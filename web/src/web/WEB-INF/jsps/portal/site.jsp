@@ -1,0 +1,1 @@
+<% application.getNamedDispatcher("AdminServlet").include(request,response); %>

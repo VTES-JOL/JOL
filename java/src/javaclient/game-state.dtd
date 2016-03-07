@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : game-state.dtd
+    Created on : September 7, 2003, 6:26 PM
+    Author     : administrator
+    Description:
+        Purpose of the document follows.
+-->
+
+<!ELEMENT game-state (name, counter, player*, region*, notation*)>
+
+<!ELEMENT name (#PCDATA)>
+
+<!ELEMENT counter (#PCDATA)>
+
+<!ELEMENT player (#PCDATA)>
+
+<!ELEMENT region (name, notation*, game-card*)>
+
+<!ELEMENT notation (name, value)>
+
+<!ELEMENT value (#PCDATA)>
+
+<!ELEMENT game-card (id, cardid, notation*)>

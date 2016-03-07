@@ -1,0 +1,34 @@
+
+<application>
+  <display-name>JOL3</display-name>
+  <module>
+    <web>
+       <web-uri>
+          dsorig.war
+       </web-uri>
+       <context-root>
+          /jol3
+       </context-root>
+    </web>
+  </module>
+  <module>
+    <web>
+       <web-uri>
+          dsweb.war
+       </web-uri>
+       <context-root>
+          /jol4
+       </context-root>
+    </web>
+  </module>
+  <module>
+    <web>
+       <web-uri>
+          dsdoc.war
+       </web-uri>
+       <context-root>
+          /doc
+       </context-root>
+    </web>
+  </module>
+</application>

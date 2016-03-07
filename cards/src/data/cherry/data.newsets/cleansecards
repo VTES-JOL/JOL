@@ -1,0 +1,8 @@
+#!/bin/csh -f
+
+set cardset=$1
+
+#cat $cardset.base | sed 's/{/(/g' | sed 's/}/)/g' | sed 's/</(/g' | sed 's/>/)/g' > base.txt
+echo "" >> base.txt
+sed 's/ \[...\]$//' $cardset.base | sed 's/{/(/g' | sed 's/}/)/g' | sed 's/</(/g' | sed 's/>/)/g' > base.txt
+echo "" >> base.txt
