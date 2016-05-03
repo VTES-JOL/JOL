@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<JavaBean xmlns="http://xmlns.oracle.com/adfm/beanmodel" version="10.1.3.36.84"
+          id="SGame" BeanClass="nbclient.model.state.SGame"
+          Package="nbclient.model.state" isJavaBased="true">
+  <Attribute Name="name" IsUpdateable="0" Type="java.lang.String"/>
+  <AccessorAttribute id="players" IsCollection="true" Type="java.lang.String[]"
+                     RemoveMethod="removeString" AddMethod="addString"
+                     CollectionBeanClass="UpdateableCollection">
+    <Properties>
+      <Property Name="RemoveMethod" Value="removeString"/>
+      <Property Name="AddMethod" Value="addString"/>
+    </Properties>
+    <Attribute Name="element" Type="java.lang.String"/>
+  </AccessorAttribute>
+  <MethodAccessor IsCollection="false" Type="nbclient.model.state.SCard"
+                  BeanClass="nbclient.model.state.SCard" id="getCard"
+                  ReturnNodeName="nbclient.model.state.SCard">
+    <ParameterInfo id="id" Type="java.lang.String" isStructured="false"/>
+  </MethodAccessor>
+  <MethodAccessor IsCollection="false" Type="nbclient.model.state.SLocation"
+                  BeanClass="nbclient.model.state.SLocation" id="getLocation"
+                  ReturnNodeName="nbclient.model.state.SLocation">
+    <ParameterInfo id="regionName" Type="java.lang.String"
+                   isStructured="false"/>
+  </MethodAccessor>
+  <MethodAccessor IsCollection="false" Type="nbclient.model.state.SLocation"
+                  BeanClass="nbclient.model.state.SLocation"
+                  id="getPlayerLocation"
+                  ReturnNodeName="nbclient.model.state.SLocation">
+    <ParameterInfo id="player" Type="java.lang.String" isStructured="false"/>
+    <ParameterInfo id="regionName" Type="java.lang.String"
+                   isStructured="false"/>
+  </MethodAccessor>
+  <MethodAccessor IsCollection="true" Type="nbclient.model.state.SLocation"
+                  BeanClass="nbclient.model.state.SLocation"
+                  id="getPlayerLocations"
+                  ReturnNodeName="nbclient.model.state.SLocation"
+                  CollectionBeanClass="UpdateableCollection">
+    <ParameterInfo id="player" Type="java.lang.String" isStructured="false"/>
+  </MethodAccessor>
+  <MethodAccessor IsCollection="false" Type="java.lang.String"
+                  id="getPlayerRegionName" ReturnNodeName="Return">
+    <ParameterInfo id="location" Type="nbclient.model.state.SLocation"
+                   isStructured="true"/>
+  </MethodAccessor>
+  <MethodAccessor IsCollection="false"
+                  Type="nbclient.model.state.SCardContainer"
+                  BeanClass="nbclient.model.state.SCardContainer"
+                  id="getRegionFromCard"
+                  ReturnNodeName="nbclient.model.state.SCardContainer">
+    <ParameterInfo id="card" Type="nbclient.model.state.SCard"
+                   isStructured="true"/>
+  </MethodAccessor>
+</JavaBean>

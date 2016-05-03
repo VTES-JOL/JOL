@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<JavaBean xmlns="http://xmlns.oracle.com/adfm/beanmodel" version="10.1.3.36.84"
+          id="GameAction" BeanClass="nbclient.model.GameAction"
+          Package="nbclient.model" isJavaBased="true">
+  <Attribute Name="sequence" IsUpdateable="0" Type="int"/>
+  <Attribute Name="text" IsUpdateable="0" Type="java.lang.String"/>
+  <Attribute Name="command" IsUpdateable="0" Type="boolean"/>
+  <MethodAccessor IsCollection="true" Type="java.lang.String[]" id="command"
+                  ReturnNodeName="java.lang.String"
+                  CollectionBeanClass="UpdateableCollection">
+    <Attribute Name="element" Type="java.lang.String"/>
+  </MethodAccessor>
+  <MethodAccessor IsCollection="false" Type="java.lang.String" id="toString"
+                  ReturnNodeName="Return"/>
+</JavaBean>
