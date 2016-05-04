@@ -14,7 +14,6 @@ import cards.model.CardSet;
 import cards.model.Deck;
 import deckserver.util.AdminFactory;
 import deckserver.util.DeckParams;
-import deckserver.util.MailUtil;
 import deckserver.util.WebParams;
 
 import javax.servlet.ServletException;
@@ -126,7 +125,6 @@ public class DeckServlet extends GameServlet {
             getServletContext().getRequestDispatcher("/WEB-INF/jsps/admin/deckconstruction.jsp").include(request, response);
         } catch (Throwable t) {
             String msg = "Error in deck " + deckname + " for player " + player;
-            MailUtil.sendError(params, msg, t);
             throw new IOException(msg, t);
         }
         out.close();

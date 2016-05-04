@@ -5,7 +5,6 @@ import cards.local.NormalizeDeckFactory;
 import cards.model.CardSearch;
 import deckserver.rich.GameModel;
 import deckserver.rich.PlayerModel;
-import deckserver.util.MailUtil;
 import nbclient.vtesmodel.JolAdminFactory;
 
 public class DeckSummaryBean {
@@ -42,7 +41,6 @@ public class DeckSummaryBean {
             crypt = 0;
             groups = "ERROR";
             String msg = "Error in deck " + name + " for player " + player;
-            MailUtil.sendError(msg, t);
         }
     }
 

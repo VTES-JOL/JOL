@@ -3,8 +3,9 @@ package deckserver.dwr;
 import deckserver.rich.AdminBean;
 import deckserver.rich.PlayerModel;
 import deckserver.util.AdminFactory;
-import deckserver.util.Logger;
 import nbclient.vtesmodel.JolAdminFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -17,11 +18,7 @@ import java.util.Date;
 public class Utils {
 
     static final DateFormat format = new SimpleDateFormat("HH:mm M/d ");
-    private static Logger log = Logger.getLogger(Utils.class);
-
-    {
-        Logger.activateLog("Utils");
-    }
+    private static Logger log = LoggerFactory.getLogger(Utils.class);
 
     public static String getGameName(HttpServletRequest request) {
         if (true) { // workaround until beta period is over.
@@ -63,7 +60,7 @@ public class Utils {
         AdminBean abean = AdminFactory.getBean(ctx);
         String player = (String) request.getSession().getAttribute("meth");
         String login = request.getParameter("login");
-        log.log("Get request " + request.getRequestURI() + " with " + player + " and " + login);
+        log.info("Get request " + request.getRequestURI() + " with " + player + " and " + login);
         if (login != null) {
             if (login.equals("Log in")) {
                 player = request.getParameter("dsuserin");

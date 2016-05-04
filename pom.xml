@@ -27,12 +27,6 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>1.4.5</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.21</version>
@@ -54,16 +48,6 @@
                 <version>2.2</version>
                 <configuration>
                     <path>/jol3</path>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.btmatthews.maven.plugins</groupId>
-                <artifactId>emailserver-maven-plugin</artifactId>
-                <version>1.1.1</version>
-                <configuration>
-                    <portOffset>1000</portOffset>
-                    <monitorKey>emailserver</monitorKey>
-                    <monitorPort>10025</monitorPort>
                 </configuration>
             </plugin>
         </plugins>

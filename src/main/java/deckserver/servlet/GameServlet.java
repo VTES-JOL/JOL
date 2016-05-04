@@ -7,7 +7,6 @@
 package deckserver.servlet;
 
 import deckserver.util.AdminFactory;
-import deckserver.util.MailUtil;
 import deckserver.util.WebParams;
 import nbclient.vtesmodel.JolAdminFactory;
 
@@ -69,7 +68,6 @@ public abstract class GameServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace(System.err);
             params.addStatusMsg("Server error, please contact server administrator.");
-            MailUtil.sendError(params, e);
             gotoMain(request, response);
         }
     }

@@ -5,7 +5,6 @@ import cards.local.NormalizeDeckFactory;
 import cards.model.CardEntry;
 import deckserver.servlet.DeckServlet;
 import deckserver.util.DeckParams;
-import deckserver.util.MailUtil;
 import nbclient.vtesmodel.JolAdminFactory;
 import uk.ltd.getahead.dwr.WebContextFactory;
 import util.Shuffle;
@@ -81,7 +80,6 @@ public class DeckEditBean {
             }
         } catch (Exception e) {
             String msg = "Error in deck " + name + " for player " + player;
-            MailUtil.sendError(msg, e);
             format = "Error parsing deck.";
         }
         lib = nd.getLibSize();

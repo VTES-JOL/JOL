@@ -11,21 +11,17 @@ import deckserver.rich.GameModel;
 import deckserver.rich.GameView;
 import deckserver.rich.PlayerModel;
 import deckserver.util.AdminFactory;
-import deckserver.util.Logger;
-import deckserver.util.MailUtil;
 import nbclient.model.GameAction;
 import nbclient.vtesmodel.JolAdminFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webclient.state.InteractiveAdmin;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 public class DeckserverRemote implements DSRemote {
-//	private static Logger log = Logger.getLogger(DeckserverRemote.class);
-
-    static {
-        Logger.activateLog("DeckserverRemote");
-    }
+	private static Logger log = LoggerFactory.getLogger(DeckserverRemote.class);
 
     private final AdminBean abean;
     ContextProvider provider;
@@ -112,7 +108,6 @@ public class DeckserverRemote implements DSRemote {
         JolAdminFactory admin = JolAdminFactory.INSTANCE;
         if (admin.getOwner(game).equals(player) && admin.isOpen(game)) {
             admin.startGame(game);
-            MailUtil.sendStartMsg(admin.getGame(game));
             getModel(game).firstPing();
         }
         abean.notifyAboutGame(game);

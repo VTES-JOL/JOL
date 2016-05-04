@@ -1,8 +1,9 @@
 package deckserver.rich;
 
 import deckserver.dwr.bean.DeckSummaryBean;
-import deckserver.util.MailUtil;
 import nbclient.vtesmodel.JolAdminFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -18,6 +19,7 @@ public class PlayerModel implements Comparable {
     private DeckSummaryBean[] decks = null;
     private Collection<String> removedGames = new ArrayList<String>(2);
     private Collection<String> changedGames = new ArrayList<String>();
+    private static Logger logger = LoggerFactory.getLogger(PlayerModel.class);
 
     public PlayerModel(AdminBean abean, String name, List<String> chatin) {
         this.player = name;
@@ -129,8 +131,7 @@ public class PlayerModel implements Comparable {
                 try {
                     c.add(new DeckSummaryBean(this, names[i]));
                 } catch (Throwable t) {
-                    MailUtil.sendError("DeckSummaryBean Error for " + player +
-                            " and deck " + names[i], t);
+                    logger.error("DeckSummaryBean Error for " + player + " and deck " + names[i], t);
                 }
 
             }

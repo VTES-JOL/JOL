@@ -2,10 +2,10 @@ package deckserver.rich;
 
 import deckserver.dwr.bean.SummaryBean;
 import deckserver.util.AdminFactory;
-import deckserver.util.Logger;
-import deckserver.util.MailUtil;
 import nbclient.vtesmodel.JolAdminFactory;
 import nbclient.vtesmodel.JolGame;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ltd.getahead.dwr.WebContextFactory;
 import webclient.state.DoCommand;
 
@@ -16,13 +16,7 @@ import java.util.*;
 public class GameModel implements Comparable {
 
     public static final long TIMEOUT_INTERVAL = 600000;
-    //	private static Logger log = Logger.getLogger(GameModel.class);
-    private static Logger cmdlog = new Logger("commands");
-
-    static {
-        Logger.activateLog("GameModel");
-        Logger.activateLog("commands");
-    }
+    private static Logger log = LoggerFactory.getLogger(GameModel.class);
 
     private String globalOwner = null;
     private String name;
@@ -94,7 +88,6 @@ public class GameModel implements Comparable {
                 String email = admin.getEmail(ping);
                 game.setPingTag(ping);
                 pingChanged = true;
-                status.append(MailUtil.ping(game.getName(), email));
             }
             if (phase != null &&
                     game.getActivePlayer().equals(player)
@@ -119,7 +112,7 @@ public class GameModel implements Comparable {
                     StringTokenizer st = new StringTokenizer(command, ";");
                     while (st.hasMoreTokens()) {
                         String cmd = st.nextToken();
-                        cmdlog.log("Command " + name + " " + player + ":" + cmd);
+                        log.info("Command " + name + " " + player + ":" + cmd);
                         try {
                             status.append(commander.doCommand(player, tokenize(cmd)));
                         } catch (Exception e) {
@@ -140,17 +133,10 @@ public class GameModel implements Comparable {
             if ((game.getActivePlayer().equals(player)
                     || admin.getOwner(game.getName()).equals(player))
                     && "Yes".equalsIgnoreCase(endTurn)) {
-                try {
-                    MailUtil.sendTurn(game);
-                } catch (Error e) {
-                    status.append("Turn email failed.");
-                }
                 game.newTurn();
                 resetChats();
                 idx = 0; // reset the current action index for the new turn.
-                String email = admin.getEmail(game.getActivePlayer());
                 try {
-                    MailUtil.ping(game.getName(), email);
                     game.setPingTag(game.getActivePlayer());
                 } catch (Error e) {
                     status.append("Turn ping failed.");
@@ -172,7 +158,6 @@ public class GameModel implements Comparable {
         JolGame game = admin.getGame(name);
         String email = admin.getEmail(game.getActivePlayer());
         game.setPingTag(game.getActivePlayer());
-        MailUtil.ping(game.getName(), email);
     }
 
     private void addChats(int idx) {

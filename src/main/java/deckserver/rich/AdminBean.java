@@ -1,7 +1,8 @@
 package deckserver.rich;
 
-import deckserver.util.Logger;
 import nbclient.vtesmodel.JolAdminFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webclient.state.JolAdmin;
 
 import java.util.*;
@@ -10,13 +11,9 @@ import java.util.*;
 public class AdminBean {
 
     public static AdminBean INSTANCE = null;
-    private static Logger log = Logger.getLogger(AdminBean.class);
+    private static Logger log = LoggerFactory.getLogger(AdminBean.class);
     private static int CHAT_STORAGE = 1000;
     private static int CHAT_DISCARD = 100;
-
-    static {
-        Logger.activateLog("AdminBean");
-    }
 
     private Map<String, GameModel> gmap = new HashMap<String, GameModel>();
     private Map<String, PlayerModel> pmap = new HashMap<String, PlayerModel>();
@@ -74,7 +71,7 @@ public class AdminBean {
         if (bean == null) {
             bean = new PlayerModel(this, name, chats);
             if (name != null) {
-                log.log("Creating a model for " + name);
+                log.info("Creating a model for " + name);
                 pmap.put(name, bean);
                 mkWho();
             }
@@ -108,7 +105,7 @@ public class AdminBean {
                     ) {
                 i.next().resetView(player);
             }
-            log.log("Removing " + player + " from admin");
+            log.info("Removing " + player + " from admin");
             mkWho();
         }
     }
