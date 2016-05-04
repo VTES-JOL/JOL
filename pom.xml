@@ -19,6 +19,19 @@
             <artifactId>dwr</artifactId>
             <version>1.30.2.10</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.netbeans</groupId>
+            <artifactId>schema2beans</artifactId>
+            <version>1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.5</version>
+        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
