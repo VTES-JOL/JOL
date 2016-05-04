@@ -1,1 +1,1 @@
-<jsp:include page="/doc/commands.html"/>
+<jsp:include page="/commands.html"/>

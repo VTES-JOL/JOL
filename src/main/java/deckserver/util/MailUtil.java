@@ -46,8 +46,9 @@ public class MailUtil {
     public static Session getSession() {
         if (mySession != null) {
             Properties props = new Properties();
-            props.put("mail.smtp.host", "mark.bch.net");
-            mySession = Session.getInstance(props);
+            props.put("mail.smtp.host", "localhost");
+            props.put("mail.smtp.port", "1025");
+            mySession = Session.getDefaultInstance(props);
         }
         return mySession;
     }

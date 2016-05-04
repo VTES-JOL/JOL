@@ -50,7 +50,7 @@ public class AdminBean {
         if (JolAdminFactory.INSTANCE == null) {
             try {
                 JolAdminFactory.INSTANCE =
-                        new JolAdmin("/home/deckserv/interactive/data");
+                        new JolAdmin("/Users/shannon/IdeaProjects/jol-legacy/src/main/resources");
             } catch (Exception e) {
                 e.printStackTrace(System.err);
             }

@@ -10,7 +10,7 @@
 
     <context-param>
         <param-name>directory</param-name>
-        <param-value>/home/deckserv/interactive/data</param-value>
+        <param-value>/Users/shannon/IdeaProjects/jol-legacy/src/main/resources</param-value>
     </context-param>
 
     <context-param>
@@ -157,6 +157,11 @@
     <servlet-mapping>
         <servlet-name>default</servlet-name>
         <url-pattern>/ds.js</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/commands.html</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

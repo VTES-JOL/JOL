@@ -33,6 +33,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.0.1</version>
@@ -41,6 +47,26 @@
     </dependencies>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <path>/jol3</path>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.btmatthews.maven.plugins</groupId>
+                <artifactId>emailserver-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <configuration>
+                    <portOffset>1000</portOffset>
+                    <monitorKey>emailserver</monitorKey>
+                    <monitorPort>10025</monitorPort>
+                </configuration>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>

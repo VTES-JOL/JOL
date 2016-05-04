@@ -62,7 +62,7 @@ public class JolAdmin extends JolAdminFactory {
     public static void main(String[] argv) throws Throwable {
         CardUtil.setShow(true);
         System.out.println("cards");
-        INSTANCE = new JolAdmin("/home/deckserv/interactive/data");
+        INSTANCE = new JolAdmin("/Users/shannon/IdeaProjects/jol-legacy/src/main/resources");
         System.out.println(INSTANCE.getBaseCards().getAllCards().getCardArray()[0].getName());
     }
 

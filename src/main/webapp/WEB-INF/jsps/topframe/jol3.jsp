@@ -56,7 +56,7 @@
         </div>
 
         <div id="help" style="display :none;">
-            <iframe width="100%" height="100%" src="/doc/commands.html">
+            <iframe width="100%" height="100%" src="${pageContext.request.contextPath}/commands.html">
             </iframe>
         </div>
     </div>

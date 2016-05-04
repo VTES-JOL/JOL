@@ -18,7 +18,7 @@
     Welcome to JOL-3, the lastest version of Jyhad-OnLine. This version is fully interactive,
     as all commands are available through the web site, making it possible to play real-time games
     across the network with only a browser for a client. The new JOL
-    command <a href="/doc/commands.html">set</a> is streamlined and hopefully
+    command <a href="/commands.html">set</a> is streamlined and hopefully
     more useful.
 <p>
     The first tournament of 2005 is ongoing, see the tourney <a

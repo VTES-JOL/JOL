@@ -37,7 +37,7 @@
     }
     function openHelpWin() // Open command help window
     {
-        var URL = '/doc/commands.html';
+        var URL = '/commands.html';
         openWinImpl(URL, "help");
     }
     function details(thistag) // Toggle region details on/off
