@@ -7,15 +7,14 @@
 package nbclient.model;
 
 /**
- *
- * @author  administrator
+ * @author administrator
  */
 public interface Note {
-    
+
     public String getName();
-    
+
     public String getValue();
-    
+
     public void setValue(String value);
-    
+
 }

@@ -20,7 +20,7 @@ public class AdminPageBean {
             if (admin.getOwner(names[i]).equals(player)) {
                 if (admin.isOpen(names[i])) {
                     games.put(names[i], new RegistrationSummaryBean(abean, names[i]));
-                } else if (!admin.isFinished(names[i])){
+                } else if (!admin.isFinished(names[i])) {
                     c.add(names[i]);
                 }
             }

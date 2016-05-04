@@ -4,9 +4,9 @@ import java.util.Date;
 
 public class ChatModel {
 
+    private static int BUFFER_SIZE = 100;
     private String[] queue = new String[BUFFER_SIZE];
     private int idx = 0;
-    private static int BUFFER_SIZE = 100;
     private Date timestamp = new Date();
 
     public synchronized void addMessage(String msg) {
@@ -15,7 +15,7 @@ public class ChatModel {
         idx++;
         timestamp = new Date();
     }
-    
+
     public long getTimestamp() {
         return timestamp.getTime();
     }
@@ -42,6 +42,6 @@ public class ChatModel {
         }
         return ret;
     }
-    
+
 }
 

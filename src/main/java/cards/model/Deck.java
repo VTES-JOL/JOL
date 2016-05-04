@@ -7,20 +7,19 @@
 package cards.model;
 
 /**
- *
- * @author  administrator
+ * @author administrator
  */
 public interface Deck {
-    
+
     public CardEntry[] getCards();
-    
+
     public void addCard(CardEntry card);
-    
+
     public int getQuantity(CardEntry card);
-    
+
     public void setQuantity(CardEntry card, int quantity);
-    
+
     public void removeCard(CardEntry card);
-    
+
     public void removeAllCards();
 }

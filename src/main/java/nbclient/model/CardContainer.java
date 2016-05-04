@@ -7,15 +7,14 @@
 package nbclient.model;
 
 /**
- *
- * @author  administrator
+ * @author administrator
  */
 public interface CardContainer extends nbclient.model.state.SCardContainer {
-    
+
     public void addCard(Card card, boolean first);
-    
+
     public void removeCard(Card card);
 
-	public void setCards(Card[] cards);
-    
+    public void setCards(Card[] cards);
+
 }

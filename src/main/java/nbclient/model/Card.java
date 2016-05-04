@@ -7,9 +7,8 @@
 package nbclient.model;
 
 /**
- *
- * @author  administrator
+ * @author administrator
  */
 public interface Card extends NoteTaker, nbclient.model.state.SCard, CardContainer {
-    
+
 }

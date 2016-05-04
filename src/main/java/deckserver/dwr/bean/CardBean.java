@@ -4,25 +4,25 @@ import cards.model.CardEntry;
 
 public final class CardBean {
 
-	private final String id;
-	private final String name;
-	private final String[] text;
-	
-	public CardBean(CardEntry card) {
-		id = card.getCardId();
-		name = card.getName();
-		text = card.getFullText();
-	}
+    private final String id;
+    private final String name;
+    private final String[] text;
 
-	public String getId() {
-		return id;
-	}
+    public CardBean(CardEntry card) {
+        id = card.getCardId();
+        name = card.getName();
+        text = card.getFullText();
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public String[] getText() {
-		return text;
-	}
+    public String getName() {
+        return name;
+    }
+
+    public String[] getText() {
+        return text;
+    }
 }

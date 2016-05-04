@@ -17,253 +17,242 @@ import java.util.HashSet;
 
 public class GameView {
 
-	private String name;
+    boolean stateChanged = true;
+    boolean phaseChanged = true;
+    boolean pingChanged = true;
+    boolean globalChanged = true;
+    boolean turnChanged = true;
+    boolean resetChat = true;
+    private String name;
+    private String player;
+    private boolean isPlayer = false;
+    private boolean isAdmin = false;
+    private Collection<String> chats = new ArrayList<String>();
+    private Collection<String> collapsed = new HashSet<String>();
 
-	private String player;
+    public GameView(String name, String player) {
+        this.name = name;
+        this.player = player;
+        init();
+    }
 
-	private boolean isPlayer = false;
+    private void init() {
+        JolAdminFactory admin = JolAdminFactory.INSTANCE;
+        JolGame game = admin.getGame(name);
+        GameAction[] actions = game.getActions(game.getCurrentTurn());
+        for (int i = 0; i < actions.length; i++) {
+            addChat(actions[i].getText());
+        }
+        String[] players = game.getPlayers();
+        for (int i = 0; i < players.length; ) {
+            boolean active = players[i].equals(player);
+            if (active)
+                isPlayer = true;
+            boolean ousted = game.getPool(players[i]) < 1;
+            i++;
+            collapsed.add("t" + i);
+            collapsed.add("a" + i);
+            if (ousted) {
+                collapsed.add("r" + i);
+            }
+            if (!active || ousted) {
+                collapsed.add("i" + i);
+            }
+        }
+        if (!isPlayer
+                && (admin.isSuperUser(player) || admin.getOwner(name).equals(
+                player)))
+            isAdmin = true;
+    }
 
-	private boolean isAdmin = false;
+    public synchronized GameBean create() {
+        JolAdminFactory admin = JolAdminFactory.INSTANCE;
+        HttpServletRequest request = WebContextFactory.get()
+                .getHttpServletRequest();
+        JolGame game = admin.getGame(name);
 
-	boolean stateChanged = true;
+        if (isPlayer) {
+            admin.recordAccess(name, player);
+        }
 
-	private Collection<String> chats = new ArrayList<String>();
+        int refresh = -1;
 
-	boolean phaseChanged = true;
+        if (player != null && admin.doInteractive(player)) {
+            Date stamp = admin.getGameTimeStamp(name);
+            refresh = RefreshInterval.calc(stamp);
+        }
 
-	boolean pingChanged = true;
+        String[] pingvalues = null;
+        String[] pingkeys = null;
+        String hand = null;
+        String global = null;
+        String text = null;
+        String label = null;
+        String[] turn = null;
+        String[] turns = null;
+        String state = null;
+        String[] phases = null;
+        String[] collapsed = null;
 
-	boolean globalChanged = true;
+        if (pingChanged && (isPlayer || isAdmin)) {
+            pingvalues = game.getPlayers();
+            pingkeys = new String[pingvalues.length];
+            for (int i = 0; i < pingvalues.length; i++) {
+                pingkeys[i] = pingvalues[i] + "("
+                        + game.getPingTag(pingvalues[i]) + ")";
+            }
+        }
 
-	private Collection<String> collapsed = new HashSet<String>();
+        if (isPlayer && stateChanged) {
+            try {
+                HandParams h = new HandParams(game, player, "red", "Hand",
+                        JolGame.HAND);
+                request.setAttribute("hparams", h);
+                request.setAttribute("game", game);
+                hand = WebContextFactory.get().forwardToString(
+                        "/WEB-INF/jsps/dwr/hand.jsp");
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
+                hand = "Error retrieving hand.";
+            }
+        }
 
-	boolean turnChanged = true;
+        if (globalChanged) {
+            global = game.getGlobalText();
+            if (isPlayer)
+                text = game.getPlayerText(player);
+        }
 
-	boolean resetChat = true;
+        if (phaseChanged) {
+            label = game.getCurrentTurn() + " " + game.getPhase();
+        }
 
-	public GameView(String name, String player) {
-		this.name = name;
-		this.player = player;
-		init();
-	}
+        if (chats.size() > 0) {
+            turn = (String[]) chats.toArray(new String[0]);
+        }
 
-	private void init() {
-		JolAdminFactory admin = JolAdminFactory.INSTANCE;
-		JolGame game = admin.getGame(name);
-		GameAction[] actions = game.getActions(game.getCurrentTurn());
-		for (int i = 0; i < actions.length; i++) {
-			addChat(actions[i].getText());
-		}
-		String[] players = game.getPlayers();
-		for (int i = 0; i < players.length;) {
-			boolean active = players[i].equals(player);
-			if (active)
-				isPlayer = true;
-			boolean ousted = game.getPool(players[i]) < 1;
-			i++;
-			collapsed.add("t" + i);
-			collapsed.add("a" + i);
-			if (ousted) {
-				collapsed.add("r" + i);
-			}
-			if (!active || ousted) {
-				collapsed.add("i" + i);
-			}
-		}
-		if (!isPlayer
-				&& (admin.isSuperUser(player) || admin.getOwner(name).equals(
-						player)))
-			isAdmin = true;
-	}
+        if (turnChanged) {
+            resetChat = true;
+            String[] tmpturns = game.getTurns();
+            turns = new String[tmpturns.length];
+            for (int i = 0, j = turns.length; i < turns.length; i++)
+                turns[i] = tmpturns[--j];
+        }
 
-	public synchronized GameBean create() {
-		JolAdminFactory admin = JolAdminFactory.INSTANCE;
-		HttpServletRequest request = WebContextFactory.get()
-				.getHttpServletRequest();
-		JolGame game = admin.getGame(name);
+        if (stateChanged) {
+            try {
+                request.setAttribute("game", game);
+                state = WebContextFactory.get().forwardToString(
+                        "/WEB-INF/jsps/dwr/state.jsp");
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
+                hand = "Error retrieving state.";
+            }
+        }
 
-		if (isPlayer) {
-			admin.recordAccess(name, player);
-		}
+        // pending use phaseChanged here?
+        if (isPlayer && game.getActivePlayer().equals(player)) {
+            boolean show = false;
+            Collection<String> c = new ArrayList<String>();
+            String phase = game.getPhase();
+            for (int i = 0; i < JolGame.TURN_PHASES.length; i++) {
+                if (phase.equals(JolGame.TURN_PHASES[i]))
+                    show = true;
+                if (show)
+                    c.add(JolGame.TURN_PHASES[i]);
+            }
+            phases = c.toArray(new String[0]);
+        }
 
-		int refresh = -1;
+        if (stateChanged) {
+            collapsed = getCollapsed();
+        }
 
-		if (player != null && admin.doInteractive(player)) {
-			Date stamp = admin.getGameTimeStamp(name);
-			refresh = RefreshInterval.calc(stamp);
-		}
+        boolean chatReset = resetChat;
+        boolean tc = turnChanged;
+        clearAccess();
+        String stamp = Utils.getDate();
+        return new GameBean(isPlayer, isAdmin, refresh, hand, global, text, label,
+                chatReset, tc, turn, turns, state, phases, pingkeys, pingvalues,
+                collapsed, stamp);
+    }
 
-		String[] pingvalues = null;
-		String[] pingkeys = null;
-		String hand = null;
-		String global = null;
-		String text = null;
-		String label = null;
-		String[] turn = null;
-		String[] turns = null;
-		String state = null;
-		String[] phases = null;
-		String[] collapsed = null;
+    public synchronized void clearAccess() {
+        globalChanged = phaseChanged = stateChanged = pingChanged = turnChanged = false;
+        chats.clear();
+        resetChat = false;
+    }
 
-		if (pingChanged && (isPlayer || isAdmin)) {
-			pingvalues = game.getPlayers();
-			pingkeys = new String[pingvalues.length];
-			for (int i = 0; i < pingvalues.length; i++) {
-				pingkeys[i] = pingvalues[i] + "("
-						+ game.getPingTag(pingvalues[i]) + ")";
-			}
-		}
+    public synchronized void globalChanged() {
+        globalChanged = true;
+    }
 
-		if (isPlayer && stateChanged) {
-			try {
-				HandParams h = new HandParams(game, player, "red", "Hand",
-						JolGame.HAND);
-				request.setAttribute("hparams", h);
-				request.setAttribute("game", game);
-				hand = WebContextFactory.get().forwardToString(
-						"/WEB-INF/jsps/dwr/hand.jsp");
-			} catch (Exception e) {
-				e.printStackTrace(System.err);
-				hand = "Error retrieving hand.";
-			}
-		}
+    public synchronized void phaseChanged() {
+        phaseChanged = true;
+    }
 
-		if (globalChanged) {
-			global = game.getGlobalText();
-			if (isPlayer)
-				text = game.getPlayerText(player);
-		}
+    public synchronized void stateChanged() {
+        stateChanged = true;
+    }
 
-		if (phaseChanged) {
-			label = game.getCurrentTurn() + " " + game.getPhase();
-		}
+    public synchronized void pingChanged() {
+        pingChanged = true;
+    }
 
-		if (chats.size() > 0) {
-			turn = (String[]) chats.toArray(new String[0]);
-		}
+    public String[] getCollapsed() {
+        return (String[]) collapsed.toArray(new String[0]);
+    }
 
-		if (turnChanged) {
-			resetChat = true;
-			String[] tmpturns = game.getTurns();
-			turns = new String[tmpturns.length];
-			for (int i = 0, j = turns.length; i < turns.length; i++)
-				turns[i] = tmpturns[--j];
-		}
+    public void toggleCollapsed(String id) {
+        if (collapsed.contains(id))
+            collapsed.remove(id);
+        else
+            collapsed.add(id);
+    }
 
-		if (stateChanged) {
-			try {
-				request.setAttribute("game", game);
-				state = WebContextFactory.get().forwardToString(
-						"/WEB-INF/jsps/dwr/state.jsp");
-			} catch (Exception e) {
-				e.printStackTrace(System.err);
-				hand = "Error retrieving state.";
-			}
-		}
+    public long getTimestamp() {
+        if (isPlayer) {
+            return JolAdminFactory.INSTANCE.getAccess(name, player).getTime();
+        } else {
+            return (new Date()).getTime();
+        }
+    }
 
-		// pending use phaseChanged here?
-		if (isPlayer && game.getActivePlayer().equals(player)) {
-			boolean show = false;
-			Collection<String> c = new ArrayList<String>();
-			String phase = game.getPhase();
-			for (int i = 0; i < JolGame.TURN_PHASES.length; i++) {
-				if (phase.equals(JolGame.TURN_PHASES[i]))
-					show = true;
-				if (show)
-					c.add(JolGame.TURN_PHASES[i]);
-			}
-			phases = c.toArray(new String[0]);
-		}
+    public void turnChanged() {
+        turnChanged = true;
+    }
 
-		if (stateChanged) {
-			collapsed = getCollapsed();
-		}
+    public boolean isChanged() {
+        return globalChanged || phaseChanged || stateChanged || turnChanged
+                || chats.size() > 0;
+    }
 
-		boolean chatReset = resetChat;
-		boolean tc = turnChanged;
-		clearAccess();
-		String stamp = Utils.getDate();
-		return new GameBean(isPlayer, isAdmin, refresh, hand, global, text, label,
-				chatReset, tc, turn, turns, state, phases, pingkeys, pingvalues,
-				collapsed,stamp);
-	}
-	
-	public synchronized void clearAccess() {
-		globalChanged = phaseChanged = stateChanged = pingChanged = turnChanged = false;
-		chats.clear();
-		resetChat = false;
-	}
+    public void addChat(String chat) {
+        chats.add(chat);
+    }
 
-	public synchronized void globalChanged() {
-		globalChanged = true;
-	}
+    public void reset(boolean reload) {
+        clearAccess();
+        if (reload) addChats(0);
+    }
 
-	public synchronized void phaseChanged() {
-		phaseChanged = true;
-	}
+    public void addChats(int idx) {
+        JolGame game = JolAdminFactory.INSTANCE.getGame(name);
+        GameAction[] actions = game.getActions(game.getCurrentTurn());
+        for (int i = idx; i < actions.length; i++)
+            chats.add(actions[i].getText());
+    }
 
-	public synchronized void stateChanged() {
-		stateChanged = true;
-	}
+    public String getPlayer() {
+        return player;
+    }
 
-	public synchronized void pingChanged() {
-		pingChanged = true;
-	}
+    public boolean isPlayer() {
+        return isPlayer;
+    }
 
-	public String[] getCollapsed() {
-		return (String[]) collapsed.toArray(new String[0]);
-	}
-
-	public void toggleCollapsed(String id) {
-		if (collapsed.contains(id))
-			collapsed.remove(id);
-		else
-			collapsed.add(id);
-	}
-
-	public long getTimestamp() {
-		if (isPlayer) {
-			return JolAdminFactory.INSTANCE.getAccess(name, player).getTime();
-		} else {
-			return (new Date()).getTime();
-		}
-	}
-
-	public void turnChanged() {
-		turnChanged = true;
-	}
-
-	public boolean isChanged() {
-		return globalChanged || phaseChanged || stateChanged || turnChanged
-				|| chats.size() > 0;
-	}
-
-	public void addChat(String chat) {
-		chats.add(chat);
-	}
-
-	public void reset(boolean reload) {
-		clearAccess();
-		if(reload) addChats(0);
-	}
-	
-	public void addChats(int idx) {
-		JolGame game = JolAdminFactory.INSTANCE.getGame(name);
-		GameAction[] actions = game.getActions(game.getCurrentTurn());
-		for (int i = idx; i < actions.length; i++)
-			chats.add(actions[i].getText());
-	}
-
-	public String getPlayer() {
-		return player;
-	}
-
-	public boolean isPlayer() {
-		return isPlayer;
-	}
-
-	public void reset() {
-		reset(true);
-	}
+    public void reset() {
+        reset(true);
+    }
 
 }

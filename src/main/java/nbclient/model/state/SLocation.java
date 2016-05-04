@@ -7,17 +7,16 @@
 package nbclient.model.state;
 
 /**
- *
- * @author  administrator
+ * @author administrator
  */
 public interface SLocation extends SCardContainer {
-    
+
     public String getName();
-        
+
     public SCard getCard(int index);
-    
+
     public SCard getLastCard();
-    
+
     public SCard getFirstCard();
-    
+
 }

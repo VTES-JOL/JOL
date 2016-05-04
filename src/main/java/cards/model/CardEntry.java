@@ -7,11 +7,10 @@
 package cards.model;
 
 /**
- *
- * @author  administrator
+ * @author administrator
  */
 public interface CardEntry {
-    
+
     public static String VAMPIRE = "Vampire";
     public static String IMBUED = "Imbued";
     public static String MASTER = "Master";
@@ -24,26 +23,26 @@ public interface CardEntry {
     public static String POLITICAL = "Political Action";
     public static String EQUIPMENT = "Equipment";
     public static String EVENT = "Event";
-    public static String[] types = { VAMPIRE, MASTER, ACTION, MODIFIER, REACTION,
-                                     COMBAT, ALLY, RETAINER, POLITICAL, EQUIPMENT,
-                                     EVENT, IMBUED};
-                                     
+    public static String[] types = {VAMPIRE, MASTER, ACTION, MODIFIER, REACTION,
+            COMBAT, ALLY, RETAINER, POLITICAL, EQUIPMENT,
+            EVENT, IMBUED};
+
     public String getType();
-    
+
     public String getCardId();
-    
+
     public String getName();
-    
+
     public String getBaseName();
-    
+
     public String getShortDescription();
-    
+
     public String[] getFullText();
-    
+
     public String getGroup();
-    
+
     public boolean isAdvanced();
-    
+
     public boolean isCrypt();
-    
+
 }

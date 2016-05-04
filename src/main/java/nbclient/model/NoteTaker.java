@@ -7,15 +7,14 @@
 package nbclient.model;
 
 /**
- *
- * @author  administrator
+ * @author administrator
  */
 public interface NoteTaker {
-    
+
     public Note[] getNotes();
-    
+
     public Note addNote(String name);
-    
+
     public void removeNote(Note note);
-    
+
 }

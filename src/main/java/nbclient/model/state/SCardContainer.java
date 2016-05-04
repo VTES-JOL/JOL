@@ -7,11 +7,10 @@
 package nbclient.model.state;
 
 /**
- *
- * @author  administrator
+ * @author administrator
  */
 public interface SCardContainer {
-    
+
     public SCard[] getCards();
-    
+
 }

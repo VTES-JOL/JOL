@@ -17,53 +17,53 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- *
- * @author  Joe User
- * @version
+ * @author Joe User
  */
 public class LoginServlet extends GameServlet {
-    
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -5147977537689110334L;
 
-	/** Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
+    /**
+     *
+     */
+    private static final long serialVersionUID = -5147977537689110334L;
+
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     *
+     * @param request  servlet request
      * @param response servlet response
      */
     protected void processRequest(WebParams params, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
         String player = (String) request.getSession().getAttribute("meth");
         String logout = request.getParameter("logout");
-        if(logout != null) {
+        if (logout != null) {
             player = null;
             request.getSession().removeAttribute("meth");
         }
-        if(player == null || player.equals("guest")) {
+        if (player == null || player.equals("guest")) {
             String login = request.getParameter("login");
             String pwd = request.getParameter("password");
-            if(login == null || pwd == null || !authenticate(login,pwd)) {
+            if (login == null || pwd == null || !authenticate(login, pwd)) {
                 params.addStatusMsg("Login failed");
-                doLoginPage(response,login);
-    //            request.getSession().setAttribute("meth","guest");
+                doLoginPage(response, login);
+                //            request.getSession().setAttribute("meth","guest");
                 return;
             }
             request.getSession().setAttribute("meth", login);
             request.getSession().setMaxInactiveInterval(64000);
             player = login;
         }
-        doPlayerPage(params,request,response,player);
+        doPlayerPage(params, request, response, player);
     }
-        
+
     void doLoginPage(HttpServletResponse response, String login) throws IOException {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
-        if(login != null) {
+        if (login != null) {
             out.println("Failed login for " + login);
             out.println("<hr/>");
         }
-        if(login == null) login = "";
+        if (login == null) login = "";
         out.println("<form method=post>");
         out.println("Name: <input size=20 name=login value=\"" + login + "\"/><br/>");
         out.println("Password: <input size=20 name=password type=password /><br/>");
@@ -71,10 +71,10 @@ public class LoginServlet extends GameServlet {
         out.println("</form>");
         out.close();
     }
-    
+
     void doPlayerPage(WebParams params, HttpServletRequest request, HttpServletResponse response, String login) throws ServletException, IOException {
         response.sendRedirect(params.getPrefix() + "player");
-       //getServletContext().getNamedDispatcher("PlayerServlet").forward(request,response);
+        //getServletContext().getNamedDispatcher("PlayerServlet").forward(request,response);
 /*
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
@@ -86,15 +86,16 @@ public class LoginServlet extends GameServlet {
         out.close();
  **/
     }
-    
+
     boolean authenticate(String login, String password) {
-        return AdminFactory.get(getServletContext()).authenticate(login,password);
+        return AdminFactory.get(getServletContext()).authenticate(login, password);
     }
-    
-    /** Returns a short description of the servlet.
+
+    /**
+     * Returns a short description of the servlet.
      */
     public String getServletInfo() {
         return "Log into deckserver";
     }
-    
+
 }

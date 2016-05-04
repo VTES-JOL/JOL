@@ -15,45 +15,44 @@ import java.util.Collection;
 import java.util.HashSet;
 
 /**
- *
- * @author  Joe User
+ * @author Joe User
  */
 public class PortalParams extends WebParams {
-    
+
     private static final Collection<String> pages = new HashSet<String>();
     private static final Collection<String> adminpages = new HashSet<String>();
     private static final Collection<String> sitepages = new HashSet<String>();
-    
+
     {
-        pages.addAll(Arrays.asList(new String[] {
-            "main",
-            "help",
-            "deck",
-            "user",
-            "show"
+        pages.addAll(Arrays.asList(new String[]{
+                "main",
+                "help",
+                "deck",
+                "user",
+                "show"
         }));
         adminpages.add("admin");
         sitepages.add("site");
     }
-    
+
     public PortalParams(HttpServletRequest request) {
         super(request);
     }
-    
+
     public String getPage() {
         String page = getRequest().getParameter("page");
-        if(page != null) {
-            if(pages.contains(page)) return page;
+        if (page != null) {
+            if (pages.contains(page)) return page;
             JolAdminFactory admin = JolAdminFactory.INSTANCE;
-            if(adminpages.contains(page) && admin.isAdmin(getPlayer())) {
+            if (adminpages.contains(page) && admin.isAdmin(getPlayer())) {
                 return page;
             }
-            if(sitepages.contains(page) && admin.isSuperUser(getPlayer())) {
+            if (sitepages.contains(page) && admin.isSuperUser(getPlayer())) {
                 return page;
             }
         }
-        if(getGame() != null) return "game";
+        if (getGame() != null) return "game";
         return "main";
     }
-    
+
 }

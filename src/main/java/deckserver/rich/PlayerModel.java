@@ -47,7 +47,7 @@ public class PlayerModel implements Comparable {
         Collection<String> c = new ArrayList<String>(Arrays.asList(games));
         if ( /*model.getPlayers().contains(player) && */!c.contains(game)) {
             c.add(game);
-            games = (String[])c.toArray(games);
+            games = (String[]) c.toArray(games);
         }
         if (!game.equals(this.game)) {
             abean.getGameModel(game).resetView(player);
@@ -87,13 +87,13 @@ public class PlayerModel implements Comparable {
     }
 
     public synchronized String[] getChat() {
-        String[] ret = (String[])chats.toArray(new String[0]);
+        String[] ret = (String[]) chats.toArray(new String[0]);
         chats.clear();
         return ret;
     }
 
     public int compareTo(Object arg0) {
-        return player.compareToIgnoreCase(((PlayerModel)arg0).getPlayer());
+        return player.compareToIgnoreCase(((PlayerModel) arg0).getPlayer());
     }
 
     public void setTmpDeck(String name, String deck) {
@@ -130,7 +130,7 @@ public class PlayerModel implements Comparable {
                     c.add(new DeckSummaryBean(this, names[i]));
                 } catch (Throwable t) {
                     MailUtil.sendError("DeckSummaryBean Error for " + player +
-                                       " and deck " + names[i], t);
+                            " and deck " + names[i], t);
                 }
 
             }

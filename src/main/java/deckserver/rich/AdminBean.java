@@ -11,12 +11,12 @@ public class AdminBean {
 
     public static AdminBean INSTANCE = null;
     private static Logger log = Logger.getLogger(AdminBean.class);
+    private static int CHAT_STORAGE = 1000;
+    private static int CHAT_DISCARD = 100;
+
     static {
         Logger.activateLog("AdminBean");
     }
-
-    private static int CHAT_STORAGE = 1000;
-    private static int CHAT_DISCARD = 100;
 
     private Map<String, GameModel> gmap = new HashMap<String, GameModel>();
     private Map<String, PlayerModel> pmap = new HashMap<String, PlayerModel>();
@@ -26,18 +26,6 @@ public class AdminBean {
     private List<String> chats = new ArrayList<String>();
     private Date timestamp = new Date();
     private String[] admins = new String[0];
-
-    public JolAdminFactory getAdmin() {
-        if (JolAdminFactory.INSTANCE == null) {
-            try {
-                JolAdminFactory.INSTANCE =
-                        new JolAdmin("/home/deckserv/interactive/data");
-            } catch (Exception e) {
-                e.printStackTrace(System.err);
-            }
-        }
-        return JolAdminFactory.INSTANCE;
-    }
 
     public AdminBean() {
         if (INSTANCE == null)
@@ -56,6 +44,18 @@ public class AdminBean {
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }
+    }
+
+    public JolAdminFactory getAdmin() {
+        if (JolAdminFactory.INSTANCE == null) {
+            try {
+                JolAdminFactory.INSTANCE =
+                        new JolAdmin("/home/deckserv/interactive/data");
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
+            }
+        }
+        return JolAdminFactory.INSTANCE;
     }
 
     /*  public JolAdminFactory getAdmin() {
@@ -105,7 +105,7 @@ public class AdminBean {
             model.saveDeck();
             pmap.remove(player);
             for (Iterator<GameModel> i = gmap.values().iterator(); i.hasNext();
-            ) {
+                    ) {
                 i.next().resetView(player);
             }
             log.log("Removing " + player + " from admin");
@@ -117,7 +117,7 @@ public class AdminBean {
         Collection<String> c = new TreeSet<String>(pmap.keySet());
         who = c.toArray(new String[c.size()]);
         for (Iterator i = c.iterator(); i.hasNext(); ) {
-            if (!getAdmin().isAdmin((String)i.next())) {
+            if (!getAdmin().isAdmin((String) i.next())) {
                 i.remove();
             }
         }
@@ -141,7 +141,7 @@ public class AdminBean {
         if (model.getPlayer() == null)
             return true;
         if (timestamp.getTime() - model.getTimestamp() >
-            GameModel.TIMEOUT_INTERVAL) {
+                GameModel.TIMEOUT_INTERVAL) {
             remove(model.getPlayer());
             return true;
         }
@@ -162,7 +162,7 @@ public class AdminBean {
 
     private void notifyAboutGame(String name, boolean removed) {
         for (Iterator<PlayerModel> i = pmap.values().iterator(); i.hasNext();
-        ) {
+                ) {
             PlayerModel model = i.next();
             if (removed) {
                 model.removeGame(name);

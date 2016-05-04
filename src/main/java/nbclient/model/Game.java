@@ -7,19 +7,18 @@
 package nbclient.model;
 
 /**
- *
- * @author  administrator
+ * @author administrator
  */
 public interface Game extends NoteTaker, nbclient.model.state.SGame {
-    
+
     public void setName(String name);
-    
+
     public void addPlayer(String player);
-    
+
     public void orderPlayers(String[] order);
-    
+
     public void addLocation(String regionName);
-    
+
     public void addLocation(String player, String regionName);
-    
+
 }

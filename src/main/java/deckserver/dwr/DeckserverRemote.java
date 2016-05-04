@@ -26,6 +26,8 @@ public class DeckserverRemote implements DSRemote {
     static {
         Logger.activateLog("DeckserverRemote");
     }
+
+    private final AdminBean abean;
     ContextProvider provider;
 
     public DeckserverRemote() {
@@ -36,7 +38,13 @@ public class DeckserverRemote implements DSRemote {
         this.provider = p;
         abean = AdminFactory.getBean(provider.getServletContext());
     }
-    private final AdminBean abean;
+
+    private static final String ne(String arg) {
+        if ("".equals(arg)) {
+            return null;
+        }
+        return arg;
+    }
 
     public String[] getTypes() {
         return CardEntry.types;
@@ -75,7 +83,7 @@ public class DeckserverRemote implements DSRemote {
             return JolAdminFactory.INSTANCE.dump(name);
         }
     }
-    
+
     public String dosu(String name) {
         String player = getPlayer().getPlayer();
         JolAdminFactory admin = JolAdminFactory.INSTANCE;
@@ -83,11 +91,10 @@ public class DeckserverRemote implements DSRemote {
             return "Access denied";
         } else {
             HttpServletRequest request = provider.getHttpServletRequest();
-            Utils.setPlayer(request,name);
+            Utils.setPlayer(request, name);
             return "Su to " + name;
         }
     }
-
 
     public Map<String, Object> invitePlayer(String game, String name) {
         String player = getPlayer().getPlayer();
@@ -111,10 +118,10 @@ public class DeckserverRemote implements DSRemote {
         abean.notifyAboutGame(game);
         return UpdateFactory.getUpdate(provider);
     }
-    
+
     public String unEndGame(String game) {
         String player = getPlayer().getPlayer();
-        if(JolAdminFactory.INSTANCE.isSuperUser(player)) {
+        if (JolAdminFactory.INSTANCE.isSuperUser(player)) {
             abean.unEndGame(game);
             return "Game available in beta again";
         }
@@ -182,7 +189,7 @@ public class DeckserverRemote implements DSRemote {
     }
 
     public Map<String, Object> submitForm(String gamename, String phase, String command, String chat,
-            String ping, String endTurn, String global, String text) {
+                                          String ping, String endTurn, String global, String text) {
         phase = ne(phase);
         command = ne(command);
         chat = ne(chat);
@@ -282,7 +289,7 @@ public class DeckserverRemote implements DSRemote {
     private void endGameImpl(String name) {
         System.err.println("Attempting to close " + name);
         PlayerModel player = getPlayer();
-         System.err.println(player.isSuper());
+        System.err.println(player.isSuper());
         System.err.println(abean.getGameModel(name).getOwner());
         if (player != null && (player.isSuper() || player.getPlayer().equals(abean.getGameModel(name).getOwner()))) {
             System.err.println("Closing " + name);
@@ -304,12 +311,5 @@ public class DeckserverRemote implements DSRemote {
 
     private GameModel getModel(String name) {
         return abean.getGameModel(name);
-    }
-
-    private static final String ne(String arg) {
-        if ("".equals(arg)) {
-            return null;
-        }
-        return arg;
     }
 }

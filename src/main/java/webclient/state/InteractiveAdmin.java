@@ -16,18 +16,17 @@ import java.lang.reflect.Method;
 import java.util.StringTokenizer;
 
 /**
- *
- * @author  gfinklan
+ * @author gfinklan
  */
 public class InteractiveAdmin {
-    
+
     public static String executeBlock(String block) {
         StringReader reader = new StringReader(block);
         LineNumberReader r = new LineNumberReader(reader);
         StringWriter res = new StringWriter();
         try {
             String line = "";
-            while((line = r.readLine()) != null) {
+            while ((line = r.readLine()) != null) {
                 res.write(line + " : " + execute(line));
             }
         } catch (IOException ie) {
@@ -35,35 +34,35 @@ public class InteractiveAdmin {
         }
         return res.getBuffer().toString();
     }
-    
+
     public static String execute(String line) {
         try {
             JolAdminFactory factory = JolAdminFactory.INSTANCE;
             Class<JolAdminFactory> cl = JolAdminFactory.class;
-            StringTokenizer tok = new StringTokenizer(line,",");
+            StringTokenizer tok = new StringTokenizer(line, ",");
             int argc = tok.countTokens() - 1;
             String cmd = tok.nextToken();
-            if(cmd.equals("list")) {
+            if (cmd.equals("list")) {
                 StringWriter w = new StringWriter();
                 Method[] m = cl.getMethods();
-                for(int i = 0; i < m.length; i++)
+                for (int i = 0; i < m.length; i++)
                     w.write(m[i].toString() + "\n");
                 return w.getBuffer().toString();
             }
             String[] argv = new String[argc];
             Class[] clarr = new Class[argc];
-            for(int i = 0; i < argc; i++) {
+            for (int i = 0; i < argc; i++) {
                 argv[i] = tok.nextToken();
                 clarr[i] = String.class;
             }
-            
-            Method m = cl.getMethod(cmd,clarr);
-            Object ret = m.invoke(factory,(Object[])argv);
-            if(ret instanceof Object[]) {
+
+            Method m = cl.getMethod(cmd, clarr);
+            Object ret = m.invoke(factory, (Object[]) argv);
+            if (ret instanceof Object[]) {
                 Object[] arr = (Object[]) ret;
                 String tmp = "[";
-                for(int i = 0; i < arr.length; i++) {
-                    if( i > 0) tmp += ",";
+                for (int i = 0; i < arr.length; i++) {
+                    if (i > 0) tmp += ",";
                     tmp += arr[i].toString();
                 }
                 tmp += "]";
@@ -79,5 +78,5 @@ public class InteractiveAdmin {
             return "Bad error " + t.getMessage();
         }
     }
-    
+
 }

@@ -7,20 +7,19 @@
 package nbclient.model;
 
 /**
- *
- * @author  gfink
+ * @author gfink
  */
 public interface GameAction {
-    
+
     public int getSequence();
-    
+
     public boolean isCommand();
-    
+
     public String getText();
-    
+
     public String[] command();
-    
+
     /* should be same as getText */
     public String toString();
-    
+
 }

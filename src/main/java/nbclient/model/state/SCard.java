@@ -7,17 +7,16 @@
 package nbclient.model.state;
 
 /**
- *
- * @author  administrator
+ * @author administrator
  */
 public interface SCard extends SCardContainer {
-    
+
     public String getName();
-       
+
     public SCardContainer getParent();
-        
+
     public String getId();
-    
+
     public String getCardId();
-    
+
 }

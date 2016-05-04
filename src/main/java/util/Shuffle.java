@@ -7,24 +7,23 @@
 package util;
 
 /**
- *
- * @author  gfinklan
+ * @author gfinklan
  */
 public class Shuffle extends DSRandom {
-    
+
     public static Object[] shuffle(Object[] arr, int num) {
-        if(num <= 0 || num > arr.length) num = arr.length;
-        for(int i = num; i != 0; i--) {
+        if (num <= 0 || num > arr.length) num = arr.length;
+        for (int i = num; i != 0; i--) {
             int index = getNumber(i);
-            if(index == i) index = 0;
+            if (index == i) index = 0;
             Object tmp = arr[i - 1];
             arr[i - 1] = arr[index];
             arr[index] = tmp;
         }
-        return arr;        
+        return arr;
     }
-    
+
     public static Object[] shuffle(Object[] arr) {
-        return shuffle(arr,0);
+        return shuffle(arr, 0);
     }
 }

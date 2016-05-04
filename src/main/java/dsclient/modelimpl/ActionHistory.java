@@ -7,87 +7,87 @@ import java.util.*;
 
 public class ActionHistory implements TurnRecorder {
 
-	private int counter = 1;
-	Map<String, Turn> turns = new HashMap<String, Turn>();
-	Collection<String> names = new Vector<String>();
+    Map<String, Turn> turns = new HashMap<String, Turn>();
+    Collection<String> names = new Vector<String>();
+    private int counter = 1;
 
-	public void addTurn(String meth, String label) {
-		turns.put(label,new Turn(meth,label));
-		names.add(label);
-	}
+    public void addTurn(String meth, String label) {
+        turns.put(label, new Turn(meth, label));
+        names.add(label);
+    }
 
-	public String[] getTurns() {
-		return (String[]) names.toArray(new String[0]);
-	}
+    public String[] getTurns() {
+        return (String[]) names.toArray(new String[0]);
+    }
 
-	public String getMethTurn(String label) {
-		return getTurn(label).m;
-	}
+    public String getMethTurn(String label) {
+        return getTurn(label).m;
+    }
 
-	public void addCommand(String turn, String text, String[] command) {
-		new Act(text,command,getTurn(turn));
-		}
+    public void addCommand(String turn, String text, String[] command) {
+        new Act(text, command, getTurn(turn));
+    }
 
-	public void addMessage(String turn, String text) {
-		new Act(text,getTurn(turn));
-	}
-	
-	Turn getTurn(String turn) {
-		return turns.get(turn);
-	}
+    public void addMessage(String turn, String text) {
+        new Act(text, getTurn(turn));
+    }
 
-	public GameAction[] getActions(String turn) {
-		Turn t = getTurn(turn);
-		return (GameAction[]) t.c.toArray(new GameAction[0]);
-	}
+    Turn getTurn(String turn) {
+        return turns.get(turn);
+    }
 
-	public int getCounter() {
-		return counter;
-	}
+    public GameAction[] getActions(String turn) {
+        Turn t = getTurn(turn);
+        return (GameAction[]) t.c.toArray(new GameAction[0]);
+    }
 
-	static class Turn {
-		private final String m;
-		//private final String l;
-		final LinkedList<Act> c = new LinkedList<Act>();
+    public int getCounter() {
+        return counter;
+    }
 
-		Turn(String m, String l) {
-			this.m = m;
-		//	this.l = l;
-		}
-	}
-	
-	static class Act implements GameAction {
-		
-		private final String text;
-		private final String[] command;
-		private final int index;
+    static class Turn {
+        //private final String l;
+        final LinkedList<Act> c = new LinkedList<Act>();
+        private final String m;
 
-		public Act(String text, String[] command, Turn turn) {
-			this.text = text;
-			this.command = command;
-			this.index = turn.c.size();
-			turn.c.addLast(this);
-		}
+        Turn(String m, String l) {
+            this.m = m;
+            //	this.l = l;
+        }
+    }
 
-		public Act(String text, Turn turn) {
-			this(text,null,turn);
-		}
+    static class Act implements GameAction {
 
-		public int getSequence() {
-			return index;
-		}
+        private final String text;
+        private final String[] command;
+        private final int index;
 
-		public boolean isCommand() {
-			return command == null;
-		}
+        public Act(String text, String[] command, Turn turn) {
+            this.text = text;
+            this.command = command;
+            this.index = turn.c.size();
+            turn.c.addLast(this);
+        }
 
-		public String getText() {
-			return text;
-		}
+        public Act(String text, Turn turn) {
+            this(text, null, turn);
+        }
 
-		public String[] command() {
-			return command;
-		}
-		
-	}
+        public int getSequence() {
+            return index;
+        }
+
+        public boolean isCommand() {
+            return command == null;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public String[] command() {
+            return command;
+        }
+
+    }
 }

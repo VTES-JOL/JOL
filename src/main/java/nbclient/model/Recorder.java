@@ -7,21 +7,20 @@
 package nbclient.model;
 
 /**
- *
- * @author  administrator
+ * @author administrator
  */
-public interface Recorder  {
-    
+public interface Recorder {
+
     public void addCommand(String text, String[] command);
-    
+
     public void addMessage(String text);
-    
+
     public GameAction[] getAllActions();
-    
+
     public GameAction[] getRecentActions(int count);
-    
+
     public GameAction getAction(int actionNumber);
-    
+
     public int getNumActions();
-    
+
 }

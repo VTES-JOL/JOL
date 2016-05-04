@@ -2,132 +2,132 @@ package deckserver.dwr.bean;
 
 public final class GameBean {
 
-	int refresh = -1;
+    int refresh = -1;
 
-	String hand = null;
+    String hand = null;
 
-	String global = null;
+    String global = null;
 
-	String text = null;
-	
-	String label = null;
-	
-	String[] turn = null;
+    String text = null;
 
-	String[] turns = null;
-	
-	String[] pingkeys = null;
-	
-	String[] pingvalues = null;
+    String label = null;
 
-	String state = null;
+    String[] turn = null;
 
-	String[] phases = null;
-	
-	String[] collapsed = null;
+    String[] turns = null;
 
-	private boolean admin;
-	
-	private boolean resetChat;
-	
-	private boolean turnChanged;
+    String[] pingkeys = null;
 
-	private boolean player;
+    String[] pingvalues = null;
 
-	private String stamp;
+    String state = null;
 
-	public String[] getCollapsed() {
-		return collapsed;
-	}
+    String[] phases = null;
 
-	public GameBean(boolean isPlayer, boolean isAdmin, int refresh, String hand, String global, String text,
-			String label, boolean resetChat, boolean turnChanged, String[] turn, String[] turns, String state, String[] phases,
-			String[] pingkeys, String[] pingvalues, String[] collapsed,String stamp) {
-		this(pingkeys,pingvalues,refresh);
-		this.player = isPlayer;
-		this.admin = isAdmin;
-		this.hand = hand;
-		this.global = global;
-		this.text = text;
-		this.label = label;
-		this.resetChat = resetChat;
-		this.turnChanged = turnChanged;
-		this.turn = turn;
-		this.turns = turns;
-		this.state = state;
-		this.phases = phases;
-		this.collapsed = collapsed;
-		this.stamp = stamp;
-	}
-	
-	public GameBean(String[] pingkeys, String[] pingvalues, int refresh) {
-		this.pingkeys = pingkeys;
-		this.pingvalues = pingvalues;
-		this.refresh = refresh;
-	}
+    String[] collapsed = null;
 
-	public String getHand() {
-		return hand;
-	}
+    private boolean admin;
 
-	public String getGlobal() {
-		return global;
-	}
+    private boolean resetChat;
 
-	public String[] getPhases() {
-		return phases;
-	}
+    private boolean turnChanged;
 
-	public int getRefresh() {
-		return refresh;
-	}
+    private boolean player;
 
-	public String getState() {
-		return state;
-	}
+    private String stamp;
 
-	public String getText() {
-		return text;
-	}
+    public GameBean(boolean isPlayer, boolean isAdmin, int refresh, String hand, String global, String text,
+                    String label, boolean resetChat, boolean turnChanged, String[] turn, String[] turns, String state, String[] phases,
+                    String[] pingkeys, String[] pingvalues, String[] collapsed, String stamp) {
+        this(pingkeys, pingvalues, refresh);
+        this.player = isPlayer;
+        this.admin = isAdmin;
+        this.hand = hand;
+        this.global = global;
+        this.text = text;
+        this.label = label;
+        this.resetChat = resetChat;
+        this.turnChanged = turnChanged;
+        this.turn = turn;
+        this.turns = turns;
+        this.state = state;
+        this.phases = phases;
+        this.collapsed = collapsed;
+        this.stamp = stamp;
+    }
 
-	public String[] getTurns() {
-		return turns;
-	}
+    public GameBean(String[] pingkeys, String[] pingvalues, int refresh) {
+        this.pingkeys = pingkeys;
+        this.pingvalues = pingvalues;
+        this.refresh = refresh;
+    }
 
-	public String getLabel() {
-		return label;
-	}
-	
-	public boolean getTurnChanged() {
-		return turnChanged;
-	}
-	
-	public String[] getTurn() {
-		return turn;
-	}
-	
-	public boolean isResetChat() {
-		return resetChat;
-	}
+    public String[] getCollapsed() {
+        return collapsed;
+    }
 
-	public boolean isAdmin() {
-		return admin;
-	}
+    public String getHand() {
+        return hand;
+    }
 
-	public boolean isPlayer() {
-		return player;
-	}
+    public String getGlobal() {
+        return global;
+    }
 
-	public String[] getPingkeys() {
-		return pingkeys;
-	}
+    public String[] getPhases() {
+        return phases;
+    }
 
-	public String[] getPingvalues() {
-		return pingvalues;
-	}
+    public int getRefresh() {
+        return refresh;
+    }
 
-	public String getStamp() {
-		return stamp;
-	}
+    public String getState() {
+        return state;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public String[] getTurns() {
+        return turns;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public boolean getTurnChanged() {
+        return turnChanged;
+    }
+
+    public String[] getTurn() {
+        return turn;
+    }
+
+    public boolean isResetChat() {
+        return resetChat;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public boolean isPlayer() {
+        return player;
+    }
+
+    public String[] getPingkeys() {
+        return pingkeys;
+    }
+
+    public String[] getPingvalues() {
+        return pingvalues;
+    }
+
+    public String getStamp() {
+        return stamp;
+    }
 
 }

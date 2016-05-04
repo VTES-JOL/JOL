@@ -7,13 +7,12 @@
 package nbclient.model;
 
 /**
- *
- * @author  administrator
+ * @author administrator
  */
 public interface Location extends NoteTaker, nbclient.model.state.SLocation, CardContainer {
-    
+
     public void initCards(String[] cardIds);
-    
+
     public void shuffle(int num);
-    
+
 }

@@ -7,11 +7,10 @@
 package cards.model;
 
 /**
- *
- * @author  administrator
+ * @author administrator
  */
 public interface CardSet {
-    
+
     public CardEntry[] getCardArray();
-    
+
 }

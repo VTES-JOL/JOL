@@ -1,8 +1,7 @@
 package deckserver.rich;
 
 public class ChatView {
-	
-	
+
 
     private int chatIndex = 0;
     
@@ -12,46 +11,46 @@ public class ChatView {
         CoreInputText chat = bean.getChat();
        // chat.
     } */
-    
+
     public boolean isUptoDate() {
-    	return true;
+        return true;
 //        return getChatBean().getIndex() == chatIndex;
     }
-    
+
     public String getMessage() {
         return "";
     }
-    
+
     public void setMessage(String msg) {
- //       getChatBean().addMessage(msg);
+        //       getChatBean().addMessage(msg);
         resetMessage();
         doUpdate();
     }
-    
+
     // hacked up hack to get around the non-incrementality of the components.
     public String getMessages() {
         ChatModel chat = null;//getChatBean();
         chatIndex = chat.getIndex();
-        String[] msgs = chat.getMessagesForIndexes(0,chatIndex);
+        String[] msgs = chat.getMessagesForIndexes(0, chatIndex);
         StringBuffer ret = new StringBuffer();
-        for(int i = 0; i < msgs.length; i++) {
+        for (int i = 0; i < msgs.length; i++) {
             ret.append(msgs[i]);
             ret.append("\n");
         }
         return ret.toString();
     }
-    
+
     private void resetMessage() {
      /*   Home bean = (Home) getValueBinding("#{backing_home}");  
         bean.getChatInput().resetValue();*/
     }
-    
+
     private void doUpdate() {
 //        Home bean = (Home) getValueBinding("#{backing_home}");  
 //        CoreInputHidden trigger = bean.getChatTrigger();
 //        trigger.queueEvent(new ValueChangeEvent(trigger,null,""));        
     }
-    
+
     public int getPollInterval() {
         return 1000;//RefreshInterval.calc(getChatBean().getTimestamp());
     }

@@ -21,16 +21,27 @@ import java.io.StringWriter;
 import java.util.Properties;
 
 /**
- *
- * @author  gfinklan
+ * @author gfinklan
  */
 public class MailUtil {
 
-    /** Creates a new instance of MailUtil */
+    private static Session mySession;
+    private static int rcount = 0;
+    private static String[] reminders =
+            new String[]{"It's now your turn", "It's your turn to act",
+                    "You now have priority in this game",
+                    "Your presence is requested at the table."
+            /*
+        "Hurry up, we're all waiting for you here",
+        "Get a move on!",
+        "Our blood is boiling"*/
+            };
+
+    /**
+     * Creates a new instance of MailUtil
+     */
     public MailUtil() {
     }
-
-    private static Session mySession;
 
     public static Session getSession() {
         if (mySession != null) {
@@ -40,17 +51,6 @@ public class MailUtil {
         }
         return mySession;
     }
-
-    private static int rcount = 0;
-    private static String[] reminders =
-        new String[] { "It's now your turn", "It's your turn to act",
-                       "You now have priority in this game",
-                       "Your presence is requested at the table."
-            /*
-        "Hurry up, we're all waiting for you here",
-        "Get a move on!",
-        "Our blood is boiling"*/
-            } ;
 
     private static String getReminder() {
         try {
@@ -66,8 +66,8 @@ public class MailUtil {
     }
 
     public static String ping(String name, String email) {
-        if (sendMsg(new String[] { email }, "Ping from " + name,
-                    getReminder()))
+        if (sendMsg(new String[]{email}, "Ping from " + name,
+                getReminder()))
             return "Ping sent to " + email;
         return "Ping failed";
     }
@@ -81,8 +81,8 @@ public class MailUtil {
             for (int i = 0; i < to.length; i++)
                 to[i] = new InternetAddress(email[i]);
             Address replys = new InternetAddress("dsadmin@deckserver.net");
-            msg.addFrom(new Address[] { from });
-            msg.setReplyTo(new Address[] { replys });
+            msg.addFrom(new Address[]{from});
+            msg.setReplyTo(new Address[]{replys});
             msg.setSubject(subj);
             msg.setRecipients(Message.RecipientType.TO, to);
             msg.setText(body);
@@ -106,14 +106,14 @@ public class MailUtil {
         };
         t.start();
     }
-    
+
     public static void sendStartMsg(JolGame game) {
         String header = "Game " + game.getName() + " is starting.";
         String msg = "Good luck!";
         String[] players = game.getPlayers();
         String[] emails = new String[players.length];
         for (int i = 0; i < emails.length; i++)
-           emails[i] = JolAdminFactory.INSTANCE.getEmail(players[i]);
+            emails[i] = JolAdminFactory.INSTANCE.getEmail(players[i]);
         sendMsg(emails, header, msg);
     }
 
@@ -131,37 +131,37 @@ public class MailUtil {
         String[] players = game.getPlayers();
         String[] emails = new String[players.length];
         for (int i = 0; i < emails.length; i++)
-            if(JolAdminFactory.INSTANCE.receivesTurnSummaries(players[i]))
+            if (JolAdminFactory.INSTANCE.receivesTurnSummaries(players[i]))
                 emails[i] = JolAdminFactory.INSTANCE.getEmail(players[i]);
         sendMsg(emails, header, buf.toString());
     }
 
     public static void sendError(WebParams params, Exception e) {
-        sendError(params,null,e);
+        sendError(params, null, e);
     }
 
     public static void sendError(WebParams params, String s, Throwable e) {
         StringWriter writer = new StringWriter();
         PrintWriter pw = new PrintWriter(writer);
-        if(params != null) {
+        if (params != null) {
             pw.println("Request for " + params.getRequest().getRequestURI() +
-                       " from " + params.getPlayer() + " with");
+                    " from " + params.getPlayer() + " with");
             pw.println(params.getRequest().getParameterMap());
         } else {
             pw.println("beta interface Request");
         }
-        if(s != null) pw.println(s);
+        if (s != null) pw.println(s);
         pw.println("Caused an exception : " + e.getMessage());
         e.printStackTrace(pw);
         if (e.getCause() != null) {
             pw.println("Caused by : ");
             e.getCause().printStackTrace(pw);
         }
-        sendMsg(new String[] { "george.finklang@gmail.com" },
+        sendMsg(new String[]{"george.finklang@gmail.com"},
                 "Deckserver Server Exception", writer.getBuffer().toString());
     }
-    
+
     public static void sendError(String s, Throwable e) {
-        sendError(null,s,e);
+        sendError(null, s, e);
     }
 }

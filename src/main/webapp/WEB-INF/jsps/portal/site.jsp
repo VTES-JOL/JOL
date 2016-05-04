@@ -1,1 +1,1 @@
-<% application.getNamedDispatcher("AdminServlet").include(request,response); %>
+<% application.getNamedDispatcher("AdminServlet").include(request, response); %>

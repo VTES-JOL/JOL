@@ -9,31 +9,34 @@ package cards.model;
 import java.util.Set;
 
 /**
- *
- * @author  administrator
+ * @author administrator
  */
 public interface CardSearch {
-        
-    /** From CardMap */
+
+    /**
+     * From CardMap
+     */
     public String getId(String nm);
-    
-    /** From CardMap */
+
+    /**
+     * From CardMap
+     */
     public Set<String> getNames();
-    
+
     public CardSet getAllCards();
-    
- //   public CardEntry getCardByName(String name);
-    
+
+    //   public CardEntry getCardByName(String name);
+
     public CardEntry getCardById(String id);
-    
+
     public CardSet searchByClan(CardSet set, String clan);
-    
+
     public CardSet searchByDiscipline(CardSet set, String disc);
-    
+
     public CardSet searchByType(CardSet set, String type);
-    
+
     public CardSet searchByText(CardSet set, String text);
-    
+
     public CardSet searchByName(CardSet set, String name);
-    
+
 }

@@ -5,8 +5,8 @@ import deckserver.rich.PlayerModel;
 
 public interface ViewCreator {
 
-	public String getFunction();
+    public String getFunction();
 
-	public Object createData(AdminBean abean, PlayerModel model);
-	
+    public Object createData(AdminBean abean, PlayerModel model);
+
 }

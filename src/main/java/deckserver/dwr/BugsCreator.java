@@ -5,12 +5,12 @@ import deckserver.rich.PlayerModel;
 import nbclient.vtesmodel.JolAdminFactory;
 
 public class BugsCreator extends AdminCreator {
-	public String getFunction() {
-		return "loadbugs";
-	}
+    public String getFunction() {
+        return "loadbugs";
+    }
 
-	public Object createData(AdminBean abean, PlayerModel model) {
-		JolAdminFactory admin = abean.getAdmin();
-		return admin.getBugs();
-	}
+    public Object createData(AdminBean abean, PlayerModel model) {
+        JolAdminFactory admin = abean.getAdmin();
+        return admin.getBugs();
+    }
 }

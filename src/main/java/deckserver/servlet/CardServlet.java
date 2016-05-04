@@ -19,35 +19,37 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- *
- * @author  Joe User
- * @version
+ * @author Joe User
  */
 public class CardServlet extends HttpServlet {
-    
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6413386535172727154L;
 
-	/** Initializes the servlet.
+    /**
+     *
+     */
+    private static final long serialVersionUID = 6413386535172727154L;
+
+    /**
+     * Initializes the servlet.
      */
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
     }
-    
-    /** Destroys the servlet.
+
+    /**
+     * Destroys the servlet.
      */
     public void destroy() {
-        
+
     }
-    
-    /** Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
+
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     *
+     * @param request  servlet request
      * @param response servlet response
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         String id = request.getQueryString();
 //        String cmd = request.getParameter("command");
         response.setContentType("text/html");
@@ -55,38 +57,43 @@ public class CardServlet extends HttpServlet {
         CardSearch cards = AdminFactory.get(getServletContext()).getAllCards();
         CardEntry card = cards.getCardById(id);
         String[] text = card.getFullText();
-       // out.println("<table>");
-        for(int i = 0; i < text.length; i++) {
-            if(i > 0) out.print("  ");
+        // out.println("<table>");
+        for (int i = 0; i < text.length; i++) {
+            if (i > 0) out.print("  ");
             out.println(text[i]);
             out.println("<br/>");
         }
-      //  out.println("</pre>");
+        //  out.println("</pre>");
         out.close();
     }
-    
-    /** Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
+
+    /**
+     * Handles the HTTP <code>GET</code> method.
+     *
+     * @param request  servlet request
      * @param response servlet response
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
     }
-    
-    /** Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
+
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request  servlet request
      * @param response servlet response
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
     }
-    
-    /** Returns a short description of the servlet.
+
+    /**
+     * Returns a short description of the servlet.
      */
     public String getServletInfo() {
         return "Short description";
     }
-    
+
 }

@@ -6,12 +6,12 @@ import deckserver.rich.PlayerModel;
 
 public class MainCreator implements ViewCreator {
 
-	public String getFunction() {
-		return "loadmain";
-	}
+    public String getFunction() {
+        return "loadmain";
+    }
 
-	public Object createData(AdminBean abean, PlayerModel model) {
-		return new MainBean(abean, model);
-	}
+    public Object createData(AdminBean abean, PlayerModel model) {
+        return new MainBean(abean, model);
+    }
 
 }

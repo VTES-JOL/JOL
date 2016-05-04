@@ -2,20 +2,20 @@ package nbclient.vtesmodel;
 
 public interface BugDescriptor {
 
-	public String getFiler();
+    public String getFiler();
 
-	public String getStatus();
-	
-	public void setStatus(String status);
+    public String getStatus();
 
-	public String getSummary();
-	
-	public String getDescription();
-	
-	public String[] getComments();
-	
-	public void addComment(String comment);
+    public void setStatus(String status);
 
-	public String getIndex();
+    public String getSummary();
+
+    public String getDescription();
+
+    public String[] getComments();
+
+    public void addComment(String comment);
+
+    public String getIndex();
 
 }

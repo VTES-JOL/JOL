@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-    Document   : game-state.dtd
-    Created on : September 7, 2003, 6:26 PM
-    Author     : administrator
-    Description:
-        Purpose of the document follows.
--->
+        <!--
+            Document   : game-state.dtd
+            Created on : September 7, 2003, 6:26 PM
+            Author     : administrator
+            Description:
+                Purpose of the document follows.
+        -->
 
-<!ELEMENT game-actions (name, counter, game-counter, turn*)>
+        <!ELEMENT game-actions (name, counter, game-counter, turn*)>
 
-<!ELEMENT name (#PCDATA)>
+        <!ELEMENT name (#PCDATA)>
 
-<!ELEMENT counter (#PCDATA)>
+        <!ELEMENT counter (#PCDATA)>
 
-<!ELEMENT game-counter (#PCDATA)>
+        <!ELEMENT game-counter (#PCDATA)>
 
-<!ELEMENT turn (sequence, name, counter, label, action*)>
+        <!ELEMENT turn (sequence, name, counter, label, action*)>
 
-<!ELEMENT sequence (#PCDATA)>
+        <!ELEMENT sequence (#PCDATA)>
 
-<!ELEMENT label (#PCDATA)>
+        <!ELEMENT label (#PCDATA)>
 
-<!ELEMENT action (counter, text, command*)>
+        <!ELEMENT action (counter, text, command*)>
 
-<!ELEMENT command (#PCDATA)>
+        <!ELEMENT command (#PCDATA)>
 
-<!ELEMENT text (#PCDATA)>
+        <!ELEMENT text (#PCDATA)>
