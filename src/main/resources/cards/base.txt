@@ -11136,7 +11136,7 @@ Master: out-of-turn. Frenzy.
 Only usable before range is chosen. Choose a vampire in combat. In this round, that vampire cannot use equipment and cannot use presses to end combat. This round has a press, only usable to continue combat.
 Artist: Pete Venters
 
-Name: Frère Marc
+Name: Frere Marc
 [Third:V]
 Cardtype: Vampire
 Clan: Gangrel antitribu
