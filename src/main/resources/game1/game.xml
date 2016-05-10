@@ -2107,4 +2107,8 @@
     <name>Player2ping</name>
     <value>14:58 5/4 </value>
   </notation>
+  <notation>
+    <name>Player2text</name>
+    <value/>
+  </notation>
 </game-state>
