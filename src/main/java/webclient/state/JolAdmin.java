@@ -56,16 +56,6 @@ public class JolAdmin extends JolAdminFactory {
         sysInfo = new SystemInfo();
     }
 
-    /**
-     * test harness *
-     */
-    public static void main(String[] argv) throws Throwable {
-        CardUtil.setShow(true);
-        System.out.println("cards");
-        INSTANCE = new JolAdmin("/Users/shannon/IdeaProjects/jol-legacy/src/main/resources");
-        System.out.println(INSTANCE.getBaseCards().getAllCards().getCardArray()[0].getName());
-    }
-
     private final static String readFile(File file) throws IOException {
         return StreamReader.read(new FileInputStream(file));
     }

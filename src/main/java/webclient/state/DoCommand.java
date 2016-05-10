@@ -46,19 +46,6 @@ public class DoCommand {
         return buf.toString();
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws Throwable {
-        //  String datadir = args[0];
-        String player = args[2];
-        String game = args[1];
-        DoCommand cmd = new DoCommand(game);
-        System.out.println(cmd.doCommand(player, args));
-        ShowGame generator = new ShowGame(game);
-        generator.generate(player, "/cgi-bin/live-submit.cgi", new PrintWriter(System.out));
-    }
-
     public String doMessage(String player, String message) {
         if (message.equals(""))
             return "No message received";
@@ -311,22 +298,7 @@ public class DoCommand {
             e.printStackTrace();
             return cmd + " produced exception.";
         } finally {
-        /*  turn off save here.
-            try {
-                JolAdminFactory.INSTANCE.saveGame(game);
-            } catch (IllegalStateException e) {
-                if(!retrying) {
-                    retrying = true;
-                    try {
-                        DoCommand dc = new DoCommand(game.getName());
-                        return dc.doCommand(player,cmdStr);
-                    } catch (Exception ie) {
-                        return "Unrecoverable server exception.  Contact Sys Admin ASAP.";
-                    }
-                }
-            } finally {
-                retrying = false;
-            }*/
+
         }
         return cmd + " not a valid command";
     }

@@ -57,10 +57,6 @@ public class CardUtil {
         return new SetImpl(arr);
     }
 
-    public static void main(String[] argv) {
-        // new CardUtil(true);
-    }
-
     static class SearchImpl implements CardSearch {
 
         final CardMap map;

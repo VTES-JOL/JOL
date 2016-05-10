@@ -26,18 +26,6 @@ public class MkHandFrame {
         this.game = game;
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws Throwable {
-  /*      String name = args[0];
-        JolGame game = nbclient.TestMain.mkGame();
-        game.startGame();
-        MkHandFrame generator = new MkHandFrame(game);
-        PrintWriter out = new PrintWriter(new FileOutputStream(args[1]));
-        generator.writeFrame(name,out); */
-    }
-
     public void setCardUrl(String url) {
         cardUrl = url;
     }

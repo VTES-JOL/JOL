@@ -23,26 +23,6 @@ public class ShowGame {
         this.game = JolAdminFactory.INSTANCE.getGame(game);
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws Throwable {
-        //  needs to be updated for GameFactory
-     /*  String dir = args[0];
-        String gamename = args[1];
-        String player = args[2];
-        String filename = dir + "/" + gamename + ".xml";
-        InputStream in = new FileInputStream(filename);
-        GameState state = GameState.createGraph(in);
-        in.close();
-        GameActions gameActions = new GameActions();
-        gameActions.setCounter("1");
-        ActionImpl actions = new ActionImpl(gameActions);
-        JolGame game = new JolGameImpl(new GameImpl(state), actions);
-        ShowGame generator = new ShowGame(game);
-        generator.generate(player, "/cgi-bin/live-submit.cgi", new PrintWriter(System.out)); */
-    }
-
     public void setCardUrl(String url) {
         cardUrl = url;
     }

@@ -98,31 +98,11 @@ class TranslateCard implements CardEntry {
         return getName().compareTo(card.getName());
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    /*
-    public static void main(String[] args) throws Throwable {
-        if(args.length == 0)
-            args = new String[] {"/gfink/ds/cardx/Cardlist.txt","/gfink/ds/nevdir/cards/local/cards.xml"};
-        Reader file = new FileReader(args[0]);
-        LineNumberReader reader = new LineNumberReader(file);
-        CardEntry[] cards = readCards(reader);
-        CardDb db = new CardDb();
-        for(int i = 0; i < cards.length; i++) {
-            CardDbEntry card = CardUtil.mkDbEntry(cards[i]);
-            db.addCardDbEntry(card);
-        }
-        Writer writer = new FileWriter(args[1]);
-        db.write(writer);
-    }
-     */
     public String getType() {
         return type;
     }
 
     public boolean isCrypt() {
-        // 	System.err.println("V" + getType() + "V");
         return getType().equals(VAMPIRE) || getType().equals(IMBUED);
     }
 

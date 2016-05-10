@@ -61,16 +61,4 @@ public class CardMap {
         }
         return ret;
     }
-    
-    /*
-    public static void main(String[] argv) {
-        CardMap trans = new CardMap("cards/local/old.properties");
-        CardMap real = CardMap.INSTANCE;
-        for(Iterator i = trans.map.keySet().iterator();i.hasNext();) {
-            String n = (String) i.next();
-            String a = trans.getId(n);
-            String id = real.getId(n);
-            System.out.println(id + "=" + a);
-        }
-    }*/
 }

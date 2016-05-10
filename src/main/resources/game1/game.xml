@@ -431,10 +431,6 @@
   <region>
     <name>Player1's hand</name>
     <game-card>
-      <id>474</id>
-      <cardid>sa7</cardid>
-    </game-card>
-    <game-card>
       <id>430</id>
       <cardid>sa58</cardid>
     </game-card>
@@ -458,6 +454,10 @@
       <id>482</id>
       <cardid>jy8</cardid>
     </game-card>
+    <game-card>
+      <id>445</id>
+      <cardid>jy401</cardid>
+    </game-card>
   </region>
   <region>
     <name>Player1's ashheap</name>
@@ -465,13 +465,13 @@
       <id>468</id>
       <cardid>jy20</cardid>
     </game-card>
+    <game-card>
+      <id>474</id>
+      <cardid>sa7</cardid>
+    </game-card>
   </region>
   <region>
     <name>Player1's library</name>
-    <game-card>
-      <id>445</id>
-      <cardid>jy401</cardid>
-    </game-card>
     <game-card>
       <id>446</id>
       <cardid>jy401</cardid>

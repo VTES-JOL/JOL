@@ -26,18 +26,6 @@ public class MkState {
         this.game = game;
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws Throwable {
-      /*  String name = args[0];
-        JolGame game = nbclient.TestMain.mkGame();
-        game.startGame();
-        MkState generator = new MkState(game);
-        PrintWriter out = new PrintWriter(new FileOutputStream(args[1]));
-        generator.writeState(out); */
-    }
-
     public void setCardUrl(String url) {
         cardUrl = url;
     }

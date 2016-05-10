@@ -182,52 +182,6 @@ public class NormalizeDeckImpl implements NormalizeDeck {
     public CardSet findCardName(String text) {
         return NormalizeDeckFactory.findCardName(search, text, errors);
     }
-    
- /*   private static final void time() {
-    	System.out.println(System.currentTimeMillis());
-    }*/
-
-//    public static void main(String[] args) throws Throwable {
-//    	JolAdminFactory admin = JolAdminFactory.INSTANCE = new JolAdmin("/home/deckserv/interactive/data");
-//    	CardSearch search = admin.getBaseCards();
-//    	String[] players = admin.getPlayers();
-//    	for(int i = 0; i < players.length; i++) {
-//    		String[] names = admin.getDeckNames(players[i]);
-//    		for(int j = 0; j < names.length; j++) {
-//    			String deck = admin.getDeck(players[i], names[j]);
-//    			NormalizeDeck nd = NormalizeDeckFactory.constructDeck(search, deck);
-//    			System.out.println(players[i] + " " + names[j] + " " + nd.getGroups());
-//    			System.out.println(nd.getCards().length);
-//    			return;
-//    		}
-//    	}
-//    }
-    
-   /* 
-    public static void main(String[] args) throws Throwable {
-    	JolAdminFactory admin = JolAdminFactory.INSTANCE = new JolAdmin("/home/deckserv/interactive/data");
-    	CardSearch search = admin.getBaseCards();
-    	String[] players = admin.getPlayers();
-    	for(int i = 0; i < players.length; i++) {
-    		String[] names = admin.getDeckNames(players[i]);
-    		for(int j = 0; j < names.length; j++) {
-    			String deck = admin.getDeck(players[i], names[j]);
-    			NormalizeDeck nd = NormalizeDeckFactory.getNormalizer(search, deck);
-    			admin.createDeck(players[i], names[j], nd.getFilteredDeck());
-    			System.out.println(players[i] + " " + names[j]);
-    		}
-    	}
-    }*/
-    
- /*   public static void main(String[] args) throws Throwable {
-    	JolAdminFactory admin = JolAdminFactory.INSTANCE = new JolAdmin("/home/deckserv/interactive/data");
-    	CardSearch search = admin.getBaseCards();
-    	String deck = StreamReader.read(new FileInputStream("/gfink/priv/ds/cards/src/data/card.test"));
-    	NormalizeDeck nd = NormalizeDeckFactory.getNormalizer(search, deck);
-    	String[] err = nd.getErrorLines();
-    	for(int i = 0; i < err.length; i++)
-    		System.out.println(err[i]);
-    }*/
 
     /* (non-Javadoc)
 	 * @see cards.local.NormalizeDeck#getErrorLines()
