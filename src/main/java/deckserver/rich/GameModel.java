@@ -109,15 +109,13 @@ public class GameModel implements Comparable {
             if (command != null || chat != null) {
                 DoCommand commander = new DoCommand(game);
                 if (command != null) {
-                    StringTokenizer st = new StringTokenizer(command, ";");
-                    while (st.hasMoreTokens()) {
-                        String cmd = st.nextToken();
-                        log.info("Command " + name + " " + player + ":" + cmd);
+                    String[] commands = command.split(";");
+                    for (String cmd : commands) {
                         try {
-                            status.append(commander.doCommand(player, tokenize(cmd)));
+                            String[] cmdTokens = cmd.split("[\\s\n\r\f\t]");
+                            status.append(commander.doCommand(player, cmdTokens));
                         } catch (Exception e) {
-                            System.err.println("Error with command " + cmd + " for player " + player + " and game " + name);
-                            //     MailUtil.sendError("Error with command " + cmd + " for player " + player + " and game " + name,e);
+                            System.err.printf("Error with command %s for player %s and game %s", cmd, player, name);
                             status.append(e.getMessage());
                         }
                     }

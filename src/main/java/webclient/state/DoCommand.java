@@ -54,8 +54,8 @@ public class DoCommand {
     }
 
     public String doCommand(String player, String[] cmdStr) throws CommandException {
-        String cmd = cmdStr[3];
-        CommandParser cmdObj = new CommandParser(cmdStr, 4);
+        String cmd = cmdStr[0];
+        CommandParser cmdObj = new CommandParser(cmdStr, 1);
         try {
             if (cmd.equalsIgnoreCase("label")) {
                 String targetPlayer = cmdObj.getPlayer(player);
