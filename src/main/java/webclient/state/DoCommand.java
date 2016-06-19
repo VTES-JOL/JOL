@@ -360,7 +360,12 @@ public class DoCommand {
                     throw new CommandException("Card not specified");
                 }
                 int size = cards == null ? 0 : cards.length;
-                int num = Integer.parseInt(args[ind]) - 1;
+                int num;
+                char first = args[ind].charAt(0);
+                if (first == '+')
+                    num = -1;
+                else
+                    num = Integer.parseInt(args[ind]) - 1;
                 if (num < 0 && optional) return null;
                 if (num < 0 || num >= size) throw new CommandException("Num out of range");
                 SCard card = cards[num];
