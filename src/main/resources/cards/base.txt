@@ -1121,7 +1121,7 @@ Name: Anarch Convert
 [TR:U]
 Cardtype: Vampire
 Clan: Caitiff
-Group: ANY
+Group: *
 Capacity: 1
 Discipline: -none-
 Independent. Anarch: When the convert enters play, you may remove him from the game to make a non-titled vampire you control anarch and either gain 1 pool or draw a card from your crypt.
@@ -3892,7 +3892,7 @@ Requires an anarch.
 [cel] Maneuver or press.
 [pre] Cancel the opposing minion's aim, frenzy, or grapple card as it is played, and its cost is not paid.
 [tha] Strike: hand strike at +1 damage. This damage cannot be prevented by cards requiring Fortitude [for]. The opposing vampire's strikes with weapons inflict no damage on this vampire this round.
-Artist: Tomá¿ "zelgaris" Zahradní¿ek
+Artist: Tomáš "zelgaris" Zahradnícek
 
 Name: Bomb
 [Jyhad:U, VTES:U, CE:PN, Third:U, KoT:U]
@@ -8235,7 +8235,7 @@ Requires an anarch. Only usable at close range.
 [obf] Strike: burn equipment or retainer with first strike.
 [pro] Strike: hand strike, aggravated.
 [ser] Strike: steal 2 blood.
-Artist: Tomá¿ "zelgaris" Zahradní¿ek
+Artist: Tomáš "zelgaris" Zahradnícek
 
 Name: Dorian Strack
 [Jyhad:V, VTES:V, Tenth:A]
@@ -10441,7 +10441,7 @@ Cardtype: Action
 Cost: 1 blood
 +1 stealth action. Requires an anarch.
 Put this card on another ready, non-titled vampire you control, choose a Discipline the acting vampire has at superior and untap the acting vampire. The vampire with this card is considered anarch (and Independent), and gets +1 level of the chosen Discipline. If this vampire changes sect, burn this card. A vampire can have only one Field Training.
-Artist: Tomá¿ zelgaris Zahradní¿ek
+Artist: Tomáš zelgaris Zahradnícek
 
 Name: Fiendish Tongue
 [Anarchs:C2, Third:C]
@@ -20698,7 +20698,7 @@ Name: New Blood
 [Promo-20150213]
 Cardtype: Vampire
 Clan: Blood Brother
-Group: ANY
+Group: *
 Capacity: 2
 Discipline: san
 Sabbat: When New Blood enters play during your influence phase, choose a circle and draw 1 card from your crypt. New Blood belongs to the chosen circle. Sterile.
@@ -24847,7 +24847,7 @@ Name: Rewilding
 Cardtype: Action
 Clan: Gangrel
 (D) Burn a location and burn 2 pool from its controller.
-Artist: Tomá¿ "zelgaris" Zahradní¿ek
+Artist: Tomáš "zelgaris" Zahradnícek
 
 Name: Rewind Time
 [BL:R2, LoB:R]
