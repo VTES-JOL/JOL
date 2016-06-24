@@ -2,9 +2,7 @@ package deckserver.dwr;
 
 import deckserver.dwr.bean.DeckBean;
 import deckserver.dwr.bean.DeckSummaryBean;
-import deckserver.rich.AdminBean;
-import deckserver.rich.GameModel;
-import deckserver.rich.PlayerModel;
+import deckserver.dwr.bean.AdminBean;
 
 import java.util.ArrayList;
 import java.util.Collection;

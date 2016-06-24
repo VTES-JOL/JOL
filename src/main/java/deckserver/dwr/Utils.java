@@ -1,9 +1,8 @@
 package deckserver.dwr;
 
-import deckserver.rich.AdminBean;
-import deckserver.rich.PlayerModel;
+import deckserver.dwr.bean.AdminBean;
 import deckserver.util.AdminFactory;
-import nbclient.vtesmodel.JolAdminFactory;
+import deckserver.JolAdminFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

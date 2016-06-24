@@ -218,7 +218,6 @@ function shide(s, h) {
     $(s).style.display = '';
 }
 function init() {
-//	DWRUtil.useLoadingMessage();
     DS.getTypes(loadTypes);
     DS.init(pmap);
 }

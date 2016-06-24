@@ -1,8 +1,7 @@
 package deckserver.dwr;
 
 import deckserver.dwr.bean.AdminPageBean;
-import deckserver.rich.AdminBean;
-import deckserver.rich.PlayerModel;
+import deckserver.dwr.bean.AdminBean;
 
 public class AdminCreator implements ViewCreator {
 

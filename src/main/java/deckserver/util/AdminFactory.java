@@ -6,11 +6,11 @@
 
 package deckserver.util;
 
-import deckserver.rich.AdminBean;
-import nbclient.vtesmodel.JolAdminFactory;
+import deckserver.dwr.bean.AdminBean;
+import deckserver.JolAdminFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webclient.state.JolAdmin;
+import deckserver.client.JolAdmin;
 
 import javax.servlet.ServletContext;
 

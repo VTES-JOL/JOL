@@ -1,7 +1,6 @@
 package deckserver.dwr.bean;
 
-import deckserver.rich.AdminBean;
-import nbclient.vtesmodel.JolAdminFactory;
+import deckserver.JolAdminFactory;
 
 import java.util.*;
 
@@ -15,7 +14,7 @@ public class AdminPageBean {
     public AdminPageBean(AdminBean abean, String player) {
         JolAdminFactory admin = JolAdminFactory.INSTANCE;
         String[] names = admin.getGames(player);
-        Collection<String> c = new ArrayList<String>();
+        Collection<String> c = new ArrayList<>();
         for (int i = 0; i < names.length; i++) {
             if (admin.getOwner(names[i]).equals(player)) {
                 if (admin.isOpen(names[i])) {

@@ -1,13 +1,7 @@
-/*
- * DServlet.java
- *
- * Created on March 8, 2004, 10:02 PM
- */
-
 package deckserver.servlet;
 
-import cards.model.CardEntry;
-import cards.model.CardSearch;
+import deckserver.interfaces.CardEntry;
+import deckserver.interfaces.CardSearch;
 import deckserver.util.AdminFactory;
 
 import javax.servlet.ServletConfig;
@@ -51,19 +45,16 @@ public class CardServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String id = request.getQueryString();
-//        String cmd = request.getParameter("command");
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         CardSearch cards = AdminFactory.get(getServletContext()).getAllCards();
         CardEntry card = cards.getCardById(id);
         String[] text = card.getFullText();
-        // out.println("<table>");
         for (int i = 0; i < text.length; i++) {
             if (i > 0) out.print("  ");
             out.println(text[i]);
             out.println("<br/>");
         }
-        //  out.println("</pre>");
         out.close();
     }
 

@@ -1,14 +1,8 @@
-/*
- * DServlet.java
- *
- * Created on March 8, 2004, 10:02 PM
- */
-
 package deckserver.servlet;
 
 import deckserver.util.AdminFactory;
 import deckserver.util.WebParams;
-import nbclient.vtesmodel.JolAdminFactory;
+import deckserver.JolAdminFactory;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletConfig;
@@ -55,7 +49,7 @@ public abstract class GameServlet extends HttpServlet {
     protected abstract void processRequest(WebParams params, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException;
 
-    protected void preprocessRequest(HttpServletRequest request, HttpServletResponse response)
+    private void preprocessRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         WebParams params = (WebParams) request.getSession(true).getAttribute("wparams");
         if (params == null) {
@@ -100,12 +94,12 @@ public abstract class GameServlet extends HttpServlet {
      */
     public abstract String getServletInfo();
 
-    public final void gotoMain(HttpServletRequest request, HttpServletResponse response)
+    protected final void gotoMain(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        getServletContext().getNamedDispatcher("MainPage").forward(request, response);
+        getServletContext().getRequestDispatcher("/main.jsp").forward(request, response);
     }
 
-    public final void loginExpired(WebParams params, HttpServletRequest request, HttpServletResponse response)
+    final void loginExpired(WebParams params, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         params.addStatusMsg("Login expired, log in again");
         gotoMain(request, response);

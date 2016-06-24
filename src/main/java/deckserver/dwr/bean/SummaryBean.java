@@ -1,8 +1,8 @@
 package deckserver.dwr.bean;
 
-import deckserver.rich.GameModel;
-import deckserver.rich.GameView;
-import nbclient.vtesmodel.JolAdminFactory;
+import deckserver.dwr.GameModel;
+import deckserver.dwr.GameView;
+import deckserver.JolAdminFactory;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

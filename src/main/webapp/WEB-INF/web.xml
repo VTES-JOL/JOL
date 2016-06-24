@@ -8,6 +8,10 @@
     <display-name>JOL3</display-name>
     <description>Jyhad On-Line 3.0 Web Client</description>
 
+    <listener>
+        <listener-class>deckserver.JyhadOnlineServletInitializer</listener-class>
+    </listener>
+
     <context-param>
         <param-name>prefix</param-name>
         <param-value>/jol3/</param-value>
@@ -39,23 +43,18 @@
     </servlet>
 
     <servlet>
-        <servlet-name>DeckserverServlet</servlet-name>
-        <servlet-class>deckserver.servlet.DServlet</servlet-class>
-    </servlet>
-
-    <servlet>
         <servlet-name>LoginServlet</servlet-name>
-        <servlet-class>deckserver.login.LoginServlet</servlet-class>
+        <servlet-class>deckserver.servlet.LoginServlet</servlet-class>
     </servlet>
 
     <servlet>
         <servlet-name>RegisterServlet</servlet-name>
-        <servlet-class>deckserver.login.RegisterServlet</servlet-class>
+        <servlet-class>deckserver.servlet.RegisterServlet</servlet-class>
     </servlet>
 
     <servlet>
         <servlet-name>AdminServlet</servlet-name>
-        <servlet-class>deckserver.admin.AdminServlet</servlet-class>
+        <servlet-class>deckserver.servlet.AdminServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -69,54 +68,8 @@
     </servlet>
 
     <servlet>
-        <servlet-name>MainPage</servlet-name>
-        <jsp-file>/main.jsp</jsp-file>
-    </servlet>
-
-    <servlet>
-        <servlet-name>ForwardPlayer</servlet-name>
-        <jsp-file>/toplayer.jsp</jsp-file>
-    </servlet>
-
-    <servlet>
-        <servlet-name>JolInit</servlet-name>
-        <servlet-class>deckserver.dwr.Init</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet>
-        <servlet-name>MainPagePreload</servlet-name>
-        <jsp-file>/WEB-INF/jsps/topframe/main.jsp</jsp-file>
-        <load-on-startup>10</load-on-startup>
-    </servlet>
-
-    <servlet>
-        <servlet-name>DeckPagePreload</servlet-name>
-        <jsp-file>/WEB-INF/jsps/topframe/deck.jsp</jsp-file>
-        <load-on-startup>10</load-on-startup>
-    </servlet>
-
-    <servlet>
-        <servlet-name>TopBarPreload</servlet-name>
-        <jsp-file>/WEB-INF/jsps/topframe/topbar.jsp</jsp-file>
-        <load-on-startup>10</load-on-startup>
-    </servlet>
-
-    <servlet>
-        <servlet-name>AdminPagePreload</servlet-name>
-        <jsp-file>/WEB-INF/jsps/topframe/admin.jsp</jsp-file>
-        <load-on-startup>10</load-on-startup>
-    </servlet>
-
-    <servlet>
-        <servlet-name>GamePagePreload</servlet-name>
-        <jsp-file>/WEB-INF/jsps/topframe/game.jsp</jsp-file>
-        <load-on-startup>10</load-on-startup>
-    </servlet>
-
-    <servlet>
         <servlet-name>JolMain</servlet-name>
-        <jsp-file>/WEB-INF/jsps/topframe/jol3.jsp</jsp-file>
+        <jsp-file>/WEB-INF/jsps/jol3.jsp</jsp-file>
         <load-on-startup>10</load-on-startup>
     </servlet>
 
@@ -212,11 +165,6 @@
     <servlet-mapping>
         <servlet-name>ShowDeck</servlet-name>
         <url-pattern>/showdeck</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>DeckserverServlet</servlet-name>
-        <url-pattern>/</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>

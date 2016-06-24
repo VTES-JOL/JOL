@@ -1,12 +1,11 @@
 package deckserver.dwr;
 
-import deckserver.rich.AdminBean;
-import deckserver.rich.PlayerModel;
+import deckserver.dwr.bean.AdminBean;
 
 public interface ViewCreator {
 
-    public String getFunction();
+    String getFunction();
 
-    public Object createData(AdminBean abean, PlayerModel model);
+    Object createData(AdminBean abean, PlayerModel model);
 
 }

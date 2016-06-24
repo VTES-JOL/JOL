@@ -6,8 +6,8 @@
 
 package deckserver.util;
 
-import nbclient.model.Card;
-import nbclient.vtesmodel.JolGame;
+import deckserver.interfaces.Card;
+import deckserver.JolGame;
 
 /**
  * @author Joe User

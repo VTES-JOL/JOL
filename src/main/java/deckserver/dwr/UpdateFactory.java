@@ -1,7 +1,6 @@
 package deckserver.dwr;
 
-import deckserver.rich.AdminBean;
-import deckserver.rich.PlayerModel;
+import deckserver.dwr.bean.AdminBean;
 import deckserver.util.AdminFactory;
 
 import javax.servlet.ServletContext;
@@ -18,12 +17,11 @@ public class UpdateFactory {
         viewMap.put("main", new MainCreator());
         viewMap.put("deck", new DeckCreator());
         viewMap.put("admin", new AdminCreator());
-        viewMap.put("bugs", new BugsCreator());
         viewMap.put("suser", new SuperCreator());
     }
 
     public static ViewCreator getView(String type) {
-        return (ViewCreator) viewMap.get(type);
+        return viewMap.get(type);
     }
 
     public static Map<String, Object> getUpdate(ContextProvider provider) {

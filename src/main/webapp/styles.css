@@ -68,18 +68,26 @@ td.gameplayers {
     overflow: auto;
 }
 
-a:link {
+a:link, a:visited, a:hover, a:active {
     color: yellow
 }
 
-a:visited {
-    color: yellow
+span.edge {
+    color: yellow;
 }
 
-a:hover {
-    color: yellow
+span.library {
+    color: olive;
 }
 
-a:active {
-    color: yellow
+span.crypt {
+    color: teal;
+}
+
+span.hand {
+    color: burlywood;
+}
+
+span.cardtext {
+    color: lime;
 }

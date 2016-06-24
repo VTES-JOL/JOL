@@ -6,12 +6,12 @@
 
 package deckserver.servlet;
 
-import cards.local.NormalizeDeck;
-import cards.local.NormalizeDeckFactory;
-import cards.model.CardEntry;
-import cards.model.CardSearch;
-import cards.model.CardSet;
-import cards.model.Deck;
+import deckserver.interfaces.NormalizeDeck;
+import deckserver.cards.NormalizeDeckFactory;
+import deckserver.interfaces.CardEntry;
+import deckserver.interfaces.CardSearch;
+import deckserver.interfaces.CardSet;
+import deckserver.interfaces.Deck;
 import deckserver.util.AdminFactory;
 import deckserver.util.DeckParams;
 import deckserver.util.WebParams;
@@ -36,8 +36,7 @@ public class DeckServlet extends GameServlet {
     public static int sumMap(Collection<?> c) {
         if (c == null) return 0;
         int ret = 0;
-        for (Iterator<?> i = c.iterator(); i.hasNext(); )
-            ret += ((Integer) i.next()).intValue();
+        for (Object aC : c) ret += (Integer) aC;
         return ret;
     }
 
@@ -47,21 +46,19 @@ public class DeckServlet extends GameServlet {
 
     public static Map<String, TreeMap<CardEntry, Integer>> getDeckHtmlMap(final Deck deck) {
         CardEntry[] cards = deck.getCards();
-        Comparator<CardEntry> comp = new Comparator<CardEntry>() {
-            public int compare(CardEntry c1, CardEntry c2) {
-                int i1 = deck.getQuantity(c1);
-                int i2 = deck.getQuantity(c2);
-                if (i1 == i2) {
-                    return c1.getName().compareTo(c2.getName());
-                }
-                return i2 - i1;
+        Comparator<CardEntry> comp = (c1, c2) -> {
+            int i1 = deck.getQuantity(c1);
+            int i2 = deck.getQuantity(c2);
+            if (i1 == i2) {
+                return c1.getName().compareTo(c2.getName());
             }
+            return i2 - i1;
         };
-        Map<String, TreeMap<CardEntry, Integer>> ret = new HashMap<String, TreeMap<CardEntry, Integer>>();
-        for (int i = 0; i < cards.length; i++) {
-            String type = cards[i].getType();
-            if (!ret.containsKey(type)) ret.put(type, new TreeMap<CardEntry, Integer>(comp));
-            ret.get(type).put(cards[i], new Integer(deck.getQuantity(cards[i])));
+        Map<String, TreeMap<CardEntry, Integer>> ret = new HashMap<>();
+        for (CardEntry card : cards) {
+            String type = card.getType();
+            if (!ret.containsKey(type)) ret.put(type, new TreeMap<>(comp));
+            ret.get(type).put(card, deck.getQuantity(card));
         }
         return ret;
     }
@@ -87,9 +84,9 @@ public class DeckServlet extends GameServlet {
 
         CardSearch cs = AdminFactory.get(getServletContext()).getBaseCards();
         NormalizeDeck nd = NormalizeDeckFactory.getNormalizer(cs, deck);
-        if (request.getParameter("submit") != null && player != null && deck != null && deckname != null && deckname.length() > 0) {
+        if (request.getParameter("submit") != null && player != null && deckname != null && deckname.length() > 0) {
             if (admin.createDeck(player, deckname, nd.getFilteredDeck())) {
-                getServletContext().getNamedDispatcher("ForwardPlayer").forward(request, response);
+                getServletContext().getRequestDispatcher("/toplayer.jsp").forward(request, response);
             } else {
                 params.addStatusMsg("Deck submission failed.");
             }
@@ -97,8 +94,8 @@ public class DeckServlet extends GameServlet {
 
         String[] newcards = request.getParameterValues("newcard");
         if (newcards != null) {
-            for (int i = 0; i < newcards.length; i++) {
-                CardEntry card = cs.getCardById(newcards[i]);
+            for (String newcard : newcards) {
+                CardEntry card = cs.getCardById(newcard);
                 nd.addCard(card);
             }
         }
@@ -113,15 +110,15 @@ public class DeckServlet extends GameServlet {
         if (query.length() > 0) {
             CardSet set = type.equals("All") ? cs.getAllCards() : cs.searchByType(cs.getAllCards(), type);
             set = cs.searchByText(set, query);
-            CardSet set2 = NormalizeDeckFactory.findCardName(cs, query, new LinkedList<String>());
-            Collection<CardEntry> c = new HashSet<CardEntry>(Arrays.asList(set.getCardArray()));
+            CardSet set2 = NormalizeDeckFactory.findCardName(cs, query, new LinkedList<>());
+            Collection<CardEntry> c = new HashSet<>(Arrays.asList(set.getCardArray()));
             c.addAll(Arrays.asList(set2.getCardArray()));
-            entries = (CardEntry[]) c.toArray(entries);
+            entries = c.toArray(entries);
         }
         DeckParams p = new DeckParams(deckname, type, query, entries, nd);
         request.setAttribute("dparams", p);
         try {
-            getServletContext().getRequestDispatcher("/WEB-INF/jsps/admin/deckconstruction.jsp").include(request, response);
+            getServletContext().getRequestDispatcher("/WEB-INF/jsps/deckconstruction.jsp").include(request, response);
         } catch (Throwable t) {
             String msg = "Error in deck " + deckname + " for player " + player;
             throw new IOException(msg, t);

@@ -1,14 +1,8 @@
-/*
- * DServlet.java
- *
- * Created on March 8, 2004, 10:02 PM
- */
-
 package deckserver.servlet;
 
-import nbclient.model.GameAction;
-import nbclient.vtesmodel.JolAdminFactory;
-import nbclient.vtesmodel.JolGame;
+import deckserver.interfaces.GameAction;
+import deckserver.JolAdminFactory;
+import deckserver.JolGame;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -60,14 +54,12 @@ public class TurnServlet extends HttpServlet {
         GameAction[] actions = game.getActions(turn);
         out.print(game.getName() + " - " + turn);
         out.print("<hr/>");
-        // out.println("<table>");
         for (int i = 0; i < actions.length; i++) {
             if (actions[i].isCommand()) out.print("<b>");
             out.println(actions[i].getText());
             if (actions[i].isCommand()) out.print("</b>");
             out.println("<br/>");
         }
-        //  out.println("</pre>");
         out.close();
     }
 

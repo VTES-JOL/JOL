@@ -1,10 +1,9 @@
 package deckserver.dwr.bean;
 
-import deckserver.rich.AdminBean;
-import deckserver.rich.GameModel;
-import deckserver.rich.GameView;
-import deckserver.rich.PlayerModel;
-import nbclient.vtesmodel.JolAdminFactory;
+import deckserver.dwr.GameModel;
+import deckserver.dwr.GameView;
+import deckserver.dwr.PlayerModel;
+import deckserver.JolAdminFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,11 +21,10 @@ public class NavBean {
         loggedOut.put("main", "Main");
         loggedIn.put("main", "Main");
         loggedIn.put("deck", "Deck Register");
-        //	loggedIn.put("bugs", "Bugs");
         isadmin.put("admin", "Game Admin");
         suser.put("admin", "Game Admin");
         suser.put("suser", "Site Admin");
-        hasChats = new HashMap<String, String>(loggedIn);
+        hasChats = new HashMap<>(loggedIn);
         hasChats.put("main", "Main *");
     }
 

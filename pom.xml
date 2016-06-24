@@ -22,9 +22,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.netbeans</groupId>
-            <artifactId>schema2beans</artifactId>
-            <version>1</version>
+            <groupId>org.glassfish.main.external</groupId>
+            <artifactId>schema2beans-repackaged</artifactId>
+            <version>3.1.2</version>
         </dependency>
 
         <dependency>
@@ -41,9 +41,29 @@
 
         <dependency>
             <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.0.1</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

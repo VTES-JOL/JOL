@@ -1,11 +1,11 @@
 package deckserver.dwr.bean;
 
-import cards.local.NormalizeDeck;
-import cards.local.NormalizeDeckFactory;
-import cards.model.CardSearch;
-import deckserver.rich.GameModel;
-import deckserver.rich.PlayerModel;
-import nbclient.vtesmodel.JolAdminFactory;
+import deckserver.interfaces.NormalizeDeck;
+import deckserver.cards.NormalizeDeckFactory;
+import deckserver.interfaces.CardSearch;
+import deckserver.dwr.GameModel;
+import deckserver.dwr.PlayerModel;
+import deckserver.JolAdminFactory;
 
 public class DeckSummaryBean {
 

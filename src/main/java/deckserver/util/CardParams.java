@@ -6,8 +6,8 @@
 
 package deckserver.util;
 
-import cards.model.CardEntry;
-import nbclient.model.Card;
+import deckserver.interfaces.CardEntry;
+import deckserver.interfaces.Card;
 
 /**
  * @author Joe User

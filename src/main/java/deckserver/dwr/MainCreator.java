@@ -1,8 +1,7 @@
 package deckserver.dwr;
 
 import deckserver.dwr.bean.MainBean;
-import deckserver.rich.AdminBean;
-import deckserver.rich.PlayerModel;
+import deckserver.dwr.bean.AdminBean;
 
 public class MainCreator implements ViewCreator {
 

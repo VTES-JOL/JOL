@@ -1,11 +1,10 @@
 package deckserver.dwr.bean;
 
 import deckserver.dwr.Utils;
-import deckserver.rich.AdminBean;
-import deckserver.rich.GameModel;
-import deckserver.rich.PlayerModel;
+import deckserver.dwr.GameModel;
+import deckserver.dwr.PlayerModel;
 import deckserver.util.RefreshInterval;
-import nbclient.vtesmodel.JolAdminFactory;
+import deckserver.JolAdminFactory;
 
 import java.util.*;
 
@@ -24,9 +23,7 @@ public class MainBean {
 
     {
         news = new NewsBean[]{
-                new NewsBean("/tourney/kjm2010", "KevinM's 2010 tourney"),
-                new NewsBean("http://groups.google.com/group/jol-league", "Join the JOL League."),
-                new NewsBean("http://www.white-wolf.com/vtes/", "Visit VtES home page")
+                new NewsBean("https://www.facebook.com/groups/jolstatus/", "JOL Status Facebook Group")
         };
     }
 
@@ -51,8 +48,8 @@ public class MainBean {
             if (gamenames.contains(game.getName()) && (game.isOpen() || game.getPlayers().contains(model.getPlayer())))
                 mgv.add(new PlSummaryBean(game, model.getPlayer()));
         }
-        games = (SummaryBean[]) gv.toArray(new SummaryBean[0]);
-        mygames = (PlSummaryBean[]) mgv.toArray(new PlSummaryBean[0]);
+        games = gv.toArray(new SummaryBean[0]);
+        mygames = mgv.toArray(new PlSummaryBean[0]);
         remGames = model.getRemovedGames().toArray(new String[0]);
         chat = model.getChat();
         if (chat.length == 0) chat = null;

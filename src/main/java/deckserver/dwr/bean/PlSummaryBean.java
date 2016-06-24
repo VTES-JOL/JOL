@@ -1,10 +1,10 @@
 package deckserver.dwr.bean;
 
-import cards.local.NormalizeDeck;
-import cards.local.NormalizeDeckFactory;
-import deckserver.rich.GameModel;
-import deckserver.rich.GameView;
-import nbclient.vtesmodel.JolAdminFactory;
+import deckserver.interfaces.NormalizeDeck;
+import deckserver.cards.NormalizeDeckFactory;
+import deckserver.dwr.GameModel;
+import deckserver.dwr.GameView;
+import deckserver.JolAdminFactory;
 
 import java.util.Date;
 

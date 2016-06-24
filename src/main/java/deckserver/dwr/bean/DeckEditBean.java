@@ -1,13 +1,13 @@
 package deckserver.dwr.bean;
 
-import cards.local.NormalizeDeck;
-import cards.local.NormalizeDeckFactory;
-import cards.model.CardEntry;
+import deckserver.interfaces.NormalizeDeck;
+import deckserver.cards.NormalizeDeckFactory;
+import deckserver.interfaces.CardEntry;
 import deckserver.servlet.DeckServlet;
 import deckserver.util.DeckParams;
-import nbclient.vtesmodel.JolAdminFactory;
+import deckserver.JolAdminFactory;
 import uk.ltd.getahead.dwr.WebContextFactory;
-import util.Shuffle;
+import deckserver.util.Shuffle;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -71,12 +71,12 @@ public class DeckEditBean {
                 dp.put("library", larr);
                 request.setAttribute("sparams", dp);
                 format = WebContextFactory.get().forwardToString(
-                        "/WEB-INF/jsps/topframe/shuffle.jsp");
+                        "/WEB-INF/jsps/shuffle.jsp");
             } else {
                 DeckParams dp = new DeckParams(null, null, null, null, nd);
                 request.setAttribute("dparams", dp);
                 format = WebContextFactory.get().forwardToString(
-                        "/WEB-INF/jsps/topframe/showdeck.jsp");
+                        "/WEB-INF/jsps/showdeck.jsp");
             }
         } catch (Exception e) {
             String msg = "Error in deck " + name + " for player " + player;

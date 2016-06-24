@@ -1,8 +1,7 @@
 package deckserver.dwr.bean;
 
-import deckserver.rich.AdminBean;
-import deckserver.rich.GameModel;
-import nbclient.vtesmodel.JolAdminFactory;
+import deckserver.dwr.GameModel;
+import deckserver.JolAdminFactory;
 
 import java.util.HashMap;
 import java.util.Map;

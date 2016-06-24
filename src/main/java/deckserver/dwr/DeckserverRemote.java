@@ -1,21 +1,17 @@
 package deckserver.dwr;
 
-import cards.model.CardEntry;
-import cards.model.CardSearch;
-import cards.model.CardSet;
-import deckserver.dwr.bean.BugDetailBean;
+import deckserver.interfaces.CardEntry;
+import deckserver.interfaces.CardSearch;
+import deckserver.interfaces.CardSet;
 import deckserver.dwr.bean.CardBean;
 import deckserver.dwr.bean.DeckEditBean;
-import deckserver.rich.AdminBean;
-import deckserver.rich.GameModel;
-import deckserver.rich.GameView;
-import deckserver.rich.PlayerModel;
+import deckserver.dwr.bean.AdminBean;
 import deckserver.util.AdminFactory;
-import nbclient.model.GameAction;
-import nbclient.vtesmodel.JolAdminFactory;
+import deckserver.interfaces.GameAction;
+import deckserver.JolAdminFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webclient.state.InteractiveAdmin;
+import deckserver.client.InteractiveAdmin;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -170,8 +166,7 @@ public class DeckserverRemote implements DSRemote {
 
     public Map<String, Object> getCardText(String callback, String game, String id) {
         Map<String, Object> ret = UpdateFactory.getUpdate(provider);
-        CardSearch cards = (game == null) ? JolAdminFactory.INSTANCE.getBaseCards()
-                : JolAdminFactory.INSTANCE.getCardsForGame(game);
+        CardSearch cards = JolAdminFactory.INSTANCE.getBaseCards();
         CardEntry card = cards.getCardById(id);
         ret.put(callback, new CardBean(card));
         return ret;
@@ -275,10 +270,6 @@ public class DeckserverRemote implements DSRemote {
             return InteractiveAdmin.executeBlock(cmd);
         }
         return "Permission denied";
-    }
-
-    public BugDetailBean getBugDetail(String index) {
-        return new BugDetailBean(JolAdminFactory.INSTANCE.getBug(index));
     }
 
     private void endGameImpl(String name) {

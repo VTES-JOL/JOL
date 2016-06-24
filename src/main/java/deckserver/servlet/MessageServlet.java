@@ -1,13 +1,7 @@
-/*
- * DServlet.java
- *
- * Created on March 8, 2004, 10:02 PM
- */
-
 package deckserver.servlet;
 
 import deckserver.util.WebParams;
-import webclient.state.MkMessages;
+import deckserver.client.MkMessages;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

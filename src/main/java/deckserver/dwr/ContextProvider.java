@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface ContextProvider {
 
-    public ServletContext getServletContext();
+    ServletContext getServletContext();
 
-    public HttpServletRequest getHttpServletRequest();
+    HttpServletRequest getHttpServletRequest();
 }

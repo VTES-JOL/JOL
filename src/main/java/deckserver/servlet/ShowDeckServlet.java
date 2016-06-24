@@ -6,11 +6,11 @@
 
 package deckserver.servlet;
 
-import cards.local.NormalizeDeck;
-import cards.local.NormalizeDeckFactory;
+import deckserver.interfaces.NormalizeDeck;
+import deckserver.cards.NormalizeDeckFactory;
 import deckserver.util.DeckParams;
 import deckserver.util.WebParams;
-import nbclient.vtesmodel.JolAdminFactory;
+import deckserver.JolAdminFactory;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -48,7 +48,7 @@ public class ShowDeckServlet extends DeckServlet {
             NormalizeDeck nd = NormalizeDeckFactory.getNormalizer(JolAdminFactory.INSTANCE.getBaseCards(), deck);
             DeckParams dp = new DeckParams(null, null, null, null, nd);
             request.setAttribute("dparams", dp);
-            RequestDispatcher dispatch = request.getRequestDispatcher("/WEB-INF/jsps/admin/showdeck.jsp");
+            RequestDispatcher dispatch = request.getRequestDispatcher("/WEB-INF/jsps/showdeck.jsp");
             dispatch.forward(request, response);
         } catch (Exception e) {
             params.addStatusMsg("Couldn't find deck.");
