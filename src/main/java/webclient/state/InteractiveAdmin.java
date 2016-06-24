@@ -7,6 +7,7 @@
 package webclient.state;
 
 import nbclient.vtesmodel.JolAdminFactory;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -15,10 +16,14 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * @author gfinklan
  */
 public class InteractiveAdmin {
+
+    private static final Logger logger = getLogger(InteractiveAdmin.class);
 
     public static String executeBlock(String block) {
         StringReader reader = new StringReader(block);
@@ -74,7 +79,7 @@ public class InteractiveAdmin {
         } catch (SecurityException e) {
             return "Badly configured server - this functionality is disabled";
         } catch (Throwable t) {
-            t.printStackTrace(System.err);
+            logger.error("Something went wrong building server {}", t);
             return "Bad error " + t.getMessage();
         }
     }

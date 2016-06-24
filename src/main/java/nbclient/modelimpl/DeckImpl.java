@@ -44,7 +44,6 @@ public class DeckImpl implements Deck {
 
     public void setQuantity(CardEntry card, int quantity) {
         cards.put(card, new Integer(quantity));
-        //      System.err.println("Adding to deck " + card.getName());
     }
 
 }

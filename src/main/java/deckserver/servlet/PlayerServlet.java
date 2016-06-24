@@ -9,6 +9,7 @@ package deckserver.servlet;
 import cards.local.NormalizeDeck;
 import cards.local.NormalizeDeckFactory;
 import deckserver.util.WebParams;
+import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +20,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * @author Joe User
  */
@@ -28,6 +31,8 @@ public class PlayerServlet extends GameServlet {
      *
      */
     private static final long serialVersionUID = 2273556448003744737L;
+
+    private static final Logger logger = getLogger(PlayerServlet.class);
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -58,7 +63,7 @@ public class PlayerServlet extends GameServlet {
             if (admin.isAdmin(player))
                 out.println("<a href=" + params.getPrefix() + "dadmin>Admin page</a><br>");
         } catch (Exception e) {
-            System.out.println("NPE in admin checking, player is " + player);
+            logger.error("NPE in admin checking, player is " + player);
         }
         out.println("<form action=" + params.getPrefix() + "login method=post>");
         out.println("<input name=logout value=yes type=hidden />");

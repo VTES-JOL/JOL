@@ -7,6 +7,8 @@
 package deckserver.login;
 
 import deckserver.util.WebParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
@@ -25,6 +27,7 @@ public class SessionStorage {
     static Session newest = null;
     Map<String, Session> sessions = null;
     private File sessionFile = null;
+    private static final Logger logger = LoggerFactory.getLogger(SessionStorage.class);
 
     public SessionStorage() {
     }
@@ -61,36 +64,16 @@ public class SessionStorage {
                 sessions.put(id, s);
             }
         } catch (IOException ie) {
-            ie.printStackTrace(System.err);
+            logger.error("Error loading session map {}", ie);
         } finally {
             try {
                 if (in != null) in.close();
             } catch (IOException ie2) {
-                ie2.printStackTrace(System.err);
+                logger.error("Error closing file stream {}", ie2);
             }
         }
     }
 
-    /*
-    private void writeSessionMap() {
-        Properties props = new Properties();
-        for(Session s = oldest; s != null ; s = s.getNext())
-            props.setProperty(s.getId(),s.getPlayer());
-        OutputStream out = null;
-        try {
-            out = new FileOutputStream(sessionFile);
-            props.store(out,"JOL3 Session storage");
-        } catch (IOException ie) {
-            ie.printStackTrace(System.err);
-        } finally {
-            try {
-                if(out != null) out.close();
-            } catch (IOException ie2) {
-                ie2.printStackTrace(System.err);
-            }
-        }
-    }
-    */
     // returns the player to whom this session belongs
     public String lookupSession(WebParams p) {
         HttpSession sess = p.getRequest().getSession();

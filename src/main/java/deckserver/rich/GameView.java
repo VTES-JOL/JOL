@@ -7,6 +7,7 @@ import deckserver.util.RefreshInterval;
 import nbclient.model.GameAction;
 import nbclient.vtesmodel.JolAdminFactory;
 import nbclient.vtesmodel.JolGame;
+import org.slf4j.Logger;
 import uk.ltd.getahead.dwr.WebContextFactory;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class GameView {
 
@@ -29,6 +32,7 @@ public class GameView {
     private boolean isAdmin = false;
     private Collection<String> chats = new ArrayList<String>();
     private Collection<String> collapsed = new HashSet<String>();
+    private static final Logger logger = getLogger(GameView.class);
 
     public GameView(String name, String player) {
         this.name = name;
@@ -112,7 +116,7 @@ public class GameView {
                 hand = WebContextFactory.get().forwardToString(
                         "/WEB-INF/jsps/dwr/hand.jsp");
             } catch (Exception e) {
-                e.printStackTrace(System.err);
+                logger.error("Error retrieving hand {}", e);
                 hand = "Error retrieving hand.";
             }
         }
@@ -145,7 +149,7 @@ public class GameView {
                 state = WebContextFactory.get().forwardToString(
                         "/WEB-INF/jsps/dwr/state.jsp");
             } catch (Exception e) {
-                e.printStackTrace(System.err);
+                logger.error("Error retrieving state {}", e);
                 hand = "Error retrieving state.";
             }
         }

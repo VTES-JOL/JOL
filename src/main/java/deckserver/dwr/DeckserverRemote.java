@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 public class DeckserverRemote implements DSRemote {
-	private static Logger log = LoggerFactory.getLogger(DeckserverRemote.class);
+	private static Logger logger = LoggerFactory.getLogger(DeckserverRemote.class);
 
     private final AdminBean abean;
     ContextProvider provider;
@@ -282,12 +282,12 @@ public class DeckserverRemote implements DSRemote {
     }
 
     private void endGameImpl(String name) {
-        System.err.println("Attempting to close " + name);
+        logger.error("Attempting to close " + name);
         PlayerModel player = getPlayer();
-        System.err.println(player.isSuper());
-        System.err.println(abean.getGameModel(name).getOwner());
-        if (player != null && (player.isSuper() || player.getPlayer().equals(abean.getGameModel(name).getOwner()))) {
-            System.err.println("Closing " + name);
+        logger.error("Is player super? : {}", player.isSuper());
+        logger.error(abean.getGameModel(name).getOwner());
+        if (player.isSuper() || player.getPlayer().equals(abean.getGameModel(name).getOwner())) {
+            logger.error("Closing " + name);
             abean.endGame(name);
         }
     }

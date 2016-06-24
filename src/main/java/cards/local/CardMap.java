@@ -6,6 +6,8 @@
 
 package cards.local;
 
+import org.slf4j.Logger;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.LineNumberReader;
@@ -15,6 +17,8 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * @author gfinklan
  */
@@ -22,14 +26,14 @@ public class CardMap {
 
     private final Properties map = new Properties();
 
+    private static final Logger logger = getLogger(CardMap.class);
+
     /**
      * Creates a new instance of CardMap
      */
     public CardMap(String resource) {
         InputStream in = null;
         try {
-            //in = getClass().getClassLoader().getResourceAsStream(resource);
-            //LineNumberReader reader = new LineNumberReader(new InputStreamReader(in,"ISO-8859-1"));
             StringReader r = new StringReader(resource);
             LineNumberReader reader = new LineNumberReader(r);
             String line = null;
@@ -37,11 +41,10 @@ public class CardMap {
                 int eq = line.indexOf("=");
                 String value = line.substring(0, eq);
                 String key = line.substring(eq + 1).toLowerCase();
-                //      System.err.println(key + "=" + value);
                 map.setProperty(key, value);
             }
         } catch (IOException ie) {
-            ie.printStackTrace(System.out);
+            logger.error("Unable to read card map {}", ie);
         } finally {
             try {
                 if (in != null) in.close();

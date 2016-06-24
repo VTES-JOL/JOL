@@ -8,6 +8,8 @@ package deckserver.util;
 
 import deckserver.rich.AdminBean;
 import nbclient.vtesmodel.JolAdminFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webclient.state.JolAdmin;
 
 import javax.servlet.ServletContext;
@@ -17,14 +19,16 @@ import javax.servlet.ServletContext;
  */
 public class AdminFactory {
 
+    private static final Logger logger = LoggerFactory.getLogger(AdminFactory.class);
+
     public static synchronized JolAdminFactory get(ServletContext context) {
         if (JolAdminFactory.INSTANCE == null) try {
-            System.out.println("Initing deckserver with " + System.getProperty("JOL_DATA"));
+            logger.info("Initing deckserver with " + System.getProperty("JOL_DATA"));
             JolAdminFactory.INSTANCE = new JolAdmin(System.getProperty("JOL_DATA"));
             context.setAttribute("dsadmin", new AdminBean());
-            System.out.println("Initialization complete");
+            logger.info("Initialization complete");
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+            logger.error("Error creating admin factory {}", e);
         }
         return JolAdminFactory.INSTANCE;
     }

@@ -7,6 +7,8 @@
 package deckserver.login;
 
 import nbclient.vtesmodel.JolAdminFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webclient.state.JolAdmin;
 
 import javax.servlet.*;
@@ -24,6 +26,7 @@ import java.util.*;
 public class AuthenticationFilter implements Filter {
 
     private static final boolean debug = false;
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
 
     public AuthenticationFilter() {
     }
@@ -157,7 +160,7 @@ public class AuthenticationFilter implements Filter {
         try {
             new JolAdmin(System.getProperty("JOL_DATA"));
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+            logger.error("Error loading data {}", e);
         }
     }
 
@@ -225,8 +228,7 @@ public class AuthenticationFilter implements Filter {
 
         @SuppressWarnings("unchecked")
         public void setParameter(String name, String[] values) {
-            if (debug)
-                System.out.println("AuthenticationFilter::setParameter(" + name + "=" + values + ")" + " localParams = " + localParams);
+            logger.debug("AuthenticationFilter::setParameter(" + name + "=" + values + ")" + " localParams = " + localParams);
 
             if (localParams == null) {
                 localParams = new Hashtable<String, String[]>();
@@ -246,23 +248,19 @@ public class AuthenticationFilter implements Filter {
         }
 
         public String getParameter(String name) {
-            if (debug)
-                System.out.println("AuthenticationFilter::getParameter(" + name + ") localParams = " + localParams);
+            logger.debug("AuthenticationFilter::getParameter(" + name + ") localParams = " + localParams);
             if (localParams == null)
                 return getRequest().getParameter(name);
             Object val = localParams.get(name);
-            if (val instanceof String)
-                return (String) val;
-            if (val instanceof String[]) {
+            if (val != null) {
                 String[] values = (String[]) val;
                 return values[0];
             }
-            return (val == null ? null : val.toString());
+            return null;
         }
 
         public String[] getParameterValues(String name) {
-            if (debug)
-                System.out.println("AuthenticationFilter::getParameterValues(" + name + ") localParams = " + localParams);
+            logger.debug("AuthenticationFilter::getParameterValues(" + name + ") localParams = " + localParams);
             if (localParams == null)
                 return getRequest().getParameterValues(name);
 
@@ -271,7 +269,7 @@ public class AuthenticationFilter implements Filter {
 
         @SuppressWarnings("unchecked")
         public Enumeration<String> getParameterNames() {
-            if (debug) System.out.println("AuthenticationFilter::getParameterNames() localParams = " + localParams);
+            logger.debug("AuthenticationFilter::getParameterNames() localParams = " + localParams);
             if (localParams == null)
                 return getRequest().getParameterNames();
 
@@ -280,7 +278,7 @@ public class AuthenticationFilter implements Filter {
 
         @SuppressWarnings("unchecked")
         public Map<String, String[]> getParameterMap() {
-            if (debug) System.out.println("AuthenticationFilter::getParameterMap() localParams = " + localParams);
+            logger.debug("AuthenticationFilter::getParameterMap() localParams = " + localParams);
             if (localParams == null)
                 return getRequest().getParameterMap();
             return localParams;

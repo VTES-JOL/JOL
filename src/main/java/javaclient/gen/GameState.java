@@ -327,7 +327,6 @@ public class GameState extends org.netbeans.modules.schema2beans.BaseBean {
         write(baos);
         String str = baos.toString();
         ;
-        // System.out.println("str='"+str+"'");
         out.writeUTF(str);
     }
 
@@ -336,7 +335,6 @@ public class GameState extends org.netbeans.modules.schema2beans.BaseBean {
         try {
             init(comparators, runtimeVersion);
             String strDocument = in.readUTF();
-            // System.out.println("strDocument='"+strDocument+"'");
             ByteArrayInputStream bais = new ByteArrayInputStream(strDocument.getBytes());
             Document doc = GraphManager.createXmlDocument(bais, false);
             initOptions(Common.NO_DEFAULT_VALUES);

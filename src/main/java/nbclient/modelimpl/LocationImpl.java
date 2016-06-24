@@ -104,14 +104,6 @@ public class LocationImpl implements Location {
         NoteImpl impl = (NoteImpl) note;
         region.removeNotation(impl.note);
     }
-    
-    /*
-    private void debug_print() {
-        System.err.println("printing location");
-        GameCard[] cards = region.getGameCard();
-        for(int i = 0;i < cards.length; i++)
-            System.err.println("  " + cards[i].getId());
-    } */
 
     // PENDING this should return long - the seed used to generate the shuffle, so
     // the exact shuffle can be re-done.  to do this, the static variable needs to be SecureRandom

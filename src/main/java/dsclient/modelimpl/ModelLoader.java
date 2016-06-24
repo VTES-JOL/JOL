@@ -2,11 +2,16 @@ package dsclient.modelimpl;
 
 import nbclient.model.*;
 import nbclient.vtesmodel.JolGame;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.Writer;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public final class ModelLoader {
+
+    private static final Logger logger = getLogger(ModelLoader.class);
 
     public static void createModel(Game game, Game orig) {
         game.setName(orig.getName());
@@ -26,7 +31,6 @@ public final class ModelLoader {
                 moveLoc(game, orig, players[i], locs[j]);
             }
         }
-        //dumpState(game,new PrintWriter(System.out));
     }
 
     private static void moveNotes(NoteTaker from, NoteTaker to) {
@@ -82,7 +86,7 @@ public final class ModelLoader {
                 }
             }
         } catch (IOException ie) {
-            System.out.println("ERROR HERE");
+            logger.error("Error dumping state");
             ie.printStackTrace();
         }
     }

@@ -9,6 +9,8 @@ package cards.local;
 import cards.model.CardEntry;
 import cards.model.CardSearch;
 import cards.model.CardSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -22,6 +24,8 @@ import java.util.*;
  * @author gfinklan
  */
 public class NormalizeDeckImpl implements NormalizeDeck {
+
+    private static final Logger logger = LoggerFactory.getLogger(NormalizeDeckImpl.class);
 
     final CardSearch search;
     StringBuffer orig = new StringBuffer();
@@ -83,7 +87,7 @@ public class NormalizeDeckImpl implements NormalizeDeck {
                 translated.append('\n');
             }
         } catch (IOException ie) {
-            ie.printStackTrace(System.err);
+            logger.error("Error reading deck: {}", ie);
         }
     }
 
@@ -167,10 +171,7 @@ public class NormalizeDeckImpl implements NormalizeDeck {
         if (cards.length == 0) return null;
         CardEntry bestfit = cards[0];
         for (int i = 0; i < cards.length; i++) {
-            //	System.err.println("FOO" + text + "FOO");
-            // 	System.err.println("Testing against F " + cards[i].getBaseName() + "F");
             if (cards[i].getBaseName().toLowerCase().equals(text)) return cards[i];
-            // 	System.err.println("No match");
             if (cards[i].getBaseName().toLowerCase().startsWith(text)) bestfit = cards[i];
         }
         return bestfit;
@@ -202,7 +203,6 @@ public class NormalizeDeckImpl implements NormalizeDeck {
     }
 
     private void addCard(CardEntry card, int quantity) {
-//    	System.err.println("adding " + card.getName() + " " + card.isCrypt());
         if (card.isCrypt()) {
             cryptsum += quantity;
             groups.add(card.getGroup());

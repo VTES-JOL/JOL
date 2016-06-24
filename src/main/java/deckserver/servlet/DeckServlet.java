@@ -80,7 +80,6 @@ public class DeckServlet extends GameServlet {
         String noinit = request.getParameter("editinit");
         if (editdeck != null && noinit == null) {
             deck = admin.getDeck(player, editdeck);
-            //  System.err.println("Deck is " + deck);
             if (deck != null) deckname = editdeck;
         }
         if (deck == null) deck = "";

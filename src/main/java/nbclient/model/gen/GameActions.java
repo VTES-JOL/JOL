@@ -219,8 +219,6 @@ public class GameActions extends org.netbeans.modules.schema2beans.BaseBean {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         write(baos);
         String str = baos.toString();
-        ;
-        // System.out.println("str='"+str+"'");
         out.writeUTF(str);
     }
 
@@ -229,7 +227,6 @@ public class GameActions extends org.netbeans.modules.schema2beans.BaseBean {
         try {
             init(comparators, runtimeVersion);
             String strDocument = in.readUTF();
-            // System.out.println("strDocument='"+strDocument+"'");
             ByteArrayInputStream bais = new ByteArrayInputStream(strDocument.getBytes());
             Document doc = GraphManager.createXmlDocument(bais, false);
             initOptions(Common.NO_DEFAULT_VALUES);

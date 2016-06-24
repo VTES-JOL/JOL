@@ -21,10 +21,13 @@ import nbclient.vtesmodel.BugDescriptor;
 import nbclient.vtesmodel.JolAdminFactory;
 import nbclient.vtesmodel.JolGame;
 import nbclient.vtesmodel.JolGameImpl;
+import org.slf4j.Logger;
 import util.StreamReader;
 
 import java.io.*;
 import java.util.*;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author Joe User
@@ -46,6 +49,8 @@ public class JolAdmin extends JolAdminFactory {
     private final Map<String, PlayerInfo> players;
 
     private final CardsInfo cards;
+
+    private static final Logger logger = getLogger(JolAdmin.class);
 
     public JolAdmin(String dir) throws Exception {
         this.dir = dir;
@@ -70,11 +75,6 @@ public class JolAdmin extends JolAdminFactory {
     }
 
     public String dump(String value) {
-        if (false) {
-            System.out.println(this);
-            System.out.println(games);
-            System.out.println(players);
-        }
         if (value == null || value.equals("") || value.equals("root"))
             return sysInfo.dump();
         String key = sysInfo.getKey(value);
@@ -141,7 +141,7 @@ public class JolAdmin extends JolAdminFactory {
         try {
             deck = readFile(file);
         } catch (IOException ie) {
-            ie.printStackTrace(System.out);
+            logger.error("Error adding player from file {}", ie);
             return false;
         }
         return addPlayerInternal(gameName, playerName, file.getName(), deck);
@@ -498,14 +498,14 @@ public class JolAdmin extends JolAdminFactory {
                 }
                 // handled by addCardSet write();
             } catch (Exception ie) {
-                ie.printStackTrace(System.err);
+                logger.error("Error creating game {}", ie);
                 throw new IllegalStateException("Couldn't initialize game "
                         + name);
             }
         }
 
         private void loadGame(String name) {
-            System.out.println("Loading " + name);
+            logger.debug("Loading game {}", name);
             try {
                 File file = new File(getGameDir(), "game.xml");
                 InputStream in = new FileInputStream(file);
@@ -520,12 +520,8 @@ public class JolAdmin extends JolAdminFactory {
                 ModelLoader.createModel(state, new GameImpl(gstate));
                 ModelLoader.createRecorder(actions, new TurnImpl(gactions));
                 game = new JolGameImpl(state, actions);
-                // System.out.println("here");
-                // ModelLoader.dumpState(state,new
-                // OutputStreamWriter(System.out));
             } catch (IOException ie) {
-                // System.out.println("ZZZZCOULDNT");
-                ie.printStackTrace(System.err);
+                logger.error("Error initializing game {}", ie);
                 throw new IllegalStateException("Couldn't initialize game "
                         + name);
             }
@@ -563,7 +559,7 @@ public class JolAdmin extends JolAdminFactory {
                 File deckFile = new File(getGameDir(), playerKey + ".deck");
                 writeFile(deckFile, deck);
             } catch (IOException ie) {
-                ie.printStackTrace(System.err);
+                logger.error("Error creating player {}", ie);
             }
             write();
         }
@@ -661,12 +657,10 @@ public class JolAdmin extends JolAdminFactory {
                 } catch (IOException ie) {
                     // TODO need to shut down this game at this point, so no
                     // futher data is lost.
-                    // System.err.println(state.dumpBeanNode());
-                    // System.err.println(actions.dumpBeanNode());
-                    ie.printStackTrace(System.err);
+                    logger.error("Error writing game state {}", ie);
                 } catch (NullPointerException npe) {
                     games.clear();
-                    npe.printStackTrace(System.err);
+                    logger.error("Schema2beans malfunction {}", npe);
                     throw new IllegalStateException("Schema2beans malfunction");
                 }
             }
@@ -773,7 +767,7 @@ public class JolAdmin extends JolAdminFactory {
                 writeFile(file, deck);
                 return true;
             } catch (Exception e) {
-                e.printStackTrace(System.err);
+                logger.error("Error creating deck {}", e);
                 return false;
             }
         }
@@ -1058,7 +1052,7 @@ public class JolAdmin extends JolAdminFactory {
                 info.load(in);
             } catch (IOException ie) {
                 if (!ignoreExceptions) {
-                    ie.printStackTrace(System.out);
+                    logger.error("Error Loading {}", ie);
                     throw new IllegalArgumentException("Invalid " + getHeader()
                             + " : " + filename);
                 }
@@ -1078,7 +1072,7 @@ public class JolAdmin extends JolAdminFactory {
                 out = new FileOutputStream(filename);
                 info.store(out, getHeader());
             } catch (IOException ie) {
-                ie.printStackTrace(System.err);
+                logger.error("Error writing file {}", ie);
             } finally {
                 try {
                     if (out != null)

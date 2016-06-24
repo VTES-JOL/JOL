@@ -9,6 +9,7 @@ package deckserver.servlet;
 import deckserver.util.AdminFactory;
 import deckserver.util.WebParams;
 import nbclient.vtesmodel.JolAdminFactory;
+import org.slf4j.Logger;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -17,12 +18,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * @author Joe User
  */
 public abstract class GameServlet extends HttpServlet {
 
     protected JolAdminFactory admin = null;
+    private static final Logger logger = getLogger(GameServlet.class);
 
     /**
      * Initializes the servlet.
@@ -56,17 +60,14 @@ public abstract class GameServlet extends HttpServlet {
         WebParams params = (WebParams) request.getSession(true).getAttribute("wparams");
         if (params == null) {
             params = new WebParams(request);
-            //     System.out.println("Created new WebParams  " + params + " with player " + params.getPlayer());
             request.getSession().setAttribute("wparams", params);
         } else {
             params.setRequest(request);
-            //      System.out.println("Using old WebParams " + params + " with player " + params.getPlayer());
         }
-        // request.setAttribute("params",params);
         try {
             processRequest(params, request, response);
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+            logger.error("Error processing request {}", e);
             params.addStatusMsg("Server error, please contact server administrator.");
             gotoMain(request, response);
         }

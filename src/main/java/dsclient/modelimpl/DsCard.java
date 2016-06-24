@@ -3,12 +3,17 @@ package dsclient.modelimpl;
 import nbclient.model.Card;
 import nbclient.model.state.SCardContainer;
 import nbclient.vtesmodel.JolAdminFactory;
+import org.slf4j.Logger;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 class DsCard extends CardBox implements Card {
 
     private String id;
     private String card;
     private CardBox parent;
+
+    private static final Logger logger = getLogger(DsCard.class);
 
     DsCard(String id, String card) {
         super(null);
@@ -24,7 +29,7 @@ class DsCard extends CardBox implements Card {
         try {
             return JolAdminFactory.INSTANCE.getAllCards().getCardById(card).getName();
         } catch (Throwable t) {
-            System.err.println("Error finding card " + this.card);
+            logger.error("Error finding card " + this.card);
             return "ERROR CARD";
         }
     }

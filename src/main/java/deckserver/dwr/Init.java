@@ -8,6 +8,8 @@ package deckserver.dwr;
 
 import deckserver.util.AdminFactory;
 import nbclient.vtesmodel.JolAdminFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -17,6 +19,8 @@ import javax.servlet.http.HttpServlet;
  * @author Joe User
  */
 public class Init extends HttpServlet {
+
+    private static final Logger logger = LoggerFactory.getLogger(Init.class);
 
     /**
      *
@@ -39,7 +43,7 @@ public class Init extends HttpServlet {
     }
 
     public void destroy() {
-        System.err.println("Destroying JOL factory");
+        logger.debug("Destroying JOL factory");
         JolAdminFactory.INSTANCE = null;
     }
 

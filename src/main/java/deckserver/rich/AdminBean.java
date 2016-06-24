@@ -11,7 +11,7 @@ import java.util.*;
 public class AdminBean {
 
     public static AdminBean INSTANCE = null;
-    private static Logger log = LoggerFactory.getLogger(AdminBean.class);
+    private static Logger logger = LoggerFactory.getLogger(AdminBean.class);
     private static int CHAT_STORAGE = 1000;
     private static int CHAT_DISCARD = 100;
 
@@ -39,7 +39,7 @@ public class AdminBean {
             }
             actives = new ArrayList<GameModel>(activeSort);
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+            logger.error("Error creating admin bean {}", e);
         }
     }
 
@@ -49,7 +49,7 @@ public class AdminBean {
                 JolAdminFactory.INSTANCE =
                         new JolAdmin(System.getProperty("JOL_DATA"));
             } catch (Exception e) {
-                e.printStackTrace(System.err);
+                logger.error("Error getting admin bean {}", e);
             }
         }
         return JolAdminFactory.INSTANCE;
@@ -71,7 +71,7 @@ public class AdminBean {
         if (bean == null) {
             bean = new PlayerModel(this, name, chats);
             if (name != null) {
-                log.info("Creating a model for " + name);
+                logger.info("Creating a model for " + name);
                 pmap.put(name, bean);
                 mkWho();
             }
@@ -105,7 +105,7 @@ public class AdminBean {
                     ) {
                 i.next().resetView(player);
             }
-            log.info("Removing " + player + " from admin");
+            logger.info("Removing " + player + " from admin");
             mkWho();
         }
     }

@@ -87,15 +87,6 @@ public class PortalServlet extends HttpServlet {
         processLogin(request, params);
         processGame(request, params);
         getServletContext().getNamedDispatcher("PortalPage").forward(request, response);
-        /*
-        try {
-            processRequest(params,request,response);
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
-            params.addStatusMsg("Server error, please contact server administrator.");
-            MailUtil.sendError(params,e);
-            gotoMain(request,response);
-        } */
     }
 
     /**

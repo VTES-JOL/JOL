@@ -11,19 +11,22 @@ import nbclient.model.state.SCard;
 import nbclient.model.state.SLocation;
 import nbclient.vtesmodel.JolAdminFactory;
 import nbclient.vtesmodel.JolGame;
+import org.slf4j.Logger;
 import util.DSRandom;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author Joe User
  */
 public class DoCommand {
 
-    //static boolean retrying = false;
-
     private final JolGame game;
+
+    private static final Logger logger = getLogger(DoCommand.class);
 
     /**
      * Creates a new instance of MkState
@@ -128,8 +131,7 @@ public class DoCommand {
                 String srcCard = cmdObj.getCard(false, player, srcRegion);
                 String targetPlayer = cmdObj.getPlayer(player);
                 String targetRegion = cmdObj.getRegion(crypt ? JolGame.READY_REGION : JolGame.ASHHEAP);
-                System.err.println("target region is " + targetRegion);
-                System.err.println(crypt);
+                logger.error("target region is {} with crypt {}", targetRegion, crypt);
                 String targetCard = cmdObj.getCard(true, targetPlayer, targetRegion);
                 boolean draw = cmdObj.consumeString("draw");
                 if (targetCard != null) {

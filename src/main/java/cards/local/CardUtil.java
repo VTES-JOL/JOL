@@ -9,6 +9,7 @@ package cards.local;
 import cards.model.CardEntry;
 import cards.model.CardSearch;
 import cards.model.CardSet;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,12 +17,16 @@ import java.io.LineNumberReader;
 import java.io.StringReader;
 import java.util.*;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * @author administrator
  */
 public class CardUtil {
 
     private static boolean showstatus;
+
+    private static final Logger logger = getLogger(CardUtil.class);
 
     public static CardSearch createSearch(String textfile, String mapfile) {
         return new SearchImpl(textfile, mapfile);
@@ -44,7 +49,6 @@ public class CardUtil {
             boolean notfound = true;
             for (int j = 0; j < text.length; j++)
                 if (text[j].startsWith(field)) {
-                    //                    System.err.println("Checking " + text[j]);
                     if ((value != null) && text[j].toLowerCase().indexOf(value, 6) > 0)
                         v.add(arr[i]);
                     notfound = false;
@@ -71,21 +75,17 @@ public class CardUtil {
         private void readCards(String file) {
             InputStream in = null;
             try {
-                // in = getClass().getClassLoader().getResourceAsStream(file);
-                // byte[] bytes = toByteArray(in);
-                //  in = new ByteArrayInputStream(bytes);
                 StringReader r = new StringReader(file);
-                //InputStreamReader r = new InputStreamReader(in,"ISO-8859-1");
                 LineNumberReader reader = new LineNumberReader(r);
                 cardArr = TranslateCard.readCards(map, reader);
                 cardTable = new HashMap<String, CardEntry>();
                 for (int i = 0; i < cardArr.length; i++) {
                     cardTable.put(cardArr[i].getCardId(), cardArr[i]);
                     if (showstatus && cardArr[i].getCardId().equals("not found"))
-                        System.out.println(cardArr[i].getCardId() + " = " + cardArr[i].getName());
+                        logger.debug(cardArr[i].getCardId() + " = " + cardArr[i].getName());
                 }
             } catch (Exception e) {
-                e.printStackTrace(System.out);
+                logger.error("Can't load cards db {}", e);
                 throw new IllegalStateException("Cannot load cards db");
             } finally {
                 try {
@@ -103,17 +103,6 @@ public class CardUtil {
         public CardEntry getCardById(String id) {
             return cardTable.get(id);
         }
-
-        /*
-        private CardEntry getCardByName(String name) {
-            name = name.toLowerCase();
-            for(int i = 0; i < cardArr.length; i++)
-                if(cardArr[i].getName().toLowerCase().startsWith(name)) {
-                    //               System.err.println("Found " + cardArr[i]);
-                    return cardArr[i];
-                }
-            return null;
-        } */
 
         public CardSet searchByName(CardSet set, String name) {
             return searchByField(set, "Name:", name);

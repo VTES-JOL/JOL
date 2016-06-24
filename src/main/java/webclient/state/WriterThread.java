@@ -27,7 +27,6 @@ class WriterThread extends Thread {
     public void run() {
         while (true) {
             String game = pop();
-            // System.err.println("Popped " + game);
             if (game == null) {
                 try {
                     sleep(60000);

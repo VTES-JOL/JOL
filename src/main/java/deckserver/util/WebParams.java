@@ -7,6 +7,8 @@
 package deckserver.util;
 
 import nbclient.vtesmodel.JolAdminFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -19,12 +21,13 @@ import java.util.Iterator;
  */
 public class WebParams {
 
-    public int LOG_LEVEL = 2;
-    ServletContext context;
-    HttpServletRequest request;
-    String status = null;
-    String player = "";
-    String game = "";
+    private static Logger logger = LoggerFactory.getLogger(WebParams.class);
+
+    private ServletContext context;
+    private HttpServletRequest request;
+    private String status = null;
+    private String player = "";
+    private String game = "";
     /**
      * Holds value of property cmdIndex.
      */
@@ -82,10 +85,7 @@ public class WebParams {
     }
 
     public String getPlayer() {
-        //     System.out.println("Getting player from " + this);
-        //     System.out.println("Request is " + request);
-        //     System.out.println("Session is " + request.getSession());
-        return player; //(String) request.getSession().getAttribute("meth");
+        return player;
     }
 
     public boolean isPlayer() {
@@ -118,19 +118,17 @@ public class WebParams {
     }
 
     public void log() {
-        if (LOG_LEVEL > 0) {
-            HttpSession session = request.getSession();
-            String meth = session == null ? "someone" : (String) session.getAttribute("meth");
-            System.err.println("Request for " + request.getRequestURI() + " by " + meth);
-        }
-        if (LOG_LEVEL > 2)
-            for (Iterator i = request.getParameterMap().keySet().iterator(); i.hasNext(); ) {
-                String key = (String) i.next();
-                System.err.println("   " + key + "=" + request.getParameter(key));
+        if (logger.isTraceEnabled()) {
+            logger.trace("Request map:");
+            for (String key : request.getParameterMap().keySet()) {
+                logger.trace(key + " -> " + request.getParameter(key));
             }
-        else if (LOG_LEVEL > 1) {
-            if (request.getParameter("command") != null && request.getParameter("command").length() > 0)
-                System.err.println("  " + "command" + "=" + request.getParameter("command"));
+        }
+        if (logger.isDebugEnabled()) {
+            String command = request.getParameter("command");
+            if (command != null && !command.isEmpty()) {
+                logger.debug("Command received: " + command);
+            }
         }
     }
 

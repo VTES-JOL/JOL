@@ -55,11 +55,6 @@ public class DServlet extends GameServlet {
      * @param response servlet response
      */
     protected void processRequest(WebParams params, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-       /* System.err.println(request.getContextPath());
-        System.err.println(request.getPathInfo());
-        System.err.println(request.getQueryString());
-        System.err.println(request.getPathTranslated());
-        System.err.println(request.getServletPath()); */
         PrintWriter out = response.getWriter();
         String gamename = request.getServletPath();
         if (gamename.length() > 0) gamename = gamename.substring(1);

@@ -49,45 +49,27 @@ public class ND implements Iterator, NormalizeDeck {
     }
 
     public static CardSet findCardName(CardSearch search, String text, Collection<String> errors) {
-        //        System.out.println("Finding card " + text);
-        // check for exact matches first
-        //  CardEntry card = search.getCardByName(text);
-        //    if(card != null) {
-        //       System.out.println("Searching prefix");
         CardSet cards = search.getAllCards();
-        // check for prefixes
         CardSet set = search.searchByName(cards, text);
-        //    System.out.println("Initial size " + set.getCardArray().length);
         if (set.getCardArray().length > 0) return set;
-        // check for abbreviations
         text = text.toLowerCase();
-        //         System.out.println("Searching abbreviations");
         String id = search.getId(text);
-        //    System.out.println("id is " + id);
         if (id == null || id.equals("not found"))
-            // check for abbreviation prefixes
             for (Iterator<?> i = search.getNames().iterator(); i.hasNext(); ) {
                 String abbrev = (String) i.next();
-                //     System.out.println("Checking " + abbrev);
                 if (abbrev.startsWith(text)) {
-                    //         System.out.println("Found abbrev " + abbrev);
                     id = search.getId(abbrev);
                     break;
                 }
             }
         if (id.equals("not found")) id = null;
         if (id != null) {
-            // now need to convert this to a set to handle advanced vamps
             CardEntry card = search.getCardById(id);
             set = search.searchByName(cards, card.getBaseName());
         }
         if (id == null || set.getCardArray().length == 0) {
-            //   }
-            // couldn't find any match
-            //          System.out.println("No match");
             errors.add(text);
         }
-        //  System.out.println("Returning " + set.getCardArray().length);
         return set;
     }
 
@@ -124,10 +106,6 @@ public class ND implements Iterator, NormalizeDeck {
         } catch (IOException ie) {
             nextLine = null;
         }
-//        if(nextLine == null) System.out.println("Found no card at all");
-//        else {
-        //           System.out.println("Found card " + nextLine);
-        //      }
     }
 
     private void processLine() {
@@ -154,7 +132,6 @@ public class ND implements Iterator, NormalizeDeck {
     }
 
     private String findCard(String text) {
-        //       System.out.println("Text in " + text);
         // first find out if advanced
         boolean advanced = false;
         if (text.endsWith("(advanced)")) {
@@ -164,12 +141,10 @@ public class ND implements Iterator, NormalizeDeck {
         CardSet set = findCardName(text);
         card = selectCard(text, set);
         if (card == null) return null;
-        //      System.out.println("Text out " + card.getName());
         if (!advanced) return card.getName();
         set = search.searchByText(set, "Advanced");
         card = selectCard(text, set);
         if (card == null) return null;
-        //       System.out.println("Text out " + card.getName());
         return card.getName();
     }
 
@@ -178,7 +153,6 @@ public class ND implements Iterator, NormalizeDeck {
         CardEntry[] cards = set.getCardArray();
         if (cards.length == 0) return null;
         for (int i = 0; i < cards.length; i++) {
-            //         System.out.println("Finding prefix of " + text + " with card " + cards[i].getName());
             if (cards[i].getBaseName().toLowerCase().startsWith(text)) return cards[i];
         }
         return cards[0];
@@ -193,7 +167,6 @@ public class ND implements Iterator, NormalizeDeck {
     }
 
     public Object next() {
-        //     System.out.println("Returning " + nextLine);
         try {
             return nextLine;
         } finally {
@@ -240,7 +213,6 @@ public class ND implements Iterator, NormalizeDeck {
 
     public void setQuantity(CardEntry card, int quantity) {
         cards.put(card, new Integer(quantity));
-        //      System.err.println("Adding to deck " + card.getName());
     }
 
     public String getFilteredDeck() {

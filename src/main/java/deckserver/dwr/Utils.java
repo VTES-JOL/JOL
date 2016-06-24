@@ -18,7 +18,7 @@ import java.util.Date;
 public class Utils {
 
     static final DateFormat format = new SimpleDateFormat("HH:mm M/d ");
-    private static Logger log = LoggerFactory.getLogger(Utils.class);
+    private static Logger logger = LoggerFactory.getLogger(Utils.class);
 
     public static String getGameName(HttpServletRequest request) {
         if (true) { // workaround until beta period is over.
@@ -60,7 +60,7 @@ public class Utils {
         AdminBean abean = AdminFactory.getBean(ctx);
         String player = (String) request.getSession().getAttribute("meth");
         String login = request.getParameter("login");
-        log.info("Get request " + request.getRequestURI() + " with " + player + " and " + login);
+        logger.info("Get request {} from player {}", request.getRequestURI(), player);
         if (login != null) {
             if (login.equals("Log in")) {
                 player = request.getParameter("dsuserin");
@@ -69,13 +69,13 @@ public class Utils {
                         && JolAdminFactory.INSTANCE.authenticate(player,
                         password)) {
                     setPlayer(request, player);
-                    System.err.println("Logged in with " + player + " " + password);
+                    logger.debug("Logged in player {}", player);
                 } else {
-                    System.err.println("Log in failed: " + player);
+                    logger.debug("Log in failed for player {}", player);
                     player = null;
                 }
             } else if (login.equals("Log out")) {
-                System.err.println("Log out: " + player);
+                logger.debug("Log out: " + player);
                 request.getSession().removeAttribute("meth");
                 abean.remove(player);
                 player = null;
@@ -86,9 +86,9 @@ public class Utils {
             String password = request.getParameter("newpassword");
             if (JolAdminFactory.INSTANCE.registerPlayer(player, password, email)) {
                 setPlayer(request, player);
-                System.err.println("registered " + player);
+                logger.debug("registered " + player);
             } else {
-                System.err.println("registration failed for " + player);
+                logger.error("registration failed for " + player);
                 player = null;
             }
         }
@@ -101,7 +101,7 @@ public class Utils {
             gamename = gamename.substring(1);
         if (gamename != null && gamename.length() > 0
                 && JolAdminFactory.INSTANCE.existsGame(gamename)) {
-            System.err.println("Setting game to be " + gamename);
+            logger.debug("Setting game to be " + gamename);
 
             model.enterGame(abean, gamename);
         }

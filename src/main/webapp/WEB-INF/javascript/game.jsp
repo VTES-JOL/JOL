@@ -4,12 +4,7 @@
     String prefix = params.getPrefix();
 
 %>
-<SCRIPT LANGUAGE="JavaScript">
-    <!--
-    Hide
-    from
-    older
-    browsers
+<SCRIPT type="text/javascript">
     var aWindow = '';
     function openWin(card) // Open card text in separate window (always on top)
     {
@@ -72,5 +67,4 @@
             region.style.display = 'none'; // Hide ashheap region details
         }
     }
-    // Stop hiding from older browsers -->
 </SCRIPT>

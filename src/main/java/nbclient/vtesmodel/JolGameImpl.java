@@ -269,9 +269,7 @@ public class JolGameImpl implements JolGame {
     }
 
     public int getCounters(String cardId) {
-        //	System.out.println("Getting counters for " + cardId);
         Card card = (Card) state.getCard(cardId);
-        //   System.out.println("Card is " + card);
         Note note = getNote(card, COUNTERS, false);
         if (note != null)
             return Integer.parseInt(note.getValue());
