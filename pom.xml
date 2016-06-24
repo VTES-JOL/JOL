@@ -11,7 +11,7 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <jolData>${basedir}/src/main/resources</jolData>
+        <dataDir>${basedir}/src/main/resources</dataDir>
     </properties>
     
     <dependencies>
@@ -50,7 +50,7 @@
                 <configuration>
                     <path>/jol3</path>
                     <systemProperties>
-                        <jolData>${jolData}</jolData>
+                        <JOL_DATA>${dataDir}</JOL_DATA>
                     </systemProperties>
                 </configuration>
             </plugin>

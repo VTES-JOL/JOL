@@ -155,7 +155,7 @@ public class AuthenticationFilter implements Filter {
      */
     public void init(FilterConfig filterConfig) {
         try {
-            new JolAdmin(System.getProperty("jolData"));
+            new JolAdmin(System.getProperty("JOL_DATA"));
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }

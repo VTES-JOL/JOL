@@ -19,8 +19,8 @@ public class AdminFactory {
 
     public static synchronized JolAdminFactory get(ServletContext context) {
         if (JolAdminFactory.INSTANCE == null) try {
-            System.out.println("Initing deckserver with " + System.getProperty("jolData"));
-            JolAdminFactory.INSTANCE = new JolAdmin(System.getProperty("jolData"));
+            System.out.println("Initing deckserver with " + System.getProperty("JOL_DATA"));
+            JolAdminFactory.INSTANCE = new JolAdmin(System.getProperty("JOL_DATA"));
             context.setAttribute("dsadmin", new AdminBean());
             System.out.println("Initialization complete");
         } catch (Exception e) {

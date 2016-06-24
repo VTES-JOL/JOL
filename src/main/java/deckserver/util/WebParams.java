@@ -53,7 +53,7 @@ public class WebParams {
     }
 
     public String getDataDir() {
-        return System.getProperty("jolData");
+        return System.getProperty("JOL_DATA");
     }
 
     public String getPrefix() {
