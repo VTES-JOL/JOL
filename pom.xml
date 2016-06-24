@@ -11,6 +11,7 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <jolData>${basedir}/src/main/resources</jolData>
     </properties>
     
     <dependencies>
@@ -48,6 +49,9 @@
                 <version>2.2</version>
                 <configuration>
                     <path>/jol3</path>
+                    <systemProperties>
+                        <jolData>${jolData}</jolData>
+                    </systemProperties>
                 </configuration>
             </plugin>
         </plugins>

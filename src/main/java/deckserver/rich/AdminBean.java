@@ -47,7 +47,7 @@ public class AdminBean {
         if (JolAdminFactory.INSTANCE == null) {
             try {
                 JolAdminFactory.INSTANCE =
-                        new JolAdmin("/Users/shannon/IdeaProjects/jol-legacy/src/main/resources");
+                        new JolAdmin(System.getProperty("jolData"));
             } catch (Exception e) {
                 e.printStackTrace(System.err);
             }

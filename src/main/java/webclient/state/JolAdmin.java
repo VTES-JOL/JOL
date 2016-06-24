@@ -50,8 +50,8 @@ public class JolAdmin extends JolAdminFactory {
     public JolAdmin(String dir) throws Exception {
         this.dir = dir;
         this.bugdir = new File(dir, "bugs");
-        games = new HashMap<String, GameInfo>();
-        players = new HashMap<String, PlayerInfo>();
+        games = new HashMap<>();
+        players = new HashMap<>();
         cards = new CardsInfo();
         sysInfo = new SystemInfo();
     }

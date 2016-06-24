@@ -9,11 +9,6 @@
     <description>Jyhad On-Line 3.0 Web Client</description>
 
     <context-param>
-        <param-name>directory</param-name>
-        <param-value>/Users/shannon/IdeaProjects/jol-legacy/src/main/resources</param-value>
-    </context-param>
-
-    <context-param>
         <param-name>prefix</param-name>
         <param-value>/jol3/</param-value>
     </context-param>
