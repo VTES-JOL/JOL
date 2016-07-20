@@ -76,7 +76,7 @@ public class DeckEditBean {
                 DeckParams dp = new DeckParams(null, null, null, null, nd);
                 request.setAttribute("dparams", dp);
                 format = WebContextFactory.get().forwardToString(
-                        "/WEB-INF/jsps/showdeck.jsp");
+                        "/WEB-INF/jsps/dwrdeck.jsp");
             }
         } catch (Exception e) {
             String msg = "Error in deck " + name + " for player " + player;

@@ -1,11 +1,10 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="deckserver.interfaces.CardEntry" %>
 <%@page import="deckserver.servlet.DeckServlet" %>
 <%@page import="deckserver.util.DeckParams" %>
 <%@page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.TreeMap" %>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<jsp:include page="/WEB-INF/jsps/scripts.jsp"/>
 <%
     DeckParams p = (DeckParams) request.getAttribute("dparams");
     Map<String, TreeMap<CardEntry, Integer>> deck = DeckServlet.getDeckHtmlMap(p);
@@ -30,12 +29,13 @@
 <br/>
 <%= vampires.size() > 0 ? "Vampires: <br/>" : "" %>
 <c:forEach items="${vampires.keySet()}" var="card">
-    ${vampires.get(card)} x <a href="javascript:getCard(null,'${card.cardId}')">${card.name} (G${card.group})</a><br/>
+    ${vampires.get(card)} x <a href="javascript:getCardDeck(null,'${card.cardId}')">${card.name}
+    (G${card.group})</a><br/>
 </c:forEach>
 
 <%= imbued.size() > 0 ? "Imbued: <br/>" : "" %>
 <c:forEach items="${imbued.keySet()}" var="card">
-    ${imbued.get(card)} x <a href="javascript:getCard(null,'${card.cardId}')">${card.name} (G${card.group})</a><br/>
+    ${imbued.get(card)} x <a href="javascript:getCardDeck(null,'${card.cardId}')">${card.name} (G${card.group})</a><br/>
 </c:forEach>
 
 <b>Library: (<%= sum %>)</b>
@@ -50,6 +50,6 @@
     %>
     ${type}: (${typeCount})<br/>
     <c:forEach items="${typeMap.keySet()}" var="card">
-        ${typeMap.get(card)} x <a href="javascript:getCard(null,'${card.cardId}')">${card.name}</a><br/>
+        ${typeMap.get(card)} x <a href="javascript:getCardDeck(null,'${card.cardId}')">${card.name}</a><br/>
     </c:forEach>
 </c:forEach>
