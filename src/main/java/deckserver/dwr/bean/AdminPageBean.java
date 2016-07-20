@@ -15,12 +15,15 @@ public class AdminPageBean {
         JolAdminFactory admin = JolAdminFactory.INSTANCE;
         String[] names = admin.getGames(player);
         Collection<String> c = new ArrayList<>();
-        for (int i = 0; i < names.length; i++) {
-            if (admin.getOwner(names[i]).equals(player)) {
-                if (admin.isOpen(names[i])) {
-                    games.put(names[i], new RegistrationSummaryBean(abean, names[i]));
-                } else if (!admin.isFinished(names[i])) {
-                    c.add(names[i]);
+        for (String gameName : names) {
+            if (gameName == null) {
+                continue;
+            }
+            if (admin.getOwner(gameName).equals(player)) {
+                if (admin.isOpen(gameName)) {
+                    games.put(gameName, new RegistrationSummaryBean(abean, gameName));
+                } else if (!admin.isFinished(gameName)) {
+                    c.add(gameName);
                 }
             }
         }
