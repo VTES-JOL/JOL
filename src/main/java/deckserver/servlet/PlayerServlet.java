@@ -6,8 +6,8 @@
 
 package deckserver.servlet;
 
-import deckserver.interfaces.NormalizeDeck;
 import deckserver.cards.NormalizeDeckFactory;
+import deckserver.interfaces.NormalizeDeck;
 import deckserver.util.WebParams;
 import org.slf4j.Logger;
 
@@ -75,8 +75,11 @@ public class PlayerServlet extends GameServlet {
         String[] games = admin.getGames(player);
         Collection<String> v = new Vector<String>(); // to hold open games
         if (games != null)
-            for (int i = 0; i < games.length; i++) {
-                if (admin.isOpen(games[i])) v.add(games[i]);
+            for (String game : games) {
+                if (game == null) {
+                    continue;
+                }
+                if (admin.isOpen(game)) v.add(game);
             }
         out.println("<td>");
         out.println("Decks:");
