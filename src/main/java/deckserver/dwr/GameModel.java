@@ -5,9 +5,9 @@ import deckserver.dwr.bean.SummaryBean;
 import deckserver.util.AdminFactory;
 import deckserver.JolAdminFactory;
 import deckserver.JolGame;
+import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ltd.getahead.dwr.WebContextFactory;
 import deckserver.client.DoCommand;
 
 import javax.servlet.ServletContext;

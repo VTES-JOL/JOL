@@ -1,6 +1,6 @@
 package deckserver.dwr;
 
-import uk.ltd.getahead.dwr.WebContextFactory;
+import org.directwebremoting.WebContextFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;

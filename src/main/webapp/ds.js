@@ -1,291 +1,62 @@
-function getCard(game, card) // Open card text in separate window (always on top)
-{
-    var divid = "card" + card;
-    if ($(divid) == null) {
-        DS.getCardText(pmap, 'showCard', game, card);
-    } else {
-        DWRUtil.setValue("cards", card);
-        selectCard();
-    }
+/*
+function loadTypes(data) {
+    dwr.util.addOptions('cardtype', data);
 }
-function showCard(data) {
-    var old = DWRUtil.getValue('extra');
-    var text = data.text.join("<br />");
-    DWRUtil.setValue('extra', old + "<div id=card" + data.id + ">" + text + "</div>");
-    DWRUtil.addOptions("cards", [data], "id", "name");
-    DWRUtil.setValue("cards", data.id);
-    selectCard();
-}
-function selectCard() {
-    if (DWRUtil.getValue("cards") == "NOCARD") {
-        selectHistory();
-    } else {
-        var divid = "card" + DWRUtil.getValue("cards");
-        var selected = DWRUtil.getValue("extraSelect");
-        DWRUtil.setValue("extraSelect", divid);
-        shide(divid, selected);
-    }
-}
+
 function pmap(data) {
     for (var item in data) {
         eval(item + '(data[item]);');
     }
 }
-function details(thistag) {
-    dsdebug("details " + thistag);
-    DS.doToggle(pmap, game, thistag);
-    doToggle(thistag);
-}
-function doToggle(thistag) {
-    var region = document.getElementById("region" + thistag);
-    if (region.style.display == 'none') {
-        region.style.display = ''; // Show details
-        document.getElementById(thistag).innerHTML = "-";
-    }
-    else {
-        region.style.display = 'none'; // Hide details
-        document.getElementById(thistag).innerHTML = "+";
-    }
-}
 
-function dsload(force) {
-    DS.getState(pmap, game, force);
-}
-
-function dochat(did, id, data) {
-    var curScroll = $(did).scrollTop;
-    $(did).scrollTop = 1000000;
-    if ($(did).scrollTop == curScroll) {
-        curScroll = 1000000;
-    }
-    var table = $(id);
-    for (var idx in data) {
-        table.insertRow(table.rows.length).insertCell(0).innerHTML = data[idx];
-    }
-    $(did).scrollTop = curScroll;
-}
-
-var refresher = null;
-function loadGame(data) {
-    if (!data.player) {
-        $('hand').style.display = 'none';
-        $('playerPad').style.display = 'none';
-        if (!data.admin) {
-            $('dsForm').style.display = 'none';
-        }
-    } else {
-        $('hand').style.display = '';
-        $('playerPad').style.display = '';
-    }
-    if (data.hand != null)
-        DWRUtil.setValue('hand', data.hand);
-    if (data.state != null)
-        DWRUtil.setValue('state', data.state);
-    if (data.global != null)
-        DWRUtil.setValue('global', data.global);
-    if (data.text != null)
-        DWRUtil.setValue('notes', data.text);
-    if (data.label != null) {
-        DWRUtil.setValue('turnlabel', data.label);
-//		    dochat('curturn',data.label);
-    }
-    if (data.refresh > 0) {
-        if (refresher != null) clearTimeout(refresher);
-        refresher = setTimeout("dsload(false)", data.refresh);
-    }
-    if (data.pingkeys != null) {
-        var pingarr = new Array();
-        for (var i in data.pingkeys) {
-            pingarr[i] = new Object();
-            pingarr[i].key = data.pingkeys[i];
-            pingarr[i].value = data.pingvalues[i];
-        }
-        var sel = DWRUtil.getValue('ping');
-        DWRUtil.removeAllOptions('ping');
-        DWRUtil.addOptions('ping', {"NNNPPPP": "No ping"});
-        DWRUtil.addOptions('ping', pingarr, 'value', 'key');
-        DWRUtil.setValue('ping', sel);
-    }
-    if (data.turns != null) {
-        var sel = DWRUtil.getValue('turns');
-        var num = $('turns').options.length;
-        DWRUtil.removeAllOptions('turns');
-        DWRUtil.addOptions('turns', data.turns);
-        if (num != data.turns.length && (data.turns.length == 1 || sel == data.turns[1])) {
-            DWRUtil.setValue('turns', data.turns[0]);
-        } else {
-            DWRUtil.setValue('turns', sel);
-        }
-    }
-    if (data.turn != null) {
-        if (data.resetChat) {
-            var table = $('curturntable');
-            while (table.rows.length > 0) table.deleteRow(0);
-        }
-        dochat('curturn', 'curturntable', data.turn);
-        var turncontent = data.turn.join('<br />');
-        var val = DWRUtil.getValue('turns');
-        var val2 = $('turns').options;
-        if (data.turns != null) {
-            DWRUtil.setValue('history', turncontent);
-        } else if (DWRUtil.getValue('turns') == $('turns').options[0].value) {
-            DWRUtil.setValue('history', DWRUtil.getValue('history') + "<br />" + turncontent);
-        }
-    }
-    if (data.phases != null) {
-        var phasev = DWRUtil.getValue('phase');
-        $('phasecommand').style.display = '';
-        $('endcommand').style.display = '';
-        DWRUtil.removeAllOptions('phase');
-        DWRUtil.addOptions('phase', data.phases);
-        if (data.turnChanged) {
-            phasev = 'Untap';
-        }
-        DWRUtil.setValue('phase', phasev);
-    } else {
-        $('phasecommand').style.display = 'none';
-        $('endcommand').style.display = 'none';
-    }
-    if (data.collapsed != null) {
-        for (var c in data.collapsed) {
-            doToggle(data.collapsed[c]);
-        }
-    }
-    if (data.stamp != null) {
-        DWRUtil.setValue('gamestamp', data.stamp);
-    }
-}
-function showStatus(data) {
-    if (data != null) {
-        DWRUtil.setValue('status', data);
-    }
-}
-
-function dosubmit() {
-    if ($('phase') != null) {
-        phase = DWRUtil.getValue('phase');
-    }
-    var command = DWRUtil.getValue('command');
-    DWRUtil.setValue('command', "");
-    var chat = DWRUtil.getValue('chat');
-    DWRUtil.setValue('chat', "");
-    var ping = null;
-    if ($('ping').selectedIndex > 0) {
-        ping = DWRUtil.getValue('ping');
-    }
-    DWRUtil.setValue('ping', 'NNNPPPP');
-    var endTurn = DWRUtil.getValue('endturn');
-    if (endTurn == "Yes") DWRUtil.setValue('phase', "Untap");
-    $('endturn').selectedIndex = 0;
-    // TODO should only submit global and text if they've changed
-    var global = DWRUtil.getValue('global');
-    var text = DWRUtil.getValue('notes');
-    DS.submitForm(pmap, game, phase, command, chat, ping, endTurn, global, text);
-    return false;
-}
-
-function dsdebug(data) {
-    //DWRUtil.setValue('dsdebug',DWRUtil.getValue('dsdebug') + "DEBUG " + data);
-}
-
-function ds2debug(data) {
-    DWRUtil.setValue('dsdebug', DWRUtil.getValue('dsdebug') + "DEBUG " + data);
-}
-
-function loadHistory(data) {
-    var text = data.join('<br/>');
-    DWRUtil.setValue('history', text);
-}
-
-function retrieveHistory() {
-    DS.getHistory(loadHistory, game, DWRUtil.getValue('turns'));
-}
-
-function selectHistory() {
-    var id = DWRUtil.getValue("extraSelect");
-    $('cards').selectedIndex = 0;
-    DWRUtil.setValue("extraSelect", "history");
-    shide('history', id);
-}
-
-function getHistory() {
-    selectHistory();
-    retrieveHistory();
+function init() {
+    DS.getTypes(loadTypes);
+    DS.init(pmap);
 }
 
 function shide(s, h) {
     $(h).style.display = 'none';
     $(s).style.display = '';
 }
-function init() {
-    DS.getTypes(loadTypes);
-    DS.init(pmap);
+
+function dobuttons(data) {
+    var buttons = '';
+    for (var prop in data) {
+        if (data.hasOwnProperty(prop)) {
+            buttons += '<button onclick="dsnav(' + "'" + prop + "'" + ');">' + data[prop] + "</button>";
+        }
+    }
+    dwr.util.setValue('buttons', dwr.util.getValue('buttons') + buttons);
 }
-function loadTypes(data) {
-    DWRUtil.addOptions('cardtype', data);
-}
-function dsnav(target) {
-    DS.navigate(pmap, target);
-}
-var game = null;
+
 function navigate(data) {
     shide('loaded', 'loadmsg');
-    var selected = DWRUtil.getValue("contentselect");
-    DWRUtil.setValue("contentselect", data.target);
+    var selected = dwr.util.getValue("contentselect");
+    dwr.util.setValue("contentselect", data.target);
     shide(data.target, selected);
-    DWRUtil.setValue('buttons', '');
+    dwr.util.setValue('buttons', '');
     dobuttons(data.playerButtons);
     dobuttons(data.adminButtons);
     dobuttons(data.gameButtons);
-    DWRUtil.setValue('buttons', DWRUtil.getValue('buttons') + '<button onclick=dsnav("help");>Help</button>');
+    dwr.util.setValue('buttons', dwr.util.getValue('buttons') + '<button onclick=dsnav("help");>Help</button>', { escapeHtml:false });
     if (data.player == null) {
         shide('logininputs', 'loggedin');
-        DWRUtil.setValue('login', 'Log in');
+        dwr.util.setValue('login', 'Log in');
     } else {
-        DWRUtil.setValue('username', data.player);
+        dwr.util.setValue('username', data.player);
         shide('loggedin', 'logininputs');
-        DWRUtil.setValue('login', 'Log out');
+        dwr.util.setValue('login', 'Log out');
     }
     game = data.game;
     if (game == null) {
-        DWRUtil.setValue('gamename', '');
-    } else if (DWRUtil.getValue('gamename') != game) {
-        DWRUtil.setValue('gamename', game);
+        dwr.util.setValue('gamename', '');
+    } else if (dwr.util.getValue('gamename') != game) {
+        dwr.util.setValue('gamename', game);
     }
 }
-function dobuttons(data) {
-    var buttons = '';
-    for (var item in data) {
-        buttons += '<button onclick="dsnav(' + "'" + item + "'" + ');">' + data[item] + "</button>";
-    }
-    DWRUtil.setValue('buttons', DWRUtil.getValue('buttons') + buttons);
-}
-function addgamerow(tid, label) {
-    var table = $(tid);
-    for (var idx in table.rows) {
-        var row = table.rows[idx];
-        if (row.label == label) {
-            return row;
-        }
-    }
-    var row = table.insertRow(0);
-    row.label = label;
-    return row;
-}
-function findgamerow(tid, label) {
-    var table = $(tid);
-    for (var idx in table.rows) {
-        var row = table.rows[idx];
-        if (row.label == label) {
-            return idx;
-        }
-    }
-    return -1;
-}
-function mkgamelink(game) {
-    return '<a class=gamelink onclick="dsnav(' + "'g" + game + "');" + '">' + game + "</a>";
-}
+
 function loadmain(data) {
+    console.log(data);
     if (data.loggedIn) {
         shide('player', 'register');
         $('globalchat').style.display = '';
@@ -293,17 +64,17 @@ function loadmain(data) {
             dochat('gchatwin', 'gchattable', data.chat);
         }
         if (data.who != null) {
-            DWRUtil.setValue('whoson', data.who.join(', '));
+            dwr.util.setValue('whoson', data.who.join(', '));
         }
         if (data.admins != null) {
-            DWRUtil.setValue('adson', data.admins.join(', '));
+            dwr.util.setValue('adson', data.admins.join(', '));
         }
         if (data.stamp != null) {
-            DWRUtil.setValue('chatstamp', data.stamp);
+            dwr.util.setValue('chatstamp', data.stamp);
         }
         if (data.myGames != null) {
-            for (var i in data.myGames) {
-                var row = addgamerow('owngames', data.myGames[i].game);
+            for (i = 0; i < data.myGames.length; i++) {
+                row = addgamerow('owngames', data.myGames[i].game);
                 if (row.cells.length == 0) {
                     row.insertCell(0);
                     row.insertCell(1);
@@ -364,9 +135,249 @@ function loadmain(data) {
         refresher = setTimeout("DS.doPoll(pmap)", data.refresh);
     }
 }
+
+function getCard(game, card) // Open card text in separate window (always on top)
+{
+    var divid = "card" + card;
+    if ($(divid) == null) {
+        DS.getCardText(pmap, 'showCard', game, card);
+    } else {
+        dwr.util.setValue("cards", card);
+        selectCard();
+    }
+}
+function showCard(data) {
+    var old = dwr.util.getValue('extra');
+    var text = data.text.join("<br />");
+    dwr.util.setValue('extra', old + "<div id=card" + data.id + ">" + text + "</div>");
+    dwr.util.addOptions("cards", [data], "id", "name");
+    dwr.util.setValue("cards", data.id);
+    selectCard();
+}
+function selectCard() {
+    if (dwr.util.getValue("cards") == "NOCARD") {
+        selectHistory();
+    } else {
+        var divid = "card" + dwr.util.getValue("cards");
+        var selected = dwr.util.getValue("extraSelect");
+        dwr.util.setValue("extraSelect", divid);
+        shide(divid, selected);
+    }
+}
+function details(thistag) {
+    dsdebug("details " + thistag);
+    DS.doToggle(pmap, game, thistag);
+    doToggle(thistag);
+}
+function doToggle(thistag) {
+    var region = document.getElementById("region" + thistag);
+    if (region.style.display == 'none') {
+        region.style.display = ''; // Show details
+        document.getElementById(thistag).innerHTML = "-";
+    }
+    else {
+        region.style.display = 'none'; // Hide details
+        document.getElementById(thistag).innerHTML = "+";
+    }
+}
+
+function dsload(force) {
+    DS.getState(pmap, game, force);
+}
+
+function dochat(did, id, data) {
+    var curScroll = $(did).scrollTop;
+    $(did).scrollTop = 1000000;
+    if ($(did).scrollTop == curScroll) {
+        curScroll = 1000000;
+    }
+    var table = $(id);
+    for (var idx in data) {
+        table.insertRow(table.rows.length).insertCell(0).innerHTML = data[idx];
+    }
+    $(did).scrollTop = curScroll;
+}
+
+var refresher = null;
+function loadGame(data) {
+    if (!data.player) {
+        $('hand').style.display = 'none';
+        $('playerPad').style.display = 'none';
+        if (!data.admin) {
+            $('dsForm').style.display = 'none';
+        }
+    } else {
+        $('hand').style.display = '';
+        $('playerPad').style.display = '';
+    }
+    if (data.hand != null)
+        dwr.util.setValue('hand', data.hand);
+    if (data.state != null)
+        dwr.util.setValue('state', data.state);
+    if (data.global != null)
+        dwr.util.setValue('global', data.global);
+    if (data.text != null)
+        dwr.util.setValue('notes', data.text);
+    if (data.label != null) {
+        dwr.util.setValue('turnlabel', data.label);
+//		    dochat('curturn',data.label);
+    }
+    if (data.refresh > 0) {
+        if (refresher != null) clearTimeout(refresher);
+        refresher = setTimeout("dsload(false)", data.refresh);
+    }
+    if (data.pingkeys != null) {
+        var pingarr = new Array();
+        for (var i in data.pingkeys) {
+            pingarr[i] = new Object();
+            pingarr[i].key = data.pingkeys[i];
+            pingarr[i].value = data.pingvalues[i];
+        }
+        var sel = dwr.util.getValue('ping');
+        dwr.util.removeAllOptions('ping');
+        dwr.util.addOptions('ping', {"NNNPPPP": "No ping"});
+        dwr.util.addOptions('ping', pingarr, 'value', 'key');
+        dwr.util.setValue('ping', sel);
+    }
+    if (data.turns != null) {
+        var sel = dwr.util.getValue('turns');
+        var num = $('turns').options.length;
+        dwr.util.removeAllOptions('turns');
+        dwr.util.addOptions('turns', data.turns);
+        if (num != data.turns.length && (data.turns.length == 1 || sel == data.turns[1])) {
+            dwr.util.setValue('turns', data.turns[0]);
+        } else {
+            dwr.util.setValue('turns', sel);
+        }
+    }
+    if (data.turn != null) {
+        if (data.resetChat) {
+            var table = $('curturntable');
+            while (table.rows.length > 0) table.deleteRow(0);
+        }
+        dochat('curturn', 'curturntable', data.turn);
+        var turncontent = data.turn.join('<br />');
+        var val = dwr.util.getValue('turns');
+        var val2 = $('turns').options;
+        if (data.turns != null) {
+            dwr.util.setValue('history', turncontent);
+        } else if (dwr.util.getValue('turns') == $('turns').options[0].value) {
+            dwr.util.setValue('history', dwr.util.getValue('history') + "<br />" + turncontent);
+        }
+    }
+    if (data.phases != null) {
+        var phasev = dwr.util.getValue('phase');
+        $('phasecommand').style.display = '';
+        $('endcommand').style.display = '';
+        dwr.util.removeAllOptions('phase');
+        dwr.util.addOptions('phase', data.phases);
+        if (data.turnChanged) {
+            phasev = 'Untap';
+        }
+        dwr.util.setValue('phase', phasev);
+    } else {
+        $('phasecommand').style.display = 'none';
+        $('endcommand').style.display = 'none';
+    }
+    if (data.collapsed != null) {
+        for (var c in data.collapsed) {
+            doToggle(data.collapsed[c]);
+        }
+    }
+    if (data.stamp != null) {
+        dwr.util.setValue('gamestamp', data.stamp);
+    }
+}
+function showStatus(data) {
+    if (data != null) {
+        dwr.util.setValue('status', data);
+    }
+}
+
+function dosubmit() {
+    if ($('phase') != null) {
+        phase = dwr.util.getValue('phase');
+    }
+    var command = dwr.util.getValue('command');
+    dwr.util.setValue('command', "");
+    var chat = dwr.util.getValue('chat');
+    dwr.util.setValue('chat', "");
+    var ping = null;
+    if ($('ping').selectedIndex > 0) {
+        ping = dwr.util.getValue('ping');
+    }
+    dwr.util.setValue('ping', 'NNNPPPP');
+    var endTurn = dwr.util.getValue('endturn');
+    if (endTurn == "Yes") dwr.util.setValue('phase', "Untap");
+    $('endturn').selectedIndex = 0;
+    // TODO should only submit global and text if they've changed
+    var global = dwr.util.getValue('global');
+    var text = dwr.util.getValue('notes');
+    DS.submitForm(pmap, game, phase, command, chat, ping, endTurn, global, text);
+    return false;
+}
+
+function dsdebug(data) {
+    //dwr.util.setValue('dsdebug',dwr.util.getValue('dsdebug') + "DEBUG " + data);
+}
+
+function ds2debug(data) {
+    dwr.util.setValue('dsdebug', dwr.util.getValue('dsdebug') + "DEBUG " + data);
+}
+
+function loadHistory(data) {
+    var text = data.join('<br/>');
+    dwr.util.setValue('history', text);
+}
+
+function retrieveHistory() {
+    DS.getHistory(loadHistory, game, dwr.util.getValue('turns'));
+}
+
+function selectHistory() {
+    var id = dwr.util.getValue("extraSelect");
+    $('cards').selectedIndex = 0;
+    dwr.util.setValue("extraSelect", "history");
+    shide('history', id);
+}
+
+function getHistory() {
+    selectHistory();
+    retrieveHistory();
+}
+
+function dsnav(target) {
+    DS.navigate(pmap, target);
+}
+var game = null;
+function addgamerow(tid, label) {
+    var table = $(tid);
+    for (var idx in table.rows) {
+        var row = table.rows[idx];
+        if (row.label == label) {
+            return row;
+        }
+    }
+    var row = table.insertRow(0);
+    row.label = label;
+    return row;
+}
+function findgamerow(tid, label) {
+    var table = $(tid);
+    for (var idx in table.rows) {
+        var row = table.rows[idx];
+        if (row.label == label) {
+            return idx;
+        }
+    }
+    return -1;
+}
+function mkgamelink(game) {
+    return '<a class=gamelink onclick="dsnav(' + "'g" + game + "');" + '">' + game + "</a>";
+}
 function globchat() {
-    DS.chat(pmap, DWRUtil.getValue('gchat'));
-    DWRUtil.setValue('gchat', '');
+    DS.chat(pmap, dwr.util.getValue('gchat'));
+    dwr.util.setValue('gchat', '');
 }
 function doedit() {
     shide('deckedit', 'noedit');
@@ -376,7 +387,7 @@ function doedit() {
 function donewdeck() {
     doedit();
     var name = findname();
-    DWRUtil.setValue('deckname', name);
+    dwr.util.setValue('deckname', name);
     var newdeck = new Object();
     newdeck.text = '';
     newdeck.format = '';
@@ -402,24 +413,24 @@ function findname() {
     return name;
 }
 function doadjust() {
-    DS.refreshDeck(pmap, DWRUtil.getValue('deckname'), DWRUtil.getValue('decktext'), DWRUtil.getValue('shuffle'));
+    DS.refreshDeck(pmap, dwr.util.getValue('deckname'), dwr.util.getValue('decktext'), dwr.util.getValue('shuffle'));
 }
 function dosave() {
     shide('noedit', 'deckedit');
     $('deckname').readOnly = 'readonly';
     $('decktext').readOnly = 'readonly';
-    DS.submitDeck(pmap, DWRUtil.getValue('deckname'), DWRUtil.getValue('decktext'));
+    DS.submitDeck(pmap, dwr.util.getValue('deckname'), dwr.util.getValue('decktext'));
 }
 function repldeckname(data) {
-    DWRUtil.setValue('deckname', data);
+    dwr.util.setValue('deckname', data);
 }
 function showDeck(data) {
-    if (data.text != null) DWRUtil.setValue('decktext', data.text);
+    if (data.text != null) dwr.util.setValue('decktext', data.text);
     $('deckcontents').innerHTML = data.format;
-    if (data.errors != null) DWRUtil.setValue('deckerrors', data.errors.join('<br />'));
+    if (data.errors != null) dwr.util.setValue('deckerrors', data.errors.join('<br />'));
 }
 function loaddeck(deck) {
-    DWRUtil.setValue('deckname', deck);
+    dwr.util.setValue('deckname', deck);
     DS.getDeck(pmap, deck);
 }
 function showDecks(data) {
@@ -441,13 +452,13 @@ function showDecks(data) {
         row.cells[1].innerHTML = data.games[i].name;
         row.cells[2].innerHTML = 'L' + data.games[i].lib + ' C' + data.games[i].crypt + ' G ' + data.games[i].groups;
     }
-    DWRUtil.removeAllOptions('reggames');
-    DWRUtil.removeAllOptions('regdecks');
-    DWRUtil.addOptions('reggames', data.games, 'game', 'game');
-    DWRUtil.addOptions('regdecks', data.decks, 'name', 'name');
+    dwr.util.removeAllOptions('reggames');
+    dwr.util.removeAllOptions('regdecks');
+    dwr.util.addOptions('reggames', data.games, 'game', 'game');
+    dwr.util.addOptions('regdecks', data.decks, 'name', 'name');
 }
 function doregister() {
-    DS.registerDeck(pmap, DWRUtil.getValue('reggames'), DWRUtil.getValue('regdecks'));
+    DS.registerDeck(pmap, dwr.util.getValue('reggames'), dwr.util.getValue('regdecks'));
 }
 function showCards(data) {
     var len = $('showcards').rows.length;
@@ -465,33 +476,33 @@ function getCardDeck(game, card) // Open card text in separate window (always on
     if ($(divid) == null) {
         DS.getCardText(pmap, 'showCardDeck', game, card);
     } else {
-        DWRUtil.setValue("deckcards", card);
+        dwr.util.setValue("deckcards", card);
         selectCardDeck();
     }
 }
 function showCardDeck(data) {
-    var old = DWRUtil.getValue('cardtext');
+    var old = dwr.util.getValue('cardtext');
     var text = data.text.join("<br />");
-    DWRUtil.setValue('cardtext', old + "<div id=dcard" + data.id + ">" + text + "</div>");
-    DWRUtil.addOptions("deckcards", [data], "id", "name");
-    DWRUtil.setValue("deckcards", data.id);
+    dwr.util.setValue('cardtext', old + "<div id=dcard" + data.id + ">" + text + "</div>");
+    dwr.util.addOptions("deckcards", [data], "id", "name");
+    dwr.util.setValue("deckcards", data.id);
     selectCardDeck();
 }
 function selectCardDeck() {
-    var divid = "dcard" + DWRUtil.getValue("deckcards");
-    var selected = DWRUtil.getValue("cardSelect");
-    DWRUtil.setValue("cardSelect", divid);
+    var divid = "dcard" + dwr.util.getValue("deckcards");
+    var selected = dwr.util.getValue("cardSelect");
+    dwr.util.setValue("cardSelect", divid);
     shide(divid, selected);
 }
 function dosearch() {
-    DS.cardSearch(pmap, DWRUtil.getValue("cardtype"), DWRUtil.getValue("cardquery"));
+    DS.cardSearch(pmap, dwr.util.getValue("cardtype"), dwr.util.getValue("cardquery"));
 }
 function creategame() {
-    DS.createGame(pmap, DWRUtil.getValue("creategame"));
-    DWRUtil.setValue("creategame", '');
+    DS.createGame(pmap, dwr.util.getValue("creategame"));
+    dwr.util.setValue("creategame", '');
 }
 function inviteplayer(game) {
-    DS.invitePlayer(pmap, game, DWRUtil.getValue('cgs' + game));
+    DS.invitePlayer(pmap, game, dwr.util.getValue('cgs' + game));
 }
 function startgame(game) {
     if (confirm("Start game?")) {
@@ -511,7 +522,7 @@ function doadmin(data) {
             row.cells[0].innerHTML = game;
             row.insertCell(1);
             row.cells[1].innerHTML = '<select id="cgs' + game + '"></select><button onclick="inviteplayer(' + "'" + game + "'" + ');">Invite</button>';
-            DWRUtil.addOptions('cgs' + game, data.players);
+            dwr.util.addOptions('cgs' + game, data.players);
             row.insertCell(2);
             row.cells[2].innerHTML = '<button onclick="startgame(' + "'" + game + "'" + ');">Start game</button>';
         }
@@ -526,29 +537,29 @@ function doadmin(data) {
             row.insertCell(3).innerHTML = player + '(C' + csize + ',L' + lsize + ',G ' + grps + ')';
         }
     }
-    DWRUtil.removeAllOptions('endgameselector');
-    DWRUtil.addOptions('endgameselector', data.runningGames);
+    dwr.util.removeAllOptions('endgameselector');
+    dwr.util.addOptions('endgameselector', data.runningGames);
 }
 function loadsuper(data) {
 
 }
 function beuser() {
-    DS.dosu(getsuper, DWRUtil.getValue("userspec"));
+    DS.dosu(getsuper, dwr.util.getValue("userspec"));
 }
 function unend() {
-    DS.unend(getsuper, DWRUtil.getValue("gamespec"));
+    DS.unend(getsuper, dwr.util.getValue("gamespec"));
 }
 function closegames() {
-    DS.endGames(pmap, DWRUtil.getValue("endgameselector"));
+    DS.endGames(pmap, dwr.util.getValue("endgameselector"));
 }
 function getinfo() {
-    DS.inspect(getsuper, DWRUtil.getValue("icmd"));
+    DS.inspect(getsuper, dwr.util.getValue("icmd"));
 }
 function dosuper() {
-    DS.doCommand(getsuper, DWRUtil.getValue("scmd"));
+    DS.doCommand(getsuper, dwr.util.getValue("scmd"));
 }
 function getsuper(data) {
-    DWRUtil.setValue('sres', data);
+    dwr.util.setValue('sres', data);
 }
 function loadbugs(data) {
     dsdebug("loading bugs");
@@ -570,11 +581,12 @@ function getbug(index) {
     DS.getBugDetail(loadbug, index);
 }
 function loadbug(data) {
-    DWRUtil.setValue('bugdetail', data.details);
-    DWRUtil.removeAllRows('commenttable');
+    dwr.util.setValue('bugdetail', data.details);
+    dwr.util.removeAllRows('commenttable');
     for (var comment in data.comments) {
         var row = $('commenttable').insertRow();
         row.insertCell(0);
         row.cells[0].innerHTML = commment;
     }
 }
+*/

@@ -7,8 +7,7 @@ import deckserver.interfaces.GameAction;
 import deckserver.JolAdminFactory;
 import deckserver.JolGame;
 import org.slf4j.Logger;
-import uk.ltd.getahead.dwr.WebContextFactory;
-
+import org.directwebremoting.WebContextFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;

@@ -3,8 +3,8 @@
 <html>
     <head>
         <title>JOL3</title>
-        <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/interface/DS.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/engine.js'></script>
+        <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/interface/DS.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/util.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/ds.js'></script>
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles.css"/>

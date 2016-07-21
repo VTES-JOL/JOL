@@ -18,7 +18,8 @@
         <dependency>
             <groupId>org.directwebremoting</groupId>
             <artifactId>dwr</artifactId>
-            <version>1.30.2.10</version>
+            <!--<version>1.30.2.10</version>-->
+            <version>3.0.1-RELEASE</version>
         </dependency>
 
         <dependency>
@@ -78,6 +79,7 @@
                     <path>/jol3</path>
                     <systemProperties>
                         <JOL_DATA>${dataDir}</JOL_DATA>
+                        <JAVA_OPTS>-Xms256M -Xmx384M</JAVA_OPTS>
                     </systemProperties>
                 </configuration>
             </plugin>

@@ -6,7 +6,7 @@ import deckserver.interfaces.CardEntry;
 import deckserver.servlet.DeckServlet;
 import deckserver.util.DeckParams;
 import deckserver.JolAdminFactory;
-import uk.ltd.getahead.dwr.WebContextFactory;
+import org.directwebremoting.WebContextFactory;
 import deckserver.util.Shuffle;
 
 import javax.servlet.http.HttpServletRequest;
