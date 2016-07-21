@@ -33,6 +33,7 @@ public class LoginServlet extends GameServlet {
         if (logout != null) {
             player = null;
             request.getSession().removeAttribute("meth");
+            response.sendRedirect(request.getContextPath());
         }
         if (player == null || player.equals("guest")) {
             String login = request.getParameter("login");

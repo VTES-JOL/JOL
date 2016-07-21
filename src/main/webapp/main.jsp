@@ -1,47 +1,83 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="deckserver.dwr.Utils" %>
 <%@page contentType="text/html" %>
 
+<%
+    String player = Utils.getPlayer(request);
+    request.setAttribute("player", player);
+    request.setAttribute("loggedIn", player != null);
+%>
+
 <html>
-    <head><title>Jyhad Online</title></head>
-    <body>
+<head>
+    <title>Jyhad Online</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
+          integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+            integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="${pageContext.request.contextPath}">JOL</a>
+        </div>
 
-        <p>
-            Try the <a href="${pageContext.request.contextPath}/beta/">beta</a> site, its much improved, though both
-            methods of playing games work interchangeably for now.
-        </p>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="${pageContext.request.contextPath}/beta/">Game Lobby</a></li>
+                <c:if test="${loggedIn}">
+                    <li><a href="${pageContext.request.contextPath}/player">Player Home</a></li>
+                    <li><a href="${pageContext.request.contextPath}/deck">Deck Construction</a></li>
+                </c:if>
+                <li><a href="${pageContext.request.contextPath}/commands.html">Command Help</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <c:if test="${!loggedIn}">
+                    <li><a href="${pageContext.request.contextPath}/register">Register</a></li>
+                    <li><a href="${pageContext.request.contextPath}/login">Login</a></li>
+                </c:if>
+                <c:if test="${loggedIn}">
+                    <li><p class="navbar-text">Logged in as ${player}</p></li>
+                    <li><a href="${pageContext.request.contextPath}/login?logout">Logout</a></li>
+                </c:if>
+            </ul>
+        </div>
+    </div>
+</nav>
 
-        <p>
-            Welcome to JOL-3, the latest version of Jyhad-OnLine. This version is fully interactive, as all commands
-            are available through the web site, making it possible to play real-time games across the network with only
-            a browser for a client. The new JOL command <a
-                href="${pageContext.request.contextPath}/commands.html">set</a> is streamlined and hopefully more
-            useful.
-        </p>
-        <p>
-            To play games on this server, register and login using the links below, then construct some decks.
-            You can cut/paste decks into the deck construction window from an external tool or editor if you like.
-            Cards go on separate lines, you can prefix with 1x or 2x or 10x if you want multiples of a card. Once you've got a deck, send
-            email to register@deckserver.net and I'll put you in a game. If you've rounded up a group to play
-            a game together, let me know and I'll put you all in the same game. Because JOL3 can be truly interactive,
-            games can go fast if everybody is on-line at the same time.
-        </p>
-        <ul>
-            <li><a href="${pageContext.request.contextPath}/register">Register</a> if you haven't registered to this
-                site left.
-            </li>
-            <li><a href="${pageContext.request.contextPath}/login">Log in</a> if you've already registered. Login
-                information is
-                preserved throughout your browser session. One login is used for all your games. You
-                have to be logged on to use any of the subsequent pages.
-            </li>
-            <li> Player <a href="${pageContext.request.contextPath}/player">home page</a>. This page links to all your
-                games and
-                decks.
-            </li>
-            <li><a href="${pageContext.request.contextPath}/deck">Deck construction</a>. Any deck used in a JOL-3 game
-                must be first
-                registered through this page.
-            </li>
-            <li> Or go to deckserver.net<${pageContext.request.contextPath}>/{game name} to go to a game.</li>
-        </ul>
-    </body>
+<div class="container">
+    <div class="page-header">
+        <h1>Jyhad Online
+            <small>Test Server</small>
+        </h1>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    News
+                </div>
+                <div class="panel-body">
+                    <p>Welcome to the new JOL server</p>
+                    <p>If you are coming from the current server you can login with your existing account details,
+                        otherwise click <a href="${pageContext.request.contextPath}/register">register</a> to sign up
+                        and start using JOL.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
 </html>
