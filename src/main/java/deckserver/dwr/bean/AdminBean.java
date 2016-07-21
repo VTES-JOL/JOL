@@ -160,9 +160,7 @@ public class AdminBean {
     }
 
     private void notifyAboutGame(String name, boolean removed) {
-        for (Iterator<PlayerModel> i = pmap.values().iterator(); i.hasNext();
-                ) {
-            PlayerModel model = i.next();
+        for (PlayerModel model : pmap.values()) {
             if (removed) {
                 model.removeGame(name);
             } else {

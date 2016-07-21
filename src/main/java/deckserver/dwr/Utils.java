@@ -16,7 +16,7 @@ import java.util.Date;
 
 public class Utils {
 
-    static final DateFormat format = new SimpleDateFormat("HH:mm M/d ");
+    static final DateFormat format = new SimpleDateFormat("d-MMM HH:mm zz ");
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
 
     public static String getGameName(HttpServletRequest request) {

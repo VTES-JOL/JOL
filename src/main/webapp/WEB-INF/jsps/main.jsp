@@ -1,7 +1,7 @@
 <%@page contentType="text/html" %>
 <table width="100%">
     <tr>
-        <td width="25%" align="top">
+        <td width="25%" valign="top">
             <div id="player" style="display: none;">
                 <span>Your games:</span>
                 <div id="owngamediv" class="gamediv">
@@ -32,7 +32,7 @@
                 </form>
             </div>
         </td>
-        <td width="50%">
+        <td width="50%" valign="top">
             <p>
                 Welcome to JOL-4 beta, the latest version of Jyhad-OnLine, where you can play Vampire-The Eternal
                 Struggle(VTES) card games online over
