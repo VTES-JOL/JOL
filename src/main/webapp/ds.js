@@ -1,3 +1,5 @@
+var refresher = null;
+
 function loadTypes(data) {
     dwr.util.addOptions('cardtype', data);
 }
@@ -129,12 +131,33 @@ function renderOnline(div, who) {
 function renderActiveGames(games) {
     if (games == null) return;
     for (var index = 0; index < games.length; index++) {
+        if (games[index].turn == null) continue;
         var row = addGameRow('activegames', games[index]);
+        if (row.cells.length == 0) {
+            row.insertCell(0);
+            row.insertCell(1);
+        }
+        if (row.cells.length == 2) {
+            row.cells[1].colspan = '1';
+            row.insertCell(2);
+            row.insertCell(3);
+        }
+        row.cells[0].innerHTML = makeGameLink(games[index].game);
+        row.cells[1].innerHTML = games[index].access;
+        row.cells[2].innerHTML = games[index].turn;
+        row.cells[3].innerHTML = '&nbsp ' + games[index].available.join(',');
     }
 }
 
+function renderNews(news) {
+    var newsItems = '';
+    for (var index = 0; index < news.length; index++) {
+        newsItems += '<p><a href="' + news[index].url + '">' + news[index].text + '</a></p>';
+    }
+    dwr.util.byId('news').innerHTML = newsItems;
+}
+
 function loadMain(data) {
-    console.log(data);
     if (data.loggedIn) {
         toggleVisible('player', 'register');
         toggleVisible('globalchat', 'register');
@@ -144,51 +167,51 @@ function loadMain(data) {
         renderOnline('adson', data.admins);
         renderMyGames(data.myGames);
         renderActiveGames(data.games);
+        renderNews(data.news);
+        if (data.refresh > 0) {
+            refresher = setTimeout("DS.doPoll(playerMap)", data.refresh);
+        }
     }
-    /*
-     for (var i in data.games) {
-     var row = addgamerow('activegames', data.games[i].game);
-     if (row.cells.length == 0) {
-     row.insertCell(0);
-     row.insertCell(1);
-     }
-     if (data.games[i].turn == null) {
-     row.cells[0].innerHTML = data.games[i].game;
-     row.cells[1].innerHTML = 'forming';
-     row.cells[1].colspan = 3;
-     } else {
-     if (row.cells.length == 2) {
-     row.cells[1].colspan = '1';
-     row.insertCell(2);
-     row.insertCell(3);
-     }
-     row.cells[0].innerHTML = mkgamelink(data.games[i].game);
-     row.cells[1].innerHTML = data.games[i].access;
-     row.cells[2].innerHTML = data.games[i].turn;
-     row.cells[3].innerHTML = '&nbsp ' + data.games[i].available.join(',');
-     //row.cells[3].class = 'gameplayers';
-     }
-     }
-     var news = '';
-     for (var i in data.news) {
-     news += '<p><a href="' + data.news[i].url + '">' + data.news[i].text + "</a></p>";
-     }
-     dwr.util.byId('news').innerHTML = news;
-     if (data.refresh > 0) {
-     if (refresher != null) clearTimeout(refresher);
-     refresher = setTimeout("DS.doPoll(pmap)", data.refresh);
-     }
-     */
 }
 
+function loadDeck(deck) {
+    dwr.util.setValue('deckname', deck);
+    DS.getDeck(deck, {callback: playerMap});
+}
+
+function showDeck(data) {
+    if (data.text != null) dwr.util.setValue('decktext', data.text);
+    dwr.util.byId('deckcontents').innerHTML = data.format;
+    if (data.errors != null) dwr.util.setValue('deckerrors', data.errors.join('<br />'));
+}
+
+function showDecks(data) {
+    // Deck List
+    for (var dIdx = 0; dIdx < data.decks.length; dIdx++) {
+        var row = addGameRow('decks', data.decks[dIdx].name);
+        if (row.cells.length == 0) {
+            row.insertCell(0).innerHTML = '<a onclick="loadDeck(' + "'" + data.decks[dIdx].name + "');" + '">' + data.decks[dIdx].name + '</a>';
+            row.insertCell(1);
+        }
+        row.cells[1].innerHTML = 'L' + data.decks[dIdx].lib + ' C' + data.decks[dIdx].crypt + ' G ' + data.decks[dIdx].groups;
+    }
+    // Register Decks for Games
+    for (var gIdx = 0; gIdx < data.games.length; gIdx++) {
+        var row = addGameRow('opengames', data.games[gIdx].game);
+        if (row.cells.length == 0) {
+            row.insertCell(0).innerHTML = data.games[gIdx].game;
+            row.insertCell(1);
+            row.insertCell(2);
+        }
+        row.cells[1].innerHTML = data.games[gIdx].name;
+        row.cells[2].innerHTML = 'L' + data.games[gIdx].lib + ' C' + data.games[gIdx].crypt + ' G ' + data.games[gIdx].groups;
+    }
+    dwr.util.removeAllOptions('reggames');
+    dwr.util.removeAllOptions('regdecks');
+    dwr.util.addOptions('reggames', data.games, 'game', 'game');
+    dwr.util.addOptions('regdecks', data.decks, 'name', 'name');
+}
 /*
-
-
-
-
-
-
-
 
  function getCard(game, card) // Open card text in separate window (always on top)
  {
@@ -470,34 +493,8 @@ function loadMain(data) {
  dwr.util.byId('deckcontents').innerHTML = data.format;
  if (data.errors != null) dwr.util.setValue('deckerrors', data.errors.join('<br />'));
  }
- function loaddeck(deck) {
- dwr.util.setValue('deckname', deck);
- DS.getDeck(pmap, deck);
- }
- function showDecks(data) {
- for (var i in data.decks) {
- var row = addgamerow('decks', data.decks[i].name);
- if (row.cells.length == 0) {
- row.insertCell(0).innerHTML = '<a onclick="loaddeck(' + "'" + data.decks[i].name + "');" + '">' + data.decks[i].name + '</a>';
- row.insertCell(1);
- }
- row.cells[1].innerHTML = 'L' + data.decks[i].lib + ' C' + data.decks[i].crypt + ' G ' + data.decks[i].groups;
- }
- for (var i in data.games) {
- var row = addgamerow('opengames', data.games[i].game);
- if (row.cells.length == 0) {
- row.insertCell(0).innerHTML = data.games[i].game;
- row.insertCell(1);
- row.insertCell(2);
- }
- row.cells[1].innerHTML = data.games[i].name;
- row.cells[2].innerHTML = 'L' + data.games[i].lib + ' C' + data.games[i].crypt + ' G ' + data.games[i].groups;
- }
- dwr.util.removeAllOptions('reggames');
- dwr.util.removeAllOptions('regdecks');
- dwr.util.addOptions('reggames', data.games, 'game', 'game');
- dwr.util.addOptions('regdecks', data.decks, 'name', 'name');
- }
+
+
  function doregister() {
  DS.registerDeck(pmap, dwr.util.getValue('reggames'), dwr.util.getValue('regdecks'));
  }
