@@ -59,7 +59,7 @@ public class Utils {
         AdminBean abean = AdminFactory.getBean(ctx);
         String player = (String) request.getSession().getAttribute("meth");
         String login = request.getParameter("login");
-        logger.info("Get request {} from player {}", request.getRequestURI(), player);
+        logger.trace("Get request {} from player {}", request.getRequestURI(), player);
         if (login != null) {
             if (login.equals("Log in")) {
                 player = request.getParameter("dsuserin");

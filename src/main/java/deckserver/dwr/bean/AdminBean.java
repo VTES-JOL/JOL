@@ -73,7 +73,7 @@ public class AdminBean {
         if (bean == null) {
             bean = new PlayerModel(this, name, chats);
             if (name != null) {
-                logger.info("Creating a model for " + name);
+                logger.trace("Creating a model for " + name);
                 pmap.put(name, bean);
                 mkWho();
             }
@@ -103,17 +103,15 @@ public class AdminBean {
         if (model != null) {
             model.saveDeck();
             pmap.remove(player);
-            for (Iterator<GameModel> i = gmap.values().iterator(); i.hasNext();
-                    ) {
-                i.next().resetView(player);
+            for (GameModel gameModel : gmap.values()) {
+                gameModel.resetView(player);
             }
-            logger.info("Removing " + player + " from admin");
             mkWho();
         }
     }
 
     private synchronized void mkWho() {
-        Collection<String> c = new TreeSet<String>(pmap.keySet());
+        Collection<String> c = new TreeSet<>(pmap.keySet());
         who = c.toArray(new String[c.size()]);
         for (Iterator i = c.iterator(); i.hasNext(); ) {
             if (!getAdmin().isAdmin((String) i.next())) {
@@ -130,9 +128,9 @@ public class AdminBean {
         }
         PlayerModel[] players = pmap.values().toArray(new PlayerModel[0]);
         timestamp = new Date();
-        for (int i = 0; i < players.length; i++) {
-            if (!checkViewTime(players[i]))
-                players[i].chat(chat);
+        for (PlayerModel player : players) {
+            if (!checkViewTime(player))
+                player.chat(chat);
         }
     }
 
@@ -160,9 +158,7 @@ public class AdminBean {
     }
 
     private void notifyAboutGame(String name, boolean removed) {
-        for (Iterator<PlayerModel> i = pmap.values().iterator(); i.hasNext();
-                ) {
-            PlayerModel model = i.next();
+        for (PlayerModel model : pmap.values()) {
             if (removed) {
                 model.removeGame(name);
             } else {

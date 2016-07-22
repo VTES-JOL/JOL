@@ -86,7 +86,7 @@ public class DeckServlet extends GameServlet {
         NormalizeDeck nd = NormalizeDeckFactory.getNormalizer(cs, deck);
         if (request.getParameter("submit") != null && player != null && deckname != null && deckname.length() > 0) {
             if (admin.createDeck(player, deckname, nd.getFilteredDeck())) {
-                getServletContext().getRequestDispatcher("/toplayer.jsp").forward(request, response);
+                response.sendRedirect(request.getContextPath() + "/player");
             } else {
                 params.addStatusMsg("Deck submission failed.");
             }
