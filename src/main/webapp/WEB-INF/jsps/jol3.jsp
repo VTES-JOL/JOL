@@ -6,8 +6,8 @@
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/engine.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/interface/DS.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/util.js'></script>
-        <script type='text/javascript' src='${pageContext.request.contextPath}/ds.js'></script>
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/styles.css"/>
+        <script type='text/javascript' src='${pageContext.request.contextPath}/js/ds.js'></script>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/styles.css"/>
     </head>
     <body onload="init();">
         <div id="dsdebug"></div>
@@ -35,8 +35,7 @@
                 </div>
 
                 <div id="help" style="display :none;">
-                    <iframe width="100%" height="100%" src="${pageContext.request.contextPath}/commands.html">
-                    </iframe>
+                    <jsp:include page="/WEB-INF/jsps/commands.jsp"/>
                 </div>
             </div>
         </div>

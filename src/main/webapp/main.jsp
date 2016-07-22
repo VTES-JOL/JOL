@@ -10,6 +10,9 @@
 
 <html>
 <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Jyhad Online</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
           integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
@@ -41,7 +44,6 @@
                     <li><a href="${pageContext.request.contextPath}/player">Player Home</a></li>
                     <li><a href="${pageContext.request.contextPath}/deck">Deck Construction</a></li>
                 </c:if>
-                <li><a href="${pageContext.request.contextPath}/commands.html">Command Help</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <c:if test="${!loggedIn}">
@@ -59,9 +61,7 @@
 
 <div class="container">
     <div class="page-header">
-        <h1>Jyhad Online
-            <small>Test Server</small>
-        </h1>
+        <h1>Jyhad Online </h1>
     </div>
     <div class="row">
         <div class="col-md-6">
