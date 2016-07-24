@@ -1,7 +1,7 @@
 package deckserver.dwr;
 
-import deckserver.dwr.bean.NavBean;
 import deckserver.dwr.bean.AdminBean;
+import deckserver.dwr.bean.NavBean;
 
 public class NavCreator implements ViewCreator {
 

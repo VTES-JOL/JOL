@@ -1,21 +1,21 @@
 package deckserver.dwr.bean;
 
+import deckserver.client.JolAdminFactory;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.GameView;
 import deckserver.dwr.PlayerModel;
-import deckserver.JolAdminFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class NavBean {
 
-    private static final Map<String, String> loggedIn = new HashMap<String, String>();
+    private static final Map<String, String> loggedIn = new HashMap<>();
     private static final Map<String, String> hasChats;
-    private static final Map<String, String> loggedOut = new HashMap<String, String>();
-    private static final Map<String, String> noadmin = new HashMap<String, String>();
-    private static final Map<String, String> isadmin = new HashMap<String, String>();
-    private static final Map<String, String> suser = new HashMap<String, String>();
+    private static final Map<String, String> loggedOut = new HashMap<>();
+    private static final Map<String, String> noadmin = new HashMap<>();
+    private static final Map<String, String> isadmin = new HashMap<>();
+    private static final Map<String, String> suser = new HashMap<>();
 
     static {
         loggedOut.put("main", "Main");
@@ -29,7 +29,7 @@ public class NavBean {
     }
 
     String player, game = null, target;
-    private Map<String, String> gameB = new HashMap<String, String>(), playerB = loggedOut, adminB = noadmin;
+    private Map<String, String> gameB = new HashMap<>(), playerB = loggedOut, adminB = noadmin;
 
     public NavBean(AdminBean abean, PlayerModel model) {
         player = model.getPlayer();
@@ -46,11 +46,11 @@ public class NavBean {
             }
         }
         String[] games = model.getCurrentGames();
-        for (int i = 0; i < games.length; i++) {
-            GameModel gmodel = abean.getGameModel(games[i]);
+        for (String game1 : games) {
+            GameModel gmodel = abean.getGameModel(game1);
             GameView view = gmodel.getView(player);
             String current = view.isChanged() ? " *" : "";
-            gameB.put("g" + games[i], games[i] + current);
+            gameB.put("g" + game1, game1 + current);
         }
     }
 

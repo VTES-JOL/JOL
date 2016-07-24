@@ -1,13 +1,14 @@
 package deckserver.dwr;
 
+import deckserver.client.JolAdminFactory;
+import deckserver.client.JolGame;
 import deckserver.dwr.bean.GameBean;
+import deckserver.game.turn.GameAction;
 import deckserver.util.HandParams;
 import deckserver.util.RefreshInterval;
-import deckserver.interfaces.GameAction;
-import deckserver.JolAdminFactory;
-import deckserver.JolGame;
-import org.slf4j.Logger;
 import org.directwebremoting.WebContextFactory;
+import org.slf4j.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,8 +29,8 @@ public class GameView {
     private String player;
     private boolean isPlayer = false;
     private boolean isAdmin = false;
-    private Collection<String> chats = new ArrayList<String>();
-    private Collection<String> collapsed = new HashSet<String>();
+    private Collection<String> chats = new ArrayList<>();
+    private Collection<String> collapsed = new HashSet<>();
     private static final Logger logger = getLogger(GameView.class);
 
     public GameView(String name, String player) {
@@ -42,8 +43,8 @@ public class GameView {
         JolAdminFactory admin = JolAdminFactory.INSTANCE;
         JolGame game = admin.getGame(name);
         GameAction[] actions = game.getActions(game.getCurrentTurn());
-        for (int i = 0; i < actions.length; i++) {
-            addChat(actions[i].getText());
+        for (GameAction action : actions) {
+            addChat(action.getText());
         }
         String[] players = game.getPlayers();
         for (int i = 0; i < players.length; ) {
@@ -61,10 +62,9 @@ public class GameView {
                 collapsed.add("i" + i);
             }
         }
-        if (!isPlayer
-                && (admin.isSuperUser(player) || admin.getOwner(name).equals(
-                player)))
+        if (!isPlayer && (admin.isSuperUser(player) || admin.getOwner(name).equals(player))) {
             isAdmin = true;
+        }
     }
 
     public synchronized GameBean create() {
@@ -107,8 +107,7 @@ public class GameView {
 
         if (isPlayer && stateChanged) {
             try {
-                HandParams h = new HandParams(game, player, "red", "Hand",
-                        JolGame.HAND);
+                HandParams h = new HandParams(game, player, "Hand", JolGame.HAND);
                 request.setAttribute("hparams", h);
                 request.setAttribute("game", game);
                 hand = WebContextFactory.get().forwardToString(
@@ -155,7 +154,7 @@ public class GameView {
         // pending use phaseChanged here?
         if (isPlayer && game.getActivePlayer().equals(player)) {
             boolean show = false;
-            Collection<String> c = new ArrayList<String>();
+            Collection<String> c = new ArrayList<>();
             String phase = game.getPhase();
             for (int i = 0; i < JolGame.TURN_PHASES.length; i++) {
                 if (phase.equals(JolGame.TURN_PHASES[i]))

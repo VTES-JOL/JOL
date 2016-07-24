@@ -1,13 +1,13 @@
 package deckserver.dwr.bean;
 
-import deckserver.JolAdminFactory;
+import deckserver.client.JolAdminFactory;
 
 import java.util.*;
 
 public class AdminPageBean {
 
     // map of Game name -> RegistrationSummaryBean[]
-    private Map<String, RegistrationSummaryBean> games = new HashMap<String, RegistrationSummaryBean>();
+    private Map<String, RegistrationSummaryBean> games = new HashMap<>();
     private String[] players;
     private String[] rGames;
 

@@ -1,10 +1,10 @@
 package deckserver.dwr.bean;
 
-import deckserver.interfaces.NormalizeDeck;
-import deckserver.cards.NormalizeDeckFactory;
+import deckserver.client.JolAdminFactory;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.GameView;
-import deckserver.JolAdminFactory;
+import deckserver.game.cards.NormalizeDeck;
+import deckserver.game.cards.NormalizeDeckFactory;
 
 import java.util.Date;
 
@@ -28,8 +28,7 @@ public class PlSummaryBean {
         JolAdminFactory admin = JolAdminFactory.INSTANCE;
         if (!started) {
             String deck = admin.getGameDeck(game.getName(), player);
-            NormalizeDeck nd = NormalizeDeckFactory.getDeckSize(admin
-                    .getCardsForGame(this.game), deck);
+            NormalizeDeck nd = NormalizeDeckFactory.getDeckSize(admin.getAllCards(), deck);
             library = nd.getLibSize();
             crypt = nd.getCryptSize();
             groups = nd.getGroups();

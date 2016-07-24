@@ -1,14 +1,14 @@
 package deckserver.dwr;
 
+import deckserver.client.DoCommand;
+import deckserver.client.JolAdminFactory;
+import deckserver.client.JolGame;
 import deckserver.dwr.bean.AdminBean;
 import deckserver.dwr.bean.SummaryBean;
 import deckserver.util.AdminFactory;
-import deckserver.JolAdminFactory;
-import deckserver.JolGame;
 import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import deckserver.client.DoCommand;
 
 import javax.servlet.ServletContext;
 import java.text.DateFormat;
@@ -22,7 +22,7 @@ public class GameModel implements Comparable {
     private String globalOwner = null;
     private String name;
     private long timestamp;
-    private Map<String, GameView> views = new HashMap<String, GameView>();
+    private Map<String, GameView> views = new HashMap<>();
     private SummaryBean sumbean;
 
     public GameModel(String name) {
@@ -76,7 +76,7 @@ public class GameModel implements Comparable {
             return "Not authorized";
         }
         JolGame game = admin.getGame(name);
-        StringBuffer status = new StringBuffer();
+        StringBuilder status = new StringBuilder();
         if (player != null) {
             boolean stateChanged = false;
             boolean pingChanged = false;
@@ -160,14 +160,14 @@ public class GameModel implements Comparable {
     }
 
     private void addChats(int idx) {
-        for (Iterator<GameView> i = views.values().iterator(); i.hasNext(); ) {
-            i.next().addChats(idx);
+        for (GameView gameView : views.values()) {
+            gameView.addChats(idx);
         }
     }
 
     private void resetChats() {
-        for (Iterator<GameView> i = views.values().iterator(); i.hasNext(); ) {
-            i.next().reset(false);
+        for (GameView gameView : views.values()) {
+            gameView.reset(false);
         }
     }
 
@@ -183,8 +183,7 @@ public class GameModel implements Comparable {
 
     private void doReload(boolean stateChanged, boolean phaseChanged, boolean pingChanged, boolean globalChanged, boolean turnChanged) {
         timestamp = JolAdminFactory.INSTANCE.getGameTimeStamp(name).getTime();
-        for (Iterator<String> i = (new ArrayList<String>(views.keySet())).iterator(); i.hasNext(); ) {
-            String key = i.next();
+        for (String key : (new ArrayList<>(views.keySet()))) {
             GameView view = views.get(key);
             //		if(checkViewTime(key, view,timestamp)) continue;
             if (stateChanged) view.stateChanged();

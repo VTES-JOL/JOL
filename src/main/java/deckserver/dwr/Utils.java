@@ -1,8 +1,11 @@
 package deckserver.dwr;
 
+import deckserver.client.JolAdminFactory;
 import deckserver.dwr.bean.AdminBean;
+import deckserver.game.cards.Deck;
 import deckserver.util.AdminFactory;
-import deckserver.JolAdminFactory;
+import deckserver.util.DeckParams;
+import net.deckserver.jol.game.cards.CardEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +15,8 @@ import java.text.CharacterIterator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
-import java.util.Date;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
 
@@ -112,7 +116,7 @@ public class Utils {
 
     public static String sanitizeName(String name) {
         StringCharacterIterator it = new StringCharacterIterator(name);
-        StringBuffer res = new StringBuffer();
+        StringBuilder res = new StringBuilder();
         for (char c = it.first(); c != CharacterIterator.DONE; c = it.next()) {
             if (Character.isJavaIdentifierPart(c))
                 res.append(c);
@@ -122,4 +126,49 @@ public class Utils {
         return res.toString();
     }
 
+    public static void shuffle(Object[] obj, int num) {
+        Random rnd = ThreadLocalRandom.current();
+        if (num <= 0 || num > obj.length) {
+            num = obj.length;
+        }
+        for (int i = num - 1; i > 0; i--)
+        {
+            int index = rnd.nextInt(i + 1);
+            Object a = obj[index];
+            obj[index] = obj[i];
+            obj[i] = a;
+        }
+    }
+
+    public static void shuffle(Object[] obj) {
+        shuffle(obj, 0);
+    }
+
+    public static Map<String, TreeMap<CardEntry, Integer>> getDeckHtmlMap(final Deck deck) {
+        CardEntry[] cards = deck.getCards();
+        Comparator<CardEntry> comp = (c1, c2) -> {
+            int i1 = deck.getQuantity(c1);
+            int i2 = deck.getQuantity(c2);
+            if (i1 == i2) {
+                return c1.getName().compareTo(c2.getName());
+            }
+            return i2 - i1;
+        };
+        Map<String, TreeMap<CardEntry, Integer>> ret = new HashMap<>();
+        for (CardEntry card : cards) {
+            String type = card.getType();
+            if (!ret.containsKey(type)) ret.put(type, new TreeMap<>(comp));
+            ret.get(type).put(card, deck.getQuantity(card));
+        }
+        return ret;
+    }
+
+    public static Map<String, TreeMap<CardEntry, Integer>> getDeckHtmlMap(DeckParams params) {
+        return getDeckHtmlMap(params.getDeckObj());
+    }
+
+    public static int sumMap(Collection<Integer> c) {
+        if (c == null) return 0;
+        return c.stream().mapToInt(i -> i).sum();
+    }
 }

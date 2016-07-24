@@ -6,23 +6,21 @@
 
 package deckserver.util;
 
-import deckserver.interfaces.Card;
-import deckserver.JolGame;
+import deckserver.client.JolGame;
+import deckserver.game.state.Card;
 
 /**
  * @author Joe User
  */
 public class RegionParams {
 
-    String text;
-    String color;
-    String index;
-    Card[] cards;
-    boolean hidden;
+    private String text;
+    private String index;
+    private Card[] cards;
+    private boolean hidden;
 
-    public RegionParams(JolGame game, String player, int index, String color, String text, String region, boolean hidden) {
+    public RegionParams(JolGame game, String player, int index, String text, String region, boolean hidden) {
         cards = (Card[]) game.getState().getPlayerLocation(player, region).getCards();
-        this.color = color;
         this.text = text;
         this.hidden = hidden;
         this.index = region.substring(0, 1).toLowerCase() + index;
@@ -30,10 +28,6 @@ public class RegionParams {
 
     public int getSize() {
         return cards.length;
-    }
-
-    public String getColor() {
-        return color;
     }
 
     public String getText() {

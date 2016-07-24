@@ -1,12 +1,10 @@
 package deckserver.client;
 
-import deckserver.JolAdminFactory;
-
 import java.util.Collections;
 import java.util.LinkedList;
 
 class WriterThread extends Thread {
-    private LinkedList<String> writes = new LinkedList<String>();
+    private LinkedList<String> writes = new LinkedList<>();
 
     public WriterThread() {
         setDaemon(true);

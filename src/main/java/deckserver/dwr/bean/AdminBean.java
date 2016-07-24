@@ -1,11 +1,11 @@
 package deckserver.dwr.bean;
 
-import deckserver.JolAdminFactory;
+import deckserver.client.JolAdmin;
+import deckserver.client.JolAdminFactory;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.PlayerModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import deckserver.client.JolAdmin;
 
 import java.util.*;
 
@@ -17,12 +17,12 @@ public class AdminBean {
     private static int CHAT_STORAGE = 1000;
     private static int CHAT_DISCARD = 100;
 
-    private Map<String, GameModel> gmap = new HashMap<String, GameModel>();
-    private Map<String, PlayerModel> pmap = new HashMap<String, PlayerModel>();
+    private Map<String, GameModel> gmap = new HashMap<>();
+    private Map<String, PlayerModel> pmap = new HashMap<>();
     private String[] who = new String[0];
-    private Collection<GameModel> activeSort = new TreeSet<GameModel>();
+    private Collection<GameModel> activeSort = new TreeSet<>();
     private List<GameModel> actives;
-    private List<String> chats = new ArrayList<String>();
+    private List<String> chats = new ArrayList<>();
     private Date timestamp = new Date();
     private String[] admins = new String[0];
 
@@ -32,14 +32,14 @@ public class AdminBean {
         try {
             JolAdminFactory admin = getAdmin();
             String[] games = admin.getGames();
-            for (int i = 0; i < games.length; i++) {
-                if (admin.isActive(games[i]) || admin.isOpen(games[i])) {
-                    GameModel bean = new GameModel(games[i]);
-                    gmap.put(games[i], bean);
+            for (String game : games) {
+                if (admin.isActive(game) || admin.isOpen(game)) {
+                    GameModel bean = new GameModel(game);
+                    gmap.put(game, bean);
                     activeSort.add(bean);
                 }
             }
-            actives = new ArrayList<GameModel>(activeSort);
+            actives = new ArrayList<>(activeSort);
         } catch (Exception e) {
             logger.error("Error creating admin bean {}", e);
         }
@@ -170,22 +170,23 @@ public class AdminBean {
     public synchronized void unEndGame(String name) {
         JolAdminFactory.INSTANCE.setGP(name, "state", "closed");
         activeSort.add(getGameModel(name));
-        actives = new ArrayList<GameModel>(activeSort);
+        actives = new ArrayList<>(activeSort);
         notifyAboutGame(name);
     }
 
     public synchronized void endGame(String name) {
         JolAdminFactory.INSTANCE.endGame(name);
         activeSort.remove(getGameModel(name));
-        actives = new ArrayList<GameModel>(activeSort);
+        actives = new ArrayList<>(activeSort);
         notifyAboutGame(name, true);
     }
 
     public synchronized void createGame(String name, PlayerModel player) {
+        logger.trace("Creating game {} for player {}", name, player.getPlayer());
         if (JolAdminFactory.INSTANCE.mkGame(name)) {
             JolAdminFactory.INSTANCE.setOwner(name, player.getPlayer());
             activeSort.add(new GameModel(name));
-            actives = new ArrayList<GameModel>(activeSort);
+            actives = new ArrayList<>(activeSort);
             notifyAboutGame(name);
         }
     }

@@ -1,12 +1,12 @@
 package deckserver.dwr;
 
-import deckserver.dwr.bean.MainBean;
 import deckserver.dwr.bean.AdminBean;
+import deckserver.dwr.bean.MainBean;
 
 public class MainCreator implements ViewCreator {
 
     public String getFunction() {
-        return "loadMain";
+        return "callbackMain";
     }
 
     public Object createData(AdminBean abean, PlayerModel model) {

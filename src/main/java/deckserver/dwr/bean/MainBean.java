@@ -1,12 +1,15 @@
 package deckserver.dwr.bean;
 
-import deckserver.dwr.Utils;
+import deckserver.client.JolAdminFactory;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.PlayerModel;
+import deckserver.dwr.Utils;
 import deckserver.util.RefreshInterval;
-import deckserver.JolAdminFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 
 public class MainBean {
 
@@ -33,16 +36,15 @@ public class MainBean {
 
     public void init(AdminBean abean, PlayerModel model) {
         Collection<GameModel> actives = abean.getActiveGames();
-        Collection<SummaryBean> gv = new ArrayList<SummaryBean>();
-        Collection<PlSummaryBean> mgv = new ArrayList<PlSummaryBean>();
-        Collection<String> gamenames = new HashSet<String>();
+        Collection<SummaryBean> gv = new ArrayList<>();
+        Collection<PlSummaryBean> mgv = new ArrayList<>();
+        Collection<String> gamenames = new HashSet<>();
         loggedin = model.getPlayer() != null;
         if (loggedin) {
             gamenames.addAll(Arrays.asList(JolAdminFactory.INSTANCE.getGames(model.getPlayer())));
             refresh = RefreshInterval.calc(abean.getTimestamp());
         }
-        for (Iterator i = actives.iterator(); i.hasNext(); ) {
-            GameModel game = (GameModel) i.next();
+        for (GameModel game : actives) {
             if (!model.getChangedGames().contains(game.getName())) continue;
             gv.add(game.getSummaryBean());
             if (gamenames.contains(game.getName()) && (game.isOpen() || game.getPlayers().contains(model.getPlayer())))

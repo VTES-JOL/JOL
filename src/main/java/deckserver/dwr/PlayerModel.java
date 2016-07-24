@@ -1,12 +1,16 @@
 package deckserver.dwr;
 
+import deckserver.client.JolAdminFactory;
 import deckserver.dwr.bean.AdminBean;
 import deckserver.dwr.bean.DeckSummaryBean;
-import deckserver.JolAdminFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class PlayerModel implements Comparable {
 
@@ -14,21 +18,19 @@ public class PlayerModel implements Comparable {
     private String view;
     private String[] games = new String[0];
     private String game = null;
-    private Collection<String> chats = new ArrayList<String>();
+    private Collection<String> chats = new ArrayList<>();
     private String tmpDeck;
     private String tmpDeckName;
     private DeckSummaryBean[] decks = null;
-    private Collection<String> removedGames = new ArrayList<String>(2);
-    private Collection<String> changedGames = new ArrayList<String>();
+    private Collection<String> removedGames = new ArrayList<>(2);
+    private Collection<String> changedGames = new ArrayList<>();
     private static Logger logger = LoggerFactory.getLogger(PlayerModel.class);
 
     public PlayerModel(AdminBean abean, String name, List<String> chatin) {
+        logger.trace("Creating new Player model for {}", name);
         this.player = name;
         setView("main");
-        for (Iterator<GameModel> i = abean.getActiveGames().iterator();
-             i.hasNext(); ) {
-            changedGames.add(i.next().getName());
-        }
+        changedGames.addAll(abean.getActiveGames().stream().map(GameModel::getName).collect(Collectors.toList()));
         chats.addAll(chatin);
     }
 
@@ -47,7 +49,7 @@ public class PlayerModel implements Comparable {
     public void enterGame(AdminBean abean, String game) {
         setView("game");
         //		GameModel model = abean.getGameModel(game);
-        Collection<String> c = new ArrayList<String>(Arrays.asList(games));
+        Collection<String> c = new ArrayList<>(Arrays.asList(games));
         if ( /*model.getPlayers().contains(player) && */!c.contains(game)) {
             c.add(game);
             games = c.toArray(games);
@@ -115,24 +117,26 @@ public class PlayerModel implements Comparable {
         }
     }
 
+    public void removeDeck() {
+        decks = null;
+    }
+
     public void submitDeck(String name, String deck) {
         clearDeck();
         JolAdminFactory.INSTANCE.createDeck(player, name, deck);
         decks = null;
     }
 
-    // TODO optimize deck cache???
-
     public DeckSummaryBean[] getDecks() {
         if (decks == null) {
             String[] names = JolAdminFactory.INSTANCE.getDeckNames(player);
             Arrays.sort(names);
-            Collection<DeckSummaryBean> c = new ArrayList<DeckSummaryBean>(names.length);
-            for (int i = 0; i < names.length; i++) {
+            Collection<DeckSummaryBean> c = new ArrayList<>(names.length);
+            for (String name : names) {
                 try {
-                    c.add(new DeckSummaryBean(this, names[i]));
+                    c.add(new DeckSummaryBean(this, name));
                 } catch (Throwable t) {
-                    logger.error("DeckSummaryBean Error for " + player + " and deck " + names[i], t);
+                    logger.error("DeckSummaryBean Error for " + player + " and deck " + name, t);
                 }
 
             }

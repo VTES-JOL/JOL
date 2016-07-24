@@ -1,20 +1,20 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page import="deckserver.interfaces.CardEntry" %>
-<%@page import="deckserver.servlet.DeckServlet" %>
+<%@page import="deckserver.dwr.Utils" %>
 <%@page import="deckserver.util.DeckParams" %>
+<%@page import="net.deckserver.jol.game.cards.CardEntry" %>
 <%@page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.TreeMap" %>
 <%
     DeckParams p = (DeckParams) request.getAttribute("dparams");
-    Map<String, TreeMap<CardEntry, Integer>> deck = DeckServlet.getDeckHtmlMap(p);
-    Map vampires = deck.get("Vampire");
-    Map imbued = deck.get("Imbued");
+    Map<String, TreeMap<CardEntry, Integer>> deck = Utils.getDeckHtmlMap(p);
+    Map<CardEntry, Integer> vampires = deck.get("Vampire");
+    Map<CardEntry, Integer> imbued = deck.get("Imbued");
     deck.remove("Vampire");
     deck.remove("Imbued");
-    if (vampires == null) vampires = new HashMap();
-    if (imbued == null) imbued = new HashMap();
-    int csize = DeckServlet.sumMap(vampires.values()) + DeckServlet.sumMap(imbued.values());
+    if (vampires == null) vampires = new HashMap<CardEntry, Integer>();
+    if (imbued == null) imbued = new HashMap<CardEntry, Integer>();
+    int csize = Utils.sumMap(vampires.values()) + Utils.sumMap(imbued.values());
     int sum = 0;
     for (TreeMap<CardEntry, Integer> libraryCard : deck.values()) {
         for (Integer count : libraryCard.values()) {
@@ -44,7 +44,7 @@
     <%
         String type = (String) pageContext.findAttribute("type");
         Map typeMap = deck.get(type);
-        int typeCount = DeckServlet.sumMap(typeMap.values());
+        int typeCount = Utils.sumMap(typeMap.values());
         pageContext.setAttribute("typeCount", typeCount);
         pageContext.setAttribute("typeMap", typeMap);
     %>

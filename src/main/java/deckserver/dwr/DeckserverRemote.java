@@ -1,23 +1,27 @@
 package deckserver.dwr;
 
-import deckserver.interfaces.CardEntry;
-import deckserver.interfaces.CardSearch;
-import deckserver.interfaces.CardSet;
+import deckserver.client.JolAdminFactory;
+import deckserver.dwr.bean.AdminBean;
 import deckserver.dwr.bean.CardBean;
 import deckserver.dwr.bean.DeckEditBean;
-import deckserver.dwr.bean.AdminBean;
+import deckserver.game.cards.CardSet;
+import deckserver.game.cards.OldCardSearch;
+import deckserver.game.turn.GameAction;
 import deckserver.util.AdminFactory;
-import deckserver.interfaces.GameAction;
-import deckserver.JolAdminFactory;
+import net.deckserver.jol.game.cards.CardEntry;
+import net.deckserver.jol.game.cards.CardType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import deckserver.client.InteractiveAdmin;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DeckserverRemote implements DSRemote {
-	private static Logger logger = LoggerFactory.getLogger(DeckserverRemote.class);
+    private static Logger logger = LoggerFactory.getLogger(DeckserverRemote.class);
 
     private final AdminBean abean;
     ContextProvider provider;
@@ -39,7 +43,9 @@ public class DeckserverRemote implements DSRemote {
     }
 
     public String[] getTypes() {
-        return CardEntry.types;
+        Set<CardType> cardTypes = EnumSet.allOf(CardType.class);
+        List<String> labels = cardTypes.stream().map(CardType::getLabel).collect(Collectors.toList());
+        return labels.toArray(new String[labels.size()]);
     }
 
     public Map<String, Object> doPoll() {
@@ -59,41 +65,10 @@ public class DeckserverRemote implements DSRemote {
         return UpdateFactory.getUpdate(provider);
     }
 
-    public Map<String, Object> endGames(String[] names) {
-        for (int i = 0; i < names.length; i++) {
-            endGameImpl(names[i]);
-        }
-        return UpdateFactory.getUpdate(provider);
-    }
-
-    public String inspect(String name) {
-        String player = getPlayer().getPlayer();
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
-        if (!admin.isSuperUser(player)) {
-            return "Access denied";
-        } else {
-            return JolAdminFactory.INSTANCE.dump(name);
-        }
-    }
-
-    public String dosu(String name) {
-        String player = getPlayer().getPlayer();
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
-        if (!admin.isSuperUser(player)) {
-            return "Access denied";
-        } else {
-            HttpServletRequest request = provider.getHttpServletRequest();
-            Utils.setPlayer(request, name);
-            return "Su to " + name;
-        }
-    }
-
     public Map<String, Object> invitePlayer(String game, String name) {
         String player = getPlayer().getPlayer();
         JolAdminFactory admin = JolAdminFactory.INSTANCE;
-        if (!admin.isAdmin(player)) {
-            // TODO throw invalid access error
-        } else {
+        if (admin.isAdmin(player)) {
             admin.invitePlayer(game, name);
         }
         return UpdateFactory.getUpdate(provider);
@@ -164,9 +139,9 @@ public class DeckserverRemote implements DSRemote {
         return ret;
     }
 
-    public Map<String, Object> getCardText(String callback, String game, String id) {
+    public Map<String, Object> getCardText(String callback, String id) {
         Map<String, Object> ret = UpdateFactory.getUpdate(provider);
-        CardSearch cards = JolAdminFactory.INSTANCE.getBaseCards();
+        OldCardSearch cards = JolAdminFactory.INSTANCE.getAllCards();
         CardEntry card = cards.getCardById(id);
         ret.put(callback, new CardBean(card));
         return ret;
@@ -198,11 +173,11 @@ public class DeckserverRemote implements DSRemote {
         name = ne(name);
         name = Utils.sanitizeName(name);
         PlayerModel model = getPlayer();
-        if (model != null && name != null && deck != null) {
+        if (model != null && deck != null) {
             model.submitDeck(name, deck);
         }
         Map<String, Object> ret = UpdateFactory.getUpdate(provider);
-        ret.put("repldeckname", name);
+        ret.put("callbackUpdateDeck", name);
         return ret;
     }
 
@@ -213,11 +188,15 @@ public class DeckserverRemote implements DSRemote {
         return UpdateFactory.getUpdate(provider);
     }
 
-    public boolean removeDeck(String name) {
+    public Map<String, Object> removeDeck(String name) {
         JolAdminFactory admin = JolAdminFactory.INSTANCE;
         String player = getPlayer().getPlayer();
         admin.removeDeck(player, name);
-        return true;
+        PlayerModel model = getPlayer();
+        if (model != null) {
+            model.removeDeck();
+        }
+        return UpdateFactory.getUpdate(provider);
     }
 
     public Map<String, Object> getDeck(String name) {
@@ -239,7 +218,7 @@ public class DeckserverRemote implements DSRemote {
 
     public Map<String, Object> cardSearch(String type, String string) {
         Map<String, Object> ret = UpdateFactory.getUpdate(provider);
-        CardSearch search = JolAdminFactory.INSTANCE.getBaseCards();
+        OldCardSearch search = JolAdminFactory.INSTANCE.getAllCards();
         CardSet set = search.getAllCards();
         type = ne(type);
         if (type != null && !type.equals("All")) {
@@ -251,25 +230,8 @@ public class DeckserverRemote implements DSRemote {
         for (int i = 0, j = arr.length - 1; i < arr.length; i++, j--) {
             beans[j] = new CardBean(arr[i]);
         }
-        ret.put("showCards", beans);
+        ret.put("callbackShowCards", beans);
         return ret;
-    }
-
-    public String doCommand(String cmd) {
-        HttpServletRequest request = provider.getHttpServletRequest();
-        String player = Utils.getPlayer(request);
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
-        if (admin.isSuperUser(player)) {
-            cmd = cmd.trim();
-            if (cmd.length() == 0) {
-                return admin.dump(cmd);
-            }
-            if (cmd.startsWith("dump")) {
-                return admin.dump(cmd.substring(5).trim());
-            }
-            return InteractiveAdmin.executeBlock(cmd);
-        }
-        return "Permission denied";
     }
 
     private void endGameImpl(String name) {

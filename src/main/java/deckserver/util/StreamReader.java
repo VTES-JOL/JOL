@@ -35,11 +35,10 @@ public class StreamReader {
         byte[] bytes = toByteArray(in);
         in = new ByteArrayInputStream(bytes);
         InputStreamReader r = new InputStreamReader(in, "ISO-8859-1");
-        LineNumberReader reader = new LineNumberReader(r);
-        return reader;
+        return new LineNumberReader(r);
     }
 
-    public static byte[] toByteArray(InputStream in) throws IOException {
+    private static byte[] toByteArray(InputStream in) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buf = new byte[1000];
         int read = 0;

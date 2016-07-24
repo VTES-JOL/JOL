@@ -13,8 +13,6 @@ public interface DSRemote {
 
     Map<String, Object> init();
 
-    String inspect(String name);
-
     Map<String, Object> invitePlayer(String game, String name);
 
     Map<String, Object> startGame(String game);
@@ -27,8 +25,7 @@ public interface DSRemote {
 
     String[] getHistory(String game, String turn);
 
-    Map<String, Object> getCardText(String callback, String game,
-                                    String id);
+    Map<String, Object> getCardText(String callback, String id);
 
     Map<String, Object> doToggle(String game, String id);
 
@@ -41,7 +38,7 @@ public interface DSRemote {
 
     Map<String, Object> registerDeck(String game, String name);
 
-    boolean removeDeck(String name);
+    Map<String, Object> removeDeck(String name);
 
     Map<String, Object> getDeck(String name);
 
@@ -50,5 +47,4 @@ public interface DSRemote {
 
     Map<String, Object> cardSearch(String type, String string);
 
-    String doCommand(String cmd);
 }

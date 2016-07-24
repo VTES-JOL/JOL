@@ -1,11 +1,11 @@
 package deckserver.dwr.bean;
 
-import deckserver.interfaces.NormalizeDeck;
-import deckserver.cards.NormalizeDeckFactory;
-import deckserver.interfaces.CardSearch;
+import deckserver.client.JolAdminFactory;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.PlayerModel;
-import deckserver.JolAdminFactory;
+import deckserver.game.cards.NormalizeDeck;
+import deckserver.game.cards.NormalizeDeckFactory;
+import deckserver.game.cards.OldCardSearch;
 
 public class DeckSummaryBean {
 
@@ -28,9 +28,7 @@ public class DeckSummaryBean {
     }
 
     private void init(String player, String deck) {
-        CardSearch search = (game == null) ?
-                JolAdminFactory.INSTANCE.getBaseCards() :
-                JolAdminFactory.INSTANCE.getCardsForGame(game);
+        OldCardSearch search = JolAdminFactory.INSTANCE.getAllCards();
         try {
             NormalizeDeck nd = NormalizeDeckFactory.getDeckSize(search, deck);
             lib = nd.getLibSize();

@@ -1,13 +1,12 @@
 package deckserver.dwr.bean;
 
-import deckserver.interfaces.NormalizeDeck;
-import deckserver.cards.NormalizeDeckFactory;
-import deckserver.interfaces.CardEntry;
-import deckserver.servlet.DeckServlet;
+import deckserver.client.JolAdminFactory;
+import deckserver.dwr.Utils;
+import deckserver.game.cards.NormalizeDeck;
+import deckserver.game.cards.NormalizeDeckFactory;
 import deckserver.util.DeckParams;
-import deckserver.JolAdminFactory;
+import net.deckserver.jol.game.cards.CardEntry;
 import org.directwebremoting.WebContextFactory;
-import deckserver.util.Shuffle;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -37,36 +36,33 @@ public class DeckEditBean {
     private String init(String player, String name, String deck, boolean shuffle) {
         JolAdminFactory admin = JolAdminFactory.INSTANCE;
         NormalizeDeck nd = NormalizeDeckFactory.constructDeck(admin
-                .getBaseCards(), deck);
+                .getAllCards(), deck);
         try {
             HttpServletRequest request = WebContextFactory.get()
                     .getHttpServletRequest();
             if (shuffle) {
-                Map<String, TreeMap<CardEntry, Integer>> map = DeckServlet
+                Map<String, TreeMap<CardEntry, Integer>> map = Utils
                         .getDeckHtmlMap(nd);
-                Collection<CardEntry> c = new ArrayList<CardEntry>();
-                Collection<CardEntry> v = new ArrayList<CardEntry>();
+                Collection<CardEntry> c = new ArrayList<>();
+                Collection<CardEntry> v = new ArrayList<>();
                 nd.getCards();
-                for (Iterator<String> i = map.keySet().iterator(); i.hasNext(); ) {
-                    String t = i.next();
+                for (String t : map.keySet()) {
                     Collection<CardEntry> l = v;
                     if (t.equalsIgnoreCase("Vampire")
                             || t.equalsIgnoreCase("Imbued")) {
                         l = c;
                     }
-                    for (Iterator<CardEntry> j = map.get(t).keySet().iterator(); j
-                            .hasNext(); ) {
-                        CardEntry card = j.next();
-                        int num = map.get(t).get(card).intValue();
+                    for (CardEntry card : map.get(t).keySet()) {
+                        int num = map.get(t).get(card);
                         for (int k = 0; k < num; k++)
                             l.add(card);
                     }
                 }
                 CardEntry[] carr = c.toArray(new CardEntry[0]);
-                carr = (CardEntry[]) Shuffle.shuffle(carr);
+                Utils.shuffle(carr);
                 CardEntry[] larr = v.toArray(new CardEntry[0]);
-                larr = (CardEntry[]) Shuffle.shuffle(larr);
-                Map<String, CardEntry[]> dp = new HashMap<String, CardEntry[]>();
+                Utils.shuffle(larr);
+                Map<String, CardEntry[]> dp = new HashMap<>();
                 dp.put("crypt", carr);
                 dp.put("library", larr);
                 request.setAttribute("sparams", dp);

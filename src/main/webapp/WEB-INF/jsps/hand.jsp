@@ -1,6 +1,6 @@
 <%@page import="deckserver.util.HandParams" %>
 <% HandParams p = (HandParams) request.getAttribute("hparams"); %>
-<div style="color: <%= p.getColor() %>">
+<div>
     <%= p.getText() %> ( <%= p.getSize() %>)
     <ol>
         <% for (int i = 0; i < p.getSize(); i++) {

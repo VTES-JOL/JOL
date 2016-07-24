@@ -17,29 +17,14 @@ body {
     height: 100%
 }
 
-#decks {
-    height: 350px;
-}
-
-#opengames {
-    background: white;
-    color: black;
-}
-
-#deckcontentdiv {
-    height: 420px;
-    overflow: auto;
-}
-
 .cardsdiv {
     height: 200px;
     overflow: auto;
 }
 
 .errdiv {
-    height: 70px;
-    color: white;
-    overflow: auto;
+    color: black;
+    font-weight: bolder;
 }
 
 td.gameplayers {
@@ -56,10 +41,13 @@ td.gameplayers {
 }
 
 .gamediv {
-    height: 300px;
     overflow: auto;
     background: white;
     color: black;
+}
+
+td.delete {
+    text-align: center;
 }
 
 .history {
@@ -116,21 +104,6 @@ a:link, a:visited, a:hover, a:active {
 }
 
 span.edge {
-    color: yellow;
-}
-
-span.library {
-    color: olive;
-}
-
-span.crypt {
-    color: teal;
-}
-
-span.hand {
-    color: burlywood;
-}
-
-span.cardtext {
-    color: lime;
+    color: red;
+    font-weight: bold;
 }

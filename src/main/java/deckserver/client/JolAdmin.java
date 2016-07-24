@@ -6,17 +6,18 @@
 
 package deckserver.client;
 
-import deckserver.cards.CardUtil;
-import deckserver.interfaces.CardSearch;
-import deckserver.game.state.GameState;
-import deckserver.interfaces.Game;
-import deckserver.interfaces.TurnRecorder;
-import deckserver.game.turn.GameActions;
-import deckserver.JolAdminFactory;
-import deckserver.JolGame;
-import deckserver.JolGameImpl;
-import org.slf4j.Logger;
+import deckserver.game.cards.CardUtil;
+import deckserver.game.cards.OldCardSearch;
+import deckserver.game.state.DsGame;
+import deckserver.game.state.Game;
+import deckserver.game.state.GameImpl;
+import deckserver.game.state.model.GameState;
+import deckserver.game.turn.ActionHistory;
+import deckserver.game.turn.TurnImpl;
+import deckserver.game.turn.TurnRecorder;
+import deckserver.game.turn.model.GameActions;
 import deckserver.util.StreamReader;
+import org.slf4j.Logger;
 
 import java.io.*;
 import java.util.*;
@@ -55,27 +56,17 @@ public class JolAdmin extends JolAdminFactory {
         sysInfo = new SystemInfo();
     }
 
-    private final static String readFile(File file) throws IOException {
+    private static String readFile(File file) throws IOException {
         return StreamReader.read(new FileInputStream(file));
     }
 
-    private final static void writeFile(File file, String contents)
+    private static void writeFile(File file, String contents)
             throws IOException {
         if (!file.exists())
             file.createNewFile();
         FileWriter out = new FileWriter(file);
         out.write(contents);
         out.close();
-    }
-
-    public String dump(String value) {
-        if (value == null || value.equals("") || value.equals("root"))
-            return sysInfo.dump();
-        String key = sysInfo.getKey(value);
-        if (key.startsWith("game"))
-            return getGameInfo(value).dump();
-        else
-            return getPlayerInfo(value).dump();
     }
 
     public boolean existsPlayer(String name) {
@@ -86,8 +77,7 @@ public class JolAdmin extends JolAdminFactory {
         return name != null && sysInfo.hasGame(name);
     }
 
-    PlayerInfo getPlayerInfo(String name) {
-        // assert existsPlayer
+    private PlayerInfo getPlayerInfo(String name) {
         if (players.containsKey(name))
             return players.get(name);
         PlayerInfo ret = new PlayerInfo(name);
@@ -96,7 +86,6 @@ public class JolAdmin extends JolAdminFactory {
     }
 
     GameInfo getGameInfo(String game) {
-        // assert existsGame
         if (games.containsKey(game))
             return games.get(game);
         GameInfo ret = new GameInfo(game);
@@ -128,19 +117,6 @@ public class JolAdmin extends JolAdminFactory {
         return addPlayerInternal(gameName, playerName, key, deck);
     }
 
-    public boolean addPlayerFromFile(String gameName, String playerName,
-                                     String deckfile) {
-        File file = new File(deckfile);
-        String deck = null;
-        try {
-            deck = readFile(file);
-        } catch (IOException ie) {
-            logger.error("Error adding player from file {}", ie);
-            return false;
-        }
-        return addPlayerInternal(gameName, playerName, file.getName(), deck);
-    }
-
     private boolean addPlayerInternal(String gameName, String playerName,
                                       String key, String deck) {
         GameInfo game = getGameInfo(gameName);
@@ -160,16 +136,6 @@ public class JolAdmin extends JolAdminFactory {
     public Date getLastAccess(String playerName) {
         PlayerInfo player = getPlayerInfo(playerName);
         return player.getLastAccess();
-    }
-
-    public boolean receivesTurnSummaries(String playerName) {
-        PlayerInfo player = getPlayerInfo(playerName);
-        return player.receivesTurnSummaries();
-    }
-
-    public void setReceivesTurnSummaries(String playerName, String set) {
-        PlayerInfo player = getPlayerInfo(playerName);
-        player.setReceivesTurnSummaries(set);
     }
 
     public boolean mkGame(String name) {
@@ -192,10 +158,6 @@ public class JolAdmin extends JolAdminFactory {
 
     public String getId(String name) {
         return sysInfo.getKey(name);
-    }
-
-    public JolGame getGameFromId(String id) {
-        return getGameInfo(sysInfo.getValue(id)).getGame();
     }
 
     public void saveGame(JolGame jolgame) {
@@ -230,10 +192,6 @@ public class JolAdmin extends JolAdminFactory {
         return existsPlayer(player) && getPlayerInfo(player).isSuperUser();
     }
 
-    public void setAdmin(String player, boolean set) {
-        getPlayerInfo(player).setAdmin(set);
-    }
-
     public String getOwner(String gameName) {
         return getGameInfo(gameName).getOwner();
     }
@@ -241,10 +199,6 @@ public class JolAdmin extends JolAdminFactory {
     public void setOwner(String game, String player) {
         getGameInfo(game).setOwner(player);
         getPlayerInfo(player).claimGame(game);
-    }
-
-    public void setEmail(String player, String email) {
-        getPlayerInfo(player).setEmail(email);
     }
 
     public String getDeck(String player, String name) {
@@ -290,15 +244,12 @@ public class JolAdmin extends JolAdminFactory {
         return getGameInfo(gameName).isFinished();
     }
 
-    public boolean isBetaGame(String gamename) {
-        return getGameInfo(gamename).isBeta();
-    }
-
     public void startGame(String game) {
         getGameInfo(game).startGame();
     }
 
     public void removeDeck(String player, String deckname) {
+        logger.trace("Removing deck: {} from player: {}", deckname, player);
         getPlayerInfo(player).removeDeck(deckname);
     }
 
@@ -308,10 +259,6 @@ public class JolAdmin extends JolAdminFactory {
 
     public Date getGameTimeStamp(String gameName) {
         return getGameInfo(gameName).getTimeStamp();
-    }
-
-    public Collection<String> haveAccessed(String gameName) {
-        return getGameInfo(gameName).getAccessed();
     }
 
     public void recordAccess(String gameName, String playerName) {
@@ -329,62 +276,15 @@ public class JolAdmin extends JolAdminFactory {
         info.write();
     }
 
-    public void setPP(String player, String prop, String value) {
-        PlayerInfo info = getPlayerInfo(player);
-        if (value.equals("REM")) info.remove(prop);
-        else info.setProperty(prop, value);
-        info.write();
-    }
-
-    public void setAP(String prop, String value) {
-        if (value.equals("REM")) sysInfo.remove(prop);
-        else sysInfo.setProperty(prop, value);
-        sysInfo.write();
-    }
-
-    @Override
-    public void replacePlayer(String game, String oldPlayer, String newPlayer) {
-        setGP(game, getId(newPlayer), oldPlayer + "sub");
-        setPP(newPlayer, getId(game), oldPlayer + "sub");
-        final JolGame jolgame = getGame(game);
-        jolgame.replacePlayer(oldPlayer, newPlayer);
-        saveGame(jolgame);
-    }
-
-    public void addCardSetToGame(String game, String set) {
-        getGameInfo(game).addCardSet(set);
-    }
-
-    public String[] getCardSets() {
-        return cards.getCardSets();
-    }
-
-    public void addCardSet(String name, String label, String set) {
-        try {
-            cards.addCardSet(name, label, set);
-        } catch (IOException ie) {
-
-        }
-    }
-
-    public CardSearch getBaseCards() {
-        return cards.getBaseCards();
-    }
-
-    public CardSearch getAllCards() {
+    public OldCardSearch getAllCards() {
         return cards.getAllCards();
-    }
-
-    public CardSearch getCardsForGame(String name) {
-        String[] sets = getGameInfo(name).getCardSets();
-        return cards.getCards(sets);
     }
 
     class GameInfo extends Info {
         private final String prefix;
         JolGame game;
         String gamename;
-        Map<String, Date> playerAccess = new HashMap<String, Date>(8);
+        Map<String, Date> playerAccess = new HashMap<>(8);
         private Game state;
 
         private TurnRecorder actions;
@@ -420,7 +320,7 @@ public class JolAdmin extends JolAdminFactory {
             return game;
         }
 
-        public Date getTimeStamp() {
+        Date getTimeStamp() {
             String ts = info.getProperty("timestamp");
             if (ts == null)
                 return new Date();
@@ -428,7 +328,7 @@ public class JolAdmin extends JolAdminFactory {
             return new Date(timestamp);
         }
 
-        public void recordAccess(String player) {
+        void recordAccess(String player) {
             playerAccess.put(player, new Date());
         }
 
@@ -436,7 +336,7 @@ public class JolAdmin extends JolAdminFactory {
             return playerAccess.keySet();
         }
 
-        public Date getAccessed(String player) {
+        Date getAccessed(String player) {
             Date ret = playerAccess.get(player);
             if (ret == null)
                 return startDate;
@@ -447,11 +347,6 @@ public class JolAdmin extends JolAdminFactory {
             try {
                 getGameDir().mkdir();
                 info.setProperty("state", "open");
-                String[] sets = cards.getCoreSets();
-                for (int i = 0; i < sets.length; i++) {
-                    addCardSet(sets[i]);
-                }
-                // handled by addCardSet write();
             } catch (Exception ie) {
                 logger.error("Error creating game {}", ie);
                 throw new IllegalStateException("Couldn't initialize game "
@@ -486,16 +381,16 @@ public class JolAdmin extends JolAdminFactory {
             return "Deckserver 3.0 game file";
         }
 
-        public String getOwner() {
+        String getOwner() {
             return info.getProperty("owner");
         }
 
-        public void setOwner(String player) {
+        void setOwner(String player) {
             info.setProperty("owner", player);
             write();
         }
 
-        public String getPlayerDeck(String player) {
+        String getPlayerDeck(String player) {
             String playerKey = sysInfo.getKey(player);
             File deckFile = new File(getGameDir(), playerKey + ".deck");
             if (!deckFile.exists())
@@ -507,7 +402,7 @@ public class JolAdmin extends JolAdminFactory {
             }
         }
 
-        public void addPlayer(String name, String deckKey, String deck) {
+        void addPlayer(String name, String deckKey, String deck) {
             String playerKey = sysInfo.getKey(name);
             info.setProperty(playerKey, deckKey);
             try {
@@ -519,13 +414,13 @@ public class JolAdmin extends JolAdminFactory {
             write();
         }
 
-        public void endGame() {
+        void endGame() {
             info.setProperty("state", "finished");
             // PENDING generate state html, archive all other game artifacts.
             write();
         }
 
-        public void startGame() {
+        void startGame() {
             info.setProperty("state", "closed");
             state = new DsGame();
             actions = new ActionHistory();
@@ -538,19 +433,18 @@ public class JolAdmin extends JolAdminFactory {
 
         private void regDecks() {
             String[] players = getPlayers();
-            for (int i = 0; i < players.length; i++) {
-                String deck = getPlayerDeck(players[i]);
+            for (String player : players) {
+                String deck = getPlayerDeck(player);
                 if (deck != null) {
-                    getGame().addPlayer(getCardsForGame(gamename), players[i],
-                            deck);
+                    getGame().addPlayer(getAllCards(), player, deck);
                 }
             }
         }
 
         public String[] getPlayers() {
-            Collection<String> ps = new LinkedList<String>();
-            for (Iterator i = info.keySet().iterator(); i.hasNext(); ) {
-                String k = (String) i.next();
+            Collection<String> ps = new LinkedList<>();
+            for (Object o : info.keySet()) {
+                String k = (String) o;
                 if (k.startsWith("player")) {
                     ps.add(sysInfo.getValue(k));
                 }
@@ -558,20 +452,16 @@ public class JolAdmin extends JolAdminFactory {
             return ps.toArray(new String[0]);
         }
 
-        public boolean isOpen() {
+        boolean isOpen() {
             return info.getProperty("state", "closed").equals("open");
         }
 
-        public boolean isActive() {
+        boolean isActive() {
             return info.getProperty("state", "closed").equals("closed");
         }
 
-        public boolean isFinished() {
+        boolean isFinished() {
             return info.getProperty("state", "finished").equals("finished");
-        }
-
-        public boolean isBeta() {
-            return info.getProperty("beta", "no").equals("yes");
         }
 
         protected void write() {
@@ -619,21 +509,9 @@ public class JolAdmin extends JolAdminFactory {
                 }
             }
         }
-
-        private void addCardSet(String name) {
-            info.put("set" + name, name);
-            write();
-        }
-
-        private String[] getCardSets() {
-            String[] sets = findValues("set").toArray(new String[0]);
-            if (sets == null || sets.length == 0)
-                return cards.getCoreSets();
-            return sets;
-        }
     }
 
-    class PlayerInfo extends Info {
+    private class PlayerInfo extends Info {
 
         private final String prefix;
 
@@ -669,47 +547,46 @@ public class JolAdmin extends JolAdminFactory {
             write();
         }
 
-        public boolean authenticate(String password) {
+        boolean authenticate(String password) {
             return info.getProperty("password").equals(password);
         }
 
-        public boolean doInteractive() {
+        boolean doInteractive() {
             return "yes".equals(info.getProperty("interactive", "yes"));
         }
 
-        public void recordAccess() {
+        void recordAccess() {
             info.setProperty("time", (new Date()).getTime() + "");
         }
 
-        public Date getLastAccess() {
+        Date getLastAccess() {
             String str = info.getProperty("time");
             long time = Long.parseLong(str);
             return new Date(time);
         }
 
-        public void addGame(String name, String key) {
+        void addGame(String name, String key) {
             info.setProperty(sysInfo.getKey(name), key);
             write();
         }
 
         public String[] getGames() {
             Iterator<?> i = findKeys("game").iterator();
-            Collection<String> c = new ArrayList<String>();
+            Collection<String> c = new ArrayList<>();
             while (i.hasNext())
                 c.add(sysInfo.getValue((String) i.next()));
             return c.toArray(new String[0]);
         }
 
-        public void removeDeck(String name) {
+        void removeDeck(String name) {
             String key = getDeckKey(name);
             if (key != null) {
                 info.remove(key);
                 write();
             }
-            // PENDING leave data files around for now just in case
         }
 
-        public boolean createDeck(String name, String deck) {
+        boolean createDeck(String name, String deck) {
             try {
                 String key = getDeckKey(name);
                 if (key == null) {
@@ -726,7 +603,7 @@ public class JolAdmin extends JolAdminFactory {
             }
         }
 
-        public String getGameDeckName(String game) {
+        String getGameDeckName(String game) {
             String id = getId(game);
             String deck = info.getProperty(id, "fubar");
             return info.getProperty(deck, "Not found");
@@ -749,9 +626,8 @@ public class JolAdmin extends JolAdminFactory {
             }
         }
 
-        public String[] getDeckNames() {
-            String[] ret = findValues("deck").toArray(new String[0]);
-            return ret;
+        String[] getDeckNames() {
+            return findValues("deck").toArray(new String[0]);
         }
 
         public boolean isAdmin() {
@@ -774,11 +650,11 @@ public class JolAdmin extends JolAdminFactory {
             write();
         }
 
-        public boolean isSuperUser() {
+        boolean isSuperUser() {
             return info.getProperty("admin", "no").equals("super");
         }
 
-        public void claimGame(String gameName) {
+        void claimGame(String gameName) {
             info.setProperty(sysInfo.getKey(gameName), "owner");
             write();
         }
@@ -788,12 +664,12 @@ public class JolAdmin extends JolAdminFactory {
                     "owner");
         }
 
-        public void invite(String gameName) {
+        void invite(String gameName) {
             info.setProperty(sysInfo.getKey(gameName), "invited");
             write();
         }
 
-        public boolean isInvited(String gameName) {
+        boolean isInvited(String gameName) {
             return info.getProperty(sysInfo.getKey(gameName), "no").equals(
                     "invited");
         }
@@ -811,9 +687,7 @@ public class JolAdmin extends JolAdminFactory {
         }
     }
 
-    class CardsInfo extends Info {
-
-        private Map<String, CardSearch> map = new HashMap<String, CardSearch>();
+    private class CardsInfo extends Info {
 
         CardsInfo() {
             super("cards.properties");
@@ -823,82 +697,18 @@ public class JolAdmin extends JolAdminFactory {
             return "Deckserver 3.0 card set file";
         }
 
-        public String[] getCoreSets() {
-            String str = info.getProperty("standard");
-            StringTokenizer tok = new StringTokenizer(str, ",");
-            String[] ret = new String[tok.countTokens()];
-            for (int i = 0; i < ret.length; i++)
-                ret[i] = tok.nextToken();
-            return ret;
-        }
-
-        public String[] getCardSets() {
-            return findValues("set").toArray(new String[0]);
-        }
-
-        public CardSearch getBaseCards() {
-            if (!map.containsKey("standard")) {
-                try {
-                    map.put("standard", getCards(getCoreSets()));
-                } catch (Exception e) {
-                    // core set broken???
-                }
+        OldCardSearch getAllCards() {
+            try {
+                String set = readFile(new File(dir + "/cards/base.txt"));
+                String prop = readFile(new File(dir + "/cards/base.prop"));
+                return CardUtil.createSearch(set, prop);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to open card files", e);
             }
-            return map.get("standard");
-        }
-
-        public CardSearch getAllCards() {
-            if (!map.containsKey("allcards")) {
-                try {
-                    map.put("allcards", getCards(getCardSets()));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            return map.get("allcards");
-        }
-
-        public void addCardSet(String name, String label, String set)
-                throws IOException {
-            if (info.containsKey(label) || info.containsValue(name))
-                throw new IllegalStateException("Set already exists");
-            info.put(label, name);
-            createCardSet(label, set);
-        }
-
-        private CardSearch getCards(String[] sets) {
-            CardSearch[] csets = new CardSearch[sets.length];
-            for (int i = 0; i < csets.length; i++) {
-                try {
-                    csets[i] = getCardSet(sets[i]);
-                } catch (Exception e) {
-
-                }
-            }
-            if (sets.length == 1)
-                return csets[0];
-            return CardUtil.combineSearch(csets);
-        }
-
-        private CardSearch getCardSet(String name) throws IOException {
-            String label = getKey(name).substring(3);
-            if (map.containsKey(label))
-                return map.get(label);
-            String set = readFile(new File(dir + "/cards", label + ".txt"));
-            String prop = readFile(new File(dir + "/cards", label + ".prop"));
-            CardSearch ret = CardUtil.createSearch(set, prop);
-            map.put(label, ret);
-            return ret;
-        }
-
-        private void createCardSet(String label, String set) throws IOException {
-            File file = new File(dir + "/cards", label + ".txt");
-            writeFile(file, set);
-            // PENDING not planning to expose UI for this.
         }
     }
 
-    class SystemInfo extends Info {
+    private class SystemInfo extends Info {
         SystemInfo() {
             super("system.properties");
         }
@@ -907,26 +717,26 @@ public class JolAdmin extends JolAdminFactory {
             return "Deckserver 3.0 system file";
         }
 
-        public String newPlayer(String name) {
+        String newPlayer(String name) {
             String key = "player" + incrementCounter("playerindex");
             info.setProperty(key, name);
             write();
             return key;
         }
 
-        public String newGame(String name) {
+        String newGame(String name) {
             String key = "game" + incrementCounter("gameindex");
             info.setProperty(key, name);
             write();
             return key;
         }
 
-        public boolean hasGame(String game) {
+        boolean hasGame(String game) {
             String key = getKey(game);
             return key != null && key.startsWith("game");
         }
 
-        public boolean hasPlayer(String player) {
+        boolean hasPlayer(String player) {
             String key = getKey(player);
             return key != null && key.startsWith("player");
         }
@@ -941,9 +751,9 @@ public class JolAdmin extends JolAdminFactory {
     }
 
     abstract class Info {
-        protected final Properties info = new Properties();
+        final Properties info = new Properties();
 
-        protected final String filename;
+        final String filename;
 
         Info(String filename) {
             this(filename, false);
@@ -956,7 +766,7 @@ public class JolAdmin extends JolAdminFactory {
 
         abstract String getHeader();
 
-        protected String incrementCounter(String counter) {
+        String incrementCounter(String counter) {
             String index = info.getProperty(counter, "0");
             String num = String.valueOf(Integer.parseInt(index) + 1);
             info.setProperty(counter, num);
@@ -964,18 +774,18 @@ public class JolAdmin extends JolAdminFactory {
             return num;
         }
 
-        protected Collection<String> findKeys(String pre) {
+        Collection<String> findKeys(String pre) {
             return find(pre, true);
         }
 
-        protected Collection<String> findValues(String pre) {
+        Collection<String> findValues(String pre) {
             return find(pre, false);
         }
 
         private Collection<String> find(String pre, boolean sendKey) {
-            Collection<String> v = new ArrayList<String>();
-            for (Iterator i = info.keySet().iterator(); i.hasNext(); ) {
-                String key = (String) i.next();
+            Collection<String> v = new ArrayList<>();
+            for (Object o : info.keySet()) {
+                String key = (String) o;
                 if (key.startsWith(pre) && !key.endsWith("index")) {
                     v.add(sendKey ? key : info.getProperty(key));
                 }
@@ -983,13 +793,12 @@ public class JolAdmin extends JolAdminFactory {
             return v;
         }
 
-        public String getKey(String name) {
+        String getKey(String name) {
             if (!info.containsValue(name))
                 return null;
-            for (Iterator<?> i = info.entrySet().iterator(); i.hasNext(); ) {
-                Map.Entry<?, ?> entry = (Map.Entry<?, ?>) i.next();
-                if (entry.getValue().equals(name)) {
-                    return (String) entry.getKey();
+            for (Map.Entry<Object, Object> objectObjectEntry : info.entrySet()) {
+                if (((Map.Entry<?, ?>) objectObjectEntry).getValue().equals(name)) {
+                    return (String) ((Map.Entry<?, ?>) objectObjectEntry).getKey();
                 }
             }
             return null;
@@ -1031,7 +840,7 @@ public class JolAdmin extends JolAdminFactory {
                 try {
                     if (out != null)
                         out.close();
-                } catch (Exception e) {
+                } catch (Exception ignored) {
 
                 }
             }
@@ -1041,7 +850,7 @@ public class JolAdmin extends JolAdminFactory {
             return info.toString();
         }
 
-        public void setProperty(String prop, String value) {
+        void setProperty(String prop, String value) {
             info.setProperty(prop, value);
         }
 

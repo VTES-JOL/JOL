@@ -4,7 +4,17 @@
         <td width="25%" align="top">
             <label for="decks">Your decks:</label>
             <div class="gamediv">
-                <table class="gametable" id="decks" border="1" cellspacing="1" cellpadding="1" width="100%">
+                <table id="mydecks" class="gametable" border="1" cellspacing="1" cellpadding="1" width="100%">
+                    <thead>
+                        <colgroup>
+                            <col width="50%"/>
+                            <col width="40%"/>
+                            <col width="10%"/>
+                        </colgroup>
+                    </thead>
+                    <tbody id="decks">
+
+                    </tbody>
                 </table>
             </div>
             <span>Open games:</span>
@@ -15,7 +25,7 @@
             </select>
             <select title="Choose deck" id="regdecks">
             </select>
-            <button onclick="doregister();">Register</button>
+            <button onclick="doRegister();">Register</button>
         </td>
         <td width="40%">
             <table width="100%">
@@ -26,11 +36,11 @@
                     </td>
                     <td align="right">
                         <div id="noedit">
-                            <button onclick="doedit();">Edit</button>
-                            <button onclick="donewdeck();">New</button>
+                            <button onclick="doEdit();">Edit</button>
+                            <button onclick="doNewDeck();">New</button>
                         </div>
                         <div id="deckedit" style="display :none;">
-                            <button onclick="dosave();">Save</button>
+                            <button onclick="doSave();">Save</button>
                         </div>
                     </td>
                 </tr>
@@ -42,11 +52,11 @@
                     <td align=right>
                         <label for="shuffle">Shuffle:</label>
                         <input type="checkbox" id="shuffle" name="shuffle" value="yes"/>
-                        <button id="adjust" onclick="doadjust();">Parse deck</button>
+                        <button id="adjust" onclick="doAdjust();">Parse deck</button>
                     </td>
                 </tr>
             </table>
-            <form action="javascript:dosearch();">
+            <form action="javascript:doSearch();">
                 <table>
                     <tr>
                         <td>
@@ -68,7 +78,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <button onclick="dosearch();">Search cards</button>
+                            <button>Search cards</button>
                         </td>
                     </tr>
                 </table>
@@ -78,10 +88,8 @@
             </div>
         </td>
         <td align="top">
-            <p>Deck errors:</p>
             <div id="deckerrors" class="errdiv">
             </div>
-            <hr/>
             <div id="deckcontentdiv">
                 <table>
                     <tr>

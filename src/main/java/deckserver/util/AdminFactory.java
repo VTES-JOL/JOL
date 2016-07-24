@@ -6,11 +6,11 @@
 
 package deckserver.util;
 
+import deckserver.client.JolAdmin;
+import deckserver.client.JolAdminFactory;
 import deckserver.dwr.bean.AdminBean;
-import deckserver.JolAdminFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import deckserver.client.JolAdmin;
 
 import javax.servlet.ServletContext;
 
@@ -39,10 +39,6 @@ public class AdminFactory {
 
     public static synchronized void init(ServletContext context) {
         get(context);
-    }
-
-    public static synchronized JolAdminFactory getFactory() {
-        return JolAdminFactory.INSTANCE;
     }
 
     public static synchronized AdminBean getAdmin() {

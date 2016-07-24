@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class UpdateFactory {
 
-    private static final Map<String, ViewCreator> viewMap = new HashMap<String, ViewCreator>();
+    private static final Map<String, ViewCreator> viewMap = new HashMap<>();
 
     static {
         viewMap.put("nav", new NavCreator());
@@ -30,9 +30,9 @@ public class UpdateFactory {
         PlayerModel model = Utils.getPlayerModel(provider.getHttpServletRequest(), abean);
         model.recordAccess();
         String[] views = new String[]{model.getView(), "nav"};
-        Map<String, Object> ret = new HashMap<String, Object>();
-        for (int i = 0; i < views.length; i++) {
-            ViewCreator view = getView(views[i]);
+        Map<String, Object> ret = new HashMap<>();
+        for (String view1 : views) {
+            ViewCreator view = getView(view1);
             if (view != null)
                 ret.put(view.getFunction(), view.createData(abean, model));
         }

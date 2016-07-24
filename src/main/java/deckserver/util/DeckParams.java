@@ -6,8 +6,8 @@
 
 package deckserver.util;
 
-import deckserver.interfaces.NormalizeDeck;
-import deckserver.interfaces.CardEntry;
+import deckserver.game.cards.NormalizeDeck;
+import net.deckserver.jol.game.cards.CardEntry;
 
 /**
  * @author Joe User
@@ -37,16 +37,8 @@ public class DeckParams {
         return type;
     }
 
-    public String getQuery() {
-        return query;
-    }
-
     public CardEntry[] getCards() {
         return cards;
-    }
-
-    public String[] getErrors() {
-        return nd.getErrorLines();
     }
 
     public NormalizeDeck getDeckObj() {

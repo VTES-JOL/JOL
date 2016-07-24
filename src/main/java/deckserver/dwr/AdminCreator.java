@@ -1,12 +1,12 @@
 package deckserver.dwr;
 
-import deckserver.dwr.bean.AdminPageBean;
 import deckserver.dwr.bean.AdminBean;
+import deckserver.dwr.bean.AdminPageBean;
 
 public class AdminCreator implements ViewCreator {
 
     public String getFunction() {
-        return "doadmin";
+        return "callbackAdmin";
     }
 
     public Object createData(AdminBean abean, PlayerModel model) {

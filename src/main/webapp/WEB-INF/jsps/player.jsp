@@ -1,8 +1,8 @@
 <%@page contentType="text/html" %>
 <%@page pageEncoding="UTF-8" %>
+<%@page import="deckserver.client.JolGame" %>
 <%@page import="deckserver.dwr.Utils" %>
 <%@page import="deckserver.util.RegionParams" %>
-<%@page import="deckserver.JolGame" %>
 
 <% String curPlayer = Utils.getPlayer(request);
     JolGame game = (JolGame) request.getAttribute("game");
@@ -38,14 +38,14 @@
     </tr>
 </table>
 <hr/>
-<% request.setAttribute("rparams", new RegionParams(game, player, index, "lime", "READY", JolGame.READY_REGION, false)); %>
+<% request.setAttribute("rparams", new RegionParams(game, player, index, "READY", JolGame.READY_REGION, false)); %>
 <jsp:include page="region.jsp"/>
 <hr/>
-<% request.setAttribute("rparams", new RegionParams(game, player, index, "aqua", "TORPOR", JolGame.TORPOR, false)); %>
+<% request.setAttribute("rparams", new RegionParams(game, player, index, "TORPOR", JolGame.TORPOR, false)); %>
 <jsp:include page="region.jsp"/>
 <hr/>
-<% request.setAttribute("rparams", new RegionParams(game, player, index, "blue", "INACTIVE", JolGame.INACTIVE_REGION, !active)); %>
+<% request.setAttribute("rparams", new RegionParams(game, player, index, "INACTIVE", JolGame.INACTIVE_REGION, !active)); %>
 <jsp:include page="region.jsp"/>
 <hr/>
-<% request.setAttribute("rparams", new RegionParams(game, player, index, "silver", "ASHHEAP", JolGame.ASHHEAP, false)); %>
+<% request.setAttribute("rparams", new RegionParams(game, player, index, "ASHHEAP", JolGame.ASHHEAP, false)); %>
 <jsp:include page="region.jsp"/>

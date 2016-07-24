@@ -6,21 +6,19 @@
 
 package deckserver.util;
 
-import deckserver.interfaces.Card;
-import deckserver.JolGame;
+import deckserver.client.JolGame;
+import deckserver.game.state.Card;
 
 /**
  * @author Joe User
  */
 public class HandParams {
 
-    Card[] cards;
-    String color;
-    String text;
+    private Card[] cards;
+    private String text;
 
-    public HandParams(JolGame game, String player, String color, String text, String region) {
+    public HandParams(JolGame game, String player, String text, String region) {
         cards = (Card[]) game.getState().getPlayerLocation(player, region).getCards();
-        this.color = color;
         this.text = text;
     }
 
@@ -28,16 +26,11 @@ public class HandParams {
         return cards.length;
     }
 
-    public String getColor() {
-        return color;
-    }
-
     public String getText() {
         return text;
     }
 
     public CardParams getCardParam(int i) {
-        CardParams ret = new CardParams(cards[i]);
-        return ret;
+        return new CardParams(cards[i]);
     }
 }    

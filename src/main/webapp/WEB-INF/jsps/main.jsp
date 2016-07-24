@@ -48,7 +48,7 @@
                     <table width="100%" class="chattable" id="gchattable" cellspacing="0" cellpadding="0"
                            border="0"></table>
                 </div>
-                <form action="javascript: globchat();">
+                <form action="javascript:globalChat();">
                     <span>
                         <span id="chatstamp"></span>
                         <label for="gchat">Chat:</label>

@@ -5,6 +5,7 @@ import deckserver.dwr.bean.AdminBean;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SuperCreator implements ViewCreator {
 
@@ -15,10 +16,7 @@ public class SuperCreator implements ViewCreator {
     public Object createData(AdminBean abean, PlayerModel model) {
         if (!model.isSuper()) return null;
         List<GameModel> games = abean.getActiveGames();
-        Collection<String> res = new ArrayList<String>();
-        for (GameModel g : games) {
-            if (g.isActive()) res.add(g.getName());
-        }
+        Collection<String> res = games.stream().filter(GameModel::isActive).map(GameModel::getName).collect(Collectors.toCollection(ArrayList::new));
         return res.toArray();
     }
 }

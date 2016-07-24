@@ -1,8 +1,8 @@
 package deckserver.dwr.bean;
 
+import deckserver.client.JolAdminFactory;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.GameView;
-import deckserver.JolAdminFactory;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -24,9 +24,9 @@ public class SummaryBean {
             access = getDate(game.getTimestamp());
             turn = JolAdminFactory.INSTANCE.getGame(this.game).getCurrentTurn();
             GameView[] views = game.getViews();
-            Collection<String> actives = new ArrayList<String>(5);
-            for (int i = 0; i < views.length; i++) {
-                if (views[i].isPlayer()) actives.add(views[i].getPlayer());
+            Collection<String> actives = new ArrayList<>(5);
+            for (GameView view : views) {
+                if (view.isPlayer()) actives.add(view.getPlayer());
             }
             available = actives.toArray(new String[0]);
         }

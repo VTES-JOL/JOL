@@ -13,12 +13,11 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <dataDir>${basedir}/src/test/resources</dataDir>
     </properties>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.directwebremoting</groupId>
             <artifactId>dwr</artifactId>
-            <!--<version>1.30.2.10</version>-->
             <version>3.0.1-RELEASE</version>
         </dependency>
 
@@ -26,6 +25,12 @@
             <groupId>org.glassfish.main.external</groupId>
             <artifactId>schema2beans-repackaged</artifactId>
             <version>3.1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.3.2</version>
         </dependency>
 
         <dependency>
@@ -79,7 +84,7 @@
                     <path>/jol3</path>
                     <systemProperties>
                         <JOL_DATA>${dataDir}</JOL_DATA>
-                        <JAVA_OPTS>-Xms256M -Xmx384M</JAVA_OPTS>
+                        <JAVA_OPTS>-Xms256M -Xmx256M</JAVA_OPTS>
                     </systemProperties>
                 </configuration>
             </plugin>
@@ -94,12 +99,5 @@
             </plugins>
         </pluginManagement>
     </build>
-
-    <repositories>
-        <repository>
-            <id>local-maven-repo</id>
-            <url>file:///${project.basedir}/local-maven-repo</url>
-        </repository>
-    </repositories>
 
 </project>

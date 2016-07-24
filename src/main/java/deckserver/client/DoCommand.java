@@ -6,33 +6,20 @@
 
 package deckserver.client;
 
-import deckserver.interfaces.CardEntry;
-import deckserver.interfaces.SCard;
-import deckserver.interfaces.SLocation;
-import deckserver.JolAdminFactory;
-import deckserver.JolGame;
+import deckserver.game.state.SCard;
+import deckserver.game.state.SLocation;
+import net.deckserver.jol.game.cards.CardEntry;
 import org.slf4j.Logger;
-import deckserver.util.DSRandom;
 
-import java.io.IOException;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-/**
- * @author Joe User
- */
 public class DoCommand {
 
     private final JolGame game;
 
     private static final Logger logger = getLogger(DoCommand.class);
-
-    /**
-     * Creates a new instance of MkState
-     */
-    public DoCommand(String gamename) throws IOException {
-        this(JolAdminFactory.INSTANCE.getGame(gamename));
-    }
 
     public DoCommand(JolGame game) {
         this.game = game;
@@ -40,7 +27,7 @@ public class DoCommand {
 
     private static String format(String[] str) {
         if (str == null || str.length == 0) return "";
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < str.length; ) {
             buf.append(str[i++]);
             if (i < str.length) buf.append(" ");
@@ -63,7 +50,7 @@ public class DoCommand {
                 String targetPlayer = cmdObj.getPlayer(player);
                 String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
                 String card = cmdObj.getCard(false, targetPlayer, targetRegion);
-                StringBuffer note = new StringBuffer();
+                StringBuilder note = new StringBuilder();
                 while (cmdObj.hasMoreArgs()) {
                     note.append(" ");
                     note.append(cmdObj.nextArg());
@@ -86,7 +73,7 @@ public class DoCommand {
             if (cmd.equalsIgnoreCase("random")) {
                 int d = cmdObj.getNumber(-1);
                 if (d < 1) d = 2;
-                int num = DSRandom.getNumber(d);
+                int num = ThreadLocalRandom.current().nextInt(1,d +1);
                 if (num == 0) num = d;
                 game.sendMsg(player, player + " rolls from 1-" + d + " : " + num);
                 return "Rolled the die";
@@ -130,7 +117,6 @@ public class DoCommand {
                 String srcCard = cmdObj.getCard(false, player, srcRegion);
                 String targetPlayer = cmdObj.getPlayer(player);
                 String targetRegion = cmdObj.getRegion(crypt ? JolGame.READY_REGION : JolGame.ASHHEAP);
-                logger.error("target region is {} with crypt {}", targetRegion, crypt);
                 String targetCard = cmdObj.getCard(true, targetPlayer, targetRegion);
                 boolean draw = cmdObj.consumeString("draw");
                 if (targetCard != null) {
@@ -143,12 +129,12 @@ public class DoCommand {
                         int curcap = game.getCapacity(srcCard);
                         if (curcap <= 0) {
                             CardEntry card =
-                                    JolAdminFactory.INSTANCE.getCardsForGame(game.getName()).getCardById(game.getCardDescripId(srcCard));
+                                    JolAdminFactory.INSTANCE.getAllCards().getCardById(game.getCardDescripId(srcCard));
                             int capincr = 1;
                             String[] text = card.getFullText();
-                            for (int t = 0; t < text.length; t++) {
-                                if (text[t].startsWith("Capacity:")) {
-                                    capincr = Integer.parseInt(text[t].substring(10).trim());
+                            for (String aText : text) {
+                                if (aText.startsWith("Capacity:")) {
+                                    capincr = Integer.parseInt(aText.substring(10).trim());
                                 }
                             }
                             game.changeCapacity(srcCard, capincr);
@@ -159,8 +145,6 @@ public class DoCommand {
                 }
             }
             if (cmd.equalsIgnoreCase("move")) {
-                // move [<srcplayer>] [<srcregion>] <cardnum> [<destplayer>] [<destregion>] [<destcard>]
-
                 String srcPlayer = cmdObj.getPlayer(player);
                 String srcRegion = cmdObj.getRegion(JolGame.READY_REGION);
                 String srcCard = cmdObj.getCard(false, srcPlayer, srcRegion);
@@ -177,7 +161,6 @@ public class DoCommand {
                 }
             }
             if (cmd.equalsIgnoreCase("blood")) {
-                // blood [<targetplayer>] [<targetregion> <targetcard>] [+|-]<amount>
                 String targetPlayer = cmdObj.getPlayer(player);
                 String targetRegion = cmdObj.getRegion(null);
                 String targetCard = null;
@@ -241,7 +224,7 @@ public class DoCommand {
                 String[] recipients = all ? game.getPlayers() : new String[]{cmdObj.getPlayer(player)};
                 SLocation loc = game.getState().getPlayerLocation(player, targetRegion);
                 SCard[] cards = loc.getCards();
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 int len = Math.min(cards.length, amt);
                 buf.append(len);
                 buf.append(" cards of ");
@@ -257,9 +240,9 @@ public class DoCommand {
                     buf.append("\n");
                 }
                 String text = buf.toString();
-                for (int j = 0; j < recipients.length; j++) {
-                    String old = game.getPlayerText(recipients[j]);
-                    game.setPlayerText(recipients[j], old + "\n" + text);
+                for (String recipient : recipients) {
+                    String old = game.getPlayerText(recipient);
+                    game.setPlayerText(recipient, old + "\n" + text);
                 }
                 String msg = null;
                 if (recipients.length == 1) {
@@ -282,29 +265,27 @@ public class DoCommand {
             }
             if (cmd.equalsIgnoreCase("transfer")) {
                 // transfer [<targetPlayer>] <vampno> [+|-]<amount>
-                String targetPlayer = player;
                 String targetRegion = cmdObj.getRegion(JolGame.INACTIVE_REGION);
-                String card = cmdObj.getCard(false, targetPlayer, targetRegion);
+                String card = cmdObj.getCard(false, player, targetRegion);
                 int amount = cmdObj.getAmount(1);
                 if (amount == 0) return "Must transfer an amount";
-                game.changePool(targetPlayer, -amount);
+                game.changePool(player, -amount);
                 game.changeCounters(card, amount);
                 return "Did the transfer";
             }
         } catch (NumberFormatException e) {
-            return format(cmdStr) + " had a badly formated number";
+            e.printStackTrace();
+            return format(cmdStr) + " had a badly formatted number";
         } catch (CommandException ce) {
             throw ce;
         } catch (Exception e) {
             e.printStackTrace();
             return cmd + " produced exception.";
-        } finally {
-
         }
         return cmd + " not a valid command";
     }
 
-    class CommandParser {
+    private class CommandParser {
 
         String[] args;
         int ind;
@@ -314,7 +295,7 @@ public class DoCommand {
             this.ind = index;
         }
 
-        public String getRegion(String defaultRegion) throws CommandException {
+        String getRegion(String defaultRegion) throws CommandException {
             if (!hasMoreArgs()) return defaultRegion;
             String arg = args[ind++].toLowerCase();
             if (JolGame.ACTIVE_REGION.startsWith(arg))
@@ -341,9 +322,9 @@ public class DoCommand {
             if (!hasMoreArgs()) return defaultPlayer;
             String arg = args[ind++].toLowerCase();
             String[] players = game.getPlayers();
-            for (int j = 0; j < players.length; j++)
-                if (players[j].toLowerCase().startsWith(arg)) {
-                    return players[j];
+            for (String player : players)
+                if (player.toLowerCase().startsWith(arg)) {
+                    return player;
                 }
             ind--;
             return defaultPlayer;
@@ -380,7 +361,7 @@ public class DoCommand {
             }
         }
 
-        public int getAmount(int amount) throws CommandException {
+        int getAmount(int amount) throws CommandException {
             char first = args[ind].charAt(0);
             amount = Integer.parseInt(args[ind++].substring(1));
             if (first == '-') {
@@ -391,7 +372,7 @@ public class DoCommand {
             return amount;
         }
 
-        public int getNumber(int def) throws CommandException {
+        int getNumber(int def) throws CommandException {
             try {
                 return Integer.parseInt(args[ind++]);
             } catch (Exception nfe) {
@@ -399,15 +380,15 @@ public class DoCommand {
             }
         }
 
-        public boolean hasMoreArgs() {
+        boolean hasMoreArgs() {
             return ind < args.length;
         }
 
-        public String nextArg() {
+        String nextArg() {
             return args[ind++];
         }
 
-        public boolean consumeString(String val) {
+        boolean consumeString(String val) {
             if (!hasMoreArgs()) return false;
             if (val.equalsIgnoreCase(args[ind])) {
                 ind++;
@@ -418,13 +399,13 @@ public class DoCommand {
 
     }
 
-    class CommandException extends Exception {
+    private class CommandException extends Exception {
         /**
          *
          */
         private static final long serialVersionUID = -1426332705239199332L;
 
-        public CommandException(String msg) {
+        CommandException(String msg) {
             super(msg);
         }
     }

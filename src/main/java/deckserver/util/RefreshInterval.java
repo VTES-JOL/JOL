@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public final class RefreshInterval {
 
-    public static final int calc(Date from) {
+    public static int calc(Date from) {
         Date to = new Date();
         long interval = to.getTime() - from.getTime();
         if (interval < 10000) return 5000;

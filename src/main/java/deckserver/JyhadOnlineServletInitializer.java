@@ -1,5 +1,6 @@
 package deckserver;
 
+import deckserver.client.JolAdminFactory;
 import deckserver.util.AdminFactory;
 import org.slf4j.Logger;
 

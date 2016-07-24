@@ -8,18 +8,15 @@ public class ParamCheck implements Filter {
 
     private ServletContext ctx = null;
 
-    public void init(FilterConfig arg0) throws ServletException {
-        ctx = arg0.getServletContext();
-        // no initialization necessary
+    public void init(FilterConfig filterConfig) throws ServletException {
+        ctx = filterConfig.getServletContext();
     }
 
-    public void doFilter(ServletRequest arg0, ServletResponse arg1, FilterChain arg2) throws IOException, ServletException {
-        Utils.checkParams((HttpServletRequest) arg0, ctx);
-
-        arg2.doFilter(arg0, arg1);
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        Utils.checkParams((HttpServletRequest) request, ctx);
+        chain.doFilter(request, response);
     }
 
     public void destroy() {
-        // no destroy necessary
     }
 }

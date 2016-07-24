@@ -1,7 +1,8 @@
 package deckserver.client;
 
-import deckserver.interfaces.*;
-import deckserver.JolGame;
+import deckserver.game.state.*;
+import deckserver.game.turn.GameAction;
+import deckserver.game.turn.TurnRecorder;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -17,27 +18,27 @@ public final class ModelLoader {
         game.setName(orig.getName());
         moveNotes(orig, game);
         String[] players = orig.getPlayers();
-        for (int i = 0; i < players.length; i++) {
-            game.addPlayer(players[i]);
-            game.addLocation(players[i], JolGame.READY_REGION);
-            game.addLocation(players[i], JolGame.TORPOR);
-            game.addLocation(players[i], JolGame.INACTIVE_REGION);
-            game.addLocation(players[i], JolGame.HAND);
-            game.addLocation(players[i], JolGame.ASHHEAP);
-            game.addLocation(players[i], JolGame.LIBRARY);
-            game.addLocation(players[i], JolGame.CRYPT);
-            Location[] locs = (Location[]) orig.getPlayerLocations(players[i]);
-            for (int j = 0; j < locs.length; j++) {
-                moveLoc(game, orig, players[i], locs[j]);
+        for (String player : players) {
+            game.addPlayer(player);
+            game.addLocation(player, JolGame.READY_REGION);
+            game.addLocation(player, JolGame.TORPOR);
+            game.addLocation(player, JolGame.INACTIVE_REGION);
+            game.addLocation(player, JolGame.HAND);
+            game.addLocation(player, JolGame.ASHHEAP);
+            game.addLocation(player, JolGame.LIBRARY);
+            game.addLocation(player, JolGame.CRYPT);
+            Location[] locs = (Location[]) orig.getPlayerLocations(player);
+            for (Location loc : locs) {
+                moveLoc(game, orig, player, loc);
             }
         }
     }
 
     private static void moveNotes(NoteTaker from, NoteTaker to) {
         Note[] notes = from.getNotes();
-        for (int i = 0; i < notes.length; i++) {
-            Note n = to.addNote(notes[i].getName());
-            n.setValue(notes[i].getValue());
+        for (Note note : notes) {
+            Note n = to.addNote(note.getName());
+            n.setValue(note.getValue());
         }
     }
 
@@ -63,11 +64,11 @@ public final class ModelLoader {
 
     public static void createRecorder(TurnRecorder to, TurnRecorder orig) {
         String[] turns = orig.getTurns();
-        for (int i = 0; i < turns.length; i++) {
-            to.addTurn(orig.getMethTurn(turns[i]), turns[i]);
-            GameAction[] actions = orig.getActions(turns[i]);
-            for (int j = 0; j < actions.length; j++) {
-                to.addCommand(turns[i], actions[j].getText(), actions[j].command());
+        for (String turn : turns) {
+            to.addTurn(orig.getMethTurn(turn), turn);
+            GameAction[] actions = orig.getActions(turn);
+            for (GameAction action : actions) {
+                to.addCommand(turn, action.getText(), action.command());
             }
         }
     }
@@ -80,9 +81,9 @@ public final class ModelLoader {
             for (int i = 0; i < players.length; i++) {
                 out.write("  Player #" + i + " " + players[i] + "\n");
                 Location[] locs = (Location[]) game.getPlayerLocations(players[i]);
-                for (int j = 0; j < locs.length; j++) {
-                    out.write("    Region" + game.getPlayerRegionName(locs[j]) + "\n");
-                    dumpCards(locs[j], "      ", out);
+                for (Location loc : locs) {
+                    out.write("    Region" + game.getPlayerRegionName(loc) + "\n");
+                    dumpCards(loc, "      ", out);
                 }
             }
         } catch (IOException ie) {
@@ -93,17 +94,17 @@ public final class ModelLoader {
 
     private static void dumpCards(CardContainer box, String pre, Writer out) throws IOException {
         Card[] cards = (Card[]) box.getCards();
-        for (int i = 0; i < cards.length; i++) {
-            out.write(pre + "Card " + cards[i].getId() + "/" + cards[i].getCardId() + "\n");
-            dumpNotes(cards[i], pre + "    ", out);
-            dumpCards(cards[i], pre + "  ", out);
+        for (Card card : cards) {
+            out.write(pre + "Card " + card.getId() + "/" + card.getCardId() + "\n");
+            dumpNotes(card, pre + "    ", out);
+            dumpCards(card, pre + "  ", out);
         }
     }
 
     private static void dumpNotes(NoteTaker notes, String pre, Writer out) throws IOException {
         Note[] note = notes.getNotes();
-        for (int i = 0; i < note.length; i++) {
-            out.write(pre + note[i].getName() + "/" + note[i].getValue() + "\n");
+        for (Note aNote : note) {
+            out.write(pre + aNote.getName() + "/" + aNote.getValue() + "\n");
         }
     }
 }
