@@ -8,13 +8,13 @@
 %>
 
 <a href="javascript:details('<%= r.getIndex() %>');" id="<%= r.getIndex() %>">-</a>
-<span style="color: <%= r.getColor() %>">
+<span>
     <%= r.getText() %>
     <%= r.getSize() %>
 </span>
 
 <span id="region<%= r.getIndex() %>">
-    <ol style="color: <%= r.getColor() %>">
+    <ol>
          <% for (int i = 0; i < r.getSize(); i++) {
              request.setAttribute("cparams", r.getCardParam(i));
          %>

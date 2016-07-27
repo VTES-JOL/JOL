@@ -114,23 +114,3 @@ ul.help li a {
 a:link, a:visited, a:hover, a:active {
     color: red;
 }
-
-span.edge {
-    color: yellow;
-}
-
-span.library {
-    color: olive;
-}
-
-span.crypt {
-    color: teal;
-}
-
-span.hand {
-    color: burlywood;
-}
-
-span.cardtext {
-    color: lime;
-}
