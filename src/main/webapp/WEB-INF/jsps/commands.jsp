@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
     <head>
-        <title>JOL3 Command Set</title>
+        <title>VOL Command Set</title>
     </head>
     <body>
         <ul class="help">

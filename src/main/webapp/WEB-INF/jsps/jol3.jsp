@@ -2,7 +2,7 @@
 <%@ page pageEncoding="UTF-8" %>
 <html>
     <head>
-        <title>JOL3</title>
+        <title>VOL</title>
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/interface/DS.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/engine.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/util.js'></script>

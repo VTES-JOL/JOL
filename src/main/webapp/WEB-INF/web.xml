@@ -6,7 +6,7 @@
          version="3.0">
 
     <display-name>JOL3</display-name>
-    <description>Jyhad On-Line 3.0 Web Client</description>
+    <description>Vtes Online Web Client</description>
 
     <listener>
         <listener-class>deckserver.JyhadOnlineServletInitializer</listener-class>

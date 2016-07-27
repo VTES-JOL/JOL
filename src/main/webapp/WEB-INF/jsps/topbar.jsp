@@ -4,7 +4,7 @@
     <table width="100%">
         <tr>
             <td align="left">
-                <div id="title">Jyhad On-Line (JOL)</div>
+                <div id="title">VOL</div>
             </td>
             <td align="center">
                 <div id="buttons"></div>

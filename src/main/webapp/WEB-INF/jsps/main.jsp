@@ -34,7 +34,7 @@
         </td>
         <td width="50%">
             <p>
-                Welcome to JOL-4 beta, the latest version of Jyhad-OnLine, where you can play Vampire-The Eternal
+                Welcome to VOL Test Server, the latest version of Vtes-OnLine, where you can play Vampire-The Eternal
                 Struggle(VTES) card games online over
                 the web.
                 To play games on this server, register, login, create some decks, and use chat below to organize games,
