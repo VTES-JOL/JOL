@@ -356,7 +356,7 @@ function loadmain(data) {
     }
     var news = '';
     for (var i in data.news) {
-        news += '<p><a href="' + data.news[i].url + '">' + data.news[i].text + "</a></p>";
+        news += '<p><a href="' + data.news[i].url + '" target=_blank>' + data.news[i].text + "</a></p>";
     }
     $('news').innerHTML = news;
     if (data.refresh > 0) {
