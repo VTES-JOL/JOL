@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
     <head>
-        <title>VOL Command Set</title>
+        <title>V:TES Online Command Set</title>
     </head>
     <body>
         <ul class="help">

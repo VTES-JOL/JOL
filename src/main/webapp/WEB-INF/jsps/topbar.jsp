@@ -4,7 +4,7 @@
     <table width="100%">
         <tr>
             <td align="left">
-                <div id="title">VOL</div>
+                <div id="title">V:TES Online</div>
             </td>
             <td align="center">
                 <div id="buttons"></div>

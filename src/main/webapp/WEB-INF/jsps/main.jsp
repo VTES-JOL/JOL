@@ -10,7 +10,7 @@
                 </div>
             </div>
             <div id="register">
-                <span>Register for deckserver.net to create decks and join games!</span>
+                <span>Register to create decks and join games!</span>
                 <form method="post">
                     <table>
                         <tr>
@@ -34,11 +34,10 @@
         </td>
         <td width="50%" valign="top">
             <p>
-                Welcome to VOL Test Server, the latest version of Vtes-OnLine, where you can play Vampire-The Eternal
-                Struggle(VTES) card games online over
-                the web.
-                To play games on this server, register, login, create some decks, and use chat below to organize games,
-                more regular games are organized via the league, see thelink on the right.
+                Welcome to V:TES Online Test Server, where you can play Vampire-The Eternal Struggle (V:TES) card games online over the web.
+            </p>
+            <p>
+                To play games on this server login, create some decks, and use chat below to organize games.
             </p>
             <div id="globalchat" style="display: none;">
                 <p>Now logged on: <span id="whoson"></span></p>
