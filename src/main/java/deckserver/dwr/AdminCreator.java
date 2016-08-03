@@ -3,7 +3,7 @@ package deckserver.dwr;
 import deckserver.dwr.bean.AdminBean;
 import deckserver.dwr.bean.AdminPageBean;
 
-public class AdminCreator implements ViewCreator {
+class AdminCreator implements ViewCreator {
 
     public String getFunction() {
         return "callbackAdmin";

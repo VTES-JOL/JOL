@@ -3,7 +3,7 @@ package deckserver.dwr;
 import deckserver.dwr.bean.AdminBean;
 import deckserver.dwr.bean.NavBean;
 
-public class NavCreator implements ViewCreator {
+class NavCreator implements ViewCreator {
 
     public String getFunction() {
         return "navigate";

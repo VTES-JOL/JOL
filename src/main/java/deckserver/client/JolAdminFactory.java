@@ -87,8 +87,6 @@ public abstract class JolAdminFactory {
 
     public abstract String getOwner(String game);
 
-    public abstract boolean isSuperUser(String player);
-
     public abstract OldCardSearch getAllCards();
 
     public abstract void setGP(String gamename, String prop, String value);

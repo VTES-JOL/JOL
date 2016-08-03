@@ -2,7 +2,7 @@ package deckserver.dwr;
 
 import deckserver.dwr.bean.AdminBean;
 
-public interface ViewCreator {
+interface ViewCreator {
 
     String getFunction();
 

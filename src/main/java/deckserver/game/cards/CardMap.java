@@ -22,9 +22,8 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 class CardMap {
 
-    private final Properties map = new Properties();
-
     private static final Logger logger = getLogger(CardMap.class);
+    private final Properties map = new Properties();
 
     CardMap(String resource) {
         try (StringReader r = new StringReader(resource);

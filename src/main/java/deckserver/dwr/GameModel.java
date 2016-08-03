@@ -32,23 +32,6 @@ public class GameModel implements Comparable {
         regen();
     }
 
-    public void unsetGlobalOwner() {
-        globalOwner = null;
-    }
-
-    public synchronized boolean isGlobalEditable(String player) {
-        return globalOwner == null || globalOwner.equals(player);
-    }
-
-    public String getGlobalOwner() {
-        return globalOwner;
-    }
-
-    public synchronized void setGlobalOwner(String globalOwner) {
-        if (globalOwner == null)
-            this.globalOwner = globalOwner;
-    }
-
     public boolean isOpen() {
         return JolAdminFactory.INSTANCE.isOpen(name);
     }
@@ -72,7 +55,7 @@ public class GameModel implements Comparable {
     public synchronized String submit(String player, String phase, String command, String chat,
                                       String ping, String endTurn, String global, String text) {
         JolAdminFactory admin = JolAdminFactory.INSTANCE;
-        if (!getPlayers().contains(player) && !admin.getOwner(name).equals(player) && !admin.isSuperUser(player)) {
+        if (!getPlayers().contains(player) && !admin.getOwner(name).equals(player)) {
             return "Not authorized";
         }
         JolGame game = admin.getGame(name);

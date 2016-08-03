@@ -30,8 +30,6 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class JolGameImpl implements JolGame {
 
-    private static final Logger logger = getLogger(JolGameImpl.class);
-
     static final String COUNTERS = "counters";
     static final String BLOOD = "blood";
     static final String TEXT = "text";
@@ -42,6 +40,7 @@ public class JolGameImpl implements JolGame {
     static final String TAPPED = "tap";
     static final String UNTAPPED = "untap";
     static final String PING = "ping";
+    private static final Logger logger = getLogger(JolGameImpl.class);
     private static DateFormat format = new SimpleDateFormat("HH:mm M/d ");
     Game state = null;
     TurnRecorder actions = null;

@@ -15,20 +15,17 @@ public class NavBean {
     private static final Map<String, String> loggedOut = new HashMap<>();
     private static final Map<String, String> noadmin = new HashMap<>();
     private static final Map<String, String> isadmin = new HashMap<>();
-    private static final Map<String, String> suser = new HashMap<>();
 
     static {
         loggedOut.put("main", "Main");
         loggedIn.put("main", "Main");
         loggedIn.put("deck", "Deck Register");
         isadmin.put("admin", "Game Admin");
-        suser.put("admin", "Game Admin");
-        suser.put("suser", "Site Admin");
         hasChats = new HashMap<>(loggedIn);
         hasChats.put("main", "Main *");
     }
 
-    String player, game = null, target;
+    private String player, game = null, target;
     private Map<String, String> gameB = new HashMap<>(), playerB = loggedOut, adminB = noadmin;
 
     public NavBean(AdminBean abean, PlayerModel model) {
@@ -39,9 +36,7 @@ public class NavBean {
         if (player != null) {
             playerB = model.hasChats() ? hasChats : loggedIn;
             JolAdminFactory admin = JolAdminFactory.INSTANCE;
-            if (admin.isSuperUser(player)) {
-                adminB = suser;
-            } else if (admin.isAdmin(player)) {
+            if (admin.isAdmin(player)) {
                 adminB = isadmin;
             }
         }

@@ -17,9 +17,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class DoCommand {
 
-    private final JolGame game;
-
     private static final Logger logger = getLogger(DoCommand.class);
+    private final JolGame game;
 
     public DoCommand(JolGame game) {
         this.game = game;
@@ -73,7 +72,7 @@ public class DoCommand {
             if (cmd.equalsIgnoreCase("random")) {
                 int d = cmdObj.getNumber(-1);
                 if (d < 1) d = 2;
-                int num = ThreadLocalRandom.current().nextInt(1,d +1);
+                int num = ThreadLocalRandom.current().nextInt(1, d + 1);
                 if (num == 0) num = d;
                 game.sendMsg(player, player + " rolls from 1-" + d + " : " + num);
                 return "Rolled the die";

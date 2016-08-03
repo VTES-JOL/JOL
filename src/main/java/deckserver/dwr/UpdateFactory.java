@@ -7,7 +7,7 @@ import javax.servlet.ServletContext;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UpdateFactory {
+class UpdateFactory {
 
     private static final Map<String, ViewCreator> viewMap = new HashMap<>();
 
@@ -17,14 +17,13 @@ public class UpdateFactory {
         viewMap.put("main", new MainCreator());
         viewMap.put("deck", new DeckCreator());
         viewMap.put("admin", new AdminCreator());
-        viewMap.put("suser", new SuperCreator());
     }
 
-    public static ViewCreator getView(String type) {
+    private static ViewCreator getView(String type) {
         return viewMap.get(type);
     }
 
-    public static Map<String, Object> getUpdate(ContextProvider provider) {
+    static Map<String, Object> getUpdate(ContextProvider provider) {
         ServletContext ctx = provider.getServletContext();
         AdminBean abean = AdminFactory.getBean(ctx);
         PlayerModel model = Utils.getPlayerModel(provider.getHttpServletRequest(), abean);

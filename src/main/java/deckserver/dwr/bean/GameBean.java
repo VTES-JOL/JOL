@@ -1,30 +1,30 @@
 package deckserver.dwr.bean;
 
-public final class GameBean {
+public class GameBean {
 
-    int refresh = -1;
+    private int refresh = -1;
 
-    String hand = null;
+    private String hand = null;
 
-    String global = null;
+    private String global = null;
 
-    String text = null;
+    private String text = null;
 
-    String label = null;
+    private String label = null;
 
-    String[] turn = null;
+    private String[] turn = null;
 
-    String[] turns = null;
+    private String[] turns = null;
 
-    String[] pingkeys = null;
+    private String[] pingkeys = null;
 
-    String[] pingvalues = null;
+    private String[] pingvalues = null;
 
-    String state = null;
+    private String state = null;
 
-    String[] phases = null;
+    private String[] phases = null;
 
-    String[] collapsed = null;
+    private String[] collapsed = null;
 
     private boolean admin;
 

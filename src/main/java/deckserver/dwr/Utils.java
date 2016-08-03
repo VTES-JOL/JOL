@@ -20,31 +20,18 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
 
-    static final DateFormat format = new SimpleDateFormat("d-MMM HH:mm zz ");
+    private static final DateFormat format = new SimpleDateFormat("d-MMM HH:mm zz ");
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
-
-    public static String getGameName(HttpServletRequest request) {
-        if (true) { // workaround until beta period is over.
-            return (String) request.getAttribute("gamename");
-        }
-        String gamename = request.getServletPath();
-        if (gamename.length() > 0)
-            gamename = gamename.substring(1);
-        if (gamename.equals("")
-                || !JolAdminFactory.INSTANCE.existsGame(gamename))
-            gamename = null;
-        return gamename;
-    }
 
     public static String getPlayer(HttpServletRequest request) {
         return (String) request.getSession().getAttribute("meth");
     }
 
-    public static void setPlayer(HttpServletRequest request, String player) {
+    private static void setPlayer(HttpServletRequest request, String player) {
         request.getSession().setAttribute("meth", player);
     }
 
-    public static PlayerModel getPlayerModel(HttpServletRequest request, AdminBean abean) {
+    static PlayerModel getPlayerModel(HttpServletRequest request, AdminBean abean) {
         String player = getPlayer(request);
         PlayerModel model;
         if (player == null) {
@@ -59,7 +46,7 @@ public class Utils {
         return model;
     }
 
-    public static void checkParams(HttpServletRequest request, ServletContext ctx) {
+    static void checkParams(HttpServletRequest request, ServletContext ctx) {
         AdminBean abean = AdminFactory.getBean(ctx);
         String player = (String) request.getSession().getAttribute("meth");
         String login = request.getParameter("login");
@@ -110,11 +97,11 @@ public class Utils {
         }
     }
 
-    static public final String getDate() {
+    static public String getDate() {
         return Utils.format.format(new Date());
     }
 
-    public static String sanitizeName(String name) {
+    static String sanitizeName(String name) {
         StringCharacterIterator it = new StringCharacterIterator(name);
         StringBuilder res = new StringBuilder();
         for (char c = it.first(); c != CharacterIterator.DONE; c = it.next()) {
@@ -131,8 +118,7 @@ public class Utils {
         if (num <= 0 || num > obj.length) {
             num = obj.length;
         }
-        for (int i = num - 1; i > 0; i--)
-        {
+        for (int i = num - 1; i > 0; i--) {
             int index = rnd.nextInt(i + 1);
             Object a = obj[index];
             obj[index] = obj[i];

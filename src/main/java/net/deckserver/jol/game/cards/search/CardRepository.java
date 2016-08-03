@@ -4,6 +4,7 @@ import net.deckserver.jol.game.cards.CardEntry;
 import net.deckserver.jol.game.cards.CardType;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Set;
 
 /**
@@ -11,9 +12,13 @@ import java.util.Set;
  */
 public interface CardRepository {
 
-    String getId(String name);
     Collection<CardEntry> findAll();
+
     CardEntry findById(String id);
-    Set<CardEntry> findByType(String query, CardType type);
+
+    Collection<CardEntry> findByName(String name);
+
+    Collection<CardEntry> findByType(String query, EnumSet<CardType> typeFilter);
+
     void refresh();
 }

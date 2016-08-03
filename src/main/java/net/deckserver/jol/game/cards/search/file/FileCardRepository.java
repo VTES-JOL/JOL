@@ -87,7 +87,7 @@ public class FileCardRepository implements CardRepository {
             String lineData = LineType.stripLine(type, line).trim();
             switch (type) {
                 case NAME:
-                    String id = getId(lineData);
+                    String id = idMap.get(lineData);
                     builder.setName(lineData);
                     builder.setId(id);
                     break;
@@ -110,11 +110,6 @@ public class FileCardRepository implements CardRepository {
     }
 
     @Override
-    public String getId(String name) {
-        return idMap.get(name);
-    }
-
-    @Override
     public Collection<CardEntry> findAll() {
         return cardMap.values();
     }
@@ -125,12 +120,13 @@ public class FileCardRepository implements CardRepository {
     }
 
     @Override
-    public Set<CardEntry> findByType(String query, CardType type) {
-        return cardMap.values()
-                .stream()
-                .filter(e -> e.getType().equals(type.getLabel()))
-                .filter(e -> e.getText().contains(query))
-                .collect(Collectors.toSet());
+    public Collection<CardEntry> findByName(String name) {
+        return null;
+    }
+
+    @Override
+    public Collection<CardEntry> findByType(String query, EnumSet<CardType> typeFilter) {
+        return null;
     }
 
     @Override

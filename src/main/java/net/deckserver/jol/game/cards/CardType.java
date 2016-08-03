@@ -27,10 +27,6 @@ public enum CardType {
         this.label = label;
     }
 
-    public String getLabel() {
-        return label;
-    }
-
     public static CardType of(String label) {
         for (CardType type : EnumSet.allOf(CardType.class)) {
             if (type.label.equals(label)) {
@@ -42,5 +38,9 @@ public enum CardType {
 
     public static EnumSet<CardType> cryptTypes() {
         return EnumSet.of(VAMPIRE, IMBUED);
+    }
+
+    public String getLabel() {
+        return label;
     }
 }

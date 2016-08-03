@@ -2,7 +2,7 @@ package deckserver.dwr.bean;
 
 import net.deckserver.jol.game.cards.CardEntry;
 
-public final class CardBean {
+public class CardBean {
 
     private final String id;
     private final String name;

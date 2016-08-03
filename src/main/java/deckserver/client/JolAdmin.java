@@ -30,22 +30,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class JolAdmin extends JolAdminFactory {
 
     private static final Date startDate = new Date();
-
-    private final WriterThread wt = new WriterThread();
-
-    private final File bugdir;
-
-    private final String dir;
-
-    private final SystemInfo sysInfo;
-
-    private final Map<String, GameInfo> games;
-
-    private final Map<String, PlayerInfo> players;
-
-    private final CardsInfo cards;
-
     private static final Logger logger = getLogger(JolAdmin.class);
+    private final WriterThread wt = new WriterThread();
+    private final File bugdir;
+    private final String dir;
+    private final SystemInfo sysInfo;
+    private final Map<String, GameInfo> games;
+    private final Map<String, PlayerInfo> players;
+    private final CardsInfo cards;
 
     public JolAdmin(String dir) throws Exception {
         this.dir = dir;
@@ -186,10 +178,6 @@ public class JolAdmin extends JolAdminFactory {
 
     public boolean isAdmin(String player) {
         return existsPlayer(player) && getPlayerInfo(player).isAdmin();
-    }
-
-    public boolean isSuperUser(String player) {
-        return existsPlayer(player) && getPlayerInfo(player).isSuperUser();
     }
 
     public String getOwner(String gameName) {

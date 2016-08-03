@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 public class PlayerModel implements Comparable {
 
+    private static Logger logger = LoggerFactory.getLogger(PlayerModel.class);
     private final String player;
     private String view;
     private String[] games = new String[0];
@@ -24,7 +25,6 @@ public class PlayerModel implements Comparable {
     private DeckSummaryBean[] decks = null;
     private Collection<String> removedGames = new ArrayList<>(2);
     private Collection<String> changedGames = new ArrayList<>();
-    private static Logger logger = LoggerFactory.getLogger(PlayerModel.class);
 
     public PlayerModel(AdminBean abean, String name, List<String> chatin) {
         logger.trace("Creating new Player model for {}", name);
@@ -46,11 +46,10 @@ public class PlayerModel implements Comparable {
         return game;
     }
 
-    public void enterGame(AdminBean abean, String game) {
+    void enterGame(AdminBean abean, String game) {
         setView("game");
-        //		GameModel model = abean.getGameModel(game);
         Collection<String> c = new ArrayList<>(Arrays.asList(games));
-        if ( /*model.getPlayers().contains(player) && */!c.contains(game)) {
+        if (!c.contains(game)) {
             c.add(game);
             games = c.toArray(games);
         }
@@ -58,16 +57,6 @@ public class PlayerModel implements Comparable {
             abean.getGameModel(game).resetView(player);
         }
         this.game = game;
-    }
-
-    public void leaveGame(String game) {
-        Collection<String> c = Arrays.asList(games);
-        c.remove(game);
-        games = c.toArray(games);
-        if (game.equals(this.game))
-            this.game = null;
-        if (games.length > 0)
-            this.game = games[0];
     }
 
     public void recordAccess() {
@@ -147,10 +136,6 @@ public class PlayerModel implements Comparable {
 
     public boolean isAdmin() {
         return JolAdminFactory.INSTANCE.isAdmin(player);
-    }
-
-    public boolean isSuper() {
-        return JolAdminFactory.INSTANCE.isSuperUser(player);
     }
 
     public boolean hasChats() {

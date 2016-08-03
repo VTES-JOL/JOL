@@ -7,11 +7,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 class DsCard extends CardBox implements Card {
 
+    private static final Logger logger = getLogger(DsCard.class);
     private String id;
     private String card;
     private CardBox parent;
-
-    private static final Logger logger = getLogger(DsCard.class);
 
     DsCard(String id, String card) {
         super(null);

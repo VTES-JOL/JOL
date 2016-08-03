@@ -24,18 +24,14 @@ public class DeckserverRemote implements DSRemote {
     private static Logger logger = LoggerFactory.getLogger(DeckserverRemote.class);
 
     private final AdminBean abean;
-    ContextProvider provider;
+    private ContextProvider provider;
 
     public DeckserverRemote() {
-        this(new DWRContextProvider());
-    }
-
-    public DeckserverRemote(ContextProvider p) {
-        this.provider = p;
+        provider = new DWRContextProvider();
         abean = AdminFactory.getBean(provider.getServletContext());
     }
 
-    private static final String ne(String arg) {
+    private static String ne(String arg) {
         if ("".equals(arg)) {
             return null;
         }
@@ -83,15 +79,6 @@ public class DeckserverRemote implements DSRemote {
         }
         abean.notifyAboutGame(game);
         return UpdateFactory.getUpdate(provider);
-    }
-
-    public String unEndGame(String game) {
-        String player = getPlayer().getPlayer();
-        if (JolAdminFactory.INSTANCE.isSuperUser(player)) {
-            abean.unEndGame(game);
-            return "Game available in beta again";
-        }
-        return "Permission denied";
     }
 
     public Map<String, Object> chat(String txt) {
@@ -237,9 +224,8 @@ public class DeckserverRemote implements DSRemote {
     private void endGameImpl(String name) {
         logger.error("Attempting to close " + name);
         PlayerModel player = getPlayer();
-        logger.error("Is player super? : {}", player.isSuper());
         logger.error(abean.getGameModel(name).getOwner());
-        if (player.isSuper() || player.getPlayer().equals(abean.getGameModel(name).getOwner())) {
+        if (player.getPlayer().equals(abean.getGameModel(name).getOwner())) {
             logger.error("Closing " + name);
             abean.endGame(name);
         }

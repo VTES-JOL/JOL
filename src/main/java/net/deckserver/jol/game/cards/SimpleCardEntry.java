@@ -17,6 +17,10 @@ public class SimpleCardEntry implements CardEntry {
     private String group;
     private boolean isAdvanced;
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     @Override
     public String getType() {
         return type.getLabel();
@@ -67,10 +71,6 @@ public class SimpleCardEntry implements CardEntry {
                 ", text='" + text + '\'' +
                 ", group='" + group + '\'' +
                 '}';
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {

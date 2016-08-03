@@ -5,9 +5,7 @@ import org.directwebremoting.WebContextFactory;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-public class DWRContextProvider implements ContextProvider {
-    public DWRContextProvider() {
-    }
+class DWRContextProvider implements ContextProvider {
 
     public ServletContext getServletContext() {
         return WebContextFactory.get().getServletContext();

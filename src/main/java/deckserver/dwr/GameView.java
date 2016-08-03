@@ -19,6 +19,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class GameView {
 
+    private static final Logger logger = getLogger(GameView.class);
     boolean stateChanged = true;
     boolean phaseChanged = true;
     boolean pingChanged = true;
@@ -31,7 +32,6 @@ public class GameView {
     private boolean isAdmin = false;
     private Collection<String> chats = new ArrayList<>();
     private Collection<String> collapsed = new HashSet<>();
-    private static final Logger logger = getLogger(GameView.class);
 
     public GameView(String name, String player) {
         this.name = name;
@@ -62,7 +62,7 @@ public class GameView {
                 collapsed.add("i" + i);
             }
         }
-        if (!isPlayer && (admin.isSuperUser(player) || admin.getOwner(name).equals(player))) {
+        if (!isPlayer && (admin.getOwner(name).equals(player))) {
             isAdmin = true;
         }
     }

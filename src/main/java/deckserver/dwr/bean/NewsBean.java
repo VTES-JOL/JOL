@@ -2,10 +2,10 @@ package deckserver.dwr.bean;
 
 public class NewsBean {
 
-    public String url;
-    public String text;
+    private String url;
+    private String text;
 
-    public NewsBean(String url, String text) {
+    NewsBean(String url, String text) {
         this.url = url;
         this.text = text;
     }
