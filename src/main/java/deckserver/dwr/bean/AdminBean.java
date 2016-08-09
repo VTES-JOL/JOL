@@ -49,7 +49,7 @@ public class AdminBean {
         if (JolAdminFactory.INSTANCE == null) {
             try {
                 JolAdminFactory.INSTANCE =
-                        new JolAdmin(System.getProperty("JOL_DATA"));
+                        new JolAdmin(System.getProperty("jol.data"));
             } catch (Exception e) {
                 logger.error("Error getting admin bean {}", e);
             }

@@ -13,7 +13,7 @@ public class ApplicationServletInitializer implements ServletContextListener {
 
     private static final Logger logger = getLogger(ApplicationServletInitializer.class);
 
-    private String data = System.getProperty("JOL_DATA");
+    private String data = System.getProperty("jol.data");
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {

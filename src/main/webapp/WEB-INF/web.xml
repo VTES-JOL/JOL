@@ -5,17 +5,12 @@
 		  http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          version="3.0">
 
-    <display-name>JOL3</display-name>
+    <display-name>V:TES Online</display-name>
     <description>Vtes Online Web Client</description>
 
     <listener>
         <listener-class>deckserver.JyhadOnlineServletInitializer</listener-class>
     </listener>
-
-    <context-param>
-        <param-name>prefix</param-name>
-        <param-value>/jol3/</param-value>
-    </context-param>
 
     <context-param>
         <param-name>email</param-name>

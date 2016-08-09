@@ -83,6 +83,8 @@ public abstract class JolAdminFactory {
 
     public abstract String getEmail(String player);
 
+    public abstract boolean receivesTurnSummaries(String player);
+
     public abstract void setOwner(String game, String player);
 
     public abstract String getOwner(String game);

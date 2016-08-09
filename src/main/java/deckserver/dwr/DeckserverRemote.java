@@ -8,6 +8,7 @@ import deckserver.game.cards.CardSet;
 import deckserver.game.cards.OldCardSearch;
 import deckserver.game.turn.GameAction;
 import deckserver.util.AdminFactory;
+import deckserver.util.MailUtil;
 import net.deckserver.jol.game.cards.CardEntry;
 import net.deckserver.jol.game.cards.CardType;
 import org.slf4j.Logger;
@@ -75,6 +76,7 @@ public class DeckserverRemote implements DSRemote {
         JolAdminFactory admin = JolAdminFactory.INSTANCE;
         if (admin.getOwner(game).equals(player) && admin.isOpen(game)) {
             admin.startGame(game);
+            MailUtil.sendStartMsg(admin.getGame(game));
             getModel(game).firstPing();
         }
         abean.notifyAboutGame(game);

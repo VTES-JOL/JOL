@@ -23,8 +23,8 @@ public class AdminFactory {
 
     public static synchronized JolAdminFactory get(ServletContext context) {
         if (JolAdminFactory.INSTANCE == null) try {
-            logger.info("Initing deckserver with " + System.getProperty("JOL_DATA"));
-            JolAdminFactory.INSTANCE = new JolAdmin(System.getProperty("JOL_DATA"));
+            logger.info("Initializing deckserver with " + System.getProperty("jol.data"));
+            JolAdminFactory.INSTANCE = new JolAdmin(System.getProperty("jol.data"));
             context.setAttribute("dsadmin", new AdminBean());
             logger.info("Initialization complete");
         } catch (Exception e) {

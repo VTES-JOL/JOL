@@ -6,6 +6,7 @@ import deckserver.client.JolGame;
 import deckserver.dwr.bean.AdminBean;
 import deckserver.dwr.bean.SummaryBean;
 import deckserver.util.AdminFactory;
+import deckserver.util.MailUtil;
 import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +73,7 @@ public class GameModel implements Comparable {
                 String email = admin.getEmail(ping);
                 game.setPingTag(ping);
                 pingChanged = true;
+                status.append(MailUtil.ping(game.getName(), email));
             }
             if (phase != null &&
                     game.getActivePlayer().equals(player)
@@ -115,10 +117,17 @@ public class GameModel implements Comparable {
             if ((game.getActivePlayer().equals(player)
                     || admin.getOwner(game.getName()).equals(player))
                     && "Yes".equalsIgnoreCase(endTurn)) {
+                try {
+                    MailUtil.sendTurn(game);
+                } catch (Error e) {
+                    status.append("Turn email failed.");
+                }
                 game.newTurn();
                 resetChats();
                 idx = 0; // reset the current action index for the new turn.
+                String email = admin.getEmail(game.getActivePlayer());
                 try {
+                    MailUtil.ping(game.getName(), email);
                     game.setPingTag(game.getActivePlayer());
                 } catch (Error e) {
                     status.append("Turn ping failed.");
@@ -135,11 +144,12 @@ public class GameModel implements Comparable {
         return status.toString();
     }
 
-    public void firstPing() {
+    void firstPing() {
         JolAdminFactory admin = JolAdminFactory.INSTANCE;
         JolGame game = admin.getGame(name);
         String email = admin.getEmail(game.getActivePlayer());
         game.setPingTag(game.getActivePlayer());
+        MailUtil.ping(game.getName(), email);
     }
 
     private void addChats(int idx) {

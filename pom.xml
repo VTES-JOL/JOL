@@ -28,20 +28,27 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>2.3.2</version>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.5</version>
         </dependency>
 
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.21</version>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.3.2</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
             <version>1.7.21</version>
         </dependency>
 
@@ -74,18 +81,31 @@
     </dependencies>
 
     <build>
-        <finalName>jol3</finalName>
+        <finalName>jol</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>2.2</version>
                 <configuration>
-                    <path>/jol3</path>
+                    <path>/jol</path>
                     <systemProperties>
-                        <JOL_DATA>${dataDir}</JOL_DATA>
                         <JAVA_OPTS>-Xms256M -Xmx256M</JAVA_OPTS>
+                        <mail.smtp.port>1025</mail.smtp.port>
+                        <mail.debug>true</mail.debug>
+                        <jol.data>${dataDir}</jol.data>
+                        <jol.email>jol@localhost</jol.email>
                     </systemProperties>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.btmatthews.maven.plugins</groupId>
+                <artifactId>emailserver-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <configuration>
+                    <monitorPort>10025</monitorPort>
+                    <monitorKey>localhost</monitorKey>
+                    <portOffset>1000</portOffset>
                 </configuration>
             </plugin>
         </plugins>

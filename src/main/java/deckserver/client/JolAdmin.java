@@ -120,6 +120,11 @@ public class JolAdmin extends JolAdminFactory {
         return true;
     }
 
+    public boolean receivesTurnSummaries(String playerName) {
+        PlayerInfo player = getPlayerInfo(playerName);
+        return player.receivesTurnSummaries();
+    }
+
     public void recordAccess(String playerName) {
         PlayerInfo player = getPlayerInfo(playerName);
         player.recordAccess();
@@ -666,13 +671,10 @@ public class JolAdmin extends JolAdminFactory {
             return "Deckserver 3.0 player information";
         }
 
-        private boolean receivesTurnSummaries() {
+        boolean receivesTurnSummaries() {
             return "true".equals(info.getProperty("turns", "true"));
         }
 
-        private void setReceivesTurnSummaries(String set) {
-            info.setProperty("turns", set);
-        }
     }
 
     private class CardsInfo extends Info {
