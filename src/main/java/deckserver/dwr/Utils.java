@@ -5,12 +5,14 @@ import deckserver.dwr.bean.AdminBean;
 import deckserver.game.cards.Deck;
 import deckserver.util.AdminFactory;
 import deckserver.util.DeckParams;
+import deckserver.util.VerifyRecaptcha;
 import net.deckserver.jol.game.cards.CardEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.text.CharacterIterator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -74,11 +76,18 @@ public class Utils {
             player = request.getParameter("newplayer");
             String email = request.getParameter("newemail");
             String password = request.getParameter("newpassword");
-            if (JolAdminFactory.INSTANCE.registerPlayer(player, password, email)) {
-                setPlayer(request, player);
-                logger.debug("registered " + player);
-            } else {
-                logger.error("registration failed for " + player);
+            String captchaResponse = request.getParameter("g-recaptcha-response");
+            try {
+                boolean verify = VerifyRecaptcha.verify(captchaResponse);
+                if (verify && JolAdminFactory.INSTANCE.registerPlayer(player, password, email)) {
+                    setPlayer(request, player);
+                    logger.debug("registered " + player);
+                } else {
+                    logger.error("registration failed for " + player);
+                    player = null;
+                }
+            } catch (IOException e) {
+                logger.error("Unable to verify recaptcha",e);
                 player = null;
             }
         }

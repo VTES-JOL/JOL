@@ -7,6 +7,7 @@
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/interface/DS.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/util.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/js/ds.js'></script>
+        <script src='https://www.google.com/recaptcha/api.js'></script>
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/styles.css"/>
         <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/favicon.ico" />
     </head>
