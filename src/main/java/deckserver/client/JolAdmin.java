@@ -7,7 +7,7 @@
 package deckserver.client;
 
 import deckserver.game.cards.CardSearch;
-import deckserver.game.cards.CardUtil;
+import deckserver.game.cards.SearchImpl;
 import deckserver.game.state.DsGame;
 import deckserver.game.state.Game;
 import deckserver.game.state.GameImpl;
@@ -692,7 +692,7 @@ public class JolAdmin {
             try {
                 String set = readFile(new File(dir + "/cards/base.txt"));
                 String prop = readFile(new File(dir + "/cards/base.prop"));
-                return CardUtil.createSearch(set, prop);
+                return new SearchImpl(set, prop);
             } catch (IOException e) {
                 throw new RuntimeException("Unable to open card files", e);
             }

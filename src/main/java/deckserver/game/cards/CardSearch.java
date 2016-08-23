@@ -27,4 +27,6 @@ public interface CardSearch {
 
     CardEntry[] searchByName(CardEntry[] set, String name);
 
+    CardEntry[] searchByField(CardEntry[] set, String field, String value);
+
 }

@@ -5,7 +5,7 @@ import deckserver.dwr.GameModel;
 import deckserver.dwr.PlayerModel;
 import deckserver.game.cards.CardSearch;
 import deckserver.game.cards.Deck;
-import deckserver.game.cards.DeckFactory;
+import deckserver.game.cards.DeckImpl;
 
 public class DeckSummaryBean {
 
@@ -30,7 +30,7 @@ public class DeckSummaryBean {
     private void init(String player, String deck) {
         CardSearch search = JolAdmin.INSTANCE.getAllCards();
         try {
-            Deck nd = DeckFactory.getDeckSize(search, deck);
+            Deck nd = new DeckImpl(search, deck);
             lib = nd.getLibSize();
             crypt = nd.getCryptSize();
             groups = nd.getGroups();

@@ -65,6 +65,35 @@ public class DeckImpl implements Deck {
         }
     }
 
+    private CardEntry[] findCardName(CardSearch search, String text, Collection<String> errors) {
+        CardEntry[] cards = search.getAllCards();
+        // check for prefixes
+        CardEntry[] set = search.searchByName(cards, text);
+        if (set.length > 0) return set;
+        // check for abbreviations
+        text = text.toLowerCase();
+        String id = search.getId(text);
+        if (id == null || id.equals("not found"))
+            // check for abbreviation prefixes
+            for (String abbrev : search.getNames()) {
+                if (abbrev.startsWith(text)) {
+                    id = search.getId(abbrev);
+                    break;
+                }
+            }
+        if (id.equals("not found")) id = null;
+        if (id != null) {
+            // now need to convert this to a set to handle advanced vamps
+            CardEntry card = search.getCardById(id);
+
+            set = search.searchByName(cards, card.getBaseName());
+        }
+        if (id == null || set.length == 0) {
+            errors.add(text);
+        }
+        return set;
+    }
+
     private void init(String deckin, boolean ignoreTranslation) {
         Reader r = new StringReader(deckin);
         LineNumberReader reader = new LineNumberReader(r);
@@ -164,7 +193,7 @@ public class DeckImpl implements Deck {
     }
 
     public CardEntry[] findCardName(String text) {
-        return DeckFactory.findCardName(search, text, errors);
+        return findCardName(search, text, errors);
     }
 
     public String[] getErrorLines() {
