@@ -9,6 +9,7 @@ import deckserver.game.cards.CardSearch;
 import deckserver.game.cards.CardType;
 import deckserver.game.turn.GameAction;
 import deckserver.util.MailUtil;
+import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,14 +20,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DeckserverRemote implements DSRemote {
+public class DeckserverRemote {
     private static Logger logger = LoggerFactory.getLogger(DeckserverRemote.class);
 
     private final AdminBean abean;
-    private ContextProvider provider;
+    private HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
 
     public DeckserverRemote() {
-        provider = new DWRContextProvider();
         abean = AdminBean.INSTANCE;
     }
 
@@ -44,7 +44,7 @@ public class DeckserverRemote implements DSRemote {
     }
 
     public Map<String, Object> doPoll() {
-        return UpdateFactory.getUpdate(provider);
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> createGame(String name) {
@@ -52,12 +52,12 @@ public class DeckserverRemote implements DSRemote {
         if (player != null && player.isAdmin()) {
             abean.createGame(name, player);
         }
-        return UpdateFactory.getUpdate(provider);
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> endGame(String name) {
         endGameImpl(name);
-        return UpdateFactory.getUpdate(provider);
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> invitePlayer(String game, String name) {
@@ -66,7 +66,7 @@ public class DeckserverRemote implements DSRemote {
         if (admin.isAdmin(player)) {
             admin.invitePlayer(game, name);
         }
-        return UpdateFactory.getUpdate(provider);
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> startGame(String game) {
@@ -78,21 +78,19 @@ public class DeckserverRemote implements DSRemote {
             getModel(game).firstPing();
         }
         abean.notifyAboutGame(game);
-        return UpdateFactory.getUpdate(provider);
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> chat(String txt) {
-        HttpServletRequest request = provider.getHttpServletRequest();
         String player = Utils.getPlayer(request);
         abean.chat(Utils.getDate() + player + ": " + txt);
-        return UpdateFactory.getUpdate(provider);
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> init() {
-        HttpServletRequest request = provider.getHttpServletRequest();
         String player = Utils.getPlayer(request);
         abean.remove(player);
-        return UpdateFactory.getUpdate(provider);
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> navigate(String target) {
@@ -104,14 +102,14 @@ public class DeckserverRemote implements DSRemote {
                 player.setView(target);
             }
         }
-        return UpdateFactory.getUpdate(provider);
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> getState(String game, boolean forceLoad) {
         if (forceLoad) {
             getView(game).reset();
         }
-        return UpdateFactory.getUpdate(provider);
+        return UpdateFactory.getUpdate();
     }
 
     public String[] getHistory(String game, String turn) {
@@ -127,7 +125,7 @@ public class DeckserverRemote implements DSRemote {
     }
 
     public Map<String, Object> getCardText(String callback, String id) {
-        Map<String, Object> ret = UpdateFactory.getUpdate(provider);
+        Map<String, Object> ret = UpdateFactory.getUpdate();
         CardSearch cards = JolAdmin.INSTANCE.getAllCards();
         CardEntry card = cards.getCardById(id);
         ret.put(callback, new CardBean(card));
@@ -137,7 +135,7 @@ public class DeckserverRemote implements DSRemote {
     public Map<String, Object> doToggle(String game, String id) {
         GameView view = getView(game);
         view.toggleCollapsed(id);
-        return UpdateFactory.getUpdate(provider);
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> submitForm(String gamename, String phase, String command, String chat,
@@ -147,11 +145,10 @@ public class DeckserverRemote implements DSRemote {
         chat = ne(chat);
         ping = ne(ping);
         endTurn = ne(endTurn);
-        HttpServletRequest request = provider.getHttpServletRequest();
         String player = Utils.getPlayer(request);
         GameModel game = getModel(gamename);
         String status = game.submit(player, phase, command, chat, ping, endTurn, global, text);
-        Map<String, Object> ret = UpdateFactory.getUpdate(provider);
+        Map<String, Object> ret = UpdateFactory.getUpdate();
         ret.put("showStatus", status);
         return ret;
     }
@@ -163,7 +160,7 @@ public class DeckserverRemote implements DSRemote {
         if (model != null && deck != null) {
             model.submitDeck(name, deck);
         }
-        Map<String, Object> ret = UpdateFactory.getUpdate(provider);
+        Map<String, Object> ret = UpdateFactory.getUpdate();
         ret.put("callbackUpdateDeck", name);
         return ret;
     }
@@ -172,7 +169,7 @@ public class DeckserverRemote implements DSRemote {
         JolAdmin admin = JolAdmin.INSTANCE;
         String player = getPlayer().getPlayer();
         admin.addPlayerToGame(game, player, name);
-        return UpdateFactory.getUpdate(provider);
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> removeDeck(String name) {
@@ -183,11 +180,11 @@ public class DeckserverRemote implements DSRemote {
         if (model != null) {
             model.removeDeck();
         }
-        return UpdateFactory.getUpdate(provider);
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> getDeck(String name) {
-        Map<String, Object> ret = UpdateFactory.getUpdate(provider);
+        Map<String, Object> ret = UpdateFactory.getUpdate();
         String player = getPlayer().getPlayer();
         DeckEditBean deck = new DeckEditBean(player, name);
         ret.put("showDeck", deck);
@@ -196,7 +193,7 @@ public class DeckserverRemote implements DSRemote {
 
     public Map<String, Object> refreshDeck(String name, String deck, String shuffle) {
         boolean doshuffle = "true".equals(shuffle);
-        Map<String, Object> ret = UpdateFactory.getUpdate(provider);
+        Map<String, Object> ret = UpdateFactory.getUpdate();
         getPlayer().setTmpDeck(name, deck);
         DeckEditBean bean = new DeckEditBean(deck, doshuffle);
         ret.put("showDeck", bean);
@@ -204,7 +201,7 @@ public class DeckserverRemote implements DSRemote {
     }
 
     public Map<String, Object> cardSearch(String type, String string) {
-        Map<String, Object> ret = UpdateFactory.getUpdate(provider);
+        Map<String, Object> ret = UpdateFactory.getUpdate();
         CardSearch search = JolAdmin.INSTANCE.getAllCards();
         CardEntry[] set = search.getAllCards();
         type = ne(type);
@@ -231,12 +228,10 @@ public class DeckserverRemote implements DSRemote {
     }
 
     private PlayerModel getPlayer() {
-        HttpServletRequest request = provider.getHttpServletRequest();
         return Utils.getPlayerModel(request, abean);
     }
 
     private GameView getView(String name) {
-        HttpServletRequest request = provider.getHttpServletRequest();
         String player = Utils.getPlayer(request);
         GameModel gmodel = getModel(name);
         return gmodel.getView(player);

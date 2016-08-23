@@ -1,8 +1,8 @@
 package deckserver.dwr;
 
 import deckserver.dwr.bean.AdminBean;
+import org.directwebremoting.WebContextFactory;
 
-import javax.servlet.ServletContext;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,10 +22,9 @@ class UpdateFactory {
         return viewMap.get(type);
     }
 
-    static Map<String, Object> getUpdate(ContextProvider provider) {
-        ServletContext ctx = provider.getServletContext();
+    static Map<String, Object> getUpdate() {
         AdminBean abean = AdminBean.INSTANCE;
-        PlayerModel model = Utils.getPlayerModel(provider.getHttpServletRequest(), abean);
+        PlayerModel model = Utils.getPlayerModel(WebContextFactory.get().getHttpServletRequest(), abean);
         model.recordAccess();
         String[] views = new String[]{model.getView(), "nav"};
         Map<String, Object> ret = new HashMap<>();
