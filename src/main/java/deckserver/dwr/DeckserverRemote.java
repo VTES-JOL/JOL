@@ -6,7 +6,6 @@ import deckserver.dwr.bean.CardBean;
 import deckserver.dwr.bean.DeckEditBean;
 import deckserver.game.cards.CardEntry;
 import deckserver.game.cards.CardSearch;
-import deckserver.game.cards.CardSet;
 import deckserver.game.cards.CardType;
 import deckserver.game.turn.GameAction;
 import deckserver.util.MailUtil;
@@ -207,16 +206,15 @@ public class DeckserverRemote implements DSRemote {
     public Map<String, Object> cardSearch(String type, String string) {
         Map<String, Object> ret = UpdateFactory.getUpdate(provider);
         CardSearch search = JolAdmin.INSTANCE.getAllCards();
-        CardSet set = search.getAllCards();
+        CardEntry[] set = search.getAllCards();
         type = ne(type);
         if (type != null && !type.equals("All")) {
             set = search.searchByType(set, type);
         }
         set = search.searchByText(set, string);
-        CardEntry[] arr = set.getCardArray();
-        CardBean[] beans = new CardBean[arr.length];
-        for (int i = 0, j = arr.length - 1; i < arr.length; i++, j--) {
-            beans[j] = new CardBean(arr[i]);
+        CardBean[] beans = new CardBean[set.length];
+        for (int i = 0, j = set.length - 1; i < set.length; i++, j--) {
+            beans[j] = new CardBean(set[i]);
         }
         ret.put("callbackShowCards", beans);
         return ret;

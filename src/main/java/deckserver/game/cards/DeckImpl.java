@@ -143,7 +143,7 @@ public class DeckImpl implements Deck {
             text = text.substring(0, text.lastIndexOf("(advanced)")).trim();
             advanced = true;
         }
-        CardSet set = findCardName(text);
+        CardEntry[] set = findCardName(text);
         CardEntry card = selectCard(text, set);
         if (card == null) return null;
         if (!advanced) return card;
@@ -152,19 +152,18 @@ public class DeckImpl implements Deck {
         return card;
     }
 
-    private CardEntry selectCard(String text, CardSet set) {
+    private CardEntry selectCard(String text, CardEntry[] set) {
         text = text.toLowerCase();
-        CardEntry[] cards = set.getCardArray();
-        if (cards.length == 0) return null;
-        CardEntry bestfit = cards[0];
-        for (CardEntry card : cards) {
+        if (set.length == 0) return null;
+        CardEntry bestfit = set[0];
+        for (CardEntry card : set) {
             if (card.getBaseName().toLowerCase().equals(text)) return card;
             if (card.getBaseName().toLowerCase().startsWith(text)) bestfit = card;
         }
         return bestfit;
     }
 
-    public CardSet findCardName(String text) {
+    public CardEntry[] findCardName(String text) {
         return DeckFactory.findCardName(search, text, errors);
     }
 

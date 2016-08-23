@@ -17,7 +17,7 @@ public interface Deck {
 
     String getDeckString();
 
-    CardSet findCardName(String text);
+    CardEntry[] findCardName(String text);
 
     String[] getErrorLines();
 

@@ -26,11 +26,10 @@ public class CardUtil {
         return new SearchImpl(textfile, mapfile);
     }
 
-    private static CardSet searchByField(CardSet set, String field, String value) {
-        Vector<CardEntry> v = new Vector<>();
+    private static CardEntry[] searchByField(CardEntry[] set, String field, String value) {
+        List<CardEntry> v = new ArrayList<>();
         value = value.toLowerCase();
-        CardEntry[] arr = set.getCardArray();
-        for (CardEntry anArr : arr) {
+        for (CardEntry anArr : set) {
             String[] text = anArr.getFullText();
             for (String aText : text)
                 if (aText.startsWith(field)) {
@@ -39,9 +38,9 @@ public class CardUtil {
                     break;
                 }
         }
-        arr = new CardEntry[v.size()];
-        v.toArray(arr);
-        return new SetImpl(arr);
+        set = new CardEntry[v.size()];
+        v.toArray(set);
+        return set;
     }
 
     private static class SearchImpl implements CardSearch {
@@ -71,27 +70,26 @@ public class CardUtil {
             }
         }
 
-        public CardSet getAllCards() {
-            return new SetImpl(cardArr);
+        public CardEntry[] getAllCards() {
+            return cardArr;
         }
 
         public CardEntry getCardById(String id) {
             return cardTable.get(id);
         }
 
-        public CardSet searchByName(CardSet set, String name) {
+        public CardEntry[] searchByName(CardEntry[] set, String name) {
             return searchByField(set, "Name:", name);
         }
 
-        public CardSet searchByType(CardSet set, String type) {
+        public CardEntry[] searchByType(CardEntry[] set, String type) {
             return searchByField(set, "Cardtype:", type);
         }
 
-        public CardSet searchByText(CardSet set, String text) {
-            CardEntry[] arr = set.getCardArray();
+        public CardEntry[] searchByText(CardEntry[] set, String text) {
             text = text.toLowerCase();
             Vector<CardEntry> v = new Vector<>();
-            for (CardEntry anArr : arr) {
+            for (CardEntry anArr : set) {
                 String[] cardText = anArr.getFullText();
                 for (String aCardText : cardText) {
                     if (aCardText.toLowerCase().indexOf(text) > 0) {
@@ -100,9 +98,9 @@ public class CardUtil {
                     }
                 }
             }
-            arr = new CardEntry[v.size()];
-            v.toArray(arr);
-            return new SetImpl(arr);
+            set = new CardEntry[v.size()];
+            v.toArray(set);
+            return set;
         }
 
         public String getId(String nm) {
@@ -112,19 +110,5 @@ public class CardUtil {
         public Set<String> getNames() {
             return map.getNames();
         }
-    }
-
-    static class SetImpl implements CardSet {
-
-        CardEntry[] arr;
-
-        SetImpl(CardEntry[] arr) {
-            this.arr = arr;
-        }
-
-        public CardEntry[] getCardArray() {
-            return arr;
-        }
-
     }
 }

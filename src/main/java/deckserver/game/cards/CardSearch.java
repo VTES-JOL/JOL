@@ -17,14 +17,14 @@ public interface CardSearch {
 
     Set<String> getNames();
 
-    CardSet getAllCards();
+    CardEntry[] getAllCards();
 
     CardEntry getCardById(String id);
 
-    CardSet searchByType(CardSet set, String type);
+    CardEntry[] searchByType(CardEntry[] set, String type);
 
-    CardSet searchByText(CardSet set, String text);
+    CardEntry[] searchByText(CardEntry[] set, String text);
 
-    CardSet searchByName(CardSet set, String name);
+    CardEntry[] searchByName(CardEntry[] set, String name);
 
 }

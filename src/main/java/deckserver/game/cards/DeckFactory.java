@@ -21,11 +21,11 @@ public final class DeckFactory {
         return new DeckImpl(search, deck, false, true);
     }
 
-    public static CardSet findCardName(CardSearch search, String text, Collection<String> errors) {
-        CardSet cards = search.getAllCards();
+    public static CardEntry[] findCardName(CardSearch search, String text, Collection<String> errors) {
+        CardEntry[] cards = search.getAllCards();
         // check for prefixes
-        CardSet set = search.searchByName(cards, text);
-        if (set.getCardArray().length > 0) return set;
+        CardEntry[] set = search.searchByName(cards, text);
+        if (set.length > 0) return set;
         // check for abbreviations
         text = text.toLowerCase();
         String id = search.getId(text);
@@ -44,7 +44,7 @@ public final class DeckFactory {
 
             set = search.searchByName(cards, card.getBaseName());
         }
-        if (id == null || set.getCardArray().length == 0) {
+        if (id == null || set.length == 0) {
             errors.add(text);
         }
         return set;
