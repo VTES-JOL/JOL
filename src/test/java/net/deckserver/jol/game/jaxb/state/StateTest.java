@@ -1,4 +1,4 @@
-package net.deckserver.jol.game.state;
+package net.deckserver.jol.game.jaxb.state;
 
 import org.junit.Assert;
 import org.junit.Test;
