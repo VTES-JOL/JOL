@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="deckserver.dwr.Utils" %>
-<%@page import="deckserver.util.DeckParams" %>
 <%@page import="deckserver.game.cards.CardEntry" %>
+<%@page import="deckserver.util.DeckParams" %>
 <%@page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.TreeMap" %>

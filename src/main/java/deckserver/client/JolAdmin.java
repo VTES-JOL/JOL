@@ -32,7 +32,6 @@ public class JolAdmin {
     private static final Date startDate = new Date();
     private static final Logger logger = getLogger(JolAdmin.class);
     public static JolAdmin INSTANCE = null;
-    private final WriterThread wt = new WriterThread();
     private final File bugdir;
     private final String dir;
     private final SystemInfo sysInfo;
@@ -363,7 +362,7 @@ public class JolAdmin {
                 actions = new ActionHistory();
                 ModelLoader.createModel(state, new GameImpl(gstate));
                 ModelLoader.createRecorder(actions, new TurnImpl(gactions));
-                game = new JolGameImpl(state, actions);
+                game = new JolGame(state, actions);
             } catch (IOException ie) {
                 logger.error("Error initializing game {}", ie);
                 throw new IllegalStateException("Couldn't initialize game "
@@ -418,7 +417,7 @@ public class JolAdmin {
             info.setProperty("state", "closed");
             state = new DsGame();
             actions = new ActionHistory();
-            game = new JolGameImpl(state, actions);
+            game = new JolGame(state, actions);
             game.initGame(gamename);
             regDecks();
             getGame().startGame();
@@ -459,14 +458,15 @@ public class JolAdmin {
         }
 
         protected void write() {
-            wt.addWrite(gamename);
+            dowrite();
             playerAccess.clear();
             info.setProperty("timestamp", (new Date()).getTime() + "");
         }
 
-        void dowrite() {
+        synchronized void dowrite() {
             super.write();
             if (game != null) {
+                logger.info("Saving game {}", gamename);
                 GameState gstate;
                 GameActions gactions;
                 try {
