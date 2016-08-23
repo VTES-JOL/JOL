@@ -6,8 +6,8 @@
 
 package deckserver.util;
 
-import deckserver.game.cards.NormalizeDeck;
 import deckserver.game.cards.CardEntry;
+import deckserver.game.cards.NormalizeDeck;
 
 /**
  * @author Joe User

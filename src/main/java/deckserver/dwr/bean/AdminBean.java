@@ -1,7 +1,6 @@
 package deckserver.dwr.bean;
 
 import deckserver.client.JolAdmin;
-import deckserver.client.JolAdminFactory;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.PlayerModel;
 import org.slf4j.Logger;
@@ -27,10 +26,8 @@ public class AdminBean {
     private String[] admins = new String[0];
 
     public AdminBean() {
-        if (INSTANCE == null)
-            INSTANCE = this;
         try {
-            JolAdminFactory admin = getAdmin();
+            JolAdmin admin = JolAdmin.INSTANCE;
             String[] games = admin.getGames();
             for (String game : games) {
                 if (admin.isActive(game) || admin.isOpen(game)) {
@@ -44,22 +41,6 @@ public class AdminBean {
             logger.error("Error creating admin bean {}", e);
         }
     }
-
-    public JolAdminFactory getAdmin() {
-        if (JolAdminFactory.INSTANCE == null) {
-            try {
-                JolAdminFactory.INSTANCE =
-                        new JolAdmin(System.getProperty("jol.data"));
-            } catch (Exception e) {
-                logger.error("Error getting admin bean {}", e);
-            }
-        }
-        return JolAdminFactory.INSTANCE;
-    }
-
-    /*  public JolAdminFactory getAdmin() {
-        return JolAdminFactory.INSTANCE;
-    } */
 
     /**
      * @return list of GameModels
@@ -114,7 +95,7 @@ public class AdminBean {
         Collection<String> c = new TreeSet<>(pmap.keySet());
         who = c.toArray(new String[c.size()]);
         for (Iterator i = c.iterator(); i.hasNext(); ) {
-            if (!getAdmin().isAdmin((String) i.next())) {
+            if (!JolAdmin.INSTANCE.isAdmin((String) i.next())) {
                 i.remove();
             }
         }
@@ -168,14 +149,14 @@ public class AdminBean {
     }
 
     public synchronized void unEndGame(String name) {
-        JolAdminFactory.INSTANCE.setGP(name, "state", "closed");
+        JolAdmin.INSTANCE.setGP(name, "state", "closed");
         activeSort.add(getGameModel(name));
         actives = new ArrayList<>(activeSort);
         notifyAboutGame(name);
     }
 
     public synchronized void endGame(String name) {
-        JolAdminFactory.INSTANCE.endGame(name);
+        JolAdmin.INSTANCE.endGame(name);
         activeSort.remove(getGameModel(name));
         actives = new ArrayList<>(activeSort);
         notifyAboutGame(name, true);
@@ -183,8 +164,8 @@ public class AdminBean {
 
     public synchronized void createGame(String name, PlayerModel player) {
         logger.trace("Creating game {} for player {}", name, player.getPlayer());
-        if (JolAdminFactory.INSTANCE.mkGame(name)) {
-            JolAdminFactory.INSTANCE.setOwner(name, player.getPlayer());
+        if (JolAdmin.INSTANCE.mkGame(name)) {
+            JolAdmin.INSTANCE.setOwner(name, player.getPlayer());
             activeSort.add(new GameModel(name));
             actives = new ArrayList<>(activeSort);
             notifyAboutGame(name);
@@ -194,4 +175,5 @@ public class AdminBean {
     public List<String> getChats() {
         return chats;
     }
+
 }

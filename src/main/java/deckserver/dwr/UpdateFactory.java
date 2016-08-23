@@ -1,7 +1,6 @@
 package deckserver.dwr;
 
 import deckserver.dwr.bean.AdminBean;
-import deckserver.util.AdminFactory;
 
 import javax.servlet.ServletContext;
 import java.util.HashMap;
@@ -25,7 +24,7 @@ class UpdateFactory {
 
     static Map<String, Object> getUpdate(ContextProvider provider) {
         ServletContext ctx = provider.getServletContext();
-        AdminBean abean = AdminFactory.getBean(ctx);
+        AdminBean abean = AdminBean.INSTANCE;
         PlayerModel model = Utils.getPlayerModel(provider.getHttpServletRequest(), abean);
         model.recordAccess();
         String[] views = new String[]{model.getView(), "nav"};

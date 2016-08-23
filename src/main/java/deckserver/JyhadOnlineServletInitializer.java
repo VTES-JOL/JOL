@@ -1,7 +1,7 @@
 package deckserver;
 
-import deckserver.client.JolAdminFactory;
-import deckserver.util.AdminFactory;
+import deckserver.client.JolAdmin;
+import deckserver.dwr.bean.AdminBean;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletContextEvent;
@@ -16,12 +16,20 @@ public class JyhadOnlineServletInitializer implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         logger.info("Starting Jyhad Online...");
-        AdminFactory.init(servletContextEvent.getServletContext());
+        logger.info("Initializing deckserver with " + System.getProperty("jol.data"));
+        try {
+            JolAdmin.INSTANCE = new JolAdmin(System.getProperty("jol.data"));
+        } catch (Exception e) {
+            logger.error("Error creating admin factory {}", e);
+            throw new RuntimeException("Unable to initialize JolAdmin", e);
+        }
+        AdminBean.INSTANCE = new AdminBean();
+        logger.info("Initialization complete");
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         logger.info("Closing Jyhad Online...");
-        JolAdminFactory.INSTANCE = null;
+        JolAdmin.INSTANCE = null;
     }
 }

@@ -1,11 +1,10 @@
 package deckserver.dwr;
 
-import deckserver.client.JolAdminFactory;
+import deckserver.client.JolAdmin;
 import deckserver.dwr.bean.AdminBean;
-import deckserver.game.cards.Deck;
-import deckserver.util.AdminFactory;
-import deckserver.util.DeckParams;
 import deckserver.game.cards.CardEntry;
+import deckserver.game.cards.Deck;
+import deckserver.util.DeckParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +46,7 @@ public class Utils {
     }
 
     static void checkParams(HttpServletRequest request, ServletContext ctx) {
-        AdminBean abean = AdminFactory.getBean(ctx);
+        AdminBean abean = AdminBean.INSTANCE;
         String player = (String) request.getSession().getAttribute("meth");
         String login = request.getParameter("login");
         logger.trace("Get request {} from player {}", request.getRequestURI(), player);
@@ -56,7 +55,7 @@ public class Utils {
                 player = request.getParameter("dsuserin");
                 String password = request.getParameter("dspassin");
                 if (player != null
-                        && JolAdminFactory.INSTANCE.authenticate(player,
+                        && JolAdmin.INSTANCE.authenticate(player,
                         password)) {
                     setPlayer(request, player);
                     logger.debug("Logged in player {}", player);
@@ -74,7 +73,7 @@ public class Utils {
             player = request.getParameter("newplayer");
             String email = request.getParameter("newemail");
             String password = request.getParameter("newpassword");
-            if (JolAdminFactory.INSTANCE.registerPlayer(player, password, email)) {
+            if (JolAdmin.INSTANCE.registerPlayer(player, password, email)) {
                 setPlayer(request, player);
                 logger.debug("registered " + player);
             } else {
@@ -90,7 +89,7 @@ public class Utils {
         if (gamename != null && gamename.length() > 0)
             gamename = gamename.substring(1);
         if (gamename != null && gamename.length() > 0
-                && JolAdminFactory.INSTANCE.existsGame(gamename)) {
+                && JolAdmin.INSTANCE.existsGame(gamename)) {
             logger.debug("Setting game to be " + gamename);
 
             model.enterGame(abean, gamename);

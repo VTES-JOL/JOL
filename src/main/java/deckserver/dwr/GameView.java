@@ -1,6 +1,6 @@
 package deckserver.dwr;
 
-import deckserver.client.JolAdminFactory;
+import deckserver.client.JolAdmin;
 import deckserver.client.JolGame;
 import deckserver.dwr.bean.GameBean;
 import deckserver.game.turn.GameAction;
@@ -40,7 +40,7 @@ public class GameView {
     }
 
     private void init() {
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
+        JolAdmin admin = JolAdmin.INSTANCE;
         JolGame game = admin.getGame(name);
         GameAction[] actions = game.getActions(game.getCurrentTurn());
         for (GameAction action : actions) {
@@ -68,7 +68,7 @@ public class GameView {
     }
 
     public synchronized GameBean create() {
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
+        JolAdmin admin = JolAdmin.INSTANCE;
         HttpServletRequest request = WebContextFactory.get()
                 .getHttpServletRequest();
         JolGame game = admin.getGame(name);
@@ -213,7 +213,7 @@ public class GameView {
 
     public long getTimestamp() {
         if (isPlayer) {
-            return JolAdminFactory.INSTANCE.getAccess(name, player).getTime();
+            return JolAdmin.INSTANCE.getAccess(name, player).getTime();
         } else {
             return (new Date()).getTime();
         }
@@ -238,7 +238,7 @@ public class GameView {
     }
 
     public void addChats(int idx) {
-        JolGame game = JolAdminFactory.INSTANCE.getGame(name);
+        JolGame game = JolAdmin.INSTANCE.getGame(name);
         GameAction[] actions = game.getActions(game.getCurrentTurn());
         for (int i = idx; i < actions.length; i++)
             chats.add(actions[i].getText());

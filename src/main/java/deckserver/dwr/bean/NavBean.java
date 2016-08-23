@@ -1,6 +1,6 @@
 package deckserver.dwr.bean;
 
-import deckserver.client.JolAdminFactory;
+import deckserver.client.JolAdmin;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.GameView;
 import deckserver.dwr.PlayerModel;
@@ -35,7 +35,7 @@ public class NavBean {
             game = model.getCurrentGame();
         if (player != null) {
             playerB = model.hasChats() ? hasChats : loggedIn;
-            JolAdminFactory admin = JolAdminFactory.INSTANCE;
+            JolAdmin admin = JolAdmin.INSTANCE;
             if (admin.isAdmin(player)) {
                 adminB = isadmin;
             }

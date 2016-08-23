@@ -1,6 +1,6 @@
 package deckserver.dwr;
 
-import deckserver.client.JolAdminFactory;
+import deckserver.client.JolAdmin;
 import deckserver.dwr.bean.AdminBean;
 import deckserver.dwr.bean.DeckSummaryBean;
 import org.slf4j.Logger;
@@ -61,11 +61,11 @@ public class PlayerModel implements Comparable {
 
     public void recordAccess() {
         if (player != null)
-            JolAdminFactory.INSTANCE.recordAccess(player);
+            JolAdmin.INSTANCE.recordAccess(player);
     }
 
     public long getTimestamp() {
-        return JolAdminFactory.INSTANCE.getLastAccess(player).getTime();
+        return JolAdmin.INSTANCE.getLastAccess(player).getTime();
     }
 
     public String getView() {
@@ -102,7 +102,7 @@ public class PlayerModel implements Comparable {
 
     public void saveDeck() {
         if (tmpDeckName != null) {
-            JolAdminFactory.INSTANCE.createDeck(player, tmpDeckName, tmpDeck);
+            JolAdmin.INSTANCE.createDeck(player, tmpDeckName, tmpDeck);
         }
     }
 
@@ -112,13 +112,13 @@ public class PlayerModel implements Comparable {
 
     public void submitDeck(String name, String deck) {
         clearDeck();
-        JolAdminFactory.INSTANCE.createDeck(player, name, deck);
+        JolAdmin.INSTANCE.createDeck(player, name, deck);
         decks = null;
     }
 
     public DeckSummaryBean[] getDecks() {
         if (decks == null) {
-            String[] names = JolAdminFactory.INSTANCE.getDeckNames(player);
+            String[] names = JolAdmin.INSTANCE.getDeckNames(player);
             Arrays.sort(names);
             Collection<DeckSummaryBean> c = new ArrayList<>(names.length);
             for (String name : names) {
@@ -135,7 +135,7 @@ public class PlayerModel implements Comparable {
     }
 
     public boolean isAdmin() {
-        return JolAdminFactory.INSTANCE.isAdmin(player);
+        return JolAdmin.INSTANCE.isAdmin(player);
     }
 
     public boolean hasChats() {

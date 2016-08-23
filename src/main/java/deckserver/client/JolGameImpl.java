@@ -7,13 +7,13 @@
 package deckserver.client;
 
 import deckserver.dwr.Utils;
+import deckserver.game.cards.CardEntry;
 import deckserver.game.cards.Deck;
 import deckserver.game.cards.NormalizeDeckFactory;
 import deckserver.game.cards.OldCardSearch;
 import deckserver.game.state.*;
 import deckserver.game.turn.GameAction;
 import deckserver.game.turn.TurnRecorder;
-import deckserver.game.cards.CardEntry;
 import org.slf4j.Logger;
 
 import java.text.DateFormat;

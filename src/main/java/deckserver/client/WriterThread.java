@@ -32,7 +32,7 @@ class WriterThread extends Thread {
                     continue;
                 }
             } else {
-                ((JolAdmin) JolAdminFactory.INSTANCE).getGameInfo(game).dowrite();
+                ((JolAdmin) JolAdmin.INSTANCE).getGameInfo(game).dowrite();
             }
         }
     }

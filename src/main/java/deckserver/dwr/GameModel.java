@@ -1,11 +1,10 @@
 package deckserver.dwr;
 
 import deckserver.client.DoCommand;
-import deckserver.client.JolAdminFactory;
+import deckserver.client.JolAdmin;
 import deckserver.client.JolGame;
 import deckserver.dwr.bean.AdminBean;
 import deckserver.dwr.bean.SummaryBean;
-import deckserver.util.AdminFactory;
 import deckserver.util.MailUtil;
 import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
@@ -28,21 +27,21 @@ public class GameModel implements Comparable {
 
     public GameModel(String name) {
         this.name = name;
-        if (isActive()) JolAdminFactory.INSTANCE.getGame(name);  // make sure its loaded
-        timestamp = JolAdminFactory.INSTANCE.getGameTimeStamp(name).getTime();
+        if (isActive()) JolAdmin.INSTANCE.getGame(name);  // make sure its loaded
+        timestamp = JolAdmin.INSTANCE.getGameTimeStamp(name).getTime();
         regen();
     }
 
     public boolean isOpen() {
-        return JolAdminFactory.INSTANCE.isOpen(name);
+        return JolAdmin.INSTANCE.isOpen(name);
     }
 
     public boolean isActive() {
-        return JolAdminFactory.INSTANCE.isActive(name);
+        return JolAdmin.INSTANCE.isActive(name);
     }
 
     public boolean isFinished() {
-        return JolAdminFactory.INSTANCE.isFinished(name);
+        return JolAdmin.INSTANCE.isFinished(name);
     }
 
     public String getName() {
@@ -50,12 +49,12 @@ public class GameModel implements Comparable {
     }
 
     public String getOwner() {
-        return JolAdminFactory.INSTANCE.getOwner(name);
+        return JolAdmin.INSTANCE.getOwner(name);
     }
 
     public synchronized String submit(String player, String phase, String command, String chat,
                                       String ping, String endTurn, String global, String text) {
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
+        JolAdmin admin = JolAdmin.INSTANCE;
         if (!getPlayers().contains(player) && !admin.getOwner(name).equals(player)) {
             return "Not authorized";
         }
@@ -145,7 +144,7 @@ public class GameModel implements Comparable {
     }
 
     void firstPing() {
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
+        JolAdmin admin = JolAdmin.INSTANCE;
         JolGame game = admin.getGame(name);
         String email = admin.getEmail(game.getActivePlayer());
         game.setPingTag(game.getActivePlayer());
@@ -175,7 +174,7 @@ public class GameModel implements Comparable {
 	} */
 
     private void doReload(boolean stateChanged, boolean phaseChanged, boolean pingChanged, boolean globalChanged, boolean turnChanged) {
-        timestamp = JolAdminFactory.INSTANCE.getGameTimeStamp(name).getTime();
+        timestamp = JolAdmin.INSTANCE.getGameTimeStamp(name).getTime();
         for (String key : (new ArrayList<>(views.keySet()))) {
             GameView view = views.get(key);
             //		if(checkViewTime(key, view,timestamp)) continue;
@@ -186,7 +185,7 @@ public class GameModel implements Comparable {
             if (turnChanged) view.turnChanged();
             if (stateChanged || phaseChanged || globalChanged || turnChanged) {
                 ServletContext ctx = WebContextFactory.get().getServletContext();
-                AdminBean abean = AdminFactory.getBean(ctx);
+                AdminBean abean = AdminBean.INSTANCE;
                 abean.notifyAboutGame(name);
             }
         }
@@ -232,7 +231,7 @@ public class GameModel implements Comparable {
     }
 
     public Collection getPlayers() {
-        return Arrays.asList(JolAdminFactory.INSTANCE.getPlayers(name));
+        return Arrays.asList(JolAdmin.INSTANCE.getPlayers(name));
     }
 
     public int compareTo(Object arg0) {

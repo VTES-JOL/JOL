@@ -1,11 +1,11 @@
 package deckserver.dwr.bean;
 
-import deckserver.client.JolAdminFactory;
+import deckserver.client.JolAdmin;
 import deckserver.dwr.Utils;
+import deckserver.game.cards.CardEntry;
 import deckserver.game.cards.NormalizeDeck;
 import deckserver.game.cards.NormalizeDeckFactory;
 import deckserver.util.DeckParams;
-import deckserver.game.cards.CardEntry;
 import org.directwebremoting.WebContextFactory;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ public class DeckEditBean {
     private String groups = null;
 
     public DeckEditBean(String player, String name) {
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
+        JolAdmin admin = JolAdmin.INSTANCE;
         String deck = admin.getDeck(player, name);
         text = init(player, name, deck, false);
     }
@@ -34,7 +34,7 @@ public class DeckEditBean {
     }
 
     private String init(String player, String name, String deck, boolean shuffle) {
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
+        JolAdmin admin = JolAdmin.INSTANCE;
         NormalizeDeck nd = NormalizeDeckFactory.constructDeck(admin
                 .getAllCards(), deck);
         try {

@@ -1,6 +1,6 @@
 package deckserver.dwr.bean;
 
-import deckserver.client.JolAdminFactory;
+import deckserver.client.JolAdmin;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.GameView;
 import deckserver.game.cards.NormalizeDeck;
@@ -25,7 +25,7 @@ public class PlSummaryBean {
     public PlSummaryBean(GameModel game, String player) {
         this.game = game.getName();
         this.started = game.isActive();
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
+        JolAdmin admin = JolAdmin.INSTANCE;
         if (!started) {
             String deck = admin.getGameDeck(game.getName(), player);
             NormalizeDeck nd = NormalizeDeckFactory.getDeckSize(admin.getAllCards(), deck);

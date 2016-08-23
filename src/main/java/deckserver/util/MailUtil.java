@@ -6,7 +6,7 @@
 
 package deckserver.util;
 
-import deckserver.client.JolAdminFactory;
+import deckserver.client.JolAdmin;
 import deckserver.client.JolGame;
 import deckserver.game.turn.GameAction;
 import org.slf4j.Logger;
@@ -76,7 +76,7 @@ public class MailUtil {
         String header = "Game " + game.getName() + " is starting.";
         String msg = "Good luck!";
         String[] players = game.getPlayers();
-        List<String> emails = Stream.of(players).map(JolAdminFactory.INSTANCE::getEmail).collect(Collectors.toList());
+        List<String> emails = Stream.of(players).map(JolAdmin.INSTANCE::getEmail).collect(Collectors.toList());
         sendMsg(header, msg, emails);
     }
 
@@ -91,7 +91,7 @@ public class MailUtil {
             buf.append("\n");
         }
         String[] players = game.getPlayers();
-        List<String> emails = Stream.of(players).map(JolAdminFactory.INSTANCE::getEmail).collect(Collectors.toList());
+        List<String> emails = Stream.of(players).map(JolAdmin.INSTANCE::getEmail).collect(Collectors.toList());
         sendMsg(header, buf.toString(), emails);
     }
 }

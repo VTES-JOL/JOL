@@ -1,6 +1,6 @@
 package deckserver.dwr.bean;
 
-import deckserver.client.JolAdminFactory;
+import deckserver.client.JolAdmin;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.GameView;
 
@@ -20,9 +20,9 @@ public class SummaryBean {
 
     public SummaryBean(GameModel game) {
         this.game = game.getName();
-        if (JolAdminFactory.INSTANCE.isActive(this.game)) {
+        if (JolAdmin.INSTANCE.isActive(this.game)) {
             access = getDate(game.getTimestamp());
-            turn = JolAdminFactory.INSTANCE.getGame(this.game).getCurrentTurn();
+            turn = JolAdmin.INSTANCE.getGame(this.game).getCurrentTurn();
             GameView[] views = game.getViews();
             Collection<String> actives = new ArrayList<>(5);
             for (GameView view : views) {

@@ -6,8 +6,8 @@
 
 package deckserver.util;
 
-import deckserver.game.state.Card;
 import deckserver.game.cards.CardEntry;
+import deckserver.game.state.Card;
 
 /**
  * @author Joe User

@@ -1,6 +1,6 @@
 package deckserver.dwr.bean;
 
-import deckserver.client.JolAdminFactory;
+import deckserver.client.JolAdmin;
 import deckserver.dwr.GameModel;
 
 import java.util.HashMap;
@@ -12,7 +12,7 @@ public class RegistrationSummaryBean {
 
     public RegistrationSummaryBean(AdminBean abean, String name) {
         GameModel game = abean.getGameModel(name);
-        JolAdminFactory admin = abean.getAdmin();
+        JolAdmin admin = JolAdmin.INSTANCE;
         String[] players = admin.getPlayers();
         for (String player : players) {
             if (admin.isInvited(name, player) || admin.getGameDeck(name, player) != null) {

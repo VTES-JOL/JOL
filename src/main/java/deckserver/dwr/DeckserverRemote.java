@@ -1,16 +1,15 @@
 package deckserver.dwr;
 
-import deckserver.client.JolAdminFactory;
+import deckserver.client.JolAdmin;
 import deckserver.dwr.bean.AdminBean;
 import deckserver.dwr.bean.CardBean;
 import deckserver.dwr.bean.DeckEditBean;
+import deckserver.game.cards.CardEntry;
 import deckserver.game.cards.CardSet;
+import deckserver.game.cards.CardType;
 import deckserver.game.cards.OldCardSearch;
 import deckserver.game.turn.GameAction;
-import deckserver.util.AdminFactory;
 import deckserver.util.MailUtil;
-import deckserver.game.cards.CardEntry;
-import deckserver.game.cards.CardType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +28,7 @@ public class DeckserverRemote implements DSRemote {
 
     public DeckserverRemote() {
         provider = new DWRContextProvider();
-        abean = AdminFactory.getBean(provider.getServletContext());
+        abean = AdminBean.INSTANCE;
     }
 
     private static String ne(String arg) {
@@ -64,7 +63,7 @@ public class DeckserverRemote implements DSRemote {
 
     public Map<String, Object> invitePlayer(String game, String name) {
         String player = getPlayer().getPlayer();
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
+        JolAdmin admin = JolAdmin.INSTANCE;
         if (admin.isAdmin(player)) {
             admin.invitePlayer(game, name);
         }
@@ -73,7 +72,7 @@ public class DeckserverRemote implements DSRemote {
 
     public Map<String, Object> startGame(String game) {
         String player = getPlayer().getPlayer();
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
+        JolAdmin admin = JolAdmin.INSTANCE;
         if (admin.getOwner(game).equals(player) && admin.isOpen(game)) {
             admin.startGame(game);
             MailUtil.sendStartMsg(admin.getGame(game));
@@ -119,7 +118,7 @@ public class DeckserverRemote implements DSRemote {
     public String[] getHistory(String game, String turn) {
         String[] ret = new String[0];
         if (game != null && turn != null) {
-            GameAction[] actions = JolAdminFactory.INSTANCE.getGame(game).getActions(turn);
+            GameAction[] actions = JolAdmin.INSTANCE.getGame(game).getActions(turn);
             ret = new String[actions.length];
             for (int i = 0; i < actions.length; i++) {
                 ret[i] = actions[i].getText();
@@ -130,7 +129,7 @@ public class DeckserverRemote implements DSRemote {
 
     public Map<String, Object> getCardText(String callback, String id) {
         Map<String, Object> ret = UpdateFactory.getUpdate(provider);
-        OldCardSearch cards = JolAdminFactory.INSTANCE.getAllCards();
+        OldCardSearch cards = JolAdmin.INSTANCE.getAllCards();
         CardEntry card = cards.getCardById(id);
         ret.put(callback, new CardBean(card));
         return ret;
@@ -171,14 +170,14 @@ public class DeckserverRemote implements DSRemote {
     }
 
     public Map<String, Object> registerDeck(String game, String name) {
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
+        JolAdmin admin = JolAdmin.INSTANCE;
         String player = getPlayer().getPlayer();
         admin.addPlayerToGame(game, player, name);
         return UpdateFactory.getUpdate(provider);
     }
 
     public Map<String, Object> removeDeck(String name) {
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
+        JolAdmin admin = JolAdmin.INSTANCE;
         String player = getPlayer().getPlayer();
         admin.removeDeck(player, name);
         PlayerModel model = getPlayer();
@@ -207,7 +206,7 @@ public class DeckserverRemote implements DSRemote {
 
     public Map<String, Object> cardSearch(String type, String string) {
         Map<String, Object> ret = UpdateFactory.getUpdate(provider);
-        OldCardSearch search = JolAdminFactory.INSTANCE.getAllCards();
+        OldCardSearch search = JolAdmin.INSTANCE.getAllCards();
         CardSet set = search.getAllCards();
         type = ne(type);
         if (type != null && !type.equals("All")) {

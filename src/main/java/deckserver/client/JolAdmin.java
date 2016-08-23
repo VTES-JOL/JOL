@@ -27,10 +27,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * @author Joe User
  */
-public class JolAdmin extends JolAdminFactory {
+public class JolAdmin {
 
     private static final Date startDate = new Date();
     private static final Logger logger = getLogger(JolAdmin.class);
+    public static JolAdmin INSTANCE = null;
     private final WriterThread wt = new WriterThread();
     private final File bugdir;
     private final String dir;

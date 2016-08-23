@@ -6,9 +6,9 @@
 
 package deckserver.client;
 
+import deckserver.game.cards.CardEntry;
 import deckserver.game.state.SCard;
 import deckserver.game.state.SLocation;
-import deckserver.game.cards.CardEntry;
 import org.slf4j.Logger;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -128,7 +128,7 @@ public class DoCommand {
                         int curcap = game.getCapacity(srcCard);
                         if (curcap <= 0) {
                             CardEntry card =
-                                    JolAdminFactory.INSTANCE.getAllCards().getCardById(game.getCardDescripId(srcCard));
+                                    JolAdmin.INSTANCE.getAllCards().getCardById(game.getCardDescripId(srcCard));
                             int capincr = 1;
                             String[] text = card.getFullText();
                             for (String aText : text) {

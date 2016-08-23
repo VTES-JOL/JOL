@@ -1,6 +1,6 @@
 package deckserver.dwr.bean;
 
-import deckserver.client.JolAdminFactory;
+import deckserver.client.JolAdmin;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.PlayerModel;
 import deckserver.game.cards.NormalizeDeck;
@@ -17,18 +17,18 @@ public class DeckSummaryBean {
     public DeckSummaryBean(PlayerModel model, String name) {
         this.name = name;
         game = null;
-        init(model.getPlayer(), JolAdminFactory.INSTANCE.getDeck(model.getPlayer(), name));
+        init(model.getPlayer(), JolAdmin.INSTANCE.getDeck(model.getPlayer(), name));
     }
 
     // get information about the player's deck that is registered for a game
     public DeckSummaryBean(GameModel game, PlayerModel model) {
         this.game = game.getName();
-        name = JolAdminFactory.INSTANCE.getDeckName(this.game, model.getPlayer());
-        init(model.getPlayer(), JolAdminFactory.INSTANCE.getGameDeck(this.game, model.getPlayer()));
+        name = JolAdmin.INSTANCE.getDeckName(this.game, model.getPlayer());
+        init(model.getPlayer(), JolAdmin.INSTANCE.getGameDeck(this.game, model.getPlayer()));
     }
 
     private void init(String player, String deck) {
-        OldCardSearch search = JolAdminFactory.INSTANCE.getAllCards();
+        OldCardSearch search = JolAdmin.INSTANCE.getAllCards();
         try {
             NormalizeDeck nd = NormalizeDeckFactory.getDeckSize(search, deck);
             lib = nd.getLibSize();

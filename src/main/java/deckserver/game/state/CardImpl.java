@@ -6,9 +6,9 @@
 
 package deckserver.game.state;
 
-import deckserver.client.JolAdminFactory;
-import deckserver.game.state.model.GameCard;
+import deckserver.client.JolAdmin;
 import deckserver.game.cards.CardEntry;
+import deckserver.game.state.model.GameCard;
 
 /**
  * @author administrator
@@ -35,7 +35,7 @@ public class CardImpl implements Card {
     }
 
     public String getName() {
-        CardEntry card = JolAdminFactory.INSTANCE.getAllCards().getCardById(getCardId());
+        CardEntry card = JolAdmin.INSTANCE.getAllCards().getCardById(getCardId());
         if (card == null) return getCardId();
         return card.getName();
     }

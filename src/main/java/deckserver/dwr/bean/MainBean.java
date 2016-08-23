@@ -1,6 +1,6 @@
 package deckserver.dwr.bean;
 
-import deckserver.client.JolAdminFactory;
+import deckserver.client.JolAdmin;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.PlayerModel;
 import deckserver.dwr.Utils;
@@ -41,7 +41,7 @@ public class MainBean {
         Collection<String> gamenames = new HashSet<>();
         loggedin = model.getPlayer() != null;
         if (loggedin) {
-            gamenames.addAll(Arrays.asList(JolAdminFactory.INSTANCE.getGames(model.getPlayer())));
+            gamenames.addAll(Arrays.asList(JolAdmin.INSTANCE.getGames(model.getPlayer())));
             refresh = RefreshInterval.calc(abean.getTimestamp());
         }
         for (GameModel game : actives) {

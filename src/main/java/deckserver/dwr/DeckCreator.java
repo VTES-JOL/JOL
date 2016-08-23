@@ -1,5 +1,6 @@
 package deckserver.dwr;
 
+import deckserver.client.JolAdmin;
 import deckserver.dwr.bean.AdminBean;
 import deckserver.dwr.bean.DeckBean;
 import deckserver.dwr.bean.DeckSummaryBean;
@@ -19,8 +20,9 @@ class DeckCreator implements ViewCreator {
         String player = model.getPlayer();
         DeckSummaryBean[] beans = model.getDecks();
         List<GameModel> actives = abean.getActiveGames();
-        Collection<DeckSummaryBean> games = actives.stream().filter(game -> abean.getAdmin().isOpen(game.getName()) &&
-                (abean.getAdmin().isInvited(game.getName(), player) || abean.getAdmin().getOwner(game.getName()).equals(player) || abean.getAdmin().getGameDeck(game.getName(), player) != null)).map(game -> new DeckSummaryBean(game, model)).collect(Collectors.toCollection(ArrayList::new));
+        JolAdmin admin = JolAdmin.INSTANCE;
+        Collection<DeckSummaryBean> games = actives.stream().filter(game -> admin.isOpen(game.getName()) &&
+                (admin.isInvited(game.getName(), player) || admin.getOwner(game.getName()).equals(player) || admin.getGameDeck(game.getName(), player) != null)).map(game -> new DeckSummaryBean(game, model)).collect(Collectors.toCollection(ArrayList::new));
         return new DeckBean(beans, games);
     }
 

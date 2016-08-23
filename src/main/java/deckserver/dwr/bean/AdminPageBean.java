@@ -1,6 +1,6 @@
 package deckserver.dwr.bean;
 
-import deckserver.client.JolAdminFactory;
+import deckserver.client.JolAdmin;
 
 import java.util.*;
 
@@ -12,7 +12,7 @@ public class AdminPageBean {
     private String[] rGames;
 
     public AdminPageBean(AdminBean abean, String player) {
-        JolAdminFactory admin = JolAdminFactory.INSTANCE;
+        JolAdmin admin = JolAdmin.INSTANCE;
         String[] names = admin.getGames(player);
         Collection<String> c = new ArrayList<>();
         for (String gameName : names) {
