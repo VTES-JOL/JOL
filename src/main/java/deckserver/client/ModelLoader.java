@@ -5,9 +5,6 @@ import deckserver.game.turn.GameAction;
 import deckserver.game.turn.TurnRecorder;
 import org.slf4j.Logger;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 public final class ModelLoader {
@@ -73,38 +70,4 @@ public final class ModelLoader {
         }
     }
 
-    public static void dumpState(Game game, Writer out) {
-        try {
-            out.write("Dumping " + game.getName() + "\n");
-            dumpNotes(game, "    ", out);
-            String[] players = game.getPlayers();
-            for (int i = 0; i < players.length; i++) {
-                out.write("  Player #" + i + " " + players[i] + "\n");
-                Location[] locs = (Location[]) game.getPlayerLocations(players[i]);
-                for (Location loc : locs) {
-                    out.write("    Region" + game.getPlayerRegionName(loc) + "\n");
-                    dumpCards(loc, "      ", out);
-                }
-            }
-        } catch (IOException ie) {
-            logger.error("Error dumping state");
-            ie.printStackTrace();
-        }
-    }
-
-    private static void dumpCards(CardContainer box, String pre, Writer out) throws IOException {
-        Card[] cards = (Card[]) box.getCards();
-        for (Card card : cards) {
-            out.write(pre + "Card " + card.getId() + "/" + card.getCardId() + "\n");
-            dumpNotes(card, pre + "    ", out);
-            dumpCards(card, pre + "  ", out);
-        }
-    }
-
-    private static void dumpNotes(NoteTaker notes, String pre, Writer out) throws IOException {
-        Note[] note = notes.getNotes();
-        for (Note aNote : note) {
-            out.write(pre + aNote.getName() + "/" + aNote.getValue() + "\n");
-        }
-    }
 }

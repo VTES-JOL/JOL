@@ -3,9 +3,9 @@ package deckserver.dwr.bean;
 import deckserver.client.JolAdmin;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.PlayerModel;
-import deckserver.game.cards.NormalizeDeck;
-import deckserver.game.cards.NormalizeDeckFactory;
-import deckserver.game.cards.OldCardSearch;
+import deckserver.game.cards.CardSearch;
+import deckserver.game.cards.Deck;
+import deckserver.game.cards.DeckFactory;
 
 public class DeckSummaryBean {
 
@@ -28,9 +28,9 @@ public class DeckSummaryBean {
     }
 
     private void init(String player, String deck) {
-        OldCardSearch search = JolAdmin.INSTANCE.getAllCards();
+        CardSearch search = JolAdmin.INSTANCE.getAllCards();
         try {
-            NormalizeDeck nd = NormalizeDeckFactory.getDeckSize(search, deck);
+            Deck nd = DeckFactory.getDeckSize(search, deck);
             lib = nd.getLibSize();
             crypt = nd.getCryptSize();
             groups = nd.getGroups();

@@ -2,26 +2,26 @@ package deckserver.game.cards;
 
 import java.util.Collection;
 
-public final class NormalizeDeckFactory {
+public final class DeckFactory {
 
-    public final static NormalizeDeck getNormalizer(OldCardSearch search, String deck) {
-        return new NormalizeDeckImpl(search, deck);
+    public final static Deck getNormalizer(CardSearch search, String deck) {
+        return new DeckImpl(search, deck);
     }
 
-    public final static NormalizeDeck getDeckSize(OldCardSearch search, String deck) {
+    public final static Deck getDeckSize(CardSearch search, String deck) {
         try {
-            return new NormalizeDeckImpl(search, deck, true);
+            return new DeckImpl(search, deck, true);
         } catch (Exception e) {
             // deck shortcut didn't work
             return getNormalizer(search, deck);
         }
     }
 
-    public final static NormalizeDeck constructDeck(OldCardSearch search, String deck) {
-        return new NormalizeDeckImpl(search, deck, false, true);
+    public final static Deck constructDeck(CardSearch search, String deck) {
+        return new DeckImpl(search, deck, false, true);
     }
 
-    public static CardSet findCardName(OldCardSearch search, String text, Collection<String> errors) {
+    public static CardSet findCardName(CardSearch search, String text, Collection<String> errors) {
         CardSet cards = search.getAllCards();
         // check for prefixes
         CardSet set = search.searchByName(cards, text);

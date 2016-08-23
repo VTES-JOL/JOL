@@ -6,8 +6,8 @@
 
 package deckserver.client;
 
+import deckserver.game.cards.CardSearch;
 import deckserver.game.cards.CardUtil;
-import deckserver.game.cards.OldCardSearch;
 import deckserver.game.state.DsGame;
 import deckserver.game.state.Game;
 import deckserver.game.state.GameImpl;
@@ -269,7 +269,7 @@ public class JolAdmin {
         info.write();
     }
 
-    public OldCardSearch getAllCards() {
+    public CardSearch getAllCards() {
         return cards.getAllCards();
     }
 
@@ -688,7 +688,7 @@ public class JolAdmin {
             return "Deckserver 3.0 card set file";
         }
 
-        OldCardSearch getAllCards() {
+        CardSearch getAllCards() {
             try {
                 String set = readFile(new File(dir + "/cards/base.txt"));
                 String prop = readFile(new File(dir + "/cards/base.prop"));

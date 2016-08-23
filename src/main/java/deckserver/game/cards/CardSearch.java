@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * @author administrator
  */
-public interface OldCardSearch {
+public interface CardSearch {
 
     String getId(String nm);
 

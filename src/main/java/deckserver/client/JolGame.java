@@ -8,9 +8,9 @@ package deckserver.client;
 
 import deckserver.dwr.Utils;
 import deckserver.game.cards.CardEntry;
+import deckserver.game.cards.CardSearch;
 import deckserver.game.cards.Deck;
-import deckserver.game.cards.NormalizeDeckFactory;
-import deckserver.game.cards.OldCardSearch;
+import deckserver.game.cards.DeckFactory;
 import deckserver.game.state.*;
 import deckserver.game.turn.GameAction;
 import deckserver.game.turn.TurnRecorder;
@@ -60,8 +60,8 @@ public class JolGame {
         this.actions = actions;
     }
 
-    public void addPlayer(OldCardSearch cardset, String name, String deckStr) {
-        Deck deck = NormalizeDeckFactory.getNormalizer(cardset, deckStr);
+    public void addPlayer(CardSearch cardset, String name, String deckStr) {
+        Deck deck = DeckFactory.getNormalizer(cardset, deckStr);
         boolean reregister = false;
         String[] players = state.getPlayers();
         for (String player : players) if (name.equals(player)) reregister = true;

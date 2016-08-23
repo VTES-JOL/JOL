@@ -5,9 +5,9 @@ import deckserver.dwr.bean.AdminBean;
 import deckserver.dwr.bean.CardBean;
 import deckserver.dwr.bean.DeckEditBean;
 import deckserver.game.cards.CardEntry;
+import deckserver.game.cards.CardSearch;
 import deckserver.game.cards.CardSet;
 import deckserver.game.cards.CardType;
-import deckserver.game.cards.OldCardSearch;
 import deckserver.game.turn.GameAction;
 import deckserver.util.MailUtil;
 import org.slf4j.Logger;
@@ -129,7 +129,7 @@ public class DeckserverRemote implements DSRemote {
 
     public Map<String, Object> getCardText(String callback, String id) {
         Map<String, Object> ret = UpdateFactory.getUpdate(provider);
-        OldCardSearch cards = JolAdmin.INSTANCE.getAllCards();
+        CardSearch cards = JolAdmin.INSTANCE.getAllCards();
         CardEntry card = cards.getCardById(id);
         ret.put(callback, new CardBean(card));
         return ret;
@@ -206,7 +206,7 @@ public class DeckserverRemote implements DSRemote {
 
     public Map<String, Object> cardSearch(String type, String string) {
         Map<String, Object> ret = UpdateFactory.getUpdate(provider);
-        OldCardSearch search = JolAdmin.INSTANCE.getAllCards();
+        CardSearch search = JolAdmin.INSTANCE.getAllCards();
         CardSet set = search.getAllCards();
         type = ne(type);
         if (type != null && !type.equals("All")) {

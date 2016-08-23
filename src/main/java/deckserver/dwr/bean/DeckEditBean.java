@@ -3,8 +3,8 @@ package deckserver.dwr.bean;
 import deckserver.client.JolAdmin;
 import deckserver.dwr.Utils;
 import deckserver.game.cards.CardEntry;
-import deckserver.game.cards.NormalizeDeck;
-import deckserver.game.cards.NormalizeDeckFactory;
+import deckserver.game.cards.Deck;
+import deckserver.game.cards.DeckFactory;
 import deckserver.util.DeckParams;
 import org.directwebremoting.WebContextFactory;
 
@@ -35,7 +35,7 @@ public class DeckEditBean {
 
     private String init(String player, String name, String deck, boolean shuffle) {
         JolAdmin admin = JolAdmin.INSTANCE;
-        NormalizeDeck nd = NormalizeDeckFactory.constructDeck(admin
+        Deck nd = DeckFactory.constructDeck(admin
                 .getAllCards(), deck);
         try {
             HttpServletRequest request = WebContextFactory.get()

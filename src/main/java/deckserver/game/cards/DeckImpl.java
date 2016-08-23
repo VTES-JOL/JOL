@@ -20,11 +20,11 @@ import java.util.*;
  *
  * @author gfinklan
  */
-public class NormalizeDeckImpl implements NormalizeDeck {
+public class DeckImpl implements Deck {
 
-    private static final Logger logger = LoggerFactory.getLogger(NormalizeDeckImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeckImpl.class);
 
-    final OldCardSearch search;
+    final CardSearch search;
     StringBuffer orig = new StringBuffer();
     StringBuffer translated = new StringBuffer();
     Collection<String> errors = new Vector<>();
@@ -35,15 +35,15 @@ public class NormalizeDeckImpl implements NormalizeDeck {
     Map<CardEntry, Integer> cards = new HashMap<>();
     private Collection<String> groups = new TreeSet<>();
 
-    public NormalizeDeckImpl(OldCardSearch search, String deck) {
+    public DeckImpl(CardSearch search, String deck) {
         this(search, deck, false, false);
     }
 
-    public NormalizeDeckImpl(OldCardSearch search, String deck, boolean sizeOnly) {
+    public DeckImpl(CardSearch search, String deck, boolean sizeOnly) {
         this(search, deck, sizeOnly, false);
     }
 
-    public NormalizeDeckImpl(OldCardSearch search, String deck, boolean sizeOnly, boolean doConstruction) {
+    public DeckImpl(CardSearch search, String deck, boolean sizeOnly, boolean doConstruction) {
         this.search = search;
         if (deck != null) {
             if (sizeOnly && deck.startsWith("ZZZ@@@")) {
@@ -165,7 +165,7 @@ public class NormalizeDeckImpl implements NormalizeDeck {
     }
 
     public CardSet findCardName(String text) {
-        return NormalizeDeckFactory.findCardName(search, text, errors);
+        return DeckFactory.findCardName(search, text, errors);
     }
 
     public String[] getErrorLines() {

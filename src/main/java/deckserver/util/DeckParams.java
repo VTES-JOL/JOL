@@ -7,7 +7,7 @@
 package deckserver.util;
 
 import deckserver.game.cards.CardEntry;
-import deckserver.game.cards.NormalizeDeck;
+import deckserver.game.cards.Deck;
 
 /**
  * @author Joe User
@@ -18,9 +18,9 @@ public class DeckParams {
     CardEntry[] cards;
     String type;
     String query;
-    NormalizeDeck nd;
+    Deck nd;
 
-    public DeckParams(String name, String type, String query, CardEntry[] cards, NormalizeDeck nd) {
+    public DeckParams(String name, String type, String query, CardEntry[] cards, Deck nd) {
         this.name = name;
         this.type = type;
         this.query = query;
@@ -41,7 +41,7 @@ public class DeckParams {
         return cards;
     }
 
-    public NormalizeDeck getDeckObj() {
+    public Deck getDeckObj() {
         return nd;
     }
 

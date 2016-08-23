@@ -20,8 +20,8 @@ import java.util.Map;
 public class GameImpl implements Game {
 
     public GameState state;
-    Map<String, LocationImpl> regionCache = new HashMap<>();
-    Map<String, CardImpl> cardCache = new HashMap<>();
+    private Map<String, LocationImpl> regionCache = new HashMap<>();
+    private Map<String, CardImpl> cardCache = new HashMap<>();
 
     /**
      * Creates a new instance of CardImpl

@@ -3,8 +3,8 @@ package deckserver.dwr.bean;
 import deckserver.client.JolAdmin;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.GameView;
-import deckserver.game.cards.NormalizeDeck;
-import deckserver.game.cards.NormalizeDeckFactory;
+import deckserver.game.cards.Deck;
+import deckserver.game.cards.DeckFactory;
 
 import java.util.Date;
 
@@ -28,7 +28,7 @@ public class PlSummaryBean {
         JolAdmin admin = JolAdmin.INSTANCE;
         if (!started) {
             String deck = admin.getGameDeck(game.getName(), player);
-            NormalizeDeck nd = NormalizeDeckFactory.getDeckSize(admin.getAllCards(), deck);
+            Deck nd = DeckFactory.getDeckSize(admin.getAllCards(), deck);
             library = nd.getLibSize();
             crypt = nd.getCryptSize();
             groups = nd.getGroups();
