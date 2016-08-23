@@ -9,6 +9,15 @@ package deckserver.game.state;
 /**
  * @author administrator
  */
-public interface Card extends NoteTaker, SCard, CardContainer {
+public interface Card extends NoteTaker, CardContainer {
 
+    String getName();
+
+    CardContainer getParent();
+
+    String getId();
+
+    String getCardId();
+
+    Card[] getCards();
 }

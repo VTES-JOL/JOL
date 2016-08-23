@@ -43,10 +43,10 @@ public class GameImpl implements Game {
     }
 
     public Note[] getNotes() {
-        return NoteImpl.getNotes(state.getNotation());
+        return Note.getNotes(state.getNotation());
     }
 
-    public SLocation getLocation(String regionName) {
+    public Location getLocation(String regionName) {
         return getLocation(regionName, false);
     }
 
@@ -76,7 +76,7 @@ public class GameImpl implements Game {
         state.setName(name);
     }
 
-    public SLocation[] getPlayerLocations(final String player) {
+    public Location[] getPlayerLocations(final String player) {
         return getLocations(new StringFilter() {
             public boolean accept(String str) {
                 return str.startsWith(player + "'s ");
@@ -110,7 +110,7 @@ public class GameImpl implements Game {
         addLocation(player + "'s " + regionName);
     }
 
-    public SLocation getPlayerLocation(String player, String regionName) {
+    public Location getPlayerLocation(String player, String regionName) {
         return getLocation(player + "'s " + regionName);
     }
 
@@ -166,22 +166,22 @@ public class GameImpl implements Game {
         return mkCard(card.getCardId(), card.getId());
     }
 
-    public SCard getCard(String id) {
+    public Card getCard(String id) {
         return cardCache.get(id);
     }
 
     public Note addNote(String name) {
-        return NoteImpl.mkNote(state, name);
+        return Note.mkNote(state, name);
     }
 
-    public String getPlayerRegionName(SLocation location) {
+    public String getPlayerRegionName(Location location) {
         String name = location.getName();
         int index = name.lastIndexOf("'s ");
         if (index > 0) return name.substring(index + 3);
         return null;
     }
 
-    public SCardContainer getRegionFromCard(SCard card) {
+    public CardContainer getRegionFromCard(Card card) {
         CardContainer container = getContainer((CardImpl) card);
         if (container instanceof Card) return getRegionFromCard((Card) container);
         return container;

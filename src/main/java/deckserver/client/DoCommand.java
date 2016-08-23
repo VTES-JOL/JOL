@@ -7,8 +7,8 @@
 package deckserver.client;
 
 import deckserver.game.cards.CardEntry;
-import deckserver.game.state.SCard;
-import deckserver.game.state.SLocation;
+import deckserver.game.state.Card;
+import deckserver.game.state.Location;
 import org.slf4j.Logger;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -221,8 +221,8 @@ public class DoCommand {
                 int amt = cmdObj.getNumber(100);
                 boolean all = cmdObj.consumeString("all");
                 String[] recipients = all ? game.getPlayers() : new String[]{cmdObj.getPlayer(player)};
-                SLocation loc = game.getState().getPlayerLocation(player, targetRegion);
-                SCard[] cards = loc.getCards();
+                Location loc = game.getState().getPlayerLocation(player, targetRegion);
+                Card[] cards = loc.getCards();
                 StringBuilder buf = new StringBuilder();
                 int len = Math.min(cards.length, amt);
                 buf.append(len);
@@ -330,11 +330,11 @@ public class DoCommand {
         }
 
         public String getCard(boolean optional, String player, String region) throws CommandException {
-            SLocation loc = game.getState().getPlayerLocation(player, region);
+            Location loc = game.getState().getPlayerLocation(player, region);
             return getCard(optional, loc.getCards());
         }
 
-        private String getCard(boolean optional, SCard[] cards) throws CommandException {
+        private String getCard(boolean optional, Card[] cards) throws CommandException {
             try {
                 if (!hasMoreArgs()) {
                     if (optional) return null;
@@ -349,7 +349,7 @@ public class DoCommand {
                     num = Integer.parseInt(args[ind]) - 1;
                 if (num < 0 && optional) return null;
                 if (num < 0 || num >= size) throw new CommandException("Num out of range");
-                SCard card = cards[num];
+                Card card = cards[num];
                 ind++;
                 String rec = getCard(true, card.getCards());
                 if (rec == null) return card.getId();

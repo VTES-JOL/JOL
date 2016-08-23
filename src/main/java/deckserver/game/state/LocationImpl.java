@@ -32,11 +32,11 @@ public class LocationImpl implements Location {
         return null;
     }
 
-    public SCard getCard(int index) {
+    public Card getCard(int index) {
         return game.getCard(region.getGameCard(index).getId());
     }
 
-    public SCard[] getCards() {
+    public Card[] getCards() {
         GameCard[] cards = region.getGameCard();
         CardImpl[] ret = new CardImpl[cards.length];
         for (int i = 0; i < ret.length; i++)
@@ -51,7 +51,7 @@ public class LocationImpl implements Location {
         }
     }
 
-    public SCard getFirstCard() {
+    public Card getFirstCard() {
         return new CardImpl(game, region.getGameCard(0));
     }
 
@@ -60,7 +60,7 @@ public class LocationImpl implements Location {
     }
 
     public Note[] getNotes() {
-        return NoteImpl.getNotes(region.getNotation());
+        return Note.getNotes(region.getNotation());
     }
 
     public void addCard(Card card, boolean first) {
@@ -76,7 +76,7 @@ public class LocationImpl implements Location {
     }
 
     public Note addNote(String name) {
-        return NoteImpl.mkNote(region, name);
+        return Note.mkNote(region, name);
     }
 
     public void initCards(String[] cardIds) {

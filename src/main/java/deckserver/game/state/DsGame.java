@@ -9,7 +9,7 @@ public class DsGame extends Notes implements Game {
 
     private final LinkedList<Player> players = new LinkedList<>();
     private final LinkedList<LocBox> regions = new LinkedList<>();
-    private final Map<String, SCard> cards = new HashMap<>(500);
+    private final Map<String, Card> cards = new HashMap<>(500);
     private String gname;
     private int index = 1;
 
@@ -59,12 +59,12 @@ public class DsGame extends Notes implements Game {
         return ret;
     }
 
-    public SLocation[] getPlayerLocations(String player) {
+    public Location[] getPlayerLocations(String player) {
         Player p = getPlayer(player);
         return p.locs.toArray(new Location[0]);
     }
 
-    public SLocation getPlayerLocation(String player, String regionName) {
+    public Location getPlayerLocation(String player, String regionName) {
         Player p = getPlayer(player);
         for (LocBox l : p.locs) {
             if (l.getName().equals(regionName)) return l;
@@ -72,19 +72,19 @@ public class DsGame extends Notes implements Game {
         return null;
     }
 
-    public SLocation getLocation(String regionName) {
+    public Location getLocation(String regionName) {
         for (LocBox l : regions) {
             if (l.getName().equals(regionName)) return l;
         }
         return null;
     }
 
-    public String getPlayerRegionName(SLocation location) {
+    public String getPlayerRegionName(Location location) {
         if (regions.contains(location)) return null;
         return location.getName();
     }
 
-    void addCard(SCard card) {
+    void addCard(Card card) {
         cards.put(card.getId(), card);
     }
 
@@ -92,11 +92,11 @@ public class DsGame extends Notes implements Game {
         return index++;
     }
 
-    public SCard getCard(String id) {
+    public Card getCard(String id) {
         return cards.get(id);
     }
 
-    public SCardContainer getRegionFromCard(SCard card) {
+    public CardContainer getRegionFromCard(Card card) {
         DsCard p = (DsCard) card;
         while (p.getParent() instanceof DsCard) {
             p = (DsCard) p.getParent();

@@ -207,7 +207,7 @@ public class JolGame {
         // PENDING should record the shuffle seed, so needs to be formatted differently
     }
 
-    public SGame getState() {
+    public Game getState() {
         return state;
     }
 

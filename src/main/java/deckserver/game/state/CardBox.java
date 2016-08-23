@@ -25,7 +25,7 @@ class CardBox extends Notes implements CardContainer {
         cards.remove(card);
     }
 
-    public SCard[] getCards() {
+    public Card[] getCards() {
         return cards.toArray(new Card[0]);
     }
 

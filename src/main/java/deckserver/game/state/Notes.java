@@ -16,7 +16,7 @@ class Notes implements NoteTaker {
     public Note addNote(String name) {
         Notation notation = new Notation();
         notation.setName(name);
-        Note n = new NoteImpl(notation);
+        Note n = new Note(notation);
         notes.add(n);
         return n;
     }

@@ -9,7 +9,7 @@ package deckserver.game.state;
 /**
  * @author administrator
  */
-public interface CardContainer extends SCardContainer {
+public interface CardContainer {
 
     void addCard(Card card, boolean first);
 
@@ -17,4 +17,5 @@ public interface CardContainer extends SCardContainer {
 
     void setCards(Card[] cards);
 
+    Card[] getCards();
 }

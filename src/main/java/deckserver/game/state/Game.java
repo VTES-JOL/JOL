@@ -9,7 +9,7 @@ package deckserver.game.state;
 /**
  * @author administrator
  */
-public interface Game extends NoteTaker, SGame {
+public interface Game extends NoteTaker {
 
     void setName(String name);
 
@@ -21,4 +21,19 @@ public interface Game extends NoteTaker, SGame {
 
     void addLocation(String player, String regionName);
 
+    String getName();
+
+    String[] getPlayers();
+
+    Location[] getPlayerLocations(String player);
+
+    Location getPlayerLocation(String player, String regionName);
+
+    Location getLocation(String regionName);
+
+    String getPlayerRegionName(Location location);
+
+    Card getCard(String id);
+
+    CardContainer getRegionFromCard(Card card);
 }

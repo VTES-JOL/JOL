@@ -41,7 +41,7 @@ public class CardImpl implements Card {
     }
 
     public Note[] getNotes() {
-        return NoteImpl.getNotes(gamecard.getNotation());
+        return Note.getNotes(gamecard.getNotation());
     }
 
     public void addCard(Card card, boolean first) {
@@ -50,10 +50,10 @@ public class CardImpl implements Card {
     }
 
     public Note addNote(String name) {
-        return NoteImpl.mkNote(gamecard, name);
+        return Note.mkNote(gamecard, name);
     }
 
-    public SCard[] getCards() {
+    public Card[] getCards() {
         CardContainer container = game.getCardContainer(this, false);
         if (container == null) return new Card[0];
         return container.getCards();
@@ -67,7 +67,7 @@ public class CardImpl implements Card {
         }
     }
 
-    public SCardContainer getParent() {
+    public CardContainer getParent() {
         return game.getContainer(this);
     }
 

@@ -31,7 +31,7 @@ class DsCard extends CardBox implements Card {
         }
     }
 
-    public SCardContainer getParent() {
+    public CardContainer getParent() {
         return parent;
     }
 

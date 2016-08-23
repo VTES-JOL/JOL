@@ -23,7 +23,7 @@ class LocBox extends CardBox implements Location {
     }
 
     public void shuffle(int num) {
-        SCard[] sCards = getCards();
+        Card[] sCards = getCards();
         Utils.shuffle(sCards, num);
         cards.clear();
         Collections.addAll(cards, (Card[]) sCards);
@@ -33,11 +33,11 @@ class LocBox extends CardBox implements Location {
         return lname;
     }
 
-    public SCard getCard(int index) {
+    public Card getCard(int index) {
         return cards.get(index);
     }
 
-    public SCard getFirstCard() {
+    public Card getFirstCard() {
         return cards.getFirst();
     }
 
