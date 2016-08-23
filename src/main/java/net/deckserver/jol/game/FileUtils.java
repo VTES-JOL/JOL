@@ -1,7 +1,7 @@
 package net.deckserver.jol.game;
 
-import net.deckserver.jol.game.state.GameState;
-import net.deckserver.jol.game.turn.GameActions;
+import net.deckserver.jol.game.jaxb.state.GameState;
+import net.deckserver.jol.game.jaxb.turn.GameActions;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;

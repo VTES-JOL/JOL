@@ -1,4 +1,4 @@
-package net.deckserver.jol.game.turn;
+package net.deckserver.jol.game.jaxb.turn;
 
 import javax.xml.bind.annotation.*;
 
