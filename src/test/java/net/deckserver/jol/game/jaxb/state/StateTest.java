@@ -13,7 +13,7 @@ public class StateTest {
 
     @Test
     public void GameLoad() throws Exception {
-        JAXBContext context = JAXBContext.newInstance("net.deckserver.jol.game.state");
+        JAXBContext context = JAXBContext.newInstance("net.deckserver.jol.game.jaxb.state");
         Assert.assertNotNull(context);
         Source source = new StreamSource(new FileInputStream("src/test/resources/game1/game.xml"));
         Assert.assertNotNull(source);
