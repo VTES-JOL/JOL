@@ -15,4 +15,15 @@ public interface Deck {
 
     int getQuantity(CardEntry card);
 
+    String getDeckString();
+
+    CardSet findCardName(String text);
+
+    String[] getErrorLines();
+
+    int getCryptSize();
+
+    int getLibSize();
+
+    String getGroups();
 }

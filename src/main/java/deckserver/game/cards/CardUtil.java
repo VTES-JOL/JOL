@@ -22,8 +22,8 @@ public class CardUtil {
 
     private static final Logger logger = getLogger(CardUtil.class);
 
-    public static OldCardSearch createSearch(String textfile, String mapfile) {
-        return new SearchImplOld(textfile, mapfile);
+    public static CardSearch createSearch(String textfile, String mapfile) {
+        return new SearchImpl(textfile, mapfile);
     }
 
     private static CardSet searchByField(CardSet set, String field, String value) {
@@ -44,13 +44,13 @@ public class CardUtil {
         return new SetImpl(arr);
     }
 
-    private static class SearchImplOld implements OldCardSearch {
+    private static class SearchImpl implements CardSearch {
 
         final CardMap map;
         private Map<String, CardEntry> cardTable = null;
         private CardEntry[] cardArr;
 
-        SearchImplOld(String cardlist, String cardmap) {
+        SearchImpl(String cardlist, String cardmap) {
             map = new CardMap(cardmap);
             readCards(cardlist);
         }
