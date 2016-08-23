@@ -6,8 +6,6 @@
 
 package deckserver.game.cards;
 
-import net.deckserver.jol.game.cards.CardEntry;
-
 /**
  * @author administrator
  */

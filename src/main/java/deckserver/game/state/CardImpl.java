@@ -8,7 +8,7 @@ package deckserver.game.state;
 
 import deckserver.client.JolAdminFactory;
 import deckserver.game.state.model.GameCard;
-import net.deckserver.jol.game.cards.CardEntry;
+import deckserver.game.cards.CardEntry;
 
 /**
  * @author administrator

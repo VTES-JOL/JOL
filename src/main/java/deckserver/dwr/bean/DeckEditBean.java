@@ -5,7 +5,7 @@ import deckserver.dwr.Utils;
 import deckserver.game.cards.NormalizeDeck;
 import deckserver.game.cards.NormalizeDeckFactory;
 import deckserver.util.DeckParams;
-import net.deckserver.jol.game.cards.CardEntry;
+import deckserver.game.cards.CardEntry;
 import org.directwebremoting.WebContextFactory;
 
 import javax.servlet.http.HttpServletRequest;

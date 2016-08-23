@@ -4,7 +4,7 @@
  * Created on September 23, 2003, 9:02 PM
  */
 
-package net.deckserver.jol.game.cards;
+package deckserver.game.cards;
 
 /**
  * @author administrator

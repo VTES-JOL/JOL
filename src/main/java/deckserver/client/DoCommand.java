@@ -8,7 +8,7 @@ package deckserver.client;
 
 import deckserver.game.state.SCard;
 import deckserver.game.state.SLocation;
-import net.deckserver.jol.game.cards.CardEntry;
+import deckserver.game.cards.CardEntry;
 import org.slf4j.Logger;
 
 import java.util.concurrent.ThreadLocalRandom;

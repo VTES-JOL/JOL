@@ -1,6 +1,6 @@
 package deckserver.dwr.bean;
 
-import net.deckserver.jol.game.cards.CardEntry;
+import deckserver.game.cards.CardEntry;
 
 public class CardBean {
 

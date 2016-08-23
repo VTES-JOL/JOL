@@ -9,8 +9,8 @@ import deckserver.game.cards.OldCardSearch;
 import deckserver.game.turn.GameAction;
 import deckserver.util.AdminFactory;
 import deckserver.util.MailUtil;
-import net.deckserver.jol.game.cards.CardEntry;
-import net.deckserver.jol.game.cards.CardType;
+import deckserver.game.cards.CardEntry;
+import deckserver.game.cards.CardType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

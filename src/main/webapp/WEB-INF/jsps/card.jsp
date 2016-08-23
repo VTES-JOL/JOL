@@ -2,7 +2,7 @@
 <%@page import="deckserver.client.JolGame" %>
 <%@page import="deckserver.game.state.Card" %>
 <%@page import="deckserver.util.CardParams" %>
-<%@ page import="net.deckserver.jol.game.cards.CardEntry" %>
+<%@ page import="deckserver.game.cards.CardEntry" %>
 <%
     CardParams p = (CardParams) request.getAttribute("cparams");
     JolGame game = (JolGame) request.getAttribute("game");

@@ -13,7 +13,7 @@ import deckserver.game.cards.OldCardSearch;
 import deckserver.game.state.*;
 import deckserver.game.turn.GameAction;
 import deckserver.game.turn.TurnRecorder;
-import net.deckserver.jol.game.cards.CardEntry;
+import deckserver.game.cards.CardEntry;
 import org.slf4j.Logger;
 
 import java.text.DateFormat;

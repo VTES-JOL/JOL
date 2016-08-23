@@ -1,4 +1,4 @@
-package net.deckserver.jol.game.cards;
+package deckserver.game.cards;
 
 import java.util.EnumSet;
 

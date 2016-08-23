@@ -5,7 +5,7 @@ import deckserver.dwr.bean.AdminBean;
 import deckserver.game.cards.Deck;
 import deckserver.util.AdminFactory;
 import deckserver.util.DeckParams;
-import net.deckserver.jol.game.cards.CardEntry;
+import deckserver.game.cards.CardEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

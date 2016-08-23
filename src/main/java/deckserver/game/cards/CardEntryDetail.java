@@ -6,9 +6,6 @@
 
 package deckserver.game.cards;
 
-import net.deckserver.jol.game.cards.CardEntry;
-import net.deckserver.jol.game.cards.CardType;
-
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.ArrayList;

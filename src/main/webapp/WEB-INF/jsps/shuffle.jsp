@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page import="net.deckserver.jol.game.cards.CardEntry" %>
+<%@page import="deckserver.game.cards.CardEntry" %>
 <%@page import="java.util.Map" %>
 <%
     Map map = (Map) request.getAttribute("sparams");

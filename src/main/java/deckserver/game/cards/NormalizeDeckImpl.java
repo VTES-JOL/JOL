@@ -6,7 +6,6 @@
 
 package deckserver.game.cards;
 
-import net.deckserver.jol.game.cards.CardEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
