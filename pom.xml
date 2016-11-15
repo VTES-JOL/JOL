@@ -59,6 +59,18 @@
         </dependency>
 
         <dependency>
+            <groupId>net.tanesha.recaptcha4j</groupId>
+            <artifactId>recaptcha4j</artifactId>
+            <version>0.0.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.0.1</version>
@@ -95,6 +107,8 @@
                         <mail.debug>true</mail.debug>
                         <jol.data>${dataDir}</jol.data>
                         <jol.email>jol@localhost</jol.email>
+                        <recaptcha.key>***REMOVED***</recaptcha.key>
+                        <recaptcha.secret>***REMOVED***</recaptcha.secret>
                     </systemProperties>
                 </configuration>
             </plugin>

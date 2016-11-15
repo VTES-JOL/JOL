@@ -15,15 +15,20 @@
                     <table>
                         <tr>
                             <td><label for="newplayer">Name:</label></td>
-                            <td><input type="text" size="30" name="newplayer" id="newplayer"/></td>
+                            <td><input style="width:100%;" type="text" size="30" name="newplayer" id="newplayer"/></td>
                         </tr>
                         <tr>
                             <td><label for="newpassword">Password:</label></td>
-                            <td><input type="password" size="30" name="newpassword" id="newpassword"/></td>
+                            <td><input style="width:100%;" type="password" size="30" name="newpassword" id="newpassword"/></td>
                         </tr>
                         <tr>
                             <td><label for="newemail">Email:</label></td>
-                            <td><input type="text" size=30 name="newemail" id="newemail"/></td>
+                            <td><input style="width:100%;" type="text" size=30 name="newemail" id="newemail"/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <div class="g-recaptcha" data-sitekey="<%= System.getProperty("recaptcha.key") %>"></div>
+                            </td>
                         </tr>
                         <tr>
                             <td colspan="2"><input type=submit name="register" value="Register"/></td>
