@@ -39,7 +39,7 @@
         </td>
         <td width="50%" valign="top">
             <p>
-                Welcome to V:TES Online Test Server, where you can play Vampire-The Eternal Struggle (V:TES) card games online over the web.
+                Welcome to V:TES Online, where you can play Vampire-The Eternal Struggle (V:TES) card games online over the web.
             </p>
             <p>
                 To play games on this server login, create some decks, and use chat below to organize games.

@@ -33,6 +33,8 @@
     <orderEntry type="library" name="jquery-1.11.1" level="application" />
     <orderEntry type="library" name="bootstrap" level="application" />
     <orderEntry type="library" name="api" level="application" />
+    <orderEntry type="library" name="Maven: net.tanesha.recaptcha4j:recaptcha4j:0.0.7" level="project" />
+    <orderEntry type="library" name="Maven: org.glassfish:javax.json:1.0.4" level="project" />
     <orderEntry type="library" name="Maven: org.directwebremoting:dwr:3.0.1-RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.main.external:schema2beans-repackaged:3.1.2" level="project" />
     <orderEntry type="library" name="Maven: javax.mail:mail:1.4.5" level="project" />
