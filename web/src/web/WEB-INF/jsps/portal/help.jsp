@@ -1,1 +1,0 @@
-<jsp:include page="/doc/commands.html"/>

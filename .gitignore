@@ -1,3 +1,9 @@
 *.class
-.idea/
-*.iml
+.idea/*
+target/*
+.DS_Store
+src/main/resources/game*
+src/main/resources/player*
+src/main/resources/system.properties
+data/
+src/main/dwr/*

@@ -1,0 +1,109 @@
+body {
+    background: #e7e7e7;
+}
+
+#curturn {
+    background: white;
+    color: black;
+}
+
+#gchatwin {
+    width: 100%;
+    background: white;
+    color: black;
+}
+
+#owngamediv {
+    height: 100%
+}
+
+.cardsdiv {
+    height: 200px;
+    overflow: auto;
+}
+
+.errdiv {
+    color: black;
+    font-weight: bolder;
+}
+
+td.gameplayers {
+    font-size: small;
+}
+
+.chattable {
+    color: black;
+}
+
+.gamelink {
+    color: black;
+    text-decoration: underline;
+}
+
+.gamediv {
+    overflow: auto;
+    background: white;
+    color: black;
+}
+
+td.delete {
+    text-align: center;
+}
+
+.history {
+    height: 200px;
+    overflow: auto;
+}
+
+ul.help {
+    list-style-type: none;
+    overflow: hidden;
+    background-color: darkslategrey;
+}
+
+ul.help li {
+    float: left;
+}
+
+div#help-body {
+    width: 80%;
+    margin: 0 auto;
+}
+
+table.help-example {
+    border: 1px solid black;
+    border-collapse: collapse;
+    width: 100%;
+    background-color: white;
+    border-spacing: 0;
+}
+
+table.help-example th, table.help-example td {
+    padding: 2px;
+    border: 1px solid black;
+}
+
+th.help-command {
+    width: 30%;
+}
+
+td.help-command {
+    font-family: monospace;
+}
+
+ul.help li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 16px;
+    text-decoration: none;
+}
+
+a:link, a:visited, a:hover, a:active {
+    color: red;
+}
+
+span.edge {
+    color: red;
+    font-weight: bold;
+}

@@ -1,8 +1,0 @@
-#!/bin/csh -f
-
-set cardset=$1
-set setabbrev=$2
-set prefix=$3
-
-grep ZZZZ$setabbrev $cardset.zzz | sed 's/Name: //' | sed 's/ZZZZ.*//' | awk '{print ++i"="$0}' | sed "s/^/$prefix/" > $cardset.map
-sed 's/.*=//' $cardset.map > $cardset.test
