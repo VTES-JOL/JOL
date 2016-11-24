@@ -61,11 +61,11 @@ public class PlayerModel implements Comparable {
 
     public void recordAccess() {
         if (player != null)
-            JolAdmin.INSTANCE.recordAccess(player);
+            JolAdmin.getInstance().recordAccess(player);
     }
 
     public long getTimestamp() {
-        return JolAdmin.INSTANCE.getLastAccess(player).getTime();
+        return JolAdmin.getInstance().getLastAccess(player).getTime();
     }
 
     public String getView() {
@@ -102,7 +102,7 @@ public class PlayerModel implements Comparable {
 
     public void saveDeck() {
         if (tmpDeckName != null) {
-            JolAdmin.INSTANCE.createDeck(player, tmpDeckName, tmpDeck);
+            JolAdmin.getInstance().createDeck(player, tmpDeckName, tmpDeck);
         }
     }
 
@@ -112,13 +112,13 @@ public class PlayerModel implements Comparable {
 
     public void submitDeck(String name, String deck) {
         clearDeck();
-        JolAdmin.INSTANCE.createDeck(player, name, deck);
+        JolAdmin.getInstance().createDeck(player, name, deck);
         decks = null;
     }
 
     public DeckSummaryBean[] getDecks() {
         if (decks == null) {
-            String[] names = JolAdmin.INSTANCE.getDeckNames(player);
+            String[] names = JolAdmin.getInstance().getDeckNames(player);
             Arrays.sort(names);
             Collection<DeckSummaryBean> c = new ArrayList<>(names.length);
             for (String name : names) {
@@ -135,7 +135,7 @@ public class PlayerModel implements Comparable {
     }
 
     public boolean isAdmin() {
-        return JolAdmin.INSTANCE.isAdmin(player);
+        return JolAdmin.getInstance().isAdmin(player);
     }
 
     public boolean hasChats() {

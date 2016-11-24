@@ -12,7 +12,7 @@ public class RegistrationSummaryBean {
 
     public RegistrationSummaryBean(AdminBean abean, String name) {
         GameModel game = abean.getGameModel(name);
-        JolAdmin admin = JolAdmin.INSTANCE;
+        JolAdmin admin = JolAdmin.getInstance();
         String[] players = admin.getPlayers();
         for (String player : players) {
             if (admin.isInvited(name, player) || admin.getGameDeck(name, player) != null) {

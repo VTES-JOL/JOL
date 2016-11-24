@@ -62,7 +62,7 @@ public class DeckserverRemote {
 
     public Map<String, Object> invitePlayer(String game, String name) {
         String player = getPlayer().getPlayer();
-        JolAdmin admin = JolAdmin.INSTANCE;
+        JolAdmin admin = JolAdmin.getInstance();
         if (admin.isAdmin(player)) {
             admin.invitePlayer(game, name);
         }
@@ -71,7 +71,7 @@ public class DeckserverRemote {
 
     public Map<String, Object> startGame(String game) {
         String player = getPlayer().getPlayer();
-        JolAdmin admin = JolAdmin.INSTANCE;
+        JolAdmin admin = JolAdmin.getInstance();
         if (admin.getOwner(game).equals(player) && admin.isOpen(game)) {
             admin.startGame(game);
             MailUtil.sendStartMsg(admin.getGame(game));
@@ -115,7 +115,7 @@ public class DeckserverRemote {
     public String[] getHistory(String game, String turn) {
         String[] ret = new String[0];
         if (game != null && turn != null) {
-            GameAction[] actions = JolAdmin.INSTANCE.getGame(game).getActions(turn);
+            GameAction[] actions = JolAdmin.getInstance().getGame(game).getActions(turn);
             ret = new String[actions.length];
             for (int i = 0; i < actions.length; i++) {
                 ret[i] = actions[i].getText();
@@ -126,7 +126,7 @@ public class DeckserverRemote {
 
     public Map<String, Object> getCardText(String callback, String id) {
         Map<String, Object> ret = UpdateFactory.getUpdate();
-        CardSearch cards = JolAdmin.INSTANCE.getAllCards();
+        CardSearch cards = JolAdmin.getInstance().getAllCards();
         CardEntry card = cards.getCardById(id);
         ret.put(callback, new CardBean(card));
         return ret;
@@ -166,14 +166,14 @@ public class DeckserverRemote {
     }
 
     public Map<String, Object> registerDeck(String game, String name) {
-        JolAdmin admin = JolAdmin.INSTANCE;
+        JolAdmin admin = JolAdmin.getInstance();
         String player = getPlayer().getPlayer();
         admin.addPlayerToGame(game, player, name);
         return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> removeDeck(String name) {
-        JolAdmin admin = JolAdmin.INSTANCE;
+        JolAdmin admin = JolAdmin.getInstance();
         String player = getPlayer().getPlayer();
         admin.removeDeck(player, name);
         PlayerModel model = getPlayer();
@@ -202,7 +202,7 @@ public class DeckserverRemote {
 
     public Map<String, Object> cardSearch(String type, String string) {
         Map<String, Object> ret = UpdateFactory.getUpdate();
-        CardSearch search = JolAdmin.INSTANCE.getAllCards();
+        CardSearch search = JolAdmin.getInstance().getAllCards();
         CardEntry[] set = search.getAllCards();
         type = ne(type);
         if (type != null && !type.equals("All")) {

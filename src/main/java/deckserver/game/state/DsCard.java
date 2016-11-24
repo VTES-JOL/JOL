@@ -24,7 +24,7 @@ class DsCard extends CardBox implements Card {
 
     public String getName() {
         try {
-            return JolAdmin.INSTANCE.getAllCards().getCardById(card).getName();
+            return JolAdmin.getInstance().getAllCards().getCardById(card).getName();
         } catch (Throwable t) {
             logger.error("Error finding card " + this.card);
             return "ERROR CARD";

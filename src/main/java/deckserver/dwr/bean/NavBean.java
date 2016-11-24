@@ -35,7 +35,7 @@ public class NavBean {
             game = model.getCurrentGame();
         if (player != null) {
             playerB = model.hasChats() ? hasChats : loggedIn;
-            JolAdmin admin = JolAdmin.INSTANCE;
+            JolAdmin admin = JolAdmin.getInstance();
             if (admin.isAdmin(player)) {
                 adminB = isadmin;
             }

@@ -12,7 +12,7 @@ public class AdminPageBean {
     private String[] rGames;
 
     public AdminPageBean(AdminBean abean, String player) {
-        JolAdmin admin = JolAdmin.INSTANCE;
+        JolAdmin admin = JolAdmin.getInstance();
         String[] names = admin.getGames(player);
         Collection<String> c = new ArrayList<>();
         for (String gameName : names) {

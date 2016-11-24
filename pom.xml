@@ -109,6 +109,8 @@
                         <jol.email>jol@localhost</jol.email>
                         <recaptcha.key>***REMOVED***</recaptcha.key>
                         <recaptcha.secret>***REMOVED***</recaptcha.secret>
+                        <tomcat.username>tomcat-deploy</tomcat.username>
+                        <tomcat.password>local-deploy</tomcat.password>
                     </systemProperties>
                 </configuration>
             </plugin>

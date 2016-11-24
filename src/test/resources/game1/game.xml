@@ -8,6 +8,14 @@
   <player>Player4</player>
   <region>
     <name>Player3's ready region</name>
+    <game-card>
+      <id>188</id>
+      <cardid>jy108</cardid>
+      <notation>
+        <name>capac</name>
+        <value>2</value>
+      </notation>
+    </game-card>
   </region>
   <region>
     <name>Player3's torpor</name>
@@ -15,12 +23,12 @@
   <region>
     <name>Player3's inactive region</name>
     <game-card>
-      <id>188</id>
-      <cardid>jy108</cardid>
-    </game-card>
-    <game-card>
       <id>191</id>
       <cardid>ah95</cardid>
+      <notation>
+        <name>counters</name>
+        <value>2</value>
+      </notation>
     </game-card>
     <game-card>
       <id>190</id>
@@ -405,6 +413,18 @@
   </region>
   <region>
     <name>Player1's ready region</name>
+    <game-card>
+      <id>390</id>
+      <cardid>sa181</cardid>
+      <notation>
+        <name>counters</name>
+        <value>3</value>
+      </notation>
+      <notation>
+        <name>capac</name>
+        <value>3</value>
+      </notation>
+    </game-card>
   </region>
   <region>
     <name>Player1's torpor</name>
@@ -418,10 +438,6 @@
     <game-card>
       <id>388</id>
       <cardid>sw61</cardid>
-    </game-card>
-    <game-card>
-      <id>390</id>
-      <cardid>sa181</cardid>
     </game-card>
     <game-card>
       <id>394</id>
@@ -838,6 +854,18 @@
   </region>
   <region>
     <name>Player2's ready region</name>
+    <game-card>
+      <id>291</id>
+      <cardid>bl100</cardid>
+      <notation>
+        <name>counters</name>
+        <value>4</value>
+      </notation>
+      <notation>
+        <name>capac</name>
+        <value>6</value>
+      </notation>
+    </game-card>
   </region>
   <region>
     <name>Player2's torpor</name>
@@ -851,10 +879,6 @@
     <game-card>
       <id>287</id>
       <cardid>ce102</cardid>
-    </game-card>
-    <game-card>
-      <id>291</id>
-      <cardid>bl100</cardid>
     </game-card>
     <game-card>
       <id>284</id>
@@ -2069,22 +2093,50 @@
   </notation>
   <notation>
     <name>Player3pool</name>
-    <value>30</value>
+    <value>28</value>
   </notation>
   <notation>
     <name>Player2pool</name>
-    <value>30</value>
+    <value>26</value>
   </notation>
   <notation>
     <name>Player1pool</name>
-    <value>30</value>
+    <value>27</value>
   </notation>
   <notation>
     <name>active meth</name>
-    <value>Player3</value>
+    <value>Player2</value>
   </notation>
   <notation>
     <name>phase</name>
     <value>Untap</value>
+  </notation>
+  <notation>
+    <name>text</name>
+    <value/>
+  </notation>
+  <notation>
+    <name>Player3text</name>
+    <value/>
+  </notation>
+  <notation>
+    <name>Player4text</name>
+    <value/>
+  </notation>
+  <notation>
+    <name>Player2text</name>
+    <value/>
+  </notation>
+  <notation>
+    <name>Player1ping</name>
+    <value>10:45 11/24 </value>
+  </notation>
+  <notation>
+    <name>Player1text</name>
+    <value/>
+  </notation>
+  <notation>
+    <name>Player2ping</name>
+    <value>10:46 11/24 </value>
   </notation>
 </game-state>

@@ -17,18 +17,18 @@ public class DeckSummaryBean {
     public DeckSummaryBean(PlayerModel model, String name) {
         this.name = name;
         game = null;
-        init(model.getPlayer(), JolAdmin.INSTANCE.getDeck(model.getPlayer(), name));
+        init(model.getPlayer(), JolAdmin.getInstance().getDeck(model.getPlayer(), name));
     }
 
     // get information about the player's deck that is registered for a game
     public DeckSummaryBean(GameModel game, PlayerModel model) {
         this.game = game.getName();
-        name = JolAdmin.INSTANCE.getDeckName(this.game, model.getPlayer());
-        init(model.getPlayer(), JolAdmin.INSTANCE.getGameDeck(this.game, model.getPlayer()));
+        name = JolAdmin.getInstance().getDeckName(this.game, model.getPlayer());
+        init(model.getPlayer(), JolAdmin.getInstance().getGameDeck(this.game, model.getPlayer()));
     }
 
     private void init(String player, String deck) {
-        CardSearch search = JolAdmin.INSTANCE.getAllCards();
+        CardSearch search = JolAdmin.getInstance().getAllCards();
         try {
             Deck nd = new DeckImpl(search, deck);
             lib = nd.getLibSize();

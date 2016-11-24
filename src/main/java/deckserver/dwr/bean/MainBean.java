@@ -41,7 +41,7 @@ public class MainBean {
         Collection<String> gamenames = new HashSet<>();
         loggedin = model.getPlayer() != null;
         if (loggedin) {
-            gamenames.addAll(Arrays.asList(JolAdmin.INSTANCE.getGames(model.getPlayer())));
+            gamenames.addAll(Arrays.asList(JolAdmin.getInstance().getGames(model.getPlayer())));
             refresh = RefreshInterval.calc(abean.getTimestamp());
         }
         for (GameModel game : actives) {

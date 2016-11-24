@@ -35,7 +35,7 @@ public class CardImpl implements Card {
     }
 
     public String getName() {
-        CardEntry card = JolAdmin.INSTANCE.getAllCards().getCardById(getCardId());
+        CardEntry card = JolAdmin.getInstance().getAllCards().getCardById(getCardId());
         if (card == null) return getCardId();
         return card.getName();
     }

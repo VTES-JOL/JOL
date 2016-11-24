@@ -1,15 +1,137 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <game-actions>
-  <counter>2</counter>
-  <game-counter>2</game-counter>
+  <counter>4</counter>
+  <game-counter>19</game-counter>
   <turn>
     <sequence>1</sequence>
     <name>Player3</name>
-    <counter>2</counter>
+    <counter>9</counter>
     <label>Player3 1.1</label>
     <action>
       <counter>1</counter>
       <text>22:00 3/17 [Player3] START OF UNTAP PHASE.</text>
+    </action>
+    <action>
+      <counter>2</counter>
+      <text>10:44 11/24 [Player4] test</text>
+    </action>
+    <action>
+      <counter>3</counter>
+      <text>10:44 11/24 [Player2] test</text>
+    </action>
+    <action>
+      <counter>4</counter>
+      <text>10:44 11/24 [Player3] test</text>
+    </action>
+    <action>
+      <counter>5</counter>
+      <text>10:45 11/24 Player3's pool was 30, now is 28.</text>
+      <command>pool</command>
+      <command>Player3</command>
+      <command>28</command>
+    </action>
+    <action>
+      <counter>6</counter>
+      <text>10:45 11/24 Added 2 blood to inactive region #2, now 2.</text>
+      <command>counter</command>
+      <command>191</command>
+      <command>2</command>
+    </action>
+    <action>
+      <counter>7</counter>
+      <text>10:45 11/24 Move Delilah Easton to Player3's ready region</text>
+      <command>move</command>
+      <command>188</command>
+      <command>Player3</command>
+      <command>ready region</command>
+      <command>bottom</command>
+    </action>
+    <action>
+      <counter>8</counter>
+      <text>10:45 11/24 Capacity of Delilah Easton now 2</text>
+      <command>capacity</command>
+      <command>188</command>
+      <command>2</command>
+    </action>
+  </turn>
+  <turn>
+    <sequence>2</sequence>
+    <name>Player1</name>
+    <counter>6</counter>
+    <label>Player1 1.2</label>
+    <action>
+      <counter>1</counter>
+      <text>10:45 11/24 [Player1] START OF UNTAP PHASE.</text>
+    </action>
+    <action>
+      <counter>2</counter>
+      <text>10:46 11/24 Player1's pool was 30, now is 27.</text>
+      <command>pool</command>
+      <command>Player1</command>
+      <command>27</command>
+    </action>
+    <action>
+      <counter>3</counter>
+      <text>10:46 11/24 Added 3 blood to inactive region #3, now 3.</text>
+      <command>counter</command>
+      <command>390</command>
+      <command>3</command>
+    </action>
+    <action>
+      <counter>4</counter>
+      <text>10:46 11/24 Move Leon to Player1's ready region</text>
+      <command>move</command>
+      <command>390</command>
+      <command>Player1</command>
+      <command>ready region</command>
+      <command>bottom</command>
+    </action>
+    <action>
+      <counter>5</counter>
+      <text>10:46 11/24 Capacity of Leon now 3</text>
+      <command>capacity</command>
+      <command>390</command>
+      <command>3</command>
+    </action>
+  </turn>
+  <turn>
+    <sequence>3</sequence>
+    <name>Player2</name>
+    <counter>6</counter>
+    <label>Player2 1.3</label>
+    <action>
+      <counter>1</counter>
+      <text>10:46 11/24 [Player2] START OF UNTAP PHASE.</text>
+    </action>
+    <action>
+      <counter>2</counter>
+      <text>10:48 11/24 Player2's pool was 30, now is 26.</text>
+      <command>pool</command>
+      <command>Player2</command>
+      <command>26</command>
+    </action>
+    <action>
+      <counter>3</counter>
+      <text>10:48 11/24 Added 4 blood to inactive region #3, now 4.</text>
+      <command>counter</command>
+      <command>291</command>
+      <command>4</command>
+    </action>
+    <action>
+      <counter>4</counter>
+      <text>10:48 11/24 Move Kassiym Malikhair to Player2's ready region</text>
+      <command>move</command>
+      <command>291</command>
+      <command>Player2</command>
+      <command>ready region</command>
+      <command>bottom</command>
+    </action>
+    <action>
+      <counter>5</counter>
+      <text>10:48 11/24 Capacity of Kassiym Malikhair now 6</text>
+      <command>capacity</command>
+      <command>291</command>
+      <command>6</command>
     </action>
   </turn>
 </game-actions>

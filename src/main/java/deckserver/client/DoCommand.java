@@ -128,7 +128,7 @@ public class DoCommand {
                         int curcap = game.getCapacity(srcCard);
                         if (curcap <= 0) {
                             CardEntry card =
-                                    JolAdmin.INSTANCE.getAllCards().getCardById(game.getCardDescripId(srcCard));
+                                    JolAdmin.getInstance().getAllCards().getCardById(game.getCardDescripId(srcCard));
                             int capincr = 1;
                             String[] text = card.getFullText();
                             for (String aText : text) {

@@ -40,7 +40,7 @@ public class GameView {
     }
 
     private void init() {
-        JolAdmin admin = JolAdmin.INSTANCE;
+        JolAdmin admin = JolAdmin.getInstance();
         JolGame game = admin.getGame(name);
         GameAction[] actions = game.getActions(game.getCurrentTurn());
         for (GameAction action : actions) {
@@ -68,7 +68,7 @@ public class GameView {
     }
 
     public synchronized GameBean create() {
-        JolAdmin admin = JolAdmin.INSTANCE;
+        JolAdmin admin = JolAdmin.getInstance();
         HttpServletRequest request = WebContextFactory.get()
                 .getHttpServletRequest();
         JolGame game = admin.getGame(name);
@@ -213,7 +213,7 @@ public class GameView {
 
     public long getTimestamp() {
         if (isPlayer) {
-            return JolAdmin.INSTANCE.getAccess(name, player).getTime();
+            return JolAdmin.getInstance().getAccess(name, player).getTime();
         } else {
             return (new Date()).getTime();
         }
@@ -238,7 +238,7 @@ public class GameView {
     }
 
     public void addChats(int idx) {
-        JolGame game = JolAdmin.INSTANCE.getGame(name);
+        JolGame game = JolAdmin.getInstance().getGame(name);
         GameAction[] actions = game.getActions(game.getCurrentTurn());
         for (int i = idx; i < actions.length; i++)
             chats.add(actions[i].getText());

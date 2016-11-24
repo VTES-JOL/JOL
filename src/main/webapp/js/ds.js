@@ -127,7 +127,7 @@ function renderActiveGames(games) {
     if (games == null) return;
     for (var index = 0; index < games.length; index++) {
         if (games[index].turn == null) continue;
-        var row = addGameRow('activegames', games[index]);
+        var row = addGameRow('activegames', games[index].game);
         if (row.cells.length == 0) {
             row.insertCell(0);
             row.insertCell(1);

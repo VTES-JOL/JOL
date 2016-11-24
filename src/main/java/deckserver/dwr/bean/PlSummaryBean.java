@@ -25,7 +25,7 @@ public class PlSummaryBean {
     public PlSummaryBean(GameModel game, String player) {
         this.game = game.getName();
         this.started = game.isActive();
-        JolAdmin admin = JolAdmin.INSTANCE;
+        JolAdmin admin = JolAdmin.getInstance();
         if (!started) {
             String deck = admin.getGameDeck(game.getName(), player);
             Deck nd = new DeckImpl(admin.getAllCards(), deck);

@@ -27,7 +27,7 @@ public class AdminBean {
 
     public AdminBean() {
         try {
-            JolAdmin admin = JolAdmin.INSTANCE;
+            JolAdmin admin = JolAdmin.getInstance();
             String[] games = admin.getGames();
             for (String game : games) {
                 if (admin.isActive(game) || admin.isOpen(game)) {
@@ -95,7 +95,7 @@ public class AdminBean {
         Collection<String> c = new TreeSet<>(pmap.keySet());
         who = c.toArray(new String[c.size()]);
         for (Iterator i = c.iterator(); i.hasNext(); ) {
-            if (!JolAdmin.INSTANCE.isAdmin((String) i.next())) {
+            if (!JolAdmin.getInstance().isAdmin((String) i.next())) {
                 i.remove();
             }
         }
@@ -149,14 +149,14 @@ public class AdminBean {
     }
 
     public synchronized void unEndGame(String name) {
-        JolAdmin.INSTANCE.setGP(name, "state", "closed");
+        JolAdmin.getInstance().setGP(name, "state", "closed");
         activeSort.add(getGameModel(name));
         actives = new ArrayList<>(activeSort);
         notifyAboutGame(name);
     }
 
     public synchronized void endGame(String name) {
-        JolAdmin.INSTANCE.endGame(name);
+        JolAdmin.getInstance().endGame(name);
         activeSort.remove(getGameModel(name));
         actives = new ArrayList<>(activeSort);
         notifyAboutGame(name, true);
@@ -164,8 +164,8 @@ public class AdminBean {
 
     public synchronized void createGame(String name, PlayerModel player) {
         logger.trace("Creating game {} for player {}", name, player.getPlayer());
-        if (JolAdmin.INSTANCE.mkGame(name)) {
-            JolAdmin.INSTANCE.setOwner(name, player.getPlayer());
+        if (JolAdmin.getInstance().mkGame(name)) {
+            JolAdmin.getInstance().setOwner(name, player.getPlayer());
             activeSort.add(new GameModel(name));
             actives = new ArrayList<>(activeSort);
             notifyAboutGame(name);

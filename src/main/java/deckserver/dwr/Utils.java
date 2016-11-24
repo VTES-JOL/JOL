@@ -57,7 +57,7 @@ public class Utils {
                 player = request.getParameter("dsuserin");
                 String password = request.getParameter("dspassin");
                 if (player != null
-                        && JolAdmin.INSTANCE.authenticate(player,
+                        && JolAdmin.getInstance().authenticate(player,
                         password)) {
                     setPlayer(request, player);
                     logger.debug("Logged in player {}", player);
@@ -78,7 +78,7 @@ public class Utils {
             String captchaResponse = request.getParameter("g-recaptcha-response");
             try {
                 boolean verify = VerifyRecaptcha.verify(captchaResponse);
-                if (verify && JolAdmin.INSTANCE.registerPlayer(player, password, email)) {
+                if (verify && JolAdmin.getInstance().registerPlayer(player, password, email)) {
                     setPlayer(request, player);
                     logger.debug("registered " + player);
                 } else {
@@ -98,7 +98,7 @@ public class Utils {
         if (gamename != null && gamename.length() > 0)
             gamename = gamename.substring(1);
         if (gamename != null && gamename.length() > 0
-                && JolAdmin.INSTANCE.existsGame(gamename)) {
+                && JolAdmin.getInstance().existsGame(gamename)) {
             logger.debug("Setting game to be " + gamename);
 
             model.enterGame(abean, gamename);

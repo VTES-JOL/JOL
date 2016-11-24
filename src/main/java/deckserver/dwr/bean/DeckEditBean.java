@@ -24,7 +24,7 @@ public class DeckEditBean {
     private String groups = null;
 
     public DeckEditBean(String player, String name) {
-        JolAdmin admin = JolAdmin.INSTANCE;
+        JolAdmin admin = JolAdmin.getInstance();
         String deck = admin.getDeck(player, name);
         text = init(player, name, deck, false);
     }
@@ -34,7 +34,7 @@ public class DeckEditBean {
     }
 
     private String init(String player, String name, String deck, boolean shuffle) {
-        JolAdmin admin = JolAdmin.INSTANCE;
+        JolAdmin admin = JolAdmin.getInstance();
         Deck nd = new DeckImpl(admin.getAllCards(), deck);
         try {
             HttpServletRequest request = WebContextFactory.get()

@@ -27,21 +27,21 @@ public class GameModel implements Comparable {
 
     public GameModel(String name) {
         this.name = name;
-        if (isActive()) JolAdmin.INSTANCE.getGame(name);  // make sure its loaded
-        timestamp = JolAdmin.INSTANCE.getGameTimeStamp(name).getTime();
+        if (isActive()) JolAdmin.getInstance().getGame(name);  // make sure its loaded
+        timestamp = JolAdmin.getInstance().getGameTimeStamp(name).getTime();
         regen();
     }
 
     public boolean isOpen() {
-        return JolAdmin.INSTANCE.isOpen(name);
+        return JolAdmin.getInstance().isOpen(name);
     }
 
     public boolean isActive() {
-        return JolAdmin.INSTANCE.isActive(name);
+        return JolAdmin.getInstance().isActive(name);
     }
 
     public boolean isFinished() {
-        return JolAdmin.INSTANCE.isFinished(name);
+        return JolAdmin.getInstance().isFinished(name);
     }
 
     public String getName() {
@@ -49,12 +49,12 @@ public class GameModel implements Comparable {
     }
 
     public String getOwner() {
-        return JolAdmin.INSTANCE.getOwner(name);
+        return JolAdmin.getInstance().getOwner(name);
     }
 
     public synchronized String submit(String player, String phase, String command, String chat,
                                       String ping, String endTurn, String global, String text) {
-        JolAdmin admin = JolAdmin.INSTANCE;
+        JolAdmin admin = JolAdmin.getInstance();
         if (!getPlayers().contains(player) && !admin.getOwner(name).equals(player)) {
             return "Not authorized";
         }
@@ -144,7 +144,7 @@ public class GameModel implements Comparable {
     }
 
     void firstPing() {
-        JolAdmin admin = JolAdmin.INSTANCE;
+        JolAdmin admin = JolAdmin.getInstance();
         JolGame game = admin.getGame(name);
         String email = admin.getEmail(game.getActivePlayer());
         game.setPingTag(game.getActivePlayer());
@@ -174,7 +174,7 @@ public class GameModel implements Comparable {
 	} */
 
     private void doReload(boolean stateChanged, boolean phaseChanged, boolean pingChanged, boolean globalChanged, boolean turnChanged) {
-        timestamp = JolAdmin.INSTANCE.getGameTimeStamp(name).getTime();
+        timestamp = JolAdmin.getInstance().getGameTimeStamp(name).getTime();
         for (String key : (new ArrayList<>(views.keySet()))) {
             GameView view = views.get(key);
             //		if(checkViewTime(key, view,timestamp)) continue;
@@ -231,7 +231,7 @@ public class GameModel implements Comparable {
     }
 
     public Collection getPlayers() {
-        return Arrays.asList(JolAdmin.INSTANCE.getPlayers(name));
+        return Arrays.asList(JolAdmin.getInstance().getPlayers(name));
     }
 
     public int compareTo(Object arg0) {

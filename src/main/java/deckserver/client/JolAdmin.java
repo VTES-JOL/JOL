@@ -31,33 +31,33 @@ public class JolAdmin {
 
     private static final Date startDate = new Date();
     private static final Logger logger = getLogger(JolAdmin.class);
-    public static JolAdmin INSTANCE = null;
-    private final File bugdir;
+    private static final JolAdmin INSTANCE = new JolAdmin(System.getProperty("jol.data"));
+    private static CardSearch CARD_DATA = null;
     private final String dir;
     private final SystemInfo sysInfo;
     private final Map<String, GameInfo> games;
     private final Map<String, PlayerInfo> players;
-    private final CardsInfo cards;
 
-    public JolAdmin(String dir) throws Exception {
+    public JolAdmin(String dir) {
         this.dir = dir;
-        this.bugdir = new File(dir, "bugs");
         games = new HashMap<>();
         players = new HashMap<>();
-        cards = new CardsInfo();
         sysInfo = new SystemInfo();
     }
 
-    private static String readFile(File file) throws IOException {
+    public static JolAdmin getInstance() {
+        return INSTANCE;
+    }
+
+    private synchronized static String readFile(File file) throws IOException {
         return StreamReader.read(new FileInputStream(file));
     }
 
-    private static void writeFile(File file, String contents)
+    private synchronized static void writeFile(File file, String contents)
             throws IOException {
-        if (!file.exists())
-            file.createNewFile();
         FileWriter out = new FileWriter(file);
         out.write(contents);
+        out.flush();
         out.close();
     }
 
@@ -270,7 +270,17 @@ public class JolAdmin {
     }
 
     public CardSearch getAllCards() {
-        return cards.getAllCards();
+        if (CARD_DATA == null) {
+            logger.info("Loading Card Data");
+            try {
+                String set = readFile(new File(dir + "/cards/base.txt"));
+                String prop = readFile(new File(dir + "/cards/base.prop"));
+                CARD_DATA = new SearchImpl(set, prop);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to open card files", e);
+            }
+        }
+        return CARD_DATA;
     }
 
     class GameInfo extends Info {
@@ -347,7 +357,7 @@ public class JolAdmin {
             }
         }
 
-        private void loadGame(String name) {
+        private synchronized void loadGame(String name) {
             logger.debug("Loading game {}", name);
             try {
                 File file = new File(getGameDir(), "game.xml");
@@ -383,7 +393,7 @@ public class JolAdmin {
             write();
         }
 
-        String getPlayerDeck(String player) {
+        synchronized String getPlayerDeck(String player) {
             String playerKey = sysInfo.getKey(player);
             File deckFile = new File(getGameDir(), playerKey + ".deck");
             if (!deckFile.exists())
@@ -395,7 +405,7 @@ public class JolAdmin {
             }
         }
 
-        void addPlayer(String name, String deckKey, String deck) {
+        synchronized void addPlayer(String name, String deckKey, String deck) {
             String playerKey = sysInfo.getKey(name);
             info.setProperty(playerKey, deckKey);
             try {
@@ -407,13 +417,13 @@ public class JolAdmin {
             write();
         }
 
-        void endGame() {
+        synchronized void endGame() {
             info.setProperty("state", "finished");
             // PENDING generate state html, archive all other game artifacts.
             write();
         }
 
-        void startGame() {
+        synchronized void startGame() {
             info.setProperty("state", "closed");
             state = new DsGame();
             actions = new ActionHistory();
@@ -678,27 +688,6 @@ public class JolAdmin {
 
     }
 
-    private class CardsInfo extends Info {
-
-        CardsInfo() {
-            super("cards.properties");
-        }
-
-        String getHeader() {
-            return "Deckserver 3.0 card set file";
-        }
-
-        CardSearch getAllCards() {
-            try {
-                String set = readFile(new File(dir + "/cards/base.txt"));
-                String prop = readFile(new File(dir + "/cards/base.prop"));
-                return new SearchImpl(set, prop);
-            } catch (IOException e) {
-                throw new RuntimeException("Unable to open card files", e);
-            }
-        }
-    }
-
     private class SystemInfo extends Info {
         SystemInfo() {
             super("system.properties");
@@ -799,7 +788,8 @@ public class JolAdmin {
             return info.getProperty(key);
         }
 
-        private void load(boolean ignoreExceptions) {
+        private synchronized void load(boolean ignoreExceptions) {
+            logger.debug("Reading {}", filename);
             InputStream in = null;
             try {
                 in = new FileInputStream(filename);
@@ -820,7 +810,8 @@ public class JolAdmin {
             }
         }
 
-        protected void write() {
+        protected synchronized void write() {
+            logger.debug("Writing {}", filename);
             OutputStream out = null;
             try {
                 out = new FileOutputStream(filename);
