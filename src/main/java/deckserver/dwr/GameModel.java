@@ -97,8 +97,8 @@ public class GameModel implements Comparable {
                     String[] commands = command.split(";");
                     for (String cmd : commands) {
                         try {
-                            String[] cmdTokens = cmd.split("[\\s\n\r\f\t]");
-                            status.append(commander.doCommand(player, cmdTokens));
+                            String[] cmdTokens = cmd.trim().split("[\\s\n\r\f\t]");
+                            status.append(commander.doCommand(player, cmdTokens)).append("<br/>");
                         } catch (Exception e) {
                             logger.error("Error with command {} for player {} and game {}", cmd, player, name);
                             status.append(e.getMessage());

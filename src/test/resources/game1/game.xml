@@ -418,11 +418,23 @@
       <cardid>sa181</cardid>
       <notation>
         <name>counters</name>
-        <value>3</value>
+        <value>6</value>
       </notation>
       <notation>
         <name>capac</name>
         <value>3</value>
+      </notation>
+    </game-card>
+    <game-card>
+      <id>384</id>
+      <cardid>sa135</cardid>
+      <notation>
+        <name>capac</name>
+        <value>2</value>
+      </notation>
+      <notation>
+        <name>counters</name>
+        <value>1</value>
       </notation>
     </game-card>
   </region>
@@ -431,10 +443,6 @@
   </region>
   <region>
     <name>Player1's inactive region</name>
-    <game-card>
-      <id>384</id>
-      <cardid>sa135</cardid>
-    </game-card>
     <game-card>
       <id>388</id>
       <cardid>sw61</cardid>
@@ -447,60 +455,6 @@
   <region>
     <name>Player1's hand</name>
     <game-card>
-      <id>468</id>
-      <cardid>jy20</cardid>
-    </game-card>
-    <game-card>
-      <id>474</id>
-      <cardid>sa7</cardid>
-    </game-card>
-    <game-card>
-      <id>430</id>
-      <cardid>sa58</cardid>
-    </game-card>
-    <game-card>
-      <id>480</id>
-      <cardid>jy8</cardid>
-    </game-card>
-    <game-card>
-      <id>485</id>
-      <cardid>jy28</cardid>
-    </game-card>
-    <game-card>
-      <id>437</id>
-      <cardid>sa138</cardid>
-    </game-card>
-    <game-card>
-      <id>423</id>
-      <cardid>sa58</cardid>
-    </game-card>
-  </region>
-  <region>
-    <name>Player1's ashheap</name>
-  </region>
-  <region>
-    <name>Player1's library</name>
-    <game-card>
-      <id>482</id>
-      <cardid>jy8</cardid>
-    </game-card>
-    <game-card>
-      <id>445</id>
-      <cardid>jy401</cardid>
-    </game-card>
-    <game-card>
-      <id>446</id>
-      <cardid>jy401</cardid>
-    </game-card>
-    <game-card>
-      <id>421</id>
-      <cardid>sa58</cardid>
-    </game-card>
-    <game-card>
-      <id>483</id>
-      <cardid>jy8</cardid>
-    </game-card>
-    <game-card>
       <id>449</id>
       <cardid>jy401</cardid>
     </game-card>
@@ -510,10 +464,6 @@
     </game-card>
     <game-card>
       <id>401</id>
-      <cardid>sa295</cardid>
-    </game-card>
-    <game-card>
-      <id>402</id>
       <cardid>sa295</cardid>
     </game-card>
     <game-card>
@@ -528,10 +478,68 @@
       <id>462</id>
       <cardid>jy20</cardid>
     </game-card>
+  </region>
+  <region>
+    <name>Player1's ashheap</name>
+    <game-card>
+      <id>468</id>
+      <cardid>jy20</cardid>
+    </game-card>
+    <game-card>
+      <id>430</id>
+      <cardid>sa58</cardid>
+    </game-card>
+    <game-card>
+      <id>474</id>
+      <cardid>sa7</cardid>
+    </game-card>
+    <game-card>
+      <id>485</id>
+      <cardid>jy28</cardid>
+    </game-card>
+    <game-card>
+      <id>480</id>
+      <cardid>jy8</cardid>
+    </game-card>
+    <game-card>
+      <id>437</id>
+      <cardid>sa138</cardid>
+    </game-card>
+    <game-card>
+      <id>445</id>
+      <cardid>jy401</cardid>
+    </game-card>
+    <game-card>
+      <id>423</id>
+      <cardid>sa58</cardid>
+    </game-card>
+    <game-card>
+      <id>482</id>
+      <cardid>jy8</cardid>
+    </game-card>
+    <game-card>
+      <id>446</id>
+      <cardid>jy401</cardid>
+    </game-card>
+    <game-card>
+      <id>421</id>
+      <cardid>sa58</cardid>
+    </game-card>
+    <game-card>
+      <id>402</id>
+      <cardid>sa295</cardid>
+    </game-card>
     <game-card>
       <id>399</id>
       <cardid>sa295</cardid>
     </game-card>
+    <game-card>
+      <id>483</id>
+      <cardid>jy8</cardid>
+    </game-card>
+  </region>
+  <region>
+    <name>Player1's library</name>
     <game-card>
       <id>436</id>
       <cardid>sa138</cardid>
@@ -2101,7 +2109,7 @@
   </notation>
   <notation>
     <name>Player1pool</name>
-    <value>27</value>
+    <value>25</value>
   </notation>
   <notation>
     <name>active meth</name>

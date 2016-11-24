@@ -405,7 +405,7 @@ function details(thistag) {
 }
 
 function showStatus(data) {
-    dwr.util.setValue('status', data);
+    dwr.util.setValue('status', data, {escapeHtml: false});
 }
 
 function getCard(card) // Open card text in separate window (always on top)
