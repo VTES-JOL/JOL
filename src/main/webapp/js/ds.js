@@ -18,7 +18,7 @@ function playerMap(data) {
 
 function globalChat() {
     DS.chat(dwr.util.getValue('gchat'), {callback: playerMap});
-    dwr.util.setValue('gchat','');
+    dwr.util.setValue('gchat', '');
 }
 
 function toggleVisible(s, h) {
@@ -244,6 +244,11 @@ function doNewDeck() {
 }
 
 function createGame() {
+    var gameName = dwr.util.getValue("creategame");
+    if (gameName.indexOf("\'") > -1 || gameName.indexOf("\"") > -1) {
+        alert("Game name can not contain \' or \" characters in it");
+        return;
+    }
     DS.createGame(dwr.util.getValue("creategame"), {callback: playerMap});
     dwr.util.setValue("creategame", '');
 }
