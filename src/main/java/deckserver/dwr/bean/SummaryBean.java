@@ -17,12 +17,14 @@ public class SummaryBean {
     private String access = "none";
     private String turn = null;
     private String[] available = new String[0];
+    private String admin;
 
     public SummaryBean(GameModel game) {
         this.game = game.getName();
         if (JolAdmin.getInstance().isActive(this.game)) {
             access = getDate(game.getTimestamp());
             turn = JolAdmin.getInstance().getGame(this.game).getCurrentTurn();
+            admin = JolAdmin.getInstance().getOwner(this.game);
             GameView[] views = game.getViews();
             Collection<String> actives = new ArrayList<>(5);
             for (GameView view : views) {
@@ -52,4 +54,7 @@ public class SummaryBean {
         return turn;
     }
 
+    public String getAdmin() {
+        return admin;
+    }
 }

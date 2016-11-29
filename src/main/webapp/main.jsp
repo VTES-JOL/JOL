@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html" %>
 <%@ page pageEncoding="UTF-8" %>
 <html>
@@ -11,7 +12,7 @@
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/styles.css"/>
         <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/favicon.ico" />
     </head>
-    <body onload="init();">
+    <body onload="init();" class="${applicationScope.get("environment")}">
         <div id="loadmsg">Loading...</div>
         <div id="loaded" style="display :none;">
             <jsp:include page="/WEB-INF/jsps/topbar.jsp"/>

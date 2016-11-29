@@ -69,10 +69,12 @@ function navigate(data) {
     if (data.player == null) {
         toggleVisible('logininputs', 'loggedin');
         dwr.util.setValue('login', 'Log in');
+        dwr.util.byId('gameRow').style.display = "none";
     } else {
         dwr.util.setValue('loggedin', data.player + ' is logged in');
         toggleVisible('loggedin', 'logininputs');
         dwr.util.setValue('login', 'Log out');
+        dwr.util.byId('gameRow').style.display = "";
     }
     game = data.game;
     dwr.util.setValue('gamename', '');
@@ -136,20 +138,14 @@ function renderActiveGames(games) {
             row.cells[1].colspan = '1';
             row.insertCell(2);
             row.insertCell(3);
+            row.insertCell(4);
         }
         row.cells[0].innerHTML = makeGameLink(games[index].game);
         row.cells[1].innerHTML = games[index].access;
         row.cells[2].innerHTML = games[index].turn;
         row.cells[3].innerHTML = '&nbsp ' + games[index].available.join(',');
+        row.cells[4].innerHTML = games[index].admin;
     }
-}
-
-function renderNews(news) {
-    var newsItems = '';
-    for (var index = 0; index < news.length; index++) {
-        newsItems += '<p><a href="' + news[index].url + '">' + news[index].text + '</a></p>';
-    }
-    dwr.util.byId('news').innerHTML = newsItems;
 }
 
 function loadDeck(deck) {
@@ -517,7 +513,6 @@ function callbackMain(data) {
         renderOnline('adson', data.admins);
         renderMyGames(data.myGames);
         renderActiveGames(data.games);
-        renderNews(data.news);
         if (data.refresh > 0) {
             refresher = setTimeout("DS.doPoll(playerMap)", data.refresh);
         }

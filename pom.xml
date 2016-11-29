@@ -107,6 +107,7 @@
                         <mail.debug>true</mail.debug>
                         <jol.data>${dataDir}</jol.data>
                         <jol.email>jol@localhost</jol.email>
+                        <jol.env>dev</jol.env>
                         <recaptcha.key>***REMOVED***</recaptcha.key>
                         <recaptcha.secret>***REMOVED***</recaptcha.secret>
                         <tomcat.username>tomcat-deploy</tomcat.username>

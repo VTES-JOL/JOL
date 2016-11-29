@@ -1,5 +1,13 @@
-body {
+body.production {
     background: #e7e7e7;
+}
+
+body.test {
+    background: #7590a3;
+}
+
+body.dev {
+    background: #a9caff;
 }
 
 #curturn {

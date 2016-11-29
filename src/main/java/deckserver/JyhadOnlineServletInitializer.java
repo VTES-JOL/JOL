@@ -1,6 +1,5 @@
 package deckserver;
 
-import deckserver.client.JolAdmin;
 import deckserver.dwr.bean.AdminBean;
 import org.slf4j.Logger;
 
@@ -18,6 +17,8 @@ public class JyhadOnlineServletInitializer implements ServletContextListener {
         logger.info("Starting Jyhad Online...");
         logger.info("Initializing deckserver with " + System.getProperty("jol.data"));
         AdminBean.INSTANCE = new AdminBean();
+        String environment = System.getProperty("jol.env", "production");
+        servletContextEvent.getServletContext().setAttribute("environment", environment);
         logger.info("Initialization complete");
     }
 

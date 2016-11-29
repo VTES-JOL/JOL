@@ -1,7 +1,8 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" %>
 <table width="100%">
     <tr>
-        <td width="25%" valign="top">
+        <td width="25%" valign="top" rowspan="2">
             <div id="player" style="display: none;">
                 <span>Your games:</span>
                 <div id="owngamediv" class="gamediv">
@@ -19,7 +20,8 @@
                         </tr>
                         <tr>
                             <td><label for="newpassword">Password:</label></td>
-                            <td><input style="width:100%;" type="password" size="30" name="newpassword" id="newpassword"/></td>
+                            <td><input style="width:100%;" type="password" size="30" name="newpassword"
+                                       id="newpassword"/></td>
                         </tr>
                         <tr>
                             <td><label for="newemail">Email:</label></td>
@@ -27,7 +29,8 @@
                         </tr>
                         <tr>
                             <td colspan="2">
-                                <div class="g-recaptcha" data-sitekey="<%= System.getProperty("recaptcha.key") %>"></div>
+                                <div class="g-recaptcha"
+                                     data-sitekey="<%= System.getProperty("recaptcha.key") %>"></div>
                             </td>
                         </tr>
                         <tr>
@@ -39,11 +42,17 @@
         </td>
         <td width="50%" valign="top">
             <p>
-                Welcome to V:TES Online, where you can play Vampire-The Eternal Struggle (V:TES) card games online over the web.
+                Welcome to V:TES Online, where you can play Vampire-The Eternal Struggle (V:TES) card games online over
+                the web.
             </p>
             <p>
                 To play games on this server login, create some decks, and use chat below to organize games.
             </p>
+
+            <c:if test="${applicationScope.get('environment') eq 'test'}">
+                <h3>TEST SERVER - DATA ON THIS SERVER SUBJECT TO CHANGE</h3>
+            </c:if>
+
             <div id="globalchat" style="display: none;">
                 <p>Now logged on: <span id="whoson"></span></p>
                 <p>Admins currently on: <span id="adson"></span></p>
@@ -60,13 +69,36 @@
                     </span>
                 </form>
             </div>
-            <span>Currently active games:</span>
-            <div class="gamediv">
-                <table id="activegames" border="1" cellspacing="1" cellpadding="1" width="100%"></table>
-            </div>
         </td>
-        <td width="20%" align="top">
-            <div id="news"></div>
+        <td width="20%" valign="top">
+            <p>
+                <a href="https://www.facebook.com/groups/jolstatus/" target="_blank">Facebook Status Group</a>
+            </p>
+            <c:if test="${applicationScope.get('environment') eq 'production'}">
+                <p><a href="/jol-news/">Patch Notes / News</a></p>
+                <p><a href="https://test.deckserver.net/jol/" target="_blank">Test Server</a></p>
+            </c:if>
+        </td>
+    </tr>
+    <tr id="gameRow">
+        <td>
+            <div class="gamediv">
+                <span>Currently active games:</span>
+                <table border="1" cellspacing="1" cellpadding="1" width="100%">
+                    <thead>
+                    <tr>
+                        <th>Game Name</th>
+                        <th>Last Access</th>
+                        <th>Current Turn</th>
+                        <th>Active Players</th>
+                        <th>Game Admin</th>
+                    </tr>
+                    </thead>
+                    <tbody id="activegames">
+
+                    </tbody>
+                </table>
+            </div>
         </td>
     </tr>
 </table>
