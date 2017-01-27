@@ -77,6 +77,7 @@
             <c:if test="${applicationScope.get('environment') eq 'production'}">
                 <p><a href="/jol-news/">Patch Notes / News</a></p>
                 <p><a href="https://test.deckserver.net/jol/" target="_blank">Test Server</a></p>
+                <p><a href="https://www.kickstarter.com/projects/254514360/white-lily-miniseries-issue-1-expanded-print-run?ref=8xoa9e" target="_blank">White Lily Kickstarter</a></p>
             </c:if>
         </td>
     </tr>
