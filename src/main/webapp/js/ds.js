@@ -1,10 +1,16 @@
 var refresher = null;
 var game = null;
 
-dwr.engine.setTextHtmlHandler(function() {
-    window.alert("Your session has expired, please login again." );
-    document.location = '/mycontext/login';
-});
+function errorhandler(errorString, exception) {
+    console.log(exception);
+    if (exception.name == "dwr.engine.textHtmlReply") {
+        window.alert("Your session has expired, please login again.");
+        document.location = '/jol/';
+    } else if (exception.name == "dwr.engine.incompleteReply") {
+        window.alert("Lost connection with the server, reloading..");
+        document.location = "/jol/";
+    }
+}
 
 function loadTypes(data) {
     dwr.util.addOptions('cardtype', data);
@@ -525,7 +531,7 @@ function callbackMain(data) {
         renderMyGames(data.myGames);
         renderActiveGames(data.games);
         if (data.refresh > 0) {
-            refresher = setTimeout("DS.doPoll(playerMap)", data.refresh);
+            refresher = setTimeout("DS.doPoll({callback: playerMap, errorHandler: errorhandler})", data.refresh);
         }
     }
 }
