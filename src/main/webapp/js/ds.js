@@ -1,6 +1,11 @@
 var refresher = null;
 var game = null;
 
+dwr.engine.setTextHtmlHandler(function() {
+    window.alert("Your session has expired, please login again." );
+    document.location = '/mycontext/login';
+});
+
 function loadTypes(data) {
     dwr.util.addOptions('cardtype', data);
 }
