@@ -16,6 +16,7 @@ class UpdateFactory {
         viewMap.put("main", new MainCreator());
         viewMap.put("deck", new DeckCreator());
         viewMap.put("admin", new AdminCreator());
+        viewMap.put("status", new StatusCreator());
     }
 
     private static ViewCreator getView(String type) {
@@ -26,7 +27,7 @@ class UpdateFactory {
         AdminBean abean = AdminBean.INSTANCE;
         PlayerModel model = Utils.getPlayerModel(WebContextFactory.get().getHttpServletRequest(), abean);
         model.recordAccess();
-        String[] views = new String[]{model.getView(), "nav"};
+        String[] views = new String[]{model.getView(), "nav", "status"};
         Map<String, Object> ret = new HashMap<>();
         for (String view1 : views) {
             ViewCreator view = getView(view1);
