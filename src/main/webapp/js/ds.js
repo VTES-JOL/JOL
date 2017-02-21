@@ -1,6 +1,7 @@
 var refresher = null;
 var game = null;
 var timeInterval = null;
+var outageTime = null;
 
 function errorhandler(errorString, exception) {
     console.log(exception);
@@ -570,10 +571,27 @@ function callbackAdmin(data) {
 }
 
 function callbackStatus(data) {
+    var clockDiv = dwr.util.byId('clockdiv');
     if (data === "outage past" || data === "not yet") {
-        clearClock('clockdiv');
+        clockDiv.style.display = 'none';
+        clearInterval(timeInterval);
     } else {
-        initializeClock('clockdiv', data);
+        if (data === outageTime) {
+            return;
+        }
+        console.log("updating clock timer");
+        clockDiv.style.display = '';
+        clearInterval(timeInterval);
+        timeInterval = setInterval(function () {
+            var t = getTimeRemaining(data);
+            clockDiv.innerHTML = 'System restart in ' + t.days + 'd ' +
+                t.hours + 'h ' +
+                t.minutes + 'm ' +
+                t.seconds + 's';
+            if (t.total <= 0) {
+                clearInterval(timeInterval);
+            }
+        }, 1000);
     }
 }
 
@@ -590,25 +608,4 @@ function getTimeRemaining(endtime) {
         'minutes': minutes,
         'seconds': seconds
     };
-}
-
-function initializeClock(id, endtime) {
-    var clock = document.getElementById(id);
-    dwr.util.byId(id).style.display = '';
-    clearInterval(timeInterval);
-    timeInterval = setInterval(function () {
-        var t = getTimeRemaining(endtime);
-        clock.innerHTML = 'System restart in ' + t.days + 'd ' +
-            t.hours + 'h ' +
-            t.minutes + 'm ' +
-            t.seconds + 's';
-        if (t.total <= 0) {
-            clearInterval(timeInterval);
-        }
-    }, 1000);
-}
-
-function clearClock(id) {
-    dwr.util.byId(id).style.display = 'none';
-    clearInterval(timeInterval);
 }
