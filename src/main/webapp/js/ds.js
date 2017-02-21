@@ -609,7 +609,6 @@ function initializeClock(id, endtime) {
 }
 
 function clearClock(id) {
-    console.log("clearing clock");
     dwr.util.byId(id).style.display = 'none';
     clearInterval(timeInterval);
 }
