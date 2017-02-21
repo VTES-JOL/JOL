@@ -42,11 +42,16 @@
         </td>
         <td width="50%" valign="top">
             <p>
-                Welcome to V:TES Online, where you can play Vampire-The Eternal Struggle (V:TES) card games online over
-                the web.
+                This is a playtest server - designed to help test the upcoming bloodlines set. To help with this please
+                keep track of the following while using the new cars.
             </p>
+            <ul>
+                <li>How well did the new cards perform?</li>
+                <li>How well did they interact with other new cards?</li>
+                <li>How well did the new cards interact with older cards?</li>
+            </ul>
             <p>
-                To play games on this server login, create some decks, and use chat below to organize games.
+                Try not to redesign the card(s) in your comments - focus more on what does/doesn't work with current card
             </p>
 
             <c:if test="${applicationScope.get('environment') eq 'test'}">
@@ -88,13 +93,13 @@
                 <span>Currently active games:</span>
                 <table border="1" cellspacing="1" cellpadding="1" width="100%">
                     <thead>
-                    <tr>
-                        <th>Game Name</th>
-                        <th>Last Access</th>
-                        <th>Current Turn</th>
-                        <th>Active Players</th>
-                        <th>Game Admin</th>
-                    </tr>
+                        <tr>
+                            <th>Game Name</th>
+                            <th>Last Access</th>
+                            <th>Current Turn</th>
+                            <th>Active Players</th>
+                            <th>Game Admin</th>
+                        </tr>
                     </thead>
                     <tbody id="activegames">
 
