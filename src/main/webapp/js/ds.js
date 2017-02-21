@@ -3,15 +3,13 @@ var game = null;
 var timeInterval = null;
 var outageTime = null;
 
-dwr.engine.setTextHtmlHandler(function () {
-    window.alert("Your session has expired, please login again.");
-    document.location = '/jol/';
-});
-
 function errorhandler(errorString, exception) {
-    if (exception.name == "dwr.engine.incompleteReply") {
+    if (exception.name === "dwr.engine.incompleteReply") {
         window.alert("Lost connection with the server, reloading..");
         document.location = "/jol/";
+    } else if (exception.name === "dwr.engine.missingData") {
+        window.alert("Your session has expired, please login again.");
+        document.location = '/jol/';
     }
 }
 
