@@ -581,7 +581,6 @@ function callbackStatus(data) {
             return;
         }
         console.log("updating clock timer");
-        clockDiv.style.display = '';
         clearInterval(timeInterval);
         timeInterval = setInterval(function () {
             var t = getTimeRemaining(data);
@@ -591,7 +590,9 @@ function callbackStatus(data) {
                 t.seconds + 's';
             if (t.total <= 0) {
                 clearInterval(timeInterval);
+                clockDiv.style.display = 'none';
             }
+            clockDiv.style.display = '';
         }, 1000);
     }
 }
