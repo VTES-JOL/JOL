@@ -195,25 +195,25 @@ public class DoCommand {
                     message = message + " " + cmdObj.nextArg();
                 return doMessage(player, message);
             }
-            if (cmd.equalsIgnoreCase("untap")) {
-                // untap [<targetplayer>] [<targetregion>] [<targetcard>]
+            if (cmd.equalsIgnoreCase("untap") || cmd.equalsIgnoreCase("unlock")) {
+                // unlock [<targetplayer>] [<targetregion>] [<targetcard>]
                 String targetPlayer = cmdObj.getPlayer(player);
                 if (!cmdObj.hasMoreArgs()) {
                     game.untapAll(targetPlayer);
-                    return "Untap all";
+                    return "Unlock all";
                 }
                 String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
                 String card = cmdObj.getCard(false, targetPlayer, targetRegion);
                 game.setTapped(card, false);
-                return "Untap card";
+                return "Unlock card";
             }
-            if (cmd.equalsIgnoreCase("tap")) {
-                // untap [<targetplayer>] [<targetregion>] <targetcard>
+            if (cmd.equalsIgnoreCase("tap") || cmd.equalsIgnoreCase("lock")) {
+                // lock [<targetplayer>] [<targetregion>] <targetcard>
                 String targetPlayer = cmdObj.getPlayer(player);
                 String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
                 String card = cmdObj.getCard(false, targetPlayer, targetRegion);
                 game.setTapped(card, true);
-                return "Tapped card";
+                return "Locked card";
             }
             if (cmd.equalsIgnoreCase("show")) {
                 // show [<targetregion>] <amount> [<recipientplayer>]

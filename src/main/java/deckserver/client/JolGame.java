@@ -38,7 +38,7 @@ public class JolGame {
     public static final String LIBRARY = "library";
     public static final String CRYPT = "crypt";
     public static final String TORPOR = "torpor";
-    public static final String[] TURN_PHASES = new String[]{"Untap", "Master", "Minion", "Influence", "Discard"};
+    public static final String[] TURN_PHASES = new String[]{"Unlock", "Master", "Minion", "Influence", "Discard"};
 
     static final String COUNTERS = "counters";
     static final String BLOOD = "blood";
@@ -47,8 +47,8 @@ public class JolGame {
     static final String POOL = "pool";
     static final String EDGE = "edge";
     static final String TAP = "tapnote";
-    static final String TAPPED = "tap";
-    static final String UNTAPPED = "untap";
+    static final String TAPPED = "lock";
+    static final String UNTAPPED = "unlock";
     static final String PING = "ping";
     private static final Logger logger = getLogger(JolGame.class);
     private static DateFormat format = new SimpleDateFormat("HH:mm M/d ");
@@ -389,14 +389,14 @@ public class JolGame {
 
     public void setTapped(String cardId, boolean tapped) {
         Card card = (Card) state.getCard(cardId);
-        String logtext = (tapped ? "Tap " : "Untap ") + getCardName(card);
+        String logtext = (tapped ? "Lock " : "Unlock ") + getCardName(card);
         addCommand(logtext, new String[]{"tap", cardId});
         _setTap(card, tapped);
     }
 
     private void _setTap(Card card, boolean tapped) {
         Note note = getNote(card, TAP, tapped);
-        if (note == null) return; // defaults to untapped, no need to create a note
+        if (note == null) return; // defaults to unlocked, no need to create a note
         // in this circumstance.
         String value = tapped ? TAPPED : UNTAPPED;
         note.setValue(value);
@@ -404,7 +404,7 @@ public class JolGame {
 
     public void untapAll(String player) {
         Location[] locs = (Location[]) state.getPlayerLocations(player);
-        addCommand(player + " untaps.", new String[]{"untap", player});
+        addCommand(player + " unlocks.", new String[]{"unlock", player});
         for (Location loc : locs) untapAll(loc);
     }
 

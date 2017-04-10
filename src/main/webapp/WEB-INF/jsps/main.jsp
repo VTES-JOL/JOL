@@ -73,13 +73,30 @@
             </div>
         </td>
         <td width="20%" valign="top">
-            <p>
-                <a href="https://www.facebook.com/groups/jolstatus/" target="_blank">Facebook Status Group</a>
-            </p>
-            <c:if test="${applicationScope.get('environment') eq 'production'}">
-                <p><a href="/jol-news/">Patch Notes / News</a></p>
-                <p><a href="https://test.deckserver.net/jol/" target="_blank">Test Server</a></p>
-            </c:if>
+            <ul>
+                <li>
+                    <a href="https://www.facebook.com/groups/jolstatus/" target="_blank">Facebook Status Group</a>
+                    <p>Scheduled / Unplanned outages</p>
+                </li>
+                <li>
+                    <a href="https://www.facebook.com/groups/jol-development/" target="_blank">Facebook Development
+                        Group</a>
+                    <p>Request a fix, Suggest improvements</p>
+                </li>
+
+                <c:if test="${applicationScope.get('environment') eq 'production'}">
+
+                    <li>
+                        <a href="/jol-news/">Patch Notes / News</a>
+                        <p>Implemented / upcoming changes / announcements</p>
+                    </li>
+                    <li>
+                        <a href="https://test.deckserver.net/jol/" target="_blank">Test Server</a>
+                        <p>Staging / Playtesting environment</p>
+                    </li>
+                </c:if>
+
+            </ul>
         </td>
     </tr>
     <tr id="gameRow">
