@@ -47,8 +47,8 @@ public class JolGame {
     static final String POOL = "pool";
     static final String EDGE = "edge";
     static final String TAP = "tapnote";
-    static final String TAPPED = "lock";
-    static final String UNTAPPED = "unlock";
+    static final String TAPPED = "tap";
+    static final String UNTAPPED = "untap";
     static final String PING = "ping";
     private static final Logger logger = getLogger(JolGame.class);
     private static DateFormat format = new SimpleDateFormat("HH:mm M/d ");

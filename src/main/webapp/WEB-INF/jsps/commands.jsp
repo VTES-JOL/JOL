@@ -17,9 +17,9 @@
             <li><a href="#help_random">Random</a>
             <li><a href="#help_show">Show</a>
             <li><a href="#help_shuffle">Shuffle</a>
-            <li><a href="#help_tap">Tap</a>
             <li><a href="#help_transfer">Transfer</a>
-            <li><a href="#help_untap">Untap</a>
+            <li><a href="#help_lock">Lock</a>
+            <li><a href="#help_unlock">Unlock</a>
         </ul>
         <div id="help-body">
             <div id="help_blood">
@@ -424,32 +424,6 @@
                     </tr>
                 </table>
             </div>
-            <div id="help_tap">
-                <h2>Tap</h2>
-                <p>
-                    Taps a particular card. You may target any card on the table. Note that tapping other people's cards should
-                    never be necessary. The default PLAYER is yourself. The default REGION is your ready region.
-                </p>
-                <h4>Syntax</h4>
-                <p>
-                <code>tap [PLAYER] [REGION] CARD</code>
-                </p>
-                <h4>Examples</h4>
-                <table class="help-example">
-                    <tr>
-                        <th class="help-command">Command</th>
-                        <th>Result</th>
-                    </tr>
-                    <tr>
-                        <td class="help-command">tap ready 1</td>
-                        <td>tap card #1 in your ready region</td>
-                    </tr>
-                    <tr>
-                        <td class="help-command">tap George ready 3</td>
-                        <td>tap card #3 in George's ready region (Jar the Soul, Misdirection)</td>
-                    </tr>
-                </table>
-            </div>
             <div id="help_transfer">
                 <h2>Transfer</h2>
                 <p>
@@ -476,16 +450,19 @@
                     </tr>
                 </table>
             </div>
-            <div id="help_untap">
-                <h2>Untap</h2>
+            <div id="help_lock">
+                <h2>Lock</h2>
                 <p>
-                    Untaps a particular card. You may target any card on the table. Note that untapping other people's cards should
-                    never be necessary. The default PLAYER is yourself. The default REGION includes all of your cards. In other
-                    words, you can easily start your turn by using a UNTAP command to untap all of your cards.
+                    Locks a particular card. You may target any card on the table. Note that locking other people's cards should
+                    never be necessary. The default PLAYER is yourself. The default REGION is your ready region.
                 </p>
                 <h4>Syntax</h4>
                 <p>
-                <code>untap [PLAYER] [REGION] [CARD]</code>
+                    <code>lock [PLAYER] [REGION] CARD</code>
+                </p>
+                <h5>Deprecated: VEKN has changed the keyword tap to lock.  This command will be removed in a future release.</h5>
+                <p>
+                    <code>tap [PLAYER] [REGION] CARD</code>
                 </p>
                 <h4>Examples</h4>
                 <table class="help-example">
@@ -494,16 +471,47 @@
                         <th>Result</th>
                     </tr>
                     <tr>
-                        <td class="help-command">untap</td>
-                        <td>untap all of your cards (start of turn)</td>
+                        <td class="help-command">lock ready 1</td>
+                        <td>lock card #1 in your ready region</td>
                     </tr>
                     <tr>
-                        <td class="help-command">untap ready 1</td>
-                        <td>untap card #1 in your ready region (Speak with Spirits, 2nd Tradition)</td>
+                        <td class="help-command">lock George ready 3</td>
+                        <td>lock card #3 in George's ready region (Jar the Soul, Misdirection)</td>
+                    </tr>
+                </table>
+            </div>
+            <div id="help_unlock">
+                <h2>Unlock</h2>
+                <p>
+                    Unlocks a particular card. You may target any card on the table. Note that unlocking other people's cards should
+                    never be necessary. The default PLAYER is yourself. The default REGION includes all of your cards. In other
+                    words, you can easily start your turn by using a UNTAP command to unlock all of your cards.
+                </p>
+                <h4>Syntax</h4>
+                <p>
+                <code>unlock [PLAYER] [REGION] [CARD]</code>
+                </p>
+                <h5>Deprecated: VEKN has changed the keyword untap to unlock.  This command will be removed in a future release.</h5>
+                <p>
+                    <code>untap [PLAYER] [REGION] [CARD]</code>
+                </p>
+                <h4>Examples</h4>
+                <table class="help-example">
+                    <tr>
+                        <th class="help-command">Command</th>
+                        <th>Result</th>
                     </tr>
                     <tr>
-                        <td class="help-command">untap George ready 3</td>
-                        <td>untap card #3 in George's ready region (Babble, Angela Preston)</td>
+                        <td class="help-command">unlock</td>
+                        <td>unlock all of your cards (start of turn)</td>
+                    </tr>
+                    <tr>
+                        <td class="help-command">unlock ready 1</td>
+                        <td>unlock card #1 in your ready region (Speak with Spirits, 2nd Tradition)</td>
+                    </tr>
+                    <tr>
+                        <td class="help-command">unlock George ready 3</td>
+                        <td>unlock card #3 in George's ready region (Babble, Angela Preston)</td>
                     </tr>
                 </table>
             </div>

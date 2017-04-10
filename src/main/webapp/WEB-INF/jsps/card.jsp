@@ -31,7 +31,7 @@
         }
         // Tapped
         if (game.isTapped(c.getId())) {
-            builder.append(", TAPPED");
+            builder.append(", LOCKED");
         }
         // Label Text
         String text = game.getText(c.getId());
