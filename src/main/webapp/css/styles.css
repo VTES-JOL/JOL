@@ -111,6 +111,10 @@ a:link, a:visited, a:hover, a:active {
     color: red;
 }
 
+body.test a {
+    color: #2E546F;
+}
+
 span.edge {
     color: red;
     font-weight: bold;
