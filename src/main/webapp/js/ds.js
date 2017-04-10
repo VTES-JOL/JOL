@@ -9,7 +9,7 @@ dwr.engine.setTextHtmlHandler(function () {
 });
 
 function errorhandler(errorString, exception) {
-    if (exception.name == "dwr.engine.incompleteReply") {
+    if (exception.name === "dwr.engine.incompleteReply") {
         window.alert("Lost connection with the server, reloading..");
         document.location = "/jol/";
     }
@@ -55,12 +55,12 @@ function doButtons(data) {
 }
 
 function renderChat(did, id, data) {
-    if (data == null) {
+    if (data === null) {
         return;
     }
     var curScroll = dwr.util.byId(did).scrollTop;
     dwr.util.byId(did).scrollTop = 1000000;
-    if (dwr.util.byId(did).scrollTop == curScroll) {
+    if (dwr.util.byId(did).scrollTop === curScroll) {
         curScroll = 1000000;
     }
     var table = dwr.util.byId(id);
@@ -81,7 +81,7 @@ function navigate(data) {
     doButtons(data.gameButtons);
     doButtons({help: "Help"});
     doButtons({_guides: "Guides"})
-    if (data.player == null) {
+    if (data.player === null) {
         toggleVisible('logininputs', 'loggedin');
         dwr.util.setValue('login', 'Log in');
         dwr.util.byId('gameRow').style.display = "none";
@@ -93,7 +93,7 @@ function navigate(data) {
     }
     game = data.game;
     dwr.util.setValue('gamename', '');
-    if (game != null) {
+    if (game !== null) {
         dwr.util.setValue('gamename', game);
     }
 }
@@ -102,7 +102,7 @@ function addGameRow(tid, label) {
     var table = dwr.util.byId(tid);
     for (var idx = 0; idx < table.rows.length; idx++) {
         var row = table.rows[idx];
-        if (row.label == label) {
+        if (row.label === label) {
             return row;
         }
     }
@@ -112,10 +112,10 @@ function addGameRow(tid, label) {
 }
 
 function renderMyGames(games) {
-    if (games == null) return;
+    if (games === null) return;
     for (var index = 0; index < games.length; index++) {
         var gameRow = addGameRow('owngames', games[index].game);
-        if (gameRow.cells.length == 0) {
+        if (gameRow.cells.length === 0) {
             gameRow.insertCell(0);
             gameRow.insertCell(1);
         }
@@ -134,22 +134,22 @@ function makeGameLink(game) {
 }
 
 function renderOnline(div, who) {
-    if (who == null) {
+    if (who === null) {
         return;
     }
     dwr.util.setValue(div, who.join(', '));
 }
 
 function renderActiveGames(games) {
-    if (games == null) return;
+    if (games === null) return;
     for (var index = 0; index < games.length; index++) {
-        if (games[index].turn == null) continue;
+        if (games[index].turn === null) continue;
         var row = addGameRow('activegames', games[index].game);
-        if (row.cells.length == 0) {
+        if (row.cells.length === 0) {
             row.insertCell(0);
             row.insertCell(1);
         }
-        if (row.cells.length == 2) {
+        if (row.cells.length === 2) {
             row.cells[1].colspan = '1';
             row.insertCell(2);
             row.insertCell(3);
@@ -169,10 +169,10 @@ function loadDeck(deck) {
 }
 
 function showDeck(data) {
-    if (data.text != null) dwr.util.setValue('decktext', data.text);
+    if (data.text !== null) dwr.util.setValue('decktext', data.text);
     dwr.util.byId('deckcontents').innerHTML = data.format;
     dwr.util.byId('deckerrors').style.display = "none";
-    if (data.errors != null && data.errors.length != 0) {
+    if (data.errors !== null && data.errors.length !== 0) {
         var errorText = "<h3>Deck Errors</h3>" + data.errors.join('<br />');
         dwr.util.setValue('deckerrors', errorText, {escapeHtml: false});
         dwr.util.byId('deckerrors').style.display = "block";
@@ -181,7 +181,7 @@ function showDeck(data) {
 
 function getCardDeck(game, card) {
     var divid = "dcard" + card;
-    if (dwr.util.byId(divid) == null) {
+    if (dwr.util.byId(divid) === null) {
         DS.getCardText('showCardDeck', card, {callback: playerMap});
     } else {
         dwr.util.setValue("deckcards", card);
@@ -215,11 +215,11 @@ function findName() {
     var found = false;
     var name = '';
     var idx = 1;
-    while (found == false) {
+    while (found === false) {
         name = 'newdeck' + idx;
         found = true;
         for (idx; idx < rows.length; idx++) {
-            if (rows[idx].label == name) {
+            if (rows[idx].label === name) {
                 found = false;
                 break;
             }
@@ -292,7 +292,7 @@ function refreshState(force) {
 
 function doToggle(thistag) {
     var region = document.getElementById("region" + thistag);
-    if (region.style.display == 'none') {
+    if (region.style.display === 'none') {
         region.style.display = ''; // Show details
         document.getElementById(thistag).innerHTML = "-";
     }
@@ -307,7 +307,7 @@ function doSubmit() {
     var command = dwr.util.getValue('command');
     var chat = dwr.util.getValue('chat');
     var endTurn = dwr.util.getValue('endturn');
-    if (dwr.util.byId('phase') != null) {
+    if (dwr.util.byId('phase') !== null) {
         phase = dwr.util.getValue('phase');
     }
     if (dwr.util.byId('ping').selectedIndex > 0) {
@@ -317,7 +317,7 @@ function doSubmit() {
     dwr.util.setValue('command', "");
     dwr.util.setValue('chat', "");
     dwr.util.setValue('ping', 'NNNPPPP');
-    if (endTurn == "Yes") dwr.util.setValue('phase', "Untap");
+    if (endTurn === "Yes") dwr.util.setValue('phase', "Unlock");
     dwr.util.byId('endturn').selectedIndex = 0;
     var global = dwr.util.getValue('global');
     var text = dwr.util.getValue('notes');
@@ -330,29 +330,28 @@ function loadGame(data) {
     if (!data.player) {
         dwr.util.byId('hand').style.display = 'none';
         dwr.util.byId('playerPad').style.display = 'none';
-        if (!data.admin) {
-            dwr.util.byId('dsForm').style.display = 'none';
-        }
+        dwr.util.byId('dsForm').style.display = 'none';
     } else {
         dwr.util.byId('hand').style.display = '';
         dwr.util.byId('playerPad').style.display = '';
+        dwr.util.byId('dsForm').style.display = '';
     }
-    if (data.hand != null)
+    if (data.hand !== null)
         dwr.util.setValue('hand', data.hand, {escapeHtml: false});
-    if (data.state != null)
+    if (data.state !== null)
         dwr.util.setValue('state', data.state, {escapeHtml: false});
     if (data.global !== null)
         dwr.util.setValue('global', data.global);
-    if (data.text != null)
+    if (data.text !== null)
         dwr.util.setValue('notes', data.text);
-    if (data.label != null) {
+    if (data.label !== null) {
         dwr.util.setValue('turnlabel', data.label);
     }
     if (data.refresh > 0) {
-        if (refresher != null) clearTimeout(refresher);
+        if (refresher !== null) clearTimeout(refresher);
         refresher = setTimeout("refreshState(false)", data.refresh);
     }
-    if (data.pingkeys != null) {
+    if (data.pingkeys !== null) {
         var pingarr = [];
         for (var i = 0; i < data.pingkeys.length; i++) {
             pingarr[i] = {};
@@ -365,18 +364,18 @@ function loadGame(data) {
         dwr.util.addOptions('ping', pingarr, 'value', 'key');
         dwr.util.setValue('ping', pingSelection);
     }
-    if (data.turns != null) {
+    if (data.turns !== null) {
         var sel = dwr.util.getValue('turns');
         var num = dwr.util.byId('turns').options.length;
         dwr.util.removeAllOptions('turns');
         dwr.util.addOptions('turns', data.turns);
-        if (num != data.turns.length && (data.turns.length == 1 || sel == data.turns[1])) {
+        if (num !== data.turns.length && (data.turns.length === 1 || sel === data.turns[1])) {
             dwr.util.setValue('turns', data.turns[0]);
         } else {
             dwr.util.setValue('turns', sel);
         }
     }
-    if (data.turn != null) {
+    if (data.turn !== null) {
         if (data.resetChat) {
             var table = dwr.util.byId('curturntable');
             while (table.rows.length > 0) table.deleteRow(0);
@@ -385,32 +384,32 @@ function loadGame(data) {
         var turncontent = data.turn.join('<br />');
         var val = dwr.util.getValue('turns');
         var val2 = dwr.util.byId('turns').options;
-        if (data.turns != null) {
+        if (data.turns !== null) {
             dwr.util.setValue('history', turncontent, {escapeHtml: false});
-        } else if (dwr.util.getValue('turns') == dwr.util.byId('turns').options[0].value) {
+        } else if (dwr.util.getValue('turns') === dwr.util.byId('turns').options[0].value) {
             dwr.util.setValue('history', dwr.util.getValue('history', {escapeHtml: false}) + "<br />" + turncontent, {escapeHtml: false});
         }
     }
-    if (data.phases != null) {
+    if (data.phases !== null) {
         var phasev = dwr.util.getValue('phase');
         dwr.util.byId('phasecommand').style.display = '';
         dwr.util.byId('endcommand').style.display = '';
         dwr.util.removeAllOptions('phase');
         dwr.util.addOptions('phase', data.phases);
         if (data.turnChanged) {
-            phasev = 'Untap';
+            phasev = 'Unlock';
         }
         dwr.util.setValue('phase', phasev);
     } else {
         dwr.util.byId('phasecommand').style.display = 'none';
         dwr.util.byId('endcommand').style.display = 'none';
     }
-    if (data.collapsed != null) {
+    if (data.collapsed !== null) {
         for (var c in data.collapsed) {
             doToggle(data.collapsed[c]);
         }
     }
-    if (data.stamp != null) {
+    if (data.stamp !== null) {
         dwr.util.setValue('gamestamp', data.stamp);
     }
 }
@@ -427,7 +426,7 @@ function showStatus(data) {
 function getCard(card) // Open card text in separate window (always on top)
 {
     var divid = "card" + card;
-    if (dwr.util.byId(divid) == null) {
+    if (dwr.util.byId(divid) === null) {
         DS.getCardText('showCard', card, {callback: playerMap});
     } else {
         dwr.util.setValue("cards", card);
@@ -446,7 +445,7 @@ function showCard(data) {
 }
 
 function selectCard() {
-    if (dwr.util.getValue("cards") == "NOCARD") {
+    if (dwr.util.getValue("cards") === "NOCARD") {
         selectHistory();
     } else {
         var divid = "card" + dwr.util.getValue("cards");
@@ -482,7 +481,7 @@ function callbackShowDecks(data) {
     dwr.util.removeAllRows('decks');
     for (var dIdx = 0; dIdx < data.decks.length; dIdx++) {
         var dRow = addGameRow('decks', data.decks[dIdx].name);
-        if (dRow.cells.length == 0) {
+        if (dRow.cells.length === 0) {
             dRow.insertCell(0).innerHTML = '<a onclick="loadDeck(' + "'" + data.decks[dIdx].name + "');" + '">' + data.decks[dIdx].name + '</a>';
             dRow.insertCell(1);
             dRow.insertCell(2);
@@ -494,7 +493,7 @@ function callbackShowDecks(data) {
     // Register Decks for Games
     for (var gIdx = 0; gIdx < data.games.length; gIdx++) {
         var gRow = addGameRow('opengames', data.games[gIdx].game);
-        if (gRow.cells.length == 0) {
+        if (gRow.cells.length === 0) {
             gRow.insertCell(0).innerHTML = data.games[gIdx].game;
             gRow.insertCell(1);
             gRow.insertCell(2);
@@ -544,7 +543,7 @@ function callbackAdmin(data) {
     for (var game in data.games) {
         if (data.games.hasOwnProperty(game)) {
             var row = addGameRow('gameadmintable', "cg" + game);
-            if (row.cells.length == 0) {
+            if (row.cells.length === 0) {
                 row.insertCell(0);
                 row.cells[0].innerHTML = game;
                 row.insertCell(1);
@@ -597,8 +596,8 @@ function callbackStatus(data) {
     }
 }
 
-function getTimeRemaining(endtime) {
-    var t = Date.parse(endtime) - Date.parse(new Date());
+function getTimeRemaining(endTime) {
+    var t = Date.parse(endTime) - Date.parse(new Date());
     var seconds = Math.floor((t / 1000) % 60);
     var minutes = Math.floor((t / 1000 / 60) % 60);
     var hours = Math.floor((t / (1000 * 60 * 60)) % 24);

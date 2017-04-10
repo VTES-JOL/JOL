@@ -15,7 +15,7 @@ public class StateTest {
     public void GameLoad() throws Exception {
         JAXBContext context = JAXBContext.newInstance("net.deckserver.jol.game.jaxb.state");
         Assert.assertNotNull(context);
-        Source source = new StreamSource(new FileInputStream("src/test/resources/game1/game.xml"));
+        Source source = new StreamSource(new FileInputStream("src/test/resources/game5/game.xml"));
         Assert.assertNotNull(source);
         JAXBElement<GameState> gameState = context.createUnmarshaller().unmarshal(source, GameState.class);
         Assert.assertNotNull(gameState);
