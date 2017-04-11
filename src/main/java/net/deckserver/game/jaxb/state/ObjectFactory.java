@@ -1,4 +1,4 @@
-package net.deckserver.jol.game.jaxb.state;
+package net.deckserver.game.jaxb.state;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlRegistry;
 /**
  * This object contains factory methods for each
  * Java content interface and Java element interface
- * generated in the net.deckserver.jol.game.state package.
+ * generated in the net.deckserver.game.state package.
  * <p>An ObjectFactory allows you to programatically
  * construct new instances of the Java representation
  * for XML content. The Java representation of XML
@@ -21,7 +21,7 @@ public class ObjectFactory {
 
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.deckserver.jol.game.state
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.deckserver.game.state
      */
     public ObjectFactory() {
     }

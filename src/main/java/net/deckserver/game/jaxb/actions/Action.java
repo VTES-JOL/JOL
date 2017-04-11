@@ -1,4 +1,4 @@
-package net.deckserver.jol.game.jaxb.turn;
+package net.deckserver.game.jaxb.actions;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -10,41 +10,18 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-        "name",
         "counter",
-        "gameCounter",
-        "turn"
+        "text",
+        "command"
 })
-@XmlRootElement(name = "game-actions")
-public class GameActions {
+@XmlRootElement(name = "action")
+public class Action {
 
-    @XmlElement(required = true)
-    protected String name;
     @XmlElement(required = true)
     protected String counter;
-    @XmlElement(name = "game-counter", required = true)
-    protected String gameCounter;
-    protected List<Turn> turn;
-
-    /**
-     * Gets the value of the name property.
-     *
-     * @return possible object is
-     * {@link String }
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the value of the name property.
-     *
-     * @param value allowed object is
-     *              {@link String }
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
+    @XmlElement(required = true)
+    protected String text;
+    protected List<Command> command;
 
     /**
      * Gets the value of the counter property.
@@ -67,50 +44,50 @@ public class GameActions {
     }
 
     /**
-     * Gets the value of the gameCounter property.
+     * Gets the value of the text property.
      *
      * @return possible object is
      * {@link String }
      */
-    public String getGameCounter() {
-        return gameCounter;
+    public String getText() {
+        return text;
     }
 
     /**
-     * Sets the value of the gameCounter property.
+     * Sets the value of the text property.
      *
      * @param value allowed object is
      *              {@link String }
      */
-    public void setGameCounter(String value) {
-        this.gameCounter = value;
+    public void setText(String value) {
+        this.text = value;
     }
 
     /**
-     * Gets the value of the turn property.
+     * Gets the value of the command property.
      * <p>
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the turn property.
+     * This is why there is not a <CODE>set</CODE> method for the command property.
      * <p>
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getTurn().add(newItem);
+     *    getCommand().add(newItem);
      * </pre>
      * <p>
      * <p>
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Turn }
+     * {@link Command }
      */
-    public List<Turn> getTurn() {
-        if (turn == null) {
-            turn = new ArrayList<Turn>();
+    public List<Command> getCommand() {
+        if (command == null) {
+            command = new ArrayList<Command>();
         }
-        return this.turn;
+        return this.command;
     }
 
 }

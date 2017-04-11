@@ -1,7 +1,7 @@
-package net.deckserver.jol.game;
+package net.deckserver.game.jaxb;
 
-import net.deckserver.jol.game.jaxb.state.GameState;
-import net.deckserver.jol.game.jaxb.turn.GameActions;
+import net.deckserver.game.jaxb.actions.GameActions;
+import net.deckserver.game.jaxb.state.GameState;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -12,17 +12,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-/**
- * Created by shannon on 24/07/2016.
- */
 public class FileUtils {
 
+    private final static String GAME_STATE_CONTEXT = "net.deckserver.game.jaxb.state";
+    private final static String GAME_ACTIONS_CONTEXT = "net.deckserver.game.jaxb.actions";
+
     public static GameState loadGameState(File file) {
-        return loadFromFile("net.deckserver.jol.game.state", GameState.class, file);
+        return loadFromFile(GAME_STATE_CONTEXT, GameState.class, file);
     }
 
     public static GameActions loadGameActions(File file) {
-        return loadFromFile("net.deckserver.jol.game.turn", GameActions.class, file);
+        return loadFromFile(GAME_ACTIONS_CONTEXT, GameActions.class, file);
     }
 
     private static <T> T loadFromFile(String contextPath, Class<T> type, File file) {
@@ -39,7 +39,11 @@ public class FileUtils {
     }
 
     public static void saveGameActions(GameActions gameActions, File file) {
-        saveToFile("net.deckserver.jol.game.turn", GameActions.class, gameActions, file);
+        saveToFile(GAME_ACTIONS_CONTEXT, GameActions.class, gameActions, file);
+    }
+
+    public static void saveGameState(GameState gameState, File file) {
+        saveToFile(GAME_STATE_CONTEXT, GameState.class, gameState, file);
     }
 
     private static <T> void saveToFile(String contextPath, Class<T> type, T data, File file) {

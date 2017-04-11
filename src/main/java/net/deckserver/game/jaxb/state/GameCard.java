@@ -1,4 +1,4 @@
-package net.deckserver.jol.game.jaxb.state;
+package net.deckserver.game.jaxb.state;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;

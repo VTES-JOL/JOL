@@ -2061,7 +2061,7 @@
   </region>
   <notation>
     <name>edge</name>
-    <value>no one</value>
+    <value>Player1</value>
   </notation>
   <notation>
     <name>Player5pool</name>
@@ -2102,5 +2102,9 @@
   <notation>
     <name>Player5ping</name>
     <value>19:11 4/10 </value>
+  </notation>
+  <notation>
+    <name>Player1text</name>
+    <value/>
   </notation>
 </game-state>

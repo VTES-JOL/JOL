@@ -1,4 +1,4 @@
-package net.deckserver.jol.game.jaxb.state;
+package net.deckserver.game.jaxb.state;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -11,7 +11,6 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "name",
-        "counter",
         "player",
         "region",
         "notation"
@@ -21,8 +20,6 @@ public class GameState {
 
     @XmlElement(required = true)
     protected String name;
-    @XmlElement(required = true)
-    protected String counter;
     protected List<Player> player;
     protected List<Region> region;
     protected List<Notation> notation;
@@ -45,26 +42,6 @@ public class GameState {
      */
     public void setName(String value) {
         this.name = value;
-    }
-
-    /**
-     * Gets the value of the counter property.
-     *
-     * @return possible object is
-     * {@link String }
-     */
-    public String getCounter() {
-        return counter;
-    }
-
-    /**
-     * Sets the value of the counter property.
-     *
-     * @param value allowed object is
-     *              {@link String }
-     */
-    public void setCounter(String value) {
-        this.counter = value;
     }
 
     /**
@@ -152,7 +129,6 @@ public class GameState {
     public String toString() {
         return "GameState{" +
                 "name='" + name + '\'' +
-                ", counter='" + counter + '\'' +
                 ", player=" + player +
                 ", region=" + region +
                 ", notation=" + notation +

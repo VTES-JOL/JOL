@@ -1,4 +1,4 @@
-package net.deckserver.jol.game.jaxb.turn;
+package net.deckserver.game.jaxb.actions;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.List;
         "label",
         "action"
 })
-@XmlRootElement(name = "turn")
+@XmlRootElement(name = "actions")
 public class Turn {
 
     @XmlElement(required = true)
