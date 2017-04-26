@@ -77,6 +77,10 @@ public class JolAdmin {
         return ret;
     }
 
+    public Date getSystemStart() {
+        return startDate;
+    }
+
     GameInfo getGameInfo(String game) {
         if (games.containsKey(game))
             return games.get(game);
@@ -251,7 +255,9 @@ public class JolAdmin {
     }
 
     public Date getGameTimeStamp(String gameName) {
-        return getGameInfo(gameName).getTimeStamp();
+        Date gameTimeStamp = getGameInfo(gameName).getTimeStamp();
+        logger.trace("Game timestamp for {} is {}", gameName, gameTimeStamp);
+        return gameTimeStamp;
     }
 
     public void recordAccess(String gameName, String playerName) {
@@ -259,7 +265,9 @@ public class JolAdmin {
     }
 
     public Date getAccess(String name, String player) {
-        return getGameInfo(name).getAccessed(player);
+        Date accessDate = getGameInfo(name).getAccessed(player);
+        logger.trace("Player {} accessed game {} at {}", player, name, accessDate);
+        return accessDate;
     }
 
     public void setGP(String gamename, String prop, String value) {
