@@ -39,6 +39,10 @@ public class PlSummaryBean {
             } else {
                 Date access = admin.getAccess(this.game, player);
                 Date timestamp = admin.getGameTimeStamp(this.game);
+                Date systemStart = admin.getSystemStart();
+                if (timestamp.compareTo(systemStart) < 0) {
+                    timestamp = systemStart;
+                }
                 this.current = timestamp.before(access);
             }
         }
