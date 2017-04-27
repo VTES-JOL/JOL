@@ -151,7 +151,7 @@ public class DoCommand {
                 String destRegion = cmdObj.getRegion(JolGame.READY_REGION);
                 String destCard = cmdObj.getCard(true, destPlayer, destRegion);
 
-                logger.info("Destination region for command {} is {}", cmd, destRegion);
+                logger.trace("Destination region for command {} is {}", cmd, destRegion);
 
                 if ((destRegion.equals(JolGame.READY_REGION) || destRegion.equals(JolGame.INACTIVE_REGION) || destRegion.equals(JolGame.TORPOR)) && destCard != null) {
                     game.moveToCard(srcCard, destCard);

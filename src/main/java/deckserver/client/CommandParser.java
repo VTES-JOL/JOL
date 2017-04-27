@@ -31,7 +31,7 @@ class CommandParser {
     String getRegion(String defaultRegion) throws CommandException {
         if (!hasMoreArgs()) return defaultRegion;
         String arg = args[ind++].toLowerCase();
-        logger.info("Attempting to get region {}", arg);
+        logger.trace("Attempting to get region {}", arg);
         if (JolGame.ACTIVE_REGION.startsWith(arg))
             return JolGame.READY_REGION;
         if (JolGame.RFG.startsWith(arg))
@@ -50,6 +50,8 @@ class CommandParser {
             return JolGame.CRYPT;
         if (JolGame.TORPOR.startsWith(arg))
             return JolGame.TORPOR;
+        if (JolGame.RESEARCH.startsWith(arg))
+            return JolGame.RESEARCH;
         ind--;
         return defaultRegion;
     }

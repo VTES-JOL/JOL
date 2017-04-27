@@ -52,4 +52,6 @@
 <hr/>
 <% request.setAttribute("rparams", new RegionParams(game, player, index, "RFG", JolGame.RFG, "rfg", false)); %>
 <jsp:include page="region.jsp"/>
-
+<hr/>
+<% request.setAttribute("rparams", new RegionParams(game, player, index, "RESEARCH", JolGame.RESEARCH, "res", !active)); %>
+<jsp:include page="region.jsp"/>

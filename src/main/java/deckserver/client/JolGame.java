@@ -39,6 +39,7 @@ public class JolGame {
     public static final String CRYPT = "crypt";
     public static final String TORPOR = "torpor";
     public static final String RFG = "rfg";
+    public static final String RESEARCH = "research";
     public static final String[] TURN_PHASES = new String[]{"Unlock", "Master", "Minion", "Influence", "Discard"};
 
     static final String COUNTERS = "counters";
@@ -77,6 +78,7 @@ public class JolGame {
             state.addLocation(name, LIBRARY);
             state.addLocation(name, CRYPT);
             state.addLocation(name, RFG);
+            state.addLocation(name, RESEARCH);
         }
         CardEntry[] cards = deck.getCards();
         Location crypt = (Location) state.getPlayerLocation(name, CRYPT);
@@ -276,7 +278,7 @@ public class JolGame {
     } */
 
     private boolean isHiddenRegion(String region) {
-        return region.equals(INACTIVE_REGION) || region.equals(HAND) || region.equals(LIBRARY) || region.equals(CRYPT);
+        return region.equals(INACTIVE_REGION) || region.equals(HAND) || region.equals(LIBRARY) || region.equals(CRYPT) || region.equals(RESEARCH);
     }
 
     private String getCardName(Card card, String destRegion) {

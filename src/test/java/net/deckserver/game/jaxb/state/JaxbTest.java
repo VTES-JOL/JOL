@@ -1,7 +1,8 @@
 package net.deckserver.game.jaxb.state;
 
-import net.deckserver.game.jaxb.actions.GameActions;
 import net.deckserver.game.jaxb.FileUtils;
+import net.deckserver.game.jaxb.actions.GameActions;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -9,6 +10,7 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+@Ignore
 public class JaxbTest {
 
     @Test

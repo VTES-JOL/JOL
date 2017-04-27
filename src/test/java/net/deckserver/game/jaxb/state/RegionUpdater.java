@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class RegionTest {
+public class RegionUpdater {
 
     private static final String BASE_PATH = "/home/shannon/data/";
 
@@ -27,8 +27,9 @@ public class RegionTest {
     private static final String CRYPT = "crypt";
     private static final String TORPOR = "torpor";
     private static final String RFG = "rfg";
+    private static final String RESEARCH = "research";
 
-    private static final String[] REGIONS = {READY_REGION, INACTIVE_REGION, ASHHEAP, HAND, LIBRARY, CRYPT, TORPOR, RFG};
+    private static final String[] REGIONS = {READY_REGION, INACTIVE_REGION, ASHHEAP, HAND, LIBRARY, CRYPT, TORPOR, RFG, RESEARCH};
 
     private static List<FixData> fixData = new ArrayList<>();
 
@@ -68,7 +69,7 @@ public class RegionTest {
                     for (String region : regionNames) {
                         if (!gameRegions.contains(region)) {
                             FixData fixData = new FixData(gameFile, gameState, playerName, region);
-                            RegionTest.fixData.add(fixData);
+                            RegionUpdater.fixData.add(fixData);
                         }
                     }
                 });
