@@ -38,6 +38,7 @@ public class JolGame {
     public static final String LIBRARY = "library";
     public static final String CRYPT = "crypt";
     public static final String TORPOR = "torpor";
+    public static final String RFG = "rfg";
     public static final String[] TURN_PHASES = new String[]{"Unlock", "Master", "Minion", "Influence", "Discard"};
 
     static final String COUNTERS = "counters";
@@ -75,6 +76,7 @@ public class JolGame {
             state.addLocation(name, ASHHEAP);
             state.addLocation(name, LIBRARY);
             state.addLocation(name, CRYPT);
+            state.addLocation(name, RFG);
         }
         CardEntry[] cards = deck.getCards();
         Location crypt = (Location) state.getPlayerLocation(name, CRYPT);

@@ -55,6 +55,7 @@ public class GameView {
             i++;
             collapsed.add("t" + i);
             collapsed.add("a" + i);
+            collapsed.add("rfg" + i);
             if (ousted) {
                 collapsed.add("r" + i);
             }

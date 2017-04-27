@@ -38,14 +38,18 @@
     </tr>
 </table>
 <hr/>
-<% request.setAttribute("rparams", new RegionParams(game, player, index, "READY", JolGame.READY_REGION, false)); %>
+<% request.setAttribute("rparams", new RegionParams(game, player, index, "READY", JolGame.READY_REGION, "r", false)); %>
 <jsp:include page="region.jsp"/>
 <hr/>
-<% request.setAttribute("rparams", new RegionParams(game, player, index, "TORPOR", JolGame.TORPOR, false)); %>
+<% request.setAttribute("rparams", new RegionParams(game, player, index, "TORPOR", JolGame.TORPOR, "t", false)); %>
 <jsp:include page="region.jsp"/>
 <hr/>
-<% request.setAttribute("rparams", new RegionParams(game, player, index, "INACTIVE", JolGame.INACTIVE_REGION, !active)); %>
+<% request.setAttribute("rparams", new RegionParams(game, player, index, "INACTIVE", JolGame.INACTIVE_REGION, "i", !active)); %>
 <jsp:include page="region.jsp"/>
 <hr/>
-<% request.setAttribute("rparams", new RegionParams(game, player, index, "ASHHEAP", JolGame.ASHHEAP, false)); %>
+<% request.setAttribute("rparams", new RegionParams(game, player, index, "ASHHEAP", JolGame.ASHHEAP, "a", false)); %>
 <jsp:include page="region.jsp"/>
+<hr/>
+<% request.setAttribute("rparams", new RegionParams(game, player, index, "RFG", JolGame.RFG, "rfg", false)); %>
+<jsp:include page="region.jsp"/>
+

@@ -2,11 +2,16 @@ package deckserver.client;
 
 import deckserver.game.state.Card;
 import deckserver.game.state.Location;
+import org.slf4j.Logger;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Created by shannon on 23/08/2016.
  */
 class CommandParser {
+
+    private final static Logger logger = getLogger(CommandParser.class);
 
     String[] args;
     int ind;
@@ -26,8 +31,11 @@ class CommandParser {
     String getRegion(String defaultRegion) throws CommandException {
         if (!hasMoreArgs()) return defaultRegion;
         String arg = args[ind++].toLowerCase();
+        logger.info("Attempting to get region {}", arg);
         if (JolGame.ACTIVE_REGION.startsWith(arg))
             return JolGame.READY_REGION;
+        if (JolGame.RFG.startsWith(arg))
+            return JolGame.RFG;
         if (JolGame.READY_REGION.startsWith(arg))
             return JolGame.READY_REGION;
         if (JolGame.INACTIVE_REGION.startsWith(arg))

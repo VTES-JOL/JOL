@@ -11,6 +11,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class FileUtils {
 
@@ -26,15 +27,17 @@ public class FileUtils {
     }
 
     private static <T> T loadFromFile(String contextPath, Class<T> type, File file) {
-        try {
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
             JAXBContext context = JAXBContext.newInstance(contextPath);
-            Source source = new StreamSource(new FileInputStream(file));
+            Source source = new StreamSource(fileInputStream);
             JAXBElement<T> element = context.createUnmarshaller().unmarshal(source, type);
             return element.getValue();
         } catch (JAXBException e) {
             throw new RuntimeException("Unable to create JAXB context for " + type.getName(), e);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(type.getName() + " file not found", e);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to open " + type.getName() + " " + file.getName(), e);
         }
     }
 

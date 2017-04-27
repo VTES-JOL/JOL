@@ -19,11 +19,11 @@ public class RegionParams {
     private Card[] cards;
     private boolean hidden;
 
-    public RegionParams(JolGame game, String player, int index, String text, String region, boolean hidden) {
+    public RegionParams(JolGame game, String player, int index, String text, String region, String id, boolean hidden) {
         cards = (Card[]) game.getState().getPlayerLocation(player, region).getCards();
         this.text = text;
         this.hidden = hidden;
-        this.index = region.substring(0, 1).toLowerCase() + index;
+        this.index = id + index;
     }
 
     public int getSize() {

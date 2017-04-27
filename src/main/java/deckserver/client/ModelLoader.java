@@ -24,6 +24,7 @@ public final class ModelLoader {
             game.addLocation(player, JolGame.ASHHEAP);
             game.addLocation(player, JolGame.LIBRARY);
             game.addLocation(player, JolGame.CRYPT);
+            game.addLocation(player, JolGame.RFG);
             Location[] locs = (Location[]) orig.getPlayerLocations(player);
             for (Location loc : locs) {
                 moveLoc(game, orig, player, loc);
