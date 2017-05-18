@@ -6,6 +6,9 @@ import deckserver.dwr.PlayerModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 
 
@@ -21,9 +24,11 @@ public class AdminBean {
     private String[] who = new String[0];
     private Collection<GameModel> activeSort = new TreeSet<>();
     private List<GameModel> actives;
-    private List<String> chats = new ArrayList<>();
+    private volatile List<String> chats = new ArrayList<>();
     private Date timestamp = new Date();
     private String[] admins = new String[0];
+
+    private File chatPersistenceFile = new File(System.getProperty("jol.data"), "global_chat.txt");
 
     public AdminBean() {
         try {
@@ -37,6 +42,7 @@ public class AdminBean {
                 }
             }
             actives = new ArrayList<>(activeSort);
+            this.chats = loadChats();
         } catch (Exception e) {
             logger.error("Error creating admin bean {}", e);
         }
@@ -172,8 +178,27 @@ public class AdminBean {
         }
     }
 
-    public List<String> getChats() {
+    public synchronized List<String> getChats() {
         return chats;
+    }
+
+    private synchronized List<String> loadChats() {
+        try {
+            List<String> chatLines = Files.readAllLines(chatPersistenceFile.toPath());
+            logger.debug("Loaded chat state: {} loaded", chatLines.size());
+            return chatLines;
+        } catch (IOException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public synchronized void persistChats() {
+        try {
+            Files.write(chatPersistenceFile.toPath(), this.chats);
+            logger.debug("Saved chat state: {} stored", this.chats.size());
+        } catch (IOException e) {
+            logger.error("Error persisting chat");
+        }
     }
 
 }
