@@ -6,9 +6,13 @@
 
 package deckserver.game.turn;
 
-import deckserver.game.turn.model.Action;
-import deckserver.game.turn.model.GameActions;
-import deckserver.game.turn.model.Turn;
+import net.deckserver.game.jaxb.actions.Action;
+import net.deckserver.game.jaxb.actions.GameActions;
+import net.deckserver.game.jaxb.actions.Turn;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author administrator
@@ -25,23 +29,26 @@ public class TurnImpl implements TurnRecorder {
     }
 
     private Turn getTurn(String label) {
-        Turn[] turns = actions.getTurn();
-        int i = turns.length;
-        while (i-- > 0)
-            if (turns[i].getLabel().equals(label)) return turns[i];
-        return null;
+        List<Turn> turns = actions.getTurn();
+        return turns.stream()
+                .filter(turn -> turn.getLabel().equals(label))
+                .findFirst()
+                .orElse(null);
     }
 
     private synchronized void addAction(String turn, String text, String[] command) {
         Turn t = getTurn(turn);
         Action act = new Action();
         act.setText(text);
-        if (command != null && command.length > 0) act.setCommand(command);
+        if (command != null && command.length > 0) {
+            act.getCommand().clear();
+            act.getCommand().addAll(Arrays.asList(command));
+        }
         String cur = t.getCounter();
         act.setCounter(cur);
         t.setCounter((Integer.parseInt(cur) + 1) + "");
         actions.setGameCounter((getCounter() + 1) + "");
-        t.addAction(act);
+        t.getAction().add(act);
     }
 
     public void addCommand(String turn, String text, String[] command) {
@@ -60,15 +67,15 @@ public class TurnImpl implements TurnRecorder {
         t.setCounter("1");
         t.setName(meth);
         t.setLabel(label);
-        actions.addTurn(t);
+        actions.getTurn().add(t);
     }
 
     public GameAction[] getActions(String turn) {
         Turn t = getTurn(turn);
-        Action[] acts = t.getAction();
-        GameAction[] ret = new GameAction[acts.length];
+        List<Action> acts = t.getAction();
+        GameAction[] ret = new GameAction[acts.size()];
         for (int i = 0; i < ret.length; i++) {
-            ret[i] = new GameActionImpl(acts[i], i);
+            ret[i] = new GameActionImpl(acts.get(i), i);
         }
         return ret;
     }
@@ -79,11 +86,11 @@ public class TurnImpl implements TurnRecorder {
     }
 
     public String[] getTurns() {
-        Turn[] turns = actions.getTurn();
-        String[] ret = new String[turns.length];
-        for (int i = 0; i < ret.length; i++)
-            ret[i] = turns[i].getLabel();
-        return ret;
+        List<Turn> turns = actions.getTurn();
+        return turns.stream()
+                .map(Turn::getLabel)
+                .collect(Collectors.toList())
+                .toArray(new String[turns.size()]);
     }
 
     public int getCounter() {
@@ -101,7 +108,7 @@ public class TurnImpl implements TurnRecorder {
         }
 
         public String[] command() {
-            return act.getCommand();
+            return act.getCommand().toArray(new String[act.getCommand().size()]);
         }
 
         public String getText() {
@@ -109,7 +116,7 @@ public class TurnImpl implements TurnRecorder {
         }
 
         public boolean isCommand() {
-            return act.getCommand() != null && act.getCommand().length > 0;
+            return act.getCommand() != null && act.getCommand().size() > 0;
         }
 
         public String toString() {

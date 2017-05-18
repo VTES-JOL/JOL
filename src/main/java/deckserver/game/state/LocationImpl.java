@@ -6,9 +6,11 @@
 
 package deckserver.game.state;
 
-import deckserver.dwr.Utils;
-import deckserver.game.state.model.GameCard;
-import deckserver.game.state.model.Region;
+import net.deckserver.game.jaxb.state.GameCard;
+import net.deckserver.game.jaxb.state.Region;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author administrator
@@ -33,26 +35,26 @@ public class LocationImpl implements Location {
     }
 
     public Card getCard(int index) {
-        return game.getCard(region.getGameCard(index).getId());
+        return game.getCard(region.getGameCard().get(index).getId());
     }
 
     public Card[] getCards() {
-        GameCard[] cards = region.getGameCard();
-        CardImpl[] ret = new CardImpl[cards.length];
+        List<GameCard> cards = region.getGameCard();
+        CardImpl[] ret = new CardImpl[cards.size()];
         for (int i = 0; i < ret.length; i++)
-            ret[i] = new CardImpl(game, cards[i]);
+            ret[i] = new CardImpl(game, cards.get(i));
         return ret;
     }
 
     public void setCards(Card[] cards) {
-        region.setGameCard(new GameCard[0]);
+        region.getGameCard().clear();
         for (Card card : cards) {
-            region.addGameCard(game.mkCard(card));
+            region.getGameCard().add(game.mkCard(card));
         }
     }
 
     public Card getFirstCard() {
-        return new CardImpl(game, region.getGameCard(0));
+        return new CardImpl(game, region.getGameCard().get(0));
     }
 
     public String getName() {
@@ -67,12 +69,11 @@ public class LocationImpl implements Location {
         CardImpl impl = (CardImpl) game.getCard(card.getId());
         GameCard gc = impl.gamecard;
         if (first) {
-            GameCard[] old = region.getGameCard();
-            region.setGameCard(new GameCard[0]);
-            region.addGameCard(gc);
-            for (GameCard anOld : old) region.addGameCard(gc);
+            List<GameCard> old = region.getGameCard();
+            region.getGameCard().clear();
+            region.getGameCard().add(gc);
         } else
-            region.addGameCard(gc);
+            region.getGameCard().add(gc);
     }
 
     public Note addNote(String name) {
@@ -80,15 +81,15 @@ public class LocationImpl implements Location {
     }
 
     public void initCards(String[] cardIds) {
-        region.setGameCard(new GameCard[0]);
+        region.getGameCard().clear();
         for (String cardId : cardIds) {
-            region.addGameCard(game.mkCard(cardId));
+            region.getGameCard().add(game.mkCard(cardId));
         }
     }
 
     public void removeCard(Card card) {
         CardImpl tmp = (CardImpl) game.getCard(card.getId());
-        region.removeGameCard(tmp.gamecard);
+        region.getGameCard().remove(tmp.gamecard);
     }
 
     // PENDING this should return long - the seed used to generate the shuffle, so
@@ -97,10 +98,9 @@ public class LocationImpl implements Location {
     // then get a long value from there, using that to initialize a transient Random object, from
     // which we do the shuffle.  The long value can be returned so the shuffle can be replicated.
     public void shuffle(int num) {
-        GameCard[] cards = region.getGameCard();
-        Utils.shuffle(cards, num);
-        region.setGameCard(null);
-        region.setGameCard(cards);
+        List<GameCard> cards = region.getGameCard();
+        List<GameCard> subList = cards.subList(0, num);
+        Collections.shuffle(subList);
     }
 
 }

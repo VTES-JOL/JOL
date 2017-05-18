@@ -1,6 +1,6 @@
 package deckserver.game.state;
 
-import deckserver.game.state.model.Notation;
+import net.deckserver.game.jaxb.state.Notation;
 
 import java.util.Collection;
 import java.util.LinkedList;

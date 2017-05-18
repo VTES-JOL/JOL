@@ -6,9 +6,12 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.List;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 @Ignore
 public class JaxbTest {
@@ -18,7 +21,13 @@ public class JaxbTest {
         File gameFile = new File("src/test/resources/game1/game.xml");
         GameState gameState = FileUtils.loadGameState(gameFile);
         assertNotNull(gameState);
-        assertEquals(5, gameState.getPlayer().size());
+        List<String> players = gameState.getPlayer();
+        assertThat(players.size(), is(5));
+        assertThat(players.get(0), is("Player4"));
+        assertThat(players.get(1), is("Player5"));
+        assertThat(players.get(2), is("Player2"));
+        assertThat(players.get(3), is("Player3"));
+        assertThat(players.get(4), is("Player1"));
     }
 
     @Test

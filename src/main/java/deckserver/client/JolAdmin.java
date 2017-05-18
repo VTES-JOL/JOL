@@ -11,15 +11,17 @@ import deckserver.game.cards.SearchImpl;
 import deckserver.game.state.DsGame;
 import deckserver.game.state.Game;
 import deckserver.game.state.GameImpl;
-import deckserver.game.state.model.GameState;
 import deckserver.game.turn.ActionHistory;
 import deckserver.game.turn.TurnImpl;
 import deckserver.game.turn.TurnRecorder;
-import deckserver.game.turn.model.GameActions;
-import deckserver.util.StreamReader;
+import net.deckserver.game.jaxb.FileUtils;
+import net.deckserver.game.jaxb.actions.GameActions;
+import net.deckserver.game.jaxb.state.GameState;
 import org.slf4j.Logger;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.*;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -50,15 +52,20 @@ public class JolAdmin {
     }
 
     private synchronized static String readFile(File file) throws IOException {
-        return StreamReader.read(new FileInputStream(file));
+        byte[] bytes = Files.readAllBytes(file.toPath());
+        return new String(bytes);
     }
+
+    private synchronized static String readIsoFile(File file) throws IOException {
+        byte[] bytes = Files.readAllBytes(file.toPath());
+        return new String(bytes, Charset.forName("ISO8859-1"));
+    }
+
 
     private synchronized static void writeFile(File file, String contents)
             throws IOException {
-        FileWriter out = new FileWriter(file);
-        out.write(contents);
-        out.flush();
-        out.close();
+        byte[] bytes = contents.getBytes("utf-8");
+        Files.write(file.toPath(), bytes);
     }
 
     public boolean existsPlayer(String name) {
@@ -281,8 +288,8 @@ public class JolAdmin {
         if (CARD_DATA == null) {
             logger.info("Loading Card Data");
             try {
-                String set = readFile(new File(dir + "/cards/base.txt"));
-                String prop = readFile(new File(dir + "/cards/base.prop"));
+                String set = readIsoFile(new File(dir + "/cards/base.txt"));
+                String prop = readIsoFile(new File(dir + "/cards/base.prop"));
                 CARD_DATA = new SearchImpl(set, prop);
             } catch (IOException e) {
                 throw new RuntimeException("Unable to open card files", e);
@@ -367,25 +374,15 @@ public class JolAdmin {
 
         private synchronized void loadGame(String name) {
             logger.debug("Loading game {}", name);
-            try {
-                File file = new File(getGameDir(), "game.xml");
-                InputStream in = new FileInputStream(file);
-                GameState gstate = GameState.createGraph(in);
-                in.close();
-                file = new File(getGameDir(), "actions.xml");
-                in = new FileInputStream(file);
-                GameActions gactions = GameActions.createGraph(in);
-                in.close();
-                state = new DsGame();
-                actions = new ActionHistory();
-                ModelLoader.createModel(state, new GameImpl(gstate));
-                ModelLoader.createRecorder(actions, new TurnImpl(gactions));
-                game = new JolGame(state, actions);
-            } catch (IOException ie) {
-                logger.error("Error initializing game {}", ie);
-                throw new IllegalStateException("Couldn't initialize game "
-                        + name);
-            }
+            File gameFile = new File(getGameDir(), "game.xml");
+            GameState gstate = FileUtils.loadGameState(gameFile);
+            File actionsFile = new File(getGameDir(), "actions.xml");
+            GameActions gactions = FileUtils.loadGameActions(actionsFile);
+            state = new DsGame();
+            actions = new ActionHistory();
+            ModelLoader.createModel(state, new GameImpl(gstate));
+            ModelLoader.createRecorder(actions, new TurnImpl(gactions));
+            game = new JolGame(state, actions);
         }
 
         String getHeader() {
@@ -485,40 +482,18 @@ public class JolAdmin {
             super.write();
             if (game != null) {
                 logger.info("Saving game {}", gamename);
-                GameState gstate;
-                GameActions gactions;
-                try {
-                    gstate = GameState.createGraph();
-                    gactions = GameActions.createGraph();
-                    gactions.setCounter("1");
-                    gactions.setGameCounter("1");
-                    GameImpl wgame = new GameImpl(gstate);
-                    TurnImpl wrec = new TurnImpl(gactions);
-                    ModelLoader.createModel(wgame, state);
-                    ModelLoader.createRecorder(wrec, actions);
-                    ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                    gstate.write(bout);
-                    bout.close();
-                    File file = new File(getGameDir(), "game.xml");
-                    OutputStream out = new FileOutputStream(file);
-                    out.write(bout.toByteArray());
-                    out.close();
-                    bout = new ByteArrayOutputStream();
-                    gactions.write(bout);
-                    bout.close();
-                    file = new File(getGameDir(), "actions.xml");
-                    out = new FileOutputStream(file);
-                    out.write(bout.toByteArray());
-                    out.close();
-                } catch (IOException ie) {
-                    // TODO need to shut down this game at this point, so no
-                    // futher data is lost.
-                    logger.error("Error writing game state {}", ie);
-                } catch (NullPointerException npe) {
-                    games.clear();
-                    logger.error("Schema2beans malfunction {}", npe);
-                    throw new IllegalStateException("Schema2beans malfunction");
-                }
+                GameState gstate = new GameState();
+                GameActions gactions = new GameActions();
+                gactions.setCounter("1");
+                gactions.setGameCounter("1");
+                GameImpl wgame = new GameImpl(gstate);
+                TurnImpl wrec = new TurnImpl(gactions);
+                ModelLoader.createModel(wgame, state);
+                ModelLoader.createRecorder(wrec, actions);
+                File gameFile = new File(getGameDir(), "game.xml");
+                FileUtils.saveGameState(gstate, gameFile);
+                File actionsFile = new File(getGameDir(), "actions.xml");
+                FileUtils.saveGameActions(gactions, actionsFile);
             }
         }
     }

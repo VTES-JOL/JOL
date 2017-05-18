@@ -6,14 +6,14 @@
 
 package deckserver.game.state;
 
-import deckserver.game.state.model.GameCard;
-import deckserver.game.state.model.GameState;
-import deckserver.game.state.model.Notation;
-import deckserver.game.state.model.Region;
+import net.deckserver.game.jaxb.state.GameCard;
+import net.deckserver.game.jaxb.state.GameState;
+import net.deckserver.game.jaxb.state.Notation;
+import net.deckserver.game.jaxb.state.Region;
 
-/**
- * @author administrator
- */
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Note {
 
     Notation note;
@@ -28,29 +28,29 @@ public class Note {
     public static Note mkNote(Region region, String name) {
         Notation note = new Notation();
         note.setName(name);
-        region.addNotation(note);
+        region.getNotation().add(note);
         return new Note(note);
     }
 
     public static Note mkNote(GameCard card, String name) {
         Notation note = new Notation();
         note.setName(name);
-        card.addNotation(note);
+        card.getNotation().add(note);
         return new Note(note);
     }
 
     public static Note mkNote(GameState state, String name) {
         Notation note = new Notation();
         note.setName(name);
-        state.addNotation(note);
+        state.getNotation().add(note);
         return new Note(note);
     }
 
-    public static Note[] getNotes(Notation[] notes) {
-        Note[] ret = new Note[notes.length];
-        for (int i = 0; i < ret.length; i++)
-            ret[i] = new Note(notes[i]);
-        return ret;
+    public static Note[] getNotes(List<Notation> notes) {
+        return notes.stream()
+                .map(Note::new)
+                .collect(Collectors.toList())
+                .toArray(new Note[notes.size()]);
     }
 
     public String getName() {

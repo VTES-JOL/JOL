@@ -6,13 +6,11 @@
 
 package deckserver.game.state;
 
-import deckserver.game.state.model.GameCard;
-import deckserver.game.state.model.GameState;
-import deckserver.game.state.model.Region;
+import net.deckserver.game.jaxb.state.GameCard;
+import net.deckserver.game.jaxb.state.GameState;
+import net.deckserver.game.jaxb.state.Region;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author administrator
@@ -32,10 +30,10 @@ public class GameImpl implements Game {
     }
 
     private void createCache() {
-        Region[] regions = state.getRegion();
+        List<Region> regions = state.getRegion();
         for (Region region : regions) {
             regionCache.put(region.getName(), new LocationImpl(this, region));
-            GameCard[] cards = region.getGameCard();
+            List<GameCard> cards = region.getGameCard();
             for (GameCard card : cards) {
                 cardCache.put(card.getId(), new CardImpl(this, card));
             }
@@ -57,7 +55,7 @@ public class GameImpl implements Game {
     }
 
     private LocationImpl[] getLocations(StringFilter filter) {
-        Region[] regions = state.getRegion();
+        List<Region> regions = state.getRegion();
         ArrayList<LocationImpl> list = new ArrayList<>();
         for (Region region : regions)
             if (filter.accept(region.getName())) {
@@ -85,18 +83,19 @@ public class GameImpl implements Game {
     }
 
     public String[] getPlayers() {
-        return state.getPlayer();
+        return state.getPlayer().toArray(new String[0]);
     }
 
     public void orderPlayers(String[] order) {
-        state.setPlayer(null);
-        state.setPlayer(order);
+        List<String> playerOrder = state.getPlayer();
+        playerOrder.clear();
+        playerOrder.addAll(Arrays.asList(order));
     }
 
     private LocationImpl addLocationImpl(String regionName) {
         Region region = new Region();
         region.setName(regionName);
-        state.addRegion(region);
+        state.getRegion().add(region);
         LocationImpl loc = new LocationImpl(this, region);
         regionCache.put(regionName, loc);
         return loc;
@@ -115,7 +114,7 @@ public class GameImpl implements Game {
     }
 
     public void addPlayer(String player) {
-        state.addPlayer(player);
+        state.getPlayer().add(player);
     }
 
     LocationImpl getCardContainer(CardImpl card, boolean create) {
@@ -126,11 +125,15 @@ public class GameImpl implements Game {
     }
 
     CardContainer getContainer(CardImpl card) {
-        Region region = (Region) card.gamecard.parent();
-        String name = region.getName();
-        if (name.startsWith("ZZZ"))
-            return (CardContainer) getCard(getCardIdFromRegionName(name));
-        else return regionCache.get(name);
+        Optional<String> parentRegion = state.getRegion().stream()
+                .filter(region -> region.getGameCard().contains(card.gamecard))
+                .findFirst()
+                .map(Region::getName);
+        return parentRegion.map(regionName -> {
+            if (regionName.startsWith("ZZZ")) {
+                return getCard(getCardIdFromRegionName(regionName));
+            } else return regionCache.get(regionName);
+        }).orElseThrow(() -> new IllegalArgumentException("Card doesn't have a parent region"));
     }
 
     private String getCardIdFromRegionName(String name) {

@@ -2,7 +2,6 @@ package deckserver.game.cards;
 
 import org.slf4j.Logger;
 
-import java.io.InputStream;
 import java.io.LineNumberReader;
 import java.io.StringReader;
 import java.util.*;
@@ -26,7 +25,6 @@ public class SearchImpl implements CardSearch {
     }
 
     private void readCards(String file) {
-        InputStream in = null;
         try (StringReader r = new StringReader(file);
              LineNumberReader reader = new LineNumberReader(r)) {
             List<CardEntry> cardEntries = CardEntryDetail.readCards(map, reader);

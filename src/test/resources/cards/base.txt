@@ -32857,180 +32857,152 @@ Discipline: pot AUS NEC
 Sabbat: When Zygodat successfully bleeds a Methuselah, she may burn the top two cards of that Methuselah's library.
 Artist: Sam Araya
 
-
 Name: Agi
-[Bl2017:V]
+[BL2017:V]
 Cardtype: Vampire
 Clan: Blood Brother
 Group: 6
 Capacity: 6
 Discipline: FOR SAN VIC
-Sabbat. Budapest circle: Cards requiring Sanguinus cost Agi 1 less blood. Sterile
+Sabbat. Budapest circle: Cards requiring Sanguinus [san] cost Agi 1 less blood. Sterile.
 
-Name: Dorka
-[Bl2017:V]
-Cardtype: Vampire
-Clan: Blood Brother
-Group: 6
-Capacity: 4
-Discipline: for san vic
-Sabbat. Budapest circle: Dorka can enter combat with a minion controlled by your predator or prey as a D action. Sterile.
-
-Name: Gabi
-[Bl2017:V]
-Cardtype: Vampire
-Clan: Blood Brother
-Group: 6
-Capacity: 5
-Discipline: for SAN VIC
-Sabbat. Budapest circle: A minion opposing Gabi cannot strike: dodge during the first round of combat.  Sterile.
-
-Name: Viri
-[Bl2017:V]
-Cardtype: Vampire
-Clan: Blood Brother
-Group: 6
-Capacity: 3
-Discipline: san vic
-Sabbat. Budapest circle: +1 strength. Sterile
-
-Name: Zizi
-[Bl2017:V]
-Cardtype: Vampire
-Clan: Blood Brother
-Group: 6
-Capacity: 2
-Discipline: san
-Sabbat. Budapest circle; Zizi can lock to give another ready Blood Brother in the same circle 1 level of a Discipline she has until the end of the turn. Sterile.
-
-Name: Alabastrom
-[Bl2017:V]
-Cardtype: Vampire
-Clan: Gargoyle
-Group: 6
-Capacity: 7
-Discipline: aus cel for POT VIS
-Independent anarch: During your turn, you can unlock another Gargoyle you control. Flight.
-
-Name: Chalcedony
-[Bl2017:V]
-Cardtype: Vampire
-Clan: Gargoyle
-Group: 6
-Capacity: 8
-Discipline: FOR POT THA VIS
-Camarilla. Tremere slave.  Cards requring Visceratika cost Chalcendoy 1 less blood.  Recruiting gargoyle creature allies and employing gargoyle creature retainers cost her 1 less blood or pool.  Flight.
-
-Name: Porphyry
-[Bl2017:V]
-Cardtype: Vampire
-Clan: Gargoyle
-Group: 6
-Capacity: 4
-Discipline: vis POT
-Camarilla. Tremere slave: Porphyry gets +1 bleed for each location controlled by the target of the bleed.  Flight.
-
-Name: Sheela Na Gig
-[Bl2017:V]
-Cardtype: Vampire
-Clan: Gargoyle
-Group: 5
-Capacity: 2
-Discipline: vis
-Sabbat. Tremere antitribu slave: Flight.
-
-Name: Verbruch
-[Bl2017:V]
-Cardtype: Vampire
-Clan: Gargoyle
-Group: 5
-Capacity: 5
-Discipline: vis FOR POT
-Camarilla. Tremere slave: When Verbruch enters play, you can search your crypt for a Tremere vampire and move him or her to your uncontrolled region (shuffle afterward). Flight.
-
-Name: Angelique, Guardian of the Necropoli
-[Bl2017:V]
+Name: Angelique
+[BL2017:V]
 Cardtype: Vampire
 Clan: Harbinger of Skulls
 Group: 6
 Capacity: 9
 Discipline: AUS FOR NEC SER THA
-Sabbat: While Angelique is ready, if a vampire you control is burned, move him or her to your uncontrolled region.  She gets +1 bleed against a Methuselah who controls a ready Giovanni.
+Sabbat: While Angelique is ready, cards requiring Necromancy [nec] cost Harbingers of Skulls you control 1 less blood.
+
+Name: Castiel
+[BL2017:V]
+Cardtype: Vampire
+Clan: Salubri antitribu
+Group: 3
+Capacity: 6
+Discipline: for AUS VAL
+Sabbat: If Castiel does not have a melee weapon before range is determined, he can equip with a melee weapon from your hand (requirements and cost apply as normal).
+
+Name: Chalcedony
+[BL2017:V]
+Cardtype: Vampire
+Clan: Gargoyle
+Group: 6
+Capacity: 8
+Discipline: FOR POT THA VIS
+Camarilla. Tremere slave: Gargoyle creature allies and gargoyle creature retainers cost Chalcedony 1 less blood or pool. Flight [FLIGHT].
+
+Name: Dorka
+[BL2017:V]
+Cardtype: Vampire
+Clan: Blood Brother
+Group: 6
+Capacity: 4
+Discipline: for san vic
+Sabbat. Budapest circle: Dorka can enter combat with a minion controlled by your predator or prey as a (D) action. Sterile.
+
+Name: Erebus
+[BL2017:V]
+Cardtype: Vampire
+Clan: Harbinger of Skulls
+Group: 3
+Capacity: 7
+Discipline: dem AUS FOR NEC
+Independent: Wraith allies and wraith retainers cost Erebus 1 less blood or pool.
 
 Name: Erlik
-[Bl2017:V]
+[BL2017:V]
 Cardtype: Vampire
 Clan: Harbinger of Skulls
 Group: 3
 Capacity: 10
 Discipline: AUS CEL FOR NEC THN
-Sabbat: When Erlik enters play, you can distribute up to 5 blood from him to any of your uncontrolled Harbingers of Skulls. +1 bleed. +1 hand size.
+Sabbat: When Erlik enters play, you can distribute up to 5 blood from him to any Harbingers of Skulls in your uncontrolled region. +1 bleed. +1 hand size.
+
+Name: Gabi
+[BL2017:V]
+Cardtype: Vampire
+Clan: Blood Brother
+Group: 6
+Capacity: 5
+Discipline: for SAN VIC
+Sabbat. Budapest circle: Minions opposing Gabi cannot strike: dodge during the first round of combat. Sterile.
+
+Name: Handsome Dan
+[BL2017:V]
+Cardtype: Vampire
+Clan: Gargoyle
+Group: 6
+Capacity: 5
+Discipline: cel for obf pot vis
+Independent anarch: Flight [FLIGHT].
 
 Name: Hecate
-[Bl2017:V]
+[BL2017:V]
+Cardtype: Vampire
+Clan: Harbinger of Skulls
+Group: 5
+Capacity: 6
+Discipline: AUS FOR NEC
+Sabbat: After resolution of a successful bleed by Hecate, burn the top card of the target Methuselah's library.
+
+Name: Jean Lisle
+[BL2017:V]
+Cardtype: Vampire
+Clan: Samedi
+Group: 6
+Capacity: 8
+Discipline: pot FOR OBF THN
+Independent: Once each round of combat, Jean can burn 1 blood to make the damage from his hand strikes aggravated that round.
+
+Name: Khurshid
+[BL2017:V]
 Cardtype: Vampire
 Clan: Harbinger of Skulls
 Group: 6
-Capacity: 6
-Discipline: AUS FOR NEC
-Sabbat: When Hecate sucessfully bleeds, burn the top card of the target Methuselah's library.
-
-Name: Castiel
-[Bl2017:V]
-Cardtype: Vampire
-Clan: Salubri Antitribu
-Group: 3
-Capacity: 6
-Discipline: for AUS VAL
-Sabbat: If Castiel does not have a melee weapon before range is determined, he can equip with a melee weapon from your hand (requirements and cost apply as normal)
+Capacity: 8
+Discipline: AUS FOR NEC POT
+Sabbat: +2 strength.
 
 Name: Lailah
-[Bl2017:V]
+[BL2017:V]
 Cardtype: Vampire
-Clan: Salubri Antitribu
+Clan: Salubri antitribu
 Group: 6
 Capacity: 4
 Discipline: aus VAL
 Sabbat.
 
-Name: Michaela
-[Bl2017:V]
-Cardtype: Vampire
-Clan: Salubri Antitribu
-Group: 5
-Capacity: 7
-Discipline: AUS FOR PRE VAL
-Sabbat: Once each combat, Michaela can burn 1 blood to cancel a grapple or aim card as it is played by an opposing minion.
-
-Name: Nuriel
-[Bl2017:V]
-Cardtype: Vampire
-Clan: Salubri Antitribu
-Group: 6
-Capacity: 8
-Discipline: dom pot AUS FOR VAL
-Sabbat: Nuriel gets 1 optional additional strike during the first round of combat.  He inflicts +1 damage with melee weapons.
-
 Name: Mambo Jeanne
-[Bl2017:V]
+[BL2017:V]
 Cardtype: Vampire
 Clan: Samedi
 Group: 6
 Capacity: 9
 Discipline: FOR NEC OBF THN
-Independent: Minions opposing Jeanne take 2R damage each round of combat during normal strike resolution. +1 bleed.
+Independent: Minions opposing Jeanne take 2 environmental damage each round during normal strike resolution at close range. +1 bleed.
 
 Name: Marie-Pierre
-[Bl2017:V]
+[BL2017:V]
 Cardtype: Vampire
 Clan: Samedi
 Group: 6
 Capacity: 4
-Discipline: NEC THN
+Discipline: for nec THN
 Independent: Marie-Pierre can lock after a combat involving a Samedi you control to enter combat with the opposing minion. -1 stealth.
 
+Name: Michaela
+[BL2017:V]
+Cardtype: Vampire
+Clan: Salubri antitribu
+Group: 5
+Capacity: 7
+Discipline: AUS FOR VAL
+Sabbat: Once each combat, Michaela can burn 1 blood to cancel a grapple or aim card as it is played by an opposing minion, and its cost is not paid.
+
 Name: Mister Schwartz
-[Bl2017:V]
+[BL2017:V]
 Cardtype: Vampire
 Clan: Samedi
 Group: 6
@@ -33038,148 +33010,222 @@ Capacity: 6
 Discipline: for obf NEC THN
 Camarilla.
 
-Name: Archilles Heel
-[Bl2017:U]
-Cardtype: Combat
-Unique. Only usable if this Blood Brother is ready and the opposing minion is not.
-Put this card in play.  Blood Brothers of the same circle as this one get +1 bleed.  Burn this card during your unlock phase.
+Name: Nuriel
+[BL2017:V]
+Cardtype: Vampire
+Clan: Salubri antitribu
+Group: 6
+Capacity: 8
+Discipline: cel dom AUS FOR VAL
+Sabbat: Nuriel gets 1 optional additional strike (limited) during the first round of combat. He inflicts +1 damage with melee weapons.
+
+Name: Porphyry
+[BL2017:V]
+Cardtype: Vampire
+Clan: Gargoyle
+Group: 6
+Capacity: 4
+Discipline: vis POT
+Camarilla. Tremere slave: When bleeding, Porphyry gets +1 bleed for each location controlled by the target Methuselah. Flight [FLIGHT].
+
+Name: Sheela Na Gig
+[BL2017:V]
+Cardtype: Vampire
+Clan: Gargoyle
+Group: 5
+Capacity: 2
+Discipline: vis
+Sabbat. Tremere antitribu slave: Flight [FLIGHT].
+
+Name: Verbruch
+[BL2017:V]
+Cardtype: Vampire
+Clan: Gargoyle
+Group: 5
+Capacity: 5
+Discipline: vis FOR POT
+Camarilla. Tremere slave: When Verbruch enters play, you can search your crypt for a Tremere, reveal them, and move them to your uncontrolled region (shuffle afterward). Flight [FLIGHT].
+
+Name: Viri
+[BL2017:V]
+Cardtype: Vampire
+Clan: Blood Brother
+Group: 6
+Capacity: 3
+Discipline: san vic
+Sabbat. Budapest circle: If Zizi is in your ready region, Viri gets +1 strength. Sterile.
+
+Name: Zizi
+[BL2017:V]
+Cardtype: Vampire
+Clan: Blood Brother
+Group: 6
+Capacity: 3
+Discipline: san vic
+Sabbat. Budapest circle: If Viri is in your ready region, Zizi can lock to unlock another Blood Brother of the same circle. Sterile.
+
+Name: Acheron Vortex
+[BL2017:C]
+Cardtype: Action Modifier
+Clan: Harbinger of Skulls
+Minions without Necromancy [nec] or Obtenebration [obt] get -1 intercept.
+
+Name: Achilles Heel
+[BL2017:C]
+Cardtype: Master
+Clan: Blood Brother
+Unique master.
+Put this card on a vampire controlled by another Methuselah, and choose a circle. While this vampire is in torpor, Blood Brothers of the chosen circle get +1 bleed. Any minion can burn this card as a (D) action.
 
 Name: Alvusia
-[Bl2017:U]
+[BL2017:C]
 Cardtype: Master
 Clan: Tremere
-Unique.  Put this card in play with X counters, where X is the total number of Tremere and Gargoyles you control.  Once each action, you can burn 1 counter from this card to give a slave Gargoyle you control +1 bleed or +1 strength.  Burn this card when it has no counters, or if you do not control any Tremere.
+Unique.
+Put this card in play with 1 counter for each Tremere and Gargoyle you control. Once each action, you can burn 1 counter from this card to give a slave Gargoyle you control +1 bleed or +1 strength. Burn this card 	 it has no counters, or if you do not control any Tremere.
 
 Name: Blade of Bellona
-[Bl2017:U]
+[BL2017:C]
 Cardtype: Equipment
-Clan: Salubri Antitribu
+Clan: Salubri antitribu
 Melee weapon.
 Strike: strength +1 damage, with 1 optional maneuver each combat, only usable to maneuver to close range.
 
 Name: Blessed Blade
-[Bl2017:U]
+[BL2017:C]
 Cardtype: Combat
 Discipline: Valeren
-[val] [REFLEX]: Cancel a grapple card played by the opposing minion.
+[val][REFLEX] Cancel a grapple card played by the opposing minion.
 [val] Strike: use a melee weapon strike at +2 damage.
 [VAL] Strike: use a melee weapon strike at +3 damage.
 
 Name: Blessings of the Loa
-[Bl2017:U]
-Cardtype: Master
-Burn Option
+[BL2017:C]
+Cardtype: Action
 Clan: Samedi
-Unique.  Samedi you control get +1 bleed against your prey for each vampire in torpor he or she controls.
+(D) Bleed at +1 bleed, with an additional +1 bleed for each vampire in the target Methuselah's torpor region.
 
 Name: Blood Buff
-[Bl2017:U]
+[BL2017:C]
 Cardtype: Master
-Trifle. Put this card on a ready Blood Brother you control.  This Blood Brother gets +1 level of Sanguinus.
+Clan: Blood Brother
+Trifle.
+Put this card on a ready Blood Brother you control. This Blood Brother gets +1 level of Sanguinus [san].
 
 Name: Camaraderie
-[Bl2017:U]
+[BL2017:C]
 Cardtype: Reaction
 Discipline: Sanguinus
-[san] Lock X other ready Blood Brothers you control of the same circle as this one to give this Blood Brother X+1 intercept.  If this vampire blocks, you can unlock one of those Blood Brothers.
-[SAN} As above, but unlock two of those Blood Brothers if this vampire blocks.
+[san] Lock X other ready Blood Brothers you control of the same circle as this one to give this Blood Brother +X+1 intercept. If this vampire blocks, you can unlock one of those Blood Brothers.
+[SAN] As above, but unlock two of those Blood Brothers if this vampire blocks.
 
 Name: Children of Stone
-[Bl2017:U]
+[BL2017:C]
 Cardtype: Action
-Discipline: Visceratika/Thaumaturgy
+Discipline: Thaumaturgy/Visceratika
 +2 stealth action.
-[tha] Equip with an equipment card from your hand and reduce it's cost by 1 pool or 1 blood (requirements apply as normal).
-[vis] Search your hand or library for a gargoyle creature retainer and employ that retainer (requirements and cost apply as normal, shuffle afterwards).
-[VIS] As [vis] above, but reduce the cost by 1 pool or blood.
+[tha] Equip with an equipment card from your hand, and reduce its cost by 1 pool or 1 blood (requirements apply as normal).
+[vis] Search your hand or library for a gargoyle creature retainer, and employ that retainer (requirements and cost apply as normal; shuffle afterwards).
+[VIS] As [vis] above, but reduce the cost by 1 blood or pool.
+
+Name: Disciple of Lazarus
+[BL2017:C]
+Cardtype: Action
+Clan: Harbinger of Skulls
++1 stealth action.
+Add 2 blood to a younger Harbinger of Skulls in your uncontrolled region.
 
 Name: Embalm
-[Bl2017:U]
+[BL2017:C]
 Cardtype: Action
-Discipline: Fortitude & Necromancy
+Discipline: Fortitude/Necromancy
 +1 stealth action.
-[for][nec] Put this card on a zombie or mummy ally you control and unlock this vampire.  This ally can burn this card to prevent all damage from an opposing minion's strike.
-[FOR][NEC] As above, and the chosen ally gains 1 life when this card is played (even if this would exceed his or her starting life).
+[for][nec] Unlock this vampire, and put this card on a zombie or mummy ally you control. This ally can burn this card to prevent all damage from an opposing minion's strike.
+[FOR][NEC] As above, and add 1 life to the attached ally when this card is played (even if this would exceed their starting life).
+
+Name: Emerald Legionnaire
+[BL2017:C]
+Cardtype: Ally
+Clan: Harbinger of Skulls
+Cost: 1 pool
+Wraith with 2 life. 2 strength, 1 bleed.
+During your unlock phase, you can remove 7 cards in your ash heap from the game to move an Emerald Legionnaire from your ash heap to the ready region with 2 life.
 
 Name: Hunky Punk
-[Bl2017:U]
+[BL2017:C]
 Cardtype: Ally
-Clan: Tremere/Tremere Antitribu
+Clan: Tremere/Tremere antitribu
 Cost: 1 pool
-Gargoyle creature with 2 life. 1 strength and 0 bleed.
-After recruiting this ally, the acting vampire unlocks.  Burn Hunky Punk during a (D) action against a location you control to have the action fail.
+Unique gargoyle creature with 2 life. 1 strength, 0 bleed.
+Once each action, if a Gargoyle you control blocks, you can lock a location you control to inflict 1 unpreventable environmental damage on the acting minion before combat (if any).
+
+Name: I Am the Keystone
+[BL2017:C]
+Cardtype: Combat
+Discipline: Visceratika
+Only usable before range is determined. A vampire can play only one I Am the Keystone each round.
+[vis] This vampire gets +1 strength and can prevent 1 damage this round.
+[VIS] This vampire gets +1 level of Potence [pot] and +1 level of Fortitude [for] this combat.
 
 Name: Inevitability of the Void
-[Bl2017:U]
+[BL2017:C]
 Cardtype: Action Modifier
-Discipline: Necromancy & Auspex
-Only usable during a bleed action.  You cannot play another action modifier to increase this bleed amount.
-[aus][nec] +1 bleed
-[AUS][NEC] +1 bleed for every 10 cards in the ash heap of the target of the bleed.
-
-Name: Memories of Betrayal
-[Bl2017:U]
-Cardtype: Reaction
-Discipline: Necromancy & Auspex
-Only usable during a D action against you.  Only one Memories of Betrayal can be played each action.
-[aus][nec] The action ends unsuccessfully.  The acting minion can discard 1 card at random to cancel this card as it is played.
-[AUS][NEC] As above, but the acting minion must discard 3 cards at random to cancel this card as it is played.
+Discipline: Auspex/Necromancy
+Only usable during a bleed action (limited).
+[aus][nec] +1 bleed.
+[AUS][NEC] +1 bleed for every 10 cards in the ash heap of the target Methuselah.
 
 Name: Necrosis
-[Bl2017:U]
+[BL2017:C]
 Cardtype: Combat
 Discipline: Potence/Thanatosis
 [pot] Strike: hand strike at +1 damage.
 [thn] Strike: hand strike at +2 damage.
-[THN] As [thn] above, and the opposing vampire takes 1 unpreventable damage during the press step this round.
-
-Name: Pillar of Salt
-[Bl2017:U]
-Cardtype: Action
-Discipline: Potence/Valeren
-[pot] (D) Inflict 1 unpreventable damage on a ready minion.
-[val] (D) Burn a vampire in torpor (this is not considered diablerie).
-[VAL] As [val] above and that vampire's controller burns 2 pool.
+[THN] As [thn] above, and the opposing vampire takes 1 unpreventable environmental damage during the press step this round.
 
 Name: Relentless Reaper
-[Bl2017:U]
+[BL2017:C]
 Cardtype: Combat
-Discipline: Fortitude/Thanatosis
-[for] Prevent 1 damage.
+Discipline: Potence/Thanatosis
+[pot] Press.
 [thn] Press.
-[THN] Only usable at the end of a round when both combatants are still ready and the combat is about to end.  The round ends, but combat does not end; another round starts.
+[THN] Only usable at the end of a round when both combatants are still ready and combat is about to end. The round ends, but combat does not end; another round starts.
+
+Name: Remain At Rest
+[BL2017:C]
+Cardtype: Action
+Discipline: Potence/Valeren
+[pot] (D) Inflict 2 unpreventable damage on a minion in torpor.
+[val] (D) Put this card on a vampire in torpor. Actions that would move the attached vampire to the ready region cost 1 additional blood.
+[VAL] As above, but those actions cost 2 additional blood.
 
 Name: Righteous Aura
-[Bl2017:U]
+[BL2017:C]
 Cardtype: Combat
-Clan: Salubri Antitribu
+Clan: Salubri antitribu
 Only usable if this vampire is ready and the opposing minion is not.
-Put this card on this vampire.  This vampire gets +2 bleed.  Burn this card if this vampire leaves the ready region.  A vampire can have only one Righteous Aura.
-
-Name: Stygian Servant
-[Bl2017:U]
-Cardtype: Ally
-Clan: Harbinger of Skulls
-Wraith with 2 life. 2 strength, 1 bleed.
-During your unlock phase, you can remove 7 cards in your ash heap from the game to move a Stygian Servant from your ash heap to the ready region with 2 life.
+Put this card on this vampire. This vampire gets +2 bleed. Burn this card if this vampire leaves the ready region. A vampire can have only one Righteous Aura.
 
 Name: Their Master's Voice
-[Bl2017:U]
+[BL2017:C]
 Cardtype: Reaction
-Clan: Tremere/Tremere Antitribu
-unlock a ready slave Gargoyle you control.
+Clan: Tremere/Tremere antitribu
+Usable by a locked vampire.
+Unlock a ready slave Gargoyle you control.
 
 Name: Unleash the Hounds
-[Bl2017:U]
+[BL2017:C]
 Cardtype: Action Modifier
 Discipline: Dominate/Visceratika
-[dom] +1 bleed.  You cannot play another action modifier to increase this bleed amount.
-[vis] As [dom] above.
-[VIS] This slave Gargoyle gets +1 bleed for each vampire of the enslaving clan you control.
+Only usable during a bleed action (limited).
+[dom] +1 bleed.
+[vis] +1 bleed.
+[VIS] Only usable by a slave Gargoyle. +1 bleed for each ready vampire of the enslaving clan you control.
 
-Name: Warding the Threshold
-[BL2017:U]
-Cardtype: Reaction
-Only usable by Gargoyle enslaved to a vampire you control who blocks an action, before combat (if any).
-Cancel the combat (if any), do not lock the blocking vampire, and this slave Gargoyle enters combat with the acting minion instead.
-
+Name: Vengeful Spirit
+[BL2017:C]
+Cardtype: Retainer
+Clan: Harbinger of Skulls
+Cost: 1 blood
+Wraith with 2 life.
+The employer gets +1 bleed. Vengeful Spirit inflicts 1 damage on the opposing minion each round of combat during normal strike resolution at close range.

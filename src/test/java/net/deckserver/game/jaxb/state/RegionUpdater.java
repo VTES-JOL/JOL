@@ -58,10 +58,9 @@ public class RegionUpdater {
 
     private void assertRegionsValid(File gameFile) {
         GameState gameState = FileUtils.loadGameState(gameFile);
-        List<Player> players = gameState.getPlayer();
+        List<String> players = gameState.getPlayer();
         List<String> gameRegions = gameState.getRegion().stream().map(Region::getName).collect(Collectors.toList());
-        players.stream()
-                .map(Player::getvalue)
+        players
                 .forEach(playerName -> {
                     List<String> regionNames = Arrays.stream(REGIONS)
                             .map(region -> playerName + "'s " + region)

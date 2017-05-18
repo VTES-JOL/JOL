@@ -34,13 +34,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Player }
-     */
-    public Player createPlayer() {
-        return new Player();
-    }
-
-    /**
      * Create an instance of {@link Region }
      */
     public Region createRegion() {
