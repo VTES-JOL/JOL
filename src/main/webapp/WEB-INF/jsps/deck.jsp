@@ -25,7 +25,7 @@
             </select>
             <select title="Choose deck" id="regdecks">
             </select>
-            <button onclick="doRegister();">Register</button>
+            <button onclick="doRegister();" class="btn-vtes-default">Register</button>
         </td>
         <td width="40%">
             <table width="100%">
@@ -36,8 +36,8 @@
                     </td>
                     <td align="right">
                         <div id="noedit">
-                            <button onclick="doEdit();">Edit</button>
-                            <button onclick="doNewDeck();">New</button>
+                            <button class="btn-vtes-default" onclick="doEdit();">Edit</button>
+                            <button class="btn-vtes-default" onclick="doNewDeck();">New</button>
                         </div>
                         <div id="deckedit" style="display :none;">
                             <button onclick="doSave();">Save</button>
@@ -52,7 +52,7 @@
                     <td align=right>
                         <label for="shuffle">Shuffle:</label>
                         <input type="checkbox" id="shuffle" name="shuffle" value="yes"/>
-                        <button id="adjust" onclick="doAdjust();">Parse deck</button>
+                        <button class="btn-vtes-default" id="adjust" onclick="doAdjust();">Parse deck</button>
                     </td>
                 </tr>
             </table>
@@ -78,7 +78,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <button>Search cards</button>
+                            <button class="btn-vtes-default">Search cards</button>
                         </td>
                     </tr>
                 </table>

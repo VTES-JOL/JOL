@@ -3,14 +3,16 @@
 <div id="topbar">
     <table width="100%">
         <tr>
-            <td align="left">
-                <div id="title">V:TES Online</div>
+            <td width="25%" align="left">
+                <h2 id="title">V:TES Online</h2>
             </td>
-            <td align="center">
-                <div id="buttons"></div>
+            <td width="50%" align="left">
+                <div id="buttons">
+                </div>
+                <div id="clockdiv" style="display: none;"></div>
             </td>
-            <td align="right">
-                <form method="post">
+            <td width="20%" align="right">
+                <form method="post" style="display: inline;">
                     <span id="logininputs">
                         <label for="dsuserin">Login:</label>
                         <input type="text" size=15 id="dsuserin" name="dsuserin"/>
@@ -20,7 +22,7 @@
                     <span id="loggedin">
                         <span id="username"></span> is logged in.
                     </span>
-                    <input type="submit" id="login" name="login" value="Log in"/>
+                    <input type="submit" class="btn-vtes-default" id="login" name="login" value="Log in"/>
                 </form>
             </td>
         </tr>

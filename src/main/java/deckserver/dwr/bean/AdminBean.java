@@ -29,6 +29,7 @@ public class AdminBean {
     private String[] admins = new String[0];
 
     private File chatPersistenceFile = new File(System.getProperty("jol.data"), "global_chat.txt");
+    private String message;
 
     public AdminBean() {
         try {
@@ -201,4 +202,11 @@ public class AdminBean {
         }
     }
 
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 }

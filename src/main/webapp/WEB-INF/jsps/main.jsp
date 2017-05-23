@@ -53,7 +53,7 @@
                 <h3>TEST SERVER - DATA ON THIS SERVER SUBJECT TO CHANGE</h3>
             </c:if>
 
-            <div id="clockdiv" style="display: none;"></div>
+            <div id="messages" style="display: none;"></div>
 
             <div id="globalchat" style="display: none;">
                 <p>Now logged on: <span id="whoson"></span></p>
