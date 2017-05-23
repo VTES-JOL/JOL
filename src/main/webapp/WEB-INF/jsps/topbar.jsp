@@ -14,10 +14,8 @@
             <td width="20%" align="right">
                 <form method="post" style="display: inline;">
                     <span id="logininputs">
-                        <label for="dsuserin">Login:</label>
-                        <input type="text" size=15 id="dsuserin" name="dsuserin"/>
-                        <label for="dspassin">Password:</label>
-                        <input type="password" size=15 id="dspassin" name="dspassin"/>
+                        <input type="text" size=15 id="dsuserin" name="dsuserin" placeholder="Username"/>
+                        <input type="password" size=15 id="dspassin" name="dspassin" placeholder="Password"/>
                     </span>
                     <span id="loggedin">
                         <span id="username"></span> is logged in.
