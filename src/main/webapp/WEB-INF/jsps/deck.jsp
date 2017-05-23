@@ -21,9 +21,9 @@
             <table id="opengames" border="1" cellspacing="1" cellpadding="1" width="100%">
             </table>
             <label for="reggames">Register for game:</label>
-            <select title="reggames" id="reggames">
+            <select class="btn-vtes-default" title="reggames" id="reggames">
             </select>
-            <select title="Choose deck" id="regdecks">
+            <select class="btn-vtes-default" title="Choose deck" id="regdecks">
             </select>
             <button onclick="doRegister();" class="btn-vtes-default">Register</button>
         </td>
@@ -63,7 +63,7 @@
                             <label for="cardtype">Type:</label>
                         </td>
                         <td>
-                            <select id="cardtype">
+                            <select class="btn-vtes-default" id="cardtype">
                                 <option value="All">All</option>
                             </select>
                         </td>
@@ -99,7 +99,7 @@
             </div>
             <hr/>
             <p>Card Texts:</p>
-            <select id="deckcards" onchange="selectCardDeck()"></select>
+            <select class="btn-vtes-default"  id="deckcards" onchange="selectCardDeck()"></select>
             <input type="hidden" id="cardSelect" value="history"/>
             <div class="history" id="cardtext"></div>
         </td>

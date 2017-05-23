@@ -5,6 +5,6 @@
 <table id="gameadmintable" width="100%">
 </table>
 <br/>
-<select id="endgameselector">
+<select class="btn-vtes-default" id="endgameselector">
 </select>
 <button class="btn-vtes-default" onclick="closeGame()">End games</button>
