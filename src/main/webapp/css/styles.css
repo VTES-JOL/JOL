@@ -120,7 +120,32 @@ span.edge {
     font-weight: bold;
 }
 
+#buttons {
+    display: inline;
+}
+
+.btn-vtes-default {
+    //background-color: darkslategrey;
+    //color: white;
+    padding: 0.3em;
+}
+
+.btn-vtes-info {
+    background-color: rgba(27, 45, 45, 0.98);
+    color: white;
+    padding: 0.3em;
+}
+
 #clockdiv {
-    background-color: antiquewhite;
+    display: inline;
+}
+
+#messages {
+    background-color: darkslategrey;
+    color: white;
     padding: 1em;
+}
+
+#globalchat {
+    clear: both;
 }

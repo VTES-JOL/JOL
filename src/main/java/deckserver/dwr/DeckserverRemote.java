@@ -55,6 +55,11 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
+    public Map<String, Object> setMessage(String message) {
+        abean.setMessage(message);
+        return UpdateFactory.getUpdate();
+    }
+
     public Map<String, Object> endGame(String name) {
         endGameImpl(name);
         return UpdateFactory.getUpdate();

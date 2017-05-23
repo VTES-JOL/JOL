@@ -11,7 +11,7 @@
                             <label for="phase">Phase:</label>
                         </td>
                         <td>
-                            <select id="phase" name="phase"></select>
+                            <select class="btn-vtes-default" id="phase" name="phase"></select>
                         </td>
                     </tr>
                     <tr>
@@ -35,7 +35,7 @@
                             <label for="ping">Ping:</label>
                         </td>
                         <td>
-                            <select id="ping" name="ping"></select>
+                            <select class="btn-vtes-default" id="ping" name="ping"></select>
                         </td>
                     </tr>
                     <tr id="endcommand">
@@ -43,7 +43,7 @@
                             <label for="endturn">End turn?</label>
                         </td>
                         <td>
-                            <select id="endturn" name="endturn">
+                            <select class="btn-vtes-default" id="endturn" name="endturn">
                                 <option value="No">No</option>
                                 <option value="Yes">Yes</option>
                             </select>
@@ -89,12 +89,12 @@
             <span>Current Turn: <span id="turnlabel"></span></span>
         </td>
         <td align="left">
-            <select title="cards" id="cards" name="cards" onchange="selectCard()">
+            <select class="btn-vtes-default" title="cards" id="cards" name="cards" onchange="selectCard()">
                 <option value="NOCARD">Show history</option>
             </select>
         </td>
         <td align="right">
-            <span>Turn selector:<select title="turns" id="turns" name="turns" onchange="getHistory()"></select></span>
+            <span>Turn selector:<select class="btn-vtes-default" title="turns" id="turns" name="turns" onchange="getHistory()"></select></span>
         </td>
     </tr>
     <tr>

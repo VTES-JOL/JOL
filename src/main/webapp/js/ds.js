@@ -48,7 +48,7 @@ function doButtons(data) {
     var buttons = dwr.util.getValue('buttons', {escapeHtml: false});
     for (var prop in data) {
         if (data.hasOwnProperty(prop)) {
-            buttons += '<button onclick="doNav(' + "'" + prop + "'" + ');">' + data[prop] + "</button>";
+            buttons += '<button class="btn-vtes-default" onclick="doNav(' + "'" + prop + "'" + ');">' + data[prop] + "</button>";
         }
     }
     dwr.util.setValue('buttons', buttons, {escapeHtml: false});
@@ -86,7 +86,7 @@ function navigate(data) {
         dwr.util.setValue('login', 'Log in');
         dwr.util.byId('gameRow').style.display = "none";
     } else {
-        dwr.util.setValue('loggedin', data.player + ' is logged in');
+        dwr.util.setValue('loggedin', data.player);
         toggleVisible('loggedin', 'logininputs');
         dwr.util.setValue('login', 'Log out');
         dwr.util.byId('gameRow').style.display = "";
@@ -138,6 +138,16 @@ function renderOnline(div, who) {
         return;
     }
     dwr.util.setValue(div, who.join(', '));
+}
+
+function renderMessage(message) {
+    if (message !== null && message !== "") {
+        dwr.util.byId('messages').style.display = "";
+        dwr.util.setValue('messages', message);
+        console.log(message);
+    } else {
+        dwr.util.byId('messages').style.display = "none";
+    }
 }
 
 function renderActiveGames(games) {
@@ -532,6 +542,7 @@ function callbackMain(data) {
         renderOnline('adson', data.admins);
         renderMyGames(data.myGames);
         renderActiveGames(data.games);
+        renderMessage(data.message);
         if (data.refresh > 0) {
             refresher = setTimeout("DS.doPoll({callback: playerMap, errorHandler: errorhandler})", data.refresh);
         }
@@ -583,10 +594,10 @@ function callbackStatus(data) {
         clearInterval(timeInterval);
         timeInterval = setInterval(function () {
             var t = getTimeRemaining(data);
-            clockDiv.innerHTML = 'System restart in ' + t.days + 'd ' +
+            clockDiv.innerHTML = '<button class="btn-vtes-info">System restart in ' + t.days + 'd ' +
                 t.hours + 'h ' +
                 t.minutes + 'm ' +
-                t.seconds + 's';
+                t.seconds + 's' + "</button>";
             if (t.total <= 0) {
                 clearInterval(timeInterval);
                 clockDiv.style.display = 'none';

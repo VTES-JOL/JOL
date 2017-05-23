@@ -20,15 +20,9 @@ public class MainBean {
     private SummaryBean[] games;
     private String[] chat;
     private int refresh = 0;
-    private NewsBean[] news;
     private String stamp;
     private String[] remGames;
-
-    {
-        news = new NewsBean[]{
-                new NewsBean("https://www.facebook.com/groups/jolstatus/", "JOL Status Facebook Group")
-        };
-    }
+    private String message;
 
     public MainBean(AdminBean abean, PlayerModel model) {
         init(abean, model);
@@ -58,6 +52,7 @@ public class MainBean {
         who = abean.getWho();
         admins = abean.getAdmins();
         stamp = Utils.getDate();
+        message = abean.getMessage();
         model.clearGames();
     }
 
@@ -85,8 +80,8 @@ public class MainBean {
         return refresh;
     }
 
-    public NewsBean[] getNews() {
-        return news;
+    public String getMessage() {
+        return message;
     }
 
     public boolean isLoggedIn() {
