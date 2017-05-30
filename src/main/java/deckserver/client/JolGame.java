@@ -119,8 +119,7 @@ public class JolGame {
         source.removeCard(card);
         dest.addCard(card, false);
         if (log) {
-            addCommand(player + " draws from " + srcRegion,
-                    new String[]{"draw", srcRegion, destRegion});
+            addCommand(player + " draws from " + srcRegion, new String[]{"draw", srcRegion, destRegion});
         }
     }
 
@@ -138,8 +137,7 @@ public class JolGame {
         Card dstCard = (Card) state.getCard(destCard);
         if (srcCard == null || dstCard == null) throw new IllegalArgumentException("No such card");
         CardContainer source = (CardContainer) srcCard.getParent();
-        addCommand("Put " + srcCard.getName() + " on " + getCardName(dstCard),
-                new String[]{"puton", cardId, destCard});
+        addCommand("Put " + srcCard.getName() + " on " + getCardName(dstCard), new String[]{"puton", cardId, destCard});
         source.removeCard(srcCard);
         dstCard.addCard(srcCard, false);
     }
@@ -150,8 +148,7 @@ public class JolGame {
         CardContainer source = (CardContainer) card.getParent();
         Location dest = (Location) state.getPlayerLocation(destPlayer, destRegion);
         if (dest == null) throw new IllegalStateException("No such region");
-        addCommand("Move " + getCardName(card, destRegion) + " to " + destPlayer + "'s " + destRegion,
-                new String[]{"move", cardId, destPlayer, destRegion, bottom ? "bottom" : "top"});
+        addCommand("Move " + getCardName(card, destRegion) + " to " + destPlayer + "'s " + destRegion, new String[]{"move", cardId, destPlayer, destRegion, bottom ? "bottom" : "top"});
         source.removeCard(card);
         dest.addCard(card, false);
         // PENDING flatten when moving to ashheap
@@ -161,8 +158,7 @@ public class JolGame {
         state.orderPlayers(players);
         String order = "";
         for (String player : players) order = order + " " + player;
-        addCommand("Player order" + order,
-                new String[]{"order", order});
+        addCommand("Player order" + order, new String[]{"order", order});
     }
 
     public void shuffle(String player, String region, int num) {
@@ -174,8 +170,7 @@ public class JolGame {
         location.shuffle(num);
         if (log) {
             String add = (num == 0) ? "" : num + " of ";
-            addCommand("Shuffle " + add + player + "'s " + region,
-                    new String[]{"shuffle", player, region, num + ""});
+            addCommand("Shuffle " + add + player + "'s " + region, new String[]{"shuffle", player, region, num + ""});
         }
     }
 
@@ -193,6 +188,14 @@ public class JolGame {
     public void startGame() {
         String[] players = state.getPlayers();
         Utils.shuffle(players);
+        startGame(players);
+    }
+
+    public void startGame(String[] playerSeating) {
+        String[] players = state.getPlayers();
+        if (Arrays.asList(players).containsAll(Arrays.asList(playerSeating))) {
+            throw new IllegalArgumentException("Player ordering not valid, does not contain current players");
+        }
         state.orderPlayers(players);
         addCommand("Start game", new String[]{"start"});
         newTurn();
@@ -208,7 +211,6 @@ public class JolGame {
             for (int j = 0; j < 7; j++)
                 _drawCard(player, LIBRARY, HAND, false);
         }
-        // PENDING should record the shuffle seed, so needs to be formatted differently
     }
 
     public Game getState() {
@@ -248,8 +250,7 @@ public class JolGame {
     public int getCounters(String cardId) {
         Card card = (Card) state.getCard(cardId);
         Note note = getNote(card, COUNTERS, false);
-        if (note != null)
-            return Integer.parseInt(note.getValue());
+        if (note != null) return Integer.parseInt(note.getValue());
         return 0;
     }
 
@@ -297,8 +298,7 @@ public class JolGame {
                 loc = (Location) container;
                 Card[] cards = (Card[]) loc.getCards();
                 for (int j = 0; j < cards.length; j++)
-                    if (card.getId().equals(cards[j].getId()))
-                        return region + " #" + (j + 1);
+                    if (card.getId().equals(cards[j].getId())) return region + " #" + (j + 1);
             }
         }
         return card.getName();
@@ -328,10 +328,8 @@ public class JolGame {
         if (old == null) old = "";
         else old = " from " + old;
         note.setValue(edge);
-        if (player == null)
-            addCommand("Edge burned" + old + ".", new String[]{"edge", "burn"});
-        else
-            addCommand(player + " grabs edge" + old + ".", new String[]{"edge", player});
+        if (player == null) addCommand("Edge burned" + old + ".", new String[]{"edge", "burn"});
+        else addCommand(player + " grabs edge" + old + ".", new String[]{"edge", player});
     }
 
     public int getPool(String player) {
@@ -432,14 +430,12 @@ public class JolGame {
 
     private void addCommand(String arg1, String[] arg2) {
         String turn = getTurn();
-        if (turn != null)
-            actions.addCommand(turn, getDate() + arg1, arg2);
+        if (turn != null) actions.addCommand(turn, getDate() + arg1, arg2);
     }
 
     private void addMessage(String arg1) {
         String turn = getTurn();
-        if (turn != null)
-            actions.addMessage(getTurn(), getDate() + arg1);
+        if (turn != null) actions.addMessage(getTurn(), getDate() + arg1);
     }
 
     private String getDate() {
@@ -506,15 +502,13 @@ public class JolGame {
         else amt = Integer.parseInt(val) + capincr;
         if (amt < 0) amt = 0;
         cap.setValue(amt + "");
-        addCommand("Capacity of " + getCardName(card) + " now " + amt,
-                new String[]{"capacity", cardId, capincr + ""});
+        addCommand("Capacity of " + getCardName(card) + " now " + amt, new String[]{"capacity", cardId, capincr + ""});
     }
 
     public int getCapacity(String cardId) {
         Card card = (Card) state.getCard(cardId);
         Note cap = getNote(card, "capac", false);
-        if (cap == null)
-            return -1;
+        if (cap == null) return -1;
         return Integer.parseInt(cap.getValue());
     }
 
