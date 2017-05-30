@@ -1,10 +1,6 @@
 *.class
 .idea/*
+*.iml
 target/*
 .DS_Store
-src/main/resources/game*
-src/main/resources/player*
-src/main/resources/system.properties
-data/
-src/main/dwr/*
 src/test/resources/global_chat.txt
