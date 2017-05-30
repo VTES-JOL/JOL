@@ -76,7 +76,7 @@ public class JolAdmin {
         return name != null && sysInfo.hasGame(name);
     }
 
-    private PlayerInfo getPlayerInfo(String name) {
+    PlayerInfo getPlayerInfo(String name) {
         if (players.containsKey(name))
             return players.get(name);
         PlayerInfo ret = new PlayerInfo(name);
@@ -155,6 +155,7 @@ public class JolAdmin {
         try {
             games.put(name, new GameInfo(name, true));
         } catch (Exception e) {
+            logger.error("Error creating game" ,e);
             return false;
         }
         return true;
@@ -439,6 +440,17 @@ public class JolAdmin {
             write();
         }
 
+        synchronized void startGame(String[] playerSeating) {
+            info.setProperty("state", "closed");
+            state = new DsGame();
+            actions = new ActionHistory();
+            game = new JolGame(state, actions);
+            game.initGame(gamename);
+            regDecks();
+            getGame().startGame(playerSeating);
+            write();
+        }
+
         private void regDecks() {
             String[] players = getPlayers();
             for (String player : players) {
@@ -498,7 +510,7 @@ public class JolAdmin {
         }
     }
 
-    private class PlayerInfo extends Info {
+    class PlayerInfo extends Info {
 
         private final String prefix;
 

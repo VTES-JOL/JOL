@@ -193,10 +193,10 @@ public class JolGame {
 
     public void startGame(String[] playerSeating) {
         String[] players = state.getPlayers();
-        if (Arrays.asList(players).containsAll(Arrays.asList(playerSeating))) {
+        if (!Arrays.asList(players).containsAll(Arrays.asList(playerSeating))) {
             throw new IllegalArgumentException("Player ordering not valid, does not contain current players");
         }
-        state.orderPlayers(players);
+        state.orderPlayers(playerSeating);
         addCommand("Start game", new String[]{"start"});
         newTurn();
         for (String player : players) {

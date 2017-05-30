@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 
 public class TournamentBuilder {
 
-    private static String dataDir = "/home/shannon/jol/prod";
+    private static String dataDir = "/Users/shannon/data";
     private static JolAdmin jolAdmin;
     private static String admin = "shade_nz";
     private static String seedGame = "Tournament-2017-1";
@@ -61,6 +61,9 @@ public class TournamentBuilder {
         createGame("Tournament-2017", 3, 2);
         createGame("Tournament-2017", 3, 3);
 
+        JolAdmin.GameInfo seedInfo = jolAdmin.getGameInfo(seedGame);
+        seedInfo.endGame();
+
     }
 
     private static Properties load(File propertiesFile) throws IOException {
@@ -72,14 +75,34 @@ public class TournamentBuilder {
     }
 
     private static void createGame(String prefix, int round, int table) {
+        JolAdmin.GameInfo seedInfo = jolAdmin.getGameInfo(seedGame);
         String gameName = prefix + "-Round" + round + "-Table" + table;
         System.out.println(gameName);
         int[] seating = roundData[round - 1][table - 1];
         List<String> playerRoundSeating = IntStream.of(seating).mapToObj(n -> players[n]).collect(Collectors.toList());
         System.out.println("Seating : " + playerRoundSeating);
         System.out.println("------");
+        if (jolAdmin.existsGame(gameName)) {
+            System.out.println("Game exists - skipping creation");
+        } else {
+            jolAdmin.mkGame(gameName);
+        }
+        jolAdmin.setOwner(gameName, admin);
 
-        //jolAdmin.mkGame("Tournament-2017-Round1-Table1");
-        //jolAdmin.setOwner("Tournament-2017-Round1-Table1", admin);
+        JolAdmin.GameInfo gameInfo = jolAdmin.getGameInfo(gameName);
+
+        for (String player : playerRoundSeating) {
+            JolAdmin.PlayerInfo playerInfo = jolAdmin.getPlayerInfo(player);
+            if (!jolAdmin.isInvited(gameName, player)) {
+                jolAdmin.invitePlayer(gameName, player);
+            }
+            String playerDeck = seedInfo.getPlayerDeck(player);
+            String playerId = jolAdmin.getId(player);
+            gameInfo.addPlayer(player, "deck" + playerId, playerDeck);
+        }
+
+        if (!gameInfo.isActive()) {
+            gameInfo.startGame(playerRoundSeating.toArray(new String[playerRoundSeating.size()]));
+        }
     }
 }
