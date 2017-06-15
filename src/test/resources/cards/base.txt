@@ -4802,7 +4802,7 @@ Discipline: dom obf NEC POT
 Independent: Carlotta may exchange a library card in your ash heap for a card in your hand as a +1 stealth action that costs 1 blood.
 Artist: Anson Maddocks
 
-Name: Carlton Van Wyk
+Name: Carlton Van Wyk (Hunter)
 [Tenth:A/B, Anthology:1]
 Cardtype: Ally
 Cost: 2 pool
