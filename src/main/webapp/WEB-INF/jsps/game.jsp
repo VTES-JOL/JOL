@@ -4,7 +4,7 @@
     <tr>
         <td valign="top" width="30%" id="hand"></td>
         <td id="dsForm">
-            <form onsubmit="return doSubmit();">
+            <form onsubmit="return doSubmit();" autocomplete='off'>
                 <table>
                     <tr id="phasecommand">
                         <td>
