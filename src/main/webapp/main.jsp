@@ -7,9 +7,9 @@
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/engine.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/interface/DS.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/util.js'></script>
-        <script type='text/javascript' src='${pageContext.request.contextPath}/js/ds.js?version=1.1.1'></script>
+        <script type='text/javascript' src='${pageContext.request.contextPath}/js/ds.js?version=1.1.2'></script>
         <script src='https://www.google.com/recaptcha/api.js'></script>
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/styles.css?version=1.1.1"/>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/styles.css?version=1.1.2"/>
         <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/favicon.ico" />
     </head>
     <body onload="init();" class="${applicationScope.get("environment")}">

@@ -4,13 +4,11 @@ var timeInterval = null;
 var outageTime = null;
 
 dwr.engine.setTextHtmlHandler(function () {
-    window.alert("Lost connection with the server, reloading..");
     document.location = '/jol/';
 });
 
 function errorhandler(errorString, exception) {
     if (exception.name === "dwr.engine.incompleteReply") {
-        window.alert("Lost connection with the server, reloading..");
         document.location = "/jol/";
     }
 }
