@@ -25,21 +25,20 @@
     request.setAttribute("imbued", imbued);
     request.setAttribute("deck", deck);
 %>
-<b>Crypt: (<%= csize %>)</b>
-<br/>
-<%= vampires.size() > 0 ? "Vampires: <br/>" : "" %>
-<c:forEach items="${vampires.keySet()}" var="card">
-    ${vampires.get(card)} x <a href="javascript:getCardDeck(null,'${card.cardId}')">${card.name}
-    (G${card.group})</a><br/>
-</c:forEach>
+<h4>Crypt: (<%= csize %>)</h4>
+<ul class='deck-list'>
+    <c:forEach items="${vampires.keySet()}" var="card">
+        <li>${vampires.get(card)} x <a href="javascript:getCardDeck(null,'${card.cardId}')">${card.name}
+            (G${card.group})</a>
+        </li>
+    </c:forEach>
+    <c:forEach items="${imbued.keySet()}" var="card">
+        <li>${imbued.get(card)} x <a href="javascript:getCardDeck(null,'${card.cardId}')">${card.name}
+            (G${card.group})</a></li>
+    </c:forEach>
+</ul>
 
-<%= imbued.size() > 0 ? "Imbued: <br/>" : "" %>
-<c:forEach items="${imbued.keySet()}" var="card">
-    ${imbued.get(card)} x <a href="javascript:getCardDeck(null,'${card.cardId}')">${card.name} (G${card.group})</a><br/>
-</c:forEach>
-
-<b>Library: (<%= sum %>)</b>
-<br/>
+<h4>Library: (<%= sum %>)</h4>
 <c:forEach items="${deck.keySet()}" var="type">
     <%
         String type = (String) pageContext.findAttribute("type");
@@ -48,8 +47,10 @@
         pageContext.setAttribute("typeCount", typeCount);
         pageContext.setAttribute("typeMap", typeMap);
     %>
-    ${type}: (${typeCount})<br/>
-    <c:forEach items="${typeMap.keySet()}" var="card">
-        ${typeMap.get(card)} x <a href="javascript:getCardDeck(null,'${card.cardId}')">${card.name}</a><br/>
-    </c:forEach>
+    <h5>${type}: (${typeCount})</h5>
+    <ul class='deck-list'>
+        <c:forEach items="${typeMap.keySet()}" var="card">
+            <li>${typeMap.get(card)} x <a href="javascript:getCardDeck(null,'${card.cardId}')">${card.name}</a></li>
+        </c:forEach>
+    </ul>
 </c:forEach>

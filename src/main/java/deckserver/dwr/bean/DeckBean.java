@@ -1,21 +1,23 @@
 package deckserver.dwr.bean;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DeckBean {
 
-    DeckSummaryBean[] decks, games;
+    private List<String> decks = new ArrayList<>();
+    private List<DeckSummaryBean> games = new ArrayList<>();
 
-    public DeckBean(DeckSummaryBean[] beans, Collection<DeckSummaryBean> games) {
-        decks = beans;
-        this.games = games.toArray(new DeckSummaryBean[0]);
+    public DeckBean(List<String> decks, List<DeckSummaryBean> games) {
+        this.decks = decks;
+        this.games = games;
     }
 
-    public DeckSummaryBean[] getDecks() {
+    public List<String> getDecks() {
         return decks;
     }
 
-    public DeckSummaryBean[] getGames() {
+    public List<DeckSummaryBean> getGames() {
         return games;
     }
 }

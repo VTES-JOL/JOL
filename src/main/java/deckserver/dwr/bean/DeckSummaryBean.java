@@ -13,11 +13,17 @@ public class DeckSummaryBean {
     public int lib, crypt;
     public String groups;
 
-    // get information about a player's deck
-    public DeckSummaryBean(PlayerModel model, String name) {
+    public DeckSummaryBean(PlayerModel model, String name, boolean read) {
         this.name = name;
         game = null;
-        init(model.getPlayer(), JolAdmin.getInstance().getDeck(model.getPlayer(), name));
+        if (read) {
+            init(model.getPlayer(), JolAdmin.getInstance().getDeck(model.getPlayer(), name));
+        }
+    }
+
+    // get information about a player's deck
+    public DeckSummaryBean(PlayerModel model, String name) {
+        this(model, name, true);
     }
 
     // get information about the player's deck that is registered for a game

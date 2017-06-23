@@ -1,14 +1,25 @@
-<%@page contentType="text/html" %>
-<table border="1" width="100%">
-    <tr>
-        <td width="25%" align="top">
-            <label for="decks">Your decks:</label>
+<div class='container'>
+    <div class='col-3'>
+        <div id='gameRegistration' class='box'>
+            <h3>Game Registration:</h3>
+            <div>
+                <select class="btn-vtes-default" title="reggames" id="reggames">
+                </select>
+                <select class="btn-vtes-default" title="Choose deck" id="regdecks">
+                </select>
+                <button onclick="doRegister();" class="btn-vtes-default">Register</button>
+            </div>
+            <br/>
+            <table id="opengames" border="1" cellspacing="1" cellpadding="1" width="100%">
+            </table>
+        </div>
+        <div id='playerDecks' class='box'>
+            <h3>Your decks:</h3>
             <div class="gamediv">
                 <table id="mydecks" class="gametable" border="1" cellspacing="1" cellpadding="1" width="100%">
                     <thead>
                         <colgroup>
-                            <col width="50%"/>
-                            <col width="40%"/>
+                            <col width="90%"/>
                             <col width="10%"/>
                         </colgroup>
                     </thead>
@@ -17,17 +28,11 @@
                     </tbody>
                 </table>
             </div>
-            <span>Open games:</span>
-            <table id="opengames" border="1" cellspacing="1" cellpadding="1" width="100%">
-            </table>
-            <label for="reggames">Register for game:</label>
-            <select class="btn-vtes-default" title="reggames" id="reggames">
-            </select>
-            <select class="btn-vtes-default" title="Choose deck" id="regdecks">
-            </select>
-            <button onclick="doRegister();" class="btn-vtes-default">Register</button>
-        </td>
-        <td width="40%">
+        </div>
+    </div>
+    <div class='col-4'>
+        <div id='deckEditor' class='box'>
+            <h3>Deck Editor</h3>
             <table width="100%">
                 <tr>
                     <td align="left">
@@ -48,7 +53,6 @@
             <textarea rows="25" cols="60" id="decktext" readonly="readonly" style="width:100%;"></textarea>
             <table width="100%">
                 <tr>
-                    <td align=left>Search for cards:</td>
                     <td align=right>
                         <label for="shuffle">Shuffle:</label>
                         <input type="checkbox" id="shuffle" name="shuffle" value="yes"/>
@@ -56,6 +60,26 @@
                     </td>
                 </tr>
             </table>
+            <div id="deckerrors" class="errdiv">
+            </div>
+            <div id="deckcontentdiv">
+                <table>
+                    <tr>
+                        <td id="deckcontents"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class='col-3'>
+        <div id='editorCardDetails' class='box'>
+            <h3>Card Text:</h3>
+            <select class="btn-vtes-default" id="deckcards" onchange="selectCardDeck()"></select>
+            <input type="hidden" id="cardSelect" value="history"/>
+            <div class="history" id="cardtext"></div>
+        </div>
+        <div id='cardSearch' class='box'>
+            <h3>Card Search</h3>
             <form action="javascript:doSearch();">
                 <table>
                     <tr>
@@ -86,22 +110,6 @@
             <div class="cardsdiv">
                 <table class="gametable" id="showcards" cellspacing="0" cellpadding="0" border="0"></table>
             </div>
-        </td>
-        <td align="top">
-            <div id="deckerrors" class="errdiv">
-            </div>
-            <div id="deckcontentdiv">
-                <table>
-                    <tr>
-                        <td id="deckcontents"></td>
-                    </tr>
-                </table>
-            </div>
-            <hr/>
-            <p>Card Texts:</p>
-            <select class="btn-vtes-default"  id="deckcards" onchange="selectCardDeck()"></select>
-            <input type="hidden" id="cardSelect" value="history"/>
-            <div class="history" id="cardtext"></div>
-        </td>
-    </tr>
-</table>
+        </div>
+    </div>
+</div>

@@ -22,7 +22,7 @@ public class PlayerModel implements Comparable {
     private Collection<String> chats = new ArrayList<>();
     private String tmpDeck;
     private String tmpDeckName;
-    private DeckSummaryBean[] decks = null;
+    private List<DeckSummaryBean> decks = new ArrayList<>();
     private Collection<String> removedGames = new ArrayList<>(2);
     private Collection<String> changedGames = new ArrayList<>();
 
@@ -60,8 +60,7 @@ public class PlayerModel implements Comparable {
     }
 
     public void recordAccess() {
-        if (player != null)
-            JolAdmin.getInstance().recordAccess(player);
+        if (player != null) JolAdmin.getInstance().recordAccess(player);
     }
 
     public long getTimestamp() {
@@ -116,22 +115,8 @@ public class PlayerModel implements Comparable {
         decks = null;
     }
 
-    public DeckSummaryBean[] getDecks() {
-        if (decks == null) {
-            String[] names = JolAdmin.getInstance().getDeckNames(player);
-            Arrays.sort(names);
-            Collection<DeckSummaryBean> c = new ArrayList<>(names.length);
-            for (String name : names) {
-                try {
-                    c.add(new DeckSummaryBean(this, name));
-                } catch (Throwable t) {
-                    logger.error("DeckSummaryBean Error for " + player + " and deck " + name, t);
-                }
-
-            }
-            decks = c.toArray(new DeckSummaryBean[0]);
-        }
-        return decks;
+    public List<String> getDecks() {
+        return Arrays.asList(JolAdmin.getInstance().getDeckNames(player));
     }
 
     public boolean isAdmin() {

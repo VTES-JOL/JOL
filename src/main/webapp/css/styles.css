@@ -25,11 +25,6 @@ body.dev {
     height: 100%
 }
 
-.cardsdiv {
-    height: 200px;
-    overflow: auto;
-}
-
 .errdiv {
     color: black;
     font-weight: bolder;
@@ -59,7 +54,7 @@ td.delete {
 }
 
 .history {
-    height: 200px;
+    height: 15em;
     overflow: auto;
 }
 
@@ -148,4 +143,43 @@ span.edge {
 
 #globalchat {
     clear: both;
+}
+
+.container {
+    display: flex;
+}
+
+.box {
+    box-shadow: 2px 0 0 0 #888, 0 2px 0 0 #888, 2px 2px 0 0 #888, 2px 0 0 0 #888 inset, 0 2px 0 0 #888 inset;
+    padding: 5px;
+}
+
+.col-2 {
+    width: 16.7%;
+    flex: 1 1 auto;
+}
+
+.col-3 {
+    width: 25%;
+    flex: 1 1 auto;
+}
+
+.col-4 {
+    width: 33%;
+    flex: 1 1 auto;
+}
+
+.col-6 {
+    width: 50%;
+    flex: 1 1 auto;
+}
+
+h3, h4, h5 {
+    margin: 5px;
+}
+
+ul.deck-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0 0 5px 5px;
 }

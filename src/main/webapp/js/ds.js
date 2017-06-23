@@ -445,7 +445,7 @@ function getCard(card) // Open card text in separate window (always on top)
 function showCard(data) {
     var old = dwr.util.getValue('extra', {escapeHtml: false});
     var text = data.text.join("<br />");
-    dwr.util.setValue('extra', old + "<div id=card" + data.id + ">" + text + "</div>", {escapeHtml: false});
+    dwr.util.setValue('extra', old + "<div id='card'" + data.id + ">" + text + "</div>", {escapeHtml: false});
     dwr.util.addOptions("cards", [data], "id", "name");
     dwr.util.setValue("cards", data.id);
     selectCard();
@@ -487,31 +487,34 @@ function callbackShowDecks(data) {
     // Deck List
     dwr.util.removeAllRows('decks');
     for (var dIdx = 0; dIdx < data.decks.length; dIdx++) {
-        var dRow = addGameRow('decks', data.decks[dIdx].name);
+        var dRow = addGameRow('decks', data.decks[dIdx]);
         if (dRow.cells.length === 0) {
-            dRow.insertCell(0).innerHTML = '<a onclick="loadDeck(' + "'" + data.decks[dIdx].name + "');" + '">' + data.decks[dIdx].name + '</a>';
+            dRow.insertCell(0).innerHTML = '<a onclick="loadDeck(' + "'" + data.decks[dIdx] + "');" + '">' + data.decks[dIdx] + '</a>';
             dRow.insertCell(1);
-            dRow.insertCell(2);
         }
-        dRow.cells[1].innerHTML = 'L' + data.decks[dIdx].lib + ' C' + data.decks[dIdx].crypt + ' G ' + data.decks[dIdx].groups;
-        dRow.cells[2].innerHTML = "<a onclick='doDelete(\"" + data.decks[dIdx].name + "\");'>&#x2717;</a>";
-        dRow.cells[2].className = 'delete';
+        dRow.cells[1].innerHTML = "<a onclick='doDelete(\"" + data.decks[dIdx] + "\");'>&#x2717;</a>";
+        dRow.cells[1].className = 'delete';
     }
-    // Register Decks for Games
-    for (var gIdx = 0; gIdx < data.games.length; gIdx++) {
-        var gRow = addGameRow('opengames', data.games[gIdx].game);
-        if (gRow.cells.length === 0) {
-            gRow.insertCell(0).innerHTML = data.games[gIdx].game;
-            gRow.insertCell(1);
-            gRow.insertCell(2);
+    if (data.games.length === 0) {
+        dwr.util.byId('gameRegistration').style.display = 'none';
+    } else {
+        dwr.util.byId('gameRegistration').style.display = 'block';
+        // Register Decks for Games
+        for (var gIdx = 0; gIdx < data.games.length; gIdx++) {
+            var gRow = addGameRow('opengames', data.games[gIdx].game);
+            if (gRow.cells.length === 0) {
+                gRow.insertCell(0).innerHTML = data.games[gIdx].game;
+                gRow.insertCell(1);
+                gRow.insertCell(2);
+            }
+            gRow.cells[1].innerHTML = data.games[gIdx].name;
+            gRow.cells[2].innerHTML = 'L' + data.games[gIdx].lib + ' C' + data.games[gIdx].crypt + ' G ' + data.games[gIdx].groups;
         }
-        gRow.cells[1].innerHTML = data.games[gIdx].name;
-        gRow.cells[2].innerHTML = 'L' + data.games[gIdx].lib + ' C' + data.games[gIdx].crypt + ' G ' + data.games[gIdx].groups;
+        dwr.util.removeAllOptions('reggames');
+        dwr.util.removeAllOptions('regdecks');
+        dwr.util.addOptions('reggames', data.games, 'game', 'game');
+        dwr.util.addOptions('regdecks', data.decks);
     }
-    dwr.util.removeAllOptions('reggames');
-    dwr.util.removeAllOptions('regdecks');
-    dwr.util.addOptions('reggames', data.games, 'game', 'game');
-    dwr.util.addOptions('regdecks', data.decks, 'name', 'name');
 }
 
 function callbackShowCards(data) {
