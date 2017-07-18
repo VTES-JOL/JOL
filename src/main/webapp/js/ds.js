@@ -141,8 +141,7 @@ function renderOnline(div, who) {
 function renderMessage(message) {
     if (message !== null && message !== "") {
         dwr.util.byId('messages').style.display = "";
-        dwr.util.setValue('messages', message);
-        console.log(message);
+        dwr.util.setValue('messages', message, {escapeHtml: false});
     } else {
         dwr.util.byId('messages').style.display = "none";
     }
