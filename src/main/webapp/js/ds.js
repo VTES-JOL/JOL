@@ -445,7 +445,7 @@ function getCard(card) // Open card text in separate window (always on top)
 function showCard(data) {
     var old = dwr.util.getValue('extra', {escapeHtml: false});
     var text = data.text.join("<br />");
-    dwr.util.setValue('extra', old + "<div id='card'" + data.id + ">" + text + "</div>", {escapeHtml: false});
+    dwr.util.setValue('extra', old + "<div id='card" + data.id + "'>" + text + "</div>", {escapeHtml: false});
     dwr.util.addOptions("cards", [data], "id", "name");
     dwr.util.setValue("cards", data.id);
     selectCard();
