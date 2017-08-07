@@ -11,6 +11,7 @@ import deckserver.game.state.Card;
 import deckserver.game.state.Location;
 import org.slf4j.Logger;
 
+import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -44,6 +45,7 @@ public class DoCommand {
     public String doCommand(String player, String[] cmdStr) throws CommandException {
         String cmd = cmdStr[0];
         CommandParser cmdObj = new CommandParser(cmdStr, 1, game);
+        boolean random = Arrays.asList(cmdStr).contains("random");
         try {
             if (cmd.equalsIgnoreCase("label")) {
                 String targetPlayer = cmdObj.getPlayer(player);
@@ -79,7 +81,7 @@ public class DoCommand {
             }
             if (cmd.equalsIgnoreCase("discard")) {
                 String card = cmdObj.getCard(false, player, JolGame.HAND);
-                game.moveToRegion(card, player, JolGame.ASHHEAP, false);
+                game.moveToRegion(card, player, JolGame.ASHHEAP, false, random);
                 if (cmdObj.consumeString("draw")) {
                     game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
                 }
@@ -160,6 +162,12 @@ public class DoCommand {
                     game.moveToRegion(srcCard, destPlayer, destRegion, true);
                     return "Moved the card";
                 }
+            }
+            if (cmd.equalsIgnoreCase("pool")) {
+                String targetPlayer = cmdObj.getPlayer(player);
+                int amount = cmdObj.getAmount(0);
+                game.changePool(targetPlayer, amount);
+                return "Adjusted pool";
             }
             if (cmd.equalsIgnoreCase("blood")) {
                 String targetPlayer = cmdObj.getPlayer(player);

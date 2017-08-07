@@ -4,6 +4,8 @@ import deckserver.game.state.Card;
 import deckserver.game.state.Location;
 import org.slf4j.Logger;
 
+import java.util.Random;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -74,20 +76,25 @@ class CommandParser {
     }
 
     private String getCard(boolean optional, Card[] cards) throws CommandException {
+        if (cards == null) {
+            return null;
+        }
         try {
             if (!hasMoreArgs()) {
                 if (optional) return null;
                 throw new CommandException("Card not specified");
             }
-            int size = cards == null ? 0 : cards.length;
+            int size = cards.length;
             int num;
-            char first = args[ind].charAt(0);
-            if (first == '+')
-                num = -1;
-            else
-                num = Integer.parseInt(args[ind]) - 1;
-            if (num < 0 && optional) return null;
-            if (num < 0 || num >= size) throw new CommandException("Num out of range");
+            if ("random".equals(args[ind])) {
+                num = new Random().nextInt(size);
+            } else {
+                char first = args[ind].charAt(0);
+                if (first == '+') num = -1;
+                else num = Integer.parseInt(args[ind]) - 1;
+                if (num < 0 && optional) return null;
+                if (num < 0 || num >= size) throw new CommandException("Num out of range");
+            }
             Card card = cards[num];
             ind++;
             String rec = getCard(true, card.getCards());

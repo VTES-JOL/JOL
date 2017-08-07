@@ -5,6 +5,7 @@
     </head>
     <body>
         <ul class="help">
+            <li><a href="#help_pool">Pool</a></li>
             <li><a href="#help_blood">Blood</a>
             <li><a href="#help_capacity">Capacity</a>
             <li><a href="#help_discard">Discard</a>
@@ -22,6 +23,36 @@
             <li><a href="#help_unlock">Unlock</a>
         </ul>
         <div id="help-body">
+            <div id="help_pool">
+                <h2>Pool</h2>
+                <p>
+                    Manipulates player pool values
+                    The default PLAYER is yourself.
+                </p>
+                <h4>Syntax</h4>
+                <p>
+                    <code>pool [PLAYER] [+|-]AMOUNT</code>
+                </p>
+                <h4>Examples</h4>
+                <table class="help-example">
+                    <tr>
+                        <th class="help-command">Command</th>
+                        <th>Result</th>
+                    </tr>
+                    <tr>
+                        <td class="help-command"> pool +2</td>
+                        <td> adds 2 to your pool</td>
+                    </tr>
+                    <tr>
+                        <td class="help-command"> pool -2</td>
+                        <td> deducts 2 from your pool</td>
+                    </tr>
+                    <tr>
+                        <td class='help-command'>pool Adam +2</td>
+                        <td> adds 2 to Adam's pool</td>
+                    </tr>
+                </table>
+            </div>
             <div id="help_blood">
                 <h2>Blood</h2>
                 <p>
@@ -43,11 +74,11 @@
                     </tr>
                     <tr>
                         <td class="help-command"> blood +2</td>
-                        <td> adds 2 to your pool</td>
+                        <td> adds 2 to your pool ( Deprecated: Will be removed in future release in favor of pool command )</td>
                     </tr>
                     <tr>
                         <td class="help-command"> blood -2</td>
-                        <td> deducts 2 from your pool</td>
+                        <td> deducts 2 from your pool ( Deprecated: Will be removed in future release in favor of pool command )</td>
                     </tr>
                     <tr>
                         <td class="help-command"> blood ready 1 +3</td>
@@ -72,7 +103,7 @@
                 </p>
                 <h4>Syntax</h4>
                 <p>
-                <code>capacity [PLAYER] [REGION] CARD [+|-]amount</code>
+                    <code>capacity [PLAYER] [REGION] CARD [+|-]amount</code>
                 </p>
                 <h4>Examples</h4>
                 <table class="help-example">
@@ -98,7 +129,7 @@
                 </p>
                 <h4>Syntax</h4>
                 <p>
-                <code>discard CARD [draw]</code>
+                    <code>discard CARD|random [draw]</code>
                 </p>
                 <h4>Examples</h4>
                 <table class="help-example">
@@ -114,17 +145,26 @@
                         <td class="help-command">discard 5 draw</td>
                         <td>discards card #5 from your hand and replaces it with a new card from your library</td>
                     </tr>
+                    <tr>
+                        <td class='help-command'>discard random</td>
+                        <td>discard random card from hand without replacing</td>
+                    </tr>
+                    <tr>
+                        <td class='help-command'>discard random draw</td>
+                        <td>discards a random card from hand and replaces it with a new card from your library</td>
+                    </tr>
                 </table>
             </div>
             <div id="help_draw">
                 <h2>Draw</h2>
                 <p>
-                    Used to draw cards from your library or from your crypt. By default, the command will draw one card from your
+                    Used to draw cards from your library or from your crypt. By default, the command will draw one card
+                    from your
                     library.
                 </p>
                 <h4>Syntax</h4>
                 <p>
-                <code>draw [vamp] [NUM]</code>
+                    <code>draw [vamp] [NUM]</code>
                 </p>
                 <h4>Examples</h4>
                 <table class="help-example">
@@ -157,7 +197,7 @@
                 </p>
                 <h4>Syntax</h4>
                 <p>
-                <code>edge [burn]</code>
+                    <code>edge [burn]</code>
                 </p>
                 <h4>Examples</h4>
                 <table class="help-example">
@@ -182,7 +222,7 @@
                 </p>
                 <h4>Syntax</h4>
                 <p>
-                <code>label [PLAYER] [REGION] CARD [text here]</code>
+                    <code>label [PLAYER] [REGION] CARD [text here]</code>
                 </p>
                 <h4>Examples</h4>
                 <table class="help-example">
@@ -200,20 +240,24 @@
                     </tr>
                     <tr>
                         <td class="help-command">label Jeff inactive 1 Is Tremere</td>
-                        <td>Label Jeff's first inactive with a label "Is Tremere", perhaps because it was a target of Arcane Library</td>
+                        <td>Label Jeff's first inactive with a label "Is Tremere", perhaps because it was a target of
+                            Arcane Library
+                        </td>
                     </tr>
                 </table>
             </div>
             <div id="help_move">
                 <h2>Move</h2>
                 <p>
-                    Moves cards from one region to another. Note that cards can be placed on top of other cards. The default
-                    SRCPLAYER is yourself. The default SRCREGION is your ready region. The default DESTREGION is your opponent's
+                    Moves cards from one region to another. Note that cards can be placed on top of other cards. The
+                    default
+                    SRCPLAYER is yourself. The default SRCREGION is your ready region. The default DESTREGION is your
+                    opponent's
                     ready region. DESTPLAYER and DESTCARD do not have defaults obviously.
                 </p>
                 <h4>Syntax</h4>
                 <p>
-                <code>move [SRCPLAYER] [SRCREGION] CARD [DESTPLAYER] [DESTREGION] [DESTCARD]</code>
+                    <code>move [SRCPLAYER] [SRCREGION] CARD [DESTPLAYER] [DESTREGION] [DESTCARD]</code>
                 </p>
                 <h4>Examples</h4>
                 <table class="help-example">
@@ -223,11 +267,15 @@
                     </tr>
                     <tr>
                         <td class="help-command">move 1</td>
-                        <td>moves card #1 in your ready region to the last spot in the ready region (assigns card #1 a different #)</td>
+                        <td>moves card #1 in your ready region to the last spot in the ready region (assigns card #1 a
+                            different #)
+                        </td>
                     </tr>
                     <tr>
                         <td class="help-command">move ready 2 1 ashheap</td>
-                        <td>moves card #1 which is attached to card #2 in the ready region from card #2 to your ashheap</td>
+                        <td>moves card #1 which is attached to card #2 in the ready region from card #2 to your
+                            ashheap
+                        </td>
                     </tr>
                     <tr>
                         <td class="help-command">move re 2 1 ash</td>
@@ -235,7 +283,8 @@
                     </tr>
                     <tr>
                         <td class="help-command">move Scott torpor 1 Ghost ready</td>
-                        <td>moves vampire #1 from Scott's torpor region to Ghost's ready region (Graverobbing at DOM)</td>
+                        <td>moves vampire #1 from Scott's torpor region to Ghost's ready region (Graverobbing at DOM)
+                        </td>
                     </tr>
                     <tr>
                         <td class="help-command"> move hand 1 ready 2</td>
@@ -250,12 +299,13 @@
             <div id="help_order">
                 <h2>Order</h2>
                 <p>
-                    Re-seat the players around the table. Useful with the restructuring cards. Also used with Reversal of Fortune,
+                    Re-seat the players around the table. Useful with the restructuring cards. Also used with Reversal
+                    of Fortune,
                     since the server always advances player turns in order.
                 </p>
                 <h4>Syntax</h4>
                 <p>
-                <code>order index1 index2 index3 index4 index5</code>
+                    <code>order index1 index2 index3 index4 index5</code>
                 </p>
                 <h4>Examples</h4>
                 <p>Assume the current table seating is "Al Bo Cy Di Ed".</p>
@@ -277,14 +327,17 @@
             <div id="help_play">
                 <h2>Play</h2>
                 <p>
-                    Manipulates cards in various ways. You can use this command to play vampires from your uncontrolled region to
-                    your ready region. You may also use this command to play cards from your hand. The default PLAYER is yourself.
-                    The default REGION is your ashheap if you are playing a library card or your ready region if you are playing a
+                    Manipulates cards in various ways. You can use this command to play vampires from your uncontrolled
+                    region to
+                    your ready region. You may also use this command to play cards from your hand. The default PLAYER is
+                    yourself.
+                    The default REGION is your ashheap if you are playing a library card or your ready region if you are
+                    playing a
                     vampire. By default you will not draw to replace a card played.
                 </p>
                 <h4>Syntax</h4>
                 <p>
-                <code>play [vamp] CARD [PLAYER] [REGION] [CARD] [draw]</code>
+                    <code>play [vamp] CARD [PLAYER] [REGION] [CARD] [draw]</code>
                 </p>
                 <h4>Examples</h4>
                 <table class="help-example">
@@ -306,12 +359,16 @@
                     </tr>
                     <tr>
                         <td class="help-command">play 1 ready 2 draw</td>
-                        <td>moves your hand card #1 to be attached to your ready region card #2 and then draws (example: Owl
-                            Companion, Perfectionist)</td>
+                        <td>moves your hand card #1 to be attached to your ready region card #2 and then draws (example:
+                            Owl
+                            Companion, Perfectionist)
+                        </td>
                     </tr>
                     <tr>
                         <td class="help-command">play 1 ready 2 1</td>
-                        <td>moves your hand card #1 to be attached to the first card already attached to ready region card #2</td>
+                        <td>moves your hand card #1 to be attached to the first card already attached to ready region
+                            card #2
+                        </td>
                     </tr>
                     <tr>
                         <td class="help-command">play 1 Jeff</td>
@@ -338,7 +395,7 @@
                 </p>
                 <h4>Syntax</h4>
                 <p>
-                <code>random [NUMBER]</code>
+                    <code>random [NUMBER]</code>
                 </p>
                 <h4>Examples</h4>
                 <table class="help-example">
@@ -361,7 +418,7 @@
                 </p>
                 <h4>Syntax</h4>
                 <p>
-                <code>show [REGION] amount [[PLAYER]|all]</code>
+                    <code>show [REGION] amount [[PLAYER]|all]</code>
                 </p>
                 <h4>Examples</h4>
                 <table class="help-example">
@@ -383,7 +440,9 @@
                     </tr>
                     <tr>
                         <td class="help-command">show hand 1 Jeff</td>
-                        <td>show Jeff the first card in your hand. shuffle your hand first if you want to show a random card</td>
+                        <td>show Jeff the first card in your hand. shuffle your hand first if you want to show a random
+                            card
+                        </td>
                     </tr>
                     <tr>
                         <td class="help-command">show library 1 all</td>
@@ -398,7 +457,7 @@
                 </p>
                 <h4>Syntax</h4>
                 <p>
-                <code>shuffle [PLAYER] [REGION] [num]</code>
+                    <code>shuffle [PLAYER] [REGION] [num]</code>
                 </p>
                 <h4>Examples</h4>
                 <table class="help-example">
@@ -427,12 +486,13 @@
             <div id="help_transfer">
                 <h2>Transfer</h2>
                 <p>
-                    Transfers your pool to vampires in your uncontrolled/inactive region. The default PLAYER is yourself. To reveal
+                    Transfers your pool to vampires in your uncontrolled/inactive region. The default PLAYER is
+                    yourself. To reveal
                     a vampire, you must use the PLAY command.
                 </p>
                 <h4>Syntax</h4>
                 <p>
-                <code>transfer [REGION] VAMP [+|-]AMOUNT</code>
+                    <code>transfer [REGION] VAMP [+|-]AMOUNT</code>
                 </p>
                 <h4>Examples</h4>
                 <table class="help-example">
@@ -453,16 +513,17 @@
             <div id="help_lock">
                 <h2>Lock</h2>
                 <p>
-                    Locks a particular card. You may target any card on the table. Note that locking other people's cards should
+                    Locks a particular card. You may target any card on the table. Note that locking other people's
+                    cards should
                     never be necessary. The default PLAYER is yourself. The default REGION is your ready region.
                 </p>
                 <h4>Syntax</h4>
                 <p>
                     <code>lock [PLAYER] [REGION] CARD</code>
                 </p>
-                <h5>Deprecated: VEKN has changed the keyword tap to lock.  This command will be removed in a future release.</h5>
                 <p>
                     <code>tap [PLAYER] [REGION] CARD</code>
+                    <h5>Deprecated: VEKN has changed the keyword tap to lock. This command will be removed in a future release.</h5>
                 </p>
                 <h4>Examples</h4>
                 <table class="help-example">
@@ -483,17 +544,19 @@
             <div id="help_unlock">
                 <h2>Unlock</h2>
                 <p>
-                    Unlocks a particular card. You may target any card on the table. Note that unlocking other people's cards should
-                    never be necessary. The default PLAYER is yourself. The default REGION includes all of your cards. In other
+                    Unlocks a particular card. You may target any card on the table. Note that unlocking other people's
+                    cards should
+                    never be necessary. The default PLAYER is yourself. The default REGION includes all of your cards.
+                    In other
                     words, you can easily start your turn by using a UNTAP command to unlock all of your cards.
                 </p>
                 <h4>Syntax</h4>
                 <p>
-                <code>unlock [PLAYER] [REGION] [CARD]</code>
+                    <code>unlock [PLAYER] [REGION] [CARD]</code>
                 </p>
-                <h5>Deprecated: VEKN has changed the keyword untap to unlock.  This command will be removed in a future release.</h5>
                 <p>
                     <code>untap [PLAYER] [REGION] [CARD]</code>
+                    <h5>Deprecated: VEKN has changed the keyword untap to unlock. This command will be removed in a future release.</h5>
                 </p>
                 <h4>Examples</h4>
                 <table class="help-example">
