@@ -1,6 +1,7 @@
 package deckserver.dwr.bean;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DeckBean {
@@ -11,6 +12,7 @@ public class DeckBean {
     public DeckBean(List<String> decks, List<DeckSummaryBean> games) {
         this.decks = decks;
         this.games = games;
+        Collections.sort(decks);
     }
 
     public List<String> getDecks() {
