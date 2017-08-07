@@ -104,7 +104,7 @@ function addGameRow(tid, label) {
             return row;
         }
     }
-    var newRow = table.insertRow(0);
+    var newRow = table.insertRow(table.rows.length);
     newRow.label = label;
     return newRow;
 }

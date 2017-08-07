@@ -6,18 +6,15 @@ import deckserver.dwr.PlayerModel;
 import deckserver.dwr.Utils;
 import deckserver.util.RefreshInterval;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.*;
 
 public class MainBean {
 
-    private PlSummaryBean[] mygames = null;
+    private List<PlSummaryBean> mygames = new ArrayList<>();
     private String[] who = null;
     private String[] admins = null;
     private boolean loggedin;
-    private SummaryBean[] games;
+    private List<SummaryBean> games = new ArrayList<>();
     private String[] chat;
     private int refresh = 0;
     private String stamp;
@@ -30,8 +27,6 @@ public class MainBean {
 
     public void init(AdminBean abean, PlayerModel model) {
         Collection<GameModel> actives = abean.getActiveGames();
-        Collection<SummaryBean> gv = new ArrayList<>();
-        Collection<PlSummaryBean> mgv = new ArrayList<>();
         Collection<String> gamenames = new HashSet<>();
         loggedin = model.getPlayer() != null;
         if (loggedin) {
@@ -40,12 +35,10 @@ public class MainBean {
         }
         for (GameModel game : actives) {
             if (!model.getChangedGames().contains(game.getName())) continue;
-            gv.add(game.getSummaryBean());
+            games.add(game.getSummaryBean());
             if (gamenames.contains(game.getName()) && (game.isOpen() || game.getPlayers().contains(model.getPlayer())))
-                mgv.add(new PlSummaryBean(game, model.getPlayer()));
+                mygames.add(new PlSummaryBean(game, model.getPlayer()));
         }
-        games = gv.toArray(new SummaryBean[0]);
-        mygames = mgv.toArray(new PlSummaryBean[0]);
         remGames = model.getRemovedGames().toArray(new String[0]);
         chat = model.getChat();
         if (chat.length == 0) chat = null;
@@ -53,6 +46,8 @@ public class MainBean {
         admins = abean.getAdmins();
         stamp = Utils.getDate();
         message = abean.getMessage();
+        mygames.sort(Comparator.comparing(PlSummaryBean::getGame));
+        games.sort(Comparator.comparing(SummaryBean::getGame));
         model.clearGames();
     }
 
@@ -60,7 +55,7 @@ public class MainBean {
         return stamp;
     }
 
-    public SummaryBean[] getGames() {
+    public List<SummaryBean> getGames() {
         return games;
     }
 
@@ -88,7 +83,7 @@ public class MainBean {
         return loggedin;
     }
 
-    public PlSummaryBean[] getMyGames() {
+    public List<PlSummaryBean> getMyGames() {
         return mygames;
     }
 
