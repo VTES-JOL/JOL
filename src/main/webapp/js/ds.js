@@ -590,7 +590,6 @@ function callbackStatus(data) {
         if (data === outageTime) {
             return;
         }
-        console.log("updating clock timer");
         clearInterval(timeInterval);
         timeInterval = setInterval(function () {
             var t = getTimeRemaining(data);
