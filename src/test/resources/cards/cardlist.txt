@@ -2910,7 +2910,7 @@ Name: Bear's Skin
 [TU:C]
 Cardtype: Combat
 Discipline: Animalism & Protean
-Only usable before range is determined. A vampire can play only one Bear's Skin each combat. 
+Only usable before range is determined. A vampire can play only one Bear's Skin each combat.
 [ani][pro] This round, this vampire gets +1 strength and can prevent 1 damage.
 [ANI][PRO] This combat, this vampire gets +1 strength and can prevent 1 damage each round.
 Artist: Heather Kreiter
@@ -4298,7 +4298,7 @@ Choose a ready Brujah. If this referendum passes, put this card on the chosen Br
 Artist: Heather Hudson; Steve Prescott
 
 Name: Brunhilde
-[Anarchs:U2, Anthology:1]
+[Anarchs:U2]
 Cardtype: Vampire
 Clan: Gangrel
 Group: 3
@@ -5589,7 +5589,7 @@ Level: Advanced
 Group: 5
 Capacity: 9
 Discipline: cel obf AUS DOM THA
-Camarilla: If Claudio is ready, you can use a discard phase action to discard a card requiring Thaumaturgy [tha] to gain 1 pool. 
+Camarilla: If Claudio is ready, you can use a discard phase action to discard a card requiring Thaumaturgy [tha] to gain 1 pool.
 [MERGED] Claudio can burn 1 blood to get +1 stealth.
 Artist: Ginés Quiñonero
 
@@ -9418,7 +9418,7 @@ Name: Ennoia's Theater
 [TU:C]
 Cardtype: Master
 Clan: Gangrel/Gangrel antitribu
-Unique location. 
+Unique location.
 You can lock this card to get +1 hand size this turn. You can lock this card during your influence phase to get +1 transfer.
 Artist: Javier Santos
 
@@ -13923,7 +13923,7 @@ Name: Illegalism
 [AU:C]
 Cardtype: Action
 Discipline: Celerity/Chimerstry/Presence
-Requires an anarch. More than one discipline can be used when playing this card. 
+Requires an anarch. More than one discipline can be used when playing this card.
 (D) Bleed.
 [cel] Unlock this anarch if the bleed is successful.
 [chi] This action is at +1 stealth.
@@ -23474,7 +23474,7 @@ Artist: Brian LeBlanc
 Name: Public Vilification
 [DM:C]
 Cardtype: Political Action
-Requires a titled Sabbat vampire. 
+Requires a titled Sabbat vampire.
 Choose a younger ready vampire controlled by another Methuselah. Successful referendum means this vampire steals 3 blood from the chosen vampire.
 Artist: zelgaris
 
@@ -26804,7 +26804,7 @@ Artist: Andrew Bates
 Name: Shakar: the Hunt
 [DM:C]
 Cardtype: Master
-Master: contract. Trifle. Unique. Requires a Black Hand vampire. 
+Master: contract. Trifle. Unique. Requires a Black Hand vampire.
 Put this card on a ready minion. Every Black Hand vampire is considered chosen for this contract. Any Black Hand vampire can enter combat with this minon as a +1 stealth (D) action. Burn this card when this minion leaves the ready region.
 Artist: Javier Santos
 
@@ -28031,7 +28031,7 @@ Name: Spiritual Guidance
 Cardtype: Combat
 Clan: Giovanni
 A vampire can play only one Spiritual Guidance each combat.
-Play a combat card from your ash heap as if from your hand. When that card would be burned, remove it from the game instead. 
+Play a combat card from your ash heap as if from your hand. When that card would be burned, remove it from the game instead.
 Artist: Ginés Quiñonero
 
 Name: Spiritual Intervention
@@ -28065,7 +28065,7 @@ Name: Spoils of War
 [DM:C]
 Cardtype: Action Modifier
 Clan: Brujah antitribu
-Only usable after a successful (D) action. 
+Only usable after a successful (D) action.
 This vampire gains 1 blood and you gain 1 pool.
 Artist: August Bøgedal Hansen
 
@@ -29076,7 +29076,7 @@ Clan: Tremere
 Group: 4
 Capacity: 4
 Discipline: aus nec tha
-Camarilla: While Tarautas is ready, Blood Doll and Minion Lock cards cost an additional pool.
+Camarilla: While Tarautas is ready, Blood Doll and Minion Tap cards cost an additional pool.
 Artist: Vince Locke
 
 Name: Tarbaby Jack
@@ -30759,7 +30759,7 @@ Name: Under Siege
 [DM:C, Anthology:2]
 Cardtype: Action
 Cost: 1 pool
-+1 stealth action. Requires a titled Sabbat vampire. Unique. 
++1 stealth action. Requires a titled Sabbat vampire. Unique.
 Put this card in play with 3 counters. Once each action, a Sabbat vampire you control can burn 1 counter from this card to unlock and attempt to block with +1 intercept, even if intercept is not yet needed. Burn this card when it has no counters.
 Artist: Anna Evertsdotter;Ginés Quiñonero
 
@@ -31599,7 +31599,7 @@ Name: Villein
 [KoT:U, HttB:PGar2/PKia2/PSal2/PSam2]
 Cardtype: Master
 Master: trifle.
-Put this card on a vampire you control and move 2 or more blood from that vampire to your pool. Minion Lock cards cost you an additional pool. Villein costs an additional pool to play on this vampire.
+Put this card on a vampire you control and move 2 or more blood from that vampire to your pool. Minion Tap cards cost you an additional pool. Villein costs an additional pool to play on this vampire.
 Artist: Vince Locke
 
 Name: Vincent Day, Paladin and Paragon
