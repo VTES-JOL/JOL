@@ -62,7 +62,7 @@ public class CardImpl implements Card {
     public void setCards(Card[] cards) {
         for (Card card : cards) {
             GameCard c = game.mkCard(card);
-            Card cd = (Card) game.getCard(c.getId());
+            Card cd = game.getCard(c.getId());
             addCard(cd, false);
         }
     }

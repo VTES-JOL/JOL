@@ -42,20 +42,20 @@ public class JolGame {
     public static final String RESEARCH = "research";
     public static final String[] TURN_PHASES = new String[]{"Unlock", "Master", "Minion", "Influence", "Discard"};
 
-    static final String COUNTERS = "counters";
-    static final String BLOOD = "blood";
-    static final String TEXT = "text";
-    static final String ACTIVE = "active meth";
-    static final String POOL = "pool";
-    static final String EDGE = "edge";
-    static final String TAP = "tapnote";
-    static final String TAPPED = "tap";
-    static final String UNTAPPED = "untap";
-    static final String PING = "ping";
+    private static final String COUNTERS = "counters";
+    private static final String BLOOD = "blood";
+    private static final String TEXT = "text";
+    private static final String ACTIVE = "active meth";
+    private static final String POOL = "pool";
+    private static final String EDGE = "edge";
+    private static final String TAP = "tapnote";
+    private static final String TAPPED = "tap";
+    private static final String UNTAPPED = "untap";
+    private static final String PING = "ping";
     private static final Logger logger = getLogger(JolGame.class);
     private static DateFormat format = new SimpleDateFormat("HH:mm M/d ");
-    Game state = null;
-    TurnRecorder actions = null;
+    private Game state = null;
+    private TurnRecorder actions = null;
 
     public JolGame(Game state, TurnRecorder actions) {
         this.state = state;
@@ -81,8 +81,8 @@ public class JolGame {
             state.addLocation(name, RESEARCH);
         }
         CardEntry[] cards = deck.getCards();
-        Location crypt = (Location) state.getPlayerLocation(name, CRYPT);
-        Location library = (Location) state.getPlayerLocation(name, LIBRARY);
+        Location crypt = state.getPlayerLocation(name, CRYPT);
+        Location library = state.getPlayerLocation(name, LIBRARY);
         Collection<String> cryptlist = new Vector<>();
         Collection<String> librarylist = new Vector<>();
         for (CardEntry card : cards) {
@@ -111,10 +111,10 @@ public class JolGame {
     }
 
     public void _drawCard(String player, String srcRegion, String destRegion, boolean log) {
-        Location source = (Location) state.getPlayerLocation(player, srcRegion);
-        Location dest = (Location) state.getPlayerLocation(player, destRegion);
+        Location source = state.getPlayerLocation(player, srcRegion);
+        Location dest = state.getPlayerLocation(player, destRegion);
         if (source == null || dest == null) throw new IllegalArgumentException("Not a valid region");
-        Card card = (Card) source.getFirstCard();
+        Card card = source.getFirstCard();
         if (card == null) throw new IllegalArgumentException("No card available");
         source.removeCard(card);
         dest.addCard(card, false);
@@ -133,20 +133,20 @@ public class JolGame {
 
     public void moveToCard(String cardId, String destCard) {
         if (cardId.equals(destCard)) throw new IllegalArgumentException("Can't move a card to itself");
-        Card srcCard = (Card) state.getCard(cardId);
-        Card dstCard = (Card) state.getCard(destCard);
+        Card srcCard = state.getCard(cardId);
+        Card dstCard = state.getCard(destCard);
         if (srcCard == null || dstCard == null) throw new IllegalArgumentException("No such card");
-        CardContainer source = (CardContainer) srcCard.getParent();
-        addCommand("Put " + srcCard.getName() + " on " + getCardName(dstCard), new String[]{"puton", cardId, destCard});
+        CardContainer source = srcCard.getParent();
+        addCommand("Put " + getCardName(srcCard) + " on " + getCardName(dstCard), new String[]{"puton", cardId, destCard});
         source.removeCard(srcCard);
         dstCard.addCard(srcCard, false);
     }
 
     public void moveToRegion(String cardId, String destPlayer, String destRegion, boolean bottom, boolean random) {
-        Card card = (Card) state.getCard(cardId);
+        Card card = state.getCard(cardId);
         if (card == null) throw new IllegalArgumentException("No such card");
-        CardContainer source = (CardContainer) card.getParent();
-        Location dest = (Location) state.getPlayerLocation(destPlayer, destRegion);
+        CardContainer source = card.getParent();
+        Location dest = state.getPlayerLocation(destPlayer, destRegion);
         if (dest == null) throw new IllegalStateException("No such region");
         addCommand("Move " + getCardName(card, destRegion) + " to " + destPlayer + "'s " + destRegion + (random ? " (picked randomly)" : ""), new String[]{"move", cardId, destPlayer, destRegion, bottom ? "bottom" : "top"});
         source.removeCard(card);
@@ -170,7 +170,7 @@ public class JolGame {
     }
 
     private void _shuffle(String player, String region, int num, boolean log) {
-        Location location = (Location) state.getPlayerLocation(player, region);
+        Location location = state.getPlayerLocation(player, region);
         location.shuffle(num);
         if (log) {
             String add = (num == 0) ? "" : num + " of ";
@@ -180,9 +180,9 @@ public class JolGame {
 
     private void _moveall(String player, String srcLoc, String destPlayer, String destLoc) {
         if (destPlayer == null) destPlayer = player;
-        Location src = (Location) state.getPlayerLocation(player, srcLoc);
-        Location dest = (Location) state.getPlayerLocation(destPlayer, destLoc);
-        Card[] cards = (Card[]) src.getCards();
+        Location src = state.getPlayerLocation(player, srcLoc);
+        Location dest = state.getPlayerLocation(destPlayer, destLoc);
+        Card[] cards = src.getCards();
         for (Card card : cards) {
             src.removeCard(card);
             dest.addCard(card, false);
@@ -247,12 +247,12 @@ public class JolGame {
     }
 
     public String getCardDescripId(String cardId) {
-        Card card = (Card) state.getCard(cardId);
+        Card card = state.getCard(cardId);
         return card.getCardId();
     }
 
     public int getCounters(String cardId) {
-        Card card = (Card) state.getCard(cardId);
+        Card card = state.getCard(cardId);
         Note note = getNote(card, COUNTERS, false);
         if (note != null) return Integer.parseInt(note.getValue());
         return 0;
@@ -260,7 +260,7 @@ public class JolGame {
 
     public void changeCounters(String cardId, int incr) {
         if (incr == 0) return; // no change necessary - PENDING log this though?
-        Card card = (Card) state.getCard(cardId);
+        Card card = state.getCard(cardId);
         Note note = getNote(card, COUNTERS, true);
         String valStr = note.getValue();
         int val = (valStr == null) ? 0 : Integer.parseInt(valStr);
@@ -272,15 +272,6 @@ public class JolGame {
         logText = logText + getCardName(card) + ", now " + val + ".";
         addCommand(logText, new String[]{"counter", cardId, incr + ""});
     }
-
-    /*
-    private String getCardName(Card card, Card destCard) {
-        Location loc = (Location) state.getRegionFromCard(destCard);
-        if(loc == null) return card.getName();
-        String region = state.getPlayerRegionName(loc);
-        if(region == null) return card.getName();
-        return getCardName(card,region);
-    } */
 
     private boolean isHiddenRegion(String region) {
         return region.equals(INACTIVE_REGION) || region.equals(HAND) || region.equals(LIBRARY) || region.equals(CRYPT) || region.equals(RESEARCH);
@@ -374,7 +365,7 @@ public class JolGame {
     }
 
     public String getText(String cardId) {
-        Card card = (Card) state.getCard(cardId);
+        Card card = state.getCard(cardId);
         Note note = getNote(card, TEXT, false);
         if (note != null) return note.getValue();
         return "";
@@ -386,20 +377,20 @@ public class JolGame {
     }
 
     public void setText(String cardId, String text) {
-        Card card = (Card) state.getCard(cardId);
+        Card card = state.getCard(cardId);
         Note note = getNote(card, TEXT, true);
         note.setValue(text);
         addMessage(getCardName(card) + " now " + text);
     }
 
     public boolean isTapped(String cardId) {
-        Card card = (Card) state.getCard(cardId);
+        Card card = state.getCard(cardId);
         Note note = getNote(card, TAP, false);
         return note != null && note.getValue().equals(TAPPED);
     }
 
     public void setTapped(String cardId, boolean tapped) {
-        Card card = (Card) state.getCard(cardId);
+        Card card = state.getCard(cardId);
         String logtext = (tapped ? "Lock " : "Unlock ") + getCardName(card);
         addCommand(logtext, new String[]{"tap", cardId});
         _setTap(card, tapped);
@@ -414,13 +405,13 @@ public class JolGame {
     }
 
     public void untapAll(String player) {
-        Location[] locs = (Location[]) state.getPlayerLocations(player);
+        Location[] locs = state.getPlayerLocations(player);
         addCommand(player + " unlocks.", new String[]{"unlock", player});
         for (Location loc : locs) untapAll(loc);
     }
 
     private void untapAll(CardContainer loc) {
-        Card[] cards = (Card[]) loc.getCards();
+        Card[] cards = loc.getCards();
         for (Card card : cards) {
             _setTap(card, false);
             untapAll(card);
@@ -503,7 +494,7 @@ public class JolGame {
     }
 
     public void changeCapacity(String cardId, int capincr) {
-        Card card = (Card) state.getCard(cardId);
+        Card card = state.getCard(cardId);
         Note cap = getNote(card, "capac", true);
         String val = cap.getValue();
         int amt = 0;
@@ -515,7 +506,7 @@ public class JolGame {
     }
 
     public int getCapacity(String cardId) {
-        Card card = (Card) state.getCard(cardId);
+        Card card = state.getCard(cardId);
         Note cap = getNote(card, "capac", false);
         if (cap == null) return -1;
         return Integer.parseInt(cap.getValue());

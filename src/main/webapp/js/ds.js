@@ -78,7 +78,7 @@ function navigate(data) {
     doButtons(data.adminButtons);
     doButtons(data.gameButtons);
     doButtons({help: "Help"});
-    doButtons({_guides: "Guides"})
+    doButtons({_guides: "Guides"});
     if (data.player === null) {
         toggleVisible('logininputs', 'loggedin');
         dwr.util.setValue('login', 'Log in');

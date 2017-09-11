@@ -18,7 +18,7 @@ public class HandParams {
     private String text;
 
     public HandParams(JolGame game, String player, String text, String region) {
-        cards = (Card[]) game.getState().getPlayerLocation(player, region).getCards();
+        cards = game.getState().getPlayerLocation(player, region).getCards();
         this.text = text;
     }
 

@@ -41,7 +41,7 @@
         out.write("<span class='cardtext'>" + builder.toString() + "</span>");
         // Other cards attached
         if (p.doNesting()) {
-            Card[] cards = (Card[]) c.getCards();
+            Card[] cards = c.getCards();
             if (cards != null && cards.length > 0) {
                 out.write("<ol>");
                 for (Card card : cards) {

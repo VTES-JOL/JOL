@@ -26,7 +26,7 @@ public final class ModelLoader {
             game.addLocation(player, JolGame.CRYPT);
             game.addLocation(player, JolGame.RFG);
             game.addLocation(player, JolGame.RESEARCH);
-            Location[] locs = (Location[]) orig.getPlayerLocations(player);
+            Location[] locs = orig.getPlayerLocations(player);
             for (Location loc : locs) {
                 moveLoc(game, orig, player, loc);
             }
@@ -43,18 +43,18 @@ public final class ModelLoader {
 
     private static void moveLoc(Game game, Game orig, String player, Location loc) {
         String name = orig.getPlayerRegionName(loc);
-        Location to = (Location) game.getPlayerLocation(player, name);
+        Location to = game.getPlayerLocation(player, name);
         moveNotes(loc, to);
         moveCards(loc, to);
     }
 
     private static void moveCards(CardContainer from, CardContainer to) {
-        Card[] cards = (Card[]) from.getCards();
+        Card[] cards = from.getCards();
         to.setCards(cards);
         for (int i = 0; i < cards.length; i++) {
-            Card toCard = (Card) to.getCards()[i];
+            Card toCard = to.getCards()[i];
             moveNotes(cards[i], toCard);
-            Card[] inner = (Card[]) cards[i].getCards();
+            Card[] inner = cards[i].getCards();
             if (inner.length > 0) {
                 moveCards(cards[i], toCard);
             }

@@ -29,7 +29,7 @@ public class LocationImpl implements Location {
     }
 
     public Card getCard(String id) {
-        Card card = (Card) game.getCard(id);
+        Card card = game.getCard(id);
         if (card.getParent().equals(this)) return card;
         return null;
     }

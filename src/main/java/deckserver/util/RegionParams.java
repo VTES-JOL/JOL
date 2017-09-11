@@ -20,7 +20,7 @@ public class RegionParams {
     private boolean hidden;
 
     public RegionParams(JolGame game, String player, int index, String text, String region, String id, boolean hidden) {
-        cards = (Card[]) game.getState().getPlayerLocation(player, region).getCards();
+        cards = game.getState().getPlayerLocation(player, region).getCards();
         this.text = text;
         this.hidden = hidden;
         this.index = id + index;

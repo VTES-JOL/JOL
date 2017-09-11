@@ -15,19 +15,14 @@ class CommandParser {
 
     private final static Logger logger = getLogger(CommandParser.class);
 
-    String[] args;
-    int ind;
+    private String[] args;
+    private int ind;
     private JolGame game;
 
     public CommandParser(String[] args, int ind, JolGame game) {
         this.args = args;
         this.ind = ind;
         this.game = game;
-    }
-
-    CommandParser(String[] args, int index) {
-        this.args = args;
-        this.ind = index;
     }
 
     String getRegion(String defaultRegion) throws CommandException {
