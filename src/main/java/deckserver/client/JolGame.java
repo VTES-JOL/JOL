@@ -287,7 +287,8 @@ public class JolGame {
     }
 
     private String getCardName(Card card, String destRegion) {
-        if (!isHiddenRegion(destRegion)) return card.getName();
+        if (!isHiddenRegion(destRegion))
+            return getCardLink(card);
         return getCardName(card);
     }
 
@@ -297,15 +298,19 @@ public class JolGame {
         String region = state.getPlayerRegionName(loc);
         if (region == null) return card.getName();
         if (isHiddenRegion(region)) {
-            CardContainer container = (CardContainer) card.getParent();
+            CardContainer container = card.getParent();
             if (container instanceof Location) {
                 loc = (Location) container;
-                Card[] cards = (Card[]) loc.getCards();
+                Card[] cards = loc.getCards();
                 for (int j = 0; j < cards.length; j++)
                     if (card.getId().equals(cards[j].getId())) return region + " #" + (j + 1);
             }
         }
-        return card.getName();
+        return getCardLink(card);
+    }
+
+    private String getCardLink(Card card) {
+        return "<a href='javascript:getCard(\"" + card.getCardId() + "\")';>" + card.getName() + "</a>";
     }
 
     public String getActivePlayer() {

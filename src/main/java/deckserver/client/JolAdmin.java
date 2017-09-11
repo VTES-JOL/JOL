@@ -493,7 +493,7 @@ public class JolAdmin {
         synchronized void dowrite() {
             super.write();
             if (game != null) {
-                logger.info("Saving game {}", gamename);
+                logger.debug("Saving game {}", gamename);
                 GameState gstate = new GameState();
                 GameActions gactions = new GameActions();
                 gactions.setCounter("1");
