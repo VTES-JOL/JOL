@@ -113,14 +113,7 @@ public class GameModel implements Comparable {
                     chatChanged = true;
                 }
             }
-            if ((game.getActivePlayer().equals(player)
-                    || admin.getOwner(game.getName()).equals(player))
-                    && "Yes".equalsIgnoreCase(endTurn)) {
-                try {
-                    MailUtil.sendTurn(game);
-                } catch (Error e) {
-                    status.append("Turn email failed.");
-                }
+            if ((game.getActivePlayer().equals(player) || admin.getOwner(game.getName()).equals(player)) && "Yes".equalsIgnoreCase(endTurn)) {
                 game.newTurn();
                 resetChats();
                 idx = 0; // reset the current action index for the new turn.

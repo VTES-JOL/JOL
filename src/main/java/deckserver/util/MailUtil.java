@@ -80,7 +80,7 @@ public class MailUtil {
         sendMsg(header, msg, emails);
     }
 
-    public static void sendTurn(JolGame game) {
+    /*public static void sendTurn(JolGame game) {
         String turn = game.getCurrentTurn();
         GameAction[] actions = game.getActions(turn);
         StringBuilder buf = new StringBuilder();
@@ -93,5 +93,5 @@ public class MailUtil {
         String[] players = game.getPlayers();
         List<String> emails = Stream.of(players).map(JolAdmin.getInstance()::getEmail).collect(Collectors.toList());
         sendMsg(header, buf.toString(), emails);
-    }
+    }*/
 }
