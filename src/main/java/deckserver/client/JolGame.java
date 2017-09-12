@@ -137,7 +137,8 @@ public class JolGame {
         Card dstCard = state.getCard(destCard);
         if (srcCard == null || dstCard == null) throw new IllegalArgumentException("No such card");
         CardContainer source = srcCard.getParent();
-        addCommand("Put " + getCardName(srcCard) + " on " + getCardName(dstCard), new String[]{"puton", cardId, destCard});
+        Location loc = (Location) state.getRegionFromCard(dstCard);
+        addCommand("Put " + getCardName(srcCard, loc.getName()) + " on " + getCardName(dstCard), new String[]{"puton", cardId, destCard});
         source.removeCard(srcCard);
         dstCard.addCard(srcCard, false);
     }
