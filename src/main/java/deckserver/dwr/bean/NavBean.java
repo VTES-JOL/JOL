@@ -17,9 +17,8 @@ public class NavBean {
     private static final Map<String, String> isadmin = new HashMap<>();
 
     static {
-        loggedOut.put("main", "Main");
-        loggedIn.put("main", "Main");
         loggedIn.put("deck", "Deck Register");
+        loggedIn.put("profile", "Profile");
         isadmin.put("admin", "Game Admin");
         hasChats = new HashMap<>(loggedIn);
         hasChats.put("main", "Main *");

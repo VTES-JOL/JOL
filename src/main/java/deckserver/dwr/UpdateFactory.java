@@ -17,6 +17,7 @@ class UpdateFactory {
         viewMap.put("deck", new DeckCreator());
         viewMap.put("admin", new AdminCreator());
         viewMap.put("status", new StatusCreator());
+        viewMap.put("profile", new ProfileCreator());
     }
 
     private static ViewCreator getView(String type) {

@@ -17,6 +17,7 @@ import deckserver.game.turn.TurnRecorder;
 import net.deckserver.game.jaxb.FileUtils;
 import net.deckserver.game.jaxb.actions.GameActions;
 import net.deckserver.game.jaxb.state.GameState;
+import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -107,6 +108,14 @@ public class JolAdmin {
         return true;
     }
 
+    public void changePassword(String player, String newPassword) {
+        getPlayerInfo(player).setPassword(newPassword);
+    }
+
+    public void updateProfile(String player, String email, boolean receivePing, boolean receiveSummary) {
+        getPlayerInfo(player).updateProfile(email, receivePing, receiveSummary);
+    }
+
     public boolean authenticate(String player, String password) {
         return existsPlayer(player)
                 && getPlayerInfo(player).authenticate(password);
@@ -134,6 +143,11 @@ public class JolAdmin {
     public boolean receivesTurnSummaries(String playerName) {
         PlayerInfo player = getPlayerInfo(playerName);
         return player.receivesTurnSummaries();
+    }
+
+    public boolean receivesPing(String playerName) {
+        PlayerInfo player = getPlayerInfo(playerName);
+        return player.receivesPing();
     }
 
     public void recordAccess(String playerName) {
@@ -542,12 +556,14 @@ public class JolAdmin {
         }
 
         public void setPassword(String password) {
-            info.setProperty("password", password);
+            String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
+            info.setProperty("hash", hash);
             write();
         }
 
         boolean authenticate(String password) {
-            return info.getProperty("password").equals(password);
+            String hash =  info.getProperty("hash");
+            return BCrypt.checkpw(password, hash);
         }
 
         boolean doInteractive() {
@@ -681,6 +697,16 @@ public class JolAdmin {
             return "true".equals(info.getProperty("turns", "true"));
         }
 
+        boolean receivesPing() {
+            return "true".equals(info.getProperty("pings", "true"));
+        }
+
+        public void updateProfile(String email, boolean receivePing, boolean receiveSummary) {
+            info.setProperty("email", email);
+            info.setProperty("pings", String.valueOf(receivePing));
+            info.setProperty("turns", String.valueOf(receiveSummary));
+            write();
+        }
     }
 
     private class SystemInfo extends Info {

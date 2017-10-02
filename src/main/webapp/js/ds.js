@@ -3,6 +3,12 @@ var game = null;
 var timeInterval = null;
 var outageTime = null;
 
+var profile = {
+    email: "",
+    receivePing: "",
+    receiveSummary: ""
+};
+
 dwr.engine.setTextHtmlHandler(function () {
     document.location = '/jol/';
 });
@@ -74,21 +80,22 @@ function navigate(data) {
     dwr.util.setValue("contentselect", data.target);
     toggleVisible(data.target, selected);
     dwr.util.setValue('buttons', '');
-    doButtons(data.playerButtons);
-    doButtons(data.adminButtons);
-    doButtons(data.gameButtons);
-    doButtons({help: "Help"});
-    doButtons({_guides: "Guides"});
     if (data.player === null) {
         toggleVisible('logininputs', 'loggedin');
         dwr.util.setValue('login', 'Log in');
         dwr.util.byId('gameRow').style.display = "none";
     } else {
+        doButtons({main: "Main"});
+        doButtons(data.playerButtons);
+        doButtons(data.adminButtons);
+        doButtons(data.gameButtons);
         dwr.util.setValue('loggedin', data.player);
         toggleVisible('loggedin', 'logininputs');
         dwr.util.setValue('login', 'Log out');
         dwr.util.byId('gameRow').style.display = "";
     }
+    doButtons({help: "Help"});
+    doButtons({_guides: "Guides"});
     game = data.game;
     dwr.util.setValue('gamename', '');
     if (game !== null) {
@@ -481,6 +488,46 @@ function getHistory() {
 function loadHistory(data) {
     var text = data.join('<br/>');
     dwr.util.setValue('history', text, {escapeHtml: false});
+}
+
+function callbackProfile(data) {
+    if (profile.email !== data.email) {
+        dwr.util.setValue("profileEmail", data.email);
+    }
+
+    if (profile.receivePing !== data.receivePing) {
+        dwr.util.setValue("profilePing", data.receivePing);
+    }
+
+    if (profile.receiveSummary !== data.receiveSummary) {
+        dwr.util.setValue("profileTurnSummary", data.receiveSummary);
+    }
+
+    profile = data;
+
+    dwr.util.setValue("profilePasswordError","");
+    dwr.util.setValue("profileNewPassword","");
+    dwr.util.setValue("profileConfirmPassword","");
+}
+
+function updateProfile() {
+    var newEmail = dwr.util.getValue("profileEmail");
+    var newPing = dwr.util.getValue("profilePing");
+    var newSummary = dwr.util.getValue("profileTurnSummary");
+    DS.updateProfile(newEmail, newPing, newSummary, {callback: playerMap});
+}
+
+function updatePassword() {
+    var profileNewPassword = dwr.util.getValue("profileNewPassword");
+    var profileConfirmPassword = dwr.util.getValue("profileConfirmPassword");
+    if (!profileNewPassword && !profileConfirmPassword) {
+        dwr.util.setValue("profilePasswordError", "Please enter a new password to proceed.");
+    } else if (profileNewPassword !== profileConfirmPassword) {
+        dwr.util.setValue("profilePasswordError", "Password chosen does not match.");
+    } else {
+        DS.changePassword(profileNewPassword, {callback: playerMap});
+        dwr.util.setValue("profilePasswordError", "Password updated");
+    }
 }
 
 function callbackShowDecks(data) {

@@ -43,6 +43,10 @@
                 <div id="_guides" style="display: none;">
                     <jsp:include page="/WEB-INF/jsps/guides.jsp"/>
                 </div>
+
+                <div id="profile" style="display:none">
+                    <jsp:include page="/WEB-INF/jsps/profile.jsp"/>
+                </div>
             </div>
         </div>
         <script>

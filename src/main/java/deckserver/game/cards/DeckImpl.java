@@ -24,23 +24,19 @@ public class DeckImpl implements Deck {
 
     private static final Logger logger = LoggerFactory.getLogger(DeckImpl.class);
 
-    final CardSearch search;
-    StringBuffer orig = new StringBuffer();
-    StringBuffer translated = new StringBuffer();
-    Collection<String> errors = new Vector<>();
-    boolean didTranslation = false;
-    int cryptsum = 0;
-    int decksum = 0;
-    boolean parseCards = true;
-    Map<CardEntry, Integer> cards = new HashMap<>();
+    private final CardSearch search;
+    private StringBuffer orig = new StringBuffer();
+    private StringBuffer translated = new StringBuffer();
+    private Collection<String> errors = new Vector<>();
+    private boolean didTranslation = false;
+    private int cryptsum = 0;
+    private int decksum = 0;
+    private boolean parseCards = true;
+    private Map<CardEntry, Integer> cards = new HashMap<>();
     private Collection<String> groups = new TreeSet<>();
 
     public DeckImpl(CardSearch search, String deck) {
         this(search, deck, false, false);
-    }
-
-    public DeckImpl(CardSearch search, String deck, boolean sizeOnly) {
-        this(search, deck, sizeOnly, false);
     }
 
     public DeckImpl(CardSearch search, String deck, boolean sizeOnly, boolean doConstruction) {

@@ -1,5 +1,6 @@
 package deckserver.client;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,12 +10,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Properties;
 
 public class PromoteAdmin {
 
     private static final Logger logger = LoggerFactory.getLogger(PromoteAdmin.class);
-    private static final String sourceDirectory = "/Users/shannon/data";
+    private static final String sourceDirectory = "src/test/resources";
     private static Path dataPath = Paths.get(sourceDirectory);
 
     private static Properties load(Path propertyPath) {
@@ -27,7 +29,7 @@ public class PromoteAdmin {
         } catch (IOException e) {
             logger.error("Error reading property file {}", propertyPath);
         }
-        return null;
+        throw new IllegalArgumentException("Unable to find properties file");
     }
 
     private static void save(Properties properties, Path propertyPath) {
@@ -40,13 +42,22 @@ public class PromoteAdmin {
 
     public static void main(String[] args) {
         Properties systemProperties = load(dataPath.resolve("system.properties"));
-        systemProperties.stringPropertyNames().stream().filter(s -> s.matches("^player\\d*")).forEach(PromoteAdmin::promotePlayer);
+        systemProperties.stringPropertyNames().stream().filter(s -> s.matches("^player\\d*")).forEach(PromoteAdmin::encryptPassword);
     }
 
     private static void promotePlayer(String playerId) {
         Path playerPath = dataPath.resolve(playerId).resolve("player.properties");
         Properties playerProperties = load(playerPath);
         playerProperties.setProperty("admin", "yes");
+        save(playerProperties, playerPath);
+    }
+
+    private static void encryptPassword(String playerId) {
+        Path playerPath = dataPath.resolve(playerId).resolve("player.properties");
+        Properties playerProperties = load(playerPath);
+        String password = playerProperties.getProperty("password","");
+        String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
+        playerProperties.setProperty("hash", hash);
         save(playerProperties, playerPath);
     }
 }

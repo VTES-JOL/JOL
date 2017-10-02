@@ -232,6 +232,19 @@ public class DeckserverRemote {
         }
     }
 
+    public Map<String, Object> updateProfile(String email, boolean receivePing, boolean receiveSummary) {
+        String player = Utils.getPlayer(request);
+        JolAdmin.getInstance().updateProfile(player, email, receivePing, receiveSummary);
+        return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> changePassword(String newPassword) {
+        String player = Utils.getPlayer(request);
+        JolAdmin.getInstance().changePassword(player, newPassword);
+        return UpdateFactory.getUpdate();
+    }
+
+
     private PlayerModel getPlayer() {
         return Utils.getPlayerModel(request, abean);
     }
