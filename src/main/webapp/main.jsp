@@ -7,9 +7,11 @@
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/engine.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/interface/DS.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/util.js'></script>
-        <script type='text/javascript' src='${pageContext.request.contextPath}/js/ds.js?version=${project.version}'></script>
+        <script type='text/javascript' src='${pageContext.request.contextPath}/js/moment-with-locales.min.js'></script>
+        <script type='text/javascript' src='${pageContext.request.contextPath}/js/moment-timezone-with-data.min.js'></script>
+        <script type='text/javascript' src='${pageContext.request.contextPath}/js/ds.js?version=<%= System.getProperty("jol.version")%>'></script>
         <script src='https://www.google.com/recaptcha/api.js'></script>
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/styles.css?version=${project.version}"/>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/styles.css?version=<%= System.getProperty("jol.version")%>"/>
         <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/favicon.ico" />
     </head>
     <body onload="init();" class="${applicationScope.get("environment")}">

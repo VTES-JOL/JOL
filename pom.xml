@@ -34,10 +34,15 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>2.3.2</version>
-            <scope>test</scope>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.16</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.8.9</version>
         </dependency>
 
         <dependency>
@@ -108,6 +113,7 @@
                         <jol.data>${dataDir}</jol.data>
                         <jol.email>jol@localhost</jol.email>
                         <jol.env>dev</jol.env>
+                        <jol.version>${project.version}</jol.version>
                         <recaptcha.key>***REMOVED***</recaptcha.key>
                         <recaptcha.secret>***REMOVED***</recaptcha.secret>
                         <tomcat.username>tomcat-deploy</tomcat.username>
@@ -132,14 +138,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
                     <version>3.1.0</version>
-                    <configuration>
-                        <webResources>
-                            <resource>
-                                <directory>src/main/webapp</directory>
-                                <filtering>true</filtering>
-                            </resource>
-                        </webResources>
-                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
