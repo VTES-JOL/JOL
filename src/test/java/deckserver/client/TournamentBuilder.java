@@ -3,6 +3,12 @@ package deckserver.client;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -10,7 +16,7 @@ import java.util.stream.IntStream;
 
 public class TournamentBuilder {
 
-    private static String dataDir = "/Users/shannon/data";
+    private static String dataDir = "/home/shannon/data";
     private static JolAdmin jolAdmin;
     private static String admin = "shade_nz";
     private static String seedGame = "Tournament-2017-1";
@@ -48,7 +54,45 @@ public class TournamentBuilder {
     }
 
     public static void main(String[] args) throws Exception {
+        replacePlayer("Tournament-2017-Round1-Table1", "BBDave", "bluedevil");
+        replacePlayer("Tournament-2017-Round2-Table3", "BBDave", "bluedevil");
+        replacePlayer("Tournament-2017-Round3-Table1", "BBDave", "bluedevil");
+    }
 
+    private static void replacePlayer(String gameName, String sourcePlayer, String targetPlayer) {
+        JolAdmin.GameInfo gameInfo = jolAdmin.getGameInfo(gameName);
+        JolAdmin.PlayerInfo sourceInfo = jolAdmin.getPlayerInfo(sourcePlayer);
+        JolAdmin.PlayerInfo targetInfo = jolAdmin.getPlayerInfo(targetPlayer);
+        List<String> players = Arrays.asList(gameInfo.getPlayers());
+        if (players.contains(targetPlayer)) {
+            System.out.println("Game already contains " + targetPlayer + ", unable to continue");
+        } else if (!players.contains(sourcePlayer)) {
+            System.out.println("Game doesn't contain " + sourcePlayer + ", unable to continue");
+        } else {
+            gameInfo.replacePlayer(sourcePlayer, targetPlayer);
+            sourceInfo.removeGame(gameName);
+            targetInfo.addGame(gameName, "replace");
+            Path statePath = Paths.get(dataDir, jolAdmin.getId(gameName), "game.xml");
+            Path actionsPath = Paths.get(dataDir, jolAdmin.getId(gameName), "actions.xml");
+            updateGameFile(statePath, sourcePlayer, targetPlayer);
+            updateGameFile(actionsPath, sourcePlayer, targetPlayer);
+            System.out.println("Replacing " + sourcePlayer + " with " + targetPlayer + " in game " + gameName);
+        }
+    }
+
+    private static void updateGameFile(Path filePath, String sourcePlayer, String targetPlayer) {
+        Charset charset = StandardCharsets.UTF_8;
+
+        try {
+            String content = new String(Files.readAllBytes(filePath), charset);
+            content = content.replaceAll(sourcePlayer, targetPlayer);
+            Files.write(filePath, content.getBytes(charset));
+        } catch (IOException e) {
+            System.out.println("Unable to update state: " + e.getMessage());
+        }
+    }
+
+    private void buildTournament() {
         createGame("Tournament-2017", 1, 1);
         createGame("Tournament-2017", 1, 2);
         createGame("Tournament-2017", 1, 3);
@@ -63,7 +107,6 @@ public class TournamentBuilder {
 
         JolAdmin.GameInfo seedInfo = jolAdmin.getGameInfo(seedGame);
         seedInfo.endGame();
-
     }
 
     private static Properties load(File propertiesFile) throws IOException {
