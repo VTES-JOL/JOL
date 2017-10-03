@@ -22,8 +22,10 @@ import org.slf4j.Logger;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
+import static java.lang.System.getProperty;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -33,7 +35,7 @@ public class JolAdmin {
 
     private static final Date startDate = new Date();
     private static final Logger logger = getLogger(JolAdmin.class);
-    private static final JolAdmin INSTANCE = new JolAdmin(System.getProperty("jol.data"));
+    private static final JolAdmin INSTANCE = new JolAdmin(getProperty("jol.data"));
     private static CardSearch CARD_DATA = null;
     private final String dir;
     private final SystemInfo sysInfo;
@@ -115,19 +117,19 @@ public class JolAdmin {
     public boolean addPlayerToGame(String gameName, String playerName,
                                    String deckName) {
         PlayerInfo player = getPlayerInfo(playerName);
-        String key = player.getDeckKey(deckName);
-        String deck = player.getDeck(key);
-        return addPlayerInternal(gameName, playerName, key, deck);
+        String deckKey = player.getDeckKey(deckName);
+        String deckContents = player.getDeck(deckKey);
+        return addPlayerInternal(gameName, playerName, deckKey, deckContents);
     }
 
     private boolean addPlayerInternal(String gameName, String playerName,
-                                      String key, String deck) {
+                                      String deckKey, String deckContents) {
         GameInfo game = getGameInfo(gameName);
         if (!game.isOpen())
             return false;
         PlayerInfo player = getPlayerInfo(playerName);
-        game.addPlayer(playerName, key, deck);
-        player.addGame(gameName, key);
+        game.addPlayer(playerName, deckKey, deckContents);
+        player.addGame(gameName, deckKey);
         return true;
     }
 
@@ -155,7 +157,7 @@ public class JolAdmin {
         try {
             games.put(name, new GameInfo(name, true));
         } catch (Exception e) {
-            logger.error("Error creating game" ,e);
+            logger.error("Error creating game", e);
             return false;
         }
         return true;
@@ -302,7 +304,7 @@ public class JolAdmin {
     class GameInfo extends Info {
         private final String prefix;
         JolGame game;
-        String gamename;
+        String gameName;
         Map<String, Date> playerAccess = new HashMap<>(8);
         private Game state;
 
@@ -315,13 +317,11 @@ public class JolAdmin {
         GameInfo(String name, String prefix, boolean init) {
             super(prefix + "/game.properties", init);
             this.prefix = prefix;
-            gamename = name;
+            gameName = name;
             if (!init && info.size() == 0)
-                throw new IllegalArgumentException("Game " + name
-                        + " doesn't exist.");
+                throw new IllegalArgumentException("Game " + name + " doesn't exist.");
             else if (init && info.size() > 0)
-                throw new IllegalArgumentException("Game " + name
-                        + " already exists.");
+                throw new IllegalArgumentException("Game " + name + " already exists.");
         }
 
         GameInfo(String name, boolean create) {
@@ -335,7 +335,7 @@ public class JolAdmin {
 
         public JolGame getGame() {
             if (game == null)
-                loadGame(gamename);
+                loadGame(gameName);
             return game;
         }
 
@@ -423,6 +423,15 @@ public class JolAdmin {
             write();
         }
 
+        synchronized void replacePlayer(String oldPlayer, String newPlayer) {
+            String oldPlayerKey = sysInfo.getKey(oldPlayer);
+            String newPlayerKey = sysInfo.getKey(newPlayer);
+            String deckKey = info.getProperty(oldPlayerKey);
+            info.remove(oldPlayerKey);
+            info.setProperty(newPlayerKey, deckKey);
+            write();
+        }
+
         synchronized void endGame() {
             info.setProperty("state", "finished");
             // PENDING generate state html, archive all other game artifacts.
@@ -434,7 +443,7 @@ public class JolAdmin {
             state = new DsGame();
             actions = new ActionHistory();
             game = new JolGame(state, actions);
-            game.initGame(gamename);
+            game.initGame(gameName);
             regDecks();
             getGame().startGame();
             write();
@@ -445,7 +454,7 @@ public class JolAdmin {
             state = new DsGame();
             actions = new ActionHistory();
             game = new JolGame(state, actions);
-            game.initGame(gamename);
+            game.initGame(gameName);
             regDecks();
             getGame().startGame(playerSeating);
             write();
@@ -493,7 +502,7 @@ public class JolAdmin {
         synchronized void dowrite() {
             super.write();
             if (game != null) {
-                logger.debug("Saving game {}", gamename);
+                logger.debug("Saving game {}", gameName);
                 GameState gstate = new GameState();
                 GameActions gactions = new GameActions();
                 gactions.setCounter("1");
@@ -512,7 +521,7 @@ public class JolAdmin {
 
     class PlayerInfo extends Info {
 
-        private final String prefix;
+        private final String id;
 
         PlayerInfo(String name, String password, String email) {
             this(name, sysInfo.newPlayer(name), true);
@@ -526,9 +535,9 @@ public class JolAdmin {
             this(name, sysInfo.getKey(name), false);
         }
 
-        private PlayerInfo(String name, String prefix, boolean init) {
-            super(prefix + "/player.properties", init);
-            this.prefix = prefix;
+        private PlayerInfo(String name, String id, boolean init) {
+            super(id + "/player.properties", init);
+            this.id = id;
             if (!init && info.size() == 0)
                 throw new IllegalArgumentException("Player " + name
                         + " doesn't exist.");
@@ -538,7 +547,7 @@ public class JolAdmin {
         }
 
         private File getPlayerDir() {
-            return new File(dir, prefix);
+            return new File(dir, id);
         }
 
         public void setPassword(String password) {
@@ -566,6 +575,11 @@ public class JolAdmin {
 
         void addGame(String name, String key) {
             info.setProperty(sysInfo.getKey(name), key);
+            write();
+        }
+
+        void removeGame(String name) {
+            info.remove(sysInfo.getKey(name));
             write();
         }
 
@@ -620,7 +634,7 @@ public class JolAdmin {
                 File file = new File(getPlayerDir(), deckName + ".txt");
                 return readFile(file);
             } catch (IOException ie) {
-                String msg = "Deck read Error for " + prefix + " and deck " + deckName;
+                String msg = "Deck read Error for " + id + " and deck " + deckName;
                 throw new RuntimeException(msg, ie);
             }
         }
@@ -770,7 +784,7 @@ public class JolAdmin {
 
         String getKey(String name) {
             if (!info.containsValue(name))
-                return null;
+                throw new IllegalArgumentException(name + " not found");
             for (Map.Entry<Object, Object> objectObjectEntry : info.entrySet()) {
                 if (((Map.Entry<?, ?>) objectObjectEntry).getValue().equals(name)) {
                     return (String) ((Map.Entry<?, ?>) objectObjectEntry).getKey();
@@ -785,46 +799,26 @@ public class JolAdmin {
 
         private synchronized void load(boolean ignoreExceptions) {
             logger.debug("Reading {}", filename);
-            InputStream in = null;
-            try {
-                in = new FileInputStream(filename);
+            if (!Files.exists(Paths.get(filename))) {
+                throw new IllegalArgumentException("No such file " + filename);
+            }
+            try (InputStream in = new FileInputStream(filename)) {
                 info.load(in);
-            } catch (IOException ie) {
+            } catch (IOException e) {
                 if (!ignoreExceptions) {
-                    logger.error("Error Loading {}", ie);
-                    throw new IllegalArgumentException("Invalid " + getHeader()
-                            + " : " + filename);
+                    logger.error("Error loading {}", e);
+                    throw new IllegalArgumentException("Invalid " + getHeader() + " : " + filename);
                 }
-            } finally {
-                if (in != null)
-                    try {
-                        in.close();
-                    } catch (IOException ie) {
-                        // ignore
-                    }
             }
         }
 
         protected synchronized void write() {
             logger.debug("Writing {}", filename);
-            OutputStream out = null;
-            try {
-                out = new FileOutputStream(filename);
+            try (OutputStream out = new FileOutputStream(filename)) {
                 info.store(out, getHeader());
-            } catch (IOException ie) {
-                logger.error("Error writing file {}", ie);
-            } finally {
-                try {
-                    if (out != null)
-                        out.close();
-                } catch (Exception ignored) {
-
-                }
+            } catch (IOException e) {
+                logger.error("Error writing file {}", e);
             }
-        }
-
-        public String dump() {
-            return info.toString();
         }
 
         void setProperty(String prop, String value) {
