@@ -1,28 +1,30 @@
-1xBear Paw
-1xDani
-1xGillian Krader
-1xLeon
-2xNavar McClaren
-1xNigel the Shunned
-1xPanagos Levidis
-1xRaziya Samater
-1xShannon Price, the Whisperer
-1xTommy
-1xVliam Andor
-1xWendy Wade
+1 x Spleen, Georgio Gutterpunk
+1 x Navar McClaren
+1 x Vliam Andor
+1 x Gillian Krader
+1 x Dani
+1 x Raziya Samater
+1 x Shannon Price, the Whisperer
+1 x Leon
+1 x Tommy
+1 x Anastasia Grey
+1 x Wendy Wade
+1 x Panagos Levidis
+1 x Muse
 
-9xAnimalism
-5xEffective Management
-5xAmbush
-2xArmy of Rats
-3xBum's Rush
-3xCats' Guidance
-4xGuard Dogs
-3xWake with Evening's Freshness
-7xAid from Bats
-2xCanine Horde
-14xCarrion Crows
-5xDrawing Out the Beast
-5xScorpion Sting
-9xSong of Serenity
-14xTrap
+9 x Animalism
+5 x Effective Management
+
+10 x Deep Song
+
+3 x Cats' Guidance
+4 x Guard Dogs
+3 x Rat's Warning
+
+7 x Aid from Bats
+2 x Canine Horde
+14 x Carrion Crows
+5 x Drawing Out the Beast
+5 x Scorpion Sting
+9 x Song of Serenity
+14 x Trap
