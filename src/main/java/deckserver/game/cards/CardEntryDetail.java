@@ -34,7 +34,7 @@ class CardEntryDetail implements CardEntry {
             if (lines[i].startsWith("Name:")) name = lines[i].substring(6).trim();
             if (lines[i].startsWith("Level:")) advanced = true;
         }
-        if (ids != null) id = ids.getId(name + (advanced ? " (advanced)" : ""));
+        if (ids != null) id = ids.getId(name + (advanced ? " (ADV)" : ""));
     }
 
     static List<CardEntry> readCards(CardMap map, LineNumberReader reader) {
@@ -77,7 +77,7 @@ class CardEntryDetail implements CardEntry {
 
     @Override
     public String getName() {
-        return !advanced ? name : name + " (advanced)";
+        return !advanced ? name : name + " (ADV)";
     }
 
     @Override

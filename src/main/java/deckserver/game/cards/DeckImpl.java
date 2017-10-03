@@ -168,6 +168,10 @@ public class DeckImpl implements Deck {
     private CardEntry findCard(String text) {
         // first find out if advanced
         boolean advanced = false;
+        if (text.endsWith("(ADV)")) {
+            text = text.substring(0, text.lastIndexOf("(ADV)")).trim();
+            advanced = true;
+        }
         if (text.endsWith("(advanced)")) {
             text = text.substring(0, text.lastIndexOf("(advanced)")).trim();
             advanced = true;
