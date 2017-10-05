@@ -3,19 +3,39 @@ package net.deckserver.storage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.game.SummaryCard;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public class DeckTest {
 
-    private static Pattern countPattern = Pattern.compile("^");
+    private static Pattern countPattern = Pattern.compile("(\\d+)\\s?[xX]?\\s?(.*)");
+    private static Map<String, String> cardNameIdMap = new HashMap<>();
+    private static Map<String, SummaryCard> cardKeySummaryMap = new HashMap<>();
+
+    @BeforeClass
+    public static void init() throws IOException {
+        Path cardPath = Paths.get("src/test/resources/cards/summary.json");
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<SummaryCard> cards = objectMapper.readValue(cardPath.toFile(), new TypeReference<List<SummaryCard>>() {
+        });
+        System.out.println("Loaded " + cards.size() + " cards");
+        cards.forEach(card -> {
+            card.getNames().forEach(name -> cardNameIdMap.put(name, card.getKey()));
+            cardKeySummaryMap.put(card.getKey(), card);
+        });
+        System.out.println("Populated " + cardNameIdMap.size() + " name entries");
+    }
 
     @Test
     public void sampleDeck() throws Exception {
@@ -25,19 +45,60 @@ public class DeckTest {
         assertNotNull(cards);
         assertFalse(cards.isEmpty());
 
-        List<String> deckLines = Files.readAllLines(Paths.get("src/test/resources/player1/deck1.txt"));
-        System.out.println(deckLines.size());
-        deckLines.forEach(DeckTest::parseline);
+        List<String> deckLines = Files.readAllLines(Paths.get("src/test/resources/player1/deck.txt"));
+        Deck deck = parseDeck(deckLines);
+        System.out.println(deck);
     }
 
-    private static DeckItem parseline(String deckLine) {
-        System.out.println(deckLine);
-        Matcher countMatcher = countPattern.matcher(deckLine.trim());
-        if (countMatcher.matches()) {
-            Integer count = 1;
-            String card = "Dummy card";
-            System.out.printf(count + " x " + card);
+    private static Deck parseDeck(List<String> deckLines) {
+        Deck deck = new Deck();
+        List<DeckItem> items = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
+        for (String line : deckLines) {
+            try {
+                Optional<DeckItem> item = parseline(line);
+                item.ifPresent(items::add);
+            } catch (IllegalArgumentException e) {
+                errors.add(e.getMessage());
+            }
         }
-        return null;
+        int cryptCount = items.stream().filter(DeckTest::isCard).filter(item -> isCrypt(item.getType())).mapToInt(DeckItem::getCount).sum();
+        int libraryCount = items.stream().filter(DeckTest::isCard).filter(item -> !isCrypt(item.getType())).mapToInt(DeckItem::getCount).sum();
+        deck.setCryptCount(cryptCount);
+        deck.setLibraryCount(libraryCount);
+        deck.setContents(items);
+        deck.setErrors(errors);
+        return deck;
+    }
+
+    private static Optional<DeckItem> parseline(String deckLine) throws IllegalArgumentException {
+        deckLine = deckLine.trim();
+        Matcher countMatcher = countPattern.matcher(deckLine);
+        if (deckLine.isEmpty()) {
+            return Optional.empty();
+        } else if (countMatcher.find()) {
+            Integer count = Integer.valueOf(countMatcher.group(1));
+            String cardName = countMatcher.group(2);
+            return Optional.of(generate(count, cardName));
+        } else {
+            return Optional.of(DeckItem.of(deckLine));
+        }
+    }
+
+    private static boolean isCard(DeckItem item) {
+        return item.getKey() != null;
+    }
+
+    private static boolean isCrypt(String type) {
+        return type.equals("Vampire") || type.equals("Imbued");
+    }
+
+    private static DeckItem generate(Integer count, String cardName) throws IllegalArgumentException {
+        String cardKey = cardNameIdMap.get(cardName);
+        if (cardKey == null) {
+            throw new IllegalArgumentException(cardName);
+        }
+        SummaryCard summaryCard = cardKeySummaryMap.get(cardKey);
+        return DeckItem.of(cardKey, summaryCard.getDisplayName(), count, summaryCard.getType());
     }
 }

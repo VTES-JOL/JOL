@@ -1,0 +1,14 @@
+# Parsable Crypt
+1 x New Blood
+1 Arika
+3 Sarrasine
+1 Sarrasine (ADV)
+1 Beatrice "Oracle171" Tremblay
+
+# Parseable Library
+10 x Deep Song
+1 x Auto-da-fe
+1 Auto-da-fé
+
+# Errors
+1 Sarrasine (advanced)
