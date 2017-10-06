@@ -810,7 +810,7 @@ public class JolAdmin {
 
         String getKey(String name) {
             if (!info.containsValue(name))
-                throw new IllegalArgumentException(name + " not found");
+                return null;
             for (Map.Entry<Object, Object> objectObjectEntry : info.entrySet()) {
                 if (((Map.Entry<?, ?>) objectObjectEntry).getValue().equals(name)) {
                     return (String) ((Map.Entry<?, ?>) objectObjectEntry).getKey();
@@ -825,10 +825,7 @@ public class JolAdmin {
 
         private synchronized void load(boolean ignoreExceptions) {
             logger.debug("Reading {}", filename);
-            if (!Files.exists(Paths.get(filename))) {
-                throw new IllegalArgumentException("No such file " + filename);
-            }
-            try (InputStream in = new FileInputStream(filename)) {
+            try (FileReader in = new FileReader(filename)) {
                 info.load(in);
             } catch (IOException e) {
                 if (!ignoreExceptions) {
@@ -840,7 +837,7 @@ public class JolAdmin {
 
         protected synchronized void write() {
             logger.debug("Writing {}", filename);
-            try (OutputStream out = new FileOutputStream(filename)) {
+            try (FileWriter out = new FileWriter(filename)) {
                 info.store(out, getHeader());
             } catch (IOException e) {
                 logger.error("Error writing file {}", e);
