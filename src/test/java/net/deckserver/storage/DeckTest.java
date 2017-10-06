@@ -2,17 +2,21 @@ package net.deckserver.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import net.deckserver.game.SummaryCard;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -22,6 +26,7 @@ public class DeckTest {
     private static Pattern countPattern = Pattern.compile("(\\d+)\\s?[xX]?\\s?(.*)");
     private static Map<String, String> cardNameIdMap = new HashMap<>();
     private static Map<String, SummaryCard> cardKeySummaryMap = new HashMap<>();
+    private static Predicate<DeckItem> isCard = (item) -> item.getKey() != null;
 
     @BeforeClass
     public static void init() throws IOException {
@@ -40,6 +45,7 @@ public class DeckTest {
     @Test
     public void sampleDeck() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         List<SummaryCard> cards = objectMapper.readValue(Paths.get("src/test/resources/cards/summary.json").toFile(), new TypeReference<List<SummaryCard>>() {
         });
         assertNotNull(cards);
@@ -47,7 +53,7 @@ public class DeckTest {
 
         List<String> deckLines = Files.readAllLines(Paths.get("src/test/resources/player1/deck.txt"));
         Deck deck = parseDeck(deckLines);
-        System.out.println(deck);
+        objectMapper.writeValue(new File("target/deck.json"), deck);
     }
 
     private static Deck parseDeck(List<String> deckLines) {
@@ -62,6 +68,10 @@ public class DeckTest {
                 errors.add(e.getMessage());
             }
         }
+        Map<String, List<DeckItem>> deckMap = items.stream().filter(isCard).collect(Collectors.groupingBy(DeckItem::getKey));
+        deckMap.forEach((k,v) -> {
+            System.out.println(k + v);
+        });
         int cryptCount = items.stream().filter(DeckTest::isCard).filter(item -> isCrypt(item.getType())).mapToInt(DeckItem::getCount).sum();
         int libraryCount = items.stream().filter(DeckTest::isCard).filter(item -> !isCrypt(item.getType())).mapToInt(DeckItem::getCount).sum();
         deck.setCryptCount(cryptCount);

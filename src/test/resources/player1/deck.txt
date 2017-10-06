@@ -3,6 +3,7 @@
 1 Arika
 3 Sarrasine
 1 Sarrasine (ADV)
+1 Sarrasine (advanced)
 1 Beatrice "Oracle171" Tremblay
 
 # Parseable Library
