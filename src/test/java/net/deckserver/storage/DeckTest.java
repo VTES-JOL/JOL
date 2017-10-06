@@ -1,6 +1,6 @@
 package net.deckserver.storage;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.deckserver.game.SummaryCard;
@@ -17,12 +17,10 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-
 public class DeckTest {
 
     private static Pattern countPattern = Pattern.compile("^(\\d+)\\s*[xX]?\\s*([^\\t]+).*$");
+    private static ObjectMapper objectMapper;
     private static Map<String, String> cardNameIdMap = new HashMap<>();
     private static Map<String, SummaryCard> cardKeySummaryMap = new HashMap<>();
     private static Predicate<DeckItem> isCard = (item) -> item.getKey() != null;
@@ -32,9 +30,10 @@ public class DeckTest {
     @BeforeClass
     public static void init() throws IOException {
         Path cardPath = Paths.get("src/test/resources/cards/summary.json");
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<SummaryCard> cards = objectMapper.readValue(cardPath.toFile(), new TypeReference<List<SummaryCard>>() {
-        });
+        objectMapper = new ObjectMapper();
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        JavaType summaryCollectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, SummaryCard.class);
+        List<SummaryCard> cards = objectMapper.readValue(cardPath.toFile(), summaryCollectionType);
         System.out.println("Loaded " + cards.size() + " cards");
         cards.forEach(card -> {
             card.getNames().forEach(name -> cardNameIdMap.put(name, card.getKey()));
@@ -45,13 +44,6 @@ public class DeckTest {
 
     @Test
     public void sampleDeck() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        List<SummaryCard> cards = objectMapper.readValue(Paths.get("src/test/resources/cards/summary.json").toFile(), new TypeReference<List<SummaryCard>>() {
-        });
-        assertNotNull(cards);
-        assertFalse(cards.isEmpty());
-
         List<String> deckLines = Files.readAllLines(Paths.get("src/test/resources/player1/deck.txt"));
         Deck deck = parseDeck(deckLines);
         System.out.println("Parsed deck with " + deckLines.size() + " lines, got " + deck.getCryptCount() + " crypt cards, and " + deck.getLibraryCount() + " library cards. " + deck.getErrors().size() + " errors");
