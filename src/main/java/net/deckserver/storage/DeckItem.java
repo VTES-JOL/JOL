@@ -14,15 +14,15 @@ public class DeckItem {
     private String key;
     private String name;
     private Integer count;
-    private String type;
+    private boolean crypt;
     private String comment;
 
-    public static DeckItem of(String key, String name, Integer count, String type) {
+    public static DeckItem of(String key, String name, Integer count, boolean crypt) {
         DeckItem item = new DeckItem();
         item.key = key;
         item.name = name;
         item.count = count;
-        item.type = type;
+        item.crypt = crypt;
         return item;
     }
 

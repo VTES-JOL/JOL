@@ -16,17 +16,18 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 public class DeckTest {
 
-    private static Pattern countPattern = Pattern.compile("(\\d+)\\s?[xX]?\\s?(.*)");
+    private static Pattern countPattern = Pattern.compile("^(\\d+)\\s*[xX]?\\s*([^\\t]+).*$");
     private static Map<String, String> cardNameIdMap = new HashMap<>();
     private static Map<String, SummaryCard> cardKeySummaryMap = new HashMap<>();
     private static Predicate<DeckItem> isCard = (item) -> item.getKey() != null;
+    private static Predicate<DeckItem> isCrypt = DeckItem::isCrypt;
+    private static Predicate<DeckItem> isLibrary = (item) -> !item.isCrypt();
 
     @BeforeClass
     public static void init() throws IOException {
@@ -53,27 +54,34 @@ public class DeckTest {
 
         List<String> deckLines = Files.readAllLines(Paths.get("src/test/resources/player1/deck.txt"));
         Deck deck = parseDeck(deckLines);
+        System.out.println("Parsed deck with " + deckLines.size() + " lines, got " + deck.getCryptCount() + " crypt cards, and " + deck.getLibraryCount() + " library cards. " + deck.getErrors().size() + " errors");
         objectMapper.writeValue(new File("target/deck.json"), deck);
     }
 
     private static Deck parseDeck(List<String> deckLines) {
         Deck deck = new Deck();
-        List<DeckItem> items = new ArrayList<>();
         List<String> errors = new ArrayList<>();
+        Map<String, DeckItem> itemMap = new HashMap<>();
         for (String line : deckLines) {
             try {
-                Optional<DeckItem> item = parseline(line);
-                item.ifPresent(items::add);
+                Optional<DeckItem> item = parseLine(line);
+                item.filter(isCard).ifPresent(card -> {
+                    if (itemMap.containsKey(card.getKey())) {
+                        DeckItem existing = itemMap.get(card.getKey());
+                        System.out.println("Updating " + existing.getName() + ", had " + existing.getCount() + " copies, adding " + card.getCount());
+                        existing.setCount(existing.getCount() + card.getCount());
+                    } else {
+                        System.out.println("Adding " + card.getCount() + " copies of " + card.getName());
+                        itemMap.put(card.getKey(), card);
+                    }
+                });
             } catch (IllegalArgumentException e) {
                 errors.add(e.getMessage());
             }
         }
-        Map<String, List<DeckItem>> deckMap = items.stream().filter(isCard).collect(Collectors.groupingBy(DeckItem::getKey));
-        deckMap.forEach((k,v) -> {
-            System.out.println(k + v);
-        });
-        int cryptCount = items.stream().filter(DeckTest::isCard).filter(item -> isCrypt(item.getType())).mapToInt(DeckItem::getCount).sum();
-        int libraryCount = items.stream().filter(DeckTest::isCard).filter(item -> !isCrypt(item.getType())).mapToInt(DeckItem::getCount).sum();
+        List<DeckItem> items = new ArrayList<>(itemMap.values());
+        int cryptCount = items.stream().filter(isCard).filter(isCrypt).mapToInt(DeckItem::getCount).sum();
+        int libraryCount = items.stream().filter(isCard).filter(isLibrary).mapToInt(DeckItem::getCount).sum();
         deck.setCryptCount(cryptCount);
         deck.setLibraryCount(libraryCount);
         deck.setContents(items);
@@ -81,7 +89,7 @@ public class DeckTest {
         return deck;
     }
 
-    private static Optional<DeckItem> parseline(String deckLine) throws IllegalArgumentException {
+    private static Optional<DeckItem> parseLine(String deckLine) throws IllegalArgumentException {
         deckLine = deckLine.trim();
         Matcher countMatcher = countPattern.matcher(deckLine);
         if (deckLine.isEmpty()) {
@@ -95,20 +103,12 @@ public class DeckTest {
         }
     }
 
-    private static boolean isCard(DeckItem item) {
-        return item.getKey() != null;
-    }
-
-    private static boolean isCrypt(String type) {
-        return type.equals("Vampire") || type.equals("Imbued");
-    }
-
     private static DeckItem generate(Integer count, String cardName) throws IllegalArgumentException {
         String cardKey = cardNameIdMap.get(cardName);
         if (cardKey == null) {
             throw new IllegalArgumentException(cardName);
         }
         SummaryCard summaryCard = cardKeySummaryMap.get(cardKey);
-        return DeckItem.of(cardKey, summaryCard.getDisplayName(), count, summaryCard.getType());
+        return DeckItem.of(cardKey, summaryCard.getDisplayName(), count, summaryCard.isCrypt());
     }
 }

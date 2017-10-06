@@ -11668,7 +11668,7 @@
   "type" : "Political Action",
   "text" : "Name: Praxis Seizure: Washington, D.C.\nCardtype: Political Action\nRequires a Camarilla vampire. Title.\nIf this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Washington, D.C.",
   "displayName" : "Praxis Seizure: Washington, D.C.",
-  "names" : [ "Praxis Seizure: Washington, D.C." ],
+  "names" : [ "Praxis Seizure: Washington, DC", "Praxis Seizure: Washington, D.C." ],
   "crypt" : false
 }, {
   "id" : "59d6f72633bad67eb646e4a9",

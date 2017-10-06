@@ -23333,7 +23333,7 @@
   "text" : "Requires a Camarilla vampire. Title.\nIf this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Washington, D.C.",
   "type" : [ "Political Action" ],
   "displayName" : "Praxis Seizure: Washington, D.C.",
-  "names" : [ "Praxis Seizure: Washington, D.C." ],
+  "names" : [ "Praxis Seizure: Washington, DC", "Praxis Seizure: Washington, D.C." ],
   "blood" : null,
   "pool" : null,
   "conviction" : null,

@@ -1,15 +1,55 @@
-# Parsable Crypt
-1 x New Blood
-1 Arika
-3 Sarrasine
-1 Sarrasine (ADV)
-1 Sarrasine (advanced)
-1 Beatrice "Oracle171" Tremblay
+Praxis Seizure: Raleigh
+Raleigh, North Carolina
+March 25th 2000
+Jeff Dai
+https://groups.google.com/d/topic/rec.games.trading-cards.jyhad/YIqKMcir3-8/discussion
 
-# Parseable Library
-10 x Deep Song
-1 x Auto-da-fe
-1 Auto-da-fé
+Jeff Dai's winning deck:
 
-# Errors
-1 Sarrasine (advanced)
+Crypt (12 cards, min=26, max=42, avg=8.58)
+------------------------------------------
+1x Arika				11  DOM FOR OBF PRE aus cel	inner circle	Ventrue:2
+1x Etrius				11  AUS DOM OBF THA pro		inner circle	Tremere:2
+1x Angelica, The Canonicus		10  DOM OBT POT cel obf		cardinal	Lasombra:2
+1x Lucian				10  AUS DOM OBF cel tha		justicar	Malkavian:1
+1x Queen Anne				10  DOM FOR PRE aus obf		prince		Ventrue:2
+1x Roxanne, Rectrix of the 13th Floor	9   AUS DOM FOR OBF pot		primogen	Malkavian:1
+1x Gratiano				8   DOM OBT obf pot		priscus		Lasombra:2
+1x Justine, Elder of Dallas		8   AUS DOM THA obf		primogen	Tremere:1
+1x Carlotta Giovanni			7   NEC POT dom obf				Giovanni:2
+1x Gilbert Duane			7   AUS DOM OBF			prince		Malkavian:1
+1x Mariel, Lady Thunder			7   DOM OBF aus tha				Malkavian:1
+1x Didi Meyers				5   DOM aus cel obf				Malkavian:1
+
+Library:
+Master
+1 Asylum HG
+7 Minion Taps
+2 Sudden Reversals
+3 Effective Management
+1 Info Highway
+2 Dreams of the Sphinx
+
+Votes and Others
+2 Conservative Agitation
+8 KRC
+1 Ancient Influence
+1 Political Stranglehold
+8 WWEF
+
+Dominate
+10 Obediance
+15 GtU
+10 Deflection
+2 Conditioning
+3 Foreshadowing Destruction
+
+Obfuscate
+4 Lost in Crowds
+3 Faceless Night
+2 Forgotten Labyrinth
+6 Cloak of the Gathering
+
+Notes from Jeff: Bring out an 11 or 10 capacity vampire.
+GtU the other vampires out. Once you have enough, bleed
+and vote your prey out of existence. --
