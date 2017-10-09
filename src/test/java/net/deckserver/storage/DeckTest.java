@@ -3,12 +3,17 @@ package net.deckserver.storage;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import lombok.extern.slf4j.Slf4j;
 import net.deckserver.game.SummaryCard;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,14 +21,20 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+@Slf4j
 public class DeckTest {
 
     private static Pattern countPattern = Pattern.compile("^(\\d+)\\s*[xX]?\\s*([^\\t]+).*$");
+    private static Predicate<String> playerMatcher = (name) -> name.matches("^player\\d*");
+    private static Predicate<String> deckMatcher = (name) -> name.matches("^deck\\d*");
+    private static Path basePath = Paths.get("/Users/shannon/data");
     private static ObjectMapper objectMapper;
     private static Map<String, String> cardNameIdMap = new HashMap<>();
     private static Map<String, SummaryCard> cardKeySummaryMap = new HashMap<>();
     private static Predicate<DeckItem> isCard = (item) -> item.getKey() != null;
+    private static Predicate<DeckItem> isComment = (item) -> item.getComment() != null && !item.getComment().isEmpty();
     private static Predicate<DeckItem> isCrypt = DeckItem::isCrypt;
     private static Predicate<DeckItem> isLibrary = (item) -> !item.isCrypt();
 
@@ -36,7 +47,7 @@ public class DeckTest {
         List<SummaryCard> cards = objectMapper.readValue(cardPath.toFile(), summaryCollectionType);
         System.out.println("Loaded " + cards.size() + " cards");
         cards.forEach(card -> {
-            card.getNames().forEach(name -> cardNameIdMap.put(name, card.getKey()));
+            card.getNames().stream().map(String::toLowerCase).forEach(name -> cardNameIdMap.put(name, card.getKey()));
             cardKeySummaryMap.put(card.getKey(), card);
         });
         System.out.println("Populated " + cardNameIdMap.size() + " name entries");
@@ -46,61 +57,132 @@ public class DeckTest {
     public void sampleDeck() throws Exception {
         List<String> deckLines = Files.readAllLines(Paths.get("src/test/resources/player1/deck.txt"));
         Deck deck = parseDeck(deckLines);
-        System.out.println("Parsed deck with " + deckLines.size() + " lines, got " + deck.getCryptCount() + " crypt cards, and " + deck.getLibraryCount() + " library cards. " + deck.getErrors().size() + " errors");
+        log.info("Parsed deck with " + deckLines.size() + " lines, got " + deck.getCryptCount() + " crypt cards, and " + deck.getLibraryCount() + " library cards. " + deck.getErrors().size() + " errors");
         objectMapper.writeValue(new File("target/deck.json"), deck);
+    }
+
+    @Test
+    public void convertDecks() throws Exception {
+        List<String> players = getPlayerIds();
+        for (String player : players) {
+            List<String> decks = getPlayerDeckIds(player);
+            for (String deck : decks) {
+                Path deckPath = basePath.resolve(player).resolve(deck + ".txt");
+                List<String> deckLines = null;
+                try {
+                    deckLines = Files.readAllLines(deckPath, Charset.forName("UTF-8"));
+                } catch (MalformedInputException e) {
+                    deckLines = Files.readAllLines(deckPath, Charset.forName("ISO8859-1"));
+                }
+                deckLines = deckLines.stream()
+                        .map(s -> s.replaceAll("^Z@.*@Z", ""))
+                        .map(s -> s.replaceAll("^ZZZ@@@.*@@@ZZZ", ""))
+                        .map(s -> s.replaceAll("^\\s*", ""))
+                        .map(s -> s.replaceAll("\\s{4}", "\t"))
+                        .collect(Collectors.toList());
+                Deck parsedDeck = parseDeck(deckLines);
+                Path targetPath = Paths.get("target", player, deck + ".json");
+                if (!Files.exists(targetPath)) {
+                    Files.createDirectories(targetPath.getParent());
+                    Files.createFile(targetPath);
+                }
+                objectMapper.writeValue(targetPath.toFile(), parsedDeck);
+                log.info("Parsed {} {}, {} lines with {} crypt, {} library, {} comments, and {} errors", player, deck, deckLines.size(), parsedDeck.getCryptCount(), parsedDeck.getLibraryCount(), parsedDeck.getComments().size(), parsedDeck.getErrors().size());
+            }
+        }
+    }
+
+    private static Properties load(Path propertyPath) {
+        Properties properties = new Properties();
+        try (FileReader fileReader = new FileReader(propertyPath.toFile())) {
+            properties.load(fileReader);
+            return properties;
+        } catch (FileNotFoundException e) {
+            log.error("Unable to find file {}", propertyPath);
+        } catch (IOException e) {
+            log.error("Error reading property file {}", propertyPath);
+        }
+        throw new IllegalArgumentException("Unable to find properties file");
+    }
+
+    private static List<String> getPlayerIds() {
+        Properties systemProperties = load(basePath.resolve("system.properties"));
+        return systemProperties.stringPropertyNames().stream().filter(playerMatcher).collect(Collectors.toList());
+    }
+
+    private static List<String> getPlayerDeckIds(String playerId) {
+        Properties playerProperties = load(basePath.resolve(playerId).resolve("player.properties"));
+        return playerProperties.stringPropertyNames().stream().filter(deckMatcher).collect(Collectors.toList());
+    }
+
+    private static Deck loadDeck(String playerId, String deckId) throws IOException {
+        try {
+            List<String> deckLines = Files.readAllLines(basePath.resolve(playerId).resolve(deckId + ".txt"));
+            return parseDeck(deckLines);
+        } catch (IOException e) {
+            log.error("Error reading {} {}: {}", playerId, deckId, e.getMessage());
+            throw e;
+        }
     }
 
     private static Deck parseDeck(List<String> deckLines) {
         Deck deck = new Deck();
         List<String> errors = new ArrayList<>();
         Map<String, DeckItem> itemMap = new HashMap<>();
+        List<String> comments = new ArrayList<>();
         for (String line : deckLines) {
             try {
                 Optional<DeckItem> item = parseLine(line);
                 item.filter(isCard).ifPresent(card -> {
                     if (itemMap.containsKey(card.getKey())) {
                         DeckItem existing = itemMap.get(card.getKey());
-                        System.out.println("Updating " + existing.getName() + ", had " + existing.getCount() + " copies, adding " + card.getCount());
+                        log.debug("Updating " + existing.getName() + ", had " + existing.getCount() + " copies, adding " + card.getCount());
                         existing.setCount(existing.getCount() + card.getCount());
                     } else {
-                        System.out.println("Adding " + card.getCount() + " copies of " + card.getName());
+                        log.debug("Adding " + card.getCount() + " copies of " + card.getName());
                         itemMap.put(card.getKey(), card);
                     }
                 });
+                item.filter(isComment).map(DeckItem::getComment).ifPresent(comments::add);
             } catch (IllegalArgumentException e) {
                 errors.add(e.getMessage());
             }
         }
-        List<DeckItem> items = new ArrayList<>(itemMap.values());
-        int cryptCount = items.stream().filter(isCard).filter(isCrypt).mapToInt(DeckItem::getCount).sum();
-        int libraryCount = items.stream().filter(isCard).filter(isLibrary).mapToInt(DeckItem::getCount).sum();
+        Map<String, Integer> contents = new HashMap<>();
+        itemMap.values().forEach(item -> contents.put(item.getKey(), item.getCount()));
+        int cryptCount = (int) itemMap.values().stream().filter(isCard).filter(isCrypt).mapToInt(DeckItem::getCount).sum();
+        int libraryCount = (int) itemMap.values().stream().filter(isCard).filter(isLibrary).mapToInt(DeckItem::getCount).sum();
         deck.setCryptCount(cryptCount);
         deck.setLibraryCount(libraryCount);
-        deck.setContents(items);
+        deck.setContents(contents);
+        deck.setComments(comments);
         deck.setErrors(errors);
         return deck;
     }
 
     private static Optional<DeckItem> parseLine(String deckLine) throws IllegalArgumentException {
-        deckLine = deckLine.trim();
-        Matcher countMatcher = countPattern.matcher(deckLine);
-        if (deckLine.isEmpty()) {
+        final String cleanLine = deckLine.trim();
+        Matcher countMatcher = countPattern.matcher(cleanLine);
+        if (cleanLine.isEmpty()) {
             return Optional.empty();
         } else if (countMatcher.find()) {
             Integer count = Integer.valueOf(countMatcher.group(1));
             String cardName = countMatcher.group(2);
             return Optional.of(generate(count, cardName));
-        } else {
-            return Optional.of(DeckItem.of(deckLine));
         }
+        // see if line is a just a single card name
+        return getKey(cleanLine).map(name -> Optional.of(generate(1, cleanLine)))
+                .orElse(Optional.of(DeckItem.of(cleanLine)));
     }
 
     private static DeckItem generate(Integer count, String cardName) throws IllegalArgumentException {
-        String cardKey = cardNameIdMap.get(cardName);
-        if (cardKey == null) {
-            throw new IllegalArgumentException(cardName);
-        }
-        SummaryCard summaryCard = cardKeySummaryMap.get(cardKey);
-        return DeckItem.of(cardKey, summaryCard.getDisplayName(), count, summaryCard.isCrypt());
+        return getKey(cardName)
+                .map(cardKeySummaryMap::get)
+                .map(card -> DeckItem.of(card.getKey(), card.getDisplayName(), count, card.isCrypt()))
+                .orElseThrow(() -> new IllegalArgumentException(count + " x " + cardName));
+    }
+
+    private static Optional<String> getKey(String cardName) {
+        return Optional.ofNullable(cardNameIdMap.get(cardName.toLowerCase()));
     }
 }
