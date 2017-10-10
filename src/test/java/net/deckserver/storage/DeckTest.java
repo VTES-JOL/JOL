@@ -29,7 +29,7 @@ public class DeckTest {
     private static Pattern countPattern = Pattern.compile("^(\\d+)\\s*[xX]?\\s*([^\\t]+).*$");
     private static Predicate<String> playerMatcher = (name) -> name.matches("^player\\d*");
     private static Predicate<String> deckMatcher = (name) -> name.matches("^deck\\d*");
-    private static Path basePath = Paths.get("/Users/shannon/data");
+    private static Path basePath = Paths.get("/home/shannon/data");
     private static ObjectMapper objectMapper;
     private static Map<String, String> cardNameIdMap = new HashMap<>();
     private static Map<String, SummaryCard> cardKeySummaryMap = new HashMap<>();
@@ -78,7 +78,7 @@ public class DeckTest {
                         .map(s -> s.replaceAll("^Z@.*@Z", ""))
                         .map(s -> s.replaceAll("^ZZZ@@@.*@@@ZZZ", ""))
                         .map(s -> s.replaceAll("^\\s*", ""))
-                        .map(s -> s.replaceAll("\\s{4}", "\t"))
+                        .map(s -> s.replaceAll("\\s{2}", "\t"))
                         .collect(Collectors.toList());
                 Deck parsedDeck = parseDeck(deckLines);
                 Path targetPath = Paths.get("target", player, deck + ".json");
@@ -87,7 +87,7 @@ public class DeckTest {
                     Files.createFile(targetPath);
                 }
                 objectMapper.writeValue(targetPath.toFile(), parsedDeck);
-                log.info("Parsed {} {}, {} lines with {} crypt, {} library, {} comments, and {} errors", player, deck, deckLines.size(), parsedDeck.getCryptCount(), parsedDeck.getLibraryCount(), parsedDeck.getComments().size(), parsedDeck.getErrors().size());
+                log.info("Parsed {} {}, {} lines with {} crypt, {} library, {} ignored, and {} errors", player, deck, deckLines.size(), parsedDeck.getCryptCount(), parsedDeck.getLibraryCount(), parsedDeck.getIgnored().size(), parsedDeck.getErrors().size());
             }
         }
     }
@@ -129,7 +129,7 @@ public class DeckTest {
         Deck deck = new Deck();
         List<String> errors = new ArrayList<>();
         Map<String, DeckItem> itemMap = new HashMap<>();
-        List<String> comments = new ArrayList<>();
+        List<String> ignored = new ArrayList<>();
         for (String line : deckLines) {
             try {
                 Optional<DeckItem> item = parseLine(line);
@@ -143,19 +143,19 @@ public class DeckTest {
                         itemMap.put(card.getKey(), card);
                     }
                 });
-                item.filter(isComment).map(DeckItem::getComment).ifPresent(comments::add);
+                item.filter(isComment).map(DeckItem::getComment).ifPresent(ignored::add);
             } catch (IllegalArgumentException e) {
                 errors.add(e.getMessage());
             }
         }
         Map<String, Integer> contents = new HashMap<>();
         itemMap.values().forEach(item -> contents.put(item.getKey(), item.getCount()));
-        int cryptCount = (int) itemMap.values().stream().filter(isCard).filter(isCrypt).mapToInt(DeckItem::getCount).sum();
-        int libraryCount = (int) itemMap.values().stream().filter(isCard).filter(isLibrary).mapToInt(DeckItem::getCount).sum();
+        int cryptCount = itemMap.values().stream().filter(isCard).filter(isCrypt).mapToInt(DeckItem::getCount).sum();
+        int libraryCount = itemMap.values().stream().filter(isCard).filter(isLibrary).mapToInt(DeckItem::getCount).sum();
         deck.setCryptCount(cryptCount);
         deck.setLibraryCount(libraryCount);
         deck.setContents(contents);
-        deck.setComments(comments);
+        deck.setIgnored(ignored);
         deck.setErrors(errors);
         return deck;
     }

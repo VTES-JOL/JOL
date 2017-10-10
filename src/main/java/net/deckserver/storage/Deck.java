@@ -14,5 +14,5 @@ public class Deck {
     private int libraryCount;
     private Map<String, Integer> contents = new HashMap<>();
     private List<String> errors = new ArrayList<>();
-    private List<String> comments = new ArrayList<>();
+    private List<String> ignored = new ArrayList<>();
 }
