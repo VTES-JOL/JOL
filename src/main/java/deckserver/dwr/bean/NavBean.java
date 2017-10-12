@@ -10,54 +10,37 @@ import java.util.Map;
 
 public class NavBean {
 
-    private static final Map<String, String> loggedIn = new HashMap<>();
-    private static final Map<String, String> hasChats;
-    private static final Map<String, String> loggedOut = new HashMap<>();
-    private static final Map<String, String> noadmin = new HashMap<>();
-    private static final Map<String, String> isadmin = new HashMap<>();
+    private Map<String, String> adminButtons = new HashMap<>();
+    private Map<String, String> gameButtons = new HashMap<>();
 
-    static {
-        loggedIn.put("deck", "Deck Register");
-        loggedIn.put("profile", "Profile");
-        isadmin.put("admin", "Game Admin");
-        hasChats = new HashMap<>(loggedIn);
-        hasChats.put("main", "Main *");
-    }
-
-    private String player, game = null, target;
-    private Map<String, String> gameB = new HashMap<>(), playerB = loggedOut, adminB = noadmin;
+    private String player, target, game = null;
+    private boolean chats = false;
 
     public NavBean(AdminBean abean, PlayerModel model) {
+        JolAdmin admin = JolAdmin.getInstance();
         player = model.getPlayer();
         target = model.getView();
         if (target.equals("game"))
             game = model.getCurrentGame();
-        if (player != null) {
-            playerB = model.hasChats() ? hasChats : loggedIn;
-            JolAdmin admin = JolAdmin.getInstance();
-            if (admin.isAdmin(player)) {
-                adminB = isadmin;
-            }
+        chats = model.hasChats();
+        if (player != null && admin.isAdmin(player)) {
+            adminButtons.put("admin", "Game Admin");
         }
         String[] games = model.getCurrentGames();
         for (String game1 : games) {
             GameModel gmodel = abean.getGameModel(game1);
             GameView view = gmodel.getView(player);
             String current = view.isChanged() ? " *" : "";
-            gameB.put("g" + game1, game1 + current);
+            gameButtons.put("g" + game1, game1 + current);
         }
     }
 
     public Map<String, String> getGameButtons() {
-        return gameB;
-    }
-
-    public Map<String, String> getPlayerButtons() {
-        return playerB;
+        return gameButtons;
     }
 
     public Map<String, String> getAdminButtons() {
-        return adminB;
+        return adminButtons;
     }
 
     public String getPlayer() {
@@ -72,4 +55,7 @@ public class NavBean {
         return target;
     }
 
+    public boolean isChats() {
+        return chats;
+    }
 }

@@ -85,7 +85,10 @@ function navigate(data) {
         dwr.util.setValue('login', 'Log in');
         dwr.util.byId('gameRow').style.display = "none";
     } else {
-        doButtons({main: "Main"});
+        var chatLabel = "Main" + (data.chats ? " *" : "");
+        doButtons({main: chatLabel});
+        doButtons({deck: "Deck Register"});
+        doButtons({profile: "Profile"});
         doButtons(data.playerButtons);
         doButtons(data.adminButtons);
         doButtons(data.gameButtons);
