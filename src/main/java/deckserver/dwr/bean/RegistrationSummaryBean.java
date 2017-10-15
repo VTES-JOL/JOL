@@ -3,25 +3,31 @@ package deckserver.dwr.bean;
 import deckserver.client.JolAdmin;
 import deckserver.dwr.GameModel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RegistrationSummaryBean {
 
-    Map<String, PlSummaryBean> registrations = new HashMap<>();
+    private String gameName;
+    private List<PlayerRegistrationBean> registrations = new ArrayList<>();
 
     public RegistrationSummaryBean(AdminBean abean, String name) {
-        GameModel game = abean.getGameModel(name);
         JolAdmin admin = JolAdmin.getInstance();
-        String[] players = admin.getPlayers();
-        for (String player : players) {
-            if (admin.isInvited(name, player) || admin.getGameDeck(name, player) != null) {
-                registrations.put(player, new PlSummaryBean(game, player));
-            }
-        }
+        this.registrations = admin.getPlayers().stream()
+                .filter(player -> admin.isInvited(name, player) || admin.isRegistered(name, player))
+                .map(player -> new PlayerRegistrationBean(abean, player, name))
+                .collect(Collectors.toList());
+        this.gameName = name;
     }
 
-    public Map<String, PlSummaryBean> getRegistrations() {
+    public String getGameName() {
+        return gameName;
+    }
+
+    public List<PlayerRegistrationBean> getRegistrations() {
         return registrations;
     }
 }

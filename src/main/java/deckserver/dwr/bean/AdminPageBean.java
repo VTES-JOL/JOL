@@ -6,42 +6,38 @@ import java.util.*;
 
 public class AdminPageBean {
 
-    // map of Game name -> RegistrationSummaryBean[]
-    private Map<String, RegistrationSummaryBean> games = new HashMap<>();
-    private String[] players;
-    private String[] rGames;
+    private List<String> players = new ArrayList<>();
+    private List<String> currentGames = new ArrayList<>();
+    private List<RegistrationSummaryBean> forming = new ArrayList<>();
 
     public AdminPageBean(AdminBean abean, String player) {
         JolAdmin admin = JolAdmin.getInstance();
-        String[] names = admin.getGames(player);
-        Collection<String> c = new ArrayList<>();
-        for (String gameName : names) {
-            if (gameName == null) {
-                continue;
-            }
-            if (admin.getOwner(gameName).equals(player)) {
-                if (admin.isOpen(gameName)) {
-                    games.put(gameName, new RegistrationSummaryBean(abean, gameName));
-                } else if (!admin.isFinished(gameName)) {
-                    c.add(gameName);
-                }
-            }
-        }
-        rGames = c.toArray(new String[0]);
-        Arrays.sort(rGames);
+        List<String> games = Arrays.asList(admin.getGames());
+        games.stream()
+                .filter(Objects::nonNull)
+                .filter(gameName -> admin.isSuperUser(player) || admin.getOwner(gameName).equals(player))
+                .forEach(gameName -> {
+                    if (admin.isOpen(gameName)) {
+                        forming.add(new RegistrationSummaryBean(abean, gameName));
+                    } else if (!admin.isFinished(gameName)) {
+                        currentGames.add(gameName);
+                    }
+                });
         players = admin.getPlayers();
-        Arrays.sort(players);
+        Collections.sort(players);
+        Collections.sort(currentGames);
     }
 
-    public Map<String, RegistrationSummaryBean> getGames() {
-        return games;
-    }
-
-    public String[] getRunningGames() {
-        return rGames;
-    }
-
-    public String[] getPlayers() {
+    public List<String> getPlayers() {
         return players;
     }
+
+    public List<String> getCurrentGames() {
+        return currentGames;
+    }
+
+    public List<RegistrationSummaryBean> getForming() {
+        return forming;
+    }
+
 }

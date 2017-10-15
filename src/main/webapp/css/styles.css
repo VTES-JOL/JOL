@@ -149,6 +149,10 @@ span.edge {
     display: flex;
 }
 
+.section {
+    padding: 0.5em;
+}
+
 .box {
     box-shadow: 2px 0 0 0 #888, 0 2px 0 0 #888, 2px 2px 0 0 #888, 2px 0 0 0 #888 inset, 0 2px 0 0 #888 inset;
     padding: 5px;
@@ -165,12 +169,17 @@ span.edge {
 }
 
 .col-4 {
-    width: 33%;
+    width: 32%;
     flex: 1 1 auto;
 }
 
 .col-6 {
     width: 50%;
+    flex: 1 1 auto;
+}
+
+.col-8 {
+    width: 65%;
     flex: 1 1 auto;
 }
 
@@ -182,4 +191,44 @@ ul.deck-list {
     list-style: none;
     padding-left: 0;
     margin: 0 0 5px 5px;
+}
+
+label.label-invalid {
+    color: #111;
+    background-color: #ffc107;
+    padding: 0.25em 0.5em;
+    font-size: 75%;
+    font-weight: 600;
+    text-align: center;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    margin-left: 0.5em;
+}
+
+#currentGames {
+    border-collapse:collapse;
+    border:1px solid #000000;
+}
+
+#currentGames th {
+    text-align: left;
+    padding: 0.5em 1em;
+}
+
+#currentGames th:last-child {
+    text-align: right;
+}
+
+#currentGames td, #currentGames tr {
+    border:1px solid #000000;
+    padding: 0.25em;
+}
+
+#currentGames td:first-child {
+    padding-left: 1em;
+}
+
+#currentGames td:last-child {
+    text-align: right;
+    padding: 0 1em;
 }
