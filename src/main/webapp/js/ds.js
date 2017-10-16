@@ -80,12 +80,12 @@ function navigate(data) {
     dwr.util.setValue("contentselect", data.target);
     toggleVisible(data.target, selected);
     dwr.util.setValue('buttons', '');
+    var chatLabel = "Main" + (data.chats ? " *" : "");
     if (data.player === null) {
         toggleVisible('logininputs', 'loggedin');
         dwr.util.setValue('login', 'Log in');
         dwr.util.byId('gameRow').style.display = "none";
     } else {
-        var chatLabel = "Main" + (data.chats ? " *" : "");
         doButtons({main: chatLabel});
         doButtons({deck: "Deck Register"});
         doButtons({profile: "Profile"});
