@@ -173,6 +173,30 @@ function renderActiveGames(games) {
     }
 }
 
+function removeOwnGames(removedGames) {
+    var table = dwr.util.byId('owngames');
+    $.each(removedGames, function(index, game) {
+        $.each(table.rows, function(i, row) {
+            if (row.label === game) {
+               table.deleteRow(i);
+               return false;
+            }
+        });
+    });
+}
+
+function removeActiveGames(removedGames) {
+    var table = dwr.util.byId('activegames');
+    $.each(removedGames, function(index, game) {
+        $.each(table.rows, function(i, row) {
+            if (row.label === game) {
+                table.deleteRow(i);
+                return false;
+            }
+        });
+    });
+}
+
 function loadDeck(deck) {
     dwr.util.setValue('deckname', deck);
     DS.getDeck(deck, {callback: playerMap});
@@ -644,6 +668,8 @@ function callbackMain(data) {
         renderOnline('adson', data.admins);
         renderMyGames(data.myGames);
         renderActiveGames(data.games);
+        removeOwnGames(data.remGames);
+        removeActiveGames(data.remGames);
         renderMessage(data.message);
         if (data.refresh > 0) {
             refresher = setTimeout("DS.doPoll({callback: playerMap, errorHandler: errorhandler})", data.refresh);
