@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
 import net.deckserver.game.SummaryCard;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -24,6 +25,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Ignore
 public class DeckTest {
 
     private static Pattern countPattern = Pattern.compile("^(\\d+)\\s*[xX]?\\s*([^\\t]+).*$");

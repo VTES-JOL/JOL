@@ -14,6 +14,7 @@ import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Normalizes deck inputlines to 1x <cardname> form
@@ -24,19 +25,24 @@ public class DeckImpl implements Deck {
 
     private static final Logger logger = LoggerFactory.getLogger(DeckImpl.class);
 
-    private final CardSearch search;
-    private StringBuffer orig = new StringBuffer();
-    private StringBuffer translated = new StringBuffer();
-    private Collection<String> errors = new Vector<>();
-    private boolean didTranslation = false;
-    private int cryptsum = 0;
-    private int decksum = 0;
-    private boolean parseCards = true;
-    private Map<CardEntry, Integer> cards = new HashMap<>();
-    private Collection<String> groups = new TreeSet<>();
+    final CardSearch search;
+    StringBuffer orig = new StringBuffer();
+    StringBuffer translated = new StringBuffer();
+    Collection<String> errors = new Vector<>();
+    boolean didTranslation = false;
+    int cryptsum = 0;
+    int decksum = 0;
+    boolean parseCards = true;
+    Map<CardEntry, Integer> cards = new HashMap<>();
+    private Set<String> groups = new TreeSet<>();
+    private boolean valid;
 
     public DeckImpl(CardSearch search, String deck) {
         this(search, deck, false, false);
+    }
+
+    public DeckImpl(CardSearch search, String deck, boolean sizeOnly) {
+        this(search, deck, sizeOnly, false);
     }
 
     public DeckImpl(CardSearch search, String deck, boolean sizeOnly, boolean doConstruction) {
@@ -164,10 +170,6 @@ public class DeckImpl implements Deck {
     private CardEntry findCard(String text) {
         // first find out if advanced
         boolean advanced = false;
-        if (text.endsWith("(ADV)")) {
-            text = text.substring(0, text.lastIndexOf("(ADV)")).trim();
-            advanced = true;
-        }
         if (text.endsWith("(advanced)")) {
             text = text.substring(0, text.lastIndexOf("(advanced)")).trim();
             advanced = true;
@@ -203,7 +205,9 @@ public class DeckImpl implements Deck {
     private void addCard(CardEntry card, int quantity) {
         if (card.isCrypt()) {
             cryptsum += quantity;
-            groups.add(card.getGroup());
+            if (!card.getGroup().toUpperCase().equals("ANY")) {
+                groups.add(card.getGroup());
+            }
         } else
             decksum += quantity;
         if (cards.containsKey(card))
@@ -212,9 +216,12 @@ public class DeckImpl implements Deck {
     }
 
     public String getGroups() {
-        StringBuilder gps = new StringBuilder();
-        groups.forEach(gps::append);
-        return gps.toString();
+        if (groups.size() == 0) {
+            return "none";
+        } else {
+            return groups.stream()
+                    .collect(Collectors.joining("/"));
+        }
     }
 
     public CardEntry[] getCards() {
@@ -235,4 +242,21 @@ public class DeckImpl implements Deck {
         return decksum;
     }
 
+    public boolean isValid() {
+        return cryptsum >= 12 && decksum >= 60 && decksum <= 90 && validGroups();
+    }
+
+    public boolean validGroups() {
+        if (this.groups.size() <= 1) {
+            return true;
+        } else if (this.groups.size() > 2) {
+            return false;
+        }
+        String[] groupsArray = this.groups.toArray(new String[0]);
+        // Get first group
+        Integer first = Integer.valueOf(groupsArray[0]);
+        // Is it within 1 group of second group
+        Integer second = Integer.valueOf(groupsArray[1]);
+        return (Math.abs(first - second) <= 1);
+    }
 }

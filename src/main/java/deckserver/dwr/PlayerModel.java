@@ -123,6 +123,10 @@ public class PlayerModel implements Comparable {
         return JolAdmin.getInstance().isAdmin(player);
     }
 
+    public boolean isSuperUser() {
+        return JolAdmin.getInstance().isSuperUser(player);
+    }
+
     public boolean hasChats() {
         return !chats.isEmpty();
     }

@@ -2,6 +2,7 @@ var refresher = null;
 var game = null;
 var timeInterval = null;
 var outageTime = null;
+var player = null;
 
 var profile = {
     email: "",
@@ -9,12 +10,8 @@ var profile = {
     receiveSummary: ""
 };
 
-dwr.engine.setTextHtmlHandler(function () {
-    document.location = '/jol/';
-});
-
 function errorhandler(errorString, exception) {
-    if (exception.name === "dwr.engine.incompleteReply") {
+    if (exception.name === "dwr.engine.incompleteReply" || exception.name === 'dwr.engine.textHtmlReply') {
         document.location = "/jol/";
     }
 }
@@ -23,10 +20,10 @@ function loadTypes(data) {
     dwr.util.addOptions('cardtype', data);
 }
 
-function init() {
+$(document).ready(function() {
     DS.getTypes({callback: loadTypes});
     DS.init({callback: playerMap});
-}
+});
 
 function playerMap(data) {
     for (var item in data) {
@@ -85,6 +82,7 @@ function navigate(data) {
         toggleVisible('logininputs', 'loggedin');
         dwr.util.setValue('login', 'Log in');
         dwr.util.byId('gameRow').style.display = "none";
+        player = null;
     } else {
         doButtons({main: chatLabel});
         doButtons({deck: "Deck Register"});
@@ -96,6 +94,7 @@ function navigate(data) {
         toggleVisible('loggedin', 'logininputs');
         dwr.util.setValue('login', 'Log out');
         dwr.util.byId('gameRow').style.display = "";
+        player = data.player;
     }
     doButtons({help: "Help"});
     doButtons({_guides: "Guides"});
@@ -130,6 +129,11 @@ function renderMyGames(games) {
         if (games[index].started) {
             gameRow.cells[0].innerHTML = makeGameLink(games[index].game);
             gameRow.cells[1].innerHTML = games[index].current ? '&nbsp;' : '*';
+            if (games[index].turn === player) {
+                gameRow.className = "active";
+            } else {
+                gameRow.className = "";
+            }
         } else {
             gameRow.cells[0].innerHTML = games[index].game;
             gameRow.cells[1].innerHTML = 'C' + games[index].cryptSize + ' L' + games[index].libSize;
@@ -178,6 +182,30 @@ function renderActiveGames(games) {
         row.cells[3].innerHTML = '&nbsp ' + games[index].available.join(',');
         row.cells[4].innerHTML = games[index].admin;
     }
+}
+
+function removeOwnGames(removedGames) {
+    var table = dwr.util.byId('owngames');
+    $.each(removedGames, function(index, game) {
+        $.each(table.rows, function(i, row) {
+            if (row.label === game) {
+               table.deleteRow(i);
+               return false;
+            }
+        });
+    });
+}
+
+function removeActiveGames(removedGames) {
+    var table = dwr.util.byId('activegames');
+    $.each(removedGames, function(index, game) {
+        $.each(table.rows, function(i, row) {
+            if (row.label === game) {
+                table.deleteRow(i);
+                return false;
+            }
+        });
+    });
 }
 
 function loadDeck(deck) {
@@ -275,32 +303,91 @@ function doNewDeck() {
     showDeck({text: '', format: '', errors: []});
 }
 
+
+// Callback for AdminCreator
+function callbackAdmin(data) {
+    var currentGamesSelector = $("#endGameSelector");
+    var currentGames = $("#currentGames");
+    var gameList = $("#gameList");
+    gameList.empty();
+    currentGamesSelector.empty();
+    currentGames.empty();
+    $.each(data.currentGames, function (index, game) {
+        currentGamesSelector.append(new Option(game, game));
+    });
+
+    $("#playerList").autocomplete({
+        source: data.players,
+        change: function (event, ui) {
+            if (ui.item === null) {
+                $(this).val((ui.item ? ui.item.id : ""));
+            }
+        }
+    });
+
+    $.each(data.forming, function (index, game) {
+        var headerRow = $("<tr/>");
+        var gameHeader = $("<th/>").text(game.gameName);
+        var startHeader = $("<th/>");
+        headerRow.append(gameHeader);
+        headerRow.append(startHeader);
+        currentGames.append(headerRow);
+        gameList.append(new Option(game.gameName, game.gameName));
+        var registrationCount = 0;
+        $.each(game.registrations, function (i, registration) {
+            var registrationRow = $("<tr/>");
+            var player = $("<td/>").text(registration.player);
+            registrationRow.append(player);
+            var summary = $("<td/>").text(registration.deckSummary);
+            if ("invited" !== registration.deckSummary) {
+                registrationCount++;
+                if (!registration.valid) {
+                    summary.append($('<label/>').addClass("label-invalid").text('Invalid'));
+                }
+            }
+            registrationRow.append(summary);
+            currentGames.append(registrationRow);
+        });
+        var registrationText = "( " + registrationCount + " registered )";
+        var startButton = $("<button/>").text("Start " + registrationText).click(game, function () {
+            if (confirm("Start game?")) {
+                DS.startGame(game.gameName, {callback: playerMap});
+            }
+        });
+        var cancelButton = $("<button/>").text("Close").click(game, function() {
+            if (confirm("Cancel game?")) {
+                DS.endGame(game.gameName, {callback: playerMap});
+            }
+        });
+        startHeader.append(startButton);
+        startHeader.append(cancelButton);
+    });
+}
+
 function createGame() {
-    var gameName = dwr.util.getValue("creategame");
+    var gameName = dwr.util.getValue("newGameName");
     if (gameName.indexOf("\'") > -1 || gameName.indexOf("\"") > -1) {
         alert("Game name can not contain \' or \" characters in it");
         return;
     }
-    DS.createGame(dwr.util.getValue("creategame"), {callback: playerMap});
-    dwr.util.setValue("creategame", '');
+    DS.createGame(dwr.util.getValue("newGameName"), {callback: playerMap});
+    dwr.util.setValue("newGameName", '');
 }
 
-function invitePlayer(game) {
-    DS.invitePlayer(game, dwr.util.getValue('cgs' + game), {callback: playerMap});
+function invitePlayer() {
+    var game = $("#gameList").val();
+    var player = $("#playerList").val();
+    DS.invitePlayer(game, player, {callback: playerMap});
 }
 
-function startGame(game) {
-    if (confirm("Start game?")) {
-        DS.startGame(game, {callback: playerMap});
+function closeGame() {
+    if (confirm("End game?")) {
+        DS.endGame(dwr.util.getValue("endGameSelector"), {callback: playerMap});
     }
 }
 
 function doRegister() {
     DS.registerDeck(dwr.util.getValue('reggames'), dwr.util.getValue('regdecks'), {callback: playerMap});
-}
-
-function closeGame() {
-    DS.endGame(dwr.util.getValue("endgameselector"), {callback: playerMap});
 }
 
 function refreshState(force) {
@@ -592,43 +679,13 @@ function callbackMain(data) {
         renderOnline('adson', data.admins);
         renderMyGames(data.myGames);
         renderActiveGames(data.games);
+        removeOwnGames(data.remGames);
+        removeActiveGames(data.remGames);
         renderMessage(data.message);
         if (data.refresh > 0) {
             refresher = setTimeout("DS.doPoll({callback: playerMap, errorHandler: errorhandler})", data.refresh);
         }
     }
-}
-
-// Callback for AdminCreator
-function callbackAdmin(data) {
-    for (var game in data.games) {
-        if (data.games.hasOwnProperty(game)) {
-            var row = addGameRow('gameadmintable', "cg" + game);
-            if (row.cells.length === 0) {
-                row.insertCell(0);
-                row.cells[0].innerHTML = game;
-                row.insertCell(1);
-                row.cells[1].innerHTML = '<select id="cgs' + game + '"></select><button onclick="invitePlayer(' + "'" + game + "'" + ');">Invite</button>';
-                dwr.util.addOptions('cgs' + game, data.players);
-                row.insertCell(2);
-                row.cells[2].innerHTML = '<button onclick="startGame(' + "'" + game + "'" + ');">Start game</button>';
-            }
-            for (var idx = row.cells.length; --idx > 2;) {
-                row.deleteCell(idx);
-            }
-            var regs = data.games[game].registrations;
-            for (var player in regs) {
-                if (regs.hasOwnProperty(player)) {
-                    var csize = regs[player].cryptSize;
-                    var lsize = regs[player].libSize;
-                    var grps = regs[player].groups;
-                    row.insertCell(3).innerHTML = player + '(C' + csize + ',L' + lsize + ',G ' + grps + ')';
-                }
-            }
-        }
-    }
-    dwr.util.removeAllOptions('endgameselector');
-    dwr.util.addOptions('endgameselector', data.runningGames);
 }
 
 function callbackStatus(data) {

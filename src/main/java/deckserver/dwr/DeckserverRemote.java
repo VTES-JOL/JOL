@@ -61,14 +61,17 @@ public class DeckserverRemote {
     }
 
     public Map<String, Object> endGame(String name) {
-        endGameImpl(name);
+        PlayerModel player = getPlayer();
+        if (player.isSuperUser() || player.getPlayer().equals(abean.getGameModel(name).getOwner())) {
+            abean.endGame(name);
+        }
         return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> invitePlayer(String game, String name) {
         String player = getPlayer().getPlayer();
         JolAdmin admin = JolAdmin.getInstance();
-        if (admin.isAdmin(player)) {
+        if (admin.isAdmin(player) || admin.isSuperUser(player)) {
             admin.invitePlayer(game, name);
         }
         return UpdateFactory.getUpdate();
@@ -77,7 +80,7 @@ public class DeckserverRemote {
     public Map<String, Object> startGame(String game) {
         String player = getPlayer().getPlayer();
         JolAdmin admin = JolAdmin.getInstance();
-        if (admin.getOwner(game).equals(player) && admin.isOpen(game)) {
+        if ((admin.getOwner(game).equals(player) || admin.isSuperUser(player)) && admin.isOpen(game)) {
             admin.startGame(game);
             MailUtil.sendStartMsg(admin.getGame(game));
             getModel(game).firstPing();
@@ -220,16 +223,6 @@ public class DeckserverRemote {
         }
         ret.put("callbackShowCards", beans);
         return ret;
-    }
-
-    private void endGameImpl(String name) {
-        logger.error("Attempting to close " + name);
-        PlayerModel player = getPlayer();
-        logger.error(abean.getGameModel(name).getOwner());
-        if (player.getPlayer().equals(abean.getGameModel(name).getOwner())) {
-            logger.error("Closing " + name);
-            abean.endGame(name);
-        }
     }
 
     public Map<String, Object> updateProfile(String email, boolean receivePing, boolean receiveSummary) {

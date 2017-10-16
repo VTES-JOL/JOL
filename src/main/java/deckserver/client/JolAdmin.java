@@ -241,7 +241,7 @@ public class JolAdmin {
         return getPlayerInfo(player).getDeckNames();
     }
 
-    public String[] getPlayers() {
+    public List<String> getPlayers() {
         return sysInfo.getPlayers();
     }
 
@@ -313,6 +313,15 @@ public class JolAdmin {
             }
         }
         return CARD_DATA;
+    }
+
+    public boolean isSuperUser(String player) {
+        return existsPlayer(player) && getPlayerInfo(player).isSuperUser();
+    }
+
+    public boolean isRegistered(String gameName, String player) {
+        String playerKey = sysInfo.getKey(player);
+        return getGameInfo(gameName).getValue(playerKey) != null;
     }
 
     class GameInfo extends Info {
@@ -760,8 +769,8 @@ public class JolAdmin {
             return findValues("game").toArray(new String[0]);
         }
 
-        public String[] getPlayers() {
-            return findValues("player").toArray(new String[0]);
+        public List<String> getPlayers() {
+            return new ArrayList<>(findValues("player"));
         }
     }
 
