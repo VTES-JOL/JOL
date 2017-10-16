@@ -22,6 +22,8 @@ public class PlSummaryBean {
 
     private String game;
 
+    private String turn;
+
     public PlSummaryBean(GameModel game, String player) {
         this.game = game.getName();
         this.started = game.isActive();
@@ -33,6 +35,7 @@ public class PlSummaryBean {
             crypt = nd.getCryptSize();
             groups = nd.getGroups();
         } else {
+            turn = JolAdmin.getInstance().getGame(this.game).getActivePlayer();
             GameView view = game.hasView(player);
             if (view != null) {
                 this.current = !view.isChanged();
@@ -70,5 +73,9 @@ public class PlSummaryBean {
 
     public String getGroups() {
         return groups;
+    }
+
+    public String getTurn() {
+        return turn;
     }
 }

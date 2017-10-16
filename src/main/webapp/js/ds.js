@@ -2,6 +2,7 @@ var refresher = null;
 var game = null;
 var timeInterval = null;
 var outageTime = null;
+var player = null;
 
 var profile = {
     email: "",
@@ -80,6 +81,7 @@ function navigate(data) {
         toggleVisible('logininputs', 'loggedin');
         dwr.util.setValue('login', 'Log in');
         dwr.util.byId('gameRow').style.display = "none";
+        player = null;
     } else {
         doButtons({main: "Main"});
         doButtons(data.playerButtons);
@@ -89,6 +91,7 @@ function navigate(data) {
         toggleVisible('loggedin', 'logininputs');
         dwr.util.setValue('login', 'Log out');
         dwr.util.byId('gameRow').style.display = "";
+        player = data.player;
     }
     doButtons({help: "Help"});
     doButtons({_guides: "Guides"});
@@ -123,6 +126,11 @@ function renderMyGames(games) {
         if (games[index].started) {
             gameRow.cells[0].innerHTML = makeGameLink(games[index].game);
             gameRow.cells[1].innerHTML = games[index].current ? '&nbsp;' : '*';
+            if (games[index].turn === player) {
+                gameRow.className = "active";
+            } else {
+                gameRow.className = "";
+            }
         } else {
             gameRow.cells[0].innerHTML = games[index].game;
             gameRow.cells[1].innerHTML = 'C' + games[index].cryptSize + ' L' + games[index].libSize;

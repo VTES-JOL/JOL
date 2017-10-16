@@ -232,3 +232,7 @@ label.label-invalid {
     text-align: right;
     padding: 0 1em;
 }
+
+#owngames tr.active {
+    background-color: #dddddd;
+}
