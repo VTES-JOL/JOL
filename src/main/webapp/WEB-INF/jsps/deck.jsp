@@ -1,22 +1,22 @@
 <div class='container'>
     <div class='col-3'>
         <div id='gameRegistration' class='box'>
-            <h3>Game Registration:</h3>
+            <h4>Game Registration:</h4>
             <div>
-                <select class="btn-vtes-default" title="reggames" id="reggames">
+                <select title="reggames" id="reggames">
                 </select>
-                <select class="btn-vtes-default" title="Choose deck" id="regdecks">
+                <select title="Choose deck" id="regdecks">
                 </select>
-                <button onclick="doRegister();" class="btn-vtes-default">Register</button>
+                <button onclick="doRegister();">Register</button>
             </div>
             <br/>
-            <table id="opengames" border="1" cellspacing="1" cellpadding="1" width="100%">
+            <table id="opengames" class="clean-table">
             </table>
         </div>
         <div id='playerDecks' class='box'>
-            <h3>Your decks:</h3>
+            <h4>Your decks:</h4>
             <div class="gamediv">
-                <table id="mydecks" class="gametable" border="1" cellspacing="1" cellpadding="1" width="100%">
+                <table id="mydecks" class="clean-table">
                     <thead>
                         <colgroup>
                             <col width="90%"/>
@@ -32,7 +32,7 @@
     </div>
     <div class='col-4'>
         <div id='deckEditor' class='box'>
-            <h3>Deck Editor</h3>
+            <h4>Deck Editor</h4>
             <table width="100%">
                 <tr>
                     <td align="left">
@@ -41,8 +41,8 @@
                     </td>
                     <td align="right">
                         <div id="noedit">
-                            <button class="btn-vtes-default" onclick="doEdit();">Edit</button>
-                            <button class="btn-vtes-default" onclick="doNewDeck();">New</button>
+                            <button onclick="doEdit();">Edit</button>
+                            <button onclick="doNewDeck();">New</button>
                         </div>
                         <div id="deckedit" style="display :none;">
                             <button onclick="doSave();">Save</button>
@@ -56,7 +56,7 @@
                     <td align=right>
                         <label for="shuffle">Shuffle:</label>
                         <input type="checkbox" id="shuffle" name="shuffle" value="yes"/>
-                        <button class="btn-vtes-default" id="adjust" onclick="doAdjust();">Parse deck</button>
+                        <button id="adjust" onclick="doAdjust();">Parse deck</button>
                     </td>
                 </tr>
             </table>
@@ -73,8 +73,8 @@
     </div>
     <div class='col-3'>
         <div id='editorCardDetails' class='box'>
-            <h3>Card Text:</h3>
-            <select class="btn-vtes-default" id="deckcards" onchange="selectCardDeck()"></select>
+            <h4>Card Text:</h4>
+            <select id="deckcards" onchange="selectCardDeck()"></select>
             <input type="hidden" id="cardSelect" value="history"/>
             <div class="history" id="cardtext"></div>
         </div>
@@ -87,7 +87,7 @@
                             <label for="cardtype">Type:</label>
                         </td>
                         <td>
-                            <select class="btn-vtes-default" id="cardtype">
+                            <select id="cardtype">
                                 <option value="All">All</option>
                             </select>
                         </td>
@@ -102,7 +102,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <button class="btn-vtes-default">Search cards</button>
+                            <button>Search cards</button>
                         </td>
                     </tr>
                 </table>

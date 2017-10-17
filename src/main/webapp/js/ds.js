@@ -49,7 +49,7 @@ function doButtons(data) {
     var buttons = dwr.util.getValue('buttons', {escapeHtml: false});
     for (var prop in data) {
         if (data.hasOwnProperty(prop)) {
-            buttons += '<button class="btn-vtes-default" onclick="doNav(' + "'" + prop + "'" + ');">' + data[prop] + "</button>";
+            buttons += '<button onclick="doNav(' + "'" + prop + "'" + ');">' + data[prop] + "</button>";
         }
     }
     dwr.util.setValue('buttons', buttons, {escapeHtml: false});
@@ -83,7 +83,7 @@ function navigate(data) {
         dwr.util.byId('gameRow').style.display = "none";
         player = null;
     } else {
-        doButtons({main: "Main" + (data.chats ? " *" : "")});
+        doButtons({main: "Main" + (data.chats ? " *" : ""), deck: "Deck Register"});
         if (data.admin) {
             doButtons({admin: "Game Admin"})
         }
@@ -144,10 +144,21 @@ function makeGameLink(game) {
 }
 
 function renderOnline(div, who) {
+    var container = $("#" + div);
+    container.empty();
     if (who === null) {
         return;
     }
-    dwr.util.setValue(div, who.join(', '));
+    $.each(who, function(index, player) {
+        var playerSpan = $("<span/>").text(player.name).addClass("player");
+        if (player.superUser) {
+            playerSpan.addClass("player-superUser");
+        } else if (player.admin) {
+            playerSpan.addClass("player-admin");
+        }
+        container.append(playerSpan);
+        container.append(" ");
+    });
 }
 
 function renderMessage(message) {
@@ -674,11 +685,10 @@ function callbackMain(data) {
         dwr.util.setValue('chatstamp', data.stamp);
         renderChat('gchatwin', 'gchattable', data.chat);
         renderOnline('whoson', data.who);
-        renderOnline('adson', data.admins);
         renderMyGames(data.myGames);
         renderActiveGames(data.games);
-        removeOwnGames(data.remGames);
-        removeActiveGames(data.remGames);
+        removeOwnGames(data.removedGames);
+        removeActiveGames(data.removedGames);
         renderMessage(data.message);
         if (data.refresh > 0) {
             refresher = setTimeout("DS.doPoll({callback: playerMap, errorHandler: errorhandler})", data.refresh);

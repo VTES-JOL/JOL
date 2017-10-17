@@ -21,6 +21,16 @@ body.dev {
     color: black;
 }
 
+#globalChatForm {
+    margin-bottom: 0.5em;
+}
+
+#gchat {
+    border: 1px solid #000000;
+    width: 100%;
+    padding: 0.25em;
+}
+
 #owngamediv {
     height: 100%
 }
@@ -119,16 +129,11 @@ span.edge {
     display: inline;
 }
 
-.btn-vtes-default {
-    //background-color: darkslategrey;
-    //color: white;
-    padding: 0.3em;
-}
-
 .btn-vtes-info {
     background-color: rgba(27, 45, 45, 0.98);
     color: white;
     padding: 0.3em;
+    font-size: 75%;
 }
 
 #clockdiv {
@@ -193,7 +198,7 @@ ul.deck-list {
     margin: 0 0 5px 5px;
 }
 
-label.label-invalid {
+label.label-invalid{
     color: #111;
     background-color: #ffc107;
     padding: 0.25em 0.5em;
@@ -235,4 +240,102 @@ label.label-invalid {
 
 #owngames tr.active {
     background-color: #dddddd;
+}
+
+ol.game-list {
+    margin: 0;
+    padding: 0.25em 1.5em;
+}
+
+td.player-active {
+    background-color: #dddddd;
+}
+
+table.game-table, td.game-table {
+    border-collapse:collapse;
+    border:1px solid #000000;
+    width: 100%;
+}
+
+table.game-table > tbody > tr, table.game-table > tbody > tr > td {
+    border:1px solid #000000;
+    border-collapse: collapse;
+    vertical-align: top;
+    padding: 0.25em;
+}
+
+div.players {
+    display: flex;
+}
+
+table.game-state {
+    border-collapse: collapse;
+    padding: 0;
+}
+
+td.game-row {
+    width: 20%;
+    padding: 0.25em;
+    border-right: 1px solid #000000;
+}
+
+td.game-row:last-child {
+    border: 0;
+}
+
+#dsForm input, #dsForm select, #dsForm table {
+    width: 100%;
+}
+
+#dsForm form {
+    padding: 0.5em;
+}
+
+#gameNotes textarea {
+    width: 100%;
+    height: 5em;
+}
+
+.float-right {
+    float: right;
+}
+
+.no-padding, #state.no-padding {
+    padding: 0;
+}
+
+.some-padding {
+    padding: 0.5em 0.25em;
+    line-height: 1.5em;
+}
+
+table.clean-table {
+    border: 1px solid #000000;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table.clean-table td {
+    border: 1px solid #000000;
+    padding: 0.15em 0.5em;
+    white-space: nowrap;
+}
+
+span.player {
+    border-radius: 0.25rem;
+    border: 1px solid #000000;
+    font-size: 75%;
+    padding: 0.25em 0.5em;
+    vertical-align: baseline;
+    text-align: center;
+}
+
+span.player-admin {
+    color: #111;
+    background-color: #dddddd;
+}
+
+span.player-superUser {
+    background-color: #ffc107;
+    color: #111;
 }

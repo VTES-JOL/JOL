@@ -1,9 +1,8 @@
-<%@page contentType="text/html" %>
-<%@page pageEncoding="UTF-8" %>
-<table width="100%" border="2">
+<table class="game-table">
     <tr>
-        <td valign="top" width="30%" id="hand"></td>
+        <td width="30%" id="hand"></td>
         <td id="dsForm">
+            <h5>Commands</h5>
             <form onsubmit="return doSubmit();" autocomplete='off'>
                 <table>
                     <tr id="phasecommand">
@@ -11,7 +10,7 @@
                             <label for="phase">Phase:</label>
                         </td>
                         <td>
-                            <select class="btn-vtes-default" id="phase" name="phase"></select>
+                            <select id="phase" name="phase"></select>
                         </td>
                     </tr>
                     <tr>
@@ -19,7 +18,7 @@
                             <label for="command">Command:</label>
                         </td>
                         <td>
-                            <input name="command" type="text" id="command" size="25" maxlength="100"/>
+                            <input name="command" type="text" id="command" maxlength="100"/>
                         </td>
                     </tr>
                     <tr>
@@ -27,7 +26,7 @@
                             <label for="chat">Chat:</label>
                         </td>
                         <td>
-                            <input name="chat" type="text" id="chat" size="25" maxlength="100"/>
+                            <input name="chat" type="text" id="chat" maxlength="100"/>
                         </td>
                     </tr>
                     <tr>
@@ -35,7 +34,7 @@
                             <label for="ping">Ping:</label>
                         </td>
                         <td>
-                            <select class="btn-vtes-default" id="ping" name="ping"></select>
+                            <select id="ping" name="ping"></select>
                         </td>
                     </tr>
                     <tr id="endcommand">
@@ -43,7 +42,7 @@
                             <label for="endturn">End turn?</label>
                         </td>
                         <td>
-                            <select class="btn-vtes-default" id="endturn" name="endturn">
+                            <select id="endturn" name="endturn">
                                 <option value="No">No</option>
                                 <option value="Yes">Yes</option>
                             </select>
@@ -62,39 +61,30 @@
                 </table>
             </form>
         </td>
-        <td colspan="2" valign=top>
+        <td colspan="2" id="gameNotes">
             <div id="globalPad">
-                <label for="global">Global notes and pending actions:</label><br/>
-                <textarea rows="4" cols="50" name="global" id="global"></textarea>
+                <h5>Global notes and pending actions:</h5>
+                <textarea name="global" id="global"></textarea>
             </div>
             <div id="playerPad">
-                <label for="notes">Private notepad:</label><br/>
-                <textarea rows="4" cols="50" name="notes" id="notes"></textarea>
+                <h5>Private notepad:</h5>
+                <textarea name="notes" id="notes"></textarea>
             </div>
         </td>
     </tr>
     <tr>
-        <td align="left">
-            <table>
-                <tr>
-                    <td align="left">
-                        <div id="gamename"></div>
-                    </td>
-                    <td align="right">
-                        <div id="gamestamp"></div>
-                </tr>
-            </table>
+        <td>
+            <small id="gamename"></small>
+            <small id="gamestamp" class="float-right"></small>
         </td>
-        <td align="center">
-            <span>Current Turn: <span id="turnlabel"></span></span>
+        <td>
+            <small class="float-right">Current Turn: <span id="turnlabel"></span></small>
         </td>
-        <td align="left">
-            <select class="btn-vtes-default" title="cards" id="cards" name="cards" onchange="selectCard()">
+        <td colspan="2">
+            <select title="cards" id="cards" name="cards" onchange="selectCard()">
                 <option value="NOCARD">Show history</option>
             </select>
-        </td>
-        <td align="right">
-            <span>Turn selector:<select class="btn-vtes-default" title="turns" id="turns" name="turns" onchange="getHistory()"></select></span>
+            <span class="float-right">Turn selector:<select title="turns" id="turns" name="turns" onchange="getHistory()"></select></span>
         </td>
     </tr>
     <tr>
@@ -110,9 +100,8 @@
             </div>
         </td>
     </tr>
-    <tr>
-        <td colspan="4">
-            <span id="state"></span>
+    <tr class="no-padding">
+        <td colspan="4" id="state" class="no-padding">
         </td>
     </tr>
 </table>

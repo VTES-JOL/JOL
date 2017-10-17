@@ -7,21 +7,17 @@
     RegionParams r = (RegionParams) request.getAttribute("rparams");
 %>
 
-<a href="javascript:details('<%= r.getIndex() %>');" id="<%= r.getIndex() %>">-</a>
-<span>
-    <%= r.getText() %>
-    <%= r.getSize() %>
-</span>
+<h5>
+    <a href="javascript:details('<%= r.getIndex() %>');" id="<%= r.getIndex() %>">-</a>
+    <%= r.getText() %> ( <%= r.getSize() %> )
+</h5>
 
-<span id="region<%= r.getIndex() %>">
-    <ol>
-         <% for (int i = 0; i < r.getSize(); i++) {
-             request.setAttribute("cparams", r.getCardParam(i));
-         %>
-        <li>
-            <jsp:include page="card.jsp"/>
-        </li>
-         <% } %>
-    </ol>
-</span>
- 
+<ol id="region<%= r.getIndex() %>" class="game-list">
+    <% for (int i = 0; i < r.getSize(); i++) {
+        request.setAttribute("cparams", r.getCardParam(i));
+    %>
+    <li>
+        <jsp:include page="card.jsp"/>
+    </li>
+    <% } %>
+</ol>

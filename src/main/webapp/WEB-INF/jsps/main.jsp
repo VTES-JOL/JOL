@@ -4,10 +4,9 @@
     <tr>
         <td width="25%" valign="top" rowspan="2">
             <div id="player" style="display: none;">
-                <span>Your games:</span>
+                <h4>Your games:</h4>
                 <div id="owngamediv" class="gamediv">
-                    <table class="gametable" id="owngames" border="1" cellspacing="1" cellpadding="1"
-                           width="100%"></table>
+                    <table id="owngames" class="clean-table"></table>
                 </div>
             </div>
             <div id="register">
@@ -41,46 +40,41 @@
             </div>
         </td>
         <td width="50%" valign="top">
-            <p>
-                Welcome to V:TES Online, where you can play Vampire-The Eternal Struggle (V:TES) card games online over
-                the web.
-            </p>
-            <p>
-                To play games on this server login, create some decks, and use chat below to organize games.
-            </p>
-
-            <c:if test="${applicationScope.get('environment') eq 'test'}">
-                <h3>TEST SERVER - DATA ON THIS SERVER SUBJECT TO CHANGE</h3>
-            </c:if>
-
             <div id="messages" style="display: none;"></div>
 
             <div id="globalchat" style="display: none;">
-                <p>Now logged on: <span id="whoson"></span></p>
-                <p>Admins currently on: <span id="adson"></span></p>
-                <span>Chat to organize new games:</span>
-                <div class="history" id="gchatwin">
-                    <table width="100%" class="chattable" id="gchattable" cellspacing="0" cellpadding="0"
-                           border="0"></table>
+                <div>
+                    <h4>
+                        Online Users:
+                    </h4>
+                    <div id="whoson" class="some-padding"></div>
                 </div>
-                <form action="javascript:globalChat();" autocomplete='off'>
-                    <span>
-                        <span id="chatstamp"></span>
-                        <label for="gchat">Chat:</label>
-                        <input type="text" style="width:100%" maxlength="200" id="gchat"/>
-                    </span>
-                </form>
+
+                <div>
+                    <h4>Global Chat:</h4>
+                    <div class="history" id="gchatwin">
+                        <table width="100%" class="chattable" id="gchattable" cellspacing="0" cellpadding="0"
+                               border="0"></table>
+                    </div>
+                    <form id="globalChatForm" action="javascript:globalChat();" autocomplete='off'>
+                        <input type="text" maxlength="200" id="gchat" placeholder="Chat with players"/>
+                    </form>
+                </div>
+
             </div>
         </td>
         <td width="20%" valign="top">
+            <h4>News:</h4>
             <ul>
                 <li>
                     Donate to keep JOL running
                     <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
                         <input type="hidden" name="cmd" value="_s-xclick">
                         <input type="hidden" name="hosted_button_id" value="BJ4GNJK6CDGLS">
-                        <input type="image" src="https://www.paypalobjects.com/en_AU/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal – The safer, easier way to pay online!">
-                        <img alt="" border="0" src="https://www.paypalobjects.com/en_AU/i/scr/pixel.gif" width="1" height="1">
+                        <input type="image" src="https://www.paypalobjects.com/en_AU/i/btn/btn_donateCC_LG.gif"
+                               border="0" name="submit" alt="PayPal – The safer, easier way to pay online!">
+                        <img alt="" border="0" src="https://www.paypalobjects.com/en_AU/i/scr/pixel.gif" width="1"
+                             height="1">
                     </form>
                 </li>
                 <li>
@@ -106,13 +100,22 @@
                 </c:if>
 
             </ul>
+            <div>
+                <h4>User Legend:</h4>
+                <div class="some-padding">
+                    <span class="player">Player</span>
+                    <span class="player player-admin">Admin</span>
+                    <span class="player player-superUser">Super</span>
+                </div>
+            </div>
+
         </td>
     </tr>
     <tr id="gameRow">
         <td>
+            <h4>Currently active games:</h4>
             <div class="gamediv">
-                <span>Currently active games:</span>
-                <table border="1" cellspacing="1" cellpadding="1" width="100%">
+                <table class="clean-table">
                     <thead>
                     <tr>
                         <th>Game Name</th>

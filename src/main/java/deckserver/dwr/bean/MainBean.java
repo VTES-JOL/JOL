@@ -7,18 +7,18 @@ import deckserver.dwr.Utils;
 import deckserver.util.RefreshInterval;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MainBean {
 
-    private List<PlSummaryBean> mygames = new ArrayList<>();
-    private String[] who = null;
-    private String[] admins = null;
-    private boolean loggedin;
+    private List<PlSummaryBean> myGames = new ArrayList<>();
+    private List<UserSummaryBean> who = new ArrayList<>();
+    private boolean loggedIn;
     private List<SummaryBean> games = new ArrayList<>();
     private String[] chat;
     private int refresh = 0;
     private String stamp;
-    private String[] remGames;
+    private List<String> removedGames = new ArrayList<>();
     private String message;
 
     public MainBean(AdminBean abean, PlayerModel model) {
@@ -26,10 +26,11 @@ public class MainBean {
     }
 
     public void init(AdminBean abean, PlayerModel model) {
+        JolAdmin jolAdmin = JolAdmin.getInstance();
         Collection<GameModel> actives = abean.getActiveGames();
         Collection<String> gamenames = new HashSet<>();
-        loggedin = model.getPlayer() != null;
-        if (loggedin) {
+        loggedIn = model.getPlayer() != null;
+        if (loggedIn) {
             gamenames.addAll(Arrays.asList(JolAdmin.getInstance().getGames(model.getPlayer())));
             refresh = RefreshInterval.calc(abean.getTimestamp());
         }
@@ -37,34 +38,35 @@ public class MainBean {
             if (!model.getChangedGames().contains(game.getName())) continue;
             games.add(game.getSummaryBean());
             if (gamenames.contains(game.getName()) && (game.isOpen() || game.getPlayers().contains(model.getPlayer())))
-                mygames.add(new PlSummaryBean(game, model.getPlayer()));
+                myGames.add(new PlSummaryBean(game, model.getPlayer()));
         }
-        remGames = model.getRemovedGames().toArray(new String[0]);
+        removedGames = new ArrayList<>(model.getRemovedGames());
         chat = model.getChat();
         if (chat.length == 0) chat = null;
-        who = abean.getWho();
-        admins = abean.getAdmins();
+        who = abean.getWho().stream()
+                .map(who -> new UserSummaryBean(who, jolAdmin.isAdmin(who), jolAdmin.isSuperUser(who)))
+                .collect(Collectors.toList());
         stamp = Utils.getDate();
         message = abean.getMessage();
-        mygames.sort(Comparator.comparing(PlSummaryBean::getGame));
+        myGames.sort(Comparator.comparing(PlSummaryBean::getGame));
         games.sort(Comparator.comparing(SummaryBean::getGame));
         model.clearGames();
     }
 
-    public String getStamp() {
-        return stamp;
+    public List<PlSummaryBean> getMyGames() {
+        return myGames;
+    }
+
+    public List<UserSummaryBean> getWho() {
+        return who;
+    }
+
+    public boolean isLoggedIn() {
+        return loggedIn;
     }
 
     public List<SummaryBean> getGames() {
         return games;
-    }
-
-    public String[] getWho() {
-        return who;
-    }
-
-    public String[] getAdmins() {
-        return admins;
     }
 
     public String[] getChat() {
@@ -75,20 +77,15 @@ public class MainBean {
         return refresh;
     }
 
+    public String getStamp() {
+        return stamp;
+    }
+
+    public List<String> getRemovedGames() {
+        return removedGames;
+    }
+
     public String getMessage() {
         return message;
     }
-
-    public boolean isLoggedIn() {
-        return loggedin;
-    }
-
-    public List<PlSummaryBean> getMyGames() {
-        return mygames;
-    }
-
-    public String[] getRemGames() {
-        return remGames;
-    }
-
 }

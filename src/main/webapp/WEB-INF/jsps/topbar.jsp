@@ -8,6 +8,7 @@
                 <div id="buttons">
                 </div>
                 <div id="clockdiv" style="display: none;"></div>
+                <span id="chatstamp" class="btn-vtes-info"></span>
             </td>
             <td width="20%" align="right">
                 <form method="post" style="display: inline;">
@@ -18,7 +19,7 @@
                     <span id="loggedin">
                         <span id="username"></span> is logged in.
                     </span>
-                    <input type="submit" class="btn-vtes-default" id="login" name="login" value="Log in"/>
+                    <input type="submit" id="login" name="login" value="Log in"/>
                 </form>
             </td>
         </tr>
