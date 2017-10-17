@@ -679,10 +679,10 @@ function callbackUpdateDeck(data) {
 
 // Callback for MainCreator
 function callbackMain(data) {
+    dwr.util.setValue('chatstamp', data.stamp);
     if (data.loggedIn) {
         toggleVisible('player', 'register');
         toggleVisible('globalchat', 'register');
-        dwr.util.setValue('chatstamp', data.stamp);
         renderChat('gchatwin', 'gchattable', data.chat);
         renderOnline('whoson', data.who);
         renderMyGames(data.myGames);

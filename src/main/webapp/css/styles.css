@@ -7,7 +7,7 @@ body.test {
 }
 
 body.dev {
-    background: #bbbbbb;
+    background: #e7e7e7;
 }
 
 #curturn {
@@ -130,10 +130,13 @@ span.edge {
 }
 
 .btn-vtes-info {
+    border-radius: 0.25rem;
     background-color: rgba(27, 45, 45, 0.98);
     color: white;
     padding: 0.3em;
-    font-size: 75%;
+    font-weight: 100;
+    font-size: 60%;
+    vertical-align: middle;
 }
 
 #clockdiv {
@@ -248,7 +251,7 @@ ol.game-list {
 }
 
 td.player-active {
-    background-color: #dddddd;
+    background-color: #cccccc;
 }
 
 table.game-table, td.game-table {
@@ -332,7 +335,7 @@ span.player {
 
 span.player-admin {
     color: #111;
-    background-color: #dddddd;
+    background-color: #bbbbbb;
 }
 
 span.player-superUser {

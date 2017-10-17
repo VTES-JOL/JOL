@@ -63,7 +63,7 @@
 
             </div>
         </td>
-        <td width="20%" valign="top">
+        <td width="20%" valign="top" rowspan="2">
             <h4>News:</h4>
             <ul>
                 <li>

@@ -2,13 +2,15 @@
     <table width="100%">
         <tr>
             <td width="25%" align="left">
-                <h2 id="title">V:TES Online <small>v<%= System.getProperty("jol.version")%></small></h2>
+                <h3 id="title">V:TES Online
+                    <small>v<%= System.getProperty("jol.version")%></small>
+                    <span id="chatstamp" class="btn-vtes-info"></span>
+                </h3>
             </td>
             <td width="50%" align="left">
                 <div id="buttons">
                 </div>
                 <div id="clockdiv" style="display: none;"></div>
-                <span id="chatstamp" class="btn-vtes-info"></span>
             </td>
             <td width="20%" align="right">
                 <form method="post" style="display: inline;">
