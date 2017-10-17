@@ -83,9 +83,10 @@ function navigate(data) {
         dwr.util.byId('gameRow').style.display = "none";
         player = null;
     } else {
-        doButtons({main: "Main"});
-        doButtons(data.playerButtons);
-        doButtons(data.adminButtons);
+        doButtons({main: "Main" + (data.chats ? " *" : "")});
+        if (data.admin) {
+            doButtons({admin: "Game Admin"})
+        }
         doButtons(data.gameButtons);
         dwr.util.setValue('loggedin', data.player);
         toggleVisible('loggedin', 'logininputs');
