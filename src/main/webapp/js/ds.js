@@ -32,8 +32,12 @@ function playerMap(data) {
 }
 
 function globalChat() {
-    DS.chat(dwr.util.getValue('gchat'), {callback: playerMap});
+    var chatLine = dwr.util.getValue('gchat');
     dwr.util.setValue('gchat', '');
+    if (chatLine === "") {
+        return;
+    }
+    DS.chat(chatLine, {callback: playerMap});
 }
 
 function toggleVisible(s, h) {
@@ -64,10 +68,11 @@ function renderChat(did, id, data) {
     if (dwr.util.byId(did).scrollTop === curScroll) {
         curScroll = 1000000;
     }
-    var table = dwr.util.byId(id);
-    for (var idx = 0; idx < data.length; idx++) {
-        table.insertRow(table.rows.length).insertCell(0).innerHTML = data[idx];
-    }
+    var table = $("#" + id);
+    $.each(data, function(index, chat) {
+       var chatLine = $("<p/>").addClass("chat").text(chat);
+       table.append(chatLine);
+    });
     dwr.util.byId(did).scrollTop = curScroll;
 }
 
@@ -83,12 +88,11 @@ function navigate(data) {
         dwr.util.byId('gameRow').style.display = "none";
         player = null;
     } else {
-        doButtons({main: "Main" + (data.chats ? " *" : ""), deck: "Deck Register"});
+        doButtons({main: "Main" + (data.chats ? " *" : ""), deck: "Deck Register", profile: "Profile"});
         if (data.admin) {
             doButtons({admin: "Game Admin"})
         }
         doButtons(data.gameButtons);
-        dwr.util.setValue('loggedin', data.player);
         toggleVisible('loggedin', 'logininputs');
         dwr.util.setValue('login', 'Log out');
         dwr.util.byId('gameRow').style.display = "";
@@ -120,6 +124,7 @@ function renderMyGames(games) {
     if (games === null) return;
     for (var index = 0; index < games.length; index++) {
         var gameRow = addGameRow('owngames', games[index].game);
+        gameRow.removeAttribute('className')
         if (gameRow.cells.length === 0) {
             gameRow.insertCell(0);
             gameRow.insertCell(1);
@@ -129,18 +134,16 @@ function renderMyGames(games) {
             gameRow.cells[1].innerHTML = games[index].current ? '&nbsp;' : '*';
             if (games[index].turn === player) {
                 gameRow.className = "active";
-            } else {
-                gameRow.className = "";
             }
         } else {
-            gameRow.cells[0].innerHTML = games[index].game;
-            gameRow.cells[1].innerHTML = 'C' + games[index].cryptSize + ' L' + games[index].libSize;
+            gameRow.cells[0].innerHTML = '<small>' + games[index].game + '</small>';
+            gameRow.cells[1].innerHTML = '<small>C' + games[index].cryptSize + ' L' + games[index].libSize + ' G' + games[index].groups + "</small>";
         }
     }
 }
 
 function makeGameLink(game) {
-    return '<a class="gamelink" onclick="doNav(' + "'g" + game + "');" + '">' + game + "</a>";
+    return '<a onclick="doNav(' + "'g" + game + "');" + '"><small>' + game + "</small></a>";
 }
 
 function renderOnline(div, who) {
@@ -150,11 +153,13 @@ function renderOnline(div, who) {
         return;
     }
     $.each(who, function(index, player) {
-        var playerSpan = $("<span/>").text(player.name).addClass("player");
+        var playerSpan = $("<span/>").text(player.name).addClass("label");
         if (player.superUser) {
-            playerSpan.addClass("player-superUser");
+            playerSpan.addClass("label-warning");
         } else if (player.admin) {
-            playerSpan.addClass("player-admin");
+            playerSpan.addClass("label-dark");
+        } else {
+            playerSpan.addClass("label-light")
         }
         container.append(playerSpan);
         container.append(" ");
@@ -186,10 +191,10 @@ function renderActiveGames(games) {
             row.insertCell(4);
         }
         row.cells[0].innerHTML = makeGameLink(games[index].game);
-        row.cells[1].innerHTML = games[index].access;
-        row.cells[2].innerHTML = games[index].turn;
-        row.cells[3].innerHTML = '&nbsp ' + games[index].available.join(',');
-        row.cells[4].innerHTML = games[index].admin;
+        row.cells[1].innerHTML = '<small>' + games[index].access + '</small>';
+        row.cells[2].innerHTML = '<small>' + games[index].turn + '</small>';
+        row.cells[3].innerHTML = '<small>' + '&nbsp ' + games[index].available.join(',') + '</small>';
+        row.cells[4].innerHTML = '<small>' + games[index].admin + '</small>';
     }
 }
 
@@ -654,7 +659,7 @@ function callbackShowDecks(data) {
                 gRow.insertCell(2);
             }
             gRow.cells[1].innerHTML = data.games[gIdx].name;
-            gRow.cells[2].innerHTML = 'L' + data.games[gIdx].lib + ' C' + data.games[gIdx].crypt + ' G ' + data.games[gIdx].groups;
+            gRow.cells[2].innerHTML = '<small>L' + data.games[gIdx].lib + ' C' + data.games[gIdx].crypt + ' G ' + data.games[gIdx].groups + "</small>";
         }
         dwr.util.removeAllOptions('reggames');
         dwr.util.removeAllOptions('regdecks');
@@ -682,7 +687,7 @@ function callbackMain(data) {
     dwr.util.setValue('chatstamp', data.stamp);
     if (data.loggedIn) {
         toggleVisible('player', 'register');
-        toggleVisible('globalchat', 'register');
+        toggleVisible('globalchat', 'welcome');
         renderChat('gchatwin', 'gchattable', data.chat);
         renderOnline('whoson', data.who);
         renderMyGames(data.myGames);

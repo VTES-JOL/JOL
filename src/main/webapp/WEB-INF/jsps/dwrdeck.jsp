@@ -25,7 +25,7 @@
     request.setAttribute("imbued", imbued);
     request.setAttribute("deck", deck);
 %>
-<h4>Crypt: (<%= csize %>)</h4>
+<h5>Crypt: (<%= csize %>)</h5>
 <ul class='deck-list'>
     <c:forEach items="${vampires.keySet()}" var="card">
         <li>${vampires.get(card)} x <a href="javascript:getCardDeck(null,'${card.cardId}')">${card.name}
@@ -38,7 +38,7 @@
     </c:forEach>
 </ul>
 
-<h4>Library: (<%= sum %>)</h4>
+<h5>Library: (<%= sum %>)</h5>
 <c:forEach items="${deck.keySet()}" var="type">
     <%
         String type = (String) pageContext.findAttribute("type");

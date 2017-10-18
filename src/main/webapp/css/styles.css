@@ -1,66 +1,55 @@
-body.production {
-    background: #e7e7e7;
+body {
+    background: #d0d0d0;
 }
 
-body.test {
-    background: #7590a3;
+.inline {
+    display: inline;
 }
 
-body.dev {
-    background: #e7e7e7;
-}
-
-#curturn {
+.info-area {
     background: white;
     color: black;
+    border: 1px solid #aaaaaa;
+}
+
+td a {
+    width: 100%;
+    display: block;
+    color: black;
+}
+
+td a:hover {
+    color: #888888;
+}
+
+#welcome div {
+    height: 30em;
+}
+
+#globalChatForm {
+    margin-bottom: 0;
+}
+
+#globalChatForm {
+    border-left: 1px solid #aaaaaa;
+    border-right: 1px solid #aaaaaa;
+    border-bottom: 1px solid #aaaaaa;
+}
+
+#gchat {
+    width: 100%;
+    padding: 0 0.5em;
+    border: 0;
+    line-height: 2em;
 }
 
 #gchatwin {
     width: 100%;
-    background: white;
-    color: black;
 }
 
-#globalChatForm {
-    margin-bottom: 0.5em;
-}
-
-#gchat {
-    border: 1px solid #000000;
-    width: 100%;
-    padding: 0.25em;
-}
-
-#owngamediv {
-    height: 100%
-}
-
-.errdiv {
-    color: black;
-    font-weight: bolder;
-}
-
-td.gameplayers {
+p.chat {
+    margin: 0;
     font-size: small;
-}
-
-.chattable {
-    color: black;
-}
-
-.gamelink {
-    color: black;
-    text-decoration: underline;
-}
-
-.gamediv {
-    overflow: auto;
-    background: white;
-    color: black;
-}
-
-td.delete {
-    text-align: center;
 }
 
 .history {
@@ -84,7 +73,7 @@ div#help-body {
 }
 
 table.help-example {
-    border: 1px solid black;
+    border: 1px solid aaaaaa;
     border-collapse: collapse;
     width: 100%;
     background-color: white;
@@ -110,14 +99,6 @@ ul.help li a {
     text-align: center;
     padding: 16px;
     text-decoration: none;
-}
-
-a:link, a:visited, a:hover, a:active {
-    color: red;
-}
-
-body.test a {
-    color: #2E546F;
 }
 
 span.edge {
@@ -157,42 +138,39 @@ span.edge {
     display: flex;
 }
 
-.section {
-    padding: 0.5em;
-}
-
-.box {
-    box-shadow: 2px 0 0 0 #888, 0 2px 0 0 #888, 2px 2px 0 0 #888, 2px 0 0 0 #888 inset, 0 2px 0 0 #888 inset;
-    padding: 5px;
-}
-
 .col-2 {
     width: 16.7%;
     flex: 1 1 auto;
+    padding: 0.5em;
 }
 
 .col-3 {
     width: 25%;
     flex: 1 1 auto;
+    padding: 0.5em;
 }
 
 .col-4 {
     width: 32%;
     flex: 1 1 auto;
+    padding: 0.5em;
 }
 
 .col-6 {
     width: 50%;
     flex: 1 1 auto;
+    padding: 0.5em;
 }
 
 .col-8 {
     width: 65%;
     flex: 1 1 auto;
+    padding: 0.5em;
 }
 
 h3, h4, h5 {
     margin: 5px;
+    font-family: 'IM Fell English', serif;
 }
 
 ul.deck-list {
@@ -201,9 +179,9 @@ ul.deck-list {
     margin: 0 0 5px 5px;
 }
 
-label.label-invalid{
+label.label-invalid {
     color: #111;
-    background-color: #ffc107;
+    background-color: rgb(255, 228, 146);
     padding: 0.25em 0.5em;
     font-size: 75%;
     font-weight: 600;
@@ -214,8 +192,8 @@ label.label-invalid{
 }
 
 #currentGames {
-    border-collapse:collapse;
-    border:1px solid #000000;
+    border-collapse: collapse;
+    border: 1px solid #aaaaaa;
 }
 
 #currentGames th {
@@ -228,7 +206,7 @@ label.label-invalid{
 }
 
 #currentGames td, #currentGames tr {
-    border:1px solid #000000;
+    border: 1px solid #aaaaaa;
     padding: 0.25em;
 }
 
@@ -242,12 +220,49 @@ label.label-invalid{
 }
 
 #owngames tr.active {
-    background-color: #dddddd;
+    background-color: rgb(255, 228, 146);
 }
 
-ol.game-list {
+ol.condensed-list, ul.condensed-list {
     margin: 0;
-    padding: 0.25em 1.5em;
+    padding: 0.25em;
+}
+
+.light {
+    border: 1px solid #aaaaaa;
+    background-color: white;
+}
+
+h4 {
+    border-top: 1px solid #aaa;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    margin: 0.5em 0 0;
+    line-height: 1.5em;
+    padding: 0.25em;
+    background-color: #ddd;
+}
+
+.footer {
+    background-color: #ddd;
+    line-height: 1.5em;
+    padding: 0.25em;
+    margin: 0 0 0.5em;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+}
+
+ul.condensed-list {
+    list-style: none;
+}
+
+ul.condensed-list li {
+    padding: 0.5em 0.25em 0.25em 0.25em;
+}
+
+ul.condensed-list li p {
+    margin: 0.25em 0.25em;
 }
 
 td.player-active {
@@ -255,13 +270,13 @@ td.player-active {
 }
 
 table.game-table, td.game-table {
-    border-collapse:collapse;
-    border:1px solid #000000;
+    border-collapse: collapse;
+    border: 1px solid #aaaaaa;
     width: 100%;
 }
 
 table.game-table > tbody > tr, table.game-table > tbody > tr > td {
-    border:1px solid #000000;
+    border: 1px solid #aaaaaa;
     border-collapse: collapse;
     vertical-align: top;
     padding: 0.25em;
@@ -279,7 +294,7 @@ table.game-state {
 td.game-row {
     width: 20%;
     padding: 0.25em;
-    border-right: 1px solid #000000;
+    border-right: 1px solid #aaaaaa;
 }
 
 td.game-row:last-child {
@@ -312,33 +327,85 @@ td.game-row:last-child {
     line-height: 1.5em;
 }
 
+table.clean-no-border {
+    width: 100%;
+}
+
 table.clean-table {
-    border: 1px solid #000000;
+    border: 1px solid #aaaaaa;
     border-collapse: collapse;
     width: 100%;
 }
 
-table.clean-table td {
-    border: 1px solid #000000;
+table.clean-table td, table.clean-table th {
+    border: 1px solid #aaaaaa;
     padding: 0.15em 0.5em;
-    white-space: nowrap;
 }
 
-span.player {
+span.label {
     border-radius: 0.25rem;
-    border: 1px solid #000000;
+    border: 1px solid #aaaaaa;
     font-size: 75%;
     padding: 0.25em 0.5em;
     vertical-align: baseline;
     text-align: center;
+    line-height: 1.5em;
+    white-space: nowrap;
+    font-family: 'IM Fell English', serif;
 }
 
-span.player-admin {
+span.label-light {
+    background-color: #eee;
     color: #111;
-    background-color: #bbbbbb;
 }
 
-span.player-superUser {
-    background-color: #ffc107;
+span.label-dark {
     color: #111;
+    background-color: #bbb;
+}
+
+span.label-warning {
+    background-color: rgb(255, 228, 146);
+    color: #111;
+}
+
+#donateBox {
+    padding-top: 0.5em;
+}
+
+td.layout {
+    vertical-align: top;
+    padding: 0 0.25em;
+}
+
+.g-recaptcha {
+
+}
+
+#mydecks td:first-child {
+    width: 90%;
+}
+
+#mydecks td:last-child {
+    width: 10%;
+}
+
+#deckcards {
+    width: 50%;
+    margin-top: 0.25em;
+}
+
+.padded {
+    padding: 0.5em;
+}
+
+#decktext {
+    padding: 0.5em;
+    border: 0;
+    width: 100%;
+    height: 40em;
+}
+
+#deckcontents {
+    width: 100%;
 }

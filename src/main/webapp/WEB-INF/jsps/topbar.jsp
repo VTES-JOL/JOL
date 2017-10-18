@@ -2,10 +2,10 @@
     <table width="100%">
         <tr>
             <td width="25%" align="left">
-                <h3 id="title">V:TES Online
+                <h3 id="title" class="inline">V:TES Online
                     <small>v<%= System.getProperty("jol.version")%></small>
-                    <span id="chatstamp" class="btn-vtes-info"></span>
                 </h3>
+                <span id="chatstamp" class="label label-light"></span>
             </td>
             <td width="50%" align="left">
                 <div id="buttons">
@@ -18,9 +18,7 @@
                         <input type="text" size=15 id="dsuserin" name="dsuserin" placeholder="Username"/>
                         <input type="password" size=15 id="dspassin" name="dspassin" placeholder="Password"/>
                     </span>
-                    <span id="loggedin">
-                        <span id="username"></span> is logged in.
-                    </span>
+                    <span id="loggedin"></span>
                     <input type="submit" id="login" name="login" value="Log in"/>
                 </form>
             </td>

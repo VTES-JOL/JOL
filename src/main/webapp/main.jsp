@@ -9,8 +9,9 @@
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.structure.min.css"/>
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.theme.min.css"/>
         <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/favicon.ico" />
+        <link href="https://fonts.googleapis.com/css?family=IM+Fell+English" rel="stylesheet">
     </head>
-    <body class="${applicationScope.get("environment")}">
+    <body>
         <div id="loadmsg">Loading...</div>
         <div id="loaded" style="display :none;">
             <jsp:include page="/WEB-INF/jsps/topbar.jsp"/>

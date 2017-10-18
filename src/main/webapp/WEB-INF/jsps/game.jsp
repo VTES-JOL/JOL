@@ -90,7 +90,7 @@
     <tr>
         <td colspan="2" width="60%">
             <div class="history" id="curturn">
-                <table class="chattable" cellspacing="0" cellpadding="0" border="0" id="curturntable"></table>
+                <table id="curturntable"></table>
             </div>
         </td>
         <td colspan="2" width="40%">

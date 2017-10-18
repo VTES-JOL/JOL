@@ -12,7 +12,7 @@
     <%= r.getText() %> ( <%= r.getSize() %> )
 </h5>
 
-<ol id="region<%= r.getIndex() %>" class="game-list">
+<ol id="region<%= r.getIndex() %>" class="condensed-list">
     <% for (int i = 0; i < r.getSize(); i++) {
         request.setAttribute("cparams", r.getCardParam(i));
     %>

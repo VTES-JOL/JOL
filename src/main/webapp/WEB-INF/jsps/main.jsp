@@ -2,17 +2,16 @@
 <%@page contentType="text/html" %>
 <table width="100%">
     <tr>
-        <td width="25%" valign="top" rowspan="2">
+        <td width="25%" class="layout" rowspan="2">
             <div id="player" style="display: none;">
                 <h4>Your games:</h4>
-                <div id="owngamediv" class="gamediv">
-                    <table id="owngames" class="clean-table"></table>
-                </div>
+                <table id="owngames" class="clean-table light"></table>
             </div>
             <div id="register">
-                <span>Register to create decks and join games!</span>
-                <form method="post">
-                    <table>
+                <h4>Register</h4>
+                <form method="post" class="light some-padding">
+                    <span>Register to create decks and join games!</span>
+                    <table class="clean-no-border">
                         <tr>
                             <td><label for="newplayer">Name:</label></td>
                             <td><input style="width:100%;" type="text" size="30" name="newplayer" id="newplayer"/></td>
@@ -39,22 +38,28 @@
                 </form>
             </div>
         </td>
-        <td width="50%" valign="top">
+        <td width="50%" class="layout">
             <div id="messages" style="display: none;"></div>
+
+            <div id="welcome">
+                <h4>Welcome to V:TES Online</h4>
+                <div class="light">
+
+                </div>
+            </div>
 
             <div id="globalchat" style="display: none;">
                 <div>
                     <h4>
                         Online Users:
                     </h4>
-                    <div id="whoson" class="some-padding"></div>
+                    <div id="whoson" class="light some-padding"></div>
                 </div>
 
                 <div>
                     <h4>Global Chat:</h4>
-                    <div class="history" id="gchatwin">
-                        <table width="100%" class="chattable" id="gchattable" cellspacing="0" cellpadding="0"
-                               border="0"></table>
+                    <div class="info-area history" id="gchatwin">
+                        <div id="gchattable"></div>
                     </div>
                     <form id="globalChatForm" action="javascript:globalChat();" autocomplete='off'>
                         <input type="text" maxlength="200" id="gchat" placeholder="Chat with players"/>
@@ -63,12 +68,44 @@
 
             </div>
         </td>
-        <td width="20%" valign="top" rowspan="2">
-            <h4>News:</h4>
-            <ul>
+        <td width="20%" class="layout" rowspan="2">
+            <h4>Links:</h4>
+            <ul class="condensed-list light">
                 <li>
-                    Donate to keep JOL running
-                    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                    <a href="https://www.facebook.com/groups/jolstatus/" target="_blank">Facebook Status Group</a>
+                </li>
+                <li>
+                    <a href="https://www.facebook.com/groups/jol-development/" target="_blank">Facebook Development
+                        Group</a>
+                </li>
+                <li>
+                    <a href="/jol-news/">Patch Notes / News</a>
+                </li>
+                <li>
+                    <a href="https://test.deckserver.net/jol/" target="_blank">Test Server</a>
+                </li>
+
+            </ul>
+            <h4>User Ranks:</h4>
+            <ul class="condensed-list light">
+                <li>
+                    <span class="label label-light">Embrace</span>
+                    <p>Can make decks, play, chat</p>
+                </li>
+                <li>
+                    <span class="label label-dark">Justicar</span>
+                    <p>Creates games, Invites players, Closes games</p>
+                </li>
+                <li>
+                    <span class="label label-warning">Inner Circle</span>
+                    <p>Administer games for all other Justicars</p>
+                </li>
+            </ul>
+            <h4>Donate:</h4>
+            <ul class="condensed-list light">
+                <li>
+                    <span>Goes towards keeping JOL running.  Any donation appreciated.</span>
+                    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" id="donateBox">
                         <input type="hidden" name="cmd" value="_s-xclick">
                         <input type="hidden" name="hosted_button_id" value="BJ4GNJK6CDGLS">
                         <input type="image" src="https://www.paypalobjects.com/en_AU/i/btn/btn_donateCC_LG.gif"
@@ -77,45 +114,15 @@
                              height="1">
                     </form>
                 </li>
-                <li>
-                    <a href="https://www.facebook.com/groups/jolstatus/" target="_blank">Facebook Status Group</a>
-                    <p>Scheduled / Unplanned outages</p>
-                </li>
-                <li>
-                    <a href="https://www.facebook.com/groups/jol-development/" target="_blank">Facebook Development
-                        Group</a>
-                    <p>Request a fix, Suggest improvements</p>
-                </li>
-
-                <c:if test="${applicationScope.get('environment') eq 'production'}">
-
-                    <li>
-                        <a href="/jol-news/">Patch Notes / News</a>
-                        <p>Implemented / upcoming changes / announcements</p>
-                    </li>
-                    <li>
-                        <a href="https://test.deckserver.net/jol/" target="_blank">Test Server</a>
-                        <p>Staging / Playtesting environment</p>
-                    </li>
-                </c:if>
-
             </ul>
-            <div>
-                <h4>User Legend:</h4>
-                <div class="some-padding">
-                    <span class="player">Player</span>
-                    <span class="player player-admin">Admin</span>
-                    <span class="player player-superUser">Super</span>
-                </div>
-            </div>
 
         </td>
     </tr>
     <tr id="gameRow">
         <td>
             <h4>Currently active games:</h4>
-            <div class="gamediv">
-                <table class="clean-table">
+            <div>
+                <table class="clean-table light">
                     <thead>
                     <tr>
                         <th>Game Name</th>

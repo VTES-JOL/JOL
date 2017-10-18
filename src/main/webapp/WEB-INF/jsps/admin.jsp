@@ -13,14 +13,14 @@
     </div>
     <div class="col-8">
         <div class="box">
-            <div class="section">
+            <div>
                 <h4>Invite Players and Start Games</h4>
                 <label>Players:</label>
                 <input id="playerList" size="30"/>
                 <select id="gameList"></select>
                 <button onclick="invitePlayer()">Invite</button>
             </div>
-            <table id="currentGames" class="gamediv">
+            <table id="currentGames">
             </table>
         </div>
     </div>
