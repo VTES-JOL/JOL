@@ -43,7 +43,7 @@
         if (p.doNesting()) {
             Card[] cards = c.getCards();
             if (cards != null && cards.length > 0) {
-                out.write("<ol>");
+                out.write("<ol class='game-list'>");
                 for (Card card : cards) {
                     request.setAttribute("cparams", new CardParams(card));
                     out.write("<li>");

@@ -49,7 +49,7 @@ function doButtons(data) {
     var buttons = dwr.util.getValue('buttons', {escapeHtml: false});
     for (var prop in data) {
         if (data.hasOwnProperty(prop)) {
-            buttons += '<button class="btn-vtes-default" onclick="doNav(' + "'" + prop + "'" + ');">' + data[prop] + "</button>";
+            buttons += '<button onclick="doNav(' + "'" + prop + "'" + ');">' + data[prop] + "</button>";
         }
     }
     dwr.util.setValue('buttons', buttons, {escapeHtml: false});
@@ -77,18 +77,16 @@ function navigate(data) {
     dwr.util.setValue("contentselect", data.target);
     toggleVisible(data.target, selected);
     dwr.util.setValue('buttons', '');
-    var chatLabel = "Main" + (data.chats ? " *" : "");
     if (data.player === null) {
         toggleVisible('logininputs', 'loggedin');
         dwr.util.setValue('login', 'Log in');
         dwr.util.byId('gameRow').style.display = "none";
         player = null;
     } else {
-        doButtons({main: chatLabel});
-        doButtons({deck: "Deck Register"});
-        doButtons({profile: "Profile"});
-        doButtons(data.playerButtons);
-        doButtons(data.adminButtons);
+        doButtons({main: "Main" + (data.chats ? " *" : ""), deck: "Deck Register"});
+        if (data.admin) {
+            doButtons({admin: "Game Admin"})
+        }
         doButtons(data.gameButtons);
         dwr.util.setValue('loggedin', data.player);
         toggleVisible('loggedin', 'logininputs');
@@ -146,10 +144,21 @@ function makeGameLink(game) {
 }
 
 function renderOnline(div, who) {
+    var container = $("#" + div);
+    container.empty();
     if (who === null) {
         return;
     }
-    dwr.util.setValue(div, who.join(', '));
+    $.each(who, function(index, player) {
+        var playerSpan = $("<span/>").text(player.name).addClass("player");
+        if (player.superUser) {
+            playerSpan.addClass("player-superUser");
+        } else if (player.admin) {
+            playerSpan.addClass("player-admin");
+        }
+        container.append(playerSpan);
+        container.append(" ");
+    });
 }
 
 function renderMessage(message) {
@@ -670,17 +679,16 @@ function callbackUpdateDeck(data) {
 
 // Callback for MainCreator
 function callbackMain(data) {
+    dwr.util.setValue('chatstamp', data.stamp);
     if (data.loggedIn) {
         toggleVisible('player', 'register');
         toggleVisible('globalchat', 'register');
-        dwr.util.setValue('chatstamp', data.stamp);
         renderChat('gchatwin', 'gchattable', data.chat);
         renderOnline('whoson', data.who);
-        renderOnline('adson', data.admins);
         renderMyGames(data.myGames);
         renderActiveGames(data.games);
-        removeOwnGames(data.remGames);
-        removeActiveGames(data.remGames);
+        removeOwnGames(data.removedGames);
+        removeActiveGames(data.removedGames);
         renderMessage(data.message);
         if (data.refresh > 0) {
             refresher = setTimeout("DS.doPoll({callback: playerMap, errorHandler: errorhandler})", data.refresh);

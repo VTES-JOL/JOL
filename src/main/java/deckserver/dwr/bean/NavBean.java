@@ -10,21 +10,20 @@ import java.util.Map;
 
 public class NavBean {
 
-    private Map<String, String> adminButtons = new HashMap<>();
+    private boolean chats;
+    private boolean admin;
     private Map<String, String> gameButtons = new HashMap<>();
 
     private String player, target, game = null;
-    private boolean chats = false;
 
     public NavBean(AdminBean abean, PlayerModel model) {
-        JolAdmin admin = JolAdmin.getInstance();
         player = model.getPlayer();
         target = model.getView();
         if (target.equals("game"))
             game = model.getCurrentGame();
-        chats = model.hasChats();
-        if (player != null && admin.isAdmin(player)) {
-            adminButtons.put("admin", "Game Admin");
+        if (player != null) {
+            chats = model.hasChats();
+            admin = JolAdmin.getInstance().isAdmin(player);
         }
         String[] games = model.getCurrentGames();
         for (String game1 : games) {
@@ -37,10 +36,6 @@ public class NavBean {
 
     public Map<String, String> getGameButtons() {
         return gameButtons;
-    }
-
-    public Map<String, String> getAdminButtons() {
-        return adminButtons;
     }
 
     public String getPlayer() {
@@ -57,5 +52,9 @@ public class NavBean {
 
     public boolean isChats() {
         return chats;
+    }
+
+    public boolean isAdmin() {
+        return admin;
     }
 }

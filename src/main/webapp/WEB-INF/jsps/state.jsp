@@ -4,15 +4,17 @@
 <%
     JolGame game = (JolGame) request.getAttribute("game");
 %>
-<table border="2">
-    <% String[] players = game.getPlayers();
-        for (String player : players) {
-            request.setAttribute("pparam", player);
-    %>
-    <td valign="top" width="20%">
-        <jsp:include page="player.jsp"/>
-    </td>
-    <%
-        }
-    %>
+<table class="game-state">
+    <tr>
+        <% String[] players = game.getPlayers();
+            for (String player : players) {
+                request.setAttribute("pparam", player);
+        %>
+        <td valign="top" class="game-row <%= game.getActivePlayer().equals(player) ? "player-active" : "" %>">
+            <jsp:include page="player.jsp"/>
+        </td>
+        <%
+            }
+        %>
+    </tr>
 </table>

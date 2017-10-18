@@ -21,7 +21,7 @@ public class AdminBean {
 
     private Map<String, GameModel> gmap = new HashMap<>();
     private Map<String, PlayerModel> pmap = new HashMap<>();
-    private String[] who = new String[0];
+    private List<String> who = new ArrayList<>();
     private Collection<GameModel> activeSort = new TreeSet<>();
     private List<GameModel> actives;
     private volatile List<String> chats = new ArrayList<>();
@@ -82,7 +82,7 @@ public class AdminBean {
         return bean;
     }
 
-    public String[] getWho() {
+    public List<String> getWho() {
         return who;
     }
 
@@ -99,14 +99,7 @@ public class AdminBean {
     }
 
     private synchronized void mkWho() {
-        Collection<String> c = new TreeSet<>(pmap.keySet());
-        who = c.toArray(new String[c.size()]);
-        for (Iterator i = c.iterator(); i.hasNext(); ) {
-            if (!JolAdmin.getInstance().isAdmin((String) i.next())) {
-                i.remove();
-            }
-        }
-        admins = c.toArray(new String[c.size()]);
+        who = new ArrayList<>(pmap.keySet());
     }
 
     public synchronized void chat(String chat) {

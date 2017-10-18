@@ -18,25 +18,9 @@
 </b>
 (Pool: <%= game.getPool(player) %>)
 <br/>
-<table>
-    <tr>
-        <td align="left">
-            <span class="library">
-                Library:<%= game.getState().getPlayerLocation(player, JolGame.LIBRARY).getCards().length %>
-            </span>
-        </td>
-        <td align="center">
-            <span class="crypt">
-                Crypt:<%= game.getState().getPlayerLocation(player, JolGame.CRYPT).getCards().length %>
-            </span>
-        </td>
-        <td align="right">
-            <span class="hand">
-                Hand:<%= game.getState().getPlayerLocation(player, JolGame.HAND).getCards().length %>
-            </span>
-        </td>
-    </tr>
-</table>
+<span class="library">Library:<%= game.getState().getPlayerLocation(player, JolGame.LIBRARY).getCards().length %></span>
+<span class="crypt">Crypt:<%= game.getState().getPlayerLocation(player, JolGame.CRYPT).getCards().length %></span>
+<span class="hand">Hand:<%= game.getState().getPlayerLocation(player, JolGame.HAND).getCards().length %></span>
 <hr/>
 <% request.setAttribute("rparams", new RegionParams(game, player, index, "READY", JolGame.READY_REGION, "r", false)); %>
 <jsp:include page="region.jsp"/>
