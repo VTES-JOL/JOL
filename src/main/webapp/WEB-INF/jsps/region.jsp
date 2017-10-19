@@ -7,7 +7,7 @@
     RegionParams r = (RegionParams) request.getAttribute("rparams");
 %>
 <h5 class="region-header">
-    <a onclick="details(event,'<%= r.getIndex() %>');" id="<%= r.getIndex() %>">
+    <a href="javascript:details('<%= r.getIndex() %>');" id="<%= r.getIndex() %>">
         <i class="toggle"></i>
         <%= r.getText() %> ( <%= r.getSize() %> )
     </a>

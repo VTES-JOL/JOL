@@ -10,11 +10,11 @@
 %>
 <b>Crypt:</b><br/>
 <c:forEach items="${c}" var="card">
-    <a onclick="getCardDeck(event, null, '${card.cardId}');">${card.name}</a>
+    <a href="javascript:getCardDeck(null, '${card.cardId}');">${card.name}</a>
     <br/>
 </c:forEach>
 <b>Library:</b><br/>
 <c:forEach items="${l}" var="card">
-    <a onclick="getCardDeck(event, null, '${card.cardId}');">${card.name}</a>
+    <a href="javascript:getCardDeck(null, '${card.cardId}');">${card.name}</a>
     <br/>
 </c:forEach>

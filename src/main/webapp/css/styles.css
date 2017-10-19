@@ -47,8 +47,10 @@ td a:hover {
     line-height: 2em;
 }
 
-#gchatwin {
+#gchatwin, #curturn, #history {
     width: 100%;
+    padding-left: 0.25em;
+    padding-right: 0.25em;
 }
 
 p.chat {

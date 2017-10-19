@@ -239,8 +239,7 @@ function showDeck(data) {
     }
 }
 
-function getCardDeck(e, game, card) {
-    e.preventDefault();
+function getCardDeck(game, card) {
     var divid = "dcard" + card;
     if (dwr.util.byId(divid) === null) {
         DS.getCardText('showCardDeck', card, {callback: playerMap});
@@ -502,11 +501,10 @@ function loadGame(data) {
     }
     if (data.turn !== null) {
         if (data.resetChat) {
-            var table = $("#curturntable");
-            table.empty();
+            $("#curturntable").empty();
+            $("#history").empty();
         }
         renderChat('curturn', 'curturntable', data.turn);
-        retrieveHistory();
     }
     if (data.phases !== null) {
         var phasev = dwr.util.getValue('phase');
@@ -529,26 +527,13 @@ function loadGame(data) {
     }
 }
 
-function details(e, tag) {
-    e.preventDefault();
+function details(tag) {
     DS.doToggle(game, tag, {callback: playerMap});
     doToggle(tag);
 }
 
 function showStatus(data) {
     dwr.util.setValue('status', data, {escapeHtml: false});
-}
-
-function getCard(e, card) // Open card text in separate window (always on top)
-{
-    e.preventDefault();
-    var divid = "card" + card;
-    if (dwr.util.byId(divid) === null) {
-        DS.getCardText('showCard', card, {callback: playerMap});
-    } else {
-        dwr.util.setValue("cards", card);
-        selectCard();
-    }
 }
 
 function getCard(card) {
@@ -686,7 +671,7 @@ function callbackShowCards(data) {
         dwr.util.byId('showcards').deleteRow(0);
     }
     for (var i = 0; i < data.length; i++) {
-        dwr.util.byId('showcards').insertRow(0).insertCell(0).innerHTML = '<a onclick="getCardDeck(event, null,' + "'" + data[i].id + "'" + ');">' + data[i].name + '</a>';
+        dwr.util.byId('showcards').insertRow(0).insertCell(0).innerHTML = '<a href="javascript:getCardDeck(null,' + "'" + data[i].id + "'" + ');">' + data[i].name + '</a>';
     }
 }
 

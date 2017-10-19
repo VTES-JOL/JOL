@@ -37,12 +37,16 @@
     XXXXXX
 </c:if>
 <c:if test="${!p.hidden}">
-    <a class="card-name" onclick="getCard(event, '<%= p.getId() %>');"><%= p.getName() %>
+    <a class="card-name" href="javascript:getCard('<%= p.getId() %>');"><%= p.getName() %>
     </a>
 </c:if>
 <c:if test="${game != null}">
-    <c:if test="${capacity > 0 && isCrypt}">
+    <c:if test="${capacity > 0 && isCrypt && !p.hidden}">
         <small class="counter blood"><%= counters %> / <%= capacity %>
+        </small>
+    </c:if>
+    <c:if test="${capacity <= 0 && isCrypt && counters > 0}">
+        <small class="counter blood"><%= counters %>
         </small>
     </c:if>
     <c:if test="${counters > 0 && hasLife}">
@@ -53,6 +57,7 @@
         <small class="counter"><%= counters %>
         </small>
     </c:if>
+
     <c:if test="${locked}">
         <small class="label label-dark">LOCKED</small>
     </c:if>
