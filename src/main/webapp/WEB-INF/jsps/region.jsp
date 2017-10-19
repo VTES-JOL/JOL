@@ -6,13 +6,14 @@
     JolGame game = (JolGame) request.getAttribute("game");
     RegionParams r = (RegionParams) request.getAttribute("rparams");
 %>
-
-<h5>
-    <a href="javascript:details('<%= r.getIndex() %>');" id="<%= r.getIndex() %>">-</a>
-    <%= r.getText() %> ( <%= r.getSize() %> )
+<h5 class="region-header">
+    <a href="javascript:details('<%= r.getIndex() %>');" id="<%= r.getIndex() %>">
+        <i class="toggle"></i>
+        <%= r.getText() %> ( <%= r.getSize() %> )
+    </a>
 </h5>
 
-<ol id="region<%= r.getIndex() %>" class="condensed-list">
+<ol class="card-list" id="region<%= r.getIndex() %>">
     <% for (int i = 0; i < r.getSize(); i++) {
         request.setAttribute("cparams", r.getCardParam(i));
     %>

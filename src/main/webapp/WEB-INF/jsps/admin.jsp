@@ -1,27 +1,37 @@
 <div class="container">
-    <div class="col-3">
+    <div class="col-4">
         <div class="box">
-            <h4>Create Game</h4>
-            <input type="text" size="30" name="newGameName" maxlength="30"/>
-            <button onclick="createGame()">Create</button>
+            <h4 class="header">Create Game</h4>
+            <div class="light">
+                <input type="text" class="full-width" name="newGameName" maxlength="30" placeholder="Game name cannot &quot; or &lsquo; characters"/>
+            </div>
+            <div class="footer">
+                <button onclick="createGame()">Create</button>
+            </div>
         </div>
-        <div class="box">
-            <h4>Current Games</h4>
-            <select id="endGameSelector"></select>
-            <button onclick="closeGame()">End game</button>
-        </div>
+
     </div>
-    <div class="col-8">
+    <div class="col-4">
         <div class="box">
-            <div>
-                <h4>Invite Players and Start Games</h4>
+            <h4 class="header">Invite Players and Start Games</h4>
+            <table id="currentGames" class="clean-table light"></table>
+            <div class="footer">
                 <label>Players:</label>
-                <input id="playerList" size="30"/>
+                <input id="playerList" placeholder="Start typing a player name"/>
                 <select id="gameList"></select>
                 <button onclick="invitePlayer()">Invite</button>
             </div>
-            <table id="currentGames">
-            </table>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="box">
+            <h4 class="header">Current Games</h4>
+            <div class="light">
+                <input id="endGameList" class="full-width" placeholder="Start typing a game name"/>
+            </div>
+            <div class="footer">
+                <button onclick="closeGame()">End game</button>
+            </div>
         </div>
     </div>
 </div>

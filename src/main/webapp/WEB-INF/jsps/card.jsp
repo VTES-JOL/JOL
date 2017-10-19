@@ -38,12 +38,12 @@
         if (text != null && text.length() > 0) {
             builder.append(",").append(text);
         }
-        out.write("<span class='cardtext'>" + builder.toString() + "</span>");
+        out.write("<span>" + builder.toString() + "</span>");
         // Other cards attached
         if (p.doNesting()) {
             Card[] cards = c.getCards();
             if (cards != null && cards.length > 0) {
-                out.write("<ol class='game-list'>");
+                out.write("<ol>");
                 for (Card card : cards) {
                     request.setAttribute("cparams", new CardParams(card));
                     out.write("<li>");

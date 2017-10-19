@@ -52,6 +52,10 @@ p.chat {
     font-size: small;
 }
 
+p.chat a {
+    display: inline;
+}
+
 .history {
     height: 15em;
     overflow: auto;
@@ -72,8 +76,16 @@ div#help-body {
     margin: 0 auto;
 }
 
+ul.help li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 1em 0.5em;
+    text-decoration: none;
+}
+
 table.help-example {
-    border: 1px solid aaaaaa;
+    border: 1px solid #aaa;
     border-collapse: collapse;
     width: 100%;
     background-color: white;
@@ -93,13 +105,6 @@ td.help-command {
     font-family: monospace;
 }
 
-ul.help li a {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 16px;
-    text-decoration: none;
-}
 
 span.edge {
     color: red;
@@ -179,18 +184,6 @@ ul.deck-list {
     margin: 0 0 5px 5px;
 }
 
-label.label-invalid {
-    color: #111;
-    background-color: rgb(255, 228, 146);
-    padding: 0.25em 0.5em;
-    font-size: 75%;
-    font-weight: 600;
-    text-align: center;
-    vertical-align: baseline;
-    border-radius: 0.25rem;
-    margin-left: 0.5em;
-}
-
 #currentGames {
     border-collapse: collapse;
     border: 1px solid #aaaaaa;
@@ -223,24 +216,26 @@ label.label-invalid {
     background-color: rgb(255, 228, 146);
 }
 
-ol.condensed-list, ul.condensed-list {
-    margin: 0;
-    padding: 0.25em;
-}
-
 .light {
     border: 1px solid #aaaaaa;
     background-color: white;
 }
 
-h4 {
+.grey {
+    background-color: #eee;
+}
+
+h2.header, h3.header, h4.header, h5.header {
     border-top: 1px solid #aaa;
     border-left: 1px solid #aaa;
     border-right: 1px solid #aaa;
     margin: 0.5em 0 0;
-    line-height: 1.5em;
     padding: 0.25em;
     background-color: #ddd;
+}
+
+h4.header {
+    line-height: 1.5em;
 }
 
 .footer {
@@ -254,6 +249,8 @@ h4 {
 }
 
 ul.condensed-list {
+    margin: 0;
+    padding: 0.25em;
     list-style: none;
 }
 
@@ -263,55 +260,6 @@ ul.condensed-list li {
 
 ul.condensed-list li p {
     margin: 0.25em 0.25em;
-}
-
-td.player-active {
-    background-color: #cccccc;
-}
-
-table.game-table, td.game-table {
-    border-collapse: collapse;
-    border: 1px solid #aaaaaa;
-    width: 100%;
-}
-
-table.game-table > tbody > tr, table.game-table > tbody > tr > td {
-    border: 1px solid #aaaaaa;
-    border-collapse: collapse;
-    vertical-align: top;
-    padding: 0.25em;
-}
-
-div.players {
-    display: flex;
-}
-
-table.game-state {
-    border-collapse: collapse;
-    padding: 0;
-}
-
-td.game-row {
-    width: 20%;
-    padding: 0.25em;
-    border-right: 1px solid #aaaaaa;
-}
-
-td.game-row:last-child {
-    border: 0;
-}
-
-#dsForm input, #dsForm select, #dsForm table {
-    width: 100%;
-}
-
-#dsForm form {
-    padding: 0.5em;
-}
-
-#gameNotes textarea {
-    width: 100%;
-    height: 5em;
 }
 
 .float-right {
@@ -369,6 +317,10 @@ span.label-warning {
     color: #111;
 }
 
+span.label-basic {
+    font-family: serif;
+}
+
 #donateBox {
     padding-top: 0.5em;
 }
@@ -406,6 +358,81 @@ td.layout {
     height: 40em;
 }
 
-#deckcontents {
+.full-width {
     width: 100%;
+}
+
+table.game-table, table.player-state {
+    width: 100%;
+    padding: 0;
+    border-collapse: collapse;
+}
+
+table.game-table td.player {
+    width: 20%;
+    padding: 0;
+    border-right: 1px solid #aaa;
+    background-color: #eee;
+}
+
+table.game-table td.player:last-child {
+
+}
+
+table.game-table td.game-cell {
+    vertical-align: top;
+    padding: 0;
+    border: 1px solid #aaa;
+}
+
+table.game-table div.half-height {
+    height: 50%;
+}
+
+table.game-table td.command-cell {
+    width: 25%;
+    background-color: #eee;
+}
+
+textarea#global, textarea#notes {
+    width: 100%;
+    height: calc(100% - 2.6em);
+    font-size: small;
+}
+
+table.game-table ol.card-list {
+    margin: 0 0 0 1.5em;
+    padding: 0.5em;
+}
+
+table.game-table td.command-cell-double {
+    width: 50%;
+    height: 10em;
+}
+
+table.game-table td.player-active {
+    background-color: rgb(220, 230, 191);
+}
+
+table.game-table h5.game-header {
+    border-bottom: 1px solid #aaa;
+    margin: 0;
+    padding: 0.25em;
+    line-height: 1.5em;
+    background-color: #ddd;
+    font-family: "Times New Roman", Times, serif;
+}
+
+h5.region-header {
+    font-family: "Times New Roman", Times, serif;
+    clear: both;
+}
+
+span.pool {
+    line-height: 0.85em;
+    font-size: 1em;
+}
+
+table.game-table a {
+    text-decoration: none;
 }

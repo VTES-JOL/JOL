@@ -5,7 +5,7 @@
                 <h3 id="title" class="inline">V:TES Online
                     <small>v<%= System.getProperty("jol.version")%></small>
                 </h3>
-                <span id="chatstamp" class="label label-light"></span>
+                <span id="chatstamp" class="label label-light label-basic"></span>
             </td>
             <td width="50%" align="left">
                 <div id="buttons">

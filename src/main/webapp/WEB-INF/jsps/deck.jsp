@@ -1,7 +1,7 @@
 <div class='container'>
     <div class='col-3'>
         <div id='gameRegistration' class='box'>
-            <h4>Game Registration:</h4>
+            <h4 class="header">Game Registration:</h4>
             <table class="light clean-table" id="opengames"></table>
             <div class="footer">
                 <select title="reggames" id="reggames"></select>
@@ -10,14 +10,14 @@
             </div>
         </div>
         <div id='playerDecks' class='box'>
-            <h4>Your decks:</h4>
+            <h4 class="header">Your decks:</h4>
             <table id="decks" class="clean-table light">
             </table>
         </div>
     </div>
     <div class='col-4'>
         <div id='deckEditor' class='box'>
-            <h4>
+            <h4 class="header">
                 Deck Editor
                 <span class="float-right">
                     <span id="noedit">
@@ -42,12 +42,12 @@
                 </div>
             </div>
             <div id="deckerrors"></div>
-            <div id="deckcontents"></div>
+            <div id="deckcontents" class="full-width"></div>
         </div>
     </div>
     <div class='col-3'>
         <div id='editorCardDetails' class='box'>
-            <h4>
+            <h4 class="header">
                 Card Text:
                 <select id="deckcards" onchange="selectCardDeck()" class="float-right"></select>
             </h4>
@@ -57,7 +57,7 @@
             </div>
         </div>
         <div id='cardSearch' class='box'>
-            <h4>Card Search</h4>
+            <h4 class="header">Card Search</h4>
             <form action="javascript:doSearch();" class="light padded">
                 <table class="clean-no-border">
                     <tr>

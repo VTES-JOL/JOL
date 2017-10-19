@@ -4,13 +4,13 @@
 <%
     JolGame game = (JolGame) request.getAttribute("game");
 %>
-<table class="game-state">
+<table class="player-state">
     <tr>
         <% String[] players = game.getPlayers();
             for (String player : players) {
                 request.setAttribute("pparam", player);
         %>
-        <td valign="top" class="game-row <%= game.getActivePlayer().equals(player) ? "player-active" : "" %>">
+        <td valign="top" class="player <%= game.getActivePlayer().equals(player) ? "player-active" : "" %>">
             <jsp:include page="player.jsp"/>
         </td>
         <%

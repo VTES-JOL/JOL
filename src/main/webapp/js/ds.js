@@ -20,7 +20,7 @@ function loadTypes(data) {
     dwr.util.addOptions('cardtype', data);
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
     DS.getTypes({callback: loadTypes});
     DS.init({callback: playerMap});
 });
@@ -69,9 +69,9 @@ function renderChat(did, id, data) {
         curScroll = 1000000;
     }
     var table = $("#" + id);
-    $.each(data, function(index, chat) {
-       var chatLine = $("<p/>").addClass("chat").text(chat);
-       table.append(chatLine);
+    $.each(data, function (index, chat) {
+        var chatLine = $("<p/>").addClass("chat").html(chat);
+        table.append(chatLine);
     });
     dwr.util.byId(did).scrollTop = curScroll;
 }
@@ -82,13 +82,14 @@ function navigate(data) {
     dwr.util.setValue("contentselect", data.target);
     toggleVisible(data.target, selected);
     dwr.util.setValue('buttons', '');
+    doButtons({main: "Main" + (data.chats ? " *" : "")});
     if (data.player === null) {
         toggleVisible('logininputs', 'loggedin');
         dwr.util.setValue('login', 'Log in');
         dwr.util.byId('gameRow').style.display = "none";
         player = null;
     } else {
-        doButtons({main: "Main" + (data.chats ? " *" : ""), deck: "Deck Register", profile: "Profile"});
+        doButtons({deck: "Deck Register", profile: "Profile"});
         if (data.admin) {
             doButtons({admin: "Game Admin"})
         }
@@ -152,7 +153,7 @@ function renderOnline(div, who) {
     if (who === null) {
         return;
     }
-    $.each(who, function(index, player) {
+    $.each(who, function (index, player) {
         var playerSpan = $("<span/>").text(player.name).addClass("label");
         if (player.superUser) {
             playerSpan.addClass("label-warning");
@@ -200,11 +201,11 @@ function renderActiveGames(games) {
 
 function removeOwnGames(removedGames) {
     var table = dwr.util.byId('owngames');
-    $.each(removedGames, function(index, game) {
-        $.each(table.rows, function(i, row) {
+    $.each(removedGames, function (index, game) {
+        $.each(table.rows, function (i, row) {
             if (row.label === game) {
-               table.deleteRow(i);
-               return false;
+                table.deleteRow(i);
+                return false;
             }
         });
     });
@@ -212,8 +213,8 @@ function removeOwnGames(removedGames) {
 
 function removeActiveGames(removedGames) {
     var table = dwr.util.byId('activegames');
-    $.each(removedGames, function(index, game) {
-        $.each(table.rows, function(i, row) {
+    $.each(removedGames, function (index, game) {
+        $.each(table.rows, function (i, row) {
             if (row.label === game) {
                 table.deleteRow(i);
                 return false;
@@ -320,14 +321,18 @@ function doNewDeck() {
 
 // Callback for AdminCreator
 function callbackAdmin(data) {
-    var currentGamesSelector = $("#endGameSelector");
     var currentGames = $("#currentGames");
     var gameList = $("#gameList");
     gameList.empty();
-    currentGamesSelector.empty();
     currentGames.empty();
-    $.each(data.currentGames, function (index, game) {
-        currentGamesSelector.append(new Option(game, game));
+
+    $("#endGameList").autocomplete({
+        source: data.currentGames,
+        change: function (event, ui) {
+            if (ui.item === null) {
+                $(this).val((ui.item ? ui.item.id : ""));
+            }
+        }
     });
 
     $("#playerList").autocomplete({
@@ -368,7 +373,7 @@ function callbackAdmin(data) {
                 DS.startGame(game.gameName, {callback: playerMap});
             }
         });
-        var cancelButton = $("<button/>").text("Close").click(game, function() {
+        var cancelButton = $("<button/>").text("Close").click(game, function () {
             if (confirm("Cancel game?")) {
                 DS.endGame(game.gameName, {callback: playerMap});
             }
@@ -409,14 +414,15 @@ function refreshState(force) {
 }
 
 function doToggle(thistag) {
-    var region = document.getElementById("region" + thistag);
-    if (region.style.display === 'none') {
-        region.style.display = ''; // Show details
-        document.getElementById(thistag).innerHTML = "-";
+    var region = $("#region" + thistag);
+    var regionToggle = region.find("i.toggle");
+    if (region.css("display") === 'none') {
+        region.show();
+        regionToggle.text("-");
     }
     else {
-        region.style.display = 'none'; // Hide details
-        document.getElementById(thistag).innerHTML = "+";
+        region.hide();
+        regionToggle.text("+");
     }
 }
 
@@ -499,14 +505,7 @@ function loadGame(data) {
             while (table.rows.length > 0) table.deleteRow(0);
         }
         renderChat('curturn', 'curturntable', data.turn);
-        var turncontent = data.turn.join('<br />');
-        var val = dwr.util.getValue('turns');
-        var val2 = dwr.util.byId('turns').options;
-        if (data.turns !== null) {
-            dwr.util.setValue('history', turncontent, {escapeHtml: false});
-        } else if (dwr.util.getValue('turns') === dwr.util.byId('turns').options[0].value) {
-            dwr.util.setValue('history', dwr.util.getValue('history', {escapeHtml: false}) + "<br />" + turncontent, {escapeHtml: false});
-        }
+        loadHistory(data.turn);
     }
     if (data.phases !== null) {
         var phasev = dwr.util.getValue('phase');
@@ -526,9 +525,6 @@ function loadGame(data) {
         for (var c in data.collapsed) {
             doToggle(data.collapsed[c]);
         }
-    }
-    if (data.stamp !== null) {
-        dwr.util.setValue('gamestamp', data.stamp);
     }
 }
 
@@ -552,11 +548,10 @@ function getCard(card) // Open card text in separate window (always on top)
     }
 }
 
-
 function showCard(data) {
     var old = dwr.util.getValue('extra', {escapeHtml: false});
     var text = data.text.join("<br />");
-    dwr.util.setValue('extra', old + "<div id='card" + data.id + "'>" + text + "</div>", {escapeHtml: false});
+    dwr.util.setValue('extra', old + "<div class='padded' id='card" + data.id + "'>" + text + "</div>", {escapeHtml: false});
     dwr.util.addOptions("cards", [data], "id", "name");
     dwr.util.setValue("cards", data.id);
     selectCard();
@@ -590,8 +585,12 @@ function getHistory() {
 }
 
 function loadHistory(data) {
-    var text = data.join('<br/>');
-    dwr.util.setValue('history', text, {escapeHtml: false});
+    var historyDiv = $("#history");
+    historyDiv.empty();
+    $.each(data, function (index, content) {
+        var turnContent = $("<p/>").addClass("chat").html(content);
+        historyDiv.append(turnContent);
+    });
 }
 
 function callbackProfile(data) {
@@ -609,9 +608,9 @@ function callbackProfile(data) {
 
     profile = data;
 
-    dwr.util.setValue("profilePasswordError","");
-    dwr.util.setValue("profileNewPassword","");
-    dwr.util.setValue("profileConfirmPassword","");
+    dwr.util.setValue("profilePasswordError", "");
+    dwr.util.setValue("profileNewPassword", "");
+    dwr.util.setValue("profileConfirmPassword", "");
 }
 
 function updateProfile() {

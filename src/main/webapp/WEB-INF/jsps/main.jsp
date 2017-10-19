@@ -4,11 +4,11 @@
     <tr>
         <td width="25%" class="layout" rowspan="2">
             <div id="player" style="display: none;">
-                <h4>Your games:</h4>
+                <h4 class="header">Your games:</h4>
                 <table id="owngames" class="clean-table light"></table>
             </div>
             <div id="register">
-                <h4>Register</h4>
+                <h4 class="header">Register</h4>
                 <form method="post" class="light some-padding">
                     <span>Register to create decks and join games!</span>
                     <table class="clean-no-border">
@@ -42,7 +42,7 @@
             <div id="messages" style="display: none;"></div>
 
             <div id="welcome">
-                <h4>Welcome to V:TES Online</h4>
+                <h4 class="header">Welcome to V:TES Online</h4>
                 <div class="light">
 
                 </div>
@@ -50,14 +50,14 @@
 
             <div id="globalchat" style="display: none;">
                 <div>
-                    <h4>
+                    <h4 class="header">
                         Online Users:
                     </h4>
                     <div id="whoson" class="light some-padding"></div>
                 </div>
 
                 <div>
-                    <h4>Global Chat:</h4>
+                    <h4 class="header">Global Chat:</h4>
                     <div class="info-area history" id="gchatwin">
                         <div id="gchattable"></div>
                     </div>
@@ -69,7 +69,7 @@
             </div>
         </td>
         <td width="20%" class="layout" rowspan="2">
-            <h4>Links:</h4>
+            <h4 class="header">Links:</h4>
             <ul class="condensed-list light">
                 <li>
                     <a href="https://www.facebook.com/groups/jolstatus/" target="_blank">Facebook Status Group</a>
@@ -86,7 +86,7 @@
                 </li>
 
             </ul>
-            <h4>User Ranks:</h4>
+            <h4 class="header">User Ranks:</h4>
             <ul class="condensed-list light">
                 <li>
                     <span class="label label-light">Embrace</span>
@@ -101,7 +101,7 @@
                     <p>Administer games for all other Justicars</p>
                 </li>
             </ul>
-            <h4>Donate:</h4>
+            <h4 class="header">Donate:</h4>
             <ul class="condensed-list light">
                 <li>
                     <span>Goes towards keeping JOL running.  Any donation appreciated.</span>
@@ -115,12 +115,15 @@
                     </form>
                 </li>
             </ul>
-
+            <h4 class="header">Contact</h4>
+            <ul class="condensed-list light">
+                <li><a href="mailto:admin@deckserver.net">Contact Site Administrator</a></li>
+            </ul>
         </td>
     </tr>
     <tr id="gameRow">
         <td>
-            <h4>Currently active games:</h4>
+            <h4 class="header">Currently active games:</h4>
             <div>
                 <table class="clean-table light">
                     <thead>
