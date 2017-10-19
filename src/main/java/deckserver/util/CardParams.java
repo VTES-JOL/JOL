@@ -6,6 +6,7 @@
 
 package deckserver.util;
 
+import deckserver.client.JolAdmin;
 import deckserver.game.cards.CardEntry;
 import deckserver.game.state.Card;
 
@@ -25,6 +26,7 @@ public class CardParams {
     CardParams(Card card, boolean hidden) {
         this.card = card;
         this.hidden = hidden;
+        this.entry = JolAdmin.getInstance().getAllCards().getCardById(this.card.getCardId());
     }
 
     public CardParams(CardEntry entry) {

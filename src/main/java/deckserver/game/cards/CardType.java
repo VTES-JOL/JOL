@@ -40,6 +40,10 @@ public enum CardType {
         return EnumSet.of(VAMPIRE, IMBUED);
     }
 
+    public static EnumSet<CardType> lifeTypes() {
+        return EnumSet.of(ALLY, RETAINER);
+    }
+
     public String getLabel() {
         return label;
     }

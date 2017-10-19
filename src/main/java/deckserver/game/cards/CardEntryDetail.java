@@ -100,4 +100,9 @@ class CardEntryDetail implements CardEntry {
         return CardType.cryptTypes().contains(CardType.of(type));
     }
 
+    @Override
+    public boolean hasLife() {
+        return CardType.lifeTypes().contains(CardType.of(type));
+    }
+
 }

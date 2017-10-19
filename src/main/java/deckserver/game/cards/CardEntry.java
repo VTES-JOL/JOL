@@ -27,4 +27,6 @@ public interface CardEntry {
 
     boolean isCrypt();
 
+    boolean hasLife();
+
 }

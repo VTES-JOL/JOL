@@ -1,7 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="deckserver.client.JolGame" %>
+<%@page import="deckserver.game.cards.CardEntry" %>
 <%@page import="deckserver.game.state.Card" %>
-<%@page import="deckserver.util.CardParams" %>
+<%@ page import="deckserver.util.CardParams" %>
 <%
     CardParams p = (CardParams) request.getAttribute("cparams");
     JolGame game = (JolGame) request.getAttribute("game");
@@ -13,6 +14,9 @@
     boolean nested = p.doNesting();
     Card[] cards = c.getCards();
     boolean hasCards = cards != null && cards.length > 0;
+    CardEntry cardEntry = p.getEntry();
+    boolean isCrypt = cardEntry.isCrypt();
+    boolean hasLife = cardEntry.hasLife();
 
     request.setAttribute("p", p);
     request.setAttribute("c", c);
@@ -24,6 +28,9 @@
     request.setAttribute("nested", nested);
     request.setAttribute("cards", cards);
     request.setAttribute("hasCards", hasCards);
+    request.setAttribute("isCrypt", isCrypt);
+    request.setAttribute("hasLife", hasLife);
+    request.setAttribute("cardEntry", cardEntry);
 %>
 
 <c:if test="${p.hidden}">
@@ -34,16 +41,18 @@
     </a>
 </c:if>
 <c:if test="${game != null}">
-    <c:choose>
-        <c:when test="${capacity > 0}">
-            <small class="counter blood"><%= counters %> / <%= capacity %>
-            </small>
-        </c:when>
-        <c:when test="${counters > 0}">
-            <small class="counter life"><%= counters %>
-            </small>
-        </c:when>
-    </c:choose>
+    <c:if test="${capacity > 0 && isCrypt}">
+        <small class="counter blood"><%= counters %> / <%= capacity %>
+        </small>
+    </c:if>
+    <c:if test="${counters > 0 && hasLife}">
+        <small class="counter life"><%= counters %>
+        </small>
+    </c:if>
+    <c:if test="${counters > 0 && !isCrypt && !hasLife}">
+        <small class="counter"><%= counters %>
+        </small>
+    </c:if>
     <c:if test="${locked}">
         <small class="label label-dark">LOCKED</small>
     </c:if>
@@ -64,4 +73,7 @@
             </c:forEach>
         </ol>
     </c:if>
+</c:if>
+<c:if test="${game == null && isCrypt}">
+    ( <%= cardEntry.getGroup() %>)
 </c:if>
