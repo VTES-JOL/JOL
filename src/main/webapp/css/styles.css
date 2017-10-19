@@ -105,7 +105,6 @@ td.help-command {
     font-family: monospace;
 }
 
-
 span.edge {
     color: red;
     font-weight: bold;
@@ -290,7 +289,7 @@ table.clean-table td, table.clean-table th {
     padding: 0.15em 0.5em;
 }
 
-span.label {
+span.label, small.label {
     border-radius: 0.25rem;
     border: 1px solid #aaaaaa;
     font-size: 75%;
@@ -307,7 +306,7 @@ span.label-light {
     color: #111;
 }
 
-span.label-dark {
+span.label-dark, small.label-dark {
     color: #111;
     background-color: #bbb;
 }
@@ -403,6 +402,39 @@ textarea#global, textarea#notes {
 table.game-table ol.card-list {
     margin: 0 0 0 1.5em;
     padding: 0.5em;
+    line-height: 1.5em;
+}
+
+td.player ol.card-list li {
+    border: 1px solid #aaa;
+    border-right-color: black;
+    border-bottom-color: black;
+    border-top-right-radius: 0.5em;
+    border-bottom-right-radius: 0.5em;
+    padding: 0.25em;
+    margin: 0.25em;
+}
+
+td.player ol.card-list li a {
+}
+
+td.player ol.card-list li li {
+    border: none;
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+}
+
+td.player ol.card-list ol {
+    border: none;
+    border-top: 1px solid #aaa;
+}
+
+td.player ol.card-list li li a {
+    border: none;
+}
+
+table.game-table ol.card-list li a {
 }
 
 table.game-table td.command-cell-double {
@@ -435,4 +467,30 @@ span.pool {
 
 table.game-table a {
     text-decoration: none;
+}
+
+a.card-name {
+
+}
+
+small.counter {
+    display: inline-block;
+    min-width: 10px;
+    padding: 3px 7px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    border-radius: 10px;
+    color: #fff;
+}
+
+small.blood {
+    background-color: #e04747;
+}
+
+small.life {
+    background-color: #1d9041;
 }

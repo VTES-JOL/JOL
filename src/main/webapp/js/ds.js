@@ -239,7 +239,8 @@ function showDeck(data) {
     }
 }
 
-function getCardDeck(game, card) {
+function getCardDeck(e, game, card) {
+    e.preventDefault();
     var divid = "dcard" + card;
     if (dwr.util.byId(divid) === null) {
         DS.getCardText('showCardDeck', card, {callback: playerMap});
@@ -528,17 +529,19 @@ function loadGame(data) {
     }
 }
 
-function details(thistag) {
-    DS.doToggle(game, thistag, {callback: playerMap});
-    doToggle(thistag);
+function details(e, tag) {
+    e.preventDefault();
+    DS.doToggle(game, tag, {callback: playerMap});
+    doToggle(tag);
 }
 
 function showStatus(data) {
     dwr.util.setValue('status', data, {escapeHtml: false});
 }
 
-function getCard(card) // Open card text in separate window (always on top)
+function getCard(e, card) // Open card text in separate window (always on top)
 {
+    e.preventDefault();
     var divid = "card" + card;
     if (dwr.util.byId(divid) === null) {
         DS.getCardText('showCard', card, {callback: playerMap});
@@ -673,7 +676,7 @@ function callbackShowCards(data) {
         dwr.util.byId('showcards').deleteRow(0);
     }
     for (var i = 0; i < data.length; i++) {
-        dwr.util.byId('showcards').insertRow(0).insertCell(0).innerHTML = '<a onclick="getCardDeck(null,' + "'" + data[i].id + "'" + ');">' + data[i].name + '</a>';
+        dwr.util.byId('showcards').insertRow(0).insertCell(0).innerHTML = '<a onclick="getCardDeck(event, null,' + "'" + data[i].id + "'" + ');">' + data[i].name + '</a>';
     }
 }
 

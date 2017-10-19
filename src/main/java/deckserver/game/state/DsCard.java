@@ -1,13 +1,9 @@
 package deckserver.game.state;
 
 import deckserver.client.JolAdmin;
-import org.slf4j.Logger;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 class DsCard extends CardBox implements Card {
 
-    private static final Logger logger = getLogger(DsCard.class);
     private String id;
     private String card;
     private CardBox parent;
@@ -26,7 +22,6 @@ class DsCard extends CardBox implements Card {
         try {
             return JolAdmin.getInstance().getAllCards().getCardById(card).getName();
         } catch (Throwable t) {
-            logger.error("Error finding card " + this.card);
             return "ERROR CARD";
         }
     }

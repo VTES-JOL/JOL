@@ -14,15 +14,15 @@ import deckserver.game.state.Card;
  */
 public class CardParams {
 
-    Card card;
-    CardEntry entry;
-    boolean hidden = false;
+    private Card card;
+    private CardEntry entry;
+    private boolean hidden = false;
 
     public CardParams(Card card) {
         this(card, false);
     }
 
-    public CardParams(Card card, boolean hidden) {
+    CardParams(Card card, boolean hidden) {
         this.card = card;
         this.hidden = hidden;
     }
