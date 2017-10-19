@@ -79,7 +79,7 @@
                 <span class="float-right label-basic">Current Turn: <span id="turnlabel"></span></span>
             </h5>
             <div id="curturn" class="history">
-                <table id="curturntable"></table>
+                <div id="curturntable"></div>
             </div>
         </td>
         <td colspan="2" class="game-cell">

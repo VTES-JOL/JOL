@@ -551,6 +551,16 @@ function getCard(e, card) // Open card text in separate window (always on top)
     }
 }
 
+function getCard(card) {
+    var divid = "card" + card;
+    if (dwr.util.byId(divid) === null) {
+        DS.getCardText('showCard', card, {callback: playerMap});
+    } else {
+        dwr.util.setValue("cards", card);
+        selectCard();
+    }
+}
+
 function showCard(data) {
     var old = dwr.util.getValue('extra', {escapeHtml: false});
     var text = data.text.join("<br />");

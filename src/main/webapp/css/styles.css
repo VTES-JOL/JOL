@@ -60,6 +60,10 @@ p.chat a {
     display: inline;
 }
 
+#curturntable p.chat a {
+    text-decoration: underline;
+}
+
 .history {
     height: 15em;
     overflow: auto;
