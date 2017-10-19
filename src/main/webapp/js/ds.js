@@ -502,11 +502,11 @@ function loadGame(data) {
     }
     if (data.turn !== null) {
         if (data.resetChat) {
-            var table = dwr.util.byId('curturntable');
-            while (table.rows.length > 0) table.deleteRow(0);
+            var table = $("#curturntable");
+            table.empty();
         }
         renderChat('curturn', 'curturntable', data.turn);
-        loadHistory(data.turn);
+        retrieveHistory();
     }
     if (data.phases !== null) {
         var phasev = dwr.util.getValue('phase');

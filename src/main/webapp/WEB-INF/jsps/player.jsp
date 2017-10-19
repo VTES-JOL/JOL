@@ -13,10 +13,11 @@
     int index = -1;
     for (int i = 0; i < players.length; i++)
         if (players[i].equals(player)) index = i + 1;
+    String poolStyle = game.getPool(player) <= 0 ? "pool-ousted" : "pool";
 %>
 <h5 class="game-header">
     <%= player + (edge ? " <span class='edge'>(EDGE)</span>" : "") %>
-    <span class="float-right label label-basic label-warning pool">Pool: <%= game.getPool(player) %></span>
+    <span class="float-right label label-basic <%= poolStyle %>">Pool: <%= game.getPool(player) %></span>
 </h5>
 <div class="padded">
     <small>
