@@ -1,6 +1,7 @@
 package deckserver.dwr.bean;
 
 import deckserver.client.JolAdmin;
+import deckserver.client.JolGame;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.GameView;
 import deckserver.game.cards.Deck;
@@ -10,9 +11,9 @@ import java.util.Date;
 
 public class PlSummaryBean {
 
-    private int library = 0;
+    private int libSize = 0;
 
-    private int crypt = 0;
+    private int cryptSize = 0;
 
     private String groups = "";
 
@@ -24,6 +25,8 @@ public class PlSummaryBean {
 
     private String turn;
 
+    private boolean hidden = true;
+
     public PlSummaryBean(GameModel game, String player) {
         this.game = game.getName();
         this.started = game.isActive();
@@ -31,11 +34,13 @@ public class PlSummaryBean {
         if (!started) {
             String deck = admin.getGameDeck(game.getName(), player);
             Deck nd = new DeckImpl(admin.getAllCards(), deck);
-            library = nd.getLibSize();
-            crypt = nd.getCryptSize();
+            libSize = nd.getLibSize();
+            cryptSize = nd.getCryptSize();
             groups = nd.getGroups();
         } else {
-            turn = JolAdmin.getInstance().getGame(this.game).getActivePlayer();
+            JolGame thisGame = JolAdmin.getInstance().getGame(this.game);
+            turn = thisGame.getActivePlayer();
+            hidden = thisGame.getPool(player) <= 0;
             GameView view = game.hasView(player);
             if (view != null) {
                 this.current = !view.isChanged();
@@ -64,11 +69,11 @@ public class PlSummaryBean {
     }
 
     public int getCryptSize() {
-        return crypt;
+        return cryptSize;
     }
 
     public int getLibSize() {
-        return library;
+        return libSize;
     }
 
     public String getGroups() {
@@ -77,5 +82,9 @@ public class PlSummaryBean {
 
     public String getTurn() {
         return turn;
+    }
+
+    public boolean isHidden() {
+        return hidden;
     }
 }
