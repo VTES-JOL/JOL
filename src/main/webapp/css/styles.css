@@ -205,6 +205,10 @@ ul.deck-list {
     background-color: #eee;
 }
 
+#owngames tr.flagged {
+    background-color: rgb(255, 228, 146);
+}
+
 .light {
     border: 1px solid #aaaaaa;
     background-color: white;
@@ -503,8 +507,7 @@ small.counter {
     display: inline-block;
     min-width: 10px;
     padding: 3px 7px;
-    font-size: 1em;
-    font-weight: 700;
+    font-size: small;
     line-height: 1em;
     text-align: center;
     white-space: nowrap;

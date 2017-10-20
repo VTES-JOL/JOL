@@ -9,7 +9,7 @@ import deckserver.game.cards.DeckImpl;
 
 import java.util.Date;
 
-public class PlSummaryBean {
+public class PlayerSummaryBean {
 
     private int libSize = 0;
 
@@ -25,9 +25,11 @@ public class PlSummaryBean {
 
     private String turn;
 
-    private boolean hidden = true;
+    private boolean hidden = false;
 
-    public PlSummaryBean(GameModel game, String player) {
+    private boolean flagged = false;
+
+    public PlayerSummaryBean(GameModel game, String player) {
         this.game = game.getName();
         this.started = game.isActive();
         JolAdmin admin = JolAdmin.getInstance();
@@ -40,7 +42,8 @@ public class PlSummaryBean {
         } else {
             JolGame thisGame = JolAdmin.getInstance().getGame(this.game);
             turn = thisGame.getActivePlayer();
-            hidden = thisGame.getPool(player) <= 0;
+            hidden = thisGame.getPool(player) == 0;
+            flagged = thisGame.getPool(player) < 0;
             GameView view = game.hasView(player);
             if (view != null) {
                 this.current = !view.isChanged();
@@ -86,5 +89,9 @@ public class PlSummaryBean {
 
     public boolean isHidden() {
         return hidden;
+    }
+
+    public boolean isFlagged() {
+        return flagged;
     }
 }

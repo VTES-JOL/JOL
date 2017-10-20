@@ -241,8 +241,7 @@ public class JolGame {
         Note[] notes = nt.getNotes();
         for (Note note1 : notes) if (note1.getName().equals(name)) return note1;
         if (create) {
-            Note note = nt.addNote(name);
-            return note;
+            return nt.addNote(name);
         }
         return null;
     }

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class MainBean {
 
-    private List<PlSummaryBean> myGames = new ArrayList<>();
+    private List<PlayerSummaryBean> myGames = new ArrayList<>();
     private List<UserSummaryBean> who = new ArrayList<>();
     private boolean loggedIn;
     private List<SummaryBean> games = new ArrayList<>();
@@ -38,22 +38,23 @@ public class MainBean {
             if (!model.getChangedGames().contains(game.getName())) continue;
             games.add(game.getSummaryBean());
             if (gamenames.contains(game.getName()) && (game.isOpen() || game.getPlayers().contains(model.getPlayer())))
-                myGames.add(new PlSummaryBean(game, model.getPlayer()));
+                myGames.add(new PlayerSummaryBean(game, model.getPlayer()));
         }
         removedGames = new ArrayList<>(model.getRemovedGames());
         chat = model.getChat();
         if (chat.length == 0) chat = null;
         who = abean.getWho().stream()
+                .sorted(Comparator.reverseOrder())
                 .map(who -> new UserSummaryBean(who, jolAdmin.isAdmin(who), jolAdmin.isSuperUser(who)))
                 .collect(Collectors.toList());
         stamp = Utils.getDate();
         message = abean.getMessage();
-        myGames.sort(Comparator.comparing(PlSummaryBean::getGame));
+        myGames.sort(Comparator.comparing(PlayerSummaryBean::getGame));
         games.sort(Comparator.comparing(SummaryBean::getGame));
         model.clearGames();
     }
 
-    public List<PlSummaryBean> getMyGames() {
+    public List<PlayerSummaryBean> getMyGames() {
         return myGames;
     }
 

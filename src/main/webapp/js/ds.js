@@ -134,6 +134,7 @@ function renderMyGames(games) {
             gameRow.cells[0].innerHTML = makeGameLink(games[index].game);
             gameRow.cells[1].innerHTML = games[index].current ? '&nbsp;' : '*';
             gameRow.className = games[index].turn === player ? "active" : 'game';
+            gameRow.className += games[index].flagged ? " flagged" : "";
             gameRow.style.display = games[index].hidden ? 'none' : '';
         } else {
             gameRow.cells[0].innerHTML = '<small>' + games[index].game + '</small>';
