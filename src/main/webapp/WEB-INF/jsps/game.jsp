@@ -2,7 +2,9 @@
     <tr>
         <td id="hand" class="game-cell command-cell"></td>
         <td id="dsForm" class="game-cell command-cell">
-            <h5 class="game-header">Commands</h5>
+            <div class="game-header">
+                <h5>Commands</h5>
+            </div>
             <form onsubmit="return doSubmit();" autocomplete='off'>
                 <table>
                     <tr id="phasecommand">
@@ -63,32 +65,41 @@
         </td>
         <td id="gameNotes" class="game-cell command-cell-double" colspan="2">
             <div id="globalPad" class="half-height">
-                <h5 class="game-header">Global notes and pending actions:</h5>
+                <div class="game-header">
+                    <h5>Global notes and pending actions:</h5>
+                </div>
                 <textarea name="global" id="global"></textarea>
             </div>
             <div id="playerPad" class="half-height">
-                <h5 class="game-header">Private notepad:</h5>
+                <div class="game-header">
+                    <h5>Private notes:</h5>
+                </div>
                 <textarea name="notes" id="notes"></textarea>
             </div>
         </td>
     </tr>
     <tr>
         <td colspan="2" class="game-cell">
-            <h5 class="game-header">
-                <span id="gamename" class="label-basic"></span>
-                <span class="float-right label-basic">Current Turn: <span id="turnlabel"></span></span>
-            </h5>
+            <div class="game-header">
+                <h5 id="gamename"></h5>
+                <span>Current Turn: <span id="turnlabel"></span></span>
+            </div>
             <div id="curturn" class="history">
                 <div id="curturntable"></div>
             </div>
         </td>
         <td colspan="2" class="game-cell">
-            <h5 class="game-header">
+            <div class="game-header">
+                <h5>&nbsp;</h5>
+                <span>
                 <select title="cards" id="cards" name="cards" onchange="selectCard()">
                     <option value="NOCARD">Show history</option>
                 </select>
-                <span class="float-right">Turn selector:<select title="turns" id="turns" name="turns" onchange="getHistory()"></select></span>
-            </h5>
+                <select title="turns" id="turns" name="turns" onchange="getHistory()">
+
+                </select>
+                </span>
+            </div>
             <div id="extra" class="history grey">
                 <input type="hidden" id="extraSelect" value="history"/>
                 <div id="history"></div>

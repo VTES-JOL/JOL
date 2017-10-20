@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" %>
 <%@page pageEncoding="UTF-8" %>
 <%@page import="deckserver.client.JolGame" %>
@@ -13,12 +14,18 @@
     int index = -1;
     for (int i = 0; i < players.length; i++)
         if (players[i].equals(player)) index = i + 1;
-    String poolStyle = game.getPool(player) <= 0 ? "pool-ousted" : "pool";
+    String poolStyle = game.getPool(player) == 0 ? "pool-ousted" : "pool";
+    poolStyle = game.getPool(player) < 0 ? "pool-sacked" : poolStyle;
+
+    request.setAttribute("edge", edge);
 %>
-<h5 class="game-header">
-    <%= player + (edge ? " <span class='edge'>(EDGE)</span>" : "") %>
-    <span class="float-right label label-basic <%= poolStyle %>">Pool: <%= game.getPool(player) %></span>
-</h5>
+<div class="game-header">
+    <h5><%= player %></h5>
+    <c:if test="${edge}">
+        <span class="label label-basic edge">Edge</span>
+    </c:if>
+    <span class="label label-basic <%= poolStyle %>">Pool: <%= game.getPool(player) %></span>
+</div>
 <div class="padded">
     <small>
         Crypt: <%= game.getState().getPlayerLocation(player, JolGame.CRYPT).getCards().length %> -

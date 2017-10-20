@@ -55,7 +55,6 @@ td a:hover {
 
 p.chat {
     margin: 0;
-    font-size: small;
 }
 
 p.chat a {
@@ -115,23 +114,8 @@ td.help-command {
     font-family: monospace;
 }
 
-span.edge {
-    color: red;
-    font-weight: bold;
-}
-
 #buttons {
     display: inline;
-}
-
-.btn-vtes-info {
-    border-radius: 0.25rem;
-    background-color: rgba(27, 45, 45, 0.98);
-    color: white;
-    padding: 0.3em;
-    font-weight: 100;
-    font-size: 60%;
-    vertical-align: middle;
 }
 
 #clockdiv {
@@ -150,36 +134,32 @@ span.edge {
 
 .container {
     display: flex;
+    flex-wrap: wrap;
+}
+
+.col {
+    flex: auto;
+    padding: 0.5em;
 }
 
 .col-2 {
-    width: 16.7%;
-    flex: 1 1 auto;
-    padding: 0.5em;
+    flex-basis: calc(100% / 6);
 }
 
 .col-3 {
-    width: 25%;
-    flex: 1 1 auto;
-    padding: 0.5em;
+    flex-basis: 25%;
 }
 
 .col-4 {
-    width: 32%;
-    flex: 1 1 auto;
-    padding: 0.5em;
+    flex-basis: 33%;
 }
 
 .col-6 {
-    width: 50%;
-    flex: 1 1 auto;
-    padding: 0.5em;
+    flex-basis: 50%;
 }
 
 .col-8 {
-    width: 65%;
-    flex: 1 1 auto;
-    padding: 0.5em;
+    flex-basis: 66%;
 }
 
 h3, h4, h5 {
@@ -302,7 +282,7 @@ table.clean-table td, table.clean-table th {
 span.label, small.label {
     border-radius: 0.25rem;
     border: 1px solid #aaaaaa;
-    font-size: 75%;
+    font-size: small;
     padding: 0.25em 0.5em;
     vertical-align: baseline;
     text-align: center;
@@ -406,7 +386,7 @@ table.game-table td.command-cell {
 textarea#global, textarea#notes {
     width: 100%;
     height: calc(100% - 2em);
-    font-size: small;
+    resize: none;
 }
 
 table.game-table ol.card-list {
@@ -457,13 +437,20 @@ table.game-table td.player-active {
     background-color: #ddd;
 }
 
-table.game-table h5.game-header {
+table.game-table div.game-header {
     border-bottom: 1px solid #aaa;
     margin: 0;
-    padding: 0.25em;
-    line-height: 1.5em;
+    padding: 0 0.25em;
+    line-height: 1em;
     background-color: #ddd;
     font-family: "Times New Roman", Times, serif;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+table.game-table div.game-header h5 {
+    display: inline-block;
 }
 
 h5.region-header {
@@ -472,17 +459,36 @@ h5.region-header {
 }
 
 span.pool {
-    line-height: 0.85em;
-    font-size: 1em;
+    line-height: 1em;
+    font-size: small;
     background-color: #dce6be;
     color: #111;
+    padding: 0.15em 0.5em
 }
 
 span.pool-ousted {
-    line-height: 0.85em;
-    font-size: 1em;
+    line-height: 1em;
+    font-size: small;
     background-color: #e04848;
     color: white;
+    padding: 0.15em 0.5em
+}
+
+span.pool-sacked {
+    line-height: 1em;
+    font-size: small;
+    background-color: #e0bb69;
+    color: black;
+    padding: 0.15em 0.5em
+}
+
+span.edge {
+    line-height: 1em;
+    font-size: small;
+    border: 1px solid red;
+    background-color: #eee;
+    color: #000000;
+    padding: 0.15em 0.5em
 }
 
 table.game-table a {
@@ -497,7 +503,7 @@ small.counter {
     display: inline-block;
     min-width: 10px;
     padding: 3px 7px;
-    font-size: 12px;
+    font-size: 1em;
     font-weight: 700;
     line-height: 1em;
     text-align: center;

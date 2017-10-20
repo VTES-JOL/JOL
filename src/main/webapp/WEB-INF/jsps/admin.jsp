@@ -1,5 +1,5 @@
 <div class="container">
-    <div class="col-4">
+    <div class="col col-4">
         <div class="box">
             <h4 class="header">Create Game</h4>
             <div class="light">
@@ -11,7 +11,7 @@
         </div>
 
     </div>
-    <div class="col-4">
+    <div class="col col-4">
         <div class="box">
             <h4 class="header">Invite Players and Start Games</h4>
             <table id="currentGames" class="clean-table light"></table>
@@ -23,7 +23,7 @@
             </div>
         </div>
     </div>
-    <div class="col-4">
+    <div class="col col-4">
         <div class="box">
             <h4 class="header">Current Games</h4>
             <div class="light">

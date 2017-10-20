@@ -1,5 +1,5 @@
 <div class="container">
-    <div class="col-4">
+    <div class="col col-4">
         <h4 class="header">Update Profile</h4>
         <table class="clean-table light">
             <tr>
@@ -31,7 +31,7 @@
             <button onclick="updateProfile()">Update Profile</button>
         </div>
     </div>
-    <div class="col-4">
+    <div class="col col-4">
         <h4 class="header">Change Password</h4>
         <table class="clean-table light">
             <tr>
@@ -47,8 +47,5 @@
             <button onclick="updatePassword()">Update Password</button>
             <p id="profilePasswordError"></p>
         </div>
-    </div>
-    <div class="col-4">
-
     </div>
 </div>

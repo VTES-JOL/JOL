@@ -133,9 +133,7 @@ function renderMyGames(games) {
         if (games[index].started) {
             gameRow.cells[0].innerHTML = makeGameLink(games[index].game);
             gameRow.cells[1].innerHTML = games[index].current ? '&nbsp;' : '*';
-            if (games[index].turn === player) {
-                gameRow.className = "active";
-            }
+            gameRow.className = games[index].turn === player ? "active" : 'game';
         } else {
             gameRow.cells[0].innerHTML = '<small>' + games[index].game + '</small>';
             gameRow.cells[1].innerHTML = '<small>C' + games[index].cryptSize + ' L' + games[index].libSize + ' G' + games[index].groups + "</small>";
@@ -710,7 +708,7 @@ function callbackStatus(data) {
         clearInterval(timeInterval);
         timeInterval = setInterval(function () {
             var t = getTimeRemaining(data);
-            clockDiv.innerHTML = '<button class="btn-vtes-info">System restart in ' + t.days + 'd ' +
+            clockDiv.innerHTML = '<button class="">System restart in ' + t.days + 'd ' +
                 t.hours + 'h ' +
                 t.minutes + 'm ' +
                 t.seconds + 's' + "</button>";

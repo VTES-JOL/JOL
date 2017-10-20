@@ -1,5 +1,5 @@
 <div class='container'>
-    <div class='col-3'>
+    <div class='col col-3'>
         <div id='gameRegistration' class='box'>
             <h4 class="header">Game Registration:</h4>
             <table class="light clean-table" id="opengames"></table>
@@ -15,7 +15,7 @@
             </table>
         </div>
     </div>
-    <div class='col-4'>
+    <div class='col col-4'>
         <div id='deckEditor' class='box'>
             <h4 class="header">
                 Deck Editor
@@ -45,7 +45,7 @@
             <div id="deckcontents" class="full-width"></div>
         </div>
     </div>
-    <div class='col-3'>
+    <div class='col col-3'>
         <div id='editorCardDetails' class='box'>
             <h4 class="header">
                 Card Text:
