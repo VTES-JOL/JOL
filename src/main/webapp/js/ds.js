@@ -3,6 +3,7 @@ var game = null;
 var timeInterval = null;
 var outageTime = null;
 var player = null;
+var currentPage = 'main';
 
 var profile = {
     email: "",
@@ -16,99 +17,79 @@ function errorhandler(errorString, exception) {
     }
 }
 
-function loadTypes(data) {
-    dwr.util.addOptions('cardtype', data);
-}
-
 $(document).ready(function () {
-    DS.getTypes({callback: loadTypes});
-    DS.init({callback: playerMap});
+    DS.init({callback: init});
 });
 
-function playerMap(data) {
+function init(data) {
+    $("#loadMessage").hide();
+    $("#loaded").show();
+    processData(data);
+}
+
+function processData(data) {
     for (var item in data) {
         eval(item + '(data[item]);');
     }
 }
 
-function globalChat() {
-    var chatLine = dwr.util.getValue('gchat');
-    dwr.util.setValue('gchat', '');
+function toggleVisible(s, h) {
+    $("#"+h).hide();
+    $("#"+s).show();
+}
+
+// Main page: global chat
+function doGlobalChat() {
+    var chatInput = $("#gchat");
+    var chatLine = chatInput.val();
+    chatInput.val('');
     if (chatLine === "") {
         return;
     }
-    DS.chat(chatLine, {callback: playerMap});
+    DS.chat(chatLine, {callback: processData});
 }
 
-function toggleVisible(s, h) {
-    dwr.util.byId(h).style.display = 'none';
-    dwr.util.byId(s).style.display = '';
-}
-
+// Main page: navigation buttons
 function doNav(target) {
-    DS.navigate(target, {callback: playerMap});
+    DS.navigate(target, {callback: processData});
 }
 
-function doButtons(data) {
-    var buttons = dwr.util.getValue('buttons', {escapeHtml: false});
-    for (var prop in data) {
-        if (data.hasOwnProperty(prop)) {
-            buttons += '<button onclick="doNav(' + "'" + prop + "'" + ');">' + data[prop] + "</button>";
-        }
-    }
-    dwr.util.setValue('buttons', buttons, {escapeHtml: false});
+// Deck Register: deck link
+function doLoadDeck(deck) {
+    $("#deckName").val(deck);
+    DS.getDeck(deck, {callback: processData});
+}
+
+// Utility functions
+function renderButton(data) {
+    var buttonsDiv = $("#buttons");
+    $.each(data, function(key, value) {
+        var button = $("<button/>").text(value).click(key, function() {
+            DS.navigate(key, {callback: processData});
+        });
+        buttonsDiv.append(button);
+    });
 }
 
 function renderChat(did, id, data) {
     if (data === null) {
         return;
     }
-    var curScroll = dwr.util.byId(did).scrollTop;
-    dwr.util.byId(did).scrollTop = 1000000;
-    if (dwr.util.byId(did).scrollTop === curScroll) {
+    var chatDiv = $("#"+did);
+    var curScroll = chatDiv.scrollTop();
+    chatDiv.scrollTop(100000);
+    if (chatDiv.scrollTop() === curScroll) {
         curScroll = 1000000;
     }
-    var table = $("#" + id);
+    var chatOutputDiv = $("#" + id);
     $.each(data, function (index, chat) {
         var chatLine = $("<p/>").addClass("chat").html(chat);
-        table.append(chatLine);
+        chatOutputDiv.append(chatLine);
     });
-    dwr.util.byId(did).scrollTop = curScroll;
+    chatDiv.scrollTop(curScroll);
 }
 
-function navigate(data) {
-    toggleVisible('loaded', 'loadmsg');
-    var selected = dwr.util.getValue("contentselect");
-    dwr.util.setValue("contentselect", data.target);
-    toggleVisible(data.target, selected);
-    dwr.util.setValue('buttons', '');
-    doButtons({main: "Main" + (data.chats ? " *" : "")});
-    if (data.player === null) {
-        toggleVisible('logininputs', 'loggedin');
-        dwr.util.setValue('login', 'Log in');
-        dwr.util.byId('gameRow').style.display = "none";
-        player = null;
-    } else {
-        doButtons({deck: "Deck Register", profile: "Profile"});
-        if (data.admin) {
-            doButtons({admin: "Game Admin"})
-        }
-        doButtons(data.gameButtons);
-        toggleVisible('loggedin', 'logininputs');
-        dwr.util.setValue('login', 'Log out');
-        dwr.util.byId('gameRow').style.display = "";
-        player = data.player;
-    }
-    doButtons({help: "Help"});
-    doButtons({_guides: "Guides"});
-    game = data.game;
-    dwr.util.setValue('gamename', '');
-    if (game !== null) {
-        dwr.util.setValue('gamename', game);
-    }
-}
-
-function addGameRow(tid, label) {
+function renderRowWithLabel(tid, label) {
     var table = dwr.util.byId(tid);
     for (var idx = 0; idx < table.rows.length; idx++) {
         var row = table.rows[idx];
@@ -124,14 +105,14 @@ function addGameRow(tid, label) {
 function renderMyGames(games) {
     if (games === null) return;
     for (var index = 0; index < games.length; index++) {
-        var gameRow = addGameRow('owngames', games[index].game);
-        gameRow.removeAttribute('className')
+        var gameRow = renderRowWithLabel('ownGames', games[index].game);
+        gameRow.removeAttribute('className');
         if (gameRow.cells.length === 0) {
             gameRow.insertCell(0);
             gameRow.insertCell(1);
         }
         if (games[index].started) {
-            gameRow.cells[0].innerHTML = makeGameLink(games[index].game);
+            gameRow.cells[0].innerHTML = renderGameLink(games[index].game);
             gameRow.cells[1].innerHTML = games[index].current ? '&nbsp;' : '*';
             gameRow.className = games[index].turn === player ? "active" : 'game';
             gameRow.className += games[index].flagged ? " flagged" : "";
@@ -143,7 +124,7 @@ function renderMyGames(games) {
     }
 }
 
-function makeGameLink(game) {
+function renderGameLink(game) {
     return '<a onclick="doNav(' + "'g" + game + "');" + '"><small>' + game + "</small></a>";
 }
 
@@ -168,11 +149,10 @@ function renderOnline(div, who) {
 }
 
 function renderMessage(message) {
-    if (message !== null && message !== "") {
-        dwr.util.byId('messages').style.display = "";
-        dwr.util.setValue('messages', message, {escapeHtml: false});
+    if (!!message) {
+        $("#messages").html(message).show();
     } else {
-        dwr.util.byId('messages').style.display = "none";
+        $("#messages").hide();
     }
 }
 
@@ -180,7 +160,7 @@ function renderActiveGames(games) {
     if (games === null) return;
     for (var index = 0; index < games.length; index++) {
         if (games[index].turn === null) continue;
-        var row = addGameRow('activegames', games[index].game);
+        var row = renderRowWithLabel('activeGames', games[index].game);
         if (row.cells.length === 0) {
             row.insertCell(0);
             row.insertCell(1);
@@ -191,7 +171,7 @@ function renderActiveGames(games) {
             row.insertCell(3);
             row.insertCell(4);
         }
-        row.cells[0].innerHTML = makeGameLink(games[index].game);
+        row.cells[0].innerHTML = renderGameLink(games[index].game);
         row.cells[1].innerHTML = '<small>' + games[index].access + '</small>';
         row.cells[2].innerHTML = '<small>' + games[index].turn + '</small>';
         row.cells[3].innerHTML = '<small>' + '&nbsp ' + games[index].available.join(',') + '</small>';
@@ -199,8 +179,8 @@ function renderActiveGames(games) {
     }
 }
 
-function removeOwnGames(removedGames) {
-    var table = dwr.util.byId('owngames');
+function removeLabeledRows(table, removedGames) {
+    var table = dwr.util.byId(table);
     $.each(removedGames, function (index, game) {
         $.each(table.rows, function (i, row) {
             if (row.label === game) {
@@ -211,30 +191,41 @@ function removeOwnGames(removedGames) {
     });
 }
 
-function removeActiveGames(removedGames) {
-    var table = dwr.util.byId('activegames');
-    $.each(removedGames, function (index, game) {
-        $.each(table.rows, function (i, row) {
-            if (row.label === game) {
-                table.deleteRow(i);
-                return false;
-            }
-        });
-    });
-}
-
-function loadDeck(deck) {
-    dwr.util.setValue('deckname', deck);
-    DS.getDeck(deck, {callback: playerMap});
+// Invoked via processData()
+function navigate(data) {
+    $("#" + currentPage).hide();
+    $("#" + data.target).show();
+    currentPage = data.target;
+    $("#buttons").empty();
+    renderButton({main: "Main" + (data.chats ? " *" : "")});
+    if (data.player === null) {
+        $("#loginInputs").show();
+        $("#login").val("Log in");
+        $("#gameRow").hide();
+        player = null;
+    } else {
+        renderButton({deck: "Deck Register", profile: "Profile"});
+        if (data.admin) {
+            renderButton({admin: "Game Admin"})
+        }
+        renderButton(data.gameButtons);
+        $("#loginInputs").hide();
+        $("#login").val("Log out");
+        $("#gameRow").show();
+        player = data.player;
+    }
+    renderButton({help: "Help", _guides: "Guides"});
+    game = data.game;
+    $("#gamename").text(game !== null ? game : '');
 }
 
 function showDeck(data) {
-    if (data.text !== null) dwr.util.setValue('decktext', data.text);
+    if (data.text !== null) $('#deckText').val(data.text);
     dwr.util.byId('deckcontents').innerHTML = data.format;
     dwr.util.byId('deckerrors').style.display = "none";
     if (data.errors !== null && data.errors.length !== 0) {
         var errorText = "<h3>Deck Errors</h3>" + data.errors.join('<br />');
-        dwr.util.setValue('deckerrors', errorText, {escapeHtml: false});
+        $('#deckerrors').html(errorText)
         dwr.util.byId('deckerrors').style.display = "block";
     }
 }
@@ -242,7 +233,7 @@ function showDeck(data) {
 function getCardDeck(game, card) {
     var divid = "dcard" + card;
     if (dwr.util.byId(divid) === null) {
-        DS.getCardText('showCardDeck', card, {callback: playerMap});
+        DS.getCardText('showCardDeck', card, {callback: processData});
     } else {
         dwr.util.setValue("deckcards", card);
         selectCardDeck();
@@ -260,14 +251,14 @@ function showCardDeck(data) {
     var oldText = dwr.util.getValue('cardtext', {escapeHtml: false});
     var text = data.text.join("<br />");
     var newText = oldText + "<div id='dcard" + data.id + "' style='display:block;'>" + text + "</div>";
-    dwr.util.setValue('cardtext', newText, {escapeHtml: false});
+    $('#cardtext').html(newText)
     dwr.util.addOptions("deckcards", [data], "id", "name");
     dwr.util.setValue("deckcards", data.id);
     selectCardDeck();
 }
 
 function doSearch() {
-    DS.cardSearch(dwr.util.getValue("cardtype"), dwr.util.getValue("cardquery"), {callback: playerMap});
+    DS.cardSearch(dwr.util.getValue("cardtype"), dwr.util.getValue("cardquery"), {callback: processData});
 }
 
 function findName() {
@@ -290,31 +281,32 @@ function findName() {
 }
 
 function doEdit() {
-    toggleVisible('deckedit', 'noedit');
-    dwr.util.byId('deckname').readOnly = null;
-    dwr.util.byId('decktext').readOnly = null;
+    $("#deckEdit").show();
+    $("#noedit").hide();
+    $("#deckName").prop('readOnly', false);
+    $("#deckText").prop('readOnly', false);
 }
 
 function doAdjust() {
-    DS.refreshDeck(dwr.util.getValue('deckname'), dwr.util.getValue('decktext'), dwr.util.getValue('shuffle'), {callback: playerMap});
+    DS.refreshDeck($('#deckName').val(), $('#deckText').val(), $('#shuffle').val(), {callback: processData});
 }
 
 function doSave() {
-    toggleVisible('noedit', 'deckedit');
-    dwr.util.byId('deckname').readOnly = 'readonly';
-    dwr.util.byId('decktext').readOnly = 'readonly';
-    DS.submitDeck(dwr.util.getValue('deckname'), dwr.util.getValue('decktext'), {callback: playerMap});
+    toggleVisible('noedit', 'deckEdit');
+    dwr.util.byId('deckName').readOnly = 'readonly';
+    dwr.util.byId('deckText').readOnly = 'readonly';
+    DS.submitDeck($('#deckName').val(), $('#deckText').val(), {callback: processData});
 }
 
 function doDelete(name) {
     var confirmed = confirm("Are you use you want to delete " + name + "\nThis action is not reversible");
     if (!confirmed) return;
-    DS.removeDeck(name, {callback: playerMap});
+    DS.removeDeck(name, {callback: processData});
 }
 
 function doNewDeck() {
     doEdit();
-    dwr.util.setValue('deckname', findName());
+    $('#deckName').val(findName());
     showDeck({text: '', format: '', errors: []});
 }
 
@@ -370,12 +362,12 @@ function callbackAdmin(data) {
         var registrationText = "( " + registrationCount + " registered )";
         var startButton = $("<button/>").text("Start " + registrationText).click(game, function () {
             if (confirm("Start game?")) {
-                DS.startGame(game.gameName, {callback: playerMap});
+                DS.startGame(game.gameName, {callback: processData});
             }
         });
         var cancelButton = $("<button/>").text("Close").click(game, function () {
             if (confirm("Cancel game?")) {
-                DS.endGame(game.gameName, {callback: playerMap});
+                DS.endGame(game.gameName, {callback: processData});
             }
         });
         startHeader.append(startButton);
@@ -383,34 +375,35 @@ function callbackAdmin(data) {
     });
 }
 
-function createGame() {
-    var gameName = dwr.util.getValue("newGameName");
+function doCreateGame() {
+    var newGameDiv = $("#newGameName");
+    var gameName = newGameDiv.val();
     if (gameName.indexOf("\'") > -1 || gameName.indexOf("\"") > -1) {
         alert("Game name can not contain \' or \" characters in it");
         return;
     }
-    DS.createGame(dwr.util.getValue("newGameName"), {callback: playerMap});
-    dwr.util.setValue("newGameName", '');
+    DS.createGame(gameName, {callback: processData});
+    newGameDiv.val('');
 }
 
 function invitePlayer() {
     var game = $("#gameList").val();
     var player = $("#playerList").val();
-    DS.invitePlayer(game, player, {callback: playerMap});
+    DS.invitePlayer(game, player, {callback: processData});
 }
 
 function closeGame() {
     if (confirm("End game?")) {
-        DS.endGame(dwr.util.getValue("endGameSelector"), {callback: playerMap});
+        DS.endGame($("#endGameList").val(), {callback: processData});
     }
 }
 
 function doRegister() {
-    DS.registerDeck(dwr.util.getValue('reggames'), dwr.util.getValue('regdecks'), {callback: playerMap});
+    DS.registerDeck($("reggames").val(), $("#regdecks").val(), {callback: processData});
 }
 
 function refreshState(force) {
-    DS.getState(game, force, {callback: playerMap});
+    DS.getState(game, force, {callback: processData});
 }
 
 function doToggle(thistag) {
@@ -428,29 +421,32 @@ function doToggle(thistag) {
 
 function doSubmit() {
     var phase, ping = null;
-    var command = dwr.util.getValue('command');
-    var chat = dwr.util.getValue('chat');
-    var endTurn = dwr.util.getValue('endturn');
+    var command = $('#command').val();
+    var chat = $('#chat').val();
+    var endTurn = $('#endturn').val();
     if (dwr.util.byId('phase') !== null) {
-        phase = dwr.util.getValue('phase');
+        phase = $('#phase').val();
     }
     if (dwr.util.byId('ping').selectedIndex > 0) {
-        ping = dwr.util.getValue('ping');
+        ping = $('#ping').val();
     }
 
-    dwr.util.setValue('command', "");
-    dwr.util.setValue('chat', "");
-    dwr.util.setValue('ping', 'NNNPPPP');
-    if (endTurn === "Yes") dwr.util.setValue('phase', "Unlock");
+    $('#command').val("");
+    $('#chat').val("");
+    $('#ping').val('NNNPPPP');
+    if (endTurn === "Yes") $('#phase').val("Unlock");
     dwr.util.byId('endturn').selectedIndex = 0;
-    var global = dwr.util.getValue('global');
-    var text = dwr.util.getValue('notes');
-    DS.submitForm(game, phase, command, chat, ping, endTurn, global, text, {callback: playerMap});
+    var global = $('#global').val();
+    var text = $('#notes').val();
+    DS.submitForm(game, phase, command, chat, ping, endTurn, global, text, {callback: processData});
     return false;
 }
 
 
 function loadGame(data) {
+    var turnSelect = $("#turns");
+    var gameChatDiv = $("#gameChat");
+    var historyDiv = $("#history");
     if (!data.player) {
         dwr.util.byId('hand').style.display = 'none';
         dwr.util.byId('playerPad').style.display = 'none';
@@ -461,15 +457,15 @@ function loadGame(data) {
         dwr.util.byId('dsForm').style.display = '';
     }
     if (data.hand !== null)
-        dwr.util.setValue('hand', data.hand, {escapeHtml: false});
+        $('#hand').html(data.hand)
     if (data.state !== null)
-        dwr.util.setValue('state', data.state, {escapeHtml: false});
+        $('#state').html(data.state)
     if (data.global !== null)
-        dwr.util.setValue('global', data.global);
+        $('#global').val(data.global);
     if (data.text !== null)
-        dwr.util.setValue('notes', data.text);
+        $('#notes').val(data.text);
     if (data.label !== null) {
-        dwr.util.setValue('turnlabel', data.label);
+        $('#turnlabel').text(data.label);
     }
     if (data.refresh > 0) {
         if (refresher !== null) clearTimeout(refresher);
@@ -482,32 +478,34 @@ function loadGame(data) {
             pingarr[i].key = data.pingkeys[i];
             pingarr[i].value = data.pingvalues[i];
         }
-        var pingSelection = dwr.util.getValue('ping');
+        var pingSelection = $('#ping').val();
         dwr.util.removeAllOptions('ping');
         dwr.util.addOptions('ping', {"": "No ping"});
         dwr.util.addOptions('ping', pingarr, 'value', 'key');
-        dwr.util.setValue('ping', pingSelection);
-    }
-    if (data.turns !== null) {
-        var sel = dwr.util.getValue('turns');
-        var num = dwr.util.byId('turns').options.length;
-        dwr.util.removeAllOptions('turns');
-        dwr.util.addOptions('turns', data.turns);
-        if (num !== data.turns.length && (data.turns.length === 1 || sel === data.turns[1])) {
-            dwr.util.setValue('turns', data.turns[0]);
-        } else {
-            dwr.util.setValue('turns', sel);
-        }
+        $('#ping').val(pingSelection);
     }
     if (data.turn !== null) {
         if (data.resetChat) {
-            $("#curturntable").empty();
+            gameChatDiv.empty();
             $("#history").empty();
         }
-        renderChat('curturn', 'curturntable', data.turn);
+        renderChat('curturn', 'gameChat', data.turn);
+    }
+    if (data.turns !== null) {
+        var currentSelected = turnSelect.val();
+        var num = turnSelect.find("option").length;
+        turnSelect.empty();
+        $.each(data.turns, function(index, turn) {
+           turnSelect.append($(new Option(turn, turn)));
+        });
+        if (currentSelected === null || currentSelected === data.turns[num]) {
+            turnSelect.val(data.turns[num]).change();
+        } else {
+            turnSelect.val(currentSelected).change();
+        }
     }
     if (data.phases !== null) {
-        var phasev = dwr.util.getValue('phase');
+        var phasev = $('#phase').val();
         dwr.util.byId('phasecommand').style.display = '';
         dwr.util.byId('endcommand').style.display = '';
         dwr.util.removeAllOptions('phase');
@@ -515,7 +513,7 @@ function loadGame(data) {
         if (data.turnChanged) {
             phasev = 'Unlock';
         }
-        dwr.util.setValue('phase', phasev);
+        $('#phase').val(phasev);
     } else {
         dwr.util.byId('phasecommand').style.display = 'none';
         dwr.util.byId('endcommand').style.display = 'none';
@@ -528,18 +526,18 @@ function loadGame(data) {
 }
 
 function details(tag) {
-    DS.doToggle(game, tag, {callback: playerMap});
+    DS.doToggle(game, tag, {callback: processData});
     doToggle(tag);
 }
 
 function showStatus(data) {
-    dwr.util.setValue('status', data, {escapeHtml: false});
+    $('#status').html(data)
 }
 
 function getCard(card) {
     var divid = "card" + card;
     if (dwr.util.byId(divid) === null) {
-        DS.getCardText('showCard', card, {callback: playerMap});
+        DS.getCardText('showCard', card, {callback: processData});
     } else {
         dwr.util.setValue("cards", card);
         selectCard();
@@ -574,7 +572,7 @@ function selectHistory() {
 }
 
 function retrieveHistory() {
-    DS.getHistory(game, dwr.util.getValue('turns'), {callback: loadHistory});
+    DS.getHistory(game, $('#turns').val(), {callback: loadHistory});
 }
 
 function getHistory() {
@@ -615,7 +613,7 @@ function updateProfile() {
     var newEmail = dwr.util.getValue("profileEmail");
     var newPing = dwr.util.getValue("profilePing");
     var newSummary = dwr.util.getValue("profileTurnSummary");
-    DS.updateProfile(newEmail, newPing, newSummary, {callback: playerMap});
+    DS.updateProfile(newEmail, newPing, newSummary, {callback: processData});
 }
 
 function updatePassword() {
@@ -626,18 +624,23 @@ function updatePassword() {
     } else if (profileNewPassword !== profileConfirmPassword) {
         dwr.util.setValue("profilePasswordError", "Password chosen does not match.");
     } else {
-        DS.changePassword(profileNewPassword, {callback: playerMap});
+        DS.changePassword(profileNewPassword, {callback: processData});
         dwr.util.setValue("profilePasswordError", "Password updated");
     }
 }
 
+function loadTypes(data) {
+    dwr.util.addOptions('cardtype', data);
+}
+
 function callbackShowDecks(data) {
+    DS.getTypes({callback: loadTypes});
     // Deck List
     dwr.util.removeAllRows('decks');
     for (var dIdx = 0; dIdx < data.decks.length; dIdx++) {
-        var dRow = addGameRow('decks', data.decks[dIdx]);
+        var dRow = renderRowWithLabel('decks', data.decks[dIdx]);
         if (dRow.cells.length === 0) {
-            dRow.insertCell(0).innerHTML = '<a onclick="loadDeck(' + "'" + data.decks[dIdx] + "');" + '">' + data.decks[dIdx] + '</a>';
+            dRow.insertCell(0).innerHTML = '<a onclick="doLoadDeck(' + "'" + data.decks[dIdx] + "');" + '">' + data.decks[dIdx] + '</a>';
             dRow.insertCell(1);
         }
         dRow.cells[1].innerHTML = "<a onclick='doDelete(\"" + data.decks[dIdx] + "\");'>&#x2717;</a>";
@@ -649,7 +652,7 @@ function callbackShowDecks(data) {
         dwr.util.byId('gameRegistration').style.display = 'block';
         // Register Decks for Games
         for (var gIdx = 0; gIdx < data.games.length; gIdx++) {
-            var gRow = addGameRow('opengames', data.games[gIdx].game);
+            var gRow = renderRowWithLabel('opengames', data.games[gIdx].game);
             if (gRow.cells.length === 0) {
                 gRow.insertCell(0).innerHTML = data.games[gIdx].game;
                 gRow.insertCell(1);
@@ -676,12 +679,12 @@ function callbackShowCards(data) {
 }
 
 function callbackUpdateDeck(data) {
-    dwr.util.setValue('deckname', data);
+    $('#deckName').val(data);
 }
 
 // Callback for MainCreator
 function callbackMain(data) {
-    dwr.util.setValue('chatstamp', data.stamp);
+    $('#chatstamp').text(data.stamp);
     if (data.loggedIn) {
         toggleVisible('player', 'register');
         toggleVisible('globalchat', 'welcome');
@@ -689,11 +692,11 @@ function callbackMain(data) {
         renderOnline('whoson', data.who);
         renderMyGames(data.myGames);
         renderActiveGames(data.games);
-        removeOwnGames(data.removedGames);
-        removeActiveGames(data.removedGames);
+        removeLabeledRows('ownGames', data.removedGames);
+        removeLabeledRows('activeGames', data.removedGames);
         renderMessage(data.message);
         if (data.refresh > 0) {
-            refresher = setTimeout("DS.doPoll({callback: playerMap, errorHandler: errorhandler})", data.refresh);
+            refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", data.refresh);
         }
     }
 }

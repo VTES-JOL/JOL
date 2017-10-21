@@ -14,11 +14,10 @@
             </td>
             <td width="20%" align="right">
                 <form method="post" style="display: inline;">
-                    <span id="logininputs">
+                    <span id="loginInputs">
                         <input type="text" size=15 id="dsuserin" name="dsuserin" placeholder="Username"/>
                         <input type="password" size=15 id="dspassin" name="dspassin" placeholder="Password"/>
                     </span>
-                    <span id="loggedin"></span>
                     <input type="submit" id="login" name="login" value="Log in"/>
                 </form>
             </td>

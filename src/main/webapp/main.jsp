@@ -12,13 +12,11 @@
         <link href="https://fonts.googleapis.com/css?family=IM+Fell+English" rel="stylesheet">
     </head>
     <body>
-        <div id="loadmsg">Loading...</div>
+        <div id="loadMessage">Loading...</div>
         <div id="loaded" style="display :none;">
             <jsp:include page="/WEB-INF/jsps/topbar.jsp"/>
 
             <div id="content">
-                <input type="hidden" name="contentselect" id="contentselect" value="main"/>
-
                 <div id="main">
                     <jsp:include page="/WEB-INF/jsps/main.jsp"/>
                 </div>

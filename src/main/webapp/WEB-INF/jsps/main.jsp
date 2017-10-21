@@ -5,7 +5,7 @@
         <td width="25%" class="layout" rowspan="2">
             <div id="player" style="display: none;">
                 <h4 class="header">Your games:</h4>
-                <table id="owngames" class="clean-table light"></table>
+                <table id="ownGames" class="clean-table light"></table>
             </div>
             <div id="register">
                 <h4 class="header">Register</h4>
@@ -78,7 +78,7 @@
                     <div class="info-area history" id="gchatwin">
                         <div id="gchattable"></div>
                     </div>
-                    <form id="globalChatForm" action="javascript:globalChat();" autocomplete='off'>
+                    <form id="globalChatForm" action="javascript:doGlobalChat();" autocomplete='off'>
                         <input type="text" maxlength="200" id="gchat" placeholder="Chat with players"/>
                     </form>
                 </div>
@@ -152,7 +152,7 @@
                         <th>Game Admin</th>
                     </tr>
                     </thead>
-                    <tbody id="activegames">
+                    <tbody id="activeGames">
 
                     </tbody>
                 </table>

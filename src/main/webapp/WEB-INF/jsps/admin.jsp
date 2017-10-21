@@ -6,7 +6,7 @@
                 <input type="text" class="full-width" name="newGameName" maxlength="30" placeholder="Game name cannot &quot; or &lsquo; characters"/>
             </div>
             <div class="footer">
-                <button onclick="createGame()">Create</button>
+                <button onclick="doCreateGame()">Create</button>
             </div>
         </div>
 

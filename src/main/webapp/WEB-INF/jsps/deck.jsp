@@ -24,17 +24,17 @@
                         <button onclick="doEdit();">Edit</button>
                         <button onclick="doNewDeck();">New</button>
                     </span>
-                    <span id="deckedit" style="display :none;">
+                    <span id="deckEdit" style="display :none;">
                         <button onclick="doSave();">Save</button>
                     </span>
                 </span>
             </h4>
             <div class="light">
-                <textarea id="decktext" readonly="readonly"></textarea>
+                <textarea id="deckText" readonly="readonly"></textarea>
             </div>
             <div class="footer">
-                <label for="deckname">Name:</label>
-                <input readonly="readonly" id="deckname" type="text" size="20" maxlength="40"/>
+                <label for="deckName">Name:</label>
+                <input readonly="readonly" id="deckName" type="text" size="20" maxlength="40"/>
                 <div class="float-right">
                     <label for="shuffle">Shuffle:</label>
                     <input type="checkbox" id="shuffle" name="shuffle" value="yes"/>
