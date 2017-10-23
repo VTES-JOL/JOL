@@ -10,7 +10,6 @@ import deckserver.dwr.Utils;
 import deckserver.game.cards.CardEntry;
 import deckserver.game.cards.CardSearch;
 import deckserver.game.cards.Deck;
-import deckserver.game.cards.DeckImpl;
 import deckserver.game.state.*;
 import deckserver.game.turn.GameAction;
 import deckserver.game.turn.TurnRecorder;
@@ -63,7 +62,7 @@ public class JolGame {
     }
 
     public void addPlayer(CardSearch cardset, String name, String deckStr) {
-        Deck deck = new DeckImpl(cardset, deckStr);
+        Deck deck = new Deck(cardset, deckStr);
         boolean reregister = false;
         String[] players = state.getPlayers();
         for (String player : players) if (name.equals(player)) reregister = true;

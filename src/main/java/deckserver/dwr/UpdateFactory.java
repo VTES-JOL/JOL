@@ -3,8 +3,8 @@ package deckserver.dwr;
 import deckserver.dwr.bean.AdminBean;
 import org.directwebremoting.WebContextFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 class UpdateFactory {
 
@@ -28,14 +28,11 @@ class UpdateFactory {
         AdminBean abean = AdminBean.INSTANCE;
         PlayerModel model = Utils.getPlayerModel(WebContextFactory.get().getHttpServletRequest(), abean);
         model.recordAccess();
-        String[] views = new String[]{model.getView(), "nav", "status"};
-        Map<String, Object> ret = new HashMap<>();
-        for (String view1 : views) {
-            ViewCreator view = getView(view1);
-            if (view != null)
-                ret.put(view.getFunction(), view.createData(abean, model));
-        }
-        return ret;
+        List<String> views = Arrays.asList(model.getView(), "nav", "status");
+        return views.stream()
+                .map(UpdateFactory::getView)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(ViewCreator::getFunction, v -> v.createData(abean, model)));
     }
 
 }

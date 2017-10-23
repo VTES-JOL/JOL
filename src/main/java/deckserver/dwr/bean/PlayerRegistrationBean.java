@@ -1,7 +1,7 @@
 package deckserver.dwr.bean;
 
 import deckserver.client.JolAdmin;
-import deckserver.game.cards.DeckImpl;
+import deckserver.game.cards.Deck;
 
 public class PlayerRegistrationBean {
 
@@ -15,7 +15,7 @@ public class PlayerRegistrationBean {
         String deck = JolAdmin.getInstance().getGameDeck(game, player);
         this.registered = deck != null;
         if (this.registered) {
-            DeckImpl impl = new DeckImpl(JolAdmin.getInstance().getAllCards(), deck, true);
+            Deck impl = new Deck(JolAdmin.getInstance().getAllCards(), deck, true);
             this.deckSummary = "Crypt: " + impl.getCryptSize() + ", Library: " + impl.getLibSize() + ", Groups: " + impl.getGroups();
             this.valid = impl.isValid();
         } else {

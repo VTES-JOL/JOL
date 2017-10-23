@@ -5,7 +5,6 @@ import deckserver.client.JolGame;
 import deckserver.dwr.GameModel;
 import deckserver.dwr.GameView;
 import deckserver.game.cards.Deck;
-import deckserver.game.cards.DeckImpl;
 
 import java.util.Date;
 
@@ -35,7 +34,7 @@ public class PlayerSummaryBean {
         JolAdmin admin = JolAdmin.getInstance();
         if (!started) {
             String deck = admin.getGameDeck(game.getName(), player);
-            Deck nd = new DeckImpl(admin.getAllCards(), deck);
+            Deck nd = new Deck(admin.getAllCards(), deck);
             libSize = nd.getLibSize();
             cryptSize = nd.getCryptSize();
             groups = nd.getGroups();

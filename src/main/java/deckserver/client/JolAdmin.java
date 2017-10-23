@@ -7,7 +7,6 @@
 package deckserver.client;
 
 import deckserver.game.cards.CardSearch;
-import deckserver.game.cards.SearchImpl;
 import deckserver.game.state.DsGame;
 import deckserver.game.state.Game;
 import deckserver.game.state.GameImpl;
@@ -307,7 +306,7 @@ public class JolAdmin {
             try {
                 String set = readIsoFile(new File(dir + "/cards/base.txt"));
                 String prop = readIsoFile(new File(dir + "/cards/base.prop"));
-                CARD_DATA = new SearchImpl(set, prop);
+                CARD_DATA = new CardSearch(set, prop);
             } catch (IOException e) {
                 throw new RuntimeException("Unable to open card files", e);
             }
@@ -580,7 +579,7 @@ public class JolAdmin {
         }
 
         boolean authenticate(String password) {
-            String hash =  info.getProperty("hash");
+            String hash = info.getProperty("hash");
             return BCrypt.checkpw(password, hash);
         }
 
