@@ -53,14 +53,14 @@ public class GameView {
                 isPlayer = true;
             boolean ousted = game.getPool(players[i]) < 1;
             i++;
-            //collapsed.add("t" + i);
             collapsed.add("a" + i);
             collapsed.add("rfg" + i);
             collapsed.add("res" + i);
             if (ousted) {
+                collapsed.add("t" + i);
                 collapsed.add("r" + i);
-            }
-            if (!active || ousted) {
+                collapsed.add("i" + i);
+            } else if (!active) {
                 collapsed.add("i" + i);
             }
         }

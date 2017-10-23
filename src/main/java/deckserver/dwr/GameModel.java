@@ -156,16 +156,6 @@ public class GameModel implements Comparable {
         }
     }
 
-/*	private boolean checkViewTime(String player, GameView view, long timestamp) {
-        if(timestamp - view.getTimestamp() > TIMEOUT_INTERVAL) {
-			logger.logger("timestamp " + timestamp + " view " + view.getTimestamp());
-			//views.remove(player);
-			logger.logger("Removing " + player + " from " + name);
-			return true;
-		}
-		return false;
-	} */
-
     private void doReload(boolean stateChanged, boolean phaseChanged, boolean pingChanged, boolean globalChanged, boolean turnChanged) {
         timestamp = JolAdmin.getInstance().getGameTimeStamp(name).getTime();
         for (String key : (new ArrayList<>(views.keySet()))) {

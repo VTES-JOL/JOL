@@ -70,7 +70,6 @@ public class JolGame {
         if (!reregister) {
             state.addPlayer(name);
             state.addLocation(name, READY_REGION);
-            changePool(name, 30);
             state.addLocation(name, TORPOR);
             state.addLocation(name, INACTIVE_REGION);
             state.addLocation(name, HAND);
@@ -79,6 +78,7 @@ public class JolGame {
             state.addLocation(name, CRYPT);
             state.addLocation(name, RFG);
             state.addLocation(name, RESEARCH);
+            changePool(name, 30);
         }
         CardEntry[] cards = deck.getCards();
         Location crypt = state.getPlayerLocation(name, CRYPT);
