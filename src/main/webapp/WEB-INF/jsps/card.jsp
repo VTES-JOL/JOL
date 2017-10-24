@@ -1,8 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page import="deckserver.client.JolGame" %>
-<%@page import="deckserver.game.cards.CardEntry" %>
-<%@page import="deckserver.game.state.Card" %>
-<%@ page import="deckserver.util.CardParams" %>
+<%@page import="net.deckserver.dwr.jsp.CardParams" %>
+<%@page import="net.deckserver.dwr.model.JolGame" %>
+<%@page import="net.deckserver.game.interfaces.state.Card" %>
+<%@ page import="net.deckserver.game.storage.cards.CardEntry" %>
 <%
     CardParams p = (CardParams) request.getAttribute("cparams");
     JolGame game = (JolGame) request.getAttribute("game");

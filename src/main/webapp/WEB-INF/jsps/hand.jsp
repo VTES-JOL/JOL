@@ -1,4 +1,4 @@
-<%@page import="deckserver.util.HandParams" %>
+<%@page import="net.deckserver.dwr.jsp.HandParams" %>
 <% HandParams p = (HandParams) request.getAttribute("hparams"); %>
 <div class="game-header">
     <h5><%= p.getText() %> ( <%= p.getSize() %>)</h5>

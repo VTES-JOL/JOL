@@ -1,7 +1,7 @@
 <%@page contentType="text/html" %>
 <%@page pageEncoding="UTF-8" %>
-<%@page import="deckserver.client.JolGame" %>
-<%@page import="deckserver.util.RegionParams" %>
+<%@page import="net.deckserver.dwr.jsp.RegionParams" %>
+<%@page import="net.deckserver.dwr.model.JolGame" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
     RegionParams r = (RegionParams) request.getAttribute("rparams");

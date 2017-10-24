@@ -1,6 +1,4 @@
-<%@page contentType="text/html" %>
-<%@page pageEncoding="UTF-8" %>
-<%@page import="deckserver.client.JolGame" %>
+<%@page import="net.deckserver.dwr.model.JolGame" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
 %>

@@ -1,9 +1,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" %>
 <%@page pageEncoding="UTF-8" %>
-<%@page import="deckserver.client.JolGame" %>
-<%@page import="deckserver.dwr.Utils" %>
-<%@page import="deckserver.util.RegionParams" %>
+<%@page import="net.deckserver.Utils" %>
+<%@page import="net.deckserver.dwr.jsp.RegionParams" %>
+<%@page import="net.deckserver.dwr.model.JolGame" %>
 
 <% String curPlayer = Utils.getPlayer(request);
     JolGame game = (JolGame) request.getAttribute("game");

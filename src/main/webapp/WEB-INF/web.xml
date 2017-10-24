@@ -8,15 +8,6 @@
     <display-name>V:TES Online</display-name>
     <description>Vtes Online Web Client</description>
 
-    <listener>
-        <listener-class>deckserver.JyhadOnlineServletInitializer</listener-class>
-    </listener>
-
-    <context-param>
-        <param-name>email</param-name>
-        <param-value>shannon.dowley@gmail.com</param-value>
-    </context-param>
-
     <servlet>
         <servlet-name>JolMain</servlet-name>
         <jsp-file>/main.jsp</jsp-file>
@@ -32,16 +23,6 @@
         </init-param>
     </servlet>
 
-    <filter>
-        <filter-name>DeckserverParamFilter</filter-name>
-        <filter-class>deckserver.dwr.ParamCheck</filter-class>
-    </filter>
-
-    <filter-mapping>
-        <filter-name>DeckserverParamFilter</filter-name>
-        <url-pattern>/main.jsp</url-pattern>
-    </filter-mapping>
-
     <servlet-mapping>
         <servlet-name>dwr-invoker</servlet-name>
         <url-pattern>/dwr/*</url-pattern>
@@ -50,21 +31,6 @@
     <servlet-mapping>
         <servlet-name>JolMain</servlet-name>
         <url-pattern>/main.jsp</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>default</servlet-name>
-        <url-pattern>/js/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>default</servlet-name>
-        <url-pattern>/css/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>default</servlet-name>
-        <url-pattern>/images/*</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>
