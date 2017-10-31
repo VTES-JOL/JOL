@@ -552,7 +552,7 @@
             <p>
                 <code>tap [PLAYER] [REGION] CARD</code>
             </p>
-            <strong>Deprecated: VEKN has changed the keyword tap to lock. The lock command will be removed in a future
+            <strong>Deprecated: VEKN has changed the keyword tap to lock. The tap command will be removed in a future
                 release.</strong>
             <h5>Examples</h5>
             <table class="help-example">
@@ -588,9 +588,7 @@
             <p>
                 <code>untap [PLAYER] [REGION] [CARD]</code>
             </p>
-            <strong>Deprecated: VEKN has changed the keyword untap to unlock. The unlock command will be removed in a
-                future
-                release.</strong>
+            <strong>Deprecated: VEKN has changed the keyword untap to unlock. The untap command will be removed in a future release.</strong>
             <h5>Examples</h5>
             <table class="help-example">
                 <tr>

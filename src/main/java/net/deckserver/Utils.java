@@ -181,8 +181,7 @@ public class Utils {
         if (interval < 10000) return 5000;
         if (interval < 60000) return 10000;
         if (interval < 300000) return 30000;
-        if (interval < 6000000) return 120000;
-        return 600000;
+        return 60000;
     }
 
     public static boolean verify(String gRecaptchaResponse) throws IOException {

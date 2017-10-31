@@ -305,6 +305,11 @@ span.label-dark, small.label-dark {
     background-color: #bbb;
 }
 
+span.label-bold, small.label-bold {
+    color: #111;
+    border: 2px dotted #111;
+}
+
 span.label-warning {
     background-color: rgb(255, 228, 146);
     color: #111;
@@ -370,6 +375,10 @@ table.game-table td.player {
 
 table.game-table td.player:last-child {
 
+}
+
+#dsForm table, #dsForm input, #judgeForm table, #judgeForm input {
+    width: 100%;
 }
 
 table.game-table td.game-cell {

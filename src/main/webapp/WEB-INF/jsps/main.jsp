@@ -61,7 +61,7 @@
                         Play multiple games simultaneously, test a deck before a tournament.
                     </p>
 
-                    <p>Our Justicars are available to help create games for you</p>
+                    <p>Our Prince's are available to help create games for you</p>
                 </div>
             </div>
 
@@ -86,6 +86,29 @@
             </div>
         </td>
         <td width="20%" class="layout" rowspan="2">
+            <h4 class="header">User Ranks:</h4>
+            <ul class="condensed-list light">
+                <li>
+                    <span class="label label-light">Embrace</span>
+                    <p>Can make decks, play, chat</p>
+                </li>
+                <li>
+                    <span class="label label-dark">Prince</span>
+                    <p>Creates games, Invites players, Closes games</p>
+                </li>
+                <li>
+                    <span class="label label-light label-bold">Justicar</span>
+                    <p>Can chat in games they are not playing to attend to rulings</p>
+                </li>
+                <li>
+                    <span class="label label-warning">Inner Circle</span>
+                    <p>Administer games for all other Princes</p>
+                </li>
+            </ul>
+            <h4 class="header">Contact</h4>
+            <ul class="condensed-list light">
+                <li><a href="mailto:admin@deckserver.net">Contact Site Administrator</a></li>
+            </ul>
             <h4 class="header">Links:</h4>
             <ul class="condensed-list light">
                 <li>
@@ -103,21 +126,6 @@
                 </li>
 
             </ul>
-            <h4 class="header">User Ranks:</h4>
-            <ul class="condensed-list light">
-                <li>
-                    <span class="label label-light">Embrace</span>
-                    <p>Can make decks, play, chat</p>
-                </li>
-                <li>
-                    <span class="label label-dark">Justicar</span>
-                    <p>Creates games, Invites players, Closes games</p>
-                </li>
-                <li>
-                    <span class="label label-warning">Inner Circle</span>
-                    <p>Administer games for all other Justicars</p>
-                </li>
-            </ul>
             <h4 class="header">Donate:</h4>
             <ul class="condensed-list light">
                 <li>
@@ -131,10 +139,6 @@
                              height="1">
                     </form>
                 </li>
-            </ul>
-            <h4 class="header">Contact</h4>
-            <ul class="condensed-list light">
-                <li><a href="mailto:admin@deckserver.net">Contact Site Administrator</a></li>
             </ul>
         </td>
     </tr>

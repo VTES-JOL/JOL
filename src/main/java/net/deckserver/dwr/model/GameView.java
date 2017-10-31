@@ -18,26 +18,23 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class GameView {
 
     private static final Logger logger = getLogger(GameView.class);
-    boolean stateChanged = true;
-    boolean phaseChanged = true;
-    boolean pingChanged = true;
-    boolean globalChanged = true;
-    boolean turnChanged = true;
-    boolean resetChat = true;
+    private boolean stateChanged = true;
+    private boolean phaseChanged = true;
+    private boolean pingChanged = true;
+    private boolean globalChanged = true;
+    private boolean turnChanged = true;
+    private boolean resetChat = true;
     private String name;
     private String player;
     private boolean isPlayer = false;
     private boolean isAdmin = false;
+    private boolean isJudge = false;
     private Collection<String> chats = new ArrayList<>();
     private Collection<String> collapsed = new HashSet<>();
 
     public GameView(String name, String player) {
         this.name = name;
         this.player = player;
-        init();
-    }
-
-    private void init() {
         JolAdmin admin = JolAdmin.getInstance();
         JolGame game = admin.getGame(name);
         GameAction[] actions = game.getActions(game.getCurrentTurn());
@@ -65,24 +62,21 @@ public class GameView {
         if (!isPlayer && (admin.getOwner(name).equals(player))) {
             isAdmin = true;
         }
+        if (!isPlayer && (admin.isJudge(player))) {
+            isJudge = true;
+        }
     }
 
     public synchronized GameBean create() {
         JolAdmin admin = JolAdmin.getInstance();
-        HttpServletRequest request = WebContextFactory.get()
-                .getHttpServletRequest();
+        HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
         JolGame game = admin.getGame(name);
 
         if (isPlayer) {
             admin.recordAccess(name, player);
         }
 
-        int refresh = -1;
-
-        if (player != null && admin.doInteractive(player)) {
-            Date stamp = admin.getGameTimeStamp(name);
-            refresh = Utils.calc(stamp);
-        }
+        int refresh = Utils.calc(admin.getGameTimeStamp(name));
 
         String[] pingvalues = null;
         String[] pingkeys = null;
@@ -173,7 +167,7 @@ public class GameView {
         boolean tc = turnChanged;
         clearAccess();
         String stamp = Utils.getDate();
-        return new GameBean(isPlayer, isAdmin, refresh, hand, global, text, label,
+        return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, global, text, label,
                 chatReset, tc, turn, turns, state, phases, pingkeys, pingvalues,
                 collapsed, stamp);
     }
@@ -240,8 +234,9 @@ public class GameView {
     public void addChats(int idx) {
         JolGame game = JolAdmin.getInstance().getGame(name);
         GameAction[] actions = game.getActions(game.getCurrentTurn());
-        for (int i = idx; i < actions.length; i++)
+        for (int i = idx; i < actions.length; i++) {
             chats.add(actions[i].getText());
+        }
     }
 
     public String getPlayer() {

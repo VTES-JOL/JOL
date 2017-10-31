@@ -46,6 +46,20 @@ public class GameModel implements Comparable {
         return JolAdmin.getInstance().getOwner(name);
     }
 
+    public synchronized String chat(String player, String chat) {
+        JolAdmin admin = JolAdmin.getInstance();
+        JolGame game = admin.getGame(name);
+        if (getPlayers().contains(player) || !admin.isJudge(player)) {
+            return "Not authorized";
+        }
+        DoCommand commander = new DoCommand(game);
+        int idx = game.getActions(game.getCurrentTurn()).length;
+        String status = commander.doMessage(player, chat);
+        addChats(idx);
+        admin.saveGame(game);
+        return status;
+    }
+
     public synchronized String submit(String player, String phase, String command, String chat,
                                       String ping, String endTurn, String global, String text) {
         JolAdmin admin = JolAdmin.getInstance();
@@ -136,6 +150,7 @@ public class GameModel implements Comparable {
     }
 
     private void addChats(int idx) {
+        logger.info("Chat index {}",idx);
         for (GameView gameView : views.values()) {
             gameView.addChats(idx);
         }

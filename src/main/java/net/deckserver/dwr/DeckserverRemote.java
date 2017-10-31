@@ -1,10 +1,14 @@
-package net.deckserver.dwr.model;
+package net.deckserver.dwr;
 
 import net.deckserver.Utils;
 import net.deckserver.dwr.bean.AdminBean;
 import net.deckserver.dwr.bean.CardBean;
 import net.deckserver.dwr.bean.DeckEditBean;
 import net.deckserver.dwr.creators.UpdateFactory;
+import net.deckserver.dwr.model.GameModel;
+import net.deckserver.dwr.model.GameView;
+import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.interfaces.turn.GameAction;
 import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
@@ -14,10 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DeckserverRemote {
@@ -143,6 +144,15 @@ public class DeckserverRemote {
         GameView view = getView(game);
         view.toggleCollapsed(id);
         return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> gameChat(String gamename, String chat) {
+        String player = Utils.getPlayer(request);
+        GameModel game = getModel(gamename);
+        String status = game.chat(player, chat);
+        Map<String, Object> ret = UpdateFactory.getUpdate();
+        ret.put("showStatus", status);
+        return ret;
     }
 
     public Map<String, Object> submitForm(String gamename, String phase, String command, String chat,

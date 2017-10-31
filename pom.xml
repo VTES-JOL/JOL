@@ -4,7 +4,7 @@
 
     <groupId>deckserver.net</groupId>
     <artifactId>jol-legacy</artifactId>
-    <version>1.1.5.4</version>
+    <version>1.1.5.5</version>
 
     <packaging>war</packaging>
 
@@ -18,19 +18,13 @@
         <dependency>
             <groupId>org.directwebremoting</groupId>
             <artifactId>dwr</artifactId>
-            <version>3.0.1-RELEASE</version>
+            <version>3.0.2-RELEASE</version>
         </dependency>
 
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>1.4.5</version>
         </dependency>
 
         <dependency>

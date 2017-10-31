@@ -143,6 +143,9 @@ function renderOnline(div, who) {
         } else {
             playerSpan.addClass("label-light")
         }
+        if (player.judge) {
+            playerSpan.addClass("label-bold");
+        }
         container.append(playerSpan);
         container.append(" ");
     });
@@ -393,8 +396,11 @@ function invitePlayer() {
 }
 
 function closeGame() {
+    const gameDiv = $("#endGameList");
+    var selected = gameDiv.val();
+    gameDiv.val("");
     if (confirm("End game?")) {
-        DS.endGame($("#endGameList").val(), {callback: processData});
+        DS.endGame(selected, {callback: processData});
     }
 }
 
@@ -417,6 +423,14 @@ function doToggle(thistag) {
         region.hide();
         regionToggle.text("+");
     }
+}
+
+function doGameChat() {
+    const chatDiv = $("#judgeChat");
+    var chat = chatDiv.val();
+    chatDiv.val("");
+    DS.gameChat(game, chat, {callback: processData});
+    return false;
 }
 
 function doSubmit() {
@@ -446,15 +460,19 @@ function doSubmit() {
 function loadGame(data) {
     var turnSelect = $("#turns");
     var gameChatDiv = $("#gameChat");
-    var historyDiv = $("#history");
     if (!data.player) {
-        dwr.util.byId('hand').style.display = 'none';
-        dwr.util.byId('playerPad').style.display = 'none';
-        dwr.util.byId('dsForm').style.display = 'none';
+        $("#hand").hide();
+        $("#playerPad").hide();
+        $("#dsForm").hide();
     } else {
-        dwr.util.byId('hand').style.display = '';
-        dwr.util.byId('playerPad').style.display = '';
-        dwr.util.byId('dsForm').style.display = '';
+        $("#hand").show();
+        $("#playerPad").show();
+        $("#dsForm").show();
+    }
+    if (data.judge && !data.player) {
+        $("#judgeForm").show();
+    } else {
+        $("#judgeForm").hide();
     }
     if (data.hand !== null)
         $('#hand').html(data.hand)

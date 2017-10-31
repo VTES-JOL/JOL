@@ -4,7 +4,7 @@
 <dwr>
     <allow>
         <create creator="new" javascript="DS">
-            <param name="class" value="net.deckserver.dwr.model.DeckserverRemote"/>
+            <param name="class" value="net.deckserver.dwr.DeckserverRemote"/>
         </create>
         <convert converter="bean" match="net.deckserver.dwr.bean.*"/>
     </allow>

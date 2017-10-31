@@ -325,6 +325,10 @@ public class JolAdmin {
         return getGameInfo(gameName).getValue(playerKey) != null;
     }
 
+    public boolean isJudge(String player) {
+        return existsPlayer(player) && getPlayerInfo(player).isJudge();
+    }
+
     class GameInfo extends Info {
         private final String prefix;
         JolGame game;
@@ -546,6 +550,7 @@ public class JolAdmin {
     class PlayerInfo extends Info {
 
         private final String id;
+        private boolean judge;
 
         PlayerInfo(String name, String password, String email) {
             this(name, sysInfo.newPlayer(name), true);
@@ -693,6 +698,11 @@ public class JolAdmin {
             return info.getProperty("admin", "no").equals("super");
         }
 
+        public boolean isJudge() {
+            return info.getProperty("judge", "no").equals("yes");
+        }
+
+
         void claimGame(String gameName) {
             info.setProperty(sysInfo.getKey(gameName), "owner");
             write();
@@ -731,6 +741,7 @@ public class JolAdmin {
             info.setProperty("turns", String.valueOf(receiveSummary));
             write();
         }
+
     }
 
     private class SystemInfo extends Info {
