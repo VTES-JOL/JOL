@@ -129,15 +129,9 @@ public class JolAdmin {
         PlayerInfo player = getPlayerInfo(playerName);
         String deckKey = player.getDeckKey(deckName);
         String deckContents = player.getDeck(deckKey);
-        return addPlayerInternal(gameName, playerName, deckKey, deckContents);
-    }
-
-    private boolean addPlayerInternal(String gameName, String playerName,
-                                      String deckKey, String deckContents) {
         GameInfo game = getGameInfo(gameName);
         if (!game.isOpen())
             return false;
-        PlayerInfo player = getPlayerInfo(playerName);
         game.addPlayer(playerName, deckKey, deckContents);
         player.addGame(gameName, deckKey);
         return true;
@@ -507,6 +501,13 @@ public class JolAdmin {
                 }
             }
             return ps.toArray(new String[0]);
+        }
+
+        public long getRegisteredPlayerCount() {
+            return info.entrySet().stream()
+                    .filter(e -> ((String)e.getKey()).startsWith("player"))
+                    .filter(e -> ((String)e.getValue()).startsWith("deck"))
+                    .count();
         }
 
         boolean isOpen() {

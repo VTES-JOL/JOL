@@ -3,7 +3,7 @@
         <div class="box">
             <h4 class="header">Create Game</h4>
             <div class="light">
-                <input type="text" class="full-width" name="newGameName" maxlength="30" placeholder="Game name cannot &quot; or &lsquo; characters"/>
+                <input type="text" class="full-width" id="newGameName" name="newGameName" maxlength="30" placeholder="Game name cannot &quot; or &lsquo; characters"/>
             </div>
             <div class="footer">
                 <button onclick="doCreateGame()">Create</button>

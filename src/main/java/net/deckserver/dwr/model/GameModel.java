@@ -150,7 +150,6 @@ public class GameModel implements Comparable {
     }
 
     private void addChats(int idx) {
-        logger.info("Chat index {}",idx);
         for (GameView gameView : views.values()) {
             gameView.addChats(idx);
         }

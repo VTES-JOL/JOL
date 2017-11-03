@@ -46,18 +46,18 @@ function doGlobalChat() {
     if (chatLine === "") {
         return;
     }
-    DS.chat(chatLine, {callback: processData});
+    DS.chat(chatLine, {callback: processData, errorHandler: errorhandler});
 }
 
 // Main page: navigation buttons
 function doNav(target) {
-    DS.navigate(target, {callback: processData});
+    DS.navigate(target, {callback: processData, errorHandler: errorhandler});
 }
 
 // Deck Register: deck link
 function doLoadDeck(deck) {
     $("#deckName").val(deck);
-    DS.getDeck(deck, {callback: processData});
+    DS.getDeck(deck, {callback: processData, errorHandler: errorhandler});
 }
 
 // Utility functions
@@ -65,7 +65,7 @@ function renderButton(data) {
     var buttonsDiv = $("#buttons");
     $.each(data, function(key, value) {
         var button = $("<button/>").text(value).click(key, function() {
-            DS.navigate(key, {callback: processData});
+            DS.navigate(key, {callback: processData, errorHandler: errorhandler});
         });
         buttonsDiv.append(button);
     });
@@ -236,7 +236,7 @@ function showDeck(data) {
 function getCardDeck(game, card) {
     var divid = "dcard" + card;
     if (dwr.util.byId(divid) === null) {
-        DS.getCardText('showCardDeck', card, {callback: processData});
+        DS.getCardText('showCardDeck', card, {callback: processData, errorHandler: errorhandler});
     } else {
         dwr.util.setValue("deckcards", card);
         selectCardDeck();
@@ -261,7 +261,9 @@ function showCardDeck(data) {
 }
 
 function doSearch() {
-    DS.cardSearch(dwr.util.getValue("cardtype"), dwr.util.getValue("cardquery"), {callback: processData});
+    var type = dwr.util.getValue("cardtype");
+    var query = dwr.util.getValue("cardquery");
+    DS.cardSearch(type, query, {callback: processData, errorHandler: errorhandler});
 }
 
 function findName() {
@@ -291,20 +293,25 @@ function doEdit() {
 }
 
 function doAdjust() {
-    DS.refreshDeck($('#deckName').val(), $('#deckText').val(), $('#shuffle').val(), {callback: processData});
+    var deckName = $('#deckName').val();
+    var deckText = $('#deckText').val();
+    var shuffle = $('#shuffle').is(":checked")
+    DS.refreshDeck(deckName, deckText, shuffle, {callback: processData, errorHandler: errorhandler});
 }
 
 function doSave() {
     toggleVisible('noedit', 'deckEdit');
     dwr.util.byId('deckName').readOnly = 'readonly';
     dwr.util.byId('deckText').readOnly = 'readonly';
-    DS.submitDeck($('#deckName').val(), $('#deckText').val(), {callback: processData});
+    var deckName = $('#deckName').val();
+    var deckText = $('#deckText').val();
+    DS.submitDeck(deckName, deckText, {callback: processData, errorHandler: errorhandler});
 }
 
 function doDelete(name) {
     var confirmed = confirm("Are you use you want to delete " + name + "\nThis action is not reversible");
     if (!confirmed) return;
-    DS.removeDeck(name, {callback: processData});
+    DS.removeDeck(name, {callback: processData, errorHandler: errorhandler});
 }
 
 function doNewDeck() {
@@ -365,12 +372,12 @@ function callbackAdmin(data) {
         var registrationText = "( " + registrationCount + " registered )";
         var startButton = $("<button/>").text("Start " + registrationText).click(game, function () {
             if (confirm("Start game?")) {
-                DS.startGame(game.gameName, {callback: processData});
+                DS.startGame(game.gameName, {callback: processData, errorHandler: errorhandler});
             }
         });
         var cancelButton = $("<button/>").text("Close").click(game, function () {
             if (confirm("Cancel game?")) {
-                DS.endGame(game.gameName, {callback: processData});
+                DS.endGame(game.gameName, {callback: processData, errorHandler: errorhandler});
             }
         });
         startHeader.append(startButton);
@@ -385,14 +392,14 @@ function doCreateGame() {
         alert("Game name can not contain \' or \" characters in it");
         return;
     }
-    DS.createGame(gameName, {callback: processData});
+    DS.createGame(gameName, {callback: processData, errorHandler: errorhandler});
     newGameDiv.val('');
 }
 
 function invitePlayer() {
     var game = $("#gameList").val();
     var player = $("#playerList").val();
-    DS.invitePlayer(game, player, {callback: processData});
+    DS.invitePlayer(game, player, {callback: processData, errorHandler: errorhandler});
 }
 
 function closeGame() {
@@ -400,16 +407,18 @@ function closeGame() {
     var selected = gameDiv.val();
     gameDiv.val("");
     if (confirm("End game?")) {
-        DS.endGame(selected, {callback: processData});
+        DS.endGame(selected, {callback: processData, errorHandler: errorhandler});
     }
 }
 
 function doRegister() {
-    DS.registerDeck($("reggames").val(), $("#regdecks").val(), {callback: processData});
+    var regGame = $("#reggames").val();
+    var regDeck = $("#regdecks").val();
+    DS.registerDeck(regGame, regDeck, {callback: processData, errorHandler: errorhandler});
 }
 
 function refreshState(force) {
-    DS.getState(game, force, {callback: processData});
+    DS.getState(game, force, {callback: processData, errorHandler: errorhandler});
 }
 
 function doToggle(thistag) {
@@ -429,7 +438,7 @@ function doGameChat() {
     const chatDiv = $("#judgeChat");
     var chat = chatDiv.val();
     chatDiv.val("");
-    DS.gameChat(game, chat, {callback: processData});
+    DS.gameChat(game, chat, {callback: processData, errorHandler: errorhandler});
     return false;
 }
 
@@ -452,7 +461,7 @@ function doSubmit() {
     dwr.util.byId('endturn').selectedIndex = 0;
     var global = $('#global').val();
     var text = $('#notes').val();
-    DS.submitForm(game, phase, command, chat, ping, endTurn, global, text, {callback: processData});
+    DS.submitForm(game, phase, command, chat, ping, endTurn, global, text, {callback: processData, errorHandler: errorhandler});
     return false;
 }
 
@@ -544,7 +553,7 @@ function loadGame(data) {
 }
 
 function details(tag) {
-    DS.doToggle(game, tag, {callback: processData});
+    DS.doToggle(game, tag, {callback: processData, errorHandler: errorhandler});
     doToggle(tag);
 }
 
@@ -555,7 +564,7 @@ function showStatus(data) {
 function getCard(card) {
     var divid = "card" + card;
     if (dwr.util.byId(divid) === null) {
-        DS.getCardText('showCard', card, {callback: processData});
+        DS.getCardText('showCard', card, {callback: processData, errorHandler: errorhandler});
     } else {
         dwr.util.setValue("cards", card);
         selectCard();
@@ -590,7 +599,8 @@ function selectHistory() {
 }
 
 function retrieveHistory() {
-    DS.getHistory(game, $('#turns').val(), {callback: loadHistory});
+    var turns = $('#turns').val();
+    DS.getHistory(game, turns, {callback: loadHistory});
 }
 
 function getHistory() {
@@ -631,7 +641,7 @@ function updateProfile() {
     var newEmail = dwr.util.getValue("profileEmail");
     var newPing = dwr.util.getValue("profilePing");
     var newSummary = dwr.util.getValue("profileTurnSummary");
-    DS.updateProfile(newEmail, newPing, newSummary, {callback: processData});
+    DS.updateProfile(newEmail, newPing, newSummary, {callback: processData, errorHandler: errorhandler});
 }
 
 function updatePassword() {
@@ -642,7 +652,7 @@ function updatePassword() {
     } else if (profileNewPassword !== profileConfirmPassword) {
         dwr.util.setValue("profilePasswordError", "Password chosen does not match.");
     } else {
-        DS.changePassword(profileNewPassword, {callback: processData});
+        DS.changePassword(profileNewPassword, {callback: processData, errorHandler: errorhandler});
         dwr.util.setValue("profilePasswordError", "Password updated");
     }
 }
