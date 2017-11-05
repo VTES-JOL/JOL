@@ -6,6 +6,7 @@
         <td class="game-cell command-cell">
             <div class="game-header">
                 <h5>Commands</h5>
+                <button id="gameDeck" onclick="doShowDeck();">Deck</button>
             </div>
             <form onsubmit="return doSubmit();" autocomplete='off' class="padded" id="dsForm">
                 <table>
@@ -112,16 +113,15 @@
                 <h5>&nbsp;</h5>
                 <span>
                 <select title="cards" id="cards" name="cards" onchange="selectCard()">
-                    <option value="NOCARD">Show history</option>
+                    <option value="history">History</option>
                 </select>
-                <select title="turns" id="turns" name="turns" onchange="getHistory()">
-
-                </select>
+                <select title="turns" id="turns" name="turns" onchange="getHistory()"></select>
                 </span>
             </div>
             <div id="extra" class="history grey">
                 <input type="hidden" id="extraSelect" value="history"/>
                 <div id="history"></div>
+                <div id="gameDeckContents" class="display: none;"></div>
             </div>
         </td>
     </tr>

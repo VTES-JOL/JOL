@@ -442,6 +442,10 @@ function doGameChat() {
     return false;
 }
 
+function doShowDeck() {
+    DS.gameDeck(game, {callback: processData, errorHandler: errorhandler});
+}
+
 function doSubmit() {
     var phase, ping = null;
     var command = $('#command').val();
@@ -574,21 +578,18 @@ function getCard(card) {
 function showCard(data) {
     var old = dwr.util.getValue('extra', {escapeHtml: false});
     var text = data.text.join("<br />");
-    dwr.util.setValue('extra', old + "<div class='padded' id='card" + data.id + "'>" + text + "</div>", {escapeHtml: false});
-    dwr.util.addOptions("cards", [data], "id", "name");
-    dwr.util.setValue("cards", data.id);
+    var cardId = "card" + data.id;
+    dwr.util.setValue('extra', old + "<div class='padded' id='"+ cardId + "'>" + text + "</div>", {escapeHtml: false});
+    dwr.util.addOptions("cards", [{"id" : cardId, "name" : data.name}], "id", "name");
+    dwr.util.setValue("cards", cardId);
     selectCard();
 }
 
 function selectCard() {
-    if (dwr.util.getValue("cards") === "NOCARD") {
-        selectHistory();
-    } else {
-        var divid = "card" + dwr.util.getValue("cards");
-        var selected = dwr.util.getValue("extraSelect");
-        dwr.util.setValue("extraSelect", divid);
-        toggleVisible(divid, selected);
-    }
+    var divid = dwr.util.getValue("cards");
+    var selected = dwr.util.getValue("extraSelect");
+    dwr.util.setValue("extraSelect", divid);
+    toggleVisible(divid, selected);
 }
 
 function selectHistory() {
@@ -694,6 +695,21 @@ function callbackShowDecks(data) {
         dwr.util.addOptions('reggames', data.games, 'game', 'game');
         dwr.util.addOptions('regdecks', data.decks);
     }
+}
+
+function callbackShowGameDeck(data) {
+    var extraSelectInput = $("#extraSelect");
+    var deckContentsDiv = $("#gameDeckContents");
+    if (deckContentsDiv.html() === "") {
+        var contents = data.split("\n").join("<br />");
+        var currentDiv = extraSelectInput.val();
+        $("#" + currentDiv).hide();
+        deckContentsDiv.html(contents);
+        dwr.util.addOptions("cards", [{"id" : "gameDeckContents", "name" : "Deck"}], "id", "name");
+    }
+    extraSelectInput.val("gameDeckContents");
+    dwr.util.setValue("cards", "gameDeckContents");
+    selectCard();
 }
 
 function callbackShowCards(data) {

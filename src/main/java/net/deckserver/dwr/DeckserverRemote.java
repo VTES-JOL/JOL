@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -179,6 +180,16 @@ public class DeckserverRemote {
         }
         Map<String, Object> ret = UpdateFactory.getUpdate();
         ret.put("callbackUpdateDeck", name);
+        return ret;
+    }
+
+    public Map<String, Object> gameDeck(String game) {
+        String player = Utils.getPlayer(request);
+        HttpServletResponse response = WebContextFactory.get().getHttpServletResponse();
+        response.setContentType("text/javascript;charset=UTF-8");
+        String deck = JolAdmin.getInstance().getGameDeck(game, player);
+        Map<String, Object> ret = UpdateFactory.getUpdate();
+        ret.put("callbackShowGameDeck", deck);
         return ret;
     }
 
