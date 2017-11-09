@@ -57,14 +57,6 @@ p.chat {
     margin: 0;
 }
 
-p.chat a {
-    display: inline;
-}
-
-#curturntable p.chat a {
-    text-decoration: underline;
-}
-
 .history {
     height: 15em;
     overflow: auto;
@@ -506,6 +498,11 @@ span.edge {
 
 table.game-table a {
     text-decoration: none;
+}
+
+p.chat a {
+    display: inline;
+    text-decoration: underline;
 }
 
 a.card-name {
