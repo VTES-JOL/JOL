@@ -519,6 +519,9 @@ function loadGame(data) {
         if (data.resetChat) {
             gameChatDiv.empty();
             $("#history").empty();
+            $("#gameDeckContents").empty();
+            dwr.util.removeAllOptions('cards');
+            dwr.util.addOptions('cards', {"history": "History"});
         }
         renderChat('curturn', 'gameChat', data.turn);
     }

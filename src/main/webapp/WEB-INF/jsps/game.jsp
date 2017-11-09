@@ -121,7 +121,7 @@
             <div id="extra" class="history grey">
                 <input type="hidden" id="extraSelect" value="history"/>
                 <div id="history"></div>
-                <div id="gameDeckContents" class="display: none;"></div>
+                <div id="gameDeckContents" class="padded" style="display: none;"></div>
             </div>
         </td>
     </tr>
