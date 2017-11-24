@@ -20,6 +20,7 @@ public class UpdateFactory {
         viewMap.put("admin", new AdminCreator());
         viewMap.put("status", new StatusCreator());
         viewMap.put("profile", new ProfileCreator());
+        viewMap.put("super", new SuperCreator());
     }
 
     private static ViewCreator getView(String type) {

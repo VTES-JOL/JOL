@@ -44,6 +44,10 @@
                 <div id="profile" style="display:none">
                     <jsp:include page="/WEB-INF/jsps/profile.jsp"/>
                 </div>
+
+                <div id="super" style="display:none">
+                    <jsp:include page="/WEB-INF/jsps/super.jsp"/>
+                </div>
             </div>
         </div>
         <script>

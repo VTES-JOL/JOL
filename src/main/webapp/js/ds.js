@@ -209,7 +209,10 @@ function navigate(data) {
     } else {
         renderButton({deck: "Deck Register", profile: "Profile"});
         if (data.admin) {
-            renderButton({admin: "Game Admin"})
+            renderButton({admin: "Game Admin"});
+        }
+        if (data.superUser) {
+            renderButton({super: "User Admin"});
         }
         renderButton(data.gameButtons);
         $("#loginInputs").hide();

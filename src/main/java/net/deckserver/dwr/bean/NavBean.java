@@ -12,6 +12,7 @@ public class NavBean {
 
     private boolean chats;
     private boolean admin;
+    private boolean superUser;
     private Map<String, String> gameButtons = new HashMap<>();
 
     private String player, target, game = null;
@@ -24,6 +25,7 @@ public class NavBean {
         if (player != null) {
             chats = model.hasChats();
             admin = JolAdmin.getInstance().isAdmin(player);
+            superUser = JolAdmin.getInstance().isSuperUser(player);
         }
         String[] games = model.getCurrentGames();
         for (String game1 : games) {
@@ -56,5 +58,9 @@ public class NavBean {
 
     public boolean isAdmin() {
         return admin;
+    }
+
+    public boolean isSuperUser() {
+        return superUser;
     }
 }
