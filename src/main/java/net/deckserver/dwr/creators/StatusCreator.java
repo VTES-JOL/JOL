@@ -23,7 +23,7 @@ public class StatusCreator implements ViewCreator {
 
     @Override
     public Object createData(AdminBean abean, PlayerModel model) {
-        File outageFile = new File(System.getProperty("jol.data"), "outage.txt");
+        File outageFile = new File(System.getenv("JOL_DATA"), "outage.txt");
         // Read file if we haven't read it since it last updated
         long fileModified = outageFile.lastModified();
         if (fileModified != lastModified) {

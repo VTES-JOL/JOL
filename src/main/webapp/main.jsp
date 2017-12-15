@@ -4,7 +4,7 @@
 <html>
     <head>
         <title>V:TES Online</title>
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/styles.css?version=<%= System.getProperty("jol.version")%>"/>
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/styles.css"/>
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.min.css"/>
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.structure.min.css"/>
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.theme.min.css"/>
@@ -67,7 +67,7 @@
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/engine.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/interface/DS.js'></script>
         <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/util.js'></script>
-        <script type='text/javascript' src='${pageContext.request.contextPath}/js/ds.js?version=<%= System.getProperty("jol.version")%>'></script>
+        <script type='text/javascript' src='${pageContext.request.contextPath}/js/ds.js'></script>
         <script src='https://www.google.com/recaptcha/api.js'></script>
     </body>
 </html>

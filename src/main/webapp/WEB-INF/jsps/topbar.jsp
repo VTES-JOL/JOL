@@ -3,7 +3,7 @@
         <tr>
             <td width="25%" align="left">
                 <h3 id="title" class="inline">V:TES Online
-                    <small>v<%= System.getProperty("jol.version")%></small>
+                    <small>v<%= System.getenv("JOL_VERSION")%></small>
                 </h3>
                 <span id="chatstamp" class="label label-light label-basic"></span>
             </td>

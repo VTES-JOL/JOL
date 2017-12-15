@@ -29,7 +29,7 @@ public class AdminBean {
     private Date timestamp = new Date();
     private String[] admins = new String[0];
 
-    private File chatPersistenceFile = new File(System.getProperty("jol.data"), "global_chat.txt");
+    private File chatPersistenceFile = new File(System.getenv("JOL_DATA"), "global_chat.txt");
     private String message;
 
     public AdminBean() {
