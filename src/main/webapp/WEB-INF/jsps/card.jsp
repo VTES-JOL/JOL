@@ -37,7 +37,7 @@
     XXXXXX
 </c:if>
 <c:if test="${!p.hidden}">
-    <a class="card-name" data-id="<%= p.getId() %>"><%= p.getName() %></a>
+    <a class="card-name" title="<%= p.getId() %>"><%= p.getName() %></a>
 </c:if>
 <c:if test="${game != null}">
     <c:if test="${capacity > 0 && !p.hidden}">

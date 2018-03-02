@@ -34,8 +34,8 @@ function processData(data) {
 }
 
 function toggleVisible(s, h) {
-    $("#"+h).hide();
-    $("#"+s).show();
+    $("#" + h).hide();
+    $("#" + s).show();
 }
 
 // Main page: global chat
@@ -63,8 +63,8 @@ function doLoadDeck(deck) {
 // Utility functions
 function renderButton(data) {
     var buttonsDiv = $("#buttons");
-    $.each(data, function(key, value) {
-        var button = $("<button/>").text(value).click(key, function() {
+    $.each(data, function (key, value) {
+        var button = $("<button/>").text(value).click(key, function () {
             DS.navigate(key, {callback: processData, errorHandler: errorhandler});
         });
         buttonsDiv.append(button);
@@ -75,7 +75,7 @@ function renderChat(did, id, data) {
     if (data === null) {
         return;
     }
-    var chatDiv = $("#"+did);
+    var chatDiv = $("#" + did);
     var curScroll = chatDiv.scrollTop();
     chatDiv.scrollTop(100000);
     if (chatDiv.scrollTop() === curScroll) {
@@ -468,7 +468,10 @@ function doSubmit() {
     dwr.util.byId('endturn').selectedIndex = 0;
     var global = $('#global').val();
     var text = $('#notes').val();
-    DS.submitForm(game, phase, command, chat, ping, endTurn, global, text, {callback: processData, errorHandler: errorhandler});
+    DS.submitForm(game, phase, command, chat, ping, endTurn, global, text, {
+        callback: processData,
+        errorHandler: errorhandler
+    });
     return false;
 }
 
@@ -501,10 +504,6 @@ function loadGame(data) {
     if (data.label !== null) {
         $('#turnlabel').text(data.label);
     }
-    $('.card-name').off().mouseover(function(event) {
-       var id = event.target.attributes.getNamedItem('data-id').value;
-       $.ajax({url: 'rest/card/'+id, dataType: 'html', success: });
-    });
     if (data.refresh > 0) {
         if (refresher !== null) clearTimeout(refresher);
         refresher = setTimeout("refreshState(false)", data.refresh);
@@ -527,8 +526,6 @@ function loadGame(data) {
             gameChatDiv.empty();
             $("#history").empty();
             $("#gameDeckContents").empty();
-            dwr.util.removeAllOptions('cards');
-            dwr.util.addOptions('cards', {"history": "History"});
         }
         renderChat('curturn', 'gameChat', data.turn);
     }
@@ -536,8 +533,8 @@ function loadGame(data) {
         var currentSelected = turnSelect.val();
         var num = turnSelect.find("option").length;
         turnSelect.empty();
-        $.each(data.turns, function(index, turn) {
-           turnSelect.append($(new Option(turn, turn)));
+        $.each(data.turns, function (index, turn) {
+            turnSelect.append($(new Option(turn, turn)));
         });
         if (currentSelected === null || currentSelected === data.turns[num]) {
             turnSelect.val(data.turns[num]).change();
@@ -564,6 +561,24 @@ function loadGame(data) {
             doToggle(data.collapsed[c]);
         }
     }
+    generateCardData("#game");
+}
+
+function generateCardData(parent) {
+    tippy(parent + ' a.card-name', {
+        placement: 'right',
+        arrow: true,
+        onShow: function (instance) {
+            const content = this.querySelector('.tippy-content');
+            content.innerHTML = "Loading...";
+            var cardId = instance.title;
+            $.get({
+                url: "rest/card/" + cardId, success: function (data) {
+                    content.innerHTML = data;
+                }
+            });
+        }
+    });
 }
 
 function details(tag) {
@@ -584,7 +599,6 @@ function selectCard() {
 
 function selectHistory() {
     var id = dwr.util.getValue("extraSelect");
-    dwr.util.byId('cards').selectedIndex = 0;
     dwr.util.setValue("extraSelect", "history");
     toggleVisible('history', id);
 }
@@ -606,6 +620,7 @@ function loadHistory(data) {
         var turnContent = $("<p/>").addClass("chat").html(content);
         historyDiv.append(turnContent);
     });
+    generateCardData("#history");
 }
 
 function callbackSuper(data) {
@@ -699,7 +714,7 @@ function callbackShowGameDeck(data) {
         var currentDiv = extraSelectInput.val();
         $("#" + currentDiv).hide();
         deckContentsDiv.html(contents);
-        dwr.util.addOptions("cards", [{"id" : "gameDeckContents", "name" : "Deck"}], "id", "name");
+        dwr.util.addOptions("cards", [{"id": "gameDeckContents", "name": "Deck"}], "id", "name");
     }
     extraSelectInput.val("gameDeckContents");
     dwr.util.setValue("cards", "gameDeckContents");

@@ -112,9 +112,6 @@
             <div class="game-header">
                 <h5>&nbsp;</h5>
                 <span>
-                <select title="cards" id="cards" name="cards" onchange="selectCard()">
-                    <option value="history">History</option>
-                </select>
                 <select title="turns" id="turns" name="turns" onchange="getHistory()"></select>
                 </span>
             </div>

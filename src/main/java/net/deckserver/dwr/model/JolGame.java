@@ -298,7 +298,7 @@ public class JolGame {
     }
 
     private String getCardLink(Card card) {
-        return "<a href='javascript:getCard(\"" + card.getCardId() + "\")';>" + card.getName() + "</a>";
+        return "<a class='card-name' title='" + card.getCardId() + "'>" + card.getName() + "</a>";
     }
 
     public String getActivePlayer() {

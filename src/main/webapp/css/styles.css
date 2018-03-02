@@ -13,7 +13,6 @@ body {
 }
 
 td a {
-    width: 100%;
     display: block;
     color: black;
 }
@@ -435,6 +434,7 @@ table.game-table ol.card-list li a {
 
 table.game-table td.command-cell-double {
     width: 50%;
+    background-color: #eee;
     height: 10em;
 }
 
@@ -507,6 +507,7 @@ p.chat a {
 
 a.card-name {
     display: inline-block;
+    width: fit-content;
 }
 
 small.counter {
