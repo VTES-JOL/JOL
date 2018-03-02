@@ -506,7 +506,7 @@ p.chat a {
 }
 
 a.card-name {
-
+    display: inline-block;
 }
 
 small.counter {

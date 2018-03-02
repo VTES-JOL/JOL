@@ -19,8 +19,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DeckserverRemote {
     private static Logger logger = LoggerFactory.getLogger(DeckserverRemote.class);
@@ -133,12 +137,10 @@ public class DeckserverRemote {
         return ret;
     }
 
-    public Map<String, Object> getCardText(String callback, String id) {
-        Map<String, Object> ret = UpdateFactory.getUpdate();
+    public String getCardText(String callback, String id) {
         CardSearch cards = JolAdmin.getInstance().getAllCards();
         CardEntry card = cards.getCardById(id);
-        ret.put(callback, new CardBean(card));
-        return ret;
+        return Stream.of(card.getFullText()).collect(Collectors.joining("<br/>"));
     }
 
     public Map<String, Object> doToggle(String game, String id) {

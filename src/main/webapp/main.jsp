@@ -4,10 +4,10 @@
 <html>
     <head>
         <title>V:TES Online</title>
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/styles.css?version=<%= System.getProperty("jol.version")%>"/>
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.min.css"/>
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.structure.min.css"/>
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.theme.min.css"/>
+        <link rel="stylesheet" type="text/css" href="css/styles.css?version=<%= System.getProperty("jol.version")%>"/>
+        <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
+        <link rel="stylesheet" type="text/css" href="css/jquery-ui.structure.min.css"/>
+        <link rel="stylesheet" type="text/css" href="css/jquery-ui.theme.min.css"/>
         <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/favicon.ico" />
         <link href="https://fonts.googleapis.com/css?family=IM+Fell+English" rel="stylesheet">
     </head>
@@ -59,15 +59,16 @@
             ga('create', 'UA-88229809-1', 'auto');
             ga('send', 'pageview');
         </script>
-        <script type='text/javascript' src='${pageContext.request.contextPath}/js/moment-with-locales.min.js'></script>
-        <script type='text/javascript' src='${pageContext.request.contextPath}/js/moment-timezone-with-data.min.js'></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.2.1.js"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui.js"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-throttle.js"></script>
-        <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/engine.js'></script>
-        <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/interface/DS.js'></script>
-        <script type='text/javascript' src='${pageContext.request.contextPath}/dwr/util.js'></script>
-        <script type='text/javascript' src='${pageContext.request.contextPath}/js/ds.js?version=<%= System.getProperty("jol.version")%>'></script>
+        <script type='text/javascript' src='js/moment-with-locales.min.js'></script>
+        <script type='text/javascript' src='js/moment-timezone-with-data.min.js'></script>
+        <script type="text/javascript" src="js/jquery-3.2.1.js"></script>
+        <script type="text/javascript" src="js/jquery-ui.js"></script>
+        <script type="text/javascript" src="js/jquery-throttle.js"></script>
+        <script type='text/javascript' src='dwr/engine.js'></script>
+        <script type='text/javascript' src='dwr/interface/DS.js'></script>
+        <script type='text/javascript' src='dwr/util.js'></script>
+        <script src="https://unpkg.com/tippy.js@2.2.3/dist/tippy.all.min.js"></script>
+        <script type='text/javascript' src='js/ds.js?version=<%= System.getProperty("jol.version")%>'></script>
         <script src='https://www.google.com/recaptcha/api.js'></script>
     </body>
 </html>

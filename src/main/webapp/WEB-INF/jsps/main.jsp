@@ -18,12 +18,12 @@
                         </tr>
                         <tr>
                             <td><label for="newpassword">Password:</label></td>
-                            <td><input style="width:100%;" type="password" size="30" name="newpassword"
+                            <td><input style="width:100%;" type="password" size="30" name="newpassword" autocomplete="new-password"
                                        id="newpassword"/></td>
                         </tr>
                         <tr>
                             <td><label for="newemail">Email:</label></td>
-                            <td><input style="width:100%;" type="text" size=30 name="newemail" id="newemail"/></td>
+                            <td><input style="width:100%;" type="text" size=30 name="newemail" autocomplete="email" id="newemail"/></td>
                         </tr>
                         <tr>
                             <td colspan="2">

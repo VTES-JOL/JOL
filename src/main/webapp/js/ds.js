@@ -501,6 +501,10 @@ function loadGame(data) {
     if (data.label !== null) {
         $('#turnlabel').text(data.label);
     }
+    $('.card-name').off().mouseover(function(event) {
+       var id = event.target.attributes.getNamedItem('data-id').value;
+       $.ajax({url: 'rest/card/'+id, dataType: 'html', success: });
+    });
     if (data.refresh > 0) {
         if (refresher !== null) clearTimeout(refresher);
         refresher = setTimeout("refreshState(false)", data.refresh);
@@ -571,26 +575,6 @@ function showStatus(data) {
     $('#status').html(data)
 }
 
-function getCard(card) {
-    var divid = "card" + card;
-    if (dwr.util.byId(divid) === null) {
-        DS.getCardText('showCard', card, {callback: processData, errorHandler: errorhandler});
-    } else {
-        dwr.util.setValue("cards", card);
-        selectCard();
-    }
-}
-
-function showCard(data) {
-    var old = dwr.util.getValue('extra', {escapeHtml: false});
-    var text = data.text.join("<br />");
-    var cardId = "card" + data.id;
-    dwr.util.setValue('extra', old + "<div class='padded' id='"+ cardId + "'>" + text + "</div>", {escapeHtml: false});
-    dwr.util.addOptions("cards", [{"id" : cardId, "name" : data.name}], "id", "name");
-    dwr.util.setValue("cards", cardId);
-    selectCard();
-}
-
 function selectCard() {
     var divid = dwr.util.getValue("cards");
     var selected = dwr.util.getValue("extraSelect");
@@ -622,6 +606,10 @@ function loadHistory(data) {
         var turnContent = $("<p/>").addClass("chat").html(content);
         historyDiv.append(turnContent);
     });
+}
+
+function callbackSuper(data) {
+
 }
 
 function callbackProfile(data) {
