@@ -2,11 +2,11 @@ package net.deckserver.servlet;
 
 import net.deckserver.dwr.bean.AdminBean;
 
-public class CardPersistenceJob implements Runnable {
+public class ChatPersistenceJob implements Runnable {
 
     private final AdminBean INSTANCE;
 
-    CardPersistenceJob(AdminBean instance) {
+    ChatPersistenceJob(AdminBean instance) {
         this.INSTANCE = instance;
     }
 

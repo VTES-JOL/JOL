@@ -7,7 +7,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-@WebFilter(filterName = "ParamFiler", urlPatterns = "/main.jsp")
+@WebFilter(urlPatterns = "/main.jsp")
 public class ParamFilter implements Filter {
 
     private ServletContext ctx = null;

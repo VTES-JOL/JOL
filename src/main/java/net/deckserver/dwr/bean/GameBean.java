@@ -1,6 +1,8 @@
 package net.deckserver.dwr.bean;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class GameBean {
 
@@ -18,9 +20,7 @@ public class GameBean {
 
     private String[] turns = null;
 
-    private String[] pingkeys = null;
-
-    private String[] pingvalues = null;
+    private List<String> ping = new ArrayList<>();
 
     private String state = null;
 
@@ -42,8 +42,8 @@ public class GameBean {
 
     public GameBean(boolean isPlayer, boolean isAdmin, boolean isJudge, int refresh, String hand, String global, String text,
                     String label, boolean resetChat, boolean turnChanged, String[] turn, String[] turns, String state, String[] phases,
-                    String[] pingkeys, String[] pingvalues, String[] collapsed, String stamp) {
-        this(pingkeys, pingvalues, refresh);
+                    List<String> ping, String[] collapsed, String stamp) {
+        this(ping, refresh);
         this.player = isPlayer;
         this.admin = isAdmin;
         this.judge = isJudge;
@@ -61,9 +61,8 @@ public class GameBean {
         this.stamp = stamp;
     }
 
-    public GameBean(String[] pingkeys, String[] pingvalues, int refresh) {
-        this.pingkeys = pingkeys;
-        this.pingvalues = pingvalues;
+    public GameBean(List<String> ping, int refresh) {
+        this.ping = ping;
         this.refresh = refresh;
     }
 
@@ -127,16 +126,12 @@ public class GameBean {
         return judge;
     }
 
-    public String[] getPingkeys() {
-        return pingkeys;
-    }
-
-    public String[] getPingvalues() {
-        return pingvalues;
-    }
-
     public String getStamp() {
         return stamp;
+    }
+
+    public List<String> getPing() {
+        return ping;
     }
 
     @Override
@@ -147,8 +142,6 @@ public class GameBean {
                 ", label='" + label + '\'' +
                 ", turn=" + Arrays.toString(turn) +
                 ", turns=" + Arrays.toString(turns) +
-                ", pingkeys=" + Arrays.toString(pingkeys) +
-                ", pingvalues=" + Arrays.toString(pingvalues) +
                 ", phases=" + Arrays.toString(phases) +
                 ", collapsed=" + Arrays.toString(collapsed) +
                 ", admin=" + admin +

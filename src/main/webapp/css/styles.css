@@ -46,7 +46,7 @@ td a:hover {
     line-height: 2em;
 }
 
-#gchatwin, #curturn, #history {
+#gchatwin {
     width: calc(100% - 0.6em);
     padding-left: 0.25em;
     padding-right: 0.25em;
@@ -56,9 +56,18 @@ p.chat {
     margin: 0;
 }
 
-.history {
-    height: 15em;
+.chat-history {
+    height: 10em;
     overflow: auto;
+}
+
+.scrollable {
+    height: 23.3rem;
+    overflow: auto;
+}
+
+#notes, #history, #gameDeck {
+    height: 25em;
 }
 
 ul.help {
@@ -133,24 +142,42 @@ td.help-command {
     padding: 0.5em;
 }
 
+.game-col {
+    flex: auto;
+}
+
 .col-2 {
     flex-basis: calc(100% / 6);
 }
 
 .col-3 {
-    flex-basis: 25%;
+    flex-basis: 24%;
+    flex-shrink: 1;
+    flex-grow: 1;
 }
 
 .col-4 {
-    flex-basis: 33%;
+    flex-basis: 32%;
+    flex-shrink: 1;
+    flex-grow: 1;
 }
 
 .col-6 {
-    flex-basis: 50%;
+    flex-basis: 48%;
+    flex-shrink: 1;
+    flex-grow: 1;
 }
 
 .col-8 {
-    flex-basis: 66%;
+    flex-basis: 65%;
+    flex-shrink: 1;
+    flex-grow: 1;
+}
+
+.col-12 {
+    flex-basis: 98%;
+    flex-shrink: 1;
+    flex-grow: 1;
 }
 
 h3, h4, h5 {
@@ -207,6 +234,22 @@ ul.deck-list {
 
 .grey {
     background-color: #eee;
+}
+
+.border-left {
+    border-left: 1px solid #aaa;
+}
+
+.border-right {
+    border-right: 1px solid #aaa;
+}
+
+.border-top {
+    border-top: 1px solid #aaa;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #aaa;
 }
 
 h2.header, h3.header, h4.header, h5.header {
@@ -340,6 +383,13 @@ td.layout {
     padding: 0.5em;
 }
 
+.side-padded {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
 #decktext {
     padding: 0.5em;
     border: 0;
@@ -364,39 +414,15 @@ table.game-table td.player {
     background-color: #eee;
 }
 
-table.game-table td.player:last-child {
-
-}
-
-#dsForm table, #dsForm input, #judgeForm table, #judgeForm input {
-    width: 100%;
-}
-
 table.game-table td.game-cell {
     vertical-align: top;
     padding: 0;
     border: 1px solid #aaa;
 }
 
-table.game-table div.half-height {
-    height: 50%;
-}
-
 table.game-table td.command-cell {
     width: 25%;
     background-color: #eee;
-}
-
-textarea#global, textarea#notes {
-    width: 100%;
-    height: calc(100% - 2em);
-    resize: none;
-}
-
-table.game-table ol.card-list {
-    margin: 0 0 0 1.5em;
-    padding: 0.5em;
-    line-height: 1.5em;
 }
 
 td.player ol.card-list li {
@@ -408,9 +434,6 @@ td.player ol.card-list li {
     padding-left: 0.25em;
     padding-right: 0.25em;
     margin: 0.25em;
-}
-
-td.player ol.card-list li a {
 }
 
 td.player ol.card-list li li {
@@ -429,13 +452,15 @@ td.player ol.card-list li li a {
     border: none;
 }
 
-table.game-table ol.card-list li a {
-}
-
 table.game-table td.command-cell-double {
     width: 50%;
     background-color: #eee;
-    height: 10em;
+}
+
+div.command-cell-double {
+    width: 49%;
+    display: inline-block;
+    background-color: #eee;
 }
 
 table.game-table td.player-active {
@@ -530,4 +555,41 @@ small.blood {
 
 small.life {
     background-color: #1d9041;
+}
+
+div.gameDetails > div {
+    height: 20em;
+}
+
+#gameChat {
+    height: 10em;
+    overflow: auto;
+    background-color: white;
+    padding-left: 0.25em;
+    padding-right: 0.25em;
+
+}
+
+.game-notes {
+    height: 23.3rem;
+    width: 100%;
+    border: 0;
+    box-sizing: border-box;         /* For IE and modern versions of Chrome */
+    -moz-box-sizing: border-box;    /* For Firefox                          */
+    -webkit-box-sizing: border-box; /* For Safari                           */
+}
+
+.fill-width {
+    flex-grow: 1;
+}
+
+#hand {
+    height: 11em;
+    overflow-y: scroll;
+}
+
+#hand ol.card-list {
+    margin: 0 0 0 1.5em;
+    padding: 0.5em;
+    line-height: 1.5em;
 }

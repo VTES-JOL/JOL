@@ -75,7 +75,7 @@
 
                 <div>
                     <h4 class="header">Global Chat:</h4>
-                    <div class="info-area history" id="gchatwin">
+                    <div class="info-area chat-history" id="gchatwin">
                         <div id="gchattable"></div>
                     </div>
                     <form id="globalChatForm" action="javascript:doGlobalChat();" autocomplete='off'>

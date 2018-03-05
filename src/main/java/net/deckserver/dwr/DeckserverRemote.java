@@ -185,14 +185,11 @@ public class DeckserverRemote {
         return ret;
     }
 
-    public Map<String, Object> gameDeck(String game) {
+    public String gameDeck(String game) {
         String player = Utils.getPlayer(request);
         HttpServletResponse response = WebContextFactory.get().getHttpServletResponse();
         response.setContentType("text/javascript;charset=UTF-8");
-        String deck = JolAdmin.getInstance().getGameDeck(game, player);
-        Map<String, Object> ret = UpdateFactory.getUpdate();
-        ret.put("callbackShowGameDeck", deck);
-        return ret;
+        return JolAdmin.getInstance().getGameDeck(game, player);
     }
 
     public Map<String, Object> registerDeck(String game, String name) {

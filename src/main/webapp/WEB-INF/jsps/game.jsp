@@ -1,129 +1,120 @@
 <table class="game-table light">
     <tr>
-        <td class="game-cell command-cell">
-            <div id="hand"></div>
-        </td>
-        <td class="game-cell command-cell">
-            <div class="game-header">
-                <h5>Commands</h5>
-                <button id="gameDeck" onclick="doShowDeck();">Deck</button>
-            </div>
-            <form onsubmit="return doSubmit();" autocomplete='off' class="padded" id="dsForm">
-                <table>
-                    <tr id="phasecommand">
-                        <td>
-                            <label for="phase">Phase:</label>
-                        </td>
-                        <td>
-                            <select id="phase" name="phase"></select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="command">Command:</label>
-                        </td>
-                        <td>
-                            <input name="command" type="text" id="command" maxlength="100"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="chat">Chat:</label>
-                        </td>
-                        <td>
-                            <input name="chat" type="text" id="chat" maxlength="100"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="ping">Ping:</label>
-                        </td>
-                        <td>
-                            <select id="ping" name="ping"></select>
-                        </td>
-                    </tr>
-                    <tr id="endcommand">
-                        <td>
-                            <label for="endturn">End turn?</label>
-                        </td>
-                        <td>
-                            <select id="endturn" name="endturn">
-                                <option value="No">No</option>
-                                <option value="Yes">Yes</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input name="Submit" type="submit" value="Submit"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span id="status"></span>
-                        </td>
-                    </tr>
-                </table>
-            </form>
-            <form onsubmit="return doGameChat();" autocomplete="off" class="padded" id="judgeForm">
-                <table>
-                    <tr>
-                        <td>
-                            <label for="judgeChat">Judge Chat:</label>
-                        </td>
-                        <td>
-                            <input id="judgeChat" name="judgeChat" maxlength="100"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input name="Submit" type="submit" value="Submit"/>
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </td>
-        <td id="gameNotes" class="game-cell command-cell-double" colspan="2">
-            <div id="globalPad" class="half-height">
-                <div class="game-header">
-                    <h5>Global notes and pending actions:</h5>
+        <td class="no-padding">
+            <div id="game-info" class="container">
+                <div id="gameDetails" class="game-col col-6 container">
+                    <div id="playerHand" class="player-only game-col col-6 grey border-right border-bottom">
+                        <div class="game-header">
+                            <h5>Hand</h5>
+                        </div>
+                        <div id="hand"></div>
+                    </div>
+                    <div id="playerCommands" class="player-only game-col col-6 grey border-right border-bottom">
+                        <div class="game-header">
+                            <h5>Commands</h5>
+                        </div>
+                        <form onsubmit="return doSubmit()" autocomplete="off">
+                            <table class="full-width padded">
+                                <tr id="phaseCommand">
+                                    <td>
+                                        <label for="phase">Phase:</label>
+                                    </td>
+                                    <td>
+                                        <select id="phase" name="phase"></select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label for="command">Command:</label>
+                                    </td>
+                                    <td>
+                                        <input name="command" type="text" id="command" class="full-width"
+                                               maxlength="100"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label for="chat">Chat:</label>
+                                    </td>
+                                    <td>
+                                        <input name="chat" type="text" id="chat" class="full-width" maxlength="100"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label for="ping">Ping:</label>
+                                    </td>
+                                    <td>
+                                        <select id="ping" name="ping"></select>
+                                    </td>
+                                </tr>
+                                <tr id="endCommand">
+                                    <td>
+                                        <label for="endturn">End turn?</label>
+                                    </td>
+                                    <td>
+                                        <select id="endTurn" name="endturn">
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input name="Submit" type="submit" value="Submit"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <span id="status"></span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                    <div id="gameChatContainer" class="game-col col-8 border-right border-bottom">
+                        <div class="game-header">
+                            <h5>Game Chat</h5>
+                            <span class="" id="gameLabel"></span>
+                        </div>
+                        <div id="gameChat"></div>
+                    </div>
                 </div>
-                <textarea name="global" id="global"></textarea>
-            </div>
-            <div id="playerPad" class="half-height">
-                <div class="game-header">
-                    <h5>Private notes:</h5>
+                <div id="other" class="game-col col-4 grey border-right border-bottom">
+                    <div class="game-header">
+                        <h5>Game Information</h5>
+                        <select id="otherSelect" onchange="updateOther()">
+                            <option value="notes">Notes</option>
+                            <option value="history">History</option>
+                            <option value="deck">Deck</option>
+                        </select>
+                    </div>
+                    <div id="history" style="display:none;">
+                        <h5>History
+                            <select id="turns" onchange="getHistory()"></select>
+                        </h5>
+                        <div id="historyOutput" class="scrollable side-padded"></div>
+                    </div>
+                    <div id="notes" class="container">
+                        <div class="col-6 border-right fill-width">
+                            <h5>Global Notes</h5>
+                            <textarea id="globalNotes" class="game-notes"></textarea>
+                        </div>
+                        <div class="col-6 fill-width player-only">
+                            <h5>Private Notes</h5>
+                            <textarea id="privateNotes" class="game-notes"></textarea>
+                        </div>
+                    </div>
+                    <div id="gameDeck">
+                        <h5>Registered Deck</h5>
+                        <div id="gameDeckOutput" class="scrollable side-padded"></div>
+                    </div>
                 </div>
-                <textarea name="notes" id="notes"></textarea>
             </div>
         </td>
     </tr>
     <tr>
-        <td colspan="2" class="game-cell">
-            <div class="game-header">
-                <h5 id="gamename"></h5>
-                <span>Current Turn: <span id="turnlabel"></span></span>
-            </div>
-            <div id="curturn" class="history">
-                <div id="gameChat"></div>
-            </div>
-        </td>
-        <td colspan="2" class="game-cell">
-            <div class="game-header">
-                <h5>&nbsp;</h5>
-                <span>
-                <select title="turns" id="turns" name="turns" onchange="getHistory()"></select>
-                </span>
-            </div>
-            <div id="extra" class="history grey">
-                <input type="hidden" id="extraSelect" value="history"/>
-                <div id="history"></div>
-                <div id="gameDeckContents" class="padded" style="display: none;"></div>
-            </div>
-        </td>
+        <td id="state" colspan="4" class="no-padding"></td>
     </tr>
-    <tr>
-        <td colspan="4" id="state" class="no-padding">
-        </td>
-    </tr>
+</table>
 </table>

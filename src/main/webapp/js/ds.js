@@ -4,6 +4,7 @@ var timeInterval = null;
 var outageTime = null;
 var player = null;
 var currentPage = 'main';
+var currentOption = "notes";
 
 var profile = {
     email: "",
@@ -446,28 +447,34 @@ function doGameChat() {
 }
 
 function doShowDeck() {
-    DS.gameDeck(game, {callback: processData, errorHandler: errorhandler});
+    DS.gameDeck(game, {callback: callbackShowGameDeck, errorHandler: errorhandler});
 }
 
 function doSubmit() {
-    var phase, ping = null;
-    var command = $('#command').val();
-    var chat = $('#chat').val();
-    var endTurn = $('#endturn').val();
-    if (dwr.util.byId('phase') !== null) {
-        phase = $('#phase').val();
-    }
-    if (dwr.util.byId('ping').selectedIndex > 0) {
-        ping = $('#ping').val();
-    }
+    var phaseSelect = $("#phase");
+    var commandInput = $("#command");
+    var chatInput = $("#chat");
+    var pingSelect = $("#ping");
+    var endTurnSelect = $("#endTurn");
+    var globalNotes = $("#globalNotes");
+    var privateNotes = $("#privateNotes");
 
-    $('#command').val("");
-    $('#chat').val("");
-    $('#ping').val('NNNPPPP');
-    if (endTurn === "Yes") $('#phase').val("Unlock");
-    dwr.util.byId('endturn').selectedIndex = 0;
-    var global = $('#global').val();
-    var text = $('#notes').val();
+    var phase = phaseSelect.val();
+    var ping = pingSelect.val();
+    var command = commandInput.val();
+    var chat = chatInput.val();
+    var endTurn = endTurnSelect.val();
+    var global = globalNotes.val();
+    var text = privateNotes.val();
+    phase = phase === "" ? null : phase;
+    ping = ping === "" ? null : ping;
+    commandInput.val("");
+    chatInput.val("");
+    pingSelect.val("");
+    endTurnSelect.val("No");
+    if (endTurn === "Yes") {
+        phaseSelect.val("Unlock");
+    }
     DS.submitForm(game, phase, command, chat, ping, endTurn, global, text, {
         callback: processData,
         errorHandler: errorhandler
@@ -475,86 +482,107 @@ function doSubmit() {
     return false;
 }
 
+function updateOther() {
+    currentOption = $("#otherSelect").val();
+    switch (currentOption) {
+        case "notes":
+            showNotes();
+            break;
+        case "history":
+            showHistory();
+            break;
+        case "deck":
+            showGameDeck();
+            break;
+    }
+}
+
+function showGameDeck() {
+    $("#gameDeck").show();
+    $("#notes").hide();
+    $("#history").hide();
+    doShowDeck();
+}
+
+function showNotes() {
+    $("#notes").show();
+    $("#history").hide();
+    $("#gameDeck").hide();
+}
+
+function showHistory() {
+    $("#history").show();
+    $("#notes").hide();
+    $("#gameDeck").hide();
+    getHistory();
+}
 
 function loadGame(data) {
-    var turnSelect = $("#turns");
-    var gameChatDiv = $("#gameChat");
     if (!data.player) {
-        $("#hand").hide();
-        $("#playerPad").hide();
-        $("#dsForm").hide();
+        $(".player-only").hide();
     } else {
-        $("#hand").show();
-        $("#playerPad").show();
-        $("#dsForm").show();
+        $(".player-only").show();
     }
-    if (data.judge && !data.player) {
-        $("#judgeForm").show();
-    } else {
-        $("#judgeForm").hide();
+    $("#otherSelect").val(currentOption);
+    updateOther();
+    if (data.hand !== null) {
+        $("#hand").html(data.hand);
     }
-    if (data.hand !== null)
-        $('#hand').html(data.hand)
-    if (data.state !== null)
-        $('#state').html(data.state)
-    if (data.global !== null)
-        $('#global').val(data.global);
-    if (data.text !== null)
-        $('#notes').val(data.text);
+    if (data.state !== null) {
+        $("#state").html(data.state);
+    }
+    if (data.global !== null) {
+        $("#globalNotes").val(data.global);
+    }
+    if (data.text !== null) {
+        $("#privateNotes").val(data.text);
+    }
     if (data.label !== null) {
-        $('#turnlabel').text(data.label);
+        $("#gameLabel").text(data.label);
     }
     if (data.refresh > 0) {
         if (refresher !== null) clearTimeout(refresher);
         refresher = setTimeout("refreshState(false)", data.refresh);
     }
-    if (data.pingkeys !== null) {
-        var pingarr = [];
-        for (var i = 0; i < data.pingkeys.length; i++) {
-            pingarr[i] = {};
-            pingarr[i].key = data.pingkeys[i];
-            pingarr[i].value = data.pingvalues[i];
-        }
-        var pingSelection = $('#ping').val();
-        dwr.util.removeAllOptions('ping');
-        dwr.util.addOptions('ping', {"": "No ping"});
-        dwr.util.addOptions('ping', pingarr, 'value', 'key');
-        $('#ping').val(pingSelection);
+    if (data.ping !== null) {
+        var pingSelect = $("#ping");
+        pingSelect.empty();
+        pingSelect.append(new Option("",""));
+        $.each(data.ping, function(index,value) {
+           pingSelect.append(new Option(value, value));
+        });
     }
     if (data.turn !== null) {
+        var gameChatDiv = $("#gameChat");
         if (data.resetChat) {
             gameChatDiv.empty();
-            $("#history").empty();
-            $("#gameDeckContents").empty();
         }
-        renderChat('curturn', 'gameChat', data.turn);
+        renderChat('gameDetails', 'gameChat', data.turn);
     }
     if (data.turns !== null) {
-        var currentSelected = turnSelect.val();
-        var num = turnSelect.find("option").length;
+        var turnSelect = $("#turns");
         turnSelect.empty();
+        data.turns.shift();
         $.each(data.turns, function (index, turn) {
             turnSelect.append($(new Option(turn, turn)));
         });
-        if (currentSelected === null || currentSelected === data.turns[num]) {
-            turnSelect.val(data.turns[num]).change();
-        } else {
-            turnSelect.val(currentSelected).change();
-        }
     }
     if (data.phases !== null) {
-        var phasev = $('#phase').val();
-        dwr.util.byId('phasecommand').style.display = '';
-        dwr.util.byId('endcommand').style.display = '';
-        dwr.util.removeAllOptions('phase');
-        dwr.util.addOptions('phase', data.phases);
+        var phaseSelect = $("#phase");
+        var currentPhase = phaseSelect.val();
+        $("#phaseCommand").show();
+        $("#endCommand").show();
+        phaseSelect.empty();
+        $.each(data.phases, function (index, value) {
+            phase.append(new Option(value, value));
+        });
         if (data.turnChanged) {
-            phasev = 'Unlock';
+            currentPhase = "Unlock";
         }
-        $('#phase').val(phasev);
+        phaseSelect.val(currentPhase);
     } else {
-        dwr.util.byId('phasecommand').style.display = 'none';
-        dwr.util.byId('endcommand').style.display = 'none';
+        $("#phaseCommand").hide();
+        $("#endCommand").hide();
     }
     if (data.collapsed !== null) {
         for (var c in data.collapsed) {
@@ -597,30 +625,19 @@ function selectCard() {
     toggleVisible(divid, selected);
 }
 
-function selectHistory() {
-    var id = dwr.util.getValue("extraSelect");
-    dwr.util.setValue("extraSelect", "history");
-    toggleVisible('history', id);
-}
-
-function retrieveHistory() {
+function getHistory() {
     var turns = $('#turns').val();
     DS.getHistory(game, turns, {callback: loadHistory});
 }
 
-function getHistory() {
-    selectHistory();
-    retrieveHistory();
-}
-
 function loadHistory(data) {
-    var historyDiv = $("#history");
+    var historyDiv = $("#historyOutput");
     historyDiv.empty();
     $.each(data, function (index, content) {
         var turnContent = $("<p/>").addClass("chat").html(content);
         historyDiv.append(turnContent);
     });
-    generateCardData("#history");
+    generateCardData("#historyOutput");
 }
 
 function callbackSuper(data) {
@@ -707,18 +724,11 @@ function callbackShowDecks(data) {
 }
 
 function callbackShowGameDeck(data) {
-    var extraSelectInput = $("#extraSelect");
-    var deckContentsDiv = $("#gameDeckContents");
+    var deckContentsDiv = $("#gameDeckOutput");
     if (deckContentsDiv.html() === "") {
         var contents = data.split("\n").join("<br />");
-        var currentDiv = extraSelectInput.val();
-        $("#" + currentDiv).hide();
         deckContentsDiv.html(contents);
-        dwr.util.addOptions("cards", [{"id": "gameDeckContents", "name": "Deck"}], "id", "name");
     }
-    extraSelectInput.val("gameDeckContents");
-    dwr.util.setValue("cards", "gameDeckContents");
-    selectCard();
 }
 
 function callbackShowCards(data) {

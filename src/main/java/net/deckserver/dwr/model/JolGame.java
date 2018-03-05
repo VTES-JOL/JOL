@@ -51,8 +51,8 @@ public class JolGame {
     private static final String PING = "ping";
     private static final Logger logger = getLogger(JolGame.class);
     private static DateFormat format = new SimpleDateFormat("HH:mm M/d ");
-    private Game state = null;
-    private TurnRecorder actions = null;
+    private Game state;
+    private TurnRecorder actions;
 
     public JolGame(Game state, TurnRecorder actions) {
         this.state = state;

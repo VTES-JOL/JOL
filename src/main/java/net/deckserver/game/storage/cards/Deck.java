@@ -20,15 +20,13 @@ public class Deck {
 
     private static final Logger logger = LoggerFactory.getLogger(Deck.class);
 
-    final CardSearch search;
-    StringBuffer orig = new StringBuffer();
-    StringBuffer translated = new StringBuffer();
-    Collection<String> errors = new Vector<>();
-    boolean didTranslation = false;
-    int cryptsum = 0;
-    int decksum = 0;
-    boolean parseCards = true;
-    Map<CardEntry, Integer> cards = new HashMap<>();
+    private final CardSearch search;
+    private StringBuffer orig = new StringBuffer();
+    private Collection<String> errors = new Vector<>();
+    private int cryptSum = 0;
+    private int deckSum = 0;
+    private boolean parseCards = true;
+    private Map<CardEntry, Integer> cards = new HashMap<>();
     private Set<String> groups = new TreeSet<>();
     private boolean valid;
 
@@ -47,10 +45,10 @@ public class Deck {
                 //time();
                 int idx1 = deck.indexOf("L");
                 String sz = deck.substring(7, idx1);
-                cryptsum = Integer.parseInt(sz);
+                cryptSum = Integer.parseInt(sz);
                 int idx2 = deck.indexOf("G");
                 sz = deck.substring(idx1 + 1, idx2);
-                decksum = Integer.parseInt(sz);
+                deckSum = Integer.parseInt(sz);
                 //time();
                 int idx3 = deck.indexOf("@@@ZZZ");
                 for (int i = idx2 + 1; i < idx3; i++) {
@@ -103,11 +101,8 @@ public class Deck {
                 }
                 String id = processLine(line, ignoreTranslation);
                 if (id != null) {
-                    didTranslation = true;
-                    translated.append("Z@").append(id).append("@Z");
+                    boolean didTranslation = true;
                 }
-                translated.append(line);
-                translated.append('\n');
             }
         } catch (IOException ie) {
             logger.error("Error reading deck: {}", ie);
@@ -199,12 +194,12 @@ public class Deck {
 
     private void addCard(CardEntry card, int quantity) {
         if (card.isCrypt()) {
-            cryptsum += quantity;
+            cryptSum += quantity;
             if (!card.getGroup().toUpperCase().equals("ANY")) {
                 groups.add(card.getGroup());
             }
         } else
-            decksum += quantity;
+            deckSum += quantity;
         if (cards.containsKey(card))
             quantity += getQuantity(card);
         cards.put(card, quantity);
@@ -230,15 +225,15 @@ public class Deck {
     }
 
     public int getCryptSize() {
-        return cryptsum;
+        return cryptSum;
     }
 
     public int getLibSize() {
-        return decksum;
+        return deckSum;
     }
 
     public boolean isValid() {
-        return cryptsum >= 12 && decksum >= 60 && decksum <= 90 && validGroups();
+        return cryptSum >= 12 && deckSum >= 60 && deckSum <= 90 && validGroups();
     }
 
     public boolean validGroups() {

@@ -9,12 +9,6 @@
     <description>Vtes Online Web Client</description>
 
     <servlet>
-        <servlet-name>JolMain</servlet-name>
-        <jsp-file>/main.jsp</jsp-file>
-        <load-on-startup>10</load-on-startup>
-    </servlet>
-
-    <servlet>
         <servlet-name>dwr-invoker</servlet-name>
         <servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
         <init-param>
@@ -30,11 +24,6 @@
     <servlet-mapping>
         <servlet-name>dwr-invoker</servlet-name>
         <url-pattern>/dwr/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>JolMain</servlet-name>
-        <url-pattern>/main.jsp</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>

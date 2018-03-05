@@ -26,7 +26,7 @@ public class JyhadOnlineServletInitializer implements ServletContextListener {
         AdminBean.INSTANCE = new AdminBean();
         String environment = System.getProperty("jol.env", "production");
         servletContextEvent.getServletContext().setAttribute("environment", environment);
-        scheduler.scheduleAtFixedRate(new CardPersistenceJob(AdminBean.INSTANCE), 1, 5, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new ChatPersistenceJob(AdminBean.INSTANCE), 1, 5, TimeUnit.MINUTES);
         logger.info("Initialization complete");
     }
 

@@ -8,10 +8,7 @@ import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -78,8 +75,7 @@ public class GameView {
 
         int refresh = Utils.calc(admin.getGameTimeStamp(name));
 
-        String[] pingvalues = null;
-        String[] pingkeys = null;
+        List<String> ping = new ArrayList<>();
         String hand = null;
         String global = null;
         String text = null;
@@ -91,12 +87,7 @@ public class GameView {
         String[] collapsed = null;
 
         if (pingChanged && (isPlayer || isAdmin)) {
-            pingvalues = game.getPlayers();
-            pingkeys = new String[pingvalues.length];
-            for (int i = 0; i < pingvalues.length; i++) {
-                pingkeys[i] = pingvalues[i] + "("
-                        + game.getPingTag(pingvalues[i]) + ")";
-            }
+            ping = Arrays.asList(game.getPlayers());
         }
 
         if (isPlayer && stateChanged) {
@@ -168,7 +159,7 @@ public class GameView {
         clearAccess();
         String stamp = Utils.getDate();
         return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, global, text, label,
-                chatReset, tc, turn, turns, state, phases, pingkeys, pingvalues,
+                chatReset, tc, turn, turns, state, phases, ping,
                 collapsed, stamp);
     }
 
