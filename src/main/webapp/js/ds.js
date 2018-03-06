@@ -197,6 +197,7 @@ function removeLabeledRows(table, removedGames) {
 
 // Invoked via processData()
 function navigate(data) {
+    ga('send', 'pageview', data.target);
     $("#" + currentPage).hide();
     $("#" + data.target).show();
     currentPage = data.target;
@@ -523,6 +524,14 @@ function loadGame(data) {
     } else {
         $(".player-only").show();
     }
+    if (data.resetChat) {
+        $("#gameChat").empty();
+        $("#historyOutput").empty();
+        $("#gameDeckOutput").empty();
+        $("#globalNotes").empty();
+        $("#privateNotes").empty();
+        currentOption = "notes";
+    }
     $("#otherSelect").val(currentOption);
     updateOther();
     if (data.hand !== null) {
@@ -553,10 +562,6 @@ function loadGame(data) {
         });
     }
     if (data.turn !== null) {
-        var gameChatDiv = $("#gameChat");
-        if (data.resetChat) {
-            gameChatDiv.empty();
-        }
         renderChat('gameDetails', 'gameChat', data.turn);
     }
     if (data.turns !== null) {

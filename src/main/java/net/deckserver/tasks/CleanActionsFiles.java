@@ -1,31 +1,32 @@
-package net.deckserver.game.jaxb.state;
+package net.deckserver.tasks;
 
 import net.deckserver.game.jaxb.FileUtils;
-import net.deckserver.game.jaxb.actions.Action;
 import net.deckserver.game.jaxb.actions.GameActions;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+public class CleanActionsFiles {
 
-public class RegionUpdater {
+    public static void main(String[] args) throws Exception {
 
-    private static final String BASE_PATH = "/home/shannon/data/";
+        if (args.length == 0) {
+            System.out.println("Need to provide a file path");
+            System.exit(1);
+        }
 
-    @Test
-    public void updateCardLinks() throws Exception {
+        String basePath = args[0];
+
         Properties systemProperties = new Properties();
-        File systemFile = new File(BASE_PATH, "system.properties");
-        assertTrue(systemFile.exists());
+        File systemFile = new File(basePath, "system.properties");
+        if (!systemFile.exists()) {
+            System.out.println("Unable to find system.properties file at location " + basePath);
+            System.exit(1);
+        }
         try (FileReader systemReader = new FileReader(systemFile)) {
             systemProperties.load(systemReader);
         }
@@ -33,15 +34,20 @@ public class RegionUpdater {
         List<String> gameNames = systemProperties.stringPropertyNames().stream()
                 .filter(s -> s.startsWith("game"))
                 .collect(Collectors.toList());
-        assertFalse(gameNames.isEmpty());
 
+        if (!systemFile.exists()) {
+            System.out.println("Unable to find system.properties file at location " + basePath);
+            System.exit(1);
+        }
+
+        System.out.println("Updating " + gameNames.size() + " games with latest actions definitions");
         gameNames.stream()
-                .map(name -> Paths.get(BASE_PATH, name, "actions.xml").toFile())
+                .map(name -> Paths.get(basePath, name, "actions.xml").toFile())
                 .filter(File::exists)
-                .forEach(this::updateCardLinks);
+                .forEach(CleanActionsFiles::updateCardLinks);
     }
 
-    private void updateCardLinks(File actionsFile) {
+    private static void updateCardLinks(File actionsFile) {
         GameActions gameActions = FileUtils.loadGameActions(actionsFile);
         gameActions.getTurn().forEach(turn -> {
             turn.getAction()
@@ -53,6 +59,4 @@ public class RegionUpdater {
         });
         FileUtils.saveGameActions(gameActions, actionsFile);
     }
-
-
 }

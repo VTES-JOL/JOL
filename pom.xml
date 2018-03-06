@@ -149,6 +149,34 @@
                     <portOffset>1000</portOffset>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>tasks</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <finalName>cleanActions</finalName>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>libs/</classpathPrefix>
+                            <mainClass>
+                                net.deckserver.tasks.CleanActionsFiles
+                            </mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
