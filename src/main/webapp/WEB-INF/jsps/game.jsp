@@ -86,7 +86,7 @@
                         <select id="otherSelect" onchange="updateOther()">
                             <option value="notes">Notes</option>
                             <option value="history">History</option>
-                            <option value="deck">Deck</option>
+                            <option value="deck" class="player-only">Deck</option>
                         </select>
                     </div>
                     <div id="history" style="display:none;">
