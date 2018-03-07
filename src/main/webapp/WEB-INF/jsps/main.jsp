@@ -75,8 +75,8 @@
 
                 <div>
                     <h4 class="header">Global Chat:</h4>
-                    <div class="info-area chat-history" id="gchatwin">
-                        <div id="gchattable"></div>
+                    <div class="info-area" id="gchatwin">
+                        <div id="globalChatOutput" class="scrollable side-padded"></div>
                     </div>
                     <form id="globalChatForm" action="javascript:doGlobalChat();" autocomplete='off'>
                         <input type="text" maxlength="200" id="gchat" placeholder="Chat with players"/>

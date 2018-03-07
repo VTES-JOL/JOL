@@ -72,22 +72,16 @@ function renderButton(data) {
     });
 }
 
-function renderChat(did, id, data) {
+function renderChat(id, data) {
     if (data === null) {
         return;
-    }
-    var chatDiv = $("#" + did);
-    var curScroll = chatDiv.scrollTop();
-    chatDiv.scrollTop(100000);
-    if (chatDiv.scrollTop() === curScroll) {
-        curScroll = 1000000;
     }
     var chatOutputDiv = $("#" + id);
     $.each(data, function (index, chat) {
         var chatLine = $("<p/>").addClass("chat").html(chat);
         chatOutputDiv.append(chatLine);
     });
-    chatDiv.scrollTop(curScroll);
+    chatOutputDiv.scrollTop(chatOutputDiv.prop("scrollHeight") - chatOutputDiv.prop("clientHeight"));
 }
 
 function renderRowWithLabel(tid, label) {
@@ -571,7 +565,7 @@ function loadGame(data) {
         });
     }
     if (data.turn !== null) {
-        renderChat('gameDetails', 'gameChat', data.turn);
+        renderChat('gameChatOutput', data.turn);
     }
     if (data.turns !== null) {
         var turnSelect = $("#turns");
@@ -609,7 +603,6 @@ function loadGame(data) {
 function generateCardData(parent) {
     tippy(parent + ' a.card-name', {
         placement: 'right',
-        flipBehavior: 'clockwise',
         arrow: true,
         onShow: function (instance) {
             const content = this.querySelector('.tippy-content');
@@ -766,7 +759,7 @@ function callbackMain(data) {
     if (data.loggedIn) {
         toggleVisible('player', 'register');
         toggleVisible('globalchat', 'welcome');
-        renderChat('gchatwin', 'gchattable', data.chat);
+        renderChat('globalChatOutput', data.chat);
         renderOnline('whoson', data.who);
         renderMyGames(data.myGames);
         renderActiveGames(data.games);

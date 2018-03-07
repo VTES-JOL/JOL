@@ -74,7 +74,7 @@
                 <h5>Game Chat</h5>
                 <span class="" id="gameLabel"></span>
             </div>
-            <div id="gameChat" class="scrollable side-padded half-height-content light border-top"></div>
+            <div id="gameChatOutput" class="scrollable side-padded half-height-content light border-top"></div>
         </div>
     </div>
     <div id="other" class="col-4 grey border-left">
