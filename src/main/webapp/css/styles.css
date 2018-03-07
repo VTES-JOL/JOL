@@ -469,6 +469,7 @@ table.game-table td.player-active {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     border: 0;
+    border-collapse: collapse;
 }
 
 .scrollable {
@@ -615,6 +616,15 @@ small.life {
     -webkit-column-count: 2;
     -moz-column-count: 2;
     column-count: 2;
+    column-width: 10em;
 
     list-style-position: inside;
+}
+
+.region-empty-true {
+    display: none;
+}
+
+.region-empty-false {
+    display: block;
 }

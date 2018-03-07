@@ -41,4 +41,8 @@ public class RegionParams {
     public String getIndex() {
         return index;
     }
+
+    public boolean isEmpty() {
+        return cards.length == 0;
+    }
 }    
