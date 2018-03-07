@@ -28,7 +28,7 @@
                         <tr>
                             <td colspan="2">
                                 <div class="g-recaptcha"
-                                     data-sitekey="<%= System.getProperty("recaptcha.key") %>"></div>
+                                     data-sitekey="<%= System.getenv("JOL_RECAPTCHA_KEY") %>"></div>
                             </td>
                         </tr>
                         <tr>

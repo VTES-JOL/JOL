@@ -4,7 +4,7 @@
 <html>
     <head>
         <title>V:TES Online</title>
-        <link rel="stylesheet" type="text/css" href="css/styles.css?version=<%= System.getProperty("jol.version")%>"/>
+        <link rel="stylesheet" type="text/css" href="css/styles.css?version=<%= System.getenv("jol.version")%>"/>
         <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery-ui.structure.min.css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery-ui.theme.min.css"/>
@@ -68,7 +68,7 @@
         <script type='text/javascript' src='dwr/interface/DS.js'></script>
         <script type='text/javascript' src='dwr/util.js'></script>
         <script src="https://unpkg.com/tippy.js@2.2.3/dist/tippy.all.min.js"></script>
-        <script type='text/javascript' src='js/ds.js?version=<%= System.getProperty("jol.version")%>'></script>
+        <script type='text/javascript' src='js/ds.js?version=<%= System.getenv("jol.version")%>'></script>
         <script src='https://www.google.com/recaptcha/api.js'></script>
     </body>
 </html>

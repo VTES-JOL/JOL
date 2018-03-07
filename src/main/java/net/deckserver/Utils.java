@@ -29,7 +29,7 @@ public class Utils {
     private static final DateFormat format = new SimpleDateFormat("d-MMM HH:mm zz ");
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
     private static final String url = "https://www.google.com/recaptcha/api/siteverify";
-    private static final String secret = System.getProperty("recaptcha.secret");
+    private static final String secret = System.getenv("JOL_RECAPTCHA_SECRET");
     private final static String USER_AGENT = "Mozilla/5.0";
 
 

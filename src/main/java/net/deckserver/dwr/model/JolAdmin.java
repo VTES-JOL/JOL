@@ -27,7 +27,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
 
-import static java.lang.System.getProperty;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -37,7 +36,7 @@ public class JolAdmin {
 
     private static final Date startDate = new Date();
     private static final Logger logger = getLogger(JolAdmin.class);
-    private static final JolAdmin INSTANCE = new JolAdmin(getProperty("jol.data"));
+    private static final JolAdmin INSTANCE = new JolAdmin(System.getenv("JOL_DATA"));
     private static CardSearch CARD_DATA = null;
     private final String dir;
     private final SystemInfo sysInfo;
