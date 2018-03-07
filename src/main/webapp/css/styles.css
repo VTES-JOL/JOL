@@ -57,7 +57,7 @@ td a:hover {
 }
 
 #globalChatOutput {
-    height: 40vh;
+    height: 30em;
 }
 
 p.chat {
@@ -490,7 +490,7 @@ table.game-table td.player-active {
 }
 
 #gameDetails > div {
-    height: 25vh;
+    height: 15em;
 }
 
 #game-info div, #game-info textarea {
@@ -508,30 +508,31 @@ textarea.game-notes {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     width: 100%;
+    font-size: 1em;
 }
 
 .full-height {
-    height: 50vh;
+    height: 30em;
 }
 
 .full-height-content {
-    height: calc(50vh - 1.5em);
+    height: 28.5em;
 }
 
 .full-height-content-header {
-    height: calc(50vh - 4em - 1px);
+    height: calc(27em - 6px);
 }
 
 .half-height {
-    height: 25vh;
+    height: 15em;
 }
 
 .half-height-content {
-    height: calc(25vh - 1.5em);
+    height: 13.5em;
 }
 
 .half-height-content-header {
-    height: calc(25vh - 4em - 1px);
+    height: calc(12em - 6px);
 }
 
 .notes-header {
@@ -649,12 +650,6 @@ small.life {
     margin: 0;
     padding: 0.2em 0.5em 0.2em 0.5em;
     line-height: 1.5em;
-
-    -webkit-column-count: 2;
-    column-count: 2;
-    -webkit-column-width: 10em;
-    column-width: 10em;
-
     list-style-position: inside;
 }
 

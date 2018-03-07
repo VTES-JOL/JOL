@@ -95,11 +95,11 @@
         <div id="notes" class="container reactive-height-content">
             <div class="col-6 fill-width">
                 <h5 class="notes-header">Global Notes</h5>
-                <textarea id="globalNotes" class="game-notes border-right reactive-height-content-header"></textarea>
+                <textarea id="globalNotes" class="game-notes border-right reactive-height-content-header side-padded"></textarea>
             </div>
             <div class="col-6 fill-width player-only">
                 <h5 class="notes-header">Private Notes</h5>
-                <textarea id="privateNotes" class="game-notes reactive-height-content-header"></textarea>
+                <textarea id="privateNotes" class="game-notes reactive-height-content-header side-padded"></textarea>
             </div>
         </div>
         <div id="gameDeck" class="reactive-height-content">
