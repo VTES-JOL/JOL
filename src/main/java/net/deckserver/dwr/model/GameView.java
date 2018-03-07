@@ -86,9 +86,7 @@ public class GameView {
         String[] phases = null;
         String[] collapsed = null;
 
-        if (pingChanged && (isPlayer || isAdmin)) {
-            ping = Arrays.asList(game.getPlayers());
-        }
+        ping = Arrays.asList(game.getPlayers());
 
         if (isPlayer && stateChanged) {
             try {
