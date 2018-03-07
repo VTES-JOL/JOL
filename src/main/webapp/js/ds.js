@@ -519,7 +519,7 @@ function loadGame(data) {
         $(".player-only").show();
     }
     if (data.resetChat) {
-        $("#gameChat").empty();
+        $("#gameChatOutput").empty();
         $("#historyOutput").empty();
         $("#gameDeckOutput").empty();
         $("#globalNotes").empty();
