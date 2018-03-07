@@ -11,7 +11,10 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <dataDir>${basedir}/src/test/resources</dataDir>
+        <JOL_DATA>${basedir}/src/test/resources</JOL_DATA>
+        <JOL_VERSION>${project.version}</JOL_VERSION>
+        <JOL_RECAPTCHA_KEY>***REMOVED***</JOL_RECAPTCHA_KEY>
+        <JOL_RECAPTCHA_SECRET>***REMOVED***</JOL_RECAPTCHA_SECRET>
     </properties>
 
     <dependencies>
@@ -124,19 +127,6 @@
                 <version>2.2</version>
                 <configuration>
                     <path>/jol</path>
-                    <systemProperties>
-                        <JAVA_OPTS>-Xms256M -Xmx256M</JAVA_OPTS>
-                        <mail.smtp.port>1025</mail.smtp.port>
-                        <mail.debug>true</mail.debug>
-                        <jol.data>${dataDir}</jol.data>
-                        <jol.email>jol@localhost</jol.email>
-                        <jol.env>dev</jol.env>
-                        <jol.version>${project.version}</jol.version>
-                        <recaptcha.key>***REMOVED***</recaptcha.key>
-                        <recaptcha.secret>***REMOVED***</recaptcha.secret>
-                        <tomcat.username>tomcat-deploy</tomcat.username>
-                        <tomcat.password>local-deploy</tomcat.password>
-                    </systemProperties>
                 </configuration>
             </plugin>
             <plugin>
@@ -188,5 +178,11 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>local</id>
+        </profile>
+    </profiles>
 
 </project>

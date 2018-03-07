@@ -532,7 +532,7 @@ function loadGame(data) {
         $(".reactive-height-content-header").addClass("half-height-content-header").removeClass("full-height-content-header");
     } else {
         $(".reactive-height").addClass("full-height").removeClass("half-height");
-        $(".reactive-height-content").addClass("full-height-content").addClass("half-height-content");
+        $(".reactive-height-content").addClass("full-height-content").removeClass("half-height-content");
         $(".reactive-height-content-header").addClass("full-height-content-header").removeClass("half-height-content-header");
     }
     $("#otherSelect").val(currentOption);
