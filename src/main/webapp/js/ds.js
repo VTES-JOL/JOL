@@ -609,6 +609,7 @@ function loadGame(data) {
 function generateCardData(parent) {
     tippy(parent + ' a.card-name', {
         placement: 'right',
+        flipBehavior: 'clockwise',
         arrow: true,
         onShow: function (instance) {
             const content = this.querySelector('.tippy-content');

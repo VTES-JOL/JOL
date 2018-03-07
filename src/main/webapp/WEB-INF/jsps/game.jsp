@@ -1,4 +1,4 @@
-<div id="game-info" class="container reactive-height">
+<div id="game-info" class="container reactive-height border-bottom">
     <div id="gameDetails" class="col-6 container">
         <div id="playerHand" class="player-only col-6 grey border-right">
             <div class="game-header">

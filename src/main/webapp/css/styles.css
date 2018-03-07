@@ -412,6 +412,12 @@ table.game-table td.command-cell {
     background-color: #eee;
 }
 
+table.game-table ol.card-list {
+    margin: 0 0 0 1.5em;
+    padding: 0.5em;
+    line-height: 1.5em;
+}
+
 td.player ol.card-list li {
     border: 1px solid #aaa;
     border-right-color: black;
@@ -485,7 +491,7 @@ textarea.game-notes {
 }
 
 .full-height-content-header {
-    height: calc(50vh - 4em);
+    height: calc(50vh - 4em - 1px);
 }
 
 .half-height {
@@ -497,7 +503,7 @@ textarea.game-notes {
 }
 
 .half-height-content-header {
-    height: calc(25vh - 4em);
+    height: calc(25vh - 4em - 1px);
 }
 
 .notes-header {
@@ -602,7 +608,13 @@ small.life {
 }
 
 #hand ol.card-list {
-    margin: 0 0 0 1.5em;
-    padding: 0.5em;
+    margin: 0;
+    padding: 0.2em 0.5em 0.2em 0.5em;
     line-height: 1.5em;
+
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;
+
+    list-style-position: inside;
 }
