@@ -8,6 +8,7 @@ import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -194,11 +195,11 @@ public class GameView {
             collapsed.add(id);
     }
 
-    public long getTimestamp() {
+    public LocalDateTime getTimestamp() {
         if (isPlayer) {
-            return JolAdmin.getInstance().getAccess(name, player).getTime();
+            return JolAdmin.getInstance().getAccess(name, player);
         } else {
-            return (new Date()).getTime();
+            return LocalDateTime.now();
         }
     }
 

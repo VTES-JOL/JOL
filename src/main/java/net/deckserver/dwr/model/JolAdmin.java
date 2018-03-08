@@ -25,6 +25,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.*;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -34,7 +36,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class JolAdmin {
 
-    private static final Date startDate = new Date();
+    private static final LocalDateTime startDate = LocalDateTime.now();
     private static final Logger logger = getLogger(JolAdmin.class);
     private static final JolAdmin INSTANCE = new JolAdmin(System.getenv("JOL_DATA"));
     private static CardSearch CARD_DATA = null;
@@ -87,7 +89,7 @@ public class JolAdmin {
         return ret;
     }
 
-    public Date getSystemStart() {
+    public LocalDateTime getSystemStart() {
         return startDate;
     }
 
@@ -151,7 +153,7 @@ public class JolAdmin {
         player.recordAccess();
     }
 
-    public Date getLastAccess(String playerName) {
+    public LocalDateTime getLastAccess(String playerName) {
         PlayerInfo player = getPlayerInfo(playerName);
         return player.getLastAccess();
     }
@@ -272,9 +274,8 @@ public class JolAdmin {
         return getPlayerInfo(playerName).doInteractive();
     }
 
-    public Date getGameTimeStamp(String gameName) {
-        Date gameTimeStamp = getGameInfo(gameName).getTimeStamp();
-        logger.trace("Game timestamp for {} is {}", gameName, gameTimeStamp);
+    public LocalDateTime getGameTimeStamp(String gameName) {
+        LocalDateTime gameTimeStamp = getGameInfo(gameName).getTimeStamp();
         return gameTimeStamp;
     }
 
@@ -282,10 +283,8 @@ public class JolAdmin {
         getGameInfo(gameName).recordAccess(playerName);
     }
 
-    public Date getAccess(String name, String player) {
-        Date accessDate = getGameInfo(name).getAccessed(player);
-        logger.trace("Player {} accessed game {} at {}", player, name, accessDate);
-        return accessDate;
+    public LocalDateTime getAccess(String name, String player) {
+        return getGameInfo(name).getAccessed(player);
     }
 
     public void setGP(String gamename, String prop, String value) {
@@ -326,7 +325,7 @@ public class JolAdmin {
         private final String prefix;
         JolGame game;
         String gameName;
-        Map<String, Date> playerAccess = new HashMap<>(8);
+        Map<String, LocalDateTime> playerAccess = new HashMap<>(8);
         private Game state;
 
         private TurnRecorder actions;
@@ -360,24 +359,23 @@ public class JolAdmin {
             return game;
         }
 
-        Date getTimeStamp() {
+        LocalDateTime getTimeStamp() {
             String ts = info.getProperty("timestamp");
             if (ts == null)
-                return new Date();
-            long timestamp = Long.parseLong(ts);
-            return new Date(timestamp);
+                return LocalDateTime.now();
+            return LocalDateTime.parse(ts);
         }
 
         void recordAccess(String player) {
-            playerAccess.put(player, new Date());
+            playerAccess.put(player, LocalDateTime.now());
         }
 
         public Collection<String> getAccessed() {
             return playerAccess.keySet();
         }
 
-        Date getAccessed(String player) {
-            Date ret = playerAccess.get(player);
+        LocalDateTime getAccessed(String player) {
+            LocalDateTime ret = playerAccess.get(player);
             if (ret == null)
                 return startDate;
             return ret;
@@ -504,8 +502,8 @@ public class JolAdmin {
 
         public long getRegisteredPlayerCount() {
             return info.entrySet().stream()
-                    .filter(e -> ((String)e.getKey()).startsWith("player"))
-                    .filter(e -> ((String)e.getValue()).startsWith("deck"))
+                    .filter(e -> ((String) e.getKey()).startsWith("player"))
+                    .filter(e -> ((String) e.getValue()).startsWith("deck"))
                     .count();
         }
 
@@ -524,7 +522,7 @@ public class JolAdmin {
         protected void write() {
             dowrite();
             playerAccess.clear();
-            info.setProperty("timestamp", (new Date()).getTime() + "");
+            info.setProperty("timestamp", LocalDateTime.now().toString());
         }
 
         synchronized void dowrite() {
@@ -595,13 +593,15 @@ public class JolAdmin {
         }
 
         void recordAccess() {
-            info.setProperty("time", (new Date()).getTime() + "");
+            info.setProperty("timestamp", LocalDateTime.now().toString());
         }
 
-        Date getLastAccess() {
-            String str = info.getProperty("time");
-            long time = Long.parseLong(str);
-            return new Date(time);
+        LocalDateTime getLastAccess() {
+            String str = info.getProperty("timestamp");
+            if (str == null) {
+                return LocalDateTime.of(2000, Month.JANUARY, 1, 0, 0);
+            }
+            return LocalDateTime.parse(str);
         }
 
         void addGame(String name, String key) {

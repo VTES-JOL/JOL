@@ -9,12 +9,15 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 
 public class AdminBean {
 
-    public static final long TIMEOUT_INTERVAL = 600000;
+    public static final Duration TIMEOUT_INTERVAL = Duration.of(10, ChronoUnit.MINUTES);
     public static AdminBean INSTANCE = null;
     private static Logger logger = LoggerFactory.getLogger(AdminBean.class);
     private static int CHAT_STORAGE = 1000;
@@ -26,7 +29,7 @@ public class AdminBean {
     private Collection<GameModel> activeSort = new TreeSet<>();
     private List<GameModel> actives;
     private volatile List<String> chats = new ArrayList<>();
-    private Date timestamp = new Date();
+    private LocalDateTime timestamp = LocalDateTime.now();
     private String[] admins = new String[0];
 
     private File chatPersistenceFile = new File(System.getenv("JOL_DATA"), "global_chat.txt");
@@ -109,7 +112,7 @@ public class AdminBean {
             chats = chats.subList(CHAT_DISCARD, CHAT_STORAGE);
         }
         PlayerModel[] players = pmap.values().toArray(new PlayerModel[0]);
-        timestamp = new Date();
+        timestamp = LocalDateTime.now();
         for (PlayerModel player : players) {
             if (!checkViewTime(player))
                 player.chat(chat);
@@ -119,15 +122,14 @@ public class AdminBean {
     private boolean checkViewTime(PlayerModel model) {
         if (model.getPlayer() == null)
             return true;
-        if (timestamp.getTime() - model.getTimestamp() >
-                TIMEOUT_INTERVAL) {
+        if (model.getTimestamp().plus(TIMEOUT_INTERVAL).isBefore(timestamp)) {
             remove(model.getPlayer());
             return true;
         }
         return false;
     }
 
-    public Date getTimestamp() {
+    public LocalDateTime getTimestamp() {
         return timestamp;
     }
 

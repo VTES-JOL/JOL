@@ -6,7 +6,7 @@ import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.JolGame;
 import net.deckserver.game.storage.cards.Deck;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class PlayerSummaryBean {
 
@@ -47,13 +47,13 @@ public class PlayerSummaryBean {
             if (view != null) {
                 this.current = !view.isChanged();
             } else {
-                Date access = admin.getAccess(this.game, player);
-                Date timestamp = admin.getGameTimeStamp(this.game);
-                Date systemStart = admin.getSystemStart();
+                LocalDateTime access = admin.getAccess(this.game, player);
+                LocalDateTime timestamp = admin.getGameTimeStamp(this.game);
+                LocalDateTime systemStart = admin.getSystemStart();
                 if (timestamp.compareTo(systemStart) < 0) {
                     timestamp = systemStart;
                 }
-                this.current = timestamp.before(access);
+                this.current = timestamp.isBefore(access);
             }
         }
     }

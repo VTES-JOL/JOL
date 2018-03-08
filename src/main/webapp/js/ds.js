@@ -562,9 +562,9 @@ function loadGame(data) {
     if (data.ping !== null) {
         var pingSelect = $("#ping");
         pingSelect.empty();
-        pingSelect.append(new Option("",""));
-        $.each(data.ping, function(index,value) {
-           pingSelect.append(new Option(value, value));
+        pingSelect.append(new Option("", ""));
+        $.each(data.ping, function (index, value) {
+            pingSelect.append(new Option(value, value));
         });
     }
     if (data.turn !== null) {
@@ -653,6 +653,23 @@ function loadHistory(data) {
 
 function callbackSuper(data) {
 
+    var adminList = $("#adminList");
+    adminList.empty();
+
+    var judgeList = $("#judgeList");
+    judgeList.empty();
+
+    $.each(data.admins, function (index, value) {
+        var adminRow = $("<tr/>");
+        adminRow.append($("<td/>").text(value));
+        adminList.append(adminRow);
+    });
+
+    $.each(data.judges, function (index, value) {
+        var judgeRow = $("<tr/>");
+        judgeRow.append($("<td/>").text(value));
+        judgeList.append(judgeRow);
+    });
 }
 
 function callbackProfile(data) {

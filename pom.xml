@@ -150,18 +150,18 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <classifier>tasks</classifier>
+                            <classifier>task</classifier>
                         </configuration>
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>cleanActions</finalName>
+                    <finalName>updateData</finalName>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
                             <mainClass>
-                                net.deckserver.tasks.CleanActionsFiles
+                                net.deckserver.tasks.UpdateData
                             </mainClass>
                         </manifest>
                     </archive>

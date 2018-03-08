@@ -18,15 +18,16 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.URL;
 import java.text.CharacterIterator;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
 
-    private static final DateFormat format = new SimpleDateFormat("d-MMM HH:mm zz ");
+    private static final DateTimeFormatter CHAT_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm zz ");
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
     private static final String url = "https://www.google.com/recaptcha/api/siteverify";
     private static final String secret = System.getenv("JOL_RECAPTCHA_SECRET");
@@ -115,7 +116,7 @@ public class Utils {
     }
 
     static public String getDate() {
-        return Utils.format.format(new Date());
+        return LocalDateTime.now().format(CHAT_FORMAT);
     }
 
     public static String sanitizeName(String name) {
@@ -175,9 +176,9 @@ public class Utils {
         return c.stream().mapToInt(i -> i).sum();
     }
 
-    public static int calc(Date from) {
-        Date to = new Date();
-        long interval = to.getTime() - from.getTime();
+    public static int calc(LocalDateTime from) {
+        LocalDateTime to = LocalDateTime.now();
+        long interval = Duration.between(from, to).getSeconds();
         if (interval < 10000) return 5000;
         if (interval < 60000) return 10000;
         if (interval < 300000) return 30000;

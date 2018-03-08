@@ -5,6 +5,7 @@ import net.deckserver.dwr.bean.DeckSummaryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -62,8 +63,8 @@ public class PlayerModel implements Comparable {
         if (player != null) JolAdmin.getInstance().recordAccess(player);
     }
 
-    public long getTimestamp() {
-        return JolAdmin.getInstance().getLastAccess(player).getTime();
+    public LocalDateTime getTimestamp() {
+        return JolAdmin.getInstance().getLastAccess(player);
     }
 
     public String getView() {

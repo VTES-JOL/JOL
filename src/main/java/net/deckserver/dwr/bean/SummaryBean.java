@@ -4,15 +4,13 @@ import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
 import net.deckserver.dwr.model.JolAdmin;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 
 public class SummaryBean {
 
-    private static DateFormat format = new SimpleDateFormat("HH:mm M/d ");
     private String game;
     private String access = "none";
     private String turn = null;
@@ -34,8 +32,8 @@ public class SummaryBean {
         }
     }
 
-    private String getDate(long timestamp) {
-        return format.format(new Date(timestamp));
+    private String getDate(LocalDateTime timestamp) {
+        return timestamp.format(DateTimeFormatter.ISO_DATE_TIME);
     }
 
     public String getAccess() {

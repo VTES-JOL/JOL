@@ -16,9 +16,12 @@ import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.cards.Deck;
 import org.slf4j.Logger;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Vector;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -50,7 +53,7 @@ public class JolGame {
     private static final String UNTAPPED = "untap";
     private static final String PING = "ping";
     private static final Logger logger = getLogger(JolGame.class);
-    private static DateFormat format = new SimpleDateFormat("HH:mm M/d ");
+    private static DateTimeFormatter SIMPLE_FORMAT = DateTimeFormatter.ofPattern("HH:mm M/d ");
     private Game state;
     private TurnRecorder actions;
 
@@ -436,7 +439,7 @@ public class JolGame {
     }
 
     private String getDate() {
-        return format.format(new Date());
+        return LocalDateTime.now().format(SIMPLE_FORMAT);
     }
 
     public GameAction[] getActions(String turn) {

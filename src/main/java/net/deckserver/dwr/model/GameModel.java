@@ -7,7 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
-import java.text.DateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class GameModel implements Comparable {
@@ -15,14 +16,14 @@ public class GameModel implements Comparable {
     private static Logger logger = LoggerFactory.getLogger(GameModel.class);
 
     private String name;
-    private long timestamp;
+    private LocalDateTime timestamp;
     private Map<String, GameView> views = new HashMap<>();
     private SummaryBean sumbean;
 
     public GameModel(String name) {
         this.name = name;
         if (isActive()) JolAdmin.getInstance().getGame(name);  // make sure its loaded
-        timestamp = JolAdmin.getInstance().getGameTimeStamp(name).getTime();
+        timestamp = JolAdmin.getInstance().getGameTimeStamp(name);
         regen();
     }
 
@@ -162,7 +163,7 @@ public class GameModel implements Comparable {
     }
 
     private void doReload(boolean stateChanged, boolean phaseChanged, boolean pingChanged, boolean globalChanged, boolean turnChanged) {
-        timestamp = JolAdmin.getInstance().getGameTimeStamp(name).getTime();
+        timestamp = JolAdmin.getInstance().getGameTimeStamp(name);
         for (String key : (new ArrayList<>(views.keySet()))) {
             GameView view = views.get(key);
             //		if(checkViewTime(key, view,timestamp)) continue;
@@ -201,12 +202,10 @@ public class GameModel implements Comparable {
     }
 
     public String getDate() {
-        Date d = new Date(timestamp);
-        DateFormat df = DateFormat.getDateTimeInstance();
-        return df.format(d);
+        return timestamp.format(DateTimeFormatter.ISO_DATE_TIME);
     }
 
-    public long getTimestamp() {
+    public LocalDateTime getTimestamp() {
         return timestamp;
     }
 
