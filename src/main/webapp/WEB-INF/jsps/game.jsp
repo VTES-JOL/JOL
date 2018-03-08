@@ -93,9 +93,9 @@
             <div id="historyOutput" class="scrollable side-padded reactive-height-content-header"></div>
         </div>
         <div id="notes" class="container reactive-height-content">
-            <div class="col-6 fill-width">
+            <div class="col-6 fill-width border-right">
                 <h5 class="notes-header">Global Notes</h5>
-                <textarea id="globalNotes" class="game-notes border-right reactive-height-content-header side-padded"></textarea>
+                <textarea id="globalNotes" class="game-notes reactive-height-content-header side-padded"></textarea>
             </div>
             <div class="col-6 fill-width player-only">
                 <h5 class="notes-header">Private Notes</h5>

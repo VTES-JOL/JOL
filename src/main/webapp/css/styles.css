@@ -127,6 +127,14 @@ td.help-command {
     clear: both;
 }
 
+#buttons button {
+    margin-right: 0.25em;
+}
+
+#buttons button.active-button {
+    font-weight: bold;
+}
+
 .container {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -252,20 +260,29 @@ ul.deck-list {
     background-color: #eee;
 }
 
+.full-border {
+    border: 1px solid #aaa !important;
+    border-collapse: collapse;
+}
+
 .border-left {
     border-left: 1px solid #aaa !important;
+    border-collapse: collapse;
 }
 
 .border-right {
     border-right: 1px solid #aaa !important;
+    border-collapse: collapse;
 }
 
 .border-top {
     border-top: 1px solid #aaa !important;
+    border-collapse: collapse;
 }
 
 .border-bottom {
     border-bottom: 1px solid #aaa !important;
+    border-collapse: collapse;
 }
 
 h2.header, h3.header, h4.header, h5.header {

@@ -68,6 +68,9 @@ function renderButton(data) {
         var button = $("<button/>").text(value).click(key, function () {
             DS.navigate(key, {callback: processData, errorHandler: errorhandler});
         });
+        if (game === value || currentPage.toLowerCase() === key.toLowerCase()) {
+            button.addClass("active-button");
+        }
         buttonsDiv.append(button);
     });
 }
@@ -195,6 +198,7 @@ function navigate(data) {
     $("#" + currentPage).hide();
     $("#" + data.target).show();
     currentPage = data.target;
+    game = data.game;
     $("#buttons").empty();
     renderButton({main: "Main" + (data.chats ? " *" : "")});
     if (data.player === null) {
@@ -217,7 +221,6 @@ function navigate(data) {
         player = data.player;
     }
     renderButton({help: "Help", _guides: "Guides"});
-    game = data.game;
     $("#gamename").text(game !== null ? game : '');
 }
 
