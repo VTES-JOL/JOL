@@ -21,13 +21,14 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
 
-    private static final DateTimeFormatter CHAT_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm zz ");
+    private static final DateTimeFormatter CHAT_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm zz");
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
     private static final String url = "https://www.google.com/recaptcha/api/siteverify";
     private static final String secret = System.getenv("JOL_RECAPTCHA_SECRET");
@@ -116,7 +117,7 @@ public class Utils {
     }
 
     static public String getDate() {
-        return LocalDateTime.now().format(CHAT_FORMAT);
+        return ZonedDateTime.now().format(CHAT_FORMAT);
     }
 
     public static String sanitizeName(String name) {

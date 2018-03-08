@@ -1,15 +1,13 @@
 package net.deckserver.dwr.model;
 
 import net.deckserver.dwr.bean.AdminBean;
+import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.DeckSummaryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PlayerModel implements Comparable {
@@ -19,14 +17,14 @@ public class PlayerModel implements Comparable {
     private String view;
     private String[] games = new String[0];
     private String game = null;
-    private Collection<String> chats = new ArrayList<>();
+    private List<ChatEntryBean> chats = new ArrayList<>();
     private String tmpDeck;
     private String tmpDeckName;
     private List<DeckSummaryBean> decks = new ArrayList<>();
     private Collection<String> removedGames = new ArrayList<>(2);
     private Collection<String> changedGames = new ArrayList<>();
 
-    public PlayerModel(AdminBean abean, String name, List<String> chatin) {
+    public PlayerModel(AdminBean abean, String name, List<ChatEntryBean> chatin) {
         logger.trace("Creating new Player model for {}", name);
         this.player = name;
         setView("main");
@@ -75,14 +73,16 @@ public class PlayerModel implements Comparable {
         this.view = view;
     }
 
-    public synchronized void chat(String chat) {
+    public synchronized void chat(ChatEntryBean chat) {
+        logger.info("Chat added to {} from player: {}, message: {}", this.player, chat.getPlayer(), chat.getMessage());
         chats.add(chat);
     }
 
-    public synchronized String[] getChat() {
-        String[] ret = chats.toArray(new String[0]);
+    public synchronized List<ChatEntryBean> getChat() {
+        List<ChatEntryBean> output = new ArrayList<>(chats);
+        Collections.copy(output, chats);
         chats.clear();
-        return ret;
+        return output;
     }
 
     public int compareTo(Object arg0) {

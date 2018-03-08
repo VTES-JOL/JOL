@@ -14,7 +14,7 @@ public class MainBean {
     private List<UserSummaryBean> who = new ArrayList<>();
     private boolean loggedIn;
     private List<SummaryBean> games = new ArrayList<>();
-    private String[] chat;
+    private List<ChatEntryBean> chat;
     private int refresh = 0;
     private String stamp;
     private List<String> removedGames = new ArrayList<>();
@@ -41,7 +41,6 @@ public class MainBean {
         }
         removedGames = new ArrayList<>(model.getRemovedGames());
         chat = model.getChat();
-        if (chat.length == 0) chat = null;
         who = abean.getWho().stream()
                 .sorted(Comparator.reverseOrder())
                 .map(who -> new UserSummaryBean(who, jolAdmin.isAdmin(who), jolAdmin.isSuperUser(who), jolAdmin.isJudge(who)))
@@ -69,7 +68,7 @@ public class MainBean {
         return games;
     }
 
-    public String[] getChat() {
+    public List<ChatEntryBean> getChat() {
         return chat;
     }
 

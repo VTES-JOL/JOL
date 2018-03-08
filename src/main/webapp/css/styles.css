@@ -350,6 +350,10 @@ table.clean-table td, table.clean-table th {
     padding: 0.15em 0.5em;
 }
 
+.chat-message {
+    margin: 0.1em 0.2em 0.1em 0.2em;
+}
+
 span.label, small.label {
     border-radius: 0.25rem;
     border: 1px solid #aaaaaa;
@@ -626,6 +630,10 @@ p.chat a {
     background-color: lightgrey;
     padding: 0.1em 0.3em 0.1em 0.3em;
     border-radius: 0.4em;
+}
+
+p.chat span.chat-span {
+    padding-right: 0.2em;
 }
 
 a.card-name {

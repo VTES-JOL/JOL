@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -94,9 +96,9 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-    public Map<String, Object> chat(String txt) {
+    public Map<String, Object> chat(String text) {
         String player = Utils.getPlayer(request);
-        abean.chat(Utils.getDate() + player + ": " + txt);
+        abean.chat(player, text);
         return UpdateFactory.getUpdate();
     }
 

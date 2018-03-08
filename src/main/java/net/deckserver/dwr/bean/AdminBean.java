@@ -7,8 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -28,7 +26,7 @@ public class AdminBean {
     private List<String> who = new ArrayList<>();
     private Collection<GameModel> activeSort = new TreeSet<>();
     private List<GameModel> actives;
-    private volatile List<String> chats = new ArrayList<>();
+    private volatile List<ChatEntryBean> chats = new ArrayList<>();
     private LocalDateTime timestamp = LocalDateTime.now();
     private String[] admins = new String[0];
 
@@ -47,7 +45,6 @@ public class AdminBean {
                 }
             }
             actives = new ArrayList<>(activeSort);
-            this.chats = loadChats();
         } catch (Exception e) {
             logger.error("Error creating admin bean {}", e);
         }
@@ -106,27 +103,21 @@ public class AdminBean {
         who = new ArrayList<>(pmap.keySet());
     }
 
-    public synchronized void chat(String chat) {
-        chats.add(chat);
-        if (chats.size() > CHAT_STORAGE) {
-            chats = chats.subList(CHAT_DISCARD, CHAT_STORAGE);
-        }
-        PlayerModel[] players = pmap.values().toArray(new PlayerModel[0]);
-        timestamp = LocalDateTime.now();
-        for (PlayerModel player : players) {
-            if (!checkViewTime(player))
-                player.chat(chat);
-        }
+    public synchronized void chat(String player, String message) {
+        ChatEntryBean chatEntryBean = new ChatEntryBean(player, message);
+        chats.add(chatEntryBean);
+        pmap.values().stream()
+                .forEach(playerModel -> playerModel.chat(chatEntryBean));
     }
 
     private boolean checkViewTime(PlayerModel model) {
         if (model.getPlayer() == null)
-            return true;
+            return false;
         if (model.getTimestamp().plus(TIMEOUT_INTERVAL).isBefore(timestamp)) {
             remove(model.getPlayer());
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     public LocalDateTime getTimestamp() {
@@ -175,27 +166,8 @@ public class AdminBean {
         }
     }
 
-    public synchronized List<String> getChats() {
+    public synchronized List<ChatEntryBean> getChats() {
         return chats;
-    }
-
-    private synchronized List<String> loadChats() {
-        try {
-            List<String> chatLines = Files.readAllLines(chatPersistenceFile.toPath());
-            logger.debug("Loaded chat state: {} loaded", chatLines.size());
-            return chatLines;
-        } catch (IOException e) {
-            return new ArrayList<>();
-        }
-    }
-
-    public synchronized void persistChats() {
-        try {
-            Files.write(chatPersistenceFile.toPath(), this.chats);
-            logger.debug("Saved chat state: {} stored", this.chats.size());
-        } catch (IOException e) {
-            logger.error("Error persisting chat");
-        }
     }
 
     public void setMessage(String message) {

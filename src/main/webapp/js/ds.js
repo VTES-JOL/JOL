@@ -5,6 +5,7 @@ var outageTime = null;
 var player = null;
 var currentPage = 'main';
 var currentOption = "notes";
+var onlineUsers = new Set();
 
 var profile = {
     email: "",
@@ -19,6 +20,11 @@ function errorhandler(errorString, exception) {
 }
 
 $(document).ready(function () {
+    moment.tz.load({
+        zones: [],
+        links: [],
+        version: '2018c'
+    });
     DS.init({callback: init});
 });
 
@@ -87,6 +93,23 @@ function renderChat(id, data) {
     chatOutputDiv.scrollTop(chatOutputDiv.prop("scrollHeight") - chatOutputDiv.prop("clientHeight"));
 }
 
+function renderGlobalChat(data) {
+    if (!data) {
+        return;
+    }
+
+    var globalChatOutput = $("#globalChatOutput");
+    $.each(data, function (index, chat) {
+        var timestamp = moment(timestamp).format("d-MMM HH:mm z");
+        var localTime = moment(timestamp).tz(moment.tz.guess());
+        var chatLine = $("<p/>").addClass("chat");
+
+        chatLine.text(timestamp + " " + chat.player + ": " + chat.message);
+        globalChatOutput.append(chatLine);
+    });
+    globalChatOutput.scrollTop(globalChatOutput.prop("scrollHeight") - globalChatOutput.prop("clientHeight"));
+}
+
 function renderRowWithLabel(tid, label) {
     var table = dwr.util.byId(tid);
     for (var idx = 0; idx < table.rows.length; idx++) {
@@ -133,6 +156,7 @@ function renderOnline(div, who) {
         return;
     }
     $.each(who, function (index, player) {
+        onlineUsers.add(player.name);
         var playerSpan = $("<span/>").text(player.name).addClass("label");
         if (player.superUser) {
             playerSpan.addClass("label-warning");
@@ -194,9 +218,11 @@ function removeLabeledRows(table, removedGames) {
 
 // Invoked via processData()
 function navigate(data) {
-    ga('send', 'pageview', data.target);
     $("#" + currentPage).hide();
     $("#" + data.target).show();
+    if (data.target !== currentPage) {
+        ga('send', 'pageview', data.target);
+    }
     currentPage = data.target;
     game = data.game;
     $("#buttons").empty();
@@ -779,8 +805,8 @@ function callbackMain(data) {
     if (data.loggedIn) {
         toggleVisible('player', 'register');
         toggleVisible('globalchat', 'welcome');
-        renderChat('globalChatOutput', data.chat);
         renderOnline('whoson', data.who);
+        renderGlobalChat(data.chat);
         renderMyGames(data.myGames);
         renderActiveGames(data.games);
         removeLabeledRows('ownGames', data.removedGames);
