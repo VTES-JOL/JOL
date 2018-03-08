@@ -16,13 +16,14 @@ import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.cards.Deck;
 import org.slf4j.Logger;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -439,7 +440,7 @@ public class JolGame {
     }
 
     private String getDate() {
-        return LocalDateTime.now().format(SIMPLE_FORMAT);
+        return OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
     }
 
     public GameAction[] getActions(String turn) {

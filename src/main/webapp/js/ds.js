@@ -196,7 +196,7 @@ function renderActiveGames(games) {
             row.insertCell(4);
         }
         row.cells[0].innerHTML = renderGameLink(games[index].game);
-        row.cells[1].innerHTML = '<small>' + games[index].access + '</small>';
+        row.cells[1].innerHTML = '<small>' + moment(games[index].access).tz("UTC").format("d-MMM-YYYY HH:mm z") + '</small>';
         row.cells[2].innerHTML = '<small>' + games[index].turn + '</small>';
         row.cells[3].innerHTML = '<small>' + '&nbsp ' + games[index].available.join(',') + '</small>';
         row.cells[4].innerHTML = '<small>' + games[index].admin + '</small>';
@@ -800,7 +800,7 @@ function callbackUpdateDeck(data) {
 
 // Callback for MainCreator
 function callbackMain(data) {
-    $('#chatstamp').text(data.stamp);
+    $('#chatstamp').text(moment(data.stamp).tz("UTC").format("d-MMM HH:mm z"));
     if (data.loggedIn) {
         toggleVisible('player', 'register');
         toggleVisible('globalchat', 'welcome');

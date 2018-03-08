@@ -20,15 +20,12 @@ import java.net.URL;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
 
-    private static final DateTimeFormatter CHAT_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm zz");
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
     private static final String url = "https://www.google.com/recaptcha/api/siteverify";
     private static final String secret = System.getenv("JOL_RECAPTCHA_SECRET");
@@ -116,10 +113,6 @@ public class Utils {
         }
     }
 
-    static public String getDate() {
-        return ZonedDateTime.now().format(CHAT_FORMAT);
-    }
-
     public static String sanitizeName(String name) {
         StringCharacterIterator it = new StringCharacterIterator(name);
         StringBuilder res = new StringBuilder();
@@ -177,8 +170,8 @@ public class Utils {
         return c.stream().mapToInt(i -> i).sum();
     }
 
-    public static int calc(LocalDateTime from) {
-        LocalDateTime to = LocalDateTime.now();
+    public static int calc(OffsetDateTime from) {
+        OffsetDateTime to = OffsetDateTime.now();
         long interval = Duration.between(from, to).getSeconds();
         if (interval < 10000) return 5000;
         if (interval < 60000) return 10000;

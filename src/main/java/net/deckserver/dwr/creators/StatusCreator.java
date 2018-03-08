@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.Duration;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class StatusCreator implements ViewCreator {
@@ -34,8 +34,8 @@ public class StatusCreator implements ViewCreator {
                 return "not yet";
             }
         }
-        ZonedDateTime outageTime = ZonedDateTime.parse(outageString, DateTimeFormatter.ISO_DATE_TIME);
-        Duration within = Duration.between(ZonedDateTime.now(), outageTime);
+        OffsetDateTime outageTime = OffsetDateTime.parse(outageString, DateTimeFormatter.ISO_DATE_TIME);
+        Duration within = Duration.between(OffsetDateTime.now(), outageTime);
         if (within.toHours() > 0 && within.toHours() < 48) {
             return outageString;
         } else if (within.toHours() < 0) {

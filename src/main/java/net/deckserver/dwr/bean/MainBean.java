@@ -45,7 +45,7 @@ public class MainBean {
                 .sorted(Comparator.reverseOrder())
                 .map(who -> new UserSummaryBean(who, jolAdmin.isAdmin(who), jolAdmin.isSuperUser(who), jolAdmin.isJudge(who)))
                 .collect(Collectors.toList());
-        stamp = Utils.getDate();
+        stamp = JolAdmin.getDate();
         message = abean.getMessage();
         myGames.sort(Comparator.comparing(PlayerSummaryBean::getGame));
         games.sort(Comparator.comparing(SummaryBean::getGame));

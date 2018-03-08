@@ -4,10 +4,10 @@ import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
 import net.deckserver.dwr.model.JolAdmin;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
 public class SummaryBean {
 
@@ -20,7 +20,7 @@ public class SummaryBean {
     public SummaryBean(GameModel game) {
         this.game = game.getName();
         if (JolAdmin.getInstance().isActive(this.game)) {
-            access = getDate(game.getTimestamp());
+            access = game.getTimestamp().format(ISO_OFFSET_DATE_TIME);
             turn = JolAdmin.getInstance().getGame(this.game).getCurrentTurn();
             admin = JolAdmin.getInstance().getOwner(this.game);
             GameView[] views = game.getViews();
@@ -30,10 +30,6 @@ public class SummaryBean {
             }
             available = actives.toArray(new String[0]);
         }
-    }
-
-    private String getDate(LocalDateTime timestamp) {
-        return timestamp.format(DateTimeFormatter.ISO_DATE_TIME);
     }
 
     public String getAccess() {

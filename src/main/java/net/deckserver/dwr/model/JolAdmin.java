@@ -27,8 +27,11 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -36,7 +39,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class JolAdmin {
 
-    private static final LocalDateTime startDate = LocalDateTime.now();
+    private static final OffsetDateTime startDate = OffsetDateTime.now();
     private static final Logger logger = getLogger(JolAdmin.class);
     private static final JolAdmin INSTANCE = new JolAdmin(System.getenv("JOL_DATA"));
     private static CardSearch CARD_DATA = null;
@@ -73,6 +76,10 @@ public class JolAdmin {
         Files.write(file.toPath(), bytes);
     }
 
+    public static String getDate() {
+        return OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
+    }
+
     public boolean existsPlayer(String name) {
         return name != null && sysInfo.hasPlayer(name);
     }
@@ -89,7 +96,7 @@ public class JolAdmin {
         return ret;
     }
 
-    public LocalDateTime getSystemStart() {
+    public OffsetDateTime getSystemStart() {
         return startDate;
     }
 
@@ -153,7 +160,7 @@ public class JolAdmin {
         player.recordAccess();
     }
 
-    public LocalDateTime getLastAccess(String playerName) {
+    public OffsetDateTime getLastAccess(String playerName) {
         PlayerInfo player = getPlayerInfo(playerName);
         return player.getLastAccess();
     }
@@ -274,8 +281,8 @@ public class JolAdmin {
         return getPlayerInfo(playerName).doInteractive();
     }
 
-    public LocalDateTime getGameTimeStamp(String gameName) {
-        LocalDateTime gameTimeStamp = getGameInfo(gameName).getTimeStamp();
+    public OffsetDateTime getGameTimeStamp(String gameName) {
+        OffsetDateTime gameTimeStamp = getGameInfo(gameName).getTimeStamp();
         return gameTimeStamp;
     }
 
@@ -283,7 +290,7 @@ public class JolAdmin {
         getGameInfo(gameName).recordAccess(playerName);
     }
 
-    public LocalDateTime getAccess(String name, String player) {
+    public OffsetDateTime getAccess(String name, String player) {
         return getGameInfo(name).getAccessed(player);
     }
 
@@ -325,7 +332,7 @@ public class JolAdmin {
         private final String prefix;
         JolGame game;
         String gameName;
-        Map<String, LocalDateTime> playerAccess = new HashMap<>(8);
+        Map<String, OffsetDateTime> playerAccess = new HashMap<>(8);
         private Game state;
 
         private TurnRecorder actions;
@@ -359,23 +366,23 @@ public class JolAdmin {
             return game;
         }
 
-        LocalDateTime getTimeStamp() {
+        OffsetDateTime getTimeStamp() {
             String ts = info.getProperty("timestamp");
             if (ts == null)
-                return LocalDateTime.now();
-            return LocalDateTime.parse(ts);
+                return OffsetDateTime.now();
+            return OffsetDateTime.parse(ts);
         }
 
         void recordAccess(String player) {
-            playerAccess.put(player, LocalDateTime.now());
+            playerAccess.put(player, OffsetDateTime.now());
         }
 
         public Collection<String> getAccessed() {
             return playerAccess.keySet();
         }
 
-        LocalDateTime getAccessed(String player) {
-            LocalDateTime ret = playerAccess.get(player);
+        OffsetDateTime getAccessed(String player) {
+            OffsetDateTime ret = playerAccess.get(player);
             if (ret == null)
                 return startDate;
             return ret;
@@ -522,7 +529,7 @@ public class JolAdmin {
         protected void write() {
             dowrite();
             playerAccess.clear();
-            info.setProperty("timestamp", LocalDateTime.now().toString());
+            info.setProperty("timestamp", OffsetDateTime.now().toString());
         }
 
         synchronized void dowrite() {
@@ -593,15 +600,16 @@ public class JolAdmin {
         }
 
         void recordAccess() {
-            info.setProperty("timestamp", LocalDateTime.now().toString());
+            info.setProperty("timestamp", OffsetDateTime.now().toString());
         }
 
-        LocalDateTime getLastAccess() {
+        OffsetDateTime getLastAccess() {
             String str = info.getProperty("timestamp");
             if (str == null) {
-                return LocalDateTime.of(2000, Month.JANUARY, 1, 0, 0);
+                LocalDateTime historic = LocalDateTime.of(2000, Month.JANUARY, 1, 0, 0);
+                return OffsetDateTime.of(historic, ZoneOffset.UTC);
             }
-            return LocalDateTime.parse(str);
+            return OffsetDateTime.parse(str);
         }
 
         void addGame(String name, String key) {

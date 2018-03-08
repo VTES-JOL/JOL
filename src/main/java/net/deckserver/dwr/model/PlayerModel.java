@@ -6,7 +6,7 @@ import net.deckserver.dwr.bean.DeckSummaryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,7 +61,7 @@ public class PlayerModel implements Comparable {
         if (player != null) JolAdmin.getInstance().recordAccess(player);
     }
 
-    public LocalDateTime getTimestamp() {
+    public OffsetDateTime getTimestamp() {
         return JolAdmin.getInstance().getLastAccess(player);
     }
 

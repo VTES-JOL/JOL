@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -27,7 +27,7 @@ public class AdminBean {
     private Collection<GameModel> activeSort = new TreeSet<>();
     private List<GameModel> actives;
     private volatile List<ChatEntryBean> chats = new ArrayList<>();
-    private LocalDateTime timestamp = LocalDateTime.now();
+    private OffsetDateTime timestamp = OffsetDateTime.now();
     private String[] admins = new String[0];
 
     private File chatPersistenceFile = new File(System.getenv("JOL_DATA"), "global_chat.txt");
@@ -120,7 +120,7 @@ public class AdminBean {
         return true;
     }
 
-    public LocalDateTime getTimestamp() {
+    public OffsetDateTime getTimestamp() {
         return timestamp;
     }
 

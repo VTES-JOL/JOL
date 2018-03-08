@@ -8,7 +8,7 @@ import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -156,7 +156,7 @@ public class GameView {
         boolean chatReset = resetChat;
         boolean tc = turnChanged;
         clearAccess();
-        String stamp = Utils.getDate();
+        String stamp = JolAdmin.getDate();
         return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, global, text, label,
                 chatReset, tc, turn, turns, state, phases, ping,
                 collapsed, stamp);
@@ -195,11 +195,11 @@ public class GameView {
             collapsed.add(id);
     }
 
-    public LocalDateTime getTimestamp() {
+    public OffsetDateTime getTimestamp() {
         if (isPlayer) {
             return JolAdmin.getInstance().getAccess(name, player);
         } else {
-            return LocalDateTime.now();
+            return OffsetDateTime.now();
         }
     }
 

@@ -11,8 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Properties;
@@ -98,7 +99,7 @@ public class UpdateData {
                 instant = lastModifiedTime.toInstant();
                 playerProperties.setProperty("time", String.valueOf(instant.toEpochMilli()));
             }
-            LocalDateTime lastAccess = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+            OffsetDateTime lastAccess = instant.atOffset(ZoneOffset.UTC);
             playerProperties.remove("password");
             playerProperties.remove("time");
             playerProperties.setProperty("timestamp", lastAccess.toString());
@@ -118,17 +119,17 @@ public class UpdateData {
         try (FileReader fileReader = new FileReader(file)) {
             properties.load(fileReader);
             String time = properties.getProperty("timestamp");
-            LocalDateTime lastAccess;
+            OffsetDateTime lastAccess;
             try {
-                lastAccess = LocalDateTime.parse(time);
-            } catch (DateTimeParseException parseE) {
+                lastAccess = OffsetDateTime.parse(time);
+            } catch (DateTimeParseException | NullPointerException parseE) {
                 Instant instant;
                 try {
                     instant = Instant.ofEpochMilli(Long.valueOf(time));
                 } catch (NumberFormatException e) {
                     instant = Files.getLastModifiedTime(file.toPath()).toInstant();
                 }
-                lastAccess = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+                lastAccess = instant.atZone(ZoneId.systemDefault()).toOffsetDateTime();
             }
             properties.setProperty("timestamp", lastAccess.toString());
         } catch (IOException e) {

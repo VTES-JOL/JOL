@@ -7,16 +7,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.OffsetDateTime;
 import java.util.*;
+
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
 public class GameModel implements Comparable {
 
     private static Logger logger = LoggerFactory.getLogger(GameModel.class);
 
     private String name;
-    private LocalDateTime timestamp;
+    private OffsetDateTime timestamp;
     private Map<String, GameView> views = new HashMap<>();
     private SummaryBean sumbean;
 
@@ -202,10 +203,10 @@ public class GameModel implements Comparable {
     }
 
     public String getDate() {
-        return timestamp.format(DateTimeFormatter.ISO_DATE_TIME);
+        return timestamp.format(ISO_OFFSET_DATE_TIME);
     }
 
-    public LocalDateTime getTimestamp() {
+    public OffsetDateTime getTimestamp() {
         return timestamp;
     }
 

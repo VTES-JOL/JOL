@@ -1,9 +1,9 @@
 package net.deckserver.dwr.bean;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
 public class ChatEntryBean {
 
@@ -14,7 +14,7 @@ public class ChatEntryBean {
     public ChatEntryBean(String player, String message) {
         this.timestamp = OffsetDateTime.now()
                 .truncatedTo(ChronoUnit.SECONDS)
-                .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+                .format(ISO_OFFSET_DATE_TIME);
         this.player = player;
         this.message = message;
     }

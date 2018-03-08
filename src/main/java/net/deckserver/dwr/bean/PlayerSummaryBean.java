@@ -6,7 +6,7 @@ import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.JolGame;
 import net.deckserver.game.storage.cards.Deck;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class PlayerSummaryBean {
 
@@ -47,9 +47,9 @@ public class PlayerSummaryBean {
             if (view != null) {
                 this.current = !view.isChanged();
             } else {
-                LocalDateTime access = admin.getAccess(this.game, player);
-                LocalDateTime timestamp = admin.getGameTimeStamp(this.game);
-                LocalDateTime systemStart = admin.getSystemStart();
+                OffsetDateTime access = admin.getAccess(this.game, player);
+                OffsetDateTime timestamp = admin.getGameTimeStamp(this.game);
+                OffsetDateTime systemStart = admin.getSystemStart();
                 if (timestamp.compareTo(systemStart) < 0) {
                     timestamp = systemStart;
                 }
