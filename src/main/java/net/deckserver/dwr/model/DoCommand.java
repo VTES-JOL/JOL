@@ -11,7 +11,10 @@ import net.deckserver.game.interfaces.state.Location;
 import net.deckserver.game.storage.cards.CardEntry;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -60,13 +63,13 @@ public class DoCommand {
                 return "Adjusted label";
             }
             if (cmd.equalsIgnoreCase("order")) {
-                String[] players = game.getPlayers();
-                String[] neworder = new String[players.length];
-                for (int j = 0; j < players.length; j++) {
+                List<String> players = game.getPlayers();
+                List<String> neworder = new ArrayList<>();
+                for (int j = 0; j < players.size(); j++) {
                     int index = cmdObj.getNumber(-1);
                     if (index == -1) return "Must specify a number for each player";
-                    if (index < 1 || index > players.length) return "Bad number : " + index;
-                    neworder[j] = players[index - 1];
+                    if (index < 1 || index > players.size()) return "Bad number : " + index;
+                    neworder.add(players.get(index - 1));
                 }
                 game.setOrder(neworder);
                 return "Changed seating order";
@@ -230,7 +233,7 @@ public class DoCommand {
                 String targetRegion = cmdObj.getRegion(JolGame.LIBRARY);
                 int amt = cmdObj.getNumber(100);
                 boolean all = cmdObj.consumeString("all");
-                String[] recipients = all ? game.getPlayers() : new String[]{cmdObj.getPlayer(player)};
+                List<String> recipients = all ? game.getPlayers() : Collections.singletonList(cmdObj.getPlayer(player));
                 Location loc = game.getState().getPlayerLocation(player, targetRegion);
                 Card[] cards = loc.getCards();
                 StringBuilder buf = new StringBuilder();
@@ -254,10 +257,10 @@ public class DoCommand {
                     game.setPlayerText(recipient, old + "\n" + text);
                 }
                 String msg = null;
-                if (recipients.length == 1) {
+                if (recipients.size() == 1) {
                     msg = "Looks at " + len + " cards of " +
-                            (!player.equals(recipients[0]) ? player + "'s " : "") + targetRegion + ".";
-                    game.sendMsg(recipients[0], msg);
+                            (!player.equals(recipients.get(0)) ? player + "'s " : "") + targetRegion + ".";
+                    game.sendMsg(recipients.get(0), msg);
                 } else {
                     msg = "Everyone looks at " + len + " cards of " + player + "'s " + targetRegion + ".";
                     game.sendMsg(player, msg);

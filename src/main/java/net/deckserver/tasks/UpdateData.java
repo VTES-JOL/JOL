@@ -17,10 +17,13 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UpdateData {
+
+    private static final Pattern TIMESTAMP_PATTERN = Pattern.compile("^(\\d{1,2}:\\d{2} \\d{1,2}\\/\\d{1,2}) ");
 
     public static void main(String[] args) throws Exception {
 

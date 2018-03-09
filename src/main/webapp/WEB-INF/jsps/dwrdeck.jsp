@@ -28,12 +28,12 @@
 <h5>Crypt: (<%= csize %>)</h5>
 <ul class='deck-list'>
     <c:forEach items="${vampires.keySet()}" var="card">
-        <li>${vampires.get(card)} x <a href="javascript:getCardDeck(null,'${card.cardId}')">${card.name}
+        <li>${vampires.get(card)} x <a class='card-name' title="${card.cardId}">${card.name}
             (G${card.group})</a>
         </li>
     </c:forEach>
     <c:forEach items="${imbued.keySet()}" var="card">
-        <li>${imbued.get(card)} x <a href="javascript:getCardDeck(null,'${card.cardId}')">${card.name}
+        <li>${imbued.get(card)} x <a class='card-name' title="${card.cardId}">${card.name}
             (G${card.group})</a></li>
     </c:forEach>
 </ul>
@@ -50,7 +50,7 @@
     <h5>${type}: (${typeCount})</h5>
     <ul class='deck-list'>
         <c:forEach items="${typeMap.keySet()}" var="card">
-            <li>${typeMap.get(card)} x <a href="javascript:getCardDeck(null,'${card.cardId}')">${card.name}</a></li>
+            <li>${typeMap.get(card)} x <a class='card-name' title="${card.cardId}">${card.name}</a></li>
         </c:forEach>
     </ul>
 </c:forEach>

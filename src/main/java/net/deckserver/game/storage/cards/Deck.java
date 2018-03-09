@@ -163,6 +163,9 @@ public class Deck {
         if (text.endsWith("(advanced)")) {
             text = text.substring(0, text.lastIndexOf("(advanced)")).trim();
             advanced = true;
+        } else if (text.endsWith("(ADV)")) {
+            text = text.substring(0, text.lastIndexOf("(ADV)")).trim();
+            advanced = true;
         }
         CardEntry[] set = findCardName(text);
         CardEntry card = selectCard(text, set);

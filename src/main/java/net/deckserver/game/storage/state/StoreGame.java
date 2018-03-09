@@ -83,14 +83,14 @@ public class StoreGame implements Game {
         });
     }
 
-    public String[] getPlayers() {
-        return state.getPlayer().toArray(new String[0]);
+    public List<String> getPlayers() {
+        return state.getPlayer();
     }
 
-    public void orderPlayers(String[] order) {
+    public void orderPlayers(List<String> order) {
         List<String> playerOrder = state.getPlayer();
         playerOrder.clear();
-        playerOrder.addAll(Arrays.asList(order));
+        playerOrder.addAll(order);
     }
 
     private StoreLocation addLocationImpl(String regionName) {

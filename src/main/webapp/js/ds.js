@@ -81,11 +81,11 @@ function renderButton(data) {
     });
 }
 
-function renderChat(id, data) {
+function renderGameChat(data) {
     if (data === null) {
         return;
     }
-    var chatOutputDiv = $("#" + id);
+    var chatOutputDiv = $("#gameChatOutput");
     $.each(data, function (index, chat) {
         var chatLine = $("<p/>").addClass("chat").html(chat);
         chatOutputDiv.append(chatLine);
@@ -258,6 +258,7 @@ function showDeck(data) {
         $('#deckerrors').html(errorText)
         dwr.util.byId('deckerrors').style.display = "block";
     }
+    generateCardData("#deckcontents");
 }
 
 function getCardDeck(game, card) {
@@ -593,7 +594,7 @@ function loadGame(data) {
         });
     }
     if (data.turn !== null) {
-        renderChat('gameChatOutput', data.turn);
+        renderGameChat(data.turn);
     }
     if (data.turns !== null) {
         var turnSelect = $("#turns");
@@ -807,7 +808,6 @@ function callbackMain(data) {
         renderOnline('whoson', data.who);
         renderGlobalChat(data.chat);
         renderMyGames(data.myGames);
-        renderActiveGames(data.games);
         removeLabeledRows('ownGames', data.removedGames);
         removeLabeledRows('activeGames', data.removedGames);
         renderMessage(data.message);

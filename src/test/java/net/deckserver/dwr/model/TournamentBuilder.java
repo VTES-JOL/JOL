@@ -135,7 +135,6 @@ public class TournamentBuilder {
         JolAdmin.GameInfo gameInfo = jolAdmin.getGameInfo(gameName);
 
         for (String player : playerRoundSeating) {
-            JolAdmin.PlayerInfo playerInfo = jolAdmin.getPlayerInfo(player);
             if (!jolAdmin.isInvited(gameName, player)) {
                 jolAdmin.invitePlayer(gameName, player);
             }
@@ -145,7 +144,7 @@ public class TournamentBuilder {
         }
 
         if (!gameInfo.isActive()) {
-            gameInfo.startGame(playerRoundSeating.toArray(new String[playerRoundSeating.size()]));
+            gameInfo.startGame(playerRoundSeating);
         }
     }
 }

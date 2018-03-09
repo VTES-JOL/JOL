@@ -5,10 +5,8 @@ import net.deckserver.game.interfaces.state.CardContainer;
 import net.deckserver.game.interfaces.state.Game;
 import net.deckserver.game.interfaces.state.Location;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DsGame extends DsNoteTaker implements Game {
 
@@ -29,13 +27,11 @@ public class DsGame extends DsNoteTaker implements Game {
         return null;
     }
 
-    public void orderPlayers(String[] order) {
-        Collection<Player> newP = new LinkedList<>();
-        for (String anOrder : order) {
-            newP.add(getPlayer(anOrder));
-        }
+    public void orderPlayers(List<String> order) {
+        List<Player> newPlayers = new ArrayList<>();
+        order.stream().map(this::getPlayer).forEach(newPlayers::add);
         players.clear();
-        players.addAll(newP);
+        players.addAll(newPlayers);
     }
 
     public void addLocation(String regionName) {
@@ -57,11 +53,8 @@ public class DsGame extends DsNoteTaker implements Game {
         gname = name;
     }
 
-    public String[] getPlayers() {
-        String[] ret = new String[players.size()];
-        for (int i = 0; i < ret.length; i++)
-            ret[i] = players.get(i).name;
-        return ret;
+    public List<String> getPlayers() {
+        return players.stream().map(Player::getName).collect(Collectors.toList());
     }
 
     public Location[] getPlayerLocations(String player) {
@@ -116,6 +109,10 @@ public class DsGame extends DsNoteTaker implements Game {
 
         Player(String name) {
             this.name = name;
+        }
+
+        public String getName() {
+            return name;
         }
     }
 }

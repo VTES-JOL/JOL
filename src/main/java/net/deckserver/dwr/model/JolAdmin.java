@@ -475,7 +475,7 @@ public class JolAdmin {
             write();
         }
 
-        synchronized void startGame(String[] playerSeating) {
+        synchronized void startGame(List<String> playerSeating) {
             info.setProperty("state", "closed");
             state = new DsGame();
             actions = new DsTurnRecorder();

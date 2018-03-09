@@ -39,12 +39,12 @@ public class GameView {
         for (GameAction action : actions) {
             addChat(action.getText());
         }
-        String[] players = game.getPlayers();
-        for (int i = 0; i < players.length; ) {
-            boolean active = players[i].equals(player);
+        List<String> players = game.getPlayers();
+        for (int i = 0; i < players.size(); ) {
+            boolean active = players.get(i).equals(player);
             if (active)
                 isPlayer = true;
-            boolean ousted = game.getPool(players[i]) < 1;
+            boolean ousted = game.getPool(players.get(i)) < 1;
             i++;
             collapsed.add("a" + i);
             collapsed.add("rfg" + i);
@@ -87,7 +87,7 @@ public class GameView {
         String[] phases = null;
         String[] collapsed = null;
 
-        ping = Arrays.asList(game.getPlayers());
+        ping = game.getPlayers();
 
         if (isPlayer && stateChanged) {
             try {

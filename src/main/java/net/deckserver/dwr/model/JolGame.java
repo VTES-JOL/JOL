@@ -54,7 +54,7 @@ public class JolGame {
     private static final String UNTAPPED = "untap";
     private static final String PING = "ping";
     private static final Logger logger = getLogger(JolGame.class);
-    private static DateTimeFormatter SIMPLE_FORMAT = DateTimeFormatter.ofPattern("HH:mm M/d ");
+    private static DateTimeFormatter SIMPLE_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm ");
     private Game state;
     private TurnRecorder actions;
 
@@ -66,7 +66,7 @@ public class JolGame {
     public void addPlayer(CardSearch cardset, String name, String deckStr) {
         Deck deck = new Deck(cardset, deckStr);
         boolean reregister = false;
-        String[] players = state.getPlayers();
+        List<String> players = state.getPlayers();
         for (String player : players) if (name.equals(player)) reregister = true;
         if (!reregister) {
             state.addPlayer(name);
@@ -128,7 +128,7 @@ public class JolGame {
         return state.getName();
     }
 
-    public String[] getPlayers() {
+    public List<String> getPlayers() {
         return state.getPlayers();
     }
 
@@ -160,7 +160,7 @@ public class JolGame {
         moveToRegion(cardId, destPlayer, destRegion, bottom, false);
     }
 
-    public void setOrder(String[] players) {
+    public void setOrder(List<String> players) {
         state.orderPlayers(players);
         String order = "";
         for (String player : players) order = order + " " + player;
@@ -192,14 +192,14 @@ public class JolGame {
     }
 
     public void startGame() {
-        String[] players = state.getPlayers();
+        List<String> players = state.getPlayers();
         Utils.shuffle(players);
         startGame(players);
     }
 
-    public void startGame(String[] playerSeating) {
-        String[] players = state.getPlayers();
-        if (!Arrays.asList(players).containsAll(Arrays.asList(playerSeating))) {
+    public void startGame(List<String> playerSeating) {
+        List<String> players = state.getPlayers();
+        if (!players.containsAll(playerSeating)) {
             throw new IllegalArgumentException("Player ordering not valid, does not contain current players");
         }
         state.orderPlayers(playerSeating);
@@ -440,7 +440,7 @@ public class JolGame {
     }
 
     private String getDate() {
-        return OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
+        return OffsetDateTime.now().format(SIMPLE_FORMAT);
     }
 
     public GameAction[] getActions(String turn) {
@@ -453,8 +453,7 @@ public class JolGame {
 
     public void newTurn() {
         String turn = getCurrentTurn();
-        String[] players = getPlayers();
-        logger.trace("Players {}", Arrays.toString(players));
+        List<String> players = getPlayers();
         int round = 1;
         int index = 0;
         if (turn != null) {
@@ -462,22 +461,22 @@ public class JolGame {
             int length = turn.length();
             int space = turn.lastIndexOf(" ");
             round = Integer.parseInt(turn.substring(space + 1, length - 2));
-            for (int i = 0; i < players.length; i++)
-                if (meth.equals(players[i])) index = i + 1;
-            if (index == players.length) {
+            for (int i = 0; i < players.size(); i++)
+                if (meth.equals(players.get(i))) index = i + 1;
+            if (index == players.size()) {
                 index = 0;
                 round++;
             }
-            while (!meth.equals(players[index]) && getPool(players[index]) < 1) {
+            while (!meth.equals(players.get(index)) && getPool(players.get(index)) < 1) {
                 index++;
-                if (index == players.length) {
+                if (index == players.size()) {
                     index = 0;
                     round++;
                 }
             }
         }
-        actions.addTurn(players[index], players[index] + " " + round + "." + (index + 1));
-        setActivePlayer(players[index]);
+        actions.addTurn(players.get(index), players.get(index) + " " + round + "." + (index + 1));
+        setActivePlayer(players.get(index));
         setPhase(TURN_PHASES[0]);
     }
 

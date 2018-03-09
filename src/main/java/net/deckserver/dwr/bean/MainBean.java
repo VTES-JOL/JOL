@@ -13,7 +13,6 @@ public class MainBean {
     private List<PlayerSummaryBean> myGames = new ArrayList<>();
     private List<UserSummaryBean> who = new ArrayList<>();
     private boolean loggedIn;
-    private List<SummaryBean> games = new ArrayList<>();
     private List<ChatEntryBean> chat;
     private int refresh = 0;
     private String stamp;
@@ -35,7 +34,6 @@ public class MainBean {
         }
         for (GameModel game : actives) {
             if (!model.getChangedGames().contains(game.getName())) continue;
-            games.add(game.getSummaryBean());
             if (gamenames.contains(game.getName()) && (game.isOpen() || game.getPlayers().contains(model.getPlayer())))
                 myGames.add(new PlayerSummaryBean(game, model.getPlayer()));
         }
@@ -48,7 +46,6 @@ public class MainBean {
         stamp = JolAdmin.getDate();
         message = abean.getMessage();
         myGames.sort(Comparator.comparing(PlayerSummaryBean::getGame));
-        games.sort(Comparator.comparing(SummaryBean::getGame));
         model.clearGames();
     }
 
@@ -62,10 +59,6 @@ public class MainBean {
 
     public boolean isLoggedIn() {
         return loggedIn;
-    }
-
-    public List<SummaryBean> getGames() {
-        return games;
     }
 
     public List<ChatEntryBean> getChat() {

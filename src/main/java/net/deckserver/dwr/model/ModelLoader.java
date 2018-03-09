@@ -17,7 +17,7 @@ public final class ModelLoader {
     public static void createModel(Game game, Game orig) {
         game.setName(orig.getName());
         moveNotes(orig, game);
-        String[] players = orig.getPlayers();
+        List<String> players = orig.getPlayers();
         for (String player : players) {
             game.addPlayer(player);
             game.addLocation(player, JolGame.READY_REGION);

@@ -22,7 +22,6 @@ import java.text.StringCharacterIterator;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
 
@@ -125,20 +124,12 @@ public class Utils {
         return res.toString();
     }
 
-    public static void shuffle(Object[] obj, int num) {
-        Random rnd = ThreadLocalRandom.current();
-        if (num <= 0 || num > obj.length) {
-            num = obj.length;
-        }
-        for (int i = num - 1; i > 0; i--) {
-            int index = rnd.nextInt(i + 1);
-            Object a = obj[index];
-            obj[index] = obj[i];
-            obj[i] = a;
-        }
+    public static <T> void shuffle(List<T> obj, int num) {
+        List<T> shuffle = num > 0 ? obj.subList(0, num) : obj;
+        Collections.shuffle(shuffle);
     }
 
-    public static void shuffle(Object[] obj) {
+    public static <T> void shuffle(List<T> obj) {
         shuffle(obj, 0);
     }
 

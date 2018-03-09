@@ -4,7 +4,8 @@ import net.deckserver.Utils;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.Location;
 
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.List;
 
 class DsLocation extends DsCardContainer implements Location {
 
@@ -25,10 +26,10 @@ class DsLocation extends DsCardContainer implements Location {
     }
 
     public void shuffle(int num) {
-        Card[] sCards = getCards();
+        List<Card> sCards = Arrays.asList(getCards());
         Utils.shuffle(sCards, num);
         cards.clear();
-        Collections.addAll(cards, (Card[]) sCards);
+        cards.addAll(sCards);
     }
 
     public String getName() {

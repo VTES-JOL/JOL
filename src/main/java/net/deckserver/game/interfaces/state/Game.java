@@ -6,6 +6,8 @@
 
 package net.deckserver.game.interfaces.state;
 
+import java.util.List;
+
 /**
  * @author administrator
  */
@@ -15,7 +17,7 @@ public interface Game extends NoteTaker {
 
     void addPlayer(String player);
 
-    void orderPlayers(String[] order);
+    void orderPlayers(List<String> order);
 
     void addLocation(String regionName);
 
@@ -23,7 +25,7 @@ public interface Game extends NoteTaker {
 
     String getName();
 
-    String[] getPlayers();
+    List<String> getPlayers();
 
     Location[] getPlayerLocations(String player);
 

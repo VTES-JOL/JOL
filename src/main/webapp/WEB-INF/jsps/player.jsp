@@ -4,16 +4,17 @@
 <%@page import="net.deckserver.Utils" %>
 <%@page import="net.deckserver.dwr.jsp.RegionParams" %>
 <%@page import="net.deckserver.dwr.model.JolGame" %>
+<%@ page import="java.util.List" %>
 
 <% String curPlayer = Utils.getPlayer(request);
     JolGame game = (JolGame) request.getAttribute("game");
     String player = (String) request.getAttribute("pparam");
     boolean active = player.equals(curPlayer);
     boolean edge = player.equals(game.getEdge());
-    String[] players = game.getPlayers();
+    List<String> players = game.getPlayers();
     int index = -1;
-    for (int i = 0; i < players.length; i++)
-        if (players[i].equals(player)) index = i + 1;
+    for (int i = 0; i < players.size(); i++)
+        if (players.get(i).equals(player)) index = i + 1;
     String poolStyle = game.getPool(player) == 0 ? "pool-ousted" : "pool";
     poolStyle = game.getPool(player) < 0 ? "pool-sacked" : poolStyle;
 

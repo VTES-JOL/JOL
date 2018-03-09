@@ -41,8 +41,8 @@ public class DeckEditBean {
             if (shuffle) {
                 Map<String, TreeMap<CardEntry, Integer>> map = Utils
                         .getDeckHtmlMap(nd);
-                Collection<CardEntry> c = new ArrayList<>();
-                Collection<CardEntry> v = new ArrayList<>();
+                List<CardEntry> c = new ArrayList<>();
+                List<CardEntry> v = new ArrayList<>();
                 nd.getCards();
                 for (String t : map.keySet()) {
                     Collection<CardEntry> l = v;
@@ -56,13 +56,11 @@ public class DeckEditBean {
                             l.add(card);
                     }
                 }
-                CardEntry[] carr = c.toArray(new CardEntry[0]);
-                Utils.shuffle(carr);
-                CardEntry[] larr = v.toArray(new CardEntry[0]);
-                Utils.shuffle(larr);
-                Map<String, CardEntry[]> dp = new HashMap<>();
-                dp.put("crypt", carr);
-                dp.put("library", larr);
+                Utils.shuffle(c);
+                Utils.shuffle(v);
+                Map<String, List<CardEntry>> dp = new HashMap<>();
+                dp.put("crypt", c);
+                dp.put("library", v);
                 request.setAttribute("sparams", dp);
                 format = WebContextFactory.get().forwardToString(
                         "/WEB-INF/jsps/shuffle.jsp");

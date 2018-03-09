@@ -4,6 +4,7 @@ import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.Location;
 import org.slf4j.Logger;
 
+import java.util.List;
 import java.util.Random;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -56,7 +57,7 @@ class CommandParser {
     public String getPlayer(String defaultPlayer) throws CommandException {
         if (!hasMoreArgs()) return defaultPlayer;
         String arg = args[ind++].toLowerCase();
-        String[] players = game.getPlayers();
+        List<String> players = game.getPlayers();
         for (String player : players)
             if (player.toLowerCase().startsWith(arg)) {
                 return player;
