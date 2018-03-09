@@ -100,7 +100,7 @@ function renderGlobalChat(data) {
 
     var globalChatOutput = $("#globalChatOutput");
     $.each(data, function (index, chat) {
-        var timestamp = moment(timestamp).tz("GMT").format("d-MMM HH:mm z");
+        var timestamp = moment(timestamp).tz("UTC").format("d-MMM HH:mm z");
         var chatLine = $("<p/>").addClass("chat");
 
         chatLine.text(timestamp + " " + chat.player + ": " + chat.message);
