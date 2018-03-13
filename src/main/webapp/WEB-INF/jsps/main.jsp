@@ -86,7 +86,7 @@
             </div>
         </td>
         <td width="20%" class="layout" rowspan="2">
-            <h4 class="header">User Ranks:</h4>
+            <h4 class="header collapse">User Ranks:</h4>
             <ul class="condensed-list light">
                 <li>
                     <span class="label label-light">Embrace</span>
@@ -105,11 +105,11 @@
                     <p>Administer games for all other Princes</p>
                 </li>
             </ul>
-            <h4 class="header">Contact</h4>
+            <h4 class="header collapse">Contact</h4>
             <ul class="condensed-list light">
                 <li><a href="mailto:admin@deckserver.net">Contact Site Administrator</a></li>
             </ul>
-            <h4 class="header">Links:</h4>
+            <h4 class="header collapse">Links:</h4>
             <ul class="condensed-list light">
                 <li>
                     <a href="https://www.facebook.com/groups/jolstatus/" target="_blank">Facebook Status Group</a>
@@ -126,7 +126,7 @@
                 </li>
 
             </ul>
-            <h4 class="header">Donate:</h4>
+            <h4 class="header collapse">Donate:</h4>
             <ul class="condensed-list light">
                 <li>
                     <span>Goes towards keeping JOL running.  Any donation appreciated.</span>

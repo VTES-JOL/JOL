@@ -6,6 +6,7 @@ var player = null;
 var currentPage = 'main';
 var currentOption = "notes";
 var onlineUsers = new Set();
+var USER_TIMEZONE = moment.tz.guess();
 
 var profile = {
     email: "",
@@ -32,6 +33,9 @@ function init(data) {
     $("#loadMessage").hide();
     $("#loaded").show();
     processData(data);
+    $("h4.collapse").click(function() {
+        $(this).next().slideToggle();
+    })
 }
 
 function processData(data) {
@@ -100,10 +104,13 @@ function renderGlobalChat(data) {
 
     var globalChatOutput = $("#globalChatOutput");
     $.each(data, function (index, chat) {
-        var timestamp = moment(timestamp).tz("UTC").format("d-MMM HH:mm z");
+        var timestamp = moment(chat.timestamp).tz("UTC").format("d-MMM HH:mm z");
+        var userTimestamp = moment(chat.timestamp).tz(USER_TIMEZONE).format("d-MMM HH:mm z");
         var chatLine = $("<p/>").addClass("chat");
+        var timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp);
+        var message = $("<span/>").text(" " + chat.player + ": " + chat.message);
 
-        chatLine.text(timestamp + " " + chat.player + ": " + chat.message);
+        chatLine.append(timeOutput).append(message);
         globalChatOutput.append(chatLine);
     });
     globalChatOutput.scrollTop(globalChatOutput.prop("scrollHeight") - globalChatOutput.prop("clientHeight"));
@@ -801,7 +808,9 @@ function callbackUpdateDeck(data) {
 
 // Callback for MainCreator
 function callbackMain(data) {
-    $('#chatstamp').text(moment(data.stamp).tz("UTC").format("d-MMM HH:mm z"));
+    var timestamp = moment(data.stamp).tz("UTC").format("d-MMM HH:mm z");
+    var userTimestamp = moment(data.stamp).tz(USER_TIMEZONE).format("d-MMM HH:mm z");
+    $('#chatstamp').text(timestamp).attr("title", userTimestamp);
     if (data.loggedIn) {
         toggleVisible('player', 'register');
         toggleVisible('globalchat', 'welcome');
