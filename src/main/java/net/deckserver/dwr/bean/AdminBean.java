@@ -107,6 +107,7 @@ public class AdminBean {
         ChatEntryBean chatEntryBean = new ChatEntryBean(player, message);
         chats.add(chatEntryBean);
         pmap.values().stream()
+                .filter(this::checkViewTime)
                 .forEach(playerModel -> playerModel.chat(chatEntryBean));
     }
 

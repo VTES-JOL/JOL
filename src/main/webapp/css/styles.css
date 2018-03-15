@@ -627,7 +627,7 @@ table.game-table a {
 
 p.chat a {
     display: inline;
-    background-color: lightgrey;
+    background-color: #eee;
     padding: 0.1em 0.3em 0.1em 0.3em;
     border-radius: 0.4em;
 }
@@ -684,4 +684,8 @@ small.life {
 
 .region-empty-false {
     display: block;
+}
+
+.tippy-content {
+    text-align: left;
 }

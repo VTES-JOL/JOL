@@ -1,11 +1,8 @@
 var refresher = null;
 var game = null;
-var timeInterval = null;
-var outageTime = null;
 var player = null;
 var currentPage = 'main';
 var currentOption = "notes";
-var onlineUsers = new Set();
 var USER_TIMEZONE = moment.tz.guess();
 
 var profile = {
@@ -33,7 +30,7 @@ function init(data) {
     $("#loadMessage").hide();
     $("#loaded").show();
     processData(data);
-    $("h4.collapse").click(function() {
+    $("h4.collapse").click(function () {
         $(this).next().slideToggle();
     })
 }
@@ -162,7 +159,6 @@ function renderOnline(div, who) {
         return;
     }
     $.each(who, function (index, player) {
-        onlineUsers.add(player.name);
         var playerSpan = $("<span/>").text(player.name).addClass("label");
         if (player.superUser) {
             playerSpan.addClass("label-warning");
@@ -589,7 +585,7 @@ function loadGame(data) {
         $("#gameLabel").text(data.label);
     }
     if (data.refresh > 0) {
-        if (refresher !== null) clearTimeout(refresher);
+        if (refresher) clearTimeout(refresher);
         refresher = setTimeout("refreshState(false)", data.refresh);
     }
     if (data.ping !== null) {
@@ -638,8 +634,8 @@ function loadGame(data) {
 
 function generateCardData(parent) {
     tippy(parent + ' a.card-name', {
-        placement: 'right',
-        arrow: true,
+        animateFill: false,
+        hideOnClick: false,
         onShow: function (instance) {
             const content = this.querySelector('.tippy-content');
             content.innerHTML = "Loading...";
@@ -821,6 +817,7 @@ function callbackMain(data) {
         removeLabeledRows('activeGames', data.removedGames);
         renderMessage(data.message);
         if (data.refresh > 0) {
+            if (refresher) clearTimeout(refresher);
             refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", data.refresh);
         }
     }
@@ -828,40 +825,5 @@ function callbackMain(data) {
 
 function callbackStatus(data) {
     var clockDiv = dwr.util.byId('clockdiv');
-    if (data === "outage past" || data === "not yet") {
-        clockDiv.style.display = 'none';
-        clearInterval(timeInterval);
-    } else {
-        if (data === outageTime) {
-            return;
-        }
-        clearInterval(timeInterval);
-        timeInterval = setInterval(function () {
-            var t = getTimeRemaining(data);
-            clockDiv.innerHTML = '<button class="">System restart in ' + t.days + 'd ' +
-                t.hours + 'h ' +
-                t.minutes + 'm ' +
-                t.seconds + 's' + "</button>";
-            if (t.total <= 0) {
-                clearInterval(timeInterval);
-                clockDiv.style.display = 'none';
-            }
-            clockDiv.style.display = '';
-        }, 1000);
-    }
-}
 
-function getTimeRemaining(endTime) {
-    var t = Date.parse(endTime) - Date.parse(new Date());
-    var seconds = Math.floor((t / 1000) % 60);
-    var minutes = Math.floor((t / 1000 / 60) % 60);
-    var hours = Math.floor((t / (1000 * 60 * 60)) % 24);
-    var days = Math.floor(t / (1000 * 60 * 60 * 24));
-    return {
-        'total': t,
-        'days': days,
-        'hours': hours,
-        'minutes': minutes,
-        'seconds': seconds
-    };
 }

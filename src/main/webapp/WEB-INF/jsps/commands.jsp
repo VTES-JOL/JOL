@@ -207,7 +207,7 @@
             </p>
             <h5>Syntax</h5>
             <p>
-                <code>edge [burn]</code>
+                <code>edge [PLAYER] [burn]</code>
             </p>
             <h5>Examples</h5>
             <table class="help-example">
@@ -218,6 +218,10 @@
                 <tr>
                     <td class="help-command">edge</td>
                     <td>gives you the Edge</td>
+                </tr>
+                <tr>
+                    <td class="help-command">edge Adam</td>
+                    <td>gives the edge to Adam</td>
                 </tr>
                 <tr>
                     <td class="help-command">edge burn</td>
