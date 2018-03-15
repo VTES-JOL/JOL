@@ -556,6 +556,8 @@ function loadGame(data) {
         $("#gameDeckOutput").empty();
         $("#globalNotes").empty();
         $("#privateNotes").empty();
+        $("#chat").empty();
+        $("#command").empty();
         currentOption = "notes";
     }
     if (!data.player && !data.judge) {
