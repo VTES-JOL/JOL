@@ -20,6 +20,7 @@ public class UpdateFactory {
         viewMap.put("admin", new AdminCreator());
         viewMap.put("status", new StatusCreator());
         viewMap.put("profile", new ProfileCreator());
+        viewMap.put("active", new AllGamesCreator());
         viewMap.put("super", new SuperCreator());
     }
 
@@ -30,7 +31,7 @@ public class UpdateFactory {
     public static Map<String, Object> getUpdate() {
         AdminBean abean = AdminBean.INSTANCE;
         PlayerModel model = Utils.getPlayerModel(WebContextFactory.get().getHttpServletRequest(), abean);
-        model.recordAccess();
+        abean.recordAccess(model);
         List<String> views = Arrays.asList(model.getView(), "nav", "status");
         return views.stream()
                 .map(UpdateFactory::getView)

@@ -1,36 +1,39 @@
 package net.deckserver.dwr.bean;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 public class AdminBean {
 
-    public static final Duration TIMEOUT_INTERVAL = Duration.of(10, ChronoUnit.MINUTES);
+    private static final int CHAT_STORAGE = 1000;
+    private static final int CHAT_DISCARD = 100;
+    private static final Logger logger = LoggerFactory.getLogger(AdminBean.class);
+
     public static AdminBean INSTANCE = null;
-    private static Logger logger = LoggerFactory.getLogger(AdminBean.class);
-    private static int CHAT_STORAGE = 1000;
-    private static int CHAT_DISCARD = 100;
 
     private Map<String, GameModel> gmap = new HashMap<>();
     private Map<String, PlayerModel> pmap = new HashMap<>();
-    private List<String> who = new ArrayList<>();
     private Collection<GameModel> activeSort = new TreeSet<>();
     private List<GameModel> actives;
     private volatile List<ChatEntryBean> chats = new ArrayList<>();
     private OffsetDateTime timestamp = OffsetDateTime.now();
-    private String[] admins = new String[0];
 
-    private File chatPersistenceFile = new File(System.getenv("JOL_DATA"), "global_chat.txt");
+    // Cache of users / status
+    private Cache<String, String> activeUsers = Caffeine.newBuilder()
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .build();
+
+
     private String message;
 
     public AdminBean() {
@@ -64,14 +67,9 @@ public class AdminBean {
             if (name != null) {
                 logger.trace("Creating a model for " + name);
                 pmap.put(name, bean);
-                mkWho();
             }
         }
         return bean;
-    }
-
-    public boolean isPlayerActive(String name) {
-        return pmap.containsKey(name);
     }
 
     public GameModel getGameModel(String name) {
@@ -83,8 +81,8 @@ public class AdminBean {
         return bean;
     }
 
-    public List<String> getWho() {
-        return who;
+    public Set<String> getWho() {
+        return activeUsers.asMap().keySet();
     }
 
     public void remove(String player) {
@@ -95,38 +93,21 @@ public class AdminBean {
             for (GameModel gameModel : gmap.values()) {
                 gameModel.resetView(player);
             }
-            mkWho();
         }
-    }
-
-    private synchronized void mkWho() {
-        who = new ArrayList<>(pmap.keySet());
     }
 
     public synchronized void chat(String player, String message) {
         ChatEntryBean chatEntryBean = new ChatEntryBean(player, message);
         chats.add(chatEntryBean);
-        pmap.values().stream()
-                .filter(this::checkViewTime)
-                .forEach(playerModel -> playerModel.chat(chatEntryBean));
-    }
-
-    private boolean checkViewTime(PlayerModel model) {
-        if (model.getPlayer() == null)
-            return false;
-        if (model.getTimestamp().plus(TIMEOUT_INTERVAL).isBefore(timestamp)) {
-            remove(model.getPlayer());
-            return false;
+        if (chats.size() > CHAT_STORAGE) {
+            chats = chats.subList(CHAT_DISCARD, CHAT_STORAGE);
         }
-        return true;
+        pmap.values()
+                .forEach(playerModel -> playerModel.chat(chatEntryBean));
     }
 
     public OffsetDateTime getTimestamp() {
         return timestamp;
-    }
-
-    public String[] getAdmins() {
-        return admins;
     }
 
     public void notifyAboutGame(String name) {
@@ -141,13 +122,6 @@ public class AdminBean {
                 model.changeGame(name);
             }
         }
-    }
-
-    public synchronized void unEndGame(String name) {
-        JolAdmin.getInstance().setGP(name, "state", "closed");
-        activeSort.add(getGameModel(name));
-        actives = new ArrayList<>(activeSort);
-        notifyAboutGame(name);
     }
 
     public synchronized void endGame(String name) {
@@ -167,15 +141,18 @@ public class AdminBean {
         }
     }
 
-    public synchronized List<ChatEntryBean> getChats() {
-        return chats;
-    }
-
     public void setMessage(String message) {
         this.message = message;
     }
 
     public String getMessage() {
         return message;
+    }
+
+    public void recordAccess(PlayerModel model) {
+        if (model.getPlayer() != null) {
+            activeUsers.put(model.getPlayer(), model.getView());
+            model.recordAccess();
+        }
     }
 }

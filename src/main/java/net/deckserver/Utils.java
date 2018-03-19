@@ -9,14 +9,8 @@ import net.deckserver.game.storage.cards.Deck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
-import java.net.URL;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.time.Duration;
@@ -83,32 +77,18 @@ public class Utils {
             String email = request.getParameter("newemail");
             String password = request.getParameter("newpassword");
             String captchaResponse = request.getParameter("g-recaptcha-response");
-            try {
-                boolean verify = verify(captchaResponse);
-                if (verify && JolAdmin.getInstance().registerPlayer(player, password, email)) {
-                    setPlayer(request, player);
-                    logger.debug("registered " + player);
-                } else {
-                    logger.error("registration failed for " + player);
-                    player = null;
-                }
-            } catch (IOException e) {
-                logger.error("Unable to verify recaptcha", e);
+            boolean verify = Recaptcha.verify(captchaResponse);
+            if (verify && JolAdmin.getInstance().registerPlayer(player, password, email)) {
+                setPlayer(request, player);
+                logger.debug("registered " + player);
+            } else {
+                logger.error("registration failed for " + player);
                 player = null;
             }
         }
         PlayerModel model = getPlayerModel(request, abean);
         if (player == null) {
             request.getSession().setAttribute("guest", model);
-        }
-        String gamename = request.getPathInfo();
-        if (gamename != null && gamename.length() > 0)
-            gamename = gamename.substring(1);
-        if (gamename != null && gamename.length() > 0
-                && JolAdmin.getInstance().existsGame(gamename)) {
-            logger.debug("Setting game to be " + gamename);
-
-            model.enterGame(abean, gamename);
         }
     }
 
@@ -168,58 +148,5 @@ public class Utils {
         if (interval < 60000) return 10000;
         if (interval < 300000) return 30000;
         return 60000;
-    }
-
-    public static boolean verify(String gRecaptchaResponse) throws IOException {
-        if (gRecaptchaResponse == null || "".equals(gRecaptchaResponse)) {
-            return false;
-        }
-
-        try {
-            URL obj = new URL(url);
-            HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
-
-            // add reuqest header
-            con.setRequestMethod("POST");
-            con.setRequestProperty("User-Agent", USER_AGENT);
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-
-            String postParams = "secret=" + secret + "&response=" + gRecaptchaResponse;
-
-            // Send post request
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(postParams);
-            wr.flush();
-            wr.close();
-
-            int responseCode = con.getResponseCode();
-            logger.trace("\nSending 'POST' request to URL : " + url);
-            logger.trace("Post parameters : " + postParams);
-            logger.trace("Response Code : " + responseCode);
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                    con.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            // print result
-            logger.trace(response.toString());
-
-            //parse JSON response and return 'success' value
-            JsonReader jsonReader = Json.createReader(new StringReader(response.toString()));
-            JsonObject jsonObject = jsonReader.readObject();
-            jsonReader.close();
-
-            return jsonObject.getBoolean("success");
-        } catch (Exception e) {
-            logger.error("Unable to verify recaptcha", e);
-            return false;
-        }
     }
 }

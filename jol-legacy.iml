@@ -64,6 +64,7 @@
     <orderEntry type="library" name="Maven: org.javassist:javassist:3.22.0-CR2" level="project" />
     <orderEntry type="library" name="Maven: net.tanesha.recaptcha4j:recaptcha4j:0.0.7" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish:javax.json:1.0.4" level="project" />
+    <orderEntry type="library" name="Maven: com.github.ben-manes.caffeine:caffeine:2.6.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:javax.servlet-api:3.0.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.tomcat:tomcat-catalina:7.0.85" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.tomcat:tomcat-servlet-api:7.0.85" level="project" />

@@ -105,10 +105,6 @@ public class PlayerModel implements Comparable {
         }
     }
 
-    public void removeDeck() {
-        decks = null;
-    }
-
     public void submitDeck(String name, String deck) {
         clearDeck();
         JolAdmin.getInstance().createDeck(player, name, deck);

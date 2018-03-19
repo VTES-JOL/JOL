@@ -235,7 +235,7 @@ function navigate(data) {
         $("#gameRow").hide();
         player = null;
     } else {
-        renderButton({deck: "Deck Register", profile: "Profile"});
+        renderButton({active: "All Games", deck: "Deck Register", profile: "Profile"});
         if (data.admin) {
             renderButton({admin: "Game Admin"});
         }
@@ -250,6 +250,10 @@ function navigate(data) {
     }
     renderButton({help: "Help", _guides: "Guides"});
     $("#gamename").text(game !== null ? game : '');
+}
+
+function callbackAllGames(data) {
+    renderActiveGames(data.games);
 }
 
 function showDeck(data) {
@@ -743,12 +747,8 @@ function updatePassword() {
     }
 }
 
-function loadTypes(data) {
-    dwr.util.addOptions('cardtype', data);
-}
-
 function callbackShowDecks(data) {
-    DS.getTypes({callback: loadTypes});
+    dwr.util.addOptions('cardtype', data.types);
     // Deck List
     dwr.util.removeAllRows('decks');
     for (var dIdx = 0; dIdx < data.decks.length; dIdx++) {

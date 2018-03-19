@@ -632,6 +632,10 @@ p.chat a {
     border-radius: 0.4em;
 }
 
+.grey p.chat a {
+    background-color: #ccc;
+}
+
 p.chat span.chat-span {
     padding-right: 0.2em;
 }

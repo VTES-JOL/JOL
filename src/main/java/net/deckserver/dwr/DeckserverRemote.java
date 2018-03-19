@@ -12,22 +12,17 @@ import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.interfaces.turn.GameAction;
 import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
-import net.deckserver.game.storage.cards.CardType;
 import org.directwebremoting.WebContextFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.EnumSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DeckserverRemote {
-    private static Logger logger = LoggerFactory.getLogger(DeckserverRemote.class);
 
     private final AdminBean abean;
     private HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
@@ -41,12 +36,6 @@ public class DeckserverRemote {
             return null;
         }
         return arg;
-    }
-
-    public String[] getTypes() {
-        Set<CardType> cardTypes = EnumSet.allOf(CardType.class);
-        List<String> labels = cardTypes.stream().map(CardType::getLabel).collect(Collectors.toList());
-        return labels.toArray(new String[labels.size()]);
     }
 
     public Map<String, Object> doPoll() {
@@ -125,13 +114,12 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-    public String[] getHistory(String game, String turn) {
-        String[] ret = new String[0];
+    public List<String> getHistory(String game, String turn) {
+        List<String> ret = new ArrayList<>();
         if (game != null && turn != null) {
             GameAction[] actions = JolAdmin.getInstance().getGame(game).getActions(turn);
-            ret = new String[actions.length];
             for (int i = 0; i < actions.length; i++) {
-                ret[i] = actions[i].getText();
+                ret.add(actions[i].getText());
             }
         }
         return ret;
@@ -203,10 +191,6 @@ public class DeckserverRemote {
         JolAdmin admin = JolAdmin.getInstance();
         String player = getPlayer().getPlayer();
         admin.removeDeck(player, name);
-        PlayerModel model = getPlayer();
-        if (model != null) {
-            model.removeDeck();
-        }
         return UpdateFactory.getUpdate();
     }
 
