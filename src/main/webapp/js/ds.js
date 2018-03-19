@@ -101,8 +101,8 @@ function renderGlobalChat(data) {
 
     var globalChatOutput = $("#globalChatOutput");
     $.each(data, function (index, chat) {
-        var timestamp = moment(chat.timestamp).tz("UTC").format("d-MMM HH:mm z");
-        var userTimestamp = moment(chat.timestamp).tz(USER_TIMEZONE).format("d-MMM HH:mm z");
+        var timestamp = moment(chat.timestamp).tz("UTC").format("D-MMM HH:mm z");
+        var userTimestamp = moment(chat.timestamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
         var chatLine = $("<p/>").addClass("chat");
         var timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp);
         var message = $("<span/>").text(" " + chat.player + ": " + chat.message);
@@ -199,7 +199,7 @@ function renderActiveGames(games) {
             row.insertCell(4);
         }
         row.cells[0].innerHTML = renderGameLink(games[index].game);
-        row.cells[1].innerHTML = '<small>' + moment(games[index].access).tz("UTC").format("d-MMM-YYYY HH:mm z") + '</small>';
+        row.cells[1].innerHTML = '<small>' + moment(games[index].access).tz("UTC").format("D-MMM-YYYY HH:mm z") + '</small>';
         row.cells[2].innerHTML = '<small>' + games[index].turn + '</small>';
         row.cells[3].innerHTML = '<small>' + '&nbsp ' + games[index].available.join(',') + '</small>';
         row.cells[4].innerHTML = '<small>' + games[index].admin + '</small>';
@@ -806,8 +806,8 @@ function callbackUpdateDeck(data) {
 
 // Callback for MainCreator
 function callbackMain(data) {
-    var timestamp = moment(data.stamp).tz("UTC").format("d-MMM HH:mm z");
-    var userTimestamp = moment(data.stamp).tz(USER_TIMEZONE).format("d-MMM HH:mm z");
+    var timestamp = moment(data.stamp).tz("UTC").format("D-MMM HH:mm z");
+    var userTimestamp = moment(data.stamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
     $('#chatstamp').text(timestamp).attr("title", userTimestamp);
     if (data.loggedIn) {
         toggleVisible('player', 'register');
