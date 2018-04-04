@@ -4,6 +4,7 @@ import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.Location;
 import org.slf4j.Logger;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -103,14 +104,19 @@ class CommandParser {
     }
 
     int getAmount(int amount) throws CommandException {
-        char first = args[ind].charAt(0);
-        amount = Integer.parseInt(args[ind++].substring(1));
-        if (first == '-') {
-            amount = 0 - amount;
-        } else if (first != '+') {
-            throw new CommandException("Must preface amount with '+' or '-'");
+        try {
+            char first = args[ind].charAt(0);
+            if (!Arrays.asList('-', '+').contains(first)) {
+                throw new CommandException("Must preface amount with '+' or '-'");
+            }
+            amount = Integer.parseInt(args[ind++].substring(1));
+            if (first == '-') {
+                amount = 0 - amount;
+            }
+            return amount;
+        } catch (Exception e) {
+            return amount;
         }
-        return amount;
     }
 
     int getNumber(int def) throws CommandException {

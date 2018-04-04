@@ -661,6 +661,12 @@ small.counter {
     background-color: grey;
 }
 
+small.votes {
+    background-color: #ffd246;
+    border: 1px solid black;
+    color: black;
+}
+
 small.blood {
     background-color: #e04747;
 }

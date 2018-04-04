@@ -15,6 +15,7 @@
     <li><a href="#help_transfer">Transfer</a>
     <li><a href="#help_lock">Lock</a>
     <li><a href="#help_unlock">Unlock</a>
+    <li><a href="#help_votes">Votes</a></li>
 </ul>
 <div id="help-body">
     <div id="help_pool">
@@ -610,6 +611,39 @@
                 <tr>
                     <td class="help-command">unlock George ready 3</td>
                     <td>unlock card #3 in George's ready region (Babble, Angela Preston)</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="help_votes">
+        <h4 class="header">Votes</h4>
+        <div class="light padded">
+            <p>
+                The default PLAYER is yourself. The default region is the ready region.
+                Note: This is a label only, no mechanics use votes currently.
+            </p>
+            <h5>Syntax</h5>
+            <p>
+                <code>votes [PLAYER] [REGION CARD] [+|-]AMOUNT</code>
+            </p>
+            <h5>Examples</h5>
+            <table class="help-example">
+                <tr>
+                    <th class="help-command">Command</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td class="help-command"> votes ready 1 +3</td>
+                    <td>labels ready region card #1 with 3 votes</td>
+                </tr>
+                <tr>
+                    <td class="help-command"> blood ready 1 1 0</td>
+                    <td>removes vote label from ready region card #1.1
+                    </td>
+                </tr>
+                <tr>
+                    <td class="help-command"> blood Adam 2 +4</td>
+                    <td> adds 4 votes to Adam's ready region card #2</td>
                 </tr>
             </table>
         </div>

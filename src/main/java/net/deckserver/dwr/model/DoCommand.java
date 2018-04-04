@@ -62,6 +62,14 @@ public class DoCommand {
                 game.setText(card, note.toString());
                 return "Adjusted label";
             }
+            if (cmd.equalsIgnoreCase("votes")) {
+                String targetPlayer = cmdObj.getPlayer(player);
+                String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
+                String card = cmdObj.getCard(false, targetPlayer, targetRegion);
+
+                game.setVotes(card, cmdObj.getNumber(0));
+                return "Adjusted votes";
+            }
             if (cmd.equalsIgnoreCase("order")) {
                 List<String> players = game.getPlayers();
                 List<String> neworder = new ArrayList<>();

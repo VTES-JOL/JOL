@@ -18,12 +18,10 @@ import org.slf4j.Logger;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -46,6 +44,7 @@ public class JolGame {
     private static final String COUNTERS = "counters";
     private static final String BLOOD = "blood";
     private static final String TEXT = "text";
+    private static final String VOTES = "votes";
     private static final String ACTIVE = "active meth";
     private static final String POOL = "pool";
     private static final String EDGE = "edge";
@@ -247,6 +246,11 @@ public class JolGame {
         return null;
     }
 
+    private void removeNote(NoteTaker nt, String name) {
+        List<Notation> notes = nt.getNotes();
+        notes.stream().filter(note -> note.getName().equals(name)).findFirst().ifPresent(notes::remove);
+    }
+
     public String getCardDescripId(String cardId) {
         Card card = state.getCard(cardId);
         return card.getCardId();
@@ -365,6 +369,30 @@ public class JolGame {
         return note.getValue();
     }
 
+    public Integer getPlayerVotes(String player) {
+        Notation note = getNote(state, player + VOTES, false);
+        if (note != null) {
+            return Integer.valueOf(note.getValue());
+        } else {
+            return 0;
+        }
+    }
+
+    public void setPlayerVotes(String player, Integer votes) {
+        Notation note = getNote(state, player + VOTES, true);
+        note.setValue(votes.toString());
+    }
+
+    public void changePlayerVotes(String player, Integer votes) {
+        Notation note = getNote(state, player + VOTES, true);
+        Integer current = Integer.valueOf(note.getValue());
+        Integer newVotes = current + votes;
+        if (newVotes < 0) {
+            newVotes = 0;
+        }
+        setPlayerVotes(player, newVotes);
+    }
+
     public String getText(String cardId) {
         Card card = state.getCard(cardId);
         Notation note = getNote(card, TEXT, false);
@@ -380,8 +408,35 @@ public class JolGame {
     public void setText(String cardId, String text) {
         Card card = state.getCard(cardId);
         Notation note = getNote(card, TEXT, true);
-        note.setValue(text);
-        addMessage(getCardName(card) + " now " + text);
+        String cleanText = text.trim();
+        note.setValue(cleanText);
+        if (!"".equals(cleanText)) {
+            addMessage(getCardName(card) + " now " + text);
+        } else {
+            addMessage("Removed label from " + getCardName(card));
+        }
+    }
+
+    public Integer getVotes(String cardId) {
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, VOTES, false);
+        if (note != null) {
+            return Integer.valueOf(note.getValue());
+        } else {
+            return 0;
+        }
+    }
+
+    public void setVotes(String cardId, Integer votes) {
+        Card card = state.getCard(cardId);
+        if (votes > 0) {
+            Notation note = getNote(card, VOTES, true);
+            note.setValue(votes.toString());
+            addMessage(getCardName(card) + " now has " + votes + " votes");
+        } else {
+            removeNote(card, VOTES);
+            addMessage(getCardName(card) + " now has no votes");
+        }
     }
 
     public boolean isTapped(String cardId) {

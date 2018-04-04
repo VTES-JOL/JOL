@@ -11,6 +11,7 @@
     int counters = game.getCounters(c.getId());
     boolean locked = game.isTapped(c.getId());
     String label = game.getText(c.getId());
+    Integer votes = game.getVotes(c.getId());
     boolean nested = p.doNesting();
     Card[] cards = c.getCards();
     boolean hasCards = cards != null && cards.length > 0;
@@ -23,6 +24,7 @@
     request.setAttribute("game", game);
     request.setAttribute("capacity", capacity);
     request.setAttribute("counters", counters);
+    request.setAttribute("votes", votes);
     request.setAttribute("locked", locked);
     request.setAttribute("label", label);
     request.setAttribute("nested", nested);
@@ -54,6 +56,11 @@
     </c:if>
     <c:if test="${counters > 0 && !hasLife && !isCrypt && capacity <= 0}">
         <small class="counter"><%= counters %>
+        </small>
+    </c:if>
+
+    <c:if test="${votes > 0}">
+        <small class="counter votes" title="<%= votes %> votes"><%= votes %>
         </small>
     </c:if>
 
