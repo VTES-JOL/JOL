@@ -135,7 +135,7 @@ public class AdminBean {
         logger.trace("Creating game {} for player {}", name, player.getPlayer());
         if (JolAdmin.getInstance().mkGame(name)) {
             JolAdmin.getInstance().setOwner(name, player.getPlayer());
-            activeSort.add(new GameModel(name));
+            activeSort.add(getGameModel(name));
             actives = new ArrayList<>(activeSort);
             notifyAboutGame(name);
         }

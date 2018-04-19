@@ -119,6 +119,9 @@
                         Group</a>
                 </li>
                 <li>
+                    <a href="https://discord.gg/fJjac75" target="_blank">Discord Channel</a>
+                </li>
+                <li>
                     <a href="/jol-news/">Patch Notes / News</a>
                 </li>
                 <li>

@@ -1,49 +1,49 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <game-actions>
-  <counter>3</counter>
-  <game-counter>7</game-counter>
-  <turn>
-    <sequence>1</sequence>
-    <name>Player4</name>
-    <counter>5</counter>
-    <label>Player4 1.1</label>
-    <action>
-      <counter>1</counter>
-      <text>19:08 4/10 [Player4] START OF UNLOCK PHASE.</text>
-    </action>
-    <action>
-      <counter>2</counter>
-      <text>19:10 4/10 [Player4] START OF INFLUENCE PHASE.</text>
-    </action>
-    <action>
-      <counter>3</counter>
-      <text>19:10 4/10 Player4's pool was 30, now is 29.</text>
-      <command>pool</command>
-      <command>Player4</command>
-      <command>29</command>
-    </action>
-    <action>
-      <counter>4</counter>
-      <text>19:10 4/10 Added 1 blood to inactive region #4, now 1.</text>
-      <command>counter</command>
-      <command>86</command>
-      <command>1</command>
-    </action>
-  </turn>
-  <turn>
-    <sequence>2</sequence>
-    <name>Player5</name>
     <counter>3</counter>
-    <label>Player5 1.2</label>
-    <action>
-      <counter>1</counter>
-      <text>19:11 4/10 [Player5] START OF UNLOCK PHASE.</text>
-    </action>
-    <action>
-      <counter>2</counter>
-      <text>12:58 4/11 Player1 grabs edge from no one.</text>
-      <command>edge</command>
-      <command>Player1</command>
-    </action>
-  </turn>
+    <game-counter>7</game-counter>
+    <turn>
+        <sequence>1</sequence>
+        <name>Player4</name>
+        <counter>5</counter>
+        <label>Player4 1.1</label>
+        <action>
+            <counter>1</counter>
+            <text>19:08 4/10 [Player4] START OF UNLOCK PHASE.</text>
+        </action>
+        <action>
+            <counter>2</counter>
+            <text>19:10 4/10 [Player4] START OF INFLUENCE PHASE.</text>
+        </action>
+        <action>
+            <counter>3</counter>
+            <text>19:10 4/10 Player4's pool was 30, now is 29.</text>
+            <command>pool</command>
+            <command>Player4</command>
+            <command>29</command>
+        </action>
+        <action>
+            <counter>4</counter>
+            <text>19:10 4/10 Added 1 blood to inactive region #4, now 1.</text>
+            <command>counter</command>
+            <command>86</command>
+            <command>1</command>
+        </action>
+    </turn>
+    <turn>
+        <sequence>2</sequence>
+        <name>Player5</name>
+        <counter>3</counter>
+        <label>Player5 1.2</label>
+        <action>
+            <counter>1</counter>
+            <text>19:11 4/10 [Player5] START OF UNLOCK PHASE.</text>
+        </action>
+        <action>
+            <counter>2</counter>
+            <text>12:58 4/11 Player1 grabs edge from no one.</text>
+            <command>edge</command>
+            <command>Player1</command>
+        </action>
+    </turn>
 </game-actions>
