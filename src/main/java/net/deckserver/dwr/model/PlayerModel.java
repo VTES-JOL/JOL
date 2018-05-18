@@ -74,7 +74,6 @@ public class PlayerModel implements Comparable {
     }
 
     public synchronized void chat(ChatEntryBean chat) {
-        logger.info("Chat added to {} from player: {}, message: {}", this.player, chat.getPlayer(), chat.getMessage());
         chats.add(chat);
     }
 

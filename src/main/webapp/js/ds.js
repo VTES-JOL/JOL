@@ -796,8 +796,9 @@ function callbackShowCards(data) {
         dwr.util.byId('showcards').deleteRow(0);
     }
     for (var i = 0; i < data.length; i++) {
-        dwr.util.byId('showcards').insertRow(0).insertCell(0).innerHTML = '<a href="javascript:getCardDeck(null,' + "'" + data[i].id + "'" + ');">' + data[i].name + '</a>';
+        dwr.util.byId('showcards').insertRow(0).insertCell(0).innerHTML = '<a class="card-name" title="' + data[i].id + '">' + data[i].name + '</a>';
     }
+    generateCardData("#showcards");
 }
 
 function callbackUpdateDeck(data) {
