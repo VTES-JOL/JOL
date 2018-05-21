@@ -49,10 +49,6 @@ public class PlayerSummaryBean {
             } else {
                 OffsetDateTime access = admin.getAccess(this.game, player);
                 OffsetDateTime timestamp = admin.getGameTimeStamp(this.game);
-                OffsetDateTime systemStart = admin.getSystemStart();
-                if (timestamp.compareTo(systemStart) < 0) {
-                    timestamp = systemStart;
-                }
                 this.current = timestamp.isBefore(access);
             }
         }
