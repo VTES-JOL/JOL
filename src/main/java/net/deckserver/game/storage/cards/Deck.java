@@ -6,6 +6,7 @@
 
 package net.deckserver.game.storage.cards;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,13 +96,10 @@ public class Deck {
         String line = null;
         try {
             while (reader.ready() && ((line = reader.readLine()) != null)) {
-                if (line.startsWith("ZZZ@@@") && !ignoreTranslation) {
-                    parseCards = false;
-                    continue;
-                }
-                String id = processLine(line, ignoreTranslation);
-                if (id != null) {
-                    boolean didTranslation = true;
+                try {
+                    processLine(line, ignoreTranslation);
+                } catch (Exception e) {
+                    logger.error("Error parsing deck line: " + line);
                 }
             }
         } catch (IOException ie) {
@@ -158,21 +156,10 @@ public class Deck {
     }
 
     private CardEntry findCard(String text) {
-        // first find out if advanced
-        boolean advanced = false;
-        if (text.endsWith("(advanced)")) {
-            text = text.substring(0, text.lastIndexOf("(advanced)")).trim();
-            advanced = true;
-        } else if (text.endsWith("(ADV)")) {
-            text = text.substring(0, text.lastIndexOf("(ADV)")).trim();
-            advanced = true;
-        }
+        text = text.replaceAll("\\(advanced\\)", "(Adv)");
         CardEntry[] set = findCardName(text);
         CardEntry card = selectCard(text, set);
         if (card == null) return null;
-        if (!advanced) return card;
-        set = search.searchByText(set, "Advanced");
-        card = selectCard(text, set);
         return card;
     }
 

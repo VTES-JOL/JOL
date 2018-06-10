@@ -73,7 +73,7 @@ public class CardEntry {
     }
 
     public String getName() {
-        return !advanced ? name : name + " (ADV)";
+        return name;
     }
 
     public String getBaseName() {

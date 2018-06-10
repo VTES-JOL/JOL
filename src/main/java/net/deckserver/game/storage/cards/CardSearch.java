@@ -6,6 +6,7 @@
 
 package net.deckserver.game.storage.cards;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import java.io.LineNumberReader;
