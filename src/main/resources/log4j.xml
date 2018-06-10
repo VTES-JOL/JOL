@@ -19,29 +19,29 @@
         </layout>
     </appender>
 
-    <!-- All application exceptions/errors will be written here -->
+<!--    &lt;!&ndash; All application exceptions/errors will be written here &ndash;&gt;
     <category name="org.directwebremoting.log.accessLog">
         <priority value="INFO"/>
         <appender-ref ref="dwrLogFile" />
     </category>
 
-    <!-- All DWR startup information will be written here -->
+    &lt;!&ndash; All DWR startup information will be written here &ndash;&gt;
     <category name="org.directwebremoting.log.startup">
         <priority value="DEBUG"/>
         <appender-ref ref="dwrLogFile" />
     </category>
 
-    <!-- All DWR script information will be written here -->
+    &lt;!&ndash; All DWR script information will be written here &ndash;&gt;
     <category name="org.directwebremoting.log.scripts">
         <priority value="DEBUG"/>
         <appender-ref ref="dwrLogFile" />
     </category>
 
-    <!-- All DWR session information will be written here -->
+    &lt;!&ndash; All DWR session information will be written here &ndash;&gt;
     <category name="org.directwebremoting.log.session">
         <priority value="DEBUG"/>
         <appender-ref ref="dwrLogFile" />
-    </category>
+    </category>-->
 
     <!-- All other messages will be written here, including exceptions internal to DWR -->
     <root>

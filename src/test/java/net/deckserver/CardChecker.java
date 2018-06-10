@@ -1,5 +1,7 @@
 package net.deckserver;
 
+import net.deckserver.game.storage.cards.CardEntry;
+import net.deckserver.game.storage.cards.CardSearch;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -20,7 +22,7 @@ public class CardChecker {
 
     @Test
     public void loadCards() throws Exception {
-        String basePath = "/Users/shannon/data";
+        String basePath = "src/test/resources";
         Path keyFile = Paths.get(basePath, "cards", "base.prop");
         Path textFile = Paths.get(basePath, "cards", "base.txt");
         assertTrue(keyFile.toFile().exists());
@@ -33,7 +35,17 @@ public class CardChecker {
 
         // Map of Names -> keys
         Map<String, String> nameKeys = keys.stream().map(s -> s.split("=")).collect(Collectors.toMap(s -> s[1], s -> s[0]));
-        nameKeys.keySet().removeAll(names);
-        nameKeys.keySet().forEach(System.out::println);
+
+        names.forEach(name -> {
+            assertTrue("missing key" + name, nameKeys.containsKey(name));
+        });
+
+        CardSearch cardSearch = new CardSearch(keys, text);
+
+        CardEntry ek7 = cardSearch.getCardById("ek7");
+
+        String unmasking = cardSearch.getId("Unmasking, The");
+        System.out.println(unmasking);
+
     }
 }
