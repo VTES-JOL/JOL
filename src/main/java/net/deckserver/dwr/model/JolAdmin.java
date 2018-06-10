@@ -25,6 +25,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.OffsetDateTime;
@@ -305,9 +307,13 @@ public class JolAdmin {
         if (CARD_DATA == null) {
             logger.info("Loading Card Data");
             try {
-                String set = readIsoFile(new File(dir + "/cards/base.txt"));
-                String prop = readIsoFile(new File(dir + "/cards/base.prop"));
-                CARD_DATA = new CardSearch(set, prop);
+                Path keyFile = Paths.get(dir, "cards", "base.prop");
+                Path textFile = Paths.get(dir, "cards", "base.txt");
+
+                List<String> keys = Files.readAllLines(keyFile, Charset.forName("ISO-8859-1"));
+                List<String> text = Files.readAllLines(textFile, Charset.forName("ISO-8859-1"));
+
+                CARD_DATA = new CardSearch(keys, text);
             } catch (IOException e) {
                 throw new RuntimeException("Unable to open card files", e);
             }

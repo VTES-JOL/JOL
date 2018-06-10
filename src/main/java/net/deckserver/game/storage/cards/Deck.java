@@ -6,7 +6,6 @@
 
 package net.deckserver.game.storage.cards;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,35 +58,6 @@ public class Deck {
                 init(deck, doConstruction);
             }
         }
-    }
-
-    private CardEntry[] findCardName(CardSearch search, String text, Collection<String> errors) {
-        CardEntry[] cards = search.getAllCards();
-        // check for prefixes
-        CardEntry[] set = search.searchByName(cards, text);
-        if (set.length > 0) return set;
-        // check for abbreviations
-        text = text.toLowerCase();
-        String id = search.getId(text);
-        if (id == null || id.equals("not found"))
-            // check for abbreviation prefixes
-            for (String abbrev : search.getNames()) {
-                if (abbrev.startsWith(text)) {
-                    id = search.getId(abbrev);
-                    break;
-                }
-            }
-        if (id.equals("not found")) id = null;
-        if (id != null) {
-            // now need to convert this to a set to handle advanced vamps
-            CardEntry card = search.getCardById(id);
-
-            set = search.searchByName(cards, card.getBaseName());
-        }
-        if (id == null || set.length == 0) {
-            errors.add(text);
-        }
-        return set;
     }
 
     private void init(String deckin, boolean ignoreTranslation) {
@@ -157,25 +127,9 @@ public class Deck {
 
     private CardEntry findCard(String text) {
         text = text.replaceAll("\\(advanced\\)", "(Adv)");
-        CardEntry[] set = findCardName(text);
-        CardEntry card = selectCard(text, set);
+        CardEntry card = search.findCard(text);
         if (card == null) return null;
         return card;
-    }
-
-    private CardEntry selectCard(String text, CardEntry[] set) {
-        text = text.toLowerCase();
-        if (set.length == 0) return null;
-        CardEntry bestfit = set[0];
-        for (CardEntry card : set) {
-            if (card.getBaseName().toLowerCase().equals(text)) return card;
-            if (card.getBaseName().toLowerCase().startsWith(text)) bestfit = card;
-        }
-        return bestfit;
-    }
-
-    public CardEntry[] findCardName(String text) {
-        return findCardName(search, text, errors);
     }
 
     public String[] getErrorLines() {
