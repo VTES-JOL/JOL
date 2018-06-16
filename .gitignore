@@ -4,3 +4,6 @@
 target/*
 .DS_Store
 src/test/resources/global_chat.txt
+
+# Vim
+*.swp
