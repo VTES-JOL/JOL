@@ -33,6 +33,7 @@ function init(data) {
     $("h4.collapse").click(function () {
         $(this).next().slideToggle();
     })
+	$('#dsuserin').focus();
 }
 
 function processData(data) {
@@ -72,11 +73,13 @@ function doLoadDeck(deck) {
 function renderButton(data) {
     var buttonsDiv = $("#buttons");
     $.each(data, function (key, value) {
-        var button = $("<button/>").text(value).click(key, function () {
+        var button = $("<a/>").addClass("nav-item nav-link").text(value).click(key, function () {
             DS.navigate(key, {callback: processData, errorHandler: errorhandler});
+            $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
+            //$('#navbarNavAltMarkup').removeClass('show'); //Collapse instantly
         });
         if (game === value || currentPage.toLowerCase() === key.toLowerCase()) {
-            button.addClass("active-button");
+            button.addClass("active");
         }
         buttonsDiv.append(button);
     });
@@ -101,7 +104,7 @@ function renderGlobalChat(data) {
 
     var globalChatOutput = $("#globalChatOutput");
     $.each(data, function (index, chat) {
-        var timestamp = moment(chat.timestamp).tz("UTC").format("D-MMM HH:mm z");
+        var timestamp = moment(chat.timestamp).tz("UTC").format("D-MMM HH:mm");
         var userTimestamp = moment(chat.timestamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
         var chatLine = $("<p/>").addClass("chat");
         var timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp);
@@ -230,8 +233,7 @@ function navigate(data) {
     $("#buttons").empty();
     renderButton({main: "Main" + (data.chats ? " *" : "")});
     if (data.player === null) {
-        $("#loginInputs").show();
-        $("#login").val("Log in");
+        $('#logout').hide();
         $("#gameRow").hide();
         player = null;
     } else {
@@ -243,8 +245,7 @@ function navigate(data) {
             renderButton({super: "User Admin"});
         }
         renderButton(data.gameButtons);
-        $("#loginInputs").hide();
-        $("#login").val("Log out");
+        $('#logout').show();
         $("#gameRow").show();
         player = data.player;
     }
@@ -827,6 +828,12 @@ function callbackMain(data) {
 }
 
 function callbackStatus(data) {
-    var clockDiv = dwr.util.byId('clockdiv');
+}
 
+function goToRegister(event) {
+    event.preventDefault();
+    //window.scroll({top: 99, left:0, behavior: 'smooth'});
+    $('body').scrollTop(999);
+    //$('#register').focus();
+    //$('#newplayer').focus();
 }

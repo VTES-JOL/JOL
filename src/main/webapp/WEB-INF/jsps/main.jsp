@@ -1,51 +1,38 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" %>
 <div class="row">
-    <div class="col-sm-3">
-        <div id="player" style="display: none;">
-            <h4 class="header">Your games:</h4>
-            <table id="ownGames" class="clean-table light"></table>
-        </div>
-        <div id="register">
-            <h4 class="header">Register</h4>
-            <form method="post" class="light some-padding">
-                <span>Register to create decks and join games!</span>
-                <table class="clean-no-border">
-                    <tr>
-                        <td><label for="newplayer">Name:</label></td>
-                        <td><input style="width:100%;" type="text" size="30" name="newplayer" id="newplayer"/></td>
-                    </tr>
-                    <tr>
-                        <td><label for="newpassword">Password:</label></td>
-                        <td><input style="width:100%;" type="password" size="30" name="newpassword" autocomplete="new-password"
-                                   id="newpassword"/></td>
-                    </tr>
-                    <tr>
-                        <td><label for="newemail">Email:</label></td>
-                        <td><input style="width:100%;" type="text" size=30 name="newemail" autocomplete="email" id="newemail"/></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <div class="g-recaptcha"
-                                 data-sitekey="<%= System.getenv("JOL_RECAPTCHA_KEY") %>"></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2"><input type=submit name="register" value="Register"/></td>
-                    </tr>
-                </table>
-            </form>
-        </div>
+    <div id="player" class="col-sm-4" style="display: none;">
+        <h4 class="header">Your games:</h4>
+        <table id="ownGames" class="clean-table light"></table>
     </div>
-    <div class="col-sm-6">
-        <div id="messages" style="display: none;"></div>
+    <div class="col-sm-5">
+        <div class="row">
+            <div class="col">
+                <div id="messages" style="display: none;"></div>
+            </div>
+        </div>
 
         <div id="welcome">
             <h4 class="header">Welcome to V:TES Online</h4>
+            <form method="post" class="light some-padding">
+                <div class="form-row">
+                    <div class="col">
+                        <input type="text" class="form-control" id="dsuserin" name="dsuserin" autocomplete="username" placeholder="Username"/>
+                    </div>
+                    <div class="col">
+                        <input type="password" class="form-control" id="dspassin" name="dspassin" autocomplete="current-password" placeholder="Password"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mt-1">
+                        <button type="submit" id="login" name="login" value="Log in" class="btn btn-primary w-100">Log In</button>
+                    </div>
+                </div>
+            </form>
             <div class="light padded">
                 <p>V:TES Online is the unofficial home to play Vampire: The Eternal Struggle online.</p>
 
-                <p>Register an account, create a deck, or import from your favorite deck building programs.</p>
+                <p><a href="#" onclick="return goToRegister(event);">Register an account</a>, create a deck, or import from your favorite deck building programs.</p>
 
                 <p>
                     Play using text commands, in a format that suits your availability.
@@ -84,8 +71,39 @@
 
         </div>
     </div>
+    <div id="register" class="col-sm-4">
+        <h4 class="header">Register</h4>
+        <form method="post" class="light some-padding">
+            <span>Register to create decks and join games!</span>
+
+            <div class="form-group form-row mb-1">
+                <label for="newplayer" class="col-3 col-form-label">Name</label>
+                <div class="col-9">
+                    <input type="text" class="form-control" name="newplayer" id="newplayer"/>
+                </div>
+            </div>
+            <div class="form-group form-row mb-1">
+                <label for="newpassword" class="col-3 col-form-label">Password</label>
+                <div class="col-9">
+                    <input type="password" class="form-control" name="newpassword" autocomplete="new-password"
+                           id="newpassword"/>
+                </div>
+            </div>
+            <div class="form-group form-row mb-1">
+                <label for="newemail" class="col-3 col-form-label">Email</label>
+                <div class="col-9">
+                    <input type="email" class="form-control" name="newemail" autocomplete="email" id="newemail"/>
+                </div>
+            </div>
+            <div class="form-group form-row mb-1">
+                <div class="g-recaptcha"
+                     data-sitekey="<%= System.getenv("JOL_RECAPTCHA_KEY") %>"></div>
+            </div>
+            <button type="submit" name="register" value="Register" class="btn btn-primary w-100">Register</button>
+        </form>
+    </div>
     <div class="col-sm-3">
-        <h4 class="header collapse">User Ranks:</h4>
+        <h4 class="header">User Ranks:</h4>
         <ul class="condensed-list light">
             <li>
                 <span class="label label-light">Embrace</span>
@@ -104,11 +122,11 @@
                 <p>Administer games for all other Princes</p>
             </li>
         </ul>
-        <h4 class="header collapse">Contact</h4>
+        <h4 class="header">Contact:</h4>
         <ul class="condensed-list light">
             <li><a href="mailto:admin@deckserver.net">Contact Site Administrator</a></li>
         </ul>
-        <h4 class="header collapse">Links:</h4>
+        <h4 class="header">Links:</h4>
         <ul class="condensed-list light">
             <li>
                 <a href="https://www.facebook.com/groups/jolstatus/" target="_blank">Facebook Status Group</a>
@@ -128,7 +146,7 @@
             </li>
 
         </ul>
-        <h4 class="header collapse">Donate:</h4>
+        <h4 class="header">Donate:</h4>
         <ul class="condensed-list light">
             <li>
                 <span>Goes towards keeping JOL running.  Any donation appreciated.</span>

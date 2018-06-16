@@ -51,27 +51,24 @@ public class Utils {
     public static void checkParams(HttpServletRequest request, ServletContext ctx) {
         AdminBean abean = AdminBean.INSTANCE;
         String player = (String) request.getSession().getAttribute("meth");
-        String login = request.getParameter("login");
         logger.trace("Get request {} from player {}", request.getRequestURI(), player);
-        if (login != null) {
-            if (login.equals("Log in")) {
-                player = request.getParameter("dsuserin");
-                String password = request.getParameter("dspassin");
-                if (player != null
-                        && JolAdmin.getInstance().authenticate(player,
-                        password)) {
-                    setPlayer(request, player);
-                    logger.debug("Logged in player {}", player);
-                } else {
-                    logger.debug("Log in failed for player {}", player);
-                    player = null;
-                }
-            } else if (login.equals("Log out")) {
-                logger.debug("Log out: " + player);
-                request.getSession().removeAttribute("meth");
-                abean.remove(player);
-                player = null;
-            }
+		if (request.getParameter("logout") != null) {
+			logger.debug("Log out: " + player);
+			request.getSession().removeAttribute("meth");
+			abean.remove(player);
+			player = null;
+		} else if (request.getParameter("login") != null) {
+			player = request.getParameter("dsuserin");
+			String password = request.getParameter("dspassin");
+			if (player != null
+					&& JolAdmin.getInstance().authenticate(player,
+					password)) {
+				setPlayer(request, player);
+				logger.debug("Logged in player {}", player);
+			} else {
+				logger.debug("Log in failed for player {}", player);
+				player = null;
+			}
         } else if ("Register".equals(request.getParameter("register"))) {
             player = request.getParameter("newplayer");
             String email = request.getParameter("newemail");
