@@ -12,7 +12,7 @@
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
 
-        <!--<link rel="stylesheet" type="text/css" href="css/styles.css"/>-->
+        <link rel="stylesheet" type="text/css" href="css/styles.css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery-ui.structure.min.css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery-ui.theme.min.css"/>
@@ -20,11 +20,13 @@
         <link href="https://fonts.googleapis.com/css?family=IM+Fell+English" rel="stylesheet">
     </head>
     <body>
-        <div id="loadMessage">Loading...</div>
-        <div id="loaded" style="display :none;" class="container">
+        <div id="loadMessage" class="col text-center">
+            <h1>Loading...</h1>
+        </div>
+        <div id="loaded" style="display :none;">
             <jsp:include page="/WEB-INF/jsps/topbar.jsp"/>
 
-            <div id="content">
+            <div id="content" class="container-fluid">
                 <div id="main">
                     <jsp:include page="/WEB-INF/jsps/main.jsp"/>
                 </div>
@@ -60,6 +62,11 @@
                 <div id="super" style="display:none">
                     <jsp:include page="/WEB-INF/jsps/super.jsp"/>
                 </div>
+
+				<div class="row">  <!-- Footer -->
+					<small>v<%= System.getenv("JOL_VERSION")%></small>
+					<span id="chatstamp" class="label label-light label-basic navbar-text"></span>
+				</div>
             </div>
         </div>
         <!-- Bootstrap -->
