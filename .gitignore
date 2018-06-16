@@ -3,7 +3,10 @@
 *.iml
 target/*
 .DS_Store
-src/test/resources/global_chat.txt
 
 # Vim
 *.swp
+
+# Game data
+src/test/resources/game*
+src/test/resources/global_chat.txt
