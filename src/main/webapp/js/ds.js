@@ -76,7 +76,6 @@ function renderButton(data) {
         var button = $("<a/>").addClass("nav-item nav-link").text(value).click(key, function () {
             DS.navigate(key, {callback: processData, errorHandler: errorhandler});
             $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
-            //$('#navbarNavAltMarkup').removeClass('show'); //Collapse instantly
         });
         if (game === value || currentPage.toLowerCase() === key.toLowerCase()) {
             button.addClass("active");
@@ -250,7 +249,6 @@ function navigate(data) {
         player = data.player;
     }
     renderButton({help: "Help", _guides: "Guides"});
-    $("#gamename").text(game !== null ? game : '');
 }
 
 function callbackAllGames(data) {
@@ -514,19 +512,18 @@ function doSubmit() {
     return false;
 }
 
-function updateOther() {
-    currentOption = $("#otherSelect").val();
+function setOther(newOption) {
+    currentOption = newOption;
     switch (currentOption) {
-        case "notes":
-            showNotes();
-            break;
-        case "history":
-            showHistory();
-            break;
-        case "deck":
-            showGameDeck();
-            break;
+        case "notes": showNotes(); break;
+        case "history": showHistory(); break;
+        case "deck": showGameDeck(); break;
     }
+}
+
+function otherClicked(event) {
+    setOther($(event.target).data('target'));
+    event.preventDefault();
 }
 
 function showGameDeck() {
@@ -574,8 +571,7 @@ function loadGame(data) {
         $(".reactive-height-content").addClass("full-height-content").removeClass("half-height-content");
         $(".reactive-height-content-header").addClass("full-height-content-header").removeClass("half-height-content-header");
     }
-    $("#otherSelect").val(currentOption);
-    updateOther();
+    setOther(currentOption);
     if (data.hand !== null) {
         $("#hand").html(data.hand);
     }
@@ -688,7 +684,6 @@ function loadHistory(data) {
 }
 
 function callbackSuper(data) {
-
     var adminList = $("#adminList");
     adminList.empty();
 
@@ -824,7 +819,10 @@ function callbackMain(data) {
             if (refresher) clearTimeout(refresher);
             refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", data.refresh);
         }
-    }
+    } else {
+        toggleVisible('register', 'player');
+        toggleVisible('welcome', 'globalchat');
+	}
 }
 
 function callbackStatus(data) {
