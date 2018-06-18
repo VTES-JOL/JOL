@@ -32,7 +32,7 @@
             <div class="light padded">
                 <p>V:TES Online is the unofficial home to play Vampire: The Eternal Struggle online.</p>
 
-                <p><a href="#" onclick="return goToRegister(event);">Register an account</a>, create a deck, or import from your favorite deck building programs.</p>
+                <p>Register an account, create a deck, or import from your favorite deck building programs.</p>
 
                 <p>
                     Play using text commands, in a format that suits your availability.

@@ -1,73 +1,61 @@
-<div id="game-info" class="reactive-height border-bottom row">
+<div id="game-info" class="border-bottom row no-gutters">
     <div class="col-sm-7">
-        <div id="gameDetails" class="row">
-            <div id="playerHand" class="player-only col-sm-6 grey border-right">
+        <div class="row no-gutters">
+            <div id="playerHand" class="col-sm-6 player-only grey border-right">
                 <div class="game-header">
                     <h5>Hand</h5>
                 </div>
-                <div id="hand" class="scrollable half-height-content"></div>
+                <div id="hand" class="scrollable"></div>
             </div>
             <div id="playerCommands" class="player-only col-sm-6 grey">
                 <div class="game-header">
                     <h5>Commands</h5>
                 </div>
-                <form onsubmit="return doSubmit()" autocomplete="off">
-                    <table class="full-width padded">
-                        <tr id="phaseCommand">
-                            <td>
-                                <label for="phase">Phase:</label>
-                            </td>
-                            <td>
-                                <select id="phase" name="phase"></select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="command">Command:</label>
-                            </td>
-                            <td>
-                                <input name="command" type="text" id="command" class="full-width"
-                                       maxlength="100"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="chat">Chat:</label>
-                            </td>
-                            <td>
-                                <input name="chat" type="text" id="chat" class="full-width" maxlength="100"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="ping">Ping:</label>
-                            </td>
-                            <td>
-                                <select id="ping" name="ping"></select>
-                            </td>
-                        </tr>
-                        <tr id="endCommand">
-                            <td>
-                                <label for="endturn">End turn?</label>
-                            </td>
-                            <td>
-                                <select id="endTurn" name="endturn">
-                                    <option value="No">No</option>
-                                    <option value="Yes">Yes</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input name="Submit" type="submit" value="Submit"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                <span id="status"></span>
-                            </td>
-                        </tr>
-                    </table>
+                <form onsubmit="return doSubmit()" autocomplete="off" class="padded">
+
+                    <div id="phaseCommand" class="form-group form-row mb-1">
+                        <label for="phase" class="col-4 col-form-label col-form-label-sm">Phase:</label>
+                        <div class="col-8">
+                            <select id="phase" name="phase" class="form-control form-control-sm"></select>
+                        </div>
+                    </div>
+                    <div class="form-group form-row mb-1">
+                        <label for="command" class="col-4 col-form-label col-form-label-sm">Command:</label>
+                        <div class="col-8">
+                            <input name="command" type="text" id="command" class="form-control form-control-sm"
+                                   maxlength="100"/>
+                        </div>
+                    </div>
+                    <div class="form-group form-row mb-1">
+                        <label for="chat" class="col-4 col-form-label col-form-label-sm">Chat:</label>
+                        <div class="col-8">
+                            <input name="chat" type="text" id="chat" class="form-control form-control-sm" maxlength="100"/>
+                        </div>
+                    </div>
+                    <div class="form-group form-row mb-1">
+                        <label for="ping" class="col-4 col-form-label col-form-label-sm">Ping:</label>
+                        <div class="col-8">
+                            <select id="ping" name="ping" class="form-control form-control-sm"></select>
+                        </div>
+                    </div>
+                    <div class="form-group form-row mb-1">
+                        <div id="endCommand" class="col-8">
+                            <div class="form-row">
+                                <label for="endturn" class="col-6 col-form-label col-form-label-sm">End turn?</label>
+                                <div class="col-6">
+                                    <select id="endTurn" name="endturn" class="form-control form-control-sm">
+                                        <option value="No">No</option>
+                                        <option value="Yes">Yes</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <button name="Submit" type="submit" value="Submit" class="btn btn-sm btn-primary w-100">Submit</button>
+                        </div>
+                    </div>
+                    <span id="status"></span>
+
                 </form>
             </div>
         </div>
@@ -83,37 +71,36 @@
     </div>
     <div id="other" class="col-sm-5 grey border-left">
         <div class="game-header">
-            <h5>Game Information</h5>
-            <select id="otherSelect" onchange="updateOther()">
-                <option value="notes">Notes</option>
-                <option value="history">History</option>
-                <option value="deck" class="player-only">Deck</option>
-            </select>
+            <nav class="nav">
+                <a class="nav-link" href="#" onclick="otherClicked(event)" data-target="notes">Notes</a>
+                <a class="nav-link" href="#" onclick="otherClicked(event)" data-target="history">History</a>
+                <a class="nav-link player-only" href="#" onclick="otherClicked(event)" data-target="deck">Deck</a>
+            </nav>
         </div>
-        <div id="history" style="display:none;" class="reactive-height-content">
-            <h5 class="notes-header">History
-                <select id="turns" onchange="getHistory()"></select>
-            </h5>
-            <div id="historyOutput" class="scrollable side-padded reactive-height-content-header"></div>
+        <div id="history" class="row no-gutters">
+            <div class="col reactive-height-content">
+                <h5 class="notes-header">History
+                    <select id="turns" onchange="getHistory()"></select>
+                </h5>
+                <div id="historyOutput" class="scrollable side-padded reactive-height-content-header"></div>
+            </div>
         </div>
-        <div id="notes" class="row reactive-height-content">
-            <div class="col-sm-6 fill-width border-right">
+        <div id="notes" class="row no-gutters">
+            <div class="col-sm-6 border-right reactive-height-content">
                 <h5 class="notes-header">Global Notes</h5>
                 <textarea id="globalNotes" class="game-notes reactive-height-content-header side-padded"></textarea>
             </div>
-            <div class="col-sm-6 fill-width player-only">
+            <div class="col-sm-6 player-only reactive-height-content">
                 <h5 class="notes-header">Private Notes</h5>
                 <textarea id="privateNotes" class="game-notes reactive-height-content-header side-padded"></textarea>
             </div>
         </div>
-        <div id="gameDeck" class="reactive-height-content">
-            <h5 class="notes-header">Registered Deck</h5>
-            <div id="gameDeckOutput" class="scrollable side-padded reactive-height-content-header"></div>
+        <div id="gameDeck" class="row no-gutters">
+            <div class="col reactive-height-content">
+                <h5 class="notes-header">Registered Deck</h5>
+                <div id="gameDeckOutput" class="scrollable side-padded reactive-height-content-header"></div>
+            </div>
         </div>
     </div>
 </div>
-<table class="game-table light">
-    <tr>
-        <td id="state" colspan="4" class="no-padding"></td>
-    </tr>
-</table>
+<div id="state" class="game-table row no-gutters"></div>

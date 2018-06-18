@@ -353,37 +353,18 @@ td.layout {
     width: 100%;
 }
 
-table.game-table, table.player-state {
-    width: 100%;
-    padding: 0;
-    border-collapse: collapse;
-}
-
-table.game-table td.player {
-    width: 20%;
-    padding: 0;
+.game-table .player {
     border-right: 1px solid #aaa;
     background-color: #eee;
 }
 
-table.game-table td.game-cell {
-    vertical-align: top;
-    padding: 0;
-    border: 1px solid #aaa;
-}
-
-table.game-table td.command-cell {
-    width: 25%;
-    background-color: #eee;
-}
-
-table.game-table ol.card-list {
+.game-table ol.card-list {
     margin: 0 0 0 1.5em;
     padding: 0.5em;
     line-height: 1.5em;
 }
 
-td.player ol.card-list li {
+.player ol.card-list li {
     border: 1px solid #aaa;
     border-right-color: black;
     border-bottom-color: black;
@@ -394,28 +375,23 @@ td.player ol.card-list li {
     margin: 0.25em;
 }
 
-td.player ol.card-list li li {
+.player ol.card-list li li {
     border: none;
     padding: 0;
     margin: 0;
     border-radius: 0;
 }
 
-td.player ol.card-list ol {
+.player ol.card-list ol {
     border: none;
     border-top: 1px solid #aaa;
 }
 
-td.player ol.card-list li li a {
+.player ol.card-list li li a {
     border: none;
 }
 
-table.game-table td.command-cell-double {
-    width: 50%;
-    background-color: #eee;
-}
-
-table.game-table td.player-active {
+.game-table .player-active {
     background-color: #ddd;
 }
 
@@ -423,10 +399,6 @@ table.game-table td.player-active {
     border-left: 1px solid #aaa;
     border-right: 1px solid #aaa;
     border-top: 1px solid #aaa;
-}
-
-#gameDetails > div {
-    height: 15em;
 }
 
 #game-info div, #game-info textarea {
@@ -448,15 +420,30 @@ textarea.game-notes {
 }
 
 .full-height {
-    height: 30em;
+    height: 20em;
+}
+@media (min-width: 576px) {
+    .full-height {
+        height: 30em;
+    }
 }
 
 .full-height-content {
-    height: 28.5em;
+    height: 18.5em;
+}
+@media (min-width: 576px) {
+    .full-height-content {
+        height: 28.5em;
+    }
 }
 
 .full-height-content-header {
-    height: calc(27em - 6px);
+    height: calc(17em - 6px);
+}
+@media (min-width: 576px) {
+    .full-height-content-header {
+        height: calc(27em - 6px);
+    }
 }
 
 .half-height {
@@ -464,7 +451,12 @@ textarea.game-notes {
 }
 
 .half-height-content {
-    height: 13.5em;
+    height: 20em;
+}
+@media (min-width: 576px) {
+    .half-height-content {
+        height: 13.5em;
+    }
 }
 
 .half-height-content-header {
@@ -472,6 +464,7 @@ textarea.game-notes {
 }
 
 .notes-header {
+	font-size: 1rem;
     height: 1.5em;
 }
 
@@ -496,11 +489,18 @@ textarea.game-notes {
 
 .game-header h5 {
     display: inline-block;
+	font-size: 1rem;
 }
 
 h5.region-header {
     font-family: "Times New Roman", Times, serif;
+	font-size: 1rem;
     clear: both;
+}
+
+.region-header a {
+    text-decoration: none!important;
+	color: black;
 }
 
 span.pool {
@@ -534,10 +534,6 @@ span.edge {
     background-color: #eee;
     color: #000000;
     padding: 0.15em 0.5em
-}
-
-table.game-table a {
-    text-decoration: none;
 }
 
 p.chat a {
@@ -590,10 +586,11 @@ small.life {
     background-color: #1d9041;
 }
 
-.fill-width {
-    -webkit-box-flex: 1;
-    -ms-flex-positive: 1;
-    flex-grow: 1;
+#hand { }
+@media (min-width: 576px) {
+    #hand {
+        height: 13.5em;
+    }
 }
 
 #hand ol.card-list {
@@ -617,4 +614,8 @@ small.life {
 
 #loadMessage {
     margin-top: 40vh;
+}
+
+a {
+	cursor: pointer;
 }
