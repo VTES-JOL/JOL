@@ -33323,3 +33323,4 @@ Capacity: 6
 Discipline: pot AUS NEC
 Sabbat: When Zygodat successfully bleeds a Methuselah, she may burn the top two cards of that Methuselah's library.
 Artist: Sam Araya
+
