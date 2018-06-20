@@ -1,10 +1,13 @@
 package net.deckserver;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,22 +33,19 @@ public class CardChecker {
         List<String> keys = Files.readAllLines(keyFile, Charset.forName("ISO-8859-1"));
         List<String> text = Files.readAllLines(textFile, Charset.forName("ISO-8859-1"));
 
-        List<String> names = text.stream().filter(s -> s.startsWith("Name:")).map(s -> s.replaceAll("^Name: ", "")).collect(Collectors.toList());
+        List<String> names = text.stream().filter(s -> s.startsWith("Name:")).map(s -> s.replaceAll("^Name: ", "")).map(String::toLowerCase).collect(Collectors.toList());
         assertThat(names.size(), is(3723));
 
         // Map of Names -> keys
-        Map<String, String> nameKeys = keys.stream().map(s -> s.split("=")).collect(Collectors.toMap(s -> s[1], s -> s[0]));
+        Map<String, String> nameKeys = keys.stream().map(s -> s.split("=")).collect(Collectors.toMap(s -> s[1].toLowerCase(), s -> s[0]));
 
         names.forEach(name -> {
-            assertTrue("missing key" + name, nameKeys.containsKey(name));
+            assertTrue("missing key " + name, nameKeys.containsKey(name));
+
         });
 
         CardSearch cardSearch = new CardSearch(keys, text);
 
-        CardEntry ek7 = cardSearch.getCardById("ek7");
-
-        String unmasking = cardSearch.getId("Unmasking, The");
-        System.out.println(unmasking);
-
+        cardSearch.export(new File(basePath, "cards/cards.json"));
     }
 }

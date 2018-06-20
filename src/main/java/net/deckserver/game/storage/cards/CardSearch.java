@@ -6,8 +6,12 @@
 
 package net.deckserver.game.storage.cards;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -91,7 +95,7 @@ public class CardSearch {
     }
 
     public String getId(String nm) {
-        return nameKeys.get(nm);
+        return nameKeys.get(nm.toLowerCase());
     }
 
     public Set<String> getNames() {
@@ -110,5 +114,26 @@ public class CardSearch {
             }
         }
         throw new IllegalArgumentException("Can't find " + text);
+    }
+
+    public void export(File file) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        Map<String, CardAlias> exportMap = new HashMap<>();
+        cardTable.forEach((k, v) -> {
+            CardAlias alias = new CardAlias();
+            alias.setKey(k);
+            alias.setText(Arrays.asList(v.getFullText()));
+            exportMap.put(k, alias);
+        });
+
+        nameKeys.forEach((k, v) -> {
+            exportMap.get(v).getNames().add(k);
+        });
+
+        objectMapper.writeValue(file, exportMap);
+        System.out.println(exportMap.size());
     }
 }
