@@ -1,12 +1,12 @@
-<div class='container'>
-    <div class='col col-3'>
+<div class='row'>
+    <div class='col-sm-4'>
         <div id='gameRegistration' class='box'>
             <h4 class="header">Game Registration:</h4>
             <table class="light clean-table" id="opengames"></table>
             <div class="footer">
                 <select title="reggames" id="reggames"></select>
                 <select title="Choose deck" id="regdecks"></select>
-                <button onclick="doRegister();">Register</button>
+                <button class="btn btn-primary btn-sm" onclick="doRegister();">Register</button>
             </div>
         </div>
         <div id='playerDecks' class='box'>
@@ -15,17 +15,17 @@
             </table>
         </div>
     </div>
-    <div class='col col-4'>
+    <div class='col-sm-4 p-sm-0'>
         <div id='deckEditor' class='box'>
             <h4 class="header">
                 Deck Editor
                 <span class="float-right">
                     <span id="noedit">
-                        <button onclick="doEdit();">Edit</button>
-                        <button onclick="doNewDeck();">New</button>
+                        <button class="btn btn-secondary btn-sm" onclick="doEdit();">Edit</button>
+                        <button class="btn btn-secondary btn-sm" onclick="doNewDeck();">New</button>
                     </span>
                     <span id="deckEdit" style="display :none;">
-                        <button onclick="doSave();">Save</button>
+                        <button class="btn btn-primary btn-sm" onclick="doSave();">Save</button>
                     </span>
                 </span>
             </h4>
@@ -38,14 +38,14 @@
                 <div class="float-right">
                     <label for="shuffle">Shuffle:</label>
                     <input type="checkbox" id="shuffle" name="shuffle" value="yes"/>
-                    <button id="adjust" onclick="doAdjust();">Parse deck</button>
+                    <button id="adjust" class="btn btn-info btn-sm" onclick="doAdjust();">Parse</button>
                 </div>
             </div>
             <div id="deckerrors"></div>
             <div id="deckcontents" class="full-width"></div>
         </div>
     </div>
-    <div class='col col-3'>
+    <div class='col-sm-4'>
         <div id='editorCardDetails' class='box'>
             <h4 class="header">
                 Card Text:
@@ -80,7 +80,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <button>Search cards</button>
+                            <button class="btn btn-info btn-sm">Search cards</button>
                         </td>
                     </tr>
                 </table>
