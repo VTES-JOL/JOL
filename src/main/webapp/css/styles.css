@@ -210,6 +210,7 @@ h2.header, h3.header, h4.header, h5.header {
 }
 
 h4.header {
+	font-size: 1em;
     line-height: 1.5em;
 }
 
@@ -342,11 +343,15 @@ td.layout {
     padding-bottom: 0;
 }
 
-#decktext {
+#deckText {
     padding: 0.5em;
     border: 0;
     width: 100%;
-    height: 40em;
+    height: 65vh;
+}
+
+#deckEditor h4 {
+	height: 2.5em;
 }
 
 .full-width {
@@ -476,7 +481,7 @@ textarea.game-notes {
     height: 1.5em;
     background-color: #ddd;
     font-family: "Times New Roman", Times, serif;
-    display: -webkit-box;
+    display: -webkit-nox;
     display: -ms-flexbox;
     display: flex;
     -webkit-box-pack: justify;
