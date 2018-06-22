@@ -46,16 +46,6 @@
         </div>
     </div>
     <div class='col-sm-4'>
-        <div id='editorCardDetails' class='box'>
-            <h4 class="header">
-                Card Text:
-                <select id="deckcards" onchange="selectCardDeck()" class="float-right"></select>
-            </h4>
-            <div class="light">
-                <input type="hidden" id="cardSelect" value="history"/>
-                <div class="history padded" id="cardtext"></div>
-            </div>
-        </div>
         <div id='cardSearch' class='box'>
             <h4 class="header">Card Search</h4>
             <form action="javascript:doSearch();" class="light padded">
@@ -80,7 +70,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <button class="btn btn-info btn-sm">Search cards</button>
+                            <button class="btn btn-info btn-sm">Search</button>
                         </td>
                     </tr>
                 </table>
