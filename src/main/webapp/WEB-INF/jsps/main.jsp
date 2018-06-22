@@ -1,77 +1,72 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" %>
 <div class="row">
+	<div class="col">
+		<div id="messages" style="display: none;"></div>
+	</div>
+</div>
+<div class="row">
     <div id="player" class="col-sm-4" style="display: none;">
         <h4 class="header">Your games:</h4>
         <table id="ownGames" class="clean-table light"></table>
     </div>
-    <div class="col-sm-5">
-        <div class="row">
-            <div class="col">
-                <div id="messages" style="display: none;"></div>
-            </div>
-        </div>
+    <div id="welcome" class="col-sm-5">
+		<h4 class="header">Welcome to V:TES Online</h4>
+		<form method="post" class="light some-padding">
+			<div class="form-row">
+				<div class="col">
+					<input type="text" class="form-control" id="dsuserin" name="dsuserin" autocomplete="username" placeholder="Username"/>
+				</div>
+				<div class="col">
+					<input type="password" class="form-control" id="dspassin" name="dspassin" autocomplete="current-password" placeholder="Password"/>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col mt-1">
+					<button type="submit" id="login" name="login" value="Log in" class="btn btn-primary w-100">Log In</button>
+				</div>
+			</div>
+		</form>
+		<div class="light padded">
+			<p>V:TES Online is the unofficial home to play Vampire: The Eternal Struggle online.</p>
 
-        <div id="welcome">
-            <h4 class="header">Welcome to V:TES Online</h4>
-            <form method="post" class="light some-padding">
-                <div class="form-row">
-                    <div class="col">
-                        <input type="text" class="form-control" id="dsuserin" name="dsuserin" autocomplete="username" placeholder="Username"/>
-                    </div>
-                    <div class="col">
-                        <input type="password" class="form-control" id="dspassin" name="dspassin" autocomplete="current-password" placeholder="Password"/>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col mt-1">
-                        <button type="submit" id="login" name="login" value="Log in" class="btn btn-primary w-100">Log In</button>
-                    </div>
-                </div>
-            </form>
-            <div class="light padded">
-                <p>V:TES Online is the unofficial home to play Vampire: The Eternal Struggle online.</p>
+			<p>Register an account, create a deck, or import from your favorite deck building programs.</p>
 
-                <p>Register an account, create a deck, or import from your favorite deck building programs.</p>
+			<p>
+				Play using text commands, in a format that suits your availability.
+				<ul>
+					<li>Real time (RT)</li>
+					<li>Check during breaks at work (WT)</li>
+					<li>Check one or more times a day (QK)</li>
+				</ul>
+			</p>
 
-                <p>
-                    Play using text commands, in a format that suits your availability.
-                    <ul>
-                        <li>Real time (RT)</li>
-                        <li>Check during breaks at work (WT)</li>
-                        <li>Check one or more times a day (QK)</li>
-                    </ul>
-                </p>
+			<p>
+				Play multiple games simultaneously, test a deck before a tournament.
+			</p>
 
-                <p>
-                    Play multiple games simultaneously, test a deck before a tournament.
-                </p>
+			<p>Our Prince's are available to help create games for you</p>
+		</div>
+	</div>
+    <div id="globalchat" class="col-sm-5 p-sm-0" style="display: none;">
+		<div>
+			<h4 class="header">
+				Online Users:
+			</h4>
+			<div id="whoson" class="light some-padding"></div>
+		</div>
 
-                <p>Our Prince's are available to help create games for you</p>
-            </div>
-        </div>
-
-        <div id="globalchat" style="display: none;">
-            <div>
-                <h4 class="header">
-                    Online Users:
-                </h4>
-                <div id="whoson" class="light some-padding"></div>
-            </div>
-
-            <div>
-                <h4 class="header">Global Chat:</h4>
-                <div class="info-area" id="gchatwin">
-                    <div id="globalChatOutput" class="scrollable side-padded"></div>
-                </div>
-                <form id="globalChatForm" action="javascript:doGlobalChat();" autocomplete='off'>
-                    <input type="text" maxlength="200" id="gchat" placeholder="Chat with players"/>
-                </form>
-            </div>
-
-        </div>
+		<div>
+			<h4 class="header">Global Chat:</h4>
+			<div class="info-area" id="gchatwin">
+				<div id="globalChatOutput" class="scrollable side-padded"></div>
+			</div>
+			<form id="globalChatForm" action="javascript:doGlobalChat();" autocomplete='off'>
+				<input type="text" maxlength="200" id="gchat" placeholder="Chat with players"/>
+			</form>
+		</div>
     </div>
-    <div id="register" class="col-sm-4">
+    <div id="register" class="col-sm-4 p-sm-0">
         <h4 class="header">Register</h4>
         <form method="post" class="light some-padding">
             <span>Register to create decks and join games!</span>
@@ -122,10 +117,6 @@
                 <p>Administer games for all other Princes</p>
             </li>
         </ul>
-        <h4 class="header">Contact:</h4>
-        <ul class="condensed-list light">
-            <li><a href="mailto:admin@deckserver.net">Contact Site Administrator</a></li>
-        </ul>
         <h4 class="header">Links:</h4>
         <ul class="condensed-list light">
             <li>
@@ -145,6 +136,10 @@
                 <a href="https://test.deckserver.net/jol/" target="_blank">Test Server</a>
             </li>
 
+        </ul>
+        <h4 class="header">Contact:</h4>
+        <ul class="condensed-list light">
+            <li><a href="mailto:admin@deckserver.net">Contact Site Administrator</a></li>
         </ul>
         <h4 class="header">Donate:</h4>
         <ul class="condensed-list light">
