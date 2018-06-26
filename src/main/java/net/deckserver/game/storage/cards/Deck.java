@@ -60,48 +60,16 @@ public class Deck {
         }
     }
 
-    private CardEntry[] findCardName(CardSearch search, String text, Collection<String> errors) {
-        CardEntry[] cards = search.getAllCards();
-        // check for prefixes
-        CardEntry[] set = search.searchByName(cards, text);
-        if (set.length > 0) return set;
-        // check for abbreviations
-        text = text.toLowerCase();
-        String id = search.getId(text);
-        if (id == null || id.equals("not found"))
-            // check for abbreviation prefixes
-            for (String abbrev : search.getNames()) {
-                if (abbrev.startsWith(text)) {
-                    id = search.getId(abbrev);
-                    break;
-                }
-            }
-        if (id.equals("not found")) id = null;
-        if (id != null) {
-            // now need to convert this to a set to handle advanced vamps
-            CardEntry card = search.getCardById(id);
-
-            set = search.searchByName(cards, card.getBaseName());
-        }
-        if (id == null || set.length == 0) {
-            errors.add(text);
-        }
-        return set;
-    }
-
     private void init(String deckin, boolean ignoreTranslation) {
         Reader r = new StringReader(deckin);
         LineNumberReader reader = new LineNumberReader(r);
         String line = null;
         try {
             while (reader.ready() && ((line = reader.readLine()) != null)) {
-                if (line.startsWith("ZZZ@@@") && !ignoreTranslation) {
-                    parseCards = false;
-                    continue;
-                }
-                String id = processLine(line, ignoreTranslation);
-                if (id != null) {
-                    boolean didTranslation = true;
+                try {
+                    processLine(line, ignoreTranslation);
+                } catch (Exception e) {
+                    logger.error("Error parsing deck line: " + line);
                 }
             }
         } catch (IOException ie) {
@@ -158,37 +126,10 @@ public class Deck {
     }
 
     private CardEntry findCard(String text) {
-        // first find out if advanced
-        boolean advanced = false;
-        if (text.endsWith("(advanced)")) {
-            text = text.substring(0, text.lastIndexOf("(advanced)")).trim();
-            advanced = true;
-        } else if (text.endsWith("(ADV)")) {
-            text = text.substring(0, text.lastIndexOf("(ADV)")).trim();
-            advanced = true;
-        }
-        CardEntry[] set = findCardName(text);
-        CardEntry card = selectCard(text, set);
+        text = text.replaceAll("\\(advanced\\)", "(Adv)");
+        CardEntry card = search.findCard(text);
         if (card == null) return null;
-        if (!advanced) return card;
-        set = search.searchByText(set, "Advanced");
-        card = selectCard(text, set);
         return card;
-    }
-
-    private CardEntry selectCard(String text, CardEntry[] set) {
-        text = text.toLowerCase();
-        if (set.length == 0) return null;
-        CardEntry bestfit = set[0];
-        for (CardEntry card : set) {
-            if (card.getBaseName().toLowerCase().equals(text)) return card;
-            if (card.getBaseName().toLowerCase().startsWith(text)) bestfit = card;
-        }
-        return bestfit;
-    }
-
-    public CardEntry[] findCardName(String text) {
-        return findCardName(search, text, errors);
     }
 
     public String[] getErrorLines() {
