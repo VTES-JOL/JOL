@@ -624,3 +624,7 @@ small.life {
 a {
 	cursor: pointer;
 }
+
+.form-control-sm {
+	font-size: 16px; /* 16px = minimum to prevent auto-zoom on phone Safari */
+}
