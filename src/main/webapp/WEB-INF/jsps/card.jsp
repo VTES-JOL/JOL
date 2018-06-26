@@ -18,7 +18,8 @@
     CardEntry cardEntry = p.getEntry();
     boolean isCrypt = cardEntry.isCrypt();
     boolean hasLife = cardEntry.hasLife();
-
+    request.setAttribute("isCrypt", isCrypt);
+    request.setAttribute("hasLife", hasLife);
     request.setAttribute("p", p);
     request.setAttribute("c", c);
     request.setAttribute("game", game);
@@ -30,8 +31,6 @@
     request.setAttribute("nested", nested);
     request.setAttribute("cards", cards);
     request.setAttribute("hasCards", hasCards);
-    request.setAttribute("isCrypt", isCrypt);
-    request.setAttribute("hasLife", hasLife);
     request.setAttribute("cardEntry", cardEntry);
 %>
 
@@ -39,7 +38,8 @@
     XXXXXX
 </c:if>
 <c:if test="${!p.hidden}">
-    <a class="card-name" title="<%= p.getId() %>"><%= p.getName() %></a>
+    <a class="card-name" title="<%= p.getId() %>"><%= p.getName() %>
+    </a>
 </c:if>
 <c:if test="${game != null}">
     <c:if test="${capacity > 0 && !p.hidden}">
