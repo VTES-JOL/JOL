@@ -12,5 +12,6 @@ public class ChatPersistenceJob implements Runnable {
 
     @Override
     public void run() {
+        INSTANCE.persistChats();
     }
 }

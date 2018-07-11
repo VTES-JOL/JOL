@@ -1,5 +1,8 @@
 package net.deckserver.dwr.bean;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import net.deckserver.dwr.model.GameModel;
@@ -8,12 +11,19 @@ import net.deckserver.dwr.model.PlayerModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-
 public class AdminBean {
+
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    CollectionType chatType = objectMapper.getTypeFactory().constructCollectionType(List.class, ChatEntryBean.class);
 
     private static final int CHAT_STORAGE = 1000;
     private static final int CHAT_DISCARD = 100;
@@ -33,11 +43,14 @@ public class AdminBean {
             .expireAfterWrite(5, TimeUnit.MINUTES)
             .build();
 
+    private File chatPersistenceFile;
 
     private String message;
 
     public AdminBean() {
         try {
+            objectMapper.findAndRegisterModules();
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             JolAdmin admin = JolAdmin.getInstance();
             String[] games = admin.getGames();
             for (String game : games) {
@@ -48,6 +61,11 @@ public class AdminBean {
                 }
             }
             actives = new ArrayList<>(activeSort);
+            chatPersistenceFile = new File(System.getenv("JOL_DATA"), "chats.json");
+            if (Files.notExists(chatPersistenceFile.toPath())) {
+                Files.createFile(chatPersistenceFile.toPath());
+            }
+            loadChats();
         } catch (Exception e) {
             logger.error("Error creating admin bean {}", e);
         }
@@ -153,6 +171,23 @@ public class AdminBean {
         if (model.getPlayer() != null) {
             activeUsers.put(model.getPlayer(), model.getView());
             model.recordAccess();
+        }
+    }
+
+    public void loadChats() {
+        try {
+            this.chats = objectMapper.readValue(chatPersistenceFile, chatType);
+        } catch (IOException e) {
+            logger.error("Unable to load chats", e);
+            this.chats = new ArrayList<>();
+        }
+    }
+
+    public void persistChats() {
+        try {
+            objectMapper.writeValue(chatPersistenceFile, this.chats);
+        } catch (IOException e) {
+            logger.error("Unable to persist chats", e);
         }
     }
 }
