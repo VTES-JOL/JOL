@@ -251,6 +251,10 @@ ul.condensed-list li p {
     line-height: 1.5em;
 }
 
+.some-more-padding {
+    padding: 0.5em;
+}
+
 table.clean-no-border {
     width: 100%;
 }
@@ -267,6 +271,12 @@ table.clean-table td, table.clean-table th {
 }
 
 div.clean-table {
+    border: 1px solid #aaaaaa;
+    border-bottom: 0;
+    border-collapse: collapse;
+}
+
+form.clean-table {
     border: 1px solid #aaaaaa;
     border-bottom: 0;
     border-collapse: collapse;
