@@ -151,7 +151,7 @@ function renderMyGames(games) {
 }
 
 function renderGameLink(game) {
-    return '<a onclick="doNav(' + "'g" + game + "');" + '"><small>' + game + "</small></a>";
+    return '<a onclick="doNav(' + "'g" + game + "');" + '">' + game + "</a>";
 }
 
 function renderOnline(div, who) {
@@ -185,26 +185,35 @@ function renderMessage(message) {
     }
 }
 
+function renderRowWithLabel2(tid, label) {
+    var table = $('#' + tid).eq(0);
+    for (var idx = 0; idx < table.children().length; idx++) {
+        var row = table.children().eq(idx);
+        if (row.data('label') === label) {
+            return row;
+        }
+    }
+    var newRow = $('#activeGameTemplate').eq(0)
+		.clone()
+		.attr('id', null)
+		.removeClass('d-none')
+		.data('label', label)
+		.click(function(e){ doNav('g' + label); });
+	table.append(newRow);
+    return newRow;
+}
+
 function renderActiveGames(games) {
     if (games === null) return;
     for (var index = 0; index < games.length; index++) {
-        if (games[index].turn === null) continue;
-        var row = renderRowWithLabel('activeGames', games[index].game);
-        if (row.cells.length === 0) {
-            row.insertCell(0);
-            row.insertCell(1);
-        }
-        if (row.cells.length === 2) {
-            row.cells[1].colspan = '1';
-            row.insertCell(2);
-            row.insertCell(3);
-            row.insertCell(4);
-        }
-        row.cells[0].innerHTML = renderGameLink(games[index].game);
-        row.cells[1].innerHTML = '<small>' + moment(games[index].access).tz("UTC").format("D-MMM-YYYY HH:mm z") + '</small>';
-        row.cells[2].innerHTML = '<small>' + games[index].turn + '</small>';
-        row.cells[3].innerHTML = '<small>' + '&nbsp ' + games[index].available.join(',') + '</small>';
-        row.cells[4].innerHTML = '<small>' + games[index].admin + '</small>';
+		var game = games[index];
+        if (game.turn === null) continue;
+        var row = renderRowWithLabel2('activeGames', game.game);
+        row.children().eq(0).html(renderGameLink(game.game));
+        row.children().eq(1).html(moment(game.access).tz("UTC").format("D-MMM-YYYY HH:mm z"));
+        row.children().eq(2).html(game.turn);
+        row.children().eq(3).html('&nbsp ' + game.available.join(','));
+        row.children().eq(4).html(game.admin);
     }
 }
 

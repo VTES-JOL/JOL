@@ -6,7 +6,7 @@
 	</div>
 </div>
 <div class="row">
-    <div id="player" class="col-sm-4" style="display: none;">
+    <div id="player" class="col-sm-3" style="display: none;">
         <h4 class="header">Your games:</h4>
         <table id="ownGames" class="clean-table light"></table>
     </div>
@@ -48,7 +48,7 @@
 			<p>Our Prince's are available to help create games for you</p>
 		</div>
 	</div>
-    <div id="globalchat" class="col-sm-5 p-sm-0" style="display: none;">
+    <div id="globalchat" class="col-sm-6 p-sm-0" style="display: none;">
 		<div>
 			<h4 class="header">
 				Online Users:
