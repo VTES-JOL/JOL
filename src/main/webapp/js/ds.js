@@ -844,3 +844,22 @@ function goToRegister(event) {
     //$('#register').focus();
     //$('#newplayer').focus();
 }
+
+var DESKTOP_VIEWPORT_CONTENT = 'width=1024';
+
+function toggleMobileView(event) {
+	event.preventDefault();
+	var $link = $('#toggleMobileViewLink').eq(0);
+	var viewport = $('meta[name=viewport]').get(0);
+	console.log('before: ' + viewport.content)
+	if (viewport.content == DESKTOP_VIEWPORT_CONTENT) {
+		viewport.content = 'width=device-width, initial-scale=1, shrink-to-fit=no';
+		$link.html('Desktop view');
+	}
+	else {
+		viewport.content = DESKTOP_VIEWPORT_CONTENT;
+		$link.html('Mobile view');
+	}
+	console.log('after: ' + viewport.content)
+    $('body').scrollTop(0);
+}

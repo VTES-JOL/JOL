@@ -69,8 +69,14 @@
 						<span id="chatstamp" class="label label-light label-basic navbar-text"></span>
 					</div>
 				</div>
+				<div class="row mb-5">
+					<div class="col">
+						<a id="toggleMobileViewLink" href="#" onclick="toggleMobileView(event);">Desktop view</a>
+					</div>
+				</div>
             </div>
         </div>
+
         <!-- Bootstrap -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script type="text/javascript" src="js/jquery-3.2.1.js"></script>
