@@ -15,7 +15,7 @@ public class PlayerRegistrationBean {
         String deck = JolAdmin.getInstance().getGameDeck(game, player);
         this.registered = deck != null;
         if (this.registered) {
-            Deck impl = new Deck(JolAdmin.getInstance().getAllCards(), deck, true);
+            Deck impl = new Deck(JolAdmin.getInstance().getAllCards(), deck);
             this.deckSummary = "Crypt: " + impl.getCryptSize() + ", Library: " + impl.getLibSize() + ", Groups: " + impl.getGroups();
             this.valid = impl.isValid();
         } else {
