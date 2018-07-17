@@ -1,5 +1,5 @@
-<div class="container">
-    <div class="col col-3">
+<div class="row">
+    <div class="col-sm">
         <div class="box">
             <h4 class="header">Admins</h4>
             <table class="clean-table light">
@@ -14,7 +14,7 @@
             </table>
         </div>
     </div>
-    <div class="col col-3">
+    <div class="col-sm pl-sm-0">
         <div class="box">
             <h4 class="header">Judges</h4>
             <table class="clean-table light">
