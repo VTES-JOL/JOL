@@ -47,6 +47,9 @@ public class Deck {
 
     private void processLine(String nextLine) {
         nextLine = nextLine.trim();
+        if (nextLine.isEmpty()) {
+            return;
+        }
         int num = 1;
         if (nextLine.matches("\\d+\\s*x.*")) {
             int x = nextLine.indexOf("x");
