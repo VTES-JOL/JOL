@@ -4,31 +4,32 @@ import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class SuperAdminBean {
 
-    private static Predicate<UserSummaryBean> isAdmin = UserSummaryBean::isAdmin;
-    private static Predicate<UserSummaryBean> isJudge = UserSummaryBean::isJudge;
-
-    private List<UserSummaryBean> players;
-    private List<String> names;
+    private List<String> players;
+    private List<String> admins;
+    private List<String> judges;
 
     public SuperAdminBean(AdminBean abean, PlayerModel model) {
         JolAdmin admin = JolAdmin.getInstance();
-        names = admin.getPlayers();
-        players = names.stream()
-                .map(UserSummaryBean::new)
-                .filter(isAdmin.or(isJudge))
-                .collect(Collectors.toList());
+        players = admin.getPlayers();
+        admins = players.stream()
+                .filter(admin::isAdmin)
+                .sorted().collect(Collectors.toList());
+        judges = players.stream().filter(admin::isJudge).sorted().collect(Collectors.toList());
     }
 
-    public List<UserSummaryBean> getPlayers() {
+    public List<String> getPlayers() {
         return players;
     }
 
-    public List<String> getNames() {
-        return names;
+    public List<String> getAdmins() {
+        return admins;
+    }
+
+    public List<String> getJudges() {
+        return judges;
     }
 }
