@@ -438,7 +438,7 @@ function invitePlayer() {
 }
 
 function closeGame() {
-    const gameDiv = $("#endGameList");
+    var gameDiv = $("#endGameList");
     var selected = gameDiv.val();
     gameDiv.val("");
     if (confirm("End game?")) {
@@ -470,7 +470,7 @@ function doToggle(thistag) {
 }
 
 function doGameChat() {
-    const chatDiv = $("#judgeChat");
+    var chatDiv = $("#judgeChat");
     var chat = chatDiv.val();
     chatDiv.val("");
     DS.gameChat(game, chat, {callback: processData, errorHandler: errorhandler});
@@ -643,7 +643,7 @@ function generateCardData(parent) {
         animateFill: false,
         hideOnClick: false,
         onShow: function (instance) {
-            const content = this.querySelector('.tippy-content');
+            var content = this.querySelector('.tippy-content');
             content.innerHTML = "Loading...";
             var cardId = instance.title;
             $.get({
@@ -686,24 +686,55 @@ function loadHistory(data) {
     generateCardData("#historyOutput");
 }
 
+function addRole() {
+    var player = $("#allPlayersList").val();
+    var role = $("#roles").val();
+    DS.addRole(player, role, {callback: processData, errorHandler: errorhandler});
+}
+
 function callbackSuper(data) {
 
-    var adminList = $("#adminList");
-    adminList.empty();
+    var playerList = $("#adminPlayerList");
+    playerList.empty();
 
-    var judgeList = $("#judgeList");
-    judgeList.empty();
-
-    $.each(data.admins, function (index, value) {
-        var adminRow = $("<tr/>");
-        adminRow.append($("<td/>").text(value));
-        adminList.append(adminRow);
+    $("#allPlayersList").autocomplete({
+        source: data.names,
+        change: function (event, ui) {
+            if (ui.item === null) {
+                $(this).val((ui.item ? ui.item.id : ""));
+            }
+        }
     });
 
-    $.each(data.judges, function (index, value) {
-        var judgeRow = $("<tr/>");
-        judgeRow.append($("<td/>").text(value));
-        judgeList.append(judgeRow);
+    $.each(data.players, function (index, value) {
+        var playerRow = $("<tr/>");
+        playerRow.append($("<td/>").text(value.name));
+        playerRow.append($("<td/>").text(moment(value.lastOnline).tz(USER_TIMEZONE).format("DD-MMM-YYYY HH:mm z")));
+        var adminCell = $("<td/>");
+        if (value.admin) {
+            var adminButton = $("<button/>").text('Remove').click(value.name, function () {
+                DS.removeRole(value.name, 'admin', {callback: processData, errorHandler: errorhandler});
+            });
+            adminCell.append(adminButton);
+        }
+        playerRow.append(adminCell);
+        var superCell = $("<td/>");
+        if (value.superUser) {
+            var superButton = $("<button/>").text('Remove').click(value.name, function () {
+                DS.removeRole(value.name, 'super', {callback: processData, errorHandler: errorhandler});
+            });
+            superCell.append(superButton);
+        }
+        playerRow.append(superCell);
+        var judgeCell = $("<td/>");
+        if (value.judge) {
+            var judgeButton = $("<button/>").text('Remove').click(value.name, function () {
+                DS.removeRole(value.name, 'judge', {callback: processData, errorHandler: errorhandler});
+            });
+            judgeCell.append(judgeButton);
+        }
+        playerRow.append(judgeCell);
+        playerList.append(playerRow);
     });
 }
 
