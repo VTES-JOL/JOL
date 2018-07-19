@@ -29,19 +29,21 @@ public class Deck {
 
     public Deck(CardSearch search, String deck) {
         this.search = search;
-        Reader r = new StringReader(deck);
-        LineNumberReader reader = new LineNumberReader(r);
-        String line = null;
-        try {
-            while (reader.ready() && ((line = reader.readLine()) != null)) {
-                try {
-                    processLine(line);
-                } catch (Exception e) {
-                    errors.add(line);
+        if (deck != null) {
+            Reader r = new StringReader(deck);
+            LineNumberReader reader = new LineNumberReader(r);
+            String line = null;
+            try {
+                while (reader.ready() && ((line = reader.readLine()) != null)) {
+                    try {
+                        processLine(line);
+                    } catch (Exception e) {
+                        errors.add(line);
+                    }
                 }
+            } catch (IOException ie) {
+                logger.error("Error reading deck: {}", ie);
             }
-        } catch (IOException ie) {
-            logger.error("Error reading deck: {}", ie);
         }
     }
 
