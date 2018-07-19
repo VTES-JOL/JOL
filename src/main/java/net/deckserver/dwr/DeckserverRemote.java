@@ -13,6 +13,8 @@ import net.deckserver.game.interfaces.turn.GameAction;
 import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
 import org.directwebremoting.WebContextFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DeckserverRemote {
+
+    private Logger logger = LoggerFactory.getLogger(DeckserverRemote.class);
 
     private final AdminBean abean;
     private HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
@@ -226,6 +230,17 @@ public class DeckserverRemote {
         }
         ret.put("callbackShowCards", beans);
         return ret;
+    }
+
+    public Map<String, Object> removeRole(String player, String role) {
+        logger.info("Removing {} role from {}", role, player);
+        JolAdmin.getInstance().setRole(player, role, false);
+        return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> addRole(String player, String role) {
+        JolAdmin.getInstance().setRole(player, role, true);
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> updateProfile(String email, boolean receivePing, boolean receiveSummary) {
