@@ -78,7 +78,7 @@ public class DeckEditBean {
         crypt = nd.getCryptSize();
         groups = nd.getGroups();
         errors = nd.getErrorLines();
-        return nd.getDeckString();
+        return deck;
     }
 
     public String[] getErrors() {

@@ -21,83 +21,37 @@ public class Deck {
     private static final Logger logger = LoggerFactory.getLogger(Deck.class);
 
     private final CardSearch search;
-    private StringBuffer orig = new StringBuffer();
     private Collection<String> errors = new Vector<>();
     private int cryptSum = 0;
     private int deckSum = 0;
-    private boolean parseCards = true;
     private Map<CardEntry, Integer> cards = new HashMap<>();
     private Set<String> groups = new TreeSet<>();
-    private boolean valid;
 
     public Deck(CardSearch search, String deck) {
-        this(search, deck, false, false);
-    }
-
-    public Deck(CardSearch search, String deck, boolean sizeOnly) {
-        this(search, deck, sizeOnly, false);
-    }
-
-    public Deck(CardSearch search, String deck, boolean sizeOnly, boolean doConstruction) {
         this.search = search;
         if (deck != null) {
-            if (sizeOnly && deck.startsWith("ZZZ@@@")) {
-                //time();
-                int idx1 = deck.indexOf("L");
-                String sz = deck.substring(7, idx1);
-                cryptSum = Integer.parseInt(sz);
-                int idx2 = deck.indexOf("G");
-                sz = deck.substring(idx1 + 1, idx2);
-                deckSum = Integer.parseInt(sz);
-                //time();
-                int idx3 = deck.indexOf("@@@ZZZ");
-                for (int i = idx2 + 1; i < idx3; i++) {
-                    groups.add(deck.substring(i, i + 1));
+            Reader r = new StringReader(deck);
+            LineNumberReader reader = new LineNumberReader(r);
+            String line = null;
+            try {
+                while (reader.ready() && ((line = reader.readLine()) != null)) {
+                    try {
+                        processLine(line);
+                    } catch (Exception e) {
+                        errors.add(line);
+                    }
                 }
-            } else {
-                init(deck, doConstruction);
+            } catch (IOException ie) {
+                logger.error("Error reading deck: {}", ie);
             }
         }
     }
 
-    private void init(String deckin, boolean ignoreTranslation) {
-        Reader r = new StringReader(deckin);
-        LineNumberReader reader = new LineNumberReader(r);
-        String line = null;
-        try {
-            while (reader.ready() && ((line = reader.readLine()) != null)) {
-                try {
-                    processLine(line, ignoreTranslation);
-                } catch (Exception e) {
-                    logger.error("Error parsing deck line: " + line);
-                }
-            }
-        } catch (IOException ie) {
-            logger.error("Error reading deck: {}", ie);
-        }
-    }
-
-    public String getDeckString() {
-        return orig.toString();
-    }
-
-    private String processLine(String nextLine, boolean ignoreTranslation) {
+    private void processLine(String nextLine) {
         nextLine = nextLine.trim();
-        if (nextLine.length() == 0) {
-            orig.append("\n");
-            return null;
+        if (nextLine.isEmpty()) {
+            return;
         }
-        if (nextLine.startsWith("ZZZ@@@")) {
-            return null;
-        }
-        String id = null;
-        if (nextLine.startsWith("Z@")) {
-            int idx = nextLine.indexOf("@Z");
-            if (!ignoreTranslation)
-                id = nextLine.substring(2, idx);
-            nextLine = nextLine.substring(idx + 2);
-        }
-        orig.append(nextLine).append("\n");
         int num = 1;
         if (nextLine.matches("\\d+\\s*x.*")) {
             int x = nextLine.indexOf("x");
@@ -111,25 +65,16 @@ public class Deck {
             nextLine = nextLine.substring(x + 1).trim();
         }
         // now, find the card
-        CardEntry card = null;
-        if (id != null) {
-            card = search.getCardById(id);
-        } else {
-            if (!parseCards) return null;
-            card = findCard(nextLine);
-        }
+        CardEntry card;
+        card = findCard(nextLine);
         if (card != null) {
             addCard(card, num);
-            if (id == null) return card.getCardId();
         }
-        return null;
     }
 
     private CardEntry findCard(String text) {
         text = text.replaceAll("\\(advanced\\)", "(Adv)");
-        CardEntry card = search.findCard(text);
-        if (card == null) return null;
-        return card;
+        return search.findCard(text);
     }
 
     public String[] getErrorLines() {

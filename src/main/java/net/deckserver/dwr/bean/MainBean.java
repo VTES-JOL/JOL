@@ -41,7 +41,7 @@ public class MainBean {
         chat = model.getChat();
         who = abean.getWho().stream()
                 .sorted(Comparator.reverseOrder())
-                .map(who -> new UserSummaryBean(who, jolAdmin.isAdmin(who), jolAdmin.isSuperUser(who), jolAdmin.isJudge(who)))
+                .map(who -> new UserSummaryBean(who))
                 .collect(Collectors.toList());
         stamp = JolAdmin.getDate();
         message = abean.getMessage();
