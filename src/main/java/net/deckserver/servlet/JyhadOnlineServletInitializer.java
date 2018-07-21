@@ -31,6 +31,7 @@ public class JyhadOnlineServletInitializer implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         logger.info("Closing Jyhad Online...");
+        AdminBean.INSTANCE.persistChats();
         scheduler.shutdownNow();
     }
 }

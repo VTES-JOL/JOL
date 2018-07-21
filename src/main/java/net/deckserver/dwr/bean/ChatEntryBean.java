@@ -1,5 +1,7 @@
 package net.deckserver.dwr.bean;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -19,6 +21,9 @@ public class ChatEntryBean {
         this.message = message;
     }
 
+    public ChatEntryBean() {
+    }
+
     public String getTimestamp() {
         return timestamp;
     }
@@ -29,5 +34,17 @@ public class ChatEntryBean {
 
     public String getMessage() {
         return message;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public void setPlayer(String player) {
+        this.player = player;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

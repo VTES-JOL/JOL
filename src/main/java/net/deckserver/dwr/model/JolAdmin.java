@@ -82,6 +82,21 @@ public class JolAdmin {
         return OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
     }
 
+    public void setRole(String player, String role, boolean flag) {
+        PlayerInfo playerInfo = getPlayerInfo(player);
+        switch (role) {
+            case "admin":
+                playerInfo.setAdmin(flag);
+                break;
+            case "super":
+                playerInfo.setSuper(flag);
+                break;
+            case "judge":
+                playerInfo.setJudge(flag);
+                break;
+        }
+    }
+
     public boolean existsPlayer(String name) {
         return name != null && sysInfo.hasPlayer(name);
     }
@@ -696,6 +711,18 @@ public class JolAdmin {
         public void setAdmin(boolean set) {
             String admin = set ? "yes" : "no";
             info.setProperty("admin", admin);
+            write();
+        }
+
+        public void setSuper(boolean set) {
+            String superUser = set ? "super" : "yes";
+            info.setProperty("admin", superUser);
+            write();
+        }
+
+        public void setJudge(boolean set) {
+            String judge = set ? "yes" : "no";
+            info.setProperty("judge", judge);
             write();
         }
 
