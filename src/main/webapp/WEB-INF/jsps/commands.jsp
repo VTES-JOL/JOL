@@ -1,28 +1,28 @@
-<ul class="help">
-    <li><a href="#help_pool">Pool</a></li>
-    <li><a href="#help_blood">Blood</a>
-    <li><a href="#help_capacity">Capacity</a>
-    <li><a href="#help_discard">Discard</a>
-    <li><a href="#help_draw">Draw</a>
-    <li><a href="#help_edge">Edge</a>
-    <li><a href="#help_label">Label</a>
-    <li><a href="#help_move">Move</a>
-    <li><a href="#help_order">Order</a>
-    <li><a href="#help_play">Play</a>
-    <li><a href="#help_random">Random</a>
-    <li><a href="#help_show">Show</a>
-    <li><a href="#help_shuffle">Shuffle</a>
-    <li><a href="#help_transfer">Transfer</a>
-    <li><a href="#help_lock">Lock</a>
-    <li><a href="#help_unlock">Unlock</a>
-    <li><a href="#help_votes">Votes</a></li>
-</ul>
+<div class="help d-flex flex-wrap justify-content-between">
+    <a href="#help_pool">Pool</a>
+    <a href="#help_blood">Blood</a>
+    <a href="#help_capacity">Capacity</a>
+    <a href="#help_discard">Discard</a>
+    <a href="#help_draw">Draw</a>
+    <a href="#help_edge">Edge</a>
+    <a href="#help_label">Label</a>
+    <a href="#help_move">Move</a>
+    <a href="#help_order">Order</a>
+    <a href="#help_play">Play</a>
+    <a href="#help_random">Random</a>
+    <a href="#help_show">Show</a>
+    <a href="#help_shuffle">Shuffle</a>
+    <a href="#help_transfer">Transfer</a>
+    <a href="#help_lock">Lock</a>
+    <a href="#help_unlock">Unlock</a>
+    <a href="#help_votes">Votes</a>
+</div>
 <div id="help-body">
     <div id="help_pool">
-        <h4 class="header">Pool</h4>
+        <h4 class="header">Pool <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
-                Manipulates player pool values
+                Manipulates player pool values.
                 The default PLAYER is yourself.
             </p>
             <h5>Syntax</h5>
@@ -51,7 +51,7 @@
         </div>
     </div>
     <div id="help_blood">
-        <h4 class="header">Blood</h4>
+        <h4 class="header">Blood <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Manipulates counters on various cards. Generally used for moving blood on or off of vampires, or
@@ -101,7 +101,7 @@
         </div>
     </div>
     <div id="help_capacity">
-        <h4 class="header">Capacity</h4>
+        <h4 class="header">Capacity <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Changes the capacity of a vampire or other minion with blood.
@@ -128,7 +128,7 @@
         </div>
     </div>
     <div id="help_discard">
-        <h4 class="header">Discard</h4>
+        <h4 class="header">Discard <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Moves a card from your hand into the ashheap. Note that this will not draw a replacement card by
@@ -164,7 +164,7 @@
         </div>
     </div>
     <div id="help_draw">
-        <h4 class="header">Draw</h4>
+        <h4 class="header">Draw <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Used to draw cards from your library or from your crypt. By default, the command will draw one card
@@ -201,7 +201,7 @@
         </div>
     </div>
     <div id="help_edge">
-        <h4 class="header">Edge</h4>
+        <h4 class="header">Edge <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Assign or burn the edge.
@@ -232,7 +232,7 @@
         </div>
     </div>
     <div id="help_label">
-        <h4 class="header">Label</h4>
+        <h4 class="header">Label <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Used to tag a card with some extra text.
@@ -265,7 +265,7 @@
         </div>
     </div>
     <div id="help_move">
-        <h4 class="header">Move</h4>
+        <h4 class="header">Move <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Moves cards from one region to another. Note that cards can be placed on top of other cards. The
@@ -317,7 +317,7 @@
         </div>
     </div>
     <div id="help_order">
-        <h4 class="header">Order</h4>
+        <h4 class="header">Order <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Re-seat the players around the table. Useful with the restructuring cards. Also used with Reversal
@@ -347,7 +347,7 @@
         </div>
     </div>
     <div id="help_play">
-        <h4 class="header">Play</h4>
+        <h4 class="header">Play <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Manipulates cards in various ways. You can use this command to play vampires from your uncontrolled
@@ -413,7 +413,7 @@
         </div>
     </div>
     <div id="help_random">
-        <h4 class="header">Random</h4>
+        <h4 class="header">Random <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Roll a NUMBER-sided die.
@@ -430,13 +430,13 @@
                 </tr>
                 <tr>
                     <td class="help-command">random 6</td>
-                    <td>roll a 6 sided dice</td>
+                    <td>roll a 6 sided die</td>
                 </tr>
             </table>
         </div>
     </div>
     <div id="help_show">
-        <h4 class="header">Show</h4>
+        <h4 class="header">Show <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Reveal hidden cards to somebody. Used for searching libraries/crypts, or for peeking at the top of
@@ -479,7 +479,7 @@
         </div>
     </div>
     <div id="help_shuffle">
-        <h4 class="header">Shuffle</h4>
+        <h4 class="header">Shuffle <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Shuffles a particular stack of cards.
@@ -514,7 +514,7 @@
         </div>
     </div>
     <div id="help_transfer">
-        <h4 class="header">Transfer</h4>
+        <h4 class="header">Transfer <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Transfers your pool to vampires in your uncontrolled/inactive region. The default PLAYER is
@@ -543,7 +543,7 @@
         </div>
     </div>
     <div id="help_lock">
-        <h4 class="header">Lock</h4>
+        <h4 class="header">Lock <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Locks a particular card. You may target any card on the table. Note that locking other people's
@@ -577,7 +577,7 @@
         </div>
     </div>
     <div id="help_unlock">
-        <h4 class="header">Unlock</h4>
+        <h4 class="header">Unlock <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 Unlocks a particular card. You may target any card on the table. Note that unlocking other people's
@@ -616,7 +616,7 @@
         </div>
     </div>
     <div id="help_votes">
-        <h4 class="header">Votes</h4>
+		<h4 class="header">Votes <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
             <p>
                 The default PLAYER is yourself. The default region is the ready region.
@@ -637,12 +637,12 @@
                     <td>labels ready region card #1 with 3 votes</td>
                 </tr>
                 <tr>
-                    <td class="help-command"> blood ready 1 1 0</td>
+                    <td class="help-command"> votes ready 1 1 0</td>
                     <td>removes vote label from ready region card #1.1
                     </td>
                 </tr>
                 <tr>
-                    <td class="help-command"> blood Adam 2 +4</td>
+                    <td class="help-command"> votes Adam 2 +4</td>
                     <td> adds 4 votes to Adam's ready region card #2</td>
                 </tr>
             </table>

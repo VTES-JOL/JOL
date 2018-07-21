@@ -62,6 +62,17 @@ p.chat {
     line-height: 1.3em;
 }
 
+div.help {
+    background-color: darkslategrey;
+    padding: 0 .5em;
+}
+
+div.help > a {
+    color: white;
+    padding: .5em;
+    text-decoration: none;
+}
+
 ul.help {
     list-style-type: none;
     overflow: hidden;
@@ -73,8 +84,12 @@ ul.help li {
 }
 
 div#help-body {
-    width: 80%;
     margin: 0 auto;
+}
+@media (min-width: 576px) {
+    div#help-body {
+        width: 80%;
+    }
 }
 
 ul.help li a {
