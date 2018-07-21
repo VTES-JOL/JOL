@@ -144,8 +144,8 @@ function renderMyGames(games) {
             gameRow.className += games[index].flagged ? " flagged" : "";
             gameRow.style.display = games[index].hidden ? 'none' : '';
         } else {
-            gameRow.cells[0].innerHTML = '<small>' + games[index].game + '</small>';
-            gameRow.cells[1].innerHTML = '<small>C' + games[index].cryptSize + ' L' + games[index].libSize + ' G' + games[index].groups + "</small>";
+            gameRow.cells[0].innerHTML = games[index].game;
+            gameRow.cells[1].innerHTML = 'C' + games[index].cryptSize + ' L' + games[index].libSize + ' G' + games[index].groups;
         }
     }
 }
