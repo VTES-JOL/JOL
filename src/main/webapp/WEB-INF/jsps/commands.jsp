@@ -17,7 +17,7 @@
     <a href="#help_unlock">Unlock</a>
     <a href="#help_votes">Votes</a>
 </div>
-<div id="help-body">
+<div class="help-body">
     <div id="help_pool">
         <h4 class="header">Pool <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">

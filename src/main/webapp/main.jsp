@@ -62,8 +62,8 @@
                 <div id="super" style="display:none">
                     <jsp:include page="/WEB-INF/jsps/super.jsp"/>
                 </div>
-
-				<div class="row">  <!-- Footer -->
+				<!-- Footer -->
+				<div class="row mt-2">
 					<div class="col">
 						<small>v<%= System.getenv("JOL_VERSION")%></small>
 						<span id="chatstamp" class="label label-light label-basic navbar-text"></span>

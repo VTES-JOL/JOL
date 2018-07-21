@@ -83,11 +83,11 @@ ul.help li {
     float: left;
 }
 
-div#help-body {
+div.help-body {
     margin: 0 auto;
 }
 @media (min-width: 576px) {
-    div#help-body {
+    div.help-body {
         width: 80%;
     }
 }
