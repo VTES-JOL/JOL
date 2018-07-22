@@ -856,8 +856,3 @@ function callbackMain(data) {
         }
     }
 }
-
-function callbackStatus(data) {
-    var clockDiv = dwr.util.byId('clockdiv');
-
-}

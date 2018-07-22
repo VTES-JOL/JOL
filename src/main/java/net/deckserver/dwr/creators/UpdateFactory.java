@@ -18,7 +18,6 @@ public class UpdateFactory {
         viewMap.put("main", new MainCreator());
         viewMap.put("deck", new DeckCreator());
         viewMap.put("admin", new AdminCreator());
-        viewMap.put("status", new StatusCreator());
         viewMap.put("profile", new ProfileCreator());
         viewMap.put("active", new AllGamesCreator());
         viewMap.put("super", new SuperCreator());

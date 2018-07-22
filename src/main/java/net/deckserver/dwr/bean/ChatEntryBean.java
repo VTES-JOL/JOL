@@ -1,7 +1,5 @@
 package net.deckserver.dwr.bean;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 

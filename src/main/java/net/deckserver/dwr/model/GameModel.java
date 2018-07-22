@@ -17,14 +17,12 @@ public class GameModel implements Comparable {
     private static Logger logger = LoggerFactory.getLogger(GameModel.class);
 
     private String name;
-    private OffsetDateTime timestamp;
     private Map<String, GameView> views = new HashMap<>();
     private SummaryBean sumbean;
 
     public GameModel(String name) {
         this.name = name;
         if (isActive()) JolAdmin.getInstance().getGame(name);  // make sure its loaded
-        timestamp = JolAdmin.getInstance().getGameTimeStamp(name);
         regen();
     }
 
@@ -79,8 +77,7 @@ public class GameModel implements Comparable {
             boolean turnChanged = false;
             int idx = game.getActions(game.getCurrentTurn()).length;
             if (ping != null) {
-                String email = admin.getEmail(ping);
-                game.setPingTag(ping);
+                admin.pingPlayer(ping, name);
                 pingChanged = true;
                 status.append("Ping sent to " + ping);
             }
@@ -122,6 +119,7 @@ public class GameModel implements Comparable {
                     chat = null;
                     chatChanged = true;
                 }
+                admin.clearPing(player, name);
             }
             if ((game.getActivePlayer().equals(player) || admin.getOwner(game.getName()).equals(player)) && "Yes".equalsIgnoreCase(endTurn)) {
                 game.newTurn();
@@ -164,7 +162,6 @@ public class GameModel implements Comparable {
     }
 
     private void doReload(boolean stateChanged, boolean phaseChanged, boolean pingChanged, boolean globalChanged, boolean turnChanged) {
-        timestamp = JolAdmin.getInstance().getGameTimeStamp(name);
         for (String key : (new ArrayList<>(views.keySet()))) {
             GameView view = views.get(key);
             //		if(checkViewTime(key, view,timestamp)) continue;
@@ -200,14 +197,6 @@ public class GameModel implements Comparable {
 
     public GameView hasView(String player) {
         return views.get(player);
-    }
-
-    public String getDate() {
-        return timestamp.format(ISO_OFFSET_DATE_TIME);
-    }
-
-    public OffsetDateTime getTimestamp() {
-        return timestamp;
     }
 
     public GameView[] getViews() {

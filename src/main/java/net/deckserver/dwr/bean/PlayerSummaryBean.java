@@ -43,11 +43,10 @@ public class PlayerSummaryBean {
             turn = thisGame.getActivePlayer();
             hidden = thisGame.getPool(player) == 0;
             flagged = thisGame.getPool(player) < 0;
-            GameView view = game.hasView(player);
-            if (view != null) {
-                this.current = !view.isChanged();
+            if (admin.isPlayerPinged(player, this.game)) {
+                this.current = false;
             } else {
-                OffsetDateTime access = admin.getAccess(this.game, player);
+                OffsetDateTime access = admin.getPlayerAccess(player, this.game);
                 OffsetDateTime timestamp = admin.getGameTimeStamp(this.game);
                 this.current = timestamp.isBefore(access);
             }

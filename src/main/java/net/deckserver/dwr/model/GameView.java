@@ -8,7 +8,6 @@ import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.OffsetDateTime;
 import java.util.*;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -71,7 +70,7 @@ public class GameView {
         JolGame game = admin.getGame(name);
 
         if (isPlayer) {
-            admin.recordAccess(name, player);
+            admin.recordPlayerAccess(player, name);
         }
 
         int refresh = Utils.calc(admin.getGameTimeStamp(name));
@@ -193,14 +192,6 @@ public class GameView {
             collapsed.remove(id);
         else
             collapsed.add(id);
-    }
-
-    public OffsetDateTime getTimestamp() {
-        if (isPlayer) {
-            return JolAdmin.getInstance().getAccess(name, player);
-        } else {
-            return OffsetDateTime.now();
-        }
     }
 
     public void turnChanged() {
