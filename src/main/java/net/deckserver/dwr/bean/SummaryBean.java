@@ -20,7 +20,7 @@ public class SummaryBean {
     public SummaryBean(GameModel game) {
         this.game = game.getName();
         if (JolAdmin.getInstance().isActive(this.game)) {
-            access = game.getTimestamp().format(ISO_OFFSET_DATE_TIME);
+            access = JolAdmin.getInstance().getGameTimeStamp(this.game).format(ISO_OFFSET_DATE_TIME);
             turn = JolAdmin.getInstance().getGame(this.game).getCurrentTurn();
             admin = JolAdmin.getInstance().getOwner(this.game);
             GameView[] views = game.getViews();

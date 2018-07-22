@@ -1,6 +1,7 @@
 package net.deckserver.servlet;
 
 import net.deckserver.dwr.bean.AdminBean;
+import net.deckserver.dwr.model.JolAdmin;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletContextEvent;
@@ -32,6 +33,7 @@ public class JyhadOnlineServletInitializer implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         logger.info("Closing Jyhad Online...");
         AdminBean.INSTANCE.persistChats();
+        JolAdmin.getInstance().shutdown();
         scheduler.shutdownNow();
     }
 }
