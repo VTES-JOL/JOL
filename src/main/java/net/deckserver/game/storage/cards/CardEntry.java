@@ -6,12 +6,10 @@
 
 package net.deckserver.game.storage.cards;
 
-import java.io.IOException;
-import java.io.LineNumberReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author administrator
@@ -62,6 +60,14 @@ public class CardEntry {
 
     public String getType() {
         return type;
+    }
+
+    public List<String> getTypes() {
+        return Arrays.asList(type.toLowerCase().trim().split("/"));
+    }
+
+    public String getTypeClass() {
+        return getTypes().stream().map(s -> s.replaceAll(" ", "_")).collect(Collectors.joining(" "));
     }
 
     public boolean isCrypt() {
