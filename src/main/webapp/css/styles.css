@@ -1,3 +1,5 @@
+@font-face { font-family: 'jol'; src: url('../fonts/jol.ttf') format('truetype')}
+
 body {
     background: #d0d0d0;
 }
@@ -646,6 +648,84 @@ a.card-name {
     width: -moz-fit-content;
     width: fit-content;
 }
+
+div#hand a.action:before {
+    font-family: 'jol';
+    content: 'p';
+    font-size: 1.5em;
+    padding-right: 5px;
+    vertical-align: bottom;
+}
+
+div#hand a.master:before {
+    font-family: 'jol';
+    content: 'x';
+    font-size: 1.5em;
+    padding-right: 5px;
+    vertical-align: bottom;
+}
+
+div#hand a.political_action:before {
+    font-family: 'jol';
+    content: 'r';
+    font-size: 1.5em;
+    padding-right: 5px;
+    vertical-align: bottom;
+}
+
+div#hand a.combat:before {
+    font-family: 'jol';
+    content: 't';
+    font-size: 1.5em;
+    padding-right: 5px;
+    vertical-align: bottom;
+}
+
+div#hand a.reaction:before {
+    font-family: 'jol';
+    content: 'v';
+    font-size: 1.5em;
+    padding-right: 5px;
+    vertical-align: bottom;
+}
+
+div#hand a.action_modifier:before {
+    font-family: 'jol';
+    content: 'q';
+    font-size: 1.5em;
+    padding-right: 5px;
+    vertical-align: bottom;
+}
+
+div#hand a.ally:before {
+    font-family: 'jol';
+    content: 's';
+    font-size: 1.5em;
+    padding-right: 5px;
+    vertical-align: bottom;
+}
+
+div#hand a.retainer:before {
+    font-family: 'jol';
+    content: 'w';
+    font-size: 1.5em;
+    padding-right: 5px;
+    vertical-align: bottom;
+}
+
+div#hand a.equipment:before {
+    font-family: 'jol';
+    content: 'u';
+    font-size: 1.5em;
+    padding-right: 5px;
+    vertical-align: bottom;
+}
+
+
+
+
+
+
 
 small.counter {
     display: inline-block;
