@@ -67,7 +67,7 @@ public class CardEntry {
     }
 
     public String getTypeClass() {
-        return getTypes().stream().map(s -> s.replaceAll(" ", "_")).collect(Collectors.joining(" "));
+        return getTypes().stream().map(s -> s.replaceAll(" ", "_")).sorted().collect(Collectors.joining(" "));
     }
 
     public boolean isCrypt() {

@@ -649,83 +649,68 @@ a.card-name {
     width: fit-content;
 }
 
-div#hand a.action:before {
+div#hand a.action:before,div#hand a.master:before, div#hand a.political_action:before, div#hand a.combat:before, div#hand a.reaction:before, div#hand a.action_modifier:before, div#hand a.ally:before, div#hand a.retainer:before, div#hand a.equipment:before {
     font-family: 'jol';
-    content: 'p';
     font-size: 1.5em;
     padding-right: 5px;
     vertical-align: bottom;
+}
+
+div#hand a.action:before {
+    content: 'p';
 }
 
 div#hand a.master:before {
-    font-family: 'jol';
     content: 'x';
-    font-size: 1.5em;
-    padding-right: 5px;
-    vertical-align: bottom;
 }
 
 div#hand a.political_action:before {
-    font-family: 'jol';
     content: 'r';
-    font-size: 1.5em;
-    padding-right: 5px;
-    vertical-align: bottom;
 }
 
 div#hand a.combat:before {
-    font-family: 'jol';
     content: 't';
-    font-size: 1.5em;
-    padding-right: 5px;
-    vertical-align: bottom;
 }
 
 div#hand a.reaction:before {
-    font-family: 'jol';
     content: 'v';
-    font-size: 1.5em;
-    padding-right: 5px;
-    vertical-align: bottom;
 }
 
 div#hand a.action_modifier:before {
-    font-family: 'jol';
     content: 'q';
-    font-size: 1.5em;
-    padding-right: 5px;
-    vertical-align: bottom;
 }
 
 div#hand a.ally:before {
-    font-family: 'jol';
     content: 's';
-    font-size: 1.5em;
-    padding-right: 5px;
-    vertical-align: bottom;
 }
 
 div#hand a.retainer:before {
-    font-family: 'jol';
     content: 'w';
-    font-size: 1.5em;
-    padding-right: 5px;
-    vertical-align: bottom;
 }
 
 div#hand a.equipment:before {
-    font-family: 'jol';
     content: 'u';
-    font-size: 1.5em;
-    padding-right: 5px;
-    vertical-align: bottom;
 }
 
+div#hand a.action_modifier.reaction:before {
+    content: 'qv';
+}
 
+div#hand a.action_modifier.combat:before {
+    content: "qt"
+}
 
+div#hand a.combat.reaction:before {
+    content: "tv"
+}
 
+div#hand a.action.reaction:before {
+    content: "pv"
+}
 
-
+div#hand a.action.combat:before {
+    content: "pt"
+}
 
 small.counter {
     display: inline-block;
