@@ -137,6 +137,7 @@ function renderMyGames(games) {
         }
         if (games[index].started) {
             gameRow.cells[0].innerHTML = renderGameLink(games[index].game);
+            gameRow.cells[1].innerHTML = '&nbsp;';
             if (games[index].flagged) {
                 gameRow.cells[1].innerHTML = '!';
             } else if (!games[index].current) {
