@@ -1,7 +1,6 @@
 package net.deckserver.dwr.bean;
 
 import net.deckserver.dwr.model.GameModel;
-import net.deckserver.dwr.model.GameView;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.JolGame;
 import net.deckserver.game.storage.cards.Deck;
@@ -44,12 +43,11 @@ public class PlayerSummaryBean {
             hidden = thisGame.getPool(player) == 0;
             flagged = thisGame.getPool(player) < 0;
             if (admin.isPlayerPinged(player, this.game)) {
-                this.current = false;
-            } else {
-                OffsetDateTime access = admin.getPlayerAccess(player, this.game);
-                OffsetDateTime timestamp = admin.getGameTimeStamp(this.game);
-                this.current = timestamp.isBefore(access);
+                this.flagged = true;
             }
+            OffsetDateTime access = admin.getPlayerAccess(player, this.game);
+            OffsetDateTime timestamp = admin.getGameTimeStamp(this.game);
+            this.current = timestamp.isBefore(access);
         }
     }
 
