@@ -1,14 +1,1 @@
-{
-  "playerTimestamps": {},
-  "gameTimestamps": {
-    "game1": {
-      "timestamp": "2017-09-29T01:11:41.160Z",
-      "playerTimestamps": {
-        "player1": "2017-09-29T01:11:41.160Z"
-      },
-      "playerPings": {
-        "player1": true
-      }
-    }
-  }
-}
+{"playerTimestamps":{"Player1":"2018-07-23T11:18:36.164+10:00"},"gameTimestamps":{"game1":{"timestamp":"2017-09-29T01:11:41.16Z","playerTimestamps":{"player1":"2017-09-29T01:11:41.16Z"},"playerPings":{"player1":true}},"Game 1":{"timestamp":"2018-07-23T11:18:08.223+10:00","playerTimestamps":{"Player1":"2018-07-23T11:18:10.692+10:00"},"playerPings":{"Player1":true}}}}
