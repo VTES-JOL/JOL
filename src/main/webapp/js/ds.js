@@ -251,7 +251,7 @@ function navigate(data) {
         $("#gameRow").hide();
         player = null;
     } else {
-        renderButton({active: "All Games", deck: "Deck Register", profile: "Profile"});
+        renderButton({active: "All Games", deck: "Decks", profile: "Profile"});
         if (data.admin) {
             renderButton({admin: "Game Admin"});
         }
