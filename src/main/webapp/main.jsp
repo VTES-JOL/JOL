@@ -69,11 +69,6 @@
 						<span id="chatstamp" class="label label-light label-basic navbar-text"></span>
 					</div>
 				</div>
-				<div class="row mb-5">
-					<div class="col">
-						<a id="toggleMobileViewLink" href="#" onclick="toggleMobileView(event);">Desktop view</a>
-					</div>
-				</div>
             </div>
         </div>
 
