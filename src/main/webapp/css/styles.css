@@ -668,9 +668,35 @@ small.life {
 }
 
 a {
-	cursor: pointer;
+    cursor: pointer;
 }
 
 .form-control-sm {
-	font-size: 16px; /* 16px = minimum to prevent auto-zoom on phone Safari */
+    font-size: 16px; /* 16px = minimum to prevent auto-zoom on phone Safari */
+}
+
+.card {
+    border: 1px solid #aaaaaa;
+}
+
+.user-card {
+}
+@media (min-width: 576px) {
+    .user-card {
+		width: 25%;
+		float: left;
+    }
+}
+
+.card-header {
+    background-color: #ddd;
+    font-family: 'IM Fell English', serif;
+}
+
+.list-group-item-action {
+    cursor: pointer;
+}
+
+input[type=checkbox] {
+    cursor: pointer;
 }
