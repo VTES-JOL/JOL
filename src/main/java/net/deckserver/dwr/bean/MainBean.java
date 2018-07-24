@@ -30,7 +30,7 @@ public class MainBean {
         loggedIn = model.getPlayer() != null;
         if (loggedIn) {
             gamenames.addAll(Arrays.asList(JolAdmin.getInstance().getGames(model.getPlayer())));
-            refresh = Utils.calc(abean.getTimestamp());
+            refresh = 5000;
         }
         for (GameModel game : actives) {
             if (!model.getChangedGames().contains(game.getName())) continue;

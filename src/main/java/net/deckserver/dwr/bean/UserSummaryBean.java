@@ -18,7 +18,7 @@ public class UserSummaryBean {
         this.admin = JolAdmin.getInstance().isAdmin(name);
         this.superUser = JolAdmin.getInstance().isSuperUser(name);
         this.judge = JolAdmin.getInstance().isJudge(name);
-        this.lastOnline = JolAdmin.getInstance().getLastAccess(name).truncatedTo(ChronoUnit.SECONDS).format(ISO_OFFSET_DATE_TIME);
+        this.lastOnline = JolAdmin.getInstance().getPlayerAccess(name).truncatedTo(ChronoUnit.SECONDS).format(ISO_OFFSET_DATE_TIME);
     }
 
     public String getName() {

@@ -1,3 +1,5 @@
+@font-face { font-family: 'jol'; src: url('../fonts/jol.ttf') format('truetype')}
+
 body {
     background: #d0d0d0;
 }
@@ -607,6 +609,69 @@ a.card-name {
     width: -webkit-fit-content;
     width: -moz-fit-content;
     width: fit-content;
+}
+
+div#hand a.action:before,div#hand a.master:before, div#hand a.political_action:before, div#hand a.combat:before, div#hand a.reaction:before, div#hand a.action_modifier:before, div#hand a.ally:before, div#hand a.retainer:before, div#hand a.equipment:before {
+    font-family: 'jol';
+    font-size: 1.5em;
+    padding-right: 5px;
+    vertical-align: bottom;
+}
+
+div#hand a.action:before {
+    content: 'p';
+}
+
+div#hand a.master:before {
+    content: 'x';
+}
+
+div#hand a.political_action:before {
+    content: 'r';
+}
+
+div#hand a.combat:before {
+    content: 't';
+}
+
+div#hand a.reaction:before {
+    content: 'v';
+}
+
+div#hand a.action_modifier:before {
+    content: 'q';
+}
+
+div#hand a.ally:before {
+    content: 's';
+}
+
+div#hand a.retainer:before {
+    content: 'w';
+}
+
+div#hand a.equipment:before {
+    content: 'u';
+}
+
+div#hand a.action_modifier.reaction:before {
+    content: 'qv';
+}
+
+div#hand a.action_modifier.combat:before {
+    content: "qt"
+}
+
+div#hand a.combat.reaction:before {
+    content: "tv"
+}
+
+div#hand a.action.reaction:before {
+    content: "pv"
+}
+
+div#hand a.action.combat:before {
+    content: "pt"
 }
 
 small.counter {

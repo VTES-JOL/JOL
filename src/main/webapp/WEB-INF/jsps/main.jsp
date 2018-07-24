@@ -141,19 +141,5 @@
         <ul class="condensed-list light">
             <li><a href="mailto:admin@deckserver.net">Contact Site Administrator</a></li>
         </ul>
-        <h4 class="header">Donate:</h4>
-        <ul class="condensed-list light">
-            <li>
-                <span>Goes towards keeping JOL running.  Any donation appreciated.</span>
-                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" id="donateBox">
-                    <input type="hidden" name="cmd" value="_s-xclick">
-                    <input type="hidden" name="hosted_button_id" value="BJ4GNJK6CDGLS">
-                    <input type="image" src="https://www.paypalobjects.com/en_AU/i/btn/btn_donateCC_LG.gif"
-                           border="0" name="submit" alt="PayPal – The safer, easier way to pay online!">
-                    <img alt="" border="0" src="https://www.paypalobjects.com/en_AU/i/scr/pixel.gif" width="1"
-                         height="1">
-                </form>
-            </li>
-        </ul>
     </div>
 </div>

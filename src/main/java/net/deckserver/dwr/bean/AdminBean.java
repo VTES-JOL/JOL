@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -36,7 +35,6 @@ public class AdminBean {
     private Collection<GameModel> activeSort = new TreeSet<>();
     private List<GameModel> actives;
     private volatile List<ChatEntryBean> chats = new ArrayList<>();
-    private OffsetDateTime timestamp = OffsetDateTime.now();
 
     // Cache of users / status
     private Cache<String, String> activeUsers = Caffeine.newBuilder()
@@ -122,10 +120,6 @@ public class AdminBean {
         }
         pmap.values()
                 .forEach(playerModel -> playerModel.chat(chatEntryBean));
-    }
-
-    public OffsetDateTime getTimestamp() {
-        return timestamp;
     }
 
     public void notifyAboutGame(String name) {
