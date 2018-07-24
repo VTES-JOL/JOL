@@ -233,6 +233,8 @@ function removeLabeledRows(table, removedGames) {
     });
 }
 
+var TITLE = 'V:TES Online';
+
 // Invoked via processData()
 function navigate(data) {
     $("#" + currentPage).hide();
@@ -243,7 +245,7 @@ function navigate(data) {
     currentPage = data.target;
     game = data.game;
     $("#buttons").empty();
-    renderButton({main: "Main" + (data.chats ? " *" : "")});
+    $('#titleLink').text(TITLE + (data.chats ? ' *' : ''));
     if (data.player === null) {
         $('#logout').hide();
         $("#gameRow").hide();
