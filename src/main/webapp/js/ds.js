@@ -262,6 +262,7 @@ function navigate(data) {
         player = data.player;
     }
     renderButton({help: "Help", _guides: "Guides"});
+	renderDesktopViewButton();
 }
 
 function callbackAllGames(data) {
@@ -914,20 +915,36 @@ function goToRegister(event) {
     //$('#newplayer').focus();
 }
 
+function renderDesktopViewButton() {
+	var viewport = $('meta[name=viewport]').get(0);
+	var text = (
+		viewport.content == DESKTOP_VIEWPORT_CONTENT
+		? 'Mobile' : 'Desktop') + ' View';
+	var button = $('<a/>')
+		.attr('id', 'toggleMobileViewLink')
+		.addClass('nav-item nav-link')
+		.text(text)
+		.click(function() {
+			toggleMobileView();
+			$('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
+	});
+	$('#buttons').append(button);
+}
+
 var DESKTOP_VIEWPORT_CONTENT = 'width=1024';
 
 function toggleMobileView(event) {
-	event.preventDefault();
+	if (event) event.preventDefault();
 	var $link = $('#toggleMobileViewLink').eq(0);
 	var viewport = $('meta[name=viewport]').get(0);
 	console.log('before: ' + viewport.content)
 	if (viewport.content == DESKTOP_VIEWPORT_CONTENT) {
 		viewport.content = 'width=device-width, initial-scale=1, shrink-to-fit=no';
-		$link.html('Desktop view');
+		$link.html('Desktop View');
 	}
 	else {
 		viewport.content = DESKTOP_VIEWPORT_CONTENT;
-		$link.html('Mobile view');
+		$link.html('Mobile View');
 	}
 	console.log('after: ' + viewport.content)
     $('body').scrollTop(0);
