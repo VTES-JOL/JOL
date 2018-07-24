@@ -698,6 +698,20 @@ function addRole() {
     DS.addRole(player, role, {callback: processData, errorHandler: errorhandler});
 }
 
+function addRoleButton(userColumn, username, role, roleKey) {
+	var button = $('#userRoleTemplate').eq(0)
+		.clone()
+		.attr('id', null)
+		.removeClass('d-none');
+	button.find('span').text(role);
+	button.click(username, function () {
+		DS.removeRole(username, roleKey ? rokeKey : role.toLowerCase(), {
+			callback: processData, errorHandler: errorhandler});
+	});
+	var buttonList = userColumn.find('.list-group').eq(0);
+	buttonList.append(button);
+}
+
 function callbackSuper(data) {
     var playerList = $("#adminPlayerList");
     playerList.empty();
@@ -711,7 +725,27 @@ function callbackSuper(data) {
         }
     });
 
-    $.each(data.players, function (index, value) {
+	var userAdmins = $('#userAdmins');
+	userAdmins.empty();
+
+	var sortedUsers = Array.from(data.players);
+	sortedUsers.sort(function(a, b) { return a.name.localeCompare(b.name); });
+
+    $.each(sortedUsers, function (index, value) {
+		var userCol= $('#userAdminTemplate').eq(0)
+			.clone()
+			.attr('id', null)
+			.removeClass('d-none');
+		userCol.find('.card-header').text(value.name);
+		userCol.find('.card-footer > span').text(
+			moment(value.lastOnline).tz(USER_TIMEZONE).format("DD-MMM-YYYY HH:mm z"));
+
+        if (value.admin) addRoleButton(userCol, value.name, 'Admin');
+        if (value.superUser) addRoleButton(userCol, value.name, 'Super User', 'super');
+        if (value.judge) addRoleButton(userCol, value.name, 'Judge');
+		userAdmins.append(userCol);
+
+		////////////////
         var playerRow = $("<tr/>");
         playerRow.append($("<td/>").text(value.name));
         playerRow.append($("<td/>").text(moment(value.lastOnline).tz(USER_TIMEZONE).format("DD-MMM-YYYY HH:mm z")));
