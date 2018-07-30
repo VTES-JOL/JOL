@@ -51,7 +51,7 @@ td a:hover {
 }
 
 #globalChatOutput {
-    height: 20em;
+    height: 10em;
 }
 @media (min-width: 576px) {
 	#globalChatOutput {
