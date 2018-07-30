@@ -4,6 +4,14 @@
 		<span class="navbar-toggler-icon"></span>
 	</button>
 	<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+		<div id="gameButtonsNav" class="navbar-nav">
+			<div class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="myGamesLink" role="button"
+				   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">My Games</a>
+				<div id="gameButtons" class="dropdown-menu" aria-labelledby="myGamesLink">
+				</div>
+			</div>
+		</div>
 		<div id="buttons" class="navbar-nav"></div>
 		<div id="logout" class="navbar-nav">
 			<form method="post" class="form-inline">
