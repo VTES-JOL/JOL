@@ -60,6 +60,7 @@ function doGlobalChat() {
 
 // Main page: navigation buttons
 function doNav(target) {
+    $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
     DS.navigate(target, {callback: processData, errorHandler: errorhandler});
 }
 
@@ -75,13 +76,29 @@ function renderButton(data) {
     $.each(data, function (key, value) {
         var button = $("<a/>").addClass("nav-item nav-link").text(value).click(key, function () {
             DS.navigate(key, {callback: processData, errorHandler: errorhandler});
-            $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
         });
         if (game === value || currentPage.toLowerCase() === key.toLowerCase()) {
             button.addClass("active");
         }
         buttonsDiv.append(button);
     });
+}
+function renderGameButtons(data) {
+    var buttonsDiv = $("#gameButtons");
+    var newActivity = false;
+    $.each(data, function (key, value) {
+        var button = $("<a/>").addClass("dropdown-item").text(value).click(key, function () {
+            DS.navigate(key, {callback: processData, errorHandler: errorhandler});
+            $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
+        });
+        if (game === value || currentPage.toLowerCase() === key.toLowerCase()) {
+            button.addClass("active");
+        }
+        buttonsDiv.append(button);
+        $('#gameButtonsNav').show();
+        if (value.indexOf('*') > -1) newActivity = true;
+    });
+    $('#myGamesLink').text('My Games' + (newActivity ? ' *' : ''));
 }
 
 function renderGameChat(data) {
@@ -245,20 +262,24 @@ function navigate(data) {
     currentPage = data.target;
     game = data.game;
     $("#buttons").empty();
+    $('#gameButtons').empty();
+    // Always hide the My Games item to start.
+    // Will be shown if necessary.
+    $('#gameButtonsNav').hide();
     $('#titleLink').text(TITLE + (data.chats ? ' *' : ''));
     if (data.player === null) {
         $('#logout').hide();
         $("#gameRow").hide();
         player = null;
     } else {
-        renderButton({active: "All Games", deck: "Decks", profile: "Profile"});
+        renderButton({active: "Watch", deck: "Decks", profile: "Profile"});
         if (data.admin) {
             renderButton({admin: "Game Admin"});
         }
         if (data.superUser) {
             renderButton({super: "User Admin"});
         }
-        renderButton(data.gameButtons);
+        renderGameButtons(data.gameButtons);
         $('#logout').show();
         $("#gameRow").show();
         player = data.player;
