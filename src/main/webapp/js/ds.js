@@ -154,7 +154,7 @@ function renderMyGames(games) {
             gameRow.insertCell(1);
         }
         if (games[index].started) {
-            gameRow.cells[0].innerHTML = renderGameLink(games[index].game);
+            gameRow.cells[0].innerHTML = renderGameLink(games[index].game, true);
             gameRow.cells[1].innerHTML = '&nbsp;';
             if (games[index].pinged) {
                 gameRow.cells[1].innerHTML = '!';
@@ -171,8 +171,12 @@ function renderMyGames(games) {
     }
 }
 
-function renderGameLink(game) {
-    return '<a onclick="doNav(' + "'g" + game + "');" + '">' + game + "</a>";
+function renderGameLink(game, small = false) {
+    return '<a onclick="doNav(' + "'g" + game + "');" + '">'
+		+ (small ? '<small>' : '')
+		+ game
+		+ (small ? '</small>' : '')
+		+ "</a>";
 }
 
 function renderOnline(div, who) {
