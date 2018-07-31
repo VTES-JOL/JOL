@@ -89,6 +89,7 @@ function renderGameButtons(data) {
     $.each(data, function (key, value) {
         var button = $("<a/>").addClass("dropdown-item").text(value).click(key, function () {
             DS.navigate(key, {callback: processData, errorHandler: errorhandler});
+			$('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
         });
         if (game === value || currentPage.toLowerCase() === key.toLowerCase()) {
             button.addClass("active");
