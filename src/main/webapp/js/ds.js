@@ -60,7 +60,6 @@ function doGlobalChat() {
 
 // Main page: navigation buttons
 function doNav(target) {
-    $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
     DS.navigate(target, {callback: processData, errorHandler: errorhandler});
 }
 
@@ -76,6 +75,7 @@ function renderButton(data) {
     $.each(data, function (key, value) {
         var button = $("<a/>").addClass("nav-item nav-link").text(value).click(key, function () {
             DS.navigate(key, {callback: processData, errorHandler: errorhandler});
+			$('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
         });
         if (game === value || currentPage.toLowerCase() === key.toLowerCase()) {
             button.addClass("active");
