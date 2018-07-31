@@ -176,11 +176,11 @@ ul.deck-list {
     padding: 0 1em;
 }
 
-#owngames tr.active {
+#ownGames tr.active {
     background-color: #eee;
 }
 
-#owngames tr.flagged {
+#ownGames tr.flagged {
     background-color: rgb(255, 228, 146);
 }
 
