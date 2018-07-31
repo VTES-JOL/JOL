@@ -157,12 +157,13 @@ function renderMyGames(games) {
         if (games[index].started) {
             gameRow.cells[0].innerHTML = renderGameLink(games[index].game);
             gameRow.cells[1].innerHTML = '&nbsp;';
-            if (games[index].flagged) {
+            if (games[index].pinged) {
                 gameRow.cells[1].innerHTML = '!';
             } else if (!games[index].current) {
                 gameRow.cells[1].innerHTML = '*';
             }
             gameRow.className = games[index].turn === player ? "active" : 'game';
+            gameRow.className += games[index].flagged ? " flagged" : "";
             gameRow.style.display = games[index].hidden ? 'none' : '';
         } else {
             gameRow.cells[0].innerHTML = games[index].game;
