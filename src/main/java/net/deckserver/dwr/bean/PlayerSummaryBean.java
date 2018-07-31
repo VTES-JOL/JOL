@@ -27,6 +27,8 @@ public class PlayerSummaryBean {
 
     private boolean flagged = false;
 
+    private boolean pinged = false;
+
     public PlayerSummaryBean(GameModel game, String player) {
         this.game = game.getName();
         this.started = game.isActive();
@@ -41,9 +43,9 @@ public class PlayerSummaryBean {
             JolGame thisGame = JolAdmin.getInstance().getGame(this.game);
             turn = thisGame.getActivePlayer();
             hidden = thisGame.getPool(player) == 0;
-            flagged = thisGame.getPool(player) < 0;
+            this.flagged = thisGame.getPool(player) < 0;
             if (admin.isPlayerPinged(player, this.game)) {
-                this.flagged = true;
+                this.pinged = true;
             }
             OffsetDateTime access = admin.getPlayerAccess(player, this.game);
             OffsetDateTime timestamp = admin.getGameTimeStamp(this.game);
@@ -85,5 +87,9 @@ public class PlayerSummaryBean {
 
     public boolean isFlagged() {
         return flagged;
+    }
+
+    public boolean isPinged() {
+        return pinged;
     }
 }
