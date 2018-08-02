@@ -12,7 +12,7 @@
 		</div>
     </div>
 </div>
-<div id="userAdmins" class="clearfix">
+<div id="userAdmins" class="d-flex flex-wrap justify-content-between">
 </div>
 
 <button id="userRoleTemplate" type="button" class="list-group-item list-group-item-action list-group-item-light d-none">
