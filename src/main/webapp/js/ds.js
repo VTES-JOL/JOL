@@ -130,7 +130,7 @@ function renderGlobalChat(data) {
         chatLine.append(timeOutput).append(message);
         globalChatOutput.append(chatLine);
     });
-    globalChatOutput.scrollTop(globalChatOutput.prop("scrollHeight") - globalChatOutput.prop("clientHeight"));
+    // globalChatOutput.scrollTop(globalChatOutput.prop("scrollHeight") - globalChatOutput.prop("clientHeight"));
 }
 
 function renderRowWithLabel(tid, label) {
@@ -173,7 +173,7 @@ function renderMyGames(games) {
     }
 }
 
-function renderGameLink(game, small = false) {
+function renderGameLink(game, small) {
     return '<a onclick="doNav(' + "'g" + game + "');" + '">'
 		+ (small ? '<small>' : '')
 		+ game
