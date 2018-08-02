@@ -763,11 +763,11 @@ a {
 }
 
 .user-card {
+    width: 100%;
 }
 @media (min-width: 576px) {
     .user-card {
-		width: 25%;
-		float: left;
+        width: 25%;
     }
 }
 
