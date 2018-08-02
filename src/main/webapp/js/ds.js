@@ -118,8 +118,13 @@ function renderGlobalChat(data) {
     if (!data) {
         return;
     }
-
     var globalChatOutput = $("#globalChatOutput");
+
+    var scrollTop = globalChatOutput.scrollTop();
+    var maxScrollTop = globalChatOutput.prop("scrollHeight") - globalChatOutput.prop("clientHeight");
+    // Only scroll to bottom if scrollbar is at bottom (has not been scrolled up)
+    var scrollToBottom = scrollTop == maxScrollTop;
+
     $.each(data, function (index, chat) {
         var timestamp = moment(chat.timestamp).tz("UTC").format("D-MMM HH:mm");
         var userTimestamp = moment(chat.timestamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
@@ -130,7 +135,11 @@ function renderGlobalChat(data) {
         chatLine.append(timeOutput).append(message);
         globalChatOutput.append(chatLine);
     });
-    // globalChatOutput.scrollTop(globalChatOutput.prop("scrollHeight") - globalChatOutput.prop("clientHeight"));
+
+    if (scrollToBottom) {
+        var newScrollTop = globalChatOutput.prop("scrollHeight") - globalChatOutput.prop("clientHeight");
+        globalChatOutput.scrollTop(newScrollTop);
+    }
 }
 
 function renderRowWithLabel(tid, label) {
