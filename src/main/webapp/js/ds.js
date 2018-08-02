@@ -121,6 +121,7 @@ function renderGlobalChat(data) {
     var globalChatOutput = $("#globalChatOutput");
 
     var scrollTop = globalChatOutput.scrollTop();
+    var contentHt0 = globalChatOutput.prop("scrollHeight");
     var maxScrollTop = globalChatOutput.prop("scrollHeight") - globalChatOutput.prop("clientHeight");
     // Only scroll to bottom if scrollbar is at bottom (has not been scrolled up)
     var scrollToBottom = scrollTop == maxScrollTop;
@@ -137,8 +138,11 @@ function renderGlobalChat(data) {
     });
 
     if (scrollToBottom) {
+        $('#newChatAlert').hide();
         var newScrollTop = globalChatOutput.prop("scrollHeight") - globalChatOutput.prop("clientHeight");
         globalChatOutput.scrollTop(newScrollTop);
+    } else if (globalChatOutput.prop("scrollHeight") != contentHt0) {
+        $('#newChatAlert').show();
     }
 }
 

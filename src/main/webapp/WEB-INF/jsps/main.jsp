@@ -62,6 +62,7 @@
 				<div id="globalChatOutput" class="scrollable side-padded"></div>
 			</div>
 			<form id="globalChatForm" action="javascript:doGlobalChat();" autocomplete='off'>
+				<div id="newChatAlert">~ New messages ~</div>
 				<input type="text" maxlength="200" id="gchat" placeholder="Chat with players"/>
 			</form>
 		</div>
