@@ -652,7 +652,12 @@ function loadGame(data) {
         pingSelect.empty();
         pingSelect.append(new Option("", ""));
         $.each(data.ping, function (index, value) {
-            pingSelect.append(new Option(value, value));
+            var pinged = $.inArray(value, data.pinged) !== -1;
+            var option = new Option(value, value);
+            if (pinged) option.style.fontWeight = "bold";
+            if (pinged) option.style.fontStyle = "italic";
+            if (pinged) option.style.color = "red";
+            pingSelect.append(option);
         });
     }
     if (data.turn !== null) {
