@@ -126,11 +126,6 @@ public class GameModel implements Comparable {
                 resetChats();
                 idx = 0; // reset the current action index for the new turn.
                 String email = admin.getEmail(game.getActivePlayer());
-                try {
-                    game.setPingTag(game.getActivePlayer());
-                } catch (Error e) {
-                    status.append("Turn ping failed.");
-                }
                 turnChanged = stateChanged = phaseChanged = pingChanged = true;
                 regen();
             }
@@ -167,7 +162,6 @@ public class GameModel implements Comparable {
             //		if(checkViewTime(key, view,timestamp)) continue;
             if (stateChanged) view.stateChanged();
             if (phaseChanged) view.phaseChanged();
-            if (pingChanged) view.pingChanged();
             if (globalChanged) view.globalChanged();
             if (turnChanged) view.turnChanged();
             if (stateChanged || phaseChanged || globalChanged || turnChanged) {

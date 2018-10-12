@@ -17,7 +17,6 @@ public class GameView {
     private static final Logger logger = getLogger(GameView.class);
     private boolean stateChanged = true;
     private boolean phaseChanged = true;
-    private boolean pingChanged = true;
     private boolean globalChanged = true;
     private boolean turnChanged = true;
     private boolean resetChat = true;
@@ -75,7 +74,8 @@ public class GameView {
 
         int refresh = Utils.calc(admin.getGameTimeStamp(name));
 
-        List<String> ping = new ArrayList<>();
+        List<String> ping;
+        List<String> pinged;
         String hand = null;
         String global = null;
         String text = null;
@@ -87,6 +87,7 @@ public class GameView {
         String[] collapsed = null;
 
         ping = game.getPlayers();
+        pinged = game.getPingList();
 
         if (isPlayer && stateChanged) {
             try {
@@ -158,11 +159,11 @@ public class GameView {
         String stamp = JolAdmin.getDate();
         return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, global, text, label,
                 chatReset, tc, turn, turns, state, phases, ping,
-                collapsed, stamp);
+                collapsed, stamp, pinged);
     }
 
     public synchronized void clearAccess() {
-        globalChanged = phaseChanged = stateChanged = pingChanged = turnChanged = false;
+        globalChanged = phaseChanged = stateChanged = turnChanged = false;
         chats.clear();
         resetChat = false;
     }
@@ -177,10 +178,6 @@ public class GameView {
 
     public synchronized void stateChanged() {
         stateChanged = true;
-    }
-
-    public synchronized void pingChanged() {
-        pingChanged = true;
     }
 
     public String[] getCollapsed() {

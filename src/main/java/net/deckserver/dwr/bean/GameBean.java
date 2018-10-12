@@ -20,7 +20,9 @@ public class GameBean {
 
     private String[] turns = null;
 
-    private List<String> ping = new ArrayList<>();
+    private List<String> ping;
+
+    private List<String> pinged;
 
     private String state = null;
 
@@ -42,7 +44,7 @@ public class GameBean {
 
     public GameBean(boolean isPlayer, boolean isAdmin, boolean isJudge, int refresh, String hand, String global, String text,
                     String label, boolean resetChat, boolean turnChanged, String[] turn, String[] turns, String state, String[] phases,
-                    List<String> ping, String[] collapsed, String stamp) {
+                    List<String> ping, String[] collapsed, String stamp, List<String> pinged) {
         this(ping, refresh);
         this.player = isPlayer;
         this.admin = isAdmin;
@@ -59,6 +61,7 @@ public class GameBean {
         this.phases = phases;
         this.collapsed = collapsed;
         this.stamp = stamp;
+        this.pinged = pinged;
     }
 
     public GameBean(List<String> ping, int refresh) {
@@ -132,6 +135,10 @@ public class GameBean {
 
     public List<String> getPing() {
         return ping;
+    }
+
+    public List<String> getPinged() {
+        return pinged;
     }
 
     @Override
