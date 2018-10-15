@@ -14,6 +14,7 @@ import net.deckserver.game.jaxb.state.Notation;
 import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.cards.Deck;
+import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
 
 import java.time.OffsetDateTime;
@@ -230,6 +231,7 @@ public class JolGame {
 
     public void sendMsg(String player, String msg) {
         msg = truncateMsg(msg);
+        msg = Sanitizers.FORMATTING.sanitize(msg);
         addMessage("[" + player + "] " + msg);
     }
 

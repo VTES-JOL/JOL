@@ -987,11 +987,11 @@ function toggleMobileView(event) {
 	console.log('before: ' + viewport.content)
 	if (viewport.content == DESKTOP_VIEWPORT_CONTENT) {
 		viewport.content = 'width=device-width, initial-scale=1, shrink-to-fit=no';
-		$link.html('Desktop View');
+		$link.text('Desktop View');
 	}
 	else {
 		viewport.content = DESKTOP_VIEWPORT_CONTENT;
-		$link.html('Mobile View');
+		$link.text('Mobile View');
 	}
 	console.log('after: ' + viewport.content)
     $('body').scrollTop(0);
