@@ -1,4 +1,7 @@
-@font-face { font-family: 'jol'; src: url('../fonts/jol.ttf') format('truetype')}
+@font-face {
+    font-family: 'jol';
+    src: url('../fonts/jol.ttf') format('truetype')
+}
 
 body {
     background: #d0d0d0;
@@ -53,10 +56,11 @@ td a:hover {
 #globalChatOutput {
     height: 20em;
 }
+
 @media (min-width: 576px) {
-	#globalChatOutput {
-		height: 30em;
-	}
+    #globalChatOutput {
+        height: 30em;
+    }
 }
 
 p.chat {
@@ -88,6 +92,7 @@ ul.help li {
 div.help-body {
     margin: 0 auto;
 }
+
 @media (min-width: 576px) {
     div.help-body {
         width: 80%;
@@ -227,7 +232,7 @@ h2.header, h3.header, h4.header, h5.header {
 }
 
 h4.header {
-	font-size: 1em;
+    font-size: 1em;
     line-height: 1.5em;
 }
 
@@ -301,17 +306,17 @@ form.clean-table {
 
 div.clean-table > div {
     border-bottom: 1px solid #aaaaaa;
-	padding: 0.3rem;
+    padding: 0.3rem;
 }
 
 div.clean-table > div:not(.h5) {
-	cursor: pointer;
+    cursor: pointer;
 }
 
 #activeGames > div.h5 {
-	font-size: 1rem;
-	font-weight: bold;
-	margin-bottom: 0;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 0;
 }
 
 .chat-message {
@@ -399,7 +404,7 @@ td.layout {
 }
 
 #deckEditor h4 {
-	height: 2.5em;
+    height: 2.5em;
 }
 
 .full-width {
@@ -475,6 +480,7 @@ textarea.game-notes {
 .full-height {
     height: 20em;
 }
+
 @media (min-width: 576px) {
     .full-height {
         height: 30em;
@@ -484,6 +490,7 @@ textarea.game-notes {
 .full-height-content {
     height: 18.5em;
 }
+
 @media (min-width: 576px) {
     .full-height-content {
         height: 28.5em;
@@ -493,6 +500,7 @@ textarea.game-notes {
 .full-height-content-header {
     height: calc(17em - 6px);
 }
+
 @media (min-width: 576px) {
     .full-height-content-header {
         height: calc(27em - 6px);
@@ -506,6 +514,7 @@ textarea.game-notes {
 .half-height-content {
     height: 20em;
 }
+
 @media (min-width: 576px) {
     .half-height-content {
         height: 13.5em;
@@ -517,7 +526,7 @@ textarea.game-notes {
 }
 
 .notes-header {
-	font-size: 1rem;
+    font-size: 1rem;
     height: 1.5em;
 }
 
@@ -547,20 +556,20 @@ textarea.game-notes {
 }
 
 @media (min-width: 576px) {
-	.game-header {
-		border-top: 0;
-	}
+    .game-header {
+        border-top: 0;
+    }
 }
 
 h5.region-header {
     font-family: "Times New Roman", Times, serif;
-	font-size: 1rem;
+    font-size: 1rem;
     clear: both;
 }
 
 .region-header a {
-    text-decoration: none!important;
-	color: black;
+    text-decoration: none !important;
+    color: black;
 }
 
 span.pool {
@@ -618,7 +627,17 @@ a.card-name {
     width: fit-content;
 }
 
-div#hand a.action:before,div#hand a.master:before, div#hand a.political_action:before, div#hand a.combat:before, div#hand a.reaction:before, div#hand a.action_modifier:before, div#hand a.ally:before, div#hand a.retainer:before, div#hand a.equipment:before, div#hand a.event:before {
+div.torpor a.card-name {
+    font-style: italic;
+    background-color: #edd;
+}
+
+div.torpor li ol a.card-name {
+    font-style: normal;
+    background-color: transparent;
+}
+
+div#hand a.action:before, div#hand a.master:before, div#hand a.political_action:before, div#hand a.combat:before, div#hand a.reaction:before, div#hand a.action_modifier:before, div#hand a.ally:before, div#hand a.retainer:before, div#hand a.equipment:before, div#hand a.event:before {
     font-family: 'jol';
     font-size: 1.5em;
     padding-right: 5px;
@@ -713,7 +732,9 @@ small.life {
     background-color: #1d9041;
 }
 
-#hand { }
+#hand {
+}
+
 @media (min-width: 576px) {
     #hand {
         height: 13.5em;
@@ -731,11 +752,12 @@ small.life {
     padding-bottom: .2em;
     padding-top: .2em;
 }
+
 @media (min-width: 576px) {
-	#hand ol.card-list > li {
-		padding-bottom: 0;
-		padding-top: 0;
-	}
+    #hand ol.card-list > li {
+        padding-bottom: 0;
+        padding-top: 0;
+    }
 }
 
 .region-empty-true {
@@ -769,6 +791,7 @@ a {
 .user-card {
     width: 100%;
 }
+
 @media (min-width: 576px) {
     .user-card {
         width: 25%;

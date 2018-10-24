@@ -1,13 +1,12 @@
 <%@page contentType="text/html" %>
 <%@page pageEncoding="UTF-8" %>
 <%@page import="net.deckserver.dwr.jsp.RegionParams" %>
-<%@page import="net.deckserver.dwr.model.JolGame" %>
 <%
-    JolGame game = (JolGame) request.getAttribute("game");
     RegionParams r = (RegionParams) request.getAttribute("rparams");
     boolean empty = r.isEmpty();
+    String region = r.getRegion();
 %>
-<div class="region-empty-<%= empty %>">
+<div class="region-empty-<%= empty %> <%= region %>">
     <h5 class="region-header">
         <a href="javascript:details('<%= r.getIndex() %>');" id="<%= r.getIndex() %>">
             <i class="toggle"></i>
