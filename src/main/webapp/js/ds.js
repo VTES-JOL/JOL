@@ -603,6 +603,7 @@ function showHistory() {
 }
 
 function loadGame(data) {
+    $("#gameTitle").text(data.name);
     if (!data.player) {
         $(".player-only").hide();
     } else {
