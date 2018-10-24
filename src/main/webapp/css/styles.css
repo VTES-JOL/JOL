@@ -618,7 +618,7 @@ a.card-name {
     width: fit-content;
 }
 
-div#hand a.action:before,div#hand a.master:before, div#hand a.political_action:before, div#hand a.combat:before, div#hand a.reaction:before, div#hand a.action_modifier:before, div#hand a.ally:before, div#hand a.retainer:before, div#hand a.equipment:before {
+div#hand a.action:before,div#hand a.master:before, div#hand a.political_action:before, div#hand a.combat:before, div#hand a.reaction:before, div#hand a.action_modifier:before, div#hand a.ally:before, div#hand a.retainer:before, div#hand a.equipment:before, div#hand a.event:before {
     font-family: 'jol';
     font-size: 1.5em;
     padding-right: 5px;
@@ -666,19 +666,23 @@ div#hand a.action_modifier.reaction:before {
 }
 
 div#hand a.action_modifier.combat:before {
-    content: "qt"
+    content: "qt";
 }
 
 div#hand a.combat.reaction:before {
-    content: "tv"
+    content: "tv";
 }
 
 div#hand a.action.reaction:before {
-    content: "pv"
+    content: "pv";
 }
 
 div#hand a.action.combat:before {
-    content: "pt"
+    content: "pt";
+}
+
+div#hand a.event:before {
+    content: "{";
 }
 
 small.counter {
