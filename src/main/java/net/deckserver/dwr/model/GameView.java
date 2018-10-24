@@ -159,7 +159,7 @@ public class GameView {
         String stamp = JolAdmin.getDate();
         return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, global, text, label,
                 chatReset, tc, turn, turns, state, phases, ping,
-                collapsed, stamp, pinged);
+                collapsed, stamp, pinged, name);
     }
 
     public synchronized void clearAccess() {

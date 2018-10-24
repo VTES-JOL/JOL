@@ -63,7 +63,8 @@
             <div id="gameChatContainer" class="col">
                 <div class="game-header">
                     <h5>Game Chat</h5>
-                    <span class="" id="gameLabel"></span>
+                    <span id="gameTitle"></span>
+                    <span id="gameLabel"></span>
                 </div>
                 <div id="gameChatOutput" class="scrollable side-padded half-height-content light border-top"></div>
             </div>

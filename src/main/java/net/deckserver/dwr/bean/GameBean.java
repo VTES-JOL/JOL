@@ -42,9 +42,11 @@ public class GameBean {
 
     private String stamp;
 
+    private String name;
+
     public GameBean(boolean isPlayer, boolean isAdmin, boolean isJudge, int refresh, String hand, String global, String text,
                     String label, boolean resetChat, boolean turnChanged, String[] turn, String[] turns, String state, String[] phases,
-                    List<String> ping, String[] collapsed, String stamp, List<String> pinged) {
+                    List<String> ping, String[] collapsed, String stamp, List<String> pinged, String name) {
         this(ping, refresh);
         this.player = isPlayer;
         this.admin = isAdmin;
@@ -62,6 +64,7 @@ public class GameBean {
         this.collapsed = collapsed;
         this.stamp = stamp;
         this.pinged = pinged;
+        this.name = name;
     }
 
     public GameBean(List<String> ping, int refresh) {
@@ -139,6 +142,10 @@ public class GameBean {
 
     public List<String> getPinged() {
         return pinged;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override
