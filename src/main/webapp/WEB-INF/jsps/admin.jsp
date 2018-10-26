@@ -4,6 +4,7 @@
 			<h4 class="header">Create Game</h4>
 			<div class="light">
 				<input type="text" class="full-width" id="newGameName" name="newGameName" maxlength="30" placeholder="Game name cannot &quot; or &lsquo; characters"/>
+				Make this game private? <input type="checkbox" name="privateFlag" id="privateFlag">
 			</div>
 			<div class="footer">
 				<button class="btn btn-primary" onclick="doCreateGame()">Create</button>

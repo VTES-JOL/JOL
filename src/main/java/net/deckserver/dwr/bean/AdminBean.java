@@ -143,10 +143,11 @@ public class AdminBean {
         notifyAboutGame(name, true);
     }
 
-    public synchronized void createGame(String name, PlayerModel player) {
+    public synchronized void createGame(String name, Boolean isPrivate, PlayerModel player) {
         logger.trace("Creating game {} for player {}", name, player.getPlayer());
         if (JolAdmin.getInstance().mkGame(name)) {
             JolAdmin.getInstance().setOwner(name, player.getPlayer());
+            JolAdmin.getInstance().setGamePrivate(name, isPrivate);
             activeSort.add(getGameModel(name));
             actives = new ArrayList<>(activeSort);
             notifyAboutGame(name);

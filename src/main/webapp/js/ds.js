@@ -477,13 +477,15 @@ function callbackAdmin(data) {
 
 function doCreateGame() {
     var newGameDiv = $("#newGameName");
+    var isPrivate = $("#privateFlag").prop('checked');
     var gameName = newGameDiv.val();
     if (gameName.indexOf("\'") > -1 || gameName.indexOf("\"") > -1) {
         alert("Game name can not contain \' or \" characters in it");
         return;
     }
-    DS.createGame(gameName, {callback: processData, errorHandler: errorhandler});
+    DS.createGame(gameName, isPrivate, {callback: processData, errorHandler: errorhandler});
     newGameDiv.val('');
+    isPrivate.prop('checked', false);
 }
 
 function invitePlayer() {
