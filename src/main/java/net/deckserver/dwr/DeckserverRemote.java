@@ -46,10 +46,10 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-    public Map<String, Object> createGame(String name) {
+    public Map<String, Object> createGame(String name, Boolean isPrivate) {
         PlayerModel player = getPlayer();
         if (player != null && player.isAdmin()) {
-            abean.createGame(name, player);
+            abean.createGame(name, isPrivate, player);
         }
         return UpdateFactory.getUpdate();
     }

@@ -287,6 +287,10 @@ public class JolAdmin {
         getPlayerInfo(player).claimGame(game);
     }
 
+    public void setGamePrivate(String game, Boolean isPrivate) {
+        getGameInfo(game).setPrivate(isPrivate);
+    }
+
     public String getDeck(String player, String name) {
         PlayerInfo info = getPlayerInfo(player);
         return info.getDeck(info.getDeckKey(name));
@@ -328,6 +332,10 @@ public class JolAdmin {
 
     public boolean isFinished(String gameName) {
         return getGameInfo(gameName).isFinished();
+    }
+
+    public boolean isPrivate(String gameName) {
+        return getGameInfo(gameName).isPrivate();
     }
 
     public void startGame(String game) {
@@ -579,12 +587,19 @@ public class JolAdmin {
                 FileUtils.saveGameActions(gactions, actionsFile);
             }
         }
+
+        public boolean isPrivate() {
+            return info.getProperty("private", "false").equals("true");
+        }
+
+        public void setPrivate(Boolean flag) {
+            info.setProperty("private", flag.toString());
+        }
     }
 
     class PlayerInfo extends Info {
 
         private final String id;
-        private boolean judge;
 
         PlayerInfo(String name, String password, String email) {
             this(name, sysInfo.newPlayer(name), true);

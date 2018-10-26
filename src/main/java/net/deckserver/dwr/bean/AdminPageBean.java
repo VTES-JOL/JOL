@@ -3,6 +3,7 @@ package net.deckserver.dwr.bean;
 import net.deckserver.dwr.model.JolAdmin;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public class AdminPageBean {
 
@@ -16,6 +17,7 @@ public class AdminPageBean {
         games.stream()
                 .filter(Objects::nonNull)
                 .filter(gameName -> admin.isSuperUser(player) || admin.getOwner(gameName).equals(player))
+                .filter(gameName -> !admin.isPrivate(gameName) || admin.getOwner(gameName).equals(player))
                 .forEach(gameName -> {
                     if (admin.isOpen(gameName)) {
                         forming.add(new RegistrationSummaryBean(abean, gameName));
