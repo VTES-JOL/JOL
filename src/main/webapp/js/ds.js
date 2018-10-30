@@ -62,6 +62,7 @@ function doGlobalChat() {
 function doNav(target) {
     $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
     DS.navigate(target, {callback: processData, errorHandler: errorhandler});
+    return false;
 }
 
 // Deck Register: deck link
