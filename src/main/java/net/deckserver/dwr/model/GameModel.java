@@ -141,7 +141,7 @@ public class GameModel implements Comparable {
     public void firstPing() {
         JolAdmin admin = JolAdmin.getInstance();
         JolGame game = admin.getGame(name);
-        game.setPingTag(game.getActivePlayer());
+        admin.pingPlayer(game.getActivePlayer(), name);
     }
 
     private void addChats(int idx) {

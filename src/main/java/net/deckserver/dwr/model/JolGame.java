@@ -570,16 +570,17 @@ public class JolGame {
         return Integer.parseInt(cap.getValue());
     }
 
-    public List<String> getPingList() {
+    public List<String> getPingedList() {
         return state.getPlayers().stream()
+                .filter(player -> getPool(player) > 0)
                 .filter(player -> JolAdmin.getInstance().isPlayerPinged(player, state.getName()))
                 .collect(Collectors.toList());
     }
 
-    public void setPingTag(String player) {
-        Notation note = getNote(state, player + PING, true);
-        note.setValue(getDate());
+    public List<String> getPingList() {
+        return state.getPlayers().stream()
+                .filter(player -> getPool(player) > 0)
+                .collect(Collectors.toList());
     }
-
 
 }

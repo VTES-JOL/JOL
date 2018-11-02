@@ -8,7 +8,11 @@ import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -86,8 +90,8 @@ public class GameView {
         String[] phases = null;
         String[] collapsed = null;
 
-        ping = game.getPlayers();
-        pinged = game.getPingList();
+        ping = game.getPingList();
+        pinged = game.getPingedList();
 
         if (isPlayer && stateChanged) {
             try {
