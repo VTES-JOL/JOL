@@ -9,7 +9,6 @@ package net.deckserver.game.storage.cards;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author administrator
@@ -50,10 +49,6 @@ public class CardEntry {
         return name;
     }
 
-    public String getBaseName() {
-        return name;
-    }
-
     public String getGroup() {
         return group;
     }
@@ -62,20 +57,24 @@ public class CardEntry {
         return type;
     }
 
-    public List<String> getTypes() {
-        return Arrays.asList(type.toLowerCase().trim().split("/"));
-    }
-
-    public String getTypeClass() {
-        return getTypes().stream().map(s -> s.replaceAll(" ", "_")).sorted().collect(Collectors.joining(" "));
+    public CardType getCardType() {
+        return CardType.of(type);
     }
 
     public boolean isCrypt() {
-        return CardType.cryptTypes().contains(CardType.of(type));
+        return CardType.cryptTypes().contains(getCardType());
+    }
+
+    public boolean isLibrary() {
+        return CardType.libraryTypes().contains(getCardType());
     }
 
     public boolean hasLife() {
-        return CardType.lifeTypes().contains(CardType.of(type));
+        return CardType.lifeTypes().contains(getCardType());
+    }
+
+    public boolean hasBlood() {
+        return CardType.VAMPIRE.equals(getCardType());
     }
 
     @Override

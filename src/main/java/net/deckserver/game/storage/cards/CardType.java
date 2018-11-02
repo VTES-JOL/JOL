@@ -40,8 +40,12 @@ public enum CardType {
         return EnumSet.of(VAMPIRE, IMBUED);
     }
 
+    public static EnumSet<CardType> libraryTypes() {
+        return EnumSet.complementOf(cryptTypes());
+    }
+
     public static EnumSet<CardType> lifeTypes() {
-        return EnumSet.of(ALLY, RETAINER);
+        return EnumSet.of(ALLY, RETAINER, IMBUED);
     }
 
     public String getLabel() {
