@@ -19,9 +19,10 @@
     CardEntry cardEntry = p.getEntry();
     boolean isCrypt = cardEntry.isCrypt();
     boolean hasLife = cardEntry.hasLife();
-    String typeClass = cardEntry.getTypeClass();
+    boolean hasBlood = cardEntry.hasBlood();
     request.setAttribute("isCrypt", isCrypt);
     request.setAttribute("hasLife", hasLife);
+    request.setAttribute("hasBlood", hasBlood);
     request.setAttribute("p", p);
     request.setAttribute("c", c);
     request.setAttribute("game", game);
@@ -34,30 +35,25 @@
     request.setAttribute("cards", cards);
     request.setAttribute("hasCards", hasCards);
     request.setAttribute("cardEntry", cardEntry);
-    request.setAttribute("typeClass", typeClass);
 %>
 
 <c:if test="${p.hidden}">
     XXXXXX
 </c:if>
 <c:if test="${!p.hidden}">
-    <a class="card-name <%= typeClass %>" title="<%= p.getId() %>"><%= p.getName() %>
+    <a class="card-name " title="<%= p.getId() %>"><%= p.getName() %>
     </a>
 </c:if>
 <c:if test="${game != null}">
-    <c:if test="${capacity > 0 && !p.hidden}">
+    <c:if test="${capacity > 0 && !p.hidden && hasBlood}">
         <small class="counter blood"><%= counters %> / <%= capacity %>
         </small>
     </c:if>
-    <c:if test="${capacity <= 0 && isCrypt && counters > 0}">
-        <small class="counter blood"><%= counters %>
-        </small>
-    </c:if>
-    <c:if test="${counters > 0 && hasLife}">
+    <c:if test="${hasLife && counters > 0}">
         <small class="counter life"><%= counters %>
         </small>
     </c:if>
-    <c:if test="${counters > 0 && !hasLife && !isCrypt && capacity <= 0}">
+    <c:if test="${counters > 0 && !(capacity > 0 && !p.hidden && hasBlood) && !(hasLife)}">
         <small class="counter"><%= counters %>
         </small>
     </c:if>

@@ -19,6 +19,17 @@ public class GameCard {
     protected String cardid;
     protected List<Notation> notation;
 
+    @XmlAttribute(name = "type")
+    protected String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getId() {
         return id;
     }
