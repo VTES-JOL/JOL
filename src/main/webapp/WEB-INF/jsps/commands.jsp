@@ -57,8 +57,7 @@
                 Manipulates counters on various cards. Generally used for moving blood on or off of vampires, or
                 manipulating pool
                 totals. Can be used for cards such as Dreams of the Sphinx to indicate the number of counters on the
-                card. The
-                default PLAYER is yourself. There is no default region.
+                card. The default PLAYER is yourself. The default REGION is ready region
             </p>
             <h5>Syntax</h5>
             <p>
@@ -69,19 +68,6 @@
                 <tr>
                     <th class="help-command">Command</th>
                     <th>Result</th>
-                </tr>
-                <tr>
-                    <td class="help-command"> blood +2</td>
-                    <td> adds 2 to your pool ( Deprecated: Will be removed in future release in favor of pool command
-                        )
-                    </td>
-                </tr>
-                <tr>
-                    <td class="help-command"> blood -2</td>
-                    <td> deducts 2 from your pool ( Deprecated: Will be removed in future release in favor of pool
-                        command
-                        )
-                    </td>
                 </tr>
                 <tr>
                     <td class="help-command"> blood ready 1 +3</td>
@@ -173,7 +159,7 @@
             </p>
             <h5>Syntax</h5>
             <p>
-                <code>draw [vamp] [NUM]</code>
+                <code>draw [crypt] [NUM]</code>
             </p>
             <h5>Examples</h5>
             <table class="help-example">
@@ -186,7 +172,7 @@
                     <td>draw 1 card from your library</td>
                 </tr>
                 <tr>
-                    <td class="help-command">draw vamp</td>
+                    <td class="help-command">draw crypt</td>
                     <td>draw 1 card from your crypt</td>
                 </tr>
                 <tr>
@@ -194,7 +180,7 @@
                     <td>draws 5 cards from your library</td>
                 </tr>
                 <tr>
-                    <td class="help-command">draw vamp 4</td>
+                    <td class="help-command">draw crypt 4</td>
                     <td>draws 4 vamps from your crypt</td>
                 </tr>
             </table>
@@ -554,11 +540,6 @@
             <p>
                 <code>lock [PLAYER] [REGION] CARD</code>
             </p>
-            <p>
-                <code>tap [PLAYER] [REGION] CARD</code>
-            </p>
-            <strong>Deprecated: VEKN has changed the keyword tap to lock. The tap command will be removed in a future
-                release.</strong>
             <h5>Examples</h5>
             <table class="help-example">
                 <tr>
@@ -590,10 +571,6 @@
             <p>
                 <code>unlock [PLAYER] [REGION] [CARD]</code>
             </p>
-            <p>
-                <code>untap [PLAYER] [REGION] [CARD]</code>
-            </p>
-            <strong>Deprecated: VEKN has changed the keyword untap to unlock. The untap command will be removed in a future release.</strong>
             <h5>Examples</h5>
             <table class="help-example">
                 <tr>

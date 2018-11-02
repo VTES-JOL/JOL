@@ -100,11 +100,11 @@ public class DoCommand {
             }
             if (cmd.equalsIgnoreCase("draw")) {
                 // draw [vamp] [<numcards>]
-                boolean vamp = cmdObj.consumeString("vamp");
+                boolean crypt = cmdObj.consumeString("crypt") || cmdObj.consumeString("vamp");
                 int count = cmdObj.getNumber(1);
                 if (count <= 0) return "Must draw > 0 cards";
                 for (int j = 0; j < count; j++) {
-                    if (vamp)
+                    if (crypt)
                         game.drawCard(player, JolGame.CRYPT, JolGame.INACTIVE_REGION);
                     else
                         game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
@@ -182,22 +182,13 @@ public class DoCommand {
             }
             if (cmd.equalsIgnoreCase("blood")) {
                 String targetPlayer = cmdObj.getPlayer(player);
-                String targetRegion = cmdObj.getRegion(null);
-                String targetCard = null;
-                if (targetRegion != null) {
-                    targetCard = cmdObj.getCard(false, targetPlayer, targetRegion);
-                    if (targetCard == null) throw new CommandException("Must specify a card in the region");
-                }
+                String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
+                String targetCard = cmdObj.getCard(false, targetPlayer, targetRegion);
+                if (targetCard == null) throw new CommandException("Must specify a card in the region");
                 int amount = cmdObj.getAmount(0);
                 if (amount == 0) return "Must specify an amount of blood";
-                if (targetRegion == null) {
-                    // int pool = game.getPool(targetPlayer);
-                    game.changePool(targetPlayer, amount);
-                    return "Adjusted pool";
-                } else {
-                    game.changeCounters(targetCard, amount);
-                    return "Adjusted blood";
-                }
+                game.changeCounters(targetCard, amount);
+                return "Adjusted blood";
             }
             if (cmd.equalsIgnoreCase("capacity")) {
                 // blood [<targetplayer>] [<targetregion>] <targetcard> [+|-]<amount>
