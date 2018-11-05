@@ -20,6 +20,8 @@
     boolean isCrypt = cardEntry.isCrypt();
     boolean hasLife = cardEntry.hasLife();
     boolean hasBlood = cardEntry.hasBlood();
+    String typeClass = cardEntry.getTypeClass();
+    request.setAttribute("typeClass", typeClass);
     request.setAttribute("isCrypt", isCrypt);
     request.setAttribute("hasLife", hasLife);
     request.setAttribute("hasBlood", hasBlood);
@@ -41,7 +43,7 @@
     XXXXXX
 </c:if>
 <c:if test="${!p.hidden}">
-    <a class="card-name " title="<%= p.getId() %>"><%= p.getName() %>
+    <a class="card-name <%= typeClass %>" title="<%= p.getId() %>"><%= p.getName() %>
     </a>
 </c:if>
 <c:if test="${game != null}">
