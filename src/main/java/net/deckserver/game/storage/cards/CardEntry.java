@@ -9,6 +9,7 @@ package net.deckserver.game.storage.cards;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author administrator
@@ -59,6 +60,14 @@ public class CardEntry {
 
     public CardType getCardType() {
         return CardType.of(type);
+    }
+
+    public String getTypeClass() {
+        return Arrays.stream(type.toLowerCase()
+                .trim().split("/"))
+                .map(s -> s.replaceAll(" ", "_"))
+                .sorted()
+                .collect(Collectors.joining(" "));
     }
 
     public boolean isCrypt() {
