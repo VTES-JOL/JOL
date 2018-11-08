@@ -47,7 +47,7 @@
     </a>
 </c:if>
 <c:if test="${game != null}">
-    <c:if test="${capacity > 0 && !p.hidden && hasBlood}">
+    <c:if test="${capacity > 0 && !p.hidden}">
         <small class="counter blood"><%= counters %> / <%= capacity %>
         </small>
     </c:if>
@@ -55,7 +55,7 @@
         <small class="counter life"><%= counters %>
         </small>
     </c:if>
-    <c:if test="${counters > 0 && !(capacity > 0 && !p.hidden && hasBlood) && !(hasLife)}">
+    <c:if test="${counters > 0 && !(capacity > 0 && !p.hidden) && !(hasLife)}">
         <small class="counter"><%= counters %>
         </small>
     </c:if>
