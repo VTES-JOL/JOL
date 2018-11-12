@@ -44,4 +44,11 @@ class DsCard extends DsCardContainer implements Card {
         return card;
     }
 
+    @Override
+    public String toString() {
+        return "DsCard{" +
+                "id='" + id + '\'' +
+                ", card='" + card + '\'' +
+                '}';
+    }
 }

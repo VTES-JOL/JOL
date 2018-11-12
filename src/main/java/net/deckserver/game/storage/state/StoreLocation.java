@@ -11,7 +11,10 @@ import net.deckserver.game.interfaces.state.Location;
 import net.deckserver.game.jaxb.state.GameCard;
 import net.deckserver.game.jaxb.state.Notation;
 import net.deckserver.game.jaxb.state.Region;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,6 +22,8 @@ import java.util.List;
  * @author administrator
  */
 public class StoreLocation implements Location {
+
+    private final static Logger logger = LoggerFactory.getLogger(StoreLocation.class);
 
     StoreGame game;
     Region region;
@@ -106,7 +111,11 @@ public class StoreLocation implements Location {
     public void shuffle(int num) {
         List<GameCard> cards = region.getGameCard();
         List<GameCard> subList = cards.subList(0, num);
-        Collections.shuffle(subList);
+        logger.debug("pre-shuffle: {}", subList);
+        for (int x = 0; x < 20; x++) {
+            Collections.shuffle(subList, new SecureRandom());
+            logger.debug("post-shuffle: {}", subList);
+        }
     }
 
 }

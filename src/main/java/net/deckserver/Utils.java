@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import java.security.SecureRandom;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.time.Duration;
@@ -103,7 +104,11 @@ public class Utils {
 
     public static <T> void shuffle(List<T> obj, int num) {
         List<T> shuffle = num > 0 ? obj.subList(0, num) : obj;
-        Collections.shuffle(shuffle);
+        logger.debug("pre-shuffle: {}", shuffle);
+        for (int x = 0; x < 20; x++) {
+            Collections.shuffle(shuffle, new SecureRandom());
+            logger.debug("post-shuffle: {}", shuffle);
+        }
     }
 
     public static <T> void shuffle(List<T> obj) {
