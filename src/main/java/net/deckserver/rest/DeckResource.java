@@ -12,23 +12,29 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Base64;
 
-@Path("/deck/{playerId}/{deckId}")
+@Path("/deck/{deckHash}")
 public class DeckResource {
 
     @GET
     @Produces("application/json")
-    public String getDeck(@PathParam("playerId") String playerId, @PathParam("deckId") String deckId) {
+    public String getDeck(@PathParam("deckHash") String deckHash) {
 
+        String translatedPath = new String(Base64.getDecoder().decode(deckHash));
+        String[] pathParts = translatedPath.split(":");
+        if (pathParts.length != 2) {
+            return "Invalid deck URL";
+        }
         try {
-            java.nio.file.Path path = Paths.get(System.getenv("JOL_DATA"), playerId, deckId + ".txt");
+            java.nio.file.Path path = Paths.get(System.getenv("JOL_DATA"), pathParts[0], pathParts[1] +".txt");
             if (!Files.exists(path)) {
                 return "Invalid deck URL";
             }
             String deckContents = new String(Files.readAllBytes(path));
 
             Client client = ClientBuilder.newClient();
-            Response response = client.target("https://www.deckserver.net/api/decks/parse")
+            Response response = client.target(System.getenv("API_SERVER") + "/api/decks/parse")
                     .request(MediaType.APPLICATION_JSON)
                     .post(Entity.entity(deckContents, MediaType.TEXT_PLAIN));
 
