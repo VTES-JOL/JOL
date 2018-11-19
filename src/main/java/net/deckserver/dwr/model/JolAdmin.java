@@ -389,6 +389,14 @@ public class JolAdmin {
         return existsPlayer(player) && getPlayerInfo(player).isJudge();
     }
 
+    public String getDeckId(String player, String deckName) {
+        return getPlayerInfo(player).getDeckKey(deckName);
+    }
+
+    public String getPlayerId(String player) {
+        return getPlayerInfo(player).id;
+    }
+
 
     class GameInfo extends Info {
         private final String prefix;
