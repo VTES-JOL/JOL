@@ -33,7 +33,7 @@ function init(data) {
     $("h4.collapse").click(function () {
         $(this).next().slideToggle();
     })
-	$('#dsuserin').focus();
+    $('#dsuserin').focus();
 }
 
 function processData(data) {
@@ -85,6 +85,7 @@ function renderButton(data) {
         buttonsDiv.append(button);
     });
 }
+
 function renderGameButtons(data) {
     var buttonsDiv = $("#gameButtons");
     var newActivity = false;
@@ -189,10 +190,10 @@ function renderMyGames(games) {
 
 function renderGameLink(game, small) {
     return '<a onclick="doNav(' + "'g" + game + "');" + '">'
-		+ (small ? '<small>' : '')
-		+ game
-		+ (small ? '</small>' : '')
-		+ "</a>";
+        + (small ? '<small>' : '')
+        + game
+        + (small ? '</small>' : '')
+        + "</a>";
 }
 
 function renderOnline(div, who) {
@@ -235,19 +236,21 @@ function renderRowWithLabel2(tid, label) {
         }
     }
     var newRow = $('#activeGameTemplate').eq(0)
-		.clone()
-		.attr('id', null)
-		.removeClass('d-none')
-		.data('label', label)
-		.click(function(e){ doNav('g' + label); });
-	table.append(newRow);
+        .clone()
+        .attr('id', null)
+        .removeClass('d-none')
+        .data('label', label)
+        .click(function (e) {
+            doNav('g' + label);
+        });
+    table.append(newRow);
     return newRow;
 }
 
 function renderActiveGames(games) {
     if (games === null) return;
     for (var index = 0; index < games.length; index++) {
-		var game = games[index];
+        var game = games[index];
         if (game.turn === null) continue;
         var row = renderRowWithLabel2('activeGames', game.game);
         row.children().eq(0).html(renderGameLink(game.game));
@@ -305,7 +308,7 @@ function navigate(data) {
         player = data.player;
     }
     renderButton({help: "Help", _guides: "Guides"});
-	renderDesktopViewButton();
+    renderDesktopViewButton();
 }
 
 function callbackAllGames(data) {
@@ -403,6 +406,17 @@ function doDelete(name) {
     var confirmed = confirm("Are you use you want to delete " + name + "\nThis action is not reversible");
     if (!confirmed) return;
     DS.removeDeck(name, {callback: processData, errorHandler: errorhandler});
+}
+
+function doExport(url) {
+    var exportURL = window.location.protocol + "//" + window.location.hostname + (window.location.port !== 80 || window.location !== 443 ? ":" + window.location.port : "") + window.location.pathname + url;
+    const el = document.createElement('textarea');
+    el.value = exportURL;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    alert("Copied export URL to clipboard : " + exportURL);
 }
 
 function doNewDeck() {
@@ -574,9 +588,15 @@ function doSubmit() {
 function setOther(newOption) {
     currentOption = newOption;
     switch (currentOption) {
-        case "notes": showNotes(); break;
-        case "history": showHistory(); break;
-        case "deck": showGameDeck(); break;
+        case "notes":
+            showNotes();
+            break;
+        case "history":
+            showHistory();
+            break;
+        case "deck":
+            showGameDeck();
+            break;
     }
 }
 
@@ -755,17 +775,18 @@ function addRole() {
 }
 
 function addRoleButton(userColumn, username, role, roleKey) {
-	var button = $('#userRoleTemplate').eq(0)
-		.clone()
-		.attr('id', null)
-		.removeClass('d-none');
-	button.find('span').text(role);
-	button.click(username, function () {
-		DS.removeRole(username, roleKey ? rokeKey : role.toLowerCase(), {
-			callback: processData, errorHandler: errorhandler});
-	});
-	var buttonList = userColumn.find('.list-group').eq(0);
-	buttonList.append(button);
+    var button = $('#userRoleTemplate').eq(0)
+        .clone()
+        .attr('id', null)
+        .removeClass('d-none');
+    button.find('span').text(role);
+    button.click(username, function () {
+        DS.removeRole(username, roleKey ? rokeKey : role.toLowerCase(), {
+            callback: processData, errorHandler: errorhandler
+        });
+    });
+    var buttonList = userColumn.find('.list-group').eq(0);
+    buttonList.append(button);
 }
 
 function callbackSuper(data) {
@@ -781,27 +802,29 @@ function callbackSuper(data) {
         }
     });
 
-	var userAdmins = $('#userAdmins');
-	userAdmins.empty();
+    var userAdmins = $('#userAdmins');
+    userAdmins.empty();
 
-	var sortedUsers = Array.from(data.players);
-	sortedUsers.sort(function(a, b) { return a.name.localeCompare(b.name); });
+    var sortedUsers = Array.from(data.players);
+    sortedUsers.sort(function (a, b) {
+        return a.name.localeCompare(b.name);
+    });
 
     $.each(sortedUsers, function (index, value) {
-		var userCol= $('#userAdminTemplate').eq(0)
-			.clone()
-			.attr('id', null)
-			.removeClass('d-none');
-		userCol.find('.card-header').text(value.name);
-		userCol.find('.card-footer > span').text(
-			moment(value.lastOnline).tz(USER_TIMEZONE).format("DD-MMM-YYYY HH:mm z"));
+        var userCol = $('#userAdminTemplate').eq(0)
+            .clone()
+            .attr('id', null)
+            .removeClass('d-none');
+        userCol.find('.card-header').text(value.name);
+        userCol.find('.card-footer > span').text(
+            moment(value.lastOnline).tz(USER_TIMEZONE).format("DD-MMM-YYYY HH:mm z"));
 
         if (value.admin) addRoleButton(userCol, value.name, 'Admin');
         if (value.superUser) addRoleButton(userCol, value.name, 'Super User', 'super');
         if (value.judge) addRoleButton(userCol, value.name, 'Judge');
-		userAdmins.append(userCol);
+        userAdmins.append(userCol);
 
-		////////////////
+        ////////////////
         var playerRow = $("<tr/>");
         playerRow.append($("<td/>").text(value.name));
         playerRow.append($("<td/>").text(moment(value.lastOnline).tz(USER_TIMEZONE).format("DD-MMM-YYYY HH:mm z")));
@@ -878,13 +901,15 @@ function callbackShowDecks(data) {
     // Deck List
     dwr.util.removeAllRows('decks');
     for (var dIdx = 0; dIdx < data.decks.length; dIdx++) {
-        var dRow = renderRowWithLabel('decks', data.decks[dIdx]);
+        var dRow = renderRowWithLabel('decks', data.decks[dIdx].name);
         if (dRow.cells.length === 0) {
-            dRow.insertCell(0).innerHTML = '<a onclick="doLoadDeck(' + "'" + data.decks[dIdx] + "');" + '">' + data.decks[dIdx] + '</a>';
+            dRow.insertCell(0).innerHTML = '<a onclick="doLoadDeck(' + "'" + data.decks[dIdx].name + "');" + '">' + data.decks[dIdx].name + '</a>';
             dRow.insertCell(1);
+            dRow.insertCell(2);
         }
-        dRow.cells[1].innerHTML = "<a onclick='doDelete(\"" + data.decks[dIdx] + "\");'>&#x2717;</a>";
-        dRow.cells[1].className = 'delete';
+        dRow.cells[1].innerHTML = "<a onclick='doExport(\"" + data.decks[dIdx].url + "\");'>&#x21e8;</a>";
+        dRow.cells[2].innerHTML = "<a onclick='doDelete(\"" + data.decks[dIdx].name + "\");'>&#x2717;</a>";
+        dRow.cells[2].className = 'delete';
     }
     if (data.games.length === 0) {
         dwr.util.byId('gameRegistration').style.display = 'none';
@@ -952,7 +977,7 @@ function callbackMain(data) {
     } else {
         toggleVisible('register', 'player');
         toggleVisible('welcome', 'globalchat');
-	}
+    }
 }
 
 function callbackStatus(data) {
@@ -967,36 +992,36 @@ function goToRegister(event) {
 }
 
 function renderDesktopViewButton() {
-	var viewport = $('meta[name=viewport]').get(0);
-	var text = (
-		viewport.content == DESKTOP_VIEWPORT_CONTENT
-		? 'Mobile' : 'Desktop') + ' View';
-	var button = $('<a/>')
-		.attr('id', 'toggleMobileViewLink')
-		.addClass('nav-item nav-link')
-		.text(text)
-		.click(function() {
-			toggleMobileView();
-			$('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
-	});
-	$('#buttons').append(button);
+    var viewport = $('meta[name=viewport]').get(0);
+    var text = (
+        viewport.content == DESKTOP_VIEWPORT_CONTENT
+            ? 'Mobile' : 'Desktop') + ' View';
+    var button = $('<a/>')
+        .attr('id', 'toggleMobileViewLink')
+        .addClass('nav-item nav-link')
+        .text(text)
+        .click(function () {
+            toggleMobileView();
+            $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
+        });
+    $('#buttons').append(button);
 }
 
 var DESKTOP_VIEWPORT_CONTENT = 'width=1024';
 
 function toggleMobileView(event) {
-	if (event) event.preventDefault();
-	var $link = $('#toggleMobileViewLink').eq(0);
-	var viewport = $('meta[name=viewport]').get(0);
-	console.log('before: ' + viewport.content)
-	if (viewport.content == DESKTOP_VIEWPORT_CONTENT) {
-		viewport.content = 'width=device-width, initial-scale=1, shrink-to-fit=no';
-		$link.text('Desktop View');
-	}
-	else {
-		viewport.content = DESKTOP_VIEWPORT_CONTENT;
-		$link.text('Mobile View');
-	}
-	console.log('after: ' + viewport.content)
+    if (event) event.preventDefault();
+    var $link = $('#toggleMobileViewLink').eq(0);
+    var viewport = $('meta[name=viewport]').get(0);
+    console.log('before: ' + viewport.content)
+    if (viewport.content == DESKTOP_VIEWPORT_CONTENT) {
+        viewport.content = 'width=device-width, initial-scale=1, shrink-to-fit=no';
+        $link.text('Desktop View');
+    }
+    else {
+        viewport.content = DESKTOP_VIEWPORT_CONTENT;
+        $link.text('Mobile View');
+    }
+    console.log('after: ' + viewport.content)
     $('body').scrollTop(0);
 }

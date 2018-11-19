@@ -2,7 +2,6 @@ package net.deckserver.dwr.model;
 
 import net.deckserver.dwr.bean.AdminBean;
 import net.deckserver.dwr.bean.ChatEntryBean;
-import net.deckserver.dwr.bean.DeckSummaryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +18,6 @@ public class PlayerModel implements Comparable {
     private List<ChatEntryBean> chats = new ArrayList<>();
     private String tmpDeck;
     private String tmpDeckName;
-    private List<DeckSummaryBean> decks = new ArrayList<>();
     private Collection<String> removedGames = new ArrayList<>(2);
     private Collection<String> changedGames = new ArrayList<>();
 
@@ -102,7 +100,6 @@ public class PlayerModel implements Comparable {
     public void submitDeck(String name, String deck) {
         clearDeck();
         JolAdmin.getInstance().createDeck(player, name, deck);
-        decks = null;
     }
 
     public List<String> getDecks() {
