@@ -397,7 +397,6 @@ public class JolAdmin {
         return getPlayerInfo(player).id;
     }
 
-
     class GameInfo extends Info {
         private final String prefix;
         JolGame game;
