@@ -1,3 +1,4 @@
+"use strict";
 var refresher = null;
 var game = null;
 var player = null;
@@ -929,7 +930,7 @@ function callbackShowDecks(data) {
         dwr.util.removeAllOptions('reggames');
         dwr.util.removeAllOptions('regdecks');
         dwr.util.addOptions('reggames', data.games, 'game', 'game');
-        dwr.util.addOptions('regdecks', data.decks);
+        dwr.util.addOptions('regdecks', data.decks.map(d => d.name));
     }
 }
 

@@ -10,6 +10,7 @@ import net.deckserver.dwr.model.PlayerModel;
 import org.glassfish.jersey.internal.util.Base64;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,7 @@ class DeckCreator implements ViewCreator {
 
     public Object createData(AdminBean abean, PlayerModel model) {
         this.player = model.getPlayer();
-        List<DeckInfoBean> decks = model.getDecks().stream().map(this::getDeck).collect(Collectors.toList());
+        List<DeckInfoBean> decks = model.getDecks().stream().map(this::getDeck).sorted(Comparator.comparing(DeckInfoBean::getName)).collect(Collectors.toList());
         List<GameModel> actives = abean.getActiveGames();
         JolAdmin admin = JolAdmin.getInstance();
         List<DeckSummaryBean> games = actives.stream()
