@@ -409,7 +409,7 @@ function doDelete(name) {
 }
 
 function doExport(url) {
-    var exportURL = window.location.protocol + "//" + window.location.hostname + (window.location.port !== 80 || window.location !== 443 ? ":" + window.location.port : "") + window.location.pathname + url;
+    var exportURL = window.location.protocol + "//" + window.location.hostname + (window.location.port !== 80 || window.location.port !== 443 ? ":" + window.location.port : "") + window.location.pathname + url;
     const el = document.createElement('textarea');
     el.value = exportURL;
     document.body.appendChild(el);
