@@ -34,7 +34,7 @@ public class DeckResource {
             String deckContents = new String(Files.readAllBytes(path));
 
             Client client = ClientBuilder.newClient();
-            Response response = client.target(System.getenv("API_SERVER") + "/api/decks/parse")
+            Response response = client.target(System.getenv("API_SERVER") + "/decks/parse")
                     .request(MediaType.APPLICATION_JSON)
                     .post(Entity.entity(deckContents, MediaType.TEXT_PLAIN));
 
