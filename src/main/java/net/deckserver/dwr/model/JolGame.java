@@ -145,20 +145,48 @@ public class JolGame {
         dstCard.addCard(srcCard, false);
     }
 
-    public void moveToRegion(String cardId, String destPlayer, String destRegion, boolean bottom, boolean random) {
+    public Card _moveToRegion(String cardId, String destPlayer, String destRegion, boolean bottom) {
         Card card = state.getCard(cardId);
         if (card == null) throw new IllegalArgumentException("No such card");
         CardContainer source = card.getParent();
         Location dest = state.getPlayerLocation(destPlayer, destRegion);
         if (dest == null) throw new IllegalStateException("No such region");
-        addCommand("Move " + getCardName(card, destRegion) + " to " + destPlayer + "'s " + destRegion + (random ? " (picked randomly)" : ""), new String[]{"move", cardId, destPlayer, destRegion, bottom ? "bottom" : "top"});
         source.removeCard(card);
         dest.addCard(card, false);
+        return card;
+    }
+
+    public void moveToRegion(String cardId, String destPlayer, String destRegion, boolean bottom, boolean random) {
+        Card card = _moveToRegion(cardId, destPlayer, destRegion, bottom);
+        addCommand("Move " + getCardName(card, destRegion) + " to " + destPlayer + "'s " + destRegion + (random ? " (picked randomly)" : ""), new String[]{"move", cardId, destPlayer, destRegion, bottom ? "bottom" : "top"});
         // PENDING flatten when moving to ashheap
     }
 
     public void moveToRegion(String cardId, String destPlayer, String destRegion, boolean bottom) {
         moveToRegion(cardId, destPlayer, destRegion, bottom, false);
+    }
+
+    public void discard(String player, String cardId, boolean random) {
+        Card card = _moveToRegion(cardId, player, JolGame.ASHHEAP, false);
+        String message = String.format(
+                "%s discards %s%s",
+                player,
+                getCardName(card, JolGame.ASHHEAP),
+                random ? " (picked randomly)" : "");
+        addCommand(message, new String[]{"move", cardId, player, JolGame.ASHHEAP, "top"});
+    }
+
+    public void playCard(String player, String cardId, String destPlayer, String destRegion) {
+        Card card = _moveToRegion(cardId, destPlayer, destRegion, true);
+        String destMessage = "";
+        if (destPlayer != player || destRegion != JolGame.ASHHEAP)
+            destMessage = String.format(" to %s's %s", destPlayer, destRegion);
+        String message = String.format(
+                "%s plays %s%s",
+                player,
+                getCardName(card, destRegion),
+                destMessage);
+        addCommand(message, new String[]{"move", cardId, destPlayer, destRegion, "bottom"});
     }
 
     public void setOrder(List<String> players) {
