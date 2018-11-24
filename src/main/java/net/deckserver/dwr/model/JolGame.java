@@ -179,8 +179,10 @@ public class JolGame {
     public void playCard(String player, String cardId, String destPlayer, String destRegion) {
         Card card = _moveToRegion(cardId, destPlayer, destRegion, true);
         String destMessage = "";
-        if (destPlayer != player || destRegion != JolGame.ASHHEAP)
+        if (destPlayer != player)
             destMessage = String.format(" to %s's %s", destPlayer, destRegion);
+        else if (destRegion != JolGame.ASHHEAP)
+            destMessage = String.format(" to %s", destRegion);
         String message = String.format(
                 "%s plays %s%s",
                 player,
