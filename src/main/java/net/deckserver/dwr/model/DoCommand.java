@@ -92,7 +92,7 @@ public class DoCommand {
             }
             if (cmd.equalsIgnoreCase("discard")) {
                 String card = cmdObj.getCard(false, player, JolGame.HAND);
-                game.moveToRegion(card, player, JolGame.ASHHEAP, false, random);
+                game.discard(player, card, random);
                 if (cmdObj.consumeString("draw")) {
                     game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
                 }
@@ -136,7 +136,7 @@ public class DoCommand {
                     if (draw) game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
                     return "Put a card on another card";
                 } else {
-                    game.moveToRegion(srcCard, targetPlayer, targetRegion, true);
+                    game.playCard(player, srcCard, targetPlayer, targetRegion);
                     if (docap) {
                         int curcap = game.getCapacity(srcCard);
                         if (curcap <= 0) {
