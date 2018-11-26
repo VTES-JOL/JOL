@@ -176,7 +176,7 @@ public class JolGame {
         Card card = state.getCard(cardId);
         if (card == null) throw new IllegalArgumentException("No such card");
         CardContainer source = card.getParent();
-        Location dest = state.getPlayerLocation(player, ASHHEAP);
+        Location dest = state.getPlayerLocation(destPlayer, destRegion);
         if (dest == null) throw new IllegalStateException("No such region");
         String destMessage = "";
         if (!destPlayer.equals(player))
