@@ -163,6 +163,7 @@ public class DoCommand {
                 String destPlayer = cmdObj.getPlayer(player);
                 String destRegion = cmdObj.getRegion(JolGame.READY_REGION);
                 String destCard = cmdObj.getCard(true, destPlayer, destRegion);
+                boolean bottom = !Arrays.asList(cmdStr).contains("top");
 
                 logger.trace("Destination region for command {} is {}", cmd, destRegion);
 
@@ -170,7 +171,7 @@ public class DoCommand {
                     game.moveToCard(srcCard, destCard);
                     return "Moved it onto the card";
                 } else {
-                    game.moveToRegion(srcCard, destPlayer, destRegion, true);
+                    game.moveToRegion(srcCard, destPlayer, destRegion, bottom);
                     return "Moved the card";
                 }
             }
