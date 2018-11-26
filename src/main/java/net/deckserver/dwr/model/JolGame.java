@@ -145,43 +145,43 @@ public class JolGame {
         dstCard.addCard(srcCard, false);
     }
 
-    public Card _moveToRegion(String cardId, String destPlayer, String destRegion, boolean bottom) {
+    void moveToRegion(String cardId, String destPlayer, String destRegion, boolean bottom) {
         Card card = state.getCard(cardId);
         if (card == null) throw new IllegalArgumentException("No such card");
         CardContainer source = card.getParent();
         Location dest = state.getPlayerLocation(destPlayer, destRegion);
         if (dest == null) throw new IllegalStateException("No such region");
+        addCommand("Move " + getCardName(card, destRegion) + " to " + (bottom ? "" : "top of ") + destPlayer + "'s " + destRegion, new String[]{"move", cardId, destPlayer, destRegion, bottom ? "bottom" : "top"});
         source.removeCard(card);
-        dest.addCard(card, false);
-        return card;
-    }
-
-    public void moveToRegion(String cardId, String destPlayer, String destRegion, boolean bottom, boolean random) {
-        Card card = _moveToRegion(cardId, destPlayer, destRegion, bottom);
-        addCommand("Move " + getCardName(card, destRegion) + " to " + destPlayer + "'s " + destRegion + (random ? " (picked randomly)" : ""), new String[]{"move", cardId, destPlayer, destRegion, bottom ? "bottom" : "top"});
-        // PENDING flatten when moving to ashheap
-    }
-
-    public void moveToRegion(String cardId, String destPlayer, String destRegion, boolean bottom) {
-        moveToRegion(cardId, destPlayer, destRegion, bottom, false);
+        dest.addCard(card, !bottom);
     }
 
     public void discard(String player, String cardId, boolean random) {
-        Card card = _moveToRegion(cardId, player, JolGame.ASHHEAP, false);
+        Card card = state.getCard(cardId);
+        if (card == null) throw new IllegalArgumentException("No such card");
+        CardContainer source = card.getParent();
+        Location dest = state.getPlayerLocation(player, ASHHEAP);
+        if (dest == null) throw new IllegalStateException("No such region");
         String message = String.format(
                 "%s discards %s%s",
                 player,
-                getCardName(card, JolGame.ASHHEAP),
+                getCardLink(card),
                 random ? " (picked randomly)" : "");
         addCommand(message, new String[]{"move", cardId, player, JolGame.ASHHEAP, "top"});
+        source.removeCard(card);
+        dest.addCard(card, false);
     }
 
     public void playCard(String player, String cardId, String destPlayer, String destRegion) {
-        Card card = _moveToRegion(cardId, destPlayer, destRegion, true);
+        Card card = state.getCard(cardId);
+        if (card == null) throw new IllegalArgumentException("No such card");
+        CardContainer source = card.getParent();
+        Location dest = state.getPlayerLocation(player, ASHHEAP);
+        if (dest == null) throw new IllegalStateException("No such region");
         String destMessage = "";
-        if (destPlayer != player)
+        if (!destPlayer.equals(player))
             destMessage = String.format(" to %s's %s", destPlayer, destRegion);
-        else if (destRegion != JolGame.ASHHEAP)
+        else if (!destRegion.equals(JolGame.ASHHEAP))
             destMessage = String.format(" to %s", destRegion);
         String message = String.format(
                 "%s plays %s%s",
@@ -189,6 +189,8 @@ public class JolGame {
                 getCardName(card, destRegion),
                 destMessage);
         addCommand(message, new String[]{"move", cardId, destPlayer, destRegion, "bottom"});
+        source.removeCard(card);
+        dest.addCard(card, false);
     }
 
     public void setOrder(List<String> players) {
