@@ -137,6 +137,17 @@ public class JolGame {
         if (cardId.equals(destCard)) throw new IllegalArgumentException("Can't move a card to itself");
         Card srcCard = state.getCard(cardId);
         Card dstCard = state.getCard(destCard);
+        CardContainer parentContainer = dstCard.getParent();
+        while (parentContainer != null) {
+            if (parentContainer instanceof Card) {
+                Card parentCard = (Card) parentContainer;
+                if (parentCard.getId().equals(srcCard.getId()))
+                    throw new IllegalArgumentException("Can't create card loop");
+                parentContainer = parentCard.getParent();
+            } else {
+                break;
+            }
+        }
         if (srcCard == null || dstCard == null) throw new IllegalArgumentException("No such card");
         CardContainer source = srcCard.getParent();
         Location loc = (Location) state.getRegionFromCard(dstCard);
