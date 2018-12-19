@@ -396,6 +396,10 @@ public class JolAdmin {
     }
 
     public void replacePlayer(String game, String oldPlayer, String newPlayer) {
+        // don't replace a player with someone already in game
+        if (Arrays.asList(getGameInfo(game).getPlayers()).contains(newPlayer)) {
+            return;
+        }
         getPlayerInfo(oldPlayer).removeGame(game);
         getPlayerInfo(newPlayer).addGame(game, "replaced");
         getGameInfo(game).replacePlayer(oldPlayer, newPlayer);
