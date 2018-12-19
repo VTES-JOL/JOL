@@ -8,8 +8,6 @@ package net.deckserver.dwr.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import net.deckserver.game.interfaces.state.Game;
-import net.deckserver.game.interfaces.turn.TurnRecorder;
 import net.deckserver.game.jaxb.FileUtils;
 import net.deckserver.game.jaxb.actions.GameActions;
 import net.deckserver.game.jaxb.state.GameState;
@@ -397,13 +395,19 @@ public class JolAdmin {
         return getPlayerInfo(player).id;
     }
 
+    public void replacePlayer(String game, String oldPlayer, String newPlayer) {
+        getPlayerInfo(oldPlayer).removeGame(game);
+        getPlayerInfo(newPlayer).addGame(game, "replaced");
+        getGameInfo(game).replacePlayer(oldPlayer, newPlayer);
+    }
+
     class GameInfo extends Info {
         private final String prefix;
         JolGame game;
         String gameName;
-        private Game state;
 
-        private TurnRecorder actions;
+        private DsGame state;
+        private DsTurnRecorder actions;
 
         GameInfo(String name) {
             this(name, sysInfo.getKey(name), false);
@@ -475,11 +479,11 @@ public class JolAdmin {
             String playerKey = sysInfo.getKey(player);
             File deckFile = new File(getGameDir(), playerKey + ".deck");
             if (!deckFile.exists())
-                return null;
+                return "Deck not found";
             try {
                 return readFile(deckFile);
             } catch (IOException ie) {
-                return null;
+                return "Deck not found";
             }
         }
 
@@ -501,6 +505,7 @@ public class JolAdmin {
             String deckKey = info.getProperty(oldPlayerKey);
             info.remove(oldPlayerKey);
             info.setProperty(newPlayerKey, deckKey);
+            game.replacePlayer(oldPlayer, newPlayer);
             write();
         }
 

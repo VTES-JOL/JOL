@@ -102,12 +102,24 @@ public class DsGame extends DsNoteTaker implements Game {
         return p.getParent();
     }
 
+    public void replacePlayer(String oldPlayer, String newPlayer) {
+        getPlayer(oldPlayer).name = newPlayer;
+        for (DsLocation region : regions) {
+            String regionName = region.getName();
+            regionName.replaceFirst(oldPlayer, newPlayer);
+        }
+    }
+
     static class Player {
 
-        final String name;
+        String name;
         final Collection<DsLocation> locs = new LinkedList<>();
 
         Player(String name) {
+            this.name = name;
+        }
+
+        private void setName(String name) {
             this.name = name;
         }
 

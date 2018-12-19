@@ -14,6 +14,8 @@ import net.deckserver.game.jaxb.state.Notation;
 import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.cards.Deck;
+import net.deckserver.game.ui.state.DsGame;
+import net.deckserver.game.ui.turn.DsTurnRecorder;
 import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
 
@@ -56,10 +58,10 @@ public class JolGame {
     private static final String PING = "ping";
     private static final Logger logger = getLogger(JolGame.class);
     private static DateTimeFormatter SIMPLE_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm ");
-    private Game state;
-    private TurnRecorder actions;
+    private DsGame state;
+    private DsTurnRecorder actions;
 
-    public JolGame(Game state, TurnRecorder actions) {
+    public JolGame(DsGame state, DsTurnRecorder actions) {
         this.state = state;
         this.actions = actions;
     }
@@ -626,4 +628,8 @@ public class JolGame {
                 .collect(Collectors.toList());
     }
 
+    public void replacePlayer(String oldPlayer, String newPlayer) {
+        this.state.replacePlayer(oldPlayer, newPlayer);
+        getNote(this.state, oldPlayer + POOL, false).setName(newPlayer + POOL);
+    }
 }

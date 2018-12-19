@@ -87,6 +87,12 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
+    public Map<String, Object> replacePlayer(String game, String oldPlayer, String newPlayer) {
+        JolAdmin.getInstance().replacePlayer(game, oldPlayer, newPlayer);
+        getView(game).reset();
+        return UpdateFactory.getUpdate();
+    }
+
     public Map<String, Object> chat(String text) {
         String player = Utils.getPlayer(request);
         abean.chat(player, text);
