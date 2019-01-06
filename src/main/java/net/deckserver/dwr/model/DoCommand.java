@@ -225,6 +225,8 @@ public class DoCommand {
                 String targetPlayer = cmdObj.getPlayer(player);
                 String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
                 String card = cmdObj.getCard(false, targetPlayer, targetRegion);
+                if (game.isTapped(card))
+                    throw new CommandException("Card is already locked");
                 game.setTapped(card, true);
                 return "Locked card";
             }
