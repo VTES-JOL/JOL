@@ -552,7 +552,7 @@ function doGameChat() {
 
 function doShowDeck() {
     if ($("#gameDeckOutput").html() === "")
-		DS.gameDeck(game, {callback: callbackShowGameDeck, errorHandler: errorhandler});
+        DS.gameDeck(game, {callback: callbackShowGameDeck, errorHandler: errorhandler});
 }
 
 function doSubmit() {
