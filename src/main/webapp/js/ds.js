@@ -501,7 +501,7 @@ function doCreateGame() {
     }
     DS.createGame(gameName, isPrivate, {callback: processData, errorHandler: errorhandler});
     newGameDiv.val('');
-    isPrivate.prop('checked', false);
+    $("#privateFlag").prop('checked', false);
 }
 
 function invitePlayer() {
@@ -551,7 +551,8 @@ function doGameChat() {
 }
 
 function doShowDeck() {
-    DS.gameDeck(game, {callback: callbackShowGameDeck, errorHandler: errorhandler});
+    if ($("#gameDeckOutput").html() === "")
+		DS.gameDeck(game, {callback: callbackShowGameDeck, errorHandler: errorhandler});
 }
 
 function doSubmit() {
@@ -937,8 +938,8 @@ function callbackShowDecks(data) {
 function callbackShowGameDeck(data) {
     var deckContentsDiv = $("#gameDeckOutput");
     if (deckContentsDiv.html() === "") {
-        var contents = data.split("\n").join("<br />");
-        deckContentsDiv.html(contents);
+        deckContentsDiv.html(data);
+        generateCardData("#gameDeckOutput");
     }
 }
 

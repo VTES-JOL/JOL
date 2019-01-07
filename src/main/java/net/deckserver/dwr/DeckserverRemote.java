@@ -12,6 +12,7 @@ import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.interfaces.turn.GameAction;
 import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.game.storage.cards.Deck;
 import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -187,7 +188,30 @@ public class DeckserverRemote {
         String player = Utils.getPlayer(request);
         HttpServletResponse response = WebContextFactory.get().getHttpServletResponse();
         response.setContentType("text/javascript;charset=UTF-8");
-        return JolAdmin.getInstance().getGameDeck(game, player);
+        JolAdmin admin = JolAdmin.getInstance();
+        String deckList = admin.getGameDeck(game, player);
+        if (deckList == JolAdmin.DECK_NOT_FOUND) return deckList;
+
+        Deck deck = new Deck(admin.getAllCards(), deckList);
+        StringBuilder sb = new StringBuilder(deckList.length() * 4);
+        sb.append("<br/>"); //Crypt/library separator
+        StringBuilder line = new StringBuilder(80);
+        for (CardEntry card: deck.getCards()) {
+            line.append(deck.getQuantity(card))
+                .append("x")
+                .append("<a class='card-name' title='")
+                .append(card.getCardId())
+                .append("'>")
+                .append(card.getName())
+                .append("</a><br/>");
+
+            if (card.isCrypt())
+                sb.insert(0, line.toString());
+            else sb.append(line.toString());
+
+            line.delete(0, line.length());
+        }
+        return sb.toString();
     }
 
     public Map<String, Object> registerDeck(String game, String name) {
