@@ -39,6 +39,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class JolAdmin {
 
+    public static final String DECK_NOT_FOUND = "Deck not found";
     private static final Logger logger = getLogger(JolAdmin.class);
     private static final JolAdmin INSTANCE = new JolAdmin(System.getenv("JOL_DATA"));
     private static CardSearch CARD_DATA = null;
@@ -483,11 +484,11 @@ public class JolAdmin {
             String playerKey = sysInfo.getKey(player);
             File deckFile = new File(getGameDir(), playerKey + ".deck");
             if (!deckFile.exists())
-                return "Deck not found";
+                return JolAdmin.DECK_NOT_FOUND;
             try {
                 return readFile(deckFile);
             } catch (IOException ie) {
-                return "Deck not found";
+                return JolAdmin.DECK_NOT_FOUND;
             }
         }
 
