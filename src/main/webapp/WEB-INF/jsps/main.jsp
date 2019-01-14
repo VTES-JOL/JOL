@@ -121,6 +121,9 @@
         <h4 class="header">Links:</h4>
         <ul class="condensed-list light">
             <li>
+                <a href="http://www.vekn.net/rulebook" target="_blank">V:TES Rulebook</a>
+            </li>
+            <li>
                 <a href="https://www.facebook.com/groups/jolstatus/" target="_blank">Facebook Status Group</a>
             </li>
             <li>
