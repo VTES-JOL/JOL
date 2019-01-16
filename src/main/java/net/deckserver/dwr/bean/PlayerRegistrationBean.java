@@ -13,7 +13,7 @@ public class PlayerRegistrationBean {
     public PlayerRegistrationBean(AdminBean abean, String player, String game) {
         this.player = player;
         String deck = JolAdmin.getInstance().getGameDeck(game, player);
-        this.registered = deck != null;
+        this.registered = !deck.equals(JolAdmin.DECK_NOT_FOUND);
         if (this.registered) {
             Deck impl = new Deck(JolAdmin.getInstance().getAllCards(), deck);
             this.deckSummary = "Crypt: " + impl.getCryptSize() + ", Library: " + impl.getLibSize() + ", Groups: " + impl.getGroups();
