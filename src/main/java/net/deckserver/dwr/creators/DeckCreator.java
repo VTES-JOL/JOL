@@ -28,7 +28,7 @@ class DeckCreator implements ViewCreator {
         JolAdmin admin = JolAdmin.getInstance();
         List<DeckSummaryBean> games = actives.stream()
                 .filter(game -> admin.isOpen(game.getName()))
-                .filter(game -> (admin.isInvited(game.getName(), player) || admin.getOwner(game.getName()).equals(player) || admin.getGameDeck(game.getName(), player) != null))
+                .filter(game -> (admin.isInvited(game.getName(), player) || admin.getOwner(game.getName()).equals(player) || admin.getGameDeck(game.getName(), player) != JolAdmin.DECK_NOT_FOUND))
                 .map(game -> new DeckSummaryBean(game, model))
                 .collect(Collectors.toCollection(ArrayList::new));
         return new DeckBean(decks, games);
