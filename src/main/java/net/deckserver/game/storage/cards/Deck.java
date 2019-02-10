@@ -105,8 +105,9 @@ public class Deck {
 
     public CardEntry[] getCards() {
         CardEntry[] ret = new CardEntry[cards.size()];
-        cards.keySet().toArray(ret);
-        return ret;
+        List<CardEntry> cardSet = new ArrayList<>(cards.keySet());
+        cardSet.sort(Comparator.comparing(CardEntry::getCardType).thenComparing(CardEntry::getName));
+        return cardSet.toArray(ret);
     }
 
     public int getQuantity(CardEntry card) {

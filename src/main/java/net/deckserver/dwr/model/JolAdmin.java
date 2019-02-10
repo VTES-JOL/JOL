@@ -172,7 +172,7 @@ public class JolAdmin {
         String deckKey = player.getDeckKey(deckName);
         String deckContents = player.getDeck(deckKey);
         GameInfo game = getGameInfo(gameName);
-        if (!game.isOpen())
+        if (!game.isOpen() || game.getRegisteredPlayerCount() == 5)
             return false;
         game.addPlayer(playerName, deckKey, deckContents);
         player.addGame(gameName, deckKey);
