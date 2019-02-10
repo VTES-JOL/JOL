@@ -12,6 +12,7 @@ import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.interfaces.turn.GameAction;
 import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.game.storage.cards.CardType;
 import net.deckserver.game.storage.cards.Deck;
 import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
@@ -194,11 +195,15 @@ public class DeckserverRemote {
 
         Deck deck = new Deck(admin.getAllCards(), deckList);
         StringBuilder sb = new StringBuilder(deckList.length() * 4);
-        sb.append("<br/>"); //Crypt/library separator
         StringBuilder line = new StringBuilder(80);
+        CardType type = CardType.VAMPIRE;
         for (CardEntry card: deck.getCards()) {
+            if (!card.getCardType().equals(type)) {
+                line.append("<br/>");
+                type = card.getCardType();
+            }
             line.append(deck.getQuantity(card))
-                .append("x")
+                .append(" x ")
                 .append("<a class='card-name' title='")
                 .append(card.getCardId())
                 .append("'>")
