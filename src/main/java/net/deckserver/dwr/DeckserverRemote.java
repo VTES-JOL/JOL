@@ -210,9 +210,7 @@ public class DeckserverRemote {
                 .append(card.getName())
                 .append("</a><br/>");
 
-            if (card.isCrypt())
-                sb.insert(0, line.toString());
-            else sb.append(line.toString());
+            sb.append(line.toString());
 
             line.delete(0, line.length());
         }
