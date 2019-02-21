@@ -6,6 +6,8 @@
 
 package net.deckserver.game.storage.cards;
 
+import net.deckserver.game.json.deck.CardSummary;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -21,17 +23,15 @@ public class CardEntry {
     private String type = "no type";
     private String[] text;
     private String group;
+    private boolean crypt;
 
-    CardEntry(Map<String, String> ids, List<String> lines) {
-        text = new String[lines.size()];
-        for (int i = 0; i < lines.size(); i++) {
-            String currentLine = lines.get(i);
-            text[i] = currentLine;
-            if (currentLine.startsWith("Group:")) group = currentLine.replaceAll("Group:", "").trim();
-            if (currentLine.startsWith("Cardtype:")) type = currentLine.replaceAll("Cardtype:", "").trim();
-            if (currentLine.startsWith("Name:")) name = currentLine.replaceAll("Name:", "").trim();
-        }
-        if (ids != null) id = ids.get(name.toLowerCase());
+    CardEntry(CardSummary cardSummary) {
+        this.id = cardSummary.getKey();
+        this.name = cardSummary.getDisplayName();
+        this.type = cardSummary.getType();
+        this.text = cardSummary.getText().split("\n");
+        this.group = cardSummary.getGroup();
+        this.crypt = cardSummary.isCrypt();
     }
 
     public String getCardId() {
@@ -71,11 +71,11 @@ public class CardEntry {
     }
 
     public boolean isCrypt() {
-        return CardType.cryptTypes().contains(getCardType());
+        return crypt;
     }
 
     public boolean isLibrary() {
-        return CardType.libraryTypes().contains(getCardType());
+        return !crypt;
     }
 
     public boolean hasLife() {

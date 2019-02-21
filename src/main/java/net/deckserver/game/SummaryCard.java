@@ -14,4 +14,5 @@ public class SummaryCard {
     private String displayName;
     private Set<String> names;
     private boolean crypt;
+    private String group;
 }

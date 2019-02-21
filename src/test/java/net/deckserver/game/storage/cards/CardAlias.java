@@ -1,4 +1,4 @@
-package net.deckserver.game.storage.cards.importer;
+package net.deckserver.game.storage.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

@@ -17,6 +17,9 @@ public class LibraryCard {
     private List<String> type;
     private String displayName;
     private Set<String> names;
+    private Set<String> partials;
+
+    private boolean unique;
 
     // Costs
     private String blood;

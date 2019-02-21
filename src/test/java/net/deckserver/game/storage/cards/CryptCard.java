@@ -3,6 +3,7 @@ package net.deckserver.game.storage.cards;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,15 +17,17 @@ public class CryptCard {
     private String text;
     private String displayName;
     private Set<String> names;
+    private Set<String> partials;
 
+    private boolean unique = true;
     private Integer capacity;
     private String clan;
     private String group;
     private String sect;
     private Boolean advanced;
     private String title;
-    private String disciplineList;
-    private Map<String, Integer> disciplines;
+    private List<String> disciplines;
+    private Map<String, Integer> discipline;
 
     private Boolean banned;
 }
