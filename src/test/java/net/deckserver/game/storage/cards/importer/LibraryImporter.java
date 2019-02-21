@@ -4,41 +4,45 @@ import lombok.extern.slf4j.Slf4j;
 import net.deckserver.game.storage.cards.LibraryCard;
 
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class LibraryImporter extends AbstractImporter<LibraryCard> {
 
-    private static final int FIELD_NAME = 0;
-    private static final int FIELD_TYPE = 1;
-    private static final int FIELD_REQUIREMENTS_CLAN = 2;
-    private static final int FIELD_REQUIREMENTS_DISCIPLINE = 3;
-    private static final int FIELD_POOL_COST = 4;
-    private static final int FIELD_BLOOD_COST = 5;
-    private static final int FIELD_CONVICTION_COST = 6;
-    private static final int FIELD_BURN_OPTION = 7;
-    private static final int FIELD_TEXT = 8;
-    private static final int FIELD_REQUIREMENTS_OTHER = 11;
-    private static final int FIELD_BANNED = 12;
+    private static final int FIELD_ID = 0;
+    private static final int FIELD_NAME = 1;
+    private static final int FIELD_ALIASES = 2;
+    private static final int FIELD_TYPE = 3;
+    private static final int FIELD_REQUIREMENTS_CLAN = 4;
+    private static final int FIELD_REQUIREMENTS_DISCIPLINE = 5;
+    private static final int FIELD_POOL_COST = 6;
+    private static final int FIELD_BLOOD_COST = 7;
+    private static final int FIELD_CONVICTION_COST = 8;
+    private static final int FIELD_BURN_OPTION = 9;
+    private static final int FIELD_TEXT = 10;
+    private static final int FIELD_REQUIREMENTS_OTHER = 13;
+    private static final int FIELD_BANNED = 14;
 
-    public LibraryImporter(InputStream dataStream) {
-        super(dataStream);
-    }
+    private Function<String, Boolean> burnOption = (text) -> text.equals("Y") || text.equalsIgnoreCase("Yes");
 
-    public LibraryImporter(InputStream dataStream, InputStream aliasStream) {
-        super(dataStream, aliasStream);
+    public LibraryImporter(Path dataPath) {
+        super(dataPath);
     }
 
     @Override
     public LibraryCard map(String[] lineData) {
         String originalName = lineData[FIELD_NAME].trim();
-        List<String> aliases = getAliases().stream().filter(cardAlias -> cardAlias.getCard().equals(originalName)).findFirst().map(CardAlias::getAliases).orElse(new ArrayList<>());
+        List<String> aliases = Arrays.stream(lineData[FIELD_ALIASES].split(";")).map(String::trim).collect(Collectors.toList());
         Set<String> names = Utils.otherNames(originalName, false, aliases);
         String displayName = Utils.generateDisplayName(originalName, false);
 
         LibraryCard card = new LibraryCard();
+        card.setId(lineData[FIELD_ID]);
         card.setName(originalName);
         card.setDisplayName(displayName);
         card.setNames(names);
@@ -54,9 +58,11 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         Utils.getClean(lineData[FIELD_BLOOD_COST]).ifPresent(card::setBlood);
         Utils.getClean(lineData[FIELD_CONVICTION_COST]).ifPresent(card::setConviction);
 
-        Utils.getClean(lineData[FIELD_BURN_OPTION]).map(burnOption -> burnOption.equals("Y")).ifPresent(card::setBurnOption);
+        Utils.getClean(lineData[FIELD_BURN_OPTION]).map(burnOption).ifPresent(card::setBurnOption);
         Utils.getClean(lineData[FIELD_TEXT]).ifPresent(card::setText);
         Utils.getClean(lineData[FIELD_BANNED]).map(banned -> !banned.isEmpty()).ifPresent(card::setBanned);
+
+        Arrays.stream(card.getText().split("\n")).findFirst().map(String::toLowerCase).filter(line -> line.contains("unique")).ifPresent(s -> card.setUnique(true));
 
         return card;
     }

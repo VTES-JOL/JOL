@@ -1,6 +1,7 @@
 package net.deckserver.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.deckserver.dwr.model.JolAdmin;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -10,7 +11,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-@WebServlet(urlPatterns = {"/auth/login"})
+@WebServlet("/auth/login")
 public class LoginServlet extends HttpServlet {
 
     @Override
@@ -19,9 +20,12 @@ public class LoginServlet extends HttpServlet {
         String password = req.getParameter("password");
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> responseJson = new HashMap<>();
-        responseJson.put("authResult", String.valueOf(false));
+        boolean authResult = JolAdmin.getInstance().authenticate(username,password);
+        responseJson.put("authResult", String.valueOf(authResult));
         String responseString = objectMapper.writeValueAsString(responseJson);
-
+        if (authResult) {
+            req.getSession().setAttribute("user", username);
+        }
         resp.setContentType("application/json");
         resp.getWriter().write(responseString);
     }

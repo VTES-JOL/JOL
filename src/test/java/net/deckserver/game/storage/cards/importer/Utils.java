@@ -9,6 +9,9 @@ import java.util.stream.Stream;
 public class Utils {
 
     private static String clean(String source) {
+        if (source == null) {
+            return "";
+        }
         return source.replaceAll("[{}]", "").replaceAll("-none-", "").trim();
     }
 
@@ -27,8 +30,7 @@ public class Utils {
     }
 
     static Set<String> otherNames(String original, boolean advanced, List<String> aliases) {
-        Set<String> tempNames = new HashSet<>();
-        tempNames.addAll(aliases);
+        Set<String> tempNames = new HashSet<>(aliases);
 
         String simpleName = original.endsWith(", The") ?
                 original.replaceAll(", The", "")
@@ -36,8 +38,8 @@ public class Utils {
 
         // Add base, or original name
         if (advanced) {
-            tempNames.add(generateDisplayName(original, advanced));
-            tempNames.add(generateDisplayName(simpleName, advanced));
+            tempNames.add(generateDisplayName(original, true));
+            tempNames.add(generateDisplayName(simpleName, true));
         } else {
             tempNames.add(original);
             tempNames.add(simpleName);
@@ -49,11 +51,9 @@ public class Utils {
             names.add(StringUtils.stripAccents(name));
         });
 
-        return names;
-    }
+        names.remove("");
 
-    static Optional<String> stripAccents(String source) {
-        return getClean(StringUtils.stripAccents(source));
+        return names;
     }
 
 }

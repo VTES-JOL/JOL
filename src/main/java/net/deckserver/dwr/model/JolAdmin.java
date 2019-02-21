@@ -361,13 +361,9 @@ public class JolAdmin {
         if (CARD_DATA == null) {
             logger.info("Loading Card Data");
             try {
-                Path keyFile = Paths.get(dir, "cards", "base.prop");
-                Path textFile = Paths.get(dir, "cards", "base.txt");
+                Path cardsPath = Paths.get(dir, "cards", "cards.json");
 
-                List<String> keys = Files.readAllLines(keyFile, Charset.forName("ISO-8859-1"));
-                List<String> text = Files.readAllLines(textFile, Charset.forName("ISO-8859-1"));
-
-                CARD_DATA = new CardSearch(keys, text);
+                CARD_DATA = new CardSearch(cardsPath);
             } catch (IOException e) {
                 throw new RuntimeException("Unable to open card files", e);
             }
