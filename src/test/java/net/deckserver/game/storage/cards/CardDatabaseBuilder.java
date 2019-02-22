@@ -4,20 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.deckserver.game.storage.cards.importer.CryptImporter;
 import net.deckserver.game.storage.cards.importer.LibraryImporter;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.FileReader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 public class CardDatabaseBuilder {
 
@@ -31,9 +26,11 @@ public class CardDatabaseBuilder {
 
         Properties keyProperties = new Properties();
         Map<String, String> keys = new HashMap<>();
+        final Set<String> remainingKeys;
         try (FileReader keyReader = new FileReader(keyPath.toFile())) {
             keyProperties.load(keyReader);
-            for (String key: keyProperties.stringPropertyNames()) {
+            remainingKeys = keyProperties.stringPropertyNames();
+            for (String key : remainingKeys) {
                 keys.put(keyProperties.getProperty(key), key);
             }
         }
@@ -45,12 +42,20 @@ public class CardDatabaseBuilder {
         List<CryptCard> cryptCards = cryptImporter.read();
         List<SummaryCard> summaryCards = new ArrayList<>();
 
-        assertThat(libraryCards.size(), is (2212));
-        assertThat(cryptCards.size(), is (1519));
+        assertThat(libraryCards.size(), is(2212));
+        assertThat(cryptCards.size(), is(1519));
 
-        libraryCards.forEach(card -> card.setKey(keys.get(card.getDisplayName())));
+        for (LibraryCard card : libraryCards) {
+            String key = keys.get(card.getDisplayName());
+            card.setKey(key);
+            remainingKeys.remove(key);
+        }
 
-        cryptCards.forEach(card -> card.setKey(keys.get(card.getDisplayName())));
+        for (CryptCard card : cryptCards) {
+            String key = keys.get(card.getDisplayName());
+            card.setKey(key);
+            remainingKeys.remove(key);
+        }
 
         libraryCards.forEach(libraryCard -> {
             summaryCards.add(new SummaryCard(libraryCard));
@@ -59,6 +64,8 @@ public class CardDatabaseBuilder {
         cryptCards.forEach(cryptCard -> {
             summaryCards.add(new SummaryCard(cryptCard));
         });
+
+        assertThat(remainingKeys.size(), is(0));
 
 
         // Index on displayName
