@@ -7,17 +7,14 @@
 package net.deckserver.game.storage.cards;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import net.deckserver.game.json.deck.CardSummary;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -38,10 +35,10 @@ public class CardSearch {
         List<CardSummary> cardList = objectMapper.readValue(cardPath.toFile(), cardSummaryCollectionType);
         cardList.forEach(card -> {
             for (String name: card.getNames()) {
-                nameKeys.put(name.toLowerCase(), card.getKey());
+                nameKeys.put(name.toLowerCase(), card.getJolId());
             }
             CardEntry cardEntry = new CardEntry(card);
-            cardTable.put(card.getKey(), cardEntry);
+            cardTable.put(card.getJolId(), cardEntry);
         });
         cardArr = cardTable.values().toArray(new CardEntry[0]);
         logger.info("Read {} keys, {} cards", nameKeys.size(), cardTable.size());

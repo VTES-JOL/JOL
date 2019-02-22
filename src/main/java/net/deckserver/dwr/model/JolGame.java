@@ -9,7 +9,6 @@ package net.deckserver.dwr.model;
 import net.deckserver.Utils;
 import net.deckserver.game.interfaces.state.*;
 import net.deckserver.game.interfaces.turn.GameAction;
-import net.deckserver.game.interfaces.turn.TurnRecorder;
 import net.deckserver.game.jaxb.state.Notation;
 import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
@@ -21,9 +20,7 @@ import org.slf4j.Logger;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -46,7 +43,6 @@ public class JolGame {
     public static final String[] TURN_PHASES = new String[]{"Unlock", "Master", "Minion", "Influence", "Discard"};
 
     private static final String COUNTERS = "counters";
-    private static final String BLOOD = "blood";
     private static final String TEXT = "text";
     private static final String VOTES = "votes";
     private static final String ACTIVE = "active meth";
@@ -55,11 +51,11 @@ public class JolGame {
     private static final String TAP = "tapnote";
     private static final String TAPPED = "tap";
     private static final String UNTAPPED = "untap";
-    private static final String PING = "ping";
-    private static final Logger logger = getLogger(JolGame.class);
     private static DateTimeFormatter SIMPLE_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm ");
     private DsGame state;
     private DsTurnRecorder actions;
+
+    private Set<String> uniques = new HashSet<>();
 
     public JolGame(DsGame state, DsTurnRecorder actions) {
         this.state = state;
@@ -110,11 +106,11 @@ public class JolGame {
 
     }
 
-    public void drawCard(String player, String srcRegion, String destRegion) {
+    void drawCard(String player, String srcRegion, String destRegion) {
         _drawCard(player, srcRegion, destRegion, true);
     }
 
-    public void _drawCard(String player, String srcRegion, String destRegion, boolean log) {
+    private void _drawCard(String player, String srcRegion, String destRegion, boolean log) {
         Location source = state.getPlayerLocation(player, srcRegion);
         Location dest = state.getPlayerLocation(player, destRegion);
         if (source == null || dest == null) throw new IllegalArgumentException("Not a valid region");
@@ -135,7 +131,7 @@ public class JolGame {
         return state.getPlayers();
     }
 
-    public void moveToCard(String cardId, String destCard) {
+    void moveToCard(String cardId, String destCard) {
         if (cardId.equals(destCard)) throw new IllegalArgumentException("Can't move a card to itself");
         Card srcCard = state.getCard(cardId);
         Card dstCard = state.getCard(destCard);
@@ -150,7 +146,7 @@ public class JolGame {
                 break;
             }
         }
-        if (srcCard == null || dstCard == null) throw new IllegalArgumentException("No such card");
+        if (srcCard == null) throw new IllegalArgumentException("No such card");
         CardContainer source = srcCard.getParent();
         Location loc = (Location) state.getRegionFromCard(dstCard);
         addCommand("Put " + getCardName(srcCard, loc.getName()) + " on " + getCardName(dstCard), new String[]{"puton", cardId, destCard});
