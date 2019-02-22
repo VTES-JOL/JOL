@@ -11090,7 +11090,7 @@
   "unique" : false
 }, {
   "id" : "101110",
-  "key" : "ant1",
+  "key" : "ant9",
   "type" : "Master",
   "text" : "Name: Line, The\nCardtype: Master\nUnique location.\nLock to reduce the cost of an action card played by a vampire you control by 1 blood (this location is not locked if that card is canceled as it is played). Any vampire can steal this location as a (D) action.",
   "htmlText" : "Name: Line, The<br/>Cardtype: Master<br/>Unique location.\nLock to reduce the cost of an action card played by a vampire you control by 1 blood (this location is not locked if that card is canceled as it is played). Any vampire can steal this location as a (D) action.",
@@ -21270,7 +21270,7 @@
   "unique" : false
 }, {
   "id" : "102128",
-  "key" : "ant2",
+  "key" : "ant11",
   "type" : "Ally",
   "text" : "Name: Vivienne Géroux\nCardtype: Ally\nCost: 1 pool\nUnique ghoul with 2 life. 2 strength, 1 bleed. Requires an anarch.\nVivienne can play cards requiring basic Celerity [cel] or Fortitude [for] as a vampire. Vampires you control get -1 stealth on political actions. A vampire you control can give control of Vivienne to another Methuselah as a (D) action. A vampire controlled by another Methuselah can steal Vivienne as a (D) action.",
   "htmlText" : "Name: Vivienne Géroux<br/>Cardtype: Ally<br/>Cost: 1 pool<br/>Unique ghoul with 2 life. 2 strength, 1 bleed. Requires an anarch.\nVivienne can play cards requiring basic Celerity [cel] or Fortitude [for] as a vampire. Vampires you control get -1 stealth on political actions. A vampire you control can give control of Vivienne to another Methuselah as a (D) action. A vampire controlled by another Methuselah can steal Vivienne as a (D) action.",
@@ -22439,7 +22439,7 @@
   "group" : "2"
 }, {
   "id" : "200030",
-  "key" : "ant3",
+  "key" : "ant1",
   "type" : "Vampire",
   "text" : "Name: Aisha az-Zahra\nCardtype: Vampire\nClan: Toreador\nGroup: 5\nCapacity: 9\nDisciplines: obf qui AUS CEL PRE\nIndependent anarch: During a referendum, Aisha can burn 1 blood to get +1 vote for each ready anarch you control. +1 bleed.",
   "htmlText" : "Name: Aisha az-Zahra<br/>Cardtype: Vampire<br/>Clan: Toreador<br/>Group: 5<br/>Capacity: 9<br/>Disciplines: obf qui AUS CEL PRE<br/>Independent anarch: During a referendum, Aisha can burn 1 blood to get +1 vote for each ready anarch you control. +1 bleed.",
@@ -22538,7 +22538,7 @@
   "group" : "5"
 }, {
   "id" : "200039",
-  "key" : "ant12",
+  "key" : "ant2",
   "type" : "Vampire",
   "text" : "Name: Alabástrom\nCardtype: Vampire\nClan: Gargoyle\nGroup: 6\nCapacity: 7\nDisciplines: aus cel for POT VIS\nIndependent anarch: If Alabástrom is ready during your turn, you can unlock another ready Gargoyle you control. Flight [FLIGHT].",
   "htmlText" : "Name: Alabástrom<br/>Cardtype: Vampire<br/>Clan: Gargoyle<br/>Group: 6<br/>Capacity: 7<br/>Disciplines: aus cel for POT VIS<br/>Independent anarch: If Alabástrom is ready during your turn, you can unlock another ready Gargoyle you control. Flight [FLIGHT].",
@@ -23011,7 +23011,7 @@
   "group" : "5"
 }, {
   "id" : "200081",
-  "key" : "ant4",
+  "key" : "ant3",
   "type" : "Vampire",
   "text" : "Name: André the Manipulator\nCardtype: Vampire\nClan: Gangrel\nGroup: 5\nCapacity: 6\nDisciplines: FOR PRO\nCamarilla: While André is ready, you get +2 hand size.",
   "htmlText" : "Name: André the Manipulator<br/>Cardtype: Vampire<br/>Clan: Gangrel<br/>Group: 5<br/>Capacity: 6<br/>Disciplines: FOR PRO<br/>Camarilla: While André is ready, you get +2 hand size.",
@@ -23275,7 +23275,7 @@
   "group" : "5"
 }, {
   "id" : "200105",
-  "key" : "ant5",
+  "key" : "ant4",
   "type" : "Vampire",
   "text" : "Name: Anne-Marie Bourgeois, Inconnu Recruiter\nCardtype: Vampire\nClan: Toreador\nGroup: 5\nCapacity: 5\nDisciplines: cel pre AUS\nCamarilla: Equipment costs Anne-Marie 1 less pool.",
   "htmlText" : "Name: Anne-Marie Bourgeois, Inconnu Recruiter<br/>Cardtype: Vampire<br/>Clan: Toreador<br/>Group: 5<br/>Capacity: 5<br/>Disciplines: cel pre AUS<br/>Camarilla: Equipment costs Anne-Marie 1 less pool.",
@@ -23473,7 +23473,7 @@
   "group" : "4"
 }, {
   "id" : "200123",
-  "key" : "ant6",
+  "key" : "ant5",
   "type" : "Vampire",
   "text" : "Name: Apolonia Czarnecki\nCardtype: Vampire\nClan: Malkavian\nGroup: 5\nCapacity: 7\nDisciplines: pre AUS DEM OBF\nCamarilla: Apolonia can steal 1 blood from a younger vampire as a (D) action.",
   "htmlText" : "Name: Apolonia Czarnecki<br/>Cardtype: Vampire<br/>Clan: Malkavian<br/>Group: 5<br/>Capacity: 7<br/>Disciplines: pre AUS DEM OBF<br/>Camarilla: Apolonia can steal 1 blood from a younger vampire as a (D) action.",
@@ -28335,7 +28335,7 @@
   "group" : "4"
 }, {
   "id" : "200562",
-  "key" : "ant7",
+  "key" : "ant6",
   "type" : "Vampire",
   "text" : "Name: Hamid Mansour\nCardtype: Vampire\nClan: Ventrue\nGroup: 5\nCapacity: 4\nDisciplines: dom for pre\nCamarilla.",
   "htmlText" : "Name: Hamid Mansour<br/>Cardtype: Vampire<br/>Clan: Ventrue<br/>Group: 5<br/>Capacity: 4<br/>Disciplines: dom for pre<br/>Camarilla.",
@@ -30106,7 +30106,7 @@
   "group" : "5"
 }, {
   "id" : "200723",
-  "key" : "ant8",
+  "key" : "ant7",
   "type" : "Vampire",
   "text" : "Name: Joseph Fischer\nCardtype: Vampire\nClan: Gangrel antitribu\nGroup: 5\nCapacity: 3\nDisciplines: PRO\nIndependent anarch.",
   "htmlText" : "Name: Joseph Fischer<br/>Cardtype: Vampire<br/>Clan: Gangrel antitribu<br/>Group: 5<br/>Capacity: 3<br/>Disciplines: PRO<br/>Independent anarch.",
@@ -31140,7 +31140,7 @@
   "group" : "4"
 }, {
   "id" : "200816",
-  "key" : "ant9",
+  "key" : "ant8",
   "type" : "Vampire",
   "text" : "Name: Laura Goldman\nCardtype: Vampire\nClan: Brujah\nGroup: 5\nCapacity: 3\nDisciplines: cel pre\nIndependent anarch.",
   "htmlText" : "Name: Laura Goldman<br/>Cardtype: Vampire<br/>Clan: Brujah<br/>Group: 5<br/>Capacity: 3<br/>Disciplines: cel pre<br/>Independent anarch.",
@@ -36035,6 +36035,7 @@
   "group" : "3"
 }, {
   "id" : "201258",
+  "key" : "bh100",
   "type" : "Vampire",
   "text" : "Name: Sébastien Goulet\nCardtype: Vampire\nClan: Gangrel antitribu\nLevel: Advanced\nGroup: 3\nCapacity: 8\nDisciplines: cel pre pro DOM OBF\nSabbat: Sébastien gets +1 stealth on recruit and employ actions.\n[MERGED] He can steal an ally or retainer as a +1 stealth (D) action.",
   "htmlText" : "Name: Sébastien Goulet<br/>Cardtype: Vampire<br/>Clan: Gangrel antitribu<br/>Level: Advanced<br/>Group: 3<br/>Capacity: 8<br/>Disciplines: cel pre pro DOM OBF<br/>Sabbat: Sébastien gets +1 stealth on recruit and employ actions.\n[MERGED] He can steal an ally or retainer as a +1 stealth (D) action.",
@@ -38311,7 +38312,7 @@
   "group" : "2"
 }, {
   "id" : "201465",
-  "key" : "ant11",
+  "key" : "ant12",
   "type" : "Vampire",
   "text" : "Name: Weirich Waldburg\nCardtype: Vampire\nClan: Ventrue\nGroup: 3\nCapacity: 8\nDisciplines: cel DOM FOR PRE\nCamarilla: While Weirich is ready, primogen you control get +1 stealth.",
   "htmlText" : "Name: Weirich Waldburg<br/>Cardtype: Vampire<br/>Clan: Ventrue<br/>Group: 3<br/>Capacity: 8<br/>Disciplines: cel DOM FOR PRE<br/>Camarilla: While Weirich is ready, primogen you control get +1 stealth.",
