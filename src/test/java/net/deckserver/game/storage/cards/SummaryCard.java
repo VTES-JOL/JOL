@@ -2,7 +2,6 @@ package net.deckserver.game.storage.cards;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,8 @@ import static java.util.stream.Collectors.joining;
 public class SummaryCard {
 
     private String id;
-    private String key;
+    private String jolId;
+    private String amaranthId;
     private String type;
     private String text;
     private String htmlText;
@@ -33,7 +33,8 @@ public class SummaryCard {
 
     public SummaryCard(CryptCard cryptCard) {
         this.id = cryptCard.getId();
-        this.key = cryptCard.getKey();
+        this.jolId = cryptCard.getJolId();
+        this.amaranthId = cryptCard.getAmaranthId();
         this.displayName = cryptCard.getDisplayName();
         this.names = cryptCard.getNames();
         this.type = cryptCard.getType();
@@ -60,7 +61,8 @@ public class SummaryCard {
 
     public SummaryCard(LibraryCard libraryCard) {
         this.id = libraryCard.getId();
-        this.key = libraryCard.getKey();
+        this.jolId = libraryCard.getKey();
+        this.amaranthId = libraryCard.getJolId();
         this.displayName = libraryCard.getDisplayName();
         this.names = libraryCard.getNames();
         this.type = String.join("/", libraryCard.getType());

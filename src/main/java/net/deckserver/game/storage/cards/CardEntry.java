@@ -9,8 +9,6 @@ package net.deckserver.game.storage.cards;
 import net.deckserver.game.json.deck.CardSummary;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -19,19 +17,21 @@ import java.util.stream.Collectors;
 public class CardEntry {
 
     private String id;
-    private String name = "";
-    private String type = "no type";
+    private String name;
+    private String type;
     private String[] text;
     private String group;
     private boolean crypt;
+    private boolean unique;
 
     CardEntry(CardSummary cardSummary) {
-        this.id = cardSummary.getKey();
+        this.id = cardSummary.getJolId();
         this.name = cardSummary.getDisplayName();
         this.type = cardSummary.getType();
         this.text = cardSummary.getText().split("\n");
         this.group = cardSummary.getGroup();
         this.crypt = cardSummary.isCrypt();
+        this.unique = cardSummary.isUnique();
     }
 
     public String getCardId() {
@@ -76,6 +76,10 @@ public class CardEntry {
 
     public boolean isLibrary() {
         return !crypt;
+    }
+
+    public boolean isUnique() {
+        return unique;
     }
 
     public boolean hasLife() {

@@ -159,7 +159,6 @@ public class GameModel implements Comparable {
     private void doReload(boolean stateChanged, boolean phaseChanged, boolean pingChanged, boolean globalChanged, boolean turnChanged) {
         for (String key : (new ArrayList<>(views.keySet()))) {
             GameView view = views.get(key);
-            //		if(checkViewTime(key, view,timestamp)) continue;
             if (stateChanged) view.stateChanged();
             if (phaseChanged) view.phaseChanged();
             if (globalChanged) view.globalChanged();
