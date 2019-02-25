@@ -26,6 +26,7 @@ public class SummaryCard {
     private boolean crypt;
     private boolean unique;
     private String group;
+    private String sect;
 
     private SummaryCard() {
 
@@ -41,6 +42,7 @@ public class SummaryCard {
         this.crypt = true;
         this.unique = cryptCard.isUnique();
         this.group = cryptCard.getGroup();
+        this.sect = cryptCard.getSect();
 
         List<String> cardLines = new ArrayList<>();
         boolean vampire = cryptCard.getType().equals("Vampire");
