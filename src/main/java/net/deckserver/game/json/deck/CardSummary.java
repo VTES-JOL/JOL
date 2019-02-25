@@ -21,4 +21,5 @@ public class CardSummary {
     private boolean crypt;
     private boolean unique;
     private String group;
+    private String sect;
 }
