@@ -113,6 +113,7 @@ public class AdminBean {
     }
 
     public synchronized void chat(String player, String message) {
+        String parsedMessage = JolAdmin.getInstance().parseMessage(message);
         ChatEntryBean chatEntryBean = new ChatEntryBean(player, message);
         chats.add(chatEntryBean);
         if (chats.size() > CHAT_STORAGE) {

@@ -402,6 +402,10 @@ public class JolAdmin {
         getGameInfo(game).replacePlayer(oldPlayer, newPlayer);
     }
 
+    public String parseMessage(String message) {
+        return message;
+    }
+
     class GameInfo extends Info {
         private final String prefix;
         JolGame game;
