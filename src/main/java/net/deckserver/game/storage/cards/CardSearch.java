@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -25,6 +27,8 @@ public class CardSearch {
 
     private static final Logger logger = getLogger(CardSearch.class);
 
+    private static final Pattern MARKUP_PATTERN = Pattern.compile("\\[(.*?)\\]");
+
     private Map<String, String> nameKeys = new HashMap<>();
     private Map<String, CardEntry> cardTable = new HashMap<>();
     private CardEntry[] cardArr;
@@ -34,7 +38,7 @@ public class CardSearch {
         CollectionType cardSummaryCollectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CardSummary.class);
         List<CardSummary> cardList = objectMapper.readValue(cardPath.toFile(), cardSummaryCollectionType);
         cardList.forEach(card -> {
-            for (String name: card.getNames()) {
+            for (String name : card.getNames()) {
                 nameKeys.put(name.toLowerCase(), card.getJolId());
             }
             CardEntry cardEntry = new CardEntry(card);
@@ -49,7 +53,7 @@ public class CardSearch {
     }
 
     public CardEntry getCardById(String id) {
-        CardEntry entry =  cardTable.get(id);
+        CardEntry entry = cardTable.get(id);
         logger.trace("Lookup {} - found {}", id, entry);
         return entry;
     }
@@ -90,6 +94,29 @@ public class CardSearch {
         set = new CardEntry[v.size()];
         v.toArray(set);
         return set;
+    }
+
+    public String parseText(String text) {
+        Matcher matcher = MARKUP_PATTERN.matcher(text);
+
+        StringBuffer sb = new StringBuffer(text.length());
+        while (matcher.find()) {
+            for (int x = 1; x <= matcher.groupCount(); x++) {
+                String match = matcher.group(x);
+                try {
+                    CardEntry card = findCard(match);
+                    matcher.appendReplacement(sb, generateCardLink(card));
+                } catch (IllegalArgumentException e) {
+                    // do nothing
+                }
+            }
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
+
+    private String generateCardLink(CardEntry card) {
+        return "<a class='card-name' title='" + card.getCardId() + "'>" + card.getName() + "</a>";
     }
 
     public String getId(String nm) {

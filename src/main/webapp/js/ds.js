@@ -134,10 +134,11 @@ function renderGlobalChat(data) {
         var userTimestamp = moment(chat.timestamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
         var chatLine = $("<p/>").addClass("chat");
         var timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp);
-        var message = $("<span/>").text(" " + chat.player + ": " + chat.message);
+        var message = $("<span/>").html(" " + chat.player + ": " + chat.message);
 
         chatLine.append(timeOutput).append(message);
         globalChatOutput.append(chatLine);
+        generateCardData("#globalChatOutput");
     });
 
     if (scrollToBottom) {
@@ -535,8 +536,7 @@ function doToggle(thistag) {
     if (region.css("display") === 'none') {
         region.show();
         regionToggle.text("-");
-    }
-    else {
+    } else {
         region.hide();
         regionToggle.text("+");
     }
@@ -1019,8 +1019,7 @@ function toggleMobileView(event) {
     if (viewport.content == DESKTOP_VIEWPORT_CONTENT) {
         viewport.content = 'width=device-width, initial-scale=1, shrink-to-fit=no';
         $link.text('Desktop View');
-    }
-    else {
+    } else {
         viewport.content = DESKTOP_VIEWPORT_CONTENT;
         $link.text('Mobile View');
     }

@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -114,7 +113,7 @@ public class AdminBean {
 
     public synchronized void chat(String player, String message) {
         String parsedMessage = JolAdmin.getInstance().parseMessage(message);
-        ChatEntryBean chatEntryBean = new ChatEntryBean(player, message);
+        ChatEntryBean chatEntryBean = new ChatEntryBean(player, parsedMessage);
         chats.add(chatEntryBean);
         if (chats.size() > CHAT_STORAGE) {
             chats = chats.subList(CHAT_DISCARD, CHAT_STORAGE);
