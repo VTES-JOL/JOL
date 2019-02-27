@@ -403,7 +403,7 @@ public class JolAdmin {
     }
 
     public String parseMessage(String message) {
-        return message;
+        return getAllCards().parseText(message);
     }
 
     class GameInfo extends Info {
