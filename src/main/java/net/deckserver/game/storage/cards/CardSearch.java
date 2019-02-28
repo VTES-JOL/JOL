@@ -102,9 +102,9 @@ public class CardSearch {
         StringBuffer sb = new StringBuffer(text.length());
         while (matcher.find()) {
             for (int x = 1; x <= matcher.groupCount(); x++) {
-                String match = matcher.group(x);
+                String match = matcher.group(x).trim();
                 try {
-                    CardEntry card = findCard(match);
+                    CardEntry card = findCardExact(match);
                     matcher.appendReplacement(sb, generateCardLink(card));
                 } catch (IllegalArgumentException e) {
                     // do nothing
@@ -125,6 +125,17 @@ public class CardSearch {
 
     public Set<String> getNames() {
         return nameKeys.keySet();
+    }
+
+    private CardEntry findCardExact(String text) throws IllegalArgumentException {
+        final String lowerText = StringUtils.stripAccents(text).toLowerCase();
+        String key = nameKeys.get(lowerText);
+        if (key != null) {
+            return cardTable.get(key);
+        } else {
+            throw new IllegalArgumentException("Card not found");
+        }
+
     }
 
     public CardEntry findCard(String text) throws IllegalArgumentException {

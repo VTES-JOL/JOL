@@ -6,13 +6,10 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
 import java.nio.file.Paths;
-import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 
 public class ChatParserTest {
-
-    private static final Pattern pattern = Pattern.compile("\\[(.*?)\\]");
 
     @Rule
     public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
@@ -40,5 +37,11 @@ public class ChatParserTest {
         test = "This [card not found] shouldn't work";
         modified = search.parseText(test);
         assertEquals(test, modified);
+
+        test = "Multiple cards [ Abactor ] and also [Zip  ]";
+        modified = search.parseText(test);
+
+        assertEquals("Multiple cards <a class='card-name' title='pr59'>Abactor</a> and also <a class='card-name' title='bh144'>Zip</a>", modified);
+
     }
 }
