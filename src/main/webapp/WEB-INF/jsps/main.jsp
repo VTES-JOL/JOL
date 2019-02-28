@@ -130,7 +130,7 @@
                 <a href="https://discord.gg/fJjac75" target="_blank">Discord Channel</a>
             </li>
             <li>
-                <a href="https://amaranth.vtes.co.nz/">Amaranth Deck Builder</a>
+                <a href="https://amaranth.vtes.co.nz/" target="_blank">Amaranth Deck Builder</a>
             </li>
 
         </ul>
