@@ -127,17 +127,10 @@
                 <a href="https://www.facebook.com/groups/jolstatus/" target="_blank">Facebook Status Group</a>
             </li>
             <li>
-                <a href="https://www.facebook.com/groups/jol-development/" target="_blank">Facebook Development
-                    Group</a>
-            </li>
-            <li>
                 <a href="https://discord.gg/fJjac75" target="_blank">Discord Channel</a>
             </li>
             <li>
-                <a href="/jol-news/">Patch Notes / News</a>
-            </li>
-            <li>
-                <a href="https://test.deckserver.net/jol/" target="_blank">Test Server</a>
+                <a href="https://amaranth.vtes.co.nz/">Amaranth Deck Builder</a>
             </li>
 
         </ul>
