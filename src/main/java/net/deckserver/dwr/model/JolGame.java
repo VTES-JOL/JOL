@@ -461,25 +461,34 @@ public class JolGame {
         }
     }
 
-    public Integer getVotes(String cardId) {
+    public String getVotes(String cardId) {
         Card card = state.getCard(cardId);
         Notation note = getNote(card, VOTES, false);
         if (note != null) {
-            return Integer.valueOf(note.getValue());
+            return note.getValue();
         } else {
-            return 0;
+            return "0";
         }
     }
 
-    public void setVotes(String cardId, Integer votes) {
+    public void setVotes(String cardId, String votes) {
         Card card = state.getCard(cardId);
-        if (votes > 0) {
-            Notation note = getNote(card, VOTES, true);
-            note.setValue(votes.toString());
-            addMessage(getCardName(card) + " now has " + votes + " votes");
-        } else {
+        Integer voteAmount = 0;
+        Notation note = getNote(card, VOTES, true);
+        try {
+            voteAmount = Integer.parseInt(votes);
+        } catch (Exception nfe) {
+            // do nothing
+        }
+        if (votes.trim().toLowerCase().equals("priscus")) {
+            note.setValue("P");
+            addMessage(getCardName(card) + " is priscus");
+        } else if (voteAmount == 0) {
             removeNote(card, VOTES);
             addMessage(getCardName(card) + " now has no votes");
+        } else if (voteAmount > 0) {
+            note.setValue(voteAmount.toString());
+            addMessage(getCardName(card) + " now has " + voteAmount + " votes");
         }
     }
 

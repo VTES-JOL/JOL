@@ -67,7 +67,7 @@ public class DoCommand {
                 String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
                 String card = cmdObj.getCard(false, targetPlayer, targetRegion);
 
-                game.setVotes(card, cmdObj.getNumber(0));
+                game.setVotes(card, cmdObj.nextArg());
                 return "Adjusted votes";
             }
             if (cmd.equalsIgnoreCase("order")) {
