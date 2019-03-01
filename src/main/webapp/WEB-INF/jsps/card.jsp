@@ -12,7 +12,7 @@
     int counters = game.getCounters(c.getId());
     boolean locked = game.isTapped(c.getId());
     String label = game.getText(c.getId());
-    Integer votes = game.getVotes(c.getId());
+    String votes = game.getVotes(c.getId());
     boolean nested = p.doNesting();
     Card[] cards = c.getCards();
     boolean hasCards = cards != null && cards.length > 0;
@@ -60,7 +60,7 @@
         </small>
     </c:if>
 
-    <c:if test="${votes > 0}">
+    <c:if test="${votes != '0'}">
         <small class="counter votes" title="<%= votes %> votes"><%= votes %>
         </small>
     </c:if>
