@@ -28,6 +28,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -511,6 +512,13 @@ public class JolAdmin {
             info.remove(oldPlayerKey);
             info.setProperty(newPlayerKey, deckKey);
             game.replacePlayer(oldPlayer, newPlayer);
+            Path oldPlayerDeck = getGameDir().toPath().resolve(oldPlayerKey + ".deck");
+            Path newPlayerDeck = getGameDir().toPath().resolve(newPlayerKey + ".deck");
+            try {
+                Files.copy(oldPlayerDeck, newPlayerDeck, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                logger.error("Unable to copy deck, may not exist in the first place", e);
+            }
             write();
         }
 
@@ -520,24 +528,23 @@ public class JolAdmin {
             write();
         }
 
-        synchronized void startGame() {
+        private void preStart() {
             info.setProperty("state", "closed");
             state = new DsGame();
             actions = new DsTurnRecorder();
             game = new JolGame(state, actions);
             game.initGame(gameName);
             regDecks();
+        }
+
+        synchronized void startGame() {
+            preStart();
             getGame().startGame();
             write();
         }
 
         synchronized void startGame(List<String> playerSeating) {
-            info.setProperty("state", "closed");
-            state = new DsGame();
-            actions = new DsTurnRecorder();
-            game = new JolGame(state, actions);
-            game.initGame(gameName);
-            regDecks();
+            preStart();
             getGame().startGame(playerSeating);
             write();
         }
