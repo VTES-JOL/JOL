@@ -634,6 +634,10 @@ public class JolGame {
     }
 
     public void replacePlayer(String oldPlayer, String newPlayer) {
+        if (getActivePlayer().equals(oldPlayer)) {
+
+            setActivePlayer(newPlayer);
+        }
         this.state.replacePlayer(oldPlayer, newPlayer);
         getNote(this.state, oldPlayer + POOL, false).setName(newPlayer + POOL);
     }
