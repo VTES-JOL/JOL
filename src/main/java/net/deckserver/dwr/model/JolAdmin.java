@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -42,8 +41,7 @@ public class JolAdmin {
 
     public static final String DECK_NOT_FOUND = "Deck not found";
     private static final Logger logger = getLogger(JolAdmin.class);
-    private static final JolAdmin INSTANCE = new JolAdmin(System.getenv("JOL_DATA"));
-    private static CardSearch CARD_DATA = null;
+    private static final JolAdmin INSTANCE = new JolAdmin(System.getProperty("JOL_DATA"));
     private final String dir;
     private final SystemInfo sysInfo;
     private final Map<String, GameInfo> games;
@@ -358,20 +356,6 @@ public class JolAdmin {
         info.write();
     }
 
-    public CardSearch getAllCards() {
-        if (CARD_DATA == null) {
-            logger.info("Loading Card Data");
-            try {
-                Path cardsPath = Paths.get(dir, "cards", "cards.json");
-
-                CARD_DATA = new CardSearch(cardsPath);
-            } catch (IOException e) {
-                throw new RuntimeException("Unable to open card files", e);
-            }
-        }
-        return CARD_DATA;
-    }
-
     public boolean isSuperUser(String player) {
         return existsPlayer(player) && getPlayerInfo(player).isSuperUser();
     }
@@ -401,10 +385,6 @@ public class JolAdmin {
         getPlayerInfo(oldPlayer).removeGame(game);
         getPlayerInfo(newPlayer).addGame(game, "replaced");
         getGameInfo(game).replacePlayer(oldPlayer, newPlayer);
-    }
-
-    public String parseMessage(String message) {
-        return getAllCards().parseText(message);
     }
 
     class GameInfo extends Info {
@@ -554,7 +534,7 @@ public class JolAdmin {
             for (String player : players) {
                 String deck = getPlayerDeck(player);
                 if (deck != null) {
-                    getGame().addPlayer(getAllCards(), player, deck);
+                    getGame().addPlayer(CardSearch.INSTANCE, player, deck);
                 }
             }
         }

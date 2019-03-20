@@ -1,1 +1,13 @@
-[ ]
+[ {
+  "timestamp" : "2019-03-20T10:36:56+10:00",
+  "player" : "Player1",
+  "message" : "<a class='card-name' title='th56'>Hektor</a>"
+}, {
+  "timestamp" : "2019-03-20T10:36:59+10:00",
+  "player" : "Player1",
+  "message" : "<span class='discipline pot'></span>"
+}, {
+  "timestamp" : "2019-03-20T10:37:24+10:00",
+  "player" : "Player1",
+  "message" : "<a class='card-name' title='th56'>Hektor</a> bleeds using <a class='card-name' title='dam28'>Show of Force</a> for <span class='discipline POT'></span><span class='discipline PRE'></span>"
+} ]

@@ -4,6 +4,7 @@ import net.deckserver.Utils;
 import net.deckserver.dwr.jsp.DeckParams;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.game.storage.cards.CardEntry;
+import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.cards.Deck;
 import org.directwebremoting.WebContextFactory;
 
@@ -33,8 +34,7 @@ public class DeckEditBean {
     }
 
     private String init(String player, String name, String deck, boolean shuffle) {
-        JolAdmin admin = JolAdmin.getInstance();
-        Deck nd = new Deck(admin.getAllCards(), deck);
+        Deck nd = new Deck(CardSearch.INSTANCE, deck);
         try {
             HttpServletRequest request = WebContextFactory.get()
                     .getHttpServletRequest();

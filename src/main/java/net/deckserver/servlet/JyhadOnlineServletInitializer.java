@@ -23,7 +23,7 @@ public class JyhadOnlineServletInitializer implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         logger.info("Starting Jyhad Online...");
-        logger.info("Initializing deckserver with " + System.getenv("JOL_DATA"));
+        logger.info("Initializing deckserver with " + System.getProperty("JOL_DATA"));
         AdminBean.INSTANCE = new AdminBean();
         scheduler.scheduleAtFixedRate(new ChatPersistenceJob(AdminBean.INSTANCE), 1, 5, TimeUnit.MINUTES);
         logger.info("Initialization complete");

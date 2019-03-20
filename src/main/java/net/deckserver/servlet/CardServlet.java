@@ -2,6 +2,7 @@ package net.deckserver.servlet;
 
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.game.storage.cards.CardEntry;
+import net.deckserver.game.storage.cards.CardSearch;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,11 +18,10 @@ public class CardServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        JolAdmin jolAdmin = JolAdmin.getInstance();
         String id = req.getParameter("id");
         resp.setContentType("text/html");
         PrintWriter writer = resp.getWriter();
-        Optional<CardEntry> result = Optional.ofNullable(jolAdmin.getAllCards().getCardById(id));
+        Optional<CardEntry> result = Optional.ofNullable(CardSearch.INSTANCE.getCardById(id));
         String html = result
                 .map(CardEntry::getFullText)
                 .map(cardText -> Stream.of(cardText).collect(Collectors.joining("<br/>")))

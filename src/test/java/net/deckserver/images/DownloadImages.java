@@ -20,19 +20,18 @@ public class DownloadImages {
     private static final String BASE_URL = "http://www.lackeyccg.com/vtes/high/cards/";
     private static final Path BASE_PATH = Paths.get("src/test/resources");
     private static final Path IMAGE_PATH = BASE_PATH.resolve("images");
-    private static final Path CARDS_PATH = BASE_PATH.resolve("cards").resolve("cards.json");
 
     @Test
     public void download() throws Exception {
 
-        CardSearch cardSearch = new CardSearch(CARDS_PATH);
+        CardSearch cardSearch = CardSearch.INSTANCE;
 
         if (!Files.exists(IMAGE_PATH)) {
             Files.createDirectory(IMAGE_PATH);
         }
         for (CardEntry card : cardSearch.getAllCards()) {
             String id = card.getCardId();
-            String name = StringUtils.stripAccents(card.getName()).replaceAll("\\W","").toLowerCase();
+            String name = StringUtils.stripAccents(card.getName()).replaceAll("\\W", "").toLowerCase();
             String url = BASE_URL + name + ".jpg";
             String filename = id + ".jpg";
             if (!Files.exists(IMAGE_PATH.resolve(id + ".jpg"))) {

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
@@ -58,7 +59,7 @@ public class AdminBean {
                 }
             }
             actives = new ArrayList<>(activeSort);
-            chatPersistenceFile = new File(System.getenv("JOL_DATA"), "chats.json");
+            chatPersistenceFile = new File(System.getProperty("JOL_DATA"), "chats.json");
             if (Files.notExists(chatPersistenceFile.toPath())) {
                 Files.createFile(chatPersistenceFile.toPath());
             }
@@ -112,7 +113,7 @@ public class AdminBean {
     }
 
     public synchronized void chat(String player, String message) {
-        String parsedMessage = JolAdmin.getInstance().parseMessage(message);
+        String parsedMessage = ChatParser.parseText(message);
         ChatEntryBean chatEntryBean = new ChatEntryBean(player, parsedMessage);
         chats.add(chatEntryBean);
         if (chats.size() > CHAT_STORAGE) {

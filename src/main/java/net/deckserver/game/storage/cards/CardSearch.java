@@ -14,9 +14,8 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -27,29 +26,32 @@ public class CardSearch {
 
     private static final Logger logger = getLogger(CardSearch.class);
 
-    private static final Pattern MARKUP_PATTERN = Pattern.compile("\\[(.*?)\\]");
-
     private Map<String, String> nameKeys = new HashMap<>();
     private Map<String, CardEntry> cardTable = new HashMap<>();
-    private CardEntry[] cardArr;
 
-    public CardSearch(Path cardPath) throws IOException {
+    public static CardSearch INSTANCE = new CardSearch(Paths.get(System.getProperty("JOL_DATA")));
+
+    private CardSearch(Path cardPath) {
+        cardPath = cardPath.resolve("cards").resolve("cards.json");
         ObjectMapper objectMapper = new ObjectMapper();
         CollectionType cardSummaryCollectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CardSummary.class);
-        List<CardSummary> cardList = objectMapper.readValue(cardPath.toFile(), cardSummaryCollectionType);
-        cardList.forEach(card -> {
-            for (String name : card.getNames()) {
-                nameKeys.put(name.toLowerCase(), card.getJolId());
-            }
-            CardEntry cardEntry = new CardEntry(card);
-            cardTable.put(card.getJolId(), cardEntry);
-        });
-        cardArr = cardTable.values().toArray(new CardEntry[0]);
-        logger.info("Read {} keys, {} cards", nameKeys.size(), cardTable.size());
+        try {
+            List<CardSummary> cardList = objectMapper.readValue(cardPath.toFile(), cardSummaryCollectionType);
+            cardList.forEach(card -> {
+                for (String name : card.getNames()) {
+                    nameKeys.put(name.toLowerCase(), card.getJolId());
+                }
+                CardEntry cardEntry = new CardEntry(card);
+                cardTable.put(card.getJolId(), cardEntry);
+            });
+            logger.info("Read {} keys, {} cards", nameKeys.size(), cardTable.size());
+        } catch (IOException e) {
+            logger.error("Unable to read cards", e);
+        }
     }
 
-    public CardEntry[] getAllCards() {
-        return cardArr;
+    public Collection<CardEntry> getAllCards() {
+        return cardTable.values();
     }
 
     public CardEntry getCardById(String id) {
@@ -58,13 +60,13 @@ public class CardSearch {
         return entry;
     }
 
-    public CardEntry[] searchByType(CardEntry[] set, String type) {
+    public Collection<CardEntry> searchByType(Collection<CardEntry> set, String type) {
         return searchByField(set, "Cardtype:", type);
     }
 
-    public CardEntry[] searchByText(CardEntry[] set, String text) {
+    public Collection<CardEntry> searchByText(Collection<CardEntry> set, String text) {
         text = text.toLowerCase();
-        Vector<CardEntry> v = new Vector<>();
+        Set<CardEntry> v = new HashSet<>();
         for (CardEntry anArr : set) {
             String[] cardText = anArr.getFullText();
             for (String aCardText : cardText) {
@@ -74,12 +76,10 @@ public class CardSearch {
                 }
             }
         }
-        set = new CardEntry[v.size()];
-        v.toArray(set);
-        return set;
+        return v;
     }
 
-    public CardEntry[] searchByField(CardEntry[] set, String field, String value) {
+    public Collection<CardEntry> searchByField(Collection<CardEntry> set, String field, String value) {
         List<CardEntry> v = new ArrayList<>();
         value = value.toLowerCase();
         for (CardEntry anArr : set) {
@@ -91,32 +91,7 @@ public class CardSearch {
                     break;
                 }
         }
-        set = new CardEntry[v.size()];
-        v.toArray(set);
-        return set;
-    }
-
-    public String parseText(String text) {
-        Matcher matcher = MARKUP_PATTERN.matcher(text);
-
-        StringBuffer sb = new StringBuffer(text.length());
-        while (matcher.find()) {
-            for (int x = 1; x <= matcher.groupCount(); x++) {
-                String match = matcher.group(x).trim();
-                try {
-                    CardEntry card = findCardExact(match);
-                    matcher.appendReplacement(sb, generateCardLink(card));
-                } catch (IllegalArgumentException e) {
-                    // do nothing
-                }
-            }
-        }
-        matcher.appendTail(sb);
-        return sb.toString();
-    }
-
-    private String generateCardLink(CardEntry card) {
-        return "<a class='card-name' title='" + card.getCardId() + "'>" + card.getName() + "</a>";
+        return v;
     }
 
     public String getId(String nm) {
@@ -127,7 +102,7 @@ public class CardSearch {
         return nameKeys.keySet();
     }
 
-    private CardEntry findCardExact(String text) throws IllegalArgumentException {
+    public CardEntry findCardExact(String text) throws IllegalArgumentException {
         final String lowerText = StringUtils.stripAccents(text).toLowerCase();
         String key = nameKeys.get(lowerText);
         if (key != null) {
