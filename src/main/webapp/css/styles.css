@@ -1091,3 +1091,55 @@ input[type=checkbox] {
 .SPI:before {
     content: 'Z';
 }
+
+.obt:before {
+    content: '*';
+    position: relative;
+    top: 2px;
+}
+
+.OBT:before {
+    content: '+';
+}
+
+.tem:before {
+    content: '(';
+    position: relative;
+    top: 2px;
+}
+
+.TEM:before {
+    content: ')';
+}
+
+.str:before {
+    content: ':';
+    position: relative;
+    top: 2px;
+    margin-right: 5px;
+}
+
+.STR:before {
+    content: ';';
+    margin-right: 5px;
+}
+
+.mal:before {
+    content: '<';
+    position: relative;
+    top: 2px;
+    margin-right: 5px;
+}
+
+.MAL:before {
+    content: '>';
+    margin-right: 5px;
+}
+
+.flight:before {
+    content: "=";
+}
+
+.d:before {
+    content: "0";
+}

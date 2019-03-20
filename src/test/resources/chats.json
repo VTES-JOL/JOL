@@ -10,4 +10,44 @@
   "timestamp" : "2019-03-20T10:37:24+10:00",
   "player" : "Player1",
   "message" : "<a class='card-name' title='th56'>Hektor</a> bleeds using <a class='card-name' title='dam28'>Show of Force</a> for <span class='discipline POT'></span><span class='discipline PRE'></span>"
+}, {
+  "timestamp" : "2019-03-20T13:19:47+10:00",
+  "player" : "Player1",
+  "message" : "<span class='discipline obt'></span><span class='discipline OBT'></span>"
+}, {
+  "timestamp" : "2019-03-20T13:20:38+10:00",
+  "player" : "Player1",
+  "message" : "<span class='discipline tem'></span><span class='discipline TEM'></span>"
+}, {
+  "timestamp" : "2019-03-20T13:22:29+10:00",
+  "player" : "Player1",
+  "message" : "<span class='discipline str'></span><span class='discipline STR'></span>"
+}, {
+  "timestamp" : "2019-03-20T13:22:57+10:00",
+  "player" : "Player1",
+  "message" : "<span class='discipline str'></span> some text"
+}, {
+  "timestamp" : "2019-03-20T13:24:31+10:00",
+  "player" : "Player1",
+  "message" : "<span class='discipline mal'></span><span class='discipline MAL'></span>"
+}, {
+  "timestamp" : "2019-03-20T13:24:49+10:00",
+  "player" : "Player1",
+  "message" : "<span class='discipline mal'></span><span class='discipline MAL'></span> some text"
+}, {
+  "timestamp" : "2019-03-20T13:25:06+10:00",
+  "player" : "Player1",
+  "message" : "<span class='discipline str'></span><span class='discipline STR'></span> some text"
+}, {
+  "timestamp" : "2019-03-20T13:28:23+10:00",
+  "player" : "Player1",
+  "message" : "<span class='discipline d'></span>"
+}, {
+  "timestamp" : "2019-03-20T13:28:32+10:00",
+  "player" : "Player1",
+  "message" : "some text <span class='discipline d'></span> some text"
+}, {
+  "timestamp" : "2019-03-20T13:28:53+10:00",
+  "player" : "Player1",
+  "message" : "some text <span class='discipline flight'></span> some text"
 } ]
