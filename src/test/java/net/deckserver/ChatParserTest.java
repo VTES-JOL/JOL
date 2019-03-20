@@ -1,19 +1,16 @@
 package net.deckserver;
 
 import net.deckserver.dwr.model.ChatParser;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
 import static org.junit.Assert.assertEquals;
 
 public class ChatParserTest {
 
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-
     @Test
     public void testParseCard() throws Exception {
+
+        System.setProperty("JOL_DATA", "src/test/resources");
 
         String test = "[Mata Hari] is awesome, and turning that into a tooltip would be quite handy";
 
@@ -31,7 +28,7 @@ public class ChatParserTest {
 
         assertEquals("Multiple cards <a class='card-name' title='pr59'>Abactor</a> and also <a class='card-name' title='bh144'>Zip</a>", modified);
 
-        test = "This [card not found] shouldn't work";
+        test = "This [card not found] shouldn&#39;t work";
         modified = ChatParser.parseText(test);
         assertEquals(test, modified);
 
