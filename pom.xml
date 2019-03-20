@@ -178,7 +178,7 @@
                 <configuration>
                     <path>/jol</path>
                     <systemProperties>
-                        <JOL_DATA>${basedir}/src/test/resources</JOL_DATA>
+                        <JOL_DATA>${JOL_DATA}</JOL_DATA>
                     </systemProperties>
                 </configuration>
             </plugin>
