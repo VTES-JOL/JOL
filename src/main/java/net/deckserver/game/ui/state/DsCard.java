@@ -1,8 +1,8 @@
 package net.deckserver.game.ui.state;
 
-import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.CardContainer;
+import net.deckserver.game.storage.cards.CardSearch;
 
 class DsCard extends DsCardContainer implements Card {
 
@@ -22,7 +22,7 @@ class DsCard extends DsCardContainer implements Card {
 
     public String getName() {
         try {
-            return JolAdmin.getInstance().getAllCards().getCardById(card).getName();
+            return CardSearch.INSTANCE.getCardById(card).getName();
         } catch (Throwable t) {
             return "ERROR CARD";
         }

@@ -9,6 +9,7 @@ package net.deckserver.dwr.jsp;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.storage.cards.CardEntry;
+import net.deckserver.game.storage.cards.CardSearch;
 
 /**
  * @author Joe User
@@ -26,7 +27,7 @@ public class CardParams {
     CardParams(Card card, boolean hidden) {
         this.card = card;
         this.hidden = hidden;
-        this.entry = JolAdmin.getInstance().getAllCards().getCardById(this.card.getCardId());
+        this.entry = CardSearch.INSTANCE.getCardById(this.card.getCardId());
     }
 
     public CardParams(CardEntry entry) {

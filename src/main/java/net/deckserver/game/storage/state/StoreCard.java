@@ -12,6 +12,7 @@ import net.deckserver.game.interfaces.state.CardContainer;
 import net.deckserver.game.jaxb.state.GameCard;
 import net.deckserver.game.jaxb.state.Notation;
 import net.deckserver.game.storage.cards.CardEntry;
+import net.deckserver.game.storage.cards.CardSearch;
 
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class StoreCard implements Card {
     }
 
     public String getName() {
-        CardEntry card = JolAdmin.getInstance().getAllCards().getCardById(getCardId());
+        CardEntry card = CardSearch.INSTANCE.getCardById(getCardId());
         if (card == null) return getCardId();
         return card.getName();
     }

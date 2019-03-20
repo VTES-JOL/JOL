@@ -24,7 +24,7 @@ public class ApiResource {
     private Map<String, CardSummary> cardSummaryMap = new HashMap<>();
 
     public ApiResource() {
-        File cardFile = Paths.get(System.getenv("JOL_DATA"), "cards", "cards.json").toFile();
+        File cardFile = Paths.get(System.getProperty("JOL_DATA"), "cards", "cards.json").toFile();
         ObjectMapper objectMapper = new ObjectMapper();
         CollectionType cardSummaryCollectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CardSummary.class);
         try {

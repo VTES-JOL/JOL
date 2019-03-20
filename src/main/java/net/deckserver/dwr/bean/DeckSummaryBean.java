@@ -33,7 +33,7 @@ public class DeckSummaryBean {
     }
 
     private void init(String player, String deck) {
-        CardSearch search = JolAdmin.getInstance().getAllCards();
+        CardSearch search = CardSearch.INSTANCE;
         try {
             Deck nd = new Deck(search, deck);
             lib = nd.getLibSize();

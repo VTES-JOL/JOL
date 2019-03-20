@@ -20,9 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -138,7 +136,7 @@ public class DeckserverRemote {
     }
 
     public String getCardText(String callback, String id) {
-        CardSearch cards = JolAdmin.getInstance().getAllCards();
+        CardSearch cards = CardSearch.INSTANCE;
         CardEntry card = cards.getCardById(id);
         return Stream.of(card.getFullText()).collect(Collectors.joining("<br/>"));
     }
@@ -193,7 +191,7 @@ public class DeckserverRemote {
         String deckList = admin.getGameDeck(game, player);
         if (deckList == JolAdmin.DECK_NOT_FOUND) return deckList;
 
-        Deck deck = new Deck(admin.getAllCards(), deckList);
+        Deck deck = new Deck(CardSearch.INSTANCE, deckList);
         StringBuilder sb = new StringBuilder(deckList.length() * 4);
         StringBuilder line = new StringBuilder(80);
         CardType type = CardType.VAMPIRE;
@@ -250,17 +248,14 @@ public class DeckserverRemote {
 
     public Map<String, Object> cardSearch(String type, String string) {
         Map<String, Object> ret = UpdateFactory.getUpdate();
-        CardSearch search = JolAdmin.getInstance().getAllCards();
-        CardEntry[] set = search.getAllCards();
+        CardSearch search = CardSearch.INSTANCE;
+        Collection<CardEntry> set = search.getAllCards();
         type = ne(type);
         if (type != null && !type.equals("All")) {
             set = search.searchByType(set, type);
         }
         set = search.searchByText(set, string);
-        CardBean[] beans = new CardBean[set.length];
-        for (int i = 0, j = set.length - 1; i < set.length; i++, j--) {
-            beans[j] = new CardBean(set[i]);
-        }
+        Set<CardBean> beans = set.stream().map(CardBean::new).collect(Collectors.toSet());
         ret.put("callbackShowCards", beans);
         return ret;
     }

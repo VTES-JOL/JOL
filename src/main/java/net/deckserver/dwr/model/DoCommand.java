@@ -9,6 +9,7 @@ package net.deckserver.dwr.model;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.Location;
 import net.deckserver.game.storage.cards.CardEntry;
+import net.deckserver.game.storage.cards.CardSearch;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -140,8 +141,7 @@ public class DoCommand {
                     if (docap) {
                         int curcap = game.getCapacity(srcCard);
                         if (curcap <= 0) {
-                            CardEntry card =
-                                    JolAdmin.getInstance().getAllCards().getCardById(game.getCardDescripId(srcCard));
+                            CardEntry card = CardSearch.INSTANCE.getCardById(game.getCardDescripId(srcCard));
                             int capincr = 1;
                             String[] text = card.getFullText();
                             for (String aText : text) {

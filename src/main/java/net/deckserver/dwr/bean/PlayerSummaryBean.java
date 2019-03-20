@@ -3,6 +3,7 @@ package net.deckserver.dwr.bean;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.JolGame;
+import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.cards.Deck;
 
 import java.time.OffsetDateTime;
@@ -35,7 +36,7 @@ public class PlayerSummaryBean {
         JolAdmin admin = JolAdmin.getInstance();
         if (!started) {
             String deck = admin.getGameDeck(game.getName(), player);
-            Deck nd = new Deck(admin.getAllCards(), deck);
+            Deck nd = new Deck(CardSearch.INSTANCE, deck);
             libSize = nd.getLibSize();
             cryptSize = nd.getCryptSize();
             groups = nd.getGroups();

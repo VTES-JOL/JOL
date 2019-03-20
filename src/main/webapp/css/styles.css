@@ -3,6 +3,11 @@
     src: url('../fonts/jol.ttf') format('truetype')
 }
 
+@font-face {
+    font-family: 'disciplines';
+    src: url('../fonts/disciplines.ttf') format('truetype');
+}
+
 body {
     background: #d0d0d0;
 }
@@ -818,4 +823,271 @@ input[type=checkbox] {
     font-size: .9em;
     font-weight: bold;
     text-align: center;
+}
+
+.discipline {
+    font-family: 'disciplines';
+    font-size: 1.3em;
+    padding-right: 2px;
+    vertical-align: bottom;
+}
+
+.ani:before {
+    content: 'a';
+    position: relative;
+    top: 2px;
+}
+
+.ANI:before {
+    content: 'A';
+}
+
+.obe:before {
+    content: 'b';
+    position: relative;
+    top: 2px;
+}
+
+.OBE:before {
+    content: 'B';
+}
+
+.cel:before {
+    content: 'c';
+    position: relative;
+    top: 2px;
+}
+
+.CEL:before {
+    content: 'C';
+}
+
+.dom:before {
+    content: 'd';
+    position: relative;
+    top: 2px;
+}
+
+.DOM:before {
+    content: 'D';
+}
+
+.dem:before {
+    content: 'e';
+    position: relative;
+    top: 2px;
+}
+
+.DEM:before {
+    content: 'E';
+}
+
+.for:before {
+    content: 'f';
+    position: relative;
+    top: 2px;
+}
+
+.FOR:before {
+    content: 'F';
+}
+
+.san:before {
+    content: 'g';
+    position: relative;
+    top: 2px;
+}
+
+.SAN:before {
+    content: 'G';
+}
+
+.thn:before {
+    content: 'h';
+    position: relative;
+    top: 2px;
+}
+
+.THN:before {
+    content: 'H';
+}
+
+.vic:before {
+    content: 'i';
+    position: relative;
+    top: 2px;
+}
+
+.VIC:before {
+    content: 'I';
+}
+
+.pro:before {
+    content: 'j';
+    position: relative;
+    top: 2px;
+}
+
+.PRO:before {
+    content: 'J';
+}
+
+.chi:before {
+    content: 'k';
+    position: relative;
+    top: 2px;
+}
+
+.CHI:before {
+    content: 'K';
+}
+
+.val:before {
+    content: 'l';
+    position: relative;
+    top: 2px;
+}
+
+.VAL:before {
+    content: 'L';
+}
+
+.mel:before {
+    content: 'm';
+    position: relative;
+    top: 2px;
+}
+
+.MEL:before {
+    content: 'M';
+}
+
+.nec:before {
+    content: 'n';
+    position: relative;
+    top: 2px;
+}
+
+.NEC:before {
+    content: 'N';
+}
+
+.obf:before {
+    content: 'o';
+    position: relative;
+    top: 2px;
+}
+
+.OBF:before {
+    content: 'O';
+}
+
+.pot:before {
+    content: 'p';
+    position: relative;
+    top: 2px;
+}
+
+.POT:before {
+    content: 'P';
+}
+
+.qui:before {
+    content: 'q';
+    position: relative;
+    top: 2px;
+}
+
+.QUI:before {
+    content: 'Q';
+}
+
+.pre:before {
+    content: 'r';
+    position: relative;
+    top: 2px;
+}
+
+.PRE:before {
+    content: 'R';
+}
+
+.ser:before {
+    content: 's';
+    position: relative;
+    top: 2px;
+}
+
+.SER:before {
+    content: 'S';
+}
+
+.tha:before {
+    content: 't';
+    position: relative;
+    top: 2px;
+}
+
+.THA:before {
+    content: 'T';
+}
+
+.aus:before {
+    content: 'u';
+    position: relative;
+    top: 2px;
+}
+
+.AUS:before {
+    content: 'U';
+}
+
+.vis:before {
+    content: 'v';
+    position: relative;
+    top: 2px;
+}
+
+.VIS:before {
+    content: 'V';
+}
+
+.abo:before {
+    content: 'w';
+    position: relative;
+    top: 2px;
+}
+
+.ABO:before {
+    content: 'W';
+}
+
+.myt:before {
+    content: 'x';
+    position: relative;
+    top: 2px;
+}
+
+.MYT:before {
+    content: 'X';
+}
+
+.dai:before {
+    content: 'y';
+    position: relative;
+    top: 2px;
+}
+
+.DAI:before {
+    content: 'Y';
+}
+
+.spi:before {
+    content: 'z';
+    position: relative;
+    top: 2px;
+}
+
+.SPI:before {
+    content: 'Z';
 }
