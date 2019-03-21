@@ -50,4 +50,16 @@
   "timestamp" : "2019-03-20T13:28:53+10:00",
   "player" : "Player1",
   "message" : "some text <span class='discipline flight'></span> some text"
+}, {
+  "timestamp" : "2019-03-20T13:46:54+10:00",
+  "player" : "Player1",
+  "message" : "<span class='discipline obt'></span>"
+}, {
+  "timestamp" : "2019-03-20T13:46:56+10:00",
+  "player" : "Player1",
+  "message" : "<span class='discipline OBT'></span>"
+}, {
+  "timestamp" : "2019-03-20T13:47:58+10:00",
+  "player" : "Player1",
+  "message" : "<span class='discipline flight'></span>"
 } ]
