@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class ChatParser {
 
     private static final Pattern MARKUP_PATTERN = Pattern.compile("\\[(.*?)\\]");
-    private static final List<String> disciplineSet = Arrays.asList("ani", "obe", "cel", "dom", "dem", "for", "san", "thn", "vic", "pro", "chi", "val", "mel", "nec", "obf", "pot", "qui", "pre", "ser", "tha", "aus", "vis", "abo", "myt", "dai", "spi","tem","obt","str","mal","flight");
+    private static final List<String> disciplineSet = Arrays.asList("ani", "obe", "cel", "dom", "dem", "for", "san", "thn", "vic", "pro", "chi", "val", "mel", "nec", "obf", "pot", "qui", "pre", "ser", "tha", "aus", "vis", "abo", "myt", "dai", "spi", "tem", "obt", "str", "mal", "flight");
 
     public static String parseText(String text) {
         String sanitizedMessage = Sanitizers.FORMATTING.sanitize(text);
