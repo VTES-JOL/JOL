@@ -1,1 +1,28 @@
-{"playerTimestamps":{"Player1":"2019-03-20T13:48:15.64+10:00","Player4":"2018-07-23T21:57:17.48Z"},"gameTimestamps":{"game1":{"timestamp":"2017-09-29T01:11:41.16Z","playerTimestamps":{"player1":"2017-09-29T01:11:41.16Z"},"playerPings":{"player1":true}},"Game 1":{"timestamp":"2018-07-23T21:56:47.224Z","playerTimestamps":{"Player1":"2019-03-20T00:21:42.022Z","Player4":"2018-07-23T21:57:12.349Z"},"playerPings":{"Player1":false,"Player4":false}}}}
+{
+  "playerTimestamps": {
+    "Player1": "2019-03-20T03:29:33.634Z",
+    "Player4": "2018-07-23T21:57:17.48Z"
+  },
+  "gameTimestamps": {
+    "game1": {
+      "timestamp": "2017-09-29T01:11:41.16Z",
+      "playerTimestamps": {
+        "player1": "2017-09-29T01:11:41.16Z"
+      },
+      "playerPings": {
+        "player1": true
+      }
+    },
+    "Game 1": {
+      "timestamp": "2018-07-23T21:56:47.224Z",
+      "playerTimestamps": {
+        "Player1": "2019-03-20T00:21:42.022Z",
+        "Player4": "2018-07-23T21:57:12.349Z"
+      },
+      "playerPings": {
+        "Player1": false,
+        "Player4": false
+      }
+    }
+  }
+}
