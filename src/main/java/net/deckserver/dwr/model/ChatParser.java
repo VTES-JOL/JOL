@@ -26,7 +26,7 @@ public class ChatParser {
         StringBuffer sb = new StringBuffer(text.length());
         while (matcher.find()) {
             for (int x = 1; x <= matcher.groupCount(); x++) {
-                String match = matcher.group(x).trim();
+                String match = matcher.group(x).trim().replaceAll("&#39;", "'").replaceAll("&#34;", "\"");
                 try {
                     CardEntry card = CardSearch.INSTANCE.findCardExact(match);
                     matcher.appendReplacement(sb, generateCardLink(card));
