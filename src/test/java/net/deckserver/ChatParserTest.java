@@ -1,6 +1,7 @@
 package net.deckserver;
 
 import net.deckserver.dwr.model.ChatParser;
+import net.deckserver.game.storage.cards.CardSearch;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -37,5 +38,9 @@ public class ChatParserTest {
 
         assertEquals("Multiple cards <a class='card-name' title='pr59'>Abactor</a> and also <a class='card-name' title='bh144'>Zip</a>", modified);
 
+        test = "A link to [Cats' Guidance]";
+        modified = ChatParser.parseText(test);
+
+        assertEquals("A link to <a class='card-name' title='jy74'>Cats' Guidance</a>", modified);
     }
 }
