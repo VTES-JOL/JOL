@@ -78,6 +78,7 @@ public class SummaryCard {
         Optional.ofNullable(libraryCard.getClans()).ifPresent(clan -> cardLines.add("Clan: " + String.join("/", clan)));
         Optional.ofNullable(libraryCard.getBlood()).ifPresent(blood -> cardLines.add("Cost: " + blood + " blood"));
         Optional.ofNullable(libraryCard.getPool()).ifPresent(pool -> cardLines.add("Cost: " + pool + " pool"));
+        Optional.ofNullable(libraryCard.getBurnOption()).ifPresent(burnOption -> cardLines.add("Burn Option"));
         Optional.ofNullable(libraryCard.getConviction()).ifPresent(conviction -> cardLines.add("Cost: " + conviction + " conviction"));
         Optional.ofNullable(libraryCard.getDisciplines()).ifPresent(disciplines -> cardLines.add("Discipline: " + disciplines.stream().collect(joining("/"))));
         Optional.ofNullable(libraryCard.getText()).ifPresent(cardLines::add);
