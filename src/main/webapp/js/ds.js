@@ -117,6 +117,8 @@ function renderGameChat(data) {
     chatOutputDiv.scrollTop(chatOutputDiv.prop("scrollHeight") - chatOutputDiv.prop("clientHeight"));
 }
 
+var globalChatLastPlayer = null;
+var globalChatLastDay = null;
 function renderGlobalChat(data) {
     if (!data) {
         return;
@@ -130,15 +132,28 @@ function renderGlobalChat(data) {
     var scrollToBottom = scrollTop == maxScrollTop;
 
     $.each(data, function (index, chat) {
-        var timestamp = moment(chat.timestamp).tz("UTC").format("D-MMM HH:mm");
+        var day = moment(chat.timestamp).tz("UTC").format("D MMMM");
+        if (globalChatLastDay != day) {
+            var dayBreak = $('<div style="height: .9rem; margin-bottom: .6rem; margin-top: -.3rem; border-bottom: 1px solid #dcc; text-align: center">'
+                + '<span style="font-size: .8rem; background-color: #fff; padding: 0 .5rem; color: #b99">'
+                + day
+                + '</span>'
+                + '</div>');
+            globalChatOutput.append(dayBreak);
+        }
+
+        var timestamp = moment(chat.timestamp).tz("UTC").format("HH:mm");
         var userTimestamp = moment(chat.timestamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
         var chatLine = $("<p/>").addClass("chat");
-        var timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp);
-        var message = $("<span/>").html(" " + chat.player + ": " + chat.message);
+        var timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp).css('color', '#888').css('font-size', 'smaller');
+        var playerLabel = globalChatLastPlayer == chat.player && globalChatLastDay == day ? "" : "<b>" + chat.player + "</b> ";
+        var message = $("<span/>").html(" " + playerLabel + chat.message);
 
         chatLine.append(timeOutput).append(message);
         globalChatOutput.append(chatLine);
         generateCardData("#globalChatOutput");
+        globalChatLastPlayer = chat.player;
+        globalChatLastDay = day;
     });
 
     if (scrollToBottom) {
