@@ -54,8 +54,6 @@ td a:hover {
 
 #gchatwin {
     width: 100%;
-    /*padding-left: 0.25em;
-    padding-right: 0.25em;*/
 }
 
 #globalChatOutput {
@@ -64,7 +62,8 @@ td a:hover {
 
 @media (min-width: 576px) {
     #globalChatOutput {
-        height: 30em;
+        /*Fill all available space*/
+        height: calc(100vh - 12em);
     }
 }
 

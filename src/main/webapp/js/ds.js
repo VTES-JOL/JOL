@@ -135,7 +135,7 @@ function renderGlobalChat(data) {
         var day = moment(chat.timestamp).tz("UTC").format("D MMMM");
         if (globalChatLastDay != day) {
             var dayBreak = $('<div style="height: .9rem; margin-bottom: .6rem; margin-top: -.3rem; border-bottom: 1px solid #dcc; text-align: center">'
-                + '<span style="font-size: .8rem; background-color: #fff; padding: 0 .5rem; color: #b99">'
+                + '<span style="font-size: .8rem; background-color: #fff; padding: 0 .5rem; color: #b99; font-weight: bold">'
                 + day
                 + '</span>'
                 + '</div>');
@@ -188,7 +188,7 @@ function renderMyGames(games) {
             gameRow.insertCell(1);
         }
         if (games[index].started) {
-            gameRow.cells[0].innerHTML = renderGameLink(games[index].game, true);
+            gameRow.cells[0].innerHTML = renderGameLink(games[index].game);
             gameRow.cells[1].innerHTML = '&nbsp;';
             if (games[index].pinged) {
                 gameRow.cells[1].innerHTML = '!';
@@ -273,7 +273,7 @@ function renderActiveGames(games) {
         row.children().eq(0).html(renderGameLink(game.game));
         row.children().eq(1).html(moment(game.access).tz("UTC").format("D-MMM-YYYY HH:mm z"));
         row.children().eq(2).html(game.turn);
-        row.children().eq(3).html('&nbsp ' + game.available.join(','));
+        row.children().eq(3).html(game.available.join(', '));
         row.children().eq(4).html(game.admin);
     }
 }
@@ -599,6 +599,17 @@ function doSubmit() {
         callback: processData,
         errorHandler: errorhandler
     });
+    return false;
+}
+
+function sendChat(message) {
+    DS.submitForm(
+            game, null, '', message, null, 'No',
+            $("#globalNotes").val(), $("#privateNotes").val(), {
+        callback: processData,
+        errorHandler: errorhandler
+    });
+    $('#quickChatModal').modal('hide');
     return false;
 }
 
@@ -981,6 +992,7 @@ function callbackMain(data) {
     if (data.loggedIn) {
         toggleVisible('player', 'register');
         toggleVisible('globalchat', 'welcome');
+        $("#onlineUsers").show();
         renderOnline('whoson', data.who);
         renderGlobalChat(data.chat);
         renderMyGames(data.myGames);
@@ -994,6 +1006,7 @@ function callbackMain(data) {
     } else {
         toggleVisible('register', 'player');
         toggleVisible('welcome', 'globalchat');
+        $("#onlineUsers").hide();
     }
 }
 
