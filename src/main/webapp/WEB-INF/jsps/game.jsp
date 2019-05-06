@@ -1,3 +1,29 @@
+<div class="modal" id="quickChatModal" tabindex="-1" role="dialog" aria-labelledby="quickChatModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="quickChatModalLabel">Quick Chat</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('No block')">No block</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('Blocked')">Blocked</button>
+        <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('No pre-maneuver')">No pre-maneuver</button>
+        <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('No maneuver')">No maneuver</button>
+        <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('No pre, no maneuver')">No pre, no maneuver</button>
+        <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('Hands for 1')">H1</button>
+        <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('Hands for 2')">H2</button>
+        <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('Hands for 3')">H3</button>
+        <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('No press')">No press</button>
+        <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('Combat ends')">Combat ends</button>
+        <button type="button" class="btn btn-sm btn-outline-success m-1" onclick="sendChat('No sudden/wash')">No sudden/wash</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="game-info" class="border-bottom row no-gutters">
     <div class="col-sm-7">
         <div class="row no-gutters">
@@ -27,7 +53,10 @@
                         </div>
                     </div>
                     <div class="form-group form-row mb-1">
-                        <label for="chat" class="col-4 col-form-label col-form-label-sm">Chat:</label>
+                        <label for="chat" class="col-2 col-form-label col-form-label-sm">Chat:</label>
+                        <div class="col-2" style="text-align:right;padding-right:0">
+                            <button id="quickChatButton" type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#quickChatModal">...</button>
+                        </div>
                         <div class="col-8">
                             <input name="chat" type="text" id="chat" class="form-control form-control-sm" maxlength="100"/>
                         </div>
