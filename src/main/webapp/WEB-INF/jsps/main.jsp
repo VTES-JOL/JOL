@@ -50,13 +50,6 @@
 	</div>
     <div id="globalchat" class="col-sm-6 p-sm-0" style="display: none;">
 		<div>
-			<h4 class="header">
-				Online Users:
-			</h4>
-			<div id="whoson" class="light some-padding"></div>
-		</div>
-
-		<div>
 			<h4 class="header">Global Chat:</h4>
 			<div class="info-area" id="gchatwin">
 				<div id="globalChatOutput" class="scrollable side-padded"></div>
@@ -99,25 +92,33 @@
         </form>
     </div>
     <div class="col-sm-3">
-        <h4 class="header">User Ranks:</h4>
-        <ul class="condensed-list light">
-            <li>
-                <span class="label label-light">Embrace</span>
-                <p>Can make decks, play, chat</p>
-            </li>
-            <li>
-                <span class="label label-dark">Prince</span>
-                <p>Creates games, Invites players, Closes games</p>
-            </li>
-            <li>
-                <span class="label label-light label-bold">Justicar</span>
-                <p>Can chat in games they are not playing to attend to rulings</p>
-            </li>
-            <li>
-                <span class="label label-warning">Inner Circle</span>
-                <p>Administer games for all other Princes</p>
-            </li>
-        </ul>
+		<div id="onlineUsers" style="display:none">
+			<h4 class="header">Online Users:</h4>
+			<div id="whoson" class="light some-padding"></div>
+			<div class="footer">
+				<a data-toggle="collapse" href="#userRanks" aria-expanded="false" aria-controls="userRanks">User Ranks</a>
+				<div id="userRanks" class="collapse">
+					<ul class="condensed-list light">
+						<li>
+							<span class="label label-light">Embrace</span>
+							<p>Can make decks, play, chat</p>
+						</li>
+						<li>
+							<span class="label label-dark">Prince</span>
+							<p>Creates games, Invites players, Closes games</p>
+						</li>
+						<li>
+							<span class="label label-light label-bold">Justicar</span>
+							<p>Can chat in games they are not playing to attend to rulings</p>
+						</li>
+						<li>
+							<span class="label label-warning">Inner Circle</span>
+							<p>Administer games for all other Princes</p>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
         <h4 class="header">Links:</h4>
         <ul class="condensed-list light">
             <li>
