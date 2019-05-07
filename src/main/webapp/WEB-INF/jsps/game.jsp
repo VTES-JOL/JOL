@@ -55,7 +55,7 @@
                     <div class="form-group form-row mb-1">
                         <label for="chat" class="col-2 col-form-label col-form-label-sm">Chat:</label>
                         <div class="col-2" style="text-align:right;padding-right:0">
-                            <button id="quickChatButton" type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#quickChatModal">...</button>
+                            <button id="quickChatButton" type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#quickChatModal" tabindex="-1">...</button>
                         </div>
                         <div class="col-8">
                             <input name="chat" type="text" id="chat" class="form-control form-control-sm" maxlength="100"/>
