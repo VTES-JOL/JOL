@@ -6,25 +6,27 @@ import net.deckserver.dwr.model.PlayerModel;
 public class ProfileBean {
 
     private String email;
-    private boolean receivePing;
-    private boolean receiveSummary;
+    private String discordID;
+    private boolean pingDiscord;
 
     public ProfileBean(AdminBean abean, PlayerModel model) {
         String player = model.getPlayer();
-        this.email = JolAdmin.getInstance().getEmail(player);
-        this.receivePing = JolAdmin.getInstance().receivesPing(player);
-        this.receiveSummary = JolAdmin.getInstance().receivesTurnSummaries(player);
+        JolAdmin jolAdmin = JolAdmin.getInstance();
+        this.email = jolAdmin.getEmail(player);
+        this.discordID = jolAdmin.getDiscordID(player);
+        this.pingDiscord = jolAdmin.receivesDiscordPing(player);
     }
 
     public String getEmail() {
         return email;
     }
 
-    public boolean isReceivePing() {
-        return receivePing;
+    public String getDiscordID() {
+        return discordID;
     }
 
-    public boolean isReceiveSummary() {
-        return receiveSummary;
+    //This name is not natural, but makes for a natural sound in JavaScript
+    public boolean isPingDiscord() {
+        return pingDiscord;
     }
 }

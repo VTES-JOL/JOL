@@ -1142,3 +1142,10 @@ input[type=checkbox] {
 .d:before {
     content: "0";
 }
+
+@media (min-width: 768px) {
+    .max-width-md {
+        margin-left: calc(calc(100vw - 768px) / 2);
+        margin-right: calc(calc(100vw - 768px) / 2);
+    }
+}

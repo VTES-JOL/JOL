@@ -8,6 +8,12 @@ package net.deckserver.dwr.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.mashape.unirest.http.Headers;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.async.Callback;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import net.deckserver.game.jaxb.FileUtils;
 import net.deckserver.game.jaxb.actions.GameActions;
 import net.deckserver.game.jaxb.state.GameState;
@@ -30,6 +36,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.concurrent.Future;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -40,6 +47,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class JolAdmin {
 
     public static final String DECK_NOT_FOUND = "Deck not found";
+    private static final String DISCORD_API_VERSION = System.getenv("DISCORD_API_VERSION");
+    private static final String DISCORD_BOT_TOKEN = System.getenv("DISCORD_BOT_TOKEN");
+    private static final String DISCORD_PING_CHANNEL_ID = System.getenv("DISCORD_PING_CHANNEL_ID");
+
     private static final Logger logger = getLogger(JolAdmin.class);
     private static final JolAdmin INSTANCE = new JolAdmin(System.getProperty("JOL_DATA"));
     private final String dir;
@@ -58,6 +69,7 @@ public class JolAdmin {
         objectMapper.findAndRegisterModules();
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         timestamps = loadTimestamps();
+        Unirest.setTimeouts(5000, 10000);
     }
 
     private Timestamps loadTimestamps() {
@@ -71,6 +83,7 @@ public class JolAdmin {
     public void shutdown() {
         try {
             saveTimestamps();
+            Unirest.shutdown();
         } catch (Exception e) {
             logger.error("Unable to cleanly shutdown", e);
         }
@@ -156,8 +169,8 @@ public class JolAdmin {
         getPlayerInfo(player).setPassword(newPassword);
     }
 
-    public void updateProfile(String player, String email, boolean receivePing, boolean receiveSummary) {
-        getPlayerInfo(player).updateProfile(email, receivePing, receiveSummary);
+    public void updateProfile(String player, String email, String discordID, boolean pingDiscord) {
+        getPlayerInfo(player).updateProfile(email, discordID, pingDiscord);
     }
 
     public boolean authenticate(String player, String password) {
@@ -216,8 +229,38 @@ public class JolAdmin {
         return this.timestamps.isPlayerPinged(player, game);
     }
 
-    public void pingPlayer(String player, String game) {
-        this.timestamps.pingPlayer(player, game);
+    public void pingPlayer(String playerName, String gameName) {
+        this.timestamps.pingPlayer(playerName, gameName);
+
+        //Ping on Discord
+        PlayerInfo player = getPlayerInfo(playerName);
+        if (player != null
+            && player.getDiscordID() != null
+            && player.receivesDiscordPing())
+        {
+            Unirest.post("https://discordapp.com/api/v{api-version}/channels/{channel-id}/messages")
+            .routeParam("api-version", DISCORD_API_VERSION)
+            .routeParam("channel-id", DISCORD_PING_CHANNEL_ID)
+            .header("Content-type", "application/json")
+            .header("Authorization", String.format("Bot %s", DISCORD_BOT_TOKEN))
+            .body(String.format("{\"content\":\"<@!%s> to %s\"}", player.getDiscordID(), gameName))
+            .asStringAsync(new Callback<String>() {
+                public void completed(HttpResponse<String> response) {
+                     int responseCode = response.getStatus();
+                     if (responseCode != 200) {
+                         logger.warn(
+                             "Non-200 response calling Discord ({}); response body: {}",
+                             String.valueOf(responseCode), response.getBody());
+                     }
+                }
+                public void failed(UnirestException e) {
+                    logger.error("Error calling Discord", e);
+                }
+                public void cancelled() {
+                    logger.warn("Discord call was cancelled");
+                }
+            });
+        }
     }
 
     public void clearPing(String player, String game) {
@@ -270,6 +313,14 @@ public class JolAdmin {
 
     public String getEmail(String player) {
         return getPlayerInfo(player).getEmail();
+    }
+
+    public String getDiscordID(String player) {
+        return getPlayerInfo(player).getDiscordID();
+    }
+
+    public boolean receivesDiscordPing(String player) {
+        return getPlayerInfo(player).receivesDiscordPing();
     }
 
     public boolean isAdmin(String player) {
@@ -603,6 +654,9 @@ public class JolAdmin {
 
     class PlayerInfo extends Info {
 
+        final static String DISCORD_ID_KEY = "discordID";
+        final static String PING_DISCORD_KEY = "pingDiscord";
+
         private final String id;
 
         PlayerInfo(String name, String password, String email) {
@@ -790,13 +844,27 @@ public class JolAdmin {
             return "true".equals(info.getProperty("pings", "true"));
         }
 
-        public void updateProfile(String email, boolean receivePing, boolean receiveSummary) {
-            info.setProperty("email", email);
-            info.setProperty("pings", String.valueOf(receivePing));
-            info.setProperty("turns", String.valueOf(receiveSummary));
-            write();
+        String getDiscordID() { return info.getProperty(DISCORD_ID_KEY, null); }
+        boolean receivesDiscordPing() {
+            return "true".equals(info.getProperty(PING_DISCORD_KEY, "false"));
         }
 
+        public void updateProfile(String email, String discordID, boolean pingDiscord) {
+            info.setProperty("email", email);
+
+            if (discordID != null && !"".equals(discordID)) {
+                boolean isNumeric = discordID.chars().allMatch(Character::isDigit);
+                if (!isNumeric)
+                    throw new RuntimeException(
+                        String.format(
+                            "Invalid Discord ID '%s'; must be numeric",
+                            discordID));
+            }
+
+            info.setProperty(DISCORD_ID_KEY, discordID);
+            info.setProperty(PING_DISCORD_KEY, String.valueOf(pingDiscord));
+            write();
+        }
     }
 
     private class SystemInfo extends Info {
