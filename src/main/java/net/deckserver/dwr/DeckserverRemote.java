@@ -271,9 +271,9 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-    public Map<String, Object> updateProfile(String email, boolean receivePing, boolean receiveSummary) {
+    public Map<String, Object> updateProfile(String email, String discordID, boolean pingDiscord) {
         String player = Utils.getPlayer(request);
-        JolAdmin.getInstance().updateProfile(player, email, receivePing, receiveSummary);
+        JolAdmin.getInstance().updateProfile(player, email, discordID, pingDiscord);
         return UpdateFactory.getUpdate();
     }
 

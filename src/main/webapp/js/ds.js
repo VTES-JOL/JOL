@@ -8,8 +8,9 @@ var USER_TIMEZONE = moment.tz.guess();
 
 var profile = {
     email: "",
-    receivePing: "",
-    receiveSummary: ""
+    discordID: "",
+    pingDiscord: false,
+    updating: false
 };
 
 function errorhandler(errorString, exception) {
@@ -885,30 +886,43 @@ function callbackSuper(data) {
 }
 
 function callbackProfile(data) {
-    if (profile.email !== data.email) {
-        dwr.util.setValue("profileEmail", data.email);
-    }
-
-    if (profile.receivePing !== data.receivePing) {
-        dwr.util.setValue("profilePing", data.receivePing);
-    }
-
-    if (profile.receiveSummary !== data.receiveSummary) {
-        dwr.util.setValue("profileTurnSummary", data.receiveSummary);
+    if (profile.email !== data.email)
+        $('#profileEmail').val(data.email);
+    if (profile.discordID !== data.discordID)
+        $('#discordID').val(data.discordID);
+    if (profile.pingDiscord !== data.pingDiscord)
+        $('#pingDiscord').prop('checked', data.pingDiscord);
+    if (profile.updating) {
+        var result = $('#profileUpdateResult');
+        result.text('Done!');
+        result.stop(true);
+        result.css('opacity', 1);
+        result.css('color', 'green');
+        result.fadeTo(2000, 0);
     }
 
     profile = data;
+    profile.updating = false;
 
-    dwr.util.setValue("profilePasswordError", "");
-    dwr.util.setValue("profileNewPassword", "");
-    dwr.util.setValue("profileConfirmPassword", "");
+    $('#profilePasswordError').val('');
+    $('#profileNewPassword').val('');
+    $('#profileConfirmPassword').val('');
+}
+
+function updateProfileErrorHandler(errorString, exception) {
+    var result = $('#profileUpdateResult');
+    result.text('An error occurred');
+    result.stop(true);
+    result.css('opacity', 1);
+    result.css('color', 'red');
 }
 
 function updateProfile() {
-    var newEmail = dwr.util.getValue("profileEmail");
-    var newPing = dwr.util.getValue("profilePing");
-    var newSummary = dwr.util.getValue("profileTurnSummary");
-    DS.updateProfile(newEmail, newPing, newSummary, {callback: processData, errorHandler: errorhandler});
+    profile.updating = true;
+    var email = $('#profileEmail').val();
+    var discordID = $('#discordID').val();
+    var pingDiscord = $('#pingDiscord').prop('checked');
+    DS.updateProfile(email, discordID, pingDiscord, {callback: processData, errorHandler: updateProfileErrorHandler});
 }
 
 function updatePassword() {
