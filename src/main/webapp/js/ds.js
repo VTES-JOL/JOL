@@ -1013,6 +1013,8 @@ function callbackMain(data) {
         removeLabeledRows('ownGames', data.removedGames);
         removeLabeledRows('activeGames', data.removedGames);
         renderMessage(data.message);
+        //TODO how can I inject this into data.message?
+        renderMessage('Players can now receive pings on their phones via Discord push notifications!  Visit the Profile page to learn more.');
         if (data.refresh > 0) {
             if (refresher) clearTimeout(refresher);
             refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", data.refresh);
