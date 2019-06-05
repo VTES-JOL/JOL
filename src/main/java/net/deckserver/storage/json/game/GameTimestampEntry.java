@@ -18,7 +18,6 @@ public class GameTimestampEntry {
         return this.playerTimestamps.getOrDefault(player, OffsetDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC));
     }
 
-
     public void recordPlayerAccess(String player) {
         this.playerTimestamps.put(player, OffsetDateTime.now());
     }
