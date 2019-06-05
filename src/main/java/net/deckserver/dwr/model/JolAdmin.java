@@ -229,7 +229,15 @@ public class JolAdmin {
         return this.timestamps.isPlayerPinged(player, game);
     }
 
-    public void pingPlayer(String playerName, String gameName) {
+    /**
+     * @return  true if player was pinged; false if player was already pinged
+     */
+    public boolean pingPlayer(String playerName, String gameName) {
+        if (isPlayerPinged(playerName, gameName)) {
+            logger.debug("{} already pinged for {}; not pinging again", playerName, gameName);
+            return false;
+        }
+
         this.timestamps.pingPlayer(playerName, gameName);
 
         //Ping on Discord
@@ -261,6 +269,7 @@ public class JolAdmin {
                 }
             });
         }
+        return true;
     }
 
     public void clearPing(String player, String game) {
