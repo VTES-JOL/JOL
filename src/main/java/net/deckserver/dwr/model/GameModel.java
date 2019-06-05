@@ -77,9 +77,11 @@ public class GameModel implements Comparable {
             boolean turnChanged = false;
             int idx = game.getActions(game.getCurrentTurn()).length;
             if (ping != null) {
-                admin.pingPlayer(ping, name);
-                pingChanged = true;
-                status.append("Ping sent to " + ping);
+                if (admin.pingPlayer(ping, name)) {
+                    pingChanged = true;
+                    status.append("Ping sent to " + ping);
+                }
+                else status.append("Player is already pinged");
             }
             if (phase != null &&
                     game.getActivePlayer().equals(player)
