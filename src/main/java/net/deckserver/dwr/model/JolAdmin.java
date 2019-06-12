@@ -230,7 +230,7 @@ public class JolAdmin {
     }
 
     /**
-     * @return  true if player was pinged; false if player was already pinged
+     * Returns true if player was pinged; false if player was already pinged.
      */
     public boolean pingPlayer(String playerName, String gameName) {
         if (isPlayerPinged(playerName, gameName)) {
