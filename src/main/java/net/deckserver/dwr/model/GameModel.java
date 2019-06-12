@@ -80,6 +80,7 @@ public class GameModel implements Comparable {
                 if (admin.pingPlayer(ping, name)) {
                     pingChanged = true;
                     status.append("Ping sent to " + ping);
+                    AdminBean.INSTANCE.notifyAboutGame(ping, name);
                 }
                 else status.append("Player is already pinged");
             }

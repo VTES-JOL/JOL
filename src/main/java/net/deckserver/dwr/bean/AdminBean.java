@@ -123,17 +123,31 @@ public class AdminBean {
                 .forEach(playerModel -> playerModel.chat(chatEntryBean));
     }
 
+    /**
+     * Notify all players of a change to the named game.
+     */
     public void notifyAboutGame(String name) {
         notifyAboutGame(name, false);
     }
 
+    /**
+     * Notify a player of a change to the named game.
+     */
+    public void notifyAboutGame(String playerName, String gameName) {
+        notifyAboutGame(getPlayerModel(playerName), gameName, false);
+    }
+
     private void notifyAboutGame(String name, boolean removed) {
-        for (PlayerModel model : pmap.values()) {
-            if (removed) {
-                model.removeGame(name);
-            } else {
-                model.changeGame(name);
-            }
+        for (PlayerModel player : pmap.values()) {
+            notifyAboutGame(player, name, removed);
+        }
+    }
+
+    private void notifyAboutGame(PlayerModel player, String gameName, boolean removed) {
+        if (removed) {
+            player.removeGame(gameName);
+        } else {
+            player.changeGame(gameName);
         }
     }
 
