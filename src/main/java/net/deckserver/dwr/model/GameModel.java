@@ -92,8 +92,8 @@ public class GameModel implements Comparable {
             if (global != null) {
                 if (global.length() > 800)
                     global = global.substring(0, 799);
-                if (game.setGlobalText(global))
-                    globalChanged = true;
+                game.setGlobalText(global);
+                globalChanged = true;
             }
             if (text != null) {
                 if (text.length() > 800)
@@ -116,7 +116,8 @@ public class GameModel implements Comparable {
                     stateChanged = true;
                 }
                 if (chat != null) {
-                    status.append(commander.doMessage(player, chat));
+                    status.append(commander.doMessage(player,
+                            chat));
                     chat = null;
                     chatChanged = true;
                 }
@@ -131,7 +132,7 @@ public class GameModel implements Comparable {
                 regen();
             }
             addChats(idx);
-            if (stateChanged || phaseChanged || chatChanged || globalChanged) {
+            if (stateChanged || phaseChanged || chatChanged || pingChanged || globalChanged) {
                 admin.saveGame(game);
             }
             doReload(stateChanged, phaseChanged, pingChanged, globalChanged, turnChanged);
