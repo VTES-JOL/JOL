@@ -402,14 +402,9 @@ public class JolGame {
         return note.getValue();
     }
 
-    /**
-     * Returns true if global text changed.
-     */
-    public boolean setGlobalText(String text) {
+    public void setGlobalText(String text) {
         Notation note = getNote(state, TEXT, true);
-        if (text != null && text.equals(note.getValue())) return false;
         note.setValue(text);
-        return true;
     }
 
     public String getPlayerText(String player) {
