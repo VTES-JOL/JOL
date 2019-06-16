@@ -911,13 +911,13 @@ input[type=checkbox] {
     content: 'H';
 }
 
-.vic:before {
+.vis:before {
     content: 'i';
     position: relative;
     top: 2px;
 }
 
-.VIC:before {
+.VIS:before {
     content: 'I';
 }
 
@@ -1041,13 +1041,13 @@ input[type=checkbox] {
     content: 'U';
 }
 
-.vis:before {
+.vic:before {
     content: 'v';
     position: relative;
     top: 2px;
 }
 
-.VIS:before {
+.VIC:before {
     content: 'V';
 }
 
