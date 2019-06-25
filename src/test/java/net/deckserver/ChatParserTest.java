@@ -46,6 +46,6 @@ public class ChatParserTest {
         test = "Name: Acrobatics<br/>Cardtype: Combat<br/>Cost: 1 blood<br/>Discipline: Celerity<br/>[cel] Additional strike.\\n[CEL] Strike: dodge, with an additional strike.";
         modified = ChatParser.parseText(test);
 
-        assertEquals("Name: Acrobatics<br/>Cardtype: Combat<br/>Cost: 1 blood<br/>Discipline: Celerity<br/>[cel] Additional strike.\\n[CEL] Strike: dodge, with an additional strike.", modified);
+        assertEquals("Name: Acrobatics<br />Cardtype: Combat<br />Cost: 1 blood<br />Discipline: Celerity<br /><span class='discipline cel'></span> Additional strike.\\n<span class='discipline CEL'></span> Strike: dodge, with an additional strike.", modified);
     }
 }
