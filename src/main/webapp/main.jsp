@@ -16,7 +16,7 @@
         <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery-ui.structure.min.css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery-ui.theme.min.css"/>
-        <link rel="stylesheet" href="https://unpkg.com/tippy.js@4/themes/light.css"/>
+        <link rel="stylesheet" type="text/css" href="css/light.css"/>
         <link rel="shortcut icon" href="images/favicon.ico" />
         <link href="https://fonts.googleapis.com/css?family=IM+Fell+English" rel="stylesheet">
     </head>
