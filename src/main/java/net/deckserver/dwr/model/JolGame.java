@@ -8,14 +8,19 @@ package net.deckserver.dwr.model;
 
 import com.google.common.base.Strings;
 import net.deckserver.Utils;
+import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.game.interfaces.state.*;
 import net.deckserver.game.interfaces.turn.GameAction;
 import net.deckserver.game.jaxb.state.Notation;
+import net.deckserver.game.json.deck.CardSummary;
 import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.cards.Deck;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
+import net.deckserver.rest.ApiResource;
+import org.owasp.html.Sanitizers;
+import org.slf4j.Logger;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -180,7 +185,7 @@ public class JolGame {
         dest.addCard(card, false);
     }
 
-    public void playCard(String player, String cardId, String destPlayer, String destRegion) {
+    public void playCard(String player, String cardId, String destPlayer, String destRegion, String[] modes) {
         Card card = state.getCard(cardId);
         if (card == null) throw new IllegalArgumentException("No such card");
         CardContainer source = card.getParent();
@@ -191,10 +196,19 @@ public class JolGame {
             destMessage = String.format(" to %s's %s", destPlayer, destRegion);
         else if (!destRegion.equals(JolGame.ASHHEAP))
             destMessage = String.format(" to %s", destRegion);
+
+        String modeMessage = "";
+        if (modes != null) {
+            for (String mode: modes)
+                modeMessage += ChatParser.generateDisciplineLink(mode);
+            modeMessage = " at " + modeMessage;
+        }
+
         String message = String.format(
-                "%s plays %s%s",
+                "%s plays %s%s%s",
                 player,
                 getCardName(card, destRegion),
+                modeMessage,
                 destMessage);
         addCommand(message, new String[]{"move", cardId, destPlayer, destRegion, "bottom"});
         source.removeCard(card);

@@ -132,11 +132,18 @@ public class DoCommand {
                 return edge + " grabs the edge";
             }
             if (cmd.equalsIgnoreCase("play")) {
-                // play [vamp] <cardnumber> [<targetplayer>] [<targetregion>] [<targetcard>] [draw]
+                // TODO unsure about introducing a non-English word "@" here
+                // play [vamp] <cardnumber> [@ <modes>] [<targetplayer>] [<targetregion>] [<targetcard>] [draw]
                 boolean crypt = cmdObj.consumeString("vamp");
                 String srcRegion = crypt ? JolGame.INACTIVE_REGION : JolGame.HAND;
                 boolean docap = srcRegion.equals(JolGame.INACTIVE_REGION);
                 String srcCard = cmdObj.getCard(false, player, srcRegion);
+
+                String[] modes = null;
+                boolean modeSpecified = cmdObj.consumeString("@");
+                if (modeSpecified)
+                    modes = cmdObj.nextArg().split(",");
+
                 String targetPlayer = cmdObj.getPlayer(player);
                 String targetRegion = cmdObj.getRegion(crypt ? JolGame.READY_REGION : JolGame.ASHHEAP);
                 String targetCard = cmdObj.getCard(true, targetPlayer, targetRegion);
@@ -146,7 +153,7 @@ public class DoCommand {
                     if (draw) game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
                     return "Put a card on another card";
                 } else {
-                    game.playCard(player, srcCard, targetPlayer, targetRegion);
+                    game.playCard(player, srcCard, targetPlayer, targetRegion, modes);
                     if (docap) {
                         int curcap = game.getCapacity(srcCard);
                         if (curcap <= 0) {

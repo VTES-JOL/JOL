@@ -24,6 +24,151 @@
   </div>
 </div>
 
+<div class="modal" id="cardModal" tabindex="-1" role="dialog" aria-labelledby="cardModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content loading" style="height:50vh;text-align:center">
+      <h2 style="position:relative;top:43%">Loading...</h2>
+    </div>
+    <div class="modal-content loaded" style="text-align:center">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cardModalLabel">
+          <span class="card-type action" style="font-size:2em;vertical-align:sub"></span>
+          <span class="card-name">Song of Serenity</span>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="preamble mb-2">
+          Only usable before range is chosen.
+        </p>
+        <div class="card-modes">
+        </div>
+        <div class="templates d-none">
+          <button type="button" class="card-mode btn btn-block btn-outline-dark mb-2" style="white-space:normal" aria-pressed="false" data-toggle="button">
+            <span class="discipline"></span>
+            <p class="mode-text">The opposing minion gets -1 strength this round. A vampire may play only one Song of Serenity each combat.</span>
+          </button>
+        </div>
+        <hr/>
+        <button id="cardModalPlay" type="button"
+                class="btn btn-block btn-primary mb-2" style="white-space:normal"
+                onclick="playCard(event);">Play</button>
+        <!--hr/>
+        <button type="button" class="btn btn-outline-danger mb-1">Discard</button>
+        <input type="checkbox" checked="checked">Replace</input-->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+var DISCIPLINE_CHARS = { //TODO duplication from css bad
+  ani: 'a', ANI: 'A', obe: 'b', OBE: 'B', cel: 'c', CEL: 'C',
+  dom: 'd', DOM: 'D', dem: 'e', DEM: 'E', for: 'f', FOR: 'F',
+  san: 'g', SAN: 'G', thn: 'h', THN: 'H', vic: 'i', VIC: 'I',
+  pro: 'j', PRO: 'J', chi: 'k', CHI: 'K', val: 'l', VAL: 'L',
+  mel: 'm', MEL: 'M', nec: 'n', NEC: 'N', obf: 'o', OBF: 'O',
+  pot: 'p', POT: 'P', qui: 'q', QUI: 'Q', pre: 'r', PRE: 'R',
+  ser: 's', SER: 'S', tha: 't', THA: 'T', aus: 'u', AUS: 'U',
+  vis: 'v', VIS: 'V', abo: 'w', ABO: 'W', myt: 'x', MYT: 'X',
+  dai: 'y', DAI: 'Y', spi: 'z', SPI: 'Z', obt: '*', OBT: '+',
+  tem: '(', TEM: ')', str: ':', STR: ',', mal: '<', MAL: '>',
+  flight: '='
+};
+function cardTypeCSSClass(cardType) {
+  return cardType.toLowerCase().replace(' ', '_').replace('/', ' ');
+}
+function showCardModal(event) {
+  console.log(event);
+  $('#cardModal .loaded').hide();
+  $('#cardModal .loading').show();
+  //Show modal immediately with Loading text
+  //$('#cardModal').modal('show');
+  var cardId = $(event.target).data('card-id');
+  var handIndex = $(event.target).data('index');
+  $.get({
+      //url: "rest/api/cards/au32", success: function(card) { //Guardian Vigil
+      //url: "rest/api/cards/bl61", success: function(card) { //Elemental Stoicism
+      url: "rest/api/cards/" + cardId, success: function(card) {
+        console.log(card);
+        var modal = $('#cardModal');
+        modal.data('hand-index', handIndex);
+        modal.data('do-not-replace', card.doNotReplace);
+
+        $('#cardModal .card-name').text(card.displayName);
+        $('#cardModal .card-type')
+          .removeClass()
+          .addClass('card-type ' + cardTypeCSSClass(card.type));
+        $('#cardModal .preamble').text(card.preamble);
+
+        var modeContainer = $('#cardModal .card-modes');
+        modeContainer.empty();
+
+        if (card.modes && card.modes.length > 0) {
+          var modeTemplate = $('#cardModal .templates .card-mode');
+          for (var i = 0; i < card.modes.length; ++i) {
+            var mode = card.modes[i];
+            var button = modeTemplate.clone();
+
+            if (card.multiMode) {
+              //button.data('toggle', 'button');
+            }
+            else button.on('click', playCard);
+
+            button.data('disciplines', mode.disciplines);
+            var disciplineStr = '';
+            if (mode.disciplines != null) {
+              for (var d of mode.disciplines)
+                disciplineStr += DISCIPLINE_CHARS[d];
+            }
+            button.children('.discipline').text(disciplineStr);
+            button.children('.mode-text').text(mode.text);
+            button.appendTo(modeContainer);
+          }
+        }
+        $('#cardModal .loading').hide();
+        $('#cardModal .loaded').show();
+        $('#cardModal').modal('show');
+      }
+  });
+}
+function playCardCommand(disciplines) {
+  var modal = $('#cardModal');
+  var handIndex1 = modal.data('hand-index') + 1;
+  var doNotReplace = modal.data('do-not-replace');
+  return 'play ' + handIndex1
+         + (disciplines ? ' @ ' + disciplines.join(',') : '')
+         + (doNotReplace ? '' : ' draw');
+}
+function playCard(event) {
+  console.log(event);
+  var button = $(event.target).closest('button'); //target might be inner p
+  console.log(button);
+
+  var disciplines = [];
+  if (button.attr('id') == 'cardModalPlay') { //Multi-mode cards
+    $('#cardModal .card-modes button.active')
+      .each(function() { disciplines = disciplines.concat($(this).data('disciplines')); });
+  }
+  else { //Single-mode cards
+    disciplines = button.data('disciplines');
+  }
+
+  var command = playCardCommand(disciplines);
+  console.log(command);
+  DS.submitForm(
+      game, null, command, '', null, 'No',
+      $("#globalNotes").val(), $("#privateNotes").val(), {
+    callback: processData,
+    errorHandler: errorhandler
+  });
+  $('#cardModal').modal('hide');
+  return false;
+}
+</script>
+
 <div id="game-info" class="border-bottom row no-gutters">
     <div class="col-sm-7">
         <div class="row no-gutters">

@@ -2,9 +2,11 @@ package net.deckserver.game.storage.cards.importer;
 
 import lombok.extern.slf4j.Slf4j;
 import net.deckserver.game.storage.cards.LibraryCard;
+import net.deckserver.game.storage.cards.LibraryCardMode;
 
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -62,8 +64,38 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         Utils.getClean(lineData[FIELD_TEXT]).ifPresent(card::setText);
         Utils.getClean(lineData[FIELD_BANNED]).map(banned -> !banned.isEmpty()).ifPresent(card::setBanned);
 
-        Arrays.stream(card.getText().split("\n")).findFirst().map(String::toLowerCase).filter(line -> line.contains("unique")).ifPresent(s -> card.setUnique(true));
+        List<String> lines = new ArrayList(Arrays.asList(card.getText().split("\n")));
+        String preamble = null;
+        if (lines.size() == 1 || lines.get(0).startsWith("[")) { } //No preamble
+        else {
+            preamble = lines.remove(0);
+            card.setPreamble(preamble);
 
+            // Preamble checks
+            String p = preamble.toLowerCase();
+            if (p.contains("unique")) card.setUnique(true);
+            if (p.contains("do not replace")) card.setDoNotReplace(true);
+            if (p.contains("more than one discipline can be used when playing this card")) card.setMultiMode(true);
+        }
+        setModes(card, lines);
         return card;
+    }
+    void setModes(LibraryCard card, List<String> lines) {
+        List<LibraryCardMode> modes = new ArrayList(lines.size());
+        for (String line: lines) {
+            LibraryCardMode mode = new LibraryCardMode();
+            if (line.startsWith("[")) {
+                String[] disciplinesAndText = line.split(" ", 2);
+                List<String> disciplines = Arrays
+                    .stream(disciplinesAndText[0].split("[\\[\\]]+"))
+                    .filter(d -> !d.equals(""))
+                    .collect(Collectors.toList());
+                mode.setDisciplines(disciplines);
+                mode.setText(disciplinesAndText[1]);
+            }
+            else mode.setText(line);
+            modes.add(mode);
+        }
+        card.setModes(modes);
     }
 }
