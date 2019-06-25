@@ -42,5 +42,10 @@ public class ChatParserTest {
         modified = ChatParser.parseText(test);
 
         assertEquals("A link to <a class='card-name' title='jy74'>Cats' Guidance</a>", modified);
+
+        test = "Name: Acrobatics<br/>Cardtype: Combat<br/>Cost: 1 blood<br/>Discipline: Celerity<br/>[cel] Additional strike.\\n[CEL] Strike: dodge, with an additional strike.";
+        modified = ChatParser.parseText(test);
+
+        assertEquals("Name: Acrobatics<br/>Cardtype: Combat<br/>Cost: 1 blood<br/>Discipline: Celerity<br/>[cel] Additional strike.\\n[CEL] Strike: dodge, with an additional strike.", modified);
     }
 }
