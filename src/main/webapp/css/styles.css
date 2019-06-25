@@ -1149,3 +1149,44 @@ input[type=checkbox] {
         margin-right: calc(calc(100vw - 768px) / 2);
     }
 }
+
+.card-type:before { font-family: 'jol'; }
+.action:before { content: 'p'; }
+.master:before { content: 'x'; }
+.political_action:before { content: 'r'; }
+.combat:before { content: 't'; }
+.reaction:before { content: 'v'; }
+.action_modifier:before { content: 'q'; }
+.ally:before { content: 's'; }
+.retainer:before { content: 'w'; }
+.equipment:before { content: 'u'; }
+.action_modifier.reaction:before { content: 'qv'; }
+.action_modifier.combat:before { content: "qt"; }
+.combat.reaction:before { content: "tv"; }
+.action.reaction:before { content: "pv"; } 
+.action.combat:before { content: "pt"; } 
+.event:before { content: "{"; }
+
+#cardModal .discipline {
+    float: left;
+    font-family: 'disciplines';
+    font-size: 2.5em;
+    line-height: 1.1em;
+    padding-right: .25em;
+}
+
+#cardModal .mode-text {
+    margin-bottom: 0;
+    text-align: left;
+}
+
+/*Disable the standard hover behavior of bootstrap buttons.  On touch screens
+  like mobile phones, it's more intuitive to show the dramatic change in style
+  once the button is pressed, so save it for that.*/
+#cardModal .card-modes button:hover:not(.active) {
+  color: #343a40;
+  /*background-color: transparent;*/
+  background-color: #cdccdc;
+  background-image: none;
+  border-color: #343a40;
+}

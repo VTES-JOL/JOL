@@ -1,12 +1,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page import="net.deckserver.dwr.jsp.CardParams" %>
-<%@page import="net.deckserver.dwr.model.JolGame" %>
-<%@page import="net.deckserver.game.interfaces.state.Card" %>
+<%@ page import="net.deckserver.dwr.jsp.CardParams" %>
+<%@ page import="net.deckserver.dwr.model.JolGame" %>
+<%@ page import="net.deckserver.game.interfaces.state.Card" %>
 <%@ page import="net.deckserver.game.storage.cards.CardEntry" %>
 <%@ page import="java.util.List" %>
 <%
     CardParams p = (CardParams) request.getAttribute("cparams");
     JolGame game = (JolGame) request.getAttribute("game");
+    int index = (Integer)request.getAttribute("index");
     Card c = p.getCard();
     int capacity = game.getCapacity(c.getId());
     int counters = game.getCounters(c.getId());
@@ -43,8 +44,8 @@
     XXXXXX
 </c:if>
 <c:if test="${!p.hidden}">
-    <a class="card-name <%= typeClass %>" title="<%= p.getId() %>"><%= p.getName() %>
-    </a>
+    <a class="card-name <%= typeClass %>" title="<%= p.getId() %>" data-card-id="<%= p.getId() %>"
+       data-index="<%= index %>" onclick="showCardModal(event)"><%= p.getName() %></a>
 </c:if>
 <c:if test="${game != null}">
     <c:if test="${capacity > 0 && !p.hidden}">

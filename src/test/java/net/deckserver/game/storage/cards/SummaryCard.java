@@ -28,6 +28,11 @@ public class SummaryCard {
     private String group;
     private String sect;
 
+    private String preamble;
+    private List<LibraryCardMode> modes;
+    private boolean doNotReplace;
+    private boolean multiMode;
+
     private SummaryCard() {
 
     }
@@ -72,6 +77,11 @@ public class SummaryCard {
         this.type = String.join("/", libraryCard.getType());
         this.crypt = false;
         this.unique = libraryCard.isUnique();
+
+        this.preamble = libraryCard.getPreamble();
+        this.modes = libraryCard.getModes();
+        this.doNotReplace = libraryCard.isDoNotReplace();
+        this.multiMode = libraryCard.isMultiMode();
 
         List<String> cardLines = new ArrayList<>();
         Optional.ofNullable(libraryCard.getName()).ifPresent(name -> cardLines.add("Name: " + name));

@@ -59,7 +59,7 @@ public class ChatParser {
         return "<a class='card-name' title='" + card.getCardId() + "'>" + card.getName() + "</a>";
     }
 
-    private static String generateDisciplineLink(String discipline) {
+    public static String generateDisciplineLink(String discipline) {
         return "<span class='discipline " + discipline + "'></span>";
     }
 
