@@ -55,7 +55,9 @@ public class SummaryCard {
         Optional.ofNullable(cryptCard.getAdvanced()).ifPresent(advanced -> cardLines.add("Level: Advanced"));
         Optional.ofNullable(cryptCard.getGroup()).ifPresent(group -> cardLines.add("Group: " + group));
         Optional.ofNullable(cryptCard.getCapacity()).ifPresent(capacity -> cardLines.add("Capacity: " + capacity));
-        Optional.ofNullable(cryptCard.getDisciplines()).ifPresent(disciplines -> cardLines.add(disciplinesLabel + disciplines.stream().collect(Collectors.joining(" "))));
+        Optional.ofNullable(cryptCard.getDisciplines())
+                .map(disciplines -> disciplines.stream().map(s -> "[" + s + "]").collect(Collectors.joining(" ")))
+                .ifPresent(disciplines -> cardLines.add(disciplinesLabel + disciplines));
         Optional.ofNullable(cryptCard.getText()).ifPresent(cardLines::add);
         this.text = String.join("\n", cardLines);
         this.htmlText = String.join("<br/>", cardLines);

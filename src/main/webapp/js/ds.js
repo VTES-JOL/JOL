@@ -753,6 +753,8 @@ function generateCardData(parent) {
     tippy(parent + ' a.card-name', {
         animateFill: false,
         hideOnClick: false,
+        interactive: true,
+        theme: 'light',
         onShow: function (instance) {
             var content = this.querySelector('.tippy-content');
             content.innerHTML = "Loading...";
