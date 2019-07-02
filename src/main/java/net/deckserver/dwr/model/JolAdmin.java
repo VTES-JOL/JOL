@@ -8,9 +8,7 @@ package net.deckserver.dwr.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.mashape.unirest.http.Headers;
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.async.Callback;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -36,7 +34,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.concurrent.Future;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -184,8 +181,12 @@ public class JolAdmin {
         String deckKey = player.getDeckKey(deckName);
         String deckContents = player.getDeck(deckKey);
         GameInfo game = getGameInfo(gameName);
-        if (!game.isOpen() || game.getRegisteredPlayerCount() == 5)
+        List<String> currentPlayers = Arrays.asList(game.getPlayers());
+        if (!game.isOpen()) {
             return false;
+        } else if (game.getRegisteredPlayerCount() == 5 && !currentPlayers.contains(playerName)) {
+            return false;
+        }
         game.addPlayer(playerName, deckKey, deckContents);
         player.addGame(gameName, deckKey);
         return true;
@@ -230,7 +231,7 @@ public class JolAdmin {
     }
 
     /**
-     * @return  true if player was pinged; false if player was already pinged
+     * @return true if player was pinged; false if player was already pinged
      */
     public boolean pingPlayer(String playerName, String gameName) {
         if (isPlayerPinged(playerName, gameName)) {
@@ -243,31 +244,32 @@ public class JolAdmin {
         //Ping on Discord
         PlayerInfo player = getPlayerInfo(playerName);
         if (player != null
-            && player.getDiscordID() != null
-            && player.receivesDiscordPing())
-        {
+                && player.getDiscordID() != null
+                && player.receivesDiscordPing()) {
             Unirest.post("https://discordapp.com/api/v{api-version}/channels/{channel-id}/messages")
-            .routeParam("api-version", DISCORD_API_VERSION)
-            .routeParam("channel-id", DISCORD_PING_CHANNEL_ID)
-            .header("Content-type", "application/json")
-            .header("Authorization", String.format("Bot %s", DISCORD_BOT_TOKEN))
-            .body(String.format("{\"content\":\"<@!%s> to %s\"}", player.getDiscordID(), gameName))
-            .asStringAsync(new Callback<String>() {
-                public void completed(HttpResponse<String> response) {
-                     int responseCode = response.getStatus();
-                     if (responseCode != 200) {
-                         logger.warn(
-                             "Non-200 response calling Discord ({}); response body: {}",
-                             String.valueOf(responseCode), response.getBody());
-                     }
-                }
-                public void failed(UnirestException e) {
-                    logger.error("Error calling Discord", e);
-                }
-                public void cancelled() {
-                    logger.warn("Discord call was cancelled");
-                }
-            });
+                    .routeParam("api-version", DISCORD_API_VERSION)
+                    .routeParam("channel-id", DISCORD_PING_CHANNEL_ID)
+                    .header("Content-type", "application/json")
+                    .header("Authorization", String.format("Bot %s", DISCORD_BOT_TOKEN))
+                    .body(String.format("{\"content\":\"<@!%s> to %s\"}", player.getDiscordID(), gameName))
+                    .asStringAsync(new Callback<String>() {
+                        public void completed(HttpResponse<String> response) {
+                            int responseCode = response.getStatus();
+                            if (responseCode != 200) {
+                                logger.warn(
+                                        "Non-200 response calling Discord ({}); response body: {}",
+                                        String.valueOf(responseCode), response.getBody());
+                            }
+                        }
+
+                        public void failed(UnirestException e) {
+                            logger.error("Error calling Discord", e);
+                        }
+
+                        public void cancelled() {
+                            logger.warn("Discord call was cancelled");
+                        }
+                    });
         }
         return true;
     }
@@ -853,7 +855,10 @@ public class JolAdmin {
             return "true".equals(info.getProperty("pings", "true"));
         }
 
-        String getDiscordID() { return info.getProperty(DISCORD_ID_KEY, null); }
+        String getDiscordID() {
+            return info.getProperty(DISCORD_ID_KEY, null);
+        }
+
         boolean receivesDiscordPing() {
             return "true".equals(info.getProperty(PING_DISCORD_KEY, "false"));
         }
@@ -865,9 +870,9 @@ public class JolAdmin {
                 boolean isNumeric = discordID.chars().allMatch(Character::isDigit);
                 if (!isNumeric)
                     throw new RuntimeException(
-                        String.format(
-                            "Invalid Discord ID '%s'; must be numeric",
-                            discordID));
+                            String.format(
+                                    "Invalid Discord ID '%s'; must be numeric",
+                                    discordID));
             }
 
             info.setProperty(DISCORD_ID_KEY, discordID);
