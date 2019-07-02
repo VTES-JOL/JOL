@@ -46,18 +46,20 @@
         <div class="card-modes">
         </div>
         <div class="templates d-none">
-          <button type="button" class="card-mode btn btn-block btn-outline-dark mb-2" style="white-space:normal" aria-pressed="false" data-toggle="button">
+          <button type="button" class="card-mode btn btn-block btn-outline-dark mb-2" aria-pressed="false" data-toggle="button">
             <span class="discipline"></span>
             <p class="mode-text">The opposing minion gets -1 strength this round. A vampire may play only one Song of Serenity each combat.</span>
           </button>
         </div>
-        <hr/>
-        <button id="cardModalPlay" type="button"
-                class="btn btn-block btn-primary mb-2" style="white-space:normal"
-                onclick="playCard(event);">Play</button>
-        <!--hr/>
-        <button type="button" class="btn btn-outline-danger mb-1">Discard</button>
-        <input type="checkbox" checked="checked">Replace</input-->
+        <div class="play-button" style="display:none">
+          <hr/>
+          <button id="cardModalPlay" type="button"
+                  class="btn btn-block btn-primary mb-2" style="white-space:normal"
+                  onclick="playCard(event);">Play</button>
+          <!--hr/>
+          <button type="button" class="btn btn-outline-danger mb-1">Discard</button>
+          <input type="checkbox" checked="checked">Replace</input-->
+        </div>
       </div>
     </div>
   </div>
@@ -113,9 +115,12 @@ function showCardModal(event) {
             var button = modeTemplate.clone();
 
             if (card.multiMode) {
-              //button.data('toggle', 'button');
+              $('#cardModal .play-button').show();
             }
-            else button.on('click', playCard);
+            else {
+              $('#cardModal .play-button').hide();
+              button.on('click', playCard);
+            }
 
             button.data('disciplines', mode.disciplines);
             var disciplineStr = '';
@@ -130,6 +135,7 @@ function showCardModal(event) {
         }
         $('#cardModal .loading').hide();
         $('#cardModal .loaded').show();
+        //tippy.hideAll({ duration: 0 });
         $('#cardModal').modal('show');
       }
   });
