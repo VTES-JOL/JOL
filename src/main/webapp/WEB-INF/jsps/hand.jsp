@@ -7,5 +7,6 @@
     <li>
         <jsp:include page="card.jsp"/>
     </li>
-    <% } %>
+    <% }
+        request.removeAttribute("index"); %>
 </ol>
