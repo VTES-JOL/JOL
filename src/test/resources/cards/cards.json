@@ -18209,11 +18209,8 @@
   "names" : [ "Illegalism" ],
   "crypt" : false,
   "unique" : false,
-  "preamble" : "Requires an anarch. More than one discipline can be used when playing this card. ",
+  "preamble" : "Requires an anarch. More than one discipline can be used when playing this card. \n(D) Bleed.",
   "modes" : [ {
-    "disciplines" : null,
-    "text" : "(D) Bleed."
-  }, {
     "disciplines" : [ "cel" ],
     "text" : "Unlock this anarch if the bleed is successful."
   }, {
@@ -21910,11 +21907,8 @@
   "names" : [ "Make the Misere" ],
   "crypt" : false,
   "unique" : false,
-  "preamble" : "Requires an anarch. More than one discipline can be used when playing this card.",
+  "preamble" : "Requires an anarch. More than one discipline can be used when playing this card.\n(D) Enter combat with a locked minion.",
   "modes" : [ {
-    "disciplines" : null,
-    "text" : "(D) Enter combat with a locked minion."
-  }, {
     "disciplines" : [ "cel" ],
     "text" : "This anarch gets 1 optional maneuver during this combat."
   }, {
@@ -32512,11 +32506,8 @@
   "names" : [ "Second Sight" ],
   "crypt" : false,
   "unique" : false,
-  "preamble" : "An imbued may burn only one Second Sight for the following effects each action.",
+  "preamble" : "An imbued may burn only one Second Sight for the following effects each action.\nBurn when a monster is acting to give this imbued +1 intercept for that action.",
   "modes" : [ {
-    "disciplines" : null,
-    "text" : "Burn when a monster is acting to give this imbued +1 intercept for that action."
-  }, {
     "disciplines" : null,
     "text" : "Burn when this imbued declares an action to give monsters -1 intercept for this action."
   } ],
