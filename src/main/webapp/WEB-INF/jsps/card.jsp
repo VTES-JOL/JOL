@@ -7,7 +7,7 @@
 <%
     CardParams p = (CardParams) request.getAttribute("cparams");
     JolGame game = (JolGame) request.getAttribute("game");
-    int index = (Integer)request.getAttribute("index");
+    Integer index = (Integer)request.getAttribute("index");
     Card c = p.getCard();
     int capacity = game.getCapacity(c.getId());
     int counters = game.getCounters(c.getId());
@@ -45,7 +45,10 @@
 </c:if>
 <c:if test="${!p.hidden}">
     <a class="card-name <%= typeClass %>" title="<%= p.getId() %>" data-card-id="<%= p.getId() %>"
-       data-index="<%= index %>" onclick="showCardModal(event)"><%= p.getName() %></a>
+       <c:if test="${index != null}">
+       data-index="<%= index %>" onclick="showCardModal(event)"
+       </c:if>
+       ><%= p.getName() %></a>
 </c:if>
 <c:if test="${game != null}">
     <c:if test="${capacity > 0 && !p.hidden}">
