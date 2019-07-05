@@ -135,7 +135,7 @@ function showCardModal(event) {
         }
         $('#cardModal .loading').hide();
         $('#cardModal .loaded').show();
-        //tippy.hideAll({ duration: 0 });
+        tippy.hideAll({ duration: 0 });
         $('#cardModal').modal('show');
       }
   });

@@ -753,15 +753,17 @@ function generateCardData(parent) {
     tippy(parent + ' a.card-name', {
         animateFill: false,
         hideOnClick: false,
+        flipOnUpdate: true,
+        placement: 'auto',
+        boundary: 'viewport',
         interactive: true,
         theme: 'light',
         onShow: function (instance) {
-            var content = this.querySelector('.tippy-content');
-            content.innerHTML = "Loading...";
-            var cardId = instance.title;
+            instance.setContent("Loading...");
+            var cardId = instance.reference.title;
             $.get({
                 url: "rest/card/" + cardId, success: function (data) {
-                    content.innerHTML = data;
+                    instance.setContent(data);
                 }
             });
         }
