@@ -29,9 +29,7 @@
 		</form>
 		<div class="light padded">
 			<p>V:TES Online is the unofficial home to play Vampire: The Eternal Struggle online.</p>
-
 			<p>Register an account, create a deck, or import from your favorite deck building programs.</p>
-
 			<p>
 				Play using text commands, in a format that suits your availability.
 				<ul>
@@ -40,11 +38,9 @@
 					<li>Check one or more times a day (QK)</li>
 				</ul>
 			</p>
-
 			<p>
 				Play multiple games simultaneously, test a deck before a tournament.
 			</p>
-
 			<p>Our Prince's are available to help create games for you</p>
 		</div>
 	</div>
