@@ -91,8 +91,9 @@ function showCardModal(event) {
   var cardId = $(event.target).data('card-id');
   var handIndex = $(event.target).data('index');
   $.get({
-      //url: "rest/api/cards/au32", success: function(card) { //Guardian Vigil
-      //url: "rest/api/cards/bl61", success: function(card) { //Elemental Stoicism
+      //url: "rest/api/cards/au36", success: function(card) { //Make the Misere - multiple lines in preamble
+      //url: "rest/api/cards/au32", success: function(card) { //Guardian Vigil - multi-mode
+      //url: "rest/api/cards/bl61", success: function(card) { //Elemental Stoicism - modes require multiple disciplines
       url: "rest/api/cards/" + cardId, success: function(card) {
         console.log(card);
         var modal = $('#cardModal');

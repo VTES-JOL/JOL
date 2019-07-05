@@ -65,10 +65,14 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         Utils.getClean(lineData[FIELD_BANNED]).map(banned -> !banned.isEmpty()).ifPresent(card::setBanned);
 
         List<String> lines = new ArrayList(Arrays.asList(card.getText().split("\n")));
-        String preamble = null;
-        if (lines.size() == 1 || lines.get(0).startsWith("[")) { } //No preamble
-        else {
-            preamble = lines.remove(0);
+        List<String> preambleLines = new ArrayList(1);
+
+        //Some cards like Make the Misere have two lines of preamble
+        while (!(lines.size() == 1 || lines.get(0).startsWith("[")))
+            preambleLines.add(lines.remove(0));
+
+        if (preambleLines.size() > 0) {
+            String preamble = String.join("\n", preambleLines);
             card.setPreamble(preamble);
 
             // Preamble checks
