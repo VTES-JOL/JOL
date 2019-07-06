@@ -51,9 +51,9 @@
             <p class="mode-text">The opposing minion gets -1 strength this round. A vampire may play only one Song of Serenity each combat.</span>
           </button>
         </div>
-        <div class="play-button" style="display:none">
+        <div class="extended-play-panel" style="display:none">
           <hr/>
-          <button id="cardModalPlay" type="button"
+          <button id="cardModalPlayButton" type="button"
                   class="btn btn-block btn-primary mb-2" style="white-space:normal"
                   onclick="playCard(event);">Play</button>
           <!--hr/>
@@ -83,7 +83,6 @@ function cardTypeCSSClass(cardType) {
   return cardType.toLowerCase().replace(' ', '_').replace('/', ' ');
 }
 function showCardModal(event) {
-  console.log(event);
   $('#cardModal .loaded').hide();
   $('#cardModal .loading').show();
   //Show modal immediately with Loading text
@@ -95,7 +94,6 @@ function showCardModal(event) {
       //url: "rest/api/cards/au32", success: function(card) { //Guardian Vigil - multi-mode
       //url: "rest/api/cards/bl61", success: function(card) { //Elemental Stoicism - modes require multiple disciplines
       url: "rest/api/cards/" + cardId, success: function(card) {
-        console.log(card);
         var modal = $('#cardModal');
         modal.data('hand-index', handIndex);
         modal.data('do-not-replace', card.doNotReplace);
@@ -115,11 +113,16 @@ function showCardModal(event) {
             var mode = card.modes[i];
             var button = modeTemplate.clone();
 
+            var extendedPlayPanel = $('#cardModal .extended-play-panel');
             if (card.multiMode) {
-              $('#cardModal .play-button').show();
+              extendedPlayPanel.show();
+              var playButton = $('#cardModalPlayButton');
+              playButton.prop('disabled', true);
+              playButton.text('Select one or more disciplines');
+              button.on('click', multiModeButtonClicked);
             }
             else {
-              $('#cardModal .play-button').hide();
+              extendedPlayPanel.hide();
               button.on('click', playCard);
             }
 
@@ -150,12 +153,9 @@ function playCardCommand(disciplines) {
          + (doNotReplace ? '' : ' draw');
 }
 function playCard(event) {
-  console.log(event);
   var button = $(event.target).closest('button'); //target might be inner p
-  console.log(button);
-
   var disciplines = [];
-  if (button.attr('id') == 'cardModalPlay') { //Multi-mode cards
+  if (button.attr('id') == 'cardModalPlayButton') { //Multi-mode cards
     $('#cardModal .card-modes button.active')
       .each(function() { disciplines = disciplines.concat($(this).data('disciplines')); });
   }
@@ -173,6 +173,14 @@ function playCard(event) {
   });
   $('#cardModal').modal('hide');
   return false;
+}
+function multiModeButtonClicked(event) {
+  var button = $(event.target).closest('button');
+  var delta = button.hasClass('active') ? -1 : 1;
+  var modes = $('#cardModal .card-modes button.active').length + delta;
+  var playButton = $('#cardModalPlayButton');
+  playButton.prop('disabled', modes < 1);
+  playButton.text(modes < 1 ? 'Select one or more disciplines' : 'Play');
 }
 </script>
 
