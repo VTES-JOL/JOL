@@ -28,4 +28,6 @@ public class CardSummary {
     private List<LibraryCardMode> modes;
     private boolean doNotReplace;
     private boolean multiMode;
+    private String cost;
+    private List<String> clans;
 }

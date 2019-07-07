@@ -2,6 +2,7 @@ package net.deckserver.game.storage.cards;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,8 @@ public class SummaryCard {
     private List<LibraryCardMode> modes;
     private boolean doNotReplace;
     private boolean multiMode;
+    private String cost;
+    private List<String> clans;
 
     private SummaryCard() {
 
@@ -82,6 +85,13 @@ public class SummaryCard {
         this.modes = libraryCard.getModes();
         this.doNotReplace = libraryCard.isDoNotReplace();
         this.multiMode = libraryCard.isMultiMode();
+
+        if (!StringUtils.isBlank(libraryCard.getPool()))
+            this.cost = libraryCard.getPool() + " pool";
+        else if (!StringUtils.isBlank(libraryCard.getBlood()))
+            this.cost = libraryCard.getBlood() + " blood";
+
+        this.clans = libraryCard.getClans();
 
         List<String> cardLines = new ArrayList<>();
         Optional.ofNullable(libraryCard.getName()).ifPresent(name -> cardLines.add("Name: " + name));
