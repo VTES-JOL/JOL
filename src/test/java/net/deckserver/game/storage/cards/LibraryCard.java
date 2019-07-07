@@ -36,11 +36,10 @@ public class LibraryCard {
     private Boolean burnOption;
     private Boolean banned;
 
-    // New // Modes
     /**
-     * The first line of a card's text in vteslib.csv. Contains restrictions
-     * and other information that apply to the card regardless of which mode
-     * is used.
+     * The first line (or rarely, two lines: Make the Misere) of a card's text
+     * in vteslib.csv. Contains restrictions and other information that apply
+     * to the card regardless of which mode is used.
      */
     private String preamble;
 

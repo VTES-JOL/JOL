@@ -30,21 +30,22 @@
       <h2 style="position:relative;top:43%">Loading...</h2>
     </div>
     <div class="modal-content loaded" style="text-align:center">
-      <div class="modal-header">
-        <h5 class="modal-title" id="cardModalLabel">
-          <span class="card-type action" style="font-size:2em;vertical-align:sub"></span>
-          <span class="card-name">Song of Serenity</span>
+      <div class="modal-header" style="text-align:justify">
+        <h5 class="modal-title">
+          <span class="card-type action"></span>
+          <span class="card-name" id="cardModalLabel">Song of Serenity</span>
         </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <p class="preamble mb-2">
-          Only usable before range is chosen.
-        </p>
-        <div class="card-modes">
+        <div class="requirements">
+          <span class="card-clan"></span>
+          <span class="card-cost">Costs 1 blood.</span>
         </div>
+        <p class="preamble mb-2">Only usable before range is chosen.</p>
+        <div class="card-modes"></div>
         <div class="templates d-none">
           <button type="button" class="card-mode btn btn-block btn-outline-dark mb-2" aria-pressed="false" data-toggle="button">
             <span class="discipline"></span>
@@ -66,7 +67,21 @@
 </div>
 
 <script type="text/javascript">
-var DISCIPLINE_CHARS = { //TODO duplication from css bad
+var CLAN_CHARS = {
+  abomination: 'A', arihmane: 'B', akunanse: 'C', assamite: 'D', baali: 'E',
+  blood_brothers: 'F', brujah: 'G', brujah_antitribu: 'H', caitiff: 'I',
+  daughters_of_cacophony: 'J', followers_of_set: 'K', gangrel: 'L',
+  gangrel_antitribu: 'M', gargoyle: 'N', giovanni: 'O', guruhi: 'P',
+  harbingers_of_skulls: 'Q', ishtarri: 'R', kiasyd: 'S', lasombra: 'T',
+  malkavian: 'U', malkavian_antitribu: 'V', nagaraja: 'W', nosferatu: 'X',
+  nosferatu_antitribu: 'Y', osebo: 'Z', pander: '[', ravnos: '\\',
+  salubri: ']', salubri_antitribu: '^', samedi: '_', toreador: '`',
+  toreador_antitribu: 'a', tremere: 'b', tremere_antitrubu: 'c',
+  true_brujah: 'd', tzimisce: 'e', ventrue: 'f', ventrue_antitribu: 'g',
+  avenger: 'h', defender: 'i', innocent: 'j', judge: 'k', martyr: 'l',
+  redeemer: 'm', visionary: 'n'
+};
+var DISCIPLINE_CHARS = {
   ani: 'a', ANI: 'A', obe: 'b', OBE: 'B', cel: 'c', CEL: 'C',
   dom: 'd', DOM: 'D', dem: 'e', DEM: 'E', for: 'f', FOR: 'F',
   san: 'g', SAN: 'G', thn: 'h', THN: 'H', vic: 'i', VIC: 'I',
@@ -82,6 +97,9 @@ var DISCIPLINE_CHARS = { //TODO duplication from css bad
 function cardTypeCSSClass(cardType) {
   return cardType.toLowerCase().replace(' ', '_').replace('/', ' ');
 }
+function clanToKey(clan) {
+  return clan.toLowerCase().replace(' ', '_');
+}
 function showCardModal(event) {
   $('#cardModal .loaded').hide();
   $('#cardModal .loading').show();
@@ -90,6 +108,8 @@ function showCardModal(event) {
   var cardId = $(event.target).data('card-id');
   var handIndex = $(event.target).data('index');
   $.get({
+      //url: "rest/api/cards/lo22", success: function(card) { //Base Hunting Ground - pool cost and clan requirement
+      //url: "rest/api/cards/una21", success: function(card) { //Ennoia's Theater - multiple clans
       //url: "rest/api/cards/au36", success: function(card) { //Make the Misere - multiple lines in preamble
       //url: "rest/api/cards/au32", success: function(card) { //Guardian Vigil - multi-mode
       //url: "rest/api/cards/bl61", success: function(card) { //Elemental Stoicism - modes require multiple disciplines
@@ -103,6 +123,19 @@ function showCardModal(event) {
           .removeClass()
           .addClass('card-type ' + cardTypeCSSClass(card.type));
         $('#cardModal .preamble').text(card.preamble);
+
+        var clanText = '';
+        if (card.clans != null) {
+          for (var c of card.clans)
+            clanText += CLAN_CHARS[clanToKey(c)];
+        }
+        $('#cardModal .card-clan').text(clanText);
+
+        var costText = null;
+        if (card.cost != null) costText = 'Costs ' + card.cost + '.';
+        $('#cardModal .card-cost').text(costText);
+
+        //$('#cardModal .requirements').    if (clanText == '' && costText == null)
 
         var modeContainer = $('#cardModal .card-modes');
         modeContainer.empty();
