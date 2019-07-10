@@ -263,7 +263,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Lasombra" ]
+  "clans" : [ "Lasombra" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100015",
   "jolId" : "jy3",
@@ -283,7 +284,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Tremere" ]
+  "clans" : [ "Tremere" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100016",
   "jolId" : "lk1",
@@ -642,7 +644,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "4 pool"
+  "cost" : "4 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100034",
   "jolId" : "lo7",
@@ -680,7 +683,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Brujah" ]
+  "clans" : [ "Brujah" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100036",
   "jolId" : "ah7",
@@ -721,7 +725,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Assamite" ]
+  "clans" : [ "Assamite" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100038",
   "jolId" : "ge5",
@@ -757,7 +762,8 @@
     "text" : "Requires at least two Gehenna cards in play. Alia can play cards that require basic Auspex [aus] or Obeah [obe] as a vampire. She may move a vampire in your torpor region to your ready region as a +1 stealth action. (D) actions directed at her cost an additional pool."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100040",
   "jolId" : "bh3",
@@ -818,7 +824,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Follower of Set" ]
+  "clans" : [ "Follower of Set" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100043",
   "jolId" : "jy11",
@@ -855,7 +862,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Giovanni" ]
+  "clans" : [ "Giovanni" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100045",
   "jolId" : "ln7",
@@ -949,7 +957,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Brujah antitribu" ]
+  "clans" : [ "Brujah antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100050",
   "jolId" : "ah11",
@@ -988,7 +997,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "4 pool",
-  "clans" : [ "Guruhi" ]
+  "clans" : [ "Guruhi" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100052",
   "jolId" : "an3",
@@ -1044,7 +1054,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100055",
   "jolId" : "jy12",
@@ -1540,7 +1551,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Toreador" ]
+  "clans" : [ "Toreador" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100081",
   "jolId" : "jy25",
@@ -1560,7 +1572,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Tremere" ]
+  "clans" : [ "Tremere" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100082",
   "jolId" : "ah14",
@@ -1578,7 +1591,8 @@
     "text" : "Each of your predator and prey burns 1 pool during his or her unlock phase for each Hunting Ground he or she controls. Any minion may burn this card as a (D) action."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100083",
   "jolId" : "ah15",
@@ -1597,7 +1611,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100084",
   "jolId" : "jy26",
@@ -1741,7 +1756,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Brujah" ]
+  "clans" : [ "Brujah" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100091",
   "jolId" : "sa15",
@@ -1838,7 +1854,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Toreador" ]
+  "clans" : [ "Toreador" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100096",
   "jolId" : "sa18",
@@ -1996,7 +2013,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 blood",
-  "clans" : [ "Tzimisce" ]
+  "clans" : [ "Tzimisce" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100104",
   "jolId" : "jy31",
@@ -2094,7 +2112,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Malkavian" ]
+  "clans" : [ "Malkavian" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100109",
   "jolId" : "ah16",
@@ -2451,7 +2470,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Gangrel" ]
+  "clans" : [ "Gangrel" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100127",
   "jolId" : "fn16",
@@ -2622,7 +2642,8 @@
     "text" : "Lock to discard a card from your hand (draw afterward)."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100136",
   "jolId" : "lo22",
@@ -2642,7 +2663,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Osebo" ]
+  "clans" : [ "Osebo" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100137",
   "jolId" : "tr6",
@@ -2723,7 +2745,8 @@
     "text" : "Lock during the referendum of a political action to gain X votes, where X is the number of ready Daughters of Cacophony you control. If you control no ready Daughters of Cacophony, you may lock and burn this location during the referendum of a political action to gain 1 vote."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100141",
   "jolId" : "lo24",
@@ -3113,7 +3136,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 blood",
-  "clans" : [ "Follower of Set" ]
+  "clans" : [ "Follower of Set" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100161",
   "jolId" : "lo27",
@@ -3208,7 +3232,8 @@
     "text" : "Once each turn, a Sabbat vampire may call a referendum to give his or her controller 2 pool from the blood bank as a +1 stealth political action. Any Changeling may burn this card as a +1 stealth (D) action."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100166",
   "jolId" : "bh10",
@@ -3305,7 +3330,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "4 pool",
-  "clans" : [ "Gangrel antitribu" ]
+  "clans" : [ "Gangrel antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100171",
   "jolId" : "km20",
@@ -3346,7 +3372,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Assamite" ]
+  "clans" : [ "Assamite" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100173",
   "jolId" : "fn18",
@@ -4972,7 +4999,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Giovanni" ]
+  "clans" : [ "Giovanni" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100255",
   "jolId" : "an19",
@@ -5069,7 +5097,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Brujah antitribu" ]
+  "clans" : [ "Brujah antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100260",
   "jolId" : "ds15",
@@ -5403,7 +5432,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100277",
   "jolId" : "ah27",
@@ -5422,7 +5452,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100278",
   "jolId" : "bl24",
@@ -5638,7 +5669,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Gangrel antitribu" ]
+  "clans" : [ "Gangrel antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100289",
   "jolId" : "ln26",
@@ -5805,7 +5837,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100298",
   "jolId" : "te3",
@@ -5824,7 +5857,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100299",
   "jolId" : "an22",
@@ -5922,7 +5956,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100304",
   "jolId" : "ge22",
@@ -6082,7 +6117,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Follower of Set" ]
+  "clans" : [ "Follower of Set" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100312",
   "jolId" : "jy76",
@@ -6158,7 +6194,8 @@
     "text" : "Weapons cost an additional pool."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100316",
   "jolId" : "ge25",
@@ -6394,7 +6431,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100328",
   "jolId" : "sa63",
@@ -6431,7 +6469,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Tremere" ]
+  "clans" : [ "Tremere" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100330",
   "jolId" : "htb26",
@@ -6792,7 +6831,8 @@
     "text" : "Lock this card to add one counter to a location you control that uses counters."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100348",
   "jolId" : "nr11",
@@ -6811,7 +6851,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100349",
   "jolId" : "bl30",
@@ -6866,7 +6907,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Gangrel antitribu" ]
+  "clans" : [ "Gangrel antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100352",
   "jolId" : "lo34",
@@ -7172,7 +7214,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100367",
   "jolId" : "fn30",
@@ -7191,7 +7234,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "4 pool"
+  "cost" : "4 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100368",
   "jolId" : "ah32",
@@ -7550,7 +7594,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100386",
   "jolId" : "sa71",
@@ -7569,7 +7614,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100387",
   "jolId" : "ln35",
@@ -8377,7 +8423,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Ventrue antitribu" ]
+  "clans" : [ "Ventrue antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100427",
   "jolId" : "bh26",
@@ -8440,7 +8487,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100430",
   "jolId" : "ah36",
@@ -8532,7 +8580,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 blood",
-  "clans" : [ "Nosferatu antitribu" ]
+  "clans" : [ "Nosferatu antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100435",
   "jolId" : "sw12",
@@ -8730,7 +8779,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100445",
   "jolId" : "pr33",
@@ -8750,7 +8800,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Harbinger of Skulls" ]
+  "clans" : [ "Harbinger of Skulls" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100446",
   "jolId" : "tr14",
@@ -8834,7 +8885,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Follower of Set" ]
+  "clans" : [ "Follower of Set" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100450",
   "jolId" : "ge30",
@@ -9305,7 +9357,8 @@
     "text" : "If the action to recruit this ally is blocked, the acting anarch goes to torpor. This werewolf must enter combat with any minion controlled by another Methuselah as a (D) action. He gets one optional press each combat. This werewolf does not unlock as normal during your unlock phase. If he is locked during your unlock phase, burn him."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100476",
   "jolId" : "tr15",
@@ -9792,7 +9845,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Malkavian antitribu" ]
+  "clans" : [ "Malkavian antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100501",
   "jolId" : "jy101",
@@ -10507,7 +10561,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Assamite" ]
+  "clans" : [ "Assamite" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100537",
   "jolId" : "lo45",
@@ -11378,7 +11433,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Kiasyd" ]
+  "clans" : [ "Kiasyd" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100580",
   "jolId" : "jy127",
@@ -11675,7 +11731,8 @@
     "text" : "You may burn this card when you are being bled to reduce the bleed amount by 2."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100595",
   "jolId" : "ek14",
@@ -11943,7 +12000,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Toreador antitribu" ]
+  "clans" : [ "Toreador antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100608",
   "jolId" : "bl59",
@@ -11988,7 +12046,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Gangrel" ]
+  "clans" : [ "Gangrel" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100610",
   "jolId" : "fn41",
@@ -12204,7 +12263,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100621",
   "jolId" : "an37",
@@ -12383,7 +12443,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Lasombra" ]
+  "clans" : [ "Lasombra" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100630",
   "jolId" : "ge50",
@@ -12402,7 +12463,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100631",
   "jolId" : "jy143",
@@ -12420,7 +12482,8 @@
     "text" : "Only usable when a Camarilla vampire you control is in combat with another Camarilla vampire. You may lock this card before range is determined to end combat. Any Camarilla vampire can call a referendum to burn this card as a +1 stealth political action."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100632",
   "jolId" : "ds34",
@@ -12439,7 +12502,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100633",
   "jolId" : "jy144",
@@ -12478,7 +12542,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Harbinger of Skulls" ]
+  "clans" : [ "Harbinger of Skulls" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100635",
   "jolId" : "ge51",
@@ -12713,7 +12778,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Gangrel", "Gangrel antitribu" ]
+  "clans" : [ "Gangrel", "Gangrel antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100647",
   "jolId" : "sc17",
@@ -13011,7 +13077,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Malkavian antitribu" ]
+  "clans" : [ "Malkavian antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100662",
   "jolId" : "ge54",
@@ -14170,7 +14237,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Giovanni" ]
+  "clans" : [ "Giovanni" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100720",
   "jolId" : "sa117",
@@ -14266,7 +14334,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Toreador antitribu" ]
+  "clans" : [ "Toreador antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100725",
   "jolId" : "au31",
@@ -14340,7 +14409,8 @@
     "text" : "Any minion may equip with any non-location equipment card in any Methuselah's ash heap as an undirected +1 stealth equip action (he or she must meet the requirements of the card, if any). That action costs 1 additional pool if the minion chooses a card from his or her controller's ash heap. Otherwise, the action costs 1 less pool or blood (but never less than zero)."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100729",
   "jolId" : "ln52",
@@ -15089,7 +15159,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Malkavian" ]
+  "clans" : [ "Malkavian" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100767",
   "jolId" : "th41",
@@ -15307,7 +15378,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Ravnos" ]
+  "clans" : [ "Ravnos" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100778",
   "jolId" : "ah57",
@@ -15348,7 +15420,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Toreador antitribu" ]
+  "clans" : [ "Toreador antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100780",
   "jolId" : "lo65",
@@ -15820,7 +15893,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Brujah antitribu" ]
+  "clans" : [ "Brujah antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100804",
   "jolId" : "jy171",
@@ -15915,7 +15989,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Tremere antitribu" ]
+  "clans" : [ "Tremere antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100809",
   "jolId" : "tr23",
@@ -15933,7 +16008,8 @@
     "text" : "Lock and burn 1 pool during your unlock phase to exchange a card in your ash heap that requires an anarch for a card from your hand. Lock before range is determined to end combat between an anarch you control and another anarch."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100810",
   "jolId" : "fn57",
@@ -16171,7 +16247,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Pander" ]
+  "clans" : [ "Pander" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100822",
   "jolId" : "fn59",
@@ -16191,7 +16268,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Assamite" ]
+  "clans" : [ "Assamite" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100823",
   "jolId" : "una27",
@@ -16211,7 +16289,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Giovanni" ]
+  "clans" : [ "Giovanni" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100824",
   "jolId" : "jy175",
@@ -16386,7 +16465,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 blood",
-  "clans" : [ "Giovanni" ]
+  "clans" : [ "Giovanni" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100833",
   "jolId" : "ds53",
@@ -16622,7 +16702,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Toreador antitribu" ]
+  "clans" : [ "Toreador antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100845",
   "jolId" : "jy184",
@@ -16700,7 +16781,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Follower of Set" ]
+  "clans" : [ "Follower of Set" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100849",
   "jolId" : "bl80",
@@ -16846,7 +16928,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100856",
   "jolId" : "htb59",
@@ -16906,7 +16989,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 blood"
+  "cost" : "2 blood",
+  "targetRegion" : "ready"
 }, {
   "id" : "100859",
   "jolId" : "htb60",
@@ -17081,7 +17165,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Tzimisce" ]
+  "clans" : [ "Tzimisce" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100868",
   "jolId" : "au32",
@@ -17160,7 +17245,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 pool"
+  "cost" : "3 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100872",
   "jolId" : "bh47",
@@ -17236,7 +17322,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Gangrel" ]
+  "clans" : [ "Gangrel" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100876",
   "jolId" : "au33",
@@ -17254,7 +17341,8 @@
     "text" : "Put this card in play with X counters, where X is the number of anarchs you control. When an anarch comes into play under your control, or when a vampire you control becomes anarch, add 1 counter to this card. When equipping an anarch, you can use the counters on this card to pay some or all of the blood or pool cost of the equipment."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100877",
   "jolId" : "bl81",
@@ -17532,7 +17620,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "5 pool"
+  "cost" : "5 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100891",
   "jolId" : "htb64",
@@ -17858,7 +17947,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Assamite" ]
+  "clans" : [ "Assamite" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100907",
   "jolId" : "lo82",
@@ -17902,7 +17992,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100909",
   "jolId" : "th57",
@@ -17964,7 +18055,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100912",
   "jolId" : "bl82",
@@ -17984,7 +18076,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Baali" ]
+  "clans" : [ "Baali" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100913",
   "jolId" : "kt75",
@@ -18026,7 +18119,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Tremere antitribu" ]
+  "clans" : [ "Tremere antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100915",
   "jolId" : "htb67",
@@ -18266,7 +18360,8 @@
     "text" : "Gain 4 pool when you put this card into play or gain control of it. Any vampire can steal this location for his or her controller as a (D) action. Burn 4 pool when you lose control of the High Museum (including when it is burned or becomes contested)."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100927",
   "jolId" : "lo86",
@@ -18322,7 +18417,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "4 pool",
-  "clans" : [ "Ahrimane" ]
+  "clans" : [ "Ahrimane" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100930",
   "jolId" : "an62",
@@ -18501,7 +18597,8 @@
     "text" : "Lock when an anarch announces a hunting action. If that action is successful, the anarch gains an additional blood."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100939",
   "jolId" : "jy201",
@@ -18584,7 +18681,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100943",
   "jolId" : "ah65",
@@ -18638,7 +18736,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100946",
   "jolId" : "ds62",
@@ -19066,7 +19165,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 blood"
+  "cost" : "3 blood",
+  "targetRegion" : "ready"
 }, {
   "id" : "100967",
   "jolId" : "una35",
@@ -19103,7 +19203,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100969",
   "jolId" : "pr61",
@@ -19361,7 +19462,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "100982",
   "jolId" : "nr27",
@@ -19398,7 +19500,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Ishtarri" ]
+  "clans" : [ "Ishtarri" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100984",
   "jolId" : "jy209",
@@ -19416,7 +19519,8 @@
     "text" : "+2 transfers."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "100985",
   "jolId" : "bh53",
@@ -19654,7 +19758,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Malkavian antitribu" ]
+  "clans" : [ "Malkavian antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "100997",
   "jolId" : "te5",
@@ -19993,7 +20098,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Ventrue" ]
+  "clans" : [ "Ventrue" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101014",
   "jolId" : "jy210",
@@ -20320,7 +20426,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Akunanse" ]
+  "clans" : [ "Akunanse" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101031",
   "jolId" : "vt3",
@@ -20641,7 +20748,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "5 pool",
-  "clans" : [ "Follower of Set" ]
+  "clans" : [ "Follower of Set" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101048",
   "jolId" : "fn81",
@@ -20661,7 +20769,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Follower of Set" ]
+  "clans" : [ "Follower of Set" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101049",
   "jolId" : "ds74",
@@ -20890,7 +20999,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "4 pool"
+  "cost" : "4 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101061",
   "jolId" : "bl102",
@@ -21033,7 +21143,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101068",
   "jolId" : "ln81",
@@ -21091,7 +21202,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Nosferatu" ]
+  "clans" : [ "Nosferatu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101071",
   "jolId" : "tr32",
@@ -21562,7 +21674,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Giovanni" ]
+  "clans" : [ "Giovanni" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101095",
   "jolId" : "ln84",
@@ -21709,7 +21822,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Tzimisce" ]
+  "clans" : [ "Tzimisce" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101103",
   "jolId" : "jy231",
@@ -21863,7 +21977,8 @@
     "text" : "Lock to reduce the cost of an action card played by a vampire you control by 1 blood (this location is not locked if that card is canceled as it is played). Any vampire can steal this location as a (D) action."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101111",
   "jolId" : "sc28",
@@ -22058,7 +22173,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 pool"
+  "cost" : "3 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101121",
   "jolId" : "ge85",
@@ -22205,7 +22321,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Toreador" ]
+  "clans" : [ "Toreador" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101128",
   "jolId" : "htb88",
@@ -22385,7 +22502,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Harbinger of Skulls" ]
+  "clans" : [ "Harbinger of Skulls" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101137",
   "jolId" : "sa190",
@@ -22955,7 +23073,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101166",
   "jolId" : "ah99",
@@ -23072,7 +23191,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Assamite" ]
+  "clans" : [ "Assamite" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101172",
   "jolId" : "pr62",
@@ -23391,7 +23511,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Giovanni" ]
+  "clans" : [ "Giovanni" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101188",
   "jolId" : "bh76",
@@ -23431,7 +23552,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 pool"
+  "cost" : "3 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101190",
   "jolId" : "sa198",
@@ -23525,7 +23647,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 pool"
+  "cost" : "3 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101195",
   "jolId" : "sa200",
@@ -23584,7 +23707,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Daughter of Cacophony" ]
+  "clans" : [ "Daughter of Cacophony" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101198",
   "jolId" : "ah104",
@@ -23789,7 +23913,8 @@
     "text" : "During your discard phase, you may lock this card and burn 1 pool to unlock a vampire you control."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101208",
   "jolId" : "ah107",
@@ -24262,7 +24387,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101232",
   "jolId" : "ln100",
@@ -24402,7 +24528,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 pool"
+  "cost" : "3 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101239",
   "jolId" : "tr37",
@@ -24495,7 +24622,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Giovanni" ]
+  "clans" : [ "Giovanni" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101244",
   "jolId" : "htb102",
@@ -24637,7 +24765,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Malkavian" ]
+  "clans" : [ "Malkavian" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101251",
   "jolId" : "ah111",
@@ -24854,7 +24983,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101262",
   "jolId" : "fn93",
@@ -25029,7 +25159,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 blood"
+  "cost" : "2 blood",
+  "targetRegion" : "ready"
 }, {
   "id" : "101271",
   "jolId" : "kt115",
@@ -25066,7 +25197,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Tremere antitribu" ]
+  "clans" : [ "Tremere antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101273",
   "jolId" : "ln107",
@@ -25086,7 +25218,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Follower of Set" ]
+  "clans" : [ "Follower of Set" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101274",
   "jolId" : "ln108",
@@ -25173,7 +25306,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Brujah" ]
+  "clans" : [ "Brujah" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101278",
   "jolId" : "lo135",
@@ -25492,7 +25626,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 blood"
+  "cost" : "1 blood",
+  "targetRegion" : "ready"
 }, {
   "id" : "101294",
   "jolId" : "kt119",
@@ -25511,7 +25646,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101295",
   "jolId" : "ge99",
@@ -25631,7 +25767,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Nosferatu antitribu" ]
+  "clans" : [ "Nosferatu antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101301",
   "jolId" : "ds93",
@@ -25952,7 +26089,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Ahrimane" ]
+  "clans" : [ "Ahrimane" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101318",
   "jolId" : "kt121",
@@ -26123,7 +26261,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Follower of Set" ]
+  "clans" : [ "Follower of Set" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101327",
   "jolId" : "htb111",
@@ -26179,7 +26318,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "4 pool"
+  "cost" : "4 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101330",
   "jolId" : "sa217",
@@ -26253,7 +26393,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 pool"
+  "cost" : "3 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101334",
   "jolId" : "sw39",
@@ -26331,7 +26472,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Tremere" ]
+  "clans" : [ "Tremere" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101338",
   "jolId" : "htb112",
@@ -26412,7 +26554,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Brujah" ]
+  "clans" : [ "Brujah" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101342",
   "jolId" : "km98",
@@ -26472,7 +26615,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Guruhi" ]
+  "clans" : [ "Guruhi" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101345",
   "jolId" : "ds97",
@@ -26595,7 +26739,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 pool"
+  "cost" : "3 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101351",
   "jolId" : "an94",
@@ -26634,7 +26779,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Daughter of Cacophony" ]
+  "clans" : [ "Daughter of Cacophony" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101353",
   "jolId" : "jy285",
@@ -26672,7 +26818,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Ravnos" ]
+  "clans" : [ "Ravnos" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101355",
   "jolId" : "ah122",
@@ -26691,7 +26838,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101356",
   "jolId" : "sa221",
@@ -27237,7 +27385,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101384",
   "jolId" : "ds99",
@@ -27275,7 +27424,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 pool"
+  "cost" : "3 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101386",
   "jolId" : "fn102",
@@ -27649,7 +27799,8 @@
     "text" : "During your unlock phase, choose up to X ready anarchs you control who each gain 1 blood, where X is the number of non-derivative hunting grounds controlled by other Methuselahs. A vampire can gain blood from only one hunting ground card each turn."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101405",
   "jolId" : "htb117",
@@ -27766,7 +27917,8 @@
     "text" : "Lock to give a press, only usable to end combat, to a minion you control."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101411",
   "jolId" : "jy289",
@@ -27805,7 +27957,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Ventrue antitribu" ]
+  "clans" : [ "Ventrue antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101413",
   "jolId" : "jy290",
@@ -27860,7 +28013,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Lasombra" ]
+  "clans" : [ "Lasombra" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101416",
   "jolId" : "sa227",
@@ -27937,7 +28091,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Tremere" ]
+  "clans" : [ "Tremere" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101420",
   "jolId" : "pr21",
@@ -27975,7 +28130,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Ishtarri" ]
+  "clans" : [ "Ishtarri" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101422",
   "jolId" : "ah129",
@@ -28169,7 +28325,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101432",
   "jolId" : "ds103",
@@ -28188,7 +28345,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Ventrue" ]
+  "clans" : [ "Ventrue" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101433",
   "jolId" : "lo159",
@@ -28207,7 +28365,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Giovanni" ]
+  "clans" : [ "Giovanni" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101434",
   "jolId" : "jy293",
@@ -28226,7 +28385,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101435",
   "jolId" : "te9",
@@ -28244,7 +28404,8 @@
     "text" : "Lock during your discard phase to gain a discard phase action. If you use that discard phase action to discard a card that requires an anarch or a card that makes a vampire an anarch, you may unlock a ready anarch. Any anarch controlled by another Methuselah may steal this location for his or her controller as a (D) action."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101436",
   "jolId" : "ek43",
@@ -28262,7 +28423,8 @@
     "text" : "Lock this card during your master phase and choose a vampire you control. Once this turn, the chosen vampire may enter combat with any minion as a +1 stealth (D) action. Any vampire can steal this location as a (D) action."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101437",
   "jolId" : "sw49",
@@ -28281,7 +28443,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101438",
   "jolId" : "sa231",
@@ -28300,7 +28463,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101439",
   "jolId" : "sw50",
@@ -28318,7 +28482,8 @@
     "text" : "During your influence phase, you may move 1 blood from the blood bank to a vampire in your uncontrolled region. Any vampire may steal this location for his or her controller as a (D) action."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101440",
   "jolId" : "sa232",
@@ -28337,7 +28502,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101441",
   "jolId" : "ds104",
@@ -28355,7 +28521,8 @@
     "text" : "You may use a master phase action to move 1 counter from the blood bank to the Powerbase. Any Giovanni you control may move up to 2 of his or her blood counters to this card as a +1 stealth action. Lock and burn X counters from this card to gain X votes during the referendum of a political action. Any minion may burn all counters on this card as a (D) action."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101442",
   "jolId" : "ln121",
@@ -28373,7 +28540,8 @@
     "text" : "You may lock any other unique location you control to end combat involving an acting vampire you control before range is chosen. Any vampire may steal this location for his or her controller as a (D) action."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101443",
   "jolId" : "lo160",
@@ -28391,7 +28559,8 @@
     "text" : "Lock this location to reduce the cost of a card you play by 1 pool (this location is not locked if that card is canceled as it is played). Any Laibon may steal this location for his or her controller as a (D) action."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101444",
   "jolId" : "jy294",
@@ -28410,7 +28579,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101445",
   "jolId" : "ln122",
@@ -28428,7 +28598,8 @@
     "text" : "While you have the Edge, any vampire you control may add 2 blood from the blood bank to a younger vampire in your uncontrolled region as a +1 stealth action. If that action is blocked, burn the Edge (before combat, if any). Any Methuselah may burn the Edge during his or her master phase to steal this card."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101446",
   "jolId" : "sc38",
@@ -29306,7 +29477,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 blood"
+  "cost" : "2 blood",
+  "targetRegion" : "ready"
 }, {
   "id" : "101492",
   "jolId" : "nr45",
@@ -29863,7 +30035,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101520",
   "jolId" : "sw52",
@@ -30026,7 +30199,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Follower of Set" ]
+  "clans" : [ "Follower of Set" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101528",
   "jolId" : "sa240",
@@ -30205,7 +30379,8 @@
     "text" : "As this card is played or the controller of this card changes, the controller chooses a ready vampire they control. During the controller's unlock phase, the chosen vampire can gain 2 blood. A vampire controlled by another Methuselah can steal this location as a (D) action."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101537",
   "jolId" : "fn111",
@@ -30224,7 +30399,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 pool"
+  "cost" : "3 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101538",
   "jolId" : "lo168",
@@ -30517,7 +30693,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Ravnos" ]
+  "clans" : [ "Ravnos" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101553",
   "jolId" : "ah139",
@@ -30537,7 +30714,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Ravnos" ]
+  "clans" : [ "Ravnos" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101554",
   "jolId" : "htb123",
@@ -30739,7 +30917,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "X blood"
+  "cost" : "X blood",
+  "targetRegion" : "ready"
 }, {
   "id" : "101564",
   "jolId" : "ge108",
@@ -31463,7 +31642,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "6 pool"
+  "cost" : "6 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101601",
   "jolId" : "bh92",
@@ -31501,7 +31681,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "5 pool",
-  "clans" : [ "Gangrel" ]
+  "clans" : [ "Gangrel" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101603",
   "jolId" : "bl143",
@@ -31566,7 +31747,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 blood"
+  "cost" : "1 blood",
+  "targetRegion" : "ready"
 }, {
   "id" : "101606",
   "jolId" : "bl144",
@@ -32361,7 +32543,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "4 pool",
-  "clans" : [ "Gargoyle" ]
+  "clans" : [ "Gargoyle" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101646",
   "jolId" : "lo178",
@@ -32460,7 +32643,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Ravnos" ]
+  "clans" : [ "Ravnos" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101651",
   "jolId" : "bh97",
@@ -32521,7 +32705,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101654",
   "jolId" : "jy336",
@@ -32633,7 +32818,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Baali" ]
+  "clans" : [ "Baali" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101660",
   "jolId" : "ds129",
@@ -32688,7 +32874,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101663",
   "jolId" : "jy340",
@@ -32747,7 +32934,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Follower of Set" ]
+  "clans" : [ "Follower of Set" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101666",
   "jolId" : "sa265",
@@ -32941,7 +33129,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "5 pool"
+  "cost" : "5 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101676",
   "jolId" : "ge119",
@@ -33177,7 +33366,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Giovanni" ]
+  "clans" : [ "Giovanni" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101688",
   "jolId" : "htb130",
@@ -33591,7 +33781,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Nosferatu" ]
+  "clans" : [ "Nosferatu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101709",
   "jolId" : "lo186",
@@ -33646,7 +33837,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101712",
   "jolId" : "jy350",
@@ -34177,7 +34369,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Gangrel antitribu" ]
+  "clans" : [ "Gangrel antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101738",
   "jolId" : "bl155",
@@ -34469,7 +34662,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 blood"
+  "cost" : "3 blood",
+  "targetRegion" : "ready"
 }, {
   "id" : "101752",
   "jolId" : "nr52",
@@ -34509,7 +34703,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Nosferatu antitribu" ]
+  "clans" : [ "Nosferatu antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101754",
   "jolId" : "bh104",
@@ -35446,7 +35641,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Brujah" ]
+  "clans" : [ "Brujah" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101800",
   "jolId" : "bl161",
@@ -35466,7 +35662,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Harbinger of Skulls" ]
+  "clans" : [ "Harbinger of Skulls" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101801",
   "jolId" : "sa291",
@@ -35629,7 +35826,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Nosferatu" ]
+  "clans" : [ "Nosferatu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101809",
   "jolId" : "an110",
@@ -35882,7 +36080,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Toreador" ]
+  "clans" : [ "Toreador" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101822",
   "jolId" : "jy368",
@@ -36244,7 +36443,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Nosferatu" ]
+  "clans" : [ "Nosferatu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101840",
   "jolId" : "bl165",
@@ -36450,7 +36650,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Tremere antitribu" ]
+  "clans" : [ "Tremere antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101850",
   "jolId" : "jy371",
@@ -36826,7 +37027,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Nosferatu antitribu" ]
+  "clans" : [ "Nosferatu antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101869",
   "jolId" : "tr53",
@@ -37018,7 +37220,8 @@
     "text" : "Put a card from your hand face down (out of play) on this card when you play it. You may look at the card at any time. During your master phase, you may exchange a card in your hand for the card on this Storage Annex."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101878",
   "jolId" : "jy374",
@@ -37037,7 +37240,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Nosferatu" ]
+  "clans" : [ "Nosferatu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101879",
   "jolId" : "ds147",
@@ -37315,7 +37519,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "4 pool",
-  "clans" : [ "Tremere antitribu" ]
+  "clans" : [ "Tremere antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101893",
   "jolId" : "jy376",
@@ -37333,7 +37538,8 @@
     "text" : "During your unlock phase, you may lock this card to trade with a Methuselah who agrees to trade. You may trade pool and cards from your hand and cards you control. The trade cannot result in either Methuselah have fewer cards in hand than his or her hand size. Any additional terms can be established, but none are enforced by the rules."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101894",
   "jolId" : "fn139",
@@ -37554,7 +37760,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101905",
   "jolId" : "sa305",
@@ -37666,7 +37873,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Brujah antitribu" ]
+  "clans" : [ "Brujah antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101911",
   "jolId" : "una65",
@@ -38070,7 +38278,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 pool"
+  "cost" : "3 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101931",
   "jolId" : "jy380",
@@ -38215,7 +38424,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Ravnos" ]
+  "clans" : [ "Ravnos" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101938",
   "jolId" : "ln155",
@@ -38521,7 +38731,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Follower of Set" ]
+  "clans" : [ "Follower of Set" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101954",
   "jolId" : "ah165",
@@ -38678,7 +38889,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Assamite" ]
+  "clans" : [ "Assamite" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101962",
   "jolId" : "km136",
@@ -38717,7 +38929,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "4 pool",
-  "clans" : [ "Tremere" ]
+  "clans" : [ "Tremere" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "101964",
   "jolId" : "sa310",
@@ -38810,7 +39023,8 @@
     "text" : "Locations cost you 1 less blood or pool."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "101969",
   "jolId" : "htb149",
@@ -39045,7 +39259,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 pool"
+  "cost" : "3 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101981",
   "jolId" : "fn149",
@@ -39184,7 +39399,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 pool"
+  "cost" : "3 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "101988",
   "jolId" : "ah169",
@@ -39471,7 +39687,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Giovanni" ]
+  "clans" : [ "Giovanni" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102002",
   "jolId" : "bl183",
@@ -40344,7 +40561,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "4 pool",
-  "clans" : [ "Akunanse" ]
+  "clans" : [ "Akunanse" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102048",
   "jolId" : "fn153",
@@ -40364,7 +40582,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "4 pool",
-  "clans" : [ "Follower of Set" ]
+  "clans" : [ "Follower of Set" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102049",
   "jolId" : "tr58",
@@ -40402,7 +40621,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Gangrel antitribu" ]
+  "clans" : [ "Gangrel antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102051",
   "jolId" : "sa318",
@@ -40461,7 +40681,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Giovanni" ]
+  "clans" : [ "Giovanni" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102054",
   "jolId" : "bh124",
@@ -40712,7 +40933,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 blood"
+  "cost" : "1 blood",
+  "targetRegion" : "ready"
 }, {
   "id" : "102066",
   "jolId" : "ah173",
@@ -40732,7 +40954,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Assamite" ]
+  "clans" : [ "Assamite" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102067",
   "jolId" : "km152",
@@ -40912,7 +41135,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Tremere antitribu" ]
+  "clans" : [ "Tremere antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102076",
   "jolId" : "htb156",
@@ -41097,7 +41321,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Ventrue" ]
+  "clans" : [ "Ventrue" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102085",
   "jolId" : "ln169",
@@ -41153,7 +41378,8 @@
     "text" : "Lock Vagabond Mystic to move 1 life counter from the blood bank to an ally you control who has fewer life than his or her starting amount. The Vagabond Mystic cannot block vampires."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "102088",
   "jolId" : "jy413",
@@ -41465,7 +41691,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Baali" ]
+  "clans" : [ "Baali" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102104",
   "jolId" : "fn159",
@@ -41590,7 +41817,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Ventrue" ]
+  "clans" : [ "Ventrue" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102110",
   "jolId" : "sa326",
@@ -41852,7 +42080,8 @@
     "text" : "When a vampire you control with capacity above 7 is burned, burn this card and search your crypt for a vampire with capacity below 5. Place that vampire in your ready region with 1 blood. That vampire cannot act this turn."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "102124",
   "jolId" : "htb161",
@@ -41956,7 +42185,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "102129",
   "jolId" : "sw73",
@@ -42218,7 +42448,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "102142",
   "jolId" : "pr31",
@@ -42237,7 +42468,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "102143",
   "jolId" : "lo225",
@@ -42278,7 +42510,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "3 pool",
-  "clans" : [ "Tzimisce" ]
+  "clans" : [ "Tzimisce" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102145",
   "jolId" : "sa334",
@@ -42374,7 +42607,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Nosferatu" ]
+  "clans" : [ "Nosferatu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102150",
   "jolId" : "jy425",
@@ -42394,7 +42628,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Brujah" ]
+  "clans" : [ "Brujah" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102151",
   "jolId" : "th153",
@@ -42431,7 +42666,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "clans" : [ "Tremere" ]
+  "clans" : [ "Tremere" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102153",
   "jolId" : "sw74",
@@ -42451,7 +42687,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Brujah antitribu" ]
+  "clans" : [ "Brujah antitribu" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102154",
   "jolId" : "bh132",
@@ -42726,7 +42963,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 pool"
+  "cost" : "3 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "102168",
   "jolId" : "km161",
@@ -42842,7 +43080,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "3 pool"
+  "cost" : "3 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "102174",
   "jolId" : "ds168",
@@ -42862,7 +43101,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "4 pool",
-  "clans" : [ "Gangrel" ]
+  "clans" : [ "Gangrel" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102175",
   "jolId" : "ah178",
@@ -43156,7 +43396,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "1 pool"
+  "cost" : "1 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "102190",
   "jolId" : "jy428",
@@ -43353,7 +43594,8 @@
     "text" : "When a political action is successful, before the referendum, lock this card and a ready unlocked Sabbat vampire you control to have that vampire enter combat with the acting vampire. If the acting vampire is still ready at the end of combat, the Sabbat vampire takes 2 damage, and the referendum is conducted as normal."
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "targetRegion" : "ready"
 }, {
   "id" : "102200",
   "jolId" : "an126",
@@ -43390,7 +43632,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 pool",
-  "clans" : [ "Assamite" ]
+  "clans" : [ "Assamite" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "102202",
   "jolId" : "th156",
@@ -43409,7 +43652,8 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
-  "cost" : "2 pool"
+  "cost" : "2 pool",
+  "targetRegion" : "ready"
 }, {
   "id" : "102203",
   "jolId" : "lo232",
@@ -43600,7 +43844,8 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "2 pool",
-  "clans" : [ "Gangrel" ]
+  "clans" : [ "Gangrel" ],
+  "targetRegion" : "ready"
 }, {
   "id" : "200001",
   "jolId" : "fn1",

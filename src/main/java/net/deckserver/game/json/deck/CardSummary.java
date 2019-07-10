@@ -30,4 +30,5 @@ public class CardSummary {
     private boolean multiMode;
     private String cost;
     private List<String> clans;
+    private String targetRegion;
 }
