@@ -61,4 +61,6 @@ public class LibraryCard {
      * e.g. Guardian Vigil.
      */
     private boolean multiMode;
+
+    private String targetRegion;
 }

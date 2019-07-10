@@ -108,15 +108,18 @@ function showCardModal(event) {
   var cardId = $(event.target).data('card-id');
   var handIndex = $(event.target).data('index');
   $.get({
+      //url: "rest/api/cards/lo170", success: function(card) { //Reanimated Corpse - an ally
       //url: "rest/api/cards/lo22", success: function(card) { //Base Hunting Ground - pool cost and clan requirement
       //url: "rest/api/cards/una21", success: function(card) { //Ennoia's Theater - multiple clans
       //url: "rest/api/cards/au36", success: function(card) { //Make the Misere - multiple lines in preamble
       //url: "rest/api/cards/au32", success: function(card) { //Guardian Vigil - multi-mode
       //url: "rest/api/cards/bl61", success: function(card) { //Elemental Stoicism - modes require multiple disciplines
       url: "rest/api/cards/" + cardId, success: function(card) {
+        console.log(card);
         var modal = $('#cardModal');
         modal.data('hand-index', handIndex);
         modal.data('do-not-replace', card.doNotReplace);
+        modal.data('target-region', card.targetRegion);
 
         $('#cardModal .card-name').text(card.displayName);
         $('#cardModal .card-type')
@@ -181,8 +184,10 @@ function playCardCommand(disciplines) {
   var modal = $('#cardModal');
   var handIndex1 = modal.data('hand-index') + 1;
   var doNotReplace = modal.data('do-not-replace');
+  var targetRegion = modal.data('target-region');
   return 'play ' + handIndex1
          + (disciplines ? ' @ ' + disciplines.join(',') : '')
+         + (targetRegion ? ' ' + targetRegion : '')
          + (doNotReplace ? '' : ' draw');
 }
 function playCard(event) {

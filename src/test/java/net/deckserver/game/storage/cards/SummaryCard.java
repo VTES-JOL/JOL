@@ -35,6 +35,7 @@ public class SummaryCard {
     private boolean multiMode;
     private String cost;
     private List<String> clans;
+    private String targetRegion;
 
     private SummaryCard() {
 
@@ -92,6 +93,7 @@ public class SummaryCard {
             this.cost = libraryCard.getBlood() + " blood";
 
         this.clans = libraryCard.getClans();
+        this.targetRegion = libraryCard.getTargetRegion();
 
         List<String> cardLines = new ArrayList<>();
         Optional.ofNullable(libraryCard.getName()).ifPresent(name -> cardLines.add("Name: " + name));

@@ -80,6 +80,10 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
             if (p.contains("unique")) card.setUnique(true);
             if (p.contains("do not replace")) card.setDoNotReplace(true);
             if (p.contains("more than one discipline can be used when playing this card")) card.setMultiMode(true);
+
+            if ((card.getType().stream().anyMatch("master"::equalsIgnoreCase) && p.contains("location"))
+                    || card.getType().stream().anyMatch("ally"::equalsIgnoreCase))
+                card.setTargetRegion("ready"); //TODO is this defined somewhere else?
         }
         setModes(card, lines);
         return card;
