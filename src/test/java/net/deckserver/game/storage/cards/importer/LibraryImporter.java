@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,6 +33,8 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final int FIELD_BANNED = 14;
 
     private Function<String, Boolean> burnOption = (text) -> text.equals("Y") || text.equalsIgnoreCase("Yes");
+
+    private static final Pattern PUT_INTO_PLAY_PATTERN = Pattern.compile(".*[Pp]ut this card in(?:to)? play.*");
 
     public LibraryImporter(Path dataPath) {
         super(dataPath);
@@ -80,10 +84,6 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
             if (p.contains("unique")) card.setUnique(true);
             if (p.contains("do not replace")) card.setDoNotReplace(true);
             if (p.contains("more than one discipline can be used when playing this card")) card.setMultiMode(true);
-
-            if ((card.getType().stream().anyMatch("master"::equalsIgnoreCase) && p.contains("location"))
-                    || card.getType().stream().anyMatch("ally"::equalsIgnoreCase))
-                card.setTargetRegion("ready"); //TODO is this defined somewhere else?
         }
         setModes(card, lines);
         return card;
@@ -102,6 +102,14 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                 mode.setText(disciplinesAndText[1]);
             }
             else mode.setText(line);
+
+            if ((card.getType().stream().anyMatch("master"::equalsIgnoreCase)
+                        && card.getPreamble() != null
+                        && card.getPreamble().contains("location"))
+                    || card.getType().stream().anyMatch("ally"::equalsIgnoreCase)
+                    || PUT_INTO_PLAY_PATTERN.matcher(mode.getText()).matches())
+                mode.setTargetRegion("ready");
+
             modes.add(mode);
         }
         card.setModes(modes);
