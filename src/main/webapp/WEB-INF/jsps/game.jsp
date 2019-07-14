@@ -108,6 +108,7 @@ function showCardModal(event) {
   var cardId = $(event.target).data('card-id');
   var handIndex = $(event.target).data('index');
   $.get({
+      //url: "rest/api/cards/tr14", success: function(card) { //CrimethInc
       //url: "rest/api/cards/lo170", success: function(card) { //Reanimated Corpse - an ally
       //url: "rest/api/cards/lo22", success: function(card) { //Base Hunting Ground - pool cost and clan requirement
       //url: "rest/api/cards/una21", success: function(card) { //Ennoia's Theater - multiple clans
@@ -119,7 +120,6 @@ function showCardModal(event) {
         var modal = $('#cardModal');
         modal.data('hand-index', handIndex);
         modal.data('do-not-replace', card.doNotReplace);
-        modal.data('target-region', card.targetRegion);
 
         $('#cardModal .card-name').text(card.displayName);
         $('#cardModal .card-type')
@@ -163,6 +163,7 @@ function showCardModal(event) {
             }
 
             button.data('disciplines', mode.disciplines);
+            button.data('target-region', mode.targetRegion);
             var disciplineStr = '';
             if (mode.disciplines != null) {
               for (var d of mode.disciplines)
@@ -180,11 +181,10 @@ function showCardModal(event) {
       }
   });
 }
-function playCardCommand(disciplines) {
+function playCardCommand(disciplines, targetRegion) {
   var modal = $('#cardModal');
   var handIndex1 = modal.data('hand-index') + 1;
   var doNotReplace = modal.data('do-not-replace');
-  var targetRegion = modal.data('target-region');
   return 'play ' + handIndex1
          + (disciplines ? ' @ ' + disciplines.join(',') : '')
          + (targetRegion ? ' ' + targetRegion : '')
@@ -193,15 +193,18 @@ function playCardCommand(disciplines) {
 function playCard(event) {
   var button = $(event.target).closest('button'); //target might be inner p
   var disciplines = [];
+  var targetRegion = null;
   if (button.attr('id') == 'cardModalPlayButton') { //Multi-mode cards
     $('#cardModal .card-modes button.active')
       .each(function() { disciplines = disciplines.concat($(this).data('disciplines')); });
+    targetRegion = $('#cardModal .card-modes button.active:first').data('target-region');
   }
   else { //Single-mode cards
     disciplines = button.data('disciplines');
+    targetRegion = button.data('target-region');
   }
 
-  var command = playCardCommand(disciplines);
+  var command = playCardCommand(disciplines, targetRegion);
   console.log(command);
   DS.submitForm(
       game, null, command, '', null, 'No',

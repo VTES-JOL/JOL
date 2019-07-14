@@ -12,5 +12,11 @@ public class LibraryCardMode {
      * Disciplines required to use this mode.
      */
     private List<String> disciplines;
+
     private String text;
+
+    /**
+     * Where the card is played, if not the ash heap.
+     */
+    private String targetRegion;
 }
