@@ -35,6 +35,8 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private Function<String, Boolean> burnOption = (text) -> text.equals("Y") || text.equalsIgnoreCase("Yes");
 
     private static final Pattern PUT_INTO_PLAY_PATTERN = Pattern.compile(".*[Pp]ut this card in(?:to)? play.*");
+    private static final Pattern PUT_ON_ACTING_PATTERN = Pattern.compile(".*[Pp]ut this card on the acting.*");
+    private static final Pattern PUT_ON_SELF_PATTERN = Pattern.compile(".*[Pp]ut this card on this.*");
 
     public LibraryImporter(Path dataPath) {
         super(dataPath);
@@ -108,7 +110,14 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                         && card.getPreamble().contains("location"))
                     || card.getType().stream().anyMatch("ally"::equalsIgnoreCase)
                     || PUT_INTO_PLAY_PATTERN.matcher(mode.getText()).matches())
-                mode.setTargetRegion("ready");
+                mode.setTarget(LibraryCardMode.Target.READY_REGION);
+            else if (card.getType().stream().anyMatch("equipment"::equalsIgnoreCase)
+                    || card.getType().stream().anyMatch("retainer"::equalsIgnoreCase)
+                    || ((card.getType().stream().anyMatch("action"::equalsIgnoreCase)
+                        || card.getType().stream().anyMatch("action modifier"::equalsIgnoreCase))
+                        && PUT_ON_ACTING_PATTERN.matcher(mode.getText()).matches())
+                    || PUT_ON_SELF_PATTERN.matcher(mode.getText()).matches())
+                mode.setTarget(LibraryCardMode.Target.SELF);
 
             modes.add(mode);
         }

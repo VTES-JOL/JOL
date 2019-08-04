@@ -15,8 +15,12 @@ public class LibraryCardMode {
 
     private String text;
 
+    public enum Target {
+        READY_REGION, SELF
+    }
+
     /**
      * Where the card is played, if not the ash heap.
      */
-    private String targetRegion;
+    private Target target;
 }
