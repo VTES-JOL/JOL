@@ -15,15 +15,11 @@ import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.cards.Deck;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
-import org.owasp.html.Sanitizers;
-import org.slf4j.Logger;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * @author administrator
@@ -54,10 +50,12 @@ public class JolGame {
     private static DateTimeFormatter SIMPLE_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm ");
     private DsGame state;
     private DsTurnRecorder actions;
+    private final String id;
 
     private Set<String> uniques = new HashSet<>();
 
-    public JolGame(DsGame state, DsTurnRecorder actions) {
+    public JolGame(String id, DsGame state, DsTurnRecorder actions) {
+        this.id = id;
         this.state = state;
         this.actions = actions;
     }
@@ -586,6 +584,8 @@ public class JolGame {
         actions.addTurn(players.get(index), players.get(index) + " " + round + "." + (index + 1));
         setActivePlayer(players.get(index));
         setPhase(TURN_PHASES[0]);
+        String turnString = round + "-" + (index +1);
+        JolAdmin.getInstance().writeSnapshot(id, state, actions, turnString);
     }
 
     public String getPhase() {
