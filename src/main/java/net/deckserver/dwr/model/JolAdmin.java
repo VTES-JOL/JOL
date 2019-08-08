@@ -8,6 +8,7 @@ package net.deckserver.dwr.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.base.Strings;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.async.Callback;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -67,6 +69,31 @@ public class JolAdmin {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         timestamps = loadTimestamps();
         Unirest.setTimeouts(5000, 10000);
+    }
+
+    public void writeSnapshot(String id, DsGame state, DsTurnRecorder actions, String turn) {
+        writeState(id, state, turn);
+        writeActions(id, actions, turn);
+    }
+
+    private void writeActions(String id, DsTurnRecorder actions, String turn) {
+        GameActions gactions = new GameActions();
+        gactions.setCounter("1");
+        gactions.setGameCounter("1");
+        StoreTurnRecorder wrec = new StoreTurnRecorder(gactions);
+        ModelLoader.createRecorder(wrec, actions);
+        String fileName = Strings.isNullOrEmpty(turn) ? "actions.xml" : "actions-"+turn+".xml";
+        File actionsFile = Paths.get(dir).resolve(id).resolve(fileName).toFile();
+        FileUtils.saveGameActions(gactions, actionsFile);
+    }
+
+    private void writeState(String id, DsGame state, String turn) {
+        GameState gstate = new GameState();
+        StoreGame wgame = new StoreGame(gstate);
+        ModelLoader.createModel(wgame, state);
+        String fileName = Strings.isNullOrEmpty(turn) ? "game.xml" : "game-"+turn+".xml";
+        File gameFile = Paths.get(dir).resolve(id).resolve(fileName).toFile();
+        FileUtils.saveGameState(gstate, gameFile);
     }
 
     private Timestamps loadTimestamps() {
@@ -450,7 +477,7 @@ public class JolAdmin {
     }
 
     class GameInfo extends Info {
-        private final String prefix;
+        private final String id;
         JolGame game;
         String gameName;
 
@@ -461,9 +488,9 @@ public class JolAdmin {
             this(name, sysInfo.getKey(name), false);
         }
 
-        GameInfo(String name, String prefix, boolean init) {
-            super(prefix + "/game.properties", init);
-            this.prefix = prefix;
+        GameInfo(String name, String id, boolean init) {
+            super(id + "/game.properties", init);
+            this.id = id;
             gameName = name;
             if (!init && info.size() == 0)
                 throw new IllegalArgumentException("Game " + name + " doesn't exist.");
@@ -477,7 +504,7 @@ public class JolAdmin {
         }
 
         private File getGameDir() {
-            return new File(dir, prefix);
+            return new File(dir, id);
         }
 
         public JolGame getGame() {
@@ -507,7 +534,7 @@ public class JolAdmin {
             actions = new DsTurnRecorder();
             ModelLoader.createModel(state, new StoreGame(gstate));
             ModelLoader.createRecorder(actions, new StoreTurnRecorder(gactions));
-            game = new JolGame(state, actions);
+            game = new JolGame(id, state, actions);
         }
 
         String getHeader() {
@@ -574,7 +601,7 @@ public class JolAdmin {
             info.setProperty("state", "closed");
             state = new DsGame();
             actions = new DsTurnRecorder();
-            game = new JolGame(state, actions);
+            game = new JolGame(id, state, actions);
             game.initGame(gameName);
             regDecks();
         }
@@ -639,18 +666,8 @@ public class JolAdmin {
             super.write();
             if (game != null) {
                 logger.debug("Saving game {}", gameName);
-                GameState gstate = new GameState();
-                GameActions gactions = new GameActions();
-                gactions.setCounter("1");
-                gactions.setGameCounter("1");
-                StoreGame wgame = new StoreGame(gstate);
-                StoreTurnRecorder wrec = new StoreTurnRecorder(gactions);
-                ModelLoader.createModel(wgame, state);
-                ModelLoader.createRecorder(wrec, actions);
-                File gameFile = new File(getGameDir(), "game.xml");
-                FileUtils.saveGameState(gstate, gameFile);
-                File actionsFile = new File(getGameDir(), "actions.xml");
-                FileUtils.saveGameActions(gactions, actionsFile);
+                writeState(id, state, null);
+                writeActions(id, actions, null);
             }
         }
 
