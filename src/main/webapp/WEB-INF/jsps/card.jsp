@@ -7,7 +7,8 @@
 <%
     CardParams p = (CardParams) request.getAttribute("cparams");
     JolGame game = (JolGame) request.getAttribute("game");
-    Integer index = (Integer)request.getAttribute("index");
+    String region = (String)request.getAttribute("region");
+    String coordinates = (String)request.getAttribute("coordinates");
     Card c = p.getCard();
     int capacity = game.getCapacity(c.getId());
     int counters = game.getCounters(c.getId());
@@ -44,11 +45,16 @@
     XXXXXX
 </c:if>
 <c:if test="${!p.hidden}">
-    <a class="card-name <%= typeClass %>" title="<%= p.getId() %>" data-card-id="<%= p.getId() %>"
-       <c:if test="${index != null}">
-       data-index="<%= index %>" onclick="showCardModal(event)"
-       </c:if>
-       ><%= p.getName() %></a>
+    <a class="card-name <%= typeClass %>" title="<%= p.getId() %>" data-card-id="<%= p.getId() %>" data-coordinates="<%= coordinates %>"
+      <c:choose>
+        <c:when test="${region == 'hand'}">
+          onclick="showCardModal(event)"
+        </c:when>
+        <c:otherwise>
+          onclick="pickTarget(event)"
+        </c:otherwise>
+      </c:choose>
+      ><%= p.getName() %></a>
 </c:if>
 <c:if test="${game != null}">
     <c:if test="${capacity > 0 && !p.hidden}">
@@ -78,10 +84,15 @@
     </c:if>
     <c:if test="${nested && hasCards}">
         <ol>
+            <%
+              int childCoord = 1;
+            %>
             <c:forEach items="${cards}" var="child">
                 <%
                     Card child = (Card) pageContext.findAttribute("child");
                     request.setAttribute("cparams", new CardParams(child));
+                    request.setAttribute("coordinates", String.format("%s %s", coordinates, childCoord));
+                    ++childCoord;
                 %>
                 <li>
                     <jsp:include page="card.jsp"/>

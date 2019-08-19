@@ -16,7 +16,23 @@ public class LibraryCardMode {
     private String text;
 
     public enum Target {
-        READY_REGION, SELF
+        /**
+         * Played to player's ready region.
+         */
+        READY_REGION,
+        /**
+         * Played on the minion playing the card.
+         * Presents a list of the player's ready and torpored minions for
+         * selection.
+         */
+        SELF,
+        /**
+         * Played on any card on the table.
+         * Used when a more specific parser for "Put this card on" is not
+         * implemented. This target presents a list of all cards on the table
+         * for selection.
+         */
+        SOMETHING
     }
 
     /**

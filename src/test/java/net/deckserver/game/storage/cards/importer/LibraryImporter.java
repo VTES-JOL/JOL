@@ -37,6 +37,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final Pattern PUT_INTO_PLAY_PATTERN = Pattern.compile(".*[Pp]ut this card in(?:to)? play.*");
     private static final Pattern PUT_ON_ACTING_PATTERN = Pattern.compile(".*[Pp]ut this card on the acting.*");
     private static final Pattern PUT_ON_SELF_PATTERN = Pattern.compile(".*[Pp]ut this card on this.*");
+    private static final Pattern PUT_ON_SOMETHING_PATTERN = Pattern.compile(".*[Pp]ut this card on.*");
 
     public LibraryImporter(Path dataPath) {
         super(dataPath);
@@ -118,6 +119,8 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                         && PUT_ON_ACTING_PATTERN.matcher(mode.getText()).matches())
                     || PUT_ON_SELF_PATTERN.matcher(mode.getText()).matches())
                 mode.setTarget(LibraryCardMode.Target.SELF);
+            else if (PUT_ON_SOMETHING_PATTERN.matcher(mode.getText()).matches())
+                mode.setTarget(LibraryCardMode.Target.SOMETHING);
 
             modes.add(mode);
         }
