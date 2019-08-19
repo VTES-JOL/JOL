@@ -1152,27 +1152,30 @@ input[type=checkbox] {
     }
 }
 
-#cardModal .card-type {
+.modal-title {
+  text-align: left;
+}
+.modal-title .card-type {
   font-size: 2em;
   vertical-align: sub;
   line-height: 1em;
 }
-#cardModal .card-type:before { font-family: 'jol'; }
-#cardModal .action:before { content: 'p'; }
-#cardModal .master:before { content: 'x'; }
-#cardModal .political_action:before { content: 'r'; }
-#cardModal .combat:before { content: 't'; }
-#cardModal .reaction:before { content: 'v'; }
-#cardModal .action_modifier:before { content: 'q'; }
-#cardModal .ally:before { content: 's'; }
-#cardModal .retainer:before { content: 'w'; }
-#cardModal .equipment:before { content: 'u'; }
-#cardModal .action_modifier.reaction:before { content: 'qv'; }
-#cardModal .action_modifier.combat:before { content: "qt"; }
-#cardModal .combat.reaction:before { content: "tv"; }
-#cardModal .action.reaction:before { content: "pv"; }
-#cardModal .action.combat:before { content: "pt"; }
-#cardModal .event:before { content: "{"; }
+.modal-title .card-type:before { font-family: 'jol'; }
+.modal-title .action:before { content: 'p'; }
+.modal-title .master:before { content: 'x'; }
+.modal-title .political_action:before { content: 'r'; }
+.modal-title .combat:before { content: 't'; }
+.modal-title .reaction:before { content: 'v'; }
+.modal-title .action_modifier:before { content: 'q'; }
+.modal-title .ally:before { content: 's'; }
+.modal-title .retainer:before { content: 'w'; }
+.modal-title .equipment:before { content: 'u'; }
+.modal-title .action_modifier.reaction:before { content: 'qv'; }
+.modal-title .action_modifier.combat:before { content: "qt"; }
+.modal-title .combat.reaction:before { content: "tv"; }
+.modal-title .action.reaction:before { content: "pv"; }
+.modal-title .action.combat:before { content: "pt"; }
+.modal-title .event:before { content: "{"; }
 
 #cardModal .discipline {
     float: left;
@@ -1226,4 +1229,8 @@ input[type=checkbox] {
 #cardModal .card-minion {
   text-align: left;
   white-space: normal;
+}
+
+#targetPicker {
+  background-color: rgba(0, 0, 0, .5);
 }

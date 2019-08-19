@@ -6,7 +6,7 @@
     boolean empty = r.isEmpty();
     String region = r.getRegion();
 %>
-<div class="region-empty-<%= empty %> <%= region %>">
+<div class="region-empty-<%= empty %> <%= region %>" data-region="<%= region %>">
     <h5 class="region-header">
         <a href="javascript:details('<%= r.getIndex() %>');" id="<%= r.getIndex() %>">
             <i class="toggle"></i>
@@ -17,10 +17,12 @@
     <ol class="card-list" id="region<%= r.getIndex() %>">
         <% for (int i = 0; i < r.getSize(); i++) {
             request.setAttribute("cparams", r.getCardParam(i));
+            request.setAttribute("coordinates", String.valueOf(i + 1));
         %>
         <li>
             <jsp:include page="card.jsp"/>
         </li>
-        <% } %>
+        <% }
+            request.removeAttribute("coordinates"); %>
     </ol>
 </div>

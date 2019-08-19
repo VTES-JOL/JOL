@@ -78,6 +78,23 @@
   </div>
 </div>
 
+<div id="targetPicker" class="fixed-top" style="display:none">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <span class="card-type action"></span>
+          <span class="card-name">Song of Serenity</span>
+        </h5>
+        <button type="button" class="close" onclick="closeTargetPicker()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">Pick target.</div>
+    </div>
+  </div>
+</div>
+
 <script type="text/javascript">
 var CLAN_CHARS = {
   abomination: 'A', arihmane: 'B', akunanse: 'C', assamite: 'D', baali: 'E',
@@ -118,8 +135,9 @@ function showCardModal(event) {
   //Show modal immediately with Loading text
   //$('#cardModal').modal('show');
   var cardId = $(event.target).data('card-id');
-  var handIndex = $(event.target).data('index');
+  var handCoord = $(event.target).data('coordinates');
   $.get({
+      //url: "rest/api/cards/lo0", success: function(card) { //Abombwe
       //url: "rest/api/cards/lo7", success: function(card) { //Akhunanse Kholo
       //url: "rest/api/cards/km98", success: function(card) { //Pack Alpha
       //url: "rest/api/cards/jy322", success: function(card) { //Raven Spy
@@ -133,7 +151,7 @@ function showCardModal(event) {
       url: "rest/api/cards/" + cardId, success: function(card) {
         console.log(card);
         var modal = $('#cardModal');
-        modal.data('hand-index', handIndex);
+        modal.data('hand-coord', handCoord);
         modal.data('do-not-replace', card.doNotReplace);
 
         $('#cardModal .card-name').text(card.displayName);
@@ -157,7 +175,7 @@ function showCardModal(event) {
         modeContainer.empty();
 
         var minionsConfigured = false;
-        var allModesTargetActingMinion = true;
+        var allModesTargetSelf = true;
 
         if (card.modes && card.modes.length > 0) {
           var modeTemplate = $('#cardModal .templates .card-mode');
@@ -196,10 +214,10 @@ function showCardModal(event) {
               }
             }
             else {
-              allModesTargetActingMinion = false;
+              allModesTargetSelf = false;
             }
           }
-          $('#cardModal .who-is-playing-panel').toggle(allModesTargetActingMinion);
+          $('#cardModal .who-is-playing-panel').toggle(allModesTargetSelf);
         }
         if (!minionsConfigured) $('who-is-playing-panel').hide();
         $('#cardModal .loading').hide();
@@ -222,7 +240,6 @@ function configureMinionButtons() {
   ];
   for (var i = 0; i < minions.length; ++i) {
     var minion = minions[i];
-    console.log(minion);
     var button = minionTemplate.clone();
     button.data('region-index', minion.index);
     button.children('.minion-name').text(minion.name);
@@ -271,20 +288,60 @@ function modeClicked(event) {
 
   if (minionPanel.css('display') == 'none'
       || $('#cardModal .card-minions button.active').length > 0) {
-    playCard(event);
+    if (button.data('target') == 'SOMETHING')
+      showTargetPicker();
+    else playCard(event);
   }
   else {
     $('#cardModal .card-modes button').removeClass('active');
   }
 }
+function showTargetPicker() {
+  var picker = $('#targetPicker');
+  $('#targetPicker .card-name').text($('#cardModalLabel').text());
+  $('#targetPicker .card-type')
+    .removeClass()
+    .addClass($('#cardModal .card-type').get(0).className);
+  picker.show();
+
+  var firstPlayerTop =
+    $('#state .player').offset().top
+    - picker.get(0).getBoundingClientRect().bottom;
+  window.scrollTo(0, firstPlayerTop);
+
+  $('#cardModal').modal('hide');
+}
+function pickTarget(event) {
+  var picker = $('#targetPicker');
+  if (picker.css('display') == 'none') {
+    return;
+  }
+  var targetAnchor = $(event.target).closest('a');
+  var player = targetAnchor.closest('[data-player]').data('player').split(' ', 1)[0];
+  var region = targetAnchor.closest('[data-region]').data('region').split('-', 1)[0];
+  var coords = targetAnchor.data('coordinates');
+  var modal = $('#cardModal');
+  modal.data('target', player + ' ' + region + ' ' + coords);
+  console.log(player, region, coords);
+  tippy.hideAll({ duration: 0 });
+
+  var modesSelected = $('#cardModal .card-modes button.active');
+  playCard({target: modesSelected.eq(0)});
+  closeTargetPicker();
+  return false;
+}
+function closeTargetPicker() {
+  $('#targetPicker').hide();
+}
 function playCardCommand(disciplines, target) {
   var modal = $('#cardModal');
-  var handIndex1 = modal.data('hand-index') + 1;
+  var handIndex = modal.data('hand-coord');
   var doNotReplace = modal.data('do-not-replace');
-  return 'play ' + handIndex1
+  return 'play ' + handIndex
          + (disciplines ? ' @ ' + disciplines.join(',') : '')
          + (target == 'READY_REGION' ? ' ready' : '')
          + (target == 'SELF' ? ' re ' + $('#cardModal .card-minions button.active').data('region-index') : '')
+         + (target == 'SOMETHING' ? ' ' + modal.data('target') : '')
          + (doNotReplace ? '' : ' draw');
 }
 function playCard(event) {

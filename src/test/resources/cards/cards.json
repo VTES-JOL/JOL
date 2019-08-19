@@ -171,7 +171,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Laibon or on a vampire with Protean [pro]. This vampire gains one level of Abombwe [abo]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Abombwe [ABO].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -336,7 +336,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire controlled by another Methuselah and choose a circle. While this vampire is in torpor, Blood Brothers of the chosen circle get +1 bleed against this vampire's controller. Any minion can burn this card as a (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -356,7 +356,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Toreador. If this Toreador is blocked, the controller of the blocking minion burns 1 pool (before combat occurs, if any).",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -508,7 +508,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire you control and choose a Discipline. This vampire gains 1 level of that Discipline. Burn this card during your discard phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -1029,7 +1029,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire with capacity above 6. This vampire cannot have or use any ranged weapons except the Ivory Bow. (If he or she currently has any, they are burned.)",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -1167,7 +1167,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put an anarch counter on this acting vampire. This vampire becomes anarch (and Independent). If he or she had a city title, put this card on him or her as a title card to represent the title of baron of the same city. Minions without titles cannot block this action. Burn the anarch counter if this vampire changes sects.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -1223,7 +1223,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a ready vampire. If the referendum is successful, put this card on that vampire. If the vampire with this card is reduced to zero blood in combat, he or she is burned, and the Methuselah controlling the opposing minion gains pool equal to the burned vampire's capacity.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -1242,7 +1242,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Laibon with capacity above 4. This Laibon has +1 bleed and gets an additional vote in any referendum he or she calls.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -1433,7 +1433,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains 1 level of Animalism [ani]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Animalism [ANI].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -1530,7 +1530,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "(D) Put this card on a non-Sabbat vampire with capacity less than 8. The vampire with this card cannot hunt. If he or she must hunt, he or she locks and goes to torpor instead. Burn this card during this vampire's discard phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -1719,7 +1719,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a Camarilla vampire. If this referendum is successful, put this card on the chosen vampire. This vampire may enter combat with a vampire controlled by another Methuselah as a +1 stealth (D) action. Any vampire attempting to block this vampire burns 1 blood. Blood hunts cannot be called on this vampire. Any Camarilla vampire can call a referendum to burn this card as a +1 stealth political action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -1804,7 +1804,7 @@
   "modes" : [ {
     "disciplines" : [ "tha" ],
     "text" : "Put this card on a slave Gargoyle you control. The Gargoyle with this card treats aggravated damage as normal damage. Burn this card if this Gargoyle goes to torpor. A Gargoyle can have only one Armor of Terra.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "vis" ],
     "text" : "As [tha] above, but put this card on this acting Gargoyle.",
@@ -2018,7 +2018,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready Toreador antitribu. This vampire gets +2 strength.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -2067,7 +2067,7 @@
   }, {
     "disciplines" : [ "MEL" ],
     "text" : "(D) Put this card on any ready unlocked minion and lock that minion. The minion with this card burns 1 additional blood or life each time he or she attempts to take an action or block. During his or her master phase, the controller of the minion with this card may lock this minion and burn a pool to burn this card. A minion may have only one Art's Traumatic Essence.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -2086,7 +2086,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on any ready Brujah. Toreador cannot attempt to block the actions of that vampire. This card may be burned by any Toreador as a (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -2360,7 +2360,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains 1 level of Auspex [aus]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Auspex [AUS].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -2446,7 +2446,7 @@
   }, {
     "disciplines" : [ "VAL" ],
     "text" : "Only usable when a minion is bleeding you for 1 or more. Put this card on the acting minion. You still control this card. This minion gets -1 bleed when bleeding you. Any minion may burn this card as a +1 stealth (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -2490,7 +2490,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Laibon. This Laibon may lock this card to cancel a Frenzy card played on him or her as it is played. This Laibon may burn a blood and lock three of his or her Aye to be able to play reaction cards and attempt to block as if unlocked for the current action. If this Laibon burns a minion, equipment, or location in play, he or she burns one Aye. Burn this card if this Laibon has more Orun and Aye than his or her capacity.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -2777,7 +2777,7 @@
   "modes" : [ {
     "disciplines" : [ "mal" ],
     "text" : "(D) Put this card on a vampire and unlock this acting vampire. This vampire is sterile and his or her capacity decreases by 2 (to a minimum of 1.) [mal] is not a Discipline.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "MAL" ],
     "text" : "(D) Burn a vampire whose capacity is 1.",
@@ -3200,7 +3200,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Gangrel antitribu. The vampire with this card gets -1 stealth.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -3367,7 +3367,7 @@
   }, {
     "disciplines" : [ "THA" ],
     "text" : "Put this card on a minion you control. The minion with this card gets an optional maneuver each combat and +1 strength.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -3465,7 +3465,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready Black Hand vampire. This Black Hand vampire gets X additional votes, where X is the number of ready Black Hand vampires you control. Any Seraph may move this card to a ready Black Hand vampire as a +1 stealth (D) action, directed at the controller of this card.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -3595,7 +3595,7 @@
   }, {
     "disciplines" : [ "OBF" ],
     "text" : "(D) Put this card on a ready vampire. The vampire with this card cannot block this acting vampire. He or she may burn this card by burning 2 blood during his or her unlock phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -3833,7 +3833,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on an Ahrimane you control with any cards requiring Spiritus [spi] from your hand (before replacing), face down (you can look at the cards at any time). This Ahrimane can play these cards as if from your hand. Burn this card if it has no cards on it. A vampire can have only one Blessing of the Beast.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -4054,7 +4054,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "(D) Put this card on any vampire. The vampire with this card cannot block this acting vampire.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -4095,7 +4095,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready Blood Brother you control. This Blood Brother gets +1 level of Sanguinus [san].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -4115,7 +4115,7 @@
   "modes" : [ {
     "disciplines" : [ "qui" ],
     "text" : "(D) Put this card on a minion controlled by another Methuselah. This minion cannot gain blood or life; any blood or life this minion gains goes to the blood bank instead. Any minion may burn this card as an action.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "QUI" ],
     "text" : "As above, and the minion with this card burns 1 blood or life when this card is burned.",
@@ -4158,7 +4158,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire you control. During his or her master phase, this vampire's controller may move 1 blood from this vampire to his or her pool or from his or her pool to this vampire.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -4221,7 +4221,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "(D) Put this card on a vampire who is not a prince, a justicar or an Inner Circle member. Any vampire controlled by another Methuselah may enter combat with this vampire as a +1 stealth (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -4266,7 +4266,7 @@
   }, {
     "disciplines" : [ "THA" ],
     "text" : "+6 stealth action. (D) Put this card on a ready locked younger vampire. Reaction cards the attached vampire plays while locked are canceled as they are played (their cost must be paid still). Burn this card if the attached vampire is in torpor.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -4308,7 +4308,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Sabbat vampire other than the acting vampire. The vampire with this card gains 1 blood after each successful (D) action he or she performs. A vampire may have only one Blood of the Sabbat.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -4392,7 +4392,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "No action modifiers can be played during or after this referendum. Choose a ready Sabbat vampire and a ready prince. Successful referendum means that that prince loses his or her title; put this card on the Sabbat vampire to represent the unique Sabbat title of Archbishop of that city. Any ready vampire can gain votes during this referendum by burning one blood per vote gained.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -4453,7 +4453,7 @@
   "modes" : [ {
     "disciplines" : [ "for", "qui" ],
     "text" : "Put this card on an equipment. This melee weapon inflicts an additional damage each strike. When this equipment prevents damage in combat, it can prevent an additional point. An equipment can have only one Blood Tempering.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "FOR", "QUI" ],
     "text" : "As above, and unlock this acting vampire.",
@@ -4520,7 +4520,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on any minion. When this minion enters combat, he or she moves this card and 1 blood (or life) to the opposing minion. If the opposing minion is an anarch, that anarch can move this card onto any minion instead (but it must move).",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -4558,7 +4558,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Move 2 blood from the blood bank to a ready Sabbat vampire with capacity above 4. Put this card on that vampire. The vampire with this card gains 1 additional vote unless he or she has a title. A vampire may have only one Bloodbath.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -4619,7 +4619,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Salubri antitribu you control. This Salubri antitribu gains one level of Valeren [val] and gets +1 strength. Capacity increases by 1: the Salubri antitribu is one generation older. A vampire can have only one Blooding by the Code.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -4991,7 +4991,7 @@
   "modes" : [ {
     "disciplines" : [ "vic" ],
     "text" : "Strike: 1 damage. Put this card on the opposing minion. The minion with this card has -1 strength. (This does not affect the current Strike Resolution step.) He or she may burn this card by paying 2 blood as a +1 stealth action.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "VIC" ],
     "text" : "As above, but the minion with this card has -2 strength.",
@@ -5073,7 +5073,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on any ready vampire and put X+1 counters on this card. If this vampire is sent to torpor in combat, the opposing minion's controller moves up to 2 counters from this card to his or her pool. If this vampire is burned in combat or by diablerie, the controller of the opposing minion or diablerist takes all of the counters from this card. Burn this card when it has no counters.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -5131,7 +5131,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on an uncontrolled minion in your prey's uncontrolled region. This card remains in play. No transfers can be used to move blood to or from that card. Any minion may burn this card as a +1 stealth (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -5169,7 +5169,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire you control. Once per turn, when this vampire successfully performs an action to enter combat with another, he or she gains 1 blood from the blood bank when the combat ends, if he or she is still ready. A vampire can have only one archetype.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -5485,7 +5485,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a ready Brujah. If this referendum passes, put this card on the chosen Brujah to represent the unique Camarilla title of Brujah Justicar. In this referendum, each ready Brujah gets 1 additional vote.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -5609,7 +5609,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on any minion. While it is not this minion's turn, using an effect to unlock this minion or to allow this minion to block as if unlocked costs an additional pool. This minion may burn this card and unlock as a (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -5765,7 +5765,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Sabbat vampire in your uncontrolled region who is not Black Hand. While this Sabbat vampire is controlled, he or she is Black Hand. This card remains in play, even when the vampire is in the uncontrolled region. A minion may have only one Cadet.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -6118,7 +6118,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Sabbat vampire you control. Once per turn, when this vampire successfully bleeds his or her prey, he or she gains 1 blood from the bank. A vampire can have only one archetype.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -6156,7 +6156,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a Sabbat vampire with a capacity over 6. If this referendum passes, put this card on that vampire to represent the Sabbat title of cardinal. Camarilla vampires cannot cast votes or ballots during this referendum.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -6175,7 +6175,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Only usable when this vampire has blocked a Sabbat vampire without a title, before combat begins. Put this card on that vampire. You still control this card. Any Sabbat vampire controlled by another Methuselah may enter combat with the vampire with this card as a (D) action. Any Sabbat vampire can burn this card as a (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -6254,7 +6254,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready Toreador. You may burn this card to give this Toreador +1 stealth for the current action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -6491,7 +6491,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire you control. Once each turn, this vampire can burn 1 blood to unlock after performing a successful action costing blood. A vampire can have only one archetype.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -6531,7 +6531,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains one level of Celerity [cel]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Celerity [CEL].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -6573,7 +6573,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready Black Hand vampire. During an action, this Black Hand vampire can lock to give any other Sabbat vampire +1 bleed or 2 additional votes for the current action. During an action, this Black Hand vampire can lock to give any other Black Hand vampire +1 intercept.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -6825,7 +6825,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire you control. Other Methuselahs' actions targeting this vampire cost an additional blood. This vampire can burn this card to cause an action targeting him or her to fail. A vampire may have only one Chanjelin Ward.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -6950,7 +6950,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready vampire. This vampire's recruit ally actions cost 1 less blood or pool (but never less than 0 blood or pool).",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -7149,7 +7149,7 @@
   "modes" : [ {
     "disciplines" : [ "nec" ],
     "text" : "Put this card on a ready vampire. This vampire may burn this card in combat to treat aggravated damage as normal for the remainder of combat. A vampire can have only one Chill of Oblivion.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "NEC" ],
     "text" : "As above, and this acting vampire unlocks during your next discard phase.",
@@ -7172,7 +7172,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains 1 level of Chimerstry [chi]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Chimerstry [CHI].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -7436,7 +7436,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "(D) Enter combat with a ready minion controlled by another Methuselah and put this card on that minion. This Assamite is chosen for this contract. This Assamite may enter combat with this minion as a +1 stealth (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -7985,7 +7985,7 @@
   }, {
     "disciplines" : [ "DOM" ],
     "text" : "As above, and put this card on the ally. This ally does not unlock as normal. During this ally's next unlock phase, burn this card.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -8356,7 +8356,7 @@
   }, {
     "disciplines" : [ "dai" ],
     "text" : "Requires an Infernal vampire. (D) Put this card on a ready minion. Bleed actions cost the minion with this card an additional blood. Burn all other Condemnations on this minion.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "DAI" ],
     "text" : "As [dai] above, and the minion's controller burns the top card from his or her library during each of his or her unlock phases.",
@@ -8383,7 +8383,7 @@
   }, {
     "disciplines" : [ "dai" ],
     "text" : "Requires an Infernal vampire. (D) Put this card on a ready minion. The minion with this card has -1 stealth. Burn all other Condemnations on this minion.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "DAI" ],
     "text" : "As [dai] above, and the minion's controller burns 1 pool each time the minion is successfully blocked.",
@@ -8410,7 +8410,7 @@
   }, {
     "disciplines" : [ "dai" ],
     "text" : "Requires an Infernal vampire. (D) Put this card on a ready minion. The minion with this card has -1 strength. Burn all other Condemnations on this minion.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "DAI" ],
     "text" : "As [dai] above, and the minion cannot use presses in combat.",
@@ -8437,7 +8437,7 @@
   }, {
     "disciplines" : [ "dai" ],
     "text" : "Requires an infernal vampire. (D) Put this card on a ready vampire. The vampire with this card has -3 votes. Burn all other Condemnations on this minion.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "DAI" ],
     "text" : "As above, and this vampire burns 1 blood each time a referendum passes.",
@@ -8484,7 +8484,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Daughter of Cacophony. While this Daughter of Cacophony is unlocked or acting, each unlocked or acting Daughter of Cacophony gets an additional vote.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -8596,7 +8596,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire you control. If your prey loses pool when it is neither your turn nor your prey's turn, you may lock this card to move 1 blood from the blood bank to this vampire. A vampire can have only one archetype.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -8717,7 +8717,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a location you control. You may burn this card to cause an action directed at the location to fail.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -8757,7 +8757,7 @@
   }, {
     "disciplines" : [ "SER" ],
     "text" : "(D) Put this card on a ready minion. During this minion's unlock phase, he or she burns 1 blood or life. If this vampire cannot burn a blood, he or she goes to torpor. Burn this card if this acting minion enters combat or leaves the ready region. A minion can have only one Consignment to Duat.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -8862,7 +8862,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on any ready minion and choose an Assamite in play. That Assamite may enter combat with that minion as a +1 stealth (D) action unless they are controlled by the same Methuselah.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -8964,7 +8964,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on any Black Hand vampire. This vampire may lock this card to prevent 1 point of damage in combat or to gain a blood. This card doesn't unlock as normal. This vampire may burn a blood to unlock this card during his or her unlock phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9319,7 +9319,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Sabbat vampire you control. Once per turn, when a minion opposing this vampire in combat dodges or ends combat as a strike, this vampire gains 1 blood from the blood bank. A vampire can have only one archetype.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9337,7 +9337,7 @@
   "modes" : [ {
     "disciplines" : [ "thn" ],
     "text" : "Strike: hand strike, and put this card on the opposing minion. You still control this card. When this striking vampire announces an action, you may burn this card to prevent this minion from blocking. A minion may have only one Creeping Infection.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "THN" ],
     "text" : "As [thn] above, and this striking vampire gets +1 bleed when bleeding this minion's controller.",
@@ -9515,7 +9515,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Amsterdam. This could lead to a contested title. If this vampire is Ventrue antitribu, he or she unlocks during your next discard phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9534,7 +9534,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Aragon. If Lucita is in play and is Sabbat, put this card on her instead.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9553,7 +9553,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Atlanta. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9572,7 +9572,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Barcelona. This could lead to a contested title. If this vampire is Tremere antitribu, he or she unlocks during your next discard phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9591,7 +9591,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Berlin. This could lead to a contested title. If this vampire is Lasombra, he or she unlocks during your next discard phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9610,7 +9610,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Brussels. This could lead to a contested title. If this vampire is Toreador antitribu, he or she unlocks during your next discard phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9629,7 +9629,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Chicago. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9648,7 +9648,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Detroit. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9667,7 +9667,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Dublin. This could lead to a contested title. If this vampire is Gangrel antitribu, he or she unlocks during your next discard phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9686,7 +9686,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Frankfurt. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9705,7 +9705,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Geneva. This could lead to a contested title. If this vampire is Malkavian antitribu, he or she unlocks during your next discard phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9724,7 +9724,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Houston. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9743,7 +9743,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Istanbul. This could lead to a contested title. If this vampire is Tzimisce, he or she unlocks during your next discard phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9762,7 +9762,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of London. This could lead to a contested title. If this vampire is Nosferatu antitribu, he or she unlocks during your next discard phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9781,7 +9781,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Mexico City. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9800,7 +9800,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Miami. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9819,7 +9819,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of New York. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9838,7 +9838,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Paris. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9857,7 +9857,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Philadelphia. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9876,7 +9876,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Pittsburgh. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9895,7 +9895,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Rome. This could lead to a contested title. If this vampire is Brujah antitribu, he or she unlocks during your next discard phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9914,7 +9914,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Toronto. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9933,7 +9933,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum passes, put this card on the acting vampire to represent the unique Sabbat title of Archbishop of Washington, D.C. This could lead to a contested title. If this vampire is Ventrue antitribu, he or she unlocks during your next discard phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -10111,7 +10111,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire you control. During your prey's unlock phase, you may choose a minion controlled by your prey. If that minion is blocked this turn, you may lock this card to move 1 blood from the blood bank to this vampire. A vampire can have only one archetype.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -10169,7 +10169,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire you control. Once each turn, this vampire can gain 1 blood or burn 1 blood to unlock after performing an action (successful or not) during which they used 3 or more Disciplines to play cards. A vampire can have only one archetype.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -10277,7 +10277,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire with a capacity below 5. The vampire with this card burns 1 additional blood for each bleeding action he or she successfully performs (after resolving the action).",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -10452,7 +10452,7 @@
   }, {
     "disciplines" : [ "OBT" ],
     "text" : "As above, and if this vampire successfully blocks the acting minion, put this card on the acting minion. The minion with this card gets -1 stealth when attempting to bleed this reacting vampire's controller. Any minion may burn this card as a +1 stealth action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -10688,7 +10688,7 @@
   "modes" : [ {
     "disciplines" : [ "nec" ],
     "text" : "(D) Put this card on a ready vampire. If that vampire is burned, put this card on the vampire who brought this card into play. This card then represents a wraith retainer with 2 life. Once each combat, the vampire with this retainer may treat one aggravated damage inflicted on him or her as normal.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "NEC" ],
     "text" : "As above, but the retainer has 3 life.",
@@ -10756,7 +10756,7 @@
   "modes" : [ {
     "disciplines" : [ "thn" ],
     "text" : "(D) Put this card on any minion. The attached minion gets -1 stealth on non-hunt actions and cannot use additional strikes. During their unlock phase, the attached minion can burn 2 blood or life to burn this card.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "THN" ],
     "text" : "As [thn] above, and presses cost the attached minion 1 additional blood or life to use.",
@@ -10803,7 +10803,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "(D) Put this card on a younger ready vampire. You still control this card. During your unlock phase, you may look at this vampire's controller's hand. This vampire can burn this card as a (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -10864,7 +10864,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a slave Gargoyle with a capacity above 4. This Gargoyle gets +2 intercept against (D) actions. A Gargoyle can have only one Defender of the Haven.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -10948,7 +10948,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains 1 level of Dementation [dem]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Dementation [DEM].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -11051,7 +11051,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready vampire you control. This vampire has +1 strength, and he or she gets +1 stealth on diablerie actions. He or she cannot recruit allies or employ retainers.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -11071,7 +11071,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "(D) Put this card on a younger vampire. The vampire with this card is considered to be the same clan as the acting vampire. The vampire with this card does not unlock as normal. During his or her controller's unlock phase, he or she may burn 1 blood to unlock. The vampire with this card may move it to another vampire as a (D) action. This card cannot be placed on a Malkavian or Malkavian antitribu.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -11091,7 +11091,7 @@
   "modes" : [ {
     "disciplines" : [ "obt" ],
     "text" : "Turn the acting vampire and any cards on him or her face down, out of play (breaking any temporary control effects). Put this card on him or her (in play). During your influence phase, move 2 blood to this face down vampire from the blood bank, and you can choose to burn this card to return the vampire to play, locked.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "OBT" ],
     "text" : "As above, but the vampire is unlocked when he or she returns to play.",
@@ -11204,7 +11204,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Lasombra. The vampire with this card does not unlock as normal. During his or her controller's unlock phase, this vampire may burn 1 blood to unlock. This vampire cannot cast votes or ballots. He or she may burn this card as a (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -11493,7 +11493,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a minion and choose a Samedi in play. The chosen Samedi can enter combat with the minion with this card as a +1 stealth (D) action unless they are controlled by the same Methuselah. This card cannot be placed on a Nosferatu or a Giovanni.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -11552,7 +11552,7 @@
   "modes" : [ {
     "disciplines" : [ "pot" ],
     "text" : "Only usable at close range at the end of a round of combat in which this vampire successfully inflicted more damage than the opposing vampire. Not usable by a vampire being burned or going into torpor. Put this card on the opposing vampire and send that vampire into torpor. The vampire with this card has -1 strength. He or she may burn this card by burning 3 blood. A vampire can have only one Disarm.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "POT" ],
     "text" : "As above, but the vampire with this card has -2 strength.",
@@ -12050,7 +12050,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains 1 level of Dominate [dom]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Dominate [DOM].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -12092,7 +12092,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Black Hand vampire. Vampires must burn 1 blood to attempt to block this Black Hand vampire. A vampire can have only one Dominion.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -12182,7 +12182,7 @@
   "modes" : [ {
     "disciplines" : [ "chi" ],
     "text" : "+1 stealth action. (D) Put this card on a ready minion. You still control this card. Burn this card to reduce that minion's stealth to 0. The minion may still increase his or her stealth.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "CHI" ],
     "text" : "Reduce the acting minion's stealth to 0. The minion may still increase his or her stealth.",
@@ -13663,11 +13663,11 @@
   "modes" : [ {
     "disciplines" : [ "pre" ],
     "text" : "Put this card on a vampire you control. This vampire has +1 strength and may enter combat with any minion as a (D) action. Burn this card at the end of this turn.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "PRE" ],
     "text" : "(D) Put this card on any vampire. This vampire must burn 2 blood to attempt any action except hunts and actions to enter combat. Burn this card after resolving this vampire's action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -13685,7 +13685,7 @@
   "modes" : [ {
     "disciplines" : [ "vis" ],
     "text" : "[ACTION] +1 stealth action. Put this card on a location and unlock this vampire. While this vampire is ready, their controller can burn this card during a (D) action against the attached location to have the action fail, and the acting minion and this vampire enter combat.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "VIS" ],
     "text" : "[REACTION] Only usable during a (D) action against any location. This vampire unlocks, the action fails, and the acting minion and this vampire enter combat.",
@@ -13816,7 +13816,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Ventrue with capacity 8 or more. This Ventrue gets +1 intercept and +1 vote. This Ventrue can force a vampire to yield a contested title as a +1 stealth (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -13896,7 +13896,7 @@
   "modes" : [ {
     "disciplines" : [ "qui" ],
     "text" : "(D) Put this card on a minion controlled by another Methuselah. That minion has a base strength of 0 and cannot use melee weapons; he or she may burn this card as a +1 stealth action.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "QUI" ],
     "text" : "As above, but the action to burn this card does not get +1 stealth.",
@@ -14255,7 +14255,7 @@
   "modes" : [ {
     "disciplines" : [ "ser" ],
     "text" : "Put this card on the acting minion. The minion with this card burns an additional blood to unlock during his or her unlock phase. A Methuselah can burn the Edge to burn all Extortion cards he or she has.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "SER" ],
     "text" : "The acting minion's controller takes control of this card (put this card in play). The controller of this card burns 1 pool during his or her unlock phase. He or she can burn the Edge to burn all Extortion cards he or she has.",
@@ -14767,7 +14767,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready vampire. The controller of this vampire burns 3 pool after this vampire goes to torpor. During each Methuselah's unlock phase, if this vampire is in torpor, that Methuselah burns 1 pool.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -14827,7 +14827,7 @@
   "modes" : [ {
     "disciplines" : [ "chi" ],
     "text" : "(D) Put this card on a ready minion and lock that minion. This minion cannot play cards or cast votes or ballots. This minion does not unlock as normal. During this minion's unlock phase, he or she can burn 1 life or 1 blood to burn this card. Burn this card if this minion enters combat.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "CHI" ],
     "text" : "As above, but this is a +1 stealth action.",
@@ -14943,7 +14943,7 @@
   "modes" : [ {
     "disciplines" : [ "chi" ],
     "text" : "[COMBAT] Strike: put this card on the opposing vampire; this cannot be dodged. The vampire with this card cannot play cards that require any superior Disciplines. He or she may burn this card during his or her unlock phase instead of unlocking.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "CHI" ],
     "text" : "[REACTION] As above, but put on the acting vampire after a successful (D) action directed at you (after resolving the action).",
@@ -15032,7 +15032,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready justicar or Inner Circle member. Lock that vampire. During this vampire's unlock phase, he or she burns 5 blood. If the vampire cannot burn the blood, he or she is burned; otherwise, the vampire's controller moves this card to any other justicar or Inner Circle member (or burns this card if there are no others).",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -15258,7 +15258,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Gangrel or Gangrel antitribu you control. This vampire is now Ahrimane (and Sabbat). This vampire gains one level of Spiritus [spi]. This vampire is now sterile.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -15338,7 +15338,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Unlock this vampire, choose a discipline they have at superior and put this card on another  ready non-titled vampire you control. The attached vampire is considered anarch (and Independent), and gets +1 level of the chosen Discipline. If the attached vampire changes sect, burn this card. A vampire can have only one Field Training.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -15498,7 +15498,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Sabbat vampire. Once each combat, the vampire with this card may treat 1 aggravated damage inflicted on him or her as normal damage. A vampire may have only one Fire Dance.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -15560,7 +15560,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting anarch. This anarch gets 1 additional vote during a political action. During your minion phase, this anarch can burn 1 blood to unlock a ready younger anarch. Burn this card if this anarch goes to torpor. An anarch may have only 1 Firebrand.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -15855,7 +15855,7 @@
   "modes" : [ {
     "disciplines" : [ "vic" ],
     "text" : "Strike: 1 damage. Put this card on the opposing minion. The minion with this card has -1 stealth. He or she may burn this card as a +1 stealth action.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "VIC" ],
     "text" : "As above, but the minion with this card has -2 stealth.",
@@ -16224,7 +16224,7 @@
   "modes" : [ {
     "disciplines" : [ "pot" ],
     "text" : "Put this card on the weapon. This weapon inflicts +1 damage each strike.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "POT" ],
     "text" : "As above, and the cost of this weapon is reduced by 1 blood or 1 pool.",
@@ -16379,7 +16379,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains 1 level of Fortitude [for]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Fortitude [FOR].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -16503,7 +16503,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a younger Laibon in your uncontrolled region and move 4 blood from the blood bank to that vampire. (This card remains in play.) A vampire may have only one Founders of the Ebony Kingdom. Burn this card if the vampire leaves the uncontrolled region.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -16891,7 +16891,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready non-titled, non-anarch vampire you control. The vampire with this card is considered anarch (and independent). If this vampire changes sects, burn this card.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -17009,7 +17009,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Gangrel. This vampire gets -1 bleed.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -17048,7 +17048,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "In this referendum, each Gangrel gets an extra vote. Choose a ready Camarilla Gangrel. If this referendum is successful, put this card on the chosen Gangrel to represent the unique Camarilla title of Gangrel Justicar. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -17341,7 +17341,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this action is successful, put this card on that ally and add 1 additional life to the ally from the blood bank. This ally is considered a ghoul and not a mortal. Once each combat, this ally can play a strike card that requires basic Potence [pot] as a vampire.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -18061,7 +18061,7 @@
   }, {
     "disciplines" : [ "mal" ],
     "text" : "(D) Put this card on an ally or a younger vampire. Bleed actions and combat cards cost this minion an additional blood or life. A minion can have only one Greater Curse. [mal] is not a Discipline.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "MAL" ],
     "text" : "As [mal] above, but the vampire need not be younger.",
@@ -18316,7 +18316,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready vampire you control. This vampire gets +1 intercept when you are being bled. This vampire may prevent 1 damage each combat. Burn this card if this vampire goes to torpor.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -18442,7 +18442,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Sabbat vampire you control. Once per turn, when this vampire calls a referendum and it passes, he or she gains 1 blood from the blood bank. A vampire can have only one archetype.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -18619,7 +18619,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on any ready minion and choose a Black Hand vampire. That Black Hand vampire may enter combat with the minion with this card as a +1 stealth (D) action unless they are controlled by the same Methuselah.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -18697,7 +18697,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Lock a ready Independent or Anarch Assamite you control to put this card on a younger vampire. Every Independent or Anarch Assamite is considered chosen for this contract. Any Independent or Anarch Assamite can enter combat with the attached vampire as a +1 stealth (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -18884,7 +18884,7 @@
   "modes" : [ {
     "disciplines" : [ "nec" ],
     "text" : "Put this card on a location you control. The controller of this location can burn this card to cause an action directed at this location to fail. A location can have only one Haunt.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "NEC" ],
     "text" : "(D) Burn a location that doesn't require Giovanni to play.",
@@ -18907,7 +18907,7 @@
   "modes" : [ {
     "disciplines" : [ "dem" ],
     "text" : "(D) Put this card on any minion. The minion with this card burns 1 blood or life during his or her unlock phase. Any minion can burn this card as an action. A minion can have only one The Haunting.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "As above, but this action is at +1 stealth.",
@@ -18930,7 +18930,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Tzimisce. When this Tzimisce blocks, he or she may play combat cards in the resulting combat as if all of his or her Disciplines were at the superior level.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -18970,7 +18970,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready vampire. Any minion not controlled by that vampire's controller may enter combat with that vampire as a +1 stealth (D) action. That vampire can burn this card as a +1 stealth (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -19538,7 +19538,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum succeeds, put this card on the acting Laibon. This Laibon gets +1 bleed. Cards which require a non-Laibon title cannot be played on this Laibon nor while this Laibon is acting. A minion may have only one Hiding in the Open.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -19556,7 +19556,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a Follower of Set. If this referendum passes, put this card on the chosen vampire. The vampire with this card has 1 additional vote. Any vampire who successfully blocks the vampire with this card burns 1 blood (before combat, if any).",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -19905,7 +19905,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready Samedi you control. During your unlock phase, this Samedi gains 1 blood from the bank, and he or she may lock to gain an additional blood. Any other Samedi may move this card to himself or herself as a +1 stealth action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -19973,7 +19973,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready vampire you control. When attempting to rescue a vampire from torpor, this vampire gets +1 stealth and burns 1 less blood if successful. This vampire cannot commit diablerie.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -20030,7 +20030,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on any ready vampire. This vampire gets +1 stealth when attempting to commit diablerie. This vampire may not cast votes or ballots during a referendum to call a blood hunt on this vampire.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -20276,7 +20276,7 @@
   "modes" : [ {
     "disciplines" : [ "qui" ],
     "text" : "Put this card on that vampire; that vampire cannot block this reacting vampire. Burn this card if that vampire goes into torpor.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "QUI" ],
     "text" : "As above, but the acting vampire does not gain blood from the current hunting action.",
@@ -20346,7 +20346,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a Camarilla vampire with capacity 8 or more. If this referendum is successful, put this card on the chosen vampire to represent the unique Camarilla title of Imperator (worth 3 votes). This vampire may play a Blood Hunt card from your hand or ash heap as a prince. This vampire gets 3 additional votes in blood hunt referendums.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -20533,7 +20533,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire of capacity 1, and put three cards from your hand, ash heap or library on this card, face up but out of play. This vampire may play other copies of these cards as if he or she had the Discipline required (if any) at superior.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -20659,7 +20659,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Red List anarch vampire. This vampire is infernal, Bahari, and gets 2 additional votes. During this vampire's minion phase, his or her controller may unlock a ready anarch he or she controls.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -20678,7 +20678,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Tremere antitribu with a title. The vampire with this card cannot cast votes or ballots.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -20704,7 +20704,7 @@
   }, {
     "disciplines" : [ "THN" ],
     "text" : "Only usable at the end of a round in which this vampire successfully inflicted damage on the opposing vampire. Put this card on the opposing vampire. The vampire with this card cannot block the vampire playing this card.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -20744,7 +20744,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Tremere antitribu you control and choose a Discipline. The vampire with this card can play cards that require that Discipline as though he or she has the superior version of that Discipline.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -21256,7 +21256,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "In this referendum, each ready cardinal gets one additional vote. Choose a Sabbat vampire. If this referendum is successful, put this card on the chosen vampire to represent the Sabbat title of priscus. Camarilla vampires cannot cast votes or ballots during this referendum.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -21449,7 +21449,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on an Ishtarri you control. This Ishtarri gets an optional maneuver or press each combat. A minion can have only one Ishtarri Warlord.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -21900,7 +21900,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "(D) Put this card on a younger ready vampire. You still control this card. This vampire cannot block undirected actions. (D) actions cost this vampire an additional blood.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -22300,7 +22300,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready vampire. This vampire doesn't unlock as normal. During his or her controller's unlock phase, that vampire either puts Society Games on a younger locked vampire or burns 1 blood to unlock. If the vampire choses to move Society Games but there is no locked younger vampire, Society Games is burned.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -22617,7 +22617,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a younger vampire with capacity 6 or less. If this referendum succeeds, put this card on that vampire. Directed actions cost this vampire an additional blood. This vampire cannot block older vampires. Any vampire may call a referendum to burn this card as a +1 stealth political action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -22772,7 +22772,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready Harbinger of Skulls you control. The Harbinger of Skulls with this card can burn up to 2 blood from a ready vampire as a +1 stealth (D) action. Any Sabbat vampire can burn this card as a (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -22941,7 +22941,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Only usable when an ally would be burned in combat. Combat ends. Put this card on that ally; that ally is not burned. Put 1 life on the ally from the blood bank if he or she has no life. Lock the ally. This ally does not unlock as normal. If he or she enters combat, he or she is burned. Burn this card during his or her next unlock phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -22979,7 +22979,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire with a capacity above 6 controlled by another Methuselah. This vampire cannot hunt as normal. He or she may hunt by stealing 1 blood from another vampire as a (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -23081,7 +23081,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire with a capacity above 6 who was moved into your ready region during your last influence phase. This vampire gets +2 bleed and an additional 2 votes. Any vampire may call a referendum to burn this card as a +1 stealth political action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -23161,7 +23161,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Only usable when a minion you control would successfully block. The action resolves as if unblocked instead. Put this card on the acting minion. This minion cannot block your minions. Burn this card if you block this minion again, or when this minion's controller has less than 6 pool.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -23257,7 +23257,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on an anarch. Allies cannot block this anarch. Cards that require Dominate [dom] or Presence [pre] cost other minions an additional blood while this anarch is acting, attempting to block, or in combat.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -23585,7 +23585,7 @@
   "modes" : [ {
     "disciplines" : [ "vic" ],
     "text" : "If the action is successful, put this card on the ally and lock the ally. Actions that require Dominate [dom] or Presence [pre] do not affect this ally. This ally has -1 bleed and cannot use maneuvers.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "VIC" ],
     "text" : "As above, but the ally is not locked.",
@@ -23628,7 +23628,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on any minion. Other Methuselahs' actions targeting this minion cost monsters an additional blood or life. If this minion is a monster, he or she burns a blood or life when he or she attempts an action or a block. This minion may burn this card as an action. A minion can have only one Lock.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -23690,7 +23690,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire you control. During your influence phase, if this vampire successfully performed an action this turn and none of your other minions attempted any actions this turn, he or she gains 1 blood from the blood bank, if he or she is ready. A vampire can have only one archetype.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -23936,7 +23936,7 @@
   "modes" : [ {
     "disciplines" : [ "dem" ],
     "text" : "(D) Put this card on any ready minion. During his or her minion phase, the minion with this card must enter combat with a ready minion controlled by his or her prey as a (D) action (unless the minion must hunt). Any minion may burn this card as an action.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "As above, and the minion taking the action to burn this card takes 1 unpreventable damage when this card is burned.",
@@ -24068,7 +24068,7 @@
   }, {
     "disciplines" : [ "AUS", "DEM" ],
     "text" : "(D) Put this card on any ready minion controlled by your prey. Not usable if a Madman's Quill is already on any of your prey's minions. When a vampire with Dementation [dem] bleeds this minion's controller, that acting vampire gets +1 bleed. Any vampire can burn this card as an action that costs 2 blood.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -24156,7 +24156,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a gun on this minion and put an ammo card from your hand on this card. When using this gun, you may use the effect of the ammo card as if it were played from your hand (requirements and cost apply as normal).",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -24308,7 +24308,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on an infernal vampire. This vampire may play cards that require Maleficia [mal] (not a Discipline). With two of these cards, he or she may play cards that require superior Maleficia [MAL]. Burn this card if this vampire is not infernal.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -24346,7 +24346,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a ready Malkavian. Put this card on the vampire. Each time the Malkavian takes an action, his or her controller flips a coin. If the result is heads, continue with the action. If the result is tails, the action fails: his or her controller burns 1 pool and locks the Malkavian.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -24366,7 +24366,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Malkavian antitribu. The vampire with this card cannot perform actions. Any vampire may burn this card as a (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -24405,7 +24405,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a ready Malkavian. If this referendum is successful, put this card on the chosen Malkavian to represent the unique Camarilla title of Malkavian Justicar. In this referendum, each Malkavian gets 1 extra vote.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -24651,7 +24651,7 @@
   "modes" : [ {
     "disciplines" : [ "ser" ],
     "text" : "(D) Put this card on a vampire controlled by your prey. Any minion in combat with that vampire gets +1 strength and gets one optional press to continue combat. The vampire with this card may burn this card as an action.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "SER" ],
     "text" : "As above, but opposing minions get +2 strength.",
@@ -24796,7 +24796,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a younger Sabbat vampire and unlock this acting vampire. The Sabbat vampire with this card gets +1 strength. During your next unlock phase, burn this card.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -25020,7 +25020,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire who successfully hunts. This vampire does not gain any blood from the hunt. This vampire doesn't unlock as normal during his or her unlock phase. During this vampire's next unlock phase, burn this card.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -25267,7 +25267,7 @@
   }, {
     "disciplines" : [ "AUS" ],
     "text" : "As above, and if this vampire successfully blocks, put this card on the acting minion; you still control this card. When bleeding the controller of the minion with this card, this reacting vampire may burn this card to get +1 bleed.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -25328,7 +25328,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire; this vampire cannot attempt to block allies. Any damage this vampire inflicts on allies is reduced to 0. This vampire may burn 1 blood during his or her controller's influence phase to burn this card; he or she then goes into torpor.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -25444,7 +25444,7 @@
   "modes" : [ {
     "disciplines" : [ "nec" ],
     "text" : "Strike: put this card on the opposing minion. If this minion is a mortal, he or she is burned. During his or her unlock phase, the minion with this card takes 1 unpreventable damage. The minion with this card may burn it as a +1 stealth action.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "NEC" ],
     "text" : "As above, and this strike inflicts 1 damage as well.",
@@ -25610,7 +25610,7 @@
   "modes" : [ {
     "disciplines" : [ "pre" ],
     "text" : "(D) Put this card on any unlocked vampire. Lock that vampire; he or she does not unlock as normal during his or her controller's unlock phase. Burn this card during your next unlock phase.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "PRE" ],
     "text" : "As above, with +1 stealth.",
@@ -25633,7 +25633,7 @@
   "modes" : [ {
     "disciplines" : [ "dem" ],
     "text" : "(D) Put this card on any vampire. The vampire with this card cannot play cards that require Disciplines. Any vampire can burn this card as a +1 stealth action.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "As above, and the capacity of the vampire with this card is reduced by 1 (but not below 1). Remove excess blood.",
@@ -25657,7 +25657,7 @@
   "modes" : [ {
     "disciplines" : [ "dem" ],
     "text" : "(D) Put this card on a ready minion. This minion gets +1 strength. Burn this card when a combat involving this minion ends. During this minion's discard phase, burn this card, and this minion's controller must inflict 2 damage on another ready minion he or she controls.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "As above, and lock this minion when this card is burned.",
@@ -25705,7 +25705,7 @@
   }, {
     "disciplines" : [ "DOM" ],
     "text" : "(D) Lock a younger vampire and put this card on that vampire; you still control this card. This vampire does not unlock as normal. During your next minion phase, burn this card to unlock this vampire and take control of him or her until the end of your turn.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -25787,7 +25787,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Only usable when a vampire controlled by another Methuselah is going into torpor. Put this card on that vampire to prevent that vampire from going to torpor (combat still ends, if any). This vampire cannot bleed you. Burn this card if this vampire rescues a vampire you control from torpor.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -25806,7 +25806,7 @@
   "modes" : [ {
     "disciplines" : [ "mal" ],
     "text" : "(D) Put this card on any minion. This minion's controller doesn't replace cards played by this minion until the end of the action. [mal] is not a Discipline.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "MAL" ],
     "text" : "As above, but the cards are not replaced until the discard phase of that turn.",
@@ -26250,7 +26250,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "(D) Enter combat with a ready Sabbat vampire controlled by another Methuselah. That vampire may end combat before range is chosen during the first round of combat. If he or she does so, put this card on him or her; that vampire gets -1 bleed.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -26269,7 +26269,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready vampire you control. Once each turn when combat involving this vampire ends and the opposing minion is not ready, this vampire may burn a blood to unlock. A vampire may have only one archetype.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -26313,7 +26313,7 @@
   }, {
     "disciplines" : [ "val" ],
     "text" : "Strike: combat ends, and put this card on the opposing minion. The attached minion cannot act or block. Burn this card at the end of the turn.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "VAL" ],
     "text" : "As [val] above, and if this vampire was blocked while performing a non-bleed action, the action continues as if unblocked.",
@@ -26462,7 +26462,7 @@
   "modes" : [ {
     "disciplines" : [ "ser" ],
     "text" : "Strike: combat ends. This vampire unlocks and goes into torpor; put this card on the vampire. This vampire cannot attempt a leave torpor action. Burn this card if the vampire leaves torpor.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "SER" ],
     "text" : "As above, but this vampire may attempt a leave torpor action.",
@@ -26506,7 +26506,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Laibon with no Orun and no Mundane. Cards that require Disciplines cost this vampire 1 additional blood. Burn this card if this vampire gets an Orun. Alternatively, when a minion with no Orun plays an action card requiring a Discipline or Virtue, play this card to your ash heap as an out-of-turn master to cancel that card as it is played.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -26617,7 +26617,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a younger non-Black Hand Sabbat vampire who has performed a successful action this turn, and unlock that vampire. The Sabbat vampire with this card is Black Hand.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -26719,7 +26719,7 @@
   "modes" : [ {
     "disciplines" : [ "tha" ],
     "text" : "(D) Put this card on a ready unique vampire. If the vampire with this card is burned, he or she is removed from the game instead, and all Methuselahs remove all other vampires with the same name in their crypts, uncontrolled regions and ash heaps from the game as well (shuffle all crypts afterward).",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "THA" ],
     "text" : "As above, but this action is at +1 stealth.",
@@ -26801,7 +26801,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains 1 level of Necromancy [nec]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Necromancy [NEC].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -27040,7 +27040,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on any vampire with a capacity below 8 who was moved to the ready region in any Methuselah's influence phase since your last turn. This vampire gets -1 stealth. This vampire can burn this card as a (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -27097,7 +27097,7 @@
   "modes" : [ {
     "disciplines" : [ "spi" ],
     "text" : "Put this card on a vampire you control. The attached vampire gets 1 optional maneuver each combat. A vampire can have only one New Moon Sigil.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "SPI" ],
     "text" : "As above, and during an action, the attached vampire can burn 2 blood to get +1 stealth.",
@@ -27173,7 +27173,7 @@
   }, {
     "disciplines" : [ "aus", "chi" ],
     "text" : "(D) Put this card on a ready minion and lock him or her. This minion doesn't unlock as normal. During this minion's unlock phase, he or she may burn a pool to unlock. Burn this card when the acting vampire leaves play.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "AUS", "CHI" ],
     "text" : "As [aus][chi] above, but without the option to burn a pool to unlock.",
@@ -27300,7 +27300,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a titled non-anarch vampire controlled by the target of the action (or by your predator or prey if the action is undirected). A vampire with two No Confidence cards loses the benefit of his or her title. Burn this card if this acting vampire leaves the ready region.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -27493,7 +27493,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a ready Nosferatu. If this referendum is successful, put this card on the chosen Nosferatu to represent the unique Camarilla title of Nosferatu Justicar. In this referendum, each Nosferatu gets 1 extra vote.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -27552,7 +27552,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Nosferatu in combat. The Nosferatu with this card has -1 strength each combat. You may play this card even if you are not involved in the current combat.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -27667,7 +27667,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on an Assamite controlled by another Methuselah. That Assamite cannot attempt to bleed you. This card can be burned by another Assamite as a (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -27709,7 +27709,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains one level of Obfuscate [obf]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Obfuscate [OBF].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -27728,7 +27728,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready Toreador antitribu. The vampire with this card does not unlock as normal. During his or her controller's unlock phase, he or she burns 1 blood to unlock or is burned. If the vampire goes into torpor, this card is burned.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -27748,7 +27748,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains 1 level of Obtenebration [obt]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Obtenebration [OBT].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -27813,7 +27813,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a Camarilla vampire with a capacity above 5 who does not have a title. Put this card on that vampire to represent the Camarilla title of primogen. Not usable on Caitiff.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -28134,7 +28134,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Laibon. For non-Orun cards played by Methuselahs other than this Laibon's controller, this Laibon is considered to have 2 additional capacity. A Laibon gets an additional vote for every three Orun he or she has. If this Laibon successfully bleeds for more than 2 or successfully performs a (D) action against a non-mortal minion, he or she burns one Orun. Burn this card if this Laibon has more Orun and Aye than his or her capacity.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -28302,7 +28302,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "In this referendum, each Guruhi gets one additional vote. Any votes or ballots any magaji cast in favor of this referendum are ignored. If this referendum passes, put this card on the acting Laibon to represent the Laibon title of magaji (worth 2 votes).",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -28468,7 +28468,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Laibon with no Aye and no Pallid. This vampire gets -1 stealth. Burn this card if this vampire gets an Aye. Alternatively, when a vampire with no Aye or a zombie is acting, play this card to your ash heap as an out-of-turn master to give a vampire you control +1 intercept.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -28561,7 +28561,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready Ventrue who was moved into your ready region during your last influence phase. This vampire gets 1 additional vote in referendums called by younger vampires. A younger vampire who successfully blocks this vampire burns 1 blood (before combat begins, if any).",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -28930,7 +28930,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Salubri when you move that Salubri from your uncontrolled region to your ready region during your influence phase. If you burned 3 or more pool for the scarce penalty for this vampire, you gain 3 pool. Cards that require Obeah [obe] cost this Salubri 1 less blood. Any minion may burn this card as a (D) action. A vampire can have only one path.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -28992,7 +28992,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire you control. This vampire gets +1 stealth, -1 bleed, and can inflict 1 damage on any minion as a (D) action. During this vampire's unlock phase, his or her controller must discard a master card or lock this vampire. Burn this card if this vampire commits diablerie. A vampire can have only one path.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -29242,7 +29242,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on any ready minion. The minion with this card cannot take actions and cannot block actions. This card may be burned by any other minion as a (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -29329,7 +29329,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire you control. Once each turn, this vampire can gain 1 blood after performing a successful action during which no reaction cards are played. A vampire can have only one archetype.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -29351,7 +29351,7 @@
   }, {
     "disciplines" : [ "CHI" ],
     "text" : "Only usable when an action card that requires Chimerstry is put in play. Put this card on the action card. If the action card is burned, return it to your hand instead (discard down afterward).",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -29561,7 +29561,7 @@
   "modes" : [ {
     "disciplines" : [ "ser" ],
     "text" : "(D) Put this card on any vampire; you still control this card. During your master phase, you may put a phobia counter on this card. If a minion you control blocks the vampire with this card, you may burn five counters from this card before range is chosen to end combat.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "SER" ],
     "text" : "As above, but with +1 stealth.",
@@ -29950,7 +29950,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "(D) Put this card on a ready vampire controlled by another Methuselah. The acting vampire may enter combat with the vampire with this card as a +1 stealth (D) action. If the vampire with this card is burned or sent into torpor, this card is burned and the acting vampire gains X votes, where X is the number of non-contested votes the vampire with this card has.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -30074,7 +30074,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains one level of Potence [pot]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Potence [POT].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30093,7 +30093,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Gargoyle enslaved to this vampire's clan. If this Gargoyle is burned or sent to torpor in combat, he or she burns and inflicts 3 aggravated damage on the opposing minion and each retainer in combat. A minion may have only one Potio Martyrium.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -30511,7 +30511,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a non-Black Hand Sabbat vampire with a capacity above 6 to represent the title of cardinal. Burn this card if you do not control a ready Seraph (or if this vampire otherwise loses the title).",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -30531,7 +30531,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Amsterdam. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30550,7 +30550,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Athens. This could lead to a contested title. If the prince is Tremere, his or her capacity increases by 1.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30569,7 +30569,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Atlanta.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30588,7 +30588,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Barcelona. This could lead to a contested title. If the prince is Tremere, his or her capacity increases by 1.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30607,7 +30607,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Berlin. This could lead to a contested title. If the prince is Ventrue, his or her capacity increases by 1.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30626,7 +30626,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Boston. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30645,7 +30645,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Brussels. This could lead to a contested title. If the prince is Nosferatu, his or her capacity increases by 1.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30664,7 +30664,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Cairo. This could lead to a contested title. If the prince is Ventrue, his or her capacity increases by 1.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30683,7 +30683,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Chicago.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30702,7 +30702,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Cleveland. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30721,7 +30721,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Dallas. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30740,7 +30740,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Dublin. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30759,7 +30759,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Frankfurt. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30778,7 +30778,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Geneva. This could lead to a contested title. If the prince is Ventrue, his or her capacity increases by 1.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30797,7 +30797,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Glasgow. This could lead to a contested title. If the prince is Gangrel, his or her capacity increases by 1.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30816,7 +30816,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Houston.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30835,7 +30835,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Istanbul. This could lead to a contested title. Each Assamite gets one additional vote for this political action. If the vampire declared prince is not an Assamite, lock all Assamites.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30854,7 +30854,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of London. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30873,7 +30873,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Miami.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30892,7 +30892,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Monaco. This could lead to a contested title. If the prince is Toreador, his or her capacity increases by 1.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30911,7 +30911,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Paris. This could lead to a contested title. If the prince is Toreador, his or her capacity increases by 1.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30930,7 +30930,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Rome. This could lead to a contested title. If the prince is Brujah, his or her capacity increases by 1.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30949,7 +30949,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Seattle. This could lead to a contested title.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30968,7 +30968,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Stockholm. This could lead to a contested title. If the prince is Malkavian, his or her capacity increases by 1.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -30987,7 +30987,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "In this referendum, each Giovanni gets one additional vote. If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Venice. This could lead to a contested title. If the vampire declared prince is not Giovanni, lock all Giovanni.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -31006,7 +31006,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If this referendum is successful, put this card on the acting vampire to represent the unique Camarilla title of Prince of Washington, D.C.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -31190,7 +31190,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains 1 level of Presence [pre]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Presence [PRE].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -31349,7 +31349,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a minion controlled by your prey and choose a ready Assamite you control. The chosen Assamite can enter combat with this minion as a +1 stealth (D) action. If this minion would leave the ready region, you can burn this card to gain 3 pool.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -31391,7 +31391,7 @@
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "(D) Put this card on a vampire. This vampire has -1 stealth and -2 intercept. Any vampire(s) can burn this card with three +1 stealth actions. A vampire can have only one Prison of the Mind.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -31575,7 +31575,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains one level of Protean [pro]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Protean [PRO].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -31693,7 +31693,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Giovanni when you move him or her from your uncontrolled region to your ready region during your influence phase. This Giovanni gains one level of Potence [pot] and one level of Fortitude [for]. His or her capacity is increased by 1. Move 1 blood from the blood bank to this Giovanni.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -31806,7 +31806,7 @@
   "modes" : [ {
     "disciplines" : [ "aus" ],
     "text" : "Put this card on a minion you control. The minion with this card gets +2 intercept. Burn this card during your unlock phase.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "AUS" ],
     "text" : "Put this card into play. Each of your minions gets +1 intercept. Burn this card during your next unlock phase.",
@@ -31941,7 +31941,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on the opposing vampire, and this minion inflicts 1 point of damage. The victim cannot hunt until this card is removed. Any vampire(s) may burn this card with two +1 stealth actions. If the victim must hunt and cannot, he or she goes into torpor. A vampire can have only 1 Pulled Fangs.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -32006,11 +32006,11 @@
   "modes" : [ {
     "disciplines" : [ "ACTION" ],
     "text" : "+1 stealth action. (D) Put this card on a vampire. You still control this card. The vampire with this card cannot gain blood. Any blood he or she gains goes to the blood bank instead. Burn this card during your next unlock phase.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "COMBAT" ],
     "text" : "As [ACTION] above, but put this card on the opposing vampire as a hand strike (at strength damage) instead.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -32161,7 +32161,7 @@
   }, {
     "disciplines" : [ "thn" ],
     "text" : "Strike: 1 damage. Put this card on the opposing minion. The minion with this card has -1 stealth. He or she may choose not to unlock as normal and burn this card during his or her unlock phase. A minion may have only one Putrefaction.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "THN" ],
     "text" : "As [thn] above, and this minion takes 1 unpreventable damage when he or she strikes in combat or takes an action. The minion with this card may choose not to strike during the Choose Strike step of combat.",
@@ -32185,11 +32185,11 @@
   "modes" : [ {
     "disciplines" : [ "thn" ],
     "text" : "Move any mortal or ghoul retainer you control to this vampire, or put this card on a mortal or ghoul ally you control. This ally gains 1 life, and he or she may play cards that require basic Potence [pot] as a vampire.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "THN" ],
     "text" : "(D) As above, but take any mortal or ghoul retainer or put this card on any mortal or ghoul ally and take control of that ally.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -32369,7 +32369,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains 1 level of Quietus [qui]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Quietus [QUI].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -32616,7 +32616,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "(D) Put this card on a titled vampire. The vampire's title is worth 1 less vote during referendums, and he or she gets -1 stealth when attempting political actions. This vampire's capacity is reduced by 1. (A vampire's capacity cannot go below 1.) A vampire may have only one Rastacourere.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -32659,7 +32659,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Kiasyd. Non-changelings cannot block this Kiasyd's undirected hunt actions.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -32999,7 +32999,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire you control. Once per turn, when this vampire successfully blocks a titled vampire or a political action, he or she gains 1 blood from the blood bank (before the resulting combat, if any). A vampire can have only one archetype.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -33331,7 +33331,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Only usable when a blood hunt referendum passes and would burn a vampire controlled by another Methuselah. That vampire is not burned. Put this card on that vampire and take control of him or her. This vampire is independent. This vampire gets one optional press when in combat with a Camarilla vampire and can enter combat with any Camarilla vampire as a +1 stealth (D) action. Burn this card if the vampire changes sects.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -33460,7 +33460,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Samedi you control. The Samedi with this card can heal 2 non-aggravated damage for each blood counter he or she burns.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -33481,7 +33481,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Sabbat vampire you control with a capacity above 7 to represent the unique Sabbat title of regent. Any Sabbat vampire with a different controller can enter combat with this vampire as a (D) action. If a Sabbat vampire diablerizes this vampire, move this card to the diablerist (before the blood hunt is called).",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -33775,7 +33775,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Black Hand vampire. This vampire can lock any card (including a minion) as a +1 stealth (D) action. A vampire can have only one Remover.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -34082,7 +34082,7 @@
   "modes" : [ {
     "disciplines" : [ "dem" ],
     "text" : "(D) Put this card on any ally. This ally does not unlock as normal during his or her controller's unlock phase. His or her controller can burn a pool during his or her unlock phase to unlock this ally.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "(D) Take control of an ally controlled by another Methuselah.",
@@ -34306,7 +34306,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a younger Caitiff. The vampire with this card is now considered to be a member of the same clan as the acting vampire. He or she is no longer considered Caitiff. His or her capacity increases by 1.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -34493,7 +34493,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "(D) Put this card on an ally or younger vampire who is not Malkavian or Malkavian antitribu. Put X riddle counters on this card, where X is half the capacity of the acting vampire (round down). The minion with this card burns 1 riddle counter instead of unlocking during his or her unlock phase. Burn this card when it has no counters. You may not play this card if another Riddle Phantastique is in play.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -34916,7 +34916,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire when an opposing minion attempts to inflict aggravated damage on him or her, whether the damage would be successfully inflicted or not. Combat ends. This vampire is locked and sent to torpor. This vampire does not unlock as normal. During this vampire's next unlock phase, burn this card.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -35155,7 +35155,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a Sabbat vampire who is not an Inquisitor. If this referendum is successful, put this card on the chosen vampire. This vampire is an Inquisitor and gets +1 bleed. He or she may look at the top card of any Methuselah's crypt as a (D) action; if it is a vampire with Thaumaturgy [tha], burn that card. Any Sabbat vampire may call a referendum to burn this card as a +1 stealth political action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -35322,7 +35322,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Usable by a locked Tremere. Cause a (D) action targeting a location you control to fail and put this card on that location. You may burn this card to cause a (D) action targeting this location to fail.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -35449,7 +35449,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a Discipline this vampire has at superior. Put this card on a ready vampire of the same clan as this acting vampire. The vampire with this card gains one level of the chosen Discipline. The vampire's capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with the superior version of the Discipline.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -35749,7 +35749,7 @@
   "modes" : [ {
     "disciplines" : [ "qui" ],
     "text" : "Strike: hand strike or use a melee weapon strike. Put this card on the opposing minion. This minion gets -1 strength (after the current strike resolution step). Any vampire may burn this card as a +1 stealth action. A minion may have only one Scorpion's Touch.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "QUI" ],
     "text" : "As above, and this minion burns 1 blood or life during his or her unlock phase.",
@@ -35773,7 +35773,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a vampire of the same sect. If this referendum is successful, put this card on the chosen vampire and unlock this acting vampire. The vampire with this card may enter combat with a vampire with capacity 4 or less or with an ally as a +1 stealth (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -36080,7 +36080,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready minion you control. If this minion is the target of a (D) action while he or she is ready, you may burn this card to make the action fail. A minion can have only one Secret Passage.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -36142,7 +36142,7 @@
   "modes" : [ {
     "disciplines" : [ "tha" ],
     "text" : "(D) Put this card on one of your prey's vampires. If the vampire is a Follower of Set, he or she burns 2 additional blood when attempting an action; otherwise, he or she burns 1 additional blood when attempting an action. The vampire's special abilities cannot be used. Any vampire(s) may burn this card with two +1 stealth actions.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "THA" ],
     "text" : "As above, but the vampire burns 2 additional blood when attempting an action; Followers of Set burn 3 additional blood.",
@@ -36285,7 +36285,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Laibon with Auspex [aus]. This Laibon with Auspex may lock this card during a referendum to get 1 additional vote. A vampire can have only one Sense Vibrations.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -36330,11 +36330,11 @@
   "modes" : [ {
     "disciplines" : [ "chi" ],
     "text" : "(D) Burn any retainer or put this card on any ally. The minion with this card does not unlock as normal during the unlock phase as long as the acting vampire remains in play.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "CHI" ],
     "text" : "As above, but put this card on any vampire in play.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -36353,7 +36353,7 @@
   "modes" : [ {
     "disciplines" : [ "chi" ],
     "text" : "(D) Put this card on a ready minion. You still control this card. The minion with this card may not act or block. Burn this card during the minion's controller's discard phase.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "CHI" ],
     "text" : "As above, but burn this card during your next unlock phase.",
@@ -36377,7 +36377,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a non-Seraph Black Hand vampire with a capacity above 5. If this referendum is successful, put this card on the chosen vampire. That Black Hand vampire gains 2 blood and is a Seraph. Non-Sabbat vampires cannot cast votes or ballots in this referendum.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -36461,7 +36461,7 @@
   }, {
     "disciplines" : [ "PRE", "SER" ],
     "text" : "As above, and if the range is close, this vampire burns 1 blood to put this card on the opposing minion and lock him or her. This minion does not unlock as normal during your unlock phase. Burn this card during your unlock phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -36480,7 +36480,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains 1 level of Serpentis [ser]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Serpentis [SER].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -36499,7 +36499,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready vampire you control. After any Methuselah plays a Gehenna card, you may draw two additional cards from your library if this vampire is ready. Discard down to your hand size afterward. A vampire can have only one Servitor of Irad.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -36887,7 +36887,7 @@
   }, {
     "disciplines" : [ "OBT" ],
     "text" : "As above, and put this card on that minion. You still control this card. The minion with this card has -1 stealth. Burn this card during your next unlock phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -36906,7 +36906,7 @@
   "modes" : [ {
     "disciplines" : [ "aus", "obt" ],
     "text" : "(D) Put this card on an ally or younger vampire. This minion gets -2 intercept and cannot take (D) actions or use ranged strikes. Any minion may burn this card as a +1 stealth action.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "AUS", "OBT" ],
     "text" : "As above, and the action to burn this card costs an additional blood or conviction [1 CONVICTION].",
@@ -36930,7 +36930,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Black Hand vampire. This Black Hand vampire can enter combat with any younger non-Black Hand vampire as a (D) action. A vampire can have only one Shakar.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -36950,7 +36950,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready minion. Every Black Hand vampire is considered chosen for this contract. Any Black Hand vampire can enter combat with this minon as a +1 stealth (D) action. Burn this card when this minion leaves the ready region.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -37145,7 +37145,7 @@
   "modes" : [ {
     "disciplines" : [ "dem" ],
     "text" : "Put this card on the acting minion and end the action (with no combat). The minion with this card gets -1 bleed. He or she may burn it as an action that costs 1 blood. A minion may have only one Shattered Mirror.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "As above, and this reacting vampire doesn't lock for successfully blocking the action.",
@@ -37630,7 +37630,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Salubri you control. The Salubri with this card gets +1 intercept.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -37697,7 +37697,7 @@
   }, {
     "disciplines" : [ "AUS" ],
     "text" : "Put this card on the acting vampire. You still control this card. This reacting vampire gets +1 intercept when the vampire with this card attempts to bleed you. The vampire with this card can burn this card as a (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -38098,7 +38098,7 @@
   }, {
     "disciplines" : [ "DOM" ],
     "text" : "(D) Put this card on a vampire controlled by your predator. Each time that vampire announces an action, he or she moves 1 blood to this acting vampire. That vampire may burn this card by burning 4 blood during his or her controller's minion phase. Burn this card if this acting vampire is sent to torpor or burned.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -38503,7 +38503,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready vampire you control. During your influence phase, remove this vampire from the game and move all the blood counters from that vampire to an older vampire in your uncontrolled region.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -38543,7 +38543,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. During his or her controller's unlock phase, the vampire with this card either burns 1 blood or is burned (the controller's choice). The vampire with this card can move it to any other vampire as a +1 stealth (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -38562,7 +38562,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Sabbat vampire you control. Once per turn, when this vampire remains ready and burns a minion in combat or sends a vampire to torpor in combat, he or she gains 1 blood from the blood bank. A vampire can have only one archetype.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -38782,7 +38782,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a slave Gargoyle. The Gargoyle with this card can burn it to reduce the cost of recruiting or employing an ally or retainer that requires a Gargoyle by up to 3 blood or pool.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -38802,7 +38802,7 @@
   "modes" : [ {
     "disciplines" : [ "aus", "pre" ],
     "text" : "(D) Put this card on a ready vampire. Vampires with Auspex [aus] get +1 intercept when attempting to block the vampire with this card. This vampire can burn this card as an action that costs 1 blood. A vampire can have only one Soul Painting.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "AUS", "PRE" ],
     "text" : "As [aus][pre] above, but all vampires get +1 intercept when attempting to block this vampire.",
@@ -38872,7 +38872,7 @@
   "modes" : [ {
     "disciplines" : [ "aus", "dom" ],
     "text" : "[ACTION] +1 stealth action. Put this card on a minion you control. If an action to steal the minion with this card is successful, this minion is burned instead and the acting minion takes 1 unpreventable damage.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "AUS", "DOM" ],
     "text" : "[REACTION] As above, but play when an action to steal a minion you control is successful.",
@@ -39263,7 +39263,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire and choose a Discipline. This vampire gains 1 level of the chosen Discipline. While in play, this card counts as a master: Discipline card.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -39480,7 +39480,7 @@
   }, {
     "disciplines" : [ "myt" ],
     "text" : "(D) Put this card on a ready minion. The acting vampire gets +2 intercept when attempting to block that minion. Any minion can burn this card as an action.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "MYT" ],
     "text" : "As [myt] above, and the minion with this card gets -1 bleed when bleeding this acting vampire's controller.",
@@ -39904,7 +39904,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on an infernal vampire. This vampire may play cards that require Striga [str] (not a Discipline). With two of these cards, he or she may play cards that require superior Striga [STR]. Burn this card if this vampire is not infernal.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -40553,7 +40553,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a ready anarch vampire. If this referendum is successful, put this card on the chosen anarch. During your unlock phase, if the anarch with this card is ready, you may look at the top card of each Methuselah's library (including your own).",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -40793,7 +40793,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "That vampire gains 2 additional blood. Put this card on that vampire. You still control this card. Bleed actions directed at you cost the vampire an additional blood.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -40944,7 +40944,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Gangrel antitribu you control. Damage from this vampire's hand strikes is aggravated. (D) actions cost this vampire an additional blood. This vampire's controller may use a master phase action to burn this card.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -41348,7 +41348,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a Sabbat vampire. If this referendum is successful, put this card on the chosen vampire. This vampire is a Templar. He or she may enter combat with a ready vampire controlled by another Methuselah as a +1 stealth (D) action. Any Sabbat vampire may call a referendum to burn this card as a +1 stealth political action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -41387,7 +41387,7 @@
   "modes" : [ {
     "disciplines" : [ "ser" ],
     "text" : "(D) Put this card on a ready vampire; you still control this card. During your master phase, you may put a counter on this card. During your minion phase, if the number of counters on this card equals or exceeds the amount of blood on this vampire, you may burn the counters to unlock this vampire and take control of him or her until the end of the turn.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "SER" ],
     "text" : "As above, and add a counter when you play this card.",
@@ -41616,7 +41616,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains 1 level of Thaumaturgy [tha]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Thaumaturgy [THA].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -42140,7 +42140,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a ready Toreador. If this referendum is successful, put this card on the chosen Toreador to represent the unique Camarilla title of Toreador Justicar. In this referendum, each Toreador gets 1 extra vote.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -42291,7 +42291,7 @@
   "modes" : [ {
     "disciplines" : [ "dem" ],
     "text" : "(D) Put this card on an ally or a younger vampire. The minion with this card has -1 stealth. During this minion's unlock phase, add a counter to this card. Burn this card when it has 3 counters on it.",
-    "target" : null
+    "target" : "SOMETHING"
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "As above, and the minion with this card cannot play action cards.",
@@ -42428,7 +42428,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Play when the opposing minion burns blood or life due to damage. Put this card on the opposing minion. This Salubri antitribu gets +1 intercept when attempting to block the minion with this card. If the vampire with this card is Tremere or Baali, this Salubri antitribu can enter combat with him or her as a (D) action. The minion with this card may burn it as a +1 stealth action. A vampire can play only one Tracker's Mark each combat.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -42467,7 +42467,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire you control. Once per turn, when this vampire casts his or her votes or ballots against a referendum and the referendum fails, he or she gains 1 blood from the blood bank. A vampire can have only one archetype.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -42486,7 +42486,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Toreador. Lock that Toreador. The Toreador suffering the Tragic Love Affair does not unlock during the unlock phase. The Toreador's controller may burn 1 pool during his or her master phase to transfer this card to another Toreador. A Methuselah can burn the Edge to burn this card.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -42551,7 +42551,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Laibon with at least three Aye and three Orun. During your unlock phase, this Laibon gains 1 blood. Allies and younger vampires must burn 1 blood or life to attempt to block this Laibon or to target this Laibon with a (D) action. Burn this card if this minion is not ready or has fewer than three Aye or three Orun.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -42723,7 +42723,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a prince who has successfully bled you since your last turn. Each time this prince unlocks, he or she takes 1 point of damage (damage not preventable). This prince may burn this card as a (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -42802,7 +42802,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a ready Tremere. If this referendum is successful, put this card on the chosen Tremere to represent the unique Camarilla title of Tremere Justicar. In this referendum, each Tremere gets 1 extra vote.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -42879,7 +42879,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "(D) Put this card on a Ventrue who is not at full capacity. A Ventrue suffering Triole's Revenge must hunt once each minion phase as his or her first action. If the Ventrue hunts while at full capacity, he or she is burned. Any Ventrue can take an action to burn this card.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -43173,7 +43173,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a non-infernal mortal ally you control, or pay 2 pool to put this card on any non-infernal minion you control. Actions requiring Dominate [dom] or Presence [pre] cannot be directed at this minion. In combat, any damage this minion inflicts on an infernal minion is aggravated. Infernal minions cannot block or strike this minion. Burn this card if this minion becomes infernal.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -43215,7 +43215,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a ready non-Red List minion. If this referendum succeeds, put this card on that minion. This minion is now Red List. In this referendum, the chosen minion's controller gets 2 additional votes for every Red List minion in play. Any titled vampire may call a referendum to burn this card as a +1 stealth political action. Burn this card if the minion is no longer Red List.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -43492,7 +43492,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Nosferatu antitribu. The vampire with this card is no longer considered to be a Nosferatu antitribu. He or she is now a Pander, and any Nosferatu antitribu with a different controller may enter combat with him or her as a (D) action. The vampire with this card may burn it as a (D) action that costs 2 blood.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -43518,7 +43518,7 @@
   }, {
     "disciplines" : [ "OBE" ],
     "text" : "(D) Put this card on an ally or a younger vampire. The minion with this card cannot take actions, block or play reaction cards. During this minion's unlock phase, this card is burned unless this acting vampire burns 2 blood.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -43808,7 +43808,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on the acting vampire. When there are any vampires in torpor that this vampire can diablerize, this vampire cannot take any action other than diablerie (although he or she is free not to take any action). If this vampire must hunt, he or she may choose to diablerize a vampire instead.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -43873,7 +43873,7 @@
   }, {
     "disciplines" : [ "PRE" ],
     "text" : "As above, and put this card on the opposing minion (ranged). The striking vampire gets +1 bleed against this minion's controller. This minion may burn this card as a +1 stealth action. A minion can have only one Unholy Penance.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -44298,7 +44298,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a ready minion you control. While you control this minion, he or she can equip with the first piece of equipment you find in your library (working down from the top) as a +1 stealth action (requirements and cost apply as normal). Shuffle afterward.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -44487,7 +44487,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on the acting minion. Brujah antitribu get +1 strength in combat with the minion with this card. Any ready Brujah antitribu may enter combat with this vampire as a (D) action. Burn this card if this minion goes to torpor.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -44701,7 +44701,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a ready Ventrue. If this referendum is successful, put this card on the chosen Ventrue to represent the unique Camarilla title of Ventrue Justicar. In this referendum, each Ventrue gets 1 extra vote.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -44741,7 +44741,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on any vampire, and you can burn a Blood Doll (if any). During their unlock phase, this vampire's controller can move 1 blood from this vampire to their pool or from their pool to this vampire.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -44801,7 +44801,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire. This vampire gains 1 level of Vicissitude [vic]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Vicissitude [VIC].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -44820,7 +44820,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a Tzimisce. Put a poison counter on this card each time this vampire plays a card that requires Vicissitude [vic]. If the number of poison counters on this card is greater than the capacity of the vampire, burn him or her at the end of the current action or combat.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -44901,7 +44901,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a vampire you control who has any amount of blood and move 2 to 5 blood from that vampire to your pool. Minion Tap costs you 1 additional pool. Villein costs 1 additional pool to play on this vampire.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -45418,7 +45418,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "(D) Put this card on a vampire who is not an archbishop, priscus, cardinal or regent. Any vampire may enter combat with that vampire as a +1 stealth (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -45481,7 +45481,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a younger ready vampire. If this referendum succeeds, put this card on that vampire. Any ready vampire may enter combat with this vampire as a (D) action that costs 1 blood.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -46469,7 +46469,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose a ready justicar. If the referendum is successful, put this card on that justicar. The justicar loses his or her title, and his or her capacity decreases by 1. (A vampire's capacity cannot go below 1.)",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -46530,7 +46530,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Only usable when a vampire successfully hunts. Put this card on that vampire. During this vampire's minion phase, he or she must hunt, even if at capacity. Any vampire may burn this card as a +1 stealth (D) action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
