@@ -6,6 +6,7 @@
 
 package net.deckserver.dwr.model;
 
+import com.google.common.base.Strings;
 import net.deckserver.Utils;
 import net.deckserver.game.interfaces.state.*;
 import net.deckserver.game.interfaces.turn.GameAction;
@@ -640,5 +641,21 @@ public class JolGame {
         }
         this.state.replacePlayer(oldPlayer, newPlayer);
         getNote(this.state, oldPlayer + POOL, false).setName(newPlayer + POOL);
+    }
+
+    public void setChoice(String player, String choice) {
+        getNote(this.state, player + "-choice", true).setValue(choice);
+        addMessage(player + " has made their choice");
+    }
+
+    public void getChoices() {
+        addMessage("The choices have been revealed:");
+        state.getPlayers().forEach(player -> {
+            Notation choiceNotation = getNote(this.state, player + "-choice", true);
+            if (!Strings.isNullOrEmpty(choiceNotation.getValue())) {
+                addMessage(player + " chose " + choiceNotation.getValue());
+                choiceNotation.setValue("");
+            }
+        });
     }
 }

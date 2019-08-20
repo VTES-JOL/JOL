@@ -51,6 +51,15 @@ public class DoCommand {
         CommandParser cmdObj = new CommandParser(cmdStr, 1, game);
         boolean random = Arrays.asList(cmdStr).contains("random");
         try {
+            if (cmd.equalsIgnoreCase("choose")) {
+                String choice = cmdObj.nextArg();
+                game.setChoice(player, choice);
+                return "Made choice";
+            }
+            if (cmd.equalsIgnoreCase("reveal")) {
+                game.getChoices();
+                return "Choices revealed";
+            }
             if (cmd.equalsIgnoreCase("label")) {
                 String targetPlayer = cmdObj.getPlayer(player);
                 String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
