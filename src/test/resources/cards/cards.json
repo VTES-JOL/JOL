@@ -152,7 +152,7 @@
   }, {
     "disciplines" : [ "FOR" ],
     "text" : "As above, but this vampire may also prevent aggravated damage in combat in this way.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -1391,7 +1391,7 @@
   }, {
     "disciplines" : [ "AUS" ],
     "text" : "As above, and the chosen minion also gets +1 bleed.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -1812,7 +1812,7 @@
   }, {
     "disciplines" : [ "VIS" ],
     "text" : "As [vis] above, and the Gargoyle with this card may prevent 1 damage each combat.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -2951,7 +2951,7 @@
   }, {
     "disciplines" : [ "VIC" ],
     "text" : "As above, but you may burn this card and the chosen equipment at any time.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -3507,7 +3507,7 @@
   }, {
     "disciplines" : [ "OBT" ],
     "text" : "As above, and this vampire gets an optional press each combat.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -3791,7 +3791,7 @@
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "As above, and actions requiring those Disciplines cannot be directed at this vampire.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -3988,7 +3988,7 @@
   }, {
     "disciplines" : [ "OBF" ],
     "text" : "As above, but this vampire can burn 1 blood when he enters combat instead of burning this card.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -4119,7 +4119,7 @@
   }, {
     "disciplines" : [ "QUI" ],
     "text" : "As above, and the minion with this card burns 1 blood or life when this card is burned.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -4457,7 +4457,7 @@
   }, {
     "disciplines" : [ "FOR", "QUI" ],
     "text" : "As above, and unlock this acting vampire.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -4644,7 +4644,7 @@
   }, {
     "disciplines" : [ "PRE" ],
     "text" : "As above, but choose X+1 minions.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -4995,7 +4995,7 @@
   }, {
     "disciplines" : [ "VIC" ],
     "text" : "As above, but the minion with this card has -2 strength.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -6276,7 +6276,7 @@
   }, {
     "disciplines" : [ "PRO" ],
     "text" : "As above, but this action is at +1 stealth.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -7153,7 +7153,7 @@
   }, {
     "disciplines" : [ "NEC" ],
     "text" : "As above, and this acting vampire unlocks during your next discard phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -8308,7 +8308,7 @@
   }, {
     "disciplines" : [ "DAI" ],
     "text" : "As [dai] above, and this vampire has flight [FLIGHT]. During your influence phase, this vampire may burn 1 blood to unlock.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -8360,7 +8360,7 @@
   }, {
     "disciplines" : [ "DAI" ],
     "text" : "As [dai] above, and the minion's controller burns the top card from his or her library during each of his or her unlock phases.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -8387,7 +8387,7 @@
   }, {
     "disciplines" : [ "DAI" ],
     "text" : "As [dai] above, and the minion's controller burns 1 pool each time the minion is successfully blocked.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -8414,7 +8414,7 @@
   }, {
     "disciplines" : [ "DAI" ],
     "text" : "As [dai] above, and the minion cannot use presses in combat.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -8441,7 +8441,7 @@
   }, {
     "disciplines" : [ "DAI" ],
     "text" : "As above, and this vampire burns 1 blood each time a referendum passes.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -8823,7 +8823,7 @@
   }, {
     "disciplines" : [ "DAI" ],
     "text" : "As [dai] above, and once per combat, this vampire can put a corruption counter on the opposing minion as a strike. If the number of your corruption counters on the minion equals or exceeds the capacity of that vampire or the cost of that ally, you may burn all of your corruption counters on that minion to gain control of him or her after strike resolution (ending combat).",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -9341,7 +9341,7 @@
   }, {
     "disciplines" : [ "THN" ],
     "text" : "As [thn] above, and this striking vampire gets +1 bleed when bleeding this minion's controller.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -10429,7 +10429,7 @@
   }, {
     "disciplines" : [ "OBT" ],
     "text" : "As above, with an optional maneuver.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -10658,15 +10658,15 @@
   "unique" : false,
   "preamble" : "Only usable at long range.",
   "modes" : [ {
-    "disciplines" : [ "cel", ":" ],
+    "disciplines" : [ "cel" ],
     "text" : "Strike: 1R damage.",
     "target" : null
   }, {
-    "disciplines" : [ "mel", ":" ],
+    "disciplines" : [ "mel" ],
     "text" : "Strike: 2R damage, only preventable by cards that require Fortitude [for] or Visceratika [vis].",
     "target" : null
   }, {
-    "disciplines" : [ "MEL", ":" ],
+    "disciplines" : [ "MEL" ],
     "text" : "As [mel] above, and the damage is aggravated.",
     "target" : null
   } ],
@@ -10692,7 +10692,7 @@
   }, {
     "disciplines" : [ "NEC" ],
     "text" : "As above, but the retainer has 3 life.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -10760,7 +10760,7 @@
   }, {
     "disciplines" : [ "THN" ],
     "text" : "As [thn] above, and presses cost the attached minion 1 additional blood or life to use.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -11095,7 +11095,7 @@
   }, {
     "disciplines" : [ "OBT" ],
     "text" : "As above, but the vampire is unlocked when he or she returns to play.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -11556,7 +11556,7 @@
   }, {
     "disciplines" : [ "POT" ],
     "text" : "As above, but the vampire with this card has -2 strength.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -11770,7 +11770,7 @@
   }, {
     "disciplines" : [ "DOM", "PRE" ],
     "text" : "As above, and you can force the chosen vampire to cast his or her votes and ballots when you burn this card.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -11928,7 +11928,7 @@
   }, {
     "disciplines" : [ "NEC" ],
     "text" : "As above, and if this minion successfully blocks the chosen minion, his or her controller plays with an open hand in the resulting combat.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -12314,7 +12314,7 @@
   }, {
     "disciplines" : [ "AUS", "QUI" ],
     "text" : "As [aus][qui] above, and this vampire gets +1 bleed when bleeding the controller of the burned vampire.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -12913,7 +12913,7 @@
   }, {
     "disciplines" : [ "AUS" ],
     "text" : "As above, and once per combat, this vampire may press to continue combat if any damage has been successfully inflicted on him or her in the current round.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -13900,7 +13900,7 @@
   }, {
     "disciplines" : [ "QUI" ],
     "text" : "As above, but the action to burn this card does not get +1 stealth.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -14006,7 +14006,7 @@
   }, {
     "disciplines" : [ "POT", "PRE" ],
     "text" : "As above, and you can burn this card to cancel an action card requiring Dementation [dem], Dominate [dom] or Presence [pre] that would target you (or a card you control) as it is played.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -14136,7 +14136,7 @@
   }, {
     "disciplines" : [ "NEC" ],
     "text" : "As above, but you may burn this card during any Methuselah's unlock phase.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -14433,7 +14433,7 @@
   }, {
     "disciplines" : [ "PRO" ],
     "text" : "As above, with 1 optional maneuver during the first round of the resulting combat if this vampire blocks.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -14831,7 +14831,7 @@
   }, {
     "disciplines" : [ "CHI" ],
     "text" : "As above, but this is a +1 stealth action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -14994,7 +14994,7 @@
   }, {
     "disciplines" : [ "CHI" ],
     "text" : "As above, and put a counter on this card when it comes into play.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -15859,7 +15859,7 @@
   }, {
     "disciplines" : [ "VIC" ],
     "text" : "As above, but the minion with this card has -2 stealth.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -16228,7 +16228,7 @@
   }, {
     "disciplines" : [ "POT" ],
     "text" : "As above, and the cost of this weapon is reduced by 1 blood or 1 pool.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -16293,7 +16293,7 @@
   }, {
     "disciplines" : [ "SER" ],
     "text" : "As above, and your prey burns 1 pool when you burn this card.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -18065,7 +18065,7 @@
   }, {
     "disciplines" : [ "MAL" ],
     "text" : "As [mal] above, but the vampire need not be younger.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -18911,7 +18911,7 @@
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "As above, but this action is at +1 stealth.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -19082,7 +19082,7 @@
   }, {
     "disciplines" : [ "SER" ],
     "text" : "As above, and this vampire may prevent 1 damage each combat.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -19126,7 +19126,7 @@
   }, {
     "disciplines" : [ "PRE" ],
     "text" : "As above, but this vampire gets +2 bleed.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -19330,7 +19330,7 @@
   }, {
     "disciplines" : [ "POT" ],
     "text" : "As above, with an additional +1 strength, and this vampire can strike: 2R damage.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -19424,7 +19424,7 @@
   }, {
     "disciplines" : [ "OBF" ],
     "text" : "As above, but playing this card is a +1 stealth action.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -20238,7 +20238,7 @@
   }, {
     "disciplines" : [ "CHI" ],
     "text" : "As above, but this card comes in play with 2 counters.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -20280,7 +20280,7 @@
   }, {
     "disciplines" : [ "QUI" ],
     "text" : "As above, but the acting vampire does not gain blood from the current hunting action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -23589,7 +23589,7 @@
   }, {
     "disciplines" : [ "VIC" ],
     "text" : "As above, but the ally is not locked.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -23745,7 +23745,7 @@
   }, {
     "disciplines" : [ "OBE" ],
     "text" : "As [obe] above, but this vampire can gain 2 blood.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -23940,7 +23940,7 @@
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "As above, and the minion taking the action to burn this card takes 1 unpreventable damage when this card is burned.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -24655,7 +24655,7 @@
   }, {
     "disciplines" : [ "SER" ],
     "text" : "As above, but opposing minions get +2 strength.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -24717,7 +24717,7 @@
   }, {
     "disciplines" : [ "OBF" ],
     "text" : "As above, but for +2 stealth.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -24953,7 +24953,7 @@
   }, {
     "disciplines" : [ "FOR" ],
     "text" : "As above, but put an additional rush counter on this card at the end of any round of combat in which this vampire takes damage.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -25061,7 +25061,7 @@
   }, {
     "disciplines" : [ "CHI" ],
     "text" : "As above, but the weapons inflict +2 damage each strike.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -25448,7 +25448,7 @@
   }, {
     "disciplines" : [ "NEC" ],
     "text" : "As above, and this strike inflicts 1 damage as well.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -25614,7 +25614,7 @@
   }, {
     "disciplines" : [ "PRE" ],
     "text" : "As above, with +1 stealth.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -25637,7 +25637,7 @@
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "As above, and the capacity of the vampire with this card is reduced by 1 (but not below 1). Remove excess blood.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -25661,7 +25661,7 @@
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "As above, and lock this minion when this card is burned.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -25810,7 +25810,7 @@
   }, {
     "disciplines" : [ "MAL" ],
     "text" : "As above, but the cards are not replaced until the discard phase of that turn.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -26317,7 +26317,7 @@
   }, {
     "disciplines" : [ "VAL" ],
     "text" : "As [val] above, and if this vampire was blocked while performing a non-bleed action, the action continues as if unblocked.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -26466,7 +26466,7 @@
   }, {
     "disciplines" : [ "SER" ],
     "text" : "As above, but this vampire may attempt a leave torpor action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -26723,7 +26723,7 @@
   }, {
     "disciplines" : [ "THA" ],
     "text" : "As above, but this action is at +1 stealth.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -27101,7 +27101,7 @@
   }, {
     "disciplines" : [ "SPI" ],
     "text" : "As above, and during an action, the attached vampire can burn 2 blood to get +1 stealth.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -27177,7 +27177,7 @@
   }, {
     "disciplines" : [ "AUS", "CHI" ],
     "text" : "As [aus][chi] above, but without the option to burn a pool to unlock.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -29414,7 +29414,7 @@
   }, {
     "disciplines" : [ "MEL" ],
     "text" : "As [mel] above, and the vampire may play the card as if he or she had superior Melpominee [MEL].",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -29565,7 +29565,7 @@
   }, {
     "disciplines" : [ "SER" ],
     "text" : "As above, but with +1 stealth.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -31258,7 +31258,7 @@
   }, {
     "disciplines" : [ "POT" ],
     "text" : "As above, but this vampire gets +2 strength.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -32165,7 +32165,7 @@
   }, {
     "disciplines" : [ "THN" ],
     "text" : "As [thn] above, and this minion takes 1 unpreventable damage when he or she strikes in combat or takes an action. The minion with this card may choose not to strike during the Choose Strike step of combat.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -33847,7 +33847,7 @@
   }, {
     "disciplines" : [ "FOR" ],
     "text" : "As above, but burn only 2 blood per point.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -33957,7 +33957,7 @@
   }, {
     "disciplines" : [ "FOR" ],
     "text" : "As above, and this vampire unlocks at the end of this action.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -34161,7 +34161,7 @@
   }, {
     "disciplines" : [ "CEL", "QUI" ],
     "text" : "As above, but move 2 blood from this card to this vampire during your unlock phase.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -35114,7 +35114,7 @@
   }, {
     "disciplines" : [ "THA" ],
     "text" : "As above, but this acting vampire may prevent the aggravated damage by burning 3 additional blood.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -35753,7 +35753,7 @@
   }, {
     "disciplines" : [ "QUI" ],
     "text" : "As above, and this minion burns 1 blood or life during his or her unlock phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -36146,7 +36146,7 @@
   }, {
     "disciplines" : [ "THA" ],
     "text" : "As above, but the vampire burns 2 additional blood when attempting an action; Followers of Set burn 3 additional blood.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -36357,7 +36357,7 @@
   }, {
     "disciplines" : [ "CHI" ],
     "text" : "As above, but burn this card during your next unlock phase.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -36748,7 +36748,7 @@
   }, {
     "disciplines" : [ "PRO" ],
     "text" : "As above, and this vampire gets an optional press each combat.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -36910,7 +36910,7 @@
   }, {
     "disciplines" : [ "AUS", "OBT" ],
     "text" : "As above, and the action to burn this card costs an additional blood or conviction [1 CONVICTION].",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -37149,7 +37149,7 @@
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "As above, and this reacting vampire doesn't lock for successfully blocking the action.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -38164,7 +38164,7 @@
   }, {
     "disciplines" : [ "OBF" ],
     "text" : "As above, but minions without superior Auspex [AUS] cannot direct (D) actions at this vampire.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -38806,7 +38806,7 @@
   }, {
     "disciplines" : [ "AUS", "PRE" ],
     "text" : "As [aus][pre] above, but all vampires get +1 intercept when attempting to block this vampire.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -39484,7 +39484,7 @@
   }, {
     "disciplines" : [ "MYT" ],
     "text" : "As [myt] above, and the minion with this card gets -1 bleed when bleeding this acting vampire's controller.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -40864,7 +40864,7 @@
   }, {
     "disciplines" : [ "ABO" ],
     "text" : "As above, and this vampire gets an optional maneuver each combat.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -41391,7 +41391,7 @@
   }, {
     "disciplines" : [ "SER" ],
     "text" : "As above, and add a counter when you play this card.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -42295,7 +42295,7 @@
   }, {
     "disciplines" : [ "DEM" ],
     "text" : "As above, and the minion with this card cannot play action cards.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -43651,7 +43651,7 @@
   }, {
     "disciplines" : [ "THN" ],
     "text" : "As [thn] above, but for +2 stealth this action.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -43957,7 +43957,7 @@
   }, {
     "disciplines" : [ "DAI" ],
     "text" : "As above, and unlock this vampire.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -45032,7 +45032,7 @@
   }, {
     "disciplines" : [ "OBE" ],
     "text" : "As [obe] above, but move up to 3 blood to this card.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false

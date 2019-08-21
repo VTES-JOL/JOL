@@ -38,6 +38,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final Pattern PUT_ON_ACTING_PATTERN = Pattern.compile(".*[Pp]ut this card on the acting.*");
     private static final Pattern PUT_ON_SELF_PATTERN = Pattern.compile(".*[Pp]ut this card on this.*");
     private static final Pattern PUT_ON_SOMETHING_PATTERN = Pattern.compile(".*[Pp]ut this card on.*");
+    private static final Pattern AS_ABOVE_PATTERN = Pattern.compile("As (\\[(?<disc>.*)\\])? ?above.*");
 
     public LibraryImporter(Path dataPath) {
         super(dataPath);
@@ -100,6 +101,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                 List<String> disciplines = Arrays
                     .stream(disciplinesAndText[0].split("[\\[\\]]+"))
                     .filter(d -> !d.equals(""))
+                    .filter(d -> !d.equals(":")) //Death of the Drum
                     .collect(Collectors.toList());
                 mode.setDisciplines(disciplines);
                 mode.setText(disciplinesAndText[1]);
@@ -121,7 +123,29 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                 mode.setTarget(LibraryCardMode.Target.SELF);
             else if (PUT_ON_SOMETHING_PATTERN.matcher(mode.getText()).matches())
                 mode.setTarget(LibraryCardMode.Target.SOMETHING);
-
+            else {
+                Matcher matcher = AS_ABOVE_PATTERN.matcher(mode.getText());
+                if (matcher.matches()) {
+                    String disciplineString = matcher.group("disc");
+                    LibraryCardMode reference = null;
+                    if (disciplineString == null) {
+                        reference = modes.get(modes.size() - 1);
+                    }
+                    else {
+                        List<String> disciplines = Arrays.asList(disciplineString.split("[\\[\\]]+"));
+                        reference = modes.stream().filter(m -> m.getDisciplines().equals(disciplines)).findFirst().orElse(null);
+                        if (reference == null) {
+                            System.out.println(
+                                String.format(
+                                    "WARNING! %s: Could not find match for '%s' among modes [%s]",
+                                    card.getName(), disciplines, modes));
+                        }
+                    }
+                    if (reference != null) {
+                        mode.setTarget(reference.getTarget());
+                    }
+                }
+            }
             modes.add(mode);
         }
         card.setModes(modes);
