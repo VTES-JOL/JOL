@@ -207,19 +207,19 @@ function showCardModal(event) {
             button.children('.mode-text').text(mode.text);
             button.appendTo(modeContainer);
 
-            if (mode.target == 'SELF') {
-              if (!minionsConfigured) {
-                configureMinionButtons();
-                minionsConfigured = true;
-              }
-            }
-            else {
-              allModesTargetSelf = false;
-            }
+            //if (mode.target == 'SELF') {
+            //  if (!minionsConfigured) {
+            //    configureMinionButtons();
+            //    minionsConfigured = true;
+            //  }
+            //}
+            //else {
+            //  allModesTargetSelf = false;
+            //}
           }
-          $('#cardModal .who-is-playing-panel').toggle(allModesTargetSelf);
+          //$('#cardModal .who-is-playing-panel').toggle(allModesTargetSelf);
         }
-        if (!minionsConfigured) $('who-is-playing-panel').hide();
+        //if (!minionsConfigured) $('who-is-playing-panel').hide();
         $('#cardModal .loading').hide();
         $('#cardModal .loaded').show();
         tippy.hideAll({ duration: 0 });
@@ -284,30 +284,36 @@ function minionClicked(event) {
 function modeClicked(event) {
   var button = $(event.target).closest('button');
   var minionPanel = $('#cardModal .who-is-playing-panel');
-  minionPanel.toggle(button.data('target') == 'SELF');
+  //minionPanel.toggle(button.data('target') == 'SELF');
 
   if (minionPanel.css('display') == 'none'
       || $('#cardModal .card-minions button.active').length > 0) {
-    if (button.data('target') == 'SOMETHING')
-      showTargetPicker();
+    var target = button.data('target');
+    if (target == 'SELF' || target == 'SOMETHING')
+      showTargetPicker(target);
     else playCard(event);
   }
   else {
     $('#cardModal .card-modes button').removeClass('active');
   }
 }
-function showTargetPicker() {
+function showTargetPicker(target) {
   var picker = $('#targetPicker');
   $('#targetPicker .card-name').text($('#cardModalLabel').text());
   $('#targetPicker .card-type')
     .removeClass()
     .addClass($('#cardModal .card-type').get(0).className);
+  $('#targetPicker .modal-body').text(
+    target == 'SELF' ? 'Who is playing this?' : 'Pick target.');
   picker.show();
 
-  var firstPlayerTop =
-    $('#state .player').offset().top
+  //"player" from js/ds.js
+  var playerSelector = target == 'SELF' ? '[data-player="' + player +'"]' : '';
+  var playerDiv = $('#state .player' + playerSelector);
+  var scrollTo =
+    playerDiv.offset().top
     - picker.get(0).getBoundingClientRect().bottom;
-  window.scrollTo(0, firstPlayerTop);
+  window.scrollTo(0, scrollTo);
 
   $('#cardModal').modal('hide');
 }
@@ -322,7 +328,6 @@ function pickTarget(event) {
   var coords = targetAnchor.data('coordinates');
   var modal = $('#cardModal');
   modal.data('target', player + ' ' + region + ' ' + coords);
-  console.log(player, region, coords);
   tippy.hideAll({ duration: 0 });
 
   var modesSelected = $('#cardModal .card-modes button.active');
@@ -340,8 +345,8 @@ function playCardCommand(disciplines, target) {
   return 'play ' + handIndex
          + (disciplines ? ' @ ' + disciplines.join(',') : '')
          + (target == 'READY_REGION' ? ' ready' : '')
-         + (target == 'SELF' ? ' re ' + $('#cardModal .card-minions button.active').data('region-index') : '')
-         + (target == 'SOMETHING' ? ' ' + modal.data('target') : '')
+         //+ (target == 'SELF' ? ' re ' + $('#cardModal .card-minions button.active').data('region-index') : '')
+         + (target == 'SELF' || target == 'SOMETHING' ? ' ' + modal.data('target') : '')
          + (doNotReplace ? '' : ' draw');
 }
 function playCard(event) {
