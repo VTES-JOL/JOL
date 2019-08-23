@@ -99,7 +99,7 @@
 var CLAN_CHARS = {
   abomination: 'A', arihmane: 'B', akunanse: 'C', assamite: 'D', baali: 'E',
   blood_brothers: 'F', brujah: 'G', brujah_antitribu: 'H', caitiff: 'I',
-  daughters_of_cacophony: 'J', followers_of_set: 'K', gangrel: 'L',
+  daughters_of_cacophony: 'J', follower_of_set: 'K', gangrel: 'L',
   gangrel_antitribu: 'M', gargoyle: 'N', giovanni: 'O', guruhi: 'P',
   harbingers_of_skulls: 'Q', ishtarri: 'R', kiasyd: 'S', lasombra: 'T',
   malkavian: 'U', malkavian_antitribu: 'V', nagaraja: 'W', nosferatu: 'X',
@@ -127,7 +127,7 @@ function cardTypeCSSClass(cardType) {
   return cardType.toLowerCase().replace(' ', '_').replace('/', ' ');
 }
 function clanToKey(clan) {
-  return clan.toLowerCase().replace(' ', '_');
+  return clan.toLowerCase().replace(/ /g, '_');
 }
 function showCardModal(event) {
   $('#cardModal .loaded').hide();
