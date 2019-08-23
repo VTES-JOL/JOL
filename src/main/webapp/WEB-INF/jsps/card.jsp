@@ -42,7 +42,7 @@
 %>
 
 <c:if test="${p.hidden}">
-    XXXXXX
+    <a data-coordinates="<%= coordinates %>" onclick="pickTarget(event)">XXXXXX</a>
 </c:if>
 <c:if test="${!p.hidden}">
     <a class="card-name <%= typeClass %>" title="<%= p.getId() %>" data-card-id="<%= p.getId() %>" data-coordinates="<%= coordinates %>"
