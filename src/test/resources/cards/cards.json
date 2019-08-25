@@ -2275,7 +2275,8 @@
     "target" : null
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "cost" : "1 conviction"
 }, {
   "id" : "100111",
   "jolId" : "bl10",
@@ -11226,7 +11227,8 @@
     "target" : null
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "cost" : "1 conviction"
 }, {
   "id" : "100535",
   "jolId" : "htb38",
@@ -20411,7 +20413,8 @@
     "target" : null
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "cost" : "2 conviction"
 }, {
   "id" : "100964",
   "jolId" : "bl88",
@@ -20814,7 +20817,8 @@
     "target" : null
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "cost" : "1 conviction"
 }, {
   "id" : "100983",
   "jolId" : "lo94",
@@ -23569,6 +23573,7 @@
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
+  "cost" : "X conviction",
   "clans" : [ "Avenger" ]
 }, {
   "id" : "101116",
@@ -38339,7 +38344,8 @@
     "target" : null
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : false,
+  "cost" : "3 conviction"
 }, {
   "id" : "101813",
   "jolId" : "ge133",

@@ -90,6 +90,8 @@ public class SummaryCard {
             this.cost = libraryCard.getPool() + " pool";
         else if (!StringUtils.isBlank(libraryCard.getBlood()))
             this.cost = libraryCard.getBlood() + " blood";
+        else if (!StringUtils.isBlank(libraryCard.getConviction()))
+            this.cost = libraryCard.getConviction() + " conviction";
 
         this.clans = libraryCard.getClans();
 
