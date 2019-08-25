@@ -210,7 +210,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Requires at least one other Gehenna card in play. During each Methuselah's unlock phase, he or she may put the top card of his or her library in play. That card represents a nameless, textless ghoul ally with 2 life, 2 strength and 1 bleed. If the ally is burned, it is removed from the game. When a Methuselah is ousted, burn this card. Remove all such allies from the game when this card leaves play.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -1511,7 +1511,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Once each master phase, a Methuselah can use a master phase action to exchange a master card in his or her hand for one in his or her ash heap.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -3078,7 +3078,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Requires at least two other Gehenna cards controlled by other Methuselahs in play. During each Methuselah's unlock phase, he or she chooses a ready vampire he or she controls. The chosen vampire takes 1 unpreventable damage. Earth Meld cards cost 2 additional blood.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -3388,7 +3388,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Each Methuselah gets +2 hand size for each victory point he or she has.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -4140,7 +4140,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Requires a ready imbued in play. Whenever there are any ready imbued in play, any action to put a vampire or ghoul in play or to add counters to an uncontrolled vampire gets -1 stealth and costs an additional blood or life.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -4502,7 +4502,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Burn all boons in play. No more boons may be put in play. During each Methuselah's unlock phase, that Methuselah may move a blood from a vampire he or she controls to a vampire controlled by another Methuselah.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -4540,7 +4540,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Cards minions play in an action that require any Disciplines are not replaced until the end of the current action or until any Methuselah's hand is empty (whichever comes first). Any vampire who commits diablerie is immune to this effect until the next Gehenna card is played.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -5189,7 +5189,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Imbued get -1 intercept when attempting to block monsters. A ready monster can enter combat with an imbued as a (D) action.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -8639,7 +8639,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Requires at least two other Gehenna cards in play. During each Methuselah's unlock phase, he or she may choose a location controlled by his or her prey. The chosen location is burned unless its controller burns 2 pool.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -12166,7 +12166,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "During your unlock phase, add two counters to this card from the blood bank. When a vampire with capacity less than X is blocked while hunting, where X is the number of counters on this card, burn that vampire and all the counters on this card.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -12247,7 +12247,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "During each Methuselah's discard phase, that Methuselah burns 1 pool for each vampire in torpor they control.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -12934,7 +12934,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Requires at least one other Gehenna card in play. Each imbued can have (and use) one power card for which he or she doesn't meet the requirements. An imbued who performs a successful action may gain 1 conviction [1 CONVICTION] from his or her ash heap. An imbued can only gain 1 conviction [1 CONVICTION] this way each turn.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -14708,7 +14708,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Requires at least three other Gehenna cards in play. There is no Camarilla. Any Camarilla vampire is considered Independent instead.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -14727,7 +14727,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Requires at least three other Gehenna cards in play. Not playable if any ready vampire is Black Hand. There is no Sabbat. Any Sabbat vampire is considered Independent instead.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -15015,7 +15015,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "When an ally is burned in combat with an acting vampire, put a counter on this card, and that acting vampire takes 2 unpreventable damage (after combat ends). Burn this card when it has 4 counters.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -16526,7 +16526,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Requires at least two Gehenna cards in play. When this card is played, burn all Gehenna cards and conviction [1 CONVICTION] cards, then send all vampires with capacity 3 or less to torpor. No Gehenna cards may be played while this card remains in play.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -16850,7 +16850,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put 10 counters on this card. Remove one counter each time another Gehenna card is put in play. A blood hunt cannot be called on a vampire whose capacity is greater than the number of counters on this card when he or she diablerizes a younger vampire.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -19993,7 +19993,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "If a vampire successfully hunts, move 1 blood from that vampire to this card after resolution. Burn this card if it has 5 blood.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -20555,7 +20555,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "A Methuselah may spend four transfers and remove a vampire in his or her uncontrolled region from the game to search for any card in his or her library and put it in his or her hand (discarding and shuffling afterward).",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -26768,7 +26768,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Minion cards that change the target of a bleed cost an additional blood or life.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -27064,7 +27064,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Requires at least one other Gehenna card in play. During each Methuselah's unlock phase, he or she may choose a ready vampire controlled by his or her prey. That vampire takes 1 unpreventable damage. Any titled vampire may call a referendum to burn this card as a +1 stealth political action.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -27202,7 +27202,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "For each minion a Methuselah controls during his or her unlock phase, the Methuselah must burn a card from his or her hand or lock that minion. Cards burned in this way are not replaced until the master phase. Vampires with capacity greater than the number of Gehenna cards in play and mortal allies are not affected by this card.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -27616,7 +27616,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Any minion who successfully performs an equip action unlocks at the end of the turn.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -27635,7 +27635,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "During the first combat between an acting vampire and a blocking vampire each turn, neither combatant may end combat as a strike in the first round. A Methuselah may use a discard phase action to burn this card if his or her minions attempted no actions in the current turn.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -29996,7 +29996,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "When a Methuselah uses a discard phase action to discard a card, he or she doesn't draw to replace that card until his or her next unlock phase.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -33042,7 +33042,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Requires at least two other Gehenna cards in play. During each Methuselah's unlock phase, if he or she controls more than two vampires of the same clan, he or she burns one such vampire. If that vampire's capacity is above 5, this Methuselah becomes immune to the effects of this card for the remainder of the game.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -34069,7 +34069,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Vampires cannot hunt unless forced to hunt. A vampire who must hunt may hunt by stealing a blood from a younger vampire as a (D) action instead of performing the usual hunt action.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -34610,7 +34610,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Requires at least one other Gehenna card in play. Any Independent vampire may take an action to become liaison. Liaison is a unique Independent title worth 4 votes. If this title would be contested with a younger vampire, the younger vampire immediately yields instead of contesting.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -34629,7 +34629,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "A Methuselah cannot gain pool during their own turn unless they have the Edge or at least 1 victory point (any pool they would gain goes to the blood bank instead).",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -35819,7 +35819,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "During your discard phase, you can burn a vampire with capacity 2 or less, and your predator takes control of this card (even if you do not burn a vampire).",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -38236,7 +38236,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Requires at least one other Gehenna card in play. Cards that require any superior Disciplines cost an additional blood. Any vampire who commits diablerie is immune to this effect until the next Gehenna card is played.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -41805,7 +41805,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "After the end of a Methuselah's minion phase, each ready vampire he or she controls with capacity less than the number of Gehenna cards in play who did not hunt in that minion phase burns 1 blood.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -42237,7 +42237,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Actions taken by vampires in torpor cost an additional blood. Rescuing an older vampire from torpor costs an additional blood.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -43543,7 +43543,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "During your discard phase, burn one other event at random. Any other Methuselah may use a discard phase action and burn X pool to burn this card, where X is the number of other events in play.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -44029,7 +44029,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Allies get +1 intercept against vampires.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -44159,7 +44159,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Blood hunt referendums get an additional 2 votes against the referendum.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -44362,7 +44362,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Each turn, when a vampire plays his or her first card that turn that requires any Disciplines, that vampire's controller reveals the top card of his or her library (before drawing to replace). If it is a master card, the original card has no effect (no cost is paid), and in addition, if the original card required Obtenebration [obt], the vampire burns 2 blood.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
@@ -46114,7 +46114,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "During your next discard phase, you must burn this card, and you may either burn a vampire in torpor or, by locking a ready werewolf ally you control or discarding a White Nights Massacre from your hand, burn all vampires in torpor.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -46456,7 +46456,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Requires at least one other Gehenna card in play. Put 10 counters on this card. Burn 1 counter whenever another Gehenna card is put in play. A vampire whose capacity is greater than X is treated as if his or her capacity is X (minimum of 1), where X is the number of counters on this card.",
-    "target" : null
+    "target" : "READY_REGION"
   } ],
   "doNotReplace" : true,
   "multiMode" : false
