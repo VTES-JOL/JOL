@@ -127,9 +127,9 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "COMBAT" ],
-    "text" : "Lock this imbued before range is determined to end a combat between a monster and a mortal. If the mortal is a minion other than this imbued, you may move a conviction [1 CONVICTION] to this imbued from your hand or ash heap.",
-    "target" : null
+    "disciplines" : null,
+    "text" : "[COMBAT] Lock this imbued before range is determined to end a combat between a monster and a mortal. If the mortal is a minion other than this imbued, you may move a conviction [1 CONVICTION] to this imbued from your hand or ash heap.",
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -6744,9 +6744,9 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "REACTION" ],
-    "text" : "[2 CONVICTION] Only usable when a monster controlled by another Methuselah is taking a (D) action against you or against an imbued controlled by any player. The action fails and the acting monster enters combat with this imbued instead.",
-    "target" : null
+    "disciplines" : null,
+    "text" : "[REACTION] [2 CONVICTION] Only usable when a monster controlled by another Methuselah is taking a (D) action against you or against an imbued controlled by any player. The action fails and the acting monster enters combat with this imbued instead.",
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -11597,9 +11597,9 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "REACTION", "+1" ],
-    "text" : "intercept. Only usable when a monster is acting.",
-    "target" : null
+    "disciplines" : null,
+    "text" : "[REACTION]+1 intercept. Only usable when a monster is acting.",
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -12110,17 +12110,9 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "ACTION" ],
-    "text" : "MODIFIER] [1 CONVICTION] Only usable by a ready imbued other than the acting mortal. Burn this card to give the acting mortal you control +1 bleed.",
-    "target" : null
-  }, {
-    "disciplines" : [ "REACTION" ],
-    "text" : "[1 CONVICTION] Burn this card to give another mortal you control +1 intercept.",
-    "target" : null
-  }, {
-    "disciplines" : [ "COMBAT" ],
-    "text" : "[1 CONVICTION] Only usable by a ready imbued other than a mortal combatant you control. Burn this card to give that combatant +1 strength for the remainder of the action.",
-    "target" : null
+    "disciplines" : null,
+    "text" : "[ACTION MODIFIER] [1 CONVICTION] Only usable by a ready imbued other than the acting mortal. Burn this card to give the acting mortal you control +1 bleed.\n[REACTION] [1 CONVICTION] Burn this card to give another mortal you control +1 intercept.\n[COMBAT] [1 CONVICTION] Only usable by a ready imbued other than a mortal combatant you control. Burn this card to give that combatant +1 strength for the remainder of the action.",
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -16161,9 +16153,9 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "COMBAT" ],
-    "text" : "[1 CONVICTION] Only usable before range is determined on the first round of combat resulting from a block. Look at the opposing minion's controller's hand. You may then choose to cancel combat. If you do, and this imbued was blocking, the action continues as if unblocked.",
-    "target" : null
+    "disciplines" : null,
+    "text" : "[COMBAT] [1 CONVICTION] Only usable before range is determined on the first round of combat resulting from a block. Look at the opposing minion's controller's hand. You may then choose to cancel combat. If you do, and this imbued was blocking, the action continues as if unblocked.",
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -19465,15 +19457,10 @@
   "names" : [ "Hide" ],
   "crypt" : false,
   "unique" : false,
-  "preamble" : "Not usable by an imbued with Illuminate.",
   "modes" : [ {
-    "disciplines" : [ "ACTION" ],
-    "text" : "MODIFIER] [1 CONVICTION] Only usable as the action is announced. Monsters get -1 intercept against this action.",
-    "target" : null
-  }, {
-    "disciplines" : [ "REACTION" ],
-    "text" : "[1 CONVICTION] Only usable during a monster's (D) action targeting this imbued. The action fails.",
-    "target" : null
+    "disciplines" : null,
+    "text" : "Not usable by an imbued with Illuminate.\n[ACTION MODIFIER] [1 CONVICTION] Only usable as the action is announced. Monsters get -1 intercept against this action.\n[REACTION] [1 CONVICTION] Only usable during a monster's (D) action targeting this imbued. The action fails.",
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -20193,7 +20180,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "All imbued get +1 intercept when blocking monsters (not cumulative with any other Illuminate in play, nor with The Unmasking). Any monster may enter combat with this imbued as a (D) action. Burn this card during your next unlock phase or if this imbued leaves the ready region.",
-    "target" : null
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -20995,13 +20982,9 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "ACTION" ],
-    "text" : "[1 CONVICTION] +1 stealth action.",
-    "target" : null
-  }, {
     "disciplines" : null,
-    "text" : "Add a counter to an imbued in your uncontrolled region or move the conviction [1 CONVICTION] you paid for this action from your ash heap to any imbued in play.",
-    "target" : null
+    "text" : "[ACTION] [1 CONVICTION] +1 stealth action.\nAdd a counter to an imbued in your uncontrolled region or move the conviction [1 CONVICTION] you paid for this action from your ash heap to any imbued in play.",
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -31453,13 +31436,9 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "ACTION" ],
-    "text" : "MODIFIER] [1 CONVICTION] Only usable as the action is announced.",
-    "target" : null
-  }, {
     "disciplines" : null,
-    "text" : "Vampires with capacity less than 7 and monster allies who cost less than 4 pool cannot block this action.",
-    "target" : null
+    "text" : "[ACTION MODIFIER] [1 CONVICTION] Only usable as the action is announced.\nVampires with capacity less than 7 and monster allies who cost less than 4 pool cannot block this action.",
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -32852,7 +32831,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "When an effect that would change control of this imbued is played or announced, you may burn this card to cancel that effect. Burn this card to cancel either a (D) action against this imbued that requires Chimerstry [chi], Dementation [dem], Dominate [dom], Presence [pre], or Serpentis [ser] or a strike card that requires any of those Disciplines played by a minion opposing this imbued as it is announced. No cost is paid.",
-    "target" : null
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -33585,11 +33564,10 @@
   "names" : [ "Rejuvenate" ],
   "crypt" : false,
   "unique" : false,
-  "preamble" : "During your unlock phase, if this imbued has fewer life than his or her starting amount, he or she gains 1 life.",
   "modes" : [ {
-    "disciplines" : [ "ACTION" ],
-    "text" : "[1 CONVICTION] +1 stealth action. Add 1 blood to a vampire or 1 life to any other ally, not to exceed starting life.",
-    "target" : null
+    "disciplines" : null,
+    "text" : "During your unlock phase, if this imbued has fewer life than his or her starting amount, he or she gains 1 life.\n[ACTION] [1 CONVICTION] +1 stealth action. Add 1 blood to a vampire or 1 life to any other ally, not to exceed starting life.",
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -34001,13 +33979,9 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "ACTION" ],
-    "text" : "(D) Inflict 1 damage on a vampire with capacity less than 6. If this action is successful, you may move 1 conviction [1 CONVICTION] from your hand or ash heap to this imbued.",
-    "target" : null
-  }, {
-    "disciplines" : [ "ACTION" ],
-    "text" : "[1 CONVICTION] +1 stealth action. Add 1 blood to a vampire or 1 life to any other ally, not to exceed starting life.",
-    "target" : null
+    "disciplines" : null,
+    "text" : "[ACTION] (D) Inflict 1 damage on a vampire with capacity less than 6. If this action is successful, you may move 1 conviction [1 CONVICTION] from your hand or ash heap to this imbued.\n[ACTION] [1 CONVICTION] +1 stealth action. Add 1 blood to a vampire or 1 life to any other ally, not to exceed starting life.",
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -35983,11 +35957,10 @@
   "names" : [ "Second Sight" ],
   "crypt" : false,
   "unique" : false,
-  "preamble" : "An imbued may burn only one Second Sight for the following effects each action.\nBurn when a monster is acting to give this imbued +1 intercept for that action.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Burn when this imbued declares an action to give monsters -1 intercept for this action.",
-    "target" : null
+    "text" : "An imbued may burn only one Second Sight for the following effects each action.\nBurn when a monster is acting to give this imbued +1 intercept for that action.\nBurn when this imbued declares an action to give monsters -1 intercept for this action.",
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -37015,13 +36988,9 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "COMBAT" ],
-    "text" : "[2 CONVICTION] Only usable before strikes are chosen.",
-    "target" : null
-  }, {
     "disciplines" : null,
-    "text" : "Burn this card. The opposing monster takes an amount of damage equal to his or her strength, then combat ends. Not usable on an infernal minion, a vampire with capacity above 7, nor a vampire who has Memories of Mortality or Humanitas.",
-    "target" : null
+    "text" : "[COMBAT] [2 CONVICTION] Only usable before strikes are chosen.\nBurn this card. The opposing monster takes an amount of damage equal to his or her strength, then combat ends. Not usable on an infernal minion, a vampire with capacity above 7, nor a vampire who has Memories of Mortality or Humanitas.",
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -39947,11 +39916,10 @@
   "names" : [ "Strike with Conviction" ],
   "crypt" : false,
   "unique" : false,
-  "preamble" : "Burn to make a hand or weapon strike against a monster at +1 damage.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Burn to bleed at +1 bleed as a (D) action.",
-    "target" : null
+    "text" : "Burn to make a hand or weapon strike against a monster at +1 damage.\nBurn to bleed at +1 bleed as a (D) action.",
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -40414,9 +40382,9 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "COMBAT", "REACTION" ],
-    "text" : "[1 CONVICTION] Put three surge counters on this imbued. This imbued may burn any number of surge counters to prevent that amount of non-aggravated damage. Burn all surge counters on this imbued at the end of the action.",
-    "target" : null
+    "disciplines" : null,
+    "text" : "[COMBAT][REACTION] [1 CONVICTION] Put three surge counters on this imbued. This imbued may burn any number of surge counters to prevent that amount of non-aggravated damage. Burn all surge counters on this imbued at the end of the action.",
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -44882,13 +44850,9 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "ACTION" ],
-    "text" : "MODIFIER] Only usable at the end of a successful action (after resolving the action). Unlock this imbued.",
-    "target" : null
-  }, {
-    "disciplines" : [ "REACTION" ],
-    "text" : "[1 CONVICTION] Only usable by a locked imbued. Unlock this imbued.",
-    "target" : null
+    "disciplines" : null,
+    "text" : "[ACTION MODIFIER] Only usable at the end of a successful action (after resolving the action). Unlock this imbued.\n[REACTION] [1 CONVICTION] Only usable by a locked imbued. Unlock this imbued.",
+    "target" : "SELF"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
