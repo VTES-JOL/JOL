@@ -75,6 +75,11 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         List<String> lines = new ArrayList(Arrays.asList(card.getText().split("\n")));
         List<String> preambleLines = new ArrayList(1);
 
+        switch (card.getType().get(0).toLowerCase()) {
+            case "conviction": return parsePowerOrConviction(card, LibraryCardMode.Target.SOMETHING);
+            case "power": return parsePowerOrConviction(card, LibraryCardMode.Target.SELF);
+        }
+
         //Some cards like Make the Misere have two lines of preamble
         while (!(lines.size() == 1 || lines.get(0).startsWith("[")))
             preambleLines.add(lines.remove(0));
@@ -90,6 +95,24 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
             if (p.contains("more than one discipline can be used when playing this card")) card.setMultiMode(true);
         }
         setModes(card, lines);
+        return card;
+    }
+    /**
+     * Powers and convictions behave differently than other minion cards in
+     * that their various modes can only be used after they have been played on
+     * a minion. The act of playing them on a minion is like playing a card
+     * with a single mode, so we treat them as having a single mode here. A
+     * potential future feature would be: clicking one of these cards that
+     * is already on a minion displays the card modal with separate modes that
+     * could then be used for individual effect.
+     */
+    LibraryCard parsePowerOrConviction(LibraryCard card, LibraryCardMode.Target target) {
+        LibraryCardMode mode = new LibraryCardMode();
+        mode.setText(card.getText());
+        mode.setTarget(target);
+        List<LibraryCardMode> modes = new ArrayList(1);
+        modes.add(mode);
+        card.setModes(modes);
         return card;
     }
     void setModes(LibraryCard card, List<String> lines) {
@@ -122,7 +145,8 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                         && PUT_ON_ACTING_PATTERN.matcher(mode.getText()).matches())
                     || PUT_ON_SELF_PATTERN.matcher(mode.getText()).matches())
                 mode.setTarget(LibraryCardMode.Target.SELF);
-            else if (PUT_ON_SOMETHING_PATTERN.matcher(mode.getText()).matches())
+            else if (PUT_ON_SOMETHING_PATTERN.matcher(mode.getText()).matches()
+                    || card.getType().stream().anyMatch("conviction"::equalsIgnoreCase))
                 mode.setTarget(LibraryCardMode.Target.SOMETHING);
             else {
                 Matcher matcher = AS_ABOVE_PATTERN.matcher(mode.getText());
