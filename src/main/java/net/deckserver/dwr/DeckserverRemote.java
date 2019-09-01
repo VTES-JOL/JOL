@@ -261,13 +261,13 @@ public class DeckserverRemote {
     }
 
     public Map<String, Object> removeRole(String player, String role) {
-        logger.info("Removing {} role from {}", role, player);
-        JolAdmin.getInstance().setRole(player, role, false);
+        //logger.info("Removing {} role from {}", role, player);
+        //JolAdmin.getInstance().setRole(player, role, false);
         return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> addRole(String player, String role) {
-        JolAdmin.getInstance().setRole(player, role, true);
+        //JolAdmin.getInstance().setRole(player, role, true);
         return UpdateFactory.getUpdate();
     }
 
