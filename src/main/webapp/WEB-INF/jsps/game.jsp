@@ -51,18 +51,6 @@
             <span class="discipline">a</span>
             <p class="mode-text">The opposing minion gets -1 strength this round. A vampire may play only one Song of Serenity each combat.</p>
           </button>
-          <button type="button" class="card-minion btn btn-block btn-outline-dark mb-2" aria-pressed="false" data-toggle="button">
-            <span class="minion-name">Suzy</span>
-            <small class="minion-life counter blood">3 / 7</small>
-            <span class="minion-locked label-dark" style="border: 1px solid black; padding: 0 .5rem">LOCKED</span>
-            <span class="minion-label label-light">Sammy</span>
-            <span class="minion-index">(#1)</span>
-          </button>
-        </div>
-        <div class="who-is-playing-panel" style="display:none">
-          <hr/>
-          <p>Who is playing this?</p>
-          <div class="card-minions"></div>
         </div>
         <div class="extended-play-panel" style="display:none">
           <hr/>

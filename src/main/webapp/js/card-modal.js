@@ -40,17 +40,6 @@ function showCardModal(event) {
   var cardId = $(event.target).data('card-id');
   var handCoord = $(event.target).data('coordinates');
   $.get({
-      //url: "rest/api/cards/lo0", success: function(card) { //Abombwe
-      //url: "rest/api/cards/lo7", success: function(card) { //Akhunanse Kholo
-      //url: "rest/api/cards/km98", success: function(card) { //Pack Alpha
-      //url: "rest/api/cards/jy322", success: function(card) { //Raven Spy
-      //url: "rest/api/cards/tr14", success: function(card) { //CrimethInc
-      //url: "rest/api/cards/lo170", success: function(card) { //Reanimated Corpse - an ally
-      //url: "rest/api/cards/lo22", success: function(card) { //Base Hunting Ground - pool cost and clan requirement
-      //url: "rest/api/cards/una21", success: function(card) { //Ennoia's Theater - multiple clans
-      //url: "rest/api/cards/au36", success: function(card) { //Make the Misere - multiple lines in preamble
-      //url: "rest/api/cards/au32", success: function(card) { //Guardian Vigil - multi-mode
-      //url: "rest/api/cards/bl61", success: function(card) { //Elemental Stoicism - modes require multiple disciplines
       url: "rest/api/cards/" + cardId, success: function(card) {
         console.log(card);
         var modal = $('#cardModal');
@@ -76,9 +65,6 @@ function showCardModal(event) {
 
         var modeContainer = $('#cardModal .card-modes');
         modeContainer.empty();
-
-        var minionsConfigured = false;
-        var allModesTargetSelf = true;
 
         if (card.modes && card.modes.length > 0) {
           var modeTemplate = $('#cardModal .templates .card-mode');
@@ -109,20 +95,8 @@ function showCardModal(event) {
             button.children('.discipline').text(disciplineStr);
             button.children('.mode-text').text(mode.text);
             button.appendTo(modeContainer);
-
-            //if (mode.target == 'SELF') {
-            //  if (!minionsConfigured) {
-            //    configureMinionButtons();
-            //    minionsConfigured = true;
-            //  }
-            //}
-            //else {
-            //  allModesTargetSelf = false;
-            //}
           }
-          //$('#cardModal .who-is-playing-panel').toggle(allModesTargetSelf);
         }
-        //if (!minionsConfigured) $('who-is-playing-panel').hide();
         $('#cardModal .loading').hide();
         $('#cardModal .loaded').show();
         tippy.hideAll({ duration: 0 });
@@ -130,75 +104,12 @@ function showCardModal(event) {
       }
   });
 }
-function configureMinionButtons() {
-  var minionContainer = $('#cardModal .card-minions');
-  minionContainer.empty();
-
-  var minionTemplate = $('#cardModal .templates .card-minion');
-  //TODO fetch from forthcoming minion API
-  var minions = [
-    {index: 1, name: 'Suzy', type: 'vampire', blood: 3, capacity: 7, locked: true},
-    {index: 3, name: 'Ambrosio Luis Monçada, Plenipotentiary', type: 'vampire', blood: 10, capacity: 10, locked: false},
-    {index: 10, name: 'Reanimated Corpse', type: 'ally', life: 2, locked: false, label: 'Sammy'}
-  ];
-  for (var i = 0; i < minions.length; ++i) {
-    var minion = minions[i];
-    var button = minionTemplate.clone();
-    button.data('region-index', minion.index);
-    button.children('.minion-name').text(minion.name);
-    var life = button.children('.minion-life');
-    switch (minion.type) {
-      case 'vampire':
-        life.text(minion.blood + ' / ' + minion.capacity);
-        life.removeClass('life').addClass('blood');
-        break;
-      case 'ally':
-        life.text(minion.life);
-        life.removeClass('blood').addClass('life');
-        break;
-      default:
-        console.log('Card Modal: unknown minion type: ' + minion.type);
-        break;
-    }
-    button.children('.minion-locked').toggle(minion.locked);
-    var label = button.children('.minion-label');
-    label.text(minion.label);
-    label.toggle(minion.label != null);
-    button.children('.minion-index').text('(#' + minion.index + ')');
-    button.on('click', minionClicked);
-    button.appendTo(minionContainer);
-  }
-}
-function minionClicked(event) {
-  var button = $(event.target).closest('button');
-  var minions = $('#cardModal .card-minions');
-  minions.children().removeClass('active');
-
-  var extendedPlayPanel = $('#cardModal .extended-play-panel');
-  var multiMode = extendedPlayPanel.css('display') != 'none';
-  var modesSelected = $('#cardModal .card-modes button.active');
-  if (!multiMode && modesSelected.length > 0) {
-    //Not needed for visual effects or state change.  Only needed in case the
-    //card play is happening now, before the state change takes effect normally.
-    button.addClass('active');
-    playCard({target: modesSelected.eq(0)});
-  }
-}
 function modeClicked(event) {
   var button = $(event.target).closest('button');
-  var minionPanel = $('#cardModal .who-is-playing-panel');
-  //minionPanel.toggle(button.data('target') == 'SELF');
-
-  if (minionPanel.css('display') == 'none'
-      || $('#cardModal .card-minions button.active').length > 0) {
-    var target = button.data('target');
-    if (target == 'SELF' || target == 'SOMETHING')
-      showTargetPicker(target);
-    else playCard(event);
-  }
-  else {
-    $('#cardModal .card-modes button').removeClass('active');
-  }
+  var target = button.data('target');
+  if (target == 'SELF' || target == 'SOMETHING')
+    showTargetPicker(target);
+  else playCard(event);
 }
 function showTargetPicker(target) {
   var picker = $('#targetPicker');
@@ -248,7 +159,6 @@ function playCardCommand(disciplines, target) {
   return 'play ' + handIndex
          + (disciplines ? ' @ ' + disciplines.join(',') : '')
          + (target == 'READY_REGION' ? ' ready' : '')
-         //+ (target == 'SELF' ? ' re ' + $('#cardModal .card-minions button.active').data('region-index') : '')
          + (target == 'SELF' || target == 'SOMETHING' ? ' ' + modal.data('target') : '')
          + (doNotReplace ? '' : ' draw');
 }
