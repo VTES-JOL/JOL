@@ -149,9 +149,9 @@ public class DoCommand {
                 String targetCard = cmdObj.getCard(true, targetPlayer, targetRegion);
                 boolean draw = cmdObj.consumeString("draw");
                 if (targetCard != null) {
-                    game.moveToCard(srcCard, targetCard);
+                    game.moveToCard(true, player, srcCard, targetPlayer, targetRegion, targetCard, modes);
                     if (draw) game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
-                    return "Put a card on another card";
+                    return "Played a card on another card";
                 } else {
                     game.playCard(player, srcCard, targetPlayer, targetRegion, modes);
                     if (docap) {
