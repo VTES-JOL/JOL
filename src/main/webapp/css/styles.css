@@ -1219,18 +1219,6 @@ input[type=checkbox] {
 #cardModal .card-cost {
 }
 
-#cardModal .card-minions button:hover:not(.active) {
-  color: #343a40;
-  background-color: #cdccdc;
-  background-image: none;
-  border-color: #343a40;
-}
-
-#cardModal .card-minion {
-  text-align: left;
-  white-space: normal;
-}
-
 #targetPicker {
   background-color: rgba(0, 0, 0, .5);
 }
