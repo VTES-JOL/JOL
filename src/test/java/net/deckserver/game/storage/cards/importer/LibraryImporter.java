@@ -2,13 +2,17 @@ package net.deckserver.game.storage.cards.importer;
 
 import lombok.extern.slf4j.Slf4j;
 import net.deckserver.game.storage.cards.LibraryCard;
+import net.deckserver.game.storage.cards.LibraryCardMode;
 
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,6 +33,12 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final int FIELD_BANNED = 14;
 
     private Function<String, Boolean> burnOption = (text) -> text.equals("Y") || text.equalsIgnoreCase("Yes");
+
+    private static final Pattern PUT_INTO_PLAY_PATTERN = Pattern.compile(".*[Pp]ut this card in(?:to)? play.*");
+    private static final Pattern PUT_ON_ACTING_PATTERN = Pattern.compile(".*[Pp]ut this card on the acting.*");
+    private static final Pattern PUT_ON_SELF_PATTERN = Pattern.compile(".*[Pp]ut this card on this.*");
+    private static final Pattern PUT_ON_SOMETHING_PATTERN = Pattern.compile(".*[Pp]ut this card on.*");
+    private static final Pattern AS_ABOVE_PATTERN = Pattern.compile("As (\\[(?<disc>.*)\\])? ?above.*");
 
     public LibraryImporter(Path dataPath) {
         super(dataPath);
@@ -62,8 +72,107 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         Utils.getClean(lineData[FIELD_TEXT]).ifPresent(card::setText);
         Utils.getClean(lineData[FIELD_BANNED]).map(banned -> !banned.isEmpty()).ifPresent(card::setBanned);
 
-        Arrays.stream(card.getText().split("\n")).findFirst().map(String::toLowerCase).filter(line -> line.contains("unique")).ifPresent(s -> card.setUnique(true));
+        List<String> lines = new ArrayList(Arrays.asList(card.getText().split("\n")));
+        List<String> preambleLines = new ArrayList(1);
 
+        switch (card.getType().get(0).toLowerCase()) {
+            case "conviction": return parsePowerOrConviction(card, LibraryCardMode.Target.SOMETHING);
+            case "power": return parsePowerOrConviction(card, LibraryCardMode.Target.SELF);
+        }
+
+        //Some cards like Make the Misere have two lines of preamble
+        while (!(lines.size() == 1 || lines.get(0).startsWith("[")))
+            preambleLines.add(lines.remove(0));
+
+        if (preambleLines.size() > 0) {
+            String preamble = String.join("\n", preambleLines);
+            card.setPreamble(preamble);
+
+            // Preamble checks
+            String p = preamble.toLowerCase();
+            if (p.contains("unique")) card.setUnique(true);
+            if (p.contains("do not replace")) card.setDoNotReplace(true);
+            if (p.contains("more than one discipline can be used when playing this card")) card.setMultiMode(true);
+        }
+        setModes(card, lines);
         return card;
+    }
+    /**
+     * Powers and convictions behave differently than other minion cards in
+     * that their various modes can only be used after they have been played on
+     * a minion. The act of playing them on a minion is like playing a card
+     * with a single mode, so we treat them as having a single mode here. A
+     * potential future feature would be: clicking one of these cards that
+     * is already on a minion displays the card modal with separate modes that
+     * could then be used for individual effect.
+     */
+    LibraryCard parsePowerOrConviction(LibraryCard card, LibraryCardMode.Target target) {
+        LibraryCardMode mode = new LibraryCardMode();
+        mode.setText(card.getText());
+        mode.setTarget(target);
+        List<LibraryCardMode> modes = new ArrayList(1);
+        modes.add(mode);
+        card.setModes(modes);
+        return card;
+    }
+    void setModes(LibraryCard card, List<String> lines) {
+        List<LibraryCardMode> modes = new ArrayList(lines.size());
+        for (String line: lines) {
+            LibraryCardMode mode = new LibraryCardMode();
+            if (line.startsWith("[")) {
+                String[] disciplinesAndText = line.split(" ", 2);
+                List<String> disciplines = Arrays
+                    .stream(disciplinesAndText[0].split("[\\[\\]]+"))
+                    .filter(d -> !d.equals(""))
+                    .filter(d -> !d.equals(":")) //Death of the Drum
+                    .collect(Collectors.toList());
+                mode.setDisciplines(disciplines);
+                mode.setText(disciplinesAndText[1]);
+            }
+            else mode.setText(line);
+
+            if ((card.getType().stream().anyMatch("master"::equalsIgnoreCase)
+                        && card.getPreamble() != null
+                        && card.getPreamble().contains("location"))
+                    || card.getType().stream().anyMatch("ally"::equalsIgnoreCase)
+                    || card.getType().stream().anyMatch("event"::equalsIgnoreCase)
+                    || PUT_INTO_PLAY_PATTERN.matcher(mode.getText()).matches())
+                mode.setTarget(LibraryCardMode.Target.READY_REGION);
+            else if (card.getType().stream().anyMatch("equipment"::equalsIgnoreCase)
+                    || card.getType().stream().anyMatch("retainer"::equalsIgnoreCase)
+                    || ((card.getType().stream().anyMatch("action"::equalsIgnoreCase)
+                        || card.getType().stream().anyMatch("action modifier"::equalsIgnoreCase))
+                        && PUT_ON_ACTING_PATTERN.matcher(mode.getText()).matches())
+                    || PUT_ON_SELF_PATTERN.matcher(mode.getText()).matches())
+                mode.setTarget(LibraryCardMode.Target.SELF);
+            else if (PUT_ON_SOMETHING_PATTERN.matcher(mode.getText()).matches()
+                    || card.getType().stream().anyMatch("conviction"::equalsIgnoreCase))
+                mode.setTarget(LibraryCardMode.Target.SOMETHING);
+            else {
+                Matcher matcher = AS_ABOVE_PATTERN.matcher(mode.getText());
+                if (matcher.matches()) {
+                    String disciplineString = matcher.group("disc");
+                    LibraryCardMode reference = null;
+                    if (disciplineString == null) {
+                        reference = modes.get(modes.size() - 1);
+                    }
+                    else {
+                        List<String> disciplines = Arrays.asList(disciplineString.split("[\\[\\]]+"));
+                        reference = modes.stream().filter(m -> m.getDisciplines().equals(disciplines)).findFirst().orElse(null);
+                        if (reference == null) {
+                            System.out.println(
+                                String.format(
+                                    "WARNING! %s: Could not find match for '%s' among modes [%s]",
+                                    card.getName(), disciplines, modes));
+                        }
+                    }
+                    if (reference != null) {
+                        mode.setTarget(reference.getTarget());
+                    }
+                }
+            }
+            modes.add(mode);
+        }
+        card.setModes(modes);
     }
 }

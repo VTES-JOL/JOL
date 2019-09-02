@@ -753,15 +753,17 @@ function generateCardData(parent) {
     tippy(parent + ' a.card-name', {
         animateFill: false,
         hideOnClick: false,
+        flipOnUpdate: true,
+        placement: 'auto',
+        boundary: 'viewport',
         interactive: true,
         theme: 'light',
         onShow: function (instance) {
-            var content = this.querySelector('.tippy-content');
-            content.innerHTML = "Loading...";
-            var cardId = instance.title;
+            instance.setContent("Loading...");
+            var cardId = instance.reference.title;
             $.get({
                 url: "rest/card/" + cardId, success: function (data) {
-                    content.innerHTML = data;
+                    instance.setContent(data);
                 }
             });
         }
@@ -1016,7 +1018,7 @@ function callbackMain(data) {
         removeLabeledRows('activeGames', data.removedGames);
         renderMessage(data.message);
         //TODO how can I inject this into data.message?
-        renderMessage('Players can now receive pings on their phones via Discord push notifications!  Visit the Profile page to learn more.');
+        renderMessage('September 2019: Cards can be played from hand with a click or a tap.');
         if (data.refresh > 0) {
             if (refresher) clearTimeout(refresher);
             refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", data.refresh);

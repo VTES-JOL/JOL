@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -22,4 +23,11 @@ public class CardSummary {
     private boolean unique;
     private String group;
     private String sect;
+
+    private String preamble;
+    private List<LibraryCardMode> modes;
+    private boolean doNotReplace;
+    private boolean multiMode;
+    private String cost;
+    private List<String> clans;
 }
