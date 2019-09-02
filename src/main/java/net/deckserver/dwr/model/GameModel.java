@@ -116,8 +116,7 @@ public class GameModel implements Comparable {
                     stateChanged = true;
                 }
                 if (chat != null) {
-                    status.append(commander.doMessage(player,
-                            chat));
+                    status.append(commander.doMessage(player, chat));
                     chat = null;
                     chatChanged = true;
                 }

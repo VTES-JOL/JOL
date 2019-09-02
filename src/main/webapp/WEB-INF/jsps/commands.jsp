@@ -337,17 +337,18 @@
         <div class="light padded">
             <p>
                 Manipulates cards in various ways. You can use this command to play vampires from your uncontrolled
-                region to
-                your ready region. You may also use this command to play cards from your hand. The default PLAYER is
-                yourself.
-                The default REGION is your ashheap if you are playing a library card or your ready region if you are
-                playing a
-                vampire. By default you will not draw to replace a card played.
+                region to your ready region. You may also use this command to play cards from your hand.
             </p>
             <h5>Syntax</h5>
-            <p>
-                <code>play [vamp] CARD [PLAYER] [REGION] [CARD] [draw]</code>
-            </p>
+            <div>
+                <code>play [vamp] CARD [@ DISCIPLINES] [PLAYER] [REGION] [CARD] [draw]</code>
+                <ul>
+                  <li>The default PLAYER is yourself.</li>
+                  <li>The default REGION is your ashheap if you are playing a library card or your ready region if you are playing a vampire.</li>
+                  <li>By default you will not draw to replace a card played.</li>
+                  <li>DISCIPLINES are printed in the log to let others know how you are using the card.</li>
+                </ul>
+            </div>
             <h5>Examples</h5>
             <table class="help-example">
                 <tr>
@@ -394,6 +395,14 @@
                 <tr>
                     <td class="help-command">play 1 torpor</td>
                     <td>moves your hand card #1 to your torpor region</td>
+                </tr>
+                <tr>
+                    <td class="help-command">play 1 @ ani</td>
+                    <td>play card #1 at basic animalism</td>
+                </tr>
+                <tr>
+                    <td class="help-command">play 1 @ ani,FOR</td>
+                    <td>play card #1 at basic animalism and superior fortitude</td>
                 </tr>
             </table>
         </div>

@@ -8,14 +8,19 @@ package net.deckserver.dwr.model;
 
 import com.google.common.base.Strings;
 import net.deckserver.Utils;
+import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.game.interfaces.state.*;
 import net.deckserver.game.interfaces.turn.GameAction;
 import net.deckserver.game.jaxb.state.Notation;
+import net.deckserver.game.json.deck.CardSummary;
 import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.cards.Deck;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
+import net.deckserver.rest.ApiResource;
+import org.owasp.html.Sanitizers;
+import org.slf4j.Logger;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -130,7 +135,9 @@ public class JolGame {
         return state.getPlayers();
     }
 
-    void moveToCard(String cardId, String destCard) {
+    void moveToCard(
+            boolean play, String player, String cardId, String destPlayer,
+            String destRegion, String destCard, String[] modes) {
         if (cardId.equals(destCard)) throw new IllegalArgumentException("Can't move a card to itself");
         Card srcCard = state.getCard(cardId);
         Card dstCard = state.getCard(destCard);
@@ -148,9 +155,45 @@ public class JolGame {
         if (srcCard == null) throw new IllegalArgumentException("No such card");
         CardContainer source = srcCard.getParent();
         Location loc = (Location) state.getRegionFromCard(dstCard);
-        addCommand("Put " + getCardName(srcCard, loc.getName()) + " on " + getCardName(dstCard), new String[]{"puton", cardId, destCard});
+
+        String message = null;
+        if (play) {
+            //Destination messages:
+            //Target is unique and public: "on <target>"
+            //Target is non-unique and public: "on [<player>'s] <target> [#<region-index>] ["<label>"]"
+            //Target is in secret region: "on [<player>'s] <secret region #>"
+
+            boolean destHidden = isHiddenRegion(destRegion);
+            CardEntry destEntry = CardSearch.INSTANCE.getCardById(dstCard.getCardId());
+
+            boolean includePlayer = !player.equals(destPlayer) && (destHidden || !destEntry.isUnique());
+            String differentiators = "";
+            if (!(destHidden || destEntry.isUnique())) {
+                int regionIndex = getIndexInRegion(dstCard);
+                String label = getText(destCard);
+                differentiators = String.format(
+                    "%s%s",
+                    regionIndex > -1 ? String.format(" #%s", regionIndex + 1) : "",
+                    label.equals("") ? "" : String.format(" \"%s\"", label)
+                );
+            }
+            String destMessage = String.format(
+                " on %s%s%s",
+                includePlayer ? String.format("%s's ", destPlayer) : "",
+                getCardName(dstCard),
+                differentiators
+            );
+            message = playCardMessage(player, srcCard, destRegion, modes, destMessage);
+        }
+        else message = "Put " + getCardName(srcCard, loc.getName()) + " on " + getCardName(dstCard);
+        addCommand(message, new String[]{"puton", cardId, destCard});
+
         source.removeCard(srcCard);
         dstCard.addCard(srcCard, false);
+    }
+
+    void moveToCard(String cardId, String destCard) {
+        moveToCard(false, null, cardId, null, null, destCard, null);
     }
 
     void moveToRegion(String cardId, String destPlayer, String destRegion, boolean bottom) {
@@ -180,7 +223,7 @@ public class JolGame {
         dest.addCard(card, false);
     }
 
-    public void playCard(String player, String cardId, String destPlayer, String destRegion) {
+    public void playCard(String player, String cardId, String destPlayer, String destRegion, String[] modes) {
         Card card = state.getCard(cardId);
         if (card == null) throw new IllegalArgumentException("No such card");
         CardContainer source = card.getParent();
@@ -191,14 +234,26 @@ public class JolGame {
             destMessage = String.format(" to %s's %s", destPlayer, destRegion);
         else if (!destRegion.equals(JolGame.ASHHEAP))
             destMessage = String.format(" to %s", destRegion);
-        String message = String.format(
-                "%s plays %s%s",
-                player,
-                getCardName(card, destRegion),
-                destMessage);
+
+        String message = playCardMessage(player, card, destRegion, modes, destMessage);
         addCommand(message, new String[]{"move", cardId, destPlayer, destRegion, "bottom"});
         source.removeCard(card);
         dest.addCard(card, false);
+    }
+
+    String playCardMessage(String player, Card card, String destRegion, String[] modes, String destMessage) {
+        String modeMessage = "";
+        if (modes != null) {
+            for (String mode: modes)
+                modeMessage += ChatParser.generateDisciplineLink(mode);
+            modeMessage = " at " + modeMessage;
+        }
+        return String.format(
+            "%s plays %s%s%s",
+            player,
+            getCardLink(card),
+            modeMessage,
+            destMessage);
     }
 
     public void setOrder(List<String> players) {
@@ -337,15 +392,25 @@ public class JolGame {
         String region = state.getPlayerRegionName(loc);
         if (region == null) return card.getName();
         if (isHiddenRegion(region)) {
-            CardContainer container = card.getParent();
-            if (container instanceof Location) {
-                loc = (Location) container;
-                Card[] cards = loc.getCards();
-                for (int j = 0; j < cards.length; j++)
-                    if (card.getId().equals(cards[j].getId())) return region + " #" + (j + 1);
-            }
+            int regionIndex = getIndexInRegion(card);
+            if (regionIndex > -1) return region + " #" + (regionIndex + 1);
         }
         return getCardLink(card);
+    }
+
+    /**
+     * Zero-based.
+     */
+    private int getIndexInRegion(Card card) {
+        CardContainer container = card.getParent();
+        if (container instanceof Location) {
+            Location loc = (Location) container;
+            Card[] cards = loc.getCards();
+            for (int j = 0; j < cards.length; j++)
+                if (card.getId().equals(cards[j].getId()))
+                    return j;
+        }
+        return -1;
     }
 
     private String getCardLink(Card card) {

@@ -24,6 +24,67 @@
   </div>
 </div>
 
+<div class="modal" id="cardModal" tabindex="-1" role="dialog" aria-labelledby="cardModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content loading" style="height:50vh;text-align:center">
+      <h2 style="position:relative;top:43%">Loading...</h2>
+    </div>
+    <div class="modal-content loaded" style="text-align:center">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <span class="card-type action"></span>
+          <span class="card-name" id="cardModalLabel">Song of Serenity</span>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="requirements">
+          <span class="card-clan"></span>
+          <span class="card-cost">Costs 1 blood.</span>
+        </div>
+        <p class="preamble mb-2">Only usable before range is chosen.</p>
+        <div class="card-modes"></div>
+        <div class="templates d-none">
+          <button type="button" class="card-mode btn btn-block btn-outline-dark mb-2" aria-pressed="false" data-toggle="button">
+            <span class="discipline">a</span>
+            <p class="mode-text">The opposing minion gets -1 strength this round. A vampire may play only one Song of Serenity each combat.</p>
+          </button>
+        </div>
+        <div class="extended-play-panel" style="display:none">
+          <hr/>
+          <button id="cardModalPlayButton" type="button"
+                  class="btn btn-block btn-primary mb-2" style="white-space:normal"
+                  onclick="playCard(event);">Play</button>
+          <!--hr/>
+          <button type="button" class="btn btn-outline-danger mb-1">Discard</button>
+          <input type="checkbox" checked="checked">Replace</input-->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="targetPicker" class="fixed-top" style="display:none">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <span class="card-type action"></span>
+          <span class="card-name">Song of Serenity</span>
+        </h5>
+        <button type="button" class="close" onclick="closeTargetPicker()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">Pick target.</div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="js/card-modal.js"></script>
+
 <div id="game-info" class="border-bottom row no-gutters">
     <div class="col-sm-7">
         <div class="row no-gutters">
