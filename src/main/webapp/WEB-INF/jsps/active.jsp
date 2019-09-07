@@ -9,7 +9,7 @@
 	</div>
 </div>
 <div id="activeGameTemplate" class="row no-gutters d-none">
-	<div class="col"></div>
+	<div class="col" style="word-break: break-all"></div>
 	<div class="col d-none d-sm-flex"></div>
 	<div class="col"></div>
 	<div class="col d-none d-sm-flex"></div>
