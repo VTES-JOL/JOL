@@ -193,6 +193,10 @@ ul.deck-list {
     background-color: rgb(255, 228, 146);
 }
 
+#ownGames td {
+  word-break: break-all;
+}
+
 .light {
     background-color: white;
 }
