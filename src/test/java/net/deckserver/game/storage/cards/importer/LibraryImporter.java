@@ -120,6 +120,9 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         for (String line: lines) {
             LibraryCardMode mode = new LibraryCardMode();
             if (line.startsWith("[")) {
+                //HACK: Mirror's Visage superior
+                line = line.replace("]+", "] +");
+
                 String[] disciplinesAndText = line.split(" ", 2);
                 List<String> disciplines = Arrays
                     .stream(disciplinesAndText[0].split("[\\[\\]]+"))
