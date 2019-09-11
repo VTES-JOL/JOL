@@ -8,14 +8,16 @@
         </button>
       </div>
       <div class="modal-body">
+        <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('Block?')">Block?</button>
         <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('No block')">No block</button>
         <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('Blocked')">Blocked</button>
-        <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('No pre-maneuver')">No pre-maneuver</button>
+        <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('No pre-range')">No pre-range</button>
         <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('No maneuver')">No maneuver</button>
         <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('No pre, no maneuver')">No pre, no maneuver</button>
         <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('Hands for 1')">H1</button>
         <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('Hands for 2')">H2</button>
         <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('Hands for 3')">H3</button>
+        <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('Wave')">Wave</button>
         <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('No press')">No press</button>
         <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('Combat ends')">Combat ends</button>
         <button type="button" class="btn btn-sm btn-outline-success m-1" onclick="sendChat('No sudden/wash')">No sudden/wash</button>

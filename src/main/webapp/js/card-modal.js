@@ -23,8 +23,8 @@ var DISCIPLINE_CHARS = {
   ser: 's', SER: 'S', tha: 't', THA: 'T', aus: 'u', AUS: 'U',
   vis: 'v', VIS: 'V', abo: 'w', ABO: 'W', myt: 'x', MYT: 'X',
   dai: 'y', DAI: 'Y', spi: 'z', SPI: 'Z', obt: '*', OBT: '+',
-  tem: '(', TEM: ')', str: ':', STR: ',', mal: '<', MAL: '>',
-  flight: '='
+  tem: '(', TEM: ')', str: ':', STR: ';', mal: '<', MAL: '>',
+  FLIGHT: '='
 };
 function cardTypeCSSClass(cardType) {
   return cardType.toLowerCase().replace(' ', '_').replace('/', ' ');

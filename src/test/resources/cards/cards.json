@@ -25883,8 +25883,8 @@
     "text" : "Only usable when this acting vampire is blocked (play before combat, if any). Unlock this vampire and end the action. This vampire cannot act again this turn.",
     "target" : null
   }, {
-    "disciplines" : [ "CHI", "+2" ],
-    "text" : "stealth if this is an undirected action, otherwise +1 stealth.",
+    "disciplines" : [ "CHI" ],
+    "text" : "+2 stealth if this is an undirected action, otherwise +1 stealth.",
     "target" : null
   } ],
   "doNotReplace" : false,
