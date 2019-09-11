@@ -24,7 +24,7 @@ var DISCIPLINE_CHARS = {
   vis: 'v', VIS: 'V', abo: 'w', ABO: 'W', myt: 'x', MYT: 'X',
   dai: 'y', DAI: 'Y', spi: 'z', SPI: 'Z', obt: '*', OBT: '+',
   tem: '(', TEM: ')', str: ':', STR: ',', mal: '<', MAL: '>',
-  flight: '='
+  FLIGHT: '='
 };
 function cardTypeCSSClass(cardType) {
   return cardType.toLowerCase().replace(' ', '_').replace('/', ' ');
