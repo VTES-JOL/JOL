@@ -1,4 +1,4 @@
-Name: .44 Magnum
+﻿Name: .44 Magnum
 [Jyhad:C, VTES:C, Sabbat:C, SW:PB, CE:PTo3, LoB:PO3]
 Cardtype: Equipment
 Cost: 2 pool
@@ -265,7 +265,7 @@ Clan: Brujah
 Group: 4
 Capacity: 11
 Discipline: aus CEL OBF POT PRE PRO
-Camarilla Brujah Inner Circle: Combat cards cost Adana 1 less blood. +2 bleed.
+Camarilla Brujah Inner Circle: Combat cards cost Adana 1 fewer blood. +2 bleed.
 Artist: Marian Churchland
 
 Name: Adaptability
@@ -378,7 +378,7 @@ Name: Agate Talisman
 [KoT:C/B1]
 Cardtype: Equipment
 Only usable by a vampire with capacity 4 or more.
-The bearer can lock this card during a referendum before votes and ballots are cast to get +1 vote. A vampire can have only one Agate Talisman.
+The bearer can lock this card during the polling step of any referendum before votes and ballots are cast to get +1 vote. A vampire can have only one Agate Talisman.
 Artist: Brian LeBlanc
 
 Name: Agatha
@@ -413,7 +413,7 @@ Clan: Blood Brother
 Group: 6
 Capacity: 6
 Discipline: FOR SAN VIC
-Sabbat: Cards requiring Sanguinus [san] cost Ági 1 less blood. Budapest circle. Sterile.
+Sabbat: Cards requiring Sanguinus [san] cost Ági 1 fewer blood. Budapest circle. Sterile.
 Artist: Noora Hirvonen
 
 Name: Agrippina
@@ -542,13 +542,13 @@ Independent: Once each turn, Aisha may burn 1 blood to get +1 intercept.
 Artist: Alan Rabinowitz
 
 Name: Aisha az-Zahra
-[Anthology:1]
+[Anthology:LARP1]
 Cardtype: Vampire
 Clan: Toreador
 Group: 5
 Capacity: 9
 Discipline: obf qui AUS CEL PRE
-Independent anarch: During a referendum, Aisha can burn 1 blood to get +1 vote for each ready anarch you control. +1 bleed.
+{Anarch}: {During the polling step of any referendum}, Aisha can burn 1 blood to get +1 vote for each ready anarch you control. +1 bleed.
 Artist: Riccardo Fabiani
 
 Name: Aisling Sturbridge
@@ -616,14 +616,6 @@ Only usable during a referendum. Usable by a locked vampire. Title.
 Put this card on this Laibon Akunanse to represent the unique Laibon title of Akunanse Kholo (worth 2 votes). Not usable if there are any older ready untitled Laibon Akunanse. Whenever this vampire is not a ready Laibon Akunanse or there is an older ready untitled Laibon Akunanse, move this card to (one of) the oldest ready untitled Laibon Akunanse (if any).
 Artist: Ken Meyer, Jr.
 
-Name: Al's Army Apparatus
-[Jyhad:R2, VTES:R, CE:R, KoT:R]
-Cardtype: Master
-Clan: Brujah
-Master: unique location.
-During your minion phase, you may lock this card to search your library for a weapon and move it to your hand (shuffle and discard afterward).
-Artist: Steve Ellis; Robert McNeill
-
 Name: Al-Ashrad, Amr of Alamut
 [AH:V3, FN:PA]
 Cardtype: Vampire
@@ -666,6 +658,14 @@ Discipline: obf qui AUS FOR PRE TEM
 Sabbat: If you control four or more True Brujah, burn Al-Muntathir. He cannot use cards requiring Celerity [cel]. Black Hand. Scarce.
 Artist: Jami Waggoner
 
+Name: Al's Army Apparatus
+[Jyhad:R2, VTES:R, CE:R, KoT:R]
+Cardtype: Master
+Clan: Brujah
+Master: unique location.
+During your minion phase, you may lock this card to search your library for a weapon and move it to your hand (shuffle and discard afterward).
+Artist: Steve Ellis; Robert McNeill
+
 Name: Alabástrom
 [Anthology:1]
 Cardtype: Vampire
@@ -673,7 +673,7 @@ Clan: Gargoyle
 Group: 6
 Capacity: 7
 Discipline: aus cel for POT VIS
-Independent anarch: If Alabástrom is ready during your turn, you can unlock another ready Gargoyle you control. Flight [FLIGHT].
+Anarch: If Alabástrom is ready during your turn, you can unlock another ready Gargoyle you control. Flight [FLIGHT].
 Artist: Ginés Quiñonero
 
 Name: Alacrity
@@ -686,12 +686,12 @@ Discipline: Celerity
 Artist: L. A. Williams
 
 Name: Alamut
-[AH:R2, FN:PA]
+[AH:R2, FN:PA, 25th:1]
 Cardtype: Master
 Clan: Assamite
 Cost: 1 pool
-Master: unique location.
-If an Assamite you control successfully bleeds another Methuselah, put the pool lost by that Methuselah on this card. During the referendum of a political action, you may burn X blood from this card to give a vampire you control X votes for that referendum.
+Unique location.
+After an Assamite you control successfully bleeds a Methuselah, put the pool lost by that Methuselah on this card. Burn X blood from this card during the polling step of a political action to give a vampire you control +X votes.
 Artist: Pat Morrissey
 
 Name: Alan Sovereign
@@ -790,7 +790,7 @@ Clan: Caitiff
 Group: 5
 Capacity: 1
 Discipline: cel
-Camarilla: After Alex successfully bleeds, the target Methuselah can burn 1 additional pool to take control of him.
+Camarilla: If Alex successfully bleeds, the target Methuselah can burn 1 additional pool to steal him after resolution.
 Artist: Trevor Claxton
 
 Name: Alexandra
@@ -919,7 +919,7 @@ Clan: Nosferatu
 Group: 5
 Capacity: 10
 Discipline: for tha ANI DOM OBF POT
-Camarilla Nosferatu Justicar: After Alonso bleeds successfully, each anarch controlled by the target takes 1 unpreventable damage. +1 bleed.
+Camarilla Nosferatu Justicar: Alonso inflicts 1 unpreventable damage on each anarch controlled by the target of the bleed after bleeding successfully. +1 bleed.
 Artist: Tony Shasteen
 
 Name: Alonzo Guillen
@@ -967,7 +967,7 @@ Name: Alvusia
 Cardtype: Master
 Clan: Tremere
 Unique.
-Put this card in play with 1 counter for each Tremere and Gargoyle you control. Once each action, you can burn 1 counter from this card to give a slave Gargoyle you control +1 bleed or +1 strength. Put 1 counter on this card after a Tremere or Gargoyle enters play during your influence phase. Burn this card {if} it has no counters.
+Put this card in play with 1 counter for each Tremere and Gargoyle you control. During an action, you can burn 1 counter from this card to give a slave Gargoyle you control +1 bleed or +1 strength. Add 1 counter on this card after a Tremere or Gargoyle enters play during your influence phase. Burn this card if it has no counters.
 Artist: Jared Smith
 
 Name: Amadeo
@@ -1190,7 +1190,7 @@ Clan: Caitiff
 Group: ANY
 Capacity: 1
 Discipline: -none-
-Independent anarch: When the convert enters play, you may remove him from the game to make a non-titled vampire you control anarch and either gain 1 pool or draw 1 card from your crypt.
+Anarch: As the convert enters play, you can remove him from the game to make a non-titled vampire you control Anarch and either gain 1 pool or draw 1 card from your crypt.
 Artist: Lawrence Snelly
 
 Name: The Anarch Free Press
@@ -1245,7 +1245,7 @@ Put this card in play. During your unlock phase, you may lock up to 2 vampires c
 Artist: Peter Bergting; Bryon Wackwitz
 
 Name: Anarchist Uprising
-[Sabbat:C, SW:C/PV, Anarchs:PAB3, Third:C, SP:PoS1]
+[Sabbat:C, SW:C/PV, Anarchs:PAB3, Third:C, SP:PoS1, 25th:1]
 Cardtype: Political Action
 Successful referendum means each Methuselah burns 1 pool for each minion they control.
 Artist: Scott Fischer
@@ -1312,16 +1312,16 @@ The minion with this equipment gets +1 intercept when attempting to block action
 Artist: Liz Danforth
 
 Name: Ancient Influence
-[Jyhad:C, VTES:C, SW:PT/PV, CE:C, LoB:PG, SP:PoS1]
+[Jyhad:C, VTES:C, SW:PT/PV, CE:C, LoB:PG, SP:PoS1, 25th:1]
 Cardtype: Political Action
 Only one Ancient Influence can be played or called in a game.
 Successful referendum means each Methuselah can choose a ready vampire they control; each Methuselah gains pool equal to their chosen vampire's capacity, then burns 5 pool.
 Artist: Pete Venters
 
 Name: Ancilla Empowerment
-[Jyhad:C, VTES:C, CE:C/PTo2, LoB:PG2]
+[Jyhad:C, VTES:C, CE:C/PTo2, LoB:PG2, 25th:1]
 Cardtype: Political Action
-Successful referendum means each Methuselah burns 1 pool for each minion he or she controls.
+Successful referendum means each Methuselah burns 1 pool for each minion they control.
 Artist: William O'Connor
 
 Name: Andre LeRoux
@@ -1331,11 +1331,11 @@ Clan: Toreador
 Group: 5
 Capacity: 3
 Discipline: aus
-Camarilla: When a vampire you control would successfully bleed, you can reduce the bleed amount by 1 to give Andre +2 bleed this turn.
+Camarilla: {If} a vampire you control would successfully bleed, you can reduce the bleed amount by 1 to give Andre +2 bleed this turn.
 Artist: Juan Antonio Serrano Garcia
 
 Name: André the Manipulator
-[Anthology:1]
+[Anthology:LARP1]
 Cardtype: Vampire
 Clan: Gangrel
 Group: 5
@@ -1479,7 +1479,7 @@ Clan: Harbinger of Skulls
 Group: 6
 Capacity: 9
 Discipline: AUS FOR NEC SER THA
-Sabbat: While Angelique is ready, cards requiring Necromancy [nec] cost Harbingers of Skulls you control 1 less blood.
+Sabbat: While Angelique is ready, cards requiring Necromancy [nec] cost Harbingers of Skulls you control 1 fewer blood.
 Artist: Noora Hirvonen
 
 Name: Angelo
@@ -1558,12 +1558,12 @@ Sabbat: Anka can enter combat with a ready Lasombra controlled by another Methus
 Artist: Christopher Shy
 
 Name: The Ankara Citadel, Turkey
-[AH:U5, CE:U, KoT:U]
+[AH:U5, CE:U, KoT:U, 25th:1]
 Cardtype: Equipment
 Clan: Tremere
 Cost: 2 blood
-This equipment card represents a location and does not count as equipment while in play. Unique.
-Cards that cost blood cost this vampire half as much blood to play (round down).
+While in play, this equipment card represents a location and does not count as equipment. Unique.
+Non-action modifier cards costing blood cost this vampire half as much blood to play, rounded down (multiplication and division are handled first, followed by addition and subtraction).
 Artist: Greg Simanson; Brian LeBlanc
 
 Name: Ankh-sen-Sutekh
@@ -1627,13 +1627,13 @@ Independent. 2 votes (titled): Annazir can burn a location or steal an equipment
 Artist: Nicolas Bigot
 
 Name: Anne-Marie Bourgeois, Inconnu Recruiter
-[Anthology:1]
+[Anthology:LARP1]
 Cardtype: Vampire
 Clan: Toreador
 Group: 5
 Capacity: 5
 Discipline: cel pre AUS
-Camarilla: Equipment costs Anne-Marie 1 less pool.
+Camarilla: Equipment costs Anne-Marie 1 {fewer} pool.
 Artist: Carmen Cornet
 
 Name: Anneke
@@ -1684,7 +1684,7 @@ Name: Anthelios, The Red Star
 [Promo-20040411]
 Cardtype: Event
 Gehenna.
-Once each master phase, a Methuselah can use a master phase action to exchange a master card in his or her hand for one in his or her ash heap.
+Once each master phase, a Methuselah can use a master phase action to exchange a master card in his or her hand for one in his or her ash heap. {Added to the V:EKN banned list in 2016}
 Artist: Becky Jollensten
 
 Name: Antithesis
@@ -1705,6 +1705,16 @@ Discipline: aus cel dem OBF
 Camarilla.
 Artist: Ken Meyer, Jr.
 
+Name: Antoinette, She Who Watches
+[CE:V, BSC:X]
+Cardtype: Vampire
+Clan: Toreador
+Group: 3
+Capacity: 6
+Discipline: cel obf AUS PRE
+Camarilla primogen.
+Artist: Lawrence Snelly
+
 Name: Antoinette Dubois
 [LoB:U]
 Cardtype: Vampire
@@ -1724,16 +1734,6 @@ Capacity: 1
 Discipline: cel pre
 Camarilla: Action cards and strike cards that require Celerity [cel] cost Antoinette an additional blood.
 Artist: Max Shade Fellwalker
-
-Name: Antoinette, She Who Watches
-[CE:V, BSC:X]
-Cardtype: Vampire
-Clan: Toreador
-Group: 3
-Capacity: 6
-Discipline: cel obf AUS PRE
-Camarilla primogen.
-Artist: Lawrence Snelly
 
 Name: Anton
 [Sabbat:V, SW:U/PT]
@@ -1836,7 +1836,7 @@ Sabbat.
 Artist: Steve Ellis
 
 Name: Apolonia Czarnecki
-[Anthology:1]
+[Anthology:LARP1]
 Cardtype: Vampire
 Clan: Malkavian
 Group: 5
@@ -1883,8 +1883,8 @@ Level: Advanced
 Group: 1
 Capacity: 10
 Discipline: dom CEL FOR POT PRE
-Independent anarch: Appolonius gets +1 bleed for each titled vampire controlled by the target of the bleed.
-[MERGED] Baron of London: Appolonius can enter combat with any minion as a (D) action.
+Anarch: Appolonius gets +1 bleed for each titled vampire controlled by the target Methuselah.
+[MERGED] Baron of London: Appolonius can enter combat with a minion as a (D) action.
 Artist: Ginés Quiñonero
 
 Name: Apportation
@@ -1928,7 +1928,7 @@ Name: Arcane Appraiser
 Cardtype: Ally
 Clan: Toreador
 Unique ghoul with 1 life. 0 strength, 1 bleed.
-Arcane Appraiser can move an equipment from a vampire in torpor to a ready minion you control as a +1 stealth (D) action. If a second copy of a unique equipment you control would enter play, it is burned instead.
+Arcane Appraiser can move an equipment from a vampire in torpor to a ready minion you control as a +1 stealth (D) action. If a second copy of a unique equipment you control would enter play, {instead it is burned}.
 Artist: Tony Shasteen
 
 Name: Arcane Library
@@ -2333,9 +2333,8 @@ Artist: Talon Dunning
 Name: Ashur Tablets
 [KoT:C, Anthology:3]
 Cardtype: Master
-Master.
-Put this card in play. If you control three copies, remove all copies in play (even controlled by other Methuselahs) from the game to gain 3 pool and choose up to thirteen cards from your ash heap. Move one of those cards to your hand and shuffle the others into your library.
-Artist: Sandra Chang;Ginés Quiñonero
+Put this card in play. If you control three copies, remove all copies in play (even controlled by other Methuselahs) from the game to gain 3 pool and choose up to thirteen library cards from your ash heap; move one of the chosen cards to your hand and shuffle the others in your library.
+Artist: Sandra Chang-Adair; Ginés Quiñonero; Sandra Chang-Adair
 
 Name: Assad Salhoum
 [Gehenna:U]
@@ -2385,7 +2384,7 @@ Artist: Randy Gallegos
 Name: Augur
 [NoR:C]
 Cardtype: Action
-Cost: 1 Conviction
+Cost: 1 conviction
 Virtue: Vision
 +1 stealth action.
 Look at the hands of your predator and prey and at the top three cards of your library. This acting imbued unlocks at the end of the action.
@@ -2615,12 +2614,12 @@ Maneuver, only usable to go to long range. If the opposing minion's strike succe
 Artist: Monte Moore
 
 Name: Backways
-[Jyhad:U, VTES:U, Anarchs:PG, KoT:U]
+[Jyhad:U, VTES:U, Anarchs:PG, KoT:U, 25th:1]
 Cardtype: Master
 Clan: Gangrel
 Cost: 2 pool
-Master: unique location.
-Lock to give a Gangrel you control +1 stealth for the current action.
+Unique location.
+Lock to give a Gangrel you control +1 stealth.
 Artist: Nicola Leonard; Chet Masters; Mike Chaney
 
 Name: Badger
@@ -2633,6 +2632,16 @@ Discipline: ani pot FOR PRO
 Camarilla.
 Artist: Pete Venters
 
+Name: Badr, Shadow of Granada
+[DM:C, Anthology:1]
+Cardtype: Vampire
+Clan: Lasombra
+Group: 5
+Capacity: 7
+Discipline: DOM OBT POT
+Independent: Cards requiring Obtenebration [obt] cost Badr 1 {fewer} blood.
+Artist: Francesc Grimalt
+
 Name: Badr al-Budur
 [FN:U2]
 Cardtype: Vampire
@@ -2642,16 +2651,6 @@ Capacity: 5
 Discipline: cel dom qui OBF
 Independent: Blood cursed.
 Artist: Christopher Shy
-
-Name: Badr, Shadow of Granada
-[DM:C, Anthology:1]
-Cardtype: Vampire
-Clan: Lasombra
-Group: 5
-Capacity: 7
-Discipline: DOM OBT POT
-Independent: Cards requiring Obtenebration [obt] cost Badr 1 less blood.
-Artist: Francesc Grimalt
 
 Name: Bajazet al-Nasir
 [FN:U2]
@@ -2718,7 +2717,7 @@ Strike: strength{}+2 damage.
 Artist: Ron Spencer
 
 Name: Banishment
-[DS:U2, FN:PS, CE:PTo/PV, KMW:PAn2, LoB:PG, SP:PoS2]
+[DS:U2, FN:PS, CE:PTo/PV, KMW:PAn2, LoB:PG, SP:PoS2, 25th:2]
 Cardtype: Political Action
 Choose a ready younger vampire. Successful referendum means the chosen vampire is moved to the uncontrolled region (breaking any temporary control effects); any cards and counters on the chosen vampire stay with them but are out of play as long as the chosen vampire remains uncontrolled.
 Artist: Steve Casper
@@ -2775,7 +2774,7 @@ Clan: Nosferatu
 Group: 4
 Capacity: 9
 Discipline: ANI OBF POT PRO
-Camarilla Prince of Brussels: After Dieudonne performs a successful action during your minion phase, he can burn 1 blood to unlock.
+Camarilla Prince of Brussels: During your minion phase, Dieudonne can burn 1 blood to unlock after performing a successful action.
 Artist: Tony Shasteen
 
 Name: Baroque
@@ -2966,15 +2965,6 @@ Discipline: for pre pro ANI
 Camarilla.
 Artist: Robert McNeill
 
-Name: Bear's Skin
-[TU:C]
-Cardtype: Combat
-Discipline: Animalism & Protean
-Only usable before range is determined. A vampire can play only one Bear's Skin each combat. 
-[ani][pro] This round, this vampire gets +1 strength and can prevent 1 damage.
-[ANI][PRO] This combat, this vampire gets +1 strength and can prevent 1 damage each round.
-Artist: Heather Kreiter
-
 Name: Bear-Baiting
 [Anarchs:R]
 Cardtype: Action Modifier
@@ -2983,14 +2973,14 @@ Requires a ready anarch. Only usable when an older non-anarch vampire successful
 Compare the costs of the top cards in your crypt and the blocker's crypt and shuffle both. If yours is younger, this anarch takes 1 unpreventable damage (and combat occurs as normal). Otherwise, cancel the combat and place this card on the acting anarch. This anarch gets +2 bleed when bleeding the blocking vampire's controller.
 Artist: Steve Prescott
 
-Name: Beast Meld
-[BL:R2]
-Cardtype: Action Modifier
-Cost: 2 blood
+Name: Bear's Skin
+[TU:C]
+Cardtype: Combat
 Discipline: Animalism & Protean
-[ani][pro] +1 stealth. If this action is blocked, this vampire may prevent 1 damage during the resulting combat.
-[ANI][PRO] Only usable when the acting vampire's action is announced. Not usable on a bleed action. Vampires cannot block this action.
-Artist: Brian LeBlanc
+Only usable before range is determined. A vampire can play only one Bear's Skin each combat. 
+[ani][pro] This round, this vampire gets +1 strength and can prevent 1 damage.
+[ANI][PRO] This combat, this vampire gets +1 strength and can prevent 1 damage each round.
+Artist: Heather Kreiter
 
 Name: Beast, The Leatherface of Detroit
 [Sabbat:V, SW:U, BH:PN]
@@ -3002,16 +2992,14 @@ Discipline: ani cel OBF POT
 Sabbat: Beast cannot play action cards. He cannot have or use equipment or retainers. Beast may enter combat with any ready minion controlled by another Methuselah as a (D) action. +1 strength.
 Artist: Pete Venters
 
-Name: Béatrice "Oracle171" Tremblay
-AKA: Beatrice "Oracle171" Tremblay
-[NoR:U]
-Cardtype: Imbued
-Creed: Innocent
-Group: 4
-Life: 3
-Virtue: inn ven
-During your unlock phase, another ready imbued you control takes 1 unpreventable damage. +1 bleed.
-Artist: Jim Pavelec
+Name: Beast Meld
+[BL:R2, 25th:1]
+Cardtype: Action Modifier
+Cost: 2 blood
+Discipline: Animalism & Protean
+[ani][pro] +1 stealth. If this vampire is blocked, they can prevent 1 damage in the resulting combat.
+[ANI][PRO] Only usable as a non-bleed action is announced. Vampires cannot block this action.
+Artist: Brian LeBlanc
 
 Name: Béatrice L'Angou
 [BL:U2]
@@ -3022,6 +3010,17 @@ Capacity: 5
 Discipline: aus dom nec MYT
 Sabbat: Cold iron vulnerability.
 Artist: Christopher Shy
+
+Name: Béatrice "Oracle171" Tremblay
+AKA: Beatrice "Oracle171" Tremblay
+[NoR:U]
+Cardtype: Imbued
+Creed: Innocent
+Group: 4
+Life: 3
+Virtue: inn ven
+During your unlock phase, another ready imbued you control takes 1 unpreventable damage. +1 bleed.
+Artist: Jim Pavelec
 
 Name: Beauregard Krueller
 [Third:PM2]
@@ -3059,7 +3058,7 @@ Name: The Becoming
 Cardtype: Action
 Cost: 2 blood
 +1 stealth action. Requires a non-sterile vampire.
-Put this card in play; it becomes a 0-capacity non-unique vampire of the same clan as the acting vampire and cannot act this turn; put up to 3 master discipline cards from your hand to this vampire; move up to 1 blood from the acting vampire to this new vampire. Burn this vampire {if} they have no capacity-increasing discipline cards.
+Put this card in play; it becomes a 0-capacity non-unique vampire of the same clan as the acting vampire and cannot act this turn; put up to 3 master discipline cards from your hand to this vampire; move up to 1 blood from the acting vampire to this new vampire. Burn this vampire if they have no capacity-increasing discipline cards.
 Artist: Kyri Koniotis
 
 Name: Becoming of Ennoia
@@ -3096,7 +3095,7 @@ Group: 5
 Capacity: 3
 Discipline: ani obf pro DEM
 Independent: Bela cannot take political actions. -1 stealth.
-Artist: Heather Kreiter
+Artist: Heather V. Kreiter
 
 Name: Bela Kardoza
 [Third:V]
@@ -3135,6 +3134,16 @@ Discipline: cel dom nec FOR POT
 Independent: During your unlock phase, any Giovanni older than the oldest ready Giovanni you control can burn 1 blood to take control of Benedict. Benedict cannot block undirected actions.
 Artist: Steve Ellis
 
+Name: Benedito, a Lanterna
+[Promo-20190601]
+Cardtype: Vampire
+Clan: Nosferatu
+Group: 6
+Capacity: 6
+Discipline: ani aus obf POT
+Anarch Baron of Fortaleza.
+Artist: Christopher Shy
+
 Name: Benefit Performance
 [HttB:C/B1]
 Cardtype: Political Action
@@ -3150,7 +3159,7 @@ Group: 5
 Capacity: 7
 Discipline: ani pot AUS OBF
 Camarilla Prince of Washington, D.C.: Benjamin can call a referendum to give you +1 hand size until the end of the game as a +1 stealth political action.
-Artist: Sam Arraya
+Artist: Samuel Araya
 
 Name: Beretta 9mm
 [KMW:C, KoT:C/PT5]
@@ -3409,12 +3418,13 @@ Sabbat.
 Artist: Steve Ellis
 
 Name: Black Metamorphosis
-[SW:R, Third:R]
+[SW:R, Third:R, 25th:1]
 Cardtype: Action
 Cost: 2 blood
 Discipline: Obtenebration
-[obt] Put this card on the acting vampire. This vampire gets one optional additional strike per round. A vampire may have only one Black Metamorphosis.
-[OBT] As above, and this vampire gets an optional press each combat.
++1 stealth action.
+[obt] Put this card on this vampire. This vampire gets 1 optional additional strike (limited) each round. A vampire can have only one Black Metamorphosis.
+[OBT] As above, and this vampire gets 1 optional press each combat.
 Artist: Mike Danza
 
 Name: Black Spiral Buddy
@@ -3484,7 +3494,7 @@ Name: Blade of Bellona
 Cardtype: Equipment
 Clan: Salubri antitribu
 Melee weapon.
-Strike: strength +1 damage, with 1 optional maneuver each combat, only usable to maneuver to close range.
+Strike: strength+1 damage, with 1 optional maneuver each combat, only usable to get to close range.
 Artist: Ginés Quiñonero
 
 Name: Blade of Enoch
@@ -3554,7 +3564,6 @@ Artist: Riccardo Fabiani
 Name: Blessed Resilience
 [HttB:R/A1]
 Cardtype: Master
-
 Move a vampire in your ash heap with superior Fortitude [FOR] and superior Necromancy [NEC] who was burned from play to your ready region.
 Artist: Leif Jones
 
@@ -3582,8 +3591,7 @@ Name: Blessing of the Beast
 Cardtype: Master
 Clan: Ahrimane
 Burn Option
-
-Put this card on an Ahrimane you control with any cards requiring Spiritus [spi] from your hand (before replacing), face down (you can look at the cards at any time). This Ahrimane can play these cards as if from your hand. Burn this card if it has no cards on it. A vampire can have only one Blessing of the Beast.
+Put this card on an Ahrimane you control with any cards requiring Spiritus [spi] from your hand (before replacing), face down {and out of play} (you can look at the cards at any time). This Ahrimane can play these cards as if from your hand. Burn this card if it has no cards on it. A vampire can have only one Blessing of the Beast.
 Artist: Paul Tobin
 
 Name: Blessing of the Name
@@ -4412,8 +4420,8 @@ Level: Advanced
 Group: 3
 Capacity: 8
 Discipline: pre ANI FOR PRO
-Independent anarch Baron of Stockholm: The action to become anarch costs vampires you control 0 blood.
-[MERGED] Brunhilde can enter combat with a non-anarch vampire as a (D) action.
+Anarch Baron of Stockholm: The action to become Anarch costs vampires you control 0 blood.
+[MERGED] Brunhilde can enter combat with a non-Anarch vampire as a (D) action.
 Artist: Mark Kelly
 
 Name: Brutal Influence
@@ -4459,7 +4467,7 @@ Clan: Ventrue
 Group: 5
 Capacity: 8
 Discipline: dom pot pre AUS FOR
-Camarilla: If you control the Edge, Bulscu can steal a location or an equipment costing 3 or less blood or pool as a (D) action.
+Camarilla: If you control the Edge, Bulscu can steal a location or an equipment costing 3 or fewer blood or pool as a (D) action.
 Artist: Ken Meyer, Jr.
 
 Name: Bulscu
@@ -4565,7 +4573,7 @@ Clan: Harbinger of Skulls
 Group: 6
 Capacity: 10
 Discipline: dom pre AUS FOR NEC OBF
-Sabbat: If Byzar would be burned, put 1 burn counter on him and move him to torpor instead. If he has 3 burn counters, remove him from the game. +1 stealth.
+Sabbat: If Byzar would be burned, {instead} put 1 burn counter on him and move him to torpor{}. If he has 3 burn counters, remove him from the game. +1 stealth.
 Artist: Lawrence Snelly
 
 Name: C.J.
@@ -4747,13 +4755,13 @@ If this referendum is successful, put this card in play. Each Methuselah must pa
 Artist: Jason Brubaker
 
 Name: Camarilla Vitae Slave
-[Sabbat:R]
+[Sabbat:R, 25th:1]
 Cardtype: Retainer
 Clan: Lasombra
 Cost: 2 blood
 Retainer with 1 life.
-The vampire with this retainer increases his or her capacity by 1. During each of his or her controller's master phases, he or she may choose a basic level Discipline he or she possesses. He or she then has the chosen Discipline at the superior level until his or her controller's next master phase.
-Artist: Zina Saunders
+{This vampire} gets +1 capacity. During their master phase, they can choose a basic level Discipline they possess and get the chosen Discipline at the superior level until their next master phase.
+Artist: Zina Saunders; Carmen Cornet
 
 Name: Camera Phone
 [LotN:C/PG2, KoT:C, HttB:PSam3]
@@ -4832,7 +4840,7 @@ Put this card on a Sabbat vampire you control. Once per turn, when this vampire 
 Artist: Aaron Voss
 
 Name: The Capuchin
-[Promo-20150219, Promo-20181004:HB2]
+[Promo-20150219, Promo-20181004:HB2, Promo-20190804]
 Cardtype: Vampire
 Clan: Harbinger of Skulls
 Group: 5
@@ -4895,7 +4903,7 @@ Clan: Brujah
 Group: 5
 Capacity: 8
 Discipline: dom pot CEL PRE
-Camarilla Prince of Prague: After results are tallied during a referendum, Carlak gains 1 blood for each Methuselah casting no votes in favor and 1 or more votes against the referendum. He gets 1 optional press each combat.
+Camarilla Prince of Prague: Once results of a referendum are tallied, Carlak gains 1 blood for each Methuselah casting no votes in favor and 1 or more votes against the referendum. He gets 1 optional press each combat.
 Artist: Veronica Jones
 
 Name: Carlotta Giovanni
@@ -4915,7 +4923,7 @@ Cardtype: Ally
 Cost: 2 pool
 Unique mortal with 2 life. 0 strength, 0 bleed.
 Carlton can strike: 1R damage. Once each combat, he can strike: dodge. Carlton gets +1 intercept against vampires. During your discard phase, you can burn Carlton to burn a vampire who has committed diablerie since your last turn.
-Artist: Mark Poole;Jarkko Suvela;Mark Poole
+Artist: Mark Poole; Jarkko Suvela; Mark Poole
 
 Name: Carmen
 [SoC:V]
@@ -4962,7 +4970,7 @@ Group: 5
 Capacity: 9
 Discipline: aus DOM OBT POT PRE
 Sabbat Archbishop of Montreal: Carolina is immune to damage from allies and retainers.
-Artist: Christel Espenkrona;Ken Meyer, Jr.
+Artist: Christel Espenkrona; Ken Meyer, Jr.
 
 Name: Caroline Bishops
 [Third:V]
@@ -5026,6 +5034,16 @@ Ammo.
 Only usable before resolution of a gun's strike. For the remainder of combat, once each round when the bearer strikes with this gun, the bearer gets an optional additional strike, only usable to strike with this gun. No more than one ammo card can be used on a gun each combat.
 Artist: Jeff Holt
 
+Name: Casey Snyder
+[Promo-20190615]
+Cardtype: Vampire
+Clan: Gangrel
+Group: 6
+Capacity: 6
+Discipline: ani cel for PRO
+Anarch Baron of Columbus.
+Artist: Ken Meyer, Jr.
+
 Name: Casino Reeds
 [CE:V, BSC:X]
 Cardtype: Vampire
@@ -5036,16 +5054,6 @@ Discipline: cel dem ANI OBF POT
 Camarilla Prince of Seattle: Casino may move up to 3 blood from himself to a younger Nosferatu in your uncontrolled region as an action. Casino inflicts +1 damage with ranged strikes (even at close range).
 Artist: Christopher Shy
 
-Name: Cassandra Langely, The Waif
-[KoT:PM2/A1]
-Cardtype: Vampire
-Clan: Malkavian
-Group: 4
-Capacity: 2
-Discipline: dem
-Camarilla.
-Artist: Leif Jones
-
 Name: Cassandra, Magus Prime
 [Jyhad:V, VTES:V, Tenth:B]
 Cardtype: Vampire
@@ -5055,6 +5063,16 @@ Capacity: 10
 Discipline: cel pre AUS DOM THA
 Camarilla primogen: If Cassandra is ready, your hand size is increased by one. +1 strength.
 Artist: Rob Alexander
+
+Name: Cassandra Langely, The Waif
+[KoT:PM2/A1]
+Cardtype: Vampire
+Clan: Malkavian
+Group: 4
+Capacity: 2
+Discipline: dem
+Camarilla.
+Artist: Leif Jones
 
 Name: Castiel
 [LK:2]
@@ -5153,6 +5171,16 @@ Master: Discipline.
 Put this card on a vampire. This vampire gains one level of Celerity [cel]. Capacity increases by 1: the vampire is one generation older. Cannot be placed on a vampire with superior Celerity [CEL].
 Artist: Greg Simanson; Nicola Leonard; Peter Morbacher
 
+Name: Céleste, The Voice of a Secret
+[BL:U2]
+Cardtype: Vampire
+Clan: Daughter of Cacophony
+Group: 2
+Capacity: 3
+Discipline: mel pre
+Independent: Céleste gets -1 intercept when attempting to block a bleed action. Céleste gets +1 bleed when bleeding a Methuselah who controls a ready Toreador.
+Artist: Christopher Shy
+
 Name: Céleste Lamontagne
 AKA: Célèste Lamontagne
 [Gehenna:U]
@@ -5163,16 +5191,6 @@ Capacity: 5
 Discipline: for ANI PRO
 Sabbat: Cél{e}ste can strike{: combat ends in combat with} a werewolf{}. She gets +1 intercept {against}{} Camarilla vampire{s} whose controller {controls}{} {any} Gehenna card{s}{}.
 Artist: Chad Michael Ward
-
-Name: Céleste, The Voice of a Secret
-[BL:U2]
-Cardtype: Vampire
-Clan: Daughter of Cacophony
-Group: 2
-Capacity: 3
-Discipline: mel pre
-Independent: Céleste gets -1 intercept when attempting to block a bleed action. Céleste gets +1 bleed when bleeding a Methuselah who controls a ready Toreador.
-Artist: Christopher Shy
 
 Name: Celestial Harmony
 [BH:R]
@@ -5215,7 +5233,7 @@ Clan: Caitiff
 Group: 4
 Capacity: 1
 Discipline: obf
-Camarilla: At the end of your minion phase, if there are any Gehenna cards in play and César did not hunt, he burns 1 blood.
+Camarilla: At the end of your minion phase, if there are any Gehenna events in play and César did not hunt, he burns 1 blood.
 Artist: Justin Norman
 
 Name: Cesewayo
@@ -5274,7 +5292,7 @@ Clan: Gargoyle
 Group: 6
 Capacity: 7
 Discipline: FOR POT THA VIS
-Camarilla: Cards requiring a Gargoyle cost Chalcedony 1 less blood or pool. Flight [FLIGHT]. Tremere slave.
+Camarilla: Cards requiring a Gargoyle cost Chalcedony 1 fewer blood or pool. Flight [FLIGHT]. Tremere slave.
 Artist: Alejandro F. Giraldo
 
 Name: Chalice of Kinship
@@ -5519,7 +5537,7 @@ Clan: Malkavian
 Cost: 1 pool
 Changeling with 1 life.
 This Malkavian gets +1 bleed.
-Artist: Heather Kreiter
+Artist: Heather V. Kreiter
 
 Name: Children of Osiris
 [AH:R2]
@@ -5535,7 +5553,7 @@ Cardtype: Action
 Discipline: Visceratika/Thaumaturgy
 +2 stealth action.
 [tha] Equip with an equipment card from your hand and reduce its cost by 1 pool or 1 blood (requirements apply as normal).
-[vis] Search your hand or library for a gargoyle creature retainer and employ it (requirements and cost apply as normal; shuffle afterward).
+[vis] Search your library (shuffle afterward) and/or hand for a gargoyle creature retainer and employ it (requirements and cost apply as normal).
 [VIS] As [vis] above, but reduce its cost by 1 blood or pool.
 Artist: André Freitas
 
@@ -5750,7 +5768,7 @@ Group: 5
 Capacity: 5
 Discipline: aus for tha DOM
 Camarilla.
-Artist: Sam Arraya
+Artist: Samuel Araya
 
 Name: Claven
 [Sabbat:V, SW:U]
@@ -6609,10 +6627,10 @@ Camarilla.
 Artist: Dan Smith
 
 Name: The Coven
-[SW:R, Anarchs:PAG, KoT:PM]
+[SW:R, Anarchs:PAG, KoT:PM, 25th:1]
 Cardtype: Master
-Unique master. Trifle.
-Put this card into play. Lock to move 2 blood from the blood bank to a ready vampire you control. During your discard phase, your predator takes control of The Coven.
+Unique. Trifle.
+Put this card in play. Lock to add 2 blood to a ready vampire you control. During your discard phase, your predator takes control of The Coven.
 Artist: Brian LeBlanc
 
 Name: Covenant of Blood
@@ -6790,7 +6808,7 @@ Clan: Gangrel
 Group: 5
 Capacity: 5
 Discipline: for pro tha ANI
- Independent anarch.
+Independent anarch.
 Artist: Christopher Shy
 
 Name: Crusade: Amsterdam
@@ -7022,7 +7040,7 @@ Artist: Anson Maddocks
 Name: Cunctator Motion
 [Jyhad:R2, VTES:R]
 Cardtype: Political Action
-Only usable if playing for ante. Choose how you would rearrange the remaining ante cards among the surviving Methuselahs. Successful referendum means you then rearrange the remaining ante cards. {Added to the V:EKN banned list in 1995.}
+Only usable if playing for ante. Choose how you would rearrange the remaining ante cards among the surviving Methuselahs. Successful referendum means you then rearrange the remaining ante cards. {Added to the V:EKN banned list in 1995}
 Artist: Michael Weaver
 
 Name: Curmudgeon
@@ -7082,7 +7100,7 @@ Name: Dabbler
 [HttB:R/B1]
 Cardtype: Master
 Archetype. Trifle.
-Put this card on a vampire you control. Once each turn, this vampire can gain 1 blood or burn 1 blood to unlock after performing an action (successful or not) during which they used 3 or more Disciplines to play cards. A vampire can have only one archetype.
+Put this card on a vampire you control. Once each turn, this vampire can gain 1 blood or burn 1 blood to unlock {after an action (successful or not) is performed during which they used 3 or more Disciplines to play cards}. A vampire can have only one archetype.
 Artist: Matt Smith
 
 Name: Daemonic Possession
@@ -7118,7 +7136,7 @@ Clan: Tzimisce
 Group: 4
 Capacity: 6
 Discipline: ani aus pot VIC
- Independent anarch: When Daliah enters combat, she gains 1 blood.
+Independent anarch: When Daliah enters combat, she gains 1 blood.
 Artist: Heather Kreiter
 
 Name: Daliyah
@@ -7282,8 +7300,8 @@ Name: Dark Influences
 Cardtype: Master
 Cost: 2 pool
 Out-of-turn.
-Cancel a minion card as it is played, its cost is not paid, and put this card in play. That card cannot be played again until the end of the turn. The next card played that would cancel another Methuselah's minion card as it is played is canceled, its cost is not paid, and this card is burned instead.
-Artist: Sam Arraya
+Cancel a minion card as it is played, its cost is not paid, and put this card in play. That card cannot be played again this turn. The next card played that would cancel another Methuselah's minion card as it is played is canceled, its cost is not paid, and this card is burned instead.
+Artist: Samuel Araya
 
 Name: Dark Mirror of the Mind
 [KoT:U/A2]
@@ -7552,7 +7570,7 @@ Name: Deep Song
 Cardtype: Action
 Discipline: Animalism
 [ani] (D) Bleed with +1 bleed.
-[ANI] Frenzy. (D) Enter combat with and lock a vampire. That vampire is considered the acting minion in that combat.
+[ANI] Frenzy. (D) Enter combat with and lock a vampire. That {target} vampire is considered the acting minion in that combat.
 Artist: Jeremy McHugh
 
 Name: Deer Rifle
@@ -7573,7 +7591,7 @@ Put this card on a slave Gargoyle with a capacity above 4. This Gargoyle gets +2
 Artist: Jeff Holt
 
 Name: Deflection
-[Jyhad:C, VTES:C, SW:PV2, FN:PG2, CE:C/PTr3, BH:PTr4, HttB:PGar4, SP:PoS4/PwN3]
+[Jyhad:C, VTES:C, SW:PV2, FN:PG2, CE:C/PTr3, BH:PTr4, HttB:PGar4, SP:PoS4/PwN3, 25th:6]
 Cardtype: Reaction
 Cost: 1 blood
 Discipline: Dominate
@@ -7767,7 +7785,7 @@ Clan: Ravnos
 Group: 6
 Capacity: 6
 Discipline: ani cel for nec CHI
- Independent anarch.
+Anarch.
 Artist: Noora Hirvonen
 
 Name: Despiral
@@ -7808,7 +7826,7 @@ Artist: Greg Simanson
 Name: Determine
 [NoR:C]
 Cardtype: Reaction
-Cost: 1 Conviction
+Cost: 1 conviction
 Virtue: Vision
 Play when a monster controlled by your predator is bleeding you, after blocks are declined. Lock this reacting imbued. The monster is now bleeding your predator's predator.
 Or play when a monster controlled by your predator or prey plays an action card. Lock this reacting imbued and cancel that action card as it is played (no cost is paid, and the monster doesn't lock). That monster cannot play the same action card again this turn.
@@ -8052,7 +8070,7 @@ Name: Disciple of Lazarus
 Cardtype: Action
 Clan: Harbinger of Skulls
 +1 stealth action.
-Add 2 blood to a younger Harbinger of Skulls in your uncontrolled region, or search your crypt for a Harbinger of Skulls, reveal them, and move them to your uncontrolled region (shuffle afterward).
+Add 2 blood to a younger Harbinger of Skulls in your uncontrolled region, or search your crypt for any Harbinger of Skulls, reveal them, and move them to your uncontrolled region (shuffle afterward).
 Artist: Carmen Cornet
 
 Name: Disease
@@ -8417,7 +8435,7 @@ Clan: Caitiff
 Group: 5
 Capacity: 1
 Discipline: aus
-Camarilla: After a referendum called by your predator passes, Donald burns 1 blood.
+Camarilla: Donald burns 1 blood after a referendum called by your predator passes.
 Artist: Justin Norman
 
 Name: Donate
@@ -8556,7 +8574,7 @@ Clan: Tremere
 Group: 4
 Capacity: 9
 Discipline: chi ANI AUS DOM THA
-Camarilla Prince of London: Ventrue in combat with John cannot strike: combat ends. During a referendum, he can discard a card requiring Thaumaturgy [tha] to get +2 votes.
+Camarilla Prince of London: Ventrue in combat with John cannot strike: combat ends. During the polling step of any referendum, he can discard a card requiring Thaumaturgy [tha] to get +2 votes.
 Artist: Trevor Claxton
 
 Name: Dr. Julius Sutphen
@@ -8648,13 +8666,13 @@ Discipline: Chimerstry
 Artist: Brian LeBlanc
 
 Name: The Dracon
-[Promo-20150216, Promo-20181004:HB2]
+[Promo-20150216, Promo-20181004:HB2, Promo-20190804]
 Cardtype: Vampire
 Clan: Tzimisce
 Group: 5
 Capacity: 11
 Discipline: ANI AUS POT THA VIC
-Independent: Cards requiring Vicissitude [vic] cost The Dracon 1 fewer blood. He inflicts +1 damage or steals 1 additional blood or life with ranged strikes (even at close range). Flight [flight]. +1 bleed. +2 strength.
+Independent: Cards requiring Vicissitude [vic] cost The Dracon 1 fewer blood. He inflicts +1 damage or steals 1 additional blood or life with ranged strikes (even at close range). Flight [FLIGHT]. +1 bleed. +2 strength.
 Artist: Ginés Quiñonero
 
 Name: Draeven Softfoot
@@ -8704,7 +8722,7 @@ Artist: Leif Jones; Anson Maddocks
 Name: Dramatic Upheaval
 [Jyhad:V, VTES:V, CE:U, Anarchs:PAB, BH:PM]
 Cardtype: Political Action
-Choose another Methuselah. Successful referendum means you switch places with that Methuselah. {Added to the V:EKN banned list in 2005.}
+Choose another Methuselah. Successful referendum means you switch places with that Methuselah. {Added to the V:EKN banned list in 2005}
 Artist: Heather Hudson; Mike Huddleston
 
 Name: Draught of the Soul
@@ -8754,7 +8772,7 @@ Discipline: Presence
 Artist: Jim DiBartolo
 
 Name: Dreams of the Sphinx
-[AH:R2, FN:PG, KMW:PG/PAn, Third:R2, HttB:PSam, SP:PwN1]
+[AH:R2, FN:PG, KMW:PG/PAn, Third:R2, HttB:PSam, SP:PwN1, 25th:1]
 Cardtype: Master
 Cost: 1 pool
 Unique.
@@ -8826,7 +8844,7 @@ Discipline: Protean
 Artist: Monte Moore
 
 Name: Duality
-[Promo-20060710:, Third:PTz, SP:DoF1]
+[Promo-20060710, Third:PTz, SP:DoF1]
 Cardtype: Vampire
 Clan: Tzimisce
 Group: 4
@@ -8957,7 +8975,7 @@ Discipline: Spiritus/Protean
 Artist: Veronica Jones
 
 Name: Earth Control
-[Jyhad:C, VTES:C, Anarchs:C/PG3]
+[Jyhad:C, VTES:C, Anarchs:C/PG3, 25th:4]
 Cardtype: Action Modifier
 Cost: 1 blood
 Discipline: Protean
@@ -8966,11 +8984,11 @@ Discipline: Protean
 Artist: Jeff Menges
 
 Name: Earth Meld
-[Jyhad:C, VTES:C, Anarchs:C/PG2]
+[Jyhad:C, VTES:C, Anarchs:C/PG2, 25th:6]
 Cardtype: Combat
 Discipline: Protean
 [pro] Strike: combat ends.
-[PRO] As above, and this vampire unlocks before combat ends.
+[PRO] As above, and unlock this vampire before combat ends.
 Artist: Ron Spencer
 
 Name: Earth Swords
@@ -9055,12 +9073,12 @@ Artist: Brian LeBlanc
 
 Name: Ecoterrorists
 AKA: Eco Terrorists
-[Jyhad:R, VTES:R, Anarchs:R, KoT:R]
+[Jyhad:R, VTES:R, Anarchs:R, KoT:R, 25th:1]
 Cardtype: Master
 Clan: Gangrel
 Cost: 2 pool
-Master: unique location.
-During your influence phase, lock to move 1 blood from the blood bank to a Gangrel in your uncontrolled region.
+Unique location.
+Lock during your influence phase to add 1 blood to a Gangrel in your uncontrolled region.
 Artist: Dan Smith; Joel Biske
 
 Name: Ecstasy
@@ -9094,7 +9112,7 @@ Name: Edge Explosion
 [NoR:R]
 Cardtype: Event
 Gehenna.
-Requires at least one other Gehenna card in play. Each imbued can have (and use) one power card for which he or she doesn't meet the requirements. An imbued who performs a successful action may gain 1 conviction [1 CONVICTION] from his or her ash heap. An imbued can only gain 1 conviction [1 CONVICTION] this way each turn. {Added to the V:EKN banned list in 2008.}
+Requires at least one other Gehenna card in play. Each imbued can have (and use) one power card for which he or she doesn't meet the requirements. An imbued who performs a successful action may gain 1 conviction [1 CONVICTION] from his or her ash heap. An imbued can only gain 1 conviction [1 CONVICTION] this way each turn. {Added to the V:EKN banned list in 2008}
 Artist: John Bridges
 
 Name: Edge of the World
@@ -9601,18 +9619,18 @@ Sabbat. Red List: Enkidu can enter combat with any minion as a (D) action. If En
 Artist: Mark Nelson
 
 Name: Enkil Cog
-[KoT:R, Anthology:1]
+[KoT:R, Anthology:1, 25th:1]
 Cardtype: Action Modifier
-Unique. Requires a vampire of capacity 10 or more. Only usable after resolution of a successful bleed against your prey.
-Put this card on this vampire. During any Methuselah's minion phase, this vampire can lock this card to take an action. This vampire gets +1 bleed.
-Artist: Marian Churchland;Ginés Quiñonero
+Unique. Requires a vampire with capacity 10 or more. Only usable after resolution of a successful bleed against your prey.
+Put this card on this vampire. This vampire gets +1 bleed. During any Methuselah's minion phase, this vampire can lock this card to take an action.
+Artist: Marian Churchland; Ginés Quiñonero; Marian Churchland
 
 Name: Ennoia's Theater
-[TU:C]
+[TU:C, 25th:1]
 Cardtype: Master
 Clan: Gangrel/Gangrel antitribu
-Unique location. 
-You can lock this card to get +1 hand size this turn. You can lock this card during your influence phase to get +1 transfer.
+Unique location.
+Lock to get +1 hand size this turn. Lock during your influence phase to get +1 transfer.
 Artist: Javier Santos
 
 Name: Enrage
@@ -9651,16 +9669,16 @@ Requires the Edge.
 Artist: Steve Ellis
 
 Name: Entombment
-[Sabbat:R, SW:R/PL]
+[Sabbat:R, SW:R/PL, 25th:1]
 Cardtype: Combat
 Cost: 2 blood
 Discipline: Obtenebration
 [obt] Strike: burn the opposing ally.
-[OBT] Strike: send the opposing vampire into torpor.
+[OBT] Strike: send the opposing vampire to torpor.
 Artist: L. A. Williams
 
 Name: Entrancement
-[Jyhad:R, VTES:R, CE:R, LoB:PI, KoT:PT, SP:LB3]
+[Jyhad:R, VTES:R, CE:R, LoB:PI, KoT:PT, SP:LB3, Promo-20190629]
 Cardtype: Action
 Discipline: Presence
 [pre] (D) Bleed with +1 bleed.
@@ -9702,7 +9720,7 @@ Cardtype: Master
 Clan: Ventrue
 Cost: 1 pool
 Unique.
-Put this card on a Ventrue with capacity 8 or more. This Ventrue gets +1 intercept and +1 vote. This Ventrue can force a vampire to yield a contested title as a +1 stealth (D) action.
+Put this card on a Ventrue with capacity 8 or more. This Ventrue gets +1 intercept and +1 vote. This Ventrue can force any vampire to yield a contested title as a +1 stealth (D) action.
 Artist: Vince Locke
 
 Name: Epikasta Rigatos
@@ -9712,7 +9730,7 @@ Clan: Toreador
 Group: 4
 Capacity: 8
 Discipline: cel AUS DOM PRE
-Camarilla Prince of New York: After action resolution, you can move an action card Epikasta played from your ash heap to your library (shuffle afterward).
+Camarilla Prince of New York: You can move an action card Epikasta played from your ash heap to your library after resolution (shuffle afterward).
 Artist: Becky Jollensten
 
 Name: Epiphany
@@ -9736,7 +9754,7 @@ Clan: Harbinger of Skulls
 Group: 3
 Capacity: 7
 Discipline: dem AUS FOR NEC
-Independent: Wraiths (allies and retainers) cost Erebus 1 less blood or pool.
+Independent: Wraiths (allies and retainers) cost Erebus 1 fewer blood or pool.
 Artist: Ginés Quiñonero
 
 Name: Erebus Mask
@@ -10156,7 +10174,7 @@ Cardtype: Reaction
 Discipline: Protean
 [pro] +1 intercept, and put this card on this vampire. This vampire gets -1 stealth. Burn this card during your discard phase.
 [PRO] As above, with 1 optional maneuver during the first round of the resulting combat if this vampire blocks.
-Artist: Sam Arraya
+Artist: Samuel Araya
 
 Name: Eyes of the Dead
 [DS:C2]
@@ -10265,7 +10283,7 @@ Name: Faerie Wards
 Cardtype: Reaction
 Cost: 2 blood
 Discipline: Mytherceria/Auspex
-Only usable if an ally or younger vampire is taking a (D) action against you.
+Only usable if an ally or younger vampire is taking a (D) action against you {(or a card you control)}.
 [aus] +2 intercept.
 [myt] The action fails. Lock this reacting vampire.
 [MYT] As [myt] above, and the acting minion does not unlock as normal during their next unlock phase.
@@ -10320,7 +10338,7 @@ Clan: Gangrel
 Group: 4
 Capacity: 11
 Discipline: abo ANI FOR PRE PRO THA
-Independent: Before votes and ballots are cast, Fakir can burn 3 blood to have the referendum of a political action fail. He gets 1 optional press each combat. +1 bleed. +1 strength.
+Independent: Fakir can burn 3 blood during the polling step of a political action before votes and ballots are cast to have the referendum fail. He gets 1 optional press each combat. +1 bleed. +1 strength.
 Artist: Ed Tadem
 
 Name: Falcon's Eye
@@ -10385,7 +10403,7 @@ Name: Fanfare for Elysium
 Cardtype: Political Action
 Discipline: Melpominee
 [mel] Choose up to five older vampires. Successful referendum means each chosen vampire gains 1 blood.
-[MEL] As above, and successful referendum means this card is put in in play. Unique. You can burn this card before range is determined to end any combat.
+[MEL] As above, and successful referendum means this card is put in{} play. Unique. You can burn this card before range is determined to end any combat.
 Artist: Aaron Acevedo
 
 Name: Fantasy World
@@ -10499,11 +10517,10 @@ When an ally is burned in combat with an acting vampire, put a counter on this c
 Artist: Jim DiBartolo
 
 Name: Fear of Mekhet
-[DS:U, CE:PV]
+[DS:U, CE:PV, 25th:1]
 Cardtype: Master
 Cost: 2 pool
-Master.
-Put this card on a ready justicar or Inner Circle member. Lock that vampire. During this vampire's unlock phase, he or she burns 5 blood. If the vampire cannot burn the blood, he or she is burned; otherwise, the vampire's controller moves this card to any other justicar or Inner Circle member (or burns this card if there are no others).
+Put this card on a ready justicar or Inner Circle member and lock them. During this vampire's unlock phase, they burn 5 blood. If they cannot burn the blood, they are burned; otherwise, their controller moves this card to another justicar or Inner Circle member, or burns this card if there are no others.
 Artist: Pete Venters
 
 Name: Fear of the Void Below
@@ -10598,12 +10615,12 @@ Felix can take a +1 stealth (D) action that costs 1 pool to burn any location.
 Artist: Mike Danza
 
 Name: Femur of Toomler
-[Sabbat:U, SW:PT]
+[Sabbat:U, SW:PT, 25th:1]
 Cardtype: Equipment
 Clan: Tzimisce
 Cost: 2 pool
 Unique melee weapon.
-Strength+1 aggravated damage each strike.
+Strike: strength+1 aggravated damage.
 Artist: Mark Tedin
 
 Name: Feo Ramos
@@ -10705,8 +10722,8 @@ Name: Field Training
 Cardtype: Action
 Cost: 1 blood
 +1 stealth action. Requires an anarch.
-Unlock this vampire, choose a discipline they have at superior and put this card on another  ready non-titled vampire you control. The attached vampire is considered anarch (and Independent), and gets +1 level of the chosen Discipline. If the attached vampire changes sect, burn this card. A vampire can have only one Field Training.
-Artist: Tomáš zelgaris Zahradníček;Ginés Quiñonero
+Unlock this vampire, choose a Discipline they have at superior, and put this card on another ready non-titled vampire you control. The attached vampire is considered Anarch and gets +1 level of the chosen Discipline. If the attached vampire changes sect, burn this card. A vampire can have only one Field Training.
+Artist: Tomáš "zelgaris" Zahradníček; Ginés Quiñonero
 
 Name: Fiendish Tongue
 [Anarchs:C2, Third:C]
@@ -10988,7 +11005,7 @@ Name: Foldable Machine Gun
 Cardtype: Equipment
 Cost: 2 pool
 Weapon: gun.
-Strike: 1R damage, with 1 optional maneuver each combat. This maneuver cannot be used during the first round. Once each round, if the bearer strikes with this gun, they get 1 optional additional strike this round, only usable to strike with this gun.
+Strike: 1R damage, with 1 optional maneuver each combat. This maneuver cannot be used during the first round. Once each round, if the bearer strikes with this gun, they get 1 optional additional strike {(limited)} this round, only usable to strike with this gun.
 Artist: Brian LeBlanc
 
 Name: Folderol
@@ -11042,12 +11059,12 @@ This reacting vampire can attempt to block and play reaction cards as though unl
 Artist: Alan Rabinowitz
 
 Name: Forced March
-[KMW:C/PAn2, LoB:PI4, LotN:PR]
+[KMW:C/PAn2, LoB:PI4, LotN:PR, 25th:3]
 Cardtype: Action Modifier
 Discipline: Celerity & Fortitude
 A vampire can play only one Forced March each turn.
-[cel][for] Only usable when an action is successful (after resolving the action). This vampire unlocks.
-[CEL][FOR] +1 stealth. If the action is successful, this vampire may burn 1 blood to unlock (after resolving the action).
+[cel][for] Only usable after resolution of a successful action. Unlock this vampire.
+[CEL][FOR] +1 stealth. After action resolution, if the action was successful, this vampire can burn 1 blood to unlock.
 Artist: Steve Ellis
 
 Name: Forced Vigilance
@@ -11073,13 +11090,13 @@ Virtue: Vision
 Artist: Eric Lofgren
 
 Name: Foreshadowing Destruction
-[AH:C2, FN:PG3, Third:C]
+[AH:C2, FN:PG3, Third:C, 25th:1]
 Cardtype: Action Modifier
 Discipline: Dominate
-After playing this card, you cannot play another action modifier to further increase the bleed for this action.
-[dom] +1 bleed.
-[DOM] +3 bleed if the Methuselah you are bleeding has fewer than 10 pool.
-Artist: Harold Arthur McNeill
+Only usable during a bleed action.
+[dom] +1 bleed (limited).
+[DOM] +3 bleed if the target Methuselah has 9 or fewer pool (limited).
+Artist: Harold Arthur McNeill; Javier Santos
 
 Name: Forest of Shadows
 [DS:U, CE:PM]
@@ -11117,20 +11134,20 @@ Not usable on a bleed action.
 Artist: Drew Tucker
 
 Name: Form of Corruption
-[AH:R2, FN:PS, KMW:PB, LotN:PS]
+[AH:R2, FN:PS, KMW:PB, LotN:PS, 25th:1]
 Cardtype: Action
 Discipline: Serpentis
-[ser] Put this card in play. When your prey gets the Edge anew, put a counter on this card. During your master phase, if the number of counters on this card equals or exceeds the amount of blood on a vampire controlled by your prey, you may burn this card to take control of that vampire. A Methuselah can have only one Form of Corruption in play.
-[SER] As above, and your prey burns 1 pool when you burn this card.
+[ser] Put this card in play. If your prey gets the Edge anew, add 1 counter on this card. If the number of counters on this card equals or exceeds the amount of blood on a vampire controlled by your prey during your master phase, you can burn this card to steal that vampire. A Methuselah can have only one Form of Corruption.
+[SER] As above, and your prey burns 1 pool after you burn this card.
 Artist: Richard Thomas
 
 Name: Form of Mist
-[Jyhad:U2, VTES:U, Anarchs:C/PG3, KMW:PG2, Third:C, KoT:C]
+[Jyhad:U2, VTES:U, Anarchs:C/PG3, KMW:PG2, Third:C, KoT:C, 25th:6]
 Cardtype: Combat
 Discipline: Protean
 [pro] Strike: dodge.
-[PRO] Strike: combat ends. If this vampire is acting and needs stealth when this strike resolves, he or she may burn 1 blood after combat ends to continue the action at +1 stealth as if unblocked. A vampire may play only one Form of Mist at superior each action.
-Artist: Chet Masters; Rob Alexander; Mike Chaney
+[PRO] Strike: combat ends. If this vampire is acting and the action was blocked, they can burn 1 blood after combat ends to continue the action at +1 stealth as if unblocked, even if stealth is not yet needed. A vampire can play only one Form of Mist at superior each action.
+Artist: Rob Alexander; Chet Masters; Mike Chaney;Ginés Quiñonero
 
 Name: Form of the Ghost
 [Jyhad:C, VTES:C, Anarchs:C/PG2]
@@ -11315,6 +11332,16 @@ Discipline: aus
 Camarilla: Franciscus is burned (without going into torpor) if he takes more than 3 damage during a single combat.
 Artist: Mark Tedin
 
+Name: François Villon
+[DS:V, CE:PTo]
+Cardtype: Vampire
+Clan: Toreador
+Group: 2
+Capacity: 10
+Discipline: chi obf pot AUS CEL PRE
+Camarilla Prince of Paris: François may steal up to 2 blood from a younger vampire as a +1 stealth (D) action. +1 bleed.
+Artist: Anson Maddocks
+
 Name: François "Warden" Loehr
 AKA: Francois "Warden" Loehr
 [NoR:U]
@@ -11325,16 +11352,6 @@ Life: 3
 Virtue: def jud
 Other Methuselahs' actions that target François cost an additional blood or life.
 Artist: Jim Pavelec
-
-Name: François Villon
-[DS:V, CE:PTo]
-Cardtype: Vampire
-Clan: Toreador
-Group: 2
-Capacity: 10
-Discipline: chi obf pot AUS CEL PRE
-Camarilla Prince of Paris: François may steal up to 2 blood from a younger vampire as a +1 stealth (D) action. +1 bleed.
-Artist: Anson Maddocks
 
 Name: Frank Litzpar
 [Third:V]
@@ -11357,13 +11374,14 @@ Camarilla.
 Artist: Mathias Kollros
 
 Name: Freak Drive
-[Jyhad:R2, VTES:R, CE:U/PV2, Anarchs:PG, LoB:PA2, Third:U, LotN:PR, KoT:PV3, HttB:PSam2]
+[Jyhad:R2, VTES:R, CE:U/PV2, Anarchs:PG, LoB:PA2, Third:U, LotN:PR, KoT:PV3, HttB:PSam2, 25th:3]
 Cardtype: Action Modifier
 Cost: 1 blood
 Discipline: Fortitude
-[for] Only usable at the end of a successful action (after resolving the action). This vampire unlocks.
-[FOR] As above, but usable even if the action is blocked (play after combat, if any).
-Artist: Nilson; Daniel Gelon
+Only usable after action resolution.
+[for] Only usable if the action was successful. Unlock this vampire.
+[FOR] Only usable if the action was blocked. Unlock this vampire.
+Artist: Daniel Gelon; Nilson; Ken Meyer, Jr.
 
 Name: Freddy Gage
 [KoT:V/B1]
@@ -11398,7 +11416,7 @@ Name: Free States Rant
 [FN:C2, Anarchs:PAB2, KMW:PAn3, LotN:PA]
 Cardtype: Political Action
 Requires an Independent {or Anarch} vampire.
-Allocate X points among one or more ready vampires, where X is half {}{this} acting vampire{'s capacity} {}rounded up{}. No {4 or more} points can be allocated to each vampire. Successful referendum means each vampire burns 1 blood for each point {allocated}. In this referendum, non-priscus titles are worth 1 {less} vote each, priscus title is worth 1 less ballot, and burning the Edge is worth {1} additional vote.
+Allocate X points among one or more ready vampires, where X is half the capacity of the acting vampire (rounded up). No more than 3 points points can be allocated to each vampire. Successful referendum means each vampire burns 1 blood for each point {allocated}. In this referendum, {non-priscus titles are worth 1 less vote each, priscus title is worth 1 less ballot}, and burning the Edge is worth {1} additional vote.
 Artist: Drew Tucker
 
 Name: Frenzy
@@ -11450,7 +11468,6 @@ Artist: Rik Martin
 Name: Frontal Assault
 [Third:U, LotN:PA, KoT:U, SP:PwN2]
 Cardtype: Master
-
 Put this card in play. Each ready minion you control can enter combat with a minion controlled by your prey as a (D) action. You gain 1 pool after a ready minion controlled by your prey is burned or sent to torpor. During your influence phase, burn this card and burn 1 pool for each ready minion controlled by your prey.
 Artist: David Day
 
@@ -11518,7 +11535,7 @@ Clan: Tremere
 Group: 5
 Capacity: 10
 Discipline: obf pot ANI AUS DOM THA
-Camarilla Tremere Justicar: Gabrielle can steal 2 blood (or life) from a ready minion as a +1 stealth (D) action.
+Camarilla Tremere Justicar: Gabrielle can steal 2 blood {or life (becoming blood)} from a ready minion as a +1 stealth (D) action.
 Artist: Matt Smith
 
 Name: Gabrin
@@ -11839,7 +11856,7 @@ Clan: Tremere antitribu
 Group: 5
 Capacity: 7
 Discipline: AUS DOM THA
-Sabbat. Black Hand Seraph: During your unlock phase, Gerald can burn 1 blood to make a younger non-titled Sabbat vampire you control Black Hand.
+Sabbat: During your unlock phase, Gerald can burn 1 blood to make a younger non-titled Sabbat vampire you control Black Hand. Black Hand. Seraph.
 Artist: Ginés Quiñonero
 
 Name: Gerald Windham
@@ -11997,11 +12014,11 @@ When another of your minions is in combat, Gianna can lock and burn herself to b
 Artist: Javier Santos
 
 Name: Giant's Blood
-[Jyhad:R, VTES:R, CE:R, LoB:PG, Third:R, LotN:PG, KoT:R/PM]
+[Jyhad:R, VTES:R, CE:R, LoB:PG, Third:R, LotN:PG, KoT:R/PM, 25th:1]
 Cardtype: Master
-Master.
-Fill a vampire to full capacity with blood from the blood bank. Only one Giant's Blood can be played in a game.
-Artist: Richard Thomas; Edward Beard, Jr.
+Only one Giant's Blood can be played in a game.
+Fill any vampire to full capacity with blood from the blood bank.
+Artist: Edward Beard, Jr.; Richard Thomas
 
 Name: Gideon Fontaine
 [Jyhad:V, VTES:V, Tenth:B]
@@ -12042,7 +12059,7 @@ Name: Gift of Sleep
 Cardtype: Action Modifier/Reaction
 Discipline: Obeah/Obfuscate
 [obf] [ACTION MODIFIER] +1 stealth.
-[obe] [ACTION MODIFIER][REACTION] Only usable when this vampire is about to enter combat with an ally. Lock that ally and end the action. (Do not lock this vampire if they are blocking.)
+[obe] [ACTION MODIFIER][REACTION] Only usable {if} this vampire is about to enter combat with an ally. Lock that ally and end the action. (Do not lock this vampire if they are blocking.)
 [OBE] [ACTION MODIFIER] +1 stealth.
 Artist: Heather V. Kreiter
 
@@ -12265,7 +12282,7 @@ Clan: Brujah antitribu
 Group: 5
 Capacity: 6
 Discipline: cel POT PRE
-Sabbat: Once each turn when combat involving Dan ends and the opposing minion is not ready, Dan can burn 1 blood to unlock.
+Sabbat: Once each turn after combat involving Dan ends, Dan can burn 1 blood to unlock if the opposing minion is not ready.
 Artist: Lawrence Snelly
 
 Name: Goodnight, Sweet Prince
@@ -12316,10 +12333,10 @@ Group: 4
 Capacity: 9
 Discipline: ani AUS DOM FOR PRE
 Camarilla: Gotsdam can burn 1 blood to strike: combat ends. He treats aggravated damage as normal damage in combat. Frenzy cards cannot be played on him.
-Artist: Jim DiBartolo
+Artist: Jim Di Bartolo
 
 Name: Govern the Unaligned
-[Jyhad:C, VTES:C, SW:PL2/PV, FN:PG2, CE:C/PV4, Anarchs:PAG, KMW:PAl3, Third:PTr5, HttB:PKia6/PSal4, SP:PoS6]
+[Jyhad:C, VTES:C, SW:PL2/PV, FN:PG2, CE:C/PV4, Anarchs:PAG, KMW:PAl3, Third:PTr5, HttB:PKia6/PSal4, SP:PoS6, 25th:7]
 Cardtype: Action
 Cost: 1 blood
 Discipline: Dominate
@@ -12539,6 +12556,16 @@ Cost: 2 blood
 Unique ghoul with 2 life. 1 strength, 1 bleed. Requires an anarch.
 Grey may play cards that require Celerity [cel] or Potence [pot] as an anarch vampire. During your unlock phase, if Grey has only 1 life, any ready anarch may burn a blood to add 1 life to him.
 Artist: Matt Dixon
+
+Name: Grimgroth
+[25th:2]
+Cardtype: Vampire
+Clan: Tremere
+Group: 6
+Capacity: 10
+Discipline: for AUS DOM PRE THA
+Camarilla: While Grimgroth is ready, mage allies cost Tremere you control 2 fewer pool to recruit. +2 bleed.
+Artist: Edward Beard, Jr.
 
 Name: Groaning Corpse
 [HttB:C/A2]
@@ -12775,7 +12802,7 @@ Clan: Ventrue
 Group: 4
 Capacity: 10
 Discipline: aus cel pot DOM FOR PRE
-Camarilla Prince of Berlin: Gustav can lock during a referendum to get +5 votes. +1 bleed.
+Camarilla Prince of Berlin: Gustav can lock during the polling step of any referendum to get +5 votes. +1 bleed.
 Artist: Matt Smith
 
 Name: Gustav Mallenhous
@@ -12835,7 +12862,7 @@ Clan: Gangrel
 Group: 4
 Capacity: 10
 Discipline: tem ANI DEM FOR POT PRO
-Camarilla primogen: After Gwyedd performs an undirected action (successful or not), lock any younger vampire who attempted to block and failed.
+Camarilla primogen: Lock any younger vampire who attempted and failed to block an undirected action (successful or not) Gwyedd performed, after resolution.
 Artist: Brian LeBlanc
 
 Name: Gypsies
@@ -12935,7 +12962,7 @@ Only usable during the first round of combat.
 Artist: James Richardson
 
 Name: Hamid Mansour
-[Anthology:1]
+[Anthology:LARP1]
 Cardtype: Vampire
 Clan: Ventrue
 Group: 5
@@ -12959,11 +12986,11 @@ Choose a Methuselah. If this referendum is successful, put this card in play. Th
 Artist: matrix von z
 
 Name: Hand of Conrad
-[Sabbat:R, SW:R]
+[Sabbat:R, SW:R, 25th:1]
 Cardtype: Equipment
 Cost: 1 pool
-Unique equipment.
-The vampire with this equipment has superior Potence [POT]. As an action, the vampire with this equipment may move a vampire from your ash heap to your uncontrolled region.
+Unique.
+This vampire gets superior Potence [POT]. This vampire can move a vampire from your ash heap to your uncontrolled region as an action.
 Artist: L. A. Williams
 
 Name: Handsome Dan
@@ -13136,14 +13163,14 @@ Sabbat: Damage-dealing strikes Harry makes against non-mortal allies are at +1 d
 Artist: Joel Biske
 
 Name: Hartmut Stover
-[Gehenna:U, KMW:PG]
+[Gehenna:U, KMW:PG, 25th:2]
 Cardtype: Vampire
 Clan: Gangrel antitribu
 Group: 3
 Capacity: 10
 Discipline: dom for CEL OBF PRO
-Sabbat Archbishop of Berlin: Any vampire casting votes or ballots against a referendum called by Hartmut burns 1 blood when the results are tallied. You may burn the Edge during your discard phase to gain 1 pool.
-Artist: Alejandro Collucci
+Sabbat Archbishop of Berlin: Any vampire casting votes or ballots against a referendum called by Hartmut burns 1 blood once results are tallied. You can burn the Edge during your discard phase to gain 1 pool.
+Artist: Alejandro Colucci
 
 Name: Harvest Rites
 [Third:U]
@@ -13359,7 +13386,7 @@ Clan: Harbinger of Skulls
 Group: 5
 Capacity: 6
 Discipline: AUS FOR NEC
-Sabbat: After Hecate bleeds successfully, you can burn the top card of the target Methuselah's library.
+Sabbat: You can burn the top card of the target Methuselah's library after Hecate bleeds successfully.
 Artist: Carmen Cornet
 
 Name: Hector Sosa
@@ -13384,11 +13411,11 @@ Artist: Thomas Denmark
 
 Name: Heidelberg Castle, Germany
 AKA: Heidelburg Castle, Germany
-[DS:U2, FN:PR, KMW:PAl, LoB:PI]
+[DS:U2, FN:PR, KMW:PAl, LoB:PI, 25th:1]
 Cardtype: Master
 Cost: 2 pool
-Master: unique location.
-Lock to move blood, equipment cards and/or retainers between any two ready vampires you control. (You choose the amount of blood you move and which cards you transfer.) Cannot be used during an action.
+Unique location.
+Lock to move blood, equipment and/or retainers between any two ready vampires you control. Cannot be used during an action.
 Artist: L. A. Williams
 
 Name: Heinrick Schlempt
@@ -13432,15 +13459,15 @@ Camarilla: If Helena is locked and ready, she can burn a blood to be able to att
 Artist: Rebecca Guay
 
 Name: Helena
-[Promo-20051001]
+[Promo-20051001, Promo-20190804]
 Cardtype: Vampire
 Clan: Toreador
 Level: Advanced
 Group: 3
 Capacity: 10
 Discipline: dai obf pre tha AUS CEL DOM
-Advanced, Independent: Helena pays no blood costs for reaction cards that require Auspex [aus] or Dominate [dom]. Infernal.
-[MERGED] Helena is immune to damage from demons and gains 1 level of Daimoinon [dai] and Obtenebration [obt].
+Independent: Helena pays no blood costs for reaction cards requiring Auspex [aus] or Dominate [dom]. Infernal.
+[MERGED] Helena is immune to damage from demons and gets +1 level of Daimoinon [dai] and Obtenebration [obt].
 Artist: Rik Martin
 
 Name: Helena Casimir
@@ -13516,7 +13543,7 @@ Clan: Brujah
 Group: 4
 Capacity: 5
 Discipline: pot OBF PRE
-Camarilla: After Herbert performs a successful equip action, you can draw 1 card (discard down afterward).
+Camarilla: You can draw 1 card after Herbert performs a successful equip action (discard down afterward).
 Artist: Ken Meyer, Jr.
 
 Name: Hermana Hambrienta Mayor
@@ -13708,7 +13735,7 @@ Name: High Stakes
 [Jyhad:R2, VTES:R]
 Cardtype: Political Action
 Clan: Ventrue
-Only usable if playing for ante. Successful referendum means each Methuselah decides whether to ante the next card in his or her library or be ousted from the game. Decisions should be made simultaneously, as follows: each Methuselah holds out a hand with zero or one blood in it. Open hands simultaneously. A pool in a Methuselah's hand indicates that he or she chooses not to be ousted. {Added to the V:EKN banned list in 1995.}
+Only usable if playing for ante. Successful referendum means each Methuselah decides whether to ante the next card in his or her library or be ousted from the game. Decisions should be made simultaneously, as follows: each Methuselah holds out a hand with zero or one blood in it. Open hands simultaneously. A pool in a Methuselah's hand indicates that he or she chooses not to be ousted. {Added to the V:EKN banned list in 1995}
 Artist: Stuart Beel
 
 Name: High Top
@@ -13768,11 +13795,11 @@ Laibon.
 Artist: Ken Meyer, Jr.
 
 Name: Homunculus
-[Jyhad:U, VTES:U, Tenth:A]
+[Jyhad:U, VTES:U, Tenth:A, 25th:1]
 Cardtype: Retainer
 Discipline: Protean
 Retainer with 1 life.
-[pro] During any Methuselah's unlock phase, the vampire with this retainer can burn 1 blood to unlock.
+[pro] During any Methuselah's unlock phase, this vampire can burn 1 blood to unlock.
 [PRO] As above, but Homunculus has 2 life.
 Artist: Bryon Wackwitz
 
@@ -14343,7 +14370,7 @@ Artist: Brian LeBlanc
 Name: Imprison
 [NoR:R]
 Cardtype: Combat
-Cost: 2 Conviction
+Cost: 2 conviction
 Virtue: Judgment
 Only usable before range is determined.
 For the remainder of combat, the opposing monster cannot maneuver or press to continue, and strikes other than strikes to end combat cost the opposing monster an additional blood or life.
@@ -14511,7 +14538,7 @@ Artist: Erica Danell
 Name: Inflict
 [NoR:C]
 Cardtype: Combat
-Cost: 1 Conviction
+Cost: 1 conviction
 Virtue: Martyrdom
 Only usable before range is determined.
 For the remainder of combat, the amount of damage inflicted on this imbued by hand strikes, melee weapon strikes, or retainers is also inflicted on the striking minion or damage-dealing retainer, even if this imbued prevents the damage.
@@ -14526,7 +14553,7 @@ The Informant cannot act or block. During your unlock phase, any Methuselah who 
 Artist: William O'Connor
 
 Name: Information Highway
-[Jyhad:U, VTES:U, Sabbat:U, SW:PT, CE:PTr/PV, LoB:PI, Third:U, HttB:PSal, SP:PoS1]
+[Jyhad:U, VTES:U, Sabbat:U, SW:PT, CE:PTr/PV, LoB:PI, Third:U, HttB:PSal, SP:PoS1, 25th:1]
 Cardtype: Master
 Unique location.
 +2 transfers.
@@ -14552,13 +14579,13 @@ Sabbat. Black Hand.
 Artist: Brian LeBlanc
 
 Name: Ingrid Rossler
-[DS:V, Anarchs:PG]
+[DS:V, Anarchs:PG, 25th:2]
 Cardtype: Vampire
 Clan: Gangrel
 Group: 2
 Capacity: 9
 Discipline: dom ANI FOR PRO
-Camarilla Prince of Geneva: If Ingrid is ready {at the start of your influence phase}, you get {+2} transfers{}.
+Camarilla Prince of Geneva: If Ingrid is ready at the start of your influence phase, you get +2 transfers.
 Artist: Ron Spencer
 
 Name: Ingrid Russo
@@ -14647,7 +14674,7 @@ Only usable if your prey controls the Edge or the Edge is uncontrolled. Your pre
 Artist: Patrick McEvoy
 
 Name: Instantaneous Transformation
-[DM:C, Anthology:4]
+[DM:C, Anthology:4, 25th:3]
 Cardtype: Action Modifier
 Discipline: Celerity/Protean
 [cel][pro] +1 stealth.
@@ -14770,7 +14797,7 @@ Clan: Gangrel
 Group: 4
 Capacity: 9
 Discipline: dom nec ANI AUS FOR PRO
-Camarilla primogen: Allies requiring Gangrel cost Inyanga 1 less blood or pool. +1 intercept.
+Camarilla primogen: Allies requiring Gangrel cost Inyanga 1 {fewer} blood or pool. +1 intercept.
 Artist: Riccardo Fabiani
 
 Name: IR Goggles
@@ -14797,7 +14824,7 @@ Clan: Ravnos
 Group: 5
 Capacity: 5
 Discipline: ani for pre CHI
- Independent anarch.
+Independent anarch.
 Artist: Noah Hirka
 
 Name: Iris Bennett
@@ -14807,7 +14834,7 @@ Clan: Caitiff
 Group: 5
 Capacity: 1
 Discipline: pro
-Camarilla: If an older vampire blocks Iris, their controller can look at your hand before combat (if any).
+Camarilla: If an older vampire blocks Iris, their controller can look at your hand before {block resolution}.
 Artist: Mathias Tapia
 
 Name: Iron Glare
@@ -14988,16 +15015,6 @@ Discipline: cel for pot san
 Sabbat. Torrance Circle: You may lock Jack when you play a Master: location (unique or not) to reduce the cost of that location by 1 pool. +1 strength. Sterile.
 Artist: Lawrence Snelly
 
-Name: Jack "Hannibal137" Harmon
-[NoR:U]
-Cardtype: Imbued
-Creed: Defender
-Group: 4
-Life: 4
-Virtue: def jud
-Jack gets an optional maneuver on the first round of combat.
-Artist: Lawrence Snelly
-
 Name: Jack Dawson
 [BL:U1]
 Cardtype: Vampire
@@ -15016,7 +15033,7 @@ Level: Advanced
 Group: 2
 Capacity: 8
 Discipline: cel nec qui thn FOR OBF
-Independent: {Jack can burn 1 blood to get 1 additional strike (limited), only usable to strike with the a weapon he used this round.} He gets {fast} strike{} in combat with a werewolf.
+Independent: {Jack can burn 1 blood to get 1 additional strike (limited), only usable to strike with the a weapon he used this round.} He gets first strike{} in combat with a werewolf.
 Artist: James Stowe
 
 Name: Jack Drake
@@ -15028,6 +15045,16 @@ Capacity: 8
 Discipline: pre tha CEL POT
 Independent. Anarch: When you put a younger vampire in play from your uncontrolled region, that vampire may burn a blood to become anarch. +1 strength.
 Artist: Leif Jones
+
+Name: Jack "Hannibal137" Harmon
+[NoR:U]
+Cardtype: Imbued
+Creed: Defender
+Group: 4
+Life: 4
+Virtue: def jud
+Jack gets an optional maneuver on the first round of combat.
+Artist: Lawrence Snelly
 
 Name: Jack of Both Sides
 [Gehenna:C, Third:PTz, LotN:PG2]
@@ -15094,6 +15121,16 @@ Discipline: dom
 Camarilla.
 Artist: Ken Meyer, Jr.
 
+Name: Jacob, The Glitch
+[Gehenna:U]
+Cardtype: Vampire
+Clan: Tremere antitribu
+Group: 3
+Capacity: 2
+Discipline: THA
+Sabbat: Jacob's capacity is increased by 4 while he is controlled. Your predator can use a master phase action to discard a master card to force you to discard your hand. Draw back up to your hand size afterward.
+Artist: Thomas Denmark
+
 Name: Jacob Bragg
 [Sabbat:V, SW:PB]
 Cardtype: Vampire
@@ -15114,16 +15151,6 @@ Discipline: ani tha PRO
 Independent: While Jacob is ready, werewolves you control get +1 bleed. Jacob gets an optional press each combat.
 Artist: Ken Meyer, Jr.
 
-Name: Jacob, The Glitch
-[Gehenna:U]
-Cardtype: Vampire
-Clan: Tremere antitribu
-Group: 3
-Capacity: 2
-Discipline: THA
-Sabbat: Jacob's capacity is increased by 4 while he is controlled. Your predator can use a master phase action to discard a master card to force you to discard your hand. Draw back up to your hand size afterward.
-Artist: Thomas Denmark
-
 Name: Jacques Molay
 [Third:V]
 Cardtype: Vampire
@@ -15133,6 +15160,16 @@ Capacity: 9
 Discipline: obf val CEL POT PRE
 Sabbat: Jacques may enter combat with an ally or younger vampire as a (D) action. +1 strength.
 Artist: Jeremy McHugh
+
+Name: Jacques Rouge
+[Promo-20190818]
+Cardtype: Vampire
+Clan: Nosferatu
+Group: 6
+Capacity: 6
+Discipline: ani pot pre OBF
+Anarch Baron of Versailles.
+Artist: Carmen Cornet
 
 Name: Jaggedy Andy
 [Third:V]
@@ -15251,7 +15288,7 @@ Clan: Brujah
 Group: 4
 Capacity: 10
 Discipline: dem for CEL POT PRE
-Camarilla Prince of Monaco: Cards requiring Potence [pot] cost Jann 1 less blood. +1 bleed.
+Camarilla Prince of Monaco: Cards requiring Potence [pot] cost Jann 1 fewer blood. +1 bleed.
 Artist: Marian Churchland
 
 Name: Janni
@@ -15443,16 +15480,6 @@ Discipline: obt pre CEL POT
 Sabbat.
 Artist: Peter Bergting
 
-Name: Jeremy "Wix" Wyzchovsky
-[KoT:V/A1]
-Cardtype: Vampire
-Clan: Nosferatu
-Group: 4
-Capacity: 5
-Discipline: ani obf pot
-Camarilla: Jeremy can bleed at +1 bleed as a (D) action.
-Artist: Andrew Trabbold
-
 Name: Jeremy MacNeil
 [CE:V, Anarchs:PAB2, BSC:X]
 Cardtype: Vampire
@@ -15484,6 +15511,16 @@ Capacity: 4
 Discipline: dem obf
 Camarilla: During your unlock phase, check your pool total. Jeremy gains 1 blood if your pool total is even and burns 1 blood if your pool total is odd.
 Artist: Jeff Holt
+
+Name: Jeremy "Wix" Wyzchovsky
+[KoT:V/A1]
+Cardtype: Vampire
+Clan: Nosferatu
+Group: 4
+Capacity: 5
+Discipline: ani obf pot
+Camarilla: Jeremy can bleed with +1 bleed as a (D) action.
+Artist: Andrew Trabbold
 
 Name: Jericho Founding
 [LotN:C]
@@ -15761,17 +15798,17 @@ Clan: Ventrue
 Group: 5
 Capacity: 6
 Discipline: aus dom for PRE
-Camarilla: After any Methuselah puts a master location in play, unlock Joseph.
+Camarilla: Unlock Joseph after any Methuselah puts a master location in play.
 Artist: Jim Pavelec
 
 Name: Joseph Fischer
-[Anthology:1]
+[Anthology:LARP1]
 Cardtype: Vampire
 Clan: Gangrel antitribu
 Group: 5
 Capacity: 3
 Discipline: PRO
-Independent anarch.
+{Anarch}.
 Artist: Grant Garvin
 
 Name: Joseph O'Grady
@@ -15988,16 +16025,6 @@ Requires a Camarilla vampire.
 Successful referendum burns all vampires with a current bleed of 3 or more.
 Artist: Andrew Trabbold; Michael Weaver
 
-Name: Justine Chen, Innocent
-[Third:V, SP:LB1]
-Cardtype: Vampire
-Clan: Toreador antitribu
-Group: 4
-Capacity: 2
-Discipline: pre
-Sabbat.
-Artist: Jim Di Bartolo
-
 Name: Justine, Elder of Dallas
 [Jyhad:V, VTES:V, Tenth:B]
 Cardtype: Vampire
@@ -16007,6 +16034,16 @@ Capacity: 8
 Discipline: obf AUS DOM THA
 Camarilla primogen: Justine does not lock when she successfully blocks a vampire with a capacity below 4.
 Artist: Sandra Everingham
+
+Name: Justine Chen, Innocent
+[Third:V, SP:LB1]
+Cardtype: Vampire
+Clan: Toreador antitribu
+Group: 4
+Capacity: 2
+Discipline: pre
+Sabbat.
+Artist: Jim Di Bartolo
 
 Name: Kabede Maru
 [LotN:U]
@@ -16155,8 +16192,8 @@ Clan: Brujah
 Group: 5
 Capacity: 7
 Discipline: obf pre CEL POT
-Camarilla Prince of Houston: Gehenna cards do not affect Karen while she is a prince. She gets +1 stealth on undirected actions.
-Artist: Heather Kreiter
+Camarilla Prince of Houston: {While Karen is a prince, Gehenna events do not affect her}. She gets +1 stealth on undirected actions.
+Artist: Heather V. Kreiter
 
 Name: Karif al Numair
 [DM:C, Anthology:1]
@@ -16165,7 +16202,7 @@ Clan: Assamite
 Group: 5
 Capacity: 10
 Discipline: for AUS CEL OBF QUI
-Sabbat. Black Hand: During your turn, you can lock or unlock another ready Black Hand vampire. +1 strength. +1 bleed.
+Sabbat: During your turn, you can lock or unlock another ready Black Hand vampire. Black Hand. +1 bleed. +1 strength.
 Artist: Ginés Quiñonero
 
 Name: Karl
@@ -16199,14 +16236,14 @@ Camarilla: Karsh may enter combat with a locked non-Camarilla vampire controlled
 Artist: Christopher Shy
 
 Name: Karsh
-[Promo-20100510]
+[Promo-20100510, Promo-20190804]
 Cardtype: Vampire
 Clan: Gangrel
 Level: Advanced
 Group: 3
 Capacity: 10
 Discipline: ANI CEL FOR POT PRO
-Advanced, Camarilla: Karsh may play a Blood Hunt card from your hand or ash heap as a prince. He gets 3 additional votes in blood hunt referendums. He cannot block infernal vampires.
+Camarilla: Karsh can play cards named /Blood Hunt/ from your hand or ash heap as a prince. He gets +3 votes in blood hunt referendums. He cannot block infernal vampires.
 [MERGED] Imperator (3 votes): +1 intercept.
 Artist: Chad Michael Ward
 
@@ -16257,7 +16294,7 @@ Clan: Toreador
 Group: 4
 Capacity: 7
 Discipline: AUS CEL PRE
-Camarilla: During a political action, Kateline can burn 1 blood to force a non-acting vampire to abstain.
+Camarilla: During the polling step of the referendum of a political action, Kateline can burn 1 blood to force a non-acting vampire to abstain.
 Artist: Mike Gaydos
 
 Name: Katherine Stoddard
@@ -16344,7 +16381,7 @@ Clan: Malkavian
 Group: 5
 Capacity: 4
 Discipline: aus dem
-Camarilla: After a minion bleeds you successfully, they burn 1 blood or life if Keller is ready and unlocked.
+Camarilla: If Keller is ready and unlocked, minions burn 1 blood or life after bleeding you successfully.
 Artist: Mathias Tapia
 
 Name: Kemintiri
@@ -16544,11 +16581,11 @@ Kherebutu {can} play cards requiring basic Necromancy [nec] as a vampire with{} 
 Artist: Pete Venters
 
 Name: Khobar Towers, Al-Khubar
-[FN:R2, LotN:PS]
+[FN:R2, LotN:PS, 25th:1]
 Cardtype: Master
 Clan: Follower of Set
 Cost: 2 pool
-Master: unique location.
+Unique location.
 Lock during your unlock phase to remove a ready minion you control from the game and gain X pool, where X is the capacity of that vampire or the blood or pool cost of that ally.
 Artist: Michael Gaydos
 
@@ -16613,7 +16650,7 @@ Name: Kindred Restructure
 [Jyhad:V, VTES:V, CE:U/PV]
 Cardtype: Political Action
 Requires a prince or justicar.
-Choose a new seating order. Successful referendum means each Methuselah takes his or her new seat. {Added to the V:EKN banned list in 2005.}
+Choose a new seating order. Successful referendum means each Methuselah takes his or her new seat. {Added to the V:EKN banned list in 2005}
 Artist: Quinton Hoover
 
 Name: Kindred Segregation
@@ -16639,7 +16676,7 @@ Discipline: Dementation
 Artist: Greg Loudon; Jenny Frison
 
 Name: Kine Resources Contested
-[Jyhad:C, VTES:C, CE:C/PTo2, Anarchs:PAB3, BH:PM5, LoB:PG3, Third:PB6, KoT:C/PT4/PV6, SP:LB6/PoS8]
+[Jyhad:C, VTES:C, CE:C/PTo2, Anarchs:PAB3, BH:PM5, LoB:PG3, Third:PB6, KoT:C/PT4/PV6, SP:LB6/PoS8, 25th:4]
 Cardtype: Political Action
 Allocate 4 points among two or more Methuselahs. Successful referendum means each Methuselah burns 1 pool for each point allocated.
 Artist: Heather Hudson; Brian LeBlanc
@@ -17133,13 +17170,13 @@ Sabbat bishop: When Laszlo calls a referendum, he may choose a younger vampire. 
 Artist: Avery Butterworth
 
 Name: Laura Goldman
-[Anthology:1]
+[Anthology:LARP1]
 Cardtype: Vampire
 Clan: Brujah
 Group: 5
 Capacity: 3
 Discipline: cel pre
-Independent anarch.
+{Anarch}.
 Artist: Mark Kelly
 
 Name: Laurent de Valois
@@ -17338,7 +17375,7 @@ Name: Legacy
 Cardtype: Action
 Burn Option
 +2 stealth action. Requires an unmerged advanced vampire.
-Unlock this vampire, search your crypt (shuffle afterward), uncontrolled region and/or ash heap for their base version and merge them with it.
+Unlock this vampire, search your crypt (shuffle afterward), uncontrolled region, and/or ash heap for their base version, and merge them with it.
 Artist: Ginés Quiñonero
 
 Name: Legacy of Caine
@@ -17392,11 +17429,11 @@ Cost: 1 blood
 Artist: Glenn Osterberger
 
 Name: Legendary Vampire
-[DS:U2, FN:PA, LoB:PG]
+[DS:U2, FN:PA, LoB:PG, 25th:1]
 Cardtype: Master
 Cost: 2 pool
-Unique master.
-Put this card on a vampire with a capacity above 6 who was moved into your ready region during your last influence phase. This vampire gets +2 bleed and an additional 2 votes. Any vampire may call a referendum to burn this card as a +1 stealth political action.
+Unique.
+Put this card on a vampire with capacity 7 or more who entered your ready region during your last influence phase. This vampire gets +2 bleed and +2 votes. Any vampire can call a referendum to burn this card as a +1 stealth political action.
 Artist: Pete Venters
 
 Name: Legion
@@ -17542,10 +17579,10 @@ During your unlock phase, a ready vampire you control can gain 1 blood. A vampir
 Artist: Mike Weaver
 
 Name: Life Boon
-[Jyhad:U, VTES:U, SW:PV, CE:PTo]
+[Jyhad:U, VTES:U, SW:PV, CE:PTo, 25th:1]
 Cardtype: Master
-Master: out-of-turn. Boon
-Give pool to a Methuselah with no pool to keep him or her in the game; put this card in play. During each of his or her unlock phases, you can collect 1 pool from that Methuselah. The first victory point that the Methuselah wins is given to you (unless you are ousted by then). This Life Boon is then burned.
+Out-of-turn. Boon.
+Give pool to a Methuselah with no pool to keep them in the game, and put this card in play. During each of their unlock phases, you can steal 1 pool from that Methuselah. You gain any victory point gained by that Methuselah instead of them, until you are being ousted or until you have gained 1 victory point from this card. Burn this card after you have gained 1 victory point from this card.
 Artist: Kaja Foglio
 
 Name: Life in the City
@@ -17568,7 +17605,7 @@ Name: Light Intensifying Goggles
 [KoT:U/B2]
 Cardtype: Equipment
 Electronic.
-The bearer gets 1 optional maneuver during the first round of combat. You can move any aim card the bearer uses to this card (even if it is canceled). The bearer can play an aim card on this equipment as if from your hand; it is then removed from the game.
+The bearer gets 1 optional maneuver during the first round of combat. You can move any aim card the bearer uses to this card{, face up and out of play} (even if it is canceled). The bearer can play an aim card on this equipment as if from your hand; it is then removed from the game.
 Artist: Juan Calle
 
 Name: Lightning Reflexes
@@ -17585,7 +17622,7 @@ Name: Lilith's Blessing
 Cardtype: Master
 Cost: 1 pool
 Master.
-Put this card in play. As a master phase action, you may lock this card to search your library for a master: Discipline card and choose a ready non-Bahari vampire you control who has no blood. That vampire gains the Discipline card (if any) and 3 blood and becomes Bahari. {Added to the V:EKN banned list in 2013.}
+Put this card in play. As a master phase action, you may lock this card to search your library for a master: Discipline card and choose a ready non-Bahari vampire you control who has no blood. That vampire gains the Discipline card (if any) and 3 blood and becomes Bahari. {Added to the V:EKN banned list in 2013}
 Artist: Matt Smith
 
 Name: Lille Haake
@@ -17638,7 +17675,7 @@ Camarilla.
 Artist: Mike Gaydos
 
 Name: The Line
-[Anthology:1]
+[Anthology:LARP1]
 Cardtype: Master
 Unique location.
 Lock to reduce the cost of an action card played by a vampire you control by 1 blood (this location is not locked if that card is canceled as it is played). Any vampire can steal this location as a (D) action.
@@ -17658,7 +17695,7 @@ Name: Liquidation
 Cardtype: Master
 Do not replace until your discard phase.
 Burn 7 cards from the top of your library to gain 3 pool.
-Artist: James Stowe;Javier Santos
+Artist: James Stowe; Javier Santos; James Stowe
 
 Name: Lisa Noble
 [Anarchs:U2]
@@ -17743,7 +17780,7 @@ Name: Living Manse
 Cardtype: Equipment
 Clan: Tzimisce
 Cost: 1 blood
-This equipment card represents a location and does not count as equipment while in play.
+{While in play,} this equipment card represents a location and does not count as equipment{}.
 This vampire gets +1 bleed. They can burn this card before range is determined to end combat. A vampire can have only one Living Manse.
 Artist: Mark Tedin
 
@@ -17751,7 +17788,7 @@ Name: Living Wood Staff
 [NoR:R]
 Cardtype: Equipment
 Creed: Avenger
-Cost: X Conviction
+Cost: X conviction
 Unique melee weapon.
 Strength damage each strike. Imbued inflict +X damage each strike with this weapon. Using Cleave with this weapon will not burn this weapon.
 Artist: Travis Ingram
@@ -17817,7 +17854,7 @@ Cardtype: Action
 Discipline: Protean
 +1 stealth hunt action.
 [pro] Hunt, and put this card on this vampire. This vampire can burn this card and 1 blood to get +1 stealth. A vampire can have only one Loki's Gift.
-[PRO] (D) As above, and burn 1 blood from any vampire. This vampire can burn this card as above, or can burn it during a referendum to get +2 votes.
+[PRO] (D) As above, and burn 1 blood from any vampire. This vampire can burn this card as above, or can burn it during the polling step of any referendum to get +2 votes.
 Artist: Justin Norman
 
 Name: Lolita
@@ -17903,7 +17940,7 @@ Clan: Tremere
 Group: 5
 Capacity: 6
 Discipline: for pre AUS THA
-Camarilla: After Ephraim plays an action card, you can search your library for another copy of that card and move it to your ash heap. If the action succeeds, move the card to your hand.
+Camarilla: You can search your library for another copy of an action card Ephraim plays after it is played and move that copy to your ash heap (shuffle afterward). If the action succeeds, move the card to your hand.
 Artist: Leif Jones
 
 Name: Lord Fianna
@@ -17913,7 +17950,7 @@ Clan: Malkavian
 Group: 5
 Capacity: 8
 Discipline: cel pro AUS DEM OBF
-Camarilla{}: Allies cannot block Lord Fianna. Red List. +1 stealth.
+Camarilla: Allies cannot block Lord Fianna. Red List. +1 stealth.
 Artist: Warren Mahy
 
 Name: Lord Leopold Valdemar
@@ -17923,7 +17960,7 @@ Clan: Lasombra
 Group: 5
 Capacity: 8
 Discipline: cel dom obf OBT POT
-Sabbat priscus: Leopold can strike, ranged: steal 2 blood.
+Sabbat priscus: Leopold can strike, ranged: steal 2 blood{ or life (becoming blood)}.
 Artist: Ginés Quiñonero
 
 Name: Lord of Serenity
@@ -17938,12 +17975,12 @@ Discipline: Obeah/ Fortitude
 Artist: Vatche Mavlian
 
 Name: Lord Tremere
-[Promo-20150220, Promo-20181004:HB2]
+[Promo-20150220, Promo-20181004:HB2, Promo-20190804]
 Cardtype: Vampire
 Clan: Tremere
 Group: 5
 Capacity: 11
-Discipline: obe ANI AUS DOM VIC THA
+Discipline: obe ANI AUS DOM THA VIC
 Camarilla: Cards requiring Thaumaturgy [tha] cost Lord Tremere 1 fewer blood. During your minion phase, you can lock or unlock another ready Tremere or Tremere antitribu. +2 bleed. +1 intercept.
 Artist: Mark Kelly
 
@@ -18040,7 +18077,7 @@ Level: Advanced
 Group: 4
 Capacity: 5
 Discipline: aus dom for obf pre
-Independent anarch.
+Anarch.
 [MERGED] Louis gets +1 level of Dominate [dom] and Presence [pre].
 Artist: Riccardo Fabiani
 
@@ -18384,16 +18421,6 @@ Discipline: pot AUS DEM OBF PRE
 Camarilla Malkavian Inner Circle: If Lutz is ready, your prey burns 1 pool after the referendum of a political action passes. +2 bleed.
 Artist: Warren Mahy
 
-Name: Lydia Van Cuelen
-[Jyhad:V, VTES:V, Tenth:B]
-Cardtype: Vampire
-Clan: Tremere
-Group: 1
-Capacity: 6
-Discipline: aus dom pre tha
-Camarilla: +1 bleed.
-Artist: Christopher Rush
-
 Name: Lydia, Grand Praetor
 [HttB:U/B2]
 Cardtype: Vampire
@@ -18403,6 +18430,16 @@ Capacity: 9
 Discipline: dom pre AUS FOR POT TEM
 Independent. 1 vote (titled): During an action, Lydia can burn 1 blood to get +1 stealth. She cannot use cards requiring Celerity [cel]. Scarce.
 Artist: Ken Meyer, Jr.
+
+Name: Lydia Van Cuelen
+[Jyhad:V, VTES:V, Tenth:B]
+Cardtype: Vampire
+Clan: Tremere
+Group: 1
+Capacity: 6
+Discipline: aus dom pre tha
+Camarilla: +1 bleed.
+Artist: Christopher Rush
 
 Name: Lyndhurst Estate, New York
 [Sabbat:U]
@@ -18419,8 +18456,8 @@ Clan: Brujah
 Group: 5
 Capacity: 3
 Discipline: cel pot
-Camarilla: Lynn cannot have a haven (any haven that she would receive is burned instead).
-Artist: Heather Kreiter
+Camarilla: Lynn cannot have a haven ({instead} any haven that she would receive is burned{}).
+Artist: Heather V. Kreiter
 
 Name: Maabara
 [LoB:R]
@@ -18501,7 +18538,7 @@ Cardtype: Master
 Clan: Malkavian
 Cost: 2 pool
 Unique Master.
-Put this card in play. All players in the game must speak in rhyming sentences. If a player speaks without rhyming, he or she burns 1 pool. Any minion may burn this card as a (D) action. {Added to the V:EKN banned list in 1997.}
+Put this card in play. All players in the game must speak in rhyming sentences. If a player speaks without rhyming, he or she burns 1 pool. Any minion may burn this card as a (D) action. {Added to the V:EKN banned list in 1997}
 Artist: Harold Arthur McNeill
 
 Name: Madrigal
@@ -19012,16 +19049,6 @@ Discipline: for nec THN
 Independent: Marie-Pierre can lock after a combat involving another Samedi you control to enter combat with the opposing minion. She cannot block older vampires.
 Artist: Jarkko Suvela
 
-Name: Mariel St. John
-[Third:V, HttB:PSal]
-Cardtype: Vampire
-Clan: Ventrue antitribu
-Group: 4
-Capacity: 6
-Discipline: dom pro AUS FOR
-Sabbat.
-Artist: Becky Jollensten
-
 Name: Mariel, Lady Thunder
 [Jyhad:V, VTES:V, Tenth:B]
 Cardtype: Vampire
@@ -19031,6 +19058,16 @@ Capacity: 7
 Discipline: aus tha DOM OBF
 Camarilla: Before range is chosen in a combat that does not involve Mariel, she may lock to end that combat and inflict 1 unpreventable damage on each combatant and any retainers they have after combat ends.
 Artist: Anson Maddocks
+
+Name: Mariel St. John
+[Third:V, HttB:PSal]
+Cardtype: Vampire
+Clan: Ventrue antitribu
+Group: 4
+Capacity: 6
+Discipline: dom pro AUS FOR
+Sabbat.
+Artist: Becky Jollensten
 
 Name: Marijava Ghoul
 [AH:U1/V2, FN:PS, CE:PTo, LoB:PI, Third:U]
@@ -19068,16 +19105,6 @@ Discipline: nec pot
 Independent.
 Artist: Alan Rabinowitz
 
-Name: Marion "Teacher193" Perks
-[NoR:U]
-Cardtype: Imbued
-Creed: Redeemer
-Group: 4
-Life: 4
-Virtue: red jud
-Marion gets an optional press each combat.
-Artist: Thomas Manning
-
 Name: Marion French
 [KMW:U]
 Cardtype: Vampire
@@ -19087,6 +19114,16 @@ Capacity: 3
 Discipline: ani chi
 Independent.
 Artist: Monte Moore
+
+Name: Marion "Teacher193" Perks
+[NoR:U]
+Cardtype: Imbued
+Creed: Redeemer
+Group: 4
+Life: 4
+Virtue: jud red
+Marion gets an optional press each combat.
+Artist: Thomas Manning
 
 Name: Maris Streck
 [CE:V, BSC:X]
@@ -19109,13 +19146,13 @@ Sabbat bishop. Torrance Circle: Mark gets +1 intercept when attempting to block 
 Artist: Lawrence Snelly
 
 Name: Mark Decker
-[TU:C]
+[TU:C, 25th:2]
 Cardtype: Vampire
 Clan: Gangrel
 Group: 3
 Capacity: 8
 Discipline: ani for obf pot CEL PRO
-Camarilla Prince of Milwaukee: Mark gets an additional +1 strength when in combat with a werewolf. +1 strength.
+Camarilla Prince of Milwaukee: Mark gets an additional +1 strength in combat with a werewolf. +1 strength.
 Artist: Ginés Quiñonero
 
 Name: Mark of Damnation
@@ -19285,7 +19322,7 @@ Clan: Ventrue
 Group: 5
 Capacity: 10
 Discipline: ani pot AUS DOM FOR PRE
-Camarilla Ventrue Justicar: Mary Anne can add 2 blood to a vampire in your uncontrolled region as a +1 stealth action. Inner Circle members get -2 bleed while she is ready.
+Camarilla Ventrue Justicar: Mary Anne can add 2 blood to a vampire in your uncontrolled region as a +1 stealth action. {While she is ready,} Inner Circle members get -2 bleed{}.
 Artist: Matt Smith
 
 Name: Mary Johnson
@@ -19354,7 +19391,7 @@ Level: Advanced
 Group: 1
 Capacity: 10
 Discipline: AUS CEL PRE
-Camarilla primogen: Once each action, Masika can discard a political action card [POLITICAL ACTION] to give a minion you control +1 intercept.
+Camarilla primogen: Once each action, Masika can discard a political action card{} to give a minion you control +1 intercept.
 [MERGED] Prince of Lisbon.
 Artist: Ginés Quiñonero
 
@@ -19413,7 +19450,8 @@ A vampire may play only one Masque of Judas each combat. Only usable against an 
 [AUS][OBF] Only usable before range is determined. The opposing minion's controller discards 2 cards at random. Those cards are not replaced until after combat.
 Artist: Rebecca Guay
 
-Name: Masquer (Wraith)
+Name: Masquer
+AKA: Masquer (Wraith)
 [FN:C2/PG]
 Cardtype: Retainer
 Cost: 2 blood
@@ -19480,7 +19518,7 @@ Clan: Gangrel
 Group: 5
 Capacity: 10
 Discipline: ANI AUS CEL FOR PRO
-Independent: When a minion opposing Matasuntha in combat leaves the ready region, gain 1 pool. +2 strength.
+Independent: After a minion opposing Matasuntha in combat leaves the ready region, you can gain 1 pool. +2 strength.
 Artist: Noora Hirvonen
 
 Name: Matata
@@ -19656,7 +19694,7 @@ Clan: Nosferatu
 Group: 5
 Capacity: 6
 Discipline: dem for OBF POT
- Independent anarch: During your turn, you can burn the Edge to add 1 blood to an anarch you control.
+Anarch: During your turn, you can burn the Edge to add 1 blood to an anarch you control.
 Artist: Mark Kelly
 
 Name: Mehemet of the Ahl-i-Batin
@@ -19759,7 +19797,7 @@ Name: Memories of Mortality
 Cardtype: Master
 Cost: 1 pool
 Master.
-Put this card on a vampire; this vampire cannot attempt to block allies. Any damage this vampire inflicts on allies is reduced to 0. This vampire may burn 1 blood during his or her controller's influence phase to burn this card; he or she then goes into torpor. {Added to the V:EKN banned list in 2008.}
+Put this card on a vampire; this vampire cannot attempt to block allies. Any damage this vampire inflicts on allies is reduced to 0. This vampire may burn 1 blood during his or her controller's influence phase to burn this card; he or she then goes into torpor. {Added to the V:EKN banned list in 2008}
 Artist: Scott Kirschner
 
 Name: Memory Rift
@@ -19792,15 +19830,15 @@ Camarilla: During your unlock phase, you may move 2 blood from Menele to a young
 Artist: Lawrence Snelly
 
 Name: Menele
-[Promo-20090929]
+[Promo-20090929, Promo-20190804]
 Cardtype: Vampire
 Clan: Brujah
 Level: Advanced
 Group: 3
 Capacity: 10
 Discipline: aus dom CEL POT PRE THA
-Advanced, Independent: If Helena is ready, minion cards cost Menele 1 less blood.
-[MERGED] Menele may steal 2 blood as a strike.
+Independent: While /Helena/ is ready, minion cards cost Menele 1 fewer blood.
+[MERGED] Menele can strike: steal 2 blood {or life (becoming blood)}.
 Artist: Vince Locke
 
 Name: Meno Ngari
@@ -19832,6 +19870,16 @@ Discipline: Celerity
 [CEL] Strike: 3R damage.
 Artist: Peter Bergting
 
+Name: Mercy, Knight Inquisitor
+[SW:C]
+Cardtype: Vampire
+Clan: Toreador antitribu
+Group: 2
+Capacity: 5
+Discipline: cel dom pre AUS
+Sabbat.
+Artist: Christopher Shy
+
 Name: Mercy for Seth
 [KMW:C]
 Cardtype: Combat
@@ -19847,16 +19895,6 @@ Cardtype: Combat
 Cost: 2 blood
 Strike: combat ends. Only usable if this vampire has more blood than the opposing vampire. Opposing vampire gains 1 blood (even at long range).
 Artist: Ron Spencer
-
-Name: Mercy, Knight Inquisitor
-[SW:C]
-Cardtype: Vampire
-Clan: Toreador antitribu
-Group: 2
-Capacity: 5
-Discipline: cel dom pre AUS
-Sabbat.
-Artist: Christopher Shy
 
 Name: Merrill Molitor
 [Jyhad:V, VTES:V, Tenth:A]
@@ -19940,7 +19978,7 @@ Clan: Gangrel
 Group: 5
 Capacity: 10
 Discipline: pre pro ANI FOR POT THA
-Independent: Mictlantecuhtli is immune to damage from weapons. After he commits diablerie, each of your other ready vampires gains 1 blood (before the blood hunt is called). +1 strength.
+Independent: Mictlantecuhtli is immune to damage from weapons. Each of your other ready vampires gains 1 blood after he commits diablerie (before the blood hunt is called). +1 strength.
 Artist: Brian LeBlanc
 
 Name: Midget
@@ -20256,7 +20294,7 @@ Clan: Tremere
 Group: 4
 Capacity: 11
 Discipline: AUS CEL DOM OBF THA VIC
-Camarilla Tremere Inner Circle: Mistress Fanchon can search your library (shuffle afterward) for any minion card and move it to your hand as a +1 stealth action. +2 bleed.
+Camarilla Tremere Inner Circle: Mistress Fanchon can search your library for any minion card, reveal it, and move it to your hand as a +1 stealth action. +2 bleed.
 Artist: Ken Meyer, Jr.
 
 Name: Mistrust
@@ -20278,7 +20316,7 @@ Sabbat: Rescuing Mitchell from torpor costs an additional blood.
 Artist: John Bolton
 
 Name: Mithras
-[Promo-20150218, Promo-20181004:HB2]
+[Promo-20150218, Promo-20181004:HB2, Promo-20190804]
 Cardtype: Vampire
 Clan: Ventrue
 Group: 3
@@ -20307,7 +20345,7 @@ Artist: William O'Connor; Greg Simanson
 Name: Mob Rule
 [Anarchs:C, KMW:PAn3]
 Cardtype: Action Modifier/Reaction
- Only usable during a referendum.
+Only usable during a referendum.
 Each vampire with a capacity above 4 can burn blood to gain votes. A vampire gains 1 vote for each blood he or she burns. A vampire with a capacity above 7 gains an additional vote for each blood he or she burns.
 Artist: Brian LeBlanc
 
@@ -20357,7 +20395,7 @@ Artist: Richard Thomas
 Name: Momentary Delay
 [HttB:C/A2]
 Cardtype: Action Modifier
-Requires a vampire with capacity 7 or more. Only usable after resolution of an action blocked by an ally or a vampire with capacity 5 or less. Not usable if, during this action, more than 1 round of combat has occurred or if this vampire has lost 3 or more blood or ended combat before the press step.
+Requires a vampire with capacity 7 or more. Only usable after resolution of an action blocked by an ally or a vampire with capacity 5 or less. Not usable if, during this action, more than 1 round of combat has occurred or{} this vampire has lost 3 or more blood or ended combat before the press step.
 The action continues as if unblocked.
 Artist: Brian LeBlanc
 
@@ -20369,12 +20407,12 @@ Put this card in play. You may lock this card during your unlock phase to gain 1
 Artist: David Day
 
 Name: Monastery of Shadows
-[KoT:R, Anthology:1, SP:PoS1]
+[KoT:R, Anthology:1, SP:PoS1, 25th:1]
 Cardtype: Master
 Cost: 3 pool
 Unique location.
 +1 hand size. Lock to give a vampire with capacity 8 or more +1 stealth.
-Artist: Brian LeBlanc;Ginés Quiñonero;Brian LeBlanc
+Artist: Brian LeBlanc; Ginés Quiñonero; Brian LeBlanc
 
 Name: Monica Chang
 [AU:C, Anthology:1]
@@ -20383,7 +20421,7 @@ Clan: Tremere
 Group: 5
 Capacity: 3
 Discipline: dom tha
- Independent anarch.
+Anarch.
 Artist: Noah Hirka
 
 Name: Monique
@@ -20436,7 +20474,7 @@ Put this card on a ready vampire you control. Once each turn when combat involvi
 Artist: Peter Bergting
 
 Name: Montano
-[Promo-20150217, Promo-20181004:HB2]
+[Promo-20150217, Promo-20181004:HB2, Promo-20190804]
 Cardtype: Vampire
 Clan: Lasombra
 Group: 3
@@ -20452,7 +20490,7 @@ Clan: Toreador
 Group: 5
 Capacity: 10
 Discipline: obt AUS CEL DOM PRE
-Camarilla Toreador Justicar: Montecalme can call a referendum to burn a location as a +1 stealth political action.
+Camarilla Toreador Justicar: Montecalme can call a referendum to burn any location as a +1 stealth political action.
 Artist: Ken Meyer, Jr.
 
 Name: Monty Coven
@@ -20738,12 +20776,12 @@ Sabbat: +1 strength.
 Artist: Max Shade Fellwalker
 
 Name: Murmur of the False Will
-[LotN:C/PG4, KoT:C/PV5, HttB:PKia4]
+[LotN:C/PG4, KoT:C/PV5, HttB:PKia4, 25th:2]
 Cardtype: Action Modifier/Reaction
 Discipline: Dominate
-[dom] [ACTION MODIFIER] +1 bleed. You cannot play another action modifier to increase this bleed amount.
-[DOM] [REACTION] Only usable when a younger vampire is bleeding you, after blocks are declined. Lock this reacting vampire. Choose another Methuselah other than the acting vampire's controller. That acting vampire is now bleeding that Methuselah.
-Artist: Jim DiBartolo
+[dom] [ACTION MODIFIER] Only usable during a bleed action. +1 bleed (limited).
+[DOM] [REACTION] Only usable if a younger vampire is bleeding you, after blocks are declined. {Lock this reacting vampire.} Change the target of the bleed to another Methuselah other than the acting vampire's controller (that Methuselah can attempt to block).
+Artist: Jim Di Bartolo
 
 Name: Muse
 [BL:U2]
@@ -20763,16 +20801,6 @@ Virtue: Vengeance
 (D) If this action is successful, choose a monster controlled by your prey at random. This imbued enters combat with the chosen monster.
 Artist: Eric Lofgren
 
-Name: Mustafa Rahman
-[AH:V3, CE:PTr]
-Cardtype: Vampire
-Clan: Tremere
-Group: 2
-Capacity: 2
-Discipline: dom
-Camarilla.
-Artist: Alan Rabinowitz
-
 Name: Mustafa, The Heir
 [Gehenna:U]
 Cardtype: Vampire
@@ -20782,6 +20810,16 @@ Capacity: 6
 Discipline: cel dom FOR PRE
 Camarilla Prince of Istanbul: Once each political action, any older Toreador controlled by another Methuselah can move 1 blood to Mustafa to force him to cast his votes and ballots as that Toreador's controller chooses.
 Artist: David Day
+
+Name: Mustafa Rahman
+[AH:V3, CE:PTr]
+Cardtype: Vampire
+Clan: Tremere
+Group: 2
+Capacity: 2
+Discipline: dom
+Camarilla.
+Artist: Alan Rabinowitz
 
 Name: Mustajib
 [SoC:C]
@@ -21028,6 +21066,18 @@ Discipline: cel pot DOM OBF PRE SER
 Independent: Nefertiti can place a corruption counter on a minion controlled by your prey as a +1 stealth (D) action that costs 1 blood. +1 bleed.
 Artist: Lawrence Snelly
 
+Name: Nefertiti
+[Promo-20190816]
+Cardtype: Vampire
+Clan: Follower of Set
+Level: Advanced
+Group: 2
+Capacity: 10
+Discipline: cel pot DOM OBF PRE SER
+Independent: Nefertiti can search your crypt for an /Aabbt Kindred/ (shuffle afterwards), reveal it and move it to your uncontrolled region as a +1 stealth action.
+[MERGED] Nefertiti can unlock during your minion phase.
+Artist: Ginés Quiñonero
+
 Name: Neferu
 [KMW:U]
 Cardtype: Vampire
@@ -21078,7 +21128,7 @@ Lock {after resolution} of {an unsuccessful action} to inflict 1 damage on the a
 Artist: Ken Meyer, Jr.
 
 Name: Neonate Breach
-[KoT:C/A2, SP:PoS1]
+[KoT:C/A2, SP:PoS1, 25th:1]
 Cardtype: Political Action
 Choose one or more Methuselahs. Successful referendum means each chosen Methuselah burns 1 pool, plus 3 additional pool if they control a ready vampire with capacity 4 or less.
 Artist: Jeremy McHugh
@@ -21113,24 +21163,24 @@ Nephren-Ka may enter combat with a ready minion as a (D) action. He may prevent 
 Artist: Mark Poole
 
 Name: Nergal
-[Promo-20051001]
+[Promo-20051001, Promo-20190804]
 Cardtype: Vampire
 Clan: Baali
 Group: 5
 Capacity: 10
 Discipline: AUS DAI FOR OBF PRE THA
-Independent: Once each turn, Nergal may reduce the cost of a card he plays by one blood. +2 bleed. Infernal.
+Independent: Once each turn, Nergal can reduce the cost of a card he plays by 1 blood. Infernal. +2 bleed.
 Artist: Mark Poole
 
 Name: Nergal
-[Promo-20080203]
+[Promo-20080203, Promo-20190804]
 Cardtype: Vampire
 Clan: Baali
 Level: Advanced
 Group: 5
 Capacity: 10
 Discipline: AUS DAI FOR OBF PRE THA
-Advanced, Independent: Reaction cards cost an additional blood when Nergal is acting. Once each action, Nergal may burn 1 blood to get +1 stealth. Infernal.
+Independent: While Nergal is acting, reaction cards cost 1 additional blood. Once each action, he can burn 1 blood to get +1 stealth. Infernal.
 Artist: Ron Lemon
 
 Name: Nest of Eagles
@@ -21188,7 +21238,7 @@ Clan: Blood Brother
 Group: ANY
 Capacity: 2
 Discipline: san
-Sabbat: When New Blood enters play during your influence phase, choose a circle and draw 1 card from your crypt. New Blood belongs to the chosen circle. Sterile.
+Sabbat: As New Blood enters play during your influence phase, choose any circle and draw 1 card from your crypt. New Blood belongs to the chosen circle. Sterile.
 Artist: Gábor Németh
 
 Name: New Carthage
@@ -21632,7 +21682,7 @@ Name: Obedience
 [Jyhad:U, VTES:U, Sabbat:U, SW:PV, CE:U, Third:U, HttB:PKia3, SP:PoS2]
 Cardtype: Reaction
 Discipline: Dominate
-Only usable when this vampire is about to enter combat with an acting younger vampire.
+Only usable {if} this vampire is about to enter combat with an acting younger vampire.
 [dom] Unlock the acting vampire and end the action. (Do not lock this vampire if they are blocking.) The acting vampire cannot take the same action this turn.
 [DOM] As above, but do not unlock the acting vampire.
 Artist: Ron Spencer; L. A. Williams; Oliver Meinerding
@@ -21739,7 +21789,7 @@ Cost: 1 blood
 Discipline: Obfuscate
 Do not replace until your unlock phase.
 [obf] Only usable during a bleed action. +1 bleed (limited).
-[OBF] Only usable during a referendum. This vampire gets +2 votes.
+[OBF] Only usable during the polling step of a political action. This vampire gets +2 votes.
 Artist: Jeremy McHugh
 
 Name: Old Neddacka
@@ -21839,7 +21889,7 @@ Sabbat priscus: Cards that require Mytherceria [myt] cost Omme 1 less blood. Col
 Artist: Mark Nelson
 
 Name: On the Qui Vive
-[Third:C/PB2/PM2/PTr2, KoT:C/PB3/PM3/PT2, HttB:PKia3/PSam4, SP:DoF4/LB4/PoS2/PwN6]
+[Third:C/PB2/PM2/PTr2, KoT:C/PB3/PM3/PT2, HttB:PKia3/PSam4, SP:DoF4/LB4/PoS2/PwN6, 25th:3]
 Cardtype: Reaction
 Only usable by a locked minion. A minion can play only one On the Qui Vive between their unlock phases.
 This minion wakes (they ignore the requirement to be unlocked for playing reaction cards and attempting to block until the end of the action). If this minion is an ally, they do not unlock as normal during their next unlock phase.
@@ -22227,11 +22277,11 @@ Lock to give a Daughter of Cacophony you control +1 stealth. Lock this card and 
 Artist: William O'Connor
 
 Name: Parity Shift
-[Jyhad:V, VTES:V, CE:U]
+[Jyhad:V, VTES:V, CE:U, 25th:5]
 Cardtype: Political Action
 Requires a prince or justicar.
-Choose a Methuselah who has more pool than you do. Allocate X of his or her pool between 1 or more of the other Methuselahs (including you), where X is the number of Methuselahs in the game. Successful referendum means the chosen Methuselah loses that pool, and it is allocated as you announced.
-Artist: L. A. Williams
+Choose a Methuselah who has more pool than you do, and allocate 3 of their pool between 1 or more of the other Methuselahs (including you). Successful referendum means the chosen Methuselah loses that pool, and it is allocated as you chose.
+Artist: L. A. Williams;Mark Kelly
 
 Name: Park Hunting Ground
 [DS:C2, FN:PR, LotN:PR]
@@ -22482,16 +22532,6 @@ Discipline: Dementation
 [DEM] Only usable when a bleed is successful. Look at the cards in the hand of the Methuselah being bled.
 Artist: Leif Jones
 
-Name: Paul "Sixofswords29" Moreton
-[NoR:U]
-Cardtype: Imbued
-Creed: Visionary
-Group: 4
-Life: 4
-Virtue: def vis
-During your influence phase, you may move a counter from your pool to an imbued in your uncontrolled region.
-Artist: David Day
-
 Name: Paul Calderone
 [KoT:V/A1]
 Cardtype: Vampire
@@ -22531,6 +22571,16 @@ Capacity: 5
 Discipline: chi for pre
 Independent: Once each action, Paul can burn a blood to give an acting Ravnos you control +1 bleed.
 Artist: Brian LeBlanc
+
+Name: Paul "Sixofswords29" Moreton
+[NoR:U]
+Cardtype: Imbued
+Creed: Visionary
+Group: 4
+Life: 4
+Virtue: def vis
+During your influence phase, you may move a counter from your pool to an imbued in your uncontrolled region.
+Artist: David Day
 
 Name: Paulo de Castille
 [Third:V]
@@ -22613,7 +22663,7 @@ Discipline: Fortitude & Obeah
 [FOR][OBE] [ACTION MODIFIER] Only usable as the action is announced. Choose any vampire. The chosen vampire cannot block this action.
 Artist: Sandra Chang-Adair
 
-Name: Pentex(TM) Loves You!
+Name: Pentex™ Loves You!
 [Sabbat:U, SW:U/PT, Third:U]
 Cardtype: Master
 Cost: 2 pool
@@ -22621,13 +22671,13 @@ Master: unique location.
 You may lock this card and choose a Sabbat vampire. Once during the current action, the chosen vampire may burn 1 blood to get +1 bleed.
 Artist: Michael Weaver
 
-Name: Pentex(TM) Subversion
-[DS:U3, FN:PS, Third:U]
+Name: Pentex™ Subversion
+[DS:U3, FN:PS, Third:U, 25th:1]
 Cardtype: Master
 Cost: 2 pool
-Unique master.
-Put this card on any ready minion. The minion with this card cannot take actions and cannot block actions. This card may be burned by any other minion as a (D) action.
-Artist: Pete Venters
+Unique.
+Put this card on a ready minion. This minion cannot block. Any other minion can burn this card as a (D) action.
+Artist: Pete Venters;Riccardo Fabiani
 
 Name: Pentweret
 [LotN:U]
@@ -22693,10 +22743,10 @@ Discipline: Chimerstry
 Artist: Mark Poole
 
 Name: Permanent Vacation
-[LotN:R]
+[LotN:R, 25th:1]
 Cardtype: Political Action
-Choose a ready ally. Successful referendum means that ally is removed from the game.
-Artist: Jim DiBartolo
+Choose a ready ally. Successful referendum means the chosen ally is removed from the game.
+Artist: Jim Di Bartolo
 
 Name: Perpetual Care
 [Third:C]
@@ -22780,16 +22830,6 @@ Discipline: chi AUS DAI DEM OBF THA
 Advanced, Independent. Red List: Once each combat, Petaniqua may burn a blood to gain a press. Petaniqua may recruit a werewolf ally as if she meets the requirements of playing that card. +1 strength. Infernal.
 Artist: Richard Thomas
 
-Name: Peter "Outback295" Rophail
-[NoR:U]
-Cardtype: Imbued
-Creed: Redeemer
-Group: 4
-Life: 4
-Virtue: red ven
-While Peter is in combat with a monster, he may burn a conviction [1 CONVICTION] to get a maneuver.
-Artist: Lawrence Snelly
-
 Name: Peter Blaine
 [SW:C]
 Cardtype: Vampire
@@ -22799,6 +22839,16 @@ Capacity: 4
 Discipline: aus dom for
 Sabbat: Peter gets +1 bleed when bleeding a Methuselah who controls a ready Ventrue.
 Artist: William O'Connor
+
+Name: Peter "Outback295" Rophail
+[NoR:U]
+Cardtype: Imbued
+Creed: Redeemer
+Group: 4
+Life: 4
+Virtue: red ven
+While Peter is in combat with a monster, he may burn a conviction [1 CONVICTION] to get a maneuver.
+Artist: Lawrence Snelly
 
 Name: Petra
 [Gehenna:U, HttB:PSam]
@@ -22972,7 +23022,7 @@ Name: Playing for Keeps
 Cardtype: Master
 Cost: X pool
 Unique Master. Only usable if playing for ante.
-The cost of this card (X) represents the number of Methuselahs currently in the game. Put this card in play. When a Methuselah's prey is ousted, the surviving Methuselah wins his or her prey's ante and antes an additional card. {Added to the V:EKN banned list in 1995.}
+The cost of this card (X) represents the number of Methuselahs currently in the game. Put this card in play. When a Methuselah's prey is ousted, the surviving Methuselah wins his or her prey's ante and antes an additional card. {Added to the V:EKN banned list in 1995}
 Artist: Harold Arthur McNeill
 
 Name: Poacher's Hunting Ground
@@ -23088,7 +23138,7 @@ Choose a location controlled by another Methuselah. This card contests that loca
 Artist: Fred Harper
 
 Name: Political Stranglehold
-[Sabbat:U, SW:U/PL, FN:PG, LoB:PG, Third:U, SP:PoS1]
+[Sabbat:U, SW:U/PL, FN:PG, LoB:PG, Third:U, SP:PoS1, 25th:1]
 Cardtype: Political Action
 Only one Political Stranglehold can be played or called in a game.
 Successful referendum means each Methuselah gains 3 pool for each vampire they control with capacity 8 or more.
@@ -23164,7 +23214,7 @@ Clan: Ventrue
 Group: 5
 Capacity: 4
 Discipline: for pre pro
-Camarilla: Portia gets +1 stealth when hunting. If her hunt is blocked, she takes 1 damage before range is determined during the first round of the resulting combat.
+Camarilla: Portia gets +1 stealth when hunting. Whenever her hunt is blocked, she takes 1 environmental damage before range is determined during the first round of the resulting combat.
 Artist: Ken Meyer, Jr.
 
 Name: The Portrait
@@ -23563,7 +23613,7 @@ Name: Precognition
 Cardtype: Reaction
 Discipline: Auspex
 [aus] +1 intercept.
-[AUS] As above, and this vampire can prevent 1 damage during the first round of the resulting combat whenever they block.
+[AUS] As above, and this vampire can prevent 1 damage during the first round of the resulting combat {if} they block.
 Artist: Eric LaCombe; Anna Christenson
 
 Name: Precognizant Mobility
@@ -23793,7 +23843,7 @@ Name: Protect Thine Own
 Cardtype: Political Action
 Cost: 1 blood
 Requires a justicar or Inner Circle member.
-Choose a non-Camarilla vampire with a capacity below 6. If the acting vampire is a member of the Inner Circle, you may choose any non-Camarilla vampire instead. If this referendum is successful, burn that vampire. {Added to the V:EKN banned list in 2008.}
+Choose a non-Camarilla vampire with a capacity below 6. If the acting vampire is a member of the Inner Circle, you may choose any non-Camarilla vampire instead. If this referendum is successful, burn that vampire. {Added to the V:EKN banned list in 2008}
 Artist: Phillip Tan
 
 Name: Protected Resources
@@ -24460,7 +24510,7 @@ Independent.
 Artist: Lawrence Snelly
 
 Name: Rapid Change
-[Sabbat:C, SW:C, Third:C]
+[Sabbat:C, SW:C, Third:C, 25th:2]
 Cardtype: Action Modifier/Combat
 Cost: 1 blood
 Discipline: Protean
@@ -24595,7 +24645,7 @@ Name: Raw Recruit
 Cardtype: Action
 Clan: Gargoyle
 +1 stealth action. Requires a slave.
-(D) Put this card in play and move a vampire in torpor to this card, out of play. A vampire you control to whom this Gargoyle is enslaved can remove that vampire from the game as a +1 stealth action to turn this card into a Gargoyle with the same capacity, Fortitude [for], Potence [pot], Visceratika [vis] and flight [FLIGHT], enslaved to the acting vampire's clan.
+(D) Put this card in play and move a vampire in torpor to this card, {face up and} out of play. A vampire you control to whom this Gargoyle is enslaved can remove that vampire from the game as a +1 stealth action to turn this card into a Gargoyle with the same capacity, Fortitude [for], Potence [pot], Visceratika [vis] and flight [FLIGHT], enslaved to the acting vampire's clan.
 Artist: Jim Pavelec
 
 Name: Rayzeel's Song
@@ -24986,7 +25036,7 @@ Choose one or more Methuselahs. Successful referendum means each chosen Methusel
 Artist: Steve Ellis
 
 Name: Reins of Power
-[Anarchs:C, KMW:PAn, Third:PTr, KoT:C/PV, SP:PoS1]
+[Anarchs:C, KMW:PAn, Third:PTr, KoT:C/PV, SP:PoS1, 25th:1]
 Cardtype: Political Action
 Only one Reins of Power can be played or called in a game.
 Successful referendum means each Methuselah can choose a ready vampire they control. Each Methuselah gains 6 pool, then burns pool equal to the capacity of their predator's chosen vampire.
@@ -25024,7 +25074,7 @@ Cardtype: Combat
 Discipline: Thanatosis/Fortitude
 [for] Prevent 1 damage.
 [thn] Press.
-[THN] Only usable when both combatants are still ready and combat would end. Burn 1 blood to start a new round instead.
+[THN] Only usable if both combatants are still ready and combat would end. Instead, burn 1 blood to start a new round.
 Artist: Alejandro F. Giraldo
 
 Name: Reliquary: Akunanse Remains
@@ -25255,7 +25305,7 @@ Name: The Return to Innocence
 [AH:R2]
 Cardtype: Action
 Cost: 4 blood
-(D) Bleed. If you successfully bleed your prey for one or more, put this card on the acting vampire. Burn this card if this vampire loses any blood or goes to torpor, or if your prey is ousted. During your next unlock, this vampire is removed from the game and your prey burns X pool, where X is the capacity of this vampire. {Added to the V:EKN banned list in 1999.}
+(D) Bleed. If you successfully bleed your prey for one or more, put this card on the acting vampire. Burn this card if this vampire loses any blood or goes to torpor, or if your prey is ousted. During your next unlock, this vampire is removed from the game and your prey burns X pool, where X is the capacity of this vampire. {Added to the V:EKN banned list in 1999}
 Artist: Dave Roach
 
 Name: Reunion Kamut
@@ -25540,7 +25590,7 @@ Name: The Rising
 [HttB:R/A1]
 Cardtype: Event
 Gehenna. Requires at least 2 other Gehenna events in play. Do not replace until your prey is ousted.
-A Methuselah cannot gain pool during their own turn unless they have the Edge or at least 1 victory point (any pool they would gain goes to the blood bank instead).
+A Methuselah cannot gain pool during their own turn unless they have the Edge or at least 1 victory point ({instead,} any pool they would gain goes to the blood bank{}).
 Artist: Samuel Araya
 
 Name: Ritual Challenge
@@ -25923,7 +25973,7 @@ Clan: Tzimisce
 Group: 5
 Capacity: 6
 Discipline: aus ANI VIC
-Sabbat: Rurik gets 1 optional press each combat. While Ludmijla Rakoczy is ready, Rurik gets +1 bleed.
+Sabbat: Rurik gets 1 optional press each combat. While /Ludmijla Rakoczy/ is ready, Rurik gets +1 bleed.
 Artist: Heather V. Kreiter
 
 Name: Rusticus
@@ -25954,16 +26004,16 @@ Group: 5
 Capacity: 7
 Discipline: pro vic AUS DOM THA
 Camarilla: Tzimisce get -1 intercept against Rutor.
-Artist: Eric Gist
+Artist: E.M. Gist
 
 Name: Rutor's Hand
-[DS:C, CE:PTr, KMW:PB3, Third:PTr]
+[DS:C, CE:PTr, KMW:PB3, Third:PTr, 25th:1]
 Cardtype: Action
 Cost: 1 blood
 Discipline: Thaumaturgy
 +1 stealth action.
-[tha] Put this card on the acting vampire. This vampire takes 1 unpreventable aggravated damage. Beginning with your next turn, this vampire may unlock once during each of your minion phases. A vampire may have only one Rutor's Hand.
-[THA] As above, but this acting vampire may prevent the aggravated damage by burning 3 additional blood.
+[tha] Put this card on this vampire, and this vampire takes 1 unpreventable environmental aggravated damage. Beginning with your next turn, this vampire can unlock during your minion phase. A vampire can have only one Rutor's Hand.
+[THA] As above, and this vampire can burn 3 blood to be immune to this aggravated damage.
 Artist: Stuart Beel
 
 Name: Ruxandra
@@ -26175,7 +26225,7 @@ Clan: Brujah
 Group: 4
 Capacity: 7
 Discipline: pot pro CEL PRE
-Independent anarch: While Salvador is ready, cards requiring an anarch cost you and anarchs you control 1 fless blood or pool.
+Anarch: While Salvador is ready, cards requiring an anarch cost you and anarchs you control 1 fewer blood or pool.
 Artist: Carmen Cornet
 
 Name: Salvatore Giovanni
@@ -26368,11 +26418,11 @@ Independent: Whenever Sargon successfully performs an action, you get the Edge. 
 Artist: Christopher Shy
 
 Name: The Sargon Fragment
-[FN:R2, LotN:PG]
+[FN:R2, LotN:PG, 25th:1]
 Cardtype: Equipment
 Cost: 1 pool
-Unique equipment.
-The vampire with this equipment has superior Necromancy [NEC]. This vampire can move a library card from your ash heap to your hand as an action that costs 1 blood (discard afterward).
+Unique.
+This vampire gets superior Necromancy [NEC]. This vampire can move a library card from your ash heap to your hand as an action that costs 1 blood (discard down afterward).
 Artist: Jim Nelson
 
 Name: Sarisha Veliku
@@ -26405,7 +26455,7 @@ Capacity: 8
 Discipline: aus nec OBF PRE SER
 Camarilla Prince of Sydney.
 [MERGED] If Sarrasine is ready during your unlock phase, you can put 1 corruption counter on a minion controlled by your prey.
-Artist: Óscar Salcedo
+Artist: Oscar Salcedo; Mark Kelly
 
 Name: Sascha Vykos, The Angel of Caine
 [Promo-20010302, SW:PT]
@@ -26629,7 +26679,6 @@ Artist: Patrick McEvoy
 Name: Scourge of the Enochians
 [KoT:R/B1]
 Cardtype: Event
-
 During your discard phase, you can burn a vampire with capacity 2 or less, and your predator takes control of this card (even if you do not burn a vampire).
 Artist: Jeremy McHugh
 
@@ -26763,11 +26812,11 @@ Artist: Avery Butterworth
 
 Name: Second Tradition: Domain
 AKA: The Second Tradition: Domain
-[Jyhad:U, VTES:U, CE:U/PTo/PV2, KMW:PAl3, KoT:U/PV3]
+[Jyhad:U, VTES:U, CE:U/PTo/PV2, KMW:PAl3, KoT:U/PV3, 25th:3]
 Cardtype: Reaction
-Requires a ready prince or justicar.
-+2 intercept. Also usable by a locked prince or justicar, even if intercept is not yet needed, to burn a blood to unlock and attempt to block with +2 intercept.
-Artist: Durwin Talon; L. A. Williams
+Requires a prince or justicar.
++2 intercept. Also usable by a locked prince or justicar, even if intercept is not yet needed, to burn 1 blood to unlock and attempt to block with +2 intercept.
+Artist: L. A. Williams; Durwin Talon
 
 Name: Secret Horde
 [Sabbat:C, SW:C, CE:C/PN, Anarchs:PG, LoB:PA, Third:PB]
@@ -26824,7 +26873,7 @@ Cost: 2 blood
 Discipline: Thaumaturgy
 +1 stealth action.
 [tha] (D) Put this card on one of your prey's vampires. If the vampire is a Follower of Set, he or she burns 2 additional blood when attempting an action; otherwise, he or she burns 1 additional blood when attempting an action. The vampire's special abilities cannot be used. Any vampire(s) may burn this card with two +1 stealth actions.
-[THA] As above, but the vampire burns 2 additional blood when attempting an action; Followers of Set burn 3 additional blood.
+[THA] As above, but the vampire burns 2 additional blood when attempting an action; Followers of Set burn 3 additional blood. {Added to the V:EKN banned list in 2016}
 Artist: Harold Arthur McNeill
 
 Name: Sela
@@ -27019,7 +27068,7 @@ Clan: Nosferatu
 Group: 5
 Capacity: 10
 Discipline: dom pro ANI AUS OBF POT
-Camarilla: If Sergei blocks, you can look at the acting Methuselah's hand, and he can burn 1 blood to discard 1 action card from it before combat (if any). +1 intercept.
+Camarilla: If Sergei blocks, you can look at the acting Methuselah's hand, and he can burn 1 blood to discard 1 action card from it before {block resolution}. +1 intercept.
 Artist: Erica Danell
 
 Name: Sermon of Caine
@@ -27612,8 +27661,8 @@ Name: Shroud of Absence
 Cardtype: Action Modifier
 Discipline: Dominate & Obtenebration
 [dom][obt] +1 stealth.
-[DOM][OBT] As above, and this vampire can strike: combat ends during the first round of the resulting combat whenever this action is blocked.
-Artist: Brian LeBlanc;Francesc Grimalt;Brian LeBlanc
+[DOM][OBT] As above, and this vampire can strike: combat ends during the first round of the resulting combat {if} this action is blocked.
+Artist: Brian LeBlanc; Francesc Grimalt; Brian LeBlanc
 
 Name: Shroud of Night
 [Sabbat:C, SW:PL, Third:C, SP:PoS4]
@@ -27677,11 +27726,11 @@ Put this card on a Salubri you control. The Salubri with this card gets +1 inter
 Artist: Durwin Talon
 
 Name: The Signet of King Saul
-[AH:R2, Tenth:B]
+[AH:R2, Tenth:B, 25th:1]
 Cardtype: Equipment
 Cost: 1 pool
-Unique equipment.
-Vampires with capacity above 7 cannot attempt to block this minion.
+Unique.
+Vampires with capacity 8 or more cannot attempt to block the bearer.
 Artist: Michael Astrachan
 
 Name: Sigrid Bekker
@@ -27921,7 +27970,7 @@ Group: 5
 Capacity: 4
 Discipline: ani OBF
 Sabbat.
-Artist: Nicolas 'Dimple' Bigot
+Artist: Nicolas "Dimple" Bigot
 
 Name: Skullduggery
 [Anarchs:C2/PAB4]
@@ -28098,7 +28147,7 @@ Artist: Drew Tucker; Kieran Yanner
 Name: Smite
 [NoR:R]
 Cardtype: Combat
-Cost: 3 Conviction
+Cost: 3 conviction
 Virtue: Vengeance
 Strike: strength+1 aggravated ranged damage. Even if the strike is dodged, burn any electronic equipment (e.g., IR Goggles, Laptop Computer, or Phased Motion Detector) on either combatant.
 Artist: Heather Kreiter
@@ -28362,7 +28411,7 @@ Cardtype: Action
 Cost: 1 blood
 Discipline: Auspex
 +1 stealth action.
-[aus] Search your crypt for a younger vampire without Obfuscate [obf] and move them to your uncontrolled region (shuffle afterward).
+[aus] Search your crypt for a younger vampire without Obfuscate [obf]{, reveal them}, and move them to your uncontrolled region (shuffle afterward).
 [AUS] As above, but you can search for a younger vampire with up to one level of Obfuscate.
 Artist: Peter Bergting
 
@@ -28518,7 +28567,7 @@ Name: Spirit's Touch
 Cardtype: Reaction
 Discipline: Auspex
 [aus] +1 intercept.
-[AUS] As above, with 1 optional maneuver during the resulting combat whenever this vampire blocks.
+[AUS] As above, with 1 optional maneuver during the resulting combat {if} this vampire blocks.
 Artist: Amy Weber; Hannibal King; Brian LeBlanc
 
 Name: Spiritual Guidance
@@ -28526,7 +28575,7 @@ Name: Spiritual Guidance
 Cardtype: Combat
 Clan: Giovanni
 A vampire can play only one Spiritual Guidance each combat.
-Play a combat card from your ash heap as if from your hand. When that card would be burned, remove it from the game instead. 
+Play a combat card from your ash heap as if from your hand. When that card would be burned,{ instead} remove it from the game{}.
 Artist: Ginés Quiñonero
 
 Name: Spiritual Intervention
@@ -28599,13 +28648,13 @@ Discipline: Spiritus/Celerity
 Artist: Alexander Dunnigan
 
 Name: Stanislava
-[DS:V, Anarchs:PG]
+[DS:V, Anarchs:PG, 25th:4]
 Cardtype: Vampire
 Clan: Gangrel
 Group: 2
 Capacity: 11
 Discipline: ANI CEL DOM FOR PRO
-Camarilla Gangrel Inner Circle: Retainers employed by a minion opposing Stanislava lose their abilities until the end of combat. Allies cannot block Stanislava. +2 bleed.
+Camarilla Gangrel Inner Circle: Retainers employed by minions opposing Stanislava in combat lose their abilities. Allies cannot block her. +2 bleed.
 Artist: Max Shade Fellwalker
 
 Name: Staredown
@@ -28950,7 +28999,7 @@ Discipline: Celerity
 Artist: Steve Ellis
 
 Name: Styles Margs
-[Anthology:1]
+[Anthology:LARP1]
 Cardtype: Vampire
 Clan: Gangrel antitribu
 Group: 5
@@ -28987,7 +29036,7 @@ Name: Succubus Club
 [Jyhad:R, VTES:R, CE:R]
 Cardtype: Master
 Master: unique location.
-During your unlock phase, you may lock this card to trade with a Methuselah who agrees to trade. You may trade pool and cards from your hand and cards you control. The trade cannot result in either Methuselah have fewer cards in hand than his or her hand size. Any additional terms can be established, but none are enforced by the rules. {Added to the V:EKN banned list in 2005.}
+During your unlock phase, you may lock this card to trade with a Methuselah who agrees to trade. You may trade pool and cards from your hand and cards you control. The trade cannot result in either Methuselah have fewer cards in hand than his or her hand size. Any additional terms can be established, but none are enforced by the rules. {Added to the V:EKN banned list in 2005}
 Artist: Pete Venters; Julie Collins
 
 Name: Succulent Vitae
@@ -29038,8 +29087,8 @@ Name: Summon History
 Cardtype: Action
 Cost: X blood
 Discipline: Temporis
-[tem] Search your library (shuffle afterwards) and/or ash heap for an ally, retainer or equipment whose cost is X or less. Put that card in play (on this vampire and with starting life from the bank as needed).
-[TEM] Search your crypt (shuffle afterwards) and/or ash heap for a non-scarce vampire with capacity X or less and put that vampire in play (with no blood).
+[tem] Search your library (shuffle afterward) and/or ash heap for an ally, retainer or equipment whose cost is X or less and put that card in play, on this vampire and with life equal to its starting life if applicable.
+[TEM] Search your crypt (shuffle afterward) and/or ash heap for a non-scarce vampire with capacity X or less and put that vampire in play (with no blood).
 Artist: Andrew Hepworth
 
 Name: Summon Soul
@@ -29450,16 +29499,16 @@ Clan: Gangrel
 Group: 5
 Capacity: 7
 Discipline: for ANI NEC PRO
-Independent: You can discard a master card to have Talbot attempt to enter combat with any minion as a +1 stealth (D) action.
+Independent: You can discard a master card to have Talbot attempt to enter combat with a minion as a +1 stealth (D) action.
 Artist: Brian LeBlanc
 
 Name: Talbot's Chainsaw
-[Jyhad:R, VTES:R, CE:R, KoT:R]
+[Jyhad:R, VTES:R, CE:R, KoT:R, 25th:1]
 Cardtype: Equipment
 Cost: 3 pool
 Unique weapon.
-Strike: 3 damage. If bearer is ready during your unlock phase, a ready minion you control takes 3 unpreventable damage. Bearer cannot hunt. Bearer may enter combat with a minion controlled by another Methuselah as a +1 stealth (D) action. Bearer gets a press, only usable to continue combat on the first round, and may prevent up to 1 damage each combat.
-Artist: Jim Nelson; Tom Wänerstrand
+Strike: 3 damage. If the bearer is ready during your unlock phase, this weapon inflicts 3 unpreventable damage on a ready minion you control. The bearer cannot hunt. The bearer can enter combat with a minion as a +1 stealth (D) action. The bearer gets 1 press (mandatory), only usable to continue combat during the first round, and can prevent 1 damage each combat.
+Artist: Tom Wänerstrand; Jim Nelson
 
 Name: Talith
 [LotN:U/PR]
@@ -29518,14 +29567,14 @@ Independent: When in combat with a Salubri, Tanginé cannot strike except to dod
 Artist: James Stowe
 
 Name: Tangle Atropos' Hand
-[LoB:R]
+[LoB:R, Promo-20190614]
 Cardtype: Action Modifier
 Cost: 1 blood
 Discipline: Temporis/Potence
-Only usable when a minion is attempting to block.
-[pot] Cancel the action and unlock the acting minion. (The blocking minion is not locked.)
-[tem] As [pot] above, and take the action card, if any, back into your hand (discard afterward).
-[TEM] As [tem] above, and this vampire gets +1 stealth on his or her next action this turn.
+Only usable if a minion attempts to block.
+[pot] Cancel the action and unlock this vampire. (The action is not blocked. Do not lock the blocking minion.)
+[tem] As [pot] above, and take the action card, if any, back in your hand (discard down afterward).
+[TEM] As [tem] above, and this vampire gets +1 stealth on their next action this turn.
 Artist: Jeremy McHugh
 
 Name: Tansu Bekir
@@ -29554,7 +29603,7 @@ Group: 5
 Capacity: 6
 Discipline: cel POT PRE
 Camarilla Prince of San Diego.
-Artist: Heather Kreiter
+Artist: Heather V. Kreiter
 
 Name: Tara, The Hollow One
 AKA: Tara, The Hollow One (Mage)
@@ -29610,8 +29659,8 @@ Artist: Imaginary Friends Studios
 Name: Target Retainer
 [KoT:R/B1]
 Cardtype: Combat
-Aim. {Only usable as this minion chooses a strike.} A minion can play only one aim each strike.
-You can target a retainer on the opposing minion with this strike (instead of the opposing minion). Or you can target the opposing minion directly as usual, but if any damage from this strike is successfully inflicted, this strike inflicts +1 damage. The opposing minion can discard two combat cards [COMBAT] to cancel this card as it is played.
+Aim. Only usable as this minion chooses a strike. A minion can play only one aim each strike.
+You can target a retainer on the opposing minion with this strike (instead of the opposing minion). Or you can target the opposing minion directly as usual, but if any damage from this strike is successfully inflicted, this strike inflicts +1 damage. The opposing minion can discard two combat cards{} to cancel this card as it is played.
 Artist: Jeremy McHugh
 
 Name: Target Vitals
@@ -29619,7 +29668,7 @@ Name: Target Vitals
 Cardtype: Combat
 Aim. Only usable as this minion chooses a strike. A minion can play only one aim each strike.
 If any damage from this strike is successfully inflicted on the opposing minion, they take +2 damage from this strike, and they cannot press this round. They can discard two combat cards to cancel this card as it is played.
-Artist: Imaginary Friends Studios;Javier Santos;Imaginary Friends Studios
+Artist: Imaginary Friends Studios; Javier Santos; Imaginary Friends Studios
 
 Name: Tariq, The Silent
 [FN:U2]
@@ -29778,7 +29827,7 @@ Cardtype: Reaction
 Cost: 1 blood
 Discipline: Auspex
 [aus] +1 intercept.
-[AUS] Only usable when a minion is bleeding you, after blocks are declined. Lock this reacting vampire. Change the target of the bleed to another Methuselah other than the acting minion's controller (that Methuselah can attempt to block).
+[AUS] Only usable {if} a minion is bleeding you, after blocks are declined. Lock this reacting vampire. Change the target of the bleed to another Methuselah other than the acting minion's controller (that Methuselah can attempt to block).
 Artist: Edward Beard, Jr.; James Stowe
 
 Name: Telepathic Tracking
@@ -29787,7 +29836,7 @@ Cardtype: Combat
 Cost: 1 blood
 Discipline: Auspex
 [aus] Press, only usable to continue combat. If another round of combat occurs, this vampire gets 1 optional maneuver that round.
-[AUS] Only usable when both combatants are still ready and combat would end. Start a new round instead.
+[AUS] Only usable {if} both combatants are still ready and combat would end. {Instead,} start a new round{}.
 Artist: Mike Danza
 
 Name: Telepathic Vote Counting
@@ -29829,15 +29878,14 @@ Name: Temptation of Greater Power
 Cardtype: Master
 Cost: 3 pool
 Master. Requires a ready justicar.
-Choose a vampire. Methuselahs may bid pool for control of that vampire. The winner pays the bid to the blood bank and takes control. Methuselahs may be credited up to 5 pool on the bid: winner pays 1 pool toward his or her debt during his or her discard phase until the debt is repaid. Only 1 Temptation of Greater Power can be played in a game.
+Choose a vampire. Methuselahs may bid pool for control of that vampire. The winner pays the bid to the blood bank and takes control. Methuselahs may be credited up to 5 pool on the bid: winner pays 1 pool toward his or her debt during his or her discard phase until the debt is repaid. Only 1 Temptation of Greater Power can be played in a game. {Added to the V:EKN banned list in 2016}
 Artist: Christopher Rush; Brian LeBlanc
 
 Name: Tend the Flock
 [HttB:C/A2]
 Cardtype: Master
 Clan: Baali
-
-Choose a ready unlocked infernal Baali you control. Add 3 pool to a younger infernal vampire in your uncontrolled region.
+Choose a ready unlocked infernal Baali you control. Add 3 {blood} to a younger infernal vampire in your uncontrolled region.
 Artist: Paul Ballard
 
 Name: Tenebrous Form
@@ -30064,7 +30112,6 @@ Name: Thicker than Blood
 Cardtype: Master
 Clan: Blood Brother
 Cost: 2 pool
-
 Choose a ready Blood Brother you control. Move a unique Blood Brother of the same circle from your uncontrolled region to your ready region. Not usable if they would contest a card in play.
 Artist: Phil Wohr
 
@@ -30116,7 +30163,7 @@ Clan: Toreador
 Group: 4
 Capacity: 4
 Discipline: aus cel pre
-Camarilla primogen: After Thomas goes to torpor, burn 1 pool.
+Camarilla primogen: Burn 1 pool after Thomas goes to torpor.
 Artist: Ken Meyer, Jr.
 
 Name: Thomas Steed, The Angry
@@ -30347,7 +30394,7 @@ Clan: Brujah
 Group: 4
 Capacity: 6
 Discipline: CEL POT PRE
-Camarilla primogen: Your prey gets +1 hand size while they control a ready Sabbat vampire and Tomaine is ready.
+Camarilla primogen: {While Tomaine is ready and your prey controls a ready Sabbat vampire, you prey gets +1 hand size.}
 Artist: Veronica Jones
 
 Name: Tomb of Rameses III
@@ -30461,7 +30508,7 @@ Name: Torrent
 Cardtype: Combat
 Cost: 2 blood
 Discipline: Celerity
-[cel] Additional strike.
+[cel] Additional strike {(limited)}.
 [CEL] Strike: combat ends. If this vampire was blocked while performing an action, the action continues as if unblocked.
 Artist: John Bridges
 
@@ -30637,7 +30684,7 @@ Cardtype: Imbued
 Creed: Martyr
 Group: 4
 Life: 5
-Virtue: mar def
+Virtue: def mar
 Travis may move 2 blood from the blood bank to an imbued in your uncontrolled region as a +1 stealth action that costs 1 conviction [1 CONVICTION].
 Artist: Becky Jollensten
 
@@ -31072,7 +31119,7 @@ Clan: Toreador
 Group: 5
 Capacity: 4
 Discipline: pre AUS
-Camarilla: During a referendum, Tyler gets +1 vote after any Methuselah burns the Edge for a vote. He cannot block Nosferatu.
+Camarilla: In a referendum, Tyler gets +1 vote after any Methuselah burns the Edge for a vote. He cannot block Nosferatu.
 Artist: Ken Meyer, Jr.
 
 Name: Typhonic Beast
@@ -31167,13 +31214,13 @@ Laibon magaji: You may use a master phase action to search your library or ash h
 Artist: Leif Jones
 
 Name: Una
-[Gehenna:U]
+[Gehenna:U, 25th:1]
 Cardtype: Vampire
 Clan: Gangrel antitribu
 Group: 3
 Capacity: 9
 Discipline: dem ANI FOR PRE PRO
-Sabbat Archbishop of Dublin: Cards that require Fortitude [for] cost Una 1 less blood.
+Sabbat Archbishop of Dublin: Combat cards requiring Fortitude [for] cost Una 1 fewer blood.
 Artist: Christopher Shy
 
 Name: Unacceptable Appearance
@@ -31269,7 +31316,7 @@ Cardtype: Action
 Cost: 1 pool
 +1 stealth action. Requires a titled Sabbat vampire. Unique.
 Put this card in play with 3 counters. Once each action, a Sabbat vampire you control can burn 1 counter from this card to unlock and attempt to block with +1 intercept, even if intercept is not yet needed. Burn this card if it has no counters.
-Artist: Anna Evertsdotter;Ginés Quiñonero
+Artist: Anna Evertsdotter; Ginés Quiñonero
 
 Name: Under the Skin
 [BH:C/PTo2]
@@ -31383,9 +31430,9 @@ Cost: 2 pool
 Discipline: Daimoinon
 Burn Option
 +1 stealth action. Requires an infernal vampire. Unique.
-[dai] Put this card in play. This card can attempt to block a (D) action against you and is considered a 9-capacity infernal vampire with +2 intercept during that attempt; if successful, the acting minion takes 1 unpreventable aggravated damage, and this card is burned.
+[dai] Put this card in play. This card can attempt to block a (D) action against you {(or a card you control)} and is considered a 9-capacity infernal vampire with +2 intercept during that attempt; if successful, the acting minion takes 1 unpreventable {environmental} aggravated damage{} and this card is burned.
 [DAI] As above, and unlock this vampire.
-Artist: Brian LeBlanc;Ginés Quiñonero
+Artist: Brian LeBlanc; Ginés Quiñonero; Brian LeBlanc
 
 Name: Unleash the Hounds
 [LK:4]
@@ -31412,14 +31459,14 @@ Group: 5
 Capacity: 10
 Discipline: cel for AUS DEM OBF VIC
 Camarilla Malkavian Justicar: While Unmada is ready, you get +1 discard phase action at the start of your discard phase, and +1 hand size.
-Artist: Heather Kreiter
+Artist: Heather V. Kreiter
 
 Name: The Unmasking
 [Gehenna:R, KoT:R, Anthology:1, SP:PwN1]
 Cardtype: Event
 Gehenna. Do not replace until your next discard phase.
 Allies get +1 intercept against vampires.
-Artist: Steve Ellis;Javier Santos;Steve Ellis
+Artist: Steve Ellis; Javier Santos; Steve Ellis
 
 Name: The unnamed
 [HttB:U/A2]
@@ -31617,7 +31664,7 @@ Clan: Gangrel
 Group: 3
 Capacity: 4
 Discipline: for pre pro
-Independent: Non-unique. Valkyrie cannot perform (D) actions unless Brunhilde is ready. +1 strength.
+Independent: Valkyrie cannot perform (D) actions unless Brunhilde is ready. Non-unique. +1 strength.
 Artist: Ginés Quiñonero
 
 Name: Valois Sang, The Watcher
@@ -31859,7 +31906,7 @@ Clan: Baali
 Cost: 1 pool
 Burn Option
 Unique mage with 2 life. 1 strength, 2 bleed. Requires an infernal vampire.
-Veneficti has +1 stealth. He can steal a demon ally or burn a demon retainer as a (D) action. He cannot be the target of a (D) action by a vampire with capacity 6 or less or an ally.
+Veneficti has +1 stealth. He can steal a demon ally or burn a demon retainer as a (D) action. He cannot be the target of a (D) action by {an ally or a vampire with capacity 6 or less}.
 Artist: Paul Ballard
 
 Name: Venenation
@@ -31950,7 +31997,7 @@ Clan: Gargoyle
 Group: 5
 Capacity: 5
 Discipline: for POT VIS
-Camarilla: As Verbruch enters play, you can search your crypt for a Tremere, reveal them, and move them to your uncontrolled region (shuffle afterward). Flight [FLIGHT]. Tremere slave.
+Camarilla: As Verbruch enters play, you can search your crypt for any Tremere, reveal them, and move them to your uncontrolled region. Flight [FLIGHT]. Tremere slave.
 Artist: Ginés Quiñonero
 
 Name: Vermin Channel
@@ -32025,7 +32072,7 @@ Clan: Ventrue
 Group: 5
 Capacity: 6
 Discipline: for pre DOM
-Camarilla Prince of Atlanta: If a Golconda: Inner Peace you play is canceled, you can move that card from your ash heap to your library (shuffle afterward).
+Camarilla Prince of Atlanta: If a /Golconda: Inner Peace/ you play is canceled, you can move that card from your ash heap to your library (shuffle afterward).
 Artist: Matt Smith
 
 Name: Victor Gerard
@@ -32035,7 +32082,7 @@ Clan: Toreador
 Group: 2
 Capacity: 7
 Discipline: cel dom for obf AUS PRE
- Independent anarch: You and Victor can play cards requiring a Camarilla vampire as if Victor were a Camarilla vampire. While Victor is a Baron, you and Victor can play cards requiring a Prince as if Victor were a Prince.
+Independent anarch: You and Victor can play cards requiring a Camarilla vampire as if Victor were a Camarilla vampire. While Victor is a Baron, you and Victor can play cards requiring a Prince as if Victor were a Prince.
 Artist: Gábor Németh
 
 Name: Victor Pelletier
@@ -32135,7 +32182,7 @@ Independent: +1 stealth.
 Artist: Mathias Tapia
 
 Name: Villein
-[KoT:U/A2/B2, HttB:PGar2/PKia2/PSal2/PSam2, SP:DoF3/PoS4]
+[KoT:U/A2/B2, HttB:PGar2/PKia2/PSal2/PSam2, SP:DoF3/PoS4, 25th:5]
 Cardtype: Master
 Trifle.
 Put this card on a vampire you control who has any amount of blood and move 2 to 5 blood from that vampire to your pool. Minion Tap costs you 1 additional pool. Villein costs 1 additional pool to play on this vampire.
@@ -32205,7 +32252,7 @@ Clan: Blood Brother
 Group: 6
 Capacity: 3
 Discipline: san vic
-Sabbat: While Zizi is in your ready region, Viri gets +1 strength. Budapest circle. Sterile.
+Sabbat: While /Zizi/ is in your ready region, Viri gets +1 strength. Budapest circle. Sterile.
 Artist: Noora Hirvonen
 
 Name: Virolax Facility
@@ -32271,7 +32318,7 @@ Independent.
 Artist: Pete Venters
 
 Name: Vivienne Géroux
-[Anthology:1]
+[Anthology:LARP1]
 Cardtype: Ally
 Cost: 1 pool
 Unique ghoul with 2 life. 2 strength, 1 bleed. Requires an anarch.
@@ -32376,7 +32423,7 @@ Clan: Gangrel
 Group: 2
 Capacity: 7
 Discipline: for pre ANI POT PRO
- Independent anarch: Once each turn, an anarch vampire you control can unlock after successfully equipping with a vehicle from your hand.
+Independent anarch: Once each turn, an anarch vampire you control can unlock after successfully equipping with a vehicle from your hand.
 Artist: Riccardo Fabiani
 
 Name: Vulture's Buffet
@@ -32718,7 +32765,7 @@ During any Methuselah's unlock phase, you may look at the top card of that Methu
 Artist: Matt Mitchell
 
 Name: Weirich Waldburg
-[Anthology:1]
+[Anthology:LARP1]
 Cardtype: Vampire
 Clan: Ventrue
 Group: 3
@@ -33047,7 +33094,7 @@ Cardtype: Reaction
 Cost: 1 blood
 Discipline: Dementation
 [dem] Reduce a bleed against you by 2.
-[DEM] Only usable during a referendum. This vampire gets +4 votes against the referendum.
+[DEM] Only usable during the polling step of a political action. This vampire gets +4 votes against the referendum.
 Artist: John Bridges
 
 Name: Wynn
@@ -33071,14 +33118,14 @@ Independent: Xaviar has 2 votes (titled). He can prevent 1 damage each combat. O
 Artist: Kieran Yanner
 
 Name: Xaviar
-[TU:C]
+[TU:C, 25th:2]
 Cardtype: Vampire
 Clan: Gangrel
 Level: Advanced
 Group: 3
 Capacity: 10
 Discipline: aus cel pot ABO ANI FOR PRO
-Camarilla Gangrel Justicar: If a referendum called by Xaviar is successful, he can unlock at the end of the action.
+Camarilla Gangrel Justicar: You can unlock Xaviar after a referendum called by him passes.
 Artist: Carmen Cornet
 
 Name: Xendil Charmer
@@ -33166,15 +33213,15 @@ Sabbat. Black Hand Seraph: +1 bleed.
 Artist: James Stowe
 
 Name: Yazid Tamari
-[Promo-20090929]
+[Promo-20090929, Promo-20190804]
 Cardtype: Vampire
 Clan: Assamite
 Level: Advanced
 Group: 3
 Capacity: 8
 Discipline: ani dom obf CEL QUI
-Advanced, Sabbat. Black Hand: Yazid gets +1 stealth on (D) actions.
-[MERGED] Independent. Anarch.
+Sabbat: Yazid gets +1 stealth on (D) actions. Black Hand.
+[MERGED] Anarch.
 Artist: James Stowe
 
 Name: Year of Fortune
@@ -33261,16 +33308,6 @@ Discipline: FOR MEL PRE
 Sabbat: When Yseult plays a card that requires Melpominee [mel], you may draw an additional card. Discard afterward. Yseult cannot block vampires with capacity above 4.
 Artist: Lawrence Snelly
 
-Name: Yuri Kerezenski
-[Third:PTz2, SP:DoF1]
-Cardtype: Vampire
-Clan: Tzimisce
-Group: 4
-Capacity: 5
-Discipline: aus for vic ANI
-Sabbat bishop.
-Artist: Richard Thomas
-
 Name: Yuri, The Talon
 [Jyhad:V, VTES:V, Tenth:A]
 Cardtype: Vampire
@@ -33280,6 +33317,16 @@ Capacity: 4
 Discipline: cel pot pre
 Camarilla.
 Artist: Richard Kane Ferguson
+
+Name: Yuri Kerezenski
+[Third:PTz2, SP:DoF1]
+Cardtype: Vampire
+Clan: Tzimisce
+Group: 4
+Capacity: 5
+Discipline: aus for vic ANI
+Sabbat bishop.
+Artist: Richard Thomas
 
 Name: Yusuf, Scribe of Alamut
 [FN:U2]
@@ -33399,7 +33446,7 @@ Group: 5
 Capacity: 8
 Discipline: pro ANI OBF POT
 Camarilla primogen: If Zelios is ready, he can lock to pay the pool cost of a location with his blood instead. +1 strength.
-Artist: Sam Arraya
+Artist: Samuel Araya
 
 Name: Zephyr
 [TU:C, Anthology:4]
@@ -33438,10 +33485,9 @@ Put this card on this acting vampire and move 1 blood from the blood bank to thi
 Artist: Jim Nelson
 
 Name: Zillah's Valley
-[FN:C, BH:PTo2, LoB:PG2, KoT:C, SP:PoS2]
+[FN:C, BH:PTo2, LoB:PG2, KoT:C, SP:PoS2, 25th:4]
 Cardtype: Master
 Cost: 5 pool
-
 Add 4 blood to a vampire in your uncontrolled region with capacity 8 or more.
 Artist: Steve Prescott
 
@@ -33475,7 +33521,7 @@ Clan: Blood Brother
 Group: 6
 Capacity: 3
 Discipline: san vic
-Sabbat: If Viri is in your ready region, Zizi can lock to unlock another Blood Brother of the same circle. Budapest circle. Sterile.
+Sabbat: If /Viri/ is in your ready region, Zizi can lock to unlock another Blood Brother of the same circle. Budapest circle. Sterile.
 Artist: Noora Hirvonen
 
 Name: Zöe
