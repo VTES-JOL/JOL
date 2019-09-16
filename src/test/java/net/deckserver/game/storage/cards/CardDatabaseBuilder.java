@@ -52,7 +52,7 @@ public class CardDatabaseBuilder {
         List<SummaryCard> summaryCards = new ArrayList<>();
 
         assertThat(libraryCards.size(), is(2212));
-        assertThat(cryptCards.size(), is(1519));
+        assertThat(cryptCards.size(), is(1524));
 
         // Uncomment when Ke fixes cards
         //JsonNode amaranthNode = mapper.readTree(new URL("http://amaranth.vtes.co.nz/api/cards"));
