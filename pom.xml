@@ -13,8 +13,8 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <JOL_DATA>${basedir}/src/test/resources</JOL_DATA>
         <JOL_VERSION>${project.version}</JOL_VERSION>
-        <JOL_RECAPTCHA_KEY>***REMOVED***</JOL_RECAPTCHA_KEY>
-        <JOL_RECAPTCHA_SECRET>***REMOVED***</JOL_RECAPTCHA_SECRET>
+        <JOL_RECAPTCHA_KEY></JOL_RECAPTCHA_KEY>
+        <JOL_RECAPTCHA_SECRET></JOL_RECAPTCHA_SECRET>
     </properties>
 
     <dependencies>
