@@ -150,24 +150,30 @@ public class DeckserverRemote {
     public Map<String, Object> gameChat(String gamename, String chat) {
         String player = Utils.getPlayer(request);
         GameModel game = getModel(gamename);
-        String status = game.chat(player, chat);
         Map<String, Object> ret = UpdateFactory.getUpdate();
-        ret.put("showStatus", status);
+        // only process a command if the player is in the game
+        if (game.getPlayers().contains(player)) {
+            String status = game.chat(player, chat);
+            ret.put("showStatus", status);
+        }
         return ret;
     }
 
     public Map<String, Object> submitForm(String gamename, String phase, String command, String chat,
                                           String ping, String endTurn, String global, String text) {
-        phase = ne(phase);
-        command = ne(command);
-        chat = ne(chat);
-        ping = ne(ping);
-        endTurn = ne(endTurn);
         String player = Utils.getPlayer(request);
         GameModel game = getModel(gamename);
-        String status = game.submit(player, phase, command, chat, ping, endTurn, global, text);
         Map<String, Object> ret = UpdateFactory.getUpdate();
-        ret.put("showStatus", status);
+        // only process a command if the player is in the game
+        if (game.getPlayers().contains(player)) {
+            phase = ne(phase);
+            command = ne(command);
+            chat = ne(chat);
+            ping = ne(ping);
+            endTurn = ne(endTurn);
+            String status = game.submit(player, phase, command, chat, ping, endTurn, global, text);
+            ret.put("showStatus", status);
+        }
         return ret;
     }
 

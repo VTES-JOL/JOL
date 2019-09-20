@@ -16,12 +16,12 @@ var CLAN_CHARS = {
 var DISCIPLINE_CHARS = {
   ani: 'a', ANI: 'A', obe: 'b', OBE: 'B', cel: 'c', CEL: 'C',
   dom: 'd', DOM: 'D', dem: 'e', DEM: 'E', for: 'f', FOR: 'F',
-  san: 'g', SAN: 'G', thn: 'h', THN: 'H', vic: 'i', VIC: 'I',
+  san: 'g', SAN: 'G', thn: 'h', THN: 'H', vic: 'v', VIC: 'V',
   pro: 'j', PRO: 'J', chi: 'k', CHI: 'K', val: 'l', VAL: 'L',
   mel: 'm', MEL: 'M', nec: 'n', NEC: 'N', obf: 'o', OBF: 'O',
   pot: 'p', POT: 'P', qui: 'q', QUI: 'Q', pre: 'r', PRE: 'R',
   ser: 's', SER: 'S', tha: 't', THA: 'T', aus: 'u', AUS: 'U',
-  vis: 'v', VIS: 'V', abo: 'w', ABO: 'W', myt: 'x', MYT: 'X',
+  vis: 'i', VIS: 'I', abo: 'w', ABO: 'W', myt: 'x', MYT: 'X',
   dai: 'y', DAI: 'Y', spi: 'z', SPI: 'Z', obt: '*', OBT: '+',
   tem: '(', TEM: ')', str: ':', STR: ';', mal: '<', MAL: '>',
   FLIGHT: '='
