@@ -154,6 +154,7 @@ public class DeckserverRemote {
         // only process a command if the player is in the game
         if (game.getPlayers().contains(player)) {
             String status = game.chat(player, chat);
+            ret = UpdateFactory.getUpdate();
             ret.put("showStatus", status);
         }
         return ret;
@@ -172,6 +173,7 @@ public class DeckserverRemote {
             ping = ne(ping);
             endTurn = ne(endTurn);
             String status = game.submit(player, phase, command, chat, ping, endTurn, global, text);
+            ret = UpdateFactory.getUpdate();
             ret.put("showStatus", status);
         }
         return ret;
