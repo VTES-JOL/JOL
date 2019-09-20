@@ -326,6 +326,7 @@ public class JolGame {
 
     public void sendMsg(String player, String msg) {
         msg = truncateMsg(msg);
+        msg = ChatParser.sanitizeText(msg);
         msg = ChatParser.parseText(msg);
         addMessage("[" + player + "] " + msg);
     }
