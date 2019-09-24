@@ -59,7 +59,7 @@ public class ChatParser {
     }
 
     private static String generateCardLink(CardEntry card) {
-        return "<a class='card-name' title='" + card.getCardId() + "'>" + card.getName() + "</a>";
+        return "<a class='card-name' data-card-id='" + card.getCardId() + "'>" + card.getName() + "</a>";
     }
 
     public static String generateDisciplineLink(String discipline) {

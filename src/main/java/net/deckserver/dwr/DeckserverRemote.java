@@ -210,7 +210,7 @@ public class DeckserverRemote {
             }
             line.append(deck.getQuantity(card))
                 .append(" x ")
-                .append("<a class='card-name' title='")
+                .append("<a class='card-name' data-card-id='")
                 .append(card.getCardId())
                 .append("'>")
                 .append(card.getName())

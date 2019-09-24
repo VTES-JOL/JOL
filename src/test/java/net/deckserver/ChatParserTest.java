@@ -17,7 +17,7 @@ public class ChatParserTest {
 
         String modified = ChatParser.parseText(test);
 
-        assertEquals("<a class='card-name' title='km86'>Mata Hari</a> is awesome, and turning that into a tooltip would be quite handy", modified);
+        assertEquals("<a class='card-name' data-card-id='km86'>Mata Hari</a> is awesome, and turning that into a tooltip would be quite handy", modified);
 
         test = "Nothing interesting here";
 
@@ -27,7 +27,7 @@ public class ChatParserTest {
         test = "Multiple cards [Abactor] and also [Zip]";
         modified = ChatParser.parseText(test);
 
-        assertEquals("Multiple cards <a class='card-name' title='pr59'>Abactor</a> and also <a class='card-name' title='bh144'>Zip</a>", modified);
+        assertEquals("Multiple cards <a class='card-name' data-card-id='pr59'>Abactor</a> and also <a class='card-name' data-card-id='bh144'>Zip</a>", modified);
 
         test = "This [card not found] shouldn&#39;t work";
         modified = ChatParser.parseText(test);
@@ -36,11 +36,11 @@ public class ChatParserTest {
         test = "Multiple cards [ Abactor ] and also [Zip  ]";
         modified = ChatParser.parseText(test);
 
-        assertEquals("Multiple cards <a class='card-name' title='pr59'>Abactor</a> and also <a class='card-name' title='bh144'>Zip</a>", modified);
+        assertEquals("Multiple cards <a class='card-name' data-card-id='pr59'>Abactor</a> and also <a class='card-name' data-card-id='bh144'>Zip</a>", modified);
 
         test = "A link to [Cats' Guidance]";
         modified = ChatParser.parseText(test);
 
-        assertEquals("A link to <a class='card-name' title='jy74'>Cats' Guidance</a>", modified);
+        assertEquals("A link to <a class='card-name' data-card-id='jy74'>Cats' Guidance</a>", modified);
     }
 }

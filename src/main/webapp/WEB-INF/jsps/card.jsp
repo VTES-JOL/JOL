@@ -45,7 +45,7 @@
     <a data-coordinates="<%= coordinates %>" onclick="pickTarget(event)">XXXXXX</a>
 </c:if>
 <c:if test="${!p.hidden}">
-    <a class="card-name <%= typeClass %>" title="<%= p.getId() %>" data-card-id="<%= p.getId() %>" data-coordinates="<%= coordinates %>"
+    <a class="card-name <%= typeClass %>" data-card-id="<%= p.getId() %>" data-coordinates="<%= coordinates %>"
       <c:choose>
         <c:when test="${region == 'hand'}">
           onclick="showCardModal(event)"
