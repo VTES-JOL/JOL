@@ -656,6 +656,11 @@ function showHistory() {
 }
 
 function loadGame(data) {
+    //Reset on game change
+    if ($("#gameTitle").text() != data.name) {
+        $("#ping").empty();
+    }
+
     $("#gameTitle").text(data.name);
     if (!data.player) {
         $(".player-only").hide();
