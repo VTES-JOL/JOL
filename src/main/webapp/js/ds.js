@@ -703,15 +703,22 @@ function loadGame(data) {
     }
     if (data.ping !== null) {
         var pingSelect = $("#ping");
-        pingSelect.empty();
-        pingSelect.append(new Option("", ""));
+
+        //+1 for the empty option
+        if (pingSelect.children('option').length != data.ping.length + 1) {
+          pingSelect.empty();
+          pingSelect.append(new Option("", ""));
+          $.each(data.ping, function (index, value) {
+              var option = new Option(value, value);
+              pingSelect.append(option);
+          });
+        }
+
         $.each(data.ping, function (index, value) {
+            var option = pingSelect.children('option[value="' + value + '"]:first');
             var pinged = $.inArray(value, data.pinged) !== -1;
-            var option = new Option(value, value);
-            if (pinged) option.style.fontWeight = "bold";
-            if (pinged) option.style.fontStyle = "italic";
-            if (pinged) option.style.color = "red";
-            pingSelect.append(option);
+            option.removeClass('pinged');
+            if (pinged) option.addClass('pinged');
         });
     }
     if (data.turn !== null) {
@@ -726,18 +733,19 @@ function loadGame(data) {
         });
     }
     if (data.phases !== null) {
-        var phaseSelect = $("#phase");
-        var currentPhase = phaseSelect.val();
         $("#phaseCommand").show();
         $("#endCommand").show();
-        phaseSelect.empty();
-        $.each(data.phases, function (index, value) {
-            phase.append(new Option(value, value));
-        });
-        if (data.turnChanged) {
-            currentPhase = "Unlock";
+
+        var phaseSelect = $("#phase");
+        if (phaseSelect.children('option').length != data.phases.length) {
+          phaseSelect.empty();
+          $.each(data.phases, function (index, value) {
+              phase.append(new Option(value, value));
+          });
         }
-        phaseSelect.val(currentPhase);
+        if (data.turnChanged) {
+          phaseSelect.val("Unlock");
+        }
     } else {
         $("#phaseCommand").hide();
         $("#endCommand").hide();
@@ -760,6 +768,9 @@ function generateCardData(parent) {
         interactive: true,
         theme: 'light',
         onShow: function (instance) {
+            //HACK To workaround the "sticky" / duplicate popups
+            tippy.hideAll({ duration: 0 });
+
             instance.setContent("Loading...");
             var ref = $(instance.reference);
             var cardId = ref.data('card-id');
