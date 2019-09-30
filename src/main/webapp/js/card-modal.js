@@ -41,7 +41,6 @@ function showCardModal(event) {
   var handCoord = $(event.target).data('coordinates');
   $.get({
       url: "rest/api/cards/" + cardId, success: function(card) {
-        console.log(card);
         var modal = $('#cardModal');
         modal.data('hand-coord', handCoord);
         modal.data('do-not-replace', card.doNotReplace);
@@ -159,6 +158,8 @@ function playCardCommand(disciplines, target) {
   return 'play ' + handIndex
          + (disciplines ? ' @ ' + disciplines.join(',') : '')
          + (target == 'READY_REGION' ? ' ready' : '')
+         + (target == 'REMOVE_FROM_GAME' ? ' rfg' : '')
+         + (target == 'INACTIVE_REGION' ? ' inactive' : '')
          + (target == 'SELF' || target == 'SOMETHING' ? ' ' + modal.data('target') : '')
          + (doNotReplace ? '' : ' draw');
 }

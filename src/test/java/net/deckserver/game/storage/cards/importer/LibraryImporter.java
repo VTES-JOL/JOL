@@ -35,10 +35,14 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private Function<String, Boolean> burnOption = (text) -> text.equals("Y") || text.equalsIgnoreCase("Yes");
 
     private static final Pattern PUT_INTO_PLAY_PATTERN = Pattern.compile(".*[Pp]ut this card in(?:to)? play.*");
+    private static final Pattern PUT_INTO_UNCONTROLLED_PATTERN = Pattern.compile(".*[Pp]ut this card in(?:to)? play in your uncontrolled region.*");
     private static final Pattern PUT_ON_ACTING_PATTERN = Pattern.compile(".*[Pp]ut this card on the acting.*");
     private static final Pattern PUT_ON_SELF_PATTERN = Pattern.compile(".*[Pp]ut this card on this.*");
     private static final Pattern PUT_ON_SOMETHING_PATTERN = Pattern.compile(".*[Pp]ut this card on.*");
     private static final Pattern AS_ABOVE_PATTERN = Pattern.compile("As (\\[(?<disc>.*)\\])? ?above.*");
+    private static final Pattern REMOVE_FROM_GAME_PATTERN = Pattern.compile(".*[Rr]emove this card from the game.*");
+
+    private static final List<String> DISCIPLINES = Arrays.asList("ani", "obe", "cel", "dom", "dem", "for", "san", "thn", "vic", "pro", "chi", "val", "mel", "nec", "obf", "pot", "qui", "pre", "ser", "tha", "aus", "vis", "abo", "myt", "dai", "spi", "tem", "obt", "str", "mal", "flight");
 
     public LibraryImporter(Path dataPath) {
         super(dataPath);
@@ -129,12 +133,19 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                     .filter(d -> !d.equals(""))
                     .filter(d -> !d.equals(":")) //Death of the Drum
                     .collect(Collectors.toList());
-                mode.setDisciplines(disciplines);
-                mode.setText(disciplinesAndText[1]);
+
+                if (DISCIPLINES.contains(disciplines.get(0).toLowerCase())) {
+                    mode.setDisciplines(disciplines);
+                    mode.setText(disciplinesAndText[1]);
+                }
+                //Card type instead of discipline, e.g. Covincraft
+                else mode.setText(line);
             }
             else mode.setText(line);
 
-            if ((card.getType().stream().anyMatch("master"::equalsIgnoreCase)
+            if (PUT_INTO_UNCONTROLLED_PATTERN.matcher(mode.getText()).matches())
+                mode.setTarget(LibraryCardMode.Target.INACTIVE_REGION);
+            else if ((card.getType().stream().anyMatch("master"::equalsIgnoreCase)
                         && card.getPreamble() != null
                         && card.getPreamble().contains("location"))
                     || card.getType().stream().anyMatch("ally"::equalsIgnoreCase)
@@ -148,8 +159,9 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                         && PUT_ON_ACTING_PATTERN.matcher(mode.getText()).matches())
                     || PUT_ON_SELF_PATTERN.matcher(mode.getText()).matches())
                 mode.setTarget(LibraryCardMode.Target.SELF);
-            else if (PUT_ON_SOMETHING_PATTERN.matcher(mode.getText()).matches()
-                    || card.getType().stream().anyMatch("conviction"::equalsIgnoreCase))
+            else if (REMOVE_FROM_GAME_PATTERN.matcher(mode.getText()).matches())
+                mode.setTarget(LibraryCardMode.Target.REMOVE_FROM_GAME);
+            else if (PUT_ON_SOMETHING_PATTERN.matcher(mode.getText()).matches())
                 mode.setTarget(LibraryCardMode.Target.SOMETHING);
             else {
                 Matcher matcher = AS_ABOVE_PATTERN.matcher(mode.getText());

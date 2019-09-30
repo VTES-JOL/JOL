@@ -995,10 +995,16 @@ function callbackShowDecks(data) {
             gRow.cells[1].innerHTML = data.games[gIdx].name;
             gRow.cells[2].innerHTML = '<small>L' + data.games[gIdx].lib + ' C' + data.games[gIdx].crypt + ' G ' + data.games[gIdx].groups + "</small>";
         }
-        dwr.util.removeAllOptions('reggames');
-        dwr.util.removeAllOptions('regdecks');
-        dwr.util.addOptions('reggames', data.games, 'game', 'game');
-        dwr.util.addOptions('regdecks', data.decks.map(d => d.name));
+        var gameOptions = $('#reggames option').map(function() { return this.value; }).get().join();
+        var newGameOptions = data.games.map(g => g.game).join();
+        if (gameOptions != newGameOptions) {
+            dwr.util.removeAllOptions('reggames');
+            dwr.util.addOptions('reggames', data.games, 'game', 'game');
+        }
+        if ($('#regdecks option').length != data.decks.length) {
+            dwr.util.removeAllOptions('regdecks');
+            dwr.util.addOptions('regdecks', data.decks.map(d => d.name));
+        }
     }
 }
 

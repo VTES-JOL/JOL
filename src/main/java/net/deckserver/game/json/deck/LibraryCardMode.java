@@ -29,7 +29,15 @@ public class LibraryCardMode {
          * Used when a more specific parser for "Put this card on" is not
          * implemented.
          */
-        SOMETHING
+        SOMETHING,
+        /**
+         * Removed from game.
+         */
+        REMOVE_FROM_GAME,
+        /**
+         * Played to player's inactive/uncontrolled region.
+         */
+        INACTIVE_REGION
     }
 
     /**
