@@ -82,7 +82,8 @@ public class UpdateData {
             turn.getAction()
                     .forEach(action -> {
                         String text = action.getText();
-                        String newText = text.replaceAll("href='javascript:getCard\\((\".*?\")\\)';", "class='card-name' title=$1");
+                        String newText = text.replaceAll("href='javascript:getCard\\((\".*?\")\\)';", "class='card-name' data-card-id=$1")
+                            .replaceAll("class=['\"]card-name['\"] title=(['\"].*?['\"])", "class='card-name' data-card-id=$1");
                         action.setText(newText);
                     });
         });

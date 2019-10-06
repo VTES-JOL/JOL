@@ -113,7 +113,8 @@ public class AdminBean {
     }
 
     public synchronized void chat(String player, String message) {
-        String parsedMessage = ChatParser.parseText(message);
+        String sanitize = ChatParser.sanitizeText(message);
+        String parsedMessage = ChatParser.parseText(sanitize);
         ChatEntryBean chatEntryBean = new ChatEntryBean(player, parsedMessage);
         chats.add(chatEntryBean);
         if (chats.size() > CHAT_STORAGE) {

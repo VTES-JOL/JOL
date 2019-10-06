@@ -651,10 +651,16 @@ function showHistory() {
     $("#history").show();
     $("#notes").hide();
     $("#gameDeck").hide();
-    getHistory();
+    if ($("#historyOutput").html() == '')
+      getHistory();
 }
 
 function loadGame(data) {
+    //Reset on game change
+    if ($("#gameTitle").text() != data.name) {
+        $("#ping").empty();
+    }
+
     $("#gameTitle").text(data.name);
     if (!data.player) {
         $(".player-only").hide();
@@ -702,15 +708,22 @@ function loadGame(data) {
     }
     if (data.ping !== null) {
         var pingSelect = $("#ping");
-        pingSelect.empty();
-        pingSelect.append(new Option("", ""));
+
+        //+1 for the empty option
+        if (pingSelect.children('option').length != data.ping.length + 1) {
+          pingSelect.empty();
+          pingSelect.append(new Option("", ""));
+          $.each(data.ping, function (index, value) {
+              var option = new Option(value, value);
+              pingSelect.append(option);
+          });
+        }
+
         $.each(data.ping, function (index, value) {
+            var option = pingSelect.children('option[value="' + value + '"]:first');
             var pinged = $.inArray(value, data.pinged) !== -1;
-            var option = new Option(value, value);
-            if (pinged) option.style.fontWeight = "bold";
-            if (pinged) option.style.fontStyle = "italic";
-            if (pinged) option.style.color = "red";
-            pingSelect.append(option);
+            option.removeClass('pinged');
+            if (pinged) option.addClass('pinged');
         });
     }
     if (data.turn !== null) {
@@ -725,18 +738,19 @@ function loadGame(data) {
         });
     }
     if (data.phases !== null) {
-        var phaseSelect = $("#phase");
-        var currentPhase = phaseSelect.val();
         $("#phaseCommand").show();
         $("#endCommand").show();
-        phaseSelect.empty();
-        $.each(data.phases, function (index, value) {
-            phase.append(new Option(value, value));
-        });
-        if (data.turnChanged) {
-            currentPhase = "Unlock";
+
+        var phaseSelect = $("#phase");
+        if (phaseSelect.children('option').length != data.phases.length) {
+          phaseSelect.empty();
+          $.each(data.phases, function (index, value) {
+              phase.append(new Option(value, value));
+          });
         }
-        phaseSelect.val(currentPhase);
+        if (data.turnChanged) {
+          phaseSelect.val("Unlock");
+        }
     } else {
         $("#phaseCommand").hide();
         $("#endCommand").hide();
@@ -759,8 +773,17 @@ function generateCardData(parent) {
         interactive: true,
         theme: 'light',
         onShow: function (instance) {
+            //HACK To workaround the "sticky" / duplicate popups
+            tippy.hideAll({ duration: 0 });
+
             instance.setContent("Loading...");
-            var cardId = instance.reference.title;
+            var ref = $(instance.reference);
+            var cardId = ref.data('card-id');
+            if (cardId == null) { //Backwards compatibility in main chat
+              cardId = instance.reference.title;
+              ref.data('card-id', cardId);
+              instance.reference.removeAttribute('title');
+            }
             $.get({
                 url: "rest/card/" + cardId, success: function (data) {
                     instance.setContent(data);
@@ -972,10 +995,16 @@ function callbackShowDecks(data) {
             gRow.cells[1].innerHTML = data.games[gIdx].name;
             gRow.cells[2].innerHTML = '<small>L' + data.games[gIdx].lib + ' C' + data.games[gIdx].crypt + ' G ' + data.games[gIdx].groups + "</small>";
         }
-        dwr.util.removeAllOptions('reggames');
-        dwr.util.removeAllOptions('regdecks');
-        dwr.util.addOptions('reggames', data.games, 'game', 'game');
-        dwr.util.addOptions('regdecks', data.decks.map(d => d.name));
+        var gameOptions = $('#reggames option').map(function() { return this.value; }).get().join();
+        var newGameOptions = data.games.map(g => g.game).join();
+        if (gameOptions != newGameOptions) {
+            dwr.util.removeAllOptions('reggames');
+            dwr.util.addOptions('reggames', data.games, 'game', 'game');
+        }
+        if ($('#regdecks option').length != data.decks.length) {
+            dwr.util.removeAllOptions('regdecks');
+            dwr.util.addOptions('regdecks', data.decks.map(d => d.name));
+        }
     }
 }
 
@@ -993,7 +1022,7 @@ function callbackShowCards(data) {
         dwr.util.byId('showcards').deleteRow(0);
     }
     for (var i = 0; i < data.length; i++) {
-        dwr.util.byId('showcards').insertRow(0).insertCell(0).innerHTML = '<a class="card-name" title="' + data[i].id + '">' + data[i].name + '</a>';
+        dwr.util.byId('showcards').insertRow(0).insertCell(0).innerHTML = '<a class="card-name" data-card-id="' + data[i].id + '">' + data[i].name + '</a>';
     }
     generateCardData("#showcards");
 }

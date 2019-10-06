@@ -2,7 +2,7 @@
 var CLAN_CHARS = {
   abomination: 'A', arihmane: 'B', akunanse: 'C', assamite: 'D', baali: 'E',
   blood_brothers: 'F', brujah: 'G', brujah_antitribu: 'H', caitiff: 'I',
-  daughters_of_cacophony: 'J', follower_of_set: 'K', gangrel: 'L',
+  daughter_of_cacophony: 'J', follower_of_set: 'K', gangrel: 'L',
   gangrel_antitribu: 'M', gargoyle: 'N', giovanni: 'O', guruhi: 'P',
   harbingers_of_skulls: 'Q', ishtarri: 'R', kiasyd: 'S', lasombra: 'T',
   malkavian: 'U', malkavian_antitribu: 'V', nagaraja: 'W', nosferatu: 'X',
@@ -16,12 +16,12 @@ var CLAN_CHARS = {
 var DISCIPLINE_CHARS = {
   ani: 'a', ANI: 'A', obe: 'b', OBE: 'B', cel: 'c', CEL: 'C',
   dom: 'd', DOM: 'D', dem: 'e', DEM: 'E', for: 'f', FOR: 'F',
-  san: 'g', SAN: 'G', thn: 'h', THN: 'H', vic: 'i', VIC: 'I',
+  san: 'g', SAN: 'G', thn: 'h', THN: 'H', vic: 'v', VIC: 'V',
   pro: 'j', PRO: 'J', chi: 'k', CHI: 'K', val: 'l', VAL: 'L',
   mel: 'm', MEL: 'M', nec: 'n', NEC: 'N', obf: 'o', OBF: 'O',
   pot: 'p', POT: 'P', qui: 'q', QUI: 'Q', pre: 'r', PRE: 'R',
   ser: 's', SER: 'S', tha: 't', THA: 'T', aus: 'u', AUS: 'U',
-  vis: 'v', VIS: 'V', abo: 'w', ABO: 'W', myt: 'x', MYT: 'X',
+  vis: 'i', VIS: 'I', abo: 'w', ABO: 'W', myt: 'x', MYT: 'X',
   dai: 'y', DAI: 'Y', spi: 'z', SPI: 'Z', obt: '*', OBT: '+',
   tem: '(', TEM: ')', str: ':', STR: ';', mal: '<', MAL: '>',
   FLIGHT: '='
@@ -41,7 +41,6 @@ function showCardModal(event) {
   var handCoord = $(event.target).data('coordinates');
   $.get({
       url: "rest/api/cards/" + cardId, success: function(card) {
-        console.log(card);
         var modal = $('#cardModal');
         modal.data('hand-coord', handCoord);
         modal.data('do-not-replace', card.doNotReplace);
@@ -159,6 +158,8 @@ function playCardCommand(disciplines, target) {
   return 'play ' + handIndex
          + (disciplines ? ' @ ' + disciplines.join(',') : '')
          + (target == 'READY_REGION' ? ' ready' : '')
+         + (target == 'REMOVE_FROM_GAME' ? ' rfg' : '')
+         + (target == 'INACTIVE_REGION' ? ' inactive' : '')
          + (target == 'SELF' || target == 'SOMETHING' ? ' ' + modal.data('target') : '')
          + (doNotReplace ? '' : ' draw');
 }

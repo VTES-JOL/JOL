@@ -1999,7 +1999,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Remove this card from the game when it is played. If the action is successful, move one card played by this vampire during this action from your ash heap to your hand. Discard down to your hand size.",
-    "target" : null
+    "target" : "REMOVE_FROM_GAME"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -8794,12 +8794,12 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "ACTION" ],
-    "text" : "+1 stealth action. (D) Enter combat with a wraith ally or burn a wraith retainer.",
+    "disciplines" : null,
+    "text" : "[ACTION] +1 stealth action. (D) Enter combat with a wraith ally or burn a wraith retainer.",
     "target" : null
   }, {
-    "disciplines" : [ "REACTION" ],
-    "text" : "Only usable when a minion or retainer is being burned by any means except diablerie. Usable during combat. Usable by a locked Nagaraja. Remove that minion or retainer from the game instead. This Nagaraja gains 1 blood if the minion was a vampire or gains X+1 blood, where X is the blood or pool cost of that ally or retainer.",
+    "disciplines" : null,
+    "text" : "[REACTION] Only usable when a minion or retainer is being burned by any means except diablerie. Usable during combat. Usable by a locked Nagaraja. Remove that minion or retainer from the game instead. This Nagaraja gains 1 blood if the minion was a vampire or gains X+1 blood, where X is the blood or pool cost of that ally or retainer.",
     "target" : null
   } ],
   "doNotReplace" : false,
@@ -9206,12 +9206,12 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "REACTION" ],
-    "text" : "Reduce a bleed against you by 1.",
+    "disciplines" : null,
+    "text" : "[REACTION] Reduce a bleed against you by 1.",
     "target" : null
   }, {
-    "disciplines" : [ "REACTION" ],
-    "text" : "Only usable during a referendum. This Kiasyd gains 4 votes.",
+    "disciplines" : null,
+    "text" : "[REACTION] Only usable during a referendum. This Kiasyd gains 4 votes.",
     "target" : null
   } ],
   "doNotReplace" : false,
@@ -13130,12 +13130,12 @@
   "unique" : false,
   "preamble" : "Only usable during a referendum.",
   "modes" : [ {
-    "disciplines" : [ "ACTION" ],
-    "text" : "MODIFIER] Each ready Laibon Ravnos gets 2 additional votes.",
+    "disciplines" : null,
+    "text" : "[ACTION MODIFIER] Each ready Laibon Ravnos gets 2 additional votes.",
     "target" : null
   }, {
-    "disciplines" : [ "REACTION" ],
-    "text" : "Each ready Ravnos gets 1 additional vote.",
+    "disciplines" : null,
+    "text" : "[REACTION] Each ready Ravnos gets 1 additional vote.",
     "target" : null
   } ],
   "doNotReplace" : false,
@@ -31988,12 +31988,12 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "ACTION" ],
-    "text" : "+1 stealth action. (D) Put this card on a vampire. You still control this card. The vampire with this card cannot gain blood. Any blood he or she gains goes to the blood bank instead. Burn this card during your next unlock phase.",
+    "disciplines" : null,
+    "text" : "[ACTION] +1 stealth action. (D) Put this card on a vampire. You still control this card. The vampire with this card cannot gain blood. Any blood he or she gains goes to the blood bank instead. Burn this card during your next unlock phase.",
     "target" : "SOMETHING"
   }, {
-    "disciplines" : [ "COMBAT" ],
-    "text" : "As [ACTION] above, but put this card on the opposing vampire as a hand strike (at strength damage) instead.",
+    "disciplines" : null,
+    "text" : "[COMBAT] As [ACTION] above, but put this card on the opposing vampire as a hand strike (at strength damage) instead.",
     "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
@@ -33530,7 +33530,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Choose one or more Methuselahs. Successful referendum means each chosen Methuselah selects up to 3 library cards from his or her ash heap and shuffles them into his or her library. Remove this card from the game, even if the action is canceled or blocked or the referendum fails.",
-    "target" : null
+    "target" : "REMOVE_FROM_GAME"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -40173,7 +40173,7 @@
   }, {
     "disciplines" : [ "NEC" ],
     "text" : "Remove this card from the game and move up to 2 cards from your ash heap to your library. Shuffle your library afterward.",
-    "target" : null
+    "target" : "REMOVE_FROM_GAME"
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -45341,12 +45341,12 @@
   "crypt" : false,
   "unique" : false,
   "modes" : [ {
-    "disciplines" : [ "ACTION" ],
-    "text" : "MODIFIER][REACTION] Only usable during a referendum. Usable by a locked vampire. This Akunanse gets an additional vote in this referendum.",
+    "disciplines" : null,
+    "text" : "[ACTION MODIFIER][REACTION] Only usable during a referendum. Usable by a locked vampire. This Akunanse gets an additional vote in this referendum.",
     "target" : null
   }, {
-    "disciplines" : [ "ACTION" ],
-    "text" : "MODIFIER] Only usable when this Akunanse successfully hunts. He or she gains 1 additional blood.",
+    "disciplines" : null,
+    "text" : "[ACTION MODIFIER] Only usable when this Akunanse successfully hunts. He or she gains 1 additional blood.",
     "target" : null
   } ],
   "doNotReplace" : false,
@@ -45804,7 +45804,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card in play in your uncontrolled region with 3 training counters. During your unlock phase, burn a training counter from this card. You may burn counters from no more than two recruits each unlock phase. When the last training counter is burned, move this card to your ready region; it becomes a 3-capacity, non-unique Assamite with Celerity [cel], Obfuscate [obf], Potence [pot], Quietus [qui] and 3 blood who is Blood Cursed.",
-    "target" : "READY_REGION"
+    "target" : "INACTIVE_REGION"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,

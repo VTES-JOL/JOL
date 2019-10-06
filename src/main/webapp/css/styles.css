@@ -1226,3 +1226,9 @@ input[type=checkbox] {
 #targetPicker {
   background-color: rgba(0, 0, 0, .5);
 }
+
+option.pinged {
+  color: red;
+  font-style: italic;
+  font-weight: bold;
+}
