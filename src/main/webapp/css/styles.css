@@ -20,12 +20,6 @@ body * {
     display: inline;
 }
 
-.info-area {
-    background: white;
-    color: black;
-    border: 1px solid #aaaaaa;
-}
-
 td a {
     display: block;
     color: black;
@@ -52,12 +46,12 @@ td a:hover {
     line-height: 2em;
 }
 
-#gchatwin {
-    width: 100%;
-}
-
 #globalChatOutput {
     height: 20em;
+    width: 100%;
+    background: white;
+    color: black;
+    border: 1px solid #aaaaaa;
 }
 
 @media (min-width: 576px) {
@@ -475,7 +469,9 @@ td.layout {
 }
 
 .scrollable {
+    overflow-x: clip;
     overflow-y: scroll;
+    word-break: break-all;
 }
 
 textarea.game-notes {

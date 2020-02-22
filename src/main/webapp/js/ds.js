@@ -295,12 +295,12 @@ var TITLE = 'V:TES Online';
 
 // Invoked via processData()
 function navigate(data) {
-    $("#" + currentPage).hide();
-    $("#" + data.target).show();
     if (data.target !== currentPage) {
+        $("#" + currentPage).hide();
+        $("#" + data.target).show();
         ga('send', 'pageview', data.target);
+        currentPage = data.target;
     }
-    currentPage = data.target;
     game = data.game;
     $("#buttons").empty();
     $('#gameButtons').empty();
