@@ -26,6 +26,7 @@ public class SummaryCard {
     private Set<String> names;
     private boolean crypt;
     private boolean unique;
+    private boolean burnOption;
     private String group;
     private String sect;
 
@@ -80,6 +81,7 @@ public class SummaryCard {
         this.type = String.join("/", libraryCard.getType());
         this.crypt = false;
         this.unique = libraryCard.isUnique();
+        Optional.ofNullable(libraryCard.getBurnOption()).ifPresent(burnOption -> this.burnOption = burnOption);
 
         this.preamble = libraryCard.getPreamble();
         this.modes = libraryCard.getModes();

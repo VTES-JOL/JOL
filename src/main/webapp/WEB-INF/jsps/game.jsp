@@ -46,7 +46,10 @@
           <span class="card-clan"></span>
           <span class="card-cost">Costs 1 blood.</span>
         </div>
-        <p class="preamble mb-2">Only usable before range is chosen.</p>
+        <p class="mb-2">
+          <img class="burn-option" src="images/burn-option.png"></img>
+          <span class="preamble">Only usable before range is chosen.</span>
+        </p>
         <div class="card-modes"></div>
         <div class="templates d-none">
           <button type="button" class="card-mode btn btn-block btn-outline-dark mb-2" aria-pressed="false" data-toggle="button">

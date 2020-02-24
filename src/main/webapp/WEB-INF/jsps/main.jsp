@@ -45,11 +45,10 @@
 		</div>
 	</div>
 	<div id="globalchat" class="col-sm-6 p-sm-0" style="display: none;">
+    <div id="chatLog"></div>
 		<div>
 			<h4 class="header">Global Chat:</h4>
-			<div class="info-area" id="gchatwin">
-				<div id="globalChatOutput" class="scrollable side-padded"></div>
-			</div>
+			<div id="globalChatOutput" class="scrollable side-padded"></div>
 			<form id="globalChatForm" action="javascript:doGlobalChat();" autocomplete='off'>
 				<div id="newChatAlert">~ New messages ~</div>
 				<input type="text" maxlength="200" id="gchat" placeholder="Chat with players"/>
