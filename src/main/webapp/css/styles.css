@@ -1228,3 +1228,7 @@ option.pinged {
   font-style: italic;
   font-weight: bold;
 }
+
+#cardModal .burn-option {
+  width: 36px;
+}

@@ -21,6 +21,7 @@ public class CardSummary {
     private Set<String> names = new HashSet<>();
     private boolean crypt;
     private boolean unique;
+    private boolean burnOption;
     private String group;
     private String sect;
 

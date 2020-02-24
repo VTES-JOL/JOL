@@ -26,6 +26,7 @@ var DISCIPLINE_CHARS = {
   tem: '(', TEM: ')', str: ':', STR: ';', mal: '<', MAL: '>',
   FLIGHT: '='
 };
+var DISCIPLINES_NEEDING_SPACING_HACK = ['str', 'STR', 'mal', 'MAL'];
 function cardTypeCSSClass(cardType) {
   return cardType.toLowerCase().replace(' ', '_').replace('/', ' ');
 }
@@ -50,6 +51,7 @@ function showCardModal(event) {
           .removeClass()
           .addClass('card-type ' + cardTypeCSSClass(card.type));
         $('#cardModal .preamble').text(card.preamble);
+        $('#cardModal .burn-option').toggle(card.burnOption);
 
         var clanText = '';
         if (card.clans != null) {
@@ -87,11 +89,17 @@ function showCardModal(event) {
             button.data('disciplines', mode.disciplines);
             button.data('target', mode.target);
             var disciplineStr = '';
+            var hackDisciplineMargin = false;
             if (mode.disciplines != null) {
-              for (var d of mode.disciplines)
+              for (var d of mode.disciplines) {
                 disciplineStr += DISCIPLINE_CHARS[d];
+                if (DISCIPLINES_NEEDING_SPACING_HACK.includes(d))
+                  hackDisciplineMargin = true;
+              }
             }
-            button.children('.discipline').text(disciplineStr);
+            var disciplineSpan = button.children('.discipline');
+            disciplineSpan.text(disciplineStr);
+            disciplineSpan.css('margin-right', hackDisciplineMargin ? '15px' : '');
             button.children('.mode-text').text(mode.text);
             button.appendTo(modeContainer);
           }
