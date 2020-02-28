@@ -8,6 +8,8 @@
         </button>
       </div>
       <div class="modal-body">
+        <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('Bleed')">Bleed</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('Hunt')">Hunt</button>
         <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('Block?')">Block?</button>
         <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('No block')">No block</button>
         <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('Blocked')">Blocked</button>
@@ -28,7 +30,7 @@
 
 <div class="modal" id="cardModal" tabindex="-1" role="dialog" aria-labelledby="cardModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
-    <div class="modal-content loading" style="height:50vh;text-align:center">
+    <div class="modal-content loading" style="height:30vh;text-align:center">
       <h2 style="position:relative;top:43%">Loading...</h2>
     </div>
     <div class="modal-content loaded" style="text-align:center">
@@ -65,6 +67,24 @@
           <!--hr/>
           <button type="button" class="btn btn-outline-danger mb-1">Discard</button>
           <input type="checkbox" checked="checked">Replace</input-->
+        </div>
+        <div class="d-flex justify-content-center">
+          <button type="button" class="btn btn-outline-dark round-button mx-1"
+                  title="Previous card"
+                  onclick="previousCard();">&lt;</button>
+          <button type="button" class="btn btn-outline-danger round-button mx-1"
+                  title="Discard and replace"
+                  onclick="discard();">
+            <span class="round-button-big-font">&#10607;</span>
+          </button>
+          <button type="button" class="btn btn-outline-danger round-button mx-1"
+                  title="Discard"
+                  onclick="discard(false);">
+            <span class="round-button-big-font">&#10585;</span>
+          </button>
+          <button type="button" class="btn btn-outline-dark round-button mx-1"
+                  title="Next card"
+                  onclick="nextCard();">&gt;</button>
         </div>
       </div>
     </div>
