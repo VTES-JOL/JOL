@@ -1193,7 +1193,7 @@ input[type=checkbox] {
 /*Disable the standard hover behavior of bootstrap buttons.  On touch screens
   like mobile phones, it's more intuitive to show the dramatic change in style
   once the button is pressed, so save it for that.*/
-#cardModal .card-modes button:hover:not(.active) {
+#cardModal .modal-body button:hover:not(.active) {
   color: #343a40;
   background-color: #cdccdc;
   background-image: none;
@@ -1231,4 +1231,26 @@ option.pinged {
 
 #cardModal .burn-option {
   width: 36px;
+}
+
+#cardModal .round-button {
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  font-weight: bold;
+  font-size: 1.5rem;
+  white-space: normal;
+}
+
+#cardModal .round-button-big-font {
+  display: block;
+  font-size: 2rem;
+  margin-top: -7px;
+}
+
+@media (min-width: 576px) {
+  #cardModal .round-button-big-font {
+    font-size: 1.5rem;
+    margin-top: 0;
+  }
 }

@@ -196,6 +196,37 @@ function playCard(event) {
   $('#cardModal').modal('hide');
   return false;
 }
+function discard(replace = true) {
+  var modal = $('#cardModal');
+  var handIndex = modal.data('hand-coord');
+  var command = 'discard ' + handIndex + (replace ? ' draw' : '');
+  console.log(command);
+  DS.submitForm(
+      game, null, command, '', null, 'No',
+      $("#globalNotes").val(), $("#privateNotes").val(), {
+    callback: processData,
+    errorHandler: errorhandler
+  });
+  $('#cardModal').modal('hide');
+  return false;
+}
+function nextCard() {
+  var modal = $('#cardModal');
+  var nextIndex = modal.data('hand-coord') + 1;
+  var nextCard = $('#hand .card-list a[data-coordinates=' + nextIndex + ']')
+  if (nextCard.length == 0) nextCard = $('#hand .card-list a:first')
+  nextCard.click();
+  return false;
+}
+function previousCard() {
+  var modal = $('#cardModal');
+  var nextIndex = modal.data('hand-coord') - 1;
+  var nextCard = null;
+  if (nextIndex < 1) nextCard = $('#hand .card-list a:last');
+  else nextCard = $('#hand .card-list a[data-coordinates=' + nextIndex + ']')
+  nextCard.click();
+  return false;
+}
 function multiModeButtonClicked(event) {
   var button = $(event.target).closest('button');
   var delta = button.hasClass('active') ? -1 : 1;
