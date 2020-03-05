@@ -42,7 +42,7 @@ public class DeckTest {
 
     @BeforeClass
     public static void init() throws IOException {
-        Path cardPath = Paths.get("src/test/resources/cards/summary.json");
+        Path cardPath = Paths.get("src/test/resources/data/cards/summary.json");
         objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         JavaType summaryCollectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, SummaryCard.class);
@@ -57,7 +57,7 @@ public class DeckTest {
 
     @Test
     public void sampleDeck() throws Exception {
-        List<String> deckLines = Files.readAllLines(Paths.get("src/test/resources/player1/deck.txt"));
+        List<String> deckLines = Files.readAllLines(Paths.get("src/test/resources/data/player1/deck.txt"));
         Deck deck = parseDeck(deckLines);
         log.info("Parsed deck with " + deckLines.size() + " lines, got " + deck.getCryptCount() + " crypt cards, and " + deck.getLibraryCount() + " library cards. " + deck.getErrors().size() + " errors");
         objectMapper.writeValue(new File("target/deck.json"), deck);

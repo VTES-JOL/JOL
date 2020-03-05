@@ -25,7 +25,7 @@ public class CardDatabaseBuilder {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-        Path basePath = Paths.get("src/test/resources/cards");
+        Path basePath = Paths.get("src/test/resources/data/cards");
         Path keyPath = basePath.resolve("cardlist.properties");
         Path libraryPath = basePath.resolve("vteslib.csv");
         Path cryptPath = basePath.resolve("vtescrypt.csv");

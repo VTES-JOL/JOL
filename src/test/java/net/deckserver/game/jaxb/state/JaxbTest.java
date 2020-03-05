@@ -16,7 +16,7 @@ public class JaxbTest {
 
     @Test
     public void GameLoad() throws Exception {
-        File gameFile = new File("src/test/resources/game1/game.xml");
+        File gameFile = new File("src/test/resources/data/game1/game.xml");
         GameState gameState = FileUtils.loadGameState(gameFile);
         assertNotNull(gameState);
         List<String> players = gameState.getPlayer();
@@ -30,7 +30,7 @@ public class JaxbTest {
 
     @Test
     public void ActionsLoad() throws Exception {
-        File actionsFile = new File("src/test/resources/game1/actions.xml");
+        File actionsFile = new File("src/test/resources/data/game1/actions.xml");
         GameActions gameActions = FileUtils.loadGameActions(actionsFile);
         assertNotNull(gameActions);
         assertEquals("3", gameActions.getCounter());
