@@ -2,6 +2,7 @@ package net.deckserver.game.storage.cards.importer;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -21,11 +22,11 @@ public abstract class AbstractImporter<T> {
         this.dataPath = dataPath;
     }
 
-    public List<T> read() throws IOException {
+    public List<T> read() throws Exception {
         try (InputStream dataStream = Files.newInputStream(dataPath); InputStreamReader inputStreamReader = new InputStreamReader(dataStream); CSVReader csvReader = new CSVReaderBuilder(inputStreamReader).withSkipLines(1).build()) {
             List<String[]> lineData = csvReader.readAll();
             return lineData.stream().map(this::map).collect(Collectors.toList());
-        } catch (IOException e) {
+        } catch (IOException | CsvException e) {
             log.error("Exception reading library file: {}", e);
             throw e;
         }

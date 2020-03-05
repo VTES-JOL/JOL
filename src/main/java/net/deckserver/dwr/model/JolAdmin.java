@@ -51,7 +51,7 @@ public class JolAdmin {
     private static final String DISCORD_PING_CHANNEL_ID = System.getenv("DISCORD_PING_CHANNEL_ID");
 
     private static final Logger logger = getLogger(JolAdmin.class);
-    private static final JolAdmin INSTANCE = new JolAdmin(System.getProperty("JOL_DATA"));
+    private static final JolAdmin INSTANCE = new JolAdmin(System.getenv("JOL_DATA"));
     private final String dir;
     private final SystemInfo sysInfo;
     private final Map<String, GameInfo> games;

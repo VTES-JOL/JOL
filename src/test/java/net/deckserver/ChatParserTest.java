@@ -2,16 +2,21 @@ package net.deckserver;
 
 import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.game.storage.cards.CardSearch;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
 import static org.junit.Assert.assertEquals;
 
 public class ChatParserTest {
 
+    @Rule
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+
     @Test
     public void testParseCard() throws Exception {
 
-        System.setProperty("JOL_DATA", "src/test/resources");
+        environmentVariables.set("JOL_DATA", "src/test/resources");
 
         String test = "[Mata Hari] is awesome, and turning that into a tooltip would be quite handy";
 

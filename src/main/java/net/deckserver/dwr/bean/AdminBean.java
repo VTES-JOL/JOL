@@ -59,7 +59,7 @@ public class AdminBean {
                 }
             }
             actives = new ArrayList<>(activeSort);
-            chatPersistenceFile = new File(System.getProperty("JOL_DATA"), "chats.json");
+            chatPersistenceFile = new File(System.getenv("JOL_DATA"), "chats.json");
             if (Files.notExists(chatPersistenceFile.toPath())) {
                 Files.createFile(chatPersistenceFile.toPath());
             }

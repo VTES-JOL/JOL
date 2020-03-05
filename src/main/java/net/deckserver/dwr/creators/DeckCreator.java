@@ -7,9 +7,9 @@ import net.deckserver.dwr.bean.DeckSummaryBean;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
-import org.glassfish.jersey.internal.util.Base64;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,7 +38,8 @@ class DeckCreator implements ViewCreator {
         JolAdmin admin = JolAdmin.getInstance();
         String deckId = admin.getDeckId(this.player, deckName);
         String playerId = admin.getPlayerId(this.player);
-        String url = "rest/deck/" + Base64.encodeAsString(playerId + ":" + deckId);
+        String authHeader = playerId + ":" + deckId;
+        String url = "rest/deck/" + Base64.getEncoder().encodeToString(authHeader.getBytes());
         return new DeckInfoBean(url, deckName);
     }
 

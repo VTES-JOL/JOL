@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+  jol:
+    image: containous/whoami
+    networks:
+      - web
+    labels:
+      - "traefik.http.routers.jol.entrypoints=websecure"
+      - "traefik.http.routers.jol.rule=Host(`test.deckserver.net`)"
+      - "traefik.http.routers.jol.tls.certresolver=myresolver"
+networks:
+  web:
+    external: true

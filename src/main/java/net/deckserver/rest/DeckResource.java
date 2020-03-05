@@ -27,7 +27,7 @@ public class DeckResource {
             return "Invalid deck URL";
         }
         try {
-            java.nio.file.Path path = Paths.get(System.getProperty("JOL_DATA"), pathParts[0], pathParts[1] +".txt");
+            java.nio.file.Path path = Paths.get(System.getenv("JOL_DATA"), pathParts[0], pathParts[1] +".txt");
             if (!Files.exists(path)) {
                 return "Invalid deck URL";
             }

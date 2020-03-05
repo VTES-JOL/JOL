@@ -29,7 +29,7 @@ public class CardSearch {
     private Map<String, String> nameKeys = new HashMap<>();
     private Map<String, CardEntry> cardTable = new HashMap<>();
 
-    public static CardSearch INSTANCE = new CardSearch(Paths.get(System.getProperty("JOL_DATA")));
+    public static CardSearch INSTANCE = new CardSearch(Paths.get(System.getenv("JOL_DATA")));
 
     private CardSearch(Path cardPath) {
         cardPath = cardPath.resolve("cards").resolve("cards.json");
