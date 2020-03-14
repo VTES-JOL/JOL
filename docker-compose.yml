@@ -17,6 +17,23 @@ services:
     volumes:
       - test-data:/data
       - test-app:/usr/local/tomcat/webapps
+  prod:
+    image: tomcat:9-jdk13-openjdk-buster
+    container_name: prod
+    networks:
+      - web
+    labels:
+      - "traefik.http.routers.prod.entrypoints=websecure"
+      - "traefik.http.routers.prod.rule=Host(`www.deckserver.net`) || Host(`deckserver.net`)"
+      - "traefik.http.routers.prod.tls.certresolver=myresolver"
+    environment:
+      JOL_DATA: /data
+      JOL_VERSION: 1.2.0-prod
+      JOL_RECAPTCHA_KEY: ***REMOVED***
+      JOL_RECAPTCHA_SECRET: ***REMOVED***
+    volumes:
+      - prod-data:/data
+      - prod-app:/usr/local/tomcat/webapps
 networks:
   web:
     external: true
@@ -24,4 +41,8 @@ volumes:
   test-data:
     external: true
   test-app:
+    external: true
+  prod-data:
+    external: true
+  prod-app:
     external: true
