@@ -31,6 +31,9 @@ services:
       JOL_VERSION: 1.2.0-prod
       JOL_RECAPTCHA_KEY: ***REMOVED***
       JOL_RECAPTCHA_SECRET: ***REMOVED***
+      DISCORD_API_VERSION: 6
+      DISCORD_BOT_TOKEN: ***REMOVED***
+      DISCORD_PING_CHANNEL_ID: 455542605535510529
     volumes:
       - prod-data:/data
       - prod-app:/usr/local/tomcat/webapps
