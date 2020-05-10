@@ -38,7 +38,7 @@ public class CardDatabaseBuilder {
         final Set<String> remainingKeys;
         try (FileReader keyReader = new FileReader(keyPath.toFile())) {
             keyProperties.load(keyReader);
-            remainingKeys = keyProperties.stringPropertyNames();
+            remainingKeys = new HashSet<>(keyProperties.stringPropertyNames());
             for (String key : remainingKeys) {
                 keys.put(keyProperties.getProperty(key), key);
             }
@@ -52,7 +52,7 @@ public class CardDatabaseBuilder {
         List<SummaryCard> summaryCards = new ArrayList<>();
 
         assertThat(libraryCards.size(), is(2212));
-        assertThat(cryptCards.size(), is(1524));
+        assertThat(cryptCards.size(), is(1526));
 
         // Uncomment when Ke fixes cards
         //JsonNode amaranthNode = mapper.readTree(new URL("http://amaranth.vtes.co.nz/api/cards"));

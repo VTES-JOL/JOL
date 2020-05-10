@@ -62,4 +62,12 @@
   "timestamp" : "2019-03-20T13:47:58+10:00",
   "player" : "Player1",
   "message" : "<span class='discipline flight'></span>"
+}, {
+  "timestamp" : "2020-05-06T03:40:23Z",
+  "player" : "Player1",
+  "message" : "<a class='card-name' data-card-id='pro5'>Bituin</a>"
+}, {
+  "timestamp" : "2020-05-06T03:40:46Z",
+  "player" : "Player1",
+  "message" : "<a class='card-name' data-card-id='pro6'>Leumeah</a>"
 } ]
