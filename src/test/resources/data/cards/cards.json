@@ -19233,7 +19233,7 @@
     "target" : null
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : true
 }, {
   "id" : "100869",
   "jolId" : "pr72",
@@ -21121,7 +21121,7 @@
     "target" : null
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : true
 }, {
   "id" : "100953",
   "jolId" : "nr24",
@@ -25412,7 +25412,7 @@
     "target" : null
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : true
 }, {
   "id" : "101148",
   "jolId" : "ln91",
@@ -26551,7 +26551,7 @@
     "target" : null
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : true
 }, {
   "id" : "101200",
   "jolId" : "ah105",
@@ -28407,7 +28407,7 @@
     "target" : null
   } ],
   "doNotReplace" : false,
-  "multiMode" : false
+  "multiMode" : true
 }, {
   "id" : "101283",
   "jolId" : "jy273",

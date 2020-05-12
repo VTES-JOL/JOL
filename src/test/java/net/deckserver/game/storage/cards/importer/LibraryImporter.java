@@ -96,7 +96,9 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
             String p = preamble.toLowerCase();
             if (p.contains("unique")) card.setUnique(true);
             if (p.contains("do not replace")) card.setDoNotReplace(true);
-            if (p.contains("more than one discipline can be used when playing this card")) card.setMultiMode(true);
+            if (p.contains("more than one discipline can be used when playing this card")
+                || p.contains("more than one discipline can be used to play this card"))
+                card.setMultiMode(true);
         }
         setModes(card, lines);
         return card;
