@@ -28,9 +28,10 @@ services:
       - "traefik.http.routers.prod.tls.certresolver=myresolver"
     environment:
       JOL_DATA: /data
-      JOL_VERSION: 1.2.0-prod
+      JOL_VERSION: 14-May-2020
       JOL_RECAPTCHA_KEY: ***REMOVED***
       JOL_RECAPTCHA_SECRET: ***REMOVED***
+      _JAVA_OPTIONS: -Djava.security.egd=file:/dev/./urandom
       DISCORD_API_VERSION: 6
       DISCORD_BOT_TOKEN: ***REMOVED***
       DISCORD_PING_CHANNEL_ID: 455542605535510529
