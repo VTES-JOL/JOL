@@ -11,11 +11,11 @@ class GameCreator implements ViewCreator {
         return "loadGame";
     }
 
-    public Object createData(AdminBean abean, PlayerModel model) {
-        String name = model.getCurrentGame();
+    public Object createData(AdminBean abean, PlayerModel player) {
+        String name = player.getCurrentGame();
         GameModel game = abean.getGameModel(name);
-        GameView gview = game.getView(model.getPlayer());
-        model.changeGame(name);
+        GameView gview = game.getView(player.getPlayer());
+        player.changeGame(name);
         return gview.create();
     }
 

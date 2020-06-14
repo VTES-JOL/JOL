@@ -667,8 +667,9 @@ function loadGame(data) {
     } else {
         $(".player-only").show();
     }
+    var gameLog = $("#gameChatOutput");
     if (data.resetChat) {
-        $("#gameChatOutput").empty();
+        gameLog.empty();
         $("#historyOutput").empty();
         $("#gameDeckOutput").empty();
         $("#globalNotes").empty();
@@ -702,10 +703,19 @@ function loadGame(data) {
     if (data.label !== null) {
         $("#gameLabel").text(data.label);
     }
-    if (data.refresh > 0) {
-        if (refresher) clearTimeout(refresher);
-        refresher = setTimeout("refreshState(false)", data.refresh);
+    var fetchFullLog = false;
+    if (data.logLength !== null) {
+        var myLogLength = gameLog.children().length
+            + (data.turn == null ? 0 : data.turn.length);
+        fetchFullLog = myLogLength < data.logLength;
     }
+    //If we're missing any messages from the log, skip adding this batch and
+    //get a full refresh from server to prevent new messages appearing in the
+    //past, where they are likely to be missed.
+    if (data.turn !== null && !fetchFullLog) {
+        renderGameChat(data.turn);
+    }
+
     if (data.ping !== null) {
         var pingSelect = $("#ping");
 
@@ -725,9 +735,6 @@ function loadGame(data) {
             option.removeClass('pinged');
             if (pinged) option.addClass('pinged');
         });
-    }
-    if (data.turn !== null) {
-        renderGameChat(data.turn);
     }
     if (data.turns !== null) {
         var turnSelect = $("#turns");
@@ -761,6 +768,22 @@ function loadGame(data) {
         }
     }
     generateCardData("#game");
+
+    if (data.refresh > 0 || fetchFullLog) {
+        if (refresher) clearTimeout(refresher);
+
+        //If we're missing anything from the log, fetch the whole thing from
+        //server immediately
+        var timeout = data.refresh;
+        if (fetchFullLog) {
+            console.log('Client log missing lines (has '
+                + gameLog.children().length + '/' + data.logLength
+                + '); requesting full refresh');
+            gameLog.empty();
+            timeout = 0;
+        }
+        refresher = setTimeout("refreshState(" + fetchFullLog + ")", timeout);
+    }
 }
 
 function generateCardData(parent) {

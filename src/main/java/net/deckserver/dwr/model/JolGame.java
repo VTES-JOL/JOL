@@ -616,8 +616,18 @@ public class JolGame {
         return OffsetDateTime.now().format(SIMPLE_FORMAT);
     }
 
+    /**
+    * Return actions for the given turn.
+    */
     public GameAction[] getActions(String turn) {
         return actions.getActions(turn);
+    }
+
+    /**
+    * Return actions for the current turn.
+    */
+    public GameAction[] getActions() {
+        return getActions(getCurrentTurn());
     }
 
     public String[] getTurns() {

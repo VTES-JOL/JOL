@@ -143,12 +143,16 @@ public class Utils {
         return c.stream().mapToInt(i -> i).sum();
     }
 
-    public static int calc(OffsetDateTime from) {
-        OffsetDateTime to = OffsetDateTime.now();
-        long interval = Duration.between(from, to).getSeconds();
-        if (interval < 10000) return 5000;
-        if (interval < 60000) return 10000;
-        if (interval < 300000) return 30000;
+    /**
+    * Returns how long in milliseconds the client should wait before calling
+    * back for a refresh
+    */
+    public static int getRefershInterval(OffsetDateTime lastChanged) {
+        OffsetDateTime now = OffsetDateTime.now();
+        long interval = Duration.between(lastChanged, now).getSeconds();
+        if (interval < 60) return 5000;
+        if (interval < 180) return 10000;
+        if (interval < 300) return 30000;
         return 60000;
     }
 }

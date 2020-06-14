@@ -44,9 +44,11 @@ public class GameBean {
 
     private String name;
 
+    private int logLength;
+
     public GameBean(boolean isPlayer, boolean isAdmin, boolean isJudge, int refresh, String hand, String global, String text,
                     String label, boolean resetChat, boolean turnChanged, String[] turn, String[] turns, String state, String[] phases,
-                    List<String> ping, String[] collapsed, String stamp, List<String> pinged, String name) {
+                    List<String> ping, String[] collapsed, String stamp, List<String> pinged, String name, int logLength) {
         this(ping, refresh);
         this.player = isPlayer;
         this.admin = isAdmin;
@@ -65,6 +67,7 @@ public class GameBean {
         this.stamp = stamp;
         this.pinged = pinged;
         this.name = name;
+        this.logLength = logLength;
     }
 
     public GameBean(List<String> ping, int refresh) {
@@ -148,6 +151,10 @@ public class GameBean {
         return name;
     }
 
+    public int getLogLength() {
+        return logLength;
+    }
+
     @Override
     public String toString() {
         return "GameBean{" +
@@ -163,6 +170,7 @@ public class GameBean {
                 ", turnChanged=" + turnChanged +
                 ", player=" + player +
                 ", stamp='" + stamp + '\'' +
+                ", logLength='" + logLength + '\'' +
                 '}';
     }
 }

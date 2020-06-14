@@ -76,7 +76,7 @@ public class GameView {
             admin.recordPlayerAccess(player, name);
         }
 
-        int refresh = Utils.calc(admin.getGameTimeStamp(name));
+        int refresh = Utils.getRefershInterval(admin.getGameTimeStamp(name));
 
         List<String> ping;
         List<String> pinged;
@@ -161,9 +161,10 @@ public class GameView {
         boolean tc = turnChanged;
         clearAccess();
         String stamp = JolAdmin.getDate();
+        int logLength = game.getActions().length;
         return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, global, text, label,
                 chatReset, tc, turn, turns, state, phases, ping,
-                collapsed, stamp, pinged, name);
+                collapsed, stamp, pinged, name, logLength);
     }
 
     public synchronized void clearAccess() {
@@ -231,6 +232,7 @@ public class GameView {
 
     public void reset() {
         reset(true);
+        resetChat = true;
     }
 
 }

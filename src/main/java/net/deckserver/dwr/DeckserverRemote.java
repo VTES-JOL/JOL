@@ -164,18 +164,20 @@ public class DeckserverRemote {
                                           String ping, String endTurn, String global, String text) {
         String player = Utils.getPlayer(request);
         GameModel game = getModel(gamename);
-        Map<String, Object> ret = UpdateFactory.getUpdate();
         // only process a command if the player is in the game
-        if (game.getPlayers().contains(player)) {
+        boolean isPlaying = game.getPlayers().contains(player);
+        String status = null;
+        if (isPlaying) {
             phase = ne(phase);
             command = ne(command);
             chat = ne(chat);
             ping = ne(ping);
             endTurn = ne(endTurn);
-            String status = game.submit(player, phase, command, chat, ping, endTurn, global, text);
-            ret = UpdateFactory.getUpdate();
-            ret.put("showStatus", status);
+            status = game.submit(player, phase, command, chat, ping, endTurn, global, text);
         }
+        Map<String, Object> ret = UpdateFactory.getUpdate();
+        if (isPlaying)
+            ret.put("showStatus", status);
         return ret;
     }
 

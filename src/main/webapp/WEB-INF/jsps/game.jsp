@@ -134,8 +134,8 @@
                     <div class="form-group form-row mb-1">
                         <label for="command" class="col-4 col-form-label col-form-label-sm">Command:</label>
                         <div class="col-8">
-                            <input name="command" type="text" id="command" class="form-control form-control-sm"
-                                   maxlength="100"/>
+                            <input name="command" type="text" id="command" class="form-control form-control-sm" maxlength="100"
+                                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
                         </div>
                     </div>
                     <div class="form-group form-row mb-1">

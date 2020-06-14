@@ -29,13 +29,13 @@ public class UpdateFactory {
 
     public static Map<String, Object> getUpdate() {
         AdminBean abean = AdminBean.INSTANCE;
-        PlayerModel model = Utils.getPlayerModel(WebContextFactory.get().getHttpServletRequest(), abean);
-        abean.recordAccess(model);
-        List<String> views = Arrays.asList(model.getView(), "nav", "status");
+        PlayerModel player = Utils.getPlayerModel(WebContextFactory.get().getHttpServletRequest(), abean);
+        abean.recordAccess(player);
+        List<String> views = Arrays.asList(player.getView(), "nav", "status");
         return views.stream()
                 .map(UpdateFactory::getView)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toMap(ViewCreator::getFunction, v -> v.createData(abean, model)));
+                .collect(Collectors.toMap(ViewCreator::getFunction, v -> v.createData(abean, player)));
     }
 
 }
