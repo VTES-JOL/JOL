@@ -232,7 +232,9 @@ public class GameView {
 
     public void reset() {
         reset(true);
+        //Force client to refresh all game data
         resetChat = true;
+        globalChanged = phaseChanged = stateChanged = turnChanged = true;
     }
 
 }

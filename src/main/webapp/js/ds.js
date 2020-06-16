@@ -779,7 +779,6 @@ function loadGame(data) {
             console.log('Client log missing lines (has '
                 + gameLog.children().length + '/' + data.logLength
                 + '); requesting full refresh');
-            gameLog.empty();
             timeout = 0;
         }
         refresher = setTimeout("refreshState(" + fetchFullLog + ")", timeout);
