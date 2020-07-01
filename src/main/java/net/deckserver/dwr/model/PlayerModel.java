@@ -114,6 +114,13 @@ public class PlayerModel implements Comparable {
         return JolAdmin.getInstance().isSuperUser(player);
     }
 
+    /**
+    * Can this user promote others?
+    **/
+    public boolean canPromote() {
+        return isSuperUser();
+    }
+
     public boolean hasChats() {
         return !chats.isEmpty();
     }

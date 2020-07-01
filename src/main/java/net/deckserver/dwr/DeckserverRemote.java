@@ -271,13 +271,26 @@ public class DeckserverRemote {
     }
 
     public Map<String, Object> removeRole(String player, String role) {
-        //logger.info("Removing {} role from {}", role, player);
-        //JolAdmin.getInstance().setRole(player, role, false);
+        PlayerModel user = getPlayer();
+        if (user.canPromote()) {
+            JolAdmin.getInstance().setRole(player, role, false);
+            logger.info("{} removed {} from role '{}'", user.getPlayer(), player, role);
+        } else {
+            logger.warn("Unauthorized role change attempt by {} ({} -{})",
+                user.getPlayer(), player, role);
+        }
         return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> addRole(String player, String role) {
-        //JolAdmin.getInstance().setRole(player, role, true);
+        PlayerModel user = getPlayer();
+        if (user.canPromote()) {
+            logger.info("{} added {} to role '{}'", user.getPlayer(), player, role);
+            JolAdmin.getInstance().setRole(player, role, true);
+        } else {
+            logger.warn("Unauthorized role change attempt by {} ({} +{})",
+                user.getPlayer(), player, role);
+        }
         return UpdateFactory.getUpdate();
     }
 
