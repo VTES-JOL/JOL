@@ -18,7 +18,7 @@
 				<div class="col">
 					<input type="text" name="discordID" id="discordID" class="form-control"/>
 					<span class="form-text text-muted">
-						<a target="_blank" href="https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-">This article</a>
+						<a target="_blank" href="https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-">This article</a>
 						explains how to get your user ID from Discord.
 					</span>
 				</div>

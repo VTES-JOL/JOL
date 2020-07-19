@@ -273,7 +273,7 @@ public class JolAdmin {
         if (player != null
                 && player.getDiscordID() != null
                 && player.receivesDiscordPing()) {
-            Unirest.post("https://discordapp.com/api/v{api-version}/channels/{channel-id}/messages")
+            Unirest.post("https://discord.com/api/v{api-version}/channels/{channel-id}/messages")
                     .routeParam("api-version", DISCORD_API_VERSION)
                     .routeParam("channel-id", DISCORD_PING_CHANNEL_ID)
                     .header("Content-type", "application/json")
