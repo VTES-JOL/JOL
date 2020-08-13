@@ -122,7 +122,7 @@ public class GameModel implements Comparable {
                 }
                 admin.clearPing(player, name);
             }
-            if ((game.getActivePlayer().equals(player) || admin.getOwner(game.getName()).equals(player)) && "Yes".equalsIgnoreCase(endTurn)) {
+            if (game.getActivePlayer().equals(player) && "Yes".equalsIgnoreCase(endTurn)) {
                 game.newTurn();
                 resetChats();
                 idx = 0; // reset the current action index for the new turn.
