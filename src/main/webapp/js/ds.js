@@ -571,6 +571,7 @@ function doShowDeck() {
         DS.gameDeck(game, {callback: callbackShowGameDeck, errorHandler: errorhandler});
 }
 
+var lastGlobal = "";
 function doSubmit() {
     var phaseSelect = $("#phase");
     var commandInput = $("#command");
@@ -589,6 +590,7 @@ function doSubmit() {
     var text = privateNotes.val();
     phase = phase === "" ? null : phase;
     ping = ping === "" ? null : ping;
+    if (global == lastGlobal) global = null;
     commandInput.val("");
     chatInput.val("");
     pingSelect.val("");
@@ -696,6 +698,7 @@ function loadGame(data) {
     }
     if (data.global !== null) {
         $("#globalNotes").val(data.global);
+        lastGlobal = data.global;
     }
     if (data.text !== null) {
         $("#privateNotes").val(data.text);

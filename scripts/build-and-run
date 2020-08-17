@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+mvn package && docker-compose -f local-docker-compose.yml up

@@ -19,13 +19,17 @@ public class PlayerModel implements Comparable {
     private String tmpDeck;
     private String tmpDeckName;
     private Collection<String> removedGames = new ArrayList<>(2);
-    private Collection<String> changedGames = new ArrayList<>();
+    private Collection<String> changedGames = new HashSet<>();
 
     public PlayerModel(AdminBean abean, String name, List<ChatEntryBean> chatin) {
         logger.trace("Creating new Player model for {}", name);
         this.player = name;
         setView("main");
-        changedGames.addAll(abean.getActiveGames().stream().map(GameModel::getName).collect(Collectors.toList()));
+        changedGames.addAll(
+            abean.getActiveGames().stream()
+                .filter(g -> g.isOpen() || g.getPlayers().contains(player))
+                .map(GameModel::getName)
+                .collect(Collectors.toList()));
         chats.addAll(chatin);
     }
 

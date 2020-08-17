@@ -92,8 +92,10 @@ public class GameModel implements Comparable {
             if (global != null) {
                 if (global.length() > 800)
                     global = global.substring(0, 799);
-                game.setGlobalText(global);
-                globalChanged = true;
+                if (!global.equals(game.getGlobalText())) {
+                    game.setGlobalText(global);
+                    globalChanged = true;
+                }
             }
             if (text != null) {
                 if (text.length() > 800)
@@ -131,10 +133,10 @@ public class GameModel implements Comparable {
                 regen();
             }
             addChats(idx);
-            if (stateChanged || phaseChanged || chatChanged || pingChanged || globalChanged) {
+            if (stateChanged || phaseChanged || chatChanged || globalChanged) {
                 admin.saveGame(game);
             }
-            doReload(stateChanged, phaseChanged, pingChanged, globalChanged, turnChanged);
+            doReload(stateChanged, phaseChanged, pingChanged, globalChanged, turnChanged, chatChanged);
         }
         return status.toString();
     }
@@ -157,14 +159,14 @@ public class GameModel implements Comparable {
         }
     }
 
-    private void doReload(boolean stateChanged, boolean phaseChanged, boolean pingChanged, boolean globalChanged, boolean turnChanged) {
+    private void doReload(boolean stateChanged, boolean phaseChanged, boolean pingChanged, boolean globalChanged, boolean turnChanged, boolean chatChanged) {
         for (String key : (new ArrayList<>(views.keySet()))) {
             GameView view = views.get(key);
             if (stateChanged) view.stateChanged();
             if (phaseChanged) view.phaseChanged();
             if (globalChanged) view.globalChanged();
             if (turnChanged) view.turnChanged();
-            if (stateChanged || phaseChanged || globalChanged || turnChanged) {
+            if (stateChanged || phaseChanged || pingChanged || globalChanged || turnChanged || chatChanged) {
                 ServletContext ctx = WebContextFactory.get().getServletContext();
                 AdminBean abean = AdminBean.INSTANCE;
                 abean.notifyAboutGame(name);
