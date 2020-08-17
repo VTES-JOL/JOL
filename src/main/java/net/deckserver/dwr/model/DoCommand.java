@@ -184,10 +184,10 @@ public class DoCommand {
                 logger.trace("Destination region for command {} is {}", cmd, destRegion);
 
                 if ((destRegion.equals(JolGame.READY_REGION) || destRegion.equals(JolGame.INACTIVE_REGION) || destRegion.equals(JolGame.TORPOR)) && destCard != null) {
-                    game.moveToCard(srcCard, destCard);
+                    game.moveToCard(player, srcCard, destCard);
                     return "Moved it onto the card";
                 } else {
-                    game.moveToRegion(srcCard, destPlayer, destRegion, bottom);
+                    game.moveToRegion(player, srcCard, destPlayer, destRegion, bottom);
                     return "Moved the card";
                 }
             }
@@ -204,7 +204,7 @@ public class DoCommand {
                 if (targetCard == null) throw new CommandException("Must specify a card in the region");
                 int amount = cmdObj.getAmount(0);
                 if (amount == 0) return "Must specify an amount of blood";
-                game.changeCounters(targetCard, amount);
+                game.changeCounters(player, targetCard, amount);
                 return "Adjusted blood";
             }
             if (cmd.equalsIgnoreCase("capacity")) {
@@ -233,7 +233,7 @@ public class DoCommand {
                 }
                 String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
                 String card = cmdObj.getCard(false, targetPlayer, targetRegion);
-                game.setTapped(card, false);
+                game.setTapped(player, card, false);
                 return "Unlock card";
             }
             if (cmd.equalsIgnoreCase("tap") || cmd.equalsIgnoreCase("lock")) {
@@ -243,7 +243,7 @@ public class DoCommand {
                 String card = cmdObj.getCard(false, targetPlayer, targetRegion);
                 if (game.isTapped(card))
                     throw new CommandException("Card is already locked");
-                game.setTapped(card, true);
+                game.setTapped(player, card, true);
                 return "Locked card";
             }
             if (cmd.equalsIgnoreCase("show")) {
@@ -300,7 +300,7 @@ public class DoCommand {
                 int amount = cmdObj.getAmount(1);
                 if (amount == 0) return "Must transfer an amount";
                 game.changePool(player, -amount);
-                game.changeCounters(card, amount);
+                game.changeCounters(player, card, amount);
                 return "Did the transfer";
             }
         } catch (NumberFormatException e) {

@@ -185,24 +185,38 @@ public class JolGame {
             );
             message = playCardMessage(player, srcCard, destRegion, modes, destMessage);
         }
-        else message = "Put " + getCardName(srcCard, loc.getName()) + " on " + getCardName(dstCard);
+        else {
+            message = String.format(
+                "%s puts %s on %s",
+                player,
+                getCardName(srcCard, loc.getName()),
+                getCardName(dstCard));
+        }
         addCommand(message, new String[]{"puton", cardId, destCard});
 
         source.removeCard(srcCard);
         dstCard.addCard(srcCard, false);
     }
 
-    void moveToCard(String cardId, String destCard) {
-        moveToCard(false, null, cardId, null, null, destCard, null);
+    void moveToCard(String player, String cardId, String destCard) {
+        moveToCard(false, player, cardId, null, null, destCard, null);
     }
 
-    void moveToRegion(String cardId, String destPlayer, String destRegion, boolean bottom) {
+    void moveToRegion(String player, String cardId, String destPlayer, String destRegion, boolean bottom) {
         Card card = state.getCard(cardId);
         if (card == null) throw new IllegalArgumentException("No such card");
         CardContainer source = card.getParent();
         Location dest = state.getPlayerLocation(destPlayer, destRegion);
         if (dest == null) throw new IllegalStateException("No such region");
-        addCommand("Move " + getCardName(card, destRegion) + " to " + (bottom ? "" : "top of ") + destPlayer + "'s " + destRegion, new String[]{"move", cardId, destPlayer, destRegion, bottom ? "bottom" : "top"});
+
+        String message = String.format(
+            "%s moves %s to %s%s's %s",
+            player,
+            getCardName(card, destRegion),
+            bottom ? "" : "top of ",
+            destPlayer,
+            destRegion);
+        addCommand(message, new String[]{"move", cardId, destPlayer, destRegion, bottom ? "bottom" : "top"});
         source.removeCard(card);
         dest.addCard(card, !bottom);
     }
@@ -362,7 +376,7 @@ public class JolGame {
         return 0;
     }
 
-    public void changeCounters(String cardId, int incr) {
+    public void changeCounters(String player, String cardId, int incr) {
         if (incr == 0) return; // no change necessary - PENDING log this though?
         Card card = state.getCard(cardId);
         Notation note = getNote(card, COUNTERS, true);
@@ -370,10 +384,14 @@ public class JolGame {
         int val = (valStr == null) ? 0 : Integer.parseInt(valStr);
         val += incr;
         note.setValue(val + "");
-        String logText;
-        if (incr < 0) logText = "Removed " + Math.abs(incr) + " blood from ";
-        else logText = "Added " + incr + " blood to ";
-        logText = logText + getCardName(card) + ", now " + val + ".";
+        String logText = String.format(
+            "%s %s %s blood %s %s, now %s",
+            player,
+            incr < 0 ? "removes" : "adds",
+            Math.abs(incr),
+            incr < 0 ? "from" : "to",
+            getCardName(card),
+            val);
         addCommand(logText, new String[]{"counter", cardId, incr + ""});
     }
 
@@ -563,9 +581,13 @@ public class JolGame {
         return note != null && note.getValue().equals(TAPPED);
     }
 
-    public void setTapped(String cardId, boolean tapped) {
+    public void setTapped(String player, String cardId, boolean tapped) {
         Card card = state.getCard(cardId);
-        String logtext = (tapped ? "Lock " : "Unlock ") + getCardName(card);
+        String logtext = String.format(
+            "%s %s %s",
+            player,
+            tapped ? "locks" : "unlocks",
+            getCardName(card));
         addCommand(logtext, new String[]{"tap", cardId});
         _setTap(card, tapped);
     }
