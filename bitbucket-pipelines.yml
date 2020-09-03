@@ -10,8 +10,10 @@ pipelines:
     - step:
         caches:
           - maven
-        script: # Modify the commands below to build your repository.
-          - mvn -B package # -B batch mode makes Maven less verbose
+        script:
+          - mvn -B package
+        artifacts:
+          - target/jol.war
     - step:
         services:
           - docker
@@ -24,4 +26,4 @@ pipelines:
           - export DOCKER_HOST="$DOCKER_HOST"
           - export DOCKER_CERT_PATH=~/.docker
           - export DOCKER_MACHINE_NAME="jol"
-          - docker ps
+          - docker cp target/jol.war prod:/usr/local/tomcat/webapps/
