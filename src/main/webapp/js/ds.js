@@ -106,16 +106,51 @@ function renderGameButtons(data) {
     $('#myGamesLink').text('My Games' + (newActivity ? ' *' : ''));
 }
 
+function isScrolledToBottom(container) {
+    var scrollTop = container.scrollTop();
+    var contentHt0 = container.prop("scrollHeight");
+    var maxScrollTop = container.prop("scrollHeight") - container.prop("clientHeight");
+    return scrollTop == maxScrollTop;
+}
+
+function scrollBottom(container) {
+    container.scrollTop(container.prop("scrollHeight") - container.prop("clientHeight"));
+}
+
+var gameChatLastDay = null;
 function renderGameChat(data) {
     if (data === null) {
         return;
     }
-    var chatOutputDiv = $("#gameChatOutput");
-    $.each(data, function (index, chat) {
-        var chatLine = $("<p/>").addClass("chat").html(chat);
-        chatOutputDiv.append(chatLine);
+    var container = $("#gameChatOutput");
+    // Only scroll to bottom if scrollbar is at bottom (has not been scrolled up)
+    var scrollToBottom = isScrolledToBottom(container);
+    $.each(data, function (index, line) {
+        var dateAndTime = line.split(' ', 2);
+        var date = dateAndTime[0];
+        var time = dateAndTime[1];
+        //Strip off date and time; reattached later
+        line = line.slice(date.length + time.length + 2);
+        var timestamp = null;
+        if (date == gameChatLastDay)
+            timestamp = time;
+        else {
+            gameChatLastDay = date;
+            timestamp = date + ' ' + time;
+        }
+        var timeSpan = $("<span/>").text(timestamp).addClass('chat-timestamp');
+        var playerLabel = '';
+        if (line[0] == '[') {
+            var player = line.split(']', 1)[0].slice(1); //Strip [
+            playerLabel = $('<b/>').text(player)[0].outerHTML;
+            line = line.slice(player.length + 3); //3 for [] and space
+        }
+        //var lineElement = $('<p/>').addClass('chat').html(timeSpan[0].outerHTML + ' ' + line);
+        var lineElement = $('<p/>').addClass('chat').append(timeSpan, ' ', playerLabel, ' ', line);
+        container.append(lineElement);
     });
-    chatOutputDiv.scrollTop(chatOutputDiv.prop("scrollHeight") - chatOutputDiv.prop("clientHeight"));
+    if (scrollToBottom)
+        scrollBottom(container);
 }
 
 var globalChatLastPlayer = null;
@@ -124,13 +159,10 @@ function renderGlobalChat(data) {
     if (!data) {
         return;
     }
-    var globalChatOutput = $("#globalChatOutput");
-
-    var scrollTop = globalChatOutput.scrollTop();
-    var contentHt0 = globalChatOutput.prop("scrollHeight");
-    var maxScrollTop = globalChatOutput.prop("scrollHeight") - globalChatOutput.prop("clientHeight");
+    var container = $("#globalChatOutput");
+    var contentHt0 = container.prop("scrollHeight");
     // Only scroll to bottom if scrollbar is at bottom (has not been scrolled up)
-    var scrollToBottom = scrollTop == maxScrollTop;
+    var scrollToBottom = isScrolledToBottom(container);
 
     $.each(data, function (index, chat) {
         var day = moment(chat.timestamp).tz("UTC").format("D MMMM");
@@ -140,28 +172,27 @@ function renderGlobalChat(data) {
                 + day
                 + '</span>'
                 + '</div>');
-            globalChatOutput.append(dayBreak);
+            container.append(dayBreak);
         }
 
         var timestamp = moment(chat.timestamp).tz("UTC").format("HH:mm");
         var userTimestamp = moment(chat.timestamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
         var chatLine = $("<p/>").addClass("chat");
-        var timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp).css('color', '#888').css('font-size', 'smaller');
+        var timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp).addClass('chat-timestamp');
         var playerLabel = globalChatLastPlayer == chat.player && globalChatLastDay == day ? "" : "<b>" + chat.player + "</b> ";
         var message = $("<span/>").html(" " + playerLabel + chat.message);
 
         chatLine.append(timeOutput).append(message);
-        globalChatOutput.append(chatLine);
-        generateCardData("#globalChatOutput");
+        container.append(chatLine);
         globalChatLastPlayer = chat.player;
         globalChatLastDay = day;
     });
+    generateCardData("#globalChatOutput");
 
     if (scrollToBottom) {
         $('#newChatAlert').hide();
-        var newScrollTop = globalChatOutput.prop("scrollHeight") - globalChatOutput.prop("clientHeight");
-        globalChatOutput.scrollTop(newScrollTop);
-    } else if (globalChatOutput.prop("scrollHeight") != contentHt0) {
+        scrollBottom(container);
+    } else if (container.prop("scrollHeight") != contentHt0) {
         $('#newChatAlert').show();
     }
 }
@@ -661,6 +692,7 @@ function loadGame(data) {
     //Reset on game change
     if ($("#gameTitle").text() != data.name) {
         $("#ping").empty();
+        gameChatLastDay = null;
     }
 
     $("#gameTitle").text(data.name);
@@ -679,6 +711,7 @@ function loadGame(data) {
         $("#chat").empty();
         $("#command").empty();
         currentOption = "notes";
+        gameChatLastDay = null;
     }
     if (!data.player && !data.judge) {
         $(".reactive-height").addClass("half-height").removeClass("full-height");

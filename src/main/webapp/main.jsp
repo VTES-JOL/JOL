@@ -66,7 +66,6 @@
 				<!-- Footer -->
 				<div class="row mt-2">
 					<div class="col">
-						<small>v<%= System.getenv("JOL_VERSION")%></small>
 						<span id="chatstamp" class="label label-light label-basic navbar-text"></span>
 					</div>
 				</div>
