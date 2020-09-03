@@ -17,9 +17,9 @@ pipelines:
           - docker
         script: 
           - mkdir -p ~/.docker
-          - echo "$TLSCACERT" > ~/.docker/ca.pem
-          - echo "$TLSCERT" > ~/.docker/cert.pem
-          - echo "$TLSKEY" > ~/.docker/key.pem
+          - echo $TLSCACERT | base64 --decode  > ~/.docker/ca.pem
+          - echo $TLSCERT | base64 --decode  > ~/.docker/cert.pem
+          - echo $TLSKEY | base64 --decode  > ~/.docker/key.pem
           - export DOCKER_TLS_VERIFY="1"
           - export DOCKER_HOST="$DOCKER_HOST"
           - export DOCKER_CERT_PATH=~/.docker
