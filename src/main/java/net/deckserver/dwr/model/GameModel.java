@@ -74,6 +74,7 @@ public class GameModel implements Comparable {
             boolean phaseChanged = false;
             boolean chatChanged = false;
             boolean globalChanged = false;
+            boolean privateNotesChanged = false;
             boolean turnChanged = false;
             int idx = game.getActions(game.getCurrentTurn()).length;
             if (ping != null) {
@@ -100,7 +101,10 @@ public class GameModel implements Comparable {
             if (text != null) {
                 if (text.length() > 800)
                     text = text.substring(0, 799);
-                game.setPlayerText(player, text);
+                if (!text.equals(game.getPlayerText(player))) {
+                    game.setPlayerText(player, text);
+                    privateNotesChanged = true;
+                }
             }
             if (command != null || chat != null) {
                 DoCommand commander = new DoCommand(game);
@@ -136,7 +140,7 @@ public class GameModel implements Comparable {
             if (stateChanged || phaseChanged || chatChanged || globalChanged) {
                 admin.saveGame(game);
             }
-            doReload(stateChanged, phaseChanged, pingChanged, globalChanged, turnChanged, chatChanged);
+            doReload(stateChanged, phaseChanged, pingChanged, globalChanged, turnChanged, chatChanged, privateNotesChanged);
         }
         return status.toString();
     }
@@ -159,14 +163,15 @@ public class GameModel implements Comparable {
         }
     }
 
-    private void doReload(boolean stateChanged, boolean phaseChanged, boolean pingChanged, boolean globalChanged, boolean turnChanged, boolean chatChanged) {
+    private void doReload(boolean stateChanged, boolean phaseChanged, boolean pingChanged, boolean globalChanged, boolean turnChanged, boolean chatChanged, boolean privateNotesChanged) {
         for (String key : (new ArrayList<>(views.keySet()))) {
             GameView view = views.get(key);
             if (stateChanged) view.stateChanged();
             if (phaseChanged) view.phaseChanged();
             if (globalChanged) view.globalChanged();
+            if (privateNotesChanged) view.privateNotesChanged();
             if (turnChanged) view.turnChanged();
-            if (stateChanged || phaseChanged || pingChanged || globalChanged || turnChanged || chatChanged) {
+            if (stateChanged || phaseChanged || pingChanged || globalChanged || turnChanged || chatChanged || privateNotesChanged) {
                 ServletContext ctx = WebContextFactory.get().getServletContext();
                 AdminBean abean = AdminBean.INSTANCE;
                 abean.notifyAboutGame(name);

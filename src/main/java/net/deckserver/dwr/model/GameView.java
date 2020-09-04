@@ -22,6 +22,7 @@ public class GameView {
     private boolean stateChanged = true;
     private boolean phaseChanged = true;
     private boolean globalChanged = true;
+    private boolean privateNotesChanged = true;
     private boolean turnChanged = true;
     private boolean resetChat = true;
     private String name;
@@ -108,8 +109,11 @@ public class GameView {
 
         if (globalChanged) {
             global = game.getGlobalText();
-            if (isPlayer)
-                text = game.getPlayerText(player);
+        }
+
+        //TODO only do this if my notes changed
+        if (privateNotesChanged && isPlayer) {
+            text = game.getPlayerText(player);
         }
 
         if (phaseChanged) {
@@ -177,6 +181,10 @@ public class GameView {
         globalChanged = true;
     }
 
+    public synchronized void privateNotesChanged() {
+        privateNotesChanged = true;
+    }
+
     public synchronized void phaseChanged() {
         phaseChanged = true;
     }
@@ -234,7 +242,7 @@ public class GameView {
         reset(true);
         //Force client to refresh all game data
         resetChat = true;
-        globalChanged = phaseChanged = stateChanged = turnChanged = true;
+        globalChanged = phaseChanged = stateChanged = turnChanged = privateNotesChanged = true;
     }
 
 }
