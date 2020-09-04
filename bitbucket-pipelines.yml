@@ -1,29 +1,48 @@
-# This is a sample build configuration for Docker.
-# Check our guides at https://confluence.atlassian.com/x/O1toN for more examples.
-# Only use spaces to indent your .yml configuration.
-# -----
-# You can specify a custom docker image from Docker Hub as your build environment.
 image: atlassian/default-image:2
 
-pipelines:
-  default:
-    - step:
+definitions:
+  steps:
+    - step: &build-artifact
         caches:
           - maven
         script:
           - mvn -B package
         artifacts:
           - target/jol.war
-    - step:
-        services:
-          - docker
-        script: 
-          - mkdir -p ~/.docker
-          - echo $TLSCACERT | base64 --decode  > ~/.docker/ca.pem
-          - echo $TLSCERT | base64 --decode  > ~/.docker/cert.pem
-          - echo $TLSKEY | base64 --decode  > ~/.docker/key.pem
-          - export DOCKER_TLS_VERIFY="1"
-          - export DOCKER_HOST="$DOCKER_HOST"
-          - export DOCKER_CERT_PATH=~/.docker
-          - export DOCKER_MACHINE_NAME="jol"
-          - docker cp target/jol.war prod:/usr/local/tomcat/webapps/
+
+pipelines:
+  branches:
+    release/*:
+      - step: *build-artifact
+      - step:
+          name: Deploy to prod
+          deployment: production
+          services:
+            - docker
+          script:
+            - mkdir -p ~/.docker
+            - echo $TLSCACERT | base64 --decode  > ~/.docker/ca.pem
+            - echo $TLSCERT | base64 --decode  > ~/.docker/cert.pem
+            - echo $TLSKEY | base64 --decode  > ~/.docker/key.pem
+            - export DOCKER_TLS_VERIFY="1"
+            - export DOCKER_HOST="$DOCKER_HOST"
+            - export DOCKER_CERT_PATH=~/.docker
+            - export DOCKER_MACHINE_NAME="jol"
+            - docker cp target/jol.war prod:/usr/local/tomcat/webapps/
+    develop:
+      - step: *build-artifact
+      - step:
+          name: Deploy to test
+          deployment: test
+          services:
+            - docker
+          script:
+            - mkdir -p ~/.docker
+            - echo $TLSCACERT | base64 --decode  > ~/.docker/ca.pem
+            - echo $TLSCERT | base64 --decode  > ~/.docker/cert.pem
+            - echo $TLSKEY | base64 --decode  > ~/.docker/key.pem
+            - export DOCKER_TLS_VERIFY="1"
+            - export DOCKER_HOST="$DOCKER_HOST"
+            - export DOCKER_CERT_PATH=~/.docker
+            - export DOCKER_MACHINE_NAME="jol"
+            - docker cp target/jol.war test:/usr/local/tomcat/webapps/
