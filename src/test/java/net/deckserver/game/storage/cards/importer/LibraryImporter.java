@@ -37,6 +37,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final Pattern PUT_INTO_PLAY_PATTERN = Pattern.compile(".*[Pp]ut this card in(?:to)? play.*");
     private static final Pattern PUT_INTO_UNCONTROLLED_PATTERN = Pattern.compile(".*[Pp]ut this card in(?:to)? play in your uncontrolled region.*");
     private static final Pattern PUT_ON_ACTING_PATTERN = Pattern.compile(".*[Pp]ut this card on the acting.*");
+    private static final Pattern PUT_ON_CONTROLLED_PATTERN = Pattern.compile(".*[Pp]ut this card on a minion you control.*");
     private static final Pattern PUT_ON_SELF_PATTERN = Pattern.compile(".*[Pp]ut this card on this.*");
     private static final Pattern PUT_ON_SOMETHING_PATTERN = Pattern.compile(".*[Pp]ut this card on.*");
     private static final Pattern AS_ABOVE_PATTERN = Pattern.compile("As (\\[(?<disc>.*)\\])? ?above.*");
@@ -147,13 +148,6 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
 
             if (PUT_INTO_UNCONTROLLED_PATTERN.matcher(mode.getText()).matches())
                 mode.setTarget(LibraryCardMode.Target.INACTIVE_REGION);
-            else if ((card.getType().stream().anyMatch("master"::equalsIgnoreCase)
-                        && card.getPreamble() != null
-                        && card.getPreamble().contains("location"))
-                    || card.getType().stream().anyMatch("ally"::equalsIgnoreCase)
-                    || card.getType().stream().anyMatch("event"::equalsIgnoreCase)
-                    || PUT_INTO_PLAY_PATTERN.matcher(mode.getText()).matches())
-                mode.setTarget(LibraryCardMode.Target.READY_REGION);
             else if (card.getType().stream().anyMatch("equipment"::equalsIgnoreCase)
                     || card.getType().stream().anyMatch("retainer"::equalsIgnoreCase)
                     || ((card.getType().stream().anyMatch("action"::equalsIgnoreCase)
@@ -163,8 +157,17 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                 mode.setTarget(LibraryCardMode.Target.SELF);
             else if (REMOVE_FROM_GAME_PATTERN.matcher(mode.getText()).matches())
                 mode.setTarget(LibraryCardMode.Target.REMOVE_FROM_GAME);
+            else if (PUT_ON_CONTROLLED_PATTERN.matcher(mode.getText()).matches())
+                mode.setTarget(LibraryCardMode.Target.MINION_YOU_CONTROL);
             else if (PUT_ON_SOMETHING_PATTERN.matcher(mode.getText()).matches())
                 mode.setTarget(LibraryCardMode.Target.SOMETHING);
+            else if ((card.getType().stream().anyMatch("master"::equalsIgnoreCase)
+                        && card.getPreamble() != null
+                        && card.getPreamble().contains("location"))
+                    || card.getType().stream().anyMatch("ally"::equalsIgnoreCase)
+                    || card.getType().stream().anyMatch("event"::equalsIgnoreCase)
+                    || PUT_INTO_PLAY_PATTERN.matcher(mode.getText()).matches())
+                mode.setTarget(LibraryCardMode.Target.READY_REGION);
             else {
                 Matcher matcher = AS_ABOVE_PATTERN.matcher(mode.getText());
                 if (matcher.matches()) {

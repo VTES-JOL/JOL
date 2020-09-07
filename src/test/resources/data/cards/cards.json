@@ -3528,7 +3528,7 @@
   }, {
     "disciplines" : [ "THA" ],
     "text" : "Put this card on a minion you control. The minion with this card gets an optional maneuver each combat and +1 strength.",
-    "target" : "SOMETHING"
+    "target" : "MINION_YOU_CONTROL"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -33304,7 +33304,7 @@
   "modes" : [ {
     "disciplines" : [ "aus" ],
     "text" : "Put this card on a minion you control. The minion with this card gets +2 intercept. Burn this card during your unlock phase.",
-    "target" : "SOMETHING"
+    "target" : "MINION_YOU_CONTROL"
   }, {
     "disciplines" : [ "AUS" ],
     "text" : "Put this card into play. Each of your minions gets +1 intercept. Burn this card during your next unlock phase.",
@@ -37792,7 +37792,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "Put this card on a minion you control. This minion cannot be the target of other Methuselahs' actions. Any Methuselah burns an additional pool when playing master cards on (or that target) this minion. Burn this card if this minion enters torpor. A minion may have only one haven.",
-    "target" : "READY_REGION"
+    "target" : "MINION_YOU_CONTROL"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -39003,7 +39003,7 @@
   "modes" : [ {
     "disciplines" : null,
     "text" : "(D) Put this card on a ready unique non-wraith, non-zombie minion who does not already have a Shell Break. If that minion is burned, move this card to the Giovanni who put this card in play. This card then represents a wraith retainer with 2 life who is immune to non-aggravated damage. The minion with this retainer gets +1 bleed and +1 intercept.",
-    "target" : "READY_REGION"
+    "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
   "multiMode" : false,
@@ -40688,7 +40688,7 @@
   "modes" : [ {
     "disciplines" : [ "aus", "dom" ],
     "text" : "[ACTION] +1 stealth action. Put this card on a minion you control. If an action to steal the minion with this card is successful, this minion is burned instead and the acting minion takes 1 unpreventable damage.",
-    "target" : "SOMETHING"
+    "target" : "MINION_YOU_CONTROL"
   }, {
     "disciplines" : [ "AUS", "DOM" ],
     "text" : "[REACTION] As above, but play when an action to steal a minion you control is successful.",

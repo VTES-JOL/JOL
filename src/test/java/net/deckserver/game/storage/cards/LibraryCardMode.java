@@ -37,7 +37,11 @@ public class LibraryCardMode {
         /**
          * Played to player's inactive/uncontrolled region.
          */
-        INACTIVE_REGION
+        INACTIVE_REGION,
+        /**
+         * Played on a minion the player controls.
+         */
+        MINION_YOU_CONTROL
     }
 
     /**

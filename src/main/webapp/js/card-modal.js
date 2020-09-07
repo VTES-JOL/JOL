@@ -114,7 +114,7 @@ function showCardModal(event) {
 function modeClicked(event) {
   var button = $(event.target).closest('button');
   var target = button.data('target');
-  if (target == 'SELF' || target == 'SOMETHING')
+  if (target == 'MINION_YOU_CONTROL' || target == 'SELF' || target == 'SOMETHING')
     showTargetPicker(target);
   else playCard(event);
 }
@@ -128,8 +128,9 @@ function showTargetPicker(target) {
     target == 'SELF' ? 'Who is playing this?' : 'Pick target.');
   picker.show();
 
+  var usePlayerSelector = target == 'MINION_YOU_CONTROL' || target == 'SELF';
   //"player" from js/ds.js
-  var playerSelector = target == 'SELF' ? '[data-player="' + player +'"]' : '';
+  var playerSelector = usePlayerSelector ? '[data-player="' + player +'"]' : '';
   var playerDiv = $('#state .player' + playerSelector);
   var scrollTo =
     playerDiv.offset().top
@@ -163,12 +164,13 @@ function playCardCommand(disciplines, target) {
   var modal = $('#cardModal');
   var handIndex = modal.data('hand-coord');
   var doNotReplace = modal.data('do-not-replace');
+  var getTargetFromModal = target == 'MINION_YOU_CONTROL' || target == 'SELF' || target == 'SOMETHING';
   return 'play ' + handIndex
          + (disciplines ? ' @ ' + disciplines.join(',') : '')
          + (target == 'READY_REGION' ? ' ready' : '')
          + (target == 'REMOVE_FROM_GAME' ? ' rfg' : '')
          + (target == 'INACTIVE_REGION' ? ' inactive' : '')
-         + (target == 'SELF' || target == 'SOMETHING' ? ' ' + modal.data('target') : '')
+         + (getTargetFromModal ? ' ' + modal.data('target') : '')
          + (doNotReplace ? '' : ' draw');
 }
 function playCard(event) {
