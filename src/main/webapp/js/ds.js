@@ -108,9 +108,8 @@ function renderGameButtons(data) {
 
 function isScrolledToBottom(container) {
     var scrollTop = container.scrollTop();
-    var contentHt0 = container.prop("scrollHeight");
     var maxScrollTop = container.prop("scrollHeight") - container.prop("clientHeight");
-    return scrollTop == maxScrollTop;
+    return Math.abs(maxScrollTop - scrollTop) < 20;
 }
 
 function scrollBottom(container) {
