@@ -1232,17 +1232,17 @@
   "jolId" : "jy13",
   "amaranthId" : "129",
   "type" : "Master",
-  "text" : "Name: Anarch Troublemaker\nCardtype: Master\nUnique master.\nPut this card in play. During your unlock phase, you may lock up to 2 vampires controlled by your prey or burn an equipment on one of your prey's minions. If you do so, your prey takes control of the Anarch Troublemaker.",
-  "htmlText" : "Name: Anarch Troublemaker<br/>Cardtype: Master<br/>Unique master.\nPut this card in play. During your unlock phase, you may lock up to 2 vampires controlled by your prey or burn an equipment on one of your prey's minions. If you do so, your prey takes control of the Anarch Troublemaker.",
+  "text" : "Name: Anarch Troublemaker\nCardtype: Master\nUnique.\nPut this card in play. During your unlock phase, you can give control of the Anarch Troublemaker to your prey and either lock up to two vampires they control or burn an equipment on one of their minions.",
+  "htmlText" : "Name: Anarch Troublemaker<br/>Cardtype: Master<br/>Unique.\nPut this card in play. During your unlock phase, you can give control of the Anarch Troublemaker to your prey and either lock up to two vampires they control or burn an equipment on one of their minions.",
   "displayName" : "Anarch Troublemaker",
   "names" : [ "Anarch Troublemaker" ],
   "crypt" : false,
   "unique" : true,
   "burnOption" : false,
-  "preamble" : "Unique master.",
+  "preamble" : "Unique.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card in play. During your unlock phase, you may lock up to 2 vampires controlled by your prey or burn an equipment on one of your prey's minions. If you do so, your prey takes control of the Anarch Troublemaker.",
+    "text" : "Put this card in play. During your unlock phase, you can give control of the Anarch Troublemaker to your prey and either lock up to two vampires they control or burn an equipment on one of their minions.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -3192,8 +3192,8 @@
   "jolId" : "kt16",
   "amaranthId" : "323",
   "type" : "Action",
-  "text" : "Name: Becoming, The\nCardtype: Action\nCost: 2 blood\n+1 stealth action. Requires a non-sterile vampire.\nPut this card in play; it becomes a 0-capacity non-unique vampire of the same clan as the acting vampire and cannot act this turn; put up to 3 master discipline cards from your hand to this vampire; move up to 1 blood from the acting vampire to this new vampire. Burn this vampire if they have no capacity-increasing discipline cards.",
-  "htmlText" : "Name: Becoming, The<br/>Cardtype: Action<br/>Cost: 2 blood<br/>+1 stealth action. Requires a non-sterile vampire.\nPut this card in play; it becomes a 0-capacity non-unique vampire of the same clan as the acting vampire and cannot act this turn; put up to 3 master discipline cards from your hand to this vampire; move up to 1 blood from the acting vampire to this new vampire. Burn this vampire if they have no capacity-increasing discipline cards.",
+  "text" : "Name: Becoming, The\nCardtype: Action\nCost: 2 blood\n+1 stealth action. Requires a non-sterile vampire.\nPut this card in play; it becomes a 0-capacity non-unique vampire of the same clan and sect as the acting vampire and cannot act this turn; put up to 3 master discipline cards from your hand to this vampire; move up to 1 blood from the acting vampire to this new vampire. Burn this vampire if they have no capacity-increasing discipline cards.",
+  "htmlText" : "Name: Becoming, The<br/>Cardtype: Action<br/>Cost: 2 blood<br/>+1 stealth action. Requires a non-sterile vampire.\nPut this card in play; it becomes a 0-capacity non-unique vampire of the same clan and sect as the acting vampire and cannot act this turn; put up to 3 master discipline cards from your hand to this vampire; move up to 1 blood from the acting vampire to this new vampire. Burn this vampire if they have no capacity-increasing discipline cards.",
   "displayName" : "Becoming, The",
   "names" : [ "Becoming, The", "The Becoming" ],
   "crypt" : false,
@@ -3202,7 +3202,7 @@
   "preamble" : "+1 stealth action. Requires a non-sterile vampire.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card in play; it becomes a 0-capacity non-unique vampire of the same clan as the acting vampire and cannot act this turn; put up to 3 master discipline cards from your hand to this vampire; move up to 1 blood from the acting vampire to this new vampire. Burn this vampire if they have no capacity-increasing discipline cards.",
+    "text" : "Put this card in play; it becomes a 0-capacity non-unique vampire of the same clan and sect as the acting vampire and cannot act this turn; put up to 3 master discipline cards from your hand to this vampire; move up to 1 blood from the acting vampire to this new vampire. Burn this vampire if they have no capacity-increasing discipline cards.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -3708,8 +3708,8 @@
   "jolId" : "km20",
   "amaranthId" : "364",
   "type" : "Reaction",
-  "text" : "Name: Black Sunrise\nCardtype: Reaction\nDiscipline: Quietus\nOnly usable by a locked vampire.\n[qui] Only usable during a (D) action against you (or a card you control). This vampire unlocks and attempts to block.\n[QUI] As above, but usable during any action.",
-  "htmlText" : "Name: Black Sunrise<br/>Cardtype: Reaction<br/>Discipline: Quietus<br/>Only usable by a locked vampire.\n[qui] Only usable during a (D) action against you (or a card you control). This vampire unlocks and attempts to block.\n[QUI] As above, but usable during any action.",
+  "text" : "Name: Black Sunrise\nCardtype: Reaction\nDiscipline: Quietus\nOnly usable by a locked vampire.\n[qui] Only usable during a (D) action against you (or a card you control). This vampire unlocks and attempts to block.\n[QUI] This vampire unlocks and attempts to block.",
+  "htmlText" : "Name: Black Sunrise<br/>Cardtype: Reaction<br/>Discipline: Quietus<br/>Only usable by a locked vampire.\n[qui] Only usable during a (D) action against you (or a card you control). This vampire unlocks and attempts to block.\n[QUI] This vampire unlocks and attempts to block.",
   "displayName" : "Black Sunrise",
   "names" : [ "Black Sunrise" ],
   "crypt" : false,
@@ -3722,7 +3722,7 @@
     "target" : null
   }, {
     "disciplines" : [ "QUI" ],
-    "text" : "As above, but usable during any action.",
+    "text" : "This vampire unlocks and attempts to block.",
     "target" : null
   } ],
   "doNotReplace" : false,
@@ -5326,8 +5326,8 @@
   "jolId" : "te1",
   "amaranthId" : "444",
   "type" : "Equipment",
-  "text" : "Name: Bowl of Convergence\nCardtype: Equipment\nUnique.\nThe bearer with Auspex [aus] gets +1 intercept. The bearer with superior Auspex [AUS] can burn 1 blood during an action to get an additional +1 intercept .",
-  "htmlText" : "Name: Bowl of Convergence<br/>Cardtype: Equipment<br/>Unique.\nThe bearer with Auspex [aus] gets +1 intercept. The bearer with superior Auspex [AUS] can burn 1 blood during an action to get an additional +1 intercept .",
+  "text" : "Name: Bowl of Convergence\nCardtype: Equipment\nUnique.\nThe bearer with Auspex [aus] gets +1 intercept. The bearer with superior Auspex [AUS] can burn 1 blood during an action to get an additional +1 intercept.",
+  "htmlText" : "Name: Bowl of Convergence<br/>Cardtype: Equipment<br/>Unique.\nThe bearer with Auspex [aus] gets +1 intercept. The bearer with superior Auspex [AUS] can burn 1 blood during an action to get an additional +1 intercept.",
   "displayName" : "Bowl of Convergence",
   "names" : [ "Bowl of Convergence" ],
   "crypt" : false,
@@ -5336,7 +5336,7 @@
   "preamble" : "Unique.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "The bearer with Auspex [aus] gets +1 intercept. The bearer with superior Auspex [AUS] can burn 1 blood during an action to get an additional +1 intercept .",
+    "text" : "The bearer with Auspex [aus] gets +1 intercept. The bearer with superior Auspex [AUS] can burn 1 blood during an action to get an additional +1 intercept.",
     "target" : "SELF"
   } ],
   "doNotReplace" : false,
@@ -5607,8 +5607,8 @@
   "jolId" : "lo30",
   "amaranthId" : "464",
   "type" : "Action",
-  "text" : "Name: Brother in Arms\nCardtype: Action\nClan: Salubri antitribu\nCost: 1 pool\n+1 stealth action. Requires a ready, non-sterile Salubri antitribu with capacity above 2.\nPut this card in play; it becomes a 2-capacity, non-unique Salubri antitribu with basic Valeren [val]. Move 1 blood from the acting vampire to this vampire. This vampire cannot act this turn. During your unlock phase, if you control more ready Brothers in Arms than ready unique Salubri antitribu, burn the excess ready Brothers in Arms.",
-  "htmlText" : "Name: Brother in Arms<br/>Cardtype: Action<br/>Clan: Salubri antitribu<br/>Cost: 1 pool<br/>+1 stealth action. Requires a ready, non-sterile Salubri antitribu with capacity above 2.\nPut this card in play; it becomes a 2-capacity, non-unique Salubri antitribu with basic Valeren [val]. Move 1 blood from the acting vampire to this vampire. This vampire cannot act this turn. During your unlock phase, if you control more ready Brothers in Arms than ready unique Salubri antitribu, burn the excess ready Brothers in Arms.",
+  "text" : "Name: Brother in Arms\nCardtype: Action\nClan: Salubri antitribu\nCost: 1 pool\n+1 stealth action. Requires a ready, non-sterile Salubri antitribu with capacity above 2.\nPut this card in play; it becomes a 2-capacity, non-unique Salubri antitribu of the same sect as the acting Salubri antitribu with basic Valeren [val]. Move 1 blood from the acting vampire to this vampire. This vampire cannot act this turn. During your unlock phase, if you control more ready Brothers in Arms than ready unique Salubri antitribu, burn the excess ready Brothers in Arms.",
+  "htmlText" : "Name: Brother in Arms<br/>Cardtype: Action<br/>Clan: Salubri antitribu<br/>Cost: 1 pool<br/>+1 stealth action. Requires a ready, non-sterile Salubri antitribu with capacity above 2.\nPut this card in play; it becomes a 2-capacity, non-unique Salubri antitribu of the same sect as the acting Salubri antitribu with basic Valeren [val]. Move 1 blood from the acting vampire to this vampire. This vampire cannot act this turn. During your unlock phase, if you control more ready Brothers in Arms than ready unique Salubri antitribu, burn the excess ready Brothers in Arms.",
   "displayName" : "Brother in Arms",
   "names" : [ "Brother in Arms" ],
   "crypt" : false,
@@ -5617,7 +5617,7 @@
   "preamble" : "+1 stealth action. Requires a ready, non-sterile Salubri antitribu with capacity above 2.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card in play; it becomes a 2-capacity, non-unique Salubri antitribu with basic Valeren [val]. Move 1 blood from the acting vampire to this vampire. This vampire cannot act this turn. During your unlock phase, if you control more ready Brothers in Arms than ready unique Salubri antitribu, burn the excess ready Brothers in Arms.",
+    "text" : "Put this card in play; it becomes a 2-capacity, non-unique Salubri antitribu of the same sect as the acting Salubri antitribu with basic Valeren [val]. Move 1 blood from the acting vampire to this vampire. This vampire cannot act this turn. During your unlock phase, if you control more ready Brothers in Arms than ready unique Salubri antitribu, burn the excess ready Brothers in Arms.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -7077,8 +7077,8 @@
   "jolId" : "jy78",
   "amaranthId" : "572",
   "type" : "Action Modifier",
-  "text" : "Name: Change of Target\nCardtype: Action Modifier\nOnly usable if this minion is blocked, before block resolution.\nUnlock this acting minion, and the action ends (unsuccessfully). This minion cannot perform the same action again this turn.",
-  "htmlText" : "Name: Change of Target<br/>Cardtype: Action Modifier<br/>Only usable if this minion is blocked, before block resolution.\nUnlock this acting minion, and the action ends (unsuccessfully). This minion cannot perform the same action again this turn.",
+  "text" : "Name: Change of Target\nCardtype: Action Modifier\nOnly usable if this minion is blocked, before block resolution.\nUnlock this minion, and the action ends (unsuccessfully). This minion cannot perform the same action again this turn.",
+  "htmlText" : "Name: Change of Target<br/>Cardtype: Action Modifier<br/>Only usable if this minion is blocked, before block resolution.\nUnlock this minion, and the action ends (unsuccessfully). This minion cannot perform the same action again this turn.",
   "displayName" : "Change of Target",
   "names" : [ "Change of Target" ],
   "crypt" : false,
@@ -7087,7 +7087,7 @@
   "preamble" : "Only usable if this minion is blocked, before block resolution.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Unlock this acting minion, and the action ends (unsuccessfully). This minion cannot perform the same action again this turn.",
+    "text" : "Unlock this minion, and the action ends (unsuccessfully). This minion cannot perform the same action again this turn.",
     "target" : null
   } ],
   "doNotReplace" : false,
@@ -9730,8 +9730,8 @@
   "jolId" : "sa77",
   "amaranthId" : "724",
   "type" : "Action",
-  "text" : "Name: Creation Rites\nCardtype: Action\nCost: 1 blood\n+1 stealth action. Requires a ready non-sterile archbishop, priscus, cardinal or regent.\nPut this card in play; it becomes a 1-capacity vampire. You may go through your library (shuffle afterward), ash heap or hand to find a Discipline card for this card. You may move a blood from the acting vampire to this vampire. This vampire is not considered unique, cannot act this turn, and is the same clan as the acting vampire.",
-  "htmlText" : "Name: Creation Rites<br/>Cardtype: Action<br/>Cost: 1 blood<br/>+1 stealth action. Requires a ready non-sterile archbishop, priscus, cardinal or regent.\nPut this card in play; it becomes a 1-capacity vampire. You may go through your library (shuffle afterward), ash heap or hand to find a Discipline card for this card. You may move a blood from the acting vampire to this vampire. This vampire is not considered unique, cannot act this turn, and is the same clan as the acting vampire.",
+  "text" : "Name: Creation Rites\nCardtype: Action\nCost: 1 blood\n+1 stealth action. Requires a ready non-sterile archbishop, priscus, cardinal or regent.\nPut this card in play. It becomes a 1-capacity (non-unique) Sabbat vampire of the same clan as the acting vampire, and cannot perform actions this turn. You can search your library (shuffle afterward), hand, and/or ash heap for a master Discipline card and put it on this new vampire. Move up to 1 blood from the acting vampire to this new vampire.",
+  "htmlText" : "Name: Creation Rites<br/>Cardtype: Action<br/>Cost: 1 blood<br/>+1 stealth action. Requires a ready non-sterile archbishop, priscus, cardinal or regent.\nPut this card in play. It becomes a 1-capacity (non-unique) Sabbat vampire of the same clan as the acting vampire, and cannot perform actions this turn. You can search your library (shuffle afterward), hand, and/or ash heap for a master Discipline card and put it on this new vampire. Move up to 1 blood from the acting vampire to this new vampire.",
   "displayName" : "Creation Rites",
   "names" : [ "Creation Rites" ],
   "crypt" : false,
@@ -9740,7 +9740,7 @@
   "preamble" : "+1 stealth action. Requires a ready non-sterile archbishop, priscus, cardinal or regent.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card in play; it becomes a 1-capacity vampire. You may go through your library (shuffle afterward), ash heap or hand to find a Discipline card for this card. You may move a blood from the acting vampire to this vampire. This vampire is not considered unique, cannot act this turn, and is the same clan as the acting vampire.",
+    "text" : "Put this card in play. It becomes a 1-capacity (non-unique) Sabbat vampire of the same clan as the acting vampire, and cannot perform actions this turn. You can search your library (shuffle afterward), hand, and/or ash heap for a master Discipline card and put it on this new vampire. Move up to 1 blood from the acting vampire to this new vampire.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -9790,6 +9790,28 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 blood"
+}, {
+  "id" : "102213",
+  "jolId" : "fth01",
+  "amaranthId" : "4147",
+  "type" : "Action",
+  "text" : "Name: Creeping Sabotage\nCardtype: Action\nClan: Nosferatu\nCost: X blood\n+1 stealth action.\nX is the number of Creeping Sabotages you control. Put this card in play. During your unlock phase, your prey burns 1 pool. Any minion can burn this card as a (D) action.",
+  "htmlText" : "Name: Creeping Sabotage<br/>Cardtype: Action<br/>Clan: Nosferatu<br/>Cost: X blood<br/>+1 stealth action.\nX is the number of Creeping Sabotages you control. Put this card in play. During your unlock phase, your prey burns 1 pool. Any minion can burn this card as a (D) action.",
+  "displayName" : "Creeping Sabotage",
+  "names" : [ "Creeping Sabotage" ],
+  "crypt" : false,
+  "unique" : false,
+  "burnOption" : false,
+  "preamble" : "+1 stealth action.",
+  "modes" : [ {
+    "disciplines" : null,
+    "text" : "X is the number of Creeping Sabotages you control. Put this card in play. During your unlock phase, your prey burns 1 pool. Any minion can burn this card as a (D) action.",
+    "target" : "READY_REGION"
+  } ],
+  "doNotReplace" : false,
+  "multiMode" : false,
+  "cost" : "X blood",
+  "clans" : [ "Nosferatu" ]
 }, {
   "id" : "100444",
   "jolId" : "fn33",
@@ -11329,8 +11351,8 @@
   "jolId" : "kt36",
   "amaranthId" : "827",
   "type" : "Action",
-  "text" : "Name: Deep Song\nCardtype: Action\nDiscipline: Animalism\n[ani] (D) Bleed with +1 bleed.\n[ANI] Frenzy. (D) Enter combat with and lock a vampire. That target vampire is considered the acting minion in that combat.",
-  "htmlText" : "Name: Deep Song<br/>Cardtype: Action<br/>Discipline: Animalism<br/>[ani] (D) Bleed with +1 bleed.\n[ANI] Frenzy. (D) Enter combat with and lock a vampire. That target vampire is considered the acting minion in that combat.",
+  "text" : "Name: Deep Song\nCardtype: Action\nDiscipline: Animalism\n[ani] (D) Bleed with +1 bleed.\n[ANI] Frenzy. (D) Enter combat with and lock a vampire. The target vampire is considered the acting minion during that combat.",
+  "htmlText" : "Name: Deep Song<br/>Cardtype: Action<br/>Discipline: Animalism<br/>[ani] (D) Bleed with +1 bleed.\n[ANI] Frenzy. (D) Enter combat with and lock a vampire. The target vampire is considered the acting minion during that combat.",
   "displayName" : "Deep Song",
   "names" : [ "Deep Song" ],
   "crypt" : false,
@@ -11342,7 +11364,7 @@
     "target" : null
   }, {
     "disciplines" : [ "ANI" ],
-    "text" : "Frenzy. (D) Enter combat with and lock a vampire. That target vampire is considered the acting minion in that combat.",
+    "text" : "Frenzy. (D) Enter combat with and lock a vampire. The target vampire is considered the acting minion during that combat.",
     "target" : null
   } ],
   "doNotReplace" : false,
@@ -12974,8 +12996,8 @@
   "jolId" : "ah48",
   "amaranthId" : "957",
   "type" : "Master",
-  "text" : "Name: Dreams of the Sphinx\nCardtype: Master\nCost: 1 pool\nUnique.\nPut this card in play. Add 1 counter on this card each time you lock it. Lock to get +2 hand size until the end of this turn. Lock during your unlock phase to gain 1 pool if you have the Edge. Lock to add 1 blood to a vampire in your uncontrolled region. Burn this card if it has 3 counters.",
-  "htmlText" : "Name: Dreams of the Sphinx<br/>Cardtype: Master<br/>Cost: 1 pool<br/>Unique.\nPut this card in play. Add 1 counter on this card each time you lock it. Lock to get +2 hand size until the end of this turn. Lock during your unlock phase to gain 1 pool if you have the Edge. Lock to add 1 blood to a vampire in your uncontrolled region. Burn this card if it has 3 counters.",
+  "text" : "Name: Dreams of the Sphinx\nCardtype: Master\nCost: 1 pool\nUnique.\nPut this card in play. Add 1 counter to this card each time you lock it. Lock to get +2 hand size until the end of the turn. Lock during your unlock phase to gain 1 pool if you have the Edge. Lock to add 1 blood to a vampire in your uncontrolled region. Burn this card if it has 3 counters.",
+  "htmlText" : "Name: Dreams of the Sphinx<br/>Cardtype: Master<br/>Cost: 1 pool<br/>Unique.\nPut this card in play. Add 1 counter to this card each time you lock it. Lock to get +2 hand size until the end of the turn. Lock during your unlock phase to gain 1 pool if you have the Edge. Lock to add 1 blood to a vampire in your uncontrolled region. Burn this card if it has 3 counters.",
   "displayName" : "Dreams of the Sphinx",
   "names" : [ "Dreams of the Sphinx" ],
   "crypt" : false,
@@ -12984,7 +13006,7 @@
   "preamble" : "Unique.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card in play. Add 1 counter on this card each time you lock it. Lock to get +2 hand size until the end of this turn. Lock during your unlock phase to gain 1 pool if you have the Edge. Lock to add 1 blood to a vampire in your uncontrolled region. Burn this card if it has 3 counters.",
+    "text" : "Put this card in play. Add 1 counter to this card each time you lock it. Lock to get +2 hand size until the end of the turn. Lock during your unlock phase to gain 1 pool if you have the Edge. Lock to add 1 blood to a vampire in your uncontrolled region. Burn this card if it has 3 counters.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -13058,8 +13080,8 @@
   "jolId" : "km46",
   "amaranthId" : "964",
   "type" : "Action",
-  "text" : "Name: Dual Form\nCardtype: Action\nCost: 2 blood\nDiscipline: Protean\n+1 stealth action.\n[pro] Unlock this vampire. During this minion phase, you may unlock this vampire again.\n[PRO] This acting vampire's capacity is reduced by 1 until the end of the game. Put this card in play, locked. It becomes a non-unique vampire with the same clan, capacity and Disciplines as the acting vampire. You may move up to 2 blood from the acting vampire to this vampire. If either minion leaves the ready region, the other is burned.",
-  "htmlText" : "Name: Dual Form<br/>Cardtype: Action<br/>Cost: 2 blood<br/>Discipline: Protean<br/>+1 stealth action.\n[pro] Unlock this vampire. During this minion phase, you may unlock this vampire again.\n[PRO] This acting vampire's capacity is reduced by 1 until the end of the game. Put this card in play, locked. It becomes a non-unique vampire with the same clan, capacity and Disciplines as the acting vampire. You may move up to 2 blood from the acting vampire to this vampire. If either minion leaves the ready region, the other is burned.",
+  "text" : "Name: Dual Form\nCardtype: Action\nCost: 2 blood\nDiscipline: Protean\n+1 stealth action.\n[pro] Unlock this vampire. During this minion phase, you may unlock this vampire again.\n[PRO] This acting vampire's capacity is reduced by 1 until the end of the game. Put this card in play, locked. It becomes a non-unique vampire with the same clan, sect, capacity and Disciplines as the acting vampire. You may move up to 2 blood from the acting vampire to this vampire. If either minion leaves the ready region, the other is burned.",
+  "htmlText" : "Name: Dual Form<br/>Cardtype: Action<br/>Cost: 2 blood<br/>Discipline: Protean<br/>+1 stealth action.\n[pro] Unlock this vampire. During this minion phase, you may unlock this vampire again.\n[PRO] This acting vampire's capacity is reduced by 1 until the end of the game. Put this card in play, locked. It becomes a non-unique vampire with the same clan, sect, capacity and Disciplines as the acting vampire. You may move up to 2 blood from the acting vampire to this vampire. If either minion leaves the ready region, the other is burned.",
   "displayName" : "Dual Form",
   "names" : [ "Dual Form" ],
   "crypt" : false,
@@ -13072,7 +13094,7 @@
     "target" : null
   }, {
     "disciplines" : [ "PRO" ],
-    "text" : "This acting vampire's capacity is reduced by 1 until the end of the game. Put this card in play, locked. It becomes a non-unique vampire with the same clan, capacity and Disciplines as the acting vampire. You may move up to 2 blood from the acting vampire to this vampire. If either minion leaves the ready region, the other is burned.",
+    "text" : "This acting vampire's capacity is reduced by 1 until the end of the game. Put this card in play, locked. It becomes a non-unique vampire with the same clan, sect, capacity and Disciplines as the acting vampire. You may move up to 2 blood from the acting vampire to this vampire. If either minion leaves the ready region, the other is burned.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -13704,14 +13726,14 @@
   "jolId" : "jy141",
   "amaranthId" : "1009",
   "type" : "Master",
-  "text" : "Name: Elder Library\nCardtype: Master\nCost: 1 pool\nMaster: unique location.\n+1 hand size.",
-  "htmlText" : "Name: Elder Library<br/>Cardtype: Master<br/>Cost: 1 pool<br/>Master: unique location.\n+1 hand size.",
+  "text" : "Name: Elder Library\nCardtype: Master\nCost: 1 pool\nUnique location.\n+1 hand size.",
+  "htmlText" : "Name: Elder Library<br/>Cardtype: Master<br/>Cost: 1 pool<br/>Unique location.\n+1 hand size.",
   "displayName" : "Elder Library",
   "names" : [ "Elder Library" ],
   "crypt" : false,
   "unique" : true,
   "burnOption" : false,
-  "preamble" : "Master: unique location.",
+  "preamble" : "Unique location.",
   "modes" : [ {
     "disciplines" : null,
     "text" : "+1 hand size.",
@@ -13967,17 +13989,17 @@
   "jolId" : "ds34",
   "amaranthId" : "1032",
   "type" : "Master",
-  "text" : "Name: Elysium: The Palace of Versailles\nCardtype: Master\nCost: 2 pool\nMaster: unique location.\nDuring the referendum of a political action, you may lock this card to give 1 additional vote to each ready titled Camarilla vampire you control.",
-  "htmlText" : "Name: Elysium: The Palace of Versailles<br/>Cardtype: Master<br/>Cost: 2 pool<br/>Master: unique location.\nDuring the referendum of a political action, you may lock this card to give 1 additional vote to each ready titled Camarilla vampire you control.",
+  "text" : "Name: Elysium: The Palace of Versailles\nCardtype: Master\nCost: 2 pool\nUnique location.\nLock during the polling step of a political action to give each ready titled Camarilla vampire you control +1 vote.",
+  "htmlText" : "Name: Elysium: The Palace of Versailles<br/>Cardtype: Master<br/>Cost: 2 pool<br/>Unique location.\nLock during the polling step of a political action to give each ready titled Camarilla vampire you control +1 vote.",
   "displayName" : "Elysium: The Palace of Versailles",
   "names" : [ "Elysium: The Palace of Versailles" ],
   "crypt" : false,
   "unique" : true,
   "burnOption" : false,
-  "preamble" : "Master: unique location.",
+  "preamble" : "Unique location.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "During the referendum of a political action, you may lock this card to give 1 additional vote to each ready titled Camarilla vampire you control.",
+    "text" : "Lock during the polling step of a political action to give each ready titled Camarilla vampire you control +1 vote.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -15029,8 +15051,8 @@
   "jolId" : "kt48",
   "amaranthId" : "1107",
   "type" : "Reaction",
-  "text" : "Name: Eyes of Argus\nCardtype: Reaction\nDiscipline: Auspex\n[aus] Only usable during a (D) action against you (or a card you control). +2 intercept.\n[AUS] Only usable by a locked vampire. This vampire wakes (they ignore the requirement to be unlocked for playing reaction cards and attempting to block until the end of the action).",
-  "htmlText" : "Name: Eyes of Argus<br/>Cardtype: Reaction<br/>Discipline: Auspex<br/>[aus] Only usable during a (D) action against you (or a card you control). +2 intercept.\n[AUS] Only usable by a locked vampire. This vampire wakes (they ignore the requirement to be unlocked for playing reaction cards and attempting to block until the end of the action).",
+  "text" : "Name: Eyes of Argus\nCardtype: Reaction\nDiscipline: Auspex\n[aus] Only usable during an action directed at you (or a card you control). +2 intercept.\n[AUS] Only usable by a locked vampire. This vampire wakes (they ignore the requirement to be unlocked for playing reaction cards and attempting to block until the end of the action).",
+  "htmlText" : "Name: Eyes of Argus<br/>Cardtype: Reaction<br/>Discipline: Auspex<br/>[aus] Only usable during an action directed at you (or a card you control). +2 intercept.\n[AUS] Only usable by a locked vampire. This vampire wakes (they ignore the requirement to be unlocked for playing reaction cards and attempting to block until the end of the action).",
   "displayName" : "Eyes of Argus",
   "names" : [ "Eyes of Argus" ],
   "crypt" : false,
@@ -15038,7 +15060,7 @@
   "burnOption" : false,
   "modes" : [ {
     "disciplines" : [ "aus" ],
-    "text" : "Only usable during a (D) action against you (or a card you control). +2 intercept.",
+    "text" : "Only usable during an action directed at you (or a card you control). +2 intercept.",
     "target" : null
   }, {
     "disciplines" : [ "AUS" ],
@@ -15193,8 +15215,8 @@
   "jolId" : "jy149",
   "amaranthId" : "1119",
   "type" : "Action Modifier",
-  "text" : "Name: Faceless Night\nCardtype: Action Modifier\nDiscipline: Obfuscate\n[obf] +1 stealth.\n[OBF] +1 stealth, and any minion who attempts to block this action and fails becomes locked when the action is resolved (before resolving the action).",
-  "htmlText" : "Name: Faceless Night<br/>Cardtype: Action Modifier<br/>Discipline: Obfuscate<br/>[obf] +1 stealth.\n[OBF] +1 stealth, and any minion who attempts to block this action and fails becomes locked when the action is resolved (before resolving the action).",
+  "text" : "Name: Faceless Night\nCardtype: Action Modifier\nDiscipline: Obfuscate\n[obf] +1 stealth.\n[OBF] As above, and any minion who attempts to block this action and fails becomes locked before action resolution.",
+  "htmlText" : "Name: Faceless Night<br/>Cardtype: Action Modifier<br/>Discipline: Obfuscate<br/>[obf] +1 stealth.\n[OBF] As above, and any minion who attempts to block this action and fails becomes locked before action resolution.",
   "displayName" : "Faceless Night",
   "names" : [ "Faceless Night" ],
   "crypt" : false,
@@ -15206,7 +15228,7 @@
     "target" : null
   }, {
     "disciplines" : [ "OBF" ],
-    "text" : "+1 stealth, and any minion who attempts to block this action and fails becomes locked when the action is resolved (before resolving the action).",
+    "text" : "As above, and any minion who attempts to block this action and fails becomes locked before action resolution.",
     "target" : null
   } ],
   "doNotReplace" : false,
@@ -17924,8 +17946,8 @@
   "jolId" : "fn57",
   "amaranthId" : "1283",
   "type" : "Equipment",
-  "text" : "Name: Garrote\nCardtype: Equipment\nCost: 1 pool\nMelee weapon.\nStrike: strength damage, only usable at close range. If the opposing vampire goes into torpor during the strike resolution step of this strike and the bearer remains ready, the bearer may burn this card to burn the opposing vampire. This is not considered diablerie.",
-  "htmlText" : "Name: Garrote<br/>Cardtype: Equipment<br/>Cost: 1 pool<br/>Melee weapon.\nStrike: strength damage, only usable at close range. If the opposing vampire goes into torpor during the strike resolution step of this strike and the bearer remains ready, the bearer may burn this card to burn the opposing vampire. This is not considered diablerie.",
+  "text" : "Name: Garrote\nCardtype: Equipment\nCost: 1 pool\nMelee weapon.\nStrike: strength damage, only usable at close range. If the opposing vampire would go to torpor during the strike resolution step of this strike and the bearer remains ready, the bearer may burn this card to burn the opposing vampire instead. This is not considered diablerie.",
+  "htmlText" : "Name: Garrote<br/>Cardtype: Equipment<br/>Cost: 1 pool<br/>Melee weapon.\nStrike: strength damage, only usable at close range. If the opposing vampire would go to torpor during the strike resolution step of this strike and the bearer remains ready, the bearer may burn this card to burn the opposing vampire instead. This is not considered diablerie.",
   "displayName" : "Garrote",
   "names" : [ "Garrote" ],
   "crypt" : false,
@@ -17934,7 +17956,7 @@
   "preamble" : "Melee weapon.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Strike: strength damage, only usable at close range. If the opposing vampire goes into torpor during the strike resolution step of this strike and the bearer remains ready, the bearer may burn this card to burn the opposing vampire. This is not considered diablerie.",
+    "text" : "Strike: strength damage, only usable at close range. If the opposing vampire would go to torpor during the strike resolution step of this strike and the bearer remains ready, the bearer may burn this card to burn the opposing vampire instead. This is not considered diablerie.",
     "target" : "SELF"
   } ],
   "doNotReplace" : false,
@@ -19168,17 +19190,16 @@
   "jolId" : "ah59",
   "amaranthId" : "1387",
   "type" : "Master",
-  "text" : "Name: Guardian Angel\nCardtype: Master\nCost: 2 pool\nMaster.\nPut this card on a ready vampire you control. This vampire gets +1 intercept when you are being bled. This vampire may prevent 1 damage each combat. Burn this card if this vampire goes to torpor.",
-  "htmlText" : "Name: Guardian Angel<br/>Cardtype: Master<br/>Cost: 2 pool<br/>Master.\nPut this card on a ready vampire you control. This vampire gets +1 intercept when you are being bled. This vampire may prevent 1 damage each combat. Burn this card if this vampire goes to torpor.",
+  "text" : "Name: Guardian Angel\nCardtype: Master\nCost: 2 pool\nPut this card on a ready vampire you control. This vampire gets +1 intercept during bleed actions against you. This vampire can prevent 1 damage each combat. Burn this card if this vampire is in torpor.",
+  "htmlText" : "Name: Guardian Angel<br/>Cardtype: Master<br/>Cost: 2 pool<br/>Put this card on a ready vampire you control. This vampire gets +1 intercept during bleed actions against you. This vampire can prevent 1 damage each combat. Burn this card if this vampire is in torpor.",
   "displayName" : "Guardian Angel",
   "names" : [ "Guardian Angel" ],
   "crypt" : false,
   "unique" : false,
   "burnOption" : false,
-  "preamble" : "Master.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card on a ready vampire you control. This vampire gets +1 intercept when you are being bled. This vampire may prevent 1 damage each combat. Burn this card if this vampire goes to torpor.",
+    "text" : "Put this card on a ready vampire you control. This vampire gets +1 intercept during bleed actions against you. This vampire can prevent 1 damage each combat. Burn this card if this vampire is in torpor.",
     "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
@@ -19362,8 +19383,8 @@
   "jolId" : "jy190",
   "amaranthId" : "1410",
   "type" : "Ally",
-  "text" : "Name: Gypsies\nCardtype: Ally\nClan: Gangrel\nCost: 3 pool\nUnique mortal with 1 life. 1 strength, 1 bleed.\nGypsies get +1 stealth on each of their actions.",
-  "htmlText" : "Name: Gypsies<br/>Cardtype: Ally<br/>Clan: Gangrel<br/>Cost: 3 pool<br/>Unique mortal with 1 life. 1 strength, 1 bleed.\nGypsies get +1 stealth on each of their actions.",
+  "text" : "Name: Gypsies\n-- Banned --\nCardtype: Ally\nClan: Gangrel\nCost: 3 pool\nUnique mortal with 1 life. 1 strength, 1 bleed.\nGypsies get +1 stealth on each of their actions.",
+  "htmlText" : "Name: Gypsies<br/>-- Banned --<br/>Cardtype: Ally<br/>Clan: Gangrel<br/>Cost: 3 pool<br/>Unique mortal with 1 life. 1 strength, 1 bleed.\nGypsies get +1 stealth on each of their actions.",
   "displayName" : "Gypsies",
   "names" : [ "Gypsies" ],
   "crypt" : false,
@@ -19853,17 +19874,16 @@
   "jolId" : "jy192",
   "amaranthId" : "1451",
   "type" : "Master",
-  "text" : "Name: Haven Uncovered\nCardtype: Master\nMaster.\nPut this card on a ready vampire. Any minion not controlled by that vampire's controller may enter combat with that vampire as a +1 stealth (D) action. That vampire can burn this card as a +1 stealth (D) action.",
-  "htmlText" : "Name: Haven Uncovered<br/>Cardtype: Master<br/>Master.\nPut this card on a ready vampire. Any minion not controlled by that vampire's controller may enter combat with that vampire as a +1 stealth (D) action. That vampire can burn this card as a +1 stealth (D) action.",
+  "text" : "Name: Haven Uncovered\nCardtype: Master\nPut this card on a ready vampire. Any minion can enter combat with this vampire as a +1 stealth (D) action. This vampire can burn this card as a +1 stealth (D) action.",
+  "htmlText" : "Name: Haven Uncovered<br/>Cardtype: Master<br/>Put this card on a ready vampire. Any minion can enter combat with this vampire as a +1 stealth (D) action. This vampire can burn this card as a +1 stealth (D) action.",
   "displayName" : "Haven Uncovered",
   "names" : [ "Haven Uncovered" ],
   "crypt" : false,
   "unique" : false,
   "burnOption" : false,
-  "preamble" : "Master.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card on a ready vampire. Any minion not controlled by that vampire's controller may enter combat with that vampire as a +1 stealth (D) action. That vampire can burn this card as a +1 stealth (D) action.",
+    "text" : "Put this card on a ready vampire. Any minion can enter combat with this vampire as a +1 stealth (D) action. This vampire can burn this card as a +1 stealth (D) action.",
     "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
@@ -20349,8 +20369,8 @@
   "jolId" : "ah64",
   "amaranthId" : "1490",
   "type" : "Combat",
-  "text" : "Name: Hidden Strength\nCardtype: Combat\nCost: X blood\nDiscipline: Fortitude\n[for] Prevent X+1 damage.\n[FOR] As above, with an optional press.",
-  "htmlText" : "Name: Hidden Strength<br/>Cardtype: Combat<br/>Cost: X blood<br/>Discipline: Fortitude<br/>[for] Prevent X+1 damage.\n[FOR] As above, with an optional press.",
+  "text" : "Name: Hidden Strength\nCardtype: Combat\nCost: X blood\nDiscipline: Fortitude\n[for] Prevent X+1 damage.\n[FOR] As above, with 1 optional press.",
+  "htmlText" : "Name: Hidden Strength<br/>Cardtype: Combat<br/>Cost: X blood<br/>Discipline: Fortitude<br/>[for] Prevent X+1 damage.\n[FOR] As above, with 1 optional press.",
   "displayName" : "Hidden Strength",
   "names" : [ "Hidden Strength" ],
   "crypt" : false,
@@ -20362,7 +20382,7 @@
     "target" : null
   }, {
     "disciplines" : [ "FOR" ],
-    "text" : "As above, with an optional press.",
+    "text" : "As above, with 1 optional press.",
     "target" : null
   } ],
   "doNotReplace" : false,
@@ -21264,21 +21284,21 @@
   "jolId" : "jy206",
   "amaranthId" : "1570",
   "type" : "Combat",
-  "text" : "Name: Immortal Grapple\nCardtype: Combat\nDiscipline: Potence\nOnly usable at close range before strikes are chosen. Grapple.\n[pot] Strikes that are not hand strikes may not be used this round (by either combatant). A vampire may play only one Immortal Grapple each round.\n[POT] As above, with an optional press. If another round of combat occurs, that round is at close range; skip the determine range step for that round.",
-  "htmlText" : "Name: Immortal Grapple<br/>Cardtype: Combat<br/>Discipline: Potence<br/>Only usable at close range before strikes are chosen. Grapple.\n[pot] Strikes that are not hand strikes may not be used this round (by either combatant). A vampire may play only one Immortal Grapple each round.\n[POT] As above, with an optional press. If another round of combat occurs, that round is at close range; skip the determine range step for that round.",
+  "text" : "Name: Immortal Grapple\nCardtype: Combat\nDiscipline: Potence\nGrapple. Only usable at close range before strikes are chosen. A vampire can play only one Immortal Grapple each round.\n[pot] Strikes that are not hand strikes cannot be used this round (by either combatant).\n[POT] As above, with 1 optional press. If another round of combat occurs, that round is at close range (skip the determine range step for that round).",
+  "htmlText" : "Name: Immortal Grapple<br/>Cardtype: Combat<br/>Discipline: Potence<br/>Grapple. Only usable at close range before strikes are chosen. A vampire can play only one Immortal Grapple each round.\n[pot] Strikes that are not hand strikes cannot be used this round (by either combatant).\n[POT] As above, with 1 optional press. If another round of combat occurs, that round is at close range (skip the determine range step for that round).",
   "displayName" : "Immortal Grapple",
   "names" : [ "Immortal Grapple" ],
   "crypt" : false,
   "unique" : false,
   "burnOption" : false,
-  "preamble" : "Only usable at close range before strikes are chosen. Grapple.",
+  "preamble" : "Grapple. Only usable at close range before strikes are chosen. A vampire can play only one Immortal Grapple each round.",
   "modes" : [ {
     "disciplines" : [ "pot" ],
-    "text" : "Strikes that are not hand strikes may not be used this round (by either combatant). A vampire may play only one Immortal Grapple each round.",
+    "text" : "Strikes that are not hand strikes cannot be used this round (by either combatant).",
     "target" : null
   }, {
     "disciplines" : [ "POT" ],
-    "text" : "As above, with an optional press. If another round of combat occurs, that round is at close range; skip the determine range step for that round.",
+    "text" : "As above, with 1 optional press. If another round of combat occurs, that round is at close range (skip the determine range step for that round).",
     "target" : null
   } ],
   "doNotReplace" : false,
@@ -24421,17 +24441,17 @@
   "jolId" : "an78",
   "amaranthId" : "1913",
   "type" : "Master",
-  "text" : "Name: Life in the City\nCardtype: Master\nMaster: trifle.\nMove 1 blood from the blood bank to a ready vampire.",
-  "htmlText" : "Name: Life in the City<br/>Cardtype: Master<br/>Master: trifle.\nMove 1 blood from the blood bank to a ready vampire.",
+  "text" : "Name: Life in the City\nCardtype: Master\nTrifle.\nAdd 1 blood to a ready vampire.",
+  "htmlText" : "Name: Life in the City<br/>Cardtype: Master<br/>Trifle.\nAdd 1 blood to a ready vampire.",
   "displayName" : "Life in the City",
   "names" : [ "Life in the City" ],
   "crypt" : false,
   "unique" : false,
   "burnOption" : false,
-  "preamble" : "Master: trifle.",
+  "preamble" : "Trifle.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Move 1 blood from the blood bank to a ready vampire.",
+    "text" : "Add 1 blood to a ready vampire.",
     "target" : null
   } ],
   "doNotReplace" : false,
@@ -24895,8 +24915,8 @@
   "jolId" : "jy232",
   "amaranthId" : "1958",
   "type" : "Action Modifier",
-  "text" : "Name: Lost in Crowds\nCardtype: Action Modifier\nDiscipline: Obfuscate\n[obf] +1 stealth. /Into Thin Air/ and Lost in Crowds cannot both be played on the same action.\n[OBF] As above, but for +2 stealth.",
-  "htmlText" : "Name: Lost in Crowds<br/>Cardtype: Action Modifier<br/>Discipline: Obfuscate<br/>[obf] +1 stealth. /Into Thin Air/ and Lost in Crowds cannot both be played on the same action.\n[OBF] As above, but for +2 stealth.",
+  "text" : "Name: Lost in Crowds\nCardtype: Action Modifier\nDiscipline: Obfuscate\n[obf] +1 stealth. Lost in Crowds and cards named /Into Thin Air/ cannot both be played on the same action.\n[OBF] As above, but for +2 stealth.",
+  "htmlText" : "Name: Lost in Crowds<br/>Cardtype: Action Modifier<br/>Discipline: Obfuscate<br/>[obf] +1 stealth. Lost in Crowds and cards named /Into Thin Air/ cannot both be played on the same action.\n[OBF] As above, but for +2 stealth.",
   "displayName" : "Lost in Crowds",
   "names" : [ "Lost in Crowds" ],
   "crypt" : false,
@@ -24904,7 +24924,7 @@
   "burnOption" : false,
   "modes" : [ {
     "disciplines" : [ "obf" ],
-    "text" : "+1 stealth. /Into Thin Air/ and Lost in Crowds cannot both be played on the same action.",
+    "text" : "+1 stealth. Lost in Crowds and cards named /Into Thin Air/ cannot both be played on the same action.",
     "target" : null
   }, {
     "disciplines" : [ "OBF" ],
@@ -25300,8 +25320,8 @@
   "jolId" : "jy241",
   "amaranthId" : "2015",
   "type" : "Action",
-  "text" : "Name: Magic of the Smith\nCardtype: Action\nCost: 1 blood\nDiscipline: Thaumaturgy\n+1 stealth action.\n[tha] Search your library for an equipment card and equip this acting vampire with it (requirements and cost apply as normal). Shuffle afterward.\n[THA] As above, but this is a +3 stealth action.",
-  "htmlText" : "Name: Magic of the Smith<br/>Cardtype: Action<br/>Cost: 1 blood<br/>Discipline: Thaumaturgy<br/>+1 stealth action.\n[tha] Search your library for an equipment card and equip this acting vampire with it (requirements and cost apply as normal). Shuffle afterward.\n[THA] As above, but this is a +3 stealth action.",
+  "text" : "Name: Magic of the Smith\nCardtype: Action\nCost: 1 blood\nDiscipline: Thaumaturgy\n+1 stealth action.\n[tha] Search your library for an equipment card and equip this vampire with it (requirements and cost apply as normal; shuffle afterward).\n[THA] As above, but this is a +3 stealth action.",
+  "htmlText" : "Name: Magic of the Smith<br/>Cardtype: Action<br/>Cost: 1 blood<br/>Discipline: Thaumaturgy<br/>+1 stealth action.\n[tha] Search your library for an equipment card and equip this vampire with it (requirements and cost apply as normal; shuffle afterward).\n[THA] As above, but this is a +3 stealth action.",
   "displayName" : "Magic of the Smith",
   "names" : [ "Magic of the Smith" ],
   "crypt" : false,
@@ -25310,7 +25330,7 @@
   "preamble" : "+1 stealth action.",
   "modes" : [ {
     "disciplines" : [ "tha" ],
-    "text" : "Search your library for an equipment card and equip this acting vampire with it (requirements and cost apply as normal). Shuffle afterward.",
+    "text" : "Search your library for an equipment card and equip this vampire with it (requirements and cost apply as normal; shuffle afterward).",
     "target" : null
   }, {
     "disciplines" : [ "THA" ],
@@ -27076,8 +27096,8 @@
   "jolId" : "th110",
   "amaranthId" : "2189",
   "type" : "Action Modifier",
-  "text" : "Name: Mirror Walk\nCardtype: Action Modifier\nDiscipline: Thaumaturgy\nDo not replace until your discard phase.\n[tha] +1 stealth.\n[THA] As [tha] above, and if this action is blocked, lock the blocking minion and end the action before block resolution.",
-  "htmlText" : "Name: Mirror Walk<br/>Cardtype: Action Modifier<br/>Discipline: Thaumaturgy<br/>Do not replace until your discard phase.\n[tha] +1 stealth.\n[THA] As [tha] above, and if this action is blocked, lock the blocking minion and end the action before block resolution.",
+  "text" : "Name: Mirror Walk\nCardtype: Action Modifier\nDiscipline: Thaumaturgy\nDo not replace until your discard phase.\n[tha] +1 stealth.\n[THA] As above, and if this action is blocked, lock the blocking minion and end the action before block resolution.",
+  "htmlText" : "Name: Mirror Walk<br/>Cardtype: Action Modifier<br/>Discipline: Thaumaturgy<br/>Do not replace until your discard phase.\n[tha] +1 stealth.\n[THA] As above, and if this action is blocked, lock the blocking minion and end the action before block resolution.",
   "displayName" : "Mirror Walk",
   "names" : [ "Mirror Walk" ],
   "crypt" : false,
@@ -27090,7 +27110,7 @@
     "target" : null
   }, {
     "disciplines" : [ "THA" ],
-    "text" : "As [tha] above, and if this action is blocked, lock the blocking minion and end the action before block resolution.",
+    "text" : "As above, and if this action is blocked, lock the blocking minion and end the action before block resolution.",
     "target" : null
   } ],
   "doNotReplace" : true,
@@ -27760,8 +27780,8 @@
   "jolId" : "jy270",
   "amaranthId" : "2250",
   "type" : "Retainer",
-  "text" : "Name: Murder of Crows\nCardtype: Retainer\nCost: 1 blood\nDiscipline: Animalism\nAnimal with 1 life.\n[ani] Murder of Crows inflicts 1R damage each round of combat during normal strike resolution.\n[ANI] As above, but Murder of Crows has 2 life.",
-  "htmlText" : "Name: Murder of Crows<br/>Cardtype: Retainer<br/>Cost: 1 blood<br/>Discipline: Animalism<br/>Animal with 1 life.\n[ani] Murder of Crows inflicts 1R damage each round of combat during normal strike resolution.\n[ANI] As above, but Murder of Crows has 2 life.",
+  "text" : "Name: Murder of Crows\nCardtype: Retainer\nCost: 1 blood\nDiscipline: Animalism\nAnimal with 1 life.\n[ani] Murder of Crows inflicts 1R damage on the opposing minion each round of combat during normal strike resolution.\n[ANI] As above, but Murder of Crows has 2 life.",
+  "htmlText" : "Name: Murder of Crows<br/>Cardtype: Retainer<br/>Cost: 1 blood<br/>Discipline: Animalism<br/>Animal with 1 life.\n[ani] Murder of Crows inflicts 1R damage on the opposing minion each round of combat during normal strike resolution.\n[ANI] As above, but Murder of Crows has 2 life.",
   "displayName" : "Murder of Crows",
   "names" : [ "Murder of Crows" ],
   "crypt" : false,
@@ -27770,7 +27790,7 @@
   "preamble" : "Animal with 1 life.",
   "modes" : [ {
     "disciplines" : [ "ani" ],
-    "text" : "Murder of Crows inflicts 1R damage each round of combat during normal strike resolution.",
+    "text" : "Murder of Crows inflicts 1R damage on the opposing minion each round of combat during normal strike resolution.",
     "target" : "SELF"
   }, {
     "disciplines" : [ "ANI" ],
@@ -28730,8 +28750,8 @@
   "jolId" : "an92",
   "amaranthId" : "2335",
   "type" : "Action",
-  "text" : "Name: Nosferatu Bestial\nCardtype: Action\nClan: Nosferatu\nCost: 1 pool\n+1 stealth action. Unique.\nPut this card into play. This card represents a unique Nosferatu with 2 capacity and basic Animalism [ani]. The Bestial cannot act except to hunt, cannot cast votes or ballots and cannot have equipment. During your unlock phase, this Bestial may employ a retainer from your hand that requires Animalism (requirements and cost apply as normal). This is not an action and cannot be blocked.",
-  "htmlText" : "Name: Nosferatu Bestial<br/>Cardtype: Action<br/>Clan: Nosferatu<br/>Cost: 1 pool<br/>+1 stealth action. Unique.\nPut this card into play. This card represents a unique Nosferatu with 2 capacity and basic Animalism [ani]. The Bestial cannot act except to hunt, cannot cast votes or ballots and cannot have equipment. During your unlock phase, this Bestial may employ a retainer from your hand that requires Animalism (requirements and cost apply as normal). This is not an action and cannot be blocked.",
+  "text" : "Name: Nosferatu Bestial\nCardtype: Action\nClan: Nosferatu\nCost: 1 pool\n+1 stealth action. Unique.\nPut this card into play. This card represents a unique Nosferatu of the same sect as the acting Nosferatu with 2 capacity and basic Animalism [ani]. The Bestial cannot act except to hunt, cannot cast votes or ballots and cannot have equipment. During your unlock phase, this Bestial may employ a retainer from your hand that requires Animalism (requirements and cost apply as normal). This is not an action and cannot be blocked.",
+  "htmlText" : "Name: Nosferatu Bestial<br/>Cardtype: Action<br/>Clan: Nosferatu<br/>Cost: 1 pool<br/>+1 stealth action. Unique.\nPut this card into play. This card represents a unique Nosferatu of the same sect as the acting Nosferatu with 2 capacity and basic Animalism [ani]. The Bestial cannot act except to hunt, cannot cast votes or ballots and cannot have equipment. During your unlock phase, this Bestial may employ a retainer from your hand that requires Animalism (requirements and cost apply as normal). This is not an action and cannot be blocked.",
   "displayName" : "Nosferatu Bestial",
   "names" : [ "Nosferatu Bestial" ],
   "crypt" : false,
@@ -28740,7 +28760,7 @@
   "preamble" : "+1 stealth action. Unique.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card into play. This card represents a unique Nosferatu with 2 capacity and basic Animalism [ani]. The Bestial cannot act except to hunt, cannot cast votes or ballots and cannot have equipment. During your unlock phase, this Bestial may employ a retainer from your hand that requires Animalism (requirements and cost apply as normal). This is not an action and cannot be blocked.",
+    "text" : "Put this card into play. This card represents a unique Nosferatu of the same sect as the acting Nosferatu with 2 capacity and basic Animalism [ani]. The Bestial cannot act except to hunt, cannot cast votes or ballots and cannot have equipment. During your unlock phase, this Bestial may employ a retainer from your hand that requires Animalism (requirements and cost apply as normal). This is not an action and cannot be blocked.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -29152,8 +29172,8 @@
   "jolId" : "lo139",
   "amaranthId" : "2362",
   "type" : "Ally",
-  "text" : "Name: Ohoyo Hopoksia (Bastet)\nCardtype: Ally\nClan: Ahrimane\nCost: 3 pool\nUnique werewolf with 3 life. 3 strength, 0 bleed.\nWhen a minion you control is about to enter combat with an acting minion, you may lock Ohoyo to cancel that combat; Ohoyo enters combat with the acting minion instead. She gets an optional maneuver each combat. If she has less than 3 life during your unlock phase, she gains 1 life from the blood bank.",
-  "htmlText" : "Name: Ohoyo Hopoksia (Bastet)<br/>Cardtype: Ally<br/>Clan: Ahrimane<br/>Cost: 3 pool<br/>Unique werewolf with 3 life. 3 strength, 0 bleed.\nWhen a minion you control is about to enter combat with an acting minion, you may lock Ohoyo to cancel that combat; Ohoyo enters combat with the acting minion instead. She gets an optional maneuver each combat. If she has less than 3 life during your unlock phase, she gains 1 life from the blood bank.",
+  "text" : "Name: Ohoyo Hopoksia (Bastet)\nCardtype: Ally\nClan: Ahrimane\nCost: 3 pool\nUnique werewolf with 3 life. 3 strength, 0 bleed.\nWhen a minion you control would enter combat with an acting minion, you may lock Ohoyo to cancel that combat and have Ohoyo enter combat with the acting minion instead. She gets an optional maneuver each combat. If she has less than 3 life during your unlock phase, she gains 1 life from the blood bank.",
+  "htmlText" : "Name: Ohoyo Hopoksia (Bastet)<br/>Cardtype: Ally<br/>Clan: Ahrimane<br/>Cost: 3 pool<br/>Unique werewolf with 3 life. 3 strength, 0 bleed.\nWhen a minion you control would enter combat with an acting minion, you may lock Ohoyo to cancel that combat and have Ohoyo enter combat with the acting minion instead. She gets an optional maneuver each combat. If she has less than 3 life during your unlock phase, she gains 1 life from the blood bank.",
   "displayName" : "Ohoyo Hopoksia (Bastet)",
   "names" : [ "Ohoyo Hopoksia (Bastet)" ],
   "crypt" : false,
@@ -29162,7 +29182,7 @@
   "preamble" : "Unique werewolf with 3 life. 3 strength, 0 bleed.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "When a minion you control is about to enter combat with an acting minion, you may lock Ohoyo to cancel that combat; Ohoyo enters combat with the acting minion instead. She gets an optional maneuver each combat. If she has less than 3 life during your unlock phase, she gains 1 life from the blood bank.",
+    "text" : "When a minion you control would enter combat with an acting minion, you may lock Ohoyo to cancel that combat and have Ohoyo enter combat with the acting minion instead. She gets an optional maneuver each combat. If she has less than 3 life during your unlock phase, she gains 1 life from the blood bank.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -32719,8 +32739,8 @@
   "jolId" : "ln124",
   "amaranthId" : "2587",
   "type" : "Action",
-  "text" : "Name: Preternatural Strength\nCardtype: Action\nCost: 1 blood\nDiscipline: Potence\n+2 stealth action.\n[pot] Put this card on this vampire. This vampire gets +1 strength. He or she cannot play Torn Signpost. A vampire can have only one Preternatural Strength.\n[POT] As above, but this vampire gets +2 strength.",
-  "htmlText" : "Name: Preternatural Strength<br/>Cardtype: Action<br/>Cost: 1 blood<br/>Discipline: Potence<br/>+2 stealth action.\n[pot] Put this card on this vampire. This vampire gets +1 strength. He or she cannot play Torn Signpost. A vampire can have only one Preternatural Strength.\n[POT] As above, but this vampire gets +2 strength.",
+  "text" : "Name: Preternatural Strength\nCardtype: Action\nCost: 1 blood\nDiscipline: Potence\n+2 stealth action.\n[pot] Put this card on this vampire. This vampire gets +1 strength. They cannot play cards named /Torn Signpost/. A vampire can have only one Preternatural Strength.\n[POT] As above, but this vampire gets +2 strength.",
+  "htmlText" : "Name: Preternatural Strength<br/>Cardtype: Action<br/>Cost: 1 blood<br/>Discipline: Potence<br/>+2 stealth action.\n[pot] Put this card on this vampire. This vampire gets +1 strength. They cannot play cards named /Torn Signpost/. A vampire can have only one Preternatural Strength.\n[POT] As above, but this vampire gets +2 strength.",
   "displayName" : "Preternatural Strength",
   "names" : [ "Preternatural Strength" ],
   "crypt" : false,
@@ -32729,7 +32749,7 @@
   "preamble" : "+2 stealth action.",
   "modes" : [ {
     "disciplines" : [ "pot" ],
-    "text" : "Put this card on this vampire. This vampire gets +1 strength. He or she cannot play Torn Signpost. A vampire can have only one Preternatural Strength.",
+    "text" : "Put this card on this vampire. This vampire gets +1 strength. They cannot play cards named /Torn Signpost/. A vampire can have only one Preternatural Strength.",
     "target" : "SELF"
   }, {
     "disciplines" : [ "POT" ],
@@ -33087,6 +33107,26 @@
   "doNotReplace" : false,
   "multiMode" : false,
   "cost" : "1 blood"
+}, {
+  "id" : "102214",
+  "jolId" : "fth02",
+  "amaranthId" : "4148",
+  "type" : "Reaction",
+  "text" : "Name: Protected District\nCardtype: Reaction\nRequires a primogen. Only usable during a bleed action against you or during the polling step of a political action.\nReduce the bleed amount by 3 or this vampire gains +3 votes against the referendum.",
+  "htmlText" : "Name: Protected District<br/>Cardtype: Reaction<br/>Requires a primogen. Only usable during a bleed action against you or during the polling step of a political action.\nReduce the bleed amount by 3 or this vampire gains +3 votes against the referendum.",
+  "displayName" : "Protected District",
+  "names" : [ "Protected District" ],
+  "crypt" : false,
+  "unique" : false,
+  "burnOption" : false,
+  "preamble" : "Requires a primogen. Only usable during a bleed action against you or during the polling step of a political action.",
+  "modes" : [ {
+    "disciplines" : null,
+    "text" : "Reduce the bleed amount by 3 or this vampire gains +3 votes against the referendum.",
+    "target" : null
+  } ],
+  "doNotReplace" : false,
+  "multiMode" : false
 }, {
   "id" : "101500",
   "jolId" : "vt4",
@@ -34541,17 +34581,17 @@
   "jolId" : "ge108",
   "amaranthId" : "2706",
   "type" : "Master",
-  "text" : "Name: Rebel\nCardtype: Master\nMaster: archetype. Trifle.\nPut this card on a vampire you control. Once per turn, when this vampire successfully blocks a titled vampire or a political action, he or she gains 1 blood from the blood bank (before the resulting combat, if any). A vampire can have only one archetype.",
-  "htmlText" : "Name: Rebel<br/>Cardtype: Master<br/>Master: archetype. Trifle.\nPut this card on a vampire you control. Once per turn, when this vampire successfully blocks a titled vampire or a political action, he or she gains 1 blood from the blood bank (before the resulting combat, if any). A vampire can have only one archetype.",
+  "text" : "Name: Rebel\nCardtype: Master\nArchetype. Trifle.\nPut this card on a vampire you control. Once each turn, if they block a titled vampire or a political action, this vampire gains 1 blood before block resolution. A vampire can have only one archetype.",
+  "htmlText" : "Name: Rebel<br/>Cardtype: Master<br/>Archetype. Trifle.\nPut this card on a vampire you control. Once each turn, if they block a titled vampire or a political action, this vampire gains 1 blood before block resolution. A vampire can have only one archetype.",
   "displayName" : "Rebel",
   "names" : [ "Rebel" ],
   "crypt" : false,
   "unique" : false,
   "burnOption" : false,
-  "preamble" : "Master: archetype. Trifle.",
+  "preamble" : "Archetype. Trifle.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card on a vampire you control. Once per turn, when this vampire successfully blocks a titled vampire or a political action, he or she gains 1 blood from the blood bank (before the resulting combat, if any). A vampire can have only one archetype.",
+    "text" : "Put this card on a vampire you control. Once each turn, if they block a titled vampire or a political action, this vampire gains 1 blood before block resolution. A vampire can have only one archetype.",
     "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
@@ -35947,8 +35987,8 @@
   "jolId" : "sa255",
   "amaranthId" : "2775",
   "type" : "Action",
-  "text" : "Name: Revelations\nCardtype: Action\nCost: 1 blood\nDiscipline: Auspex\n+1 stealth action.\n[aus] (D) Look at your prey's hand. He or she discards a card of your choice.\n[AUS] Put this card in play. Your prey plays with an open hand. Any minion may burn this card as a (D) action.",
-  "htmlText" : "Name: Revelations<br/>Cardtype: Action<br/>Cost: 1 blood<br/>Discipline: Auspex<br/>+1 stealth action.\n[aus] (D) Look at your prey's hand. He or she discards a card of your choice.\n[AUS] Put this card in play. Your prey plays with an open hand. Any minion may burn this card as a (D) action.",
+  "text" : "Name: Revelations\nCardtype: Action\nCost: 1 blood\nDiscipline: Auspex\n+1 stealth action.\n[aus] (D) Look at your prey's hand and discard one card of your choice from it.\n[AUS] Put this card in play. Your prey plays with an open hand. Any minion can burn this card as a (D) action.",
+  "htmlText" : "Name: Revelations<br/>Cardtype: Action<br/>Cost: 1 blood<br/>Discipline: Auspex<br/>+1 stealth action.\n[aus] (D) Look at your prey's hand and discard one card of your choice from it.\n[AUS] Put this card in play. Your prey plays with an open hand. Any minion can burn this card as a (D) action.",
   "displayName" : "Revelations",
   "names" : [ "Revelations" ],
   "crypt" : false,
@@ -35957,11 +35997,11 @@
   "preamble" : "+1 stealth action.",
   "modes" : [ {
     "disciplines" : [ "aus" ],
-    "text" : "(D) Look at your prey's hand. He or she discards a card of your choice.",
+    "text" : "(D) Look at your prey's hand and discard one card of your choice from it.",
     "target" : null
   }, {
     "disciplines" : [ "AUS" ],
-    "text" : "Put this card in play. Your prey plays with an open hand. Any minion may burn this card as a (D) action.",
+    "text" : "Put this card in play. Your prey plays with an open hand. Any minion can burn this card as a (D) action.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -36451,8 +36491,8 @@
   "jolId" : "ds127",
   "amaranthId" : "2818",
   "type" : "Ally",
-  "text" : "Name: Rom Gypsy\nCardtype: Ally\nClan: Ravnos\nCost: 3 pool\nMortal with 2 life. 0 strength, 0 bleed.\nRom Gypsy may strike for 1R damage. Rom Gypsy gets one optional maneuver each combat. Lock to give a Ravnos you control +1 stealth.",
-  "htmlText" : "Name: Rom Gypsy<br/>Cardtype: Ally<br/>Clan: Ravnos<br/>Cost: 3 pool<br/>Mortal with 2 life. 0 strength, 0 bleed.\nRom Gypsy may strike for 1R damage. Rom Gypsy gets one optional maneuver each combat. Lock to give a Ravnos you control +1 stealth.",
+  "text" : "Name: Rom Gypsy\n-- Banned --\nCardtype: Ally\nClan: Ravnos\nCost: 3 pool\nMortal with 2 life. 0 strength, 0 bleed.\nRom Gypsy may strike for 1R damage. Rom Gypsy gets one optional maneuver each combat. Lock to give a Ravnos you control +1 stealth.",
+  "htmlText" : "Name: Rom Gypsy<br/>-- Banned --<br/>Cardtype: Ally<br/>Clan: Ravnos<br/>Cost: 3 pool<br/>Mortal with 2 life. 0 strength, 0 bleed.\nRom Gypsy may strike for 1R damage. Rom Gypsy gets one optional maneuver each combat. Lock to give a Ravnos you control +1 stealth.",
   "displayName" : "Rom Gypsy",
   "names" : [ "Rom Gypsy" ],
   "crypt" : false,
@@ -36554,6 +36594,29 @@
     "disciplines" : null,
     "text" : "Put this card on a vampire when an opposing minion attempts to inflict aggravated damage on him or her, whether the damage would be successfully inflicted or not. Combat ends. This vampire is locked and sent to torpor. This vampire does not unlock as normal. During this vampire's next unlock phase, burn this card.",
     "target" : "SOMETHING"
+  } ],
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "102215",
+  "jolId" : "fth03",
+  "amaranthId" : "4149",
+  "type" : "Combat",
+  "text" : "Name: Roundhouse\nCardtype: Combat\nDiscipline: Potence\n[pot] Strike: hand strike at +2 damage.\n[POT] Strike: hand strike at +3 damage.",
+  "htmlText" : "Name: Roundhouse<br/>Cardtype: Combat<br/>Discipline: Potence<br/>[pot] Strike: hand strike at +2 damage.\n[POT] Strike: hand strike at +3 damage.",
+  "displayName" : "Roundhouse",
+  "names" : [ "Roundhouse" ],
+  "crypt" : false,
+  "unique" : false,
+  "burnOption" : false,
+  "modes" : [ {
+    "disciplines" : [ "pot" ],
+    "text" : "Strike: hand strike at +2 damage.",
+    "target" : null
+  }, {
+    "disciplines" : [ "POT" ],
+    "text" : "Strike: hand strike at +3 damage.",
+    "target" : null
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -41128,8 +41191,8 @@
   "jolId" : "jy373",
   "amaranthId" : "3135",
   "type" : "Action Modifier",
-  "text" : "Name: Spying Mission\nCardtype: Action Modifier\nDiscipline: Obfuscate\n[obf] +1 stealth.\n[OBF] Only usable when a bleed would be successful. The bleed burns no pool; it is unsuccessful. Instead, put this card on the acting vampire. The next time this vampire would successfully bleed the same Methuselah, burn this card for +2 bleed.",
-  "htmlText" : "Name: Spying Mission<br/>Cardtype: Action Modifier<br/>Discipline: Obfuscate<br/>[obf] +1 stealth.\n[OBF] Only usable when a bleed would be successful. The bleed burns no pool; it is unsuccessful. Instead, put this card on the acting vampire. The next time this vampire would successfully bleed the same Methuselah, burn this card for +2 bleed.",
+  "text" : "Name: Spying Mission\nCardtype: Action Modifier\nDiscipline: Obfuscate\n[obf] +1 stealth.\n[OBF] Only usable if a bleed would be successful. Instead, the bleed burns no pool, is unsuccessful, and this card is put on this vampire. The next time this vampire is about to successfully bleed the same Methuselah, burn this card and this vampire gets +2 bleed.",
+  "htmlText" : "Name: Spying Mission<br/>Cardtype: Action Modifier<br/>Discipline: Obfuscate<br/>[obf] +1 stealth.\n[OBF] Only usable if a bleed would be successful. Instead, the bleed burns no pool, is unsuccessful, and this card is put on this vampire. The next time this vampire is about to successfully bleed the same Methuselah, burn this card and this vampire gets +2 bleed.",
   "displayName" : "Spying Mission",
   "names" : [ "Spying Mission" ],
   "crypt" : false,
@@ -41141,8 +41204,8 @@
     "target" : null
   }, {
     "disciplines" : [ "OBF" ],
-    "text" : "Only usable when a bleed would be successful. The bleed burns no pool; it is unsuccessful. Instead, put this card on the acting vampire. The next time this vampire would successfully bleed the same Methuselah, burn this card for +2 bleed.",
-    "target" : "SELF"
+    "text" : "Only usable if a bleed would be successful. Instead, the bleed burns no pool, is unsuccessful, and this card is put on this vampire. The next time this vampire is about to successfully bleed the same Methuselah, burn this card and this vampire gets +2 bleed.",
+    "target" : null
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -43112,17 +43175,17 @@
   "jolId" : "jy382",
   "amaranthId" : "3257",
   "type" : "Combat",
-  "text" : "Name: Taste of Vitae\nCardtype: Combat\nOnly usable at the end of a round of combat. Not usable by a vampire being burned or going to torpor.\nThis vampire gains an amount of blood equal to the amount lost by the opposing vampire to damage during this round. A vampire may play only one Taste of Vitae each round.",
-  "htmlText" : "Name: Taste of Vitae<br/>Cardtype: Combat<br/>Only usable at the end of a round of combat. Not usable by a vampire being burned or going to torpor.\nThis vampire gains an amount of blood equal to the amount lost by the opposing vampire to damage during this round. A vampire may play only one Taste of Vitae each round.",
+  "text" : "Name: Taste of Vitae\nCardtype: Combat\nOnly usable at the end of a round of combat. Not usable by a vampire being burned or going to torpor. A vampire can play only one Taste of Vitae each round.\nThis vampire gains blood equal to the amount of blood lost by the opposing vampire to damage this round.",
+  "htmlText" : "Name: Taste of Vitae<br/>Cardtype: Combat<br/>Only usable at the end of a round of combat. Not usable by a vampire being burned or going to torpor. A vampire can play only one Taste of Vitae each round.\nThis vampire gains blood equal to the amount of blood lost by the opposing vampire to damage this round.",
   "displayName" : "Taste of Vitae",
   "names" : [ "Taste of Vitae" ],
   "crypt" : false,
   "unique" : false,
   "burnOption" : false,
-  "preamble" : "Only usable at the end of a round of combat. Not usable by a vampire being burned or going to torpor.",
+  "preamble" : "Only usable at the end of a round of combat. Not usable by a vampire being burned or going to torpor. A vampire can play only one Taste of Vitae each round.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "This vampire gains an amount of blood equal to the amount lost by the opposing vampire to damage during this round. A vampire may play only one Taste of Vitae each round.",
+    "text" : "This vampire gains blood equal to the amount of blood lost by the opposing vampire to damage this round.",
     "target" : null
   } ],
   "doNotReplace" : false,
@@ -43466,8 +43529,8 @@
   "jolId" : "ah166",
   "amaranthId" : "3285",
   "type" : "Ally",
-  "text" : "Name: Terrorists\nCardtype: Ally\nClan: Assamite\nCost: 2 pool\nMortal with 1 life. 2 strength, 1 bleed.\nTerrorists may take a +1 stealth action to go through your library, find a Bomb, and equip them with it. Pay the cost to equip as normal. Reshuffle your library afterwards.",
-  "htmlText" : "Name: Terrorists<br/>Cardtype: Ally<br/>Clan: Assamite<br/>Cost: 2 pool<br/>Mortal with 1 life. 2 strength, 1 bleed.\nTerrorists may take a +1 stealth action to go through your library, find a Bomb, and equip them with it. Pay the cost to equip as normal. Reshuffle your library afterwards.",
+  "text" : "Name: Terrorists\n-- Banned --\nCardtype: Ally\nClan: Assamite\nCost: 2 pool\nMortal with 1 life. 2 strength, 1 bleed.\nTerrorists may take a +1 stealth action to go through your library, find a Bomb, and equip them with it. Pay the cost to equip as normal. Reshuffle your library afterwards.",
+  "htmlText" : "Name: Terrorists<br/>-- Banned --<br/>Cardtype: Ally<br/>Clan: Assamite<br/>Cost: 2 pool<br/>Mortal with 1 life. 2 strength, 1 bleed.\nTerrorists may take a +1 stealth action to go through your library, find a Bomb, and equip them with it. Pay the cost to equip as normal. Reshuffle your library afterwards.",
   "displayName" : "Terrorists",
   "names" : [ "Terrorists" ],
   "crypt" : false,
@@ -43723,8 +43786,8 @@
   "jolId" : "jy391",
   "amaranthId" : "3304",
   "type" : "Action",
-  "text" : "Name: Third Tradition: Progeny\nCardtype: Action\nCost: 1 blood\n+1 stealth action. Requires a ready non-Sterile prince or justicar.\nPut this card in play; it becomes a non-unique 1-capacity vampire of the same clan as the acting vampire. You may go through your library (shuffle afterward), ash heap or hand to find a Discipline card for this vampire. Move up to 2 blood from the acting vampire to this vampire. This vampire cannot take any actions this turn.",
-  "htmlText" : "Name: Third Tradition: Progeny<br/>Cardtype: Action<br/>Cost: 1 blood<br/>+1 stealth action. Requires a ready non-Sterile prince or justicar.\nPut this card in play; it becomes a non-unique 1-capacity vampire of the same clan as the acting vampire. You may go through your library (shuffle afterward), ash heap or hand to find a Discipline card for this vampire. Move up to 2 blood from the acting vampire to this vampire. This vampire cannot take any actions this turn.",
+  "text" : "Name: Third Tradition: Progeny\nCardtype: Action\nCost: 1 blood\n+1 stealth action. Requires a ready non-Sterile prince or justicar.\nPut this card in play; it becomes a non-unique 1-capacity Camarilla vampire of the same clan as the acting vampire. You may go through your library (shuffle afterward), ash heap or hand to find a Discipline card for this vampire. Move up to 2 blood from the acting vampire to this vampire. This vampire cannot take any actions this turn.",
+  "htmlText" : "Name: Third Tradition: Progeny<br/>Cardtype: Action<br/>Cost: 1 blood<br/>+1 stealth action. Requires a ready non-Sterile prince or justicar.\nPut this card in play; it becomes a non-unique 1-capacity Camarilla vampire of the same clan as the acting vampire. You may go through your library (shuffle afterward), ash heap or hand to find a Discipline card for this vampire. Move up to 2 blood from the acting vampire to this vampire. This vampire cannot take any actions this turn.",
   "displayName" : "Third Tradition: Progeny",
   "names" : [ "Third Tradition: Progeny", "Third Tradition: Progeny, The" ],
   "crypt" : false,
@@ -43733,7 +43796,7 @@
   "preamble" : "+1 stealth action. Requires a ready non-Sterile prince or justicar.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card in play; it becomes a non-unique 1-capacity vampire of the same clan as the acting vampire. You may go through your library (shuffle afterward), ash heap or hand to find a Discipline card for this vampire. Move up to 2 blood from the acting vampire to this vampire. This vampire cannot take any actions this turn.",
+    "text" : "Put this card in play; it becomes a non-unique 1-capacity Camarilla vampire of the same clan as the acting vampire. You may go through your library (shuffle afterward), ash heap or hand to find a Discipline card for this vampire. Move up to 2 blood from the acting vampire to this vampire. This vampire cannot take any actions this turn.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -44079,17 +44142,16 @@
   "jolId" : "ds151",
   "amaranthId" : "3337",
   "type" : "Master",
-  "text" : "Name: Toreador Grand Ball\nCardtype: Master\nClan: Toreador\nCost: 1 pool\nMaster.\nPut this card in play. Choose 2 ready Toreador you control. The first Toreador's non-bleed actions cannot be blocked. The second Toreador does not unlock as normal during the unlock phase; lock the second Toreador. Any minion may burn this card as a (D) action; Nosferatu get -1 stealth when attempting that action.",
-  "htmlText" : "Name: Toreador Grand Ball<br/>Cardtype: Master<br/>Clan: Toreador<br/>Cost: 1 pool<br/>Master.\nPut this card in play. Choose 2 ready Toreador you control. The first Toreador's non-bleed actions cannot be blocked. The second Toreador does not unlock as normal during the unlock phase; lock the second Toreador. Any minion may burn this card as a (D) action; Nosferatu get -1 stealth when attempting that action.",
+  "text" : "Name: Toreador Grand Ball\nCardtype: Master\nClan: Toreador\nCost: 1 pool\nChoose two ready Toreador you control, put this card in play, and lock one of the two. The locked Toreador does not unlock as normal. The other Toreador's non-bleed actions cannot be blocked. Any minion can burn this card as a (D) action; Nosferatu get -1 stealth during that action.",
+  "htmlText" : "Name: Toreador Grand Ball<br/>Cardtype: Master<br/>Clan: Toreador<br/>Cost: 1 pool<br/>Choose two ready Toreador you control, put this card in play, and lock one of the two. The locked Toreador does not unlock as normal. The other Toreador's non-bleed actions cannot be blocked. Any minion can burn this card as a (D) action; Nosferatu get -1 stealth during that action.",
   "displayName" : "Toreador Grand Ball",
   "names" : [ "Toreador Grand Ball" ],
   "crypt" : false,
   "unique" : false,
   "burnOption" : false,
-  "preamble" : "Master.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card in play. Choose 2 ready Toreador you control. The first Toreador's non-bleed actions cannot be blocked. The second Toreador does not unlock as normal during the unlock phase; lock the second Toreador. Any minion may burn this card as a (D) action; Nosferatu get -1 stealth when attempting that action.",
+    "text" : "Choose two ready Toreador you control, put this card in play, and lock one of the two. The locked Toreador does not unlock as normal. The other Toreador's non-bleed actions cannot be blocked. Any minion can burn this card as a (D) action; Nosferatu get -1 stealth during that action.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -44101,8 +44163,8 @@
   "jolId" : "jy398",
   "amaranthId" : "3338",
   "type" : "Political Action",
-  "text" : "Name: Toreador Justicar\nCardtype: Political Action\nTitle.\nChoose a ready Toreador. If this referendum is successful, put this card on the chosen Toreador to represent the unique Camarilla title of Toreador Justicar. In this referendum, each Toreador gets 1 extra vote.",
-  "htmlText" : "Name: Toreador Justicar<br/>Cardtype: Political Action<br/>Title.\nChoose a ready Toreador. If this referendum is successful, put this card on the chosen Toreador to represent the unique Camarilla title of Toreador Justicar. In this referendum, each Toreador gets 1 extra vote.",
+  "text" : "Name: Toreador Justicar\nCardtype: Political Action\nTitle.\nChoose a ready Toreador. Successful referendum means this card is put on the chosen Toreador to represent the unique Camarilla title of Toreador Justicar. In this referendum, each ready Toreador gets +1 vote.",
+  "htmlText" : "Name: Toreador Justicar<br/>Cardtype: Political Action<br/>Title.\nChoose a ready Toreador. Successful referendum means this card is put on the chosen Toreador to represent the unique Camarilla title of Toreador Justicar. In this referendum, each ready Toreador gets +1 vote.",
   "displayName" : "Toreador Justicar",
   "names" : [ "Toreador Justicar" ],
   "crypt" : false,
@@ -44111,8 +44173,8 @@
   "preamble" : "Title.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Choose a ready Toreador. If this referendum is successful, put this card on the chosen Toreador to represent the unique Camarilla title of Toreador Justicar. In this referendum, each Toreador gets 1 extra vote.",
-    "target" : "SOMETHING"
+    "text" : "Choose a ready Toreador. Successful referendum means this card is put on the chosen Toreador to represent the unique Camarilla title of Toreador Justicar. In this referendum, each ready Toreador gets +1 vote.",
+    "target" : null
   } ],
   "doNotReplace" : false,
   "multiMode" : false
@@ -45085,8 +45147,8 @@
   "jolId" : "km144",
   "amaranthId" : "3389",
   "type" : "Master",
-  "text" : "Name: Trophy: Progeny\nCardtype: Master\nMaster. Trophy.\nIf this card would be moved to a non-sterile vampire, that vampire's controller takes control of it instead, and it becomes a non-unique vampire of the same clan as that vampire with 2 capacity. He or she may go through his or her library (shuffle afterward), ash heap or hand to find a Discipline card for this new vampire. Move 2 blood from the blood bank to this new vampire.",
-  "htmlText" : "Name: Trophy: Progeny<br/>Cardtype: Master<br/>Master. Trophy.\nIf this card would be moved to a non-sterile vampire, that vampire's controller takes control of it instead, and it becomes a non-unique vampire of the same clan as that vampire with 2 capacity. He or she may go through his or her library (shuffle afterward), ash heap or hand to find a Discipline card for this new vampire. Move 2 blood from the blood bank to this new vampire.",
+  "text" : "Name: Trophy: Progeny\nCardtype: Master\nMaster. Trophy.\nIf this card would be moved to a non-sterile vampire, that vampire's controller takes control of it instead, and it becomes a non-unique vampire of the same clan and sect as that vampire with 2 capacity. He or she may go through his or her library (shuffle afterward), ash heap or hand to find a Discipline card for this new vampire. Move 2 blood from the blood bank to this new vampire.",
+  "htmlText" : "Name: Trophy: Progeny<br/>Cardtype: Master<br/>Master. Trophy.\nIf this card would be moved to a non-sterile vampire, that vampire's controller takes control of it instead, and it becomes a non-unique vampire of the same clan and sect as that vampire with 2 capacity. He or she may go through his or her library (shuffle afterward), ash heap or hand to find a Discipline card for this new vampire. Move 2 blood from the blood bank to this new vampire.",
   "displayName" : "Trophy: Progeny",
   "names" : [ "Trophy: Progeny" ],
   "crypt" : false,
@@ -45095,7 +45157,7 @@
   "preamble" : "Master. Trophy.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "If this card would be moved to a non-sterile vampire, that vampire's controller takes control of it instead, and it becomes a non-unique vampire of the same clan as that vampire with 2 capacity. He or she may go through his or her library (shuffle afterward), ash heap or hand to find a Discipline card for this new vampire. Move 2 blood from the blood bank to this new vampire.",
+    "text" : "If this card would be moved to a non-sterile vampire, that vampire's controller takes control of it instead, and it becomes a non-unique vampire of the same clan and sect as that vampire with 2 capacity. He or she may go through his or her library (shuffle afterward), ash heap or hand to find a Discipline card for this new vampire. Move 2 blood from the blood bank to this new vampire.",
     "target" : null
   } ],
   "doNotReplace" : false,
@@ -45632,8 +45694,8 @@
   "jolId" : "jy407",
   "amaranthId" : "3434",
   "type" : "Combat",
-  "text" : "Name: Undead Persistence\nCardtype: Combat\nDiscipline: Fortitude\n[for] Only usable when this vampire should go into torpor. This vampire gets an optional press and will not go to torpor until combat ends (although he or she is still considered wounded and can be burned as normal). If three rounds of combat pass with no cards played, combat ends. This vampire is sent into torpor after combat.\n[FOR] Prevent 2 damage.",
-  "htmlText" : "Name: Undead Persistence<br/>Cardtype: Combat<br/>Discipline: Fortitude<br/>[for] Only usable when this vampire should go into torpor. This vampire gets an optional press and will not go to torpor until combat ends (although he or she is still considered wounded and can be burned as normal). If three rounds of combat pass with no cards played, combat ends. This vampire is sent into torpor after combat.\n[FOR] Prevent 2 damage.",
+  "text" : "Name: Undead Persistence\nCardtype: Combat\nDiscipline: Fortitude\n[for] Only usable when this vampire should go into torpor. Instead, this vampire gets an optional press,  will not go to torpor until combat ends but is still considered wounded and can be burned as normal. If three rounds of combat pass with no cards played, combat ends. This vampire is sent into torpor after combat.\n[FOR] Prevent 2 damage.",
+  "htmlText" : "Name: Undead Persistence<br/>Cardtype: Combat<br/>Discipline: Fortitude<br/>[for] Only usable when this vampire should go into torpor. Instead, this vampire gets an optional press,  will not go to torpor until combat ends but is still considered wounded and can be burned as normal. If three rounds of combat pass with no cards played, combat ends. This vampire is sent into torpor after combat.\n[FOR] Prevent 2 damage.",
   "displayName" : "Undead Persistence",
   "names" : [ "Undead Persistence" ],
   "crypt" : false,
@@ -45641,7 +45703,7 @@
   "burnOption" : false,
   "modes" : [ {
     "disciplines" : [ "for" ],
-    "text" : "Only usable when this vampire should go into torpor. This vampire gets an optional press and will not go to torpor until combat ends (although he or she is still considered wounded and can be burned as normal). If three rounds of combat pass with no cards played, combat ends. This vampire is sent into torpor after combat.",
+    "text" : "Only usable when this vampire should go into torpor. Instead, this vampire gets an optional press,  will not go to torpor until combat ends but is still considered wounded and can be burned as normal. If three rounds of combat pass with no cards played, combat ends. This vampire is sent into torpor after combat.",
     "target" : null
   }, {
     "disciplines" : [ "FOR" ],
@@ -45751,8 +45813,8 @@
   "jolId" : "ln166",
   "amaranthId" : "3440",
   "type" : "Ally",
-  "text" : "Name: Underbridge Stray\nCardtype: Ally\nCost: 1 blood\nDiscipline: Animalism\nAnimal with 1 life. 0 strength, 0 bleed.\n[ani] The Stray may burn 1 life to give a minion you control a press. During a (D) action directed at you, you may burn the Stray to unlock a ready minion you control (not usable if the Stray is blocking).\n[ANI] As above, but the Stray has 2 life and 1 strength.",
-  "htmlText" : "Name: Underbridge Stray<br/>Cardtype: Ally<br/>Cost: 1 blood<br/>Discipline: Animalism<br/>Animal with 1 life. 0 strength, 0 bleed.\n[ani] The Stray may burn 1 life to give a minion you control a press. During a (D) action directed at you, you may burn the Stray to unlock a ready minion you control (not usable if the Stray is blocking).\n[ANI] As above, but the Stray has 2 life and 1 strength.",
+  "text" : "Name: Underbridge Stray\nCardtype: Ally\nCost: 1 blood\nDiscipline: Animalism\nAnimal with 1 life. 0 strength, 0 bleed.\n[ani] This ally can burn 1 life to give a minion you control 1 press. During an action directed at you (or a card you control), you can burn this ally if it is not blocking to unlock a ready minion you control.\n[ANI] As above, but this ally has 2 life and 1 strength.",
+  "htmlText" : "Name: Underbridge Stray<br/>Cardtype: Ally<br/>Cost: 1 blood<br/>Discipline: Animalism<br/>Animal with 1 life. 0 strength, 0 bleed.\n[ani] This ally can burn 1 life to give a minion you control 1 press. During an action directed at you (or a card you control), you can burn this ally if it is not blocking to unlock a ready minion you control.\n[ANI] As above, but this ally has 2 life and 1 strength.",
   "displayName" : "Underbridge Stray",
   "names" : [ "Underbridge Stray" ],
   "crypt" : false,
@@ -45761,11 +45823,11 @@
   "preamble" : "Animal with 1 life. 0 strength, 0 bleed.",
   "modes" : [ {
     "disciplines" : [ "ani" ],
-    "text" : "The Stray may burn 1 life to give a minion you control a press. During a (D) action directed at you, you may burn the Stray to unlock a ready minion you control (not usable if the Stray is blocking).",
+    "text" : "This ally can burn 1 life to give a minion you control 1 press. During an action directed at you (or a card you control), you can burn this ally if it is not blocking to unlock a ready minion you control.",
     "target" : "READY_REGION"
   }, {
     "disciplines" : [ "ANI" ],
-    "text" : "As above, but the Stray has 2 life and 1 strength.",
+    "text" : "As above, but this ally has 2 life and 1 strength.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -46826,8 +46888,8 @@
   "jolId" : "ln172",
   "amaranthId" : "3512",
   "type" : "Master",
-  "text" : "Name: Vessel\nCardtype: Master\nCost: 1 pool\nTrifle.\nPut this card on any vampire, and you can burn a Blood Doll (if any). During their unlock phase, this vampire's controller can move 1 blood from this vampire to their pool or from their pool to this vampire.",
-  "htmlText" : "Name: Vessel<br/>Cardtype: Master<br/>Cost: 1 pool<br/>Trifle.\nPut this card on any vampire, and you can burn a Blood Doll (if any). During their unlock phase, this vampire's controller can move 1 blood from this vampire to their pool or from their pool to this vampire.",
+  "text" : "Name: Vessel\nCardtype: Master\nCost: 1 pool\nTrifle.\nPut this card on any vampire, and you can burn a card named /Blood Doll/ (if any). During their unlock phase, this vampire's controller can move 1 blood from this vampire to their pool or from their pool to this vampire.",
+  "htmlText" : "Name: Vessel<br/>Cardtype: Master<br/>Cost: 1 pool<br/>Trifle.\nPut this card on any vampire, and you can burn a card named /Blood Doll/ (if any). During their unlock phase, this vampire's controller can move 1 blood from this vampire to their pool or from their pool to this vampire.",
   "displayName" : "Vessel",
   "names" : [ "Vessel" ],
   "crypt" : false,
@@ -46836,7 +46898,7 @@
   "preamble" : "Trifle.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card on any vampire, and you can burn a Blood Doll (if any). During their unlock phase, this vampire's controller can move 1 blood from this vampire to their pool or from their pool to this vampire.",
+    "text" : "Put this card on any vampire, and you can burn a card named /Blood Doll/ (if any). During their unlock phase, this vampire's controller can move 1 blood from this vampire to their pool or from their pool to this vampire.",
     "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
@@ -46990,8 +47052,8 @@
   "jolId" : "kt171",
   "amaranthId" : "3531",
   "type" : "Master",
-  "text" : "Name: Villein\nCardtype: Master\nTrifle.\nPut this card on a vampire you control who has any amount of blood and move 2 to 5 blood from that vampire to your pool. Minion Tap costs you 1 additional pool. Villein costs 1 additional pool to play on this vampire.",
-  "htmlText" : "Name: Villein<br/>Cardtype: Master<br/>Trifle.\nPut this card on a vampire you control who has any amount of blood and move 2 to 5 blood from that vampire to your pool. Minion Tap costs you 1 additional pool. Villein costs 1 additional pool to play on this vampire.",
+  "text" : "Name: Villein\nCardtype: Master\nTrifle.\nPut this card on a vampire you control who has any amount of blood and move 2 to 5 blood from that vampire to your pool. Cards named /Minion Tap/ costs you 1 additional pool to play. Villein costs 1 additional pool to play on this vampire.",
+  "htmlText" : "Name: Villein<br/>Cardtype: Master<br/>Trifle.\nPut this card on a vampire you control who has any amount of blood and move 2 to 5 blood from that vampire to your pool. Cards named /Minion Tap/ costs you 1 additional pool to play. Villein costs 1 additional pool to play on this vampire.",
   "displayName" : "Villein",
   "names" : [ "Villein" ],
   "crypt" : false,
@@ -47000,7 +47062,7 @@
   "preamble" : "Trifle.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card on a vampire you control who has any amount of blood and move 2 to 5 blood from that vampire to your pool. Minion Tap costs you 1 additional pool. Villein costs 1 additional pool to play on this vampire.",
+    "text" : "Put this card on a vampire you control who has any amount of blood and move 2 to 5 blood from that vampire to your pool. Cards named /Minion Tap/ costs you 1 additional pool to play. Villein costs 1 additional pool to play on this vampire.",
     "target" : "SOMETHING"
   } ],
   "doNotReplace" : false,
@@ -47099,17 +47161,17 @@
   "jolId" : "fn162",
   "amaranthId" : "3542",
   "type" : "Master",
-  "text" : "Name: Visit from the Capuchin\nCardtype: Master\nUnique master.\nPut this card into play with 4 counters on it. You get +X hand size, where X is the number of counters on this card. Each time you would draw to replace a card (not counting the card to replace the Visit), burn a counter from this card instead. Burn this card if it has no counters.",
-  "htmlText" : "Name: Visit from the Capuchin<br/>Cardtype: Master<br/>Unique master.\nPut this card into play with 4 counters on it. You get +X hand size, where X is the number of counters on this card. Each time you would draw to replace a card (not counting the card to replace the Visit), burn a counter from this card instead. Burn this card if it has no counters.",
+  "text" : "Name: Visit from the Capuchin\nCardtype: Master\nUnique.\nPut this card in play with 4 counters. You get +1 hand size for each counter on this card. Each time you would replace a card other than this card, instead burn 1 counter from this card. Burn this card if it has no counters.",
+  "htmlText" : "Name: Visit from the Capuchin<br/>Cardtype: Master<br/>Unique.\nPut this card in play with 4 counters. You get +1 hand size for each counter on this card. Each time you would replace a card other than this card, instead burn 1 counter from this card. Burn this card if it has no counters.",
   "displayName" : "Visit from the Capuchin",
   "names" : [ "Visit from the Capuchin" ],
   "crypt" : false,
   "unique" : true,
   "burnOption" : false,
-  "preamble" : "Unique master.",
+  "preamble" : "Unique.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card into play with 4 counters on it. You get +X hand size, where X is the number of counters on this card. Each time you would draw to replace a card (not counting the card to replace the Visit), burn a counter from this card instead. Burn this card if it has no counters.",
+    "text" : "Put this card in play with 4 counters. You get +1 hand size for each counter on this card. Each time you would replace a card other than this card, instead burn 1 counter from this card. Burn this card if it has no counters.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -47220,21 +47282,21 @@
   "jolId" : "jy421",
   "amaranthId" : "3551",
   "type" : "Action Modifier",
-  "text" : "Name: Voter Captivation\nCardtype: Action Modifier\nDiscipline: Presence\nOnly usable after resolving a successful referendum called by this acting vampire.\n[pre] The acting vampire gains X blood from the blood bank, where X is the number of votes by which the referendum passed.\n[PRE] As above, but move up to 2 of those blood counters to your pool instead of this vampire.",
-  "htmlText" : "Name: Voter Captivation<br/>Cardtype: Action Modifier<br/>Discipline: Presence<br/>Only usable after resolving a successful referendum called by this acting vampire.\n[pre] The acting vampire gains X blood from the blood bank, where X is the number of votes by which the referendum passed.\n[PRE] As above, but move up to 2 of those blood counters to your pool instead of this vampire.",
+  "text" : "Name: Voter Captivation\nCardtype: Action Modifier\nDiscipline: Presence\nOnly usable after resolution of a political action whose referendum passed.\n[pre] This vampire gains 1 blood for each vote by which the referendum passed.\n[PRE] As above, but move up to 2 of those blood to your pool instead of this vampire.",
+  "htmlText" : "Name: Voter Captivation<br/>Cardtype: Action Modifier<br/>Discipline: Presence<br/>Only usable after resolution of a political action whose referendum passed.\n[pre] This vampire gains 1 blood for each vote by which the referendum passed.\n[PRE] As above, but move up to 2 of those blood to your pool instead of this vampire.",
   "displayName" : "Voter Captivation",
   "names" : [ "Voter Captivation" ],
   "crypt" : false,
   "unique" : false,
   "burnOption" : false,
-  "preamble" : "Only usable after resolving a successful referendum called by this acting vampire.",
+  "preamble" : "Only usable after resolution of a political action whose referendum passed.",
   "modes" : [ {
     "disciplines" : [ "pre" ],
-    "text" : "The acting vampire gains X blood from the blood bank, where X is the number of votes by which the referendum passed.",
+    "text" : "This vampire gains 1 blood for each vote by which the referendum passed.",
     "target" : null
   }, {
     "disciplines" : [ "PRE" ],
-    "text" : "As above, but move up to 2 of those blood counters to your pool instead of this vampire.",
+    "text" : "As above, but move up to 2 of those blood to your pool instead of this vampire.",
     "target" : null
   } ],
   "doNotReplace" : false,
@@ -47613,12 +47675,34 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "102216",
+  "jolId" : "fth04",
+  "amaranthId" : "4150",
+  "type" : "Reaction",
+  "text" : "Name: Warrens, The\nCardtype: Reaction\nClan: Nosferatu\nCost: 1 blood\nOnly usable during an action directed at you (or a card you control).\n+2 intercept, with an additional +1 intercept if this Nosferatu is titled.",
+  "htmlText" : "Name: Warrens, The<br/>Cardtype: Reaction<br/>Clan: Nosferatu<br/>Cost: 1 blood<br/>Only usable during an action directed at you (or a card you control).\n+2 intercept, with an additional +1 intercept if this Nosferatu is titled.",
+  "displayName" : "Warrens, The",
+  "names" : [ "The Warrens", "Warrens, The" ],
+  "crypt" : false,
+  "unique" : false,
+  "burnOption" : false,
+  "preamble" : "Only usable during an action directed at you (or a card you control).",
+  "modes" : [ {
+    "disciplines" : null,
+    "text" : "+2 intercept, with an additional +1 intercept if this Nosferatu is titled.",
+    "target" : null
+  } ],
+  "doNotReplace" : false,
+  "multiMode" : false,
+  "cost" : "1 blood",
+  "clans" : [ "Nosferatu" ]
+}, {
   "id" : "102149",
   "jolId" : "kt174",
   "amaranthId" : "3573",
   "type" : "Master",
-  "text" : "Name: Warsaw Station\nCardtype: Master\nClan: Nosferatu\nCost: 2 pool\nUnique location.\nYou can lock this card as a Nosferatu announces an undirected action; if that action is successful, unlock the acting Nosferatu. You can burn this card (even if it is locked) to move a Nosferatu in torpor to the ready region.",
-  "htmlText" : "Name: Warsaw Station<br/>Cardtype: Master<br/>Clan: Nosferatu<br/>Cost: 2 pool<br/>Unique location.\nYou can lock this card as a Nosferatu announces an undirected action; if that action is successful, unlock the acting Nosferatu. You can burn this card (even if it is locked) to move a Nosferatu in torpor to the ready region.",
+  "text" : "Name: Warsaw Station\nCardtype: Master\nClan: Nosferatu\nCost: 2 pool\nUnique location.\nYou can lock this card as a Nosferatu announces an undirected action; after action resolution, if that action was successful, unlock the acting Nosferatu. You can burn this card (even if it is locked) to move a Nosferatu in torpor to the ready region.",
+  "htmlText" : "Name: Warsaw Station<br/>Cardtype: Master<br/>Clan: Nosferatu<br/>Cost: 2 pool<br/>Unique location.\nYou can lock this card as a Nosferatu announces an undirected action; after action resolution, if that action was successful, unlock the acting Nosferatu. You can burn this card (even if it is locked) to move a Nosferatu in torpor to the ready region.",
   "displayName" : "Warsaw Station",
   "names" : [ "Warsaw Station" ],
   "crypt" : false,
@@ -47627,7 +47711,7 @@
   "preamble" : "Unique location.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "You can lock this card as a Nosferatu announces an undirected action; if that action is successful, unlock the acting Nosferatu. You can burn this card (even if it is locked) to move a Nosferatu in torpor to the ready region.",
+    "text" : "You can lock this card as a Nosferatu announces an undirected action; after action resolution, if that action was successful, unlock the acting Nosferatu. You can burn this card (even if it is locked) to move a Nosferatu in torpor to the ready region.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -47681,17 +47765,17 @@
   "jolId" : "ds167",
   "amaranthId" : "3576",
   "type" : "Master",
-  "text" : "Name: Wasserschloss Anif, Austria\nCardtype: Master\nClan: Tremere\nMaster: unique location.\nDuring your master phase, a Tremere you control may move 1 blood to this card. During your influence phase, you may lock this card to move all counters on this card to a Tremere in your uncontrolled region. This card may be burned by any minion as a (D) action; Malkavians get +1 stealth when attempting that action.",
-  "htmlText" : "Name: Wasserschloss Anif, Austria<br/>Cardtype: Master<br/>Clan: Tremere<br/>Master: unique location.\nDuring your master phase, a Tremere you control may move 1 blood to this card. During your influence phase, you may lock this card to move all counters on this card to a Tremere in your uncontrolled region. This card may be burned by any minion as a (D) action; Malkavians get +1 stealth when attempting that action.",
+  "text" : "Name: Wasserschloss Anif, Austria\nCardtype: Master\nClan: Tremere\nUnique location.\nDuring your master phase, a Tremere you control can move 1 blood from themselves to this card. Lock during your influence phase to move all counters on this card to a Tremere in your uncontrolled region. Any minion can burn this card as a (D) action; Malkavians get +1 stealth during that action.",
+  "htmlText" : "Name: Wasserschloss Anif, Austria<br/>Cardtype: Master<br/>Clan: Tremere<br/>Unique location.\nDuring your master phase, a Tremere you control can move 1 blood from themselves to this card. Lock during your influence phase to move all counters on this card to a Tremere in your uncontrolled region. Any minion can burn this card as a (D) action; Malkavians get +1 stealth during that action.",
   "displayName" : "Wasserschloss Anif, Austria",
   "names" : [ "Wasserschloss Anif, Austria" ],
   "crypt" : false,
   "unique" : true,
   "burnOption" : false,
-  "preamble" : "Master: unique location.",
+  "preamble" : "Unique location.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "During your master phase, a Tremere you control may move 1 blood to this card. During your influence phase, you may lock this card to move all counters on this card to a Tremere in your uncontrolled region. This card may be burned by any minion as a (D) action; Malkavians get +1 stealth when attempting that action.",
+    "text" : "During your master phase, a Tremere you control can move 1 blood from themselves to this card. Lock during your influence phase to move all counters on this card to a Tremere in your uncontrolled region. Any minion can burn this card as a (D) action; Malkavians get +1 stealth during that action.",
     "target" : "READY_REGION"
   } ],
   "doNotReplace" : false,
@@ -47968,8 +48052,8 @@
   "jolId" : "km160",
   "amaranthId" : "3590",
   "type" : "Action",
-  "text" : "Name: Web of Knives Recruit\nCardtype: Action\nClan: Assamite\nCost: 1 pool\n+1 stealth action.\nPut this card in play in your uncontrolled region with 3 training counters. During your unlock phase, burn 1 training counter from this card. You can burn counters from no more than two recruits each unlock phase. When the last training counter is burned, move this card to your ready region; it becomes a 3-capacity non-unique Assamite with Celerity [cel], Obfuscate [obf], Potence [pot], Quietus [qui] and 3 blood who is Blood cursed.",
-  "htmlText" : "Name: Web of Knives Recruit<br/>Cardtype: Action<br/>Clan: Assamite<br/>Cost: 1 pool<br/>+1 stealth action.\nPut this card in play in your uncontrolled region with 3 training counters. During your unlock phase, burn 1 training counter from this card. You can burn counters from no more than two recruits each unlock phase. When the last training counter is burned, move this card to your ready region; it becomes a 3-capacity non-unique Assamite with Celerity [cel], Obfuscate [obf], Potence [pot], Quietus [qui] and 3 blood who is Blood cursed.",
+  "text" : "Name: Web of Knives Recruit\nCardtype: Action\nClan: Assamite\nCost: 1 pool\n+1 stealth action.\nPut this card in play in your uncontrolled region with 3 training counters. During your unlock phase, burn 1 training counter from this card. You can burn counters from no more than two recruits each unlock phase. When the last training counter is burned, move this card to your ready region; it becomes a 3-capacity non-unique Independent Assamite with Celerity [cel], Obfuscate [obf], Potence [pot], Quietus [qui] and 3 blood who is Blood cursed.",
+  "htmlText" : "Name: Web of Knives Recruit<br/>Cardtype: Action<br/>Clan: Assamite<br/>Cost: 1 pool<br/>+1 stealth action.\nPut this card in play in your uncontrolled region with 3 training counters. During your unlock phase, burn 1 training counter from this card. You can burn counters from no more than two recruits each unlock phase. When the last training counter is burned, move this card to your ready region; it becomes a 3-capacity non-unique Independent Assamite with Celerity [cel], Obfuscate [obf], Potence [pot], Quietus [qui] and 3 blood who is Blood cursed.",
   "displayName" : "Web of Knives Recruit",
   "names" : [ "Web of Knives Recruit" ],
   "crypt" : false,
@@ -47978,7 +48062,7 @@
   "preamble" : "+1 stealth action.",
   "modes" : [ {
     "disciplines" : null,
-    "text" : "Put this card in play in your uncontrolled region with 3 training counters. During your unlock phase, burn 1 training counter from this card. You can burn counters from no more than two recruits each unlock phase. When the last training counter is burned, move this card to your ready region; it becomes a 3-capacity non-unique Assamite with Celerity [cel], Obfuscate [obf], Potence [pot], Quietus [qui] and 3 blood who is Blood cursed.",
+    "text" : "Put this card in play in your uncontrolled region with 3 training counters. During your unlock phase, burn 1 training counter from this card. You can burn counters from no more than two recruits each unlock phase. When the last training counter is burned, move this card to your ready region; it becomes a 3-capacity non-unique Independent Assamite with Celerity [cel], Obfuscate [obf], Potence [pot], Quietus [qui] and 3 blood who is Blood cursed.",
     "target" : "INACTIVE_REGION"
   } ],
   "doNotReplace" : false,
@@ -49775,6 +49859,38 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201529",
+  "jolId" : "fth05",
+  "amaranthId" : "4101",
+  "type" : "Vampire",
+  "text" : "Name: Alexa Draper\nCardtype: Vampire\nClan: Ventrue\nGroup: 6\nCapacity: 8\nDisciplines: [for] [pot] [DOM] [PRE]\nCamarilla Prince of Melbourne: During the polling step of any referendum, Alexa can discard 1 card requiring Dominate [dom] to get +1 vote.",
+  "htmlText" : "Name: Alexa Draper<br/>Cardtype: Vampire<br/>Clan: Ventrue<br/>Group: 6<br/>Capacity: 8<br/>Disciplines: [for] [pot] [DOM] [PRE]<br/>Camarilla Prince of Melbourne: During the polling step of any referendum, Alexa can discard 1 card requiring Dominate [dom] to get +1 vote.",
+  "displayName" : "Alexa Draper",
+  "names" : [ "Alexa Draper" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201530",
+  "jolId" : "fth06",
+  "amaranthId" : "4102",
+  "type" : "Vampire",
+  "text" : "Name: Alexander Silverson\nCardtype: Vampire\nClan: Malkavian\nGroup: 6\nCapacity: 8\nDisciplines: [pre] [AUS] [DOM] [OBF]\nCamarilla Prince of Birmingham: Vampires must burn 1 blood to cast votes and ballots against referendums called by Alexander.",
+  "htmlText" : "Name: Alexander Silverson<br/>Cardtype: Vampire<br/>Clan: Malkavian<br/>Group: 6<br/>Capacity: 8<br/>Disciplines: [pre] [AUS] [DOM] [OBF]<br/>Camarilla Prince of Birmingham: Vampires must burn 1 blood to cast votes and ballots against referendums called by Alexander.",
+  "displayName" : "Alexander Silverson",
+  "names" : [ "Alexander Silverson" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200049",
   "jolId" : "ds3",
   "amaranthId" : "82",
@@ -49852,6 +49968,22 @@
   "burnOption" : false,
   "group" : "3",
   "sect" : "Independent",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201531",
+  "jolId" : "fth07",
+  "amaranthId" : "4103",
+  "type" : "Vampire",
+  "text" : "Name: Alice Chen\nCardtype: Vampire\nClan: Ventrue\nGroup: 6\nCapacity: 7\nDisciplines: [dom] [obf] [FOR] [PRE]\nCamarilla Prince of Nairobi.",
+  "htmlText" : "Name: Alice Chen<br/>Cardtype: Vampire<br/>Clan: Ventrue<br/>Group: 6<br/>Capacity: 7<br/>Disciplines: [dom] [obf] [FOR] [PRE]<br/>Camarilla Prince of Nairobi.",
+  "displayName" : "Alice Chen",
+  "names" : [ "Alice Chen" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
 }, {
@@ -50283,6 +50415,22 @@
   "unique" : true,
   "burnOption" : false,
   "group" : "2",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201532",
+  "jolId" : "fth08",
+  "amaranthId" : "4104",
+  "type" : "Vampire",
+  "text" : "Name: Andi Liu\nCardtype: Vampire\nClan: Malkavian\nGroup: 6\nCapacity: 6\nDisciplines: [aus] [obf] [pre] [DOM]\nCamarilla Prince of Taipei.",
+  "htmlText" : "Name: Andi Liu<br/>Cardtype: Vampire<br/>Clan: Malkavian<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [aus] [obf] [pre] [DOM]<br/>Camarilla Prince of Taipei.",
+  "displayName" : "Andi Liu",
+  "names" : [ "Andi Liu" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
   "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
@@ -51359,6 +51507,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201533",
+  "jolId" : "fth09",
+  "amaranthId" : "4105",
+  "type" : "Vampire",
+  "text" : "Name: Ashley\nCardtype: Vampire\nClan: Malkavian\nGroup: 6\nCapacity: 3\nDisciplines: [dom] [obf]\nCamarilla.",
+  "htmlText" : "Name: Ashley<br/>Cardtype: Vampire<br/>Clan: Malkavian<br/>Group: 6<br/>Capacity: 3<br/>Disciplines: [dom] [obf]<br/>Camarilla.",
+  "displayName" : "Ashley",
+  "names" : [ "Ashley" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200147",
   "jolId" : "ge11",
   "amaranthId" : "244",
@@ -51407,6 +51571,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201534",
+  "jolId" : "fth10",
+  "amaranthId" : "4106",
+  "type" : "Vampire",
+  "text" : "Name: Aunt Linda\nCardtype: Vampire\nClan: Nosferatu\nGroup: 6\nCapacity: 4\nDisciplines: [obf] [POT]\nCamarilla.",
+  "htmlText" : "Name: Aunt Linda<br/>Cardtype: Vampire<br/>Clan: Nosferatu<br/>Group: 6<br/>Capacity: 4<br/>Disciplines: [obf] [POT]<br/>Camarilla.",
+  "displayName" : "Aunt Linda",
+  "names" : [ "Aunt Linda" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200150",
   "jolId" : "sa20",
   "amaranthId" : "254",
@@ -51452,6 +51632,22 @@
   "burnOption" : false,
   "group" : "2",
   "sect" : "Sabbat",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201535",
+  "jolId" : "fth11",
+  "amaranthId" : "4107",
+  "type" : "Vampire",
+  "text" : "Name: Ayelech\nCardtype: Vampire\nClan: Tremere\nGroup: 6\nCapacity: 7\nDisciplines: [AUS] [DOM] [THA]\nCamarilla Prince of Addis Ababa.",
+  "htmlText" : "Name: Ayelech<br/>Cardtype: Vampire<br/>Clan: Tremere<br/>Group: 6<br/>Capacity: 7<br/>Disciplines: [AUS] [DOM] [THA]<br/>Camarilla Prince of Addis Ababa.",
+  "displayName" : "Ayelech",
+  "names" : [ "Ayelech" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
 }, {
@@ -51596,6 +51792,22 @@
   "burnOption" : false,
   "group" : "2",
   "sect" : "Independent",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201536",
+  "jolId" : "fth12",
+  "amaranthId" : "4108",
+  "type" : "Vampire",
+  "text" : "Name: Baixinho\nCardtype: Vampire\nClan: Nosferatu\nGroup: 6\nCapacity: 3\nDisciplines: [ani] [obf]\nCamarilla.",
+  "htmlText" : "Name: Baixinho<br/>Cardtype: Vampire<br/>Clan: Nosferatu<br/>Group: 6<br/>Capacity: 3<br/>Disciplines: [ani] [obf]<br/>Camarilla.",
+  "displayName" : "Baixinho",
+  "names" : [ "Baixinho" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
 }, {
@@ -52015,6 +52227,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201537",
+  "jolId" : "fth13",
+  "amaranthId" : "4109",
+  "type" : "Vampire",
+  "text" : "Name: Belinde\nCardtype: Vampire\nClan: Nosferatu\nGroup: 6\nCapacity: 6\nDisciplines: [ani] [aus] [pot] [OBF]\nCamarilla Prince of Copenhagen.",
+  "htmlText" : "Name: Belinde<br/>Cardtype: Vampire<br/>Clan: Nosferatu<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [ani] [aus] [pot] [OBF]<br/>Camarilla Prince of Copenhagen.",
+  "displayName" : "Belinde",
+  "names" : [ "Belinde" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200188",
   "jolId" : "ln14",
   "amaranthId" : "328",
@@ -52049,7 +52277,7 @@
 }, {
   "id" : "201524",
   "jolId" : "pro1",
-  "amaranthId" : "3911",
+  "amaranthId" : "4043",
   "type" : "Vampire",
   "text" : "Name: Benedito, a Lanterna\nCardtype: Vampire\nClan: Nosferatu\nGroup: 6\nCapacity: 6\nDisciplines: [ani] [aus] [obf] [POT]\nAnarch Baron of Fortaleza.",
   "htmlText" : "Name: Benedito, a Lanterna<br/>Cardtype: Vampire<br/>Clan: Nosferatu<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [ani] [aus] [obf] [POT]<br/>Anarch Baron of Fortaleza.",
@@ -52225,7 +52453,7 @@
 }, {
   "id" : "201525",
   "jolId" : "pro5",
-  "amaranthId" : "3912",
+  "amaranthId" : "4048",
   "type" : "Vampire",
   "text" : "Name: Bituin\nCardtype: Vampire\nClan: Tremere\nGroup: 6\nCapacity: 6\nDisciplines: [ani] [cel] [dom] [THA]\nAnarch Baron of Manila.",
   "htmlText" : "Name: Bituin<br/>Cardtype: Vampire<br/>Clan: Tremere<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [ani] [cel] [dom] [THA]<br/>Anarch Baron of Manila.",
@@ -52431,6 +52659,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201528",
+  "jolId" : "fth14",
+  "amaranthId" : "4110",
+  "type" : "Vampire",
+  "text" : "Name: Bolesław Gutowski\nCardtype: Vampire\nClan: Malkavian\nGroup: 6\nCapacity: 6\nDisciplines: [ani] [aus] [cel] [dom] [obf] [pre]\nAnarch: During an action he performs, Bolesław can burn 1 blood to reveal the top card of your crypt and then shuffle your crypt. If the revealed card is a copy of Bolesław, Bolesław gets +1 stealth for this action; otherwise, he gets +1 strength for this action.",
+  "htmlText" : "Name: Bolesław Gutowski<br/>Cardtype: Vampire<br/>Clan: Malkavian<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [ani] [aus] [cel] [dom] [obf] [pre]<br/>Anarch: During an action he performs, Bolesław can burn 1 blood to reveal the top card of your crypt and then shuffle your crypt. If the revealed card is a copy of Bolesław, Bolesław gets +1 stealth for this action; otherwise, he gets +1 strength for this action.",
+  "displayName" : "Bolesław Gutowski",
+  "names" : [ "Boleslaw Gutowski", "Bolesław Gutowski" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Anarch",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200212",
   "jolId" : "an17",
   "amaranthId" : "439",
@@ -52527,6 +52771,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201538",
+  "jolId" : "fth15",
+  "amaranthId" : "4111",
+  "type" : "Vampire",
+  "text" : "Name: Bret Stryker\nCardtype: Vampire\nClan: Toreador\nGroup: 6\nCapacity: 4\nDisciplines: [CEL] [PRE]\nCamarilla: Bret gets -1 intercept against titled vampires.",
+  "htmlText" : "Name: Bret Stryker<br/>Cardtype: Vampire<br/>Clan: Toreador<br/>Group: 6<br/>Capacity: 4<br/>Disciplines: [CEL] [PRE]<br/>Camarilla: Bret gets -1 intercept against titled vampires.",
+  "displayName" : "Bret Stryker",
+  "names" : [ "Bret Stryker" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200218",
   "jolId" : "ln21",
   "amaranthId" : "455",
@@ -52556,6 +52816,22 @@
   "burnOption" : false,
   "group" : "6",
   "sect" : "Independent",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201539",
+  "jolId" : "fth16",
+  "amaranthId" : "4112",
+  "type" : "Vampire",
+  "text" : "Name: Brock Sterling\nCardtype: Vampire\nClan: Ventrue\nGroup: 6\nCapacity: 3\nDisciplines: [FOR]\nCamarilla.",
+  "htmlText" : "Name: Brock Sterling<br/>Cardtype: Vampire<br/>Clan: Ventrue<br/>Group: 6<br/>Capacity: 3<br/>Disciplines: [FOR]<br/>Camarilla.",
+  "displayName" : "Brock Sterling",
+  "names" : [ "Brock Sterling" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
 }, {
@@ -52915,8 +53191,8 @@
   "jolId" : "pr79",
   "amaranthId" : "520",
   "type" : "Vampire",
-  "text" : "Name: Capuchin, The\nCardtype: Vampire\nClan: Harbinger of Skulls\nGroup: 5\nCapacity: 11\nDisciplines: [AUS] [DOM] [FOR] [NEC] [THA] [THN]\nIndependent: If The Capuchin is burned, move him to your uncontrolled region and you get +3 transfers at the start of your next influence phase. +1 bleed. +2 hand size. +1 intercept.",
-  "htmlText" : "Name: Capuchin, The<br/>Cardtype: Vampire<br/>Clan: Harbinger of Skulls<br/>Group: 5<br/>Capacity: 11<br/>Disciplines: [AUS] [DOM] [FOR] [NEC] [THA] [THN]<br/>Independent: If The Capuchin is burned, move him to your uncontrolled region and you get +3 transfers at the start of your next influence phase. +1 bleed. +2 hand size. +1 intercept.",
+  "text" : "Name: Capuchin, The\nCardtype: Vampire\nClan: Harbinger of Skulls\nGroup: 5\nCapacity: 11\nDisciplines: [AUS] [DOM] [FOR] [NEC] [THA] [THN]\nIndependent: If The Capuchin is burned, move him to his owner's uncontrolled region and you get +3 transfers at the start of your next influence phase. +1 bleed. +2 hand size. +1 intercept.",
+  "htmlText" : "Name: Capuchin, The<br/>Cardtype: Vampire<br/>Clan: Harbinger of Skulls<br/>Group: 5<br/>Capacity: 11<br/>Disciplines: [AUS] [DOM] [FOR] [NEC] [THA] [THN]<br/>Independent: If The Capuchin is burned, move him to his owner's uncontrolled region and you get +3 transfers at the start of your next influence phase. +1 bleed. +2 hand size. +1 intercept.",
   "displayName" : "Capuchin, The",
   "names" : [ "Capuchin, The", "The Capuchin" ],
   "crypt" : true,
@@ -53073,7 +53349,7 @@
 }, {
   "id" : "201521",
   "jolId" : "pro2",
-  "amaranthId" : "3913",
+  "amaranthId" : "4044",
   "type" : "Vampire",
   "text" : "Name: Casey Snyder\nCardtype: Vampire\nClan: Gangrel\nGroup: 6\nCapacity: 6\nDisciplines: [ani] [for] [cel] [PRO]\nAnarch Baron of Columbus.",
   "htmlText" : "Name: Casey Snyder<br/>Cardtype: Vampire<br/>Clan: Gangrel<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [ani] [for] [cel] [PRO]<br/>Anarch Baron of Columbus.",
@@ -53148,6 +53424,22 @@
   "burnOption" : false,
   "group" : "3",
   "sect" : "Sabbat",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201540",
+  "jolId" : "fth17",
+  "amaranthId" : "4113",
+  "type" : "Vampire",
+  "text" : "Name: Catalina Vega\nCardtype: Vampire\nClan: Toreador\nGroup: 6\nCapacity: 8\nDisciplines: [for] [AUS] [CEL] [PRE]\nCamarilla Prince of Buenos Aires: +1 bleed.",
+  "htmlText" : "Name: Catalina Vega<br/>Cardtype: Vampire<br/>Clan: Toreador<br/>Group: 6<br/>Capacity: 8<br/>Disciplines: [for] [AUS] [CEL] [PRE]<br/>Camarilla Prince of Buenos Aires: +1 bleed.",
+  "displayName" : "Catalina Vega",
+  "names" : [ "Catalina Vega" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
 }, {
@@ -53407,6 +53699,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201541",
+  "jolId" : "fth18",
+  "amaranthId" : "4114",
+  "type" : "Vampire",
+  "text" : "Name: Chelsea Blake\nCardtype: Vampire\nClan: Ventrue\nGroup: 6\nCapacity: 5\nDisciplines: [cel] [for] [pre] [DOM]\nCamarilla.",
+  "htmlText" : "Name: Chelsea Blake<br/>Cardtype: Vampire<br/>Clan: Ventrue<br/>Group: 6<br/>Capacity: 5<br/>Disciplines: [cel] [for] [pre] [DOM]<br/>Camarilla.",
+  "displayName" : "Chelsea Blake",
+  "names" : [ "Chelsea Blake" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200271",
   "jolId" : "jy82",
   "amaranthId" : "591",
@@ -53467,6 +53775,22 @@
   "unique" : true,
   "burnOption" : false,
   "group" : "3",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201542",
+  "jolId" : "fth19",
+  "amaranthId" : "4115",
+  "type" : "Vampire",
+  "text" : "Name: Chrysanthemum\nCardtype: Vampire\nClan: Tremere\nGroup: 6\nCapacity: 5\nDisciplines: [dom] [AUS] [THA]\nCamarilla primogen.",
+  "htmlText" : "Name: Chrysanthemum<br/>Cardtype: Vampire<br/>Clan: Tremere<br/>Group: 6<br/>Capacity: 5<br/>Disciplines: [dom] [AUS] [THA]<br/>Camarilla primogen.",
+  "displayName" : "Chrysanthemum",
+  "names" : [ "Chrysanthemum" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
   "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
@@ -53643,6 +53967,22 @@
   "unique" : true,
   "burnOption" : false,
   "group" : "3",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201543",
+  "jolId" : "fth20",
+  "amaranthId" : "4116",
+  "type" : "Vampire",
+  "text" : "Name: Colette\nCardtype: Vampire\nClan: Malkavian\nGroup: 6\nCapacity: 5\nDisciplines: [dom] [AUS] [OBF]\nCamarilla.",
+  "htmlText" : "Name: Colette<br/>Cardtype: Vampire<br/>Clan: Malkavian<br/>Group: 6<br/>Capacity: 5<br/>Disciplines: [dom] [AUS] [OBF]<br/>Camarilla.",
+  "displayName" : "Colette",
+  "names" : [ "Colette" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
   "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
@@ -54975,6 +55315,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201544",
+  "jolId" : "fth21",
+  "amaranthId" : "4117",
+  "type" : "Vampire",
+  "text" : "Name: Donny Kowalczyk\nCardtype: Vampire\nClan: Malkavian\nGroup: 6\nCapacity: 6\nDisciplines: [obf] [dom] [cel] [AUS]\nCamarilla Prince of Pittsburgh.",
+  "htmlText" : "Name: Donny Kowalczyk<br/>Cardtype: Vampire<br/>Clan: Malkavian<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [obf] [dom] [cel] [AUS]<br/>Camarilla Prince of Pittsburgh.",
+  "displayName" : "Donny Kowalczyk",
+  "names" : [ "Donny Kowalczyk" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200368",
   "jolId" : "jy124",
   "amaranthId" : "927",
@@ -55036,6 +55392,22 @@
   "burnOption" : false,
   "group" : "6",
   "sect" : "Sabbat",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201545",
+  "jolId" : "fth22",
+  "amaranthId" : "4118",
+  "type" : "Vampire",
+  "text" : "Name: Dowager, The\nCardtype: Vampire\nClan: Nosferatu\nGroup: 6\nCapacity: 6\nDisciplines: [aus] [pot] [ANI] [OBF]\nCamarilla primogen: The Dowager gets +1 intercept during directed actions.",
+  "htmlText" : "Name: Dowager, The<br/>Cardtype: Vampire<br/>Clan: Nosferatu<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [aus] [pot] [ANI] [OBF]<br/>Camarilla primogen: The Dowager gets +1 intercept during directed actions.",
+  "displayName" : "Dowager, The",
+  "names" : [ "The Dowager", "Dowager, The" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
 }, {
@@ -55227,6 +55599,22 @@
   "unique" : true,
   "burnOption" : false,
   "group" : "5",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201546",
+  "jolId" : "fth23",
+  "amaranthId" : "4119",
+  "type" : "Vampire",
+  "text" : "Name: Dr. Stephen Norton\nCardtype: Vampire\nClan: Malkavian\nGroup: 6\nCapacity: 4\nDisciplines: [aus] [OBF]\nCamarilla.",
+  "htmlText" : "Name: Dr. Stephen Norton<br/>Cardtype: Vampire<br/>Clan: Malkavian<br/>Group: 6<br/>Capacity: 4<br/>Disciplines: [aus] [OBF]<br/>Camarilla.",
+  "displayName" : "Dr. Stephen Norton",
+  "names" : [ "Dr. Stephen Norton" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
   "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
@@ -56607,6 +56995,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201547",
+  "jolId" : "fth24",
+  "amaranthId" : "4120",
+  "type" : "Vampire",
+  "text" : "Name: Flávio Gonçalves\nCardtype: Vampire\nClan: Toreador\nGroup: 6\nCapacity: 7\nDisciplines: [aus] [for] [CEL] [PRE]\nCamarilla Prince of São Paulo: Once each combat, Flávio can strike: dodge.",
+  "htmlText" : "Name: Flávio Gonçalves<br/>Cardtype: Vampire<br/>Clan: Toreador<br/>Group: 6<br/>Capacity: 7<br/>Disciplines: [aus] [for] [CEL] [PRE]<br/>Camarilla Prince of São Paulo: Once each combat, Flávio can strike: dodge.",
+  "displayName" : "Flávio Gonçalves",
+  "names" : [ "Flávio Gonçalves", "Flavio Goncalves" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200470",
   "jolId" : "ce42",
   "amaranthId" : "1200",
@@ -57052,6 +57456,22 @@
   "burnOption" : false,
   "group" : "5",
   "sect" : "Sabbat",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201548",
+  "jolId" : "fth25",
+  "amaranthId" : "4121",
+  "type" : "Vampire",
+  "text" : "Name: Gelasia Fotiou\nCardtype: Vampire\nClan: Malkavian\nGroup: 6\nCapacity: 6\nDisciplines: [obf] [pre] [AUS] [DOM]\nCamarilla.",
+  "htmlText" : "Name: Gelasia Fotiou<br/>Cardtype: Vampire<br/>Clan: Malkavian<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [obf] [pre] [AUS] [DOM]<br/>Camarilla.",
+  "displayName" : "Gelasia Fotiou",
+  "names" : [ "Gelasia Fotiou" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
 }, {
@@ -57745,7 +58165,7 @@
 }, {
   "id" : "201522",
   "jolId" : "tf1",
-  "amaranthId" : "3914",
+  "amaranthId" : "4045",
   "type" : "Vampire",
   "text" : "Name: Grimgroth\nCardtype: Vampire\nClan: Tremere\nGroup: 6\nCapacity: 10\nDisciplines: [for] [AUS] [DOM] [PRE] [THA]\nCamarilla: While Grimgroth is ready, mage allies cost Tremere you control 2 fewer pool to recruit. +2 bleed.",
   "htmlText" : "Name: Grimgroth<br/>Cardtype: Vampire<br/>Clan: Tremere<br/>Group: 6<br/>Capacity: 10<br/>Disciplines: [for] [AUS] [DOM] [PRE] [THA]<br/>Camarilla: While Grimgroth is ready, mage allies cost Tremere you control 2 fewer pool to recruit. +2 bleed.",
@@ -57763,8 +58183,8 @@
   "jolId" : "htb61",
   "amaranthId" : "1380",
   "type" : "Vampire",
-  "text" : "Name: Grotesque\nCardtype: Vampire\nClan: Gargoyle\nGroup: 6\nCapacity: 3\nDisciplines: [for] [pot] [vis]\nCamarilla: As this Grotesque enters play, choose a location you control not chosen for a Grotesque. Remove this Grotesque from the game if you no longer control the location. Flight [FLIGHT]. Tremere slave. Non-unique.",
-  "htmlText" : "Name: Grotesque<br/>Cardtype: Vampire<br/>Clan: Gargoyle<br/>Group: 6<br/>Capacity: 3<br/>Disciplines: [for] [pot] [vis]<br/>Camarilla: As this Grotesque enters play, choose a location you control not chosen for a Grotesque. Remove this Grotesque from the game if you no longer control the location. Flight [FLIGHT]. Tremere slave. Non-unique.",
+  "text" : "Name: Grotesque\nCardtype: Vampire\nClan: Gargoyle\nGroup: 6\nCapacity: 3\nDisciplines: [for] [pot] [vis]\nCamarilla: As this Grotesque enters play, choose a location you control not chosen for another Grotesque. Remove this Grotesque from the game if you no longer control the location. Flight [FLIGHT]. Tremere slave. Non-unique.",
+  "htmlText" : "Name: Grotesque<br/>Cardtype: Vampire<br/>Clan: Gargoyle<br/>Group: 6<br/>Capacity: 3<br/>Disciplines: [for] [pot] [vis]<br/>Camarilla: As this Grotesque enters play, choose a location you control not chosen for another Grotesque. Remove this Grotesque from the game if you no longer control the location. Flight [FLIGHT]. Tremere slave. Non-unique.",
   "displayName" : "Grotesque",
   "names" : [ "Grotesque" ],
   "crypt" : true,
@@ -58767,6 +59187,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201549",
+  "jolId" : "fth26",
+  "amaranthId" : "4122",
+  "type" : "Vampire",
+  "text" : "Name: Horace Radcliffe\nCardtype: Vampire\nClan: Nosferatu\nGroup: 6\nCapacity: 5\nDisciplines: [obf] [ANI] [POT]\nCamarilla.",
+  "htmlText" : "Name: Horace Radcliffe<br/>Cardtype: Vampire<br/>Clan: Nosferatu<br/>Group: 6<br/>Capacity: 5<br/>Disciplines: [obf] [ANI] [POT]<br/>Camarilla.",
+  "displayName" : "Horace Radcliffe",
+  "names" : [ "Horace Radcliffe" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200603",
   "jolId" : "sa145",
   "amaranthId" : "1512",
@@ -58828,6 +59264,22 @@
   "burnOption" : false,
   "group" : "3",
   "sect" : "Independent",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201550",
+  "jolId" : "fth27",
+  "amaranthId" : "4123",
+  "type" : "Vampire",
+  "text" : "Name: Horst von Brühl\nCardtype: Vampire\nClan: Ventrue\nGroup: 6\nCapacity: 6\nDisciplines: [aus] [pre] [dom] [FOR]\nCamarilla Prince of Mannheim.",
+  "htmlText" : "Name: Horst von Brühl<br/>Cardtype: Vampire<br/>Clan: Ventrue<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [aus] [pre] [dom] [FOR]<br/>Camarilla Prince of Mannheim.",
+  "displayName" : "Horst von Brühl",
+  "names" : [ "Horst von Brühl", "Horst von Bruhl" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
 }, {
@@ -59228,6 +59680,22 @@
   "burnOption" : false,
   "group" : "2",
   "sect" : "Sabbat",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201551",
+  "jolId" : "fth28",
+  "amaranthId" : "4124",
+  "type" : "Vampire",
+  "text" : "Name: Inês Tristão\nCardtype: Vampire\nClan: Tremere\nGroup: 6\nCapacity: 6\nDisciplines: [aus] [dom] [pre] [THA]\nCamarilla Prince of Rio de Janeiro.",
+  "htmlText" : "Name: Inês Tristão<br/>Cardtype: Vampire<br/>Clan: Tremere<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [aus] [dom] [pre] [THA]<br/>Camarilla Prince of Rio de Janeiro.",
+  "displayName" : "Inês Tristão",
+  "names" : [ "Inês Tristão", "Ines Tristao" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
 }, {
@@ -59761,7 +60229,7 @@
 }, {
   "id" : "201523",
   "jolId" : "pro3",
-  "amaranthId" : "3915",
+  "amaranthId" : "4046",
   "type" : "Vampire",
   "text" : "Name: Jacques Rouge\nCardtype: Vampire\nClan: Nosferatu\nGroup: 6\nCapacity: 6\nDisciplines: [ani] [pot] [pre] [OBF]\nAnarch Baron of Versailles.",
   "htmlText" : "Name: Jacques Rouge<br/>Cardtype: Vampire<br/>Clan: Nosferatu<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [ani] [pot] [pre] [OBF]<br/>Anarch Baron of Versailles.",
@@ -61375,6 +61843,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201552",
+  "jolId" : "fth29",
+  "amaranthId" : "4125",
+  "type" : "Vampire",
+  "text" : "Name: Kathy Glens\nCardtype: Vampire\nClan: Toreador\nGroup: 6\nCapacity: 5\nDisciplines: [aus] [cel] [tha] [PRE]\nCamarilla.",
+  "htmlText" : "Name: Kathy Glens<br/>Cardtype: Vampire<br/>Clan: Toreador<br/>Group: 6<br/>Capacity: 5<br/>Disciplines: [aus] [cel] [tha] [PRE]<br/>Camarilla.",
+  "displayName" : "Kathy Glens",
+  "names" : [ "Kathy Glens" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200765",
   "jolId" : "ln77",
   "amaranthId" : "1776",
@@ -62175,6 +62659,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201553",
+  "jolId" : "fth30",
+  "amaranthId" : "4126",
+  "type" : "Vampire",
+  "text" : "Name: Larissa Moreira\nCardtype: Vampire\nClan: Nosferatu\nGroup: 6\nCapacity: 6\nDisciplines: [pot] [ANI] [OBF]\nCamarilla primogen: During a bleed action, Larissa can discard a card requiring Animalism [ani] to get +1 bleed.",
+  "htmlText" : "Name: Larissa Moreira<br/>Cardtype: Vampire<br/>Clan: Nosferatu<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [pot] [ANI] [OBF]<br/>Camarilla primogen: During a bleed action, Larissa can discard a card requiring Animalism [ani] to get +1 bleed.",
+  "displayName" : "Larissa Moreira",
+  "names" : [ "Larissa Moreira" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200814",
   "jolId" : "bl105",
   "amaranthId" : "1863",
@@ -62220,6 +62720,22 @@
   "burnOption" : false,
   "group" : "5",
   "sect" : "Anarch",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201554",
+  "jolId" : "fth31",
+  "amaranthId" : "4127",
+  "type" : "Vampire",
+  "text" : "Name: Lauren\nCardtype: Vampire\nClan: Tremere\nGroup: 6\nCapacity: 4\nDisciplines: [aus] [dom] [tha]\nCamarilla.",
+  "htmlText" : "Name: Lauren<br/>Cardtype: Vampire<br/>Clan: Tremere<br/>Group: 6<br/>Capacity: 4<br/>Disciplines: [aus] [dom] [tha]<br/>Camarilla.",
+  "displayName" : "Lauren",
+  "names" : [ "Lauren" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
 }, {
@@ -62447,6 +62963,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201555",
+  "jolId" : "fth32",
+  "amaranthId" : "4128",
+  "type" : "Vampire",
+  "text" : "Name: Lenny Burkhead\nCardtype: Vampire\nClan: Nosferatu\nGroup: 6\nCapacity: 6\nDisciplines: [obf] [pot] [pre] [ANI]\nCamarilla primogen: +1 bleed.",
+  "htmlText" : "Name: Lenny Burkhead<br/>Cardtype: Vampire<br/>Clan: Nosferatu<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [obf] [pot] [pre] [ANI]<br/>Camarilla primogen: +1 bleed.",
+  "displayName" : "Lenny Burkhead",
+  "names" : [ "Lenny Burkhead" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200831",
   "jolId" : "th86",
   "amaranthId" : "1899",
@@ -62497,7 +63029,7 @@
 }, {
   "id" : "201526",
   "jolId" : "pro6",
-  "amaranthId" : "3916",
+  "amaranthId" : "4049",
   "type" : "Vampire",
   "text" : "Name: Leumeah\nCardtype: Vampire\nClan: Brujah\nGroup: 6\nCapacity: 6\nDisciplines: [cel] [for] [pot] [PRE]\nAnarch Baron of Canberra.",
   "htmlText" : "Name: Leumeah<br/>Cardtype: Vampire<br/>Clan: Brujah<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [cel] [for] [pot] [PRE]<br/>Anarch Baron of Canberra.",
@@ -62732,6 +63264,22 @@
   "burnOption" : false,
   "group" : "4",
   "sect" : "Independent",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201556",
+  "jolId" : "fth33",
+  "amaranthId" : "4129",
+  "type" : "Vampire",
+  "text" : "Name: Lloyd Brooks\nCardtype: Vampire\nClan: Tremere\nGroup: 6\nCapacity: 6\nDisciplines: [aus] [pot] [THA] [DOM]\nCamarilla primogen.",
+  "htmlText" : "Name: Lloyd Brooks<br/>Cardtype: Vampire<br/>Clan: Tremere<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [aus] [pot] [THA] [DOM]<br/>Camarilla primogen.",
+  "displayName" : "Lloyd Brooks",
+  "names" : [ "Lloyd Brooks" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
 }, {
@@ -63548,6 +64096,22 @@
   "burnOption" : false,
   "group" : "6",
   "sect" : "Independent",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201557",
+  "jolId" : "fth34",
+  "amaranthId" : "4130",
+  "type" : "Vampire",
+  "text" : "Name: Madison\nCardtype: Vampire\nClan: Ventrue\nGroup: 6\nCapacity: 6\nDisciplines: [DOM] [FOR] [PRE]\nCamarilla.",
+  "htmlText" : "Name: Madison<br/>Cardtype: Vampire<br/>Clan: Ventrue<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [DOM] [FOR] [PRE]<br/>Camarilla.",
+  "displayName" : "Madison",
+  "names" : [ "Madison" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
 }, {
@@ -64463,6 +65027,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201558",
+  "jolId" : "fth35",
+  "amaranthId" : "4131",
+  "type" : "Vampire",
+  "text" : "Name: Massimo Falconi\nCardtype: Vampire\nClan: Toreador\nGroup: 6\nCapacity: 4\nDisciplines: [aus] [cel] [pre]\nCamarilla.",
+  "htmlText" : "Name: Massimo Falconi<br/>Cardtype: Vampire<br/>Clan: Toreador<br/>Group: 6<br/>Capacity: 4<br/>Disciplines: [aus] [cel] [pre]<br/>Camarilla.",
+  "displayName" : "Massimo Falconi",
+  "names" : [ "Massimo Falconi" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200955",
   "jolId" : "km86",
   "amaranthId" : "2113",
@@ -64667,6 +65247,22 @@
   "unique" : true,
   "burnOption" : false,
   "group" : "3",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201559",
+  "jolId" : "fth36",
+  "amaranthId" : "4132",
+  "type" : "Vampire",
+  "text" : "Name: Meaghan\nCardtype: Vampire\nClan: Malkavian\nGroup: 6\nCapacity: 3\nDisciplines: [aus] [obf]\nCamarilla.",
+  "htmlText" : "Name: Meaghan<br/>Cardtype: Vampire<br/>Clan: Malkavian<br/>Group: 6<br/>Capacity: 3<br/>Disciplines: [aus] [obf]<br/>Camarilla.",
+  "displayName" : "Meaghan",
+  "names" : [ "Meaghan" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
   "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
@@ -65055,6 +65651,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201560",
+  "jolId" : "fth37",
+  "amaranthId" : "4133",
+  "type" : "Vampire",
+  "text" : "Name: Min-seo\nCardtype: Vampire\nClan: Toreador\nGroup: 6\nCapacity: 3\nDisciplines: [aus] [cel]\nCamarilla.",
+  "htmlText" : "Name: Min-seo<br/>Cardtype: Vampire<br/>Clan: Toreador<br/>Group: 6<br/>Capacity: 3<br/>Disciplines: [aus] [cel]<br/>Camarilla.",
+  "displayName" : "Min-seo",
+  "names" : [ "Min-seo" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "200992",
   "jolId" : "lo128",
   "amaranthId" : "2173",
@@ -65228,6 +65840,22 @@
   "burnOption" : false,
   "group" : "4",
   "sect" : "Sabbat",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201561",
+  "jolId" : "fth38",
+  "amaranthId" : "4134",
+  "type" : "Vampire",
+  "text" : "Name: Mkhokheli\nCardtype: Vampire\nClan: Toreador\nGroup: 6\nCapacity: 6\nDisciplines: [aus] [cel] [for] [PRE]\nCamarilla Prince of Cape Town.",
+  "htmlText" : "Name: Mkhokheli<br/>Cardtype: Vampire<br/>Clan: Toreador<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [aus] [cel] [for] [PRE]<br/>Camarilla Prince of Cape Town.",
+  "displayName" : "Mkhokheli",
+  "names" : [ "Mkhokheli" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
 }, {
@@ -65775,6 +66403,38 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201562",
+  "jolId" : "fth39",
+  "amaranthId" : "4135",
+  "type" : "Vampire",
+  "text" : "Name: Naomi Stewart\nCardtype: Vampire\nClan: Ventrue\nGroup: 6\nCapacity: 5\nDisciplines: [dom] [FOR] [PRE]\nCamarilla.",
+  "htmlText" : "Name: Naomi Stewart<br/>Cardtype: Vampire<br/>Clan: Ventrue<br/>Group: 6<br/>Capacity: 5<br/>Disciplines: [dom] [FOR] [PRE]<br/>Camarilla.",
+  "displayName" : "Naomi Stewart",
+  "names" : [ "Naomi Stewart" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201563",
+  "jolId" : "fth40",
+  "amaranthId" : "4136",
+  "type" : "Vampire",
+  "text" : "Name: Nassir\nCardtype: Vampire\nClan: Tremere\nGroup: 6\nCapacity: 4\nDisciplines: [aus] [THA]\nCamarilla.",
+  "htmlText" : "Name: Nassir<br/>Cardtype: Vampire<br/>Clan: Tremere<br/>Group: 6<br/>Capacity: 4<br/>Disciplines: [aus] [THA]<br/>Camarilla.",
+  "displayName" : "Nassir",
+  "names" : [ "Nassir" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "201037",
   "jolId" : "ds89",
   "amaranthId" : "2276",
@@ -65873,7 +66533,7 @@
 }, {
   "id" : "201520",
   "jolId" : "pro4",
-  "amaranthId" : "3917",
+  "amaranthId" : "4047",
   "type" : "Vampire",
   "text" : "Name: Nefertiti\nCardtype: Vampire\nClan: Follower of Set\nLevel: Advanced\nGroup: 2\nCapacity: 10\nDisciplines: [cel] [pot] [DOM] [OBF] [PRE] [SER]\nIndependent: Nefertiti can search your crypt for an /Aabbt Kindred/ (shuffle afterwards), reveal it and move it to your uncontrolled region as a +1 stealth action.\n[MERGED] Nefertiti can unlock during your minion phase.",
   "htmlText" : "Name: Nefertiti<br/>Cardtype: Vampire<br/>Clan: Follower of Set<br/>Level: Advanced<br/>Group: 2<br/>Capacity: 10<br/>Disciplines: [cel] [pot] [DOM] [OBF] [PRE] [SER]<br/>Independent: Nefertiti can search your crypt for an /Aabbt Kindred/ (shuffle afterwards), reveal it and move it to your uncontrolled region as a +1 stealth action.\n[MERGED] Nefertiti can unlock during your minion phase.",
@@ -66155,6 +66815,22 @@
   "unique" : true,
   "burnOption" : false,
   "group" : "1",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201564",
+  "jolId" : "fth41",
+  "amaranthId" : "4137",
+  "type" : "Vampire",
+  "text" : "Name: Nik Sikko\nCardtype: Vampire\nClan: Toreador\nGroup: 6\nCapacity: 3\nDisciplines: [cel] [pre]\nCamarilla.",
+  "htmlText" : "Name: Nik Sikko<br/>Cardtype: Vampire<br/>Clan: Toreador<br/>Group: 6<br/>Capacity: 3<br/>Disciplines: [cel] [pre]<br/>Camarilla.",
+  "displayName" : "Nik Sikko",
+  "names" : [ "Nik Sikko" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
   "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
@@ -66559,6 +67235,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201565",
+  "jolId" : "fth42",
+  "amaranthId" : "4138",
+  "type" : "Vampire",
+  "text" : "Name: Oshri Dahan\nCardtype: Vampire\nClan: Ventrue\nGroup: 6\nCapacity: 4\nDisciplines: [dom] [for] [pre]\nCamarilla.",
+  "htmlText" : "Name: Oshri Dahan<br/>Cardtype: Vampire<br/>Clan: Ventrue<br/>Group: 6<br/>Capacity: 4<br/>Disciplines: [dom] [for] [pre]<br/>Camarilla.",
+  "displayName" : "Oshri Dahan",
+  "names" : [ "Oshri Dahan" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "201085",
   "jolId" : "sp7",
   "amaranthId" : "2389",
@@ -66764,6 +67456,22 @@
   "burnOption" : false,
   "group" : "4",
   "sect" : "Sabbat",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201566",
+  "jolId" : "fth43",
+  "amaranthId" : "4139",
+  "type" : "Vampire",
+  "text" : "Name: Patrik Söderberg\nCardtype: Vampire\nClan: Tremere\nGroup: 6\nCapacity: 5\nDisciplines: [dom] [for] [tha] [AUS]\nCamarilla.",
+  "htmlText" : "Name: Patrik Söderberg<br/>Cardtype: Vampire<br/>Clan: Tremere<br/>Group: 6<br/>Capacity: 5<br/>Disciplines: [dom] [for] [tha] [AUS]<br/>Camarilla.",
+  "displayName" : "Patrik Söderberg",
+  "names" : [ "Patrik Söderberg", "Patrik Soderberg" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
 }, {
@@ -68495,6 +69203,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201567",
+  "jolId" : "fth44",
+  "amaranthId" : "4140",
+  "type" : "Vampire",
+  "text" : "Name: Rosalina Cortez\nCardtype: Vampire\nClan: Tremere\nGroup: 6\nCapacity: 3\nDisciplines: [THA]\nCamarilla.",
+  "htmlText" : "Name: Rosalina Cortez<br/>Cardtype: Vampire<br/>Clan: Tremere<br/>Group: 6<br/>Capacity: 3<br/>Disciplines: [THA]<br/>Camarilla.",
+  "displayName" : "Rosalina Cortez",
+  "names" : [ "Rosalina Cortez" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "201205",
   "jolId" : "ce89",
   "amaranthId" : "2826",
@@ -68667,6 +69391,22 @@
   "unique" : true,
   "burnOption" : false,
   "group" : "5",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201568",
+  "jolId" : "fth45",
+  "amaranthId" : "4141",
+  "type" : "Vampire",
+  "text" : "Name: Ryan\nCardtype: Vampire\nClan: Nosferatu\nGroup: 6\nCapacity: 4\nDisciplines: [ani] [obf] [pot]\nCamarilla.",
+  "htmlText" : "Name: Ryan<br/>Cardtype: Vampire<br/>Clan: Nosferatu<br/>Group: 6<br/>Capacity: 4<br/>Disciplines: [ani] [obf] [pot]<br/>Camarilla.",
+  "displayName" : "Ryan",
+  "names" : [ "Ryan" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
   "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
@@ -70415,6 +71155,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201569",
+  "jolId" : "fth46",
+  "amaranthId" : "4142",
+  "type" : "Vampire",
+  "text" : "Name: Sully\nCardtype: Vampire\nClan: Malkavian\nGroup: 6\nCapacity: 4\nDisciplines: [aus] [dom] [obf]\nCamarilla.",
+  "htmlText" : "Name: Sully<br/>Cardtype: Vampire<br/>Clan: Malkavian<br/>Group: 6<br/>Capacity: 4<br/>Disciplines: [aus] [dom] [obf]<br/>Camarilla.",
+  "displayName" : "Sully",
+  "names" : [ "Sully" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "201324",
   "jolId" : "ln151",
   "amaranthId" : "3192",
@@ -70491,6 +71247,22 @@
   "unique" : true,
   "burnOption" : false,
   "group" : "3",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
+  "id" : "201570",
+  "jolId" : "fth47",
+  "amaranthId" : "4143",
+  "type" : "Vampire",
+  "text" : "Name: Sybren van Oosten\nCardtype: Vampire\nClan: Ventrue\nGroup: 6\nCapacity: 7\nDisciplines: [dom] [tha] [FOR] [PRE]\nCamarilla Prince of Rotterdam: You can unlock Sybren after a referendum called by him passes.",
+  "htmlText" : "Name: Sybren van Oosten<br/>Cardtype: Vampire<br/>Clan: Ventrue<br/>Group: 6<br/>Capacity: 7<br/>Disciplines: [dom] [tha] [FOR] [PRE]<br/>Camarilla Prince of Rotterdam: You can unlock Sybren after a referendum called by him passes.",
+  "displayName" : "Sybren van Oosten",
+  "names" : [ "Sybren van Oosten" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
   "sect" : "Camarilla",
   "doNotReplace" : false,
   "multiMode" : false
@@ -70655,6 +71427,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201571",
+  "jolId" : "fth48",
+  "amaranthId" : "4144",
+  "type" : "Vampire",
+  "text" : "Name: Tamoszius\nCardtype: Vampire\nClan: Toreador\nGroup: 6\nCapacity: 5\nDisciplines: [aus] [CEL] [PRE]\nCamarilla.",
+  "htmlText" : "Name: Tamoszius<br/>Cardtype: Vampire<br/>Clan: Toreador<br/>Group: 6<br/>Capacity: 5<br/>Disciplines: [aus] [CEL] [PRE]<br/>Camarilla.",
+  "displayName" : "Tamoszius",
+  "names" : [ "Tamoszius" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "201339",
   "jolId" : "lo204",
   "amaranthId" : "3239",
@@ -70723,8 +71511,8 @@
   "jolId" : "bh117",
   "amaranthId" : "3246",
   "type" : "Vampire",
-  "text" : "Name: Tarbaby Jack\nCardtype: Vampire\nClan: Nosferatu antitribu\nGroup: 3\nCapacity: 8\nDisciplines: [dom] [ser] [ANI] [OBF] [POT]\nSabbat: If Tarbaby is ready at the start of your influence phase, you get +1 transfer. Black Hand.",
-  "htmlText" : "Name: Tarbaby Jack<br/>Cardtype: Vampire<br/>Clan: Nosferatu antitribu<br/>Group: 3<br/>Capacity: 8<br/>Disciplines: [dom] [ser] [ANI] [OBF] [POT]<br/>Sabbat: If Tarbaby is ready at the start of your influence phase, you get +1 transfer. Black Hand.",
+  "text" : "Name: Tarbaby Jack\n-- Banned --\nCardtype: Vampire\nClan: Nosferatu antitribu\nGroup: 3\nCapacity: 8\nDisciplines: [dom] [ser] [ANI] [OBF] [POT]\nSabbat: If Tarbaby is ready at the start of your influence phase, you get +1 transfer. Black Hand.",
+  "htmlText" : "Name: Tarbaby Jack<br/>-- Banned --<br/>Cardtype: Vampire<br/>Clan: Nosferatu antitribu<br/>Group: 3<br/>Capacity: 8<br/>Disciplines: [dom] [ser] [ANI] [OBF] [POT]<br/>Sabbat: If Tarbaby is ready at the start of your influence phase, you get +1 transfer. Black Hand.",
   "displayName" : "Tarbaby Jack",
   "names" : [ "Tarbaby Jack" ],
   "crypt" : true,
@@ -71423,6 +72211,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201572",
+  "jolId" : "fth49",
+  "amaranthId" : "4145",
+  "type" : "Vampire",
+  "text" : "Name: Trevon Parker\nCardtype: Vampire\nClan: Tremere\nGroup: 6\nCapacity: 6\nDisciplines: [AUS] [DOM] [THA]\nCamarilla.",
+  "htmlText" : "Name: Trevon Parker<br/>Cardtype: Vampire<br/>Clan: Tremere<br/>Group: 6<br/>Capacity: 6<br/>Disciplines: [AUS] [DOM] [THA]<br/>Camarilla.",
+  "displayName" : "Trevon Parker",
+  "names" : [ "Trevon Parker" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "201387",
   "jolId" : "lo212",
   "amaranthId" : "3379",
@@ -71491,8 +72295,8 @@
   "jolId" : "ds158",
   "amaranthId" : "3402",
   "type" : "Vampire",
-  "text" : "Name: Tsigane\nCardtype: Vampire\nClan: Ravnos\nGroup: 2\nCapacity: 3\nDisciplines: [aus] [chi]\nIndependent.",
-  "htmlText" : "Name: Tsigane<br/>Cardtype: Vampire<br/>Clan: Ravnos<br/>Group: 2<br/>Capacity: 3<br/>Disciplines: [aus] [chi]<br/>Independent.",
+  "text" : "Name: Tsigane\n-- Banned --\nCardtype: Vampire\nClan: Ravnos\nGroup: 2\nCapacity: 3\nDisciplines: [aus] [chi]\nIndependent.",
+  "htmlText" : "Name: Tsigane<br/>-- Banned --<br/>Cardtype: Vampire<br/>Clan: Ravnos<br/>Group: 2<br/>Capacity: 3<br/>Disciplines: [aus] [chi]<br/>Independent.",
   "displayName" : "Tsigane",
   "names" : [ "Tsigane" ],
   "crypt" : true,
@@ -72671,6 +73475,22 @@
   "doNotReplace" : false,
   "multiMode" : false
 }, {
+  "id" : "201573",
+  "jolId" : "fth50",
+  "amaranthId" : "4146",
+  "type" : "Vampire",
+  "text" : "Name: Wauneka\nCardtype: Vampire\nClan: Nosferatu\nGroup: 6\nCapacity: 5\nDisciplines: [ani] [aus] [obf] [POT]\nCamarilla.",
+  "htmlText" : "Name: Wauneka<br/>Cardtype: Vampire<br/>Clan: Nosferatu<br/>Group: 6<br/>Capacity: 5<br/>Disciplines: [ani] [aus] [obf] [POT]<br/>Camarilla.",
+  "displayName" : "Wauneka",
+  "names" : [ "Wauneka" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "doNotReplace" : false,
+  "multiMode" : false
+}, {
   "id" : "201465",
   "jolId" : "ant12",
   "amaranthId" : "3745",
@@ -73299,8 +74119,8 @@
   "jolId" : "kt179",
   "amaranthId" : "3668",
   "type" : "Vampire",
-  "text" : "Name: Zelios\nCardtype: Vampire\nClan: Nosferatu\nGroup: 5\nCapacity: 8\nDisciplines: [pro] [ANI] [OBF] [POT]\nCamarilla primogen: If Zelios is ready, he can lock to pay the pool cost of a location with his blood instead. +1 strength.",
-  "htmlText" : "Name: Zelios<br/>Cardtype: Vampire<br/>Clan: Nosferatu<br/>Group: 5<br/>Capacity: 8<br/>Disciplines: [pro] [ANI] [OBF] [POT]<br/>Camarilla primogen: If Zelios is ready, he can lock to pay the pool cost of a location with his blood instead. +1 strength.",
+  "text" : "Name: Zelios\nCardtype: Vampire\nClan: Nosferatu\nGroup: 5\nCapacity: 8\nDisciplines: [pro] [ANI] [OBF] [POT]\nCamarilla primogen: If Zelios is ready, you can lock him to pay the pool cost of a location with his blood instead. +1 strength.",
+  "htmlText" : "Name: Zelios<br/>Cardtype: Vampire<br/>Clan: Nosferatu<br/>Group: 5<br/>Capacity: 8<br/>Disciplines: [pro] [ANI] [OBF] [POT]<br/>Camarilla primogen: If Zelios is ready, you can lock him to pay the pool cost of a location with his blood instead. +1 strength.",
   "displayName" : "Zelios",
   "names" : [ "Zelios" ],
   "crypt" : true,
