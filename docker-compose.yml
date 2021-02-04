@@ -14,6 +14,9 @@ services:
       JOL_VERSION: docker-version
       JOL_RECAPTCHA_KEY: ***REMOVED***
       JOL_RECAPTCHA_SECRET: ***REMOVED***
+      DISCORD_API_VERSION: 6
+      DISCORD_BOT_TOKEN: ***REMOVED***
+      DISCORD_PING_CHANNEL_ID: 455542605535510529
     volumes:
       - test-data:/data
       - test-app:/usr/local/tomcat/webapps
@@ -28,7 +31,7 @@ services:
       - "traefik.http.routers.prod.tls.certresolver=myresolver"
     environment:
       JOL_DATA: /data
-      JOL_VERSION: 14-May-2020
+      JOL_VERSION: 7-Jan-2021
       JOL_RECAPTCHA_KEY: ***REMOVED***
       JOL_RECAPTCHA_SECRET: ***REMOVED***
       _JAVA_OPTIONS: -Djava.security.egd=file:/dev/./urandom

@@ -35,7 +35,7 @@ public class DsCardContainer extends DsNoteTaker implements CardContainer {
     public void setCards(Card[] c) {
         cards.clear();
         for (Card aC : c) {
-            Card n = new DsCard(aC.getId(), aC.getCardId());
+            Card n = new DsCard(aC.getId(), aC.getCardId(), aC.getOwner());
             addCard(n, false);
             getGame().addCard(n);
         }

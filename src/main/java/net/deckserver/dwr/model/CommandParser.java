@@ -69,10 +69,15 @@ class CommandParser {
 
     public String getCard(boolean optional, String player, String region) throws CommandException {
         Location loc = game.getState().getPlayerLocation(player, region);
-        return getCard(optional, loc.getCards());
+        return getCard(optional, loc.getCards(), false);
     }
 
-    private String getCard(boolean optional, Card[] cards) throws CommandException {
+    public String getCard(boolean optional, String player, String region, boolean allowTop) throws CommandException {
+        Location loc = game.getState().getPlayerLocation(player, region);
+        return getCard(optional, loc.getCards(), allowTop);
+    }
+
+    private String getCard(boolean optional, Card[] cards, boolean allowTop) throws CommandException {
         if (cards == null) {
             return null;
         }
@@ -85,6 +90,8 @@ class CommandParser {
             int num;
             if ("random".equals(args[ind])) {
                 num = new Random().nextInt(size);
+            } else if (allowTop && "top".equals(args[ind])) {
+                num = 0;
             } else {
                 char first = args[ind].charAt(0);
                 if (first == '+') num = -1;
@@ -94,7 +101,7 @@ class CommandParser {
             }
             Card card = cards[num];
             ind++;
-            String rec = getCard(true, card.getCards());
+            String rec = getCard(true, card.getCards(), allowTop);
             if (rec == null) return card.getId();
             return rec;
         } catch (NumberFormatException nfe) {

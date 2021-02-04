@@ -337,6 +337,12 @@ span.label, small.label {
     font-family: 'IM Fell English', serif;
 }
 
+#cardModal span.label {
+    border-radius: 0.25rem;
+    border: 1px solid #aaaaaa;
+    font-family: 'IM Fell English', serif;
+}
+
 span.label-light, small.label-light {
     background-color: #eee;
     color: #111;
@@ -715,7 +721,7 @@ div#hand a.event:before {
     content: "{";
 }
 
-small.counter {
+.counter {
     display: inline-block;
     min-width: 10px;
     padding: 3px 7px;
@@ -733,14 +739,6 @@ small.votes {
     background-color: #ffd246;
     border: 1px solid black;
     color: black;
-}
-
-small.blood {
-    background-color: #e04747;
-}
-
-small.life {
-    background-color: #1d9041;
 }
 
 #hand {
@@ -1157,8 +1155,19 @@ input[type=checkbox] {
     }
 }
 
+.modal-header {
+  padding: .5rem;
+  background-color: #eee;
+}
+.modal-body {
+  padding: .5rem 1rem;
+}
+.modal-footer {
+  padding: .5rem;
+}
 .modal-title {
   text-align: left;
+  width: 100%;
 }
 .modal-title .card-type {
   font-size: 2em;
@@ -1182,7 +1191,11 @@ input[type=checkbox] {
 .modal-title .action.combat:before { content: "pt"; }
 .modal-title .event:before { content: "{"; }
 
-#cardModal .discipline {
+#cardModal .modal-body {
+    text-align: left;
+}
+
+#playCardModal .discipline {
     float: left;
     font-family: 'disciplines';
     font-size: 2.5em;
@@ -1190,7 +1203,7 @@ input[type=checkbox] {
     padding-right: .25em;
 }
 
-#cardModal .mode-text {
+#playCardModal .mode-text {
     margin-bottom: 0;
     text-align: left;
 }
@@ -1198,30 +1211,30 @@ input[type=checkbox] {
 /*Disable the standard hover behavior of bootstrap buttons.  On touch screens
   like mobile phones, it's more intuitive to show the dramatic change in style
   once the button is pressed, so save it for that.*/
-#cardModal .modal-body button:hover:not(.active) {
+#playCardModal .modal-body button:hover:not(.active) {
   color: #343a40;
   background-color: #cdccdc;
   background-image: none;
   border-color: #343a40;
 }
 
-#cardModal .card-mode {
+#playCardModal .card-mode {
   white-space: normal;
 }
 
-#cardModal .requirements {
+#playCardModal .requirements {
   /*background-color: #fdf;
   border: 1px solid #a7a;*/
 }
 
-#cardModal .card-clan {
+.card-clan {
   font-family: 'jol';
   font-size: 2rem;
   line-height: 1; /*2.5rem;*/
   vertical-align: middle;
 }
 
-#cardModal .card-cost {
+#playCardModal .card-cost {
 }
 
 #targetPicker {
@@ -1234,11 +1247,11 @@ option.pinged {
   font-weight: bold;
 }
 
-#cardModal .burn-option {
+#playCardModal .burn-option {
   width: 36px;
 }
 
-#cardModal .round-button {
+.round-button {
   border-radius: 50%;
   width: 3rem;
   height: 3rem;
@@ -1247,15 +1260,52 @@ option.pinged {
   white-space: normal;
 }
 
-#cardModal .round-button-big-font {
+.round-button-big-font {
   display: block;
   font-size: 2rem;
   margin-top: -7px;
 }
 
 @media (min-width: 576px) {
-  #cardModal .round-button-big-font {
+  .round-button-big-font {
     font-size: 1.5rem;
     margin-top: 0;
   }
+}
+#cardModal .discipline {
+    font-family: 'disciplines';
+    font-size: 2em;
+    line-height: 1.1em;
+    padding-right: .25em;
+}
+.math {
+    font-family: monospace;
+}
+.counters {
+    width: 5rem;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 20px;
+    color: #fff;
+    text-align: center;
+    background-color: grey;
+    cursor: pointer;
+}
+.modal .votes {
+    display: inline-block;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    text-align: center;
+    white-space: nowrap;
+    border-radius: 20px;
+    background-color: #ffd246;
+    border: 1px solid black;
+    color: black;
+    font-size: 1rem;
+}
+.blood {
+    background-color: #c00;
+}
+.life {
+    background-color: #1d9041;
 }

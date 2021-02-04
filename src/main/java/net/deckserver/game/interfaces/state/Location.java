@@ -11,7 +11,7 @@ package net.deckserver.game.interfaces.state;
  */
 public interface Location extends NoteTaker, CardContainer {
 
-    void initCards(String[] cardIds);
+    void initCards(String[] cardIds, String owner);
 
     void shuffle(int num);
 

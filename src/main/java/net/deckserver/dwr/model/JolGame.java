@@ -103,10 +103,10 @@ public class JolGame {
         }
         String[] cryptarr = new String[cryptlist.size()];
         cryptlist.toArray(cryptarr);
-        crypt.initCards(cryptarr);
+        crypt.initCards(cryptarr, name);
         String[] libraryarr = new String[librarylist.size()];
         librarylist.toArray(libraryarr);
-        library.initCards(libraryarr);
+        library.initCards(libraryarr, name);
 
     }
 
@@ -219,6 +219,77 @@ public class JolGame {
         addCommand(message, new String[]{"move", cardId, destPlayer, destRegion, bottom ? "bottom" : "top"});
         source.removeCard(card);
         dest.addCard(card, !bottom);
+    }
+
+    void burnQuietly(String cardId) {
+        Card card = state.getCard(cardId);
+        if (card == null) throw new IllegalArgumentException("No such card");
+
+        //Burn attached cards
+        for (Card c: card.getCards())
+            burnQuietly(c.getId());
+
+        CardContainer source = card.getParent();
+        String owner = card.getOwner();
+        Location dest = state.getPlayerLocation(owner, ASHHEAP);
+
+        //Move to owner's ash heap
+        source.removeCard(card);
+        dest.addCard(card, false);
+
+        //Clear label
+        setText(cardId, "", true);
+
+        //Clear capacity
+        int capacity = getCapacity(cardId);
+        if (capacity > 0) //-1 means does not have capacity
+            changeCapacity(cardId, -capacity, true);
+
+        //Clear blood/life counters
+        int blood = getCounters(cardId);
+        if (blood > 0)
+            changeCounters(null, cardId, -blood, true);
+
+        //Unlock
+        _setTap(card, false);
+    }
+
+    void burn(String player, String cardId, String srcPlayer, String srcRegion, boolean top) {
+        Card card = state.getCard(cardId);
+        if (card == null) throw new IllegalArgumentException("No such card");
+
+        String owner = card.getOwner();
+        if (owner == null || owner.isEmpty())
+            throw new IllegalArgumentException("Game too old for burn command");
+
+        //Message formats:
+        //Target is public: "<player> burns <card> [#<region-index>] from [<player>'s] <region>"
+        //Target is private: "<player> burns <card> from [top of] [<player>'s] <region>"
+
+        boolean hidden = isHiddenRegion(srcRegion);
+        CardEntry cardEntry = CardSearch.INSTANCE.getCardById(card.getCardId());
+        String differentiators = "";
+        if (!(hidden || cardEntry.isUnique())) {
+            int regionIndex = getIndexInRegion(card);
+            String label = getText(cardId);
+            differentiators = String.format(
+                "%s%s",
+                regionIndex > -1 ? String.format(" #%s", regionIndex + 1) : "",
+                label.equals("") ? "" : String.format(" \"%s\"", label)
+            );
+        }
+
+        boolean showRegionOwner = !player.equals(srcPlayer);
+        String message = String.format(
+                "%s burns %s from %s%s%s",
+                player,
+                getCardLink(card) + differentiators,
+                top ? "top of " : "",
+                showRegionOwner ? srcPlayer + "'s " : "",
+                srcRegion);
+
+        addCommand(message, new String[]{"move", cardId, owner, ASHHEAP, "bottom"});
+        burnQuietly(cardId);
     }
 
     public void discard(String player, String cardId, boolean random) {
@@ -376,7 +447,7 @@ public class JolGame {
         return 0;
     }
 
-    public void changeCounters(String player, String cardId, int incr) {
+    public void changeCounters(String player, String cardId, int incr, boolean quiet) {
         if (incr == 0) return; // no change necessary - PENDING log this though?
         Card card = state.getCard(cardId);
         Notation note = getNote(card, COUNTERS, true);
@@ -384,15 +455,17 @@ public class JolGame {
         int val = (valStr == null) ? 0 : Integer.parseInt(valStr);
         val += incr;
         note.setValue(val + "");
-        String logText = String.format(
-            "%s %s %s blood %s %s, now %s",
-            player,
-            incr < 0 ? "removes" : "adds",
-            Math.abs(incr),
-            incr < 0 ? "from" : "to",
-            getCardName(card),
-            val);
-        addCommand(logText, new String[]{"counter", cardId, incr + ""});
+        if (!quiet) {
+            String logText = String.format(
+                "%s %s %s blood %s %s, now %s",
+                player,
+                incr < 0 ? "removes" : "adds",
+                Math.abs(incr),
+                incr < 0 ? "from" : "to",
+                getCardName(card),
+                val);
+            addCommand(logText, new String[]{"counter", cardId, incr + ""});
+        }
     }
 
     private boolean isHiddenRegion(String region) {
@@ -532,15 +605,17 @@ public class JolGame {
         note.setValue(text);
     }
 
-    public void setText(String cardId, String text) {
+    public void setText(String cardId, String text, boolean quiet) {
         Card card = state.getCard(cardId);
         Notation note = getNote(card, TEXT, true);
         String cleanText = text.trim();
         note.setValue(cleanText);
-        if (!"".equals(cleanText)) {
-            addMessage(getCardName(card) + " now " + text);
-        } else {
-            addMessage("Removed label from " + getCardName(card));
+        if (!quiet) {
+            if (!"".equals(cleanText)) {
+                addMessage(getCardName(card) + " now " + text);
+            } else {
+                addMessage("Removed label from " + getCardName(card));
+            }
         }
     }
 
@@ -700,7 +775,7 @@ public class JolGame {
         sendMsg(getActivePlayer(), "START OF " + phase.toUpperCase() + " PHASE.");
     }
 
-    public void changeCapacity(String cardId, int capincr) {
+    public void changeCapacity(String cardId, int capincr, boolean quiet) {
         Card card = state.getCard(cardId);
         Notation cap = getNote(card, "capac", true);
         String val = cap.getValue();
@@ -709,7 +784,8 @@ public class JolGame {
         else amt = Integer.parseInt(val) + capincr;
         if (amt < 0) amt = 0;
         cap.setValue(amt + "");
-        addCommand("Capacity of " + getCardName(card) + " now " + amt, new String[]{"capacity", cardId, capincr + ""});
+        if (!quiet)
+            addCommand("Capacity of " + getCardName(card) + " now " + amt, new String[]{"capacity", cardId, capincr + ""});
     }
 
     public int getCapacity(String cardId) {

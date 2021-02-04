@@ -50,6 +50,10 @@ public class StoreCard implements Card {
         return gamecard.getNotation();
     }
 
+    public String getOwner() {
+        return gamecard.getOwner();
+    }
+
     public void addCard(Card card, boolean first) {
         CardContainer container = game.getCardContainer(this, true);
         container.addCard(card, first);

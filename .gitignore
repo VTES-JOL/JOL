@@ -6,6 +6,7 @@ target/*
 
 # Vim
 *.swp
+*.swo
 
 # Game data
 src/test/resources/game*

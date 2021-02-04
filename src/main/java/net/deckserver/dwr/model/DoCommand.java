@@ -69,7 +69,7 @@ public class DoCommand {
                     note.append(" ");
                     note.append(cmdObj.nextArg());
                 }
-                game.setText(card, note.toString());
+                game.setText(card, note.toString(), false);
                 return "Adjusted label";
             }
             if (cmd.equalsIgnoreCase("votes")) {
@@ -165,7 +165,7 @@ public class DoCommand {
                                     capincr = Integer.parseInt(aText.substring(10).trim());
                                 }
                             }
-                            game.changeCapacity(srcCard, capincr);
+                            game.changeCapacity(srcCard, capincr, false);
                         }
                     }
                     if (draw) game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
@@ -191,6 +191,14 @@ public class DoCommand {
                     return "Moved the card";
                 }
             }
+            if (cmd.equalsIgnoreCase("burn")) {
+                String srcPlayer = cmdObj.getPlayer(player);
+                String srcRegion = cmdObj.getRegion(JolGame.READY_REGION);
+                String cardId = cmdObj.getCard(false, srcPlayer, srcRegion, true);
+                boolean top = Arrays.asList(cmdStr).contains("top");
+                game.burn(player, cardId, srcPlayer, srcRegion, top);
+                return "Burned the card";
+            }
             if (cmd.equalsIgnoreCase("pool")) {
                 String targetPlayer = cmdObj.getPlayer(player);
                 int amount = cmdObj.getAmount(0);
@@ -204,7 +212,7 @@ public class DoCommand {
                 if (targetCard == null) throw new CommandException("Must specify a card in the region");
                 int amount = cmdObj.getAmount(0);
                 if (amount == 0) return "Must specify an amount of blood";
-                game.changeCounters(player, targetCard, amount);
+                game.changeCounters(player, targetCard, amount, false);
                 return "Adjusted blood";
             }
             if (cmd.equalsIgnoreCase("capacity")) {
@@ -215,7 +223,7 @@ public class DoCommand {
                 if (targetCard == null) throw new CommandException("Must specify a card in the region");
                 int amount = cmdObj.getAmount(0);
                 if (amount == 0) return "Must specify an amount of blood";
-                game.changeCapacity(targetCard, amount);
+                game.changeCapacity(targetCard, amount, false);
                 return "Adjusted capacity";
             }
             if (cmd.equalsIgnoreCase("msg") || cmd.equalsIgnoreCase("message")) {
@@ -300,7 +308,7 @@ public class DoCommand {
                 int amount = cmdObj.getAmount(1);
                 if (amount == 0) return "Must transfer an amount";
                 game.changePool(player, -amount);
-                game.changeCounters(player, card, amount);
+                game.changeCounters(player, card, amount, false);
                 return "Did the transfer";
             }
         } catch (NumberFormatException e) {

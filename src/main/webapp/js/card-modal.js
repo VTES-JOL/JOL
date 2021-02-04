@@ -33,50 +33,50 @@ function cardTypeCSSClass(cardType) {
 function clanToKey(clan) {
   return clan.toLowerCase().replace(/ /g, '_');
 }
-function showCardModal(event) {
-  $('#cardModal .loaded').hide();
-  $('#cardModal .loading').show();
+function showPlayCardModal(event) {
+  $('#playCardModal .loaded').hide();
+  $('#playCardModal .loading').show();
   //Show modal immediately with Loading text
-  //$('#cardModal').modal('show');
+  //$('#playCardModal').modal('show');
   var cardId = $(event.target).data('card-id');
   var handCoord = $(event.target).data('coordinates');
   $.get({
       url: "rest/api/cards/" + cardId, success: function(card) {
-        var modal = $('#cardModal');
+        var modal = $('#playCardModal');
         modal.data('hand-coord', handCoord);
         modal.data('do-not-replace', card.doNotReplace);
 
-        $('#cardModal .card-name').text(card.displayName);
-        $('#cardModal .card-type')
+        $('#playCardModal .card-name').text(card.displayName);
+        $('#playCardModal .card-type')
           .removeClass()
           .addClass('card-type ' + cardTypeCSSClass(card.type));
-        $('#cardModal .preamble').text(card.preamble);
-        $('#cardModal .burn-option').toggle(card.burnOption);
+        $('#playCardModal .preamble').text(card.preamble);
+        $('#playCardModal .burn-option').toggle(card.burnOption);
 
         var clanText = '';
         if (card.clans != null) {
           for (var c of card.clans)
             clanText += CLAN_CHARS[clanToKey(c)];
         }
-        $('#cardModal .card-clan').text(clanText);
+        $('#playCardModal .card-clan').text(clanText);
 
         var costText = null;
         if (card.cost != null) costText = 'Costs ' + card.cost + '.';
-        $('#cardModal .card-cost').text(costText);
+        $('#playCardModal .card-cost').text(costText);
 
-        var modeContainer = $('#cardModal .card-modes');
+        var modeContainer = $('#playCardModal .card-modes');
         modeContainer.empty();
 
         if (card.modes && card.modes.length > 0) {
-          var modeTemplate = $('#cardModal .templates .card-mode');
+          var modeTemplate = $('#playCardModal .templates .card-mode');
           for (var i = 0; i < card.modes.length; ++i) {
             var mode = card.modes[i];
             var button = modeTemplate.clone();
 
-            var extendedPlayPanel = $('#cardModal .extended-play-panel');
+            var extendedPlayPanel = $('#playCardModal .extended-play-panel');
             if (card.multiMode) {
               extendedPlayPanel.show();
-              var playButton = $('#cardModalPlayButton');
+              var playButton = $('#playCardModalPlayButton');
               playButton.prop('disabled', true);
               playButton.text('Select one or more disciplines');
               button.on('click', multiModeButtonClicked);
@@ -104,10 +104,10 @@ function showCardModal(event) {
             button.appendTo(modeContainer);
           }
         }
-        $('#cardModal .loading').hide();
-        $('#cardModal .loaded').show();
+        $('#playCardModal .loading').hide();
+        $('#playCardModal .loaded').show();
         tippy.hideAll({ duration: 0 });
-        $('#cardModal').modal('show');
+        $('#playCardModal').modal('show');
       }
   });
 }
@@ -120,10 +120,10 @@ function modeClicked(event) {
 }
 function showTargetPicker(target) {
   var picker = $('#targetPicker');
-  $('#targetPicker .card-name').text($('#cardModalLabel').text());
+  $('#targetPicker .card-name').text($('#playCardModalLabel').text());
   $('#targetPicker .card-type')
     .removeClass()
-    .addClass($('#cardModal .card-type').get(0).className);
+    .addClass($('#playCardModal .card-type').get(0).className);
   $('#targetPicker .modal-body').text(
     target == 'SELF' ? 'Who is playing this?' : 'Pick target.');
   picker.show();
@@ -137,7 +137,13 @@ function showTargetPicker(target) {
     - picker.get(0).getBoundingClientRect().bottom;
   window.scrollTo(0, scrollTo);
 
-  $('#cardModal').modal('hide');
+  $('#playCardModal').modal('hide');
+}
+function cardOnTableClicked(event) {
+  var picker = $('#targetPicker');
+  if (picker.css('display') != 'none')
+    return pickTarget(event);
+  return showCardModal(event);
 }
 function pickTarget(event) {
   var picker = $('#targetPicker');
@@ -148,11 +154,11 @@ function pickTarget(event) {
   var player = targetAnchor.closest('[data-player]').data('player').split(' ', 1)[0];
   var region = targetAnchor.closest('[data-region]').data('region').split('-', 1)[0];
   var coords = targetAnchor.data('coordinates');
-  var modal = $('#cardModal');
+  var modal = $('#playCardModal');
   modal.data('target', player + ' ' + region + ' ' + coords);
   tippy.hideAll({ duration: 0 });
 
-  var modesSelected = $('#cardModal .card-modes button.active');
+  var modesSelected = $('#playCardModal .card-modes button.active');
   playCard({target: modesSelected.eq(0)});
   closeTargetPicker();
   return false;
@@ -161,7 +167,7 @@ function closeTargetPicker() {
   $('#targetPicker').hide();
 }
 function playCardCommand(disciplines, target) {
-  var modal = $('#cardModal');
+  var modal = $('#playCardModal');
   var handIndex = modal.data('hand-coord');
   var doNotReplace = modal.data('do-not-replace');
   var getTargetFromModal = target == 'MINION_YOU_CONTROL' || target == 'SELF' || target == 'SOMETHING';
@@ -177,10 +183,10 @@ function playCard(event) {
   var button = $(event.target).closest('button'); //target might be inner p
   var disciplines = [];
   var target = null;
-  if (button.attr('id') == 'cardModalPlayButton') { //Multi-mode cards
-    $('#cardModal .card-modes button.active')
+  if (button.attr('id') == 'playCardModalPlayButton') { //Multi-mode cards
+    $('#playCardModal .card-modes button.active')
       .each(function() { disciplines = disciplines.concat($(this).data('disciplines')); });
-    target = $('#cardModal .card-modes button.active:first').data('target');
+    target = $('#playCardModal .card-modes button.active:first').data('target');
   }
   else { //Single-mode cards
     disciplines = button.data('disciplines');
@@ -189,31 +195,21 @@ function playCard(event) {
 
   var command = playCardCommand(disciplines, target);
   console.log(command);
-  DS.submitForm(
-      game, null, command, '', null, 'No',
-      $("#globalNotes").val(), $("#privateNotes").val(), {
-    callback: processData,
-    errorHandler: errorhandler
-  });
-  $('#cardModal').modal('hide');
+  sendCommand(command);
+  $('#playCardModal').modal('hide');
   return false;
 }
 function discard(replace = true) {
-  var modal = $('#cardModal');
+  var modal = $('#playCardModal');
   var handIndex = modal.data('hand-coord');
   var command = 'discard ' + handIndex + (replace ? ' draw' : '');
   console.log(command);
-  DS.submitForm(
-      game, null, command, '', null, 'No',
-      $("#globalNotes").val(), $("#privateNotes").val(), {
-    callback: processData,
-    errorHandler: errorhandler
-  });
-  $('#cardModal').modal('hide');
+  sendCommand(command);
+  $('#playCardModal').modal('hide');
   return false;
 }
 function nextCard() {
-  var modal = $('#cardModal');
+  var modal = $('#playCardModal');
   var nextIndex = modal.data('hand-coord') + 1;
   var nextCard = $('#hand .card-list a[data-coordinates=' + nextIndex + ']')
   if (nextCard.length == 0) nextCard = $('#hand .card-list a:first')
@@ -221,7 +217,7 @@ function nextCard() {
   return false;
 }
 function previousCard() {
-  var modal = $('#cardModal');
+  var modal = $('#playCardModal');
   var nextIndex = modal.data('hand-coord') - 1;
   var nextCard = null;
   if (nextIndex < 1) nextCard = $('#hand .card-list a:last');
@@ -232,8 +228,164 @@ function previousCard() {
 function multiModeButtonClicked(event) {
   var button = $(event.target).closest('button');
   var delta = button.hasClass('active') ? -1 : 1;
-  var modes = $('#cardModal .card-modes button.active').length + delta;
-  var playButton = $('#cardModalPlayButton');
+  var modes = $('#playCardModal .card-modes button.active').length + delta;
+  var playButton = $('#playCardModalPlayButton');
   playButton.prop('disabled', modes < 1);
   playButton.text(modes < 1 ? 'Select one or more disciplines' : 'Play');
+}
+function showCardModal(event) {
+  $('#cardModal .loaded').hide();
+  $('#cardModal .loading').show();
+  var target = $(event.target);
+  var controller = target.closest('[data-player]').data('player');
+  var region = target.closest('[data-region]').data('region');
+  var isChild = !target.closest('ol')[0].id.startsWith('region');
+  var coordinates = target.data('coordinates');
+  var cardId = target.data('card-id');
+  var capacity = target.data('capacity');
+  var counters = target.data('counters');
+  var label = target.data('label');
+  var locked = target.data('locked');
+  var votes = target.data('votes');
+  //cardId = 'ce75'; //Maris Streck
+  //cardId = 'sw1'; //Ambrosio Luis Monçada, Plenipotentiary
+  //cardId = 'una71'; //Xaviar Adv (max disciplines)
+  $.get({
+      url: "rest/api/cards/" + cardId, success: function(card) {
+        //console.log(card);
+        var modal = $('#cardModal');
+        modal.data('controller', controller);
+        modal.data('region', region);
+        modal.data('coordinates', coordinates);
+
+        $('#cardModal .card-name').text(card.displayName);
+        $('#cardModal .card-label').text(label).toggle(label.length > 0);
+        $('#cardModal .card-text').text(card.originalText);
+        $('#cardModal .votes').text(votes).toggle(votes > 0);
+
+        var clanText = '';
+        var clanHoverText = '';
+        if (card.clans != null && card.clans.length > 0) {
+          var c = card.clans[0];
+          clanText = CLAN_CHARS[clanToKey(c)];
+          clanHoverText = c;
+        }
+        $('#cardModal .card-clan').text(clanText).attr('title', clanHoverText);
+
+        var disciplineStr = '';
+        if (card.disciplines != null) {
+          for (var d of card.disciplines) {
+            disciplineStr += DISCIPLINE_CHARS[d];
+          }
+        }
+        var disciplineSpan = $('#cardModal .discipline');
+        disciplineSpan.text(disciplineStr);
+
+        setCounters(counters, capacity, card.type);
+
+        $('#cardModal button').show();
+        $(`#cardModal button[data-region][data-region!="${region}"]`).hide();
+        $(`#cardModal button[data-lock-state][data-lock-state!="${locked ? "locked" : "unlocked"}"]`).hide()
+        //This will be a good enhancement once we can identify non-crypt cards that become minions,
+        //like Embrace, Call the Great Beast, and Jake Washington.
+        //$(`#cardModal button[data-type][data-type!="${card.type.toUpperCase()}"]`).hide();
+
+        if (isChild) {
+          $(`#cardModal button[data-top-level-only]`).hide();
+        }
+
+        $('#cardModal .loading').hide();
+        $('#cardModal .loaded').show();
+        tippy.hideAll({ duration: 0 });
+        $('#cardModal').modal('show');
+      }
+  });
+}
+function setCounters(current, capacity, cardType = null) {
+  var counterBar = $('#cardModal .counters');
+  if (cardType != null) {
+    counterBar.removeClass('blood life');
+    var class_ = null;
+    switch (cardType.toUpperCase()) {
+        case 'VAMPIRE': class_ = 'blood'; break;
+        case 'RETAINER':
+        case 'ALLY':
+        case 'IMBUED': class_ = 'life'; break;
+    }
+    if (class_ != null) counterBar.addClass(class_);
+  }
+
+  var text = capacity > 0 ? `- ${current} / ${capacity} +` : `- ${current} +`;
+  counterBar.text(text);
+
+  var modal = $('#cardModal');
+  modal.data('counters', current);
+  modal.data('capacity', capacity);
+}
+function sendCommand(command, message = '') {
+  DS.submitForm(
+    game, null, command, message, null, 'No',
+    $("#globalNotes").val(), $("#privateNotes").val(), {
+      callback: processData,
+      errorHandler: errorhandler
+  });
+}
+function doCardCommand(commandKeyword, message = '', commandTail = '', closeModal = true) {
+  var modal = $('#cardModal');
+  var player = modal.data('controller').split(' ', 1)[0];
+  var region = modal.data('region').split('-')[0]; //ready-region > ready
+  var coords = modal.data('coordinates');
+  var command = `${commandKeyword} ${player} ${region} ${coords} ${commandTail}`;
+  sendCommand(command, message);
+  if (closeModal) $('#cardModal').modal('hide');
+  return false;
+}
+function lock(message = '') { return doCardCommand('lock', message); }
+function unlock(message = '') { return doCardCommand('unlock', message); }
+function bleed() { return lock('Bleed'); }
+function hunt() { return lock('Hunt'); }
+function goAnarch() { return lock('Go anarch'); }
+function leaveTorpor() { return lock('Leave torpor'); }
+function burn() { return doCardCommand('burn'); }
+function block() {
+  var name = $('#cardModal .card-name').text();
+  var message = name + ' blocks';
+  sendChat(message);
+  $('#cardModal').modal('hide');
+  return false;
+}
+function removeCounter() {
+  var modal = $('#cardModal');
+  var counters = modal.data('counters');
+  if (counters > 0) {
+    var capacity = modal.data('capacity');
+    doCardCommand('blood', '', '-1', false);
+    setCounters(counters - 1, capacity);
+  }
+  return false;
+}
+function addCounter() {
+  var modal = $('#cardModal');
+  var counters = modal.data('counters');
+  var capacity = modal.data('capacity');
+  doCardCommand('blood', '', '+1', false);
+  setCounters(counters + 1, capacity);
+  return false;
+}
+var countersLastClicked = null;
+function countersClicked(event) {
+    //These events were firing 3 times when double-clicked.
+    //Ignore the duplicate click event that comes through with mozInputSource = MOZ_SOURCE_TOUCH
+    //on the Mac mouse when double-clicking.
+    if (event.detail > 1 && countersLastClicked != null) {
+        countersLastClicked = null;
+        return false;
+    }
+    var bounds = event.target.getBoundingClientRect();
+    var x = event.clientX - bounds.left;
+    if (x >= event.target.clientWidth / 2)
+        addCounter();
+    else removeCounter();
+    countersLastClicked = event.timeStamp;
+    return false;
 }

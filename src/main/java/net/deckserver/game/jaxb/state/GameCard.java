@@ -8,6 +8,7 @@ import java.util.List;
 @XmlType(name = "", propOrder = {
         "id",
         "cardid",
+        "owner",
         "notation"
 })
 @XmlRootElement(name = "game-card")
@@ -17,6 +18,8 @@ public class GameCard {
     protected String id;
     @XmlElement(required = true)
     protected String cardid;
+    @XmlElement(required = true)
+    protected String owner;
     protected List<Notation> notation;
 
     @XmlAttribute(name = "type")
@@ -46,6 +49,14 @@ public class GameCard {
         this.cardid = value;
     }
 
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String value) {
+        this.owner = value;
+    }
+
     public List<Notation> getNotation() {
         if (notation == null) {
             notation = new ArrayList<Notation>();
@@ -58,6 +69,7 @@ public class GameCard {
         return "GameCard{" +
                 "id='" + id + '\'' +
                 ", cardid='" + cardid + '\'' +
+                ", owner='" + owner + '\'' +
                 ", notation=" + notation +
                 '}';
     }

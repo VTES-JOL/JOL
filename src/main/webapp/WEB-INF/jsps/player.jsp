@@ -20,7 +20,7 @@
 
     request.setAttribute("edge", edge);
 %>
-<div class="game-header">
+<div class="game-header" data-player="<%= player %>">
     <h5><%= player %></h5>
     <c:if test="${edge}">
         <span class="label label-basic edge">Edge</span>

@@ -72,6 +72,197 @@
             </div>
         </div>
 
+        <div class="modal" id="quickChatModal" tabindex="-1" role="dialog" aria-labelledby="quickChatModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="quickChatModalLabel">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <span>Quick Chat<span>
+                </h5>
+              </div>
+              <div class="modal-body">
+                <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('Bleed')">Bleed</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('Hunt')">Hunt</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('Block?')">Block?</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('No block')">No block</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary m-1" onclick="sendChat('Blocked')">Blocked</button>
+                <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('No pre-range')">No pre-range</button>
+                <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('No maneuver')">No maneuver</button>
+                <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('No pre, no maneuver')">No pre, no maneuver</button>
+                <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('Hands for 1')">H1</button>
+                <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('Hands for 2')">H2</button>
+                <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('Hands for 3')">H3</button>
+                <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('Wave')">Wave</button>
+                <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('No press')">No press</button>
+                <button type="button" class="btn btn-sm btn-outline-danger m-1" onclick="sendChat('Combat ends')">Combat ends</button>
+                <button type="button" class="btn btn-sm btn-outline-success m-1" onclick="sendChat('No sudden/wash')">No sudden/wash</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal" id="playCardModal" tabindex="-1" role="dialog" aria-labelledby="playCardModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content loading" style="height:30vh;text-align:center">
+              <h2 style="position:relative;top:43%">Loading...</h2>
+            </div>
+            <div class="modal-content loaded" style="text-align:center">
+              <div class="modal-header">
+                <h5 class="modal-title">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <span class="card-type action"></span>
+                  <span class="card-name" id="playCardModalLabel">Song of Serenity</span>
+                </h5>
+              </div>
+              <div class="modal-body">
+                <div class="requirements">
+                  <span class="card-clan"></span>
+                  <span class="card-cost">Costs 1 blood.</span>
+                </div>
+                <p class="mb-2">
+                  <img class="burn-option" src="images/burn-option.png"></img>
+                  <span class="preamble">Only usable before range is chosen.</span>
+                </p>
+                <div class="card-modes"></div>
+                <div class="templates d-none">
+                  <button type="button" class="card-mode btn btn-block btn-outline-dark mb-2" aria-pressed="false" data-toggle="button">
+                    <span class="discipline">a</span>
+                    <p class="mode-text">The opposing minion gets -1 strength this round. A vampire may play only one Song of Serenity each combat.</p>
+                  </button>
+                </div>
+                <div class="extended-play-panel" style="display:none">
+                  <hr/>
+                  <button id="playCardModalPlayButton" type="button"
+                          class="btn btn-block btn-primary mb-2" style="white-space:normal"
+                          onclick="playCard(event);">Play</button>
+                </div>
+                <div class="d-flex justify-content-center">
+                  <button type="button" class="btn btn-outline-dark round-button mx-1"
+                          title="Previous card"
+                          onclick="previousCard();">&lt;</button>
+                  <button type="button" class="btn btn-outline-danger round-button mx-1"
+                          title="Discard and replace"
+                          onclick="discard();">
+                    <span>&#10607;</span>
+                  </button>
+                  <button type="button" class="btn btn-outline-danger round-button mx-1"
+                          title="Discard"
+                          onclick="discard(false);">
+                    <span>&#10585;</span>
+                  </button>
+                  <button type="button" class="btn btn-outline-dark round-button mx-1"
+                          title="Next card"
+                          onclick="nextCard();">&gt;</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="targetPicker" class="fixed-top" style="display:none">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">
+                  <button type="button" class="close" onclick="closeTargetPicker()">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <span class="card-type action"></span>
+                  <span class="card-name">Song of Serenity</span>
+                </h5>
+              </div>
+              <div class="modal-body">Pick target.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal" id="cardModal" tabindex="-1" role="dialog" aria-labelledby="cardModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content loading" style="height:30vh;text-align:center">
+              <h2 style="position:relative;top:43%">Loading...</h2>
+            </div>
+            <div class="modal-content loaded" style="text-align:center">
+              <div class="modal-header">
+                <h5 class="modal-title">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <span class="card-clan"></span>
+                  <span class="card-name" id="cardModalLabel">Maris Streck</span>
+                </h5>
+              </div>
+              <div class="modal-body">
+                <div class="d-flex align-items-center">
+                  <span class="discipline">a</span>
+                  <span class="votes" title="Votes">3</span>
+                </div>
+                <p class="mb-0">
+                  <span class="card-label label label-light"></span>
+                  <span class="card-text"></span>
+                </p>
+              </div>
+              <div class="modal-footer d-flex flex-wrap justify-content-center">
+                <div class="counters blood" title="Counters; click right side to increase, left to decrease"
+                     onclick="countersClicked(event)">99/99</div>
+                <button type="button" class="btn btn-outline-dark m-1" title="Bleed"
+                        data-region="ready-region" data-lock-state="unlocked"
+                        data-top-level-only
+                        onclick="bleed();">
+                  <span>Bleed</span>
+                </button>
+                <button type="button" class="btn btn-outline-dark m-1" title="Hunt"
+                        data-region="ready-region" data-lock-state="unlocked"
+                        data-top-level-only
+                        onclick="hunt();">
+                  <span>Hunt</span>
+                </button>
+                <button type="button" class="btn btn-outline-dark m-1" title="Go Anarch"
+                        data-region="ready-region" data-lock-state="unlocked"
+                        data-top-level-only
+                        onclick="goAnarch();">
+                  <span>Go Anarch</span>
+                </button>
+                <!--button type="button" class="btn btn-outline-dark m-1" title="Rescue"
+                        data-region="ready-region" data-lock-state="unlocked"
+                        data-top-level-only
+                        onclick="alert('todo rescue');">
+                  <span>Rescue</span>
+                </button-->
+                <button type="button" class="btn btn-outline-dark m-1" title="Leave Torpor"
+                        data-region="torpor" data-lock-state="unlocked"
+                        data-top-level-only
+                        onclick="leaveTorpor();">
+                  <span>Leave Torpor</span>
+                </button>
+                <button type="button" class="btn btn-outline-dark m-1" title="Lock"
+                        data-lock-state="unlocked"
+                        onclick="lock();">
+                  <span>&cudarrr;</span>
+                </button>
+                <button type="button" class="btn btn-outline-dark m-1" title="Unlock"
+                        data-lock-state="locked"
+                        onclick="unlock();">
+                  <div style="transform: rotate(-90deg);">&#10548;</div>
+                </button>
+                <button type="button" class="btn btn-outline-dark m-1" title="Block"
+                        data-region="ready-region" data-top-level-only
+                        onclick="block();">
+                  <span>Block</span>
+                </button>
+                <button type="button" class="btn btn-outline-dark m-1" title="Burn"
+                        onclick="burn();">
+                  <span>Burn</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Bootstrap -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script type="text/javascript" src="js/jquery-3.4.1.js"></script>
@@ -88,6 +279,7 @@
         <script type='text/javascript' src='dwr/util.js'></script>
         <script type='text/javascript' src="js/tippy.all.min.js"></script>
         <script type='text/javascript' src='js/ds.js'></script>
+        <script type="text/javascript" src="js/card-modal.js"></script>
         <script src='https://www.google.com/recaptcha/api.js'></script>
     </body>
 </html>

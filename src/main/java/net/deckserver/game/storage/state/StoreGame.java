@@ -27,7 +27,7 @@ public class StoreGame implements Game {
     private Map<String, StoreCard> cardCache = new HashMap<>();
 
     /**
-     * Creates a new instance of StoreCard
+     * Creates a new instance of StoreGame
      */
     public StoreGame(GameState state) {
         this.state = state;
@@ -153,21 +153,22 @@ public class StoreGame implements Game {
         return num;
     }
 
-    GameCard mkCard(String cardid) {
+    GameCard mkCard(String cardid, String owner) {
         String id = getCount() + "";
-        return mkCard(cardid, id);
+        return mkCard(cardid, id, owner);
     }
 
-    GameCard mkCard(String cardid, String id) {
+    GameCard mkCard(String cardid, String id, String owner) {
         GameCard card = new GameCard();
         card.setCardid(cardid);
         card.setId(id);
+        card.setOwner(owner);
         cardCache.put(id, new StoreCard(this, card));
         return card;
     }
 
     GameCard mkCard(Card card) {
-        return mkCard(card.getCardId(), card.getId());
+        return mkCard(card.getCardId(), card.getId(), card.getOwner());
     }
 
     public Card getCard(String id) {

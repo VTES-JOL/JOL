@@ -17,6 +17,7 @@ public class CardSummary {
     private String type;
     private String text;
     private String htmlText;
+    private String originalText; //Original: as in the CSV
     private String displayName;
     private Set<String> names = new HashSet<>();
     private boolean crypt;
@@ -24,11 +25,15 @@ public class CardSummary {
     private boolean burnOption;
     private String group;
     private String sect;
+    private List<String> clans;
 
+    //Library only
     private String preamble;
     private List<LibraryCardMode> modes;
     private boolean doNotReplace;
     private boolean multiMode;
     private String cost;
-    private List<String> clans;
+
+    //Crypt only
+    private List<String> disciplines;
 }

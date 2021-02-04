@@ -91,10 +91,10 @@ public class StoreLocation implements Location {
         return note;
     }
 
-    public void initCards(String[] cardIds) {
+    public void initCards(String[] cardIds, String owner) {
         region.getGameCard().clear();
         for (String cardId : cardIds) {
-            region.getGameCard().add(game.mkCard(cardId));
+            region.getGameCard().add(game.mkCard(cardId, owner));
         }
     }
 

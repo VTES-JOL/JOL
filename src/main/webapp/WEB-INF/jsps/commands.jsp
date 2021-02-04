@@ -1,55 +1,24 @@
 <div class="help d-flex flex-wrap justify-content-between">
-    <a href="#help_pool">Pool</a>
     <a href="#help_blood">Blood</a>
+    <a href="#help_burn">Burn</a>
     <a href="#help_capacity">Capacity</a>
     <a href="#help_discard">Discard</a>
     <a href="#help_draw">Draw</a>
     <a href="#help_edge">Edge</a>
     <a href="#help_label">Label</a>
+    <a href="#help_lock">Lock</a>
     <a href="#help_move">Move</a>
     <a href="#help_order">Order</a>
     <a href="#help_play">Play</a>
+    <a href="#help_pool">Pool</a>
     <a href="#help_random">Random</a>
     <a href="#help_show">Show</a>
     <a href="#help_shuffle">Shuffle</a>
     <a href="#help_transfer">Transfer</a>
-    <a href="#help_lock">Lock</a>
     <a href="#help_unlock">Unlock</a>
     <a href="#help_votes">Votes</a>
 </div>
 <div class="help-body">
-    <div id="help_pool">
-        <h4 class="header">Pool <a class="float-right" href="#top">Top</a></h4>
-        <div class="light padded">
-            <p>
-                Manipulates player pool values.
-                The default PLAYER is yourself.
-            </p>
-            <h5>Syntax</h5>
-            <p>
-                <code>pool [PLAYER] [+|-]AMOUNT</code>
-            </p>
-            <h5>Examples</h5>
-            <table class="help-example">
-                <tr>
-                    <th class="help-command">Command</th>
-                    <th>Result</th>
-                </tr>
-                <tr>
-                    <td class="help-command"> pool +2</td>
-                    <td> adds 2 to your pool</td>
-                </tr>
-                <tr>
-                    <td class="help-command"> pool -2</td>
-                    <td> deducts 2 from your pool</td>
-                </tr>
-                <tr>
-                    <td class='help-command'>pool Adam +2</td>
-                    <td> adds 2 to Adam's pool</td>
-                </tr>
-            </table>
-        </div>
-    </div>
     <div id="help_blood">
         <h4 class="header">Blood <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
@@ -82,6 +51,43 @@
                 <tr>
                     <td class="help-command"> blood Adam ashheap 2 +7</td>
                     <td> adds 7 blood to Adam's card #2 in his ashheap region</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="help_burn">
+        <h4 class="header">Burn <a class="float-right" href="#top">Top</a></h4>
+        <div class="light padded">
+            <p>
+                Burns a card, moving it to its owner's ash heap. Cards on the burned card are moved to their owner's ash heaps.
+                The default SRCPLAYER is yourself. The default SRCREGION is your ready region.
+
+                This command does not work in games created before January 2021.
+            </p>
+            <h5>Syntax</h5>
+            <p>
+                <code>burn [SRCPLAYER] [SRCREGION] CARD|top </code>
+            </p>
+            <h5>Examples</h5>
+            <table class="help-example">
+                <tr>
+                    <th class="help-command">Command</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td class="help-command">burn re 1</td>
+                    <td>burns card #1 in your ready region</td>
+                </tr>
+                    <td class="help-command">burn Jane re 2</td>
+                    <td>burns card #2 in Jane's ready region</td>
+                </tr>
+                <tr>
+                    <td class="help-command">burn Jane lib top</td>
+                    <td>burn the top card of Jane's library</td>
+                </tr>
+                <tr>
+                    <td class="help-command">burn crypt top</td>
+                    <td>burn the top card of your crypt</td>
                 </tr>
             </table>
         </div>
@@ -250,6 +256,35 @@
             </table>
         </div>
     </div>
+    <div id="help_lock">
+        <h4 class="header">Lock <a class="float-right" href="#top">Top</a></h4>
+        <div class="light padded">
+            <p>
+                Locks a particular card. You may target any card on the table. Note that locking other people's
+                cards should
+                never be necessary. The default PLAYER is yourself. The default REGION is your ready region.
+            </p>
+            <h5>Syntax</h5>
+            <p>
+                <code>lock [PLAYER] [REGION] CARD</code>
+            </p>
+            <h5>Examples</h5>
+            <table class="help-example">
+                <tr>
+                    <th class="help-command">Command</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td class="help-command">lock ready 1</td>
+                    <td>lock card #1 in your ready region</td>
+                </tr>
+                <tr>
+                    <td class="help-command">lock George ready 3</td>
+                    <td>lock card #3 in George's ready region (Jar the Soul, Misdirection)</td>
+                </tr>
+            </table>
+        </div>
+    </div>
     <div id="help_move">
         <h4 class="header">Move <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
@@ -407,6 +442,38 @@
             </table>
         </div>
     </div>
+    <div id="help_pool">
+        <h4 class="header">Pool <a class="float-right" href="#top">Top</a></h4>
+        <div class="light padded">
+            <p>
+                Manipulates player pool values.
+                The default PLAYER is yourself.
+            </p>
+            <h5>Syntax</h5>
+            <p>
+                <code>pool [PLAYER] [+|-]AMOUNT</code>
+            </p>
+            <h5>Examples</h5>
+            <table class="help-example">
+                <tr>
+                    <th class="help-command">Command</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td class="help-command"> pool +2</td>
+                    <td> adds 2 to your pool</td>
+                </tr>
+                <tr>
+                    <td class="help-command"> pool -2</td>
+                    <td> deducts 2 from your pool</td>
+                </tr>
+                <tr>
+                    <td class='help-command'>pool Adam +2</td>
+                    <td> adds 2 to Adam's pool</td>
+                </tr>
+            </table>
+        </div>
+    </div>
     <div id="help_random">
         <h4 class="header">Random <a class="float-right" href="#top">Top</a></h4>
         <div class="light padded">
@@ -533,35 +600,6 @@
                 <tr>
                     <td class="help-command">transfer re 3 -1</td>
                     <td>remove 1 blood from vampire #3 in ready region, add 1 to pool.</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-    <div id="help_lock">
-        <h4 class="header">Lock <a class="float-right" href="#top">Top</a></h4>
-        <div class="light padded">
-            <p>
-                Locks a particular card. You may target any card on the table. Note that locking other people's
-                cards should
-                never be necessary. The default PLAYER is yourself. The default REGION is your ready region.
-            </p>
-            <h5>Syntax</h5>
-            <p>
-                <code>lock [PLAYER] [REGION] CARD</code>
-            </p>
-            <h5>Examples</h5>
-            <table class="help-example">
-                <tr>
-                    <th class="help-command">Command</th>
-                    <th>Result</th>
-                </tr>
-                <tr>
-                    <td class="help-command">lock ready 1</td>
-                    <td>lock card #1 in your ready region</td>
-                </tr>
-                <tr>
-                    <td class="help-command">lock George ready 3</td>
-                    <td>lock card #3 in George's ready region (Jar the Soul, Misdirection)</td>
                 </tr>
             </table>
         </div>

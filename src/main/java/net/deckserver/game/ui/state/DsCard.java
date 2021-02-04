@@ -8,12 +8,14 @@ class DsCard extends DsCardContainer implements Card {
 
     private String id;
     private String card;
+    private String owner;
     private DsCardContainer parent;
 
-    DsCard(String id, String card) {
+    DsCard(String id, String card, String owner) {
         super(null);
         this.id = id;
         this.card = card;
+        this.owner = owner;
     }
 
     DsGame getGame() {
@@ -42,6 +44,10 @@ class DsCard extends DsCardContainer implements Card {
 
     public String getCardId() {
         return card;
+    }
+
+    public String getOwner() {
+        return owner;
     }
 
     @Override

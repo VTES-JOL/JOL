@@ -3,6 +3,7 @@
 <%@ page import="net.deckserver.dwr.model.JolGame" %>
 <%@ page import="net.deckserver.game.interfaces.state.Card" %>
 <%@ page import="net.deckserver.game.storage.cards.CardEntry" %>
+<%@ page import="org.apache.commons.lang3.StringEscapeUtils" %>
 <%@ page import="java.util.List" %>
 <%
     CardParams p = (CardParams) request.getAttribute("cparams");
@@ -13,7 +14,7 @@
     int capacity = game.getCapacity(c.getId());
     int counters = game.getCounters(c.getId());
     boolean locked = game.isTapped(c.getId());
-    String label = game.getText(c.getId());
+    String label = StringEscapeUtils.escapeHtml4(game.getText(c.getId()));
     String votes = game.getVotes(c.getId());
     boolean nested = p.doNesting();
     Card[] cards = c.getCards();
@@ -48,7 +49,11 @@
     <a class="card-name <%= typeClass %>" data-card-id="<%= p.getId() %>" data-coordinates="<%= coordinates %>"
       <c:choose>
         <c:when test="${region == 'hand'}">
-          onclick="showCardModal(event)"
+          onclick="showPlayCardModal(event)"
+        </c:when>
+        <c:when test="${region == 'ready-region' || region == 'torpor'}">
+          data-label="<%= label %>" data-locked="<%= locked %>" data-counters="<%= counters %>" data-votes="<%= votes %>" data-capacity="<%= capacity %>"
+          onclick="cardOnTableClicked(event)"
         </c:when>
         <c:otherwise>
           onclick="pickTarget(event)"

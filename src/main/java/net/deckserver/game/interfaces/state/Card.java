@@ -20,4 +20,6 @@ public interface Card extends NoteTaker, CardContainer {
     String getCardId();
 
     Card[] getCards();
+
+    String getOwner();
 }

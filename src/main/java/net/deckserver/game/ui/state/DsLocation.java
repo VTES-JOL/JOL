@@ -16,10 +16,10 @@ class DsLocation extends DsCardContainer implements Location {
         this.lname = name;
     }
 
-    public void initCards(String[] cardIds) {
+    public void initCards(String[] cardIds, String owner) {
         cards.clear();
         for (String cardId : cardIds) {
-            Card c = new DsCard(getGame().getNewId() + "", cardId);
+            Card c = new DsCard(getGame().getNewId() + "", cardId, owner);
             addCard(c, false);
             getGame().addCard(c);
         }

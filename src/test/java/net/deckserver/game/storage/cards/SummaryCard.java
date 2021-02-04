@@ -5,6 +5,7 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -22,6 +23,7 @@ public class SummaryCard {
     private String type;
     private String text;
     private String htmlText;
+    private String originalText; //Original: as in the CSV
     private String displayName;
     private Set<String> names;
     private boolean crypt;
@@ -29,13 +31,17 @@ public class SummaryCard {
     private boolean burnOption;
     private String group;
     private String sect;
+    private List<String> clans;
 
+    //Library only
     private String preamble;
     private List<LibraryCardMode> modes;
     private boolean doNotReplace;
     private boolean multiMode;
     private String cost;
-    private List<String> clans;
+
+    //Crypt only
+    private List<String> disciplines;
 
     private SummaryCard() {
 
@@ -52,6 +58,7 @@ public class SummaryCard {
         this.unique = cryptCard.isUnique();
         this.group = cryptCard.getGroup();
         this.sect = cryptCard.getSect();
+        this.clans = Arrays.asList(cryptCard.getClan());
 
         List<String> cardLines = new ArrayList<>();
         boolean vampire = cryptCard.getType().equals("Vampire");
@@ -70,6 +77,9 @@ public class SummaryCard {
         Optional.ofNullable(cryptCard.getText()).ifPresent(cardLines::add);
         this.text = String.join("\n", cardLines);
         this.htmlText = String.join("<br/>", cardLines);
+
+        this.disciplines = cryptCard.getDisciplines();
+        this.originalText = cryptCard.getText();
     }
 
     public SummaryCard(LibraryCard libraryCard) {
@@ -110,5 +120,6 @@ public class SummaryCard {
         Optional.ofNullable(libraryCard.getText()).ifPresent(cardLines::add);
         this.text = String.join("\n", cardLines);
         this.htmlText = String.join("<br/>", cardLines);
+        this.originalText = libraryCard.getText();
     }
 }
