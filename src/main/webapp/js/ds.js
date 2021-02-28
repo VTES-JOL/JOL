@@ -646,6 +646,17 @@ function sendChat(message) {
     return false;
 }
 
+function sendCommand(command, message = '') {
+  DS.submitForm(
+    game, null, command, message, null, 'No',
+    $("#globalNotes").val(), $("#privateNotes").val(), {
+      callback: processData,
+      errorHandler: errorhandler
+  });
+  $('#quickCommandModal').modal('hide');
+  return false;
+}
+
 function setOther(newOption) {
     currentOption = newOption;
     switch (currentOption) {
@@ -1104,7 +1115,7 @@ function callbackMain(data) {
         removeLabeledRows('activeGames', data.removedGames);
         renderMessage(data.message);
         //TODO how can I inject this into data.message?
-        renderMessage('January 2021: New "burn" command handles card ownership (new games only); cards on table have click/tap interface for some commands');
+        renderMessage('February 2021: click/tap interface for common commands');
         if (data.refresh > 0) {
             if (refresher) clearTimeout(refresher);
             refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", data.refresh);

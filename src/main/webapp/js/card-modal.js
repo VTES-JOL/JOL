@@ -322,14 +322,6 @@ function setCounters(current, capacity, cardType = null) {
   modal.data('counters', current);
   modal.data('capacity', capacity);
 }
-function sendCommand(command, message = '') {
-  DS.submitForm(
-    game, null, command, message, null, 'No',
-    $("#globalNotes").val(), $("#privateNotes").val(), {
-      callback: processData,
-      errorHandler: errorhandler
-  });
-}
 function doCardCommand(commandKeyword, message = '', commandTail = '', closeModal = true) {
   var modal = $('#cardModal');
   var player = modal.data('controller').split(' ', 1)[0];
