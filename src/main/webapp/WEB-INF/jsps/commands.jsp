@@ -2,6 +2,7 @@
     <a href="#help_blood">Blood</a>
     <a href="#help_burn">Burn</a>
     <a href="#help_capacity">Capacity</a>
+    <a href="#help_choose">Choose</a>
     <a href="#help_discard">Discard</a>
     <a href="#help_draw">Draw</a>
     <a href="#help_edge">Edge</a>
@@ -12,6 +13,7 @@
     <a href="#help_play">Play</a>
     <a href="#help_pool">Pool</a>
     <a href="#help_random">Random</a>
+    <a href="#help_reveal">Reveal</a>
     <a href="#help_show">Show</a>
     <a href="#help_shuffle">Shuffle</a>
     <a href="#help_transfer">Transfer</a>
@@ -115,6 +117,29 @@
                 <tr>
                     <td class="help-command">capacity Jeff torpor 1 -1</td>
                     <td>Reduces the capacity of Jeff's first torporized minion by one.</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="help_choose">
+        <h4 class="header">Choose <a class="float-right" href="#top">Top</a></h4>
+        <div class="light padded">
+            <p>
+                Choose a secret for yourself. Reveal all players' secrets simultaneously with the <a href="#help_reveal">reveal command</a>. Useful for Malkavian Prank.
+            </p>
+            <h5>Syntax</h5>
+            <p>
+                <code>choose SECRET</code>
+            </p>
+            <h5>Examples</h5>
+            <table class="help-example">
+                <tr>
+                    <th class="help-command">Command</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td class="help-command">choose 2</td>
+                    <td>Your choice (2) is saved</td>
                 </tr>
             </table>
         </div>
@@ -334,6 +359,14 @@
                     <td class="help-command">move ashheap 1 hand</td>
                     <td>moves card #1 in your ashheap into your hand (useful for mistakes)</td>
                 </tr>
+                <tr>
+                    <td class="help-command">move ashheap 1 library</td>
+                    <td>moves card #1 in your ashheap onto the bottom of your library</td>
+                </tr>
+                <tr>
+                    <td class="help-command">move ashheap 1 library top</td>
+                    <td>moves card #1 in your ashheap onto the top of your library</td>
+                </tr>
             </table>
         </div>
     </div>
@@ -493,6 +526,29 @@
                 <tr>
                     <td class="help-command">random 6</td>
                     <td>roll a 6 sided die</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="help_reveal">
+        <h4 class="header">Reveal <a class="float-right" href="#top">Top</a></h4>
+        <div class="light padded">
+            <p>
+                Reveal all secrets previously chosen with the <a href="#help_choose">choose command</a>. Useful for Malkavian Prank.
+            </p>
+            <h5>Syntax</h5>
+            <p>
+                <code>reveal</code>
+            </p>
+            <h5>Examples</h5>
+            <table class="help-example">
+                <tr>
+                    <th class="help-command">Command</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td class="help-command">reveal</td>
+                    <td>All secret choices are revealed</td>
                 </tr>
             </table>
         </div>

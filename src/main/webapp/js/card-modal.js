@@ -1,7 +1,7 @@
 "use strict";
 var CLAN_CHARS = {
   abomination: 'A', arihmane: 'B', akunanse: 'C', assamite: 'D', baali: 'E',
-  blood_brothers: 'F', brujah: 'G', brujah_antitribu: 'H', caitiff: 'I',
+  blood_brother: 'F', brujah: 'G', brujah_antitribu: 'H', caitiff: 'I',
   daughter_of_cacophony: 'J', follower_of_set: 'K', gangrel: 'L',
   gangrel_antitribu: 'M', gargoyle: 'N', giovanni: 'O', guruhi: 'P',
   harbinger_of_skulls: 'Q', ishtarri: 'R', kiasyd: 'S', lasombra: 'T',
