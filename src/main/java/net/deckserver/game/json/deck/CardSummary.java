@@ -35,5 +35,6 @@ public class CardSummary {
     private String cost;
 
     //Crypt only
+    private Integer capacity;
     private List<String> disciplines;
 }

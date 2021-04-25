@@ -15,9 +15,9 @@
     int index = -1;
     for (int i = 0; i < players.size(); i++)
         if (players.get(i).equals(player)) index = i + 1;
-    String poolStyle = game.getPool(player) == 0 ? "pool-ousted" : "pool";
-    poolStyle = game.getPool(player) < 0 ? "pool-sacked" : poolStyle;
-
+    int pool = game.getPool(player);
+    String poolStyle = pool == 0 ? "pool-ousted" : "pool";
+    poolStyle = pool < 0 ? "pool-sacked" : poolStyle;
     request.setAttribute("edge", edge);
 %>
 <div class="game-header" data-player="<%= player %>">
@@ -25,7 +25,7 @@
     <c:if test="${edge}">
         <span class="label label-basic edge">Edge</span>
     </c:if>
-    <span class="label label-basic <%= poolStyle %>">Pool: <%= game.getPool(player) %></span>
+    <span class="label label-basic <%= poolStyle %>">Pool: <%= pool %></span>
 </div>
 <div class="padded">
     <small>

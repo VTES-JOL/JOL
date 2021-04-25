@@ -1,6 +1,6 @@
 "use strict";
 var CLAN_CHARS = {
-  abomination: 'A', arihmane: 'B', akunanse: 'C', assamite: 'D', baali: 'E',
+  abomination: 'A', ahrimane: 'B', akunanse: 'C', assamite: 'D', baali: 'E',
   blood_brother: 'F', brujah: 'G', brujah_antitribu: 'H', caitiff: 'I',
   daughter_of_cacophony: 'J', follower_of_set: 'K', gangrel: 'L',
   gangrel_antitribu: 'M', gargoyle: 'N', giovanni: 'O', guruhi: 'P',
@@ -8,7 +8,7 @@ var CLAN_CHARS = {
   malkavian: 'U', malkavian_antitribu: 'V', nagaraja: 'W', nosferatu: 'X',
   nosferatu_antitribu: 'Y', osebo: 'Z', pander: '[', ravnos: '\\',
   salubri: ']', salubri_antitribu: '^', samedi: '_', toreador: '`',
-  toreador_antitribu: 'a', tremere: 'b', tremere_antitrubu: 'c',
+  toreador_antitribu: 'a', tremere: 'b', tremere_antitribu: 'c',
   true_brujah: 'd', tzimisce: 'e', ventrue: 'f', ventrue_antitribu: 'g',
   avenger: 'h', defender: 'i', innocent: 'j', judge: 'k', martyr: 'l',
   redeemer: 'm', visionary: 'n'
@@ -203,7 +203,6 @@ function discard(replace = true) {
   var modal = $('#playCardModal');
   var handIndex = modal.data('hand-coord');
   var command = 'discard ' + handIndex + (replace ? ' draw' : '');
-  console.log(command);
   sendCommand(command);
   $('#playCardModal').modal('hide');
   return false;
@@ -238,6 +237,7 @@ function showCardModal(event) {
   $('#cardModal .loading').show();
   var target = $(event.target);
   var controller = target.closest('[data-player]').data('player');
+  var controllerPool = target.closest('[data-pool]').data('pool');
   var region = target.closest('[data-region]').data('region');
   var isChild = !target.closest('ol')[0].id.startsWith('region');
   var coordinates = target.data('coordinates');
@@ -261,7 +261,7 @@ function showCardModal(event) {
         $('#cardModal .card-name').text(card.displayName);
         $('#cardModal .card-label').text(label).toggle(label.length > 0);
         $('#cardModal .card-text').text(card.originalText);
-        $('#cardModal .votes').text(votes).toggle(votes > 0);
+        $('#cardModal .votes').text(votes).toggle(votes > 0 || votes == 'P');
 
         var clanText = '';
         var clanHoverText = '';
@@ -281,7 +281,21 @@ function showCardModal(event) {
         var disciplineSpan = $('#cardModal .discipline');
         disciplineSpan.text(disciplineStr);
 
+        //If this is our inactive region, show capacity required to influence out.
+        //player is a global from ds.js - the logged-in player
+        if (controller == player && capacity == -1 && card.capacity != null)
+          capacity = card.capacity;
         setCounters(counters, capacity, card.type);
+
+        if (controller == player) { //player is a global from ds.js - the logged-in player
+          setPool(controllerPool);
+          $('#cardModal .transfers').show();
+          $('#cardModal .counters').css('position', 'absolute');
+        } else {
+          $('#cardModal .transfers').hide();
+          //Put the counter vial back in normal flow
+          $('#cardModal .counters').css('position', 'relative');
+        }
 
         $('#cardModal button').show();
         $(`#cardModal button[data-region][data-region!="${region}"]`).hide();
@@ -322,12 +336,23 @@ function setCounters(current, capacity, cardType = null) {
   modal.data('counters', current);
   modal.data('capacity', capacity);
 }
-function doCardCommand(commandKeyword, message = '', commandTail = '', closeModal = true) {
+function setPool(pool) {
+  $('#cardModal .card-modal-pool').text(`${pool} pool`);
+  $('#cardModal').data('pool', pool);
+}
+function doCardCommand(commandKeyword, message = '', commandTail = '', closeModal = true, omitPlayer = false) {
   var modal = $('#cardModal');
-  var player = modal.data('controller').split(' ', 1)[0];
-  var region = modal.data('region').split('-')[0]; //ready-region > ready
-  var coords = modal.data('coordinates');
-  var command = `${commandKeyword} ${player} ${region} ${coords} ${commandTail}`;
+  var parts = new Array(5);
+  parts.push(commandKeyword);
+  if (!omitPlayer) {
+    var player = modal.data('controller').split(' ', 2)[0]; //names with spaces do not work
+    parts.push(player);
+  }
+  parts.push(
+    modal.data('region').split('-')[0], //ready-region > ready
+    modal.data('coordinates'),
+    commandTail);
+  var command = parts.join(' ');
   sendCommand(command, message);
   if (closeModal) $('#cardModal').modal('hide');
   return false;
@@ -339,6 +364,13 @@ function hunt() { return lock('Hunt'); }
 function goAnarch() { return lock('Go anarch'); }
 function leaveTorpor() { return lock('Leave torpor'); }
 function burn() { return doCardCommand('burn'); }
+function playVamp() {
+  var modal = $('#cardModal');
+  var command = `play vamp ${modal.data('coordinates')}`;
+  sendCommand(command);
+  $('#cardModal').modal('hide');
+  return false;
+}
 function block() {
   var name = $('#cardModal .card-name').text();
   var message = name + ' blocks';
@@ -346,26 +378,26 @@ function block() {
   $('#cardModal').modal('hide');
   return false;
 }
-function removeCounter() {
+function removeCounter(doCommand = true) {
   var modal = $('#cardModal');
   var counters = modal.data('counters');
   if (counters > 0) {
     var capacity = modal.data('capacity');
-    doCardCommand('blood', '', '-1', false);
+    if (doCommand) doCardCommand('blood', '', '-1', false);
     setCounters(counters - 1, capacity);
   }
   return false;
 }
-function addCounter() {
+function addCounter(doCommand = true) {
   var modal = $('#cardModal');
   var counters = modal.data('counters');
   var capacity = modal.data('capacity');
-  doCardCommand('blood', '', '+1', false);
+  if (doCommand) doCardCommand('blood', '', '+1', false);
   setCounters(counters + 1, capacity);
   return false;
 }
 var countersLastClicked = null;
-function countersClicked(event) {
+function vialClicked(event, upClicked, downClicked) {
     //These events were firing 3 times when double-clicked.
     //Ignore the duplicate click event that comes through with mozInputSource = MOZ_SOURCE_TOUCH
     //on the Mac mouse when double-clicking.
@@ -376,8 +408,33 @@ function countersClicked(event) {
     var bounds = event.target.getBoundingClientRect();
     var x = event.clientX - bounds.left;
     if (x >= event.target.clientWidth / 2)
-        addCounter();
-    else removeCounter();
+        upClicked();
+    else downClicked();
     countersLastClicked = event.timeStamp;
     return false;
+}
+function countersClicked(event) {
+    return vialClicked(event, addCounter, removeCounter);
+}
+function transferToCard() {
+  var modal = $('#cardModal');
+  var pool = modal.data('pool');
+  doCardCommand('transfer', '', '+1', false, true);
+  setPool(pool - 1);
+  addCounter(false);
+  return false;
+}
+function transferToPool() {
+  var modal = $('#cardModal');
+  var counters = modal.data('counters');
+  if (counters > 0) {
+    var pool = modal.data('pool');
+    doCardCommand('transfer', '', '-1', false, true);
+    setPool(pool + 1);
+    removeCounter(false);
+  }
+  return false;
+}
+function poolClicked(event) {
+    return vialClicked(event, transferToPool, transferToCard);
 }

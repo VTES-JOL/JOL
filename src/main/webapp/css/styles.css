@@ -590,8 +590,6 @@ h5.region-header {
 span.pool {
     line-height: 1em;
     font-size: small;
-    background-color: #dce6be;
-    color: #111;
     padding: 0.15em 0.5em
 }
 
@@ -1290,6 +1288,38 @@ option.pinged {
     text-align: center;
     background-color: grey;
     cursor: pointer;
+    z-index: 200;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.transfers-and-counters {
+    position: relative;
+}
+.transfers {
+    display: inline-flex;
+    height: 30px;
+    line-height: 30px;
+    z-index: 100;
+    text-align: center;
+    background-color: #dce6be;
+    color: #111;
+    border: 1px solid #aaaaaa;
+    border-radius: 20px;
+    margin-left: 2.5rem;
+}
+.transfer-btn {
+    cursor: pointer;
+    width: 2rem;
+    font-size: 1.5rem;
+    opacity: .5;
+}
+.transfer-btn-left {
+    text-align: right;
+    margin-left: 2.5rem;
+}
+.transfer-btn-right {
+    text-align: left;
 }
 .modal .votes {
     display: inline-block;
@@ -1305,6 +1335,14 @@ option.pinged {
 }
 .blood {
     background-color: #c00;
+}
+.pool {
+    background-color: #dce6be;
+    color: #111;
+    border: 1px solid #aaaaaa;
+}
+.card-modal-pool {
+    padding-right: 1rem;
 }
 .life {
     background-color: #1d9041;

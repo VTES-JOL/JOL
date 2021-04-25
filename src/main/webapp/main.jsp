@@ -250,8 +250,23 @@
                 </p>
               </div>
               <div class="modal-footer d-flex flex-wrap justify-content-center">
-                <div class="counters blood" title="Counters; click right side to increase, left to decrease"
-                     onclick="countersClicked(event)">99/99</div>
+                <div class="transfers-and-counters">
+                  <div class="transfers">
+                    <div class="transfer-btn transfer-btn-left" title="Transfer one pool to this card"
+                         onclick="transferToCard();">&#9668;</div>
+                    <div class="transfer-btn transfer-btn-right" title="Transfer one blood to your pool"
+                         onclick="transferToPool();">&#9658;</div>
+                    <div class="card-modal-pool">99 pool</div>
+                  </div>
+                  <div class="counters blood"
+                       title="Counters; click right side to increase, left to decrease"
+                       onclick="countersClicked(event)">99/99</div>
+                </div>
+                <button type="button" class="btn btn-outline-dark m-1" title="Play"
+                        data-region="inactive-region" data-top-level-only
+                        onclick="playVamp();">
+                  <span>Play</span>
+                </button>
                 <button type="button" class="btn btn-outline-dark m-1" title="Bleed"
                         data-region="ready-region" data-lock-state="unlocked"
                         data-top-level-only

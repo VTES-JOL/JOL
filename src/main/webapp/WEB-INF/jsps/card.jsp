@@ -51,7 +51,7 @@
         <c:when test="${region == 'hand'}">
           onclick="showPlayCardModal(event)"
         </c:when>
-        <c:when test="${region == 'ready-region' || region == 'torpor'}">
+        <c:when test="${region == 'ready-region' || region == 'torpor' || region == 'inactive-region'}">
           data-label="<%= label %>" data-locked="<%= locked %>" data-counters="<%= counters %>" data-votes="<%= votes %>" data-capacity="<%= capacity %>"
           onclick="cardOnTableClicked(event)"
         </c:when>

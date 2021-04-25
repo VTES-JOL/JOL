@@ -41,6 +41,7 @@ public class SummaryCard {
     private String cost;
 
     //Crypt only
+    private Integer capacity;
     private List<String> disciplines;
 
     private SummaryCard() {
@@ -78,6 +79,7 @@ public class SummaryCard {
         this.text = String.join("\n", cardLines);
         this.htmlText = String.join("<br/>", cardLines);
 
+        this.capacity = cryptCard.getCapacity();
         this.disciplines = cryptCard.getDisciplines();
         this.originalText = cryptCard.getText();
     }

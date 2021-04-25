@@ -1115,7 +1115,7 @@ function callbackMain(data) {
         removeLabeledRows('activeGames', data.removedGames);
         renderMessage(data.message);
         //TODO how can I inject this into data.message?
-        renderMessage('February 2021: click/tap interface for common commands');
+        renderMessage('March 2021: click/tap interface for transfers');
         if (data.refresh > 0) {
             if (refresher) clearTimeout(refresher);
             refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", data.refresh);

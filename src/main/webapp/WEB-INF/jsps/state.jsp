@@ -8,7 +8,7 @@
     for (String player : players) {
         request.setAttribute("pparam", player);
 %>
-<div class="col-sm player <%= game.getActivePlayer().equals(player) ? "player-active" : "" %>" data-player="<%= player %>">
+<div class="col-sm player <%= game.getActivePlayer().equals(player) ? "player-active" : "" %>" data-player="<%= player %>" data-pool="<%= game.getPool(player) %>">
     <jsp:include page="player.jsp"/>
 </div>
 <%
