@@ -165,23 +165,11 @@ public class JolGame {
 
             boolean destHidden = isHiddenRegion(destRegion);
             CardEntry destEntry = CardSearch.INSTANCE.getCardById(dstCard.getCardId());
-
             boolean includePlayer = !player.equals(destPlayer) && (destHidden || !destEntry.isUnique());
-            String differentiators = "";
-            if (!(destHidden || destEntry.isUnique())) {
-                int regionIndex = getIndexInRegion(dstCard);
-                String label = getText(destCard);
-                differentiators = String.format(
-                    "%s%s",
-                    regionIndex > -1 ? String.format(" #%s", regionIndex + 1) : "",
-                    label.equals("") ? "" : String.format(" \"%s\"", label)
-                );
-            }
             String destMessage = String.format(
-                " on %s%s%s",
+                " on %s%s",
                 includePlayer ? String.format("%s's ", destPlayer) : "",
-                getCardName(dstCard),
-                differentiators
+                getCardName(dstCard)
             );
             message = playCardMessage(player, srcCard, destRegion, modes, destMessage);
         }
@@ -266,24 +254,11 @@ public class JolGame {
         //Target is public: "<player> burns <card> [#<region-index>] from [<player>'s] <region>"
         //Target is private: "<player> burns <card> from [top of] [<player>'s] <region>"
 
-        boolean hidden = isHiddenRegion(srcRegion);
-        CardEntry cardEntry = CardSearch.INSTANCE.getCardById(card.getCardId());
-        String differentiators = "";
-        if (!(hidden || cardEntry.isUnique())) {
-            int regionIndex = getIndexInRegion(card);
-            String label = getText(cardId);
-            differentiators = String.format(
-                "%s%s",
-                regionIndex > -1 ? String.format(" #%s", regionIndex + 1) : "",
-                label.equals("") ? "" : String.format(" \"%s\"", label)
-            );
-        }
-
         boolean showRegionOwner = !player.equals(srcPlayer);
         String message = String.format(
                 "%s burns %s from %s%s%s",
                 player,
-                getCardLink(card) + differentiators,
+                getCardName(card, ASHHEAP, true),
                 top ? "top of " : "",
                 showRegionOwner ? srcPlayer + "'s " : "",
                 srcRegion);
@@ -314,6 +289,7 @@ public class JolGame {
         CardContainer source = card.getParent();
         Location dest = state.getPlayerLocation(destPlayer, destRegion);
         if (dest == null) throw new IllegalStateException("No such region");
+
         String destMessage = "";
         if (!destPlayer.equals(player))
             destMessage = String.format(" to %s's %s", destPlayer, destRegion);
@@ -472,22 +448,42 @@ public class JolGame {
         return region.equals(INACTIVE_REGION) || region.equals(HAND) || region.equals(LIBRARY) || region.equals(CRYPT) || region.equals(RESEARCH);
     }
 
-    private String getCardName(Card card, String destRegion) {
-        if (!isHiddenRegion(destRegion))
-            return getCardLink(card);
-        return getCardName(card);
+    private String getCardName(Card card) {
+        return getCardName(card, null, true);
     }
 
-    private String getCardName(Card card) {
+    private String getCardName(Card card, String destRegion) {
+        return getCardName(card, destRegion, true);
+    }
+
+    private String getCardName(Card card, String destRegion, boolean differentiate) {
         Location loc = (Location) state.getRegionFromCard(card);
         if (loc == null) return card.getName();
         String region = state.getPlayerRegionName(loc);
         if (region == null) return card.getName();
-        if (isHiddenRegion(region)) {
+
+        if (destRegion == null)
+            destRegion = region;
+
+        if (isHiddenRegion(region) && isHiddenRegion(destRegion)) {
             int regionIndex = getIndexInRegion(card);
             if (regionIndex > -1) return region + " #" + (regionIndex + 1);
+            return "???"; //card is on another card
         }
-        return getCardLink(card);
+        String differentiators = "";
+        if (differentiate) {
+            CardEntry cardEntry = CardSearch.INSTANCE.getCardById(card.getCardId());
+            if (!cardEntry.isUnique()) {
+                int regionIndex = getIndexInRegion(card);
+                String label = getText(card.getId());
+                differentiators = String.format(
+                    "%s%s",
+                    regionIndex > -1 ? String.format(" #%s", regionIndex + 1) : "",
+                    label.equals("") ? "" : String.format(" \"%s\"", label)
+                );
+            }
+        }
+        return getCardLink(card) + differentiators;
     }
 
     /**
@@ -607,14 +603,15 @@ public class JolGame {
 
     public void setText(String cardId, String text, boolean quiet) {
         Card card = state.getCard(cardId);
+        String oldCardName = getCardName(card);
         Notation note = getNote(card, TEXT, true);
         String cleanText = text.trim();
         note.setValue(cleanText);
         if (!quiet) {
             if (!"".equals(cleanText)) {
-                addMessage(getCardName(card) + " now " + text);
+                addMessage(String.format("%s now \"%s\"", oldCardName, cleanText));
             } else {
-                addMessage("Removed label from " + getCardName(card));
+                addMessage("Removed label from " + oldCardName);
             }
         }
     }
