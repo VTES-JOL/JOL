@@ -29,8 +29,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final int FIELD_CONVICTION_COST = 8;
     private static final int FIELD_BURN_OPTION = 9;
     private static final int FIELD_TEXT = 10;
-    private static final int FIELD_REQUIREMENTS_OTHER = 13;
-    private static final int FIELD_BANNED = 14;
+    private static final int FIELD_BANNED = 13;
 
     private Function<String, Boolean> burnOption = (text) -> text.equals("Y") || text.equalsIgnoreCase("Yes");
 
@@ -66,7 +65,6 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         // Calculate requirements
         Utils.split(lineData[FIELD_REQUIREMENTS_CLAN], "/").ifPresent(card::setClans);
         Utils.split(lineData[FIELD_REQUIREMENTS_DISCIPLINE], "/").ifPresent(card::setDisciplines);
-        Utils.split(lineData[FIELD_REQUIREMENTS_OTHER], ",").ifPresent(card::setRequirements);
 
         // Calculate cost
         Utils.getClean(lineData[FIELD_POOL_COST]).ifPresent(card::setPool);

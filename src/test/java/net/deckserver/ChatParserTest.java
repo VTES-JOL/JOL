@@ -16,7 +16,7 @@ public class ChatParserTest {
     @Test
     public void testParseCard() throws Exception {
 
-        environmentVariables.set("JOL_DATA", "src/test/resources");
+        environmentVariables.set("JOL_DATA", "src/test/resources/data");
 
         String test = "[Mata Hari] is awesome, and turning that into a tooltip would be quite handy";
 

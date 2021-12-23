@@ -80,7 +80,12 @@ public class CardDatabaseBuilder {
         }
 
         for (CryptCard card : cryptCards) {
-            String key = keys.get(card.getDisplayName());
+            //Some cards have duplicate names as of Fifth Edition promos Gilbert Duane, Victoria Ash.
+            //Try looking up JOL ID by their source ID first.
+            //TODO At writing, Amaranth does not have the new cards, so the Amaranth IDs for these cards
+            //remain wrong.
+            String key = keys.get(card.getId().toString());
+            if (key == null) key = keys.get(card.getDisplayName());
             String amaranthId = amaranthKeys.get(card.getDisplayName());
             if (amaranthId == null) {
                 amaranthId = amaranthKeys.get(StringUtils.stripAccents(card.getDisplayName()).toLowerCase());
