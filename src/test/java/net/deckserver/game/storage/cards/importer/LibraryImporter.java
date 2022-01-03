@@ -161,7 +161,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                 mode.setTarget(LibraryCardMode.Target.SOMETHING);
             else if ((card.getType().stream().anyMatch("master"::equalsIgnoreCase)
                         && card.getPreamble() != null
-                        && card.getPreamble().contains("location"))
+                        && card.getPreamble().toLowerCase().contains("location"))
                     || card.getType().stream().anyMatch("ally"::equalsIgnoreCase)
                     || card.getType().stream().anyMatch("event"::equalsIgnoreCase)
                     || PUT_INTO_PLAY_PATTERN.matcher(mode.getText()).matches())

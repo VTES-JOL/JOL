@@ -1281,8 +1281,8 @@ option.pinged {
 }
 .counters {
     width: 5rem;
-    height: 30px;
-    line-height: 30px;
+    height: 40px;
+    line-height: 40px;
     border-radius: 20px;
     color: #fff;
     text-align: center;
@@ -1298,8 +1298,8 @@ option.pinged {
 }
 .transfers {
     display: inline-flex;
-    height: 30px;
-    line-height: 30px;
+    height: 40px;
+    line-height: 40px;
     z-index: 100;
     text-align: center;
     background-color: #dce6be;
@@ -1310,8 +1310,8 @@ option.pinged {
 }
 .transfer-btn {
     cursor: pointer;
-    width: 2rem;
-    font-size: 1.5rem;
+    width: 3rem;
+    font-size: 2.5rem;
     opacity: .5;
 }
 .transfer-btn-left {
@@ -1346,4 +1346,8 @@ option.pinged {
 }
 .life {
     background-color: #1d9041;
+}
+
+#quickChatModal .btn {
+    min-width: 3rem;
 }
