@@ -8,6 +8,8 @@ import java.util.stream.Stream;
 
 public class Utils {
 
+    static Set<String> generatedNames = new HashSet<>();
+
     private static String clean(String source) {
         if (source == null) {
             return "";
@@ -29,7 +31,7 @@ public class Utils {
         return getClean(name + (advanced ? " (ADV)" : "")).orElse(name);
     }
 
-    static Set<String> otherNames(String original, boolean advanced, List<String> aliases) {
+    static Set<String> otherNames(String original, boolean advanced, List<String> aliases, Integer group) {
         Set<String> tempNames = new HashSet<>(aliases);
 
         String simpleName = original.endsWith(", The") ?
@@ -45,6 +47,11 @@ public class Utils {
             tempNames.add(simpleName);
         }
 
+        if (group != null) {
+            tempNames.add(String.format("%s (G%d)", original, group));
+            tempNames.add(String.format("%s (G%d)", simpleName, group));
+        }
+
         Set<String> names = new HashSet<>();
         tempNames.forEach(name -> {
             names.add(name);
@@ -52,6 +59,11 @@ public class Utils {
         });
 
         names.remove("");
+
+        // If a name has been generated before, remove it from being eligible - this should mostly happen with the new V5 vamps
+        names.removeAll(generatedNames);
+        // Add generated names to the pool of generated names
+        generatedNames.addAll(names);
 
         return names;
     }

@@ -12,7 +12,6 @@ public class LibraryCard {
 
     private String id;
     private String key;
-    private String jolId;
     private String name;
     private String text;
     private List<String> type;

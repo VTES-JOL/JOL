@@ -25,7 +25,7 @@ public class CardEntry {
     private boolean unique;
 
     CardEntry(CardSummary cardSummary) {
-        this.id = cardSummary.getJolId();
+        this.id = cardSummary.getId();
         this.name = cardSummary.getDisplayName();
         this.type = cardSummary.getType();
         this.text = cardSummary.getText().split("\n");

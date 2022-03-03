@@ -29,7 +29,7 @@ public class ApiResource {
         CollectionType cardSummaryCollectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CardSummary.class);
         try {
             List<CardSummary> summaries = objectMapper.readValue(cardFile, cardSummaryCollectionType);
-            cardSummaryMap = summaries.stream().collect(Collectors.toMap(CardSummary::getJolId, Function.identity()));
+            cardSummaryMap = summaries.stream().collect(Collectors.toMap(CardSummary::getId, Function.identity()));
         } catch (IOException e) {
             System.err.println("Unable to read card data : " + e.getMessage());
         }

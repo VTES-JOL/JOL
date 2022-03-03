@@ -39,10 +39,10 @@ public class CardSearch {
             List<CardSummary> cardList = objectMapper.readValue(cardPath.toFile(), cardSummaryCollectionType);
             cardList.forEach(card -> {
                 for (String name : card.getNames()) {
-                    nameKeys.put(name.toLowerCase(), card.getJolId());
+                    nameKeys.put(name.toLowerCase(), card.getId());
                 }
                 CardEntry cardEntry = new CardEntry(card);
-                cardTable.put(card.getJolId(), cardEntry);
+                cardTable.put(card.getId(), cardEntry);
             });
             logger.info("Read {} keys, {} cards", nameKeys.size(), cardTable.size());
         } catch (IOException e) {

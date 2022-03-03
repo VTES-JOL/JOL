@@ -18,7 +18,6 @@ import static java.util.stream.Collectors.joining;
 public class SummaryCard {
 
     private String id;
-    private String jolId;
     private String amaranthId;
     private String type;
     private String text;
@@ -50,8 +49,6 @@ public class SummaryCard {
 
     public SummaryCard(CryptCard cryptCard) {
         this.id = cryptCard.getId();
-        this.jolId = cryptCard.getJolId();
-        this.amaranthId = cryptCard.getAmaranthId();
         this.displayName = cryptCard.getDisplayName();
         this.names = cryptCard.getNames();
         this.type = cryptCard.getType();
@@ -86,8 +83,6 @@ public class SummaryCard {
 
     public SummaryCard(LibraryCard libraryCard) {
         this.id = libraryCard.getId();
-        this.jolId = libraryCard.getKey();
-        this.amaranthId = libraryCard.getJolId();
         this.displayName = libraryCard.getDisplayName();
         this.names = libraryCard.getNames();
         this.type = String.join("/", libraryCard.getType());

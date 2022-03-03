@@ -12,7 +12,6 @@ import java.util.Set;
 public class CardSummary {
 
     private String id;
-    private String jolId;
     private String amaranthId;
     private String type;
     private String text;

@@ -36,8 +36,9 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
         String originalName = lineData[FIELD_NAME].trim();
         List<String> aliases = Arrays.stream(lineData[FIELD_ALIASES].split(";")).map(String::trim).collect(Collectors.toList());
         boolean advanced = Utils.getClean(lineData[FIELD_ADVANCED]).map(String::toLowerCase).map("advanced"::equals).orElse(false);
+        Integer group = Utils.getClean(lineData[FIELD_GROUP]).filter(s -> !s.equals("ANY")).map(Integer::valueOf).orElse(null);
         String displayName = Utils.generateDisplayName(originalName, advanced);
-        Set<String> names = Utils.otherNames(originalName, advanced, aliases);
+        Set<String> names = Utils.otherNames(originalName, advanced, aliases, group);
 
         CryptCard card = new CryptCard();
         card.setId(lineData[FIELD_ID]);

@@ -52,7 +52,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     public LibraryCard map(String[] lineData) {
         String originalName = lineData[FIELD_NAME].trim();
         List<String> aliases = Arrays.stream(lineData[FIELD_ALIASES].split(";")).map(String::trim).collect(Collectors.toList());
-        Set<String> names = Utils.otherNames(originalName, false, aliases);
+        Set<String> names = Utils.otherNames(originalName, false, aliases, null);
         String displayName = Utils.generateDisplayName(originalName, false);
 
         LibraryCard card = new LibraryCard();

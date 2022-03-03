@@ -14,5 +14,5 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./src/test/resources/data:/data
+      - /home/shannon/Downloads/data:/data
       - ./target/jol.war:/usr/local/tomcat/webapps/jol.war

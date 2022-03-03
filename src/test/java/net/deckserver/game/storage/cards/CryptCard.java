@@ -11,7 +11,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class CryptCard {
     private String id;
-    private String jolId;
     private String amaranthId;
     private String name;
     private String type;
