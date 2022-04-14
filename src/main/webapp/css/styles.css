@@ -191,6 +191,12 @@ ul.deck-list {
   word-break: break-all;
 }
 
+@media (max-width: 576px) {
+  #ownGames td {
+    line-height: 3rem;
+  }
+}
+
 .light {
     background-color: white;
 }
