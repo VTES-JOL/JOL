@@ -39,7 +39,7 @@ public class CardDatabaseBuilder {
         List<SummaryCard> summaryCards = new ArrayList<>();
 
         assertThat(libraryCards.size(), is(2235));
-        assertThat(cryptCards.size(), is(1621));
+        assertThat(cryptCards.size(), is(1631));
 
         libraryCards.forEach(libraryCard -> {
             summaryCards.add(new SummaryCard(libraryCard));
