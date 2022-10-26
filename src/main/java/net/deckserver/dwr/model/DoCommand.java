@@ -347,6 +347,7 @@ public class DoCommand {
         } catch (CommandException ce) {
             throw ce;
         } catch (Exception e) {
+            e.printStackTrace();
             return cmd + " created error: " + e.getMessage();
         }
         return cmd + " not a valid command";

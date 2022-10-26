@@ -19,6 +19,7 @@
     <a href="#help_transfer">Transfer</a>
     <a href="#help_unlock">Unlock</a>
     <a href="#help_votes">Votes</a>
+    <a href="#help_disciplines">Disciplines</a>
 </div>
 <div class="help-body">
     <div id="help_blood">
@@ -724,6 +725,38 @@
                 <tr>
                     <td class="help-command"> votes Adam 2 +4</td>
                     <td> adds 4 votes to Adam's ready region card #2</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="help_disciplines">
+        <h4 class="header">Disciplines <a class="float-right" href="#top">Top</a></h4>
+        <div class="light padded">
+            <p>
+                The default PLAYER is yourself. The default region is the ready region.
+            </p>
+            <h5>Syntax</h5>
+            <p>
+                <code>disc [PLAYER] [REGION CARD] [+|-][DISCIPLINE CODE]</code>
+                <code>disc [PLAYER] [REGION CARD] reset</code>
+            </p>
+            <h5>Examples</h5>
+            <table class="help-example">
+                <tr>
+                    <th class="help-command">Command</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td class="help-command"> disc ready 1 +pot</td>
+                    <td>Adds <span class="discipline pot"></span> to a vampire or adds <span class="discipline POT"></span> to a vampire with <span class="discipline pot"></span></td>
+                </tr>
+                <tr>
+                    <td class="help-command"> disc ready 1 +pot +DOM</td>
+                    <td>Adds <span class="discipline pot"></span> and <span class="discipline DOM"></span> to a vampire</td>
+                </tr>
+                <tr>
+                    <td class="help-command"> disc ready 1 reset</td>
+                    <td>Resets disciplines back to card default</td>
                 </tr>
             </table>
         </div>

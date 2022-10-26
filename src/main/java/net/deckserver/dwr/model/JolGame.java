@@ -427,9 +427,9 @@ public class JolGame {
     
     public String[] getDisciplines(String cardId) {
         Card card = state.getCard(cardId);
-        Notation note = getNote(card, DISCIPLINES, false);
-        if (note != null) return note.getValue().split(" ");
-        return ArrayUtils.EMPTY_STRING_ARRAY;
+        Notation note = getNote(card, DISCIPLINES, true);
+        if (note == null || note.getValue() == null) return ArrayUtils.EMPTY_STRING_ARRAY;
+        return note.getValue().split(" ");
     }
 
     public void changeCounters(String player, String cardId, int incr, boolean quiet) {
@@ -800,7 +800,7 @@ public class JolGame {
         Card card = state.getCard(cardId);
         Notation note = getNote(card, DISCIPLINES, true);
         note.setValue(disciplines);
-        if (!quiet) {
+        if (!quiet && disciplines.length() > 0) {
             String disciplineList = Arrays.stream(disciplines.split(" ")).map(s -> "[" + s + "]").collect(Collectors.joining(" "));
             addMessage("Disciplines of " + getCardName(card) + " reset back to " + disciplineList);
         }
@@ -809,7 +809,7 @@ public class JolGame {
     public void addDiscipline(String cardId, String discipline) {
         Card card = state.getCard(cardId);
         Notation note = getNote(card, DISCIPLINES, true);
-        String currentDisciplines = note.getValue();
+        String currentDisciplines = Optional.ofNullable(note.getValue()).orElse("");
         List<String> disciplineList = Arrays.stream(currentDisciplines.split(" ")).collect(Collectors.toList());
         // If the discipline is not represented - add it as is
         if (!currentDisciplines.toLowerCase().contains(discipline.toLowerCase())) {
