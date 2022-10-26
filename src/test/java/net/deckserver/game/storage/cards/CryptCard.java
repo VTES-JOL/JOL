@@ -26,6 +26,7 @@ public class CryptCard {
     private String sect;
     private Boolean advanced;
     private String title;
+    private String votes;
     private List<String> disciplines;
     private Map<String, Integer> discipline;
 

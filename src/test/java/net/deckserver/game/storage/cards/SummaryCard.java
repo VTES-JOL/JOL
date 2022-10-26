@@ -4,11 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.joining;
@@ -43,6 +39,10 @@ public class SummaryCard {
     private Integer capacity;
     private List<String> disciplines;
 
+    private String title;
+
+    private String votes;
+
     private SummaryCard() {
 
     }
@@ -56,7 +56,9 @@ public class SummaryCard {
         this.unique = cryptCard.isUnique();
         this.group = cryptCard.getGroup();
         this.sect = cryptCard.getSect();
-        this.clans = Arrays.asList(cryptCard.getClan());
+        this.clans = Collections.singletonList(cryptCard.getClan());
+        this.title = cryptCard.getTitle();
+        this.votes = cryptCard.getVotes();
 
         List<String> cardLines = new ArrayList<>();
         boolean vampire = cryptCard.getType().equals("Vampire");

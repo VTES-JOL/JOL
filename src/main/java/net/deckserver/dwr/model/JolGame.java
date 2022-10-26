@@ -428,7 +428,7 @@ public class JolGame {
     public String[] getDisciplines(String cardId) {
         Card card = state.getCard(cardId);
         Notation note = getNote(card, DISCIPLINES, true);
-        if (note == null || note.getValue() == null) return ArrayUtils.EMPTY_STRING_ARRAY;
+        if (note == null || note.getValue() == null || note.getValue().equals("")) return ArrayUtils.EMPTY_STRING_ARRAY;
         return note.getValue().split(" ");
     }
 
@@ -644,7 +644,7 @@ public class JolGame {
         } catch (Exception nfe) {
             // do nothing
         }
-        if (votes.trim().toLowerCase().equals("priscus")) {
+        if (votes.trim().equalsIgnoreCase("priscus") || votes.trim().equals("P")) {
             note.setValue("P");
             addMessage(getCardName(card) + " is priscus");
         } else if (voteAmount == 0) {

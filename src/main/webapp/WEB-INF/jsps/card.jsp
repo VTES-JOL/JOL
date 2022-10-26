@@ -25,6 +25,7 @@
     boolean hasBlood = cardEntry.hasBlood();
     String typeClass = cardEntry.getTypeClass();
     String[] disciplines = game.getDisciplines(c.getId());
+    boolean hasDisciplines = disciplines.length > 0;
     request.setAttribute("typeClass", typeClass);
     request.setAttribute("isCrypt", isCrypt);
     request.setAttribute("hasLife", hasLife);
@@ -42,6 +43,7 @@
     request.setAttribute("hasCards", hasCards);
     request.setAttribute("cardEntry", cardEntry);
     request.setAttribute("disciplines", disciplines);
+    request.setAttribute("hasDisciplines", hasDisciplines);
     request.setAttribute("region", region);
 %>
 
@@ -90,12 +92,12 @@
         <small class="label label-light"><%= label %>
         </small>
     </c:if>
-    <c:if test="${region == 'ready-region' || region == 'torpor' && disciplines != null}">
-        <p>
-        <c:forEach items="${disciplines}" var="disc">
-            <span class="discipline ${disc}"></span>
-        </c:forEach>
-        </p>
+    <c:if test="${hasDisciplines && (region == 'ready-region' || region == 'torpor')}">
+            <p class="discipline-display">
+            <c:forEach items="${disciplines}" var="disc">
+                <span class="discipline ${disc}"></span>
+            </c:forEach>
+            </p>
     </c:if>
     <c:if test="${nested && hasCards}">
         <ol>

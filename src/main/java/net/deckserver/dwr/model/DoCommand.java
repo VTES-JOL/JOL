@@ -169,6 +169,11 @@ public class DoCommand {
                             // Do disciplines
                             String disciplines = card.getDisciplines();
                             game.setDisciplines(srcCard, disciplines, true);
+                            // Do votes
+                            String votes = card.getVotes();
+                            if (!votes.isEmpty()) {
+                                game.setVotes(srcCard, votes);
+                            }
                         }
                     }
                     if (draw) game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);

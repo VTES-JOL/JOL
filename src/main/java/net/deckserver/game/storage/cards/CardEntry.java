@@ -27,6 +27,8 @@ public class CardEntry {
 
     private String disciplines;
 
+    private String votes;
+
     CardEntry(CardSummary cardSummary) {
         this.id = cardSummary.getId();
         this.name = cardSummary.getDisplayName();
@@ -35,6 +37,7 @@ public class CardEntry {
         this.group = cardSummary.getGroup();
         this.crypt = cardSummary.isCrypt();
         this.unique = cardSummary.isUnique();
+        this.votes = cardSummary.getVotes();
         this.disciplines = Optional.ofNullable(cardSummary.getDisciplines()).map(d -> String.join(" ", d)).orElse("");
     }
 
@@ -95,6 +98,8 @@ public class CardEntry {
     }
 
     public String getDisciplines() { return disciplines; }
+
+    public String getVotes() { return votes; }
 
     @Override
     public String toString() {

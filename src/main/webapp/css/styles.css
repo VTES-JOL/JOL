@@ -833,6 +833,10 @@ input[type=checkbox] {
     text-align: center;
 }
 
+.discipline-display {
+    margin-bottom: 0.5em;
+}
+
 .discipline {
     font-family: 'disciplines';
     font-size: 1.3em;

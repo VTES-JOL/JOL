@@ -3,7 +3,6 @@ package net.deckserver.game.storage.cards.importer;
 import lombok.extern.slf4j.Slf4j;
 import net.deckserver.game.storage.cards.CryptCard;
 
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Predicate;
@@ -59,9 +58,11 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
         Utils.getClean(lineData[FIELD_TEXT]).ifPresent(card::setText);
         Utils.getClean(lineData[FIELD_TEXT]).map(String::toLowerCase).filter(uniqueFilter).ifPresent(s -> card.setUnique(false));
         Utils.getClean(lineData[FIELD_TITLE]).ifPresent(card::setTitle);
+
         Utils.getClean(lineData[FIELD_BANNED]).map(banned -> !banned.isEmpty()).ifPresent(card::setBanned);
 
         card.setSect(determineSect(card.getClan(), card.getText()));
+        Optional.ofNullable(card.getTitle()).map(this::determineVotes).ifPresent(card::setVotes);
 
         return card;
     }
@@ -131,5 +132,34 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
             sect = textSect;
         }
         return sect;
+    }
+
+    private String determineVotes(String title) {
+        String votes = "";
+        switch (title) {
+            case "1 vote":
+            case "primogen":
+            case "bishop":
+                votes = "1";
+                break;
+            case "2 votes":
+            case "archbishop":
+            case "prince":
+            case "magaji":
+            case "baron":
+                votes = "2";
+                break;
+            case "justicar":
+            case "cardinal":
+                votes = "3";
+                break;
+            case "inner circle":
+                votes = "4";
+                break;
+            case "priscus":
+                votes = "P";
+                break;
+        }
+        return votes;
     }
 }
