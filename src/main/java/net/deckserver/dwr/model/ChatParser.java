@@ -23,6 +23,10 @@ public class ChatParser {
         return parseTextForDisciplines(parsedForCards);
     }
 
+    public static boolean isDiscipline(String discipline) {
+        return disciplineSet.contains(discipline.toLowerCase());
+    }
+
     private static String parseTextForCards(String text) {
         Matcher matcher = MARKUP_PATTERN.matcher(text);
 

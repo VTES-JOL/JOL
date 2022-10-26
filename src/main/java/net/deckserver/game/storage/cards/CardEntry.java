@@ -9,6 +9,7 @@ package net.deckserver.game.storage.cards;
 import net.deckserver.game.json.deck.CardSummary;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -24,6 +25,8 @@ public class CardEntry {
     private boolean crypt;
     private boolean unique;
 
+    private String disciplines;
+
     CardEntry(CardSummary cardSummary) {
         this.id = cardSummary.getId();
         this.name = cardSummary.getDisplayName();
@@ -32,6 +35,7 @@ public class CardEntry {
         this.group = cardSummary.getGroup();
         this.crypt = cardSummary.isCrypt();
         this.unique = cardSummary.isUnique();
+        this.disciplines = Optional.ofNullable(cardSummary.getDisciplines()).map(d -> String.join(" ", d)).orElse("");
     }
 
     public String getCardId() {
@@ -89,6 +93,8 @@ public class CardEntry {
     public boolean hasBlood() {
         return CardType.VAMPIRE.equals(getCardType());
     }
+
+    public String getDisciplines() { return disciplines; }
 
     @Override
     public String toString() {

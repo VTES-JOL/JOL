@@ -19,6 +19,7 @@ import net.deckserver.game.storage.cards.Deck;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
 import net.deckserver.rest.ApiResource;
+import org.apache.commons.lang3.ArrayUtils;
 import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
 
@@ -45,6 +46,7 @@ public class JolGame {
     public static final String[] TURN_PHASES = new String[]{"Unlock", "Master", "Minion", "Influence", "Discard"};
 
     private static final String COUNTERS = "counters";
+    private static final String DISCIPLINES = "disciplines";
     private static final String TEXT = "text";
     private static final String VOTES = "votes";
     private static final String ACTIVE = "active meth";
@@ -422,6 +424,13 @@ public class JolGame {
         if (note != null) return Integer.parseInt(note.getValue());
         return 0;
     }
+    
+    public String[] getDisciplines(String cardId) {
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, DISCIPLINES, false);
+        if (note != null) return note.getValue().split(" ");
+        return ArrayUtils.EMPTY_STRING_ARRAY;
+    }
 
     public void changeCounters(String player, String cardId, int incr, boolean quiet) {
         if (incr == 0) return; // no change necessary - PENDING log this though?
@@ -703,7 +712,9 @@ public class JolGame {
 
     private void addMessage(String arg1) {
         String turn = getTurn();
-        if (turn != null) actions.addMessage(getTurn(), getDate() + arg1);
+        String msg = ChatParser.sanitizeText(arg1);
+        msg = ChatParser.parseText(msg);
+        if (turn != null) actions.addMessage(getTurn(), getDate() + msg);
     }
 
     private String getDate() {
@@ -783,6 +794,50 @@ public class JolGame {
         cap.setValue(amt + "");
         if (!quiet)
             addCommand("Capacity of " + getCardName(card) + " now " + amt, new String[]{"capacity", cardId, capincr + ""});
+    }
+
+    public void setDisciplines(String cardId, String disciplines, boolean quiet) {
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, DISCIPLINES, true);
+        note.setValue(disciplines);
+        if (!quiet) {
+            String disciplineList = Arrays.stream(disciplines.split(" ")).map(s -> "[" + s + "]").collect(Collectors.joining(" "));
+            addMessage("Disciplines of " + getCardName(card) + " reset back to " + disciplineList);
+        }
+    }
+
+    public void addDiscipline(String cardId, String discipline) {
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, DISCIPLINES, true);
+        String currentDisciplines = note.getValue();
+        List<String> disciplineList = Arrays.stream(currentDisciplines.split(" ")).collect(Collectors.toList());
+        // If the discipline is not represented - add it as is
+        if (!currentDisciplines.toLowerCase().contains(discipline.toLowerCase())) {
+            disciplineList.add(discipline);
+        } else {
+            int index = disciplineList.indexOf(discipline.toLowerCase());
+            disciplineList.set(index, discipline.toUpperCase());
+        }
+        note.setValue(String.join(" ", disciplineList));
+        addMessage("[" + discipline + "] added to " + getCardName(card));
+    }
+
+    public void removeDiscipline(String cardId, String discipline) {
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, DISCIPLINES, true);
+        String currentDisciplines = note.getValue();
+        List<String> disciplineList = Arrays.stream(currentDisciplines.split(" ")).collect(Collectors.toList());
+        // exists, and equals incoming - remove it
+        if (currentDisciplines.contains(discipline)) {
+            disciplineList.remove(discipline);
+        }
+        // exists at superior, but incoming is inferior - downgrade it
+        else if (currentDisciplines.toLowerCase().contains(discipline)) {
+            int index = disciplineList.indexOf(discipline.toUpperCase());
+            disciplineList.set(index, discipline.toLowerCase());
+        }
+        note.setValue(String.join(" ", disciplineList));
+        addMessage("[" + discipline + "] removed from " + getCardName(card));
     }
 
     public int getCapacity(String cardId) {

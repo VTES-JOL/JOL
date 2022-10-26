@@ -3,7 +3,7 @@
 <%@ page import="net.deckserver.dwr.model.JolGame" %>
 <%@ page import="net.deckserver.game.interfaces.state.Card" %>
 <%@ page import="net.deckserver.game.storage.cards.CardEntry" %>
-<%@ page import="org.apache.commons.lang3.StringEscapeUtils" %>
+<%@ page import="org.apache.commons.text.StringEscapeUtils" %>
 <%@ page import="java.util.List" %>
 <%
     CardParams p = (CardParams) request.getAttribute("cparams");
@@ -24,6 +24,7 @@
     boolean hasLife = cardEntry.hasLife();
     boolean hasBlood = cardEntry.hasBlood();
     String typeClass = cardEntry.getTypeClass();
+    String[] disciplines = game.getDisciplines(c.getId());
     request.setAttribute("typeClass", typeClass);
     request.setAttribute("isCrypt", isCrypt);
     request.setAttribute("hasLife", hasLife);
@@ -40,6 +41,8 @@
     request.setAttribute("cards", cards);
     request.setAttribute("hasCards", hasCards);
     request.setAttribute("cardEntry", cardEntry);
+    request.setAttribute("disciplines", disciplines);
+    request.setAttribute("region", region);
 %>
 
 <c:if test="${p.hidden}">
@@ -86,6 +89,13 @@
     <c:if test="${label.length() > 0}">
         <small class="label label-light"><%= label %>
         </small>
+    </c:if>
+    <c:if test="${region == 'ready-region' || region == 'torpor' && disciplines != null}">
+        <p>
+        <c:forEach items="${disciplines}" var="disc">
+            <span class="discipline ${disc}"></span>
+        </c:forEach>
+        </p>
     </c:if>
     <c:if test="${nested && hasCards}">
         <ol>

@@ -166,6 +166,9 @@ public class DoCommand {
                                 }
                             }
                             game.changeCapacity(srcCard, capincr, false);
+                            // Do disciplines
+                            String disciplines = card.getDisciplines();
+                            game.setDisciplines(srcCard, disciplines, true);
                         }
                     }
                     if (draw) game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
@@ -214,6 +217,33 @@ public class DoCommand {
                 if (amount == 0) return "Must specify an amount of blood";
                 game.changeCounters(player, targetCard, amount, false);
                 return "Adjusted blood";
+            }
+            if (cmd.equalsIgnoreCase("disc")) {
+                String targetPlayer = cmdObj.getPlayer(player);
+                String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
+                String targetCard = cmdObj.getCard(false, targetPlayer, targetRegion);
+                if (targetCard == null) throw new CommandException("Must specify a card in the region");
+                if (cmdObj.consumeString("reset")) {
+                    CardEntry card = CardSearch.INSTANCE.getCardById(game.getCardDescripId(targetCard));
+                    String disciplines = card.getDisciplines();
+                    game.setDisciplines(targetCard, disciplines, false);
+                }
+                while (cmdObj.hasMoreArgs()) {
+                    String next = cmdObj.nextArg();
+                    String type = next.substring(0, 1);
+                    String disc = next.substring(1);
+                    if (!ChatParser.isDiscipline(disc.toLowerCase())) {
+                        throw new CommandException("Not a valid discipline");
+                    }
+                    if (type.equals("+")) {
+                        game.addDiscipline(targetCard, disc);
+                    } else if (type.equals("-")) {
+                        game.removeDiscipline(targetCard, disc);
+                    } else {
+                        throw new CommandException("Need to specify + or - to change disciplines");
+                    }
+                }
+                return "Updated disciplines";
             }
             if (cmd.equalsIgnoreCase("capacity")) {
                 // blood [<targetplayer>] [<targetregion>] <targetcard> [+|-]<amount>
