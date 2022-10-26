@@ -712,9 +712,7 @@ public class JolGame {
 
     private void addMessage(String arg1) {
         String turn = getTurn();
-        String msg = ChatParser.sanitizeText(arg1);
-        msg = ChatParser.parseText(msg);
-        if (turn != null) actions.addMessage(getTurn(), getDate() + msg);
+        if (turn != null) actions.addMessage(getTurn(), getDate() + arg1);
     }
 
     private String getDate() {
@@ -802,7 +800,8 @@ public class JolGame {
         note.setValue(disciplines);
         if (!quiet && disciplines.length() > 0) {
             String disciplineList = Arrays.stream(disciplines.split(" ")).map(s -> "[" + s + "]").collect(Collectors.joining(" "));
-            addMessage("Disciplines of " + getCardName(card) + " reset back to " + disciplineList);
+            String msg = ChatParser.parseText("Disciplines of " + getCardName(card) + " reset back to " + disciplineList);
+            addMessage(msg);
         }
     }
 
