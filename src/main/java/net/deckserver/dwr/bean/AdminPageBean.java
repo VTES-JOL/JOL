@@ -17,7 +17,7 @@ public class AdminPageBean {
         games.stream()
                 .filter(Objects::nonNull)
                 .filter(gameName -> admin.isSuperUser(player) || admin.getOwner(gameName).equals(player))
-                .filter(gameName -> !admin.isPrivate(gameName) || admin.getOwner(gameName).equals(player))
+                .filter(gameName -> !admin.isPrivate(gameName) || admin.getOwner(gameName).equals(player) || admin.isSuperUser(player))
                 .forEach(gameName -> {
                     if (admin.isOpen(gameName)) {
                         forming.add(new RegistrationSummaryBean(abean, gameName));

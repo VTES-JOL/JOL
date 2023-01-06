@@ -434,17 +434,6 @@ public class JolAdmin {
         getPlayerInfo(player).removeDeck(deckname);
     }
 
-    public boolean doInteractive(String playerName) {
-        return getPlayerInfo(playerName).doInteractive();
-    }
-
-    public void setGP(String gamename, String prop, String value) {
-        GameInfo info = getGameInfo(gamename);
-        if (value.equals("REM")) info.remove(prop);
-        else info.setProperty(prop, value);
-        info.write();
-    }
-
     public boolean isSuperUser(String player) {
         return existsPlayer(player) && getPlayerInfo(player).isSuperUser();
     }
@@ -725,9 +714,6 @@ public class JolAdmin {
             return BCrypt.checkpw(password, hash);
         }
 
-        boolean doInteractive() {
-            return "yes".equals(info.getProperty("interactive", "yes"));
-        }
 
         void addGame(String name, String key) {
             info.setProperty(sysInfo.getKey(name), key);
@@ -866,10 +852,6 @@ public class JolAdmin {
 
         boolean receivesTurnSummaries() {
             return "true".equals(info.getProperty("turns", "true"));
-        }
-
-        boolean receivesPing() {
-            return "true".equals(info.getProperty("pings", "true"));
         }
 
         String getDiscordID() {

@@ -48,7 +48,6 @@ public class UpdateData {
         System.out.println("Found " + games.size() + " games");
 
         closeOldGames(basePath);
-        updatePlayerName(basePath, "KRC 1+1+1, +1 on me", "Fredrik");
     }
 
     private static void closeOldGames(Path basePath){

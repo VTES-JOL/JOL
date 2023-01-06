@@ -103,6 +103,7 @@ public class DoCommand {
             if (cmd.equalsIgnoreCase("flip")) {
                 String result = ThreadLocalRandom.current().nextInt(2) == 0 ? "Heads" : "Tails";
                 game.sendMsg(player, player + " flips a coin : " + result);
+                return "Flipped a coin";
             }
             if (cmd.equalsIgnoreCase("discard")) {
                 String card = cmdObj.getCard(false, player, JolGame.HAND);
@@ -234,6 +235,7 @@ public class DoCommand {
                 if (targetCard == null) throw new CommandException("Must specify a card in the region");
                 boolean clear = cmdObj.consumeString("clear");
                 game.contestCard(player, targetCard, clear);
+                return clear ? "Cleared Contest." : "Contested card.";
             }
             if (cmd.equalsIgnoreCase("disc")) {
                 String targetPlayer = cmdObj.getPlayer(player);

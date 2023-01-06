@@ -281,6 +281,7 @@
                         onclick="goAnarch();">
                   <span>Go Anarch</span>
                 </button>
+
                 <!--button type="button" class="btn btn-outline-dark m-1" title="Rescue"
                         data-region="ready-region" data-lock-state="unlocked"
                         data-top-level-only

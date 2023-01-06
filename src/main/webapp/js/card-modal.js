@@ -247,9 +247,6 @@ function showCardModal(event) {
   var label = target.data('label');
   var locked = target.data('locked');
   var votes = target.data('votes');
-  //cardId = 'ce75'; //Maris Streck
-  //cardId = 'sw1'; //Ambrosio Luis Monçada, Plenipotentiary
-  //cardId = 'una71'; //Xaviar Adv (max disciplines)
   $.get({
       url: "rest/api/cards/" + cardId, success: function(card) {
         //console.log(card);
@@ -359,6 +356,10 @@ function doCardCommand(commandKeyword, message = '', commandTail = '', closeModa
 }
 function lock(message = '') { return doCardCommand('lock', message); }
 function unlock(message = '') { return doCardCommand('unlock', message); }
+
+function contest(flag) {
+
+}
 function bleed() { return lock('Bleed'); }
 function hunt() { return lock('Hunt'); }
 function goAnarch() { return lock('Go anarch'); }
