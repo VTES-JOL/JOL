@@ -227,6 +227,14 @@ public class DoCommand {
                 game.changeCounters(player, targetCard, amount, false);
                 return "Adjusted blood";
             }
+            if (cmd.equalsIgnoreCase("contest")) {
+                String targetPlayer = cmdObj.getPlayer(player);
+                String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
+                String targetCard = cmdObj.getCard(false, targetPlayer, targetRegion);
+                if (targetCard == null) throw new CommandException("Must specify a card in the region");
+                boolean clear = cmdObj.consumeString("clear");
+                game.contestCard(player, targetCard, clear);
+            }
             if (cmd.equalsIgnoreCase("disc")) {
                 String targetPlayer = cmdObj.getPlayer(player);
                 String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);

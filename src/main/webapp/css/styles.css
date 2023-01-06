@@ -451,6 +451,10 @@ td.layout {
     margin: 0.25em;
 }
 
+.player ol.card-list li.contested {
+    background-color: antiquewhite;
+}
+
 .player ol.card-list li li {
     border: none;
     padding: 0;

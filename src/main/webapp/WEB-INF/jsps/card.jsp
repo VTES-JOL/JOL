@@ -14,6 +14,7 @@
     int capacity = game.getCapacity(c.getId());
     int counters = game.getCounters(c.getId());
     boolean locked = game.isTapped(c.getId());
+    boolean contested = game.getContested(c.getId());
     String label = StringEscapeUtils.escapeHtml4(game.getText(c.getId()));
     String votes = game.getVotes(c.getId());
     boolean nested = p.doNesting();
@@ -38,6 +39,7 @@
     request.setAttribute("votes", votes);
     request.setAttribute("locked", locked);
     request.setAttribute("label", label);
+    request.setAttribute("contested", contested);
     request.setAttribute("nested", nested);
     request.setAttribute("cards", cards);
     request.setAttribute("hasCards", hasCards);
@@ -46,6 +48,8 @@
     request.setAttribute("hasDisciplines", hasDisciplines);
     request.setAttribute("region", region);
 %>
+
+<li class="<%= contested ? "contested" : "" %>">
 
 <c:if test="${p.hidden}">
     <a data-coordinates="<%= coordinates %>" onclick="pickTarget(event)">XXXXXX</a>
@@ -88,6 +92,9 @@
     <c:if test="${locked}">
         <small class="label label-dark">LOCKED</small>
     </c:if>
+    <c:if test="${contested}">
+        <small class="label">CONTEST</small>
+    </c:if>
     <c:if test="${label.length() > 0}">
         <small class="label label-light"><%= label %>
         </small>
@@ -111,9 +118,7 @@
                     request.setAttribute("coordinates", String.format("%s %s", coordinates, childCoord));
                     ++childCoord;
                 %>
-                <li>
                     <jsp:include page="card.jsp"/>
-                </li>
             </c:forEach>
         </ol>
     </c:if>
@@ -121,3 +126,4 @@
 <c:if test="${game == null && isCrypt}">
     ( <%= cardEntry.getGroup() %>)
 </c:if>
+</li>

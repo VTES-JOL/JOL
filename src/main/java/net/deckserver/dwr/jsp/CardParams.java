@@ -7,6 +7,7 @@
 package net.deckserver.dwr.jsp;
 
 import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.dwr.model.JolGame;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;

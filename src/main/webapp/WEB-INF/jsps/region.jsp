@@ -21,9 +21,7 @@
             request.setAttribute("coordinates", String.valueOf(i + 1));
             request.setAttribute("region", region);
         %>
-        <li>
             <jsp:include page="card.jsp"/>
-        </li>
         <% }
             request.removeAttribute("coordinates");
             request.removeAttribute("region"); %>

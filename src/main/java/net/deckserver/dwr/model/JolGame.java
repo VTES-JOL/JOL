@@ -46,6 +46,7 @@ public class JolGame {
     public static final String[] TURN_PHASES = new String[]{"Unlock", "Master", "Minion", "Influence", "Discard"};
 
     private static final String COUNTERS = "counters";
+    private static final String CONTEST = "contested";
     private static final String DISCIPLINES = "disciplines";
     private static final String TEXT = "text";
     private static final String VOTES = "votes";
@@ -639,6 +640,7 @@ public class JolGame {
         Card card = state.getCard(cardId);
         Integer voteAmount = 0;
         Notation note = getNote(card, VOTES, true);
+        assert note != null;
         try {
             voteAmount = Integer.parseInt(votes);
         } catch (Exception nfe) {
@@ -654,6 +656,25 @@ public class JolGame {
             note.setValue(voteAmount.toString());
             addMessage(getCardName(card) + " now has " + voteAmount + " votes");
         }
+    }
+
+    public void contestCard(String player, String cardId, boolean clear) {
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, CONTEST, true);
+        assert note != null;
+        if (clear) {
+            note.setValue("");
+            addMessage(getCardName(card) + " is no longer contested");
+        } else {
+            note.setValue(CONTEST);
+            addMessage(getCardName(card) + " is now contested");
+        }
+    }
+
+    public boolean getContested(String cardId) {
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, CONTEST, false);
+        return note != null && note.getValue().equals(CONTEST);
     }
 
     public boolean isTapped(String cardId) {

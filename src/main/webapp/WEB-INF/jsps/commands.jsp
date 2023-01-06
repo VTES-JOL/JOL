@@ -20,6 +20,8 @@
     <a href="#help_unlock">Unlock</a>
     <a href="#help_votes">Votes</a>
     <a href="#help_disciplines">Disciplines</a>
+    <a href="#help_flip">Flip</a>
+    <a href="#help_contest">Contest</a>
 </div>
 <div class="help-body">
     <div id="help_blood">
@@ -757,6 +759,61 @@
                 <tr>
                     <td class="help-command"> disc ready 1 reset</td>
                     <td>Resets disciplines back to card default</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="help_flip">
+        <h4 class="header">Flip <a class="float-right" href="#top">Top</a></h4>
+        <div class="light padded">
+            <p>
+                Flip a coin.  Heads or tails.
+            </p>
+            <h5>Syntax</h5>
+            <p>
+                <code>flip</code>
+            </p>
+            <h5>Examples</h5>
+            <table class="help-example">
+                <tr>
+                    <th class="help-command">Command</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td class="help-command">flip</td>
+                    <td>Flips a coin.  Results appear in game chat.</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="help_contest">
+        <h4 class="header">Contest <a class="float-right" href="#top">Top</a></h4>
+        <div class="light padded">
+            <p>
+                The default PLAYER is yourself.  The default region is the ready region.
+            </p>
+            <h5>Syntax</h5>
+            <p>
+                <code>contest [PLAYER] [CARD]</code>
+                <code>contest [PLAYER] [CARD] clear</code>
+            </p>
+            <h5>Examples</h5>
+            <table class="help-example">
+                <tr>
+                    <th class="help-command">Command</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td class="help-command"> contest ready 1</td>
+                    <td>Marks card 1 in your ready region as contested</td>
+                </tr>
+                <tr>
+                    <td class="help-command"> contest ShanDow ready 2</td>
+                    <td>Marks card 2 in ShanDow's ready region as contested.</td>
+                </tr>
+                <tr>
+                    <td class="help-command"> contest ready 1 clear</td>
+                    <td>Clears the contested flag on card 1 in your ready region.</td>
                 </tr>
             </table>
         </div>
