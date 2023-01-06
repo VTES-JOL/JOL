@@ -5,7 +5,7 @@
                 <div class="game-header">
                     <h5>Hand</h5>
                 </div>
-                <div id="hand" class="scrollable"></div>
+                <div id="hand" class="scrollable disc"></div>
             </div>
             <div id="playerCommands" class="player-only col-sm-6 grey">
                 <div class="game-header">

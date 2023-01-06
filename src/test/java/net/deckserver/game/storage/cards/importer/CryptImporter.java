@@ -154,6 +154,7 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
                 votes = "3";
                 break;
             case "inner circle":
+            case "regent":
                 votes = "4";
                 break;
             case "priscus":

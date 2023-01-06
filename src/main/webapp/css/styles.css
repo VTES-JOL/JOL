@@ -183,6 +183,10 @@ ul.deck-list {
     background-color: #eee;
 }
 
+#ownGames tr.ousted {
+    background-color: #A254549E;
+}
+
 #ownGames tr.flagged {
     background-color: rgb(255, 228, 146);
 }
@@ -658,70 +662,70 @@ div.torpor li ol a.card-name {
     background-color: transparent;
 }
 
-div#hand a.action:before, div#hand a.master:before, div#hand a.political_action:before, div#hand a.combat:before, div#hand a.reaction:before, div#hand a.action_modifier:before, div#hand a.ally:before, div#hand a.retainer:before, div#hand a.equipment:before, div#hand a.event:before {
+.disc a:before {
     font-family: 'jol';
     font-size: 1.5em;
     padding-right: 5px;
     vertical-align: bottom;
 }
 
-div#hand a.action:before {
+.disc a.action:before {
     content: 'p';
 }
 
-div#hand a.master:before {
+.disc a.master:before {
     content: 'x';
 }
 
-div#hand a.political_action:before {
+.disc a.political_action:before {
     content: 'r';
 }
 
-div#hand a.combat:before {
+.disc a.combat:before {
     content: 't';
 }
 
-div#hand a.reaction:before {
+.disc a.reaction:before {
     content: 'v';
 }
 
-div#hand a.action_modifier:before {
+.disc a.action_modifier:before {
     content: 'q';
 }
 
-div#hand a.ally:before {
+.disc a.ally:before {
     content: 's';
 }
 
-div#hand a.retainer:before {
+.disc a.retainer:before {
     content: 'w';
 }
 
-div#hand a.equipment:before {
+.disc a.equipment:before {
     content: 'u';
 }
 
-div#hand a.action_modifier.reaction:before {
+.disc a.action_modifier.reaction:before {
     content: 'qv';
 }
 
-div#hand a.action_modifier.combat:before {
+.disc a.action_modifier.combat:before {
     content: "qt";
 }
 
-div#hand a.combat.reaction:before {
+.disc a.combat.reaction:before {
     content: "tv";
 }
 
-div#hand a.action.reaction:before {
+.disc a.action.reaction:before {
     content: "pv";
 }
 
-div#hand a.action.combat:before {
+.disc a.action.combat:before {
     content: "pt";
 }
 
-div#hand a.event:before {
+.disc a.event:before {
     content: "{";
 }
 

@@ -41,11 +41,11 @@ public class MainBean {
         chat = model.getChat();
         who = abean.getWho().stream()
                 .sorted(Comparator.reverseOrder())
-                .map(who -> new UserSummaryBean(who))
+                .map(UserSummaryBean::new)
                 .collect(Collectors.toList());
         stamp = JolAdmin.getDate();
         message = abean.getMessage();
-        myGames.sort(Comparator.comparing(PlayerSummaryBean::getGame));
+        myGames.sort(Comparator.comparing(PlayerSummaryBean::isOusted).thenComparing(PlayerSummaryBean::getGame));
         model.clearGames();
     }
 

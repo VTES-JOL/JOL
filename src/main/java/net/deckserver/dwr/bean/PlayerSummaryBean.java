@@ -24,7 +24,7 @@ public class PlayerSummaryBean {
 
     private String turn;
 
-    private boolean hidden = false;
+    private boolean ousted = false;
 
     private boolean flagged = false;
 
@@ -43,7 +43,7 @@ public class PlayerSummaryBean {
         } else {
             JolGame thisGame = JolAdmin.getInstance().getGame(this.game);
             turn = thisGame.getActivePlayer();
-            hidden = thisGame.getPool(player) == 0;
+            ousted = thisGame.getPool(player) == 0;
             this.flagged = thisGame.getPool(player) < 0;
             if (admin.isPlayerPinged(player, this.game)) {
                 this.pinged = true;
@@ -82,8 +82,8 @@ public class PlayerSummaryBean {
         return turn;
     }
 
-    public boolean isHidden() {
-        return hidden;
+    public boolean isOusted() {
+        return ousted;
     }
 
     public boolean isFlagged() {

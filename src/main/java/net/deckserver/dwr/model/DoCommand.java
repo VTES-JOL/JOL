@@ -100,6 +100,10 @@ public class DoCommand {
                 game.sendMsg(player, player + " rolls from 1-" + d + " : " + num);
                 return "Rolled the die";
             }
+            if (cmd.equalsIgnoreCase("flip")) {
+                String result = ThreadLocalRandom.current().nextInt(2) == 0 ? "Heads" : "Tails";
+                game.sendMsg(player, player + " flips a coin : " + result);
+            }
             if (cmd.equalsIgnoreCase("discard")) {
                 String card = cmdObj.getCard(false, player, JolGame.HAND);
                 game.discard(player, card, random);

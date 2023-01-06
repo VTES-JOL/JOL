@@ -5,6 +5,7 @@
     RegionParams r = (RegionParams) request.getAttribute("rparams");
     boolean empty = r.isEmpty();
     String region = r.getRegion();
+    boolean displayDisciplines = region.equals("ashheap") || region.equals("rfg");
 %>
 <div class="region-empty-<%= empty %> <%= region %>" data-region="<%= region %>">
     <h5 class="region-header">
@@ -14,7 +15,7 @@
         </a>
     </h5>
 
-    <ol class="card-list" id="region<%= r.getIndex() %>">
+    <ol class="card-list <%= displayDisciplines ? "disc" : ""%>" id="region<%= r.getIndex() %>">
         <% for (int i = 0; i < r.getSize(); i++) {
             request.setAttribute("cparams", r.getCardParam(i));
             request.setAttribute("coordinates", String.valueOf(i + 1));

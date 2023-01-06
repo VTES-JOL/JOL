@@ -228,7 +228,7 @@ function renderMyGames(games) {
             }
             gameRow.className = games[index].turn === player ? "active" : 'game';
             gameRow.className += games[index].flagged ? " flagged" : "";
-            gameRow.style.display = games[index].hidden ? 'none' : '';
+            gameRow.className += games[index].ousted ? ' ousted' : '';
         } else {
             gameRow.cells[0].innerHTML = games[index].game;
             gameRow.cells[1].innerHTML = 'C' + games[index].cryptSize + ' L' + games[index].libSize + ' G' + games[index].groups;
