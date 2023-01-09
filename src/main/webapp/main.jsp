@@ -269,12 +269,28 @@
                         onclick="bleed();">
                   <span>Bleed</span>
                 </button>
-                <button type="button" class="btn btn-outline-dark m-1" title="Hunt"
+                  <button type="button" class="btn btn-outline-dark m-1" title="Contest"
+                          data-region="ready-region torpor-region" data-contested="false"
+                          onclick="contest(true);">
+                      <span>Contest</span>
+                  </button>
+                  <button type="button" class="btn btn-outline-dark m-1" title="Clear Contest"
+                          data-region="ready-region torpor-region" data-contested="true"
+                          onclick="contest(false);">
+                      <span>Clear Contest</span>
+                  </button>
+                  <button type="button" class="btn btn-outline-dark m-1" title="Hunt"
                         data-region="ready-region" data-lock-state="unlocked"
                         data-top-level-only
                         onclick="hunt();">
                   <span>Hunt</span>
                 </button>
+                  <button type="button" class="btn btn-outline-dark m-1" title="Torpor"
+                          data-region="ready-region"
+                          data-top-level-only
+                          onclick="torpor();">
+                      <span>Send to Torpor</span>
+                  </button>
                 <button type="button" class="btn btn-outline-dark m-1" title="Go Anarch"
                         data-region="ready-region" data-lock-state="unlocked"
                         data-top-level-only

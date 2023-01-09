@@ -247,6 +247,7 @@ function showCardModal(event) {
   var label = target.data('label');
   var locked = target.data('locked');
   var votes = target.data('votes');
+  var contested = target.data('contested');
   $.get({
       url: "rest/api/cards/" + cardId, success: function(card) {
         //console.log(card);
@@ -258,7 +259,7 @@ function showCardModal(event) {
         $('#cardModal .card-name').text(card.displayName);
         $('#cardModal .card-label').text(label).toggle(label.length > 0);
         $('#cardModal .card-text').text(card.originalText);
-        $('#cardModal .votes').text(votes).toggle(votes > 0 || votes == 'P');
+        $('#cardModal .votes').text(votes).toggle(votes > 0 || votes === 'P');
 
         var clanText = '';
         var clanHoverText = '';
@@ -295,8 +296,13 @@ function showCardModal(event) {
         }
 
         $('#cardModal button').show();
-        $(`#cardModal button[data-region][data-region!="${region}"]`).hide();
-        $(`#cardModal button[data-lock-state][data-lock-state!="${locked ? "locked" : "unlocked"}"]`).hide()
+        // $(`#cardModal button[data-region][data-region!="${region}"]`).hide();
+        $(`#cardModal button[data-region]`).each(function() {
+          let showThis = $(this).data("region").split(" ").includes(region);
+          if (!showThis) { $(this).hide(); }
+        })
+        $(`#cardModal button[data-lock-state][data-lock-state!="${locked ? "locked" : "unlocked"}"]`).hide();
+        $(`#cardModal button[data-contested][data-contested!="${contested}"]`).hide();
         //This will be a good enhancement once we can identify non-crypt cards that become minions,
         //like Embrace, Call the Great Beast, and Jake Washington.
         //$(`#cardModal button[data-type][data-type!="${card.type.toUpperCase()}"]`).hide();
@@ -358,10 +364,14 @@ function lock(message = '') { return doCardCommand('lock', message); }
 function unlock(message = '') { return doCardCommand('unlock', message); }
 
 function contest(flag) {
-
+  return doCardCommand("contest", "", flag ? "" : "clear");
 }
 function bleed() { return lock('Bleed'); }
 function hunt() { return lock('Hunt'); }
+
+function torpor() {
+  var controller = $('#cardModal').data('controller').split(' ', 2)[0];
+  return doCardCommand("move", "", controller + " torpor")}
 function goAnarch() { return lock('Go anarch'); }
 function leaveTorpor() { return lock('Leave torpor'); }
 function burn() { return doCardCommand('burn'); }
