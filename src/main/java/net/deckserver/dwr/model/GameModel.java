@@ -1,16 +1,12 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.dwr.bean.AdminBean;
 import net.deckserver.dwr.bean.SummaryBean;
 import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
-import java.time.OffsetDateTime;
 import java.util.*;
-
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
 public class GameModel implements Comparable {
 
@@ -173,8 +169,7 @@ public class GameModel implements Comparable {
             if (turnChanged) view.turnChanged();
             if (stateChanged || phaseChanged || pingChanged || globalChanged || turnChanged || chatChanged || privateNotesChanged) {
                 ServletContext ctx = WebContextFactory.get().getServletContext();
-                AdminBean abean = AdminBean.INSTANCE;
-                abean.notifyAboutGame(name);
+                JolAdmin.getInstance().notifyAboutGame(name);
             }
         }
     }

@@ -1,6 +1,5 @@
 package net.deckserver.dwr.creators;
 
-import net.deckserver.dwr.bean.AdminBean;
 import net.deckserver.dwr.bean.DeckBean;
 import net.deckserver.dwr.bean.DeckInfoBean;
 import net.deckserver.dwr.bean.DeckSummaryBean;
@@ -21,10 +20,10 @@ class DeckCreator implements ViewCreator {
         return "callbackShowDecks";
     }
 
-    public Object createData(AdminBean abean, PlayerModel model) {
+    public Object createData(PlayerModel model) {
         this.player = model.getPlayer();
         List<DeckInfoBean> decks = model.getDecks().stream().map(this::getDeck).sorted(Comparator.comparing(DeckInfoBean::getName)).collect(Collectors.toList());
-        List<GameModel> actives = abean.getActiveGames();
+        List<GameModel> actives = JolAdmin.getInstance().getActiveGames();
         JolAdmin admin = JolAdmin.getInstance();
         List<DeckSummaryBean> games = actives.stream()
                 .filter(game -> admin.isOpen(game.getName()))

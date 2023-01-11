@@ -6,7 +6,6 @@
 
 package net.deckserver.game.storage.state;
 
-import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.CardContainer;
 import net.deckserver.game.jaxb.state.GameCard;

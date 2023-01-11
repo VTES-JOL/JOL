@@ -11,7 +11,7 @@ public class PlayerRegistrationBean {
     private final String deckSummary;
     private final boolean valid;
 
-    public PlayerRegistrationBean(AdminBean abean, String player, String game) {
+    public PlayerRegistrationBean(String player, String game) {
         this.player = player;
         String deck = JolAdmin.getInstance().getGameDeck(game, player);
         this.registered = !deck.equals(JolAdmin.DECK_NOT_FOUND);

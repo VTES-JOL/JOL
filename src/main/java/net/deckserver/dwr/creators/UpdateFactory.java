@@ -1,7 +1,7 @@
 package net.deckserver.dwr.creators;
 
 import net.deckserver.Utils;
-import net.deckserver.dwr.bean.AdminBean;
+import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 import org.directwebremoting.WebContextFactory;
 
@@ -28,14 +28,13 @@ public class UpdateFactory {
     }
 
     public static Map<String, Object> getUpdate() {
-        AdminBean abean = AdminBean.INSTANCE;
-        PlayerModel player = Utils.getPlayerModel(WebContextFactory.get().getHttpServletRequest(), abean);
-        abean.recordAccess(player);
+        PlayerModel player = Utils.getPlayerModel(WebContextFactory.get().getHttpServletRequest());
+        JolAdmin.getInstance().recordAccess(player);
         List<String> views = Arrays.asList(player.getView(), "nav", "status");
         return views.stream()
                 .map(UpdateFactory::getView)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toMap(ViewCreator::getFunction, v -> v.createData(abean, player)));
+                .collect(Collectors.toMap(ViewCreator::getFunction, v -> v.createData(player)));
     }
 
 }

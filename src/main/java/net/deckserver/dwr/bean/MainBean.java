@@ -1,6 +1,5 @@
 package net.deckserver.dwr.bean;
 
-import net.deckserver.Utils;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
@@ -17,15 +16,10 @@ public class MainBean {
     private int refresh = 0;
     private String stamp;
     private List<String> removedGames = new ArrayList<>();
-    private String message;
 
-    public MainBean(AdminBean abean, PlayerModel model) {
-        init(abean, model);
-    }
-
-    public void init(AdminBean abean, PlayerModel model) {
+    public MainBean(PlayerModel model) {
         JolAdmin jolAdmin = JolAdmin.getInstance();
-        Collection<GameModel> actives = abean.getActiveGames();
+        Collection<GameModel> actives = JolAdmin.getInstance().getActiveGames();
         Collection<String> gamenames = new HashSet<>();
         loggedIn = model.getPlayer() != null;
         if (loggedIn) {
@@ -39,12 +33,11 @@ public class MainBean {
         }
         removedGames = new ArrayList<>(model.getRemovedGames());
         chat = model.getChat();
-        who = abean.getWho().stream()
+        who = JolAdmin.getInstance().getWho().stream()
                 .sorted(Comparator.reverseOrder())
                 .map(UserSummaryBean::new)
                 .collect(Collectors.toList());
         stamp = JolAdmin.getDate();
-        message = abean.getMessage();
         myGames.sort(Comparator.comparing(PlayerSummaryBean::isOusted).thenComparing(PlayerSummaryBean::getGame));
         model.clearGames();
     }
@@ -77,7 +70,4 @@ public class MainBean {
         return removedGames;
     }
 
-    public String getMessage() {
-        return message;
-    }
 }

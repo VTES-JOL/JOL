@@ -1,6 +1,5 @@
 package net.deckserver;
 
-import net.deckserver.dwr.bean.AdminBean;
 import net.deckserver.dwr.jsp.DeckParams;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
@@ -34,42 +33,39 @@ public class Utils {
         request.getSession().setAttribute("meth", player);
     }
 
-    public static PlayerModel getPlayerModel(HttpServletRequest request, AdminBean abean) {
+    public static PlayerModel getPlayerModel(HttpServletRequest request) {
         String player = getPlayer(request);
         PlayerModel model;
         if (player == null) {
             model = (PlayerModel) request.getSession().getAttribute("guest");
             if (model == null) {
-                model = abean.getPlayerModel(null);
+                model = JolAdmin.getInstance().getPlayerModel(null);
                 request.getSession().setAttribute("guest", model);
             }
         } else {
-            model = abean.getPlayerModel(player);
+            model = JolAdmin.getInstance().getPlayerModel(player);
         }
         return model;
     }
 
     public static void checkParams(HttpServletRequest request, ServletContext ctx) {
-        AdminBean abean = AdminBean.INSTANCE;
         String player = (String) request.getSession().getAttribute("meth");
         logger.trace("Get request {} from player {}", request.getRequestURI(), player);
-		if (request.getParameter("logout") != null) {
-			logger.debug("Log out: " + player);
-			request.getSession().removeAttribute("meth");
-			abean.remove(player);
-			player = null;
-		} else if (request.getParameter("login") != null) {
-			player = request.getParameter("dsuserin");
-			String password = request.getParameter("dspassin");
-			if (player != null
-					&& JolAdmin.getInstance().authenticate(player,
-					password)) {
-				setPlayer(request, player);
-				logger.debug("Logged in player {}", player);
-			} else {
-				logger.debug("Log in failed for player {}", player);
-				player = null;
-			}
+        if (request.getParameter("logout") != null) {
+            logger.debug("Log out: " + player);
+            request.getSession().removeAttribute("meth");
+            JolAdmin.getInstance().remove(player);
+            player = null;
+        } else if (request.getParameter("login") != null) {
+            player = request.getParameter("dsuserin");
+            String password = request.getParameter("dspassin");
+            if (player != null && JolAdmin.getInstance().authenticate(player, password)) {
+                setPlayer(request, player);
+                logger.debug("Logged in player {}", player);
+            } else {
+                logger.debug("Log in failed for player {}", player);
+                player = null;
+            }
         } else if ("Register".equals(request.getParameter("register"))) {
             player = request.getParameter("newplayer");
             String email = request.getParameter("newemail");
@@ -84,7 +80,7 @@ public class Utils {
                 player = null;
             }
         }
-        PlayerModel model = getPlayerModel(request, abean);
+        PlayerModel model = getPlayerModel(request);
         if (player == null) {
             request.getSession().setAttribute("guest", model);
         }
@@ -144,9 +140,9 @@ public class Utils {
     }
 
     /**
-    * Returns how long in milliseconds the client should wait before calling
-    * back for a refresh
-    */
+     * Returns how long in milliseconds the client should wait before calling
+     * back for a refresh
+     */
     public static int getRefershInterval(OffsetDateTime lastChanged) {
         OffsetDateTime now = OffsetDateTime.now();
         long interval = Duration.between(lastChanged, now).getSeconds();

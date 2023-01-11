@@ -3,7 +3,6 @@ package net.deckserver.dwr.bean;
 import net.deckserver.dwr.model.JolAdmin;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 public class AdminPageBean {
 
@@ -11,7 +10,7 @@ public class AdminPageBean {
     private List<String> currentGames = new ArrayList<>();
     private List<RegistrationSummaryBean> forming = new ArrayList<>();
 
-    public AdminPageBean(AdminBean abean, String player) {
+    public AdminPageBean(String player) {
         JolAdmin admin = JolAdmin.getInstance();
         List<String> games = Arrays.asList(admin.getGames());
         games.stream()
@@ -20,7 +19,7 @@ public class AdminPageBean {
                 .filter(gameName -> !admin.isPrivate(gameName) || admin.getOwner(gameName).equals(player) || admin.isSuperUser(player))
                 .forEach(gameName -> {
                     if (admin.isOpen(gameName)) {
-                        forming.add(new RegistrationSummaryBean(abean, gameName));
+                        forming.add(new RegistrationSummaryBean(gameName));
                     } else if (!admin.isFinished(gameName)) {
                         currentGames.add(gameName);
                     }

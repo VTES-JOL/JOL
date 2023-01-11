@@ -17,7 +17,7 @@ public class NavBean {
 
     private String player, target, game = null;
 
-    public NavBean(AdminBean abean, PlayerModel model) {
+    public NavBean(PlayerModel model) {
         player = model.getPlayer();
         target = model.getView();
         if (target.equals("game"))
@@ -29,7 +29,7 @@ public class NavBean {
         }
         String[] games = model.getCurrentGames();
         for (String game1 : games) {
-            GameModel gmodel = abean.getGameModel(game1);
+            GameModel gmodel = JolAdmin.getInstance().getGameModel(game1);
             GameView view = gmodel.getView(player);
             String current = view.isChanged() ? " *" : "";
             gameButtons.put("g" + game1, game1 + current);

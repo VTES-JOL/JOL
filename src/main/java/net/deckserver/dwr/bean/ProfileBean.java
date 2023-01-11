@@ -9,7 +9,7 @@ public class ProfileBean {
     private String discordID;
     private boolean pingDiscord;
 
-    public ProfileBean(AdminBean abean, PlayerModel model) {
+    public ProfileBean(PlayerModel model) {
         String player = model.getPlayer();
         JolAdmin jolAdmin = JolAdmin.getInstance();
         this.email = jolAdmin.getEmail(player);

@@ -11,11 +11,11 @@ public class RegistrationSummaryBean {
     private String gameName;
     private List<PlayerRegistrationBean> registrations = new ArrayList<>();
 
-    public RegistrationSummaryBean(AdminBean abean, String name) {
+    public RegistrationSummaryBean(String name) {
         JolAdmin admin = JolAdmin.getInstance();
         this.registrations = admin.getPlayers().stream()
                 .filter(player -> admin.isInvited(name, player) || admin.isRegistered(name, player))
-                .map(player -> new PlayerRegistrationBean(abean, player, name))
+                .map(player -> new PlayerRegistrationBean(player, name))
                 .collect(Collectors.toList());
         this.gameName = name;
     }

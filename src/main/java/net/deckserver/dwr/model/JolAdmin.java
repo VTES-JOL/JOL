@@ -8,11 +8,14 @@ package net.deckserver.dwr.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.base.Strings;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.async.Callback;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.game.jaxb.FileUtils;
 import net.deckserver.game.jaxb.actions.GameActions;
 import net.deckserver.game.jaxb.state.GameState;
@@ -36,6 +39,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -49,6 +53,8 @@ public class JolAdmin {
     private static final String DISCORD_API_VERSION = System.getenv("DISCORD_API_VERSION");
     private static final String DISCORD_BOT_TOKEN = System.getenv("DISCORD_BOT_TOKEN");
     private static final String DISCORD_PING_CHANNEL_ID = System.getenv("DISCORD_PING_CHANNEL_ID");
+    private static final int CHAT_STORAGE = 1000;
+    private static final int CHAT_DISCARD = 100;
 
     private static final Logger logger = getLogger(JolAdmin.class);
     private static final JolAdmin INSTANCE = new JolAdmin(System.getenv("JOL_DATA"));
@@ -58,6 +64,18 @@ public class JolAdmin {
     private final Map<String, PlayerInfo> players;
     private final ObjectMapper objectMapper;
     private final Timestamps timestamps;
+    private final File chatPersistenceFile;
+    private volatile List<ChatEntryBean> chats = new ArrayList<>();
+
+    private final Map<String, GameModel> gmap = new HashMap<>();
+    private final Map<String, PlayerModel> pmap = new HashMap<>();
+    private final Collection<GameModel> activeSort = new TreeSet<>();
+    private List<GameModel> actives;
+
+    // Cache of users / status
+    private final Cache<String, String> activeUsers = Caffeine.newBuilder()
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .build();
 
     public JolAdmin(String dir) {
         this.dir = dir;
@@ -69,6 +87,127 @@ public class JolAdmin {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         timestamps = loadTimestamps();
         Unirest.setTimeouts(5000, 10000);
+        chatPersistenceFile = new File(System.getenv("JOL_DATA"), "chats.json");
+        if (Files.notExists(chatPersistenceFile.toPath())) {
+            try {
+                Files.createFile(chatPersistenceFile.toPath());
+            } catch (IOException e) {
+                logger.error("Unable to create chat persistence file",e);
+                throw new RuntimeException(e);
+            }
+        }
+        loadChats();
+    }
+
+    public List<GameModel> getActiveGames() {
+        if (actives == null) {
+            for (String game : getGames()) {
+                if (isActive(game) || isOpen(game)) {
+                    GameModel bean = new GameModel(game);
+                    gmap.put(game, bean);
+                    activeSort.add(bean);
+                }
+            }
+            actives = new ArrayList<>(activeSort);
+        }
+        return actives;
+    }
+
+    public PlayerModel getPlayerModel(String name) {
+        PlayerModel bean = pmap.get(name);
+        if (bean == null) {
+            bean = new PlayerModel(name, chats);
+            if (name != null) {
+                logger.trace("Creating a model for " + name);
+                pmap.put(name, bean);
+            }
+        }
+        return bean;
+    }
+
+    public GameModel getGameModel(String name) {
+        GameModel bean = gmap.get(name);
+        if (bean == null) {
+            bean = new GameModel(name);
+            gmap.put(name, bean);
+        }
+        return bean;
+    }
+
+    public Set<String> getWho() {
+        return activeUsers.asMap().keySet();
+    }
+
+    public void remove(String player) {
+        PlayerModel model = getPlayerModel(player);
+        if (model != null) {
+            model.saveDeck();
+            pmap.remove(player);
+            for (GameModel gameModel : gmap.values()) {
+                gameModel.resetView(player);
+            }
+        }
+    }
+
+    public void notifyAboutGame(String name) {
+        notifyAboutGame(name, false);
+    }
+
+    private void notifyAboutGame(String name, boolean removed) {
+        for (PlayerModel model : pmap.values()) {
+            if (removed) {
+                model.removeGame(name);
+            } else {
+                model.changeGame(name);
+            }
+        }
+    }
+
+    public synchronized void createGame(String name, Boolean isPrivate, PlayerModel player) {
+        logger.trace("Creating game {} for player {}", name, player.getPlayer());
+        if (mkGame(name)) {
+            setOwner(name, player.getPlayer());
+            setGamePrivate(name, isPrivate);
+            activeSort.add(getGameModel(name));
+            actives = new ArrayList<>(activeSort);
+            notifyAboutGame(name);
+        }
+    }
+
+    public void recordAccess(PlayerModel model) {
+        if (model.getPlayer() != null) {
+            activeUsers.put(model.getPlayer(), model.getView());
+            model.recordAccess();
+        }
+    }
+
+    public void loadChats() {
+        try {
+            this.chats = objectMapper.readValue(chatPersistenceFile, objectMapper.getTypeFactory().constructCollectionType(List.class, ChatEntryBean.class));
+        } catch (IOException e) {
+            logger.error("Unable to load chats", e);
+            this.chats = new ArrayList<>();
+        }
+    }
+
+    public void persistChats() {
+        try {
+            objectMapper.writeValue(chatPersistenceFile, this.chats);
+        } catch (IOException e) {
+            logger.error("Unable to persist chats", e);
+        }
+    }
+
+    public synchronized void chat(String player, String message) {
+        String sanitize = ChatParser.sanitizeText(message);
+        String parsedMessage = ChatParser.parseText(sanitize);
+        ChatEntryBean chatEntryBean = new ChatEntryBean(player, parsedMessage);
+        chats.add(chatEntryBean);
+        if (chats.size() > CHAT_STORAGE) {
+            chats = chats.subList(CHAT_DISCARD, CHAT_STORAGE);
+        }
+        pmap.values()
+                .forEach(playerModel -> playerModel.chat(chatEntryBean));
     }
 
     public void writeSnapshot(String id, DsGame state, DsTurnRecorder actions, String turn) {
@@ -219,16 +358,6 @@ public class JolAdmin {
         return true;
     }
 
-    public boolean receivesTurnSummaries(String playerName) {
-        PlayerInfo player = getPlayerInfo(playerName);
-        return player.receivesTurnSummaries();
-    }
-
-    public boolean receivesPing(String playerName) {
-        PlayerInfo player = getPlayerInfo(playerName);
-        return player.receivesPing();
-    }
-
     public void recordPlayerAccess(String playerName) {
         this.timestamps.recordPlayerAccess(playerName);
     }
@@ -333,8 +462,11 @@ public class JolAdmin {
         getGameInfo(jolgame.getName()).write();
     }
 
-    public void endGame(String game) {
-        getGameInfo(game).endGame();
+    public void endGame(String name) {
+        getGameInfo(name).endGame();
+        activeSort.remove(getGameModel(name));
+        actives = new ArrayList<>(activeSort);
+        notifyAboutGame(name, true);
     }
 
     public String[] getGames() {

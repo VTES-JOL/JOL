@@ -15,7 +15,7 @@ public class SuperAdminBean {
     private List<UserSummaryBean> players;
     private List<String> names;
 
-    public SuperAdminBean(AdminBean abean, PlayerModel model) {
+    public SuperAdminBean(PlayerModel model) {
         JolAdmin admin = JolAdmin.getInstance();
         names = admin.getPlayers();
         players = names.stream()

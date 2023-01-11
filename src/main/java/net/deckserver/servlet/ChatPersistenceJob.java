@@ -1,17 +1,11 @@
 package net.deckserver.servlet;
 
-import net.deckserver.dwr.bean.AdminBean;
+import net.deckserver.dwr.model.JolAdmin;
 
 public class ChatPersistenceJob implements Runnable {
 
-    private final AdminBean INSTANCE;
-
-    ChatPersistenceJob(AdminBean instance) {
-        this.INSTANCE = instance;
-    }
-
     @Override
     public void run() {
-        INSTANCE.persistChats();
+        JolAdmin.getInstance().persistChats();
     }
 }

@@ -1,6 +1,5 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.dwr.bean.AdminBean;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +20,12 @@ public class PlayerModel implements Comparable {
     private Collection<String> removedGames = new ArrayList<>(2);
     private Collection<String> changedGames = new HashSet<>();
 
-    public PlayerModel(AdminBean abean, String name, List<ChatEntryBean> chatin) {
+    public PlayerModel(String name, List<ChatEntryBean> chatin) {
         logger.trace("Creating new Player model for {}", name);
         this.player = name;
         setView("main");
         changedGames.addAll(
-            abean.getActiveGames().stream()
+            JolAdmin.getInstance().getActiveGames().stream()
                 .filter(g -> g.isOpen() || g.getPlayers().contains(player))
                 .map(GameModel::getName)
                 .collect(Collectors.toList()));
@@ -45,7 +44,7 @@ public class PlayerModel implements Comparable {
         return game;
     }
 
-    public void enterGame(AdminBean abean, String game) {
+    public void enterGame(String game) {
         setView("game");
         Collection<String> c = new ArrayList<>(Arrays.asList(games));
         if (!c.contains(game)) {
@@ -53,7 +52,7 @@ public class PlayerModel implements Comparable {
             games = c.toArray(games);
         }
         if (!game.equals(this.game)) {
-            abean.getGameModel(game).resetView(player);
+            JolAdmin.getInstance().getGameModel(game).resetView(player);
         }
         this.game = game;
     }

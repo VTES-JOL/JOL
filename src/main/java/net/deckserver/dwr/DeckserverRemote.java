@@ -1,7 +1,6 @@
 package net.deckserver.dwr;
 
 import net.deckserver.Utils;
-import net.deckserver.dwr.bean.AdminBean;
 import net.deckserver.dwr.bean.CardBean;
 import net.deckserver.dwr.bean.DeckEditBean;
 import net.deckserver.dwr.creators.UpdateFactory;
@@ -28,11 +27,11 @@ public class DeckserverRemote {
 
     private Logger logger = LoggerFactory.getLogger(DeckserverRemote.class);
 
-    private final AdminBean abean;
+    private final JolAdmin admin;
     private HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
 
     public DeckserverRemote() {
-        abean = AdminBean.INSTANCE;
+        admin = JolAdmin.getInstance();
     }
 
     private static String ne(String arg) {
@@ -49,20 +48,15 @@ public class DeckserverRemote {
     public Map<String, Object> createGame(String name, Boolean isPrivate) {
         PlayerModel player = getPlayer();
         if (player != null && player.isAdmin()) {
-            abean.createGame(name, isPrivate, player);
+            admin.createGame(name, isPrivate, player);
         }
-        return UpdateFactory.getUpdate();
-    }
-
-    public Map<String, Object> setMessage(String message) {
-        abean.setMessage(message);
         return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> endGame(String name) {
         PlayerModel player = getPlayer();
-        if (player.isSuperUser() || player.getPlayer().equals(abean.getGameModel(name).getOwner())) {
-            abean.endGame(name);
+        if (player.isSuperUser() || player.getPlayer().equals(admin.getGameModel(name).getOwner())) {
+            admin.endGame(name);
         }
         return UpdateFactory.getUpdate();
     }
@@ -83,7 +77,7 @@ public class DeckserverRemote {
             admin.startGame(game);
             getModel(game).firstPing();
         }
-        abean.notifyAboutGame(game);
+        this.admin.notifyAboutGame(game);
         return UpdateFactory.getUpdate();
     }
 
@@ -95,13 +89,13 @@ public class DeckserverRemote {
 
     public Map<String, Object> chat(String text) {
         String player = Utils.getPlayer(request);
-        abean.chat(player, text);
+        admin.chat(player, text);
         return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> init() {
         String player = Utils.getPlayer(request);
-        abean.remove(player);
+        admin.remove(player);
         return UpdateFactory.getUpdate();
     }
 
@@ -109,7 +103,7 @@ public class DeckserverRemote {
         PlayerModel player = getPlayer();
         if (target != null) {
             if (target.startsWith("g")) {
-                player.enterGame(abean, target.substring(1));
+                player.enterGame(target.substring(1));
             } else {
                 player.setView(target);
             }
@@ -308,7 +302,7 @@ public class DeckserverRemote {
 
 
     private PlayerModel getPlayer() {
-        return Utils.getPlayerModel(request, abean);
+        return Utils.getPlayerModel(request);
     }
 
     private GameView getView(String name) {
@@ -318,6 +312,6 @@ public class DeckserverRemote {
     }
 
     private GameModel getModel(String name) {
-        return abean.getGameModel(name);
+        return admin.getGameModel(name);
     }
 }

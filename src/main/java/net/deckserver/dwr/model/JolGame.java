@@ -8,20 +8,15 @@ package net.deckserver.dwr.model;
 
 import com.google.common.base.Strings;
 import net.deckserver.Utils;
-import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.game.interfaces.state.*;
 import net.deckserver.game.interfaces.turn.GameAction;
 import net.deckserver.game.jaxb.state.Notation;
-import net.deckserver.game.json.deck.CardSummary;
 import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.cards.Deck;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
-import net.deckserver.rest.ApiResource;
 import org.apache.commons.lang3.ArrayUtils;
-import org.owasp.html.Sanitizers;
-import org.slf4j.Logger;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;

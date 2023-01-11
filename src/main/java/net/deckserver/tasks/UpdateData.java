@@ -1,7 +1,6 @@
 package net.deckserver.tasks;
 
 import net.deckserver.game.jaxb.FileUtils;
-import net.deckserver.game.jaxb.actions.GameActions;
 import net.deckserver.game.jaxb.state.GameCard;
 import net.deckserver.game.jaxb.state.GameState;
 import net.deckserver.game.jaxb.state.Notation;
@@ -11,21 +10,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class UpdateData {

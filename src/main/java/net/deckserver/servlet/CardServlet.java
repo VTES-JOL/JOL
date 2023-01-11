@@ -1,6 +1,5 @@
 package net.deckserver.servlet;
 
-import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
 
