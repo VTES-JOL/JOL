@@ -12,12 +12,10 @@ public class GameModel implements Comparable {
 
     private String name;
     private Map<String, GameView> views = new HashMap<>();
-    private GameSummaryBean sumbean;
 
     public GameModel(String name) {
         this.name = name;
         if (isActive()) JolAdmin.getInstance().getGame(name);  // make sure its loaded
-        regen();
     }
 
     public boolean isOpen() {
@@ -128,7 +126,6 @@ public class GameModel implements Comparable {
                 idx = 0; // reset the current action index for the new turn.
                 String email = admin.getEmail(game.getActivePlayer());
                 turnChanged = stateChanged = phaseChanged = pingChanged = true;
-                regen();
             }
             addChats(idx);
             if (stateChanged || phaseChanged || chatChanged || globalChanged) {
@@ -168,14 +165,6 @@ public class GameModel implements Comparable {
         }
     }
 
-    private String[] tokenize(String arg) {
-        StringTokenizer tok = new StringTokenizer(arg);
-        String[] ret = new String[tok.countTokens() + 3];
-        for (int i = 3; i < ret.length; i++)
-            ret[i] = tok.nextToken();
-        return ret;
-    }
-
     public GameView getView(String player) {
         if (!views.containsKey(player)) {
             synchronized (this) {
@@ -183,14 +172,6 @@ public class GameModel implements Comparable {
             }
         }
         return views.get(player);
-    }
-
-    public GameView hasView(String player) {
-        return views.get(player);
-    }
-
-    public GameView[] getViews() {
-        return views.values().toArray(new GameView[0]);
     }
 
     public void resetView(String player) {
@@ -205,11 +186,4 @@ public class GameModel implements Comparable {
         return -name.compareToIgnoreCase(((GameModel) arg0).getName());
     }
 
-    void regen() {
-        sumbean = new GameSummaryBean(this);
-    }
-
-    public GameSummaryBean getSummaryBean() {
-        return sumbean;
-    }
 }

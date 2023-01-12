@@ -29,8 +29,8 @@ public class AdminPageBean {
 
         publicGames = Arrays.stream(admin.getGames())
                 .filter(Objects::nonNull)
+                .filter(admin::isOpen)
                 .filter(gameName -> !admin.isPrivate(gameName))
-                .filter(gameName -> !admin.isFinished(gameName))
                 .map(GameStatusBean::new)
                 .collect(Collectors.toList());
 

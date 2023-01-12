@@ -5,50 +5,40 @@ import net.deckserver.dwr.model.GameView;
 import net.deckserver.dwr.model.JolAdmin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
 public class GameSummaryBean {
 
-    private String game;
-    private String access = "none";
-    private String turn = null;
-    private String[] available = new String[0];
-    private String admin;
+    private final String gameName;
+    private final String access;
+    private final String turn;
+    private final String owner;
 
-    public GameSummaryBean(GameModel game) {
-        this.game = game.getName();
-        if (JolAdmin.getInstance().isActive(this.game)) {
-            access = JolAdmin.getInstance().getGameTimeStamp(this.game).format(ISO_OFFSET_DATE_TIME);
-            turn = JolAdmin.getInstance().getGame(this.game).getCurrentTurn();
-            admin = JolAdmin.getInstance().getOwner(this.game);
-            GameView[] views = game.getViews();
-            Collection<String> actives = new ArrayList<>(5);
-            for (GameView view : views) {
-                if (view.isPlayer()) actives.add(view.getPlayer());
-            }
-            available = actives.toArray(new String[0]);
-        }
+    public GameSummaryBean(String gameName) {
+        JolAdmin admin = JolAdmin.getInstance();
+        this.gameName = gameName;
+        this.access = admin.getGameTimeStamp(gameName).format(ISO_OFFSET_DATE_TIME);
+        this.turn = admin.getGame(gameName).getCurrentTurn();
+        this.owner = admin.getOwner(gameName);
+    }
+
+    public String getGameName() {
+        return gameName;
     }
 
     public String getAccess() {
         return access;
     }
 
-    public String[] getAvailable() {
-        return available;
-    }
-
-    public String getGame() {
-        return game;
-    }
-
     public String getTurn() {
         return turn;
     }
 
-    public String getAdmin() {
-        return admin;
+    public String getOwner() {
+        return owner;
     }
 }

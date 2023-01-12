@@ -276,49 +276,20 @@ function renderMessage(message) {
     }
 }
 
-function renderRowWithLabel2(tid, label) {
-    var table = $('#' + tid).eq(0);
-    for (var idx = 0; idx < table.children().length; idx++) {
-        var row = table.children().eq(idx);
-        if (row.data('label') === label) {
-            return row;
-        }
-    }
-    var newRow = $('#activeGameTemplate').eq(0)
-        .clone()
-        .attr('id', null)
-        .removeClass('d-none')
-        .data('label', label)
-        .click(function (e) {
-            doNav('g' + label);
-        });
-    table.append(newRow);
-    return newRow;
-}
-
 function renderActiveGames(games) {
-    if (games === null) return;
-    for (var index = 0; index < games.length; index++) {
-        var game = games[index];
-        if (game.turn === null) continue;
-        var row = renderRowWithLabel2('activeGames', game.game);
-        row.children().eq(0).html(renderGameLink(game.game));
-        row.children().eq(1).html(moment(game.access).tz("UTC").format("D-MMM-YYYY HH:mm z"));
-        row.children().eq(2).html(game.turn);
-        row.children().eq(3).html(game.available.join(', '));
-        row.children().eq(4).html(game.admin);
-    }
-}
-
-function removeLabeledRows(table, removedGames) {
-    var table = dwr.util.byId(table);
-    $.each(removedGames, function (index, game) {
-        $.each(table.rows, function (i, row) {
-            if (row.label === game) {
-                table.deleteRow(i);
-                return false;
-            }
-        });
+    var activeGames = $("#activeGames tbody");
+    activeGames.empty();
+    $.each(games, function(index, game) {
+        var gameRow = $("<tr/>");
+        var gameLink = $("<td/>").html(renderGameLink(game.gameName));
+        var access = $("<td/>").text(moment(game.access).tz("UTC").format("D-MMM-YYYY HH:mm z"));
+        var turn = $("<td/>").text(game.turn);
+        var owner = $("<td/>").text(game.owner);
+        gameRow.append(gameLink);
+        gameRow.append(access);
+        gameRow.append(turn);
+        gameRow.append(owner);
+        activeGames.append(gameRow);
     });
 }
 
@@ -1143,8 +1114,6 @@ function callbackMain(data) {
         renderOnline('whoson', data.who);
         renderGlobalChat(data.chat);
         renderMyGames(data.games);
-        removeLabeledRows('ownGames', data.removedGames);
-        removeLabeledRows('activeGames', data.removedGames);
         if (data.refresh > 0) {
             if (refresher) clearTimeout(refresher);
             refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", data.refresh);
