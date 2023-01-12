@@ -953,11 +953,6 @@ public class JolAdmin {
             write();
         }
 
-        public boolean isOwner(String gameName) {
-            return info.getProperty(sysInfo.getKey(gameName), "no").equals(
-                    "owner");
-        }
-
         void invite(String gameName) {
             info.setProperty(sysInfo.getKey(gameName), "invited");
             write();
@@ -970,10 +965,6 @@ public class JolAdmin {
 
         String getHeader() {
             return "Deckserver 3.0 player information";
-        }
-
-        boolean receivesTurnSummaries() {
-            return "true".equals(info.getProperty("turns", "true"));
         }
 
         String getDiscordID() {

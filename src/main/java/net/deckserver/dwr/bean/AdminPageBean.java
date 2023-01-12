@@ -22,6 +22,7 @@ public class AdminPageBean {
 
         myGames = Arrays.stream(admin.getGames())
                 .filter(Objects::nonNull)
+                .filter(admin::isPrivate)
                 .filter(gameName -> player.equals(admin.getOwner(gameName)))
                 .filter(gameName -> !admin.isFinished(gameName))
                 .map(GameStatusBean::new)

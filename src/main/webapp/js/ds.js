@@ -316,9 +316,7 @@ function navigate(data) {
         player = null;
     } else {
         renderButton({active: "Watch", deck: "Decks", profile: "Profile"});
-        if (data.admin) {
-            renderButton({admin: "Game Admin"});
-        }
+        renderButton({admin: "Game Admin"});
         if (data.superUser) {
             renderButton({super: "User Admin"});
         }
