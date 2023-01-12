@@ -477,20 +477,14 @@ function doNewDeck() {
 // Callback for AdminCreator
 function callbackAdmin(data) {
     var currentGames = $("#currentGames");
-    var gameList = $("#gameList");
-    gameList.empty();
-    currentGames.empty();
+    var publicGames = $("#publicGames");
+    var myGameList = $("#myGameList");
+    var playerList = $("#playerList");
+    var invitedGames = $("#invitedGames");
+    var invitedGamesList = $("#invitedGamesList");
+    var mydeckList = $("#mydeckList");
 
-    $("#endGameList").autocomplete({
-        source: data.currentGames,
-        change: function (event, ui) {
-            if (ui.item === null) {
-                $(this).val((ui.item ? ui.item.id : ""));
-            }
-        }
-    });
-
-    $("#playerList").autocomplete({
+    playerList.autocomplete({
         source: data.players,
         change: function (event, ui) {
             if (ui.item === null) {
@@ -499,19 +493,78 @@ function callbackAdmin(data) {
         }
     });
 
-    $.each(data.forming, function (index, game) {
+    currentGames.empty();
+    myGameList.empty();
+    var myGamesOption = '';
+    $.each(data.myGames, function(index, game) {
+        myGamesOption += '<option value="' + game.name + '">' + game.name + '</option>';
         var headerRow = $("<tr/>");
-        var gameHeader = $("<th/>").text(game.gameName);
+        var gameHeader = $("<th/>").text(game.name);
         var startHeader = $("<th/>");
+        if (game.gameStatus === 'Inviting') {
+            var startButton = $("<button/>").addClass("btn btn-primary").text("Start").click(function () {
+                if (confirm("Start game?")) {
+                    DS.startGame(game.name, {callback: processData, errorHandler: errorhandler});
+                }
+            });
+            startHeader.append(startButton);
+        }
+        var endButton =  $("<button/>").addClass("btn btn-primary").text("Close").click(function () {
+            if (confirm("End game?")) {
+                DS.endGame(game.name, {callback: processData, errorHandler: errorhandler});
+            }
+        });
+        startHeader.append(endButton);
         headerRow.append(gameHeader);
         headerRow.append(startHeader);
         currentGames.append(headerRow);
-        gameList.append(new Option(game.gameName, game.gameName));
-        var registrationCount = 0;
         $.each(game.registrations, function (i, registration) {
             var registrationRow = $("<tr/>");
             var player = $("<td/>").text(registration.player);
             registrationRow.append(player);
+            var summary = $("<td/>").text(registration.deckSummary);
+            if ("invited" !== registration.deckSummary) {
+                if (!registration.valid) {
+                    summary.append($('<span/>').addClass("label label-warning left-margin").text('Invalid'));
+                }
+            }
+            registrationRow.append(summary);
+            currentGames.append(registrationRow);
+        });
+
+        $.each(game.players, function (i, playerStatus) {
+            var playerRow = $("<tr/>");
+            var playerName = $("<td/>").text(playerStatus.playerName);
+            var pool = $("<td/>").text(playerStatus.pool + " pool");
+            playerRow.append(playerName);
+            playerRow.append(pool);
+            currentGames.append(playerRow);
+        })
+    });
+    myGameList.append(myGamesOption);
+
+    publicGames.empty();
+    $.each(data.publicGames, function(index, game) {
+        var headerRow = $("<tr/>");
+        var gameHeader = $("<th/>").text(game.name);
+        var joinHeader = $("<th/>");
+        var joinButton = $("<button/>").addClass('btn btn-primary').text("Join").click(function () {
+            if (confirm("Join game?")) {
+                DS.invitePlayer(game.name, player, {callback: processData, errorHandler: errorhandler});
+            }
+        });
+        joinHeader.append(joinButton);
+        headerRow.append(gameHeader);
+        headerRow.append(joinHeader);
+        publicGames.append(headerRow);
+        var registrationCount = 0;
+        $.each(game.registrations, function (i, registration) {
+            var registrationRow = $("<tr/>");
+            var playerCell = $("<td/>").text(registration.player);
+            if (registration.player === player) {
+                joinButton.hide();
+            }
+            registrationRow.append(playerCell);
             var summary = $("<td/>").text(registration.deckSummary);
             if ("invited" !== registration.deckSummary) {
                 registrationCount++;
@@ -520,56 +573,60 @@ function callbackAdmin(data) {
                 }
             }
             registrationRow.append(summary);
-            currentGames.append(registrationRow);
+            publicGames.append(registrationRow);
         });
-        var registrationText = "( " + registrationCount + " registered )";
-        var startButton = $("<button/>").text("Start " + registrationText).click(game, function () {
-            if (confirm("Start game?")) {
-                DS.startGame(game.gameName, {callback: processData, errorHandler: errorhandler});
-            }
-        });
-        var cancelButton = $("<button/>").text("Close").click(game, function () {
-            if (confirm("Cancel game?")) {
-                DS.endGame(game.gameName, {callback: processData, errorHandler: errorhandler});
-            }
-        });
-        startHeader.append(startButton);
-        startHeader.append(cancelButton);
+    })
+
+    invitedGames.empty();
+    invitedGamesList.empty();
+    var invitedGamesOption = '';
+    $.each(data.invitedGames, function(index, game) {
+        var gameRow = $("<tr/>");
+        var gameName = $("<td/>").text(game.gameName);
+        var deckSummary = $("<td/>").text(game.deckSummary);
+        if (game.registered && !game.valid) {
+            var errorMessage = $("<span/>").addClass("label label-warning left-margin").text("Invalid");
+            deckSummary.append(errorMessage);
+        }
+        gameRow.append(gameName);
+        gameRow.append(deckSummary);
+        invitedGames.append(gameRow);
+        invitedGamesOption += '<option value="' + game.gameName + '">' + game.gameName + '</option>';
     });
+    invitedGamesList.append(invitedGamesOption);
+
+    mydeckList.empty();
+    var deckListOption = '';
+    $.each(data.decks, function(index, deck) {
+        deckListOption += '<option value="' + deck.name + '">' + deck.name + '</option>';
+    })
+    mydeckList.append(deckListOption);
+
+}
+
+function doRegister() {
+    var regGame = $("#invitedGamesList").val();
+    var regDeck = $("#mydeckList").val();
+    DS.registerDeck(regGame, regDeck, {callback: processData, errorHandler: errorhandler});
 }
 
 function doCreateGame() {
     var newGameDiv = $("#newGameName");
-    var isPrivate = $("#privateFlag").prop('checked');
+    var isPublic = $("#publicFlag");
     var gameName = newGameDiv.val();
     if (gameName.indexOf("\'") > -1 || gameName.indexOf("\"") > -1) {
         alert("Game name can not contain \' or \" characters in it");
         return;
     }
-    DS.createGame(gameName, isPrivate, {callback: processData, errorHandler: errorhandler});
+    DS.createGame(gameName, isPublic.prop('checked'), {callback: processData, errorHandler: errorhandler});
     newGameDiv.val('');
-    $("#privateFlag").prop('checked', false);
+    isPublic.prop('checked', false);
 }
 
 function invitePlayer() {
-    var game = $("#gameList").val();
+    var game = $("#myGameList").val();
     var player = $("#playerList").val();
     DS.invitePlayer(game, player, {callback: processData, errorHandler: errorhandler});
-}
-
-function closeGame() {
-    var gameDiv = $("#endGameList");
-    var selected = gameDiv.val();
-    gameDiv.val("");
-    if (confirm("End game?")) {
-        DS.endGame(selected, {callback: processData, errorHandler: errorhandler});
-    }
-}
-
-function doRegister() {
-    var regGame = $("#reggames").val();
-    var regDeck = $("#regdecks").val();
-    DS.registerDeck(regGame, regDeck, {callback: processData, errorHandler: errorhandler});
 }
 
 function refreshState(force) {
@@ -1048,32 +1105,6 @@ function callbackShowDecks(data) {
         dRow.cells[2].innerHTML = "<a onclick='doDelete(\"" + data.decks[dIdx].name + "\");'>&#x2717;</a>";
         dRow.cells[2].className = 'delete';
     }
-    if (data.games.length === 0) {
-        dwr.util.byId('gameRegistration').style.display = 'none';
-    } else {
-        dwr.util.byId('gameRegistration').style.display = 'block';
-        // Register Decks for Games
-        for (var gIdx = 0; gIdx < data.games.length; gIdx++) {
-            var gRow = renderRowWithLabel('opengames', data.games[gIdx].game);
-            if (gRow.cells.length === 0) {
-                gRow.insertCell(0).innerHTML = data.games[gIdx].game;
-                gRow.insertCell(1);
-                gRow.insertCell(2);
-            }
-            gRow.cells[1].innerHTML = data.games[gIdx].name;
-            gRow.cells[2].innerHTML = '<small>L' + data.games[gIdx].lib + ' C' + data.games[gIdx].crypt + ' G ' + data.games[gIdx].groups + "</small>";
-        }
-        var gameOptions = $('#reggames option').map(function() { return this.value; }).get().join();
-        var newGameOptions = data.games.map(g => g.game).join();
-        if (gameOptions != newGameOptions) {
-            dwr.util.removeAllOptions('reggames');
-            dwr.util.addOptions('reggames', data.games, 'game', 'game');
-        }
-        if ($('#regdecks option').length != data.decks.length) {
-            dwr.util.removeAllOptions('regdecks');
-            dwr.util.addOptions('regdecks', data.decks.map(d => d.name));
-        }
-    }
 }
 
 function callbackShowGameDeck(data) {
@@ -1125,14 +1156,6 @@ function callbackMain(data) {
 }
 
 function callbackStatus(data) {
-}
-
-function goToRegister(event) {
-    event.preventDefault();
-    //window.scroll({top: 99, left:0, behavior: 'smooth'});
-    $('body').scrollTop(999);
-    //$('#register').focus();
-    //$('#newplayer').focus();
 }
 
 function renderDesktopViewButton() {

@@ -1,14 +1,5 @@
 <div class='row'>
     <div class='col-sm-4'>
-        <div id='gameRegistration' class='box'>
-            <h4 class="header">Game Registration:</h4>
-            <table class="light clean-table" id="opengames"></table>
-            <div class="footer">
-                <select title="reggames" id="reggames"></select>
-                <select title="Choose deck" id="regdecks"></select>
-                <button class="btn btn-primary btn-sm" onclick="doRegister();">Register</button>
-            </div>
-        </div>
         <div id='playerDecks' class='box'>
             <h4 class="header">Your decks:</h4>
             <table id="decks" class="clean-table light">

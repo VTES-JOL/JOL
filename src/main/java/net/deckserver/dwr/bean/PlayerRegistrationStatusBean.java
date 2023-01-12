@@ -4,15 +4,16 @@ import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.cards.Deck;
 
-public class PlayerRegistrationBean {
-
+public class PlayerRegistrationStatusBean {
     private final String player;
+    private final String gameName;
     private final boolean registered;
     private final String deckSummary;
     private final boolean valid;
 
-    public PlayerRegistrationBean(String player, String game) {
+    public PlayerRegistrationStatusBean(String game, String player) {
         this.player = player;
+        this.gameName = game;
         String deck = JolAdmin.getInstance().getGameDeck(game, player);
         this.registered = !deck.equals(JolAdmin.DECK_NOT_FOUND);
         if (this.registered) {
@@ -27,6 +28,10 @@ public class PlayerRegistrationBean {
 
     public String getPlayer() {
         return player;
+    }
+
+    public String getGameName() {
+        return gameName;
     }
 
     public boolean isRegistered() {

@@ -270,12 +270,12 @@
                   <span>Bleed</span>
                 </button>
                   <button type="button" class="btn btn-outline-dark m-1" title="Contest"
-                          data-region="ready-region torpor-region" data-contested="false"
+                          data-region="ready-region torpor" data-contested="false"
                           onclick="contest(true);">
                       <span>Contest</span>
                   </button>
                   <button type="button" class="btn btn-outline-dark m-1" title="Clear Contest"
-                          data-region="ready-region torpor-region" data-contested="true"
+                          data-region="ready-region torpor" data-contested="true"
                           onclick="contest(false);">
                       <span>Clear Contest</span>
                   </button>
@@ -349,8 +349,8 @@
         <script type='text/javascript' src='dwr/interface/DS.js'></script>
         <script type='text/javascript' src='dwr/util.js'></script>
         <script type='text/javascript' src="js/tippy.all.min.js"></script>
-        <script type='text/javascript' src='js/ds.js'></script>
-        <script type="text/javascript" src="js/card-modal.js"></script>
+        <script type='text/javascript' src='js/ds.js?version=<%= System.getenv("JOL_VERSION") %>'></script>
+        <script type="text/javascript" src="js/card-modal.js?version=<%= System.getenv("JOL_VERSION") %>"></script>
         <script src='https://www.google.com/recaptcha/api.js'></script>
     </body>
 </html>

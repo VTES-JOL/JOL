@@ -23,14 +23,7 @@ class DeckCreator implements ViewCreator {
     public Object createData(PlayerModel model) {
         this.player = model.getPlayer();
         List<DeckInfoBean> decks = model.getDecks().stream().map(this::getDeck).sorted(Comparator.comparing(DeckInfoBean::getName)).collect(Collectors.toList());
-        List<GameModel> actives = JolAdmin.getInstance().getActiveGames();
-        JolAdmin admin = JolAdmin.getInstance();
-        List<DeckSummaryBean> games = actives.stream()
-                .filter(game -> admin.isOpen(game.getName()))
-                .filter(game -> (admin.isInvited(game.getName(), player) || admin.getOwner(game.getName()).equals(player) || admin.getGameDeck(game.getName(), player) != JolAdmin.DECK_NOT_FOUND))
-                .map(game -> new DeckSummaryBean(game, model))
-                .collect(Collectors.toCollection(ArrayList::new));
-        return new DeckBean(decks, games);
+        return new DeckBean(decks);
     }
 
     private DeckInfoBean getDeck(String deckName) {

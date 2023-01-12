@@ -298,6 +298,7 @@ function showCardModal(event) {
         $('#cardModal button').show();
         // $(`#cardModal button[data-region][data-region!="${region}"]`).hide();
         $(`#cardModal button[data-region]`).each(function() {
+          console.log($(this).data("region").split(" "));
           let showThis = $(this).data("region").split(" ").includes(region);
           if (!showThis) { $(this).hide(); }
         })

@@ -1,44 +1,70 @@
 package net.deckserver.dwr.bean;
 
 import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.dwr.model.PlayerModel;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AdminPageBean {
-
-    private List<String> players = new ArrayList<>();
-    private List<String> currentGames = new ArrayList<>();
-    private List<RegistrationSummaryBean> forming = new ArrayList<>();
+    private final List<String> players;
+    private final List<GameStatusBean> myGames;
+    private final List<GameStatusBean> publicGames;
+    private final List<PlayerRegistrationStatusBean> invitedGames;
+    private final List<DeckSummaryBean> decks;
 
     public AdminPageBean(String player) {
         JolAdmin admin = JolAdmin.getInstance();
-        List<String> games = Arrays.asList(admin.getGames());
-        games.stream()
-                .filter(Objects::nonNull)
-                .filter(gameName -> admin.isSuperUser(player) || admin.getOwner(gameName).equals(player))
-                .filter(gameName -> !admin.isPrivate(gameName) || admin.getOwner(gameName).equals(player) || admin.isSuperUser(player))
-                .forEach(gameName -> {
-                    if (admin.isOpen(gameName)) {
-                        forming.add(new RegistrationSummaryBean(gameName));
-                    } else if (!admin.isFinished(gameName)) {
-                        currentGames.add(gameName);
-                    }
-                });
+        PlayerModel model = admin.getPlayerModel(player);
+
         players = admin.getPlayers();
         Collections.sort(players);
-        Collections.sort(currentGames);
+
+        myGames = Arrays.stream(admin.getGames())
+                .filter(Objects::nonNull)
+                .filter(gameName -> player.equals(admin.getOwner(gameName)))
+                .filter(gameName -> !admin.isFinished(gameName))
+                .map(GameStatusBean::new)
+                .collect(Collectors.toList());
+
+        publicGames = Arrays.stream(admin.getGames())
+                .filter(Objects::nonNull)
+                .filter(gameName -> !admin.isPrivate(gameName))
+                .filter(gameName -> !admin.isFinished(gameName))
+                .map(GameStatusBean::new)
+                .collect(Collectors.toList());
+
+        invitedGames = Arrays.stream(admin.getGames())
+                .filter(Objects::nonNull)
+                .filter(admin::isOpen)
+                .filter(gameName -> admin.isInvited(gameName, player) || admin.isRegistered(gameName, player))
+                .map(gameName -> new PlayerRegistrationStatusBean(gameName, player))
+                .collect(Collectors.toList());
+
+        decks = Arrays.stream(admin.getDeckNames(player))
+                .filter(Objects::nonNull)
+                .map(deckName -> new DeckSummaryBean(model, deckName, true))
+                .sorted(Comparator.comparing(DeckSummaryBean::getName))
+                .collect(Collectors.toList());
     }
 
     public List<String> getPlayers() {
         return players;
     }
 
-    public List<String> getCurrentGames() {
-        return currentGames;
+    public List<GameStatusBean> getMyGames() {
+        return myGames;
     }
 
-    public List<RegistrationSummaryBean> getForming() {
-        return forming;
+    public List<GameStatusBean> getPublicGames() {
+        return publicGames;
     }
 
+    public List<PlayerRegistrationStatusBean> getInvitedGames() {
+        return invitedGames;
+    }
+
+    public List<DeckSummaryBean> getDecks() {
+        return decks;
+    }
 }

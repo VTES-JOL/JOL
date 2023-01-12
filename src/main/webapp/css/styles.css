@@ -151,30 +151,19 @@ ul.deck-list {
     margin: 0 0 5px 5px;
 }
 
-#currentGames {
-    border-collapse: collapse;
-    border: 1px solid #aaaaaa;
+table.games th button {
+    margin-left: 0.5em;
 }
 
-#currentGames th {
-    text-align: left;
-    padding: 0.5em 1em;
-}
-
-#currentGames th:last-child {
+table.games th:last-child {
     text-align: right;
 }
 
-#currentGames td, #currentGames tr {
-    border: 1px solid #aaaaaa;
-    padding: 0.25em;
-}
-
-#currentGames td:first-child {
+table.games td:first-child {
     padding-left: 1em;
 }
 
-#currentGames td:last-child {
+table.games td:last-child {
     text-align: right;
     padding: 0 1em;
 }
@@ -1169,6 +1158,10 @@ input[type=checkbox] {
         margin-left: calc(calc(100vw - 768px) / 2);
         margin-right: calc(calc(100vw - 768px) / 2);
     }
+}
+
+.left-margin {
+    margin-left: 0.5em;
 }
 
 .modal-header {

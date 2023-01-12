@@ -45,10 +45,10 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-    public Map<String, Object> createGame(String name, Boolean isPrivate) {
+    public Map<String, Object> createGame(String name, Boolean isPublic) {
         PlayerModel player = getPlayer();
-        if (player != null && player.isAdmin()) {
-            admin.createGame(name, isPrivate, player);
+        if (player != null) {
+            admin.createGame(name, isPublic, player);
         }
         return UpdateFactory.getUpdate();
     }
@@ -64,7 +64,7 @@ public class DeckserverRemote {
     public Map<String, Object> invitePlayer(String game, String name) {
         String player = getPlayer().getPlayer();
         JolAdmin admin = JolAdmin.getInstance();
-        if (admin.isAdmin(player) || admin.isSuperUser(player)) {
+        if (player != null) {
             admin.invitePlayer(game, name);
         }
         return UpdateFactory.getUpdate();
@@ -223,6 +223,9 @@ public class DeckserverRemote {
         JolAdmin admin = JolAdmin.getInstance();
         String player = getPlayer().getPlayer();
         admin.addPlayerToGame(game, player, name);
+        if (admin.getRegisteredPlayerCount(game) == 5) {
+            admin.startGame(game);
+        }
         return UpdateFactory.getUpdate();
     }
 

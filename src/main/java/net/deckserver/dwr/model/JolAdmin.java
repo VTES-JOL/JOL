@@ -163,11 +163,11 @@ public class JolAdmin {
         }
     }
 
-    public synchronized void createGame(String name, Boolean isPrivate, PlayerModel player) {
+    public synchronized void createGame(String name, Boolean isPublic, PlayerModel player) {
         logger.trace("Creating game {} for player {}", name, player.getPlayer());
         if (mkGame(name)) {
             setOwner(name, player.getPlayer());
-            setGamePrivate(name, isPrivate);
+            setGamePrivate(name, !isPublic);
             activeSort.add(getGameModel(name));
             actives = new ArrayList<>(activeSort);
             notifyAboutGame(name);
@@ -339,6 +339,10 @@ public class JolAdmin {
     public boolean authenticate(String player, String password) {
         return existsPlayer(player)
                 && getPlayerInfo(player).authenticate(password);
+    }
+
+    public long getRegisteredPlayerCount(String gameName) {
+        return getGameInfo(gameName).getRegisteredPlayerCount();
     }
 
     public boolean addPlayerToGame(String gameName, String playerName,
@@ -534,6 +538,7 @@ public class JolAdmin {
     }
 
     public void invitePlayer(String gameName, String player) {
+        logger.info("Inviting {} to {}", player, gameName);
         getPlayerInfo(player).invite(gameName);
     }
 
@@ -793,11 +798,12 @@ public class JolAdmin {
         }
 
         public boolean isPrivate() {
-            return info.getProperty("private", "false").equals("true");
+            return info.getProperty("private", "true").equals("true");
         }
 
         public void setPrivate(Boolean flag) {
             info.setProperty("private", flag.toString());
+            write();
         }
     }
 
