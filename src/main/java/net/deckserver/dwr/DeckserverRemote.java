@@ -77,7 +77,6 @@ public class DeckserverRemote {
             admin.startGame(game);
             getModel(game).firstPing();
         }
-        this.admin.notifyAboutGame(game);
         return UpdateFactory.getUpdate();
     }
 

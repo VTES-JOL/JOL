@@ -17,18 +17,12 @@ public class PlayerModel implements Comparable {
     private List<ChatEntryBean> chats = new ArrayList<>();
     private String tmpDeck;
     private String tmpDeckName;
-    private Collection<String> removedGames = new ArrayList<>(2);
     private Collection<String> changedGames = new HashSet<>();
 
     public PlayerModel(String name, List<ChatEntryBean> chatin) {
         logger.trace("Creating new Player model for {}", name);
         this.player = name;
         setView("main");
-        changedGames.addAll(
-            JolAdmin.getInstance().getActiveGames().stream()
-                .filter(g -> g.isOpen() || g.getPlayers().contains(player))
-                .map(GameModel::getName)
-                .collect(Collectors.toList()));
         chats.addAll(chatin);
     }
 
@@ -128,24 +122,8 @@ public class PlayerModel implements Comparable {
         return !chats.isEmpty();
     }
 
-    public void removeGame(String name) {
-        removedGames.add(name);
-    }
-
     public void changeGame(String name) {
         changedGames.add(name);
     }
 
-    public Collection<String> getChangedGames() {
-        return changedGames;
-    }
-
-    public Collection<String> getRemovedGames() {
-        return removedGames;
-    }
-
-    public void clearGames() {
-        changedGames.clear();
-        removedGames.clear();
-    }
 }

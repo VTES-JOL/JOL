@@ -9,7 +9,7 @@ import java.util.Collection;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
-public class SummaryBean {
+public class GameSummaryBean {
 
     private String game;
     private String access = "none";
@@ -17,7 +17,7 @@ public class SummaryBean {
     private String[] available = new String[0];
     private String admin;
 
-    public SummaryBean(GameModel game) {
+    public GameSummaryBean(GameModel game) {
         this.game = game.getName();
         if (JolAdmin.getInstance().isActive(this.game)) {
             access = JolAdmin.getInstance().getGameTimeStamp(this.game).format(ISO_OFFSET_DATE_TIME);

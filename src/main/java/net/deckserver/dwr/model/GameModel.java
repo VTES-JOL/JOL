@@ -1,11 +1,9 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.dwr.bean.SummaryBean;
-import org.directwebremoting.WebContextFactory;
+import net.deckserver.dwr.bean.GameSummaryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
 import java.util.*;
 
 public class GameModel implements Comparable {
@@ -14,7 +12,7 @@ public class GameModel implements Comparable {
 
     private String name;
     private Map<String, GameView> views = new HashMap<>();
-    private SummaryBean sumbean;
+    private GameSummaryBean sumbean;
 
     public GameModel(String name) {
         this.name = name;
@@ -167,10 +165,6 @@ public class GameModel implements Comparable {
             if (globalChanged) view.globalChanged();
             if (privateNotesChanged) view.privateNotesChanged();
             if (turnChanged) view.turnChanged();
-            if (stateChanged || phaseChanged || pingChanged || globalChanged || turnChanged || chatChanged || privateNotesChanged) {
-                ServletContext ctx = WebContextFactory.get().getServletContext();
-                JolAdmin.getInstance().notifyAboutGame(name);
-            }
         }
     }
 
@@ -212,10 +206,10 @@ public class GameModel implements Comparable {
     }
 
     void regen() {
-        sumbean = new SummaryBean(this);
+        sumbean = new GameSummaryBean(this);
     }
 
-    public SummaryBean getSummaryBean() {
+    public GameSummaryBean getSummaryBean() {
         return sumbean;
     }
 }

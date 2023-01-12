@@ -9,41 +9,40 @@ import java.util.stream.Collectors;
 
 public class MainBean {
 
-    private List<PlayerSummaryBean> myGames = new ArrayList<>();
-    private List<UserSummaryBean> who = new ArrayList<>();
-    private boolean loggedIn;
-    private List<ChatEntryBean> chat;
-    private int refresh = 0;
-    private String stamp;
-    private List<String> removedGames = new ArrayList<>();
+    private final List<PlayerGameStatusBean> games;
+    private final List<UserSummaryBean> who;
+    private final boolean loggedIn;
+    private final List<ChatEntryBean> chat;
+    private final String stamp;
 
     public MainBean(PlayerModel model) {
         JolAdmin jolAdmin = JolAdmin.getInstance();
-        Collection<GameModel> actives = JolAdmin.getInstance().getActiveGames();
-        Collection<String> gamenames = new HashSet<>();
+        String playerName = model.getPlayer();
         loggedIn = model.getPlayer() != null;
         if (loggedIn) {
-            gamenames.addAll(Arrays.asList(JolAdmin.getInstance().getGames(model.getPlayer())));
-            refresh = 5000;
+            this.games = Arrays.stream(jolAdmin.getGames())
+                    .filter(Objects::nonNull)
+                    .filter(jolAdmin::isActive)
+                    .filter(gameName -> jolAdmin.isRegistered(gameName, playerName))
+                    .map(gameName -> new PlayerGameStatusBean(gameName, playerName))
+                    .sorted(Comparator.comparing(PlayerGameStatusBean::isOusted).thenComparing(PlayerGameStatusBean::getGameName))
+                    .collect(Collectors.toList());
+            chat = model.getChat();
+            who = JolAdmin.getInstance().getWho().stream()
+                    .sorted(Comparator.reverseOrder())
+                    .map(UserSummaryBean::new)
+                    .collect(Collectors.toList());
+        } else {
+            this.games = Collections.emptyList();
+            this.chat = Collections.emptyList();
+            this.who = Collections.emptyList();
         }
-        for (GameModel game : actives) {
-            if (!model.getChangedGames().contains(game.getName())) continue;
-            if (gamenames.contains(game.getName()) && (game.isOpen() || game.getPlayers().contains(model.getPlayer())))
-                myGames.add(new PlayerSummaryBean(game, model.getPlayer()));
-        }
-        removedGames = new ArrayList<>(model.getRemovedGames());
-        chat = model.getChat();
-        who = JolAdmin.getInstance().getWho().stream()
-                .sorted(Comparator.reverseOrder())
-                .map(UserSummaryBean::new)
-                .collect(Collectors.toList());
+
         stamp = JolAdmin.getDate();
-        myGames.sort(Comparator.comparing(PlayerSummaryBean::isOusted).thenComparing(PlayerSummaryBean::getGame));
-        model.clearGames();
     }
 
-    public List<PlayerSummaryBean> getMyGames() {
-        return myGames;
+    public List<PlayerGameStatusBean> getGames() {
+        return games;
     }
 
     public List<UserSummaryBean> getWho() {
@@ -58,16 +57,8 @@ public class MainBean {
         return chat;
     }
 
-    public int getRefresh() {
-        return refresh;
-    }
-
     public String getStamp() {
         return stamp;
-    }
-
-    public List<String> getRemovedGames() {
-        return removedGames;
     }
 
 }

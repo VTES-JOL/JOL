@@ -210,30 +210,31 @@ function renderRowWithLabel(tid, label) {
 }
 
 function renderMyGames(games) {
-    if (games === null) return;
-    for (var index = 0; index < games.length; index++) {
-        var gameRow = renderRowWithLabel('ownGames', games[index].game);
-        gameRow.removeAttribute('className');
-        if (gameRow.cells.length === 0) {
-            gameRow.insertCell(0);
-            gameRow.insertCell(1);
+    var ownGames = $("#ownGames");
+    ownGames.empty();
+    $.each(games, function (index, game) {
+        var gameRow = $("<tr/>");
+        var gameLink = $("<td/>");
+        var status = $("<td/>");
+        gameLink.html(renderGameLink(game.gameName));
+        if (game.pinged) {
+            status.text("!");
+        } else if (!game.current) {
+            status.text("*");
         }
-        if (games[index].started) {
-            gameRow.cells[0].innerHTML = renderGameLink(games[index].game);
-            gameRow.cells[1].innerHTML = '&nbsp;';
-            if (games[index].pinged) {
-                gameRow.cells[1].innerHTML = '!';
-            } else if (!games[index].current) {
-                gameRow.cells[1].innerHTML = '*';
-            }
-            gameRow.className = games[index].turn === player ? "active" : 'game';
-            gameRow.className += games[index].flagged ? " flagged" : "";
-            gameRow.className += games[index].ousted ? ' ousted' : '';
-        } else {
-            gameRow.cells[0].innerHTML = games[index].game;
-            gameRow.cells[1].innerHTML = 'C' + games[index].cryptSize + ' L' + games[index].libSize + ' G' + games[index].groups;
+        if (game.turn) {
+            gameRow.addClass("active");
         }
-    }
+        if (game.flagged) {
+            gameRow.addClass("flagged");
+        }
+        if (game.ousted) {
+            gameRow.addClass("ousted");
+        }
+        gameRow.append(gameLink);
+        gameRow.append(status);
+        ownGames.append(gameRow);
+    });
 }
 
 function renderGameLink(game, small) {
@@ -1141,7 +1142,7 @@ function callbackMain(data) {
         $("#onlineUsers").show();
         renderOnline('whoson', data.who);
         renderGlobalChat(data.chat);
-        renderMyGames(data.myGames);
+        renderMyGames(data.games);
         removeLabeledRows('ownGames', data.removedGames);
         removeLabeledRows('activeGames', data.removedGames);
         if (data.refresh > 0) {

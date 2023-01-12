@@ -149,20 +149,6 @@ public class JolAdmin {
         }
     }
 
-    public void notifyAboutGame(String name) {
-        notifyAboutGame(name, false);
-    }
-
-    private void notifyAboutGame(String name, boolean removed) {
-        for (PlayerModel model : pmap.values()) {
-            if (removed) {
-                model.removeGame(name);
-            } else {
-                model.changeGame(name);
-            }
-        }
-    }
-
     public synchronized void createGame(String name, Boolean isPublic, PlayerModel player) {
         logger.trace("Creating game {} for player {}", name, player.getPlayer());
         if (mkGame(name)) {
@@ -170,7 +156,6 @@ public class JolAdmin {
             setGamePrivate(name, !isPublic);
             activeSort.add(getGameModel(name));
             actives = new ArrayList<>(activeSort);
-            notifyAboutGame(name);
         }
     }
 
@@ -470,7 +455,6 @@ public class JolAdmin {
         getGameInfo(name).endGame();
         activeSort.remove(getGameModel(name));
         actives = new ArrayList<>(activeSort);
-        notifyAboutGame(name, true);
     }
 
     public String[] getGames() {

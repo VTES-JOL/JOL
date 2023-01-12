@@ -10,17 +10,17 @@ import java.util.stream.Collectors;
 
 public class AllGamesBean {
 
-    private List<SummaryBean> games;
+    private List<GameSummaryBean> games;
 
     public AllGamesBean(PlayerModel model) {
         this.games = JolAdmin.getInstance().getActiveGames()
                 .stream()
                 .map(GameModel::getSummaryBean)
                 .collect(Collectors.toList());
-        games.sort(Comparator.comparing(SummaryBean::getGame));
+        games.sort(Comparator.comparing(GameSummaryBean::getGame));
     }
 
-    public List<SummaryBean> getGames() {
+    public List<GameSummaryBean> getGames() {
         return games;
     }
 }
