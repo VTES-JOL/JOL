@@ -6,69 +6,263 @@
 
 package net.deckserver.dwr.model;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.type.MapType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.base.Strings;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.async.Callback;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import net.deckserver.game.jaxb.FileUtils;
+import io.azam.ulidj.ULID;
+import net.deckserver.DeckParser;
+import net.deckserver.RandomGameName;
+import net.deckserver.dwr.bean.ChatEntryBean;
+import net.deckserver.dwr.bean.GameStatusBean;
+import net.deckserver.game.interfaces.state.Game;
+import net.deckserver.game.interfaces.turn.TurnRecorder;
+import net.deckserver.game.jaxb.XmlFileUtils;
 import net.deckserver.game.jaxb.actions.GameActions;
 import net.deckserver.game.jaxb.state.GameState;
-import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.state.StoreGame;
 import net.deckserver.game.storage.turn.StoreTurnRecorder;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
+import net.deckserver.jobs.CleanupGamesJob;
+import net.deckserver.jobs.PersistStateJob;
+import net.deckserver.jobs.PublicGamesBuilderJob;
+import net.deckserver.storage.json.deck.CardCount;
+import net.deckserver.storage.json.deck.Deck;
+import net.deckserver.storage.json.deck.DeckStats;
+import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.Timestamps;
+import net.deckserver.storage.json.system.*;
+import org.apache.commons.io.FileUtils;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.slf4j.LoggerFactory.getLogger;
 
-/**
- * @author Joe User
- */
 public class JolAdmin {
-
-    public static final String DECK_NOT_FOUND = "Deck not found";
-    private static final String DISCORD_API_VERSION = System.getenv("DISCORD_API_VERSION");
-    private static final String DISCORD_BOT_TOKEN = System.getenv("DISCORD_BOT_TOKEN");
-    private static final String DISCORD_PING_CHANNEL_ID = System.getenv("DISCORD_PING_CHANNEL_ID");
 
     private static final Logger logger = getLogger(JolAdmin.class);
     private static final JolAdmin INSTANCE = new JolAdmin(System.getenv("JOL_DATA"));
-    private final String dir;
-    private final SystemInfo sysInfo;
+    private static final String DISCORD_API_VERSION = System.getenv("DISCORD_API_VERSION");
+    private static final String DISCORD_BOT_TOKEN = System.getenv("DISCORD_BOT_TOKEN");
+    private static final String DISCORD_PING_CHANNEL_ID = System.getenv("DISCORD_PING_CHANNEL_ID");
+    private static final int CHAT_STORAGE = 1000;
+    private static final int CHAT_DISCARD = 100;
+    private final Path BASE_PATH;
     private final Map<String, GameInfo> games;
     private final Map<String, PlayerInfo> players;
+    private final Table<String, String, RegistrationStatus> registrations = HashBasedTable.create();
+    private final Table<String, String, DeckInfo> decks = HashBasedTable.create();
     private final ObjectMapper objectMapper;
     private final Timestamps timestamps;
+    private final TypeFactory typeFactory;
+    private volatile List<ChatEntryBean> chats;
+    private final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
+    private final Map<String, PlayerModel> pmap = new ConcurrentHashMap<>();
+
+    // Cache of users / status
+    private final Cache<String, String> activeUsers = Caffeine.newBuilder()
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .build();
+
+    private final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
+            .expireAfterAccess(30, TimeUnit.MINUTES)
+            .build(this::loadGameState);
+
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
 
     public JolAdmin(String dir) {
-        this.dir = dir;
-        games = new HashMap<>();
-        players = new HashMap<>();
-        sysInfo = new SystemInfo();
+        this.BASE_PATH = Paths.get(dir);
         objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        timestamps = loadTimestamps();
+        typeFactory = objectMapper.getTypeFactory();
+        games = readFile("games.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, GameInfo.class));
+        players = readFile("players.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, PlayerInfo.class));
+        chats = readFile("chats.json", typeFactory.constructCollectionType(List.class, ChatEntryBean.class));
+        timestamps = readFile("timestamps.json", typeFactory.constructType(Timestamps.class));
+        loadRegistrations();
+        loadDecks();
         Unirest.setTimeouts(5000, 10000);
+    }
+
+    public int getRefreshInterval(String gameName) {
+        OffsetDateTime lastChanged = getGameTimeStamp(gameName);
+        OffsetDateTime now = OffsetDateTime.now();
+        long interval = Duration.between(lastChanged, now).getSeconds();
+        if (interval < 60) return 5000;
+        if (interval < 180) return 10000;
+        if (interval < 300) return 30000;
+        return 60000;
+    }
+
+    private <T> T readFile(String fileName, JavaType type) {
+        try {
+            logger.info("Reading data from {}", fileName);
+            return objectMapper.readValue(BASE_PATH.resolve(fileName).toFile(), type);
+        } catch (IOException e) {
+            logger.error("Unable to read {}", fileName, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void writeFile(String fileName, Object object) {
+        try {
+            logger.info("Saving data to {}", fileName);
+            objectMapper.writeValue(BASE_PATH.resolve(fileName).toFile(), object);
+        } catch (IOException e) {
+            logger.error("Unable to write {}", fileName, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void loadRegistrations() {
+        MapType registrationMapType = typeFactory.constructMapType(Map.class, String.class, RegistrationStatus.class);
+        Map<String, Map<String, RegistrationStatus>> registrationsMap = readFile("registrations.json", typeFactory.constructMapType(ConcurrentHashMap.class, typeFactory.constructType(String.class), registrationMapType));
+        registrationsMap.forEach((gameId, gameMap) -> {
+            gameMap.forEach((playerId, registration) -> {
+                registrations.put(gameId, playerId, registration);
+            });
+        });
+    }
+
+    public void loadDecks() {
+        MapType deckMapType = typeFactory.constructMapType(Map.class, String.class, DeckInfo.class);
+        Map<String, Map<String, DeckInfo>> decksMapFile = readFile("decks.json", typeFactory.constructMapType(ConcurrentHashMap.class, typeFactory.constructType(String.class), deckMapType));
+        decksMapFile.forEach((playerName, decksMap) -> {
+            decksMap.forEach((deckName, deckInfo) -> {
+                decks.put(playerName, deckName, deckInfo);
+            });
+        });
+    }
+
+    public synchronized void persistState() {
+        writeFile("chats.json", chats);
+        writeFile("timestamps.json", timestamps);
+        writeFile("games.json", games);
+        writeFile("players.json", players);
+        writeFile("registrations.json", registrations);
+        writeFile("decks.json", decks);
+    }
+
+    public synchronized void closeGames() {
+        games.values().stream()
+                .filter(gameInfo -> gameInfo.getStatus().equals(GameStatus.ACTIVE))
+                .map(gameInfo -> new GameStatusBean(gameInfo.getName()))
+                .forEach(gameStatus -> {
+                    long activePlayers = gameStatus.getPlayers().stream().filter(player -> !player.isOusted()).count();
+                    if (activePlayers == 0) {
+                        endGame(gameStatus.getName());
+                        String message = String.format("{%s} has been closed.", gameStatus.getName());
+                        chat("SYSTEM", message);
+                    }
+                });
+    }
+
+    public synchronized void buildPublicGames() {
+        long publicGamesCount = games.values().stream()
+                .filter(gameInfo -> gameInfo.getStatus().equals(GameStatus.STARTING))
+                .filter(gameInfo -> gameInfo.getVisibility().equals(Visibility.PUBLIC))
+                .count();
+        long gamesNeeded = 5 - publicGamesCount;
+        for (int x = 0; x < gamesNeeded; x++) {
+            String gameName = RandomGameName.generateName();
+            createGame(gameName, true, "SYSTEM");
+            String message = String.format("New public game {%s} has been created.", gameName);
+            chat("SYSTEM", message);
+        }
+    }
+
+    public PlayerModel getPlayerModel(String name) {
+        if (name == null) {
+            return new PlayerModel(null, false);
+        } else {
+            PlayerModel bean = pmap.get(name);
+            if (bean == null) {
+                logger.info("Creating new Player model for {}", name);
+                bean = new PlayerModel(name, true);
+                pmap.put(name, bean);
+            }
+            return bean;
+        }
+    }
+
+    public GameModel getGameModel(String name) {
+        GameModel bean = gmap.get(name);
+        if (bean == null) {
+            bean = new GameModel(name);
+            gmap.put(name, bean);
+        }
+        return bean;
+    }
+
+    public Set<String> getWho() {
+        return activeUsers.asMap().keySet();
+    }
+
+    public void remove(String player) {
+        logger.info("removing player");
+        pmap.remove(player);
+        for (GameModel gameModel : gmap.values()) {
+            gameModel.resetView(player);
+        }
+    }
+
+    public synchronized void createGame(String gameName, Boolean isPublic, String playerName) {
+        logger.trace("Creating game {} for player {}", gameName, playerName);
+        if (gameName.length() > 2 || !existsGame(gameName)) {
+            try {
+                games.put(gameName, new GameInfo(gameName, ULID.random(), playerName, Visibility.fromBoolean(isPublic), GameStatus.STARTING));
+            } catch (Exception e) {
+                logger.error("Error creating game", e);
+            }
+        }
+    }
+
+    public synchronized void chat(String player, String message) {
+        String sanitize = ChatParser.sanitizeText(message);
+        String parsedMessage = ChatParser.parseText(sanitize);
+        ChatEntryBean chatEntryBean = new ChatEntryBean(player, parsedMessage);
+        chats.add(chatEntryBean);
+        if (chats.size() > CHAT_STORAGE) {
+            chats = chats.subList(CHAT_DISCARD, CHAT_STORAGE);
+        }
+        pmap.values()
+                .forEach(playerModel -> playerModel.chat(chatEntryBean));
+    }
+
+    public List<ChatEntryBean> getChats() {
+        return this.chats;
     }
 
     public void writeSnapshot(String id, DsGame state, DsTurnRecorder actions, String turn) {
@@ -82,184 +276,291 @@ public class JolAdmin {
         gactions.setGameCounter("1");
         StoreTurnRecorder wrec = new StoreTurnRecorder(gactions);
         ModelLoader.createRecorder(wrec, actions);
-        String fileName = Strings.isNullOrEmpty(turn) ? "actions.xml" : "actions-"+turn+".xml";
-        File actionsFile = Paths.get(dir).resolve(id).resolve(fileName).toFile();
-        FileUtils.saveGameActions(gactions, actionsFile);
+        String fileName = Strings.isNullOrEmpty(turn) ? "actions.xml" : "actions-" + turn + ".xml";
+        Path actionsPath = BASE_PATH.resolve("games").resolve(id).resolve(fileName);
+        XmlFileUtils.saveGameActions(gactions, actionsPath);
     }
 
     private void writeState(String id, DsGame state, String turn) {
         GameState gstate = new GameState();
         StoreGame wgame = new StoreGame(gstate);
         ModelLoader.createModel(wgame, state);
-        String fileName = Strings.isNullOrEmpty(turn) ? "game.xml" : "game-"+turn+".xml";
-        File gameFile = Paths.get(dir).resolve(id).resolve(fileName).toFile();
-        FileUtils.saveGameState(gstate, gameFile);
-    }
-
-    private Timestamps loadTimestamps() {
-        try {
-            return objectMapper.readValue(new File(dir, "timestamps.json"), Timestamps.class);
-        } catch (IOException e) {
-            return new Timestamps();
-        }
+        String fileName = Strings.isNullOrEmpty(turn) ? "game.xml" : "game-" + turn + ".xml";
+        Path gamePath = BASE_PATH.resolve("games").resolve(id).resolve(fileName);
+        XmlFileUtils.saveGameState(gstate, gamePath);
     }
 
     public void shutdown() {
         try {
-            saveTimestamps();
             Unirest.shutdown();
+            persistState();
+            scheduler.shutdownNow();
         } catch (Exception e) {
             logger.error("Unable to cleanly shutdown", e);
         }
     }
 
-    private void saveTimestamps() throws Exception {
-        logger.info("Saving timestamp data");
-        objectMapper.writeValue(new File(dir, "timestamps.json"), timestamps);
+    public void setup() {
+        scheduler.scheduleAtFixedRate(new PersistStateJob(), 1, 5, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 10, 10, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 1, TimeUnit.HOURS);
     }
 
     public static JolAdmin getInstance() {
         return INSTANCE;
     }
 
-    private synchronized static String readFile(File file) throws IOException {
-        byte[] bytes = Files.readAllBytes(file.toPath());
-        return new String(bytes);
-    }
-
-    private synchronized static String readIsoFile(File file) throws IOException {
-        byte[] bytes = Files.readAllBytes(file.toPath());
-        return new String(bytes, Charset.forName("ISO8859-1"));
-    }
-
-
-    private synchronized static void writeFile(File file, String contents)
-            throws IOException {
-        byte[] bytes = contents.getBytes("utf-8");
-        Files.write(file.toPath(), bytes);
-    }
-
-    public void setRole(String player, String role, boolean flag) {
-        PlayerInfo playerInfo = getPlayerInfo(player);
-        switch (role) {
-            case "admin":
-                playerInfo.setAdmin(flag);
-                break;
-            case "super":
-                playerInfo.setSuper(flag);
-                break;
-            case "judge":
-                playerInfo.setJudge(flag);
-                break;
-        }
-    }
-
     public boolean existsPlayer(String name) {
-        return name != null && sysInfo.hasPlayer(name);
+        return name != null && players.containsKey(name);
     }
 
     public boolean existsGame(String name) {
-        return name != null && sysInfo.hasGame(name);
+        return name != null && games.containsKey(name);
     }
 
-    PlayerInfo getPlayerInfo(String name) {
-        if (players.containsKey(name))
-            return players.get(name);
-        PlayerInfo ret = new PlayerInfo(name);
-        players.put(name, ret);
-        return ret;
+    public DeckFormat getDeckFormat(String playerName, String deckName) {
+        return loadDeckInfo(playerName, deckName).getFormat();
     }
 
-    GameInfo getGameInfo(String game) {
-        if (games.containsKey(game))
-            return games.get(game);
-        GameInfo ret = new GameInfo(game);
-        games.put(game, ret);
-        return ret;
+    private ExtendedDeck getDeck(String deckId) {
+        return readFile(String.format("decks/%s.json", deckId), typeFactory.constructType(ExtendedDeck.class));
     }
 
-    public boolean createDeck(String player, String name, String deck) {
-        return getPlayerInfo(player).createDeck(name, deck);
+    public Deck getGameDeck(String gameName, String playerName) {
+        RegistrationStatus status = registrations.get(gameName, playerName);
+        try {
+            String deckId = status.getDeckId();
+            String gameId = getGameId(gameName);
+            ExtendedDeck extendedDeck = readFile(String.format("games/%s/%s.json", gameId, deckId), typeFactory.constructType(ExtendedDeck.class));
+            return extendedDeck.getDeck();
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
+    private void copyDeck(String deckId, String gameId) {
+        try {
+            Path deckPath = BASE_PATH.resolve("decks").resolve(deckId + ".json");
+            Path gamePath = BASE_PATH.resolve("games").resolve(gameId).resolve(deckId + ".json");
+            logger.info("Copying {} to {}", deckPath, gamePath);
+            Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            logger.error("Unable to load deck for {}", deckId, e);
+        }
+    }
+
+    public String getDeckContents(String deckId) throws IOException {
+        ExtendedDeck deck = getDeck(deckId);
+        StringBuilder builder = new StringBuilder();
+        Consumer<CardCount> itemBuilder = cardCount -> builder.append(cardCount.getCount()).append(" x ").append(cardCount.getName()).append("\n");
+        deck.getDeck().getCrypt().getCards().forEach(itemBuilder);
+        builder.append("\n");
+        deck.getDeck().getLibrary().getCards().forEach(libraryCard -> libraryCard.getCards().forEach(itemBuilder));
+        return builder.toString();
+    }
+
+    public String getLegacyContents(String deckId) throws IOException {
+        Path deckPath = BASE_PATH.resolve("decks").resolve(deckId + ".txt");
+        return Files.readString(deckPath);
+    }
+
+    public void selectDeck(String playerName, String deckName) {
+        if (playerName != null && deckName != null) {
+            getPlayerModel(playerName).loadDeck(deckName);
+        }
+    }
+
+    public void parseDeck(String playerName, String deckName, String contents) {
+        if (playerName != null && contents != null) {
+            getPlayerModel(playerName).setContents(contents);
+            getPlayerModel(playerName).setDeckName(deckName);
+        }
+    }
+
+    public void newDeck(String playerName) {
+        if (playerName != null) {
+            getPlayerModel(playerName).clearDeck();
+        }
+    }
+
+    public void saveDeck(String playerName, String deckName, String contents) {
+        if (playerName != null && contents != null && deckName != null) {
+            PlayerModel model = getPlayerModel(playerName);
+            model.setDeckName(deckName);
+            model.setContents(contents);
+            ExtendedDeck deck = DeckParser.parseDeck(contents);
+            DeckInfo deckInfo;
+            if (decks.contains(playerName, deckName)) {
+                deckInfo = decks.get(playerName, deckName);
+                deckInfo.setFormat(DeckFormat.MODERN);
+            } else {
+                deckInfo = new DeckInfo(ULID.random(), deckName, DeckFormat.MODERN);
+            }
+            decks.put(playerName, deckName, deckInfo);
+            writeFile(String.format("decks/%s.json", deckInfo.getDeckId()), deck);
+        }
+    }
+
+    public void deleteDeck(String playerName, String deckName) {
+        if (playerName != null && deckName != null) {
+            getPlayerModel(playerName).clearDeck();
+            this.decks.remove(playerName, deckName);
+        }
+    }
+
+    private DeckInfo loadDeckInfo(String playerName, String deckName) {
+        return decks.get(playerName, deckName);
+    }
+
+    private PlayerInfo loadPlayerInfo(String playerName) {
+        if (players.containsKey(playerName)) {
+            return players.get(playerName);
+        }
+        throw new IllegalArgumentException("Player: " + playerName + " was not found.");
+    }
+
+    private GameInfo loadGameInfo(String gameName) {
+        if (games.containsKey(gameName)) {
+            return games.get(gameName);
+        }
+        throw new IllegalArgumentException("Game: " + gameName + " was not found.");
+    }
+
+    public JolGame getGame(String gameName) {
+        return gameCache.get(gameName);
+    }
+
+    private JolGame loadGameState(String gameName) {
+        logger.info("Loading {}", gameName);
+        GameInfo gameInfo = loadGameInfo(gameName);
+        String gameId = gameInfo.getId();
+        Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.xml");
+        GameState gameState = XmlFileUtils.loadGameState(gameStatePath);
+        Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions.xml");
+        GameActions gameActions = XmlFileUtils.loadGameActions(gameActionsPath);
+        DsGame deckServerState = new DsGame();
+        DsTurnRecorder deckServerActions = new DsTurnRecorder();
+        ModelLoader.createModel(deckServerState, new StoreGame(gameState));
+        ModelLoader.createRecorder(deckServerActions, new StoreTurnRecorder(gameActions));
+        return new JolGame(gameId, deckServerState, deckServerActions);
+    }
+
+    public void saveGameState(JolGame game) {
+        logger.info("Saving {}", game.getName());
+        timestamps.setGameTimestamp(game.getName());
+        String gameId = game.getId();
+        Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.xml");
+        Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions.xml");
+        Game deckServerState = game.getState();
+        TurnRecorder deckServerActions = game.getTurnRecorder();
+        GameState gameState = new GameState();
+        GameActions gameActions = new GameActions();
+        gameActions.setCounter("1");
+        gameActions.setGameCounter("1");
+        ModelLoader.createModel(new StoreGame(gameState), deckServerState);
+        ModelLoader.createRecorder(new StoreTurnRecorder(gameActions), deckServerActions);
+        XmlFileUtils.saveGameState(gameState, gameStatePath);
+        XmlFileUtils.saveGameActions(gameActions, gameActionsPath);
     }
 
     public boolean registerPlayer(String name, String password, String email) {
         if (existsPlayer(name) || name.length() == 0)
             return false;
-        players.put(name, new PlayerInfo(name, password, email));
+        String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
+        players.put(name, new PlayerInfo(name, ULID.random(), email, hash, null, new HashSet<>()));
         return true;
     }
 
-    public void changePassword(String player, String newPassword) {
-        getPlayerInfo(player).setPassword(newPassword);
+    public void changePassword(String player, String password) {
+        String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
+        loadPlayerInfo(player).setHash(hash);
     }
 
-    public void updateProfile(String player, String email, String discordID, boolean pingDiscord) {
-        getPlayerInfo(player).updateProfile(email, discordID, pingDiscord);
+    public void updateProfile(String playerName, String email, String discordID) {
+        PlayerInfo playerInfo = loadPlayerInfo(playerName);
+        playerInfo.setDiscordId(discordID);
+        playerInfo.setEmail(email);
     }
 
-    public boolean authenticate(String player, String password) {
-        return existsPlayer(player)
-                && getPlayerInfo(player).authenticate(password);
-    }
-
-    public boolean addPlayerToGame(String gameName, String playerName,
-                                   String deckName) {
-        PlayerInfo player = getPlayerInfo(playerName);
-        String deckKey = player.getDeckKey(deckName);
-        String deckContents = player.getDeck(deckKey);
-        GameInfo game = getGameInfo(gameName);
-        List<String> currentPlayers = Arrays.asList(game.getPlayers());
-        if (!game.isOpen()) {
-            return false;
-        } else if (game.getRegisteredPlayerCount() == 5 && !currentPlayers.contains(playerName)) {
+    public boolean authenticate(String playerName, String password) {
+        if (existsPlayer(playerName)) {
+            PlayerInfo playerInfo = loadPlayerInfo(playerName);
+            return BCrypt.checkpw(password, playerInfo.getHash());
+        } else {
             return false;
         }
-        game.addPlayer(playerName, deckKey, deckContents);
-        player.addGame(gameName, deckKey);
-        return true;
     }
 
-    public boolean receivesTurnSummaries(String playerName) {
-        PlayerInfo player = getPlayerInfo(playerName);
-        return player.receivesTurnSummaries();
+    public long getRegisteredPlayerCount(String gameName) {
+        return registrations.row(gameName).keySet().size();
     }
 
-    public boolean receivesPing(String playerName) {
-        PlayerInfo player = getPlayerInfo(playerName);
-        return player.receivesPing();
+    public RegistrationStatus getRegistration(String gameName, String playerName) {
+        return registrations.get(gameName, playerName);
+    }
+
+    public void registerDeck(String gameName, String playerName, String deckName) {
+        DeckInfo deckInfo = decks.get(playerName, deckName);
+        GameInfo gameInfo = loadGameInfo(gameName);
+        String result = "Successfully registered " + deckName + " in game " + gameName;
+        if (!gameInfo.getStatus().equals(GameStatus.STARTING)) {
+            result = "Game is not starting.  Unable to register deck.";
+        }
+        if (deckInfo == null) {
+            result = "Unable to find deck '" + deckName + "'.";
+        }
+        if (deckInfo.getFormat().equals(DeckFormat.LEGACY)) {
+            result = "Unable to register legacy formats in new games.  Please edit, and save deck to convert to new format.";
+        }
+        if (getRegisteredPlayerCount(gameName) >= 5) {
+            result = "Unable to register deck.  Already has 5 players registered.";
+        }
+        DeckStats stats = getDeck(deckInfo.getDeckId()).getStats();
+        if (stats == null || !stats.isValid()) {
+            result = "Unable to register deck.  Not valid.";
+        }
+        RegistrationStatus registrationStatus = registrations.get(gameName, playerName);
+        if (registrationStatus == null) {
+            result = "Unable to register deck in game that has no invite";
+        }
+        registrationStatus.setDeckId(deckInfo.getDeckId());
+        registrationStatus.setDeckName(deckInfo.getDeckName());
+        registrationStatus.setValid(stats.isValid());
+        registrationStatus.setSummary(stats.getSummary());
+        getPlayerModel(playerName).setMessage(result);
     }
 
     public void recordPlayerAccess(String playerName) {
-        this.timestamps.recordPlayerAccess(playerName);
+        if (playerName != null) {
+            this.timestamps.recordPlayerAccess(playerName);
+            this.activeUsers.put(playerName, OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME));
+        }
     }
 
-    public void recordPlayerAccess(String player, String game) {
-        this.timestamps.recordPlayerAccess(player, game);
+    public void recordPlayerAccess(String playerName, String gameName) {
+        this.timestamps.recordPlayerAccess(playerName, gameName);
     }
 
-    public OffsetDateTime getGameTimeStamp(String game) {
-        return this.timestamps.getGameTimestamp(game);
+    public OffsetDateTime getGameTimeStamp(String gameName) {
+        return this.timestamps.getGameTimestamp(gameName);
     }
 
     public static String getDate() {
         return OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
     }
 
-    public OffsetDateTime getPlayerAccess(String player) {
-        return this.timestamps.getPlayerAccess(player);
+    public OffsetDateTime getPlayerAccess(String playerName) {
+        return this.timestamps.getPlayerAccess(playerName);
     }
 
-    public OffsetDateTime getPlayerAccess(String player, String game) {
-        return this.timestamps.getPlayerAccess(player, game);
+    public OffsetDateTime getPlayerAccess(String playerName, String gameName) {
+        return this.timestamps.getPlayerAccess(playerName, gameName);
     }
 
-    public boolean isPlayerPinged(String player, String game) {
-        return this.timestamps.isPlayerPinged(player, game);
+    public boolean isPlayerPinged(String playerName, String gameName) {
+        return this.timestamps.isPlayerPinged(playerName, gameName);
     }
 
-    /**
-     * @return true if player was pinged; false if player was already pinged
-     */
     public boolean pingPlayer(String playerName, String gameName) {
         if (isPlayerPinged(playerName, gameName)) {
             logger.debug("{} already pinged for {}; not pinging again", playerName, gameName);
@@ -269,745 +570,165 @@ public class JolAdmin {
         this.timestamps.pingPlayer(playerName, gameName);
 
         //Ping on Discord
-        PlayerInfo player = getPlayerInfo(playerName);
-        if (player != null
-                && player.getDiscordID() != null
-                && player.receivesDiscordPing()) {
-            Unirest.post("https://discord.com/api/v{api-version}/channels/{channel-id}/messages")
-                    .routeParam("api-version", DISCORD_API_VERSION)
-                    .routeParam("channel-id", DISCORD_PING_CHANNEL_ID)
-                    .header("Content-type", "application/json")
-                    .header("Authorization", String.format("Bot %s", DISCORD_BOT_TOKEN))
-                    .body(String.format("{\"content\":\"<@!%s> to %s\"}", player.getDiscordID(), gameName))
-                    .asStringAsync(new Callback<String>() {
-                        public void completed(HttpResponse<String> response) {
-                            int responseCode = response.getStatus();
-                            if (responseCode != 200) {
-                                logger.warn(
-                                        "Non-200 response calling Discord ({}); response body: {}",
-                                        String.valueOf(responseCode), response.getBody());
-                            }
-                        }
-
-                        public void failed(UnirestException e) {
-                            logger.error("Error calling Discord", e);
-                        }
-
-                        public void cancelled() {
-                            logger.warn("Discord call was cancelled");
-                        }
-                    });
-        }
-        return true;
-    }
-
-    public void clearPing(String player, String game) {
-        this.timestamps.clearPing(player, game);
-    }
-
-    public boolean mkGame(String name) {
-        if (name.length() < 2 || name.equals("admin") || name.equals("login") || name.equals("player") ||
-                name.equals("card") || name.equals("showdeck") || name.equals("register") ||
-                name.equals("msg") || existsGame(name) || existsPlayer(name)) {
-            return false;
-        }
+        PlayerInfo player = loadPlayerInfo(playerName);
         try {
-            games.put(name, new GameInfo(name, true));
+            if (player != null && player.getDiscordId() != null) {
+                Unirest.post("https://discord.com/api/v{api-version}/channels/{channel-id}/messages")
+                        .routeParam("api-version", DISCORD_API_VERSION)
+                        .routeParam("channel-id", DISCORD_PING_CHANNEL_ID)
+                        .header("Content-type", "application/json")
+                        .header("Authorization", String.format("Bot %s", DISCORD_BOT_TOKEN))
+                        .body(String.format("{\"content\":\"<@!%s> to %s\"}", player.getDiscordId(), gameName))
+                        .asStringAsync(new Callback<>() {
+                            public void completed(HttpResponse<String> response) {
+                                int responseCode = response.getStatus();
+                                if (responseCode != 200) {
+                                    logger.warn(
+                                            "Non-200 response calling Discord ({}); response body: {}",
+                                            String.valueOf(responseCode), response.getBody());
+                                }
+                            }
+
+                            public void failed(UnirestException e) {
+                                logger.error("Error calling Discord", e);
+                            }
+
+                            public void cancelled() {
+                                logger.warn("Discord call was cancelled");
+                            }
+                        });
+            }
         } catch (Exception e) {
-            logger.error("Error creating game", e);
-            return false;
+            logger.error("Unable to ping player", e);
         }
         return true;
     }
 
-    public JolGame getGame(String name) {
-        return getGameInfo(name).getGame();
+    public void clearPing(String playerName, String gameName) {
+        this.timestamps.clearPing(playerName, gameName);
     }
 
-    public String getId(String name) {
-        return sysInfo.getKey(name);
+    public Set<String> getGames() {
+        return games.keySet();
     }
 
-    public void saveGame(JolGame jolgame) {
-        this.timestamps.setGameTimestamp(jolgame.getName());
-        getGameInfo(jolgame.getName()).write();
+    public Set<String> getGames(String playerName) {
+        return registrations.column(playerName).keySet();
     }
 
-    public void endGame(String game) {
-        getGameInfo(game).endGame();
-    }
-
-    public String[] getGames() {
-        return sysInfo.getGames();
-    }
-
-    public String[] getGames(String player) {
-        return getPlayerInfo(player).getGames();
-    }
-
-    public String[] getPlayers(String game) {
-        return getGameInfo(game).getPlayers();
+    public Set<String> getPlayers(String gameName) {
+        return registrations.row(gameName).keySet();
     }
 
     public String getEmail(String player) {
-        return getPlayerInfo(player).getEmail();
+        return loadPlayerInfo(player).getEmail();
     }
 
     public String getDiscordID(String player) {
-        return getPlayerInfo(player).getDiscordID();
-    }
-
-    public boolean receivesDiscordPing(String player) {
-        return getPlayerInfo(player).receivesDiscordPing();
+        return loadPlayerInfo(player).getDiscordId();
     }
 
     public boolean isAdmin(String player) {
-        return existsPlayer(player) && getPlayerInfo(player).isAdmin();
+        return loadPlayerInfo(player).getRoles().contains(PlayerRole.ADMIN);
+    }
+
+    public boolean isSuperUser(String playerName) {
+        return loadPlayerInfo(playerName).getRoles().contains(PlayerRole.SUPER_USER);
+    }
+
+    public boolean isJudge(String playerName) {
+        return loadPlayerInfo(playerName).getRoles().contains(PlayerRole.JUDGE);
     }
 
     public String getOwner(String gameName) {
-        return getGameInfo(gameName).getOwner();
+        String playerName = loadGameInfo(gameName).getOwner();
+        if (!players.containsKey(playerName)) {
+            playerName = "SYSTEM";
+        }
+        return playerName;
     }
 
-    public void setOwner(String game, String player) {
-        getGameInfo(game).setOwner(player);
-        getPlayerInfo(player).claimGame(game);
+    public Set<String> getDeckNames(String playerName) {
+        return decks.row(playerName).keySet();
     }
 
-    public void setGamePrivate(String game, Boolean isPrivate) {
-        getGameInfo(game).setPrivate(isPrivate);
+    public Set<String> getPlayers() {
+        return players.keySet();
     }
 
-    public String getDeck(String player, String name) {
-        PlayerInfo info = getPlayerInfo(player);
-        return info.getDeck(info.getDeckKey(name));
+    public void invitePlayer(String gameName, String playerName) {
+        registrations.put(gameName, playerName, new RegistrationStatus());
     }
 
-    public String getDeckName(String game, String player) {
-        PlayerInfo pinfo = getPlayerInfo(player);
-        return pinfo.getGameDeckName(game);
+    public boolean isInGame(String gameName, String playerName) {
+        return registrations.contains(gameName, playerName);
     }
 
-    public String getGameDeck(String game, String player) {
-        GameInfo info = getGameInfo(game);
-        return info.getPlayerDeck(player);
-    }
-
-    public String[] getDeckNames(String player) {
-        return getPlayerInfo(player).getDeckNames();
-    }
-
-    public List<String> getPlayers() {
-        return sysInfo.getPlayers();
-    }
-
-    public void invitePlayer(String gameName, String player) {
-        getPlayerInfo(player).invite(gameName);
-    }
-
-    public boolean isInvited(String gameName, String player) {
-        return getPlayerInfo(player).isInvited(gameName);
-    }
-
-    public boolean isOpen(String gameName) {
-        return getGameInfo(gameName).isOpen();
+    public boolean isStarting(String gameName) {
+        return loadGameInfo(gameName).getStatus().equals(GameStatus.STARTING);
     }
 
     public boolean isActive(String gameName) {
-        return getGameInfo(gameName).isActive();
-    }
-
-    public boolean isFinished(String gameName) {
-        return getGameInfo(gameName).isFinished();
+        return loadGameInfo(gameName).getStatus().equals(GameStatus.ACTIVE);
     }
 
     public boolean isPrivate(String gameName) {
-        return getGameInfo(gameName).isPrivate();
+        return loadGameInfo(gameName).getVisibility().equals(Visibility.PRIVATE);
     }
 
-    public void startGame(String game) {
-        getGameInfo(game).startGame();
+    public boolean isPublic(String gameName) {
+        return loadGameInfo(gameName).getVisibility().equals(Visibility.PUBLIC);
     }
 
-    public void removeDeck(String player, String deckname) {
-        logger.trace("Removing deck: {} from player: {}", deckname, player);
-        getPlayerInfo(player).removeDeck(deckname);
-    }
-
-    public boolean isSuperUser(String player) {
-        return existsPlayer(player) && getPlayerInfo(player).isSuperUser();
-    }
-
-    public boolean isRegistered(String gameName, String player) {
-        String playerKey = sysInfo.getKey(player);
-        return getGameInfo(gameName).getValue(playerKey) != null;
-    }
-
-    public boolean isJudge(String player) {
-        return existsPlayer(player) && getPlayerInfo(player).isJudge();
-    }
-
-    public String getDeckId(String player, String deckName) {
-        return getPlayerInfo(player).getDeckKey(deckName);
-    }
-
-    public String getPlayerId(String player) {
-        return getPlayerInfo(player).id;
-    }
-
-    public void replacePlayer(String game, String oldPlayer, String newPlayer) {
-        // don't replace a player with someone already in game
-        if (Arrays.asList(getGameInfo(game).getPlayers()).contains(newPlayer)) {
-            return;
-        }
-        getPlayerInfo(oldPlayer).removeGame(game);
-        getPlayerInfo(newPlayer).addGame(game, "replaced");
-        getGameInfo(game).replacePlayer(oldPlayer, newPlayer);
-    }
-
-    class GameInfo extends Info {
-        private final String id;
-        JolGame game;
-        String gameName;
-
-        private DsGame state;
-        private DsTurnRecorder actions;
-
-        GameInfo(String name) {
-            this(name, sysInfo.getKey(name), false);
-        }
-
-        GameInfo(String name, String id, boolean init) {
-            super(id + "/game.properties", init);
-            this.id = id;
-            gameName = name;
-            if (!init && info.size() == 0)
-                throw new IllegalArgumentException("Game " + name + " doesn't exist.");
-            else if (init && info.size() > 0)
-                throw new IllegalArgumentException("Game " + name + " already exists.");
-        }
-
-        GameInfo(String name, boolean create) {
-            this(name, sysInfo.newGame(name), true);
-            createGame(name);
-        }
-
-        private File getGameDir() {
-            return new File(dir, id);
-        }
-
-        public JolGame getGame() {
-            if (game == null)
-                loadGame(gameName);
-            return game;
-        }
-
-        private void createGame(String name) {
+    public void startGame(String gameName) {
+        GameInfo gameInfo = games.get(gameName);
+        DsGame state = new DsGame();
+        DsTurnRecorder actions = new DsTurnRecorder();
+        JolGame game = new JolGame(gameInfo.getId(), state, actions);
+        game.initGame(gameName);
+        Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId());
+        if (!Files.exists(gamePath)) {
             try {
-                getGameDir().mkdir();
-                info.setProperty("state", "open");
-            } catch (Exception ie) {
-                logger.error("Error creating game {}", ie);
-                throw new IllegalStateException("Couldn't initialize game "
-                        + name);
-            }
-        }
-
-        private synchronized void loadGame(String name) {
-            logger.debug("Loading game {}", name);
-            File gameFile = new File(getGameDir(), "game.xml");
-            GameState gstate = FileUtils.loadGameState(gameFile);
-            File actionsFile = new File(getGameDir(), "actions.xml");
-            GameActions gactions = FileUtils.loadGameActions(actionsFile);
-            state = new DsGame();
-            actions = new DsTurnRecorder();
-            ModelLoader.createModel(state, new StoreGame(gstate));
-            ModelLoader.createRecorder(actions, new StoreTurnRecorder(gactions));
-            game = new JolGame(id, state, actions);
-        }
-
-        String getHeader() {
-            return "Deckserver 3.0 game file";
-        }
-
-        String getOwner() {
-            return info.getProperty("owner");
-        }
-
-        void setOwner(String player) {
-            info.setProperty("owner", player);
-            write();
-        }
-
-        synchronized String getPlayerDeck(String player) {
-            String playerKey = sysInfo.getKey(player);
-            File deckFile = new File(getGameDir(), playerKey + ".deck");
-            if (!deckFile.exists())
-                return JolAdmin.DECK_NOT_FOUND;
-            try {
-                return readFile(deckFile);
-            } catch (IOException ie) {
-                return JolAdmin.DECK_NOT_FOUND;
-            }
-        }
-
-        synchronized void addPlayer(String name, String deckKey, String deck) {
-            String playerKey = sysInfo.getKey(name);
-            info.setProperty(playerKey, deckKey);
-            try {
-                File deckFile = new File(getGameDir(), playerKey + ".deck");
-                writeFile(deckFile, deck);
-            } catch (IOException ie) {
-                logger.error("Error creating player {}", ie);
-            }
-            write();
-        }
-
-        synchronized void replacePlayer(String oldPlayer, String newPlayer) {
-            String oldPlayerKey = sysInfo.getKey(oldPlayer);
-            String newPlayerKey = sysInfo.getKey(newPlayer);
-            String deckKey = info.getProperty(oldPlayerKey);
-            info.remove(oldPlayerKey);
-            info.setProperty(newPlayerKey, deckKey);
-            game.replacePlayer(oldPlayer, newPlayer);
-            Path oldPlayerDeck = getGameDir().toPath().resolve(oldPlayerKey + ".deck");
-            Path newPlayerDeck = getGameDir().toPath().resolve(newPlayerKey + ".deck");
-            try {
-                Files.copy(oldPlayerDeck, newPlayerDeck, StandardCopyOption.REPLACE_EXISTING);
+                logger.info("Creating game directory: {}", gamePath);
+                Files.createDirectory(gamePath);
             } catch (IOException e) {
-                logger.error("Unable to copy deck, may not exist in the first place", e);
-            }
-            write();
-        }
-
-        synchronized void endGame() {
-            info.setProperty("state", "finished");
-            // PENDING generate state html, archive all other game artifacts.
-            write();
-        }
-
-        private void preStart() {
-            info.setProperty("state", "closed");
-            state = new DsGame();
-            actions = new DsTurnRecorder();
-            game = new JolGame(id, state, actions);
-            game.initGame(gameName);
-            regDecks();
-        }
-
-        synchronized void startGame() {
-            preStart();
-            getGame().startGame();
-            write();
-        }
-
-        synchronized void startGame(List<String> playerSeating) {
-            preStart();
-            getGame().startGame(playerSeating);
-            write();
-        }
-
-        private void regDecks() {
-            String[] players = getPlayers();
-            for (String player : players) {
-                String deck = getPlayerDeck(player);
-                if (deck != null) {
-                    getGame().addPlayer(CardSearch.INSTANCE, player, deck);
-                }
+                logger.error("unable to create game directory");
+                return;
             }
         }
-
-        public String[] getPlayers() {
-            Collection<String> ps = new LinkedList<>();
-            for (Object o : info.keySet()) {
-                String k = (String) o;
-                if (k.startsWith("player")) {
-                    ps.add(sysInfo.getValue(k));
-                }
+        registrations.row(gameName).forEach((playerName, registration) -> {
+            Deck deck = getDeck(registration.getDeckId()).getDeck();
+            if (deck != null) {
+                game.addPlayer(playerName, deck);
+                copyDeck(registration.getDeckId(), gameInfo.getId());
             }
-            return ps.toArray(new String[0]);
-        }
-
-        public long getRegisteredPlayerCount() {
-            return info.entrySet().stream()
-                    .filter(e -> ((String) e.getKey()).startsWith("player"))
-                    .filter(e -> ((String) e.getValue()).startsWith("deck"))
-                    .count();
-        }
-
-        boolean isOpen() {
-            return info.getProperty("state", "closed").equals("open");
-        }
-
-        boolean isActive() {
-            return info.getProperty("state", "closed").equals("closed");
-        }
-
-        boolean isFinished() {
-            return info.getProperty("state", "finished").equals("finished");
-        }
-
-        protected void write() {
-            dowrite();
-        }
-
-        synchronized void dowrite() {
-            super.write();
-            if (game != null) {
-                logger.debug("Saving game {}", gameName);
-                writeState(id, state, null);
-                writeActions(id, actions, null);
-            }
-        }
-
-        public boolean isPrivate() {
-            return info.getProperty("private", "false").equals("true");
-        }
-
-        public void setPrivate(Boolean flag) {
-            info.setProperty("private", flag.toString());
+        });
+        if (game.getPlayers().size() >= 1 && game.getPlayers().size() <= 5) {
+            game.startGame();
+            saveGameState(game);
+            gameInfo.setStatus(GameStatus.ACTIVE);
         }
     }
 
-    class PlayerInfo extends Info {
-
-        final static String DISCORD_ID_KEY = "discordID";
-        final static String PING_DISCORD_KEY = "pingDiscord";
-
-        private final String id;
-
-        PlayerInfo(String name, String password, String email) {
-            this(name, sysInfo.newPlayer(name), true);
-            getPlayerDir().mkdir();
-            info.setProperty("name", name);
-            setPassword(password);
-            setEmail(email);
-        }
-
-        PlayerInfo(String name) {
-            this(name, sysInfo.getKey(name), false);
-        }
-
-        private PlayerInfo(String name, String id, boolean init) {
-            super(id + "/player.properties", init);
-            this.id = id;
-            if (!init && info.size() == 0)
-                throw new IllegalArgumentException("Player " + name
-                        + " doesn't exist.");
-            else if (init && info.size() > 0)
-                throw new IllegalArgumentException("Player " + name
-                        + " already exists.");
-        }
-
-        private File getPlayerDir() {
-            return new File(dir, id);
-        }
-
-        public void setPassword(String password) {
-            String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
-            info.setProperty("hash", hash);
-            write();
-        }
-
-        boolean authenticate(String password) {
-            String hash = info.getProperty("hash");
-            return BCrypt.checkpw(password, hash);
-        }
-
-
-        void addGame(String name, String key) {
-            info.setProperty(sysInfo.getKey(name), key);
-            write();
-        }
-
-        void removeGame(String name) {
-            info.remove(sysInfo.getKey(name));
-            write();
-        }
-
-        public String[] getGames() {
-            Iterator<?> i = findKeys("game").iterator();
-            Collection<String> c = new ArrayList<>();
-            while (i.hasNext())
-                c.add(sysInfo.getValue((String) i.next()));
-            return c.toArray(new String[0]);
-        }
-
-        void removeDeck(String name) {
-            String key = getDeckKey(name);
-            if (key != null) {
-                info.remove(key);
-                write();
-            }
-        }
-
-        boolean createDeck(String name, String deck) {
-            try {
-                String key = getDeckKey(name);
-                if (key == null) {
-                    key = "deck" + incrementCounter("deckindex");
-                    info.setProperty(key, name);
-                    write();
-                }
-                File file = new File(getPlayerDir(), key + ".txt");
-                writeFile(file, deck);
-                return true;
-            } catch (Exception e) {
-                logger.error("Error creating deck {}", e);
-                return false;
-            }
-        }
-
-        String getGameDeckName(String game) {
-            String id = getId(game);
-            String deck = info.getProperty(id, "fubar");
-            return info.getProperty(deck, "Not found");
-        }
-
-        private String getDeckKey(String name) {
-            String key = getKey(name);
-            if (key != null && key.startsWith("deck"))
-                return key;
-            return null;
-        }
-
-        private String getDeck(String deckName) {
-            try {
-                File file = new File(getPlayerDir(), deckName + ".txt");
-                return readFile(file);
-            } catch (IOException ie) {
-                String msg = "Deck read Error for " + id + " and deck " + deckName;
-                throw new RuntimeException(msg, ie);
-            }
-        }
-
-        String[] getDeckNames() {
-            return findValues("deck").toArray(new String[0]);
-        }
-
-        public boolean isAdmin() {
-            String admin = info.getProperty("admin", "no");
-            return !admin.equals("no");
-        }
-
-        public void setAdmin(boolean set) {
-            String admin = set ? "yes" : "no";
-            info.setProperty("admin", admin);
-            write();
-        }
-
-        public void setSuper(boolean set) {
-            String superUser = set ? "super" : "yes";
-            info.setProperty("admin", superUser);
-            write();
-        }
-
-        public void setJudge(boolean set) {
-            String judge = set ? "yes" : "no";
-            info.setProperty("judge", judge);
-            write();
-        }
-
-        public String getEmail() {
-            return info.getProperty("email");
-        }
-
-        public void setEmail(String email) {
-            info.setProperty("email", email);
-            write();
-        }
-
-        boolean isSuperUser() {
-            return info.getProperty("admin", "no").equals("super");
-        }
-
-        public boolean isJudge() {
-            return info.getProperty("judge", "no").equals("yes");
-        }
-
-
-        void claimGame(String gameName) {
-            info.setProperty(sysInfo.getKey(gameName), "owner");
-            write();
-        }
-
-        public boolean isOwner(String gameName) {
-            return info.getProperty(sysInfo.getKey(gameName), "no").equals(
-                    "owner");
-        }
-
-        void invite(String gameName) {
-            info.setProperty(sysInfo.getKey(gameName), "invited");
-            write();
-        }
-
-        boolean isInvited(String gameName) {
-            return info.getProperty(sysInfo.getKey(gameName), "no").equals(
-                    "invited");
-        }
-
-        String getHeader() {
-            return "Deckserver 3.0 player information";
-        }
-
-        boolean receivesTurnSummaries() {
-            return "true".equals(info.getProperty("turns", "true"));
-        }
-
-        String getDiscordID() {
-            return info.getProperty(DISCORD_ID_KEY, null);
-        }
-
-        boolean receivesDiscordPing() {
-            return "true".equals(info.getProperty(PING_DISCORD_KEY, "false"));
-        }
-
-        public void updateProfile(String email, String discordID, boolean pingDiscord) {
-            info.setProperty("email", email);
-
-            if (discordID != null && !"".equals(discordID)) {
-                boolean isNumeric = discordID.chars().allMatch(Character::isDigit);
-                if (!isNumeric)
-                    throw new RuntimeException(
-                            String.format(
-                                    "Invalid Discord ID '%s'; must be numeric",
-                                    discordID));
-            }
-
-            info.setProperty(DISCORD_ID_KEY, discordID);
-            info.setProperty(PING_DISCORD_KEY, String.valueOf(pingDiscord));
-            write();
+    public void endGame(String gameName) {
+        GameInfo gameInfo = games.get(gameName);
+        Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId());
+        registrations.row(gameName).clear();
+        games.remove(gameName);
+        pmap.values().forEach(playerModel -> playerModel.removeGame(gameName));
+        try {
+            FileUtils.deleteDirectory(gamePath.toFile());
+        } catch (IOException e) {
+            logger.error("Unable to delete game directory", e);
         }
     }
 
-    private class SystemInfo extends Info {
-        SystemInfo() {
-            super("system.properties");
-        }
-
-        String getHeader() {
-            return "Deckserver 3.0 system file";
-        }
-
-        String newPlayer(String name) {
-            String key = "player" + incrementCounter("playerindex");
-            info.setProperty(key, name);
-            write();
-            return key;
-        }
-
-        String newGame(String name) {
-            String key = "game" + incrementCounter("gameindex");
-            info.setProperty(key, name);
-            write();
-            return key;
-        }
-
-        boolean hasGame(String game) {
-            String key = getKey(game);
-            return key != null && key.startsWith("game");
-        }
-
-        boolean hasPlayer(String player) {
-            String key = getKey(player);
-            return key != null && key.startsWith("player");
-        }
-
-        public String[] getGames() {
-            return findValues("game").toArray(new String[0]);
-        }
-
-        public List<String> getPlayers() {
-            return new ArrayList<>(findValues("player"));
-        }
+    public String getDeckId(String playerName, String deckName) {
+        return decks.get(playerName, deckName).getDeckId();
     }
 
-    abstract class Info {
-        final Properties info = new Properties();
-
-        final String filename;
-
-        Info(String filename) {
-            this(filename, false);
-        }
-
-        Info(String filename, boolean ignore) {
-            this.filename = dir + "/" + filename;
-            load(ignore);
-        }
-
-        abstract String getHeader();
-
-        String incrementCounter(String counter) {
-            String index = info.getProperty(counter, "0");
-            String num = String.valueOf(Integer.parseInt(index) + 1);
-            info.setProperty(counter, num);
-            write();
-            return num;
-        }
-
-        Collection<String> findKeys(String pre) {
-            return find(pre, true);
-        }
-
-        Collection<String> findValues(String pre) {
-            return find(pre, false);
-        }
-
-        private Collection<String> find(String pre, boolean sendKey) {
-            Collection<String> v = new ArrayList<>();
-            for (Object o : info.keySet()) {
-                String key = (String) o;
-                if (key.startsWith(pre) && !key.endsWith("index")) {
-                    v.add(sendKey ? key : info.getProperty(key));
-                }
-            }
-            return v;
-        }
-
-        String getKey(String name) {
-            if (!info.containsValue(name))
-                return null;
-            for (Map.Entry<Object, Object> objectObjectEntry : info.entrySet()) {
-                if (((Map.Entry<?, ?>) objectObjectEntry).getValue().equals(name)) {
-                    return (String) ((Map.Entry<?, ?>) objectObjectEntry).getKey();
-                }
-            }
-            return null;
-        }
-
-        public String getValue(String key) {
-            return info.getProperty(key);
-        }
-
-        private synchronized void load(boolean ignoreExceptions) {
-            logger.debug("Reading {}", filename);
-            try (FileReader in = new FileReader(filename)) {
-                info.load(in);
-            } catch (IOException e) {
-                if (!ignoreExceptions) {
-                    logger.error("Error loading {}", e);
-                    throw new IllegalArgumentException("Invalid " + getHeader() + " : " + filename);
-                }
-            }
-        }
-
-        protected synchronized void write() {
-            logger.debug("Writing {}", filename);
-            try (FileWriter out = new FileWriter(filename)) {
-                info.store(out, getHeader());
-            } catch (IOException e) {
-                logger.error("Error writing file {}", e);
-            }
-        }
-
-        void setProperty(String prop, String value) {
-            info.setProperty(prop, value);
-        }
-
-        public void remove(String prop) {
-            info.remove(prop);
-        }
+    public String getGameId(String gameName) {
+        return loadGameInfo(gameName).getId();
     }
 
 }

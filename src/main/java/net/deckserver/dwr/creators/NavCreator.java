@@ -1,6 +1,5 @@
 package net.deckserver.dwr.creators;
 
-import net.deckserver.dwr.bean.AdminBean;
 import net.deckserver.dwr.bean.NavBean;
 import net.deckserver.dwr.model.PlayerModel;
 
@@ -10,8 +9,8 @@ class NavCreator implements ViewCreator {
         return "navigate";
     }
 
-    public Object createData(AdminBean abean, PlayerModel model) {
-        return new NavBean(abean, model);
+    public Object createData(PlayerModel model) {
+        return new NavBean(model);
     }
 
 }

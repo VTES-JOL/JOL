@@ -4,15 +4,10 @@ import net.deckserver.game.interfaces.state.*;
 import net.deckserver.game.interfaces.turn.GameAction;
 import net.deckserver.game.interfaces.turn.TurnRecorder;
 import net.deckserver.game.jaxb.state.Notation;
-import org.slf4j.Logger;
 
 import java.util.List;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public final class ModelLoader {
-
-    private static final Logger logger = getLogger(ModelLoader.class);
 
     public static void createModel(Game game, Game orig) {
         game.setName(orig.getName());

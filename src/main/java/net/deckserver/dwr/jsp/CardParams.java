@@ -6,11 +6,9 @@
 
 package net.deckserver.dwr.jsp;
 
-import net.deckserver.dwr.model.JolAdmin;
-import net.deckserver.dwr.model.JolGame;
 import net.deckserver.game.interfaces.state.Card;
-import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.storage.json.cards.CardSummary;
 
 /**
  * @author Joe User
@@ -18,7 +16,7 @@ import net.deckserver.game.storage.cards.CardSearch;
 public class CardParams {
 
     private Card card;
-    private CardEntry entry;
+    private final CardSummary summary;
     private boolean hidden = false;
 
     public CardParams(Card card) {
@@ -28,15 +26,15 @@ public class CardParams {
     CardParams(Card card, boolean hidden) {
         this.card = card;
         this.hidden = hidden;
-        this.entry = CardSearch.INSTANCE.getCardById(this.card.getCardId());
+        this.summary = CardSearch.INSTANCE.get(this.card.getCardId());
     }
 
-    public CardParams(CardEntry entry) {
-        this.entry = entry;
+    public CardParams(CardSummary summary) {
+        this.summary = summary;
     }
 
     public String getId() {
-        if (entry != null) return entry.getCardId();
+        if (summary != null) return summary.getId();
         return card.getCardId();
     }
 
@@ -44,12 +42,12 @@ public class CardParams {
         return card;
     }
 
-    public CardEntry getEntry() {
-        return entry;
+    public CardSummary getSummary() {
+        return summary;
     }
 
     public String getName() {
-        if (entry != null) return entry.getName();
+        if (summary != null) return summary.getDisplayName();
         return card.getName();
     }
 

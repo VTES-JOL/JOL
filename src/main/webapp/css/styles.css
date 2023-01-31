@@ -145,36 +145,48 @@ nav * {
     font-family: 'IM Fell English', serif;
 }
 
+#deckText {
+    padding: 0.5em;
+    border: 0;
+    width: 100%;
+    height: 60vh;
+}
+
+#deckErrors {
+    padding: 0.5em;
+    border: 0;
+    width: 100%;
+    height: 15vh;
+    overflow-y: scroll;
+}
+
+#deckPreview {
+    padding: 0.5em;
+    border: 0;
+    width: 100%;
+    height: 85vh;
+    overflow-y: scroll;
+}
+
 ul.deck-list {
     list-style: none;
     padding-left: 0;
     margin: 0 0 5px 5px;
 }
 
-#currentGames {
-    border-collapse: collapse;
-    border: 1px solid #aaaaaa;
+table.games th button {
+    margin-left: 0.5em;
 }
 
-#currentGames th {
-    text-align: left;
-    padding: 0.5em 1em;
-}
-
-#currentGames th:last-child {
+table.games th:last-child {
     text-align: right;
 }
 
-#currentGames td, #currentGames tr {
-    border: 1px solid #aaaaaa;
-    padding: 0.25em;
-}
-
-#currentGames td:first-child {
+table.games td:first-child {
     padding-left: 1em;
 }
 
-#currentGames td:last-child {
+table.games td:last-child {
     text-align: right;
     padding: 0 1em;
 }
@@ -245,7 +257,7 @@ h2.header, h3.header, h4.header, h5.header {
 
 h4.header {
     font-size: 1em;
-    line-height: 1.5em;
+    line-height: 2em;
 }
 
 .footer {
@@ -353,6 +365,10 @@ span.label, small.label {
     font-family: 'IM Fell English', serif;
 }
 
+span.label-small {
+    font-size: 0.6em;
+}
+
 span.label-light, small.label-light {
     background-color: #eee;
     color: #111;
@@ -373,12 +389,13 @@ span.label-warning {
     color: #111;
 }
 
-span.label-basic {
-    font-family: serif;
+span.label-success {
+    background-color: #007fff;
+    color: #111;
 }
 
-#donateBox {
-    padding-top: 0.5em;
+span.label-basic {
+    font-family: serif;
 }
 
 td.layout {
@@ -390,19 +407,6 @@ td.layout {
 
 }
 
-#mydecks td:first-child {
-    width: 90%;
-}
-
-#mydecks td:last-child {
-    width: 10%;
-}
-
-#deckcards {
-    width: 50%;
-    margin-top: 0.25em;
-}
-
 .padded {
     padding: 0.5em;
 }
@@ -412,17 +416,6 @@ td.layout {
     padding-right: 0.5em;
     padding-top: 0;
     padding-bottom: 0;
-}
-
-#deckText {
-    padding: 0.5em;
-    border: 0;
-    width: 100%;
-    height: 65vh;
-}
-
-#deckEditor h4 {
-    height: 2.5em;
 }
 
 .full-width {
@@ -504,6 +497,10 @@ textarea.game-notes {
     box-sizing: border-box;
     width: 100%;
     font-size: 1em;
+}
+
+span.game-name {
+    font-style: italic;
 }
 
 .full-height {
@@ -751,9 +748,6 @@ small.votes {
     background-color: #ffd246;
     border: 1px solid black;
     color: black;
-}
-
-#hand {
 }
 
 @media (min-width: 576px) {
@@ -1169,6 +1163,10 @@ input[type=checkbox] {
         margin-left: calc(calc(100vw - 768px) / 2);
         margin-right: calc(calc(100vw - 768px) / 2);
     }
+}
+
+.left-margin {
+    margin-left: 0.5em;
 }
 
 .modal-header {

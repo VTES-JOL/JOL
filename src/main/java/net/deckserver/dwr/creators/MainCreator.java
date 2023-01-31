@@ -1,6 +1,5 @@
 package net.deckserver.dwr.creators;
 
-import net.deckserver.dwr.bean.AdminBean;
 import net.deckserver.dwr.bean.MainBean;
 import net.deckserver.dwr.model.PlayerModel;
 
@@ -10,8 +9,8 @@ class MainCreator implements ViewCreator {
         return "callbackMain";
     }
 
-    public Object createData(AdminBean abean, PlayerModel model) {
-        return new MainBean(abean, model);
+    public Object createData(PlayerModel model) {
+        return new MainBean(model);
     }
 
 }

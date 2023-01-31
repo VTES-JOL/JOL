@@ -1,6 +1,5 @@
 package net.deckserver.dwr.bean;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

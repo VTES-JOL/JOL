@@ -1,43 +1,38 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.dwr.bean.AdminBean;
 import net.deckserver.dwr.bean.ChatEntryBean;
+import net.deckserver.storage.json.system.DeckFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class PlayerModel implements Comparable {
+public class PlayerModel {
 
-    private static Logger logger = LoggerFactory.getLogger(PlayerModel.class);
+    private final static Logger logger = LoggerFactory.getLogger(PlayerModel.class);
     private final String player;
-    private String view;
-    private String[] games = new String[0];
+    private final Set<String> games = new HashSet<>();
+    private final List<ChatEntryBean> chats = new ArrayList<>();
     private String game = null;
-    private List<ChatEntryBean> chats = new ArrayList<>();
-    private String tmpDeck;
-    private String tmpDeckName;
-    private Collection<String> removedGames = new ArrayList<>(2);
-    private Collection<String> changedGames = new HashSet<>();
+    private String view;
+    private String deckName;
+    private String contents;
+    private String message;
 
-    public PlayerModel(AdminBean abean, String name, List<ChatEntryBean> chatin) {
-        logger.trace("Creating new Player model for {}", name);
+    public PlayerModel(String name, boolean loadChat) {
         this.player = name;
         setView("main");
-        changedGames.addAll(
-            abean.getActiveGames().stream()
-                .filter(g -> g.isOpen() || g.getPlayers().contains(player))
-                .map(GameModel::getName)
-                .collect(Collectors.toList()));
-        chats.addAll(chatin);
+        if (loadChat) {
+            resetChats();
+        }
     }
 
-    public String getPlayer() {
+    public String getPlayerName() {
         return player;
     }
 
-    public String[] getCurrentGames() {
+    public Set<String> getCurrentGames() {
         return games;
     }
 
@@ -45,21 +40,17 @@ public class PlayerModel implements Comparable {
         return game;
     }
 
-    public void enterGame(AdminBean abean, String game) {
+    public void enterGame(String gameName) {
         setView("game");
-        Collection<String> c = new ArrayList<>(Arrays.asList(games));
-        if (!c.contains(game)) {
-            c.add(game);
-            games = c.toArray(games);
+        games.add(gameName);
+        if (!gameName.equals(this.game)) {
+            JolAdmin.getInstance().getGameModel(gameName).resetView(player);
         }
-        if (!game.equals(this.game)) {
-            abean.getGameModel(game).resetView(player);
-        }
-        this.game = game;
+        this.game = gameName;
     }
 
-    public void recordAccess() {
-        if (player != null) JolAdmin.getInstance().recordPlayerAccess(player);
+    public void removeGame(String gameName) {
+        games.remove(gameName);
     }
 
     public String getView() {
@@ -81,72 +72,61 @@ public class PlayerModel implements Comparable {
         return output;
     }
 
-    public int compareTo(Object arg0) {
-        return player.compareToIgnoreCase(((PlayerModel) arg0).getPlayer());
-    }
-
-    public void setTmpDeck(String name, String deck) {
-        this.tmpDeckName = name;
-        this.tmpDeck = deck;
-    }
-
-    public void clearDeck() {
-        this.tmpDeckName = null;
-        this.tmpDeck = null;
-    }
-
-    public void saveDeck() {
-        if (tmpDeckName != null) {
-            JolAdmin.getInstance().createDeck(player, tmpDeckName, tmpDeck);
-        }
-    }
-
-    public void submitDeck(String name, String deck) {
-        clearDeck();
-        JolAdmin.getInstance().createDeck(player, name, deck);
-    }
-
-    public List<String> getDecks() {
-        return Arrays.asList(JolAdmin.getInstance().getDeckNames(player));
-    }
-
-    public boolean isAdmin() {
-        return JolAdmin.getInstance().isAdmin(player);
-    }
-
-    public boolean isSuperUser() {
-        return JolAdmin.getInstance().isSuperUser(player);
-    }
-
-    /**
-    * Can this user promote others?
-    **/
-    public boolean canPromote() {
-        return isSuperUser();
+    public void resetChats() {
+        List<ChatEntryBean> globalChat = JolAdmin.getInstance().getChats();
+        chats.addAll(globalChat);
     }
 
     public boolean hasChats() {
         return !chats.isEmpty();
     }
 
-    public void removeGame(String name) {
-        removedGames.add(name);
+    public void loadDeck(String deckName) {
+        JolAdmin admin = JolAdmin.getInstance();
+        try {
+            this.deckName = deckName;
+            String deckId = admin.getDeckId(player, deckName);
+            DeckFormat deckFormat = admin.getDeckFormat(player, deckName);
+            if (deckFormat.equals(DeckFormat.LEGACY)) {
+                this.contents = admin.getLegacyContents(deckId).trim();
+            } else {
+                this.contents = admin.getDeckContents(deckId).trim();
+            }
+        } catch (IOException e) {
+            logger.error("Unable to set deck", e);
+            this.deckName = null;
+            this.contents = null;
+        }
     }
 
-    public void changeGame(String name) {
-        changedGames.add(name);
+    public void setContents(String contents) {
+        this.contents = contents;
     }
 
-    public Collection<String> getChangedGames() {
-        return changedGames;
+    public void setDeckName(String deckName) {
+        this.deckName = deckName;
     }
 
-    public Collection<String> getRemovedGames() {
-        return removedGames;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public void clearGames() {
-        changedGames.clear();
-        removedGames.clear();
+    public void clearDeck() {
+        this.deckName = null;
+        this.contents = null;
+    }
+
+    public String getContents() {
+        return contents;
+    }
+
+    public String getDeckName() {
+        return deckName;
+    }
+
+    public String getMessage() {
+        String result = this.message != null ? this.message : null;
+        this.message = null;
+        return result;
     }
 }

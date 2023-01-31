@@ -5,16 +5,14 @@ import net.deckserver.dwr.model.PlayerModel;
 
 public class ProfileBean {
 
-    private String email;
-    private String discordID;
-    private boolean pingDiscord;
+    private final String email;
+    private final String discordID;
 
-    public ProfileBean(AdminBean abean, PlayerModel model) {
-        String player = model.getPlayer();
+    public ProfileBean(PlayerModel model) {
+        String player = model.getPlayerName();
         JolAdmin jolAdmin = JolAdmin.getInstance();
         this.email = jolAdmin.getEmail(player);
         this.discordID = jolAdmin.getDiscordID(player);
-        this.pingDiscord = jolAdmin.receivesDiscordPing(player);
     }
 
     public String getEmail() {
@@ -25,8 +23,4 @@ public class ProfileBean {
         return discordID;
     }
 
-    //This name is not natural, but makes for a natural sound in JavaScript
-    public boolean isPingDiscord() {
-        return pingDiscord;
-    }
 }

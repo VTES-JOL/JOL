@@ -1,6 +1,5 @@
 package net.deckserver.dwr.creators;
 
-import net.deckserver.dwr.bean.AdminBean;
 import net.deckserver.dwr.bean.ProfileBean;
 import net.deckserver.dwr.model.PlayerModel;
 
@@ -11,7 +10,7 @@ public class ProfileCreator implements ViewCreator {
     }
 
     @Override
-    public Object createData(AdminBean abean, PlayerModel model) {
-        return new ProfileBean(abean, model);
+    public Object createData(PlayerModel model) {
+        return new ProfileBean(model);
     }
 }

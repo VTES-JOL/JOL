@@ -1,26 +1,25 @@
 package net.deckserver.dwr.bean;
 
-import net.deckserver.dwr.model.GameModel;
+import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class AllGamesBean {
 
-    private List<SummaryBean> games;
+    private final List<GameSummaryBean> games;
 
-    public AllGamesBean(AdminBean abean, PlayerModel model) {
-        this.games = abean.getActiveGames()
-                .stream()
-                .map(GameModel::getSummaryBean)
+    public AllGamesBean(PlayerModel model) {
+        this.games = JolAdmin.getInstance().getGames().stream()
+                .filter(JolAdmin.getInstance()::isActive)
+                .map(GameSummaryBean::new)
                 .collect(Collectors.toList());
-        games.sort(Comparator.comparing(SummaryBean::getGame));
+        games.sort(Comparator.comparing(GameSummaryBean::getGameName));
     }
 
-    public List<SummaryBean> getGames() {
+    public List<GameSummaryBean> getGames() {
         return games;
     }
 }

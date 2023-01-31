@@ -2,6 +2,7 @@ package net.deckserver.game.storage.cards;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -10,16 +11,17 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.joining;
 
 @Data
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class SummaryCard {
 
     private String id;
     private String amaranthId;
     private String type;
-    private String text;
     private String htmlText;
-    private String originalText; //Original: as in the CSV
+    private String originalText;
     private String displayName;
+    private String name;
     private Set<String> names;
     private boolean crypt;
     private boolean unique;
@@ -27,6 +29,7 @@ public class SummaryCard {
     private String group;
     private String sect;
     private List<String> clans;
+    private boolean banned;
 
     //Library only
     private String preamble;
@@ -43,13 +46,10 @@ public class SummaryCard {
 
     private String votes;
 
-    private SummaryCard() {
-
-    }
-
     public SummaryCard(CryptCard cryptCard) {
         this.id = cryptCard.getId();
         this.displayName = cryptCard.getDisplayName();
+        this.name = cryptCard.getName();
         this.names = cryptCard.getNames();
         this.type = cryptCard.getType();
         this.crypt = true;
@@ -59,14 +59,17 @@ public class SummaryCard {
         this.clans = Collections.singletonList(cryptCard.getClan());
         this.title = cryptCard.getTitle();
         this.votes = cryptCard.getVotes();
+        this.banned = cryptCard.isBanned();
 
         List<String> cardLines = new ArrayList<>();
         boolean vampire = cryptCard.getType().equals("Vampire");
         String clanLabel = vampire ? "Clan: " : "Creed: ";
         String disciplinesLabel = vampire ? "Disciplines: " : "Virtues: ";
         Optional.ofNullable(cryptCard.getName()).ifPresent(name -> cardLines.add("Name: " + name));
-        Optional.ofNullable(cryptCard.getBanned()).ifPresent(banned -> cardLines.add("-- Banned --"));
-        Optional.ofNullable(cryptCard.getType()).ifPresent(type -> cardLines.add("Cardtype: " + type));
+        if (cryptCard.isBanned()) {
+            cardLines.add("-- Banned --");
+        }
+        Optional.of(cryptCard.getType()).ifPresent(type -> cardLines.add("Cardtype: " + type));
         Optional.ofNullable(cryptCard.getClan()).ifPresent(clan -> cardLines.add(clanLabel + clan));
         Optional.ofNullable(cryptCard.getAdvanced()).ifPresent(advanced -> cardLines.add("Level: Advanced"));
         Optional.ofNullable(cryptCard.getGroup()).ifPresent(group -> cardLines.add("Group: " + group));
@@ -75,22 +78,22 @@ public class SummaryCard {
                 .map(disciplines -> disciplines.stream().map(s -> "[" + s + "]").collect(Collectors.joining(" ")))
                 .ifPresent(disciplines -> cardLines.add(disciplinesLabel + disciplines));
         Optional.ofNullable(cryptCard.getText()).ifPresent(cardLines::add);
-        this.text = String.join("\n", cardLines);
         this.htmlText = String.join("<br/>", cardLines);
-
+        this.originalText = cryptCard.getText();
         this.capacity = cryptCard.getCapacity();
         this.disciplines = cryptCard.getDisciplines();
-        this.originalText = cryptCard.getText();
     }
 
     public SummaryCard(LibraryCard libraryCard) {
         this.id = libraryCard.getId();
         this.displayName = libraryCard.getDisplayName();
+        this.name = libraryCard.getName();
         this.names = libraryCard.getNames();
         this.type = String.join("/", libraryCard.getType());
         this.crypt = false;
         this.unique = libraryCard.isUnique();
         Optional.ofNullable(libraryCard.getBurnOption()).ifPresent(burnOption -> this.burnOption = burnOption);
+        this.banned = libraryCard.isBanned();
 
         this.preamble = libraryCard.getPreamble();
         this.modes = libraryCard.getModes();
@@ -108,16 +111,17 @@ public class SummaryCard {
 
         List<String> cardLines = new ArrayList<>();
         Optional.ofNullable(libraryCard.getName()).ifPresent(name -> cardLines.add("Name: " + name));
-        Optional.ofNullable(libraryCard.getBanned()).ifPresent(banned -> cardLines.add("-- Banned --"));
+        if (libraryCard.isBanned()) {
+            cardLines.add("-- Banned --");
+        }
         Optional.ofNullable(libraryCard.getType()).ifPresent(type -> cardLines.add("Cardtype: " + String.join("/", type)));
         Optional.ofNullable(libraryCard.getClans()).ifPresent(clan -> cardLines.add("Clan: " + String.join("/", clan)));
         Optional.ofNullable(libraryCard.getBlood()).ifPresent(blood -> cardLines.add("Cost: " + blood + " blood"));
         Optional.ofNullable(libraryCard.getPool()).ifPresent(pool -> cardLines.add("Cost: " + pool + " pool"));
         Optional.ofNullable(libraryCard.getBurnOption()).ifPresent(burnOption -> cardLines.add("Burn Option"));
         Optional.ofNullable(libraryCard.getConviction()).ifPresent(conviction -> cardLines.add("Cost: " + conviction + " conviction"));
-        Optional.ofNullable(libraryCard.getDisciplines()).ifPresent(disciplines -> cardLines.add("Discipline: " + disciplines.stream().collect(joining("/"))));
+        Optional.ofNullable(libraryCard.getDisciplines()).ifPresent(disciplines -> cardLines.add("Discipline: " + String.join("/", disciplines)));
         Optional.ofNullable(libraryCard.getText()).ifPresent(cardLines::add);
-        this.text = String.join("\n", cardLines);
         this.htmlText = String.join("<br/>", cardLines);
         this.originalText = libraryCard.getText();
     }

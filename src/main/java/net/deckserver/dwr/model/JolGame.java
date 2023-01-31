@@ -7,22 +7,18 @@
 package net.deckserver.dwr.model;
 
 import com.google.common.base.Strings;
-import net.deckserver.Utils;
-import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.game.interfaces.state.*;
 import net.deckserver.game.interfaces.turn.GameAction;
+import net.deckserver.game.interfaces.turn.TurnRecorder;
 import net.deckserver.game.jaxb.state.Notation;
-import net.deckserver.game.json.deck.CardSummary;
-import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
-import net.deckserver.game.storage.cards.Deck;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
-import net.deckserver.rest.ApiResource;
+import net.deckserver.storage.json.cards.CardSummary;
+import net.deckserver.storage.json.deck.Deck;
 import org.apache.commons.lang3.ArrayUtils;
-import org.owasp.html.Sanitizers;
-import org.slf4j.Logger;
 
+import java.security.SecureRandom;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -61,56 +57,36 @@ public class JolGame {
     private DsTurnRecorder actions;
     private final String id;
 
-    private Set<String> uniques = new HashSet<>();
-
     public JolGame(String id, DsGame state, DsTurnRecorder actions) {
         this.id = id;
         this.state = state;
         this.actions = actions;
     }
 
-    public void addPlayer(CardSearch cardset, String name, String deckStr) {
-        Deck deck = new Deck(cardset, deckStr);
-        boolean reregister = false;
-        List<String> players = state.getPlayers();
-        for (String player : players) if (name.equals(player)) reregister = true;
-        if (!reregister) {
-            state.addPlayer(name);
-            state.addLocation(name, READY_REGION);
-            state.addLocation(name, TORPOR);
-            state.addLocation(name, INACTIVE_REGION);
-            state.addLocation(name, HAND);
-            state.addLocation(name, ASHHEAP);
-            state.addLocation(name, LIBRARY);
-            state.addLocation(name, CRYPT);
-            state.addLocation(name, RFG);
-            state.addLocation(name, RESEARCH);
-            changePool(name, 30);
-        }
-        CardEntry[] cards = deck.getCards();
+    public void addPlayer(String name, Deck deck) {
+        state.addPlayer(name);
+        state.addLocation(name, READY_REGION);
+        state.addLocation(name, TORPOR);
+        state.addLocation(name, INACTIVE_REGION);
+        state.addLocation(name, HAND);
+        state.addLocation(name, ASHHEAP);
+        state.addLocation(name, LIBRARY);
+        state.addLocation(name, CRYPT);
+        state.addLocation(name, RFG);
+        state.addLocation(name, RESEARCH);
+        changePool(name, 30);
         Location crypt = state.getPlayerLocation(name, CRYPT);
         Location library = state.getPlayerLocation(name, LIBRARY);
-        Collection<String> cryptlist = new Vector<>();
-        Collection<String> librarylist = new Vector<>();
-        for (CardEntry card : cards) {
-            Collection<String> dest;
-            if (card.isCrypt()) {
-                dest = cryptlist;
-            } else {
-                dest = librarylist;
-            }
-            int q = deck.getQuantity(card);
-            for (int j = 0; j < q; j++) {
-                dest.add(card.getCardId());
-            }
-        }
-        String[] cryptarr = new String[cryptlist.size()];
-        cryptlist.toArray(cryptarr);
-        crypt.initCards(cryptarr, name);
-        String[] libraryarr = new String[librarylist.size()];
-        librarylist.toArray(libraryarr);
-        library.initCards(libraryarr, name);
-
+        List<String> cryptlist = new ArrayList<>();
+        List<String> librarylist = new ArrayList<>();
+        deck.getCrypt().getCards().forEach(cardCount -> {
+            cryptlist.addAll(Collections.nCopies(cardCount.getCount(), String.valueOf(cardCount.getId())));
+        });
+        deck.getLibrary().getCards().stream()
+                .flatMap(libraryCard -> libraryCard.getCards().stream())
+                .forEach(cardCount -> librarylist.addAll(Collections.nCopies(cardCount.getCount(), String.valueOf(cardCount.getId()))));
+        crypt.initCards(cryptlist, name);
+        library.initCards(librarylist, name);
     }
 
     void drawCard(String player, String srcRegion, String destRegion) {
@@ -167,21 +143,20 @@ public class JolGame {
             //Target is in secret region: "on [<player>'s] <secret region #>"
 
             boolean destHidden = isHiddenRegion(destRegion);
-            CardEntry destEntry = CardSearch.INSTANCE.getCardById(dstCard.getCardId());
+            CardSummary destEntry = CardSearch.INSTANCE.get(dstCard.getCardId());
             boolean includePlayer = !player.equals(destPlayer) && (destHidden || !destEntry.isUnique());
             String destMessage = String.format(
-                " on %s%s",
-                includePlayer ? String.format("%s's ", destPlayer) : "",
-                getCardName(dstCard)
+                    " on %s%s",
+                    includePlayer ? String.format("%s's ", destPlayer) : "",
+                    getCardName(dstCard)
             );
             message = playCardMessage(player, srcCard, destRegion, modes, destMessage);
-        }
-        else {
+        } else {
             message = String.format(
-                "%s puts %s on %s",
-                player,
-                getCardName(srcCard, loc.getName()),
-                getCardName(dstCard));
+                    "%s puts %s on %s",
+                    player,
+                    getCardName(srcCard, loc.getName()),
+                    getCardName(dstCard));
         }
         addCommand(message, new String[]{"puton", cardId, destCard});
 
@@ -201,12 +176,12 @@ public class JolGame {
         if (dest == null) throw new IllegalStateException("No such region");
 
         String message = String.format(
-            "%s moves %s to %s%s's %s",
-            player,
-            getCardName(card, destRegion),
-            bottom ? "" : "top of ",
-            destPlayer,
-            destRegion);
+                "%s moves %s to %s%s's %s",
+                player,
+                getCardName(card, destRegion),
+                bottom ? "" : "top of ",
+                destPlayer,
+                destRegion);
         addCommand(message, new String[]{"move", cardId, destPlayer, destRegion, bottom ? "bottom" : "top"});
         source.removeCard(card);
         dest.addCard(card, !bottom);
@@ -217,7 +192,7 @@ public class JolGame {
         if (card == null) throw new IllegalArgumentException("No such card");
 
         //Burn attached cards
-        for (Card c: card.getCards())
+        for (Card c : card.getCards())
             burnQuietly(c.getId());
 
         CardContainer source = card.getParent();
@@ -308,23 +283,16 @@ public class JolGame {
     String playCardMessage(String player, Card card, String destRegion, String[] modes, String destMessage) {
         String modeMessage = "";
         if (modes != null) {
-            for (String mode: modes)
+            for (String mode : modes)
                 modeMessage += ChatParser.generateDisciplineLink(mode);
             modeMessage = " at " + modeMessage;
         }
         return String.format(
-            "%s plays %s%s%s",
-            player,
-            getCardLink(card),
-            modeMessage,
-            destMessage);
-    }
-
-    public void setOrder(List<String> players) {
-        state.orderPlayers(players);
-        String order = "";
-        for (String player : players) order = order + " " + player;
-        addCommand("Player order" + order, new String[]{"order", order});
+                "%s plays %s%s%s",
+                player,
+                getCardLink(card),
+                modeMessage,
+                destMessage);
     }
 
     public void shuffle(String player, String region, int num) {
@@ -353,7 +321,7 @@ public class JolGame {
 
     public void startGame() {
         List<String> players = state.getPlayers();
-        Utils.shuffle(players);
+        Collections.shuffle(players, new SecureRandom());
         startGame(players);
     }
 
@@ -377,10 +345,15 @@ public class JolGame {
             for (int j = 0; j < 7; j++)
                 _drawCard(player, LIBRARY, HAND, false);
         }
+        JolAdmin.getInstance().pingPlayer(this.getActivePlayer(), this.getName());
     }
 
     public Game getState() {
         return state;
+    }
+
+    public TurnRecorder getTurnRecorder() {
+        return actions;
     }
 
     public void initGame(String name) {
@@ -425,7 +398,7 @@ public class JolGame {
         if (note != null) return Integer.parseInt(note.getValue());
         return 0;
     }
-    
+
     public String[] getDisciplines(String cardId) {
         Card card = state.getCard(cardId);
         Notation note = getNote(card, DISCIPLINES, true);
@@ -443,13 +416,13 @@ public class JolGame {
         note.setValue(val + "");
         if (!quiet) {
             String logText = String.format(
-                "%s %s %s blood %s %s, now %s",
-                player,
-                incr < 0 ? "removes" : "adds",
-                Math.abs(incr),
-                incr < 0 ? "from" : "to",
-                getCardName(card),
-                val);
+                    "%s %s %s blood %s %s, now %s",
+                    player,
+                    incr < 0 ? "removes" : "adds",
+                    Math.abs(incr),
+                    incr < 0 ? "from" : "to",
+                    getCardName(card),
+                    val);
             addCommand(logText, new String[]{"counter", cardId, incr + ""});
         }
     }
@@ -482,14 +455,14 @@ public class JolGame {
         }
         String differentiators = "";
         if (differentiate) {
-            CardEntry cardEntry = CardSearch.INSTANCE.getCardById(card.getCardId());
+            CardSummary cardEntry = CardSearch.INSTANCE.get(card.getCardId());
             if (!cardEntry.isUnique()) {
                 int regionIndex = getIndexInRegion(card);
                 String label = getText(card.getId());
                 differentiators = String.format(
-                    "%s%s",
-                    regionIndex > -1 ? String.format(" #%s", regionIndex + 1) : "",
-                    label.equals("") ? "" : String.format(" \"%s\"", label)
+                        "%s%s",
+                        regionIndex > -1 ? String.format(" #%s", regionIndex + 1) : "",
+                        label.equals("") ? "" : String.format(" \"%s\"", label)
                 );
             }
         }
@@ -636,6 +609,16 @@ public class JolGame {
         }
     }
 
+    public void random(String player, int limit, int result) {
+        String msg = player + " rolls from 1-" + limit + " : " + result;
+        addMessage(msg);
+    }
+
+    public void flip(String player, String result) {
+        String msg = player + " flips a coin : " + result;
+        addMessage(msg);
+    }
+
     public void setVotes(String cardId, String votes) {
         Card card = state.getCard(cardId);
         Integer voteAmount = 0;
@@ -686,10 +669,10 @@ public class JolGame {
     public void setTapped(String player, String cardId, boolean tapped) {
         Card card = state.getCard(cardId);
         String logtext = String.format(
-            "%s %s %s",
-            player,
-            tapped ? "locks" : "unlocks",
-            getCardName(card));
+                "%s %s %s",
+                player,
+                tapped ? "locks" : "unlocks",
+                getCardName(card));
         addCommand(logtext, new String[]{"tap", cardId});
         _setTap(card, tapped);
     }
@@ -741,15 +724,15 @@ public class JolGame {
     }
 
     /**
-    * Return actions for the given turn.
-    */
+     * Return actions for the given turn.
+     */
     public GameAction[] getActions(String turn) {
         return actions.getActions(turn);
     }
 
     /**
-    * Return actions for the current turn.
-    */
+     * Return actions for the current turn.
+     */
     public GameAction[] getActions() {
         return getActions(getCurrentTurn());
     }
@@ -785,7 +768,7 @@ public class JolGame {
         actions.addTurn(players.get(index), players.get(index) + " " + round + "." + (index + 1));
         setActivePlayer(players.get(index));
         setPhase(TURN_PHASES[0]);
-        String turnString = round + "-" + (index +1);
+        String turnString = round + "-" + (index + 1);
         JolAdmin.getInstance().writeSnapshot(id, state, actions, turnString);
     }
 
@@ -815,14 +798,14 @@ public class JolGame {
             addCommand("Capacity of " + getCardName(card) + " now " + amt, new String[]{"capacity", cardId, capincr + ""});
     }
 
-    public void setDisciplines(String cardId, String disciplines, boolean quiet) {
+    public void setDisciplines(String cardId, List<String> disciplines, boolean quiet) {
         Card card = state.getCard(cardId);
         Notation note = getNote(card, DISCIPLINES, true);
-        note.setValue(disciplines);
-        if (!quiet && disciplines.length() > 0) {
-            String disciplineList = Arrays.stream(disciplines.split(" ")).map(s -> "[" + s + "]").collect(Collectors.joining(" "));
+        note.setValue(String.join(" ", disciplines));
+        if (!quiet && disciplines.size() > 0) {
+            String disciplineList = disciplines.stream().map(s -> "[" + s + "]").collect(Collectors.joining(" "));
             String msg = ChatParser.parseText("Disciplines of " + getCardName(card) + " reset back to " + disciplineList);
-            addMessage(msg);
+            addCommand(msg, new String[]{"disc", cardId, disciplines.toString()});
         }
     }
 
@@ -836,10 +819,12 @@ public class JolGame {
             disciplineList.add(discipline);
         } else {
             int index = disciplineList.indexOf(discipline.toLowerCase());
-            disciplineList.set(index, discipline.toUpperCase());
+            discipline = discipline.toUpperCase();
+            disciplineList.set(index, discipline);
         }
         note.setValue(String.join(" ", disciplineList));
-        addMessage("[" + discipline + "] added to " + getCardName(card));
+        String msg = ChatParser.parseText("[" + discipline + "] added to " + getCardName(card));
+        addMessage(msg);
     }
 
     public void removeDiscipline(String cardId, String discipline) {
@@ -857,7 +842,8 @@ public class JolGame {
             disciplineList.set(index, discipline.toLowerCase());
         }
         note.setValue(String.join(" ", disciplineList));
-        addMessage("[" + discipline + "] removed from " + getCardName(card));
+        String msg = ChatParser.parseText("[" + discipline + "] removed from " + getCardName(card));
+        addMessage(msg);
     }
 
     public int getCapacity(String cardId) {
@@ -903,5 +889,9 @@ public class JolGame {
                 choiceNotation.setValue("");
             }
         });
+    }
+
+    public String getId() {
+        return this.id;
     }
 }

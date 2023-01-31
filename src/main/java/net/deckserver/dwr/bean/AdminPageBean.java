@@ -2,44 +2,72 @@ package net.deckserver.dwr.bean;
 
 import net.deckserver.dwr.model.JolAdmin;
 
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class AdminPageBean {
+    private final List<String> players;
+    private final List<GameStatusBean> myGames;
+    private final List<GameStatusBean> publicGames;
+    private final List<PlayerRegistrationStatusBean> invitedGames;
+    private final List<DeckInfoBean> decks;
+    private final String message;
 
-    private List<String> players = new ArrayList<>();
-    private List<String> currentGames = new ArrayList<>();
-    private List<RegistrationSummaryBean> forming = new ArrayList<>();
-
-    public AdminPageBean(AdminBean abean, String player) {
+    public AdminPageBean(String player) {
         JolAdmin admin = JolAdmin.getInstance();
-        List<String> games = Arrays.asList(admin.getGames());
-        games.stream()
+
+        players = admin.getPlayers().stream().sorted().collect(Collectors.toList());
+
+        myGames = admin.getGames().stream()
                 .filter(Objects::nonNull)
-                .filter(gameName -> admin.isSuperUser(player) || admin.getOwner(gameName).equals(player))
-                .filter(gameName -> !admin.isPrivate(gameName) || admin.getOwner(gameName).equals(player) || admin.isSuperUser(player))
-                .forEach(gameName -> {
-                    if (admin.isOpen(gameName)) {
-                        forming.add(new RegistrationSummaryBean(abean, gameName));
-                    } else if (!admin.isFinished(gameName)) {
-                        currentGames.add(gameName);
-                    }
-                });
-        players = admin.getPlayers();
-        Collections.sort(players);
-        Collections.sort(currentGames);
+                .filter(admin::isPrivate)
+                .filter(gameName -> player.equals(admin.getOwner(gameName)))
+                .map(GameStatusBean::new)
+                .collect(Collectors.toList());
+
+        publicGames = admin.getGames().stream()
+                .filter(Objects::nonNull)
+                .filter(admin::isStarting)
+                .filter(admin::isPublic)
+                .map(GameStatusBean::new)
+                .collect(Collectors.toList());
+
+        invitedGames = admin.getGames().stream()
+                .filter(Objects::nonNull)
+                .filter(admin::isStarting)
+                .filter(gameName -> admin.isInGame(gameName, player))
+                .map(gameName -> new PlayerRegistrationStatusBean(gameName, player))
+                .collect(Collectors.toList());
+
+        decks = admin.getDeckNames(player).stream()
+                .filter(Objects::nonNull)
+                .map(deckName -> new DeckInfoBean(player, deckName))
+                .filter(deckInfoBean -> deckInfoBean.getDeckFormat().equals("MODERN"))
+                .collect(Collectors.toList());
+
+        message = JolAdmin.getInstance().getPlayerModel(player).getMessage();
     }
 
     public List<String> getPlayers() {
         return players;
     }
 
-    public List<String> getCurrentGames() {
-        return currentGames;
+    public List<GameStatusBean> getMyGames() {
+        return myGames;
     }
 
-    public List<RegistrationSummaryBean> getForming() {
-        return forming;
+    public List<GameStatusBean> getPublicGames() {
+        return publicGames;
     }
 
+    public List<PlayerRegistrationStatusBean> getInvitedGames() {
+        return invitedGames;
+    }
+
+    public List<DeckInfoBean> getDecks() {
+        return decks;
+    }
+
+    public String getMessage() { return message; }
 }

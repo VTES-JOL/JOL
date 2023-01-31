@@ -1,7 +1,6 @@
 package net.deckserver.game.jaxb.state;
 
-import net.deckserver.game.jaxb.FileUtils;
-import net.deckserver.game.jaxb.actions.GameActions;
+import net.deckserver.game.jaxb.XmlFileUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,7 +168,7 @@ public class Updater {
     private void updateCardIds(String gameId) {
         Path gameStatePath = Paths.get(BASE_PATH, gameId, "game.xml");
         if (Files.exists(gameStatePath)) {
-            GameState gameState = FileUtils.loadGameState(gameStatePath.toFile());
+            GameState gameState = XmlFileUtils.loadGameState(gameStatePath);
 
             LOGGER.info("Converting game state: {}", gameId);
             if (gameState.region != null && !gameState.region.isEmpty()) {
@@ -186,7 +185,7 @@ public class Updater {
                             LOGGER.info("Converted card {} to {}", oldId, newId);
                         });
 
-                FileUtils.saveGameState(gameState, gameStatePath.toFile());
+                XmlFileUtils.saveGameState(gameState, gameStatePath);
             }
         }
 

@@ -6,12 +6,14 @@
 
 package net.deckserver.game.interfaces.state;
 
+import java.util.List;
+
 /**
  * @author administrator
  */
 public interface Location extends NoteTaker, CardContainer {
 
-    void initCards(String[] cardIds, String owner);
+    void initCards(List<String> cardIds, String owner);
 
     void shuffle(int num);
 

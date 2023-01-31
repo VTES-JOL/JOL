@@ -9,7 +9,6 @@
     <a href="#help_label">Label</a>
     <a href="#help_lock">Lock</a>
     <a href="#help_move">Move</a>
-    <a href="#help_order">Order</a>
     <a href="#help_play">Play</a>
     <a href="#help_pool">Pool</a>
     <a href="#help_random">Random</a>
@@ -369,36 +368,6 @@
                 <tr>
                     <td class="help-command">move ashheap 1 library top</td>
                     <td>moves card #1 in your ashheap onto the top of your library</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-    <div id="help_order">
-        <h4 class="header">Order <a class="float-right" href="#top">Top</a></h4>
-        <div class="light padded">
-            <p>
-                Re-seat the players around the table. Useful with the restructuring cards. Also used with Reversal
-                of Fortune,
-                since the server always advances player turns in order.
-            </p>
-            <h5>Syntax</h5>
-            <p>
-                <code>order index1 index2 index3 index4 index5</code>
-            </p>
-            <h5>Examples</h5>
-            <p>Assume the current table seating is "Al Bo Cy Di Ed".</p>
-            <table class="help-example">
-                <tr>
-                    <th class="help-command">Command</th>
-                    <th>Result</th>
-                </tr>
-                <tr>
-                    <td class="help-command">order 5 4 3 2 1</td>
-                    <td>Reverses play order, now "Ed Di Cy Bo Al".</td>
-                </tr>
-                <tr>
-                    <td class="help-command">order 1 3 2 4 5</td>
-                    <td>Switch seats. New order is "Al Cy Bo Di Ed".</td>
                 </tr>
             </table>
         </div>

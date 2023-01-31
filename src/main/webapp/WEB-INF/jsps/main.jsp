@@ -12,13 +12,13 @@
 	</div>
 	<div id="welcome" class="col-sm-5">
 		<h4 class="header">Welcome to V:TES Online</h4>
-		<form method="post" class="light some-padding">
+		<form method="post" class="light some-padding" action="/jol/login">
 			<div class="form-row">
 				<div class="col">
-					<input type="text" class="form-control" id="dsuserin" name="dsuserin" autocomplete="username" placeholder="Username"/>
+					<input type="text" class="form-control" id="dsuserin" name="username" autocomplete="username" placeholder="Username"/>
 				</div>
 				<div class="col">
-					<input type="password" class="form-control" id="dspassin" name="dspassin" autocomplete="current-password" placeholder="Password"/>
+					<input type="password" class="form-control" id="dspassin" name="password" autocomplete="current-password" placeholder="Password"/>
 				</div>
 			</div>
 			<div class="row">
@@ -57,7 +57,7 @@
 	</div>
 	<div id="register" class="col-sm-4 p-sm-0">
 		<h4 class="header">Register</h4>
-		<form method="post" class="light some-padding">
+		<form method="post" class="light some-padding" action="/jol/register">
 			<span>Register to create decks and join games!</span>
 
 			<div class="form-group form-row mb-1">

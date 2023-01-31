@@ -1,17 +1,14 @@
 <h4 class="header">Active Games</h4>
-<div id="activeGames" class="clean-table light">
-	<div class="row no-gutters h5 d-none d-sm-flex">
-		<div class="col">Game</div>
-		<div class="col">Last Access</div>
-		<div class="col">Current Turn</div>
-		<div class="col">Active Players</div>
-		<div class="col">Admin</div>
-	</div>
-</div>
-<div id="activeGameTemplate" class="row no-gutters d-none">
-	<div class="col" style="word-break: break-all"></div>
-	<div class="col d-none d-sm-flex"></div>
-	<div class="col"></div>
-	<div class="col d-none d-sm-flex"></div>
-	<div class="col d-none d-sm-flex"></div>
-</div>
+<table id="activeGames" class="clean-table light">
+	<thead>
+	<tr>
+		<th>Game</th>
+		<th>Last Access</th>
+		<th>Current Turn</th>
+		<th>Owner</th>
+	</tr>
+	</thead>
+	<tbody>
+
+	</tbody>
+</table>

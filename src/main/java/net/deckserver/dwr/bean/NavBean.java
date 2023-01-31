@@ -13,12 +13,14 @@ public class NavBean {
     private boolean chats;
     private boolean admin;
     private boolean superUser;
-    private Map<String, String> gameButtons = new HashMap<>();
+    private final Map<String, String> gameButtons = new HashMap<>();
 
-    private String player, target, game = null;
+    private final String player;
+    private final String target;
+    private String game = null;
 
-    public NavBean(AdminBean abean, PlayerModel model) {
-        player = model.getPlayer();
+    public NavBean(PlayerModel model) {
+        player = model.getPlayerName();
         target = model.getView();
         if (target.equals("game"))
             game = model.getCurrentGame();
@@ -27,12 +29,11 @@ public class NavBean {
             admin = JolAdmin.getInstance().isAdmin(player);
             superUser = JolAdmin.getInstance().isSuperUser(player);
         }
-        String[] games = model.getCurrentGames();
-        for (String game1 : games) {
-            GameModel gmodel = abean.getGameModel(game1);
+        for (String game : model.getCurrentGames()) {
+            GameModel gmodel = JolAdmin.getInstance().getGameModel(game);
             GameView view = gmodel.getView(player);
             String current = view.isChanged() ? " *" : "";
-            gameButtons.put("g" + game1, game1 + current);
+            gameButtons.put("g" + game, game + current);
         }
     }
 

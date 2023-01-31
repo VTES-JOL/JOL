@@ -1,16 +1,12 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.dwr.bean.AdminBean;
-import net.deckserver.dwr.bean.SummaryBean;
-import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
-import java.time.OffsetDateTime;
-import java.util.*;
-
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class GameModel implements Comparable {
 
@@ -18,24 +14,18 @@ public class GameModel implements Comparable {
 
     private String name;
     private Map<String, GameView> views = new HashMap<>();
-    private SummaryBean sumbean;
 
     public GameModel(String name) {
         this.name = name;
         if (isActive()) JolAdmin.getInstance().getGame(name);  // make sure its loaded
-        regen();
     }
 
     public boolean isOpen() {
-        return JolAdmin.getInstance().isOpen(name);
+        return JolAdmin.getInstance().isStarting(name);
     }
 
     public boolean isActive() {
         return JolAdmin.getInstance().isActive(name);
-    }
-
-    public boolean isFinished() {
-        return JolAdmin.getInstance().isFinished(name);
     }
 
     public String getName() {
@@ -56,7 +46,7 @@ public class GameModel implements Comparable {
         int idx = game.getActions(game.getCurrentTurn()).length;
         String status = commander.doMessage(player, chat);
         addChats(idx);
-        admin.saveGame(game);
+        admin.saveGameState(game);
         return status;
     }
 
@@ -80,7 +70,7 @@ public class GameModel implements Comparable {
             if (ping != null) {
                 if (admin.pingPlayer(ping, name)) {
                     pingChanged = true;
-                    status.append("Ping sent to " + ping);
+                    status.append("Ping sent to ").append(ping);
                 }
                 else status.append("Player is already pinged");
             }
@@ -134,11 +124,10 @@ public class GameModel implements Comparable {
                 idx = 0; // reset the current action index for the new turn.
                 String email = admin.getEmail(game.getActivePlayer());
                 turnChanged = stateChanged = phaseChanged = pingChanged = true;
-                regen();
             }
             addChats(idx);
             if (stateChanged || phaseChanged || chatChanged || globalChanged) {
-                admin.saveGame(game);
+                admin.saveGameState(game);
             }
             doReload(stateChanged, phaseChanged, pingChanged, globalChanged, turnChanged, chatChanged, privateNotesChanged);
         }
@@ -148,7 +137,6 @@ public class GameModel implements Comparable {
     public void firstPing() {
         JolAdmin admin = JolAdmin.getInstance();
         JolGame game = admin.getGame(name);
-        admin.pingPlayer(game.getActivePlayer(), name);
     }
 
     private void addChats(int idx) {
@@ -171,20 +159,7 @@ public class GameModel implements Comparable {
             if (globalChanged) view.globalChanged();
             if (privateNotesChanged) view.privateNotesChanged();
             if (turnChanged) view.turnChanged();
-            if (stateChanged || phaseChanged || pingChanged || globalChanged || turnChanged || chatChanged || privateNotesChanged) {
-                ServletContext ctx = WebContextFactory.get().getServletContext();
-                AdminBean abean = AdminBean.INSTANCE;
-                abean.notifyAboutGame(name);
-            }
         }
-    }
-
-    private String[] tokenize(String arg) {
-        StringTokenizer tok = new StringTokenizer(arg);
-        String[] ret = new String[tok.countTokens() + 3];
-        for (int i = 3; i < ret.length; i++)
-            ret[i] = tok.nextToken();
-        return ret;
     }
 
     public GameView getView(String player) {
@@ -196,31 +171,16 @@ public class GameModel implements Comparable {
         return views.get(player);
     }
 
-    public GameView hasView(String player) {
-        return views.get(player);
-    }
-
-    public GameView[] getViews() {
-        return views.values().toArray(new GameView[0]);
-    }
-
     public void resetView(String player) {
         views.remove(player);
     }
 
-    public Collection getPlayers() {
-        return Arrays.asList(JolAdmin.getInstance().getPlayers(name));
+    public Set<String> getPlayers() {
+        return JolAdmin.getInstance().getPlayers(name);
     }
 
     public int compareTo(Object arg0) {
         return -name.compareToIgnoreCase(((GameModel) arg0).getName());
     }
 
-    void regen() {
-        sumbean = new SummaryBean(this);
-    }
-
-    public SummaryBean getSummaryBean() {
-        return sumbean;
-    }
 }

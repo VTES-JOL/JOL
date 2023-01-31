@@ -24,7 +24,7 @@ class DsCard extends DsCardContainer implements Card {
 
     public String getName() {
         try {
-            return CardSearch.INSTANCE.getCardById(card).getName();
+            return CardSearch.INSTANCE.get(card).getName();
         } catch (Throwable t) {
             return "ERROR CARD";
         }

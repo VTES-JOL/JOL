@@ -17,7 +17,7 @@
 		</div>
 		<div id="buttons" class="navbar-nav"></div>
 		<div id="logout" class="navbar-nav">
-			<form method="post" class="form-inline">
+			<form method="post" class="form-inline" action="/jol/logout">
 				<button type="submit" name="logout" value="logout" class="btn btn-link nav-item nav-link">Log Out</button>
 			</form>
 		</div>

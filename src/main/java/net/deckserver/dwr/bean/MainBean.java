@@ -1,56 +1,47 @@
 package net.deckserver.dwr.bean;
 
-import net.deckserver.Utils;
-import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class MainBean {
 
-    private List<PlayerSummaryBean> myGames = new ArrayList<>();
-    private List<UserSummaryBean> who = new ArrayList<>();
-    private boolean loggedIn;
-    private List<ChatEntryBean> chat;
-    private int refresh = 0;
-    private String stamp;
-    private List<String> removedGames = new ArrayList<>();
-    private String message;
+    private final List<PlayerGameStatusBean> games;
+    private final List<UserSummaryBean> who;
+    private final boolean loggedIn;
+    private final List<ChatEntryBean> chat;
+    private final String stamp;
 
-    public MainBean(AdminBean abean, PlayerModel model) {
-        init(abean, model);
-    }
-
-    public void init(AdminBean abean, PlayerModel model) {
+    public MainBean(PlayerModel model) {
         JolAdmin jolAdmin = JolAdmin.getInstance();
-        Collection<GameModel> actives = abean.getActiveGames();
-        Collection<String> gamenames = new HashSet<>();
-        loggedIn = model.getPlayer() != null;
+        String playerName = model.getPlayerName();
+        loggedIn = model.getPlayerName() != null;
         if (loggedIn) {
-            gamenames.addAll(Arrays.asList(JolAdmin.getInstance().getGames(model.getPlayer())));
-            refresh = 5000;
+            this.games = jolAdmin.getGames(playerName).stream()
+                    .filter(jolAdmin::isActive)
+                    .map(gameName -> new PlayerGameStatusBean(gameName, playerName))
+                    .sorted(Comparator.comparing(PlayerGameStatusBean::isOusted).thenComparing(PlayerGameStatusBean::getGameName))
+                    .collect(Collectors.toList());
+            chat = model.getChat();
+            who = JolAdmin.getInstance().getWho().stream()
+                    .sorted(Comparator.reverseOrder())
+                    .map(UserSummaryBean::new)
+                    .collect(Collectors.toList());
+        } else {
+            this.games = Collections.emptyList();
+            this.chat = Collections.emptyList();
+            this.who = Collections.emptyList();
         }
-        for (GameModel game : actives) {
-            if (!model.getChangedGames().contains(game.getName())) continue;
-            if (gamenames.contains(game.getName()) && (game.isOpen() || game.getPlayers().contains(model.getPlayer())))
-                myGames.add(new PlayerSummaryBean(game, model.getPlayer()));
-        }
-        removedGames = new ArrayList<>(model.getRemovedGames());
-        chat = model.getChat();
-        who = abean.getWho().stream()
-                .sorted(Comparator.reverseOrder())
-                .map(UserSummaryBean::new)
-                .collect(Collectors.toList());
+
         stamp = JolAdmin.getDate();
-        message = abean.getMessage();
-        myGames.sort(Comparator.comparing(PlayerSummaryBean::isOusted).thenComparing(PlayerSummaryBean::getGame));
-        model.clearGames();
     }
 
-    public List<PlayerSummaryBean> getMyGames() {
-        return myGames;
+    public List<PlayerGameStatusBean> getGames() {
+        return games;
     }
 
     public List<UserSummaryBean> getWho() {
@@ -65,19 +56,8 @@ public class MainBean {
         return chat;
     }
 
-    public int getRefresh() {
-        return refresh;
-    }
-
     public String getStamp() {
         return stamp;
     }
 
-    public List<String> getRemovedGames() {
-        return removedGames;
-    }
-
-    public String getMessage() {
-        return message;
-    }
 }
