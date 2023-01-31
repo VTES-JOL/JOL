@@ -1,10 +1,12 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.dwr.bean.GameSummaryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class GameModel implements Comparable {
 
@@ -19,15 +21,11 @@ public class GameModel implements Comparable {
     }
 
     public boolean isOpen() {
-        return JolAdmin.getInstance().isOpen(name);
+        return JolAdmin.getInstance().isStarting(name);
     }
 
     public boolean isActive() {
         return JolAdmin.getInstance().isActive(name);
-    }
-
-    public boolean isFinished() {
-        return JolAdmin.getInstance().isFinished(name);
     }
 
     public String getName() {
@@ -48,7 +46,7 @@ public class GameModel implements Comparable {
         int idx = game.getActions(game.getCurrentTurn()).length;
         String status = commander.doMessage(player, chat);
         addChats(idx);
-        admin.saveGame(game);
+        admin.saveGameState(game);
         return status;
     }
 
@@ -72,7 +70,7 @@ public class GameModel implements Comparable {
             if (ping != null) {
                 if (admin.pingPlayer(ping, name)) {
                     pingChanged = true;
-                    status.append("Ping sent to " + ping);
+                    status.append("Ping sent to ").append(ping);
                 }
                 else status.append("Player is already pinged");
             }
@@ -129,7 +127,7 @@ public class GameModel implements Comparable {
             }
             addChats(idx);
             if (stateChanged || phaseChanged || chatChanged || globalChanged) {
-                admin.saveGame(game);
+                admin.saveGameState(game);
             }
             doReload(stateChanged, phaseChanged, pingChanged, globalChanged, turnChanged, chatChanged, privateNotesChanged);
         }
@@ -139,7 +137,6 @@ public class GameModel implements Comparable {
     public void firstPing() {
         JolAdmin admin = JolAdmin.getInstance();
         JolGame game = admin.getGame(name);
-        admin.pingPlayer(game.getActivePlayer(), name);
     }
 
     private void addChats(int idx) {
@@ -178,8 +175,8 @@ public class GameModel implements Comparable {
         views.remove(player);
     }
 
-    public Collection getPlayers() {
-        return Arrays.asList(JolAdmin.getInstance().getPlayers(name));
+    public Set<String> getPlayers() {
+        return JolAdmin.getInstance().getPlayers(name);
     }
 
     public int compareTo(Object arg0) {

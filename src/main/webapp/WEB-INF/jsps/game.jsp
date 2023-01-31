@@ -105,7 +105,7 @@
         <div id="gameDeck" class="row no-gutters">
             <div class="col reactive-height-content">
                 <h5 class="notes-header">Registered Deck</h5>
-                <div id="gameDeckOutput" class="scrollable side-padded reactive-height-content-header"></div>
+                <div id="gameDeckOutput" class="scrollable side-padded light reactive-height-content-header"></div>
             </div>
         </div>
     </div>

@@ -1,9 +1,23 @@
 package net.deckserver.dwr.bean;
 
-import lombok.Data;
+import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.storage.json.system.DeckFormat;
 
-@Data
 public class DeckInfoBean {
-    private final String url;
+    private final DeckFormat deckFormat;
     private final String name;
+
+    public DeckInfoBean(String playerName, String deckName) {
+        JolAdmin admin = JolAdmin.getInstance();
+        this.name = deckName;
+        this.deckFormat = admin.getDeckFormat(playerName, deckName);
+    }
+
+    public String getDeckFormat() { return deckFormat.toString(); }
+
+    public String getName() {
+        return name;
+    }
+
 }
+

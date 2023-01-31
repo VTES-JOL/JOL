@@ -8,7 +8,7 @@ package net.deckserver.game.storage.cards;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import net.deckserver.game.json.deck.CardSummary;
+import net.deckserver.storage.json.cards.CardSummary;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
@@ -26,8 +26,8 @@ public class CardSearch {
 
     private static final Logger logger = getLogger(CardSearch.class);
 
-    private Map<String, String> nameKeys = new HashMap<>();
-    private Map<String, CardEntry> cardTable = new HashMap<>();
+    private final Map<String, String> nameKeys = new HashMap<>();
+    private final Map<String, CardSummary> cards = new HashMap<>();
 
     public static CardSearch INSTANCE = new CardSearch(Paths.get(System.getenv("JOL_DATA")));
 
@@ -41,57 +41,12 @@ public class CardSearch {
                 for (String name : card.getNames()) {
                     nameKeys.put(name.toLowerCase(), card.getId());
                 }
-                CardEntry cardEntry = new CardEntry(card);
-                cardTable.put(card.getId(), cardEntry);
+                cards.put(card.getId(), card);
             });
-            logger.info("Read {} keys, {} cards", nameKeys.size(), cardTable.size());
+            logger.info("Read {} keys, {} cards", nameKeys.size(), cards.size());
         } catch (IOException e) {
             logger.error("Unable to read cards", e);
         }
-    }
-
-    public Collection<CardEntry> getAllCards() {
-        return cardTable.values();
-    }
-
-    public CardEntry getCardById(String id) {
-        CardEntry entry = cardTable.get(id);
-        logger.trace("Lookup {} - found {}", id, entry);
-        return entry;
-    }
-
-    public Collection<CardEntry> searchByType(Collection<CardEntry> set, String type) {
-        return searchByField(set, "Cardtype:", type);
-    }
-
-    public Collection<CardEntry> searchByText(Collection<CardEntry> set, String text) {
-        text = text.toLowerCase();
-        Set<CardEntry> v = new HashSet<>();
-        for (CardEntry anArr : set) {
-            String[] cardText = anArr.getFullText();
-            for (String aCardText : cardText) {
-                if (aCardText.toLowerCase().indexOf(text) > 0) {
-                    v.add(anArr);
-                    break;
-                }
-            }
-        }
-        return v;
-    }
-
-    public Collection<CardEntry> searchByField(Collection<CardEntry> set, String field, String value) {
-        List<CardEntry> v = new ArrayList<>();
-        value = value.toLowerCase();
-        for (CardEntry anArr : set) {
-            String[] text = anArr.getFullText();
-            for (String aText : text)
-                if (aText.startsWith(field)) {
-                    if (aText.toLowerCase().indexOf(value, 6) > 0)
-                        v.add(anArr);
-                    break;
-                }
-        }
-        return v;
     }
 
     public String getId(String nm) {
@@ -102,28 +57,37 @@ public class CardSearch {
         return nameKeys.keySet();
     }
 
-    public CardEntry findCardExact(String text) throws IllegalArgumentException {
+    public Optional<CardSummary> findCardExact(String text) {
         final String lowerText = StringUtils.stripAccents(text).toLowerCase();
         String key = nameKeys.get(lowerText);
         if (key != null) {
-            return cardTable.get(key);
+            CardSummary entry = cards.get(key);
+            return Optional.of(entry);
         } else {
-            throw new IllegalArgumentException("Card not found");
+            return Optional.empty();
         }
-
     }
 
-    public CardEntry findCard(String text) throws IllegalArgumentException {
+    public Optional<CardSummary> findCard(String text) {
         final String lowerText = StringUtils.stripAccents(text).toLowerCase();
+        Optional<CardSummary> entry = Optional.empty();
         if (nameKeys.containsKey(lowerText)) {
-            return cardTable.get(nameKeys.get(lowerText));
+            entry = Optional.of(cards.get(nameKeys.get(lowerText)));
         } else {
             for (String name : nameKeys.keySet()) {
                 if (name.startsWith(lowerText)) {
-                    return cardTable.get(nameKeys.get(name));
+                    entry = Optional.of(cards.get(nameKeys.get(name)));
                 }
             }
         }
-        throw new IllegalArgumentException("Can't find " + text);
+        return entry;
+    }
+
+    public Collection<CardSummary> allCards() {
+        return cards.values();
+    }
+
+    public CardSummary get(String id) {
+        return cards.get(id);
     }
 }

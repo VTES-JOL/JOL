@@ -35,8 +35,9 @@
             <div class="footer">
                 <select id="invitedGamesList"></select>
                 <select id="mydeckList"></select>
-                <button class="btn btn-primary" onclick="doRegister()">Register</button>
+                <button class="btn btn-primary" onclick="registerDeck()">Register</button>
             </div>
+            <span id="registerResult"></span>
         </div>
     </div>
 </div>

@@ -1,34 +1,23 @@
 package net.deckserver.dwr;
 
-import net.deckserver.Utils;
-import net.deckserver.dwr.bean.CardBean;
-import net.deckserver.dwr.bean.DeckEditBean;
 import net.deckserver.dwr.creators.UpdateFactory;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.interfaces.turn.GameAction;
-import net.deckserver.game.storage.cards.CardEntry;
-import net.deckserver.game.storage.cards.CardSearch;
-import net.deckserver.game.storage.cards.CardType;
-import net.deckserver.game.storage.cards.Deck;
+import net.deckserver.storage.json.deck.Deck;
 import org.directwebremoting.WebContextFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class DeckserverRemote {
 
-    private Logger logger = LoggerFactory.getLogger(DeckserverRemote.class);
-
     private final JolAdmin admin;
-    private HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
+    private final HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
 
     public DeckserverRemote() {
         admin = JolAdmin.getInstance();
@@ -41,65 +30,70 @@ public class DeckserverRemote {
         return arg;
     }
 
+    public static String getPlayer(HttpServletRequest request) {
+        return (String) request.getSession().getAttribute("meth");
+    }
+
     public Map<String, Object> doPoll() {
         return UpdateFactory.getUpdate();
     }
 
-    public Map<String, Object> createGame(String name, Boolean isPublic) {
-        PlayerModel player = getPlayer();
-        if (player != null) {
-            admin.createGame(name, isPublic, player);
+    public Map<String, Object> createGame(String gameName, Boolean isPublic) {
+        String playerName = getPlayer(request);
+        if (playerName != null) {
+            admin.createGame(gameName, isPublic, playerName);
         }
         return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> endGame(String name) {
-        PlayerModel player = getPlayer();
-        if (player.isSuperUser() || player.getPlayer().equals(admin.getGameModel(name).getOwner())) {
+        String playerName = getPlayer(request);
+        if (playerName.equals(admin.getGameModel(name).getOwner())) {
             admin.endGame(name);
         }
         return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> invitePlayer(String game, String name) {
-        String player = getPlayer().getPlayer();
-        JolAdmin admin = JolAdmin.getInstance();
-        if (player != null) {
+        String playerName = getPlayer(request);
+        if (playerName != null) {
             admin.invitePlayer(game, name);
         }
         return UpdateFactory.getUpdate();
     }
 
-    public Map<String, Object> startGame(String game) {
-        String player = getPlayer().getPlayer();
-        JolAdmin admin = JolAdmin.getInstance();
-        if ((admin.getOwner(game).equals(player) || admin.isSuperUser(player)) && admin.isOpen(game)) {
-            admin.startGame(game);
-            getModel(game).firstPing();
+    public Map<String, Object> registerDeck(String gameName, String deckName) {
+        String playerName = getPlayer(request);
+        if (playerName != null) {
+            admin.registerDeck(gameName, playerName, deckName);
         }
         return UpdateFactory.getUpdate();
     }
 
-    public Map<String, Object> replacePlayer(String game, String oldPlayer, String newPlayer) {
-        JolAdmin.getInstance().replacePlayer(game, oldPlayer, newPlayer);
-        getView(game).reset();
+    public Map<String, Object> startGame(String game) {
+        String playerName = getPlayer(request);
+        if ((admin.getOwner(game).equals(playerName) || admin.isSuperUser(playerName)) && admin.isStarting(game)) {
+            admin.startGame(game);
+        }
         return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> chat(String text) {
-        String player = Utils.getPlayer(request);
+        String player = getPlayer(request);
         admin.chat(player, text);
         return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> init() {
-        String player = Utils.getPlayer(request);
-        admin.remove(player);
+        String playerName = getPlayer(request);
+        PlayerModel player = admin.getPlayerModel(playerName);
+        player.resetChats();
         return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> navigate(String target) {
-        PlayerModel player = getPlayer();
+        String playerName = getPlayer(request);
+        PlayerModel player = admin.getPlayerModel(playerName);
         if (target != null) {
             if (target.startsWith("g")) {
                 player.enterGame(target.substring(1));
@@ -120,18 +114,20 @@ public class DeckserverRemote {
     public List<String> getHistory(String game, String turn) {
         List<String> ret = new ArrayList<>();
         if (game != null && turn != null) {
-            GameAction[] actions = JolAdmin.getInstance().getGame(game).getActions(turn);
-            for (int i = 0; i < actions.length; i++) {
-                ret.add(actions[i].getText());
+            GameAction[] actions = admin.getGame(game).getActions(turn);
+            for (GameAction action : actions) {
+                ret.add(action.getText());
             }
         }
         return ret;
     }
 
-    public String getCardText(String callback, String id) {
-        CardSearch cards = CardSearch.INSTANCE;
-        CardEntry card = cards.getCardById(id);
-        return Stream.of(card.getFullText()).collect(Collectors.joining("<br/>"));
+    public Deck getGameDeck(String gameName) {
+        String playerName = getPlayer(request);
+        if (gameName != null && playerName != null) {
+            return admin.getGameDeck(gameName, playerName);
+        }
+        return null;
     }
 
     public Map<String, Object> doToggle(String game, String id) {
@@ -140,9 +136,9 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-    public Map<String, Object> gameChat(String gamename, String chat) {
-        String player = Utils.getPlayer(request);
-        GameModel game = getModel(gamename);
+    public Map<String, Object> gameChat(String gameName, String chat) {
+        String player = getPlayer(request);
+        GameModel game = getModel(gameName);
         Map<String, Object> ret = UpdateFactory.getUpdate();
         // only process a command if the player is in the game
         if (game.getPlayers().contains(player)) {
@@ -153,10 +149,10 @@ public class DeckserverRemote {
         return ret;
     }
 
-    public Map<String, Object> submitForm(String gamename, String phase, String command, String chat,
+    public Map<String, Object> submitForm(String gameName, String phase, String command, String chat,
                                           String ping, String endTurn, String global, String text) {
-        String player = Utils.getPlayer(request);
-        GameModel game = getModel(gamename);
+        String player = getPlayer(request);
+        GameModel game = getModel(gameName);
         // only process a command if the player is in the game
         boolean isPlaying = game.getPlayers().contains(player);
         String status = null;
@@ -174,146 +170,55 @@ public class DeckserverRemote {
         return ret;
     }
 
-    public Map<String, Object> submitDeck(String name, String deck) {
-        name = ne(name);
-        name = Utils.sanitizeName(name);
-        PlayerModel model = getPlayer();
-        if (model != null && deck != null) {
-            model.submitDeck(name, deck);
-        }
-        Map<String, Object> ret = UpdateFactory.getUpdate();
-        ret.put("callbackUpdateDeck", name);
-        return ret;
-    }
-
-    public String gameDeck(String game) {
-        String player = Utils.getPlayer(request);
-        HttpServletResponse response = WebContextFactory.get().getHttpServletResponse();
-        response.setContentType("text/javascript;charset=UTF-8");
-        JolAdmin admin = JolAdmin.getInstance();
-        String deckList = admin.getGameDeck(game, player);
-        if (deckList == JolAdmin.DECK_NOT_FOUND) return deckList;
-
-        Deck deck = new Deck(CardSearch.INSTANCE, deckList);
-        StringBuilder sb = new StringBuilder(deckList.length() * 4);
-        StringBuilder line = new StringBuilder(80);
-        CardType type = CardType.VAMPIRE;
-        for (CardEntry card: deck.getCards()) {
-            if (!card.getCardType().equals(type)) {
-                line.append("<br/>");
-                type = card.getCardType();
-            }
-            line.append(deck.getQuantity(card))
-                .append(" x ")
-                .append("<a class='card-name' data-card-id='")
-                .append(card.getCardId())
-                .append("'>")
-                .append(card.getName())
-                .append("</a><br/>");
-
-            sb.append(line.toString());
-
-            line.delete(0, line.length());
-        }
-        return sb.toString();
-    }
-
-    public Map<String, Object> registerDeck(String game, String name) {
-        JolAdmin admin = JolAdmin.getInstance();
-        String player = getPlayer().getPlayer();
-        admin.addPlayerToGame(game, player, name);
-        if (admin.getRegisteredPlayerCount(game) == 5) {
-            admin.startGame(game);
-        }
-        return UpdateFactory.getUpdate();
-    }
-
-    public Map<String, Object> removeDeck(String name) {
-        JolAdmin admin = JolAdmin.getInstance();
-        String player = getPlayer().getPlayer();
-        admin.removeDeck(player, name);
-        return UpdateFactory.getUpdate();
-    }
-
-    public Map<String, Object> getDeck(String name) {
-        Map<String, Object> ret = UpdateFactory.getUpdate();
-        String player = getPlayer().getPlayer();
-        DeckEditBean deck = new DeckEditBean(player, name);
-        ret.put("showDeck", deck);
-        return ret;
-    }
-
-    public Map<String, Object> refreshDeck(String name, String deck, String shuffle) {
-        boolean doshuffle = "true".equals(shuffle);
-        Map<String, Object> ret = UpdateFactory.getUpdate();
-        getPlayer().setTmpDeck(name, deck);
-        DeckEditBean bean = new DeckEditBean(deck, doshuffle);
-        ret.put("showDeck", bean);
-        return ret;
-    }
-
-    public Map<String, Object> cardSearch(String type, String string) {
-        Map<String, Object> ret = UpdateFactory.getUpdate();
-        CardSearch search = CardSearch.INSTANCE;
-        Collection<CardEntry> set = search.getAllCards();
-        type = ne(type);
-        if (type != null && !type.equals("All")) {
-            set = search.searchByType(set, type);
-        }
-        set = search.searchByText(set, string);
-        Set<CardBean> beans = set.stream().map(CardBean::new).collect(Collectors.toSet());
-        ret.put("callbackShowCards", beans);
-        return ret;
-    }
-
-    public Map<String, Object> removeRole(String player, String role) {
-        PlayerModel user = getPlayer();
-        if (user.canPromote()) {
-            JolAdmin.getInstance().setRole(player, role, false);
-            logger.info("{} removed {} from role '{}'", user.getPlayer(), player, role);
-        } else {
-            logger.warn("Unauthorized role change attempt by {} ({} -{})",
-                user.getPlayer(), player, role);
-        }
-        return UpdateFactory.getUpdate();
-    }
-
-    public Map<String, Object> addRole(String player, String role) {
-        PlayerModel user = getPlayer();
-        if (user.canPromote()) {
-            logger.info("{} added {} to role '{}'", user.getPlayer(), player, role);
-            JolAdmin.getInstance().setRole(player, role, true);
-        } else {
-            logger.warn("Unauthorized role change attempt by {} ({} +{})",
-                user.getPlayer(), player, role);
-        }
-        return UpdateFactory.getUpdate();
-    }
-
-    public Map<String, Object> updateProfile(String email, String discordID, boolean pingDiscord) {
-        String player = Utils.getPlayer(request);
-        JolAdmin.getInstance().updateProfile(player, email, discordID, pingDiscord);
+    public Map<String, Object> updateProfile(String email, String discordID) {
+        String player = getPlayer(request);
+        admin.updateProfile(player, email, discordID);
         return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> changePassword(String newPassword) {
-        String player = Utils.getPlayer(request);
-        JolAdmin.getInstance().changePassword(player, newPassword);
+        String player = getPlayer(request);
+        admin.changePassword(player, newPassword);
         return UpdateFactory.getUpdate();
     }
 
+    public Map<String, Object> loadDeck(String deckName) {
+        String playerName = getPlayer(request);
+        admin.selectDeck(playerName, deckName);
+        return UpdateFactory.getUpdate();
+    }
 
-    private PlayerModel getPlayer() {
-        return Utils.getPlayerModel(request);
+    public Map<String, Object> parseDeck(String deckName, String contents) {
+        String playerName = getPlayer(request);
+        admin.parseDeck(playerName, deckName, contents);
+        return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> newDeck() {
+        String playerName = getPlayer(request);
+        admin.newDeck(playerName);
+        return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> saveDeck(String deckName, String contents) {
+        String playerName = getPlayer(request);
+        admin.saveDeck(playerName, deckName, contents);
+        return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> deleteDeck(String deckName) {
+        String playerName = getPlayer(request);
+        admin.deleteDeck(playerName, deckName);
+        return UpdateFactory.getUpdate();
     }
 
     private GameView getView(String name) {
-        String player = Utils.getPlayer(request);
-        GameModel gmodel = getModel(name);
-        return gmodel.getView(player);
+        String player = getPlayer(request);
+        return getModel(name).getView(player);
     }
 
     private GameModel getModel(String name) {
         return admin.getGameModel(name);
     }
+
 }

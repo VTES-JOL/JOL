@@ -1,9 +1,7 @@
 package net.deckserver.dwr.bean;
 
 import net.deckserver.dwr.model.JolAdmin;
-import net.deckserver.dwr.model.JolGame;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -22,17 +20,15 @@ public class GameStatusBean {
         if (admin.isActive(gameName)) {
             this.gameStatus = "Active";
             registrations = Collections.emptyList();
-            players = Arrays.stream(admin.getPlayers(gameName))
+            players = admin.getPlayers(gameName).stream()
                     .filter(Objects::nonNull)
-                    .filter(player -> admin.isRegistered(gameName, player))
                     .map(playerName -> new PlayerGameStatusBean(gameName, playerName))
                     .collect(Collectors.toList());
         } else {
             this.gameStatus = "Inviting";
             players = Collections.emptyList();
-            registrations = admin.getPlayers().stream()
+            registrations = admin.getPlayers(gameName).stream()
                     .filter(Objects::nonNull)
-                    .filter(player -> admin.isInvited(gameName, player) || admin.isRegistered(gameName, player))
                     .map(playerName -> new PlayerRegistrationStatusBean(gameName, playerName))
                     .collect(Collectors.toList());
         }

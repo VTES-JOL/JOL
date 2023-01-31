@@ -1,6 +1,6 @@
 package net.deckserver.dwr.creators;
 
-import net.deckserver.Utils;
+import net.deckserver.dwr.DeckserverRemote;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 import org.directwebremoting.WebContextFactory;
@@ -28,8 +28,10 @@ public class UpdateFactory {
     }
 
     public static Map<String, Object> getUpdate() {
-        PlayerModel player = Utils.getPlayerModel(WebContextFactory.get().getHttpServletRequest());
-        JolAdmin.getInstance().recordAccess(player);
+        JolAdmin admin = JolAdmin.getInstance();
+        String playerName = DeckserverRemote.getPlayer(WebContextFactory.get().getHttpServletRequest());
+        PlayerModel player = admin.getPlayerModel(playerName);
+        admin.recordPlayerAccess(player.getPlayerName());
         List<String> views = Arrays.asList(player.getView(), "nav", "status");
         return views.stream()
                 .map(UpdateFactory::getView)

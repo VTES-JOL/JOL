@@ -1,10 +1,11 @@
 package net.deckserver.dwr.bean;
 
-import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class MainBean {
@@ -17,13 +18,11 @@ public class MainBean {
 
     public MainBean(PlayerModel model) {
         JolAdmin jolAdmin = JolAdmin.getInstance();
-        String playerName = model.getPlayer();
-        loggedIn = model.getPlayer() != null;
+        String playerName = model.getPlayerName();
+        loggedIn = model.getPlayerName() != null;
         if (loggedIn) {
-            this.games = Arrays.stream(jolAdmin.getGames())
-                    .filter(Objects::nonNull)
+            this.games = jolAdmin.getGames(playerName).stream()
                     .filter(jolAdmin::isActive)
-                    .filter(gameName -> jolAdmin.isRegistered(gameName, playerName))
                     .map(gameName -> new PlayerGameStatusBean(gameName, playerName))
                     .sorted(Comparator.comparing(PlayerGameStatusBean::isOusted).thenComparing(PlayerGameStatusBean::getGameName))
                     .collect(Collectors.toList());

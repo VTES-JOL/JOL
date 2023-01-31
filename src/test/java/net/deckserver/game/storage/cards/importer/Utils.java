@@ -27,45 +27,54 @@ public class Utils {
         return cleaned.isEmpty() ? Optional.empty() : Optional.of(cleaned);
     }
 
-    static String generateDisplayName(String name, boolean advanced) {
-        return getClean(name + (advanced ? " (ADV)" : "")).orElse(name);
+    static String generateUniqueName(String name, boolean advanced, Integer group) {
+        String cleanName = getClean(name).orElse(name);
+        List<String> suffix = generateSuffixes(advanced, group);
+        if (!suffix.isEmpty()) {
+            String suffixString = suffix.stream().collect(Collectors.joining(" ", "(", ")"));
+            return cleanName + " " + suffixString;
+        }
+        return cleanName;
     }
 
-    static Set<String> otherNames(String original, boolean advanced, List<String> aliases, Integer group) {
+    static List<String> generateSuffixes(boolean advanced, Integer group) {
+        List<String> suffix = new ArrayList<>();
+        if (group != null) suffix.add(String.format("G%d", group));
+        if (advanced) suffix.add("ADV");
+        return suffix;
+    }
+
+    static Names generateNames(String original, List<String> aliases, boolean advanced, Integer group) {
+        Names result = new Names();
         Set<String> tempNames = new HashSet<>(aliases);
+        Set<String> names = new HashSet<>();
 
         String simpleName = original.endsWith(", The") ?
                 original.replaceAll(", The", "")
                         .replaceAll("^", "The ") : original;
 
-        // Add base, or original name
-        if (advanced) {
-            tempNames.add(generateDisplayName(original, true));
-            tempNames.add(generateDisplayName(simpleName, true));
-        } else {
-            tempNames.add(original);
-            tempNames.add(simpleName);
+        String uniqueName = original;
+        if (generatedNames.contains(original)) {
+            uniqueName = generateUniqueName(original, advanced, group);
         }
-
-        if (group != null) {
-            tempNames.add(String.format("%s (G%d)", original, group));
-            tempNames.add(String.format("%s (G%d)", simpleName, group));
-        }
-
-        Set<String> names = new HashSet<>();
-        tempNames.forEach(name -> {
-            names.add(name);
-            names.add(StringUtils.stripAccents(name));
-        });
+        names.add(generateUniqueName(original, advanced, null));
+        names.add(uniqueName);
+        tempNames.add(original);
+        tempNames.add(simpleName);
+        tempNames.add(StringUtils.stripAccents(original));
+        tempNames.stream().map(name -> generateUniqueName(name, advanced, group)).forEach(names::add);
+        names.addAll(tempNames);
 
         names.remove("");
-
         // If a name has been generated before, remove it from being eligible - this should mostly happen with the new V5 vamps
         names.removeAll(generatedNames);
         // Add generated names to the pool of generated names
         generatedNames.addAll(names);
 
-        return names;
+        result.setDisplayName(original);
+        result.setUniqueName(uniqueName);
+        result.setNames(names);
+        return result;
     }
 
 }

@@ -29,19 +29,11 @@ public enum CardType {
 
     public static CardType of(String label) {
         for (CardType type : EnumSet.allOf(CardType.class)) {
-            if (type.label.equals(label)) {
+            if (type.label.equalsIgnoreCase(label)) {
                 return type;
             }
         }
         return COMBO;
-    }
-
-    public static EnumSet<CardType> cryptTypes() {
-        return EnumSet.of(VAMPIRE, IMBUED);
-    }
-
-    public static EnumSet<CardType> libraryTypes() {
-        return EnumSet.complementOf(cryptTypes());
     }
 
     public static EnumSet<CardType> lifeTypes() {

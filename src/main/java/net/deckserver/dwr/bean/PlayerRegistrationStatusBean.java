@@ -1,8 +1,7 @@
 package net.deckserver.dwr.bean;
 
 import net.deckserver.dwr.model.JolAdmin;
-import net.deckserver.game.storage.cards.CardSearch;
-import net.deckserver.game.storage.cards.Deck;
+import net.deckserver.storage.json.system.RegistrationStatus;
 
 public class PlayerRegistrationStatusBean {
     private final String player;
@@ -14,16 +13,11 @@ public class PlayerRegistrationStatusBean {
     public PlayerRegistrationStatusBean(String game, String player) {
         this.player = player;
         this.gameName = game;
-        String deck = JolAdmin.getInstance().getGameDeck(game, player);
-        this.registered = !deck.equals(JolAdmin.DECK_NOT_FOUND);
-        if (this.registered) {
-            Deck impl = new Deck(CardSearch.INSTANCE, deck);
-            this.deckSummary = "Crypt: " + impl.getCryptSize() + ", Library: " + impl.getLibSize() + ", Groups: " + impl.getGroups();
-            this.valid = impl.isValid();
-        } else {
-            this.deckSummary = "invited";
-            this.valid = false;
-        }
+        JolAdmin admin = JolAdmin.getInstance();
+        RegistrationStatus status = admin.getRegistration(game, player);
+        this.registered = status.getDeckId() != null;
+        this.deckSummary = status.getSummary();
+        this.valid = status.isValid();
     }
 
     public String getPlayer() {

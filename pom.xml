@@ -9,8 +9,9 @@
     <packaging>war</packaging>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <tomcat.version>7.0.109</tomcat.version>
         <JOL_DATA>${basedir}/src/test/resources</JOL_DATA>
         <JOL_VERSION>${project.version}</JOL_VERSION>
     </properties>
@@ -39,7 +40,13 @@
             <artifactId>commons-text</artifactId>
             <version>1.10.0</version>
         </dependency>
-        
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -81,6 +88,13 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>2.14.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-guava</artifactId>
+            <version>2.14.1</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -155,6 +169,13 @@
         </dependency>
 
         <dependency>
+            <groupId>io.azam.ulidj</groupId>
+            <artifactId>ulidj</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
+
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>4.0.1</version>
@@ -196,7 +217,6 @@
             <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
                 <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>2.2</version>
                 <configuration>
                     <path>/jol</path>
                 </configuration>
@@ -250,8 +270,119 @@
                     <artifactId>maven-war-plugin</artifactId>
                     <version>3.1.0</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.tomcat.maven</groupId>
+                    <artifactId>tomcat7-maven-plugin</artifactId>
+                    <version>2.2</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.tomcat.embed</groupId>
+                            <artifactId>tomcat-embed-core</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-util</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-coyote</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-api</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-jdbc</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-dbcp</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-servlet-api</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-jsp-api</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-jasper</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-jasper-el</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-el-api</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-catalina</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-tribes</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-catalina-ha</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-annotations-api</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.apache.tomcat</groupId>
+                            <artifactId>tomcat-juli</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.apache.tomcat.embed</groupId>
+                            <artifactId>tomcat-embed-logging-juli</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.apache.tomcat.embed</groupId>
+                            <artifactId>tomcat-embed-logging-log4j</artifactId>
+                            <version>${tomcat.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
             </plugins>
         </pluginManagement>
+
     </build>
 
     <profiles>

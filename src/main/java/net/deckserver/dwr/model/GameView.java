@@ -1,6 +1,5 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.Utils;
 import net.deckserver.dwr.bean.GameBean;
 import net.deckserver.dwr.jsp.HandParams;
 import net.deckserver.game.interfaces.turn.GameAction;
@@ -24,26 +23,26 @@ public class GameView {
     private boolean privateNotesChanged = true;
     private boolean turnChanged = true;
     private boolean resetChat = true;
-    private String name;
-    private String player;
+    private final String gameName;
+    private final String playerName;
     private boolean isPlayer = false;
     private boolean isAdmin = false;
     private boolean isJudge = false;
-    private Collection<String> chats = new ArrayList<>();
-    private Collection<String> collapsed = new HashSet<>();
+    private final Collection<String> chats = new ArrayList<>();
+    private final Collection<String> collapsed = new HashSet<>();
 
-    public GameView(String name, String player) {
-        this.name = name;
-        this.player = player;
+    public GameView(String gameName, String playerName) {
+        this.gameName = gameName;
+        this.playerName = playerName;
         JolAdmin admin = JolAdmin.getInstance();
-        JolGame game = admin.getGame(name);
+        JolGame game = admin.getGame(gameName);
         GameAction[] actions = game.getActions(game.getCurrentTurn());
         for (GameAction action : actions) {
             addChat(action.getText());
         }
         List<String> players = game.getPlayers();
         for (int i = 0; i < players.size(); ) {
-            boolean active = players.get(i).equals(player);
+            boolean active = players.get(i).equals(playerName);
             if (active)
                 isPlayer = true;
             boolean ousted = game.getPool(players.get(i)) < 1;
@@ -59,10 +58,10 @@ public class GameView {
                 collapsed.add("i" + i);
             }
         }
-        if (!isPlayer && (admin.getOwner(name).equals(player))) {
+        if (!isPlayer && (admin.getOwner(gameName).equals(playerName))) {
             isAdmin = true;
         }
-        if (!isPlayer && (admin.isJudge(player))) {
+        if (!isPlayer && (admin.isJudge(playerName))) {
             isJudge = true;
         }
     }
@@ -70,13 +69,13 @@ public class GameView {
     public synchronized GameBean create() {
         JolAdmin admin = JolAdmin.getInstance();
         HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
-        JolGame game = admin.getGame(name);
+        JolGame game = admin.getGame(gameName);
 
         if (isPlayer) {
-            admin.recordPlayerAccess(player, name);
+            admin.recordPlayerAccess(playerName, gameName);
         }
 
-        int refresh = Utils.getRefershInterval(admin.getGameTimeStamp(name));
+        int refresh = admin.getRefreshInterval(gameName);
 
         List<String> ping;
         List<String> pinged;
@@ -95,7 +94,7 @@ public class GameView {
 
         if (isPlayer && stateChanged) {
             try {
-                HandParams h = new HandParams(game, player, "Hand", JolGame.HAND);
+                HandParams h = new HandParams(game, playerName, "Hand", JolGame.HAND);
                 request.setAttribute("hparams", h);
                 request.setAttribute("game", game);
                 hand = WebContextFactory.get().forwardToString(
@@ -110,9 +109,8 @@ public class GameView {
             global = game.getGlobalText();
         }
 
-        //TODO only do this if my notes changed
         if (privateNotesChanged && isPlayer) {
-            text = game.getPlayerText(player);
+            text = game.getPlayerText(playerName);
         }
 
         if (phaseChanged) {
@@ -143,7 +141,7 @@ public class GameView {
         }
 
         // pending use phaseChanged here?
-        if (isPlayer && game.getActivePlayer().equals(player)) {
+        if (isPlayer && game.getActivePlayer().equals(playerName)) {
             boolean show = false;
             Collection<String> c = new ArrayList<>();
             String phase = game.getPhase();
@@ -167,7 +165,7 @@ public class GameView {
         int logLength = game.getActions().length;
         return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, global, text, label,
                 chatReset, tc, turn, turns, state, phases, ping,
-                collapsed, stamp, pinged, name, logLength);
+                collapsed, stamp, pinged, gameName, logLength);
     }
 
     public synchronized void clearAccess() {
@@ -222,7 +220,7 @@ public class GameView {
     }
 
     public void addChats(int idx) {
-        JolGame game = JolAdmin.getInstance().getGame(name);
+        JolGame game = JolAdmin.getInstance().getGame(gameName);
         GameAction[] actions = game.getActions(game.getCurrentTurn());
         for (int i = idx; i < actions.length; i++) {
             chats.add(actions[i].getText());
@@ -230,7 +228,7 @@ public class GameView {
     }
 
     public String getPlayer() {
-        return player;
+        return playerName;
     }
 
     public boolean isPlayer() {

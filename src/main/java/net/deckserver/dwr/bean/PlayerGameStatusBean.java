@@ -8,6 +8,7 @@ import java.time.OffsetDateTime;
 public class PlayerGameStatusBean {
 
     private final String gameName;
+    private final String gameId;
     private final String playerName;
     private final int pool;
     private final boolean pinged;
@@ -18,6 +19,7 @@ public class PlayerGameStatusBean {
     public PlayerGameStatusBean(String gameName, String playerName) {
         JolAdmin admin = JolAdmin.getInstance();
         JolGame game = admin.getGame(gameName);
+        this.gameId = admin.getGameId(gameName);
         this.gameName = gameName;
         this.playerName = playerName;
         this.pool = game.getPool(playerName);
@@ -30,6 +32,7 @@ public class PlayerGameStatusBean {
         this.turn = playerName.equals(game.getActivePlayer());
     }
 
+    public String getGameId() { return  gameId; }
     public String getGameName() {
         return gameName;
     }

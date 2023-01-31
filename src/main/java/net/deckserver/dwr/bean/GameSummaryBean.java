@@ -1,13 +1,6 @@
 package net.deckserver.dwr.bean;
 
-import net.deckserver.dwr.model.GameModel;
-import net.deckserver.dwr.model.GameView;
 import net.deckserver.dwr.model.JolAdmin;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 

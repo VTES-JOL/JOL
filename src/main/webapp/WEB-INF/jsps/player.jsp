@@ -1,12 +1,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" %>
 <%@page pageEncoding="UTF-8" %>
-<%@page import="net.deckserver.Utils" %>
 <%@page import="net.deckserver.dwr.jsp.RegionParams" %>
 <%@page import="net.deckserver.dwr.model.JolGame" %>
 <%@ page import="java.util.List" %>
 
-<% String curPlayer = Utils.getPlayer(request);
+<% String curPlayer = (String) request.getSession().getAttribute("meth");
     JolGame game = (JolGame) request.getAttribute("game");
     String player = (String) request.getAttribute("pparam");
     boolean active = player.equals(curPlayer);
@@ -21,7 +20,8 @@
     request.setAttribute("edge", edge);
 %>
 <div class="game-header" data-player="<%= player %>">
-    <h5><%= player %></h5>
+    <h5><%= player %>
+    </h5>
     <c:if test="${edge}">
         <span class="label label-basic edge">Edge</span>
     </c:if>

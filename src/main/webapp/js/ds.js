@@ -5,7 +5,12 @@ var player = null;
 var currentPage = 'main';
 var currentOption = "notes";
 var USER_TIMEZONE = moment.tz.guess();
-
+var gameChatLastDay = null;
+var globalChatLastPlayer = null;
+var globalChatLastDay = null;
+var TITLE = 'V:TES Online';
+var lastGlobal = "";
+var DESKTOP_VIEWPORT_CONTENT = 'width=1024';
 var profile = {
     email: "",
     discordID: "",
@@ -44,12 +49,297 @@ function processData(data) {
     }
 }
 
+function callbackAllGames(data) {
+    renderActiveGames(data.games);
+}
+
+function callbackAdmin(data) {
+    var currentGames = $("#currentGames");
+    var publicGames = $("#publicGames");
+    var myGameList = $("#myGameList");
+    var playerList = $("#playerList");
+    var invitedGames = $("#invitedGames");
+    var invitedGamesList = $("#invitedGamesList");
+    var mydeckList = $("#mydeckList");
+    if (data.message) {
+        $("#registerResult").text(data.message).addClass("label label-light");
+    } else {
+        $("#registerResult").empty().removeClass("label label-light");
+    }
+
+    playerList.autocomplete({
+        source: data.players,
+        change: function (event, ui) {
+            if (ui.item === null) {
+                $(this).val((ui.item ? ui.item.id : ""));
+            }
+        }
+    });
+
+    currentGames.empty();
+    myGameList.empty();
+    var myGamesOption = '';
+    $.each(data.myGames, function (index, game) {
+        myGamesOption += '<option value="' + game.name + '">' + game.name + '</option>';
+        var headerRow = $("<tr/>");
+        var gameHeader = $("<th/>").text(game.name);
+        var startHeader = $("<th/>");
+        if (game.gameStatus === 'Inviting') {
+            var startButton = $("<button/>").addClass("btn btn-primary").text("Start").click(function () {
+                if (confirm("Start game?")) {
+                    DS.startGame(game.name, {callback: processData, errorHandler: errorhandler});
+                }
+            });
+            startHeader.append(startButton);
+        }
+        var endButton = $("<button/>").addClass("btn btn-primary").text("Close").click(function () {
+            if (confirm("End game?")) {
+                DS.endGame(game.name, {callback: processData, errorHandler: errorhandler});
+            }
+        });
+        startHeader.append(endButton);
+        headerRow.append(gameHeader);
+        headerRow.append(startHeader);
+        currentGames.append(headerRow);
+        $.each(game.registrations, function (i, registration) {
+            var registrationRow = $("<tr/>");
+            var player = $("<td/>").text(registration.player);
+            registrationRow.append(player);
+            var summary = $("<td/>").text(registration.deckSummary);
+            if (registration.registered && !registration.valid) {
+                summary.append($('<span/>').addClass("label label-warning left-margin").text('Invalid'));
+            }
+            registrationRow.append(summary);
+            currentGames.append(registrationRow);
+        });
+
+        $.each(game.players, function (i, playerStatus) {
+            var playerRow = $("<tr/>");
+            var playerName = $("<td/>").text(playerStatus.playerName);
+            var pool = $("<td/>").text(playerStatus.pool + " pool");
+            playerRow.append(playerName);
+            playerRow.append(pool);
+            currentGames.append(playerRow);
+        })
+    });
+    myGameList.append(myGamesOption);
+
+    publicGames.empty();
+    $.each(data.publicGames, function (index, game) {
+        var headerRow = $("<tr/>");
+        var gameHeader = $("<th/>").text(game.name);
+        var joinHeader = $("<th/>");
+        var joinButton = $("<button/>").addClass('btn btn-primary').text("Join").click(function () {
+            if (confirm("Join game?")) {
+                DS.invitePlayer(game.name, player, {callback: processData, errorHandler: errorhandler});
+            }
+        });
+        joinHeader.append(joinButton);
+        headerRow.append(gameHeader);
+        headerRow.append(joinHeader);
+        publicGames.append(headerRow);
+        $.each(game.registrations, function (i, registration) {
+            var registrationRow = $("<tr/>");
+            var playerCell = $("<td/>").text(registration.player);
+            if (registration.player === player) {
+                joinButton.hide();
+            }
+            registrationRow.append(playerCell);
+            var summary = $("<td/>").text(registration.deckSummary);
+            if (!registration.valid && registration.registered) {
+                summary.append($('<label/>').addClass("label-invalid").text('Invalid'));
+            }
+            registrationRow.append(summary);
+            publicGames.append(registrationRow);
+        });
+    })
+
+    invitedGames.empty();
+    invitedGamesList.empty();
+    var invitedGamesOption = '';
+    $.each(data.invitedGames, function (index, game) {
+        var gameRow = $("<tr/>");
+        var gameName = $("<td/>").text(game.gameName);
+        var deckSummary = $("<td/>").text(game.deckSummary);
+        if (game.registered && !game.valid) {
+            var errorMessage = $("<span/>").addClass("label label-warning left-margin").text("Invalid");
+            deckSummary.append(errorMessage);
+        }
+        gameRow.append(gameName);
+        gameRow.append(deckSummary);
+        invitedGames.append(gameRow);
+        invitedGamesOption += '<option value="' + game.gameName + '">' + game.gameName + '</option>';
+    });
+    invitedGamesList.append(invitedGamesOption);
+
+    mydeckList.empty();
+    var deckListOption = '';
+    $.each(data.decks, function (index, deck) {
+        deckListOption += '<option value="' + deck.name + '">' + deck.name + '</option>';
+    })
+    mydeckList.append(deckListOption);
+
+}
+
+function callbackSuper(data) {
+
+}
+
+function callbackProfile(data) {
+    if (profile.email !== data.email)
+        $('#profileEmail').val(data.email);
+    if (profile.discordID !== data.discordID)
+        $('#discordID').val(data.discordID);
+    if (profile.pingDiscord !== data.pingDiscord)
+        $('#pingDiscord').prop('checked', data.pingDiscord);
+    if (profile.updating) {
+        var result = $('#profileUpdateResult');
+        result.text('Done!');
+        result.stop(true);
+        result.css('opacity', 1);
+        result.css('color', 'green');
+        result.fadeTo(2000, 0);
+    }
+
+    profile = data;
+    profile.updating = false;
+
+    $('#profilePasswordError').val('');
+    $('#profileNewPassword').val('');
+    $('#profileConfirmPassword').val('');
+}
+
+function callbackShowDecks(data) {
+    var decks = $("#decks");
+    decks.empty();
+    $.each(data.decks, function (index, deck) {
+        const deckRow = $("<tr/>");
+        const deckName = $("<td/>").text(deck.name);
+        const formatLabel = $("<span/>").text(deck.deckFormat).addClass("label float-right label-small");
+        deckName.click(function () {
+            DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
+        })
+        const deleteButton = $("<button/>").addClass("btn btn-warning btn-sm float-right left-margin").text("✗").click(deleteDeck);
+        deckName.append(deleteButton);
+        deckName.append(formatLabel);
+        deckRow.append(deckName);
+        decks.append(deckRow);
+    });
+    const deckText = $("#deckText");
+    const deckErrors = $("#deckErrors");
+    const deckPreview = $("#deckPreview");
+    const deckSummary = $("#deckSummary");
+    const deckName = $("#deckName");
+    deckText.val("");
+    deckErrors.text("");
+    deckPreview.empty();
+    if (data.selectedDeck) {
+        deckText.val(data.selectedDeck.contents);
+        deckSummary.text(data.selectedDeck.details['stats']['summary']);
+        deckName.val(data.selectedDeck.details.deck['name']);
+        var validSpan = $("<span/>").addClass("label label-small left-margin");
+        if (data.selectedDeck.details['stats']['valid']) {
+            validSpan.text("VALID").addClass("label-success")
+        } else {
+            validSpan.text("INVALID").addClass("label-warning");
+        }
+        deckSummary.append(validSpan);
+        deckErrors.html(data.selectedDeck.details.deck.comments.replace(/\n/g, "<br/>"));
+        renderDeck(data.selectedDeck.details.deck, "#deckPreview");
+        generateCardData("#deckPreview");
+    } else {
+    }
+}
+
+function callbackShowGameDeck(data) {
+    renderDeck(data, "#gameDeckOutput");
+    generateCardData("#gameDeckOutput");
+}
+
+function callbackMain(data) {
+    var timestamp = moment(data.stamp).tz("UTC").format("D-MMM HH:mm z");
+    var userTimestamp = moment(data.stamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
+    $('#chatstamp').text(timestamp).attr("title", userTimestamp);
+    if (data.loggedIn) {
+        toggleVisible('player', 'register');
+        toggleVisible('globalchat', 'welcome');
+        $("#onlineUsers").show();
+        renderOnline('whoson', data.who);
+        renderGlobalChat(data.chat);
+        renderMyGames(data.games);
+        if (refresher) clearTimeout(refresher);
+        refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
+    } else {
+        toggleVisible('register', 'player');
+        toggleVisible('welcome', 'globalchat');
+        $("#onlineUsers").hide();
+    }
+}
+
+function renderDeck(data, div) {
+    var render = $(div);
+    render.empty();
+    if (data.crypt) {
+        render.append($("<h5/>").text("Crypt: (" + data.crypt['count'] + ")"));
+        const crypt = $("<ul/>").addClass("deck-list");
+        $.each(data.crypt.cards, function (index, card) {
+            const cardRow = $("<li/>");
+            const cardLink = $("<a/>").text(card.name).attr("data-card-id", card.id).addClass("card-name");
+            cardRow.append(card['count'] + " x ").append(cardLink);
+            crypt.append(cardRow);
+        })
+        render.append(crypt);
+    }
+    if (data.library) {
+        render.append($("<h5/>").text("Library: (" + data.library['count'] + ")"));
+        $.each(data.library.cards, function (index, libraryCards) {
+            render.append($("<h5/>").text(libraryCards.type + ": (" + libraryCards['count'] + ")"));
+            const section = $("<ul/>").addClass("deck-list");
+            $.each(libraryCards.cards, function (index, card) {
+                const cardRow = $("<li/>");
+                const cardLink = $("<a/>").text(card.name).attr("data-card-id", card.id).addClass("card-name");
+                cardRow.append(card['count'] + " x ").append(cardLink);
+                section.append(cardRow);
+            })
+            render.append(section);
+        })
+    }
+}
+
+function deleteDeck(e) {
+    const deckField = $("#deckName");
+    var deckName = deckField.val();
+    deckField.val("");
+    if (confirm("Delete deck?")) {
+        DS.deleteDeck(deckName, {callback: processData, errorHandler: errorhandler});
+    }
+    e.stopPropagation();
+}
+
+function parseDeck() {
+    const contents = $("#deckText").val();
+    const deckName = $("#deckName").val();
+    DS.parseDeck(deckName, contents, {callback: processData, errorHandler: errorhandler});
+}
+
+function newDeck() {
+    $("#deckName").val("");
+    DS.newDeck({callback: processData, errorHandler: errorhandler});
+}
+
+function saveDeck() {
+    const deckName = $("#deckName").val();
+    const contents = $("#deckText").val();
+    if (confirm("Saving a deck will remove all lines with errors.  Are you sure?")) {
+        DS.saveDeck(deckName, contents, {callback: processData, errorHandler: errorhandler});
+    }
+}
+
 function toggleVisible(s, h) {
     $("#" + h).hide();
     $("#" + s).show();
 }
 
-// Main page: global chat
 function doGlobalChat() {
     var chatInput = $("#gchat");
     var chatLine = chatInput.val();
@@ -60,20 +350,12 @@ function doGlobalChat() {
     DS.chat(chatLine, {callback: processData, errorHandler: errorhandler});
 }
 
-// Main page: navigation buttons
 function doNav(target) {
     $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
     DS.navigate(target, {callback: processData, errorHandler: errorhandler});
     return false;
 }
 
-// Deck Register: deck link
-function doLoadDeck(deck) {
-    $("#deckName").val(deck);
-    DS.getDeck(deck, {callback: processData, errorHandler: errorhandler});
-}
-
-// Utility functions
 function renderButton(data) {
     var buttonsDiv = $("#buttons");
     $.each(data, function (key, value) {
@@ -116,7 +398,6 @@ function scrollBottom(container) {
     container.scrollTop(container.prop("scrollHeight") - container.prop("clientHeight"));
 }
 
-var gameChatLastDay = null;
 function renderGameChat(data) {
     if (data === null) {
         return;
@@ -152,8 +433,6 @@ function renderGameChat(data) {
         scrollBottom(container);
 }
 
-var globalChatLastPlayer = null;
-var globalChatLastDay = null;
 function renderGlobalChat(data) {
     if (!data) {
         return;
@@ -178,7 +457,7 @@ function renderGlobalChat(data) {
         var userTimestamp = moment(chat.timestamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
         var chatLine = $("<p/>").addClass("chat");
         var timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp).addClass('chat-timestamp');
-        var playerLabel = globalChatLastPlayer == chat.player && globalChatLastDay == day ? "" : "<b>" + chat.player + "</b> ";
+        var playerLabel = globalChatLastPlayer === chat.player && globalChatLastDay === day ? "" : "<b>" + chat.player + "</b> ";
         var message = $("<span/>").html(" " + playerLabel + chat.message);
 
         chatLine.append(timeOutput).append(message);
@@ -196,19 +475,6 @@ function renderGlobalChat(data) {
     }
 }
 
-function renderRowWithLabel(tid, label) {
-    var table = dwr.util.byId(tid);
-    for (var idx = 0; idx < table.rows.length; idx++) {
-        var row = table.rows[idx];
-        if (row.label === label) {
-            return row;
-        }
-    }
-    var newRow = table.insertRow(table.rows.length);
-    newRow.label = label;
-    return newRow;
-}
-
 function renderMyGames(games) {
     var ownGames = $("#ownGames");
     ownGames.empty();
@@ -216,7 +482,7 @@ function renderMyGames(games) {
         var gameRow = $("<tr/>");
         var gameLink = $("<td/>");
         var status = $("<td/>");
-        gameLink.html(renderGameLink(game.gameName));
+        gameLink.html(renderGameLink(game));
         if (game.pinged) {
             status.text("!");
         } else if (!game.current) {
@@ -238,10 +504,8 @@ function renderMyGames(games) {
 }
 
 function renderGameLink(game, small) {
-    return '<a onclick="doNav(' + "'g" + game + "');" + '">'
-        + (small ? '<small>' : '')
-        + game
-        + (small ? '</small>' : '')
+    return '<a onclick="doNav(' + "'g" + game.gameName + "');" + '">'
+        + game.gameName
         + "</a>";
 }
 
@@ -268,20 +532,12 @@ function renderOnline(div, who) {
     });
 }
 
-function renderMessage(message) {
-    if (!!message) {
-        $("#messages").html(message).show();
-    } else {
-        $("#messages").hide();
-    }
-}
-
 function renderActiveGames(games) {
     var activeGames = $("#activeGames tbody");
     activeGames.empty();
-    $.each(games, function(index, game) {
+    $.each(games, function (index, game) {
         var gameRow = $("<tr/>");
-        var gameLink = $("<td/>").html(renderGameLink(game.gameName));
+        var gameLink = $("<td/>").html(renderGameLink(game));
         var access = $("<td/>").text(moment(game.access).tz("UTC").format("D-MMM-YYYY HH:mm z"));
         var turn = $("<td/>").text(game.turn);
         var owner = $("<td/>").text(game.owner);
@@ -293,9 +549,6 @@ function renderActiveGames(games) {
     });
 }
 
-var TITLE = 'V:TES Online';
-
-// Invoked via processData()
 function navigate(data) {
     if (data.target !== currentPage) {
         $("#" + currentPage).hide();
@@ -317,264 +570,16 @@ function navigate(data) {
     } else {
         renderButton({active: "Watch", deck: "Decks", profile: "Profile"});
         renderButton({admin: "Game Admin"});
-        if (data.superUser) {
-            renderButton({super: "User Admin"});
-        }
         renderGameButtons(data.gameButtons);
         $('#logout').show();
         $("#gameRow").show();
         player = data.player;
     }
-    renderButton({help: "Help", _guides: "Guides"});
+    renderButton({help: "Help"});
     renderDesktopViewButton();
 }
 
-function callbackAllGames(data) {
-    renderActiveGames(data.games);
-}
-
-function showDeck(data) {
-    if (data.text !== null) $('#deckText').val(data.text);
-    dwr.util.byId('deckcontents').innerHTML = data.format;
-    dwr.util.byId('deckerrors').style.display = "none";
-    if (data.errors !== null && data.errors.length !== 0) {
-        var errorText = "<h3>Deck Errors</h3>" + data.errors.join('<br />');
-        $('#deckerrors').html(errorText)
-        dwr.util.byId('deckerrors').style.display = "block";
-    }
-    generateCardData("#deckcontents");
-}
-
-function getCardDeck(game, card) {
-    var divid = "dcard" + card;
-    if (dwr.util.byId(divid) === null) {
-        DS.getCardText('showCardDeck', card, {callback: processData, errorHandler: errorhandler});
-    } else {
-        dwr.util.setValue("deckcards", card);
-        selectCardDeck();
-    }
-}
-
-function selectCardDeck() {
-    var divid = "dcard" + dwr.util.getValue("deckcards");
-    var selected = dwr.util.getValue("cardSelect");
-    dwr.util.setValue("cardSelect", divid);
-    toggleVisible(divid, selected);
-}
-
-function showCardDeck(data) {
-    var oldText = dwr.util.getValue('cardtext', {escapeHtml: false});
-    var text = data.text.join("<br />");
-    var newText = oldText + "<div id='dcard" + data.id + "' style='display:block;'>" + text + "</div>";
-    $('#cardtext').html(newText)
-    dwr.util.addOptions("deckcards", [data], "id", "name");
-    dwr.util.setValue("deckcards", data.id);
-    selectCardDeck();
-}
-
-function doSearch() {
-    var type = dwr.util.getValue("cardtype");
-    var query = dwr.util.getValue("cardquery");
-    DS.cardSearch(type, query, {callback: processData, errorHandler: errorhandler});
-}
-
-function findName() {
-    var rows = dwr.util.byId('decks').rows;
-    var found = false;
-    var name = '';
-    var idx = 1;
-    while (found === false) {
-        name = 'newdeck' + idx;
-        found = true;
-        for (idx; idx < rows.length; idx++) {
-            if (rows[idx].label === name) {
-                found = false;
-                break;
-            }
-            idx = idx + 1;
-        }
-    }
-    return name;
-}
-
-function doEdit() {
-    $("#deckEdit").show();
-    $("#noedit").hide();
-    $("#deckName").prop('readOnly', false);
-    $("#deckText").prop('readOnly', false);
-}
-
-function doAdjust() {
-    var deckName = $('#deckName').val();
-    var deckText = $('#deckText').val();
-    var shuffle = $('#shuffle').is(":checked")
-    DS.refreshDeck(deckName, deckText, shuffle, {callback: processData, errorHandler: errorhandler});
-}
-
-function doSave() {
-    toggleVisible('noedit', 'deckEdit');
-    dwr.util.byId('deckName').readOnly = 'readonly';
-    dwr.util.byId('deckText').readOnly = 'readonly';
-    var deckName = $('#deckName').val();
-    var deckText = $('#deckText').val();
-    DS.submitDeck(deckName, deckText, {callback: processData, errorHandler: errorhandler});
-}
-
-function doDelete(name) {
-    var confirmed = confirm("Are you use you want to delete " + name + "\nThis action is not reversible");
-    if (!confirmed) return;
-    DS.removeDeck(name, {callback: processData, errorHandler: errorhandler});
-}
-
-function doExport(url) {
-    var exportURL = window.location.protocol + "//" + window.location.hostname + (window.location.port !== 80 || window.location.port !== 443 ? ":" + window.location.port : "") + window.location.pathname + url;
-    const el = document.createElement('textarea');
-    el.value = exportURL;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    alert("Copied export URL to clipboard : " + exportURL);
-}
-
-function doNewDeck() {
-    doEdit();
-    $('#deckName').val(findName());
-    showDeck({text: '', format: '', errors: []});
-}
-
-
-// Callback for AdminCreator
-function callbackAdmin(data) {
-    var currentGames = $("#currentGames");
-    var publicGames = $("#publicGames");
-    var myGameList = $("#myGameList");
-    var playerList = $("#playerList");
-    var invitedGames = $("#invitedGames");
-    var invitedGamesList = $("#invitedGamesList");
-    var mydeckList = $("#mydeckList");
-
-    playerList.autocomplete({
-        source: data.players,
-        change: function (event, ui) {
-            if (ui.item === null) {
-                $(this).val((ui.item ? ui.item.id : ""));
-            }
-        }
-    });
-
-    currentGames.empty();
-    myGameList.empty();
-    var myGamesOption = '';
-    $.each(data.myGames, function(index, game) {
-        myGamesOption += '<option value="' + game.name + '">' + game.name + '</option>';
-        var headerRow = $("<tr/>");
-        var gameHeader = $("<th/>").text(game.name);
-        var startHeader = $("<th/>");
-        if (game.gameStatus === 'Inviting') {
-            var startButton = $("<button/>").addClass("btn btn-primary").text("Start").click(function () {
-                if (confirm("Start game?")) {
-                    DS.startGame(game.name, {callback: processData, errorHandler: errorhandler});
-                }
-            });
-            startHeader.append(startButton);
-        }
-        var endButton =  $("<button/>").addClass("btn btn-primary").text("Close").click(function () {
-            if (confirm("End game?")) {
-                DS.endGame(game.name, {callback: processData, errorHandler: errorhandler});
-            }
-        });
-        startHeader.append(endButton);
-        headerRow.append(gameHeader);
-        headerRow.append(startHeader);
-        currentGames.append(headerRow);
-        $.each(game.registrations, function (i, registration) {
-            var registrationRow = $("<tr/>");
-            var player = $("<td/>").text(registration.player);
-            registrationRow.append(player);
-            var summary = $("<td/>").text(registration.deckSummary);
-            if ("invited" !== registration.deckSummary) {
-                if (!registration.valid) {
-                    summary.append($('<span/>').addClass("label label-warning left-margin").text('Invalid'));
-                }
-            }
-            registrationRow.append(summary);
-            currentGames.append(registrationRow);
-        });
-
-        $.each(game.players, function (i, playerStatus) {
-            var playerRow = $("<tr/>");
-            var playerName = $("<td/>").text(playerStatus.playerName);
-            var pool = $("<td/>").text(playerStatus.pool + " pool");
-            playerRow.append(playerName);
-            playerRow.append(pool);
-            currentGames.append(playerRow);
-        })
-    });
-    myGameList.append(myGamesOption);
-
-    publicGames.empty();
-    $.each(data.publicGames, function(index, game) {
-        var headerRow = $("<tr/>");
-        var gameHeader = $("<th/>").text(game.name);
-        var joinHeader = $("<th/>");
-        var joinButton = $("<button/>").addClass('btn btn-primary').text("Join").click(function () {
-            if (confirm("Join game?")) {
-                DS.invitePlayer(game.name, player, {callback: processData, errorHandler: errorhandler});
-            }
-        });
-        joinHeader.append(joinButton);
-        headerRow.append(gameHeader);
-        headerRow.append(joinHeader);
-        publicGames.append(headerRow);
-        var registrationCount = 0;
-        $.each(game.registrations, function (i, registration) {
-            var registrationRow = $("<tr/>");
-            var playerCell = $("<td/>").text(registration.player);
-            if (registration.player === player) {
-                joinButton.hide();
-            }
-            registrationRow.append(playerCell);
-            var summary = $("<td/>").text(registration.deckSummary);
-            if ("invited" !== registration.deckSummary) {
-                registrationCount++;
-                if (!registration.valid) {
-                    summary.append($('<label/>').addClass("label-invalid").text('Invalid'));
-                }
-            }
-            registrationRow.append(summary);
-            publicGames.append(registrationRow);
-        });
-    })
-
-    invitedGames.empty();
-    invitedGamesList.empty();
-    var invitedGamesOption = '';
-    $.each(data.invitedGames, function(index, game) {
-        var gameRow = $("<tr/>");
-        var gameName = $("<td/>").text(game.gameName);
-        var deckSummary = $("<td/>").text(game.deckSummary);
-        if (game.registered && !game.valid) {
-            var errorMessage = $("<span/>").addClass("label label-warning left-margin").text("Invalid");
-            deckSummary.append(errorMessage);
-        }
-        gameRow.append(gameName);
-        gameRow.append(deckSummary);
-        invitedGames.append(gameRow);
-        invitedGamesOption += '<option value="' + game.gameName + '">' + game.gameName + '</option>';
-    });
-    invitedGamesList.append(invitedGamesOption);
-
-    mydeckList.empty();
-    var deckListOption = '';
-    $.each(data.decks, function(index, deck) {
-        deckListOption += '<option value="' + deck.name + '">' + deck.name + '</option>';
-    })
-    mydeckList.append(deckListOption);
-
-}
-
-function doRegister() {
+function registerDeck() {
     var regGame = $("#invitedGamesList").val();
     var regDeck = $("#mydeckList").val();
     DS.registerDeck(regGame, regDeck, {callback: processData, errorHandler: errorhandler});
@@ -615,20 +620,11 @@ function doToggle(thistag) {
     }
 }
 
-function doGameChat() {
-    var chatDiv = $("#judgeChat");
-    var chat = chatDiv.val();
-    chatDiv.val("");
-    DS.gameChat(game, chat, {callback: processData, errorHandler: errorhandler});
-    return false;
-}
-
 function doShowDeck() {
     if ($("#gameDeckOutput").html() === "")
-        DS.gameDeck(game, {callback: callbackShowGameDeck, errorHandler: errorhandler});
+        DS.getGameDeck(game, {callback: callbackShowGameDeck, errorHandler: errorhandler});
 }
 
-var lastGlobal = "";
 function doSubmit() {
     var phaseSelect = $("#phase");
     var commandInput = $("#command");
@@ -647,7 +643,7 @@ function doSubmit() {
     var text = privateNotes.val();
     phase = phase === "" ? null : phase;
     ping = ping === "" ? null : ping;
-    if (global == lastGlobal) global = null;
+    if (global === lastGlobal) global = null;
     commandInput.val("");
     chatInput.val("");
     pingSelect.val("");
@@ -664,24 +660,24 @@ function doSubmit() {
 
 function sendChat(message) {
     DS.submitForm(
-            game, null, '', message, null, 'No',
-            $("#globalNotes").val(), $("#privateNotes").val(), {
-        callback: processData,
-        errorHandler: errorhandler
-    });
+        game, null, '', message, null, 'No',
+        $("#globalNotes").val(), $("#privateNotes").val(), {
+            callback: processData,
+            errorHandler: errorhandler
+        });
     $('#quickChatModal').modal('hide');
     return false;
 }
 
 function sendCommand(command, message = '') {
-  DS.submitForm(
-    game, null, command, message, null, 'No',
-    $("#globalNotes").val(), $("#privateNotes").val(), {
-      callback: processData,
-      errorHandler: errorhandler
-  });
-  $('#quickCommandModal').modal('hide');
-  return false;
+    DS.submitForm(
+        game, null, command, message, null, 'No',
+        $("#globalNotes").val(), $("#privateNotes").val(), {
+            callback: processData,
+            errorHandler: errorhandler
+        });
+    $('#quickCommandModal').modal('hide');
+    return false;
 }
 
 function setOther(newOption) {
@@ -721,18 +717,19 @@ function showHistory() {
     $("#history").show();
     $("#notes").hide();
     $("#gameDeck").hide();
-    if ($("#historyOutput").html() == '')
-      getHistory();
+    if ($("#historyOutput").html() === '')
+        getHistory();
 }
 
 function loadGame(data) {
     //Reset on game change
-    if ($("#gameTitle").text() != data.name) {
+    var gameTitle = $("#gameTitle");
+    if (gameTitle.text() !== data.name) {
         $("#ping").empty();
         gameChatLastDay = null;
     }
 
-    $("#gameTitle").text(data.name);
+    gameTitle.text(data.name);
     if (!data.player) {
         $(".player-only").hide();
     } else {
@@ -793,13 +790,13 @@ function loadGame(data) {
         var pingSelect = $("#ping");
 
         //+1 for the empty option
-        if (pingSelect.children('option').length != data.ping.length + 1) {
-          pingSelect.empty();
-          pingSelect.append(new Option("", ""));
-          $.each(data.ping, function (index, value) {
-              var option = new Option(value, value);
-              pingSelect.append(option);
-          });
+        if (pingSelect.children('option').length !== data.ping.length + 1) {
+            pingSelect.empty();
+            pingSelect.append(new Option("", ""));
+            $.each(data.ping, function (index, value) {
+                var option = new Option(value, value);
+                pingSelect.append(option);
+            });
         }
 
         $.each(data.ping, function (index, value) {
@@ -822,14 +819,14 @@ function loadGame(data) {
         $("#endCommand").show();
 
         var phaseSelect = $("#phase");
-        if (phaseSelect.children('option').length != data.phases.length) {
-          phaseSelect.empty();
-          $.each(data.phases, function (index, value) {
-              phase.append(new Option(value, value));
-          });
+        if (phaseSelect.children('option').length !== data.phases.length) {
+            phaseSelect.empty();
+            $.each(data.phases, function (index, value) {
+                phase.append(new Option(value, value));
+            });
         }
         if (data.turnChanged) {
-          phaseSelect.val("Unlock");
+            phaseSelect.val("Unlock");
         }
     } else {
         $("#phaseCommand").hide();
@@ -869,18 +866,19 @@ function generateCardData(parent) {
         theme: 'light',
         onShow: function (instance) {
             //HACK To workaround the "sticky" / duplicate popups
-            tippy.hideAll({ duration: 0 });
+            tippy.hideAll({duration: 0});
 
             instance.setContent("Loading...");
             var ref = $(instance.reference);
             var cardId = ref.data('card-id');
             if (cardId == null) { //Backwards compatibility in main chat
-              cardId = instance.reference.title;
-              ref.data('card-id', cardId);
-              instance.reference.removeAttribute('title');
+                cardId = instance.reference.title;
+                ref.data('card-id', cardId);
+                instance.reference.removeAttribute('title');
             }
             $.get({
-                url: "rest/card/" + cardId, success: function (data) {
+                dataType: "html",
+                url: "rest/api/cards/" + cardId, success: function (data) {
                     instance.setContent(data);
                 }
             });
@@ -897,13 +895,6 @@ function showStatus(data) {
     $('#status').html(data)
 }
 
-function selectCard() {
-    var divid = dwr.util.getValue("cards");
-    var selected = dwr.util.getValue("extraSelect");
-    dwr.util.setValue("extraSelect", divid);
-    toggleVisible(divid, selected);
-}
-
 function getHistory() {
     var turns = $('#turns').val();
     DS.getHistory(game, turns, {callback: loadHistory});
@@ -917,118 +908,6 @@ function loadHistory(data) {
         historyDiv.append(turnContent);
     });
     generateCardData("#historyOutput");
-}
-
-function addRole() {
-    var player = $("#allPlayersList").val();
-    var role = $("#roles").val();
-    DS.addRole(player, role, {callback: processData, errorHandler: errorhandler});
-}
-
-function addRoleButton(userColumn, username, role, roleKey) {
-    var button = $('#userRoleTemplate').eq(0)
-        .clone()
-        .attr('id', null)
-        .removeClass('d-none');
-    button.find('span').text(role);
-    button.click(username, function () {
-        DS.removeRole(username, roleKey ? rokeKey : role.toLowerCase(), {
-            callback: processData, errorHandler: errorhandler
-        });
-    });
-    var buttonList = userColumn.find('.list-group').eq(0);
-    buttonList.append(button);
-}
-
-function callbackSuper(data) {
-    var playerList = $("#adminPlayerList");
-    playerList.empty();
-
-    $("#allPlayersList").autocomplete({
-        source: data.names,
-        change: function (event, ui) {
-            if (ui.item === null) {
-                $(this).val((ui.item ? ui.item.id : ""));
-            }
-        }
-    });
-
-    var userAdmins = $('#userAdmins');
-    userAdmins.empty();
-
-    var sortedUsers = Array.from(data.players);
-    sortedUsers.sort(function (a, b) {
-        return a.name.localeCompare(b.name);
-    });
-
-    $.each(sortedUsers, function (index, value) {
-        var userCol = $('#userAdminTemplate').eq(0)
-            .clone()
-            .attr('id', null)
-            .removeClass('d-none');
-        userCol.find('.card-header').text(value.name);
-        userCol.find('.card-footer > span').text(
-            moment(value.lastOnline).tz(USER_TIMEZONE).format("DD-MMM-YYYY HH:mm z"));
-
-        if (value.admin) addRoleButton(userCol, value.name, 'Admin');
-        if (value.superUser) addRoleButton(userCol, value.name, 'Super User', 'super');
-        if (value.judge) addRoleButton(userCol, value.name, 'Judge');
-        userAdmins.append(userCol);
-
-        ////////////////
-        var playerRow = $("<tr/>");
-        playerRow.append($("<td/>").text(value.name));
-        playerRow.append($("<td/>").text(moment(value.lastOnline).tz(USER_TIMEZONE).format("DD-MMM-YYYY HH:mm z")));
-        var adminCell = $("<td/>");
-        if (value.admin) {
-            var adminButton = $("<button/>").text('Remove').click(value.name, function () {
-                DS.removeRole(value.name, 'admin', {callback: processData, errorHandler: errorhandler});
-            });
-            adminCell.append(adminButton);
-        }
-        playerRow.append(adminCell);
-        var superCell = $("<td/>");
-        if (value.superUser) {
-            var superButton = $("<button/>").text('Remove').click(value.name, function () {
-                DS.removeRole(value.name, 'super', {callback: processData, errorHandler: errorhandler});
-            });
-            superCell.append(superButton);
-        }
-        playerRow.append(superCell);
-        var judgeCell = $("<td/>");
-        if (value.judge) {
-            var judgeButton = $("<button/>").text('Remove').click(value.name, function () {
-                DS.removeRole(value.name, 'judge', {callback: processData, errorHandler: errorhandler});
-            });
-            judgeCell.append(judgeButton);
-        }
-        playerRow.append(judgeCell);
-        playerList.append(playerRow);
-    });
-}
-
-function callbackProfile(data) {
-    if (profile.email !== data.email)
-        $('#profileEmail').val(data.email);
-    if (profile.discordID !== data.discordID)
-        $('#discordID').val(data.discordID);
-    if (profile.pingDiscord !== data.pingDiscord)
-        $('#pingDiscord').prop('checked', data.pingDiscord);
-    if (profile.updating) {
-        var result = $('#profileUpdateResult');
-        result.text('Done!');
-        result.stop(true);
-        result.css('opacity', 1);
-        result.css('color', 'green');
-        result.fadeTo(2000, 0);
-    }
-
-    profile = data;
-    profile.updating = false;
-
-    $('#profilePasswordError').val('');
-    $('#profileNewPassword').val('');
-    $('#profileConfirmPassword').val('');
 }
 
 function updateProfileErrorHandler(errorString, exception) {
@@ -1060,72 +939,6 @@ function updatePassword() {
     }
 }
 
-function callbackShowDecks(data) {
-    dwr.util.addOptions('cardtype', data.types);
-    // Deck List
-    dwr.util.removeAllRows('decks');
-    for (var dIdx = 0; dIdx < data.decks.length; dIdx++) {
-        var dRow = renderRowWithLabel('decks', data.decks[dIdx].name);
-        if (dRow.cells.length === 0) {
-            dRow.insertCell(0).innerHTML = '<a onclick="doLoadDeck(' + "'" + data.decks[dIdx].name + "');" + '">' + data.decks[dIdx].name + '</a>';
-            dRow.insertCell(1);
-            dRow.insertCell(2);
-        }
-        dRow.cells[1].innerHTML = "<a onclick='doExport(\"" + data.decks[dIdx].url + "\");'>&#x21e8;</a>";
-        dRow.cells[2].innerHTML = "<a onclick='doDelete(\"" + data.decks[dIdx].name + "\");'>&#x2717;</a>";
-        dRow.cells[2].className = 'delete';
-    }
-}
-
-function callbackShowGameDeck(data) {
-    var deckContentsDiv = $("#gameDeckOutput");
-    if (deckContentsDiv.html() === "") {
-        deckContentsDiv.html(data);
-        generateCardData("#gameDeckOutput");
-    }
-}
-
-function callbackShowCards(data) {
-    var len = dwr.util.byId('showcards').rows.length;
-    for (i = 0; i < len; i++) {
-        dwr.util.byId('showcards').deleteRow(0);
-    }
-    for (var i = 0; i < data.length; i++) {
-        dwr.util.byId('showcards').insertRow(0).insertCell(0).innerHTML = '<a class="card-name" data-card-id="' + data[i].id + '">' + data[i].name + '</a>';
-    }
-    generateCardData("#showcards");
-}
-
-function callbackUpdateDeck(data) {
-    $('#deckName').val(data);
-}
-
-// Callback for MainCreator
-function callbackMain(data) {
-    var timestamp = moment(data.stamp).tz("UTC").format("D-MMM HH:mm z");
-    var userTimestamp = moment(data.stamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
-    $('#chatstamp').text(timestamp).attr("title", userTimestamp);
-    if (data.loggedIn) {
-        toggleVisible('player', 'register');
-        toggleVisible('globalchat', 'welcome');
-        $("#onlineUsers").show();
-        renderOnline('whoson', data.who);
-        renderGlobalChat(data.chat);
-        renderMyGames(data.games);
-        if (data.refresh > 0) {
-            if (refresher) clearTimeout(refresher);
-            refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", data.refresh);
-        }
-    } else {
-        toggleVisible('register', 'player');
-        toggleVisible('welcome', 'globalchat');
-        $("#onlineUsers").hide();
-    }
-}
-
-function callbackStatus(data) {
-}
-
 function renderDesktopViewButton() {
     var viewport = $('meta[name=viewport]').get(0);
     var text = (
@@ -1141,8 +954,6 @@ function renderDesktopViewButton() {
         });
     $('#buttons').append(button);
 }
-
-var DESKTOP_VIEWPORT_CONTENT = 'width=1024';
 
 function toggleMobileView(event) {
     if (event) event.preventDefault();

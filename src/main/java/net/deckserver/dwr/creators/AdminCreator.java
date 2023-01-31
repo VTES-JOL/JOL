@@ -10,7 +10,7 @@ class AdminCreator implements ViewCreator {
     }
 
     public Object createData(PlayerModel model) {
-        return new AdminPageBean(model.getPlayer());
+        return new AdminPageBean(model.getPlayerName());
     }
 
 }

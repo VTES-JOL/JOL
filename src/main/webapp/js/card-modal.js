@@ -41,6 +41,7 @@ function showPlayCardModal(event) {
   var cardId = $(event.target).data('card-id');
   var handCoord = $(event.target).data('coordinates');
   $.get({
+      dataType: "json",
       url: "rest/api/cards/" + cardId, success: function(card) {
         var modal = $('#playCardModal');
         modal.data('hand-coord', handCoord);
@@ -249,6 +250,7 @@ function showCardModal(event) {
   var votes = target.data('votes');
   var contested = target.data('contested');
   $.get({
+      dataType: "json",
       url: "rest/api/cards/" + cardId, success: function(card) {
         //console.log(card);
         var modal = $('#cardModal');

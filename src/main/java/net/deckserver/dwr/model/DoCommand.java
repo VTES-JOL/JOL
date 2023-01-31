@@ -8,11 +8,10 @@ package net.deckserver.dwr.model;
 
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.Location;
-import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.storage.json.cards.CardSummary;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -80,29 +79,17 @@ public class DoCommand {
                 game.setVotes(card, cmdObj.nextArg());
                 return "Adjusted votes";
             }
-            if (cmd.equalsIgnoreCase("order")) {
-                List<String> players = game.getPlayers();
-                List<String> neworder = new ArrayList<>();
-                for (int j = 0; j < players.size(); j++) {
-                    int index = cmdObj.getNumber(-1);
-                    if (index == -1) return "Must specify a number for each player";
-                    if (index < 1 || index > players.size()) return "Bad number : " + index;
-                    neworder.add(players.get(index - 1));
-                }
-                game.setOrder(neworder);
-                return "Changed seating order";
-            }
             if (cmd.equalsIgnoreCase("random")) {
-                int d = cmdObj.getNumber(-1);
-                if (d < 1) d = 2;
-                int num = ThreadLocalRandom.current().nextInt(1, d + 1);
-                if (num == 0) num = d;
-                game.sendMsg(player, player + " rolls from 1-" + d + " : " + num);
+                int limit = cmdObj.getNumber(-1);
+                if (limit < 1) limit = 2;
+                int result = ThreadLocalRandom.current().nextInt(1, limit + 1);
+                if (result == 0) result = limit;
+                game.random(player, limit, result);
                 return "Rolled the die";
             }
             if (cmd.equalsIgnoreCase("flip")) {
                 String result = ThreadLocalRandom.current().nextInt(2) == 0 ? "Heads" : "Tails";
-                game.sendMsg(player, player + " flips a coin : " + result);
+                game.flip(player, result);
                 return "Flipped a coin";
             }
             if (cmd.equalsIgnoreCase("discard")) {
@@ -137,7 +124,6 @@ public class DoCommand {
                 return edge + " grabs the edge";
             }
             if (cmd.equalsIgnoreCase("play")) {
-                // TODO unsure about introducing a non-English word "@" here
                 // play [vamp] <cardnumber> [@ <modes>] [<targetplayer>] [<targetregion>] [<targetcard>] [draw]
                 boolean crypt = cmdObj.consumeString("vamp");
                 String srcRegion = crypt ? JolGame.INACTIVE_REGION : JolGame.HAND;
@@ -162,21 +148,17 @@ public class DoCommand {
                     if (docap) {
                         int curcap = game.getCapacity(srcCard);
                         if (curcap <= 0) {
-                            CardEntry card = CardSearch.INSTANCE.getCardById(game.getCardDescripId(srcCard));
-                            int capincr = 1;
-                            String[] text = card.getFullText();
-                            for (String aText : text) {
-                                if (aText.startsWith("Capacity:")) {
-                                    capincr = Integer.parseInt(aText.substring(10).trim());
-                                }
+                            CardSummary card = CardSearch.INSTANCE.get(game.getCardDescripId(srcCard));
+                            Integer capacity = card.getCapacity();
+                            if (capacity != null) {
+                                game.changeCapacity(srcCard, capacity, false);
                             }
-                            game.changeCapacity(srcCard, capincr, false);
                             // Do disciplines
-                            String disciplines = card.getDisciplines();
+                            List<String> disciplines = card.getDisciplines();
                             game.setDisciplines(srcCard, disciplines, true);
                             // Do votes
                             String votes = card.getVotes();
-                            if (!votes.isEmpty()) {
+                            if (votes != null && !votes.isEmpty()) {
                                 game.setVotes(srcCard, votes);
                             }
                         }
@@ -243,8 +225,8 @@ public class DoCommand {
                 String targetCard = cmdObj.getCard(false, targetPlayer, targetRegion);
                 if (targetCard == null) throw new CommandException("Must specify a card in the region");
                 if (cmdObj.consumeString("reset")) {
-                    CardEntry card = CardSearch.INSTANCE.getCardById(game.getCardDescripId(targetCard));
-                    String disciplines = card.getDisciplines();
+                    CardSummary card = CardSearch.INSTANCE.get(game.getCardDescripId(targetCard));
+                    List<String> disciplines = card.getDisciplines();
                     game.setDisciplines(targetCard, disciplines, false);
                 }
                 while (cmdObj.hasMoreArgs()) {
@@ -275,13 +257,7 @@ public class DoCommand {
                 game.changeCapacity(targetCard, amount, false);
                 return "Adjusted capacity";
             }
-            if (cmd.equalsIgnoreCase("msg") || cmd.equalsIgnoreCase("message")) {
-                String message = "";
-                while (cmdObj.hasMoreArgs())
-                    message = message + " " + cmdObj.nextArg();
-                return doMessage(player, message);
-            }
-            if (cmd.equalsIgnoreCase("untap") || cmd.equalsIgnoreCase("unlock")) {
+            if (cmd.equalsIgnoreCase("unlock")) {
                 // unlock [<targetplayer>] [<targetregion>] [<targetcard>]
                 String targetPlayer = cmdObj.getPlayer(player);
                 if (!cmdObj.hasMoreArgs()) {
@@ -293,7 +269,7 @@ public class DoCommand {
                 game.setTapped(player, card, false);
                 return "Unlock card";
             }
-            if (cmd.equalsIgnoreCase("tap") || cmd.equalsIgnoreCase("lock")) {
+            if (cmd.equalsIgnoreCase("lock")) {
                 // lock [<targetplayer>] [<targetregion>] <targetcard>
                 String targetPlayer = cmdObj.getPlayer(player);
                 String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
@@ -303,6 +279,7 @@ public class DoCommand {
                 game.setTapped(player, card, true);
                 return "Locked card";
             }
+            // TODO Fix this
             if (cmd.equalsIgnoreCase("show")) {
                 // show [<targetregion>] <amount> [<recipientplayer>]
                 String targetRegion = cmdObj.getRegion(JolGame.LIBRARY);

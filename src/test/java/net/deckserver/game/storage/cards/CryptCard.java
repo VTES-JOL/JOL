@@ -30,5 +30,5 @@ public class CryptCard {
     private List<String> disciplines;
     private Map<String, Integer> discipline;
 
-    private Boolean banned;
+    private boolean banned;
 }

@@ -33,7 +33,7 @@ public class LibraryCard {
 
     // Other
     private Boolean burnOption;
-    private Boolean banned;
+    private boolean banned;
 
     /**
      * The first line (or rarely, two lines: Make the Misere) of a card's text

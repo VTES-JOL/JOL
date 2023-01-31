@@ -10,8 +10,8 @@ import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.CardContainer;
 import net.deckserver.game.jaxb.state.GameCard;
 import net.deckserver.game.jaxb.state.Notation;
-import net.deckserver.game.storage.cards.CardEntry;
 import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.storage.json.cards.CardSummary;
 
 import java.util.List;
 
@@ -40,7 +40,7 @@ public class StoreCard implements Card {
     }
 
     public String getName() {
-        CardEntry card = CardSearch.INSTANCE.getCardById(getCardId());
+        CardSummary card = CardSearch.INSTANCE.get(getCardId());
         if (card == null) return getCardId();
         return card.getName();
     }
