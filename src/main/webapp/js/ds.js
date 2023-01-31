@@ -219,7 +219,12 @@ function callbackShowDecks(data) {
         deckName.click(function () {
             DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
         })
-        const deleteButton = $("<button/>").addClass("btn btn-warning btn-sm float-right left-margin").text("✗").click(deleteDeck);
+        const deleteButton = $("<button/>").addClass("btn btn-warning btn-sm float-right left-margin").text("✗").click(function(event) {
+            if (confirm("Delete deck?")) {
+                DS.deleteDeck(deck.name, {callback: processData, errorHandler: errorhandler});
+            }
+            event.stopPropagation();
+        });
         deckName.append(deleteButton);
         deckName.append(formatLabel);
         deckRow.append(deckName);
@@ -230,9 +235,6 @@ function callbackShowDecks(data) {
     const deckPreview = $("#deckPreview");
     const deckSummary = $("#deckSummary");
     const deckName = $("#deckName");
-    deckText.val("");
-    deckErrors.text("");
-    deckPreview.empty();
     if (data.selectedDeck) {
         deckText.val(data.selectedDeck.contents);
         deckSummary.text(data.selectedDeck.details['stats']['summary']);
@@ -248,6 +250,10 @@ function callbackShowDecks(data) {
         renderDeck(data.selectedDeck.details.deck, "#deckPreview");
         generateCardData("#deckPreview");
     } else {
+        deckText.val("");
+        deckErrors.text("");
+        deckPreview.empty();
+        deckName.val("");
     }
 }
 
@@ -304,16 +310,6 @@ function renderDeck(data, div) {
             render.append(section);
         })
     }
-}
-
-function deleteDeck(e) {
-    const deckField = $("#deckName");
-    var deckName = deckField.val();
-    deckField.val("");
-    if (confirm("Delete deck?")) {
-        DS.deleteDeck(deckName, {callback: processData, errorHandler: errorhandler});
-    }
-    e.stopPropagation();
 }
 
 function parseDeck() {
