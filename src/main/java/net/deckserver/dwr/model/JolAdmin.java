@@ -26,6 +26,7 @@ import net.deckserver.DeckParser;
 import net.deckserver.RandomGameName;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.GameStatusBean;
+import net.deckserver.dwr.bean.PlayerGameStatusBean;
 import net.deckserver.game.interfaces.state.Game;
 import net.deckserver.game.interfaces.turn.TurnRecorder;
 import net.deckserver.game.jaxb.XmlFileUtils;
@@ -48,6 +49,7 @@ import org.apache.commons.io.FileUtils;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,6 +66,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -100,6 +103,11 @@ public class JolAdmin {
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
+    private static final Predicate<GameInfo> ACTIVE_GAME = (info) -> info.getStatus().equals(GameStatus.ACTIVE);
+    private static final Predicate<GameInfo> STARTING_GAME = (info) -> info.getStatus().equals(GameStatus.STARTING);
+    private static final Predicate<GameInfo> PUBLIC_GAME = info -> info.getVisibility().equals(Visibility.PUBLIC);
+    private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
+    private static final Predicate<PlayerGameStatusBean> PLAYER_ACTIVE = player -> !player.isOusted();
 
     public JolAdmin(String dir) {
         this.BASE_PATH = Paths.get(dir);
@@ -175,24 +183,45 @@ public class JolAdmin {
         writeFile("decks.json", decks);
     }
 
-    public synchronized void closeGames() {
+    public synchronized void cleanupGames() {
         games.values().stream()
-                .filter(gameInfo -> gameInfo.getStatus().equals(GameStatus.ACTIVE))
-                .map(gameInfo -> new GameStatusBean(gameInfo.getName()))
+                .filter(ACTIVE_GAME)
+                .map(GameInfo::getName)
+                .map(GameStatusBean::new)
                 .forEach(gameStatus -> {
-                    long activePlayers = gameStatus.getPlayers().stream().filter(player -> !player.isOusted()).count();
+                    long activePlayers = gameStatus.getPlayers().stream().filter(PLAYER_ACTIVE).count();
                     if (activePlayers == 0) {
                         endGame(gameStatus.getName());
                         String message = String.format("{%s} has been closed.", gameStatus.getName());
                         chat("SYSTEM", message);
                     }
                 });
+
+        games.values().stream()
+                .filter(STARTING_GAME)
+                .map(GameInfo::getName)
+                .forEach(gameName -> {
+                    long registeredPlayers = registrations.row(gameName).values().stream().filter(IS_REGISTERED).count();
+                    if (registeredPlayers == 5) {
+                        try {
+                            startGame(gameName);
+                            logger.info("Started {}.", gameName);
+                        } catch (Exception e) {
+                            logger.error("Something went wrong starting {}", gameName, e);
+                            endGame(gameName);
+                        }
+                    }
+                    if (registeredPlayers > 5) {
+                        logger.info("Closing {} : Too many players", gameName);
+                        endGame(gameName);
+                    }
+                });
     }
 
     public synchronized void buildPublicGames() {
         long publicGamesCount = games.values().stream()
-                .filter(gameInfo -> gameInfo.getStatus().equals(GameStatus.STARTING))
-                .filter(gameInfo -> gameInfo.getVisibility().equals(Visibility.PUBLIC))
+                .filter(ACTIVE_GAME)
+                .filter(PUBLIC_GAME)
                 .count();
         long gamesNeeded = 5 - publicGamesCount;
         for (int x = 0; x < gamesNeeded; x++) {
@@ -301,8 +330,8 @@ public class JolAdmin {
     }
 
     public void setup() {
-        scheduler.scheduleAtFixedRate(new PersistStateJob(), 1, 5, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 10, 10, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 1, 10, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 1, TimeUnit.HOURS);
     }
 
@@ -503,31 +532,48 @@ public class JolAdmin {
         DeckInfo deckInfo = decks.get(playerName, deckName);
         GameInfo gameInfo = loadGameInfo(gameName);
         String result = "Successfully registered " + deckName + " in game " + gameName;
-        if (!gameInfo.getStatus().equals(GameStatus.STARTING)) {
-            result = "Game is not starting.  Unable to register deck.";
+        try {
+            if (!gameInfo.getStatus().equals(GameStatus.STARTING)) {
+                result = "Game is not starting.  Unable to register deck.";
+                throw new IllegalStateException(result);
+            }
+            if (deckInfo == null) {
+                result = "Unable to find deck '" + deckName + "'.";
+                throw new IllegalStateException(result);
+            }
+            if (deckInfo.getFormat().equals(DeckFormat.LEGACY)) {
+                result = "Unable to register legacy formats in new games.  Please edit, and save deck to convert to new format.";
+                throw new IllegalStateException(result);
+            }
+            if (getRegisteredPlayerCount(gameName) >= 5) {
+                result = "Unable to register deck.  Already has 5 players registered.";
+                throw new IllegalStateException(result);
+            }
+            DeckStats stats = getDeck(deckInfo.getDeckId()).getStats();
+            if (stats == null || !stats.isValid()) {
+                result = "Unable to register deck.  Not valid.";
+                throw new IllegalStateException(result);
+            }
+            RegistrationStatus registrationStatus = registrations.get(gameName, playerName);
+            if (registrationStatus == null) {
+                result = "Unable to register deck in game that has no invite";
+                throw new IllegalStateException(result);
+            }
+            registrationStatus.setDeckId(deckInfo.getDeckId());
+            registrationStatus.setDeckName(deckInfo.getDeckName());
+            registrationStatus.setValid(stats.isValid());
+            registrationStatus.setSummary(stats.getSummary());
+            copyDeck(deckInfo.getDeckId(), gameInfo.getId());
+
+            long registeredPlayers = registrations.row(gameName).values().stream().filter(IS_REGISTERED).count();
+            if (registeredPlayers == 5) {
+                startGame(gameName);
+            }
+        } catch (IllegalStateException exception) {
+            logger.debug(exception.getMessage());
+        } finally {
+            getPlayerModel(playerName).setMessage(result);
         }
-        if (deckInfo == null) {
-            result = "Unable to find deck '" + deckName + "'.";
-        }
-        if (deckInfo.getFormat().equals(DeckFormat.LEGACY)) {
-            result = "Unable to register legacy formats in new games.  Please edit, and save deck to convert to new format.";
-        }
-        if (getRegisteredPlayerCount(gameName) >= 5) {
-            result = "Unable to register deck.  Already has 5 players registered.";
-        }
-        DeckStats stats = getDeck(deckInfo.getDeckId()).getStats();
-        if (stats == null || !stats.isValid()) {
-            result = "Unable to register deck.  Not valid.";
-        }
-        RegistrationStatus registrationStatus = registrations.get(gameName, playerName);
-        if (registrationStatus == null) {
-            result = "Unable to register deck in game that has no invite";
-        }
-        registrationStatus.setDeckId(deckInfo.getDeckId());
-        registrationStatus.setDeckName(deckInfo.getDeckName());
-        registrationStatus.setValid(stats.isValid());
-        registrationStatus.setSummary(stats.getSummary());
-        getPlayerModel(playerName).setMessage(result);
     }
 
     public void recordPlayerAccess(String playerName) {
@@ -700,7 +746,10 @@ public class JolAdmin {
             Deck deck = getDeck(registration.getDeckId()).getDeck();
             if (deck != null) {
                 game.addPlayer(playerName, deck);
-                copyDeck(registration.getDeckId(), gameInfo.getId());
+                Path gameDeckPath = BASE_PATH.resolve("games").resolve(gameInfo.getId()).resolve(registration.getDeckId() + ".json");
+                if (!Files.exists(gameDeckPath)) {
+                    copyDeck(registration.getDeckId(), gameInfo.getId());
+                }
             }
         });
         if (game.getPlayers().size() >= 1 && game.getPlayers().size() <= 5) {

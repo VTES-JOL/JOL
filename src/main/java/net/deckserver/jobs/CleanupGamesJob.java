@@ -6,6 +6,6 @@ public class CleanupGamesJob implements Runnable {
 
     @Override
     public void run() {
-        JolAdmin.getInstance().closeGames();
+        JolAdmin.getInstance().cleanupGames();
     }
 }
