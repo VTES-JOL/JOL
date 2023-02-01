@@ -110,6 +110,7 @@ public class StoreLocation implements Location {
     // which we do the shuffle.  The long value can be returned so the shuffle can be replicated.
     public void shuffle(int num) {
         List<GameCard> cards = region.getGameCard();
+        if (num == 0) num = cards.size();
         List<GameCard> subList = cards.subList(0, num);
         logger.debug("pre-shuffle: {}", subList);
         for (int x = 0; x < 20; x++) {

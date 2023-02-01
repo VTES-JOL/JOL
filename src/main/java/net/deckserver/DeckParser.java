@@ -33,6 +33,7 @@ public class DeckParser {
     private static final Predicate<CardCount> FOUND_CARD = (item) -> item.getId() != null;
     private static final Function<CardCount, String> TYPE_MAPPER = (item) -> cardSearch.get(String.valueOf(item.getId())).getType();
     public static final BinaryOperator<CardCount> CARD_MERGE = (a, b) -> new CardCount(b.getId(), b.getName(), a.getCount() + b.getCount(), b.getComments());
+    public static final Function<Map<Integer, Optional<CardCount>>, List<CardCount>> CARD_MAPPER = map -> map.values().stream().flatMap(Optional::stream).collect(toList());
 
     public static ExtendedDeck parseDeck(String contents) {
         Deck deck = new Deck();
@@ -43,8 +44,7 @@ public class DeckParser {
                 .collect(Collectors.toList());
         List<CardCount> foundCards = cardCounts.stream().filter(FOUND_CARD).collect(Collectors.toList());
         List<CardCount> cryptCards = foundCards.stream().filter(IS_CRYPT)
-                .collect(collectingAndThen(groupingBy(CardCount::getId, reducing(CARD_MERGE)),
-                        map -> map.values().stream().flatMap(Optional::stream).collect(toList())));
+                .collect(collectingAndThen(groupingBy(CardCount::getId, reducing(CARD_MERGE)), CARD_MAPPER));
         int cryptCount = cryptCards.stream().map(CardCount::getCount).reduce(0, Integer::sum);
         Crypt crypt = new Crypt();
         crypt.setCards(cryptCards);
@@ -55,8 +55,7 @@ public class DeckParser {
         Library library = new Library();
         List<LibraryCard> libraryCardList = new ArrayList<>();
         libraryCards.forEach((type, list) -> {
-            List<CardCount> collapsedList = list.stream().collect(collectingAndThen(groupingBy(CardCount::getId, reducing(CARD_MERGE)),
-                    map -> map.values().stream().flatMap(Optional::stream).collect(toList())));
+            List<CardCount> collapsedList = list.stream().collect(collectingAndThen(groupingBy(CardCount::getId, reducing(CARD_MERGE)), CARD_MAPPER));
             int typeCount = collapsedList.stream().map(CardCount::getCount).reduce(0, Integer::sum);
             LibraryCard libraryCard = new LibraryCard();
             libraryCard.setType(type);

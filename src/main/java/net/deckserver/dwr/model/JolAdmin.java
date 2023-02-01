@@ -201,7 +201,7 @@ public class JolAdmin {
                 .filter(STARTING_GAME)
                 .map(GameInfo::getName)
                 .forEach(gameName -> {
-                    long registeredPlayers = registrations.row(gameName).values().stream().filter(IS_REGISTERED).count();
+                    long registeredPlayers = getRegisteredPlayerCount(gameName);
                     if (registeredPlayers == 5) {
                         try {
                             startGame(gameName);
@@ -521,7 +521,7 @@ public class JolAdmin {
     }
 
     public long getRegisteredPlayerCount(String gameName) {
-        return registrations.row(gameName).keySet().size();
+        return registrations.row(gameName).values().stream().filter(IS_REGISTERED).count();
     }
 
     public RegistrationStatus getRegistration(String gameName, String playerName) {
@@ -565,7 +565,7 @@ public class JolAdmin {
             registrationStatus.setSummary(stats.getSummary());
             copyDeck(deckInfo.getDeckId(), gameInfo.getId());
 
-            long registeredPlayers = registrations.row(gameName).values().stream().filter(IS_REGISTERED).count();
+            long registeredPlayers = getRegisteredPlayerCount(gameName);
             if (registeredPlayers == 5) {
                 startGame(gameName);
             }
