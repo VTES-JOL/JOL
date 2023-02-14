@@ -12,7 +12,7 @@ services:
     environment:
       JOL_DATA: /data
       JOL_VERSION: docker-version
-      JOL_RECAPTCHA_KEY: ***REMOVED***
+      JOL_RECAPTCHA_KEY: ***REMOVED*** 
       JOL_RECAPTCHA_SECRET: ***REMOVED***
       DISCORD_API_VERSION: 6
       DISCORD_BOT_TOKEN: ***REMOVED***
