@@ -14,7 +14,6 @@ var DESKTOP_VIEWPORT_CONTENT = 'width=1024';
 var profile = {
     email: "",
     discordID: "",
-    pingDiscord: false,
     updating: false
 };
 
@@ -190,8 +189,6 @@ function callbackProfile(data) {
         $('#profileEmail').val(data.email);
     if (profile.discordID !== data.discordID)
         $('#discordID').val(data.discordID);
-    if (profile.pingDiscord !== data.pingDiscord)
-        $('#pingDiscord').prop('checked', data.pingDiscord);
     if (profile.updating) {
         var result = $('#profileUpdateResult');
         result.text('Done!');
@@ -918,8 +915,7 @@ function updateProfile() {
     profile.updating = true;
     var email = $('#profileEmail').val();
     var discordID = $('#discordID').val();
-    var pingDiscord = $('#pingDiscord').prop('checked');
-    DS.updateProfile(email, discordID, pingDiscord, {callback: processData, errorHandler: updateProfileErrorHandler});
+    DS.updateProfile(email, discordID, {callback: processData, errorHandler: updateProfileErrorHandler});
 }
 
 function updatePassword() {

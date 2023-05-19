@@ -164,12 +164,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.mashape.unirest</groupId>
-            <artifactId>unirest-java</artifactId>
-            <version>1.4.9</version>
-        </dependency>
-
-        <dependency>
             <groupId>io.azam.ulidj</groupId>
             <artifactId>ulidj</artifactId>
             <version>1.0.1</version>

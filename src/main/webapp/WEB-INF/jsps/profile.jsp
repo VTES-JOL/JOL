@@ -23,15 +23,6 @@
 					</span>
 				</div>
 			</div>
-			<div class="form-group row mb-2">
-				<div class="col-4"></div>
-				<div class="col">
-					<div class="form-check">
-						<input type="checkbox" id="pingDiscord" class="form-check-input"/>
-						<label for="pingDiscord" class="form-check-label">Ping me on Discord!</label>
-					</div>
-				</div>
-			</div>
 		</div>
 		<div class="form-group row mb-2">
 			<div class="col-4"></div>

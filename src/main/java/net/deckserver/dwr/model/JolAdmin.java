@@ -17,10 +17,6 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.base.Strings;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.async.Callback;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import io.azam.ulidj.ULID;
 import net.deckserver.DeckParser;
 import net.deckserver.RandomGameName;
@@ -51,6 +47,10 @@ import org.slf4j.Logger;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -75,9 +75,13 @@ public class JolAdmin {
 
     private static final Logger logger = getLogger(JolAdmin.class);
     private static final JolAdmin INSTANCE = new JolAdmin(System.getenv("JOL_DATA"));
-    private static final String DISCORD_API_VERSION = System.getenv("DISCORD_API_VERSION");
-    private static final String DISCORD_BOT_TOKEN = System.getenv("DISCORD_BOT_TOKEN");
-    private static final String DISCORD_PING_CHANNEL_ID = System.getenv("DISCORD_PING_CHANNEL_ID");
+    private static final String DISCORD_AUTHORIZATION_HEADER = String.format(
+        "Bot %s", System.getenv("DISCORD_BOT_TOKEN"));
+    private static final URI DISCORD_PING_CHANNEL_URI = URI.create(
+        String.format(
+            "https://discord.com/api/v%s/channels/%s/messages",
+            System.getenv("DISCORD_API_VERSION"),
+            System.getenv("DISCORD_PING_CHANNEL_ID")));
     private static final int CHAT_STORAGE = 1000;
     private static final int CHAT_DISCARD = 100;
     private final Path BASE_PATH;
@@ -101,6 +105,11 @@ public class JolAdmin {
             .expireAfterAccess(30, TimeUnit.MINUTES)
             .build(this::loadGameState);
 
+    private final HttpClient discord = HttpClient.newBuilder()
+        .version(HttpClient.Version.HTTP_2)
+        .connectTimeout(Duration.ofSeconds(5))
+        .build();
+
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     private static final Predicate<GameInfo> ACTIVE_GAME = (info) -> info.getStatus().equals(GameStatus.ACTIVE);
@@ -121,7 +130,6 @@ public class JolAdmin {
         timestamps = readFile("timestamps.json", typeFactory.constructType(Timestamps.class));
         loadRegistrations();
         loadDecks();
-        Unirest.setTimeouts(5000, 10000);
     }
 
     public int getRefreshInterval(String gameName) {
@@ -321,7 +329,6 @@ public class JolAdmin {
 
     public void shutdown() {
         try {
-            Unirest.shutdown();
             persistState();
             scheduler.shutdownNow();
         } catch (Exception e) {
@@ -619,30 +626,28 @@ public class JolAdmin {
         PlayerInfo player = loadPlayerInfo(playerName);
         try {
             if (player != null && player.getDiscordId() != null) {
-                Unirest.post("https://discord.com/api/v{api-version}/channels/{channel-id}/messages")
-                        .routeParam("api-version", DISCORD_API_VERSION)
-                        .routeParam("channel-id", DISCORD_PING_CHANNEL_ID)
-                        .header("Content-type", "application/json")
-                        .header("Authorization", String.format("Bot %s", DISCORD_BOT_TOKEN))
-                        .body(String.format("{\"content\":\"<@!%s> to %s\"}", player.getDiscordId(), gameName))
-                        .asStringAsync(new Callback<>() {
-                            public void completed(HttpResponse<String> response) {
-                                int responseCode = response.getStatus();
-                                if (responseCode != 200) {
-                                    logger.warn(
-                                            "Non-200 response calling Discord ({}); response body: {}",
-                                            String.valueOf(responseCode), response.getBody());
-                                }
+                HttpRequest request = HttpRequest.newBuilder()
+                    .uri(DISCORD_PING_CHANNEL_URI)
+                    .header("Content-type", "application/json")
+                    .header("Authorization", DISCORD_AUTHORIZATION_HEADER)
+                    .timeout(Duration.ofSeconds(10))
+                    .POST(
+                        HttpRequest.BodyPublishers.ofString(
+                            String.format("{\"content\":\"<@!%s> to %s\"}", player.getDiscordId(), gameName)))
+                    .build();
+                discord.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .handle((response, exception) -> {
+                        if (exception == null) {
+                            int responseCode = response.statusCode();
+                            if (responseCode != 200) {
+                                logger.warn(
+                                    "Non-200 response ({}) calling Discord ({}); response body: {}",
+                                    String.valueOf(responseCode), response.uri(), response.body());
                             }
-
-                            public void failed(UnirestException e) {
-                                logger.error("Error calling Discord", e);
-                            }
-
-                            public void cancelled() {
-                                logger.warn("Discord call was cancelled");
-                            }
-                        });
+                        }
+                        else logger.error("Error calling Discord", exception);
+                        return null;
+                    });
             }
         } catch (Exception e) {
             logger.error("Unable to ping player", e);
