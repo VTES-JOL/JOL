@@ -625,7 +625,8 @@ public class JolAdmin {
         //Ping on Discord
         PlayerInfo player = loadPlayerInfo(playerName);
         try {
-            if (player != null && player.getDiscordId() != null) {
+            String discordId = player.getDiscordId();
+            if (player != null && discordId != null && !discordId.isBlank()) {
                 HttpRequest request = HttpRequest.newBuilder()
                     .uri(DISCORD_PING_CHANNEL_URI)
                     .header("Content-type", "application/json")
