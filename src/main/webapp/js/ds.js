@@ -16,6 +16,7 @@ var profile = {
     discordID: "",
     updating: false
 };
+var pointerCanHover = window.matchMedia("(hover: hover)").matches;
 
 function errorhandler(errorString, exception) {
     if (exception.name === "dwr.engine.incompleteReply" || exception.name === 'dwr.engine.textHtmlReply') {
@@ -245,7 +246,7 @@ function callbackShowDecks(data) {
         deckSummary.append(validSpan);
         deckErrors.html(data.selectedDeck.details.deck.comments.replace(/\n/g, "<br/>"));
         renderDeck(data.selectedDeck.details.deck, "#deckPreview");
-        generateCardData("#deckPreview");
+        addCardTooltips("#deckPreview");
     } else {
         deckText.val("");
         deckErrors.text("");
@@ -256,7 +257,7 @@ function callbackShowDecks(data) {
 
 function callbackShowGameDeck(data) {
     renderDeck(data, "#gameDeckOutput");
-    generateCardData("#gameDeckOutput");
+    addCardTooltips("#gameDeckOutput");
 }
 
 function callbackMain(data) {
@@ -458,7 +459,7 @@ function renderGlobalChat(data) {
         globalChatLastPlayer = chat.player;
         globalChatLastDay = day;
     });
-    generateCardData("#globalChatOutput");
+    addCardTooltips("#globalChatOutput");
 
     if (scrollToBottom) {
         $('#newChatAlert').hide();
@@ -830,7 +831,7 @@ function loadGame(data) {
             doToggle(data.collapsed[c]);
         }
     }
-    generateCardData("#game");
+    addCardTooltips("#game");
 
     if (data.refresh > 0 || fetchFullLog) {
         if (refresher) clearTimeout(refresher);
@@ -848,8 +849,15 @@ function loadGame(data) {
     }
 }
 
-function generateCardData(parent) {
-    tippy(parent + ' a.card-name', {
+function addCardTooltips(parent) {
+    var linkSelector = `${parent} a.card-name`;
+    //On devices without pointer hover capabilities, like phones, do not bind
+    //tippy tooltips to cards that already have a click handler that shows the card.
+    //This fixes the bug where cards in hand required a double-tap to show the modal.
+    if (!pointerCanHover) {
+        linkSelector += `[onclick^="pickTarget"], ${parent} a.card-name:not([onclick])`;
+    }
+    tippy(linkSelector, {
         animateFill: false,
         hideOnClick: false,
         flipOnUpdate: true,
@@ -900,7 +908,7 @@ function loadHistory(data) {
         var turnContent = $("<p/>").addClass("chat").html(content);
         historyDiv.append(turnContent);
     });
-    generateCardData("#historyOutput");
+    addCardTooltips("#historyOutput");
 }
 
 function updateProfileErrorHandler(errorString, exception) {
@@ -960,5 +968,6 @@ function toggleMobileView(event) {
         $link.text('Mobile View');
     }
     console.log('after: ' + viewport.content)
+    pointerCanHover = window.matchMedia("(hover: hover)").matches;
     $('body').scrollTop(0);
 }
