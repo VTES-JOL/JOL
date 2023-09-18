@@ -19,7 +19,7 @@ var pointerCanHover = window.matchMedia("(hover: hover)").matches;
 
 function errorhandler(errorString, exception) {
     if (exception.name === "dwr.engine.incompleteReply" || exception.name === 'dwr.engine.textHtmlReply') {
-        document.location = "/jol/";
+        document.location = "/jol/main.jsp";
     }
 }
 
@@ -39,7 +39,6 @@ function init(data) {
     $("h4.collapse").click(function () {
         $(this).next().slideToggle();
     })
-    $('#dsuserin').focus();
 }
 
 function processData(data) {
@@ -264,18 +263,13 @@ function callbackMain(data) {
     var userTimestamp = moment(data.stamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
     $('#chatstamp').text(timestamp).attr("title", userTimestamp);
     if (data.loggedIn) {
-        toggleVisible('player', 'register');
-        toggleVisible('globalchat', 'welcome');
-        $("#onlineUsers").show();
         renderOnline('whoson', data.who);
         renderGlobalChat(data.chat);
         renderMyGames(data.games);
         if (refresher) clearTimeout(refresher);
         refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
     } else {
-        toggleVisible('register', 'player');
-        toggleVisible('welcome', 'globalchat');
-        $("#onlineUsers").hide();
+        document.location = "/jol/";
     }
 }
 
@@ -946,9 +940,9 @@ function updatePassword() {
     var profileNewPassword = dwr.util.getValue("profileNewPassword");
     var profileConfirmPassword = dwr.util.getValue("profileConfirmPassword");
     if (!profileNewPassword && !profileConfirmPassword) {
-        dwr.util.setValue("profilePasswordError", "Please enter a new password to proceed.");
+        dwr.util.setValue("profilePasswordError", "Enter a new password.");
     } else if (profileNewPassword !== profileConfirmPassword) {
-        dwr.util.setValue("profilePasswordError", "Password chosen does not match.");
+        dwr.util.setValue("profilePasswordError", "Password confirmation does not match.");
     } else {
         DS.changePassword(profileNewPassword, {callback: processData, errorHandler: errorhandler});
         dwr.util.setValue("profilePasswordError", "Password updated");

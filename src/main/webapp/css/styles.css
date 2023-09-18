@@ -1367,3 +1367,8 @@ option.pinged {
 #quickChatModal .btn {
     min-width: 3rem;
 }
+/*Inidicate external links with a pop-out character.*/
+a[target=_blank]:after {
+    content: ' ⎋';
+    white-space: nowrap;
+}
