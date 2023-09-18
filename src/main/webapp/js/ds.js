@@ -9,7 +9,6 @@ var gameChatLastDay = null;
 var globalChatLastPlayer = null;
 var globalChatLastDay = null;
 var TITLE = 'V:TES Online';
-var lastGlobal = "";
 var DESKTOP_VIEWPORT_CONTENT = 'width=1024';
 var profile = {
     email: "",
@@ -620,24 +619,19 @@ function doShowDeck() {
 }
 
 function doSubmit() {
-    var phaseSelect = $("#phase");
-    var commandInput = $("#command");
-    var chatInput = $("#chat");
-    var pingSelect = $("#ping");
-    var endTurnSelect = $("#endTurn");
-    var globalNotes = $("#globalNotes");
-    var privateNotes = $("#privateNotes");
+    const phaseSelect = $("#phase");
+    const commandInput = $("#command");
+    const chatInput = $("#chat");
+    const pingSelect = $("#ping");
+    const endTurnSelect = $("#endTurn");
 
-    var phase = phaseSelect.val();
-    var ping = pingSelect.val();
-    var command = commandInput.val();
-    var chat = chatInput.val();
-    var endTurn = endTurnSelect.val();
-    var global = globalNotes.val();
-    var text = privateNotes.val();
+    let phase = phaseSelect.val();
+    let ping = pingSelect.val();
+    const command = commandInput.val();
+    const chat = chatInput.val();
+    const endTurn = endTurnSelect.val();
     phase = phase === "" ? null : phase;
     ping = ping === "" ? null : ping;
-    if (global === lastGlobal) global = null;
     commandInput.val("");
     chatInput.val("");
     pingSelect.val("");
@@ -645,7 +639,7 @@ function doSubmit() {
     if (endTurn === "Yes") {
         phaseSelect.val("Unlock");
     }
-    DS.submitForm(game, phase, command, chat, ping, endTurn, global, text, {
+    DS.submitForm(game, phase, command, chat, ping, endTurn, null, null, {
         callback: processData,
         errorHandler: errorhandler
     });
@@ -654,8 +648,7 @@ function doSubmit() {
 
 function sendChat(message) {
     DS.submitForm(
-        game, null, '', message, null, 'No',
-        $("#globalNotes").val(), $("#privateNotes").val(), {
+        game, null, '', message, null, 'No', null, null, {
             callback: processData,
             errorHandler: errorhandler
         });
@@ -665,12 +658,29 @@ function sendChat(message) {
 
 function sendCommand(command, message = '') {
     DS.submitForm(
-        game, null, command, message, null, 'No',
-        $("#globalNotes").val(), $("#privateNotes").val(), {
+        game, null, command, message, null, 'No', null, null, {
             callback: processData,
             errorHandler: errorhandler
         });
     $('#quickCommandModal').modal('hide');
+    return false;
+}
+
+function sendGlobalNotes() {
+    DS.submitForm(
+        game, null, '', '', null, 'No', $("#globalNotes").val(), null, {
+            callback: processData,
+            errorHandler: errorhandler
+        });
+    return false;
+}
+
+function sendPrivateNotes() {
+    DS.submitForm(
+        game, null, '', '', null, 'No', null, $("#privateNotes").val(), {
+            callback: processData,
+            errorHandler: errorhandler
+        });
     return false;
 }
 
@@ -715,9 +725,11 @@ function showHistory() {
         getHistory();
 }
 
+var lastPrivateNotesFromServer;
+
 function loadGame(data) {
     //Reset on game change
-    var gameTitle = $("#gameTitle");
+    const gameTitle = $("#gameTitle");
     if (gameTitle.text() !== data.name) {
         $("#ping").empty();
         gameChatLastDay = null;
@@ -729,17 +741,19 @@ function loadGame(data) {
     } else {
         $(".player-only").show();
     }
-    var gameLog = $("#gameChatOutput");
+    const gameLog = $("#gameChatOutput");
+    const privateNotes = $("#privateNotes");
     if (data.resetChat) {
         gameLog.empty();
         $("#historyOutput").empty();
         $("#gameDeckOutput").empty();
         $("#globalNotes").empty();
-        $("#privateNotes").empty();
+        privateNotes.empty();
         $("#chat").empty();
         $("#command").empty();
         currentOption = "notes";
         gameChatLastDay = null;
+        lastPrivateNotesFromServer = null;
     }
     if (!data.player && !data.judge) {
         $(".reactive-height").addClass("half-height").removeClass("full-height");
@@ -759,10 +773,12 @@ function loadGame(data) {
     }
     if (data.global !== null) {
         $("#globalNotes").val(data.global);
-        lastGlobal = data.global;
     }
-    if (data.text !== null) {
-        $("#privateNotes").val(data.text);
+    //Only clobber your private notes with the server's if something has changed,
+    //like another player has shown you some cards.
+    if (data.text !== null && data.text != lastPrivateNotesFromServer) {
+        privateNotes.val(data.text);
+        lastPrivateNotesFromServer = data.text;
     }
     if (data.label !== null) {
         $("#gameLabel").text(data.label);
