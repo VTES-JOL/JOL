@@ -228,7 +228,7 @@ public class JolAdmin {
 
     public synchronized void buildPublicGames() {
         long publicGamesCount = games.values().stream()
-                .filter(ACTIVE_GAME)
+                .filter(STARTING_GAME)
                 .filter(PUBLIC_GAME)
                 .count();
         long gamesNeeded = 5 - publicGamesCount;
@@ -279,7 +279,10 @@ public class JolAdmin {
         logger.trace("Creating game {} for player {}", gameName, playerName);
         if (gameName.length() > 2 || !existsGame(gameName)) {
             try {
-                games.put(gameName, new GameInfo(gameName, ULID.random(), playerName, Visibility.fromBoolean(isPublic), GameStatus.STARTING));
+                String gameId = ULID.random();
+                games.put(gameName, new GameInfo(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), GameStatus.STARTING));
+                Path gamePath = BASE_PATH.resolve("games").resolve(gameId);
+                Files.createDirectory(gamePath);
             } catch (Exception e) {
                 logger.error("Error creating game", e);
             }
@@ -374,14 +377,16 @@ public class JolAdmin {
         }
     }
 
-    private void copyDeck(String deckId, String gameId) {
+    private boolean copyDeck(String deckId, String gameId) {
         try {
             Path deckPath = BASE_PATH.resolve("decks").resolve(deckId + ".json");
             Path gamePath = BASE_PATH.resolve("games").resolve(gameId).resolve(deckId + ".json");
             logger.info("Copying {} to {}", deckPath, gamePath);
             Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
+            return true;
         } catch (IOException e) {
             logger.error("Unable to load deck for {}", deckId, e);
+            return false;
         }
     }
 
@@ -566,11 +571,15 @@ public class JolAdmin {
                 result = "Unable to register deck in game that has no invite";
                 throw new IllegalStateException(result);
             }
+            boolean copySuccess = copyDeck(deckInfo.getDeckId(), gameInfo.getId());
+            if (!copySuccess) {
+                result = "Unable to copy deck file to game";
+                throw new IllegalStateException(result);
+            }
             registrationStatus.setDeckId(deckInfo.getDeckId());
             registrationStatus.setDeckName(deckInfo.getDeckName());
             registrationStatus.setValid(stats.isValid());
             registrationStatus.setSummary(stats.getSummary());
-            copyDeck(deckInfo.getDeckId(), gameInfo.getId());
 
             long registeredPlayers = getRegisteredPlayerCount(gameName);
             if (registeredPlayers == 5) {
@@ -738,27 +747,13 @@ public class JolAdmin {
         DsTurnRecorder actions = new DsTurnRecorder();
         JolGame game = new JolGame(gameInfo.getId(), state, actions);
         game.initGame(gameName);
-        Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId());
-        if (!Files.exists(gamePath)) {
-            try {
-                logger.info("Creating game directory: {}", gamePath);
-                Files.createDirectory(gamePath);
-            } catch (IOException e) {
-                logger.error("unable to create game directory");
-                return;
-            }
-        }
         registrations.row(gameName).forEach((playerName, registration) -> {
-            Deck deck = getDeck(registration.getDeckId()).getDeck();
-            if (deck != null) {
+            if (registration.getDeckId() != null) {
+                Deck deck = getDeck(registration.getDeckId()).getDeck();
                 game.addPlayer(playerName, deck);
-                Path gameDeckPath = BASE_PATH.resolve("games").resolve(gameInfo.getId()).resolve(registration.getDeckId() + ".json");
-                if (!Files.exists(gameDeckPath)) {
-                    copyDeck(registration.getDeckId(), gameInfo.getId());
-                }
             }
         });
-        if (game.getPlayers().size() >= 1 && game.getPlayers().size() <= 5) {
+        if (!game.getPlayers().isEmpty() && game.getPlayers().size() <= 5) {
             game.startGame();
             saveGameState(game);
             gameInfo.setStatus(GameStatus.ACTIVE);
