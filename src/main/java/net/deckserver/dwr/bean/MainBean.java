@@ -22,6 +22,7 @@ public class MainBean {
         loggedIn = model.getPlayerName() != null;
         if (loggedIn) {
             this.games = jolAdmin.getGames(playerName).stream()
+                    .filter(gameName -> jolAdmin.isRegistered(gameName, playerName))
                     .filter(jolAdmin::isActive)
                     .map(gameName -> new PlayerGameStatusBean(gameName, playerName))
                     .sorted(Comparator.comparing(PlayerGameStatusBean::isOusted).thenComparing(PlayerGameStatusBean::getGameName))

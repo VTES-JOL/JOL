@@ -42,7 +42,9 @@ public class PlayerModel {
 
     public void enterGame(String gameName) {
         setView("game");
-        games.add(gameName);
+        if (JolAdmin.getInstance().isInGame(gameName, player)) {
+            games.add(gameName);
+        }
         if (!gameName.equals(this.game)) {
             JolAdmin.getInstance().getGameModel(gameName).resetView(player);
         }

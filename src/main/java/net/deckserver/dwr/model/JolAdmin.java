@@ -45,12 +45,11 @@ import org.apache.commons.io.FileUtils;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -76,12 +75,12 @@ public class JolAdmin {
     private static final Logger logger = getLogger(JolAdmin.class);
     private static final JolAdmin INSTANCE = new JolAdmin(System.getenv("JOL_DATA"));
     private static final String DISCORD_AUTHORIZATION_HEADER = String.format(
-        "Bot %s", System.getenv("DISCORD_BOT_TOKEN"));
+            "Bot %s", System.getenv("DISCORD_BOT_TOKEN"));
     private static final URI DISCORD_PING_CHANNEL_URI = URI.create(
-        String.format(
-            "https://discord.com/api/v%s/channels/%s/messages",
-            System.getenv("DISCORD_API_VERSION"),
-            System.getenv("DISCORD_PING_CHANNEL_ID")));
+            String.format(
+                    "https://discord.com/api/v%s/channels/%s/messages",
+                    System.getenv("DISCORD_API_VERSION"),
+                    System.getenv("DISCORD_PING_CHANNEL_ID")));
     private static final int CHAT_STORAGE = 1000;
     private static final int CHAT_DISCARD = 100;
     private final Path BASE_PATH;
@@ -106,9 +105,9 @@ public class JolAdmin {
             .build(this::loadGameState);
 
     private final HttpClient discord = HttpClient.newBuilder()
-        .version(HttpClient.Version.HTTP_2)
-        .connectTimeout(Duration.ofSeconds(5))
-        .build();
+            .version(HttpClient.Version.HTTP_2)
+            .connectTimeout(Duration.ofSeconds(5))
+            .build();
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -154,7 +153,7 @@ public class JolAdmin {
 
     private void writeFile(String fileName, Object object) {
         try {
-            logger.info("Saving data to {}", fileName);
+            logger.debug("Saving data to {}", fileName);
             objectMapper.writeValue(BASE_PATH.resolve(fileName).toFile(), object);
         } catch (IOException e) {
             logger.error("Unable to write {}", fileName, e);
@@ -195,9 +194,22 @@ public class JolAdmin {
         games.values().stream()
                 .filter(ACTIVE_GAME)
                 .map(GameInfo::getName)
+                .forEach(gameName -> {
+                    Map<String, RegistrationStatus> playerRegistrations = registrations.row(gameName);
+                    playerRegistrations.forEach((player, registration) -> {
+                        if (!isRegistered(gameName, player)) {
+                            logger.info("Removing unregistered player {} from active game {}", player, gameName);
+                            playerRegistrations.remove(gameName, player);
+                        }
+                    });
+                });
+
+        games.values().stream()
+                .filter(ACTIVE_GAME)
+                .map(GameInfo::getName)
                 .map(GameStatusBean::new)
                 .forEach(gameStatus -> {
-                    long activePlayers = gameStatus.getPlayers().stream().filter(PLAYER_ACTIVE).count();
+                    long activePlayers = gameStatus.getActivePlayerCount();
                     if (activePlayers == 0) {
                         endGame(gameStatus.getName());
                         String message = String.format("{%s} has been closed.", gameStatus.getName());
@@ -224,6 +236,33 @@ public class JolAdmin {
                         endGame(gameName);
                     }
                 });
+
+        persistState();
+
+        // clear out any empty player/game names in registrations
+        if (registrations.containsColumn("")) {
+            logger.info("Removing bad player data from registrations");
+            registrations.column("").clear();
+        }
+        if (registrations.containsRow("")) {
+            logger.info("Removing bad game data from registrations");
+            registrations.row("").clear();
+        }
+
+        pmap.values().forEach(playerModel -> {
+            // Check current game exists still, this is the cause of people unable to login sometimes
+            // when the player model in session thinks they are in a game that's since been closed
+            String currentGame = playerModel.getCurrentGame();
+            if (currentGame != null && !existsGame(currentGame)) {
+                logger.info("Clearing out closed game {} for {}", playerModel.getCurrentGame(), playerModel.getPlayerName());
+                playerModel.setView("main");
+            }
+            // clear out games from the recent game view if you are just a spectator and not playing
+            playerModel.getCurrentGames().stream()
+                    .filter(gameName -> !existsGame(gameName))
+                    .peek(gameName -> logger.info("Removing {} from the list of recent games viewed by {}", gameName, playerModel.getPlayerName()))
+                    .forEach(playerModel.getCurrentGames()::remove);
+        });
     }
 
     public synchronized void buildPublicGames() {
@@ -342,7 +381,7 @@ public class JolAdmin {
     public void setup() {
         scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 1, 10, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 1, TimeUnit.HOURS);
+        scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 1, TimeUnit.MINUTES);
     }
 
     public static JolAdmin getInstance() {
@@ -472,7 +511,7 @@ public class JolAdmin {
     }
 
     private JolGame loadGameState(String gameName) {
-        logger.info("Loading {}", gameName);
+        logger.debug("Loading {}", gameName);
         GameInfo gameInfo = loadGameInfo(gameName);
         String gameId = gameInfo.getId();
         Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.xml");
@@ -541,6 +580,7 @@ public class JolAdmin {
     }
 
     public void registerDeck(String gameName, String playerName, String deckName) {
+        deckName = deckName.trim();
         DeckInfo deckInfo = decks.get(playerName, deckName);
         GameInfo gameInfo = loadGameInfo(gameName);
         String result = "Successfully registered " + deckName + " in game " + gameName;
@@ -637,27 +677,26 @@ public class JolAdmin {
             String discordId = player.getDiscordId();
             if (player != null && discordId != null && !discordId.isBlank()) {
                 HttpRequest request = HttpRequest.newBuilder()
-                    .uri(DISCORD_PING_CHANNEL_URI)
-                    .header("Content-type", "application/json")
-                    .header("Authorization", DISCORD_AUTHORIZATION_HEADER)
-                    .timeout(Duration.ofSeconds(10))
-                    .POST(
-                        HttpRequest.BodyPublishers.ofString(
-                            String.format("{\"content\":\"<@!%s> to %s\"}", player.getDiscordId(), gameName)))
-                    .build();
+                        .uri(DISCORD_PING_CHANNEL_URI)
+                        .header("Content-type", "application/json")
+                        .header("Authorization", DISCORD_AUTHORIZATION_HEADER)
+                        .timeout(Duration.ofSeconds(10))
+                        .POST(
+                                HttpRequest.BodyPublishers.ofString(
+                                        String.format("{\"content\":\"<@!%s> to %s\"}", player.getDiscordId(), gameName)))
+                        .build();
                 discord.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                    .handle((response, exception) -> {
-                        if (exception == null) {
-                            int responseCode = response.statusCode();
-                            if (responseCode != 200) {
-                                logger.warn(
-                                    "Non-200 response ({}) calling Discord ({}); response body: {}",
-                                    String.valueOf(responseCode), response.uri(), response.body());
-                            }
-                        }
-                        else logger.error("Error calling Discord", exception);
-                        return null;
-                    });
+                        .handle((response, exception) -> {
+                            if (exception == null) {
+                                int responseCode = response.statusCode();
+                                if (responseCode != 200) {
+                                    logger.warn(
+                                            "Non-200 response ({}) calling Discord ({}); response body: {}",
+                                            String.valueOf(responseCode), response.uri(), response.body());
+                                }
+                            } else logger.error("Error calling Discord", exception);
+                            return null;
+                        });
             }
         } catch (Exception e) {
             logger.error("Unable to ping player", e);
@@ -723,6 +762,10 @@ public class JolAdmin {
 
     public boolean isInGame(String gameName, String playerName) {
         return registrations.contains(gameName, playerName);
+    }
+
+    public boolean isRegistered(String gameName, String playerName) {
+        return registrations.contains(gameName, playerName) && registrations.get(gameName, playerName).getDeckId() != null;
     }
 
     public boolean isStarting(String gameName) {

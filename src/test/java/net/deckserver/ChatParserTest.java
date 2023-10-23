@@ -1,7 +1,6 @@
 package net.deckserver;
 
 import net.deckserver.dwr.model.ChatParser;
-import net.deckserver.game.storage.cards.CardSearch;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;

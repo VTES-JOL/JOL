@@ -1,5 +1,6 @@
 package net.deckserver.dwr;
 
+import com.google.common.base.Strings;
 import net.deckserver.dwr.creators.UpdateFactory;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
@@ -40,7 +41,7 @@ public class DeckserverRemote {
 
     public Map<String, Object> createGame(String gameName, Boolean isPublic) {
         String playerName = getPlayer(request);
-        if (playerName != null) {
+        if (!Strings.isNullOrEmpty(playerName)) {
             admin.createGame(gameName, isPublic, playerName);
         }
         return UpdateFactory.getUpdate();
@@ -64,7 +65,7 @@ public class DeckserverRemote {
 
     public Map<String, Object> registerDeck(String gameName, String deckName) {
         String playerName = getPlayer(request);
-        if (playerName != null) {
+        if (!Strings.isNullOrEmpty(playerName)) {
             admin.registerDeck(gameName, playerName, deckName);
         }
         return UpdateFactory.getUpdate();
@@ -124,7 +125,7 @@ public class DeckserverRemote {
 
     public Deck getGameDeck(String gameName) {
         String playerName = getPlayer(request);
-        if (gameName != null && playerName != null) {
+        if (gameName != null && !Strings.isNullOrEmpty(playerName)) {
             return admin.getGameDeck(gameName, playerName);
         }
         return null;
