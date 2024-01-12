@@ -3,6 +3,8 @@ image: atlassian/default-image:2
 definitions:
   steps:
     - step: &build-artifact
+        name: Build artifact
+        image: maven:3.9-amazoncorretto-11
         caches:
           - maven
         script:
@@ -20,14 +22,6 @@ pipelines:
           services:
             - docker
           script:
-            - mkdir -p ~/.docker
-            - echo $TLSCACERT | base64 --decode  > ~/.docker/ca.pem
-            - echo $TLSCERT | base64 --decode  > ~/.docker/cert.pem
-            - echo $TLSKEY | base64 --decode  > ~/.docker/key.pem
-            - export DOCKER_TLS_VERIFY="1"
-            - export DOCKER_HOST="$DOCKER_HOST"
-            - export DOCKER_CERT_PATH=~/.docker
-            - export DOCKER_MACHINE_NAME="jol"
             - docker cp target/jol.war prod:/usr/local/tomcat/webapps/
     develop:
       - step: *build-artifact
@@ -37,12 +31,4 @@ pipelines:
           services:
             - docker
           script:
-            - mkdir -p ~/.docker
-            - echo $TLSCACERT | base64 --decode  > ~/.docker/ca.pem
-            - echo $TLSCERT | base64 --decode  > ~/.docker/cert.pem
-            - echo $TLSKEY | base64 --decode  > ~/.docker/key.pem
-            - export DOCKER_TLS_VERIFY="1"
-            - export DOCKER_HOST="$DOCKER_HOST"
-            - export DOCKER_CERT_PATH=~/.docker
-            - export DOCKER_MACHINE_NAME="jol"
-            - docker cp target/jol.war test:/usr/local/tomcat/webapps/
+            - DOCKER_HOST=$DECKSERVER_HOST docker cp target/jol.war test:/usr/local/tomcat/webapps/

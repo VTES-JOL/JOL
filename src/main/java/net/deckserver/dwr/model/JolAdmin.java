@@ -46,6 +46,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -147,7 +148,11 @@ public class JolAdmin {
             return objectMapper.readValue(BASE_PATH.resolve(fileName).toFile(), type);
         } catch (IOException e) {
             logger.error("Unable to read {}", fileName, e);
-            throw new RuntimeException(e);
+            try {
+                return (T) type.getRawClass().getConstructor().newInstance();
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException nsm) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
