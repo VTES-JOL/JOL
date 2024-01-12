@@ -63,6 +63,14 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
+    public Map<String, Object> unInvitePlayer(String game, String name) {
+        String playerName = getPlayer(request);
+        if (playerName != null) {
+            admin.unInvitePlayer(game, name);
+        }
+        return UpdateFactory.getUpdate();
+    }
+
     public Map<String, Object> registerDeck(String gameName, String deckName) {
         String playerName = getPlayer(request);
         if (!Strings.isNullOrEmpty(playerName)) {

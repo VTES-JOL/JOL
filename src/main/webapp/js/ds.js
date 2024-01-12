@@ -141,6 +141,12 @@ function callbackAdmin(data) {
             var playerCell = $("<td/>").text(registration.player);
             if (registration.player === player) {
                 joinButton.hide();
+                var leaveButton = $("<button/>").addClass('btn btn-primary').text("Leave").click(function() {
+                    if (confirm("Leave game?")) {
+                        DS.unInvitePlayer(game.name, player, {callback: processData, errorHandler: errorhandler});
+                    }
+                })
+                joinHeader.append(leaveButton);
             }
             registrationRow.append(playerCell);
             var summary = $("<td/>").text(registration.deckSummary);

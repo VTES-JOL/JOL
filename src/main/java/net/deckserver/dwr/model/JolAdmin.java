@@ -42,6 +42,7 @@ import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.Timestamps;
 import net.deckserver.storage.json.system.*;
 import org.apache.commons.io.FileUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 
@@ -196,78 +197,111 @@ public class JolAdmin {
     }
 
     public synchronized void cleanupGames() {
-        games.values().stream()
-                .filter(ACTIVE_GAME)
-                .map(GameInfo::getName)
-                .forEach(gameName -> {
-                    Map<String, RegistrationStatus> playerRegistrations = registrations.row(gameName);
-                    playerRegistrations.forEach((player, registration) -> {
-                        if (!isRegistered(gameName, player)) {
-                            logger.info("Removing unregistered player {} from active game {}", player, gameName);
-                            playerRegistrations.remove(gameName, player);
+        try {
+            logger.info("CLEAN - Unregistered players");
+            Table<String, String, Boolean> invalidRegistrations = HashBasedTable.create();
+            games.values().stream()
+                    .filter(ACTIVE_GAME)
+                    .map(GameInfo::getName)
+                    .forEach(gameName -> {
+                        Map<String, RegistrationStatus> playerRegistrations = registrations.row(gameName);
+                        playerRegistrations.forEach((player, registration) -> {
+                            if (!isRegistered(gameName, player)) {
+                                logger.info("Removing unregistered player {} from active game {}", player, gameName);
+                                invalidRegistrations.put(gameName, player, Boolean.TRUE);
+                            }
+                        });
+                    });
+
+            logger.info("CLEAN - Close finished games");
+            games.values().stream()
+                    .filter(ACTIVE_GAME)
+                    .map(GameInfo::getName)
+                    .map(GameStatusBean::new)
+                    .forEach(gameStatus -> {
+                        long activePlayers = gameStatus.getActivePlayerCount();
+                        if (activePlayers == 0) {
+                            endGame(gameStatus.getName());
+                            String message = String.format("{%s} has been closed.", gameStatus.getName());
+                            chat("SYSTEM", message);
                         }
                     });
-                });
 
-        games.values().stream()
-                .filter(ACTIVE_GAME)
-                .map(GameInfo::getName)
-                .map(GameStatusBean::new)
-                .forEach(gameStatus -> {
-                    long activePlayers = gameStatus.getActivePlayerCount();
-                    if (activePlayers == 0) {
-                        endGame(gameStatus.getName());
-                        String message = String.format("{%s} has been closed.", gameStatus.getName());
-                        chat("SYSTEM", message);
-                    }
-                });
-
-        games.values().stream()
-                .filter(STARTING_GAME)
-                .map(GameInfo::getName)
-                .forEach(gameName -> {
-                    long registeredPlayers = getRegisteredPlayerCount(gameName);
-                    if (registeredPlayers == 5) {
-                        try {
-                            startGame(gameName);
-                            logger.info("Started {}.", gameName);
-                        } catch (Exception e) {
-                            logger.error("Something went wrong starting {}", gameName, e);
+            logger.info("CLEAN - Start ready games");
+            games.values().stream()
+                    .filter(STARTING_GAME)
+                    .map(GameInfo::getName)
+                    .forEach(gameName -> {
+                        long registeredPlayers = getRegisteredPlayerCount(gameName);
+                        if (registeredPlayers == 5) {
+                            try {
+                                startGame(gameName);
+                                logger.info("Started {}.", gameName);
+                            } catch (Exception e) {
+                                logger.error("Something went wrong starting {}", gameName, e);
+                                endGame(gameName);
+                            }
+                        }
+                        if (registeredPlayers > 5) {
+                            logger.info("Closing {} : Too many players", gameName);
                             endGame(gameName);
                         }
-                    }
-                    if (registeredPlayers > 5) {
-                        logger.info("Closing {} : Too many players", gameName);
-                        endGame(gameName);
-                    }
-                });
+                    });
 
-        persistState();
+            logger.info("CLEAN - Close Idle games and registrations");
+            games.values().stream()
+                    .filter(STARTING_GAME)
+                    .forEach(gameInfo -> {
+                        String gameName = gameInfo.getName();
+                        OffsetDateTime created = gameInfo.getCreated();
+                        if (created != null && created.plusDays(3).isBefore(OffsetDateTime.now())) {
+                            logger.info("Closing {} : Idle too long", gameName);
+                            endGame(gameName);
+                        }
+                        registrations.row(gameName).forEach((playerName, status) -> {
+                            if (status.getTimestamp() != null && status.getTimestamp().plusDays(1).isBefore(OffsetDateTime.now())) {
+                                logger.info("Removing idle player {} from starting game {}", playerName, gameName);
+                                invalidRegistrations.put(gameName, playerName, Boolean.TRUE);
+                            }
+                        });
+                    });
 
-        // clear out any empty player/game names in registrations
-        if (registrations.containsColumn("")) {
-            logger.info("Removing bad player data from registrations");
-            registrations.column("").clear();
-        }
-        if (registrations.containsRow("")) {
-            logger.info("Removing bad game data from registrations");
-            registrations.row("").clear();
-        }
+            invalidRegistrations.cellSet().forEach(cell -> {
+                String game = cell.getRowKey();
+                String player = cell.getColumnKey();
+                registrations.remove(game, player);
+            });
 
-        pmap.values().forEach(playerModel -> {
-            // Check current game exists still, this is the cause of people unable to login sometimes
-            // when the player model in session thinks they are in a game that's since been closed
-            String currentGame = playerModel.getCurrentGame();
-            if (currentGame != null && !existsGame(currentGame)) {
-                logger.info("Clearing out closed game {} for {}", playerModel.getCurrentGame(), playerModel.getPlayerName());
-                playerModel.setView("main");
+            // clear out any empty player/game names in registrations
+            if (registrations.containsColumn("")) {
+                logger.info("Removing bad player data from registrations");
+                registrations.column("").clear();
             }
-            // clear out games from the recent game view if you are just a spectator and not playing
-            playerModel.getCurrentGames().stream()
-                    .filter(gameName -> !existsGame(gameName))
-                    .peek(gameName -> logger.info("Removing {} from the list of recent games viewed by {}", gameName, playerModel.getPlayerName()))
-                    .forEach(playerModel.getCurrentGames()::remove);
-        });
+            if (registrations.containsRow("")) {
+                logger.info("Removing bad game data from registrations");
+                registrations.row("").clear();
+            }
+
+            pmap.values().forEach(playerModel -> {
+                // Check current game exists still, this is the cause of people unable to login sometimes
+                // when the player model in session thinks they are in a game that's since been closed
+                String currentGame = playerModel.getCurrentGame();
+                if (currentGame != null && !existsGame(currentGame)) {
+                    logger.info("Clearing out closed game {} for {}", playerModel.getCurrentGame(), playerModel.getPlayerName());
+                    playerModel.setView("main");
+                }
+                // clear out games from the recent game view if you are just a spectator and not playing
+                playerModel.getCurrentGames().stream()
+                        .filter(gameName -> !existsGame(gameName))
+                        .peek(gameName -> logger.info("Removing {} from the list of recent games viewed by {}", gameName, playerModel.getPlayerName()))
+                        .forEach(playerModel.getCurrentGames()::remove);
+            });
+
+            persistState();
+
+        } catch (Exception e) {
+            logger.error("Caught runtime exception", e);
+        }
     }
 
     public synchronized void buildPublicGames() {
@@ -324,7 +358,7 @@ public class JolAdmin {
         if (gameName.length() > 2 || !existsGame(gameName)) {
             try {
                 String gameId = ULID.random();
-                games.put(gameName, new GameInfo(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), GameStatus.STARTING));
+                games.put(gameName, new GameInfo(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), GameStatus.STARTING, OffsetDateTime.now()));
                 Path gamePath = BASE_PATH.resolve("games").resolve(gameId);
                 Files.createDirectory(gamePath);
             } catch (Exception e) {
@@ -762,7 +796,13 @@ public class JolAdmin {
     }
 
     public void invitePlayer(String gameName, String playerName) {
-        registrations.put(gameName, playerName, new RegistrationStatus());
+        registrations.put(gameName, playerName, new RegistrationStatus(OffsetDateTime.now()));
+    }
+
+    public void unInvitePlayer(String gameName, String playerName) {
+        if (isStarting(gameName)) {
+            registrations.remove(gameName, playerName);
+        }
     }
 
     public boolean isInGame(String gameName, String playerName) {

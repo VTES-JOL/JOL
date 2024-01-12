@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -214,7 +215,7 @@ class DataConverter {
                 if (gameName != null && status != GameStatus.CLOSED) {
                     gameProperties.put(gameId, gameProperty);
                     nameLookup.put(gameId, gameName);
-                    games.put(gameName, new GameInfo(gameName, gameId, owner, Visibility.fromBoolean(isPublic), status));
+                    games.put(gameName, new GameInfo(gameName, gameId, owner, Visibility.fromBoolean(isPublic), status, OffsetDateTime.now()));
                 }
             } catch (IOException e) {
                 logger.error("Unable to load game properties for {}", gameId, e);
@@ -249,7 +250,7 @@ class DataConverter {
                 if (invited && games.containsKey(gameId)) {
                     String playerName = nameLookup.get(playerId);
                     String gameName = nameLookup.get(gameId);
-                    RegistrationStatus status = new RegistrationStatus(null);
+                    RegistrationStatus status = new RegistrationStatus(OffsetDateTime.now());
                     registrations.put(gameName, playerName, status);
                 }
             });
