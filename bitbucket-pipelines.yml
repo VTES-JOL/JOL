@@ -22,7 +22,7 @@ pipelines:
           services:
             - docker
           script:
-            - docker cp target/jol.war prod:/usr/local/tomcat/webapps/
+            - DOCKER_HOST=$DECKSERVER_HOST docker cp target/jol.war prod:/usr/local/tomcat/webapps/
     develop:
       - step: *build-artifact
       - step:
