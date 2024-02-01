@@ -18,9 +18,8 @@ public class LoginServlet extends HttpServlet {
         boolean authResult = JolAdmin.getInstance().authenticate(username, password);
         if (authResult) {
             req.getSession().setAttribute("meth", username);
+            resp.sendRedirect("/jol/main.jsp");
         }
-        resp.sendRedirect("/jol/");
+        else resp.sendRedirect("/jol/");
     }
-
-
 }

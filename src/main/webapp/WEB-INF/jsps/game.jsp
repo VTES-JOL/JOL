@@ -95,11 +95,13 @@
         <div id="notes" class="row no-gutters">
             <div class="col-sm-6 border-right reactive-height-content">
                 <h5 class="notes-header">Global Notes</h5>
-                <textarea id="globalNotes" class="game-notes reactive-height-content-header side-padded"></textarea>
+                <textarea id="globalNotes" class="game-notes reactive-height-content-header side-padded"
+                    onblur="sendGlobalNotes();"></textarea>
             </div>
             <div class="col-sm-6 player-only reactive-height-content">
                 <h5 class="notes-header">Private Notes</h5>
-                <textarea id="privateNotes" class="game-notes reactive-height-content-header side-padded"></textarea>
+                <textarea id="privateNotes" class="game-notes reactive-height-content-header side-padded"
+                    onblur="sendPrivateNotes();"></textarea>
             </div>
         </div>
         <div id="gameDeck" class="row no-gutters">

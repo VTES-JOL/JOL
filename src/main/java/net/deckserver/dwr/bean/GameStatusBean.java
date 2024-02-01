@@ -1,10 +1,10 @@
 package net.deckserver.dwr.bean;
 
+import com.google.common.base.Strings;
 import net.deckserver.dwr.model.JolAdmin;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class GameStatusBean {
@@ -21,17 +21,22 @@ public class GameStatusBean {
             this.gameStatus = "Active";
             registrations = Collections.emptyList();
             players = admin.getPlayers(gameName).stream()
-                    .filter(Objects::nonNull)
+                    .filter(playerName -> !Strings.isNullOrEmpty(playerName))
+                    .filter(playerName -> admin.isRegistered(gameName, playerName))
                     .map(playerName -> new PlayerGameStatusBean(gameName, playerName))
                     .collect(Collectors.toList());
         } else {
             this.gameStatus = "Inviting";
             players = Collections.emptyList();
             registrations = admin.getPlayers(gameName).stream()
-                    .filter(Objects::nonNull)
+                    .filter(playerName -> !Strings.isNullOrEmpty(playerName))
                     .map(playerName -> new PlayerRegistrationStatusBean(gameName, playerName))
                     .collect(Collectors.toList());
         }
+    }
+
+    public long getActivePlayerCount() {
+        return players.stream().filter(player -> !player.isOusted()).count();
     }
 
     public String getName() {

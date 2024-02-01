@@ -9,18 +9,17 @@ var gameChatLastDay = null;
 var globalChatLastPlayer = null;
 var globalChatLastDay = null;
 var TITLE = 'V:TES Online';
-var lastGlobal = "";
 var DESKTOP_VIEWPORT_CONTENT = 'width=1024';
 var profile = {
     email: "",
     discordID: "",
-    pingDiscord: false,
     updating: false
 };
+var pointerCanHover = window.matchMedia("(hover: hover)").matches;
 
 function errorhandler(errorString, exception) {
     if (exception.name === "dwr.engine.incompleteReply" || exception.name === 'dwr.engine.textHtmlReply') {
-        document.location = "/jol/";
+        document.location = "/jol/main.jsp";
     }
 }
 
@@ -40,7 +39,6 @@ function init(data) {
     $("h4.collapse").click(function () {
         $(this).next().slideToggle();
     })
-    $('#dsuserin').focus();
 }
 
 function processData(data) {
@@ -143,6 +141,12 @@ function callbackAdmin(data) {
             var playerCell = $("<td/>").text(registration.player);
             if (registration.player === player) {
                 joinButton.hide();
+                var leaveButton = $("<button/>").addClass('btn btn-primary').text("Leave").click(function() {
+                    if (confirm("Leave game?")) {
+                        DS.unInvitePlayer(game.name, player, {callback: processData, errorHandler: errorhandler});
+                    }
+                })
+                joinHeader.append(leaveButton);
             }
             registrationRow.append(playerCell);
             var summary = $("<td/>").text(registration.deckSummary);
@@ -190,8 +194,6 @@ function callbackProfile(data) {
         $('#profileEmail').val(data.email);
     if (profile.discordID !== data.discordID)
         $('#discordID').val(data.discordID);
-    if (profile.pingDiscord !== data.pingDiscord)
-        $('#pingDiscord').prop('checked', data.pingDiscord);
     if (profile.updating) {
         var result = $('#profileUpdateResult');
         result.text('Done!');
@@ -248,7 +250,7 @@ function callbackShowDecks(data) {
         deckSummary.append(validSpan);
         deckErrors.html(data.selectedDeck.details.deck.comments.replace(/\n/g, "<br/>"));
         renderDeck(data.selectedDeck.details.deck, "#deckPreview");
-        generateCardData("#deckPreview");
+        addCardTooltips("#deckPreview");
     } else {
         deckText.val("");
         deckErrors.text("");
@@ -259,7 +261,7 @@ function callbackShowDecks(data) {
 
 function callbackShowGameDeck(data) {
     renderDeck(data, "#gameDeckOutput");
-    generateCardData("#gameDeckOutput");
+    addCardTooltips("#gameDeckOutput");
 }
 
 function callbackMain(data) {
@@ -267,18 +269,13 @@ function callbackMain(data) {
     var userTimestamp = moment(data.stamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
     $('#chatstamp').text(timestamp).attr("title", userTimestamp);
     if (data.loggedIn) {
-        toggleVisible('player', 'register');
-        toggleVisible('globalchat', 'welcome');
-        $("#onlineUsers").show();
         renderOnline('whoson', data.who);
         renderGlobalChat(data.chat);
         renderMyGames(data.games);
         if (refresher) clearTimeout(refresher);
         refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
     } else {
-        toggleVisible('register', 'player');
-        toggleVisible('welcome', 'globalchat');
-        $("#onlineUsers").hide();
+        document.location = "/jol/";
     }
 }
 
@@ -461,7 +458,7 @@ function renderGlobalChat(data) {
         globalChatLastPlayer = chat.player;
         globalChatLastDay = day;
     });
-    generateCardData("#globalChatOutput");
+    addCardTooltips("#globalChatOutput");
 
     if (scrollToBottom) {
         $('#newChatAlert').hide();
@@ -622,24 +619,19 @@ function doShowDeck() {
 }
 
 function doSubmit() {
-    var phaseSelect = $("#phase");
-    var commandInput = $("#command");
-    var chatInput = $("#chat");
-    var pingSelect = $("#ping");
-    var endTurnSelect = $("#endTurn");
-    var globalNotes = $("#globalNotes");
-    var privateNotes = $("#privateNotes");
+    const phaseSelect = $("#phase");
+    const commandInput = $("#command");
+    const chatInput = $("#chat");
+    const pingSelect = $("#ping");
+    const endTurnSelect = $("#endTurn");
 
-    var phase = phaseSelect.val();
-    var ping = pingSelect.val();
-    var command = commandInput.val();
-    var chat = chatInput.val();
-    var endTurn = endTurnSelect.val();
-    var global = globalNotes.val();
-    var text = privateNotes.val();
+    let phase = phaseSelect.val();
+    let ping = pingSelect.val();
+    const command = commandInput.val();
+    const chat = chatInput.val();
+    const endTurn = endTurnSelect.val();
     phase = phase === "" ? null : phase;
     ping = ping === "" ? null : ping;
-    if (global === lastGlobal) global = null;
     commandInput.val("");
     chatInput.val("");
     pingSelect.val("");
@@ -647,7 +639,7 @@ function doSubmit() {
     if (endTurn === "Yes") {
         phaseSelect.val("Unlock");
     }
-    DS.submitForm(game, phase, command, chat, ping, endTurn, global, text, {
+    DS.submitForm(game, phase, command, chat, ping, endTurn, null, null, {
         callback: processData,
         errorHandler: errorhandler
     });
@@ -656,8 +648,7 @@ function doSubmit() {
 
 function sendChat(message) {
     DS.submitForm(
-        game, null, '', message, null, 'No',
-        $("#globalNotes").val(), $("#privateNotes").val(), {
+        game, null, '', message, null, 'No', null, null, {
             callback: processData,
             errorHandler: errorhandler
         });
@@ -667,12 +658,29 @@ function sendChat(message) {
 
 function sendCommand(command, message = '') {
     DS.submitForm(
-        game, null, command, message, null, 'No',
-        $("#globalNotes").val(), $("#privateNotes").val(), {
+        game, null, command, message, null, 'No', null, null, {
             callback: processData,
             errorHandler: errorhandler
         });
     $('#quickCommandModal').modal('hide');
+    return false;
+}
+
+function sendGlobalNotes() {
+    DS.submitForm(
+        game, null, '', '', null, 'No', $("#globalNotes").val(), null, {
+            callback: processData,
+            errorHandler: errorhandler
+        });
+    return false;
+}
+
+function sendPrivateNotes() {
+    DS.submitForm(
+        game, null, '', '', null, 'No', null, $("#privateNotes").val(), {
+            callback: processData,
+            errorHandler: errorhandler
+        });
     return false;
 }
 
@@ -717,9 +725,11 @@ function showHistory() {
         getHistory();
 }
 
+var lastPrivateNotesFromServer;
+
 function loadGame(data) {
     //Reset on game change
-    var gameTitle = $("#gameTitle");
+    const gameTitle = $("#gameTitle");
     if (gameTitle.text() !== data.name) {
         $("#ping").empty();
         gameChatLastDay = null;
@@ -731,17 +741,19 @@ function loadGame(data) {
     } else {
         $(".player-only").show();
     }
-    var gameLog = $("#gameChatOutput");
+    const gameLog = $("#gameChatOutput");
+    const privateNotes = $("#privateNotes");
     if (data.resetChat) {
         gameLog.empty();
         $("#historyOutput").empty();
         $("#gameDeckOutput").empty();
         $("#globalNotes").empty();
-        $("#privateNotes").empty();
+        privateNotes.empty();
         $("#chat").empty();
         $("#command").empty();
         currentOption = "notes";
         gameChatLastDay = null;
+        lastPrivateNotesFromServer = null;
     }
     if (!data.player && !data.judge) {
         $(".reactive-height").addClass("half-height").removeClass("full-height");
@@ -761,10 +773,12 @@ function loadGame(data) {
     }
     if (data.global !== null) {
         $("#globalNotes").val(data.global);
-        lastGlobal = data.global;
     }
-    if (data.text !== null) {
-        $("#privateNotes").val(data.text);
+    //Only clobber your private notes with the server's if something has changed,
+    //like another player has shown you some cards.
+    if (data.text !== null && data.text != lastPrivateNotesFromServer) {
+        privateNotes.val(data.text);
+        lastPrivateNotesFromServer = data.text;
     }
     if (data.label !== null) {
         $("#gameLabel").text(data.label);
@@ -833,7 +847,7 @@ function loadGame(data) {
             doToggle(data.collapsed[c]);
         }
     }
-    generateCardData("#game");
+    addCardTooltips("#game");
 
     if (data.refresh > 0 || fetchFullLog) {
         if (refresher) clearTimeout(refresher);
@@ -851,8 +865,15 @@ function loadGame(data) {
     }
 }
 
-function generateCardData(parent) {
-    tippy(parent + ' a.card-name', {
+function addCardTooltips(parent) {
+    var linkSelector = `${parent} a.card-name`;
+    //On devices without pointer hover capabilities, like phones, do not bind
+    //tippy tooltips to cards that already have a click handler that shows the card.
+    //This fixes the bug where cards in hand required a double-tap to show the modal.
+    if (!pointerCanHover) {
+        linkSelector += `[onclick^="pickTarget"], ${parent} a.card-name:not([onclick])`;
+    }
+    tippy(linkSelector, {
         animateFill: false,
         hideOnClick: false,
         flipOnUpdate: true,
@@ -903,7 +924,7 @@ function loadHistory(data) {
         var turnContent = $("<p/>").addClass("chat").html(content);
         historyDiv.append(turnContent);
     });
-    generateCardData("#historyOutput");
+    addCardTooltips("#historyOutput");
 }
 
 function updateProfileErrorHandler(errorString, exception) {
@@ -918,17 +939,16 @@ function updateProfile() {
     profile.updating = true;
     var email = $('#profileEmail').val();
     var discordID = $('#discordID').val();
-    var pingDiscord = $('#pingDiscord').prop('checked');
-    DS.updateProfile(email, discordID, pingDiscord, {callback: processData, errorHandler: updateProfileErrorHandler});
+    DS.updateProfile(email, discordID, {callback: processData, errorHandler: updateProfileErrorHandler});
 }
 
 function updatePassword() {
     var profileNewPassword = dwr.util.getValue("profileNewPassword");
     var profileConfirmPassword = dwr.util.getValue("profileConfirmPassword");
     if (!profileNewPassword && !profileConfirmPassword) {
-        dwr.util.setValue("profilePasswordError", "Please enter a new password to proceed.");
+        dwr.util.setValue("profilePasswordError", "Enter a new password.");
     } else if (profileNewPassword !== profileConfirmPassword) {
-        dwr.util.setValue("profilePasswordError", "Password chosen does not match.");
+        dwr.util.setValue("profilePasswordError", "Password confirmation does not match.");
     } else {
         DS.changePassword(profileNewPassword, {callback: processData, errorHandler: errorhandler});
         dwr.util.setValue("profilePasswordError", "Password updated");
@@ -964,5 +984,6 @@ function toggleMobileView(event) {
         $link.text('Mobile View');
     }
     console.log('after: ' + viewport.content)
+    pointerCanHover = window.matchMedia("(hover: hover)").matches;
     $('body').scrollTop(0);
 }

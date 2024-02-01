@@ -17,10 +17,6 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.base.Strings;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.async.Callback;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import io.azam.ulidj.ULID;
 import net.deckserver.DeckParser;
 import net.deckserver.RandomGameName;
@@ -46,11 +42,16 @@ import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.Timestamps;
 import net.deckserver.storage.json.system.*;
 import org.apache.commons.io.FileUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -75,9 +76,13 @@ public class JolAdmin {
 
     private static final Logger logger = getLogger(JolAdmin.class);
     private static final JolAdmin INSTANCE = new JolAdmin(System.getenv("JOL_DATA"));
-    private static final String DISCORD_API_VERSION = System.getenv("DISCORD_API_VERSION");
-    private static final String DISCORD_BOT_TOKEN = System.getenv("DISCORD_BOT_TOKEN");
-    private static final String DISCORD_PING_CHANNEL_ID = System.getenv("DISCORD_PING_CHANNEL_ID");
+    private static final String DISCORD_AUTHORIZATION_HEADER = String.format(
+            "Bot %s", System.getenv("DISCORD_BOT_TOKEN"));
+    private static final URI DISCORD_PING_CHANNEL_URI = URI.create(
+            String.format(
+                    "https://discord.com/api/v%s/channels/%s/messages",
+                    System.getenv("DISCORD_API_VERSION"),
+                    System.getenv("DISCORD_PING_CHANNEL_ID")));
     private static final int CHAT_STORAGE = 1000;
     private static final int CHAT_DISCARD = 100;
     private final Path BASE_PATH;
@@ -101,6 +106,11 @@ public class JolAdmin {
             .expireAfterAccess(30, TimeUnit.MINUTES)
             .build(this::loadGameState);
 
+    private final HttpClient discord = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_2)
+            .connectTimeout(Duration.ofSeconds(5))
+            .build();
+
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     private static final Predicate<GameInfo> ACTIVE_GAME = (info) -> info.getStatus().equals(GameStatus.ACTIVE);
@@ -121,7 +131,6 @@ public class JolAdmin {
         timestamps = readFile("timestamps.json", typeFactory.constructType(Timestamps.class));
         loadRegistrations();
         loadDecks();
-        Unirest.setTimeouts(5000, 10000);
     }
 
     public int getRefreshInterval(String gameName) {
@@ -140,13 +149,17 @@ public class JolAdmin {
             return objectMapper.readValue(BASE_PATH.resolve(fileName).toFile(), type);
         } catch (IOException e) {
             logger.error("Unable to read {}", fileName, e);
-            throw new RuntimeException(e);
+            try {
+                return (T) type.getRawClass().getConstructor().newInstance();
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException nsm) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     private void writeFile(String fileName, Object object) {
         try {
-            logger.info("Saving data to {}", fileName);
+            logger.debug("Saving data to {}", fileName);
             objectMapper.writeValue(BASE_PATH.resolve(fileName).toFile(), object);
         } catch (IOException e) {
             logger.error("Unable to write {}", fileName, e);
@@ -184,43 +197,116 @@ public class JolAdmin {
     }
 
     public synchronized void cleanupGames() {
-        games.values().stream()
-                .filter(ACTIVE_GAME)
-                .map(GameInfo::getName)
-                .map(GameStatusBean::new)
-                .forEach(gameStatus -> {
-                    long activePlayers = gameStatus.getPlayers().stream().filter(PLAYER_ACTIVE).count();
-                    if (activePlayers == 0) {
-                        endGame(gameStatus.getName());
-                        String message = String.format("{%s} has been closed.", gameStatus.getName());
-                        chat("SYSTEM", message);
-                    }
-                });
+        try {
+            logger.info("CLEAN - Unregistered players");
+            Table<String, String, Boolean> invalidRegistrations = HashBasedTable.create();
+            games.values().stream()
+                    .filter(ACTIVE_GAME)
+                    .map(GameInfo::getName)
+                    .forEach(gameName -> {
+                        Map<String, RegistrationStatus> playerRegistrations = registrations.row(gameName);
+                        playerRegistrations.forEach((player, registration) -> {
+                            if (!isRegistered(gameName, player)) {
+                                logger.info("Removing unregistered player {} from active game {}", player, gameName);
+                                invalidRegistrations.put(gameName, player, Boolean.TRUE);
+                            }
+                        });
+                    });
 
-        games.values().stream()
-                .filter(STARTING_GAME)
-                .map(GameInfo::getName)
-                .forEach(gameName -> {
-                    long registeredPlayers = getRegisteredPlayerCount(gameName);
-                    if (registeredPlayers == 5) {
-                        try {
-                            startGame(gameName);
-                            logger.info("Started {}.", gameName);
-                        } catch (Exception e) {
-                            logger.error("Something went wrong starting {}", gameName, e);
+            logger.info("CLEAN - Close finished games");
+            games.values().stream()
+                    .filter(ACTIVE_GAME)
+                    .map(GameInfo::getName)
+                    .map(GameStatusBean::new)
+                    .forEach(gameStatus -> {
+                        long activePlayers = gameStatus.getActivePlayerCount();
+                        if (activePlayers == 0) {
+                            endGame(gameStatus.getName());
+                            String message = String.format("{%s} has been closed.", gameStatus.getName());
+                            chat("SYSTEM", message);
+                        }
+                    });
+
+            logger.info("CLEAN - Start ready games");
+            games.values().stream()
+                    .filter(STARTING_GAME)
+                    .map(GameInfo::getName)
+                    .forEach(gameName -> {
+                        long registeredPlayers = getRegisteredPlayerCount(gameName);
+                        if (registeredPlayers == 5) {
+                            try {
+                                startGame(gameName);
+                                logger.info("Started {}.", gameName);
+                            } catch (Exception e) {
+                                logger.error("Something went wrong starting {}", gameName, e);
+                                endGame(gameName);
+                            }
+                        }
+                        if (registeredPlayers > 5) {
+                            logger.info("Closing {} : Too many players", gameName);
                             endGame(gameName);
                         }
-                    }
-                    if (registeredPlayers > 5) {
-                        logger.info("Closing {} : Too many players", gameName);
-                        endGame(gameName);
-                    }
-                });
+                    });
+
+            logger.info("CLEAN - Close Idle games and registrations");
+            games.values().stream()
+                    .filter(STARTING_GAME)
+                    .forEach(gameInfo -> {
+                        String gameName = gameInfo.getName();
+                        OffsetDateTime created = gameInfo.getCreated();
+                        if (created != null && created.plusDays(3).isBefore(OffsetDateTime.now())) {
+                            logger.info("Closing {} : Idle too long", gameName);
+                            endGame(gameName);
+                        }
+                        registrations.row(gameName).forEach((playerName, status) -> {
+                            if (status.getTimestamp() != null && status.getTimestamp().plusDays(1).isBefore(OffsetDateTime.now())) {
+                                logger.info("Removing idle player {} from starting game {}", playerName, gameName);
+                                invalidRegistrations.put(gameName, playerName, Boolean.TRUE);
+                            }
+                        });
+                    });
+
+            invalidRegistrations.cellSet().forEach(cell -> {
+                String game = cell.getRowKey();
+                String player = cell.getColumnKey();
+                registrations.remove(game, player);
+            });
+
+            // clear out any empty player/game names in registrations
+            if (registrations.containsColumn("")) {
+                logger.info("Removing bad player data from registrations");
+                registrations.column("").clear();
+            }
+            if (registrations.containsRow("")) {
+                logger.info("Removing bad game data from registrations");
+                registrations.row("").clear();
+            }
+
+            pmap.values().forEach(playerModel -> {
+                // Check current game exists still, this is the cause of people unable to login sometimes
+                // when the player model in session thinks they are in a game that's since been closed
+                String currentGame = playerModel.getCurrentGame();
+                if (currentGame != null && !existsGame(currentGame)) {
+                    logger.info("Clearing out closed game {} for {}", playerModel.getCurrentGame(), playerModel.getPlayerName());
+                    playerModel.setView("main");
+                }
+                // clear out games from the recent game view if you are just a spectator and not playing
+                playerModel.getCurrentGames().stream()
+                        .filter(gameName -> !existsGame(gameName))
+                        .peek(gameName -> logger.info("Removing {} from the list of recent games viewed by {}", gameName, playerModel.getPlayerName()))
+                        .forEach(playerModel.getCurrentGames()::remove);
+            });
+
+            persistState();
+
+        } catch (Exception e) {
+            logger.error("Caught runtime exception", e);
+        }
     }
 
     public synchronized void buildPublicGames() {
         long publicGamesCount = games.values().stream()
-                .filter(ACTIVE_GAME)
+                .filter(STARTING_GAME)
                 .filter(PUBLIC_GAME)
                 .count();
         long gamesNeeded = 5 - publicGamesCount;
@@ -271,7 +357,10 @@ public class JolAdmin {
         logger.trace("Creating game {} for player {}", gameName, playerName);
         if (gameName.length() > 2 || !existsGame(gameName)) {
             try {
-                games.put(gameName, new GameInfo(gameName, ULID.random(), playerName, Visibility.fromBoolean(isPublic), GameStatus.STARTING));
+                String gameId = ULID.random();
+                games.put(gameName, new GameInfo(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), GameStatus.STARTING, OffsetDateTime.now()));
+                Path gamePath = BASE_PATH.resolve("games").resolve(gameId);
+                Files.createDirectory(gamePath);
             } catch (Exception e) {
                 logger.error("Error creating game", e);
             }
@@ -321,7 +410,6 @@ public class JolAdmin {
 
     public void shutdown() {
         try {
-            Unirest.shutdown();
             persistState();
             scheduler.shutdownNow();
         } catch (Exception e) {
@@ -332,7 +420,7 @@ public class JolAdmin {
     public void setup() {
         scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 1, 10, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 1, TimeUnit.HOURS);
+        scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 1, TimeUnit.MINUTES);
     }
 
     public static JolAdmin getInstance() {
@@ -367,14 +455,16 @@ public class JolAdmin {
         }
     }
 
-    private void copyDeck(String deckId, String gameId) {
+    private boolean copyDeck(String deckId, String gameId) {
         try {
             Path deckPath = BASE_PATH.resolve("decks").resolve(deckId + ".json");
             Path gamePath = BASE_PATH.resolve("games").resolve(gameId).resolve(deckId + ".json");
             logger.info("Copying {} to {}", deckPath, gamePath);
             Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
+            return true;
         } catch (IOException e) {
             logger.error("Unable to load deck for {}", deckId, e);
+            return false;
         }
     }
 
@@ -460,7 +550,7 @@ public class JolAdmin {
     }
 
     private JolGame loadGameState(String gameName) {
-        logger.info("Loading {}", gameName);
+        logger.debug("Loading {}", gameName);
         GameInfo gameInfo = loadGameInfo(gameName);
         String gameId = gameInfo.getId();
         Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.xml");
@@ -529,6 +619,7 @@ public class JolAdmin {
     }
 
     public void registerDeck(String gameName, String playerName, String deckName) {
+        deckName = deckName.trim();
         DeckInfo deckInfo = decks.get(playerName, deckName);
         GameInfo gameInfo = loadGameInfo(gameName);
         String result = "Successfully registered " + deckName + " in game " + gameName;
@@ -559,11 +650,15 @@ public class JolAdmin {
                 result = "Unable to register deck in game that has no invite";
                 throw new IllegalStateException(result);
             }
+            boolean copySuccess = copyDeck(deckInfo.getDeckId(), gameInfo.getId());
+            if (!copySuccess) {
+                result = "Unable to copy deck file to game";
+                throw new IllegalStateException(result);
+            }
             registrationStatus.setDeckId(deckInfo.getDeckId());
             registrationStatus.setDeckName(deckInfo.getDeckName());
             registrationStatus.setValid(stats.isValid());
             registrationStatus.setSummary(stats.getSummary());
-            copyDeck(deckInfo.getDeckId(), gameInfo.getId());
 
             long registeredPlayers = getRegisteredPlayerCount(gameName);
             if (registeredPlayers == 5) {
@@ -618,30 +713,28 @@ public class JolAdmin {
         //Ping on Discord
         PlayerInfo player = loadPlayerInfo(playerName);
         try {
-            if (player != null && player.getDiscordId() != null) {
-                Unirest.post("https://discord.com/api/v{api-version}/channels/{channel-id}/messages")
-                        .routeParam("api-version", DISCORD_API_VERSION)
-                        .routeParam("channel-id", DISCORD_PING_CHANNEL_ID)
+            String discordId = player.getDiscordId();
+            if (player != null && discordId != null && !discordId.isBlank()) {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(DISCORD_PING_CHANNEL_URI)
                         .header("Content-type", "application/json")
-                        .header("Authorization", String.format("Bot %s", DISCORD_BOT_TOKEN))
-                        .body(String.format("{\"content\":\"<@!%s> to %s\"}", player.getDiscordId(), gameName))
-                        .asStringAsync(new Callback<>() {
-                            public void completed(HttpResponse<String> response) {
-                                int responseCode = response.getStatus();
+                        .header("Authorization", DISCORD_AUTHORIZATION_HEADER)
+                        .timeout(Duration.ofSeconds(10))
+                        .POST(
+                                HttpRequest.BodyPublishers.ofString(
+                                        String.format("{\"content\":\"<@!%s> to %s\"}", player.getDiscordId(), gameName)))
+                        .build();
+                discord.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                        .handle((response, exception) -> {
+                            if (exception == null) {
+                                int responseCode = response.statusCode();
                                 if (responseCode != 200) {
                                     logger.warn(
-                                            "Non-200 response calling Discord ({}); response body: {}",
-                                            String.valueOf(responseCode), response.getBody());
+                                            "Non-200 response ({}) calling Discord ({}); response body: {}",
+                                            String.valueOf(responseCode), response.uri(), response.body());
                                 }
-                            }
-
-                            public void failed(UnirestException e) {
-                                logger.error("Error calling Discord", e);
-                            }
-
-                            public void cancelled() {
-                                logger.warn("Discord call was cancelled");
-                            }
+                            } else logger.error("Error calling Discord", exception);
+                            return null;
                         });
             }
         } catch (Exception e) {
@@ -703,11 +796,21 @@ public class JolAdmin {
     }
 
     public void invitePlayer(String gameName, String playerName) {
-        registrations.put(gameName, playerName, new RegistrationStatus());
+        registrations.put(gameName, playerName, new RegistrationStatus(OffsetDateTime.now()));
+    }
+
+    public void unInvitePlayer(String gameName, String playerName) {
+        if (isStarting(gameName)) {
+            registrations.remove(gameName, playerName);
+        }
     }
 
     public boolean isInGame(String gameName, String playerName) {
         return registrations.contains(gameName, playerName);
+    }
+
+    public boolean isRegistered(String gameName, String playerName) {
+        return registrations.contains(gameName, playerName) && registrations.get(gameName, playerName).getDeckId() != null;
     }
 
     public boolean isStarting(String gameName) {
@@ -732,27 +835,13 @@ public class JolAdmin {
         DsTurnRecorder actions = new DsTurnRecorder();
         JolGame game = new JolGame(gameInfo.getId(), state, actions);
         game.initGame(gameName);
-        Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId());
-        if (!Files.exists(gamePath)) {
-            try {
-                logger.info("Creating game directory: {}", gamePath);
-                Files.createDirectory(gamePath);
-            } catch (IOException e) {
-                logger.error("unable to create game directory");
-                return;
-            }
-        }
         registrations.row(gameName).forEach((playerName, registration) -> {
-            Deck deck = getDeck(registration.getDeckId()).getDeck();
-            if (deck != null) {
+            if (registration.getDeckId() != null) {
+                Deck deck = getDeck(registration.getDeckId()).getDeck();
                 game.addPlayer(playerName, deck);
-                Path gameDeckPath = BASE_PATH.resolve("games").resolve(gameInfo.getId()).resolve(registration.getDeckId() + ".json");
-                if (!Files.exists(gameDeckPath)) {
-                    copyDeck(registration.getDeckId(), gameInfo.getId());
-                }
             }
         });
-        if (game.getPlayers().size() >= 1 && game.getPlayers().size() <= 5) {
+        if (!game.getPlayers().isEmpty() && game.getPlayers().size() <= 5) {
             game.startGame();
             saveGameState(game);
             gameInfo.setStatus(GameStatus.ACTIVE);
