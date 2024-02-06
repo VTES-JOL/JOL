@@ -846,6 +846,19 @@ input[type=checkbox] {
     vertical-align: bottom;
 }
 
+.adv {
+    font-family: 'jol';
+    font-size: 1.2em;
+    font-style: normal;
+    font-weight: bolder;
+    position: relative;
+    left: -2px;
+}
+
+.adv:before {
+    content: '@'
+}
+
 .ani:before {
     content: 'a';
     position: relative;

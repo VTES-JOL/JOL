@@ -47,6 +47,7 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
         card.setDisplayName(names.getDisplayName());
         card.setName(names.getUniqueName());
         card.setNames(names.getNames());
+        card.setAdvanced(advanced);
         Utils.getClean(lineData[FIELD_TYPE]).ifPresent(card::setType);
         Utils.getClean(lineData[FIELD_CLAN]).ifPresent(card::setClan);
 

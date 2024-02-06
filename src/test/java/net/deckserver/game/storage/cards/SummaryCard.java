@@ -39,6 +39,7 @@ public class SummaryCard {
     //Crypt only
     private Integer capacity;
     private List<String> disciplines;
+    private boolean advanced;
 
     private String title;
 
@@ -58,6 +59,7 @@ public class SummaryCard {
         this.title = cryptCard.getTitle();
         this.votes = cryptCard.getVotes();
         this.banned = cryptCard.isBanned();
+        this.advanced = cryptCard.getAdvanced();
 
         List<String> cardLines = new ArrayList<>();
         boolean vampire = cryptCard.getType().equals("Vampire");
