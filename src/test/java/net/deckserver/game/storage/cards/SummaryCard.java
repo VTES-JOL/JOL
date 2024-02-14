@@ -39,6 +39,7 @@ public class SummaryCard {
     //Crypt only
     private Integer capacity;
     private List<String> disciplines;
+    private boolean advanced;
 
     private String title;
 
@@ -58,6 +59,7 @@ public class SummaryCard {
         this.title = cryptCard.getTitle();
         this.votes = cryptCard.getVotes();
         this.banned = cryptCard.isBanned();
+        this.advanced = cryptCard.isAdvanced();
 
         List<String> cardLines = new ArrayList<>();
         boolean vampire = cryptCard.getType().equals("Vampire");
@@ -69,7 +71,9 @@ public class SummaryCard {
         }
         Optional.of(cryptCard.getType()).ifPresent(type -> cardLines.add("Cardtype: " + type));
         Optional.ofNullable(cryptCard.getClan()).ifPresent(clan -> cardLines.add(clanLabel + clan));
-        Optional.ofNullable(cryptCard.getAdvanced()).ifPresent(advanced -> cardLines.add("Level: Advanced"));
+        if (cryptCard.isAdvanced()) {
+            cardLines.add("Level: Advanced");
+        }
         Optional.ofNullable(cryptCard.getGroup()).ifPresent(group -> cardLines.add("Group: " + group));
         Optional.ofNullable(cryptCard.getCapacity()).ifPresent(capacity -> cardLines.add("Capacity: " + capacity));
         Optional.ofNullable(cryptCard.getDisciplines())

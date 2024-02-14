@@ -42,6 +42,7 @@ public class CardSummary {
     private List<String> disciplines;
     private String title;
     private String votes;
+    private boolean advanced;
 
     @JsonIgnore
     public boolean hasLife() {

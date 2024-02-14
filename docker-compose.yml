@@ -1,25 +1,5 @@
 version: "3.7"
 services:
-  test:
-    image: tomcat:9-jdk13-openjdk-buster
-    container_name: test
-    networks:
-      - web
-    labels:
-      - "traefik.http.routers.jol.entrypoints=websecure"
-      - "traefik.http.routers.jol.rule=Host(`test.deckserver.net`)"
-      - "traefik.http.routers.jol.tls.certresolver=myresolver"
-    environment:
-      JOL_DATA: /data
-      JOL_VERSION: docker-version
-      JOL_RECAPTCHA_KEY: ***REMOVED*** 
-      JOL_RECAPTCHA_SECRET: ***REMOVED***
-      DISCORD_API_VERSION: 6
-      DISCORD_BOT_TOKEN: ***REMOVED***
-      DISCORD_PING_CHANNEL_ID: 455542605535510529
-    volumes:
-      - test-data:/data
-      - test-app:/usr/local/tomcat/webapps
   prod:
     image: tomcat:9-jdk13-openjdk-buster
     container_name: prod
@@ -31,12 +11,12 @@ services:
       - "traefik.http.routers.prod.tls.certresolver=myresolver"
     environment:
       JOL_DATA: /data
-      JOL_VERSION: 7-Jan-2021
-      JOL_RECAPTCHA_KEY: ***REMOVED***
-      JOL_RECAPTCHA_SECRET: ***REMOVED***
+      JOL_VERSION: 6-Feb-2024
+      JOL_RECAPTCHA_KEY: "***REMOVED***"
+      JOL_RECAPTCHA_SECRET: "***REMOVED***"
       _JAVA_OPTIONS: -Djava.security.egd=file:/dev/./urandom
       DISCORD_API_VERSION: 6
-      DISCORD_BOT_TOKEN: ***REMOVED***
+      DISCORD_BOT_TOKEN: "***REMOVED***"
       DISCORD_PING_CHANNEL_ID: 455542605535510529
     volumes:
       - prod-data:/data
@@ -45,10 +25,6 @@ networks:
   web:
     external: true
 volumes:
-  test-data:
-    external: true
-  test-app:
-    external: true
   prod-data:
     external: true
   prod-app:

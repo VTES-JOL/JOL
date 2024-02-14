@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'jol';
-    src: url('../fonts/jol.ttf') format('truetype')
+    src: url('../fonts/jol_v2.ttf') format('truetype')
 }
 
 @font-face {
@@ -844,6 +844,19 @@ input[type=checkbox] {
     font-size: 1.3em;
     padding-right: 2px;
     vertical-align: bottom;
+}
+
+.adv {
+    font-family: 'jol';
+    font-size: 1.2em;
+    font-style: normal;
+    font-weight: bolder;
+    position: relative;
+    left: -2px;
+}
+
+.adv:before {
+    content: '@'
 }
 
 .ani:before {

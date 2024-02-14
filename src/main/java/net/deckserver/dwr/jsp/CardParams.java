@@ -47,8 +47,7 @@ public class CardParams {
     }
 
     public String getName() {
-        if (summary != null) return summary.getDisplayName();
-        return card.getName();
+        return summary.getDisplayName() + (summary.isAdvanced() ? "<i class='adv'/>" : "");
     }
 
     public boolean isHidden() {

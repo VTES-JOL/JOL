@@ -24,7 +24,7 @@ public class CryptCard {
     private String clan;
     private String group;
     private String sect;
-    private Boolean advanced;
+    private boolean advanced;
     private String title;
     private String votes;
     private List<String> disciplines;

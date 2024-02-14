@@ -23,6 +23,7 @@
     boolean isCrypt = summary.isCrypt();
     boolean hasLife = summary.hasLife();
     boolean hasBlood = summary.hasBlood();
+    boolean advanced = summary.isAdvanced();
     String typeClass = summary.getTypeClass();
     String[] disciplines = game.getDisciplines(c.getId());
     boolean hasDisciplines = disciplines.length > 0;
@@ -35,6 +36,7 @@
     request.setAttribute("game", game);
     request.setAttribute("capacity", capacity);
     request.setAttribute("counters", counters);
+    request.setAttribute("advanced",advanced);
     request.setAttribute("votes", votes);
     request.setAttribute("locked", locked);
     request.setAttribute("label", label);
