@@ -64,6 +64,9 @@
 				<a href="https://amaranth.vtes.co.nz/" target="_blank">Amaranth Deck Builder</a>
 			</li>
 			<li>
+				<a href="https://vdb.im/" target="_blank">VDB Deck Builder</a>
+			</li>
+			<li>
 				<a href="https://codex-of-the-damned.org/" target="_blank">Codex of the Damned</a>
 				<div style="margin-left:1em;font-size:0.9em">Rulings and strategy</div>
 			</li>
