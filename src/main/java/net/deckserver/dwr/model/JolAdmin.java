@@ -266,6 +266,17 @@ public class JolAdmin {
                         });
                     });
 
+            logger.info("CLEAN - Timestamps");
+            Set<String> timestampGames = new HashSet<>();
+            timestamps.getGameTimestamps().keySet().forEach(gameName -> {
+                if (!games.containsKey(gameName)) {
+                    logger.info("Removing {} timestamp record", gameName);
+                    timestampGames.add(gameName);
+                }
+            });
+
+            timestampGames.forEach(timestamps::clearGame);
+
             invalidRegistrations.cellSet().forEach(cell -> {
                 String game = cell.getRowKey();
                 String player = cell.getColumnKey();
@@ -297,6 +308,7 @@ public class JolAdmin {
                         .forEach(playerModel.getCurrentGames()::remove);
             });
 
+            logger.info("CLEAN - FINISH");
             persistState();
 
         } catch (Exception e) {
@@ -419,7 +431,7 @@ public class JolAdmin {
 
     public void setup() {
         scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 1, 10, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 10, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 1, TimeUnit.MINUTES);
     }
 
@@ -660,6 +672,8 @@ public class JolAdmin {
             registrationStatus.setValid(stats.isValid());
             registrationStatus.setSummary(stats.getSummary());
 
+            gameInfo.setCreated(OffsetDateTime.now());
+
             long registeredPlayers = getRegisteredPlayerCount(gameName);
             if (registeredPlayers == 5) {
                 startGame(gameName);
@@ -853,6 +867,7 @@ public class JolAdmin {
         Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId());
         registrations.row(gameName).clear();
         games.remove(gameName);
+        timestamps.getGameTimestamps().remove(gameName);
         pmap.values().forEach(playerModel -> playerModel.removeGame(gameName));
         try {
             FileUtils.deleteDirectory(gamePath.toFile());

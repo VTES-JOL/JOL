@@ -19,6 +19,10 @@ public class Timestamps {
     private Map<String, OffsetDateTime> playerTimestamps = new HashMap<>();
     private Map<String, GameTimestampEntry> gameTimestamps = new HashMap<>();
 
+    public void clearGame(String gameName) {
+        this.gameTimestamps.remove(gameName);
+    }
+
     public void recordPlayerAccess(String player) {
         this.playerTimestamps.put(player, OffsetDateTime.now());
     }
