@@ -42,12 +42,12 @@ import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.Timestamps;
 import net.deckserver.storage.json.system.*;
 import org.apache.commons.io.FileUtils;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.math.RoundingMode;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -56,12 +56,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -85,39 +84,42 @@ public class JolAdmin {
                     System.getenv("DISCORD_PING_CHANNEL_ID")));
     private static final int CHAT_STORAGE = 1000;
     private static final int CHAT_DISCARD = 100;
+    private static final Predicate<GameInfo> ACTIVE_GAME = (info) -> info.getStatus().equals(GameStatus.ACTIVE);
+    private static final Predicate<GameInfo> STARTING_GAME = (info) -> info.getStatus().equals(GameStatus.STARTING);
+    private static final Predicate<GameInfo> PUBLIC_GAME = info -> info.getVisibility().equals(Visibility.PUBLIC);
+    private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
+    private static final Predicate<PlayerGameStatusBean> PLAYER_ACTIVE = player -> !player.isOusted();
+    private static final DecimalFormat format = new DecimalFormat("0.#");
+    private static DateTimeFormatter SIMPLE_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm ");
+
+    static {
+        format.setRoundingMode(RoundingMode.DOWN);
+    }
+
     private final Path BASE_PATH;
     private final Map<String, GameInfo> games;
+    private final Map<OffsetDateTime, GameHistory> pastGames;
     private final Map<String, PlayerInfo> players;
     private final Table<String, String, RegistrationStatus> registrations = HashBasedTable.create();
     private final Table<String, String, DeckInfo> decks = HashBasedTable.create();
     private final ObjectMapper objectMapper;
     private final Timestamps timestamps;
     private final TypeFactory typeFactory;
-    private volatile List<ChatEntryBean> chats;
     private final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
     private final Map<String, PlayerModel> pmap = new ConcurrentHashMap<>();
-
     // Cache of users / status
     private final Cache<String, String> activeUsers = Caffeine.newBuilder()
             .expireAfterWrite(5, TimeUnit.MINUTES)
             .build();
-
     private final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
             .expireAfterAccess(30, TimeUnit.MINUTES)
             .build(this::loadGameState);
-
     private final HttpClient discord = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_2)
             .connectTimeout(Duration.ofSeconds(5))
             .build();
-
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
-    private static final Predicate<GameInfo> ACTIVE_GAME = (info) -> info.getStatus().equals(GameStatus.ACTIVE);
-    private static final Predicate<GameInfo> STARTING_GAME = (info) -> info.getStatus().equals(GameStatus.STARTING);
-    private static final Predicate<GameInfo> PUBLIC_GAME = info -> info.getVisibility().equals(Visibility.PUBLIC);
-    private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
-    private static final Predicate<PlayerGameStatusBean> PLAYER_ACTIVE = player -> !player.isOusted();
+    private volatile List<ChatEntryBean> chats;
 
     public JolAdmin(String dir) {
         this.BASE_PATH = Paths.get(dir);
@@ -126,11 +128,20 @@ public class JolAdmin {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         typeFactory = objectMapper.getTypeFactory();
         games = readFile("games.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, GameInfo.class));
+        pastGames = readFile("pastGames.json", typeFactory.constructMapType(ConcurrentHashMap.class, OffsetDateTime.class, GameHistory.class));
         players = readFile("players.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, PlayerInfo.class));
         chats = readFile("chats.json", typeFactory.constructCollectionType(List.class, ChatEntryBean.class));
         timestamps = readFile("timestamps.json", typeFactory.constructType(Timestamps.class));
         loadRegistrations();
         loadDecks();
+    }
+
+    public static JolAdmin getInstance() {
+        return INSTANCE;
+    }
+
+    public static String getDate() {
+        return OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
     }
 
     public int getRefreshInterval(String gameName) {
@@ -143,28 +154,8 @@ public class JolAdmin {
         return 60000;
     }
 
-    private <T> T readFile(String fileName, JavaType type) {
-        try {
-            logger.info("Reading data from {}", fileName);
-            return objectMapper.readValue(BASE_PATH.resolve(fileName).toFile(), type);
-        } catch (IOException e) {
-            logger.error("Unable to read {}", fileName, e);
-            try {
-                return (T) type.getRawClass().getConstructor().newInstance();
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException nsm) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void writeFile(String fileName, Object object) {
-        try {
-            logger.debug("Saving data to {}", fileName);
-            objectMapper.writeValue(BASE_PATH.resolve(fileName).toFile(), object);
-        } catch (IOException e) {
-            logger.error("Unable to write {}", fileName, e);
-            throw new RuntimeException(e);
-        }
+    public Map<OffsetDateTime, GameHistory> getHistory() {
+        return this.pastGames;
     }
 
     public void loadRegistrations() {
@@ -194,6 +185,7 @@ public class JolAdmin {
         writeFile("players.json", players);
         writeFile("registrations.json", registrations);
         writeFile("decks.json", decks);
+        writeFile("pastGames.json", pastGames);
     }
 
     public synchronized void cleanupGames() {
@@ -370,7 +362,7 @@ public class JolAdmin {
         if (gameName.length() > 2 || !existsGame(gameName)) {
             try {
                 String gameId = ULID.random();
-                games.put(gameName, new GameInfo(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), GameStatus.STARTING, OffsetDateTime.now()));
+                games.put(gameName, new GameInfo(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), GameStatus.STARTING));
                 Path gamePath = BASE_PATH.resolve("games").resolve(gameId);
                 Files.createDirectory(gamePath);
             } catch (Exception e) {
@@ -400,26 +392,6 @@ public class JolAdmin {
         writeActions(id, actions, turn);
     }
 
-    private void writeActions(String id, DsTurnRecorder actions, String turn) {
-        GameActions gactions = new GameActions();
-        gactions.setCounter("1");
-        gactions.setGameCounter("1");
-        StoreTurnRecorder wrec = new StoreTurnRecorder(gactions);
-        ModelLoader.createRecorder(wrec, actions);
-        String fileName = Strings.isNullOrEmpty(turn) ? "actions.xml" : "actions-" + turn + ".xml";
-        Path actionsPath = BASE_PATH.resolve("games").resolve(id).resolve(fileName);
-        XmlFileUtils.saveGameActions(gactions, actionsPath);
-    }
-
-    private void writeState(String id, DsGame state, String turn) {
-        GameState gstate = new GameState();
-        StoreGame wgame = new StoreGame(gstate);
-        ModelLoader.createModel(wgame, state);
-        String fileName = Strings.isNullOrEmpty(turn) ? "game.xml" : "game-" + turn + ".xml";
-        Path gamePath = BASE_PATH.resolve("games").resolve(id).resolve(fileName);
-        XmlFileUtils.saveGameState(gstate, gamePath);
-    }
-
     public void shutdown() {
         try {
             persistState();
@@ -431,12 +403,8 @@ public class JolAdmin {
 
     public void setup() {
         scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 10, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 1, TimeUnit.MINUTES);
-    }
-
-    public static JolAdmin getInstance() {
-        return INSTANCE;
+        scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 5, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 10, 1, TimeUnit.MINUTES);
     }
 
     public boolean existsPlayer(String name) {
@@ -451,10 +419,6 @@ public class JolAdmin {
         return loadDeckInfo(playerName, deckName).getFormat();
     }
 
-    private ExtendedDeck getDeck(String deckId) {
-        return readFile(String.format("decks/%s.json", deckId), typeFactory.constructType(ExtendedDeck.class));
-    }
-
     public Deck getGameDeck(String gameName, String playerName) {
         RegistrationStatus status = registrations.get(gameName, playerName);
         try {
@@ -464,19 +428,6 @@ public class JolAdmin {
             return extendedDeck.getDeck();
         } catch (NullPointerException e) {
             return null;
-        }
-    }
-
-    private boolean copyDeck(String deckId, String gameId) {
-        try {
-            Path deckPath = BASE_PATH.resolve("decks").resolve(deckId + ".json");
-            Path gamePath = BASE_PATH.resolve("games").resolve(gameId).resolve(deckId + ".json");
-            logger.info("Copying {} to {}", deckPath, gamePath);
-            Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
-            return true;
-        } catch (IOException e) {
-            logger.error("Unable to load deck for {}", deckId, e);
-            return false;
         }
     }
 
@@ -539,41 +490,8 @@ public class JolAdmin {
         }
     }
 
-    private DeckInfo loadDeckInfo(String playerName, String deckName) {
-        return decks.get(playerName, deckName);
-    }
-
-    private PlayerInfo loadPlayerInfo(String playerName) {
-        if (players.containsKey(playerName)) {
-            return players.get(playerName);
-        }
-        throw new IllegalArgumentException("Player: " + playerName + " was not found.");
-    }
-
-    private GameInfo loadGameInfo(String gameName) {
-        if (games.containsKey(gameName)) {
-            return games.get(gameName);
-        }
-        throw new IllegalArgumentException("Game: " + gameName + " was not found.");
-    }
-
     public JolGame getGame(String gameName) {
         return gameCache.get(gameName);
-    }
-
-    private JolGame loadGameState(String gameName) {
-        logger.debug("Loading {}", gameName);
-        GameInfo gameInfo = loadGameInfo(gameName);
-        String gameId = gameInfo.getId();
-        Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.xml");
-        GameState gameState = XmlFileUtils.loadGameState(gameStatePath);
-        Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions.xml");
-        GameActions gameActions = XmlFileUtils.loadGameActions(gameActionsPath);
-        DsGame deckServerState = new DsGame();
-        DsTurnRecorder deckServerActions = new DsTurnRecorder();
-        ModelLoader.createModel(deckServerState, new StoreGame(gameState));
-        ModelLoader.createRecorder(deckServerActions, new StoreTurnRecorder(gameActions));
-        return new JolGame(gameId, deckServerState, deckServerActions);
     }
 
     public void saveGameState(JolGame game) {
@@ -698,10 +616,6 @@ public class JolAdmin {
 
     public OffsetDateTime getGameTimeStamp(String gameName) {
         return this.timestamps.getGameTimestamp(gameName);
-    }
-
-    public static String getDate() {
-        return OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
     }
 
     public OffsetDateTime getPlayerAccess(String playerName) {
@@ -864,6 +778,50 @@ public class JolAdmin {
 
     public void endGame(String gameName) {
         GameInfo gameInfo = games.get(gameName);
+        // try and generate stats for game
+        if (gameInfo.getStatus().equals(GameStatus.ACTIVE)) {
+            JolGame gameData = getGame(gameName);
+            if (gameData.getPlayers().size() > 4) {
+                GameHistory history = new GameHistory();
+                history.setName(gameName);
+                String startTime = gameInfo.getCreated() != null ? gameInfo.getCreated().format(ISO_OFFSET_DATE_TIME) : " --- ";
+                String endTime = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
+                history.setStarted(startTime);
+                history.setEnded(endTime);
+                String winner = null;
+                double topVP = 0.0;
+                boolean hasVp = false;
+                for (String player : gameData.getPlayers()) {
+                    PlayerResult result = new PlayerResult();
+                    String deckName = Optional.ofNullable(registrations.get(gameName, player)).map(RegistrationStatus::getDeckName).orElse("-- no deck name --");
+                    double victoryPoints = gameData.getVictoryPoints(player);
+                    if (victoryPoints > 0) {
+                        hasVp = true;
+                    }
+                    result.setPlayerName(player);
+                    result.setDeckName(deckName);
+                    result.setVictoryPoints(format.format(victoryPoints));
+                    if (victoryPoints >= 2.0) {
+                        if (winner == null) {
+                            winner = player;
+                            topVP = victoryPoints;
+                        } else if (victoryPoints > topVP) {
+                            winner = player;
+                        } else {
+                            winner = null;
+                        }
+                    }
+                    history.getResults().put(player, result);
+                }
+                if (winner != null) {
+                    history.getResults().get(winner).setGameWin(true);
+                }
+                if (hasVp) {
+                    pastGames.put(OffsetDateTime.now(), history);
+                }
+            }
+        }
+        // Clear out data
         Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId());
         registrations.row(gameName).clear();
         games.remove(gameName);
@@ -882,6 +840,101 @@ public class JolAdmin {
 
     public String getGameId(String gameName) {
         return loadGameInfo(gameName).getId();
+    }
+
+    private <T> T readFile(String fileName, JavaType type) {
+        try {
+            logger.info("Reading data from {}", fileName);
+            return objectMapper.readValue(BASE_PATH.resolve(fileName).toFile(), type);
+        } catch (IOException e) {
+            logger.error("Unable to read {}", fileName, e);
+            try {
+                return (T) type.getRawClass().getConstructor().newInstance();
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
+                     InvocationTargetException nsm) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void writeFile(String fileName, Object object) {
+        try {
+            logger.debug("Saving data to {}", fileName);
+            objectMapper.writeValue(BASE_PATH.resolve(fileName).toFile(), object);
+        } catch (IOException e) {
+            logger.error("Unable to write {}", fileName, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void writeActions(String id, DsTurnRecorder actions, String turn) {
+        GameActions gactions = new GameActions();
+        gactions.setCounter("1");
+        gactions.setGameCounter("1");
+        StoreTurnRecorder wrec = new StoreTurnRecorder(gactions);
+        ModelLoader.createRecorder(wrec, actions);
+        String fileName = Strings.isNullOrEmpty(turn) ? "actions.xml" : "actions-" + turn + ".xml";
+        Path actionsPath = BASE_PATH.resolve("games").resolve(id).resolve(fileName);
+        XmlFileUtils.saveGameActions(gactions, actionsPath);
+    }
+
+    private void writeState(String id, DsGame state, String turn) {
+        GameState gstate = new GameState();
+        StoreGame wgame = new StoreGame(gstate);
+        ModelLoader.createModel(wgame, state);
+        String fileName = Strings.isNullOrEmpty(turn) ? "game.xml" : "game-" + turn + ".xml";
+        Path gamePath = BASE_PATH.resolve("games").resolve(id).resolve(fileName);
+        XmlFileUtils.saveGameState(gstate, gamePath);
+    }
+
+    private ExtendedDeck getDeck(String deckId) {
+        return readFile(String.format("decks/%s.json", deckId), typeFactory.constructType(ExtendedDeck.class));
+    }
+
+    private boolean copyDeck(String deckId, String gameId) {
+        try {
+            Path deckPath = BASE_PATH.resolve("decks").resolve(deckId + ".json");
+            Path gamePath = BASE_PATH.resolve("games").resolve(gameId).resolve(deckId + ".json");
+            logger.info("Copying {} to {}", deckPath, gamePath);
+            Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
+            return true;
+        } catch (IOException e) {
+            logger.error("Unable to load deck for {}", deckId, e);
+            return false;
+        }
+    }
+
+    private DeckInfo loadDeckInfo(String playerName, String deckName) {
+        return decks.get(playerName, deckName);
+    }
+
+    private PlayerInfo loadPlayerInfo(String playerName) {
+        if (players.containsKey(playerName)) {
+            return players.get(playerName);
+        }
+        throw new IllegalArgumentException("Player: " + playerName + " was not found.");
+    }
+
+    private GameInfo loadGameInfo(String gameName) {
+        if (games.containsKey(gameName)) {
+            return games.get(gameName);
+        }
+        throw new IllegalArgumentException("Game: " + gameName + " was not found.");
+    }
+
+    private JolGame loadGameState(String gameName) {
+        logger.debug("Loading {}", gameName);
+        GameInfo gameInfo = loadGameInfo(gameName);
+        String gameId = gameInfo.getId();
+        Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.xml");
+        GameState gameState = XmlFileUtils.loadGameState(gameStatePath);
+        Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions.xml");
+        GameActions gameActions = XmlFileUtils.loadGameActions(gameActionsPath);
+        DsGame deckServerState = new DsGame();
+        DsTurnRecorder deckServerActions = new DsTurnRecorder();
+        ModelLoader.createModel(deckServerState, new StoreGame(gameState));
+        ModelLoader.createRecorder(deckServerActions, new StoreTurnRecorder(gameActions));
+        return new JolGame(gameId, deckServerState, deckServerActions);
     }
 
 }

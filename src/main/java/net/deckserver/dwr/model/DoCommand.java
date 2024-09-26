@@ -50,6 +50,18 @@ public class DoCommand {
         CommandParser cmdObj = new CommandParser(cmdStr, 1, game);
         boolean random = Arrays.asList(cmdStr).contains("random");
         try {
+            if (cmd.equalsIgnoreCase("timeout")) {
+                return game.requestTimeout(player);
+            }
+            if (cmd.equalsIgnoreCase("vp")) {
+                String targetPlayer = cmdObj.getPlayer(player);
+                int amount = cmdObj.getAmount(0);
+                if (amount == 0) {
+                    throw new CommandException("No amount given use +/-");
+                }
+                game.updateVP(targetPlayer, amount);
+                return "Updated victory points";
+            }
             if (cmd.equalsIgnoreCase("choose")) {
                 String choice = cmdObj.nextArg();
                 game.setChoice(player, choice);

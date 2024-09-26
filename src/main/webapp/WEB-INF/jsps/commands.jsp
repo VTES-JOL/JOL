@@ -21,6 +21,8 @@
     <a href="#help_disciplines">Disciplines</a>
     <a href="#help_flip">Flip</a>
     <a href="#help_contest">Contest</a>
+    <a href="#victory_points">Victory Points</a>
+    <a href="#timeout">Call Game time</a>
 </div>
 <div class="help-body">
     <div id="help_blood">
@@ -783,6 +785,61 @@
                 <tr>
                     <td class="help-command"> contest ready 1 clear</td>
                     <td>Clears the contested flag on card 1 in your ready region.</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="victory_points">
+        <h4 class="header">Victory Points <a class="float-right" href="#top">Top</a></h4>
+        <div class="light padded">
+            <p>
+                There is no default player.
+            </p>
+            <h5>Syntax</h5>
+            <p>
+                <code>vp PLAYER [+|-]AMOUNT</code>
+            </p>
+            <h5>Examples</h5>
+            <table class="help-example">
+                <tr>
+                    <th class="help-command">Command</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td class="help-command">vp ShanDow 1</td>
+                    <td>Gives ShanDow 1 VP</td>
+                </tr>
+                <tr>
+                    <td class="help-command">vp ShanDow -1</td>
+                    <td>Removes 1 VP from ShanDow</td>
+                </tr>
+                <tr>
+                    <td class="help-command">vp timeout</td>
+                    <td>Gives all remaining players 0.5 VP</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="timeout">
+        <h4 class="header">timeout <a class="float-right" href="#top">Top</a></h4>
+        <div class="light padded">
+            <p>
+                Requests a game hit the virtual time limit.  Needs two players to complete.<br/>
+                Sets all remaining players pool to 0, and awards 0.5VP to each surviving player.
+            </p>
+            <h5>Syntax</h5>
+            <p>
+                <code>timeout</code>
+            </p>
+            <h5>Examples</h5>
+            <table class="help-example">
+                <tr>
+                    <th class="help-command">Command</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td class="help-command">timeout</td>
+                    <td>First request will simply log a request.<br/>Another timeout request by another player will complete the timeout</td>
                 </tr>
             </table>
         </div>

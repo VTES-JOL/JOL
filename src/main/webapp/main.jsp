@@ -49,6 +49,10 @@
             <jsp:include page="/WEB-INF/jsps/admin.jsp"/>
         </div>
 
+        <div id="tournament" style="display: none">
+            <jsp:include page="/WEB-INF/jsps/tournament.jsp"/>
+        </div>
+
         <div id="help" style="display :none;">
             <jsp:include page="/WEB-INF/jsps/commands.jsp"/>
         </div>
@@ -78,7 +82,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <span>Quick Command<span>
+                    <span>Quick Command</span>
                 </h5>
             </div>
             <div class="modal-body">
@@ -124,7 +128,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <span>Quick Chat<span>
+                    <span>Quick Chat</span>
                 </h5>
             </div>
             <div class="modal-body">

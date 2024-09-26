@@ -49,6 +49,7 @@ function processData(data) {
 
 function callbackAllGames(data) {
     renderActiveGames(data.games);
+    renderPastGames(data.history);
 }
 
 function callbackAdmin(data) {
@@ -531,15 +532,44 @@ function renderActiveGames(games) {
     $.each(games, function (index, game) {
         var gameRow = $("<tr/>");
         var gameLink = $("<td/>").html(renderGameLink(game));
-        var access = $("<td/>").text(moment(game.access).tz("UTC").format("D-MMM-YYYY HH:mm z"));
         var turn = $("<td/>").text(game.turn);
         var owner = $("<td/>").text(game.owner);
         gameRow.append(gameLink);
-        gameRow.append(access);
         gameRow.append(turn);
         gameRow.append(owner);
         activeGames.append(gameRow);
     });
+}
+
+function renderPastGames(history) {
+    var pastGames = $("#pastGames tbody");
+    pastGames.empty();
+    $.each(history, function(index, game) {
+        let gameRow = $("<tr/>").addClass("border-bottom");
+        let gameName = $("<td/>").text(game.name);
+        let startTime = moment(game.started, moment.ISO_8601)
+        if (startTime.isValid()) {
+            startTime = startTime.tz("UTC").format("D-MMM-YYYY HH:mm z");
+        } else {
+            startTime = game.started;
+        }
+        let started = $("<td/>").text(startTime);
+        let ended = $("<td/>").text(moment(game.ended, moment.ISO_8601).tz("UTC").format("D-MMM-YYYY HH:mm z"));
+        let results = $("<td/>").addClass("no-border");
+        let resultsTable = $("<table/>").addClass("clean-no-border light");
+        console.log(game.results);
+        $.each(game.results, function(key, value) {
+            let playerRow = $("<tr/>");
+            let playerName = $("<td/>").text(key);
+            let deckName = $("<td/>").text(value.deckName);
+            let score = $("<td/>").text((value.victoryPoints !== "0" ? value.victoryPoints + " VP" : "") + (value.gameWin ? ", 1 GW" : ""))
+            playerRow.append(playerName, deckName, score);
+            resultsTable.append(playerRow);
+        })
+        results.append(resultsTable);
+        gameRow.append(gameName, started, ended, results);
+        pastGames.append(gameRow)
+    })
 }
 
 function navigate(data) {
@@ -562,7 +592,7 @@ function navigate(data) {
         player = null;
     } else {
         renderButton({active: "Watch", deck: "Decks", profile: "Profile"});
-        renderButton({admin: "Game Admin"});
+        renderButton({admin: "Game Admin", tournament: "Tournaments"});
         renderGameButtons(data.gameButtons);
         $('#logout').show();
         $("#gameRow").show();

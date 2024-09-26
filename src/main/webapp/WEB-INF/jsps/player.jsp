@@ -4,12 +4,14 @@
 <%@page import="net.deckserver.dwr.jsp.RegionParams" %>
 <%@page import="net.deckserver.dwr.model.JolGame" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.text.DecimalFormat" %>
 
 <% String curPlayer = (String) request.getSession().getAttribute("meth");
     JolGame game = (JolGame) request.getAttribute("game");
     String player = (String) request.getAttribute("pparam");
     boolean active = player.equals(curPlayer);
     boolean edge = player.equals(game.getEdge());
+    double vp = game.getVictoryPoints(player);
     List<String> players = game.getPlayers();
     int index = -1;
     for (int i = 0; i < players.size(); i++)
@@ -24,6 +26,9 @@
     </h5>
     <c:if test="${edge}">
         <span class="label label-basic edge">Edge</span>
+    </c:if>
+    <c:if test="<%= vp > 0%>">
+        <span class="label vp">VP: <%= new DecimalFormat("0.#").format(vp) %></span>
     </c:if>
     <span class="label label-basic <%= poolStyle %>">Pool: <%= pool %></span>
 </div>
