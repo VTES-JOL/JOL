@@ -94,6 +94,17 @@ public class JolGame {
         library.initCards(librarylist, name);
     }
 
+    public void withdraw(String player) {
+        addMessage(player + " withdraws and gains 0.5 VP");
+        Notation poolNote = getNote(state, player + POOL, true);
+        poolNote.setValue("0");
+        Notation vpNote = getNote(state, player + " vp", true);
+        String stringValue = Optional.ofNullable(vpNote.getValue()).orElse("0");
+        double value = Double.parseDouble(stringValue);
+        value += 0.5;
+        vpNote.setValue(String.valueOf(value));
+    }
+
     public void updateVP(String targetPlayer, double amount) {
         Notation note = getNote(state, targetPlayer + " vp", true);
         String stringValue = Optional.ofNullable(note.getValue()).orElse("0");
@@ -770,9 +781,7 @@ public class JolGame {
     }
 
     private void _setTap(Card card, boolean tapped) {
-        Notation note = getNote(card, TAP, tapped);
-        if (note == null) return; // defaults to unlocked, no need to create a note
-        // in this circumstance.
+        Notation note = getNote(card, TAP, true);
         String value = tapped ? TAPPED : UNTAPPED;
         note.setValue(value);
     }

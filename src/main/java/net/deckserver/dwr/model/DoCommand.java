@@ -55,11 +55,15 @@ public class DoCommand {
             }
             if (cmd.equalsIgnoreCase("vp")) {
                 String targetPlayer = cmdObj.getPlayer(player);
-                int amount = cmdObj.getAmount(0);
-                if (amount == 0) {
-                    throw new CommandException("No amount given use +/-");
+                if (cmdObj.consumeString("withdraw")) {
+                    game.withdraw(targetPlayer);
+                } else {
+                    int amount = cmdObj.getAmount(0);
+                    if (amount == 0) {
+                        throw new CommandException("No amount given use +/-");
+                    }
+                    game.updateVP(targetPlayer, amount);
                 }
-                game.updateVP(targetPlayer, amount);
                 return "Updated victory points";
             }
             if (cmd.equalsIgnoreCase("choose")) {

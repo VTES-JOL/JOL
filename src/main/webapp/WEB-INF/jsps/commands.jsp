@@ -797,7 +797,8 @@
             </p>
             <h5>Syntax</h5>
             <p>
-                <code>vp PLAYER [+|-]AMOUNT</code>
+                <code>vp PLAYER [+|-]AMOUNT</code><br/>
+                <code>vp PLAYER withdraw</code>
             </p>
             <h5>Examples</h5>
             <table class="help-example">
@@ -814,8 +815,8 @@
                     <td>Removes 1 VP from ShanDow</td>
                 </tr>
                 <tr>
-                    <td class="help-command">vp timeout</td>
-                    <td>Gives all remaining players 0.5 VP</td>
+                    <td class="help-command">vp ShanDow withdraw</td>
+                    <td>Gives player 0.5 VP, and sets their pool to 0</td>
                 </tr>
             </table>
         </div>
