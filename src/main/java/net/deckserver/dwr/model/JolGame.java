@@ -18,7 +18,9 @@ import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.Deck;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.math.RoundingMode;
 import java.security.SecureRandom;
+import java.text.DecimalFormat;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -52,15 +54,18 @@ public class JolGame {
     private static final String TAP = "tapnote";
     private static final String TAPPED = "tap";
     private static final String UNTAPPED = "untap";
+    private static final String TIMEOUT = "timeout";
+    private static final DecimalFormat format = new DecimalFormat("0.#");
     private static DateTimeFormatter SIMPLE_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm ");
+    private final String id;
     private DsGame state;
     private DsTurnRecorder actions;
-    private final String id;
 
     public JolGame(String id, DsGame state, DsTurnRecorder actions) {
         this.id = id;
         this.state = state;
         this.actions = actions;
+        format.setRoundingMode(RoundingMode.DOWN);
     }
 
     public void addPlayer(String name, Deck deck) {
@@ -89,8 +94,577 @@ public class JolGame {
         library.initCards(librarylist, name);
     }
 
-    void drawCard(String player, String srcRegion, String destRegion) {
-        _drawCard(player, srcRegion, destRegion, true);
+    public void withdraw(String player) {
+        addMessage(player + " withdraws and gains 0.5 VP");
+        Notation poolNote = getNote(state, player + POOL, true);
+        poolNote.setValue("0");
+        Notation vpNote = getNote(state, player + " vp", true);
+        String stringValue = Optional.ofNullable(vpNote.getValue()).orElse("0");
+        double value = Double.parseDouble(stringValue);
+        value += 0.5;
+        vpNote.setValue(String.valueOf(value));
+    }
+
+    public void updateVP(String targetPlayer, double amount) {
+        Notation note = getNote(state, targetPlayer + " vp", true);
+        String stringValue = Optional.ofNullable(note.getValue()).orElse("0");
+        double value = Double.parseDouble(stringValue);
+        value += amount;
+        note.setValue(String.valueOf(value));
+        addMessage(targetPlayer + " has " + (amount > 0 ? "gained " : "lost ") + format.format(Math.abs(amount)) + " victory points.");
+    }
+
+    public double getVictoryPoints(String player) {
+        Notation note = getNote(state, player + " vp", true);
+        String stringValue = Optional.ofNullable(note.getValue()).orElse("0");
+        return Double.parseDouble(stringValue);
+    }
+
+
+    public void timeout() {
+        getPlayers().forEach(player -> {
+            if (getPool(player) > 0) {
+                updateVP(player, 0.5);
+                zeroPool(player);
+            }
+        });
+        addMessage("Game has timed out.  Surviving players have been awarded ½ VP.");
+    }
+
+    public String requestTimeout(String player) {
+        Notation note = getNote(state, TIMEOUT, true);
+        String requester = Optional.ofNullable(note.getValue()).orElse(player);
+        if (!requester.equals(player)) {
+            timeout();
+            addMessage(player + " has confirmed the game time has been reached.");
+            return "Confirming game timeout.";
+        }
+        note.setValue(player);
+        addMessage(player + " has requested that the game be timed out.");
+        return "Game timeout has been requested";
+    }
+
+    public String getName() {
+        return state.getName();
+    }
+
+    public List<String> getPlayers() {
+        return state.getPlayers();
+    }
+
+    public void discard(String player, String cardId, boolean random) {
+        Card card = state.getCard(cardId);
+        if (card == null) throw new IllegalArgumentException("No such card");
+        CardContainer source = card.getParent();
+        Location dest = state.getPlayerLocation(player, ASHHEAP);
+        if (dest == null) throw new IllegalStateException("No such region");
+        String message = String.format(
+                "%s discards %s%s",
+                player,
+                getCardLink(card),
+                random ? " (picked randomly)" : "");
+        addCommand(message, new String[]{"move", cardId, player, JolGame.ASHHEAP, "top"});
+        source.removeCard(card);
+        dest.addCard(card, false);
+    }
+
+    public void playCard(String player, String cardId, String destPlayer, String destRegion, String[] modes) {
+        Card card = state.getCard(cardId);
+        if (card == null) throw new IllegalArgumentException("No such card");
+        CardContainer source = card.getParent();
+        Location dest = state.getPlayerLocation(destPlayer, destRegion);
+        if (dest == null) throw new IllegalStateException("No such region");
+
+        String destMessage = "";
+        if (!destPlayer.equals(player))
+            destMessage = String.format(" to %s's %s", destPlayer, destRegion);
+        else if (!destRegion.equals(JolGame.ASHHEAP))
+            destMessage = String.format(" to %s", destRegion);
+
+        String message = playCardMessage(player, card, destRegion, modes, destMessage);
+        addCommand(message, new String[]{"move", cardId, destPlayer, destRegion, "bottom"});
+        source.removeCard(card);
+        dest.addCard(card, false);
+    }
+
+    public void shuffle(String player, String region, int num) {
+        _shuffle(player, region, num, true);
+    }
+
+    public void startGame() {
+        List<String> players = state.getPlayers();
+        Collections.shuffle(players, new SecureRandom());
+        startGame(players);
+    }
+
+    public void startGame(List<String> playerSeating) {
+        List<String> players = state.getPlayers();
+        if (!players.containsAll(playerSeating)) {
+            throw new IllegalArgumentException("Player ordering not valid, does not contain current players");
+        }
+        state.orderPlayers(playerSeating);
+        addCommand("Start game", new String[]{"start"});
+        newTurn();
+        for (String player : players) {
+            Notation note = getNote(state, player + POOL, true);
+            note.setValue("30");
+            _moveall(player, INACTIVE_REGION, null, CRYPT);
+            _moveall(player, HAND, null, LIBRARY);
+            _shuffle(player, CRYPT, 0, false);
+            _shuffle(player, LIBRARY, 0, false);
+            for (int j = 0; j < 4; j++)
+                _drawCard(player, CRYPT, INACTIVE_REGION, false);
+            for (int j = 0; j < 7; j++)
+                _drawCard(player, LIBRARY, HAND, false);
+        }
+        JolAdmin.getInstance().pingPlayer(this.getActivePlayer(), this.getName());
+    }
+
+    public Game getState() {
+        return state;
+    }
+
+    public TurnRecorder getTurnRecorder() {
+        return actions;
+    }
+
+    public void initGame(String name) {
+        state.setName(name);
+        setEdge("no one");
+    }
+
+    public void sendMsg(String player, String msg) {
+        msg = truncateMsg(msg);
+        msg = ChatParser.sanitizeText(msg);
+        msg = ChatParser.parseText(msg);
+        addMessage("[" + player + "] " + msg);
+    }
+
+    public String getCardDescripId(String cardId) {
+        Card card = state.getCard(cardId);
+        return card.getCardId();
+    }
+
+    public int getCounters(String cardId) {
+        Card card = state.getCard(cardId);
+        try {
+            Notation note = getNote(card, COUNTERS, false);
+            return Integer.parseInt(note.getValue());
+        } catch (IllegalArgumentException e) {
+            return 0;
+        }
+    }
+
+    public String[] getDisciplines(String cardId) {
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, DISCIPLINES, true);
+        if (note == null || note.getValue() == null || note.getValue().equals("")) return ArrayUtils.EMPTY_STRING_ARRAY;
+        return note.getValue().split(" ");
+    }
+
+    public void changeCounters(String player, String cardId, int incr, boolean quiet) {
+        if (incr == 0) return; // no change necessary - PENDING log this though?
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, COUNTERS, true);
+        String valStr = note.getValue();
+        int val = (valStr == null) ? 0 : Integer.parseInt(valStr);
+        val += incr;
+        note.setValue(val + "");
+        if (!quiet) {
+            String logText = String.format(
+                    "%s %s %s blood %s %s, now %s",
+                    player,
+                    incr < 0 ? "removes" : "adds",
+                    Math.abs(incr),
+                    incr < 0 ? "from" : "to",
+                    getCardName(card),
+                    val);
+            addCommand(logText, new String[]{"counter", cardId, incr + ""});
+        }
+    }
+
+    public String getActivePlayer() {
+        Notation note = getNote(state, ACTIVE, false);
+        if (note == null) return "";
+        return note.getValue();
+    }
+
+    private void setActivePlayer(String player) {
+        Notation note = getNote(state, ACTIVE, true);
+        note.setValue(player);
+    }
+
+    public String getEdge() {
+        Notation note = getNote(state, EDGE, false);
+        if (note == null) return "";
+        return note.getValue();
+    }
+
+    public void setEdge(String player) {
+        String edge = (player == null) ? "no one" : player;
+        Notation note = getNote(state, EDGE, true);
+        String old = note.getValue();
+        if (old == null) old = "";
+        else old = " from " + old;
+        note.setValue(edge);
+        if (player == null) addCommand("Edge burned" + old + ".", new String[]{"edge", "burn"});
+        else addCommand(player + " grabs edge" + old + ".", new String[]{"edge", player});
+    }
+
+    public int getPool(String player) {
+        Notation note = getNote(state, player + POOL, false);
+        return Integer.parseInt(note.getValue());
+    }
+
+    public void changePool(String player, int pool) {
+        if (pool == 0) return; // PENDING report this in status?
+        Notation note = getNote(state, player + POOL, true);
+        String sval = note.getValue();
+        int ival = (sval == null) ? 0 : Integer.parseInt(sval);
+        int val = ival + pool;
+        note.setValue(val + "");
+        addCommand(player + "'s pool was " + ival + ", now is " + val + ".", new String[]{"pool", player, val + ""});
+    }
+
+    public String getGlobalText() {
+        Notation note = getNote(state, TEXT, true);
+        if (note.getValue() == null) note.setValue("");
+        return note.getValue();
+    }
+
+    public void setGlobalText(String text) {
+        Notation note = getNote(state, TEXT, true);
+        note.setValue(text);
+    }
+
+    public String getPlayerText(String player) {
+        Notation note = getNote(state, player + TEXT, true);
+        if (note == null) return "";
+        return note.getValue();
+    }
+
+    public Integer getPlayerVotes(String player) {
+        Notation note = getNote(state, player + VOTES, false);
+        if (note != null) {
+            return Integer.valueOf(note.getValue());
+        } else {
+            return 0;
+        }
+    }
+
+    public void setPlayerVotes(String player, Integer votes) {
+        Notation note = getNote(state, player + VOTES, true);
+        note.setValue(votes.toString());
+    }
+
+    public void changePlayerVotes(String player, Integer votes) {
+        Notation note = getNote(state, player + VOTES, true);
+        Integer current = Integer.valueOf(note.getValue());
+        Integer newVotes = current + votes;
+        if (newVotes < 0) {
+            newVotes = 0;
+        }
+        setPlayerVotes(player, newVotes);
+    }
+
+    public String getText(String cardId) {
+        Card card = state.getCard(cardId);
+        try {
+            Notation note = getNote(card, TEXT, false);
+            return note.getValue();
+        } catch (IllegalArgumentException e) {
+            return "";
+        }
+    }
+
+    public void setPlayerText(String player, String text) {
+        Notation note = getNote(state, player + TEXT, true);
+        note.setValue(text);
+    }
+
+    public void setText(String cardId, String text, boolean quiet) {
+        Card card = state.getCard(cardId);
+        String oldCardName = getCardName(card);
+        Notation note = getNote(card, TEXT, true);
+        String cleanText = text.trim();
+        note.setValue(cleanText);
+        if (!quiet) {
+            if (!"".equals(cleanText)) {
+                addMessage(String.format("%s now \"%s\"", oldCardName, cleanText));
+            } else {
+                addMessage("Removed label from " + oldCardName);
+            }
+        }
+    }
+
+    public String getVotes(String cardId) {
+        Card card = state.getCard(cardId);
+        try {
+            Notation note = getNote(card, VOTES, false);
+            return note.getValue();
+        } catch (IllegalArgumentException e) {
+            return "0";
+        }
+    }
+
+    public void random(String player, int limit, int result) {
+        String msg = player + " rolls from 1-" + limit + " : " + result;
+        addMessage(msg);
+    }
+
+    public void flip(String player, String result) {
+        String msg = player + " flips a coin : " + result;
+        addMessage(msg);
+    }
+
+    public void setVotes(String cardId, String votes) {
+        Card card = state.getCard(cardId);
+        Integer voteAmount = 0;
+        Notation note = getNote(card, VOTES, true);
+        assert note != null;
+        try {
+            voteAmount = Integer.parseInt(votes);
+        } catch (Exception nfe) {
+            // do nothing
+        }
+        if (votes.trim().equalsIgnoreCase("priscus") || votes.trim().equals("P")) {
+            note.setValue("P");
+            addMessage(getCardName(card) + " is priscus");
+        } else if (voteAmount == 0) {
+            removeNote(card, VOTES);
+            addMessage(getCardName(card) + " now has no votes");
+        } else if (voteAmount > 0) {
+            note.setValue(voteAmount.toString());
+            addMessage(getCardName(card) + " now has " + voteAmount + " votes");
+        }
+    }
+
+    public void contestCard(String player, String cardId, boolean clear) {
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, CONTEST, true);
+        assert note != null;
+        if (clear) {
+            note.setValue("");
+            addMessage(getCardName(card) + " is no longer contested");
+        } else {
+            note.setValue(CONTEST);
+            addMessage(getCardName(card) + " is now contested");
+        }
+    }
+
+    public boolean getContested(String cardId) {
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, CONTEST, true);
+        return Optional.ofNullable(note.getValue()).orElse("").equals(CONTEST);
+    }
+
+    public boolean isTapped(String cardId) {
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, TAP, true);
+        return Optional.ofNullable(note.getValue()).orElse(UNTAPPED).equals(TAPPED);
+    }
+
+    public void setTapped(String player, String cardId, boolean tapped) {
+        Card card = state.getCard(cardId);
+        String logtext = String.format(
+                "%s %s %s",
+                player,
+                tapped ? "locks" : "unlocks",
+                getCardName(card));
+        addCommand(logtext, new String[]{"tap", cardId});
+        _setTap(card, tapped);
+    }
+
+    public void untapAll(String player) {
+        Location[] locs = state.getPlayerLocations(player);
+        addCommand(player + " unlocks.", new String[]{"unlock", player});
+        for (Location loc : locs) untapAll(loc);
+    }
+
+    public String getCurrentTurn() {
+        String[] turns = getTurns();
+        if (turns.length == 0) return null;
+        return turns[turns.length - 1];
+    }
+
+    /**
+     * Return actions for the given turn.
+     */
+    public GameAction[] getActions(String turn) {
+        return actions.getActions(turn);
+    }
+
+    /**
+     * Return actions for the current turn.
+     */
+    public GameAction[] getActions() {
+        return getActions(getCurrentTurn());
+    }
+
+    public String[] getTurns() {
+        return actions.getTurns();
+    }
+
+    public void newTurn() {
+        String turn = getCurrentTurn();
+        List<String> players = getPlayers();
+        int round = 1;
+        int index = 0;
+        if (turn != null) {
+            String meth = actions.getMethTurn(turn);
+            int length = turn.length();
+            int space = turn.lastIndexOf(" ");
+            round = Integer.parseInt(turn.substring(space + 1, length - 2));
+            for (int i = 0; i < players.size(); i++)
+                if (meth.equals(players.get(i))) index = i + 1;
+            if (index == players.size()) {
+                index = 0;
+                round++;
+            }
+            while (!meth.equals(players.get(index)) && getPool(players.get(index)) < 1) {
+                index++;
+                if (index == players.size()) {
+                    index = 0;
+                    round++;
+                }
+            }
+        }
+        actions.addTurn(players.get(index), players.get(index) + " " + round + "." + (index + 1));
+        setActivePlayer(players.get(index));
+        setPhase(TURN_PHASES[0]);
+        String turnString = round + "-" + (index + 1);
+        JolAdmin.getInstance().writeSnapshot(id, state, actions, turnString);
+    }
+
+    public String getPhase() {
+        Notation n = getNote(state, "phase", true);
+        String val = n.getValue();
+        if (val == null || val.length() == 0) val = TURN_PHASES[0];
+        return val;
+    }
+
+    public void setPhase(String phase) {
+        Notation n = getNote(state, "phase", true);
+        n.setValue(phase);
+        sendMsg(getActivePlayer(), "START OF " + phase.toUpperCase() + " PHASE.");
+    }
+
+    public void changeCapacity(String cardId, int capincr, boolean quiet) {
+        Card card = state.getCard(cardId);
+        Notation cap = getNote(card, "capac", true);
+        String val = cap.getValue();
+        int amt = 0;
+        if (val == null || val.length() == 0) amt += capincr;
+        else amt = Integer.parseInt(val) + capincr;
+        if (amt < 0) amt = 0;
+        cap.setValue(amt + "");
+        if (!quiet)
+            addCommand("Capacity of " + getCardName(card) + " now " + amt, new String[]{"capacity", cardId, capincr + ""});
+    }
+
+    public void setDisciplines(String cardId, List<String> disciplines, boolean quiet) {
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, DISCIPLINES, true);
+        note.setValue(String.join(" ", disciplines));
+        if (!quiet && disciplines.size() > 0) {
+            String disciplineList = disciplines.stream().map(s -> "[" + s + "]").collect(Collectors.joining(" "));
+            String msg = ChatParser.parseText("Disciplines of " + getCardName(card) + " reset back to " + disciplineList);
+            addCommand(msg, new String[]{"disc", cardId, disciplines.toString()});
+        }
+    }
+
+    public void addDiscipline(String cardId, String discipline) {
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, DISCIPLINES, true);
+        String currentDisciplines = Optional.ofNullable(note.getValue()).orElse("");
+        List<String> disciplineList = Arrays.stream(currentDisciplines.split(" ")).collect(Collectors.toList());
+        // If the discipline is not represented - add it as is
+        if (!currentDisciplines.toLowerCase().contains(discipline.toLowerCase())) {
+            disciplineList.add(discipline);
+        } else {
+            int index = disciplineList.indexOf(discipline.toLowerCase());
+            discipline = discipline.toUpperCase();
+            disciplineList.set(index, discipline);
+        }
+        note.setValue(String.join(" ", disciplineList));
+        String msg = ChatParser.parseText("[" + discipline + "] added to " + getCardName(card));
+        addMessage(msg);
+    }
+
+    public void removeDiscipline(String cardId, String discipline) {
+        Card card = state.getCard(cardId);
+        Notation note = getNote(card, DISCIPLINES, true);
+        String currentDisciplines = note.getValue();
+        List<String> disciplineList = Arrays.stream(currentDisciplines.split(" ")).collect(Collectors.toList());
+        // exists, and equals incoming - remove it
+        if (currentDisciplines.contains(discipline)) {
+            disciplineList.remove(discipline);
+        }
+        // exists at superior, but incoming is inferior - downgrade it
+        else if (currentDisciplines.toLowerCase().contains(discipline)) {
+            int index = disciplineList.indexOf(discipline.toUpperCase());
+            disciplineList.set(index, discipline.toLowerCase());
+        }
+        note.setValue(String.join(" ", disciplineList));
+        String msg = ChatParser.parseText("[" + discipline + "] removed from " + getCardName(card));
+        addMessage(msg);
+    }
+
+    public int getCapacity(String cardId) {
+        Card card = state.getCard(cardId);
+        try {
+            Notation cap = getNote(card, "capac", false);
+            return Integer.parseInt(cap.getValue());
+        } catch (IllegalArgumentException e) {
+            return -1;
+        }
+    }
+
+    public List<String> getPingedList() {
+        return state.getPlayers().stream()
+                .filter(player -> getPool(player) > 0)
+                .filter(player -> JolAdmin.getInstance().isPlayerPinged(player, state.getName()))
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getPingList() {
+        return state.getPlayers().stream()
+                .filter(player -> getPool(player) > 0)
+                .collect(Collectors.toList());
+    }
+
+    public void replacePlayer(String oldPlayer, String newPlayer) {
+        if (getActivePlayer().equals(oldPlayer)) {
+
+            setActivePlayer(newPlayer);
+        }
+        this.state.replacePlayer(oldPlayer, newPlayer);
+        getNote(this.state, oldPlayer + POOL, false).setName(newPlayer + POOL);
+    }
+
+    public void setChoice(String player, String choice) {
+        getNote(this.state, player + "-choice", true).setValue(choice);
+        addMessage(player + " has made their choice");
+    }
+
+    public void getChoices() {
+        addMessage("The choices have been revealed:");
+        state.getPlayers().forEach(player -> {
+            Notation choiceNotation = getNote(this.state, player + "-choice", true);
+            if (!Strings.isNullOrEmpty(choiceNotation.getValue())) {
+                addMessage(player + " chose " + choiceNotation.getValue());
+                choiceNotation.setValue("");
+            }
+        });
+    }
+
+    public String getId() {
+        return this.id;
+    }
+
+    private void zeroPool(String player) {
+        Notation note = getNote(state, player + POOL, true);
+        note.setValue(String.valueOf(0));
     }
 
     private void _drawCard(String player, String srcRegion, String destRegion, boolean log) {
@@ -106,12 +680,140 @@ public class JolGame {
         }
     }
 
-    public String getName() {
-        return state.getName();
+    private void _shuffle(String player, String region, int num, boolean log) {
+        Location location = state.getPlayerLocation(player, region);
+        location.shuffle(num);
+        if (log) {
+            String add = (num == 0) ? "" : num + " of ";
+            addCommand("Shuffle " + add + player + "'s " + region, new String[]{"shuffle", player, region, num + ""});
+        }
     }
 
-    public List<String> getPlayers() {
-        return state.getPlayers();
+    private void _moveall(String player, String srcLoc, String destPlayer, String destLoc) {
+        if (destPlayer == null) destPlayer = player;
+        Location src = state.getPlayerLocation(player, srcLoc);
+        Location dest = state.getPlayerLocation(destPlayer, destLoc);
+        Card[] cards = src.getCards();
+        for (Card card : cards) {
+            src.removeCard(card);
+            dest.addCard(card, false);
+        }
+    }
+
+    private String truncateMsg(String msg) {
+        if (msg.length() < 120) return msg;
+        return msg.substring(0, 120);
+    }
+
+    private Notation getNote(NoteTaker nt, String name, boolean create) {
+        List<Notation> notes = nt.getNotes();
+        for (Notation note1 : notes) if (note1.getName().equals(name)) return note1;
+        if (create) {
+            return nt.addNote(name);
+        }
+        throw new IllegalArgumentException("Note " + name + " not found");
+    }
+
+    private void removeNote(NoteTaker nt, String name) {
+        List<Notation> notes = nt.getNotes();
+        notes.stream().filter(note -> note.getName().equals(name)).findFirst().ifPresent(notes::remove);
+    }
+
+    private boolean isHiddenRegion(String region) {
+        return region.equals(INACTIVE_REGION) || region.equals(HAND) || region.equals(LIBRARY) || region.equals(CRYPT) || region.equals(RESEARCH);
+    }
+
+    private String getCardName(Card card) {
+        return getCardName(card, null, true);
+    }
+
+    private String getCardName(Card card, String destRegion) {
+        return getCardName(card, destRegion, true);
+    }
+
+    private String getCardName(Card card, String destRegion, boolean differentiate) {
+        Location loc = (Location) state.getRegionFromCard(card);
+        if (loc == null) return card.getName();
+        String region = state.getPlayerRegionName(loc);
+        if (region == null) return card.getName();
+
+        if (destRegion == null)
+            destRegion = region;
+
+        if (isHiddenRegion(region) && isHiddenRegion(destRegion)) {
+            int regionIndex = getIndexInRegion(card);
+            if (regionIndex > -1) return region + " #" + (regionIndex + 1);
+            return "???"; //card is on another card
+        }
+        String differentiators = "";
+        if (differentiate) {
+            CardSummary cardEntry = CardSearch.INSTANCE.get(card.getCardId());
+            if (!cardEntry.isUnique()) {
+                int regionIndex = getIndexInRegion(card);
+                String label = getText(card.getId());
+                differentiators = String.format(
+                        "%s%s",
+                        regionIndex > -1 ? String.format(" #%s", regionIndex + 1) : "",
+                        label.equals("") ? "" : String.format(" \"%s\"", label)
+                );
+            }
+        }
+        return getCardLink(card) + differentiators;
+    }
+
+    /**
+     * Zero-based.
+     */
+    private int getIndexInRegion(Card card) {
+        CardContainer container = card.getParent();
+        if (container instanceof Location) {
+            Location loc = (Location) container;
+            Card[] cards = loc.getCards();
+            for (int j = 0; j < cards.length; j++)
+                if (card.getId().equals(cards[j].getId()))
+                    return j;
+        }
+        return -1;
+    }
+
+    private String getCardLink(Card card) {
+        return "<a class='card-name' data-card-id='" + card.getCardId() + "'>" + card.getName() + "</a>";
+    }
+
+    private void _setTap(Card card, boolean tapped) {
+        Notation note = getNote(card, TAP, true);
+        String value = tapped ? TAPPED : UNTAPPED;
+        note.setValue(value);
+    }
+
+    private void untapAll(CardContainer loc) {
+        Card[] cards = loc.getCards();
+        for (Card card : cards) {
+            _setTap(card, false);
+            untapAll(card);
+        }
+    }
+
+    private String getTurn() {
+        return getCurrentTurn();
+    }
+
+    private void addCommand(String arg1, String[] arg2) {
+        String turn = getTurn();
+        if (turn != null) actions.addCommand(turn, getDate() + arg1, arg2);
+    }
+
+    private void addMessage(String arg1) {
+        String turn = getTurn();
+        if (turn != null) actions.addMessage(getTurn(), getDate() + arg1);
+    }
+
+    private String getDate() {
+        return OffsetDateTime.now().format(SIMPLE_FORMAT);
+    }
+
+    void drawCard(String player, String srcRegion, String destRegion) {
+        _drawCard(player, srcRegion, destRegion, true);
     }
 
     void moveToCard(
@@ -245,41 +947,6 @@ public class JolGame {
         burnQuietly(cardId);
     }
 
-    public void discard(String player, String cardId, boolean random) {
-        Card card = state.getCard(cardId);
-        if (card == null) throw new IllegalArgumentException("No such card");
-        CardContainer source = card.getParent();
-        Location dest = state.getPlayerLocation(player, ASHHEAP);
-        if (dest == null) throw new IllegalStateException("No such region");
-        String message = String.format(
-                "%s discards %s%s",
-                player,
-                getCardLink(card),
-                random ? " (picked randomly)" : "");
-        addCommand(message, new String[]{"move", cardId, player, JolGame.ASHHEAP, "top"});
-        source.removeCard(card);
-        dest.addCard(card, false);
-    }
-
-    public void playCard(String player, String cardId, String destPlayer, String destRegion, String[] modes) {
-        Card card = state.getCard(cardId);
-        if (card == null) throw new IllegalArgumentException("No such card");
-        CardContainer source = card.getParent();
-        Location dest = state.getPlayerLocation(destPlayer, destRegion);
-        if (dest == null) throw new IllegalStateException("No such region");
-
-        String destMessage = "";
-        if (!destPlayer.equals(player))
-            destMessage = String.format(" to %s's %s", destPlayer, destRegion);
-        else if (!destRegion.equals(JolGame.ASHHEAP))
-            destMessage = String.format(" to %s", destRegion);
-
-        String message = playCardMessage(player, card, destRegion, modes, destMessage);
-        addCommand(message, new String[]{"move", cardId, destPlayer, destRegion, "bottom"});
-        source.removeCard(card);
-        dest.addCard(card, false);
-    }
-
     String playCardMessage(String player, Card card, String destRegion, String[] modes, String destMessage) {
         String modeMessage = "";
         if (modes != null) {
@@ -293,605 +960,5 @@ public class JolGame {
                 getCardLink(card),
                 modeMessage,
                 destMessage);
-    }
-
-    public void shuffle(String player, String region, int num) {
-        _shuffle(player, region, num, true);
-    }
-
-    private void _shuffle(String player, String region, int num, boolean log) {
-        Location location = state.getPlayerLocation(player, region);
-        location.shuffle(num);
-        if (log) {
-            String add = (num == 0) ? "" : num + " of ";
-            addCommand("Shuffle " + add + player + "'s " + region, new String[]{"shuffle", player, region, num + ""});
-        }
-    }
-
-    private void _moveall(String player, String srcLoc, String destPlayer, String destLoc) {
-        if (destPlayer == null) destPlayer = player;
-        Location src = state.getPlayerLocation(player, srcLoc);
-        Location dest = state.getPlayerLocation(destPlayer, destLoc);
-        Card[] cards = src.getCards();
-        for (Card card : cards) {
-            src.removeCard(card);
-            dest.addCard(card, false);
-        }
-    }
-
-    public void startGame() {
-        List<String> players = state.getPlayers();
-        Collections.shuffle(players, new SecureRandom());
-        startGame(players);
-    }
-
-    public void startGame(List<String> playerSeating) {
-        List<String> players = state.getPlayers();
-        if (!players.containsAll(playerSeating)) {
-            throw new IllegalArgumentException("Player ordering not valid, does not contain current players");
-        }
-        state.orderPlayers(playerSeating);
-        addCommand("Start game", new String[]{"start"});
-        newTurn();
-        for (String player : players) {
-            Notation note = getNote(state, player + POOL, true);
-            note.setValue("30");
-            _moveall(player, INACTIVE_REGION, null, CRYPT);
-            _moveall(player, HAND, null, LIBRARY);
-            _shuffle(player, CRYPT, 0, false);
-            _shuffle(player, LIBRARY, 0, false);
-            for (int j = 0; j < 4; j++)
-                _drawCard(player, CRYPT, INACTIVE_REGION, false);
-            for (int j = 0; j < 7; j++)
-                _drawCard(player, LIBRARY, HAND, false);
-        }
-        JolAdmin.getInstance().pingPlayer(this.getActivePlayer(), this.getName());
-    }
-
-    public Game getState() {
-        return state;
-    }
-
-    public TurnRecorder getTurnRecorder() {
-        return actions;
-    }
-
-    public void initGame(String name) {
-        state.setName(name);
-        setEdge("no one");
-    }
-
-    public void sendMsg(String player, String msg) {
-        msg = truncateMsg(msg);
-        msg = ChatParser.sanitizeText(msg);
-        msg = ChatParser.parseText(msg);
-        addMessage("[" + player + "] " + msg);
-    }
-
-    private String truncateMsg(String msg) {
-        if (msg.length() < 120) return msg;
-        return msg.substring(0, 120);
-    }
-
-    private Notation getNote(NoteTaker nt, String name, boolean create) {
-        List<Notation> notes = nt.getNotes();
-        for (Notation note1 : notes) if (note1.getName().equals(name)) return note1;
-        if (create) {
-            return nt.addNote(name);
-        }
-        return null;
-    }
-
-    private void removeNote(NoteTaker nt, String name) {
-        List<Notation> notes = nt.getNotes();
-        notes.stream().filter(note -> note.getName().equals(name)).findFirst().ifPresent(notes::remove);
-    }
-
-    public String getCardDescripId(String cardId) {
-        Card card = state.getCard(cardId);
-        return card.getCardId();
-    }
-
-    public int getCounters(String cardId) {
-        Card card = state.getCard(cardId);
-        Notation note = getNote(card, COUNTERS, false);
-        if (note != null) return Integer.parseInt(note.getValue());
-        return 0;
-    }
-
-    public String[] getDisciplines(String cardId) {
-        Card card = state.getCard(cardId);
-        Notation note = getNote(card, DISCIPLINES, true);
-        if (note == null || note.getValue() == null || note.getValue().equals("")) return ArrayUtils.EMPTY_STRING_ARRAY;
-        return note.getValue().split(" ");
-    }
-
-    public void changeCounters(String player, String cardId, int incr, boolean quiet) {
-        if (incr == 0) return; // no change necessary - PENDING log this though?
-        Card card = state.getCard(cardId);
-        Notation note = getNote(card, COUNTERS, true);
-        String valStr = note.getValue();
-        int val = (valStr == null) ? 0 : Integer.parseInt(valStr);
-        val += incr;
-        note.setValue(val + "");
-        if (!quiet) {
-            String logText = String.format(
-                    "%s %s %s blood %s %s, now %s",
-                    player,
-                    incr < 0 ? "removes" : "adds",
-                    Math.abs(incr),
-                    incr < 0 ? "from" : "to",
-                    getCardName(card),
-                    val);
-            addCommand(logText, new String[]{"counter", cardId, incr + ""});
-        }
-    }
-
-    private boolean isHiddenRegion(String region) {
-        return region.equals(INACTIVE_REGION) || region.equals(HAND) || region.equals(LIBRARY) || region.equals(CRYPT) || region.equals(RESEARCH);
-    }
-
-    private String getCardName(Card card) {
-        return getCardName(card, null, true);
-    }
-
-    private String getCardName(Card card, String destRegion) {
-        return getCardName(card, destRegion, true);
-    }
-
-    private String getCardName(Card card, String destRegion, boolean differentiate) {
-        Location loc = (Location) state.getRegionFromCard(card);
-        if (loc == null) return card.getName();
-        String region = state.getPlayerRegionName(loc);
-        if (region == null) return card.getName();
-
-        if (destRegion == null)
-            destRegion = region;
-
-        if (isHiddenRegion(region) && isHiddenRegion(destRegion)) {
-            int regionIndex = getIndexInRegion(card);
-            if (regionIndex > -1) return region + " #" + (regionIndex + 1);
-            return "???"; //card is on another card
-        }
-        String differentiators = "";
-        if (differentiate) {
-            CardSummary cardEntry = CardSearch.INSTANCE.get(card.getCardId());
-            if (!cardEntry.isUnique()) {
-                int regionIndex = getIndexInRegion(card);
-                String label = getText(card.getId());
-                differentiators = String.format(
-                        "%s%s",
-                        regionIndex > -1 ? String.format(" #%s", regionIndex + 1) : "",
-                        label.equals("") ? "" : String.format(" \"%s\"", label)
-                );
-            }
-        }
-        return getCardLink(card) + differentiators;
-    }
-
-    /**
-     * Zero-based.
-     */
-    private int getIndexInRegion(Card card) {
-        CardContainer container = card.getParent();
-        if (container instanceof Location) {
-            Location loc = (Location) container;
-            Card[] cards = loc.getCards();
-            for (int j = 0; j < cards.length; j++)
-                if (card.getId().equals(cards[j].getId()))
-                    return j;
-        }
-        return -1;
-    }
-
-    private String getCardLink(Card card) {
-        return "<a class='card-name' data-card-id='" + card.getCardId() + "'>" + card.getName() + "</a>";
-    }
-
-    public String getActivePlayer() {
-        Notation note = getNote(state, ACTIVE, false);
-        if (note == null) return "";
-        return note.getValue();
-    }
-
-    private void setActivePlayer(String player) {
-        Notation note = getNote(state, ACTIVE, true);
-        note.setValue(player);
-    }
-
-    public String getEdge() {
-        Notation note = getNote(state, EDGE, false);
-        if (note == null) return "";
-        return note.getValue();
-    }
-
-    public void setEdge(String player) {
-        String edge = (player == null) ? "no one" : player;
-        Notation note = getNote(state, EDGE, true);
-        String old = note.getValue();
-        if (old == null) old = "";
-        else old = " from " + old;
-        note.setValue(edge);
-        if (player == null) addCommand("Edge burned" + old + ".", new String[]{"edge", "burn"});
-        else addCommand(player + " grabs edge" + old + ".", new String[]{"edge", player});
-    }
-
-    public int getPool(String player) {
-        Notation note = getNote(state, player + POOL, false);
-        return Integer.parseInt(note.getValue());
-    }
-
-    public void changePool(String player, int pool) {
-        if (pool == 0) return; // PENDING report this in status?
-        Notation note = getNote(state, player + POOL, true);
-        String sval = note.getValue();
-        int ival = (sval == null) ? 0 : Integer.parseInt(sval);
-        int val = ival + pool;
-        note.setValue(val + "");
-        addCommand(player + "'s pool was " + ival + ", now is " + val + ".", new String[]{"pool", player, val + ""});
-    }
-
-    public String getGlobalText() {
-        Notation note = getNote(state, TEXT, true);
-        if (note.getValue() == null) note.setValue("");
-        return note.getValue();
-    }
-
-    public void setGlobalText(String text) {
-        Notation note = getNote(state, TEXT, true);
-        note.setValue(text);
-    }
-
-    public String getPlayerText(String player) {
-        Notation note = getNote(state, player + TEXT, false);
-        if (note == null) return "";
-        return note.getValue();
-    }
-
-    public Integer getPlayerVotes(String player) {
-        Notation note = getNote(state, player + VOTES, false);
-        if (note != null) {
-            return Integer.valueOf(note.getValue());
-        } else {
-            return 0;
-        }
-    }
-
-    public void setPlayerVotes(String player, Integer votes) {
-        Notation note = getNote(state, player + VOTES, true);
-        note.setValue(votes.toString());
-    }
-
-    public void changePlayerVotes(String player, Integer votes) {
-        Notation note = getNote(state, player + VOTES, true);
-        Integer current = Integer.valueOf(note.getValue());
-        Integer newVotes = current + votes;
-        if (newVotes < 0) {
-            newVotes = 0;
-        }
-        setPlayerVotes(player, newVotes);
-    }
-
-    public String getText(String cardId) {
-        Card card = state.getCard(cardId);
-        Notation note = getNote(card, TEXT, false);
-        if (note != null) return note.getValue();
-        return "";
-    }
-
-    public void setPlayerText(String player, String text) {
-        Notation note = getNote(state, player + TEXT, true);
-        note.setValue(text);
-    }
-
-    public void setText(String cardId, String text, boolean quiet) {
-        Card card = state.getCard(cardId);
-        String oldCardName = getCardName(card);
-        Notation note = getNote(card, TEXT, true);
-        String cleanText = text.trim();
-        note.setValue(cleanText);
-        if (!quiet) {
-            if (!"".equals(cleanText)) {
-                addMessage(String.format("%s now \"%s\"", oldCardName, cleanText));
-            } else {
-                addMessage("Removed label from " + oldCardName);
-            }
-        }
-    }
-
-    public String getVotes(String cardId) {
-        Card card = state.getCard(cardId);
-        Notation note = getNote(card, VOTES, false);
-        if (note != null) {
-            return note.getValue();
-        } else {
-            return "0";
-        }
-    }
-
-    public void random(String player, int limit, int result) {
-        String msg = player + " rolls from 1-" + limit + " : " + result;
-        addMessage(msg);
-    }
-
-    public void flip(String player, String result) {
-        String msg = player + " flips a coin : " + result;
-        addMessage(msg);
-    }
-
-    public void setVotes(String cardId, String votes) {
-        Card card = state.getCard(cardId);
-        Integer voteAmount = 0;
-        Notation note = getNote(card, VOTES, true);
-        assert note != null;
-        try {
-            voteAmount = Integer.parseInt(votes);
-        } catch (Exception nfe) {
-            // do nothing
-        }
-        if (votes.trim().equalsIgnoreCase("priscus") || votes.trim().equals("P")) {
-            note.setValue("P");
-            addMessage(getCardName(card) + " is priscus");
-        } else if (voteAmount == 0) {
-            removeNote(card, VOTES);
-            addMessage(getCardName(card) + " now has no votes");
-        } else if (voteAmount > 0) {
-            note.setValue(voteAmount.toString());
-            addMessage(getCardName(card) + " now has " + voteAmount + " votes");
-        }
-    }
-
-    public void contestCard(String player, String cardId, boolean clear) {
-        Card card = state.getCard(cardId);
-        Notation note = getNote(card, CONTEST, true);
-        assert note != null;
-        if (clear) {
-            note.setValue("");
-            addMessage(getCardName(card) + " is no longer contested");
-        } else {
-            note.setValue(CONTEST);
-            addMessage(getCardName(card) + " is now contested");
-        }
-    }
-
-    public boolean getContested(String cardId) {
-        Card card = state.getCard(cardId);
-        Notation note = getNote(card, CONTEST, false);
-        return note != null && note.getValue().equals(CONTEST);
-    }
-
-    public boolean isTapped(String cardId) {
-        Card card = state.getCard(cardId);
-        Notation note = getNote(card, TAP, false);
-        return note != null && note.getValue().equals(TAPPED);
-    }
-
-    public void setTapped(String player, String cardId, boolean tapped) {
-        Card card = state.getCard(cardId);
-        String logtext = String.format(
-                "%s %s %s",
-                player,
-                tapped ? "locks" : "unlocks",
-                getCardName(card));
-        addCommand(logtext, new String[]{"tap", cardId});
-        _setTap(card, tapped);
-    }
-
-    private void _setTap(Card card, boolean tapped) {
-        Notation note = getNote(card, TAP, tapped);
-        if (note == null) return; // defaults to unlocked, no need to create a note
-        // in this circumstance.
-        String value = tapped ? TAPPED : UNTAPPED;
-        note.setValue(value);
-    }
-
-    public void untapAll(String player) {
-        Location[] locs = state.getPlayerLocations(player);
-        addCommand(player + " unlocks.", new String[]{"unlock", player});
-        for (Location loc : locs) untapAll(loc);
-    }
-
-    private void untapAll(CardContainer loc) {
-        Card[] cards = loc.getCards();
-        for (Card card : cards) {
-            _setTap(card, false);
-            untapAll(card);
-        }
-    }
-
-    private String getTurn() {
-        return getCurrentTurn();
-    }
-
-    public String getCurrentTurn() {
-        String[] turns = getTurns();
-        if (turns.length == 0) return null;
-        return turns[turns.length - 1];
-    }
-
-    private void addCommand(String arg1, String[] arg2) {
-        String turn = getTurn();
-        if (turn != null) actions.addCommand(turn, getDate() + arg1, arg2);
-    }
-
-    private void addMessage(String arg1) {
-        String turn = getTurn();
-        if (turn != null) actions.addMessage(getTurn(), getDate() + arg1);
-    }
-
-    private String getDate() {
-        return OffsetDateTime.now().format(SIMPLE_FORMAT);
-    }
-
-    /**
-     * Return actions for the given turn.
-     */
-    public GameAction[] getActions(String turn) {
-        return actions.getActions(turn);
-    }
-
-    /**
-     * Return actions for the current turn.
-     */
-    public GameAction[] getActions() {
-        return getActions(getCurrentTurn());
-    }
-
-    public String[] getTurns() {
-        return actions.getTurns();
-    }
-
-    public void newTurn() {
-        String turn = getCurrentTurn();
-        List<String> players = getPlayers();
-        int round = 1;
-        int index = 0;
-        if (turn != null) {
-            String meth = actions.getMethTurn(turn);
-            int length = turn.length();
-            int space = turn.lastIndexOf(" ");
-            round = Integer.parseInt(turn.substring(space + 1, length - 2));
-            for (int i = 0; i < players.size(); i++)
-                if (meth.equals(players.get(i))) index = i + 1;
-            if (index == players.size()) {
-                index = 0;
-                round++;
-            }
-            while (!meth.equals(players.get(index)) && getPool(players.get(index)) < 1) {
-                index++;
-                if (index == players.size()) {
-                    index = 0;
-                    round++;
-                }
-            }
-        }
-        actions.addTurn(players.get(index), players.get(index) + " " + round + "." + (index + 1));
-        setActivePlayer(players.get(index));
-        setPhase(TURN_PHASES[0]);
-        String turnString = round + "-" + (index + 1);
-        JolAdmin.getInstance().writeSnapshot(id, state, actions, turnString);
-    }
-
-    public String getPhase() {
-        Notation n = getNote(state, "phase", true);
-        String val = n.getValue();
-        if (val == null || val.length() == 0) val = TURN_PHASES[0];
-        return val;
-    }
-
-    public void setPhase(String phase) {
-        Notation n = getNote(state, "phase", true);
-        n.setValue(phase);
-        sendMsg(getActivePlayer(), "START OF " + phase.toUpperCase() + " PHASE.");
-    }
-
-    public void changeCapacity(String cardId, int capincr, boolean quiet) {
-        Card card = state.getCard(cardId);
-        Notation cap = getNote(card, "capac", true);
-        String val = cap.getValue();
-        int amt = 0;
-        if (val == null || val.length() == 0) amt += capincr;
-        else amt = Integer.parseInt(val) + capincr;
-        if (amt < 0) amt = 0;
-        cap.setValue(amt + "");
-        if (!quiet)
-            addCommand("Capacity of " + getCardName(card) + " now " + amt, new String[]{"capacity", cardId, capincr + ""});
-    }
-
-    public void setDisciplines(String cardId, List<String> disciplines, boolean quiet) {
-        Card card = state.getCard(cardId);
-        Notation note = getNote(card, DISCIPLINES, true);
-        note.setValue(String.join(" ", disciplines));
-        if (!quiet && disciplines.size() > 0) {
-            String disciplineList = disciplines.stream().map(s -> "[" + s + "]").collect(Collectors.joining(" "));
-            String msg = ChatParser.parseText("Disciplines of " + getCardName(card) + " reset back to " + disciplineList);
-            addCommand(msg, new String[]{"disc", cardId, disciplines.toString()});
-        }
-    }
-
-    public void addDiscipline(String cardId, String discipline) {
-        Card card = state.getCard(cardId);
-        Notation note = getNote(card, DISCIPLINES, true);
-        String currentDisciplines = Optional.ofNullable(note.getValue()).orElse("");
-        List<String> disciplineList = Arrays.stream(currentDisciplines.split(" ")).collect(Collectors.toList());
-        // If the discipline is not represented - add it as is
-        if (!currentDisciplines.toLowerCase().contains(discipline.toLowerCase())) {
-            disciplineList.add(discipline);
-        } else {
-            int index = disciplineList.indexOf(discipline.toLowerCase());
-            discipline = discipline.toUpperCase();
-            disciplineList.set(index, discipline);
-        }
-        note.setValue(String.join(" ", disciplineList));
-        String msg = ChatParser.parseText("[" + discipline + "] added to " + getCardName(card));
-        addMessage(msg);
-    }
-
-    public void removeDiscipline(String cardId, String discipline) {
-        Card card = state.getCard(cardId);
-        Notation note = getNote(card, DISCIPLINES, true);
-        String currentDisciplines = note.getValue();
-        List<String> disciplineList = Arrays.stream(currentDisciplines.split(" ")).collect(Collectors.toList());
-        // exists, and equals incoming - remove it
-        if (currentDisciplines.contains(discipline)) {
-            disciplineList.remove(discipline);
-        }
-        // exists at superior, but incoming is inferior - downgrade it
-        else if (currentDisciplines.toLowerCase().contains(discipline)) {
-            int index = disciplineList.indexOf(discipline.toUpperCase());
-            disciplineList.set(index, discipline.toLowerCase());
-        }
-        note.setValue(String.join(" ", disciplineList));
-        String msg = ChatParser.parseText("[" + discipline + "] removed from " + getCardName(card));
-        addMessage(msg);
-    }
-
-    public int getCapacity(String cardId) {
-        Card card = state.getCard(cardId);
-        Notation cap = getNote(card, "capac", false);
-        if (cap == null) return -1;
-        return Integer.parseInt(cap.getValue());
-    }
-
-    public List<String> getPingedList() {
-        return state.getPlayers().stream()
-                .filter(player -> getPool(player) > 0)
-                .filter(player -> JolAdmin.getInstance().isPlayerPinged(player, state.getName()))
-                .collect(Collectors.toList());
-    }
-
-    public List<String> getPingList() {
-        return state.getPlayers().stream()
-                .filter(player -> getPool(player) > 0)
-                .collect(Collectors.toList());
-    }
-
-    public void replacePlayer(String oldPlayer, String newPlayer) {
-        if (getActivePlayer().equals(oldPlayer)) {
-
-            setActivePlayer(newPlayer);
-        }
-        this.state.replacePlayer(oldPlayer, newPlayer);
-        getNote(this.state, oldPlayer + POOL, false).setName(newPlayer + POOL);
-    }
-
-    public void setChoice(String player, String choice) {
-        getNote(this.state, player + "-choice", true).setValue(choice);
-        addMessage(player + " has made their choice");
-    }
-
-    public void getChoices() {
-        addMessage("The choices have been revealed:");
-        state.getPlayers().forEach(player -> {
-            Notation choiceNotation = getNote(this.state, player + "-choice", true);
-            if (!Strings.isNullOrEmpty(choiceNotation.getValue())) {
-                addMessage(player + " chose " + choiceNotation.getValue());
-                choiceNotation.setValue("");
-            }
-        });
-    }
-
-    public String getId() {
-        return this.id;
     }
 }

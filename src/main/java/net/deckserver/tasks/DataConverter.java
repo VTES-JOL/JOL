@@ -215,7 +215,7 @@ class DataConverter {
                 if (gameName != null && status != GameStatus.CLOSED) {
                     gameProperties.put(gameId, gameProperty);
                     nameLookup.put(gameId, gameName);
-                    games.put(gameName, new GameInfo(gameName, gameId, owner, Visibility.fromBoolean(isPublic), status, OffsetDateTime.now()));
+                    games.put(gameName, new GameInfo(gameName, gameId, owner, Visibility.fromBoolean(isPublic), status));
                 }
             } catch (IOException e) {
                 logger.error("Unable to load game properties for {}", gameId, e);

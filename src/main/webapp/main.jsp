@@ -49,6 +49,10 @@
             <jsp:include page="/WEB-INF/jsps/admin.jsp"/>
         </div>
 
+        <div id="tournament" style="display: none">
+            <jsp:include page="/WEB-INF/jsps/tournament.jsp"/>
+        </div>
+
         <div id="help" style="display :none;">
             <jsp:include page="/WEB-INF/jsps/commands.jsp"/>
         </div>
@@ -78,7 +82,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <span>Quick Command<span>
+                    <span>Quick Command</span>
                 </h5>
             </div>
             <div class="modal-body">
@@ -124,7 +128,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <span>Quick Chat<span>
+                    <span>Quick Chat</span>
                 </h5>
             </div>
             <div class="modal-body">
@@ -382,7 +386,7 @@
 <script type='text/javascript' src='dwr/interface/DS.js'></script>
 <script type='text/javascript' src='dwr/util.js'></script>
 <script type='text/javascript' src="js/tippy.all.min.js"></script>
-<script type='text/javascript' src='js/ds.js?version=<%= System.getenv("JOL_VERSION") %>'></script>
+<script type='text/javascript' src='js/ds.js?version=<%= System.getenv("JOL_VERSION") %>&i=1'></script>
 <script type="text/javascript" src="js/card-modal.js?version=<%= System.getenv("JOL_VERSION") %>"></script>
 <script src='https://www.google.com/recaptcha/api.js'></script>
 </body>

@@ -3,9 +3,22 @@
 	<thead>
 	<tr>
 		<th>Game</th>
-		<th>Last Access</th>
 		<th>Current Turn</th>
 		<th>Owner</th>
+	</tr>
+	</thead>
+	<tbody>
+
+	</tbody>
+</table>
+<h4 class="header">Past Games</h4>
+<table id="pastGames" class="clean-no-border light">
+	<thead>
+	<tr>
+		<th>Game</th>
+		<th>Started</th>
+		<th>Ended</th>
+		<th>Results</th>
 	</tr>
 	</thead>
 	<tbody>

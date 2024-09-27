@@ -305,6 +305,12 @@ table.clean-no-border {
     width: 100%;
 }
 
+table.no-border {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0;
+}
+
 table.clean-table {
     border: 1px solid #aaaaaa;
     border-collapse: collapse;
@@ -625,6 +631,15 @@ span.edge {
     font-size: small;
     border: 1px solid red;
     background-color: #eee;
+    color: #000000;
+    padding: 0.15em 0.5em
+}
+
+span.vp {
+    line-height: 1em;
+    font-size: small;
+    border: 1px solid #000000;
+    background-color: rgba(246, 221, 58, 0.71);
     color: #000000;
     padding: 0.15em 0.5em
 }
