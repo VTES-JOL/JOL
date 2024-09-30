@@ -558,9 +558,9 @@ function renderPastGames(history) {
         let results = $("<td/>").addClass("no-border");
         let resultsTable = $("<table/>").addClass("clean-no-border light");
         console.log(game.results);
-        $.each(game.results, function(key, value) {
+        $.each(game.results, function(i, value) {
             let playerRow = $("<tr/>");
-            let playerName = $("<td/>").text(key);
+            let playerName = $("<td/>").text(value.playerName);
             let deckName = $("<td/>").text(value.deckName);
             let score = $("<td/>").text((value.victoryPoints !== "0" ? value.victoryPoints + " VP" : "") + (value.gameWin ? ", 1 GW" : ""))
             playerRow.append(playerName, deckName, score);

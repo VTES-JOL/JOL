@@ -788,7 +788,7 @@ public class JolAdmin {
                 String endTime = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
                 history.setStarted(startTime);
                 history.setEnded(endTime);
-                String winner = null;
+                PlayerResult winner = null;
                 double topVP = 0.0;
                 boolean hasVp = false;
                 for (String player : gameData.getPlayers()) {
@@ -803,18 +803,18 @@ public class JolAdmin {
                     result.setVictoryPoints(format.format(victoryPoints));
                     if (victoryPoints >= 2.0) {
                         if (winner == null) {
-                            winner = player;
+                            winner = result;
                             topVP = victoryPoints;
                         } else if (victoryPoints > topVP) {
-                            winner = player;
+                            winner = result;
                         } else {
                             winner = null;
                         }
                     }
-                    history.getResults().put(player, result);
+                    history.getResults().add(result);
                 }
                 if (winner != null) {
-                    history.getResults().get(winner).setGameWin(true);
+                    winner.setGameWin(true);
                 }
                 if (hasVp) {
                     pastGames.put(OffsetDateTime.now(), history);
