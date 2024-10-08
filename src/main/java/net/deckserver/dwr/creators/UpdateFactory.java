@@ -21,6 +21,7 @@ public class UpdateFactory {
         viewMap.put("profile", new ProfileCreator());
         viewMap.put("active", new AllGamesCreator());
         viewMap.put("super", new SuperCreator());
+        viewMap.put("tournament", new TournamentCreator());
     }
 
     private static ViewCreator getView(String type) {

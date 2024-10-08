@@ -190,11 +190,19 @@ function callbackSuper(data) {
 
 }
 
+function callbackTournament(data) {
+    if (data.idValid) {
+        $("#validId").show();
+    } else $("#validID").hide();
+}
+
 function callbackProfile(data) {
     if (profile.email !== data.email)
         $('#profileEmail').val(data.email);
     if (profile.discordID !== data.discordID)
         $('#discordID').val(data.discordID);
+    if (profile.veknId !== data.veknID)
+        $("#veknID").val(data.veknID);
     if (profile.updating) {
         var result = $('#profileUpdateResult');
         result.text('Done!');
@@ -969,7 +977,8 @@ function updateProfile() {
     profile.updating = true;
     var email = $('#profileEmail').val();
     var discordID = $('#discordID').val();
-    DS.updateProfile(email, discordID, {callback: processData, errorHandler: updateProfileErrorHandler});
+    var veknID = $("#veknID").val();
+    DS.updateProfile(email, discordID, veknID, {callback: processData, errorHandler: updateProfileErrorHandler});
 }
 
 function updatePassword() {

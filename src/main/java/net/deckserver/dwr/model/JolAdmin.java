@@ -513,10 +513,10 @@ public class JolAdmin {
     }
 
     public boolean registerPlayer(String name, String password, String email) {
-        if (existsPlayer(name) || name.length() == 0)
+        if (existsPlayer(name) || name.isEmpty())
             return false;
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
-        players.put(name, new PlayerInfo(name, ULID.random(), email, hash, null, new HashSet<>()));
+        players.put(name, new PlayerInfo(name, ULID.random(), email, hash, null, null, new HashSet<>()));
         return true;
     }
 
@@ -525,10 +525,11 @@ public class JolAdmin {
         loadPlayerInfo(player).setHash(hash);
     }
 
-    public void updateProfile(String playerName, String email, String discordID) {
+    public void updateProfile(String playerName, String email, String discordID, String veknID) {
         PlayerInfo playerInfo = loadPlayerInfo(playerName);
         playerInfo.setDiscordId(discordID);
         playerInfo.setEmail(email);
+        playerInfo.setVeknId(veknID);
     }
 
     public boolean authenticate(String playerName, String password) {
@@ -693,6 +694,10 @@ public class JolAdmin {
 
     public String getDiscordID(String player) {
         return loadPlayerInfo(player).getDiscordId();
+    }
+
+    public String getVeknID(String player) {
+        return loadPlayerInfo(player).getVeknId();
     }
 
     public boolean isAdmin(String player) {
