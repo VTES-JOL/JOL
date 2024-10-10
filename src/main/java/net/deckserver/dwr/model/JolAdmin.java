@@ -35,6 +35,7 @@ import net.deckserver.game.ui.turn.DsTurnRecorder;
 import net.deckserver.jobs.CleanupGamesJob;
 import net.deckserver.jobs.PersistStateJob;
 import net.deckserver.jobs.PublicGamesBuilderJob;
+import net.deckserver.jobs.ValidateGWJob;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.DeckStats;
@@ -404,6 +405,7 @@ public class JolAdmin {
     public void setup() {
         scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 5, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new ValidateGWJob(), 0, 5, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 10, 1, TimeUnit.MINUTES);
     }
 
@@ -846,6 +848,39 @@ public class JolAdmin {
 
     public String getGameId(String gameName) {
         return loadGameInfo(gameName).getId();
+    }
+
+    public void validateGW() {
+        pastGames.values().forEach(gameHistory -> {
+            PlayerResult winner = null;
+            PlayerResult previousWinner = gameHistory.getResults().stream().filter(PlayerResult::isGameWin).findFirst().orElse(null);
+            double topVP = 0.0;
+            for (PlayerResult result : gameHistory.getResults()) {
+                double victoryPoints = Double.parseDouble(result.getVictoryPoints());
+                if (victoryPoints >= 2.0) {
+                    if (winner == null) {
+                        logger.debug("{} - {} has {} VP and there is no current high score.", gameHistory.getName(), result.getPlayerName(), victoryPoints);
+                        winner = result;
+                        topVP = victoryPoints;
+                    } else if (victoryPoints > topVP) {
+                        logger.debug("{} - {} has {} VP, previous high score was {} on {} VP.", gameHistory.getName(), result.getPlayerName(), victoryPoints, winner.getPlayerName(), topVP);
+                        winner = result;
+                        topVP = victoryPoints;
+                    } else if (victoryPoints == topVP) {
+                        logger.debug("{} - tie between {} and {}. No winner.", gameHistory.getName(), result.getPlayerName(), winner.getPlayerName());
+                        winner = null;
+                    }
+                }
+            }
+            if (winner != null && previousWinner == null) {
+                logger.info("Found a winner for {} where there wasn't one before, now {} on {}", gameHistory.getName(), winner.getPlayerName(), winner.getVictoryPoints());
+                winner.setGameWin(true);
+            } else if (winner != null && winner != previousWinner) {
+                logger.info("Found a new winner for {}, previously {} on {}, now {} on {}", gameHistory.getName(), previousWinner.getPlayerName(), previousWinner.getVictoryPoints(), winner.getPlayerName(), winner.getVictoryPoints());
+                winner.setGameWin(true);
+                previousWinner.setGameWin(false);
+            }
+        });
     }
 
     private <T> T readFile(String fileName, JavaType type) {
