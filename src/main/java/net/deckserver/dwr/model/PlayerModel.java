@@ -61,6 +61,7 @@ public class PlayerModel {
 
     public void setView(String view) {
         this.view = view;
+        this.game = null;
     }
 
     public synchronized void chat(ChatEntryBean chat) {

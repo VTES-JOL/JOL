@@ -812,6 +812,7 @@ public class JolAdmin {
                             topVP = victoryPoints;
                         } else if (victoryPoints > topVP) {
                             winner = result;
+                            topVP = victoryPoints;
                         } else {
                             winner = null;
                         }
