@@ -553,30 +553,28 @@ function renderPastGames(history) {
     var pastGames = $("#pastGames tbody");
     pastGames.empty();
     $.each(history, function(index, game) {
-        let gameRow = $("<tr/>").addClass("border-bottom");
-        let gameName = $("<td/>").text(game.name);
         let startTime = moment(game.started, moment.ISO_8601)
-        if (startTime.isValid()) {
-            startTime = startTime.tz("UTC").format("D-MMM-YYYY HH:mm z");
-        } else {
-            startTime = game.started;
-        }
-        let started = $("<td/>").text(startTime);
-        let ended = $("<td/>").text(moment(game.ended, moment.ISO_8601).tz("UTC").format("D-MMM-YYYY HH:mm z"));
-        let results = $("<td/>").addClass("no-border");
-        let resultsTable = $("<table/>").addClass("clean-no-border light");
-        console.log(game.results);
+        startTime = startTime.isValid ? startTime.tz("UTC").format("D-MMM-YYYY HH:mm z") : game.started
+        let endTime = moment(game.ended, moment.ISO_8601).tz("UTC").format("D-MMM-YYYY HH:mm z");
+        let firstPlayerRow = true;
         $.each(game.results, function(i, value) {
             let playerRow = $("<tr/>");
-            let playerName = $("<td/>").text(value.playerName);
+            if (firstPlayerRow) {
+                let gameName = $("<td/>").attr('rowspan',5).text(game.name);
+                let gameStarted = $("<td/>").attr('rowspan',5).text(startTime);
+                let gameFinished = $("<td/>").attr('rowspan',5).text(endTime);
+                playerRow.append(gameName, gameStarted, gameFinished);
+                playerRow.addClass("border-top")
+                firstPlayerRow = false;
+            } else {
+                playerRow.addClass("border-top-light");
+            }
+            let playerName = $("<td/>").text(value.playerName).addClass("border-left");
             let deckName = $("<td/>").text(value.deckName);
-            let score = $("<td/>").text((value.victoryPoints !== "0" ? value.victoryPoints + " VP" : "") + (value.gameWin ? ", 1 GW" : ""))
+            let score = $("<td/>").text((value.victoryPoints !== "0" ? value.victoryPoints + " VP" : "") + (value.gameWin ? ", 1 GW" : ""));
             playerRow.append(playerName, deckName, score);
-            resultsTable.append(playerRow);
+            pastGames.append(playerRow);
         })
-        results.append(resultsTable);
-        gameRow.append(gameName, started, ended, results);
-        pastGames.append(gameRow)
     })
 }
 

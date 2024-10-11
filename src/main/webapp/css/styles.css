@@ -246,6 +246,21 @@ table.games td:last-child {
     border-collapse: collapse;
 }
 
+.border-top-light {
+    border-top: 1px solid #dddddd;
+    border-collapse: collapse;
+}
+
+.border-top {
+    border-top: 1px solid #aaa !important;
+    border-collapse: collapse;
+}
+
+.border-left {
+    border-left: 1px solid #aaa !important;
+    border-collapse: collapse;
+}
+
 h2.header, h3.header, h4.header, h5.header {
     border-top: 1px solid #aaa;
     border-left: 1px solid #aaa;
@@ -303,6 +318,10 @@ ul.condensed-list li p {
 
 table.clean-no-border {
     width: 100%;
+}
+
+table.clean-no-border td, table.clean-no-border th {
+    padding: 0.15em 0.5em;
 }
 
 table.no-border {

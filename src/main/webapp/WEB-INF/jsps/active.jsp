@@ -14,11 +14,11 @@
 <h4 class="header">Past Games</h4>
 <table id="pastGames" class="clean-no-border light">
 	<thead>
-	<tr>
+	<tr class="border-top">
 		<th>Game</th>
 		<th>Started</th>
 		<th>Ended</th>
-		<th>Results</th>
+		<th colspan="3" class="border-left">Results</th>
 	</tr>
 	</thead>
 	<tbody>
