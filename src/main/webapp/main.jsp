@@ -390,7 +390,7 @@
 <script type='text/javascript' src='dwr/interface/DS.js'></script>
 <script type='text/javascript' src='dwr/util.js'></script>
 <script type='text/javascript' src="js/tippy.all.min.js"></script>
-<script type='text/javascript' src='js/ds.js?version=<%= System.getenv("JOL_VERSION") %>&i=2'></script>
+<script type='text/javascript' src='js/ds.js?version=<%= System.getenv("JOL_VERSION") %>&i=3'></script>
 <script type="text/javascript" src="js/card-modal.js?version=<%= System.getenv("JOL_VERSION") %>"></script>
 </body>
 </html>

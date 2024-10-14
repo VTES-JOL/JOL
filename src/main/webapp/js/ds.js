@@ -565,9 +565,9 @@ function renderOnline(div, who) {
     $.each(who, function (index, player) {
         var playerSpan = $("<span/>").text(player.name).addClass("label");
         if (player.superUser) {
-            playerSpan.addClass("label-warning");
-        } else if (player.admin) {
             playerSpan.addClass("label-dark");
+        } else if (player.admin) {
+            playerSpan.addClass("label-warning");
         } else {
             playerSpan.addClass("label-light")
         }
