@@ -179,9 +179,9 @@ public class DeckserverRemote {
         return ret;
     }
 
-    public Map<String, Object> updateProfile(String email, String discordID) {
+    public Map<String, Object> updateProfile(String email, String discordID, String veknID) {
         String player = getPlayer(request);
-        admin.updateProfile(player, email, discordID);
+        admin.updateProfile(player, email, discordID, veknID);
         return UpdateFactory.getUpdate();
     }
 
@@ -218,6 +218,31 @@ public class DeckserverRemote {
     public Map<String, Object> deleteDeck(String deckName) {
         String playerName = getPlayer(request);
         admin.deleteDeck(playerName, deckName);
+        return UpdateFactory.getUpdate();
+    }
+
+
+    public Map<String, Object> setJudge(String name, boolean value) {
+        String playerName = getPlayer(request);
+        if (admin.isAdmin(playerName)) {
+            admin.setJudge(name, value);
+        }
+        return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> setAdmin(String name, boolean value) {
+        String playerName = getPlayer(request);
+        if (admin.isAdmin(playerName)) {
+            admin.setAdmin(name, value);
+        }
+        return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> setSuperUser(String name, boolean value) {
+        String playerName = getPlayer(request);
+        if (admin.isAdmin(playerName)) {
+            admin.setSuperUser(name, value);
+        }
         return UpdateFactory.getUpdate();
     }
 

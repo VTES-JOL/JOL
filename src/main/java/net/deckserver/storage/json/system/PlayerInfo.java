@@ -15,6 +15,7 @@ public class PlayerInfo {
     private String email;
     private String hash;
     private String discordId;
+    private String veknId;
     private Set<PlayerRole> roles;
 
     public PlayerInfo(String name, String id, String email, String hash) {

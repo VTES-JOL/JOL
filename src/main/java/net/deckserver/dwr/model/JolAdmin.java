@@ -35,6 +35,7 @@ import net.deckserver.game.ui.turn.DsTurnRecorder;
 import net.deckserver.jobs.CleanupGamesJob;
 import net.deckserver.jobs.PersistStateJob;
 import net.deckserver.jobs.PublicGamesBuilderJob;
+import net.deckserver.jobs.ValidateGWJob;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.DeckStats;
@@ -404,6 +405,7 @@ public class JolAdmin {
     public void setup() {
         scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 5, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new ValidateGWJob(), 0, 5, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 10, 1, TimeUnit.MINUTES);
     }
 
@@ -513,10 +515,10 @@ public class JolAdmin {
     }
 
     public boolean registerPlayer(String name, String password, String email) {
-        if (existsPlayer(name) || name.length() == 0)
+        if (existsPlayer(name) || name.isEmpty())
             return false;
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
-        players.put(name, new PlayerInfo(name, ULID.random(), email, hash, null, new HashSet<>()));
+        players.put(name, new PlayerInfo(name, ULID.random(), email, hash, null, null, new HashSet<>()));
         return true;
     }
 
@@ -525,10 +527,11 @@ public class JolAdmin {
         loadPlayerInfo(player).setHash(hash);
     }
 
-    public void updateProfile(String playerName, String email, String discordID) {
+    public void updateProfile(String playerName, String email, String discordID, String veknID) {
         PlayerInfo playerInfo = loadPlayerInfo(playerName);
         playerInfo.setDiscordId(discordID);
         playerInfo.setEmail(email);
+        playerInfo.setVeknId(veknID);
     }
 
     public boolean authenticate(String playerName, String password) {
@@ -695,6 +698,10 @@ public class JolAdmin {
         return loadPlayerInfo(player).getDiscordId();
     }
 
+    public String getVeknID(String player) {
+        return loadPlayerInfo(player).getVeknId();
+    }
+
     public boolean isAdmin(String player) {
         return loadPlayerInfo(player).getRoles().contains(PlayerRole.ADMIN);
     }
@@ -788,7 +795,7 @@ public class JolAdmin {
                 String endTime = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
                 history.setStarted(startTime);
                 history.setEnded(endTime);
-                String winner = null;
+                PlayerResult winner = null;
                 double topVP = 0.0;
                 boolean hasVp = false;
                 for (String player : gameData.getPlayers()) {
@@ -803,18 +810,19 @@ public class JolAdmin {
                     result.setVictoryPoints(format.format(victoryPoints));
                     if (victoryPoints >= 2.0) {
                         if (winner == null) {
-                            winner = player;
+                            winner = result;
                             topVP = victoryPoints;
                         } else if (victoryPoints > topVP) {
-                            winner = player;
+                            winner = result;
+                            topVP = victoryPoints;
                         } else {
                             winner = null;
                         }
                     }
-                    history.getResults().put(player, result);
+                    history.getResults().add(result);
                 }
                 if (winner != null) {
-                    history.getResults().get(winner).setGameWin(true);
+                    winner.setGameWin(true);
                 }
                 if (hasVp) {
                     pastGames.put(OffsetDateTime.now(), history);
@@ -842,6 +850,62 @@ public class JolAdmin {
         return loadGameInfo(gameName).getId();
     }
 
+    public void validateGW() {
+        pastGames.values().forEach(gameHistory -> {
+            PlayerResult winner = null;
+            PlayerResult previousWinner = gameHistory.getResults().stream().filter(PlayerResult::isGameWin).findFirst().orElse(null);
+            double topVP = 0.0;
+            for (PlayerResult result : gameHistory.getResults()) {
+                double victoryPoints = Double.parseDouble(result.getVictoryPoints());
+                if (victoryPoints >= 2.0) {
+                    if (winner == null) {
+                        logger.debug("{} - {} has {} VP and there is no current high score.", gameHistory.getName(), result.getPlayerName(), victoryPoints);
+                        winner = result;
+                        topVP = victoryPoints;
+                    } else if (victoryPoints > topVP) {
+                        logger.debug("{} - {} has {} VP, previous high score was {} on {} VP.", gameHistory.getName(), result.getPlayerName(), victoryPoints, winner.getPlayerName(), topVP);
+                        winner = result;
+                        topVP = victoryPoints;
+                    } else if (victoryPoints == topVP) {
+                        logger.debug("{} - tie between {} and {}. No winner.", gameHistory.getName(), result.getPlayerName(), winner.getPlayerName());
+                        winner = null;
+                    }
+                }
+            }
+            if (winner != null && previousWinner == null) {
+                logger.info("Found a winner for {} where there wasn't one before, now {} on {}", gameHistory.getName(), winner.getPlayerName(), winner.getVictoryPoints());
+                winner.setGameWin(true);
+            } else if (winner != null && winner != previousWinner) {
+                logger.info("Found a new winner for {}, previously {} on {}, now {} on {}", gameHistory.getName(), previousWinner.getPlayerName(), previousWinner.getVictoryPoints(), winner.getPlayerName(), winner.getVictoryPoints());
+                winner.setGameWin(true);
+                previousWinner.setGameWin(false);
+            }
+        });
+    }
+    private void setRole(PlayerInfo info, PlayerRole role, boolean enabled) {
+        if (enabled) {
+            info.getRoles().add(role);
+        } else {
+            info.getRoles().remove(role);
+        }
+    }
+
+    public void setJudge(String playerName, boolean value) {
+        PlayerInfo info = players.get(playerName);
+        setRole(info, PlayerRole.JUDGE, value);
+    }
+
+    public void setAdmin(String playerName, boolean value) {
+        PlayerInfo info = players.get(playerName);
+        setRole(info, PlayerRole.ADMIN, value);
+    }
+
+    public void setSuperUser(String playerName, boolean value) {
+        PlayerInfo info = players.get(playerName);
+        setRole(info, PlayerRole.SUPER_USER, value);
+    }
+
+    @SuppressWarnings("unchecked")
     private <T> T readFile(String fileName, JavaType type) {
         try {
             logger.info("Reading data from {}", fileName);

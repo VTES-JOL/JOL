@@ -1,16 +1,16 @@
 package net.deckserver.dwr.creators;
 
-import net.deckserver.dwr.bean.AdminPageBean;
+import net.deckserver.dwr.bean.TournamentBean;
 import net.deckserver.dwr.model.PlayerModel;
 
-public class AdminCreator implements ViewCreator {
+public class TournamentCreator implements ViewCreator {
     @Override
     public String getFunction() {
-        return "callbackAdmin";
+        return "callbackTournament";
     }
 
     @Override
     public Object createData(PlayerModel model) {
-        return new AdminPageBean(model);
+        return new TournamentBean(model);
     }
 }

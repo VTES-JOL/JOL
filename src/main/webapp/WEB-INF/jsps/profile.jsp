@@ -2,7 +2,14 @@
     <form onsubmit="return false;">
         <h2>Profile</h2>
         <label for="profileEmail">E-mail Address</label>
-        <input type="email" name="email" id="profileEmail" class="form-control"/>
+        <input type="email" name="email" id="profileEmail" class="form-control" autocomplete="email"/>
+
+        <h3 class="mt-3">VEKN ID</h3>
+        <p class="px-1">
+            Link your account to your VEKN ID in order to be able to play sanctioned tournaments.
+        </p>
+        <label for="veknID">VEKN ID</label>
+        <input type="text" name="veknID" id="veknID" class="form-control"/>
 
         <h3 class="mt-3">Discord Ping</h3>
         <p class="px-1">

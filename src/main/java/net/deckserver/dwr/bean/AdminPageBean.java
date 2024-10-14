@@ -1,73 +1,24 @@
 package net.deckserver.dwr.bean;
 
+import lombok.Getter;
 import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.dwr.model.PlayerModel;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Getter
 public class AdminPageBean {
+
+    private final List<UserSummaryBean> userRoles;
     private final List<String> players;
-    private final List<GameStatusBean> myGames;
-    private final List<GameStatusBean> publicGames;
-    private final List<PlayerRegistrationStatusBean> invitedGames;
-    private final List<DeckInfoBean> decks;
-    private final String message;
 
-    public AdminPageBean(String player) {
+    public AdminPageBean(PlayerModel model) {
         JolAdmin admin = JolAdmin.getInstance();
-
-        players = admin.getPlayers().stream().sorted().collect(Collectors.toList());
-
-        myGames = admin.getGames().stream()
-                .filter(Objects::nonNull)
-                .filter(admin::isPrivate)
-                .filter(gameName -> player.equals(admin.getOwner(gameName)))
-                .map(GameStatusBean::new)
+        this.players = admin.getPlayers().stream().sorted().collect(Collectors.toList());
+        this.userRoles = this.players.stream()
+                .map(UserSummaryBean::new)
+                .filter(UserSummaryBean::isSpecialUser)
                 .collect(Collectors.toList());
-
-        publicGames = admin.getGames().stream()
-                .filter(Objects::nonNull)
-                .filter(admin::isStarting)
-                .filter(admin::isPublic)
-                .map(GameStatusBean::new)
-                .collect(Collectors.toList());
-
-        invitedGames = admin.getGames().stream()
-                .filter(Objects::nonNull)
-                .filter(admin::isStarting)
-                .filter(gameName -> admin.isInGame(gameName, player))
-                .map(gameName -> new PlayerRegistrationStatusBean(gameName, player))
-                .collect(Collectors.toList());
-
-        decks = admin.getDeckNames(player).stream()
-                .filter(Objects::nonNull)
-                .map(deckName -> new DeckInfoBean(player, deckName))
-                .filter(deckInfoBean -> deckInfoBean.getDeckFormat().equals("MODERN"))
-                .collect(Collectors.toList());
-
-        message = JolAdmin.getInstance().getPlayerModel(player).getMessage();
     }
-
-    public List<String> getPlayers() {
-        return players;
-    }
-
-    public List<GameStatusBean> getMyGames() {
-        return myGames;
-    }
-
-    public List<GameStatusBean> getPublicGames() {
-        return publicGames;
-    }
-
-    public List<PlayerRegistrationStatusBean> getInvitedGames() {
-        return invitedGames;
-    }
-
-    public List<DeckInfoBean> getDecks() {
-        return decks;
-    }
-
-    public String getMessage() { return message; }
 }

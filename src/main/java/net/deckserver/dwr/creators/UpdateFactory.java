@@ -17,10 +17,12 @@ public class UpdateFactory {
         viewMap.put("game", new GameCreator());
         viewMap.put("main", new MainCreator());
         viewMap.put("deck", new DeckCreator());
+        viewMap.put("lobby", new LobbyCreator());
         viewMap.put("admin", new AdminCreator());
         viewMap.put("profile", new ProfileCreator());
         viewMap.put("active", new AllGamesCreator());
         viewMap.put("super", new SuperCreator());
+        viewMap.put("tournament", new TournamentCreator());
     }
 
     private static ViewCreator getView(String type) {
@@ -32,7 +34,7 @@ public class UpdateFactory {
         String playerName = DeckserverRemote.getPlayer(WebContextFactory.get().getHttpServletRequest());
         PlayerModel player = admin.getPlayerModel(playerName);
         admin.recordPlayerAccess(player.getPlayerName());
-        List<String> views = Arrays.asList(player.getView(), "nav", "status");
+        List<String> views = Arrays.asList(player.getView(), "nav");
         return views.stream()
                 .map(UpdateFactory::getView)
                 .filter(Objects::nonNull)

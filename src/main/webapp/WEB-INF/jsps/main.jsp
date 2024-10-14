@@ -31,11 +31,11 @@
 					<ul class="condensed-list light">
 						<li>
 							<span class="label label-light">Embrace</span>
-							<p>Can make decks, play, chat</p>
+							<p>Novice player.  Go easy on them.</p>
 						</li>
 						<li>
 							<span class="label label-dark">Prince</span>
-							<p>Creates games, Invites players, Closes games</p>
+							<p>Experienced player.  Ask for help with commands or interface.</p>
 						</li>
 						<li>
 							<span class="label label-light label-bold">Justicar</span>
@@ -43,7 +43,7 @@
 						</li>
 						<li>
 							<span class="label label-warning">Inner Circle</span>
-							<p>Administer games for all other Princes</p>
+							<p>Administrator for JOL</p>
 						</li>
 					</ul>
 				</div>

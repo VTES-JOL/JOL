@@ -52,7 +52,50 @@ function callbackAllGames(data) {
     renderPastGames(data.history);
 }
 
+function createButton(config, fn, ...args) {
+    let button = $("<button/>");
+    button.text(config.text);
+    button.addClass(config.class);
+    button.on('click', function() {
+        if(confirm(config.confirm)) {
+            fn(...args, {callback:processData});
+        }
+    });
+    return button;
+}
+
 function callbackAdmin(data) {
+    let userRoles = $("#userRoles")
+    userRoles.empty();
+    $.each(data.userRoles, function(index,value) {
+        let playerRow = $("<tr/>");
+        let nameCell = $("<td/>").text(value.name);
+        let onlineCell = $("<td/>").text(moment(data.lastOnline).tz("UTC").format("D-MMM HH:mm z"));
+        let removeJudgeButton = value.judge ? createButton({text: "Remove", class: "btn btn-primary", confirm: "Are you sure you want to remove this role?"}, DS.setJudge, value.name, false) : "";
+        let judgeCell = $("<td/>").append(removeJudgeButton);
+        let removeSuperButton = value.superUser ? createButton({text: "Remove", class: "btn btn-primary", confirm: "Are you sure you want to remove this role?"}, DS.setSuperUser, value.name, false) : "";
+        let superCell = $("<td/>").append(removeSuperButton);
+        let removeAdminButton = value.admin ? createButton({text: "Remove", class: "btn btn-primary", confirm: "Are you sure you want to remove this role?"}, DS.setAdmin, value.name, false) : "";
+        let adminCell = $("<td/>").append(removeAdminButton);
+        playerRow.append(nameCell, onlineCell, judgeCell, superCell, adminCell);
+        userRoles.append(playerRow);
+    })
+    let adminPlayerList = $("#adminPlayerList");
+    adminPlayerList.empty();
+    $.each(data.players, function(index,value) {
+        let playerOption = $("<option/>", {value: value, text: value});
+        adminPlayerList.append(playerOption);
+    })
+}
+
+function addRole() {
+    let player = $("#adminPlayerList").val();
+    let role = $("#adminRoleList").val();
+    let functionName = "DS.set"+role;
+    eval(functionName + "('" + player + "', true, {callback:processData});");
+}
+
+function callbackLobby(data) {
     var currentGames = $("#currentGames");
     var publicGames = $("#publicGames");
     var myGameList = $("#myGameList");
@@ -190,11 +233,19 @@ function callbackSuper(data) {
 
 }
 
+function callbackTournament(data) {
+    if (data.idValid) {
+        $("#validId").show();
+    } else $("#validID").hide();
+}
+
 function callbackProfile(data) {
     if (profile.email !== data.email)
         $('#profileEmail').val(data.email);
     if (profile.discordID !== data.discordID)
         $('#discordID').val(data.discordID);
+    if (profile.veknId !== data.veknID)
+        $("#veknID").val(data.veknID);
     if (profile.updating) {
         var result = $('#profileUpdateResult');
         result.text('Done!');
@@ -352,12 +403,14 @@ function doNav(target) {
 
 function renderButton(data) {
     var buttonsDiv = $("#buttons");
-    $.each(data, function (key, value) {
-        var button = $("<a/>").addClass("nav-item nav-link").text(value).click(key, function () {
+    $.each(data, function (i, value) {
+        let key = value.split(":")[0];
+        let label = value.split(":")[1];
+        var button = $("<a/>").addClass("nav-item nav-link").text(label).click(key, function () {
             DS.navigate(key, {callback: processData, errorHandler: errorhandler});
             $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
         });
-        if (game === value || currentPage.toLowerCase() === key.toLowerCase()) {
+        if (game === label || currentPage.toLowerCase() === key.toLowerCase()) {
             button.addClass("active");
         }
         buttonsDiv.append(button);
@@ -512,9 +565,9 @@ function renderOnline(div, who) {
     $.each(who, function (index, player) {
         var playerSpan = $("<span/>").text(player.name).addClass("label");
         if (player.superUser) {
-            playerSpan.addClass("label-warning");
-        } else if (player.admin) {
             playerSpan.addClass("label-dark");
+        } else if (player.admin) {
+            playerSpan.addClass("label-warning");
         } else {
             playerSpan.addClass("label-light")
         }
@@ -545,30 +598,28 @@ function renderPastGames(history) {
     var pastGames = $("#pastGames tbody");
     pastGames.empty();
     $.each(history, function(index, game) {
-        let gameRow = $("<tr/>").addClass("border-bottom");
-        let gameName = $("<td/>").text(game.name);
         let startTime = moment(game.started, moment.ISO_8601)
-        if (startTime.isValid()) {
-            startTime = startTime.tz("UTC").format("D-MMM-YYYY HH:mm z");
-        } else {
-            startTime = game.started;
-        }
-        let started = $("<td/>").text(startTime);
-        let ended = $("<td/>").text(moment(game.ended, moment.ISO_8601).tz("UTC").format("D-MMM-YYYY HH:mm z"));
-        let results = $("<td/>").addClass("no-border");
-        let resultsTable = $("<table/>").addClass("clean-no-border light");
-        console.log(game.results);
-        $.each(game.results, function(key, value) {
+        startTime = startTime.isValid ? startTime.tz("UTC").format("D-MMM-YYYY HH:mm z") : game.started
+        let endTime = moment(game.ended, moment.ISO_8601).tz("UTC").format("D-MMM-YYYY HH:mm z");
+        let firstPlayerRow = true;
+        $.each(game.results, function(i, value) {
             let playerRow = $("<tr/>");
-            let playerName = $("<td/>").text(key);
+            if (firstPlayerRow) {
+                let gameName = $("<td/>").attr('rowspan',5).text(game.name);
+                let gameStarted = $("<td/>").attr('rowspan',5).text(startTime);
+                let gameFinished = $("<td/>").attr('rowspan',5).text(endTime);
+                playerRow.append(gameName, gameStarted, gameFinished);
+                playerRow.addClass("border-top")
+                firstPlayerRow = false;
+            } else {
+                playerRow.addClass("border-top-light");
+            }
+            let playerName = $("<td/>").text(value.playerName).addClass("border-left");
             let deckName = $("<td/>").text(value.deckName);
-            let score = $("<td/>").text((value.victoryPoints !== "0" ? value.victoryPoints + " VP" : "") + (value.gameWin ? ", 1 GW" : ""))
+            let score = $("<td/>").text((value.victoryPoints !== "0" ? value.victoryPoints + " VP" : "") + (value.gameWin ? ", 1 GW" : ""));
             playerRow.append(playerName, deckName, score);
-            resultsTable.append(playerRow);
+            pastGames.append(playerRow);
         })
-        results.append(resultsTable);
-        gameRow.append(gameName, started, ended, results);
-        pastGames.append(gameRow)
     })
 }
 
@@ -591,14 +642,12 @@ function navigate(data) {
         $("#gameRow").hide();
         player = null;
     } else {
-        renderButton({active: "Watch", deck: "Decks", profile: "Profile"});
-        renderButton({admin: "Game Admin", tournament: "Tournaments"});
+        renderButton(data.buttons);
         renderGameButtons(data.gameButtons);
         $('#logout').show();
         $("#gameRow").show();
         player = data.player;
     }
-    renderButton({help: "Help"});
     renderDesktopViewButton();
 }
 
@@ -969,7 +1018,8 @@ function updateProfile() {
     profile.updating = true;
     var email = $('#profileEmail').val();
     var discordID = $('#discordID').val();
-    DS.updateProfile(email, discordID, {callback: processData, errorHandler: updateProfileErrorHandler});
+    var veknID = $("#veknID").val();
+    DS.updateProfile(email, discordID, veknID, {callback: processData, errorHandler: updateProfileErrorHandler});
 }
 
 function updatePassword() {
