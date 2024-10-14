@@ -1,19 +1,22 @@
 package net.deckserver.dwr.bean;
 
+import lombok.Getter;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+@Getter
 public class NavBean {
 
     private boolean chats;
-    private boolean admin;
-    private boolean superUser;
     private final Map<String, String> gameButtons = new HashMap<>();
+    private final List<String> buttons = new ArrayList<>();
 
     private final String player;
     private final String target;
@@ -26,9 +29,17 @@ public class NavBean {
             game = model.getCurrentGame();
         if (player != null) {
             chats = model.hasChats();
-            admin = JolAdmin.getInstance().isAdmin(player);
-            superUser = JolAdmin.getInstance().isSuperUser(player);
+            boolean admin = JolAdmin.getInstance().isAdmin(player);
+            buttons.add("active:Watch");
+            buttons.add("deck:Decks");
+            buttons.add("profile:Profile");
+            buttons.add("lobby:Lobby");
+            buttons.add("tournament:Tournament");
+            if (admin) {
+                buttons.add("admin:Admin");
+            }
         }
+        buttons.add("help:Help");
         for (String game : model.getCurrentGames()) {
             GameModel gmodel = JolAdmin.getInstance().getGameModel(game);
             GameView view = gmodel.getView(player);
@@ -37,31 +48,4 @@ public class NavBean {
         }
     }
 
-    public Map<String, String> getGameButtons() {
-        return gameButtons;
-    }
-
-    public String getPlayer() {
-        return player;
-    }
-
-    public String getGame() {
-        return game;
-    }
-
-    public String getTarget() {
-        return target;
-    }
-
-    public boolean isChats() {
-        return chats;
-    }
-
-    public boolean isAdmin() {
-        return admin;
-    }
-
-    public boolean isSuperUser() {
-        return superUser;
-    }
 }

@@ -882,7 +882,30 @@ public class JolAdmin {
             }
         });
     }
+    private void setRole(PlayerInfo info, PlayerRole role, boolean enabled) {
+        if (enabled) {
+            info.getRoles().add(role);
+        } else {
+            info.getRoles().remove(role);
+        }
+    }
 
+    public void setJudge(String playerName, boolean value) {
+        PlayerInfo info = players.get(playerName);
+        setRole(info, PlayerRole.JUDGE, value);
+    }
+
+    public void setAdmin(String playerName, boolean value) {
+        PlayerInfo info = players.get(playerName);
+        setRole(info, PlayerRole.ADMIN, value);
+    }
+
+    public void setSuperUser(String playerName, boolean value) {
+        PlayerInfo info = players.get(playerName);
+        setRole(info, PlayerRole.SUPER_USER, value);
+    }
+
+    @SuppressWarnings("unchecked")
     private <T> T readFile(String fileName, JavaType type) {
         try {
             logger.info("Reading data from {}", fileName);

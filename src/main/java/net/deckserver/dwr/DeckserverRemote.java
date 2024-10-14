@@ -221,6 +221,31 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
+
+    public Map<String, Object> setJudge(String name, boolean value) {
+        String playerName = getPlayer(request);
+        if (admin.isAdmin(playerName)) {
+            admin.setJudge(name, value);
+        }
+        return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> setAdmin(String name, boolean value) {
+        String playerName = getPlayer(request);
+        if (admin.isAdmin(playerName)) {
+            admin.setAdmin(name, value);
+        }
+        return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> setSuperUser(String name, boolean value) {
+        String playerName = getPlayer(request);
+        if (admin.isAdmin(playerName)) {
+            admin.setSuperUser(name, value);
+        }
+        return UpdateFactory.getUpdate();
+    }
+
     private GameView getView(String name) {
         String player = getPlayer(request);
         return getModel(name).getView(player);

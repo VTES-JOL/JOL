@@ -3,14 +3,14 @@ package net.deckserver.dwr.creators;
 import net.deckserver.dwr.bean.AdminPageBean;
 import net.deckserver.dwr.model.PlayerModel;
 
-class AdminCreator implements ViewCreator {
-
+public class AdminCreator implements ViewCreator {
+    @Override
     public String getFunction() {
         return "callbackAdmin";
     }
 
+    @Override
     public Object createData(PlayerModel model) {
-        return new AdminPageBean(model.getPlayerName());
+        return new AdminPageBean(model);
     }
-
 }

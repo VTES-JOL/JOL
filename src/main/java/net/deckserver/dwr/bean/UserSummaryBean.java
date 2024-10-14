@@ -1,11 +1,13 @@
 package net.deckserver.dwr.bean;
 
+import lombok.Getter;
 import net.deckserver.dwr.model.JolAdmin;
 
 import java.time.temporal.ChronoUnit;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
+@Getter
 public class UserSummaryBean {
     private final String name;
     private final boolean admin;
@@ -21,23 +23,8 @@ public class UserSummaryBean {
         this.lastOnline = JolAdmin.getInstance().getPlayerAccess(name).truncatedTo(ChronoUnit.SECONDS).format(ISO_OFFSET_DATE_TIME);
     }
 
-    public String getName() {
-        return name;
+    public boolean isSpecialUser() {
+        return admin || superUser || judge;
     }
 
-    public boolean isAdmin() {
-        return admin;
-    }
-
-    public boolean isSuperUser() {
-        return superUser;
-    }
-
-    public boolean isJudge() {
-        return judge;
-    }
-
-    public String getLastOnline() {
-        return lastOnline;
-    }
 }

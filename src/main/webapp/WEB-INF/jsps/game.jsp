@@ -47,9 +47,9 @@
                     <div class="form-group form-row mb-1">
                         <div id="endCommand" class="col-8">
                             <div class="form-row">
-                                <label for="endturn" class="col-6 col-form-label col-form-label-sm">End turn?</label>
+                                <label for="endTurn" class="col-6 col-form-label col-form-label-sm">End turn?</label>
                                 <div class="col-6">
-                                    <select id="endTurn" name="endturn" class="form-control form-control-sm">
+                                    <select id="endTurn" name="endTurn" class="form-control form-control-sm">
                                         <option value="No">No</option>
                                         <option value="Yes">Yes</option>
                                     </select>
