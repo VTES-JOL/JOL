@@ -1,17 +1,15 @@
 package net.deckserver.game.storage.cards.importer;
 
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-import com.opencsv.exceptions.CsvException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 public abstract class AbstractImporter<T> {
@@ -23,11 +21,18 @@ public abstract class AbstractImporter<T> {
     }
 
     public List<T> read() throws Exception {
-        try (InputStream dataStream = Files.newInputStream(dataPath); InputStreamReader inputStreamReader = new InputStreamReader(dataStream); CSVReader csvReader = new CSVReaderBuilder(inputStreamReader).withSkipLines(1).build()) {
-            List<String[]> lineData = csvReader.readAll();
-            return lineData.stream().map(this::map).collect(Collectors.toList());
-        } catch (IOException | CsvException e) {
-            log.error("Exception reading library file: {}", e);
+        try (FileReader in = new FileReader(dataPath.toFile())) {
+            Iterable<CSVRecord> records = CSVFormat.DEFAULT.builder()
+                    .setHeader()
+                    .setSkipHeaderRecord(true)
+                    .build()
+                    .parse(in);
+            return StreamSupport.stream(records.spliterator(), false)
+                    .map(CSVRecord::values)
+                    .map(this::map)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            log.error("Exception reading library file:", e);
             throw e;
         }
     }

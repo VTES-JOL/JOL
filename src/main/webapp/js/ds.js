@@ -70,7 +70,7 @@ function callbackAdmin(data) {
     $.each(data.userRoles, function(index,value) {
         let playerRow = $("<tr/>");
         let nameCell = $("<td/>").text(value.name);
-        let onlineCell = $("<td/>").text(moment(data.lastOnline).tz("UTC").format("D-MMM HH:mm z"));
+        let onlineCell = $("<td/>").text(moment(value.lastOnline).tz("UTC").format("D-MMM-YY HH:mm z"));
         let removeJudgeButton = value.judge ? createButton({text: "Remove", class: "btn btn-primary", confirm: "Are you sure you want to remove this role?"}, DS.setJudge, value.name, false) : "";
         let judgeCell = $("<td/>").append(removeJudgeButton);
         let removeSuperButton = value.superUser ? createButton({text: "Remove", class: "btn btn-primary", confirm: "Are you sure you want to remove this role?"}, DS.setSuperUser, value.name, false) : "";
@@ -226,10 +226,6 @@ function callbackLobby(data) {
         deckListOption += '<option value="' + deck.name + '">' + deck.name + '</option>';
     })
     mydeckList.append(deckListOption);
-
-}
-
-function callbackSuper(data) {
 
 }
 
@@ -453,13 +449,13 @@ function renderGameChat(data) {
     // Only scroll to bottom if scrollbar is at bottom (has not been scrolled up)
     var scrollToBottom = isScrolledToBottom(container);
     $.each(data, function (index, line) {
-        var dateAndTime = line.split(' ', 2);
-        var date = dateAndTime[0];
-        var time = dateAndTime[1];
+        const dateAndTime = line.split(' ', 2);
+        const date = dateAndTime[0];
+        const time = dateAndTime[1];
         //Strip off date and time; reattached later
         line = line.slice(date.length + time.length + 2);
-        var timestamp = null;
-        if (date == gameChatLastDay)
+        let timestamp;
+        if (date === gameChatLastDay)
             timestamp = time;
         else {
             gameChatLastDay = date;
@@ -467,7 +463,7 @@ function renderGameChat(data) {
         }
         var timeSpan = $("<span/>").text(timestamp).addClass('chat-timestamp');
         var playerLabel = '';
-        if (line[0] == '[') {
+        if (line[0] === '[') {
             var player = line.split(']', 1)[0].slice(1); //Strip [
             playerLabel = $('<b/>').text(player)[0].outerHTML;
             line = line.slice(player.length + 3); //3 for [] and space
@@ -491,7 +487,7 @@ function renderGlobalChat(data) {
 
     $.each(data, function (index, chat) {
         var day = moment(chat.timestamp).tz("UTC").format("D MMMM");
-        if (globalChatLastDay != day) {
+        if (globalChatLastDay !== day) {
             var dayBreak = $('<div style="height: .9rem; margin-bottom: .6rem; margin-top: -.3rem; border-bottom: 1px solid #dcc; text-align: center">'
                 + '<span style="font-size: .8rem; background-color: #fff; padding: 0 .5rem; color: #b99; font-weight: bold">'
                 + day
@@ -517,7 +513,7 @@ function renderGlobalChat(data) {
     if (scrollToBottom) {
         $('#newChatAlert').hide();
         scrollBottom(container);
-    } else if (container.prop("scrollHeight") != contentHt0) {
+    } else if (container.prop("scrollHeight") !== contentHt0) {
         $('#newChatAlert').show();
     }
 }
@@ -550,7 +546,7 @@ function renderMyGames(games) {
     });
 }
 
-function renderGameLink(game, small) {
+function renderGameLink(game) {
     return '<a onclick="doNav(' + "'g" + game.gameName + "');" + '">'
         + game.gameName
         + "</a>";
@@ -855,7 +851,7 @@ function loadGame(data) {
     }
     //Only clobber your private notes with the server's if something has changed,
     //like another player has shown you some cards.
-    if (data.text !== null && data.text != lastPrivateNotesFromServer) {
+    if (data.text !== null && data.text !== lastPrivateNotesFromServer) {
         privateNotes.val(data.text);
         lastPrivateNotesFromServer = data.text;
     }
@@ -1006,7 +1002,7 @@ function loadHistory(data) {
     addCardTooltips("#historyOutput");
 }
 
-function updateProfileErrorHandler(errorString, exception) {
+function updateProfileErrorHandler() {
     var result = $('#profileUpdateResult');
     result.text('An error occurred');
     result.stop(true);
@@ -1038,7 +1034,7 @@ function updatePassword() {
 function renderDesktopViewButton() {
     var viewport = $('meta[name=viewport]').get(0);
     var text = (
-        viewport.content == DESKTOP_VIEWPORT_CONTENT
+        viewport.content === DESKTOP_VIEWPORT_CONTENT
             ? 'Mobile' : 'Desktop') + ' View';
     var button = $('<a/>')
         .attr('id', 'toggleMobileViewLink')
@@ -1056,7 +1052,7 @@ function toggleMobileView(event) {
     var $link = $('#toggleMobileViewLink').eq(0);
     var viewport = $('meta[name=viewport]').get(0);
     console.log('before: ' + viewport.content)
-    if (viewport.content == DESKTOP_VIEWPORT_CONTENT) {
+    if (viewport.content === DESKTOP_VIEWPORT_CONTENT) {
         viewport.content = 'width=device-width, initial-scale=1, shrink-to-fit=no';
         $link.text('Desktop View');
     } else {

@@ -1,19 +1,24 @@
 package net.deckserver.dwr.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Getter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.ObjectArrayMessage;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class GameModel implements Comparable {
+public class GameModel implements Comparable<GameModel> {
 
-    private static Logger logger = LoggerFactory.getLogger(GameModel.class);
+    private static final Logger logger = LogManager.getLogger();
+    private static final Logger metrics = LogManager.getLogger("net.deckserver.metrics");
 
-    private String name;
-    private Map<String, GameView> views = new HashMap<>();
+    @Getter
+    private final String name;
+    private final Map<String, GameView> views = new HashMap<>();
 
     public GameModel(String name) {
         this.name = name;
@@ -26,10 +31,6 @@ public class GameModel implements Comparable {
 
     public boolean isActive() {
         return JolAdmin.getInstance().isActive(name);
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getOwner() {
@@ -60,7 +61,6 @@ public class GameModel implements Comparable {
         StringBuilder status = new StringBuilder();
         if (player != null) {
             boolean stateChanged = false;
-            boolean pingChanged = false;
             boolean phaseChanged = false;
             boolean chatChanged = false;
             boolean globalChanged = false;
@@ -69,10 +69,8 @@ public class GameModel implements Comparable {
             int idx = game.getActions(game.getCurrentTurn()).length;
             if (ping != null) {
                 if (admin.pingPlayer(ping, name)) {
-                    pingChanged = true;
                     status.append("Ping sent to ").append(ping);
-                }
-                else status.append("Player is already pinged");
+                } else status.append("Player is already pinged");
             }
             if (phase != null &&
                     game.getActivePlayer().equals(player)
@@ -98,7 +96,10 @@ public class GameModel implements Comparable {
             }
             if (command != null || chat != null) {
                 DoCommand commander = new DoCommand(game);
+                boolean didCommand = false;
+                boolean didChat = false;
                 if (command != null) {
+                    didCommand = true;
                     String[] commands = command.split(";");
                     for (String cmd : commands) {
                         try {
@@ -112,54 +113,27 @@ public class GameModel implements Comparable {
                     stateChanged = true;
                 }
                 if (chat != null) {
+                    didChat = true;
                     status.append(commander.doMessage(player, chat));
-                    chat = null;
                     chatChanged = true;
                 }
+                OffsetDateTime timestamp = OffsetDateTime.now();
+                metrics.info(new ObjectArrayMessage(timestamp.getYear(), timestamp.getMonthValue(), timestamp.getDayOfMonth(), timestamp.getHour(), player, game.getName(), didCommand, didChat));
                 admin.clearPing(player, name);
             }
             if (game.getActivePlayer().equals(player) && "Yes".equalsIgnoreCase(endTurn)) {
                 game.newTurn();
                 resetChats();
                 idx = 0; // reset the current action index for the new turn.
-                String email = admin.getEmail(game.getActivePlayer());
-                turnChanged = stateChanged = phaseChanged = pingChanged = true;
+                turnChanged = stateChanged = phaseChanged = true;
             }
             addChats(idx);
             if (stateChanged || phaseChanged || chatChanged || globalChanged) {
                 admin.saveGameState(game);
             }
-            doReload(stateChanged, phaseChanged, pingChanged, globalChanged, turnChanged, chatChanged, privateNotesChanged);
+            doReload(stateChanged, phaseChanged, globalChanged, turnChanged, privateNotesChanged);
         }
         return status.toString();
-    }
-
-    public void firstPing() {
-        JolAdmin admin = JolAdmin.getInstance();
-        JolGame game = admin.getGame(name);
-    }
-
-    private void addChats(int idx) {
-        for (GameView gameView : views.values()) {
-            gameView.addChats(idx);
-        }
-    }
-
-    private void resetChats() {
-        for (GameView gameView : views.values()) {
-            gameView.reset(false);
-        }
-    }
-
-    private void doReload(boolean stateChanged, boolean phaseChanged, boolean pingChanged, boolean globalChanged, boolean turnChanged, boolean chatChanged, boolean privateNotesChanged) {
-        for (String key : (new ArrayList<>(views.keySet()))) {
-            GameView view = views.get(key);
-            if (stateChanged) view.stateChanged();
-            if (phaseChanged) view.phaseChanged();
-            if (globalChanged) view.globalChanged();
-            if (privateNotesChanged) view.privateNotesChanged();
-            if (turnChanged) view.turnChanged();
-        }
     }
 
     public GameView getView(String player) {
@@ -179,8 +153,31 @@ public class GameModel implements Comparable {
         return JolAdmin.getInstance().getPlayers(name);
     }
 
-    public int compareTo(Object arg0) {
-        return -name.compareToIgnoreCase(((GameModel) arg0).getName());
+    public int compareTo(GameModel arg0) {
+        return -name.compareToIgnoreCase(arg0.getName());
+    }
+
+    private void addChats(int idx) {
+        for (GameView gameView : views.values()) {
+            gameView.addChats(idx);
+        }
+    }
+
+    private void resetChats() {
+        for (GameView gameView : views.values()) {
+            gameView.reset(false);
+        }
+    }
+
+    private void doReload(boolean stateChanged, boolean phaseChanged, boolean globalChanged, boolean turnChanged, boolean privateNotesChanged) {
+        for (String key : (new ArrayList<>(views.keySet()))) {
+            GameView view = views.get(key);
+            if (stateChanged) view.stateChanged();
+            if (phaseChanged) view.phaseChanged();
+            if (globalChanged) view.globalChanged();
+            if (privateNotesChanged) view.privateNotesChanged();
+            if (turnChanged) view.turnChanged();
+        }
     }
 
 }

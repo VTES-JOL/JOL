@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>
+        <Property name="data" value="${env:JOL_DATA}"/>
+    </Properties>
+
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <ThresholdFilter level="DEBUG"/>
+            <PatternLayout pattern="%d %-5p %c{1} - %m%n"/>
+        </Console>
+        <RollingFile name="metrics" filePattern="${data}/metrics/%d{yyyy-MM}/%d{yyyy-MM-dd}.log" append="true">
+            <ThresholdFilter level="DEBUG"/>
+            <CsvParameterLayout quoteMode="NON_NUMERIC"/>
+            <TimeBasedTriggeringPolicy />
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="net.deckserver.metrics" level="INFO" additivity="false">
+            <AppenderRef ref="metrics"/>
+        </Logger>
+        <Root level="INFO">
+            <AppenderRef ref="console"/>
+        </Root>
+    </Loggers>
+
+</Configuration>
