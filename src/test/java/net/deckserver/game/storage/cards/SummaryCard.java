@@ -123,7 +123,7 @@ public class SummaryCard {
         Optional.ofNullable(libraryCard.getBurnOption()).ifPresent(burnOption -> cardLines.add("Burn Option"));
         Optional.ofNullable(libraryCard.getConviction()).ifPresent(conviction -> cardLines.add("Cost: " + conviction + " conviction"));
         Optional.ofNullable(libraryCard.getDisciplines()).ifPresent(disciplines -> cardLines.add("Discipline: " + String.join("/", disciplines)));
-        Optional.ofNullable(libraryCard.getText()).ifPresent(cardLines::add);
+        Optional.ofNullable(libraryCard.getText()).map(text -> text.replaceAll("\\n", "<br/>")).ifPresent(cardLines::add);
         this.htmlText = String.join("<br/>", cardLines);
         this.originalText = libraryCard.getText();
     }

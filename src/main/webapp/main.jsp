@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-    <link rel="stylesheet" type="text/css" href="css/styles.css"/>
+    <link rel="stylesheet" type="text/css" href="css/styles.css?version=<%= System.getenv("JOL_VERSION") %>"/>
     <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/jquery-ui.structure.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/jquery-ui.theme.min.css"/>
@@ -202,7 +202,7 @@
                     <span class="card-cost">Costs 1 blood.</span>
                 </div>
                 <p class="mb-2">
-                    <img class="burn-option" src="images/burn-option.png"></img>
+                    <img class="burn-option" src="images/burn-option.png" alt="burn option"/>
                     <span class="preamble">Only usable before range is chosen.</span>
                 </p>
                 <div class="card-modes"></div>
@@ -210,8 +210,8 @@
                     <button type="button" class="card-mode btn btn-block btn-outline-dark mb-2" aria-pressed="false"
                             data-toggle="button">
                         <span class="discipline">a</span>
-                        <p class="mode-text">The opposing minion gets -1 strength this round. A vampire may play only
-                            one Song of Serenity each combat.</p>
+                        <span class="mode-text">The opposing minion gets -1 strength this round. A vampire may play only
+                            one Song of Serenity each combat.</span>
                     </button>
                 </div>
                 <div class="extended-play-panel" style="display:none">
@@ -357,7 +357,7 @@
                 <button type="button" class="btn btn-outline-dark m-1" title="Unlock"
                         data-lock-state="locked"
                         onclick="unlock();">
-                    <div style="transform: rotate(-90deg);">&#10548;</div>
+                    <span style="transform: rotate(-90deg);">&#10548;</span>
                 </button>
                 <button type="button" class="btn btn-outline-dark m-1" title="Block"
                         data-region="ready-region" data-top-level-only
@@ -390,7 +390,7 @@
 <script type='text/javascript' src='dwr/interface/DS.js'></script>
 <script type='text/javascript' src='dwr/util.js'></script>
 <script type='text/javascript' src="js/tippy.all.min.js"></script>
-<script type='text/javascript' src='js/ds.js?version=<%= System.getenv("JOL_VERSION") %>&i=3'></script>
+<script type='text/javascript' src='js/ds.js?version=<%= System.getenv("JOL_VERSION") %>'></script>
 <script type="text/javascript" src="js/card-modal.js?version=<%= System.getenv("JOL_VERSION") %>"></script>
 </body>
 </html>

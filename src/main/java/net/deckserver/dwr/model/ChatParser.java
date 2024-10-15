@@ -13,7 +13,7 @@ public class ChatParser {
 
     private static final Pattern MARKUP_PATTERN = Pattern.compile("\\[(.*?)\\]");
     private static final Pattern STYLE_PATTERN = Pattern.compile("\\{(.*?)\\}");
-    private static final List<String> disciplineSet = Arrays.asList("ani", "obe", "cel", "dom", "dem", "for", "san", "thn", "vic", "pro", "chi", "val", "mel", "nec", "obf", "pot", "qui", "pre", "ser", "tha", "aus", "vis", "abo", "myt", "dai", "spi", "tem", "obt", "str", "mal", "flight");
+    private static final List<String> disciplineSet = Arrays.asList("ani", "obe", "cel", "dom", "dem", "for", "san", "thn", "vic", "pro", "chi", "val", "mel", "nec", "obf", "pot", "qui", "pre", "ser", "tha", "aus", "vis", "abo", "myt", "dai", "spi", "tem", "obt", "str", "mal", "obl", "flight");
 
     public static String sanitizeText(String text) {
         return Sanitizers.LINKS.sanitize(text);
@@ -37,9 +37,7 @@ public class ChatParser {
             for (int x = 1; x <= matcher.groupCount(); x++) {
                 String match = matcher.group(x).trim().replaceAll("&#39;", "'").replaceAll("&#34;", "\"");
                 try {
-                    CardSearch.INSTANCE.findCardExact(match).ifPresent(card -> {
-                        matcher.appendReplacement(sb, generateCardLink(card));
-                    });
+                    CardSearch.INSTANCE.findCardExact(match).ifPresent(card -> matcher.appendReplacement(sb, generateCardLink(card)));
                 } catch (IllegalArgumentException e) {
                     // do nothing
                 }

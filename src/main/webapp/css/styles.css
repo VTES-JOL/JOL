@@ -1,11 +1,11 @@
 @font-face {
     font-family: 'jol';
-    src: url('../fonts/jol_v2.ttf') format('truetype')
+    src: url('../fonts/ankha2.otf') format('opentype')
 }
 
 @font-face {
-    font-family: 'disciplines';
-    src: url('../fonts/disciplines.ttf') format('truetype');
+    font-family: 'clans';
+    src: url('../fonts/vtes-clans.otf') format("opentype");
 }
 
 body {
@@ -696,73 +696,34 @@ div.torpor li ol a.card-name {
     font-style: normal;
     background-color: transparent;
 }
+.discipline {
+    font-family: 'jol';
+    font-size: 1.5em;
 
+}
 .disc a:before {
     font-family: 'jol';
     font-size: 1.5em;
-    padding-right: 5px;
-    vertical-align: bottom;
+    padding-right: 0.2em;
 }
 
-.disc a.action:before {
-    content: 'p';
-}
+.disc a.action:before {content: '0';}
+.disc a.action_modifier:before {content: '1';}
+.disc a.political_action:before {content: '2';}
+.disc a.ally:before {content: '3';}
+.disc a.combat:before {content: '4';}
+.disc a.equipment:before {content: '5';}
+.disc a.reflex:before {content: '6';}
+.disc a.reaction:before {content: '7';}
+.disc a.retainer:before {content: '8';}
+.disc a.master:before {content: '9';}
 
-.disc a.master:before {
-    content: 'x';
-}
-
-.disc a.political_action:before {
-    content: 'r';
-}
-
-.disc a.combat:before {
-    content: 't';
-}
-
-.disc a.reaction:before {
-    content: 'v';
-}
-
-.disc a.action_modifier:before {
-    content: 'q';
-}
-
-.disc a.ally:before {
-    content: 's';
-}
-
-.disc a.retainer:before {
-    content: 'w';
-}
-
-.disc a.equipment:before {
-    content: 'u';
-}
-
-.disc a.action_modifier.reaction:before {
-    content: 'qv';
-}
-
-.disc a.action_modifier.combat:before {
-    content: "qt";
-}
-
-.disc a.combat.reaction:before {
-    content: "tv";
-}
-
-.disc a.action.reaction:before {
-    content: "pv";
-}
-
-.disc a.action.combat:before {
-    content: "pt";
-}
-
-.disc a.event:before {
-    content: "{";
-}
+.disc a.action_modifier.reaction:before {content: '17';}
+.disc a.action_modifier.combat:before {content: "14";}
+.disc a.combat.reaction:before {content: "47";}
+.disc a.action.reaction:before {content: "07";}
+.disc a.action.combat:before {content: "04";}
+.disc a.event:before {content: "[";}
 
 .counter {
     display: inline-block;
@@ -873,337 +834,80 @@ input[type=checkbox] {
     margin-bottom: 0.5em;
 }
 
-.discipline {
-    font-family: 'disciplines';
-    font-size: 1.3em;
-    padding-right: 2px;
-    vertical-align: bottom;
-}
-
 .adv {
     font-family: 'jol';
     font-size: 1.2em;
     font-style: normal;
     font-weight: bolder;
     position: relative;
-    left: -2px;
 }
 
-.adv:before {
-    content: '@'
-}
+.adv:before {content: '|'}
 
-.ani:before {
-    content: 'a';
-    position: relative;
-    top: 2px;
-}
-
-.ANI:before {
-    content: 'A';
-}
-
-.obe:before {
-    content: 'b';
-    position: relative;
-    top: 2px;
-}
-
-.OBE:before {
-    content: 'B';
-}
-
-.cel:before {
-    content: 'c';
-    position: relative;
-    top: 2px;
-}
-
-.CEL:before {
-    content: 'C';
-}
-
-.dom:before {
-    content: 'd';
-    position: relative;
-    top: 2px;
-}
-
-.DOM:before {
-    content: 'D';
-}
-
-.dem:before {
-    content: 'e';
-    position: relative;
-    top: 2px;
-}
-
-.DEM:before {
-    content: 'E';
-}
-
-.for:before {
-    content: 'f';
-    position: relative;
-    top: 2px;
-}
-
-.FOR:before {
-    content: 'F';
-}
-
-.san:before {
-    content: 'g';
-    position: relative;
-    top: 2px;
-}
-
-.SAN:before {
-    content: 'G';
-}
-
-.thn:before {
-    content: 'h';
-    position: relative;
-    top: 2px;
-}
-
-.THN:before {
-    content: 'H';
-}
-
-.vis:before {
-    content: 'i';
-    position: relative;
-    top: 2px;
-}
-
-.VIS:before {
-    content: 'I';
-}
-
-.pro:before {
-    content: 'j';
-    position: relative;
-    top: 2px;
-}
-
-.PRO:before {
-    content: 'J';
-}
-
-.chi:before {
-    content: 'k';
-    position: relative;
-    top: 2px;
-}
-
-.CHI:before {
-    content: 'K';
-}
-
-.val:before {
-    content: 'l';
-    position: relative;
-    top: 2px;
-}
-
-.VAL:before {
-    content: 'L';
-}
-
-.mel:before {
-    content: 'm';
-    position: relative;
-    top: 2px;
-}
-
-.MEL:before {
-    content: 'M';
-}
-
-.nec:before {
-    content: 'n';
-    position: relative;
-    top: 2px;
-}
-
-.NEC:before {
-    content: 'N';
-}
-
-.obf:before {
-    content: 'o';
-    position: relative;
-    top: 2px;
-}
-
-.OBF:before {
-    content: 'O';
-}
-
-.pot:before {
-    content: 'p';
-    position: relative;
-    top: 2px;
-}
-
-.POT:before {
-    content: 'P';
-}
-
-.qui:before {
-    content: 'q';
-    position: relative;
-    top: 2px;
-}
-
-.QUI:before {
-    content: 'Q';
-}
-
-.pre:before {
-    content: 'r';
-    position: relative;
-    top: 2px;
-}
-
-.PRE:before {
-    content: 'R';
-}
-
-.ser:before {
-    content: 's';
-    position: relative;
-    top: 2px;
-}
-
-.SER:before {
-    content: 'S';
-}
-
-.tha:before {
-    content: 't';
-    position: relative;
-    top: 2px;
-}
-
-.THA:before {
-    content: 'T';
-}
-
-.aus:before {
-    content: 'u';
-    position: relative;
-    top: 2px;
-}
-
-.AUS:before {
-    content: 'U';
-}
-
-.vic:before {
-    content: 'v';
-    position: relative;
-    top: 2px;
-}
-
-.VIC:before {
-    content: 'V';
-}
-
-.abo:before {
-    content: 'w';
-    position: relative;
-    top: 2px;
-}
-
-.ABO:before {
-    content: 'W';
-}
-
-.myt:before {
-    content: 'x';
-    position: relative;
-    top: 2px;
-}
-
-.MYT:before {
-    content: 'X';
-}
-
-.dai:before {
-    content: 'y';
-    position: relative;
-    top: 2px;
-}
-
-.DAI:before {
-    content: 'Y';
-}
-
-.spi:before {
-    content: 'z';
-    position: relative;
-    top: 2px;
-}
-
-.SPI:before {
-    content: 'Z';
-}
-
-.obt:before {
-    content: '*';
-    position: relative;
-    top: 2px;
-}
-
-.OBT:before {
-    content: '+';
-}
-
-.tem:before {
-    content: '(';
-    position: relative;
-    top: 2px;
-}
-
-.TEM:before {
-    content: ')';
-}
-
-.str:before {
-    content: ':';
-    position: relative;
-    top: 2px;
-    margin-right: 5px;
-}
-
-.STR:before {
-    content: ';';
-    margin-right: 5px;
-}
-
-.mal:before {
-    content: '<';
-    position: relative;
-    top: 2px;
-    margin-right: 5px;
-}
-
-.MAL:before {
-    content: '>';
-    margin-right: 5px;
-}
-
-.flight:before, .FLIGHT:before {
-    content: "=";
-}
-
-.d:before {
-    content: "0";
-}
+.aus:before {content: 'a';}
+.AUS:before {content: 'A';}
+.obe:before {content: 'b';}
+.OBE:before {content: 'B';}
+.cel:before {content: 'c';}
+.CEL:before {content: 'C';}
+.dom:before {content: 'd';}
+.DOM:before {content: 'D';}
+.dem:before {content: 'e';}
+.DEM:before {content: 'E';}
+.for:before {content: 'f';}
+.FOR:before {content: 'F';}
+.san:before {content: 'g';}
+.SAN:before {content: 'G';}
+.thn:before {content: 'h';}
+.THN:before {content: 'H';}
+.ani:before {content: 'i';}
+.ANI:before {content: 'I';}
+.pro:before {content: 'j';}
+.PRO:before {content: 'J';}
+.chi:before {content: 'k';}
+.CHI:before {content: 'K';}
+.val:before {content: 'l';}
+.VAL:before {content: 'L';}
+.mel:before {content: 'm';}
+.MEL:before {content: 'M';}
+.nec:before {content: 'n';}
+.NEC:before {content: 'N';}
+.obf:before {content: 'o';}
+.OBF:before {content: 'O';}
+.pot:before {content: 'p';}
+.POT:before {content: 'P';}
+.qui:before {content: 'q';}
+.QUI:before {content: 'Q';}
+.pre:before {content: 'r';}
+.PRE:before {content: 'R';}
+.ser:before {content: 's';}
+.SER:before {content: 'S';}
+.tha:before {content: 't';}
+.THA:before {content: 'T';}
+.vic:before {content: 'u';}
+.VIC:before {content: 'U';}
+.vis:before {content: 'v';}
+.VIS:before {content: 'V';}
+.abo:before {content: 'w';}
+.ABO:before {content: 'W';}
+.myt:before {content: 'x';}
+.MYT:before {content: 'X';}
+.dai:before {content: 'y';}
+.DAI:before {content: 'Y';}
+.spi:before {content: 'z';}
+.SPI:before {content: 'Z';}
+.obt:before {content: '$';}
+.OBT:before {content: '£';}
+.tem:before {content: '?';}
+.TEM:before {content: '!';}
+.obl:before {content: 'ø';}
+.OBL:before {content: 'Ø';}
+.str:before {content: 'à';}
+.STR:before {content: 'á';}
+.mal:before {content: 'â';}
+.MAL:before {content: 'ã';}
+.flight:before, .FLIGHT:before {content: "^";}
+.d:before {content: "}";}
 
 @media (min-width: 768px) {
     .max-width-md {
@@ -1236,21 +940,22 @@ input[type=checkbox] {
   line-height: 1em;
 }
 .modal-title .card-type:before { font-family: 'jol'; }
-.modal-title .action:before { content: 'p'; }
-.modal-title .master:before { content: 'x'; }
-.modal-title .political_action:before { content: 'r'; }
-.modal-title .combat:before { content: 't'; }
-.modal-title .reaction:before { content: 'v'; }
-.modal-title .action_modifier:before { content: 'q'; }
-.modal-title .ally:before { content: 's'; }
-.modal-title .retainer:before { content: 'w'; }
-.modal-title .equipment:before { content: 'u'; }
-.modal-title .action_modifier.reaction:before { content: 'qv'; }
-.modal-title .action_modifier.combat:before { content: "qt"; }
-.modal-title .combat.reaction:before { content: "tv"; }
-.modal-title .action.reaction:before { content: "pv"; }
-.modal-title .action.combat:before { content: "pt"; }
-.modal-title .event:before { content: "{"; }
+.modal-title .action:before { content: '0'; }
+.modal-title .action_modifier:before { content: '1'; }
+.modal-title .political_action:before { content: '2'; }
+.modal-title .ally:before { content: '3'; }
+.modal-title .combat:before { content: '4'; }
+.modal-title .equipment:before { content: '5'; }
+.modal-title .reflex:before { content: '6'; }
+.modal-title .reaction:before { content: '7'; }
+.modal-title .retainer:before { content: '8'; }
+.modal-title .master:before { content: '9'; }
+.modal-title .action_modifier.reaction:before { content: '17'; }
+.modal-title .action_modifier.combat:before { content: "14"; }
+.modal-title .combat.reaction:before { content: "47"; }
+.modal-title .action.reaction:before { content: "07"; }
+.modal-title .action.combat:before { content: "04"; }
+.modal-title .event:before { content: "["; }
 
 #cardModal .modal-body {
     text-align: left;
