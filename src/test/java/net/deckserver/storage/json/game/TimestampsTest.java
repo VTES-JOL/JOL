@@ -26,7 +26,7 @@ public class TimestampsTest {
     public void loadTimestamps() throws Exception {
 
         Timestamps timestamps = objectMapper.readValue(new File("src/test/resources/data", "timestamps.json"), Timestamps.class);
-        OffsetDateTime playerTimestamp = timestamps.getPlayerAccess("player1", "game1");
+        OffsetDateTime playerTimestamp = timestamps.getPlayerAccess("Player1", "Test private");
         assertEquals(OffsetDateTime.parse("2017-09-29T01:11:41.160Z"), playerTimestamp);
     }
 

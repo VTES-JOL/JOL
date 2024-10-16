@@ -1,4 +1,3 @@
-version: "3.7"
 services:
   prod:
     image: tomcat:9-jdk13-openjdk-buster

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
     <Properties>
-        <Property name="data" value="${env:JOL_DATA}"/>
+        <Property name="data" value="${env:JOL_DATA:-target}"/>
     </Properties>
 
     <Appenders>
