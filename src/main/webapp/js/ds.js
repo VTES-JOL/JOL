@@ -235,6 +235,12 @@ function callbackTournament(data) {
     } else $("#validID").hide();
 }
 
+function callbackTournament(data) {
+    if (data.idValid) {
+        $("#validId").show();
+    } else $("#validID").hide();
+}
+
 function callbackProfile(data) {
     if (profile.email !== data.email)
         $('#profileEmail').val(data.email);
