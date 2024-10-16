@@ -696,16 +696,30 @@ div.torpor li ol a.card-name {
     font-style: normal;
     background-color: transparent;
 }
+
 .discipline {
     font-family: 'jol';
     font-size: 1.2em;
-
 }
+
 .disc a:before {
     font-family: 'jol';
     font-size: 1.2em;
     padding-right: 0.2em;
 }
+
+span.discipline.pool1:after {content: '"'; top: 5px; position: relative;}
+span.discipline.pool2:after {content: ':'; top: 5px; position: relative;}
+span.discipline.pool3:after {content: '/'; top: 5px; position: relative;}
+span.discipline.pool4:after {content: '\\'; top: 5px; position: relative;}
+span.discipline.pool5:after {content: ']'; top: 5px; position: relative;}
+span.discipline.pool5:after {content: '`'; top: 5px; position: relative;}
+span.discipline.poolX:after {content: '_'; top: 5px; position: relative;}
+
+span.discipline.blood1:after {content: "'"; color: red;}
+span.discipline.blood2:after {content: ";"; color: red;}
+span.discipline.blood3:after {content: "."; color: red;}
+span.discipline.blood4:after {content: ","; color: red;}
 
 .disc a.action:before {content: '0';}
 .disc a.action_modifier:before {content: '1';}
@@ -907,7 +921,7 @@ input[type=checkbox] {
 .mal:before {content: 'â';}
 .MAL:before {content: 'ã';}
 .flight:before, .FLIGHT:before {content: "^";}
-.d:before {content: "}";}
+.D:before {content: "}";}
 .inn:before {content: "#";}
 .jud:before {content: "%";}
 .viz:before {content: ")";}
@@ -969,9 +983,8 @@ input[type=checkbox] {
 }
 
 #playCardModal .discipline {
-    float: left;
     font-family: 'jol';
-    font-size: 2.5em;
+    font-size: 2em;
     line-height: 1.1em;
     padding-right: .25em;
 }
@@ -1005,9 +1018,6 @@ input[type=checkbox] {
   font-size: 2rem;
   line-height: 1; /*2.5rem;*/
   vertical-align: middle;
-}
-
-#playCardModal .card-cost {
 }
 
 #targetPicker {
@@ -1049,7 +1059,7 @@ option.pinged {
     font-family: 'jol';
     font-size: 2em;
     line-height: 1.1em;
-    padding-right: .25em;
+    letter-spacing: 0.1em;
 }
 .math {
     font-family: monospace;

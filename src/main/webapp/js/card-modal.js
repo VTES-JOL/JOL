@@ -22,9 +22,9 @@ var DISCIPLINE_CHARS = {
   pot: 'p', POT: 'P', qui: 'q', QUI: 'Q', pre: 'r', PRE: 'R',
   ser: 's', SER: 'S', tha: 't', THA: 'T', vic: 'v', VIC: 'V',
   vis: 'u', VIS: 'U', abo: 'w', ABO: 'W', myt: 'x', MYT: 'X',
-  dai: 'y', DAI: 'Y', spi: 'z', SPI: 'Z', obt: '*', OBT: '+',
+  dai: 'y', DAI: 'Y', spi: 'z', SPI: 'Z', obt: '$', OBT: '£',
   tem: '?', TEM: '!', str: 'à', STR: 'á', mal: 'â', MAL: 'ã',
-  FLIGHT: '^', inn: '#', jud: "%", viz: ")", ven: "(", def: "&",
+  FLIGHT: '^', inn: '#', jud: "%", viz: ")", ven: "(", def: "@",
   mar: "&", red: "*"
 };
 function cardTypeCSSClass(cardType) {
@@ -62,8 +62,12 @@ function showPlayCardModal(event) {
         $('#playCardModal .card-clan').text(clanText);
 
         var costText = null;
-        if (card.cost != null) costText = 'Costs ' + card.cost + '.';
-        $('#playCardModal .card-cost').text(costText);
+        if (card.cost != null){
+          let value = card.cost.split(" ")[0];
+          let type = card.cost.split(" ")[1];
+          costText = "Cost: <span class='discipline cost " + type + value + "'></span>";
+        }
+        $('#playCardModal .card-cost').html(costText);
 
         var modeContainer = $('#playCardModal .card-modes');
         modeContainer.empty();
@@ -99,7 +103,7 @@ function showPlayCardModal(event) {
             var disciplineSpan = button.children('.discipline');
             disciplineSpan.text(disciplineStr);
             disciplineSpan.css('margin-right', hackDisciplineMargin ? '15px' : '');
-            button.children('.mode-text').text(mode.text);
+            button.children('.mode-text').html(mode.text);
             button.appendTo(modeContainer);
           }
         }
@@ -193,7 +197,6 @@ function playCard(event) {
   }
 
   var command = playCardCommand(disciplines, target);
-  console.log(command);
   sendCommand(command);
   $('#playCardModal').modal('hide');
   return false;
@@ -250,7 +253,6 @@ function showCardModal(event) {
   $.get({
       dataType: "json",
       url: "rest/api/cards/" + cardId, success: function(card) {
-        //console.log(card);
         var modal = $('#cardModal');
         modal.data('controller', controller);
         modal.data('region', region);
@@ -298,7 +300,6 @@ function showCardModal(event) {
         $('#cardModal button').show();
         // $(`#cardModal button[data-region][data-region!="${region}"]`).hide();
         $(`#cardModal button[data-region]`).each(function() {
-          console.log($(this).data("region").split(" "));
           let showThis = $(this).data("region").split(" ").includes(region);
           if (!showThis) { $(this).hide(); }
         })

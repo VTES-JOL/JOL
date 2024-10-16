@@ -1,6 +1,7 @@
 package net.deckserver.game.storage.cards.importer;
 
 import lombok.extern.slf4j.Slf4j;
+import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.game.storage.cards.LibraryCard;
 import net.deckserver.game.storage.cards.LibraryCardMode;
 
@@ -87,7 +88,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         while (!(lines.size() == 1 || lines.get(0).startsWith("[")))
             preambleLines.add(lines.remove(0));
 
-        if (preambleLines.size() > 0) {
+        if (!preambleLines.isEmpty()) {
             String preamble = String.join("\n", preambleLines);
             card.setPreamble(preamble);
 
@@ -126,6 +127,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         List<LibraryCardMode> modes = new ArrayList<>(lines.size());
         for (String line : lines) {
             LibraryCardMode mode = new LibraryCardMode();
+            String modeText = line;
             if (line.startsWith("[")) {
                 //HACK: Mirror's Visage superior
                 line = line.replace("]+", "] +");
@@ -133,17 +135,16 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                 String[] disciplinesAndText = line.split(" ", 2);
                 List<String> disciplines = Arrays
                         .stream(disciplinesAndText[0].split("[\\[\\]]+"))
-                        .filter(d -> !d.equals(""))
+                        .filter(d -> !d.isEmpty())
                         .filter(d -> !d.equals(":")) //Death of the Drum
                         .collect(Collectors.toList());
 
                 if (DISCIPLINES.contains(disciplines.get(0).toLowerCase())) {
                     mode.setDisciplines(disciplines);
-                    mode.setText(disciplinesAndText[1]);
+                    modeText = disciplinesAndText[1];
                 }
-                //Card type instead of discipline, e.g. Covincraft
-                else mode.setText(line);
-            } else mode.setText(line);
+            }
+            mode.setText(ChatParser.parseText(modeText));
 
             if (PUT_INTO_UNCONTROLLED_PATTERN.matcher(mode.getText()).matches())
                 mode.setTarget(LibraryCardMode.Target.INACTIVE_REGION);

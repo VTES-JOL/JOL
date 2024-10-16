@@ -1,6 +1,5 @@
 package net.deckserver.rest;
 
-import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.storage.json.cards.CardSummary;
 
@@ -39,7 +38,6 @@ public class ApiResource {
     public String getCard(@PathParam("id") String id) {
         return Optional.ofNullable(cardSearch.get(id))
                 .map(CardSummary::getHtmlText)
-                .map(ChatParser::parseText)
                 .orElse("Card not found");
     }
 }
