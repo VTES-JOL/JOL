@@ -1,32 +1,31 @@
 "use strict";
 var CLAN_CHARS = {
-  abomination: 'A', ahrimane: 'B', akunanse: 'C', assamite: 'D', baali: 'E',
-  blood_brother: 'F', brujah: 'G', brujah_antitribu: 'H', caitiff: 'I',
-  daughter_of_cacophony: 'J', follower_of_set: 'K', gangrel: 'L',
+  abomination: 'A', ahrimane: 'B', akunanse: 'C', assamite: 'n', baali: 'E',
+  blood_brother: 'F', brujah: 'o', brujah_antitribu: 'H', caitiff: 'I',
+  daughter_of_cacophony: 'J', follower_of_set: 'r', gangrel: 'p',
   gangrel_antitribu: 'M', gargoyle: 'N', giovanni: 'O', guruhi: 'P',
-  harbinger_of_skulls: 'Q', ishtarri: 'R', kiasyd: 'S', lasombra: 'T',
-  malkavian: 'U', malkavian_antitribu: 'V', nagaraja: 'W', nosferatu: 'X',
-  nosferatu_antitribu: 'Y', osebo: 'Z', pander: '[', ravnos: '\\',
-  salubri: ']', salubri_antitribu: '^', samedi: '_', toreador: '`',
-  toreador_antitribu: 'a', tremere: 'b', tremere_antitribu: 'c',
-  true_brujah: 'd', tzimisce: 'e', ventrue: 'f', ventrue_antitribu: 'g',
-  avenger: 'h', defender: 'i', innocent: 'j', judge: 'k', martyr: 'l',
-  redeemer: 'm', visionary: 'n'
+  harbinger_of_skulls: 'Q', ishtarri: 'R', kiasyd: 'S', lasombra: 'w',
+  malkavian: 'q', malkavian_antitribu: 'V', nagaraja: 'W', nosferatu: 's',
+  nosferatu_antitribu: 'Y', osebo: 'Z', pander: 'a', ravnos: 'x',
+  salubri: 'c', salubri_antitribu: 'd', samedi: 'e', toreador: 't',
+  toreador_antitribu: 'g', tremere: 'u', tremere_antitribu: 'i',
+  true_brujah: 'j', tzimisce: 'k', ventrue: 'v', ventrue_antitribu: 'm',
+  avenger: '1', defender: '2', innocent: '3', judge: '4', martyr: '5',
+  redeemer: '6', visionary: '7'
 };
 var DISCIPLINE_CHARS = {
-  ani: 'a', ANI: 'A', obe: 'b', OBE: 'B', cel: 'c', CEL: 'C',
+  aus: 'a', AUS: 'A', obe: 'b', OBE: 'B', cel: 'c', CEL: 'C',
   dom: 'd', DOM: 'D', dem: 'e', DEM: 'E', for: 'f', FOR: 'F',
-  san: 'g', SAN: 'G', thn: 'h', THN: 'H', vic: 'v', VIC: 'V',
+  san: 'g', SAN: 'G', thn: 'h', THN: 'H', ani: 'i', ANI: 'I',
   pro: 'j', PRO: 'J', chi: 'k', CHI: 'K', val: 'l', VAL: 'L',
   mel: 'm', MEL: 'M', nec: 'n', NEC: 'N', obf: 'o', OBF: 'O',
   pot: 'p', POT: 'P', qui: 'q', QUI: 'Q', pre: 'r', PRE: 'R',
-  ser: 's', SER: 'S', tha: 't', THA: 'T', aus: 'u', AUS: 'U',
-  vis: 'i', VIS: 'I', abo: 'w', ABO: 'W', myt: 'x', MYT: 'X',
+  ser: 's', SER: 'S', tha: 't', THA: 'T', vic: 'u', VIC: 'U',
+  vis: 'v', VIS: 'V', abo: 'w', ABO: 'W', myt: 'x', MYT: 'X',
   dai: 'y', DAI: 'Y', spi: 'z', SPI: 'Z', obt: '*', OBT: '+',
-  tem: '(', TEM: ')', str: ':', STR: ';', mal: '<', MAL: '>',
-  FLIGHT: '='
+  tem: '?', TEM: '!', str: 'à', STR: 'á', mal: 'â', MAL: 'ã',
+  FLIGHT: '^'
 };
-var DISCIPLINES_NEEDING_SPACING_HACK = ['str', 'STR', 'mal', 'MAL'];
 function cardTypeCSSClass(cardType) {
   return cardType.toLowerCase().replace(' ', '_').replace('/', ' ');
 }
@@ -94,8 +93,6 @@ function showPlayCardModal(event) {
             if (mode.disciplines != null) {
               for (var d of mode.disciplines) {
                 disciplineStr += DISCIPLINE_CHARS[d];
-                if (DISCIPLINES_NEEDING_SPACING_HACK.includes(d))
-                  hackDisciplineMargin = true;
               }
             }
             var disciplineSpan = button.children('.discipline');

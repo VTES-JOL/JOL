@@ -698,12 +698,12 @@ div.torpor li ol a.card-name {
 }
 .discipline {
     font-family: 'jol';
-    font-size: 1.5em;
+    font-size: 1.2em;
 
 }
 .disc a:before {
     font-family: 'jol';
-    font-size: 1.5em;
+    font-size: 1.2em;
     padding-right: 0.2em;
 }
 
@@ -963,7 +963,7 @@ input[type=checkbox] {
 
 #playCardModal .discipline {
     float: left;
-    font-family: 'disciplines';
+    font-family: 'jol';
     font-size: 2.5em;
     line-height: 1.1em;
     padding-right: .25em;
@@ -994,7 +994,7 @@ input[type=checkbox] {
 }
 
 .card-clan {
-  font-family: 'jol';
+  font-family: 'clans';
   font-size: 2rem;
   line-height: 1; /*2.5rem;*/
   vertical-align: middle;
@@ -1039,7 +1039,7 @@ option.pinged {
   }
 }
 #cardModal .discipline {
-    font-family: 'disciplines';
+    font-family: 'jol';
     font-size: 2em;
     line-height: 1.1em;
     padding-right: .25em;
