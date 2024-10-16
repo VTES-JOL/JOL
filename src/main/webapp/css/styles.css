@@ -908,6 +908,13 @@ input[type=checkbox] {
 .MAL:before {content: 'ã';}
 .flight:before, .FLIGHT:before {content: "^";}
 .d:before {content: "}";}
+.inn:before {content: "#";}
+.jud:before {content: "%";}
+.viz:before {content: ")";}
+.ven:before {content: "(";}
+.def:before {content: "@";}
+.mar:before {content: "&";}
+.red:before {content: "*";}
 
 @media (min-width: 768px) {
     .max-width-md {
