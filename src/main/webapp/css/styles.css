@@ -884,10 +884,10 @@ input[type=checkbox] {
 .SER:before {content: 'S';}
 .tha:before {content: 't';}
 .THA:before {content: 'T';}
-.vic:before {content: 'u';}
-.VIC:before {content: 'U';}
-.vis:before {content: 'v';}
-.VIS:before {content: 'V';}
+.vis:before {content: 'u';}
+.VIS:before {content: 'U';}
+.vic:before {content: 'v';}
+.VIC:before {content: 'V';}
 .abo:before {content: 'w';}
 .ABO:before {content: 'W';}
 .myt:before {content: 'x';}
