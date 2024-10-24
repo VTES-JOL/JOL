@@ -1,11 +1,15 @@
 package net.deckserver.dwr.bean;
 
+import lombok.Getter;
 import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.storage.json.system.DeckFormat;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Getter
 public class LobbyPageBean {
     private final List<String> players;
     private final List<GameStatusBean> myGames;
@@ -44,30 +48,11 @@ public class LobbyPageBean {
                 .filter(Objects::nonNull)
                 .map(deckName -> new DeckInfoBean(player, deckName))
                 .filter(deckInfoBean -> deckInfoBean.getDeckFormat().equals("MODERN"))
+                .filter(deckInfoBean -> admin.isValid(player, deckInfoBean.getName()))
+                .sorted(Comparator.comparing(DeckInfoBean::getName, String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toList());
 
         message = JolAdmin.getInstance().getPlayerModel(player).getMessage();
     }
 
-    public List<String> getPlayers() {
-        return players;
-    }
-
-    public List<GameStatusBean> getMyGames() {
-        return myGames;
-    }
-
-    public List<GameStatusBean> getPublicGames() {
-        return publicGames;
-    }
-
-    public List<PlayerRegistrationStatusBean> getInvitedGames() {
-        return invitedGames;
-    }
-
-    public List<DeckInfoBean> getDecks() {
-        return decks;
-    }
-
-    public String getMessage() { return message; }
 }

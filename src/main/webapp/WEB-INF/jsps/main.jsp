@@ -2,7 +2,7 @@
 <%@page contentType="text/html" %>
 <div class="row">
 	<div class="col">
-		<div id="messages" style="display: none;"></div>
+		<div id="message"></div>
 	</div>
 </div>
 <div class="row">

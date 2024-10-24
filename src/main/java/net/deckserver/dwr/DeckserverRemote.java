@@ -11,9 +11,7 @@ import net.deckserver.storage.json.deck.Deck;
 import org.directwebremoting.WebContextFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DeckserverRemote {
 
@@ -49,7 +47,7 @@ public class DeckserverRemote {
 
     public Map<String, Object> endGame(String name) {
         String playerName = getPlayer(request);
-        if (playerName.equals(admin.getGameModel(name).getOwner())) {
+        if (playerName.equals(admin.getGameModel(name).getOwner()) || admin.isAdmin(playerName)) {
             admin.endGame(name);
         }
         return UpdateFactory.getUpdate();
@@ -75,6 +73,14 @@ public class DeckserverRemote {
         String playerName = getPlayer(request);
         if (!Strings.isNullOrEmpty(playerName)) {
             admin.registerDeck(gameName, playerName, deckName);
+        }
+        return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> registerTournamentDeck(String deck1, String deck2, String deck3) {
+        String playerName = getPlayer(request);
+        if (!Strings.isNullOrEmpty(playerName)) {
+            admin.registerTournamentMultiDeck(playerName, deck1, deck2, deck3);
         }
         return UpdateFactory.getUpdate();
     }
@@ -137,6 +143,30 @@ public class DeckserverRemote {
             return admin.getGameDeck(gameName, playerName);
         }
         return null;
+    }
+
+    public Set<String> getGamePlayers(String gameName) {
+        String playerName = getPlayer(request);
+        if (gameName != null && !Strings.isNullOrEmpty(playerName)) {
+            return admin.getPlayers(gameName);
+        }
+        return new HashSet<>();
+    }
+
+    public Map<String, Object> replacePlayer(String gameName, String existingPlayer, String newPlayer) {
+        String playerName = getPlayer(request);
+        if (admin.isAdmin(playerName)) {
+            admin.replacePlayer(gameName, existingPlayer, newPlayer);
+        }
+        return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> deletePlayer(String playerName) {
+        String player = getPlayer(request);
+        if (admin.isAdmin(player)) {
+            admin.deletePLayer(playerName);
+        }
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> doToggle(String game, String id) {
@@ -242,6 +272,14 @@ public class DeckserverRemote {
         String playerName = getPlayer(request);
         if (admin.isAdmin(playerName)) {
             admin.setSuperUser(name, value);
+        }
+        return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> setMessage(String message) {
+        String playerName = getPlayer(request);
+        if (admin.isAdmin(playerName)) {
+            admin.setMessage(message);
         }
         return UpdateFactory.getUpdate();
     }

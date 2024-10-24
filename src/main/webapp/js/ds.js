@@ -64,6 +64,10 @@ function createButton(config, fn, ...args) {
     return button;
 }
 
+function callbackSelectGame(data) {
+
+}
+
 function callbackAdmin(data) {
     let userRoles = $("#userRoles")
     userRoles.empty();
@@ -80,12 +84,86 @@ function callbackAdmin(data) {
         playerRow.append(nameCell, onlineCell, judgeCell, superCell, adminCell);
         userRoles.append(playerRow);
     })
+    let adminReplacementList = $("#adminReplacementList");
     let adminPlayerList = $("#adminPlayerList");
+    adminReplacementList.empty();
     adminPlayerList.empty();
-    $.each(data.players, function(index,value) {
+    $.each(data.substitutes, function(index,value) {
+        let replacementOption = $("<option/>", {value: value, text: value});
+        adminReplacementList.append(replacementOption);
         let playerOption = $("<option/>", {value: value, text: value});
         adminPlayerList.append(playerOption);
     })
+    let deletePlayerList = $("#deletePlayerList");
+    deletePlayerList.empty();
+    $.each(data.players, function(index,value) {
+        let playerRow = $("<tr/>");
+        let nameCell = $("<td/>").text(value.name);
+        let onlineCell = $("<td/>").text(moment(value.lastOnline).tz("UTC").format("D-MMM-YY HH:mm z"));
+        let legacyDeckCell = $("<td/>").text(value.legacyDeckCount);
+        let modernDeckCell = $("<td/>").text(value.modernDeckCount);
+        let deletePlayerButton = value.activeGamesCount === 0 ? createButton({text: "Remove", class:"btn btn-primary", confirm:"Are you sure you want to remove this player?"}, DS.deletePlayer, value.name) : "";
+        let deleteCell = $("<td/>").append(deletePlayerButton);
+        playerRow.append(nameCell, onlineCell, legacyDeckCell, modernDeckCell, deleteCell);
+        deletePlayerList.append(playerRow);
+    })
+
+    let adminGameList = $("#adminGameList");
+    adminGameList.empty();
+    $.each(data.games, function(index, value) {
+        let gameOption = $("<option/>", {value: value, text: value});
+        adminGameList.append(gameOption);
+    })
+    adminChangeGame();
+
+    let idleGameList = $("#idleGameList");
+    idleGameList.empty();
+    $.each(data.idleGames, function(index, game) {
+        let playerCount = Object.keys(game.idlePlayers).length;
+        let firstPlayerRow = true;
+        $.each(game.idlePlayers, function(key, value) {
+            let row = $("<tr/>");
+            if (firstPlayerRow) {
+                let nameCell = $("<td/>").attr('rowspan', playerCount).text(game.gameName).on('click', function(event) {
+                    doNav('g'+game.gameName);
+                });
+                let timestampCell = $("<td/>").attr('rowspan', playerCount).text(moment(game.gameTimestamp).tz("UTC").format("D-MMM-YY HH:mm z"));
+                row.append(nameCell, timestampCell);
+            }
+            let playerCell = $("<td/>").text(key);
+            let playerTimeCell = $("<td/>").text(moment(value).tz("UTC").format("D-MMM-YY HH:mm z"));
+            row.append(playerCell, playerTimeCell);
+            if (firstPlayerRow) {
+                let endGameCell = $("<td/>").attr('rowspan', playerCount);
+                let endGameButton = createButton({text: "Close", class:"btn btn-primary", confirm:"Are you sure you want to end this game?"}, DS.endGame, game.gameName);
+                endGameCell.append(endGameButton);
+                row.append(endGameCell);
+                firstPlayerRow = false;
+            }
+            idleGameList.append(row);
+        })
+    })
+}
+
+function adminChangeGame() {
+    let currentGame = $("#adminGameList").val();
+    DS.getGamePlayers(currentGame, {callback: setPlayers});
+}
+
+function setPlayers(data) {
+    let adminReplacePlayerList = $("#adminReplacePlayerList");
+    adminReplacePlayerList.empty();
+    $.each(data, function(index, value) {
+        let playerOption = $("<option/>", {value: value, text: value});
+        adminReplacePlayerList.append(playerOption);
+    })
+}
+
+function replacePlayer() {
+    let currentGame = $("#adminGameList").val();
+    let existingPlayer = $("#adminReplacePlayerList").val();
+    let newPlayer = $("#adminReplacementList").val();
+    DS.replacePlayer(currentGame, existingPlayer, newPlayer, {callback: processData});
 }
 
 function addRole() {
@@ -232,13 +310,47 @@ function callbackLobby(data) {
 function callbackTournament(data) {
     if (data.idValid) {
         $("#validId").show();
-    } else $("#validID").hide();
+        $("#registrationPanel").show();
+        $("#registrationMessage").hide();
+        let tournamentRound1 = $("#tournamentRound1");
+        tournamentRound1.empty();
+        let tournamentRound2 = $("#tournamentRound2");
+        tournamentRound2.empty();
+        let tournamentRound3 = $("#tournamentRound3");
+        tournamentRound3.empty();
+        $.each(data.decks, function (index, deck) {
+            tournamentRound1.append($("<option/>", {value: deck, label: deck}));
+            tournamentRound2.append($("<option/>", {value: deck, label: deck}));
+            tournamentRound3.append($("<option/>", {value: deck, label: deck}));
+        })
+        if (data.registeredDecks.length > 0) {
+            tournamentRound1.val(data.registeredDecks[0]);
+            tournamentRound2.val(data.registeredDecks[1]);
+            tournamentRound3.val(data.registeredDecks[2]);
+            $("#tournamentRegisterButton").text("Update Registration")
+        }
+        let playerRegistrations = $("#playerRegistrations");
+        playerRegistrations.empty();
+        $.each(data.registrations, function(index,player) {
+            playerRegistrations.append($("<tr/>").append($("<td/>").text(player)));
+        })
+        if (data.message) {
+            $("#tournamentRegistrationResult").text(data.message).addClass("label label-light");
+        } else {
+            $("#tournamentRegistrationResult").empty().removeClass("label label-light");
+        }
+    } else {
+        $("#validID").hide();
+        $("#registrationPanel").hide();
+        $("#registrationMessage").show();
+    }
 }
 
-function callbackTournament(data) {
-    if (data.idValid) {
-        $("#validId").show();
-    } else $("#validID").hide();
+function registerforTournament() {
+    let tournamentRound1 = $("#tournamentRound1").val();
+    let tournamentRound2 = $("#tournamentRound2").val();
+    let tournamentRound3 = $("#tournamentRound3").val();
+    DS.registerTournamentDeck(tournamentRound1, tournamentRound2, tournamentRound3, {callback: processData});
 }
 
 function callbackProfile(data) {
@@ -326,6 +438,7 @@ function callbackMain(data) {
         renderOnline('whoson', data.who);
         renderGlobalChat(data.chat);
         renderMyGames(data.games);
+        $("#message").html(data.message)
         if (refresher) clearTimeout(refresher);
         refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
     } else {
@@ -399,6 +512,7 @@ function doGlobalChat() {
 
 function doNav(target) {
     $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
+    if (refresher) clearTimeout(refresher);
     DS.navigate(target, {callback: processData, errorHandler: errorhandler});
     return false;
 }
@@ -410,6 +524,7 @@ function renderButton(data) {
         let label = value.split(":")[1];
         var button = $("<a/>").addClass("nav-item nav-link").text(label).click(key, function () {
             DS.navigate(key, {callback: processData, errorHandler: errorhandler});
+            if (refresher) clearTimeout(refresher);
             $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
         });
         if (game === label || currentPage.toLowerCase() === key.toLowerCase()) {

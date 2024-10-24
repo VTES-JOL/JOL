@@ -1,5 +1,6 @@
 package net.deckserver.storage.json.game;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.slf4j.Logger;
 
@@ -7,6 +8,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -31,13 +33,14 @@ public class Timestamps {
         return this.playerTimestamps.getOrDefault(player, OffsetDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC));
     }
 
-    private GameTimestampEntry getGameTimestampEntry(String game) {
-        GameTimestampEntry gameTimestampEntry = this.gameTimestamps.get(game);
-        if (gameTimestampEntry == null) {
-            gameTimestampEntry = new GameTimestampEntry();
-            this.gameTimestamps.put(game, gameTimestampEntry);
-        }
-        return gameTimestampEntry;
+    @JsonIgnore
+    public Set<String> getPlayers() {
+        return this.playerTimestamps.keySet();
+    }
+
+    public void removePlayer(String playerName) {
+        playerTimestamps.remove(playerName);
+        gameTimestamps.forEach((gameName, entry) -> entry.removePlayer(playerName));
     }
 
     public OffsetDateTime getGameTimestamp(String game) {
@@ -70,5 +73,14 @@ public class Timestamps {
     public void pingPlayer(String player, String game) {
         logger.debug("{} being pinged in game {}", player, game);
         getGameTimestampEntry(game).setPlayerPing(player);
+    }
+
+    private GameTimestampEntry getGameTimestampEntry(String game) {
+        GameTimestampEntry gameTimestampEntry = this.gameTimestamps.get(game);
+        if (gameTimestampEntry == null) {
+            gameTimestampEntry = new GameTimestampEntry();
+            this.gameTimestamps.put(game, gameTimestampEntry);
+        }
+        return gameTimestampEntry;
     }
 }

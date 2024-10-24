@@ -22,7 +22,7 @@ public class AllGamesBean {
                 .filter(JolAdmin.getInstance()::isActive)
                 .map(GameSummaryBean::new)
                 .collect(Collectors.toList());
-        games.sort(Comparator.comparing(GameSummaryBean::getGameName));
+        games.sort(Comparator.comparing(GameSummaryBean::getGameName, String.CASE_INSENSITIVE_ORDER));
 
         this.history = JolAdmin.getInstance().getHistory().entrySet().stream()
                 .sorted(Map.Entry.<OffsetDateTime, GameHistory>comparingByKey().reversed())

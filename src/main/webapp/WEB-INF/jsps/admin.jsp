@@ -29,6 +29,45 @@
         </div>
     </div>
     <div class="col-sm-6">
+        <h4 class="header">Replace player</h4>
+        <div>
+            <label for="adminGameList">Games</label>
+            <select id="adminGameList" onchange="adminChangeGame()"></select>
+            <br/>
+            <label for="adminReplacePlayerList">Player to replace:</label>
+            <select id="adminReplacePlayerList"></select>
+            <br/>
+            <label for="adminReplacementList">Substitute</label>
+            <select id="adminReplacementList"></select>
+            <button onclick="replacePlayer()" class="btn btn-primary">Replace player</button>
+        </div>
 
+        <h4 class="header">Idle Games</h4>
+        <table class="clean-table light">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Last Update</th>
+                <th>Player</th>
+                <th>Timestamp</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody id="idleGameList"></tbody>
+        </table>
+
+        <h4 class="header">Idle Players</h4>
+        <table class="clean-table light">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Last Online</th>
+                <th>Legacy Decks</th>
+                <th>Modern Decks</th>
+                <th>Delete</th>
+            </tr>
+            </thead>
+            <tbody id="deletePlayerList"></tbody>
+        </table>
     </div>
 </div>

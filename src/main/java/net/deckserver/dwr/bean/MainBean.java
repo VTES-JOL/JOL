@@ -1,5 +1,6 @@
 package net.deckserver.dwr.bean;
 
+import lombok.Getter;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 
@@ -8,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Getter
 public class MainBean {
 
     private final List<PlayerGameStatusBean> games;
@@ -15,6 +17,7 @@ public class MainBean {
     private final boolean loggedIn;
     private final List<ChatEntryBean> chat;
     private final String stamp;
+    private final String message;
 
     public MainBean(PlayerModel model) {
         JolAdmin jolAdmin = JolAdmin.getInstance();
@@ -39,26 +42,7 @@ public class MainBean {
         }
 
         stamp = JolAdmin.getDate();
-    }
-
-    public List<PlayerGameStatusBean> getGames() {
-        return games;
-    }
-
-    public List<UserSummaryBean> getWho() {
-        return who;
-    }
-
-    public boolean isLoggedIn() {
-        return loggedIn;
-    }
-
-    public List<ChatEntryBean> getChat() {
-        return chat;
-    }
-
-    public String getStamp() {
-        return stamp;
+        message = JolAdmin.getInstance().getMessage();
     }
 
 }

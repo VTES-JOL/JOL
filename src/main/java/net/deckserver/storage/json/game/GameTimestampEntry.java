@@ -33,4 +33,9 @@ public class GameTimestampEntry {
     public void clearPlayerPing(String player) {
         this.playerPings.put(player, false);
     }
+
+    public void removePlayer(String playerName) {
+        playerTimestamps.remove(playerName);
+        playerPings.remove(playerName);
+    }
 }

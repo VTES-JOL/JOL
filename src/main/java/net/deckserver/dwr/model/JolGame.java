@@ -131,7 +131,7 @@ public class JolGame {
         addMessage("Game has timed out.  Surviving players have been awarded ½ VP.");
     }
 
-    public String requestTimeout(String player) {
+    public String requestTimeout(String player, boolean cancel) {
         Notation note = getNote(state, TIMEOUT, true);
         String requester = Optional.ofNullable(note.getValue()).orElse(player);
         if (!requester.equals(player)) {
@@ -635,11 +635,13 @@ public class JolGame {
 
     public void replacePlayer(String oldPlayer, String newPlayer) {
         if (getActivePlayer().equals(oldPlayer)) {
-
             setActivePlayer(newPlayer);
         }
         this.state.replacePlayer(oldPlayer, newPlayer);
         getNote(this.state, oldPlayer + POOL, false).setName(newPlayer + POOL);
+        Notation note = getNote(state, TIMEOUT, true);
+        note.setValue("");
+        addMessage("Player " + newPlayer + " replaced " + oldPlayer);
     }
 
     public void setChoice(String player, String choice) {

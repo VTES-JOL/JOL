@@ -10,7 +10,7 @@ services:
       - "traefik.http.routers.prod.tls.certresolver=myresolver"
     environment:
       JOL_DATA: /data
-      JOL_VERSION: 16-Oct-2024
+      JOL_VERSION: 24-Oct-2024
       JOL_RECAPTCHA_KEY: "***REMOVED***"
       JOL_RECAPTCHA_SECRET: "***REMOVED***"
       _JAVA_OPTIONS: -Djava.security.egd=file:/dev/./urandom

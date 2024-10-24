@@ -33,6 +33,7 @@
             <h4 class="header">Register Deck</h4>
             <table class="light clean-table games" id="invitedGames"></table>
             <div class="footer">
+                <span><strong>Note:</strong> Only valid decks in Modern format are displayed here.</span><br/>
                 <select id="invitedGamesList"></select>
                 <select id="mydeckList"></select>
                 <button class="btn btn-primary" onclick="registerDeck()">Register</button>

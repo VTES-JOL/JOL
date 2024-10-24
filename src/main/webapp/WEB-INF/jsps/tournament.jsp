@@ -32,13 +32,42 @@
         </div>
     </div>
     <div class="col-sm-6">
-        <div>
-            <h4 class="header">
-                Register Tournament Deck
-                <span class="label float-right label-small label-warning" id="validId" style="display: none;">VEKN Registered: &check;</span>
-            </h4>
+        <div id="registrationPanel" class="row">
+            <div class="col-6">
+                <h4 class="header">
+                    Register Tournament Deck
+                    <span class="label float-right label-small label-warning" id="validId" style="display: none;">VEKN Registered: &check;</span>
+                </h4>
+                <div class="light padded" id="tournamentRegistration">
+                    <span><strong>Note:</strong> Only valid decks in Modern format are displayed here.</span><br/>
+                    <label for="tournamentRound1">Round 1</label>
+                    <select id="tournamentRound1"></select>
+                    <br/>
+                    <label for="tournamentRound2">Round 2</label>
+                    <select id="tournamentRound2"></select>
+                    <br/>
+                    <label for="tournamentRound3">Round 3</label>
+                    <select id="tournamentRound3"></select>
+                    <br/>
+                    <button id="tournamentRegisterButton" onclick="registerforTournament()" class="btn btn-primary">Register</button>
+                    <br/>
+                    <span id="tournamentRegistrationResult"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <h4 class="header">Current Registrations</h4>
+                <table class="clean-table light">
+                    <thead>
+                    <tr><th>Player Name</th></tr>
+                    </thead>
+                    <tbody id="playerRegistrations"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="registrationMessage">
+            <h4 class="header">Registration</h4>
             <div class="light padded">
-                Coming soon....
+                To register for this tournament you will need a VEKN ID added to your <a href="#" onclick="doNav('profile')">Profile</a> page first.
             </div>
         </div>
     </div>

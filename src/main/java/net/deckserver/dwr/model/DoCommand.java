@@ -51,7 +51,8 @@ public class DoCommand {
         boolean random = Arrays.asList(cmdStr).contains("random");
         try {
             if (cmd.equalsIgnoreCase("timeout")) {
-                return game.requestTimeout(player);
+                boolean cancel = cmdObj.consumeString("cancel");
+                return game.requestTimeout(player, cancel);
             }
             if (cmd.equalsIgnoreCase("vp")) {
                 String targetPlayer = cmdObj.getPlayer(player);

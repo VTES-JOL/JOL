@@ -842,6 +842,10 @@
                     <td class="help-command">timeout</td>
                     <td>First request will simply log a request.<br/>Another timeout request by another player will complete the timeout</td>
                 </tr>
+                <tr>
+                    <td class="help-command">timeout cancel</td>
+                    <td>If a player adds the cancel command it will cancel a pending timeout request.</td>
+                </tr>
             </table>
         </div>
     </div>
