@@ -246,32 +246,27 @@ function callbackLobby(data) {
 
     publicGames.empty();
     $.each(data.publicGames, function (index, game) {
-        var headerRow = $("<tr/>");
-        var gameHeader = $("<th/>").text(game.name);
-        var joinHeader = $("<th/>");
-        var joinButton = $("<button/>").addClass('btn btn-primary').text("Join").click(function () {
-            if (confirm("Join game?")) {
-                DS.invitePlayer(game.name, player, {callback: processData, errorHandler: errorhandler});
-            }
-        });
-        joinHeader.append(joinButton);
+        let created = moment(game.created).tz("UTC");
+        let expiry = created.add(5, 'days');
+        let headerRow = $("<tr/>");
+        let gameHeader = $("<th/>").text(game.name);
+        let joinHeader = $("<th/>");
+        let joinButton = createButton({class: "btn btn-primary", text: "Join", confirm: "Join Game?"}, DS.invitePlayer, game.name, player);
+        let expiryText = $("<span/>").text("Closes " + moment().to(expiry));
+        joinHeader.append(expiryText, joinButton);
         headerRow.append(gameHeader);
         headerRow.append(joinHeader);
         publicGames.append(headerRow);
         $.each(game.registrations, function (i, registration) {
-            var registrationRow = $("<tr/>");
-            var playerCell = $("<td/>").text(registration.player);
+            let registrationRow = $("<tr/>");
+            let playerCell = $("<td/>").text(registration.player);
             if (registration.player === player) {
                 joinButton.hide();
-                var leaveButton = $("<button/>").addClass('btn btn-primary').text("Leave").click(function() {
-                    if (confirm("Leave game?")) {
-                        DS.unInvitePlayer(game.name, player, {callback: processData, errorHandler: errorhandler});
-                    }
-                })
+                let leaveButton = createButton({class: "btn btn-primary", text: "Leave", confirm:"Leave Game?"}, DS.unInvitePlayer, game.name, player);
                 joinHeader.append(leaveButton);
             }
             registrationRow.append(playerCell);
-            var summary = $("<td/>").text(registration.deckSummary);
+            let summary = $("<td/>").text(registration.deckSummary);
             if (!registration.valid && registration.registered) {
                 summary.append($('<label/>').addClass("label-invalid").text('Invalid'));
             }

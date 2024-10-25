@@ -6,7 +6,7 @@
 
     <Appenders>
         <Console name="console" target="SYSTEM_OUT">
-            <ThresholdFilter level="DEBUG"/>
+            <ThresholdFilter level="INFO"/>
             <PatternLayout pattern="%d %-5p %c{1} - %m%n"/>
         </Console>
         <RollingFile name="metrics" filePattern="${data}/metrics/%d{yyyy-MM}/%d{yyyy-MM-dd}.log" append="true">

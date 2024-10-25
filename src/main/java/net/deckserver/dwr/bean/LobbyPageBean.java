@@ -35,6 +35,7 @@ public class LobbyPageBean {
                 .filter(admin::isStarting)
                 .filter(admin::isPublic)
                 .map(GameStatusBean::new)
+                .sorted(Comparator.comparing(GameStatusBean::getCreated))
                 .collect(Collectors.toList());
 
         invitedGames = admin.getGames().stream()

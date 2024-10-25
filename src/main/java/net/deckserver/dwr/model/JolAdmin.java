@@ -106,8 +106,6 @@ public class JolAdmin {
     private final TypeFactory typeFactory;
     private final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
     private final Map<String, PlayerModel> pmap = new ConcurrentHashMap<>();
-    @Getter @Setter
-    private String message;
     // Cache of users / status
     private final Cache<String, String> activeUsers = Caffeine.newBuilder()
             .expireAfterWrite(5, TimeUnit.MINUTES)
@@ -120,6 +118,9 @@ public class JolAdmin {
             .connectTimeout(Duration.ofSeconds(5))
             .build();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    @Getter
+    @Setter
+    private String message;
     @Getter
     private volatile List<ChatEntryBean> chats;
 
@@ -192,7 +193,7 @@ public class JolAdmin {
 
     public synchronized void cleanupGames() {
         try {
-            logger.info("CLEAN - Unregistered players");
+            logger.debug("CLEAN - Unregistered players");
             Table<String, String, Boolean> invalidRegistrations = HashBasedTable.create();
             games.values().stream()
                     .filter(ACTIVE_GAME)
@@ -207,7 +208,7 @@ public class JolAdmin {
                         });
                     });
 
-            logger.info("CLEAN - Close finished games");
+            logger.debug("CLEAN - Close finished games");
             games.values().stream()
                     .filter(ACTIVE_GAME)
                     .map(GameInfo::getName)
@@ -221,7 +222,7 @@ public class JolAdmin {
                         }
                     });
 
-            logger.info("CLEAN - Start ready games");
+            logger.debug("CLEAN - Start ready games");
             games.values().stream()
                     .filter(STARTING_GAME)
                     .map(GameInfo::getName)
@@ -242,15 +243,19 @@ public class JolAdmin {
                         }
                     });
 
-            logger.info("CLEAN - Close Idle games and registrations");
+            logger.debug("CLEAN - Close Idle games and registrations");
             games.values().stream()
                     .filter(STARTING_GAME)
                     .forEach(gameInfo -> {
                         String gameName = gameInfo.getName();
                         OffsetDateTime created = gameInfo.getCreated();
-                        if (created != null && created.plusDays(3).isBefore(OffsetDateTime.now())) {
+                        if (created != null && created.plusDays(5).isBefore(OffsetDateTime.now())) {
                             logger.info("Closing {} : Idle too long", gameName);
-                            endGame(gameName);
+                            if (getRegisteredPlayerCount(gameName) == 4) {
+                                startGame(gameName);
+                            } else {
+                                endGame(gameName);
+                            }
                         }
                         registrations.row(gameName).forEach((playerName, status) -> {
                             if (status.getTimestamp() != null && status.getTimestamp().plusDays(1).isBefore(OffsetDateTime.now())) {
@@ -260,7 +265,7 @@ public class JolAdmin {
                         });
                     });
 
-            logger.info("CLEAN - Timestamps");
+            logger.debug("CLEAN - Timestamps");
             Set<String> timestampGames = new HashSet<>();
             timestamps.getGameTimestamps().keySet().forEach(gameName -> {
                 if (!games.containsKey(gameName)) {
@@ -302,7 +307,7 @@ public class JolAdmin {
                         .forEach(playerModel.getCurrentGames()::remove);
             });
 
-            logger.info("CLEAN - FINISH");
+            logger.debug("CLEAN - FINISH");
             persistState();
 
         } catch (Exception e) {
@@ -390,10 +395,10 @@ public class JolAdmin {
 
     public void setup() {
         scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 5, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(new CleanupPlayersJob(), 0, 5, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(new ValidateGWJob(), 0, 5, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 10, 1, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 1, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new CleanupPlayersJob(), 0, 1, TimeUnit.DAYS);
+        scheduler.scheduleAtFixedRate(new ValidateGWJob(), 0, 1, TimeUnit.DAYS);
+        scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 10, TimeUnit.MINUTES);
     }
 
     public boolean existsPlayer(String name) {
@@ -606,6 +611,7 @@ public class JolAdmin {
             registrationStatus.setValid(stats.isValid());
             registrationStatus.setSummary(stats.getSummary());
 
+            // Reset game time to current time to extend idle timeout
             gameInfo.setCreated(OffsetDateTime.now());
 
             long registeredPlayers = getRegisteredPlayerCount(gameName);
@@ -963,6 +969,12 @@ public class JolAdmin {
         return tournamentRegistrations.values();
     }
 
+    public OffsetDateTime getCreatedTime(String gameName) {
+        return Optional.ofNullable(games.get(gameName))
+                .map(GameInfo::getCreated)
+                .orElse(null);
+    }
+
     private void setRole(PlayerInfo info, PlayerRole role, boolean enabled) {
         if (enabled) {
             info.getRoles().add(role);
@@ -974,7 +986,7 @@ public class JolAdmin {
     @SuppressWarnings("unchecked")
     private <T> T readFile(String fileName, JavaType type) {
         try {
-            logger.info("Reading data from {}", fileName);
+            logger.debug("Reading data from {}", fileName);
             return objectMapper.readValue(BASE_PATH.resolve(fileName).toFile(), type);
         } catch (IOException e) {
             logger.error("Unable to read {}", fileName, e);

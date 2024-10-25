@@ -1,18 +1,26 @@
 package net.deckserver.dwr.bean;
 
 import com.google.common.base.Strings;
+import lombok.Getter;
 import net.deckserver.dwr.model.JolAdmin;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class GameStatusBean {
 
+    @Getter
     private final String name;
+    @Getter
     private final String gameStatus;
+    @Getter
     private final List<PlayerRegistrationStatusBean> registrations;
+    @Getter
     private final List<PlayerGameStatusBean> players;
+    private final OffsetDateTime created;
 
     public GameStatusBean(String gameName) {
         JolAdmin admin = JolAdmin.getInstance();
@@ -33,25 +41,15 @@ public class GameStatusBean {
                     .map(playerName -> new PlayerRegistrationStatusBean(gameName, playerName))
                     .collect(Collectors.toList());
         }
+        created = admin.getCreatedTime(gameName);
     }
 
     public long getActivePlayerCount() {
         return players.stream().filter(player -> !player.isOusted()).count();
     }
 
-    public String getName() {
-        return name;
+    public String getCreated() {
+        return created.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 
-    public String getGameStatus() {
-        return gameStatus;
-    }
-
-    public List<PlayerRegistrationStatusBean> getRegistrations() {
-        return registrations;
-    }
-
-    public List<PlayerGameStatusBean> getPlayers() {
-        return players;
-    }
 }
