@@ -34,7 +34,7 @@ public class GameView {
     public GameView(String gameName, String playerName) {
         this.gameName = gameName;
         this.playerName = playerName;
-        JolAdmin admin = JolAdmin.getInstance();
+        JolAdmin admin = JolAdmin.INSTANCE;
         JolGame game = admin.getGame(gameName);
         GameAction[] actions = game.getActions(game.getCurrentTurn());
         for (GameAction action : actions) {
@@ -67,7 +67,7 @@ public class GameView {
     }
 
     public synchronized GameBean create() {
-        JolAdmin admin = JolAdmin.getInstance();
+        JolAdmin admin = JolAdmin.INSTANCE;
         HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
         JolGame game = admin.getGame(gameName);
 
@@ -220,7 +220,7 @@ public class GameView {
     }
 
     public void addChats(int idx) {
-        JolGame game = JolAdmin.getInstance().getGame(gameName);
+        JolGame game = JolAdmin.INSTANCE.getGame(gameName);
         GameAction[] actions = game.getActions(game.getCurrentTurn());
         for (int i = idx; i < actions.length; i++) {
             chats.add(actions[i].getText());

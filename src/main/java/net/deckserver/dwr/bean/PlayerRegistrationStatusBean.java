@@ -13,7 +13,7 @@ public class PlayerRegistrationStatusBean {
     public PlayerRegistrationStatusBean(String game, String player) {
         this.player = player;
         this.gameName = game;
-        JolAdmin admin = JolAdmin.getInstance();
+        JolAdmin admin = JolAdmin.INSTANCE;
         RegistrationStatus status = admin.getRegistration(game, player);
         this.registered = status.getDeckId() != null;
         this.deckSummary = status.getSummary();

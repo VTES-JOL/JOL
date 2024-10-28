@@ -15,7 +15,7 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
-        boolean authResult = JolAdmin.getInstance().authenticate(username, password);
+        boolean authResult = JolAdmin.INSTANCE.authenticate(username, password);
         if (authResult) {
             req.getSession().setAttribute("meth", username);
             resp.sendRedirect("/jol/main.jsp");

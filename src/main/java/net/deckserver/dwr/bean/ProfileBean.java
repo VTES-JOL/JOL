@@ -13,7 +13,7 @@ public class ProfileBean {
 
     public ProfileBean(PlayerModel model) {
         String player = model.getPlayerName();
-        JolAdmin jolAdmin = JolAdmin.getInstance();
+        JolAdmin jolAdmin = JolAdmin.INSTANCE;
         this.email = jolAdmin.getEmail(player);
         this.discordID = jolAdmin.getDiscordID(player);
         this.veknID = jolAdmin.getVeknID(player);

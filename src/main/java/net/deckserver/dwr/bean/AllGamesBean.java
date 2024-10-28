@@ -18,13 +18,13 @@ public class AllGamesBean {
     private final List<GameHistory> history;
 
     public AllGamesBean(PlayerModel model) {
-        this.games = JolAdmin.getInstance().getGames().stream()
-                .filter(JolAdmin.getInstance()::isActive)
+        this.games = JolAdmin.INSTANCE.getGames().stream()
+                .filter(JolAdmin.INSTANCE::isActive)
                 .map(GameSummaryBean::new)
                 .collect(Collectors.toList());
         games.sort(Comparator.comparing(GameSummaryBean::getGameName, String.CASE_INSENSITIVE_ORDER));
 
-        this.history = JolAdmin.getInstance().getHistory().entrySet().stream()
+        this.history = JolAdmin.INSTANCE.getHistory().entrySet().stream()
                 .sorted(Map.Entry.<OffsetDateTime, GameHistory>comparingByKey().reversed())
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());

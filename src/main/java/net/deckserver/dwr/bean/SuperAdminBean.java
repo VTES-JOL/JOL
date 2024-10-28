@@ -6,6 +6,6 @@ import net.deckserver.dwr.model.PlayerModel;
 public class SuperAdminBean {
 
     public SuperAdminBean(PlayerModel model) {
-        JolAdmin admin = JolAdmin.getInstance();
+        JolAdmin admin = JolAdmin.INSTANCE;
     }
 }

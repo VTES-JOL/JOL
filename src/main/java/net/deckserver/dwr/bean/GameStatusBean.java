@@ -8,6 +8,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GameStatusBean {
@@ -23,7 +24,7 @@ public class GameStatusBean {
     private final OffsetDateTime created;
 
     public GameStatusBean(String gameName) {
-        JolAdmin admin = JolAdmin.getInstance();
+        JolAdmin admin = JolAdmin.INSTANCE;
         this.name = gameName;
         if (admin.isActive(gameName)) {
             this.gameStatus = "Active";
@@ -49,7 +50,9 @@ public class GameStatusBean {
     }
 
     public String getCreated() {
-        return created.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        return Optional.ofNullable(created)
+                .map(value -> value.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+                .orElse(null);
     }
 
 }

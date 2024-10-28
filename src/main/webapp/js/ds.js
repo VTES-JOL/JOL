@@ -1,21 +1,21 @@
 "use strict";
-var refresher = null;
-var game = null;
-var player = null;
-var currentPage = 'main';
-var currentOption = "notes";
-var USER_TIMEZONE = moment.tz.guess();
-var gameChatLastDay = null;
-var globalChatLastPlayer = null;
-var globalChatLastDay = null;
-var TITLE = 'V:TES Online';
-var DESKTOP_VIEWPORT_CONTENT = 'width=1024';
-var profile = {
+let refresher = null;
+let game = null;
+let player = null;
+let currentPage = 'main';
+let currentOption = "notes";
+let USER_TIMEZONE = moment.tz.guess();
+let gameChatLastDay = null;
+let globalChatLastPlayer = null;
+let globalChatLastDay = null;
+let TITLE = 'V:TES Online';
+let DESKTOP_VIEWPORT_CONTENT = 'width=1024';
+let profile = {
     email: "",
     discordID: "",
     updating: false
 };
-var pointerCanHover = window.matchMedia("(hover: hover)").matches;
+let pointerCanHover = window.matchMedia("(hover: hover)").matches;
 
 function errorhandler(errorString, exception) {
     if (exception.name === "dwr.engine.incompleteReply" || exception.name === 'dwr.engine.textHtmlReply') {
@@ -42,7 +42,7 @@ function init(data) {
 }
 
 function processData(data) {
-    for (var item in data) {
+    for (let item in data) {
         eval(item + '(data[item]);');
     }
 }
@@ -56,9 +56,9 @@ function createButton(config, fn, ...args) {
     let button = $("<button/>");
     button.text(config.text);
     button.addClass(config.class);
-    button.on('click', function() {
-        if(confirm(config.confirm)) {
-            fn(...args, {callback:processData});
+    button.on('click', function () {
+        if (confirm(config.confirm)) {
+            fn(...args, {callback: processData});
         }
     });
     return button;
@@ -71,15 +71,27 @@ function callbackSelectGame(data) {
 function callbackAdmin(data) {
     let userRoles = $("#userRoles")
     userRoles.empty();
-    $.each(data.userRoles, function(index,value) {
+    $.each(data.userRoles, function (index, value) {
         let playerRow = $("<tr/>");
         let nameCell = $("<td/>").text(value.name);
         let onlineCell = $("<td/>").text(moment(value.lastOnline).tz("UTC").format("D-MMM-YY HH:mm z"));
-        let removeJudgeButton = value.judge ? createButton({text: "Remove", class: "btn btn-primary", confirm: "Are you sure you want to remove this role?"}, DS.setJudge, value.name, false) : "";
+        let removeJudgeButton = value.judge ? createButton({
+            text: "Remove",
+            class: "btn btn-primary",
+            confirm: "Are you sure you want to remove this role?"
+        }, DS.setJudge, value.name, false) : "";
         let judgeCell = $("<td/>").append(removeJudgeButton);
-        let removeSuperButton = value.superUser ? createButton({text: "Remove", class: "btn btn-primary", confirm: "Are you sure you want to remove this role?"}, DS.setSuperUser, value.name, false) : "";
+        let removeSuperButton = value.superUser ? createButton({
+            text: "Remove",
+            class: "btn btn-primary",
+            confirm: "Are you sure you want to remove this role?"
+        }, DS.setSuperUser, value.name, false) : "";
         let superCell = $("<td/>").append(removeSuperButton);
-        let removeAdminButton = value.admin ? createButton({text: "Remove", class: "btn btn-primary", confirm: "Are you sure you want to remove this role?"}, DS.setAdmin, value.name, false) : "";
+        let removeAdminButton = value.admin ? createButton({
+            text: "Remove",
+            class: "btn btn-primary",
+            confirm: "Are you sure you want to remove this role?"
+        }, DS.setAdmin, value.name, false) : "";
         let adminCell = $("<td/>").append(removeAdminButton);
         playerRow.append(nameCell, onlineCell, judgeCell, superCell, adminCell);
         userRoles.append(playerRow);
@@ -88,7 +100,7 @@ function callbackAdmin(data) {
     let adminPlayerList = $("#adminPlayerList");
     adminReplacementList.empty();
     adminPlayerList.empty();
-    $.each(data.substitutes, function(index,value) {
+    $.each(data.substitutes, function (index, value) {
         let replacementOption = $("<option/>", {value: value, text: value});
         adminReplacementList.append(replacementOption);
         let playerOption = $("<option/>", {value: value, text: value});
@@ -96,13 +108,17 @@ function callbackAdmin(data) {
     })
     let deletePlayerList = $("#deletePlayerList");
     deletePlayerList.empty();
-    $.each(data.players, function(index,value) {
+    $.each(data.players, function (index, value) {
         let playerRow = $("<tr/>");
         let nameCell = $("<td/>").text(value.name);
         let onlineCell = $("<td/>").text(moment(value.lastOnline).tz("UTC").format("D-MMM-YY HH:mm z"));
         let legacyDeckCell = $("<td/>").text(value.legacyDeckCount);
         let modernDeckCell = $("<td/>").text(value.modernDeckCount);
-        let deletePlayerButton = value.activeGamesCount === 0 ? createButton({text: "Remove", class:"btn btn-primary", confirm:"Are you sure you want to remove this player?"}, DS.deletePlayer, value.name) : "";
+        let deletePlayerButton = value.activeGamesCount === 0 ? createButton({
+            text: "Remove",
+            class: "btn btn-primary",
+            confirm: "Are you sure you want to remove this player?"
+        }, DS.deletePlayer, value.name) : "";
         let deleteCell = $("<td/>").append(deletePlayerButton);
         playerRow.append(nameCell, onlineCell, legacyDeckCell, modernDeckCell, deleteCell);
         deletePlayerList.append(playerRow);
@@ -110,7 +126,7 @@ function callbackAdmin(data) {
 
     let adminGameList = $("#adminGameList");
     adminGameList.empty();
-    $.each(data.games, function(index, value) {
+    $.each(data.games, function (index, value) {
         let gameOption = $("<option/>", {value: value, text: value});
         adminGameList.append(gameOption);
     })
@@ -118,14 +134,14 @@ function callbackAdmin(data) {
 
     let idleGameList = $("#idleGameList");
     idleGameList.empty();
-    $.each(data.idleGames, function(index, game) {
+    $.each(data.idleGames, function (index, game) {
         let playerCount = Object.keys(game.idlePlayers).length;
         let firstPlayerRow = true;
-        $.each(game.idlePlayers, function(key, value) {
+        $.each(game.idlePlayers, function (key, value) {
             let row = $("<tr/>");
             if (firstPlayerRow) {
-                let nameCell = $("<td/>").attr('rowspan', playerCount).text(game.gameName).on('click', function(event) {
-                    doNav('g'+game.gameName);
+                let nameCell = $("<td/>").attr('rowspan', playerCount).text(game.gameName).on('click', function () {
+                    doNav('g' + game.gameName);
                 });
                 let timestampCell = $("<td/>").attr('rowspan', playerCount).text(moment(game.gameTimestamp).tz("UTC").format("D-MMM-YY HH:mm z"));
                 row.append(nameCell, timestampCell);
@@ -135,7 +151,11 @@ function callbackAdmin(data) {
             row.append(playerCell, playerTimeCell);
             if (firstPlayerRow) {
                 let endGameCell = $("<td/>").attr('rowspan', playerCount);
-                let endGameButton = createButton({text: "Close", class:"btn btn-primary", confirm:"Are you sure you want to end this game?"}, DS.endGame, game.gameName);
+                let endGameButton = createButton({
+                    text: "Close",
+                    class: "btn btn-primary",
+                    confirm: "Are you sure you want to end this game?"
+                }, DS.endGame, game.gameName);
                 endGameCell.append(endGameButton);
                 row.append(endGameCell);
                 firstPlayerRow = false;
@@ -153,7 +173,7 @@ function adminChangeGame() {
 function setPlayers(data) {
     let adminReplacePlayerList = $("#adminReplacePlayerList");
     adminReplacePlayerList.empty();
-    $.each(data, function(index, value) {
+    $.each(data, function (index, value) {
         let playerOption = $("<option/>", {value: value, text: value});
         adminReplacePlayerList.append(playerOption);
     })
@@ -169,18 +189,18 @@ function replacePlayer() {
 function addRole() {
     let player = $("#adminPlayerList").val();
     let role = $("#adminRoleList").val();
-    let functionName = "DS.set"+role;
+    let functionName = "DS.set" + role;
     eval(functionName + "('" + player + "', true, {callback:processData});");
 }
 
 function callbackLobby(data) {
-    var currentGames = $("#currentGames");
-    var publicGames = $("#publicGames");
-    var myGameList = $("#myGameList");
-    var playerList = $("#playerList");
-    var invitedGames = $("#invitedGames");
-    var invitedGamesList = $("#invitedGamesList");
-    var mydeckList = $("#mydeckList");
+    let currentGames = $("#currentGames");
+    let publicGames = $("#publicGames");
+    let myGameList = $("#myGameList");
+    let playerList = $("#playerList");
+    let invitedGames = $("#invitedGames");
+    let invitedGamesList = $("#invitedGamesList");
+    let mydeckList = $("#mydeckList");
     if (data.message) {
         $("#registerResult").text(data.message).addClass("label label-light");
     } else {
@@ -198,21 +218,21 @@ function callbackLobby(data) {
 
     currentGames.empty();
     myGameList.empty();
-    var myGamesOption = '';
+    let myGamesOption = '';
     $.each(data.myGames, function (index, game) {
         myGamesOption += '<option value="' + game.name + '">' + game.name + '</option>';
-        var headerRow = $("<tr/>");
-        var gameHeader = $("<th/>").text(game.name);
-        var startHeader = $("<th/>");
+        let headerRow = $("<tr/>");
+        let gameHeader = $("<th/>").text(game.name);
+        let startHeader = $("<th/>");
         if (game.gameStatus === 'Inviting') {
-            var startButton = $("<button/>").addClass("btn btn-primary").text("Start").click(function () {
+            let startButton = $("<button/>").addClass("btn btn-primary").text("Start").click(function () {
                 if (confirm("Start game?")) {
                     DS.startGame(game.name, {callback: processData, errorHandler: errorhandler});
                 }
             });
             startHeader.append(startButton);
         }
-        var endButton = $("<button/>").addClass("btn btn-primary").text("Close").click(function () {
+        let endButton = $("<button/>").addClass("btn btn-primary").text("Close").click(function () {
             if (confirm("End game?")) {
                 DS.endGame(game.name, {callback: processData, errorHandler: errorhandler});
             }
@@ -222,10 +242,10 @@ function callbackLobby(data) {
         headerRow.append(startHeader);
         currentGames.append(headerRow);
         $.each(game.registrations, function (i, registration) {
-            var registrationRow = $("<tr/>");
-            var player = $("<td/>").text(registration.player);
+            let registrationRow = $("<tr/>");
+            let player = $("<td/>").text(registration.player);
             registrationRow.append(player);
-            var summary = $("<td/>").text(registration.deckSummary);
+            let summary = $("<td/>").text(registration.deckSummary);
             if (registration.registered && !registration.valid) {
                 summary.append($('<span/>').addClass("label label-warning left-margin").text('Invalid'));
             }
@@ -234,9 +254,9 @@ function callbackLobby(data) {
         });
 
         $.each(game.players, function (i, playerStatus) {
-            var playerRow = $("<tr/>");
-            var playerName = $("<td/>").text(playerStatus.playerName);
-            var pool = $("<td/>").text(playerStatus.pool + " pool");
+            let playerRow = $("<tr/>");
+            let playerName = $("<td/>").text(playerStatus.playerName);
+            let pool = $("<td/>").text(playerStatus.pool + " pool");
             playerRow.append(playerName);
             playerRow.append(pool);
             currentGames.append(playerRow);
@@ -251,7 +271,11 @@ function callbackLobby(data) {
         let headerRow = $("<tr/>");
         let gameHeader = $("<th/>").text(game.name);
         let joinHeader = $("<th/>");
-        let joinButton = createButton({class: "btn btn-primary", text: "Join", confirm: "Join Game?"}, DS.invitePlayer, game.name, player);
+        let joinButton = createButton({
+            class: "btn btn-primary",
+            text: "Join",
+            confirm: "Join Game?"
+        }, DS.invitePlayer, game.name, player);
         let expiryText = $("<span/>").text("Closes " + moment().to(expiry));
         joinHeader.append(expiryText, joinButton);
         headerRow.append(gameHeader);
@@ -262,7 +286,11 @@ function callbackLobby(data) {
             let playerCell = $("<td/>").text(registration.player);
             if (registration.player === player) {
                 joinButton.hide();
-                let leaveButton = createButton({class: "btn btn-primary", text: "Leave", confirm:"Leave Game?"}, DS.unInvitePlayer, game.name, player);
+                let leaveButton = createButton({
+                    class: "btn btn-primary",
+                    text: "Leave",
+                    confirm: "Leave Game?"
+                }, DS.unInvitePlayer, game.name, player);
                 joinHeader.append(leaveButton);
             }
             registrationRow.append(playerCell);
@@ -277,13 +305,13 @@ function callbackLobby(data) {
 
     invitedGames.empty();
     invitedGamesList.empty();
-    var invitedGamesOption = '';
+    let invitedGamesOption = '';
     $.each(data.invitedGames, function (index, game) {
-        var gameRow = $("<tr/>");
-        var gameName = $("<td/>").text(game.gameName);
-        var deckSummary = $("<td/>").text(game.deckSummary);
+        let gameRow = $("<tr/>");
+        let gameName = $("<td/>").text(game.gameName);
+        let deckSummary = $("<td/>").text(game.deckSummary);
         if (game.registered && !game.valid) {
-            var errorMessage = $("<span/>").addClass("label label-warning left-margin").text("Invalid");
+            let errorMessage = $("<span/>").addClass("label label-warning left-margin").text("Invalid");
             deckSummary.append(errorMessage);
         }
         gameRow.append(gameName);
@@ -294,7 +322,7 @@ function callbackLobby(data) {
     invitedGamesList.append(invitedGamesOption);
 
     mydeckList.empty();
-    var deckListOption = '';
+    let deckListOption = '';
     $.each(data.decks, function (index, deck) {
         deckListOption += '<option value="' + deck.name + '">' + deck.name + '</option>';
     })
@@ -326,7 +354,7 @@ function callbackTournament(data) {
         }
         let playerRegistrations = $("#playerRegistrations");
         playerRegistrations.empty();
-        $.each(data.registrations, function(index,player) {
+        $.each(data.registrations, function (index, player) {
             playerRegistrations.append($("<tr/>").append($("<td/>").text(player)));
         })
         if (data.message) {
@@ -356,7 +384,7 @@ function callbackProfile(data) {
     if (profile.veknId !== data.veknID)
         $("#veknID").val(data.veknID);
     if (profile.updating) {
-        var result = $('#profileUpdateResult');
+        let result = $('#profileUpdateResult');
         result.text('Done!');
         result.stop(true);
         result.css('opacity', 1);
@@ -373,7 +401,7 @@ function callbackProfile(data) {
 }
 
 function callbackShowDecks(data) {
-    var decks = $("#decks");
+    let decks = $("#decks");
     decks.empty();
     $.each(data.decks, function (index, deck) {
         const deckRow = $("<tr/>");
@@ -382,7 +410,7 @@ function callbackShowDecks(data) {
         deckName.click(function () {
             DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
         })
-        const deleteButton = $("<button/>").addClass("btn btn-warning btn-sm float-right left-margin").text("✗").click(function(event) {
+        const deleteButton = $("<button/>").addClass("btn btn-warning btn-sm float-right left-margin").text("✗").click(function (event) {
             if (confirm("Delete deck?")) {
                 DS.deleteDeck(deck.name, {callback: processData, errorHandler: errorhandler});
             }
@@ -402,7 +430,7 @@ function callbackShowDecks(data) {
         deckText.val(data.selectedDeck.contents);
         deckSummary.text(data.selectedDeck.details['stats']['summary']);
         deckName.val(data.selectedDeck.details.deck['name']);
-        var validSpan = $("<span/>").addClass("label label-small left-margin");
+        let validSpan = $("<span/>").addClass("label label-small left-margin");
         if (data.selectedDeck.details['stats']['valid']) {
             validSpan.text("VALID").addClass("label-success")
         } else {
@@ -426,8 +454,8 @@ function callbackShowGameDeck(data) {
 }
 
 function callbackMain(data) {
-    var timestamp = moment(data.stamp).tz("UTC").format("D-MMM HH:mm z");
-    var userTimestamp = moment(data.stamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
+    let timestamp = moment(data.stamp).tz("UTC").format("D-MMM HH:mm z");
+    let userTimestamp = moment(data.stamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
     $('#chatstamp').text(timestamp).attr("title", userTimestamp);
     if (data.loggedIn) {
         renderOnline('whoson', data.who);
@@ -442,7 +470,7 @@ function callbackMain(data) {
 }
 
 function renderDeck(data, div) {
-    var render = $(div);
+    let render = $(div);
     render.empty();
     if (data.crypt) {
         render.append($("<h5/>").text("Crypt: (" + data.crypt['count'] + ")"));
@@ -496,8 +524,8 @@ function toggleVisible(s, h) {
 }
 
 function doGlobalChat() {
-    var chatInput = $("#gchat");
-    var chatLine = chatInput.val();
+    let chatInput = $("#gchat");
+    let chatLine = chatInput.val();
     chatInput.val('');
     if (chatLine === "") {
         return;
@@ -513,11 +541,11 @@ function doNav(target) {
 }
 
 function renderButton(data) {
-    var buttonsDiv = $("#buttons");
+    let buttonsDiv = $("#buttons");
     $.each(data, function (i, value) {
         let key = value.split(":")[0];
         let label = value.split(":")[1];
-        var button = $("<a/>").addClass("nav-item nav-link").text(label).click(key, function () {
+        let button = $("<a/>").addClass("nav-item nav-link").text(label).click(key, function () {
             DS.navigate(key, {callback: processData, errorHandler: errorhandler});
             if (refresher) clearTimeout(refresher);
             $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
@@ -530,10 +558,10 @@ function renderButton(data) {
 }
 
 function renderGameButtons(data) {
-    var buttonsDiv = $("#gameButtons");
-    var newActivity = false;
+    let buttonsDiv = $("#gameButtons");
+    let newActivity = false;
     $.each(data, function (key, value) {
-        var button = $("<a/>").addClass("dropdown-item").text(value).click(key, function () {
+        let button = $("<a/>").addClass("dropdown-item").text(value).click(key, function () {
             DS.navigate(key, {callback: processData, errorHandler: errorhandler});
             $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
         });
@@ -548,8 +576,8 @@ function renderGameButtons(data) {
 }
 
 function isScrolledToBottom(container) {
-    var scrollTop = container.scrollTop();
-    var maxScrollTop = container.prop("scrollHeight") - container.prop("clientHeight");
+    let scrollTop = container.scrollTop();
+    let maxScrollTop = container.prop("scrollHeight") - container.prop("clientHeight");
     return Math.abs(maxScrollTop - scrollTop) < 20;
 }
 
@@ -561,9 +589,9 @@ function renderGameChat(data) {
     if (data === null) {
         return;
     }
-    var container = $("#gameChatOutput");
+    let container = $("#gameChatOutput");
     // Only scroll to bottom if scrollbar is at bottom (has not been scrolled up)
-    var scrollToBottom = isScrolledToBottom(container);
+    let scrollToBottom = isScrolledToBottom(container);
     $.each(data, function (index, line) {
         const dateAndTime = line.split(' ', 2);
         const date = dateAndTime[0];
@@ -577,15 +605,15 @@ function renderGameChat(data) {
             gameChatLastDay = date;
             timestamp = date + ' ' + time;
         }
-        var timeSpan = $("<span/>").text(timestamp).addClass('chat-timestamp');
-        var playerLabel = '';
+        let timeSpan = $("<span/>").text(timestamp).addClass('chat-timestamp');
+        let playerLabel = '';
         if (line[0] === '[') {
-            var player = line.split(']', 1)[0].slice(1); //Strip [
+            let player = line.split(']', 1)[0].slice(1); //Strip [
             playerLabel = $('<b/>').text(player)[0].outerHTML;
             line = line.slice(player.length + 3); //3 for [] and space
         }
-        //var lineElement = $('<p/>').addClass('chat').html(timeSpan[0].outerHTML + ' ' + line);
-        var lineElement = $('<p/>').addClass('chat').append(timeSpan, ' ', playerLabel, ' ', line);
+        //let lineElement = $('<p/>').addClass('chat').html(timeSpan[0].outerHTML + ' ' + line);
+        let lineElement = $('<p/>').addClass('chat').append(timeSpan, ' ', playerLabel, ' ', line);
         container.append(lineElement);
     });
     if (scrollToBottom)
@@ -596,15 +624,15 @@ function renderGlobalChat(data) {
     if (!data) {
         return;
     }
-    var container = $("#globalChatOutput");
-    var contentHt0 = container.prop("scrollHeight");
+    let container = $("#globalChatOutput");
+    let contentHt0 = container.prop("scrollHeight");
     // Only scroll to bottom if scrollbar is at bottom (has not been scrolled up)
-    var scrollToBottom = isScrolledToBottom(container);
+    let scrollToBottom = isScrolledToBottom(container);
 
     $.each(data, function (index, chat) {
-        var day = moment(chat.timestamp).tz("UTC").format("D MMMM");
+        let day = moment(chat.timestamp).tz("UTC").format("D MMMM");
         if (globalChatLastDay !== day) {
-            var dayBreak = $('<div style="height: .9rem; margin-bottom: .6rem; margin-top: -.3rem; border-bottom: 1px solid #dcc; text-align: center">'
+            let dayBreak = $('<div style="height: .9rem; margin-bottom: .6rem; margin-top: -.3rem; border-bottom: 1px solid #dcc; text-align: center">'
                 + '<span style="font-size: .8rem; background-color: #fff; padding: 0 .5rem; color: #b99; font-weight: bold">'
                 + day
                 + '</span>'
@@ -612,12 +640,12 @@ function renderGlobalChat(data) {
             container.append(dayBreak);
         }
 
-        var timestamp = moment(chat.timestamp).tz("UTC").format("HH:mm");
-        var userTimestamp = moment(chat.timestamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
-        var chatLine = $("<p/>").addClass("chat");
-        var timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp).addClass('chat-timestamp');
-        var playerLabel = globalChatLastPlayer === chat.player && globalChatLastDay === day ? "" : "<b>" + chat.player + "</b> ";
-        var message = $("<span/>").html(" " + playerLabel + chat.message);
+        let timestamp = moment(chat.timestamp).tz("UTC").format("HH:mm");
+        let userTimestamp = moment(chat.timestamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
+        let chatLine = $("<p/>").addClass("chat");
+        let timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp).addClass('chat-timestamp');
+        let playerLabel = globalChatLastPlayer === chat.player && globalChatLastDay === day ? "" : "<b>" + chat.player + "</b> ";
+        let message = $("<span/>").html(" " + playerLabel + chat.message);
 
         chatLine.append(timeOutput).append(message);
         container.append(chatLine);
@@ -635,12 +663,12 @@ function renderGlobalChat(data) {
 }
 
 function renderMyGames(games) {
-    var ownGames = $("#ownGames");
+    let ownGames = $("#ownGames");
     ownGames.empty();
     $.each(games, function (index, game) {
-        var gameRow = $("<tr/>");
-        var gameLink = $("<td/>");
-        var status = $("<td/>");
+        let gameRow = $("<tr/>");
+        let gameLink = $("<td/>");
+        let status = $("<td/>");
         gameLink.html(renderGameLink(game));
         if (game.pinged) {
             status.text("!");
@@ -669,13 +697,13 @@ function renderGameLink(game) {
 }
 
 function renderOnline(div, who) {
-    var container = $("#" + div);
+    let container = $("#" + div);
     container.empty();
     if (who === null) {
         return;
     }
     $.each(who, function (index, player) {
-        var playerSpan = $("<span/>").text(player.name).addClass("label");
+        let playerSpan = $("<span/>").text(player.name).addClass("label");
         if (player.superUser) {
             playerSpan.addClass("label-dark");
         } else if (player.admin) {
@@ -692,13 +720,13 @@ function renderOnline(div, who) {
 }
 
 function renderActiveGames(games) {
-    var activeGames = $("#activeGames tbody");
+    let activeGames = $("#activeGames tbody");
     activeGames.empty();
     $.each(games, function (index, game) {
-        var gameRow = $("<tr/>");
-        var gameLink = $("<td/>").html(renderGameLink(game));
-        var turn = $("<td/>").text(game.turn);
-        var owner = $("<td/>").text(game.owner);
+        let gameRow = $("<tr/>");
+        let gameLink = $("<td/>").html(renderGameLink(game));
+        let turn = $("<td/>").text(game.turn);
+        let owner = $("<td/>").text(game.owner);
         gameRow.append(gameLink);
         gameRow.append(turn);
         gameRow.append(owner);
@@ -707,19 +735,19 @@ function renderActiveGames(games) {
 }
 
 function renderPastGames(history) {
-    var pastGames = $("#pastGames tbody");
+    let pastGames = $("#pastGames tbody");
     pastGames.empty();
-    $.each(history, function(index, game) {
+    $.each(history, function (index, game) {
         let startTime = moment(game.started, moment.ISO_8601)
         startTime = startTime.isValid ? startTime.tz("UTC").format("D-MMM-YYYY HH:mm z") : game.started
         let endTime = moment(game.ended, moment.ISO_8601).tz("UTC").format("D-MMM-YYYY HH:mm z");
         let firstPlayerRow = true;
-        $.each(game.results, function(i, value) {
+        $.each(game.results, function (i, value) {
             let playerRow = $("<tr/>");
             if (firstPlayerRow) {
-                let gameName = $("<td/>").attr('rowspan',5).text(game.name);
-                let gameStarted = $("<td/>").attr('rowspan',5).text(startTime);
-                let gameFinished = $("<td/>").attr('rowspan',5).text(endTime);
+                let gameName = $("<td/>").attr('rowspan', 5).text(game.name);
+                let gameStarted = $("<td/>").attr('rowspan', 5).text(startTime);
+                let gameFinished = $("<td/>").attr('rowspan', 5).text(endTime);
                 playerRow.append(gameName, gameStarted, gameFinished);
                 playerRow.addClass("border-top")
                 firstPlayerRow = false;
@@ -764,15 +792,15 @@ function navigate(data) {
 }
 
 function registerDeck() {
-    var regGame = $("#invitedGamesList").val();
-    var regDeck = $("#mydeckList").val();
+    let regGame = $("#invitedGamesList").val();
+    let regDeck = $("#mydeckList").val();
     DS.registerDeck(regGame, regDeck, {callback: processData, errorHandler: errorhandler});
 }
 
 function doCreateGame() {
-    var newGameDiv = $("#newGameName");
-    var isPublic = $("#publicFlag");
-    var gameName = newGameDiv.val();
+    let newGameDiv = $("#newGameName");
+    let isPublic = $("#publicFlag");
+    let gameName = newGameDiv.val();
     if (gameName.indexOf("\'") > -1 || gameName.indexOf("\"") > -1) {
         alert("Game name can not contain \' or \" characters in it");
         return;
@@ -783,8 +811,8 @@ function doCreateGame() {
 }
 
 function invitePlayer() {
-    var game = $("#myGameList").val();
-    var player = $("#playerList").val();
+    let game = $("#myGameList").val();
+    let player = $("#playerList").val();
     DS.invitePlayer(game, player, {callback: processData, errorHandler: errorhandler});
 }
 
@@ -793,8 +821,8 @@ function refreshState(force) {
 }
 
 function doToggle(thistag) {
-    var region = $("#region" + thistag);
-    var regionToggle = region.find("i.toggle");
+    let region = $("#region" + thistag);
+    let regionToggle = region.find("i.toggle");
     if (region.css("display") === 'none') {
         region.show();
         regionToggle.text("-");
@@ -916,7 +944,7 @@ function showHistory() {
         getHistory();
 }
 
-var lastPrivateNotesFromServer;
+let lastPrivateNotesFromServer;
 
 function loadGame(data) {
     //Reset on game change
@@ -974,9 +1002,9 @@ function loadGame(data) {
     if (data.label !== null) {
         $("#gameLabel").text(data.label);
     }
-    var fetchFullLog = false;
+    let fetchFullLog = false;
     if (data.logLength !== null) {
-        var myLogLength = gameLog.children().length
+        let myLogLength = gameLog.children().length
             + (data.turn == null ? 0 : data.turn.length);
         fetchFullLog = myLogLength < data.logLength;
     }
@@ -988,27 +1016,27 @@ function loadGame(data) {
     }
 
     if (data.ping !== null) {
-        var pingSelect = $("#ping");
+        let pingSelect = $("#ping");
 
         //+1 for the empty option
         if (pingSelect.children('option').length !== data.ping.length + 1) {
             pingSelect.empty();
             pingSelect.append(new Option("", ""));
             $.each(data.ping, function (index, value) {
-                var option = new Option(value, value);
+                let option = new Option(value, value);
                 pingSelect.append(option);
             });
         }
 
         $.each(data.ping, function (index, value) {
-            var option = pingSelect.children('option[value="' + value + '"]:first');
-            var pinged = $.inArray(value, data.pinged) !== -1;
+            let option = pingSelect.children('option[value="' + value + '"]:first');
+            let pinged = $.inArray(value, data.pinged) !== -1;
             option.removeClass('pinged');
             if (pinged) option.addClass('pinged');
         });
     }
     if (data.turns !== null) {
-        var turnSelect = $("#turns");
+        let turnSelect = $("#turns");
         turnSelect.empty();
         data.turns.shift();
         $.each(data.turns, function (index, turn) {
@@ -1019,7 +1047,7 @@ function loadGame(data) {
         $("#phaseCommand").show();
         $("#endCommand").show();
 
-        var phaseSelect = $("#phase");
+        let phaseSelect = $("#phase");
         if (phaseSelect.children('option').length !== data.phases.length) {
             phaseSelect.empty();
             $.each(data.phases, function (index, value) {
@@ -1034,7 +1062,7 @@ function loadGame(data) {
         $("#endCommand").hide();
     }
     if (data.collapsed !== null) {
-        for (var c in data.collapsed) {
+        for (let c in data.collapsed) {
             doToggle(data.collapsed[c]);
         }
     }
@@ -1045,7 +1073,7 @@ function loadGame(data) {
 
         //If we're missing anything from the log, fetch the whole thing from
         //server immediately
-        var timeout = data.refresh;
+        let timeout = data.refresh;
         if (fetchFullLog) {
             console.log('Client log missing lines (has '
                 + gameLog.children().length + '/' + data.logLength
@@ -1057,7 +1085,7 @@ function loadGame(data) {
 }
 
 function addCardTooltips(parent) {
-    var linkSelector = `${parent} a.card-name`;
+    let linkSelector = `${parent} a.card-name`;
     //On devices without pointer hover capabilities, like phones, do not bind
     //tippy tooltips to cards that already have a click handler that shows the card.
     //This fixes the bug where cards in hand required a double-tap to show the modal.
@@ -1077,8 +1105,8 @@ function addCardTooltips(parent) {
             tippy.hideAll({duration: 0});
 
             instance.setContent("Loading...");
-            var ref = $(instance.reference);
-            var cardId = ref.data('card-id');
+            let ref = $(instance.reference);
+            let cardId = ref.data('card-id');
             if (cardId == null) { //Backwards compatibility in main chat
                 cardId = instance.reference.title;
                 ref.data('card-id', cardId);
@@ -1104,22 +1132,22 @@ function showStatus(data) {
 }
 
 function getHistory() {
-    var turns = $('#turns').val();
+    let turns = $('#turns').val();
     DS.getHistory(game, turns, {callback: loadHistory});
 }
 
 function loadHistory(data) {
-    var historyDiv = $("#historyOutput");
+    let historyDiv = $("#historyOutput");
     historyDiv.empty();
     $.each(data, function (index, content) {
-        var turnContent = $("<p/>").addClass("chat").html(content);
+        let turnContent = $("<p/>").addClass("chat").html(content);
         historyDiv.append(turnContent);
     });
     addCardTooltips("#historyOutput");
 }
 
 function updateProfileErrorHandler() {
-    var result = $('#profileUpdateResult');
+    let result = $('#profileUpdateResult');
     result.text('An error occurred');
     result.stop(true);
     result.css('opacity', 1);
@@ -1128,15 +1156,15 @@ function updateProfileErrorHandler() {
 
 function updateProfile() {
     profile.updating = true;
-    var email = $('#profileEmail').val();
-    var discordID = $('#discordID').val();
-    var veknID = $("#veknID").val();
+    let email = $('#profileEmail').val();
+    let discordID = $('#discordID').val();
+    let veknID = $("#veknID").val();
     DS.updateProfile(email, discordID, veknID, {callback: processData, errorHandler: updateProfileErrorHandler});
 }
 
 function updatePassword() {
-    var profileNewPassword = dwr.util.getValue("profileNewPassword");
-    var profileConfirmPassword = dwr.util.getValue("profileConfirmPassword");
+    let profileNewPassword = dwr.util.getValue("profileNewPassword");
+    let profileConfirmPassword = dwr.util.getValue("profileConfirmPassword");
     if (!profileNewPassword && !profileConfirmPassword) {
         dwr.util.setValue("profilePasswordError", "Enter a new password.");
     } else if (profileNewPassword !== profileConfirmPassword) {
@@ -1148,11 +1176,11 @@ function updatePassword() {
 }
 
 function renderDesktopViewButton() {
-    var viewport = $('meta[name=viewport]').get(0);
-    var text = (
+    let viewport = $('meta[name=viewport]').get(0);
+    let text = (
         viewport.content === DESKTOP_VIEWPORT_CONTENT
             ? 'Mobile' : 'Desktop') + ' View';
-    var button = $('<a/>')
+    let button = $('<a/>')
         .attr('id', 'toggleMobileViewLink')
         .addClass('nav-item nav-link')
         .text(text)
@@ -1165,8 +1193,8 @@ function renderDesktopViewButton() {
 
 function toggleMobileView(event) {
     if (event) event.preventDefault();
-    var $link = $('#toggleMobileViewLink').eq(0);
-    var viewport = $('meta[name=viewport]').get(0);
+    let $link = $('#toggleMobileViewLink').eq(0);
+    let viewport = $('meta[name=viewport]').get(0);
     console.log('before: ' + viewport.content)
     if (viewport.content === DESKTOP_VIEWPORT_CONTENT) {
         viewport.content = 'width=device-width, initial-scale=1, shrink-to-fit=no';

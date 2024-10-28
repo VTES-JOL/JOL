@@ -217,7 +217,7 @@ public class JolGame {
             for (int j = 0; j < 7; j++)
                 _drawCard(player, LIBRARY, HAND, false);
         }
-        JolAdmin.getInstance().pingPlayer(this.getActivePlayer(), this.getName());
+        JolAdmin.INSTANCE.pingPlayer(this.getActivePlayer(), this.getName());
     }
 
     public Game getState() {
@@ -533,7 +533,7 @@ public class JolGame {
         setActivePlayer(players.get(index));
         setPhase(TURN_PHASES[0]);
         String turnString = round + "-" + (index + 1);
-        JolAdmin.getInstance().writeSnapshot(id, state, actions, turnString);
+        JolAdmin.INSTANCE.writeSnapshot(id, state, actions, turnString);
     }
 
     public String getPhase() {
@@ -623,7 +623,7 @@ public class JolGame {
     public List<String> getPingedList() {
         return state.getPlayers().stream()
                 .filter(player -> getPool(player) > 0)
-                .filter(player -> JolAdmin.getInstance().isPlayerPinged(player, state.getName()))
+                .filter(player -> JolAdmin.INSTANCE.isPlayerPinged(player, state.getName()))
                 .collect(Collectors.toList());
     }
 

@@ -19,7 +19,7 @@ public class RegisterServlet extends HttpServlet {
         String password = request.getParameter("newpassword");
         String captchaResponse = request.getParameter("g-recaptcha-response");
         boolean verify = Recaptcha.verify(captchaResponse);
-        if (verify && JolAdmin.getInstance().registerPlayer(player, password, email)) {
+        if (verify && JolAdmin.INSTANCE.registerPlayer(player, password, email)) {
             request.getSession().setAttribute("meth", player);
         }
         response.sendRedirect("/jol/");

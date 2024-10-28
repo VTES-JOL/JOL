@@ -42,11 +42,11 @@ public class PlayerModel {
 
     public void enterGame(String gameName) {
         setView("game");
-        if (JolAdmin.getInstance().isInGame(gameName, player)) {
+        if (JolAdmin.INSTANCE.isInGame(gameName, player)) {
             games.add(gameName);
         }
         if (!gameName.equals(this.game)) {
-            JolAdmin.getInstance().getGameModel(gameName).resetView(player);
+            JolAdmin.INSTANCE.getGameModel(gameName).resetView(player);
         }
         this.game = gameName;
     }
@@ -76,7 +76,7 @@ public class PlayerModel {
     }
 
     public void resetChats() {
-        List<ChatEntryBean> globalChat = JolAdmin.getInstance().getChats();
+        List<ChatEntryBean> globalChat = JolAdmin.INSTANCE.getChats();
         chats.addAll(globalChat);
     }
 
@@ -85,7 +85,7 @@ public class PlayerModel {
     }
 
     public void loadDeck(String deckName) {
-        JolAdmin admin = JolAdmin.getInstance();
+        JolAdmin admin = JolAdmin.INSTANCE;
         try {
             this.deckName = deckName;
             String deckId = admin.getDeckId(player, deckName);

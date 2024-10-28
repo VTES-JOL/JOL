@@ -21,7 +21,7 @@ public class PlayerActivityStatus {
     private final Integer activeGamesCount;
 
     public PlayerActivityStatus(String name) {
-        JolAdmin admin = JolAdmin.getInstance();
+        JolAdmin admin = JolAdmin.INSTANCE;
         this.name = name;
         this.lastOnline = admin.getPlayerAccess(name);
         Map<DeckFormat, Long> collect = admin.getDeckNames(name)

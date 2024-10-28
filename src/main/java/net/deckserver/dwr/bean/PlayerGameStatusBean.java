@@ -17,7 +17,7 @@ public class PlayerGameStatusBean {
     private final boolean current;
     private final boolean turn;
     public PlayerGameStatusBean(String gameName, String playerName) {
-        JolAdmin admin = JolAdmin.getInstance();
+        JolAdmin admin = JolAdmin.INSTANCE;
         JolGame game = admin.getGame(gameName);
         this.gameId = admin.getGameId(gameName);
         this.gameName = gameName;

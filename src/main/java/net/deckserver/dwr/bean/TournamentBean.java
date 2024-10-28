@@ -22,7 +22,7 @@ public class TournamentBean {
 
     public TournamentBean(PlayerModel model) {
         String player = model.getPlayerName();
-        JolAdmin jolAdmin = JolAdmin.getInstance();
+        JolAdmin jolAdmin = JolAdmin.INSTANCE;
         this.idValid = !Strings.isNullOrEmpty(jolAdmin.getVeknID(player));
         this.decks = jolAdmin.getDeckNames(model.getPlayerName()).stream()
                 .filter(deckName -> jolAdmin.isValid(player, deckName))
@@ -40,6 +40,6 @@ public class TournamentBean {
                 .findFirst()
                 .map(TournamentRegistration::getDecks)
                 .orElse(new ArrayList<>());
-        message = JolAdmin.getInstance().getPlayerModel(player).getMessage();
+        message = JolAdmin.INSTANCE.getPlayerModel(player).getMessage();
     }
 }

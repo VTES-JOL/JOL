@@ -20,7 +20,7 @@ public class MainBean {
     private final String message;
 
     public MainBean(PlayerModel model) {
-        JolAdmin jolAdmin = JolAdmin.getInstance();
+        JolAdmin jolAdmin = JolAdmin.INSTANCE;
         String playerName = model.getPlayerName();
         loggedIn = model.getPlayerName() != null;
         if (loggedIn) {
@@ -31,7 +31,7 @@ public class MainBean {
                     .sorted(Comparator.comparing(PlayerGameStatusBean::isOusted).thenComparing(PlayerGameStatusBean::getGameName))
                     .collect(Collectors.toList());
             chat = model.getChat();
-            who = JolAdmin.getInstance().getWho().stream()
+            who = JolAdmin.INSTANCE.getWho().stream()
                     .sorted(Comparator.reverseOrder())
                     .map(UserSummaryBean::new)
                     .collect(Collectors.toList());
@@ -42,7 +42,7 @@ public class MainBean {
         }
 
         stamp = JolAdmin.getDate();
-        message = JolAdmin.getInstance().getMessage();
+        message = JolAdmin.INSTANCE.getMessage();
     }
 
 }

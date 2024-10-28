@@ -8,7 +8,7 @@ public class DeckInfoBean {
     private final String name;
 
     public DeckInfoBean(String playerName, String deckName) {
-        JolAdmin admin = JolAdmin.getInstance();
+        JolAdmin admin = JolAdmin.INSTANCE;
         this.name = deckName;
         this.deckFormat = admin.getDeckFormat(playerName, deckName);
     }

@@ -5,6 +5,6 @@ import net.deckserver.dwr.model.JolAdmin;
 public class ValidateGWJob implements Runnable {
     @Override
     public void run() {
-        JolAdmin.getInstance().validateGW();
+        JolAdmin.INSTANCE.validateGW();
     }
 }

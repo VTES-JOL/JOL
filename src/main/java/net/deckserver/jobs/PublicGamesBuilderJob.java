@@ -6,6 +6,6 @@ public class PublicGamesBuilderJob implements Runnable{
 
     @Override
     public void run() {
-        JolAdmin.getInstance().buildPublicGames();
+        JolAdmin.INSTANCE.buildPublicGames();
     }
 }

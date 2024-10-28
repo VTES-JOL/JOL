@@ -14,7 +14,7 @@ public class DeckPageBean {
 
     public DeckPageBean(PlayerModel model) {
         String playerName = model.getPlayerName();
-        this.decks = JolAdmin.getInstance().getDeckNames(playerName).stream()
+        this.decks = JolAdmin.INSTANCE.getDeckNames(playerName).stream()
                 .map(deckName -> new DeckInfoBean(playerName, deckName))
                 .sorted(Comparator.comparing(DeckInfoBean::getName, String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toList());

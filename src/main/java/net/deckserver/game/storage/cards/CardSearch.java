@@ -25,11 +25,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class CardSearch {
 
     private static final Logger logger = getLogger(CardSearch.class);
-
+    public static CardSearch INSTANCE = new CardSearch(Paths.get(System.getenv("JOL_DATA")));
     private final Map<String, String> nameKeys = new HashMap<>();
     private final Map<String, CardSummary> cards = new HashMap<>();
-
-    public static CardSearch INSTANCE = new CardSearch(Paths.get(System.getenv("JOL_DATA")));
 
     private CardSearch(Path cardPath) {
         cardPath = cardPath.resolve("cards").resolve("cards.json");

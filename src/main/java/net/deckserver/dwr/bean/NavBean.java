@@ -29,7 +29,7 @@ public class NavBean {
             game = model.getCurrentGame();
         if (player != null) {
             chats = model.hasChats();
-            boolean admin = JolAdmin.getInstance().isAdmin(player);
+            boolean admin = JolAdmin.INSTANCE.isAdmin(player);
             buttons.add("active:Watch");
             buttons.add("deck:Decks");
             buttons.add("profile:Profile");
@@ -41,7 +41,7 @@ public class NavBean {
         }
         buttons.add("help:Help");
         for (String game : model.getCurrentGames()) {
-            GameModel gmodel = JolAdmin.getInstance().getGameModel(game);
+            GameModel gmodel = JolAdmin.INSTANCE.getGameModel(game);
             GameView view = gmodel.getView(player);
             String current = view.isChanged() ? " *" : "";
             gameButtons.put("g" + game, game + current);

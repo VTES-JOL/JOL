@@ -14,7 +14,7 @@ public class LogoutServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String userName = (String)req.getSession().getAttribute("meth");
-        JolAdmin.getInstance().remove(userName);
+        JolAdmin.INSTANCE.remove(userName);
         req.getSession().removeAttribute("meth");
         resp.sendRedirect("/jol/");
     }

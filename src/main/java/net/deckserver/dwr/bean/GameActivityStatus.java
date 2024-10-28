@@ -17,7 +17,7 @@ public class GameActivityStatus {
     private final OffsetDateTime gameTimestamp;
 
     public GameActivityStatus(String gameName) {
-        JolAdmin admin = JolAdmin.getInstance();
+        JolAdmin admin = JolAdmin.INSTANCE;
         this.gameName = gameName;
         gameTimestamp = admin.getGameTimeStamp(gameName);
         Set<String> players = admin.getPlayers(gameName);

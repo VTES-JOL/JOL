@@ -2,7 +2,6 @@ package net.deckserver.dwr.bean;
 
 import lombok.Getter;
 import net.deckserver.dwr.model.JolAdmin;
-import net.deckserver.storage.json.system.DeckFormat;
 
 import java.util.Comparator;
 import java.util.List;
@@ -19,7 +18,7 @@ public class LobbyPageBean {
     private final String message;
 
     public LobbyPageBean(String player) {
-        JolAdmin admin = JolAdmin.getInstance();
+        JolAdmin admin = JolAdmin.INSTANCE;
 
         players = admin.getPlayers().stream().sorted().collect(Collectors.toList());
 
@@ -53,7 +52,7 @@ public class LobbyPageBean {
                 .sorted(Comparator.comparing(DeckInfoBean::getName, String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toList());
 
-        message = JolAdmin.getInstance().getPlayerModel(player).getMessage();
+        message = JolAdmin.INSTANCE.getPlayerModel(player).getMessage();
     }
 
 }

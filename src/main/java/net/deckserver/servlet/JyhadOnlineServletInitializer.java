@@ -18,13 +18,13 @@ public class JyhadOnlineServletInitializer implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         logger.info("Starting Jyhad Online...");
         logger.info("Initializing deckserver with " + System.getenv("JOL_DATA"));
-        JolAdmin.getInstance().setup();
+        JolAdmin.INSTANCE.setup();
         logger.info("Initialization complete");
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         logger.info("Closing Jyhad Online...");
-        JolAdmin.getInstance().shutdown();
+        JolAdmin.INSTANCE.shutdown();
     }
 }

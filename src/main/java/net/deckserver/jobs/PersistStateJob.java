@@ -6,6 +6,6 @@ public class PersistStateJob implements Runnable {
 
     @Override
     public void run() {
-        JolAdmin.getInstance().persistState();
+        JolAdmin.INSTANCE.persistState();
     }
 }

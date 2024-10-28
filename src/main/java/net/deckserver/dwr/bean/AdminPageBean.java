@@ -5,13 +5,9 @@ import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 
 import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Getter
@@ -24,7 +20,7 @@ public class AdminPageBean {
     private final List<GameActivityStatus> idleGames;
 
     public AdminPageBean(PlayerModel model) {
-        JolAdmin admin = JolAdmin.getInstance();
+        JolAdmin admin = JolAdmin.INSTANCE;
         List<String> currentPlayers = admin.getPlayers().stream().sorted().collect(Collectors.toList());
         List<PlayerActivityStatus> playerActivityStatuses = currentPlayers.stream()
                 .map(PlayerActivityStatus::new)

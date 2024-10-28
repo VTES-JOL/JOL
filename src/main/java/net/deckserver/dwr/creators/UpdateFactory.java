@@ -30,12 +30,11 @@ public class UpdateFactory {
     }
 
     public static Map<String, Object> getUpdate() {
-        JolAdmin admin = JolAdmin.getInstance();
+        JolAdmin admin = JolAdmin.INSTANCE;
         String playerName = DeckserverRemote.getPlayer(WebContextFactory.get().getHttpServletRequest());
         PlayerModel player = admin.getPlayerModel(playerName);
         admin.recordPlayerAccess(player.getPlayerName());
-        List<String> views = Arrays.asList(player.getView(), "nav");
-        return views.stream()
+        return Arrays.asList(player.getView(), "nav").stream()
                 .map(UpdateFactory::getView)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(ViewCreator::getFunction, v -> v.createData(player)));

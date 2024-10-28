@@ -3,8 +3,6 @@ package net.deckserver.dwr.bean;
 import lombok.Getter;
 import net.deckserver.dwr.model.JolAdmin;
 
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-
 @Getter
 public class GameSummaryBean {
 
@@ -13,7 +11,7 @@ public class GameSummaryBean {
     private final String owner;
 
     public GameSummaryBean(String gameName) {
-        JolAdmin admin = JolAdmin.getInstance();
+        JolAdmin admin = JolAdmin.INSTANCE;
         this.gameName = gameName;
         this.turn = admin.getGame(gameName).getCurrentTurn();
         this.owner = admin.getOwner(gameName);

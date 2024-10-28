@@ -19,7 +19,7 @@ public class DeckserverRemote {
     private final HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
 
     public DeckserverRemote() {
-        admin = JolAdmin.getInstance();
+        admin = JolAdmin.INSTANCE;
     }
 
     private static String ne(String arg) {

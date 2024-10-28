@@ -44,6 +44,7 @@ import net.deckserver.storage.json.system.*;
 import org.apache.commons.io.FileUtils;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -68,12 +69,11 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class JolAdmin {
 
-    private static final Logger logger = getLogger(JolAdmin.class);
-    private static final JolAdmin INSTANCE = new JolAdmin(System.getenv("JOL_DATA"));
+    public static final JolAdmin INSTANCE = new JolAdmin(System.getenv("JOL_DATA"));
+    private static final Logger logger = LoggerFactory.getLogger(JolAdmin.class);
     private static final String DISCORD_AUTHORIZATION_HEADER = String.format(
             "Bot %s", System.getenv("DISCORD_BOT_TOKEN"));
     private static final URI DISCORD_PING_CHANNEL_URI = URI.create(
@@ -95,29 +95,29 @@ public class JolAdmin {
     }
 
     private final Path BASE_PATH;
-    private final Map<String, GameInfo> games;
-    private final Map<OffsetDateTime, GameHistory> pastGames;
-    private final Map<String, PlayerInfo> players;
     private final Table<String, String, RegistrationStatus> registrations = HashBasedTable.create();
     private final Table<String, String, DeckInfo> decks = HashBasedTable.create();
-    private final Map<String, TournamentRegistration> tournamentRegistrations;
     private final ObjectMapper objectMapper;
-    private final Timestamps timestamps;
-    private final TypeFactory typeFactory;
     private final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
     private final Map<String, PlayerModel> pmap = new ConcurrentHashMap<>();
     // Cache of users / status
     private final Cache<String, String> activeUsers = Caffeine.newBuilder()
             .expireAfterWrite(5, TimeUnit.MINUTES)
             .build();
-    private final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
-            .expireAfterAccess(30, TimeUnit.MINUTES)
-            .build(this::loadGameState);
     private final HttpClient discord = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_2)
             .connectTimeout(Duration.ofSeconds(5))
             .build();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private Map<String, GameInfo> games;
+    private final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
+            .expireAfterAccess(30, TimeUnit.MINUTES)
+            .build(this::loadGameState);
+    private Map<OffsetDateTime, GameHistory> pastGames;
+    private Map<String, PlayerInfo> players;
+    private Map<String, TournamentRegistration> tournamentRegistrations;
+    private Timestamps timestamps;
+    private TypeFactory typeFactory;
     @Getter
     @Setter
     private String message;
@@ -129,23 +129,18 @@ public class JolAdmin {
         objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        typeFactory = objectMapper.getTypeFactory();
-        games = readFile("games.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, GameInfo.class));
-        pastGames = readFile("pastGames.json", typeFactory.constructMapType(ConcurrentHashMap.class, OffsetDateTime.class, GameHistory.class));
-        players = readFile("players.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, PlayerInfo.class));
-        chats = readFile("chats.json", typeFactory.constructCollectionType(List.class, ChatEntryBean.class));
-        tournamentRegistrations = readFile("tournament.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, TournamentRegistration.class));
-        timestamps = readFile("timestamps.json", typeFactory.constructType(Timestamps.class));
-        loadRegistrations();
-        loadDecks();
-    }
-
-    public static JolAdmin getInstance() {
-        return INSTANCE;
     }
 
     public static String getDate() {
         return OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
+    }
+
+    public boolean isInRole(String playerName, String role) {
+        return Optional.ofNullable(players.get(playerName))
+                .map(PlayerInfo::getRoles)
+                .stream()
+                .flatMap(Collection::stream)
+                .anyMatch(playerRole -> playerRole.equals(PlayerRole.valueOf(role)));
     }
 
     public int getRefreshInterval(String gameName) {
@@ -394,6 +389,15 @@ public class JolAdmin {
     }
 
     public void setup() {
+        typeFactory = objectMapper.getTypeFactory();
+        games = readFile("games.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, GameInfo.class));
+        pastGames = readFile("pastGames.json", typeFactory.constructMapType(ConcurrentHashMap.class, OffsetDateTime.class, GameHistory.class));
+        players = readFile("players.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, PlayerInfo.class));
+        chats = readFile("chats.json", typeFactory.constructCollectionType(List.class, ChatEntryBean.class));
+        tournamentRegistrations = readFile("tournament.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, TournamentRegistration.class));
+        timestamps = readFile("timestamps.json", typeFactory.constructType(Timestamps.class));
+        loadRegistrations();
+        loadDecks();
         scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 1, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new CleanupPlayersJob(), 0, 1, TimeUnit.DAYS);

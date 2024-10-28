@@ -713,7 +713,7 @@ span.discipline.pool2:after {content: ':'; top: 5px; position: relative;}
 span.discipline.pool3:after {content: '/'; top: 5px; position: relative;}
 span.discipline.pool4:after {content: '\\'; top: 5px; position: relative;}
 span.discipline.pool5:after {content: ']'; top: 5px; position: relative;}
-span.discipline.pool5:after {content: '`'; top: 5px; position: relative;}
+span.discipline.pool6:after {content: '`'; top: 5px; position: relative;}
 span.discipline.poolX:after {content: '_'; top: 5px; position: relative;}
 
 span.discipline.blood1:after {content: "'"; color: red;}
