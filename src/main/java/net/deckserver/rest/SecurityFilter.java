@@ -18,6 +18,7 @@ import java.security.Principal;
 @Provider
 @Priority(Priorities.AUTHORIZATION)
 public class SecurityFilter implements ContainerRequestFilter {
+
     @Context
     UriInfo uriInfo;
 

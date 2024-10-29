@@ -1,4 +1,5 @@
 "use strict";
+let version = null;
 let refresher = null;
 let game = null;
 let player = null;
@@ -18,18 +19,17 @@ let profile = {
 let pointerCanHover = window.matchMedia("(hover: hover)").matches;
 
 function errorhandler(errorString, exception) {
-    if (exception.name === "dwr.engine.incompleteReply" || exception.name === 'dwr.engine.textHtmlReply') {
-        document.location = "/jol/main.jsp";
-    }
+    $("#connectionMessage").show();
+    refresher = setTimeout("DS.init({callback: processData, errorHandler: errorhandler})", 5000);
 }
 
 $(document).ready(function () {
     moment.tz.load({
         zones: [],
         links: [],
-        version: '2018c'
+        version: '2024b'
     });
-    DS.init({callback: init});
+    DS.init({callback: init, errorHandler: errorhandler});
 });
 
 function init(data) {
@@ -41,9 +41,19 @@ function init(data) {
     })
 }
 
-function processData(data) {
-    for (let item in data) {
-        eval(item + '(data[item]);');
+function processData(a) {
+    $("#connectionMessage").hide();
+    for (let b in a) {
+        eval(b + '(a[b]);');
+    }
+}
+
+function checkVersion(newVersion) {
+    if (version === null) {
+        version = newVersion;
+    } else if (version !== newVersion) {
+        alert("JOL version has changed. The application will reload.");
+        location.reload();
     }
 }
 
@@ -58,7 +68,7 @@ function createButton(config, fn, ...args) {
     button.addClass(config.class);
     button.on('click', function () {
         if (confirm(config.confirm)) {
-            fn(...args, {callback: processData});
+            fn(...args, {callback: processData, errorHandler: errorhandler});
         }
     });
     return button;
@@ -167,7 +177,7 @@ function callbackAdmin(data) {
 
 function adminChangeGame() {
     let currentGame = $("#adminGameList").val();
-    DS.getGamePlayers(currentGame, {callback: setPlayers});
+    DS.getGamePlayers(currentGame, {callback: setPlayers, errorHandler: errorhandler});
 }
 
 function setPlayers(data) {
@@ -183,7 +193,7 @@ function replacePlayer() {
     let currentGame = $("#adminGameList").val();
     let existingPlayer = $("#adminReplacePlayerList").val();
     let newPlayer = $("#adminReplacementList").val();
-    DS.replacePlayer(currentGame, existingPlayer, newPlayer, {callback: processData});
+    DS.replacePlayer(currentGame, existingPlayer, newPlayer, {callback: processData, errorHandler: errorhandler});
 }
 
 function addRole() {
@@ -373,7 +383,7 @@ function registerforTournament() {
     let tournamentRound1 = $("#tournamentRound1").val();
     let tournamentRound2 = $("#tournamentRound2").val();
     let tournamentRound3 = $("#tournamentRound3").val();
-    DS.registerTournamentDeck(tournamentRound1, tournamentRound2, tournamentRound3, {callback: processData});
+    DS.registerTournamentDeck(tournamentRound1, tournamentRound2, tournamentRound3, {callback: processData, errorHandler: errorhandler});
 }
 
 function callbackProfile(data) {
@@ -462,6 +472,7 @@ function callbackMain(data) {
         renderGlobalChat(data.chat);
         renderMyGames(data.games);
         $("#message").html(data.message)
+        $("#globalMessage").val(data.message);
         if (refresher) clearTimeout(refresher);
         refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
     } else {
@@ -767,7 +778,6 @@ function navigate(data) {
     if (data.target !== currentPage) {
         $("#" + currentPage).hide();
         $("#" + data.target).show();
-        ga('send', 'pageview', data.target);
         currentPage = data.target;
     }
     game = data.game;
@@ -808,6 +818,11 @@ function doCreateGame() {
     DS.createGame(gameName, isPublic.prop('checked'), {callback: processData, errorHandler: errorhandler});
     newGameDiv.val('');
     isPublic.prop('checked', false);
+}
+
+function updateMessage() {
+    let globalMessage = $("#globalMessage");
+    DS.setMessage(globalMessage.val(), {callback: processData, errorHandler: errorhandler});
 }
 
 function invitePlayer() {
@@ -1133,7 +1148,7 @@ function showStatus(data) {
 
 function getHistory() {
     let turns = $('#turns').val();
-    DS.getHistory(game, turns, {callback: loadHistory});
+    DS.getHistory(game, turns, {callback: loadHistory, errorHandler: errorhandler});
 }
 
 function loadHistory(data) {

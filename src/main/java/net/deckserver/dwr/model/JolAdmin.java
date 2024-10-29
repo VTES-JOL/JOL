@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.math.RoundingMode;
 import java.net.URI;
@@ -113,6 +114,7 @@ public class JolAdmin {
     private final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
             .expireAfterAccess(30, TimeUnit.MINUTES)
             .build(this::loadGameState);
+    private Properties properties;
     private Map<OffsetDateTime, GameHistory> pastGames;
     private Map<String, PlayerInfo> players;
     private Map<String, TournamentRegistration> tournamentRegistrations;
@@ -184,6 +186,7 @@ public class JolAdmin {
         writeFile("decks.json", decks);
         writeFile("pastGames.json", pastGames);
         writeFile("tournament.json", tournamentRegistrations);
+        writeFile("message.json", message);
     }
 
     public synchronized void cleanupGames() {
@@ -396,13 +399,19 @@ public class JolAdmin {
         chats = readFile("chats.json", typeFactory.constructCollectionType(List.class, ChatEntryBean.class));
         tournamentRegistrations = readFile("tournament.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, TournamentRegistration.class));
         timestamps = readFile("timestamps.json", typeFactory.constructType(Timestamps.class));
+        message = readFile("message.json", typeFactory.constructType(String.class));
         loadRegistrations();
         loadDecks();
+        loadProperties();
         scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 1, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new CleanupPlayersJob(), 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(new ValidateGWJob(), 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 10, TimeUnit.MINUTES);
+    }
+
+    public String getVersion() {
+        return properties.getProperty("version");
     }
 
     public boolean existsPlayer(String name) {
@@ -463,17 +472,13 @@ public class JolAdmin {
 
     public void saveDeck(String playerName, String deckName, String contents) {
         if (playerName != null && contents != null && deckName != null) {
+            deckName = deckName.trim();
             PlayerModel model = getPlayerModel(playerName);
             model.setDeckName(deckName);
             model.setContents(contents);
             ExtendedDeck deck = DeckParser.parseDeck(contents);
-            DeckInfo deckInfo;
-            if (decks.contains(playerName, deckName)) {
-                deckInfo = decks.get(playerName, deckName);
-                deckInfo.setFormat(DeckFormat.MODERN);
-            } else {
-                deckInfo = new DeckInfo(ULID.random(), deckName, DeckFormat.MODERN);
-            }
+            DeckInfo deckInfo = Optional.ofNullable(decks.get(playerName, deckName)).orElse(new DeckInfo(ULID.random(), deckName, DeckFormat.MODERN));
+            deckInfo.setFormat(DeckFormat.MODERN);
             decks.put(playerName, deckName, deckInfo);
             writeFile(String.format("decks/%s.json", deckInfo.getDeckId()), deck);
         }
@@ -977,6 +982,17 @@ public class JolAdmin {
         return Optional.ofNullable(games.get(gameName))
                 .map(GameInfo::getCreated)
                 .orElse(null);
+    }
+
+    private void loadProperties() {
+        properties = new Properties();
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        try (InputStream resourceStream = loader.getResourceAsStream("version.properties")) {
+            properties.load(resourceStream);
+        } catch (IOException e) {
+            logger.error("Unable to load version.properties", e);
+            properties.setProperty("version", OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME));
+        }
     }
 
     private void setRole(PlayerInfo info, PlayerRole role, boolean enabled) {

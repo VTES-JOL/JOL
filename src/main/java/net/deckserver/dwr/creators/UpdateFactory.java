@@ -7,6 +7,7 @@ import org.directwebremoting.WebContextFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UpdateFactory {
 
@@ -23,6 +24,7 @@ public class UpdateFactory {
         viewMap.put("active", new AllGamesCreator());
         viewMap.put("super", new SuperCreator());
         viewMap.put("tournament", new TournamentCreator());
+        viewMap.put("version", new VersionCreator());
     }
 
     private static ViewCreator getView(String type) {
@@ -34,7 +36,7 @@ public class UpdateFactory {
         String playerName = DeckserverRemote.getPlayer(WebContextFactory.get().getHttpServletRequest());
         PlayerModel player = admin.getPlayerModel(playerName);
         admin.recordPlayerAccess(player.getPlayerName());
-        return Arrays.asList(player.getView(), "nav").stream()
+        return Stream.of(player.getView(), "nav", "version")
                 .map(UpdateFactory::getView)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(ViewCreator::getFunction, v -> v.createData(player)));

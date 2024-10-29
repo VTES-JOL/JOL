@@ -1,3 +1,4 @@
+<%@ page import="net.deckserver.dwr.model.JolAdmin" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html" %>
 <%@ page pageEncoding="UTF-8" %>
@@ -375,22 +376,18 @@
 
 <!-- Bootstrap -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script type="text/javascript" src="js/jquery-3.4.1.js"></script>
-<script src="https://unpkg.com/popper.js@1.15.0/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
-
-<script type='text/javascript' src="js/ga.js"></script>
-<script type='text/javascript' src='js/moment-with-locales.min.js'></script>
-<script type='text/javascript' src='js/moment-timezone-with-data.min.js'></script>
-<script type="text/javascript" src="js/jquery-ui.js"></script>
-<script type="text/javascript" src="js/jquery-throttle.js"></script>
-<script type='text/javascript' src='dwr/engine.js'></script>
-<script type='text/javascript' src='dwr/interface/DS.js'></script>
-<script type='text/javascript' src='dwr/util.js'></script>
-<script type='text/javascript' src="js/tippy.all.min.js"></script>
-<script type='text/javascript' src='js/ds.js?version=<%= System.getenv("JOL_VERSION") %>'></script>
-<script type="text/javascript" src="js/card-modal.js?version=<%= System.getenv("JOL_VERSION") %>"></script>
+<script src="js/jquery-3.7.1.min.js"></script>
+<script src="js/jquery-throttle.min.js"></script>
+<script src="js/jquery-ui.min.js"></script>
+<script src='js/moment-with-locales.min.js'></script>
+<script src='js/moment-timezone-with-data.min.js'></script>
+<script src="js/popper.min.js"></script>
+<script src="js/tippy.all.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src='dwr/engine.js'></script>
+<script src='dwr/interface/DS.js'></script>
+<script src='dwr/util.js'></script>
+<script src='js/ds.js?version=<%= JolAdmin.INSTANCE.getVersion() %>'></script>
+<script src="js/card-modal.js?version=<%= JolAdmin.INSTANCE.getVersion() %>"></script>
 </body>
 </html>

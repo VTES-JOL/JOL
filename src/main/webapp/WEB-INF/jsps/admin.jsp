@@ -1,5 +1,11 @@
 <div class="row">
     <div class="col-sm-6">
+        <div>
+            <label for="globalMessage">Message</label>
+            <input id="globalMessage" size="50" class="full-width"/>
+            <br/><br/>
+            <button class="btn btn-primary" onclick="updateMessage()">Update</button>
+        </div>
         <h4 class="header">Add Role</h4>
         <div>
             <label for="adminPlayerList">Players</label>

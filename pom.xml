@@ -4,7 +4,7 @@
 
     <groupId>deckserver.net</groupId>
     <artifactId>jol-legacy</artifactId>
-    <version>1.4.1.1</version>
+    <version>1.4.1.5</version>
 
     <packaging>war</packaging>
 
@@ -216,6 +216,12 @@
 
     <build>
         <finalName>jol</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.opoo.maven</groupId>
@@ -240,22 +246,83 @@
                     <useSystemClassLoader>false</useSystemClassLoader>
                 </configuration>
             </plugin>
-        </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-war-plugin</artifactId>
-                    <version>3.1.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.opoo.maven</groupId>
-                    <artifactId>tomcat9-maven-plugin</artifactId>
-                    <version>3.0.1</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+<!--            <plugin>-->
+<!--                <groupId>com.samaxes.maven</groupId>-->
+<!--                <artifactId>minify-maven-plugin</artifactId>-->
+<!--                <version>1.7.6</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>prepare-package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>minify</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <charset>UTF-8</charset>-->
+<!--                    <skipMerge>true</skipMerge>-->
+<!--                    <cssSourceDir>css</cssSourceDir>-->
+<!--                    <jsSourceDir>js</jsSourceDir>-->
+<!--                    <jsEngine>CLOSURE</jsEngine>-->
+<!--                    <nosuffix>true</nosuffix>-->
+<!--                    <webappTargetDir>${project.build.directory}/minify</webappTargetDir>-->
+<!--                    <cssSourceIncludes>-->
+<!--                        <cssSourceInclude>**/*.css</cssSourceInclude>-->
+<!--                    </cssSourceIncludes>-->
+<!--                    <cssSourceExcludes>-->
+<!--                        <cssSourceExclude>**/*.min.css</cssSourceExclude>-->
+<!--                    </cssSourceExcludes>-->
+<!--                    <jsSourceIncludes>-->
+<!--                        <jsSourceInclude>**/*.js</jsSourceInclude>-->
+<!--                    </jsSourceIncludes>-->
+<!--                    <jsSourceExcludes>-->
+<!--                        <jsSourceExclude>**/*.min.js</jsSourceExclude>-->
+<!--                    </jsSourceExcludes>-->
+<!--                </configuration>-->
+<!--                <dependencies>-->
+<!--                    <dependency>-->
+<!--                        <groupId>org.codehaus.plexus</groupId>-->
+<!--                        <artifactId>plexus-utils</artifactId>-->
+<!--                        <version>3.5.1</version>-->
+<!--                    </dependency>-->
+<!--                </dependencies>-->
+<!--            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.1.0</version>
+<!--                <configuration>-->
+<!--                    <webResources>-->
+<!--                        <resource>-->
+<!--                            <directory>${project.build.directory}/minify</directory>-->
+<!--                        </resource>-->
+<!--                    </webResources>-->
+<!--                </configuration>-->
+            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-resources-plugin</artifactId>-->
+<!--                <version>3.3.1</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>generate-sources</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>copy-resources</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <outputDirectory>${project.build.directory}/minify</outputDirectory>-->
+<!--                            <resources>-->
+<!--                                <resource>-->
+<!--                                    <filtering>false</filtering>-->
+<!--                                    <directory>${project.basedir}/src/main/resources/static</directory>-->
+<!--                                </resource>-->
+<!--                            </resources>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
 
+        </plugins>
     </build>
 
     <dependencyManagement>

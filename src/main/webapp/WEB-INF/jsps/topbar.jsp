@@ -1,7 +1,7 @@
+<%@ page import="net.deckserver.dwr.model.JolAdmin" %>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	<a class="navbar-brand" href="/jol/" name="top" onclick="return doNav('main');">
-		<span id="titleLink">V:TES Online</span>
-		<sub style="font-size:.5em"><%= System.getenv("JOL_VERSION") %></sub>
+	<a class="navbar-brand" href="/jol/" onclick="return doNav('main');">
+		<span id="titleLink">V:TES Online</span> - <span><%= JolAdmin.INSTANCE.getVersion() %></span>
 	</a>
 	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
@@ -22,4 +22,5 @@
 			</form>
 		</div>
 	</div>
+	<span id="connectionMessage" class="navbar-text text-warning">Connection issue. Retrying...</span>
 </nav>
