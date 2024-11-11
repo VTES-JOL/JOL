@@ -4,7 +4,7 @@
 
     <groupId>deckserver.net</groupId>
     <artifactId>jol-legacy</artifactId>
-    <version>1.4.1.5</version>
+    <version>1.5.6</version>
 
     <packaging>war</packaging>
 
@@ -226,6 +226,7 @@
             <plugin>
                 <groupId>org.opoo.maven</groupId>
                 <artifactId>tomcat9-maven-plugin</artifactId>
+                <version>3.0.1</version>
                 <configuration>
                     <path>/jol</path>
                     <systemProperties>

@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import net.deckserver.game.storage.cards.CardType;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
@@ -27,7 +24,7 @@ public class CardSummary {
     private boolean burnOption;
     private String group;
     private String sect;
-    private List<String> clans;
+    private List<String> clans = new ArrayList<>();
     private boolean banned;
 
     //Library only
@@ -39,7 +36,7 @@ public class CardSummary {
 
     //Crypt only
     private Integer capacity;
-    private List<String> disciplines;
+    private List<String> disciplines = new ArrayList<>();
     private String title;
     private String votes;
     private boolean advanced;
@@ -54,6 +51,10 @@ public class CardSummary {
         return CardType.VAMPIRE.equals(getCardType());
     }
 
+    public boolean isMinion() {
+        return hasBlood() || hasLife();
+    }
+
     @JsonIgnore
     public String getTypeClass() {
         return Arrays.stream(type.toLowerCase()
@@ -61,6 +62,15 @@ public class CardSummary {
                 .map(s -> s.replaceAll(" ", "_"))
                 .sorted()
                 .collect(Collectors.joining(" "));
+    }
+
+    @JsonIgnore
+    public List<String> getClanClass() {
+        return clans.stream()
+                .map(s -> s.replaceAll(" ", "_"))
+                .map(String::toLowerCase)
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     @JsonIgnore

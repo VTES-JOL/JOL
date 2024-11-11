@@ -8,6 +8,13 @@
     <display-name>V:TES Online</display-name>
     <description>Vtes Online Web Client</description>
 
+    <jsp-config>
+        <jsp-property-group>
+            <url-pattern>*.jsp</url-pattern>
+            <page-encoding>UTF-8</page-encoding>
+        </jsp-property-group>
+    </jsp-config>
+
     <servlet>
         <servlet-name>dwr-invoker</servlet-name>
         <servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
@@ -30,22 +37,18 @@
         <filter-name>ExpiresFilter</filter-name>
         <filter-class>org.apache.catalina.filters.ExpiresFilter</filter-class>
         <init-param>
-            <param-name>ExpiresByType image</param-name>
+            <param-name>ExpiresByType text/html</param-name>
             <param-value>modification plus 10 minutes</param-value>
         </init-param>
         <init-param>
-            <param-name>ExpiresByType text/css</param-name>
-            <param-value>access plus 0 seconds</param-value>
-        </init-param>
-        <init-param>
-            <param-name>ExpiresByType application/javascript</param-name>
-            <param-value>access plus 0 seconds</param-value>
+            <param-name>ExpiresByType application/json</param-name>
+            <param-value>access plus 10 minutes</param-value>
         </init-param>
     </filter>
 
     <filter-mapping>
         <filter-name>ExpiresFilter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/rest/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
 

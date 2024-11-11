@@ -51,6 +51,6 @@ public class ChatParserTest {
         modified = ChatParser.parseText(test);
 
         //2023/05/13; this test does not work:
-        assertEquals("A link to <a class='card-name' data-card-id='201362'>Theo Bell</a> and <a class='card-name' data-card-id='201362'>Theo Bell</a> and <a class='card-name' data-card-id='201363'>Theo Bell <i class='adv'/></a> and <a class='card-name' data-card-id='201613'>Theo Bell</a> should all work", modified);
+        assertEquals("A link to <a class='card-name' data-card-id='201362'>Theo Bell</a> and <a class='card-name' data-card-id='201362'>Theo Bell</a> and <a class='card-name' data-card-id='201363'>Theo Bell <i class='icon adv'/></a> and <a class='card-name' data-card-id='201613'>Theo Bell</a> should all work", modified);
     }
 }

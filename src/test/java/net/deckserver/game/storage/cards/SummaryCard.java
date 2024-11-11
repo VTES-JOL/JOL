@@ -82,7 +82,7 @@ public class SummaryCard {
                 .ifPresent(disciplines -> cardLines.add(disciplinesLabel + disciplines));
         Optional.ofNullable(cryptCard.getText()).ifPresent(cardLines::add);
         this.htmlText = ChatParser.parseText(String.join("<br/>", cardLines));
-        this.originalText = cryptCard.getText();
+        this.originalText = ChatParser.parseText(cryptCard.getText());
         this.capacity = cryptCard.getCapacity();
         this.disciplines = cryptCard.getDisciplines();
     }
@@ -126,6 +126,6 @@ public class SummaryCard {
         Optional.ofNullable(libraryCard.getDisciplines()).ifPresent(disciplines -> cardLines.add("Discipline: " + String.join("/", disciplines)));
         Optional.ofNullable(libraryCard.getText()).map(text -> text.replaceAll("\\n", "<br/>")).ifPresent(cardLines::add);
         this.htmlText = ChatParser.parseText(String.join("<br/>", cardLines));
-        this.originalText = libraryCard.getText();
+        this.originalText = ChatParser.parseText(libraryCard.getText().replaceAll("\\n", "<br/>"));
     }
 }

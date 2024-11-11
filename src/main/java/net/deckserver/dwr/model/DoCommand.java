@@ -9,6 +9,7 @@ package net.deckserver.dwr.model;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.Location;
 import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.game.ui.state.CardDetail;
 import net.deckserver.storage.json.cards.CardSummary;
 import org.slf4j.Logger;
 
@@ -38,10 +39,10 @@ public class DoCommand {
         return buf.toString();
     }
 
-    public String doMessage(String player, String message) {
+    public String doMessage(String player, String message, boolean isJudge) {
         if (message.equals(""))
             return "No message received";
-        game.sendMsg(player, message);
+        game.sendMsg(player, message, isJudge);
         return "Sent message";
     }
 
@@ -165,7 +166,8 @@ public class DoCommand {
                     if (docap) {
                         int curcap = game.getCapacity(srcCard);
                         if (curcap <= 0) {
-                            CardSummary card = CardSearch.INSTANCE.get(game.getCardDescripId(srcCard));
+                            CardDetail detail = game.getCard(srcCard);
+                            CardSummary card = CardSearch.INSTANCE.get(detail.getCardId());
                             Integer capacity = card.getCapacity();
                             if (capacity != null) {
                                 game.changeCapacity(srcCard, capacity, false);
@@ -242,7 +244,7 @@ public class DoCommand {
                 String targetCard = cmdObj.getCard(false, targetPlayer, targetRegion);
                 if (targetCard == null) throw new CommandException("Must specify a card in the region");
                 if (cmdObj.consumeString("reset")) {
-                    CardSummary card = CardSearch.INSTANCE.get(game.getCardDescripId(targetCard));
+                    CardSummary card = CardSearch.INSTANCE.get(targetCard);
                     List<String> disciplines = card.getDisciplines();
                     game.setDisciplines(targetCard, disciplines, false);
                 }
@@ -323,16 +325,16 @@ public class DoCommand {
                 String text = buf.toString();
                 for (String recipient : recipients) {
                     String old = game.getPlayerText(recipient);
-                    game.setPlayerText(recipient, old + "\n" + text);
+                    game.setPrivateNotes(recipient, old + "\n" + text);
                 }
                 String msg = null;
                 if (recipients.size() == 1) {
                     msg = "Looks at " + len + " cards of " +
                             (!player.equals(recipients.get(0)) ? player + "'s " : "") + targetRegion + ".";
-                    game.sendMsg(recipients.get(0), msg);
+                    game.sendMsg(recipients.get(0), msg, false);
                 } else {
                     msg = "Everyone looks at " + len + " cards of " + player + "'s " + targetRegion + ".";
-                    game.sendMsg(player, msg);
+                    game.sendMsg(player, msg, false);
                 }
                 return "Showed cards.";
             }

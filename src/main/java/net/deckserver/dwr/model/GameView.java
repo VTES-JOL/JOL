@@ -1,8 +1,8 @@
 package net.deckserver.dwr.model;
 
 import net.deckserver.dwr.bean.GameBean;
-import net.deckserver.dwr.jsp.HandParams;
 import net.deckserver.game.interfaces.turn.GameAction;
+import net.deckserver.game.storage.state.RegionType;
 import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 
@@ -17,19 +17,19 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class GameView {
 
     private static final Logger logger = getLogger(GameView.class);
+    private final String gameName;
+    private final String playerName;
+    private final Collection<String> chats = new ArrayList<>();
+    private final Collection<String> collapsed = new HashSet<>();
     private boolean stateChanged = true;
     private boolean phaseChanged = true;
     private boolean globalChanged = true;
     private boolean privateNotesChanged = true;
     private boolean turnChanged = true;
     private boolean resetChat = true;
-    private final String gameName;
-    private final String playerName;
     private boolean isPlayer = false;
     private boolean isAdmin = false;
     private boolean isJudge = false;
-    private final Collection<String> chats = new ArrayList<>();
-    private final Collection<String> collapsed = new HashSet<>();
 
     public GameView(String gameName, String playerName) {
         this.gameName = gameName;
@@ -47,15 +47,16 @@ public class GameView {
                 isPlayer = true;
             boolean ousted = game.getPool(players.get(i)) < 1;
             i++;
-            collapsed.add("a" + i);
-            collapsed.add("rfg" + i);
-            collapsed.add("res" + i);
+            collapsed.add(i + "-" + RegionType.ASH_HEAP);
+            collapsed.add(i + "-" + RegionType.REMOVED_FROM_GAME);
+            collapsed.add(i + "-" + RegionType.LIBRARY);
+            collapsed.add(i + "-" + RegionType.HAND);
+            collapsed.add(i + "-" + RegionType.CRYPT);
             if (ousted) {
-                collapsed.add("t" + i);
-                collapsed.add("r" + i);
-                collapsed.add("i" + i);
-            } else if (!active) {
-                collapsed.add("i" + i);
+                collapsed.add(i + "-" + RegionType.TORPOR);
+                collapsed.add(i + "-" + RegionType.RESEARCH);
+                collapsed.add(i + "-" + RegionType.READY);
+                collapsed.add(i + "-" + RegionType.UNCONTROLLED);
             }
         }
         if (!isPlayer && (admin.getOwner(gameName).equals(playerName))) {
@@ -64,6 +65,10 @@ public class GameView {
         if (!isPlayer && (admin.isJudge(playerName))) {
             isJudge = true;
         }
+    }
+
+    public boolean isCollapsed(String region) {
+        return collapsed.contains(region);
     }
 
     public synchronized GameBean create() {
@@ -78,47 +83,44 @@ public class GameView {
         int refresh = admin.getRefreshInterval(gameName);
 
         List<String> ping;
-        List<String> pinged;
         String hand = null;
-        String global = null;
-        String text = null;
-        String label = null;
+        String globalNotes = null;
+        String privateNotes = null;
+        String label;
         String[] turn = null;
         String[] turns = null;
         String state = null;
         String[] phases = null;
-        String[] collapsed = null;
+        String currentPlayer = game.getActivePlayer();
 
         ping = game.getPingList();
-        pinged = game.getPingedList();
 
         if (isPlayer && stateChanged) {
             try {
-                HandParams h = new HandParams(game, playerName, "Hand", JolGame.HAND);
-                request.setAttribute("hparams", h);
                 request.setAttribute("game", game);
-                hand = WebContextFactory.get().forwardToString(
-                        "/WEB-INF/jsps/hand.jsp");
+                request.setAttribute("player", playerName);
+                request.setAttribute("viewer", playerName);
+                hand = WebContextFactory.get().forwardToString("/WEB-INF/jsps/game/hand.jsp");
             } catch (Exception e) {
-                logger.error("Error retrieving hand {}", e);
+                logger.error("Error retrieving hand", e);
                 hand = "Error retrieving hand.";
             }
         }
 
         if (globalChanged) {
-            global = game.getGlobalText();
+            globalNotes = game.getGlobalText();
         }
 
         if (privateNotesChanged && isPlayer) {
-            text = game.getPlayerText(playerName);
+            privateNotes = game.getPlayerText(playerName);
         }
 
-        if (phaseChanged) {
-            label = game.getCurrentTurn() + " " + game.getPhase();
-        }
+        label = game.getCurrentTurn() + " - " + game.getPhase();
+        String phase = game.getPhase();
 
-        if (chats.size() > 0) {
+        if (!chats.isEmpty()) {
             turn = chats.toArray(new String[0]);
+            chats.clear();
         }
 
         if (turnChanged) {
@@ -132,19 +134,17 @@ public class GameView {
         if (stateChanged) {
             try {
                 request.setAttribute("game", game);
-                state = WebContextFactory.get().forwardToString(
-                        "/WEB-INF/jsps/state.jsp");
+                request.setAttribute("viewer", playerName);
+                state = WebContextFactory.get().forwardToString("/WEB-INF/jsps/game/state.jsp");
             } catch (Exception e) {
-                logger.error("Error retrieving state {}", e);
+                logger.error("Error retrieving state:", e);
                 hand = "Error retrieving state.";
             }
         }
 
-        // pending use phaseChanged here?
-        if (isPlayer && game.getActivePlayer().equals(playerName)) {
+        if (phaseChanged) {
             boolean show = false;
             Collection<String> c = new ArrayList<>();
-            String phase = game.getPhase();
             for (int i = 0; i < JolGame.TURN_PHASES.length; i++) {
                 if (phase.equals(JolGame.TURN_PHASES[i]))
                     show = true;
@@ -154,23 +154,21 @@ public class GameView {
             phases = c.toArray(new String[0]);
         }
 
-        if (stateChanged) {
-            collapsed = getCollapsed();
-        }
-
         boolean chatReset = resetChat;
         boolean tc = turnChanged;
         clearAccess();
         String stamp = JolAdmin.getDate();
         int logLength = game.getActions().length;
-        return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, global, text, label,
-                chatReset, tc, turn, turns, state, phases, ping,
-                collapsed, stamp, pinged, gameName, logLength);
+        return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, globalNotes, privateNotes, label, phase,
+                chatReset, tc, turn, turns, state, phases, ping, stamp, gameName, logLength, currentPlayer);
+    }
+
+    public synchronized void init() {
+        resetChat = true;
     }
 
     public synchronized void clearAccess() {
-        globalChanged = phaseChanged = stateChanged = turnChanged = false;
-        chats.clear();
+        globalChanged = phaseChanged = turnChanged = stateChanged = false;
         resetChat = false;
     }
 
@@ -190,10 +188,6 @@ public class GameView {
         stateChanged = true;
     }
 
-    public String[] getCollapsed() {
-        return collapsed.toArray(new String[0]);
-    }
-
     public void toggleCollapsed(String id) {
         if (collapsed.contains(id))
             collapsed.remove(id);
@@ -206,8 +200,7 @@ public class GameView {
     }
 
     public boolean isChanged() {
-        return globalChanged || phaseChanged || stateChanged || turnChanged
-                || chats.size() > 0;
+        return globalChanged || phaseChanged || stateChanged || turnChanged || !chats.isEmpty();
     }
 
     public void addChat(String chat) {
@@ -236,6 +229,7 @@ public class GameView {
     }
 
     public void reset() {
+        logger.info("Reset - state changed");
         reset(true);
         //Force client to refresh all game data
         resetChat = true;

@@ -31,8 +31,6 @@ class CommandParser {
         if (!hasMoreArgs()) return defaultRegion;
         String arg = args[ind++].toLowerCase();
         logger.trace("Attempting to get region {}", arg);
-        if (JolGame.ACTIVE_REGION.startsWith(arg))
-            return JolGame.READY_REGION;
         if (JolGame.RFG.startsWith(arg))
             return JolGame.RFG;
         if (JolGame.READY_REGION.startsWith(arg))

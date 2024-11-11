@@ -13,8 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.*;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -25,16 +24,16 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class CardSearch {
 
     private static final Logger logger = getLogger(CardSearch.class);
-    public static CardSearch INSTANCE = new CardSearch(Paths.get(System.getenv("JOL_DATA")));
+    public static CardSearch INSTANCE = new CardSearch();
     private final Map<String, String> nameKeys = new HashMap<>();
     private final Map<String, CardSummary> cards = new HashMap<>();
 
-    private CardSearch(Path cardPath) {
-        cardPath = cardPath.resolve("cards").resolve("cards.json");
+    private CardSearch() {
         ObjectMapper objectMapper = new ObjectMapper();
         CollectionType cardSummaryCollectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CardSummary.class);
-        try {
-            List<CardSummary> cardList = objectMapper.readValue(cardPath.toFile(), cardSummaryCollectionType);
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        try (InputStream resourceStream = loader.getResourceAsStream("cards.json")) {
+            List<CardSummary> cardList = objectMapper.readValue(resourceStream, cardSummaryCollectionType);
             cardList.forEach(card -> {
                 for (String name : card.getNames()) {
                     nameKeys.put(name.toLowerCase(), card.getId());
@@ -45,14 +44,6 @@ public class CardSearch {
         } catch (IOException e) {
             logger.error("Unable to read cards", e);
         }
-    }
-
-    public String getId(String nm) {
-        return nameKeys.get(nm.toLowerCase());
-    }
-
-    public Set<String> getNames() {
-        return nameKeys.keySet();
     }
 
     public Optional<CardSummary> findCardExact(String text) {

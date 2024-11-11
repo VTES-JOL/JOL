@@ -37,6 +37,6 @@ public class CardDatabaseBuilder {
             summaryCards.add(new SummaryCard(cryptCard));
         });
 
-        mapper.writeValue(basePath.resolve("cards.json").toFile(), summaryCards);
+        mapper.writeValue(Paths.get("src/main/resources/cards.json").toFile(), summaryCards);
     }
 }

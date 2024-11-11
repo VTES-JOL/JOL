@@ -2,24 +2,22 @@ package net.deckserver.dwr.bean;
 
 import lombok.Getter;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Getter
 public class GameBean {
 
+    private final List<String> ping;
     private int refresh = -1;
-    private String hand = null;
-    private String global = null;
-    private String text = null;
-    private String label = null;
-    private String[] turn = null;
-    private String[] turns = null;
-    private List<String> ping;
-    private List<String> pinged;
-    private String state = null;
-    private String[] phases = null;
-    private String[] collapsed = null;
+    private String hand;
+    private String globalNotes;
+    private String privateNotes;
+    private String label;
+    private String phase;
+    private String[] turn;
+    private String[] turns;
+    private String state;
+    private String[] phases;
     private boolean resetChat;
     private boolean turnChanged;
     private boolean player;
@@ -28,29 +26,30 @@ public class GameBean {
     private String stamp;
     private String name;
     private int logLength;
+    private String currentPlayer;
 
-    public GameBean(boolean isPlayer, boolean isAdmin, boolean isJudge, int refresh, String hand, String global, String text,
-                    String label, boolean resetChat, boolean turnChanged, String[] turn, String[] turns, String state, String[] phases,
-                    List<String> ping, String[] collapsed, String stamp, List<String> pinged, String name, int logLength) {
+    public GameBean(boolean isPlayer, boolean isAdmin, boolean isJudge, int refresh, String hand, String globalNotes, String privateNotes,
+                    String label, String phase, boolean resetChat, boolean turnChanged, String[] turn, String[] turns, String state, String[] phases,
+                    List<String> ping, String stamp, String name, int logLength, String currentPlayer) {
         this(ping, refresh);
         this.player = isPlayer;
         this.admin = isAdmin;
         this.judge = isJudge;
         this.hand = hand;
-        this.global = global;
-        this.text = text;
+        this.globalNotes = globalNotes;
+        this.privateNotes = privateNotes;
         this.label = label;
+        this.phase = phase;
         this.resetChat = resetChat;
         this.turnChanged = turnChanged;
         this.turn = turn;
         this.turns = turns;
         this.state = state;
         this.phases = phases;
-        this.collapsed = collapsed;
         this.stamp = stamp;
-        this.pinged = pinged;
         this.name = name;
         this.logLength = logLength;
+        this.currentPlayer = currentPlayer;
     }
 
     public GameBean(List<String> ping, int refresh) {

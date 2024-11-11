@@ -1,3 +1,4 @@
+<%@ page import="net.deckserver.dwr.model.JolAdmin" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html" %>
 <%@ page pageEncoding="UTF-8" %>
@@ -6,80 +7,73 @@
 <head>
     <title>V:TES Online</title>
     <!-- Required by Bootstrap -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
-    <link rel="stylesheet" type="text/css" href="css/new.css"/>
-    <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
-    <link rel="stylesheet" type="text/css" href="css/jquery-ui.structure.min.css"/>
-    <link rel="stylesheet" type="text/css" href="css/jquery-ui.theme.min.css"/>
-    <link rel="stylesheet" type="text/css" href="css/light.css"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/styles.css"/>
     <link rel="shortcut icon" href="images/favicon.ico"/>
     <link href="https://fonts.googleapis.com/css?family=IM+Fell+English" rel="stylesheet">
 </head>
-<body class="container-fluid" style="max-width:15cm">
-    <div style="min-height:calc(100vh - 4rem)"><!--100vh - {footer}-->
-        <h1>V:TES Online</h1>
-        <form id="loginForm" method="post" action="/jol/login">
-            <p>Welcome to V:TES Online, the unofficial home to play Vampire: The Eternal Struggle online.</p>
-            <h2>Welcome back</h2>
-            <input type="text" class="form-control-lg w-100"
-                   id="dsuserin" name="username" autocomplete="username" placeholder="Username"/>
-            <input type="password" class="form-control-lg w-100 mt-1"
-                   id="dspassin" name="password" autocomplete="current-password" placeholder="Password"/>
-            <button type="submit" id="loginBtn" name="login" value="Log in"
-                class="btn btn-primary btn-lg btn-block mt-1">Log In</button>
-            <div class="mt-2" style="text-align:center">
-                <button type="button" class="btn btn-link"
-                    onclick="$('#registerForm').show(); $('#loginForm').hide();">Need an account?</button>
+<body>
+    <div id="wrapper" class="container-fluid">
+        <div class="w-md-50 m-auto mt-4" id="content">
+            <h1>V:TES Online</h1>
+            <div class="card" id="loginPanel">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fs-5">Welcome back</span>
+                    <button type="button" class="btn btn-link" onclick="$('#registerPanel').show(); $('#loginPanel').hide();">Need an account?</button>
+                </div>
+                <div class="card-body">
+                    <p>Welcome to V:TES Online, the unofficial home to play Vampire: The Eternal Struggle online.</p>
+                    <p>
+                        <a href="https://www.vekn.net/what-is-v-tes" target="_blank">What is Vampire: The Eternal Struggle?</a>
+                    </p>
+                    <form id="loginForm" method="post" action="/jol/login">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="dsuserin" name="username" autocomplete="username" placeholder="Username">
+                            <label for="dsuserin">Username</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="dspassin" name="password" autocomplete="password" placeholder="Password">
+                            <label for="dspassin">Password</label>
+                        </div>
+                        <button type="submit" id="loginBtn" name="login" value="Log in" class="btn btn-outline-secondary btn-lg mt-2">Log In</button>
+                    </form>
+                </div>
             </div>
-        </form>
-        <form id="registerForm" method="post" action="/jol/register" style="display:none">
-            <p>
-                <a href="https://www.vekn.net/what-is-v-tes" target="_blank">
-                    What is Vampire: The Eternal Struggle?
-                </a>
-            </p>
-            <p class="mb-0">Play using text commands, in a format that suits your availability:</p>
-            <ul>
-                <li>Real time (RT)</li>
-                <li>Check during breaks at work (WT)</li>
-                <li>Check one or more times a day (QK)</li>
-            </ul>
-            <p>Import decks from your favorite deck building program.  Play multiple games simultaneously.  Test a deck before a tournament.</p>
-            <h2>Join us</h2>
-            <input type="text" class="form-control-lg w-100" name="newplayer" id="newplayer" placeholder="Username"/>
-            <input type="password" class="form-control-lg w-100 mt-1" name="newpassword" autocomplete="new-password"
-                   id="newpassword" placeholder="Password"/>
-            <input type="email" class="form-control-lg w-100 mt-1" name="newemail" autocomplete="email" id="newemail"
-                   placeholder="E-mail address"/>
-            <div class="g-recaptcha mt-1"
-                 data-sitekey="<%= System.getenv("JOL_RECAPTCHA_KEY") %>"></div>
-            <button type="submit" name="register" value="Register"
-                class="btn btn-primary btn-lg btn-block mt-1">Register</button>
-            <div class="col mt-2" style="text-align:center">
-                <button type="button" class="btn btn-link"
-                    onclick="$('#loginForm').show(); $('#registerForm').hide();">
-                    Already have an account?</button>
+            <div class="card" id="registerPanel" style="display: none;">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fs-5">Join us</span>
+                    <button type="button" class="btn btn-link" onclick="$('#loginPanel').show(); $('#registerPanel').hide();">Already have an account?</button>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <div>Import decks from your favorite deck building program.  Play multiple games simultaneously.  Test a deck before a tournament.</div>
+                    </div>
+                    <form id="registerForm" method="post" action="/jol/register">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="newplayer" name="newplayer" placeholder="Username">
+                            <label for="newplayer">Username</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="newpassword" name="newpassword" placeholder="Password">
+                            <label for="newpassword">Password</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="newemail" name="newemail" placeholder="user@example.org">
+                            <label for="newemail">E-mail address</label>
+                        </div>
+                        <div class="g-recaptcha mt-1" data-sitekey="<%= System.getenv("JOL_RECAPTCHA_KEY") %>"></div>
+                        <button type="submit" name="register" value="Register" class="btn btn-outline-secondary btn-lg mt-1">Register</button>
+                    </form>
+                </div>
             </div>
-        </form>
-    </div>
-
-    <!-- Footer -->
-    <div style="height:4rem; text-align:center; padding-top:1rem">
-        <a href="https://discord.gg/fJjac75" target="_blank">Discord</a>
-        | <a href="https://www.facebook.com/groups/jolstatus/" target="_blank">Status</a>
-        | <a href="mailto:admin@deckserver.net">Admin &#7367;</a></li>
-        <br/><%= System.getenv("JOL_VERSION") %>
+        </div>
     </div>
 
     <!-- Bootstrap -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="js/jquery-3.7.1.min.js"></script>
-    <script src="js/popper.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src='https://www.google.com/recaptcha/api.js'></script>
     <script type='text/javascript'>

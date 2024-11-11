@@ -1,8 +1,6 @@
 package net.deckserver.dwr.bean;
 
 import lombok.Getter;
-import net.deckserver.dwr.model.GameModel;
-import net.deckserver.dwr.model.GameView;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 
@@ -14,12 +12,13 @@ import java.util.Map;
 @Getter
 public class NavBean {
 
-    private boolean chats;
     private final Map<String, String> gameButtons = new HashMap<>();
     private final List<String> buttons = new ArrayList<>();
-
     private final String player;
     private final String target;
+    private final String message;
+    private final String stamp;
+    private boolean chats;
     private String game = null;
 
     public NavBean(PlayerModel model) {
@@ -34,18 +33,18 @@ public class NavBean {
             buttons.add("deck:Decks");
             buttons.add("profile:Profile");
             buttons.add("lobby:Lobby");
-            buttons.add("tournament:Tournament");
+//            buttons.add("tournament:Tournament");
             if (admin) {
                 buttons.add("admin:Admin");
             }
         }
         buttons.add("help:Help");
         for (String game : model.getCurrentGames()) {
-            GameModel gmodel = JolAdmin.INSTANCE.getGameModel(game);
-            GameView view = gmodel.getView(player);
-            String current = view.isChanged() ? " *" : "";
+            String current = JolAdmin.INSTANCE.isCurrent(player, game) ? "" : "*";
             gameButtons.put("g" + game, game + current);
         }
+        message = JolAdmin.INSTANCE.getMessage();
+        stamp = JolAdmin.getDate();
     }
 
 }

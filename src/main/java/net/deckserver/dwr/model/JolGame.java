@@ -7,16 +7,18 @@
 package net.deckserver.dwr.model;
 
 import com.google.common.base.Strings;
+import lombok.Getter;
 import net.deckserver.game.interfaces.state.*;
 import net.deckserver.game.interfaces.turn.GameAction;
 import net.deckserver.game.interfaces.turn.TurnRecorder;
 import net.deckserver.game.jaxb.state.Notation;
 import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.game.storage.state.RegionType;
+import net.deckserver.game.ui.state.CardDetail;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
 import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.Deck;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.math.RoundingMode;
 import java.security.SecureRandom;
@@ -31,7 +33,6 @@ import java.util.stream.Collectors;
  */
 public class JolGame {
 
-    public static final String ACTIVE_REGION = "active region";
     public static final String READY_REGION = "ready region";
     public static final String INACTIVE_REGION = "inactive region";
     public static final String ASHHEAP = "ashheap";
@@ -51,12 +52,14 @@ public class JolGame {
     private static final String ACTIVE = "active meth";
     private static final String POOL = "pool";
     private static final String EDGE = "edge";
+    private static final String MINION = "minion";
     private static final String TAP = "tapnote";
     private static final String TAPPED = "tap";
     private static final String UNTAPPED = "untap";
     private static final String TIMEOUT = "timeout";
     private static final DecimalFormat format = new DecimalFormat("0.#");
     private static DateTimeFormatter SIMPLE_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm ");
+    @Getter
     private final String id;
     private DsGame state;
     private DsTurnRecorder actions;
@@ -199,7 +202,7 @@ public class JolGame {
 
     public void startGame(List<String> playerSeating) {
         List<String> players = state.getPlayers();
-        if (!players.containsAll(playerSeating)) {
+        if (!new HashSet<>(players).containsAll(playerSeating)) {
             throw new IllegalArgumentException("Player ordering not valid, does not contain current players");
         }
         state.orderPlayers(playerSeating);
@@ -233,16 +236,13 @@ public class JolGame {
         setEdge("no one");
     }
 
-    public void sendMsg(String player, String msg) {
+    public void sendMsg(String player, String msg, boolean isJudge) {
         msg = truncateMsg(msg);
         msg = ChatParser.sanitizeText(msg);
         msg = ChatParser.parseText(msg);
+        // TODO - add some judge styling
+        String judgePrefix = isJudge ? "(JUDGE) " : "";
         addMessage("[" + player + "] " + msg);
-    }
-
-    public String getCardDescripId(String cardId) {
-        Card card = state.getCard(cardId);
-        return card.getCardId();
     }
 
     public int getCounters(String cardId) {
@@ -255,11 +255,17 @@ public class JolGame {
         }
     }
 
-    public String[] getDisciplines(String cardId) {
+    public List<String> getDisciplines(String cardId) {
         Card card = state.getCard(cardId);
         Notation note = getNote(card, DISCIPLINES, true);
-        if (note == null || note.getValue() == null || note.getValue().equals("")) return ArrayUtils.EMPTY_STRING_ARRAY;
-        return note.getValue().split(" ");
+        return Optional.ofNullable(note)
+                .map(Notation::getValue)
+                .filter(value -> !Strings.isNullOrEmpty(value))
+                .map(value -> value.split(" "))
+                .map(Arrays::asList)
+                .orElse(Collections.emptyList())
+                .stream().sorted(Comparator.reverseOrder())
+                .collect(Collectors.toList());
     }
 
     public void changeCounters(String player, String cardId, int incr, boolean quiet) {
@@ -283,6 +289,10 @@ public class JolGame {
         }
     }
 
+    public boolean isVisible(String owner, String viewer, RegionType region) {
+        return Objects.equals(owner, viewer) ? region.ownerVisibility() : region.otherVisibility();
+    }
+
     public String getActivePlayer() {
         Notation note = getNote(state, ACTIVE, false);
         if (note == null) return "";
@@ -292,6 +302,38 @@ public class JolGame {
     private void setActivePlayer(String player) {
         Notation note = getNote(state, ACTIVE, true);
         note.setValue(player);
+    }
+
+    public int getSize(String player, RegionType region) {
+        return state.getPlayerLocation(player, region.xmlLabel()).getCards().length;
+    }
+
+    public CardDetail getCard(String id) {
+        Card card = state.getCard(id);
+        CardDetail cardDetail = new CardDetail(card);
+        List<String> cards = Arrays.stream(card.getCards())
+                .map(Card::getId)
+                .collect(Collectors.toList());
+        cardDetail.setCards(cards);
+        cardDetail.setDisciplines(getDisciplines(id));
+        cardDetail.setCapacity(getCapacity(id));
+        cardDetail.setCounters(getCounters(id));
+        cardDetail.setLabel(getLabel(id));
+        cardDetail.setVotes(getVotes(id));
+        cardDetail.setLocked(isTapped(id));
+        cardDetail.setContested(getContested(id));
+        cardDetail.setMinion(isMinion(id));
+        return cardDetail;
+    }
+
+    private boolean isMinion(String id) {
+        Card card = state.getCard(id);
+        Notation note = getNote(card, MINION, true);
+        if (note.getValue() == null) {
+            CardSummary summary = CardSearch.INSTANCE.get(card.getCardId());
+            note.setValue(String.valueOf(summary.isMinion()));
+        }
+        return Boolean.parseBoolean(note.getValue());
     }
 
     public String getEdge() {
@@ -367,7 +409,7 @@ public class JolGame {
         setPlayerVotes(player, newVotes);
     }
 
-    public String getText(String cardId) {
+    public String getLabel(String cardId) {
         Card card = state.getCard(cardId);
         try {
             Notation note = getNote(card, TEXT, false);
@@ -377,7 +419,7 @@ public class JolGame {
         }
     }
 
-    public void setPlayerText(String player, String text) {
+    public void setPrivateNotes(String player, String text) {
         Notation note = getNote(state, player + TEXT, true);
         note.setValue(text);
     }
@@ -403,7 +445,7 @@ public class JolGame {
             Notation note = getNote(card, VOTES, false);
             return note.getValue();
         } catch (IllegalArgumentException e) {
-            return "0";
+            return null;
         }
     }
 
@@ -546,7 +588,7 @@ public class JolGame {
     public void setPhase(String phase) {
         Notation n = getNote(state, "phase", true);
         n.setValue(phase);
-        sendMsg(getActivePlayer(), "START OF " + phase.toUpperCase() + " PHASE.");
+        sendMsg(getActivePlayer(), "START OF " + phase.toUpperCase() + " PHASE.", false);
     }
 
     public void changeCapacity(String cardId, int capincr, boolean quiet) {
@@ -620,16 +662,14 @@ public class JolGame {
         }
     }
 
-    public List<String> getPingedList() {
-        return state.getPlayers().stream()
-                .filter(player -> getPool(player) > 0)
-                .filter(player -> JolAdmin.INSTANCE.isPlayerPinged(player, state.getName()))
-                .collect(Collectors.toList());
+    public boolean isPinged(String player) {
+        return JolAdmin.INSTANCE.isPlayerPinged(player, state.getName());
     }
 
     public List<String> getPingList() {
         return state.getPlayers().stream()
                 .filter(player -> getPool(player) > 0)
+                .filter(player -> !JolAdmin.INSTANCE.isPlayerPinged(player, state.getName()))
                 .collect(Collectors.toList());
     }
 
@@ -658,10 +698,6 @@ public class JolGame {
                 choiceNotation.setValue("");
             }
         });
-    }
-
-    public String getId() {
-        return this.id;
     }
 
     private void zeroPool(String player) {
@@ -752,7 +788,7 @@ public class JolGame {
             CardSummary cardEntry = CardSearch.INSTANCE.get(card.getCardId());
             if (!cardEntry.isUnique()) {
                 int regionIndex = getIndexInRegion(card);
-                String label = getText(card.getId());
+                String label = getLabel(card.getId());
                 differentiators = String.format(
                         "%s%s",
                         regionIndex > -1 ? String.format(" #%s", regionIndex + 1) : "",

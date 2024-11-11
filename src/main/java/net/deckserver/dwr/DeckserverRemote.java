@@ -103,6 +103,10 @@ public class DeckserverRemote {
         String playerName = getPlayer(request);
         PlayerModel player = admin.getPlayerModel(playerName);
         player.resetChats();
+        String currentGame = player.getCurrentGame();
+        if (currentGame != null) {
+            admin.getGameModel(currentGame).resetView(playerName);
+        }
         return UpdateFactory.getUpdate();
     }
 
@@ -189,22 +193,23 @@ public class DeckserverRemote {
     }
 
     public Map<String, Object> submitForm(String gameName, String phase, String command, String chat,
-                                          String ping, String endTurn, String global, String text) {
+                                          String ping, String endTurn, String globalNotes, String privateNotes) {
         String player = getPlayer(request);
         GameModel game = getModel(gameName);
-        // only process a command if the player is in the game
+        // only process a command if the player is in the game, or a judge that isn't playing
         boolean isPlaying = game.getPlayers().contains(player);
+        boolean canJudge = admin.isJudge(player) && !game.getPlayers().contains(player);
         String status = null;
-        if (isPlaying) {
+        if (isPlaying || canJudge) {
             phase = ne(phase);
             command = ne(command);
             chat = ne(chat);
             ping = ne(ping);
             endTurn = ne(endTurn);
-            status = game.submit(player, phase, command, chat, ping, endTurn, global, text);
+            status = game.submit(player, phase, command, chat, ping, endTurn, globalNotes, privateNotes);
         }
         Map<String, Object> ret = UpdateFactory.getUpdate();
-        if (isPlaying)
+        if (isPlaying || canJudge)
             ret.put("showStatus", status);
         return ret;
     }

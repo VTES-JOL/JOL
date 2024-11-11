@@ -1,5 +1,6 @@
 package net.deckserver.dwr.model;
 
+import lombok.Getter;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.storage.json.system.DeckFormat;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ public class PlayerModel {
     private final Set<String> games = new HashSet<>();
     private final List<ChatEntryBean> chats = new ArrayList<>();
     private String game = null;
+    @Getter
     private String view;
     private String deckName;
     private String contents;
@@ -53,10 +55,6 @@ public class PlayerModel {
 
     public void removeGame(String gameName) {
         games.remove(gameName);
-    }
-
-    public String getView() {
-        return view;
     }
 
     public void setView(String view) {
@@ -102,18 +100,6 @@ public class PlayerModel {
         }
     }
 
-    public void setContents(String contents) {
-        this.contents = contents;
-    }
-
-    public void setDeckName(String deckName) {
-        this.deckName = deckName;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public void clearDeck() {
         this.deckName = null;
         this.contents = null;
@@ -123,13 +109,25 @@ public class PlayerModel {
         return contents;
     }
 
+    public void setContents(String contents) {
+        this.contents = contents;
+    }
+
     public String getDeckName() {
         return deckName;
+    }
+
+    public void setDeckName(String deckName) {
+        this.deckName = deckName;
     }
 
     public String getMessage() {
         String result = this.message != null ? this.message : null;
         this.message = null;
         return result;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

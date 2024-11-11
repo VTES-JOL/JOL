@@ -5,7 +5,9 @@ import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 import org.directwebremoting.WebContextFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,7 +25,7 @@ public class UpdateFactory {
         viewMap.put("profile", new ProfileCreator());
         viewMap.put("active", new AllGamesCreator());
         viewMap.put("super", new SuperCreator());
-        viewMap.put("tournament", new TournamentCreator());
+//        viewMap.put("tournament", new TournamentCreator());
         viewMap.put("version", new VersionCreator());
     }
 

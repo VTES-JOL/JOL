@@ -16,6 +16,7 @@ let profile = {
     discordID: "",
     updating: false
 };
+let scrollChat = true;
 let pointerCanHover = window.matchMedia("(hover: hover)").matches;
 
 function errorhandler(errorString, exception) {
@@ -33,8 +34,6 @@ $(document).ready(function () {
 });
 
 function init(data) {
-    $("#loadMessage").hide();
-    $("#loaded").show();
     processData(data);
     $("h4.collapse").click(function () {
         $(this).next().slideToggle();
@@ -64,7 +63,11 @@ function callbackAllGames(data) {
 
 function createButton(config, fn, ...args) {
     let button = $("<button/>");
-    button.text(config.text);
+    if (config.text) {
+        button.text(config.text);
+    } else if (config.html) {
+        button.html(config.html);
+    }
     button.addClass(config.class);
     button.on('click', function () {
         if (confirm(config.confirm)) {
@@ -86,23 +89,23 @@ function callbackAdmin(data) {
         let nameCell = $("<td/>").text(value.name);
         let onlineCell = $("<td/>").text(moment(value.lastOnline).tz("UTC").format("D-MMM-YY HH:mm z"));
         let removeJudgeButton = value.judge ? createButton({
-            text: "Remove",
-            class: "btn btn-primary",
+            html: '<i class="bi bi-x"></i>',
+            class: "btn btn-outline-secondary btn-sm",
             confirm: "Are you sure you want to remove this role?"
         }, DS.setJudge, value.name, false) : "";
-        let judgeCell = $("<td/>").append(removeJudgeButton);
+        let judgeCell = $("<td/>").addClass("text-center").append(removeJudgeButton);
         let removeSuperButton = value.superUser ? createButton({
-            text: "Remove",
-            class: "btn btn-primary",
+            html: '<i class="bi bi-x"></i>',
+            class: "btn btn-outline-secondary btn-sm",
             confirm: "Are you sure you want to remove this role?"
         }, DS.setSuperUser, value.name, false) : "";
-        let superCell = $("<td/>").append(removeSuperButton);
+        let superCell = $("<td/>").addClass("text-center").append(removeSuperButton);
         let removeAdminButton = value.admin ? createButton({
-            text: "Remove",
-            class: "btn btn-primary",
+            html: '<i class="bi bi-x"></i>',
+            class: "btn btn-outline-secondary btn-sm",
             confirm: "Are you sure you want to remove this role?"
         }, DS.setAdmin, value.name, false) : "";
-        let adminCell = $("<td/>").append(removeAdminButton);
+        let adminCell = $("<td/>").addClass("text-center").append(removeAdminButton);
         playerRow.append(nameCell, onlineCell, judgeCell, superCell, adminCell);
         userRoles.append(playerRow);
     })
@@ -126,7 +129,7 @@ function callbackAdmin(data) {
         let modernDeckCell = $("<td/>").text(value.modernDeckCount);
         let deletePlayerButton = value.activeGamesCount === 0 ? createButton({
             text: "Remove",
-            class: "btn btn-primary",
+            class: "btn btn-outline-secondary btn-sm",
             confirm: "Are you sure you want to remove this player?"
         }, DS.deletePlayer, value.name) : "";
         let deleteCell = $("<td/>").append(deletePlayerButton);
@@ -163,7 +166,7 @@ function callbackAdmin(data) {
                 let endGameCell = $("<td/>").attr('rowspan', playerCount);
                 let endGameButton = createButton({
                     text: "Close",
-                    class: "btn btn-primary",
+                    class: "btn btn-outline-secondary btn-sm",
                     confirm: "Are you sure you want to end this game?"
                 }, DS.endGame, game.gameName);
                 endGameCell.append(endGameButton);
@@ -210,12 +213,7 @@ function callbackLobby(data) {
     let playerList = $("#playerList");
     let invitedGames = $("#invitedGames");
     let invitedGamesList = $("#invitedGamesList");
-    let mydeckList = $("#mydeckList");
-    if (data.message) {
-        $("#registerResult").text(data.message).addClass("label label-light");
-    } else {
-        $("#registerResult").empty().removeClass("label label-light");
-    }
+    let myDeckList = $("#myDeckList");
 
     playerList.autocomplete({
         source: data.players,
@@ -228,39 +226,31 @@ function callbackLobby(data) {
 
     currentGames.empty();
     myGameList.empty();
-    let myGamesOption = '';
     $.each(data.myGames, function (index, game) {
-        myGamesOption += '<option value="' + game.name + '">' + game.name + '</option>';
-        let headerRow = $("<tr/>");
-        let gameHeader = $("<th/>").text(game.name);
-        let startHeader = $("<th/>");
-        if (game.gameStatus === 'Inviting') {
-            let startButton = $("<button/>").addClass("btn btn-primary").text("Start").click(function () {
-                if (confirm("Start game?")) {
-                    DS.startGame(game.name, {callback: processData, errorHandler: errorhandler});
-                }
-            });
-            startHeader.append(startButton);
-        }
-        let endButton = $("<button/>").addClass("btn btn-primary").text("Close").click(function () {
-            if (confirm("End game?")) {
-                DS.endGame(game.name, {callback: processData, errorHandler: errorhandler});
-            }
-        });
-        startHeader.append(endButton);
-        headerRow.append(gameHeader);
-        headerRow.append(startHeader);
-        currentGames.append(headerRow);
+        myGameList.append(new Option(game.name, game.name));
+        let gameItem = $("<li/>").addClass("list-group-item");
+        let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
+        let gameName = $("<h6/>").addClass("d-inline").text(game.name);
+        let startButton = game.gameStatus === 'Inviting' ? createButton({text: "Start", class: "btn btn-outline-secondary btn-sm", confirm: "Start Game?"}, DS.startGame, game.name) : "";
+        let endButton = createButton({text: "Close", class: "btn btn-outline-secondary btn-sm", confirm: "End Game?"}, DS.endGame, game.name);
+        let buttonWrapper = $("<span/>").addClass("d-flex justify-content-between align-items-center gap-1");
+        let playerTable = $("<table/>").addClass("table table-bordered table-sm table-hover mt-2");
+        let tableBody = $("<tbody/>");
+        buttonWrapper.append(startButton, endButton);
+        playerTable.append(tableBody);
+        gameHeader.append(gameName, buttonWrapper);
+        gameItem.append(gameHeader, playerTable);
+        currentGames.append(gameItem);
         $.each(game.registrations, function (i, registration) {
             let registrationRow = $("<tr/>");
-            let player = $("<td/>").text(registration.player);
+            let player = $("<td/>").addClass("w-25").text(registration.player);
             registrationRow.append(player);
-            let summary = $("<td/>").text(registration.deckSummary);
+            let summary = $("<td/>").addClass("w-75").text(registration.deckSummary);
             if (registration.registered && !registration.valid) {
-                summary.append($('<span/>').addClass("label label-warning left-margin").text('Invalid'));
+                summary.append($('<span/>').addClass("badge text-bg-warning").text('Invalid'));
             }
             registrationRow.append(summary);
-            currentGames.append(registrationRow);
+            playerTable.append(registrationRow);
         });
 
         $.each(game.players, function (i, playerStatus) {
@@ -269,74 +259,87 @@ function callbackLobby(data) {
             let pool = $("<td/>").text(playerStatus.pool + " pool");
             playerRow.append(playerName);
             playerRow.append(pool);
-            currentGames.append(playerRow);
+            playerTable.append(playerRow);
         })
     });
-    myGameList.append(myGamesOption);
 
     publicGames.empty();
     $.each(data.publicGames, function (index, game) {
         let created = moment(game.created).tz("UTC");
         let expiry = created.add(5, 'days');
-        let headerRow = $("<tr/>");
-        let gameHeader = $("<th/>").text(game.name);
-        let joinHeader = $("<th/>");
+        let gameItem = $("<li/>").addClass("list-group-item");
+        let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
+        let gameName = $("<h6/>").addClass("d-inline").text(game.name);
+        let expiryText = $("<span/>").text("Closes " + moment().to(expiry));
+        let buttonWrapper = $("<span/>").addClass("d-flex justify-content-between align-items-center gap-1");
         let joinButton = createButton({
-            class: "btn btn-primary",
+            class: "btn btn-outline-secondary btn-sm",
             text: "Join",
             confirm: "Join Game?"
         }, DS.invitePlayer, game.name, player);
-        let expiryText = $("<span/>").text("Closes " + moment().to(expiry));
-        joinHeader.append(expiryText, joinButton);
-        headerRow.append(gameHeader);
-        headerRow.append(joinHeader);
-        publicGames.append(headerRow);
-        $.each(game.registrations, function (i, registration) {
-            let registrationRow = $("<tr/>");
-            let playerCell = $("<td/>").text(registration.player);
-            if (registration.player === player) {
-                joinButton.hide();
-                let leaveButton = createButton({
-                    class: "btn btn-primary",
-                    text: "Leave",
-                    confirm: "Leave Game?"
-                }, DS.unInvitePlayer, game.name, player);
-                joinHeader.append(leaveButton);
-            }
-            registrationRow.append(playerCell);
-            let summary = $("<td/>").text(registration.deckSummary);
-            if (!registration.valid && registration.registered) {
-                summary.append($('<label/>').addClass("label-invalid").text('Invalid'));
-            }
-            registrationRow.append(summary);
-            publicGames.append(registrationRow);
-        });
+
+        buttonWrapper.append(expiryText, joinButton);
+        gameHeader.append(gameName, buttonWrapper);
+        gameItem.append(gameHeader);
+        publicGames.append(gameItem);
+        if (game.registrations.length > 0)
+        {
+            let playerTable = $("<table/>").addClass("table table-bordered table-sm table-hover mt-2");
+            let tableBody = $("<tbody/>");
+            playerTable.append(tableBody);
+            gameItem.append(playerTable);
+            $.each(game.registrations, function (i, registration) {
+                let registrationRow = $("<tr/>");
+                let playerCell = $("<td/>").addClass("w-50").text(registration.player);
+                if (registration.player === player) {
+                    let leaveButton = registration.player === player ? createButton({
+                        class: "btn btn-outline-secondary btn-sm",
+                        text: "Leave",
+                        confirm: "Leave Game?"
+                    }, DS.unInvitePlayer, game.name, player) : "";
+                    buttonWrapper.append(leaveButton);
+                }
+                registrationRow.append(playerCell);
+                let summary = $("<td/>").addClass("w-50 text-center")
+                if (registration.registered) {
+                    summary.text("Registered");
+                }
+                if (!registration.valid && registration.registered) {
+                    summary.append($('<span/>').addClass("badge text-bg-warning pl-1").text('Invalid'));
+                }
+                registrationRow.append(summary);
+                tableBody.append(registrationRow);
+            });        }
     })
 
     invitedGames.empty();
     invitedGamesList.empty();
-    let invitedGamesOption = '';
     $.each(data.invitedGames, function (index, game) {
-        let gameRow = $("<tr/>");
-        let gameName = $("<td/>").text(game.gameName);
-        let deckSummary = $("<td/>").text(game.deckSummary);
+        let gameItem = $("<li/>").addClass("list-group-item");
+        let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
+        let gameName = $("<span/>").text(game.gameName);
+        let deckSummary = $("<span/>").text(game.deckSummary);
         if (game.registered && !game.valid) {
             let errorMessage = $("<span/>").addClass("label label-warning left-margin").text("Invalid");
             deckSummary.append(errorMessage);
         }
-        gameRow.append(gameName);
-        gameRow.append(deckSummary);
-        invitedGames.append(gameRow);
-        invitedGamesOption += '<option value="' + game.gameName + '">' + game.gameName + '</option>';
+        gameHeader.append(gameName, deckSummary);
+        gameItem.append(gameHeader);
+        invitedGames.append(gameItem);
+        invitedGamesList.append(new Option(game.gameName, game.gameName));
     });
-    invitedGamesList.append(invitedGamesOption);
 
-    mydeckList.empty();
-    let deckListOption = '';
+    myDeckList.empty();
     $.each(data.decks, function (index, deck) {
-        deckListOption += '<option value="' + deck.name + '">' + deck.name + '</option>';
+        myDeckList.append(new Option(deck.name, deck.name));
     })
-    mydeckList.append(deckListOption);
+
+    // Registration Result
+    let registerResult = $("#registerResult");
+    registerResult.empty();
+    if (data.message) {
+        registerResult.text(data.message).addClass("badge text-bg-light");
+    }
 
 }
 
@@ -383,7 +386,10 @@ function registerforTournament() {
     let tournamentRound1 = $("#tournamentRound1").val();
     let tournamentRound2 = $("#tournamentRound2").val();
     let tournamentRound3 = $("#tournamentRound3").val();
-    DS.registerTournamentDeck(tournamentRound1, tournamentRound2, tournamentRound3, {callback: processData, errorHandler: errorhandler});
+    DS.registerTournamentDeck(tournamentRound1, tournamentRound2, tournamentRound3, {
+        callback: processData,
+        errorHandler: errorhandler
+    });
 }
 
 function callbackProfile(data) {
@@ -415,20 +421,22 @@ function callbackShowDecks(data) {
     decks.empty();
     $.each(data.decks, function (index, deck) {
         const deckRow = $("<tr/>");
-        const deckName = $("<td/>").text(deck.name);
-        const formatLabel = $("<span/>").text(deck.deckFormat).addClass("label float-right label-small");
-        deckName.click(function () {
+        const deckCell = $("<td/>").addClass("d-flex justify-content-between align-items-center");
+        const deckName = $("<span/>").text(deck.name).click(function () {
             DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
-        })
-        const deleteButton = $("<button/>").addClass("btn btn-warning btn-sm float-right left-margin").text("✗").click(function (event) {
+        });
+        const formatLabel = $("<span/>").text(deck.deckFormat).addClass("badge");
+        let formatStyle = deck.deckFormat === "MODERN" ? "text-bg-secondary" : "text-bg-warning";
+        formatLabel.addClass(formatStyle)
+        const deleteButton = $("<button/>").addClass("btn btn-sm btn-outline-secondary border p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
             if (confirm("Delete deck?")) {
                 DS.deleteDeck(deck.name, {callback: processData, errorHandler: errorhandler});
             }
             event.stopPropagation();
         });
-        deckName.append(deleteButton);
-        deckName.append(formatLabel);
-        deckRow.append(deckName);
+        let wrapper = $("<span/>").addClass("d-flex gap-1 align-items-center").append(formatLabel, deleteButton);
+        deckCell.append(deckName, wrapper);
+        deckRow.append(deckCell);
         decks.append(deckRow);
     });
     const deckText = $("#deckText");
@@ -438,13 +446,14 @@ function callbackShowDecks(data) {
     const deckName = $("#deckName");
     if (data.selectedDeck) {
         deckText.val(data.selectedDeck.contents);
-        deckSummary.text(data.selectedDeck.details['stats']['summary']);
+        deckSummary.empty();
+        deckSummary.append($("<span/>").text(data.selectedDeck.details['stats']['summary']));
         deckName.val(data.selectedDeck.details.deck['name']);
-        let validSpan = $("<span/>").addClass("label label-small left-margin");
+        let validSpan = $("<span/>").addClass("badge badge-sm");
         if (data.selectedDeck.details['stats']['valid']) {
-            validSpan.text("VALID").addClass("label-success")
+            validSpan.text("VALID").addClass("text-bg-success")
         } else {
-            validSpan.text("INVALID").addClass("label-warning");
+            validSpan.text("INVALID").addClass("text-bg-warning");
         }
         deckSummary.append(validSpan);
         deckErrors.html(data.selectedDeck.details.deck.comments.replace(/\n/g, "<br/>"));
@@ -459,19 +468,16 @@ function callbackShowDecks(data) {
 }
 
 function callbackShowGameDeck(data) {
-    renderDeck(data, "#gameDeckOutput");
-    addCardTooltips("#gameDeckOutput");
+    renderDeck(data, "#gameDeck");
+    addCardTooltips("#gameDeck");
 }
 
 function callbackMain(data) {
-    let timestamp = moment(data.stamp).tz("UTC").format("D-MMM HH:mm z");
-    let userTimestamp = moment(data.stamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
-    $('#chatstamp').text(timestamp).attr("title", userTimestamp);
     if (data.loggedIn) {
-        renderOnline('whoson', data.who);
+        renderOnline('onlinePlayers', data.who);
         renderGlobalChat(data.chat);
-        renderMyGames(data.games);
-        $("#message").html(data.message)
+        renderMyGames("#myGames", data.games);
+        renderMyGames("#oustedGames", data.ousted);
         $("#globalMessage").val(data.message);
         if (refresher) clearTimeout(refresher);
         refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
@@ -535,7 +541,7 @@ function toggleVisible(s, h) {
 }
 
 function doGlobalChat() {
-    let chatInput = $("#gchat");
+    let chatInput = $("#globalChat");
     let chatLine = chatInput.val();
     chatInput.val('');
     if (chatLine === "") {
@@ -547,6 +553,7 @@ function doGlobalChat() {
 function doNav(target) {
     $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
     if (refresher) clearTimeout(refresher);
+    scrollChat = true;
     DS.navigate(target, {callback: processData, errorHandler: errorhandler});
     return false;
 }
@@ -572,6 +579,7 @@ function renderGameButtons(data) {
     let buttonsDiv = $("#gameButtons");
     let newActivity = false;
     $.each(data, function (key, value) {
+        let li = $("<li/>");
         let button = $("<a/>").addClass("dropdown-item").text(value).click(key, function () {
             DS.navigate(key, {callback: processData, errorHandler: errorhandler});
             $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
@@ -579,7 +587,8 @@ function renderGameButtons(data) {
         if (game === value || currentPage.toLowerCase() === key.toLowerCase()) {
             button.addClass("active");
         }
-        buttonsDiv.append(button);
+        li.append(button);
+        buttonsDiv.append(li);
         $('#gameButtonsNav').show();
         if (value.indexOf('*') > -1) newActivity = true;
     });
@@ -623,7 +632,6 @@ function renderGameChat(data) {
             playerLabel = $('<b/>').text(player)[0].outerHTML;
             line = line.slice(player.length + 3); //3 for [] and space
         }
-        //let lineElement = $('<p/>').addClass('chat').html(timeSpan[0].outerHTML + ' ' + line);
         let lineElement = $('<p/>').addClass('chat').append(timeSpan, ' ', playerLabel, ' ', line);
         container.append(lineElement);
     });
@@ -636,9 +644,7 @@ function renderGlobalChat(data) {
         return;
     }
     let container = $("#globalChatOutput");
-    let contentHt0 = container.prop("scrollHeight");
     // Only scroll to bottom if scrollbar is at bottom (has not been scrolled up)
-    let scrollToBottom = isScrolledToBottom(container);
 
     $.each(data, function (index, chat) {
         let day = moment(chat.timestamp).tz("UTC").format("D MMMM");
@@ -665,46 +671,37 @@ function renderGlobalChat(data) {
     });
     addCardTooltips("#globalChatOutput");
 
-    if (scrollToBottom) {
-        $('#newChatAlert').hide();
+    if (scrollChat) {
         scrollBottom(container);
-    } else if (container.prop("scrollHeight") !== contentHt0) {
-        $('#newChatAlert').show();
+        scrollChat = false;
     }
 }
 
-function renderMyGames(games) {
-    let ownGames = $("#ownGames");
+function renderMyGames(id, games) {
+    let ownGames = $(id);
     ownGames.empty();
     $.each(games, function (index, game) {
         let gameRow = $("<tr/>");
-        let gameLink = $("<td/>");
-        let status = $("<td/>");
-        gameLink.html(renderGameLink(game));
-        if (game.pinged) {
-            status.text("!");
-        } else if (!game.current) {
-            status.text("*");
-        }
+        let gameCell = $("<td/>").addClass("w-75").text(game.gameName).on('click', function () {
+            doNav("g" + game.gameName);
+        });
+        let statusCell = $("<td/>").addClass("text-center w-25").html(game.pinged ? "<i class='bi-exclamation-triangle'></i>" : !game.current ? "<i class='bi-bell'></i>" : "");
+        gameRow.append(gameCell, statusCell);
         if (game.turn) {
-            gameRow.addClass("active");
+            gameCell.addClass("fw-bold bg-success-subtle border border-success-subtle");
+            statusCell.addClass("bg-success-subtle border border-success-subtle");
         }
         if (game.flagged) {
-            gameRow.addClass("flagged");
+            gameRow.find("td").addClass("bg-warning-subtle");
         }
-        if (game.ousted) {
-            gameRow.addClass("ousted");
-        }
-        gameRow.append(gameLink);
-        gameRow.append(status);
         ownGames.append(gameRow);
     });
 }
 
 function renderGameLink(game) {
-    return '<a onclick="doNav(' + "'g" + game.gameName + "');" + '">'
-        + game.gameName
-        + "</a>";
+    return $("<a/>").text(game.gameName).on('click', function () {
+        doNav("g" + game.gameName);
+    });
 }
 
 function renderOnline(div, who) {
@@ -714,16 +711,16 @@ function renderOnline(div, who) {
         return;
     }
     $.each(who, function (index, player) {
-        let playerSpan = $("<span/>").text(player.name).addClass("label");
+        let playerSpan = $("<span/>").text(player.name).addClass("badge mb-1");
         if (player.superUser) {
-            playerSpan.addClass("label-dark");
+            playerSpan.addClass("text-bg-secondary");
         } else if (player.admin) {
-            playerSpan.addClass("label-warning");
+            playerSpan.addClass("text-bg-warning");
         } else {
-            playerSpan.addClass("label-light")
+            playerSpan.addClass("text-bg-light border border-secondary-subtle")
         }
         if (player.judge) {
-            playerSpan.addClass("label-bold");
+            playerSpan.addClass("border border-2 border-dark border-dotted");
         }
         container.append(playerSpan);
         container.append(" ");
@@ -737,10 +734,8 @@ function renderActiveGames(games) {
         let gameRow = $("<tr/>");
         let gameLink = $("<td/>").html(renderGameLink(game));
         let turn = $("<td/>").text(game.turn);
-        let owner = $("<td/>").text(game.owner);
-        gameRow.append(gameLink);
-        gameRow.append(turn);
-        gameRow.append(owner);
+        let timestamp = $("<td/>").text(moment(game.timestamp).tz("UTC").format("D-MMM HH:mm z"));
+        gameRow.append(gameLink, turn, timestamp);
         activeGames.append(gameRow);
     });
 }
@@ -798,12 +793,16 @@ function navigate(data) {
         $("#gameRow").show();
         player = data.player;
     }
+    $("#message").html(data.message)
+    let timestamp = moment(data.stamp).tz("UTC").format("D-MMM HH:mm z");
+    let userTimestamp = moment(data.stamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
+    $('#timeStamp').text(timestamp).attr("title", userTimestamp);
     renderDesktopViewButton();
 }
 
 function registerDeck() {
     let regGame = $("#invitedGamesList").val();
-    let regDeck = $("#mydeckList").val();
+    let regDeck = $("#myDeckList").val();
     DS.registerDeck(regGame, regDeck, {callback: processData, errorHandler: errorhandler});
 }
 
@@ -835,20 +834,14 @@ function refreshState(force) {
     DS.getState(game, force, {callback: processData, errorHandler: errorhandler});
 }
 
-function doToggle(thistag) {
-    let region = $("#region" + thistag);
-    let regionToggle = region.find("i.toggle");
-    if (region.css("display") === 'none') {
-        region.show();
-        regionToggle.text("-");
-    } else {
-        region.hide();
-        regionToggle.text("+");
+function doToggle(tag) {
+    if (document.getElementById(tag)) {
+        new bootstrap.Collapse('#' + tag);
     }
 }
 
 function doShowDeck() {
-    if ($("#gameDeckOutput").html() === "")
+    if ($("#gameDeck").html() === "")
         DS.getGameDeck(game, {callback: callbackShowGameDeck, errorHandler: errorhandler});
 }
 
@@ -918,118 +911,54 @@ function sendPrivateNotes() {
     return false;
 }
 
-function setOther(newOption) {
-    currentOption = newOption;
-    switch (currentOption) {
-        case "notes":
-            showNotes();
-            break;
-        case "history":
-            showHistory();
-            break;
-        case "deck":
-            showGameDeck();
-            break;
-    }
-}
-
-function otherClicked(event) {
-    setOther($(event.target).data('target'));
-    event.preventDefault();
-}
-
-function showGameDeck() {
-    $("#gameDeck").show();
-    $("#notes").hide();
-    $("#history").hide();
-    doShowDeck();
-}
-
-function showNotes() {
-    $("#notes").show();
-    $("#history").hide();
-    $("#gameDeck").hide();
-}
-
-function showHistory() {
-    $("#history").show();
-    $("#notes").hide();
-    $("#gameDeck").hide();
-    if ($("#historyOutput").html() === '')
-        getHistory();
-}
-
-let lastPrivateNotesFromServer;
-
 function loadGame(data) {
-    //Reset on game change
+    // //Reset on game change
     const gameTitle = $("#gameTitle");
     if (gameTitle.text() !== data.name) {
         $("#ping").empty();
         gameChatLastDay = null;
     }
-
     gameTitle.text(data.name);
+    $("#gameLabel").text(data.label);
+
+    // Phases
+    let phaseSelect = $("#phase");
+    let endTurn = $("#endTurn");
+    if (data.phases !== null) {
+        phaseSelect.empty();
+        phaseSelect.removeAttr('disabled');
+        endTurn.removeAttr('disabled');
+
+        if (phaseSelect.children('option').length !== data.phases.length) {
+            $.each(data.phases, function (index, value) {
+                phase.append(new Option(value, value));
+            });
+        }
+        if (data.phase) {
+            phaseSelect.val(data.phase);
+        }
+    }
     if (!data.player) {
+        $("#gameForm :input").attr('disabled', true);
         $(".player-only").hide();
+        phaseSelect.attr('disabled', true);
+        endTurn.attr('disabled', true);
     } else {
+        $("#gameForm :input").removeAttr('disabled');
         $(".player-only").show();
     }
-    const gameLog = $("#gameChatOutput");
-    const privateNotes = $("#privateNotes");
-    if (data.resetChat) {
-        gameLog.empty();
-        $("#historyOutput").empty();
-        $("#gameDeckOutput").empty();
-        $("#globalNotes").empty();
-        privateNotes.empty();
-        $("#chat").empty();
-        $("#command").empty();
-        currentOption = "notes";
-        gameChatLastDay = null;
-        lastPrivateNotesFromServer = null;
-    }
-    if (!data.player && !data.judge) {
-        $(".reactive-height").addClass("half-height").removeClass("full-height");
-        $(".reactive-height-content").addClass("half-height-content").removeClass("full-height-content");
-        $(".reactive-height-content-header").addClass("half-height-content-header").removeClass("full-height-content-header");
-    } else {
-        $(".reactive-height").addClass("full-height").removeClass("half-height");
-        $(".reactive-height-content").addClass("full-height-content").removeClass("half-height-content");
-        $(".reactive-height-content-header").addClass("full-height-content-header").removeClass("half-height-content-header");
-    }
-    setOther(currentOption);
-    if (data.hand !== null) {
-        $("#hand").html(data.hand);
-    }
-    if (data.state !== null) {
-        $("#state").html(data.state);
-    }
-    if (data.global !== null) {
-        $("#globalNotes").val(data.global);
-    }
-    //Only clobber your private notes with the server's if something has changed,
-    //like another player has shown you some cards.
-    if (data.text !== null && data.text !== lastPrivateNotesFromServer) {
-        privateNotes.val(data.text);
-        lastPrivateNotesFromServer = data.text;
-    }
-    if (data.label !== null) {
-        $("#gameLabel").text(data.label);
-    }
-    let fetchFullLog = false;
-    if (data.logLength !== null) {
-        let myLogLength = gameLog.children().length
-            + (data.turn == null ? 0 : data.turn.length);
-        fetchFullLog = myLogLength < data.logLength;
-    }
-    //If we're missing any messages from the log, skip adding this batch and
-    //get a full refresh from server to prevent new messages appearing in the
-    //past, where they are likely to be missed.
-    if (data.turn !== null && !fetchFullLog) {
-        renderGameChat(data.turn);
+
+    if (player !== data.currentPlayer) {
+        phaseSelect.attr('disabled', true);
+        endTurn.attr('disabled', true);
     }
 
+    if (data.judge) {
+        $("#chat").removeAttr('disabled');
+        $("#gameSubmit").removeAttr('disabled');
+    }
+
+    // Pings
     if (data.ping !== null) {
         let pingSelect = $("#ping");
 
@@ -1050,41 +979,75 @@ function loadGame(data) {
             if (pinged) option.addClass('pinged');
         });
     }
+
+    let chat = $("#chat");
+    let command = $("#command");
+    let gameChatOutput = $("#gameChatOutput");
+    let gameHistory = $("gameHistory");
+    let gameDeck = $("#gameDeck");
+    let globalNotes = $("#globalNotes");
+    let privateNotes = $("#privateNotes");
+
+    // Chat Log
+    if (data.resetChat) {
+        gameChatOutput.empty();
+        gameHistory.empty();
+        gameDeck.empty();
+        globalNotes.val("");
+        privateNotes.val("");
+        chat.empty();
+        command.empty();
+        currentOption = "notes";
+        gameChatLastDay = null;
+    }
+    let fetchFullLog = false;
+    if (data.logLength !== null) {
+        let myLogLength = gameChatOutput.children().length + (data.turn == null ? 0 : data.turn.length);
+        fetchFullLog = myLogLength < data.logLength;
+    }
+    //If we're missing any messages from the log, skip adding this batch and
+    //get a full refresh from server to prevent new messages appearing in the
+    //past, where they are likely to be missed.
+    if (data.turn !== null && !fetchFullLog) {
+        renderGameChat(data.turn);
+        addCardTooltips("#gameChatOutput");
+    }
+
+    // Global Notes
+    if (data.globalNotes) {
+        globalNotes.val(data.globalNotes);
+    }
+
+    //Only clobber your private notes with the server's if something has changed,
+    //like another player has shown you some cards.
+    if (data.privateNotes) {
+        privateNotes.val(data.privateNotes);
+    }
+
     if (data.turns !== null) {
-        let turnSelect = $("#turns");
+        let turnSelect = $("#historySelect");
         turnSelect.empty();
         data.turns.shift();
         $.each(data.turns, function (index, turn) {
             turnSelect.append($(new Option(turn, turn)));
         });
     }
-    if (data.phases !== null) {
-        $("#phaseCommand").show();
-        $("#endCommand").show();
 
-        let phaseSelect = $("#phase");
-        if (phaseSelect.children('option').length !== data.phases.length) {
-            phaseSelect.empty();
-            $.each(data.phases, function (index, value) {
-                phase.append(new Option(value, value));
-            });
-        }
-        if (data.turnChanged) {
-            phaseSelect.val("Unlock");
-        }
-    } else {
-        $("#phaseCommand").hide();
-        $("#endCommand").hide();
+    // Render state
+    if (data.state !== null) {
+        $("#state").html(data.state);
+        addCardTooltips("#state");
     }
-    if (data.collapsed !== null) {
-        for (let c in data.collapsed) {
-            doToggle(data.collapsed[c]);
-        }
-    }
-    addCardTooltips("#game");
 
+    // Render hand
+    if (data.hand !== null) {
+        $("#hand").html(data.hand);
+        addCardTooltips("#hand");
+    }
+
+    // Setup polling
+    if (refresher) clearTimeout(refresher);
     if (data.refresh > 0 || fetchFullLog) {
-        if (refresher) clearTimeout(refresher);
 
         //If we're missing anything from the log, fetch the whole thing from
         //server immediately
@@ -1097,6 +1060,7 @@ function loadGame(data) {
         }
         refresher = setTimeout("refreshState(" + fetchFullLog + ")", timeout);
     }
+
 }
 
 function addCardTooltips(parent) {
@@ -1110,15 +1074,31 @@ function addCardTooltips(parent) {
     tippy(linkSelector, {
         animateFill: false,
         hideOnClick: false,
-        flipOnUpdate: true,
         placement: 'auto',
-        boundary: 'viewport',
+        allowHTML: true,
+        appendTo: () => document.body,
+        popperOptions: {
+            strategy: 'fixed',
+            modifiers: [
+                {
+                    name: 'flip',
+                    options: {
+                        fallbackPlacements: ['bottom', 'right'],
+                    },
+                },
+                {
+                    name: 'preventOverflow',
+                    options: {
+                        altAxis: true,
+                        tether: false,
+                    },
+                },
+            ],
+        },
         interactive: true,
         theme: 'light',
         onShow: function (instance) {
-            //HACK To workaround the "sticky" / duplicate popups
-            tippy.hideAll({duration: 0});
-
+            tippy.hideAll({exclude: instance});
             instance.setContent("Loading...");
             let ref = $(instance.reference);
             let cardId = ref.data('card-id');
@@ -1138,27 +1118,31 @@ function addCardTooltips(parent) {
 }
 
 function details(tag) {
+    tippy.hideAll({duration: 0});
+    if (refresher) clearTimeout(refresher);
     DS.doToggle(game, tag, {callback: processData, errorHandler: errorhandler});
-    doToggle(tag);
 }
 
 function showStatus(data) {
-    $('#status').html(data)
+    if (data !== "") {
+        $("#gameStatusMessage").html(data);
+        bootstrap.Toast.getOrCreateInstance($("#liveToast")).show();
+    }
 }
 
 function getHistory() {
-    let turns = $('#turns').val();
+    let turns = $('#historySelect').val();
     DS.getHistory(game, turns, {callback: loadHistory, errorHandler: errorhandler});
 }
 
 function loadHistory(data) {
-    let historyDiv = $("#historyOutput");
+    let historyDiv = $("#gameHistory");
     historyDiv.empty();
     $.each(data, function (index, content) {
         let turnContent = $("<p/>").addClass("chat").html(content);
         historyDiv.append(turnContent);
     });
-    addCardTooltips("#historyOutput");
+    addCardTooltips("#gameHistory");
 }
 
 function updateProfileErrorHandler() {

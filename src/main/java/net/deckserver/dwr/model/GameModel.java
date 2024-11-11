@@ -40,21 +40,24 @@ public class GameModel implements Comparable<GameModel> {
     public synchronized String chat(String player, String chat) {
         JolAdmin admin = JolAdmin.INSTANCE;
         JolGame game = admin.getGame(name);
-        if (getPlayers().contains(player) || !admin.isJudge(player)) {
+        boolean isJudge = admin.isJudge(player) && !getPlayers().contains(player);
+        if (!getPlayers().contains(player) && !isJudge) {
             return "Not authorized";
         }
         DoCommand commander = new DoCommand(game);
         int idx = game.getActions(game.getCurrentTurn()).length;
-        String status = commander.doMessage(player, chat);
+        String status = commander.doMessage(player, chat, isJudge);
         addChats(idx);
         admin.saveGameState(game);
         return status;
     }
 
     public synchronized String submit(String player, String phase, String command, String chat,
-                                      String ping, String endTurn, String global, String text) {
+                                      String ping, String endTurn, String globalNotes, String privateNotes) {
         JolAdmin admin = JolAdmin.INSTANCE;
-        if (!getPlayers().contains(player) && !admin.getOwner(name).equals(player)) {
+        // Only players and judges can issue commands.  A judge can't be a player
+        boolean isJudge = admin.isJudge(player) && !getPlayers().contains(player);
+        if (!getPlayers().contains(player) && !isJudge) {
             return "Not authorized";
         }
         JolGame game = admin.getGame(name);
@@ -70,6 +73,7 @@ public class GameModel implements Comparable<GameModel> {
             if (ping != null) {
                 if (admin.pingPlayer(ping, name)) {
                     status.append("Ping sent to ").append(ping);
+                    stateChanged = true;
                 } else status.append("Player is already pinged");
             }
             if (phase != null &&
@@ -78,19 +82,20 @@ public class GameModel implements Comparable<GameModel> {
                 game.setPhase(phase);
                 phaseChanged = true;
             }
-            if (global != null) {
-                if (global.length() > 800)
-                    global = global.substring(0, 799);
-                if (!global.equals(game.getGlobalText())) {
-                    game.setGlobalText(global);
+            if (globalNotes != null) {
+                if (globalNotes.length() > 800)
+                    globalNotes = globalNotes.substring(0, 799);
+                if (!globalNotes.equals(game.getGlobalText())) {
+                    game.setGlobalText(globalNotes);
                     globalChanged = true;
                 }
             }
-            if (text != null) {
-                if (text.length() > 800)
-                    text = text.substring(0, 799);
-                if (!text.equals(game.getPlayerText(player))) {
-                    game.setPlayerText(player, text);
+            if (privateNotes != null) {
+                logger.info("New Private notes value of {}", privateNotes);
+                if (privateNotes.length() > 800)
+                    privateNotes = privateNotes.substring(0, 799);
+                if (!privateNotes.equals(game.getPlayerText(player))) {
+                    game.setPrivateNotes(player, privateNotes);
                     privateNotesChanged = true;
                 }
             }
@@ -114,7 +119,7 @@ public class GameModel implements Comparable<GameModel> {
                 }
                 if (chat != null) {
                     didChat = true;
-                    status.append(commander.doMessage(player, chat));
+                    status.append(commander.doMessage(player, chat, isJudge));
                     chatChanged = true;
                 }
                 OffsetDateTime timestamp = OffsetDateTime.now();

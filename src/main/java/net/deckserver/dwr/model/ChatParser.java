@@ -39,7 +39,7 @@ public class ChatParser {
             for (int x = 1; x <= matcher.groupCount(); x++) {
                 String match = matcher.group(x).trim().replaceAll("&#39;", "'").replaceAll("&#34;", "\"");
                 try {
-                    CardSearch.INSTANCE.findCardExact(match).ifPresent(card -> matcher.appendReplacement(sb, generateCardLink(card)));
+                     CardSearch.INSTANCE.findCardExact(match).ifPresent(card -> matcher.appendReplacement(sb, generateCardLink(card)));
                 } catch (IllegalArgumentException e) {
                     // do nothing
                 }
@@ -102,11 +102,11 @@ public class ChatParser {
     }
 
     private static String generateCardLink(CardSummary card) {
-        return "<a class='card-name' data-card-id='" + card.getId() + "'>" + card.getDisplayName() + (card.isAdvanced() ? " <i class='adv'/>" : "") + "</a>";
+        return "<a class='card-name' data-card-id='" + card.getId() + "'>" + card.getDisplayName() + (card.isAdvanced() ? " <i class='icon adv'/>" : "") + "</a>";
     }
 
     public static String generateDisciplineLink(String discipline) {
-        return "<span class='discipline " + discipline + "'></span>";
+        return "<span class='icon " + discipline + "'></span>";
     }
 
     public static String generateStyle(String text) {
@@ -114,11 +114,11 @@ public class ChatParser {
     }
 
     public static String generateDAction() {
-        return "<span class='discipline D'></span>";
+        return "<span class='icon D'></span>";
     }
 
     public static String generateCost(int cost, String type) {
-        return "Cost: <span class='discipline cost " + type + cost + "'></span>";
+        return "Cost: <span class='icon cost " + type + cost + "'></span>";
     }
 
 }

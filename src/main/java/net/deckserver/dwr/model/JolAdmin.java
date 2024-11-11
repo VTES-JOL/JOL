@@ -58,6 +58,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -117,7 +118,7 @@ public class JolAdmin {
     private Properties properties;
     private Map<OffsetDateTime, GameHistory> pastGames;
     private Map<String, PlayerInfo> players;
-    private Map<String, TournamentRegistration> tournamentRegistrations;
+    private TournamentData tournamentRegistrations;
     private Timestamps timestamps;
     private TypeFactory typeFactory;
     @Getter
@@ -359,6 +360,7 @@ public class JolAdmin {
                 games.put(gameName, new GameInfo(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), GameStatus.STARTING));
                 Path gamePath = BASE_PATH.resolve("games").resolve(gameId);
                 Files.createDirectory(gamePath);
+                writeFile("games.json", games);
             } catch (Exception e) {
                 logger.error("Error creating game", e);
             }
@@ -397,7 +399,7 @@ public class JolAdmin {
         pastGames = readFile("pastGames.json", typeFactory.constructMapType(ConcurrentHashMap.class, OffsetDateTime.class, GameHistory.class));
         players = readFile("players.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, PlayerInfo.class));
         chats = readFile("chats.json", typeFactory.constructCollectionType(List.class, ChatEntryBean.class));
-        tournamentRegistrations = readFile("tournament.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, TournamentRegistration.class));
+        tournamentRegistrations = readFile("tournament.json", typeFactory.constructType(TournamentData.class));
         timestamps = readFile("timestamps.json", typeFactory.constructType(Timestamps.class));
         message = readFile("message.json", typeFactory.constructType(String.class));
         loadRegistrations();
@@ -496,7 +498,6 @@ public class JolAdmin {
     }
 
     public void saveGameState(JolGame game) {
-        logger.info("Saving {}", game.getName());
         timestamps.setGameTimestamp(game.getName());
         String gameId = game.getId();
         Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.xml");
@@ -569,13 +570,36 @@ public class JolAdmin {
                 deckNames.add(deckName);
             }
             registration.setDecks(deckNames);
-            tournamentRegistrations.put(playerName, registration);
+            tournamentRegistrations.getRegistrations().put(playerName, registration);
             writeFile("tournament.json", tournamentRegistrations);
         } catch (IllegalStateException e) {
             logger.error("Error registering tournament deck for {}", playerName, e);
         } finally {
             getPlayerModel(playerName).setMessage(result);
         }
+    }
+
+    public void registerTournamentDeck(String gameName, String playerName, String deckName, int round) {
+        logger.info("Registering {} for {}", playerName, gameName);
+        PlayerInfo playerInfo = players.get(playerName);
+        GameInfo gameInfo = games.get(gameName);
+        String deckId = String.format("%s-%d", playerInfo.getId(), round);
+        Path deckPath = BASE_PATH.resolve("tournaments").resolve(deckId + ".json");
+        assert Files.exists(deckPath);
+        try {
+            Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId()).resolve(deckId + ".json");
+            Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            logger.error("Unable to load deck for {}", deckId, e);
+            throw new RuntimeException(e);
+        }
+        RegistrationStatus registration = new RegistrationStatus();
+        registration.setDeckId(deckId);
+        registration.setDeckName(deckName);
+        registration.setValid(true);
+        registration.setTimestamp(OffsetDateTime.now());
+        registrations.put(gameName, playerName, registration);
+        writeFile("registrations.json", registrations);
     }
 
     public void registerDeck(String gameName, String playerName, String deckName) {
@@ -792,7 +816,7 @@ public class JolAdmin {
         return loadGameInfo(gameName).getVisibility().equals(Visibility.PUBLIC);
     }
 
-    public void startGame(String gameName) {
+    public void startGame(String gameName, List<String> players) {
         GameInfo gameInfo = games.get(gameName);
         DsGame state = new DsGame();
         DsTurnRecorder actions = new DsTurnRecorder();
@@ -800,15 +824,27 @@ public class JolAdmin {
         game.initGame(gameName);
         registrations.row(gameName).forEach((playerName, registration) -> {
             if (registration.getDeckId() != null) {
-                Deck deck = getDeck(registration.getDeckId()).getDeck();
+                Deck deck = getGameDeck(gameName, playerName);
                 game.addPlayer(playerName, deck);
             }
         });
         if (!game.getPlayers().isEmpty() && game.getPlayers().size() <= 5) {
-            game.startGame();
+            game.startGame(players);
             saveGameState(game);
             gameInfo.setStatus(GameStatus.ACTIVE);
         }
+        writeFile("games.json", games);
+    }
+
+    public void startGame(String gameName) {
+        List<String> players = new ArrayList<>();
+        registrations.row(gameName).forEach((playerName, registration) -> {
+            if (registration.getDeckId() != null) {
+                players.add(playerName);
+            }
+        });
+        Collections.shuffle(players, new SecureRandom());
+        startGame(gameName, players);
     }
 
     public void endGame(String gameName) {
@@ -975,13 +1011,28 @@ public class JolAdmin {
     }
 
     public Collection<TournamentRegistration> getTournamentRegistrations() {
-        return tournamentRegistrations.values();
+        return tournamentRegistrations.getRegistrations().values();
     }
 
     public OffsetDateTime getCreatedTime(String gameName) {
         return Optional.ofNullable(games.get(gameName))
                 .map(GameInfo::getCreated)
                 .orElse(null);
+    }
+
+    public void resetView(String playerName) {
+        PlayerModel model = getPlayerModel(playerName);
+        model.resetChats();
+        String currentGame = model.getCurrentGame();
+        if (!Strings.isNullOrEmpty(currentGame)) {
+            getGameModel(currentGame).resetView(playerName);
+        }
+    }
+
+    public boolean isCurrent(String player, String game) {
+        OffsetDateTime playerAccess = timestamps.getPlayerAccess(player, game);
+        OffsetDateTime gameLastUpdated = timestamps.getGameTimestamp(game);
+        return playerAccess.isAfter(gameLastUpdated);
     }
 
     private void loadProperties() {
