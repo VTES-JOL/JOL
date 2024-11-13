@@ -10,6 +10,7 @@ public class ProfileBean {
     private final String email;
     private final String discordID;
     private final String veknID;
+    private final boolean imageTooltipPreference;
 
     public ProfileBean(PlayerModel model) {
         String player = model.getPlayerName();
@@ -17,6 +18,7 @@ public class ProfileBean {
         this.email = jolAdmin.getEmail(player);
         this.discordID = jolAdmin.getDiscordID(player);
         this.veknID = jolAdmin.getVeknID(player);
+        this.imageTooltipPreference = jolAdmin.getImageTooltipPrefence(player);
     }
 
 }

@@ -14,7 +14,8 @@ let DESKTOP_VIEWPORT_CONTENT = 'width=1024';
 let profile = {
     email: "",
     discordID: "",
-    updating: false
+    updating: false,
+    imageTooltipPreference: true
 };
 let scrollChat = true;
 let pointerCanHover = window.matchMedia("(hover: hover)").matches;
@@ -38,6 +39,10 @@ function init(data) {
     $("h4.collapse").click(function () {
         $(this).next().slideToggle();
     })
+}
+
+function setPreferences(value) {
+    profile.imageTooltipPreference = value;
 }
 
 function processData(a) {
@@ -392,6 +397,11 @@ function registerforTournament() {
     });
 }
 
+function setImageTooltip(value) {
+    profile.imageTooltipPreference = value;
+    DS.setUserPreferences(profile.imageTooltipPreference, {callback: processData, errorHandler: errorhandler});
+}
+
 function callbackProfile(data) {
     if (profile.email !== data.email)
         $('#profileEmail').val(data.email);
@@ -406,6 +416,12 @@ function callbackProfile(data) {
         result.css('opacity', 1);
         result.css('color', 'green');
         result.fadeTo(2000, 0);
+    }
+    $("#playerPreferences .form-check-input").prop("checked", false);
+    if (data.imageTooltipPreference) {
+        $("#imageTooltipPreference").prop("checked",true)
+    } else {
+        $("#textTooltipPreference").prop("checked",true)
     }
 
     profile = data;
@@ -670,11 +686,7 @@ function renderGlobalChat(data) {
         globalChatLastDay = day;
     });
     addCardTooltips("#globalChatOutput");
-
-    if (scrollChat) {
-        scrollBottom(container);
-        scrollChat = false;
-    }
+    scrollBottom(container);
 }
 
 function renderMyGames(id, games) {
@@ -866,48 +878,29 @@ function doSubmit() {
     if (endTurn === "Yes") {
         phaseSelect.val("Unlock");
     }
-    DS.submitForm(game, phase, command, chat, ping, endTurn, null, null, {
-        callback: processData,
-        errorHandler: errorhandler
-    });
+    DS.submitForm(game, phase, command, chat, ping, endTurn, {callback: processData, errorHandler: errorhandler});
     return false;
 }
 
 function sendChat(message) {
-    DS.submitForm(
-        game, null, '', message, null, 'No', null, null, {
-            callback: processData,
-            errorHandler: errorhandler
-        });
+    DS.submitForm(game, null, '', message, null, 'No', {callback: processData, errorHandler: errorhandler});
     $('#quickChatModal').modal('hide');
     return false;
 }
 
 function sendCommand(command, message = '') {
-    DS.submitForm(
-        game, null, command, message, null, 'No', null, null, {
-            callback: processData,
-            errorHandler: errorhandler
-        });
+    DS.submitForm(game, null, command, message, null, 'No', {callback: processData, errorHandler: errorhandler});
     $('#quickCommandModal').modal('hide');
     return false;
 }
 
 function sendGlobalNotes() {
-    DS.submitForm(
-        game, null, '', '', null, 'No', $("#globalNotes").val(), null, {
-            callback: processData,
-            errorHandler: errorhandler
-        });
+    DS.updateGlobalNotes(game, $("#globalNotes").val());
     return false;
 }
 
 function sendPrivateNotes() {
-    DS.submitForm(
-        game, null, '', '', null, 'No', null, $("#privateNotes").val(), {
-            callback: processData,
-            errorHandler: errorhandler
-        });
+    DS.updatePrivateNotes(game, $("#privateNotes").val());
     return false;
 }
 
@@ -1068,53 +1061,57 @@ function addCardTooltips(parent) {
     //On devices without pointer hover capabilities, like phones, do not bind
     //tippy tooltips to cards that already have a click handler that shows the card.
     //This fixes the bug where cards in hand required a double-tap to show the modal.
-    if (!pointerCanHover) {
-        linkSelector += `[onclick^="pickTarget"], ${parent} a.card-name:not([onclick])`;
-    }
     tippy(linkSelector, {
-        animateFill: false,
-        hideOnClick: false,
-        placement: 'auto',
-        allowHTML: true,
-        appendTo: () => document.body,
-        popperOptions: {
-            strategy: 'fixed',
-            modifiers: [
-                {
-                    name: 'flip',
-                    options: {
-                        fallbackPlacements: ['bottom', 'right'],
+            placement: 'auto',
+            allowHTML: true,
+            appendTo: () => document.body,
+            popperOptions: {
+                strategy: 'fixed',
+                modifiers: [
+                    {
+                        name: 'flip',
+                        options: {
+                            fallbackPlacements: ['bottom', 'right'],
+                        },
                     },
-                },
-                {
-                    name: 'preventOverflow',
-                    options: {
-                        altAxis: true,
-                        tether: false,
+                    {
+                        name: 'preventOverflow',
+                        options: {
+                            altAxis: true,
+                            tether: false,
+                        },
                     },
-                },
-            ],
-        },
-        interactive: true,
-        theme: 'light',
-        onShow: function (instance) {
-            tippy.hideAll({exclude: instance});
-            instance.setContent("Loading...");
-            let ref = $(instance.reference);
-            let cardId = ref.data('card-id');
-            if (cardId == null) { //Backwards compatibility in main chat
-                cardId = instance.reference.title;
-                ref.data('card-id', cardId);
-                instance.reference.removeAttribute('title');
-            }
-            $.get({
-                dataType: "html",
-                url: "rest/api/cards/" + cardId, success: function (data) {
-                    instance.setContent(data);
+                ],
+            },
+            onTrigger: function (instance, event) {
+                event.stopPropagation();
+            },
+            theme: "light",
+            touch: "hold",
+            onShow: function (instance) {
+                tippy.hideAll({exclude: instance});
+                instance.setContent("Loading...");
+                let ref = $(instance.reference);
+                let cardId = ref.data('card-id');
+                if (cardId == null) { //Backwards compatibility in main chat
+                    cardId = instance.reference.title;
+                    ref.data('card-id', cardId);
+                    instance.reference.removeAttribute('title');
                 }
-            });
-        }
-    });
+                if (profile.imageTooltipPreference) {
+                    let content = `<img width="350" height="500" src="https://static.deckserver.net/images/${cardId}" alt="card"/>`;
+                    instance.setContent(content);
+                } else {
+                    $.get({
+                        dataType: "html",
+                        url: "https://static.deckserver.net/html/" + cardId, success: function (data) {
+                            let content = `<div class="p-2">${data}</div>`;
+                            instance.setContent(content);
+                        }
+                    });
+                }
+            }
+        });
 }
 
 function details(tag) {

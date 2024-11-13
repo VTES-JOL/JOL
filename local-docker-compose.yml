@@ -1,18 +1,13 @@
-version: "3.7"
 services:
-  test:
-    image: tomcat:9-jdk13-openjdk-buster
+  static:
+    image: nginx
+    container_name: static
     labels:
-      - "traefik.http.routers.jol.entrypoints=websecure"
-      - "traefik.http.routers.jol.rule=Host(`test.deckserver.net`)"
-      - "traefik.http.routers.jol.tls.certresolver=myresolver"
-    environment:
-      JOL_DATA: /data
-      JOL_VERSION: docker-version
-      JOL_RECAPTCHA_KEY: ***REMOVED***
-      JOL_RECAPTCHA_SECRET: ***REMOVED***
+      - "traefik.http.routers.static.entrypoints=websecure"
+      - "traefik.http.routers.static.rule=Host(`static.deckserver.net`)"
+      - "traefik.http.routers.static.tls.certresolver=myresolver"
     ports:
-      - 8080:8080
+      - "80:80"
     volumes:
-      - /home/shannon/Downloads/data:/data
-      - ./target/jol.war:/usr/local/tomcat/webapps/jol.war
+      - /Users/shannon/static:/usr/share/nginx/html
+      - ./static.conf:/etc/nginx/conf.d/default.conf

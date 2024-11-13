@@ -107,6 +107,15 @@ public class DeckserverRemote {
         if (currentGame != null) {
             admin.getGameModel(currentGame).resetView(playerName);
         }
+        boolean imagePreferences = admin.getImageTooltipPrefence(playerName);
+        Map<String, Object> update = UpdateFactory.getUpdate();
+        update.put("setPreferences", imagePreferences);
+        return update;
+    }
+
+    public Map<String, Object> setUserPreferences(boolean imageTooltips) {
+        String playerName = getPlayer(request);
+        admin.setImageTooltipPrefence(playerName, imageTooltips);
         return UpdateFactory.getUpdate();
     }
 
@@ -192,8 +201,26 @@ public class DeckserverRemote {
         return ret;
     }
 
+    public void updateGlobalNotes(String gameName, String notes) {
+        String player = getPlayer(request);
+        GameModel game = getModel(gameName);
+        if (game.getPlayers().contains(player)) {
+            game.updateGlobalNotes(notes);
+            admin.recordPlayerAccess(player, gameName);
+        }
+    }
+
+    public void updatePrivateNotes(String gameName, String notes) {
+        String player = getPlayer(request);
+        GameModel game = getModel(gameName);
+        if (game.getPlayers().contains(player)) {
+            game.updatePrivateNotes(player, notes);
+            admin.recordPlayerAccess(player, gameName);
+        }
+    }
+
     public Map<String, Object> submitForm(String gameName, String phase, String command, String chat,
-                                          String ping, String endTurn, String globalNotes, String privateNotes) {
+                                          String ping, String endTurn) {
         String player = getPlayer(request);
         GameModel game = getModel(gameName);
         // only process a command if the player is in the game, or a judge that isn't playing
@@ -206,7 +233,7 @@ public class DeckserverRemote {
             chat = ne(chat);
             ping = ne(ping);
             endTurn = ne(endTurn);
-            status = game.submit(player, phase, command, chat, ping, endTurn, globalNotes, privateNotes);
+            status = game.submit(player, phase, command, chat, ping, endTurn);
         }
         Map<String, Object> ret = UpdateFactory.getUpdate();
         if (isPlaying || canJudge)

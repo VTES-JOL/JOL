@@ -23,7 +23,7 @@ public class GameView {
     private final Collection<String> collapsed = new HashSet<>();
     private boolean stateChanged = true;
     private boolean phaseChanged = true;
-    private boolean globalChanged = true;
+    private boolean globalNotesChanged = true;
     private boolean privateNotesChanged = true;
     private boolean turnChanged = true;
     private boolean resetChat = true;
@@ -41,10 +41,10 @@ public class GameView {
             addChat(action.getText());
         }
         List<String> players = game.getPlayers();
+        if (players.contains(this.playerName)) {
+            isPlayer = true;
+        }
         for (int i = 0; i < players.size(); ) {
-            boolean active = players.get(i).equals(playerName);
-            if (active)
-                isPlayer = true;
             boolean ousted = game.getPool(players.get(i)) < 1;
             i++;
             collapsed.add(i + "-" + RegionType.ASH_HEAP);
@@ -107,12 +107,12 @@ public class GameView {
             }
         }
 
-        if (globalChanged) {
+        if (globalNotesChanged) {
             globalNotes = game.getGlobalText();
         }
 
-        if (privateNotesChanged && isPlayer) {
-            privateNotes = game.getPlayerText(playerName);
+        if (privateNotesChanged) {
+            privateNotes = game.getPrivateNotes(playerName);
         }
 
         label = game.getCurrentTurn() + " - " + game.getPhase();
@@ -163,17 +163,12 @@ public class GameView {
                 chatReset, tc, turn, turns, state, phases, ping, stamp, gameName, logLength, currentPlayer);
     }
 
-    public synchronized void init() {
-        resetChat = true;
-    }
-
     public synchronized void clearAccess() {
-        globalChanged = phaseChanged = turnChanged = stateChanged = false;
-        resetChat = false;
+        globalNotesChanged = phaseChanged = turnChanged = stateChanged = privateNotesChanged = resetChat = false;
     }
 
     public synchronized void globalChanged() {
-        globalChanged = true;
+        globalNotesChanged = true;
     }
 
     public synchronized void privateNotesChanged() {
@@ -199,10 +194,6 @@ public class GameView {
         turnChanged = true;
     }
 
-    public boolean isChanged() {
-        return globalChanged || phaseChanged || stateChanged || turnChanged || !chats.isEmpty();
-    }
-
     public void addChat(String chat) {
         chats.add(chat);
     }
@@ -220,20 +211,12 @@ public class GameView {
         }
     }
 
-    public String getPlayer() {
-        return playerName;
-    }
-
-    public boolean isPlayer() {
-        return isPlayer;
-    }
-
     public void reset() {
         logger.info("Reset - state changed");
         reset(true);
         //Force client to refresh all game data
         resetChat = true;
-        globalChanged = phaseChanged = stateChanged = turnChanged = privateNotesChanged = true;
+        globalNotesChanged = phaseChanged = stateChanged = turnChanged = privateNotesChanged = true;
     }
 
 }

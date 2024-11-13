@@ -33,6 +33,10 @@
         <url-pattern>/dwr/*</url-pattern>
     </servlet-mapping>
 
+    <session-config>
+        <session-timeout>600</session-timeout>
+    </session-config>
+
     <filter>
         <filter-name>ExpiresFilter</filter-name>
         <filter-class>org.apache.catalina.filters.ExpiresFilter</filter-class>

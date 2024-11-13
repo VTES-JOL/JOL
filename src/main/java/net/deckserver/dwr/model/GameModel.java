@@ -53,7 +53,7 @@ public class GameModel implements Comparable<GameModel> {
     }
 
     public synchronized String submit(String player, String phase, String command, String chat,
-                                      String ping, String endTurn, String globalNotes, String privateNotes) {
+                                      String ping, String endTurn) {
         JolAdmin admin = JolAdmin.INSTANCE;
         // Only players and judges can issue commands.  A judge can't be a player
         boolean isJudge = admin.isJudge(player) && !getPlayers().contains(player);
@@ -66,8 +66,6 @@ public class GameModel implements Comparable<GameModel> {
             boolean stateChanged = false;
             boolean phaseChanged = false;
             boolean chatChanged = false;
-            boolean globalChanged = false;
-            boolean privateNotesChanged = false;
             boolean turnChanged = false;
             int idx = game.getActions(game.getCurrentTurn()).length;
             if (ping != null) {
@@ -81,23 +79,6 @@ public class GameModel implements Comparable<GameModel> {
                     && !game.getPhase().equals(phase)) {
                 game.setPhase(phase);
                 phaseChanged = true;
-            }
-            if (globalNotes != null) {
-                if (globalNotes.length() > 800)
-                    globalNotes = globalNotes.substring(0, 799);
-                if (!globalNotes.equals(game.getGlobalText())) {
-                    game.setGlobalText(globalNotes);
-                    globalChanged = true;
-                }
-            }
-            if (privateNotes != null) {
-                logger.info("New Private notes value of {}", privateNotes);
-                if (privateNotes.length() > 800)
-                    privateNotes = privateNotes.substring(0, 799);
-                if (!privateNotes.equals(game.getPlayerText(player))) {
-                    game.setPrivateNotes(player, privateNotes);
-                    privateNotesChanged = true;
-                }
             }
             if (command != null || chat != null) {
                 DoCommand commander = new DoCommand(game);
@@ -133,10 +114,10 @@ public class GameModel implements Comparable<GameModel> {
                 turnChanged = stateChanged = phaseChanged = true;
             }
             addChats(idx);
-            if (stateChanged || phaseChanged || chatChanged || globalChanged) {
+            if (stateChanged || phaseChanged || chatChanged) {
                 admin.saveGameState(game);
             }
-            doReload(stateChanged, phaseChanged, globalChanged, turnChanged, privateNotesChanged);
+            doReload(stateChanged, phaseChanged, turnChanged);
         }
         return status.toString();
     }
@@ -162,6 +143,26 @@ public class GameModel implements Comparable<GameModel> {
         return -name.compareToIgnoreCase(arg0.getName());
     }
 
+    public void updateGlobalNotes(String notes) {
+        JolAdmin admin = JolAdmin.INSTANCE;
+        JolGame game = admin.getGame(name);
+        if (!game.getGlobalText().equals(notes)) {
+            game.setGlobalText(notes);
+            reloadNotes();
+            admin.saveGameState(game);
+        }
+    }
+
+    public void updatePrivateNotes(String player, String notes) {
+        JolAdmin admin = JolAdmin.INSTANCE;
+        JolGame game = admin.getGame(name);
+        if (!notes.equals(game.getPrivateNotes(player))) {
+            game.setPrivateNotes(player, notes);
+            views.get(player).privateNotesChanged();
+            admin.saveGameState(game);
+        }
+    }
+
     private void addChats(int idx) {
         for (GameView gameView : views.values()) {
             gameView.addChats(idx);
@@ -174,14 +175,19 @@ public class GameModel implements Comparable<GameModel> {
         }
     }
 
-    private void doReload(boolean stateChanged, boolean phaseChanged, boolean globalChanged, boolean turnChanged, boolean privateNotesChanged) {
+    private void doReload(boolean stateChanged, boolean phaseChanged, boolean turnChanged) {
         for (String key : (new ArrayList<>(views.keySet()))) {
             GameView view = views.get(key);
             if (stateChanged) view.stateChanged();
             if (phaseChanged) view.phaseChanged();
-            if (globalChanged) view.globalChanged();
-            if (privateNotesChanged) view.privateNotesChanged();
             if (turnChanged) view.turnChanged();
+        }
+    }
+
+    private void reloadNotes() {
+        for (String key : (new ArrayList<>(views.keySet()))) {
+            GameView view = views.get(key);
+            view.globalChanged();
         }
     }
 

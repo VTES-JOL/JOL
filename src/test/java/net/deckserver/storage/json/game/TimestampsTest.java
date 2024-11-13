@@ -27,7 +27,7 @@ public class TimestampsTest {
 
         Timestamps timestamps = objectMapper.readValue(new File("src/test/resources/data", "timestamps.json"), Timestamps.class);
         OffsetDateTime playerTimestamp = timestamps.getPlayerAccess("Player1", "Test private");
-        assertEquals(OffsetDateTime.parse("2017-09-29T01:11:41.160Z"), playerTimestamp);
+        assertEquals(OffsetDateTime.parse("2024-11-11T05:46:11.539292Z"), playerTimestamp);
     }
 
     @Test

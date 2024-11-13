@@ -346,9 +346,11 @@ public class JolAdmin {
 
     public void remove(String player) {
         logger.info("removing player");
-        pmap.remove(player);
-        for (GameModel gameModel : gmap.values()) {
-            gameModel.resetView(player);
+        if (player != null) {
+            pmap.remove(player);
+            for (GameModel gameModel : gmap.values()) {
+                gameModel.resetView(player);
+            }
         }
     }
 
@@ -518,7 +520,7 @@ public class JolAdmin {
         if (existsPlayer(name) || name.isEmpty())
             return false;
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
-        players.put(name, new PlayerInfo(name, ULID.random(), email, hash, null, null, new HashSet<>()));
+        players.put(name, new PlayerInfo(name, ULID.random(), email, hash));
         return true;
     }
 
@@ -752,6 +754,15 @@ public class JolAdmin {
 
     public String getVeknID(String player) {
         return loadPlayerInfo(player).getVeknId();
+    }
+
+    public boolean getImageTooltipPrefence(String player) {
+        return loadPlayerInfo(player).isShowImages();
+    }
+
+    public void setImageTooltipPrefence(String player, boolean value) {
+        loadPlayerInfo(player).setShowImages(value);
+        writeFile("players.json", players);
     }
 
     public boolean isAdmin(String player) {

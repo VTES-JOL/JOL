@@ -1,13 +1,12 @@
 package net.deckserver.storage.json.system;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class PlayerInfo {
     private String name;
@@ -16,7 +15,8 @@ public class PlayerInfo {
     private String hash;
     private String discordId;
     private String veknId;
-    private Set<PlayerRole> roles;
+    private Set<PlayerRole> roles = new HashSet<>();
+    private boolean showImages = true;
 
     public PlayerInfo(String name, String id, String email, String hash) {
         this.name = name;

@@ -20,6 +20,18 @@ services:
     volumes:
       - prod-data:/data
       - prod-app:/usr/local/tomcat/webapps
+  static:
+    image: nginx
+    container_name: static
+    networks:
+      - web
+    labels:
+      - "traefik.http.routers.static.entrypoints=websecure"
+      - "traefik.http.routers.static.rule=Host(`static.deckserver.net`)"
+      - "traefik.http.routers.static.tls.certresolver=myresolver"
+    volumes:
+      - static-data:/usr/share/nginx/html
+      - ./nginx/:/etc/nginx/conf.d/
 networks:
   web:
     external: true
@@ -27,4 +39,6 @@ volumes:
   prod-data:
     external: true
   prod-app:
+    external: true
+  static-data:
     external: true

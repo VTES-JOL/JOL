@@ -32,7 +32,7 @@ function showPlayCardModal(event) {
     if (cardId) {
         $.get({
             dataType: "json",
-            url: "rest/api/cards/" + cardId, success: function (card) {
+            url: "https://static.deckserver.net/json/" + cardId, success: function (card) {
                 playCardModal.data('hand-coord', coordinates);
                 playCardModal.data('do-not-replace', card.doNotReplace);
                 playCardModal.find(".card-name").text(card.displayName);
@@ -207,9 +207,7 @@ function discard(replace = true) {
 }
 
 function multiModeButtonClicked(event) {
-    let button = $(event.target).closest('button');
-    let delta = button.hasClass('active') ? -1 : 1;
-    let modes = $('#playCardModal .card-modes button.active').length + delta;
+    let modes = $('#playCardModal .card-modes button.active').length;
     let playButton = $('#playCardModalPlayButton');
     playButton.prop('disabled', modes < 1);
     playButton.text(modes < 1 ? 'Select one or more disciplines' : 'Play');

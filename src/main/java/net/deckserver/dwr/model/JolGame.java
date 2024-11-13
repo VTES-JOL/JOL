@@ -379,34 +379,10 @@ public class JolGame {
         note.setValue(text);
     }
 
-    public String getPlayerText(String player) {
+    public String getPrivateNotes(String player) {
         Notation note = getNote(state, player + TEXT, true);
         if (note == null) return "";
         return note.getValue();
-    }
-
-    public Integer getPlayerVotes(String player) {
-        Notation note = getNote(state, player + VOTES, false);
-        if (note != null) {
-            return Integer.valueOf(note.getValue());
-        } else {
-            return 0;
-        }
-    }
-
-    public void setPlayerVotes(String player, Integer votes) {
-        Notation note = getNote(state, player + VOTES, true);
-        note.setValue(votes.toString());
-    }
-
-    public void changePlayerVotes(String player, Integer votes) {
-        Notation note = getNote(state, player + VOTES, true);
-        Integer current = Integer.valueOf(note.getValue());
-        Integer newVotes = current + votes;
-        if (newVotes < 0) {
-            newVotes = 0;
-        }
-        setPlayerVotes(player, newVotes);
     }
 
     public String getLabel(String cardId) {

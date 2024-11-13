@@ -37,9 +37,10 @@
     String contestedStyle = cardDetail.isContested() ? "bg-warning-subtle" : "";
     String counterText = counters + (capacity > 0 ? " / " + capacity : "");
     String attributes = cardDetail.buildAttributes(region, index, visible);
-    String action = CardDetail.FULL_ATTRIBUTE_REGIONS.contains(region) ? "cardOnTableClicked(event)" : "pickCard(event)";
+    String action = CardDetail.FULL_ATTRIBUTE_REGIONS.contains(region) ? "cardOnTableClicked(event);" : "pickCard(event);";
+    String showAction = game.getPlayers().contains(viewer) ? action : "";
 %>
-<li <%= attributes %> data-visible='<%= visible %>' onclick="<%= action %>" class="list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1 <%= regionStyle%> <%= shadowStyle %> <%= contestedStyle %>">
+<li <%= attributes %> data-visible='<%= visible %>' onclick="<%= showAction %>" class="list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1 <%= regionStyle%> <%= shadowStyle %> <%= contestedStyle %>">
     <div class="mx-1 me-auto w-100">
         <div class="d-flex justify-content-between align-items-baseline w-100 pb-1">
             <c:if test="<%= visible %>">
