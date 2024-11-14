@@ -13,7 +13,7 @@
 <div class="container-fluid my-1 g-0">
     <div class="row gx-2 accordion-collapse collapse show" id="gameControls">
         <div class="col-xl-2 col-lg-3 col-md-6 player-only">
-            <div class="card shadow">
+            <div class="card shadow" data-region="hand">
                 <div class="card-header bg-body-secondary">Hand</div>
                 <ol class="card-body list-group list-group-numbered p-0" id="hand"></ol>
             </div>
@@ -333,7 +333,7 @@
             </div>
             <div class="modal-footer d-flex flex-wrap justify-content-center">
                 <div class="transfers-and-counters">
-                    <div class="d-flex justify-content-between fs-5 rounded-pill align-items-center bg-danger-subtle">
+                    <div class="d-flex justify-content-between fs-5 rounded-pill align-items-center bg-danger-subtle gap-1">
                         <div class="counters badge rounded-pill text-bg-secondary fs-5 gap-1 d-flex align-items-center"
                              title="Counters; click right side to increase, left to decrease">
                         </div>

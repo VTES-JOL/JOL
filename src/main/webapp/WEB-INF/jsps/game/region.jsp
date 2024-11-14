@@ -13,7 +13,7 @@
     String playerIndex = request.getParameter("playerIndex");
     String label = request.getParameter("label");
     RegionType region = RegionType.valueOf(request.getParameter("region"));
-    boolean simpleDisplay = EnumSet.of(RegionType.ASH_HEAP, RegionType.HAND, RegionType.REMOVED_FROM_GAME, RegionType.LIBRARY).contains(region);
+    boolean simpleDisplay = RegionType.SIMPLE_REGIONS.contains(region);
     String regionId = playerIndex + "-" + region;
     boolean startCollapsed = JolAdmin.INSTANCE.getGameModel(game.getName()).getView(viewer).isCollapsed(regionId);
     boolean isVisible = game.isVisible(player, viewer, region);

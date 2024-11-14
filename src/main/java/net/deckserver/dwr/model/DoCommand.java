@@ -144,7 +144,8 @@ public class DoCommand {
             if (cmd.equalsIgnoreCase("play")) {
                 // play [vamp] <cardnumber> [@ <modes>] [<targetplayer>] [<targetregion>] [<targetcard>] [draw]
                 boolean crypt = cmdObj.consumeString("vamp");
-                String srcRegion = crypt ? JolGame.INACTIVE_REGION : JolGame.HAND;
+                String defaultRegion = crypt ? JolGame.INACTIVE_REGION : JolGame.HAND;
+                String srcRegion = cmdObj.getRegion(defaultRegion);
                 boolean docap = srcRegion.equals(JolGame.INACTIVE_REGION);
                 String srcCard = cmdObj.getCard(false, player, srcRegion);
 
