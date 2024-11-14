@@ -29,12 +29,13 @@
     int capacity = cardDetail.getCapacity();
     String votes = cardDetail.getVotes();
     if (Strings.isNullOrEmpty(votes)) { votes = defaultVotes; }
-    boolean hasVotes = !Strings.isNullOrEmpty(votes);
+    boolean hasVotes = !Strings.isNullOrEmpty(votes) && !votes.equals("0");
+    boolean contested = cardDetail.isContested();
     boolean locked = cardDetail.isLocked();
     String shadowStyle = shadow ? "shadow" : "";
     String counterStyle = cardSummary.hasLife() ? "text-bg-success" : (capacity > 0 ? "text-bg-danger" : "text-bg-secondary");
     String regionStyle = region == RegionType.TORPOR ? "opacity-75" : "";
-    String contestedStyle = cardDetail.isContested() ? "bg-warning-subtle" : "";
+    String contestedStyle = contested ? "bg-warning-subtle" : "";
     String counterText = counters + (capacity > 0 ? " / " + capacity : "");
     String attributes = cardDetail.buildAttributes(region, index, visible);
     String action = CardDetail.FULL_ATTRIBUTE_REGIONS.contains(region) ? "cardOnTableClicked(event);" : "pickCard(event);";
@@ -65,6 +66,7 @@
             </c:if>
             <span class="d-flex gap-1 align-items-center">
                 <c:if test="<%= locked %>"><span class="badge text-bg-dark p-1 px-2" style="font-size: 0.6rem;">LOCKED</span></c:if>
+                <c:if test="<%= contested %>"><span class="badge text-bg-warning p-1 px-2" style="font-size: 0.6rem;">CONTESTED</span></c:if>
                 <c:if test="<%= counters > 0 || capacity > 0%>">
                     <span class="badge rounded-pill shadow <%= counterStyle%>"><%= counterText%></span>
                 </c:if>
@@ -89,7 +91,7 @@
                 </c:if>
             </span>
         </div>
-        <ol class="list-group list-group-numbered">
+        <ol class="list-group list-group-numbered ms-n3">
             <c:forEach items="<%= cardDetail.getCards() %>" var="card" varStatus="counter">
                 <jsp:include page="card.jsp">
                     <jsp:param name="player" value="<%= player%>"/>

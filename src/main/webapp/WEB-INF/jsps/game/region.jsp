@@ -19,7 +19,7 @@
     boolean isVisible = game.isVisible(player, viewer, region);
     String show = startCollapsed ? "" : "show";
     String collapsed = startCollapsed ? "collapsed" : "";
-    String displayPadding = simpleDisplay ? "" : "gap-2";
+    String displayPadding = simpleDisplay ? "" : "gap-1";
     String regionStyle = region == RegionType.TORPOR ? "bg-danger-subtle" : (region == RegionType.READY ? "bg-success-subtle" : "bg-body-secondary");
     int size = game.getSize(player, region);
     Card[] cards = game.getState().getPlayerLocation(player, region.xmlLabel()).getCards();
@@ -27,11 +27,11 @@
 %>
 
 <c:if test="<%= cards.length > 0 %>">
-    <div class="card mb-4 text-bg-light" data-region="<%= regionName %>">
-        <div class="card-header <%= regionStyle %>  d-flex justify-content-between fw-bold <%= collapsed %>" type="button" onclick="details('<%= regionId %>');"
+    <div class="card mb-2 text-bg-light" data-region="<%= regionName %>">
+        <div class="card-header <%= regionStyle %> <%= collapsed %>" type="button" onclick="details('<%= regionId %>');"
              data-bs-toggle="collapse" data-bs-target="#<%= regionId %>" aria-expanded="<%= isVisible %>" aria-controls="<%= regionId %>">
-            <span><%= label %></span>
-            <span><%= size %></span>
+            <span class="fw-bold"><%= label %></span>
+            <span>( <%= size %> )</span>
         </div>
         <ol id="<%= regionId %>" class="region list-group list-group-flush list-group-numbered <%= regionStyle %> collapse <%= displayPadding %> <%= show %>">
             <c:forEach items="<%= cards %>" var="card" varStatus="counter">

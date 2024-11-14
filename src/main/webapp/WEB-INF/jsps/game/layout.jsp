@@ -4,8 +4,7 @@
             <button class="accordion-button text-bg-light p-2" type="button" data-bs-toggle="collapse"
                     data-bs-target="#gameControls" aria-expanded="true" aria-controls="gameControls">
                 <span class="w-100 d-flex justify-content-between align-items-center">
-                    <span id="gameTitle"></span>
-                    <span id="gameLabel" class="px-2"></span>
+                    <span id="gameTitle" class="fs-5"></span>
                 </span>
             </button>
         </h5>
@@ -76,7 +75,10 @@
                 </div>
             </div>
             <div class="card shadow mt-2">
-                <div class="card-header bg-body-secondary">Game Chat</div>
+                <div class="card-header bg-body-secondary justify-content-between d-flex align-items-center">
+                    <span>Game Chat</span>
+                    <span id="gameLabel" class="px-2"></span>
+                </div>
                 <div class="card-body p-0">
                     <div id="gameChatOutput" class="scrollable bg-white p-1"></div>
                 </div>
@@ -331,15 +333,14 @@
             </div>
             <div class="modal-footer d-flex flex-wrap justify-content-center">
                 <div class="transfers-and-counters">
-                    <div class="d-flex justify-content-between fs-5 rounded-4 border align-items-center bg-danger-subtle">
-                        <div class="counters badge rounded-pill text-bg-secondary fs-5"
-                             title="Counters; click right side to increase, left to decrease"
-                             onclick="countersClicked(event)">99/99
+                    <div class="d-flex justify-content-between fs-5 rounded-pill align-items-center bg-danger-subtle">
+                        <div class="counters badge rounded-pill text-bg-secondary fs-5 gap-1 d-flex align-items-center"
+                             title="Counters; click right side to increase, left to decrease">
                         </div>
-                        <div class="transfers transfer-btn transfer-btn-left" title="Transfer one pool to this card"
+                        <div class="transfers transfer-btn transfer-btn-left fs-3" title="Transfer one pool to this card"
                              onclick="transferToCard();">&#9668;
                         </div>
-                        <div class="transfers transfer-btn transfer-btn-right" title="Transfer one blood to your pool"
+                        <div class="transfers transfer-btn transfer-btn-right fs-3" title="Transfer one blood to your pool"
                              onclick="transferToPool();">&#9658;
                         </div>
                         <div class="transfers badge rounded-pill text-bg-danger fs-5 card-modal-pool">99 pool</div>

@@ -441,6 +441,7 @@ public class JolGame {
         Notation note = getNote(card, VOTES, true);
         assert note != null;
         try {
+
             voteAmount = Integer.parseInt(votes);
         } catch (Exception nfe) {
             // do nothing
@@ -449,7 +450,7 @@ public class JolGame {
             note.setValue("P");
             addMessage(getCardName(card) + " is priscus");
         } else if (voteAmount == 0) {
-            removeNote(card, VOTES);
+            note.setValue("0");
             addMessage(getCardName(card) + " now has no votes");
         } else if (voteAmount > 0) {
             note.setValue(voteAmount.toString());

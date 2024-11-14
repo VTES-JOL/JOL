@@ -244,7 +244,7 @@ public class DoCommand {
                 String targetCard = cmdObj.getCard(false, targetPlayer, targetRegion);
                 if (targetCard == null) throw new CommandException("Must specify a card in the region");
                 if (cmdObj.consumeString("reset")) {
-                    CardSummary card = CardSearch.INSTANCE.get(targetCard);
+                    CardSummary card = CardSearch.INSTANCE.get(game.getCard(targetCard).getCardId());
                     List<String> disciplines = card.getDisciplines();
                     game.setDisciplines(targetCard, disciplines, false);
                 }

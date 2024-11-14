@@ -756,13 +756,16 @@ public class JolAdmin {
         return loadPlayerInfo(player).getVeknId();
     }
 
-    public boolean getImageTooltipPrefence(String player) {
-        return loadPlayerInfo(player).isShowImages();
-    }
-
-    public void setImageTooltipPrefence(String player, boolean value) {
+    public void setImageTooltipPreference(String player, boolean value) {
         loadPlayerInfo(player).setShowImages(value);
         writeFile("players.json", players);
+    }
+
+    public boolean getImageTooltipPreference(String player) {
+        if (player == null) {
+            return true;
+        }
+        return loadPlayerInfo(player).isShowImages();
     }
 
     public boolean isAdmin(String player) {

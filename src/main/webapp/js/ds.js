@@ -17,8 +17,8 @@ let profile = {
     updating: false,
     imageTooltipPreference: true
 };
-let scrollChat = true;
 let pointerCanHover = window.matchMedia("(hover: hover)").matches;
+let scrollChat = false;
 
 function errorhandler(errorString, exception) {
     $("#connectionMessage").show();
@@ -655,12 +655,26 @@ function renderGameChat(data) {
         scrollBottom(container);
 }
 
+function scrollGlobalChat() {
+    scrollBottom($("#globalChatOutput"));
+    $("#newMessages").removeClass("d-flex").addClass("d-none");
+    scrollChat = true;
+}
+
 function renderGlobalChat(data) {
-    if (!data) {
+    if (!data || data.length === 0) {
         return;
     }
     let container = $("#globalChatOutput");
     // Only scroll to bottom if scrollbar is at bottom (has not been scrolled up)
+
+    if (container.children().length === 0) {
+        scrollChat = false;
+    }
+
+    let isAtBottom = isScrolledToBottom(container);
+
+    let onlySelfChat = true;
 
     $.each(data, function (index, chat) {
         let day = moment(chat.timestamp).tz("UTC").format("D MMMM");
@@ -680,13 +694,25 @@ function renderGlobalChat(data) {
         let playerLabel = globalChatLastPlayer === chat.player && globalChatLastDay === day ? "" : "<b>" + chat.player + "</b> ";
         let message = $("<span/>").html(" " + playerLabel + chat.message);
 
+        if (chat.player !== player) {
+            onlySelfChat = false;
+        }
+
         chatLine.append(timeOutput).append(message);
         container.append(chatLine);
         globalChatLastPlayer = chat.player;
         globalChatLastDay = day;
     });
     addCardTooltips("#globalChatOutput");
-    scrollBottom(container);
+
+    if (!isAtBottom && !onlySelfChat) {
+        $("#newMessages").addClass("d-flex").removeClass("d-none");
+    }
+
+    if (isAtBottom || scrollChat) {
+        scrollBottom(container);
+        scrollChat = false;
+    }
 }
 
 function renderMyGames(id, games) {
@@ -767,12 +793,12 @@ function renderPastGames(history) {
                 let gameStarted = $("<td/>").attr('rowspan', 5).text(startTime);
                 let gameFinished = $("<td/>").attr('rowspan', 5).text(endTime);
                 playerRow.append(gameName, gameStarted, gameFinished);
-                playerRow.addClass("border-top")
+                playerRow.addClass("border-3 border-top border-bottom-0 border-start-0 border-end-0")
                 firstPlayerRow = false;
             } else {
-                playerRow.addClass("border-top-light");
+                playerRow.addClass("border-top")
             }
-            let playerName = $("<td/>").text(value.playerName).addClass("border-left");
+            let playerName = $("<td/>").text(value.playerName);
             let deckName = $("<td/>").text(value.deckName);
             let score = $("<td/>").text((value.victoryPoints !== "0" ? value.victoryPoints + " VP" : "") + (value.gameWin ? ", 1 GW" : ""));
             playerRow.append(playerName, deckName, score);

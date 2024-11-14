@@ -107,7 +107,7 @@ public class DeckserverRemote {
         if (currentGame != null) {
             admin.getGameModel(currentGame).resetView(playerName);
         }
-        boolean imagePreferences = admin.getImageTooltipPrefence(playerName);
+        boolean imagePreferences = admin.getImageTooltipPreference(playerName);
         Map<String, Object> update = UpdateFactory.getUpdate();
         update.put("setPreferences", imagePreferences);
         return update;
@@ -115,7 +115,7 @@ public class DeckserverRemote {
 
     public Map<String, Object> setUserPreferences(boolean imageTooltips) {
         String playerName = getPlayer(request);
-        admin.setImageTooltipPrefence(playerName, imageTooltips);
+        admin.setImageTooltipPreference(playerName, imageTooltips);
         return UpdateFactory.getUpdate();
     }
 
@@ -129,7 +129,10 @@ public class DeckserverRemote {
                 player.setView(target);
             }
         }
-        return UpdateFactory.getUpdate();
+        boolean imagePreferences = admin.getImageTooltipPreference(playerName);
+        Map<String, Object> update = UpdateFactory.getUpdate();
+        update.put("setPreferences", imagePreferences);
+        return update;
     }
 
     public Map<String, Object> getState(String game, boolean forceLoad) {

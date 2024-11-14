@@ -18,7 +18,7 @@ public class ProfileBean {
         this.email = jolAdmin.getEmail(player);
         this.discordID = jolAdmin.getDiscordID(player);
         this.veknID = jolAdmin.getVeknID(player);
-        this.imageTooltipPreference = jolAdmin.getImageTooltipPrefence(player);
+        this.imageTooltipPreference = jolAdmin.getImageTooltipPreference(player);
     }
 
 }

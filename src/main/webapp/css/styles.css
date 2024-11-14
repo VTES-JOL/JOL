@@ -21,6 +21,18 @@
     line-height: 1rem;
 }
 
+.ms-n2 {
+    margin-left: -0.5rem !important;
+}
+
+.ms-n3 {
+    margin-left: -1rem !important;
+}
+
+.ms-n4 {
+    margin-left: -1.5rem !important;
+}
+
 .dropdown-item.active {
     background-color: var(--bs-secondary);
 }
@@ -154,6 +166,16 @@ nav * {
     background-color: #eee;
 }
 
+#newMessages {
+    bottom: 3.3rem;
+    left: 1rem;
+    width: calc(100% - 2rem);
+}
+
+.hover-success:hover {
+    background-color: mediumseagreen !important;
+}
+
 .chat-timestamp {
     color: #888;
     font-size: smaller;
@@ -233,6 +255,7 @@ a.card-name {
 .icon.blood2:after {content: ";";color: red;}
 .icon.blood3:after {content: ".";color: red;}
 .icon.blood4:after {content: ",";color: red;}
+.icon.bloodX:after {content: "-";color: red;}
 
 .icon.card-type {font-size: 1.3rem;}
 .icon.card-type.action:before {content: '0';}

@@ -6,28 +6,32 @@
 <%@ page import="net.deckserver.game.storage.state.RegionType" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
+    String viewer = (String) request.getAttribute("viewer");
     String player = request.getParameter("player");
     String playerIndex = request.getParameter("playerIndex");
     boolean active = game.getActivePlayer().equals(player);
     int pool = game.getPool(player);
     double vp = game.getVictoryPoints(player);
     boolean edge = player.equals(game.getEdge());
-    String pingStyle = game.isPinged(player) ? "<i class='bi-exclamation-triangle ms-2'></i>" : "";
-    String activeStyle = active ? "shadow bg-body-secondary" : "";
-    String activeHeaderStyle = active ? "bg-dark-subtle" : "";
-    String activeBorder = active ? "border border-2 border-secondary" : "";
+    boolean isPlayer = viewer.equals(player);
+    String activeStyle = active ? "text-bg-light border-dark border-2" : (isPlayer ? "border-secondary border-2" : "");
+    String activeHeaderStyle = active ? "bg-info-subtle" : "";
     String poolStyle = pool == 0 ? "text-bg-danger" : pool < 0 ? "text-bg-dark" : "text-bg-success";
 %>
 <div class="col-xl col-lg-3 col-md-4 col-sm-6 g-2 player" data-player="<%= player %>" data-pool="<%= pool %>" data-vp="<%= vp %>" data-edge="<%= edge %>">
-    <div class="card shadow-lg <%= activeBorder %>">
-        <div class="card-header bg-body-secondary <%= activeHeaderStyle %>">
-            <h6 class="d-flex justify-content-between align-items-center mb-0">
+    <div class="card shadow-lg <%= activeStyle %>">
+        <div class="card-header <%= activeHeaderStyle %> <%= activeStyle %>">
+            <h6 class="d-flex justify-content-between align-items-center mb-0 lh-base">
                 <span class="fw-bold">
-                    <%= player %>
-                    <%= pingStyle %>
+                    <span><%= player %></span>
+                    <c:if test="<%= game.isPinged(player) %>"><i class='bi-exclamation-triangle ms-2'></i></c:if>
                 </span>
                 <c:if test="<%= edge %>">
-                    <span class="badge bg-light-subtle text-dark border border-secondary fw-bold">Edge</span>
+                    <span class="badge text-bg-light border border-secondary fw-bold align-items-center d-flex gap-1">
+                        <i class="bi bi-chevron-left"></i>
+                        Edge
+                        <i class="bi bi-chevron-right"></i>
+                    </span>
                 </c:if>
                 <span class="d-inline align-items-center">
                     <c:if test="<%= vp > 0%>">
@@ -37,7 +41,7 @@
                 </span>
             </h6>
         </div>
-        <div class="card-body p-2 <%= activeStyle %>">
+        <div class="card-body p-2">
             <div id="<%= playerIndex %>">
                 <jsp:include page="region.jsp">
                     <jsp:param name="player" value="<%= player %>"/>

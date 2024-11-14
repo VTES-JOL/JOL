@@ -2,7 +2,7 @@
     <div class="card-header bg-body-secondary">
         <h5>Past games</h5>
     </div>
-    <table id="pastGames" class="card-body table table-bordered table-sm mb-0">
+    <table id="pastGames" class="card-body table-sm mb-0">
         <thead>
         <tr class="border-top">
             <th>Game</th>

@@ -39,8 +39,8 @@ function showPlayCardModal(event) {
                 playCardModal.find(".card-type")
                     .removeClass()
                     .addClass('icon card-type ' + cardTypeCSSClass(card.type));
-                playCardModal.find(".preamble").text(card.preamble);
-                playCardModal.find(".burn-option").toggle(card.burnOption);
+                playCardModal.find(".preamble").text(card.preamble || "");
+                playCardModal.find(".burn-option").toggle(card.burnOption || "");
 
                 let clan = playCardModal.find(".card-clan");
                 clan.empty();
@@ -311,6 +311,7 @@ function showCardModal(event) {
 
 function setCounters(current, capacity, cardType = null) {
     let counterBar = $('#cardModal .counters');
+    counterBar.empty();
     if (cardType != null) {
         counterBar.removeClass('text-bg-danger text-bg-success text-bg-secondary');
         let class_ = null;
@@ -330,8 +331,10 @@ function setCounters(current, capacity, cardType = null) {
         counterBar.addClass(class_);
     }
 
-    var text = capacity > 0 ? `- ${current} / ${capacity} +` : `- ${current} +`;
-    counterBar.text(text);
+    let negativeCounter = $("<i/>").addClass("bi bi-dash-lg").on('click', removeCounter);
+    let plusCounter = $("<i/>").addClass("bi bi-plus-lg").on('click', addCounter);
+    let text = capacity > 0 ? `${current} / ${capacity}` : `${current}`;
+    counterBar.append(negativeCounter, text, plusCounter);
 
     var modal = $('#cardModal');
     modal.data('counters', current);
