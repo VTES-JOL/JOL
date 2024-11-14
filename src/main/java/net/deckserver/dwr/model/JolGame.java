@@ -237,7 +237,6 @@ public class JolGame {
     }
 
     public void sendMsg(String player, String msg, boolean isJudge) {
-        msg = truncateMsg(msg);
         msg = ChatParser.sanitizeText(msg);
         msg = ChatParser.parseText(msg);
         // TODO - add some judge styling
@@ -713,11 +712,6 @@ public class JolGame {
             src.removeCard(card);
             dest.addCard(card, false);
         }
-    }
-
-    private String truncateMsg(String msg) {
-        if (msg.length() < 120) return msg;
-        return msg.substring(0, 120);
     }
 
     private Notation getNote(NoteTaker nt, String name, boolean create) {

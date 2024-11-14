@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" type="text/css" href="css/styles.css?version=<%= System.getenv("JOL_VERSION") %>"/>
+    <link rel="stylesheet" type="text/css" href="css/styles.css?version=<%= JolAdmin.INSTANCE.getVersion() %>"/>
     <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/jquery-ui.structure.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/jquery-ui.theme.min.css"/>
