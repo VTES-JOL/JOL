@@ -11,6 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/styles.css"/>
+    <link rel="stylesheet" type="text/css" href="css/<%= System.getenv().getOrDefault("TYPE", "dev") %>.css"/>
     <link rel="shortcut icon" href="images/favicon.ico"/>
     <link href="https://fonts.googleapis.com/css?family=IM+Fell+English" rel="stylesheet">
 </head>

@@ -11,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" type="text/css" href="css/styles.css?version=<%= JolAdmin.INSTANCE.getVersion() %>"/>
+    <link rel="stylesheet" type="text/css" href="css/<%= System.getenv().getOrDefault("TYPE", "dev") %>.css"/>
     <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/jquery-ui.structure.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/jquery-ui.theme.min.css"/>

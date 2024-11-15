@@ -1125,7 +1125,7 @@ function addCardTooltips(parent) {
                     instance.reference.removeAttribute('title');
                 }
                 if (profile.imageTooltipPreference) {
-                    let content = `<img width="350" height="500" src="https://static.deckserver.net/images/${cardId}" alt="card"/>`;
+                    let content = `<img width="350" height="500" src="https://static.deckserver.net/images/${cardId}" alt="Loading..."/>`;
                     instance.setContent(content);
                 } else {
                     $.get({

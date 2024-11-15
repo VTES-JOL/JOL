@@ -8,18 +8,31 @@ services:
       - "traefik.http.routers.prod.entrypoints=websecure"
       - "traefik.http.routers.prod.rule=Host(`www.deckserver.net`) || Host(`deckserver.net`)"
       - "traefik.http.routers.prod.tls.certresolver=myresolver"
+    env_file: .keys
     environment:
       JOL_DATA: /data
-      JOL_VERSION: 25-Oct-2024
-      JOL_RECAPTCHA_KEY: "***REMOVED***"
-      JOL_RECAPTCHA_SECRET: "***REMOVED***"
+      TYPE: "prod"
       _JAVA_OPTIONS: -Djava.security.egd=file:/dev/./urandom
-      DISCORD_API_VERSION: 6
-      DISCORD_BOT_TOKEN: "***REMOVED***"
-      DISCORD_PING_CHANNEL_ID: 455542605535510529
     volumes:
       - prod-data:/data
       - prod-app:/usr/local/tomcat/webapps
+  test:
+    image: tomcat:9-jdk13-openjdk-buster
+    container_name: test
+    networks:
+      - web
+    labels:
+      - "traefik.http.routers.test.entrypoints=websecure"
+      - "traefik.http.routers.test.rule=Host(`test.deckserver.net`)"
+      - "traefik.http.routers.test.tls.certresolver=myresolver"
+    env_file: .keys
+    environment:
+      JOL_DATA: /data
+      TYPE: "test"
+      _JAVA_OPTIONS: -Djava.security.egd=file:/dev/./urandom
+    volumes:
+      - test-data:/data
+      - test-app:/usr/local/tomcat/webapps
   static:
     image: nginx
     container_name: static
@@ -39,6 +52,10 @@ volumes:
   prod-data:
     external: true
   prod-app:
+    external: true
+  test-data:
+    external: true
+  test-app:
     external: true
   static-data:
     external: true
