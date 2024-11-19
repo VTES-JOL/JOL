@@ -236,10 +236,19 @@
                 <version>3.0.1</version>
                 <configuration>
                     <path>/jol</path>
-                    <systemProperties>
-                        <catalina.base>target</catalina.base>
-                    </systemProperties>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.redisson</groupId>
+                        <artifactId>redisson-all</artifactId>
+                        <version>3.39.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.redisson</groupId>
+                        <artifactId>redisson-tomcat-9</artifactId>
+                        <version>3.39.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
