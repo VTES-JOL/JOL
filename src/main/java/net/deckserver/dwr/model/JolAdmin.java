@@ -34,7 +34,10 @@ import net.deckserver.game.storage.state.StoreGame;
 import net.deckserver.game.storage.turn.StoreTurnRecorder;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
-import net.deckserver.jobs.*;
+import net.deckserver.jobs.CleanupGamesJob;
+import net.deckserver.jobs.PersistStateJob;
+import net.deckserver.jobs.PublicGamesBuilderJob;
+import net.deckserver.jobs.ValidateGWJob;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.DeckStats;
@@ -409,7 +412,6 @@ public class JolAdmin {
         loadProperties();
         scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 1, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(new CleanupPlayersJob(), 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(new ValidateGWJob(), 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 10, TimeUnit.MINUTES);
     }
@@ -999,20 +1001,6 @@ public class JolAdmin {
     public void setSuperUser(String playerName, boolean value) {
         PlayerInfo info = players.get(playerName);
         setRole(info, PlayerRole.SUPER_USER, value);
-    }
-
-    public void cleanupInactivePlayers() {
-        Set<String> inactivePlayers = new HashSet<>();
-        for (String playerName : getPlayers()) {
-            OffsetDateTime playerAccess = timestamps.getPlayerAccess(playerName);
-            if (playerAccess.plusYears(5).isBefore(OffsetDateTime.now())) {
-                inactivePlayers.add(playerName);
-            }
-        }
-        inactivePlayers.forEach(player -> {
-            logger.info("Deleting inactive player {}", player);
-            archivePlayer(player);
-        });
     }
 
     public boolean isValid(String playerName, String deckName) {

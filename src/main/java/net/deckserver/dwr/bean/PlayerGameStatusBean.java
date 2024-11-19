@@ -1,10 +1,12 @@
 package net.deckserver.dwr.bean;
 
+import lombok.Getter;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.JolGame;
 
 import java.time.OffsetDateTime;
 
+@Getter
 public class PlayerGameStatusBean {
 
     private final String gameName;
@@ -16,6 +18,8 @@ public class PlayerGameStatusBean {
     private final boolean ousted;
     private final boolean current;
     private final boolean turn;
+    private final String currentTurn;
+
     public PlayerGameStatusBean(String gameName, String playerName) {
         JolAdmin admin = JolAdmin.INSTANCE;
         JolGame game = admin.getGame(gameName);
@@ -30,38 +34,7 @@ public class PlayerGameStatusBean {
         OffsetDateTime timestamp = admin.getGameTimeStamp(gameName);
         this.current = timestamp.isBefore(access);
         this.turn = playerName.equals(game.getActivePlayer());
+        this.currentTurn = game.getCurrentTurn();
     }
 
-    public String getGameId() { return  gameId; }
-    public String getGameName() {
-        return gameName;
-    }
-
-    public String getPlayerName() {
-        return playerName;
-    }
-
-    public int getPool() {
-        return pool;
-    }
-
-    public boolean isPinged() {
-        return pinged;
-    }
-
-    public boolean isFlagged() {
-        return flagged;
-    }
-
-    public boolean isOusted() {
-        return ousted;
-    }
-
-    public boolean isCurrent() {
-        return current;
-    }
-
-    public boolean isTurn() {
-        return turn;
-    }
 }

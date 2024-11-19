@@ -12,7 +12,7 @@
             aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="collapse navbar-collapse navbar-nav" id="navbarNavAltMarkup">
         <div id="gameButtonsNav" class="navbar-nav">
             <div class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="myGamesLink" role="button"
@@ -22,6 +22,7 @@
             </div>
         </div>
         <div id="buttons" class="navbar-nav"></div>
+        <a class="nav-link" href="/jol/help" target="_blank">Help</a>
         <div id="logout" class="navbar-nav">
             <form method="post" class="form-inline" action="/jol/logout">
                 <button type="submit" name="logout" value="logout" class="btn btn-link nav-item nav-link">Log Out

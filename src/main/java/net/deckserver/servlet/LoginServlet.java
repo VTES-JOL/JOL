@@ -2,6 +2,7 @@ package net.deckserver.servlet;
 
 import net.deckserver.dwr.model.JolAdmin;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,8 +19,14 @@ public class LoginServlet extends HttpServlet {
         boolean authResult = JolAdmin.INSTANCE.authenticate(username, password);
         if (authResult) {
             req.getSession().setAttribute("meth", username);
-            resp.sendRedirect("/jol/main.jsp");
+            resp.sendRedirect("/jol/");
+        } else {
+            resp.sendRedirect("/jol/login");
         }
-        else resp.sendRedirect("/jol/");
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.getRequestDispatcher("/WEB-INF/login.jsp").forward(req, resp);
     }
 }
