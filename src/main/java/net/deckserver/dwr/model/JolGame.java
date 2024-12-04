@@ -35,6 +35,7 @@ public class JolGame {
 
     public static final String READY_REGION = "ready region";
     public static final String INACTIVE_REGION = "inactive region";
+    public static final String UNCONTROLLED_REGION = "uncontrolled";
     public static final String ASHHEAP = "ashheap";
     public static final String HAND = "hand";
     public static final String LIBRARY = "library";

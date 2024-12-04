@@ -51,16 +51,12 @@
                 <jsp:include page="/WEB-INF/jsps/tournament/layout.jsp"/>
             </div>
 
-            <div id="help" style="display :none;">
-                <jsp:include page="/WEB-INF/jsps/help/layout.jsp"/>
-            </div>
-
             <div id="profile" style="display:none">
                 <jsp:include page="/WEB-INF/jsps/profile/layout.jsp"/>
             </div>
 
         </div>
-        <footer class="footer" id="footer">
+        <footer class="footer d-none d-sm-block" id="footer">
             <div class="container-fluid p-2 justify-content-center justify-content-md-between d-flex bg-secondary-subtle fw-bold">
                 <span id="timeStamp" class="d-none d-md-inline"></span>
                 <span id="message"></span>
@@ -84,21 +80,5 @@
     <script src='dwr/util.js'></script>
     <script src='js/ds.js?version=<%= JolAdmin.INSTANCE.getVersion() %>'></script>
     <script src="js/card-modal.js?version=<%= JolAdmin.INSTANCE.getVersion() %>"></script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            const informationPanel = $("#informationPanel");
-            informationPanel.on('show.bs.collapse', function (event) {
-                $(this).data('isShowing', true);
-            })
-            informationPanel.on('hide.bs.collapse', function (event) {
-                console.log(event);
-                if (!$(this).data('isShowing')) {
-                    event.preventDefault();
-                }
-                $(this).data('isShowing', false);
-            })
-            $("#historyPanel").on('show.bs.collapse', getHistory);
-        })
-    </script>
 </body>
 </html>

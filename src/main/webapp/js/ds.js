@@ -21,7 +21,7 @@ let pointerCanHover = window.matchMedia("(hover: hover)").matches;
 let scrollChat = false;
 
 function errorhandler(errorString, exception) {
-    $("#connectionMessage").show();
+    $("#connectionMessage").removeClass("d-none");
     refresher = setTimeout("DS.init({callback: processData, errorHandler: errorhandler})", 5000);
 }
 
@@ -46,7 +46,7 @@ function setPreferences(value) {
 }
 
 function processData(a) {
-    $("#connectionMessage").hide();
+    $("#connectionMessage").removeClass("d-none");
     for (let b in a) {
         eval(b + '(a[b]);');
     }
@@ -749,7 +749,7 @@ function renderOnline(div, who) {
         return;
     }
     $.each(who, function (index, player) {
-        let playerSpan = $("<span/>").text(player.name).addClass("badge mb-1");
+        let playerSpan = $("<span/>").text(player.name).addClass("badge mb-1 fs-6");
         if (player.superUser) {
             playerSpan.addClass("text-bg-secondary");
         } else if (player.admin) {
@@ -928,6 +928,22 @@ function sendGlobalNotes() {
 function sendPrivateNotes() {
     DS.updatePrivateNotes(game, $("#privateNotes").val());
     return false;
+}
+
+function toggleChat() {
+    $(".gameChat").toggleClass("d-none");
+    $(".history").toggleClass("d-none");
+    if ($("#gameHistory").children().length === 0) {
+        getHistory();
+    }
+}
+
+function toggleNotes() {
+    $(".notes").toggleClass("d-none");
+    $(".gameDeck").toggleClass("d-none");
+    if ($("#gameDeck").children().length === 0) {
+        doShowDeck();
+    }
 }
 
 function loadGame(data) {

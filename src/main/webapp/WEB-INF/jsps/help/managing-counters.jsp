@@ -1,1 +1,1 @@
-<div class="tab-pane fade show" role="tabpanel" aria-labelledby="help3" tabindex="0" id="panel3"></div>
+<div class="container-fluid tab-pane fade" role="tabpanel" aria-labelledby="help4" tabindex="0" id="panel4"></div>

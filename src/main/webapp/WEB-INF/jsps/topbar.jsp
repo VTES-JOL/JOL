@@ -30,6 +30,6 @@
             </form>
         </div>
     </div>
-    <span id="connectionMessage" class="navbar-text text-warning">Connection issue. Retrying...</span>
+    <span id="connectionMessage" class="navbar-text text-warning d-none">Connection issue. Retrying...</span>
     <span class="p-2 fw-bold ms-2 rounded <%= environmentStyle%>"><%= environmentLabel %></span>
 </nav>

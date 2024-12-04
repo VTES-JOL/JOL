@@ -1,27 +1,14 @@
-<div class="accordion accordion-flush mt-2 shadow" id="gameHeader">
-    <div class="accordion-item">
-        <h5 class="accordion-header">
-            <button class="accordion-button text-bg-light p-2" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#gameControls" aria-expanded="true" aria-controls="gameControls">
-                <span class="w-100 d-flex justify-content-between align-items-center">
-                    <span id="gameTitle" class="fs-5"></span>
-                </span>
-            </button>
-        </h5>
-    </div>
-</div>
+<h5 class="w-100 d-flex justify-content-between align-items-center">
+    <span id="gameTitle" class="fs-5 user-select-all"></span>
+</h5>
 <div class="container-fluid my-1 g-0">
-    <div class="row gx-2 accordion-collapse collapse show" id="gameControls">
-        <div class="col-xl-2 col-lg-3 col-md-6 player-only">
-            <jsp:include page="hand-card.jsp"/>
-        </div>
-        <div class="col-xl-6 col-lg-5 col-md-6">
-            <jsp:include page="commands.jsp"/>
-            <jsp:include page="game-chat.jsp"/>
-        </div>
-        <div class="col-lg-4 col-md-12">
-            <jsp:include page="information.jsp"/>
-        </div>
+    <div class="control-grid">
+        <jsp:include page="hand-card.jsp"/>
+        <jsp:include page="commands.jsp"/>
+        <jsp:include page="game-chat.jsp"/>
+        <jsp:include page="history.jsp"/>
+        <jsp:include page="notes.jsp"/>
+        <jsp:include page="game-deck.jsp"/>
     </div>
     <div class="row gx-2">
         <div class="col-12 row gy-1 gx-2" id="state"></div>
@@ -32,7 +19,8 @@
     <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header text-bg-secondary opacity-100">
             <strong class="me-auto">V:TES Online</strong>
-            <button type="button" class="btn-close btn-outline-secondary" data-bs-dismiss="toast" aria-label="Close"></button>
+            <button type="button" class="btn-close btn-outline-secondary" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
         </div>
         <div class="toast-body" id="gameStatusMessage"></div>
     </div>

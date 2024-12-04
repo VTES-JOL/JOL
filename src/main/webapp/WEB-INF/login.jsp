@@ -14,6 +14,7 @@
     <link rel="stylesheet" type="text/css" href="css/<%= System.getenv().getOrDefault("TYPE", "dev") %>.css"/>
     <link rel="shortcut icon" href="images/favicon.ico"/>
     <link href="https://fonts.googleapis.com/css?family=IM+Fell+English" rel="stylesheet">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
     <div id="wrapper" class="container-fluid">
@@ -38,6 +39,7 @@
                             <input type="password" class="form-control" id="dspassin" name="password" autocomplete="password" placeholder="Password">
                             <label for="dspassin">Password</label>
                         </div>
+                        <div class="cf-turnstile" data-sitekey="<%= System.getenv().get("JOL_RECAPTCHA_KEY") %>" data-theme="light"></div>
                         <button type="submit" id="loginBtn" name="login" value="Log in" class="btn btn-outline-secondary btn-lg mt-2">Log In</button>
                     </form>
                 </div>
@@ -64,7 +66,7 @@
                             <input type="email" class="form-control" id="newemail" name="newemail" placeholder="user@example.org">
                             <label for="newemail">E-mail address</label>
                         </div>
-                        <div class="g-recaptcha mt-1" data-sitekey="<%= System.getenv("JOL_RECAPTCHA_KEY") %>"></div>
+                        <div class="cf-turnstile" data-sitekey="<%= System.getenv().get("JOL_RECAPTCHA_KEY") %>" data-theme="light"></div>
                         <button type="submit" name="register" value="Register" class="btn btn-outline-secondary btn-lg mt-1">Register</button>
                     </form>
                 </div>
@@ -76,7 +78,6 @@
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="js/jquery-3.7.1.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-    <script src='https://www.google.com/recaptcha/api.js'></script>
     <script type='text/javascript'>
         $(document).ready(function() {
             $('#dsuserin').focus();

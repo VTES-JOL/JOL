@@ -21,18 +21,6 @@
     line-height: 1rem;
 }
 
-.ms-n2 {
-    margin-left: -0.5rem !important;
-}
-
-.ms-n3 {
-    margin-left: -1rem !important;
-}
-
-.ms-n4 {
-    margin-left: -1.5rem !important;
-}
-
 .dropdown-item.active {
     background-color: var(--bs-secondary);
 }
@@ -64,6 +52,13 @@ html, body {
     height: 100%;
     margin: 0;
 }
+
+@media only screen and (orientation: landscape) and (max-height: 576px) {
+    .footer {
+        display: none !important;
+    }
+}
+
 
 .player .card {
     background-color: #ddd;
@@ -103,26 +98,6 @@ html, body {
     line-height: 2rem;
 }
 
-#gameChatOutput {
-    height: 12rem;
-    max-height: 12rem;
-}
-
-#informationPanel {
-    max-height: 24.4rem;
-    overflow: auto;
-}
-
-@media (max-width: 992px) {
-    #informationPanel {
-        max-height: 12rem;
-    }
-}
-
-#globalNotes, #privateNotes {
-    height: 20.3rem;
-}
-
 #wrapper {
     height: 100%;
     display: flex;
@@ -159,6 +134,8 @@ nav * {
     overflow-x: clip;
     overflow-y: scroll;
     overflow-wrap: break-word;
+    overscroll-behavior: contain;
+    height: 100%;
 }
 
 .list-group-item:hover {
@@ -173,6 +150,10 @@ nav * {
 
 .hover-success:hover {
     background-color: mediumseagreen !important;
+}
+
+.button-hover:hover {
+    font-weight: 1000;
 }
 
 .chat-timestamp {
@@ -191,6 +172,36 @@ a.card-name {
     text-decoration: none;
     color: black;
 }
+
+.control-grid {
+    display: grid;
+    grid-gap: 0.5rem;
+    grid-auto-columns: minmax(10rem, 1fr);
+    grid-auto-rows: minmax(0px, 22rem);
+    grid-template-areas: 'hand commands' 'chat chat' 'info info';
+}
+
+@media (min-width: 768px) {
+    .control-grid {
+        grid-template-areas: 'hand commands info' 'chat chat chat';
+    }
+}
+
+@media (min-width: 1200px) {
+    .control-grid {
+        grid-template-areas: 'hand commands chat chat chat info';
+    }
+}
+
+.hand {grid-area: hand;}
+.commands {grid-area: commands;}
+.gameChat {grid-area: chat; }
+.globalNotes {grid-area: info; }
+.privateNotes {grid-area: info; }
+#globalNotes, #privateNotes {height: 50%;}
+.notes {grid-area: info;}
+.gameDeck {grid-area: info; }
+.history {grid-area: chat; }
 
 .clan {font-family: clans, sans-serif; font-size: 1.3rem;}
 .clan.abomination:before {content: 'A';}

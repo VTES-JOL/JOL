@@ -18,7 +18,8 @@
     String activeHeaderStyle = active ? "bg-info-subtle" : "";
     String poolStyle = pool == 0 ? "text-bg-dark" : pool < 0 ? "text-bg-warning" : "text-bg-danger";
 %>
-<div class="col-xl col-lg-3 col-md-4 col-sm-6 g-2 player" data-player="<%= player %>" data-pool="<%= pool %>" data-vp="<%= vp %>" data-edge="<%= edge %>">
+<div class="col-xl col-lg-3 col-md-4 col-sm-6 g-2 player" data-player="<%= player %>" data-pool="<%= pool %>"
+     data-vp="<%= vp %>" data-edge="<%= edge %>">
     <div class="card shadow-lg <%= activeStyle %>">
         <div class="card-header <%= activeHeaderStyle %> <%= activeStyle %>">
             <h6 class="d-flex justify-content-between align-items-center mb-0 lh-base">
@@ -41,71 +42,69 @@
                 </span>
             </h6>
         </div>
-        <div class="card-body p-2">
-            <div id="<%= playerIndex %>">
-                <jsp:include page="region.jsp">
-                    <jsp:param name="player" value="<%= player %>"/>
-                    <jsp:param name="playerIndex" value="<%= playerIndex%>"/>
-                    <jsp:param name="label" value="Ready"/>
-                    <jsp:param name="region" value="<%= RegionType.READY %>"/>
-                </jsp:include>
+        <div class="card-body p-2" id="<%= playerIndex %>">
+            <jsp:include page="region.jsp">
+                <jsp:param name="player" value="<%= player %>"/>
+                <jsp:param name="playerIndex" value="<%= playerIndex%>"/>
+                <jsp:param name="label" value="Ready"/>
+                <jsp:param name="region" value="<%= RegionType.READY %>"/>
+            </jsp:include>
 
-                <jsp:include page="region.jsp">
-                    <jsp:param name="player" value="<%= player %>"/>
-                    <jsp:param name="playerIndex" value="<%= playerIndex%>"/>
-                    <jsp:param name="label" value="Torpor"/>
-                    <jsp:param name="region" value="<%= RegionType.TORPOR %>"/>
-                </jsp:include>
+            <jsp:include page="region.jsp">
+                <jsp:param name="player" value="<%= player %>"/>
+                <jsp:param name="playerIndex" value="<%= playerIndex%>"/>
+                <jsp:param name="label" value="Torpor"/>
+                <jsp:param name="region" value="<%= RegionType.TORPOR %>"/>
+            </jsp:include>
 
-                <jsp:include page="region.jsp">
-                    <jsp:param name="player" value="<%= player %>"/>
-                    <jsp:param name="playerIndex" value="<%= playerIndex%>"/>
-                    <jsp:param name="label" value="Uncontrolled"/>
-                    <jsp:param name="region" value="<%= RegionType.UNCONTROLLED %>"/>
-                </jsp:include>
+            <jsp:include page="region.jsp">
+                <jsp:param name="player" value="<%= player %>"/>
+                <jsp:param name="playerIndex" value="<%= playerIndex%>"/>
+                <jsp:param name="label" value="Uncontrolled"/>
+                <jsp:param name="region" value="<%= RegionType.UNCONTROLLED %>"/>
+            </jsp:include>
 
-                <jsp:include page="region.jsp">
-                    <jsp:param name="player" value="<%= player %>"/>
-                    <jsp:param name="playerIndex" value="<%= playerIndex%>"/>
-                    <jsp:param name="label" value="Ash heap"/>
-                    <jsp:param name="region" value="<%= RegionType.ASH_HEAP %>"/>
-                </jsp:include>
+            <jsp:include page="region.jsp">
+                <jsp:param name="player" value="<%= player %>"/>
+                <jsp:param name="playerIndex" value="<%= playerIndex%>"/>
+                <jsp:param name="label" value="Ash heap"/>
+                <jsp:param name="region" value="<%= RegionType.ASH_HEAP %>"/>
+            </jsp:include>
 
-                <jsp:include page="region.jsp">
-                    <jsp:param name="player" value="<%= player %>"/>
-                    <jsp:param name="playerIndex" value="<%= playerIndex%>"/>
-                    <jsp:param name="label" value="Removed from game"/>
-                    <jsp:param name="region" value="<%= RegionType.REMOVED_FROM_GAME %>"/>
-                </jsp:include>
+            <jsp:include page="region.jsp">
+                <jsp:param name="player" value="<%= player %>"/>
+                <jsp:param name="playerIndex" value="<%= playerIndex%>"/>
+                <jsp:param name="label" value="Removed from game"/>
+                <jsp:param name="region" value="<%= RegionType.REMOVED_FROM_GAME %>"/>
+            </jsp:include>
 
-                <jsp:include page="region.jsp">
-                    <jsp:param name="player" value="<%= player %>"/>
-                    <jsp:param name="playerIndex" value="<%= playerIndex%>"/>
-                    <jsp:param name="label" value="Research"/>
-                    <jsp:param name="region" value="<%= RegionType.RESEARCH %>"/>
-                </jsp:include>
+            <jsp:include page="region.jsp">
+                <jsp:param name="player" value="<%= player %>"/>
+                <jsp:param name="playerIndex" value="<%= playerIndex%>"/>
+                <jsp:param name="label" value="Research"/>
+                <jsp:param name="region" value="<%= RegionType.RESEARCH %>"/>
+            </jsp:include>
 
-                <jsp:include page="region.jsp">
-                    <jsp:param name="player" value="<%= player %>"/>
-                    <jsp:param name="playerIndex" value="<%= playerIndex %>"/>
-                    <jsp:param name="label" value="Library"/>
-                    <jsp:param name="region" value="<%= RegionType.LIBRARY %>"/>
-                </jsp:include>
+            <jsp:include page="region.jsp">
+                <jsp:param name="player" value="<%= player %>"/>
+                <jsp:param name="playerIndex" value="<%= playerIndex %>"/>
+                <jsp:param name="label" value="Library"/>
+                <jsp:param name="region" value="<%= RegionType.LIBRARY %>"/>
+            </jsp:include>
 
-                <jsp:include page="region.jsp">
-                    <jsp:param name="player" value="<%= player %>"/>
-                    <jsp:param name="playerIndex" value="<%= playerIndex %>"/>
-                    <jsp:param name="label" value="Crypt"/>
-                    <jsp:param name="region" value="<%= RegionType.CRYPT %>"/>
-                </jsp:include>
+            <jsp:include page="region.jsp">
+                <jsp:param name="player" value="<%= player %>"/>
+                <jsp:param name="playerIndex" value="<%= playerIndex %>"/>
+                <jsp:param name="label" value="Crypt"/>
+                <jsp:param name="region" value="<%= RegionType.CRYPT %>"/>
+            </jsp:include>
 
-                <jsp:include page="region.jsp">
-                    <jsp:param name="player" value="<%= player %>"/>
-                    <jsp:param name="playerIndex" value="<%= playerIndex %>"/>
-                    <jsp:param name="label" value="Hand"/>
-                    <jsp:param name="region" value="<%= RegionType.HAND %>"/>
-                </jsp:include>
-            </div>
+            <jsp:include page="region.jsp">
+                <jsp:param name="player" value="<%= player %>"/>
+                <jsp:param name="playerIndex" value="<%= playerIndex %>"/>
+                <jsp:param name="label" value="Hand"/>
+                <jsp:param name="region" value="<%= RegionType.HAND %>"/>
+            </jsp:include>
         </div>
     </div>
 </div>

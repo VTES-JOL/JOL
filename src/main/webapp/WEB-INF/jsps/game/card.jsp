@@ -5,7 +5,6 @@
 <%@ page import="net.deckserver.game.storage.cards.CardSearch" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.google.common.base.Strings" %>
-<%@ page import="java.util.EnumSet" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
