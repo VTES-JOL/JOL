@@ -173,6 +173,13 @@ a.card-name {
     color: black;
 }
 
+.players {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-items: center;
+    align-items: baseline;
+}
+
 .control-grid {
     display: grid;
     grid-gap: 0.5rem;
@@ -191,6 +198,7 @@ a.card-name {
     .control-grid {
         grid-template-areas: 'hand commands chat chat chat info';
     }
+
 }
 
 .hand {grid-area: hand;}

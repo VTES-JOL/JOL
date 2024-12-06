@@ -13,7 +13,7 @@ public class LobbyPageBean {
     private final List<String> players;
     private final List<GameStatusBean> myGames;
     private final List<GameStatusBean> publicGames;
-    private final List<PlayerRegistrationStatusBean> invitedGames;
+    private final List<RegistrationStatus> invitedGames;
     private final List<DeckInfoBean> decks;
     private final String message;
 
@@ -41,7 +41,7 @@ public class LobbyPageBean {
                 .filter(Objects::nonNull)
                 .filter(admin::isStarting)
                 .filter(gameName -> admin.isInGame(gameName, player))
-                .map(gameName -> new PlayerRegistrationStatusBean(gameName, player))
+                .map(gameName -> new RegistrationStatus(gameName, player))
                 .collect(Collectors.toList());
 
         decks = admin.getDeckNames(player).stream()

@@ -46,7 +46,7 @@ function setPreferences(value) {
 }
 
 function processData(a) {
-    $("#connectionMessage").removeClass("d-none");
+    $("#connectionMessage").addClass("d-none");
     for (let b in a) {
         eval(b + '(a[b]);');
     }
@@ -493,10 +493,9 @@ function callbackMain(data) {
         renderOnline('onlinePlayers', data.who);
         renderGlobalChat(data.chat);
         renderMyGames("#myGames", data.games);
-        renderMyGames("#oustedGames", data.ousted);
         $("#globalMessage").val(data.message);
         if (refresher) clearTimeout(refresher);
-        refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
+        //refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
     } else {
         document.location = "/jol/";
     }
@@ -719,21 +718,38 @@ function renderMyGames(id, games) {
     let ownGames = $(id);
     ownGames.empty();
     $.each(games, function (index, game) {
-        let gameRow = $("<tr/>");
-        let gameCell = $("<td/>").addClass("w-75").text(game.gameName).on('click', function () {
-            doNav("g" + game.gameName);
-        });
-        let statusCell = $("<td/>").addClass("text-center w-25").html(game.pinged ? "<i class='bi-exclamation-triangle'></i>" : !game.current ? "<i class='bi-bell'></i>" : "");
-        gameRow.append(gameCell, statusCell);
-        if (game.turn) {
-            gameCell.addClass("fw-bold bg-success-subtle border border-success-subtle");
-            statusCell.addClass("bg-success-subtle border border-success-subtle");
+        let gameRow = $("<li/>").addClass("list-group-item p-0 border").on('click', function() {doNav("g" + game.name);});
+        let header = $("<div/>").addClass("d-flex p-2 justify-content-between w-100 border-bottom bg-body-tertiary");
+        let title = $("<span/>").addClass("fw-bold fs-6").text(game.name);
+        let turn = $("<span/>").text(game.turn).addClass("d-inline-block d-md-none d-xl-inline-block");
+        header.append(title, turn);
+        let players = $("<div/>").addClass("players pb-2");
+        let predator = renderPlayer(game.players[game.predator]);
+        let activePlayer = renderPlayer(game.players[game.activePlayer]);
+        let prey = renderPlayer(game.players[game.prey]);
+        activePlayer.addClass("fw-semibold");
+        let self = game.players[player];
+        if (self.pinged) {
+            title.append($("<i/>").addClass('ms-2 fs-6 text-danger bi-exclamation-triangle'));
+            players.addClass("bg-danger-subtle opacity-75");
+            header.addClass("bg-danger-subtle");
+        } else if (!self.current) {
+            title.append($("<i/>").addClass('ms-2 fs-6 bi-bell'));
+            players.addClass("bg-info-subtle opacity-75");
+            header.addClass("bg-info-subtle");
         }
-        if (game.flagged) {
-            gameRow.find("td").addClass("bg-warning-subtle");
-        }
+        players.append(predator, activePlayer, prey);
+        gameRow.append(header, players);
         ownGames.append(gameRow);
     });
+}
+
+function renderPlayer(data) {
+    let span = $("<span/>").text(data.playerName).addClass("p-2");
+    if (data.pinged) {
+        span.addClass("border-bottom pb-1 border-dark");
+    }
+    return span;
 }
 
 function renderGameLink(game) {

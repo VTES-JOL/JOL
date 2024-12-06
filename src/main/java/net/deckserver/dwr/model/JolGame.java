@@ -299,6 +299,29 @@ public class JolGame {
         return note.getValue();
     }
 
+    private List<String> getValidPlayers() {
+        return state.getPlayers().stream()
+                .filter(player -> getPool(player) > 0)
+                .collect(Collectors.toList());
+    }
+    public String getPredatorOf(String player) {
+        List<String> validPlayers = getValidPlayers();
+        int playerPosition = validPlayers.indexOf(player);
+        if (playerPosition == -1) return "";
+        int predatorIndex = playerPosition - 1;
+        if (predatorIndex < 0) predatorIndex = validPlayers.size() - 1;
+        return validPlayers.get(predatorIndex);
+    }
+
+    public String getPreyOf(String player) {
+        List<String> validPlayers = getValidPlayers();
+        int playerPosition = validPlayers.indexOf(player);
+        if (playerPosition == -1) return "";
+        int predatorIndex = playerPosition + 1;
+        if (predatorIndex > validPlayers.size() -1 ) predatorIndex = 0;
+        return validPlayers.get(predatorIndex);
+    }
+
     private void setActivePlayer(String player) {
         Notation note = getNote(state, ACTIVE, true);
         note.setValue(player);
@@ -644,8 +667,8 @@ public class JolGame {
     }
 
     public List<String> getPingList() {
-        return state.getPlayers().stream()
-                .filter(player -> getPool(player) > 0)
+        return getValidPlayers()
+                .stream()
                 .filter(player -> !JolAdmin.INSTANCE.isPlayerPinged(player, state.getName()))
                 .collect(Collectors.toList());
     }

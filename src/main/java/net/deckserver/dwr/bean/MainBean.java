@@ -13,8 +13,7 @@ import java.util.stream.Collectors;
 @Getter
 public class MainBean {
 
-    private final List<PlayerGameStatusBean> games;
-    private final List<PlayerGameStatusBean> ousted;
+    private final List<GameStatusBean> games;
     private final List<UserSummaryBean> who;
     private final boolean loggedIn;
     private final List<ChatEntryBean> chat;
@@ -24,14 +23,12 @@ public class MainBean {
         String playerName = model.getPlayerName();
         loggedIn = model.getPlayerName() != null;
         if (loggedIn) {
-            Map<Boolean, List<PlayerGameStatusBean>> allGames = jolAdmin.getGames(playerName).stream()
+            this.games = jolAdmin.getGames(playerName).stream()
                     .filter(gameName -> jolAdmin.isRegistered(gameName, playerName))
                     .filter(jolAdmin::isActive)
-                    .map(gameName -> new PlayerGameStatusBean(gameName, playerName))
-                    .sorted(Comparator.comparing(PlayerGameStatusBean::getGameName))
-                    .collect(Collectors.partitioningBy(PlayerGameStatusBean::isOusted));
-            this.games = allGames.get(false);
-            this.ousted = allGames.get(true);
+                    .map(GameStatusBean::new)
+                    .sorted(Comparator.comparing(GameStatusBean::getName))
+                    .collect(Collectors.toList());
             chat = model.getChat();
             who = JolAdmin.INSTANCE.getWho().stream()
                     .sorted(Comparator.reverseOrder())
@@ -39,7 +36,6 @@ public class MainBean {
                     .collect(Collectors.toList());
         } else {
             this.games = Collections.emptyList();
-            this.ousted = Collections.emptyList();
             this.chat = Collections.emptyList();
             this.who = Collections.emptyList();
         }

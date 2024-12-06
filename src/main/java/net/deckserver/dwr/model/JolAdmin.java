@@ -24,7 +24,6 @@ import net.deckserver.DeckParser;
 import net.deckserver.RandomGameName;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.GameStatusBean;
-import net.deckserver.dwr.bean.PlayerGameStatusBean;
 import net.deckserver.game.interfaces.state.Game;
 import net.deckserver.game.interfaces.turn.TurnRecorder;
 import net.deckserver.game.jaxb.XmlFileUtils;
@@ -92,7 +91,6 @@ public class JolAdmin {
     private static final Predicate<GameInfo> STARTING_GAME = (info) -> info.getStatus().equals(GameStatus.STARTING);
     private static final Predicate<GameInfo> PUBLIC_GAME = info -> info.getVisibility().equals(Visibility.PUBLIC);
     private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
-    private static final Predicate<PlayerGameStatusBean> PLAYER_ACTIVE = player -> !player.isOusted();
     private static final DecimalFormat format = new DecimalFormat("0.#");
 
     static {
