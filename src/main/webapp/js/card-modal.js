@@ -237,7 +237,7 @@ function showCardModal(event) {
     if (cardId) {
         $.get({
             dataType: "json",
-            url: "rest/api/cards/" + cardId, success: function (card) {
+            url: "api/cards/" + cardId, success: function (card) {
                 var modal = $('#cardModal');
                 modal.data('controller', controller);
                 modal.data('region', region);

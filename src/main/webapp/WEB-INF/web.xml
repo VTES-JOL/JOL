@@ -67,7 +67,7 @@
 
     <filter-mapping>
         <filter-name>ExpiresFilter</filter-name>
-        <url-pattern>/rest/*</url-pattern>
+        <url-pattern>/api/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
 

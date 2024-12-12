@@ -12,10 +12,10 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import java.security.Principal;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
-@Path("/api")
+@Path("/")
 public class ApiResource {
 
     private final CardSearch cardSearch = CardSearch.INSTANCE;
@@ -35,10 +35,10 @@ public class ApiResource {
     }
 
     @GET
-    @Path("/cards")
+    @Path("/autocomplete/{partial}")
     @Produces("application/json")
-    public Collection<CardSummary> cardSummaries() {
-        return cardSearch.allCards();
+    public List<String> cardNameAutoComplete(@PathParam("partial") String partial) {
+        return cardSearch.autoComplete(partial).stream().map(CardSummary::getName).sorted().collect(Collectors.toList());
     }
 
     @GET
@@ -46,15 +46,6 @@ public class ApiResource {
     @Produces("application/json")
     public CardSummary cardSummary(@PathParam("id") String id) {
         return cardSearch.get(id);
-    }
-
-    @GET
-    @Path("/cards/{id}")
-    @Produces("text/html")
-    public String getCard(@PathParam("id") String id) {
-        return Optional.ofNullable(cardSearch.get(id))
-                .map(CardSummary::getHtmlText)
-                .orElse("Card not found");
     }
 
     @POST
