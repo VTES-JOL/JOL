@@ -21,11 +21,15 @@
     List<String> defaultDisciplines = cardSummary.getDisciplines();
     String defaultVotes = cardSummary.getVotes();
     List<String> clans = cardSummary.getClanClass();
+    Integer defaultCapacity = cardSummary.getCapacity();
     List<String> disciplines = cardDetail.getDisciplines();
     if (disciplines.isEmpty()) { disciplines = defaultDisciplines; }
     String label = cardDetail.getLabel();
     int counters = cardDetail.getCounters();
     int capacity = cardDetail.getCapacity();
+    if (capacity == -1 && visible && defaultCapacity != null) {
+        capacity = defaultCapacity;
+    }
     String votes = cardDetail.getVotes();
     if (Strings.isNullOrEmpty(votes)) { votes = defaultVotes; }
     boolean hasVotes = !Strings.isNullOrEmpty(votes) && !votes.equals("0");
