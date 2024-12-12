@@ -1007,12 +1007,14 @@ function loadGame(data) {
     }
     if (!data.player) {
         $("#gameForm :input").attr('disabled', true);
-        $(".player-only").hide();
+        $(".player-only").addClass("d-none");
+        $(".control-grid").addClass("spectator");
         phaseSelect.attr('disabled', true);
         endTurn.attr('disabled', true);
     } else {
         $("#gameForm :input").removeAttr('disabled');
-        $(".player-only").show();
+        $(".player-only").removeClass("d-none");
+        $(".control-grid").removeClass("spectator");
     }
 
     if (player !== data.currentPlayer) {

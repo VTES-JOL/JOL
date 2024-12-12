@@ -188,15 +188,27 @@ a.card-name {
     grid-template-areas: 'hand commands' 'chat chat' 'info info';
 }
 
+.spectator {
+    grid-template-areas: 'commands commands' 'chat chat' 'info info';
+}
+
 @media (min-width: 768px) {
     .control-grid {
         grid-template-areas: 'hand commands info' 'chat chat chat';
+    }
+
+    .spectator {
+        grid-template-areas: 'commands info' 'chat chat';
     }
 }
 
 @media (min-width: 1200px) {
     .control-grid {
         grid-template-areas: 'hand commands chat chat chat info';
+    }
+
+    .spectator {
+        grid-template-areas: 'commands chat chat chat info';
     }
 
 }
