@@ -27,8 +27,8 @@
 %>
 
 <c:if test="<%= cards.length > 0 %>">
-    <div class="card mb-2 text-bg-light" data-region="<%= regionName %>">
-        <div class="card-header <%= regionStyle %> <%= collapsed %>" type="button" onclick="details('<%= regionId %>');"
+    <div class="mb-2 text-bg-light" data-region="<%= regionName %>">
+        <div class="p-2 <%= regionStyle %> <%= collapsed %>" type="button" onclick="details('<%= regionId %>');"
              data-bs-toggle="collapse" data-bs-target="#<%= regionId %>" aria-expanded="<%= isVisible %>" aria-controls="<%= regionId %>">
             <span class="fw-bold"><%= label %></span>
             <span>( <%= size %> )</span>

@@ -204,11 +204,11 @@ a.card-name {
 
 @media (min-width: 1200px) {
     .control-grid {
-        grid-template-areas: 'hand commands chat chat chat info';
+        grid-template-areas: 'hand commands chat chat chat info info';
     }
 
     .spectator {
-        grid-template-areas: 'commands chat chat chat info';
+        grid-template-areas: 'commands chat chat chat info info';
     }
 
 }

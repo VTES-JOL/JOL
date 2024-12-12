@@ -42,7 +42,7 @@
                 </span>
             </h6>
         </div>
-        <div class="card-body p-2" id="<%= playerIndex %>">
+        <div class="card-body px-0 py-2" id="<%= playerIndex %>">
             <jsp:include page="region.jsp">
                 <jsp:param name="player" value="<%= player %>"/>
                 <jsp:param name="playerIndex" value="<%= playerIndex%>"/>
