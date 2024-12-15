@@ -66,7 +66,9 @@
                             <input type="email" class="form-control" id="newemail" name="newemail" placeholder="user@example.org">
                             <label for="newemail">E-mail address</label>
                         </div>
-                        <div class="cf-turnstile" data-sitekey="<%= System.getenv().get("JOL_RECAPTCHA_KEY") %>" data-theme="light"></div>
+                        <c:if test='System.getenv().getOrDefault("ENABLE_CAPTCHA", "true").equals("true")'>
+                            <div class="cf-turnstile" data-sitekey="<%= System.getenv().get("JOL_RECAPTCHA_KEY") %>" data-theme="light"></div>
+                        </c:if>
                         <button type="submit" name="register" value="Register" class="btn btn-outline-secondary btn-lg mt-1">Register</button>
                     </form>
                 </div>
