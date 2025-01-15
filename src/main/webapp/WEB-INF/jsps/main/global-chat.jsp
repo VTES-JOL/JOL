@@ -3,7 +3,7 @@
         <h5>Global Chat:</h5>
     </div>
     <div class="card-body position-relative">
-        <div id="globalChatOutput" class="scrollable"></div>
+        <div id="globalChatOutput" class="scrollable mhd-70"></div>
         <div id="newMessages" class="text-center p-2 text-bg-success rounded hover-success position-absolute d-none justify-content-between align-items-center" onclick="scrollGlobalChat();">
             <i class="bi bi-chevron-double-down"></i>
             <span>New Messages</span>

@@ -11,7 +11,7 @@
             </div>
         </div>
         <div class="col-9 col-xxl-10">
-            <div data-bs-spy="scroll" data-bs-target="#deck-help-nav" data-bs-smooth-scroll="true" tabindex="0" class="scrollable h-50">
+            <div data-bs-spy="scroll" data-bs-target="#deck-help-nav" data-bs-smooth-scroll="true" tabindex="0" class="scrollable mhd-80">
                 <div id="cardNames">
                     <h4 class="mt-2">Card Names</h4>
                     Because JOL uses text based deck lists there are some rules to make sure the decks can be parsed into valid cards.  Each card has one or more unique ways to distinguish it from other cards in the collection.

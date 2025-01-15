@@ -10,7 +10,7 @@
       <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" id="help5" data-bs-target="#panel5" aria-controls="panel5">Card Information</button>
       <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" id="help7" data-bs-target="#panel7" aria-controls="panel7">Tips</button>
     </nav>
-    <div class="tab-content p-2 text-bg-light shadow" id="helpContent">
+    <div class="tab-content p-2 text-bg-light" id="helpContent">
       <jsp:include page="creating-deck.jsp"/>
       <jsp:include page="joining-games.jsp"/>
       <jsp:include page="card-information.jsp"/>

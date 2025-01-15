@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="col-9 col-xxl-10">
-            <div data-bs-spy="scroll" data-bs-target="#game-help-nav" data-bs-smooth-scroll="true" tabindex="0" class="scrollable h-50">
+            <div data-bs-spy="scroll" data-bs-target="#game-help-nav" data-bs-smooth-scroll="true" tabindex="0" class="scrollable mhd-80">
                 <div id="informationPanel">
                     <h4 class="mt-2">Information Panel</h4>
                 </div>

@@ -754,7 +754,7 @@ function renderMyGames(id, games) {
         } else if (!self.current) {
             title.prepend($("<i/>").addClass('me-2 bi-bell'));
         }
-        players.append(predator, activePlayer, prey);
+        players.append(predator, `>`, activePlayer, '>', prey);
         gameRow.append(header, players);
         ownGames.append(gameRow);
     });
