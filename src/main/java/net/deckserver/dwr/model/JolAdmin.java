@@ -346,7 +346,7 @@ public class JolAdmin {
     }
 
     public void remove(String player) {
-        logger.info("removing player");
+        logger.debug("removing player");
         if (player != null) {
             pmap.remove(player);
             for (GameModel gameModel : gmap.values()) {
@@ -582,7 +582,7 @@ public class JolAdmin {
     }
 
     public void registerTournamentDeck(String gameName, String playerName, String deckName, int round) {
-        logger.info("Registering {} for {}", playerName, gameName);
+        logger.debug("Registering {} for {}", playerName, gameName);
         PlayerInfo playerInfo = players.get(playerName);
         GameInfo gameInfo = games.get(gameName);
         String deckId = String.format("%s-%d", playerInfo.getId(), round);
@@ -1151,7 +1151,7 @@ public class JolAdmin {
         try {
             Path deckPath = BASE_PATH.resolve("decks").resolve(deckId + ".json");
             Path gamePath = BASE_PATH.resolve("games").resolve(gameId).resolve(deckId + ".json");
-            logger.info("Copying {} to {}", deckPath, gamePath);
+            logger.debug("Copying {} to {}", deckPath, gamePath);
             Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
             return true;
         } catch (IOException e) {

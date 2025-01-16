@@ -22,6 +22,8 @@
     String defaultVotes = cardSummary.getVotes();
     List<String> clans = cardSummary.getClanClass();
     Integer defaultCapacity = cardSummary.getCapacity();
+    String owner = cardDetail.getOwner();
+    if (!owner.equals(player)) visible = true;
     List<String> disciplines = cardDetail.getDisciplines();
     if (disciplines.isEmpty()) { disciplines = defaultDisciplines; }
     String label = cardDetail.getLabel();
