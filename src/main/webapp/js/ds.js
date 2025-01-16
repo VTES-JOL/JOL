@@ -763,7 +763,7 @@ function renderMyGames(id, games) {
 function renderPlayer(data) {
     let span = $("<span/>").text(data.playerName).addClass("p-2");
     if (data.pinged) {
-        span.addClass("border-bottom pb-1 border-dark");
+        span.append("<i class='bi-exclamation-triangle ms-1'></i>");
     }
     return span;
 }

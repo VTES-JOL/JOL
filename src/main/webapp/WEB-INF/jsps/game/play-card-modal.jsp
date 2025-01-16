@@ -1,4 +1,4 @@
-<div class="modal" id="playCardModal" tabindex="-1" role="dialog" aria-labelledby="playCardModalLabel" aria-hidden="true">
+<div class="modal" id="playCardModal" tabindex="-1" role="dialog" aria-labelledby="playCardModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content loading" style="height:30vh;text-align:center">
             <h2 style="position:relative;top:43%">Loading...</h2>
@@ -30,7 +30,7 @@
                     <hr/>
                     <button id="playCardModalPlayButton" type="button"
                             class="btn btn-outline-secondary mb-2" style="white-space:normal"
-                            onclick="playCard(event);">Play
+                            onclick="playCard()">Play
                     </button>
                 </div>
                 <div class="d-flex justify-content-center">

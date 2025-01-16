@@ -36,7 +36,7 @@ function showPlayCardModal(event) {
             url: "https://static.deckserver.net/json/" + cardId, success: function (card) {
                 playCardModal.data('hand-coord', coordinates);
                 playCardModal.data('region', region);
-                playCardModal.data('do-not-replace', card.doNotReplace);
+                playCardModal.data('do-not-replace', region === "research" ? true : card.doNotReplace);
                 playCardModal.find(".card-name").text(card.displayName);
                 playCardModal.find(".card-type")
                     .removeClass()

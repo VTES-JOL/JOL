@@ -112,7 +112,7 @@
                         <span>Block</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Burn"
-                            data-region="ready torpor"
+                            data-region="ready torpor inactive"
                             onclick="burn();">
                         <span>Burn</span>
                     </button>
