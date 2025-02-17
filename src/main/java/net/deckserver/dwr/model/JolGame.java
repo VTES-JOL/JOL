@@ -704,6 +704,13 @@ public class JolGame {
         }
     }
 
+    public void setOrder(List<String> players) {
+        state.orderPlayers(players);
+        String order = "";
+        for (String player : players) order = order + " " + player;
+        addCommand("Player order" + order, new String[]{"order", order});
+    }
+
     private void _moveall(String player, String srcLoc, String destPlayer, String destLoc) {
         if (destPlayer == null) destPlayer = player;
         Location src = state.getPlayerLocation(player, srcLoc);

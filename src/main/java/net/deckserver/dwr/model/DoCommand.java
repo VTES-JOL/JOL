@@ -13,6 +13,7 @@ import net.deckserver.game.ui.state.CardDetail;
 import net.deckserver.storage.json.cards.CardSummary;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -297,6 +298,18 @@ public class DoCommand {
                     throw new CommandException("Card is already locked");
                 game.setTapped(player, card, true);
                 return "Locked card";
+            }
+            if (cmd.equalsIgnoreCase("order")) {
+                List<String> players = game.getPlayers();
+                List<String> neworder = new ArrayList<>();
+                for (int j = 0; j < players.size(); j++) {
+                    int index = cmdObj.getNumber(-1);
+                    if (index == -1) return "Must specify a number for each player";
+                    if (index < 1 || index > players.size()) return "Bad number : " + index;
+                    neworder.add(players.get(index - 1));
+                }
+                game.setOrder(neworder);
+                return "Changed seating order";
             }
             // TODO Fix this
             if (cmd.equalsIgnoreCase("show")) {
