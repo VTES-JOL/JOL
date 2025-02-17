@@ -177,8 +177,9 @@ a.card-name {
 
 .players {
     display: grid;
-    grid-template-columns: 1fr 1rem 1fr 1rem 1fr;
+    grid-template-columns: repeat(3, minmax(0, 33%));
     justify-items: center;
+    justify-content: center;
     align-items: baseline;
 }
 

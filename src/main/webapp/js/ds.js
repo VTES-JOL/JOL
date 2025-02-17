@@ -754,14 +754,14 @@ function renderMyGames(id, games) {
         } else if (!self.current) {
             title.prepend($("<i/>").addClass('me-2 bi-bell'));
         }
-        players.append(predator, `>`, activePlayer, '>', prey);
+        players.append(predator, activePlayer, prey);
         gameRow.append(header, players);
         ownGames.append(gameRow);
     });
 }
 
 function renderPlayer(data) {
-    let span = $("<span/>").text(data.playerName).addClass("p-2");
+    let span = $("<span/>").text(data.playerName).addClass("my-2 px-2 border-end border-start w-100 text-center");
     if (data.pinged) {
         span.append("<i class='bi-exclamation-triangle ms-1'></i>");
     }
