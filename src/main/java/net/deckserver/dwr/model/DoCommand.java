@@ -94,7 +94,7 @@ public class DoCommand {
                 String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
                 String card = cmdObj.getCard(false, targetPlayer, targetRegion);
 
-                game.setVotes(card, cmdObj.nextArg());
+                game.setVotes(card, cmdObj.nextArg(), false);
                 return "Adjusted votes";
             }
             if (cmd.equalsIgnoreCase("random")) {
@@ -144,9 +144,10 @@ public class DoCommand {
             if (cmd.equalsIgnoreCase("play")) {
                 // play [vamp] <cardnumber> [@ <modes>] [<targetplayer>] [<targetregion>] [<targetcard>] [draw]
                 boolean crypt = cmdObj.consumeString("vamp");
-                String defaultRegion = crypt ? JolGame.INACTIVE_REGION : JolGame.HAND;
-                String srcRegion = cmdObj.getRegion(defaultRegion);
-                boolean docap = srcRegion.equals(JolGame.INACTIVE_REGION);
+                if (crypt) {
+                    return "Invalid command. Use influence instead";
+                }
+                String srcRegion = cmdObj.getRegion(JolGame.HAND);
                 String srcCard = cmdObj.getCard(false, player, srcRegion);
 
                 String[] modes = null;
@@ -155,7 +156,7 @@ public class DoCommand {
                     modes = cmdObj.nextArg().split(",");
 
                 String targetPlayer = cmdObj.getPlayer(player);
-                String targetRegion = cmdObj.getRegion(crypt ? JolGame.READY_REGION : JolGame.ASHHEAP);
+                String targetRegion = cmdObj.getRegion(JolGame.ASHHEAP);
                 String targetCard = cmdObj.getCard(true, targetPlayer, targetRegion);
                 boolean draw = cmdObj.consumeString("draw");
                 if (targetCard != null) {
@@ -164,28 +165,17 @@ public class DoCommand {
                     return "Played a card on another card";
                 } else {
                     game.playCard(player, srcCard, targetPlayer, targetRegion, modes);
-                    if (docap) {
-                        int curcap = game.getCapacity(srcCard);
-                        if (curcap <= 0) {
-                            CardDetail detail = game.getCard(srcCard);
-                            CardSummary card = CardSearch.INSTANCE.get(detail.getCardId());
-                            Integer capacity = card.getCapacity();
-                            if (capacity != null) {
-                                game.changeCapacity(srcCard, capacity, false);
-                            }
-                            // Do disciplines
-                            List<String> disciplines = card.getDisciplines();
-                            game.setDisciplines(srcCard, disciplines, true);
-                            // Do votes
-                            String votes = card.getVotes();
-                            if (votes != null && !votes.isEmpty()) {
-                                game.setVotes(srcCard, votes);
-                            }
-                        }
-                    }
                     if (draw) game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
                     return "Played a card";
                 }
+            }
+            if (cmd.equalsIgnoreCase("influence")) {
+                String srcRegion = cmdObj.getRegion(JolGame.INACTIVE_REGION);
+                String srcCard = cmdObj.getCard(false, player, srcRegion);
+                String targetPlayer = cmdObj.getPlayer(player);
+                String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
+                game.influenceCard(player, srcCard, targetPlayer, targetRegion);
+                return "Influenced a crypt card";
             }
             if (cmd.equalsIgnoreCase("move")) {
                 String srcPlayer = cmdObj.getPlayer(player);

@@ -191,6 +191,37 @@ public class JolGame {
         dest.addCard(card, false);
     }
 
+    public void influenceCard(String player, String cardId, String destPlayer, String destRegion) {
+        Card card = state.getCard(cardId);
+        if (card == null) throw new IllegalArgumentException("No such card");
+        CardContainer source = card.getParent();
+        Location dest = state.getPlayerLocation(destPlayer, destRegion);
+        if (dest == null) throw new IllegalStateException("No such region");
+
+        if (getCapacity(cardId) <= 0) {
+            String message = player + " influences out " + getCardLink(card);
+            CardDetail detail = getCard(cardId);
+            CardSummary cardSummary = CardSearch.INSTANCE.get(detail.getCardId());
+            Integer capacity = cardSummary.getCapacity();
+            if (capacity != null) {
+                changeCapacity(cardId, capacity, true);
+                message += ", capacity: " + capacity;
+            }
+            // Do disciplines
+            List<String> disciplines = cardSummary.getDisciplines();
+            setDisciplines(cardId, disciplines, true);
+            // Do votes
+            String votes = cardSummary.getVotes();
+            if (!Strings.isNullOrEmpty(votes)) {
+                setVotes(cardId, votes, true);
+                message += ", votes: " + votes;
+            }
+            source.removeCard(card);
+            dest.addCard(card, true);
+            addCommand(message, new String[]{"influence", cardId, destPlayer, destRegion});
+        }
+    }
+
     public void shuffle(String player, String region, int num) {
         _shuffle(player, region, num, true);
     }
@@ -458,7 +489,7 @@ public class JolGame {
         addMessage(msg);
     }
 
-    public void setVotes(String cardId, String votes) {
+    public void setVotes(String cardId, String votes, boolean quiet) {
         Card card = state.getCard(cardId);
         Integer voteAmount = 0;
         Notation note = getNote(card, VOTES, true);
@@ -469,15 +500,19 @@ public class JolGame {
         } catch (Exception nfe) {
             // do nothing
         }
+        String message = "";
         if (votes.trim().equalsIgnoreCase("priscus") || votes.trim().equals("P")) {
             note.setValue("P");
-            addMessage(getCardName(card) + " is priscus");
+            message = getCardName(card) + " is priscus";
         } else if (voteAmount == 0) {
             note.setValue("0");
-            addMessage(getCardName(card) + " now has no votes");
+            message = getCardName(card) + " now has no votes";
         } else if (voteAmount > 0) {
             note.setValue(voteAmount.toString());
-            addMessage(getCardName(card) + " now has " + voteAmount + " votes");
+            message = getCardName(card) + " now has " + voteAmount + " votes";
+        }
+        if (!quiet) {
+            addMessage(message);
         }
     }
 

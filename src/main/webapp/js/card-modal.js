@@ -406,7 +406,7 @@ function burn() {
 
 function playVamp() {
     var modal = $('#cardModal');
-    var command = `play vamp ${modal.data('coordinates')}`;
+    var command = `influence ${modal.data('coordinates')}`;
     sendCommand(command);
     modal.modal('hide');
     return false;

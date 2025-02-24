@@ -41,7 +41,7 @@
                             data-owner-only
                             data-minion-only
                             onclick="playVamp();">
-                        <span>Play</span>
+                        <span>Influence</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Bleed"
                             data-region="ready" data-lock-state="unlocked"
