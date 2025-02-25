@@ -20,6 +20,8 @@ public enum RegionType {
 
     public final static EnumSet<RegionType> OWNER_VISIBLE_REGIONS = EnumSet.of(READY, UNCONTROLLED, ASH_HEAP, HAND, TORPOR, REMOVED_FROM_GAME, RESEARCH);
     public final static EnumSet<RegionType> OTHER_VISIBLE_REGIONS = EnumSet.of(READY, ASH_HEAP, TORPOR, REMOVED_FROM_GAME);
+    public final static EnumSet<RegionType> SIMPLE_REGIONS = EnumSet.of(ASH_HEAP, HAND, REMOVED_FROM_GAME, LIBRARY, RESEARCH);
+    public final static EnumSet<RegionType> PLAYABLE_REGIONS = EnumSet.of(HAND, RESEARCH);
 
     RegionType(String xmlLabel, String description, boolean ownerVisibility, boolean otherVisibility) {
         this.xmlLabel = xmlLabel;

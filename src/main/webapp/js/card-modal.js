@@ -29,12 +29,14 @@ function showPlayCardModal(event) {
     let eventParent = $(event.target).parents(".list-group-item");
     let cardId = eventParent.data('card-id');
     let coordinates = eventParent.data('coordinates');
+    let region = eventParent.closest('[data-region]').data('region');
     if (cardId) {
         $.get({
             dataType: "json",
             url: "https://static.deckserver.net/json/" + cardId, success: function (card) {
                 playCardModal.data('hand-coord', coordinates);
-                playCardModal.data('do-not-replace', card.doNotReplace);
+                playCardModal.data('region', region);
+                playCardModal.data('do-not-replace', region === "research" ? true : card.doNotReplace);
                 playCardModal.find(".card-name").text(card.displayName);
                 playCardModal.find(".card-type")
                     .removeClass()
@@ -166,8 +168,9 @@ function playCardCommand(disciplines, target) {
     let modal = $('#playCardModal');
     let handIndex = modal.data('hand-coord');
     let doNotReplace = modal.data('do-not-replace');
+    let region = modal.data('region');
     let getTargetFromModal = target === 'MINION_YOU_CONTROL' || target === 'SELF' || target === 'SOMETHING';
-    return 'play ' + handIndex
+    return 'play ' + region + ' ' + handIndex
         + (disciplines ? ' @ ' + disciplines.join(',') : '')
         + (target === 'READY_REGION' ? ' ready' : '')
         + (target === 'REMOVE_FROM_GAME' ? ' rfg' : '')
@@ -234,7 +237,7 @@ function showCardModal(event) {
     if (cardId) {
         $.get({
             dataType: "json",
-            url: "rest/api/cards/" + cardId, success: function (card) {
+            url: "api/cards/" + cardId, success: function (card) {
                 var modal = $('#cardModal');
                 modal.data('controller', controller);
                 modal.data('region', region);
@@ -403,7 +406,7 @@ function burn() {
 
 function playVamp() {
     var modal = $('#cardModal');
-    var command = `play vamp ${modal.data('coordinates')}`;
+    var command = `influence ${modal.data('coordinates')}`;
     sendCommand(command);
     modal.modal('hide');
     return false;

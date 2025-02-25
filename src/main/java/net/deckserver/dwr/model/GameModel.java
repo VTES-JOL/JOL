@@ -110,6 +110,7 @@ public class GameModel implements Comparable<GameModel> {
             if (game.getActivePlayer().equals(player) && "Yes".equalsIgnoreCase(endTurn)) {
                 game.newTurn();
                 resetChats();
+                reloadNotes();
                 idx = 0; // reset the current action index for the new turn.
                 turnChanged = stateChanged = phaseChanged = true;
             }

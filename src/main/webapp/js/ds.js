@@ -21,7 +21,7 @@ let pointerCanHover = window.matchMedia("(hover: hover)").matches;
 let scrollChat = false;
 
 function errorhandler(errorString, exception) {
-    $("#connectionMessage").show();
+    $("#connectionMessage").removeClass("d-none");
     refresher = setTimeout("DS.init({callback: processData, errorHandler: errorhandler})", 5000);
 }
 
@@ -46,7 +46,7 @@ function setPreferences(value) {
 }
 
 function processData(a) {
-    $("#connectionMessage").hide();
+    $("#connectionMessage").addClass("d-none");
     for (let b in a) {
         eval(b + '(a[b]);');
     }
@@ -715,25 +715,58 @@ function renderGlobalChat(data) {
     }
 }
 
+function toggleDetailedMode(elem) {
+    let checked = elem.checked;
+    localStorage.setItem("jol-details", checked);
+    let playersDiv = $(".players");
+    if (checked) {
+        playersDiv.removeClass("d-none");
+    } else {
+        playersDiv.addClass("d-none");
+    }
+}
+
 function renderMyGames(id, games) {
+    let checked = localStorage.getItem("jol-details") || "true";
     let ownGames = $(id);
     ownGames.empty();
     $.each(games, function (index, game) {
-        let gameRow = $("<tr/>");
-        let gameCell = $("<td/>").addClass("w-75").text(game.gameName).on('click', function () {
-            doNav("g" + game.gameName);
-        });
-        let statusCell = $("<td/>").addClass("text-center w-25").html(game.pinged ? "<i class='bi-exclamation-triangle'></i>" : !game.current ? "<i class='bi-bell'></i>" : "");
-        gameRow.append(gameCell, statusCell);
-        if (game.turn) {
-            gameCell.addClass("fw-bold bg-success-subtle border border-success-subtle");
-            statusCell.addClass("bg-success-subtle border border-success-subtle");
+        let gameRow = $("<li/>").addClass("list-group-item p-0 border").on('click', function() {doNav("g" + game.name);});
+        let header = $("<div/>").addClass("d-flex p-2 justify-content-between w-100 border-bottom bg-body-tertiary");
+        let title = $("<span/>").addClass("fw-bold").text(game.name);
+        let turn = $("<small/>").text(game.turn).addClass("d-inline-block d-md-none d-xl-inline-block");
+        header.append(title, turn);
+        let players = $("<div/>").addClass("players pb-2");
+        let toggle = $("#myGamesDetailedMode");
+        if (checked === "true") {
+            toggle.prop("checked",true);
+            players.removeClass("d-none");
+        } else {
+            toggle.prop("checked",false);
+            players.addClass("d-none");
         }
-        if (game.flagged) {
-            gameRow.find("td").addClass("bg-warning-subtle");
+        let predator = renderPlayer(game.players[game.predator]);
+        let activePlayer = renderPlayer(game.players[game.activePlayer]);
+        let prey = renderPlayer(game.players[game.prey]);
+        activePlayer.addClass("fw-semibold");
+        let self = game.players[player];
+        if (self.pinged) {
+            title.prepend($("<i/>").addClass('me-2 text-danger bi-exclamation-triangle'));
+        } else if (!self.current) {
+            title.prepend($("<i/>").addClass('me-2 bi-bell'));
         }
+        players.append(predator, activePlayer, prey);
+        gameRow.append(header, players);
         ownGames.append(gameRow);
     });
+}
+
+function renderPlayer(data) {
+    let span = $("<span/>").text(data.playerName).addClass("my-2 px-2 border-end border-start w-100 text-center");
+    if (data.pinged) {
+        span.append("<i class='bi-exclamation-triangle ms-1'></i>");
+    }
+    return span;
 }
 
 function renderGameLink(game) {
@@ -749,7 +782,7 @@ function renderOnline(div, who) {
         return;
     }
     $.each(who, function (index, player) {
-        let playerSpan = $("<span/>").text(player.name).addClass("badge mb-1");
+        let playerSpan = $("<span/>").text(player.name).addClass("badge mb-1 fs-6");
         if (player.superUser) {
             playerSpan.addClass("text-bg-secondary");
         } else if (player.admin) {
@@ -930,6 +963,22 @@ function sendPrivateNotes() {
     return false;
 }
 
+function toggleChat() {
+    $(".gameChat").toggleClass("d-none");
+    $(".history").toggleClass("d-none");
+    if ($("#gameHistory").children().length === 0) {
+        getHistory();
+    }
+}
+
+function toggleNotes() {
+    $(".notes").toggleClass("d-none");
+    $(".gameDeck").toggleClass("d-none");
+    if ($("#gameDeck").children().length === 0) {
+        doShowDeck();
+    }
+}
+
 function loadGame(data) {
     // //Reset on game change
     const gameTitle = $("#gameTitle");
@@ -959,12 +1008,14 @@ function loadGame(data) {
     }
     if (!data.player) {
         $("#gameForm :input").attr('disabled', true);
-        $(".player-only").hide();
+        $(".player-only").addClass("d-none");
+        $(".control-grid").addClass("spectator");
         phaseSelect.attr('disabled', true);
         endTurn.attr('disabled', true);
     } else {
         $("#gameForm :input").removeAttr('disabled');
-        $(".player-only").show();
+        $(".player-only").removeClass("d-none");
+        $(".control-grid").removeClass("spectator");
     }
 
     if (player !== data.currentPlayer) {
@@ -1125,7 +1176,7 @@ function addCardTooltips(parent) {
                     instance.reference.removeAttribute('title');
                 }
                 if (profile.imageTooltipPreference) {
-                    let content = `<img width="350" height="500" src="https://static.deckserver.net/images/${cardId}" alt="card"/>`;
+                    let content = `<img width="350" height="500" src="https://static.deckserver.net/images/${cardId}" alt="Loading..."/>`;
                     instance.setContent(content);
                 } else {
                     $.get({

@@ -13,7 +13,7 @@
     String playerIndex = request.getParameter("playerIndex");
     String label = request.getParameter("label");
     RegionType region = RegionType.valueOf(request.getParameter("region"));
-    boolean simpleDisplay = EnumSet.of(RegionType.ASH_HEAP, RegionType.HAND, RegionType.REMOVED_FROM_GAME, RegionType.LIBRARY).contains(region);
+    boolean simpleDisplay = RegionType.SIMPLE_REGIONS.contains(region);
     String regionId = playerIndex + "-" + region;
     boolean startCollapsed = JolAdmin.INSTANCE.getGameModel(game.getName()).getView(viewer).isCollapsed(regionId);
     boolean isVisible = game.isVisible(player, viewer, region);
@@ -27,8 +27,8 @@
 %>
 
 <c:if test="<%= cards.length > 0 %>">
-    <div class="card mb-2 text-bg-light" data-region="<%= regionName %>">
-        <div class="card-header <%= regionStyle %> <%= collapsed %>" type="button" onclick="details('<%= regionId %>');"
+    <div class="mb-2 text-bg-light" data-region="<%= regionName %>">
+        <div class="p-2 <%= regionStyle %> <%= collapsed %>" type="button" onclick="details('<%= regionId %>');"
              data-bs-toggle="collapse" data-bs-target="#<%= regionId %>" aria-expanded="<%= isVisible %>" aria-controls="<%= regionId %>">
             <span class="fw-bold"><%= label %></span>
             <span>( <%= size %> )</span>

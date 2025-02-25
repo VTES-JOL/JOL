@@ -20,10 +20,10 @@
     List<String> clans = cardSummary.getClanClass();
     String regionStyle = region == RegionType.REMOVED_FROM_GAME ? "opacity-50" : "";
     String attributes = cardDetail.buildAttributes(region, index, visible);
-    String action = region == RegionType.HAND ? "showPlayCardModal(event);" : (region == RegionType.ASH_HEAP ? "cardOnTableClicked(event);" : "");
+    String action = RegionType.PLAYABLE_REGIONS.contains(region) && player.equals(viewer) ? "showPlayCardModal(event);" : (region == RegionType.ASH_HEAP ? "cardOnTableClicked(event);" : "");
     String showAction = game.getPlayers().contains(viewer) ? action : "";
 %>
-<li <%= attributes %> onclick="<%= showAction %>" class="list-group-item d-flex justify-content-between align-items-center p-1 shadow <%= regionStyle %>">
+<li <%= attributes %> onclick="<%= showAction %>" class="flex-grow-1 list-group-item d-flex justify-content-between align-items-center p-1 shadow <%= regionStyle %>">
     <div class="mx-1 me-auto w-100 align-items-center">
         <div class="d-flex justify-content-between align-items-center w-100">
             <c:if test="<%= visible %>">

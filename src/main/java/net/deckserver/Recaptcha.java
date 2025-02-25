@@ -16,13 +16,12 @@ import java.net.URL;
 public class Recaptcha {
 
     private static Logger logger = LoggerFactory.getLogger(Recaptcha.class);
-    private static final String url = "https://www.google.com/recaptcha/api/siteverify";
+    private static final String url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
     private static final String secret = System.getenv("JOL_RECAPTCHA_SECRET");
-    private final static String USER_AGENT = "Mozilla/5.0";
 
     @SuppressWarnings("unused")
     public static boolean verify(String gRecaptchaResponse) {
-        if (gRecaptchaResponse == null || "".equals(gRecaptchaResponse)) {
+        if (gRecaptchaResponse == null || gRecaptchaResponse.isEmpty()) {
             return false;
         }
 
@@ -30,10 +29,8 @@ public class Recaptcha {
             URL obj = new URL(url);
             HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 
-            // add reuqest header
+            // add request header
             con.setRequestMethod("POST");
-            con.setRequestProperty("User-Agent", USER_AGENT);
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
             String postParams = "secret=" + secret + "&response=" + gRecaptchaResponse;
 
@@ -45,9 +42,6 @@ public class Recaptcha {
             wr.close();
 
             int responseCode = con.getResponseCode();
-            logger.trace("\nSending 'POST' request to URL : " + url);
-            logger.trace("Post parameters : " + postParams);
-            logger.trace("Response Code : " + responseCode);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(
                     con.getInputStream()));
@@ -58,9 +52,6 @@ public class Recaptcha {
                 response.append(inputLine);
             }
             in.close();
-
-            // print result
-            logger.trace(response.toString());
 
             //parse JSON response and return 'success' value
             JsonReader jsonReader = Json.createReader(new StringReader(response.toString()));

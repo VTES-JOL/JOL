@@ -24,7 +24,6 @@ import net.deckserver.DeckParser;
 import net.deckserver.RandomGameName;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.GameStatusBean;
-import net.deckserver.dwr.bean.PlayerGameStatusBean;
 import net.deckserver.game.interfaces.state.Game;
 import net.deckserver.game.interfaces.turn.TurnRecorder;
 import net.deckserver.game.jaxb.XmlFileUtils;
@@ -34,7 +33,10 @@ import net.deckserver.game.storage.state.StoreGame;
 import net.deckserver.game.storage.turn.StoreTurnRecorder;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
-import net.deckserver.jobs.*;
+import net.deckserver.jobs.CleanupGamesJob;
+import net.deckserver.jobs.PersistStateJob;
+import net.deckserver.jobs.PublicGamesBuilderJob;
+import net.deckserver.jobs.ValidateGWJob;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.DeckStats;
@@ -89,7 +91,6 @@ public class JolAdmin {
     private static final Predicate<GameInfo> STARTING_GAME = (info) -> info.getStatus().equals(GameStatus.STARTING);
     private static final Predicate<GameInfo> PUBLIC_GAME = info -> info.getVisibility().equals(Visibility.PUBLIC);
     private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
-    private static final Predicate<PlayerGameStatusBean> PLAYER_ACTIVE = player -> !player.isOusted();
     private static final DecimalFormat format = new DecimalFormat("0.#");
 
     static {
@@ -345,7 +346,7 @@ public class JolAdmin {
     }
 
     public void remove(String player) {
-        logger.info("removing player");
+        logger.debug("removing player");
         if (player != null) {
             pmap.remove(player);
             for (GameModel gameModel : gmap.values()) {
@@ -409,7 +410,6 @@ public class JolAdmin {
         loadProperties();
         scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 1, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(new CleanupPlayersJob(), 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(new ValidateGWJob(), 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 10, TimeUnit.MINUTES);
     }
@@ -582,7 +582,7 @@ public class JolAdmin {
     }
 
     public void registerTournamentDeck(String gameName, String playerName, String deckName, int round) {
-        logger.info("Registering {} for {}", playerName, gameName);
+        logger.debug("Registering {} for {}", playerName, gameName);
         PlayerInfo playerInfo = players.get(playerName);
         GameInfo gameInfo = games.get(gameName);
         String deckId = String.format("%s-%d", playerInfo.getId(), round);
@@ -822,6 +822,10 @@ public class JolAdmin {
         return loadGameInfo(gameName).getStatus().equals(GameStatus.ACTIVE);
     }
 
+    public boolean isAlive(String gameName, String playerName) {
+        return loadGameState(gameName).getPool(playerName) > 0;
+    }
+
     public boolean isPrivate(String gameName) {
         return loadGameInfo(gameName).getVisibility().equals(Visibility.PRIVATE);
     }
@@ -1001,20 +1005,6 @@ public class JolAdmin {
         setRole(info, PlayerRole.SUPER_USER, value);
     }
 
-    public void cleanupInactivePlayers() {
-        Set<String> inactivePlayers = new HashSet<>();
-        for (String playerName : getPlayers()) {
-            OffsetDateTime playerAccess = timestamps.getPlayerAccess(playerName);
-            if (playerAccess.plusYears(5).isBefore(OffsetDateTime.now())) {
-                inactivePlayers.add(playerName);
-            }
-        }
-        inactivePlayers.forEach(player -> {
-            logger.info("Deleting inactive player {}", player);
-            archivePlayer(player);
-        });
-    }
-
     public boolean isValid(String playerName, String deckName) {
         return Optional.ofNullable(decks.get(playerName, deckName))
                 .map(DeckInfo::getDeckId)
@@ -1165,7 +1155,7 @@ public class JolAdmin {
         try {
             Path deckPath = BASE_PATH.resolve("decks").resolve(deckId + ".json");
             Path gamePath = BASE_PATH.resolve("games").resolve(gameId).resolve(deckId + ".json");
-            logger.info("Copying {} to {}", deckPath, gamePath);
+            logger.debug("Copying {} to {}", deckPath, gamePath);
             Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
             return true;
         } catch (IOException e) {

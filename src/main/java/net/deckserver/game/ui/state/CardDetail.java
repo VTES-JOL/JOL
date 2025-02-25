@@ -19,6 +19,7 @@ public class CardDetail {
     private int counters;
     private String label;
     private String votes;
+    private String owner;
     private boolean locked;
     private boolean contested;
     private boolean minion;
@@ -30,6 +31,7 @@ public class CardDetail {
         this.id = card.getId();
         this.name = card.getName();
         this.cardId = card.getCardId();
+        this.owner = card.getOwner();
     }
 
     public String buildAttributes(RegionType region, String index, boolean visible) {

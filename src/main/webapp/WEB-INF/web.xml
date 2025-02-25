@@ -8,13 +8,6 @@
     <display-name>V:TES Online</display-name>
     <description>Vtes Online Web Client</description>
 
-    <jsp-config>
-        <jsp-property-group>
-            <url-pattern>*.jsp</url-pattern>
-            <page-encoding>UTF-8</page-encoding>
-        </jsp-property-group>
-    </jsp-config>
-
     <servlet>
         <servlet-name>dwr-invoker</servlet-name>
         <servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
@@ -28,6 +21,24 @@
         </init-param>
     </servlet>
 
+    <servlet>
+        <servlet-name>help</servlet-name>
+        <jsp-file>/WEB-INF/help.jsp</jsp-file>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/css/*</url-pattern>
+        <url-pattern>/js/*</url-pattern>
+        <url-pattern>/fonts/*</url-pattern>
+        <url-pattern>/images/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>help</servlet-name>
+        <url-pattern>/help</url-pattern>
+    </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>dwr-invoker</servlet-name>
         <url-pattern>/dwr/*</url-pattern>
@@ -35,6 +46,10 @@
 
     <session-config>
         <session-timeout>600</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+            <secure>true</secure>
+        </cookie-config>
     </session-config>
 
     <filter>
@@ -52,7 +67,7 @@
 
     <filter-mapping>
         <filter-name>ExpiresFilter</filter-name>
-        <url-pattern>/rest/*</url-pattern>
+        <url-pattern>/api/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
 

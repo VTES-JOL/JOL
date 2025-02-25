@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -70,6 +71,13 @@ public class CardSearch {
             }
         }
         return entry;
+    }
+
+    public Set<CardSummary> autoComplete(String text) {
+        return nameKeys.keySet().stream().filter(name -> name.toLowerCase().contains(text.toLowerCase()))
+                .map(nameKeys::get)
+                .map(cards::get)
+                .collect(Collectors.toSet());
     }
 
     public Collection<CardSummary> allCards() {

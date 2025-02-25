@@ -5,7 +5,6 @@
 <%@ page import="net.deckserver.game.storage.cards.CardSearch" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.google.common.base.Strings" %>
-<%@ page import="java.util.EnumSet" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
@@ -22,11 +21,17 @@
     List<String> defaultDisciplines = cardSummary.getDisciplines();
     String defaultVotes = cardSummary.getVotes();
     List<String> clans = cardSummary.getClanClass();
+    Integer defaultCapacity = cardSummary.getCapacity();
+    String owner = cardDetail.getOwner();
+    if (!owner.equals(player)) visible = true;
     List<String> disciplines = cardDetail.getDisciplines();
     if (disciplines.isEmpty()) { disciplines = defaultDisciplines; }
     String label = cardDetail.getLabel();
     int counters = cardDetail.getCounters();
     int capacity = cardDetail.getCapacity();
+    if (capacity == -1 && visible && defaultCapacity != null) {
+        capacity = defaultCapacity;
+    }
     String votes = cardDetail.getVotes();
     if (Strings.isNullOrEmpty(votes)) { votes = defaultVotes; }
     boolean hasVotes = !Strings.isNullOrEmpty(votes) && !votes.equals("0");

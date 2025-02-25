@@ -38,7 +38,6 @@ public class NavBean {
                 buttons.add("admin:Admin");
             }
         }
-        buttons.add("help:Help");
         for (String game : model.getCurrentGames()) {
             String current = JolAdmin.INSTANCE.isCurrent(player, game) ? "" : "*";
             gameButtons.put("g" + game, game + current);

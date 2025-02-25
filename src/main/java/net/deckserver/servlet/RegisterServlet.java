@@ -17,7 +17,7 @@ public class RegisterServlet extends HttpServlet {
         String player = request.getParameter("newplayer");
         String email = request.getParameter("newemail");
         String password = request.getParameter("newpassword");
-        String captchaResponse = request.getParameter("g-recaptcha-response");
+        String captchaResponse = request.getParameter("cf-turnstile-response");
         boolean verify = Recaptcha.verify(captchaResponse);
         if (verify && JolAdmin.INSTANCE.registerPlayer(player, password, email)) {
             request.getSession().setAttribute("meth", player);

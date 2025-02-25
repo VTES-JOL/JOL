@@ -37,6 +37,8 @@ class CommandParser {
             return JolGame.READY_REGION;
         if (JolGame.INACTIVE_REGION.startsWith(arg))
             return JolGame.INACTIVE_REGION;
+        if (JolGame.UNCONTROLLED_REGION.startsWith(arg))
+            return JolGame.INACTIVE_REGION;
         if (JolGame.ASHHEAP.startsWith(arg))
             return JolGame.ASHHEAP;
         if (JolGame.HAND.startsWith(arg))
