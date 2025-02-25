@@ -1,16 +1,16 @@
 <div class="container-fluid pt-2">
   <h2>V:TES Online - Help</h2>
   <div class="mt-2">
-    <nav class="nav nav-tabs" id="helpTab" role="tablist">
-      <button class="nav-link active" data-bs-toggle="tab" type="button" role="tab" aria-selected="true" id="help1" data-bs-target="#panel1" aria-controls="panel1">Creating a deck</button>
-      <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" id="help2" data-bs-target="#panel2" aria-controls="panel2">Joining Games</button>
-      <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" id="help6" data-bs-target="#panel6" aria-controls="panel6">Game Information</button>
-      <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" id="help3" data-bs-target="#panel3" aria-controls="panel3">Moving cards</button>
-      <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" id="help4" data-bs-target="#panel4" aria-controls="panel4">Managing counters</button>
-      <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" id="help5" data-bs-target="#panel5" aria-controls="panel5">Card Information</button>
-      <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" id="help7" data-bs-target="#panel7" aria-controls="panel7">Tips</button>
+    <nav class="nav nav-pills" id="helpTab" role="tablist">
+      <a class="nav-link active" data-bs-toggle="tab" href="#deck" type="button" role="tab" aria-selected="true" id="help1" data-bs-target="#panel1" aria-controls="panel1">Creating a deck</a>
+      <a class="nav-link" data-bs-toggle="tab" href="#join" type="button" role="tab" aria-selected="false" id="help2" data-bs-target="#panel2" aria-controls="panel2">Joining Games</a>
+      <a class="nav-link" data-bs-toggle="tab" href="#gameInfo" type="button" role="tab" aria-selected="false" id="help6" data-bs-target="#panel6" aria-controls="panel6">Game Information</a>
+      <a class="nav-link" data-bs-toggle="tab" href="#cards" type="button" role="tab" aria-selected="false" id="help3" data-bs-target="#panel3" aria-controls="panel3">Moving cards</a>
+      <a class="nav-link" data-bs-toggle="tab" href="#counters" type="button" role="tab" aria-selected="false" id="help4" data-bs-target="#panel4" aria-controls="panel4">Managing counters</a>
+      <a class="nav-link" data-bs-toggle="tab" href="#cardInfo" type="button" role="tab" aria-selected="false" id="help5" data-bs-target="#panel5" aria-controls="panel5">Card Information</a>
+      <a class="nav-link" data-bs-toggle="tab" href="#tips" type="button" role="tab" aria-selected="false" id="help7" data-bs-target="#panel7" aria-controls="panel7">Tips</a>
     </nav>
-    <div class="tab-content p-2 text-bg-light" id="helpContent">
+    <div class="tab-content p-2 text-bg-light bg-secondary-subtle" id="helpContent">
       <jsp:include page="creating-deck.jsp"/>
       <jsp:include page="joining-games.jsp"/>
       <jsp:include page="card-information.jsp"/>
@@ -62,6 +62,17 @@
     });
     let targetAnchor = $(window.location.hash);
     let tabId = targetAnchor.closest('.tab-pane').attr('id');
-    $("#helpTab").find('button[data-bs-target="#' + tabId + '"]').click();
+    $("#helpTab").find('a[data-bs-target="#' + tabId + '"]').click();
+    let hash = window.location.hash;
+
+    $(".nav-pills").find("a").each(function(key, value) {
+      if (hash === $(value).attr('href')) {
+        $(value).tab('show');
+      }
+
+      $(value).click(function() {
+        location.hash = $(this).attr('href');
+      });
+    });
   })
 </script>

@@ -35,14 +35,14 @@
                 </div>
                 <div class="d-flex justify-content-center">
                     <button type="button" class="btn btn-outline-danger round-button mx-1"
-                            title="Discard and replace"
-                            onclick="discard();">
-                        <span>&#10607;</span>
-                    </button>
-                    <button type="button" class="btn btn-outline-danger round-button mx-1"
                             title="Discard"
                             onclick="discard(false);">
-                        <span>&#10585;</span>
+                        <span><i class="bi bi-trash"></i> Discard</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger round-button mx-1"
+                            title="Discard and replace"
+                            onclick="discard();">
+                        <span><i class="bi bi-recycle"></i> Discard + Draw</span>
                     </button>
                 </div>
             </div>

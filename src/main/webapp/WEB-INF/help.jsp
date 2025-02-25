@@ -17,7 +17,7 @@
   <link rel="shortcut icon" href="images/favicon.ico"/>
   <link href="https://fonts.googleapis.com/css?family=IM+Fell+English" rel="stylesheet">
 </head>
-<body>
+<body class="bg-secondary-subtle">
   <script src="js/jquery-3.7.1.min.js"></script>
   <script src="js/jquery-throttle.min.js"></script>
   <script src="js/jquery-ui.min.js"></script>
@@ -27,15 +27,5 @@
   <script src="js/tippy.all.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <jsp:include page="/WEB-INF/jsps/help/layout.jsp"/>
-  <script>
-      document.querySelectorAll('#helpTab>[data-bs-toggle="tab"]').forEach(el => {
-        el.addEventListener('shown.bs.tab', () => {
-          const target = el.getAttribute('data-bs-target')
-          const scrollElem = $(target).find('div[data-bs-spy="scroll"]');
-          const nav = scrollElem.data('bs-target');
-          new bootstrap.ScrollSpy(target, {target: nav});
-        })
-      });
-  </script>
 </body>
 </html>

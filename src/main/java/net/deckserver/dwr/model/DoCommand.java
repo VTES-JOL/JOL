@@ -170,11 +170,8 @@ public class DoCommand {
                 }
             }
             if (cmd.equalsIgnoreCase("influence")) {
-                String srcRegion = cmdObj.getRegion(JolGame.INACTIVE_REGION);
-                String srcCard = cmdObj.getCard(false, player, srcRegion);
-                String targetPlayer = cmdObj.getPlayer(player);
-                String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-                game.influenceCard(player, srcCard, targetPlayer, targetRegion);
+                String srcCard = cmdObj.getCard(false, player, JolGame.INACTIVE_REGION);
+                game.influenceCard(player, srcCard, player, JolGame.READY_REGION);
                 return "Influenced a crypt card";
             }
             if (cmd.equalsIgnoreCase("move")) {

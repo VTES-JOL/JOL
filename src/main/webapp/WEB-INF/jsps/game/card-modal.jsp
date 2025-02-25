@@ -114,7 +114,7 @@
                     <button type="button" class="btn btn-outline-dark m-1" title="Burn"
                             data-region="ready torpor inactive"
                             onclick="burn();">
-                        <span>Burn</span>
+                        <span><i class="bi bi-fire"></i> Burn</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Move to Hand"
                             data-region="ashheap"
