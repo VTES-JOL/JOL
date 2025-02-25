@@ -822,6 +822,10 @@ public class JolAdmin {
         return loadGameInfo(gameName).getStatus().equals(GameStatus.ACTIVE);
     }
 
+    public boolean isAlive(String gameName, String playerName) {
+        return loadGameState(gameName).getPool(playerName) > 0;
+    }
+
     public boolean isPrivate(String gameName) {
         return loadGameInfo(gameName).getVisibility().equals(Visibility.PRIVATE);
     }

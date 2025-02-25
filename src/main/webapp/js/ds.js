@@ -493,6 +493,7 @@ function callbackMain(data) {
         renderOnline('onlinePlayers', data.who);
         renderGlobalChat(data.chat);
         renderMyGames("#myGames", data.games);
+        renderMyGames("#oustedGames", data.ousted);
         $("#globalMessage").val(data.message);
         if (refresher) clearTimeout(refresher);
         refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
