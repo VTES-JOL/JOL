@@ -11,6 +11,7 @@ target/*
 # Game data
 src/test/resources/game*
 src/test/resources/global_chat.txt
+src/test/resources/data/metrics/*
 
 # Environmental
 .local-docker-compose.yml
