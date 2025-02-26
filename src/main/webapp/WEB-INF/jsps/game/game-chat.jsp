@@ -6,7 +6,7 @@
             <button class="border-0 shadow rounded-pill bg-light" onclick="toggleChat();"><i class="bi bi-clock-history me-2"></i>History</button>
         </span>
     </div>
-    <div class="card-body p-0 scrollable">
-        <div id="gameChatOutput" class="bg-white p-1"></div>
+    <div class="card-body p-0 game-chat">
+        <div id="gameChatOutput" class="bg-white p-1 scrollable"></div>
     </div>
 </div>
