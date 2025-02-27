@@ -17,14 +17,14 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
-        if (System.getenv().getOrDefault("ENABLE_CAPTCHA", "true").equals("true")) {
-        String captchaResponse = req.getParameter("cf-turnstile-response");
-        boolean verify = Recaptcha.verify(captchaResponse);
-        if (!verify) {
-            resp.sendRedirect("/jol/login");
-            return;
-        }
-        }
+//        if (System.getenv().getOrDefault("ENABLE_CAPTCHA", "true").equals("true")) {
+//            String captchaResponse = req.getParameter("cf-turnstile-response");
+//            boolean verify = Recaptcha.verify(captchaResponse);
+//            if (!verify) {
+//                resp.sendRedirect("/jol/login");
+//                return;
+//            }
+//        }
         boolean authResult = JolAdmin.INSTANCE.authenticate(username, password);
         if (authResult) {
             req.getSession().setAttribute("meth", username);
