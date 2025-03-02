@@ -1053,7 +1053,7 @@ function loadGame(data) {
     let chat = $("#chat");
     let command = $("#command");
     let gameChatOutput = $("#gameChatOutput");
-    let gameHistory = $("gameHistory");
+    let gameHistory = $("#gameHistory");
     let gameDeck = $("#gameDeck");
     let globalNotes = $("#globalNotes");
     let privateNotes = $("#privateNotes");
@@ -1069,6 +1069,10 @@ function loadGame(data) {
         command.empty();
         currentOption = "notes";
         gameChatLastDay = null;
+        $(".gameChat").removeClass("d-none");
+        $(".history").addClass("d-none");
+        $(".notes").removeClass("d-none");
+        $(".gameDeck").addClass("d-none");
     }
     let fetchFullLog = false;
     if (data.logLength !== null) {

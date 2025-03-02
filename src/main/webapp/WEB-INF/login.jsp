@@ -39,9 +39,9 @@
                             <input type="password" class="form-control" id="dspassin" name="password" autocomplete="password" placeholder="Password">
                             <label for="dspassin">Password</label>
                         </div>
-                        <c:if test='<%= System.getenv().getOrDefault("ENABLE_CAPTCHA", "true").equals("true") %>'>
-                            <div class="cf-turnstile" data-sitekey="<%= System.getenv().get("JOL_RECAPTCHA_KEY") %>" data-theme="light"></div>
-                        </c:if>
+<%--                        <c:if test='<%= System.getenv().getOrDefault("ENABLE_CAPTCHA", "true").equals("true") %>'>--%>
+<%--                            <div class="cf-turnstile" data-sitekey="<%= System.getenv().get("JOL_RECAPTCHA_KEY") %>" data-theme="light"></div>--%>
+<%--                        </c:if>--%>
                         <button type="submit" id="loginBtn" name="login" value="Log in" class="btn btn-outline-secondary btn-lg mt-2">Log In</button>
                     </form>
                 </div>

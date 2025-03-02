@@ -38,7 +38,10 @@
     boolean contested = cardDetail.isContested();
     boolean locked = cardDetail.isLocked();
     String shadowStyle = shadow ? "shadow" : "";
-    String counterStyle = cardSummary.hasLife() ? "text-bg-success" : (capacity > 0 ? "text-bg-danger" : "text-bg-secondary");
+    // Counter Style Logic
+    // Green: hasLife && OTHER_VISIBLE_REGION
+    // Red: isMinion
+    String counterStyle = (cardSummary.hasLife() && RegionType.OTHER_VISIBLE_REGIONS.contains(region) ) ? "text-bg-success" : (cardSummary.isMinion() ? "text-bg-danger" : "text-bg-secondary");
     String regionStyle = region == RegionType.TORPOR ? "opacity-75" : "";
     String contestedStyle = contested ? "bg-warning-subtle" : "";
     String counterText = counters + (capacity > 0 ? " / " + capacity : "");

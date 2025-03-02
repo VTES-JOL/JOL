@@ -194,6 +194,10 @@ a.card-name {
     grid-template-areas: 'commands commands' 'chat chat' 'info info';
 }
 
+.game-chat {
+    height: 20rem;
+}
+
 @media (min-width: 576px) {
     .w-sm-25 {width:25%!important;}
     .w-sm-50 {width:50%!important;}
