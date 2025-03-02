@@ -47,9 +47,6 @@ public class CardDatabaseBuilder {
         Path staticPath = Paths.get("/Users/shannon/static");
         Path jsonPath = staticPath.resolve("json");
         Path htmlPath = staticPath.resolve("html");
-        Files.createDirectory(staticPath);
-        Files.createDirectory(jsonPath);
-        Files.createDirectory(htmlPath);
 
         try {
             for (SummaryCard summaryCard : summaryCards) {
@@ -61,9 +58,17 @@ public class CardDatabaseBuilder {
 
                 Path jsonFilePath = jsonPath.resolve(id + ".json");
                 mapper.writeValue(jsonFilePath.toFile(), summaryCard);
+
+                summaryCard.setOriginalText(null);
+                summaryCard.setModes(null);
+                summaryCard.setMultiMode(null);
+                summaryCard.setPreamble(null);
+                summaryCard.setDoNotReplace(null);
             }
         } catch (IOException e) {
             logger.error("Unable to write file", e);
         }
+
+        mapper.writeValue(Paths.get("src/main/resources/cards.json").toFile(), summaryCards);
     }
 }

@@ -277,6 +277,7 @@ a.card-name {
 .clan.nagaraja:before {content: 'W';}
 .clan.nosferatu:before {content: 's';}
 .clan.nosferatu_antitribu:before {content: 'Y';}
+.clan.hecata:before {content: 'y'; }
 .clan.osebo:before {content: 'Z';}
 .clan.pander:before {content: 'a';}
 .clan.ravnos:before {content: 'x';}

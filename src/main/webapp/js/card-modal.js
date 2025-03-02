@@ -6,7 +6,7 @@ var CLAN_CHARS = {
     gangrel_antitribu: 'M', gargoyle: 'N', giovanni: 'O', guruhi: 'P',
     harbinger_of_skulls: 'Q', ishtarri: 'R', kiasyd: 'S', lasombra: 'w',
     malkavian: 'q', malkavian_antitribu: 'V', nagaraja: 'W', nosferatu: 's',
-    nosferatu_antitribu: 'Y', osebo: 'Z', pander: 'a', ravnos: 'x',
+    nosferatu_antitribu: 'Y', hecata: 'y', osebo: 'Z', pander: 'a', ravnos: 'x',
     salubri: 'c', salubri_antitribu: 'd', samedi: 'e', toreador: 't',
     toreador_antitribu: 'g', tremere: 'u', tremere_antitribu: 'i',
     true_brujah: 'j', tzimisce: 'k', ventrue: 'v', ventrue_antitribu: 'm',

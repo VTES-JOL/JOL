@@ -33,14 +33,14 @@ public class SummaryCard {
     //Library only
     private String preamble;
     private List<LibraryCardMode> modes;
-    private boolean doNotReplace;
-    private boolean multiMode;
+    private Boolean doNotReplace;
+    private Boolean multiMode;
     private String cost;
 
     //Crypt only
     private Integer capacity;
     private List<String> disciplines;
-    private boolean advanced;
+    private Boolean advanced;
 
     private String title;
 
