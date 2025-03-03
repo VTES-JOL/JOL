@@ -236,6 +236,9 @@
                 <version>3.0.1</version>
                 <configuration>
                     <path>/jol</path>
+                    <systemProperties>
+
+                    </systemProperties>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -261,6 +264,7 @@
                 <version>2.22.1</version>
                 <configuration>
                     <useSystemClassLoader>false</useSystemClassLoader>
+                    <argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
 <!--            <plugin>-->
