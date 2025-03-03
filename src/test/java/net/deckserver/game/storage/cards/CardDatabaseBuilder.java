@@ -52,11 +52,11 @@ public class CardDatabaseBuilder {
             for (SummaryCard summaryCard : summaryCards) {
                 String htmlText = summaryCard.getHtmlText();
                 String id = summaryCard.getId();
-                Path htmlFilePath = htmlPath.resolve(id + ".html");
+                Path htmlFilePath = htmlPath.resolve(id);
                 Files.write(htmlFilePath, htmlText.getBytes(StandardCharsets.UTF_8));
                 summaryCard.setHtmlText(null);
 
-                Path jsonFilePath = jsonPath.resolve(id + ".json");
+                Path jsonFilePath = jsonPath.resolve(id);
                 mapper.writeValue(jsonFilePath.toFile(), summaryCard);
 
                 summaryCard.setOriginalText(null);
