@@ -714,6 +714,8 @@ public class JolGame {
         }
         this.state.replacePlayer(oldPlayer, newPlayer);
         getNote(this.state, oldPlayer + POOL, false).setName(newPlayer + POOL);
+        getNote(this.state, oldPlayer + " vp", false).setName(newPlayer + " vp");
+        getNote(this.state, oldPlayer + TEXT, false).setName(newPlayer + TEXT);
         Notation note = getNote(state, TIMEOUT, true);
         note.setValue("");
         addMessage("Player " + newPlayer + " replaced " + oldPlayer);

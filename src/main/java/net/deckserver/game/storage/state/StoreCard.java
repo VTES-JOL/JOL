@@ -53,6 +53,11 @@ public class StoreCard implements Card {
         return gamecard.getOwner();
     }
 
+    @Override
+    public void setOwner(String owner) {
+        gamecard.setOwner(owner);
+    }
+
     public void addCard(Card card, boolean first) {
         CardContainer container = game.getCardContainer(this, true);
         container.addCard(card, first);
