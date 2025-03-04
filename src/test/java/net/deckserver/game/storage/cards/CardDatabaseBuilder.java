@@ -47,23 +47,28 @@ public class CardDatabaseBuilder {
         Path staticPath = Paths.get("/Users/shannon/static");
         Path jsonPath = staticPath.resolve("json");
         Path htmlPath = staticPath.resolve("html");
-        Files.createDirectory(staticPath);
-        Files.createDirectory(jsonPath);
-        Files.createDirectory(htmlPath);
 
         try {
             for (SummaryCard summaryCard : summaryCards) {
                 String htmlText = summaryCard.getHtmlText();
                 String id = summaryCard.getId();
-                Path htmlFilePath = htmlPath.resolve(id + ".html");
+                Path htmlFilePath = htmlPath.resolve(id);
                 Files.write(htmlFilePath, htmlText.getBytes(StandardCharsets.UTF_8));
                 summaryCard.setHtmlText(null);
 
-                Path jsonFilePath = jsonPath.resolve(id + ".json");
+                Path jsonFilePath = jsonPath.resolve(id);
                 mapper.writeValue(jsonFilePath.toFile(), summaryCard);
+
+                summaryCard.setOriginalText(null);
+                summaryCard.setModes(null);
+                summaryCard.setMultiMode(null);
+                summaryCard.setPreamble(null);
+                summaryCard.setDoNotReplace(null);
             }
         } catch (IOException e) {
             logger.error("Unable to write file", e);
         }
+
+        mapper.writeValue(Paths.get("src/main/resources/cards.json").toFile(), summaryCards);
     }
 }

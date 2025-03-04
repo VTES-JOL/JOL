@@ -22,4 +22,6 @@ public interface Card extends NoteTaker, CardContainer {
     Card[] getCards();
 
     String getOwner();
+
+    void setOwner(String owner);
 }

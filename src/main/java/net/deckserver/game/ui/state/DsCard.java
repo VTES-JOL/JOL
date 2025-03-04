@@ -1,5 +1,7 @@
 package net.deckserver.game.ui.state;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.CardContainer;
 import net.deckserver.game.storage.cards.CardSearch;
@@ -8,6 +10,7 @@ class DsCard extends DsCardContainer implements Card {
 
     private String id;
     private String card;
+    @Getter @Setter
     private String owner;
     private DsCardContainer parent;
 
@@ -44,10 +47,6 @@ class DsCard extends DsCardContainer implements Card {
 
     public String getCardId() {
         return card;
-    }
-
-    public String getOwner() {
-        return owner;
     }
 
     @Override
