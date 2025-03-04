@@ -30,7 +30,7 @@
                     <hr/>
                     <button id="playCardModalPlayButton" type="button"
                             class="btn btn-outline-secondary mb-2" style="white-space:normal"
-                            onclick="playCard()">Play
+                            onclick="playCard(event)">Play
                     </button>
                 </div>
                 <div class="d-flex justify-content-center">
