@@ -326,7 +326,7 @@ public class DoCommand {
                 String text = buf.toString();
                 for (String recipient : recipients) {
                     String old = game.getPrivateNotes(recipient);
-                    game.setPrivateNotes(recipient, old + "\n" + text);
+                    game.setPrivateNotes(recipient, old != null && !old.isEmpty() ? old + "\n" + text : text);
                     JolAdmin.INSTANCE.getGameModel(game.getName()).getView(recipient).privateNotesChanged();
                 }
                 String msg = null;
