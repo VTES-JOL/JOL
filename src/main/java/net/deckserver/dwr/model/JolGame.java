@@ -424,6 +424,7 @@ public class JolGame {
 
     public String getGlobalText() {
         Notation note = getNote(state, TEXT, true);
+        if (note == null) return "";
         if (note.getValue() == null) note.setValue("");
         return note.getValue();
     }
@@ -436,7 +437,13 @@ public class JolGame {
     public String getPrivateNotes(String player) {
         Notation note = getNote(state, player + TEXT, true);
         if (note == null) return "";
+        if (note.getValue() == null) note.setValue("");
         return note.getValue();
+    }
+
+    public void setPrivateNotes(String player, String text) {
+        Notation note = getNote(state, player + TEXT, true);
+        note.setValue(text);
     }
 
     public String getLabel(String cardId) {
@@ -447,11 +454,6 @@ public class JolGame {
         } catch (IllegalArgumentException e) {
             return "";
         }
-    }
-
-    public void setPrivateNotes(String player, String text) {
-        Notation note = getNote(state, player + TEXT, true);
-        note.setValue(text);
     }
 
     public void setText(String cardId, String text, boolean quiet) {
