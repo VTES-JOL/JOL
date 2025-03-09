@@ -1,6 +1,6 @@
 services:
   prod:
-    image: tomcat:9-jdk13-openjdk-buster
+    image: tomcat:9-jdk21-corretto
     container_name: prod
     networks:
       - web
@@ -12,12 +12,12 @@ services:
     environment:
       JOL_DATA: /data
       TYPE: "prod"
-      _JAVA_OPTIONS: -Djava.security.egd=file:/dev/./urandom
+      JDK_JAVA_OPTIONS: -Djava.security.egd=file:/dev/./urandom -Xmx2048m
     volumes:
       - prod-data:/data
       - prod-app:/usr/local/tomcat/webapps
   test:
-    image: tomcat:9-jdk13-openjdk-buster
+    image: tomcat:9-jdk21-corretto
     container_name: test
     networks:
       - web
