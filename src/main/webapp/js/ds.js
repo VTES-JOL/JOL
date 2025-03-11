@@ -745,9 +745,9 @@ function renderMyGames(id, games) {
             toggle.prop("checked",false);
             players.addClass("d-none");
         }
-        let predator = renderPlayer(game.players[game.predator]);
-        let activePlayer = renderPlayer(game.players[game.activePlayer]);
-        let prey = renderPlayer(game.players[game.prey]);
+        let predator = renderPlayer(game.players, game.predator);
+        let activePlayer = renderPlayer(game.players, game.activePlayer);
+        let prey = renderPlayer(game.players, game.prey);
         activePlayer.addClass("fw-semibold");
         let self = game.players[player];
         if (self.pinged) {
@@ -761,10 +761,13 @@ function renderMyGames(id, games) {
     });
 }
 
-function renderPlayer(data) {
-    let span = $("<span/>").text(data.playerName).addClass("my-2 px-2 border-end border-start w-100 text-center");
-    if (data.pinged) {
-        span.append("<i class='bi-exclamation-triangle ms-1'></i>");
+function renderPlayer(players, target) {
+    let span = $("<span/>").addClass("my-2 px-2 border-end border-start w-100 text-center");
+    if (target !== "") {
+        span.text(players[target].playerName);
+        if (players[target].pinged) {
+            span.append("<i class='bi-exclamation-triangle ms-1'></i>");
+        }
     }
     return span;
 }
