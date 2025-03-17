@@ -48,7 +48,7 @@ public class DeckserverRemote {
     public Map<String, Object> endGame(String name) {
         String playerName = getPlayer(request);
         if (playerName.equals(admin.getGameModel(name).getOwner()) || admin.isAdmin(playerName)) {
-            admin.endGame(name);
+            admin.endGame(name, true);
         }
         return UpdateFactory.getUpdate();
     }

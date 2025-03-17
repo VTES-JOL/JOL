@@ -193,6 +193,31 @@ public class JolAdmin {
 
     public synchronized void cleanupGames() {
         try {
+            logger.debug("Validate game state");
+            List<String> brokenGames = new ArrayList<>();
+            games.values()
+                    .stream()
+                    .filter(ACTIVE_GAME)
+                    .forEach(info ->
+                    {
+                        try {
+                            long start = System.currentTimeMillis();
+                            JolGame game = loadGameState(info.getName());
+                            long end = System.currentTimeMillis();
+                            logger.debug("Validate game state for {} [{}] took {} ms", info.getName(), info.getId(), end - start);
+                            if (end - start > 1000) {
+                                logger.info("Game state seems broken for {} [{}]", info.getName(), info.getId());
+                                brokenGames.add(info.getName());
+                            }
+                        } catch (Exception e) {
+                            logger.error("Error loading game {} [{}]", info.getName(), info.getId(), e);
+                            brokenGames.add(info.getName());
+                        }
+                    });
+            brokenGames.forEach(name -> {
+                endGame(name, false);
+            });
+
             logger.debug("CLEAN - Unregistered players");
             Table<String, String, Boolean> invalidRegistrations = HashBasedTable.create();
             games.values().stream()
@@ -216,7 +241,7 @@ public class JolAdmin {
                     .forEach(gameStatus -> {
                         long activePlayers = gameStatus.getActivePlayerCount();
                         if (activePlayers == 0) {
-                            endGame(gameStatus.getName());
+                            endGame(gameStatus.getName(), true);
                             String message = String.format("{%s} has been closed.", gameStatus.getName());
                             chat("SYSTEM", message);
                         }
@@ -234,12 +259,12 @@ public class JolAdmin {
                                 logger.info("Started {}.", gameName);
                             } catch (Exception e) {
                                 logger.error("Something went wrong starting {}", gameName, e);
-                                endGame(gameName);
+                                endGame(gameName, false);
                             }
                         }
                         if (registeredPlayers > 5) {
                             logger.info("Closing {} : Too many players", gameName);
-                            endGame(gameName);
+                            endGame(gameName, false);
                         }
                     });
 
@@ -254,7 +279,7 @@ public class JolAdmin {
                             if (getRegisteredPlayerCount(gameName) == 4) {
                                 startGame(gameName);
                             } else {
-                                endGame(gameName);
+                                endGame(gameName, false);
                             }
                         }
                         registrations.row(gameName).forEach((playerName, status) -> {
@@ -865,12 +890,12 @@ public class JolAdmin {
         startGame(gameName, players);
     }
 
-    public void endGame(String gameName) {
+    public void endGame(String gameName, boolean graceful) {
         GameInfo gameInfo = games.get(gameName);
         // try and generate stats for game
         if (gameInfo.getStatus().equals(GameStatus.ACTIVE)) {
             JolGame gameData = getGame(gameName);
-            if (gameData.getPlayers().size() > 4) {
+            if (gameData.getPlayers().size() > 4 && graceful) {
                 GameHistory history = new GameHistory();
                 history.setName(gameName);
                 String startTime = gameInfo.getCreated() != null ? gameInfo.getCreated().format(ISO_OFFSET_DATE_TIME) : " --- ";
@@ -917,6 +942,7 @@ public class JolAdmin {
         games.remove(gameName);
         timestamps.getGameTimestamps().remove(gameName);
         pmap.values().forEach(playerModel -> playerModel.removeGame(gameName));
+        gmap.remove(gameName);
         try {
             FileUtils.deleteDirectory(gamePath.toFile());
         } catch (IOException e) {
