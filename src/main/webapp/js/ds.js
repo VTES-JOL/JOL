@@ -355,19 +355,19 @@ function callbackTournament(data) {
         $("#registrationMessage").hide();
         let tournamentRound1 = $("#tournamentRound1");
         tournamentRound1.empty();
-        let tournamentRound2 = $("#tournamentRound2");
-        tournamentRound2.empty();
-        let tournamentRound3 = $("#tournamentRound3");
-        tournamentRound3.empty();
+        // let tournamentRound2 = $("#tournamentRound2");
+        // tournamentRound2.empty();
+        // let tournamentRound3 = $("#tournamentRound3");
+        // tournamentRound3.empty();
         $.each(data.decks, function (index, deck) {
             tournamentRound1.append($("<option/>", {value: deck, label: deck}));
-            tournamentRound2.append($("<option/>", {value: deck, label: deck}));
-            tournamentRound3.append($("<option/>", {value: deck, label: deck}));
+            // tournamentRound2.append($("<option/>", {value: deck, label: deck}));
+            // tournamentRound3.append($("<option/>", {value: deck, label: deck}));
         })
         if (data.registeredDecks.length > 0) {
             tournamentRound1.val(data.registeredDecks[0]);
-            tournamentRound2.val(data.registeredDecks[1]);
-            tournamentRound3.val(data.registeredDecks[2]);
+            // tournamentRound2.val(data.registeredDecks[1]);
+            // tournamentRound3.val(data.registeredDecks[2]);
             $("#tournamentRegisterButton").text("Update Registration")
         }
         let playerRegistrations = $("#playerRegistrations");
@@ -389,9 +389,9 @@ function callbackTournament(data) {
 
 function registerforTournament() {
     let tournamentRound1 = $("#tournamentRound1").val();
-    let tournamentRound2 = $("#tournamentRound2").val();
-    let tournamentRound3 = $("#tournamentRound3").val();
-    DS.registerTournamentDeck(tournamentRound1, tournamentRound2, tournamentRound3, {
+    // let tournamentRound2 = $("#tournamentRound2").val();
+    // let tournamentRound3 = $("#tournamentRound3").val();
+    DS.registerTournamentDeck(tournamentRound1, null, null, {
         callback: processData,
         errorHandler: errorhandler
     });
