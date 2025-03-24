@@ -48,7 +48,7 @@ public class DeckserverRemote {
     public Map<String, Object> endGame(String name) {
         String playerName = getPlayer(request);
         if (playerName.equals(admin.getGameModel(name).getOwner()) || admin.isAdmin(playerName)) {
-            admin.endGame(name);
+            admin.endGame(name, true);
         }
         return UpdateFactory.getUpdate();
     }
@@ -80,7 +80,7 @@ public class DeckserverRemote {
     public Map<String, Object> registerTournamentDeck(String deck1, String deck2, String deck3) {
         String playerName = getPlayer(request);
         if (!Strings.isNullOrEmpty(playerName)) {
-            admin.registerTournamentMultiDeck(playerName, deck1, deck2, deck3);
+            admin.registerTournamentMultiDeck(playerName, deck1);
         }
         return UpdateFactory.getUpdate();
     }
