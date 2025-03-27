@@ -193,30 +193,30 @@ public class JolAdmin {
 
     public synchronized void cleanupGames() {
         try {
-            logger.debug("Validate game state");
-            List<String> brokenGames = new ArrayList<>();
-            games.values()
-                    .stream()
-                    .filter(ACTIVE_GAME)
-                    .forEach(info ->
-                    {
-                        try {
-                            long start = System.currentTimeMillis();
-                            JolGame game = loadGameState(info.getName());
-                            long end = System.currentTimeMillis();
-                            logger.debug("Validate game state for {} [{}] took {} ms", info.getName(), info.getId(), end - start);
-                            if (end - start > 1000) {
-                                logger.info("Game state seems broken for {} [{}]", info.getName(), info.getId());
-                                brokenGames.add(info.getName());
-                            }
-                        } catch (Exception e) {
-                            logger.error("Error loading game {} [{}]", info.getName(), info.getId(), e);
-                            brokenGames.add(info.getName());
-                        }
-                    });
-            brokenGames.forEach(name -> {
-                endGame(name, false);
-            });
+//            logger.debug("Validate game state");
+//            List<String> brokenGames = new ArrayList<>();
+//            games.values()
+//                    .stream()
+//                    .filter(ACTIVE_GAME)
+//                    .forEach(info ->
+//                    {
+//                        try {
+//                            long start = System.currentTimeMillis();
+//                            JolGame game = loadGameState(info.getName());
+//                            long end = System.currentTimeMillis();
+//                            logger.debug("Validate game state for {} [{}] took {} ms", info.getName(), info.getId(), end - start);
+//                            if (end - start > 1000) {
+//                                logger.info("Game state seems broken for {} [{}]", info.getName(), info.getId());
+//                                brokenGames.add(info.getName());
+//                            }
+//                        } catch (Exception e) {
+//                            logger.error("Error loading game {} [{}]", info.getName(), info.getId(), e);
+//                            brokenGames.add(info.getName());
+//                        }
+//                    });
+//            brokenGames.forEach(name -> {
+//                endGame(name, false);
+//            });
 
             logger.debug("CLEAN - Unregistered players");
             Table<String, String, Boolean> invalidRegistrations = HashBasedTable.create();

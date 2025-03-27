@@ -1,21 +1,17 @@
 package net.deckserver;
 
 import net.deckserver.dwr.model.ChatParser;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ChatParserTest {
 
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-
     @Test
+    @SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
     public void testParseCard() throws Exception {
 
-        environmentVariables.set("JOL_DATA", "src/test/resources/data");
 
         String test = "[Mata Hari] is awesome, and turning that into a tooltip would be quite handy";
 

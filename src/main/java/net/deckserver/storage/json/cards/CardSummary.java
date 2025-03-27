@@ -74,7 +74,7 @@ public class CardSummary {
     }
 
     @JsonIgnore
-    private CardType getCardType() {
+    public CardType getCardType() {
         return CardType.of(type);
     }
 }

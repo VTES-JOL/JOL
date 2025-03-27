@@ -1,10 +1,13 @@
 package net.deckserver.game.storage.cards;
 
+import lombok.Getter;
+
 import java.util.EnumSet;
 
 /**
  * Created by shannon on 26/07/2016.
  */
+@Getter
 public enum CardType {
 
     VAMPIRE("Vampire"),
@@ -19,9 +22,10 @@ public enum CardType {
     POLITICAL("Political Action"),
     EQUIPMENT("Equipment"),
     EVENT("Event"),
-    COMBO("Combo");
+    LOCATION("Location"),
+    NONE("");
 
-    private String label;
+    private final String label;
 
     CardType(String label) {
         this.label = label;
@@ -33,14 +37,19 @@ public enum CardType {
                 return type;
             }
         }
-        return COMBO;
+        return NONE;
     }
 
     public static EnumSet<CardType> lifeTypes() {
         return EnumSet.of(ALLY, RETAINER, IMBUED);
     }
 
-    public String getLabel() {
-        return label;
+    public static EnumSet<CardType> permanentTypes() {
+        return EnumSet.of(VAMPIRE, IMBUED, ALLY, RETAINER, EQUIPMENT, EVENT);
     }
+
+    public static EnumSet<CardType> clanTypes() {
+        return EnumSet.of(VAMPIRE, IMBUED);
+    }
+
 }
