@@ -81,8 +81,9 @@ class GameDataConversion {
 
     private void convertGame(String gameId) {
         GameData data = convertGameFile(Paths.get("/Users/shannon/data/games", gameId, "game.xml"), gameId);
-        save(gameId, null, data);
         List<TurnData> turns = convertActionsFile(Paths.get("/Users/shannon/data/games", gameId, "actions.xml"), data.getPlayers().keySet());
+        data.setTurn(turns.getLast().getTurnId());
+        save(gameId, null, data);
         turns.forEach(turn -> {
             String fileTurnId = turn.getTurnId().replaceAll("\\.", "-");
             System.out.println("Converting " + gameId + "/game-" + fileTurnId + ".xml");
@@ -96,7 +97,9 @@ class GameDataConversion {
 
     private GameData convertGame(String gameId, String turnId) {
         try {
-            return convertGameFile(Paths.get("/Users/shannon/data/games", gameId, "game-" + turnId + ".xml"), gameId);
+            GameData gameData = convertGameFile(Paths.get("/Users/shannon/data/games", gameId, "game-" + turnId + ".xml"), gameId);
+            gameData.setTurn(turnId);
+            return gameData;
         } catch (Exception e) {
             System.err.println("Something went wrong " + e);
             return null;
