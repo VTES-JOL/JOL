@@ -1,6 +1,5 @@
 package net.deckserver.servlet;
 
-import net.deckserver.Recaptcha;
 import net.deckserver.dwr.model.JolAdmin;
 
 import javax.servlet.ServletException;

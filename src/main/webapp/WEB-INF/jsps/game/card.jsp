@@ -107,7 +107,7 @@
                     <jsp:param name="id" value="${card}"/>
                     <jsp:param name="shadow" value="false"/>
                     <jsp:param name="visible" value="<%= visible %>"/>
-                    <jsp:param name="index" value="${currentIndex} ${counter.count}"/>
+                    <jsp:param name="index" value="${currentIndex}.${counter.count}"/>
                 </jsp:include>
             </c:forEach>
         </ol>

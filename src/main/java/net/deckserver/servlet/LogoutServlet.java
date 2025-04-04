@@ -3,7 +3,6 @@ package net.deckserver.servlet;
 import net.deckserver.dwr.model.JolAdmin;
 
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

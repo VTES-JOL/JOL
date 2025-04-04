@@ -33,7 +33,7 @@ public class NavBean {
             buttons.add("deck:Decks");
             buttons.add("profile:Profile");
             buttons.add("lobby:Lobby");
-            buttons.add("tournament:Tournament");
+//            buttons.add("tournament:Tournament");
             if (admin) {
                 buttons.add("admin:Admin");
             }

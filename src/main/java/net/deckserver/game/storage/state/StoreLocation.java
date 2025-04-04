@@ -27,6 +27,7 @@ public class StoreLocation implements Location {
 
     StoreGame game;
     Region region;
+    String owner;
 
     /**
      * Creates a new instance of StoreLocation
@@ -34,6 +35,16 @@ public class StoreLocation implements Location {
     public StoreLocation(StoreGame game, Region region) {
         this.game = game;
         this.region = region;
+    }
+
+    @Override
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    @Override
+    public String getOwner() {
+        return this.owner;
     }
 
     public Card getCard(String id) {

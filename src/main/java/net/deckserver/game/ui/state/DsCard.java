@@ -6,7 +6,7 @@ import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.CardContainer;
 import net.deckserver.game.storage.cards.CardSearch;
 
-class DsCard extends DsCardContainer implements Card {
+public class DsCard extends DsCardContainer implements Card {
 
     private String id;
     private String card;

@@ -5,7 +5,6 @@
 <%@ page import="net.deckserver.game.storage.state.RegionType" %>
 <%@ page import="net.deckserver.game.interfaces.state.Card" %>
 <%@ page import="net.deckserver.dwr.model.JolAdmin" %>
-<%@ page import="java.util.EnumSet" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
     String viewer = (String) request.getAttribute("viewer");

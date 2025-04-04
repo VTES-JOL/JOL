@@ -190,6 +190,10 @@ a.card-name {
     grid-template-areas: 'hand commands' 'chat chat' 'info info';
 }
 
+#gameHistory {
+    height: 17rem;
+}
+
 .spectator {
     grid-template-areas: 'commands commands' 'chat chat' 'info info';
 }

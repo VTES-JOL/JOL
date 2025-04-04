@@ -24,4 +24,7 @@ public interface Location extends NoteTaker, CardContainer {
     Card getFirstCard();
 
     Card[] getCards();
+
+    void setOwner(String owner);
+    String getOwner();
 }

@@ -3,7 +3,7 @@ package net.deckserver.dwr.model;
 /**
  * Created by shannon on 23/08/2016.
  */
-class CommandException extends Exception {
+public class CommandException extends Exception {
     /**
      *
      */

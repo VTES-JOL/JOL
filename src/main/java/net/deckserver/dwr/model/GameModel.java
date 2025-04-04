@@ -90,9 +90,10 @@ public class GameModel implements Comparable<GameModel> {
                     for (String cmd : commands) {
                         try {
                             String[] cmdTokens = cmd.trim().split("[\\s\n\r\f\t]");
-                            status.append(commander.doCommand(player, cmdTokens)).append("<br/>");
-                        } catch (Exception e) {
-                            logger.error("Error with command {} for player {} and game {}", cmd, player, name);
+                            commander.doCommand(player, cmdTokens);
+                            logger.info("[{} - {}] {}", name, player, cmd);
+                        } catch (CommandException e) {
+                            logger.error("Invalid command: [{} - {}] {}", name, player, cmd);
                             status.append(e.getMessage());
                         }
                     }

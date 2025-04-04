@@ -48,7 +48,7 @@
             </div>
 
             <div id="tournament" style="display: none">
-                <jsp:include page="/WEB-INF/jsps/tournament/layout.jsp"/>
+<%--                <jsp:include page="/WEB-INF/jsps/tournament/layout.jsp"/>--%>
             </div>
 
             <div id="profile" style="display:none">

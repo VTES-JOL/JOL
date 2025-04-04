@@ -8,9 +8,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-class DsLocation extends DsCardContainer implements Location {
+public class DsLocation extends DsCardContainer implements Location {
 
     private final String lname;
+    private String owner;
 
     DsLocation(String name, DsGame game) {
         super(game);
@@ -24,6 +25,16 @@ class DsLocation extends DsCardContainer implements Location {
             addCard(c, false);
             getGame().addCard(c);
         }
+    }
+
+    @Override
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    @Override
+    public String getOwner() {
+        return this.owner;
     }
 
     public void shuffle(int num) {
