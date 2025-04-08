@@ -2,6 +2,7 @@ package net.deckserver.dwr.model;
 
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.Location;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import java.util.Arrays;
@@ -73,14 +74,62 @@ class CommandParser {
 
     String getPlayer(String defaultPlayer) throws CommandException {
         if (!hasMoreArgs()) return defaultPlayer;
-        String arg = args[ind++].toLowerCase();
+        String playerArgument = args[ind++];
+        assert playerArgument != null;
+        playerArgument = playerArgument.toLowerCase();
+
+        int matchLength = Integer.MAX_VALUE;
+        String match = null;
+        boolean unique = true;
+
         List<String> players = game.getPlayers();
-        for (String player : players)
-            if (player.toLowerCase().startsWith(arg)) {
+        for (String player : players) {
+            // Try a full match first
+            if (playerArgument.equals(player.toLowerCase())) {
                 return player;
             }
-        ind--;
-        return defaultPlayer;
+        }
+
+        // Try partial match with accents on
+        for (String player : players) {
+            if (player.toLowerCase().startsWith(playerArgument)) {
+                int length = player.length();
+                if (length < matchLength) {
+                    matchLength = length;
+                    unique = true;
+                    match = player;
+                } else if (length == matchLength) {
+                    unique = false;
+                }
+            }
+        }
+
+        // If no matches, then try stripping accents
+        if (match == null) {
+            String strippedArgument = StringUtils.stripAccents(playerArgument);
+            for (String player : players) {
+                String strippedPlayer = StringUtils.stripAccents(player.toLowerCase());
+                if (strippedPlayer.startsWith(strippedArgument)) {
+                    int length = player.length();
+                    if (length < matchLength) {
+                        matchLength = length;
+                        unique = true;
+                        match = player;
+                    } else if (length == matchLength) {
+                        unique = false;
+                    }
+                }
+            }
+        }
+
+        if (match == null) {
+            ind--;
+            return defaultPlayer;
+        } else if (!unique) {
+            throw new CommandException("Unable to find unique player.  Please be more specific.");
+        }
+        return match;
+
     }
 
     String findCard(boolean greedy, String player, String region) throws CommandException {

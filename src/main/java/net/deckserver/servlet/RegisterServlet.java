@@ -14,6 +14,7 @@ public class RegisterServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        request.setCharacterEncoding("UTF-8");
         String player = request.getParameter("newplayer");
         String email = request.getParameter("newemail");
         String password = request.getParameter("newpassword");

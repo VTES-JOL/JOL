@@ -1,6 +1,8 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.game.storage.state.RegionType;
+import net.deckserver.game.ui.state.DsGame;
+import net.deckserver.game.ui.turn.DsTurnRecorder;
+import net.deckserver.storage.json.deck.Deck;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,22 +17,19 @@ public class CommandParserTest {
     public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
     private JolGame game;
+    private JolGame game2;
 
     @Before
     public void setUp() {
         environmentVariables.set("JOL_DATA", "src/test/resources/data");
         game = ModelLoader.loadGame("01JHQ7QXHB7SR86F3RNVSXFVMN");
-    }
 
-    @Test
-    public void testCommands() throws Exception {
-        assertNotNull(game);
-        DoCommand command = new DoCommand(game);
-        assertEquals(4, game.getSize("Player5", RegionType.UNCONTROLLED));
-        assertEquals(0, game.getSize("Player5", RegionType.READY));
-        command.doCommand("Player5", new String[]{"move", "inactive", "1", "ready"});
-        assertEquals(3, game.getSize("Player5", RegionType.UNCONTROLLED));
-        assertEquals(1, game.getSize("Player5", RegionType.READY));
+        game2 = new JolGame("id", new DsGame(), new DsTurnRecorder());
+        game2.addPlayer("ShanDow", new Deck());
+        game2.addPlayer("shade", new Deck());
+        game2.addPlayer("ShanWod", new Deck());
+        game2.addPlayer("Mårten", new Deck());
+        game2.addPlayer("Marten", new Deck());
     }
 
     @Test
@@ -170,4 +169,51 @@ public class CommandParserTest {
         assertEquals("197", destinationCard);
     }
 
+    @Test
+    public void testDefaultPlayer() throws Exception {
+        CommandParser commandParser = new CommandParser(new String[]{"move"}, 1, game);
+        String player = commandParser.getPlayer("Marten");
+        assertEquals("Marten", player);
+    }
+
+    @Test
+    public void getPlayerFullMatchTest() throws Exception {
+        CommandParser commandParser = new CommandParser(new String[]{"move", "ShanDow", "hand", "1", "ready", "1", "1"}, 1, game2);
+        String player = commandParser.getPlayer("Marten");
+        assertEquals("ShanDow", player);
+    }
+
+    @Test
+    public void getPlayerShortestMatch() throws Exception {
+        CommandParser commandParser = new CommandParser(new String[]{"move", "Sha", "hand", "1", "ready", "1", "1"}, 1, game2);
+        String player = commandParser.getPlayer("Marten");
+        assertEquals("shade", player);
+    }
+
+    @Test
+    public void getPlayerCaseInsensitiveMatch() throws Exception {
+        CommandParser commandParser = new CommandParser(new String[]{"move", "shand", "hand", "1", "ready", "1", "1"}, 1, game2);
+        String player = commandParser.getPlayer("Marten");
+        assertEquals("ShanDow", player);
+    }
+
+    @Test
+    public void getPlayerAccentMatch() throws CommandException {
+        CommandParser commandParser = new CommandParser(new String[]{"move", "Mårt", "hand", "1", "ready", "1", "1"}, 1, game2);
+        String player = commandParser.getPlayer("Marten");
+        assertEquals("Mårten", player);
+    }
+
+    @Test
+    public void getPlayerAccentPriority() throws CommandException {
+        CommandParser commandParser = new CommandParser(new String[]{"move", "Mårt", "hand", "1", "ready", "1", "1"}, 1, game2);
+        String player = commandParser.getPlayer("Marten");
+        assertEquals("Mårten", player);
+    }
+
+    @Test(expected = CommandException.class)
+    public void getPlayerNotSpecificEnough() throws CommandException {
+        CommandParser commandParser = new CommandParser(new String[]{"move", "shan", "hand", "1", "ready", "1", "1"}, 1, game2);
+        commandParser.getPlayer("ShanDow");
+    }
 }

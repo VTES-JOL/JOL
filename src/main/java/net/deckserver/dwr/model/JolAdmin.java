@@ -24,13 +24,6 @@ import net.deckserver.DeckParser;
 import net.deckserver.RandomGameName;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.GameStatusBean;
-import net.deckserver.game.interfaces.state.Game;
-import net.deckserver.game.interfaces.turn.TurnRecorder;
-import net.deckserver.game.jaxb.XmlFileUtils;
-import net.deckserver.game.jaxb.actions.GameActions;
-import net.deckserver.game.jaxb.state.GameState;
-import net.deckserver.game.storage.state.StoreGame;
-import net.deckserver.game.storage.turn.StoreTurnRecorder;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
 import net.deckserver.storage.json.deck.CardCount;
@@ -278,12 +271,6 @@ public class JolAdmin {
                                 endGame(gameName, false);
                             }
                         }
-                        registrations.row(gameName).forEach((playerName, status) -> {
-                            if (status.getTimestamp() != null && status.getTimestamp().plusDays(1).isBefore(OffsetDateTime.now())) {
-                                logger.info("Removing idle player {} from starting game {}", playerName, gameName);
-                                invalidRegistrations.put(gameName, playerName, Boolean.TRUE);
-                            }
-                        });
                     });
 
             logger.debug("CLEAN - Timestamps");
