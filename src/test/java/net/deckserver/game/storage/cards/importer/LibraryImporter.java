@@ -40,6 +40,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final Pattern PUT_ON_SOMETHING_PATTERN = Pattern.compile(".*[Pp]ut this card on.*");
     private static final Pattern AS_ABOVE_PATTERN = Pattern.compile("As (\\[(?<disc>.*)\\])? ?above.*");
     private static final Pattern REMOVE_FROM_GAME_PATTERN = Pattern.compile(".*[Rr]emove this card from the game.*");
+    private static final Pattern TROPHY_PATTERN = Pattern.compile("Master. Trophy.");
 
     private static final List<String> DISCIPLINES = Arrays.asList("ani", "obe", "cel", "dom", "dem", "for", "san", "thn", "vic", "pro", "chi", "val", "mel", "nec", "obf", "obl", "pot", "qui", "pre", "ser", "tha", "aus", "vis", "abo", "myt", "dai", "spi", "tem", "obt", "str", "mal", "flight");
 
@@ -163,7 +164,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                 mode.setTarget(LibraryCardMode.Target.SOMETHING);
             else if ((card.getType().stream().anyMatch("master"::equalsIgnoreCase)
                     && card.getPreamble() != null
-                    && card.getPreamble().toLowerCase().contains("location"))
+                    && (card.getPreamble().toLowerCase().contains("location") || card.getPreamble().toLowerCase().contains("trophy")))
                     || card.getType().stream().anyMatch("ally"::equalsIgnoreCase)
                     || card.getType().stream().anyMatch("event"::equalsIgnoreCase)
                     || PUT_INTO_PLAY_PATTERN.matcher(mode.getText()).matches())
