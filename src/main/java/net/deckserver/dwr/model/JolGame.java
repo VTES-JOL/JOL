@@ -226,7 +226,7 @@ public class JolGame {
             }
             // Do disciplines
             List<String> disciplines = cardSummary.getDisciplines();
-            setDisciplines(cardId, disciplines, true);
+            setDisciplines(player, cardId, disciplines, true);
             // Do votes
             String votes = cardSummary.getVotes();
             if (!Strings.isNullOrEmpty(votes)) {
@@ -308,7 +308,7 @@ public class JolGame {
                 .map(value -> value.split(" "))
                 .map(Arrays::asList)
                 .orElse(Collections.emptyList())
-                .stream().sorted(Comparator.reverseOrder())
+                .stream().sorted()
                 .collect(Collectors.toList());
     }
 
@@ -633,52 +633,54 @@ public class JolGame {
             addCommand("Capacity of " + getCardName(card) + " now " + amt, new String[]{"capacity", cardId, capincr + ""});
     }
 
-    public void setDisciplines(String cardId, List<String> disciplines, boolean quiet) {
+    public void setDisciplines(String player, String cardId, List<String> disciplines, boolean quiet) {
         Card card = state.getCard(cardId);
         Notation note = getNote(card, DISCIPLINES, true);
         note.setValue(String.join(" ", disciplines));
         if (!quiet && !disciplines.isEmpty()) {
             String disciplineList = disciplines.stream().map(s -> "[" + s + "]").collect(Collectors.joining(" "));
-            String msg = ChatParser.parseText("Disciplines of " + getCardName(card) + " reset back to " + disciplineList);
+            String msg = ChatParser.parseText(player + " reset " + getCardName(card) + " back to " + disciplineList);
             addCommand(msg, new String[]{"disc", cardId, disciplines.toString()});
         }
     }
 
-    public void addDiscipline(String cardId, String discipline) {
+    public void setDisciplines(String player, String cardId, Set<String> additions, Set<String> removals) throws CommandException {
         Card card = state.getCard(cardId);
-        Notation note = getNote(card, DISCIPLINES, true);
-        String currentDisciplines = Optional.ofNullable(note.getValue()).orElse("");
-        List<String> disciplineList = Arrays.stream(currentDisciplines.split(" ")).collect(Collectors.toList());
-        // If the discipline is not represented - add it as is
-        if (!currentDisciplines.toLowerCase().contains(discipline.toLowerCase())) {
-            disciplineList.add(discipline);
+        List<String> currentDisciplines = getDisciplines(cardId);
+        List<String> newDisciplines = new ArrayList<>(currentDisciplines);
+        List<String> discAdded = new ArrayList<>();
+        List<String> discRemoved = new ArrayList<>();
+        additions.forEach(disc -> {
+            String disciplineString = String.join(" ", newDisciplines);
+            if (!disciplineString.toLowerCase().contains(disc.toLowerCase())) {
+                newDisciplines.add(disc);
+            } else {
+                int index = newDisciplines.indexOf(disc.toLowerCase());
+                disc = disc.toUpperCase();
+                newDisciplines.set(index, disc);
+            }
+            discAdded.add(disc);
+        });
+        removals.forEach(disc -> {
+            String disciplineString = String.join(" ", newDisciplines);
+            if (newDisciplines.contains(disc)) {
+                newDisciplines.remove(disc);
+                discRemoved.add(disc);
+            } else if (disciplineString.toLowerCase().contains(disc)) {
+                int index = newDisciplines.indexOf(disc.toUpperCase());
+                newDisciplines.set(index, disc.toLowerCase());
+                discRemoved.add(disc);
+            }
+        });
+        if (!discAdded.isEmpty() || !discRemoved.isEmpty()) {
+            String additionString = discAdded.isEmpty() ? "" : "added " + ChatParser.parseText(discAdded.stream().collect(Collectors.joining(" ", "[", "]")));
+            String removalsString = discRemoved.isEmpty() ? "" : "removed " + ChatParser.parseText(discRemoved.stream().collect(Collectors.joining(" ", "[", "]")));
+            addMessage(String.format("%s %s %s to %s", player, additionString, removalsString, getCardName(card)));
+            Notation note = getNote(card, DISCIPLINES, true);
+            note.setValue(String.join(" ", newDisciplines));
         } else {
-            int index = disciplineList.indexOf(discipline.toLowerCase());
-            discipline = discipline.toUpperCase();
-            disciplineList.set(index, discipline);
+            throw new CommandException("No valid disciplines chosen.");
         }
-        note.setValue(String.join(" ", disciplineList));
-        String msg = ChatParser.parseText("[" + discipline + "] added to " + getCardName(card));
-        addMessage(msg);
-    }
-
-    public void removeDiscipline(String cardId, String discipline) {
-        Card card = state.getCard(cardId);
-        Notation note = getNote(card, DISCIPLINES, true);
-        String currentDisciplines = note.getValue();
-        List<String> disciplineList = Arrays.stream(currentDisciplines.split(" ")).collect(Collectors.toList());
-        // exists, and equals incoming - remove it
-        if (currentDisciplines.contains(discipline)) {
-            disciplineList.remove(discipline);
-        }
-        // exists at superior, but incoming is inferior - downgrade it
-        else if (currentDisciplines.toLowerCase().contains(discipline)) {
-            int index = disciplineList.indexOf(discipline.toUpperCase());
-            disciplineList.set(index, discipline.toLowerCase());
-        }
-        note.setValue(String.join(" ", disciplineList));
-        String msg = ChatParser.parseText("[" + discipline + "] removed from " + getCardName(card));
-        addMessage(msg);
     }
 
     public int getCapacity(String cardId) {
@@ -962,7 +964,7 @@ public class JolGame {
         Location destinationRegion = state.getPlayerLocation(destPlayer, destRegion);
         if (destinationRegion == null) throw new IllegalStateException("No such region");
 
-        boolean sameOwner = sourceRegion.getOwner().equals(destinationRegion.getOwner());
+        boolean sameOwner = Stream.of(sourceRegion.getOwner(), destinationRegion.getOwner()).allMatch(c -> c.equals(player));
         String topMessage = bottom ? "" : "the top of ";
         String playerName = sameOwner ? "their" : destinationRegion.getOwner() + "'s";
 
@@ -1019,11 +1021,11 @@ public class JolGame {
 
         boolean showRegionOwner = !player.equals(srcPlayer);
         String message = String.format(
-                "%s burns %s from %s%s%s",
+                "%s burns %s from %s%s %s",
                 player,
                 getCardName(card),
                 top ? "top of " : "",
-                showRegionOwner ? srcPlayer + "'s " : "",
+                showRegionOwner ? srcPlayer + "'s" : "their",
                 srcRegion);
 
         addCommand(message, new String[]{"burn", cardId, owner, ASH_HEAP});

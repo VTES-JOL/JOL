@@ -12,10 +12,7 @@ import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.storage.json.cards.CardSummary;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -196,22 +193,26 @@ public class DoCommand {
             if (cmdObj.consumeString("reset")) {
                 CardSummary card = CardSearch.INSTANCE.get(game.getCard(targetCard).getCardId());
                 List<String> disciplines = card.getDisciplines();
-                game.setDisciplines(targetCard, disciplines, false);
-            }
-            while (cmdObj.hasMoreArgs()) {
-                String next = cmdObj.nextArg();
-                String type = next.substring(0, 1);
-                String disc = next.substring(1);
-                if (!ChatParser.isDiscipline(disc.toLowerCase())) {
-                    throw new CommandException("Not a valid discipline");
+                game.setDisciplines(player, targetCard, disciplines, false);
+            } else {
+                Set<String> additions = new HashSet<>();
+                Set<String> removals = new HashSet<>();
+                while (cmdObj.hasMoreArgs()) {
+                    String next = cmdObj.nextArg();
+                    String type = next.substring(0, 1);
+                    String disc = next.substring(1);
+                    if (!ChatParser.isDiscipline(disc.toLowerCase())) {
+                        throw new CommandException("Not a valid discipline");
+                    }
+                    if (type.equals("+")) {
+                        additions.add(disc);
+                    } else if (type.equals("-")) {
+                        removals.add(disc);
+                    } else {
+                        throw new CommandException("Need to specify + or - to change disciplines");
+                    }
                 }
-                if (type.equals("+")) {
-                    game.addDiscipline(targetCard, disc);
-                } else if (type.equals("-")) {
-                    game.removeDiscipline(targetCard, disc);
-                } else {
-                    throw new CommandException("Need to specify + or - to change disciplines");
-                }
+                game.setDisciplines(player, targetCard, additions, removals);
             }
         }
         if (cmd.equalsIgnoreCase("capacity")) {

@@ -26,6 +26,9 @@
                     Damned</a>
                 <div style="margin-left:1em;font-size:0.9em">Rulings and strategy</div>
             </li>
+            <li class="list-group-item">
+                <a class="link-secondary" href="https://github.com/VTES-JOL/JOL/issues" target="_blank">Report a bug</a>
+            </li>
         </ul>
     </div>
 </div>

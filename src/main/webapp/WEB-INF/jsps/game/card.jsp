@@ -29,6 +29,7 @@
     String label = cardDetail.getLabel();
     int counters = cardDetail.getCounters();
     int capacity = cardDetail.getCapacity();
+    boolean hasCapacity = capacity > 0;
     if (capacity == -1 && visible && defaultCapacity != null) {
         capacity = defaultCapacity;
     }
@@ -40,8 +41,8 @@
     String shadowStyle = shadow ? "shadow" : "";
     // Counter Style Logic
     // Green: hasLife && OTHER_VISIBLE_REGION
-    // Red: isMinion
-    String counterStyle = (cardSummary.hasLife() && RegionType.OTHER_VISIBLE_REGIONS.contains(region) ) ? "text-bg-success" : (cardSummary.isMinion() ? "text-bg-danger" : "text-bg-secondary");
+    // Red: hasBlood || hasCapacity
+    String counterStyle = (cardSummary.hasLife() && RegionType.OTHER_VISIBLE_REGIONS.contains(region) ) ? "text-bg-success" : ((cardSummary.hasBlood() || hasCapacity) ? "text-bg-danger" : "text-bg-secondary");
     String regionStyle = region == RegionType.TORPOR ? "opacity-75" : "";
     String contestedStyle = contested ? "bg-warning-subtle" : "";
     String counterText = counters + (capacity > 0 ? " / " + capacity : "");
