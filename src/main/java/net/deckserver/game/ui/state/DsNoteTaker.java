@@ -8,7 +8,7 @@ import java.util.List;
 
 public class DsNoteTaker implements NoteTaker {
 
-    private List<Notation> notes = new ArrayList<>();
+    private final List<Notation> notes = new ArrayList<>();
 
     public List<Notation> getNotes() {
         return notes;

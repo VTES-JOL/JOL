@@ -26,6 +26,10 @@ import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.GameStatusBean;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
+import net.deckserver.jobs.CleanupGamesJob;
+import net.deckserver.jobs.PersistStateJob;
+import net.deckserver.jobs.PublicGamesBuilderJob;
+import net.deckserver.jobs.ValidateGWJob;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.DeckStats;
@@ -182,31 +186,6 @@ public class JolAdmin {
 
     public synchronized void cleanupGames() {
         try {
-//            logger.debug("Validate game state");
-//            List<String> brokenGames = new ArrayList<>();
-//            games.values()
-//                    .stream()
-//                    .filter(ACTIVE_GAME)
-//                    .forEach(info ->
-//                    {
-//                        try {
-//                            long start = System.currentTimeMillis();
-//                            JolGame game = loadGameState(info.getName());
-//                            long end = System.currentTimeMillis();
-//                            logger.debug("Validate game state for {} [{}] took {} ms", info.getName(), info.getId(), end - start);
-//                            if (end - start > 1000) {
-//                                logger.info("Game state seems broken for {} [{}]", info.getName(), info.getId());
-//                                brokenGames.add(info.getName());
-//                            }
-//                        } catch (Exception e) {
-//                            logger.error("Error loading game {} [{}]", info.getName(), info.getId(), e);
-//                            brokenGames.add(info.getName());
-//                        }
-//                    });
-//            brokenGames.forEach(name -> {
-//                endGame(name, false);
-//            });
-
             logger.debug("CLEAN - Unregistered players");
             Table<String, String, Boolean> invalidRegistrations = HashBasedTable.create();
             games.values().stream()
@@ -416,10 +395,10 @@ public class JolAdmin {
         loadRegistrations();
         loadDecks();
         loadProperties();
-//        scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
-//        scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 1, TimeUnit.MINUTES);
-//        scheduler.scheduleAtFixedRate(new ValidateGWJob(), 0, 1, TimeUnit.DAYS);
-//        scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 10, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 1, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new ValidateGWJob(), 0, 1, TimeUnit.DAYS);
+        scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 10, TimeUnit.MINUTES);
     }
 
     public String getVersion() {
@@ -712,7 +691,7 @@ public class JolAdmin {
                                 if (responseCode != 200) {
                                     logger.warn(
                                             "Non-200 response ({}) calling Discord ({}); response body: {}",
-                                            String.valueOf(responseCode), response.uri(), response.body());
+                                            responseCode, response.uri(), response.body());
                                 }
                             } else logger.error("Error calling Discord", exception);
                             return null;

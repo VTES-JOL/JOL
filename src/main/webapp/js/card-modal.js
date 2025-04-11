@@ -362,7 +362,7 @@ function doCardCommand(commandKeyword, message = '', commandTail = '', closeModa
         modal.data('coordinates'),
         commandTail);
     var command = parts.join(' ');
-    sendCommand(command, message);
+    sendCommand(command.trim(), message);
     if (closeModal) $('#cardModal').modal('hide');
     return false;
 }

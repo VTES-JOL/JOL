@@ -22,7 +22,7 @@ public class CommandParserTest {
     @Before
     public void setUp() {
         environmentVariables.set("JOL_DATA", "src/test/resources/data");
-        game = ModelLoader.loadGame("01JHQ7QXHB7SR86F3RNVSXFVMN");
+        game = ModelLoader.loadGame("command-test");
 
         game2 = new JolGame("id", new DsGame(), new DsTurnRecorder());
         game2.addPlayer("ShanDow", new Deck());

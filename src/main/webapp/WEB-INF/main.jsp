@@ -8,15 +8,15 @@
     <!-- Required by Bootstrap -->
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" type="text/css" href="css/styles.css?version=<%= JolAdmin.INSTANCE.getVersion() %>"/>
-    <link rel="stylesheet" type="text/css" href="css/<%= System.getenv().getOrDefault("TYPE", "dev") %>.css"/>
-    <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
-    <link rel="stylesheet" type="text/css" href="css/jquery-ui.structure.min.css"/>
-    <link rel="stylesheet" type="text/css" href="css/jquery-ui.theme.min.css"/>
-    <link rel="stylesheet" type="text/css" href="css/light.css"/>
-    <link rel="shortcut icon" href="images/favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/styles.css?version=<%= JolAdmin.INSTANCE.getVersion() %>"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/<%= System.getenv().getOrDefault("TYPE", "dev") %>.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.structure.min.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.theme.min.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/light.css"/>
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/favicon.ico"/>
     <link href="https://fonts.googleapis.com/css?family=IM+Fell+English" rel="stylesheet">
 </head>
 <body>
@@ -67,18 +67,18 @@
 
     <!-- Bootstrap -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="js/jquery-3.7.1.min.js"></script>
-    <script src="js/jquery-throttle.min.js"></script>
-    <script src="js/jquery-ui.min.js"></script>
-    <script src='js/moment-with-locales.min.js'></script>
-    <script src='js/moment-timezone-with-data.min.js'></script>
-    <script src="js/popper.min.js"></script>
-    <script src="js/tippy.all.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src='dwr/engine.js'></script>
-    <script src='dwr/interface/DS.js'></script>
-    <script src='dwr/util.js'></script>
-    <script src='js/ds.js?version=<%= JolAdmin.INSTANCE.getVersion() %>'></script>
-    <script src="js/card-modal.js?version=<%= JolAdmin.INSTANCE.getVersion() %>"></script>
+    <script src="${pageContext.request.contextPath}/js/jquery-3.7.1.min.js"></script>
+    <script src="${pageContext.request.contextPath}/js/jquery-throttle.min.js"></script>
+    <script src="${pageContext.request.contextPath}/js/jquery-ui.min.js"></script>
+    <script src='${pageContext.request.contextPath}/js/moment-with-locales.min.js'></script>
+    <script src='${pageContext.request.contextPath}/js/moment-timezone-with-data.min.js'></script>
+    <script src="${pageContext.request.contextPath}/js/popper.min.js"></script>
+    <script src="${pageContext.request.contextPath}/js/tippy.all.min.js"></script>
+    <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>
+    <script src='${pageContext.request.contextPath}/dwr/engine.js'></script>
+    <script src='${pageContext.request.contextPath}/dwr/interface/DS.js'></script>
+    <script src='${pageContext.request.contextPath}/dwr/util.js'></script>
+    <script src='${pageContext.request.contextPath}/js/ds.js?version=<%= JolAdmin.INSTANCE.getVersion() %>'></script>
+    <script src="${pageContext.request.contextPath}/js/card-modal.js?version=<%= JolAdmin.INSTANCE.getVersion() %>"></script>
 </body>
 </html>

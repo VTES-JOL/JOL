@@ -14,6 +14,7 @@ public class DsTurnRecorder implements TurnRecorder {
     public void addTurn(String meth, String label) {
         turns.put(label, new Turn(meth, label));
         names.add(label);
+        counter++;
     }
 
     public String[] getTurns() {
@@ -60,12 +61,10 @@ public class DsTurnRecorder implements TurnRecorder {
 
         private final String text;
         private final String[] command;
-        private final int index;
 
         public Act(String text, String[] command, Turn turn) {
             this.text = text;
             this.command = command;
-            this.index = turn.c.size();
             turn.c.addLast(this);
         }
 

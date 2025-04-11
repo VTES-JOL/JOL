@@ -21,9 +21,9 @@ class CommandParser {
     private final static Logger logger = getLogger(CommandParser.class);
     private final static Pattern VALID_POSITION_PATTERN = Pattern.compile("(?<!-\\+)\\d+(?:\\.\\d+)*");
 
-    private String[] args;
+    private final String[] args;
     private int ind;
-    private JolGame game;
+    private final JolGame game;
 
     public CommandParser(String[] args, int ind, JolGame game) {
         this.args = args;

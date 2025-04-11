@@ -23,7 +23,7 @@ public class TournamentBuilder {
     private static final Logger logger = LoggerFactory.getLogger(TournamentBuilder.class);
     @Rule
     public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Before
     public void init() {

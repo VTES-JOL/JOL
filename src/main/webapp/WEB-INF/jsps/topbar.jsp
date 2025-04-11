@@ -22,9 +22,9 @@
             </div>
         </div>
         <div id="buttons" class="navbar-nav"></div>
-        <a class="nav-link" href="/jol/help" target="_blank">Help</a>
+        <a class="nav-link" href="${pageContext.request.contextPath}/help" target="_blank">Help</a>
         <div id="logout" class="navbar-nav">
-            <form method="post" class="form-inline" action="/jol/logout">
+            <form method="post" class="form-inline" action="${pageContext.request.contextPath}/logout">
                 <button type="submit" name="logout" value="logout" class="btn btn-link nav-item nav-link">Log Out
                 </button>
             </form>

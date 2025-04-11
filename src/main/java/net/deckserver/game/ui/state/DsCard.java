@@ -8,8 +8,8 @@ import net.deckserver.game.storage.cards.CardSearch;
 
 public class DsCard extends DsCardContainer implements Card {
 
-    private String id;
-    private String card;
+    private final String id;
+    private final String card;
     @Getter @Setter
     private String owner;
     private DsCardContainer parent;

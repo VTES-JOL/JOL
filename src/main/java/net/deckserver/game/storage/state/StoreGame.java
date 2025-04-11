@@ -23,8 +23,8 @@ import java.util.*;
 public class StoreGame implements Game {
 
     public GameState state;
-    private Map<String, StoreLocation> regionCache = new HashMap<>();
-    private Map<String, StoreCard> cardCache = new HashMap<>();
+    private final Map<String, StoreLocation> regionCache = new HashMap<>();
+    private final Map<String, StoreCard> cardCache = new HashMap<>();
 
     /**
      * Creates a new instance of StoreGame

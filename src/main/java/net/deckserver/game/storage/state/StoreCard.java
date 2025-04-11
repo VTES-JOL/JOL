@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class StoreCard implements Card {
 
-    private StoreGame game;
+    private final StoreGame game;
     GameCard gamecard;
 
     /**

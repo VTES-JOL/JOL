@@ -21,7 +21,6 @@ public class ApiResource {
 
     private final CardSearch cardSearch = CardSearch.INSTANCE;
     private final JolAdmin admin = JolAdmin.INSTANCE;
-    private final ObjectMapper objectMapper = new ObjectMapper();
     @Context
     private HttpServletRequest servletRequest;
 
@@ -32,7 +31,6 @@ public class ApiResource {
     private SecurityContext securityContext;
 
     public ApiResource() {
-        objectMapper.findAndRegisterModules();
     }
 
     @GET

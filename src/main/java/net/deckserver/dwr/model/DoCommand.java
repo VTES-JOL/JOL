@@ -42,7 +42,7 @@ public class DoCommand {
         boolean random = Arrays.asList(cmdStr).contains("random");
         if (cmd.equalsIgnoreCase("timeout")) {
             boolean cancel = cmdObj.consumeString("cancel");
-            game.requestTimeout(player, cancel);
+            game.requestTimeout(player);
         }
         if (cmd.equalsIgnoreCase("vp")) {
             String targetPlayer = cmdObj.getPlayer(player);
@@ -135,11 +135,7 @@ public class DoCommand {
             String targetRegion = cmdObj.getRegion(JolGame.ASH_HEAP);
             String targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
             boolean draw = cmdObj.consumeString("draw");
-            if (targetCard != null) {
-                game.moveToCard(true, player, srcCard, targetPlayer, targetRegion, targetCard, modes);
-            } else {
-                game.playCard(player, srcCard, targetPlayer, targetRegion, modes);
-            }
+            game.playCard(player, srcCard, targetPlayer, targetRegion, targetCard, modes);
             if (draw) game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
         }
         if (cmd.equalsIgnoreCase("influence")) {
@@ -190,7 +186,7 @@ public class DoCommand {
             String targetCard = cmdObj.findCard(targetPlayer, targetRegion);
             if (targetCard == null) throw new CommandException("Must specify a card in the region");
             boolean clear = cmdObj.consumeString("clear");
-            game.contestCard(player, targetCard, clear);
+            game.contestCard(targetCard, clear);
         }
         if (cmd.equalsIgnoreCase("disc")) {
             String targetPlayer = cmdObj.getPlayer(player);
