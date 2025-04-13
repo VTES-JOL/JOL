@@ -110,10 +110,11 @@ public class DoCommand {
         if (cmd.equalsIgnoreCase("edge")) {
             // edge [<player> | burn]
             if (cmdObj.consumeString("burn")) {
-                game.setEdge(null);
+                game.burnEdge();
+            } else {
+                String edge = cmdObj.getPlayer(player);
+                game.setEdge(edge);
             }
-            String edge = cmdObj.getPlayer(player);
-            game.setEdge(edge);
         }
         if (cmd.equalsIgnoreCase("play")) {
             boolean crypt = cmdObj.consumeString("vamp");
@@ -166,7 +167,7 @@ public class DoCommand {
         if (cmd.equalsIgnoreCase("pool")) {
             String targetPlayer = cmdObj.getPlayer(player);
             int amount = cmdObj.getAmount(0);
-            game.changePool(targetPlayer, amount);
+            game.updatePool(targetPlayer, amount);
         }
         if (cmd.equalsIgnoreCase("blood")) {
             String targetPlayer = cmdObj.getPlayer(player);
@@ -299,8 +300,7 @@ public class DoCommand {
             String card = cmdObj.findCard(player, targetRegion);
             int amount = cmdObj.getAmount(1);
             if (amount == 0) throw new CommandException("Must transfer an amount");
-            game.changePool(player, -amount);
-            game.changeCounters(player, card, amount, false);
+            game.transfer(player, card, amount);
         }
     }
 }
