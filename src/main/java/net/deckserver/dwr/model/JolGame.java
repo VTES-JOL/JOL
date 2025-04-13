@@ -53,8 +53,12 @@ public class JolGame {
     private static final String MINION = "minion";
     private static final String TAP = "tapnote";
     private static final String TAPPED = "tap";
+    private static final String PHASE = "phase";
+    private static final String CAPACITY = "capac";
+    private static final String CHOICE = "-choice";
     private static final String UNTAPPED = "untap";
     private static final String TIMEOUT = "timeout";
+    private static final String VP = " vp";
     private static final DecimalFormat format = new DecimalFormat("0.#");
     private static final DateTimeFormatter SIMPLE_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm ");
     @Getter
@@ -80,7 +84,7 @@ public class JolGame {
         state.addLocation(name, CRYPT);
         state.addLocation(name, RFG);
         state.addLocation(name, RESEARCH);
-        changePool(name, 30);
+        updatePool(name, 30);
         Location crypt = state.getPlayerLocation(name, CRYPT);
         Location library = state.getPlayerLocation(name, LIBRARY);
         List<String> cryptlist = new ArrayList<>();
@@ -95,28 +99,19 @@ public class JolGame {
 
     public void withdraw(String player) {
         addMessage(player + " withdraws and gains 0.5 VP");
-        Notation poolNote = getNote(state, player + POOL, true);
-        poolNote.setValue("0");
-        Notation vpNote = getNote(state, player + " vp", true);
-        String stringValue = Optional.ofNullable(vpNote.getValue()).orElse("0");
-        double value = Double.parseDouble(stringValue);
-        value += 0.5;
-        vpNote.setValue(String.valueOf(value));
+        setNotation(state, player + POOL, "0");
+        updateVP(player, 0.5);
     }
 
     public void updateVP(String targetPlayer, double amount) {
-        Notation note = getNote(state, targetPlayer + " vp", true);
-        String stringValue = Optional.ofNullable(note.getValue()).orElse("0");
-        double value = Double.parseDouble(stringValue);
+        double value = getNotationAsDouble(state, targetPlayer + VP);
         value += amount;
-        note.setValue(String.valueOf(value));
+        setNotation(state, targetPlayer + VP, String.valueOf(value));
         addMessage(targetPlayer + " has " + (amount > 0 ? "gained " : "lost ") + format.format(Math.abs(amount)) + " victory points.");
     }
 
     public double getVictoryPoints(String player) {
-        Notation note = getNote(state, player + " vp", true);
-        String stringValue = Optional.ofNullable(note.getValue()).orElse("0");
-        return Double.parseDouble(stringValue);
+        return getNotationAsDouble(state, player + VP);
     }
 
 
@@ -131,13 +126,12 @@ public class JolGame {
     }
 
     public void requestTimeout(String player) {
-        Notation note = getNote(state, TIMEOUT, true);
-        String requester = Optional.ofNullable(note.getValue()).orElse(player);
+        String requester = getNotation(state, TIMEOUT, player);
         if (!requester.equals(player)) {
             timeout();
             addMessage(player + " has confirmed the game time has been reached.");
         }
-        note.setValue(player);
+        setNotation(state, TIMEOUT, player);
         addMessage(player + " has requested that the game be timed out.");
     }
 
@@ -252,8 +246,7 @@ public class JolGame {
         addCommand("Start game", new String[]{"start"});
         newTurn();
         for (String player : players) {
-            Notation note = getNote(state, player + POOL, true);
-            note.setValue("30");
+            setNotation(state, player + POOL, "30");
             moveAll(player, INACTIVE_REGION, CRYPT);
             moveAll(player, HAND, LIBRARY);
             _shuffle(player, CRYPT, 0, false);
@@ -276,7 +269,7 @@ public class JolGame {
 
     public void initGame(String name) {
         state.setName(name);
-        setEdge("no one");
+        setEdge(null);
     }
 
     public void sendMsg(String player, String msg, boolean isJudge) {
@@ -292,8 +285,7 @@ public class JolGame {
     public int getCounters(String cardId) {
         Card card = state.getCard(cardId);
         try {
-            Notation note = getNote(card, COUNTERS, false);
-            return Integer.parseInt(note.getValue());
+            return getNotationAsInt(card, COUNTERS);
         } catch (IllegalArgumentException e) {
             return 0;
         }
@@ -301,25 +293,20 @@ public class JolGame {
 
     public List<String> getDisciplines(String cardId) {
         Card card = state.getCard(cardId);
-        Notation note = getNote(card, DISCIPLINES, true);
-        return Optional.ofNullable(note)
-                .map(Notation::getValue)
-                .filter(value -> !Strings.isNullOrEmpty(value))
-                .map(value -> value.split(" "))
-                .map(Arrays::asList)
-                .orElse(Collections.emptyList())
-                .stream().sorted()
-                .collect(Collectors.toList());
+        String[] disciplines = getNotation(card, DISCIPLINES, "").split(" ");
+        return Arrays.asList(disciplines);
+    }
+
+    public void transfer(String player, String cardId, int amount) {
+        Card card = state.getCard(cardId);
     }
 
     public void changeCounters(String player, String cardId, int incr, boolean quiet) {
         if (incr == 0) return; // no change necessary - PENDING log this though?
         Card card = state.getCard(cardId);
-        Notation note = getNote(card, COUNTERS, true);
-        String valStr = note.getValue();
-        int val = (valStr == null) ? 0 : Integer.parseInt(valStr);
-        val += incr;
-        note.setValue(val + "");
+        int current = getCounters(cardId);
+        current += incr;
+        setNotation(card, COUNTERS, String.valueOf(current));
         if (!quiet) {
             String logText = String.format(
                     "%s %s %s blood %s %s, now %s",
@@ -328,7 +315,7 @@ public class JolGame {
                     Math.abs(incr),
                     incr < 0 ? "from" : "to",
                     getCardName(card),
-                    val);
+                    current);
             addCommand(logText, new String[]{"counter", cardId, incr + ""});
         }
     }
@@ -338,14 +325,11 @@ public class JolGame {
     }
 
     public String getActivePlayer() {
-        Notation note = getNote(state, ACTIVE, false);
-        if (note == null) return "";
-        return note.getValue();
+        return getNotation(state, ACTIVE, "");
     }
 
     private void setActivePlayer(String player) {
-        Notation note = getNote(state, ACTIVE, true);
-        note.setValue(player);
+        setNotation(state, ACTIVE, player);
     }
 
     public String getPredatorOf(String player) {
@@ -389,94 +373,76 @@ public class JolGame {
     }
 
     public String getEdge() {
-        Notation note = getNote(state, EDGE, false);
-        if (note == null) return "";
-        return note.getValue();
+        return getNotation(state, EDGE, "");
     }
 
     public void setEdge(String player) {
-        String edge = (player == null) ? "no one" : player;
-        Notation note = getNote(state, EDGE, true);
-        String old = note.getValue();
-        if (old == null) old = "";
-        else old = " from " + old;
-        note.setValue(edge);
-        if (player == null) addCommand("Edge burned" + old + ".", new String[]{"edge", "burn"});
-        else addCommand(player + " grabs edge" + old + ".", new String[]{"edge", player});
+        String old = getEdge();
+        String edge = player;
+        if (player == null) {
+            edge = "no one";
+        } else {
+            String from = old == null ? "" : " from " + old;
+            addCommand(player + " grabs edge" + from + ".", new String[]{"edge", player});
+        }
+        setNotation(state, EDGE, edge);
+    }
+
+    public void burnEdge() {
+        setNotation(state, EDGE, "no one");
+        addCommand("Edge burned", new String[]{"edge", "burn"});
     }
 
     public int getPool(String player) {
-        Notation note = getNote(state, player + POOL, false);
-        return Integer.parseInt(note.getValue());
+        return getNotationAsInt(state, player + POOL);
     }
 
-    public void changePool(String player, int pool) {
-        if (pool == 0) return; // PENDING report this in status?
-        Notation note = getNote(state, player + POOL, true);
-        String sval = note.getValue();
-        int ival = (sval == null) ? 0 : Integer.parseInt(sval);
-        int val = ival + pool;
-        note.setValue(val + "");
-        addCommand(player + "'s pool was " + ival + ", now is " + val + ".", new String[]{"pool", player, pool + ""});
+    public void updatePool(String player, int amount) {
+        if (amount == 0) return; // PENDING report this in status?
+        int starting = getPool(player);
+        int ending = starting + amount;
+        setNotation(state, POOL, String.valueOf(ending));
+        addCommand(player + "'s pool was " + starting + ", now is " + ending + ".", new String[]{"pool", player, amount + ""});
     }
 
     public String getGlobalText() {
-        Notation note = getNote(state, TEXT, true);
-        if (note == null) return "";
-        if (note.getValue() == null) note.setValue("");
-        return note.getValue();
+        return getNotation(state, TEXT, "");
     }
 
     public void setGlobalText(String text) {
-        Notation note = getNote(state, TEXT, true);
-        note.setValue(text);
+        setNotation(state, TEXT, text);
     }
 
     public String getPrivateNotes(String player) {
-        Notation note = getNote(state, player + TEXT, true);
-        if (note == null) return "";
-        if (note.getValue() == null) note.setValue("");
-        return note.getValue();
+        return getNotation(state, player + TEXT, "");
     }
 
     public void setPrivateNotes(String player, String text) {
-        Notation note = getNote(state, player + TEXT, true);
-        note.setValue(text);
+        setNotation(state, player + TEXT, text);
     }
 
     public String getLabel(String cardId) {
         Card card = state.getCard(cardId);
-        try {
-            Notation note = getNote(card, TEXT, false);
-            return note.getValue();
-        } catch (IllegalArgumentException e) {
-            return "";
-        }
+        return getNotation(card, TEXT, "");
     }
 
     public void setText(String cardId, String text, boolean quiet) {
         Card card = state.getCard(cardId);
-        String oldCardName = getCardName(card);
-        Notation note = getNote(card, TEXT, true);
+        String cardName = getCardName(card);
         String cleanText = text.trim();
-        note.setValue(cleanText);
+        setNotation(card, text, cleanText);
         if (!quiet) {
             if (!cleanText.isEmpty()) {
-                addMessage(String.format("%s now \"%s\"", oldCardName, cleanText));
+                addMessage(String.format("%s now \"%s\"", cardName, cleanText));
             } else {
-                addMessage("Removed label from " + oldCardName);
+                addMessage("Removed label from " + cardName);
             }
         }
     }
 
     public String getVotes(String cardId) {
         Card card = state.getCard(cardId);
-        try {
-            Notation note = getNote(card, VOTES, false);
-            return note.getValue();
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+        return getNotation(card, VOTES, "");
     }
 
     public void random(String player, int limit, int result) {
@@ -490,23 +456,20 @@ public class JolGame {
     public void setVotes(String cardId, String votes, boolean quiet) {
         Card card = state.getCard(cardId);
         int voteAmount = 0;
-        Notation note = getNote(card, VOTES, true);
-        assert note != null;
         try {
-
             voteAmount = Integer.parseInt(votes);
         } catch (Exception nfe) {
             // do nothing
         }
         String message = "";
         if (votes.trim().equalsIgnoreCase("priscus") || votes.trim().equals("P")) {
-            note.setValue("P");
+            setNotation(card, VOTES, "P");
             message = getCardName(card) + " is priscus";
         } else if (voteAmount == 0) {
-            note.setValue("0");
+            setNotation(card, VOTES, "0");
             message = getCardName(card) + " now has no votes";
         } else if (voteAmount > 0) {
-            note.setValue(Integer.toString(voteAmount));
+            setNotation(card, VOTES, String.valueOf(voteAmount));
             message = getCardName(card) + " now has " + voteAmount + " votes";
         }
         if (!quiet) {
@@ -516,34 +479,30 @@ public class JolGame {
 
     public void contestCard(String cardId, boolean clear) {
         Card card = state.getCard(cardId);
-        Notation note = getNote(card, CONTEST, true);
-        assert note != null;
         if (clear) {
-            note.setValue("");
+            setNotation(card, CONTEST, "");
             addMessage(getCardName(card) + " is no longer contested");
         } else {
-            note.setValue(CONTEST);
+            setNotation(card, CONTEST, CONTEST);
             addMessage(getCardName(card) + " is now contested");
         }
     }
 
     public boolean getContested(String cardId) {
         Card card = state.getCard(cardId);
-        Notation note = getNote(card, CONTEST, true);
-        return Optional.ofNullable(note.getValue()).orElse("").equals(CONTEST);
+        return getNotation(card, CONTEST, "").equals(CONTEST);
     }
 
     public boolean isTapped(String cardId) {
         Card card = state.getCard(cardId);
-        Notation note = getNote(card, TAP, true);
-        return Optional.ofNullable(note.getValue()).orElse(UNTAPPED).equals(TAPPED);
+        return getNotation(card, TAP, UNTAPPED).equals(TAPPED);
     }
 
     public void setTapped(String player, String cardId, boolean tapped) {
         Card card = state.getCard(cardId);
         String message = String.format("%s %s %s", player, tapped ? "locks" : "unlocks", getCardName(card));
         addCommand(message, new String[]{"tap", cardId});
-        _setTap(card, tapped);
+        setNotation(card, TAPPED, tapped ? TAPPED : UNTAPPED);
     }
 
     public void untapAll(String player) {
@@ -608,37 +567,30 @@ public class JolGame {
     }
 
     public String getPhase() {
-        Notation n = getNote(state, "phase", true);
-        String val = n.getValue();
-        if (val == null || val.isEmpty()) val = TURN_PHASES[0];
-        return val;
+        String current = getNotation(state, PHASE, "");
+        return Strings.isNullOrEmpty(current) ? TURN_PHASES[0] : current;
     }
 
     public void setPhase(String phase) {
-        Notation n = getNote(state, "phase", true);
-        n.setValue(phase);
+        setNotation(state, PHASE, phase);
         sendMsg(getActivePlayer(), "START OF " + phase.toUpperCase() + " PHASE.", false);
     }
 
-    public void changeCapacity(String cardId, int capincr, boolean quiet) {
+    public void changeCapacity(String cardId, int change, boolean quiet) {
         Card card = state.getCard(cardId);
-        Notation cap = getNote(card, "capac", true);
-        String val = cap.getValue();
-        int amt = 0;
-        if (val == null || val.isEmpty()) amt += capincr;
-        else amt = Integer.parseInt(val) + capincr;
-        if (amt < 0) amt = 0;
-        cap.setValue(amt + "");
+        int currentCapacity = getNotationAsInt(card, CAPACITY);
+        int newCapacity = currentCapacity + change;
+        if (newCapacity < 0) newCapacity = 0;
+        setNotation(card, CAPACITY, String.valueOf(newCapacity));
         if (!quiet)
-            addCommand("Capacity of " + getCardName(card) + " now " + amt, new String[]{"capacity", cardId, capincr + ""});
+            addCommand("Capacity of " + getCardName(card) + " now " + newCapacity, new String[]{"capacity", cardId, change + ""});
     }
 
     public void setDisciplines(String player, String cardId, List<String> disciplines, boolean quiet) {
         Card card = state.getCard(cardId);
-        Notation note = getNote(card, DISCIPLINES, true);
-        note.setValue(String.join(" ", disciplines));
+        setNotation(card, DISCIPLINES, String.join(" ", disciplines));
         if (!quiet && !disciplines.isEmpty()) {
-            String disciplineList = disciplines.stream().map(s -> "[" + s + "]").collect(Collectors.joining(" "));
+            String disciplineList = disciplines.stream().collect(Collectors.joining(" ", "[", "]"));
             String msg = ChatParser.parseText(player + " reset " + getCardName(card) + " back to " + disciplineList);
             addCommand(msg, new String[]{"disc", cardId, disciplines.toString()});
         }
@@ -676,8 +628,7 @@ public class JolGame {
             String additionString = discAdded.isEmpty() ? "" : "added " + ChatParser.parseText(discAdded.stream().collect(Collectors.joining(" ", "[", "]")));
             String removalsString = discRemoved.isEmpty() ? "" : "removed " + ChatParser.parseText(discRemoved.stream().collect(Collectors.joining(" ", "[", "]")));
             addMessage(String.format("%s %s %s to %s", player, additionString, removalsString, getCardName(card)));
-            Notation note = getNote(card, DISCIPLINES, true);
-            note.setValue(String.join(" ", newDisciplines));
+            setNotation(card, DISCIPLINES, String.join(" ", newDisciplines));
         } else {
             throw new CommandException("No valid disciplines chosen.");
         }
@@ -685,12 +636,7 @@ public class JolGame {
 
     public int getCapacity(String cardId) {
         Card card = state.getCard(cardId);
-        try {
-            Notation cap = getNote(card, "capac", false);
-            return Integer.parseInt(cap.getValue());
-        } catch (IllegalArgumentException e) {
-            return -1;
-        }
+        return getNotationAsInt(card, CAPACITY);
     }
 
     public boolean isPinged(String player) {
@@ -709,26 +655,25 @@ public class JolGame {
             setActivePlayer(newPlayer);
         }
         this.state.replacePlayer(oldPlayer, newPlayer);
-        getNote(this.state, oldPlayer + POOL, false).setName(newPlayer + POOL);
-        getNote(this.state, oldPlayer + " vp", false).setName(newPlayer + " vp");
-        getNote(this.state, oldPlayer + TEXT, false).setName(newPlayer + TEXT);
-        Notation note = getNote(state, TIMEOUT, true);
-        note.setValue("");
+        getNote(this.state, oldPlayer + POOL).setName(newPlayer + POOL);
+        getNote(this.state, oldPlayer + VP).setName(newPlayer + VP);
+        getNote(this.state, oldPlayer + TEXT).setName(newPlayer + TEXT);
+        setNotation(state, TIMEOUT, "");
         addMessage("Player " + newPlayer + " replaced " + oldPlayer);
     }
 
     public void setChoice(String player, String choice) {
-        getNote(this.state, player + "-choice", true).setValue(choice);
+        setNotation(state, player + CHOICE, choice);
         addMessage(player + " has made their choice");
     }
 
     public void getChoices() {
         addMessage("The choices have been revealed:");
         state.getPlayers().forEach(player -> {
-            Notation choiceNotation = getNote(this.state, player + "-choice", true);
-            if (!Strings.isNullOrEmpty(choiceNotation.getValue())) {
-                addMessage(player + " chose " + choiceNotation.getValue());
-                choiceNotation.setValue("");
+            String choice = getNotation(state, player + CHOICE, "");
+            if (!Strings.isNullOrEmpty(choice)) {
+                addMessage(player + " chose " + choice);
+                setNotation(state, player + CHOICE, "");
             }
         });
     }
@@ -748,17 +693,17 @@ public class JolGame {
 
     private boolean isMinion(String id) {
         Card card = state.getCard(id);
-        Notation note = getNote(card, MINION, true);
-        if (note.getValue() == null) {
+        String current = getNotation(card, MINION, null);
+        if (current == null) {
             CardSummary summary = CardSearch.INSTANCE.get(card.getCardId());
-            note.setValue(String.valueOf(summary.isMinion()));
+            current = String.valueOf(summary.isMinion());
+            setNotation(card, MINION, current);
         }
-        return Boolean.parseBoolean(note.getValue());
+        return Boolean.parseBoolean(current);
     }
 
     private void zeroPool(String player) {
-        Notation note = getNote(state, player + POOL, true);
-        note.setValue(String.valueOf(0));
+        setNotation(state, player + POOL, "0");
     }
 
     private void _drawCard(String player, String srcRegion, String destRegion, boolean log) {
@@ -793,13 +738,32 @@ public class JolGame {
         }
     }
 
-    private Notation getNote(NoteTaker nt, String name, boolean create) {
+    private Notation getNote(NoteTaker nt, String name) {
         List<Notation> notes = nt.getNotes();
         for (Notation note1 : notes) if (note1.getName().equals(name)) return note1;
-        if (create) {
-            return nt.addNote(name);
-        }
-        throw new IllegalArgumentException("Note " + name + " not found");
+        return nt.addNote(name);
+    }
+
+    private void setNotation(NoteTaker nt, String name, String value) {
+        Notation note = getNote(nt, name);
+        note.setValue(value);
+    }
+
+    private String getNotation(NoteTaker nt, String name, String defaultValue) {
+        return nt.getNotes()
+                .stream()
+                .filter(notation -> notation.getName().equals(name))
+                .findFirst()
+                .map(Notation::getValue)
+                .orElse(defaultValue);
+    }
+
+    private int getNotationAsInt(NoteTaker nt, String name) {
+        return Integer.parseInt(getNotation(nt, name, "0"));
+    }
+
+    private double getNotationAsDouble(NoteTaker nt, String name) {
+        return Double.parseDouble(getNotation(nt, name, "0"));
     }
 
     /*
@@ -895,16 +859,10 @@ public class JolGame {
         return "<a class='card-name' data-card-id='" + card.getCardId() + "'>" + card.getName() + "</a>";
     }
 
-    private void _setTap(Card card, boolean tapped) {
-        Notation note = getNote(card, TAP, true);
-        String value = tapped ? TAPPED : UNTAPPED;
-        note.setValue(value);
-    }
-
     private void untapAll(CardContainer loc) {
         Card[] cards = loc.getCards();
         for (Card card : cards) {
-            _setTap(card, false);
+            setNotation(card, TAP, "false");
             untapAll(card);
         }
     }
@@ -1004,7 +962,7 @@ public class JolGame {
             changeCounters(null, cardId, -blood, true);
 
         //Unlock
-        _setTap(card, false);
+        setNotation(card, TAP, "false");
     }
 
     void burn(String player, String cardId, String srcPlayer, String srcRegion, boolean top) {
