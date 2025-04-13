@@ -1010,13 +1010,13 @@ function loadGame(data) {
         }
     }
     if (!data.player) {
-        $("#gameForm :input").attr('disabled', true);
+        $("#gameForm :input, #globalNotes").attr('disabled', true);
         $(".player-only").addClass("d-none");
         $(".control-grid").addClass("spectator");
         phaseSelect.attr('disabled', true);
         endTurn.attr('disabled', true);
     } else {
-        $("#gameForm :input").removeAttr('disabled');
+        $("#gameForm :input, #globalNotes").removeAttr('disabled');
         $(".player-only").removeClass("d-none");
         $(".control-grid").removeClass("spectator");
     }
@@ -1029,6 +1029,7 @@ function loadGame(data) {
     if (data.judge) {
         $("#chat").removeAttr('disabled');
         $("#gameSubmit").removeAttr('disabled');
+        $("#globalNotes").removeAttr('disabled');
     }
 
     // Pings

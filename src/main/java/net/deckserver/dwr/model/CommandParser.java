@@ -72,6 +72,10 @@ class CommandParser {
         return defaultRegion;
     }
 
+    /*
+    This function will attempt to find a player in the game based on the next argument, or return defaultPlayer
+    It will throw a CommandException if player not found, and defaultPlayer is null, or if more than one player found.
+     */
     String getPlayer(String defaultPlayer) throws CommandException {
         if (!hasMoreArgs()) return defaultPlayer;
         String playerArgument = args[ind++];
@@ -123,6 +127,9 @@ class CommandParser {
         }
 
         if (match == null) {
+            if (defaultPlayer == null) {
+                throw new CommandException("Unable to find player.");
+            }
             ind--;
             return defaultPlayer;
         } else if (!unique) {
@@ -181,7 +188,7 @@ class CommandParser {
                 amount = -amount;
             }
             return amount;
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             return amount;
         }
     }

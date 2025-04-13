@@ -207,7 +207,9 @@ public class DeckserverRemote {
     public void updateGlobalNotes(String gameName, String notes) {
         String player = getPlayer(request);
         GameModel game = getModel(gameName);
-        if (game.getPlayers().contains(player)) {
+        boolean isPlaying = game.getPlayers().contains(player);
+        boolean canJudge = admin.isJudge(player) && !game.getPlayers().contains(player);
+        if (isPlaying || canJudge) {
             game.updateGlobalNotes(notes);
             admin.recordPlayerAccess(player, gameName);
         }
