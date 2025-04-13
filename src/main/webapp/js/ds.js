@@ -570,6 +570,7 @@ function doNav(target) {
     $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
     if (refresher) clearTimeout(refresher);
     scrollChat = true;
+    $('#targetPicker').hide();
     DS.navigate(target, {callback: processData, errorHandler: errorhandler});
     return false;
 }

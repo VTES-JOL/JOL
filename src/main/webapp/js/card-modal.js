@@ -119,7 +119,7 @@ function showTargetPicker(target) {
         .removeClass()
         .addClass($('#playCardModal .card-type').get(0).className);
     $('#targetPicker .modal-body').text(
-        target === 'SELF' ? 'Who is playing this?' : 'Pick target.');
+        target === 'SELF' ? 'Who is playing this card?' : 'Pick target.');
     picker.show();
 
     let usePlayerSelector = target === 'MINION_YOU_CONTROL' || target === 'SELF';

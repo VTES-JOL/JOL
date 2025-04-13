@@ -66,9 +66,9 @@ html, body {
 .custom-modal {
     position: fixed;
     top: 25%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: fit-content;
+    left: 40%;
+    transform: translate(-40%, -50%);
+    width: 100%;
     height: fit-content;
     padding: 0 !important;
 }
