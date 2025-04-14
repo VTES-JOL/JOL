@@ -36,11 +36,11 @@
                     </div>
                 </div>
                 <div class="mt-2">
-                    <button type="button" class="btn btn-outline-dark m-1" title="Play"
+                    <button type="button" class="btn btn-outline-dark m-1" title="Influence"
                             data-region="inactive" data-top-level-only
                             data-owner-only
                             data-minion-only
-                            onclick="playVamp();">
+                            onclick="influence();">
                         <span>Influence</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Bleed"
@@ -92,17 +92,25 @@
                             onclick="leaveTorpor();">
                         <span>Leave Torpor</span>
                     </button>
+                    <button type="button" class="btn btn-outline-dark m-1" title="Move to ready"
+                            data-region="torpor"
+                            data-top-level-only
+                            data-owner-only
+                            data-minion-only
+                            onclick="moveReady();">
+                        <span>Move to ready</span>
+                    </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Lock"
                             data-lock-state="unlocked"
                             data-region="ready torpor"
                             onclick="lock();">
-                        <span>&cudarrr;</span>
+                        <span>&cudarrr; Lock</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Unlock"
                             data-lock-state="locked"
                             data-region="ready torpor"
                             onclick="unlock();">
-                        <span style="transform: rotate(-90deg);">&#10548;</span>
+                        <span style="transform: rotate(-90deg);">&#10548; Unlock</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Block"
                             data-region="ready" data-top-level-only
@@ -142,6 +150,12 @@
                             data-minion-only
                             onclick="moveUncontrolled();">
                         <span>Move to Uncontrolled</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-dark m-1" title="Remove from game"
+                            data-region="ready ashheap"
+                            data-owner-only
+                            onclick="removeFromGame();">
+                        <span>Remove from Game</span>
                     </button>
                 </div>
             </div>

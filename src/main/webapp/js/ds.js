@@ -143,10 +143,12 @@ function callbackAdmin(data) {
     })
 
     let adminGameList = $("#adminGameList");
+    let endTurnList = $("#endTurnList");
     adminGameList.empty();
     $.each(data.games, function (index, value) {
         let gameOption = $("<option/>", {value: value, text: value});
         adminGameList.append(gameOption);
+        endTurnList.append(gameOption);
     })
     adminChangeGame();
 
@@ -202,6 +204,13 @@ function replacePlayer() {
     let existingPlayer = $("#adminReplacePlayerList").val();
     let newPlayer = $("#adminReplacementList").val();
     DS.replacePlayer(currentGame, existingPlayer, newPlayer, {callback: processData, errorHandler: errorhandler});
+}
+
+function adminEndTurn() {
+    let currentGame = $("#endTurnList").val();
+    if (confirm("Are you sure you want to end turn for " + currentGame)) {
+        DS.endTurn(currentGame, {callback: processData, errorHandler: errorhandler});
+    }
 }
 
 function addRole() {

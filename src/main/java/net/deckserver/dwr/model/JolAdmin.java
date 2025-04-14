@@ -1009,10 +1009,24 @@ public class JolAdmin {
         }
     }
 
+    public void resetView(String playerName, String gameName) {
+        getGameModel(gameName).resetView(playerName);
+    }
+
     public boolean isCurrent(String player, String game) {
         OffsetDateTime playerAccess = timestamps.getPlayerAccess(player, game);
         OffsetDateTime gameLastUpdated = timestamps.getGameTimestamp(game);
         return playerAccess.isAfter(gameLastUpdated);
+    }
+
+    public void endTurn(String gameName, String adminName) {
+        JolGame game = getGame(gameName);
+        game.addMessage("Turn ended by admin " + adminName);
+        game.newTurn();
+    }
+
+    public boolean isOwner(String playerName, String gameName) {
+        return games.get(gameName).getOwner().equals(playerName);
     }
 
     private void loadProperties() {

@@ -404,7 +404,7 @@ function burn() {
     return doCardCommand('burn');
 }
 
-function playVamp() {
+function influence() {
     var modal = $('#cardModal');
     var command = `influence ${modal.data('coordinates')}`;
     sendCommand(command);
@@ -429,6 +429,15 @@ function moveHand() {
     return false;
 }
 
+function moveReady() {
+    let modal = $('#cardModal');
+    let region = $("#cardModal").data('region');
+    let command = `move ${region} ${modal.data('coordinates')} ready`;
+    sendCommand(command);
+    modal.modal('hide');
+    return false;
+}
+
 function moveLibrary(top) {
     let modal = $('#cardModal');
     let region = $("#cardModal").data('region');
@@ -445,6 +454,15 @@ function moveUncontrolled() {
     let modal = $('#cardModal');
     let region = $("#cardModal").data('region');
     let command = `move ${region} ${modal.data('coordinates')} inactive`;
+    sendCommand(command);
+    modal.modal('hide');
+    return false;
+}
+
+function removeFromGame() {
+    let modal = $('#cardModal');
+    let region = $("#cardModal").data('region');
+    let command = `move ${region} ${modal.data('coordinates')} rfg`;
     sendCommand(command);
     modal.modal('hide');
     return false;

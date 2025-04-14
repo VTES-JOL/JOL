@@ -28,7 +28,7 @@ public class MainBean {
                     .filter(jolAdmin::isActive)
                     .map(GameStatusBean::new)
                     .sorted(Comparator.comparing(GameStatusBean::getName))
-                    .collect(Collectors.toList());
+                    .toList();
             this.games = games.stream()
                     .filter(game -> jolAdmin.isAlive(game.getName(), playerName))
                     .collect(Collectors.toList());
