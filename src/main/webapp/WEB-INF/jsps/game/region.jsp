@@ -23,14 +23,21 @@
     int size = game.getSize(player, region);
     Card[] cards = game.getState().getPlayerLocation(player, region.xmlLabel()).getCards();
     String regionName = region.xmlLabel().split(" ")[0];
+    String showExpandIcon = startCollapsed ? "" : "d-none";
+    String hideExpandIcon = startCollapsed ? "d-none" : "";
 %>
 
 <c:if test="<%= cards.length > 0 %>">
     <div class="mb-2 text-bg-light" data-region="<%= regionName %>">
-        <div class="p-2 <%= regionStyle %> <%= collapsed %>" type="button" onclick="details('<%= regionId %>');"
-             data-bs-toggle="collapse" data-bs-target="#<%= regionId %>" aria-expanded="<%= isVisible %>" aria-controls="<%= regionId %>">
-            <span class="fw-bold"><%= label %></span>
-            <span>( <%= size %> )</span>
+        <div class="p-2 d-flex justify-content-between align-items-center <%= regionStyle %>" type="button" onclick="regionCommands(event, '<%= regionId %>')">
+            <span>
+                <span class="fw-bold"><%= label %></span>
+                <span>( <%= size %> )</span>
+            </span>
+            <button class="btn btn-sm btn-outline-dark <%= collapsed %>" onclick="details(event, '<%= regionId %>');" data-bs-toggle="collapse" data-bs-target="#<%= regionId %>" aria-expanded="<%= isVisible %>" aria-controls="<%= regionId %>">
+                <i class="fs-6 bi bi-eye <%= showExpandIcon %>"></i>
+                <i class="fs-6 bi bi-eye-slash-fill <%= hideExpandIcon %>"></i>
+            </button>
         </div>
         <ol id="<%= regionId %>" class="region list-group list-group-flush list-group-numbered <%= regionStyle %> collapse <%= displayPadding %> <%= show %>">
             <c:forEach items="<%= cards %>" var="card" varStatus="counter">

@@ -1206,7 +1206,18 @@ function addCardTooltips(parent) {
         });
 }
 
-function details(tag) {
+function regionCommands(event, tag) {
+    let regionModal = $("#regionModal");
+    regionModal.find(".loaded").hide();
+    regionModal.find(".loading").show();
+    regionModal.modal('show');
+}
+
+function details(event, tag) {
+    console.log(event);
+    event.preventDefault();
+    event.stopPropagation();
+    $(`[aria-controls='${tag}'] i`).toggleClass("d-none");
     tippy.hideAll({duration: 0});
     if (refresher) clearTimeout(refresher);
     DS.doToggle(game, tag, {callback: processData, errorHandler: errorhandler});
