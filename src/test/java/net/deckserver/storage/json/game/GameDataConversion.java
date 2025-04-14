@@ -122,7 +122,9 @@ class GameDataConversion {
                     PlayerData playerData = new PlayerData(name);
                     data.addPlayer(playerData);
                     int pool = getPool(gameState, name);
+                    float victoryPoints = getVictoryPoints(gameState, name);
                     playerData.setPool(pool);
+                    playerData.setVictoryPoints(victoryPoints);
                     playerData.setOusted(pool <= 0);
                     playerData.setNotes(getNotes(gameState, name));
                     getRegions(gameState, playerData, cardData);
@@ -204,12 +206,20 @@ class GameDataConversion {
         return Integer.parseInt(getNotation(notations, name, String.valueOf(defaultValue)));
     }
 
+    float getNotationAsFloat(List<Notation> notations, String name, double defaultValue) {
+        return Float.parseFloat(getNotation(notations, name, String.valueOf(defaultValue)));
+    }
+
     boolean getNotationAsBoolean(List<Notation> notations, String name, String check) {
         return getNotation(notations, name, "").equals(check);
     }
 
     int getPool(GameState state, String player) {
         return getNotationAsInt(state.getNotation(), player + "pool", 0);
+    }
+
+    float getVictoryPoints(GameState state, String player) {
+        return getNotationAsFloat(state.getNotation(), player + " vp", 0.0f);
     }
 
     String getNotes(GameState state, String player) {
