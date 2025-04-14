@@ -30,7 +30,7 @@
     int counters = cardDetail.getCounters();
     int capacity = cardDetail.getCapacity();
     boolean hasCapacity = capacity > 0;
-    if (capacity == -1 && visible && defaultCapacity != null) {
+    if (capacity == 0 && visible && defaultCapacity != null) {
         capacity = defaultCapacity;
     }
     String votes = cardDetail.getVotes();

@@ -32,7 +32,7 @@ class CommandParser {
     }
 
     private String[] translateNextPosition() {
-        if (!VALID_POSITION_PATTERN.matcher(args[ind]).matches()) {
+        if (!args[ind].contains("random") && !VALID_POSITION_PATTERN.matcher(args[ind]).matches()) {
             return new String[0];
         }
         String[] indexes = args[ind].split("\\.");
@@ -154,7 +154,7 @@ class CommandParser {
                 for (String index : indexes) {
                     int indexInt;
                     if ("random".equals(index)) {
-                        indexInt = new Random().nextInt(cards.length);
+                        indexInt = new Random().nextInt(cards.length) + 1;
                     } else {
                         indexInt = Integer.parseInt(index);
                     }

@@ -299,6 +299,15 @@ public class JolGame {
 
     public void transfer(String player, String cardId, int amount) {
         Card card = state.getCard(cardId);
+        int counters = getCounters(cardId);
+        int pool = getPool(player);
+        int newCounters = counters + amount;
+        int newPool = pool - amount;
+        setNotation(state, player + POOL, String.valueOf(newPool));
+        setNotation(card, COUNTERS, String.valueOf(newCounters));
+        String direction = amount > 0 ? "onto" : "off";
+        String message = String.format("%s transferred %d blood %s %s. Currently: %d, Pool: %d", player, Math.abs(amount), direction, getCardName(card), newCounters, newPool);
+        addCommand(message, new String[]{"transfer", cardId, String.valueOf(amount)});
     }
 
     public void changeCounters(String player, String cardId, int incr, boolean quiet) {
@@ -564,6 +573,7 @@ public class JolGame {
         setPhase(TURN_PHASES[0]);
         String turnString = round + "-" + (index + 1);
         JolAdmin.INSTANCE.writeSnapshot(id, state, actions, turnString);
+        JolAdmin.INSTANCE.pingPlayer(getActivePlayer(), getName());
     }
 
     public String getPhase() {

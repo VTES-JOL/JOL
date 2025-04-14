@@ -167,7 +167,11 @@ public class DoCommand {
         if (cmd.equalsIgnoreCase("pool")) {
             String targetPlayer = cmdObj.getPlayer(player);
             int amount = cmdObj.getAmount(0);
-            game.updatePool(targetPlayer, amount);
+            if (amount != 0) {
+                game.updatePool(targetPlayer, amount);
+            } else {
+                throw new CommandException("Must specify an amount of pool.");
+            }
         }
         if (cmd.equalsIgnoreCase("blood")) {
             String targetPlayer = cmdObj.getPlayer(player);
@@ -300,6 +304,8 @@ public class DoCommand {
             String card = cmdObj.findCard(player, targetRegion);
             int amount = cmdObj.getAmount(1);
             if (amount == 0) throw new CommandException("Must transfer an amount");
+            int pool = game.getPool(player);
+            if (pool - amount < 0) throw new CommandException("Invalid amount to transfer.  Not enough pool.");
             game.transfer(player, card, amount);
         }
     }
