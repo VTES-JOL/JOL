@@ -293,8 +293,8 @@ public class JolGame {
 
     public List<String> getDisciplines(String cardId) {
         Card card = state.getCard(cardId);
-        String[] disciplines = getNotation(card, DISCIPLINES, "").split(" ");
-        return Arrays.asList(disciplines);
+        String discString = getNotation(card, DISCIPLINES, "");
+        return Strings.isNullOrEmpty(discString) ? Collections.emptyList() : Arrays.asList(discString.split(" "));
     }
 
     public void transfer(String player, String cardId, int amount) {

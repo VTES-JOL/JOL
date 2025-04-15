@@ -18,13 +18,10 @@
     boolean isVisible = game.isVisible(player, viewer, region);
     String show = startCollapsed ? "" : "show";
     String collapsed = startCollapsed ? "collapsed" : "";
-    String displayPadding = simpleDisplay ? "" : "gap-1";
     String regionStyle = region == RegionType.TORPOR ? "bg-danger-subtle" : (region == RegionType.READY ? "bg-success-subtle" : "bg-body-secondary");
     int size = game.getSize(player, region);
     Card[] cards = game.getState().getPlayerLocation(player, region.xmlLabel()).getCards();
     String regionName = region.xmlLabel().split(" ")[0];
-    String showExpandIcon = startCollapsed ? "" : "d-none";
-    String hideExpandIcon = startCollapsed ? "d-none" : "";
 %>
 
 <c:if test="<%= cards.length > 0 %>">
@@ -35,11 +32,11 @@
                 <span>( <%= size %> )</span>
             </span>
             <button class="btn btn-sm btn-outline-dark <%= collapsed %>" onclick="details(event, '<%= regionId %>');" data-bs-toggle="collapse" data-bs-target="#<%= regionId %>" aria-expanded="<%= isVisible %>" aria-controls="<%= regionId %>">
-                <i class="fs-6 bi bi-eye <%= showExpandIcon %>"></i>
-                <i class="fs-6 bi bi-eye-slash-fill <%= hideExpandIcon %>"></i>
+                <i class="fs-6 bi bi-eye <%= startCollapsed ? "" :"d-none" %>"></i>
+                <i class="fs-6 bi bi-eye-slash-fill <%= startCollapsed ? "d-none" : "" %>"></i>
             </button>
         </div>
-        <ol id="<%= regionId %>" class="region list-group list-group-flush list-group-numbered <%= regionStyle %> collapse <%= displayPadding %> <%= show %>">
+        <ol id="<%= regionId %>" class="region list-group list-group-flush list-group-numbered <%= regionStyle %> collapse <%= show %>">
             <c:forEach items="<%= cards %>" var="card" varStatus="counter">
                 <c:if test="<%= !simpleDisplay %>">
                     <jsp:include page="card.jsp">
