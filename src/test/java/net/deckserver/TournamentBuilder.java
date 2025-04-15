@@ -3,11 +3,8 @@ package net.deckserver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.storage.json.system.TournamentData;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.jupiter.api.BeforeEach;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,24 +12,22 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Ignore
 public class TournamentBuilder {
     private static final Logger logger = LoggerFactory.getLogger(TournamentBuilder.class);
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-    @Before
+    @BeforeEach
     public void init() {
         objectMapper.findAndRegisterModules();
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
+    @SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
     public void testBuildTournament() throws Exception {
-        environmentVariables.set("JOL_DATA", "/Users/shannon/data");
 
         JolAdmin admin = JolAdmin.INSTANCE;
         admin.setup();

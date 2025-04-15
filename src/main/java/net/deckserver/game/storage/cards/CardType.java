@@ -22,7 +22,8 @@ public enum CardType {
     POLITICAL("Political Action"),
     EQUIPMENT("Equipment"),
     EVENT("Event"),
-    COMBO("Combo");
+    LOCATION("Location"),
+    NONE("");
 
     private final String label;
 
@@ -36,11 +37,19 @@ public enum CardType {
                 return type;
             }
         }
-        return COMBO;
+        return NONE;
     }
 
     public static EnumSet<CardType> lifeTypes() {
         return EnumSet.of(ALLY, RETAINER, IMBUED);
+    }
+
+    public static EnumSet<CardType> permanentTypes() {
+        return EnumSet.of(VAMPIRE, IMBUED, ALLY, RETAINER, EQUIPMENT, EVENT);
+    }
+
+    public static EnumSet<CardType> clanTypes() {
+        return EnumSet.of(VAMPIRE, IMBUED);
     }
 
 }
