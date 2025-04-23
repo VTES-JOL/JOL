@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.storage.json.system.TournamentData;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +17,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Ignore
+@Disabled
 public class TournamentBuilder {
     private static final Logger logger = LoggerFactory.getLogger(TournamentBuilder.class);
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -25,7 +27,7 @@ public class TournamentBuilder {
         objectMapper.findAndRegisterModules();
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     @SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
     public void testBuildTournament() throws Exception {
 
@@ -45,7 +47,7 @@ public class TournamentBuilder {
                 // Register players
                 List<String> players = tables.get(table - 1);
                 logger.info("{}: {}", gameName, players);
-                for (String player: players) {
+                for (String player : players) {
                     System.out.println("Confirming player: " + player);
                     assertTrue(admin.existsPlayer(player));
                     String deckName = data.getRegistrations().get(player).getDecks().getFirst();

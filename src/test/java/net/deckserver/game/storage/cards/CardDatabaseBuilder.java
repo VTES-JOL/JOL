@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.deckserver.game.storage.cards.importer.CryptImporter;
 import net.deckserver.game.storage.cards.importer.LibraryImporter;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+@Disabled
 public class CardDatabaseBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(CardDatabaseBuilder.class);

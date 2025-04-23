@@ -3,25 +3,21 @@ package net.deckserver.dwr.model;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
 import net.deckserver.storage.json.deck.Deck;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.ExpectedToFail;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
+@SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
 public class CommandParserTest {
-
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
     private JolGame game;
     private JolGame game2;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        environmentVariables.set("JOL_DATA", "src/test/resources/data");
         game = ModelLoader.loadGame("command-test");
 
         game2 = new JolGame("id", new DsGame(), new DsTurnRecorder());
@@ -211,9 +207,9 @@ public class CommandParserTest {
         assertEquals("Mårten", player);
     }
 
-    @Test(expected = CommandException.class)
+    @Test
     public void getPlayerNotSpecificEnough() throws CommandException {
         CommandParser commandParser = new CommandParser(new String[]{"move", "shan", "hand", "1", "ready", "1", "1"}, 1, game2);
-        commandParser.getPlayer("ShanDow");
+        assertThrows(CommandException.class, () -> commandParser.getPlayer("ShanDow"));
     }
 }

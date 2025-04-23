@@ -14,6 +14,7 @@ import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.cards.CardType;
 import net.deckserver.game.storage.state.RegionType;
 import net.deckserver.storage.json.cards.CardSummary;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
@@ -27,6 +28,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Disabled
 class GameDataConversion {
 
     static CardSearch SEARCH = CardSearch.INSTANCE;
@@ -97,13 +99,16 @@ class GameDataConversion {
 
     private GameData convertGame(String gameId, String turnId) {
         try {
-            GameData gameData = convertGameFile(Paths.get("/Users/shannon/data/games", gameId, "game-" + turnId + ".xml"), gameId);
-            gameData.setTurn(turnId);
-            return gameData;
+            Path gamePath = Paths.get("/Users/shannon/data/games", gameId, "game-" + turnId + ".xml");
+            if (Files.exists(gamePath)) {
+                GameData gameData = convertGameFile(gamePath, gameId);
+                gameData.setTurn(turnId);
+                return gameData;
+            }
         } catch (Exception e) {
-            System.err.println("Something went wrong " + e);
-            return null;
+            System.err.printf("%s/game-%s.xml %s%n", gameId, turnId, e.getMessage());
         }
+        return null;
     }
 
     private List<TurnData> convertActionsFile(Path filePath, Set<String> players) {
