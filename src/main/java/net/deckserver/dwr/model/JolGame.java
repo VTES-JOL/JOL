@@ -84,7 +84,7 @@ public class JolGame {
         state.addLocation(name, CRYPT);
         state.addLocation(name, RFG);
         state.addLocation(name, RESEARCH);
-        updatePool(name, 30);
+        changePool(name, 30);
         Location crypt = state.getPlayerLocation(name, CRYPT);
         Location library = state.getPlayerLocation(name, LIBRARY);
         List<String> cryptlist = new ArrayList<>();
@@ -244,7 +244,6 @@ public class JolGame {
         }
         state.orderPlayers(playerSeating);
         addCommand("Start game", new String[]{"start"});
-        newTurn();
         for (String player : players) {
             setNotation(state, player + POOL, "30");
             moveAll(player, INACTIVE_REGION, CRYPT);
@@ -256,6 +255,7 @@ public class JolGame {
             for (int j = 0; j < 7; j++)
                 _drawCard(player, LIBRARY, HAND, false);
         }
+        newTurn();
         JolAdmin.INSTANCE.pingPlayer(this.getActivePlayer(), this.getName());
     }
 
@@ -406,7 +406,7 @@ public class JolGame {
         return getNotationAsInt(state, player + POOL);
     }
 
-    public void updatePool(String player, int amount) {
+    public void changePool(String player, int amount) {
         if (amount == 0) return; // PENDING report this in status?
         int starting = getPool(player);
         int ending = starting + amount;

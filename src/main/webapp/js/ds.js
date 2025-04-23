@@ -977,16 +977,16 @@ function sendPrivateNotes() {
 }
 
 function toggleChat() {
-    $(".gameChat").toggleClass("d-none");
-    $(".history").toggleClass("d-none");
+    $("#gameChatCard").toggleClass("d-none");
+    $("#historyCard").toggleClass("d-none");
     if ($("#gameHistory").children().length === 0) {
         getHistory();
     }
 }
 
 function toggleNotes() {
-    $(".notes").toggleClass("d-none");
-    $(".gameDeck").toggleClass("d-none");
+    $("#notesCard").toggleClass("d-none");
+    $("#gameDeckCard").toggleClass("d-none");
     if ($("#gameDeck").children().length === 0) {
         doShowDeck();
     }
@@ -1019,28 +1019,6 @@ function loadGame(data) {
             phaseSelect.val(data.phase);
         }
     }
-    if (!data.player) {
-        $("#gameForm :input, #globalNotes").attr('disabled', true);
-        $(".player-only").addClass("d-none");
-        $(".control-grid").addClass("spectator");
-        phaseSelect.attr('disabled', true);
-        endTurn.attr('disabled', true);
-    } else {
-        $("#gameForm :input, #globalNotes").removeAttr('disabled');
-        $(".player-only").removeClass("d-none");
-        $(".control-grid").removeClass("spectator");
-    }
-
-    if (player !== data.currentPlayer) {
-        phaseSelect.attr('disabled', true);
-        endTurn.attr('disabled', true);
-    }
-
-    if (data.judge) {
-        $("#chat").removeAttr('disabled');
-        $("#gameSubmit").removeAttr('disabled');
-        $("#globalNotes").removeAttr('disabled');
-    }
 
     // Pings
     if (data.ping !== null) {
@@ -1069,8 +1047,11 @@ function loadGame(data) {
     let gameChatOutput = $("#gameChatOutput");
     let gameHistory = $("#gameHistory");
     let gameDeck = $("#gameDeck");
-    let globalNotes = $("#globalNotes");
     let privateNotes = $("#privateNotes");
+    let playerControls = $(".player-only");
+    let globalNotes = $("#globalNotes");
+    let controlGrid = $(".control-grid");
+    let chatControls = $(".can-chat");
 
     // Chat Log
     if (data.resetChat) {
@@ -1083,16 +1064,40 @@ function loadGame(data) {
         command.empty();
         currentOption = "notes";
         gameChatLastDay = null;
-        $(".gameChat").removeClass("d-none");
-        $(".history").addClass("d-none");
-        $(".notes").removeClass("d-none");
-        $(".gameDeck").addClass("d-none");
+        // initial state for cards
+        $(".panel-default").removeClass("d-none");
+        $(".panel-secondary").addClass("d-none");
+
+        // initial state for controls
+        playerControls.addClass("d-none");
+        chatControls.attr('disabled', true);
+        globalNotes.attr('disabled', true);
+        controlGrid.addClass("spectator");
     }
     let fetchFullLog = false;
     if (data.logLength !== null) {
         let myLogLength = gameChatOutput.children().length + (data.turn == null ? 0 : data.turn.length);
         fetchFullLog = myLogLength < data.logLength;
     }
+
+    // enable chat controls if judge or player
+    if (data.player || data.judge) {
+        globalNotes.removeAttr('disabled');
+        chatControls.removeAttr('disabled');
+    }
+
+    // If playing enable player controls
+    if (data.player) {
+        playerControls.removeClass("d-none");
+        controlGrid.removeClass("spectator");
+    }
+
+    // if not the current player disable phase select and end turn
+    if (player !== data.currentPlayer) {
+        phaseSelect.attr('disabled', true);
+        endTurn.attr('disabled', true);
+    }
+
     //If we're missing any messages from the log, skip adding this batch and
     //get a full refresh from server to prevent new messages appearing in the
     //past, where they are likely to be missed.

@@ -1,4 +1,4 @@
-<div class="card shadow notes">
+<div class="card shadow panel-default notes" id="notesCard">
   <div class="card-header bg-body-secondary justify-content-between d-flex align-items-center">
     <span>Notes</span>
     <button class="border-0 shadow rounded-pill bg-light player-only" onclick="toggleNotes();"><i class="bi bi-info-lg me-2"></i>Deck</button>

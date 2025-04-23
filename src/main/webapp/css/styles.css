@@ -247,13 +247,11 @@ a.card-name {
 
 .hand {grid-area: hand;}
 .commands {grid-area: commands;}
-.gameChat {grid-area: chat; }
-.globalNotes {grid-area: info; }
-.privateNotes {grid-area: info; }
+#gameChatCard {grid-area: chat; }
+#historyCard {grid-area: chat; }
 #globalNotes, #privateNotes {height: 50%;}
-.notes {grid-area: info;}
-.gameDeck {grid-area: info; }
-.history {grid-area: chat; }
+#gameDeckCard {grid-area: info; }
+#notesCard {grid-area: info; }
 
 .clan {font-family: clans, sans-serif; font-size: 1.3rem;}
 .clan.abomination:before {content: 'A';}

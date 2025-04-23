@@ -168,7 +168,7 @@ public class DoCommand {
             String targetPlayer = cmdObj.getPlayer(player);
             int amount = cmdObj.getAmount(0);
             if (amount != 0) {
-                game.updatePool(targetPlayer, amount);
+                game.changePool(targetPlayer, amount);
             } else {
                 throw new CommandException("Must specify an amount of pool.");
             }
