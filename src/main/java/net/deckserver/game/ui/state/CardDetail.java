@@ -46,6 +46,7 @@ public class CardDetail {
                 attributeString += String.format("data-votes='%s' ", votes);
                 attributeString += String.format("data-locked='%s' ", locked);
                 attributeString += String.format("data-contested='%s' ", contested);
+                attributeString += String.format("data-disciplines='%s' ", String.join(" ", disciplines));
             }
         }
         return attributeString;

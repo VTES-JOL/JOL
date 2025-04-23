@@ -233,6 +233,7 @@ function showCardModal(event) {
     let votes = target.data('votes');
     let contested = target.data('contested');
     let minion = target.data("minion");
+    let disciplines = target.data("disciplines").trim().split(" ");
     let owner = controller === player;
     if (cardId) {
         $.get({
@@ -257,8 +258,11 @@ function showCardModal(event) {
 
                 let disciplineSpan = $('#cardModal .discipline');
                 disciplineSpan.empty();
-                if (card.disciplines != null) {
-                    for (let d of card.disciplines) {
+                if (disciplines.length < 0) {
+                    disciplines = card.disciplines;
+                }
+                if (disciplines.length > 0) {
+                    for (let d of disciplines) {
                         disciplineSpan.append($("<span/>").addClass("icon").addClass(d));
                     }
                 }
