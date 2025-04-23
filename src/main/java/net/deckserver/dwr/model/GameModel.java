@@ -161,7 +161,7 @@ public class GameModel implements Comparable<GameModel> {
         if (!notes.equals(game.getPrivateNotes(player))) {
             game.setPrivateNotes(player, notes);
             views.get(player).privateNotesChanged();
-            admin.saveGameState(game);
+            admin.saveGameState(game, true);
         }
     }
 

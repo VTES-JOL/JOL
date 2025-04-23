@@ -487,7 +487,13 @@ public class JolAdmin {
     }
 
     public void saveGameState(JolGame game) {
-        timestamps.setGameTimestamp(game.getName());
+        saveGameState(game, false);
+    }
+
+    public void saveGameState(JolGame game, boolean silent) {
+        if (!silent) {
+            timestamps.setGameTimestamp(game.getName());
+        }
         ModelLoader.saveGame(game);
     }
 
