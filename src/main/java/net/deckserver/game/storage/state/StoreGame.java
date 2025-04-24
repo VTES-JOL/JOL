@@ -23,8 +23,8 @@ import java.util.*;
 public class StoreGame implements Game {
 
     public GameState state;
-    private Map<String, StoreLocation> regionCache = new HashMap<>();
-    private Map<String, StoreCard> cardCache = new HashMap<>();
+    private final Map<String, StoreLocation> regionCache = new HashMap<>();
+    private final Map<String, StoreCard> cardCache = new HashMap<>();
 
     /**
      * Creates a new instance of StoreGame
@@ -102,12 +102,9 @@ public class StoreGame implements Game {
         return loc;
     }
 
-    public void addLocation(String regionName) {
-        addLocationImpl(regionName);
-    }
-
     public void addLocation(String player, String regionName) {
-        addLocation(player + "'s " + regionName);
+        StoreLocation location = addLocationImpl(player + "'s " + regionName);
+        location.setOwner(player);
     }
 
     public Location getPlayerLocation(String player, String regionName) {

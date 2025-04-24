@@ -1,14 +1,16 @@
 package net.deckserver.dwr.bean;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterators;
 import lombok.Getter;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.JolGame;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

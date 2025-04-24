@@ -7,7 +7,6 @@ import net.deckserver.dwr.model.PlayerModel;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
@@ -29,7 +28,7 @@ public class MainBean {
                     .filter(jolAdmin::isActive)
                     .map(GameStatusBean::new)
                     .sorted(Comparator.comparing(GameStatusBean::getName))
-                    .collect(Collectors.toList());
+                    .toList();
             this.games = games.stream()
                     .filter(game -> jolAdmin.isAlive(game.getName(), playerName))
                     .collect(Collectors.toList());

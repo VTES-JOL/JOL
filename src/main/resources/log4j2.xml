@@ -14,11 +14,28 @@
             <CsvParameterLayout quoteMode="NON_NUMERIC"/>
             <TimeBasedTriggeringPolicy />
         </RollingFile>
+        <RollingFile name="commands" filePattern="${data}/commands/%d{yyyy-MM}/%d{yyyy-MM-dd}.log" append="true">
+            <ThresholdFilter level="INFO"/>
+            <TimeBasedTriggeringPolicy />
+        </RollingFile>
+        <Routing name="commands">
+            <Routes pattern="$${ctx:DYNAMIC_LOG}">
+                <Route>
+                    <File name="routing_log" append="true" fileName="${data}/commands/${ctx:DYNAMIC_LOG}.log">
+                        <PatternLayout pattern="%d{ISO8601} %-5p %m%n"/>
+                    </File>
+                </Route>
+            </Routes>
+        </Routing>
     </Appenders>
 
     <Loggers>
         <Logger name="net.deckserver.metrics" level="INFO" additivity="false">
             <AppenderRef ref="metrics"/>
+        </Logger>
+        <Logger name="net.deckserver.commands" level="INFO" additivity="false">
+            <AppenderRef ref="commands"/>
+            <AppenderRef ref="console" level="error"/>
         </Logger>
         <Root level="INFO">
             <AppenderRef ref="console"/>

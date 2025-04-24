@@ -2,20 +2,19 @@ package net.deckserver.storage.json.game;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.time.OffsetDateTime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TimestampsTest {
 
     private static ObjectMapper objectMapper;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() throws Exception {
         objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();

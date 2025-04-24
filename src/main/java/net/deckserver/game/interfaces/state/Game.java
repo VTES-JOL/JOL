@@ -19,8 +19,6 @@ public interface Game extends NoteTaker {
 
     void orderPlayers(List<String> order);
 
-    void addLocation(String regionName);
-
     void addLocation(String player, String regionName);
 
     String getName();

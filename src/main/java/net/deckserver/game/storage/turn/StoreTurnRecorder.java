@@ -118,7 +118,7 @@ public class StoreTurnRecorder implements TurnRecorder {
         }
 
         public boolean isCommand() {
-            return act.getCommand() != null && act.getCommand().size() > 0;
+            return act.getCommand() != null && !act.getCommand().isEmpty();
         }
 
         public String toString() {

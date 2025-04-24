@@ -47,7 +47,9 @@ public class DeckserverRemote {
 
     public Map<String, Object> endGame(String name) {
         String playerName = getPlayer(request);
-        if (playerName.equals(admin.getGameModel(name).getOwner()) || admin.isAdmin(playerName)) {
+        boolean isOwner = admin.isOwner(playerName, name);
+        boolean isAdmin = admin.isAdmin(playerName);
+        if (isOwner || isAdmin) {
             admin.endGame(name, true);
         }
         return UpdateFactory.getUpdate();
@@ -105,7 +107,7 @@ public class DeckserverRemote {
         player.resetChats();
         String currentGame = player.getCurrentGame();
         if (currentGame != null) {
-            admin.getGameModel(currentGame).resetView(playerName);
+            admin.resetView(playerName, currentGame);
         }
         boolean imagePreferences = admin.getImageTooltipPreference(playerName);
         Map<String, Object> update = UpdateFactory.getUpdate();
@@ -196,7 +198,7 @@ public class DeckserverRemote {
         GameModel game = getModel(gameName);
         Map<String, Object> ret = UpdateFactory.getUpdate();
         // only process a command if the player is in the game
-        if (game.getPlayers().contains(player)) {
+        if (admin.isInGame(gameName, player)) {
             String status = game.chat(player, chat);
             ret = UpdateFactory.getUpdate();
             ret.put("showStatus", status);
@@ -207,7 +209,9 @@ public class DeckserverRemote {
     public void updateGlobalNotes(String gameName, String notes) {
         String player = getPlayer(request);
         GameModel game = getModel(gameName);
-        if (game.getPlayers().contains(player)) {
+        boolean isPlaying = game.getPlayers().contains(player);
+        boolean canJudge = admin.isJudge(player) && !game.getPlayers().contains(player);
+        if (isPlaying || canJudge) {
             game.updateGlobalNotes(notes);
             admin.recordPlayerAccess(player, gameName);
         }
@@ -242,6 +246,16 @@ public class DeckserverRemote {
         if (isPlaying || canJudge)
             ret.put("showStatus", status);
         return ret;
+    }
+
+    public Map<String, Object> endTurn(String gameName) {
+        String player = getPlayer(request);
+        boolean isPlaying = admin.getPlayers(gameName).contains(player);
+        boolean isAdmin = admin.isAdmin(player);
+        if (!isPlaying && isAdmin) {
+            admin.endTurn(gameName, player);
+        }
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> updateProfile(String email, String discordID, String veknID) {

@@ -66,9 +66,9 @@ html, body {
 .custom-modal {
     position: fixed;
     top: 25%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: fit-content;
+    left: 40%;
+    transform: translate(-40%, -50%);
+    width: 100%;
     height: fit-content;
     padding: 0 !important;
 }
@@ -190,6 +190,10 @@ a.card-name {
     grid-template-areas: 'hand commands' 'chat chat' 'info info';
 }
 
+#gameHistory {
+    height: 17rem;
+}
+
 .spectator {
     grid-template-areas: 'commands commands' 'chat chat' 'info info';
 }
@@ -243,13 +247,11 @@ a.card-name {
 
 .hand {grid-area: hand;}
 .commands {grid-area: commands;}
-.gameChat {grid-area: chat; }
-.globalNotes {grid-area: info; }
-.privateNotes {grid-area: info; }
+#gameChatCard {grid-area: chat; }
+#historyCard {grid-area: chat; }
 #globalNotes, #privateNotes {height: 50%;}
-.notes {grid-area: info;}
-.gameDeck {grid-area: info; }
-.history {grid-area: chat; }
+#gameDeckCard {grid-area: info; }
+#notesCard {grid-area: info; }
 
 .clan {font-family: clans, sans-serif; font-size: 1.3rem;}
 .clan.abomination:before {content: 'A';}
@@ -334,6 +336,7 @@ a.card-name {
 .icon.card-type.action.combat:before {content: "04";}
 .icon.card-type.event:before {content: "[";}
 .icon.adv:before {font-style: normal;font-weight: bolder;content: '|'}
+.icon.merged:before {font-style: normal;font-weight: bolder;content: '{'}
 .icon.aus:before {content: 'a';}
 .icon.AUS:before {content: 'A';}
 .icon.obe:before {content: 'b';}

@@ -31,3 +31,4 @@
 <jsp:include page="play-card-modal.jsp"/>
 <jsp:include page="pick-target-modal.jsp"/>
 <jsp:include page="card-modal.jsp"/>
+<jsp:include page="region-modal.jsp"/>

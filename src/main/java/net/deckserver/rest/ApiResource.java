@@ -12,7 +12,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import java.security.Principal;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Path("/")
@@ -20,7 +21,6 @@ public class ApiResource {
 
     private final CardSearch cardSearch = CardSearch.INSTANCE;
     private final JolAdmin admin = JolAdmin.INSTANCE;
-    private final ObjectMapper objectMapper = new ObjectMapper();
     @Context
     private HttpServletRequest servletRequest;
 
@@ -31,7 +31,6 @@ public class ApiResource {
     private SecurityContext securityContext;
 
     public ApiResource() {
-        objectMapper.findAndRegisterModules();
     }
 
     @GET

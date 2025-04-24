@@ -1,4 +1,4 @@
-<div class="card shadow gameChat" id="gameChatCard">
+<div class="card shadow panel-default chat" id="gameChatCard">
     <div class="card-header bg-body-secondary justify-content-between d-flex align-items-center">
         <span>Game Chat</span>
         <span>

@@ -24,13 +24,6 @@ import net.deckserver.DeckParser;
 import net.deckserver.RandomGameName;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.GameStatusBean;
-import net.deckserver.game.interfaces.state.Game;
-import net.deckserver.game.interfaces.turn.TurnRecorder;
-import net.deckserver.game.jaxb.XmlFileUtils;
-import net.deckserver.game.jaxb.actions.GameActions;
-import net.deckserver.game.jaxb.state.GameState;
-import net.deckserver.game.storage.state.StoreGame;
-import net.deckserver.game.storage.turn.StoreTurnRecorder;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
 import net.deckserver.jobs.CleanupGamesJob;
@@ -193,31 +186,6 @@ public class JolAdmin {
 
     public synchronized void cleanupGames() {
         try {
-            logger.debug("Validate game state");
-            List<String> brokenGames = new ArrayList<>();
-            games.values()
-                    .stream()
-                    .filter(ACTIVE_GAME)
-                    .forEach(info ->
-                    {
-                        try {
-                            long start = System.currentTimeMillis();
-                            JolGame game = loadGameState(info.getName());
-                            long end = System.currentTimeMillis();
-                            logger.debug("Validate game state for {} [{}] took {} ms", info.getName(), info.getId(), end - start);
-                            if (end - start > 1000) {
-                                logger.info("Game state seems broken for {} [{}]", info.getName(), info.getId());
-                                brokenGames.add(info.getName());
-                            }
-                        } catch (Exception e) {
-                            logger.error("Error loading game {} [{}]", info.getName(), info.getId(), e);
-                            brokenGames.add(info.getName());
-                        }
-                    });
-            brokenGames.forEach(name -> {
-                endGame(name, false);
-            });
-
             logger.debug("CLEAN - Unregistered players");
             Table<String, String, Boolean> invalidRegistrations = HashBasedTable.create();
             games.values().stream()
@@ -282,12 +250,6 @@ public class JolAdmin {
                                 endGame(gameName, false);
                             }
                         }
-                        registrations.row(gameName).forEach((playerName, status) -> {
-                            if (status.getTimestamp() != null && status.getTimestamp().plusDays(1).isBefore(OffsetDateTime.now())) {
-                                logger.info("Removing idle player {} from starting game {}", playerName, gameName);
-                                invalidRegistrations.put(gameName, playerName, Boolean.TRUE);
-                            }
-                        });
                     });
 
             logger.debug("CLEAN - Timestamps");
@@ -408,8 +370,8 @@ public class JolAdmin {
     }
 
     public void writeSnapshot(String id, DsGame state, DsTurnRecorder actions, String turn) {
-        writeState(id, state, turn);
-        writeActions(id, actions, turn);
+        ModelLoader.writeState(id, state, turn);
+        ModelLoader.writeActions(id, actions, turn);
     }
 
     public void shutdown() {
@@ -525,20 +487,14 @@ public class JolAdmin {
     }
 
     public void saveGameState(JolGame game) {
-        timestamps.setGameTimestamp(game.getName());
-        String gameId = game.getId();
-        Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.xml");
-        Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions.xml");
-        Game deckServerState = game.getState();
-        TurnRecorder deckServerActions = game.getTurnRecorder();
-        GameState gameState = new GameState();
-        GameActions gameActions = new GameActions();
-        gameActions.setCounter("1");
-        gameActions.setGameCounter("1");
-        ModelLoader.createModel(new StoreGame(gameState), deckServerState);
-        ModelLoader.createRecorder(new StoreTurnRecorder(gameActions), deckServerActions);
-        XmlFileUtils.saveGameState(gameState, gameStatePath);
-        XmlFileUtils.saveGameActions(gameActions, gameActionsPath);
+        saveGameState(game, false);
+    }
+
+    public void saveGameState(JolGame game, boolean silent) {
+        if (!silent) {
+            timestamps.setGameTimestamp(game.getName());
+        }
+        ModelLoader.saveGame(game);
     }
 
     public boolean registerPlayer(String name, String password, String email) {
@@ -741,7 +697,7 @@ public class JolAdmin {
                                 if (responseCode != 200) {
                                     logger.warn(
                                             "Non-200 response ({}) calling Discord ({}); response body: {}",
-                                            String.valueOf(responseCode), response.uri(), response.body());
+                                            responseCode, response.uri(), response.body());
                                 }
                             } else logger.error("Error calling Discord", exception);
                             return null;
@@ -1059,10 +1015,24 @@ public class JolAdmin {
         }
     }
 
+    public void resetView(String playerName, String gameName) {
+        getGameModel(gameName).resetView(playerName);
+    }
+
     public boolean isCurrent(String player, String game) {
         OffsetDateTime playerAccess = timestamps.getPlayerAccess(player, game);
         OffsetDateTime gameLastUpdated = timestamps.getGameTimestamp(game);
         return playerAccess.isAfter(gameLastUpdated);
+    }
+
+    public void endTurn(String gameName, String adminName) {
+        JolGame game = getGame(gameName);
+        game.addMessage("Turn ended by admin " + adminName);
+        game.newTurn();
+    }
+
+    public boolean isOwner(String playerName, String gameName) {
+        return games.get(gameName).getOwner().equals(playerName);
     }
 
     private void loadProperties() {
@@ -1136,26 +1106,6 @@ public class JolAdmin {
         players.remove(playerInfo.getName());
     }
 
-    private void writeActions(String id, DsTurnRecorder actions, String turn) {
-        GameActions gactions = new GameActions();
-        gactions.setCounter("1");
-        gactions.setGameCounter("1");
-        StoreTurnRecorder wrec = new StoreTurnRecorder(gactions);
-        ModelLoader.createRecorder(wrec, actions);
-        String fileName = Strings.isNullOrEmpty(turn) ? "actions.xml" : "actions-" + turn + ".xml";
-        Path actionsPath = BASE_PATH.resolve("games").resolve(id).resolve(fileName);
-        XmlFileUtils.saveGameActions(gactions, actionsPath);
-    }
-
-    private void writeState(String id, DsGame state, String turn) {
-        GameState gstate = new GameState();
-        StoreGame wgame = new StoreGame(gstate);
-        ModelLoader.createModel(wgame, state);
-        String fileName = Strings.isNullOrEmpty(turn) ? "game.xml" : "game-" + turn + ".xml";
-        Path gamePath = BASE_PATH.resolve("games").resolve(id).resolve(fileName);
-        XmlFileUtils.saveGameState(gstate, gamePath);
-    }
-
     private ExtendedDeck getDeck(String deckId) {
         return readFile(String.format("decks/%s.json", deckId), typeFactory.constructType(ExtendedDeck.class));
     }
@@ -1212,15 +1162,7 @@ public class JolAdmin {
         logger.debug("Loading {}", gameName);
         GameInfo gameInfo = loadGameInfo(gameName);
         String gameId = gameInfo.getId();
-        Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.xml");
-        GameState gameState = XmlFileUtils.loadGameState(gameStatePath);
-        Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions.xml");
-        GameActions gameActions = XmlFileUtils.loadGameActions(gameActionsPath);
-        DsGame deckServerState = new DsGame();
-        DsTurnRecorder deckServerActions = new DsTurnRecorder();
-        ModelLoader.createModel(deckServerState, new StoreGame(gameState));
-        ModelLoader.createRecorder(deckServerActions, new StoreTurnRecorder(gameActions));
-        return new JolGame(gameId, deckServerState, deckServerActions);
+        return ModelLoader.loadGame(gameId);
     }
 
 }

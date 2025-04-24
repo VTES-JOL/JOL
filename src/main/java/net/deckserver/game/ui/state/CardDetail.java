@@ -23,6 +23,7 @@ public class CardDetail {
     private boolean locked;
     private boolean contested;
     private boolean minion;
+    private boolean merged;
 
     public static final EnumSet<RegionType> FULL_ATTRIBUTE_REGIONS = EnumSet.of(RegionType.READY, RegionType.TORPOR, RegionType.UNCONTROLLED);
     public static final EnumSet<RegionType> LIMITED_ATTRIBUTE_REGIONS = EnumSet.of(RegionType.ASH_HEAP);
@@ -46,6 +47,7 @@ public class CardDetail {
                 attributeString += String.format("data-votes='%s' ", votes);
                 attributeString += String.format("data-locked='%s' ", locked);
                 attributeString += String.format("data-contested='%s' ", contested);
+                attributeString += String.format("data-disciplines='%s' ", String.join(" ", disciplines));
             }
         }
         return attributeString;

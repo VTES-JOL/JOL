@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.deckserver.game.storage.cards.importer.CryptImporter;
 import net.deckserver.game.storage.cards.importer.LibraryImporter;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,16 +17,12 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+@Disabled
 public class CardDatabaseBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(CardDatabaseBuilder.class);
 
-    @Test
-    public void buildCardDatabase() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-        Path basePath = Paths.get("src/test/resources/data/cards");
+    private static List<SummaryCard> getSummaryCards(Path basePath) throws Exception {
         Path libraryPath = basePath.resolve("vteslib.csv");
         Path cryptPath = basePath.resolve("vtescrypt.csv");
 
@@ -36,13 +33,18 @@ public class CardDatabaseBuilder {
         List<CryptCard> cryptCards = cryptImporter.read();
         List<SummaryCard> summaryCards = new ArrayList<>();
 
-        libraryCards.forEach(libraryCard -> {
-            summaryCards.add(new SummaryCard(libraryCard));
-        });
+        libraryCards.forEach(libraryCard -> summaryCards.add(new SummaryCard(libraryCard)));
+        cryptCards.forEach(cryptCard -> summaryCards.add(new SummaryCard(cryptCard)));
+        return summaryCards;
+    }
 
-        cryptCards.forEach(cryptCard -> {
-            summaryCards.add(new SummaryCard(cryptCard));
-        });
+    @Test
+    public void buildCardDatabase() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        Path basePath = Paths.get("src/test/resources/data/cards");
+        List<SummaryCard> summaryCards = getSummaryCards(basePath);
 
         Path staticPath = Paths.get("/Users/shannon/static");
         Path jsonPath = staticPath.resolve("json");

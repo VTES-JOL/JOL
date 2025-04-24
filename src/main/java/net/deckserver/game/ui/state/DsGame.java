@@ -34,13 +34,9 @@ public class DsGame extends DsNoteTaker implements Game {
         players.addAll(newPlayers);
     }
 
-    public void addLocation(String regionName) {
-        DsLocation l = new DsLocation(regionName, this);
-        regions.add(l);
-    }
-
     public void addLocation(String player, String regionName) {
         DsLocation l = new DsLocation(regionName, this);
+        l.setOwner(player);
         Player p = getPlayer(player);
         p.locs.add(l);
     }

@@ -119,7 +119,7 @@ function showTargetPicker(target) {
         .removeClass()
         .addClass($('#playCardModal .card-type').get(0).className);
     $('#targetPicker .modal-body').text(
-        target === 'SELF' ? 'Who is playing this?' : 'Pick target.');
+        target === 'SELF' ? 'Who is playing this card?' : 'Pick target.');
     picker.show();
 
     let usePlayerSelector = target === 'MINION_YOU_CONTROL' || target === 'SELF';
@@ -233,6 +233,7 @@ function showCardModal(event) {
     let votes = target.data('votes');
     let contested = target.data('contested');
     let minion = target.data("minion");
+    let disciplines = target.data("disciplines").trim().split(" ");
     let owner = controller === player;
     if (cardId) {
         $.get({
@@ -257,8 +258,11 @@ function showCardModal(event) {
 
                 let disciplineSpan = $('#cardModal .discipline');
                 disciplineSpan.empty();
-                if (card.disciplines != null) {
-                    for (let d of card.disciplines) {
+                if (disciplines.length < 0) {
+                    disciplines = card.disciplines;
+                }
+                if (disciplines.length > 0) {
+                    for (let d of disciplines) {
                         disciplineSpan.append($("<span/>").addClass("icon").addClass(d));
                     }
                 }
@@ -362,7 +366,7 @@ function doCardCommand(commandKeyword, message = '', commandTail = '', closeModa
         modal.data('coordinates'),
         commandTail);
     var command = parts.join(' ');
-    sendCommand(command, message);
+    sendCommand(command.trim(), message);
     if (closeModal) $('#cardModal').modal('hide');
     return false;
 }
@@ -404,7 +408,7 @@ function burn() {
     return doCardCommand('burn');
 }
 
-function playVamp() {
+function influence() {
     var modal = $('#cardModal');
     var command = `influence ${modal.data('coordinates')}`;
     sendCommand(command);
@@ -429,6 +433,15 @@ function moveHand() {
     return false;
 }
 
+function moveReady() {
+    let modal = $('#cardModal');
+    let region = $("#cardModal").data('region');
+    let command = `move ${region} ${modal.data('coordinates')} ready`;
+    sendCommand(command);
+    modal.modal('hide');
+    return false;
+}
+
 function moveLibrary(top) {
     let modal = $('#cardModal');
     let region = $("#cardModal").data('region');
@@ -445,6 +458,15 @@ function moveUncontrolled() {
     let modal = $('#cardModal');
     let region = $("#cardModal").data('region');
     let command = `move ${region} ${modal.data('coordinates')} inactive`;
+    sendCommand(command);
+    modal.modal('hide');
+    return false;
+}
+
+function removeFromGame() {
+    let modal = $('#cardModal');
+    let region = $("#cardModal").data('region');
+    let command = `move ${region} ${modal.data('coordinates')} rfg`;
     sendCommand(command);
     modal.modal('hide');
     return false;

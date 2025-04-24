@@ -21,11 +21,11 @@ public class AdminPageBean {
 
     public AdminPageBean(PlayerModel model) {
         JolAdmin admin = JolAdmin.INSTANCE;
-        List<String> currentPlayers = admin.getPlayers().stream().sorted().collect(Collectors.toList());
+        List<String> currentPlayers = admin.getPlayers().stream().sorted().toList();
         List<PlayerActivityStatus> playerActivityStatuses = currentPlayers.stream()
                 .map(PlayerActivityStatus::new)
                 .sorted(Comparator.comparing(PlayerActivityStatus::getName, String.CASE_INSENSITIVE_ORDER))
-                .collect(Collectors.toList());
+                .toList();
         OffsetDateTime currentYear = OffsetDateTime.of(OffsetDateTime.now().getYear(), 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
         this.userRoles = currentPlayers.stream()
                 .map(UserSummaryBean::new)

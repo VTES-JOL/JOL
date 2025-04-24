@@ -5,6 +5,7 @@
 <%@ page import="net.deckserver.game.storage.cards.CardSearch" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.google.common.base.Strings" %>
+<%@ page import="net.deckserver.dwr.model.ChatParser" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
@@ -12,6 +13,7 @@
     String player = request.getParameter("player");
     String id = request.getParameter("id");
     String index = request.getParameter("index");
+    boolean topLevel = index.split("\\.").length == 1;
     pageContext.setAttribute("currentIndex", index);
     boolean shadow = Boolean.parseBoolean(request.getParameter("shadow"));
     boolean visible = Boolean.parseBoolean(request.getParameter("visible"));
@@ -29,7 +31,8 @@
     String label = cardDetail.getLabel();
     int counters = cardDetail.getCounters();
     int capacity = cardDetail.getCapacity();
-    if (capacity == -1 && visible && defaultCapacity != null) {
+    boolean hasCapacity = capacity > 0;
+    if (capacity == 0 && visible && defaultCapacity != null && topLevel) {
         capacity = defaultCapacity;
     }
     String votes = cardDetail.getVotes();
@@ -40,8 +43,8 @@
     String shadowStyle = shadow ? "shadow" : "";
     // Counter Style Logic
     // Green: hasLife && OTHER_VISIBLE_REGION
-    // Red: isMinion
-    String counterStyle = (cardSummary.hasLife() && RegionType.OTHER_VISIBLE_REGIONS.contains(region) ) ? "text-bg-success" : (cardSummary.isMinion() ? "text-bg-danger" : "text-bg-secondary");
+    // Red: hasBlood || hasCapacity
+    String counterStyle = (cardSummary.hasLife() && RegionType.OTHER_VISIBLE_REGIONS.contains(region) ) ? "text-bg-success" : ((cardSummary.hasBlood() || hasCapacity) ? "text-bg-danger" : "text-bg-secondary");
     String regionStyle = region == RegionType.TORPOR ? "opacity-75" : "";
     String contestedStyle = contested ? "bg-warning-subtle" : "";
     String counterText = counters + (capacity > 0 ? " / " + capacity : "");
@@ -55,7 +58,10 @@
             <c:if test="<%= visible %>">
                 <span>
                     <a data-card-id="<%= cardDetail.getCardId() %>" class="card-name text-wrap">
-                        <%= cardDetail.getName() %>
+                        <%= cardSummary.getDisplayName() %>
+                        <c:if test="<%= cardSummary.isAdvanced() %>">
+                            <i class='icon adv'></i>
+                        </c:if>
                     </a>
                     <c:if test="<%= hasVotes %>">
                         <span class="badge rounded-pill text-bg-warning "><%= votes %></span>
@@ -107,7 +113,7 @@
                     <jsp:param name="id" value="${card}"/>
                     <jsp:param name="shadow" value="false"/>
                     <jsp:param name="visible" value="<%= visible %>"/>
-                    <jsp:param name="index" value="${currentIndex} ${counter.count}"/>
+                    <jsp:param name="index" value="${currentIndex}.${counter.count}"/>
                 </jsp:include>
             </c:forEach>
         </ol>

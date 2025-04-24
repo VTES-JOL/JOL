@@ -5,6 +5,7 @@
     </div>
     <div class="col-sm-4">
         <jsp:include page="add-role.jsp"/>
+        <jsp:include page="end-turn.jsp"/>
         <jsp:include page="player-roles.jsp"/>
     </div>
     <div class="col-sm-4">

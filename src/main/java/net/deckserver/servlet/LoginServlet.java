@@ -1,6 +1,5 @@
 package net.deckserver.servlet;
 
-import net.deckserver.Recaptcha;
 import net.deckserver.dwr.model.JolAdmin;
 
 import javax.servlet.ServletException;
@@ -14,23 +13,16 @@ import java.io.IOException;
 public class LoginServlet extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String username = req.getParameter("username");
-        String password = req.getParameter("password");
-//        if (System.getenv().getOrDefault("ENABLE_CAPTCHA", "true").equals("true")) {
-//            String captchaResponse = req.getParameter("cf-turnstile-response");
-//            boolean verify = Recaptcha.verify(captchaResponse);
-//            if (!verify) {
-//                resp.sendRedirect("/jol/login");
-//                return;
-//            }
-//        }
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        request.setCharacterEncoding("UTF-8");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
         boolean authResult = JolAdmin.INSTANCE.authenticate(username, password);
         if (authResult) {
-            req.getSession().setAttribute("meth", username);
-            resp.sendRedirect("/jol/");
+            request.getSession().setAttribute("meth", username);
+            response.sendRedirect("/jol/");
         } else {
-            resp.sendRedirect("/jol/login");
+            response.sendRedirect("/jol/login");
         }
     }
 

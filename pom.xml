@@ -1,10 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>deckserver.net</groupId>
     <artifactId>jol-legacy</artifactId>
-    <version>1.5.12-cb25</version>
+    <version>1.6.0</version>
 
     <packaging>war</packaging>
 
@@ -205,18 +205,18 @@
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+            <groupId>org.junit-pioneer</groupId>
+            <artifactId>junit-pioneer</artifactId>
+            <version>2.3.0</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>com.github.stefanbirkner</groupId>
-            <artifactId>system-rules</artifactId>
-            <version>1.19.0</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -269,87 +269,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.1</version>
+                <version>3.5.3</version>
                 <configuration>
-                    <useSystemClassLoader>false</useSystemClassLoader>
                     <argLine>--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>com.samaxes.maven</groupId>-->
-<!--                <artifactId>minify-maven-plugin</artifactId>-->
-<!--                <version>1.7.6</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>prepare-package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>minify</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <charset>UTF-8</charset>-->
-<!--                    <skipMerge>true</skipMerge>-->
-<!--                    <cssSourceDir>css</cssSourceDir>-->
-<!--                    <jsSourceDir>js</jsSourceDir>-->
-<!--                    <jsEngine>CLOSURE</jsEngine>-->
-<!--                    <nosuffix>true</nosuffix>-->
-<!--                    <webappTargetDir>${project.build.directory}/minify</webappTargetDir>-->
-<!--                    <cssSourceIncludes>-->
-<!--                        <cssSourceInclude>**/*.css</cssSourceInclude>-->
-<!--                    </cssSourceIncludes>-->
-<!--                    <cssSourceExcludes>-->
-<!--                        <cssSourceExclude>**/*.min.css</cssSourceExclude>-->
-<!--                    </cssSourceExcludes>-->
-<!--                    <jsSourceIncludes>-->
-<!--                        <jsSourceInclude>**/*.js</jsSourceInclude>-->
-<!--                    </jsSourceIncludes>-->
-<!--                    <jsSourceExcludes>-->
-<!--                        <jsSourceExclude>**/*.min.js</jsSourceExclude>-->
-<!--                    </jsSourceExcludes>-->
-<!--                </configuration>-->
-<!--                <dependencies>-->
-<!--                    <dependency>-->
-<!--                        <groupId>org.codehaus.plexus</groupId>-->
-<!--                        <artifactId>plexus-utils</artifactId>-->
-<!--                        <version>3.5.1</version>-->
-<!--                    </dependency>-->
-<!--                </dependencies>-->
-<!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.1.0</version>
-<!--                <configuration>-->
-<!--                    <webResources>-->
-<!--                        <resource>-->
-<!--                            <directory>${project.build.directory}/minify</directory>-->
-<!--                        </resource>-->
-<!--                    </webResources>-->
-<!--                </configuration>-->
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-resources-plugin</artifactId>-->
-<!--                <version>3.3.1</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>generate-sources</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>copy-resources</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <outputDirectory>${project.build.directory}/minify</outputDirectory>-->
-<!--                            <resources>-->
-<!--                                <resource>-->
-<!--                                    <filtering>false</filtering>-->
-<!--                                    <directory>${project.basedir}/src/main/resources/static</directory>-->
-<!--                                </resource>-->
-<!--                            </resources>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
 
         </plugins>
     </build>
@@ -363,7 +292,23 @@
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
+
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.12.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest</artifactId>
+                <version>2.2</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
+
     </dependencyManagement>
 
     <profiles>

@@ -143,10 +143,12 @@ function callbackAdmin(data) {
     })
 
     let adminGameList = $("#adminGameList");
+    let endTurnList = $("#endTurnList");
     adminGameList.empty();
     $.each(data.games, function (index, value) {
         let gameOption = $("<option/>", {value: value, text: value});
         adminGameList.append(gameOption);
+        endTurnList.append(gameOption);
     })
     adminChangeGame();
 
@@ -202,6 +204,13 @@ function replacePlayer() {
     let existingPlayer = $("#adminReplacePlayerList").val();
     let newPlayer = $("#adminReplacementList").val();
     DS.replacePlayer(currentGame, existingPlayer, newPlayer, {callback: processData, errorHandler: errorhandler});
+}
+
+function adminEndTurn() {
+    let currentGame = $("#endTurnList").val();
+    if (confirm("Are you sure you want to end turn for " + currentGame)) {
+        DS.endTurn(currentGame, {callback: processData, errorHandler: errorhandler});
+    }
 }
 
 function addRole() {
@@ -570,6 +579,7 @@ function doNav(target) {
     $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
     if (refresher) clearTimeout(refresher);
     scrollChat = true;
+    $('#targetPicker').hide();
     DS.navigate(target, {callback: processData, errorHandler: errorhandler});
     return false;
 }
@@ -745,9 +755,9 @@ function renderMyGames(id, games) {
             toggle.prop("checked",false);
             players.addClass("d-none");
         }
-        let predator = renderPlayer(game.players[game.predator]);
-        let activePlayer = renderPlayer(game.players[game.activePlayer]);
-        let prey = renderPlayer(game.players[game.prey]);
+        let predator = renderPlayer(game.players, game.predator);
+        let activePlayer = renderPlayer(game.players, game.activePlayer);
+        let prey = renderPlayer(game.players, game.prey);
         activePlayer.addClass("fw-semibold");
         let self = game.players[player];
         if (self.pinged) {
@@ -761,10 +771,13 @@ function renderMyGames(id, games) {
     });
 }
 
-function renderPlayer(data) {
-    let span = $("<span/>").text(data.playerName).addClass("my-2 px-2 border-end border-start w-100 text-center");
-    if (data.pinged) {
-        span.append("<i class='bi-exclamation-triangle ms-1'></i>");
+function renderPlayer(players, target) {
+    let span = $("<span/>").addClass("my-2 px-2 border-end border-start w-100 text-center");
+    if (target !== "") {
+        span.text(players[target].playerName);
+        if (players[target].pinged) {
+            span.append("<i class='bi-exclamation-triangle ms-1'></i>");
+        }
     }
     return span;
 }
@@ -964,16 +977,16 @@ function sendPrivateNotes() {
 }
 
 function toggleChat() {
-    $(".gameChat").toggleClass("d-none");
-    $(".history").toggleClass("d-none");
+    $("#gameChatCard").toggleClass("d-none");
+    $("#historyCard").toggleClass("d-none");
     if ($("#gameHistory").children().length === 0) {
         getHistory();
     }
 }
 
 function toggleNotes() {
-    $(".notes").toggleClass("d-none");
-    $(".gameDeck").toggleClass("d-none");
+    $("#notesCard").toggleClass("d-none");
+    $("#gameDeckCard").toggleClass("d-none");
     if ($("#gameDeck").children().length === 0) {
         doShowDeck();
     }
@@ -1006,27 +1019,6 @@ function loadGame(data) {
             phaseSelect.val(data.phase);
         }
     }
-    if (!data.player) {
-        $("#gameForm :input").attr('disabled', true);
-        $(".player-only").addClass("d-none");
-        $(".control-grid").addClass("spectator");
-        phaseSelect.attr('disabled', true);
-        endTurn.attr('disabled', true);
-    } else {
-        $("#gameForm :input").removeAttr('disabled');
-        $(".player-only").removeClass("d-none");
-        $(".control-grid").removeClass("spectator");
-    }
-
-    if (player !== data.currentPlayer) {
-        phaseSelect.attr('disabled', true);
-        endTurn.attr('disabled', true);
-    }
-
-    if (data.judge) {
-        $("#chat").removeAttr('disabled');
-        $("#gameSubmit").removeAttr('disabled');
-    }
 
     // Pings
     if (data.ping !== null) {
@@ -1055,8 +1047,11 @@ function loadGame(data) {
     let gameChatOutput = $("#gameChatOutput");
     let gameHistory = $("#gameHistory");
     let gameDeck = $("#gameDeck");
-    let globalNotes = $("#globalNotes");
     let privateNotes = $("#privateNotes");
+    let playerControls = $(".player-only");
+    let globalNotes = $("#globalNotes");
+    let controlGrid = $(".control-grid");
+    let chatControls = $(".can-chat");
 
     // Chat Log
     if (data.resetChat) {
@@ -1069,16 +1064,40 @@ function loadGame(data) {
         command.empty();
         currentOption = "notes";
         gameChatLastDay = null;
-        $(".gameChat").removeClass("d-none");
-        $(".history").addClass("d-none");
-        $(".notes").removeClass("d-none");
-        $(".gameDeck").addClass("d-none");
+        // initial state for cards
+        $(".panel-default").removeClass("d-none");
+        $(".panel-secondary").addClass("d-none");
+
+        // initial state for controls
+        playerControls.addClass("d-none");
+        chatControls.attr('disabled', true);
+        globalNotes.attr('disabled', true);
+        controlGrid.addClass("spectator");
     }
     let fetchFullLog = false;
     if (data.logLength !== null) {
         let myLogLength = gameChatOutput.children().length + (data.turn == null ? 0 : data.turn.length);
         fetchFullLog = myLogLength < data.logLength;
     }
+
+    // enable chat controls if judge or player
+    if (data.player || data.judge) {
+        globalNotes.removeAttr('disabled');
+        chatControls.removeAttr('disabled');
+    }
+
+    // If playing enable player controls
+    if (data.player) {
+        playerControls.removeClass("d-none");
+        controlGrid.removeClass("spectator");
+    }
+
+    // if not the current player disable phase select and end turn
+    if (player !== data.currentPlayer) {
+        phaseSelect.attr('disabled', true);
+        endTurn.attr('disabled', true);
+    }
+
     //If we're missing any messages from the log, skip adding this batch and
     //get a full refresh from server to prevent new messages appearing in the
     //past, where they are likely to be missed.
@@ -1192,7 +1211,18 @@ function addCardTooltips(parent) {
         });
 }
 
-function details(tag) {
+function regionCommands(event, tag) {
+    let regionModal = $("#regionModal");
+    regionModal.find(".loaded").hide();
+    regionModal.find(".loading").show();
+    regionModal.modal('show');
+}
+
+function details(event, tag) {
+    console.log(event);
+    event.preventDefault();
+    event.stopPropagation();
+    $(`[aria-controls='${tag}'] i`).toggleClass("d-none");
     tippy.hideAll({duration: 0});
     if (refresher) clearTimeout(refresher);
     DS.doToggle(game, tag, {callback: processData, errorHandler: errorhandler});

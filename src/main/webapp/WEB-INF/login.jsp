@@ -9,10 +9,10 @@
     <!-- Required by Bootstrap -->
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="css/styles.css"/>
-    <link rel="stylesheet" type="text/css" href="css/<%= System.getenv().getOrDefault("TYPE", "dev") %>.css"/>
-    <link rel="shortcut icon" href="images/favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/styles.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/<%= System.getenv().getOrDefault("TYPE", "dev") %>.css"/>
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/favicon.ico"/>
     <link href="https://fonts.googleapis.com/css?family=IM+Fell+English" rel="stylesheet">
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
@@ -30,7 +30,7 @@
                     <p>
                         <a href="https://www.vekn.net/what-is-v-tes" target="_blank">What is Vampire: The Eternal Struggle?</a>
                     </p>
-                    <form id="loginForm" method="post" action="/jol/login">
+                    <form id="loginForm" method="post" action="${pageContext.request.contextPath}/login">
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="dsuserin" name="username" autocomplete="username" placeholder="Username">
                             <label for="dsuserin">Username</label>
@@ -55,7 +55,7 @@
                     <div class="mb-2">
                         <div>Import decks from your favorite deck building program.  Play multiple games simultaneously.  Test a deck before a tournament.</div>
                     </div>
-                    <form id="registerForm" method="post" action="/jol/register">
+                    <form id="registerForm" method="post" action="${pageContext.request.contextPath}/register">
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="newplayer" name="newplayer" placeholder="Username">
                             <label for="newplayer">Username</label>
@@ -80,8 +80,8 @@
 
     <!-- Bootstrap -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="js/jquery-3.7.1.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+    <script src="${pageContext.request.contextPath}/js/jquery-3.7.1.min.js"></script>
+    <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>
     <script type='text/javascript'>
         $(document).ready(function() {
             $('#dsuserin').focus();
