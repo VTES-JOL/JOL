@@ -410,7 +410,7 @@ public class JolGame {
         if (amount == 0) return; // PENDING report this in status?
         int starting = getPool(player);
         int ending = starting + amount;
-        setNotation(state, POOL, String.valueOf(ending));
+        setNotation(state, player + POOL, String.valueOf(ending));
         addCommand(player + "'s pool was " + starting + ", now is " + ending + ".", new String[]{"pool", player, amount + ""});
     }
 
@@ -511,7 +511,7 @@ public class JolGame {
         Card card = state.getCard(cardId);
         String message = String.format("%s %s %s", player, tapped ? "locks" : "unlocks", getCardName(card));
         addCommand(message, new String[]{"tap", cardId});
-        setNotation(card, TAPPED, tapped ? TAPPED : UNTAPPED);
+        setNotation(card, TAP, tapped ? TAPPED : UNTAPPED);
     }
 
     public void untapAll(String player) {
