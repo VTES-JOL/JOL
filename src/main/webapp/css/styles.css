@@ -336,6 +336,7 @@ a.card-name {
 .icon.card-type.action.combat:before {content: "04";}
 .icon.card-type.event:before {content: "[";}
 .icon.adv:before {font-style: normal;font-weight: bolder;content: '|'}
+.icon.merged:before {font-style: normal;font-weight: bolder;content: '{'}
 .icon.aus:before {content: 'a';}
 .icon.AUS:before {content: 'A';}
 .icon.obe:before {content: 'b';}

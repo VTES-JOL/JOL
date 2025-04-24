@@ -23,6 +23,7 @@ public class CardDetail {
     private boolean locked;
     private boolean contested;
     private boolean minion;
+    private boolean merged;
 
     public static final EnumSet<RegionType> FULL_ATTRIBUTE_REGIONS = EnumSet.of(RegionType.READY, RegionType.TORPOR, RegionType.UNCONTROLLED);
     public static final EnumSet<RegionType> LIMITED_ATTRIBUTE_REGIONS = EnumSet.of(RegionType.ASH_HEAP);

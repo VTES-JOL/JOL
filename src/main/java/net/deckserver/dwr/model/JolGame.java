@@ -51,6 +51,7 @@ public class JolGame {
     private static final String POOL = "pool";
     private static final String EDGE = "edge";
     private static final String MINION = "minion";
+    private static final String MERGED = "merged";
     private static final String TAP = "tapnote";
     private static final String TAPPED = "tap";
     private static final String PHASE = "phase";
@@ -378,6 +379,7 @@ public class JolGame {
         cardDetail.setLocked(isTapped(id));
         cardDetail.setContested(getContested(id));
         cardDetail.setMinion(isMinion(id));
+        cardDetail.setMerged(isMerged(id));
         return cardDetail;
     }
 
@@ -644,6 +646,11 @@ public class JolGame {
         }
     }
 
+    public void setMerged(String cardId, boolean merged) {
+        Card card = state.getCard(cardId);
+        setNotation(card, MERGED, String.valueOf(merged));
+    }
+
     public int getCapacity(String cardId) {
         Card card = state.getCard(cardId);
         return getNotationAsInt(card, CAPACITY);
@@ -710,6 +717,11 @@ public class JolGame {
             setNotation(card, MINION, current);
         }
         return Boolean.parseBoolean(current);
+    }
+
+    private boolean isMerged(String id) {
+        Card card = state.getCard(id);
+        return getNotation(card, MERGED, "false").equals("true");
     }
 
     private void zeroPool(String player) {

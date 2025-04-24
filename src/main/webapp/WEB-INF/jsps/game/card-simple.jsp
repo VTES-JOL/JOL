@@ -29,7 +29,10 @@
             <c:if test="<%= visible %>">
                 <span>
                     <a data-card-id="<%= cardDetail.getCardId() %>" class="card-name text-wrap">
-                        <%= cardDetail.getName() %>
+                        <%= cardSummary.getDisplayName() %>
+                        <c:if test="<%= cardSummary.isAdvanced() %>">
+                            <i class='icon adv'></i>
+                        </c:if>
                     </a>
                 </span>
                 <span class="d-flex gap-1 align-items-center">

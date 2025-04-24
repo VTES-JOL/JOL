@@ -5,6 +5,7 @@
 <%@ page import="net.deckserver.game.storage.cards.CardSearch" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.google.common.base.Strings" %>
+<%@ page import="net.deckserver.dwr.model.ChatParser" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
@@ -12,6 +13,7 @@
     String player = request.getParameter("player");
     String id = request.getParameter("id");
     String index = request.getParameter("index");
+    boolean topLevel = index.split("\\.").length == 1;
     pageContext.setAttribute("currentIndex", index);
     boolean shadow = Boolean.parseBoolean(request.getParameter("shadow"));
     boolean visible = Boolean.parseBoolean(request.getParameter("visible"));
@@ -30,7 +32,7 @@
     int counters = cardDetail.getCounters();
     int capacity = cardDetail.getCapacity();
     boolean hasCapacity = capacity > 0;
-    if (capacity == 0 && visible && defaultCapacity != null) {
+    if (capacity == 0 && visible && defaultCapacity != null && topLevel) {
         capacity = defaultCapacity;
     }
     String votes = cardDetail.getVotes();
@@ -56,7 +58,10 @@
             <c:if test="<%= visible %>">
                 <span>
                     <a data-card-id="<%= cardDetail.getCardId() %>" class="card-name text-wrap">
-                        <%= cardDetail.getName() %>
+                        <%= cardSummary.getDisplayName() %>
+                        <c:if test="<%= cardSummary.isAdvanced() %>">
+                            <i class='icon adv'></i>
+                        </c:if>
                     </a>
                     <c:if test="<%= hasVotes %>">
                         <span class="badge rounded-pill text-bg-warning "><%= votes %></span>

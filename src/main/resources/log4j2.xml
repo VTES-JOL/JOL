@@ -35,7 +35,7 @@
         </Logger>
         <Logger name="net.deckserver.commands" level="INFO" additivity="false">
             <AppenderRef ref="commands"/>
-            <AppenderRef ref="console"/>
+            <AppenderRef ref="console" level="error"/>
         </Logger>
         <Root level="INFO">
             <AppenderRef ref="console"/>
