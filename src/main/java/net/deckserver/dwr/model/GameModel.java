@@ -3,6 +3,7 @@ package net.deckserver.dwr.model;
 import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.message.ObjectArrayMessage;
 
 import java.time.OffsetDateTime;
@@ -13,8 +14,8 @@ import java.util.Set;
 
 public class GameModel implements Comparable<GameModel> {
 
-    private static final Logger logger = LogManager.getLogger();
-    private static final Logger metrics = LogManager.getLogger("net.deckserver.metrics");
+    private static final Logger METRICS = LogManager.getLogger("net.deckserver.metrics");
+    private static final Logger COMMANDS = LogManager.getLogger("net.deckserver.commands");
 
     @Getter
     private final String name;
@@ -87,13 +88,14 @@ public class GameModel implements Comparable<GameModel> {
                 if (command != null) {
                     didCommand = true;
                     String[] commands = command.split(";");
+                    ThreadContext.put("DYNAMIC_LOG", name);
                     for (String cmd : commands) {
                         try {
                             String[] cmdTokens = cmd.trim().split("[\\s\n\r\f\t]");
                             commander.doCommand(player, cmdTokens);
-                            logger.info("[{} - {}] {}", name, player, cmd);
+                            COMMANDS.info("[{}] {}", player, cmd);
                         } catch (CommandException e) {
-                            logger.error("Invalid command: [{} - {}] {}", name, player, cmd);
+                            COMMANDS.error("[{}] {}", player, cmd);
                             status.append(e.getMessage());
                         }
                     }
@@ -105,7 +107,7 @@ public class GameModel implements Comparable<GameModel> {
                     chatChanged = true;
                 }
                 OffsetDateTime timestamp = OffsetDateTime.now();
-                metrics.info(new ObjectArrayMessage(timestamp.getYear(), timestamp.getMonthValue(), timestamp.getDayOfMonth(), timestamp.getHour(), player, game.getName(), didCommand, didChat));
+                METRICS.info(new ObjectArrayMessage(timestamp.getYear(), timestamp.getMonthValue(), timestamp.getDayOfMonth(), timestamp.getHour(), player, game.getName(), didCommand, didChat));
                 admin.clearPing(player, name);
             }
             if (game.getActivePlayer().equals(player) && "Yes".equalsIgnoreCase(endTurn)) {

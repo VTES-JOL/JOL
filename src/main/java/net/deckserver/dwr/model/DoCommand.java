@@ -233,10 +233,11 @@ public class DoCommand {
             String targetPlayer = cmdObj.getPlayer(player);
             if (!cmdObj.hasMoreArgs()) {
                 game.untapAll(targetPlayer);
+            } else {
+                String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
+                String card = cmdObj.findCard(targetPlayer, targetRegion);
+                game.setTapped(player, card, false);
             }
-            String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-            String card = cmdObj.findCard(targetPlayer, targetRegion);
-            game.setTapped(player, card, false);
         }
         if (cmd.equalsIgnoreCase("lock")) {
             String targetPlayer = cmdObj.getPlayer(player);
