@@ -441,7 +441,7 @@ public class JolGame {
         Card card = state.getCard(cardId);
         String cardName = getCardName(card);
         String cleanText = text.trim();
-        setNotation(card, text, cleanText);
+        setNotation(card, TEXT, cleanText);
         if (!quiet) {
             if (!cleanText.isEmpty()) {
                 addMessage(String.format("%s now \"%s\"", cardName, cleanText));
