@@ -269,7 +269,7 @@ function showCardModal(event) {
 
                 //If this is our inactive region, show capacity required to influence out.
                 //player is a global from ds.js - the logged-in player
-                if (controller === player && capacity === -1 && card.capacity != null)
+                if (controller === player && capacity === 0 && card.capacity != null)
                     capacity = card.capacity;
                 setCounters(counters, capacity, card.type);
                 setPool(controllerPool);
