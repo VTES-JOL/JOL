@@ -1212,10 +1212,10 @@ function addCardTooltips(parent) {
 }
 
 function regionCommands(event, tag) {
-    let regionModal = $("#regionModal");
-    regionModal.find(".loaded").hide();
-    regionModal.find(".loading").show();
-    regionModal.modal('show');
+    // let regionModal = $("#regionModal");
+    // regionModal.find(".loaded").hide();
+    // regionModal.find(".loading").show();
+    // regionModal.modal('show');
 }
 
 function details(event, tag) {
