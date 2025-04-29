@@ -324,6 +324,104 @@ public class DoCommandTest {
         assertThrows(CommandException.class, () -> worker.doCommand("Player2", "play vamp"));
     }
 
+    @Test
+    void influence() throws CommandException {
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED.xmlLabel()).getCards().length, is(2));
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY.xmlLabel()).getCards().length, is(3));
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED.xmlLabel()).getCards()[0], hasProperty("id", is("4")));
+        worker.doCommand("Player1", "influence 1");
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY.xmlLabel()).getCards().length, is(4));
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY.xmlLabel()).getCards()[0], hasProperty("id", is("4")));
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED.xmlLabel()).getCards().length, is(1));
+        assertThat(getLastMessage(), containsString("Player1 influences out <a class='card-name' data-card-id='201025'>Muse</a>, capacity: 3"));
+    }
+
+    @Test
+    void influenceAgain() throws CommandException {
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED.xmlLabel()).getCards().length, is(2));
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY.xmlLabel()).getCards().length, is(3));
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED.xmlLabel()).getCards()[0], hasProperty("id", is("4")));
+        worker.doCommand("Player1", "influence 1");
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED.xmlLabel()).getCards().length, is(1));
+        worker.doCommand("Player1", "move ready 1 uncontrolled");
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED.xmlLabel()).getCards().length, is(2));
+        worker.doCommand("Player1", "influence 2");
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED.xmlLabel()).getCards().length, is(1));
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY.xmlLabel()).getCards()[0], hasProperty("id", is("4")));
+        assertThat(getLastMessage(), containsString("Player1 influences out <a class='card-name' data-card-id='201025'>Muse</a>."));
+    }
+
+    @Test
+    void influenceNoCapacity() throws CommandException {
+        assertThat(game.getState().getPlayerLocation("Player5", RegionType.UNCONTROLLED.xmlLabel()).getCards().length, is(4));
+        assertThat(game.getState().getPlayerLocation("Player5", RegionType.READY.xmlLabel()).getCards().length, is(3));
+        assertThat(game.getState().getPlayerLocation("Player5", RegionType.UNCONTROLLED.xmlLabel()).getCards()[3], hasProperty("id", is("442")));
+        worker.doCommand("Player5", "influence 4");
+        assertThat(game.getState().getPlayerLocation("Player5", RegionType.READY.xmlLabel()).getCards()[0], hasProperty("id", is("442")));
+        assertThat(getLastMessage(), containsString("Player5 influences out <a class='card-name' data-card-id='102165'>Web of Knives Recruit</a>."));
+    }
+
+    @Test
+    void influenceVotes() throws CommandException {
+        assertThat(game.getState().getPlayerLocation("Player4", RegionType.UNCONTROLLED.xmlLabel()).getCards().length, is(3));
+        assertThat(game.getState().getPlayerLocation("Player4", RegionType.READY.xmlLabel()).getCards().length, is(2));
+        assertThat(game.getState().getPlayerLocation("Player4", RegionType.UNCONTROLLED.xmlLabel()).getCards()[2], hasProperty("id", is("317")));
+        worker.doCommand("Player4", "influence 3");
+        assertThat(game.getState().getPlayerLocation("Player4", RegionType.READY.xmlLabel()).getCards().length, is(3));
+        assertThat(game.getState().getPlayerLocation("Player4", RegionType.READY.xmlLabel()).getCards()[0], hasProperty("id", is("317")));
+        assertThat(game.getState().getPlayerLocation("Player4", RegionType.UNCONTROLLED.xmlLabel()).getCards().length, is(2));
+        assertThat(getLastMessage(), containsString("Player4 influences out <a class='card-name' data-card-id='200810'>Lambach</a>, capacity: 10, votes: 3"));
+    }
+
+    @Test
+    void move() throws CommandException {
+        assertThat(game.getState().getPlayerLocation("Player5", RegionType.READY.xmlLabel()).getCards().length, is(3));
+        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY.xmlLabel()).getCards().length, is(1));
+        worker.doCommand("Player5", "move Player3 ready 1 ready");
+        assertThat(game.getState().getPlayerLocation("Player5", RegionType.READY.xmlLabel()).getCards().length, is(4));
+        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY.xmlLabel()).getCards().length, is(0));
+        assertThat(getLastMessage(), containsString("Player5 moves <a class='card-name' data-card-id='200788'>Klaus van der Veken</a> to Player5's ready region."));
+    }
+
+    @Test
+    void moveTop() throws CommandException {
+        assertThat(game.getState().getPlayerLocation("Player5", RegionType.LIBRARY.xmlLabel()).getCards().length, is(64));
+        assertThat(game.getState().getPlayerLocation("Player5", RegionType.HAND.xmlLabel()).getCards().length, is(7));
+        assertThat(game.getState().getPlayerLocation("Player5", RegionType.HAND.xmlLabel()).getCards()[0], hasProperty("id", is("489")));
+        worker.doCommand("Player5", "move hand 1 library top");
+        assertThat(game.getState().getPlayerLocation("Player5", RegionType.LIBRARY.xmlLabel()).getCards().length, is(65));
+        assertThat(game.getState().getPlayerLocation("Player5", RegionType.HAND.xmlLabel()).getCards().length, is(6));
+        assertThat(game.getState().getPlayerLocation("Player5", RegionType.LIBRARY.xmlLabel()).getCards()[0], hasProperty("id", is("489")));
+        assertThat(getLastMessage(), containsString("Player5 moves card #1 in their hand to the top of their library."));
+    }
+
+    @Test
+    void moveToCard() throws CommandException {
+        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY.xmlLabel()).getCards()[0].getCards().length, is(2));
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY.xmlLabel()).getCards()[2].getCards().length, is(0));
+        worker.doCommand("Player1", "move Player3 ready 1.1 ready 3");
+        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY.xmlLabel()).getCards()[0].getCards().length, is(1));
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY.xmlLabel()).getCards()[2].getCards().length, is(1));
+        assertThat(getLastMessage(), containsString("Player1 puts <a class='card-name' data-card-id='101014'>Ivory Bow</a> on <a class='card-name' data-card-id='100298'>Carlton Van Wyk</a> in their ready region."));
+    }
+
+    @Test
+    void moveCardLoop() throws CommandException {
+        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY.xmlLabel()).getCards()[0].getCards().length, is(2));
+        assertThrows(CommandException.class, () -> worker.doCommand("Player3", "move ready 1 ready 1.1"));
+    }
+
+    @Test
+    void moveComplicated() throws CommandException {
+        assertThat(game.getState().getCard("208").getCards().length, is(2));
+        assertThat(game.getState().getCard("246").getCards().length, is(0));
+        worker.doCommand("Player3", "move ready 1.2 ready 1.1");
+        assertThat(getLastMessage(), containsString("Player3 puts <a class='card-name' data-card-id='100199'>Blood Doll</a> #1.2 on <a class='card-name' data-card-id='101014'>Ivory Bow</a> in their ready region."));
+        assertThat(game.getState().getCard("208").getCards().length, is(1));
+        assertThat(game.getState().getCard("246").getCards().length, is(1));
+        assertThrows(CommandException.class, () -> worker.doCommand("Player3", "move ready 1 ready 1.1.1"));
+    }
+
     private String getLastMessage() {
         return Arrays.asList(game.getActions()).getLast().getText();
     }

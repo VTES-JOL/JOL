@@ -200,35 +200,32 @@ public class JolGame {
 
     public void influenceCard(String player, String cardId, String destPlayer, String destRegion) {
         Card card = state.getCard(cardId);
-        if (card == null) throw new IllegalArgumentException("No such card");
         CardContainer source = card.getParent();
         Location dest = state.getPlayerLocation(destPlayer, destRegion);
-        if (dest == null) throw new IllegalStateException("No such region");
 
         Location loc = (Location) state.getRegionFromCard(card);
 
-        if (loc.getName().contains(INACTIVE_REGION)) {
-            String message = player + " influences out " + getCardLink(card);
-            CardDetail detail = getCard(cardId);
-            CardSummary cardSummary = CardSearch.INSTANCE.get(detail.getCardId());
-            Integer capacity = cardSummary.getCapacity();
-            if (capacity != null && getCapacity(cardId) <= 0) {
-                changeCapacity(cardId, capacity, true);
-                message += ", capacity: " + capacity;
-            }
-            // Do disciplines
-            List<String> disciplines = cardSummary.getDisciplines();
-            setDisciplines(player, cardId, disciplines, true);
-            // Do votes
-            String votes = cardSummary.getVotes();
-            if (!Strings.isNullOrEmpty(votes)) {
-                setVotes(cardId, votes, true);
-                message += ", votes: " + votes;
-            }
-            source.removeCard(card);
-            dest.addCard(card, true);
-            addCommand(message, new String[]{"influence", cardId, destPlayer, destRegion});
+        CardDetail detail = getCard(cardId);
+        CardSummary cardSummary = CardSearch.INSTANCE.get(detail.getCardId());
+        Integer capacity = cardSummary.getCapacity();
+        String capacityText = "";
+        if (capacity != null && getCapacity(cardId) <= 0) {
+            changeCapacity(cardId, capacity, true);
+            capacityText = ", capacity: " + capacity;
         }
+        // Do disciplines
+        List<String> disciplines = cardSummary.getDisciplines();
+        setDisciplines(player, cardId, disciplines, true);
+        // Do votes
+        String votes = cardSummary.getVotes();
+        String votesText = "";
+        if (!Strings.isNullOrEmpty(votes)) {
+            setVotes(cardId, votes, true);
+            votesText = ", votes: " + votes;
+        }
+        source.removeCard(card);
+        dest.addCard(card, true);
+        addCommand(String.format("%s influences out %s%s%s.", player, getCardLink(card), capacityText, votesText), new String[]{"influence", cardId, destPlayer, destRegion});
     }
 
     public void shuffle(String player, String region, int num) {
@@ -899,7 +896,7 @@ public class JolGame {
         Card srcCard = state.getCard(cardId);
         Card dstCard = state.getCard(destCard);
         CardContainer parentContainer = dstCard.getParent();
-        while (parentContainer != null) {
+        while (true) {
             if (parentContainer instanceof Card parentCard) {
                 if (parentCard.getId().equals(srcCard.getId()))
                     throw new CommandException("Can't create card loop");
@@ -908,33 +905,30 @@ public class JolGame {
                 break;
             }
         }
-        if (srcCard == null) throw new CommandException("No such card");
         CardContainer source = srcCard.getParent();
         Location destinationRegion = (Location) state.getRegionFromCard(dstCard);
 
-        String message = String.format("%s puts %s on %s", player, getCardName(srcCard, destinationRegion), getTargetCardName(dstCard, player));
+        String message = String.format("%s puts %s on %s.", player, getCardName(srcCard, destinationRegion), getTargetCardName(dstCard, player));
         addCommand(message, new String[]{"move", cardId, destCard});
 
         source.removeCard(srcCard);
         dstCard.addCard(srcCard, false);
     }
 
-    void moveToRegion(String player, String cardId, String destPlayer, String destRegion, boolean bottom) {
+    void moveToRegion(String player, String cardId, String destPlayer, String destRegion, boolean top) {
         Card card = state.getCard(cardId);
-        if (card == null) throw new IllegalArgumentException("No such card");
         CardContainer source = card.getParent();
         Location sourceRegion = (Location) state.getRegionFromCard(card);
         Location destinationRegion = state.getPlayerLocation(destPlayer, destRegion);
-        if (destinationRegion == null) throw new IllegalStateException("No such region");
 
         boolean sameOwner = Stream.of(sourceRegion.getOwner(), destinationRegion.getOwner()).allMatch(c -> c.equals(player));
-        String topMessage = bottom ? "" : "the top of ";
+        String topMessage = top ? "the top of " : "";
         String playerName = sameOwner ? "their" : destinationRegion.getOwner() + "'s";
 
-        String message = String.format("%s moves %s to %s%s %s", player, getCardName(card, destinationRegion), topMessage, playerName, destRegion);
-        addCommand(message, new String[]{"move", cardId, destPlayer, destRegion, bottom ? "bottom" : "top"});
+        String message = String.format("%s moves %s to %s%s %s.", player, getCardName(card, destinationRegion), topMessage, playerName, destRegion);
+        addCommand(message, new String[]{"move", cardId, destPlayer, destRegion, top ? "top" : "bottom"});
         source.removeCard(card);
-        destinationRegion.addCard(card, !bottom);
+        destinationRegion.addCard(card, top);
     }
 
     void burnQuietly(String cardId) {

@@ -290,12 +290,12 @@ public class DoCommand {
         String destPlayer = cmdObj.getPlayer(player);
         String destRegion = cmdObj.getRegion(JolGame.READY_REGION);
         String destCard = cmdObj.findCard(false, destPlayer, destRegion);
-        boolean bottom = !Arrays.asList(cmdObj.args).contains("top");
+        boolean top = Arrays.asList(cmdObj.args).contains("top");
 
-        if ((destRegion.equals(JolGame.READY_REGION) || destRegion.equals(JolGame.INACTIVE_REGION) || destRegion.equals(JolGame.TORPOR)) && destCard != null) {
+        if (List.of(JolGame.READY_REGION, JolGame.INACTIVE_REGION, JolGame.TORPOR).contains(destRegion) && destCard != null) {
             game.moveToCard(player, srcCard, destCard);
         } else {
-            game.moveToRegion(player, srcCard, destPlayer, destRegion, bottom);
+            game.moveToRegion(player, srcCard, destPlayer, destRegion, top);
         }
     }
 
