@@ -31,7 +31,7 @@
                 <span class="fw-bold"><%= label %></span>
                 <span>( <%= size %> )</span>
             </span>
-            <button class="btn btn-sm <%= collapsed %>" onclick="details(event, '<%= regionId %>');" data-bs-toggle="collapse" data-bs-target="#<%= regionId %>" aria-expanded="<%= isVisible %>" aria-controls="<%= regionId %>">
+            <button class="btn btn-sm p-0 <%= collapsed %>" onclick="details(event, '<%= regionId %>');" data-bs-toggle="collapse" data-bs-target="#<%= regionId %>" aria-expanded="<%= isVisible %>" aria-controls="<%= regionId %>">
                 <i class="fs-6 bi bi-plus-circle <%= startCollapsed ? "" :"d-none" %>"></i>
                 <i class="fs-6 bi bi-dash-circle <%= startCollapsed ? "d-none" : "" %>"></i>
             </button>
