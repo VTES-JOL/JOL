@@ -401,6 +401,18 @@ public class JolAdmin {
         scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 10, TimeUnit.MINUTES);
     }
 
+    public void validate() {
+        logger.info("Validating game state");
+        games.values().stream().filter(ACTIVE_GAME)
+                .forEach(gameInfo -> {
+                    try {
+                        loadGameState(gameInfo.getName());
+                    } catch (Exception e) {
+                        logger.error("Unable to validate game {}", gameInfo.getName());
+                    }
+                });
+    }
+
     public String getVersion() {
         return properties.getProperty("version");
     }
