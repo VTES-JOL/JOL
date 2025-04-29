@@ -20,8 +20,9 @@ class CommandParser {
 
     private final static Logger logger = getLogger(CommandParser.class);
     private final static Pattern VALID_POSITION_PATTERN = Pattern.compile("(?<!-\\+)\\d+(?:\\.\\d+)*");
+    private final static Pattern SPECIAL_POSITION_PATTERN = Pattern.compile("random|top");
 
-    private final String[] args;
+    final String[] args;
     private int ind;
     private final JolGame game;
 
@@ -32,11 +33,11 @@ class CommandParser {
     }
 
     private String[] translateNextPosition() {
-        if (!args[ind].contains("random") && !VALID_POSITION_PATTERN.matcher(args[ind]).matches()) {
+        if (!SPECIAL_POSITION_PATTERN.matcher(args[ind]).matches() && !VALID_POSITION_PATTERN.matcher(args[ind]).matches()) {
             return new String[0];
         }
         String[] indexes = args[ind].split("\\.");
-        for (int i = 0; i < indexes.length - 1; i++) {
+        for (int i = 0; i < indexes.length; i++) {
             if ("top".equals(indexes[i])) {
                 indexes[i] = "1";
             }
@@ -188,7 +189,7 @@ class CommandParser {
                 amount = -amount;
             }
             return amount;
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
             return amount;
         }
     }

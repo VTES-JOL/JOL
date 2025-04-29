@@ -91,8 +91,7 @@ public class GameModel implements Comparable<GameModel> {
                     ThreadContext.put("DYNAMIC_LOG", name);
                     for (String cmd : commands) {
                         try {
-                            String[] cmdTokens = cmd.trim().split("[\\s\n\r\f\t]");
-                            commander.doCommand(player, cmdTokens);
+                            commander.doCommand(player, cmd);
                             COMMANDS.info("[{}] {}", player, cmd);
                         } catch (CommandException e) {
                             COMMANDS.error("[{}] {}", player, cmd);

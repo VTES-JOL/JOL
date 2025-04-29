@@ -1,6 +1,9 @@
 package net.deckserver.game.jaxb.state;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import javax.xml.bind.annotation.*;
 
@@ -12,6 +15,8 @@ import javax.xml.bind.annotation.*;
 })
 @XmlRootElement(name = "notation")
 @Data
+@NoArgsConstructor
+@EqualsAndHashCode(of = {"name", "value"})
 public class Notation {
 
     @XmlElement(required = true)
@@ -19,6 +24,11 @@ public class Notation {
 
     @XmlElement(required = true)
     protected String value;
+
+    public Notation(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
 
     @Override
     public String toString() {
