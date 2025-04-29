@@ -1,10 +1,16 @@
 package net.deckserver.game.storage.cards;
 
+import com.fasterxml.jackson.core.PrettyPrinter;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.core.util.MinimalPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.deckserver.game.storage.cards.importer.CryptImporter;
 import net.deckserver.game.storage.cards.importer.LibraryImporter;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +23,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-@Disabled
+@Tag("Builder")
+@Tag("CardDatabase")
 public class CardDatabaseBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(CardDatabaseBuilder.class);
@@ -40,6 +47,7 @@ public class CardDatabaseBuilder {
 
     @Test
     public void buildCardDatabase() throws Exception {
+
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
