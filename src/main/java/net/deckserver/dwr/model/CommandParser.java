@@ -32,9 +32,12 @@ class CommandParser {
         this.game = game;
     }
 
-    private String[] translateNextPosition() {
+    private String[] translateNextPosition(boolean allowRandom) throws CommandException {
         if (!SPECIAL_POSITION_PATTERN.matcher(args[ind]).matches() && !VALID_POSITION_PATTERN.matcher(args[ind]).matches()) {
             return new String[0];
+        }
+        if (!allowRandom && "random".equals(args[ind])) {
+            throw new CommandException("Unable to use random.");
         }
         String[] indexes = args[ind].split("\\.");
         for (int i = 0; i < indexes.length; i++) {
@@ -140,14 +143,14 @@ class CommandParser {
 
     }
 
-    String findCard(boolean greedy, String player, String region) throws CommandException {
+    String findCard(boolean greedy, boolean allowRandom, String player, String region) throws CommandException {
         Location location = game.getState().getPlayerLocation(player, region);
         Card[] cards = location.getCards();
         Card targetCard = null;
         boolean keepLooking = true;
         while (keepLooking && hasMoreArgs()) {
             // Get the position from the next arg
-            String[] indexes = translateNextPosition();
+            String[] indexes = translateNextPosition(allowRandom);
             if (indexes.length == 0) {
                 break;
             }
@@ -174,8 +177,8 @@ class CommandParser {
         return Optional.ofNullable(targetCard).map(Card::getId).orElse(null);
     }
 
-    String findCard(String player, String region) throws CommandException {
-        return findCard(true, player, region);
+    String findCard(boolean allowRandom, String player, String region) throws CommandException {
+        return findCard(true, allowRandom, player, region);
     }
 
     int getAmount(int amount) throws CommandException {

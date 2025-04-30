@@ -21,6 +21,7 @@ import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.Deck;
 
 import java.math.RoundingMode;
+import java.text.Collator;
 import java.text.DecimalFormat;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -62,6 +63,7 @@ public class JolGame {
     private static final String VP = " vp";
     private static final DecimalFormat format = new DecimalFormat("0.#");
     private static final DateTimeFormatter SIMPLE_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm ");
+    private static final Comparator<String> DISC_COMPARATOR = Comparator.comparing(s -> Character.isLowerCase(s.charAt(0)) ? 0 : 1);
     @Getter
     private final String id;
     private final DsGame state;
@@ -313,7 +315,7 @@ public class JolGame {
         setNotation(card, COUNTERS, String.valueOf(current));
         if (!quiet) {
             String logText = String.format(
-                    "%s %s %s blood %s %s, now %s",
+                    "%s %s %s blood %s %s, now %s. ",
                     player,
                     incr < 0 ? "removes" : "adds",
                     Math.abs(incr),
@@ -479,10 +481,10 @@ public class JolGame {
         Card card = state.getCard(cardId);
         if (clear) {
             setNotation(card, CONTEST, "");
-            addMessage(getCardName(card) + " is no longer contested");
+            addMessage(getCardName(card) + " is no longer contested.");
         } else {
             setNotation(card, CONTEST, CONTEST);
-            addMessage(getCardName(card) + " is now contested");
+            addMessage(getCardName(card) + " is now contested.");
         }
     }
 
@@ -589,7 +591,7 @@ public class JolGame {
         Card card = state.getCard(cardId);
         setNotation(card, DISCIPLINES, String.join(" ", disciplines));
         if (!quiet && !disciplines.isEmpty()) {
-            String disciplineList = disciplines.stream().collect(Collectors.joining(" ", "[", "]"));
+            String disciplineList = disciplines.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" "));
             String msg = ChatParser.parseText(player + " reset " + getCardName(card) + " back to " + disciplineList);
             addCommand(msg, new String[]{"disc", cardId, disciplines.toString()});
         }
@@ -623,10 +625,13 @@ public class JolGame {
                 discRemoved.add(disc);
             }
         });
+        newDisciplines.sort(DISC_COMPARATOR.thenComparing(Comparator.naturalOrder()));
+        discAdded.sort(DISC_COMPARATOR.thenComparing(Comparator.naturalOrder()));
+        discRemoved.sort(DISC_COMPARATOR.thenComparing(Comparator.naturalOrder()));
         if (!discAdded.isEmpty() || !discRemoved.isEmpty()) {
-            String additionString = discAdded.isEmpty() ? "" : "added " + ChatParser.parseText(discAdded.stream().collect(Collectors.joining(" ", "[", "]")));
-            String removalsString = discRemoved.isEmpty() ? "" : "removed " + ChatParser.parseText(discRemoved.stream().collect(Collectors.joining(" ", "[", "]")));
-            addMessage(String.format("%s %s %s to %s", player, additionString, removalsString, getCardName(card)));
+            String additionString = discAdded.isEmpty() ? "" : "added " + ChatParser.parseText(discAdded.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" ")));
+            String removalsString = discRemoved.isEmpty() ? "" : "removed " + ChatParser.parseText(discRemoved.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" ")));
+            addMessage(String.format("%s %s%s to %s.", player, additionString, removalsString, getCardName(card)));
             setNotation(card, DISCIPLINES, String.join(" ", newDisciplines));
         } else {
             throw new CommandException("No valid disciplines chosen.");
@@ -966,11 +971,8 @@ public class JolGame {
 
     void burn(String player, String cardId, String srcPlayer, String srcRegion, boolean top) {
         Card card = state.getCard(cardId);
-        if (card == null) throw new IllegalArgumentException("No such card");
 
         String owner = card.getOwner();
-        if (owner == null || owner.isEmpty())
-            throw new IllegalArgumentException("Game too old for burn command");
 
         //Message formats:
         //Target is public: "<player> burns <card> [#<region-index>] from [<player>'s] <region>"
