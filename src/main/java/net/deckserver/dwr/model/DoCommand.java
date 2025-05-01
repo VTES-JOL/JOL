@@ -168,7 +168,6 @@ public class DoCommand {
         for (String recipient : recipients) {
             String old = game.getPrivateNotes(recipient);
             game.setPrivateNotes(recipient, old.isEmpty() ? text : old + "\n" + text);
-            JolAdmin.INSTANCE.getGameModel(game.getName()).getView(recipient).privateNotesChanged();
         }
         String msg;
         if (player.equals(recipients.getFirst())) {
@@ -183,8 +182,7 @@ public class DoCommand {
         List<String> players = game.getPlayers();
         List<String> newOrder = new ArrayList<>();
         for (int j = 0; j < players.size(); j++) {
-            int index = cmdObj.getNumber(-1);
-            if (index == -1) throw new CommandException("Must specify a number for each player");
+            int index = cmdObj.getNumber(0);
             if (index < 1 || index > players.size()) throw new CommandException("Bad number : " + index);
             newOrder.add(players.get(index - 1));
         }
@@ -215,7 +213,6 @@ public class DoCommand {
         String targetPlayer = cmdObj.getPlayer(player);
         String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
         String targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
-        if (targetCard == null) throw new CommandException("Must specify a card in the region");
         int amount = cmdObj.getAmount(0);
         if (amount == 0) throw new CommandException("Must specify an amount of blood");
         game.changeCapacity(targetCard, amount, false);

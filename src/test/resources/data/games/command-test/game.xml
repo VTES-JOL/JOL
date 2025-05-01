@@ -7340,6 +7340,7 @@
             </notation>
             <notation>
                 <name>tapnote</name>
+                <value>tap</value>
             </notation>
             <notation>
                 <name>contested</name>
@@ -7366,6 +7367,7 @@
             </notation>
             <notation>
                 <name>tapnote</name>
+                <value>tap</value>
             </notation>
             <notation>
                 <name>contested</name>

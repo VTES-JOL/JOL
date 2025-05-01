@@ -500,7 +500,7 @@ public class JolGame {
 
     public void setLocked(String player, String cardId, boolean locked) {
         Card card = state.getCard(cardId);
-        String message = String.format("%s %s %s", player, locked ? "locks" : "unlocks", getCardName(card));
+        String message = String.format("%s %s %s.", player, locked ? "locks" : "unlocks", getCardName(card));
         addCommand(message, new String[]{"tap", cardId});
         setNotation(card, TAP, locked ? TAPPED : UNTAPPED);
     }
@@ -730,8 +730,8 @@ public class JolGame {
         Location location = state.getPlayerLocation(player, region);
         location.shuffle(num);
         if (log) {
-            String add = (num == 0) ? "" : num + " of ";
-            addCommand("Shuffle " + add + player + "'s " + region, new String[]{"shuffle", player, region, num + ""});
+            String add = (num == 0) ? "their" : "first " + num + " cards of their";
+            addCommand(String.format("%s shuffles %s %s.", player, add, region), new String[]{"shuffle", player, region, num + ""});
         }
     }
 

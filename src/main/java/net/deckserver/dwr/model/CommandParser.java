@@ -201,6 +201,7 @@ class CommandParser {
         try {
             return Integer.parseInt(args[ind++]);
         } catch (Exception nfe) {
+            ind--;
             return def;
         }
     }
