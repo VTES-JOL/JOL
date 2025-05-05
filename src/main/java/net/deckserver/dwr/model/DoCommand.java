@@ -114,6 +114,9 @@ public class DoCommand {
             case "transfer":
                 transfer(cmdObj, player);
                 break;
+            case "rfg":
+                rfg(cmdObj, player);
+                break;
         }
     }
 
@@ -271,8 +274,17 @@ public class DoCommand {
         String srcPlayer = cmdObj.getPlayer(player);
         String srcRegion = cmdObj.getRegion(JolGame.READY_REGION);
         String cardId = cmdObj.findCard(true, srcPlayer, srcRegion);
+        boolean random = Arrays.asList(cmdObj.args).contains("random");
         boolean top = Arrays.asList(cmdObj.args).contains("top");
-        game.burn(player, cardId, srcPlayer, srcRegion, top);
+        game.burn(player, cardId, srcPlayer, srcRegion, top, random);
+    }
+
+    void rfg(CommandParser cmdObj, String player) throws CommandException {
+        String srcPlayer = cmdObj.getPlayer(player);
+        String srcRegion = cmdObj.getRegion(JolGame.ASH_HEAP);
+        String cardId = cmdObj.findCard(true, srcPlayer, srcRegion);
+        boolean random = Arrays.asList(cmdObj.args).contains("random");
+        game.rfg(player, cardId, srcPlayer, srcRegion, random);
     }
 
     void move(CommandParser cmdObj, String player) throws CommandException {

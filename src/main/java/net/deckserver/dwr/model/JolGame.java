@@ -969,7 +969,7 @@ public class JolGame {
         setNotation(card, TAP, "false");
     }
 
-    void burn(String player, String cardId, String srcPlayer, String srcRegion, boolean top) {
+    void burn(String player, String cardId, String srcPlayer, String srcRegion, boolean top, boolean random) {
         Card card = state.getCard(cardId);
 
         String owner = card.getOwner();
@@ -980,14 +980,35 @@ public class JolGame {
 
         boolean showRegionOwner = !player.equals(srcPlayer);
         String message = String.format(
-                "%s burns %s from %s%s %s",
+                "%s burns %s%s from %s%s %s.",
                 player,
                 getCardName(card),
+                random ? " (picked randomly)" : "",
                 top ? "top of " : "",
                 showRegionOwner ? srcPlayer + "'s" : "their",
                 srcRegion);
 
         addCommand(message, new String[]{"burn", cardId, owner, ASH_HEAP});
         burnQuietly(cardId);
+    }
+
+    void rfg(String player, String cardId, String srcPlayer, String srcRegion, boolean random) {
+        Card card = state.getCard(cardId);
+        CardContainer source = card.getParent();
+        String owner = card.getOwner();
+        Location destinationRegion = state.getPlayerLocation(owner, RFG);
+
+        boolean showRegionOwner = !player.equals(srcPlayer);
+        source.removeCard(card);
+        destinationRegion.addCard(card, false);
+        String message = String.format(
+                "%s removes %s%s in %s %s from the game.",
+                player,
+                getCardName(card),
+                random ? " (picked randomly)" : "",
+                showRegionOwner ? srcPlayer + "'s" : "their",
+                srcRegion);
+
+        addCommand(message, new String[]{"rfg", cardId, owner, RFG});
     }
 }

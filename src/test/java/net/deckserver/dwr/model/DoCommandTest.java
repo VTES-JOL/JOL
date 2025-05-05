@@ -41,7 +41,7 @@ public class DoCommandTest {
         worker.doCommand("Player2", "burn ready top");
         assertEquals("133", game.getState().getPlayerLocation("Player2", RegionType.READY.xmlLabel()).getCard(0).getId());
         ashCards = game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP.xmlLabel()).getCards();
-        assertEquals(2, ashCards.length);
+        assertEquals(1, ashCards.length);
         assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='201337'>Talley, The Hound</a> from top of their ready region"));
     }
 
@@ -50,8 +50,18 @@ public class DoCommandTest {
         assertEquals("111", game.getState().getPlayerLocation("Player2", RegionType.READY.xmlLabel()).getCard(0).getId());
         assertEquals(0, game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP.xmlLabel()).getCards().length);
         worker.doCommand("Player2", "burn ready 1");
-        assertEquals(2, game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP.xmlLabel()).getCards().length);
+        assertEquals(1, game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP.xmlLabel()).getCards().length);
         assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='201337'>Talley, The Hound</a> from their ready region"));
+    }
+
+    @Test
+    void burnRandom() throws CommandException{
+        assertEquals("111", game.getState().getPlayerLocation("Player2", RegionType.READY.xmlLabel()).getCard(0).getId());
+        worker.doCommand("Player2", "burn ready random");
+        assertEquals(1, game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP.xmlLabel()).getCards().length);
+        assertThat(getLastMessage(), containsString("Player2 burns"));
+        assertThat(getLastMessage(), containsString("(picked randomly)"));
+        assertThat(getLastMessage(), containsString("from their ready region."));
     }
 
     @Test
@@ -59,7 +69,7 @@ public class DoCommandTest {
         assertEquals("111", game.getState().getPlayerLocation("Player2", RegionType.READY.xmlLabel()).getCard(0).getId());
         assertEquals(0, game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP.xmlLabel()).getCards().length);
         worker.doCommand("Player3", "burn Player2 ready 1");
-        assertEquals(2, game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP.xmlLabel()).getCards().length);
+        assertEquals(1, game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP.xmlLabel()).getCards().length);
         assertThat(getLastMessage(), containsString("Player3 burns <a class='card-name' data-card-id='201337'>Talley, The Hound</a> from Player2's ready region"));
     }
 
@@ -326,8 +336,8 @@ public class DoCommandTest {
         assertThat(game.getState().getPlayerLocation("Player1", RegionType.LIBRARY.xmlLabel()).getCards().length, is(76));
         assertThat(game.getState().getCard("6").getCards().length, is(0));
         worker.doCommand("Player1", "play library 11 Player2 ready 1");
-        assertThat(game.getState().getCard("111").getCards().length, is(2));
-        assertThat(game.getState().getCard("111").getCards()[1], hasProperty("id", is("18")));
+        assertThat(game.getState().getCard("111").getCards().length, is(1));
+        assertThat(game.getState().getCard("111").getCards()[0], hasProperty("id", is("18")));
         assertThat(getLastMessage(), containsString("Player1 plays <a class='card-name' data-card-id='100070'>Animalism</a> from their library on <a class='card-name' data-card-id='201337'>Talley, The Hound</a> in Player2's ready region."));
     }
 
@@ -629,5 +639,28 @@ public class DoCommandTest {
         assertThat(game.getCounters("111"), is(7));
         assertThat(game.getPool("Player2"), is(29));
         assertThat(getLastMessage(), containsString("Player2 transferred 1 blood onto <a class='card-name' data-card-id='201337'>Talley, The Hound</a>. Currently: 7, Pool: 29"));
+    }
+
+    @Test
+    void rfg() throws CommandException {
+        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY.xmlLabel()).getCards().length, is(1));
+        assertThat(game.getState().getPlayerLocation("Player3", RegionType.REMOVED_FROM_GAME.xmlLabel()).getCards().length, is(0));
+        worker.doCommand("Player5", "rfg Player3 ready 1");
+        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY.xmlLabel()).getCards().length, is(0));
+        assertThat(game.getState().getPlayerLocation("Player3", RegionType.REMOVED_FROM_GAME.xmlLabel()).getCards().length, is(1));
+        assertThat(getLastMessage(), containsString("Player5 removes <a class='card-name' data-card-id='200788'>Klaus van der Veken</a> in Player3's ready region from the game."));
+    }
+
+    @Test
+    void rfgRandom() throws CommandException {
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.ASH_HEAP.xmlLabel()).getCards().length, is(4));
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.REMOVED_FROM_GAME.xmlLabel()).getCards().length, is(0));
+        worker.doCommand("Player5", "rfg Player1 ash random");
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.ASH_HEAP.xmlLabel()).getCards().length, is(3));
+        assertThat(game.getState().getPlayerLocation("Player1", RegionType.REMOVED_FROM_GAME.xmlLabel()).getCards().length, is(1));
+        assertThat(getLastMessage(), containsString("Player5 removes"));
+        assertThat(getLastMessage(), containsString("(picked randomly)"));
+        assertThat(getLastMessage(), containsString("from the game."));
+
     }
 }
