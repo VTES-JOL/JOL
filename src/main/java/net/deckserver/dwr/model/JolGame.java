@@ -728,9 +728,10 @@ public class JolGame {
 
     private void _shuffle(String player, String region, int num, boolean log) {
         Location location = state.getPlayerLocation(player, region);
+        int size = location.getCards().length;
         location.shuffle(num);
         if (log) {
-            String add = (num == 0) ? "their" : "first " + num + " cards of their";
+            String add = (num == 0 || num >= size) ? "their" : "the first " + num + " cards of their";
             addCommand(String.format("%s shuffles %s %s.", player, add, region), new String[]{"shuffle", player, region, num + ""});
         }
     }

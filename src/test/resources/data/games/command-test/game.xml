@@ -1861,27 +1861,6 @@
         <name>Player2's research</name>
     </region>
     <region>
-        <name>ZZZ111 container</name>
-        <game-card>
-            <id>197</id>
-            <cardid>100275</cardid>
-            <owner>Player2</owner>
-            <notation>
-                <name>disciplines</name>
-            </notation>
-            <notation>
-                <name>tapnote</name>
-            </notation>
-            <notation>
-                <name>contested</name>
-            </notation>
-            <notation>
-                <name>minion</name>
-                <value>false</value>
-            </notation>
-        </game-card>
-    </region>
-    <region>
         <name>Player4's ready region</name>
         <game-card>
             <id>318</id>

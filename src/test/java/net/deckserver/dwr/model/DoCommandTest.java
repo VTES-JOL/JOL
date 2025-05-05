@@ -632,6 +632,18 @@ public class DoCommandTest {
     }
 
     @Test
+    void shuffleLibrary() throws CommandException {
+        worker.doCommand("Player3", "shuffle library 200");
+        assertThat(getLastMessage(), containsString("Player3 shuffles their library."));
+    }
+
+    @Test
+    void shufflePartial() throws CommandException {
+        worker.doCommand("Player3", "shuffle library 7");
+        assertThat(getLastMessage(), containsString("Player3 shuffles the first 7 cards of their library."));
+    }
+
+    @Test
     void transferOn() throws CommandException {
         assertThat(game.getCounters("111"), is(6));
         assertThat(game.getPool("Player2"), is(30));
