@@ -464,12 +464,7 @@ function moveUncontrolled() {
 }
 
 function removeFromGame() {
-    let modal = $('#cardModal');
-    let region = $("#cardModal").data('region');
-    let command = `move ${region} ${modal.data('coordinates')} rfg`;
-    sendCommand(command);
-    modal.modal('hide');
-    return false;
+    return doCardCommand('rfg');
 }
 
 function removeCounter(doCommand = true) {

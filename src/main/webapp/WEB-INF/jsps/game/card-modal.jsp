@@ -152,10 +152,10 @@
                         <span>Move to Uncontrolled</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Remove from game"
-                            data-region="ready ashheap"
+                            data-region="ready ashheap inactive"
                             data-owner-only
                             onclick="removeFromGame();">
-                        <span>Remove from Game</span>
+                        <span><i class="bi bi-escape"></i> Remove from Game</span>
                     </button>
                 </div>
             </div>
