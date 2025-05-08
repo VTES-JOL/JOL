@@ -3,6 +3,7 @@ package net.deckserver.dwr.model;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.jaxb.state.Notation;
 import net.deckserver.game.storage.state.RegionType;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
@@ -27,22 +28,27 @@ public class DoCommandTest {
         return Arrays.asList(game.getActions()).getLast().getText();
     }
 
+    @BeforeAll
+    public static void init() {
+        JolAdmin.INSTANCE.setup();
+    }
+
     @BeforeEach
     void setUp() {
         game = ModelLoader.loadGame("command-test");
-        worker = new DoCommand(game);
+        worker = new DoCommand(game, new GameModel("Command Test"));
     }
 
     @Test
     void burnTopLibrary() throws CommandException {
         Card[] ashCards = game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP.xmlLabel()).getCards();
-        assertEquals("111", game.getState().getPlayerLocation("Player2", RegionType.READY.xmlLabel()).getCard(0).getId());
+        assertEquals("143", game.getState().getPlayerLocation("Player2", RegionType.LIBRARY.xmlLabel()).getCard(0).getId());
         assertEquals(0, ashCards.length);
-        worker.doCommand("Player2", "burn ready top");
-        assertEquals("133", game.getState().getPlayerLocation("Player2", RegionType.READY.xmlLabel()).getCard(0).getId());
+        worker.doCommand("Player2", "burn library 1");
+        assertEquals("176", game.getState().getPlayerLocation("Player2", RegionType.LIBRARY.xmlLabel()).getCard(0).getId());
         ashCards = game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP.xmlLabel()).getCards();
         assertEquals(1, ashCards.length);
-        assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='201337'>Talley, The Hound</a> from top of their ready region"));
+        assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='101801'>Slaughtering the Herd</a> #1 from their library."));
     }
 
     @Test
@@ -51,7 +57,7 @@ public class DoCommandTest {
         assertEquals(0, game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP.xmlLabel()).getCards().length);
         worker.doCommand("Player2", "burn ready 1");
         assertEquals(1, game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP.xmlLabel()).getCards().length);
-        assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='201337'>Talley, The Hound</a> from their ready region"));
+        assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='201337'>Talley, The Hound</a> from their ready region."));
     }
 
     @Test
@@ -152,6 +158,9 @@ public class DoCommandTest {
         worker.doCommand("Player5", "label Player2 ready 1");
         assertThat(game.getLabel("111"), is(""));
         assertThat(getLastMessage(), containsString("Removed label from <a class='card-name' data-card-id='201337'>Talley, The Hound</a>"));
+        worker.doCommand("Player5", "Label Player2 ready 1 again");
+        assertThat(game.getLabel("111"), is("again"));
+        assertThat(getLastMessage(), containsString("<a class='card-name' data-card-id='201337'>Talley, The Hound</a> now \"again\""));
     }
 
     @Test
@@ -414,6 +423,15 @@ public class DoCommandTest {
         assertThat(game.getState().getPlayerLocation("Player5", RegionType.READY.xmlLabel()).getCards().length, is(4));
         assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY.xmlLabel()).getCards().length, is(0));
         assertThat(getLastMessage(), containsString("Player5 moves <a class='card-name' data-card-id='200788'>Klaus van der Veken</a> to Player5's ready region."));
+    }
+
+    @Test
+    void moveTopSort() throws CommandException {
+        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY.xmlLabel()).getCards().length, is(1));
+        worker.doCommand("Player3", "move ready 1 top");
+        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY.xmlLabel()).getCards().length, is(1));
+        assertThat(getLastMessage(), containsString("Player3 moves <a class='card-name' data-card-id='200788'>Klaus van der Veken</a> to the top of their ready region."));
+
     }
 
     @Test

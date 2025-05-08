@@ -141,6 +141,7 @@ nav * {
 
 .list-group-item:hover {
     background-color: #eee;
+    cursor: pointer;
 }
 
 #newMessages {
@@ -172,6 +173,7 @@ p.chat a {
 a.card-name {
     text-decoration: none;
     color: black;
+    cursor: pointer;
 }
 
 .players {

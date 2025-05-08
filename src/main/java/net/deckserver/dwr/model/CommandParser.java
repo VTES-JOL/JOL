@@ -20,7 +20,7 @@ class CommandParser {
 
     private final static Logger logger = getLogger(CommandParser.class);
     private final static Pattern VALID_POSITION_PATTERN = Pattern.compile("(?<!-\\+)\\d+(?:\\.\\d+)*");
-    private final static Pattern SPECIAL_POSITION_PATTERN = Pattern.compile("random|top");
+    private final static Pattern SPECIAL_POSITION_PATTERN = Pattern.compile("random");
 
     final String[] args;
     private int ind;
@@ -39,13 +39,7 @@ class CommandParser {
         if (!allowRandom && "random".equals(args[ind])) {
             throw new CommandException("Unable to use random.");
         }
-        String[] indexes = args[ind].split("\\.");
-        for (int i = 0; i < indexes.length; i++) {
-            if ("top".equals(indexes[i])) {
-                indexes[i] = "1";
-            }
-        }
-        return indexes;
+        return args[ind].split("\\.");
     }
 
     String getRegion(String defaultRegion) throws CommandException {

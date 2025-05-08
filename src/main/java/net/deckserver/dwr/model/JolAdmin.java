@@ -83,6 +83,7 @@ public class JolAdmin {
     private static final Predicate<GameInfo> ACTIVE_GAME = (info) -> info.getStatus().equals(GameStatus.ACTIVE);
     private static final Predicate<GameInfo> STARTING_GAME = (info) -> info.getStatus().equals(GameStatus.STARTING);
     private static final Predicate<GameInfo> PUBLIC_GAME = info -> info.getVisibility().equals(Visibility.PUBLIC);
+    private static final Predicate<GameInfo> TEST_GAME = info -> info.getOwner().equals("TEST");
     private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
     private static final DecimalFormat format = new DecimalFormat("0.#");
 
@@ -204,6 +205,7 @@ public class JolAdmin {
             logger.debug("CLEAN - Close finished games");
             games.values().stream()
                     .filter(ACTIVE_GAME)
+                    .filter(TEST_GAME.negate())
                     .map(GameInfo::getName)
                     .map(GameStatusBean::new)
                     .forEach(gameStatus -> {

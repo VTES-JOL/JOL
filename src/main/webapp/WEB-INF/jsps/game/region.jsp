@@ -26,14 +26,17 @@
 
 <c:if test="<%= cards.length > 0 %>">
     <div class="mb-2 text-bg-light" data-region="<%= regionName %>">
-        <div class="p-2 d-flex justify-content-between align-items-center <%= regionStyle %>" type="button" onclick="regionCommands(event, '<%= regionId %>')">
+        <div class="p-2 d-flex justify-content-between align-items-center <%= regionStyle %>">
             <span>
+                <button class="btn btn-sm p-0 <%= collapsed %>" onclick="details(event, '<%= regionId %>');" data-bs-toggle="collapse" data-bs-target="#<%= regionId %>" aria-expanded="<%= isVisible %>" aria-controls="<%= regionId %>">
+                    <i class="fs-6 bi bi-plus-circle <%= startCollapsed ? "" :"d-none" %>"></i>
+                    <i class="fs-6 bi bi-dash-circle <%= startCollapsed ? "d-none" : "" %>"></i>
+                </button>
                 <span class="fw-bold"><%= label %></span>
                 <span>( <%= size %> )</span>
             </span>
-            <button class="btn btn-sm p-0 <%= collapsed %>" onclick="details(event, '<%= regionId %>');" data-bs-toggle="collapse" data-bs-target="#<%= regionId %>" aria-expanded="<%= isVisible %>" aria-controls="<%= regionId %>">
-                <i class="fs-6 bi bi-plus-circle <%= startCollapsed ? "" :"d-none" %>"></i>
-                <i class="fs-6 bi bi-dash-circle <%= startCollapsed ? "d-none" : "" %>"></i>
+            <button class="btn btn-sm p-0" onclick="regionCommands(event, '<%= regionId %>')">
+                <i class="fs-6 bi bi-info-circle"></i>
             </button>
         </div>
         <ol id="<%= regionId %>" class="region list-group list-group-flush list-group-numbered <%= regionStyle %> collapse <%= show %>">

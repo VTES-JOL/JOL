@@ -21,7 +21,6 @@ import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.Deck;
 
 import java.math.RoundingMode;
-import java.text.Collator;
 import java.text.DecimalFormat;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -970,7 +969,7 @@ public class JolGame {
         setNotation(card, TAP, "false");
     }
 
-    void burn(String player, String cardId, String srcPlayer, String srcRegion, boolean top, boolean random) {
+    void burn(String player, String cardId, String srcPlayer, String srcRegion, boolean random) {
         Card card = state.getCard(cardId);
 
         String owner = card.getOwner();
@@ -980,17 +979,16 @@ public class JolGame {
         //Target is private: "<player> burns <card> from [top of] [<player>'s] <region>"
 
         boolean showRegionOwner = !player.equals(srcPlayer);
+        burnQuietly(cardId);
         String message = String.format(
-                "%s burns %s%s from %s%s %s.",
+                "%s burns %s%s from %s %s.",
                 player,
                 getCardName(card),
                 random ? " (picked randomly)" : "",
-                top ? "top of " : "",
                 showRegionOwner ? srcPlayer + "'s" : "their",
                 srcRegion);
 
         addCommand(message, new String[]{"burn", cardId, owner, ASH_HEAP});
-        burnQuietly(cardId);
     }
 
     void rfg(String player, String cardId, String srcPlayer, String srcRegion, boolean random) {

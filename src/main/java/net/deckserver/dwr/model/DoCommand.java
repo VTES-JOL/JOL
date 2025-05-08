@@ -19,9 +19,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class DoCommand {
 
     private final JolGame game;
+    private final GameModel model;
 
-    public DoCommand(JolGame game) {
+    public DoCommand(JolGame game, GameModel model) {
         this.game = game;
+        this.model = model;
     }
 
     public String doMessage(String player, String message, boolean isJudge) {
@@ -35,7 +37,7 @@ public class DoCommand {
         String[] cmdStr = command.trim().split("[\\s\n\r\f\t]");
         String cmd = cmdStr[0];
         CommandParser cmdObj = new CommandParser(cmdStr, 1, game);
-        switch (cmd) {
+        switch (cmd.toLowerCase()) {
             case "timeout":
                 timeOut(player);
                 break;
@@ -171,6 +173,7 @@ public class DoCommand {
         for (String recipient : recipients) {
             String old = game.getPrivateNotes(recipient);
             game.setPrivateNotes(recipient, old.isEmpty() ? text : old + "\n" + text);
+            model.getView(recipient).privateNotesChanged();
         }
         String msg;
         if (player.equals(recipients.getFirst())) {
@@ -276,7 +279,7 @@ public class DoCommand {
         String cardId = cmdObj.findCard(true, srcPlayer, srcRegion);
         boolean random = Arrays.asList(cmdObj.args).contains("random");
         boolean top = Arrays.asList(cmdObj.args).contains("top");
-        game.burn(player, cardId, srcPlayer, srcRegion, top, random);
+        game.burn(player, cardId, srcPlayer, srcRegion, random);
     }
 
     void rfg(CommandParser cmdObj, String player) throws CommandException {

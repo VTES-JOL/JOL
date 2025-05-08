@@ -1,7 +1,12 @@
-<div class="modal" id="regionModal" tabindex="-1" role="dialog" aria-labelledby="regionModalLabel" aria-hidden="true">
+<div class="modal modal-lg" id="regionModal" tabindex="-1" role="dialog" aria-labelledby="regionModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content loading" style="height:30vh;text-align:center">
-      <h2 style="position:relative;top:43%">Loading...</h2>
+      <div class="modal-header">
+        <h4>Region Notes</h4>
+      </div>
+      <div class="modal-body">
+        Feature development in progress... come back later.
+      </div>
     </div>
     <div class="modal-content loaded" style="text-align:center">
       <div class="modal-header">
