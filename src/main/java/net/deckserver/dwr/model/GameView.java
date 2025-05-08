@@ -212,9 +212,8 @@ public class GameView {
     }
 
     public void reset() {
-        logger.info("Reset - state changed");
         reset(true);
-        //Force client to refresh all game data
+        //Force the client to refresh all game data
         resetChat = true;
         globalNotesChanged = phaseChanged = stateChanged = turnChanged = privateNotesChanged = true;
     }

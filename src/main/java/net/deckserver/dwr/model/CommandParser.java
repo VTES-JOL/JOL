@@ -20,8 +20,9 @@ class CommandParser {
 
     private final static Logger logger = getLogger(CommandParser.class);
     private final static Pattern VALID_POSITION_PATTERN = Pattern.compile("(?<!-\\+)\\d+(?:\\.\\d+)*");
+    private final static Pattern SPECIAL_POSITION_PATTERN = Pattern.compile("random");
 
-    private final String[] args;
+    final String[] args;
     private int ind;
     private final JolGame game;
 
@@ -31,17 +32,14 @@ class CommandParser {
         this.game = game;
     }
 
-    private String[] translateNextPosition() {
-        if (!args[ind].contains("random") && !VALID_POSITION_PATTERN.matcher(args[ind]).matches()) {
+    private String[] translateNextPosition(boolean allowRandom) throws CommandException {
+        if (!SPECIAL_POSITION_PATTERN.matcher(args[ind]).matches() && !VALID_POSITION_PATTERN.matcher(args[ind]).matches()) {
             return new String[0];
         }
-        String[] indexes = args[ind].split("\\.");
-        for (int i = 0; i < indexes.length - 1; i++) {
-            if ("top".equals(indexes[i])) {
-                indexes[i] = "1";
-            }
+        if (!allowRandom && "random".equals(args[ind])) {
+            throw new CommandException("Unable to use random.");
         }
-        return indexes;
+        return args[ind].split("\\.");
     }
 
     String getRegion(String defaultRegion) throws CommandException {
@@ -139,14 +137,14 @@ class CommandParser {
 
     }
 
-    String findCard(boolean greedy, String player, String region) throws CommandException {
+    String findCard(boolean greedy, boolean allowRandom, String player, String region) throws CommandException {
         Location location = game.getState().getPlayerLocation(player, region);
         Card[] cards = location.getCards();
         Card targetCard = null;
         boolean keepLooking = true;
         while (keepLooking && hasMoreArgs()) {
             // Get the position from the next arg
-            String[] indexes = translateNextPosition();
+            String[] indexes = translateNextPosition(allowRandom);
             if (indexes.length == 0) {
                 break;
             }
@@ -173,8 +171,8 @@ class CommandParser {
         return Optional.ofNullable(targetCard).map(Card::getId).orElse(null);
     }
 
-    String findCard(String player, String region) throws CommandException {
-        return findCard(true, player, region);
+    String findCard(boolean allowRandom, String player, String region) throws CommandException {
+        return findCard(true, allowRandom, player, region);
     }
 
     int getAmount(int amount) throws CommandException {
@@ -188,7 +186,7 @@ class CommandParser {
                 amount = -amount;
             }
             return amount;
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
             return amount;
         }
     }
@@ -197,6 +195,7 @@ class CommandParser {
         try {
             return Integer.parseInt(args[ind++]);
         } catch (Exception nfe) {
+            ind--;
             return def;
         }
     }

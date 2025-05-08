@@ -23,19 +23,6 @@ public class GameModel implements Comparable<GameModel> {
 
     public GameModel(String name) {
         this.name = name;
-        if (isActive()) JolAdmin.INSTANCE.getGame(name);  // make sure its loaded
-    }
-
-    public boolean isOpen() {
-        return JolAdmin.INSTANCE.isStarting(name);
-    }
-
-    public boolean isActive() {
-        return JolAdmin.INSTANCE.isActive(name);
-    }
-
-    public String getOwner() {
-        return JolAdmin.INSTANCE.getOwner(name);
     }
 
     public synchronized String chat(String player, String chat) {
@@ -45,7 +32,7 @@ public class GameModel implements Comparable<GameModel> {
         if (!getPlayers().contains(player) && !isJudge) {
             return "Not authorized";
         }
-        DoCommand commander = new DoCommand(game);
+        DoCommand commander = new DoCommand(game, this);
         int idx = game.getActions(game.getCurrentTurn()).length;
         String status = commander.doMessage(player, chat, isJudge);
         addChats(idx);
@@ -82,7 +69,7 @@ public class GameModel implements Comparable<GameModel> {
                 phaseChanged = true;
             }
             if (command != null || chat != null) {
-                DoCommand commander = new DoCommand(game);
+                DoCommand commander = new DoCommand(game, this);
                 boolean didCommand = false;
                 boolean didChat = false;
                 if (command != null) {
@@ -91,8 +78,7 @@ public class GameModel implements Comparable<GameModel> {
                     ThreadContext.put("DYNAMIC_LOG", name);
                     for (String cmd : commands) {
                         try {
-                            String[] cmdTokens = cmd.trim().split("[\\s\n\r\f\t]");
-                            commander.doCommand(player, cmdTokens);
+                            commander.doCommand(player, cmd);
                             COMMANDS.info("[{}] {}", player, cmd);
                         } catch (CommandException e) {
                             COMMANDS.error("[{}] {}", player, cmd);

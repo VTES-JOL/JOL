@@ -5,7 +5,6 @@ import net.deckserver.game.ui.turn.DsTurnRecorder;
 import net.deckserver.storage.json.deck.Deck;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.ExpectedToFail;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,14 +30,14 @@ public class CommandParserTest {
     @Test
     public void testMoveWithPeriods() throws Exception {
         assertNotNull(game);
-        CommandParser commandParser = new CommandParser(new String[]{"move", "ready", "1.1", "ashheap"}, 1, game);
-        String player = "Player2";
+        CommandParser commandParser = new CommandParser(new String[]{"move", "ready", "2.1", "ashheap"}, 1, game);
+        String player = "Player1";
         String sourcePlayer = commandParser.getPlayer(player);
         assertEquals(player, sourcePlayer);
         String sourceRegion = commandParser.getRegion(JolGame.READY_REGION);
         assertEquals(JolGame.READY_REGION, sourceRegion);
-        String cardId = commandParser.findCard(sourcePlayer, sourceRegion);
-        assertEquals("197", cardId);
+        String cardId = commandParser.findCard(false, sourcePlayer, sourceRegion);
+        assertEquals("14", cardId);
         String destinationPlayer = commandParser.getPlayer(player);
         assertEquals(player, destinationPlayer);
         String destinationRegion = commandParser.getRegion(JolGame.READY_REGION);
@@ -48,14 +47,14 @@ public class CommandParserTest {
     @Test
     public void testTargetParse() throws Exception {
         assertNotNull(game);
-        CommandParser commandParser = new CommandParser(new String[]{"move", "ready", "1.1", "ashheap"}, 1, game);
-        String player = "Player2";
+        CommandParser commandParser = new CommandParser(new String[]{"move", "ready", "2.1", "ashheap"}, 1, game);
+        String player = "Player1";
         String sourcePlayer = commandParser.getPlayer(player);
         assertEquals(player, sourcePlayer);
         String sourceRegion = commandParser.getRegion(JolGame.READY_REGION);
         assertEquals(JolGame.READY_REGION, sourceRegion);
-        String cardId = commandParser.findCard(false, sourcePlayer, sourceRegion);
-        assertEquals("197", cardId);
+        String cardId = commandParser.findCard(false, false, sourcePlayer, sourceRegion);
+        assertEquals("14", cardId);
         String destinationPlayer = commandParser.getPlayer(player);
         assertEquals(player, destinationPlayer);
         String destinationRegion = commandParser.getRegion(JolGame.READY_REGION);
@@ -71,7 +70,7 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         String sourceRegion = commandParser.getRegion(JolGame.READY_REGION);
         assertEquals(JolGame.READY_REGION, sourceRegion);
-        String cardId = commandParser.findCard(false, sourcePlayer, sourceRegion);
+        String cardId = commandParser.findCard(false, false, sourcePlayer, sourceRegion);
         assertEquals("111", cardId);
     }
 
@@ -84,8 +83,8 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         String sourceRegion = commandParser.getRegion(JolGame.READY_REGION);
         assertEquals(JolGame.READY_REGION, sourceRegion);
-        String cardId = commandParser.findCard(false, sourcePlayer, sourceRegion);
-        assertEquals("197", cardId);
+        String cardId = commandParser.findCard(false, false, sourcePlayer, sourceRegion);
+        assertEquals("111", cardId);
     }
 
     @Test
@@ -97,8 +96,8 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         String sourceRegion = commandParser.getRegion(JolGame.READY_REGION);
         assertEquals(JolGame.READY_REGION, sourceRegion);
-        String cardId = commandParser.findCard(false, sourcePlayer, sourceRegion);
-        assertEquals("197", cardId);
+        String cardId = commandParser.findCard(false, false, sourcePlayer, sourceRegion);
+        assertEquals("111", cardId);
     }
 
     @Test
@@ -110,8 +109,8 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         String sourceRegion = commandParser.getRegion(JolGame.READY_REGION);
         assertEquals(JolGame.READY_REGION, sourceRegion);
-        String cardId = commandParser.findCard(false, sourcePlayer, sourceRegion);
-        assertEquals("197", cardId);
+        String cardId = commandParser.findCard(false, false, sourcePlayer, sourceRegion);
+        assertEquals("111", cardId);
     }
 
     @Test
@@ -123,8 +122,8 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         String sourceRegion = commandParser.getRegion(JolGame.READY_REGION);
         assertEquals(JolGame.READY_REGION, sourceRegion);
-        String cardId = commandParser.findCard(false, sourcePlayer, sourceRegion);
-        assertEquals("197", cardId);
+        String cardId = commandParser.findCard(false, false, sourcePlayer, sourceRegion);
+        assertEquals("111", cardId);
     }
 
     @Test
@@ -136,14 +135,14 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         String sourceRegion = commandParser.getRegion(JolGame.READY_REGION);
         assertEquals(JolGame.HAND, sourceRegion);
-        String sourceCard = commandParser.findCard(sourcePlayer, sourceRegion);
+        String sourceCard = commandParser.findCard(false, sourcePlayer, sourceRegion);
         assertEquals("141", sourceCard);
         String destinationPlayer = commandParser.getPlayer(player);
         assertEquals(player, destinationPlayer);
         String destinationRegion = commandParser.getRegion(JolGame.READY_REGION);
         assertEquals(JolGame.READY_REGION, destinationRegion);
-        String destinationCard = commandParser.findCard(destinationPlayer, destinationRegion);
-        assertEquals("197", destinationCard);
+        String destinationCard = commandParser.findCard(false, destinationPlayer, destinationRegion);
+        assertEquals("111", destinationCard);
     }
 
     @Test
@@ -155,14 +154,14 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         String sourceRegion = commandParser.getRegion(JolGame.READY_REGION);
         assertEquals(JolGame.HAND, sourceRegion);
-        String sourceCard = commandParser.findCard(sourcePlayer, sourceRegion);
+        String sourceCard = commandParser.findCard(false, sourcePlayer, sourceRegion);
         assertEquals("141", sourceCard);
         String destinationPlayer = commandParser.getPlayer(player);
         assertEquals(player, destinationPlayer);
         String destinationRegion = commandParser.getRegion(JolGame.READY_REGION);
         assertEquals(JolGame.READY_REGION, destinationRegion);
-        String destinationCard = commandParser.findCard(destinationPlayer, destinationRegion);
-        assertEquals("197", destinationCard);
+        String destinationCard = commandParser.findCard(false, destinationPlayer, destinationRegion);
+        assertEquals("111", destinationCard);
     }
 
     @Test

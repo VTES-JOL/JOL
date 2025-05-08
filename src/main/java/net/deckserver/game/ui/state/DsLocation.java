@@ -40,6 +40,7 @@ public class DsLocation extends DsCardContainer implements Location {
     public void shuffle(int num) {
         List<Card> sCards = Arrays.asList(getCards());
         if (num == 0) num = sCards.size();
+        if (num > sCards.size()) num = sCards.size();
         List<Card> subList = sCards.subList(0, num);
         for (int x = 0; x < 20; x++) {
             Collections.shuffle(subList, new SecureRandom());

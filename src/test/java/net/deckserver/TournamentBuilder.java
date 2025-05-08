@@ -5,6 +5,7 @@ import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.storage.json.system.TournamentData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.slf4j.Logger;
@@ -17,7 +18,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Disabled
+@Tag("Builder")
+@Tag("Tournament")
 public class TournamentBuilder {
     private static final Logger logger = LoggerFactory.getLogger(TournamentBuilder.class);
     private ObjectMapper objectMapper = new ObjectMapper();

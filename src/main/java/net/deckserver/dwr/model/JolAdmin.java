@@ -83,6 +83,7 @@ public class JolAdmin {
     private static final Predicate<GameInfo> ACTIVE_GAME = (info) -> info.getStatus().equals(GameStatus.ACTIVE);
     private static final Predicate<GameInfo> STARTING_GAME = (info) -> info.getStatus().equals(GameStatus.STARTING);
     private static final Predicate<GameInfo> PUBLIC_GAME = info -> info.getVisibility().equals(Visibility.PUBLIC);
+    private static final Predicate<GameInfo> TEST_GAME = info -> info.getOwner().equals("TEST");
     private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
     private static final DecimalFormat format = new DecimalFormat("0.#");
 
@@ -204,6 +205,7 @@ public class JolAdmin {
             logger.debug("CLEAN - Close finished games");
             games.values().stream()
                     .filter(ACTIVE_GAME)
+                    .filter(TEST_GAME.negate())
                     .map(GameInfo::getName)
                     .map(GameStatusBean::new)
                     .forEach(gameStatus -> {
@@ -399,6 +401,18 @@ public class JolAdmin {
         scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 1, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new ValidateGWJob(), 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 10, TimeUnit.MINUTES);
+    }
+
+    public void validate() {
+        logger.info("Validating game state");
+        games.values().stream().filter(ACTIVE_GAME)
+                .forEach(gameInfo -> {
+                    try {
+                        loadGameState(gameInfo.getName());
+                    } catch (Exception e) {
+                        logger.error("Unable to validate game {}", gameInfo.getName());
+                    }
+                });
     }
 
     public String getVersion() {

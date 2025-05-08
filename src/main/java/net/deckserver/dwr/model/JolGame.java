@@ -62,6 +62,7 @@ public class JolGame {
     private static final String VP = " vp";
     private static final DecimalFormat format = new DecimalFormat("0.#");
     private static final DateTimeFormatter SIMPLE_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm ");
+    private static final Comparator<String> DISC_COMPARATOR = Comparator.comparing(s -> Character.isLowerCase(s.charAt(0)) ? 0 : 1);
     @Getter
     private final String id;
     private final DsGame state;
@@ -99,9 +100,9 @@ public class JolGame {
     }
 
     public void withdraw(String player) {
-        addMessage(player + " withdraws and gains 0.5 VP");
         setNotation(state, player + POOL, "0");
         updateVP(player, 0.5);
+        addMessage(player + " withdraws.");
     }
 
     public void updateVP(String targetPlayer, double amount) {
@@ -129,11 +130,12 @@ public class JolGame {
     public void requestTimeout(String player) {
         String requester = getNotation(state, TIMEOUT, player);
         if (!requester.equals(player)) {
-            timeout();
             addMessage(player + " has confirmed the game time has been reached.");
+            timeout();
+        } else {
+            addMessage(player + " has requested that the game be timed out.");
+            setNotation(state, TIMEOUT, player);
         }
-        setNotation(state, TIMEOUT, player);
-        addMessage(player + " has requested that the game be timed out.");
     }
 
     public String getName() {
@@ -146,10 +148,8 @@ public class JolGame {
 
     public void discard(String player, String cardId, boolean random) {
         Card card = state.getCard(cardId);
-        if (card == null) throw new IllegalArgumentException("No such card");
         CardContainer source = card.getParent();
         Location dest = state.getPlayerLocation(player, ASH_HEAP);
-        if (dest == null) throw new IllegalStateException("No such region");
         String message = String.format(
                 "%s discards %s%s",
                 player,
@@ -162,11 +162,9 @@ public class JolGame {
 
     public void playCard(String player, String cardId, String destinationPlayer, String destinationRegion, String targetCard, String[] modes) {
         Card card = state.getCard(cardId);
-        if (card == null) throw new IllegalArgumentException("No such card");
         CardContainer parent = card.getParent();
         Location source = (Location) state.getRegionFromCard(card);
         CardContainer destination = state.getPlayerLocation(destinationPlayer, destinationRegion);
-        if (destination == null) throw new IllegalStateException("No such region");
 
         // Message structure is as follows:
         // [Player] plays [card] [sourceRegion] [mode] [target]
@@ -181,20 +179,20 @@ public class JolGame {
             modeMessage.insert(0, " at ");
         }
 
-        // Build destination string
+        // Build a destination string
         // to [targetCard] in [destinationPlayer | their] [destinationRegion]
         String destinationMessage;
         if (targetCard == null) {
             String playerTitle = destinationPlayer.equals(player) ? "their" : destinationPlayer + "'s";
             RegionType destinationRegionType = RegionType.of(destinationRegion);
-            destinationMessage = RegionType.ASH_HEAP.equals(destinationRegionType) ? "" : String.format("to %s %s", playerTitle, destinationRegion);
+            destinationMessage = RegionType.ASH_HEAP.equals(destinationRegionType) ? "" : String.format(" to %s %s", playerTitle, destinationRegion);
         } else {
             Card target = state.getCard(targetCard);
             destination = target;
-            destinationMessage = String.format("on %s", getTargetCardName(target, player));
+            destinationMessage = String.format(" on %s", getTargetCardName(target, player));
         }
 
-        String message = String.format("%s plays %s%s %s%s", player, cardName, sourceMessage, modeMessage, destinationMessage);
+        String message = String.format("%s plays %s%s%s%s.", player, cardName, sourceMessage, modeMessage, destinationMessage);
 
         addCommand(message, new String[]{"play", cardId, destinationPlayer, destinationRegion});
         parent.removeCard(card);
@@ -203,35 +201,32 @@ public class JolGame {
 
     public void influenceCard(String player, String cardId, String destPlayer, String destRegion) {
         Card card = state.getCard(cardId);
-        if (card == null) throw new IllegalArgumentException("No such card");
         CardContainer source = card.getParent();
         Location dest = state.getPlayerLocation(destPlayer, destRegion);
-        if (dest == null) throw new IllegalStateException("No such region");
 
         Location loc = (Location) state.getRegionFromCard(card);
 
-        if (loc.getName().contains(INACTIVE_REGION)) {
-            String message = player + " influences out " + getCardLink(card);
-            CardDetail detail = getCard(cardId);
-            CardSummary cardSummary = CardSearch.INSTANCE.get(detail.getCardId());
-            Integer capacity = cardSummary.getCapacity();
-            if (capacity != null && getCapacity(cardId) <= 0) {
-                changeCapacity(cardId, capacity, true);
-                message += ", capacity: " + capacity;
-            }
-            // Do disciplines
-            List<String> disciplines = cardSummary.getDisciplines();
-            setDisciplines(player, cardId, disciplines, true);
-            // Do votes
-            String votes = cardSummary.getVotes();
-            if (!Strings.isNullOrEmpty(votes)) {
-                setVotes(cardId, votes, true);
-                message += ", votes: " + votes;
-            }
-            source.removeCard(card);
-            dest.addCard(card, true);
-            addCommand(message, new String[]{"influence", cardId, destPlayer, destRegion});
+        CardDetail detail = getCard(cardId);
+        CardSummary cardSummary = CardSearch.INSTANCE.get(detail.getCardId());
+        Integer capacity = cardSummary.getCapacity();
+        String capacityText = "";
+        if (capacity != null && getCapacity(cardId) <= 0) {
+            changeCapacity(cardId, capacity, true);
+            capacityText = ", capacity: " + capacity;
         }
+        // Do disciplines
+        List<String> disciplines = cardSummary.getDisciplines();
+        setDisciplines(player, cardId, disciplines, true);
+        // Do votes
+        String votes = cardSummary.getVotes();
+        String votesText = "";
+        if (!Strings.isNullOrEmpty(votes)) {
+            setVotes(cardId, votes, true);
+            votesText = ", votes: " + votes;
+        }
+        source.removeCard(card);
+        dest.addCard(card, true);
+        addCommand(String.format("%s influences out %s%s%s.", player, getCardLink(card), capacityText, votesText), new String[]{"influence", cardId, destPlayer, destRegion});
     }
 
     public void shuffle(String player, String region, int num) {
@@ -270,7 +265,7 @@ public class JolGame {
 
     public void initGame(String name) {
         state.setName(name);
-        setEdge(null);
+        setNotation(state, EDGE, "no one");
     }
 
     public void sendMsg(String player, String msg, boolean isJudge) {
@@ -319,7 +314,7 @@ public class JolGame {
         setNotation(card, COUNTERS, String.valueOf(current));
         if (!quiet) {
             String logText = String.format(
-                    "%s %s %s blood %s %s, now %s",
+                    "%s %s %s blood %s %s, now %s. ",
                     player,
                     incr < 0 ? "removes" : "adds",
                     Math.abs(incr),
@@ -388,20 +383,13 @@ public class JolGame {
     }
 
     public void setEdge(String player) {
-        String old = getEdge();
-        String edge = player;
-        if (player == null) {
-            edge = "no one";
-        } else {
-            String from = old == null ? "" : " from " + old;
-            addCommand(player + " grabs edge" + from + ".", new String[]{"edge", player});
-        }
-        setNotation(state, EDGE, edge);
+        addCommand(String.format("%s gains the edge from %s.", player, getEdge()), new String[]{"edge", player});
+        setNotation(state, EDGE, player);
     }
 
-    public void burnEdge() {
+    public void burnEdge(String player) {
         setNotation(state, EDGE, "no one");
-        addCommand("Edge burned", new String[]{"edge", "burn"});
+        addCommand(String.format("%s burns the edge.", player), new String[]{"edge", "burn"});
     }
 
     public int getPool(String player) {
@@ -437,11 +425,11 @@ public class JolGame {
         return getNotation(card, TEXT, "");
     }
 
-    public void setText(String cardId, String text, boolean quiet) {
+    public void setLabel(String cardId, String text, boolean quiet) {
         Card card = state.getCard(cardId);
         String cardName = getCardName(card);
         String cleanText = text.trim();
-        setNotation(card, text, cleanText);
+        setNotation(card, TEXT, cleanText);
         if (!quiet) {
             if (!cleanText.isEmpty()) {
                 addMessage(String.format("%s now \"%s\"", cardName, cleanText));
@@ -472,16 +460,16 @@ public class JolGame {
         } catch (Exception nfe) {
             // do nothing
         }
-        String message = "";
+        String message;
         if (votes.trim().equalsIgnoreCase("priscus") || votes.trim().equals("P")) {
             setNotation(card, VOTES, "P");
-            message = getCardName(card) + " is priscus";
+            message = getCardName(card) + " is priscus.";
         } else if (voteAmount == 0) {
             setNotation(card, VOTES, "0");
-            message = getCardName(card) + " now has no votes";
-        } else if (voteAmount > 0) {
+            message = getCardName(card) + " now has no votes.";
+        } else {
             setNotation(card, VOTES, String.valueOf(voteAmount));
-            message = getCardName(card) + " now has " + voteAmount + " votes";
+            message = getCardName(card) + " now has " + voteAmount + " votes.";
         }
         if (!quiet) {
             addMessage(message);
@@ -492,10 +480,10 @@ public class JolGame {
         Card card = state.getCard(cardId);
         if (clear) {
             setNotation(card, CONTEST, "");
-            addMessage(getCardName(card) + " is no longer contested");
+            addMessage(getCardName(card) + " is no longer contested.");
         } else {
             setNotation(card, CONTEST, CONTEST);
-            addMessage(getCardName(card) + " is now contested");
+            addMessage(getCardName(card) + " is now contested.");
         }
     }
 
@@ -509,17 +497,17 @@ public class JolGame {
         return getNotation(card, TAP, UNTAPPED).equals(TAPPED);
     }
 
-    public void setTapped(String player, String cardId, boolean tapped) {
+    public void setLocked(String player, String cardId, boolean locked) {
         Card card = state.getCard(cardId);
-        String message = String.format("%s %s %s", player, tapped ? "locks" : "unlocks", getCardName(card));
+        String message = String.format("%s %s %s.", player, locked ? "locks" : "unlocks", getCardName(card));
         addCommand(message, new String[]{"tap", cardId});
-        setNotation(card, TAP, tapped ? TAPPED : UNTAPPED);
+        setNotation(card, TAP, locked ? TAPPED : UNTAPPED);
     }
 
-    public void untapAll(String player) {
+    public void unlockAll(String player) {
         Location[] locs = state.getPlayerLocations(player);
         addCommand(player + " unlocks.", new String[]{"untap", player});
-        for (Location loc : locs) untapAll(loc);
+        for (Location loc : locs) unlockAll(loc);
     }
 
     public String getCurrentTurn() {
@@ -602,7 +590,7 @@ public class JolGame {
         Card card = state.getCard(cardId);
         setNotation(card, DISCIPLINES, String.join(" ", disciplines));
         if (!quiet && !disciplines.isEmpty()) {
-            String disciplineList = disciplines.stream().collect(Collectors.joining(" ", "[", "]"));
+            String disciplineList = disciplines.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" "));
             String msg = ChatParser.parseText(player + " reset " + getCardName(card) + " back to " + disciplineList);
             addCommand(msg, new String[]{"disc", cardId, disciplines.toString()});
         }
@@ -636,19 +624,17 @@ public class JolGame {
                 discRemoved.add(disc);
             }
         });
+        newDisciplines.sort(DISC_COMPARATOR.thenComparing(Comparator.naturalOrder()));
+        discAdded.sort(DISC_COMPARATOR.thenComparing(Comparator.naturalOrder()));
+        discRemoved.sort(DISC_COMPARATOR.thenComparing(Comparator.naturalOrder()));
         if (!discAdded.isEmpty() || !discRemoved.isEmpty()) {
-            String additionString = discAdded.isEmpty() ? "" : "added " + ChatParser.parseText(discAdded.stream().collect(Collectors.joining(" ", "[", "]")));
-            String removalsString = discRemoved.isEmpty() ? "" : "removed " + ChatParser.parseText(discRemoved.stream().collect(Collectors.joining(" ", "[", "]")));
-            addMessage(String.format("%s %s %s to %s", player, additionString, removalsString, getCardName(card)));
+            String additionString = discAdded.isEmpty() ? "" : "added " + ChatParser.parseText(discAdded.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" ")));
+            String removalsString = discRemoved.isEmpty() ? "" : "removed " + ChatParser.parseText(discRemoved.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" ")));
+            addMessage(String.format("%s %s%s to %s.", player, additionString, removalsString, getCardName(card)));
             setNotation(card, DISCIPLINES, String.join(" ", newDisciplines));
         } else {
             throw new CommandException("No valid disciplines chosen.");
         }
-    }
-
-    public void setMerged(String cardId, boolean merged) {
-        Card card = state.getCard(cardId);
-        setNotation(card, MERGED, String.valueOf(merged));
     }
 
     public int getCapacity(String cardId) {
@@ -681,7 +667,7 @@ public class JolGame {
 
     public void setChoice(String player, String choice) {
         setNotation(state, player + CHOICE, choice);
-        addMessage(player + " has made their choice");
+        addMessage(player + " has made their choice.");
     }
 
     public void getChoices() {
@@ -731,22 +717,21 @@ public class JolGame {
     private void _drawCard(String player, String srcRegion, String destRegion, boolean log) {
         Location source = state.getPlayerLocation(player, srcRegion);
         Location dest = state.getPlayerLocation(player, destRegion);
-        if (source == null || dest == null) throw new IllegalArgumentException("Not a valid region");
         Card card = source.getFirstCard();
-        if (card == null) throw new IllegalArgumentException("No card available");
         source.removeCard(card);
         dest.addCard(card, false);
         if (log) {
-            addCommand(player + " draws from " + srcRegion, new String[]{"draw", srcRegion, destRegion});
+            addCommand(String.format("%s draws from their %s.", player, srcRegion), new String[]{"draw", srcRegion, destRegion});
         }
     }
 
     private void _shuffle(String player, String region, int num, boolean log) {
         Location location = state.getPlayerLocation(player, region);
+        int size = location.getCards().length;
         location.shuffle(num);
         if (log) {
-            String add = (num == 0) ? "" : num + " of ";
-            addCommand("Shuffle " + add + player + "'s " + region, new String[]{"shuffle", player, region, num + ""});
+            String add = (num == 0 || num >= size) ? "their" : "the first " + num + " cards of their";
+            addCommand(String.format("%s shuffles %s %s.", player, add, region), new String[]{"shuffle", player, region, num + ""});
         }
     }
 
@@ -832,13 +817,13 @@ public class JolGame {
 
         boolean sameOwner = Stream.of(sourceOwner, destinationOwner).allMatch(c -> c.equals(cardOwner));
 
-        // If the card is moving between hidden regions, and the card and regions are owned by the same player just print the index #
+        // If the card is moving between hidden regions, and the card and regions are owned by the same player, print the index #
         if (RegionType.OTHER_HIDDEN_REGIONS.containsAll(List.of(sourceRegion, destinationRegion)) && sameOwner) {
             String coordinates = getIndexCoordinates(card);
             return String.format("card #%s in their %s", coordinates, sourceLocation.getName());
         }
 
-        // if the card is not unique, then add some flavour to the name to help identify it better
+        // if the card is not unique, then add some flavor to the name to help identify it better
         String differentiators = "";
         CardSummary cardEntry = CardSearch.INSTANCE.get(card.getCardId());
         if (!cardEntry.isUnique()) {
@@ -881,11 +866,11 @@ public class JolGame {
         return "<a class='card-name' data-card-id='" + card.getCardId() + "'>" + card.getName() + "</a>";
     }
 
-    private void untapAll(CardContainer loc) {
+    private void unlockAll(CardContainer loc) {
         Card[] cards = loc.getCards();
         for (Card card : cards) {
             setNotation(card, TAP, "false");
-            untapAll(card);
+            unlockAll(card);
         }
     }
 
@@ -916,7 +901,7 @@ public class JolGame {
         Card srcCard = state.getCard(cardId);
         Card dstCard = state.getCard(destCard);
         CardContainer parentContainer = dstCard.getParent();
-        while (parentContainer != null) {
+        while (true) {
             if (parentContainer instanceof Card parentCard) {
                 if (parentCard.getId().equals(srcCard.getId()))
                     throw new CommandException("Can't create card loop");
@@ -925,33 +910,30 @@ public class JolGame {
                 break;
             }
         }
-        if (srcCard == null) throw new CommandException("No such card");
         CardContainer source = srcCard.getParent();
         Location destinationRegion = (Location) state.getRegionFromCard(dstCard);
 
-        String message = String.format("%s puts %s on %s", player, getCardName(srcCard, destinationRegion), getTargetCardName(dstCard, player));
+        String message = String.format("%s puts %s on %s.", player, getCardName(srcCard, destinationRegion), getTargetCardName(dstCard, player));
         addCommand(message, new String[]{"move", cardId, destCard});
 
         source.removeCard(srcCard);
         dstCard.addCard(srcCard, false);
     }
 
-    void moveToRegion(String player, String cardId, String destPlayer, String destRegion, boolean bottom) {
+    void moveToRegion(String player, String cardId, String destPlayer, String destRegion, boolean top) {
         Card card = state.getCard(cardId);
-        if (card == null) throw new IllegalArgumentException("No such card");
         CardContainer source = card.getParent();
         Location sourceRegion = (Location) state.getRegionFromCard(card);
         Location destinationRegion = state.getPlayerLocation(destPlayer, destRegion);
-        if (destinationRegion == null) throw new IllegalStateException("No such region");
 
         boolean sameOwner = Stream.of(sourceRegion.getOwner(), destinationRegion.getOwner()).allMatch(c -> c.equals(player));
-        String topMessage = bottom ? "" : "the top of ";
+        String topMessage = top ? "the top of " : "";
         String playerName = sameOwner ? "their" : destinationRegion.getOwner() + "'s";
 
-        String message = String.format("%s moves %s to %s%s %s", player, getCardName(card, destinationRegion), topMessage, playerName, destRegion);
-        addCommand(message, new String[]{"move", cardId, destPlayer, destRegion, bottom ? "bottom" : "top"});
+        String message = String.format("%s moves %s to %s%s %s.", player, getCardName(card, destinationRegion), topMessage, playerName, destRegion);
+        addCommand(message, new String[]{"move", cardId, destPlayer, destRegion, top ? "top" : "bottom"});
         source.removeCard(card);
-        destinationRegion.addCard(card, !bottom);
+        destinationRegion.addCard(card, top);
     }
 
     void burnQuietly(String cardId) {
@@ -971,7 +953,7 @@ public class JolGame {
         dest.addCard(card, false);
 
         //Clear label
-        setText(cardId, "", true);
+        setLabel(cardId, "", true);
 
         //Clear capacity
         int capacity = getCapacity(cardId);
@@ -987,28 +969,45 @@ public class JolGame {
         setNotation(card, TAP, "false");
     }
 
-    void burn(String player, String cardId, String srcPlayer, String srcRegion, boolean top) {
+    void burn(String player, String cardId, String srcPlayer, String srcRegion, boolean random) {
         Card card = state.getCard(cardId);
-        if (card == null) throw new IllegalArgumentException("No such card");
 
         String owner = card.getOwner();
-        if (owner == null || owner.isEmpty())
-            throw new IllegalArgumentException("Game too old for burn command");
 
         //Message formats:
         //Target is public: "<player> burns <card> [#<region-index>] from [<player>'s] <region>"
         //Target is private: "<player> burns <card> from [top of] [<player>'s] <region>"
 
         boolean showRegionOwner = !player.equals(srcPlayer);
+        burnQuietly(cardId);
         String message = String.format(
-                "%s burns %s from %s%s %s",
+                "%s burns %s%s from %s %s.",
                 player,
                 getCardName(card),
-                top ? "top of " : "",
+                random ? " (picked randomly)" : "",
                 showRegionOwner ? srcPlayer + "'s" : "their",
                 srcRegion);
 
         addCommand(message, new String[]{"burn", cardId, owner, ASH_HEAP});
-        burnQuietly(cardId);
+    }
+
+    void rfg(String player, String cardId, String srcPlayer, String srcRegion, boolean random) {
+        Card card = state.getCard(cardId);
+        CardContainer source = card.getParent();
+        String owner = card.getOwner();
+        Location destinationRegion = state.getPlayerLocation(owner, RFG);
+
+        boolean showRegionOwner = !player.equals(srcPlayer);
+        source.removeCard(card);
+        destinationRegion.addCard(card, false);
+        String message = String.format(
+                "%s removes %s%s in %s %s from the game.",
+                player,
+                getCardName(card),
+                random ? " (picked randomly)" : "",
+                showRegionOwner ? srcPlayer + "'s" : "their",
+                srcRegion);
+
+        addCommand(message, new String[]{"rfg", cardId, owner, RFG});
     }
 }

@@ -37,12 +37,8 @@ public class XmlFileUtils {
             Source source = new StreamSource(fileInputStream);
             JAXBElement<T> element = context.createUnmarshaller().unmarshal(source, type);
             return element.getValue();
-        } catch (JAXBException e) {
-            throw new RuntimeException("Unable to create JAXB context for " + type.getName(), e);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(type.getName() + " file not found", e);
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to open " + type.getName() + " " + file.getName(), e);
+        } catch (JAXBException | IOException e) {
+            throw new RuntimeException("Unable to load " + file.getName(), e);
         }
     }
 

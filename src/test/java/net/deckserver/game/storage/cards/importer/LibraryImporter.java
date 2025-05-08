@@ -38,7 +38,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final Pattern PUT_ON_CONTROLLED_PATTERN = Pattern.compile(".*[Pp]ut this card on a minion you control.*");
     private static final Pattern PUT_ON_SELF_PATTERN = Pattern.compile(".*[Pp]ut this card on this.*");
     private static final Pattern PUT_ON_SOMETHING_PATTERN = Pattern.compile(".*[Pp]ut this card on.*");
-    private static final Pattern AS_ABOVE_PATTERN = Pattern.compile("As (\\[(?<disc>.*)\\])? ?above.*");
+    private static final Pattern AS_ABOVE_PATTERN = Pattern.compile("As (\\[(?<disc>.*)])? ?above.*");
     private static final Pattern REMOVE_FROM_GAME_PATTERN = Pattern.compile(".*[Rr]emove this card from the game.*");
     private static final Pattern TROPHY_PATTERN = Pattern.compile("Master. Trophy.");
 
@@ -170,7 +170,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                     || PUT_INTO_PLAY_PATTERN.matcher(mode.getText()).matches())
                 mode.setTarget(LibraryCardMode.Target.READY_REGION);
             else {
-                Matcher matcher = AS_ABOVE_PATTERN.matcher(mode.getText());
+                Matcher matcher = AS_ABOVE_PATTERN.matcher(modeText);
                 if (matcher.matches()) {
                     String disciplineString = matcher.group("disc");
                     LibraryCardMode reference;
