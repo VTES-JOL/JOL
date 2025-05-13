@@ -14,8 +14,6 @@ import net.deckserver.storage.json.cards.CardSummary;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class DoCommand {
 
     private final JolGame game;
@@ -125,14 +123,14 @@ public class DoCommand {
     void contest(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
         String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
+        Card targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
         boolean clear = cmdObj.consumeString("clear");
         game.contestCard(targetCard, clear);
     }
 
     void transfer(CommandParser cmdObj, String player) throws CommandException {
         String targetRegion = cmdObj.getRegion(JolGame.INACTIVE_REGION);
-        String card = cmdObj.findCard(false, player, targetRegion);
+        Card card = cmdObj.findCard(false, player, targetRegion);
         int amount = cmdObj.getAmount(1);
         if (amount == 0) throw new CommandException("Must transfer an amount");
         int pool = game.getPool(player);
@@ -198,7 +196,7 @@ public class DoCommand {
     void lock(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
         String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String card = cmdObj.findCard(true, targetPlayer, targetRegion);
+        Card card = cmdObj.findCard(true, targetPlayer, targetRegion);
         if (game.isTapped(card))
             throw new CommandException("Card is already locked");
         game.setLocked(player, card, true);
@@ -210,7 +208,7 @@ public class DoCommand {
             game.unlockAll(targetPlayer);
         } else {
             String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-            String card = cmdObj.findCard(true, targetPlayer, targetRegion);
+            Card card = cmdObj.findCard(true, targetPlayer, targetRegion);
             game.setLocked(player, card, false);
         }
     }
@@ -218,7 +216,7 @@ public class DoCommand {
     void capacity(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
         String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
+        Card targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
         int amount = cmdObj.getAmount(0);
         if (amount == 0) throw new CommandException("Must specify an amount of blood");
         game.changeCapacity(targetCard, amount, false);
@@ -227,9 +225,9 @@ public class DoCommand {
     void disciplines(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
         String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
+        Card targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
         if (cmdObj.consumeString("reset")) {
-            CardSummary card = CardSearch.INSTANCE.get(game.getCard(targetCard).getCardId());
+            CardSummary card = CardSearch.INSTANCE.get(game.getDetail(targetCard).getCardId());
             List<String> disciplines = card.getDisciplines();
             game.setDisciplines(player, targetCard, disciplines, false);
         } else {
@@ -257,7 +255,7 @@ public class DoCommand {
     void blood(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
         String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String targetCard = cmdObj.findCard(false, false, targetPlayer, targetRegion);
+        Card targetCard = cmdObj.findCard(false, false, targetPlayer, targetRegion);
         int amount = cmdObj.getAmount(0);
         if (amount == 0) throw new CommandException("Must specify an amount of blood");
         game.changeCounters(player, targetCard, amount, false);
@@ -276,27 +274,26 @@ public class DoCommand {
     void burn(CommandParser cmdObj, String player) throws CommandException {
         String srcPlayer = cmdObj.getPlayer(player);
         String srcRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String cardId = cmdObj.findCard(true, srcPlayer, srcRegion);
+        Card card = cmdObj.findCard(true, srcPlayer, srcRegion);
         boolean random = Arrays.asList(cmdObj.args).contains("random");
-        boolean top = Arrays.asList(cmdObj.args).contains("top");
-        game.burn(player, cardId, srcPlayer, srcRegion, random);
+        game.burn(player, card, srcPlayer, srcRegion, random);
     }
 
     void rfg(CommandParser cmdObj, String player) throws CommandException {
         String srcPlayer = cmdObj.getPlayer(player);
         String srcRegion = cmdObj.getRegion(JolGame.ASH_HEAP);
-        String cardId = cmdObj.findCard(true, srcPlayer, srcRegion);
+        Card card = cmdObj.findCard(true, srcPlayer, srcRegion);
         boolean random = Arrays.asList(cmdObj.args).contains("random");
-        game.rfg(player, cardId, srcPlayer, srcRegion, random);
+        game.rfg(player, card, srcPlayer, srcRegion, random);
     }
 
     void move(CommandParser cmdObj, String player) throws CommandException {
         String srcPlayer = cmdObj.getPlayer(player);
         String srcRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String srcCard = cmdObj.findCard(false, srcPlayer, srcRegion);
+        Card srcCard = cmdObj.findCard(false, srcPlayer, srcRegion);
         String destPlayer = cmdObj.getPlayer(player);
         String destRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String destCard = cmdObj.findCard(false, false, destPlayer, destRegion);
+        Card destCard = cmdObj.findCard(false, false, destPlayer, destRegion);
         boolean top = Arrays.asList(cmdObj.args).contains("top");
 
         if (List.of(JolGame.READY_REGION, JolGame.INACTIVE_REGION, JolGame.TORPOR).contains(destRegion) && destCard != null) {
@@ -307,7 +304,7 @@ public class DoCommand {
     }
 
     void influence(CommandParser cmdObj, String player) throws CommandException {
-        String srcCard = cmdObj.findCard(false, player, JolGame.INACTIVE_REGION);
+        Card srcCard = cmdObj.findCard(false, player, JolGame.INACTIVE_REGION);
         game.influenceCard(player, srcCard, player, JolGame.READY_REGION);
     }
 
@@ -317,7 +314,7 @@ public class DoCommand {
             throw new CommandException("Invalid command. Use influence instead");
         }
         String srcRegion = cmdObj.getRegion(JolGame.HAND);
-        String srcCard = cmdObj.findCard(false, player, srcRegion);
+        Card srcCard = cmdObj.findCard(false, player, srcRegion);
 
         String[] modes = null;
         boolean modeSpecified = cmdObj.consumeString("@");
@@ -326,7 +323,7 @@ public class DoCommand {
 
         String targetPlayer = cmdObj.getPlayer(player);
         String targetRegion = cmdObj.getRegion(JolGame.ASH_HEAP);
-        String targetCard = cmdObj.findCard(false, false, targetPlayer, targetRegion);
+        Card targetCard = cmdObj.findCard(false, false, targetPlayer, targetRegion);
         boolean draw = cmdObj.consumeString("draw");
         game.playCard(player, srcCard, targetPlayer, targetRegion, targetCard, modes);
         if (draw) game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
@@ -357,7 +354,7 @@ public class DoCommand {
     void label(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
         String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String card = cmdObj.findCard(false, targetPlayer, targetRegion);
+        Card card = cmdObj.findCard(false, targetPlayer, targetRegion);
         StringBuilder note = new StringBuilder();
         while (cmdObj.hasMoreArgs()) {
             note.append(" ");
@@ -375,7 +372,7 @@ public class DoCommand {
 
     void discard(CommandParser cmdObj, String player) throws CommandException {
         boolean random = Arrays.asList(cmdObj.args).contains("random");
-        String card = cmdObj.findCard(true, player, JolGame.HAND);
+        Card card = cmdObj.findCard(true, player, JolGame.HAND);
         game.discard(player, card, random);
         if (cmdObj.consumeString("draw")) {
             game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
@@ -390,7 +387,7 @@ public class DoCommand {
     void votes(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
         String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String card = cmdObj.findCard(false, targetPlayer, targetRegion);
+        Card card = cmdObj.findCard(false, targetPlayer, targetRegion);
         game.setVotes(card, cmdObj.nextArg(), false);
     }
 

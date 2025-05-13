@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Pattern;
 
@@ -137,7 +136,7 @@ class CommandParser {
 
     }
 
-    String findCard(boolean greedy, boolean allowRandom, String player, String region) throws CommandException {
+    Card findCard(boolean greedy, boolean allowRandom, String player, String region) throws CommandException {
         Location location = game.getState().getPlayerLocation(player, region);
         Card[] cards = location.getCards();
         Card targetCard = null;
@@ -168,10 +167,10 @@ class CommandParser {
         if (targetCard == null && greedy) {
             throw new CommandException("Invalid card position.");
         }
-        return Optional.ofNullable(targetCard).map(Card::getId).orElse(null);
+        return targetCard;
     }
 
-    String findCard(boolean allowRandom, String player, String region) throws CommandException {
+    Card findCard(boolean allowRandom, String player, String region) throws CommandException {
         return findCard(true, allowRandom, player, region);
     }
 

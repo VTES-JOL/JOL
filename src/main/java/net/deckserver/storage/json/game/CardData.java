@@ -3,7 +3,6 @@ package net.deckserver.storage.json.game;
 import com.fasterxml.jackson.annotation.*;
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
 import lombok.Setter;
 import net.deckserver.game.storage.cards.CardType;
 

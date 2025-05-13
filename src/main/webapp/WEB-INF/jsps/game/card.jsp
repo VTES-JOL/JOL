@@ -6,6 +6,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.google.common.base.Strings" %>
 <%@ page import="net.deckserver.dwr.model.ChatParser" %>
+<%@ page import="net.deckserver.game.interfaces.state.Card" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
@@ -18,7 +19,8 @@
     boolean shadow = Boolean.parseBoolean(request.getParameter("shadow"));
     boolean visible = Boolean.parseBoolean(request.getParameter("visible"));
     RegionType region = RegionType.valueOf(request.getParameter("region"));
-    CardDetail cardDetail = game.getCard(id);
+    Card card = game.getCard(id);
+    CardDetail cardDetail = game.getDetail(card);
     CardSummary cardSummary = CardSearch.INSTANCE.get(cardDetail.getCardId());
     List<String> defaultDisciplines = cardSummary.getDisciplines();
     String defaultVotes = cardSummary.getVotes();

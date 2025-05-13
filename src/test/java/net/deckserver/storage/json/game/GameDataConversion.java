@@ -14,7 +14,6 @@ import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.cards.CardType;
 import net.deckserver.game.storage.state.RegionType;
 import net.deckserver.storage.json.cards.CardSummary;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
