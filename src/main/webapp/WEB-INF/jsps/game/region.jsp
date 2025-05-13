@@ -20,7 +20,7 @@
     String collapsed = startCollapsed ? "collapsed" : "";
     String regionStyle = region == RegionType.TORPOR ? "bg-danger-subtle" : (region == RegionType.READY ? "bg-success-subtle" : "bg-body-secondary");
     int size = game.getSize(player, region);
-    Card[] cards = game.getState().getPlayerLocation(player, region.xmlLabel()).getCards();
+    Card[] cards = game.getState().getPlayerLocation(player, region).getCards();
     String regionName = region.xmlLabel().split(" ")[0];
 %>
 

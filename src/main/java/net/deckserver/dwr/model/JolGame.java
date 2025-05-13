@@ -30,16 +30,6 @@ import java.util.stream.Stream;
 
 public class JolGame {
 
-    public static final String READY_REGION = "ready region";
-    public static final String INACTIVE_REGION = "inactive region";
-    public static final String UNCONTROLLED_REGION = "uncontrolled";
-    public static final String ASH_HEAP = "ashheap";
-    public static final String HAND = "hand";
-    public static final String LIBRARY = "library";
-    public static final String CRYPT = "crypt";
-    public static final String TORPOR = "torpor";
-    public static final String RFG = "rfg";
-    public static final String RESEARCH = "research";
     public static final String[] TURN_PHASES = new String[]{"Unlock", "Master", "Minion", "Influence", "Discard"};
 
     private static final String COUNTERS = "counters";
@@ -77,18 +67,18 @@ public class JolGame {
 
     public void addPlayer(String name, Deck deck) {
         state.addPlayer(name);
-        state.addLocation(name, READY_REGION);
-        state.addLocation(name, TORPOR);
-        state.addLocation(name, INACTIVE_REGION);
-        state.addLocation(name, HAND);
-        state.addLocation(name, ASH_HEAP);
-        state.addLocation(name, LIBRARY);
-        state.addLocation(name, CRYPT);
-        state.addLocation(name, RFG);
-        state.addLocation(name, RESEARCH);
+        state.addLocation(name, RegionType.READY);
+        state.addLocation(name, RegionType.TORPOR);
+        state.addLocation(name, RegionType.UNCONTROLLED);
+        state.addLocation(name, RegionType.HAND);
+        state.addLocation(name, RegionType.ASH_HEAP);
+        state.addLocation(name, RegionType.LIBRARY);
+        state.addLocation(name, RegionType.CRYPT);
+        state.addLocation(name, RegionType.REMOVED_FROM_GAME);
+        state.addLocation(name, RegionType.RESEARCH);
         changePool(name, 30);
-        Location crypt = state.getPlayerLocation(name, CRYPT);
-        Location library = state.getPlayerLocation(name, LIBRARY);
+        Location crypt = state.getPlayerLocation(name, RegionType.CRYPT);
+        Location library = state.getPlayerLocation(name, RegionType.LIBRARY);
         List<String> cryptlist = new ArrayList<>();
         List<String> librarylist = new ArrayList<>();
         deck.getCrypt().getCards().forEach(cardCount -> cryptlist.addAll(Collections.nCopies(cardCount.getCount(), String.valueOf(cardCount.getId()))));
@@ -148,18 +138,18 @@ public class JolGame {
 
     public void discard(String player, Card card, boolean random) {
         CardContainer source = card.getParent();
-        Location dest = state.getPlayerLocation(player, ASH_HEAP);
+        Location dest = state.getPlayerLocation(player, RegionType.ASH_HEAP);
         String message = String.format(
                 "%s discards %s%s",
                 player,
                 getCardLink(card),
                 random ? " (picked randomly)" : "");
-        addCommand(message, new String[]{"discard", card.getId(), player, JolGame.ASH_HEAP});
+        addCommand(message, new String[]{"discard", card.getId(), player, RegionType.ASH_HEAP.xmlLabel()});
         source.removeCard(card);
         dest.addCard(card, false);
     }
 
-    public void playCard(String player, Card card, String destinationPlayer, String destinationRegion, Card target, String[] modes) {
+    public void playCard(String player, Card card, String destinationPlayer, RegionType destinationRegion, Card target, String[] modes) {
         CardContainer parent = card.getParent();
         Location source = (Location) state.getRegionFromCard(card);
         CardContainer destination = state.getPlayerLocation(destinationPlayer, destinationRegion);
@@ -182,8 +172,7 @@ public class JolGame {
         String destinationMessage;
         if (target == null) {
             String playerTitle = destinationPlayer.equals(player) ? "their" : destinationPlayer + "'s";
-            RegionType destinationRegionType = RegionType.of(destinationRegion);
-            destinationMessage = RegionType.ASH_HEAP.equals(destinationRegionType) ? "" : String.format(" to %s %s", playerTitle, destinationRegion);
+            destinationMessage = RegionType.ASH_HEAP.equals(destinationRegion) ? "" : String.format(" to %s %s", playerTitle, destinationRegion.xmlLabel());
         } else {
             destination = target;
             destinationMessage = String.format(" on %s", getTargetCardName(target, player));
@@ -191,12 +180,12 @@ public class JolGame {
 
         String message = String.format("%s plays %s%s%s%s.", player, cardName, sourceMessage, modeMessage, destinationMessage);
 
-        addCommand(message, new String[]{"play", card.getId(), destinationPlayer, destinationRegion});
+        addCommand(message, new String[]{"play", card.getId(), destinationPlayer, destinationRegion.xmlLabel()});
         parent.removeCard(card);
         destination.addCard(card, false);
     }
 
-    public void influenceCard(String player, Card card, String destPlayer, String destRegion) {
+    public void influenceCard(String player, Card card, String destPlayer, RegionType destRegion) {
         CardContainer source = card.getParent();
         Location dest = state.getPlayerLocation(destPlayer, destRegion);
 
@@ -222,10 +211,10 @@ public class JolGame {
         }
         source.removeCard(card);
         dest.addCard(card, true);
-        addCommand(String.format("%s influences out %s%s%s.", player, getCardLink(card), capacityText, votesText), new String[]{"influence", card.getId(), destPlayer, destRegion});
+        addCommand(String.format("%s influences out %s%s%s.", player, getCardLink(card), capacityText, votesText), new String[]{"influence", card.getId(), destPlayer, destRegion.xmlLabel()});
     }
 
-    public void shuffle(String player, String region, int num) {
+    public void shuffle(String player, RegionType region, int num) {
         _shuffle(player, region, num, true);
     }
 
@@ -238,14 +227,14 @@ public class JolGame {
         addCommand("Start game", new String[]{"start"});
         for (String player : players) {
             setNotation(state, player + POOL, "30");
-            moveAll(player, INACTIVE_REGION, CRYPT);
-            moveAll(player, HAND, LIBRARY);
-            _shuffle(player, CRYPT, 0, false);
-            _shuffle(player, LIBRARY, 0, false);
+            moveAll(player, RegionType.UNCONTROLLED, RegionType.CRYPT);
+            moveAll(player, RegionType.HAND, RegionType.LIBRARY);
+            _shuffle(player, RegionType.CRYPT, 0, false);
+            _shuffle(player, RegionType.LIBRARY, 0, false);
             for (int j = 0; j < 4; j++)
-                _drawCard(player, CRYPT, INACTIVE_REGION, false);
+                _drawCard(player, RegionType.CRYPT, RegionType.UNCONTROLLED, false);
             for (int j = 0; j < 7; j++)
-                _drawCard(player, LIBRARY, HAND, false);
+                _drawCard(player, RegionType.LIBRARY, RegionType.HAND, false);
         }
         newTurn();
         JolAdmin.INSTANCE.pingPlayer(this.getActivePlayer(), this.getName());
@@ -348,7 +337,7 @@ public class JolGame {
     }
 
     public int getSize(String player, RegionType region) {
-        return state.getPlayerLocation(player, region.xmlLabel()).getCards().length;
+        return state.getPlayerLocation(player, region).getCards().length;
     }
 
     public CardDetail getDetail(Card card) {
@@ -675,6 +664,10 @@ public class JolGame {
         addCommand("Player order" + order, new String[]{"order", order.toString()});
     }
 
+    public Card getCard(String id) {
+        return state.getCard(id);
+    }
+
     private List<String> getValidPlayers() {
         return state.getPlayers().stream()
                 .filter(player -> getPool(player) > 0)
@@ -699,28 +692,28 @@ public class JolGame {
         setNotation(state, player + POOL, "0");
     }
 
-    private void _drawCard(String player, String srcRegion, String destRegion, boolean log) {
+    private void _drawCard(String player, RegionType srcRegion, RegionType destRegion, boolean log) {
         Location source = state.getPlayerLocation(player, srcRegion);
         Location dest = state.getPlayerLocation(player, destRegion);
         Card card = source.getFirstCard();
         source.removeCard(card);
         dest.addCard(card, false);
         if (log) {
-            addCommand(String.format("%s draws from their %s.", player, srcRegion), new String[]{"draw", srcRegion, destRegion});
+            addCommand(String.format("%s draws from their %s.", player, srcRegion.xmlLabel()), new String[]{"draw", srcRegion.xmlLabel(), destRegion.xmlLabel()});
         }
     }
 
-    private void _shuffle(String player, String region, int num, boolean log) {
+    private void _shuffle(String player, RegionType region, int num, boolean log) {
         Location location = state.getPlayerLocation(player, region);
         int size = location.getCards().length;
         location.shuffle(num);
         if (log) {
             String add = (num == 0 || num >= size) ? "their" : "the first " + num + " cards of their";
-            addCommand(String.format("%s shuffles %s %s.", player, add, region), new String[]{"shuffle", player, region, num + ""});
+            addCommand(String.format("%s shuffles %s %s.", player, add, region.xmlLabel()), new String[]{"shuffle", player, region.xmlLabel(), num + ""});
         }
     }
 
-    private void moveAll(String player, String srcLoc, String destLoc) {
+    private void moveAll(String player, RegionType srcLoc, RegionType destLoc) {
         Location src = state.getPlayerLocation(player, srcLoc);
         Location dest = state.getPlayerLocation(player, destLoc);
         Card[] cards = src.getCards();
@@ -756,10 +749,6 @@ public class JolGame {
 
     private double getNotationAsDouble(NoteTaker nt, String name) {
         return Double.parseDouble(getNotation(nt, name, "0"));
-    }
-
-    public Card getCard(String id) {
-        return state.getCard(id);
     }
 
     /*
@@ -881,7 +870,7 @@ public class JolGame {
         if (turn != null) actions.addMessage(getTurn(), getDate() + message);
     }
 
-    void drawCard(String player, String srcRegion, String destRegion) {
+    void drawCard(String player, RegionType srcRegion, RegionType destRegion) {
         _drawCard(player, srcRegion, destRegion, true);
     }
 
@@ -907,7 +896,7 @@ public class JolGame {
         dstCard.addCard(srcCard, false);
     }
 
-    void moveToRegion(String player, Card card, String destPlayer, String destRegion, boolean top) {
+    void moveToRegion(String player, Card card, String destPlayer, RegionType destRegion, boolean top) {
         CardContainer source = card.getParent();
         Location sourceRegion = (Location) state.getRegionFromCard(card);
         Location destinationRegion = state.getPlayerLocation(destPlayer, destRegion);
@@ -916,8 +905,8 @@ public class JolGame {
         String topMessage = top ? "the top of " : "";
         String playerName = sameOwner ? "their" : destinationRegion.getOwner() + "'s";
 
-        String message = String.format("%s moves %s to %s%s %s.", player, getCardName(card, destinationRegion), topMessage, playerName, destRegion);
-        addCommand(message, new String[]{"move", card.getId(), destPlayer, destRegion, top ? "top" : "bottom"});
+        String message = String.format("%s moves %s to %s%s %s.", player, getCardName(card, destinationRegion), topMessage, playerName, destRegion.xmlLabel());
+        addCommand(message, new String[]{"move", card.getId(), destPlayer, destRegion.xmlLabel(), top ? "top" : "bottom"});
         source.removeCard(card);
         destinationRegion.addCard(card, top);
     }
@@ -931,7 +920,7 @@ public class JolGame {
 
         CardContainer source = card.getParent();
         String owner = card.getOwner();
-        Location dest = state.getPlayerLocation(owner, ASH_HEAP);
+        Location dest = state.getPlayerLocation(owner, RegionType.ASH_HEAP);
 
         //Move to owner's ash heap
         source.removeCard(card);
@@ -954,7 +943,7 @@ public class JolGame {
         setNotation(card, TAP, "false");
     }
 
-    void burn(String player, Card card, String srcPlayer, String srcRegion, boolean random) {
+    void burn(String player, Card card, String srcPlayer, RegionType srcRegion, boolean random) {
         String owner = card.getOwner();
 
         //Message formats:
@@ -969,15 +958,15 @@ public class JolGame {
                 getCardName(card),
                 random ? " (picked randomly)" : "",
                 showRegionOwner ? srcPlayer + "'s" : "their",
-                srcRegion);
+                srcRegion.xmlLabel());
 
-        addCommand(message, new String[]{"burn", card.getId(), owner, ASH_HEAP});
+        addCommand(message, new String[]{"burn", card.getId(), owner, RegionType.ASH_HEAP.xmlLabel()});
     }
 
-    void rfg(String player, Card card, String srcPlayer, String srcRegion, boolean random) {
+    void rfg(String player, Card card, String srcPlayer, RegionType srcRegion, boolean random) {
         CardContainer source = card.getParent();
         String owner = card.getOwner();
-        Location destinationRegion = state.getPlayerLocation(owner, RFG);
+        Location destinationRegion = state.getPlayerLocation(owner, RegionType.REMOVED_FROM_GAME);
 
         boolean showRegionOwner = !player.equals(srcPlayer);
         source.removeCard(card);
@@ -988,8 +977,8 @@ public class JolGame {
                 getCardName(card),
                 random ? " (picked randomly)" : "",
                 showRegionOwner ? srcPlayer + "'s" : "their",
-                srcRegion);
+                srcRegion.xmlLabel());
 
-        addCommand(message, new String[]{"rfg", card.getId(), owner, RFG});
+        addCommand(message, new String[]{"rfg", card.getId(), owner, RegionType.REMOVED_FROM_GAME.xmlLabel()});
     }
 }

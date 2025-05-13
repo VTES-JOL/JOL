@@ -40,6 +40,16 @@ public enum RegionType {
         return null;
     }
 
+    public static RegionType startsWith(String text) {
+        text = text.toLowerCase();
+        for (RegionType regionType : RegionType.values()) {
+            if (regionType.xmlLabel.toLowerCase().startsWith(text) || regionType.description.toLowerCase().startsWith(text)) {
+                return regionType;
+            }
+        }
+        return null;
+    }
+
     public String xmlLabel() {
         return xmlLabel;
     }

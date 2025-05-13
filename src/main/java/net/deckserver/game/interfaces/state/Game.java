@@ -6,6 +6,8 @@
 
 package net.deckserver.game.interfaces.state;
 
+import net.deckserver.game.storage.state.RegionType;
+
 import java.util.List;
 
 /**
@@ -19,7 +21,7 @@ public interface Game extends NoteTaker {
 
     void orderPlayers(List<String> order);
 
-    void addLocation(String player, String regionName);
+    void addLocation(String player, RegionType type);
 
     String getName();
 
@@ -27,9 +29,7 @@ public interface Game extends NoteTaker {
 
     Location[] getPlayerLocations(String player);
 
-    Location getPlayerLocation(String player, String regionName);
-
-    Location getLocation(String regionName);
+    Location getPlayerLocation(String player, RegionType regionType);
 
     String getPlayerRegionName(Location location);
 

@@ -102,13 +102,13 @@ public class StoreGame implements Game {
         return loc;
     }
 
-    public void addLocation(String player, String regionName) {
-        StoreLocation location = addLocationImpl(player + "'s " + regionName);
+    public void addLocation(String player, RegionType region) {
+        StoreLocation location = addLocationImpl(player + "'s " + region.xmlLabel());
         location.setOwner(player);
     }
 
-    public Location getPlayerLocation(String player, String regionName) {
-        return getLocation(player + "'s " + regionName);
+    public Location getPlayerLocation(String player, RegionType region) {
+        return getLocation(player + "'s " + region.xmlLabel());
     }
 
     public void addPlayer(String player) {

@@ -8,6 +8,7 @@ import net.deckserver.game.jaxb.XmlFileUtils;
 import net.deckserver.game.jaxb.actions.GameActions;
 import net.deckserver.game.jaxb.state.GameState;
 import net.deckserver.game.jaxb.state.Notation;
+import net.deckserver.game.storage.state.RegionType;
 import net.deckserver.game.storage.state.StoreGame;
 import net.deckserver.game.storage.turn.StoreTurnRecorder;
 import net.deckserver.game.ui.state.DsGame;
@@ -75,15 +76,15 @@ public final class ModelLoader {
         List<String> players = orig.getPlayers();
         for (String player : players) {
             game.addPlayer(player);
-            game.addLocation(player, JolGame.READY_REGION);
-            game.addLocation(player, JolGame.TORPOR);
-            game.addLocation(player, JolGame.INACTIVE_REGION);
-            game.addLocation(player, JolGame.HAND);
-            game.addLocation(player, JolGame.ASH_HEAP);
-            game.addLocation(player, JolGame.LIBRARY);
-            game.addLocation(player, JolGame.CRYPT);
-            game.addLocation(player, JolGame.RFG);
-            game.addLocation(player, JolGame.RESEARCH);
+            game.addLocation(player, RegionType.READY);
+            game.addLocation(player, RegionType.TORPOR);
+            game.addLocation(player, RegionType.UNCONTROLLED);
+            game.addLocation(player, RegionType.HAND);
+            game.addLocation(player, RegionType.ASH_HEAP);
+            game.addLocation(player, RegionType.LIBRARY);
+            game.addLocation(player, RegionType.CRYPT);
+            game.addLocation(player, RegionType.REMOVED_FROM_GAME);
+            game.addLocation(player, RegionType.RESEARCH);
             Location[] locs = orig.getPlayerLocations(player);
             for (Location loc : locs) {
                 moveLoc(game, orig, player, loc);
@@ -101,7 +102,7 @@ public final class ModelLoader {
 
     private static void moveLoc(Game game, Game orig, String player, Location loc) {
         String name = orig.getPlayerRegionName(loc);
-        Location to = game.getPlayerLocation(player, name);
+        Location to = game.getPlayerLocation(player, RegionType.of(name));
         moveNotes(loc, to);
         moveCards(loc, to);
         loc.setOwner(player);
