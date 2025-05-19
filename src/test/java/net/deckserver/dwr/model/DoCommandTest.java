@@ -48,7 +48,7 @@ public class DoCommandTest {
         assertEquals("176", game.getState().getPlayerLocation("Player2", RegionType.LIBRARY.xmlLabel()).getCard(0).getId());
         ashCards = game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP.xmlLabel()).getCards();
         assertEquals(1, ashCards.length);
-        assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='101801'>Slaughtering the Herd</a> #1 from their library."));
+        assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='101801'>Slaughtering the Herd</a> 1 from their library."));
     }
 
     @Test
@@ -467,7 +467,7 @@ public class DoCommandTest {
         assertThat(game.getState().getCard("208").getCards().length, is(2));
         assertThat(game.getState().getCard("246").getCards().length, is(0));
         worker.doCommand("Player3", "move ready 1.2 ready 1.1");
-        assertThat(getLastMessage(), containsString("Player3 puts <a class='card-name' data-card-id='100199'>Blood Doll</a> #1.2 on <a class='card-name' data-card-id='101014'>Ivory Bow</a> in their ready region."));
+        assertThat(getLastMessage(), containsString("Player3 puts <a class='card-name' data-card-id='100199'>Blood Doll</a> 1.2 on <a class='card-name' data-card-id='101014'>Ivory Bow</a> in their ready region."));
         assertThat(game.getState().getCard("208").getCards().length, is(1));
         assertThat(game.getState().getCard("246").getCards().length, is(1));
         assertThrows(CommandException.class, () -> worker.doCommand("Player3", "move ready 1 ready 1.1.1"));
