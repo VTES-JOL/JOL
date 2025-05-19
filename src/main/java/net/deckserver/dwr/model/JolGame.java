@@ -814,7 +814,7 @@ public class JolGame {
         String coordinates = getIndexCoordinates(card);
         String label = getLabel(card);
         label = label.isEmpty() ? "" : String.format(" \"%s\"", label);
-        return String.format(" #%s%s", coordinates, label);
+        return String.format(" %s%s", coordinates, label);
     }
 
     private String getIndexCoordinates(Card card) {
@@ -945,22 +945,23 @@ public class JolGame {
 
     void burn(String player, Card card, String srcPlayer, RegionType srcRegion, boolean random) {
         String owner = card.getOwner();
+        Location destination = state.getPlayerLocation(card.getOwner(), RegionType.ASH_HEAP);
 
         //Message formats:
         //Target is public: "<player> burns <card> [#<region-index>] from [<player>'s] <region>"
         //Target is private: "<player> burns <card> from [top of] [<player>'s] <region>"
 
         boolean showRegionOwner = !player.equals(srcPlayer);
-        burnQuietly(card);
         String message = String.format(
                 "%s burns %s%s from %s %s.",
                 player,
-                getCardName(card),
+                getCardName(card, destination),
                 random ? " (picked randomly)" : "",
                 showRegionOwner ? srcPlayer + "'s" : "their",
                 srcRegion.xmlLabel());
 
         addCommand(message, new String[]{"burn", card.getId(), owner, RegionType.ASH_HEAP.xmlLabel()});
+        burnQuietly(card);
     }
 
     void rfg(String player, Card card, String srcPlayer, RegionType srcRegion, boolean random) {
