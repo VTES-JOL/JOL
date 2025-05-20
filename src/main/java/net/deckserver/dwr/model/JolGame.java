@@ -314,6 +314,24 @@ public class JolGame {
         return getNotation(state, ACTIVE, "");
     }
 
+    public void show(String player, RegionType targetRegion, int amount, List<String> recipients) {
+        Location location = getState().getPlayerLocation(player, targetRegion);
+        Card[] cards = location.getCards();
+        int size = Math.min(cards.length, amount);
+        StringBuilder notes = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            Card card = cards[i];
+            if (card != null) {
+                String cardName = getCardLink(card);
+                notes.append(cardName).append("<br/>");
+            }
+        }
+        for (String recipient : recipients) {
+            setRegionNotes(location, recipient, notes.toString());
+        }
+        addMessage(String.format("%s shows %d cards in their %s to %s.", player, size, targetRegion.xmlLabel(), recipients));
+    }
+
     private void setActivePlayer(String player) {
         setNotation(state, ACTIVE, player);
     }

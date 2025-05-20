@@ -151,36 +151,7 @@ public class DoCommand {
         int amt = cmdObj.getNumber(100);
         boolean all = cmdObj.consumeString("all");
         List<String> recipients = all ? game.getPlayers() : Collections.singletonList(cmdObj.getPlayer(player));
-        Location loc = game.getState().getPlayerLocation(player, targetRegion);
-        Card[] cards = loc.getCards();
-        StringBuilder buf = new StringBuilder();
-        int len = Math.min(cards.length, amt);
-        buf.append(len);
-        buf.append(" cards of ");
-        buf.append(player);
-        buf.append("'s ");
-        buf.append(targetRegion);
-        buf.append(":\n");
-        for (int j = 0; j < len; j++) {
-            buf.append("  ");
-            buf.append(j + 1);
-            buf.append(" ");
-            buf.append(cards[j].getName());
-            buf.append("\n");
-        }
-        String text = buf.toString();
-        for (String recipient : recipients) {
-            String old = game.getPrivateNotes(recipient);
-            game.setPrivateNotes(recipient, old.isEmpty() ? text : old + "\n" + text);
-            model.getView(recipient).privateNotesChanged();
-        }
-        String msg;
-        if (player.equals(recipients.getFirst())) {
-            msg = player + " looks at " + len + " cards of their " + targetRegion.xmlLabel() + ".";
-        } else {
-            msg = player + " shows " + (recipients.size() > 1 ? "everyone" : recipients.getFirst()) + " " + len + " cards of their " + targetRegion.xmlLabel() + ".";
-        }
-        game.addMessage(msg);
+        game.show(player, targetRegion, amt, recipients);
     }
 
     void order(CommandParser cmdObj, String player) throws CommandException {
