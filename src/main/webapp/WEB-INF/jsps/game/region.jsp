@@ -25,6 +25,7 @@
 %>
 
 <c:if test="<%= cards.length > 0 %>">
+    <div id="<%= regionId %>-notes" class="d-none"><%= game.getRegionNotes(player, region, viewer) %></div>
     <div class="mb-2 text-bg-light" data-region="<%= regionName %>">
         <div class="p-2 d-flex justify-content-between align-items-center <%= regionStyle %>">
             <span>

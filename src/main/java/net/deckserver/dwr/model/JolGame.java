@@ -319,17 +319,21 @@ public class JolGame {
         Card[] cards = location.getCards();
         int size = Math.min(cards.length, amount);
         StringBuilder notes = new StringBuilder();
+        String message = String.format("%s shows %d cards in their %s to %s.", player, size, targetRegion.xmlLabel(), recipients);
+        notes.append(message).append("<br/>");
+        notes.append("<ol class='list-group list-group-flush list-group-numbered'>");
         for (int i = 0; i < size; i++) {
             Card card = cards[i];
             if (card != null) {
-                String cardName = getCardLink(card);
-                notes.append(cardName).append("<br/>");
+                String entry = String.format("<li class='list-group-item'>%s</li><br/>", getCardLink(card));
+                notes.append(entry);
             }
         }
+        notes.append("</ol>");
         for (String recipient : recipients) {
             setRegionNotes(location, recipient, notes.toString());
         }
-        addMessage(String.format("%s shows %d cards in their %s to %s.", player, size, targetRegion.xmlLabel(), recipients));
+        addMessage(message);
     }
 
     private void setActivePlayer(String player) {
@@ -418,8 +422,9 @@ public class JolGame {
         setNotation(state, player + TEXT, text);
     }
 
-    public String getRegionNotes(Location location, String player) {
-        return getNotation(location, player + TEXT, "");
+    public String getRegionNotes(String player, RegionType region, String viewer) {
+        Location location = state.getPlayerLocation(player, region);
+        return getNotation(location, viewer + TEXT, "");
     }
 
     public void setRegionNotes(Location location, String player, String text) {
