@@ -10,7 +10,7 @@ import java.util.List;
 
 public class DsLocation extends DsCardContainer implements Location {
 
-    private final String lname;
+    private String lname;
     private String owner;
 
     DsLocation(String name, DsGame game) {
@@ -25,6 +25,10 @@ public class DsLocation extends DsCardContainer implements Location {
             addCard(c, false);
             getGame().addCard(c);
         }
+    }
+
+    public void setName(String name) {
+        this.lname = name;
     }
 
     @Override

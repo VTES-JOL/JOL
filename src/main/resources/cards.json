@@ -2585,6 +2585,18 @@
   "burnOption" : false,
   "banned" : false
 }, {
+  "id" : "102293",
+  "type" : "Ally",
+  "displayName" : "Bone Shambler",
+  "name" : "Bone Shambler",
+  "names" : [ "Bone Shambler" ],
+  "crypt" : false,
+  "unique" : false,
+  "burnOption" : false,
+  "clans" : [ "Hecata" ],
+  "banned" : false,
+  "cost" : "1 blood"
+}, {
   "id" : "100237",
   "type" : "Combat",
   "displayName" : "Bone Spur",
@@ -3215,6 +3227,17 @@
   "crypt" : false,
   "unique" : false,
   "burnOption" : false,
+  "banned" : false
+}, {
+  "id" : "102298",
+  "type" : "Master",
+  "displayName" : "Cappadocian Crypt",
+  "name" : "Cappadocian Crypt",
+  "names" : [ "Cappadocian Crypt" ],
+  "crypt" : false,
+  "unique" : true,
+  "burnOption" : false,
+  "clans" : [ "Hecata" ],
   "banned" : false
 }, {
   "id" : "100293",
@@ -5505,6 +5528,17 @@
   "crypt" : false,
   "unique" : false,
   "burnOption" : false,
+  "banned" : false
+}, {
+  "id" : "102299",
+  "type" : "Master",
+  "displayName" : "Dead Pool",
+  "name" : "Dead Pool",
+  "names" : [ "Dead Pool" ],
+  "crypt" : false,
+  "unique" : true,
+  "burnOption" : false,
+  "clans" : [ "Lasombra" ],
   "banned" : false
 }, {
   "id" : "100504",
@@ -15153,6 +15187,16 @@
   "banned" : false,
   "cost" : "1 pool"
 }, {
+  "id" : "102300",
+  "type" : "Action Modifier",
+  "displayName" : "Paths in Two Worlds",
+  "name" : "Paths in Two Worlds",
+  "names" : [ "Paths in Two Worlds" ],
+  "crypt" : false,
+  "unique" : false,
+  "burnOption" : false,
+  "banned" : false
+}, {
   "id" : "101374",
   "type" : "Reaction",
   "displayName" : "Patrol",
@@ -15873,6 +15917,17 @@
   "crypt" : false,
   "unique" : true,
   "burnOption" : false,
+  "banned" : false
+}, {
+  "id" : "102301",
+  "type" : "Master",
+  "displayName" : "Powerbase: Munich",
+  "name" : "Powerbase: Munich",
+  "names" : [ "Powerbase: Munich" ],
+  "crypt" : false,
+  "unique" : true,
+  "burnOption" : false,
+  "clans" : [ "Hecata" ],
   "banned" : false
 }, {
   "id" : "101440",
@@ -16627,6 +16682,17 @@
   "banned" : false,
   "cost" : "1 blood"
 }, {
+  "id" : "102302",
+  "type" : "Action",
+  "displayName" : "Psychophagia",
+  "name" : "Psychophagia",
+  "names" : [ "Psychophagia" ],
+  "crypt" : false,
+  "unique" : false,
+  "burnOption" : false,
+  "clans" : [ "Hecata" ],
+  "banned" : false
+}, {
   "id" : "101512",
   "type" : "Action",
   "displayName" : "Public Enemy",
@@ -16896,6 +16962,17 @@
   "burnOption" : false,
   "banned" : false,
   "cost" : "3 pool"
+}, {
+  "id" : "102303",
+  "type" : "Political Action",
+  "displayName" : "Raising the Portcullis",
+  "name" : "Raising the Portcullis",
+  "names" : [ "Raising the Portcullis" ],
+  "crypt" : false,
+  "unique" : false,
+  "burnOption" : false,
+  "clans" : [ "Lasombra" ],
+  "banned" : false
 }, {
   "id" : "101538",
   "type" : "Combat",
@@ -18156,6 +18233,18 @@
   "burnOption" : false,
   "banned" : false
 }, {
+  "id" : "102304",
+  "type" : "Ally",
+  "displayName" : "Rotting Behemoth",
+  "name" : "Rotting Behemoth",
+  "names" : [ "Rotting Behemoth" ],
+  "crypt" : false,
+  "unique" : false,
+  "burnOption" : false,
+  "clans" : [ "Hecata" ],
+  "banned" : false,
+  "cost" : "3 blood"
+}, {
   "id" : "102215",
   "type" : "Combat",
   "displayName" : "Roundhouse",
@@ -19190,6 +19279,16 @@
   "displayName" : "Shadow Sentinel",
   "name" : "Shadow Sentinel",
   "names" : [ "Shadow Sentinel" ],
+  "crypt" : false,
+  "unique" : false,
+  "burnOption" : false,
+  "banned" : false
+}, {
+  "id" : "102305",
+  "type" : "Combat",
+  "displayName" : "Shadow Shift",
+  "name" : "Shadow Shift",
+  "names" : [ "Shadow Shift" ],
   "crypt" : false,
   "unique" : false,
   "burnOption" : false,
@@ -20391,6 +20490,17 @@
   "clans" : [ "Giovanni" ],
   "banned" : false,
   "cost" : "3 blood"
+}, {
+  "id" : "102297",
+  "type" : "Action",
+  "displayName" : "Split the Veil",
+  "name" : "Split the Veil",
+  "names" : [ "Split the Veil" ],
+  "crypt" : false,
+  "unique" : false,
+  "burnOption" : false,
+  "clans" : [ "Hecata" ],
+  "banned" : false
 }, {
   "id" : "101854",
   "type" : "Action Modifier",
@@ -22578,6 +22688,16 @@
   "burnOption" : false,
   "banned" : false,
   "cost" : "1 blood"
+}, {
+  "id" : "102306",
+  "type" : "Action",
+  "displayName" : "Umbrous Clutch",
+  "name" : "Umbrous Clutch",
+  "names" : [ "Umbrous Clutch" ],
+  "crypt" : false,
+  "unique" : false,
+  "burnOption" : false,
+  "banned" : false
 }, {
   "id" : "102055",
   "type" : "Master",
@@ -30339,6 +30459,24 @@
   "disciplines" : [ "dem", "ANI", "AUS", "OBF", "VIC" ],
   "advanced" : false
 }, {
+  "id" : "201729",
+  "type" : "Vampire",
+  "displayName" : "Dafina Hanganu",
+  "name" : "Dafina Hanganu",
+  "names" : [ "Dafina Hanganu", "Dafina Hanganu (G6)" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "clans" : [ "Lasombra" ],
+  "banned" : false,
+  "capacity" : 8,
+  "disciplines" : [ "for", "DOM", "OBL", "POT" ],
+  "advanced" : false,
+  "title" : "prince",
+  "votes" : "2"
+}, {
   "id" : "200308",
   "type" : "Vampire",
   "displayName" : "Daliah",
@@ -32099,6 +32237,22 @@
   "banned" : false,
   "capacity" : 5,
   "disciplines" : [ "obf", "ANI", "SPI" ],
+  "advanced" : false
+}, {
+  "id" : "201730",
+  "type" : "Vampire",
+  "displayName" : "Egidia Arrú",
+  "name" : "Egidia Arrú",
+  "names" : [ "Egidia Arrú (G6)", "Egidia Arru", "Egidia Arru (G6)", "Egidia Arrú" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "clans" : [ "Lasombra" ],
+  "banned" : false,
+  "capacity" : 8,
+  "disciplines" : [ "pro", "DOM", "OBL", "POT" ],
   "advanced" : false
 }, {
   "id" : "200405",
@@ -35404,6 +35558,22 @@
   "advanced" : false,
   "title" : "priscus",
   "votes" : "P"
+}, {
+  "id" : "201731",
+  "type" : "Vampire",
+  "displayName" : "Hel-Blá",
+  "name" : "Hel-Blá",
+  "names" : [ "Hel-Blá (G6)", "Hel-Bla (G6)", "Hel-Blá", "Hel-Bla" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Independent",
+  "clans" : [ "Hecata" ],
+  "banned" : false,
+  "capacity" : 9,
+  "disciplines" : [ "obf", "AUS", "FOR", "OBL", "POT" ],
+  "advanced" : false
 }, {
   "id" : "200585",
   "type" : "Vampire",
@@ -47062,6 +47232,24 @@
   "capacity" : 5,
   "disciplines" : [ "pot", "pre", "qui", "CEL" ],
   "advanced" : false
+}, {
+  "id" : "201732",
+  "type" : "Vampire",
+  "displayName" : "Roger de Camden",
+  "name" : "Roger de Camden",
+  "names" : [ "Roger de Camden", "Roger de Camden (G6)" ],
+  "crypt" : true,
+  "unique" : true,
+  "burnOption" : false,
+  "group" : "6",
+  "sect" : "Camarilla",
+  "clans" : [ "Hecata" ],
+  "banned" : false,
+  "capacity" : 10,
+  "disciplines" : [ "AUS", "FOR", "OBF", "OBL", "PRE" ],
+  "advanced" : false,
+  "title" : "prince",
+  "votes" : "2"
 }, {
   "id" : "201198",
   "type" : "Vampire",

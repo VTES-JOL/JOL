@@ -102,7 +102,8 @@ public class DsGame extends DsNoteTaker implements Game {
         getPlayer(oldPlayer).name = newPlayer;
         for (DsLocation region : regions) {
             String regionName = region.getName();
-            regionName.replaceFirst(oldPlayer, newPlayer);
+            String newRegionName = regionName.replaceFirst(oldPlayer, newPlayer);
+            region.setName(newRegionName);
         }
         cards.values().stream()
                 .filter(c -> c.getOwner().equals(oldPlayer))
