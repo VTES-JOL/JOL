@@ -1196,12 +1196,12 @@ function addCardTooltips(parent) {
                     instance.reference.removeAttribute('title');
                 }
                 if (profile.imageTooltipPreference) {
-                    let content = `<img width="350" height="500" src="https://static.deckserver.net/images/${cardId}" alt="Loading..."/>`;
+                    let content = `<img width="350" height="500" src="https://static.tornsignpost.org/images/${cardId}" alt="Loading..."/>`;
                     instance.setContent(content);
                 } else {
                     $.get({
                         dataType: "html",
-                        url: "https://static.deckserver.net/html/" + cardId, success: function (data) {
+                        url: "https://static.tornsignpost.org/html/" + cardId, success: function (data) {
                             let content = `<div class="p-2">${data}</div>`;
                             instance.setContent(content);
                         }

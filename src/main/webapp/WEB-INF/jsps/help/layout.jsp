@@ -56,7 +56,7 @@
         instance.setContent("Loading...");
         let ref = $(instance.reference);
         let cardId = ref.data('card-id');
-        let content = '<img width="350" height="500" src="https://static.deckserver.net/images/' + cardId + '" alt="Loading..."/>';
+        let content = '<img width="350" height="500" src="https://static.tornsignpost.org/images/' + cardId + '" alt="Loading..."/>';
         instance.setContent(content);
       }
     });
