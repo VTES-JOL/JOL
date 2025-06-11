@@ -178,6 +178,7 @@ public class GameModel implements Comparable<GameModel> {
         for (String key : (new ArrayList<>(views.keySet()))) {
             GameView view = views.get(key);
             view.globalChanged();
+            view.privateNotesChanged();
         }
     }
 

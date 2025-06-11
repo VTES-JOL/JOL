@@ -33,7 +33,7 @@ function showPlayCardModal(event) {
     if (cardId) {
         $.get({
             dataType: "json",
-            url: "https://static.deckserver.net/json/" + cardId, success: function (card) {
+            url: "https://static.tornsignpost.org/json/" + cardId, success: function (card) {
                 playCardModal.data('hand-coord', coordinates);
                 playCardModal.data('region', region);
                 playCardModal.data('do-not-replace', region === "research" ? true : card.doNotReplace);
@@ -238,7 +238,7 @@ function showCardModal(event) {
     if (cardId) {
         $.get({
             dataType: "json",
-            url: "https://static.deckserver.net/json/" + cardId, success: function (card) {
+            url: "https://static.tornsignpost.org/json/" + cardId, success: function (card) {
                 var modal = $('#cardModal');
                 modal.data('controller', controller);
                 modal.data('region', region);
