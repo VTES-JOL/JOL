@@ -146,9 +146,8 @@ function callbackAdmin(data) {
     let endTurnList = $("#endTurnList");
     adminGameList.empty();
     $.each(data.games, function (index, value) {
-        let gameOption = $("<option/>", {value: value, text: value});
-        adminGameList.append(gameOption);
-        endTurnList.append(gameOption);
+        adminGameList.append($("<option/>", {value: value, text: value}));
+        endTurnList.append($("<option/>", {value: value, text: value}));
     })
     adminChangeGame();
 
@@ -1005,7 +1004,7 @@ function loadGame(data) {
     // Phases
     let phaseSelect = $("#phase");
     let endTurn = $("#endTurn");
-    if (data.phases !== null) {
+    if (data.phases.length > 0) {
         phaseSelect.empty();
         phaseSelect.removeAttr('disabled');
         endTurn.removeAttr('disabled');
@@ -1018,28 +1017,6 @@ function loadGame(data) {
         if (data.phase) {
             phaseSelect.val(data.phase);
         }
-    }
-
-    // Pings
-    if (data.ping !== null) {
-        let pingSelect = $("#ping");
-
-        //+1 for the empty option
-        if (pingSelect.children('option').length !== data.ping.length + 1) {
-            pingSelect.empty();
-            pingSelect.append(new Option("", ""));
-            $.each(data.ping, function (index, value) {
-                let option = new Option(value, value);
-                pingSelect.append(option);
-            });
-        }
-
-        $.each(data.ping, function (index, value) {
-            let option = pingSelect.children('option[value="' + value + '"]:first');
-            let pinged = $.inArray(value, data.pinged) !== -1;
-            option.removeClass('pinged');
-            if (pinged) option.addClass('pinged');
-        });
     }
 
     let chat = $("#chat");
@@ -1076,7 +1053,7 @@ function loadGame(data) {
     }
     let fetchFullLog = false;
     if (data.logLength !== null) {
-        let myLogLength = gameChatOutput.children().length + (data.turn == null ? 0 : data.turn.length);
+        let myLogLength = gameChatOutput.children().length + (data.turn.length);
         fetchFullLog = myLogLength < data.logLength;
     }
 
@@ -1101,7 +1078,7 @@ function loadGame(data) {
     //If we're missing any messages from the log, skip adding this batch and
     //get a full refresh from server to prevent new messages appearing in the
     //past, where they are likely to be missed.
-    if (data.turn !== null && !fetchFullLog) {
+    if (data.turn.length > 0 && !fetchFullLog) {
         renderGameChat(data.turn);
         addCardTooltips("#gameChatOutput");
     }
@@ -1117,7 +1094,7 @@ function loadGame(data) {
         privateNotes.val(data.privateNotes);
     }
 
-    if (data.turns !== null) {
+    if (data.turns.length > 0) {
         let turnSelect = $("#historySelect");
         turnSelect.empty();
         data.turns.shift();
@@ -1131,6 +1108,25 @@ function loadGame(data) {
         $("#state").html(data.state);
         addCardTooltips("#state");
     }
+
+    // Pings
+    if (data.ping !== null) {
+        let pingSelect = $("#ping");
+
+        //+1 for the empty option
+        if (pingSelect.children('option').length !== data.ping.length + 1) {
+            pingSelect.empty();
+            pingSelect.append(new Option("", ""));
+            $.each(data.ping, function (index, value) {
+                let option = new Option(value, value);
+                pingSelect.append(option);
+            });
+        }
+    }
+
+    $.each(data.pinged, function(index, pinged) {
+        $(`.player[data-player='${pinged}']`).find(".pinged").removeClass("d-none");
+    });
 
     // Render hand
     if (data.hand !== null) {

@@ -25,7 +25,7 @@
             <h6 class="d-flex justify-content-between align-items-center mb-0 lh-base">
                 <span class="fw-bold">
                     <span><%= player %></span>
-                    <c:if test="<%= game.isPinged(player) %>"><i class='bi-exclamation-triangle ms-2'></i></c:if>
+                    <i class='bi-exclamation-triangle ms-2 pinged d-none'></i>
                 </span>
                 <c:if test="<%= edge %>">
                     <span class="badge text-bg-light border border-secondary fw-bold align-items-center d-flex gap-1">

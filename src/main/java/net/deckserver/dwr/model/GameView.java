@@ -83,17 +83,19 @@ public class GameView {
         int refresh = admin.getRefreshInterval(gameName);
 
         List<String> ping;
+        List<String> pinged;
         String hand = null;
         String globalNotes = null;
         String privateNotes = null;
         String label;
-        String[] turn = null;
-        String[] turns = null;
+        List<String> turn = new ArrayList<>();
+        List<String> turns = new ArrayList<>();
         String state = null;
-        String[] phases = null;
+        List<String> phases = new ArrayList<>();
         String currentPlayer = game.getActivePlayer();
 
         ping = game.getPingList();
+        pinged = admin.getPings(gameName);
 
         if (isPlayer && stateChanged) {
             try {
@@ -119,16 +121,15 @@ public class GameView {
         String phase = game.getPhase();
 
         if (!chats.isEmpty()) {
-            turn = chats.toArray(new String[0]);
+            turn.addAll(chats);
             chats.clear();
         }
 
         if (turnChanged) {
             resetChat = true;
-            String[] tmpturns = game.getTurns();
-            turns = new String[tmpturns.length];
-            for (int i = 0, j = turns.length; i < turns.length; i++)
-                turns[i] = tmpturns[--j];
+            String[] gameTurns = game.getTurns();
+            for (int j = gameTurns.length; j > 0;)
+                turns.add(gameTurns[--j]);
         }
 
         if (stateChanged) {
@@ -144,14 +145,12 @@ public class GameView {
 
         if (phaseChanged) {
             boolean show = false;
-            Collection<String> c = new ArrayList<>();
             for (int i = 0; i < JolGame.TURN_PHASES.length; i++) {
                 if (phase.equals(JolGame.TURN_PHASES[i]))
                     show = true;
                 if (show)
-                    c.add(JolGame.TURN_PHASES[i]);
+                    phases.add(JolGame.TURN_PHASES[i]);
             }
-            phases = c.toArray(new String[0]);
         }
 
         boolean chatReset = resetChat;
@@ -160,7 +159,7 @@ public class GameView {
         String stamp = JolAdmin.getDate();
         int logLength = game.getActions().length;
         return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, globalNotes, privateNotes, label, phase,
-                chatReset, tc, turn, turns, state, phases, ping, stamp, gameName, logLength, currentPlayer);
+                chatReset, tc, turn, turns, state, phases, ping, pinged, stamp, gameName, logLength, currentPlayer);
     }
 
     public synchronized void clearAccess() {

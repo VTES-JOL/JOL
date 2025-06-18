@@ -1049,6 +1049,13 @@ public class JolAdmin {
         return games.get(gameName).getOwner().equals(playerName);
     }
 
+    public List<String> getPings(String gameName) {
+        return timestamps.getGameTimestamps().get(gameName).getPlayerPings().entrySet().stream()
+                .filter(Map.Entry::getValue)
+                .map(Map.Entry::getKey)
+                .toList();
+    }
+
     private void loadProperties() {
         properties = new Properties();
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
