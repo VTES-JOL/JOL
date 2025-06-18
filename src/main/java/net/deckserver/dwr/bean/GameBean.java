@@ -8,30 +8,33 @@ import java.util.List;
 public class GameBean {
 
     private final List<String> ping;
-    private int refresh = -1;
-    private String hand;
-    private String globalNotes;
-    private String privateNotes;
-    private String label;
-    private String phase;
-    private String[] turn;
-    private String[] turns;
-    private String state;
-    private String[] phases;
-    private boolean resetChat;
-    private boolean turnChanged;
-    private boolean player;
-    private boolean admin;
-    private boolean judge;
-    private String stamp;
-    private String name;
-    private int logLength;
-    private String currentPlayer;
+    private final List<String> pinged;
+    private final int refresh;;
+    private final String hand;
+    private final String globalNotes;
+    private final String privateNotes;
+    private final String label;
+    private final String phase;
+    private final List<String> turn;
+    private final List<String> turns;
+    private final String state;
+    private final List<String> phases;
+    private final boolean resetChat;
+    private final boolean turnChanged;
+    private final boolean player;
+    private final boolean admin;
+    private final boolean judge;
+    private final String stamp;
+    private final String name;
+    private final int logLength;
+    private final String currentPlayer;
 
     public GameBean(boolean isPlayer, boolean isAdmin, boolean isJudge, int refresh, String hand, String globalNotes, String privateNotes,
-                    String label, String phase, boolean resetChat, boolean turnChanged, String[] turn, String[] turns, String state, String[] phases,
-                    List<String> ping, String stamp, String name, int logLength, String currentPlayer) {
-        this(ping, refresh);
+                    String label, String phase, boolean resetChat, boolean turnChanged, List<String> turn, List<String> turns, String state, List<String> phases,
+                    List<String> ping, List<String> pinged, String stamp, String name, int logLength, String currentPlayer) {
+        this.ping = ping;
+        this.pinged = pinged;
+        this.refresh = refresh;
         this.player = isPlayer;
         this.admin = isAdmin;
         this.judge = isJudge;
@@ -52,8 +55,4 @@ public class GameBean {
         this.currentPlayer = currentPlayer;
     }
 
-    public GameBean(List<String> ping, int refresh) {
-        this.ping = ping;
-        this.refresh = refresh;
-    }
 }

@@ -26,7 +26,8 @@ public class AdminPageBean {
                 .map(PlayerActivityStatus::new)
                 .sorted(Comparator.comparing(PlayerActivityStatus::getName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
-        OffsetDateTime currentYear = OffsetDateTime.of(OffsetDateTime.now().getYear(), 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        OffsetDateTime currentYear = OffsetDateTime.now().minusYears(1);
+        OffsetDateTime currentMonth = OffsetDateTime.now().minusMonths(1);
         this.userRoles = currentPlayers.stream()
                 .map(UserSummaryBean::new)
                 .filter(UserSummaryBean::isSpecialUser)
@@ -38,7 +39,7 @@ public class AdminPageBean {
                 .filter(playerActivityStatus -> playerActivityStatus.getActiveGamesCount() == 0)
                 .collect(Collectors.toList());
         this.substitutes = playerActivityStatuses.stream()
-                .filter(playerActivityStatus -> playerActivityStatus.online().isAfter(currentYear))
+                .filter(playerActivityStatus -> playerActivityStatus.online().isAfter(currentMonth))
                 .map(PlayerActivityStatus::getName)
                 .collect(Collectors.toList());
         this.games = admin.getGames().stream()
@@ -47,7 +48,7 @@ public class AdminPageBean {
                 .collect(Collectors.toList());
         this.idleGames = this.games.stream()
                 .map(GameActivityStatus::new)
-                .filter(gameActivityStatus -> gameActivityStatus.timestamp().isBefore(OffsetDateTime.now().minusMonths(1)))
+                .filter(gameActivityStatus -> gameActivityStatus.timestamp().isBefore(currentMonth))
                 .sorted(Comparator.comparing(GameActivityStatus::timestamp))
                 .collect(Collectors.toList());
     }
