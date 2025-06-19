@@ -4,6 +4,7 @@ import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.CardContainer;
 import net.deckserver.game.interfaces.state.Game;
 import net.deckserver.game.interfaces.state.Location;
+import net.deckserver.game.storage.state.RegionType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,8 +35,8 @@ public class DsGame extends DsNoteTaker implements Game {
         players.addAll(newPlayers);
     }
 
-    public void addLocation(String player, String regionName) {
-        DsLocation l = new DsLocation(regionName, this);
+    public void addLocation(String player, RegionType region) {
+        DsLocation l = new DsLocation(region.xmlLabel(), this);
         l.setOwner(player);
         Player p = getPlayer(player);
         p.locs.add(l);
@@ -58,23 +59,15 @@ public class DsGame extends DsNoteTaker implements Game {
         return p.locs.toArray(new Location[0]);
     }
 
-    public Location getPlayerLocation(String player, String regionName) {
+    public Location getPlayerLocation(String player, RegionType region) {
         Player p = getPlayer(player);
         for (DsLocation l : p.locs) {
-            if (l.getName().equals(regionName)) return l;
-        }
-        return null;
-    }
-
-    public Location getLocation(String regionName) {
-        for (DsLocation l : regions) {
-            if (l.getName().equals(regionName)) return l;
+            if (l.getName().equals(region.xmlLabel())) return l;
         }
         return null;
     }
 
     public String getPlayerRegionName(Location location) {
-        if (regions.contains(location)) return null;
         return location.getName();
     }
 

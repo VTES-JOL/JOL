@@ -4,6 +4,7 @@
 <%@ page import="net.deckserver.storage.json.cards.CardSummary" %>
 <%@ page import="net.deckserver.game.storage.cards.CardSearch" %>
 <%@ page import="java.util.List" %>
+<%@ page import="net.deckserver.game.interfaces.state.Card" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
@@ -13,7 +14,8 @@
     String index = request.getParameter("index");
     RegionType region = RegionType.valueOf(request.getParameter("region"));
     boolean visible = Boolean.parseBoolean(request.getParameter("visible"));
-    CardDetail cardDetail = game.getCard(id);
+    Card card = game.getCard(id);
+    CardDetail cardDetail = game.getDetail(card);
     CardSummary cardSummary = CardSearch.INSTANCE.get(cardDetail.getCardId());
     String typeClass = cardSummary.getTypeClass();
     String label = cardDetail.getLabel();

@@ -1,6 +1,5 @@
 package net.deckserver.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.rest.commands.CreateGameCommand;

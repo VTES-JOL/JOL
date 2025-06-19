@@ -3,7 +3,6 @@ package net.deckserver.game.jaxb.state;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import javax.xml.bind.annotation.*;
 

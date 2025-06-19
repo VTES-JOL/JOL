@@ -1209,8 +1209,9 @@ function addCardTooltips(parent) {
 
 function regionCommands(event, tag) {
     let regionModal = $("#regionModal");
-    regionModal.find(".loaded").hide();
-    regionModal.find(".loading").show();
+    let content = $("#" + tag + "-notes").html();
+    $("#region-modal-body").html(content);
+    addCardTooltips("#region-modal-body");
     regionModal.modal('show');
 }
 

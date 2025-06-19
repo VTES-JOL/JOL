@@ -1,10 +1,7 @@
 package net.deckserver.storage.json.game;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Data;
-import lombok.Setter;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;

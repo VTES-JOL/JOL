@@ -6,7 +6,7 @@
     JolGame game = (JolGame) request.getAttribute("game");
     String player = (String) request.getAttribute("player");
     String viewer = (String) request.getAttribute("viewer");
-    Card[] cards = game.getState().getPlayerLocation(player, RegionType.HAND.xmlLabel()).getCards();
+    Card[] cards = game.getState().getPlayerLocation(player, RegionType.HAND).getCards();
 %>
 <c:forEach items="<%= cards %>" var="card" varStatus="counter">
     <jsp:include page="card-simple.jsp">

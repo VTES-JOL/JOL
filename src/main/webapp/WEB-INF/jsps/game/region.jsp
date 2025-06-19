@@ -20,11 +20,12 @@
     String collapsed = startCollapsed ? "collapsed" : "";
     String regionStyle = region == RegionType.TORPOR ? "bg-danger-subtle" : (region == RegionType.READY ? "bg-success-subtle" : "bg-body-secondary");
     int size = game.getSize(player, region);
-    Card[] cards = game.getState().getPlayerLocation(player, region.xmlLabel()).getCards();
+    Card[] cards = game.getState().getPlayerLocation(player, region).getCards();
     String regionName = region.xmlLabel().split(" ")[0];
 %>
 
 <c:if test="<%= cards.length > 0 %>">
+    <div id="<%= regionId %>-notes" class="d-none"><%= game.getRegionNotes(player, region, viewer) %></div>
     <div class="mb-2 text-bg-light" data-region="<%= regionName %>">
         <div class="p-2 d-flex justify-content-between align-items-center <%= regionStyle %>">
             <span>
@@ -35,7 +36,7 @@
                 <span class="fw-bold"><%= label %></span>
                 <span>( <%= size %> )</span>
             </span>
-            <button class="btn btn-sm p-0" onclick="regionCommands(event, '<%= regionId %>')">
+            <button class="btn btn-sm p-0 d-none" onclick="regionCommands(event, '<%= regionId %>')">
                 <i class="fs-6 bi bi-info-circle"></i>
             </button>
         </div>

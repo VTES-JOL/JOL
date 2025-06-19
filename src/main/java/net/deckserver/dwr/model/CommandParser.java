@@ -2,12 +2,12 @@ package net.deckserver.dwr.model;
 
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.Location;
+import net.deckserver.game.storage.state.RegionType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Pattern;
 
@@ -42,32 +42,15 @@ class CommandParser {
         return args[ind].split("\\.");
     }
 
-    String getRegion(String defaultRegion) throws CommandException {
+    RegionType getRegion(RegionType defaultRegion) {
         if (!hasMoreArgs()) return defaultRegion;
         String arg = args[ind++].toLowerCase();
-        logger.trace("Attempting to get region {}", arg);
-        if (JolGame.RFG.startsWith(arg))
-            return JolGame.RFG;
-        if (JolGame.READY_REGION.startsWith(arg))
-            return JolGame.READY_REGION;
-        if (JolGame.INACTIVE_REGION.startsWith(arg))
-            return JolGame.INACTIVE_REGION;
-        if (JolGame.UNCONTROLLED_REGION.startsWith(arg))
-            return JolGame.INACTIVE_REGION;
-        if (JolGame.ASH_HEAP.startsWith(arg))
-            return JolGame.ASH_HEAP;
-        if (JolGame.HAND.startsWith(arg))
-            return JolGame.HAND;
-        if (JolGame.LIBRARY.startsWith(arg))
-            return JolGame.LIBRARY;
-        if (JolGame.CRYPT.startsWith(arg))
-            return JolGame.CRYPT;
-        if (JolGame.TORPOR.startsWith(arg))
-            return JolGame.TORPOR;
-        if (JolGame.RESEARCH.startsWith(arg))
-            return JolGame.RESEARCH;
-        ind--;
-        return defaultRegion;
+        RegionType results = RegionType.startsWith(arg);
+        if (results == null) {
+            ind--;
+            return defaultRegion;
+        }
+        return results;
     }
 
     /*
@@ -137,7 +120,7 @@ class CommandParser {
 
     }
 
-    String findCard(boolean greedy, boolean allowRandom, String player, String region) throws CommandException {
+    Card findCard(boolean greedy, boolean allowRandom, String player, RegionType region) throws CommandException {
         Location location = game.getState().getPlayerLocation(player, region);
         Card[] cards = location.getCards();
         Card targetCard = null;
@@ -168,10 +151,10 @@ class CommandParser {
         if (targetCard == null && greedy) {
             throw new CommandException("Invalid card position.");
         }
-        return Optional.ofNullable(targetCard).map(Card::getId).orElse(null);
+        return targetCard;
     }
 
-    String findCard(boolean allowRandom, String player, String region) throws CommandException {
+    Card findCard(boolean allowRandom, String player, RegionType region) throws CommandException {
         return findCard(true, allowRandom, player, region);
     }
 
