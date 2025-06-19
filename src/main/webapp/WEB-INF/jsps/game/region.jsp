@@ -36,7 +36,7 @@
                 <span class="fw-bold"><%= label %></span>
                 <span>( <%= size %> )</span>
             </span>
-            <button class="btn btn-sm p-0" onclick="regionCommands(event, '<%= regionId %>')">
+            <button class="btn btn-sm p-0 d-none" onclick="regionCommands(event, '<%= regionId %>')">
                 <i class="fs-6 bi bi-info-circle"></i>
             </button>
         </div>
