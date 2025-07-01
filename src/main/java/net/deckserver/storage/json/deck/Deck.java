@@ -12,4 +12,5 @@ public class Deck {
     private Crypt crypt = new Crypt();
     private Library library = new Library();
     private String comments;
+    private String player;
 }

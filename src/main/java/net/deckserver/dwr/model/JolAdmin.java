@@ -1056,6 +1056,10 @@ public class JolAdmin {
                 .toList();
     }
 
+    public String getPlayerId(String playerName) {
+        return players.get(playerName).getId();
+    }
+
     private void loadProperties() {
         properties = new Properties();
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
