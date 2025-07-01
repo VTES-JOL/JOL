@@ -282,9 +282,11 @@ function callbackLobby(data) {
         let expiry = created.add(5, 'days');
         let gameItem = $("<li/>").addClass("list-group-item");
         let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
-        let gameName = $("<h6/>").addClass("d-inline").text(game.name);
+        let gameName = $("<h6/>").addClass("mx-2 d-inline").text(game.name);
+        let format = $("<span/>").addClass("badge bg-secondary").text(game.format);
         let expiryText = $("<span/>").text("Closes " + moment().to(expiry));
         let buttonWrapper = $("<span/>").addClass("d-flex justify-content-between align-items-center gap-1");
+        let nameWrapper = $("<span/>");
         let joinButton = createButton({
             class: "btn btn-outline-secondary btn-sm",
             text: "Join",
@@ -292,7 +294,8 @@ function callbackLobby(data) {
         }, DS.invitePlayer, game.name, player);
 
         buttonWrapper.append(expiryText, joinButton);
-        gameHeader.append(gameName, buttonWrapper);
+        nameWrapper.append(format, gameName);
+        gameHeader.append(nameWrapper, buttonWrapper);
         gameItem.append(gameHeader);
         publicGames.append(gameItem);
         if (game.registrations.length > 0)
@@ -330,13 +333,12 @@ function callbackLobby(data) {
     $.each(data.invitedGames, function (index, game) {
         let gameItem = $("<li/>").addClass("list-group-item");
         let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
-        let gameName = $("<span/>").text(game.gameName);
-        let deckSummary = $("<span/>").text(game.deckSummary);
-        if (game.registered && !game.valid) {
-            let errorMessage = $("<span/>").addClass("label label-warning left-margin").text("Invalid");
-            deckSummary.append(errorMessage);
-        }
-        gameHeader.append(gameName, deckSummary);
+        let nameHeader = $("<span/>");
+        let gameName = $("<span/>").addClass("mx-2").text(game.gameName);
+        let gameFormat = $("<span/>").addClass("badge bg-secondary").text(game.format);
+        let deckName = $("<span/>").text(game.deckName);
+        nameHeader.append(gameFormat, gameName);
+        gameHeader.append(nameHeader, deckName);
         gameItem.append(gameHeader);
         invitedGames.append(gameItem);
         invitedGamesList.append(new Option(game.gameName, game.gameName));
@@ -449,16 +451,19 @@ function callbackShowDecks(data) {
         const deckName = $("<span/>").text(deck.name).click(function () {
             DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
         });
-        const formatLabel = $("<span/>").text(deck.deckFormat).addClass("badge");
-        let formatStyle = deck.deckFormat === "MODERN" ? "text-bg-secondary" : "text-bg-warning";
-        formatLabel.addClass(formatStyle)
+        const tagWrapper = $("<span/>");
+        $.each(deck.tags, function(i, tag) {
+            const tagLabel = $("<span/>").text(tag).addClass("badge mx-1");
+            tagLabel.addClass("text-bg-secondary")
+            tagWrapper.append(tagLabel);
+        })
         const deleteButton = $("<button/>").addClass("btn btn-sm btn-outline-secondary border p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
             if (confirm("Delete deck?")) {
                 DS.deleteDeck(deck.name, {callback: processData, errorHandler: errorhandler});
             }
             event.stopPropagation();
         });
-        let wrapper = $("<span/>").addClass("d-flex gap-1 align-items-center").append(formatLabel, deleteButton);
+        let wrapper = $("<span/>").addClass("d-flex gap-1 align-items-center").append(tagWrapper, deleteButton);
         deckCell.append(deckName, wrapper);
         deckRow.append(deckCell);
         decks.append(deckRow);
@@ -469,19 +474,15 @@ function callbackShowDecks(data) {
     const deckSummary = $("#deckSummary");
     const deckName = $("#deckName");
     if (data.selectedDeck) {
-        deckText.val(data.selectedDeck.contents);
+        deckText.val(data.contents);
         deckSummary.empty();
-        deckSummary.append($("<span/>").text(data.selectedDeck.details['stats']['summary']));
-        deckName.val(data.selectedDeck.details.deck['name']);
-        let validSpan = $("<span/>").addClass("badge badge-sm");
-        if (data.selectedDeck.details['stats']['valid']) {
-            validSpan.text("VALID").addClass("text-bg-success")
-        } else {
-            validSpan.text("INVALID").addClass("text-bg-warning");
-        }
-        deckSummary.append(validSpan);
-        deckErrors.html(data.selectedDeck.details.deck.comments.replace(/\n/g, "<br/>"));
-        renderDeck(data.selectedDeck.details.deck, "#deckPreview");
+        deckErrors.empty();
+        deckSummary.append($("<span/>").text(data.selectedDeck['stats']['summary']));
+        deckName.val(data.selectedDeck['deck']['name']);
+        $.each(data.selectedDeck.errors, function(i, error) {
+            deckErrors.append(error.replace(/\n/g), "<br/>");
+        })
+        renderDeck(data.selectedDeck.deck, "#deckPreview");
         addCardTooltips("#deckPreview");
     } else {
         deckText.val("");
@@ -554,9 +555,13 @@ function newDeck() {
 function saveDeck() {
     const deckName = $("#deckName").val();
     const contents = $("#deckText").val();
-    if (confirm("Saving a deck will remove all lines with errors.  Are you sure?")) {
-        DS.saveDeck(deckName, contents, {callback: processData, errorHandler: errorhandler});
-    }
+    DS.saveDeck(deckName, contents, {callback: processData, errorHandler: errorhandler});
+}
+
+function validate() {
+    const contents = $("#deckText").val();
+    const validator = $("#validatorFormat").val();
+    DS.validate(contents, validator, {callback: processData, errorHandler: errorhandler})
 }
 
 function toggleVisible(s, h) {
@@ -844,7 +849,8 @@ function renderPastGames(history) {
                 playerRow.addClass("border-top")
             }
             let playerName = $("<td/>").text(value.playerName);
-            let deckName = $("<td/>").text(value.deckName);
+            let nameString = value.deckName.length > 50 ? (value.deckName.substring(0, 50) + "...") : value.deckName;
+            let deckName = $("<td/>").text(nameString);
             let score = $("<td/>").text((value.victoryPoints !== "0" ? value.victoryPoints + " VP" : "") + (value.gameWin ? ", 1 GW" : ""));
             playerRow.append(playerName, deckName, score);
             pastGames.append(playerRow);
@@ -891,15 +897,15 @@ function registerDeck() {
 
 function doCreateGame() {
     let newGameDiv = $("#newGameName");
-    let isPublic = $("#publicFlag");
+    let publicFlag = $("#publicFlag").val();
     let gameName = newGameDiv.val();
+    let format = $("#gameFormat").val();
     if (gameName.indexOf("\'") > -1 || gameName.indexOf("\"") > -1) {
         alert("Game name can not contain \' or \" characters in it");
         return;
     }
-    DS.createGame(gameName, isPublic.prop('checked'), {callback: processData, errorHandler: errorhandler});
+    DS.createGame(gameName, publicFlag, format, {callback: processData, errorHandler: errorhandler});
     newGameDiv.val('');
-    isPublic.prop('checked', false);
 }
 
 function updateMessage() {

@@ -22,6 +22,14 @@ public class Utils {
         return Optional.ofNullable(results.get(false));
     }
 
+    static Set<String> getSets(String source) {
+        List<String> setDetails = split(source, ",").orElse(new ArrayList<>());
+        return setDetails.stream()
+                .map(String::trim)
+                .map(s -> s.split(":")[0])
+                .collect(Collectors.toSet());
+    }
+
     static Optional<String> getClean(String source) {
         String cleaned = clean(source);
         return cleaned.isEmpty() ? Optional.empty() : Optional.of(cleaned);

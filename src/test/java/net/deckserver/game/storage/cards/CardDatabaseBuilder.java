@@ -68,6 +68,7 @@ public class CardDatabaseBuilder {
                 summaryCard.setMultiMode(null);
                 summaryCard.setPreamble(null);
                 summaryCard.setDoNotReplace(null);
+                summaryCard.setCost(null);
             }
         } catch (IOException e) {
             logger.error("Unable to write file", e);

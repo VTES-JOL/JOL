@@ -13,6 +13,7 @@ import net.deckserver.game.interfaces.turn.GameAction;
 import net.deckserver.game.interfaces.turn.TurnRecorder;
 import net.deckserver.game.jaxb.state.Notation;
 import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.game.storage.cards.Path;
 import net.deckserver.game.storage.state.RegionType;
 import net.deckserver.game.ui.state.CardDetail;
 import net.deckserver.game.ui.state.DsGame;
@@ -37,6 +38,8 @@ public class JolGame {
     private static final String DISCIPLINES = "disciplines";
     private static final String TEXT = "text";
     private static final String VOTES = "votes";
+    private static final String SECT = "sect";
+    private static final String PATH = "path";
     private static final String ACTIVE = "active meth";
     private static final String POOL = "pool";
     private static final String EDGE = "edge";
@@ -209,9 +212,31 @@ public class JolGame {
             setVotes(card, votes, true);
             votesText = ", votes: " + votes;
         }
+        // Do sect
+        String sect = cardSummary.getSect();
+        setSect(player, card, sect, true);
+        // Do path
+        Path path = Path.of(cardSummary.getPath());
+        if (path != null) {
+            setPath(player, card, path, true);
+        }
         source.removeCard(card);
         dest.addCard(card, true);
         addCommand(String.format("%s influences out %s%s%s.", player, getCardLink(card), capacityText, votesText), new String[]{"influence", card.getId(), destPlayer, destRegion.xmlLabel()});
+    }
+
+    public void setSect(String player, Card card, String sect, boolean quiet) {
+        setNotation(card, SECT, sect);
+        if (!quiet) {
+            addCommand(String.format("%s changes sect of %s to %s", player, getCardLink(card), sect), new String[]{"sect", card.getId(), sect});
+        }
+    }
+
+    public void setPath(String player, Card card, Path path, boolean quiet) {
+        setNotation(card, PATH, path.toString());
+        if (!quiet) {
+            addCommand(String.format("%s changes path of %s to %s", player, getCardLink(card), path), new String[]{"path", card.getId(), path.getDescription()});
+        }
     }
 
     public void shuffle(String player, RegionType region, int num) {
@@ -314,6 +339,10 @@ public class JolGame {
         return getNotation(state, ACTIVE, "");
     }
 
+    private void setActivePlayer(String player) {
+        setNotation(state, ACTIVE, player);
+    }
+
     public void show(String player, RegionType targetRegion, int amount, List<String> recipients) {
         Location location = getState().getPlayerLocation(player, targetRegion);
         Card[] cards = location.getCards();
@@ -334,10 +363,6 @@ public class JolGame {
             setRegionNotes(location, recipient, notes.toString());
         }
         addMessage(message);
-    }
-
-    private void setActivePlayer(String player) {
-        setNotation(state, ACTIVE, player);
     }
 
     public String getPredatorOf(String player) {

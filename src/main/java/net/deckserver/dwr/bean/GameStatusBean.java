@@ -22,6 +22,7 @@ public class GameStatusBean {
     private final List<RegistrationStatus> registrations;
     private final Map<String, PlayerStatus> players;
     private final OffsetDateTime created;
+    private final String format;
     private final String activePlayer;
     private final String predator;
     private final String prey;
@@ -30,6 +31,7 @@ public class GameStatusBean {
     public GameStatusBean(String gameName) {
         JolAdmin admin = JolAdmin.INSTANCE;
         this.name = gameName;
+        this.format = admin.getFormat(gameName);
         if (admin.isActive(gameName)) {
             this.gameStatus = "Active";
             registrations = Collections.emptyList();

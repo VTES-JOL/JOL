@@ -1,7 +1,10 @@
 package net.deckserver.dwr.model;
 
 import lombok.Getter;
+import lombok.Setter;
+import net.deckserver.DeckParser;
 import net.deckserver.dwr.bean.ChatEntryBean;
+import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.system.DeckFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +21,14 @@ public class PlayerModel {
     private String game = null;
     @Getter
     private String view;
-    private String deckName;
-    private String contents;
+    @Setter
     private String message;
+    @Getter
+    @Setter
+    private ExtendedDeck deck;
+    @Getter
+    @Setter
+    private String contents;
 
     public PlayerModel(String name, boolean loadChat) {
         this.player = name;
@@ -85,40 +93,26 @@ public class PlayerModel {
     public void loadDeck(String deckName) {
         JolAdmin admin = JolAdmin.INSTANCE;
         try {
-            this.deckName = deckName;
             String deckId = admin.getDeckId(player, deckName);
             DeckFormat deckFormat = admin.getDeckFormat(player, deckName);
             if (deckFormat.equals(DeckFormat.LEGACY)) {
-                this.contents = admin.getLegacyContents(deckId).trim();
+               this.contents = admin.getLegacyContents(deckId).trim();
+               this.deck = DeckParser.parseDeck(contents);
             } else {
                 this.contents = admin.getDeckContents(deckId).trim();
+                this.deck = admin.getDeck(deckId);
             }
+            this.deck.getDeck().setName(deckName);
         } catch (IOException e) {
             logger.error("Unable to set deck", e);
-            this.deckName = null;
+            this.deck = null;
             this.contents = null;
         }
     }
 
     public void clearDeck() {
-        this.deckName = null;
+        this.deck = null;
         this.contents = null;
-    }
-
-    public String getContents() {
-        return contents;
-    }
-
-    public void setContents(String contents) {
-        this.contents = contents;
-    }
-
-    public String getDeckName() {
-        return deckName;
-    }
-
-    public void setDeckName(String deckName) {
-        this.deckName = deckName;
     }
 
     public String getMessage() {
@@ -127,7 +121,4 @@ public class PlayerModel {
         return result;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

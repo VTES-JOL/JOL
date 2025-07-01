@@ -24,6 +24,7 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
     private static final int FIELD_CAPACITY = 7;
     private static final int FIELD_DISCIPLINES = 8;
     private static final int FIELD_TEXT = 9;
+    private static final int FIELD_SET = 10;
     private static final int FIELD_TITLE = 11;
     private static final int FIELD_BANNED = 12;
     Predicate<? super String> uniqueFilter = (text) -> text.contains("are not unique") || text.contains("non-unique");
@@ -63,6 +64,7 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
         Utils.getClean(lineData[FIELD_TITLE]).ifPresent(card::setTitle);
 
         Utils.getClean(lineData[FIELD_BANNED]).map(banned -> !banned.isEmpty()).ifPresent(card::setBanned);
+        Utils.getClean(lineData[FIELD_SET]).map(Utils::getSets).ifPresent(card::setSets);
 
         card.setSect(determineSect(card.getClan(), card.getText()));
         Optional.ofNullable(card.getTitle()).map(this::determineVotes).ifPresent(card::setVotes);

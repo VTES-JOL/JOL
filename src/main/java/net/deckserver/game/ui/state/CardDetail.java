@@ -4,12 +4,14 @@ import lombok.Data;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.storage.state.RegionType;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
 @Data
-public class CardDetail {
+public class CardDetail implements Serializable {
     private String id;
     private String name;
     private String cardId;
@@ -33,6 +35,13 @@ public class CardDetail {
         this.name = card.getName();
         this.cardId = card.getCardId();
         this.owner = card.getOwner();
+    }
+
+    public CardDetail(String id, String name, String cardId, String owner) {
+        this.id = id;
+        this.name = name;
+        this.cardId = cardId;
+        this.owner = owner;
     }
 
     public String buildAttributes(RegionType region, String index, boolean visible) {

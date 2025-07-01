@@ -4,6 +4,7 @@ import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.rest.commands.CreateGameCommand;
 import net.deckserver.storage.json.cards.CardSummary;
+import net.deckserver.storage.json.system.GameFormat;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +51,7 @@ public class ApiResource {
     @Path("/game")
     @Consumes("application/json")
     public void createGame(CreateGameCommand createGameCommand, @Context Principal principal) {
-        admin.createGame(createGameCommand.getGameName(), createGameCommand.isPublic(), principal.getName());
+        admin.createGame(createGameCommand.getGameName(), createGameCommand.isPublic(), GameFormat.from(createGameCommand.getFormat()), principal.getName());
     }
 
     @GET

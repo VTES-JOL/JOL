@@ -18,6 +18,7 @@ public class LibraryCard {
     private String displayName;
     private Set<String> names;
     private Set<String> partials;
+    private Set<String> sets;
 
     private boolean unique;
 

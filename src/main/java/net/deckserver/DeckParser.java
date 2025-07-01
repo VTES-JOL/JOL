@@ -41,8 +41,8 @@ public class DeckParser {
         List<CardCount> cardCounts = contents.lines()
                 .map(DeckParser::parseLine)
                 .flatMap(Optional::stream)
-                .collect(Collectors.toList());
-        List<CardCount> foundCards = cardCounts.stream().filter(FOUND_CARD).collect(Collectors.toList());
+                .toList();
+        List<CardCount> foundCards = cardCounts.stream().filter(FOUND_CARD).toList();
         List<CardCount> cryptCards = foundCards.stream().filter(IS_CRYPT)
                 .collect(collectingAndThen(groupingBy(CardCount::getId, reducing(CARD_MERGE)), CARD_MAPPER));
         int cryptCount = cryptCards.stream().map(CardCount::getCount).reduce(0, Integer::sum);
@@ -69,7 +69,6 @@ public class DeckParser {
         deck.setLibrary(library);
 
         List<String> errors = cardCounts.stream().filter(FOUND_CARD.negate()).map(CardCount::getComments).map(String::trim).collect(Collectors.toList());
-        deck.setComments(String.join("\n", errors));
 
         Set<String> groups = new HashSet<>();
         boolean hasBannedCards = false;
@@ -92,10 +91,9 @@ public class DeckParser {
                 }
             }
         }
-        boolean valid = cryptCount >= 12 && libraryCount >= 60 && libraryCount <= 90 && validGroups(groups);
-        DeckStats stats = new DeckStats(cryptCount, libraryCount, groups, valid, hasBannedCards);
+        DeckStats stats = new DeckStats(cryptCount, libraryCount, groups, hasBannedCards);
         logger.debug("Parsed deck with {} errors, {} crypt, and {} library", errors.size(), cryptCount, libraryCount);
-        return new ExtendedDeck(deck, stats);
+        return new ExtendedDeck(deck, stats, errors);
     }
 
     private static Optional<CardCount> parseLine(String deckLine) throws IllegalArgumentException {
@@ -145,19 +143,5 @@ public class DeckParser {
                 .replaceAll(EXTRA_SPACE_PATTERN.pattern(), " ")
                 .replaceAll("pentex subversion", "pentex(tm) subversion")
                 .trim();
-    }
-
-    private static boolean validGroups(Set<String> groups) {
-        if (groups.size() <= 1) {
-            return true;
-        } else if (groups.size() > 2) {
-            return false;
-        }
-        String[] groupsArray = groups.toArray(new String[0]);
-        // Get first group
-        Integer first = Integer.valueOf(groupsArray[0]);
-        // Is it within 1 group of second group
-        Integer second = Integer.valueOf(groupsArray[1]);
-        return (Math.abs(first - second) <= 1);
     }
 }

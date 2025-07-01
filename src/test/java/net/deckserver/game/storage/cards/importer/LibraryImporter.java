@@ -28,6 +28,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final int FIELD_CONVICTION_COST = 8;
     private static final int FIELD_BURN_OPTION = 9;
     private static final int FIELD_TEXT = 10;
+    private static final int FIELD_SET = 12;
     private static final int FIELD_BANNED = 13;
 
     private static final Function<String, Boolean> BURN_OPTION = (text) -> text.equals("Y") || text.equalsIgnoreCase("Yes");
@@ -74,6 +75,8 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         Utils.getClean(lineData[FIELD_BURN_OPTION]).map(BURN_OPTION).ifPresent(card::setBurnOption);
         Utils.getClean(lineData[FIELD_TEXT]).ifPresent(card::setText);
         Utils.getClean(lineData[FIELD_BANNED]).map(banned -> !banned.isEmpty()).ifPresent(card::setBanned);
+
+        Utils.getClean(lineData[FIELD_SET]).map(Utils::getSets).ifPresent(card::setSets);
 
         List<String> lines = new ArrayList<>(Arrays.asList(card.getText().split("\n")));
         List<String> preambleLines = new ArrayList<>(1);

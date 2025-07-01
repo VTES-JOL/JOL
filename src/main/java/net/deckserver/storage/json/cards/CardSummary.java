@@ -14,25 +14,17 @@ public class CardSummary {
 
     private String id;
     private String type;
-    private String htmlText;
-    private String originalText;
     private String displayName;
     private String name;
     private Set<String> names = new HashSet<>();
     private boolean crypt;
     private boolean unique;
-    private boolean burnOption;
     private String group;
     private String sect;
+    private String path;
     private List<String> clans = new ArrayList<>();
     private boolean banned;
-
-    //Library only
-    private String preamble;
-    private List<LibraryCardMode> modes;
-    private boolean doNotReplace;
-    private boolean multiMode;
-    private String cost;
+    private Set<String> sets = new HashSet<>();
 
     //Crypt only
     private Integer capacity;

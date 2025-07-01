@@ -2,6 +2,7 @@ package net.deckserver.dwr.bean;
 
 import lombok.Getter;
 import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.storage.json.system.DeckFormat;
 
 import java.util.Comparator;
 import java.util.List;
@@ -13,7 +14,7 @@ public class LobbyPageBean {
     private final List<String> players;
     private final List<GameStatusBean> myGames;
     private final List<GameStatusBean> publicGames;
-    private final List<RegistrationStatus> invitedGames;
+    private final List<GameInviteStatus> invitedGames;
     private final List<DeckInfoBean> decks;
     private final String message;
 
@@ -41,14 +42,13 @@ public class LobbyPageBean {
                 .filter(Objects::nonNull)
                 .filter(admin::isStarting)
                 .filter(gameName -> admin.isInGame(gameName, player))
-                .map(gameName -> new RegistrationStatus(gameName, player))
+                .map(gameName -> new GameInviteStatus(gameName, player))
                 .collect(Collectors.toList());
 
         decks = admin.getDeckNames(player).stream()
                 .filter(Objects::nonNull)
                 .map(deckName -> new DeckInfoBean(player, deckName))
-                .filter(deckInfoBean -> deckInfoBean.getDeckFormat().equals("MODERN"))
-                .filter(deckInfoBean -> admin.isValid(player, deckInfoBean.getName()))
+                .filter(deckInfoBean -> !deckInfoBean.getDeckFormat().equals(DeckFormat.LEGACY.toString()))
                 .sorted(Comparator.comparing(DeckInfoBean::getName, String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toList());
 

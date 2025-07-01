@@ -631,10 +631,10 @@ public class DoCommandTest {
         assertThat(game.getPrivateNotes("Player2"), is(""));
         worker.doCommand("Player3", "show library all");
         assertThat(game.getPrivateNotes("Player2"), not(is("")));
-        assertThat(getLastMessage(), containsString("Player3 shows everyone 81 cards of their library."));
+        assertThat(getLastMessage(), containsString("Player3 shows everyone 81 cards of their Library."));
         worker.doCommand("Player3", "show hand all");
         assertThat(game.getPrivateNotes("Player2"), not(is("")));
-        assertThat(getLastMessage(), containsString("Player3 shows everyone 7 cards of their hand."));
+        assertThat(getLastMessage(), containsString("Player3 shows everyone 7 cards of their Hand."));
     }
 
     @Test
@@ -642,7 +642,7 @@ public class DoCommandTest {
         assertThat(game.getPrivateNotes("Player4"), is(""));
         worker.doCommand("Player3", "show hand Player4 all");
         assertThat(game.getPrivateNotes("Player4"), not(is("")));
-        assertThat(getLastMessage(), containsString("Player3 shows Player4 7 cards of their hand."));
+        assertThat(getLastMessage(), containsString("Player3 shows Player4 7 cards of their Hand."));
     }
 
     @Test
@@ -650,7 +650,7 @@ public class DoCommandTest {
         assertThat(game.getPrivateNotes("Player3"), is(""));
         worker.doCommand("Player3", "show hand");
         assertThat(game.getPrivateNotes("Player3"), not(is("")));
-        assertThat(getLastMessage(), containsString("Player3 looks at 7 cards of their hand."));
+        assertThat(getLastMessage(), containsString("Player3 looks at 7 cards of their Hand."));
     }
 
     @Test

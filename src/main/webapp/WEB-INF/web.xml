@@ -26,6 +26,11 @@
         <jsp-file>/WEB-INF/help.jsp</jsp-file>
     </servlet>
 
+    <servlet>
+        <servlet-name>test</servlet-name>
+        <jsp-file>/WEB-INF/test.jsp</jsp-file>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>default</servlet-name>
         <url-pattern>/css/*</url-pattern>
@@ -37,6 +42,11 @@
     <servlet-mapping>
         <servlet-name>help</servlet-name>
         <url-pattern>/help</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>test</servlet-name>
+        <url-pattern>/test</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

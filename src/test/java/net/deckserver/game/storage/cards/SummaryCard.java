@@ -29,6 +29,7 @@ public class SummaryCard {
     private String sect;
     private List<String> clans;
     private boolean banned;
+    private Set<String> sets;
 
     //Library only
     private String preamble;
@@ -60,6 +61,7 @@ public class SummaryCard {
         this.title = cryptCard.getTitle();
         this.votes = cryptCard.getVotes();
         this.banned = cryptCard.isBanned();
+        this.sets = cryptCard.getSets();
         this.advanced = cryptCard.isAdvanced();
 
         List<String> cardLines = new ArrayList<>();
@@ -97,6 +99,7 @@ public class SummaryCard {
         this.unique = libraryCard.isUnique();
         Optional.ofNullable(libraryCard.getBurnOption()).ifPresent(burnOption -> this.burnOption = burnOption);
         this.banned = libraryCard.isBanned();
+        this.sets = libraryCard.getSets();
 
         this.preamble = libraryCard.getPreamble();
         this.modes = libraryCard.getModes();

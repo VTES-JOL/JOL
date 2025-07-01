@@ -25,7 +25,6 @@ public class TournamentBean {
         JolAdmin jolAdmin = JolAdmin.INSTANCE;
         this.idValid = !Strings.isNullOrEmpty(jolAdmin.getVeknID(player));
         this.decks = jolAdmin.getDeckNames(model.getPlayerName()).stream()
-                .filter(deckName -> jolAdmin.isValid(player, deckName))
                 .filter(deckName -> jolAdmin.getDeckFormat(player, deckName) == DeckFormat.MODERN)
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .collect(Collectors.toList());

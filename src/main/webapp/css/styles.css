@@ -8,9 +8,31 @@
     src: url('../fonts/vtes-clans.otf') format("opentype");
 }
 
+@font-face {
+    font-family: 'matrix';
+    src: url('../fonts/MatrixExtraBold.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Quorum Black';
+    src: url('../fonts/Quorum Black BT.ttf') format('truetype');
+}
+
 :root {
     --bs-body-font-size: 0.9rem;
     --bs-body-line-height: 1.3;
+}
+
+.ratio-7x10 {
+    --bs-aspect-ratio: calc(88 / 63 * 100%);
+    aspect-ratio: 63 / 88;
+    max-width: 20%;
+}
+
+.ratio-10x7 {
+    --bs-aspect-ratio: calc(63 / 88 * 100%);
+    aspect-ratio: 88 / 63;
+    max-width: 28%;
 }
 
 .tippy-content {
@@ -413,3 +435,9 @@ a.card-name {
 .icon.conviction:before {content: "¤";}
 .icon.burn:before {content: "~";}
 .icon.merge:before {content: "{";}
+
+.path {font-family: 'clans', sans-serif; font-size: 1.3em;}
+.path.caine:before {content: "#";}
+.path.cathari:before {content: "$";}
+.path.death:before {content: "%";}
+.path.power:before {content: "&";}

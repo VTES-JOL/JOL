@@ -26,13 +26,15 @@ import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.GameStatusBean;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
+import net.deckserver.game.validators.DeckValidator;
+import net.deckserver.game.validators.ValidationResult;
+import net.deckserver.game.validators.ValidatorFactory;
 import net.deckserver.jobs.CleanupGamesJob;
 import net.deckserver.jobs.PersistStateJob;
 import net.deckserver.jobs.PublicGamesBuilderJob;
 import net.deckserver.jobs.ValidateGWJob;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
-import net.deckserver.storage.json.deck.DeckStats;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.Timestamps;
 import net.deckserver.storage.json.system.*;
@@ -43,6 +45,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.math.RoundingMode;
 import java.net.URI;
@@ -84,6 +87,8 @@ public class JolAdmin {
     private static final Predicate<GameInfo> STARTING_GAME = (info) -> info.getStatus().equals(GameStatus.STARTING);
     private static final Predicate<GameInfo> PUBLIC_GAME = info -> info.getVisibility().equals(Visibility.PUBLIC);
     private static final Predicate<GameInfo> TEST_GAME = info -> info.getOwner().equals("TEST");
+    private static final Predicate<DeckInfo> MODERN_DECK = info -> DeckFormat.MODERN.equals(info.getFormat());
+    private static final Predicate<DeckInfo> NO_TAGS = info -> info.getTags().isEmpty();
     private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
     private static final DecimalFormat format = new DecimalFormat("0.#");
 
@@ -312,7 +317,7 @@ public class JolAdmin {
         long gamesNeeded = 5 - publicGamesCount;
         for (int x = 0; x < gamesNeeded; x++) {
             String gameName = RandomGameName.generateName();
-            createGame(gameName, true, "SYSTEM");
+            createGame(gameName, true, GameFormat.STANDARD, "SYSTEM");
             String message = String.format("New public game {%s} has been created.", gameName);
             chat("SYSTEM", message);
         }
@@ -344,12 +349,12 @@ public class JolAdmin {
         }
     }
 
-    public synchronized void createGame(String gameName, Boolean isPublic, String playerName) {
+    public synchronized void createGame(String gameName, Boolean isPublic, GameFormat format, String playerName) {
         logger.trace("Creating game {} for player {}", gameName, playerName);
         if (gameName.length() > 2 || notExistsGame(gameName)) {
             try {
                 String gameId = ULID.random();
-                games.put(gameName, new GameInfo(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), GameStatus.STARTING));
+                games.put(gameName, new GameInfo(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), GameStatus.STARTING, format));
                 Path gamePath = BASE_PATH.resolve("games").resolve(gameId);
                 Files.createDirectory(gamePath);
                 writeFile("games.json", games);
@@ -405,15 +410,45 @@ public class JolAdmin {
 
     public void validate() {
         logger.info("Validating game state");
+        List<String> invalidGames = new ArrayList<>();
         games.values().stream().filter(ACTIVE_GAME)
                 .forEach(gameInfo -> {
                     try {
                         loadGameState(gameInfo.getName());
                     } catch (Exception e) {
                         logger.error("Unable to validate game {}", gameInfo.getName());
+                        invalidGames.add(gameInfo.getName());
                     }
                 });
+        invalidGames.forEach(games::remove);
+        invalidGames.forEach(timestamps::clearGame);
+
+        logger.info("Validating deck state");
+        List<Table.Cell<String, String, DeckInfo>> invalidDecks = new ArrayList<>();
+        for (var cell : decks.cellSet()) {
+            DeckInfo deckInfo = cell.getValue();
+            String extension = DeckFormat.LEGACY.equals(deckInfo.getFormat()) ? "txt" : "json";
+            String deckFile = String.format("decks/%s.%s", deckInfo.getDeckId(), extension);
+            if (!Files.exists(BASE_PATH.resolve(deckFile))) {
+                logger.error("Unable to find deck {}", deckFile);
+                invalidDecks.add(cell);
+            }
+        }
+        invalidDecks.forEach(cell -> decks.remove(cell.getRowKey(), cell.getColumnKey()));
     }
+
+    public void upgrade() {
+        logger.info("Determining upgrades...");
+        decks.values().stream().filter(MODERN_DECK).filter(NO_TAGS)
+                .forEach(deckInfo -> {
+                    ExtendedDeck deck = getDeck(deckInfo.getDeckId());
+                    Set<String> tags = ValidatorFactory.getTags(deck.getDeck());
+                    deckInfo.setTags(tags);
+                    deckInfo.setFormat(DeckFormat.TAGGED);
+                    logger.info("Upgrading {} to {} with {} tags", deckInfo.getDeckId(), deckInfo.getFormat(), tags);
+                });
+    }
+
 
     public String getVersion() {
         return properties.getProperty("version");
@@ -429,6 +464,10 @@ public class JolAdmin {
 
     public DeckFormat getDeckFormat(String playerName, String deckName) {
         return loadDeckInfo(playerName, deckName).getFormat();
+    }
+
+    public Set<String> getTags(String playerName, String deckName) {
+        return loadDeckInfo(playerName, deckName).getTags();
     }
 
     public Deck getGameDeck(String gameName, String playerName) {
@@ -462,13 +501,6 @@ public class JolAdmin {
         }
     }
 
-    public void parseDeck(String playerName, String deckName, String contents) {
-        if (playerName != null && contents != null) {
-            getPlayerModel(playerName).setContents(contents);
-            getPlayerModel(playerName).setDeckName(deckName);
-        }
-    }
-
     public void newDeck(String playerName) {
         if (playerName != null) {
             getPlayerModel(playerName).clearDeck();
@@ -478,11 +510,13 @@ public class JolAdmin {
     public void saveDeck(String playerName, String deckName, String contents) {
         if (playerName != null && contents != null && deckName != null) {
             deckName = deckName.trim();
-            PlayerModel model = getPlayerModel(playerName);
-            model.setDeckName(deckName);
-            model.setContents(contents);
             ExtendedDeck deck = DeckParser.parseDeck(contents);
-            DeckInfo deckInfo = Optional.ofNullable(decks.get(playerName, deckName)).orElse(new DeckInfo(ULID.random(), deckName, DeckFormat.MODERN));
+            deck.getDeck().setName(deckName);
+            PlayerModel playerModel = getPlayerModel(playerName);
+            playerModel.setDeck(deck);
+            playerModel.setContents(contents);
+            Set<String> tags = ValidatorFactory.getTags(deck.getDeck());
+            DeckInfo deckInfo = Optional.ofNullable(decks.get(playerName, deckName)).orElse(new DeckInfo(ULID.random(), deckName, DeckFormat.TAGGED, tags));
             deckInfo.setFormat(DeckFormat.MODERN);
             decks.put(playerName, deckName, deckInfo);
             writeFile(String.format("decks/%s.json", deckInfo.getDeckId()), deck);
@@ -621,9 +655,9 @@ public class JolAdmin {
                 result = "Unable to register deck.  Already has 5 players registered.";
                 throw new IllegalStateException(result);
             }
-            DeckStats stats = getDeck(deckInfo.getDeckId()).getStats();
-            if (stats == null || !stats.isValid()) {
-                result = "Unable to register deck.  Not valid.";
+            ExtendedDeck extendedDeck = getDeck(deckInfo.getDeckId());
+            if (!validateDeck(extendedDeck.getDeck(), gameInfo.getGameFormat()).isValid()) {
+                result = "Unable to register deck.  Not valid for defined format.";
                 throw new IllegalStateException(result);
             }
             RegistrationStatus registrationStatus = registrations.get(gameName, playerName);
@@ -638,14 +672,14 @@ public class JolAdmin {
             }
             registrationStatus.setDeckId(deckInfo.getDeckId());
             registrationStatus.setDeckName(deckInfo.getDeckName());
-            registrationStatus.setValid(stats.isValid());
-            registrationStatus.setSummary(stats.getSummary());
+            registrationStatus.setValid(true);
+            registrationStatus.setSummary(extendedDeck.getStats().getSummary());
 
             // Reset game time to current time to extend idle timeout
             gameInfo.setCreated(OffsetDateTime.now());
 
             long registeredPlayers = getRegisteredPlayerCount(gameName);
-            if (registeredPlayers == 5) {
+            if (registeredPlayers == gameInfo.getGameFormat().getPlayerCount()) {
                 startGame(gameName);
             }
         } catch (IllegalStateException exception) {
@@ -694,7 +728,7 @@ public class JolAdmin {
         PlayerInfo player = loadPlayerInfo(playerName);
         try {
             String discordId = player.getDiscordId();
-            if (player != null && discordId != null && !discordId.isBlank()) {
+            if (discordId != null && !discordId.isBlank()) {
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(DISCORD_PING_CHANNEL_URI)
                         .header("Content-type", "application/json")
@@ -806,7 +840,7 @@ public class JolAdmin {
     }
 
     public boolean isRegistered(String gameName, String playerName) {
-        return registrations.contains(gameName, playerName) && registrations.get(gameName, playerName).getDeckId() != null;
+        return registrations.contains(gameName, playerName) && Objects.requireNonNull(registrations.get(gameName, playerName)).getDeckId() != null;
     }
 
     public boolean isStarting(String gameName) {
@@ -1001,15 +1035,6 @@ public class JolAdmin {
         setRole(info, PlayerRole.SUPER_USER, value);
     }
 
-    public boolean isValid(String playerName, String deckName) {
-        return Optional.ofNullable(decks.get(playerName, deckName))
-                .map(DeckInfo::getDeckId)
-                .map(this::getDeck)
-                .map(ExtendedDeck::getStats)
-                .map(DeckStats::isValid)
-                .orElse(false);
-    }
-
     public Collection<TournamentRegistration> getTournamentRegistrations() {
         return tournamentRegistrations.getRegistrations().values();
     }
@@ -1054,6 +1079,36 @@ public class JolAdmin {
                 .filter(Map.Entry::getValue)
                 .map(Map.Entry::getKey)
                 .toList();
+    }
+
+    public String getFormat(String gameName) {
+        return games.get(gameName).getGameFormat().getLabel();
+    }
+
+    public void validateDeck(String playerName, String contents, GameFormat format) {
+        PlayerModel model = getPlayerModel(playerName);
+        String deckName = model.getDeck().getDeck().getName();
+        ExtendedDeck deck = DeckParser.parseDeck(contents);
+        ValidationResult result = validateDeck(deck.getDeck(), format);
+        if (result.isValid()) {
+            deck.setErrors(List.of("No errors found.  Deck is valid for " + format.getLabel() + "."));
+        } else {
+            deck.setErrors(result.getErrors());
+        }
+        deck.getDeck().setName(deckName);
+        model.setDeck(deck);
+        model.setContents(contents);
+    }
+
+    private ValidationResult validateDeck(Deck deck, GameFormat gameFormat) {
+        try {
+            Constructor<? extends DeckValidator> validatorConstructor = gameFormat.getDeckValidator().getConstructor();
+            var validator = validatorConstructor.newInstance();
+            return validator.validate(deck);
+        } catch (Exception e) {
+            logger.error("Could not find constructor for DeckValidator", e);
+            throw new RuntimeException(e);
+        }
     }
 
     private void loadProperties() {
@@ -1127,7 +1182,7 @@ public class JolAdmin {
         players.remove(playerInfo.getName());
     }
 
-    private ExtendedDeck getDeck(String deckId) {
+    public ExtendedDeck getDeck(String deckId) {
         return readFile(String.format("decks/%s.json", deckId), typeFactory.constructType(ExtendedDeck.class));
     }
 

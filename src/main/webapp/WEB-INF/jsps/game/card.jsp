@@ -5,7 +5,6 @@
 <%@ page import="net.deckserver.game.storage.cards.CardSearch" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.google.common.base.Strings" %>
-<%@ page import="net.deckserver.dwr.model.ChatParser" %>
 <%@ page import="net.deckserver.game.interfaces.state.Card" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%

@@ -2,8 +2,10 @@ package net.deckserver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.storage.json.system.GameFormat;
 import net.deckserver.storage.json.system.TournamentData;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
@@ -29,7 +31,17 @@ public class TournamentBuilder {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
+    @SetEnvironmentVariable(key = "JOL_DATA", value = "/Users/shannon/data")
+    public void buildFinalTable() throws Exception {
+        // gatsu 01JJK93HMCA1J1ZSKKD18KHJDY-1.json
+        // cordovader player2083-1.json
+        // cooper player29-1.json
+        // preston player1998-1.json
+        // Stolas 01JBBWJF6VCM6DRB8Z95D28ND1-1.json
+    }
+
+    @Test
+    @Disabled
     public void testBuildTournament() throws Exception {
 
         JolAdmin admin = JolAdmin.INSTANCE;
@@ -43,7 +55,7 @@ public class TournamentBuilder {
             for (int table = 1; table <= tables.size(); table++) {
                 String gameName = String.format("Cardinal Benediction: Round %d - Table %d", round, table);
                 if (admin.notExistsGame(gameName)) {
-                    admin.createGame(gameName, false, "TOURNAMENT");
+                    admin.createGame(gameName, false, GameFormat.STANDARD, "TOURNAMENT");
                 }
                 // Register players
                 List<String> players = tables.get(table - 1);

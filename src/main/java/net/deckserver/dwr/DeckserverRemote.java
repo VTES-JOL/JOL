@@ -8,6 +8,7 @@ import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.interfaces.turn.GameAction;
 import net.deckserver.storage.json.deck.Deck;
+import net.deckserver.storage.json.system.GameFormat;
 import org.directwebremoting.WebContextFactory;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,10 +38,10 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-    public Map<String, Object> createGame(String gameName, Boolean isPublic) {
+    public Map<String, Object> createGame(String gameName, String publicFlag, String format) {
         String playerName = getPlayer(request);
         if (!Strings.isNullOrEmpty(playerName)) {
-            admin.createGame(gameName, isPublic, playerName);
+            admin.createGame(gameName, "PUBLIC".equals(publicFlag), GameFormat.from(format), playerName);
         }
         return UpdateFactory.getUpdate();
     }
@@ -276,9 +277,9 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-    public Map<String, Object> parseDeck(String deckName, String contents) {
+    public Map<String, Object> validate(String contents, String format) {
         String playerName = getPlayer(request);
-        admin.parseDeck(playerName, deckName, contents);
+        admin.validateDeck(playerName, contents, GameFormat.from(format));
         return UpdateFactory.getUpdate();
     }
 

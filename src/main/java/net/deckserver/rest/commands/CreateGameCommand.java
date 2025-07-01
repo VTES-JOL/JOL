@@ -8,4 +8,5 @@ public class CreateGameCommand {
     private String gameName;
     @JsonProperty("public")
     private boolean isPublic;
+    private String format;
 }

@@ -20,6 +20,7 @@ public class JyhadOnlineServletInitializer implements ServletContextListener {
         logger.info("Initializing deckserver with " + System.getenv("JOL_DATA"));
         JolAdmin.INSTANCE.setup();
         JolAdmin.INSTANCE.validate();
+        JolAdmin.INSTANCE.upgrade();
         logger.info("Initialization complete");
     }
 
