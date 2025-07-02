@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.vdurmont.emoji.EmojiParser;
+
 public class ChatParser {
 
     private static final Pattern MARKUP_PATTERN = Pattern.compile("\\[(.*?)\\]");
@@ -24,7 +26,8 @@ public class ChatParser {
         String parsedForCards = parseTextForCards(text);
         String parsedForDisciplines = parseTextForDisciplines(parsedForCards);
         String parsedForDActions = parseTextForDAction(parsedForDisciplines);
-        return parseTextForStyle(parsedForDActions);
+        String parsedForEmoji = parseTextForEmoji(parsedForDActions);
+        return parseTextForStyle(parsedForEmoji);
     }
 
     public static boolean isDiscipline(String discipline) {
@@ -47,6 +50,10 @@ public class ChatParser {
         }
         matcher.appendTail(sb);
         return sb.toString();
+    }
+
+    private static String parseTextForEmoji(String text) {
+        return EmojiParser.parseToUnicode(text);
     }
 
     private static String parseTextForDisciplines(String text) {

@@ -58,6 +58,7 @@
         </div>
         <uL class="list-group list-group-flush">
             <li class="list-group-item">There is currently no way to move cards via clicking, yet.</li>
+            <li class="list-group-item">Valid target regions for moving include "ready", "uncontrolled", "hand", "library", "crypt", "ashheap", "torpor", and "rfg". Use "rfg" when a card is removed from the game.</li>
         </uL>
     </div>
     <hr class="my-4"/>

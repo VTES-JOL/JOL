@@ -23,6 +23,11 @@ Install Java 11+ as per your operating system
 Run the `tomcat9:run` goal after setting up 1 or more environment variables
 `JOL_DATA=src/test/resources/data ./mvnw.cmd tomcat9:run`
 
+You can also run unit tests with
+`JOL_DATA=src/test/resources/data ./mvnw.cmd test`
+
+Note that if you run with example/test data (from `src/test`), the app will launch with 6 pre-registered players named "Player1" through "Player6" respectively, each with the password "password".
+
 ### Data Structure
 * games.json - hashmap of Game Name -> `GameInfo.java`
 * pastGames.json - hashmap of Timestamp -> `GameHistory.java`
