@@ -20,7 +20,7 @@
             <select name="gameFormat" id="gameFormat" class="form-select">
                 <option value="STANDARD">Standard</option>
                 <option value="V5">V5</option>
-                <option value="V5 Strict">V5 Strict</option>
+                <option value="JYHAD">Jyhad</option>
                 <option value="DUEL">Duel</option>
             </select>
         </div>

@@ -88,7 +88,7 @@ public class JolAdmin {
     private static final Predicate<GameInfo> PUBLIC_GAME = info -> info.getVisibility().equals(Visibility.PUBLIC);
     private static final Predicate<GameInfo> TEST_GAME = info -> info.getOwner().equals("TEST");
     private static final Predicate<DeckInfo> MODERN_DECK = info -> DeckFormat.MODERN.equals(info.getFormat());
-    private static final Predicate<DeckInfo> NO_TAGS = info -> info.getTags().isEmpty();
+    private static final Predicate<DeckInfo> NO_TAGS = info -> info.getGameFormats().isEmpty();
     private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
     private static final DecimalFormat format = new DecimalFormat("0.#");
 
@@ -443,7 +443,7 @@ public class JolAdmin {
                 .forEach(deckInfo -> {
                     ExtendedDeck deck = getDeck(deckInfo.getDeckId());
                     Set<String> tags = ValidatorFactory.getTags(deck.getDeck());
-                    deckInfo.setTags(tags);
+                    deckInfo.setGameFormats(tags);
                     deckInfo.setFormat(DeckFormat.TAGGED);
                     logger.info("Upgrading {} to {} with {} tags", deckInfo.getDeckId(), deckInfo.getFormat(), tags);
                 });
@@ -467,7 +467,7 @@ public class JolAdmin {
     }
 
     public Set<String> getTags(String playerName, String deckName) {
-        return loadDeckInfo(playerName, deckName).getTags();
+        return loadDeckInfo(playerName, deckName).getGameFormats();
     }
 
     public Deck getGameDeck(String gameName, String playerName) {
@@ -518,6 +518,7 @@ public class JolAdmin {
             Set<String> tags = ValidatorFactory.getTags(deck.getDeck());
             DeckInfo deckInfo = Optional.ofNullable(decks.get(playerName, deckName)).orElse(new DeckInfo(ULID.random(), deckName, DeckFormat.TAGGED, tags));
             deckInfo.setFormat(DeckFormat.MODERN);
+            deckInfo.setGameFormats(tags);
             decks.put(playerName, deckName, deckInfo);
             writeFile(String.format("decks/%s.json", deckInfo.getDeckId()), deck);
         }
@@ -1082,7 +1083,7 @@ public class JolAdmin {
     }
 
     public String getFormat(String gameName) {
-        return games.get(gameName).getGameFormat().getLabel();
+        return games.get(gameName).getGameFormat().toString();
     }
 
     public void validateDeck(String playerName, String contents, GameFormat format) {

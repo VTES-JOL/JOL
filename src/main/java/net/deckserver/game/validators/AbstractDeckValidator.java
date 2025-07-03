@@ -7,6 +7,7 @@ import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.LibraryCard;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class AbstractDeckValidator implements DeckValidator {
@@ -27,8 +28,8 @@ public abstract class AbstractDeckValidator implements DeckValidator {
                 .map(cardSearch::get);
     }
 
-    protected CardSummary getCardSummary(String cardId) {
-        return cardSearch.get(cardId);
+    protected String getCardName(String id) {
+        return cardSearch.get(id).getDisplayName();
     }
 
     protected Set<String> getGroups(Deck deck) {
@@ -46,21 +47,25 @@ public abstract class AbstractDeckValidator implements DeckValidator {
         return groups;
     }
 
-    protected void checkForBannedCards(Deck deck, ValidationResult result) {
-        cardSummaryStream(deck)
+    protected Set<String> findBannedCards(Deck deck) {
+        return cardSummaryStream(deck)
                 .filter(CardSummary::isBanned)
-                .forEach(bannedCard -> {
-                    result.addError(String.format("%s is banned", bannedCard.getDisplayName()));
-                });
+                .map(CardSummary::getDisplayName)
+                .collect(Collectors.toSet());
     }
 
-    protected void inSets(Deck deck, ValidationResult result, List<String> validSets) {
-        cardSummaryStream(deck).filter(cardSummary -> {
-            Set<String> cardSets = new HashSet<>(cardSummary.getSets());
-            cardSets.retainAll(validSets);
-            return cardSets.isEmpty();
-        }).forEach(bannedCard -> {
-            result.addError(String.format("%s is not allowed in this format.", bannedCard.getDisplayName()));
-        });
+    protected Set<String> checkAgainstWhitelist(Deck deck, List<String> validSets) {
+        return cardSummaryStream(deck).filter(cardSummary -> {
+                    Set<String> cardSets = new HashSet<>(cardSummary.getSets());
+                    cardSets.retainAll(validSets);
+                    return cardSets.isEmpty();
+                }).map(CardSummary::getId)
+                .collect(Collectors.toSet());
+    }
+
+    protected Set<String> checkAgainstWhitelist(Set<String> ids, List<String> whitelist) {
+        Set<String> outsideWhitelist = new HashSet<>(ids);
+        whitelist.forEach(outsideWhitelist::remove);
+        return outsideWhitelist;
     }
 }

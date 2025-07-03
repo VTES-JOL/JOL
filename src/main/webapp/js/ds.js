@@ -280,30 +280,32 @@ function callbackLobby(data) {
     $.each(data.publicGames, function (index, game) {
         let created = moment(game.created).tz("UTC");
         let expiry = created.add(5, 'days');
-        let gameItem = $("<li/>").addClass("list-group-item");
-        let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
-        let gameName = $("<h6/>").addClass("mx-2 d-inline").text(game.name);
-        let format = $("<span/>").addClass("badge bg-secondary").text(game.format);
-        let expiryText = $("<span/>").text("Closes " + moment().to(expiry));
-        let buttonWrapper = $("<span/>").addClass("d-flex justify-content-between align-items-center gap-1");
-        let nameWrapper = $("<span/>");
         let joinButton = createButton({
             class: "btn btn-outline-secondary btn-sm",
             text: "Join",
             confirm: "Join Game?"
         }, DS.invitePlayer, game.name, player);
-
-        buttonWrapper.append(expiryText, joinButton);
-        nameWrapper.append(format, gameName);
-        gameHeader.append(nameWrapper, buttonWrapper);
-        gameItem.append(gameHeader);
-        publicGames.append(gameItem);
+        let template = $(`
+        <li class='list-group-item'>
+            <div class="d-flex justify-content-between align-items-center">
+                <span>
+                    <span class="badge bg-secondary">${game.format}</span>
+                    <h6 class="mx-2 d-inline">${game.name}</h6>
+                </span>
+                <span class="d-flex justify-content-between align-items-center gap-1 game-join">
+                    <span>Closes ${moment().to(expiry)}</span>
+                </span>
+            </div>
+        </li>
+        `);
+        template.find('.game-join').append(joinButton);
+        publicGames.append(template);
         if (game.registrations.length > 0)
         {
             let playerTable = $("<table/>").addClass("table table-bordered table-sm table-hover mt-2");
             let tableBody = $("<tbody/>");
             playerTable.append(tableBody);
-            gameItem.append(playerTable);
+            template.append(playerTable);
             $.each(game.registrations, function (i, registration) {
                 let registrationRow = $("<tr/>");
                 let playerCell = $("<td/>").addClass("w-50").text(registration.player);
@@ -313,15 +315,12 @@ function callbackLobby(data) {
                         text: "Leave",
                         confirm: "Leave Game?"
                     }, DS.unInvitePlayer, game.name, player) : "";
-                    buttonWrapper.append(leaveButton);
+                    template.find('.game-join').append(leaveButton);
                 }
                 registrationRow.append(playerCell);
                 let summary = $("<td/>").addClass("w-50 text-center")
                 if (registration.registered) {
-                    summary.text("Registered");
-                }
-                if (!registration.valid && registration.registered) {
-                    summary.append($('<span/>').addClass("badge text-bg-warning pl-1").text('Invalid'));
+                    summary.append(`<i class="bi bi-check-circle"></i>`);
                 }
                 registrationRow.append(summary);
                 tableBody.append(registrationRow);
@@ -329,24 +328,39 @@ function callbackLobby(data) {
     })
 
     invitedGames.empty();
-    invitedGamesList.empty();
     $.each(data.invitedGames, function (index, game) {
-        let gameItem = $("<li/>").addClass("list-group-item");
-        let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
-        let nameHeader = $("<span/>");
-        let gameName = $("<span/>").addClass("mx-2").text(game.gameName);
-        let gameFormat = $("<span/>").addClass("badge bg-secondary").text(game.format);
-        let deckName = $("<span/>").text(game.deckName);
-        nameHeader.append(gameFormat, gameName);
-        gameHeader.append(nameHeader, deckName);
-        gameItem.append(gameHeader);
-        invitedGames.append(gameItem);
-        invitedGamesList.append(new Option(game.gameName, game.gameName));
+        let template = `
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="flex-grow-1 p-2 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-2">${game.gameName}</h5>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-secondary me-1">${game.format}</span>
+                        </div>
+                    </div>
+                    <span class="">${game.deckName || ''}</span>
+                </div>
+                <div>
+                    <div class="d-inline">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" >
+                            Choose Deck
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end invite-${game.format}" data-name="${game.gameName}">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        `;
+        invitedGames.append(template);
     });
 
-    myDeckList.empty();
     $.each(data.decks, function (index, deck) {
-        myDeckList.append(new Option(deck.name, deck.name));
+        $.each(deck.gameFormats, function(i, format) {
+            let dropDown = $(`ul .invite-${format}`);
+            let gameName = dropDown.data("name");
+            let template = $(`<li><a class="dropdown-item">${deck.name}</a></li>`).on('click', function() { registerDeck(gameName, deck.name); });
+            dropDown.append(template);
+        })
     })
 
     // Registration Result
@@ -451,11 +465,11 @@ function callbackShowDecks(data) {
         const deckName = $("<span/>").text(deck.name).click(function () {
             DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
         });
-        const tagWrapper = $("<span/>");
-        $.each(deck.tags, function(i, tag) {
-            const tagLabel = $("<span/>").text(tag).addClass("badge mx-1");
-            tagLabel.addClass("text-bg-secondary")
-            tagWrapper.append(tagLabel);
+        const formatWrapper = $("<span/>");
+        $.each(deck.gameFormats, function(i, format) {
+            const formatLabel = $("<span/>").text(format).addClass("badge mx-1");
+            formatLabel.addClass("text-bg-secondary")
+            formatWrapper.append(formatLabel);
         })
         const deleteButton = $("<button/>").addClass("btn btn-sm btn-outline-secondary border p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
             if (confirm("Delete deck?")) {
@@ -463,7 +477,7 @@ function callbackShowDecks(data) {
             }
             event.stopPropagation();
         });
-        let wrapper = $("<span/>").addClass("d-flex gap-1 align-items-center").append(tagWrapper, deleteButton);
+        let wrapper = $("<span/>").addClass("d-flex gap-1 align-items-center").append(formatWrapper, deleteButton);
         deckCell.append(deckName, wrapper);
         deckRow.append(deckCell);
         decks.append(deckRow);
@@ -889,9 +903,7 @@ function navigate(data) {
     renderDesktopViewButton();
 }
 
-function registerDeck() {
-    let regGame = $("#invitedGamesList").val();
-    let regDeck = $("#myDeckList").val();
+function registerDeck(regGame, regDeck) {
     DS.registerDeck(regGame, regDeck, {callback: processData, errorHandler: errorhandler});
 }
 

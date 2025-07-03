@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.deckserver.game.storage.cards.importer.CryptImporter;
 import net.deckserver.game.storage.cards.importer.LibraryImporter;
+import net.deckserver.game.storage.cards.importer.SetImporter;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -15,7 +16,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Tag("Builder")
 @Tag("CardDatabase")
@@ -26,12 +30,15 @@ public class CardDatabaseBuilder {
     private static List<SummaryCard> getSummaryCards(Path basePath) throws Exception {
         Path libraryPath = basePath.resolve("vteslib.csv");
         Path cryptPath = basePath.resolve("vtescrypt.csv");
+        Path setPath = basePath.resolve("vtessets.csv");
 
         LibraryImporter libraryImporter = new LibraryImporter(libraryPath);
         CryptImporter cryptImporter = new CryptImporter(cryptPath);
+        SetImporter setImporter = new SetImporter(setPath);
 
         List<LibraryCard> libraryCards = libraryImporter.read();
         List<CryptCard> cryptCards = cryptImporter.read();
+        List<CardSet> cardSets = setImporter.read();
         List<SummaryCard> summaryCards = new ArrayList<>();
 
         libraryCards.forEach(libraryCard -> summaryCards.add(new SummaryCard(libraryCard)));

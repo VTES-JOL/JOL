@@ -43,7 +43,9 @@ public class StandardDeckValidator extends AbstractDeckValidator {
         if (!validGroups(groups)) {
             result.getErrors().add(String.format("Invalid groups: %s", String.join(", ", groups)));
         }
-        checkForBannedCards(deck, result);
+        findBannedCards(deck).forEach(bannedCard -> {
+            result.addError(String.format("%s is banned", bannedCard));
+        });
         return result;
 
     }

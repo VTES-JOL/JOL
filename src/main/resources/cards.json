@@ -541,7 +541,7 @@
   "unique" : false,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "Promo", "SW", "KMW", "Sabbat", "Anarchs", "BH", "FN", "FB" ]
+  "sets" : [ "Promo-202404235", "SW", "KMW", "Sabbat", "Anarchs", "BH", "FN", "FB" ]
 }, {
   "id" : "102274",
   "type" : "Action Modifier",
@@ -854,7 +854,7 @@
   "unique" : true,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "Promo", "SW", "HttB", "DS" ]
+  "sets" : [ "SW", "HttB", "Promo-202406221", "DS" ]
 }, {
   "id" : "100074",
   "type" : "Event",
@@ -1237,7 +1237,7 @@
   "unique" : false,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "KoT", "Promo", "Anthology" ]
+  "sets" : [ "KoT", "Anthology", "Promo-202401011" ]
 }, {
   "id" : "100107",
   "type" : "Equipment",
@@ -4735,7 +4735,7 @@
   "unique" : false,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "Promo", "VTES", "Jyhad" ]
+  "sets" : [ "Promo-202404235", "VTES", "Jyhad" ]
 }, {
   "id" : "100409",
   "type" : "Event",
@@ -6107,7 +6107,7 @@
   "unique" : true,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "Promo", "KMW", "AH", "Third", "FN", "HttB" ]
+  "sets" : [ "Promo-202404235", "KMW", "AH", "Third", "FN", "HttB" ]
 }, {
   "id" : "100527",
   "type" : "Action",
@@ -7339,7 +7339,7 @@
   "burnOption" : false,
   "clans" : [ "Harbinger of Skulls" ],
   "banned" : false,
-  "sets" : [ "Promo", "LK" ]
+  "sets" : [ "Promo-202401011", "LK" ]
 }, {
   "id" : "100635",
   "type" : "Action",
@@ -7452,7 +7452,7 @@
   "unique" : false,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "Promo", "BL", "LoB" ]
+  "sets" : [ "BL", "Promo-202406011", "LoB" ]
 }, {
   "id" : "102238",
   "type" : "Equipment",
@@ -10196,7 +10196,7 @@
   "unique" : false,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "Promo", "HttB", "BL", "LoB" ]
+  "sets" : [ "HttB", "BL", "LoB", "Promo-20230701" ]
 }, {
   "id" : "100878",
   "type" : "Action Modifier/Reaction",
@@ -11828,7 +11828,7 @@
   "unique" : true,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "KoT", "Promo", "FN", "SP" ]
+  "sets" : [ "KoT", "Promo-202404235", "FN", "SP" ]
 }, {
   "id" : "101020",
   "type" : "Equipment",
@@ -12374,7 +12374,7 @@
   "unique" : true,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "KoT", "CE", "Promo", "VTES", "V5C", "Jyhad", "LotN", "SP", "LoB" ]
+  "sets" : [ "KoT", "CE", "VTES", "V5C", "Jyhad", "Promo-202312131", "LotN", "SP", "LoB" ]
 }, {
   "id" : "101068",
   "type" : "Master",
@@ -13811,7 +13811,7 @@
   "unique" : false,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "Promo-20020201", "Promo" ]
+  "sets" : [ "Promo-202404234", "Promo-20020201" ]
 }, {
   "id" : "101193",
   "type" : "Action",
@@ -14078,7 +14078,7 @@
   "unique" : false,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "Promo", "HttB" ]
+  "sets" : [ "Promo-202404235", "HttB" ]
 }, {
   "id" : "101215",
   "type" : "Action",
@@ -14654,7 +14654,7 @@
   "unique" : false,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "Promo", "FN" ]
+  "sets" : [ "FN", "Promo-202402291" ]
 }, {
   "id" : "101263",
   "type" : "Action",
@@ -16324,7 +16324,7 @@
   "unique" : false,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "Promo", "V5C", "TR" ]
+  "sets" : [ "Promo-20231014", "V5C", "TR" ]
 }, {
   "id" : "102291",
   "type" : "Action",
@@ -20026,7 +20026,7 @@
   "unique" : false,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "KoT", "Promo", "LotN" ]
+  "sets" : [ "KoT", "LotN", "Promo-202409121" ]
 }, {
   "id" : "101718",
   "type" : "Action Modifier/Reaction",
@@ -23584,7 +23584,7 @@
   "unique" : false,
   "burnOption" : false,
   "banned" : false,
-  "sets" : [ "Promo", "SW", "Sabbat", "Third" ]
+  "sets" : [ "SW", "Sabbat", "Third", "Promo-202312131" ]
 }, {
   "id" : "102024",
   "type" : "Action",
@@ -29927,7 +29927,7 @@
   "sect" : "Anarch",
   "clans" : [ "Tremere" ],
   "banned" : false,
-  "sets" : [ "Promo-20191027", "Promo", "Promo-20200511" ],
+  "sets" : [ "Promo-202309301", "Promo-20191027", "Promo-20200511" ],
   "capacity" : 6,
   "disciplines" : [ "ani", "cel", "dom", "THA" ],
   "advanced" : false,
@@ -30152,7 +30152,7 @@
   "sect" : "Anarch",
   "clans" : [ "Malkavian" ],
   "banned" : false,
-  "sets" : [ "Promo", "Promo-20201030" ],
+  "sets" : [ "Promo-202404235", "Promo-20201030" ],
   "capacity" : 6,
   "disciplines" : [ "ani", "aus", "cel", "dom", "obf", "pre" ],
   "advanced" : false
@@ -35694,7 +35694,7 @@
   "sect" : "Anarch",
   "clans" : [ "Caitiff" ],
   "banned" : false,
-  "sets" : [ "Promo", "Promo-20230531" ],
+  "sets" : [ "Promo-202404235", "Promo-20230531" ],
   "capacity" : 4,
   "disciplines" : [ "aus", "pot", "pro" ],
   "advanced" : false
@@ -41759,7 +41759,7 @@
   "sect" : "Anarch",
   "clans" : [ "Gangrel" ],
   "banned" : false,
-  "sets" : [ "Promo-20211113", "Promo", "NB2" ],
+  "sets" : [ "Promo-20211113", "Promo-202404235", "NB2" ],
   "capacity" : 6,
   "disciplines" : [ "ANI", "PRO" ],
   "advanced" : false,
@@ -43809,7 +43809,7 @@
   "sect" : "Camarilla",
   "clans" : [ "Toreador" ],
   "banned" : false,
-  "sets" : [ "Promo", "Promo-20220730", "Promo-20221105" ],
+  "sets" : [ "Promo-202404235", "Promo-20220730", "Promo-20221105" ],
   "capacity" : 6,
   "disciplines" : [ "cel", "AUS", "PRE" ],
   "advanced" : false,
@@ -53028,7 +53028,7 @@
   "sect" : "Camarilla",
   "clans" : [ "Assamite" ],
   "banned" : false,
-  "sets" : [ "Promo", "Promo-20230501" ],
+  "sets" : [ "Promo-202404235", "Promo-20230501" ],
   "capacity" : 10,
   "disciplines" : [ "AUS", "CEL", "FOR", "PRE", "THA" ],
   "advanced" : false,

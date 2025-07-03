@@ -12,7 +12,7 @@ public class ValidatorFactory {
         return switch (format) {
             case GameFormat.DUEL -> new DuelDeckValidator();
             case GameFormat.V5 -> new V5DeckValidator();
-            case GameFormat.V5_STRICT -> new V5StrictDeckValidator();
+            case GameFormat.JYHAD -> new JyhadDeckValidator();
             default -> new StandardDeckValidator();
         };
     }

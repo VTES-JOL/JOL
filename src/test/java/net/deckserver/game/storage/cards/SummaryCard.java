@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 public class SummaryCard {
 
     private String id;
-    private String amaranthId;
     private String type;
     private String htmlText;
     private String originalText;

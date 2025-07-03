@@ -14,5 +14,5 @@ public class DeckInfo {
     private String deckId;
     private String deckName;
     private DeckFormat format;
-    private Set<String> tags = new HashSet<>();
+    private Set<String> gameFormats = new HashSet<>();
 }

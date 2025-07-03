@@ -23,6 +23,7 @@ public class Utils {
     }
 
     static Set<String> getSets(String source) {
+        source = source.replaceAll("Promo:", "Promo-");
         List<String> setDetails = split(source, ",").orElse(new ArrayList<>());
         return setDetails.stream()
                 .map(String::trim)
