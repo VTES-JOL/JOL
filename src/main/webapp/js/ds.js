@@ -320,7 +320,7 @@ function callbackLobby(data) {
                 registrationRow.append(playerCell);
                 let summary = $("<td/>").addClass("w-50 text-center")
                 if (registration.registered) {
-                    summary.append(`<i class="bi bi-check-circle"></i>`);
+                    summary.append(`<i class="bi bi-check-circle text-success fs-6"></i>`);
                 }
                 registrationRow.append(summary);
                 tableBody.append(registrationRow);

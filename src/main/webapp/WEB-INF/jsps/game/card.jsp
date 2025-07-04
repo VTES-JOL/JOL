@@ -6,6 +6,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.google.common.base.Strings" %>
 <%@ page import="net.deckserver.game.interfaces.state.Card" %>
+<%@ page import="net.deckserver.game.storage.cards.Sect" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
@@ -24,7 +25,10 @@
     List<String> defaultDisciplines = cardSummary.getDisciplines();
     String defaultVotes = cardSummary.getVotes();
     List<String> clans = cardSummary.getClanClass();
+    String path = cardDetail.getPath().toLowerCase();
     Integer defaultCapacity = cardSummary.getCapacity();
+    String defaultSect = cardSummary.getSect();
+    Sect sect = Sect.of(cardDetail.getSect());
     String owner = cardDetail.getOwner();
     if (!owner.equals(player)) visible = true;
     List<String> disciplines = cardDetail.getDisciplines();
@@ -42,6 +46,11 @@
     boolean contested = cardDetail.isContested();
     boolean locked = cardDetail.isLocked();
     String shadowStyle = shadow ? "shadow" : "";
+    if (hasCapacity && cardSummary.hasBlood()) {
+        if (sect == null) {
+            sect = Sect.of(defaultSect);
+        }
+    }
     // Counter Style Logic
     // Green: hasLife && OTHER_VISIBLE_REGION
     // Red: hasBlood || hasCapacity
@@ -95,9 +104,16 @@
                     </c:forEach>
                 </span>
             </c:if>
-            <span class="d-flex align-items-center">
+            <span class="d-flex align-items-baseline gap-1">
                 <span class="badge bg-light text-black shadow border border-secondary-subtle"><%= label %></span>
                 <c:if test="<%= cardSummary.hasBlood() && visible %>">
+                    <c:if test="<%= !Strings.isNullOrEmpty(path) %>">
+                        <span class="path <%= path %>"></span>
+                    </c:if>
+                    <c:if test="<%= sect != null %>">
+                        <% assert sect != null; %>
+                        <span class="sect" title="<%= sect.getDescription()%>"><%= sect.getCode() %></span>
+                    </c:if>
                     <span>
                         <c:forEach items="<%= clans %>" var="clan">
                             <span class="clan ${clan}" title="${clan.replaceAll("_", " ")}"></span>

@@ -187,8 +187,12 @@ class CommandParser {
         return ind < args.length;
     }
 
-    String nextArg() {
-        return args[ind++];
+    String nextArg() throws CommandException {
+        try {
+            return args[ind++];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new CommandException("Command requires at least one argument.");
+        }
     }
 
     boolean consumeString(String val) {

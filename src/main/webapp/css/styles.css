@@ -9,8 +9,13 @@
 }
 
 @font-face {
-    font-family: 'matrix';
+    font-family: 'matrix-bold';
     src: url('../fonts/MatrixExtraBold.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'matrix';
+    src: url('../fonts/MatrixIIOT-Book.otf') format('opentype');
 }
 
 @font-face {
@@ -194,6 +199,7 @@ p.chat a {
 
 a.card-name {
     text-decoration: none;
+    font-family: matrix, sans-serif;
     color: black;
     cursor: pointer;
 }
@@ -277,7 +283,7 @@ a.card-name {
 #gameDeckCard {grid-area: info; }
 #notesCard {grid-area: info; }
 
-.clan {font-family: clans, sans-serif; font-size: 1.3rem;}
+.clan {font-family: clans, sans-serif; font-size: 1.5rem;}
 .clan.abomination:before {content: 'A';}
 .clan.ahrimane:before {content: 'B';}
 .clan.akunanse:before {content: 'C';}
@@ -436,8 +442,10 @@ a.card-name {
 .icon.burn:before {content: "~";}
 .icon.merge:before {content: "{";}
 
-.path {font-family: 'clans', sans-serif; font-size: 1.3em;}
+.path {font-family: 'clans', sans-serif; font-size: 1.5em;}
 .path.caine:before {content: "#";}
 .path.cathari:before {content: "$";}
-.path.death:before {content: "%";}
-.path.power:before {content: "&";}
+.path.death_and_the_soul:before {content: "%";}
+.path.power_and_the_inner_voice:before {content: "&";}
+
+.sect {font-size: 1.5em;}

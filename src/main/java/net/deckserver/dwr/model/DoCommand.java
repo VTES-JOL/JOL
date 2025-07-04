@@ -9,6 +9,8 @@ package net.deckserver.dwr.model;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.Location;
 import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.game.storage.cards.Path;
+import net.deckserver.game.storage.cards.Sect;
 import net.deckserver.game.storage.state.RegionType;
 import net.deckserver.storage.json.cards.CardSummary;
 
@@ -118,6 +120,42 @@ public class DoCommand {
             case "rfg":
                 rfg(cmdObj, player);
                 break;
+            case "path":
+                path(cmdObj, player);
+                break;
+            case "sect":
+                sect(cmdObj, player);
+                break;
+        }
+    }
+
+    private void sect(CommandParser cmdObj, String player) throws CommandException {
+        Card targetCard = cmdObj.findCard(false, player, RegionType.READY);
+        boolean clear = cmdObj.consumeString("clear");
+        if (clear) {
+            game.clearSect(player, targetCard);
+        } else {
+            String sectString = cmdObj.nextArg();
+            Sect sect = Sect.startsWith(sectString);
+            if (sect == null) {
+                throw new CommandException("Invalid sect");
+            }
+            game.setSect(player, targetCard, sect, false);
+        }
+    }
+
+    private void path(CommandParser cmdObj, String player) throws CommandException {
+        Card targetCard = cmdObj.findCard(false, player, RegionType.READY);
+        boolean clear = cmdObj.consumeString("clear");
+        if (clear) {
+            game.clearPath(player, targetCard);
+        } else {
+            String pathString = cmdObj.nextArg();
+            Path path = Path.startsWith(pathString);
+            if (path == null) {
+                throw new CommandException("Invalid path");
+            }
+            game.setPath(player, targetCard, path, false);
         }
     }
 
@@ -414,7 +452,7 @@ public class DoCommand {
         }
     }
 
-    void choose(CommandParser cmdObj, String player) {
+    void choose(CommandParser cmdObj, String player) throws CommandException {
         String choice = cmdObj.nextArg();
         game.setChoice(player, choice);
     }

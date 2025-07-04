@@ -14,6 +14,7 @@ import net.deckserver.game.interfaces.turn.TurnRecorder;
 import net.deckserver.game.jaxb.state.Notation;
 import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.cards.Path;
+import net.deckserver.game.storage.cards.Sect;
 import net.deckserver.game.storage.state.RegionType;
 import net.deckserver.game.ui.state.CardDetail;
 import net.deckserver.game.ui.state.DsGame;
@@ -213,7 +214,7 @@ public class JolGame {
             votesText = ", votes: " + votes;
         }
         // Do sect
-        String sect = cardSummary.getSect();
+        Sect sect = Sect.of(cardSummary.getSect());
         setSect(player, card, sect, true);
         // Do path
         Path path = Path.of(cardSummary.getPath());
@@ -225,18 +226,28 @@ public class JolGame {
         addCommand(String.format("%s influences out %s%s%s.", player, getCardLink(card), capacityText, votesText), new String[]{"influence", card.getId(), destPlayer, destRegion.xmlLabel()});
     }
 
-    public void setSect(String player, Card card, String sect, boolean quiet) {
-        setNotation(card, SECT, sect);
+    public void setSect(String player, Card card, Sect sect, boolean quiet) {
+        setNotation(card, SECT, sect.toString());
         if (!quiet) {
-            addCommand(String.format("%s changes sect of %s to %s", player, getCardLink(card), sect), new String[]{"sect", card.getId(), sect});
+            addCommand(String.format("%s changes sect of %s to %s", player, getCardLink(card), sect.getDescription()), new String[]{"sect", card.getId(), sect.toString()});
         }
     }
 
     public void setPath(String player, Card card, Path path, boolean quiet) {
         setNotation(card, PATH, path.toString());
         if (!quiet) {
-            addCommand(String.format("%s changes path of %s to %s", player, getCardLink(card), path), new String[]{"path", card.getId(), path.getDescription()});
+            addCommand(String.format("%s changes path of %s to %s", player, getCardLink(card), path.getDescription()), new String[]{"path", card.getId(), path.getDescription()});
         }
+    }
+
+    public void clearPath(String player, Card card) {
+        setNotation(card, PATH, "");
+        addCommand(String.format("%s clears path from %s", player, getCardLink(card)), new String[]{"path", card.getId()});
+    }
+
+    public void clearSect(String player, Card card) {
+        setNotation(card, SECT, "");
+        addCommand(String.format("%s clears sect from %s", player, getCardLink(card)), new String[]{"sect", card.getId()});
     }
 
     public void shuffle(String player, RegionType region, int num) {
@@ -402,6 +413,8 @@ public class JolGame {
         cardDetail.setContested(getContested(card));
         cardDetail.setMinion(isMinion(card));
         cardDetail.setMerged(isMerged(card));
+        cardDetail.setPath(getPath(card));
+        cardDetail.setSect(getSect(card));
         return cardDetail;
     }
 
@@ -458,6 +471,14 @@ public class JolGame {
 
     public String getLabel(Card card) {
         return getNotation(card, TEXT, "");
+    }
+
+    public String getPath(Card card) {
+        return getNotation(card, PATH, "");
+    }
+
+    public String getSect(Card card) {
+        return getNotation(card, SECT, "");
     }
 
     public void setLabel(Card card, String text, boolean quiet) {

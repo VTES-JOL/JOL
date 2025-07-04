@@ -22,26 +22,29 @@ public class NavBean {
     private String game = null;
 
     public NavBean(PlayerModel model) {
+        JolAdmin admin = JolAdmin.INSTANCE;
         player = model.getPlayerName();
         target = model.getView();
         if (target.equals("game"))
             game = model.getCurrentGame();
         if (player != null) {
             chats = model.hasChats();
-            boolean admin = JolAdmin.INSTANCE.isAdmin(player);
+            boolean isAdmin = admin.isAdmin(player);
             buttons.add("active:Watch");
             buttons.add("deck:Decks");
             buttons.add("profile:Profile");
             buttons.add("lobby:Lobby");
 //            buttons.add("tournament:Tournament");
-            if (admin) {
+            if (isAdmin) {
                 buttons.add("admin:Admin");
             }
         }
-        for (String game : model.getCurrentGames()) {
-            String current = JolAdmin.INSTANCE.isCurrent(player, game) ? "" : "*";
-            gameButtons.put("g" + game, game + current);
-        }
+        admin.getGames(player).stream()
+                .filter(game -> admin.isAlive(game, player))
+                .forEach(game -> {
+                    String current = JolAdmin.INSTANCE.isCurrent(player, game) ? "" : "*";
+                    gameButtons.put("g" + game, game + current);
+                });
         message = JolAdmin.INSTANCE.getMessage();
         stamp = JolAdmin.getDate();
     }
