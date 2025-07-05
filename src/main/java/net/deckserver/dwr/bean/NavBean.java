@@ -40,6 +40,7 @@ public class NavBean {
             }
         }
         admin.getGames(player).stream()
+                .filter(admin::isActive)
                 .filter(game -> admin.isAlive(game, player))
                 .forEach(game -> {
                     String current = JolAdmin.INSTANCE.isCurrent(player, game) ? "" : "*";

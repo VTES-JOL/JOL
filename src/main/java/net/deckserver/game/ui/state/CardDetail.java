@@ -28,6 +28,7 @@ public class CardDetail implements Serializable {
     private boolean merged;
     private String path;
     private String sect;
+    private String clan;
 
     public static final EnumSet<RegionType> FULL_ATTRIBUTE_REGIONS = EnumSet.of(RegionType.READY, RegionType.TORPOR, RegionType.UNCONTROLLED);
     public static final EnumSet<RegionType> LIMITED_ATTRIBUTE_REGIONS = EnumSet.of(RegionType.ASH_HEAP);

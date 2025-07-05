@@ -9,6 +9,7 @@ package net.deckserver.dwr.model;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.Location;
 import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.game.storage.cards.Clan;
 import net.deckserver.game.storage.cards.Path;
 import net.deckserver.game.storage.cards.Sect;
 import net.deckserver.game.storage.state.RegionType;
@@ -126,6 +127,9 @@ public class DoCommand {
             case "sect":
                 sect(cmdObj, player);
                 break;
+            case "clan":
+                clan(cmdObj, player);
+                break;
         }
     }
 
@@ -156,6 +160,26 @@ public class DoCommand {
                 throw new CommandException("Invalid path");
             }
             game.setPath(player, targetCard, path, false);
+        }
+    }
+
+    private void clan(CommandParser cmdObj, String player) throws CommandException {
+        String targetPlayer = cmdObj.getPlayer(player);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+        Card targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
+        boolean clear = cmdObj.consumeString("clear");
+        if (clear) {
+            game.setClan(player, targetCard, null, true);
+        } else {
+            StringBuilder builder = new StringBuilder();
+            while (cmdObj.hasMoreArgs()) {
+                builder.append(cmdObj.nextArg()).append(" ");
+            }
+            Clan clan = Clan.startsWith(builder.toString().trim());
+            if (clan == null) {
+                throw new CommandException("Invalid clan");
+            }
+            game.setClan(player, targetCard, clan, false);
         }
     }
 

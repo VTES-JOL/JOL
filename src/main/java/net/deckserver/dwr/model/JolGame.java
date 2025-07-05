@@ -13,6 +13,7 @@ import net.deckserver.game.interfaces.turn.GameAction;
 import net.deckserver.game.interfaces.turn.TurnRecorder;
 import net.deckserver.game.jaxb.state.Notation;
 import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.game.storage.cards.Clan;
 import net.deckserver.game.storage.cards.Path;
 import net.deckserver.game.storage.cards.Sect;
 import net.deckserver.game.storage.state.RegionType;
@@ -41,6 +42,7 @@ public class JolGame {
     private static final String VOTES = "votes";
     private static final String SECT = "sect";
     private static final String PATH = "path";
+    private static final String CLAN = "clan";
     private static final String ACTIVE = "active meth";
     private static final String POOL = "pool";
     private static final String EDGE = "edge";
@@ -221,6 +223,9 @@ public class JolGame {
         if (path != null) {
             setPath(player, card, path, true);
         }
+        // Do clan
+        Clan clan = Clan.of(cardSummary.getClans().getFirst());
+        setClan(player, card, clan, true);
         source.removeCard(card);
         dest.addCard(card, true);
         addCommand(String.format("%s influences out %s%s%s.", player, getCardLink(card), capacityText, votesText), new String[]{"influence", card.getId(), destPlayer, destRegion.xmlLabel()});
@@ -237,6 +242,13 @@ public class JolGame {
         setNotation(card, PATH, path.toString());
         if (!quiet) {
             addCommand(String.format("%s changes path of %s to %s", player, getCardLink(card), path.getDescription()), new String[]{"path", card.getId(), path.getDescription()});
+        }
+    }
+
+    public void setClan(String player, Card targetCard, Clan clan, boolean quiet) {
+        setNotation(targetCard, CLAN, clan.getDescription());
+        if (!quiet) {
+            addCommand(String.format("%s changes clan of %s to %s", player, getCardLink(targetCard), clan.getDescription()), new String[]{"path", targetCard.getId(), clan.getDescription()});
         }
     }
 
@@ -350,6 +362,8 @@ public class JolGame {
         return getNotation(state, ACTIVE, "");
     }
 
+
+
     private void setActivePlayer(String player) {
         setNotation(state, ACTIVE, player);
     }
@@ -415,6 +429,7 @@ public class JolGame {
         cardDetail.setMerged(isMerged(card));
         cardDetail.setPath(getPath(card));
         cardDetail.setSect(getSect(card));
+        cardDetail.setClan(getClan(card));
         return cardDetail;
     }
 
@@ -479,6 +494,10 @@ public class JolGame {
 
     public String getSect(Card card) {
         return getNotation(card, SECT, "");
+    }
+
+    public String getClan(Card card) {
+        return getNotation(card, CLAN, "");
     }
 
     public void setLabel(Card card, String text, boolean quiet) {

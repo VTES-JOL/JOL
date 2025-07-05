@@ -24,6 +24,7 @@ import net.deckserver.DeckParser;
 import net.deckserver.RandomGameName;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.GameStatusBean;
+import net.deckserver.dwr.bean.GameSummaryBean;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
 import net.deckserver.game.validators.DeckValidator;

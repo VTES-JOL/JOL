@@ -285,6 +285,15 @@ function callbackLobby(data) {
             text: "Join",
             confirm: "Join Game?"
         }, DS.invitePlayer, game.name, player);
+
+        let leaveButton = createButton({
+            class: "btn btn-outline-secondary btn-sm",
+            text: "Leave",
+            confirm: "Leave Game?"
+        }, DS.unInvitePlayer, game.name, player);
+
+        let playerInGame = false;
+
         let template = $(`
         <li class='list-group-item'>
             <div class="d-flex justify-content-between align-items-center">
@@ -298,7 +307,6 @@ function callbackLobby(data) {
             </div>
         </li>
         `);
-        template.find('.game-join').append(joinButton);
         publicGames.append(template);
         if (game.registrations.length > 0)
         {
@@ -310,12 +318,7 @@ function callbackLobby(data) {
                 let registrationRow = $("<tr/>");
                 let playerCell = $("<td/>").addClass("w-50").text(registration.player);
                 if (registration.player === player) {
-                    let leaveButton = registration.player === player ? createButton({
-                        class: "btn btn-outline-secondary btn-sm",
-                        text: "Leave",
-                        confirm: "Leave Game?"
-                    }, DS.unInvitePlayer, game.name, player) : "";
-                    template.find('.game-join').append(leaveButton);
+                    playerInGame = true;
                 }
                 registrationRow.append(playerCell);
                 let summary = $("<td/>").addClass("w-50 text-center")
@@ -324,7 +327,9 @@ function callbackLobby(data) {
                 }
                 registrationRow.append(summary);
                 tableBody.append(registrationRow);
-            });        }
+            });
+        }
+        template.find('.game-join').append(playerInGame ? leaveButton : joinButton);
     })
 
     invitedGames.empty();

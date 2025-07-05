@@ -65,6 +65,13 @@ public class CardSummary {
                 .collect(Collectors.toList());
     }
 
+    public String getSingleClanClass() {
+        return clans.stream().findFirst()
+                .map(s -> s.replaceAll(" ", "_"))
+                .map(String::toLowerCase)
+                .orElse(null);
+    }
+
     @JsonIgnore
     public CardType getCardType() {
         return CardType.of(type);
