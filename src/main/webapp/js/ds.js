@@ -795,14 +795,15 @@ function renderMyGames(id, games) {
 }
 
 function renderPlayer(players, target) {
-    let span = $("<span/>").addClass("my-2 px-2 border-end border-start w-100 text-center");
-    if (target !== "") {
-        span.text(players[target].playerName);
-        if (players[target].pinged) {
-            span.append("<i class='bi-exclamation-triangle ms-1'></i>");
-        }
-    }
-    return span;
+    let pinged = players[target] && players[target]["pinged"] ? `<i class='bi-exclamation-triangle ms-1></i>` : "";
+    let playerName = players[target] ? players[target]["playerName"] : "";
+    let template = `
+        <span class='my-2 px-2 border-end border-start w-100 text-center'>
+            ${playerName}
+            ${pinged}
+        </span>
+    `
+    return $(template);
 }
 
 function renderGameLink(game) {

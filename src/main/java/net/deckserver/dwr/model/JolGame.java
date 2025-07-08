@@ -253,7 +253,7 @@ public class JolGame {
     }
 
     public void clearPath(String player, Card card) {
-        setNotation(card, PATH, "");
+        setNotation(card, PATH, null);
         addCommand(String.format("%s clears path from %s", player, getCardLink(card)), new String[]{"path", card.getId()});
     }
 
@@ -489,7 +489,7 @@ public class JolGame {
     }
 
     public String getPath(Card card) {
-        return getNotation(card, PATH, "");
+        return getNotation(card, PATH, null);
     }
 
     public String getSect(Card card) {

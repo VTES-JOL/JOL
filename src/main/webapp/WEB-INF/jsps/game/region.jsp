@@ -22,6 +22,8 @@
     int size = game.getSize(player, region);
     Card[] cards = game.getState().getPlayerLocation(player, region).getCards();
     String regionName = region.xmlLabel().split(" ")[0];
+    request.setAttribute("visible", isVisible);
+    request.setAttribute("player", player);
 %>
 
 <c:if test="<%= cards.length > 0 %>">
@@ -42,25 +44,38 @@
         </div>
         <ol id="<%= regionId %>" class="region list-group list-group-flush list-group-numbered <%= regionStyle %> collapse <%= show %>">
             <c:forEach items="<%= cards %>" var="card" varStatus="counter">
-                <c:if test="<%= !simpleDisplay %>">
-                    <jsp:include page="card.jsp">
-                        <jsp:param name="player" value="<%= player %>"/>
-                        <jsp:param name="region" value="<%= region %>"/>
-                        <jsp:param name="id" value="${card.id}"/>
-                        <jsp:param name="shadow" value="true"/>
-                        <jsp:param name="visible" value="<%= isVisible %>"/>
-                        <jsp:param name="index" value="${counter.count}"/>
-                    </jsp:include>
+                <c:if test="${!player.equals(card.owner)}">
+                    <c:set var="visible" value="true"/>
                 </c:if>
-                <c:if test="<%= simpleDisplay %>">
-                    <jsp:include page="card-simple.jsp">
-                        <jsp:param name="player" value="<%= player %>"/>
-                        <jsp:param name="region" value="<%= region %>"/>
-                        <jsp:param name="id" value="${card.id}"/>
-                        <jsp:param name="visible" value="<%= isVisible %>"/>
-                        <jsp:param name="index" value="${counter.count}"/>
-                    </jsp:include>
-                </c:if>
+                <c:choose>
+                    <c:when test="${visible}">
+                        <c:if test="<%= !simpleDisplay %>">
+                            <jsp:include page="card.jsp">
+                                <jsp:param name="player" value="<%= player %>"/>
+                                <jsp:param name="region" value="<%= region %>"/>
+                                <jsp:param name="id" value="${card.id}"/>
+                                <jsp:param name="shadow" value="true"/>
+                                <jsp:param name="index" value="${counter.count}"/>
+                            </jsp:include>
+                        </c:if>
+                        <c:if test="<%= simpleDisplay %>">
+                            <jsp:include page="card-simple.jsp">
+                                <jsp:param name="player" value="<%= player %>"/>
+                                <jsp:param name="region" value="<%= region %>"/>
+                                <jsp:param name="id" value="${card.id}"/>
+                                <jsp:param name="index" value="${counter.count}"/>
+                            </jsp:include>
+                        </c:if>
+                    </c:when>
+                    <c:otherwise>
+                        <jsp:include page="card-hidden.jsp">
+                            <jsp:param name="player" value="<%= player%>"/>
+                            <jsp:param name="region" value="<%= region %>"/>
+                            <jsp:param name="id" value="${card.id}"/>
+                            <jsp:param name="index" value="${counter.count}"/>
+                        </jsp:include>
+                    </c:otherwise>
+                </c:choose>
             </c:forEach>
         </ol>
     </div>

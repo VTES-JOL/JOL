@@ -50,6 +50,7 @@ public class CardDetail implements Serializable {
     public String buildAttributes(RegionType region, String index, boolean visible) {
         String attributeString = String.format("data-coordinates='%s' ", index);
         attributeString += String.format("data-label='%s' ", label);
+        attributeString += String.format("data-visible='%s' ", visible);
         if (visible) {
             attributeString += String.format("data-card-id='%s' ", cardId);
             attributeString += String.format("data-minion='%s' ", minion);
