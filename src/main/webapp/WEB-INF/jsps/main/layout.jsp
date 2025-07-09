@@ -11,6 +11,6 @@
     <div class="col-lg-3 col-xl-2 mt-2 mt-lg-0 d-flex flex-column flex-md-row flex-lg-column gap-2">
         <jsp:include page="online-users.jsp"/>
         <jsp:include page="links.jsp"/>
-        <jsp:include page="contact.jsp"/>
+        <jsp:include page="dark-pack.jsp"/>
     </div>
 </div>
