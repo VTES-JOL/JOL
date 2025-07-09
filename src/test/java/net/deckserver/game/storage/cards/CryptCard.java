@@ -21,6 +21,7 @@ public class CryptCard {
     private Set<String> sets;
 
     private boolean unique = true;
+    private boolean infernal = false;
     private Integer capacity;
     private String clan;
     private String group;

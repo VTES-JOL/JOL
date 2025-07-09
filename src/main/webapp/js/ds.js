@@ -362,8 +362,7 @@ function callbackLobby(data) {
     $.each(data.decks, function (index, deck) {
         $.each(deck.gameFormats, function(i, format) {
             let dropDown = $(`ul .invite-${format}`);
-            let gameName = dropDown.data("name");
-            let template = $(`<li><a class="dropdown-item">${deck.name}</a></li>`).on('click', function() { registerDeck(gameName, deck.name); });
+            let template = $(`<li><a class="dropdown-item">${deck.name}</a></li>`).on('click', function() { registerDeck(this, deck.name); });
             dropDown.append(template);
         })
     })
@@ -909,8 +908,10 @@ function navigate(data) {
     renderDesktopViewButton();
 }
 
-function registerDeck(regGame, regDeck) {
-    DS.registerDeck(regGame, regDeck, {callback: processData, errorHandler: errorhandler});
+function registerDeck(deckRow, deck) {
+    let game = $(deckRow).closest('[data-name]').data('name');
+    console.log(game);
+    DS.registerDeck(game, deck, {callback: processData, errorHandler: errorhandler});
 }
 
 function doCreateGame() {

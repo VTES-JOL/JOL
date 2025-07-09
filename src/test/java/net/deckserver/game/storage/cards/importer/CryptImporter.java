@@ -27,7 +27,8 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
     private static final int FIELD_SET = 10;
     private static final int FIELD_TITLE = 11;
     private static final int FIELD_BANNED = 12;
-    Predicate<? super String> uniqueFilter = (text) -> text.contains("are not unique") || text.contains("non-unique");
+    Predicate<? super String> UNIQUE_FILTER = (text) -> text.contains("are not unique") || text.contains("non-unique");
+    Predicate<String> INFERNAL_FILTER = (text) -> text.contains("Infernal.");
 
     public CryptImporter(Path dataPath) {
         super(dataPath);
@@ -60,7 +61,8 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
                 .ifPresent(card::setDisciplines);
 
         Utils.getClean(lineData[FIELD_TEXT]).ifPresent(card::setText);
-        Utils.getClean(lineData[FIELD_TEXT]).map(String::toLowerCase).filter(uniqueFilter).ifPresent(s -> card.setUnique(false));
+        Utils.getClean(lineData[FIELD_TEXT]).map(String::toLowerCase).filter(UNIQUE_FILTER).ifPresent(s -> card.setUnique(false));
+        Utils.getClean(lineData[FIELD_TEXT]).filter(INFERNAL_FILTER).ifPresent(s -> card.setInfernal(true));
         Utils.getClean(lineData[FIELD_TITLE]).ifPresent(card::setTitle);
 
         Utils.getClean(lineData[FIELD_BANNED]).map(banned -> !banned.isEmpty()).ifPresent(card::setBanned);

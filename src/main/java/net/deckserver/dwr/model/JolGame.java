@@ -47,6 +47,7 @@ public class JolGame {
     private static final String POOL = "pool";
     private static final String EDGE = "edge";
     private static final String MINION = "minion";
+    private static final String INFERNAL = "infernal";
     private static final String MERGED = "merged";
     private static final String TAP = "tapnote";
     private static final String TAPPED = "tap";
@@ -225,10 +226,21 @@ public class JolGame {
         }
         // Do clan
         Clan clan = Clan.of(cardSummary.getClans().getFirst());
-        setClan(player, card, clan, true);
+        if (clan != null) {
+            setClan(player, card, clan, true);
+        }
+        // Do infernal
+        setInfernal(player, card, cardSummary.isInfernal(), true);
         source.removeCard(card);
         dest.addCard(card, true);
         addCommand(String.format("%s influences out %s%s%s.", player, getCardLink(card), capacityText, votesText), new String[]{"influence", card.getId(), destPlayer, destRegion.xmlLabel()});
+    }
+
+    private void setInfernal(String player, Card card, boolean infernal, boolean quiet) {
+        setNotation(card, INFERNAL, String.valueOf(infernal));
+        if (!quiet) {
+            addCommand(String.format("%s changes %s to infernal: %s", player, getCardLink(card), infernal), new String[]{"infernal", card.getId(), String.valueOf(infernal)});
+        }
     }
 
     public void setSect(String player, Card card, Sect sect, boolean quiet) {
@@ -424,6 +436,7 @@ public class JolGame {
         cardDetail.setLabel(getLabel(card));
         cardDetail.setVotes(getVotes(card));
         cardDetail.setLocked(isTapped(card));
+        cardDetail.setInfernal(isInfernal(card));
         cardDetail.setContested(getContested(card));
         cardDetail.setMinion(isMinion(card));
         cardDetail.setMerged(isMerged(card));
@@ -498,6 +511,10 @@ public class JolGame {
 
     public String getClan(Card card) {
         return getNotation(card, CLAN, "");
+    }
+
+    public boolean isInfernal(Card card) {
+        return getNotation(card, INFERNAL, "false").equals("true");
     }
 
     public void setLabel(Card card, String text, boolean quiet) {
@@ -579,6 +596,9 @@ public class JolGame {
     }
 
     public String getCurrentTurn() {
+        if (getTurns().isEmpty()) {
+            return null;
+        }
         return getTurns().getLast();
     }
 
@@ -934,7 +954,9 @@ public class JolGame {
     private void unlockAll(CardContainer loc) {
         Card[] cards = loc.getCards();
         for (Card card : cards) {
-            setNotation(card, TAP, "false");
+            if (!isInfernal(card)) {
+                setNotation(card, TAP, "false");
+            }
             unlockAll(card);
         }
     }

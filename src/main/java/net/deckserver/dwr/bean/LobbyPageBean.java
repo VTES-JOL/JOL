@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.storage.json.system.DeckFormat;
 
+import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -20,8 +21,15 @@ public class LobbyPageBean {
 
     public LobbyPageBean(String player) {
         JolAdmin admin = JolAdmin.INSTANCE;
+        OffsetDateTime currentMonth = OffsetDateTime.now().minusMonths(1);
 
-        players = admin.getPlayers().stream().sorted().collect(Collectors.toList());
+        players = admin.getPlayers().stream()
+                .sorted()
+                .map(PlayerActivityStatus::new)
+                .filter(playerActivityStatus -> playerActivityStatus.online().isAfter(currentMonth))
+                .sorted(Comparator.comparing(PlayerActivityStatus::getLastOnline))
+                .map(PlayerActivityStatus::getName)
+                .collect(Collectors.toList());
 
         myGames = admin.getGames().stream()
                 .filter(Objects::nonNull)

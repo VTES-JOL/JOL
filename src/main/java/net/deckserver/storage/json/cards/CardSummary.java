@@ -32,6 +32,7 @@ public class CardSummary {
     private String title;
     private String votes;
     private boolean advanced;
+    private boolean infernal;
 
     @JsonIgnore
     public boolean hasLife() {

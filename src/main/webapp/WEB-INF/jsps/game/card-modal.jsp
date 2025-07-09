@@ -15,10 +15,7 @@
                 </h5>
             </div>
             <div class="modal-body">
-                <div class="d-flex align-items-center">
-                    <span class="discipline">a</span>
-                </div>
-                <div class="card-text text-start"></div>
+                <img class="img-fluid" id="card-iamge" alt="card image"/>
             </div>
             <div class="modal-footer d-flex flex-wrap justify-content-center">
                 <div class="transfers-and-counters">

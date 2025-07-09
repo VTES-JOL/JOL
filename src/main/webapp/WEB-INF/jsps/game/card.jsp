@@ -47,6 +47,7 @@
     boolean hasVotes = !Strings.isNullOrEmpty(votes) && !votes.equals("0");
     boolean contested = cardDetail.isContested();
     boolean locked = cardDetail.isLocked();
+    boolean infernal = cardDetail.isInfernal();
     String shadowStyle = shadow ? "shadow" : "";
     if (hasCapacity && cardSummary.hasBlood()) {
         if (sect == null) {
@@ -93,6 +94,7 @@
             </div>
             <div class="d-flex flex-column">
                 <div class="d-flex justify-content-end align-items-center gap-1">
+                    <c:if test="<%= infernal %>"><i class="bi bi-fire text-danger fs-6"></i></c:if>
                     <c:if test="<%= locked %>"><span class="badge text-bg-dark p-1 px-2" style="font-size: 0.6rem;">LOCKED</span></c:if>
                     <c:if test="<%= counters > 0 || capacity > 0%>"><span class="badge rounded-pill shadow <%= counterStyle%>"><%= counterText%></span></c:if>
                 </div>

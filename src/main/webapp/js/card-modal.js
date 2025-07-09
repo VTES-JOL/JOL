@@ -236,6 +236,7 @@ function showCardModal(event) {
     let disciplines = target.data("disciplines").trim().split(" ");
     let owner = controller === player;
     if (cardId) {
+        $("#card-iamge").attr("src", "https://static.tornsignpost.org/images/" + cardId);
         $.get({
             dataType: "json",
             url: "https://static.tornsignpost.org/json/" + cardId, success: function (card) {
@@ -246,7 +247,6 @@ function showCardModal(event) {
 
                 $('#cardModal .card-name').text(card.displayName);
                 $('#cardModal .card-label').text(label).toggle(label.length > 0);
-                $('#cardModal .card-text').html(card.originalText);
                 $('#cardModal .votes').text(votes).addClass("badge rounded-pill text-bg-warning").toggle(votes > 0 || votes === 'P');
 
                 let clan = $("#cardModal .card-clan");
@@ -254,17 +254,6 @@ function showCardModal(event) {
                 if (card.clans != null) {
                     for (let c of card.clans)
                         clan.append($("<span/>").addClass("clan").addClass(clanToKey(c)));
-                }
-
-                let disciplineSpan = $('#cardModal .discipline');
-                disciplineSpan.empty();
-                if (disciplines.length < 0) {
-                    disciplines = card.disciplines;
-                }
-                if (disciplines.length > 0) {
-                    for (let d of disciplines) {
-                        disciplineSpan.append($("<span/>").addClass("icon").addClass(d));
-                    }
                 }
 
                 //If this is our inactive region, show capacity required to influence out.

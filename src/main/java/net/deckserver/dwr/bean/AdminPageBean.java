@@ -37,6 +37,7 @@ public class AdminPageBean {
                 .filter(playerActivityStatus -> playerActivityStatus.online().isBefore(currentYear))
                 .filter(playerActivityStatus -> playerActivityStatus.getLegacyDeckCount() + playerActivityStatus.getModernDeckCount() < 5)
                 .filter(playerActivityStatus -> playerActivityStatus.getActiveGamesCount() == 0)
+                .sorted(Comparator.comparing(PlayerActivityStatus::getLastOnline))
                 .collect(Collectors.toList());
         this.substitutes = playerActivityStatuses.stream()
                 .filter(playerActivityStatus -> playerActivityStatus.online().isAfter(currentMonth))

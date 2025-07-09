@@ -26,6 +26,7 @@ public class CardDetail implements Serializable {
     private boolean contested;
     private boolean minion;
     private boolean merged;
+    private boolean infernal;
     private String path;
     private String sect;
     private String clan;
