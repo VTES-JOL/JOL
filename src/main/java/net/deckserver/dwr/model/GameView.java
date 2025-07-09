@@ -127,9 +127,9 @@ public class GameView {
 
         if (turnChanged) {
             resetChat = true;
-            String[] gameTurns = game.getTurns();
-            for (int j = gameTurns.length; j > 0;)
-                turns.add(gameTurns[--j]);
+            List<String> gameTurns = game.getTurns();
+            for (int j = gameTurns.size(); j > 0;)
+                turns.add(gameTurns.get(--j));
         }
 
         if (stateChanged) {

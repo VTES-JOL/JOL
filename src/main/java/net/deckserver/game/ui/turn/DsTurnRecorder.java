@@ -8,7 +8,7 @@ import java.util.*;
 public class DsTurnRecorder implements TurnRecorder {
 
     Map<String, Turn> turns = new HashMap<>();
-    Collection<String> names = new Vector<>();
+    List<String> names = new ArrayList<>();
     private int counter = 1;
 
     public void addTurn(String meth, String label) {
@@ -17,8 +17,9 @@ public class DsTurnRecorder implements TurnRecorder {
         counter++;
     }
 
-    public String[] getTurns() {
-        return names.toArray(new String[0]);
+    @Override
+    public List<String> getTurns() {
+        return names;
     }
 
     public String getMethTurn(String label) {
@@ -31,6 +32,18 @@ public class DsTurnRecorder implements TurnRecorder {
 
     public void addMessage(String turn, String text) {
         new Act(text, getTurn(turn));
+    }
+
+    public void replacePlayer(String oldPlayer, String newPlayer) {
+        String currentLabel = names.getLast();
+        String newLabel = currentLabel.replace(oldPlayer, newPlayer);
+        names.set(names.size() - 1, newLabel);
+        if (currentLabel.contains(oldPlayer)) {
+            Turn currentTurn = turns.get(currentLabel);
+            currentTurn.m = newPlayer;
+            turns.remove(currentLabel);
+            turns.put(newLabel, currentTurn);
+        }
     }
 
     Turn getTurn(String turn) {
@@ -49,7 +62,7 @@ public class DsTurnRecorder implements TurnRecorder {
     static class Turn {
         //private final String l;
         final LinkedList<Act> c = new LinkedList<>();
-        private final String m;
+        private String m;
 
         Turn(String m, String l) {
             this.m = m;

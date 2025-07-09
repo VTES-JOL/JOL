@@ -122,8 +122,7 @@ public final class ModelLoader {
     }
 
     private static void createRecorder(TurnRecorder to, TurnRecorder orig) {
-        String[] turns = orig.getTurns();
-        for (String turn : turns) {
+        for (String turn : orig.getTurns()) {
             to.addTurn(orig.getMethTurn(turn), turn);
             GameAction[] actions = orig.getActions(turn);
             for (GameAction action : actions) {

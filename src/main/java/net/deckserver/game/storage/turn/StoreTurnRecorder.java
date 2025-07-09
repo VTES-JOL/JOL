@@ -87,12 +87,11 @@ public class StoreTurnRecorder implements TurnRecorder {
         return t.getName();
     }
 
-    public String[] getTurns() {
+    public List<String> getTurns() {
         List<Turn> turns = actions.getTurn();
         return turns.stream()
                 .map(Turn::getLabel)
-                .collect(Collectors.toList())
-                .toArray(new String[turns.size()]);
+                .toList();
     }
 
     public int getCounter() {

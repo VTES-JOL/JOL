@@ -6,6 +6,8 @@
 
 package net.deckserver.game.interfaces.turn;
 
+import java.util.List;
+
 /**
  * @author administrator
  */
@@ -13,7 +15,7 @@ public interface TurnRecorder {
 
     void addTurn(String meth, String label);
 
-    String[] getTurns();
+    List<String> getTurns();
 
     String getMethTurn(String label);
 

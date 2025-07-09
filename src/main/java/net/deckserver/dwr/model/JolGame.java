@@ -579,9 +579,7 @@ public class JolGame {
     }
 
     public String getCurrentTurn() {
-        String[] turns = getTurns();
-        if (turns.length == 0) return null;
-        return turns[turns.length - 1];
+        return getTurns().getLast();
     }
 
     /**
@@ -598,7 +596,7 @@ public class JolGame {
         return getActions(getCurrentTurn());
     }
 
-    public String[] getTurns() {
+    public List<String> getTurns() {
         return actions.getTurns();
     }
 
@@ -722,6 +720,7 @@ public class JolGame {
             setActivePlayer(newPlayer);
         }
         this.state.replacePlayer(oldPlayer, newPlayer);
+        this.actions.replacePlayer(oldPlayer, newPlayer);
         getNote(this.state, oldPlayer + POOL).setName(newPlayer + POOL);
         getNote(this.state, oldPlayer + VP).setName(newPlayer + VP);
         getNote(this.state, oldPlayer + TEXT).setName(newPlayer + TEXT);
