@@ -576,10 +576,10 @@ public class JolGame {
     public void contestCard(Card card, boolean clear) {
         if (clear) {
             setNotation(card, CONTEST, "");
-            addMessage(getCardName(card) + " is no longer contested.");
+            addMessage(String.format("%s's %s is no longer contested.", card.getOwner(), getCardName(card)));
         } else {
             setNotation(card, CONTEST, CONTEST);
-            addMessage(getCardName(card) + " is now contested.");
+            addMessage(String.format("%s's %s is now contested.", card.getOwner(), getCardName(card)));
         }
     }
 
