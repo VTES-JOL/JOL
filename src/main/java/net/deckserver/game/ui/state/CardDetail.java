@@ -54,8 +54,11 @@ public class CardDetail implements Serializable {
         attributeString += String.format("data-visible='%s' ", visible);
         if (visible) {
             attributeString += String.format("data-card-id='%s' ", cardId);
-            attributeString += String.format("data-minion='%s' ", minion);
             if (FULL_ATTRIBUTE_REGIONS.contains(region)) {
+                attributeString += String.format("data-minion='%s' ", minion);
+                attributeString += String.format("data-clan='%s' ", clan);
+                attributeString += String.format("data-sect='%s' ", sect);
+                attributeString += String.format("data-path='%s' ", path);
                 attributeString += String.format("data-capacity='%s' ", capacity);
                 attributeString += String.format("data-counters='%s' ", counters);
                 attributeString += String.format("data-votes='%s' ", votes);

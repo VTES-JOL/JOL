@@ -43,6 +43,7 @@ function showPlayCardModal(event) {
                     .addClass('icon card-type ' + cardTypeCSSClass(card.type));
                 playCardModal.find(".preamble").text(card.preamble || "");
                 playCardModal.find(".burn-option").toggle(card.burnOption || "");
+                playCardModal.find(".card-sect").text(card.sect || "");
 
                 let clan = playCardModal.find(".card-clan");
                 clan.empty();
@@ -234,6 +235,7 @@ function showCardModal(event) {
     let contested = target.data('contested');
     let minion = target.data("minion");
     let disciplines = target.data("disciplines").trim().split(" ");
+    let sect = target.data("sect");
     let owner = controller === player;
     if (cardId) {
         $("#card-iamge").attr("src", "https://static.tornsignpost.org/images/" + cardId);
@@ -255,6 +257,7 @@ function showCardModal(event) {
                     for (let c of card.clans)
                         clan.append($("<span/>").addClass("clan").addClass(clanToKey(c)));
                 }
+                $("#cardModal .card-sect").text(sect || "");
 
                 //If this is our inactive region, show capacity required to influence out.
                 //player is a global from ds.js - the logged-in player

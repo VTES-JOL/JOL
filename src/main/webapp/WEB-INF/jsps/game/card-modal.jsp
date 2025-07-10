@@ -4,7 +4,7 @@
             <h2 style="position:relative;top:43%">Loading...</h2>
         </div>
         <div class="modal-content loaded" style="text-align:center">
-            <div class="modal-header">
+            <div class="modal-header py-1 px-2 justify-content-between">
                 <h5 class="modal-title">
                     <span class="align-items-center">
                         <span class="card-clan"></span>
@@ -12,6 +12,7 @@
                         <span class="votes mx-2" title="Votes">3</span>
                     </span>
                 </h5>
+                <span class="card-sect"></span>
             </div>
             <div class="modal-body">
                 <img class="img-fluid" id="card-iamge" alt="card image" src=""/>

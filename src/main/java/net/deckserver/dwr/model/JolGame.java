@@ -254,7 +254,7 @@ public class JolGame {
     }
 
     public void setSect(String player, Card card, Sect sect, boolean quiet) {
-        setNotation(card, SECT, sect.toString());
+        setNotation(card, SECT, sect.getDescription());
         if (!quiet) {
             addCommand(String.format("%s changes sect of %s to %s", player, getCardLink(card), sect.getDescription()), new String[]{"sect", card.getId(), sect.toString()});
         }
@@ -514,7 +514,7 @@ public class JolGame {
     }
 
     public String getSect(Card card) {
-        return getNotation(card, SECT, "");
+        return getNotation(card, SECT, null);
     }
 
     public String getClan(Card card) {
