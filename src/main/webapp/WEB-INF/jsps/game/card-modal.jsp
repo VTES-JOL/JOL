@@ -14,9 +14,11 @@
                 </h5>
             </div>
             <div class="modal-body">
-                <img class="img-fluid" id="card-iamge" alt="card image"/>
-                <label for="card-label" class="d-none">Label</label>
-                <input type="email" class="form-control mt-2" id="card-label" placeholder="Add a label for all players to see." onchange="updateNotes();">
+                <img class="img-fluid" id="card-iamge" alt="card image" src=""/>
+                <div class="input-group mt-2">
+                    <label for="card-label" class="input-group-text"><i class="bi bi-tag"></i></label>
+                    <input type="email" class="form-control" id="card-label" placeholder="Add a label for all players to see." onchange="updateNotes();">
+                </div>
             </div>
             <div class="modal-footer d-flex flex-wrap justify-content-center">
                 <div class="transfers-and-counters">
