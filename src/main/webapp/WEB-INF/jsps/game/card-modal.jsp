@@ -5,17 +5,18 @@
         </div>
         <div class="modal-content loaded" style="text-align:center">
             <div class="modal-header">
-                <h5 class="modal-title d-flex justify-content-between align-items-center w-100">
+                <h5 class="modal-title">
                     <span class="align-items-center">
                         <span class="card-clan"></span>
                         <span class="card-name" id="cardModalLabel">Maris Streck</span>
                         <span class="votes mx-2" title="Votes">3</span>
                     </span>
-                    <span class="card-label badge bg-light text-black shadow fs-6"></span>
                 </h5>
             </div>
             <div class="modal-body">
                 <img class="img-fluid" id="card-iamge" alt="card image"/>
+                <label for="card-label" class="d-none">Label</label>
+                <input type="email" class="form-control mt-2" id="card-label" placeholder="Add a label for all players to see." onchange="updateNotes();">
             </div>
             <div class="modal-footer d-flex flex-wrap justify-content-center">
                 <div class="transfers-and-counters">

@@ -246,7 +246,7 @@ function showCardModal(event) {
                 modal.data('coordinates', coordinates);
 
                 $('#cardModal .card-name').text(card.displayName);
-                $('#cardModal .card-label').text(label).toggle(label.length > 0);
+                $('#card-label').val(label);
                 $('#cardModal .votes').text(votes).addClass("badge rounded-pill text-bg-warning").toggle(votes > 0 || votes === 'P');
 
                 let clan = $("#cardModal .card-clan");
@@ -506,6 +506,19 @@ function transferToCard() {
     setPool(pool - 1);
     addCounter(false);
     return false;
+}
+
+function updateNotes() {
+    var cardLabel = $("#card-label").val();
+    var modal = $('#cardModal');
+    var parts = new Array(5);
+    parts.push('label',
+        modal.data('controller').split(' ', 2)[0],
+        modal.data('region').split(' ')[0], //ready-region > ready
+        modal.data('coordinates'),
+        cardLabel);
+    var command = parts.join(' ');
+    sendCommand(command.trim());
 }
 
 function transferToPool() {
