@@ -190,6 +190,14 @@ public class JolGame {
         addCommand(message, new String[]{"play", card.getId(), destinationPlayer, destinationRegion.xmlLabel()});
         parent.removeCard(card);
         destination.addCard(card, false);
+
+        if (destinationRegion.equals(RegionType.READY)) {
+            Map<String, Card> cards = state.getUniqueCards(card.getCardId());
+            if (cards.size() > 1) {
+                cards.values().forEach(c -> contestCard(c, false));
+            }
+        }
+
     }
 
     public void influenceCard(String player, Card card, String destPlayer, RegionType destRegion) {
@@ -236,13 +244,13 @@ public class JolGame {
         source.removeCard(card);
         dest.addCard(card, true);
         addCommand(String.format("%s influences out %s%s%s.", player, getCardLink(card), capacityText, votesText), new String[]{"influence", card.getId(), destPlayer, destRegion.xmlLabel()});
-    }
 
-    private void setInfernal(String player, Card card, boolean infernal, boolean quiet) {
-        setNotation(card, INFERNAL, String.valueOf(infernal));
-        if (!quiet) {
-            addCommand(String.format("%s changes %s to infernal: %s", player, getCardLink(card), infernal), new String[]{"infernal", card.getId(), String.valueOf(infernal)});
+        Map<String, Card> cards = state.getUniqueCards(card.getCardId());
+        if (cards.size() > 1) {
+            cards.values().forEach(c -> contestCard(c, false));
+            contestCard(card, false);
         }
+
     }
 
     public void setSect(String player, Card card, Sect sect, boolean quiet) {
@@ -375,8 +383,6 @@ public class JolGame {
     public String getActivePlayer() {
         return getNotation(state, ACTIVE, "");
     }
-
-
 
     private void setActivePlayer(String player) {
         setNotation(state, ACTIVE, player);
@@ -775,6 +781,13 @@ public class JolGame {
 
     public Card getCard(String id) {
         return state.getCard(id);
+    }
+
+    private void setInfernal(String player, Card card, boolean infernal, boolean quiet) {
+        setNotation(card, INFERNAL, String.valueOf(infernal));
+        if (!quiet) {
+            addCommand(String.format("%s changes %s to infernal: %s", player, getCardLink(card), infernal), new String[]{"infernal", card.getId(), String.valueOf(infernal)});
+        }
     }
 
     private List<String> getValidPlayers() {

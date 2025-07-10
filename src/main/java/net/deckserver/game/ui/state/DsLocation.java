@@ -1,5 +1,8 @@
 package net.deckserver.game.ui.state;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.Location;
 
@@ -8,14 +11,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+@Getter @Setter
 public class DsLocation extends DsCardContainer implements Location {
 
-    private String lname;
+    private String name;
     private String owner;
 
     DsLocation(String name, DsGame game) {
         super(game);
-        this.lname = name;
+        this.name = name;
     }
 
     public void initCards(List<String> cardIds, String owner) {
@@ -25,20 +29,6 @@ public class DsLocation extends DsCardContainer implements Location {
             addCard(c, false);
             getGame().addCard(c);
         }
-    }
-
-    public void setName(String name) {
-        this.lname = name;
-    }
-
-    @Override
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    @Override
-    public String getOwner() {
-        return this.owner;
     }
 
     public void shuffle(int num) {
@@ -51,10 +41,6 @@ public class DsLocation extends DsCardContainer implements Location {
         }
         cards.clear();
         cards.addAll(sCards);
-    }
-
-    public String getName() {
-        return lname;
     }
 
     public Card getCard(int index) {

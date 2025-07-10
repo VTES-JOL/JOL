@@ -1,9 +1,11 @@
 package net.deckserver.game.ui.state;
 
+import lombok.Getter;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.interfaces.state.CardContainer;
 import net.deckserver.game.interfaces.state.Game;
 import net.deckserver.game.interfaces.state.Location;
+import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.game.storage.state.RegionType;
 
 import java.util.*;
@@ -12,9 +14,8 @@ import java.util.stream.Collectors;
 public class DsGame extends DsNoteTaker implements Game {
 
     private final LinkedList<Player> players = new LinkedList<>();
-    private final LinkedList<DsLocation> regions = new LinkedList<>();
     private final Map<String, Card> cards = new HashMap<>(500);
-    private String gname;
+    private String gameName;
     private int index = 1;
 
     public void addPlayer(String player) {
@@ -39,15 +40,15 @@ public class DsGame extends DsNoteTaker implements Game {
         DsLocation l = new DsLocation(region.xmlLabel(), this);
         l.setOwner(player);
         Player p = getPlayer(player);
-        p.locs.add(l);
+        p.locations.add(l);
     }
 
     public String getName() {
-        return gname;
+        return gameName;
     }
 
     public void setName(String name) {
-        gname = name;
+        gameName = name;
     }
 
     public List<String> getPlayers() {
@@ -56,15 +57,29 @@ public class DsGame extends DsNoteTaker implements Game {
 
     public Location[] getPlayerLocations(String player) {
         Player p = getPlayer(player);
-        return p.locs.toArray(new Location[0]);
+        return p.locations.toArray(new Location[0]);
     }
 
     public Location getPlayerLocation(String player, RegionType region) {
         Player p = getPlayer(player);
-        for (DsLocation l : p.locs) {
+        for (DsLocation l : p.locations) {
             if (l.getName().equals(region.xmlLabel())) return l;
         }
         return null;
+    }
+
+    public Map<String, Card> getUniqueCards(String cardId) {
+        Map<String, Card> cards = new HashMap<>();
+        if (!CardSearch.INSTANCE.get(cardId).isUnique()) {
+            return cards;
+        }
+        for (String player: getPlayers()) {
+            Location readyLocation = getPlayerLocation(player, RegionType.READY);
+            Arrays.stream(readyLocation.getCards())
+                    .filter(c -> c.getCardId().equals(cardId))
+                    .forEach(c -> cards.put(c.getId(), c));
+        }
+        return cards;
     }
 
     public String getPlayerRegionName(Location location) {
@@ -93,11 +108,6 @@ public class DsGame extends DsNoteTaker implements Game {
 
     public void replacePlayer(String oldPlayer, String newPlayer) {
         getPlayer(oldPlayer).name = newPlayer;
-        for (DsLocation region : regions) {
-            String regionName = region.getName();
-            String newRegionName = regionName.replaceFirst(oldPlayer, newPlayer);
-            region.setName(newRegionName);
-        }
         cards.values().stream()
                 .filter(c -> c.getOwner().equals(oldPlayer))
                 .forEach(c -> c.setOwner(newPlayer));
@@ -105,19 +115,13 @@ public class DsGame extends DsNoteTaker implements Game {
 
     static class Player {
 
+        @Getter
         String name;
-        final Collection<DsLocation> locs = new LinkedList<>();
+        final Collection<DsLocation> locations = new LinkedList<>();
 
         Player(String name) {
             this.name = name;
         }
 
-        private void setName(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
     }
 }
