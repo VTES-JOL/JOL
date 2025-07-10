@@ -218,7 +218,9 @@ public class JolGame {
         }
         // Do sect
         Sect sect = Sect.of(cardSummary.getSect());
-        setSect(player, card, sect, true);
+        if (sect != null) {
+            setSect(player, card, sect, true);
+        }
         // Do path
         Path path = Path.of(cardSummary.getPath());
         if (path != null) {
