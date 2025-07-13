@@ -1,6 +1,6 @@
 package net.deckserver.game.jaxb.actions;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
