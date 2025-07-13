@@ -238,7 +238,7 @@ function showCardModal(event) {
     let sect = target.data("sect");
     let owner = controller === player;
     if (cardId) {
-        $("#card-iamge").attr("src", "https://static.tornsignpost.org/images/" + cardId);
+        $("#card-image").attr("src", "https://static.tornsignpost.org/images/" + cardId);
         $.get({
             dataType: "json",
             url: "https://static.tornsignpost.org/json/" + cardId, success: function (card) {
