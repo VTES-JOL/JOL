@@ -582,7 +582,7 @@ public class JolAdmin {
         GameInfo gameInfo = games.get(gameName);
         String deckId = String.format("%s-%d", playerInfo.getId(), round);
         Path deckPath = BASE_PATH.resolve("tournaments").resolve(deckId + ".json");
-        assert Files.exists(deckPath);
+        assert Files.exists(deckPath) : String.format("Unable to find %s", deckPath);
         try {
             Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId()).resolve(deckId + ".json");
             Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);

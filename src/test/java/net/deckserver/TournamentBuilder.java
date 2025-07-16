@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.CsvWriter;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.CsvWriterSettings;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,24 @@ public class TournamentBuilder {
     @BeforeEach
     public void init() {
         objectMapper.findAndRegisterModules();
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "JOL_DATA", value = "/Users/shannon/data")
+    public void exportVekn() throws Exception {
+        JolAdmin admin = JolAdmin.INSTANCE;
+        admin.setup();
+        assertNotNull(admin);
+        Path tournamentFilePath = Paths.get(System.getenv("JOL_DATA")).resolve("tournament.json");
+        Path outputPath = Paths.get(System.getenv("JOL_DATA")).resolve("tournaments").resolve("vekn.csv");
+        TournamentData data = objectMapper.readValue(tournamentFilePath.toFile(), TournamentData.class);
+        assertNotNull(data);
+        try (CsvWriter csvWriter = new CsvWriter(outputPath.toFile(), new CsvWriterSettings())) {
+            csvWriter.writeHeaders("Player", "VEKN");
+            data.getRegistrations().forEach((playerName, registration) -> {
+                csvWriter.writeRow(registration.getPlayerName(), registration.getVeknId());
+            });
+        }
     }
 
     @Test
@@ -71,7 +91,7 @@ public class TournamentBuilder {
         data.getRegistrations().keySet().forEach(playerName -> {
             try {
                 String playerId = admin.getPlayerId(playerName);
-                String contents = getDeckContents(playerId,  playerName, 1);
+                String contents = getDeckContents(playerId, playerName, 1);
                 Path outputPath = Paths.get(System.getenv("JOL_DATA")).resolve("tournaments").resolve(playerName + ".txt");
                 Files.write(outputPath, contents.getBytes());
             } catch (IOException e) {
@@ -94,7 +114,7 @@ public class TournamentBuilder {
         for (int round = 1; round <= data.getTables().size(); round++) {
             List<List<String>> tables = data.getTables().get(round - 1);
             for (int table = 1; table <= tables.size(); table++) {
-                String gameName = String.format("Cardinal Benediction: Round %d - Table %d", round, table);
+                String gameName = String.format("Empires Fall: Round %d - Table %d", round, table);
                 if (admin.notExistsGame(gameName)) {
                     admin.createGame(gameName, false, "TOURNAMENT");
                 }
@@ -106,7 +126,7 @@ public class TournamentBuilder {
                     assertTrue(admin.existsPlayer(player));
                     String deckName = data.getRegistrations().get(player).getDecks().getFirst();
                     assertNotNull(deckName);
-                    admin.registerTournamentDeck(gameName, player, deckName, round);
+                    admin.registerTournamentDeck(gameName, player, deckName, 1);
                 }
                 admin.startGame(gameName, players);
             }
