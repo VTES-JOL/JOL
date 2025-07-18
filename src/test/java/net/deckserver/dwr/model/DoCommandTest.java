@@ -423,6 +423,11 @@ public class DoCommandTest {
         assertThat(game.getState().getPlayerLocation("Player5", RegionType.READY.xmlLabel()).getCards().length, is(4));
         assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY.xmlLabel()).getCards().length, is(0));
         assertThat(getLastMessage(), containsString("Player5 moves <a class='card-name' data-card-id='200788'>Klaus van der Veken</a> to Player5's ready region."));
+        assertThat(game.getState().getPlayerLocation("Player4", RegionType.LIBRARY.xmlLabel()).getCards().length, is(81));
+        // Handle case with multiple spaces in text
+        worker.doCommand("Player4", "Move  hand 7 library ");
+        assertThat(game.getState().getPlayerLocation("Player4", RegionType.HAND.xmlLabel()).getCards().length, is(6));
+        assertThat(game.getState().getPlayerLocation("Player4", RegionType.LIBRARY.xmlLabel()).getCards().length, is(82));
     }
 
     @Test
