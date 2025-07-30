@@ -525,15 +525,15 @@ public class JolGame {
         return getNotation(card, INFERNAL, "false").equals("true");
     }
 
-    public void setLabel(Card card, String text, boolean quiet) {
+    public void setLabel(String player, Card card, String text, boolean quiet) {
         String cardName = getCardName(card);
         String cleanText = text.trim();
         setNotation(card, TEXT, cleanText);
         if (!quiet) {
             if (!cleanText.isEmpty()) {
-                addMessage(String.format("%s now \"%s\"", cardName, cleanText));
+                addMessage(String.format("%s labels %s: \"%s\"", player, cardName, cleanText));
             } else {
-                addMessage("Removed label from " + cardName);
+                addMessage(String.format("%s removes label from %s ", player, cardName));
             }
         }
     }
@@ -1051,7 +1051,7 @@ public class JolGame {
         dest.addCard(card, false);
 
         //Clear label
-        setLabel(card, "", true);
+        setLabel(null, card, "", true);
 
         //Clear capacity
         int capacity = getCapacity(card);

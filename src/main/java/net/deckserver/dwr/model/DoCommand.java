@@ -424,7 +424,7 @@ public class DoCommand {
             note.append(" ");
             note.append(cmdObj.nextArg());
         }
-        game.setLabel(card, note.toString(), false);
+        game.setLabel(player, card, note.toString(), false);
     }
 
     void random(CommandParser cmdObj, String player) throws CommandException {
