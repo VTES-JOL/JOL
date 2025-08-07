@@ -901,7 +901,7 @@ public class JolAdmin {
         // try and generate stats for game
         if (gameInfo.getStatus().equals(GameStatus.ACTIVE)) {
             JolGame gameData = getGame(gameName);
-            if (gameData.getPlayers().size() > 4 && graceful) {
+            if (gameData.getPlayers().size() >= 4 && graceful) {
                 GameHistory history = new GameHistory();
                 history.setName(gameName);
                 String startTime = gameInfo.getCreated() != null ? gameInfo.getCreated().format(ISO_OFFSET_DATE_TIME) : " --- ";
