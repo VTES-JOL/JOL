@@ -143,13 +143,17 @@ function callbackAdmin(data) {
     })
 
     let adminGameList = $("#adminGameList");
+    let rollbackGamList = $("#rollbackGamesList");
     let endTurnList = $("#endTurnList");
     adminGameList.empty();
+    rollbackGamList.empty();
     $.each(data.games, function (index, value) {
         adminGameList.append($("<option/>", {value: value, text: value}));
         endTurnList.append($("<option/>", {value: value, text: value}));
+        rollbackGamList.append($("<option/>", {value: value, text: value}));
     })
     adminChangeGame();
+    rollbackChangeGame();
 
     let idleGameList = $("#idleGameList");
     idleGameList.empty();
@@ -189,12 +193,34 @@ function adminChangeGame() {
     DS.getGamePlayers(currentGame, {callback: setPlayers, errorHandler: errorhandler});
 }
 
+function rollbackChangeGame() {
+    let currentGame = $("#rollbackGamesList").val();
+    DS.getGameTurns(currentGame, {callback: setRollbackTurns, errorHandler: errorhandler});
+}
+
+function rollbackGame() {
+    let currentGame = $("#rollbackGamesList").val();
+    let currentTurn = $("#rollbackTurnsList").val();
+    if (confirm("Are you sure you want to rollback to turn " + currentTurn + " for " + currentGame)) {
+        DS.rollbackGame(currentGame, currentTurn, {callback: processData, errorHandler: errorhandler});
+    }
+}
+
 function setPlayers(data) {
     let adminReplacePlayerList = $("#adminReplacePlayerList");
     adminReplacePlayerList.empty();
     $.each(data, function (index, value) {
         let playerOption = $("<option/>", {value: value, text: value});
         adminReplacePlayerList.append(playerOption);
+    })
+}
+
+function setRollbackTurns(data) {
+    let rollbackTurnsList = $("#rollbackTurnsList");
+    rollbackTurnsList.empty();
+    $.each(data, function (index, value) {
+        let rollbackTurnOption = $("<option/>", {value: value, text: value});
+        rollbackTurnsList.append(rollbackTurnOption);
     })
 }
 

@@ -34,6 +34,18 @@ public final class ModelLoader {
         return new JolGame(gameId, deckServerState, deckServerActions);
     }
 
+    public static JolGame loadSnapshot(String gameId, String turn) {
+        Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game-" + turn + ".xml");
+        GameState gameState = XmlFileUtils.loadGameState(gameStatePath);
+        Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions-" + turn + ".xml");
+        GameActions gameActions = XmlFileUtils.loadGameActions(gameActionsPath);
+        DsGame deckServerState = new DsGame();
+        DsTurnRecorder deckServerActions = new DsTurnRecorder();
+        ModelLoader.createModel(deckServerState, new StoreGame(gameState));
+        ModelLoader.createRecorder(deckServerActions, new StoreTurnRecorder(gameActions));
+        return new JolGame(gameId, deckServerState, deckServerActions);
+    }
+
     public static void saveGame(JolGame game) {
         String gameId = game.getId();
         Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.xml");

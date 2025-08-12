@@ -172,6 +172,27 @@ public class DeckserverRemote {
         return new HashSet<>();
     }
 
+    public List<String> getGameTurns(String gameName) {
+        String playerName = getPlayer(request);
+        if (gameName != null && !Strings.isNullOrEmpty(playerName)) {
+            return admin.getTurns(gameName);
+        }
+        return new ArrayList<>();
+    }
+
+    public Map<String, Object> rollbackGame(String gameName, String turn) {
+        String playerName = getPlayer(request);
+        if (gameName != null && !Strings.isNullOrEmpty(playerName) && admin.isAdmin(playerName)) {
+            try {
+                String turnCode = turn.split(" ")[1].replaceAll("\\.", "-");
+                admin.rollbackGame(gameName, turnCode);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return UpdateFactory.getUpdate();
+    }
+
     public Map<String, Object> replacePlayer(String gameName, String existingPlayer, String newPlayer) {
         String playerName = getPlayer(request);
         if (admin.isAdmin(playerName)) {

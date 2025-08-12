@@ -1,4 +1,4 @@
-<div class="card shadow mt-2">
+<div class="card shadow">
   <div class="card-header bg-body-secondary">
     <h5>Replace Player</h5>
   </div>

@@ -382,6 +382,15 @@ public class JolAdmin {
         ModelLoader.writeActions(id, actions, turn);
     }
 
+    public void rollbackGame(String gameName, String turn) {
+        String id = loadGameInfo(gameName).getId();
+        logger.info("Rolling back game {} for turn {}", gameName, turn);
+        JolGame game = ModelLoader.loadSnapshot(id, turn);
+        game.addMessage("Game state rolled back by Admin.");
+        saveGameState(game, true);
+        gameCache.refresh(gameName);
+    }
+
     public void shutdown() {
         try {
             persistState();
@@ -1111,6 +1120,10 @@ public class JolAdmin {
             logger.error("Could not find constructor for DeckValidator", e);
             throw new RuntimeException(e);
         }
+    }
+
+    public List<String> getTurns(String gameName) {
+        return gameCache.get(gameName).getTurns().reversed();
     }
 
     private void loadProperties() {

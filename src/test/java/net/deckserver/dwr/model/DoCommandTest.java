@@ -154,13 +154,13 @@ public class DoCommandTest {
         assertThat(game.getLabel(card), is(""));
         worker.doCommand("Player5", "label PLayer2 ready 1 test");
         assertThat(game.getLabel(card), is("test"));
-        assertThat(getLastMessage(), containsString("<a class='card-name' data-card-id='201337'>Talley, The Hound</a> now \"test\""));
+        assertThat(getLastMessage(), containsString("<a class='card-name' data-card-id='201337'>Talley, The Hound</a>: \"test\""));
         worker.doCommand("Player5", "label Player2 ready 1");
         assertThat(game.getLabel(card), is(""));
-        assertThat(getLastMessage(), containsString("Removed label from <a class='card-name' data-card-id='201337'>Talley, The Hound</a>"));
+        assertThat(getLastMessage(), containsString("removes label from <a class='card-name' data-card-id='201337'>Talley, The Hound</a>"));
         worker.doCommand("Player5", "Label Player2 ready 1 again");
         assertThat(game.getLabel(card), is("again"));
-        assertThat(getLastMessage(), containsString("<a class='card-name' data-card-id='201337'>Talley, The Hound</a> now \"again\""));
+        assertThat(getLastMessage(), containsString("<a class='card-name' data-card-id='201337'>Talley, The Hound</a>: \"again\""));
     }
 
     @Test
