@@ -630,7 +630,11 @@ public class DoCommandTest {
     void showAll() throws CommandException {
         assertThat(game.getPrivateNotes("Player2"), is(""));
         worker.doCommand("Player3", "show library all");
-        assertThat(game.getPrivateNotes("Player2"), not(is("")));
+        assertThat(game.getPrivateNotes("Player1"), containsString("81 cards of Player3's LIBRARY"));
+        assertThat(game.getPrivateNotes("Player2"), containsString("81 cards of Player3's LIBRARY"));
+        assertThat(game.getPrivateNotes("Player3"), containsString("81 cards of Player3's LIBRARY"));
+        assertThat(game.getPrivateNotes("Player4"), containsString("81 cards of Player3's LIBRARY"));
+        assertThat(game.getPrivateNotes("Player5"), containsString("81 cards of Player3's LIBRARY"));
         assertThat(getLastMessage(), containsString("Player3 shows everyone 81 cards of their Library."));
         worker.doCommand("Player3", "show hand all");
         assertThat(game.getPrivateNotes("Player2"), not(is("")));

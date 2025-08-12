@@ -979,28 +979,28 @@ function doShowDeck() {
         DS.getGameDeck(game, {callback: callbackShowGameDeck, errorHandler: errorhandler});
 }
 
+function endTurn() {
+    if (confirm("Are you sure you want to end your turn?")) {
+        DS.endPlayerTurn(game, {callback: processData, errorHandler: errorhandler});
+    }
+}
+
 function doSubmit() {
     const phaseSelect = $("#phase");
     const commandInput = $("#command");
     const chatInput = $("#chat");
     const pingSelect = $("#ping");
-    const endTurnSelect = $("#endTurn");
 
     let phase = phaseSelect.val();
     let ping = pingSelect.val();
     const command = commandInput.val();
     const chat = chatInput.val();
-    const endTurn = endTurnSelect.val();
     phase = phase === "" ? null : phase;
     ping = ping === "" ? null : ping;
     commandInput.val("");
     chatInput.val("");
     pingSelect.val("");
-    endTurnSelect.val("No");
-    if (endTurn === "Yes") {
-        phaseSelect.val("Unlock");
-    }
-    DS.submitForm(game, phase, command, chat, ping, endTurn, {callback: processData, errorHandler: errorhandler});
+    DS.submitForm(game, phase, command, chat, ping, {callback: processData, errorHandler: errorhandler});
     return false;
 }
 

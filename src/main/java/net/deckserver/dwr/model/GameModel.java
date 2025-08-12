@@ -40,8 +40,20 @@ public class GameModel implements Comparable<GameModel> {
         return status;
     }
 
-    public synchronized String submit(String player, String phase, String command, String chat,
-                                      String ping, String endTurn) {
+    public synchronized String endTurn(String player) {
+        JolAdmin admin = JolAdmin.INSTANCE;
+        JolGame game = admin.getGame(name);
+        if (game.getActivePlayer().equals(player)) {
+            game.newTurn();
+            resetChats();
+            reloadNotes();
+            admin.saveGameState(game);
+            doReload(true, true, true);
+        }
+        return "Ended turn";
+    }
+
+    public synchronized String submit(String player, String phase, String command, String chat, String ping) {
         JolAdmin admin = JolAdmin.INSTANCE;
         // Only players and judges can issue commands.  A judge can't be a player
         boolean isJudge = admin.isJudge(player) && !getPlayers().contains(player);
@@ -95,13 +107,6 @@ public class GameModel implements Comparable<GameModel> {
                 OffsetDateTime timestamp = OffsetDateTime.now();
                 METRICS.info(new ObjectArrayMessage(timestamp.getYear(), timestamp.getMonthValue(), timestamp.getDayOfMonth(), timestamp.getHour(), player, game.getName(), didCommand, didChat));
                 admin.clearPing(player, name);
-            }
-            if (game.getActivePlayer().equals(player) && "Yes".equalsIgnoreCase(endTurn)) {
-                game.newTurn();
-                resetChats();
-                reloadNotes();
-                idx = 0; // reset the current action index for the new turn.
-                turnChanged = stateChanged = phaseChanged = true;
             }
             addChats(idx);
             if (stateChanged || phaseChanged || chatChanged) {

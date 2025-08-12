@@ -248,8 +248,7 @@ public class DeckserverRemote {
         }
     }
 
-    public Map<String, Object> submitForm(String gameName, String phase, String command, String chat,
-                                          String ping, String endTurn) {
+    public Map<String, Object> submitForm(String gameName, String phase, String command, String chat, String ping) {
         String player = getPlayer(request);
         GameModel game = getModel(gameName);
         // only process a command if the player is in the game, or a judge that isn't playing
@@ -261,13 +260,22 @@ public class DeckserverRemote {
             command = ne(command);
             chat = ne(chat);
             ping = ne(ping);
-            endTurn = ne(endTurn);
-            status = game.submit(player, phase, command, chat, ping, endTurn);
+            status = game.submit(player, phase, command, chat, ping);
         }
         Map<String, Object> ret = UpdateFactory.getUpdate();
         if (isPlaying || canJudge)
             ret.put("showStatus", status);
         return ret;
+    }
+
+    public Map<String, Object> endPlayerTurn(String gameName) {
+        String player = getPlayer(request);
+        boolean isPlaying = admin.getPlayers(gameName).contains(player);
+        GameModel game = getModel(gameName);
+        if (isPlaying) {
+            game.endTurn(player);
+        }
+        return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> endTurn(String gameName) {
