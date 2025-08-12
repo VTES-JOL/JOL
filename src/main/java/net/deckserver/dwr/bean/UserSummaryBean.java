@@ -13,6 +13,7 @@ public class UserSummaryBean {
     private final boolean admin;
     private final boolean superUser;
     private final boolean judge;
+    private final boolean playtester;
     private final String lastOnline;
 
     public UserSummaryBean(String name) {
@@ -20,11 +21,12 @@ public class UserSummaryBean {
         this.admin = JolAdmin.INSTANCE.isAdmin(name);
         this.superUser = JolAdmin.INSTANCE.isSuperUser(name);
         this.judge = JolAdmin.INSTANCE.isJudge(name);
+        this.playtester = JolAdmin.INSTANCE.isPlaytester(name);
         this.lastOnline = JolAdmin.INSTANCE.getPlayerAccess(name).truncatedTo(ChronoUnit.SECONDS).format(ISO_OFFSET_DATE_TIME);
     }
 
     public boolean isSpecialUser() {
-        return admin || superUser || judge;
+        return admin || superUser || judge || playtester;
     }
 
 }

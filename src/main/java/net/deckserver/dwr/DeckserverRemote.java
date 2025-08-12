@@ -347,6 +347,14 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
+    public Map<String, Object> setPlaytest(String name, boolean value) {
+        String playerName = getPlayer(request);
+        if (admin.isAdmin(playerName)) {
+            admin.setPlaytester(name, value);
+        }
+        return UpdateFactory.getUpdate();
+    }
+
     public Map<String, Object> setSuperUser(String name, boolean value) {
         String playerName = getPlayer(request);
         if (admin.isAdmin(playerName)) {

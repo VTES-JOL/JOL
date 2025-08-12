@@ -105,13 +105,19 @@ function callbackAdmin(data) {
             confirm: "Are you sure you want to remove this role?"
         }, DS.setSuperUser, value.name, false) : "";
         let superCell = $("<td/>").addClass("text-center").append(removeSuperButton);
+        let removePlaytestButton = value.playtester ? createButton({
+            html: '<i class="bi bi-x"></i>',
+            class: "btn btn-outline-secondary btn-sm",
+            confirm: "Are you sure you want to remove this role?"
+        }, DS.setPlaytest, value.name, false) : "";
+        let playtestCell = $("<td/>").addClass("text-center").append(removePlaytestButton);
         let removeAdminButton = value.admin ? createButton({
             html: '<i class="bi bi-x"></i>',
             class: "btn btn-outline-secondary btn-sm",
             confirm: "Are you sure you want to remove this role?"
         }, DS.setAdmin, value.name, false) : "";
         let adminCell = $("<td/>").addClass("text-center").append(removeAdminButton);
-        playerRow.append(nameCell, onlineCell, judgeCell, superCell, adminCell);
+        playerRow.append(nameCell, onlineCell, judgeCell, superCell, playtestCell, adminCell);
         userRoles.append(playerRow);
     })
     let adminReplacementList = $("#adminReplacementList");

@@ -811,6 +811,10 @@ public class JolAdmin {
         return loadPlayerInfo(player).getRoles().contains(PlayerRole.ADMIN);
     }
 
+    public synchronized boolean isPlaytester(String player) {
+        return loadPlayerInfo(player).getRoles().contains(PlayerRole.PLAYTESTER);
+    }
+
     public synchronized boolean isSuperUser(String playerName) {
         return loadPlayerInfo(playerName).getRoles().contains(PlayerRole.SUPER_USER);
     }
@@ -1038,6 +1042,11 @@ public class JolAdmin {
     public synchronized void setAdmin(String playerName, boolean value) {
         PlayerInfo info = players.get(playerName);
         setRole(info, PlayerRole.ADMIN, value);
+    }
+
+    public synchronized void setPlaytester(String playerName, boolean value) {
+        PlayerInfo info = players.get(playerName);
+        setRole(info, PlayerRole.PLAYTESTER, value);
     }
 
     public synchronized void setSuperUser(String playerName, boolean value) {

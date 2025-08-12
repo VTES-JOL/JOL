@@ -5,5 +5,6 @@ public enum PlayerRole {
     JUDGE,
     SUPER_USER,
     FOUNDER,
-    DEVELOPER
+    DEVELOPER,
+    PLAYTESTER
 }

@@ -10,6 +10,7 @@
       <option value="Judge">Judge</option>
       <option value="SuperUser">Super User</option>
       <option value="Admin">Admin</option>
+      <option value="Playtest">Playtester</option>
     </select>
     <button onclick="addRole()" class="btn btn-outline-secondary btn-sm mt-2">Add Role</button>
   </div>
