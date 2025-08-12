@@ -54,6 +54,13 @@ public abstract class AbstractDeckValidator implements DeckValidator {
                 .collect(Collectors.toSet());
     }
 
+    protected Set<String> findPlaytestCards(Deck deck) {
+        return cardSummaryStream(deck)
+                .filter(CardSummary::isPlayTest)
+                .map(CardSummary::getDisplayName)
+                .collect(Collectors.toSet());
+    }
+
     protected Set<String> checkAgainstWhitelist(Deck deck, List<String> validSets) {
         return cardSummaryStream(deck).filter(cardSummary -> {
                     Set<String> cardSets = new HashSet<>(cardSummary.getSets());

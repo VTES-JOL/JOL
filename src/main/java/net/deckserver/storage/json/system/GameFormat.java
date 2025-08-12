@@ -10,7 +10,7 @@ public enum GameFormat {
     STANDARD("Standard", StandardDeckValidator.class, 5),
     DUEL("Duel", DuelDeckValidator.class, 2),
     V5("V5", V5DeckValidator.class, 5),
-    JYHAD("Jyhad", JyhadDeckValidator.class, 5);
+    PLAYTEST("Playtest", PlayTestValidator.class, 5);
 
     @JsonValue
     private final String label;

@@ -9,6 +9,7 @@ target/*
 *.swo
 
 # Game data
+src/test/resources/data/cards/*-beta.csv
 src/test/resources/game*
 src/test/resources/global_chat.txt
 src/test/resources/data/metrics/*

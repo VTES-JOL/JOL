@@ -22,14 +22,15 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final int FIELD_ALIASES = 2;
     private static final int FIELD_TYPE = 3;
     private static final int FIELD_REQUIREMENTS_CLAN = 4;
-    private static final int FIELD_REQUIREMENTS_DISCIPLINE = 5;
-    private static final int FIELD_POOL_COST = 6;
-    private static final int FIELD_BLOOD_COST = 7;
-    private static final int FIELD_CONVICTION_COST = 8;
-    private static final int FIELD_BURN_OPTION = 9;
-    private static final int FIELD_TEXT = 10;
-    private static final int FIELD_SET = 12;
-    private static final int FIELD_BANNED = 13;
+    private static final int FIELD_REQUIREMENTS_PATH = 5;
+    private static final int FIELD_REQUIREMENTS_DISCIPLINE = 6;
+    private static final int FIELD_POOL_COST = 7;
+    private static final int FIELD_BLOOD_COST = 8;
+    private static final int FIELD_CONVICTION_COST = 9;
+    private static final int FIELD_BURN_OPTION = 10;
+    private static final int FIELD_TEXT = 11;
+    private static final int FIELD_SET = 13;
+    private static final int FIELD_BANNED = 14;
 
     private static final Function<String, Boolean> BURN_OPTION = (text) -> text.equals("Y") || text.equalsIgnoreCase("Yes");
 
@@ -45,8 +46,16 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
 
     private static final List<String> DISCIPLINES = Arrays.asList("ani", "obe", "cel", "dom", "dem", "for", "san", "thn", "vic", "pro", "chi", "val", "mel", "nec", "obf", "obl", "pot", "qui", "pre", "ser", "tha", "aus", "vis", "abo", "myt", "dai", "spi", "tem", "obt", "str", "mal", "flight");
 
-    public LibraryImporter(Path dataPath) {
-        super(dataPath);
+    private final boolean playTestMode;
+
+    public LibraryImporter(Path basePath, String filePrefix) {
+        super(basePath, filePrefix);
+        this.playTestMode = false;
+    }
+
+    public LibraryImporter(Path basePath, String filePrefix, boolean playTestMode) {
+        super(basePath, filePrefix);
+        this.playTestMode = playTestMode;
     }
 
     @Override
@@ -61,6 +70,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         card.setDisplayName(names.getDisplayName());
         card.setName(names.getUniqueName());
         card.setNames(names.getNames());
+        card.setPlayTest(playTestMode);
         Utils.split(lineData[FIELD_TYPE], "/").ifPresent(card::setType);
 
         // Calculate requirements

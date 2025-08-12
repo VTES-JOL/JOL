@@ -10,8 +10,8 @@ public class SetImporter extends AbstractImporter<CardSet> {
     private static final int FIELD_CODE = 1;
     private static final int FIELD_NAME = 3;
 
-    public SetImporter(Path dataPath) {
-        super(dataPath);
+    public SetImporter(Path basePath, String filePrefix) {
+        super(basePath, filePrefix);
     }
 
     @Override

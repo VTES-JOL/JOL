@@ -1,14 +1,16 @@
 package net.deckserver.game.storage.cards;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class LibraryCard {
+public class LibraryCard extends BaseCard{
 
     private String id;
     private String key;

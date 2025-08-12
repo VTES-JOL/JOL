@@ -707,6 +707,5 @@ public class DoCommandTest {
         assertThat(getLastMessage(), containsString("Player5 removes"));
         assertThat(getLastMessage(), containsString("(picked randomly)"));
         assertThat(getLastMessage(), containsString("from the game."));
-
     }
 }

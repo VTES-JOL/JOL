@@ -1,15 +1,17 @@
 package net.deckserver.game.storage.cards;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class CryptCard {
+public class CryptCard extends BaseCard {
     private String id;
     private String amaranthId;
     private String name;

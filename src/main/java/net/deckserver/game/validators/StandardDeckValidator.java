@@ -25,8 +25,11 @@ public class StandardDeckValidator extends AbstractDeckValidator {
         return (Math.abs(first - second) <= 1);
     }
 
-    @Override
     public ValidationResult validate(Deck deck) {
+        return validate(deck, false);
+    }
+
+    public ValidationResult validate(Deck deck, boolean includePlaytestCards) {
         ValidationResult result = new ValidationResult();
         Set<String> groups = getGroups(deck);
         int cryptCount = deck.getCrypt().getCount();
@@ -46,6 +49,11 @@ public class StandardDeckValidator extends AbstractDeckValidator {
         findBannedCards(deck).forEach(bannedCard -> {
             result.addError(String.format("%s is banned", bannedCard));
         });
+        if (!includePlaytestCards) {
+            findPlaytestCards(deck).forEach(playtestCard -> {
+                result.addError(String.format("%s is not legal yet.", playtestCard));
+            });
+        }
         return result;
 
     }

@@ -25,6 +25,7 @@ public class CardSummary {
     private List<String> clans = new ArrayList<>();
     private boolean banned;
     private Set<String> sets = new HashSet<>();
+    private boolean playTest;
 
     //Crypt only
     private Integer capacity;
