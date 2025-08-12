@@ -34,13 +34,6 @@ public class ApiResource {
     }
 
     @GET
-    @Path("/autocomplete/{partial}")
-    @Produces("application/json")
-    public List<String> cardNameAutoComplete(@PathParam("partial") String partial) {
-        return cardSearch.autoComplete(partial).stream().map(CardSummary::getName).sorted().collect(Collectors.toList());
-    }
-
-    @GET
     @Path("/cards/{id}")
     @Produces("application/json")
     public CardSummary cardSummary(@PathParam("id") String id) {

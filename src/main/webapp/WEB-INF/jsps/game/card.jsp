@@ -23,31 +23,34 @@
     RegionType region = RegionType.valueOf(request.getParameter("region"));
     Card card = game.getCard(id);
     Card[] cards = card.getCards();
+
     CardDetail cardDetail = game.getDetail(card);
+    Path path = Optional.ofNullable(cardDetail.getPath()).map(Path::valueOf).orElse(null);
+    Sect sect = Sect.of(cardDetail.getSect());
+    Clan clan = Clan.of(cardDetail.getClan());
+    List<String> disciplines = cardDetail.getDisciplines();
+    String label = cardDetail.getLabel();
+    int counters = cardDetail.getCounters();
+    int capacity = cardDetail.getCapacity();
+    String votes = cardDetail.getVotes();
+    boolean contested = cardDetail.isContested();
+    boolean locked = cardDetail.isLocked();
+    boolean infernal = cardDetail.isInfernal();
+
     CardSummary cardSummary = CardSearch.INSTANCE.get(cardDetail.getCardId());
     List<String> defaultDisciplines = cardSummary.getDisciplines();
     String defaultVotes = cardSummary.getVotes();
     String defaultClan = cardSummary.getSingleClanClass();
-    Path path = Optional.ofNullable(cardDetail.getPath()).map(Path::valueOf).orElse(null);
     Integer defaultCapacity = cardSummary.getCapacity();
     String defaultSect = cardSummary.getSect();
-    Sect sect = Sect.of(cardDetail.getSect());
-    Clan clan = Clan.of(cardDetail.getClan());
-    List<String> disciplines = cardDetail.getDisciplines();
+
     if (disciplines.isEmpty()) { disciplines = defaultDisciplines; }
-    String label = cardDetail.getLabel();
-    int counters = cardDetail.getCounters();
-    int capacity = cardDetail.getCapacity();
     boolean hasCapacity = capacity > 0;
     if (capacity == 0 && defaultCapacity != null && topLevel) {
         capacity = defaultCapacity;
     }
-    String votes = cardDetail.getVotes();
     if (Strings.isNullOrEmpty(votes)) { votes = defaultVotes; }
     boolean hasVotes = !Strings.isNullOrEmpty(votes) && !votes.equals("0");
-    boolean contested = cardDetail.isContested();
-    boolean locked = cardDetail.isLocked();
-    boolean infernal = cardDetail.isInfernal();
     String shadowStyle = shadow ? "shadow" : "";
     if (hasCapacity && cardSummary.hasBlood()) {
         if (sect == null) {

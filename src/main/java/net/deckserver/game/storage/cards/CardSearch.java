@@ -9,13 +9,16 @@ package net.deckserver.game.storage.cards;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import net.deckserver.storage.json.cards.CardSummary;
+import net.deckserver.storage.json.cards.SecuredCardLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -32,9 +35,16 @@ public class CardSearch {
     private CardSearch() {
         ObjectMapper objectMapper = new ObjectMapper();
         CollectionType cardSummaryCollectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CardSummary.class);
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        try (InputStream resourceStream = loader.getResourceAsStream("cards.json")) {
-            List<CardSummary> cardList = objectMapper.readValue(resourceStream, cardSummaryCollectionType);
+        InputStream loader;
+        try {
+            loader = getCloudfrontStream();
+            logger.info("Using cloudfront stream");
+        } catch (Exception e) {
+            loader = getLocalStream();
+            logger.info("Using local stream");
+        }
+        try {
+            List<CardSummary> cardList = objectMapper.readValue(loader, cardSummaryCollectionType);
             cardList.forEach(card -> {
                 for (String name : card.getNames()) {
                     nameKeys.put(name.toLowerCase(), card.getId());
@@ -73,18 +83,16 @@ public class CardSearch {
         return entry;
     }
 
-    public Set<CardSummary> autoComplete(String text) {
-        return nameKeys.keySet().stream().filter(name -> name.toLowerCase().contains(text.toLowerCase()))
-                .map(nameKeys::get)
-                .map(cards::get)
-                .collect(Collectors.toSet());
-    }
-
-    public Collection<CardSummary> allCards() {
-        return cards.values();
-    }
-
     public CardSummary get(String id) {
         return cards.get(id);
+    }
+
+    private InputStream getCloudfrontStream() throws Exception {
+        SecuredCardLoader loader = new SecuredCardLoader();
+        return loader.generateSignedUrl().openStream();
+    }
+
+    private InputStream getLocalStream() {
+        return Thread.currentThread().getContextClassLoader().getResourceAsStream("cards.json");
     }
 }
