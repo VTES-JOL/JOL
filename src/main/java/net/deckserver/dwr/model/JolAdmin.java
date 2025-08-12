@@ -24,7 +24,6 @@ import net.deckserver.DeckParser;
 import net.deckserver.RandomGameName;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.GameStatusBean;
-import net.deckserver.dwr.bean.GameSummaryBean;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
 import net.deckserver.game.validators.DeckValidator;
@@ -324,7 +323,7 @@ public class JolAdmin {
         }
     }
 
-    public PlayerModel getPlayerModel(String name) {
+    public synchronized PlayerModel getPlayerModel(String name) {
         if (name == null) {
             return new PlayerModel(null, false);
         } else {
@@ -332,7 +331,7 @@ public class JolAdmin {
         }
     }
 
-    public GameModel getGameModel(String name) {
+    public synchronized GameModel getGameModel(String name) {
         return gmap.computeIfAbsent(name, GameModel::new);
     }
 
@@ -382,7 +381,7 @@ public class JolAdmin {
         ModelLoader.writeActions(id, actions, turn);
     }
 
-    public void rollbackGame(String gameName, String turn) {
+    public synchronized void rollbackGame(String gameName, String turn) {
         String id = loadGameInfo(gameName).getId();
         logger.info("Rolling back game {} for turn {}", gameName, turn);
         JolGame game = ModelLoader.loadSnapshot(id, turn);
@@ -480,7 +479,7 @@ public class JolAdmin {
         return loadDeckInfo(playerName, deckName).getGameFormats();
     }
 
-    public Deck getGameDeck(String gameName, String playerName) {
+    public synchronized Deck getGameDeck(String gameName, String playerName) {
         return Optional.ofNullable(registrations.get(gameName, playerName))
                 .map(status -> {
                     String deckId = status.getDeckId();
@@ -505,19 +504,19 @@ public class JolAdmin {
         return Files.readString(deckPath);
     }
 
-    public void selectDeck(String playerName, String deckName) {
+    public synchronized void selectDeck(String playerName, String deckName) {
         if (playerName != null && deckName != null) {
             getPlayerModel(playerName).loadDeck(deckName);
         }
     }
 
-    public void newDeck(String playerName) {
+    public synchronized void newDeck(String playerName) {
         if (playerName != null) {
             getPlayerModel(playerName).clearDeck();
         }
     }
 
-    public void saveDeck(String playerName, String deckName, String contents) {
+    public synchronized void saveDeck(String playerName, String deckName, String contents) {
         if (playerName != null && contents != null && deckName != null) {
             deckName = deckName.trim();
             ExtendedDeck deck = DeckParser.parseDeck(contents);
@@ -534,14 +533,14 @@ public class JolAdmin {
         }
     }
 
-    public void deleteDeck(String playerName, String deckName) {
+    public synchronized void deleteDeck(String playerName, String deckName) {
         if (playerName != null && deckName != null) {
             getPlayerModel(playerName).clearDeck();
             this.decks.remove(playerName, deckName);
         }
     }
 
-    public JolGame getGame(String gameName) {
+    public synchronized JolGame getGame(String gameName) {
         return gameCache.get(gameName);
     }
 
@@ -564,12 +563,12 @@ public class JolAdmin {
         return true;
     }
 
-    public void changePassword(String player, String password) {
+    public synchronized void changePassword(String player, String password) {
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
         loadPlayerInfo(player).setHash(hash);
     }
 
-    public void updateProfile(String playerName, String email, String discordID, String veknID) {
+    public synchronized void updateProfile(String playerName, String email, String discordID, String veknID) {
         PlayerInfo playerInfo = loadPlayerInfo(playerName);
         playerInfo.setDiscordId(discordID);
         playerInfo.setEmail(email);
@@ -593,7 +592,7 @@ public class JolAdmin {
         return registrations.get(gameName, playerName);
     }
 
-    public void registerTournamentMultiDeck(String playerName, String... playerDecks) {
+    public synchronized void registerTournamentMultiDeck(String playerName, String... playerDecks) {
         PlayerInfo playerInfo = players.get(playerName);
         String result = "Successfully registered for tournament";
         int round = 1;
@@ -644,7 +643,7 @@ public class JolAdmin {
         writeFile("registrations.json", registrations);
     }
 
-    public void registerDeck(String gameName, String playerName, String deckName) {
+    public synchronized void registerDeck(String gameName, String playerName, String deckName) {
         deckName = deckName.trim();
         DeckInfo deckInfo = decks.get(playerName, deckName);
         GameInfo gameInfo = loadGameInfo(gameName);
@@ -707,7 +706,7 @@ public class JolAdmin {
         }
     }
 
-    public void recordPlayerAccess(String playerName, String gameName) {
+    public synchronized void recordPlayerAccess(String playerName, String gameName) {
         this.timestamps.recordPlayerAccess(playerName, gameName);
     }
 
@@ -780,7 +779,7 @@ public class JolAdmin {
         return registrations.column(playerName).keySet();
     }
 
-    public Set<String> getPlayers(String gameName) {
+    public synchronized Set<String> getPlayers(String gameName) {
         return registrations.row(gameName).keySet();
     }
 
@@ -796,31 +795,31 @@ public class JolAdmin {
         return loadPlayerInfo(player).getVeknId();
     }
 
-    public void setImageTooltipPreference(String player, boolean value) {
+    public synchronized void setImageTooltipPreference(String player, boolean value) {
         loadPlayerInfo(player).setShowImages(value);
         writeFile("players.json", players);
     }
 
-    public boolean getImageTooltipPreference(String player) {
+    public synchronized boolean getImageTooltipPreference(String player) {
         if (player == null) {
             return true;
         }
         return loadPlayerInfo(player).isShowImages();
     }
 
-    public boolean isAdmin(String player) {
+    public synchronized boolean isAdmin(String player) {
         return loadPlayerInfo(player).getRoles().contains(PlayerRole.ADMIN);
     }
 
-    public boolean isSuperUser(String playerName) {
+    public synchronized boolean isSuperUser(String playerName) {
         return loadPlayerInfo(playerName).getRoles().contains(PlayerRole.SUPER_USER);
     }
 
-    public boolean isJudge(String playerName) {
+    public synchronized boolean isJudge(String playerName) {
         return loadPlayerInfo(playerName).getRoles().contains(PlayerRole.JUDGE);
     }
 
-    public String getOwner(String gameName) {
+    public synchronized String getOwner(String gameName) {
         String playerName = loadGameInfo(gameName).getOwner();
         if (!players.containsKey(playerName)) {
             playerName = "SYSTEM";
@@ -836,17 +835,17 @@ public class JolAdmin {
         return players.keySet();
     }
 
-    public void invitePlayer(String gameName, String playerName) {
+    public synchronized void invitePlayer(String gameName, String playerName) {
         registrations.put(gameName, playerName, new RegistrationStatus(OffsetDateTime.now()));
     }
 
-    public void unInvitePlayer(String gameName, String playerName) {
+    public synchronized void unInvitePlayer(String gameName, String playerName) {
         if (isStarting(gameName)) {
             registrations.remove(gameName, playerName);
         }
     }
 
-    public boolean isInGame(String gameName, String playerName) {
+    public synchronized boolean isInGame(String gameName, String playerName) {
         return registrations.contains(gameName, playerName);
     }
 
@@ -854,7 +853,7 @@ public class JolAdmin {
         return registrations.contains(gameName, playerName) && Objects.requireNonNull(registrations.get(gameName, playerName)).getDeckId() != null;
     }
 
-    public boolean isStarting(String gameName) {
+    public synchronized boolean isStarting(String gameName) {
         return loadGameInfo(gameName).getStatus().equals(GameStatus.STARTING);
     }
 
@@ -894,7 +893,7 @@ public class JolAdmin {
         writeFile("games.json", games);
     }
 
-    public void startGame(String gameName) {
+    public synchronized void startGame(String gameName) {
         List<String> players = new ArrayList<>();
         registrations.row(gameName).forEach((playerName, registration) -> {
             if (registration.getDeckId() != null) {
@@ -905,7 +904,7 @@ public class JolAdmin {
         startGame(gameName, players);
     }
 
-    public void endGame(String gameName, boolean graceful) {
+    public synchronized void endGame(String gameName, boolean graceful) {
         GameInfo gameInfo = games.get(gameName);
         // try and generate stats for game
         if (gameInfo.getStatus().equals(GameStatus.ACTIVE)) {
@@ -1006,7 +1005,7 @@ public class JolAdmin {
         });
     }
 
-    public void replacePlayer(String gameName, String existingPlayer, String newPlayer) {
+    public synchronized void replacePlayer(String gameName, String existingPlayer, String newPlayer) {
         RegistrationStatus existingRegistration = registrations.get(gameName, existingPlayer);
         RegistrationStatus newRegistration = registrations.get(gameName, newPlayer);
         // Only replace player if existing player is in the game, and the new player isn't
@@ -1021,7 +1020,7 @@ public class JolAdmin {
         }
     }
 
-    public void deletePLayer(String playerName) {
+    public synchronized void deletePLayer(String playerName) {
         Map<String, RegistrationStatus> playerRegistrations = registrations.column(playerName);
         if (playerRegistrations.isEmpty()) {
             logger.info("Deleting unused player {}", playerName);
@@ -1031,17 +1030,17 @@ public class JolAdmin {
         }
     }
 
-    public void setJudge(String playerName, boolean value) {
+    public synchronized void setJudge(String playerName, boolean value) {
         PlayerInfo info = players.get(playerName);
         setRole(info, PlayerRole.JUDGE, value);
     }
 
-    public void setAdmin(String playerName, boolean value) {
+    public synchronized void setAdmin(String playerName, boolean value) {
         PlayerInfo info = players.get(playerName);
         setRole(info, PlayerRole.ADMIN, value);
     }
 
-    public void setSuperUser(String playerName, boolean value) {
+    public synchronized void setSuperUser(String playerName, boolean value) {
         PlayerInfo info = players.get(playerName);
         setRole(info, PlayerRole.SUPER_USER, value);
     }
@@ -1065,7 +1064,7 @@ public class JolAdmin {
         }
     }
 
-    public void resetView(String playerName, String gameName) {
+    public synchronized void resetView(String playerName, String gameName) {
         getGameModel(gameName).resetView(playerName);
     }
 
@@ -1075,13 +1074,13 @@ public class JolAdmin {
         return playerAccess.isAfter(gameLastUpdated);
     }
 
-    public void endTurn(String gameName, String adminName) {
+    public synchronized void endTurn(String gameName, String adminName) {
         JolGame game = getGame(gameName);
         game.addMessage("Turn ended by admin " + adminName);
         game.newTurn();
     }
 
-    public boolean isOwner(String playerName, String gameName) {
+    public synchronized boolean isOwner(String playerName, String gameName) {
         return games.get(gameName).getOwner().equals(playerName);
     }
 
@@ -1096,7 +1095,7 @@ public class JolAdmin {
         return games.get(gameName).getGameFormat().toString();
     }
 
-    public void validateDeck(String playerName, String contents, GameFormat format) {
+    public synchronized void validateDeck(String playerName, String contents, GameFormat format) {
         PlayerModel model = getPlayerModel(playerName);
         String deckName = model.getDeck().getDeck().getName();
         ExtendedDeck deck = DeckParser.parseDeck(contents);
@@ -1111,6 +1110,14 @@ public class JolAdmin {
         model.setContents(contents);
     }
 
+    public synchronized List<String> getTurns(String gameName) {
+        return gameCache.get(gameName).getTurns().reversed();
+    }
+
+    public ExtendedDeck getDeck(String deckId) {
+        return readFile(String.format("decks/%s.json", deckId), typeFactory.constructType(ExtendedDeck.class));
+    }
+
     private ValidationResult validateDeck(Deck deck, GameFormat gameFormat) {
         try {
             Constructor<? extends DeckValidator> validatorConstructor = gameFormat.getDeckValidator().getConstructor();
@@ -1120,10 +1127,6 @@ public class JolAdmin {
             logger.error("Could not find constructor for DeckValidator", e);
             throw new RuntimeException(e);
         }
-    }
-
-    public List<String> getTurns(String gameName) {
-        return gameCache.get(gameName).getTurns().reversed();
     }
 
     private void loadProperties() {
@@ -1195,10 +1198,6 @@ public class JolAdmin {
             logger.error("Unable to archive player {}", playerInfo.getId(), e);
         }
         players.remove(playerInfo.getName());
-    }
-
-    public ExtendedDeck getDeck(String deckId) {
-        return readFile(String.format("decks/%s.json", deckId), typeFactory.constructType(ExtendedDeck.class));
     }
 
     private boolean copyTournamentDeck(String playerId, String deckId, int round) {

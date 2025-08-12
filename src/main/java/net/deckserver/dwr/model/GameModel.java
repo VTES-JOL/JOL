@@ -130,7 +130,7 @@ public class GameModel implements Comparable<GameModel> {
         views.remove(player);
     }
 
-    public Set<String> getPlayers() {
+    public synchronized Set<String> getPlayers() {
         return JolAdmin.INSTANCE.getPlayers(name);
     }
 
@@ -138,7 +138,7 @@ public class GameModel implements Comparable<GameModel> {
         return -name.compareToIgnoreCase(arg0.getName());
     }
 
-    public void updateGlobalNotes(String notes) {
+    public synchronized void updateGlobalNotes(String notes) {
         JolAdmin admin = JolAdmin.INSTANCE;
         JolGame game = admin.getGame(name);
         if (!game.getGlobalText().equals(notes)) {
@@ -148,7 +148,7 @@ public class GameModel implements Comparable<GameModel> {
         }
     }
 
-    public void updatePrivateNotes(String player, String notes) {
+    public synchronized void updatePrivateNotes(String player, String notes) {
         JolAdmin admin = JolAdmin.INSTANCE;
         JolGame game = admin.getGame(name);
         if (!notes.equals(game.getPrivateNotes(player))) {
