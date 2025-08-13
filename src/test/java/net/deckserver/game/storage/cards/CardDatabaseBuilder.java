@@ -28,17 +28,14 @@ public class CardDatabaseBuilder {
     private static final Logger logger = LoggerFactory.getLogger(CardDatabaseBuilder.class);
     private static final String LIBRARY_FILE = "vteslib";
     private static final String CRYPT_FILE = "vtescrypt";
-    private static final String SET_FILE = "vtessets";
     private static final String PLAYTEST = "-beta";
 
     private static List<SummaryCard> getSummaryCards(Path basePath) throws Exception {
         LibraryImporter libraryImporter = new LibraryImporter(basePath, LIBRARY_FILE);
         CryptImporter cryptImporter = new CryptImporter(basePath, CRYPT_FILE);
-        SetImporter setImporter = new SetImporter(basePath, SET_FILE);
 
         List<LibraryCard> libraryCards = libraryImporter.read();
         List<CryptCard> cryptCards = cryptImporter.read();
-        List<CardSet> cardSets = setImporter.read();
         List<SummaryCard> summaryCards = new ArrayList<>();
 
         libraryCards.forEach(libraryCard -> summaryCards.add(new SummaryCard(libraryCard)));
@@ -85,6 +82,7 @@ public class CardDatabaseBuilder {
                 summaryCard.setPreamble(null);
                 summaryCard.setDoNotReplace(null);
                 summaryCard.setCost(null);
+                summaryCard.setBurnOption(null);
             }
         } catch (IOException e) {
             logger.error("Unable to write file", e);

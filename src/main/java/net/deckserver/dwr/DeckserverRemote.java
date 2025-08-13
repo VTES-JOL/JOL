@@ -1,6 +1,7 @@
 package net.deckserver.dwr;
 
 import com.google.common.base.Strings;
+import net.deckserver.dwr.bean.DeckInfoBean;
 import net.deckserver.dwr.creators.UpdateFactory;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
@@ -13,6 +14,7 @@ import org.directwebremoting.WebContextFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DeckserverRemote {
 
@@ -44,6 +46,17 @@ public class DeckserverRemote {
             admin.createGame(gameName, "PUBLIC".equals(publicFlag), GameFormat.from(format), playerName);
         }
         return UpdateFactory.getUpdate();
+    }
+
+    public List<DeckInfoBean> filterDecks(String deckFilter) {
+        String playerName = getPlayer(request);
+        PlayerModel model = admin.getPlayerModel(playerName);
+        model.setDeckFilter(deckFilter);
+        return JolAdmin.INSTANCE.getDeckNames(playerName).stream()
+                .map(deckName -> new DeckInfoBean(playerName, deckName))
+                .filter(deckInfoBean -> deckFilter.isEmpty() || deckInfoBean.getGameFormats().contains(deckFilter.toUpperCase()))
+                .sorted(Comparator.comparing(DeckInfoBean::getName, String.CASE_INSENSITIVE_ORDER))
+                .toList();
     }
 
     public Map<String, Object> endGame(String name) {

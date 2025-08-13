@@ -6,6 +6,7 @@ import net.deckserver.DeckParser;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.system.DeckFormat;
+import net.deckserver.storage.json.system.GameFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,12 +24,12 @@ public class PlayerModel {
     private String view;
     @Setter
     private String message;
-    @Getter
-    @Setter
+    @Getter @Setter
     private ExtendedDeck deck;
-    @Getter
-    @Setter
+    @Getter @Setter
     private String contents;
+    @Getter @Setter
+    private String deckFilter = GameFormat.STANDARD.getLabel();
 
     public PlayerModel(String name, boolean loadChat) {
         this.player = name;

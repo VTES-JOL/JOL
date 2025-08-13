@@ -23,7 +23,7 @@ public class SummaryCard {
     private Set<String> names;
     private boolean crypt;
     private boolean unique;
-    private boolean burnOption;
+    private Boolean burnOption;
     private String group;
     private String sect;
     private List<String> clans;

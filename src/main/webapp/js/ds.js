@@ -257,8 +257,6 @@ function callbackLobby(data) {
     let myGameList = $("#myGameList");
     let playerList = $("#playerList");
     let invitedGames = $("#invitedGames");
-    let invitedGamesList = $("#invitedGamesList");
-    let myDeckList = $("#myDeckList");
 
     playerList.autocomplete({
         source: data.players,
@@ -493,31 +491,15 @@ function callbackProfile(data) {
 }
 
 function callbackShowDecks(data) {
-    let decks = $("#decks");
-    decks.empty();
-    $.each(data.decks, function (index, deck) {
-        const deckRow = $("<tr/>");
-        const deckCell = $("<td/>").addClass("d-flex justify-content-between align-items-center");
-        const deckName = $("<span/>").text(deck.name).click(function () {
-            DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
-        });
-        const formatWrapper = $("<span/>");
-        $.each(deck.gameFormats, function(i, format) {
-            const formatLabel = $("<span/>").text(format).addClass("badge mx-1");
-            formatLabel.addClass("text-bg-secondary")
-            formatWrapper.append(formatLabel);
-        })
-        const deleteButton = $("<button/>").addClass("btn btn-sm btn-outline-secondary border p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
-            if (confirm("Delete deck?")) {
-                DS.deleteDeck(deck.name, {callback: processData, errorHandler: errorhandler});
-            }
-            event.stopPropagation();
-        });
-        let wrapper = $("<span/>").addClass("d-flex gap-1 align-items-center").append(formatWrapper, deleteButton);
-        deckCell.append(deckName, wrapper);
-        deckRow.append(deckCell);
-        decks.append(deckRow);
-    });
+    let filter = $("#deckFilter");
+    filter.empty();
+    let currentFilter = data.deckFilter;
+    filter.append(new Option("All", ""));
+    $.each(data.tags, function (index, value) {
+        let selected = currentFilter.includes(value);
+        filter.append(new Option(value, value, selected, selected));
+    })
+    selectDeckFilter();
     const deckText = $("#deckText");
     const deckErrors = $("#deckErrors");
     const deckPreview = $("#deckPreview");
@@ -540,6 +522,34 @@ function callbackShowDecks(data) {
         deckPreview.empty();
         deckName.val("");
     }
+}
+
+function selectDeckFilter() {
+    let filter = $("#deckFilter").val();
+    DS.filterDecks(filter, {callback: callbackFilterDecks, errorHandler: errorhandler});
+}
+
+function callbackFilterDecks(decks) {
+    let deckList = $("#decks");
+    deckList.empty();
+    console.log(decks);
+    $.each(decks, function (index, deck) {
+        const deckRow = $("<tr/>");
+        const deckCell = $("<td/>").addClass("d-flex justify-content-between align-items-center");
+        const deckName = $("<span/>").text(deck.name).click(function () {
+            DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
+        });
+        const deleteButton = $("<button/>").addClass("btn btn-sm btn-outline-secondary border p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
+            if (confirm("Delete deck?")) {
+                DS.deleteDeck(deck.name, {callback: processData, errorHandler: errorhandler});
+            }
+            event.stopPropagation();
+        });
+        let wrapper = $("<span/>").addClass("d-flex gap-1 align-items-center").append(deleteButton);
+        deckCell.append(deckName, wrapper);
+        deckRow.append(deckCell);
+        deckList.append(deckRow);
+    });
 }
 
 function callbackShowGameDeck(data) {

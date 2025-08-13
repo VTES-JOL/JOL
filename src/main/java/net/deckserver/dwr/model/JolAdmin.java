@@ -1127,6 +1127,15 @@ public class JolAdmin {
         return readFile(String.format("decks/%s.json", deckId), typeFactory.constructType(ExtendedDeck.class));
     }
 
+    public List<GameFormat> getAvailableGameFormats(String playerName) {
+        Set<PlayerRole> roles = loadPlayerInfo(playerName).getRoles();
+        List<GameFormat> formats = new ArrayList<>(EnumSet.of(GameFormat.STANDARD, GameFormat.V5, GameFormat.DUEL));
+        if (roles.contains(PlayerRole.PLAYTESTER)) {
+            formats.add(GameFormat.PLAYTEST);
+        }
+        return formats;
+    }
+
     private ValidationResult validateDeck(Deck deck, GameFormat gameFormat) {
         try {
             Constructor<? extends DeckValidator> validatorConstructor = gameFormat.getDeckValidator().getConstructor();
