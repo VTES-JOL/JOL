@@ -1253,6 +1253,7 @@ function addCardTooltips(parent) {
                 instance.setContent("Loading...");
                 let ref = $(instance.reference);
                 let cardId = ref.data('card-id');
+                let secured = ref.data('secured');
                 if (cardId == null) { //Backwards compatibility in main chat
                     cardId = instance.reference.title;
                     ref.data('card-id', cardId);

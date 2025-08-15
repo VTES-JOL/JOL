@@ -43,6 +43,7 @@
     String defaultClan = cardSummary.getSingleClanClass();
     Integer defaultCapacity = cardSummary.getCapacity();
     String defaultSect = cardSummary.getSect();
+    String secured = String.valueOf(cardSummary.isPlayTest());
 
     if (disciplines.isEmpty()) { disciplines = defaultDisciplines; }
     boolean hasCapacity = capacity > 0;
@@ -79,7 +80,7 @@
         <div class="d-flex justify-content-between">
             <div class="d-flex flex-column">
                 <div class="d-flex align-items-center gap-1">
-                    <a data-card-id="<%= cardDetail.getCardId() %>" class="card-name text-wrap">
+                    <a data-card-id="<%= cardDetail.getCardId() %>" data-secured="<%= secured %>" class="card-name text-wrap">
                         <%= cardSummary.getDisplayName() %>
                         <c:if test="<%= cardSummary.isAdvanced() %>"><i class='icon adv'></i></c:if>
                     </a>

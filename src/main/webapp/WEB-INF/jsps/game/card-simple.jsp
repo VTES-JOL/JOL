@@ -15,10 +15,13 @@
     RegionType region = RegionType.valueOf(request.getParameter("region"));
     Card card = game.getCard(id);
     CardDetail cardDetail = game.getDetail(card);
+    String label = cardDetail.getLabel();
+
     CardSummary cardSummary = CardSearch.INSTANCE.get(cardDetail.getCardId());
     String typeClass = cardSummary.getTypeClass();
-    String label = cardDetail.getLabel();
     List<String> clans = cardSummary.getClanClass();
+    String secured = String.valueOf(cardSummary.isPlayTest());
+
     String regionStyle = region == RegionType.REMOVED_FROM_GAME ? "opacity-50" : "";
     String attributes = cardDetail.buildAttributes(region, index, true);
     String action = RegionType.PLAYABLE_REGIONS.contains(region) && player.equals(viewer) ? "showPlayCardModal(event);" : (region == RegionType.ASH_HEAP ? "cardOnTableClicked(event);" : "");
@@ -28,7 +31,7 @@
     <div class="mx-1 me-auto w-100 align-items-center">
         <div class="d-flex justify-content-between align-items-center w-100">
             <span>
-                <a data-card-id="<%= cardDetail.getCardId() %>" class="card-name text-wrap">
+                <a data-card-id="<%= cardDetail.getCardId() %>" data-secured="<%= secured %>"  class="card-name text-wrap">
                     <%= cardSummary.getDisplayName() %>
                     <c:if test="<%= cardSummary.isAdvanced() %>">
                         <i class='icon adv'></i>
