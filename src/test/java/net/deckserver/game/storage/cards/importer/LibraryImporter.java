@@ -158,7 +158,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                     modeText = disciplinesAndText[1];
                 }
             }
-            mode.setText(ChatParser.parseText(modeText));
+            mode.setText(modeText.trim());
 
             if (PUT_INTO_UNCONTROLLED_PATTERN.matcher(mode.getText()).matches())
                 mode.setTarget(LibraryCardMode.Target.INACTIVE_REGION);

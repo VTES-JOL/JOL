@@ -27,6 +27,11 @@ public class ChatParser {
         return parseTextForStyle(parsedForDActions);
     }
 
+    public static String parseSymbols(String text) {
+        text = parseTextForDisciplines(text);
+        return parseTextForDAction(text);
+    }
+
     public static boolean isDiscipline(String discipline) {
         return disciplineSet.contains(discipline.toLowerCase());
     }

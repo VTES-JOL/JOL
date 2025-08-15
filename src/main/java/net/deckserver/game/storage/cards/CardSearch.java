@@ -45,6 +45,10 @@ public class CardSearch {
         }
         try {
             List<CardSummary> cardList = objectMapper.readValue(loader, cardSummaryCollectionType);
+            boolean playtestEnabled = cardList.stream().anyMatch(CardSummary::isPlayTest);
+            if (playtestEnabled) {
+                logger.info("Playtest cards enabled");
+            }
             cardList.forEach(card -> {
                 for (String name : card.getNames()) {
                     nameKeys.put(name.toLowerCase(), card.getId());
@@ -88,7 +92,7 @@ public class CardSearch {
     }
 
     private InputStream getCloudfrontStream() throws Exception {
-        SecuredCardLoader loader = new SecuredCardLoader();
+        SecuredCardLoader loader = new SecuredCardLoader("/secured/cards.json");
         return loader.generateSignedUrl().openStream();
     }
 
