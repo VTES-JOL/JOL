@@ -79,6 +79,7 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
         Utils.getClean(lineData[FIELD_SET]).map(Utils::getSets).ifPresent(card::setSets);
 
         card.setSect(determineSect(card.getClan(), card.getText()));
+        Utils.getClean(lineData[FIELD_PATH]).ifPresent(card::setPath);
         Optional.ofNullable(card.getTitle()).map(this::determineVotes).ifPresent(card::setVotes);
 
         return card;

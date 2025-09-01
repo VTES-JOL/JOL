@@ -580,6 +580,9 @@ function renderDeck(data, div) {
         $.each(data.crypt.cards, function (index, card) {
             const cardRow = $("<li/>");
             const cardLink = $("<a/>").text(card.name).attr("data-card-id", card.id).addClass("card-name");
+            if (card.comments === "playtest") {
+                cardLink.attr("data-secured", "true");
+            }
             cardRow.append(card['count'] + " x ").append(cardLink);
             crypt.append(cardRow);
         })
@@ -593,6 +596,9 @@ function renderDeck(data, div) {
             $.each(libraryCards.cards, function (index, card) {
                 const cardRow = $("<li/>");
                 const cardLink = $("<a/>").text(card.name).attr("data-card-id", card.id).addClass("card-name");
+                if (card.comments === "playtest") {
+                    cardLink.attr("data-secured", "true");
+                }
                 cardRow.append(card['count'] + " x ").append(cardLink);
                 section.append(cardRow);
             })
@@ -1021,13 +1027,13 @@ function doSubmit() {
 }
 
 function sendChat(message) {
-    DS.submitForm(game, null, '', message, null, 'No', {callback: processData, errorHandler: errorhandler});
+    DS.submitForm(game, null, '', message, null, {callback: processData, errorHandler: errorhandler});
     $('#quickChatModal').modal('hide');
     return false;
 }
 
 function sendCommand(command, message = '') {
-    DS.submitForm(game, null, command, message, null, 'No', {callback: processData, errorHandler: errorhandler});
+    DS.submitForm(game, null, command, message, null, {callback: processData, errorHandler: errorhandler});
     $('#quickCommandModal').modal('hide');
     return false;
 }
@@ -1253,19 +1259,19 @@ function addCardTooltips(parent) {
                 instance.setContent("Loading...");
                 let ref = $(instance.reference);
                 let cardId = ref.data('card-id');
-                let secured = ref.data('secured');
+                let secured = ref.data('secured') || false ? "secured/" : "";
                 if (cardId == null) { //Backwards compatibility in main chat
                     cardId = instance.reference.title;
                     ref.data('card-id', cardId);
                     instance.reference.removeAttribute('title');
                 }
                 if (profile.imageTooltipPreference) {
-                    let content = `<img width="350" height="500" src="https://static.tornsignpost.org/images/${cardId}" alt="Loading..."/>`;
+                    let content = `<img width="350" height="500" src="https://static.dev.deckserver.net/${secured}images/${cardId}" alt="Loading..."/>`;
                     instance.setContent(content);
                 } else {
                     $.get({
                         dataType: "html",
-                        url: "https://static.tornsignpost.org/html/" + cardId, success: function (data) {
+                        url: `https://static.dev.deckserver.net/${secured}html/${cardId}`, success: function (data) {
                             let content = `<div class="p-2">${data}</div>`;
                             instance.setContent(content);
                         }

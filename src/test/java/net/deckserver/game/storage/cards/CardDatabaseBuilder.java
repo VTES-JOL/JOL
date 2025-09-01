@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.game.storage.cards.importer.CryptImporter;
 import net.deckserver.game.storage.cards.importer.LibraryImporter;
+import net.deckserver.storage.json.cards.CardSummary;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -44,9 +45,16 @@ public class CardDatabaseBuilder {
 
         assert imagesPath.toFile().exists() : "Images path does not exist";
 
+        List<CardSummary> cardSummaries = summaryCards.stream().map(SummaryCard::toCardSummary).toList();
+        CardSearch.INSTANCE.refresh(cardSummaries);
+
         for (SummaryCard summaryCard : summaryCards) {
             String id = summaryCard.getId();
             String outputPrefix = summaryCard.isPlayTest() ? "secured/" : "";
+
+            summaryCard.getNames().forEach(name -> {
+                assert CardSearch.INSTANCE.findCardExact(name).isPresent() : String.format("Card %s does not exist", name);
+            });
 
             // Process images
             String inputPrefix = summaryCard.isPlayTest() ? "playtest" : "core";
@@ -54,18 +62,24 @@ public class CardDatabaseBuilder {
             Path outputImagePath = outputPath.resolve(outputPrefix).resolve("images").resolve(id);
             assert inputImagePath.toFile().exists() : String.format("Image %s does not exist - %s", inputImagePath, summaryCard.getDisplayName());
             Files.createDirectories(outputImagePath.getParent());
-            Files.copy(inputImagePath, outputImagePath, StandardCopyOption.REPLACE_EXISTING);
+            if (!outputImagePath.toFile().exists()) {
+                Files.copy(inputImagePath, outputImagePath, StandardCopyOption.REPLACE_EXISTING);
+            }
 
             // Process HTML
             String htmlText = ChatParser.parseSymbols(summaryCard.getHtmlText());
             Path outputHtmlPath = outputPath.resolve(outputPrefix).resolve("html").resolve(id);
             Files.createDirectories(outputHtmlPath.getParent());
-            Files.writeString(outputHtmlPath, htmlText);
+            if (!outputHtmlPath.toFile().exists()) {
+                Files.writeString(outputHtmlPath, htmlText);
+            }
 
             // Process JSON
             Path outputJsonPath = outputPath.resolve(outputPrefix).resolve("json").resolve(id);
             Files.createDirectories(outputJsonPath.getParent());
-            mapper.writeValue(outputJsonPath.toFile(), summaryCard);
+            if (!outputJsonPath.toFile().exists()) {
+                mapper.writeValue(outputJsonPath.toFile(), summaryCard);
+            }
 
             // Clear unneeded fields
             summaryCard.setOriginalText(null);
@@ -80,6 +94,7 @@ public class CardDatabaseBuilder {
 
         // Output complete cards.json
         mapper.writeValue(Paths.get("target/static/secured/cards.json").toFile(), summaryCards);
+
     }
 
     private List<SummaryCard> getCoreCards(Path basePath) throws Exception {

@@ -6,7 +6,6 @@ import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.system.GameFormat;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 

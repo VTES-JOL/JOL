@@ -3,7 +3,7 @@ package net.deckserver.game.storage.cards;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.deckserver.dwr.model.ChatParser;
+import net.deckserver.storage.json.cards.CardSummary;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -26,6 +26,7 @@ public class SummaryCard {
     private Boolean burnOption;
     private String group;
     private String sect;
+    private String path;
     private List<String> clans;
     private boolean banned;
     private boolean playTest;
@@ -58,6 +59,7 @@ public class SummaryCard {
         this.unique = cryptCard.isUnique();
         this.group = cryptCard.getGroup();
         this.sect = cryptCard.getSect();
+        this.path = cryptCard.getPath();
         this.clans = Collections.singletonList(cryptCard.getClan());
         this.title = cryptCard.getTitle();
         this.votes = cryptCard.getVotes();
@@ -92,6 +94,33 @@ public class SummaryCard {
         this.disciplines = cryptCard.getDisciplines();
     }
 
+    public CardSummary toCardSummary() {
+        CardSummary cardSummary = new CardSummary();
+        cardSummary.setId(id);
+        cardSummary.setDisplayName(displayName);
+        cardSummary.setName(name);
+        cardSummary.setNames(names);
+        cardSummary.setType(type);
+        cardSummary.setCrypt(crypt);
+        cardSummary.setUnique(unique);
+        cardSummary.setGroup(group);
+        cardSummary.setSect(sect);
+        cardSummary.setPath(path);
+        cardSummary.setClans(clans);
+        cardSummary.setTitle(title);
+        cardSummary.setVotes(votes);
+        cardSummary.setBanned(banned);
+        cardSummary.setPlayTest(playTest);
+        cardSummary.setSets(sets);
+        cardSummary.setBanned(banned);
+        cardSummary.setAdvanced(Optional.ofNullable(advanced).orElse(false));
+        cardSummary.setInfernal(Optional.ofNullable(infernal).orElse(false));
+        cardSummary.setHtmlText(htmlText);
+        cardSummary.setCapacity(capacity);
+        cardSummary.setDisciplines(disciplines);
+        return cardSummary;
+    }
+
     public SummaryCard(LibraryCard libraryCard) {
         this.id = libraryCard.getId();
         this.displayName = libraryCard.getDisplayName();
@@ -118,6 +147,7 @@ public class SummaryCard {
             this.cost = libraryCard.getConviction() + " conviction";
 
         this.clans = libraryCard.getClans();
+        this.path = libraryCard.getPath();
 
         List<String> cardLines = new ArrayList<>();
         Optional.ofNullable(libraryCard.getName()).ifPresent(name -> cardLines.add("Name: " + name));

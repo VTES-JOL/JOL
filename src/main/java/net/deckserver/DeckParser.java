@@ -121,6 +121,9 @@ public class DeckParser {
             found.setId(Integer.parseInt(cardEntry.getId()));
             found.setName(cardEntry.getName());
             found.setCount(count);
+            if (cardEntry.isPlayTest()) {
+                found.setComments("playtest");
+            }
             logger.debug("{} - found {} copies of {}", deckLine, found.getCount(), cardEntry.getName());
             return found;
         }).orElseGet(() -> {

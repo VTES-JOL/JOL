@@ -451,6 +451,7 @@ public class JolGame {
         cardDetail.setPath(getPath(card));
         cardDetail.setSect(getSect(card));
         cardDetail.setClan(getClan(card));
+        cardDetail.setPlaytest(CardSearch.INSTANCE.get(card.getCardId()).isPlayTest());
         return cardDetail;
     }
 

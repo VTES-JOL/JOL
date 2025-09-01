@@ -33,6 +33,7 @@ public class LibraryCard extends BaseCard{
     private List<String> disciplines;
     private List<String> clans;
     private List<String> requirements;
+    private String path;
 
     // Other
     private Boolean burnOption;

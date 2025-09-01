@@ -26,6 +26,7 @@ public class CardSummary {
     private boolean banned;
     private Set<String> sets = new HashSet<>();
     private boolean playTest;
+    private String htmlText;
 
     //Crypt only
     private Integer capacity;

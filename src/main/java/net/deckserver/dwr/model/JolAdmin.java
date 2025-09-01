@@ -439,7 +439,7 @@ public class JolAdmin {
             String extension = DeckFormat.LEGACY.equals(deckInfo.getFormat()) ? "txt" : "json";
             String deckFile = String.format("decks/%s.%s", deckInfo.getDeckId(), extension);
             if (!Files.exists(BASE_PATH.resolve(deckFile))) {
-                logger.error("Unable to find deck {}", deckFile);
+                logger.error("Unable to find deck {} for {}", deckFile, cell.getRowKey());
                 invalidDecks.add(cell);
             }
         }

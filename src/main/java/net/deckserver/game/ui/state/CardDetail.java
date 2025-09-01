@@ -4,7 +4,6 @@ import lombok.Data;
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.storage.state.RegionType;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -27,6 +26,7 @@ public class CardDetail implements Serializable {
     private boolean minion;
     private boolean merged;
     private boolean infernal;
+    private boolean playtest;
     private String path;
     private String sect;
     private String clan;
@@ -54,6 +54,7 @@ public class CardDetail implements Serializable {
         attributeString += String.format("data-visible='%s' ", visible);
         if (visible) {
             attributeString += String.format("data-card-id='%s' ", cardId);
+            attributeString += String.format("data-secured='%s' ", playtest);
             if (FULL_ATTRIBUTE_REGIONS.contains(region)) {
                 attributeString += String.format("data-minion='%s' ", minion);
                 attributeString += String.format("data-clan='%s' ", clan);

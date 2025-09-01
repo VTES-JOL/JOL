@@ -13,8 +13,10 @@ import net.deckserver.storage.json.cards.SecuredCardLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,25 +42,25 @@ public class CardSearch {
             loader = getCloudfrontStream();
             logger.info("Using cloudfront stream");
         } catch (Exception e) {
-            loader = getLocalStream();
-            logger.info("Using local stream");
+            try {
+                loader = getLocalStream();
+                logger.info("Using local stream");
+            } catch (Exception e1) {
+                logger.error("Unable to read cards - using empty list");
+                return;
+            }
         }
         try {
             List<CardSummary> cardList = objectMapper.readValue(loader, cardSummaryCollectionType);
-            boolean playtestEnabled = cardList.stream().anyMatch(CardSummary::isPlayTest);
-            if (playtestEnabled) {
-                logger.info("Playtest cards enabled");
-            }
-            cardList.forEach(card -> {
-                for (String name : card.getNames()) {
-                    nameKeys.put(name.toLowerCase(), card.getId());
-                }
-                cards.put(card.getId(), card);
-            });
-            logger.info("Read {} keys, {} cards", nameKeys.size(), cards.size());
+            init(cardList);
         } catch (IOException e) {
             logger.error("Unable to read cards", e);
         }
+    }
+
+    public void refresh(List<CardSummary> cardList) {
+        logger.info("Using static list");
+        INSTANCE.init(cardList);
     }
 
     public Optional<CardSummary> findCardExact(String text) {
@@ -91,12 +93,26 @@ public class CardSearch {
         return cards.get(id);
     }
 
+    private void init(List<CardSummary> cardList) {
+        boolean playtestEnabled = cardList.stream().anyMatch(CardSummary::isPlayTest);
+        if (playtestEnabled) {
+            logger.info("Playtest cards enabled");
+        }
+        cardList.forEach(card -> {
+            for (String name : card.getNames()) {
+                nameKeys.put(name.toLowerCase(), card.getId());
+            }
+            cards.put(card.getId(), card);
+        });
+        logger.info("Read {} keys, {} cards", nameKeys.size(), cards.size());
+    }
+
     private InputStream getCloudfrontStream() throws Exception {
         SecuredCardLoader loader = new SecuredCardLoader("/secured/cards.json");
         return loader.generateSignedUrl().openStream();
     }
 
-    private InputStream getLocalStream() {
-        return Thread.currentThread().getContextClassLoader().getResourceAsStream("cards.json");
+    private InputStream getLocalStream() throws Exception {
+        return new FileInputStream(Paths.get("target/static/secured/cards.json").toFile());
     }
 }

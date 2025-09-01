@@ -712,4 +712,12 @@ public class DoCommandTest {
         assertThat(getLastMessage(), containsString("(picked randomly)"));
         assertThat(getLastMessage(), containsString("from the game."));
     }
+
+    @Test
+    void pathTest() throws CommandException {
+        Card card = game.getCard("111");
+        assertThat(game.getPath(card), nullValue());
+        worker.doCommand("Player2", "path 1 caine");
+        assertThat(game.getPath(card), is("CAINE"));
+    }
 }

@@ -1,6 +1,5 @@
 package net.deckserver.game.ui.state;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import net.deckserver.game.interfaces.state.Card;

@@ -38,14 +38,14 @@ public class NavBean {
             if (isAdmin) {
                 buttons.add("admin:Admin");
             }
+            admin.getGames(player).stream()
+                    .filter(admin::isActive)
+                    .filter(game -> admin.isAlive(game, player))
+                    .forEach(game -> {
+                        String current = JolAdmin.INSTANCE.isCurrent(player, game) ? "" : "*";
+                        gameButtons.put("g" + game, game + current);
+                    });
         }
-        admin.getGames(player).stream()
-                .filter(admin::isActive)
-                .filter(game -> admin.isAlive(game, player))
-                .forEach(game -> {
-                    String current = JolAdmin.INSTANCE.isCurrent(player, game) ? "" : "*";
-                    gameButtons.put("g" + game, game + current);
-                });
         message = JolAdmin.INSTANCE.getMessage();
         stamp = JolAdmin.getDate();
     }

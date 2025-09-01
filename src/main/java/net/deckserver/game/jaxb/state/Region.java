@@ -1,8 +1,8 @@
 package net.deckserver.game.jaxb.state;
 
+import jakarta.xml.bind.annotation.*;
 import lombok.Data;
 
-import jakarta.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 

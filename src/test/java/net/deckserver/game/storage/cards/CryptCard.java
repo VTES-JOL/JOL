@@ -28,6 +28,7 @@ public class CryptCard extends BaseCard {
     private String clan;
     private String group;
     private String sect;
+    private String path;
     private boolean advanced;
     private String title;
     private String votes;

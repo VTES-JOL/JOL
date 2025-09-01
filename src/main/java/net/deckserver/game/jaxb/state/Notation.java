@@ -1,10 +1,9 @@
 package net.deckserver.game.jaxb.state;
 
+import jakarta.xml.bind.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import jakarta.xml.bind.annotation.*;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)

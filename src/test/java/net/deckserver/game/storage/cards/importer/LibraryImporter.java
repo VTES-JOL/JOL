@@ -1,7 +1,6 @@
 package net.deckserver.game.storage.cards.importer;
 
 import lombok.extern.slf4j.Slf4j;
-import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.game.storage.cards.LibraryCard;
 import net.deckserver.game.storage.cards.LibraryCardMode;
 
@@ -76,6 +75,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         // Calculate requirements
         Utils.split(lineData[FIELD_REQUIREMENTS_CLAN], "/").ifPresent(card::setClans);
         Utils.split(lineData[FIELD_REQUIREMENTS_DISCIPLINE], "/").ifPresent(card::setDisciplines);
+        Utils.getClean(lineData[FIELD_REQUIREMENTS_PATH]).ifPresent(card::setPath);
 
         // Calculate cost
         Utils.getClean(lineData[FIELD_POOL_COST]).ifPresent(card::setPool);

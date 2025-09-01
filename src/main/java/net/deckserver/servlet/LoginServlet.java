@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -38,10 +37,10 @@ public class LoginServlet extends HttpServlet {
 
     private void setupPlaytestAuth(HttpServletResponse response) {
         logger.info("Setting up playtest auth cookies");
-        SecuredCardLoader cardLoader = new SecuredCardLoader("/secured/images/*");
+        SecuredCardLoader cardLoader = new SecuredCardLoader("/secured/*");
         try {
             String secure = System.getenv().getOrDefault("TYPE", "dev").equals("dev") ? "" : "Secure;";
-            String additionalSettings = String.format(";HttpOnly;%s", secure);
+            String additionalSettings = String.format(";HttpOnly; Domain=deckserver.net; Path=/; Secure; %s", secure);
             CookiesForCannedPolicy cookies = cardLoader.generateCookies();
             response.addHeader("Set-Cookie", cookies.expiresHeaderValue() + additionalSettings);
             response.addHeader("Set-Cookie", cookies.signatureHeaderValue() + additionalSettings);

@@ -107,7 +107,7 @@ public class ChatParser {
     }
 
     private static String generateCardLink(CardSummary card) {
-        return String.format("<a class='card-name' data-card-id='%s' data-secured='%s'>%s %s</a>", card.getId(), card.isPlayTest(), card.getDisplayName(), (card.isAdvanced() ? " <i class='icon adv'></i>" : "") );
+        return String.format("<a class='card-name' data-card-id='%s' data-secured='%s'>%s%s</a>", card.getId(), card.isPlayTest(), card.getDisplayName(), (card.isAdvanced() ? " <i class='icon adv'></i>" : "") );
     }
 
     public static String generateDisciplineLink(String discipline) {

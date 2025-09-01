@@ -148,7 +148,8 @@ public class DoCommand {
         }
     }
 
-    private void path(CommandParser cmdObj, String player) throws CommandException {
+    private void
+    path(CommandParser cmdObj, String player) throws CommandException {
         Card targetCard = cmdObj.findCard(false, player, RegionType.READY);
         boolean clear = cmdObj.consumeString("clear");
         if (clear) {

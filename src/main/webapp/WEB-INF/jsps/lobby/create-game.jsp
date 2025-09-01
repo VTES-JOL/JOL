@@ -22,6 +22,7 @@
                 <option value="V5">V5</option>
                 <option value="JYHAD">Jyhad</option>
                 <option value="DUEL">Duel</option>
+                <option value="PLAYTEST">Playtest</option>
             </select>
         </div>
         <button class="btn btn-outline-secondary btn-sm mt-2" onclick="doCreateGame()">Create Game</button>

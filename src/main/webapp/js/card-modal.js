@@ -28,12 +28,13 @@ function showPlayCardModal(event) {
     playCardModal.find(".loading").show();
     let eventParent = $(event.target).parents(".list-group-item");
     let cardId = eventParent.data('card-id');
+    let secured = eventParent.data('secured') || false ? "secured/" : "";
     let coordinates = eventParent.data('coordinates');
     let region = eventParent.closest('[data-region]').data('region');
     if (cardId) {
         $.get({
             dataType: "json",
-            url: "https://static.tornsignpost.org/json/" + cardId, success: function (card) {
+            url: `https://static.dev.deckserver.net/${secured}json/${cardId}`, success: function (card) {
                 playCardModal.data('hand-coord', coordinates);
                 playCardModal.data('region', region);
                 playCardModal.data('do-not-replace', region === "research" ? true : card.doNotReplace);
@@ -233,15 +234,16 @@ function showCardModal(event) {
     let locked = target.data('locked');
     let votes = target.data('votes');
     let contested = target.data('contested');
+    let secured = target.data('secured') || false ? "secured/" : "";
     let minion = target.data("minion");
     let disciplines = target.data("disciplines").trim().split(" ");
     let sect = target.data("sect");
     let owner = controller === player;
     if (cardId) {
-        $("#card-image").attr("src", "https://static.tornsignpost.org/images/" + cardId);
+        $("#card-image").attr("src", `https://static.dev.deckserver.net/${secured}images/${cardId}`);
         $.get({
             dataType: "json",
-            url: "https://static.tornsignpost.org/json/" + cardId, success: function (card) {
+            url: `https://static.dev.deckserver.net/${secured}json/${cardId}`, success: function (card) {
                 var modal = $('#cardModal');
                 modal.data('controller', controller);
                 modal.data('region', region);

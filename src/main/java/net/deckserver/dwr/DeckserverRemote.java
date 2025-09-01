@@ -14,7 +14,6 @@ import org.directwebremoting.WebContextFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class DeckserverRemote {
 
