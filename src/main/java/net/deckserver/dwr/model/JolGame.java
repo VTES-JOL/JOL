@@ -511,15 +511,15 @@ public class JolGame {
     }
 
     public String getPath(Card card) {
-        return getNotation(card, PATH, null);
+        return getNotation(card, PATH, Path.NONE.getDescription());
     }
 
     public String getSect(Card card) {
-        return getNotation(card, SECT, null);
+        return getNotation(card, SECT, Sect.NONE.getDescription());
     }
 
     public String getClan(Card card) {
-        return getNotation(card, CLAN, "");
+        return getNotation(card, CLAN, Clan.NONE.getDescription());
     }
 
     public boolean isInfernal(Card card) {

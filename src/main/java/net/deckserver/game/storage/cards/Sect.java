@@ -8,7 +8,8 @@ public enum Sect {
     SABBAT("Sabbat", "S"),
     INDEPENDENT("Independent", "I"),
     LAIBON("Laibon", "L"),
-    ANARCH("Anarch", "A"),;
+    ANARCH("Anarch", "A"),
+    NONE("", "");
 
     private final String description;
     private final String code;
@@ -23,7 +24,7 @@ public enum Sect {
             if (sect.description.equalsIgnoreCase(description))
                 return sect;
         }
-        return null;
+        return NONE;
     }
 
     public static Sect startsWith(String description) {
@@ -32,6 +33,6 @@ public enum Sect {
                 return sect;
             }
         }
-        return null;
+        return NONE;
     }
 }

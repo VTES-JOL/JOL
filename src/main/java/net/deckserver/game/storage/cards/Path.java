@@ -7,7 +7,8 @@ public enum Path {
     CAINE("Caine"),
     CATHARI("Cathari"),
     DEATH_AND_THE_SOUL("Death and the Soul"),
-    POWER_AND_THE_INNER_VOICE("Power and the Inner Voice");
+    POWER_AND_THE_INNER_VOICE("Power and the Inner Voice"),
+    NONE("");
 
     private final String description;
 
@@ -22,7 +23,7 @@ public enum Path {
                 return path;
             }
         }
-        return null;
+        return NONE;
     }
 
     public static Path startsWith(String description) {
@@ -31,7 +32,7 @@ public enum Path {
                 return path;
             }
         }
-        return null;
+        return NONE;
     }
 
 }

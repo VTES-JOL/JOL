@@ -51,7 +51,8 @@ public enum Clan {
     JUDGE("Judge"),
     MARTYR("Marryr"),
     REDEEMER("Redeemer"),
-    VISIONARY("Visionary"),;
+    VISIONARY("Visionary"),
+    NONE("");
 
     @Getter
     private final String description;
@@ -66,7 +67,7 @@ public enum Clan {
                 return clan;
             }
         }
-        return null;
+        return NONE;
     }
 
     public static Clan startsWith(String prefix) {
@@ -75,6 +76,6 @@ public enum Clan {
                 return clan;
             }
         }
-        return null;
+        return NONE;
     }
 }

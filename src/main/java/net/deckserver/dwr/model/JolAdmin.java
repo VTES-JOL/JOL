@@ -24,6 +24,11 @@ import net.deckserver.DeckParser;
 import net.deckserver.RandomGameName;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.GameStatusBean;
+import net.deckserver.game.interfaces.state.Game;
+import net.deckserver.game.interfaces.state.Location;
+import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.game.storage.cards.Clan;
+import net.deckserver.game.storage.cards.Sect;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
 import net.deckserver.game.validators.DeckValidator;
@@ -33,6 +38,7 @@ import net.deckserver.jobs.CleanupGamesJob;
 import net.deckserver.jobs.PersistStateJob;
 import net.deckserver.jobs.PublicGamesBuilderJob;
 import net.deckserver.jobs.ValidateGWJob;
+import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
@@ -67,8 +73,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+import static net.deckserver.game.storage.state.RegionType.*;
 
 public class JolAdmin {
 
@@ -448,7 +456,10 @@ public class JolAdmin {
 
     public void upgrade() {
         logger.info("Determining upgrades...");
-        decks.values().stream().filter(MODERN_DECK).filter(NO_TAGS)
+        decks.values().stream()
+                .filter(MODERN_DECK)
+                .filter(NO_TAGS)
+                .filter(Objects::nonNull)
                 .forEach(deckInfo -> {
                     ExtendedDeck deck = getDeck(deckInfo.getDeckId());
                     Set<String> tags = ValidatorFactory.getTags(deck.getDeck());
@@ -456,6 +467,82 @@ public class JolAdmin {
                     deckInfo.setFormat(DeckFormat.TAGGED);
                     logger.info("Upgrading {} to {} with {} tags", deckInfo.getDeckId(), deckInfo.getFormat(), tags);
                 });
+
+        // Upgrade all games with no version
+        games.values().stream()
+                .filter(ACTIVE_GAME)
+                .filter(Objects::nonNull)
+                // Version 1 is the first version where we store additional information in the game state
+                .filter(gameInfo -> gameInfo.getVersion().isOlderThan(GameInfo.Version.GAME_STATE))
+                // For every active game check the game state
+                .peek(gameInfo -> {
+                    logger.info("Upgrading game {}", gameInfo.getName());
+                })
+                .forEach(gameInfo -> {
+                    JolGame game = loadGameState(gameInfo.getName());
+                    game.getPlayers()
+                            .stream()
+                            .peek(player -> {
+                                logger.info("{}", player);
+                            })
+                            // For each player check that the regions contain the right information
+                            .forEach(player -> {
+                                Game gameState = game.getState();
+                                Stream.of(READY, UNCONTROLLED, TORPOR)
+                                        .peek(region -> {
+                                            logger.info("{}", region.description());
+                                        })
+                                        // Get region
+                                        .map(region -> gameState.getPlayerLocation(player, region))
+                                        // Get cards in region
+                                        .map(Location::getCards)
+                                        .flatMap(Arrays::stream)
+                                        .peek(card -> {
+                                            logger.info("{} {}", card.getName(), card.getCardId());
+                                        })
+                                        // Populate missing information on the card
+                                        .forEach(card -> {
+                                            CardSummary summary = CardSearch.INSTANCE.get(card.getCardId());
+                                            // Populate information on vampires
+                                            if (summary.isMinion()) {
+                                                // Populate disciplines if missing
+                                                if (!summary.getDisciplines().isEmpty() && game.getDisciplines(card).isEmpty()) {
+                                                    game.setDisciplines(player, card, summary.getDisciplines(), true);
+                                                    logger.info("Populating disciplines {}", game.getDisciplines(card));
+                                                }
+                                                // Populate sect if missing
+                                                if (!Strings.isNullOrEmpty(summary.getSect()) && Strings.isNullOrEmpty(game.getSect(card))) {
+                                                    game.setSect(player, card, Sect.of(summary.getSect()), true);
+                                                    logger.info("Populating sect {}", game.getSect(card));
+                                                }
+                                                // Populate path if missing
+                                                if (!Strings.isNullOrEmpty(summary.getPath()) && Strings.isNullOrEmpty(game.getPath(card))) {
+                                                    game.setPath(player, card, net.deckserver.game.storage.cards.Path.of(summary.getPath()), true);
+                                                    logger.info("Populating path {}", game.getPath(card));
+                                                }
+                                                // Populate capacity if missing
+                                                if (summary.getCapacity() != null && summary.getCapacity() > 0 && game.getCapacity(card) == 0) {
+                                                    game.changeCapacity(card, summary.getCapacity(), true);
+                                                    logger.info("Populating capacity {}", game.getCapacity(card));
+                                                }
+                                                // Populate clan if missing
+                                                if (!summary.getClans().isEmpty() && Strings.isNullOrEmpty(game.getClan(card))) {
+                                                    game.setClan(player, card, Clan.of(summary.getClans().getFirst()), true);
+                                                    logger.info("Populating clan {}", game.getClan(card));
+                                                }
+                                                // Populate votes if missing
+                                                if (!Strings.isNullOrEmpty(summary.getVotes()) && Strings.isNullOrEmpty(game.getVotes(card))) {
+                                                    game.setVotes(card, summary.getVotes(), true);
+                                                    logger.info("Populating votes {}", game.getVotes(card));
+                                                }
+                                            }
+                                        });
+                            });
+                    saveGameState(game);
+                    gameInfo.setVersion(GameInfo.Version.GAME_STATE);
+                    logger.info("Finished upgrading game {}", gameInfo.getName());
+                });
+        persistState();
     }
 
 

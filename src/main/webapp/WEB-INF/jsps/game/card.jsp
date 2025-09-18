@@ -17,7 +17,6 @@
     String player = request.getParameter("player");
     String id = request.getParameter("id");
     String index = request.getParameter("index");
-    boolean topLevel = index.split("\\.").length == 1;
     pageContext.setAttribute("currentIndex", index);
     boolean shadow = Boolean.parseBoolean(request.getParameter("shadow"));
     RegionType region = RegionType.valueOf(request.getParameter("region"));
@@ -25,7 +24,7 @@
     Card[] cards = card.getCards();
 
     CardDetail cardDetail = game.getDetail(card);
-    Path path = Optional.ofNullable(cardDetail.getPath()).map(Path::valueOf).orElse(null);
+    Path path = Path.of(cardDetail.getPath());
     Sect sect = Sect.of(cardDetail.getSect());
     Clan clan = Clan.of(cardDetail.getClan());
     List<String> disciplines = cardDetail.getDisciplines();
@@ -38,29 +37,11 @@
     boolean infernal = cardDetail.isInfernal();
 
     CardSummary cardSummary = CardSearch.INSTANCE.get(cardDetail.getCardId());
-    List<String> defaultDisciplines = cardSummary.getDisciplines();
-    String defaultVotes = cardSummary.getVotes();
-    String defaultClan = cardSummary.getSingleClanClass();
-    Integer defaultCapacity = cardSummary.getCapacity();
-    String defaultSect = cardSummary.getSect();
     String secured = String.valueOf(cardSummary.isPlayTest());
 
-    if (disciplines.isEmpty()) { disciplines = defaultDisciplines; }
     boolean hasCapacity = capacity > 0;
-    if (capacity == 0 && defaultCapacity != null && topLevel) {
-        capacity = defaultCapacity;
-    }
-    if (Strings.isNullOrEmpty(votes)) { votes = defaultVotes; }
     boolean hasVotes = !Strings.isNullOrEmpty(votes) && !votes.equals("0");
     String shadowStyle = shadow ? "shadow" : "";
-    if (hasCapacity && cardSummary.hasBlood()) {
-        if (sect == null) {
-            sect = Sect.of(defaultSect);
-        }
-        if (clan == null) {
-            clan = Clan.of(defaultClan);
-        }
-    }
     // Counter Style Logic
     // Green: hasLife && OTHER_VISIBLE_REGION
     // Red: hasBlood || hasCapacity
@@ -147,49 +128,5 @@
                 </c:choose>
             </c:forEach>
         </ol>
-
-   <%-- <div class="d-flex justify-content-between align-items-baseline w-100 pb-1">
-            <span>
-                <a data-card-id="<%= cardDetail.getCardId() %>" class="card-name text-wrap">
-                    <%= cardSummary.getDisplayName() %>
-                    <c:if test="<%= cardSummary.isAdvanced() %>">
-                        <i class='icon adv'></i>
-                    </c:if>
-                </a>
-                <c:if test="<%= hasVotes %>">
-                    <span class="badge rounded-pill text-bg-warning "><%= votes %></span>
-                </c:if>
-            </span>
-        <span class="d-flex gap-1 align-items-center">
-                <c:if test="<%= locked %>"><span class="badge text-bg-dark p-1 px-2" style="font-size: 0.6rem;">LOCKED</span></c:if>
-                <c:if test="<%= contested %>"><span class="badge text-bg-warning p-1 px-2" style="font-size: 0.6rem;">CONTESTED</span></c:if>
-                <c:if test="<%= counters > 0 || capacity > 0%>">
-                    <span class="badge rounded-pill shadow <%= counterStyle%>"><%= counterText%></span>
-                </c:if>
-            </span>
     </div>
-    <div class="d-flex justify-content-between align-items-center w-100 pb-1">
-            <span>
-                <c:forEach items="<%= disciplines %>" var="disc">
-                    <span class="icon ${disc}"></span>
-                </c:forEach>
-            </span>
-        <span class="d-flex align-items-center gap-1">
-                <span class="badge bg-light text-black shadow border border-secondary-subtle"><%= label %></span>
-                <c:if test="<%= cardSummary.hasBlood() %>">
-                    <c:if test="<%= !Strings.isNullOrEmpty(path) %>">
-                        <span class="path <%= path %>"></span>
-                    </c:if>
-                    <c:if test="<%= sect != null %>">
-                        <% assert sect != null; %>
-                        <span class="sect" title="<%= sect.getDescription()%>"><%= sect.getDescription() %></span>
-                    </c:if>
-                    <c:if test="<%= clan != null %>">
-                        <% assert clan != null; %>
-                        <span class="clan <%= clan.toString().toLowerCase() %>" title="<%= clan.getDescription() %>"></span>
-                    </c:if>
-
-                </c:if>
-            </span>
-    </div>--%>
 </li>
