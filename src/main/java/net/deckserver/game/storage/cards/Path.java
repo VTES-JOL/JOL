@@ -16,6 +16,10 @@ public enum Path {
         this.description = description;
     }
 
+    public static Path from(String value) {
+        return Path.valueOf(value.toUpperCase());
+    }
+
     public static Path of(String description) {
         // exact match first
         for (Path path : Path.values()) {

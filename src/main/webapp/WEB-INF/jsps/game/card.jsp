@@ -24,9 +24,9 @@
     Card[] cards = card.getCards();
 
     CardDetail cardDetail = game.getDetail(card);
-    Path path = Path.of(cardDetail.getPath());
-    Sect sect = Sect.of(cardDetail.getSect());
-    Clan clan = Clan.of(cardDetail.getClan());
+    Path path = cardDetail.getPath();
+    Sect sect = cardDetail.getSect();
+    Clan clan = cardDetail.getClan();
     List<String> disciplines = cardDetail.getDisciplines();
     String label = cardDetail.getLabel();
     int counters = cardDetail.getCounters();
@@ -85,16 +85,13 @@
                 </div>
                 <div class="d-flex justify-content-end align-items-center gap-1">
                     <c:if test="<%= cardSummary.hasBlood() %>">
-                        <c:if test="<%= path != null %>">
-                            <% assert path != null; %>
+                        <c:if test="<%= !Path.NONE.equals(path) %>">
                             <span class="path <%= path.toString().toLowerCase() %>"></span>
                         </c:if>
-                        <c:if test="<%= sect != null %>">
-                            <% assert sect != null; %>
+                        <c:if test="<%= !Sect.NONE.equals(sect) %>">
                             <small class="sect" title="<%= sect.getDescription()%>"><%= sect.getDescription() %></small>
                         </c:if>
-                        <c:if test="<%= clan != null %>">
-                            <% assert clan != null; %>
+                        <c:if test="<%= !Clan.NONE.equals(clan) %>">
                             <span class="clan <%= clan.toString().toLowerCase() %>" title="<%= clan.getDescription() %>"></span>
                         </c:if>
                     </c:if>

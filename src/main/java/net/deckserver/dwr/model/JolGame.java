@@ -209,11 +209,6 @@ public class JolGame {
         CardDetail detail = getDetail(card);
         CardSummary cardSummary = CardSearch.INSTANCE.get(detail.getCardId());
         Integer capacity = cardSummary.getCapacity();
-        String capacityText = "";
-        if (capacity != null && getCapacity(card) <= 0) {
-            changeCapacity(card, capacity, true);
-            capacityText = ", capacity: " + capacity;
-        }
         // Do disciplines
         List<String> disciplines = cardSummary.getDisciplines();
         setDisciplines(player, card, disciplines, true);
@@ -243,7 +238,7 @@ public class JolGame {
         setInfernal(player, card, cardSummary.isInfernal(), true);
         source.removeCard(card);
         dest.addCard(card, true);
-        addCommand(String.format("%s influences out %s%s%s.", player, getCardLink(card), capacityText, votesText), new String[]{"influence", card.getId(), destPlayer, destRegion.xmlLabel()});
+        addCommand(String.format("%s influences out %s%s.", player, getCardLink(card), votesText), new String[]{"influence", card.getId(), destPlayer, destRegion.xmlLabel()});
 
         Map<String, Card> cards = state.getUniqueCards(card.getCardId());
         if (cards.size() > 1) {
@@ -254,7 +249,7 @@ public class JolGame {
     }
 
     public void setSect(String player, Card card, Sect sect, boolean quiet) {
-        setNotation(card, SECT, sect.getDescription());
+        setNotation(card, SECT, sect.toString());
         if (!quiet) {
             addCommand(String.format("%s changes sect of %s to %s", player, getCardLink(card), sect.getDescription()), new String[]{"sect", card.getId(), sect.toString()});
         }
@@ -268,7 +263,7 @@ public class JolGame {
     }
 
     public void setClan(String player, Card targetCard, Clan clan, boolean quiet) {
-        setNotation(targetCard, CLAN, clan.getDescription());
+        setNotation(targetCard, CLAN, clan.toString());
         if (!quiet) {
             addCommand(String.format("%s changes clan of %s to %s", player, getCardLink(targetCard), clan.getDescription()), new String[]{"path", targetCard.getId(), clan.getDescription()});
         }
@@ -510,16 +505,16 @@ public class JolGame {
         return getNotation(card, TEXT, "");
     }
 
-    public String getPath(Card card) {
-        return getNotation(card, PATH, Path.NONE.getDescription());
+    public Path getPath(Card card) {
+        return Path.from(getNotation(card, PATH, Path.NONE.toString()));
     }
 
-    public String getSect(Card card) {
-        return getNotation(card, SECT, Sect.NONE.getDescription());
+    public Sect getSect(Card card) {
+        return Sect.from(getNotation(card, SECT, Sect.NONE.toString()));
     }
 
-    public String getClan(Card card) {
-        return getNotation(card, CLAN, Clan.NONE.getDescription());
+    public Clan getClan(Card card) {
+        return Clan.from(getNotation(card, CLAN, Clan.NONE.toString()));
     }
 
     public boolean isInfernal(Card card) {

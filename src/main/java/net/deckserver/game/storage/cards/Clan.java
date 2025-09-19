@@ -61,6 +61,10 @@ public enum Clan {
         this.description = description;
     }
 
+    public static Clan from(String value) {
+        return Clan.valueOf(value.toUpperCase());
+    }
+
     public static Clan of(String description) {
         for (Clan clan : Clan.values()) {
             if (clan.description.equalsIgnoreCase(description)) {

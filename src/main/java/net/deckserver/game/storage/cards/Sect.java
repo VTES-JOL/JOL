@@ -19,6 +19,10 @@ public enum Sect {
         this.code = code;
     }
 
+    public static Sect from(String value) {
+        return Sect.valueOf(value.toUpperCase());
+    }
+
     public static Sect of(String description) {
         for (Sect sect : values()) {
             if (sect.description.equalsIgnoreCase(description))

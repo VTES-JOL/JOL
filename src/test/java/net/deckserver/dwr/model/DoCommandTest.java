@@ -2,6 +2,7 @@ package net.deckserver.dwr.model;
 
 import net.deckserver.game.interfaces.state.Card;
 import net.deckserver.game.jaxb.state.Notation;
+import net.deckserver.game.storage.cards.Path;
 import net.deckserver.game.storage.state.RegionType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -377,7 +378,7 @@ public class DoCommandTest {
         assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY).getCards().length, is(4));
         assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY).getCards()[0], hasProperty("id", is("4")));
         assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED).getCards().length, is(1));
-        assertThat(getLastMessage(), containsString("Player1 influences out <a class='card-name' data-card-id='201025'>Muse</a>, capacity: 3"));
+        assertThat(getLastMessage(), containsString("Player1 influences out <a class='card-name' data-card-id='201025'>Muse</a>."));
     }
 
     @Test
@@ -414,7 +415,7 @@ public class DoCommandTest {
         assertThat(game.getState().getPlayerLocation("Player4", RegionType.READY).getCards().length, is(3));
         assertThat(game.getState().getPlayerLocation("Player4", RegionType.READY).getCards()[0], hasProperty("id", is("317")));
         assertThat(game.getState().getPlayerLocation("Player4", RegionType.UNCONTROLLED).getCards().length, is(2));
-        assertThat(getLastMessage(), containsString("Player4 influences out <a class='card-name' data-card-id='200810'>Lambach</a>, capacity: 10, votes: 3"));
+        assertThat(getLastMessage(), containsString("Player4 influences out <a class='card-name' data-card-id='200810'>Lambach</a>, votes: 3."));
     }
 
     @Test
@@ -716,8 +717,8 @@ public class DoCommandTest {
     @Test
     void pathTest() throws CommandException {
         Card card = game.getCard("111");
-        assertThat(game.getPath(card), nullValue());
+        assertThat(game.getPath(card), is(Path.NONE));
         worker.doCommand("Player2", "path 1 caine");
-        assertThat(game.getPath(card), is("CAINE"));
+        assertThat(game.getPath(card), is(Path.CAINE));
     }
 }

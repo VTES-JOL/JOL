@@ -42,6 +42,8 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final Pattern AS_ABOVE_PATTERN = Pattern.compile("As (\\[(?<disc>.*)])? ?above.*");
     private static final Pattern REMOVE_FROM_GAME_PATTERN = Pattern.compile(".*[Rr]emove this card from the game.*");
     private static final Pattern TROPHY_PATTERN = Pattern.compile("Master. Trophy.");
+    private static final Pattern LOCATION_PATTERN = Pattern.compile("(Unique|Master:) location");
+    private static final Pattern EQUIPEMENT_LOCATION_PATTERN = Pattern.compile("equipment card represents a location");
 
     private static final List<String> DISCIPLINES = Arrays.asList("ani", "obe", "cel", "dom", "dem", "for", "san", "thn", "vic", "pro", "chi", "val", "mel", "nec", "obf", "obl", "pot", "qui", "pre", "ser", "tha", "aus", "vis", "abo", "myt", "dai", "spi", "tem", "obt", "str", "mal", "flight");
 

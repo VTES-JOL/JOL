@@ -2,6 +2,9 @@ package net.deckserver.game.ui.state;
 
 import lombok.Data;
 import net.deckserver.game.interfaces.state.Card;
+import net.deckserver.game.storage.cards.Clan;
+import net.deckserver.game.storage.cards.Path;
+import net.deckserver.game.storage.cards.Sect;
 import net.deckserver.game.storage.state.RegionType;
 
 import java.io.Serializable;
@@ -27,9 +30,9 @@ public class CardDetail implements Serializable {
     private boolean merged;
     private boolean infernal;
     private boolean playtest;
-    private String path;
-    private String sect;
-    private String clan;
+    private Path path;
+    private Sect sect;
+    private Clan clan;
 
     public static final EnumSet<RegionType> FULL_ATTRIBUTE_REGIONS = EnumSet.of(RegionType.READY, RegionType.TORPOR, RegionType.UNCONTROLLED);
     public static final EnumSet<RegionType> LIMITED_ATTRIBUTE_REGIONS = EnumSet.of(RegionType.ASH_HEAP);

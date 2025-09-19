@@ -483,14 +483,14 @@ public class JolAdmin {
                     game.getPlayers()
                             .stream()
                             .peek(player -> {
-                                logger.info("{}", player);
+                                logger.debug("{}", player);
                             })
                             // For each player check that the regions contain the right information
                             .forEach(player -> {
                                 Game gameState = game.getState();
                                 Stream.of(READY, UNCONTROLLED, TORPOR)
                                         .peek(region -> {
-                                            logger.info("{}", region.description());
+                                            logger.debug("{}", region.description());
                                         })
                                         // Get region
                                         .map(region -> gameState.getPlayerLocation(player, region))
@@ -498,7 +498,7 @@ public class JolAdmin {
                                         .map(Location::getCards)
                                         .flatMap(Arrays::stream)
                                         .peek(card -> {
-                                            logger.info("{} {}", card.getName(), card.getCardId());
+                                            logger.debug("{} {}", card.getName(), card.getCardId());
                                         })
                                         // Populate missing information on the card
                                         .forEach(card -> {
@@ -508,32 +508,38 @@ public class JolAdmin {
                                                 // Populate disciplines if missing
                                                 if (!summary.getDisciplines().isEmpty() && game.getDisciplines(card).isEmpty()) {
                                                     game.setDisciplines(player, card, summary.getDisciplines(), true);
-                                                    logger.info("Populating disciplines {}", game.getDisciplines(card));
+                                                    logger.debug("Populating disciplines {}", game.getDisciplines(card));
                                                 }
                                                 // Populate sect if missing
-                                                if (!Strings.isNullOrEmpty(summary.getSect()) && Strings.isNullOrEmpty(game.getSect(card))) {
+                                                if (!Strings.isNullOrEmpty(summary.getSect()) && game.getSect(card).equals(Sect.NONE)) {
                                                     game.setSect(player, card, Sect.of(summary.getSect()), true);
-                                                    logger.info("Populating sect {}", game.getSect(card));
+                                                    assert !game.getSect(card).equals(Sect.NONE);
                                                 }
                                                 // Populate path if missing
-                                                if (!Strings.isNullOrEmpty(summary.getPath()) && Strings.isNullOrEmpty(game.getPath(card))) {
+                                                if (!Strings.isNullOrEmpty(summary.getPath()) && game.getPath(card).equals(net.deckserver.game.storage.cards.Path.NONE)) {
                                                     game.setPath(player, card, net.deckserver.game.storage.cards.Path.of(summary.getPath()), true);
-                                                    logger.info("Populating path {}", game.getPath(card));
+                                                    assert !game.getPath(card).equals(net.deckserver.game.storage.cards.Path.NONE);
                                                 }
                                                 // Populate capacity if missing
                                                 if (summary.getCapacity() != null && summary.getCapacity() > 0 && game.getCapacity(card) == 0) {
                                                     game.changeCapacity(card, summary.getCapacity(), true);
-                                                    logger.info("Populating capacity {}", game.getCapacity(card));
+                                                    logger.debug("Populating capacity {}", game.getCapacity(card));
                                                 }
                                                 // Populate clan if missing
-                                                if (!summary.getClans().isEmpty() && Strings.isNullOrEmpty(game.getClan(card))) {
+                                                if (!summary.getClans().isEmpty() && game.getClan(card).equals(Clan.NONE)) {
                                                     game.setClan(player, card, Clan.of(summary.getClans().getFirst()), true);
-                                                    logger.info("Populating clan {}", game.getClan(card));
+                                                    assert !game.getClan(card).equals(Clan.NONE);
                                                 }
                                                 // Populate votes if missing
                                                 if (!Strings.isNullOrEmpty(summary.getVotes()) && Strings.isNullOrEmpty(game.getVotes(card))) {
                                                     game.setVotes(card, summary.getVotes(), true);
-                                                    logger.info("Populating votes {}", game.getVotes(card));
+                                                    logger.debug("Populating votes {}", game.getVotes(card));
+                                                }
+                                            }
+                                            // Populate type on other cards
+                                            else {
+                                                String type = summary.getType();
+                                                if (Set.of("Equipment", "Event", "Master").contains(type)) {
                                                 }
                                             }
                                         });

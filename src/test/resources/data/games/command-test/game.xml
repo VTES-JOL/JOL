@@ -34,6 +34,14 @@
                 <name>capac</name>
                 <value>6</value>
             </notation>
+            <notation>
+                <name>sect</name>
+                <value>SABBAT</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>LASOMBRA</value>
+            </notation>
         </game-card>
         <game-card>
             <id>133</id>
@@ -65,6 +73,7 @@
             <owner>Player2</owner>
             <notation>
                 <name>disciplines</name>
+                <value>dom obt pot</value>
             </notation>
             <notation>
                 <name>tapnote</name>
@@ -75,6 +84,18 @@
             <notation>
                 <name>minion</name>
                 <value>true</value>
+            </notation>
+            <notation>
+                <name>sect</name>
+                <value>SABBAT</value>
+            </notation>
+            <notation>
+                <name>capac</name>
+                <value>4</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>LASOMBRA</value>
             </notation>
         </game-card>
         <game-card>
@@ -83,6 +104,7 @@
             <owner>Player2</owner>
             <notation>
                 <name>disciplines</name>
+                <value>pot DOM OBT PRE</value>
             </notation>
             <notation>
                 <name>tapnote</name>
@@ -93,6 +115,18 @@
             <notation>
                 <name>minion</name>
                 <value>true</value>
+            </notation>
+            <notation>
+                <name>sect</name>
+                <value>SABBAT</value>
+            </notation>
+            <notation>
+                <name>capac</name>
+                <value>7</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>LASOMBRA</value>
             </notation>
         </game-card>
         <game-card>
@@ -101,6 +135,7 @@
             <owner>Player2</owner>
             <notation>
                 <name>disciplines</name>
+                <value>obf pot DOM OBT</value>
             </notation>
             <notation>
                 <name>tapnote</name>
@@ -111,6 +146,22 @@
             <notation>
                 <name>minion</name>
                 <value>true</value>
+            </notation>
+            <notation>
+                <name>sect</name>
+                <value>SABBAT</value>
+            </notation>
+            <notation>
+                <name>capac</name>
+                <value>8</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>LASOMBRA</value>
+            </notation>
+            <notation>
+                <name>votes</name>
+                <value>P</value>
             </notation>
         </game-card>
     </region>
@@ -1892,6 +1943,14 @@
                 <name>votes</name>
                 <value>P</value>
             </notation>
+            <notation>
+                <name>sect</name>
+                <value>SABBAT</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>TZIMISCE</value>
+            </notation>
         </game-card>
         <game-card>
             <id>376</id>
@@ -1914,6 +1973,10 @@
                 <name>counters</name>
                 <value>5</value>
             </notation>
+            <notation>
+                <name>clan</name>
+                <value>TZIMISCE</value>
+            </notation>
         </game-card>
     </region>
     <region>
@@ -1927,6 +1990,7 @@
             <owner>Player4</owner>
             <notation>
                 <name>disciplines</name>
+                <value>vic</value>
             </notation>
             <notation>
                 <name>tapnote</name>
@@ -1937,6 +2001,18 @@
             <notation>
                 <name>minion</name>
                 <value>true</value>
+            </notation>
+            <notation>
+                <name>sect</name>
+                <value>SABBAT</value>
+            </notation>
+            <notation>
+                <name>capac</name>
+                <value>2</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>TZIMISCE</value>
             </notation>
         </game-card>
         <game-card>
@@ -1945,6 +2021,7 @@
             <owner>Player4</owner>
             <notation>
                 <name>disciplines</name>
+                <value>vic ANI AUS</value>
             </notation>
             <notation>
                 <name>tapnote</name>
@@ -1955,6 +2032,18 @@
             <notation>
                 <name>minion</name>
                 <value>true</value>
+            </notation>
+            <notation>
+                <name>sect</name>
+                <value>SABBAT</value>
+            </notation>
+            <notation>
+                <name>capac</name>
+                <value>5</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>TZIMISCE</value>
             </notation>
         </game-card>
         <game-card>
@@ -1963,6 +2052,7 @@
             <owner>Player4</owner>
             <notation>
                 <name>disciplines</name>
+                <value>pre ANI AUS DOM VIC</value>
             </notation>
             <notation>
                 <name>tapnote</name>
@@ -1973,6 +2063,22 @@
             <notation>
                 <name>minion</name>
                 <value>true</value>
+            </notation>
+            <notation>
+                <name>sect</name>
+                <value>SABBAT</value>
+            </notation>
+            <notation>
+                <name>capac</name>
+                <value>10</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>TZIMISCE</value>
+            </notation>
+            <notation>
+                <name>votes</name>
+                <value>3</value>
             </notation>
         </game-card>
     </region>
@@ -3775,6 +3881,14 @@
                 <name>counters</name>
                 <value>7</value>
             </notation>
+            <notation>
+                <name>sect</name>
+                <value>INDEPENDENT</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>ASSAMITE</value>
+            </notation>
         </game-card>
         <game-card>
             <id>451</id>
@@ -3832,6 +3946,7 @@
             <owner>Player5</owner>
             <notation>
                 <name>disciplines</name>
+                <value>qui</value>
             </notation>
             <notation>
                 <name>tapnote</name>
@@ -3847,6 +3962,18 @@
                 <name>text</name>
                 <value>visible all</value>
             </notation>
+            <notation>
+                <name>sect</name>
+                <value>INDEPENDENT</value>
+            </notation>
+            <notation>
+                <name>capac</name>
+                <value>1</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>ASSAMITE</value>
+            </notation>
         </game-card>
         <game-card>
             <id>413</id>
@@ -3854,6 +3981,7 @@
             <owner>Player5</owner>
             <notation>
                 <name>disciplines</name>
+                <value>ani chi DOM OBF QUI</value>
             </notation>
             <notation>
                 <name>tapnote</name>
@@ -3865,6 +3993,18 @@
                 <name>minion</name>
                 <value>true</value>
             </notation>
+            <notation>
+                <name>sect</name>
+                <value>INDEPENDENT</value>
+            </notation>
+            <notation>
+                <name>capac</name>
+                <value>8</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>ASSAMITE</value>
+            </notation>
         </game-card>
         <game-card>
             <id>420</id>
@@ -3872,6 +4012,7 @@
             <owner>Player5</owner>
             <notation>
                 <name>disciplines</name>
+                <value>cel qui</value>
             </notation>
             <notation>
                 <name>tapnote</name>
@@ -3886,6 +4027,18 @@
             <notation>
                 <name>counters</name>
                 <value>2</value>
+            </notation>
+            <notation>
+                <name>sect</name>
+                <value>INDEPENDENT</value>
+            </notation>
+            <notation>
+                <name>capac</name>
+                <value>3</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>ASSAMITE</value>
             </notation>
         </game-card>
         <game-card>
@@ -5429,6 +5582,14 @@
                 <name>counters</name>
                 <value>9</value>
             </notation>
+            <notation>
+                <name>sect</name>
+                <value>CAMARILLA</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>TOREADOR</value>
+            </notation>
         </game-card>
     </region>
     <region>
@@ -5442,6 +5603,7 @@
             <owner>Player3</owner>
             <notation>
                 <name>disciplines</name>
+                <value>cel AUS</value>
             </notation>
             <notation>
                 <name>tapnote</name>
@@ -5457,6 +5619,18 @@
                 <name>counters</name>
                 <value>2</value>
             </notation>
+            <notation>
+                <name>sect</name>
+                <value>CAMARILLA</value>
+            </notation>
+            <notation>
+                <name>capac</name>
+                <value>4</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>TOREADOR</value>
+            </notation>
         </game-card>
         <game-card>
             <id>216</id>
@@ -5464,6 +5638,7 @@
             <owner>Player3</owner>
             <notation>
                 <name>disciplines</name>
+                <value>aus cel pre</value>
             </notation>
             <notation>
                 <name>tapnote</name>
@@ -5474,6 +5649,18 @@
             <notation>
                 <name>minion</name>
                 <value>true</value>
+            </notation>
+            <notation>
+                <name>sect</name>
+                <value>CAMARILLA</value>
+            </notation>
+            <notation>
+                <name>capac</name>
+                <value>4</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>TOREADOR</value>
             </notation>
         </game-card>
         <game-card>
@@ -5482,6 +5669,7 @@
             <owner>Player3</owner>
             <notation>
                 <name>disciplines</name>
+                <value>AUS</value>
             </notation>
             <notation>
                 <name>tapnote</name>
@@ -5492,6 +5680,18 @@
             <notation>
                 <name>minion</name>
                 <value>true</value>
+            </notation>
+            <notation>
+                <name>sect</name>
+                <value>CAMARILLA</value>
+            </notation>
+            <notation>
+                <name>capac</name>
+                <value>3</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>TOREADOR</value>
             </notation>
         </game-card>
     </region>
@@ -7308,6 +7508,14 @@
                 <name>counters</name>
                 <value>2</value>
             </notation>
+            <notation>
+                <name>sect</name>
+                <value>SABBAT</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>PANDER</value>
+            </notation>
         </game-card>
         <game-card>
             <id>11</id>
@@ -7335,6 +7543,14 @@
             <notation>
                 <name>capac</name>
                 <value>1</value>
+            </notation>
+            <notation>
+                <name>sect</name>
+                <value>CAMARILLA</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>CAITIFF</value>
             </notation>
         </game-card>
         <game-card>
@@ -7372,6 +7588,7 @@
             <owner>Player1</owner>
             <notation>
                 <name>disciplines</name>
+                <value>ani for mel</value>
             </notation>
             <notation>
                 <name>tapnote</name>
@@ -7387,6 +7604,18 @@
                 <name>text</name>
                 <value>visible all</value>
             </notation>
+            <notation>
+                <name>sect</name>
+                <value>SABBAT</value>
+            </notation>
+            <notation>
+                <name>capac</name>
+                <value>3</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>DAUGHTER_OF_CACOPHONY</value>
+            </notation>
         </game-card>
         <game-card>
             <id>8</id>
@@ -7394,6 +7623,7 @@
             <owner>Player1</owner>
             <notation>
                 <name>disciplines</name>
+                <value>ani</value>
             </notation>
             <notation>
                 <name>tapnote</name>
@@ -7404,6 +7634,18 @@
             <notation>
                 <name>minion</name>
                 <value>true</value>
+            </notation>
+            <notation>
+                <name>sect</name>
+                <value>SABBAT</value>
+            </notation>
+            <notation>
+                <name>capac</name>
+                <value>2</value>
+            </notation>
+            <notation>
+                <name>clan</name>
+                <value>NOSFERATU_ANTITRIBU</value>
             </notation>
         </game-card>
     </region>

@@ -157,7 +157,7 @@ public class DoCommand {
         } else {
             String pathString = cmdObj.nextArg();
             Path path = Path.startsWith(pathString);
-            if (path == null) {
+            if (Path.NONE.equals(path)) {
                 throw new CommandException("Invalid path");
             }
             game.setPath(player, targetCard, path, false);
