@@ -1,25 +1,31 @@
 "use strict";
-var CLAN_CHARS = {
-    abomination: 'A', ahrimane: 'B', akunanse: 'C', assamite: 'n', baali: 'E',
-    blood_brother: 'F', brujah: 'o', brujah_antitribu: 'H', caitiff: 'I',
-    daughter_of_cacophony: 'J', follower_of_set: 'r', gangrel: 'p',
-    gangrel_antitribu: 'M', gargoyle: 'N', giovanni: 'O', guruhi: 'P',
-    harbinger_of_skulls: 'Q', ishtarri: 'R', kiasyd: 'S', lasombra: 'w',
-    malkavian: 'q', malkavian_antitribu: 'V', nagaraja: 'W', nosferatu: 's',
-    nosferatu_antitribu: 'Y', hecata: 'y', osebo: 'Z', pander: 'a', ravnos: 'x',
-    salubri: 'c', salubri_antitribu: 'd', samedi: 'e', toreador: 't',
-    toreador_antitribu: 'g', tremere: 'u', tremere_antitribu: 'i',
-    true_brujah: 'j', tzimisce: 'k', ventrue: 'v', ventrue_antitribu: 'm',
-    avenger: '1', defender: '2', innocent: '3', judge: '4', martyr: '5',
-    redeemer: '6', visionary: '7'
-};
+const CLANS = ["Abomination", "Ahrimane", "Akunanse", "Baali", "Banu Haqim", "Blood Brother", "Brujah", "Brujah Antitribu",
+    "Caitiff", "Daughter of Cacophony", "Gangrel", "Gangrel Antitribu", "Gargoyle", "Giovanni", "Guruhi", "Harbinger of Skulls",
+    "Ishtarri", "Kiasyd", "Lasombra", "Malkavian", "Malkavian Antitribu", "Nagaraja", "Nosferatu", "Nosferatu Antitribu",
+    "Hecata", "Ministry", "Osebo", "Pander", "Ravnos", "Salubri", "Salubri Antitribu", "Samedi", "Toreador", "Toreador Antitribu",
+    "Tremere", "Tremere Antitribu", "True Brujah", "Tzimisce", "Ventrue", "Ventrue Antitribu", "Avenger", "Defender", "Innocent",
+    "Judge", "Martyr", "Redeemer", "Visionary"]
+
+const PATHS = ['Death and the Soul', 'Power and the Inner Voice', 'Cathari', 'Caine', 'None'];
+
+const SECTS = [
+    {value: "CAMARILLA", label: "Camarilla"},
+    {value: "SABBAT", label: "Sabbat"},
+    {value: "INDEPENDENT", label: "Independent"},
+    {value: "LAIBON", label: "Laibon"},
+    {value: "ANARCH", label: "Anarch"},
+    {value: "NONE", label: "NONE"}
+];
 
 function cardTypeCSSClass(cardType) {
     return cardType.toLowerCase().replace(' ', '_').replace('/', ' ');
 }
 
-function clanToKey(clan) {
-    return clan.toLowerCase().replace(/ /g, '_');
+function nameToKey(name) {
+    if (name.toLowerCase() === "none") {
+        return "";
+    }
+    return name.toLowerCase().replace(/ /g, '_');
 }
 
 function showPlayCardModal(event) {
@@ -45,12 +51,17 @@ function showPlayCardModal(event) {
                 playCardModal.find(".preamble").text(card.preamble || "");
                 playCardModal.find(".burn-option").toggle(card.burnOption || "");
                 playCardModal.find(".card-sect").text(card.sect || "");
+                let path = playCardModal.find(".card-path");
+                path.empty();
+                if (card.path != null) {
+                    path.append($("<span/>").addClass("path").addClass(nameToKey(card.path)));
+                }
 
                 let clan = playCardModal.find(".card-clan");
                 clan.empty();
                 if (card.clans != null) {
                     for (let c of card.clans)
-                        clan.append($("<span/>").addClass("clan").addClass(clanToKey(c)));
+                        clan.append($("<span/>").addClass("clan").addClass(nameToKey(c)));
                 }
 
                 var costText = null;
@@ -61,7 +72,7 @@ function showPlayCardModal(event) {
                 }
                 playCardModal.find(".card-cost").html(costText);
 
-                let  modeContainer = playCardModal.find(".card-modes");
+                let modeContainer = playCardModal.find(".card-modes");
                 modeContainer.empty();
 
                 if (card.modes && card.modes.length > 0) {
@@ -238,6 +249,7 @@ function showCardModal(event) {
     let minion = target.data("minion");
     let disciplines = target.data("disciplines").trim().split(" ");
     let sect = target.data("sect");
+    let path = target.data("path");
     let owner = controller === player;
     if (cardId) {
         $("#card-image").attr("src", `https://static.dev.deckserver.net/${secured}images/${cardId}`);
@@ -257,9 +269,106 @@ function showCardModal(event) {
                 clan.empty();
                 if (card.clans != null) {
                     for (let c of card.clans)
-                        clan.append($("<span/>").addClass("clan").addClass(clanToKey(c)));
+                        clan.append($("<span/>").addClass("clan").addClass(nameToKey(c)));
                 }
+
+                let pathDiv = $("#cardModal .card-path");
+                pathDiv.empty();
+                // Prepare dropdown for path selection
+                let pathSelect = $("#cardModal .card-path-select");
+                pathSelect.addClass("d-none").empty();
+
+                if (path != null) {
+                    // Show static icon initially
+                    pathDiv.append($("<span/>").addClass("path").addClass(nameToKey(path)));
+
+                    // Populate dropdown with available paths; assumes card.paths or falls back to single current path
+                    for (const p of PATHS) {
+                        const opt = $("<option/>").attr("value", p).text(p);
+                        if (p === path) opt.prop("selected", true);
+                        pathSelect.append(opt);
+                    }
+
+                    // Toggle to dropdown on click
+                    pathDiv.off("click").on("click", function () {
+                        pathDiv.toggleClass("d-none");
+                        pathSelect.toggleClass("d-none").focus();
+                    });
+
+                    // When selection changes, update UI and send command
+                    pathSelect.off("change blur").on("change", function () {
+                        const selected = $(this).val();
+                        let path = selected === "None" ? "clear" : selected;
+                        // Update static icon
+                        pathDiv.empty().append($("<span/>").addClass("path").addClass(nameToKey(selected)));
+                        // Persist selection to server/game
+                        // Reuse generic command pattern: "path <player> <region> <coords> <selected>"
+                        const modal = $('#cardModal');
+                        const parts = [];
+                        parts.push('path');
+                        parts.push(modal.data('controller').split(' ', 2)[0]);
+                        parts.push(modal.data('region').split(' ')[0]);
+                        parts.push(modal.data('coordinates'));
+                        parts.push(path);
+                        sendCommand(parts.join(' '));
+                        // Switch back to static view
+                        pathSelect.addClass("d-none");
+                        pathDiv.removeClass("d-none");
+                    }).on("blur", function () {
+                        // If user tabs away without changing, revert to static
+                        pathSelect.addClass("d-none");
+                        pathDiv.removeClass("d-none");
+                    });
+                }
+
                 $("#cardModal .card-sect").text(sect || "");
+
+                // Prepare dropdown for sect selection (based on SECTS)
+                const sectSpan = $("#cardModal .card-sect");
+                const sectSelect = $("#cardModal .card-sect-select");
+                sectSelect.addClass("d-none").empty();
+
+                // Populate dropdown and select current
+                for (const s of SECTS) {
+                    const opt = $("<option/>").attr("value", s.value).text(s.label);
+                    // sect variable contains current sect description or empty; match by label
+                    if ((sect && s.label.toLowerCase() === sect.toLowerCase()) || (!sect && s.value === "NONE")) {
+                        opt.prop("selected", true);
+                    }
+                    sectSelect.append(opt);
+                }
+
+                // Toggle to dropdown on click
+                sectSpan.off("click").on("click", function () {
+                    sectSpan.toggleClass("d-none");
+                    sectSelect.toggleClass("d-none").focus();
+                });
+
+                // On change, send command and update static text
+                sectSelect.off("change blur").on("change", function () {
+                    const selectedCode = $(this).val(); // e.g., "CAMARILLA"
+                    const selected = SECTS.find(s => s.value === selectedCode);
+                    // Update static text
+                    sectSpan.text(selected.label);
+
+                    // Send command: "sect <player> <region> <coords> <sect>"
+                    // Backend accepts starts-with of description; sending enum name is also handled via startsWith.
+                    let sect = selected.value === "NONE" ? "clear" : selected.label;
+                    const modal = $('#cardModal');
+                    const parts = [];
+                    parts.push('sect');
+                    parts.push(modal.data('controller').split(' ', 2)[0]);
+                    parts.push(modal.data('region').split(' ')[0]);
+                    parts.push(modal.data('coordinates'));
+                    parts.push(sect); // send human label (backend resolves via startsWith)
+                    sendCommand(parts.join(' '));
+
+                    sectSelect.addClass("d-none");
+                    sectSpan.removeClass("d-none");
+                }).on("blur", function () {
+                    sectSelect.addClass("d-none");
+                    sectSpan.removeClass("d-none");
+                });
 
                 //If this is our inactive region, show capacity required to influence out.
                 //player is a global from ds.js - the logged-in player

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public class SummaryCard {
 
     private String id;
+    private String icon;
     private String type;
     private String htmlText;
     private String originalText;

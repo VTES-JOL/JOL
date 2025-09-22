@@ -48,6 +48,7 @@ public class JolGame {
     private static final String EDGE = "edge";
     private static final String MINION = "minion";
     private static final String INFERNAL = "infernal";
+    private static final String PLAYTEST = "playtest";
     private static final String MERGED = "merged";
     private static final String TAP = "tapnote";
     private static final String TAPPED = "tap";
@@ -94,6 +95,8 @@ public class JolGame {
                 .forEach(cardCount -> librarylist.addAll(Collections.nCopies(cardCount.getCount(), String.valueOf(cardCount.getId()))));
         crypt.initCards(cryptlist, name);
         library.initCards(librarylist, name);
+        Arrays.stream(crypt.getCards()).forEach(this::hydrateCard);
+        Arrays.stream(library.getCards()).forEach(this::hydrateCard);
     }
 
     public void withdraw(String player) {
@@ -269,16 +272,6 @@ public class JolGame {
         }
     }
 
-    public void clearPath(String player, Card card) {
-        setNotation(card, PATH, null);
-        addCommand(String.format("%s clears path from %s", player, getCardLink(card)), new String[]{"path", card.getId()});
-    }
-
-    public void clearSect(String player, Card card) {
-        setNotation(card, SECT, "");
-        addCommand(String.format("%s clears sect from %s", player, getCardLink(card)), new String[]{"sect", card.getId()});
-    }
-
     public void shuffle(String player, RegionType region, int num) {
         _shuffle(player, region, num, true);
     }
@@ -383,6 +376,41 @@ public class JolGame {
         setNotation(state, ACTIVE, player);
     }
 
+    public void hydrateCard(Card card) {
+        String player = card.getOwner();
+        CardSummary summary = CardSearch.INSTANCE.get(card.getCardId());
+        // Populate information on vampires
+        if (summary.isMinion()) {
+            // Populate disciplines if missing
+            if (!summary.getDisciplines().isEmpty() && getDisciplines(card).isEmpty()) {
+                setDisciplines(player, card, summary.getDisciplines(), true);
+            }
+            // Populate sect if missing
+            if (!Strings.isNullOrEmpty(summary.getSect()) && getSect(card).equals(Sect.NONE)) {
+                setSect(player, card, Sect.of(summary.getSect()), true);
+            }
+            // Populate path if missing
+            if (!Strings.isNullOrEmpty(summary.getPath()) && getPath(card).equals(Path.NONE)) {
+                setPath(player, card, Path.of(summary.getPath()), true);
+            }
+            // Populate capacity if missing
+            if (summary.getCapacity() != null && summary.getCapacity() > 0 && getCapacity(card) == 0) {
+                changeCapacity(card, summary.getCapacity(), true);
+            }
+            // Populate clan if missing
+            if (!summary.getClans().isEmpty() && getClan(card).equals(Clan.NONE)) {
+                setClan(player, card, Clan.of(summary.getClans().getFirst()), true);
+            }
+            // Populate votes if missing
+            if (!Strings.isNullOrEmpty(summary.getVotes()) && Strings.isNullOrEmpty(getVotes(card))) {
+                setVotes(card, summary.getVotes(), true);
+            }
+        }
+        if (summary.isPlayTest()) {
+            setPlaytest(card, true);
+        }
+    }
+
     public void show(String player, RegionType targetRegion, int amount, List<String> recipients) {
         Location location = getState().getPlayerLocation(player, targetRegion);
         Card[] cards = location.getCards();
@@ -446,7 +474,7 @@ public class JolGame {
         cardDetail.setPath(getPath(card));
         cardDetail.setSect(getSect(card));
         cardDetail.setClan(getClan(card));
-        cardDetail.setPlaytest(CardSearch.INSTANCE.get(card.getCardId()).isPlayTest());
+        cardDetail.setPlaytest(getPlayTest(card));
         return cardDetail;
     }
 
@@ -515,6 +543,15 @@ public class JolGame {
 
     public Clan getClan(Card card) {
         return Clan.from(getNotation(card, CLAN, Clan.NONE.toString()));
+    }
+
+    public boolean getPlayTest(Card card) {
+        return getNotation(card, PLAYTEST, "false").equals("true");
+    }
+
+    public void setPlaytest(Card card, boolean playtest) {
+        String playtestString = playtest ? "true" : "false";
+        setNotation(card, PLAYTEST, playtestString);
     }
 
     public boolean isInfernal(Card card) {
@@ -684,7 +721,8 @@ public class JolGame {
         }
     }
 
-    public void setDisciplines(String player, Card card, Set<String> additions, Set<String> removals) throws CommandException {
+    public void setDisciplines(String player, Card card, Set<String> additions, Set<String> removals) throws
+            CommandException {
         List<String> currentDisciplines = getDisciplines(card);
         List<String> newDisciplines = new ArrayList<>(currentDisciplines);
         List<String> discAdded = new ArrayList<>();
@@ -959,7 +997,7 @@ public class JolGame {
     }
 
     private String getCardLink(Card card) {
-        return "<a class='card-name' data-card-id='" + card.getCardId() + "'>" + card.getName() + "</a>";
+        return String.format("<a class='card-name' data-card-id='%s' data-secured='%s'>%s</a>", card.getCardId(), getPlayTest(card), card.getName());
     }
 
     private void unlockAll(CardContainer loc) {

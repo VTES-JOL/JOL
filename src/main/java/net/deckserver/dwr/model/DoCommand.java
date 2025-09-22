@@ -134,10 +134,12 @@ public class DoCommand {
     }
 
     private void sect(CommandParser cmdObj, String player) throws CommandException {
-        Card targetCard = cmdObj.findCard(false, player, RegionType.READY);
+        String targetPlayer = cmdObj.getPlayer(player);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+        Card targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
         boolean clear = cmdObj.consumeString("clear");
         if (clear) {
-            game.clearSect(player, targetCard);
+            game.setSect(player, targetCard, Sect.NONE, false);
         } else {
             String sectString = cmdObj.nextArg();
             Sect sect = Sect.startsWith(sectString);
@@ -150,10 +152,12 @@ public class DoCommand {
 
     private void
     path(CommandParser cmdObj, String player) throws CommandException {
-        Card targetCard = cmdObj.findCard(false, player, RegionType.READY);
+        String targetPlayer = cmdObj.getPlayer(player);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+        Card targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
         boolean clear = cmdObj.consumeString("clear");
         if (clear) {
-            game.clearPath(player, targetCard);
+            game.setPath(player, targetCard, Path.NONE, true);
         } else {
             String pathString = cmdObj.nextArg();
             Path path = Path.startsWith(pathString);
@@ -170,7 +174,7 @@ public class DoCommand {
         Card targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
         boolean clear = cmdObj.consumeString("clear");
         if (clear) {
-            game.setClan(player, targetCard, null, true);
+            game.setClan(player, targetCard, Clan.NONE, true);
         } else {
             StringBuilder builder = new StringBuilder();
             while (cmdObj.hasMoreArgs()) {

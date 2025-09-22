@@ -4,15 +4,20 @@
             <h2 style="position:relative;top:43%">Loading...</h2>
         </div>
         <div class="modal-content loaded" style="text-align:center">
-            <div class="modal-header py-1 px-2 justify-content-between">
-                <h5 class="modal-title">
-                    <span class="align-items-center">
-                        <span class="card-clan"></span>
-                        <span class="card-name" id="cardModalLabel">Maris Streck</span>
-                        <span class="votes mx-2" title="Votes">3</span>
-                    </span>
-                </h5>
-                <span class="card-sect"></span>
+            <div class="modal-header py-1 px-2 justify-content-between align-items-center">
+                <span class="d-flex align-items-center">
+                    <span class="card-clan"></span>
+                    <span class="card-name fs-5" id="cardModalLabel">Maris Streck</span>
+                    <span class="votes mx-2" title="Votes">3</span>
+                </span>
+                <span class="d-flex align-items-center">
+                    <span class="card-path"></span>
+                    <label for="path-select" class="d-none"></label>
+                    <select id="path-select" class="form-select form-select-sm ms-2 card-path-select d-none" style="width:auto"></select>
+                    <span class="card-sect"></span>
+                    <label for="sect-select" class="d-none"></label>
+                    <select id="sect-select" class="form-select form-select-sm ms-2 card-sect-select d-none" style="width:auto"></select>
+                </span>
             </div>
             <div class="modal-body">
                 <img class="img-fluid" id="card-image" alt="card image" src=""/>
@@ -105,20 +110,20 @@
                             data-lock-state="unlocked"
                             data-region="ready torpor"
                             onclick="lock();">
-                        <span>&cudarrr; Lock</span>
+                        <span><i class="bi bi-lock"></i> Lock</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Unlock"
                             data-lock-state="locked"
                             data-region="ready torpor"
                             onclick="unlock();">
-                        <span style="transform: rotate(-90deg);">&#10548; Unlock</span>
+                        <span style="transform: rotate(-90deg);"><i class="bi bi-unlock"></i> Unlock</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Block"
                             data-region="ready" data-top-level-only
                             data-owner-only
                             data-minion-only
                             onclick="block();">
-                        <span>Block</span>
+                        <span><i class="bi bi-shield"></i> Block</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Burn"
                             data-region="ready torpor inactive"

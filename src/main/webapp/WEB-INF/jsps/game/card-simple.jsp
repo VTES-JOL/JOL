@@ -20,7 +20,7 @@
     CardSummary cardSummary = CardSearch.INSTANCE.get(cardDetail.getCardId());
     String typeClass = cardSummary.getTypeClass();
     List<String> clans = cardSummary.getClanClass();
-    String secured = String.valueOf(cardSummary.isPlayTest());
+    boolean secured = game.getPlayTest(card);
 
     String regionStyle = region == RegionType.REMOVED_FROM_GAME ? "opacity-50" : "";
     String attributes = cardDetail.buildAttributes(region, index, true);

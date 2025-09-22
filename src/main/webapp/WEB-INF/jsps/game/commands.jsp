@@ -1,7 +1,8 @@
 <div class="card shadow commands" id="commandCard">
     <div class="card-header bg-body-secondary">Commands</div>
     <div class="card-body p-2">
-        <div id="gameForm">
+        <form onsubmit="return doSubmit()" autocomplete="off" id="gameForm">
+            <div id="gameForm">
             <div class="align-items-center">
                 <div class="mt-2">
                     <label for="phase" class="player-only">Phase</label>
@@ -12,14 +13,14 @@
                     <button type="button" class="btn btn-outline-secondary player-only" data-bs-toggle="modal"
                             data-bs-target="#quickCommandModal" tabindex="-1">...
                     </button>
-                    <input type="text" class="form-control form-control-sm player-only" id="command">
+                    <input type="text" class="form-control form-control-sm player-only" id="command" placeholder="Enter game commands">
                 </div>
                 <label for="chat">Chat</label>
                 <div class="input-group input-group-sm mb-2">
                     <button type="button" class="btn btn-outline-secondary player-only" data-bs-toggle="modal"
                             data-bs-target="#quickChatModal" tabindex="-1">...
                     </button>
-                    <input type="text" class="form-control form-control-sm can-chat" id="chat">
+                    <input type="text" class="form-control form-control-sm can-chat" id="chat" placeholder="Chat to other players">
                 </div>
                 <label for="ping" class="player-only">Ping</label>
                 <select id="ping" class="form-select form-select-sm mb-2 player-only"></select>
@@ -29,5 +30,6 @@
                 </div>
             </div>
         </div>
+        </form>
     </div>
 </div>

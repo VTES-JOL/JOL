@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 public class CardSummary {
 
     private String id;
+    private String icon;
     private String type;
     private String displayName;
     private String name;
@@ -66,13 +67,6 @@ public class CardSummary {
                 .map(String::toLowerCase)
                 .sorted()
                 .collect(Collectors.toList());
-    }
-
-    public String getSingleClanClass() {
-        return clans.stream().findFirst()
-                .map(s -> s.replaceAll(" ", "_"))
-                .map(String::toLowerCase)
-                .orElse(null);
     }
 
     @JsonIgnore

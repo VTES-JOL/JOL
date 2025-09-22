@@ -35,9 +35,9 @@
     boolean contested = cardDetail.isContested();
     boolean locked = cardDetail.isLocked();
     boolean infernal = cardDetail.isInfernal();
+    boolean secured = cardDetail.isPlaytest();
 
     CardSummary cardSummary = CardSearch.INSTANCE.get(cardDetail.getCardId());
-    String secured = String.valueOf(cardSummary.isPlayTest());
 
     boolean hasCapacity = capacity > 0;
     boolean hasVotes = !Strings.isNullOrEmpty(votes) && !votes.equals("0");
@@ -84,16 +84,14 @@
                     <c:if test="<%= counters > 0 || capacity > 0%>"><span class="badge rounded-pill shadow <%= counterStyle%>"><%= counterText%></span></c:if>
                 </div>
                 <div class="d-flex justify-content-end align-items-center gap-1">
-                    <c:if test="<%= cardSummary.hasBlood() %>">
-                        <c:if test="<%= !Path.NONE.equals(path) %>">
-                            <span class="path <%= path.toString().toLowerCase() %>"></span>
-                        </c:if>
-                        <c:if test="<%= !Sect.NONE.equals(sect) %>">
-                            <small class="sect" title="<%= sect.getDescription()%>"><%= sect.getDescription() %></small>
-                        </c:if>
-                        <c:if test="<%= !Clan.NONE.equals(clan) %>">
-                            <span class="clan <%= clan.toString().toLowerCase() %>" title="<%= clan.getDescription() %>"></span>
-                        </c:if>
+                    <c:if test="<%= !Path.NONE.equals(path) %>">
+                        <span class="path <%= path.toString().toLowerCase() %>"></span>
+                    </c:if>
+                    <c:if test="<%= !Sect.NONE.equals(sect) %>">
+                        <small class="sect" title="<%= sect.getDescription()%>"><%= sect.getDescription() %></small>
+                    </c:if>
+                    <c:if test="<%= !Clan.NONE.equals(clan) %>">
+                        <span class="clan <%= clan.toString().toLowerCase() %>" title="<%= clan.getDescription() %>"></span>
                     </c:if>
                 </div>
         </div>

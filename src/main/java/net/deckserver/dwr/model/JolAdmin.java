@@ -26,9 +26,7 @@ import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.GameStatusBean;
 import net.deckserver.game.interfaces.state.Game;
 import net.deckserver.game.interfaces.state.Location;
-import net.deckserver.game.storage.cards.CardSearch;
-import net.deckserver.game.storage.cards.Clan;
-import net.deckserver.game.storage.cards.Sect;
+import net.deckserver.game.storage.state.RegionType;
 import net.deckserver.game.ui.state.DsGame;
 import net.deckserver.game.ui.turn.DsTurnRecorder;
 import net.deckserver.game.validators.DeckValidator;
@@ -38,7 +36,6 @@ import net.deckserver.jobs.CleanupGamesJob;
 import net.deckserver.jobs.PersistStateJob;
 import net.deckserver.jobs.PublicGamesBuilderJob;
 import net.deckserver.jobs.ValidateGWJob;
-import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
@@ -73,10 +70,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-import static net.deckserver.game.storage.state.RegionType.*;
 
 public class JolAdmin {
 
@@ -419,10 +414,12 @@ public class JolAdmin {
         loadRegistrations();
         loadDecks();
         loadProperties();
+        if (System.getenv().getOrDefault("ENABLE_GAMES_BUILDER", "false").equals("true")) {
+            scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 10, TimeUnit.MINUTES);
+        }
         scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 1, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new ValidateGWJob(), 0, 1, TimeUnit.DAYS);
-        scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 10, TimeUnit.MINUTES);
     }
 
     public void validate() {
@@ -488,7 +485,8 @@ public class JolAdmin {
                             // For each player check that the regions contain the right information
                             .forEach(player -> {
                                 Game gameState = game.getState();
-                                Stream.of(READY, UNCONTROLLED, TORPOR)
+                                EnumSet<RegionType> regions = EnumSet.allOf(RegionType.class);
+                                regions.stream()
                                         .peek(region -> {
                                             logger.debug("{}", region.description());
                                         })
@@ -501,48 +499,7 @@ public class JolAdmin {
                                             logger.debug("{} {}", card.getName(), card.getCardId());
                                         })
                                         // Populate missing information on the card
-                                        .forEach(card -> {
-                                            CardSummary summary = CardSearch.INSTANCE.get(card.getCardId());
-                                            // Populate information on vampires
-                                            if (summary.isMinion()) {
-                                                // Populate disciplines if missing
-                                                if (!summary.getDisciplines().isEmpty() && game.getDisciplines(card).isEmpty()) {
-                                                    game.setDisciplines(player, card, summary.getDisciplines(), true);
-                                                    logger.debug("Populating disciplines {}", game.getDisciplines(card));
-                                                }
-                                                // Populate sect if missing
-                                                if (!Strings.isNullOrEmpty(summary.getSect()) && game.getSect(card).equals(Sect.NONE)) {
-                                                    game.setSect(player, card, Sect.of(summary.getSect()), true);
-                                                    assert !game.getSect(card).equals(Sect.NONE);
-                                                }
-                                                // Populate path if missing
-                                                if (!Strings.isNullOrEmpty(summary.getPath()) && game.getPath(card).equals(net.deckserver.game.storage.cards.Path.NONE)) {
-                                                    game.setPath(player, card, net.deckserver.game.storage.cards.Path.of(summary.getPath()), true);
-                                                    assert !game.getPath(card).equals(net.deckserver.game.storage.cards.Path.NONE);
-                                                }
-                                                // Populate capacity if missing
-                                                if (summary.getCapacity() != null && summary.getCapacity() > 0 && game.getCapacity(card) == 0) {
-                                                    game.changeCapacity(card, summary.getCapacity(), true);
-                                                    logger.debug("Populating capacity {}", game.getCapacity(card));
-                                                }
-                                                // Populate clan if missing
-                                                if (!summary.getClans().isEmpty() && game.getClan(card).equals(Clan.NONE)) {
-                                                    game.setClan(player, card, Clan.of(summary.getClans().getFirst()), true);
-                                                    assert !game.getClan(card).equals(Clan.NONE);
-                                                }
-                                                // Populate votes if missing
-                                                if (!Strings.isNullOrEmpty(summary.getVotes()) && Strings.isNullOrEmpty(game.getVotes(card))) {
-                                                    game.setVotes(card, summary.getVotes(), true);
-                                                    logger.debug("Populating votes {}", game.getVotes(card));
-                                                }
-                                            }
-                                            // Populate type on other cards
-                                            else {
-                                                String type = summary.getType();
-                                                if (Set.of("Equipment", "Event", "Master").contains(type)) {
-                                                }
-                                            }
-                                        });
+                                        .forEach(game::hydrateCard);
                             });
                     saveGameState(game);
                     gameInfo.setVersion(GameInfo.Version.GAME_STATE);
