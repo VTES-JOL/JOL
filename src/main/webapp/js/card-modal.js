@@ -58,50 +58,64 @@ function fillSelect($select, options) {
 
 // Toggle between icon and select for a field
 function enableInlinePicker(config) {
-    const {containerSel, selectSel, values, currentDisplay, onChanged} = config;
+    const {containerSel, selectSel, values, currentDisplay, minion, onChanged} = config;
     const $container = $(containerSel);
     const $select = $(selectSel);
+
+    // Small helpers to DRY logic and reduce DOM churn
+    function createNonePlaceholder() {
+        return $('<span/>')
+            .addClass('text-muted')
+            .css({cursor: 'pointer', 'border-radius': '4px', padding: '0 2px', margin: '0 2px'})
+            .attr('title', 'None')
+            .html('<i class="bi bi-ban"></i>')
+            .on('mouseenter.inlinePicker', function () {
+                $(this).css('box-shadow', '0 0 0.25rem 0.15rem rgba(108, 117, 125, 0.6)');
+            })
+            .on('mouseleave.inlinePicker', function () {
+                $(this).css('box-shadow', 'none');
+            });
+    }
+
+    function renderContainer(kind, display) {
+        const hasValue = display && display.toLowerCase() !== 'none';
+        if (hasValue) {
+            $container.html(buildIconSpan(kind, display));
+        } else {
+            $container.html(createNonePlaceholder());
+        }
+    }
+
+    function ensureOptions($sel, opts) {
+        // Only (re)build if counts differ or first/last differ (cheap check)
+        const existing = $sel[0].options;
+        const needsBuild =
+            existing.length !== opts.length ||
+            (opts.length > 0 &&
+                (existing[0]?.value !== nameToKey(opts[0]) ||
+                 existing[existing.length - 1]?.value !== nameToKey(opts[opts.length - 1])));
+        if (needsBuild) {
+            fillSelect($sel, opts);
+        }
+    }
+
+    function setSelectValue($sel, key) {
+        if ($sel.val() !== key) {
+            $sel.val(key);
+        }
+    }
 
     // Determine kind based on container
     const kind = $container.hasClass('card-clan') ? 'clan'
         : ($container.hasClass('card-path') ? 'path' : 'sect');
 
-    // Resolve minion flag directly from the element that opened the modal
-    const modal = $('#cardModal');
-    const region = (modal.data('region') || '').toString();
-    const coords = (modal.data('coordinates') || '').toString();
-
-    // Prefer the element that was clicked (it has all data-* on the li)
-    // Fall back to the region+coordinates lookup if needed.
-    let isMinion = false;
-    let $sourceLi = $(document).find(`[data-coordinates="${coords}"]`).first();
-    if ($sourceLi.length) {
-        // data-minion might be boolean, string "true"/"false", or undefined
-        const raw = $sourceLi.attr('data-minion');
-        isMinion = raw != null && raw.toString().toLowerCase() === 'true';
-    }
-    if (!isMinion) {
-        const $byRegion = $(`[data-region]`).filter(function () {
-            return $(this).data('region') === region;
-        }).find(`[data-coordinates="${coords}"]`).first();
-        if ($byRegion.length) {
-            const raw = $byRegion.attr('data-minion');
-            isMinion = raw != null && raw.toString().toLowerCase() === 'true';
-        }
-    }
-    // As a final fallback, check what showCardModal captured
-    if (!isMinion && modal.data('minion') != null) {
-        isMinion = !!modal.data('minion');
-    }
-
-    if (!isMinion) {
-        // Hide picker and placeholder entirely if not a minion
+    // Early bail if not a minion
+    if (!minion) {
         $container.addClass('d-none').empty();
         $select.addClass('d-none');
         return;
-    } else {
-        $container.removeClass('d-none');
     }
+    $container.removeClass('d-none');
 
     // Common hover effect for container (Bootstrap secondary-like color)
     $container
@@ -114,41 +128,22 @@ function enableInlinePicker(config) {
             $(this).css('box-shadow', 'none');
         });
 
-    // Render current icon (or a "None" placeholder)
-    $container.empty();
-    const hasValue = currentDisplay && currentDisplay.toLowerCase() !== 'none';
-    if (hasValue) {
-        $container.append(buildIconSpan(kind, currentDisplay));
-    } else {
-        const $none = $('<span/>')
-            .addClass('text-muted')
-            .css({cursor: 'pointer', 'border-radius': '4px', padding: '0 2px', margin: '0 2px'})
-            .attr('title', 'None')
-            .html('<i class="bi bi-ban"></i>')
-            .on('mouseenter', function () {
-                $(this).css('box-shadow', '0 0 0.25rem 0.15rem rgba(108, 117, 125, 0.6)');
-            })
-            .on('mouseleave', function () {
-                $(this).css('box-shadow', 'none');
-            });
-        $container.append($none);
-    }
-
-    // Prepare select
-    fillSelect($select, values);
-
-    // Set current value
+    // Prepare select once (only if needed), and set current value
+    ensureOptions($select, values);
     const currentKey = nameToKey(currentDisplay || "None");
-    $select.val(currentKey);
+    setSelectValue($select, currentKey);
+
+    // Initial render
+    renderContainer(kind, currentDisplay);
 
     // Click to switch to select
-    $container.off('click').on('click', function () {
+    $container.off('click.inlinePicker').on('click.inlinePicker', function () {
         $container.addClass('d-none');
         $select.removeClass('d-none').focus();
     });
 
-    // Change handler -> send update
-    $select.off('change').on('change', function () {
+    // Change handler -> send update and re-render
+    $select.off('change.inlinePicker').on('change.inlinePicker', function () {
         const newKey = $(this).val();
         const newDisplay = keyToDisplay(newKey);
         const trimmedKey = (newKey || '').split('_', 1)[0];
@@ -156,30 +151,15 @@ function enableInlinePicker(config) {
         if (newDisplay !== currentDisplay) {
             onChanged(newDisplay, trimmedKey);
         }
+
         // Switch back to icon reflecting new value (or None placeholder)
         $select.addClass('d-none');
-        $container.removeClass('d-none').empty();
-
-        if (newDisplay && newDisplay.toLowerCase() !== 'none') {
-            $container.append(buildIconSpan(kind, newDisplay));
-        } else {
-            const $none = $('<span/>')
-                .addClass('text-muted')
-                .css({cursor: 'pointer', 'border-radius': '4px', padding: '0 2px', margin: '0 2px'})
-                .attr('title', 'None')
-                .html('<i class="bi bi-ban"></i>')
-                .on('mouseenter', function () {
-                    $(this).css('box-shadow', '0 0 0.25rem 0.15rem rgba(108, 117, 125, 0.6)');
-                })
-                .on('mouseleave', function () {
-                    $(this).css('box-shadow', 'none');
-                });
-            $container.append($none);
-        }
+        $container.removeClass('d-none');
+        renderContainer(kind, newDisplay);
     });
 
     // Blur -> revert without change
-    $select.off('blur').on('blur', function () {
+    $select.off('blur.inlinePicker').on('blur.inlinePicker', function () {
         $select.addClass('d-none');
         $container.removeClass('d-none');
     });
@@ -486,6 +466,7 @@ function showCardModal(event) {
                     selectSel: '#clan-select',
                     values: CLANS,
                     currentDisplay: currentClan,
+                    minion: minion,
                     onChanged: function (newDisplay, newKey) {
                         // Update data-* for subsequent opens or actions if needed
                         target.data('clan', newDisplay);
@@ -499,6 +480,7 @@ function showCardModal(event) {
                     selectSel: '#path-select',
                     values: PATHS,
                     currentDisplay: currentPath,
+                    minion: minion,
                     onChanged: function (newDisplay, newKey) {
                         target.data('path', newDisplay);
                         sendCommand(['path', modal.data('controller'), modal.data('region').split(' ')[0], modal.data('coordinates'), newKey.split('_')[0]].join(' ').trim());
@@ -510,6 +492,7 @@ function showCardModal(event) {
                     selectSel: '#sect-select',
                     values: SECTS,
                     currentDisplay: currentSect,
+                    minion: minion,
                     onChanged: function (newDisplay, newKey) {
                         target.data('sect', newDisplay);
                         sendCommand(['sect', modal.data('controller'), modal.data('region').split(' ')[0], modal.data('coordinates'), newKey].join(' ').trim());
