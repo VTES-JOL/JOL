@@ -20,6 +20,171 @@ function nameToKey(name) {
     return name.toLowerCase().replace(/ /g, '_');
 }
 
+// Helpers to convert between display and keys, and to sentence-case tooltips
+function sentenceCase(upperOrMixed) {
+    if (!upperOrMixed) return "";
+    const s = String(upperOrMixed).toLowerCase();
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+function keyToDisplay(key) {
+    if (!key) return "None";
+    return key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+function buildIconSpan(kind, display) {
+    const key = nameToKey(display);
+    const $span = $("<span/>").addClass(kind).addClass(key);
+    if (kind === 'clan') {
+        // Tooltip should be sentence case of original DESCRIPTION (display)
+        $span.attr('title', sentenceCase(display));
+    }
+    if (kind === 'sect') {
+        $span.addClass('sect'); // ensure class hook
+        $span.attr('title', sentenceCase(display));
+    }
+    if (kind === 'path') {
+        $span.addClass('path');
+        $span.attr('title', sentenceCase(display));
+    }
+    return $span;
+}
+function fillSelect($select, options) {
+    $select.empty();
+    for (const opt of options) {
+        const val = nameToKey(opt);
+        const text = opt; // keep human-friendly
+        $select.append($("<option/>").attr('value', val).text(text));
+    }
+}
+
+// Toggle between icon and select for a field
+function enableInlinePicker(config) {
+    const {containerSel, selectSel, values, currentDisplay, onChanged} = config;
+    const $container = $(containerSel);
+    const $select = $(selectSel);
+
+    // Determine kind based on container
+    const kind = $container.hasClass('card-clan') ? 'clan'
+        : ($container.hasClass('card-path') ? 'path' : 'sect');
+
+    // Resolve minion flag directly from the element that opened the modal
+    const modal = $('#cardModal');
+    const region = (modal.data('region') || '').toString();
+    const coords = (modal.data('coordinates') || '').toString();
+
+    // Prefer the element that was clicked (it has all data-* on the li)
+    // Fall back to the region+coordinates lookup if needed.
+    let isMinion = false;
+    let $sourceLi = $(document).find(`[data-coordinates="${coords}"]`).first();
+    if ($sourceLi.length) {
+        // data-minion might be boolean, string "true"/"false", or undefined
+        const raw = $sourceLi.attr('data-minion');
+        isMinion = raw != null && raw.toString().toLowerCase() === 'true';
+    }
+    if (!isMinion) {
+        const $byRegion = $(`[data-region]`).filter(function () {
+            return $(this).data('region') === region;
+        }).find(`[data-coordinates="${coords}"]`).first();
+        if ($byRegion.length) {
+            const raw = $byRegion.attr('data-minion');
+            isMinion = raw != null && raw.toString().toLowerCase() === 'true';
+        }
+    }
+    // As a final fallback, check what showCardModal captured
+    if (!isMinion && modal.data('minion') != null) {
+        isMinion = !!modal.data('minion');
+    }
+
+    if (!isMinion) {
+        // Hide picker and placeholder entirely if not a minion
+        $container.addClass('d-none').empty();
+        $select.addClass('d-none');
+        return;
+    } else {
+        $container.removeClass('d-none');
+    }
+
+    // Common hover effect for container (Bootstrap secondary-like color)
+    $container
+        .css('border-radius', '4px')
+        .off('mouseenter.inlinePicker mouseleave.inlinePicker')
+        .on('mouseenter.inlinePicker', function () {
+            $(this).css('box-shadow', '0 0 0.25rem 0.15rem rgba(108, 117, 125, 0.6)');
+        })
+        .on('mouseleave.inlinePicker', function () {
+            $(this).css('box-shadow', 'none');
+        });
+
+    // Render current icon (or a "None" placeholder)
+    $container.empty();
+    const hasValue = currentDisplay && currentDisplay.toLowerCase() !== 'none';
+    if (hasValue) {
+        $container.append(buildIconSpan(kind, currentDisplay));
+    } else {
+        const $none = $('<span/>')
+            .addClass('text-muted')
+            .css({cursor: 'pointer', 'border-radius': '4px', padding: '0 2px', margin: '0 2px'})
+            .attr('title', 'None')
+            .html('<i class="bi bi-ban"></i>')
+            .on('mouseenter', function () {
+                $(this).css('box-shadow', '0 0 0.25rem 0.15rem rgba(108, 117, 125, 0.6)');
+            })
+            .on('mouseleave', function () {
+                $(this).css('box-shadow', 'none');
+            });
+        $container.append($none);
+    }
+
+    // Prepare select
+    fillSelect($select, values);
+
+    // Set current value
+    const currentKey = nameToKey(currentDisplay || "None");
+    $select.val(currentKey);
+
+    // Click to switch to select
+    $container.off('click').on('click', function () {
+        $container.addClass('d-none');
+        $select.removeClass('d-none').focus();
+    });
+
+    // Change handler -> send update
+    $select.off('change').on('change', function () {
+        const newKey = $(this).val();
+        const newDisplay = keyToDisplay(newKey);
+        const trimmedKey = (newKey || '').split('_', 1)[0];
+
+        if (newDisplay !== currentDisplay) {
+            onChanged(newDisplay, trimmedKey);
+        }
+        // Switch back to icon reflecting new value (or None placeholder)
+        $select.addClass('d-none');
+        $container.removeClass('d-none').empty();
+
+        if (newDisplay && newDisplay.toLowerCase() !== 'none') {
+            $container.append(buildIconSpan(kind, newDisplay));
+        } else {
+            const $none = $('<span/>')
+                .addClass('text-muted')
+                .css({cursor: 'pointer', 'border-radius': '4px', padding: '0 2px', margin: '0 2px'})
+                .attr('title', 'None')
+                .html('<i class="bi bi-ban"></i>')
+                .on('mouseenter', function () {
+                    $(this).css('box-shadow', '0 0 0.25rem 0.15rem rgba(108, 117, 125, 0.6)');
+                })
+                .on('mouseleave', function () {
+                    $(this).css('box-shadow', 'none');
+                });
+            $container.append($none);
+        }
+    });
+
+    // Blur -> revert without change
+    $select.off('blur').on('blur', function () {
+        $select.addClass('d-none');
+        $container.removeClass('d-none');
+    });
+}
+
 function showPlayCardModal(event) {
     let playCardModal = $("#playCardModal");
     playCardModal.find(".loaded").hide();
@@ -310,6 +475,46 @@ function showCardModal(event) {
                 if (region === "ashheap") {
                     $('#cardModal .counters').addClass("d-none");
                 }
+
+                // Render and wire up clan/path/sect inline pickers
+                const currentClan = clan && clan !== 'NONE' ? clan : 'None';
+                const currentSect = sect && sect !== 'NONE' ? sect : 'None';
+                const currentPath = path && path !== 'NONE' ? path : 'None';
+
+                enableInlinePicker({
+                    containerSel: '#cardModal .card-clan',
+                    selectSel: '#clan-select',
+                    values: CLANS,
+                    currentDisplay: currentClan,
+                    onChanged: function (newDisplay, newKey) {
+                        // Update data-* for subsequent opens or actions if needed
+                        target.data('clan', newDisplay);
+                        // Send update to server
+                        sendCommand(['clan', modal.data('controller'), modal.data('region').split(' ')[0], modal.data('coordinates'), newKey.split('_')[0]].join(' ').trim());
+                    }
+                });
+
+                enableInlinePicker({
+                    containerSel: '#cardModal .card-path',
+                    selectSel: '#path-select',
+                    values: PATHS,
+                    currentDisplay: currentPath,
+                    onChanged: function (newDisplay, newKey) {
+                        target.data('path', newDisplay);
+                        sendCommand(['path', modal.data('controller'), modal.data('region').split(' ')[0], modal.data('coordinates'), newKey.split('_')[0]].join(' ').trim());
+                    }
+                });
+
+                enableInlinePicker({
+                    containerSel: '#cardModal .card-sect',
+                    selectSel: '#sect-select',
+                    values: SECTS,
+                    currentDisplay: currentSect,
+                    onChanged: function (newDisplay, newKey) {
+                        target.data('sect', newDisplay);
+                        sendCommand(['sect', modal.data('controller'), modal.data('region').split(' ')[0], modal.data('coordinates'), newKey].join(' ').trim());
+                    }
+                });
 
                 $('#cardModal .loading').hide();
                 $('#cardModal .loaded').show();

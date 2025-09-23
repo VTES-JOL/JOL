@@ -447,3 +447,9 @@ a.card-name {
 .path.cathari:before {content: "$";}
 .path.death_and_the_soul:before {content: "%";}
 .path.power_and_the_inner_voice:before {content: "&";}
+
+.sect.independent:before {content: "Independent";}
+.sect.anarch:before {content: "Anarch";}
+.sect.camarilla:before {content: "Camarilla";}
+.sect.laibon:before {content: "Laibon";}
+.sect.sabbat:before {content: "Sabbat";}

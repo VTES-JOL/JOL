@@ -176,14 +176,8 @@ public class DoCommand {
         if (clear) {
             game.setClan(player, targetCard, Clan.NONE, true);
         } else {
-            StringBuilder builder = new StringBuilder();
-            while (cmdObj.hasMoreArgs()) {
-                builder.append(cmdObj.nextArg()).append(" ");
-            }
-            Clan clan = Clan.startsWith(builder.toString().trim());
-            if (clan == null) {
-                throw new CommandException("Invalid clan");
-            }
+            String pathString = cmdObj.nextArg();
+            Clan clan = Clan.startsWith(pathString);
             game.setClan(player, targetCard, clan, false);
         }
     }

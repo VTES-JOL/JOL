@@ -44,3 +44,16 @@
 2025-09-23T13:38:47,129 ERROR [Player3] path Player3 ready 1 None
 2025-09-23T13:39:17,765 ERROR [Player3] path Player3 ready 1 None
 2025-09-23T13:39:33,388 INFO  [Player3] path Player3 ready 1 clear
+2025-09-23T19:50:29,458 INFO  [Player1] clan ready 1 guruhi
+2025-09-23T19:50:34,643 ERROR [Player1] path ready 1 power_and_the_inner_voice
+2025-09-23T19:50:39,839 INFO  [Player1] sect ready 1 independent
+2025-09-23T19:51:19,207 INFO  [Player1] clan ready 1 daughter_of_cacophony
+2025-09-23T19:53:18,370 INFO  [Player1] path ready 1 death_and_the_soul
+2025-09-23T19:54:11,902 INFO  [Player1] clan ready 1 gangrel_antitribu
+2025-09-23T19:54:39,423 INFO  [Player1] clan ready 1 brujah_antitribu
+2025-09-23T19:54:47,621 INFO  [Player1] path ready 1 death_and_the_soul
+2025-09-23T19:55:08,938 INFO  [Player1] clan ready 1 banu_haqim
+2025-09-23T19:57:54,100 INFO  [Player1] clan ready 1 banu_haqim
+2025-09-23T20:11:50,990 INFO  [Player2] clan ready 1 banu
+2025-09-23T20:12:43,641 INFO  [Player2] rfg Player2 inactive 2
+2025-09-23T20:12:50,397 INFO  [Player2] influence 2
