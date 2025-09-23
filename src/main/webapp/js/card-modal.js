@@ -250,155 +250,63 @@ function showCardModal(event) {
     let disciplines = target.data("disciplines").trim().split(" ");
     let sect = target.data("sect");
     let path = target.data("path");
+    let clan = target.data("clan");
     let owner = controller === player;
     if (cardId) {
         $("#card-image").attr("src", `https://static.dev.deckserver.net/${secured}images/${cardId}`);
         $.get({
             dataType: "json",
             url: `https://static.dev.deckserver.net/${secured}json/${cardId}`, success: function (card) {
-                var modal = $('#cardModal');
+
+                const modal = $('#cardModal');
+                // Update fields used for commands
                 modal.data('controller', controller);
                 modal.data('region', region);
                 modal.data('coordinates', coordinates);
 
+                // Set Modal name to card name
                 $('#cardModal .card-name').text(card.displayName);
+                // Display label
                 $('#card-label').val(label);
+                // Votes
                 $('#cardModal .votes').text(votes).addClass("badge rounded-pill text-bg-warning").toggle(votes > 0 || votes === 'P');
 
-                let clan = $("#cardModal .card-clan");
-                clan.empty();
-                if (card.clans != null) {
-                    for (let c of card.clans)
-                        clan.append($("<span/>").addClass("clan").addClass(nameToKey(c)));
-                }
-
-                let pathDiv = $("#cardModal .card-path");
-                pathDiv.empty();
-                // Prepare dropdown for path selection
-                let pathSelect = $("#cardModal .card-path-select");
-                pathSelect.addClass("d-none").empty();
-
-                if (path != null) {
-                    // Show static icon initially
-                    pathDiv.append($("<span/>").addClass("path").addClass(nameToKey(path)));
-
-                    // Populate dropdown with available paths; assumes card.paths or falls back to single current path
-                    for (const p of PATHS) {
-                        const opt = $("<option/>").attr("value", p).text(p);
-                        if (p === path) opt.prop("selected", true);
-                        pathSelect.append(opt);
-                    }
-
-                    // Toggle to dropdown on click
-                    pathDiv.off("click").on("click", function () {
-                        pathDiv.toggleClass("d-none");
-                        pathSelect.toggleClass("d-none").focus();
-                    });
-
-                    // When selection changes, update UI and send command
-                    pathSelect.off("change blur").on("change", function () {
-                        const selected = $(this).val();
-                        let path = selected === "None" ? "clear" : selected;
-                        // Update static icon
-                        pathDiv.empty().append($("<span/>").addClass("path").addClass(nameToKey(selected)));
-                        // Persist selection to server/game
-                        // Reuse generic command pattern: "path <player> <region> <coords> <selected>"
-                        const modal = $('#cardModal');
-                        const parts = [];
-                        parts.push('path');
-                        parts.push(modal.data('controller').split(' ', 2)[0]);
-                        parts.push(modal.data('region').split(' ')[0]);
-                        parts.push(modal.data('coordinates'));
-                        parts.push(path);
-                        sendCommand(parts.join(' '));
-                        // Switch back to static view
-                        pathSelect.addClass("d-none");
-                        pathDiv.removeClass("d-none");
-                    }).on("blur", function () {
-                        // If user tabs away without changing, revert to static
-                        pathSelect.addClass("d-none");
-                        pathDiv.removeClass("d-none");
-                    });
-                }
-
-                $("#cardModal .card-sect").text(sect || "");
-
-                // Prepare dropdown for sect selection (based on SECTS)
-                const sectSpan = $("#cardModal .card-sect");
-                const sectSelect = $("#cardModal .card-sect-select");
-                sectSelect.addClass("d-none").empty();
-
-                // Populate dropdown and select current
-                for (const s of SECTS) {
-                    const opt = $("<option/>").attr("value", s.value).text(s.label);
-                    // sect variable contains current sect description or empty; match by label
-                    if ((sect && s.label.toLowerCase() === sect.toLowerCase()) || (!sect && s.value === "NONE")) {
-                        opt.prop("selected", true);
-                    }
-                    sectSelect.append(opt);
-                }
-
-                // Toggle to dropdown on click
-                sectSpan.off("click").on("click", function () {
-                    sectSpan.toggleClass("d-none");
-                    sectSelect.toggleClass("d-none").focus();
-                });
-
-                // On change, send command and update static text
-                sectSelect.off("change blur").on("change", function () {
-                    const selectedCode = $(this).val(); // e.g., "CAMARILLA"
-                    const selected = SECTS.find(s => s.value === selectedCode);
-                    // Update static text
-                    sectSpan.text(selected.label);
-
-                    // Send command: "sect <player> <region> <coords> <sect>"
-                    // Backend accepts starts-with of description; sending enum name is also handled via startsWith.
-                    let sect = selected.value === "NONE" ? "clear" : selected.label;
-                    const modal = $('#cardModal');
-                    const parts = [];
-                    parts.push('sect');
-                    parts.push(modal.data('controller').split(' ', 2)[0]);
-                    parts.push(modal.data('region').split(' ')[0]);
-                    parts.push(modal.data('coordinates'));
-                    parts.push(sect); // send human label (backend resolves via startsWith)
-                    sendCommand(parts.join(' '));
-
-                    sectSelect.addClass("d-none");
-                    sectSpan.removeClass("d-none");
-                }).on("blur", function () {
-                    sectSelect.addClass("d-none");
-                    sectSpan.removeClass("d-none");
-                });
-
-                //If this is our inactive region, show capacity required to influence out.
-                //player is a global from ds.js - the logged-in player
+                // Set counters on card, capacity, and player pool
                 if (controller === player && capacity === 0 && card.capacity != null)
                     capacity = card.capacity;
                 setCounters(counters, capacity, card.type);
                 setPool(controllerPool);
 
+                // Reset buttons to default state
                 $('#cardModal .transfers').removeClass("d-none");
                 $('#cardModal .counters').removeClass("d-none");
                 $('#cardModal button').show();
+
+                //
                 $(`#cardModal button[data-region]`).each(function () {
                     let showThis = $(this).data("region").split(" ").includes(region);
                     if (!showThis) {
                         $(this).hide();
                     }
                 })
-
+                // Hide buttons not valid for lock state
                 $(`#cardModal button[data-lock-state][data-lock-state!="${locked ? "locked" : "unlocked"}"]`).hide();
+
+                // Hide buttons not valid for contested state
                 $(`#cardModal button[data-contested][data-contested!="${contested}"]`).hide();
 
+                // Hide buttons intended for owner only
                 if (!owner) {
                     $('#cardModal .transfers').addClass("d-none");
                     $("#cardModal button[data-owner-only]").hide();
                 }
 
+                // Hide buttons intended for use by top level cards
                 if (isChild) {
                     $(`#cardModal button[data-top-level-only]`).hide();
                 }
 
+                // Hide buttons intended for use by non-minion cards
                 if (minion) {
                     $(`#cardModal button[data-non-minion-only]`).hide();
                 } else {
@@ -406,6 +314,7 @@ function showCardModal(event) {
                     $(`#cardModal button[data-minion-only]`).hide();
                 }
 
+                // Hide counter-buttons if the card is in ashheap
                 if (region === "ashheap") {
                     $('#cardModal .counters').addClass("d-none");
                 }
@@ -413,7 +322,7 @@ function showCardModal(event) {
                 $('#cardModal .loading').hide();
                 $('#cardModal .loaded').show();
                 tippy.hideAll({duration: 0});
-                $('#cardModal').modal('show');
+                modal.modal('show');
             }
         });
     }

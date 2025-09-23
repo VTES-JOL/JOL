@@ -7,8 +7,10 @@
             <div class="modal-header py-1 px-2 justify-content-between align-items-center">
                 <span class="d-flex align-items-center">
                     <span class="card-clan"></span>
-                    <span class="card-name fs-5" id="cardModalLabel">Maris Streck</span>
-                    <span class="votes mx-2" title="Votes">3</span>
+                    <label for="clan-select" class="d-none"></label>
+                    <select id="clan-select" class="form-select form-select-sm ms-2 card-clan-select d-none" style="width:auto"></select>
+                    <span class="card-name fs-5" id="cardModalLabel"></span>
+                    <span class="votes mx-2" title="Votes"></span>
                 </span>
                 <span class="d-flex align-items-center">
                     <span class="card-path"></span>
