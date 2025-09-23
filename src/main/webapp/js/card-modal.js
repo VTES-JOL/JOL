@@ -272,6 +272,16 @@ function showTargetPicker(target) {
         target === 'SELF' ? 'Who is playing this card?' : 'Pick target.');
     picker.show();
 
+    // Close when clicking outside of the picker
+    $(document).off('mousedown.targetPicker').on('mousedown.targetPicker', function (e) {
+        const $target = $(e.target);
+        const clickedInsidePicker = $target.closest('#targetPicker').length > 0;
+        const clickedCardOnTable = $target.closest('.list-group-item,[data-coordinates]').length > 0;
+        if (!clickedInsidePicker && !clickedCardOnTable) {
+            closeTargetPicker();
+        }
+    });
+
     let usePlayerSelector = target === 'MINION_YOU_CONTROL' || target === 'SELF';
     //"player" from js/ds.js
     let playerSelector = usePlayerSelector ? '[data-player="' + player + '"]' : '';
