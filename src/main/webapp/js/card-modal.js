@@ -4,18 +4,10 @@ const CLANS = ["Abomination", "Ahrimane", "Akunanse", "Baali", "Banu Haqim", "Bl
     "Ishtarri", "Kiasyd", "Lasombra", "Malkavian", "Malkavian Antitribu", "Nagaraja", "Nosferatu", "Nosferatu Antitribu",
     "Hecata", "Ministry", "Osebo", "Pander", "Ravnos", "Salubri", "Salubri Antitribu", "Samedi", "Toreador", "Toreador Antitribu",
     "Tremere", "Tremere Antitribu", "True Brujah", "Tzimisce", "Ventrue", "Ventrue Antitribu", "Avenger", "Defender", "Innocent",
-    "Judge", "Martyr", "Redeemer", "Visionary"]
+    "Judge", "Martyr", "Redeemer", "Visionary"];
 
 const PATHS = ['Death and the Soul', 'Power and the Inner Voice', 'Cathari', 'Caine', 'None'];
-
-const SECTS = [
-    {value: "CAMARILLA", label: "Camarilla"},
-    {value: "SABBAT", label: "Sabbat"},
-    {value: "INDEPENDENT", label: "Independent"},
-    {value: "LAIBON", label: "Laibon"},
-    {value: "ANARCH", label: "Anarch"},
-    {value: "NONE", label: "NONE"}
-];
+const SECTS = ["Camarilla", "Sabbat", "Independent", "Laibon", "Anarch", "None"];
 
 function cardTypeCSSClass(cardType) {
     return cardType.toLowerCase().replace(' ', '_').replace('/', ' ');
