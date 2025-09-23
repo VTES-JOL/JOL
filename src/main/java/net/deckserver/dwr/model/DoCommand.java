@@ -18,15 +18,7 @@ import net.deckserver.storage.json.cards.CardSummary;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class DoCommand {
-
-    private final JolGame game;
-    private final GameModel model;
-
-    public DoCommand(JolGame game, GameModel model) {
-        this.game = game;
-        this.model = model;
-    }
+public record DoCommand(JolGame game, GameModel model) {
 
     public String doMessage(String player, String message, boolean isJudge) {
         if (message.isEmpty())
@@ -137,9 +129,8 @@ public class DoCommand {
         String targetPlayer = cmdObj.getPlayer(player);
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
         Card targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
-        boolean clear = cmdObj.consumeString("clear");
-        if (clear) {
-            game.setSect(player, targetCard, Sect.NONE, false);
+        if (!cmdObj.hasMoreArgs()) {
+            game.setSect(player, targetCard, Sect.NONE, true);
         } else {
             String sectString = cmdObj.nextArg();
             Sect sect = Sect.startsWith(sectString);
@@ -155,8 +146,7 @@ public class DoCommand {
         String targetPlayer = cmdObj.getPlayer(player);
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
         Card targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
-        boolean clear = cmdObj.consumeString("clear");
-        if (clear) {
+        if (!cmdObj.hasMoreArgs()) {
             game.setPath(player, targetCard, Path.NONE, true);
         } else {
             String pathString = cmdObj.nextArg();
@@ -172,8 +162,7 @@ public class DoCommand {
         String targetPlayer = cmdObj.getPlayer(player);
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
         Card targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
-        boolean clear = cmdObj.consumeString("clear");
-        if (clear) {
+        if (!cmdObj.hasMoreArgs()) {
             game.setClan(player, targetCard, Clan.NONE, true);
         } else {
             String pathString = cmdObj.nextArg();

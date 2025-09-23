@@ -408,6 +408,15 @@ function showCardModal(event) {
                 // Votes
                 $('#cardModal .votes').text(votes).addClass("badge rounded-pill text-bg-warning").toggle(votes > 0 || votes === 'P');
 
+                // Cost
+                var costText = null;
+                if (card.cost != null) {
+                    let value = card.cost.split(" ")[0];
+                    let type = card.cost.split(" ")[1];
+                    costText = "<span class='icon " + type + value + "'></span>";
+                }
+                $('#cardModal .card-cost').html(costText);
+
                 // Set counters on card, capacity, and player pool
                 if (controller === player && capacity === 0 && card.capacity != null)
                     capacity = card.capacity;

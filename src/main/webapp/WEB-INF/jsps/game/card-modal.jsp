@@ -19,6 +19,7 @@
                     <span class="card-sect"></span>
                     <label for="sect-select" class="d-none"></label>
                     <select id="sect-select" class="form-select form-select-sm ms-2 card-sect-select d-none" style="width:auto"></select>
+                    <span class="card-cost"></span>
                 </span>
             </div>
             <div class="modal-body">

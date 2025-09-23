@@ -335,13 +335,13 @@ a.card-name {
 .clan.visionary:before {content: '7';}
 
 .icon {font-family: 'jol', sans-serif;font-size: 1.2rem;padding-right: 0.1rem;}
-.icon.pool1:after {content: '"';top: 5px;position: relative;}
-.icon.pool2:after {content: ':';top: 5px;position: relative;}
-.icon.pool3:after {content: '/';top: 5px;position: relative;}
-.icon.pool4:after {content: '\\';top: 5px;position: relative;}
-.icon.pool5:after {content: ']';top: 5px;position: relative;}
-.icon.pool6:after {content: '`';top: 5px;position: relative;}
-.icon.poolX:after {content: '_';top: 5px;position: relative;}
+.icon.pool1:after {content: '"';}
+.icon.pool2:after {content: ':';}
+.icon.pool3:after {content: '/';}
+.icon.pool4:after {content: '\\'}
+.icon.pool5:after {content: ']';}
+.icon.pool6:after {content: '`';}
+.icon.poolX:after {content: '_';}
 .icon.blood1:after {content: "'";color: red;}
 .icon.blood2:after {content: ";";color: red;}
 .icon.blood3:after {content: ".";color: red;}
