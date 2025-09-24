@@ -48,5 +48,9 @@ public class ChatParserTest {
 
         //2023/05/13; this test does not work:
         assertEquals("A link to <a class='card-name' data-card-id='201362' data-secured='false'>Theo Bell</a> and <a class='card-name' data-card-id='201362' data-secured='false'>Theo Bell</a> and <a class='card-name' data-card-id='201363' data-secured='false'>Theo Bell <i class='icon adv'></i></a> and <a class='card-name' data-card-id='201613' data-secured='false'>Theo Bell</a> should all work", modified);
+
+        test = "A few emojis: :vampire: :shrug: :laughing: :joy: :sob:";
+        modified = ChatParser.parseText(test);
+        assertEquals("A few emojis: 🧛 🤷 😆 😂 😭", modified);
     }
 }

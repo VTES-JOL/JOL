@@ -18,8 +18,10 @@ public class AllGamesBean {
     private final List<GameHistory> history;
 
     public AllGamesBean(PlayerModel model) {
+        String player = model.getPlayerName();
         this.games = JolAdmin.INSTANCE.getGames().stream()
                 .filter(JolAdmin.INSTANCE::isActive)
+                .filter(gameName -> JolAdmin.INSTANCE.isViewable(gameName, player))
                 .map(GameSummaryBean::new)
                 .collect(Collectors.toList());
         games.sort(Comparator.comparing(GameSummaryBean::getGameName, String.CASE_INSENSITIVE_ORDER));

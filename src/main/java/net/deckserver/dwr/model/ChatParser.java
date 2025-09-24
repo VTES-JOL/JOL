@@ -1,5 +1,6 @@
 package net.deckserver.dwr.model;
 
+import com.vdurmont.emoji.EmojiParser;
 import net.deckserver.game.storage.cards.CardSearch;
 import net.deckserver.storage.json.cards.CardSummary;
 import org.owasp.html.Sanitizers;
@@ -24,12 +25,16 @@ public class ChatParser {
         String parsedForCards = parseTextForCards(text);
         String parsedForDisciplines = parseTextForDisciplines(parsedForCards);
         String parsedForDActions = parseTextForDAction(parsedForDisciplines);
-        return parseTextForStyle(parsedForDActions);
+        String parsedForEmojis = parseTextForEmoji(parsedForDActions);
+        return parseTextForStyle(parsedForEmojis);
     }
-
     public static String parseSymbols(String text) {
         text = parseTextForDisciplines(text);
         return parseTextForDAction(text);
+    }
+
+    public static String parseTextForEmoji(String text) {
+        return EmojiParser.parseToUnicode(text);
     }
 
     public static boolean isDiscipline(String discipline) {
