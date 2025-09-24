@@ -1186,6 +1186,11 @@ public class JolAdmin {
         return formats;
     }
 
+    public boolean isViewable(String gameName, String player) {
+        GameFormat format = games.get(gameName).getGameFormat();
+        return format != GameFormat.PLAYTEST || isPlaytester(player);
+    }
+
     private ValidationResult validateDeck(Deck deck, GameFormat gameFormat) {
         try {
             Constructor<? extends DeckValidator> validatorConstructor = gameFormat.getDeckValidator().getConstructor();

@@ -3,6 +3,7 @@ package net.deckserver.dwr.bean;
 import lombok.Getter;
 import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.storage.json.system.DeckFormat;
+import net.deckserver.storage.json.system.GameFormat;
 
 import java.time.OffsetDateTime;
 import java.util.Comparator;
@@ -18,10 +19,15 @@ public class LobbyPageBean {
     private final List<GameInviteStatus> invitedGames;
     private final List<DeckInfoBean> decks;
     private final String message;
+    private final boolean playtester;
+    private final List<String> gameFormats;
 
     public LobbyPageBean(String player) {
         JolAdmin admin = JolAdmin.INSTANCE;
         OffsetDateTime currentMonth = OffsetDateTime.now().minusMonths(1);
+
+        playtester = admin.isPlaytester(player);
+        gameFormats = admin.getAvailableGameFormats(player).stream().map(GameFormat::getLabel).toList();
 
         players = admin.getPlayers().stream()
                 .sorted()
@@ -34,6 +40,7 @@ public class LobbyPageBean {
         myGames = admin.getGames().stream()
                 .filter(Objects::nonNull)
                 .filter(admin::isPrivate)
+                .filter(gameName -> admin.isViewable(gameName, player))
                 .filter(gameName -> player.equals(admin.getOwner(gameName)))
                 .map(GameStatusBean::new)
                 .collect(Collectors.toList());
@@ -42,6 +49,7 @@ public class LobbyPageBean {
                 .filter(Objects::nonNull)
                 .filter(admin::isStarting)
                 .filter(admin::isPublic)
+                .filter(gameName -> admin.isViewable(gameName, player))
                 .map(GameStatusBean::new)
                 .sorted(Comparator.comparing(GameStatusBean::getCreated))
                 .collect(Collectors.toList());
@@ -61,6 +69,7 @@ public class LobbyPageBean {
                 .collect(Collectors.toList());
 
         message = JolAdmin.INSTANCE.getPlayerModel(player).getMessage();
+
     }
 
 }

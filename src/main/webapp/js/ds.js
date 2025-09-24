@@ -257,6 +257,12 @@ function callbackLobby(data) {
     let myGameList = $("#myGameList");
     let playerList = $("#playerList");
     let invitedGames = $("#invitedGames");
+    let createGameFormat = $("#gameFormat");
+
+    createGameFormat.empty();
+    $.each(data.gameFormats, function (index, value) {
+        createGameFormat.append($("<option/>", {value: value, text: value}));
+    })
 
     playerList.autocomplete({
         source: data.players,
