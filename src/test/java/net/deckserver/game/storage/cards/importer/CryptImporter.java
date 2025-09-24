@@ -28,10 +28,9 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
     private static final int FIELD_SET = 11;
     private static final int FIELD_TITLE = 12;
     private static final int FIELD_BANNED = 13;
+    private final boolean playTestMode;
     Predicate<? super String> UNIQUE_FILTER = (text) -> text.contains("are not unique") || text.contains("non-unique");
     Predicate<String> INFERNAL_FILTER = (text) -> text.contains("Infernal.");
-
-    private final boolean playTestMode;
 
     public CryptImporter(Path basePath, String filePrefix) {
         super(basePath, filePrefix);

@@ -1,30 +1,26 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.game.interfaces.state.Card;
-import net.deckserver.game.interfaces.state.Location;
-import net.deckserver.game.storage.state.RegionType;
+import net.deckserver.storage.json.cards.RegionType;
+import net.deckserver.storage.json.game.CardData;
+import net.deckserver.storage.json.game.RegionData;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 /**
  * Created by shannon on 23/08/2016.
  */
 class CommandParser {
 
-    private final static Logger logger = getLogger(CommandParser.class);
     private final static Pattern VALID_POSITION_PATTERN = Pattern.compile("(?<!-\\+)\\d+(?:\\.\\d+)*");
     private final static Pattern SPECIAL_POSITION_PATTERN = Pattern.compile("random");
 
     final String[] args;
-    private int ind;
     private final JolGame game;
+    private int ind;
 
     public CommandParser(String[] args, int ind, JolGame game) {
         this.args = args;
@@ -120,13 +116,12 @@ class CommandParser {
 
     }
 
-    Card findCard(boolean greedy, boolean allowRandom, String player, RegionType region) throws CommandException {
-        Location location = game.getState().getPlayerLocation(player, region);
-        Card[] cards = location.getCards();
-        Card targetCard = null;
+    CardData findCardData(boolean greedy, boolean allowRandom, String player, RegionType region) throws CommandException {
+        RegionData regionData = game.getData().getPlayerRegion(player, region);
+        var cards = regionData.getCards();
+        CardData targetCard = null;
         boolean keepLooking = true;
         while (keepLooking && hasMoreArgs()) {
-            // Get the position from the next arg
             String[] indexes = translateNextPosition(allowRandom);
             if (indexes.length == 0) {
                 break;
@@ -135,11 +130,11 @@ class CommandParser {
                 for (String index : indexes) {
                     int indexInt;
                     if ("random".equals(index)) {
-                        indexInt = new Random().nextInt(cards.length) + 1;
+                        indexInt = new Random().nextInt(cards.size()) + 1;
                     } else {
                         indexInt = Integer.parseInt(index);
                     }
-                    targetCard = cards[indexInt - 1];
+                    targetCard = cards.get(indexInt - 1);
                     cards = targetCard.getCards();
                 }
                 ind++;
@@ -149,13 +144,13 @@ class CommandParser {
         }
 
         if (targetCard == null && greedy) {
-            throw new CommandException("Invalid card position.");
+            throw new CommandException("Invalid card position");
         }
         return targetCard;
     }
 
-    Card findCard(boolean allowRandom, String player, RegionType region) throws CommandException {
-        return findCard(true, allowRandom, player, region);
+    CardData findCardData(boolean allowRandom, String player, RegionType region) throws CommandException {
+        return findCardData(true, allowRandom, player, region);
     }
 
     int getAmount(int amount) throws CommandException {

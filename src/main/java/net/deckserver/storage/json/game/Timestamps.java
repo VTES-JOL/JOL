@@ -22,10 +22,12 @@ public class Timestamps {
     private Map<String, GameTimestampEntry> gameTimestamps = new HashMap<>();
 
     public void clearGame(String gameName) {
+        if (gameName == null || gameName.isBlank()) return;
         this.gameTimestamps.remove(gameName);
     }
 
     public void recordPlayerAccess(String player) {
+        if (player == null || player.isBlank()) return;
         this.playerTimestamps.put(player, OffsetDateTime.now());
     }
 
@@ -39,43 +41,57 @@ public class Timestamps {
     }
 
     public void removePlayer(String playerName) {
+        if (playerName == null || playerName.isBlank()) return;
         playerTimestamps.remove(playerName);
         gameTimestamps.forEach((gameName, entry) -> entry.removePlayer(playerName));
     }
 
     public OffsetDateTime getGameTimestamp(String game) {
-        return getGameTimestampEntry(game).getTimestamp();
+        GameTimestampEntry e = getExistingGameTimestampEntry(game);
+        return e != null ? e.getTimestamp() : OffsetDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
     }
 
     public void setGameTimestamp(String game) {
+        if (game == null || game.isBlank()) return;
         logger.debug("Game {} state modified at {}", game, OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME));
-        getGameTimestampEntry(game).setTimestamp(OffsetDateTime.now());
+        getOrCreateGameTimestampEntry(game).setTimestamp(OffsetDateTime.now());
     }
 
     public OffsetDateTime getPlayerAccess(String player, String game) {
-        return getGameTimestampEntry(game).getPlayerAccess(player);
+        GameTimestampEntry e = getExistingGameTimestampEntry(game);
+        return e != null ? e.getPlayerAccess(player) : OffsetDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
     }
 
     public void recordPlayerAccess(String player, String game) {
+        if (player == null || player.isBlank() || game == null || game.isBlank()) return;
         logger.debug("{} entering game {} at {}", player, game, OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME));
-        getGameTimestampEntry(game).recordPlayerAccess(player);
+        getOrCreateGameTimestampEntry(game).recordPlayerAccess(player);
     }
 
     public boolean isPlayerPinged(String player, String game) {
-        return getGameTimestampEntry(game).getPlayerPing(player);
+        GameTimestampEntry e = getExistingGameTimestampEntry(game);
+        return e != null && e.getPlayerPing(player);
     }
 
     public void clearPing(String player, String game) {
+        if (player == null || player.isBlank() || game == null || game.isBlank()) return;
         logger.debug("Clearing {} ping in game {}", player, game);
-        getGameTimestampEntry(game).clearPlayerPing(player);
+        getOrCreateGameTimestampEntry(game).clearPlayerPing(player);
     }
 
     public void pingPlayer(String player, String game) {
+        if (player == null || player.isBlank() || game == null || game.isBlank()) return;
         logger.debug("{} being pinged in game {}", player, game);
-        getGameTimestampEntry(game).setPlayerPing(player);
+        getOrCreateGameTimestampEntry(game).setPlayerPing(player);
     }
 
-    private GameTimestampEntry getGameTimestampEntry(String game) {
+    private GameTimestampEntry getExistingGameTimestampEntry(String game) {
+        if (game == null || game.isBlank()) return null;
+        return this.gameTimestamps.get(game);
+    }
+
+    private GameTimestampEntry getOrCreateGameTimestampEntry(String game) {
+        if (game == null || game.isBlank()) return null;
         GameTimestampEntry gameTimestampEntry = this.gameTimestamps.get(game);
         if (gameTimestampEntry == null) {
             gameTimestampEntry = new GameTimestampEntry();

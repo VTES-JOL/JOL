@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
-public class CardSet extends BaseCard{
+public class CardSet extends BaseCard {
     private String id;
     private String code;
     private String name;

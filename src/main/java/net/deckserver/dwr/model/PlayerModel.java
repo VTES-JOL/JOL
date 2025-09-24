@@ -24,11 +24,14 @@ public class PlayerModel {
     private String view;
     @Setter
     private String message;
-    @Getter @Setter
+    @Getter
+    @Setter
     private ExtendedDeck deck;
-    @Getter @Setter
+    @Getter
+    @Setter
     private String contents;
-    @Getter @Setter
+    @Getter
+    @Setter
     private String deckFilter = GameFormat.STANDARD.getLabel();
 
     public PlayerModel(String name, boolean loadChat) {
@@ -97,8 +100,8 @@ public class PlayerModel {
             String deckId = admin.getDeckId(player, deckName);
             DeckFormat deckFormat = admin.getDeckFormat(player, deckName);
             if (deckFormat.equals(DeckFormat.LEGACY)) {
-               this.contents = admin.getLegacyContents(deckId).trim();
-               this.deck = DeckParser.parseDeck(contents);
+                this.contents = admin.getLegacyContents(deckId).trim();
+                this.deck = DeckParser.parseDeck(contents);
             } else {
                 this.contents = admin.getDeckContents(deckId).trim();
                 this.deck = admin.getDeck(deckId);

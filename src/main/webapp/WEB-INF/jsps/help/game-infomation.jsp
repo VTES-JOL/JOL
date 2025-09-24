@@ -2,8 +2,11 @@
 <div class="container-fluid tab-pane fade" role="tabpanel" aria-labelledby="help6" tabindex="0" id="panel6">
     <div id="commandIntro" class="mb-2">
         <h4>Command Basics</h4>
-        At the core of the functionality of JOL are commands, every action that modifies the current state of the game can be issued by typed commands.<br/>
-        While some elements are also supported via the click-to-play interface, understanding the command system will help for more complicated card interactions, or to achieve effects that aren't currently found in click-to-play<br/>
+        At the core of the functionality of JOL are commands, every action that modifies the current state of the game
+        can be issued by typed commands.<br/>
+        While some elements are also supported via the click-to-play interface, understanding the command system will
+        help for more complicated card interactions, or to achieve effects that aren't currently found in
+        click-to-play<br/>
     </div>
     <hr class="my-4"/>
     <div id="cardTargets" class="mb-2">
@@ -26,12 +29,14 @@
                 </h6>
             </div>
             <div class="card-body px-0 py-0">
-                <div class="p-2 bg-success-subtle " type="button" onclick="details('4-READY');" data-bs-toggle="collapse" data-bs-target="#4-READY" aria-expanded="true" aria-controls="4-READY">
+                <div class="p-2 bg-success-subtle " type="button" onclick="details('4-READY');"
+                     data-bs-toggle="collapse" data-bs-target="#4-READY" aria-expanded="true" aria-controls="4-READY">
                     <span class="fw-bold">Ready</span>
                     <span>( 8 )</span>
                 </div>
                 <ol class="region list-group list-group-flush list-group-numbered">
-                    <li data-card-id="201526" class="list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1 shadow">
+                    <li data-card-id="201526"
+                        class="list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1 shadow">
                         <div class="mx-1 me-auto w-100">
                             <div class="d-flex justify-content-between align-items-baseline w-100 pb-1">
                                 <span>
@@ -61,7 +66,8 @@
                             </ol>
                         </div>
                     </li>
-                    <li data-card-id="201521" class="list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1 shadow">
+                    <li data-card-id="201521"
+                        class="list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1 shadow">
                         <div class="mx-1 me-auto w-100">
                             <div class="d-flex justify-content-between align-items-baseline w-100 pb-1">
                                 <span>
@@ -87,7 +93,8 @@
                                 </span>
                             </div>
                             <ol class="list-group list-group-numbered ms-n3">
-                                <li data-card-id="101550" class="list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1">
+                                <li data-card-id="101550"
+                                    class="list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1">
                                     <div class="mx-1 me-auto w-100">
                                         <div class="d-flex justify-content-between align-items-baseline w-100 pb-1">
                                             <span>
@@ -104,10 +111,12 @@
                                         </div>
                                     </div>
                                 </li>
-                                <li data-card-id="100568" class="list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1">
+                                <li data-card-id="100568"
+                                    class="list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1">
                                     <div class="mx-1 me-auto w-100">
                                         <div class="d-flex justify-content-between align-items-baseline w-100 pb-1">
-                                            <span><a data-card-id="100568" class="card-name text-wrap">Dog Pack</a></span>
+                                            <span><a data-card-id="100568"
+                                                     class="card-name text-wrap">Dog Pack</a></span>
                                             <span class="d-flex gap-1 align-items-center">
                                                 <span class="badge rounded-pill shadow text-bg-success">1</span>
                                             </span>
@@ -119,7 +128,8 @@
                                         </div>
                                     </div>
                                 </li>
-                                <li data-card-id="101816" class="list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1   ">
+                                <li data-card-id="101816"
+                                    class="list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1   ">
                                     <div class="mx-1 me-auto w-100">
                                         <div class="d-flex justify-content-between align-items-baseline w-100 pb-1">
                                             <span>
@@ -140,9 +150,18 @@
             </div>
         </div>
         <table class="table">
-            <tr class="table-secondary"><th>Target</th><th>Card chosen</th></tr>
-            <tr><th><b>caine ready 1</b></th><td><a class="card-name" data-card-id="201526">Leumeah</a></td></tr>
-            <tr><th><b>caine ready 2 2</b></th><td><a data-card-id="100568" class="card-name text-wrap">Dog Pack</a></td></tr>
+            <tr class="table-secondary">
+                <th>Target</th>
+                <th>Card chosen</th>
+            </tr>
+            <tr>
+                <th><b>caine ready 1</b></th>
+                <td><a class="card-name" data-card-id="201526">Leumeah</a></td>
+            </tr>
+            <tr>
+                <th><b>caine ready 2 2</b></th>
+                <td><a data-card-id="100568" class="card-name text-wrap">Dog Pack</a></td>
+            </tr>
         </table>
         Most commands that affect cards will use this format, certain commands will have a default value for either the
         PLAYER or REGION.<br/>

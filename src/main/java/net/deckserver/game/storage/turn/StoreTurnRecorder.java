@@ -29,29 +29,6 @@ public class StoreTurnRecorder implements TurnRecorder {
         this.actions = actions;
     }
 
-    private Turn getTurn(String label) {
-        List<Turn> turns = actions.getTurn();
-        return turns.stream()
-                .filter(turn -> turn.getLabel().equals(label))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private synchronized void addAction(String turn, String text, String[] command) {
-        Turn t = getTurn(turn);
-        Action act = new Action();
-        act.setText(text);
-        if (command != null && command.length > 0) {
-            act.getCommand().clear();
-            act.getCommand().addAll(Arrays.asList(command));
-        }
-        String cur = t.getCounter();
-        act.setCounter(cur);
-        t.setCounter((Integer.parseInt(cur) + 1) + "");
-        actions.setGameCounter((getCounter() + 1) + "");
-        t.getAction().add(act);
-    }
-
     public void addCommand(String turn, String text, String[] command) {
         addAction(turn, text, command);
     }
@@ -95,6 +72,29 @@ public class StoreTurnRecorder implements TurnRecorder {
 
     public int getCounter() {
         return Integer.parseInt(actions.getGameCounter());
+    }
+
+    private Turn getTurn(String label) {
+        List<Turn> turns = actions.getTurn();
+        return turns.stream()
+                .filter(turn -> turn.getLabel().equals(label))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private synchronized void addAction(String turn, String text, String[] command) {
+        Turn t = getTurn(turn);
+        Action act = new Action();
+        act.setText(text);
+        if (command != null && command.length > 0) {
+            act.getCommand().clear();
+            act.getCommand().addAll(Arrays.asList(command));
+        }
+        String cur = t.getCounter();
+        act.setCounter(cur);
+        t.setCounter((Integer.parseInt(cur) + 1) + "");
+        actions.setGameCounter((getCounter() + 1) + "");
+        t.getAction().add(act);
     }
 
     static class GameActionImpl implements GameAction {

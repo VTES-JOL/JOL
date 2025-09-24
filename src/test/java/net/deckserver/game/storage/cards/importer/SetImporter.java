@@ -16,7 +16,7 @@ public class SetImporter extends AbstractImporter<CardSet> {
 
     @Override
     public CardSet map(String[] lineData) {
-        String id =  lineData[FIELD_ID].trim();
+        String id = lineData[FIELD_ID].trim();
         String code = lineData[FIELD_CODE].trim();
         String name = lineData[FIELD_NAME].trim();
         return new CardSet(id, code, name);

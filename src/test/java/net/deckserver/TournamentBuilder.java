@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag("Tournament")
 public class TournamentBuilder {
     private static final Logger logger = LoggerFactory.getLogger(TournamentBuilder.class);
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     public void init() {

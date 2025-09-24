@@ -1,4 +1,4 @@
-<%@ page import="net.deckserver.game.ui.state.CardDetail" %>
+<%@ page import="net.deckserver.game.ui.CardDetail" %>
 <%
     String detail = request.getParameter("detail");
     CardDetail cardDetail = (CardDetail) request.getAttribute(detail);

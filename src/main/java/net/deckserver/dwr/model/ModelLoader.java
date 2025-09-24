@@ -1,135 +1,101 @@
 package net.deckserver.dwr.model;
 
-import com.google.common.base.Strings;
-import net.deckserver.game.interfaces.state.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.game.interfaces.turn.GameAction;
 import net.deckserver.game.interfaces.turn.TurnRecorder;
 import net.deckserver.game.jaxb.XmlFileUtils;
 import net.deckserver.game.jaxb.actions.GameActions;
+import net.deckserver.game.jaxb.state.GameCard;
 import net.deckserver.game.jaxb.state.GameState;
 import net.deckserver.game.jaxb.state.Notation;
-import net.deckserver.game.storage.state.RegionType;
-import net.deckserver.game.storage.state.StoreGame;
 import net.deckserver.game.storage.turn.StoreTurnRecorder;
-import net.deckserver.game.ui.state.DsGame;
-import net.deckserver.game.ui.turn.DsTurnRecorder;
+import net.deckserver.game.ui.DsTurnRecorder;
+import net.deckserver.storage.json.cards.*;
+import net.deckserver.storage.json.game.CardData;
+import net.deckserver.storage.json.game.GameData;
+import net.deckserver.storage.json.game.PlayerData;
+import net.deckserver.storage.json.game.RegionData;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public final class ModelLoader {
 
+    private static final Logger logger = LoggerFactory.getLogger(ModelLoader.class);
     private static final Path BASE_PATH = Paths.get(System.getenv("JOL_DATA"));
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static JolGame loadGame(String gameId) {
-        Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.xml");
-        GameState gameState = XmlFileUtils.loadGameState(gameStatePath);
-        Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions.xml");
-        GameActions gameActions = XmlFileUtils.loadGameActions(gameActionsPath);
-        DsGame deckServerState = new DsGame();
-        DsTurnRecorder deckServerActions = new DsTurnRecorder();
-        ModelLoader.createModel(deckServerState, new StoreGame(gameState));
-        ModelLoader.createRecorder(deckServerActions, new StoreTurnRecorder(gameActions));
-        return new JolGame(gameId, deckServerState, deckServerActions);
+        return loadGame(gameId, false);
+    }
+
+    public static JolGame loadGame(String gameId, boolean debugMode) {
+        try {
+            Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.json");
+            GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
+            Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions.xml");
+            GameActions gameActions = XmlFileUtils.loadGameActions(gameActionsPath);
+            DsTurnRecorder deckServerActions = new DsTurnRecorder();
+            ModelLoader.createRecorder(deckServerActions, new StoreTurnRecorder(gameActions));
+            return new JolGame(gameId, gameData, deckServerActions);
+        } catch (IOException e) {
+            logger.error("Error reading game file " + gameId, e);
+        }
+        return new JolGame(gameId, new GameData(), new DsTurnRecorder());
     }
 
     public static JolGame loadSnapshot(String gameId, String turn) {
-        Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game-" + turn + ".xml");
-        GameState gameState = XmlFileUtils.loadGameState(gameStatePath);
-        Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions-" + turn + ".xml");
-        GameActions gameActions = XmlFileUtils.loadGameActions(gameActionsPath);
-        DsGame deckServerState = new DsGame();
-        DsTurnRecorder deckServerActions = new DsTurnRecorder();
-        ModelLoader.createModel(deckServerState, new StoreGame(gameState));
-        ModelLoader.createRecorder(deckServerActions, new StoreTurnRecorder(gameActions));
-        return new JolGame(gameId, deckServerState, deckServerActions);
+        try {
+            Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game-" + turn + ".json");
+            GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
+            Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions-" + turn + ".xml");
+            GameActions gameActions = XmlFileUtils.loadGameActions(gameActionsPath);
+            DsTurnRecorder deckServerActions = new DsTurnRecorder();
+            ModelLoader.createRecorder(deckServerActions, new StoreTurnRecorder(gameActions));
+            return new JolGame(gameId, gameData, deckServerActions);
+        } catch (IOException e) {
+            logger.error("Error reading game file", e);
+        }
+        return new JolGame(gameId, new GameData(), new DsTurnRecorder());
     }
 
     public static void saveGame(JolGame game) {
         String gameId = game.getId();
-        Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.xml");
+        Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.json");
         Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions.xml");
-        Game deckServerState = game.getState();
+        GameData deckServerState = game.getData();
         TurnRecorder deckServerActions = game.getTurnRecorder();
-        GameState gameState = new GameState();
         GameActions gameActions = new GameActions();
-        gameActions.setCounter("1");
-        gameActions.setGameCounter("1");
-        ModelLoader.createModel(new StoreGame(gameState), deckServerState);
         ModelLoader.createRecorder(new StoreTurnRecorder(gameActions), deckServerActions);
-        XmlFileUtils.saveGameState(gameState, gameStatePath);
         XmlFileUtils.saveGameActions(gameActions, gameActionsPath);
-    }
-
-    public static void writeState(String id, DsGame state, String turn) {
-        GameState gstate = new GameState();
-        StoreGame wgame = new StoreGame(gstate);
-        ModelLoader.createModel(wgame, state);
-        String fileName = Strings.isNullOrEmpty(turn) ? "game.xml" : "game-" + turn + ".xml";
-        Path gamePath = BASE_PATH.resolve("games").resolve(id).resolve(fileName);
-        XmlFileUtils.saveGameState(gstate, gamePath);
-    }
-
-    public static void writeActions(String id, DsTurnRecorder actions, String turn) {
-        GameActions gactions = new GameActions();
-        gactions.setCounter("1");
-        gactions.setGameCounter("1");
-        StoreTurnRecorder wrec = new StoreTurnRecorder(gactions);
-        ModelLoader.createRecorder(wrec, actions);
-        String fileName = Strings.isNullOrEmpty(turn) ? "actions.xml" : "actions-" + turn + ".xml";
-        Path actionsPath = BASE_PATH.resolve("games").resolve(id).resolve(fileName);
-        XmlFileUtils.saveGameActions(gactions, actionsPath);
-    }
-
-    private static void createModel(Game game, Game orig) {
-        game.setName(orig.getName());
-        moveNotes(orig, game);
-        List<String> players = orig.getPlayers();
-        for (String player : players) {
-            game.addPlayer(player);
-            game.addLocation(player, RegionType.READY);
-            game.addLocation(player, RegionType.TORPOR);
-            game.addLocation(player, RegionType.UNCONTROLLED);
-            game.addLocation(player, RegionType.HAND);
-            game.addLocation(player, RegionType.ASH_HEAP);
-            game.addLocation(player, RegionType.LIBRARY);
-            game.addLocation(player, RegionType.CRYPT);
-            game.addLocation(player, RegionType.REMOVED_FROM_GAME);
-            game.addLocation(player, RegionType.RESEARCH);
-            Location[] locs = orig.getPlayerLocations(player);
-            for (Location loc : locs) {
-                moveLoc(game, orig, player, loc);
-            }
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            objectMapper.writeValue(gameStatePath.toFile(), deckServerState);
+        } catch (IOException e) {
+            logger.error("Unable to save game file", e);
         }
     }
 
-    private static void moveNotes(NoteTaker from, NoteTaker to) {
-        List<Notation> notes = from.getNotes();
-        for (Notation note : notes) {
-            Notation n = to.addNote(note.getName());
-            n.setValue(note.getValue());
-        }
-    }
-
-    private static void moveLoc(Game game, Game orig, String player, Location loc) {
-        String name = orig.getPlayerRegionName(loc);
-        Location to = game.getPlayerLocation(player, RegionType.of(name));
-        moveNotes(loc, to);
-        moveCards(loc, to);
-        loc.setOwner(player);
-    }
-
-    private static void moveCards(CardContainer from, CardContainer to) {
-        Card[] cards = from.getCards();
-        to.setCards(cards);
-        for (int i = 0; i < cards.length; i++) {
-            Card toCard = to.getCards()[i];
-            moveNotes(cards[i], toCard);
-            Card[] inner = cards[i].getCards();
-            if (inner.length > 0) {
-                moveCards(cards[i], toCard);
-            }
+    public static void saveGame(JolGame game, String turn) {
+        turn = turn.replaceAll("\\.", "-");
+        String gameId = game.getId();
+        Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game-" + turn + ".json");
+        Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions-" + turn + ".xml");
+        GameActions gameActions = new GameActions();
+        ModelLoader.createRecorder(new StoreTurnRecorder(gameActions), game.getTurnRecorder());
+        XmlFileUtils.saveGameActions(gameActions, gameActionsPath);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            objectMapper.writeValue(gameStatePath.toFile(), game.getData());
+        } catch (IOException e) {
+            logger.error("Unable to save game file", e);
         }
     }
 
@@ -141,5 +107,234 @@ public final class ModelLoader {
                 to.addCommand(turn, action.getText(), action.command());
             }
         }
+    }
+
+    public static GameData convertGameState(GameState gameState, String gameId) {
+        GameData data = new GameData();
+        data.setId(gameId);
+        data.setName(gameState.getName());
+        Map<String, CardData> cardData = new HashMap<>();
+        Map<String, PlayerData> players = gameState.getPlayer().stream()
+                .map(name -> {
+                    PlayerData playerData = new PlayerData(name);
+                    data.addPlayer(playerData);
+                    int pool = getPool(gameState, name);
+                    float victoryPoints = getVictoryPoints(gameState, name);
+                    playerData.setPool(pool);
+                    playerData.setVictoryPoints(victoryPoints);
+                    playerData.setOusted(pool <= 0);
+                    String currentNotes = getNotes(gameState, name);
+                    if (!StringUtils.isEmpty(currentNotes)) {
+                        playerData.setNotes(currentNotes);
+                    }
+                    playerData.setChoice(getChoice(gameState, name));
+                    getRegions(gameState, playerData, cardData);
+                    return playerData;
+                })
+                .collect(Collectors.toMap(PlayerData::getName, Function.identity()));
+
+        gameState.getRegion().stream().filter(region -> region.getName().startsWith("ZZZ"))
+                .forEach(cardRegion -> {
+                    String id = cardRegion.getName().replaceAll("ZZZ", "").replaceAll(" container", "");
+                    List<CardData> attachedCards = getCardData(gameState, cardRegion.getName());
+                    CardData parentCard = cardData.get(id);
+                    attachedCards.forEach(card -> {
+                        card.setParent(parentCard);
+                        card.setRegion(parentCard.getRegion());
+                        parentCard.add(card, false);
+                        cardData.put(card.getId(), card);
+                    });
+                });
+
+        data.updatePredatorMapping();
+
+        Map<String, String> oldCards = getOwners(gameState);
+        mapOwners(oldCards, players, cardData);
+
+        data.setCurrentPlayer(getActivePlayer(gameState, players));
+
+        PlayerData edge = getEdge(gameState, players);
+        data.setEdge(edge);
+        data.setNotes(getNotes(gameState));
+        data.setPhase(getPhase(gameState));
+        data.initRegion(cardData.values());
+        return data;
+    }
+
+    private static Map<String, String> getOwners(GameState gameState) {
+        Map<String, String> cards = new HashMap<>();
+        gameState.getRegion().stream()
+                .flatMap(region -> region.getGameCard().stream())
+                .forEach(card -> cards.put(card.getId(), card.getOwner()));
+        return cards;
+    }
+
+    private static void mapOwners(Map<String, String> oldCards, Map<String, PlayerData> players, Map<String, CardData> cardData) {
+        cardData.forEach((id, card) -> {
+            String owner = oldCards.get(id);
+            PlayerData player = players.get(owner);
+            card.setOwner(player);
+        });
+    }
+
+    static String getNotation(List<Notation> notations, String name, String defaultValue) {
+        return notations
+                .stream()
+                .filter(notation -> notation.getName().equals(name))
+                .findFirst()
+                .map(Notation::getValue)
+                .orElse(defaultValue);
+    }
+
+    static int getNotationAsInt(List<Notation> notations, String name) {
+        return Integer.parseInt(getNotation(notations, name, String.valueOf(0)));
+    }
+
+    static float getNotationAsFloat(List<Notation> notations, String name) {
+        return Float.parseFloat(getNotation(notations, name, String.valueOf(0.0)));
+    }
+
+    static boolean getNotationAsBoolean(List<Notation> notations, String name, String check) {
+        return getNotation(notations, name, "").equals(check);
+    }
+
+    static int getPool(GameState state, String player) {
+        return getNotationAsInt(state.getNotation(), player + "pool");
+    }
+
+    static float getVictoryPoints(GameState state, String player) {
+        return getNotationAsFloat(state.getNotation(), player + " vp");
+    }
+
+    static String getChoice(GameState state, String player) {
+        return state.getNotation()
+                .stream()
+                .filter(notation -> notation.getName().equals(player + "-choice"))
+                .findFirst()
+                .map(Notation::getValue)
+                .orElse(null);
+    }
+
+    static String getNotes(GameState state, String player) {
+        return state.getNotation()
+                .stream()
+                .filter(notation -> notation.getName().equals(player + "text"))
+                .findFirst()
+                .map(Notation::getValue)
+                .orElse(null);
+    }
+
+    static PlayerData getActivePlayer(GameState state, Map<String, PlayerData> players) {
+        String playerName = state.getNotation()
+                .stream()
+                .filter(notation -> notation.getName().equals("active meth"))
+                .findFirst()
+                .map(Notation::getValue)
+                .orElseThrow(() -> new RuntimeException("Unable to find active player"));
+        return players.get(playerName);
+    }
+
+    static PlayerData getEdge(GameState state, Map<String, PlayerData> players) {
+        String playerName = getNotation(state.getNotation(), "edge", null);
+        return players.get(playerName);
+    }
+
+    static String getNotes(GameState state) {
+        return getNotation(state.getNotation(), "text", null);
+    }
+
+    static String getPhase(GameState state) {
+        return getNotation(state.getNotation(), "phase", "Unlock");
+    }
+
+    static RegionType getType(String regionName) {
+        if (regionName.endsWith("ready region")) {
+            return RegionType.READY;
+        } else if (regionName.endsWith("torpor")) {
+            return RegionType.TORPOR;
+        } else if (regionName.endsWith("inactive region")) {
+            return RegionType.UNCONTROLLED;
+        } else if (regionName.endsWith("hand")) {
+            return RegionType.HAND;
+        } else if (regionName.endsWith("ashheap")) {
+            return RegionType.ASH_HEAP;
+        } else if (regionName.endsWith("library")) {
+            return RegionType.LIBRARY;
+        } else if (regionName.endsWith("crypt")) {
+            return RegionType.CRYPT;
+        } else if (regionName.endsWith("rfg")) {
+            return RegionType.REMOVED_FROM_GAME;
+        } else if (regionName.endsWith("research")) {
+            return RegionType.RESEARCH;
+        } else throw new RuntimeException("Unknown region type");
+    }
+
+    static void getRegions(GameState state, PlayerData player, Map<String, CardData> cards) {
+        state.getRegion()
+                .stream()
+                .filter(region -> region.getName().startsWith(player.getName()))
+                .forEach(region -> {
+                    RegionType type = getType(region.getName());
+                    RegionData regionData = player.getRegion(type);
+                    LinkedList<CardData> cardData = getCardData(state, region.getName());
+                    cardData.forEach(card -> card.setRegion(regionData));
+                    regionData.setCards(cardData);
+                    cardData.forEach(cData -> cards.put(cData.getId(), cData));
+                });
+    }
+
+    static LinkedList<CardData> getCardData(GameState state, String name) {
+        return state.getRegion()
+                .stream().filter(region -> region.getName().equals(name))
+                .flatMap(region -> region.getGameCard().stream().map(ModelLoader::mapCard))
+                .collect(LinkedList::new, LinkedList::add, LinkedList::addAll);
+    }
+
+    static CardData mapCard(GameCard gameCard) {
+        CardData cardData = new CardData();
+        cardData.setId(gameCard.getId());
+        cardData.setCardId(gameCard.getCardid());
+        CardSummary summary = CardSearch.INSTANCE.get(gameCard.getCardid());
+        cardData.setName(summary.getDisplayName());
+        if (CardType.permanentTypes().contains(summary.getCardType())) {
+            cardData.setType(summary.getCardType());
+        } else {
+            cardData.setType(CardType.NONE);
+        }
+        cardData.setCounters(getNotationAsInt(gameCard.getNotation(), "counters"));
+        cardData.setCapacity(getNotationAsInt(gameCard.getNotation(), "capac"));
+        cardData.setLocked(getNotationAsBoolean(gameCard.getNotation(), "tapnote", "tap"));
+        cardData.setContested(getNotationAsBoolean(gameCard.getNotation(), "contested", "contested"));
+        if (summary.isMinion()) {
+            if (!summary.getClans().isEmpty()) {
+                cardData.setClan(Clan.of(summary.getClans().getFirst()));
+            }
+            cardData.setPath(net.deckserver.storage.json.cards.Path.of(summary.getPath()));
+            cardData.setSect(Sect.of(summary.getSect()));
+            cardData.setMinion(summary.isMinion());
+            cardData.setPlaytest(summary.isPlayTest());
+            cardData.setInfernal(summary.isInfernal());
+            if (summary.getVotes() != null) {
+                String currentVotes = getNotation(gameCard.getNotation(), "votes", null);
+                if (currentVotes != null) {
+                    cardData.setVotes(currentVotes);
+                } else {
+                    cardData.setVotes(summary.getVotes());
+                }
+            }
+        }
+        // Populate notes - if blank use null
+        String currentNotes = getNotation(gameCard.getNotation(), "notes", null);
+        if (!StringUtils.isEmpty(currentNotes)) {
+            cardData.setNotes(currentNotes);
+        }
+        cardData.setUnique(summary.isUnique());
+        cardData.setTitle(summary.getTitle());
+        cardData.setAdvanced(summary.isAdvanced());
+        String disciplines = getNotation(gameCard.getNotation(), "disciplines", null);
+        if (disciplines != null) {
+            Arrays.asList(disciplines.split(" ")).forEach(cardData::addDiscipline);
+        }
+        return cardData;
     }
 }

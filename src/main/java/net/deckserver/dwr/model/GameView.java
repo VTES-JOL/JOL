@@ -2,7 +2,7 @@ package net.deckserver.dwr.model;
 
 import net.deckserver.dwr.bean.GameBean;
 import net.deckserver.game.interfaces.turn.GameAction;
-import net.deckserver.game.storage.state.RegionType;
+import net.deckserver.storage.json.cards.RegionType;
 import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 
@@ -128,7 +128,7 @@ public class GameView {
         if (turnChanged) {
             resetChat = true;
             List<String> gameTurns = game.getTurns();
-            for (int j = gameTurns.size(); j > 0;)
+            for (int j = gameTurns.size(); j > 0; )
                 turns.add(gameTurns.get(--j));
         }
 

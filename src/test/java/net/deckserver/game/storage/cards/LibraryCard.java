@@ -10,7 +10,7 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class LibraryCard extends BaseCard{
+public class LibraryCard extends BaseCard {
 
     private String id;
     private String key;

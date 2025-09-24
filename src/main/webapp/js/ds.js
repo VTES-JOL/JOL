@@ -280,8 +280,16 @@ function callbackLobby(data) {
         let gameItem = $("<li/>").addClass("list-group-item");
         let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
         let gameName = $("<h6/>").addClass("d-inline").text(game.name);
-        let startButton = game.gameStatus === 'Inviting' ? createButton({text: "Start", class: "btn btn-outline-secondary btn-sm", confirm: "Start Game?"}, DS.startGame, game.name) : "";
-        let endButton = createButton({text: "Close", class: "btn btn-outline-secondary btn-sm", confirm: "End Game?"}, DS.endGame, game.name);
+        let startButton = game.gameStatus === 'Inviting' ? createButton({
+            text: "Start",
+            class: "btn btn-outline-secondary btn-sm",
+            confirm: "Start Game?"
+        }, DS.startGame, game.name) : "";
+        let endButton = createButton({
+            text: "Close",
+            class: "btn btn-outline-secondary btn-sm",
+            confirm: "End Game?"
+        }, DS.endGame, game.name);
         let buttonWrapper = $("<span/>").addClass("d-flex justify-content-between align-items-center gap-1");
         let playerTable = $("<table/>").addClass("table table-bordered table-sm table-hover mt-2");
         let tableBody = $("<tbody/>");
@@ -344,8 +352,7 @@ function callbackLobby(data) {
         </li>
         `);
         publicGames.append(template);
-        if (game.registrations.length > 0)
-        {
+        if (game.registrations.length > 0) {
             let playerTable = $("<table/>").addClass("table table-bordered table-sm table-hover mt-2");
             let tableBody = $("<tbody/>");
             playerTable.append(tableBody);
@@ -396,9 +403,11 @@ function callbackLobby(data) {
     });
 
     $.each(data.decks, function (index, deck) {
-        $.each(deck.gameFormats, function(i, format) {
+        $.each(deck.gameFormats, function (i, format) {
             let dropDown = $(`ul .invite-${format}`);
-            let template = $(`<li><a class="dropdown-item">${deck.name}</a></li>`).on('click', function() { registerDeck(this, deck.name); });
+            let template = $(`<li><a class="dropdown-item">${deck.name}</a></li>`).on('click', function () {
+                registerDeck(this, deck.name);
+            });
             dropDown.append(template);
         })
     })
@@ -483,9 +492,9 @@ function callbackProfile(data) {
     }
     $("#playerPreferences .form-check-input").prop("checked", false);
     if (data.imageTooltipPreference) {
-        $("#imageTooltipPreference").prop("checked",true)
+        $("#imageTooltipPreference").prop("checked", true)
     } else {
-        $("#textTooltipPreference").prop("checked",true)
+        $("#textTooltipPreference").prop("checked", true)
     }
 
     profile = data;
@@ -498,12 +507,15 @@ function callbackProfile(data) {
 
 function callbackShowDecks(data) {
     let filter = $("#deckFilter");
+    let validatorFormat = $("#validatorFormat");
     filter.empty();
+    validatorFormat.empty();
     let currentFilter = data.deckFilter;
     filter.append(new Option("All", ""));
     $.each(data.tags, function (index, value) {
         let selected = currentFilter.includes(value);
         filter.append(new Option(value, value, selected, selected));
+        validatorFormat.append(new Option(value, value, selected, selected));
     })
     selectDeckFilter();
     const deckText = $("#deckText");
@@ -517,7 +529,7 @@ function callbackShowDecks(data) {
         deckErrors.empty();
         deckSummary.append($("<span/>").text(data.selectedDeck['stats']['summary']));
         deckName.val(data.selectedDeck['deck']['name']);
-        $.each(data.selectedDeck.errors, function(i, error) {
+        $.each(data.selectedDeck.errors, function (i, error) {
             deckErrors.append(error.replace(/\n/g), "<br/>");
         })
         renderDeck(data.selectedDeck.deck, "#deckPreview");
@@ -817,7 +829,9 @@ function renderMyGames(id, games) {
     let ownGames = $(id);
     ownGames.empty();
     $.each(games, function (index, game) {
-        let gameRow = $("<li/>").addClass("list-group-item p-0 border").on('click', function() {doNav("g" + game.name);});
+        let gameRow = $("<li/>").addClass("list-group-item p-0 border").on('click', function () {
+            doNav("g" + game.name);
+        });
         let header = $("<div/>").addClass("d-flex p-2 justify-content-between w-100 border-bottom bg-body-tertiary");
         let title = $("<span/>").addClass("fw-bold").text(game.name);
         let turn = $("<small/>").text(game.turn).addClass("d-inline-block d-md-none d-xl-inline-block");
@@ -825,10 +839,10 @@ function renderMyGames(id, games) {
         let players = $("<div/>").addClass("players pb-2");
         let toggle = $("#myGamesDetailedMode");
         if (checked === "true") {
-            toggle.prop("checked",true);
+            toggle.prop("checked", true);
             players.removeClass("d-none");
         } else {
-            toggle.prop("checked",false);
+            toggle.prop("checked", false);
             players.addClass("d-none");
         }
         let predator = renderPlayer(game.players, game.predator);
@@ -1007,10 +1021,11 @@ function doShowDeck() {
         DS.getGameDeck(game, {callback: callbackShowGameDeck, errorHandler: errorhandler});
 }
 
-function endTurn() {
+function doEndTurn() {
     if (confirm("Are you sure you want to end your turn?")) {
         DS.endPlayerTurn(game, {callback: processData, errorHandler: errorhandler});
     }
+    return false;
 }
 
 function doSubmit() {
@@ -1125,7 +1140,7 @@ function loadGame(data) {
         $(".panel-secondary").addClass("d-none");
 
         // initial state for controls
-        playerControls.addClass("d-none");
+        playerControls.addClass("d-none").attr('disabled', true);
         chatControls.attr('disabled', true);
         globalNotes.attr('disabled', true);
         controlGrid.addClass("spectator");
@@ -1144,7 +1159,7 @@ function loadGame(data) {
 
     // If playing enable player controls
     if (data.player) {
-        playerControls.removeClass("d-none");
+        playerControls.removeClass("d-none").removeAttr('disabled');
         controlGrid.removeClass("spectator");
     }
 
@@ -1203,7 +1218,7 @@ function loadGame(data) {
         }
     }
 
-    $.each(data.pinged, function(index, pinged) {
+    $.each(data.pinged, function (index, pinged) {
         $(`.player[data-player='${pinged}']`).find(".pinged").removeClass("d-none");
     });
 
@@ -1234,65 +1249,57 @@ function addCardTooltips(parent) {
     //tippy tooltips to cards that already have a click handler that shows the card.
     //This fixes the bug where cards in hand required a double-tap to show the modal.
     tippy(linkSelector, {
-            placement: 'auto',
-            allowHTML: true,
-            appendTo: () => document.body,
-            popperOptions: {
-                strategy: 'fixed',
-                modifiers: [
-                    {
-                        name: 'flip',
-                        options: {
-                            fallbackPlacements: ['bottom', 'right'],
-                        },
+        placement: 'auto',
+        allowHTML: true,
+        appendTo: () => document.body,
+        popperOptions: {
+            strategy: 'fixed',
+            modifiers: [
+                {
+                    name: 'flip',
+                    options: {
+                        fallbackPlacements: ['bottom', 'right'],
                     },
-                    {
-                        name: 'preventOverflow',
-                        options: {
-                            altAxis: true,
-                            tether: false,
-                        },
+                },
+                {
+                    name: 'preventOverflow',
+                    options: {
+                        altAxis: true,
+                        tether: false,
                     },
-                ],
-            },
-            onTrigger: function (instance, event) {
-                event.stopPropagation();
-            },
-            theme: "light",
-            touch: "hold",
-            onShow: function (instance) {
-                tippy.hideAll({exclude: instance});
-                instance.setContent("Loading...");
-                let ref = $(instance.reference);
-                let cardId = ref.data('card-id');
-                let secured = ref.data('secured') || false ? "secured/" : "";
-                if (cardId == null) { //Backwards compatibility in main chat
-                    cardId = instance.reference.title;
-                    ref.data('card-id', cardId);
-                    instance.reference.removeAttribute('title');
-                }
-                if (profile.imageTooltipPreference) {
-                    let content = `<img width="350" height="500" src="https://static.dev.deckserver.net/${secured}images/${cardId}" alt="Loading..."/>`;
-                    instance.setContent(content);
-                } else {
-                    $.get({
-                        dataType: "html",
-                        url: `https://static.dev.deckserver.net/${secured}html/${cardId}`, success: function (data) {
-                            let content = `<div class="p-2">${data}</div>`;
-                            instance.setContent(content);
-                        }
-                    });
-                }
+                },
+            ],
+        },
+        onTrigger: function (instance, event) {
+            event.stopPropagation();
+        },
+        theme: "light",
+        touch: "hold",
+        onShow: function (instance) {
+            tippy.hideAll({exclude: instance});
+            instance.setContent("Loading...");
+            let ref = $(instance.reference);
+            let cardId = ref.data('card-id');
+            let secured = ref.data('secured') || false ? "secured/" : "";
+            if (cardId == null) { //Backwards compatibility in main chat
+                cardId = instance.reference.title;
+                ref.data('card-id', cardId);
+                instance.reference.removeAttribute('title');
             }
-        });
-}
-
-function regionCommands(event, tag) {
-    let regionModal = $("#regionModal");
-    let content = $("#" + tag + "-notes").html();
-    $("#region-modal-body").html(content);
-    addCardTooltips("#region-modal-body");
-    regionModal.modal('show');
+            if (profile.imageTooltipPreference) {
+                let content = `<img width="350" height="500" src="${BASE_URL}/${secured}images/${cardId}" alt="Loading..."/>`;
+                instance.setContent(content);
+            } else {
+                $.get({
+                    dataType: "html",
+                    url: `${BASE_URL}/${secured}html/${cardId}`, success: function (data) {
+                        let content = `<div class="p-2">${data}</div>`;
+                        instance.setContent(content);
+                    }
+                });
+            }
+        }
+    });
 }
 
 function details(event, tag) {

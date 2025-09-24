@@ -56,7 +56,7 @@ public class XmlFileUtils {
             JAXBContext context = getContext(type);
             context.createMarshaller().marshal(data, file);
         } catch (JAXBException e) {
-            logger.error("Unable to save to file",e);
+            logger.error("Unable to save to file", e);
             throw new RuntimeException("Unable to create JAXB context for " + type.getName(), e);
         }
     }

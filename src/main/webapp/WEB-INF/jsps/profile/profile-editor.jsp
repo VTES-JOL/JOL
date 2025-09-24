@@ -33,6 +33,7 @@
                         if (v !== digits) el.value = digits;
                     });
                 }
+
                 ['veknID', 'discordID'].forEach(function (id) {
                     const el = document.getElementById(id);
                     if (el) enforceDigitsOnly(el);

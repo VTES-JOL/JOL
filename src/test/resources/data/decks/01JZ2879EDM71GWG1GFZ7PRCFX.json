@@ -1,1 +1,212 @@
-{"deck":{"id":null,"name":null,"crypt":{"count":12,"cards":[{"id":201587,"name":"Farah Sarroub","count":2,"comments":null},{"id":201654,"name":"Tegyrius, Vizier (G6)","count":2,"comments":null},{"id":201604,"name":"Kassandra Tassaki","count":1,"comments":null},{"id":201594,"name":"Warmaksan","count":1,"comments":null},{"id":201656,"name":"Oluwafunmilayo","count":2,"comments":null},{"id":201599,"name":"Khadija Al-Kindi","count":1,"comments":null},{"id":201598,"name":"Kasim Bayar","count":2,"comments":null},{"id":201596,"name":"Kalinda (G6)","count":1,"comments":null}]},"library":{"count":42,"cards":[{"type":"Master","count":5,"cards":[{"id":102180,"name":"Wider View","count":1,"comments":null},{"id":100698,"name":"Fame","count":1,"comments":null},{"id":100860,"name":"Grooming the Protégé","count":2,"comments":null},{"id":101662,"name":"Rumor Mill, Tabloid Newspaper, The","count":1,"comments":null}]},{"type":"Action","count":4,"cards":[{"id":100747,"name":"Fleetness","count":4,"comments":null}]},{"type":"Action Modifier","count":2,"cards":[{"id":101318,"name":"Old Friends","count":2,"comments":null}]},{"type":"Combat","count":16,"cards":[{"id":102227,"name":"Hunger of Marduk","count":6,"comments":null},{"id":101523,"name":"Pursuit","count":4,"comments":null},{"id":101778,"name":"Side Strike","count":4,"comments":null},{"id":101588,"name":"Rego Motum","count":2,"comments":null}]},{"type":"Political Action","count":4,"cards":[{"id":101056,"name":"Kine Resources Contested","count":1,"comments":null},{"id":101353,"name":"Parity Shift","count":2,"comments":null},{"id":100570,"name":"Domain Challenge","count":1,"comments":null}]},{"type":"Reaction","count":7,"cards":[{"id":100618,"name":"Elder Intervention","count":2,"comments":null},{"id":101706,"name":"Second Tradition: Domain","count":5,"comments":null}]},{"type":"Action Modifier/Combat","count":4,"cards":[{"id":101913,"name":"Swallowed by the Night","count":4,"comments":null}]}]},"comments":""},"stats":{"cryptSize":12,"librarySize":42,"groups":["6"],"bannedCards":false,"summary":"Crypt: 12 Library: 42 Groups: 6"}}
+{
+  "deck": {
+    "id": null,
+    "name": null,
+    "crypt": {
+      "count": 12,
+      "cards": [
+        {
+          "id": 201587,
+          "name": "Farah Sarroub",
+          "count": 2,
+          "comments": null
+        },
+        {
+          "id": 201654,
+          "name": "Tegyrius, Vizier (G6)",
+          "count": 2,
+          "comments": null
+        },
+        {
+          "id": 201604,
+          "name": "Kassandra Tassaki",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201594,
+          "name": "Warmaksan",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201656,
+          "name": "Oluwafunmilayo",
+          "count": 2,
+          "comments": null
+        },
+        {
+          "id": 201599,
+          "name": "Khadija Al-Kindi",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201598,
+          "name": "Kasim Bayar",
+          "count": 2,
+          "comments": null
+        },
+        {
+          "id": 201596,
+          "name": "Kalinda (G6)",
+          "count": 1,
+          "comments": null
+        }
+      ]
+    },
+    "library": {
+      "count": 42,
+      "cards": [
+        {
+          "type": "Master",
+          "count": 5,
+          "cards": [
+            {
+              "id": 102180,
+              "name": "Wider View",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100698,
+              "name": "Fame",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100860,
+              "name": "Grooming the Protégé",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 101662,
+              "name": "Rumor Mill, Tabloid Newspaper, The",
+              "count": 1,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action",
+          "count": 4,
+          "cards": [
+            {
+              "id": 100747,
+              "name": "Fleetness",
+              "count": 4,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action Modifier",
+          "count": 2,
+          "cards": [
+            {
+              "id": 101318,
+              "name": "Old Friends",
+              "count": 2,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Combat",
+          "count": 16,
+          "cards": [
+            {
+              "id": 102227,
+              "name": "Hunger of Marduk",
+              "count": 6,
+              "comments": null
+            },
+            {
+              "id": 101523,
+              "name": "Pursuit",
+              "count": 4,
+              "comments": null
+            },
+            {
+              "id": 101778,
+              "name": "Side Strike",
+              "count": 4,
+              "comments": null
+            },
+            {
+              "id": 101588,
+              "name": "Rego Motum",
+              "count": 2,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Political Action",
+          "count": 4,
+          "cards": [
+            {
+              "id": 101056,
+              "name": "Kine Resources Contested",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 101353,
+              "name": "Parity Shift",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 100570,
+              "name": "Domain Challenge",
+              "count": 1,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Reaction",
+          "count": 7,
+          "cards": [
+            {
+              "id": 100618,
+              "name": "Elder Intervention",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 101706,
+              "name": "Second Tradition: Domain",
+              "count": 5,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action Modifier/Combat",
+          "count": 4,
+          "cards": [
+            {
+              "id": 101913,
+              "name": "Swallowed by the Night",
+              "count": 4,
+              "comments": null
+            }
+          ]
+        }
+      ]
+    },
+    "comments": ""
+  },
+  "stats": {
+    "cryptSize": 12,
+    "librarySize": 42,
+    "groups": [
+      "6"
+    ],
+    "bannedCards": false,
+    "summary": "Crypt: 12 Library: 42 Groups: 6"
+  }
+}

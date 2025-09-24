@@ -2,9 +2,10 @@
 <%@page contentType="text/html" %>
 <%@page pageEncoding="UTF-8" %>
 <%@ page import="net.deckserver.dwr.model.JolGame" %>
-<%@ page import="net.deckserver.game.storage.state.RegionType" %>
-<%@ page import="net.deckserver.game.interfaces.state.Card" %>
+<%@ page import="net.deckserver.storage.json.cards.RegionType" %>
 <%@ page import="net.deckserver.dwr.model.JolAdmin" %>
+<%@ page import="java.util.List" %>
+<%@ page import="net.deckserver.storage.json.game.CardData" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
     String viewer = (String) request.getAttribute("viewer");
@@ -20,31 +21,30 @@
     String collapsed = startCollapsed ? "collapsed" : "";
     String regionStyle = region == RegionType.TORPOR ? "bg-danger-subtle" : (region == RegionType.READY ? "bg-success-subtle" : "bg-body-secondary");
     int size = game.getSize(player, region);
-    Card[] cards = game.getState().getPlayerLocation(player, region).getCards();
+    List<CardData> cards = game.getData().getPlayerRegion(player, region).getCards();
     String regionName = region.xmlLabel().split(" ")[0];
     request.setAttribute("visible", isVisible);
     request.setAttribute("player", player);
 %>
 
-<c:if test="<%= cards.length > 0 %>">
-    <div id="<%= regionId %>-notes" class="d-none"><%= game.getRegionNotes(player, region, viewer) %></div>
+<c:if test="<%=!cards.isEmpty() %>">
     <div class="mb-2 text-bg-light" data-region="<%= regionName %>">
         <div class="p-2 d-flex justify-content-between align-items-center <%= regionStyle %>">
             <span>
-                <button class="btn btn-sm p-0 <%= collapsed %>" onclick="details(event, '<%= regionId %>');" data-bs-toggle="collapse" data-bs-target="#<%= regionId %>" aria-expanded="<%= isVisible %>" aria-controls="<%= regionId %>">
+                <button class="btn btn-sm p-0 <%= collapsed %>" onclick="details(event, '<%= regionId %>');"
+                        data-bs-toggle="collapse" data-bs-target="#<%= regionId %>" aria-expanded="<%= isVisible %>"
+                        aria-controls="<%= regionId %>">
                     <i class="fs-6 bi bi-plus-circle <%= startCollapsed ? "" :"d-none" %>"></i>
                     <i class="fs-6 bi bi-dash-circle <%= startCollapsed ? "d-none" : "" %>"></i>
                 </button>
                 <span class="fw-bold"><%= label %></span>
                 <span>( <%= size %> )</span>
             </span>
-            <button class="btn btn-sm p-0 d-none" onclick="regionCommands(event, '<%= regionId %>')">
-                <i class="fs-6 bi bi-info-circle"></i>
-            </button>
         </div>
-        <ol id="<%= regionId %>" class="region list-group list-group-flush list-group-numbered <%= regionStyle %> collapse <%= show %>">
+        <ol id="<%= regionId %>"
+            class="region list-group list-group-flush list-group-numbered <%= regionStyle %> collapse <%= show %>">
             <c:forEach items="<%= cards %>" var="card" varStatus="counter">
-                <c:if test="${!player.equals(card.owner)}">
+                <c:if test="${!player.equals(card.ownerName)}">
                     <c:set var="visible" value="true"/>
                 </c:if>
                 <c:choose>

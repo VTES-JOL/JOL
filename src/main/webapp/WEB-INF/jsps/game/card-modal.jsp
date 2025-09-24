@@ -6,19 +6,22 @@
         <div class="modal-content loaded" style="text-align:center">
             <div class="modal-header py-1 px-2 justify-content-between align-items-center">
                 <span class="d-flex align-items-center">
-                    <span class="card-clan"></span>
+                    <span class="card-clan m-2"></span>
                     <label for="clan-select" class="d-none"></label>
-                    <select id="clan-select" class="form-select form-select-sm ms-2 card-clan-select d-none" style="width:auto"></select>
+                    <select id="clan-select" class="form-select form-select-sm ms-2 card-clan-select d-none"
+                            style="width:auto"></select>
                     <span class="card-name fs-5" id="cardModalLabel"></span>
                     <span class="votes mx-2" title="Votes"></span>
                 </span>
                 <span class="d-flex align-items-center">
                     <span class="card-path"></span>
                     <label for="path-select" class="d-none"></label>
-                    <select id="path-select" class="form-select form-select-sm ms-2 card-path-select d-none" style="width:auto"></select>
-                    <span class="card-sect"></span>
+                    <select id="path-select" class="form-select form-select-sm ms-2 card-path-select d-none"
+                            style="width:auto"></select>
+                    <span class="card-sect m-2"></span>
                     <label for="sect-select" class="d-none"></label>
-                    <select id="sect-select" class="form-select form-select-sm ms-2 card-sect-select d-none" style="width:auto"></select>
+                    <select id="sect-select" class="form-select form-select-sm ms-2 card-sect-select d-none"
+                            style="width:auto"></select>
                     <span class="card-cost"></span>
                 </span>
             </div>
@@ -26,7 +29,8 @@
                 <img class="img-fluid" id="card-image" alt="card image" src=""/>
                 <div class="input-group mt-2">
                     <label for="card-label" class="input-group-text"><i class="bi bi-tag"></i></label>
-                    <input type="email" class="form-control" id="card-label" placeholder="Add a label for all players to see." onchange="updateNotes();">
+                    <input type="email" class="form-control" id="card-label"
+                           placeholder="Add a label for all players to see." onchange="updateNotes();">
                 </div>
             </div>
             <div class="modal-footer d-flex flex-wrap justify-content-center">
@@ -35,10 +39,12 @@
                         <div class="counters badge rounded-pill text-bg-secondary fs-5 gap-1 d-flex align-items-center"
                              title="Counters; click right side to increase, left to decrease">
                         </div>
-                        <div class="transfers transfer-btn transfer-btn-left fs-3" title="Transfer one pool to this card"
+                        <div class="transfers transfer-btn transfer-btn-left fs-3"
+                             title="Transfer one pool to this card"
                              onclick="transferToCard();">&#9668;
                         </div>
-                        <div class="transfers transfer-btn transfer-btn-right fs-3" title="Transfer one blood to your pool"
+                        <div class="transfers transfer-btn transfer-btn-right fs-3"
+                             title="Transfer one blood to your pool"
                              onclick="transferToPool();">&#9658;
                         </div>
                         <div class="transfers badge rounded-pill text-bg-danger fs-5 card-modal-pool">99 pool</div>

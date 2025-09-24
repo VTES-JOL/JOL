@@ -19,10 +19,17 @@ public class GameModel implements Comparable<GameModel> {
 
     @Getter
     private final String name;
+    private final boolean isPlayTest;
     private final Map<String, GameView> views = new HashMap<>();
 
     public GameModel(String name) {
         this.name = name;
+        this.isPlayTest = false;
+    }
+
+    public GameModel(String name, boolean isPlayTest) {
+        this.name = name;
+        this.isPlayTest = isPlayTest;
     }
 
     public synchronized String chat(String player, String chat) {

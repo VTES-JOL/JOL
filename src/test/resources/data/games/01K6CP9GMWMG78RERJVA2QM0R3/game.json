@@ -1,0 +1,5413 @@
+{
+  "id": "01K6CP9GMWMG78RERJVA2QM0R3",
+  "name": "Test Game",
+  "playerOrder": [
+    "Player3",
+    "Player4",
+    "Player5",
+    "Player1",
+    "Player2"
+  ],
+  "orderOfPlayReversed": false,
+  "turn": null,
+  "phase": "Unlock",
+  "notes": null,
+  "cards": {
+    "06bc661b-9d19-4c42-a0ed-e28a2d8cc30d": {
+      "id": "06bc661b-9d19-4c42-a0ed-e28a2d8cc30d",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101705",
+      "name": "Second Sight",
+      "type": "NONE"
+    },
+    "64b2f3ab-dfad-46df-86a9-980e5fc9e8a4": {
+      "id": "64b2f3ab-dfad-46df-86a9-980e5fc9e8a4",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "4bb26059-7124-453d-ab5b-648a0dff0391": {
+      "id": "4bb26059-7124-453d-ab5b-648a0dff0391",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101949",
+      "name": "Telepathic Misdirection",
+      "type": "REACTION"
+    },
+    "c472963f-ca05-44d7-a77c-516c079a40c4": {
+      "id": "c472963f-ca05-44d7-a77c-516c079a40c4",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101715",
+      "name": "Sengir Dagger",
+      "type": "EQUIPMENT",
+      "unique": true
+    },
+    "d2543db0-f55d-4676-905a-65e705463375": {
+      "id": "d2543db0-f55d-4676-905a-65e705463375",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100852",
+      "name": "Graverobbing",
+      "type": "ACTION"
+    },
+    "fda0fc10-3e4d-491a-a521-d0fcbed8c93a": {
+      "id": "fda0fc10-3e4d-491a-a521-d0fcbed8c93a",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200924",
+      "name": "Mariana Gilbert",
+      "type": "VAMPIRE",
+      "capacity": 4,
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "cel",
+        "PRE"
+      ]
+    },
+    "033b04ef-42c2-47fb-b8c4-80c22ed30dee": {
+      "id": "033b04ef-42c2-47fb-b8c4-80c22ed30dee",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100157",
+      "name": "Bewitching Oration",
+      "type": "MODIFIER"
+    },
+    "986ec68d-0d07-475b-ad7c-d9f223e05489": {
+      "id": "986ec68d-0d07-475b-ad7c-d9f223e05489",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101710",
+      "name": "Secret Passage",
+      "type": "MASTER"
+    },
+    "d587e62c-824e-4d9c-afa9-30cafbe1ce9d": {
+      "id": "d587e62c-824e-4d9c-afa9-30cafbe1ce9d",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "102144",
+      "name": "War Ghoul",
+      "type": "ALLY",
+      "clan": "TZIMISCE",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "5636bcf2-1091-42fe-af2f-67643849fe28": {
+      "id": "5636bcf2-1091-42fe-af2f-67643849fe28",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "102179",
+      "name": "White Phosphorus Grenade",
+      "type": "EQUIPMENT"
+    },
+    "9bca2bd8-879f-4780-a921-df544e18387e": {
+      "id": "9bca2bd8-879f-4780-a921-df544e18387e",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100685",
+      "name": "Eyes of the Night",
+      "type": "REACTION"
+    },
+    "a7d8d057-c534-4e18-af7f-e42347af60a7": {
+      "id": "a7d8d057-c534-4e18-af7f-e42347af60a7",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101705",
+      "name": "Second Sight",
+      "type": "NONE"
+    },
+    "831ed914-7d5b-4f59-b158-12d1659364ee": {
+      "id": "831ed914-7d5b-4f59-b158-12d1659364ee",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "200065",
+      "name": "Amaravati",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "chi",
+        "DOM",
+        "OBF",
+        "QUI"
+      ]
+    },
+    "fb2dfef9-bb7f-449e-964f-e40f14e31300": {
+      "id": "fb2dfef9-bb7f-449e-964f-e40f14e31300",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102165",
+      "name": "Web of Knives Recruit",
+      "type": "ACTION"
+    },
+    "0346f0d2-2484-4995-8f97-24e8ef2e9ce8": {
+      "id": "0346f0d2-2484-4995-8f97-24e8ef2e9ce8",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101698",
+      "name": "Scouting Mission",
+      "type": "ACTION"
+    },
+    "a79cce16-ae9c-476b-a696-db1e6d9ebe53": {
+      "id": "a79cce16-ae9c-476b-a696-db1e6d9ebe53",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102095",
+      "name": "Veil of Darkness",
+      "type": "EVENT"
+    },
+    "999c9a0c-d356-4a0c-96af-59fd68cd2202": {
+      "id": "999c9a0c-d356-4a0c-96af-59fd68cd2202",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "200003",
+      "name": "Aaron Duggan, Cameron's Toady",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "obt"
+      ]
+    },
+    "1cc878d8-af24-48eb-91b8-3a85c5b9915b": {
+      "id": "1cc878d8-af24-48eb-91b8-3a85c5b9915b",
+      "region": "Player5-Hand",
+      "owner": "Player5",
+      "cardId": "101491",
+      "name": "Procurer",
+      "type": "ALLY",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "6e8f912d-1d1f-4e21-95ec-352f77f4ef9d": {
+      "id": "6e8f912d-1d1f-4e21-95ec-352f77f4ef9d",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "REACTION"
+    },
+    "4950bcbe-7a42-4ae9-9e3f-80b7d56a0a00": {
+      "id": "4950bcbe-7a42-4ae9-9e3f-80b7d56a0a00",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101125",
+      "name": "Lost in Crowds",
+      "type": "MODIFIER"
+    },
+    "303ea11d-4b15-4f62-9397-822abb40c24d": {
+      "id": "303ea11d-4b15-4f62-9397-822abb40c24d",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101014",
+      "name": "Ivory Bow",
+      "type": "EQUIPMENT",
+      "unique": true
+    },
+    "2b1c2256-ce51-478d-979e-38c61c7d9432": {
+      "id": "2b1c2256-ce51-478d-979e-38c61c7d9432",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101259",
+      "name": "My Enemy's Enemy",
+      "type": "REACTION"
+    },
+    "38567522-15fb-4bcb-9a5b-6dfd4807c400": {
+      "id": "38567522-15fb-4bcb-9a5b-6dfd4807c400",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "200445",
+      "name": "Evan Rogers",
+      "type": "VAMPIRE",
+      "capacity": 3,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "cel",
+        "qui"
+      ]
+    },
+    "3add435a-a001-46be-926e-ec660f78e795": {
+      "id": "3add435a-a001-46be-926e-ec660f78e795",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100934",
+      "name": "Horrid Form",
+      "type": "COMBAT"
+    },
+    "ba3fc623-1d02-4670-a2d5-6ebfab374a25": {
+      "id": "ba3fc623-1d02-4670-a2d5-6ebfab374a25",
+      "region": "Player3-Uncontrolled region",
+      "owner": "Player3",
+      "cardId": "200788",
+      "name": "Klaus van der Veken",
+      "type": "VAMPIRE",
+      "capacity": 9,
+      "votes": "2",
+      "title": "prince",
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "obf",
+        "tha",
+        "CEL",
+        "PRE"
+      ]
+    },
+    "8ea43de0-20fa-4373-a10f-606a0721d717": {
+      "id": "8ea43de0-20fa-4373-a10f-606a0721d717",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "REACTION"
+    },
+    "216605a8-207f-4521-abc3-2a3920a80823": {
+      "id": "216605a8-207f-4521-abc3-2a3920a80823",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101886",
+      "name": "Strike with Conviction",
+      "type": "NONE"
+    },
+    "0b805879-bd4a-42b4-8d06-2aa9b70e24f4": {
+      "id": "0b805879-bd4a-42b4-8d06-2aa9b70e24f4",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100618",
+      "name": "Elder Intervention",
+      "type": "REACTION"
+    },
+    "729b801a-9f24-4965-acd0-f5acaf331510": {
+      "id": "729b801a-9f24-4965-acd0-f5acaf331510",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101309",
+      "name": "Obedience",
+      "type": "REACTION"
+    },
+    "d9df28f8-46e6-4ee7-9970-8259152e47af": {
+      "id": "d9df28f8-46e6-4ee7-9970-8259152e47af",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100984",
+      "name": "Information Highway",
+      "type": "MASTER",
+      "unique": true
+    },
+    "45e7693d-0401-4bef-8caa-710752879281": {
+      "id": "45e7693d-0401-4bef-8caa-710752879281",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101990",
+      "name": "Toreador Justicar",
+      "type": "POLITICAL"
+    },
+    "b275111d-8d8f-48ce-a255-6920126f530c": {
+      "id": "b275111d-8d8f-48ce-a255-6920126f530c",
+      "region": "Player1-Uncontrolled region",
+      "owner": "Player1",
+      "cardId": "200479",
+      "name": "François \"Warden\" Loehr",
+      "type": "IMBUED",
+      "capacity": 3,
+      "clan": "JUDGE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "def",
+        "jud"
+      ]
+    },
+    "e28bc32d-16e4-45a6-bdd2-68cf77b03fb4": {
+      "id": "e28bc32d-16e4-45a6-bdd2-68cf77b03fb4",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "df1eff20-da23-4d38-ba54-f3d7a3f915a0": {
+      "id": "df1eff20-da23-4d38-ba54-f3d7a3f915a0",
+      "region": "Player2-Hand",
+      "owner": "Player2",
+      "cardId": "100685",
+      "name": "Eyes of the Night",
+      "type": "REACTION"
+    },
+    "decf8e85-10c6-4127-a8f1-0077a35073f6": {
+      "id": "decf8e85-10c6-4127-a8f1-0077a35073f6",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102097",
+      "name": "Veil the Legions",
+      "type": "MODIFIER"
+    },
+    "9de8c553-b458-4d31-8d6e-6b3cb50cc758": {
+      "id": "9de8c553-b458-4d31-8d6e-6b3cb50cc758",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101491",
+      "name": "Procurer",
+      "type": "ALLY",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "c1f8ef92-7a6c-4806-8e66-0f7c696f1c1b": {
+      "id": "c1f8ef92-7a6c-4806-8e66-0f7c696f1c1b",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101779",
+      "name": "Sideslip",
+      "type": "COMBAT"
+    },
+    "06a7fc96-7863-4637-859f-db554976e5db": {
+      "id": "06a7fc96-7863-4637-859f-db554976e5db",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100572",
+      "name": "Dominate",
+      "type": "MASTER"
+    },
+    "d070acea-6d98-4b92-a230-4cf1468d3598": {
+      "id": "d070acea-6d98-4b92-a230-4cf1468d3598",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101654",
+      "name": "Rötschreck",
+      "type": "MASTER"
+    },
+    "cfaa6fda-5484-49ce-97e7-9766f13f339a": {
+      "id": "cfaa6fda-5484-49ce-97e7-9766f13f339a",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102097",
+      "name": "Veil the Legions",
+      "type": "MODIFIER"
+    },
+    "c0f84f0e-abc5-4bb2-aaf6-27dd06173533": {
+      "id": "c0f84f0e-abc5-4bb2-aaf6-27dd06173533",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "796503fd-eda4-480d-a178-62b36d167891": {
+      "id": "796503fd-eda4-480d-a178-62b36d167891",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "COMBAT"
+    },
+    "98cab067-824c-45ab-9919-9e619fd14b1c": {
+      "id": "98cab067-824c-45ab-9919-9e619fd14b1c",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "200656",
+      "name": "Jack \"Hannibal137\" Harmon",
+      "type": "IMBUED",
+      "capacity": 4,
+      "clan": "DEFENDER",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "def",
+        "jud"
+      ]
+    },
+    "ee5576a8-95b9-4cb8-8e0c-186a764f6dee": {
+      "id": "ee5576a8-95b9-4cb8-8e0c-186a764f6dee",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "102131",
+      "name": "Voter Captivation",
+      "type": "MODIFIER"
+    },
+    "76743da0-62a8-42ad-a3c9-a696c2ed5a16": {
+      "id": "76743da0-62a8-42ad-a3c9-a696c2ed5a16",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100588",
+      "name": "Dreams of the Sphinx",
+      "type": "MASTER",
+      "unique": true
+    },
+    "2474953a-6612-478d-b8c2-5d87b756a037": {
+      "id": "2474953a-6612-478d-b8c2-5d87b756a037",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101196",
+      "name": "Meld with the Land",
+      "type": "COMBAT"
+    },
+    "061f07a8-212c-4181-87c8-3a75cd28d62e": {
+      "id": "061f07a8-212c-4181-87c8-3a75cd28d62e",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "201157",
+      "name": "Ramiro",
+      "type": "VAMPIRE",
+      "capacity": 4,
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "dom",
+        "obt",
+        "vic"
+      ]
+    },
+    "445541ba-7239-41dd-b13a-dde3e36270e3": {
+      "id": "445541ba-7239-41dd-b13a-dde3e36270e3",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "200810",
+      "name": "Lambach",
+      "type": "VAMPIRE",
+      "capacity": 10,
+      "votes": "3",
+      "title": "cardinal",
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pre",
+        "ANI",
+        "AUS",
+        "DOM",
+        "VIC"
+      ]
+    },
+    "2b4ef9c2-4776-4c84-809d-5caa14aeb0d0": {
+      "id": "2b4ef9c2-4776-4c84-809d-5caa14aeb0d0",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101592",
+      "name": "Rejuvenate",
+      "type": "NONE"
+    },
+    "b0e0882c-3060-46e1-8a51-c9fbe378785d": {
+      "id": "b0e0882c-3060-46e1-8a51-c9fbe378785d",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101592",
+      "name": "Rejuvenate",
+      "type": "NONE"
+    },
+    "8e3d9929-834e-47ce-97c2-c71d79103e0a": {
+      "id": "8e3d9929-834e-47ce-97c2-c71d79103e0a",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101471",
+      "name": "Praxis Seizure: Venice",
+      "type": "POLITICAL"
+    },
+    "a8abd1df-5256-417d-b30d-93213b5031a2": {
+      "id": "a8abd1df-5256-417d-b30d-93213b5031a2",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100842",
+      "name": "Golconda: Inner Peace",
+      "type": "MASTER"
+    },
+    "0f0fc129-16f4-44b6-9d36-5b164472ef07": {
+      "id": "0f0fc129-16f4-44b6-9d36-5b164472ef07",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100573",
+      "name": "Dominate Kine",
+      "type": "ACTION"
+    },
+    "4f3ac25b-50ed-4b3d-8aa2-b3759969913a": {
+      "id": "4f3ac25b-50ed-4b3d-8aa2-b3759969913a",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101073",
+      "name": "Laptop Computer",
+      "type": "EQUIPMENT"
+    },
+    "b54f78e8-5fdf-4f8e-b977-fb62a5d06fd7": {
+      "id": "b54f78e8-5fdf-4f8e-b977-fb62a5d06fd7",
+      "region": "Player3-Hand",
+      "owner": "Player3",
+      "cardId": "100020",
+      "name": "Acrobatics",
+      "type": "COMBAT"
+    },
+    "147f0e0a-2bf2-46db-9130-330538eeadf6": {
+      "id": "147f0e0a-2bf2-46db-9130-330538eeadf6",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101821",
+      "name": "Society Hunting Ground",
+      "type": "MASTER",
+      "unique": true
+    },
+    "68ae6199-81cc-47e5-965c-995dc03dfee8": {
+      "id": "68ae6199-81cc-47e5-965c-995dc03dfee8",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "102131",
+      "name": "Voter Captivation",
+      "type": "MODIFIER"
+    },
+    "ed50b1ff-cdfa-4bce-8cd6-b7614b82818e": {
+      "id": "ed50b1ff-cdfa-4bce-8cd6-b7614b82818e",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101081",
+      "name": "Leather Jacket",
+      "type": "EQUIPMENT"
+    },
+    "7e0eb6ef-7d89-4037-bc1c-02e3b3dccc04": {
+      "id": "7e0eb6ef-7d89-4037-bc1c-02e3b3dccc04",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100698",
+      "name": "Fame",
+      "type": "MASTER",
+      "unique": true
+    },
+    "484bb6c0-9d8e-4cf3-b1d2-a421bd548675": {
+      "id": "484bb6c0-9d8e-4cf3-b1d2-a421bd548675",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "71db7a3a-423c-4f04-8442-edd1253da8fe": {
+      "id": "71db7a3a-423c-4f04-8442-edd1253da8fe",
+      "region": "Player1-Hand",
+      "owner": "Player1",
+      "cardId": "101886",
+      "name": "Strike with Conviction",
+      "type": "NONE"
+    },
+    "672fb102-ee04-4c5a-a16d-107966099def": {
+      "id": "672fb102-ee04-4c5a-a16d-107966099def",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100518",
+      "name": "Deflection",
+      "type": "REACTION"
+    },
+    "137dd89b-18cf-4de7-aac3-f48b4b2a7a2a": {
+      "id": "137dd89b-18cf-4de7-aac3-f48b4b2a7a2a",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102120",
+      "name": "Vigilance",
+      "type": "NONE"
+    },
+    "982dab3a-fbe1-4962-afc5-e41c3fa91616": {
+      "id": "982dab3a-fbe1-4962-afc5-e41c3fa91616",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102165",
+      "name": "Web of Knives Recruit",
+      "type": "ACTION"
+    },
+    "f80a89a6-0650-4d7d-82c2-fe45772cfb54": {
+      "id": "f80a89a6-0650-4d7d-82c2-fe45772cfb54",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102165",
+      "name": "Web of Knives Recruit",
+      "type": "ACTION"
+    },
+    "a90b0f51-ba2f-4c8a-a7f7-248dc645fd18": {
+      "id": "a90b0f51-ba2f-4c8a-a7f7-248dc645fd18",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "200818",
+      "name": "Layla bint-Nadr",
+      "type": "VAMPIRE",
+      "capacity": 5,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "qui",
+        "CEL",
+        "OBF"
+      ]
+    },
+    "48b5fa36-8c0c-4585-9f2f-af35cb8a553d": {
+      "id": "48b5fa36-8c0c-4585-9f2f-af35cb8a553d",
+      "region": "Player4-Hand",
+      "owner": "Player4",
+      "cardId": "101948",
+      "name": "Telepathic Counter",
+      "type": "REACTION"
+    },
+    "cfd31847-08be-40f6-9ecb-6ecb52a97a40": {
+      "id": "cfd31847-08be-40f6-9ecb-6ecb52a97a40",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100685",
+      "name": "Eyes of the Night",
+      "type": "REACTION"
+    },
+    "6f1afe70-5d42-4855-8987-d929f8c3e69e": {
+      "id": "6f1afe70-5d42-4855-8987-d929f8c3e69e",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101402",
+      "name": "Plasmic Form",
+      "type": "NONE"
+    },
+    "f479dd70-ab6a-4282-9fed-c67124b40935": {
+      "id": "f479dd70-ab6a-4282-9fed-c67124b40935",
+      "region": "Player2-Hand",
+      "owner": "Player2",
+      "cardId": "101735",
+      "name": "Shadow Body",
+      "type": "COMBAT"
+    },
+    "80b18395-33dd-4146-8e38-5fd2401f54f7": {
+      "id": "80b18395-33dd-4146-8e38-5fd2401f54f7",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "REACTION"
+    },
+    "36b5f66b-6a74-425e-b82d-089ad4fa4bf8": {
+      "id": "36b5f66b-6a74-425e-b82d-089ad4fa4bf8",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102079",
+      "name": "Unmasking, The",
+      "type": "EVENT"
+    },
+    "ae37c701-b663-4126-a31c-89e2f52aeca6": {
+      "id": "ae37c701-b663-4126-a31c-89e2f52aeca6",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100534",
+      "name": "Determine",
+      "type": "REACTION"
+    },
+    "1aca4f58-c321-444e-a4ae-64dc1c4d761c": {
+      "id": "1aca4f58-c321-444e-a4ae-64dc1c4d761c",
+      "region": "Player4-Hand",
+      "owner": "Player4",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "COMBAT"
+    },
+    "c4fdbdae-4f03-4194-8dfe-b530fec7dade": {
+      "id": "c4fdbdae-4f03-4194-8dfe-b530fec7dade",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100091",
+      "name": "Arms of the Abyss",
+      "type": "COMBAT"
+    },
+    "56e08faf-3cb9-42ad-a2c3-f6d76d45f225": {
+      "id": "56e08faf-3cb9-42ad-a2c3-f6d76d45f225",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101705",
+      "name": "Second Sight",
+      "type": "NONE"
+    },
+    "a00d8fd0-4526-47a2-baeb-12de79029a6f": {
+      "id": "a00d8fd0-4526-47a2-baeb-12de79029a6f",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100344",
+      "name": "Chiropteran Marauder",
+      "type": "COMBAT"
+    },
+    "790d9289-97f7-4f7f-8bc8-0e767f2684c0": {
+      "id": "790d9289-97f7-4f7f-8bc8-0e767f2684c0",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101801",
+      "name": "Slaughtering the Herd",
+      "type": "ACTION"
+    },
+    "c3631c28-aa65-4cb7-85a5-409e74c12a0c": {
+      "id": "c3631c28-aa65-4cb7-85a5-409e74c12a0c",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101014",
+      "name": "Ivory Bow",
+      "type": "EQUIPMENT",
+      "unique": true
+    },
+    "a9d32fef-81d4-4a9b-809d-688c2a346598": {
+      "id": "a9d32fef-81d4-4a9b-809d-688c2a346598",
+      "region": "Player2-Uncontrolled region",
+      "owner": "Player2",
+      "cardId": "201337",
+      "name": "Talley, The Hound",
+      "type": "VAMPIRE",
+      "capacity": 6,
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "dom",
+        "OBT",
+        "POT"
+      ]
+    },
+    "ba90c8c3-7d69-48e0-b33e-c6f970d65d02": {
+      "id": "ba90c8c3-7d69-48e0-b33e-c6f970d65d02",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100573",
+      "name": "Dominate Kine",
+      "type": "ACTION"
+    },
+    "f96e98c9-692b-4d5a-8cc9-f1c0c4903dab": {
+      "id": "f96e98c9-692b-4d5a-8cc9-f1c0c4903dab",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101654",
+      "name": "Rötschreck",
+      "type": "MASTER"
+    },
+    "fe2bae97-905f-4c73-a8c4-bcb220867300": {
+      "id": "fe2bae97-905f-4c73-a8c4-bcb220867300",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100863",
+      "name": "Guard Dogs",
+      "type": "REACTION"
+    },
+    "032e8cee-7ab7-4452-bab3-bf4e7d872d2f": {
+      "id": "032e8cee-7ab7-4452-bab3-bf4e7d872d2f",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100324",
+      "name": "Changeling",
+      "type": "MODIFIER"
+    },
+    "31998ee7-cb0b-431f-ac23-20bfb837e085": {
+      "id": "31998ee7-cb0b-431f-ac23-20bfb837e085",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100551",
+      "name": "Discern",
+      "type": "NONE"
+    },
+    "6d23957e-dfca-4e72-b01c-298cd5466112": {
+      "id": "6d23957e-dfca-4e72-b01c-298cd5466112",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "ACTION"
+    },
+    "f14ee986-52b4-4638-b0b2-704bb5787fff": {
+      "id": "f14ee986-52b4-4638-b0b2-704bb5787fff",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101491",
+      "name": "Procurer",
+      "type": "ALLY",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "084ee643-3035-4dc9-ad34-8a78035c153e": {
+      "id": "084ee643-3035-4dc9-ad34-8a78035c153e",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100037",
+      "name": "Alamut",
+      "type": "MASTER",
+      "unique": true
+    },
+    "46ba8c94-27fc-41f6-9a39-a998df0dbcfe": {
+      "id": "46ba8c94-27fc-41f6-9a39-a998df0dbcfe",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100551",
+      "name": "Discern",
+      "type": "NONE"
+    },
+    "06dadd06-57b5-4b4a-8ca2-da8ffb019d46": {
+      "id": "06dadd06-57b5-4b4a-8ca2-da8ffb019d46",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "200689",
+      "name": "Jennie \"Cassie247\" Orne",
+      "type": "IMBUED",
+      "capacity": 5,
+      "clan": "VISIONARY",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "inn",
+        "jud",
+        "viz"
+      ]
+    },
+    "c8cd17ff-8cd5-45ec-8db0-5026b387aa39": {
+      "id": "c8cd17ff-8cd5-45ec-8db0-5026b387aa39",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100131",
+      "name": "Banishment",
+      "type": "POLITICAL"
+    },
+    "09bde060-a6e5-4ae0-a8e5-62260cb9a22e": {
+      "id": "09bde060-a6e5-4ae0-a8e5-62260cb9a22e",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100588",
+      "name": "Dreams of the Sphinx",
+      "type": "MASTER",
+      "unique": true
+    },
+    "ce868423-2098-4423-9dae-2239b78c6c30": {
+      "id": "ce868423-2098-4423-9dae-2239b78c6c30",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100557",
+      "name": "Disputed Territory",
+      "type": "POLITICAL"
+    },
+    "256160dd-0fed-4ab6-9b0a-70a92e73f5cd": {
+      "id": "256160dd-0fed-4ab6-9b0a-70a92e73f5cd",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100085",
+      "name": "Archon Investigation",
+      "type": "MASTER"
+    },
+    "fa67598b-6a2b-4a00-a327-9e1923965ee2": {
+      "id": "fa67598b-6a2b-4a00-a327-9e1923965ee2",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100067",
+      "name": "Angel of Berlin",
+      "type": "MASTER"
+    },
+    "5ea16706-5b15-4855-9de6-17965f8b68ba": {
+      "id": "5ea16706-5b15-4855-9de6-17965f8b68ba",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101040",
+      "name": "Kevlar Vest",
+      "type": "EQUIPMENT"
+    },
+    "9134fba0-c61b-48cf-9657-575cf682511d": {
+      "id": "9134fba0-c61b-48cf-9657-575cf682511d",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101775",
+      "name": "Shroud of Night",
+      "type": "MODIFIER"
+    },
+    "5eef3f41-7946-4652-973f-186f81eb9f28": {
+      "id": "5eef3f41-7946-4652-973f-186f81eb9f28",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "REACTION"
+    },
+    "f3c2a081-9b0b-493b-9130-22e4de2ce954": {
+      "id": "f3c2a081-9b0b-493b-9130-22e4de2ce954",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "d2797bcf-9dd1-49e7-8006-2aebc126c5d8": {
+      "id": "d2797bcf-9dd1-49e7-8006-2aebc126c5d8",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "REACTION"
+    },
+    "56a59e1a-643f-4b0c-9373-9d47a2298326": {
+      "id": "56a59e1a-643f-4b0c-9373-9d47a2298326",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101091",
+      "name": "Legendary Vampire",
+      "type": "MASTER",
+      "unique": true
+    },
+    "73f9b4de-a7f7-43da-89c5-81432761dafe": {
+      "id": "73f9b4de-a7f7-43da-89c5-81432761dafe",
+      "region": "Player1-Hand",
+      "owner": "Player1",
+      "cardId": "102120",
+      "name": "Vigilance",
+      "type": "NONE"
+    },
+    "497243ef-fe9e-444a-9a9c-13f12f8ed203": {
+      "id": "497243ef-fe9e-444a-9a9c-13f12f8ed203",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101950",
+      "name": "Telepathic Tracking",
+      "type": "COMBAT"
+    },
+    "2f4f46f2-b6f6-4853-a976-4d821614da71": {
+      "id": "2f4f46f2-b6f6-4853-a976-4d821614da71",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100157",
+      "name": "Bewitching Oration",
+      "type": "MODIFIER"
+    },
+    "cebaac85-0e40-4840-8aa7-e1a57b0890b5": {
+      "id": "cebaac85-0e40-4840-8aa7-e1a57b0890b5",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "POLITICAL"
+    },
+    "16946572-264b-4a2a-a876-d338c4d29933": {
+      "id": "16946572-264b-4a2a-a876-d338c4d29933",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101634",
+      "name": "Riddle Phantastique",
+      "type": "ACTION"
+    },
+    "834b5291-5e47-4742-8461-4b91dfded566": {
+      "id": "834b5291-5e47-4742-8461-4b91dfded566",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100698",
+      "name": "Fame",
+      "type": "MASTER",
+      "unique": true
+    },
+    "67bfa613-ca60-49f2-b2ee-dbf803cf8c55": {
+      "id": "67bfa613-ca60-49f2-b2ee-dbf803cf8c55",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100572",
+      "name": "Dominate",
+      "type": "MASTER"
+    },
+    "063377c8-7672-435d-b895-639b3fe800d9": {
+      "id": "063377c8-7672-435d-b895-639b3fe800d9",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "d071131f-41f8-43a6-afe4-62d777591aaf": {
+      "id": "d071131f-41f8-43a6-afe4-62d777591aaf",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "102131",
+      "name": "Voter Captivation",
+      "type": "MODIFIER"
+    },
+    "a9afde11-6367-4648-afd2-c79991885a24": {
+      "id": "a9afde11-6367-4648-afd2-c79991885a24",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100177",
+      "name": "Blanket of Night",
+      "type": "MODIFIER"
+    },
+    "1802eba5-e0b6-491e-9597-89f6053020bf": {
+      "id": "1802eba5-e0b6-491e-9597-89f6053020bf",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101144",
+      "name": "Majesty",
+      "type": "COMBAT"
+    },
+    "e6f44176-4cf9-4895-b8a7-3cbf4fed3c46": {
+      "id": "e6f44176-4cf9-4895-b8a7-3cbf4fed3c46",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "201375",
+      "name": "Tobias Smith",
+      "type": "VAMPIRE",
+      "capacity": 7,
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pot",
+        "DOM",
+        "OBT",
+        "PRE"
+      ]
+    },
+    "bebcbb94-5875-482b-a873-604581248373": {
+      "id": "bebcbb94-5875-482b-a873-604581248373",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100344",
+      "name": "Chiropteran Marauder",
+      "type": "COMBAT"
+    },
+    "1a8d8f0c-115f-484b-9e56-e3e12efaa466": {
+      "id": "1a8d8f0c-115f-484b-9e56-e3e12efaa466",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "8f00820f-424a-40c9-b240-afd9211ff6e1": {
+      "id": "8f00820f-424a-40c9-b240-afd9211ff6e1",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100031",
+      "name": "Aire of Elation",
+      "type": "MODIFIER"
+    },
+    "018cdb85-379c-4f1e-bf78-e826e6fd1168": {
+      "id": "018cdb85-379c-4f1e-bf78-e826e6fd1168",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100177",
+      "name": "Blanket of Night",
+      "type": "MODIFIER"
+    },
+    "f0ea7529-4dd8-4cf4-b1c1-c4c9e44ad450": {
+      "id": "f0ea7529-4dd8-4cf4-b1c1-c4c9e44ad450",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101145",
+      "name": "Major Boon",
+      "type": "MASTER"
+    },
+    "090f75ff-9f61-40e5-b750-e3022f68b15e": {
+      "id": "090f75ff-9f61-40e5-b750-e3022f68b15e",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100934",
+      "name": "Horrid Form",
+      "type": "COMBAT"
+    },
+    "c0eb9518-a806-49e1-a4cc-ed57289b0ff6": {
+      "id": "c0eb9518-a806-49e1-a4cc-ed57289b0ff6",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100344",
+      "name": "Chiropteran Marauder",
+      "type": "COMBAT"
+    },
+    "4fd3d765-8fb1-4ddf-861d-55e3423c2be2": {
+      "id": "4fd3d765-8fb1-4ddf-861d-55e3423c2be2",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100020",
+      "name": "Acrobatics",
+      "type": "COMBAT"
+    },
+    "8d423856-cf9c-4882-b2ba-8b50f3d2d925": {
+      "id": "8d423856-cf9c-4882-b2ba-8b50f3d2d925",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "POLITICAL"
+    },
+    "160d60a7-9e92-480d-8ab6-c9fd67b3edfc": {
+      "id": "160d60a7-9e92-480d-8ab6-c9fd67b3edfc",
+      "region": "Player3-Uncontrolled region",
+      "owner": "Player3",
+      "cardId": "200107",
+      "name": "Anson",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "2",
+      "title": "prince",
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "dom",
+        "CEL",
+        "PRE"
+      ]
+    },
+    "dc3416c4-27b8-4b03-8854-f7c3a6d24937": {
+      "id": "dc3416c4-27b8-4b03-8854-f7c3a6d24937",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100984",
+      "name": "Information Highway",
+      "type": "MASTER",
+      "unique": true
+    },
+    "e9c3a910-9096-4d5c-9fc2-89a509daa044": {
+      "id": "e9c3a910-9096-4d5c-9fc2-89a509daa044",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102074",
+      "name": "Unity",
+      "type": "MASTER",
+      "unique": true
+    },
+    "faa3ecc4-177e-45d5-8249-500dc537bccb": {
+      "id": "faa3ecc4-177e-45d5-8249-500dc537bccb",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "83cc6420-c82e-43db-86c5-2579be75e83a": {
+      "id": "83cc6420-c82e-43db-86c5-2579be75e83a",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101019",
+      "name": "Jake Washington",
+      "type": "MASTER",
+      "unique": true
+    },
+    "dc7ba5a4-9269-4784-b85d-92f312a440ab": {
+      "id": "dc7ba5a4-9269-4784-b85d-92f312a440ab",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101822",
+      "name": "Society of Leopold",
+      "type": "MASTER",
+      "unique": true
+    },
+    "6c91bdf9-c1cc-4416-81e9-457e25469815": {
+      "id": "6c91bdf9-c1cc-4416-81e9-457e25469815",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101693",
+      "name": "Scorpion Sting",
+      "type": "COMBAT"
+    },
+    "84b2f924-582d-4bcf-8bfd-d53e83b50992": {
+      "id": "84b2f924-582d-4bcf-8bfd-d53e83b50992",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100474",
+      "name": "Crusader Sword, The",
+      "type": "EQUIPMENT",
+      "unique": true
+    },
+    "70a3a9af-bb5d-46c7-81c3-53032926543a": {
+      "id": "70a3a9af-bb5d-46c7-81c3-53032926543a",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101735",
+      "name": "Shadow Body",
+      "type": "COMBAT"
+    },
+    "17d15f54-d769-44bc-ac6a-1a16d33387ed": {
+      "id": "17d15f54-d769-44bc-ac6a-1a16d33387ed",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "200603",
+      "name": "Horatio",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "vic"
+      ]
+    },
+    "67bd3501-bba3-47ab-a698-3c14ff4b95f1": {
+      "id": "67bd3501-bba3-47ab-a698-3c14ff4b95f1",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "200534",
+      "name": "Gratiano",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "P",
+      "title": "priscus",
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "obf",
+        "pot",
+        "DOM",
+        "OBT"
+      ]
+    },
+    "af7092f3-da7f-42af-a971-a6d4f1c8a2d1": {
+      "id": "af7092f3-da7f-42af-a971-a6d4f1c8a2d1",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100573",
+      "name": "Dominate Kine",
+      "type": "ACTION"
+    },
+    "cbf9c9c3-9148-4674-a179-9bbae4395787": {
+      "id": "cbf9c9c3-9148-4674-a179-9bbae4395787",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100095",
+      "name": "Art Museum",
+      "type": "MASTER",
+      "unique": true
+    },
+    "94ca764d-2193-48a4-aaf5-f1acb940a7d1": {
+      "id": "94ca764d-2193-48a4-aaf5-f1acb940a7d1",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100344",
+      "name": "Chiropteran Marauder",
+      "type": "COMBAT"
+    },
+    "7c5bc17e-f208-4f14-91a4-2c973548fe60": {
+      "id": "7c5bc17e-f208-4f14-91a4-2c973548fe60",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "3c26878a-cb35-4b6f-8c12-6bb6f94a876a": {
+      "id": "3c26878a-cb35-4b6f-8c12-6bb6f94a876a",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101559",
+      "name": "Read the Winds",
+      "type": "REACTION"
+    },
+    "42ef293a-8a82-4374-870f-791b2c5ffa23": {
+      "id": "42ef293a-8a82-4374-870f-791b2c5ffa23",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100037",
+      "name": "Alamut",
+      "type": "MASTER",
+      "unique": true
+    },
+    "095b267f-9f76-4fe2-a009-fb54bbf723a1": {
+      "id": "095b267f-9f76-4fe2-a009-fb54bbf723a1",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100934",
+      "name": "Horrid Form",
+      "type": "COMBAT"
+    },
+    "68501eba-04ea-46ff-a9e3-3beacbaace25": {
+      "id": "68501eba-04ea-46ff-a9e3-3beacbaace25",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101743",
+      "name": "Shadow Play",
+      "type": "MODIFIER"
+    },
+    "3d727c28-fa4b-49d0-9e3f-da61e93e8f6f": {
+      "id": "3d727c28-fa4b-49d0-9e3f-da61e93e8f6f",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101067",
+      "name": "KRCG News Radio",
+      "type": "MASTER",
+      "unique": true
+    },
+    "0b768172-ba75-44e2-ab0d-964af62d44d1": {
+      "id": "0b768172-ba75-44e2-ab0d-964af62d44d1",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "200656",
+      "name": "Jack \"Hannibal137\" Harmon",
+      "type": "IMBUED",
+      "capacity": 4,
+      "clan": "DEFENDER",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "def",
+        "jud"
+      ]
+    },
+    "16bd14dc-1ffb-4972-8d7b-bd4a2e722376": {
+      "id": "16bd14dc-1ffb-4972-8d7b-bd4a2e722376",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101402",
+      "name": "Plasmic Form",
+      "type": "NONE"
+    },
+    "26ec7ae4-4049-4a20-a12b-c8848080e9c2": {
+      "id": "26ec7ae4-4049-4a20-a12b-c8848080e9c2",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100131",
+      "name": "Banishment",
+      "type": "POLITICAL"
+    },
+    "d0fcf838-a87a-4c28-b696-1334da63af5c": {
+      "id": "d0fcf838-a87a-4c28-b696-1334da63af5c",
+      "region": "Player4-Hand",
+      "owner": "Player4",
+      "cardId": "101402",
+      "name": "Plasmic Form",
+      "type": "NONE"
+    },
+    "71dab900-b014-4d84-8d0e-a022471ba32e": {
+      "id": "71dab900-b014-4d84-8d0e-a022471ba32e",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "50482cd9-bc68-4047-8241-2c2e1d0c4d16": {
+      "id": "50482cd9-bc68-4047-8241-2c2e1d0c4d16",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101654",
+      "name": "Rötschreck",
+      "type": "MASTER"
+    },
+    "05bc5c33-8e9a-4534-9461-a682756d64a1": {
+      "id": "05bc5c33-8e9a-4534-9461-a682756d64a1",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "REACTION"
+    },
+    "9b56e386-6c62-4654-8b97-2dc237cfd0cf": {
+      "id": "9b56e386-6c62-4654-8b97-2dc237cfd0cf",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "201319",
+      "name": "Stravinsky",
+      "type": "VAMPIRE",
+      "capacity": 9,
+      "votes": "2",
+      "title": "archbishop",
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pot",
+        "ANI",
+        "AUS",
+        "VIC"
+      ]
+    },
+    "81be4333-d63f-4d9d-9031-f537b311966e": {
+      "id": "81be4333-d63f-4d9d-9031-f537b311966e",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100903",
+      "name": "Heart of Nizchetus",
+      "type": "EQUIPMENT",
+      "unique": true
+    },
+    "68c7df84-42df-4c9f-bda4-cc6bf4a87a55": {
+      "id": "68c7df84-42df-4c9f-bda4-cc6bf4a87a55",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "200810",
+      "name": "Lambach",
+      "type": "VAMPIRE",
+      "capacity": 10,
+      "votes": "3",
+      "title": "cardinal",
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pre",
+        "ANI",
+        "AUS",
+        "DOM",
+        "VIC"
+      ]
+    },
+    "6df4c0fd-e15c-4330-9115-ba6e09b8474c": {
+      "id": "6df4c0fd-e15c-4330-9115-ba6e09b8474c",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100934",
+      "name": "Horrid Form",
+      "type": "COMBAT"
+    },
+    "5b059616-52b3-4e10-a99e-73e862b3a041": {
+      "id": "5b059616-52b3-4e10-a99e-73e862b3a041",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100703",
+      "name": "Far Mastery",
+      "type": "ACTION"
+    },
+    "a6680ed1-c695-468e-9041-590473834e4a": {
+      "id": "a6680ed1-c695-468e-9041-590473834e4a",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101215",
+      "name": "Puppet Master",
+      "type": "ACTION"
+    },
+    "72860a05-cec8-4e02-9c10-fb098c439dc3": {
+      "id": "72860a05-cec8-4e02-9c10-fb098c439dc3",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101886",
+      "name": "Strike with Conviction",
+      "type": "NONE"
+    },
+    "6a0ed19b-f0f9-4ac5-a9af-b85ce1edd2bb": {
+      "id": "6a0ed19b-f0f9-4ac5-a9af-b85ce1edd2bb",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101144",
+      "name": "Majesty",
+      "type": "COMBAT"
+    },
+    "3dd9590e-47f2-4890-9a1b-7f7b2bfa3f67": {
+      "id": "3dd9590e-47f2-4890-9a1b-7f7b2bfa3f67",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100863",
+      "name": "Guard Dogs",
+      "type": "REACTION"
+    },
+    "e59621fb-8f7c-4c79-9451-eecce46b416a": {
+      "id": "e59621fb-8f7c-4c79-9451-eecce46b416a",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "201319",
+      "name": "Stravinsky",
+      "type": "VAMPIRE",
+      "capacity": 9,
+      "votes": "2",
+      "title": "archbishop",
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pot",
+        "ANI",
+        "AUS",
+        "VIC"
+      ]
+    },
+    "ce807294-775a-4426-8976-53b260857316": {
+      "id": "ce807294-775a-4426-8976-53b260857316",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100322",
+      "name": "Champion",
+      "type": "NONE"
+    },
+    "810afe3e-9936-463e-ac69-a4c91c9a3b18": {
+      "id": "810afe3e-9936-463e-ac69-a4c91c9a3b18",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "102002",
+      "name": "Toy Chest Test",
+      "type": "MASTER"
+    },
+    "44406512-4c0a-4caf-a635-8f4fce5820e2": {
+      "id": "44406512-4c0a-4caf-a635-8f4fce5820e2",
+      "region": "Player1-Hand",
+      "owner": "Player1",
+      "cardId": "101886",
+      "name": "Strike with Conviction",
+      "type": "NONE"
+    },
+    "4fb76ab5-b3eb-4ec8-8267-a66ae96f3bd1": {
+      "id": "4fb76ab5-b3eb-4ec8-8267-a66ae96f3bd1",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "REACTION"
+    },
+    "1d85d817-08e7-4b4b-be28-f58a0ac17fcd": {
+      "id": "1d85d817-08e7-4b4b-be28-f58a0ac17fcd",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100799",
+      "name": "Gambit Accepted",
+      "type": "MASTER"
+    },
+    "d7c12ffd-dd41-4298-a94d-8f876ddde0e8": {
+      "id": "d7c12ffd-dd41-4298-a94d-8f876ddde0e8",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "316282a7-4007-4882-a93e-70f248a40de9": {
+      "id": "316282a7-4007-4882-a93e-70f248a40de9",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101193",
+      "name": "Media Influence",
+      "type": "ACTION"
+    },
+    "5e3802f6-fad9-4035-953e-d43d78501892": {
+      "id": "5e3802f6-fad9-4035-953e-d43d78501892",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100557",
+      "name": "Disputed Territory",
+      "type": "POLITICAL"
+    },
+    "0171474e-a14c-4112-b125-70a0c102e151": {
+      "id": "0171474e-a14c-4112-b125-70a0c102e151",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101896",
+      "name": "Sudden Reversal",
+      "type": "MASTER"
+    },
+    "cca3718d-9c63-402e-8574-fd00c00f188b": {
+      "id": "cca3718d-9c63-402e-8574-fd00c00f188b",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "f1c5ec05-6993-461a-a1e5-3a0b667be528": {
+      "id": "f1c5ec05-6993-461a-a1e5-3a0b667be528",
+      "region": "Player3-Hand",
+      "owner": "Player3",
+      "cardId": "102004",
+      "name": "Tradition Upheld",
+      "type": "POLITICAL"
+    },
+    "eb73ab2a-c9a0-4d56-b2cb-e68663b4629b": {
+      "id": "eb73ab2a-c9a0-4d56-b2cb-e68663b4629b",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101417",
+      "name": "Political Stranglehold",
+      "type": "POLITICAL"
+    },
+    "bf1feb04-4ee9-4e1f-ad26-ee01f1fa2f6e": {
+      "id": "bf1feb04-4ee9-4e1f-ad26-ee01f1fa2f6e",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100401",
+      "name": "Conditioning",
+      "type": "MODIFIER"
+    },
+    "c7ced527-a393-491a-b431-a34bb2ac783f": {
+      "id": "c7ced527-a393-491a-b431-a34bb2ac783f",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100326",
+      "name": "Chanjelin Ward",
+      "type": "MASTER"
+    },
+    "b4ff6347-a375-4f43-ac3e-14caef1ef027": {
+      "id": "b4ff6347-a375-4f43-ac3e-14caef1ef027",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101801",
+      "name": "Slaughtering the Herd",
+      "type": "ACTION"
+    },
+    "d14a4e28-d093-4909-8090-9fdf12e85f20": {
+      "id": "d14a4e28-d093-4909-8090-9fdf12e85f20",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100573",
+      "name": "Dominate Kine",
+      "type": "ACTION"
+    },
+    "9ea42215-cd6a-4dee-a599-14dacf007c7f": {
+      "id": "9ea42215-cd6a-4dee-a599-14dacf007c7f",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "REACTION"
+    },
+    "336184f6-082c-467a-ae0e-8c5226371a5a": {
+      "id": "336184f6-082c-467a-ae0e-8c5226371a5a",
+      "region": "Player4-Hand",
+      "owner": "Player4",
+      "cardId": "100290",
+      "name": "Canine Horde",
+      "type": "COMBAT"
+    },
+    "4baba8d2-3b8d-4d5c-957d-0faa374db7f9": {
+      "id": "4baba8d2-3b8d-4d5c-957d-0faa374db7f9",
+      "region": "Player5-Hand",
+      "owner": "Player5",
+      "cardId": "101491",
+      "name": "Procurer",
+      "type": "ALLY",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "91a172ff-ac28-4106-8d82-2f66940e4c45": {
+      "id": "91a172ff-ac28-4106-8d82-2f66940e4c45",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100581",
+      "name": "Dragonbound",
+      "type": "EVENT"
+    },
+    "15ead4ac-fc9d-442c-ae50-e46bf2a29a7d": {
+      "id": "15ead4ac-fc9d-442c-ae50-e46bf2a29a7d",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100573",
+      "name": "Dominate Kine",
+      "type": "ACTION"
+    },
+    "4a9bad7e-d726-4cca-990f-323b99ff3b76": {
+      "id": "4a9bad7e-d726-4cca-990f-323b99ff3b76",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101875",
+      "name": "Stone Travel",
+      "type": "MODIFIER"
+    },
+    "275c6c01-3456-4843-a701-56f0c0378f9e": {
+      "id": "275c6c01-3456-4843-a701-56f0c0378f9e",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "ACTION"
+    },
+    "5cf98b1c-10e5-42ac-96f0-f80bf94cbc9e": {
+      "id": "5cf98b1c-10e5-42ac-96f0-f80bf94cbc9e",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100545",
+      "name": "Direct Intervention",
+      "type": "MASTER"
+    },
+    "c5cb3594-989d-46e5-8838-ba4ad153a511": {
+      "id": "c5cb3594-989d-46e5-8838-ba4ad153a511",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101931",
+      "name": "Talbot's Chainsaw",
+      "type": "EQUIPMENT",
+      "unique": true
+    },
+    "a4307cba-7885-494d-b596-6de1efbfeaa4": {
+      "id": "a4307cba-7885-494d-b596-6de1efbfeaa4",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "200914",
+      "name": "Marconius",
+      "type": "VAMPIRE",
+      "capacity": 9,
+      "votes": "2",
+      "title": "archbishop",
+      "clan": "KIASYD",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pot",
+        "DOM",
+        "MYT",
+        "OBT"
+      ]
+    },
+    "d2ee9160-d141-42e5-b869-fb626e1dc8c0": {
+      "id": "d2ee9160-d141-42e5-b869-fb626e1dc8c0",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101557",
+      "name": "React with Conviction",
+      "type": "NONE"
+    },
+    "2b07162d-dcc8-4687-ab9e-7a035af81ed8": {
+      "id": "2b07162d-dcc8-4687-ab9e-7a035af81ed8",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "REACTION"
+    },
+    "e854d36f-abd8-4030-a91b-8d65723670d1": {
+      "id": "e854d36f-abd8-4030-a91b-8d65723670d1",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "ACTION"
+    },
+    "6079d9bd-010f-4a6c-8c1e-af85a1cf76de": {
+      "id": "6079d9bd-010f-4a6c-8c1e-af85a1cf76de",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101950",
+      "name": "Telepathic Tracking",
+      "type": "COMBAT"
+    },
+    "a82d45dc-2e19-4b72-9cff-545d16910ad8": {
+      "id": "a82d45dc-2e19-4b72-9cff-545d16910ad8",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "0f6c0c23-81d8-4b3c-b91c-c24da7540175": {
+      "id": "0f6c0c23-81d8-4b3c-b91c-c24da7540175",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101550",
+      "name": "Raven Spy",
+      "type": "RETAINER",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "ac62410f-c907-4f03-adfb-fb6a2d00a835": {
+      "id": "ac62410f-c907-4f03-adfb-fb6a2d00a835",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "COMBAT"
+    },
+    "14072c04-e56a-48be-89e4-4e88524c8d61": {
+      "id": "14072c04-e56a-48be-89e4-4e88524c8d61",
+      "region": "Player2-Hand",
+      "owner": "Player2",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "616e29fa-0ae7-4fb3-898e-9125a0c57014": {
+      "id": "616e29fa-0ae7-4fb3-898e-9125a0c57014",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100067",
+      "name": "Angel of Berlin",
+      "type": "MASTER"
+    },
+    "1af4580f-6f5d-48eb-83e2-f0cc5008d971": {
+      "id": "1af4580f-6f5d-48eb-83e2-f0cc5008d971",
+      "region": "Player4-Uncontrolled region",
+      "owner": "Player4",
+      "cardId": "201244",
+      "name": "Sascha Vykos, The Angel of Caine",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "P",
+      "title": "priscus",
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "dom",
+        "AUS",
+        "THA",
+        "VIC"
+      ]
+    },
+    "eb281f62-2540-4b6b-b140-f1259bc36ad7": {
+      "id": "eb281f62-2540-4b6b-b140-f1259bc36ad7",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101705",
+      "name": "Second Sight",
+      "type": "NONE"
+    },
+    "5b9b8179-0d9f-43ec-995c-a93803000857": {
+      "id": "5b9b8179-0d9f-43ec-995c-a93803000857",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100598",
+      "name": "Eagle's Sight",
+      "type": "REACTION"
+    },
+    "d30d4bc7-b3e2-4061-9094-760ef91b160c": {
+      "id": "d30d4bc7-b3e2-4061-9094-760ef91b160c",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100067",
+      "name": "Angel of Berlin",
+      "type": "MASTER"
+    },
+    "238bc5d2-6df8-4f31-899a-b9005442f040": {
+      "id": "238bc5d2-6df8-4f31-899a-b9005442f040",
+      "region": "Player5-Uncontrolled region",
+      "owner": "Player5",
+      "cardId": "201426",
+      "name": "Vardar Vardarian",
+      "type": "VAMPIRE",
+      "capacity": 6,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "cel",
+        "pre",
+        "OBF",
+        "QUI"
+      ]
+    },
+    "050140ff-4e9d-4b40-b66b-590096890f93": {
+      "id": "050140ff-4e9d-4b40-b66b-590096890f93",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "REACTION"
+    },
+    "b520748d-fd43-4326-92d0-5bb02fc08f2a": {
+      "id": "b520748d-fd43-4326-92d0-5bb02fc08f2a",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100986",
+      "name": "Inner Essence",
+      "type": "COMBAT"
+    },
+    "3a80ce2f-e193-4ce9-bde8-1af384f2ca82": {
+      "id": "3a80ce2f-e193-4ce9-bde8-1af384f2ca82",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100885",
+      "name": "Haqim's Law: Leadership",
+      "type": "ACTION"
+    },
+    "da2c7819-8e91-4b6d-ac9f-f891a6069047": {
+      "id": "da2c7819-8e91-4b6d-ac9f-f891a6069047",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200910",
+      "name": "Marcellus",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "2",
+      "title": "prince",
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pro",
+        "AUS",
+        "CEL"
+      ]
+    },
+    "cb975ac0-8262-4be9-9dca-566466c3cacf": {
+      "id": "cb975ac0-8262-4be9-9dca-566466c3cacf",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "f3d33a91-2c15-4c42-b5b8-5ec0eab3a8c4": {
+      "id": "f3d33a91-2c15-4c42-b5b8-5ec0eab3a8c4",
+      "region": "Player2-Hand",
+      "owner": "Player2",
+      "cardId": "100852",
+      "name": "Graverobbing",
+      "type": "ACTION"
+    },
+    "21ddacfd-1356-4c46-a3b3-6ff7e2a7f180": {
+      "id": "21ddacfd-1356-4c46-a3b3-6ff7e2a7f180",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100067",
+      "name": "Angel of Berlin",
+      "type": "MASTER"
+    },
+    "ad483aa9-8fe6-4cc6-8ca2-c5f83e1e69ba": {
+      "id": "ad483aa9-8fe6-4cc6-8ca2-c5f83e1e69ba",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101856",
+      "name": "Sport Bike",
+      "type": "EQUIPMENT"
+    },
+    "536ae22c-e882-419d-8704-006eb553e477": {
+      "id": "536ae22c-e882-419d-8704-006eb553e477",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "REACTION"
+    },
+    "00f5ec04-04d3-426d-8720-3c406c97ef23": {
+      "id": "00f5ec04-04d3-426d-8720-3c406c97ef23",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "ACTION"
+    },
+    "fc6cac88-9dac-46aa-8d12-a3fb4aa039ff": {
+      "id": "fc6cac88-9dac-46aa-8d12-a3fb4aa039ff",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "POLITICAL"
+    },
+    "684da46d-ef77-4ca3-9127-c8babe74af6b": {
+      "id": "684da46d-ef77-4ca3-9127-c8babe74af6b",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200368",
+      "name": "Dorian Strack",
+      "type": "VAMPIRE",
+      "capacity": 4,
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "cel",
+        "AUS"
+      ]
+    },
+    "8988f6ed-153b-4380-8cce-66932ae0618d": {
+      "id": "8988f6ed-153b-4380-8cce-66932ae0618d",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100362",
+      "name": "Cloak the Gathering",
+      "type": "MODIFIER"
+    },
+    "4f8b7d6b-0588-4842-9a75-5086652a04b4": {
+      "id": "4f8b7d6b-0588-4842-9a75-5086652a04b4",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101850",
+      "name": "Spirit's Touch",
+      "type": "REACTION"
+    },
+    "7bfa9d8d-ee51-4449-808c-4bd95f766f94": {
+      "id": "7bfa9d8d-ee51-4449-808c-4bd95f766f94",
+      "region": "Player5-Hand",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "212430a5-8ac5-4a4a-bbe2-be692aa8fac6": {
+      "id": "212430a5-8ac5-4a4a-bbe2-be692aa8fac6",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101654",
+      "name": "Rötschreck",
+      "type": "MASTER"
+    },
+    "0722a406-1b37-4550-b56a-b6fcc2d2eb0c": {
+      "id": "0722a406-1b37-4550-b56a-b6fcc2d2eb0c",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "200914",
+      "name": "Marconius",
+      "type": "VAMPIRE",
+      "capacity": 9,
+      "votes": "2",
+      "title": "archbishop",
+      "clan": "KIASYD",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pot",
+        "DOM",
+        "MYT",
+        "OBT"
+      ]
+    },
+    "5c6410ce-a9aa-4d42-9c05-a723579efbec": {
+      "id": "5c6410ce-a9aa-4d42-9c05-a723579efbec",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100570",
+      "name": "Domain Challenge",
+      "type": "POLITICAL"
+    },
+    "833a9eb8-ee37-47b8-a647-780785eb5285": {
+      "id": "833a9eb8-ee37-47b8-a647-780785eb5285",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101801",
+      "name": "Slaughtering the Herd",
+      "type": "ACTION"
+    },
+    "5f89c1a9-ae48-4b82-8b1e-ca4064d71eea": {
+      "id": "5f89c1a9-ae48-4b82-8b1e-ca4064d71eea",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101125",
+      "name": "Lost in Crowds",
+      "type": "MODIFIER"
+    },
+    "2b758e9f-5cfa-4628-9d5b-aa3fc607ffe6": {
+      "id": "2b758e9f-5cfa-4628-9d5b-aa3fc607ffe6",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101215",
+      "name": "Puppet Master",
+      "type": "ACTION"
+    },
+    "41156e79-b25c-46b6-9110-4be83d4e27cc": {
+      "id": "41156e79-b25c-46b6-9110-4be83d4e27cc",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100727",
+      "name": "Fifth Tradition: Hospitality",
+      "type": "ACTION"
+    },
+    "e372f4b6-6e29-4d9d-8827-a9b809001d11": {
+      "id": "e372f4b6-6e29-4d9d-8827-a9b809001d11",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200478",
+      "name": "François Villon",
+      "type": "VAMPIRE",
+      "capacity": 10,
+      "votes": "2",
+      "title": "prince",
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "chi",
+        "obf",
+        "pot",
+        "AUS",
+        "CEL",
+        "PRE"
+      ]
+    },
+    "1987ea9d-bd37-445b-868d-9b4ec17f2ccf": {
+      "id": "1987ea9d-bd37-445b-868d-9b4ec17f2ccf",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100518",
+      "name": "Deflection",
+      "type": "REACTION"
+    },
+    "11d5f943-32e8-450e-9e31-3beaf88202ea": {
+      "id": "11d5f943-32e8-450e-9e31-3beaf88202ea",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101557",
+      "name": "React with Conviction",
+      "type": "NONE"
+    },
+    "6f91d35a-ecae-4f56-9c4d-a173892fcd19": {
+      "id": "6f91d35a-ecae-4f56-9c4d-a173892fcd19",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100570",
+      "name": "Domain Challenge",
+      "type": "POLITICAL"
+    },
+    "ec50ba60-753f-4795-af33-d199edfdc170": {
+      "id": "ec50ba60-753f-4795-af33-d199edfdc170",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100885",
+      "name": "Haqim's Law: Leadership",
+      "type": "ACTION"
+    },
+    "a127bd34-d439-48f5-b65d-7745fd506102": {
+      "id": "a127bd34-d439-48f5-b65d-7745fd506102",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102097",
+      "name": "Veil the Legions",
+      "type": "MODIFIER"
+    },
+    "ad97813f-83c7-46ad-aa62-2164b4df713f": {
+      "id": "ad97813f-83c7-46ad-aa62-2164b4df713f",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101735",
+      "name": "Shadow Body",
+      "type": "COMBAT"
+    },
+    "9bd2f65b-91e9-4d02-a48d-ed71d09bc1a8": {
+      "id": "9bd2f65b-91e9-4d02-a48d-ed71d09bc1a8",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100324",
+      "name": "Changeling",
+      "type": "MODIFIER"
+    },
+    "90d0b900-c9a1-4f7b-8c99-023cdffadd4d": {
+      "id": "90d0b900-c9a1-4f7b-8c99-023cdffadd4d",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200330",
+      "name": "Delilah Easton",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pre"
+      ]
+    },
+    "277866b1-f07f-46c6-9bc4-81d79ce0025b": {
+      "id": "277866b1-f07f-46c6-9bc4-81d79ce0025b",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "REACTION"
+    },
+    "46af5eb6-2a9e-4c83-a31b-16b3f58b95ef": {
+      "id": "46af5eb6-2a9e-4c83-a31b-16b3f58b95ef",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100602",
+      "name": "Earth Swords",
+      "type": "COMBAT"
+    },
+    "aac096fb-6590-45e6-a7da-898a7298d7c9": {
+      "id": "aac096fb-6590-45e6-a7da-898a7298d7c9",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100984",
+      "name": "Information Highway",
+      "type": "MASTER",
+      "unique": true
+    },
+    "5775f2e2-263d-432a-88c1-17aa25369f41": {
+      "id": "5775f2e2-263d-432a-88c1-17aa25369f41",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100031",
+      "name": "Aire of Elation",
+      "type": "MODIFIER"
+    },
+    "cfff9234-8168-4af9-b5ea-bde63aaba225": {
+      "id": "cfff9234-8168-4af9-b5ea-bde63aaba225",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "200980",
+      "name": "Meshenka",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "P",
+      "title": "priscus",
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ANI",
+        "AUS",
+        "VIC"
+      ]
+    },
+    "87fab51d-d664-421c-987b-355cf040f403": {
+      "id": "87fab51d-d664-421c-987b-355cf040f403",
+      "region": "Player4-Hand",
+      "owner": "Player4",
+      "cardId": "100344",
+      "name": "Chiropteran Marauder",
+      "type": "COMBAT"
+    },
+    "338ba2e8-3add-41c8-b87e-3376161530e8": {
+      "id": "338ba2e8-3add-41c8-b87e-3376161530e8",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100651",
+      "name": "Entombment",
+      "type": "COMBAT"
+    },
+    "4e031959-9f64-4798-a04d-8cff30019300": {
+      "id": "4e031959-9f64-4798-a04d-8cff30019300",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101475",
+      "name": "Precognition",
+      "type": "REACTION"
+    },
+    "22c8e45b-36c6-4dc8-adff-2b25b516c4fe": {
+      "id": "22c8e45b-36c6-4dc8-adff-2b25b516c4fe",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100908",
+      "name": "Heidelberg Castle, Germany",
+      "type": "MASTER",
+      "unique": true
+    },
+    "7cbd2d1c-ab3b-4036-b2d8-2247d114d8d0": {
+      "id": "7cbd2d1c-ab3b-4036-b2d8-2247d114d8d0",
+      "region": "Player2-Uncontrolled region",
+      "owner": "Player2",
+      "cardId": "200622",
+      "name": "Ignacio, The Black Priest",
+      "type": "VAMPIRE",
+      "capacity": 4,
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "dom",
+        "obt",
+        "pot"
+      ]
+    },
+    "f7fc2645-356b-41cc-8367-ca2c9e6deb17": {
+      "id": "f7fc2645-356b-41cc-8367-ca2c9e6deb17",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101468",
+      "name": "Praxis Seizure: Rome",
+      "type": "POLITICAL"
+    },
+    "b63ac1f2-9b28-4147-a90f-4b55b191d53a": {
+      "id": "b63ac1f2-9b28-4147-a90f-4b55b191d53a",
+      "region": "Player3-Hand",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "REACTION"
+    },
+    "a91f1e3d-d28f-49f4-9949-ba60f0f1f9c3": {
+      "id": "a91f1e3d-d28f-49f4-9949-ba60f0f1f9c3",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100598",
+      "name": "Eagle's Sight",
+      "type": "REACTION"
+    },
+    "cc4a3c97-87fc-4e57-8a6d-60d605967c9f": {
+      "id": "cc4a3c97-87fc-4e57-8a6d-60d605967c9f",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "66092635-f519-45ca-9761-61bdd753c97e": {
+      "id": "66092635-f519-45ca-9761-61bdd753c97e",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "POLITICAL"
+    },
+    "05ee4358-e9b2-4095-bd47-23f53a83d666": {
+      "id": "05ee4358-e9b2-4095-bd47-23f53a83d666",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100760",
+      "name": "Forced Awakening",
+      "type": "REACTION"
+    },
+    "019a913e-a88f-467e-aa36-6fe9068020f5": {
+      "id": "019a913e-a88f-467e-aa36-6fe9068020f5",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101557",
+      "name": "React with Conviction",
+      "type": "NONE"
+    },
+    "58b3001d-b4d4-4dbb-9e78-5dab8082983c": {
+      "id": "58b3001d-b4d4-4dbb-9e78-5dab8082983c",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101592",
+      "name": "Rejuvenate",
+      "type": "NONE"
+    },
+    "859c93a6-d711-4861-8604-fc8ca1f678bf": {
+      "id": "859c93a6-d711-4861-8604-fc8ca1f678bf",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101473",
+      "name": "Praxis Solomon",
+      "type": "POLITICAL"
+    },
+    "14f255c1-d734-406f-bd6e-2f1ce87e14d8": {
+      "id": "14f255c1-d734-406f-bd6e-2f1ce87e14d8",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "61e1709c-a901-431f-8fdc-e6fc01dfe50f": {
+      "id": "61e1709c-a901-431f-8fdc-e6fc01dfe50f",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101705",
+      "name": "Second Sight",
+      "type": "NONE"
+    },
+    "f38cd6fa-7d2e-4934-b069-e8f6882da670": {
+      "id": "f38cd6fa-7d2e-4934-b069-e8f6882da670",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100557",
+      "name": "Disputed Territory",
+      "type": "POLITICAL"
+    },
+    "2f1ac7c4-8dbf-4eee-9868-f1409c0ff0f9": {
+      "id": "2f1ac7c4-8dbf-4eee-9868-f1409c0ff0f9",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101144",
+      "name": "Majesty",
+      "type": "COMBAT"
+    },
+    "86916397-0cd3-46e2-9499-f731d31d7f46": {
+      "id": "86916397-0cd3-46e2-9499-f731d31d7f46",
+      "region": "Player2-Hand",
+      "owner": "Player2",
+      "cardId": "101634",
+      "name": "Riddle Phantastique",
+      "type": "ACTION"
+    },
+    "f66a6b01-639a-4a6a-b661-9963a14e9cef": {
+      "id": "f66a6b01-639a-4a6a-b661-9963a14e9cef",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101801",
+      "name": "Slaughtering the Herd",
+      "type": "ACTION"
+    },
+    "0a2c5cd1-aa40-4a22-a1fc-b842bc68c493": {
+      "id": "0a2c5cd1-aa40-4a22-a1fc-b842bc68c493",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "POLITICAL"
+    },
+    "dcbb85bc-faf0-4a6e-9e0f-38cf20c87b3e": {
+      "id": "dcbb85bc-faf0-4a6e-9e0f-38cf20c87b3e",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100824",
+      "name": "Giant's Blood",
+      "type": "MASTER"
+    },
+    "c8d69c75-6a06-4c27-9543-31ce4d90ebf4": {
+      "id": "c8d69c75-6a06-4c27-9543-31ce4d90ebf4",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102165",
+      "name": "Web of Knives Recruit",
+      "type": "ACTION"
+    },
+    "f71b06b4-8d8b-4ccc-ad03-f8d0567e488f": {
+      "id": "f71b06b4-8d8b-4ccc-ad03-f8d0567e488f",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101091",
+      "name": "Legendary Vampire",
+      "type": "MASTER",
+      "unique": true
+    },
+    "7b673c16-c645-4db3-a24c-ad0462c2c7b3": {
+      "id": "7b673c16-c645-4db3-a24c-ad0462c2c7b3",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102097",
+      "name": "Veil the Legions",
+      "type": "MODIFIER"
+    },
+    "abee65dc-99f3-49b6-a612-5cd24b104177": {
+      "id": "abee65dc-99f3-49b6-a612-5cd24b104177",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101710",
+      "name": "Secret Passage",
+      "type": "MASTER"
+    },
+    "414d994e-bcb1-47e3-990f-9cd751c8dd2c": {
+      "id": "414d994e-bcb1-47e3-990f-9cd751c8dd2c",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101019",
+      "name": "Jake Washington",
+      "type": "MASTER",
+      "unique": true
+    },
+    "98a4dc8a-ef87-49da-ab9a-5ad59ffcfaad": {
+      "id": "98a4dc8a-ef87-49da-ab9a-5ad59ffcfaad",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100013",
+      "name": "Absorb the Mind",
+      "type": "COMBAT"
+    },
+    "5c88d84e-81a9-43b4-bf70-f174a5c45067": {
+      "id": "5c88d84e-81a9-43b4-bf70-f174a5c45067",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "102179",
+      "name": "White Phosphorus Grenade",
+      "type": "EQUIPMENT"
+    },
+    "cd657e02-c2f9-4d18-8b17-6425bebb33d0": {
+      "id": "cd657e02-c2f9-4d18-8b17-6425bebb33d0",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100322",
+      "name": "Champion",
+      "type": "NONE"
+    },
+    "fc6f4d22-982d-4e31-a4e6-5dbe8245eae5": {
+      "id": "fc6f4d22-982d-4e31-a4e6-5dbe8245eae5",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101144",
+      "name": "Majesty",
+      "type": "COMBAT"
+    },
+    "cfaa0a12-0fa6-4194-a401-15187d9d3fe7": {
+      "id": "cfaa0a12-0fa6-4194-a401-15187d9d3fe7",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101305",
+      "name": "NRA PAC",
+      "type": "EVENT"
+    },
+    "681b47d2-87a0-4486-8482-14bd57bd5653": {
+      "id": "681b47d2-87a0-4486-8482-14bd57bd5653",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "POLITICAL"
+    },
+    "06c14063-74f1-495b-9eda-83da686b3ea9": {
+      "id": "06c14063-74f1-495b-9eda-83da686b3ea9",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100172",
+      "name": "Black Throne, The",
+      "type": "MASTER",
+      "unique": true
+    },
+    "929fb916-5a5a-4ca2-aea4-10ae4949c16f": {
+      "id": "929fb916-5a5a-4ca2-aea4-10ae4949c16f",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "f814e3fd-e6d4-4437-8e27-95626f2a6e4a": {
+      "id": "f814e3fd-e6d4-4437-8e27-95626f2a6e4a",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100111",
+      "name": "Aura Absorption",
+      "type": "NONE"
+    },
+    "28d3a999-32a6-4e57-b552-ecbcccb6ad98": {
+      "id": "28d3a999-32a6-4e57-b552-ecbcccb6ad98",
+      "region": "Player4-Hand",
+      "owner": "Player4",
+      "cardId": "102144",
+      "name": "War Ghoul",
+      "type": "ALLY",
+      "clan": "TZIMISCE",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "9358f48d-7130-4679-b8e1-f1745f987f67": {
+      "id": "9358f48d-7130-4679-b8e1-f1745f987f67",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101196",
+      "name": "Meld with the Land",
+      "type": "COMBAT"
+    },
+    "d2d1775f-827c-4229-9e17-9c98a525efc7": {
+      "id": "d2d1775f-827c-4229-9e17-9c98a525efc7",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100298",
+      "name": "Carlton Van Wyk",
+      "type": "ALLY",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true,
+      "unique": true
+    },
+    "0e8c5576-1282-4e78-b13a-b9f4e066d59a": {
+      "id": "0e8c5576-1282-4e78-b13a-b9f4e066d59a",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102079",
+      "name": "Unmasking, The",
+      "type": "EVENT"
+    },
+    "9409e1e5-5917-481b-b22c-17199a85ab6a": {
+      "id": "9409e1e5-5917-481b-b22c-17199a85ab6a",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100362",
+      "name": "Cloak the Gathering",
+      "type": "MODIFIER"
+    },
+    "ef44db8b-b9bf-45a2-be9c-18e92765f920": {
+      "id": "ef44db8b-b9bf-45a2-be9c-18e92765f920",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101692",
+      "name": "Scorn of Adonis",
+      "type": "MODIFIER"
+    },
+    "a26e148e-9077-403f-99ee-2dc1895bcd19": {
+      "id": "a26e148e-9077-403f-99ee-2dc1895bcd19",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100986",
+      "name": "Inner Essence",
+      "type": "COMBAT"
+    },
+    "d463201a-83fc-4c31-82bd-69021090d11a": {
+      "id": "d463201a-83fc-4c31-82bd-69021090d11a",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101705",
+      "name": "Second Sight",
+      "type": "NONE"
+    },
+    "fffbcce5-b2ca-40d8-8016-95df4efa9559": {
+      "id": "fffbcce5-b2ca-40d8-8016-95df4efa9559",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "POLITICAL"
+    },
+    "08a1086f-1f0e-4084-8d45-aa43b0079838": {
+      "id": "08a1086f-1f0e-4084-8d45-aa43b0079838",
+      "region": "Player5-Uncontrolled region",
+      "owner": "Player5",
+      "cardId": "200748",
+      "name": "Kamau Jafari",
+      "type": "VAMPIRE",
+      "capacity": 4,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "obf",
+        "QUI"
+      ]
+    },
+    "74571bb7-d64b-48f7-afff-33d10e2839f6": {
+      "id": "74571bb7-d64b-48f7-afff-33d10e2839f6",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101491",
+      "name": "Procurer",
+      "type": "ALLY",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "7bd7dae9-5c77-46cd-b68b-de72f7befc51": {
+      "id": "7bd7dae9-5c77-46cd-b68b-de72f7befc51",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "ACTION"
+    },
+    "3263050d-5db8-445c-b670-b9921a3d6a4d": {
+      "id": "3263050d-5db8-445c-b670-b9921a3d6a4d",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101193",
+      "name": "Media Influence",
+      "type": "ACTION"
+    },
+    "9300ff42-01f6-410f-b4da-03310ff8c711": {
+      "id": "9300ff42-01f6-410f-b4da-03310ff8c711",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "REACTION"
+    },
+    "759ea4ee-0dac-42c7-8b11-e659ed888ae4": {
+      "id": "759ea4ee-0dac-42c7-8b11-e659ed888ae4",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100324",
+      "name": "Changeling",
+      "type": "MODIFIER"
+    },
+    "261c6489-6ea4-4d29-b799-d8aaa51d6843": {
+      "id": "261c6489-6ea4-4d29-b799-d8aaa51d6843",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "REACTION"
+    },
+    "714dc388-364f-4d94-80bd-55fb0f42ef0a": {
+      "id": "714dc388-364f-4d94-80bd-55fb0f42ef0a",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100013",
+      "name": "Absorb the Mind",
+      "type": "COMBAT"
+    },
+    "0bc11ce0-10d5-44ed-bfb4-dfa50a6c1060": {
+      "id": "0bc11ce0-10d5-44ed-bfb4-dfa50a6c1060",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101249",
+      "name": "Mr. Winthrop",
+      "type": "RETAINER",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true,
+      "unique": true
+    },
+    "26f7d63f-5bcd-430b-9864-4bf87b2bd9a7": {
+      "id": "26f7d63f-5bcd-430b-9864-4bf87b2bd9a7",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100518",
+      "name": "Deflection",
+      "type": "REACTION"
+    },
+    "dd20635e-2d53-4c3e-bb15-0293cea4e1bb": {
+      "id": "dd20635e-2d53-4c3e-bb15-0293cea4e1bb",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101091",
+      "name": "Legendary Vampire",
+      "type": "MASTER",
+      "unique": true
+    },
+    "792852de-18fb-4c42-9908-3a3966ff60e9": {
+      "id": "792852de-18fb-4c42-9908-3a3966ff60e9",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100984",
+      "name": "Information Highway",
+      "type": "MASTER",
+      "unique": true
+    },
+    "fe73cdfd-0057-484f-be04-fe4b7d90b8fa": {
+      "id": "fe73cdfd-0057-484f-be04-fe4b7d90b8fa",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101557",
+      "name": "React with Conviction",
+      "type": "NONE"
+    },
+    "7399caeb-6b6c-49d0-8797-6ed4a4ee6d67": {
+      "id": "7399caeb-6b6c-49d0-8797-6ed4a4ee6d67",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100324",
+      "name": "Changeling",
+      "type": "MODIFIER"
+    },
+    "e5e8d1a9-98bc-4fbe-8377-817471526624": {
+      "id": "e5e8d1a9-98bc-4fbe-8377-817471526624",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "200980",
+      "name": "Meshenka",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "P",
+      "title": "priscus",
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ANI",
+        "AUS",
+        "VIC"
+      ]
+    },
+    "3a48b67d-9896-4e9c-b73a-3b863c97d0e7": {
+      "id": "3a48b67d-9896-4e9c-b73a-3b863c97d0e7",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "1b905932-a424-45eb-b035-ccd23a38a05f": {
+      "id": "1b905932-a424-45eb-b035-ccd23a38a05f",
+      "region": "Player1-Hand",
+      "owner": "Player1",
+      "cardId": "102120",
+      "name": "Vigilance",
+      "type": "NONE"
+    },
+    "113d2e5a-3a4c-462c-baf6-bbee5cd18a30": {
+      "id": "113d2e5a-3a4c-462c-baf6-bbee5cd18a30",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101735",
+      "name": "Shadow Body",
+      "type": "COMBAT"
+    },
+    "9d80508a-b784-4d09-99c3-528e9cb48d16": {
+      "id": "9d80508a-b784-4d09-99c3-528e9cb48d16",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101402",
+      "name": "Plasmic Form",
+      "type": "NONE"
+    },
+    "14028e29-4f5c-44b3-87eb-11003bbf6789": {
+      "id": "14028e29-4f5c-44b3-87eb-11003bbf6789",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101950",
+      "name": "Telepathic Tracking",
+      "type": "COMBAT"
+    },
+    "9379fde1-c7db-412c-a4ac-1e08a2dc453c": {
+      "id": "9379fde1-c7db-412c-a4ac-1e08a2dc453c",
+      "region": "Player3-Uncontrolled region",
+      "owner": "Player3",
+      "cardId": "200642",
+      "name": "Isabel de Leon",
+      "type": "VAMPIRE",
+      "capacity": 3,
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "AUS"
+      ]
+    },
+    "90d1ec04-e695-47a7-bb5a-23a1caf11a4b": {
+      "id": "90d1ec04-e695-47a7-bb5a-23a1caf11a4b",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101437",
+      "name": "Powerbase: Madrid",
+      "type": "MASTER",
+      "unique": true
+    },
+    "80ad4825-5968-4e0c-b687-f9408809f336": {
+      "id": "80ad4825-5968-4e0c-b687-f9408809f336",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "4c71f9a3-dd02-4847-b2c4-ce4bbdae85b7": {
+      "id": "4c71f9a3-dd02-4847-b2c4-ce4bbdae85b7",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101949",
+      "name": "Telepathic Misdirection",
+      "type": "REACTION"
+    },
+    "a908d483-b7aa-4539-9603-2f7ef817628e": {
+      "id": "a908d483-b7aa-4539-9603-2f7ef817628e",
+      "region": "Player5-Hand",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "POLITICAL"
+    },
+    "a6c50c3f-27fb-4372-b56c-679ab3e8e065": {
+      "id": "a6c50c3f-27fb-4372-b56c-679ab3e8e065",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100157",
+      "name": "Bewitching Oration",
+      "type": "MODIFIER"
+    },
+    "cad951ee-4103-48ec-a89f-7642c46f0551": {
+      "id": "cad951ee-4103-48ec-a89f-7642c46f0551",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101578",
+      "name": "Redirection",
+      "type": "REACTION"
+    },
+    "48292cbd-68a2-4486-8b9e-28107653b487": {
+      "id": "48292cbd-68a2-4486-8b9e-28107653b487",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "201078",
+      "name": "Olugbenga",
+      "type": "VAMPIRE",
+      "capacity": 7,
+      "votes": "2",
+      "title": "magaji",
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "cel",
+        "OBF",
+        "QUI"
+      ]
+    },
+    "084f7ceb-cc4c-440e-b79d-e4388923cf80": {
+      "id": "084f7ceb-cc4c-440e-b79d-e4388923cf80",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101654",
+      "name": "Rötschreck",
+      "type": "MASTER"
+    },
+    "9d278d4b-5b83-449d-aa90-ca140fa287f6": {
+      "id": "9d278d4b-5b83-449d-aa90-ca140fa287f6",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101662",
+      "name": "Rumor Mill, Tabloid Newspaper, The",
+      "type": "MASTER",
+      "unique": true
+    },
+    "69997b73-7798-48b3-bed2-fbc0d585a15c": {
+      "id": "69997b73-7798-48b3-bed2-fbc0d585a15c",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100986",
+      "name": "Inner Essence",
+      "type": "COMBAT"
+    },
+    "f434b268-c858-4fe8-8996-dfe1163a0934": {
+      "id": "f434b268-c858-4fe8-8996-dfe1163a0934",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "c75b30af-6572-404d-a4e9-223f35f604c2": {
+      "id": "c75b30af-6572-404d-a4e9-223f35f604c2",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "44275bd4-831d-4d97-9dc5-7ceb1ce0e80b": {
+      "id": "44275bd4-831d-4d97-9dc5-7ceb1ce0e80b",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101014",
+      "name": "Ivory Bow",
+      "type": "EQUIPMENT",
+      "unique": true
+    },
+    "5f5cc1eb-9bc8-4aa6-a43d-67b76355e0e1": {
+      "id": "5f5cc1eb-9bc8-4aa6-a43d-67b76355e0e1",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102097",
+      "name": "Veil the Legions",
+      "type": "MODIFIER"
+    },
+    "073dd03b-031d-4655-94b2-0ba1b2354bda": {
+      "id": "073dd03b-031d-4655-94b2-0ba1b2354bda",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101559",
+      "name": "Read the Winds",
+      "type": "REACTION"
+    },
+    "3847f486-d5dc-42e2-b1fe-7297ed7a974e": {
+      "id": "3847f486-d5dc-42e2-b1fe-7297ed7a974e",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101219",
+      "name": "Minor Boon",
+      "type": "MASTER"
+    },
+    "e78b5c5d-b840-44f7-b3a0-20855bdd05df": {
+      "id": "e78b5c5d-b840-44f7-b3a0-20855bdd05df",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "201386",
+      "name": "Travis \"Traveler72\" Miller",
+      "type": "IMBUED",
+      "capacity": 5,
+      "clan": "NONE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "mar",
+        "def"
+      ]
+    },
+    "6a87625d-43d5-4147-851b-422ce2144ab8": {
+      "id": "6a87625d-43d5-4147-851b-422ce2144ab8",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100324",
+      "name": "Changeling",
+      "type": "MODIFIER"
+    },
+    "79759a54-a929-42f2-922a-9d0ff969f542": {
+      "id": "79759a54-a929-42f2-922a-9d0ff969f542",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101384",
+      "name": "Pentex(TM) Subversion",
+      "type": "MASTER",
+      "unique": true
+    },
+    "b0e1e1cb-ac81-46e2-96f9-64aa2d3375dd": {
+      "id": "b0e1e1cb-ac81-46e2-96f9-64aa2d3375dd",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "b9dcf99f-7951-4f49-a02e-181ba1fcc7f8": {
+      "id": "b9dcf99f-7951-4f49-a02e-181ba1fcc7f8",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100557",
+      "name": "Disputed Territory",
+      "type": "POLITICAL"
+    },
+    "7a4b446b-081d-47b1-87ca-351fda91d59a": {
+      "id": "7a4b446b-081d-47b1-87ca-351fda91d59a",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101559",
+      "name": "Read the Winds",
+      "type": "REACTION"
+    },
+    "6dc47db1-e1d1-4a90-9182-fd17e8d6b9d7": {
+      "id": "6dc47db1-e1d1-4a90-9182-fd17e8d6b9d7",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101557",
+      "name": "React with Conviction",
+      "type": "NONE"
+    },
+    "2a70659c-5922-4253-928a-feab11517def": {
+      "id": "2a70659c-5922-4253-928a-feab11517def",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100991",
+      "name": "Inspire",
+      "type": "NONE"
+    },
+    "b478280b-e0b1-4fc7-a065-adda5925e19d": {
+      "id": "b478280b-e0b1-4fc7-a065-adda5925e19d",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101578",
+      "name": "Redirection",
+      "type": "REACTION"
+    },
+    "261ba3cb-3d55-45c7-a5d6-9f9371578df1": {
+      "id": "261ba3cb-3d55-45c7-a5d6-9f9371578df1",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "200062",
+      "name": "Alu",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "obf"
+      ]
+    },
+    "46bdcc59-9749-4a1b-bcb0-87d3a7c08f5d": {
+      "id": "46bdcc59-9749-4a1b-bcb0-87d3a7c08f5d",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "200632",
+      "name": "Inez \"Nurse216\" Villagrande",
+      "type": "IMBUED",
+      "capacity": 3,
+      "clan": "INNOCENT",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "inn"
+      ]
+    },
+    "6a812b13-c61b-4079-9831-f0581362ea3a": {
+      "id": "6a812b13-c61b-4079-9831-f0581362ea3a",
+      "region": "Player3-Uncontrolled region",
+      "owner": "Player3",
+      "cardId": "200334",
+      "name": "Demetrius Slater",
+      "type": "VAMPIRE",
+      "capacity": 4,
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "cel",
+        "pre"
+      ]
+    },
+    "3e086588-5661-4a6f-be94-9f2370b4dae7": {
+      "id": "3e086588-5661-4a6f-be94-9f2370b4dae7",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100518",
+      "name": "Deflection",
+      "type": "REACTION"
+    },
+    "9789048e-b490-4d53-993f-c13d94464176": {
+      "id": "9789048e-b490-4d53-993f-c13d94464176",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "COMBAT"
+    },
+    "038aae4d-27d9-4e2d-8091-6c685a420495": {
+      "id": "038aae4d-27d9-4e2d-8091-6c685a420495",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101470",
+      "name": "Praxis Seizure: Stockholm",
+      "type": "POLITICAL"
+    },
+    "1797dc8f-0630-4a43-a08c-5f4cceaa6fe5": {
+      "id": "1797dc8f-0630-4a43-a08c-5f4cceaa6fe5",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101578",
+      "name": "Redirection",
+      "type": "REACTION"
+    },
+    "324145ce-7941-4578-97df-1b52b25a5267": {
+      "id": "324145ce-7941-4578-97df-1b52b25a5267",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100986",
+      "name": "Inner Essence",
+      "type": "COMBAT"
+    },
+    "e66a5a67-99a3-456b-828d-e9395b05840e": {
+      "id": "e66a5a67-99a3-456b-828d-e9395b05840e",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102120",
+      "name": "Vigilance",
+      "type": "NONE"
+    },
+    "9dfd35a1-b708-4483-a1a5-978e2fa0166a": {
+      "id": "9dfd35a1-b708-4483-a1a5-978e2fa0166a",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "COMBAT"
+    },
+    "3602e06c-00df-42b7-be88-deb4392ceb73": {
+      "id": "3602e06c-00df-42b7-be88-deb4392ceb73",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "REACTION"
+    },
+    "370be10b-cce5-474a-8b60-44ea07ae2bff": {
+      "id": "370be10b-cce5-474a-8b60-44ea07ae2bff",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100348",
+      "name": "Church of Vindicated Faith, The",
+      "type": "MASTER",
+      "unique": true
+    },
+    "3836cafe-0f09-455e-b8a9-7caa32de4675": {
+      "id": "3836cafe-0f09-455e-b8a9-7caa32de4675",
+      "region": "Player5-Uncontrolled region",
+      "owner": "Player5",
+      "cardId": "200175",
+      "name": "Basir",
+      "type": "VAMPIRE",
+      "capacity": 1,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "qui"
+      ]
+    },
+    "7d198ae5-6bcb-4faa-b276-55a435d7861b": {
+      "id": "7d198ae5-6bcb-4faa-b276-55a435d7861b",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101259",
+      "name": "My Enemy's Enemy",
+      "type": "REACTION"
+    },
+    "296a2a53-cbee-4108-8f76-421f054d642d": {
+      "id": "296a2a53-cbee-4108-8f76-421f054d642d",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101402",
+      "name": "Plasmic Form",
+      "type": "NONE"
+    },
+    "6c204b10-5f42-4a2d-a5fb-4e44e4e8291d": {
+      "id": "6c204b10-5f42-4a2d-a5fb-4e44e4e8291d",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "7b0bc2f4-425e-4bf2-9b5f-fa2a60b2c914": {
+      "id": "7b0bc2f4-425e-4bf2-9b5f-fa2a60b2c914",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101196",
+      "name": "Meld with the Land",
+      "type": "COMBAT"
+    },
+    "5f0958ce-615b-4389-8f9a-a4dcee00b50a": {
+      "id": "5f0958ce-615b-4389-8f9a-a4dcee00b50a",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101886",
+      "name": "Strike with Conviction",
+      "type": "NONE"
+    },
+    "bf55a8b3-85e4-42ff-adbc-e982c1933eb8": {
+      "id": "bf55a8b3-85e4-42ff-adbc-e982c1933eb8",
+      "region": "Player3-Hand",
+      "owner": "Player3",
+      "cardId": "100020",
+      "name": "Acrobatics",
+      "type": "COMBAT"
+    },
+    "9aae08c1-f8f9-42fe-9dbf-c06e5a3e7660": {
+      "id": "9aae08c1-f8f9-42fe-9dbf-c06e5a3e7660",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100067",
+      "name": "Angel of Berlin",
+      "type": "MASTER"
+    },
+    "2e816653-74dc-4794-b5ae-391353e47333": {
+      "id": "2e816653-74dc-4794-b5ae-391353e47333",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "201386",
+      "name": "Travis \"Traveler72\" Miller",
+      "type": "IMBUED",
+      "capacity": 5,
+      "clan": "NONE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "mar",
+        "def"
+      ]
+    },
+    "143a924f-674a-4941-9b56-ad6a53ff7e34": {
+      "id": "143a924f-674a-4941-9b56-ad6a53ff7e34",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101705",
+      "name": "Second Sight",
+      "type": "NONE"
+    },
+    "48192a9b-f5f4-47bb-b1ee-517ede83efbe": {
+      "id": "48192a9b-f5f4-47bb-b1ee-517ede83efbe",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100545",
+      "name": "Direct Intervention",
+      "type": "MASTER"
+    },
+    "9f2ce837-070f-4c4e-b7b0-c0d83262d901": {
+      "id": "9f2ce837-070f-4c4e-b7b0-c0d83262d901",
+      "region": "Player3-Hand",
+      "owner": "Player3",
+      "cardId": "102131",
+      "name": "Voter Captivation",
+      "type": "MODIFIER"
+    },
+    "2c262f71-290c-4994-9b42-0c5cfbcb9ea0": {
+      "id": "2c262f71-290c-4994-9b42-0c5cfbcb9ea0",
+      "region": "Player1-Hand",
+      "owner": "Player1",
+      "cardId": "102087",
+      "name": "Vagabond Mystic",
+      "type": "ALLY",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true,
+      "unique": true
+    },
+    "765036a2-655b-4706-ac53-35a3b4ad8211": {
+      "id": "765036a2-655b-4706-ac53-35a3b4ad8211",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "POLITICAL"
+    },
+    "95762493-10c0-47b7-8936-54080ebb8da7": {
+      "id": "95762493-10c0-47b7-8936-54080ebb8da7",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "REACTION"
+    },
+    "eb4f0ffa-6486-4aa6-b7a6-7c0ac02e9857": {
+      "id": "eb4f0ffa-6486-4aa6-b7a6-7c0ac02e9857",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101144",
+      "name": "Majesty",
+      "type": "COMBAT"
+    },
+    "cf7aedf5-de98-43b8-a2f2-a376b897cb18": {
+      "id": "cf7aedf5-de98-43b8-a2f2-a376b897cb18",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "ACTION"
+    },
+    "1397b3f1-2bb7-47c6-8cc9-2776128f8bfc": {
+      "id": "1397b3f1-2bb7-47c6-8cc9-2776128f8bfc",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100290",
+      "name": "Canine Horde",
+      "type": "COMBAT"
+    },
+    "e03b4028-baeb-4d7a-835c-dcd9c704a123": {
+      "id": "e03b4028-baeb-4d7a-835c-dcd9c704a123",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "5b44a9fc-a56e-4b4d-9d9b-c8ea87cb3524": {
+      "id": "5b44a9fc-a56e-4b4d-9d9b-c8ea87cb3524",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100885",
+      "name": "Haqim's Law: Leadership",
+      "type": "ACTION"
+    },
+    "c82aa0e3-151b-4f29-b823-bb62851db9f2": {
+      "id": "c82aa0e3-151b-4f29-b823-bb62851db9f2",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "767d4ab1-fe0a-4281-893c-d28bf9e5b877": {
+      "id": "767d4ab1-fe0a-4281-893c-d28bf9e5b877",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102120",
+      "name": "Vigilance",
+      "type": "NONE"
+    },
+    "d541d777-fab8-406d-834e-0191c889fada": {
+      "id": "d541d777-fab8-406d-834e-0191c889fada",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "8b08ece5-66cf-4031-a1b2-fbb69a2d74a2": {
+      "id": "8b08ece5-66cf-4031-a1b2-fbb69a2d74a2",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "ff4e92dd-dfad-48e5-bea8-c8d93c8b75d9": {
+      "id": "ff4e92dd-dfad-48e5-bea8-c8d93c8b75d9",
+      "region": "Player1-Uncontrolled region",
+      "owner": "Player1",
+      "cardId": "201386",
+      "name": "Travis \"Traveler72\" Miller",
+      "type": "IMBUED",
+      "capacity": 5,
+      "clan": "NONE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "mar",
+        "def"
+      ]
+    },
+    "2b970a7a-f351-4ccb-b3ab-9cd9c4798c0f": {
+      "id": "2b970a7a-f351-4ccb-b3ab-9cd9c4798c0f",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100885",
+      "name": "Haqim's Law: Leadership",
+      "type": "ACTION"
+    },
+    "20cdebff-1b73-450f-997b-4ca1c9bea15f": {
+      "id": "20cdebff-1b73-450f-997b-4ca1c9bea15f",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101125",
+      "name": "Lost in Crowds",
+      "type": "MODIFIER"
+    },
+    "5663d97f-75b1-4a6b-9306-8799d9f85232": {
+      "id": "5663d97f-75b1-4a6b-9306-8799d9f85232",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100984",
+      "name": "Information Highway",
+      "type": "MASTER",
+      "unique": true
+    },
+    "b4d78396-ae08-4af1-8c90-9528ec7f1ea7": {
+      "id": "b4d78396-ae08-4af1-8c90-9528ec7f1ea7",
+      "region": "Player1-Hand",
+      "owner": "Player1",
+      "cardId": "101886",
+      "name": "Strike with Conviction",
+      "type": "NONE"
+    },
+    "fcba2d1a-e102-4e13-9574-f474e10bbfb3": {
+      "id": "fcba2d1a-e102-4e13-9574-f474e10bbfb3",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101559",
+      "name": "Read the Winds",
+      "type": "REACTION"
+    },
+    "92de035a-c322-415f-bccc-fa9a4e96eef2": {
+      "id": "92de035a-c322-415f-bccc-fa9a4e96eef2",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100348",
+      "name": "Church of Vindicated Faith, The",
+      "type": "MASTER",
+      "unique": true
+    },
+    "a89d79fb-2ff1-4eeb-ad25-1f3e482fcc28": {
+      "id": "a89d79fb-2ff1-4eeb-ad25-1f3e482fcc28",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "a8d790fc-2ad7-4a24-b9d0-9e4411ad406d": {
+      "id": "a8d790fc-2ad7-4a24-b9d0-9e4411ad406d",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101949",
+      "name": "Telepathic Misdirection",
+      "type": "REACTION"
+    },
+    "c6df751a-b503-4806-9d51-390ec884dfb3": {
+      "id": "c6df751a-b503-4806-9d51-390ec884dfb3",
+      "region": "Player5-Hand",
+      "owner": "Player5",
+      "cardId": "101491",
+      "name": "Procurer",
+      "type": "ALLY",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "260b72fc-14c2-4dde-b65e-9fd0ca90341a": {
+      "id": "260b72fc-14c2-4dde-b65e-9fd0ca90341a",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101557",
+      "name": "React with Conviction",
+      "type": "NONE"
+    },
+    "c7bef38b-14c9-41cd-abb0-9dade0ec20b3": {
+      "id": "c7bef38b-14c9-41cd-abb0-9dade0ec20b3",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "200065",
+      "name": "Amaravati",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "chi",
+        "DOM",
+        "OBF",
+        "QUI"
+      ]
+    },
+    "3cd9b849-1334-4c7a-868f-94f62660934b": {
+      "id": "3cd9b849-1334-4c7a-868f-94f62660934b",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100545",
+      "name": "Direct Intervention",
+      "type": "MASTER"
+    },
+    "9d9bef8d-15ab-46ff-beb8-fc363a7c8081": {
+      "id": "9d9bef8d-15ab-46ff-beb8-fc363a7c8081",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "0c022417-8826-45ae-8252-9f84840d1b29": {
+      "id": "0c022417-8826-45ae-8252-9f84840d1b29",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "62303775-6385-4e86-a92e-9180ab415d6e": {
+      "id": "62303775-6385-4e86-a92e-9180ab415d6e",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100572",
+      "name": "Dominate",
+      "type": "MASTER"
+    },
+    "2794b59c-8c85-4eea-8d40-d600d2e33342": {
+      "id": "2794b59c-8c85-4eea-8d40-d600d2e33342",
+      "region": "Player4-Uncontrolled region",
+      "owner": "Player4",
+      "cardId": "200850",
+      "name": "Lolita Houston",
+      "type": "VAMPIRE",
+      "capacity": 4,
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "VIC"
+      ]
+    },
+    "b21811a1-ef02-454f-8538-39461e38a82b": {
+      "id": "b21811a1-ef02-454f-8538-39461e38a82b",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101081",
+      "name": "Leather Jacket",
+      "type": "EQUIPMENT"
+    },
+    "201425cd-4c05-4b4c-b45f-7f58672ba2c6": {
+      "id": "201425cd-4c05-4b4c-b45f-7f58672ba2c6",
+      "region": "Player2-Uncontrolled region",
+      "owner": "Player2",
+      "cardId": "200734",
+      "name": "Julia Prima",
+      "type": "VAMPIRE",
+      "capacity": 7,
+      "clan": "KIASYD",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "myt",
+        "DOM",
+        "OBT"
+      ]
+    },
+    "98898adb-e6c7-4ade-8326-856874d7764c": {
+      "id": "98898adb-e6c7-4ade-8326-856874d7764c",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100172",
+      "name": "Black Throne, The",
+      "type": "MASTER",
+      "unique": true
+    },
+    "6265d0d7-f39e-4776-a781-7f1a38f60841": {
+      "id": "6265d0d7-f39e-4776-a781-7f1a38f60841",
+      "region": "Player2-Hand",
+      "owner": "Player2",
+      "cardId": "100518",
+      "name": "Deflection",
+      "type": "REACTION"
+    },
+    "04547135-00e3-4d83-8c8b-74ab09b2395d": {
+      "id": "04547135-00e3-4d83-8c8b-74ab09b2395d",
+      "region": "Player2-Hand",
+      "owner": "Player2",
+      "cardId": "100111",
+      "name": "Aura Absorption",
+      "type": "NONE"
+    },
+    "1f832d31-0112-4dd9-aabe-552676183a86": {
+      "id": "1f832d31-0112-4dd9-aabe-552676183a86",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101144",
+      "name": "Majesty",
+      "type": "COMBAT"
+    },
+    "975a3b20-0797-4812-8b23-bb122fad2ff2": {
+      "id": "975a3b20-0797-4812-8b23-bb122fad2ff2",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100573",
+      "name": "Dominate Kine",
+      "type": "ACTION"
+    },
+    "389aab39-354c-413d-b959-c18b60270e44": {
+      "id": "389aab39-354c-413d-b959-c18b60270e44",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "REACTION"
+    },
+    "98d8c86e-d144-4568-9f75-7ee08ecf3ec3": {
+      "id": "98d8c86e-d144-4568-9f75-7ee08ecf3ec3",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101743",
+      "name": "Shadow Play",
+      "type": "MODIFIER"
+    },
+    "ad8d2ce8-c451-484c-af13-6d2b34d7e1aa": {
+      "id": "ad8d2ce8-c451-484c-af13-6d2b34d7e1aa",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "REACTION"
+    },
+    "ede251f5-c236-408b-8d58-7d6819b7ae5c": {
+      "id": "ede251f5-c236-408b-8d58-7d6819b7ae5c",
+      "region": "Player1-Uncontrolled region",
+      "owner": "Player1",
+      "cardId": "200689",
+      "name": "Jennie \"Cassie247\" Orne",
+      "type": "IMBUED",
+      "capacity": 5,
+      "clan": "VISIONARY",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "inn",
+        "jud",
+        "viz"
+      ]
+    },
+    "d20f9732-f7a8-41f5-b303-15d8993d8c1e": {
+      "id": "d20f9732-f7a8-41f5-b303-15d8993d8c1e",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101775",
+      "name": "Shroud of Night",
+      "type": "MODIFIER"
+    },
+    "4e7e2827-6e34-4783-a59a-26d6efb9e304": {
+      "id": "4e7e2827-6e34-4783-a59a-26d6efb9e304",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100739",
+      "name": "Flak Jacket",
+      "type": "EQUIPMENT"
+    },
+    "38f8e43b-8f0e-42fb-86d2-3b99cc8597c7": {
+      "id": "38f8e43b-8f0e-42fb-86d2-3b99cc8597c7",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100906",
+      "name": "Heartblood of the Clan",
+      "type": "MASTER",
+      "unique": true
+    },
+    "07ed5b60-e3c2-47c7-ae40-5e4910f9d499": {
+      "id": "07ed5b60-e3c2-47c7-ae40-5e4910f9d499",
+      "region": "Player4-Uncontrolled region",
+      "owner": "Player4",
+      "cardId": "200273",
+      "name": "Christine Boscacci",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "PANDER",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "dom",
+        "vic"
+      ]
+    },
+    "e5df7381-74ee-4017-9252-2b9b645418e5": {
+      "id": "e5df7381-74ee-4017-9252-2b9b645418e5",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102180",
+      "name": "Wider View",
+      "type": "MASTER"
+    },
+    "3aeffcfa-8651-4309-95aa-eda82d692586": {
+      "id": "3aeffcfa-8651-4309-95aa-eda82d692586",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101896",
+      "name": "Sudden Reversal",
+      "type": "MASTER"
+    },
+    "a246e98e-2b53-44b4-aa2f-44533f112b77": {
+      "id": "a246e98e-2b53-44b4-aa2f-44533f112b77",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "22d344b6-fb2a-44d2-92e9-5885f434308c": {
+      "id": "22d344b6-fb2a-44d2-92e9-5885f434308c",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100885",
+      "name": "Haqim's Law: Leadership",
+      "type": "ACTION"
+    },
+    "0a03fd20-64c9-48e6-91ed-0eb4df0e3eaa": {
+      "id": "0a03fd20-64c9-48e6-91ed-0eb4df0e3eaa",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101091",
+      "name": "Legendary Vampire",
+      "type": "MASTER",
+      "unique": true
+    },
+    "475b393d-7bee-43da-80b0-2780344969e6": {
+      "id": "475b393d-7bee-43da-80b0-2780344969e6",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "REACTION"
+    },
+    "473c9f83-286b-4572-b9ef-4d09a14feed5": {
+      "id": "473c9f83-286b-4572-b9ef-4d09a14feed5",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101196",
+      "name": "Meld with the Land",
+      "type": "COMBAT"
+    },
+    "5f1b1862-84fe-4e92-bcb8-b398d64dc1dd": {
+      "id": "5f1b1862-84fe-4e92-bcb8-b398d64dc1dd",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "200534",
+      "name": "Gratiano",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "P",
+      "title": "priscus",
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "obf",
+        "pot",
+        "DOM",
+        "OBT"
+      ]
+    },
+    "bdf56956-3ffd-47db-9fea-bd873c62f679": {
+      "id": "bdf56956-3ffd-47db-9fea-bd873c62f679",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101693",
+      "name": "Scorpion Sting",
+      "type": "COMBAT"
+    },
+    "bd8bb231-6310-4987-b47b-00dfa477e889": {
+      "id": "bd8bb231-6310-4987-b47b-00dfa477e889",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101451",
+      "name": "Praxis Seizure: Berlin",
+      "type": "POLITICAL"
+    },
+    "5ab2b079-9213-4e5c-872d-9031135a9216": {
+      "id": "5ab2b079-9213-4e5c-872d-9031135a9216",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101811",
+      "name": "Smiling Jack, The Anarch",
+      "type": "MASTER",
+      "unique": true
+    },
+    "e2e1940b-236e-4730-8e37-f2b7783aa7e7": {
+      "id": "e2e1940b-236e-4730-8e37-f2b7783aa7e7",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "200844",
+      "name": "Little Tailor of Prague",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "dem",
+        "ANI",
+        "AUS",
+        "VIC"
+      ]
+    },
+    "853ed945-f379-4123-8da7-5c1f33e10c23": {
+      "id": "853ed945-f379-4123-8da7-5c1f33e10c23",
+      "region": "Player5-Hand",
+      "owner": "Player5",
+      "cardId": "101125",
+      "name": "Lost in Crowds",
+      "type": "MODIFIER"
+    },
+    "12936d0c-b9ff-49b7-892c-68abad302c91": {
+      "id": "12936d0c-b9ff-49b7-892c-68abad302c91",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101698",
+      "name": "Scouting Mission",
+      "type": "ACTION"
+    },
+    "83566d4f-9a51-47be-b75f-c8e507ae4ac0": {
+      "id": "83566d4f-9a51-47be-b75f-c8e507ae4ac0",
+      "region": "Player5-Hand",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "ACTION"
+    },
+    "f73b2d5f-981d-4df1-83b1-b42bd7fe4bc3": {
+      "id": "f73b2d5f-981d-4df1-83b1-b42bd7fe4bc3",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101578",
+      "name": "Redirection",
+      "type": "REACTION"
+    },
+    "2f275b30-d806-46ac-acce-f7fb8a7d972b": {
+      "id": "2f275b30-d806-46ac-acce-f7fb8a7d972b",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "POLITICAL"
+    },
+    "c3d66660-d8b6-4158-b355-45abe43b4f22": {
+      "id": "c3d66660-d8b6-4158-b355-45abe43b4f22",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101743",
+      "name": "Shadow Play",
+      "type": "MODIFIER"
+    },
+    "2171d853-86c1-4226-b4a6-9575c68053e1": {
+      "id": "2171d853-86c1-4226-b4a6-9575c68053e1",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101557",
+      "name": "React with Conviction",
+      "type": "NONE"
+    },
+    "e30b3795-3699-4402-90ff-e21e7417cd41": {
+      "id": "e30b3795-3699-4402-90ff-e21e7417cd41",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101215",
+      "name": "Puppet Master",
+      "type": "ACTION"
+    },
+    "3e2469d0-64fe-4fcb-8cb5-542a735c880d": {
+      "id": "3e2469d0-64fe-4fcb-8cb5-542a735c880d",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101014",
+      "name": "Ivory Bow",
+      "type": "EQUIPMENT",
+      "unique": true
+    },
+    "a294179f-4052-45c7-85d2-20b4c722c85f": {
+      "id": "a294179f-4052-45c7-85d2-20b4c722c85f",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100344",
+      "name": "Chiropteran Marauder",
+      "type": "COMBAT"
+    },
+    "cbbd405e-bf94-4800-b6b9-54268ce48fd7": {
+      "id": "cbbd405e-bf94-4800-b6b9-54268ce48fd7",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100037",
+      "name": "Alamut",
+      "type": "MASTER",
+      "unique": true
+    },
+    "0514df5f-6d69-478d-b4b5-5adf494e2594": {
+      "id": "0514df5f-6d69-478d-b4b5-5adf494e2594",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101557",
+      "name": "React with Conviction",
+      "type": "NONE"
+    },
+    "a8e6ecc4-30df-4af1-9b29-cea4e19f357f": {
+      "id": "a8e6ecc4-30df-4af1-9b29-cea4e19f357f",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101931",
+      "name": "Talbot's Chainsaw",
+      "type": "EQUIPMENT",
+      "unique": true
+    },
+    "ff38ff94-8856-41c6-a2e4-6ed89767f2b2": {
+      "id": "ff38ff94-8856-41c6-a2e4-6ed89767f2b2",
+      "region": "Player1-Hand",
+      "owner": "Player1",
+      "cardId": "100919",
+      "name": "Hide",
+      "type": "NONE"
+    },
+    "6750dc44-e824-4ba6-9391-53014dd65bb5": {
+      "id": "6750dc44-e824-4ba6-9391-53014dd65bb5",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101654",
+      "name": "Rötschreck",
+      "type": "MASTER"
+    },
+    "a0a58b73-d7dd-4ae2-8275-2594d4b2209e": {
+      "id": "a0a58b73-d7dd-4ae2-8275-2594d4b2209e",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100863",
+      "name": "Guard Dogs",
+      "type": "REACTION"
+    },
+    "6ae053cf-7411-4121-8f5d-9eb681871a44": {
+      "id": "6ae053cf-7411-4121-8f5d-9eb681871a44",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "200065",
+      "name": "Amaravati",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "chi",
+        "DOM",
+        "OBF",
+        "QUI"
+      ]
+    },
+    "0c416aee-10da-47a4-8d19-660db2f05844": {
+      "id": "0c416aee-10da-47a4-8d19-660db2f05844",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101578",
+      "name": "Redirection",
+      "type": "REACTION"
+    },
+    "2239b8ee-8914-4748-a3a1-a905180aba2c": {
+      "id": "2239b8ee-8914-4748-a3a1-a905180aba2c",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "9977ee26-1d03-45f5-b9d6-47c2ff8b209c": {
+      "id": "9977ee26-1d03-45f5-b9d6-47c2ff8b209c",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100644",
+      "name": "Enhanced Senses",
+      "type": "REACTION"
+    },
+    "0dc5f16a-7504-4116-b660-b3eed36abae0": {
+      "id": "0dc5f16a-7504-4116-b660-b3eed36abae0",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "REACTION"
+    },
+    "904d6393-8cb4-4fed-8eb0-4a2854706fd3": {
+      "id": "904d6393-8cb4-4fed-8eb0-4a2854706fd3",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100775",
+      "name": "Fortschritt Library",
+      "type": "MASTER"
+    },
+    "fcbf3ce6-6ee9-48e1-befe-8483d5f8db56": {
+      "id": "fcbf3ce6-6ee9-48e1-befe-8483d5f8db56",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101467",
+      "name": "Praxis Seizure: Paris",
+      "type": "POLITICAL"
+    },
+    "7a92cc26-dde4-4697-acb4-619d9a677683": {
+      "id": "7a92cc26-dde4-4697-acb4-619d9a677683",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100362",
+      "name": "Cloak the Gathering",
+      "type": "MODIFIER"
+    },
+    "47f27c19-e130-4f7a-90da-c23b72babc07": {
+      "id": "47f27c19-e130-4f7a-90da-c23b72babc07",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101943",
+      "name": "Tasha Morgan",
+      "type": "RETAINER",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true,
+      "unique": true
+    },
+    "a7326d5e-9bbc-4d64-8882-49ffd3db02fc": {
+      "id": "a7326d5e-9bbc-4d64-8882-49ffd3db02fc",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100020",
+      "name": "Acrobatics",
+      "type": "COMBAT"
+    },
+    "1098deae-ea76-4506-8bde-eff3f619c9dd": {
+      "id": "1098deae-ea76-4506-8bde-eff3f619c9dd",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101746",
+      "name": "Shadow Twin",
+      "type": "ACTION"
+    },
+    "d1a85e95-3457-47b8-a353-17c00b6d647f": {
+      "id": "d1a85e95-3457-47b8-a353-17c00b6d647f",
+      "region": "Player4-Hand",
+      "owner": "Player4",
+      "cardId": "101296",
+      "name": "Nose of the Hound",
+      "type": "ACTION"
+    },
+    "ea115e43-d7e0-426a-b845-edcc472a25ae": {
+      "id": "ea115e43-d7e0-426a-b845-edcc472a25ae",
+      "region": "Player1-Uncontrolled region",
+      "owner": "Player1",
+      "cardId": "200689",
+      "name": "Jennie \"Cassie247\" Orne",
+      "type": "IMBUED",
+      "capacity": 5,
+      "clan": "VISIONARY",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "inn",
+        "jud",
+        "viz"
+      ]
+    },
+    "624c7060-c016-4255-b928-4a0b256f29d8": {
+      "id": "624c7060-c016-4255-b928-4a0b256f29d8",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100001",
+      "name": ".44 Magnum",
+      "type": "EQUIPMENT"
+    },
+    "36241f55-e0b9-4509-a3be-8f3e35a6d37a": {
+      "id": "36241f55-e0b9-4509-a3be-8f3e35a6d37a",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101948",
+      "name": "Telepathic Counter",
+      "type": "REACTION"
+    },
+    "bffeb5f0-b959-47b3-bd32-7ca7d15ce61b": {
+      "id": "bffeb5f0-b959-47b3-bd32-7ca7d15ce61b",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200478",
+      "name": "François Villon",
+      "type": "VAMPIRE",
+      "capacity": 10,
+      "votes": "2",
+      "title": "prince",
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "chi",
+        "obf",
+        "pot",
+        "AUS",
+        "CEL",
+        "PRE"
+      ]
+    },
+    "966ddf61-e694-45fa-90da-f2ca0ad2951a": {
+      "id": "966ddf61-e694-45fa-90da-f2ca0ad2951a",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100031",
+      "name": "Aire of Elation",
+      "type": "MODIFIER"
+    },
+    "ec08faaa-c081-48e0-870a-d5115f448233": {
+      "id": "ec08faaa-c081-48e0-870a-d5115f448233",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "201481",
+      "name": "Xian \"DziDzat155\" Quan",
+      "type": "IMBUED",
+      "capacity": 4,
+      "clan": "DEFENDER",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "def",
+        "inn"
+      ]
+    },
+    "61e5c874-072c-4310-82fd-fa56f8069bd6": {
+      "id": "61e5c874-072c-4310-82fd-fa56f8069bd6",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100984",
+      "name": "Information Highway",
+      "type": "MASTER",
+      "unique": true
+    },
+    "322f7840-4e18-4740-82e3-41a9c386e1a2": {
+      "id": "322f7840-4e18-4740-82e3-41a9c386e1a2",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101196",
+      "name": "Meld with the Land",
+      "type": "COMBAT"
+    },
+    "e6da19c2-fc6f-4018-8e49-7b5fe42a4811": {
+      "id": "e6da19c2-fc6f-4018-8e49-7b5fe42a4811",
+      "region": "Player3-Hand",
+      "owner": "Player3",
+      "cardId": "100020",
+      "name": "Acrobatics",
+      "type": "COMBAT"
+    },
+    "1e2a635b-ea96-4dd0-b3a8-448b9a76a64c": {
+      "id": "1e2a635b-ea96-4dd0-b3a8-448b9a76a64c",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "551ed880-8cdf-4347-9fc0-cd694a44b9d9": {
+      "id": "551ed880-8cdf-4347-9fc0-cd694a44b9d9",
+      "region": "Player5-Uncontrolled region",
+      "owner": "Player5",
+      "cardId": "201323",
+      "name": "Sukainah",
+      "type": "VAMPIRE",
+      "capacity": 3,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "qui"
+      ]
+    },
+    "37d78452-fc2d-45db-ad2e-4053fa2e36f7": {
+      "id": "37d78452-fc2d-45db-ad2e-4053fa2e36f7",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100043",
+      "name": "Amaranth",
+      "type": "COMBAT"
+    },
+    "4dde682f-d62d-4501-a039-ce83e4aab532": {
+      "id": "4dde682f-d62d-4501-a039-ce83e4aab532",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100091",
+      "name": "Arms of the Abyss",
+      "type": "COMBAT"
+    },
+    "f9176395-a05e-44a3-8cf2-1805a534ed76": {
+      "id": "f9176395-a05e-44a3-8cf2-1805a534ed76",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100885",
+      "name": "Haqim's Law: Leadership",
+      "type": "ACTION"
+    },
+    "8c09a9a7-d9b0-40bd-a474-6322b0739421": {
+      "id": "8c09a9a7-d9b0-40bd-a474-6322b0739421",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101081",
+      "name": "Leather Jacket",
+      "type": "EQUIPMENT"
+    },
+    "b0fdbb3b-1029-479a-8332-3eedb4beaaf8": {
+      "id": "b0fdbb3b-1029-479a-8332-3eedb4beaaf8",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100598",
+      "name": "Eagle's Sight",
+      "type": "REACTION"
+    },
+    "ef7157a7-9ddf-4cd9-af59-70cde64ee808": {
+      "id": "ef7157a7-9ddf-4cd9-af59-70cde64ee808",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100557",
+      "name": "Disputed Territory",
+      "type": "POLITICAL"
+    },
+    "e63140f7-e495-406d-8580-27aef8b7c779": {
+      "id": "e63140f7-e495-406d-8580-27aef8b7c779",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "7ff1e56b-c7dc-418e-9910-593e05062c7e": {
+      "id": "7ff1e56b-c7dc-418e-9910-593e05062c7e",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "200759",
+      "name": "Kashan",
+      "type": "VAMPIRE",
+      "capacity": 7,
+      "votes": "1",
+      "title": "1 vote",
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "obt",
+        "pre",
+        "CEL",
+        "OBF",
+        "QUI"
+      ]
+    },
+    "6e491c1d-4cdb-4f67-bc2a-4e9cacf56168": {
+      "id": "6e491c1d-4cdb-4f67-bc2a-4e9cacf56168",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "87c18884-71fb-4363-8867-b3deb9bcd6f2": {
+      "id": "87c18884-71fb-4363-8867-b3deb9bcd6f2",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100703",
+      "name": "Far Mastery",
+      "type": "ACTION"
+    },
+    "52f77e0a-e595-4294-a3f1-7ab1aeafc606": {
+      "id": "52f77e0a-e595-4294-a3f1-7ab1aeafc606",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101215",
+      "name": "Puppet Master",
+      "type": "ACTION"
+    },
+    "6839cc36-587e-452c-85fe-729ce32572df": {
+      "id": "6839cc36-587e-452c-85fe-729ce32572df",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100362",
+      "name": "Cloak the Gathering",
+      "type": "MODIFIER"
+    },
+    "018720cb-08fe-4ba4-869f-b53b66fb80e5": {
+      "id": "018720cb-08fe-4ba4-869f-b53b66fb80e5",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "POLITICAL"
+    },
+    "6b71b2d9-7790-4d75-aa1e-893028e1f27f": {
+      "id": "6b71b2d9-7790-4d75-aa1e-893028e1f27f",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "ACTION"
+    },
+    "4a782058-125d-4c33-81fe-6fc9457259bf": {
+      "id": "4a782058-125d-4c33-81fe-6fc9457259bf",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100043",
+      "name": "Amaranth",
+      "type": "COMBAT"
+    },
+    "fc41c74b-1e25-4aec-9f6c-0e6a1bed28cc": {
+      "id": "fc41c74b-1e25-4aec-9f6c-0e6a1bed28cc",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100250",
+      "name": "Breath of the Dragon",
+      "type": "COMBAT"
+    },
+    "88bcb168-e5be-43b7-a547-4b033fee7106": {
+      "id": "88bcb168-e5be-43b7-a547-4b033fee7106",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "200544",
+      "name": "Guido Lucciano",
+      "type": "VAMPIRE",
+      "capacity": 5,
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "dom",
+        "obf",
+        "OBT"
+      ]
+    },
+    "89a05280-82cf-444c-b845-69af35516912": {
+      "id": "89a05280-82cf-444c-b845-69af35516912",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100760",
+      "name": "Forced Awakening",
+      "type": "REACTION"
+    },
+    "82e10bec-3376-4215-90d9-8f8b4fa15547": {
+      "id": "82e10bec-3376-4215-90d9-8f8b4fa15547",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200345",
+      "name": "Dieter Kleist",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus"
+      ]
+    },
+    "c2638480-bc34-40bf-82ca-a7de10b9ecd4": {
+      "id": "c2638480-bc34-40bf-82ca-a7de10b9ecd4",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100991",
+      "name": "Inspire",
+      "type": "NONE"
+    },
+    "126595ec-15d3-495d-9ba4-f6b1ebbd7b62": {
+      "id": "126595ec-15d3-495d-9ba4-f6b1ebbd7b62",
+      "region": "Player3-Hand",
+      "owner": "Player3",
+      "cardId": "101949",
+      "name": "Telepathic Misdirection",
+      "type": "REACTION"
+    },
+    "eb900ca5-2239-4f67-b66f-388c99269fca": {
+      "id": "eb900ca5-2239-4f67-b66f-388c99269fca",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101779",
+      "name": "Sideslip",
+      "type": "COMBAT"
+    },
+    "394bdbeb-8641-4e2a-b7af-d68e4999e15a": {
+      "id": "394bdbeb-8641-4e2a-b7af-d68e4999e15a",
+      "region": "Player4-Uncontrolled region",
+      "owner": "Player4",
+      "cardId": "200339",
+      "name": "Devin Bisley",
+      "type": "VAMPIRE",
+      "capacity": 5,
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "vic",
+        "ANI",
+        "AUS"
+      ]
+    },
+    "f1f4b733-6ce6-4ec5-ba4c-a8126af1319a": {
+      "id": "f1f4b733-6ce6-4ec5-ba4c-a8126af1319a",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101735",
+      "name": "Shadow Body",
+      "type": "COMBAT"
+    },
+    "feccb5d8-9d79-476b-86bd-dad5cf444ed3": {
+      "id": "feccb5d8-9d79-476b-86bd-dad5cf444ed3",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100250",
+      "name": "Breath of the Dragon",
+      "type": "COMBAT"
+    },
+    "b41255c6-40d4-42c1-8780-307bae085ce4": {
+      "id": "b41255c6-40d4-42c1-8780-307bae085ce4",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "200432",
+      "name": "Erick \"Shophet125\" Franco",
+      "type": "IMBUED",
+      "capacity": 4,
+      "clan": "JUDGE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "inn",
+        "jud"
+      ]
+    },
+    "7fa21b6a-24c0-400e-a222-f08e9caa5cc7": {
+      "id": "7fa21b6a-24c0-400e-a222-f08e9caa5cc7",
+      "region": "Player2-Uncontrolled region",
+      "owner": "Player2",
+      "cardId": "200760",
+      "name": "Kassiym Malikhair",
+      "type": "VAMPIRE",
+      "capacity": 6,
+      "clan": "KIASYD",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "dom",
+        "for",
+        "MYT",
+        "OBT"
+      ]
+    },
+    "2d19521c-abcf-425e-bd0a-8c469b265ed3": {
+      "id": "2d19521c-abcf-425e-bd0a-8c469b265ed3",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101949",
+      "name": "Telepathic Misdirection",
+      "type": "REACTION"
+    },
+    "d57c0cca-2a90-4e04-b59a-b2a6e7401fbc": {
+      "id": "d57c0cca-2a90-4e04-b59a-b2a6e7401fbc",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100727",
+      "name": "Fifth Tradition: Hospitality",
+      "type": "ACTION"
+    },
+    "3db2b2b2-19f1-4a57-8acf-91236bd4cd5e": {
+      "id": "3db2b2b2-19f1-4a57-8acf-91236bd4cd5e",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101886",
+      "name": "Strike with Conviction",
+      "type": "NONE"
+    },
+    "c9306220-86a4-4d49-9fee-68c485d42f8f": {
+      "id": "c9306220-86a4-4d49-9fee-68c485d42f8f",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200107",
+      "name": "Anson",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "2",
+      "title": "prince",
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "dom",
+        "CEL",
+        "PRE"
+      ]
+    }
+  },
+  "players": {
+    "Player5": {
+      "name": "Player5",
+      "pool": 30,
+      "victoryPoints": 0.0,
+      "prey": "Player2",
+      "predator": "Player3",
+      "regions": {
+        "UNCONTROLLED": {
+          "id": "Player5-Uncontrolled region",
+          "cards": [
+            "08a1086f-1f0e-4084-8d45-aa43b0079838",
+            "238bc5d2-6df8-4f31-899a-b9005442f040",
+            "3836cafe-0f09-455e-b8a9-7caa32de4675",
+            "551ed880-8cdf-4347-9fc0-cd694a44b9d9"
+          ],
+          "player": "Player5",
+          "type": "UNCONTROLLED"
+        },
+        "READY": {
+          "id": "Player5-Ready region",
+          "player": "Player5",
+          "type": "READY"
+        },
+        "TORPOR": {
+          "id": "Player5-Torpor",
+          "player": "Player5",
+          "type": "TORPOR"
+        },
+        "ASH_HEAP": {
+          "id": "Player5-Ash heap",
+          "player": "Player5",
+          "type": "ASH_HEAP"
+        },
+        "CRYPT": {
+          "id": "Player5-Crypt",
+          "cards": [
+            "48292cbd-68a2-4486-8b9e-28107653b487",
+            "831ed914-7d5b-4f59-b158-12d1659364ee",
+            "c7bef38b-14c9-41cd-abb0-9dade0ec20b3",
+            "261ba3cb-3d55-45c7-a5d6-9f9371578df1",
+            "38567522-15fb-4bcb-9a5b-6dfd4807c400",
+            "6ae053cf-7411-4121-8f5d-9eb681871a44",
+            "7ff1e56b-c7dc-418e-9910-593e05062c7e",
+            "a90b0f51-ba2f-4c8a-a7f7-248dc645fd18"
+          ],
+          "player": "Player5",
+          "type": "CRYPT"
+        },
+        "RESEARCH": {
+          "id": "Player5-Research Area",
+          "player": "Player5",
+          "type": "RESEARCH"
+        },
+        "LIBRARY": {
+          "id": "Player5-Library",
+          "cards": [
+            "5b44a9fc-a56e-4b4d-9d9b-c8ea87cb3524",
+            "c8d69c75-6a06-4c27-9543-31ce4d90ebf4",
+            "5f5cc1eb-9bc8-4aa6-a43d-67b76355e0e1",
+            "018720cb-08fe-4ba4-869f-b53b66fb80e5",
+            "fffbcce5-b2ca-40d8-8016-95df4efa9559",
+            "a89d79fb-2ff1-4eeb-ad25-1f3e482fcc28",
+            "6d23957e-dfca-4e72-b01c-298cd5466112",
+            "9409e1e5-5917-481b-b22c-17199a85ab6a",
+            "1d85d817-08e7-4b4b-be28-f58a0ac17fcd",
+            "5c6410ce-a9aa-4d42-9c05-a723579efbec",
+            "faa3ecc4-177e-45d5-8249-500dc537bccb",
+            "38f8e43b-8f0e-42fb-86d2-3b99cc8597c7",
+            "982dab3a-fbe1-4962-afc5-e41c3fa91616",
+            "ef7157a7-9ddf-4cd9-af59-70cde64ee808",
+            "aac096fb-6590-45e6-a7da-898a7298d7c9",
+            "42ef293a-8a82-4374-870f-791b2c5ffa23",
+            "1e2a635b-ea96-4dd0-b3a8-448b9a76a64c",
+            "22d344b6-fb2a-44d2-92e9-5885f434308c",
+            "681b47d2-87a0-4486-8482-14bd57bd5653",
+            "7a92cc26-dde4-4697-acb4-619d9a677683",
+            "20cdebff-1b73-450f-997b-4ca1c9bea15f",
+            "cebaac85-0e40-4840-8aa7-e1a57b0890b5",
+            "c0f84f0e-abc5-4bb2-aaf6-27dd06173533",
+            "c75b30af-6572-404d-a4e9-223f35f604c2",
+            "cf7aedf5-de98-43b8-a2f2-a376b897cb18",
+            "2b970a7a-f351-4ccb-b3ab-9cd9c4798c0f",
+            "4950bcbe-7a42-4ae9-9e3f-80b7d56a0a00",
+            "929fb916-5a5a-4ca2-aea4-10ae4949c16f",
+            "cbbd405e-bf94-4800-b6b9-54268ce48fd7",
+            "792852de-18fb-4c42-9908-3a3966ff60e9",
+            "0a2c5cd1-aa40-4a22-a1fc-b842bc68c493",
+            "8988f6ed-153b-4380-8cce-66932ae0618d",
+            "00f5ec04-04d3-426d-8720-3c406c97ef23",
+            "3aeffcfa-8651-4309-95aa-eda82d692586",
+            "5f89c1a9-ae48-4b82-8b1e-ca4064d71eea",
+            "06c14063-74f1-495b-9eda-83da686b3ea9",
+            "3a80ce2f-e193-4ce9-bde8-1af384f2ca82",
+            "f3c2a081-9b0b-493b-9130-22e4de2ce954",
+            "084ee643-3035-4dc9-ad34-8a78035c153e",
+            "fc6cac88-9dac-46aa-8d12-a3fb4aa039ff",
+            "74571bb7-d64b-48f7-afff-33d10e2839f6",
+            "6b71b2d9-7790-4d75-aa1e-893028e1f27f",
+            "ce868423-2098-4423-9dae-2239b78c6c30",
+            "6f91d35a-ecae-4f56-9c4d-a173892fcd19",
+            "6e491c1d-4cdb-4f67-bc2a-4e9cacf56168",
+            "61e5c874-072c-4310-82fd-fa56f8069bd6",
+            "6839cc36-587e-452c-85fe-729ce32572df",
+            "dc3416c4-27b8-4b03-8854-f7c3a6d24937",
+            "7bd7dae9-5c77-46cd-b68b-de72f7befc51",
+            "f9176395-a05e-44a3-8cf2-1805a534ed76",
+            "f14ee986-52b4-4638-b0b2-704bb5787fff",
+            "a127bd34-d439-48f5-b65d-7745fd506102",
+            "f80a89a6-0650-4d7d-82c2-fe45772cfb54",
+            "765036a2-655b-4706-ac53-35a3b4ad8211",
+            "ec50ba60-753f-4795-af33-d199edfdc170",
+            "98898adb-e6c7-4ade-8326-856874d7764c",
+            "f434b268-c858-4fe8-8996-dfe1163a0934",
+            "fb2dfef9-bb7f-449e-964f-e40f14e31300",
+            "9de8c553-b458-4d31-8d6e-6b3cb50cc758",
+            "6c204b10-5f42-4a2d-a5fb-4e44e4e8291d",
+            "275c6c01-3456-4843-a701-56f0c0378f9e",
+            "5663d97f-75b1-4a6b-9306-8799d9f85232",
+            "0171474e-a14c-4112-b125-70a0c102e151",
+            "e854d36f-abd8-4030-a91b-8d65723670d1",
+            "7b673c16-c645-4db3-a24c-ad0462c2c7b3",
+            "2f275b30-d806-46ac-acce-f7fb8a7d972b",
+            "cfaa6fda-5484-49ce-97e7-9766f13f339a",
+            "decf8e85-10c6-4127-a8f1-0077a35073f6"
+          ],
+          "player": "Player5",
+          "type": "LIBRARY"
+        },
+        "HAND": {
+          "id": "Player5-Hand",
+          "cards": [
+            "83566d4f-9a51-47be-b75f-c8e507ae4ac0",
+            "853ed945-f379-4123-8da7-5c1f33e10c23",
+            "7bfa9d8d-ee51-4449-808c-4bd95f766f94",
+            "1cc878d8-af24-48eb-91b8-3a85c5b9915b",
+            "a908d483-b7aa-4539-9603-2f7ef817628e",
+            "4baba8d2-3b8d-4d5c-957d-0faa374db7f9",
+            "c6df751a-b503-4806-9d51-390ec884dfb3"
+          ],
+          "player": "Player5",
+          "type": "HAND"
+        },
+        "REMOVED_FROM_GAME": {
+          "id": "Player5-Removed from Game",
+          "player": "Player5",
+          "type": "REMOVED_FROM_GAME"
+        }
+      },
+      "ousted": false
+    },
+    "Player2": {
+      "name": "Player2",
+      "pool": 30,
+      "victoryPoints": 0.0,
+      "prey": "Player1",
+      "predator": "Player5",
+      "regions": {
+        "UNCONTROLLED": {
+          "id": "Player2-Uncontrolled region",
+          "cards": [
+            "7cbd2d1c-ab3b-4036-b2d8-2247d114d8d0",
+            "201425cd-4c05-4b4c-b45f-7f58672ba2c6",
+            "a9d32fef-81d4-4a9b-809d-688c2a346598",
+            "7fa21b6a-24c0-400e-a222-f08e9caa5cc7"
+          ],
+          "player": "Player2",
+          "type": "UNCONTROLLED"
+        },
+        "READY": {
+          "id": "Player2-Ready region",
+          "player": "Player2",
+          "type": "READY"
+        },
+        "TORPOR": {
+          "id": "Player2-Torpor",
+          "player": "Player2",
+          "type": "TORPOR"
+        },
+        "ASH_HEAP": {
+          "id": "Player2-Ash heap",
+          "player": "Player2",
+          "type": "ASH_HEAP"
+        },
+        "CRYPT": {
+          "id": "Player2-Crypt",
+          "cards": [
+            "999c9a0c-d356-4a0c-96af-59fd68cd2202",
+            "a4307cba-7885-494d-b596-6de1efbfeaa4",
+            "67bd3501-bba3-47ab-a698-3c14ff4b95f1",
+            "0722a406-1b37-4550-b56a-b6fcc2d2eb0c",
+            "5f1b1862-84fe-4e92-bcb8-b398d64dc1dd",
+            "e6f44176-4cf9-4895-b8a7-3cbf4fed3c46",
+            "061f07a8-212c-4181-87c8-3a75cd28d62e",
+            "88bcb168-e5be-43b7-a547-4b033fee7106"
+          ],
+          "player": "Player2",
+          "type": "CRYPT"
+        },
+        "RESEARCH": {
+          "id": "Player2-Research Area",
+          "player": "Player2",
+          "type": "RESEARCH"
+        },
+        "LIBRARY": {
+          "id": "Player2-Library",
+          "cards": [
+            "98a4dc8a-ef87-49da-ab9a-5ad59ffcfaad",
+            "475b393d-7bee-43da-80b0-2780344969e6",
+            "15ead4ac-fc9d-442c-ae50-e46bf2a29a7d",
+            "09bde060-a6e5-4ae0-a8e5-62260cb9a22e",
+            "1987ea9d-bd37-445b-868d-9b4ec17f2ccf",
+            "4dde682f-d62d-4501-a039-ce83e4aab532",
+            "ba90c8c3-7d69-48e0-b33e-c6f970d65d02",
+            "98d8c86e-d144-4568-9f75-7ee08ecf3ec3",
+            "12936d0c-b9ff-49b7-892c-68abad302c91",
+            "d2543db0-f55d-4676-905a-65e705463375",
+            "87c18884-71fb-4363-8867-b3deb9bcd6f2",
+            "113d2e5a-3a4c-462c-baf6-bbee5cd18a30",
+            "9bca2bd8-879f-4780-a921-df544e18387e",
+            "cfd31847-08be-40f6-9ecb-6ecb52a97a40",
+            "26f7d63f-5bcd-430b-9864-4bf87b2bd9a7",
+            "9134fba0-c61b-48cf-9657-575cf682511d",
+            "1098deae-ea76-4506-8bde-eff3f619c9dd",
+            "338ba2e8-3add-41c8-b87e-3376161530e8",
+            "22c8e45b-36c6-4dc8-adff-2b25b516c4fe",
+            "9ea42215-cd6a-4dee-a599-14dacf007c7f",
+            "d20f9732-f7a8-41f5-b303-15d8993d8c1e",
+            "67bfa613-ca60-49f2-b2ee-dbf803cf8c55",
+            "4a9bad7e-d726-4cca-990f-323b99ff3b76",
+            "abee65dc-99f3-49b6-a612-5cd24b104177",
+            "018cdb85-379c-4f1e-bf78-e826e6fd1168",
+            "e30b3795-3699-4402-90ff-e21e7417cd41",
+            "b478280b-e0b1-4fc7-a065-adda5925e19d",
+            "70a3a9af-bb5d-46c7-81c3-53032926543a",
+            "16946572-264b-4a2a-a876-d338c4d29933",
+            "06a7fc96-7863-4637-859f-db554976e5db",
+            "672fb102-ee04-4c5a-a16d-107966099def",
+            "1797dc8f-0630-4a43-a08c-5f4cceaa6fe5",
+            "05ee4358-e9b2-4095-bd47-23f53a83d666",
+            "729b801a-9f24-4965-acd0-f5acaf331510",
+            "3e086588-5661-4a6f-be94-9f2370b4dae7",
+            "a246e98e-2b53-44b4-aa2f-44533f112b77",
+            "a6680ed1-c695-468e-9041-590473834e4a",
+            "050140ff-4e9d-4b40-b66b-590096890f93",
+            "0f0fc129-16f4-44b6-9d36-5b164472ef07",
+            "af7092f3-da7f-42af-a971-a6d4f1c8a2d1",
+            "986ec68d-0d07-475b-ad7c-d9f223e05489",
+            "80ad4825-5968-4e0c-b687-f9408809f336",
+            "ed50b1ff-cdfa-4bce-8cd6-b7614b82818e",
+            "0dc5f16a-7504-4116-b660-b3eed36abae0",
+            "f814e3fd-e6d4-4437-8e27-95626f2a6e4a",
+            "c4fdbdae-4f03-4194-8dfe-b530fec7dade",
+            "b4ff6347-a375-4f43-ac3e-14caef1ef027",
+            "89a05280-82cf-444c-b845-69af35516912",
+            "c3d66660-d8b6-4158-b355-45abe43b4f22",
+            "d14a4e28-d093-4909-8090-9fdf12e85f20",
+            "a8abd1df-5256-417d-b30d-93213b5031a2",
+            "0346f0d2-2484-4995-8f97-24e8ef2e9ce8",
+            "975a3b20-0797-4812-8b23-bb122fad2ff2",
+            "f73b2d5f-981d-4df1-83b1-b42bd7fe4bc3",
+            "a9afde11-6367-4648-afd2-c79991885a24",
+            "2b07162d-dcc8-4687-ab9e-7a035af81ed8",
+            "c82aa0e3-151b-4f29-b823-bb62851db9f2",
+            "833a9eb8-ee37-47b8-a647-780785eb5285",
+            "62303775-6385-4e86-a92e-9180ab415d6e",
+            "f66a6b01-639a-4a6a-b661-9963a14e9cef",
+            "bf1feb04-4ee9-4e1f-ad26-ee01f1fa2f6e",
+            "68501eba-04ea-46ff-a9e3-3beacbaace25",
+            "52f77e0a-e595-4294-a3f1-7ab1aeafc606",
+            "71dab900-b014-4d84-8d0e-a022471ba32e",
+            "810afe3e-9936-463e-ac69-a4c91c9a3b18",
+            "5b059616-52b3-4e10-a99e-73e862b3a041",
+            "484bb6c0-9d8e-4cf3-b1d2-a421bd548675",
+            "063377c8-7672-435d-b895-639b3fe800d9",
+            "790d9289-97f7-4f7f-8bc8-0e767f2684c0",
+            "714dc388-364f-4d94-80bd-55fb0f42ef0a",
+            "c7ced527-a393-491a-b431-a34bb2ac783f",
+            "ad97813f-83c7-46ad-aa62-2164b4df713f",
+            "46af5eb6-2a9e-4c83-a31b-16b3f58b95ef",
+            "2b758e9f-5cfa-4628-9d5b-aa3fc607ffe6",
+            "3d727c28-fa4b-49d0-9e3f-da61e93e8f6f",
+            "1a8d8f0c-115f-484b-9e56-e3e12efaa466",
+            "0c416aee-10da-47a4-8d19-660db2f05844",
+            "8ea43de0-20fa-4373-a10f-606a0721d717",
+            "b0e1e1cb-ac81-46e2-96f9-64aa2d3375dd",
+            "f71b06b4-8d8b-4ccc-ad03-f8d0567e488f",
+            "f1f4b733-6ce6-4ec5-ba4c-a8126af1319a",
+            "dcbb85bc-faf0-4a6e-9e0f-38cf20c87b3e",
+            "cad951ee-4103-48ec-a89f-7642c46f0551"
+          ],
+          "player": "Player2",
+          "type": "LIBRARY"
+        },
+        "HAND": {
+          "id": "Player2-Hand",
+          "cards": [
+            "6265d0d7-f39e-4776-a781-7f1a38f60841",
+            "14072c04-e56a-48be-89e4-4e88524c8d61",
+            "f3d33a91-2c15-4c42-b5b8-5ec0eab3a8c4",
+            "df1eff20-da23-4d38-ba54-f3d7a3f915a0",
+            "86916397-0cd3-46e2-9499-f731d31d7f46",
+            "04547135-00e3-4d83-8c8b-74ab09b2395d",
+            "f479dd70-ab6a-4282-9fed-c67124b40935"
+          ],
+          "player": "Player2",
+          "type": "HAND"
+        },
+        "REMOVED_FROM_GAME": {
+          "id": "Player2-Removed from Game",
+          "player": "Player2",
+          "type": "REMOVED_FROM_GAME"
+        }
+      },
+      "ousted": false
+    },
+    "Player1": {
+      "name": "Player1",
+      "pool": 30,
+      "victoryPoints": 0.0,
+      "prey": "Player4",
+      "predator": "Player2",
+      "regions": {
+        "UNCONTROLLED": {
+          "id": "Player1-Uncontrolled region",
+          "cards": [
+            "ea115e43-d7e0-426a-b845-edcc472a25ae",
+            "ede251f5-c236-408b-8d58-7d6819b7ae5c",
+            "b275111d-8d8f-48ce-a255-6920126f530c",
+            "ff4e92dd-dfad-48e5-bea8-c8d93c8b75d9"
+          ],
+          "player": "Player1",
+          "type": "UNCONTROLLED"
+        },
+        "READY": {
+          "id": "Player1-Ready region",
+          "player": "Player1",
+          "type": "READY"
+        },
+        "TORPOR": {
+          "id": "Player1-Torpor",
+          "player": "Player1",
+          "type": "TORPOR"
+        },
+        "ASH_HEAP": {
+          "id": "Player1-Ash heap",
+          "player": "Player1",
+          "type": "ASH_HEAP"
+        },
+        "CRYPT": {
+          "id": "Player1-Crypt",
+          "cards": [
+            "b41255c6-40d4-42c1-8780-307bae085ce4",
+            "06dadd06-57b5-4b4a-8ca2-da8ffb019d46",
+            "ec08faaa-c081-48e0-870a-d5115f448233",
+            "46bdcc59-9749-4a1b-bcb0-87d3a7c08f5d",
+            "0b768172-ba75-44e2-ab0d-964af62d44d1",
+            "e78b5c5d-b840-44f7-b3a0-20855bdd05df",
+            "2e816653-74dc-4794-b5ae-391353e47333",
+            "98cab067-824c-45ab-9919-9e619fd14b1c"
+          ],
+          "player": "Player1",
+          "type": "CRYPT"
+        },
+        "RESEARCH": {
+          "id": "Player1-Research Area",
+          "player": "Player1",
+          "type": "RESEARCH"
+        },
+        "LIBRARY": {
+          "id": "Player1-Library",
+          "cards": [
+            "fe73cdfd-0057-484f-be04-fe4b7d90b8fa",
+            "fa67598b-6a2b-4a00-a327-9e1923965ee2",
+            "c2638480-bc34-40bf-82ca-a7de10b9ecd4",
+            "904d6393-8cb4-4fed-8eb0-4a2854706fd3",
+            "ce807294-775a-4426-8976-53b260857316",
+            "3db2b2b2-19f1-4a57-8acf-91236bd4cd5e",
+            "d2d1775f-827c-4229-9e17-9c98a525efc7",
+            "a7d8d057-c534-4e18-af7f-e42347af60a7",
+            "c5cb3594-989d-46e5-8838-ba4ad153a511",
+            "616e29fa-0ae7-4fb3-898e-9125a0c57014",
+            "5ab2b079-9213-4e5c-872d-9031135a9216",
+            "31998ee7-cb0b-431f-ac23-20bfb837e085",
+            "3cd9b849-1334-4c7a-868f-94f62660934b",
+            "b0e0882c-3060-46e1-8a51-c9fbe378785d",
+            "3e2469d0-64fe-4fcb-8cb5-542a735c880d",
+            "2a70659c-5922-4253-928a-feab11517def",
+            "216605a8-207f-4521-abc3-2a3920a80823",
+            "0e8c5576-1282-4e78-b13a-b9f4e066d59a",
+            "84b2f924-582d-4bcf-8bfd-d53e83b50992",
+            "019a913e-a88f-467e-aa36-6fe9068020f5",
+            "58b3001d-b4d4-4dbb-9e78-5dab8082983c",
+            "7e0eb6ef-7d89-4037-bc1c-02e3b3dccc04",
+            "79759a54-a929-42f2-922a-9d0ff969f542",
+            "61e1709c-a901-431f-8fdc-e6fc01dfe50f",
+            "56e08faf-3cb9-42ad-a2c3-f6d76d45f225",
+            "767d4ab1-fe0a-4281-893c-d28bf9e5b877",
+            "91a172ff-ac28-4106-8d82-2f66940e4c45",
+            "06bc661b-9d19-4c42-a0ed-e28a2d8cc30d",
+            "2b4ef9c2-4776-4c84-809d-5caa14aeb0d0",
+            "0514df5f-6d69-478d-b4b5-5adf494e2594",
+            "cfaa0a12-0fa6-4194-a401-15187d9d3fe7",
+            "2171d853-86c1-4226-b4a6-9575c68053e1",
+            "b21811a1-ef02-454f-8538-39461e38a82b",
+            "ad483aa9-8fe6-4cc6-8ca2-c5f83e1e69ba",
+            "92de035a-c322-415f-bccc-fa9a4e96eef2",
+            "d463201a-83fc-4c31-82bd-69021090d11a",
+            "8c09a9a7-d9b0-40bd-a474-6322b0739421",
+            "143a924f-674a-4941-9b56-ad6a53ff7e34",
+            "81be4333-d63f-4d9d-9031-f537b311966e",
+            "e66a5a67-99a3-456b-828d-e9395b05840e",
+            "11d5f943-32e8-450e-9e31-3beaf88202ea",
+            "624c7060-c016-4255-b928-4a0b256f29d8",
+            "eb281f62-2540-4b6b-b140-f1259bc36ad7",
+            "a79cce16-ae9c-476b-a696-db1e6d9ebe53",
+            "a8e6ecc4-30df-4af1-9b29-cea4e19f357f",
+            "370be10b-cce5-474a-8b60-44ea07ae2bff",
+            "36b5f66b-6a74-425e-b82d-089ad4fa4bf8",
+            "4f3ac25b-50ed-4b3d-8aa2-b3759969913a",
+            "e9c3a910-9096-4d5c-9fc2-89a509daa044",
+            "5ea16706-5b15-4855-9de6-17965f8b68ba",
+            "e5df7381-74ee-4017-9252-2b9b645418e5",
+            "cd657e02-c2f9-4d18-8b17-6425bebb33d0",
+            "9aae08c1-f8f9-42fe-9dbf-c06e5a3e7660",
+            "ae37c701-b663-4126-a31c-89e2f52aeca6",
+            "137dd89b-18cf-4de7-aac3-f48b4b2a7a2a",
+            "d2ee9160-d141-42e5-b869-fb626e1dc8c0",
+            "21ddacfd-1356-4c46-a3b3-6ff7e2a7f180",
+            "46ba8c94-27fc-41f6-9a39-a998df0dbcfe",
+            "d30d4bc7-b3e2-4061-9094-760ef91b160c",
+            "4e7e2827-6e34-4783-a59a-26d6efb9e304",
+            "6dc47db1-e1d1-4a90-9182-fd17e8d6b9d7",
+            "72860a05-cec8-4e02-9c10-fb098c439dc3",
+            "260b72fc-14c2-4dde-b65e-9fd0ca90341a",
+            "5f0958ce-615b-4389-8f9a-a4dcee00b50a"
+          ],
+          "player": "Player1",
+          "type": "LIBRARY"
+        },
+        "HAND": {
+          "id": "Player1-Hand",
+          "cards": [
+            "2c262f71-290c-4994-9b42-0c5cfbcb9ea0",
+            "44406512-4c0a-4caf-a635-8f4fce5820e2",
+            "73f9b4de-a7f7-43da-89c5-81432761dafe",
+            "1b905932-a424-45eb-b035-ccd23a38a05f",
+            "ff38ff94-8856-41c6-a2e4-6ed89767f2b2",
+            "b4d78396-ae08-4af1-8c90-9528ec7f1ea7",
+            "71db7a3a-423c-4f04-8442-edd1253da8fe"
+          ],
+          "player": "Player1",
+          "type": "HAND"
+        },
+        "REMOVED_FROM_GAME": {
+          "id": "Player1-Removed from Game",
+          "player": "Player1",
+          "type": "REMOVED_FROM_GAME"
+        }
+      },
+      "ousted": false
+    },
+    "Player4": {
+      "name": "Player4",
+      "pool": 30,
+      "victoryPoints": 0.0,
+      "prey": "Player3",
+      "predator": "Player1",
+      "regions": {
+        "UNCONTROLLED": {
+          "id": "Player4-Uncontrolled region",
+          "cards": [
+            "1af4580f-6f5d-48eb-83e2-f0cc5008d971",
+            "2794b59c-8c85-4eea-8d40-d600d2e33342",
+            "394bdbeb-8641-4e2a-b7af-d68e4999e15a",
+            "07ed5b60-e3c2-47c7-ae40-5e4910f9d499"
+          ],
+          "player": "Player4",
+          "type": "UNCONTROLLED"
+        },
+        "READY": {
+          "id": "Player4-Ready region",
+          "player": "Player4",
+          "type": "READY"
+        },
+        "TORPOR": {
+          "id": "Player4-Torpor",
+          "player": "Player4",
+          "type": "TORPOR"
+        },
+        "ASH_HEAP": {
+          "id": "Player4-Ash heap",
+          "player": "Player4",
+          "type": "ASH_HEAP"
+        },
+        "CRYPT": {
+          "id": "Player4-Crypt",
+          "cards": [
+            "e2e1940b-236e-4730-8e37-f2b7783aa7e7",
+            "68c7df84-42df-4c9f-bda4-cc6bf4a87a55",
+            "e59621fb-8f7c-4c79-9451-eecce46b416a",
+            "e5e8d1a9-98bc-4fbe-8377-817471526624",
+            "445541ba-7239-41dd-b13a-dde3e36270e3",
+            "17d15f54-d769-44bc-ac6a-1a16d33387ed",
+            "cfff9234-8168-4af9-b5ea-bde63aaba225",
+            "9b56e386-6c62-4654-8b97-2dc237cfd0cf"
+          ],
+          "player": "Player4",
+          "type": "CRYPT"
+        },
+        "RESEARCH": {
+          "id": "Player4-Research Area",
+          "player": "Player4",
+          "type": "RESEARCH"
+        },
+        "LIBRARY": {
+          "id": "Player4-Library",
+          "cards": [
+            "2d19521c-abcf-425e-bd0a-8c469b265ed3",
+            "7399caeb-6b6c-49d0-8797-6ed4a4ee6d67",
+            "76743da0-62a8-42ad-a3c9-a696c2ed5a16",
+            "6c91bdf9-c1cc-4416-81e9-457e25469815",
+            "56a59e1a-643f-4b0c-9373-9d47a2298326",
+            "eb73ab2a-c9a0-4d56-b2cb-e68663b4629b",
+            "cb975ac0-8262-4be9-9dca-566466c3cacf",
+            "7b0bc2f4-425e-4bf2-9b5f-fa2a60b2c914",
+            "b520748d-fd43-4326-92d0-5bb02fc08f2a",
+            "3dd9590e-47f2-4890-9a1b-7f7b2bfa3f67",
+            "5b9b8179-0d9f-43ec-995c-a93803000857",
+            "9dfd35a1-b708-4483-a1a5-978e2fa0166a",
+            "7d198ae5-6bcb-4faa-b276-55a435d7861b",
+            "0f6c0c23-81d8-4b3c-b91c-c24da7540175",
+            "feccb5d8-9d79-476b-86bd-dad5cf444ed3",
+            "95762493-10c0-47b7-8936-54080ebb8da7",
+            "a0a58b73-d7dd-4ae2-8275-2594d4b2209e",
+            "9300ff42-01f6-410f-b4da-03310ff8c711",
+            "b9dcf99f-7951-4f49-a02e-181ba1fcc7f8",
+            "ac62410f-c907-4f03-adfb-fb6a2d00a835",
+            "bebcbb94-5875-482b-a873-604581248373",
+            "497243ef-fe9e-444a-9a9c-13f12f8ed203",
+            "6a87625d-43d5-4147-851b-422ce2144ab8",
+            "fcba2d1a-e102-4e13-9574-f474e10bbfb3",
+            "47f27c19-e130-4f7a-90da-c23b72babc07",
+            "14028e29-4f5c-44b3-87eb-11003bbf6789",
+            "83cc6420-c82e-43db-86c5-2579be75e83a",
+            "796503fd-eda4-480d-a178-62b36d167891",
+            "d9df28f8-46e6-4ee7-9970-8259152e47af",
+            "4f8b7d6b-0588-4842-9a75-5086652a04b4",
+            "9789048e-b490-4d53-993f-c13d94464176",
+            "69997b73-7798-48b3-bed2-fbc0d585a15c",
+            "9358f48d-7130-4679-b8e1-f1745f987f67",
+            "4bb26059-7124-453d-ab5b-648a0dff0391",
+            "7c5bc17e-f208-4f14-91a4-2c973548fe60",
+            "1397b3f1-2bb7-47c6-8cc9-2776128f8bfc",
+            "414d994e-bcb1-47e3-990f-9cd751c8dd2c",
+            "2474953a-6612-478d-b8c2-5d87b756a037",
+            "4fb76ab5-b3eb-4ec8-8267-a66ae96f3bd1",
+            "6079d9bd-010f-4a6c-8c1e-af85a1cf76de",
+            "9bd2f65b-91e9-4d02-a48d-ed71d09bc1a8",
+            "c0eb9518-a806-49e1-a4cc-ed57289b0ff6",
+            "322f7840-4e18-4740-82e3-41a9c386e1a2",
+            "d541d777-fab8-406d-834e-0191c889fada",
+            "a00d8fd0-4526-47a2-baeb-12de79029a6f",
+            "e63140f7-e495-406d-8580-27aef8b7c779",
+            "a26e148e-9077-403f-99ee-2dc1895bcd19",
+            "4c71f9a3-dd02-4847-b2c4-ce4bbdae85b7",
+            "dd20635e-2d53-4c3e-bb15-0293cea4e1bb",
+            "b0fdbb3b-1029-479a-8332-3eedb4beaaf8",
+            "6f1afe70-5d42-4855-8987-d929f8c3e69e",
+            "759ea4ee-0dac-42c7-8b11-e659ed888ae4",
+            "9d80508a-b784-4d09-99c3-528e9cb48d16",
+            "0bc11ce0-10d5-44ed-bfb4-dfa50a6c1060",
+            "3add435a-a001-46be-926e-ec660f78e795",
+            "a91f1e3d-d28f-49f4-9949-ba60f0f1f9c3",
+            "7a4b446b-081d-47b1-87ca-351fda91d59a",
+            "fc41c74b-1e25-4aec-9f6c-0e6a1bed28cc",
+            "d587e62c-824e-4d9c-afa9-30cafbe1ce9d",
+            "073dd03b-031d-4655-94b2-0ba1b2354bda",
+            "16bd14dc-1ffb-4972-8d7b-bd4a2e722376",
+            "94ca764d-2193-48a4-aaf5-f1acb940a7d1",
+            "a8d790fc-2ad7-4a24-b9d0-9e4411ad406d",
+            "bdf56956-3ffd-47db-9fea-bd873c62f679",
+            "4e031959-9f64-4798-a04d-8cff30019300",
+            "3c26878a-cb35-4b6f-8c12-6bb6f94a876a",
+            "64b2f3ab-dfad-46df-86a9-980e5fc9e8a4",
+            "5eef3f41-7946-4652-973f-186f81eb9f28",
+            "032e8cee-7ab7-4452-bab3-bf4e7d872d2f",
+            "fe2bae97-905f-4c73-a8c4-bcb220867300",
+            "6df4c0fd-e15c-4330-9115-ba6e09b8474c",
+            "f38cd6fa-7d2e-4934-b069-e8f6882da670",
+            "095b267f-9f76-4fe2-a009-fb54bbf723a1",
+            "0a03fd20-64c9-48e6-91ed-0eb4df0e3eaa",
+            "cca3718d-9c63-402e-8574-fd00c00f188b",
+            "36241f55-e0b9-4509-a3be-8f3e35a6d37a",
+            "090f75ff-9f61-40e5-b750-e3022f68b15e",
+            "c3631c28-aa65-4cb7-85a5-409e74c12a0c",
+            "90d1ec04-e695-47a7-bb5a-23a1caf11a4b",
+            "a294179f-4052-45c7-85d2-20b4c722c85f",
+            "324145ce-7941-4578-97df-1b52b25a5267",
+            "473c9f83-286b-4572-b9ef-4d09a14feed5",
+            "296a2a53-cbee-4108-8f76-421f054d642d"
+          ],
+          "player": "Player4",
+          "type": "LIBRARY"
+        },
+        "HAND": {
+          "id": "Player4-Hand",
+          "cards": [
+            "87fab51d-d664-421c-987b-355cf040f403",
+            "336184f6-082c-467a-ae0e-8c5226371a5a",
+            "1aca4f58-c321-444e-a4ae-64dc1c4d761c",
+            "d0fcf838-a87a-4c28-b696-1334da63af5c",
+            "d1a85e95-3457-47b8-a353-17c00b6d647f",
+            "28d3a999-32a6-4e57-b552-ecbcccb6ad98",
+            "48b5fa36-8c0c-4585-9f2f-af35cb8a553d"
+          ],
+          "player": "Player4",
+          "type": "HAND"
+        },
+        "REMOVED_FROM_GAME": {
+          "id": "Player4-Removed from Game",
+          "player": "Player4",
+          "type": "REMOVED_FROM_GAME"
+        }
+      },
+      "ousted": false
+    },
+    "Player3": {
+      "name": "Player3",
+      "pool": 30,
+      "victoryPoints": 0.0,
+      "prey": "Player5",
+      "predator": "Player4",
+      "regions": {
+        "UNCONTROLLED": {
+          "id": "Player3-Uncontrolled region",
+          "cards": [
+            "6a812b13-c61b-4079-9831-f0581362ea3a",
+            "160d60a7-9e92-480d-8ab6-c9fd67b3edfc",
+            "9379fde1-c7db-412c-a4ac-1e08a2dc453c",
+            "ba3fc623-1d02-4670-a2d5-6ebfab374a25"
+          ],
+          "player": "Player3",
+          "type": "UNCONTROLLED"
+        },
+        "READY": {
+          "id": "Player3-Ready region",
+          "player": "Player3",
+          "type": "READY"
+        },
+        "TORPOR": {
+          "id": "Player3-Torpor",
+          "player": "Player3",
+          "type": "TORPOR"
+        },
+        "ASH_HEAP": {
+          "id": "Player3-Ash heap",
+          "player": "Player3",
+          "type": "ASH_HEAP"
+        },
+        "CRYPT": {
+          "id": "Player3-Crypt",
+          "cards": [
+            "82e10bec-3376-4215-90d9-8f8b4fa15547",
+            "bffeb5f0-b959-47b3-bd32-7ca7d15ce61b",
+            "fda0fc10-3e4d-491a-a521-d0fcbed8c93a",
+            "e372f4b6-6e29-4d9d-8827-a9b809001d11",
+            "c9306220-86a4-4d49-9fee-68c485d42f8f",
+            "684da46d-ef77-4ca3-9127-c8babe74af6b",
+            "90d0b900-c9a1-4f7b-8c99-023cdffadd4d",
+            "da2c7819-8e91-4b6d-ac9f-f891a6069047"
+          ],
+          "player": "Player3",
+          "type": "CRYPT"
+        },
+        "RESEARCH": {
+          "id": "Player3-Research Area",
+          "player": "Player3",
+          "type": "RESEARCH"
+        },
+        "LIBRARY": {
+          "id": "Player3-Library",
+          "cards": [
+            "d071131f-41f8-43a6-afe4-62d777591aaf",
+            "5c88d84e-81a9-43b4-bf70-f174a5c45067",
+            "8d423856-cf9c-4882-b2ba-8b50f3d2d925",
+            "ad8d2ce8-c451-484c-af13-6d2b34d7e1aa",
+            "3847f486-d5dc-42e2-b1fe-7297ed7a974e",
+            "212430a5-8ac5-4a4a-bbe2-be692aa8fac6",
+            "a6c50c3f-27fb-4372-b56c-679ab3e8e065",
+            "303ea11d-4b15-4f62-9397-822abb40c24d",
+            "038aae4d-27d9-4e2d-8091-6c685a420495",
+            "f96e98c9-692b-4d5a-8cc9-f1c0c4903dab",
+            "e03b4028-baeb-4d7a-835c-dcd9c704a123",
+            "4fd3d765-8fb1-4ddf-861d-55e3423c2be2",
+            "256160dd-0fed-4ab6-9b0a-70a92e73f5cd",
+            "c8cd17ff-8cd5-45ec-8db0-5026b387aa39",
+            "05bc5c33-8e9a-4534-9461-a682756d64a1",
+            "a82d45dc-2e19-4b72-9cff-545d16910ad8",
+            "fc6f4d22-982d-4e31-a4e6-5dbe8245eae5",
+            "fcbf3ce6-6ee9-48e1-befe-8483d5f8db56",
+            "26ec7ae4-4049-4a20-a12b-c8848080e9c2",
+            "3263050d-5db8-445c-b670-b9921a3d6a4d",
+            "4a782058-125d-4c33-81fe-6fc9457259bf",
+            "834b5291-5e47-4742-8461-4b91dfded566",
+            "8f00820f-424a-40c9-b240-afd9211ff6e1",
+            "147f0e0a-2bf2-46db-9130-330538eeadf6",
+            "0c022417-8826-45ae-8252-9f84840d1b29",
+            "eb900ca5-2239-4f67-b66f-388c99269fca",
+            "2f1ac7c4-8dbf-4eee-9868-f1409c0ff0f9",
+            "dc7ba5a4-9269-4784-b85d-92f312a440ab",
+            "6a0ed19b-f0f9-4ac5-a9af-b85ce1edd2bb",
+            "41156e79-b25c-46b6-9110-4be83d4e27cc",
+            "5cf98b1c-10e5-42ac-96f0-f80bf94cbc9e",
+            "eb4f0ffa-6486-4aa6-b7a6-7c0ac02e9857",
+            "3a48b67d-9896-4e9c-b73a-3b863c97d0e7",
+            "d57c0cca-2a90-4e04-b59a-b2a6e7401fbc",
+            "6e8f912d-1d1f-4e21-95ec-352f77f4ef9d",
+            "d2797bcf-9dd1-49e7-8006-2aebc126c5d8",
+            "d7c12ffd-dd41-4298-a94d-8f876ddde0e8",
+            "3602e06c-00df-42b7-be88-deb4392ceb73",
+            "2f4f46f2-b6f6-4853-a976-4d821614da71",
+            "1f832d31-0112-4dd9-aabe-552676183a86",
+            "316282a7-4007-4882-a93e-70f248a40de9",
+            "e28bc32d-16e4-45a6-bdd2-68cf77b03fb4",
+            "80b18395-33dd-4146-8e38-5fd2401f54f7",
+            "a7326d5e-9bbc-4d64-8882-49ffd3db02fc",
+            "48192a9b-f5f4-47bb-b1ee-517ede83efbe",
+            "389aab39-354c-413d-b959-c18b60270e44",
+            "66092635-f519-45ca-9761-61bdd753c97e",
+            "261c6489-6ea4-4d29-b799-d8aaa51d6843",
+            "9d278d4b-5b83-449d-aa90-ca140fa287f6",
+            "9977ee26-1d03-45f5-b9d6-47c2ff8b209c",
+            "68ae6199-81cc-47e5-965c-995dc03dfee8",
+            "50482cd9-bc68-4047-8241-2c2e1d0c4d16",
+            "cbf9c9c3-9148-4674-a179-9bbae4395787",
+            "44275bd4-831d-4d97-9dc5-7ceb1ce0e80b",
+            "084f7ceb-cc4c-440e-b79d-e4388923cf80",
+            "9d9bef8d-15ab-46ff-beb8-fc363a7c8081",
+            "d070acea-6d98-4b92-a230-4cf1468d3598",
+            "6750dc44-e824-4ba6-9391-53014dd65bb5",
+            "966ddf61-e694-45fa-90da-f2ca0ad2951a",
+            "5636bcf2-1091-42fe-af2f-67643849fe28",
+            "ef44db8b-b9bf-45a2-be9c-18e92765f920",
+            "37d78452-fc2d-45db-ad2e-4053fa2e36f7",
+            "45e7693d-0401-4bef-8caa-710752879281",
+            "c1f8ef92-7a6c-4806-8e66-0f7c696f1c1b",
+            "ee5576a8-95b9-4cb8-8e0c-186a764f6dee",
+            "033b04ef-42c2-47fb-b8c4-80c22ed30dee",
+            "f0ea7529-4dd8-4cf4-b1c1-c4c9e44ad450",
+            "14f255c1-d734-406f-bd6e-2f1ce87e14d8",
+            "0b805879-bd4a-42b4-8d06-2aa9b70e24f4",
+            "f7fc2645-356b-41cc-8367-ca2c9e6deb17",
+            "8b08ece5-66cf-4031-a1b2-fbb69a2d74a2",
+            "2b1c2256-ce51-478d-979e-38c61c7d9432",
+            "c472963f-ca05-44d7-a77c-516c079a40c4",
+            "859c93a6-d711-4861-8604-fc8ca1f678bf",
+            "5e3802f6-fad9-4035-953e-d43d78501892",
+            "277866b1-f07f-46c6-9bc4-81d79ce0025b",
+            "2239b8ee-8914-4748-a3a1-a905180aba2c",
+            "536ae22c-e882-419d-8704-006eb553e477",
+            "cc4a3c97-87fc-4e57-8a6d-60d605967c9f",
+            "1802eba5-e0b6-491e-9597-89f6053020bf",
+            "5775f2e2-263d-432a-88c1-17aa25369f41",
+            "8e3d9929-834e-47ce-97c2-c71d79103e0a",
+            "bd8bb231-6310-4987-b47b-00dfa477e889"
+          ],
+          "player": "Player3",
+          "type": "LIBRARY"
+        },
+        "HAND": {
+          "id": "Player3-Hand",
+          "cards": [
+            "bf55a8b3-85e4-42ff-adbc-e982c1933eb8",
+            "b54f78e8-5fdf-4f8e-b977-fb62a5d06fd7",
+            "126595ec-15d3-495d-9ba4-f6b1ebbd7b62",
+            "b63ac1f2-9b28-4147-a90f-4b55b191d53a",
+            "f1c5ec05-6993-461a-a1e5-3a0b667be528",
+            "9f2ce837-070f-4c4e-b7b0-c0d83262d901",
+            "e6da19c2-fc6f-4018-8e49-7b5fe42a4811"
+          ],
+          "player": "Player3",
+          "type": "HAND"
+        },
+        "REMOVED_FROM_GAME": {
+          "id": "Player3-Removed from Game",
+          "player": "Player3",
+          "type": "REMOVED_FROM_GAME"
+        }
+      },
+      "ousted": false
+    }
+  },
+  "currentPlayer": "Player5",
+  "edge": null,
+  "timeoutRequestor": null
+}

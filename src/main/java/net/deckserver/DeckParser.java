@@ -1,6 +1,6 @@
 package net.deckserver;
 
-import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.storage.json.cards.CardSearch;
 import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.*;
 import org.slf4j.Logger;
@@ -18,8 +18,9 @@ import static java.util.stream.Collectors.*;
 
 public class DeckParser {
 
+    public static final BinaryOperator<CardCount> CARD_MERGE = (a, b) -> new CardCount(b.getId(), b.getName(), a.getCount() + b.getCount(), b.getComments());
+    public static final Function<Map<Integer, Optional<CardCount>>, List<CardCount>> CARD_MAPPER = map -> map.values().stream().flatMap(Optional::stream).collect(toList());
     private final static Logger logger = LoggerFactory.getLogger(DeckParser.class);
-
     private final static Pattern HEADER_PATTERN = Pattern.compile("^(crypt|library|master|action|combat|reaction|all(y|ies)|combo|equipment|event|political).*");
     private final static Pattern LEGACY_JOL = Pattern.compile("^z@.*@z|^zzz.*");
     private final static Pattern COUNT_PATTERN = Pattern.compile("^(\\d{1,2}(?!\\d|st|nd|rd|th))\\s*x?\\s*(.*)$");
@@ -32,8 +33,6 @@ public class DeckParser {
     private static final Predicate<CardCount> IS_CRYPT = (item) -> cardSearch.get(String.valueOf(item.getId())).isCrypt();
     private static final Predicate<CardCount> FOUND_CARD = (item) -> item.getId() != null;
     private static final Function<CardCount, String> TYPE_MAPPER = (item) -> cardSearch.get(String.valueOf(item.getId())).getType();
-    public static final BinaryOperator<CardCount> CARD_MERGE = (a, b) -> new CardCount(b.getId(), b.getName(), a.getCount() + b.getCount(), b.getComments());
-    public static final Function<Map<Integer, Optional<CardCount>>, List<CardCount>> CARD_MAPPER = map -> map.values().stream().flatMap(Optional::stream).collect(toList());
 
     public static ExtendedDeck parseDeck(String contents) {
         Deck deck = new Deck();

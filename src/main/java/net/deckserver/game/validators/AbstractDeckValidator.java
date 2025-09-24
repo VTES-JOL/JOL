@@ -1,6 +1,6 @@
 package net.deckserver.game.validators;
 
-import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.storage.json.cards.CardSearch;
 import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;

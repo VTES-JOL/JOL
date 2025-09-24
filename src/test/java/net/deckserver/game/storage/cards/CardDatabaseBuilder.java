@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.game.storage.cards.importer.CryptImporter;
 import net.deckserver.game.storage.cards.importer.LibraryImporter;
+import net.deckserver.storage.json.cards.CardSearch;
 import net.deckserver.storage.json.cards.CardSummary;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,7 +23,6 @@ import java.util.stream.Stream;
 @Tag("CardDatabase")
 public class CardDatabaseBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(CardDatabaseBuilder.class);
     private static final String LIBRARY_FILE = "vteslib";
     private static final String CRYPT_FILE = "vtescrypt";
     private static final String PLAYTEST = "_playtest";
@@ -41,7 +39,7 @@ public class CardDatabaseBuilder {
         List<SummaryCard> summaryCards = Stream.of(coreCards, playTestCards).flatMap(List::stream).toList();
 
         Path imagesPath = Paths.get("images");
-        Path outputPath = Paths.get("target/static");
+        Path outputPath = Paths.get("static");
 
         assert imagesPath.toFile().exists() : "Images path does not exist";
 
@@ -53,7 +51,7 @@ public class CardDatabaseBuilder {
             String outputPrefix = summaryCard.isPlayTest() ? "secured/" : "";
 
             summaryCard.getNames().forEach(name -> {
-                assert CardSearch.INSTANCE.findCardExact(name).isPresent() : String.format("Card %s does not exist", name);
+                assert CardSearch.INSTANCE.findCardExact(name, true).isPresent() : String.format("Card %s does not exist", name);
             });
 
             // Process images
@@ -93,7 +91,7 @@ public class CardDatabaseBuilder {
         }
 
         // Output complete cards.json
-        mapper.writeValue(Paths.get("target/static/secured/cards.json").toFile(), summaryCards);
+        mapper.writeValue(Paths.get("static/secured/cards.json").toFile(), summaryCards);
 
     }
 

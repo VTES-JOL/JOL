@@ -4,11 +4,10 @@ import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.storage.json.cards.SecuredCardLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.services.cloudfront.cookie.CookiesForCannedPolicy;
+import software.amazon.awssdk.services.cloudfront.cookie.CookiesForCustomPolicy;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +18,23 @@ public class LoginServlet extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginServlet.class);
 
+    private void setupPlaytestAuth(HttpServletResponse response) {
+        logger.info("Setting up playtest auth cookies");
+        SecuredCardLoader cardLoader = new SecuredCardLoader("/secured/*");
+        try {
+            boolean devMode = System.getenv().getOrDefault("TYPE", "dev").equals("dev");
+            if (!devMode) {
+                String additionalSettings = ";HttpOnly; Domain=deckserver.net; Path=/; Secure;";
+                CookiesForCustomPolicy cookies = cardLoader.generateCookies();
+                response.addHeader("Set-Cookie", cookies.policyHeaderValue() + additionalSettings);
+                response.addHeader("Set-Cookie", cookies.signatureHeaderValue() + additionalSettings);
+                response.addHeader("Set-Cookie", cookies.keyPairIdHeaderValue() + additionalSettings);
+            }
+        } catch (Exception e) {
+            logger.error("Unable to set playtest auth cookies", e);
+        }
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         request.setCharacterEncoding("UTF-8");
@@ -28,25 +44,12 @@ public class LoginServlet extends HttpServlet {
         if (authResult) {
             request.getSession().setAttribute("meth", username);
             boolean playTester = JolAdmin.INSTANCE.isPlaytester(username);
-            if (playTester) { setupPlaytestAuth(response); }
+            if (playTester) {
+                setupPlaytestAuth(response);
+            }
             response.sendRedirect("/jol/");
         } else {
             response.sendRedirect("/jol/login");
-        }
-    }
-
-    private void setupPlaytestAuth(HttpServletResponse response) {
-        logger.info("Setting up playtest auth cookies");
-        SecuredCardLoader cardLoader = new SecuredCardLoader("/secured/*");
-        try {
-            String secure = System.getenv().getOrDefault("TYPE", "dev").equals("dev") ? "" : "Secure;";
-            String additionalSettings = String.format(";HttpOnly; Domain=deckserver.net; Path=/; Secure; %s", secure);
-            CookiesForCannedPolicy cookies = cardLoader.generateCookies();
-            response.addHeader("Set-Cookie", cookies.expiresHeaderValue() + additionalSettings);
-            response.addHeader("Set-Cookie", cookies.signatureHeaderValue() + additionalSettings);
-            response.addHeader("Set-Cookie", cookies.keyPairIdHeaderValue() + additionalSettings);
-        } catch (Exception e) {
-            logger.error("Unable to set playtest auth cookies", e);
         }
     }
 

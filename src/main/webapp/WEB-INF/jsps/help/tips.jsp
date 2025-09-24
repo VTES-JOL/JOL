@@ -7,8 +7,12 @@
                 <h5 class="mt-2 fs-6">Tips</h5>
             </div>
             <uL class="list-group list-group-flush">
-                <li class="list-group-item">Use square braces [] to replace text card or discipline short names with links to card images or discipline icons (e.g. [Parity Shift] or [OBF])</li>
-                <li class="list-group-item">Use colons to delimit emoji aliases and replace them with their emoji/unicode equivalent (e.g. :shrug:, :joy:, :rofl:, etc.)</li>
+                <li class="list-group-item">Use square braces [] to replace text card or discipline short names with
+                    links to card images or discipline icons (e.g. [Parity Shift] or [OBF])
+                </li>
+                <li class="list-group-item">Use colons to delimit emoji aliases and replace them with their
+                    emoji/unicode equivalent (e.g. :shrug:, :joy:, :rofl:, etc.)
+                </li>
                 <li class="list-group-item">Use (D) to get a direct action icon</li>
             </uL>
         </div>

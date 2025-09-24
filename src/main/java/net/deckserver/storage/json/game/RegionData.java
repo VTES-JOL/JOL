@@ -1,22 +1,24 @@
 package net.deckserver.storage.json.game;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
-import net.deckserver.game.storage.state.RegionType;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import net.deckserver.storage.json.cards.RegionType;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.StringIdGenerator.class, property = "id")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @JsonIdentityReference
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Data
+@EqualsAndHashCode(exclude = {"player"})
+@ToString(of = {"id"})
 public class RegionData {
     @JsonIdentityReference(alwaysAsId = true)
-    private List<CardData> cards = new ArrayList<>();
+    private LinkedList<CardData> cards = new LinkedList<>();
 
     @JsonIdentityReference(alwaysAsId = true)
     private PlayerData player;
@@ -26,8 +28,67 @@ public class RegionData {
     public RegionData(RegionType type, PlayerData playerData) {
         this.type = type;
         this.player = playerData;
+        this.id = playerData.getName() + "-" + type.description();
     }
 
     public RegionData() {
+    }
+
+    @JsonIgnore
+    public String getName() {
+        return String.format("%s - %s", player.getName(), type.description());
+    }
+
+    @JsonIgnore
+    public String getOwner() {
+        return player.getName();
+    }
+
+    public List<CardData> getCards() {
+        return cards;
+    }
+
+    @JsonIgnore
+    public CardData getFirstCard() {
+        return cards.isEmpty() ? null : cards.getFirst();
+    }
+
+    public void shuffle() {
+        Collections.shuffle(cards);
+    }
+
+    public void shuffle(int limit) {
+        if (limit < 0) return;
+        if (limit == 0) limit = cards.size();
+        List<CardData> subList = cards.subList(0, Math.min(limit, cards.size()));
+        Collections.shuffle(subList);
+    }
+
+    public void addCard(CardData card, boolean top) {
+        // Remove from parent first, if it exists
+        if (card.getParent() != null) {
+            card.getParent().remove(card);
+        }
+        // Remove from region if it exists
+        if (card.getRegion() != null) {
+            card.getRegion().removeCard(card);
+        }
+        if (top) {
+            cards.addFirst(card);
+        } else {
+            cards.add(card);
+        }
+        card.setParent(null);
+        card.setRegion(this);
+    }
+
+    public void removeCard(CardData card) {
+        cards.remove(card);
+        card.setRegion(null);
+    }
+
+    @JsonIgnore
+    public CardData getCard(int i) {
+        return cards.get(i);
     }
 }

@@ -24,21 +24,15 @@ import net.deckserver.DeckParser;
 import net.deckserver.RandomGameName;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.GameStatusBean;
-import net.deckserver.game.interfaces.state.Game;
-import net.deckserver.game.interfaces.state.Location;
-import net.deckserver.game.storage.state.RegionType;
-import net.deckserver.game.ui.state.DsGame;
-import net.deckserver.game.ui.turn.DsTurnRecorder;
+import net.deckserver.game.ui.DsTurnRecorder;
 import net.deckserver.game.validators.DeckValidator;
 import net.deckserver.game.validators.ValidationResult;
 import net.deckserver.game.validators.ValidatorFactory;
-import net.deckserver.jobs.CleanupGamesJob;
-import net.deckserver.jobs.PersistStateJob;
-import net.deckserver.jobs.PublicGamesBuilderJob;
-import net.deckserver.jobs.ValidateGWJob;
+import net.deckserver.jobs.*;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
+import net.deckserver.storage.json.game.GameData;
 import net.deckserver.storage.json.game.Timestamps;
 import net.deckserver.storage.json.system.*;
 import org.apache.commons.io.FileUtils;
@@ -182,6 +176,10 @@ public class JolAdmin {
     }
 
     public synchronized void persistState() {
+        // Defensive cleanup to avoid null Map keys in JSON output
+        if (timestamps != null && timestamps.getGameTimestamps() != null) {
+            timestamps.getGameTimestamps().remove(null);
+        }
         writeFile("chats.json", chats);
         writeFile("timestamps.json", timestamps);
         writeFile("games.json", games);
@@ -335,7 +333,8 @@ public class JolAdmin {
     }
 
     public synchronized GameModel getGameModel(String name) {
-        return gmap.computeIfAbsent(name, GameModel::new);
+        boolean isPlayTest = games.getOrDefault(name, new GameInfo()).getGameFormat() == GameFormat.PLAYTEST;
+        return gmap.computeIfAbsent(name, n -> new GameModel(n, isPlayTest));
     }
 
     public Set<String> getWho() {
@@ -369,7 +368,7 @@ public class JolAdmin {
 
     public synchronized void chat(String player, String message) {
         String sanitize = ChatParser.sanitizeText(message);
-        String parsedMessage = ChatParser.parseText(sanitize);
+        String parsedMessage = ChatParser.parseGlobalChat(sanitize);
         ChatEntryBean chatEntryBean = new ChatEntryBean(player, parsedMessage);
         chats.add(chatEntryBean);
         if (chats.size() > CHAT_STORAGE) {
@@ -377,11 +376,6 @@ public class JolAdmin {
         }
         pmap.values()
                 .forEach(playerModel -> playerModel.chat(chatEntryBean));
-    }
-
-    public void writeSnapshot(String id, DsGame state, DsTurnRecorder actions, String turn) {
-        ModelLoader.writeState(id, state, turn);
-        ModelLoader.writeActions(id, actions, turn);
     }
 
     public synchronized void rollbackGame(String gameName, String turn) {
@@ -418,25 +412,11 @@ public class JolAdmin {
             scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 10, TimeUnit.MINUTES);
         }
         scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 0, 1, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(new ValidateGWJob(), 0, 1, TimeUnit.DAYS);
+        scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 2, 1, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new ValidateGWJob(), 1, 1, TimeUnit.DAYS);
     }
 
     public void validate() {
-        logger.info("Validating game state");
-        List<String> invalidGames = new ArrayList<>();
-        games.values().stream().filter(ACTIVE_GAME)
-                .forEach(gameInfo -> {
-                    try {
-                        loadGameState(gameInfo.getName());
-                    } catch (Exception e) {
-                        logger.error("Unable to validate game {}", gameInfo.getName());
-                        invalidGames.add(gameInfo.getName());
-                    }
-                });
-        invalidGames.forEach(games::remove);
-        invalidGames.forEach(timestamps::clearGame);
-
         logger.info("Validating deck state");
         List<Table.Cell<String, String, DeckInfo>> invalidDecks = new ArrayList<>();
         for (var cell : decks.cellSet()) {
@@ -453,18 +433,7 @@ public class JolAdmin {
 
     public void upgrade() {
         logger.info("Determining upgrades...");
-        decks.values().stream()
-                .filter(MODERN_DECK)
-                .filter(NO_TAGS)
-                .filter(Objects::nonNull)
-                .forEach(deckInfo -> {
-                    ExtendedDeck deck = getDeck(deckInfo.getDeckId());
-                    Set<String> tags = ValidatorFactory.getTags(deck.getDeck());
-                    deckInfo.setGameFormats(tags);
-                    deckInfo.setFormat(DeckFormat.TAGGED);
-                    logger.info("Upgrading {} to {} with {} tags", deckInfo.getDeckId(), deckInfo.getFormat(), tags);
-                });
-
+        GameDataConversion conversion = new GameDataConversion();
         // Upgrade all games with no version
         games.values().stream()
                 .filter(ACTIVE_GAME)
@@ -476,36 +445,22 @@ public class JolAdmin {
                     logger.info("Upgrading game {}", gameInfo.getName());
                 })
                 .forEach(gameInfo -> {
-                    JolGame game = loadGameState(gameInfo.getName());
-                    game.getPlayers()
-                            .stream()
-                            .peek(player -> {
-                                logger.debug("{}", player);
-                            })
-                            // For each player check that the regions contain the right information
-                            .forEach(player -> {
-                                Game gameState = game.getState();
-                                EnumSet<RegionType> regions = EnumSet.allOf(RegionType.class);
-                                regions.stream()
-                                        .peek(region -> {
-                                            logger.debug("{}", region.description());
-                                        })
-                                        // Get region
-                                        .map(region -> gameState.getPlayerLocation(player, region))
-                                        // Get cards in region
-                                        .map(Location::getCards)
-                                        .flatMap(Arrays::stream)
-                                        .peek(card -> {
-                                            logger.debug("{} {}", card.getName(), card.getCardId());
-                                        })
-                                        // Populate missing information on the card
-                                        .forEach(game::hydrateCard);
-                            });
-                    saveGameState(game);
+                    conversion.convertGame(gameInfo.getId());
                     gameInfo.setVersion(GameInfo.Version.GAME_STATE);
-                    logger.info("Finished upgrading game {}", gameInfo.getName());
                 });
         persistState();
+
+        decks.values().stream()
+                .filter(MODERN_DECK)
+                .filter(NO_TAGS)
+                .filter(Objects::nonNull)
+                .forEach(deckInfo -> {
+                    ExtendedDeck deck = getDeck(deckInfo.getDeckId());
+                    Set<String> tags = ValidatorFactory.getTags(deck.getDeck());
+                    deckInfo.setGameFormats(tags);
+                    deckInfo.setFormat(DeckFormat.TAGGED);
+                    logger.info("Upgrading {} to {} with {} tags", deckInfo.getDeckId(), deckInfo.getFormat(), tags);
+                });
     }
 
 
@@ -929,9 +884,9 @@ public class JolAdmin {
 
     public void startGame(String gameName, List<String> players) {
         GameInfo gameInfo = games.get(gameName);
-        DsGame state = new DsGame();
+        GameData gameData = new GameData(gameInfo.getId(), gameName);
         DsTurnRecorder actions = new DsTurnRecorder();
-        JolGame game = new JolGame(gameInfo.getId(), state, actions);
+        JolGame game = new JolGame(gameInfo.getId(), gameData, actions);
         game.initGame(gameName);
         registrations.row(gameName).forEach((playerName, registration) -> {
             if (registration.getDeckId() != null) {
@@ -1008,7 +963,7 @@ public class JolAdmin {
         Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId());
         registrations.row(gameName).clear();
         games.remove(gameName);
-        timestamps.getGameTimestamps().remove(gameName);
+        timestamps.clearGame(gameName);
         pmap.values().forEach(playerModel -> playerModel.removeGame(gameName));
         gmap.remove(gameName);
         try {
@@ -1144,7 +1099,12 @@ public class JolAdmin {
     }
 
     public List<String> getPings(String gameName) {
-        return timestamps.getGameTimestamps().get(gameName).getPlayerPings().entrySet().stream()
+        var entry = timestamps.getGameTimestamps().get(gameName);
+        if (entry == null) {
+            return List.of();
+        }
+
+        return entry.getPlayerPings().entrySet().stream()
                 .filter(Map.Entry::getValue)
                 .map(Map.Entry::getKey)
                 .toList();
@@ -1325,7 +1285,7 @@ public class JolAdmin {
         logger.debug("Loading {}", gameName);
         GameInfo gameInfo = loadGameInfo(gameName);
         String gameId = gameInfo.getId();
-        return ModelLoader.loadGame(gameId);
+        return ModelLoader.loadGame(gameId, true);
     }
 
 }

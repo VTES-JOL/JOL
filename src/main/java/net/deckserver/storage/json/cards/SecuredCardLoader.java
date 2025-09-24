@@ -1,8 +1,11 @@
 package net.deckserver.storage.json.cards;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.cloudfront.CloudFrontUtilities;
-import software.amazon.awssdk.services.cloudfront.cookie.CookiesForCannedPolicy;
+import software.amazon.awssdk.services.cloudfront.cookie.CookiesForCustomPolicy;
 import software.amazon.awssdk.services.cloudfront.model.CannedSignerRequest;
+import software.amazon.awssdk.services.cloudfront.model.CustomSignerRequest;
 import software.amazon.awssdk.services.cloudfront.url.SignedUrl;
 
 import java.net.URI;
@@ -12,6 +15,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 public class SecuredCardLoader {
+
+    private static final Logger logger = LoggerFactory.getLogger(SecuredCardLoader.class);
 
     private final String baseUrl;
     private final String keyPairId;
@@ -31,6 +36,10 @@ public class SecuredCardLoader {
         return URI.create(signedUrl.url()).toURL();
     }
 
+    public CookiesForCustomPolicy generateCookies() throws Exception {
+        return CloudFrontUtilities.create().getCookiesForCustomPolicy(wildCardRequest());
+    }
+
     private CannedSignerRequest buildRequest() throws Exception {
         Instant expirationDate = Instant.now().plus(7, ChronoUnit.DAYS);
         return CannedSignerRequest.builder()
@@ -41,7 +50,14 @@ public class SecuredCardLoader {
                 .build();
     }
 
-    public CookiesForCannedPolicy generateCookies() throws Exception {
-        return CloudFrontUtilities.create().getCookiesForCannedPolicy(buildRequest());
+    private CustomSignerRequest wildCardRequest() throws Exception {
+        String policyUrl = baseUrl + "/secured/*";
+        Instant expirationDate = Instant.now().plus(7, ChronoUnit.DAYS);
+        return CustomSignerRequest.builder()
+                .resourceUrl(policyUrl)
+                .privateKey(Paths.get(keyPairPath))
+                .keyPairId(keyPairId)
+                .expirationDate(expirationDate)
+                .build();
     }
 }

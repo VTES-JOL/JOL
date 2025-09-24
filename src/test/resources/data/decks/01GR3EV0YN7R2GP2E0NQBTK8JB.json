@@ -1,1 +1,220 @@
-{"deck":{"id":null,"name":null,"crypt":{"count":13,"cards":[{"id":201090,"name":"Panagos Levidis","count":1,"comments":null},{"id":201457,"name":"Vliam Andor","count":1,"comments":null},{"id":201169,"name":"Raziya Samater","count":1,"comments":null},{"id":201025,"name":"Muse","count":1,"comments":null},{"id":200832,"name":"Leon","count":1,"comments":null},{"id":200519,"name":"Gillian Krader","count":1,"comments":null},{"id":201380,"name":"Tommy","count":1,"comments":null},{"id":200315,"name":"Dani","count":1,"comments":null},{"id":201466,"name":"Wendy Wade","count":1,"comments":null},{"id":201311,"name":"Spleen, Georgio Gutterpunk","count":1,"comments":null},{"id":201039,"name":"Navar McClaren","count":1,"comments":null},{"id":200077,"name":"Anastasia Grey","count":1,"comments":null},{"id":201276,"name":"Shannon Price, the Whisperer","count":1,"comments":null}]},"library":{"count":90,"cards":[{"type":"Master","count":13,"cards":[{"id":100070,"name":"Animalism","count":8,"comments":null},{"id":100616,"name":"Effective Management","count":5,"comments":null}]},{"type":"Action","count":10,"cards":[{"id":100515,"name":"Deep Song","count":10,"comments":null}]},{"type":"Ally","count":1,"cards":[{"id":100298,"name":"Carlton Van Wyk","count":1,"comments":null}]},{"type":"Combat","count":56,"cards":[{"id":101827,"name":"Song of Serenity","count":9,"comments":null},{"id":100290,"name":"Canine Horde","count":2,"comments":null},{"id":100585,"name":"Drawing Out the Beast","count":5,"comments":null},{"id":100029,"name":"Aid from Bats","count":7,"comments":null},{"id":100301,"name":"Carrion Crows","count":14,"comments":null},{"id":101693,"name":"Scorpion Sting","count":5,"comments":null},{"id":102012,"name":"Trap","count":14,"comments":null}]},{"type":"Reaction","count":10,"cards":[{"id":100308,"name":"Cats' Guidance","count":3,"comments":null},{"id":101547,"name":"Rat's Warning","count":3,"comments":null},{"id":100863,"name":"Guard Dogs","count":4,"comments":null}]}]},"comments":""},"stats":{"cryptSize":13,"librarySize":90,"groups":["1","2"],"valid":true,"bannedCards":false,"summary":"Crypt: 13 Library: 90 Groups: 1/2"}}
+{
+  "deck": {
+    "id": null,
+    "name": null,
+    "crypt": {
+      "count": 13,
+      "cards": [
+        {
+          "id": 201090,
+          "name": "Panagos Levidis",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201457,
+          "name": "Vliam Andor",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201169,
+          "name": "Raziya Samater",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201025,
+          "name": "Muse",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 200832,
+          "name": "Leon",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 200519,
+          "name": "Gillian Krader",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201380,
+          "name": "Tommy",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 200315,
+          "name": "Dani",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201466,
+          "name": "Wendy Wade",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201311,
+          "name": "Spleen, Georgio Gutterpunk",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201039,
+          "name": "Navar McClaren",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 200077,
+          "name": "Anastasia Grey",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201276,
+          "name": "Shannon Price, the Whisperer",
+          "count": 1,
+          "comments": null
+        }
+      ]
+    },
+    "library": {
+      "count": 90,
+      "cards": [
+        {
+          "type": "Master",
+          "count": 13,
+          "cards": [
+            {
+              "id": 100070,
+              "name": "Animalism",
+              "count": 8,
+              "comments": null
+            },
+            {
+              "id": 100616,
+              "name": "Effective Management",
+              "count": 5,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action",
+          "count": 10,
+          "cards": [
+            {
+              "id": 100515,
+              "name": "Deep Song",
+              "count": 10,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Ally",
+          "count": 1,
+          "cards": [
+            {
+              "id": 100298,
+              "name": "Carlton Van Wyk",
+              "count": 1,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Combat",
+          "count": 56,
+          "cards": [
+            {
+              "id": 101827,
+              "name": "Song of Serenity",
+              "count": 9,
+              "comments": null
+            },
+            {
+              "id": 100290,
+              "name": "Canine Horde",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 100585,
+              "name": "Drawing Out the Beast",
+              "count": 5,
+              "comments": null
+            },
+            {
+              "id": 100029,
+              "name": "Aid from Bats",
+              "count": 7,
+              "comments": null
+            },
+            {
+              "id": 100301,
+              "name": "Carrion Crows",
+              "count": 14,
+              "comments": null
+            },
+            {
+              "id": 101693,
+              "name": "Scorpion Sting",
+              "count": 5,
+              "comments": null
+            },
+            {
+              "id": 102012,
+              "name": "Trap",
+              "count": 14,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Reaction",
+          "count": 10,
+          "cards": [
+            {
+              "id": 100308,
+              "name": "Cats' Guidance",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 101547,
+              "name": "Rat's Warning",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 100863,
+              "name": "Guard Dogs",
+              "count": 4,
+              "comments": null
+            }
+          ]
+        }
+      ]
+    },
+    "comments": ""
+  },
+  "stats": {
+    "cryptSize": 13,
+    "librarySize": 90,
+    "groups": [
+      "1",
+      "2"
+    ],
+    "valid": true,
+    "bannedCards": false,
+    "summary": "Crypt: 13 Library: 90 Groups: 1/2"
+  }
+}

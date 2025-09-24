@@ -17,11 +17,7 @@
         <div class="row">
             <label for="validatorFormat" class="col-form-label col-2">Format</label>
             <div class="col-8">
-                <select name="validatorFormat" id="validatorFormat" class="form-select">
-                    <option value="STANDARD">Standard</option>
-                    <option value="V5">V5</option>
-                    <option value="DUEL">Duel</option>
-                </select>
+                <select name="validatorFormat" id="validatorFormat" class="form-select"></select>
             </div>
             <div class="col-2">
                 <button class="btn btn-outline-secondary border btn-sm mb-1" onclick="validate()">Validate</button>

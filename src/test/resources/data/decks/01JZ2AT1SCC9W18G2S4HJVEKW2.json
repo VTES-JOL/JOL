@@ -1,1 +1,278 @@
-{"deck":{"id":null,"name":null,"crypt":{"count":12,"cards":[{"id":201715,"name":"Rinaldo Albizzi","count":1,"comments":null},{"id":201714,"name":"María del Toro","count":2,"comments":null},{"id":201713,"name":"Kamaluddin","count":1,"comments":null},{"id":201712,"name":"Gnaeus Aemilius Augustinus","count":3,"comments":null},{"id":201716,"name":"Yewon Ong","count":3,"comments":null},{"id":201710,"name":"Azucena","count":1,"comments":null},{"id":201708,"name":"Aintzane Arriaga","count":1,"comments":null}]},"library":{"count":75,"cards":[{"type":"Master","count":12,"cards":[{"id":100629,"name":"Elysian Fields","count":1,"comments":null},{"id":102180,"name":"Wider View","count":2,"comments":null},{"id":101350,"name":"Papillon","count":1,"comments":null},{"id":101430,"name":"Power Structure","count":1,"comments":null},{"id":102121,"name":"Villein","count":4,"comments":null},{"id":100632,"name":"Elysium: The Palace of Versailles","count":1,"comments":null},{"id":100984,"name":"Information Highway","count":1,"comments":null},{"id":100588,"name":"Dreams of the Sphinx","count":1,"comments":null}]},{"type":"Action","count":12,"cards":[{"id":100845,"name":"Govern the Unaligned","count":12,"comments":null}]},{"type":"Action Modifier","count":20,"cards":[{"id":100401,"name":"Conditioning","count":3,"comments":null},{"id":101712,"name":"Seduction","count":3,"comments":null},{"id":102274,"name":"Amici Noctis","count":3,"comments":null},{"id":102281,"name":"Shadow Cloak","count":3,"comments":null},{"id":102280,"name":"Shadow Cast","count":3,"comments":null},{"id":102282,"name":"Stygian Shroud","count":3,"comments":null},{"id":102285,"name":"Where the Veil Thins","count":2,"comments":null}]},{"type":"Action Modifier/Reaction","count":3,"cards":[{"id":102278,"name":"Ominous Chorus","count":3,"comments":null}]},{"type":"Combat","count":6,"cards":[{"id":102279,"name":"Pass Through Shadow","count":6,"comments":null}]},{"type":"Political Action","count":14,"cards":[{"id":100065,"name":"Ancilla Empowerment","count":1,"comments":null},{"id":101056,"name":"Kine Resources Contested","count":3,"comments":null},{"id":102272,"name":"Lasombra Justicar","count":1,"comments":null},{"id":100131,"name":"Banishment","count":2,"comments":null},{"id":101353,"name":"Parity Shift","count":2,"comments":null},{"id":100059,"name":"Anarchist Uprising","count":1,"comments":null},{"id":102270,"name":"Camarilla's Iron Fist","count":4,"comments":null}]},{"type":"Reaction","count":8,"cards":[{"id":100518,"name":"Deflection","count":4,"comments":null},{"id":101321,"name":"On the Qui Vive","count":2,"comments":null},{"id":101706,"name":"Second Tradition: Domain","count":2,"comments":null}]}]},"comments":""},"stats":{"cryptSize":12,"librarySize":75,"groups":["6"],"bannedCards":false,"summary":"Crypt: 12 Library: 75 Groups: 6"}}
+{
+  "deck": {
+    "id": null,
+    "name": null,
+    "crypt": {
+      "count": 12,
+      "cards": [
+        {
+          "id": 201715,
+          "name": "Rinaldo Albizzi",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201714,
+          "name": "María del Toro",
+          "count": 2,
+          "comments": null
+        },
+        {
+          "id": 201713,
+          "name": "Kamaluddin",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201712,
+          "name": "Gnaeus Aemilius Augustinus",
+          "count": 3,
+          "comments": null
+        },
+        {
+          "id": 201716,
+          "name": "Yewon Ong",
+          "count": 3,
+          "comments": null
+        },
+        {
+          "id": 201710,
+          "name": "Azucena",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201708,
+          "name": "Aintzane Arriaga",
+          "count": 1,
+          "comments": null
+        }
+      ]
+    },
+    "library": {
+      "count": 75,
+      "cards": [
+        {
+          "type": "Master",
+          "count": 12,
+          "cards": [
+            {
+              "id": 100629,
+              "name": "Elysian Fields",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 102180,
+              "name": "Wider View",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 101350,
+              "name": "Papillon",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 101430,
+              "name": "Power Structure",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 102121,
+              "name": "Villein",
+              "count": 4,
+              "comments": null
+            },
+            {
+              "id": 100632,
+              "name": "Elysium: The Palace of Versailles",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100984,
+              "name": "Information Highway",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100588,
+              "name": "Dreams of the Sphinx",
+              "count": 1,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action",
+          "count": 12,
+          "cards": [
+            {
+              "id": 100845,
+              "name": "Govern the Unaligned",
+              "count": 12,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action Modifier",
+          "count": 20,
+          "cards": [
+            {
+              "id": 100401,
+              "name": "Conditioning",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 101712,
+              "name": "Seduction",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 102274,
+              "name": "Amici Noctis",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 102281,
+              "name": "Shadow Cloak",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 102280,
+              "name": "Shadow Cast",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 102282,
+              "name": "Stygian Shroud",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 102285,
+              "name": "Where the Veil Thins",
+              "count": 2,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action Modifier/Reaction",
+          "count": 3,
+          "cards": [
+            {
+              "id": 102278,
+              "name": "Ominous Chorus",
+              "count": 3,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Combat",
+          "count": 6,
+          "cards": [
+            {
+              "id": 102279,
+              "name": "Pass Through Shadow",
+              "count": 6,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Political Action",
+          "count": 14,
+          "cards": [
+            {
+              "id": 100065,
+              "name": "Ancilla Empowerment",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 101056,
+              "name": "Kine Resources Contested",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 102272,
+              "name": "Lasombra Justicar",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100131,
+              "name": "Banishment",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 101353,
+              "name": "Parity Shift",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 100059,
+              "name": "Anarchist Uprising",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 102270,
+              "name": "Camarilla's Iron Fist",
+              "count": 4,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Reaction",
+          "count": 8,
+          "cards": [
+            {
+              "id": 100518,
+              "name": "Deflection",
+              "count": 4,
+              "comments": null
+            },
+            {
+              "id": 101321,
+              "name": "On the Qui Vive",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 101706,
+              "name": "Second Tradition: Domain",
+              "count": 2,
+              "comments": null
+            }
+          ]
+        }
+      ]
+    },
+    "comments": ""
+  },
+  "stats": {
+    "cryptSize": 12,
+    "librarySize": 75,
+    "groups": [
+      "6"
+    ],
+    "bannedCards": false,
+    "summary": "Crypt: 12 Library: 75 Groups: 6"
+  }
+}

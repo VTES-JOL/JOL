@@ -20,7 +20,9 @@ public class DeckInfoBean {
         this.gameFormats = admin.getTags(playerName, deckName);
     }
 
-    public String getDeckFormat() { return deckFormat.toString(); }
+    public String getDeckFormat() {
+        return deckFormat.toString();
+    }
 
 }
 

@@ -14,6 +14,10 @@ public class LibraryCardMode {
     private List<String> disciplines;
 
     private String text;
+    /**
+     * Where the card is played, if not the ash heap.
+     */
+    private Target target;
 
     public enum Target {
         /**
@@ -43,9 +47,4 @@ public class LibraryCardMode {
          */
         MINION_YOU_CONTROL
     }
-
-    /**
-     * Where the card is played, if not the ash heap.
-     */
-    private Target target;
 }

@@ -26,10 +26,12 @@ function sentenceCase(upperOrMixed) {
     const s = String(upperOrMixed).toLowerCase();
     return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
 function keyToDisplay(key) {
     if (!key) return "None";
     return key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
+
 function buildIconSpan(kind, display) {
     const key = nameToKey(display);
     const $span = $("<span/>").addClass(kind).addClass(key);
@@ -47,6 +49,7 @@ function buildIconSpan(kind, display) {
     }
     return $span;
 }
+
 function fillSelect($select, options) {
     $select.empty();
     for (const opt of options) {
@@ -93,7 +96,7 @@ function enableInlinePicker(config) {
             existing.length !== opts.length ||
             (opts.length > 0 &&
                 (existing[0]?.value !== nameToKey(opts[0]) ||
-                 existing[existing.length - 1]?.value !== nameToKey(opts[opts.length - 1])));
+                    existing[existing.length - 1]?.value !== nameToKey(opts[opts.length - 1])));
         if (needsBuild) {
             fillSelect($sel, opts);
         }
@@ -177,7 +180,7 @@ function showPlayCardModal(event) {
     if (cardId) {
         $.get({
             dataType: "json",
-            url: `https://static.dev.deckserver.net/${secured}json/${cardId}`, success: function (card) {
+            url: `${BASE_URL}/${secured}json/${cardId}`, success: function (card) {
                 playCardModal.data('hand-coord', coordinates);
                 playCardModal.data('region', region);
                 playCardModal.data('do-not-replace', region === "research" ? true : card.doNotReplace);
@@ -400,10 +403,10 @@ function showCardModal(event) {
     let clan = target.data("clan");
     let owner = controller === player;
     if (cardId) {
-        $("#card-image").attr("src", `https://static.dev.deckserver.net/${secured}images/${cardId}`);
+        $("#card-image").attr("src", `${BASE_URL}/${secured}images/${cardId}`);
         $.get({
             dataType: "json",
-            url: `https://static.dev.deckserver.net/${secured}json/${cardId}`, success: function (card) {
+            url: `${BASE_URL}/${secured}json/${cardId}`, success: function (card) {
 
                 const modal = $('#cardModal');
                 // Update fields used for commands

@@ -1,10 +1,10 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.game.interfaces.state.Card;
-import net.deckserver.game.storage.state.RegionType;
-import net.deckserver.game.ui.state.DsGame;
-import net.deckserver.game.ui.turn.DsTurnRecorder;
+import net.deckserver.game.ui.DsTurnRecorder;
+import net.deckserver.storage.json.cards.RegionType;
 import net.deckserver.storage.json.deck.Deck;
+import net.deckserver.storage.json.game.CardData;
+import net.deckserver.storage.json.game.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
@@ -19,9 +19,9 @@ public class CommandParserTest {
 
     @BeforeEach
     public void setUp() {
-        game = ModelLoader.loadGame("command-test");
+        game = ModelLoader.loadGame("command-test", true);
 
-        game2 = new JolGame("id", new DsGame(), new DsTurnRecorder());
+        game2 = new JolGame("id", new GameData("id", "test2"), new DsTurnRecorder());
         game2.addPlayer("ShanDow", new Deck());
         game2.addPlayer("shade", new Deck());
         game2.addPlayer("ShanWod", new Deck());
@@ -38,7 +38,7 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         RegionType sourceRegion = commandParser.getRegion(RegionType.READY);
         assertEquals(RegionType.READY, sourceRegion);
-        Card card = commandParser.findCard(false, sourcePlayer, sourceRegion);
+        CardData card = commandParser.findCardData(false, sourcePlayer, sourceRegion);
         assertEquals("14", card.getId());
         String destinationPlayer = commandParser.getPlayer(player);
         assertEquals(player, destinationPlayer);
@@ -55,7 +55,7 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         RegionType sourceRegion = commandParser.getRegion(RegionType.READY);
         assertEquals(RegionType.READY, sourceRegion);
-        Card card = commandParser.findCard(false, false, sourcePlayer, sourceRegion);
+        CardData card = commandParser.findCardData(false, false, sourcePlayer, sourceRegion);
         assertEquals("14", card.getId());
         String destinationPlayer = commandParser.getPlayer(player);
         assertEquals(player, destinationPlayer);
@@ -72,7 +72,7 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         RegionType sourceRegion = commandParser.getRegion(RegionType.READY);
         assertEquals(RegionType.READY, sourceRegion);
-        Card card = commandParser.findCard(false, false, sourcePlayer, sourceRegion);
+        CardData card = commandParser.findCardData(false, false, sourcePlayer, sourceRegion);
         assertEquals("111", card.getId());
     }
 
@@ -85,7 +85,7 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         RegionType sourceRegion = commandParser.getRegion(RegionType.READY);
         assertEquals(RegionType.READY, sourceRegion);
-        Card card = commandParser.findCard(false, false, sourcePlayer, sourceRegion);
+        CardData card = commandParser.findCardData(false, false, sourcePlayer, sourceRegion);
         assertEquals("111", card.getId());
     }
 
@@ -98,7 +98,7 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         RegionType sourceRegion = commandParser.getRegion(RegionType.READY);
         assertEquals(RegionType.READY, sourceRegion);
-        Card card = commandParser.findCard(false, false, sourcePlayer, sourceRegion);
+        CardData card = commandParser.findCardData(false, false, sourcePlayer, sourceRegion);
         assertEquals("111", card.getId());
     }
 
@@ -111,7 +111,7 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         RegionType sourceRegion = commandParser.getRegion(RegionType.READY);
         assertEquals(RegionType.READY, sourceRegion);
-        Card card = commandParser.findCard(false, false, sourcePlayer, sourceRegion);
+        CardData card = commandParser.findCardData(false, false, sourcePlayer, sourceRegion);
         assertEquals("111", card.getId());
     }
 
@@ -124,7 +124,7 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         RegionType sourceRegion = commandParser.getRegion(RegionType.READY);
         assertEquals(RegionType.READY, sourceRegion);
-        Card card = commandParser.findCard(false, false, sourcePlayer, sourceRegion);
+        CardData card = commandParser.findCardData(false, false, sourcePlayer, sourceRegion);
         assertEquals("111", card.getId());
     }
 
@@ -137,13 +137,13 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         RegionType sourceRegion = commandParser.getRegion(RegionType.READY);
         assertEquals(RegionType.HAND, sourceRegion);
-        Card sourceCard = commandParser.findCard(false, sourcePlayer, sourceRegion);
+        CardData sourceCard = commandParser.findCardData(false, sourcePlayer, sourceRegion);
         assertEquals("141", sourceCard.getId());
         String destinationPlayer = commandParser.getPlayer(player);
         assertEquals(player, destinationPlayer);
         RegionType destinationRegion = commandParser.getRegion(RegionType.READY);
         assertEquals(RegionType.READY, destinationRegion);
-        Card destinationCard = commandParser.findCard(false, destinationPlayer, destinationRegion);
+        CardData destinationCard = commandParser.findCardData(false, destinationPlayer, destinationRegion);
         assertEquals("111", destinationCard.getId());
     }
 
@@ -156,13 +156,13 @@ public class CommandParserTest {
         assertEquals(player, sourcePlayer);
         RegionType sourceRegion = commandParser.getRegion(RegionType.READY);
         assertEquals(RegionType.HAND, sourceRegion);
-        Card sourceCard = commandParser.findCard(false, sourcePlayer, sourceRegion);
+        CardData sourceCard = commandParser.findCardData(false, sourcePlayer, sourceRegion);
         assertEquals("141", sourceCard.getId());
         String destinationPlayer = commandParser.getPlayer(player);
         assertEquals(player, destinationPlayer);
         RegionType destinationRegion = commandParser.getRegion(RegionType.READY);
         assertEquals(RegionType.READY, destinationRegion);
-        Card destinationCard = commandParser.findCard(false, destinationPlayer, destinationRegion);
+        CardData destinationCard = commandParser.findCardData(false, destinationPlayer, destinationRegion);
         assertEquals("111", destinationCard.getId());
     }
 

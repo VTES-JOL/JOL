@@ -1,1 +1,321 @@
-{"deck":{"id":null,"name":"Death Pre-con","crypt":{"count":12,"cards":[{"id":210737,"name":"Aiyana, The Unholy","count":1,"comments":"playtest"},{"id":210785,"name":"Zbigniew, Hunter of Mekhet","count":1,"comments":"playtest"},{"id":210784,"name":"Yurena, The Boor","count":1,"comments":"playtest"},{"id":210774,"name":"Sakura, The Merciless","count":1,"comments":"playtest"},{"id":210741,"name":"Ashur-uballit, Son of the Abyss","count":1,"comments":"playtest"},{"id":210757,"name":"Huldu, The Desecrator","count":1,"comments":"playtest"},{"id":210740,"name":"Anxo Vilela","count":1,"comments":"playtest"},{"id":210751,"name":"Eulogio Sánchez de los Reyes","count":1,"comments":"playtest"},{"id":210734,"name":"Abderrahim, Death's Hand","count":1,"comments":"playtest"},{"id":210750,"name":"Eudes Mercier","count":1,"comments":"playtest"},{"id":210766,"name":"Nadezhda","count":1,"comments":"playtest"},{"id":210749,"name":"Els Wassmer","count":1,"comments":"playtest"}]},"library":{"count":77,"cards":[{"type":"Master","count":10,"cards":[{"id":100199,"name":"Blood Doll","count":3,"comments":null},{"id":150026,"name":"Cursed Abattoir","count":1,"comments":"playtest"},{"id":101067,"name":"KRCG News Radio","count":1,"comments":null},{"id":150025,"name":"Burial Site Hunting Ground","count":1,"comments":"playtest"},{"id":101229,"name":"Mob Connections","count":1,"comments":null},{"id":100444,"name":"Creepshow Casino","count":1,"comments":null},{"id":100332,"name":"Charisma","count":1,"comments":null},{"id":102142,"name":"Wall Street Night, Financial Newspaper","count":1,"comments":null}]},{"type":"Action","count":16,"cards":[{"id":101664,"name":"Rutor's Hand","count":1,"comments":null},{"id":100852,"name":"Graverobbing","count":2,"comments":null},{"id":102295,"name":"Shroud of Decay","count":4,"comments":null},{"id":150036,"name":"Putrescent Sustenance","count":3,"comments":"playtest"},{"id":150027,"name":"Dead Can Dance, The","count":2,"comments":"playtest"},{"id":100845,"name":"Govern the Unaligned","count":4,"comments":null}]},{"type":"Action Modifier","count":15,"cards":[{"id":101223,"name":"Mirror Walk","count":3,"comments":null},{"id":102281,"name":"Shadow Cloak","count":3,"comments":null},{"id":102285,"name":"Where the Veil Thins","count":3,"comments":null},{"id":150031,"name":"Gifts From Hereafter","count":6,"comments":"playtest"}]},{"type":"Ally","count":11,"cards":[{"id":150034,"name":"Meddling Specter","count":1,"comments":"playtest"},{"id":150032,"name":"Gravebound Drone","count":8,"comments":"playtest"},{"id":150033,"name":"Heartrender","count":1,"comments":"playtest"},{"id":150030,"name":"Freakish Conglomeration","count":1,"comments":"playtest"}]},{"type":"Combat","count":14,"cards":[{"id":150035,"name":"Morbidity","count":3,"comments":"playtest"},{"id":100834,"name":"Glancing Blow","count":2,"comments":null},{"id":102279,"name":"Pass Through Shadow","count":3,"comments":null},{"id":101942,"name":"Target Vitals","count":3,"comments":null},{"id":150029,"name":"Entropic Touch","count":3,"comments":"playtest"}]},{"type":"Reaction","count":11,"cards":[{"id":102294,"name":"Shadow Sentinel","count":4,"comments":null},{"id":101578,"name":"Redirection","count":3,"comments":null},{"id":101949,"name":"Telepathic Misdirection","count":2,"comments":null},{"id":101309,"name":"Obedience","count":2,"comments":null}]}]},"comments":null},"stats":{"cryptSize":12,"librarySize":77,"groups":["6"],"bannedCards":false,"summary":"Crypt: 12 Library: 77 Groups: 6"},"errors":[]}
+{
+  "deck": {
+    "id": null,
+    "name": "Death Pre-con",
+    "crypt": {
+      "count": 12,
+      "cards": [
+        {
+          "id": 210737,
+          "name": "Aiyana, The Unholy",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210785,
+          "name": "Zbigniew, Hunter of Mekhet",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210784,
+          "name": "Yurena, The Boor",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210774,
+          "name": "Sakura, The Merciless",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210741,
+          "name": "Ashur-uballit, Son of the Abyss",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210757,
+          "name": "Huldu, The Desecrator",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210740,
+          "name": "Anxo Vilela",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210751,
+          "name": "Eulogio Sánchez de los Reyes",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210734,
+          "name": "Abderrahim, Death's Hand",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210750,
+          "name": "Eudes Mercier",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210766,
+          "name": "Nadezhda",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210749,
+          "name": "Els Wassmer",
+          "count": 1,
+          "comments": "playtest"
+        }
+      ]
+    },
+    "library": {
+      "count": 77,
+      "cards": [
+        {
+          "type": "Master",
+          "count": 10,
+          "cards": [
+            {
+              "id": 100199,
+              "name": "Blood Doll",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 150026,
+              "name": "Cursed Abattoir",
+              "count": 1,
+              "comments": "playtest"
+            },
+            {
+              "id": 101067,
+              "name": "KRCG News Radio",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 150025,
+              "name": "Burial Site Hunting Ground",
+              "count": 1,
+              "comments": "playtest"
+            },
+            {
+              "id": 101229,
+              "name": "Mob Connections",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100444,
+              "name": "Creepshow Casino",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100332,
+              "name": "Charisma",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 102142,
+              "name": "Wall Street Night, Financial Newspaper",
+              "count": 1,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action",
+          "count": 16,
+          "cards": [
+            {
+              "id": 101664,
+              "name": "Rutor's Hand",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100852,
+              "name": "Graverobbing",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 102295,
+              "name": "Shroud of Decay",
+              "count": 4,
+              "comments": null
+            },
+            {
+              "id": 150036,
+              "name": "Putrescent Sustenance",
+              "count": 3,
+              "comments": "playtest"
+            },
+            {
+              "id": 150027,
+              "name": "Dead Can Dance, The",
+              "count": 2,
+              "comments": "playtest"
+            },
+            {
+              "id": 100845,
+              "name": "Govern the Unaligned",
+              "count": 4,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action Modifier",
+          "count": 15,
+          "cards": [
+            {
+              "id": 101223,
+              "name": "Mirror Walk",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 102281,
+              "name": "Shadow Cloak",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 102285,
+              "name": "Where the Veil Thins",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 150031,
+              "name": "Gifts From Hereafter",
+              "count": 6,
+              "comments": "playtest"
+            }
+          ]
+        },
+        {
+          "type": "Ally",
+          "count": 11,
+          "cards": [
+            {
+              "id": 150034,
+              "name": "Meddling Specter",
+              "count": 1,
+              "comments": "playtest"
+            },
+            {
+              "id": 150032,
+              "name": "Gravebound Drone",
+              "count": 8,
+              "comments": "playtest"
+            },
+            {
+              "id": 150033,
+              "name": "Heartrender",
+              "count": 1,
+              "comments": "playtest"
+            },
+            {
+              "id": 150030,
+              "name": "Freakish Conglomeration",
+              "count": 1,
+              "comments": "playtest"
+            }
+          ]
+        },
+        {
+          "type": "Combat",
+          "count": 14,
+          "cards": [
+            {
+              "id": 150035,
+              "name": "Morbidity",
+              "count": 3,
+              "comments": "playtest"
+            },
+            {
+              "id": 100834,
+              "name": "Glancing Blow",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 102279,
+              "name": "Pass Through Shadow",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 101942,
+              "name": "Target Vitals",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 150029,
+              "name": "Entropic Touch",
+              "count": 3,
+              "comments": "playtest"
+            }
+          ]
+        },
+        {
+          "type": "Reaction",
+          "count": 11,
+          "cards": [
+            {
+              "id": 102294,
+              "name": "Shadow Sentinel",
+              "count": 4,
+              "comments": null
+            },
+            {
+              "id": 101578,
+              "name": "Redirection",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 101949,
+              "name": "Telepathic Misdirection",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 101309,
+              "name": "Obedience",
+              "count": 2,
+              "comments": null
+            }
+          ]
+        }
+      ]
+    },
+    "comments": null
+  },
+  "stats": {
+    "cryptSize": 12,
+    "librarySize": 77,
+    "groups": [
+      "6"
+    ],
+    "bannedCards": false,
+    "summary": "Crypt: 12 Library: 77 Groups: 6"
+  },
+  "errors": []
+}

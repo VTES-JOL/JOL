@@ -1,1 +1,138 @@
-{"Player6":{"Gangrel Anarch":{"deckId":"01K5WH7D9GFM86SVBJJVXFND62","deckName":"Gangrel Anarch","format":"MODERN","gameFormats":["PLAYTEST","STANDARD"]}},"Player5":{"Assamite Deck":{"deckId":"01GR3EV0H7W4RWRZJ7XZK3RVRY","deckName":"Assamite Deck","format":"TAGGED","gameFormats":["STANDARD"]}},"Player2":{"LasombraKiasyd Bleed":{"deckId":"01GR3EV0ZHC36EK47BQMFDSAPB","deckName":"LasombraKiasyd Bleed","format":"TAGGED","gameFormats":["STANDARD"]},"2-player Brujah":{"deckId":"01JZ289F9WY4AQJWE0ATM6VN0E","deckName":"2-player Brujah","format":"MODERN","gameFormats":["DUEL"]},"Cathari Pre-con":{"deckId":"01K37PD4GHB0JWHE8AQNFDXF6F","deckName":"Cathari Pre-con","format":"MODERN","gameFormats":["PLAYTEST"]}},"Player1":{"Weenie Animalism":{"deckId":"01GR3EV0YN7R2GP2E0NQBTK8JB","deckName":"Weenie Animalism","format":"TAGGED","gameFormats":["STANDARD"]},"Imbued":{"deckId":"01JMZPDCP9HJGVEZMHGKAZ84KD","deckName":"Imbued","format":"TAGGED","gameFormats":["STANDARD"]},"2-player Banu Haqim":{"deckId":"01JZ2879EDM71GWG1GFZ7PRCFX","deckName":"2-player Banu Haqim","format":"TAGGED","gameFormats":["DUEL"]},"V5 Lasombra - Custom":{"deckId":"01JZ2AT1SCC9W18G2S4HJVEKW2","deckName":"V5 Lasombra - Custom","format":"MODERN","gameFormats":["STANDARD","V5"]},"V5 Hecata":{"deckId":"01JZ2ATMRDXB2SJ72APSZVJYXE","deckName":"V5 Hecata","format":"MODERN","gameFormats":["V5_STRICT","STANDARD","V5"]},"Caine Pre-con":{"deckId":"01K37P9CJXR5CTC5HQ0QZWRKXA","deckName":"Caine Pre-con","format":"MODERN","gameFormats":["PLAYTEST"]}},"Player4":{"Tzimisce Toolbox":{"deckId":"01GR3EV10VE76Q3Y3NZ5N97BRZ","deckName":"Tzimisce Toolbox","format":"TAGGED","gameFormats":["STANDARD"]},"Power Pre-con":{"deckId":"01K37Y9WVH73X0SGQG44JWFPMF","deckName":"Power Pre-con","format":"MODERN","gameFormats":["PLAYTEST"]}},"Player3":{"Toreador Politics":{"deckId":"01GR3EV107E4AFN783R71DPVTZ","deckName":"Toreador Politics","format":"TAGGED","gameFormats":["STANDARD"]},"Death Pre-con":{"deckId":"01K37Y6ZJX4BVE7VPRDV4R2JTT","deckName":"Death Pre-con","format":"MODERN","gameFormats":["PLAYTEST"]}}}
+{
+  "Player6": {
+    "Gangrel Anarch": {
+      "deckId": "01K5WH7D9GFM86SVBJJVXFND62",
+      "deckName": "Gangrel Anarch",
+      "format": "MODERN",
+      "gameFormats": [
+        "PLAYTEST",
+        "STANDARD"
+      ]
+    }
+  },
+  "Player5": {
+    "Assamite Deck": {
+      "deckId": "01GR3EV0H7W4RWRZJ7XZK3RVRY",
+      "deckName": "Assamite Deck",
+      "format": "TAGGED",
+      "gameFormats": [
+        "STANDARD"
+      ]
+    }
+  },
+  "Player2": {
+    "LasombraKiasyd Bleed": {
+      "deckId": "01GR3EV0ZHC36EK47BQMFDSAPB",
+      "deckName": "LasombraKiasyd Bleed",
+      "format": "TAGGED",
+      "gameFormats": [
+        "STANDARD"
+      ]
+    },
+    "2-player Brujah": {
+      "deckId": "01JZ289F9WY4AQJWE0ATM6VN0E",
+      "deckName": "2-player Brujah",
+      "format": "MODERN",
+      "gameFormats": [
+        "DUEL"
+      ]
+    },
+    "Cathari Pre-con": {
+      "deckId": "01K37PD4GHB0JWHE8AQNFDXF6F",
+      "deckName": "Cathari Pre-con",
+      "format": "MODERN",
+      "gameFormats": [
+        "PLAYTEST"
+      ]
+    }
+  },
+  "Player1": {
+    "Weenie Animalism": {
+      "deckId": "01GR3EV0YN7R2GP2E0NQBTK8JB",
+      "deckName": "Weenie Animalism",
+      "format": "TAGGED",
+      "gameFormats": [
+        "STANDARD"
+      ]
+    },
+    "Imbued": {
+      "deckId": "01JMZPDCP9HJGVEZMHGKAZ84KD",
+      "deckName": "Imbued",
+      "format": "TAGGED",
+      "gameFormats": [
+        "STANDARD"
+      ]
+    },
+    "2-player Banu Haqim": {
+      "deckId": "01JZ2879EDM71GWG1GFZ7PRCFX",
+      "deckName": "2-player Banu Haqim",
+      "format": "TAGGED",
+      "gameFormats": [
+        "DUEL"
+      ]
+    },
+    "V5 Lasombra - Custom": {
+      "deckId": "01JZ2AT1SCC9W18G2S4HJVEKW2",
+      "deckName": "V5 Lasombra - Custom",
+      "format": "MODERN",
+      "gameFormats": [
+        "STANDARD",
+        "V5"
+      ]
+    },
+    "V5 Hecata": {
+      "deckId": "01JZ2ATMRDXB2SJ72APSZVJYXE",
+      "deckName": "V5 Hecata",
+      "format": "MODERN",
+      "gameFormats": [
+        "V5_STRICT",
+        "STANDARD",
+        "V5"
+      ]
+    },
+    "Caine Pre-con": {
+      "deckId": "01K37P9CJXR5CTC5HQ0QZWRKXA",
+      "deckName": "Caine Pre-con",
+      "format": "MODERN",
+      "gameFormats": [
+        "PLAYTEST"
+      ]
+    }
+  },
+  "Player4": {
+    "Tzimisce Toolbox": {
+      "deckId": "01GR3EV10VE76Q3Y3NZ5N97BRZ",
+      "deckName": "Tzimisce Toolbox",
+      "format": "TAGGED",
+      "gameFormats": [
+        "STANDARD"
+      ]
+    },
+    "Power Pre-con": {
+      "deckId": "01K37Y9WVH73X0SGQG44JWFPMF",
+      "deckName": "Power Pre-con",
+      "format": "MODERN",
+      "gameFormats": [
+        "PLAYTEST"
+      ]
+    }
+  },
+  "Player3": {
+    "Toreador Politics": {
+      "deckId": "01GR3EV107E4AFN783R71DPVTZ",
+      "deckName": "Toreador Politics",
+      "format": "TAGGED",
+      "gameFormats": [
+        "STANDARD"
+      ]
+    },
+    "Death Pre-con": {
+      "deckId": "01K37Y6ZJX4BVE7VPRDV4R2JTT",
+      "deckName": "Death Pre-con",
+      "format": "MODERN",
+      "gameFormats": [
+        "PLAYTEST"
+      ]
+    }
+  }
+}

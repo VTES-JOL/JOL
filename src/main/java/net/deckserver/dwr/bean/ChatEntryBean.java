@@ -26,20 +26,20 @@ public class ChatEntryBean {
         return timestamp;
     }
 
-    public String getPlayer() {
-        return player;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
+    public String getPlayer() {
+        return player;
+    }
+
     public void setPlayer(String player) {
         this.player = player;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     public void setMessage(String message) {

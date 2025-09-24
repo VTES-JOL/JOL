@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet({"/","/main.jsp"})
+@WebServlet({"/", "/main.jsp"})
 public class MainServlet extends HttpServlet {
 
     @Override

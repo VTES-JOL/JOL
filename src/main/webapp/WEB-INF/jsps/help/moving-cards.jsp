@@ -1,45 +1,63 @@
-<div class="container-fluid tab-pane fade bg-secondary-subtle" role="tabpanel" aria-labelledby="help3" tabindex="0" id="panel3">
+<div class="container-fluid tab-pane fade bg-secondary-subtle" role="tabpanel" aria-labelledby="help3" tabindex="0"
+     id="panel3">
     <h4>Playing cards & Influencing</h4>
-    The <span class="badge bg-secondary fs-6 px-2 py-1">play</span> command is used to play cards from your hand, and the <span class="badge bg-secondary fs-6 px-2 py-1">influence</span> command is used to play vampires from your uncontrolled region.
-    Both of these commands add additional context to the game chat, and setup the initial state of the card, like capacity, disciplines, etc.<br/>
+    The <span class="badge bg-secondary fs-6 px-2 py-1">play</span> command is used to play cards from your hand, and
+    the <span class="badge bg-secondary fs-6 px-2 py-1">influence</span> command is used to play vampires from your
+    uncontrolled region.
+    Both of these commands add additional context to the game chat, and setup the initial state of the card, like
+    capacity, disciplines, etc.<br/>
     <div class="card mt-2">
         <div class="card-header">
             <h5 class="mt-2 fs-6">Tips</h5>
         </div>
         <uL class="list-group list-group-flush">
-            <li class="list-group-item">When clicking a card name in the hand, or other playable regions a list of modes are available to choose from.</li>
+            <li class="list-group-item">When clicking a card name in the hand, or other playable regions a list of modes
+                are available to choose from.
+            </li>
             <li class="list-group-item">Cards that have multiple modes will have multiple options.</li>
-            <li class="list-group-item">Clicking on a mode that uses disciplines will print those disciplines in chat.</li>
-            <li class="list-group-item">Cards that require a target card will prompt for this after a mode has been selected.</li>
-            <li class="list-group-item">Sensible defaults for target regions have been chosen, though not every card has been implemented correctly this way.</li>
+            <li class="list-group-item">Clicking on a mode that uses disciplines will print those disciplines in chat.
+            </li>
+            <li class="list-group-item">Cards that require a target card will prompt for this after a mode has been
+                selected.
+            </li>
+            <li class="list-group-item">Sensible defaults for target regions have been chosen, though not every card has
+                been implemented correctly this way.
+            </li>
         </uL>
     </div>
     <hr class="my-4"/>
     <h4>Drawing cards</h4>
-    The best command to use for drawing cards is the <span class="badge bg-secondary fs-6 px-2 py-1">draw</span> command.  While you can achieve the same result with move, draw provides more context in the game chat.
+    The best command to use for drawing cards is the <span class="badge bg-secondary fs-6 px-2 py-1">draw</span>
+    command. While you can achieve the same result with move, draw provides more context in the game chat.
     <div class="card mt-2">
         <div class="card-header">
             <h5 class="mt-2 fs-6">Tips</h5>
         </div>
         <uL class="list-group list-group-flush">
-            <li class="list-group-item">Shortcuts to draw a single card from the library, or crypt are available in the Quick Commands.</li>
+            <li class="list-group-item">Shortcuts to draw a single card from the library, or crypt are available in the
+                Quick Commands.
+            </li>
         </uL>
     </div>
     <hr class="my-4"/>
     <h4>Discarding cards</h4>
-    There is a specific <span class="badge bg-secondary fs-6 px-2 py-1">discard</span> command to allow you to discard a card from your hand only, with the ability to do this randomly, and the option to replace automatically or not.
+    There is a specific <span class="badge bg-secondary fs-6 px-2 py-1">discard</span> command to allow you to discard a
+    card from your hand only, with the ability to do this randomly, and the option to replace automatically or not.
     <div class="card mt-2">
         <div class="card-header">
             <h5 class="mt-2 fs-6">Tips</h5>
         </div>
         <uL class="list-group list-group-flush">
             <li class="list-group-item">There is a shortcut to discard a random card in the Quick Commands.</li>
-            <li class="list-group-item">Clicking on a card in hand will display a shortcut to both discard, and discard and redraw.</li>
+            <li class="list-group-item">Clicking on a card in hand will display a shortcut to both discard, and discard
+                and redraw.
+            </li>
         </uL>
     </div>
     <hr class="my-4"/>
     <h4>Burning cards</h4>
-    There is a <span class="badge bg-secondary fs-6 px-2 py-1">burn</span> command that will move the card from the ready/torpor region into it's owner's ash-heap.
+    There is a <span class="badge bg-secondary fs-6 px-2 py-1">burn</span> command that will move the card from the
+    ready/torpor region into it's owner's ash-heap.
     <div class="card mt-2">
         <div class="card-header">
             <h5 class="mt-2 fs-6">Tips</h5>
@@ -50,7 +68,8 @@
     </div>
     <hr class="my-4"/>
     <h4>Moving cards</h4>
-    For all other cases, the <span class="badge bg-secondary fs-6 px-2 py-1">move</span> command will allow you to move cards in play from one position ( PLAYER / REGION / CARD ), to another position.
+    For all other cases, the <span class="badge bg-secondary fs-6 px-2 py-1">move</span> command will allow you to move
+    cards in play from one position ( PLAYER / REGION / CARD ), to another position.
     This command is the most commonly used, and will cover most use-cases inside a game of VTES.
     <div class="card mt-2">
         <div class="card-header">
@@ -58,12 +77,15 @@
         </div>
         <uL class="list-group list-group-flush">
             <li class="list-group-item">There is currently no way to move cards via clicking, yet.</li>
-            <li class="list-group-item">Valid target regions for moving include "ready", "uncontrolled", "hand", "library", "crypt", "ashheap", "torpor", and "rfg". Use "rfg" when a card is removed from the game.</li>
+            <li class="list-group-item">Valid target regions for moving include "ready", "uncontrolled", "hand",
+                "library", "crypt", "ashheap", "torpor", and "rfg". Use "rfg" when a card is removed from the game.
+            </li>
         </uL>
     </div>
     <hr class="my-4"/>
     <h4>Shuffling</h4>
-    The <span class="badge bg-secondary fs-6 px-2 py-1">shuffle</span> command will shuffle regions, or randomize a selection of cards in a region.
+    The <span class="badge bg-secondary fs-6 px-2 py-1">shuffle</span> command will shuffle regions, or randomize a
+    selection of cards in a region.
     <div class="card mt-2">
         <div class="card-header">
             <h5 class="mt-2 fs-6">Tips</h5>
@@ -199,7 +221,8 @@
             <div class="card-body">
                 <h6 class="card-title fs-5">draw [crypt] [amount]</h6>
                 <p class="card-text">
-                    Use this to draw cards from either the library, or crypt.  They will go into the hand, or uncontrolled regions respectfully.
+                    Use this to draw cards from either the library, or crypt. They will go into the hand, or
+                    uncontrolled regions respectfully.
                 </p>
                 <table class="table table-bordered">
                     <caption class="caption-top">Command Options</caption>
@@ -226,7 +249,7 @@
                     </tr>
                     <tr>
                         <th>draw 3</th>
-                        <td>Draw 3 cards into your hand.  Useful for Heart of Nizchetus.</td>
+                        <td>Draw 3 cards into your hand. Useful for Heart of Nizchetus.</td>
                     </tr>
                     <tr>
                         <th>draw crypt 4</th>
@@ -246,7 +269,8 @@
             <div class="card-body">
                 <h6 class="card-title fs-5">discard [CARD | random] [draw]</h6>
                 <p class="card-text">
-                    Moves a card from your hand into the ashheap. Note that this will not draw a replacement card by default.
+                    Moves a card from your hand into the ashheap. Note that this will not draw a replacement card by
+                    default.
                 </p>
                 <table class="table table-bordered">
                     <caption class="caption-top">Command Options</caption>
@@ -297,7 +321,8 @@
             <div class="card-body">
                 <h6 class="card-title fs-5">burn [SOURCE]</h6>
                 <p class="card-text">
-                    Burns a card, moving it to its owner's ash heap. Cards on the burned card are moved to their owner's ash heaps.
+                    Burns a card, moving it to its owner's ash heap. Cards on the burned card are moved to their owner's
+                    ash heaps.
                 </p>
                 <table class="table table-bordered">
                     <caption class="caption-top">Command Options</caption>
@@ -316,15 +341,17 @@
                     <caption class="caption-top">Examples</caption>
                     <tr>
                         <th>burn ready 2</th>
-                        <td>Burns card #2 in your ready region.  Useful for master cards that come into play.</td>
+                        <td>Burns card #2 in your ready region. Useful for master cards that come into play.</td>
                     </tr>
                     <tr>
                         <th>burn Lilith ready 2</th>
-                        <td>Burns card #2 in Lilith's ready region.  Useful for destroying a rival's location or equipment.</td>
+                        <td>Burns card #2 in Lilith's ready region. Useful for destroying a rival's location or
+                            equipment.
+                        </td>
                     </tr>
                     <tr>
                         <th>burn Lilith library top</th>
-                        <td>Burns the top card from Lilith's library.  Useful for cards like The Slaughterhouse.</td>
+                        <td>Burns the top card from Lilith's library. Useful for cards like The Slaughterhouse.</td>
                     </tr>
                     <tr>
                         <th>burn crypt top</th>
@@ -359,7 +386,9 @@
                     </tr>
                     <tr>
                         <th>top</th>
-                        <td>You can optionally use the keyword top to move the card to the top of the target region/card.</td>
+                        <td>You can optionally use the keyword top to move the card to the top of the target
+                            region/card.
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -367,39 +396,49 @@
                     <caption class="caption-top">Examples</caption>
                     <tr>
                         <th>move 1</th>
-                        <td>Moves ready #1 to the last spot in your ready region.  Useful for re-ordering your regions.</td>
+                        <td>Moves ready #1 to the last spot in your ready region. Useful for re-ordering your regions.
+                        </td>
                     </tr>
                     <tr>
                         <th>move 2 1 ready 1</th>
-                        <td>Moves card #1 on ready #2 to ready #1.  Use this to move equipment / retainers from one minion to another.</td>
+                        <td>Moves card #1 on ready #2 to ready #1. Use this to move equipment / retainers from one
+                            minion to another.
+                        </td>
                     </tr>
                     <tr>
                         <th>move torpor 1 ready</th>
-                        <td>Moves torpor #1 to the ready region.  Use this for rescuing from torpor.</td>
+                        <td>Moves torpor #1 to the ready region. Use this for rescuing from torpor.</td>
                     </tr>
                     <tr>
                         <th>move Caine torpor 1 Lilith ready</th>
-                        <td>Moves torpor #1 from player Caine to player Lilith's ready region.  Use this for Graverobbing.</td>
+                        <td>Moves torpor #1 from player Caine to player Lilith's ready region. Use this for
+                            Graverobbing.
+                        </td>
                     </tr>
                     <tr>
                         <th>move hand 1 research</th>
-                        <td>Moves hand #1 to the research area.  Useful for cards that need to be put face-down like Mokole Blood. </td>
+                        <td>Moves hand #1 to the research area. Useful for cards that need to be put face-down like
+                            Mokole Blood.
+                        </td>
                     </tr>
                     <tr>
                         <th>move ashheap 1 hand</th>
-                        <td>Moves ash-heap #1 to your hand.  Useful for resolving Ashur Tablets.</td>
+                        <td>Moves ash-heap #1 to your hand. Useful for resolving Ashur Tablets.</td>
                     </tr>
                     <tr>
                         <th>move ashheap 1 library</th>
-                        <td>Moves ash-heap #1 to the bottom of your library.  Useful for recursion cards like Ashur Tablets.</td>
+                        <td>Moves ash-heap #1 to the bottom of your library. Useful for recursion cards like Ashur
+                            Tablets.
+                        </td>
                     </tr>
                     <tr>
                         <th>move ashheap 1 library top</th>
-                        <td>Moves ash-heap #1 to the top of your library.  Useful for cards that re-sort your library.</td>
+                        <td>Moves ash-heap #1 to the top of your library. Useful for cards that re-sort your library.
+                        </td>
                     </tr>
                     <tr>
                         <th>move library 1 hand</th>
-                        <td>Moves the top card from your library to your hand.  Useful for Heart of Nizchetus.</td>
+                        <td>Moves the top card from your library to your hand. Useful for Heart of Nizchetus.</td>
                     </tr>
                 </table>
             </div>
@@ -446,7 +485,9 @@
                     </tr>
                     <tr>
                         <th>shuffle library 5</th>
-                        <td>Shuffle the top 5 cards of your library, while preserving the order of the remaining cards.</td>
+                        <td>Shuffle the top 5 cards of your library, while preserving the order of the remaining
+                            cards.
+                        </td>
                     </tr>
                 </table>
             </div>

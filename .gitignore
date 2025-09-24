@@ -14,6 +14,7 @@ src/test/resources/game*
 src/test/resources/global_chat.txt
 src/test/resources/data/metrics/*
 images/*
+static/*
 csv/*
 aws/*
 

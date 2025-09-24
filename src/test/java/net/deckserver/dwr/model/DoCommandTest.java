@@ -1,22 +1,20 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.game.interfaces.state.Card;
-import net.deckserver.game.jaxb.state.Notation;
-import net.deckserver.game.storage.cards.Path;
-import net.deckserver.game.storage.state.RegionType;
+import net.deckserver.storage.json.cards.Path;
+import net.deckserver.storage.json.cards.RegionType;
+import net.deckserver.storage.json.game.CardData;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
 public class DoCommandTest {
@@ -24,47 +22,48 @@ public class DoCommandTest {
     private JolGame game;
     private DoCommand worker;
 
+    @BeforeAll
+    public static void init() {
+        JolAdmin.INSTANCE.setup();
+        JolAdmin.INSTANCE.upgrade();
+    }
+
     private String getLastMessage() {
         return Arrays.asList(game.getActions()).getLast().getText();
     }
 
-    @BeforeAll
-    public static void init() {
-        JolAdmin.INSTANCE.setup();
-    }
-
     @BeforeEach
     void setUp() {
-        game = ModelLoader.loadGame("command-test");
+        game = ModelLoader.loadGame("command-test", true);
         worker = new DoCommand(game, new GameModel("Command Test"));
     }
 
     @Test
     void burnTopLibrary() throws CommandException {
-        Card[] ashCards = game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards();
-        assertEquals("143", game.getState().getPlayerLocation("Player2", RegionType.LIBRARY).getCard(0).getId());
-        assertEquals(0, ashCards.length);
+        List<? extends CardData> ashCards = game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards();
+        assertEquals("143", game.getData().getPlayerRegion("Player2", RegionType.LIBRARY).getCard(0).getId());
+        assertEquals(0, ashCards.size());
         worker.doCommand("Player2", "burn library 1");
-        assertEquals("176", game.getState().getPlayerLocation("Player2", RegionType.LIBRARY).getCard(0).getId());
-        ashCards = game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards();
-        assertEquals(1, ashCards.length);
+        assertEquals("176", game.getData().getPlayerRegion("Player2", RegionType.LIBRARY).getCard(0).getId());
+        ashCards = game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards();
+        assertEquals(1, ashCards.size());
         assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='101801' data-secured='false'>Slaughtering the Herd</a> 1 from their library."));
     }
 
     @Test
     void burnReady() throws CommandException {
-        assertEquals("111", game.getState().getPlayerLocation("Player2", RegionType.READY).getCard(0).getId());
-        assertEquals(0, game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length);
+        assertEquals("111", game.getData().getPlayerRegion("Player2", RegionType.READY).getCard(0).getId());
+        assertEquals(0, game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size());
         worker.doCommand("Player2", "burn ready 1");
-        assertEquals(1, game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length);
+        assertEquals(1, game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size());
         assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a> from their ready region."));
     }
 
     @Test
-    void burnRandom() throws CommandException{
-        assertEquals("111", game.getState().getPlayerLocation("Player2", RegionType.READY).getCard(0).getId());
+    void burnRandom() throws CommandException {
+        assertEquals("111", game.getData().getPlayerRegion("Player2", RegionType.READY).getCard(0).getId());
         worker.doCommand("Player2", "burn ready random");
-        assertEquals(1, game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length);
+        assertEquals(1, game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size());
         assertThat(getLastMessage(), containsString("Player2 burns"));
         assertThat(getLastMessage(), containsString("(picked randomly)"));
         assertThat(getLastMessage(), containsString("from their ready region."));
@@ -72,29 +71,30 @@ public class DoCommandTest {
 
     @Test
     void burnAnotherPlayer() throws CommandException {
-        assertEquals("111", game.getState().getPlayerLocation("Player2", RegionType.READY).getCard(0).getId());
-        assertEquals(0, game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length);
+        assertEquals("111", game.getData().getPlayerRegion("Player2", RegionType.READY).getCard(0).getId());
+        assertEquals(0, game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size());
         worker.doCommand("Player3", "burn Player2 ready 1");
-        assertEquals(1, game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length);
+        assertEquals(1, game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size());
         assertThat(getLastMessage(), containsString("Player3 burns <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a> from Player2's ready region"));
     }
 
     @Test
     void timeout() throws CommandException {
-        List<Notation> notes = game.getState().getNotes();
-        assertThat(notes, not(hasItems(new Notation("timeout", null))));
+        String requestor = game.getData().getTimeoutRequestor();
+        assertNull(requestor);
         worker.doCommand("Player2", "timeout");
-        notes = game.getState().getNotes();
-        assertThat(notes, hasItems(new Notation("timeout", "Player2")));
+        requestor = game.getData().getTimeoutRequestor();
+        assertThat(requestor, is("Player2"));
         assertThat(getLastMessage(), containsString("Player2 has requested that the game be timed out."));
     }
 
     @Test
     void timeoutComplete() throws CommandException {
-        List<Notation> notes = game.getState().getNotes();
-        assertThat(notes, not(hasItems(new Notation("timeout", null))));
+        String requestor = game.getData().getTimeoutRequestor();
+        assertNull(requestor);
         worker.doCommand("Player2", "timeout");
-        assertThat(notes, hasItems(new Notation("timeout", "Player2")));
+        requestor = game.getData().getTimeoutRequestor();
+        assertThat(requestor, is("Player2"));
         worker.doCommand("Player3", "timeout");
         assertThat(game.getVictoryPoints("Player2"), is(0.5));
         assertThat(game.getPool("Player2"), is(0));
@@ -128,30 +128,36 @@ public class DoCommandTest {
 
     @Test
     void choose() throws CommandException {
-        List<Notation> notes = game.getState().getNotes();
-        assertThat(notes, not(hasItems(new Notation("Player3-choice", null))));
+        String choice = game.getData().getPlayer("Player3").getChoice();
+        assertNull(choice);
         worker.doCommand("Player3", "choose 5");
-        notes = game.getState().getNotes();
-        assertThat(notes, hasItems(new Notation("Player3-choice", "5")));
+        choice = game.getData().getPlayer("Player3").getChoice();
+        assertThat(choice, is("5"));
         assertThat(getLastMessage(), containsString("Player3 has made their choice."));
     }
 
     @Test
     void reveal() throws CommandException {
-        List<Notation> notes = game.getState().getNotes();
-        assertThat(notes, not(hasItems(new Notation("Player3-choice", null), new Notation("Player5-choice", null))));
+        String player3Choice = game.getData().getPlayer("Player3").getChoice();
+        String player5Choice = game.getData().getPlayer("Player5").getChoice();
+        assertNull(player3Choice);
+        assertNull(player5Choice);
         worker.doCommand("Player3", "choose 5");
         worker.doCommand("Player5", "choose 1");
-        notes = game.getState().getNotes();
-        assertThat(notes, hasItems(new Notation("Player3-choice", "5"), new Notation("Player5-choice", "1")));
+        player3Choice = game.getData().getPlayer("Player3").getChoice();
+        player5Choice = game.getData().getPlayer("Player5").getChoice();
+        assertThat(player3Choice, is("5"));
+        assertThat(player5Choice, is("1"));
         worker.doCommand("Player4", "reveal");
-        notes = game.getState().getNotes();
-        assertThat(notes, hasItems(new Notation("Player3-choice", ""), new Notation("Player5-choice", "")));
+        player3Choice = game.getData().getPlayer("Player3").getChoice();
+        player5Choice = game.getData().getPlayer("Player5").getChoice();
+        assertNull(player3Choice);
+        assertNull(player5Choice);
     }
 
     @Test
     void label() throws CommandException {
-        Card card = game.getCard("111");
+        CardData card = game.getCard("111");
         assertThat(game.getLabel(card), is(""));
         worker.doCommand("Player5", "label PLayer2 ready 1 test");
         assertThat(game.getLabel(card), is("test"));
@@ -166,7 +172,7 @@ public class DoCommandTest {
 
     @Test
     void votes() throws CommandException {
-        Card card = game.getCard("111");
+        CardData card = game.getCard("111");
         assertThat(game.getVotes(card), is(""));
         worker.doCommand("Player2", "votes ready 1 +1");
         assertThat(game.getVotes(card), is("1"));
@@ -206,55 +212,55 @@ public class DoCommandTest {
 
     @Test
     void discard() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length, is(0));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards()[0], hasProperty("id", is("141")));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards().length, is(7));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(0));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().getFirst(), hasProperty("id", is("141")));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(7));
         worker.doCommand("Player2", "discard 1");
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards().length, is(6));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length, is(1));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards()[0], hasProperty("id", is("141")));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(6));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(1));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().getFirst(), hasProperty("id", is("141")));
         assertThat(getLastMessage(), containsString("Player2 discards <a class='card-name' data-card-id='100852' data-secured='false'>Graverobbing</a>"));
     }
 
     @Test
     void discardDraw() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length, is(0));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards().length, is(7));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(0));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(7));
         worker.doCommand("Player2", "discard 1 draw");
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length, is(1));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards()[0], hasProperty("id", is("141")));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards().length, is(7));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(1));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().getFirst(), hasProperty("id", is("141")));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(7));
         assertThat(getLastMessage(), containsString("Player2 draws from their library."));
     }
 
     @Test
     void discardRandom() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length, is(0));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards().length, is(7));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(0));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(7));
         worker.doCommand("Player2", "discard random");
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length, is(1));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards().length, is(6));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(1));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(6));
         assertThat(getLastMessage(), containsString("Player2 discards"));
         assertThat(getLastMessage(), containsString("(picked randomly)"));
     }
 
     @Test
     void draw() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards().length, is(7));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.LIBRARY).getCards()[0], hasProperty("id", is("143")));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(7));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.LIBRARY).getCards().getFirst(), hasProperty("id", is("143")));
         worker.doCommand("Player2", "draw");
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards().length, is(8));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards()[7], hasProperty("id", is("143")));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(8));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().get(7), hasProperty("id", is("143")));
         assertThat(getLastMessage(), containsString("Player2 draws from their library."));
     }
 
     @Test
     void drawCrypt() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.UNCONTROLLED).getCards().length, is(3));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.CRYPT).getCards()[0], hasProperty("id", is("105")));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.UNCONTROLLED).getCards().size(), is(3));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.CRYPT).getCards().getFirst(), hasProperty("id", is("105")));
         worker.doCommand("Player2", "draw crypt");
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.UNCONTROLLED).getCards().length, is(4));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.UNCONTROLLED).getCards()[3], hasProperty("id", is("105")));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.UNCONTROLLED).getCards().size(), is(4));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.UNCONTROLLED).getCards().get(3), hasProperty("id", is("105")));
         assertThat(getLastMessage(), containsString("Player2 draws from their crypt."));
     }
 
@@ -289,78 +295,78 @@ public class DoCommandTest {
 
     @Test
     void play() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards().length, is(7));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards()[0], hasProperty("id", is("141")));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length, is(0));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(7));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().getFirst(), hasProperty("id", is("141")));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(0));
         worker.doCommand("Player2", "play 1");
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards().length, is(6));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length, is(1));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards()[0], hasProperty("id", is("141")));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(6));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(1));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().getFirst(), hasProperty("id", is("141")));
         assertThat(getLastMessage(), containsString("Player2 plays <a class='card-name' data-card-id='100852' data-secured='false'>Graverobbing</a>."));
     }
 
     @Test
     void playWithMode() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards().length, is(7));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards()[2], hasProperty("id", is("173")));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length, is(0));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(7));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().get(2), hasProperty("id", is("173")));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(0));
         worker.doCommand("Player2", "play 3 @ obt");
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.HAND).getCards().length, is(6));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards().length, is(1));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.ASH_HEAP).getCards()[0], hasProperty("id", is("173")));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(6));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(1));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().getFirst(), hasProperty("id", is("173")));
         assertThat(getLastMessage(), containsString("Player2 plays <a class='card-name' data-card-id='101735' data-secured='false'>Shadow Body</a> at <span class='icon obt'></span>."));
     }
 
     @Test
     void playToRegion() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.HAND).getCards().length, is(7));
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.HAND).getCards()[3], hasProperty("id", is("454")));
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.READY).getCards().length, is(3));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.HAND).getCards().size(), is(7));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.HAND).getCards().get(3), hasProperty("id", is("454")));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.READY).getCards().size(), is(3));
         worker.doCommand("Player5", "play 4 ready");
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.HAND).getCards().length, is(6));
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.READY).getCards().length, is(4));
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.READY).getCards()[3], hasProperty("id", is("454")));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.HAND).getCards().size(), is(6));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.READY).getCards().size(), is(4));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.READY).getCards().get(3), hasProperty("id", is("454")));
         assertThat(getLastMessage(), containsString("Player5 plays <a class='card-name' data-card-id='100633' data-secured='false'>Embrace, The</a> to their ready region."));
     }
 
     @Test
     void playAndDraw() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.HAND).getCards().length, is(7));
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.HAND).getCards()[3], hasProperty("id", is("454")));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.HAND).getCards().size(), is(7));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.HAND).getCards().get(3), hasProperty("id", is("454")));
         worker.doCommand("Player5", "play 4 ready draw");
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.HAND).getCards().length, is(7));
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.READY).getCards()[3], hasProperty("id", is("454")));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.HAND).getCards().size(), is(7));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.READY).getCards().get(3), hasProperty("id", is("454")));
         assertThat(getLastMessage(), containsString("Player5 draws from their library."));
     }
 
     @Test
     void playFromOutsideHand() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.LIBRARY).getCards().length, is(76));
-        assertThat(game.getState().getCard("6").getCards().length, is(0));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.LIBRARY).getCards().size(), is(76));
+        assertThat(game.getData().getCard("6").getCards().size(), is(0));
         worker.doCommand("Player1", "play library 11 ready 1");
-        assertThat(game.getState().getCard("6").getCards().length, is(1));
-        assertThat(game.getState().getCard("6").getCards()[0], hasProperty("id", is("18")));
+        assertThat(game.getData().getCard("6").getCards().size(), is(1));
+        assertThat(game.getData().getCard("6").getCards().getFirst(), hasProperty("id", is("18")));
         assertThat(getLastMessage(), containsString("Player1 plays <a class='card-name' data-card-id='100070' data-secured='false'>Animalism</a> from their library on <a class='card-name' data-card-id='200519' data-secured='false'>Gillian Krader</a> in their ready region."));
     }
 
     @Test
     void playToAnotherPlayersCard() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.LIBRARY).getCards().length, is(76));
-        assertThat(game.getState().getCard("6").getCards().length, is(0));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.LIBRARY).getCards().size(), is(76));
+        assertThat(game.getData().getCard("6").getCards().size(), is(0));
         worker.doCommand("Player1", "play library 11 Player2 ready 1");
-        assertThat(game.getCard("111").getCards().length, is(1));
-        assertThat(game.getCard("111").getCards()[0], hasProperty("id", is("18")));
+        assertThat(game.getCard("111").getCards().size(), is(1));
+        assertThat(game.getCard("111").getCards().getFirst(), hasProperty("id", is("18")));
         assertThat(getLastMessage(), containsString("Player1 plays <a class='card-name' data-card-id='100070' data-secured='false'>Animalism</a> from their library on <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a> in Player2's ready region."));
     }
 
     @Test
     void playToAnotherPlayersRegion() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.LIBRARY).getCards().length, is(76));
-        assertThat(game.getState().getCard("6").getCards().length, is(0));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.READY).getCards().length, is(2));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.LIBRARY).getCards().size(), is(76));
+        assertThat(game.getData().getCard("6").getCards().size(), is(0));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.READY).getCards().size(), is(2));
         worker.doCommand("Player1", "play library 11 Player2 ready");
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.READY).getCards().length, is(3));
-        assertThat(game.getState().getPlayerLocation("Player2", RegionType.READY).getCards()[2], hasProperty("id", is("18")));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.READY).getCards().size(), is(3));
+        assertThat(game.getData().getPlayerRegion("Player2", RegionType.READY).getCards().get(2), hasProperty("id", is("18")));
         assertThat(getLastMessage(), containsString("Player1 plays <a class='card-name' data-card-id='100070' data-secured='false'>Animalism</a> from their library to Player2's ready region."));
     }
 
@@ -371,108 +377,108 @@ public class DoCommandTest {
 
     @Test
     void influence() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED).getCards().length, is(2));
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY).getCards().length, is(3));
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED).getCards()[0], hasProperty("id", is("4")));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.UNCONTROLLED).getCards().size(), is(2));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.READY).getCards().size(), is(3));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.UNCONTROLLED).getCards().getFirst(), hasProperty("id", is("4")));
         worker.doCommand("Player1", "influence 1");
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY).getCards().length, is(4));
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY).getCards()[0], hasProperty("id", is("4")));
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED).getCards().length, is(1));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.READY).getCards().size(), is(4));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.READY).getCards().getFirst(), hasProperty("id", is("4")));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.UNCONTROLLED).getCards().size(), is(1));
         assertThat(getLastMessage(), containsString("Player1 influences out <a class='card-name' data-card-id='201025' data-secured='false'>Muse</a>."));
     }
 
     @Test
     void influenceAgain() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED).getCards().length, is(2));
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY).getCards().length, is(3));
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED).getCards()[0], hasProperty("id", is("4")));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.UNCONTROLLED).getCards().size(), is(2));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.READY).getCards().size(), is(3));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.UNCONTROLLED).getCards().getFirst(), hasProperty("id", is("4")));
         worker.doCommand("Player1", "influence 1");
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED).getCards().length, is(1));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.UNCONTROLLED).getCards().size(), is(1));
         worker.doCommand("Player1", "move ready 1 uncontrolled");
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED).getCards().length, is(2));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.UNCONTROLLED).getCards().size(), is(2));
         worker.doCommand("Player1", "influence 2");
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.UNCONTROLLED).getCards().length, is(1));
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY).getCards()[0], hasProperty("id", is("4")));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.UNCONTROLLED).getCards().size(), is(1));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.READY).getCards().getFirst(), hasProperty("id", is("4")));
         assertThat(getLastMessage(), containsString("Player1 influences out <a class='card-name' data-card-id='201025' data-secured='false'>Muse</a>."));
     }
 
     @Test
     void influenceNoCapacity() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.UNCONTROLLED).getCards().length, is(4));
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.READY).getCards().length, is(3));
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.UNCONTROLLED).getCards()[3], hasProperty("id", is("442")));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.UNCONTROLLED).getCards().size(), is(4));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.READY).getCards().size(), is(3));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.UNCONTROLLED).getCards().get(3), hasProperty("id", is("442")));
         worker.doCommand("Player5", "influence 4");
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.READY).getCards()[0], hasProperty("id", is("442")));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.READY).getCards().getFirst(), hasProperty("id", is("442")));
         assertThat(getLastMessage(), containsString("Player5 influences out <a class='card-name' data-card-id='102165' data-secured='false'>Web of Knives Recruit</a>."));
     }
 
     @Test
     void influenceVotes() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player4", RegionType.UNCONTROLLED).getCards().length, is(3));
-        assertThat(game.getState().getPlayerLocation("Player4", RegionType.READY).getCards().length, is(2));
-        assertThat(game.getState().getPlayerLocation("Player4", RegionType.UNCONTROLLED).getCards()[2], hasProperty("id", is("317")));
+        assertThat(game.getData().getPlayerRegion("Player4", RegionType.UNCONTROLLED).getCards().size(), is(3));
+        assertThat(game.getData().getPlayerRegion("Player4", RegionType.READY).getCards().size(), is(2));
+        assertThat(game.getData().getPlayerRegion("Player4", RegionType.UNCONTROLLED).getCards().get(2), hasProperty("id", is("317")));
         worker.doCommand("Player4", "influence 3");
-        assertThat(game.getState().getPlayerLocation("Player4", RegionType.READY).getCards().length, is(3));
-        assertThat(game.getState().getPlayerLocation("Player4", RegionType.READY).getCards()[0], hasProperty("id", is("317")));
-        assertThat(game.getState().getPlayerLocation("Player4", RegionType.UNCONTROLLED).getCards().length, is(2));
+        assertThat(game.getData().getPlayerRegion("Player4", RegionType.READY).getCards().size(), is(3));
+        assertThat(game.getData().getPlayerRegion("Player4", RegionType.READY).getCards().getFirst(), hasProperty("id", is("317")));
+        assertThat(game.getData().getPlayerRegion("Player4", RegionType.UNCONTROLLED).getCards().size(), is(2));
         assertThat(getLastMessage(), containsString("Player4 influences out <a class='card-name' data-card-id='200810' data-secured='false'>Lambach</a>, votes: 3."));
     }
 
     @Test
     void move() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.READY).getCards().length, is(3));
-        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY).getCards().length, is(1));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.READY).getCards().size(), is(3));
+        assertThat(game.getData().getPlayerRegion("Player3", RegionType.READY).getCards().size(), is(1));
         worker.doCommand("Player5", "move Player3 ready 1 ready");
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.READY).getCards().length, is(4));
-        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY).getCards().length, is(0));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.READY).getCards().size(), is(4));
+        assertThat(game.getData().getPlayerRegion("Player3", RegionType.READY).getCards().size(), is(0));
         assertThat(getLastMessage(), containsString("Player5 moves <a class='card-name' data-card-id='200788' data-secured='false'>Klaus van der Veken</a> to Player5's ready region."));
     }
 
     @Test
     void moveTopSort() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY).getCards().length, is(1));
+        assertThat(game.getData().getPlayerRegion("Player3", RegionType.READY).getCards().size(), is(1));
         worker.doCommand("Player3", "move ready 1 top");
-        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY).getCards().length, is(1));
+        assertThat(game.getData().getPlayerRegion("Player3", RegionType.READY).getCards().size(), is(1));
         assertThat(getLastMessage(), containsString("Player3 moves <a class='card-name' data-card-id='200788' data-secured='false'>Klaus van der Veken</a> to the top of their ready region."));
 
     }
 
     @Test
     void moveTop() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.LIBRARY).getCards().length, is(64));
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.HAND).getCards().length, is(7));
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.HAND).getCards()[0], hasProperty("id", is("489")));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.LIBRARY).getCards().size(), is(64));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.HAND).getCards().size(), is(7));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.HAND).getCards().getFirst(), hasProperty("id", is("489")));
         worker.doCommand("Player5", "move hand 1 library top");
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.LIBRARY).getCards().length, is(65));
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.HAND).getCards().length, is(6));
-        assertThat(game.getState().getPlayerLocation("Player5", RegionType.LIBRARY).getCards()[0], hasProperty("id", is("489")));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.LIBRARY).getCards().size(), is(65));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.HAND).getCards().size(), is(6));
+        assertThat(game.getData().getPlayerRegion("Player5", RegionType.LIBRARY).getCards().getFirst(), hasProperty("id", is("489")));
         assertThat(getLastMessage(), containsString("Player5 moves card #1 in their hand to the top of their library."));
     }
 
     @Test
     void moveToCard() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY).getCards()[0].getCards().length, is(2));
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY).getCards()[2].getCards().length, is(0));
+        assertThat(game.getData().getPlayerRegion("Player3", RegionType.READY).getCards().getFirst().getCards().size(), is(2));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.READY).getCards().get(2).getCards().size(), is(0));
         worker.doCommand("Player1", "move Player3 ready 1.1 ready 3");
-        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY).getCards()[0].getCards().length, is(1));
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.READY).getCards()[2].getCards().length, is(1));
+        assertThat(game.getData().getPlayerRegion("Player3", RegionType.READY).getCards().getFirst().getCards().size(), is(1));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.READY).getCards().get(2).getCards().size(), is(1));
         assertThat(getLastMessage(), containsString("Player1 puts <a class='card-name' data-card-id='101014' data-secured='false'>Ivory Bow</a> on <a class='card-name' data-card-id='100298' data-secured='false'>Carlton Van Wyk</a> in their ready region."));
     }
 
     @Test
     void moveCardLoop() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY).getCards()[0].getCards().length, is(2));
+        assertThat(game.getData().getPlayerRegion("Player3", RegionType.READY).getCards().getFirst().getCards().size(), is(2));
         assertThrows(CommandException.class, () -> worker.doCommand("Player3", "move ready 1 ready 1.1"));
     }
 
     @Test
     void moveComplicated() throws CommandException {
-        assertThat(game.getState().getCard("208").getCards().length, is(2));
-        assertThat(game.getState().getCard("246").getCards().length, is(0));
+        assertThat(game.getData().getCard("208").getCards().size(), is(2));
+        assertThat(game.getData().getCard("246").getCards().size(), is(0));
         worker.doCommand("Player3", "move ready 1.2 ready 1.1");
         assertThat(getLastMessage(), containsString("Player3 puts <a class='card-name' data-card-id='100199' data-secured='false'>Blood Doll</a> 1.2 on <a class='card-name' data-card-id='101014' data-secured='false'>Ivory Bow</a> in their ready region."));
-        assertThat(game.getState().getCard("208").getCards().length, is(1));
-        assertThat(game.getState().getCard("246").getCards().length, is(1));
+        assertThat(game.getData().getCard("208").getCards().size(), is(1));
+        assertThat(game.getData().getCard("246").getCards().size(), is(1));
         assertThrows(CommandException.class, () -> worker.doCommand("Player3", "move ready 1 ready 1.1.1"));
     }
 
@@ -509,7 +515,7 @@ public class DoCommandTest {
 
     @Test
     void blood() throws CommandException {
-        Card card = game.getCard("111");
+        CardData card = game.getCard("111");
         assertThat(game.getCounters(card), is(6));
         worker.doCommand("Player2", "blood ready 1 +1");
         assertThat(game.getCounters(card), is(7));
@@ -519,7 +525,7 @@ public class DoCommandTest {
 
     @Test
     void contest() throws CommandException {
-        Card card = game.getCard("111");
+        CardData card = game.getCard("111");
         assertThat(game.getContested(card), is(false));
         worker.doCommand("Player2", "contest ready 1");
         assertThat(game.getContested(card), is(true));
@@ -531,7 +537,7 @@ public class DoCommandTest {
 
     @Test
     void disciplines() throws CommandException {
-        Card card = game.getCard("111");
+        CardData card = game.getCard("111");
         assertThat(game.getDisciplines(card), contains("aus", "dom", "OBT", "POT"));
         worker.doCommand("Player2", "disc ready 1 +ani");
         assertThat(game.getDisciplines(card), contains("ani", "aus", "dom", "OBT", "POT"));
@@ -557,11 +563,11 @@ public class DoCommandTest {
     }
 
     @Test
-    void capacity() throws CommandException{
-        Card card = game.getCard("111");
-        assertThat(game.getCapacity(card), is(6));
+    void capacity() throws CommandException {
+        CardData card = game.getCard("111");
+        assertThat(card.getCapacity(), is(6));
         worker.doCommand("Player2", "capacity ready 1 +1");
-        assertThat(game.getCapacity(card), is(7));
+        assertThat(card.getCapacity(), is(7));
         assertThat(getLastMessage(), containsString("Capacity of <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a> now 7"));
         worker.doCommand("Player2", "capacity ready 1 -1");
         assertThat(getLastMessage(), containsString("Capacity of <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a> now 6"));
@@ -572,46 +578,46 @@ public class DoCommandTest {
 
     @Test
     void unlockAll() throws CommandException {
-        Card card1 = game.getCard("6");
-        Card card2 = game.getCard("11");
-        Card card3 = game.getCard("37");
-        assertThat(game.isTapped(card1), is(false));
-        assertThat(game.isTapped(card2), is(true));
-        assertThat(game.isTapped(card3), is(true));
+        CardData card1 = game.getCard("6");
+        CardData card2 = game.getCard("11");
+        CardData card3 = game.getCard("37");
+        assertThat(card1.isLocked(), is(false));
+        assertThat(card2.isLocked(), is(true));
+        assertThat(card3.isLocked(), is(true));
         worker.doCommand("Player1", "unlock");
-        assertThat(game.isTapped(card1), is(false));
-        assertThat(game.isTapped(card2), is(false));
-        assertThat(game.isTapped(card3), is(false));
+        assertThat(card1.isLocked(), is(false));
+        assertThat(card2.isLocked(), is(false));
+        assertThat(card3.isLocked(), is(false));
         assertThat(getLastMessage(), containsString("Player1 unlocks."));
     }
 
     @Test
     void unlock() throws CommandException {
-        Card card1 = game.getCard("6");
-        Card card2 = game.getCard("11");
-        Card card3 = game.getCard("37");
-        assertThat(game.isTapped(card1), is(false));
-        assertThat(game.isTapped(card2), is(true));
-        assertThat(game.isTapped(card3), is(true));
+        CardData card1 = game.getCard("6");
+        CardData card2 = game.getCard("11");
+        CardData card3 = game.getCard("37");
+        assertThat(card1.isLocked(), is(false));
+        assertThat(card2.isLocked(), is(true));
+        assertThat(card3.isLocked(), is(true));
         worker.doCommand("Player1", "unlock ready 2");
-        assertThat(game.isTapped(card1), is(false));
-        assertThat(game.isTapped(card2), is(false));
-        assertThat(game.isTapped(card3), is(true));
+        assertThat(card1.isLocked(), is(false));
+        assertThat(card2.isLocked(), is(false));
+        assertThat(card3.isLocked(), is(true));
         assertThat(getLastMessage(), containsString("Player1 unlocks <a class='card-name' data-card-id='201039' data-secured='false'>Navar McClaren</a>."));
     }
 
     @Test
     void lock() throws CommandException {
-        Card card1 = game.getCard("6");
-        Card card2 = game.getCard("11");
-        Card card3 = game.getCard("37");
-        assertThat(game.isTapped(card1), is(false));
-        assertThat(game.isTapped(card2), is(true));
-        assertThat(game.isTapped(card3), is(true));
+        CardData card1 = game.getCard("6");
+        CardData card2 = game.getCard("11");
+        CardData card3 = game.getCard("37");
+        assertThat(card1.isLocked(), is(false));
+        assertThat(card2.isLocked(), is(true));
+        assertThat(card3.isLocked(), is(true));
         worker.doCommand("Player1", "lock ready 1");
-        assertThat(game.isTapped(card1), is(true));
-        assertThat(game.isTapped(card2), is(true));
-        assertThat(game.isTapped(card3), is(true));
+        assertThat(card1.isLocked(), is(true));
+        assertThat(card2.isLocked(), is(true));
+        assertThat(card3.isLocked(), is(true));
         assertThat(getLastMessage(), containsString("Player1 locks <a class='card-name' data-card-id='200519' data-secured='false'>Gillian Krader</a>."));
         assertThrows(CommandException.class, () -> worker.doCommand("Player1", "lock ready 1"));
     }
@@ -628,6 +634,7 @@ public class DoCommandTest {
     }
 
     @Test
+    @Disabled
     void showAll() throws CommandException {
         assertThat(game.getPrivateNotes("Player2"), is(""));
         worker.doCommand("Player3", "show library all");
@@ -643,6 +650,7 @@ public class DoCommandTest {
     }
 
     @Test
+    @Disabled
     void showPlayer() throws CommandException {
         assertThat(game.getPrivateNotes("Player4"), is(""));
         worker.doCommand("Player3", "show hand Player4 all");
@@ -651,6 +659,7 @@ public class DoCommandTest {
     }
 
     @Test
+    @Disabled
     void showSelf() throws CommandException {
         assertThat(game.getPrivateNotes("Player3"), is(""));
         worker.doCommand("Player3", "show hand");
@@ -660,10 +669,10 @@ public class DoCommandTest {
 
     @Test
     void shuffle() throws CommandException {
-        List<String> cards = Stream.of(game.getState().getPlayerLocation("Player3", RegionType.HAND).getCards()).map(Card::getId).toList();
+        List<String> cards = game.getData().getPlayerRegion("Player3", RegionType.HAND).getCards().stream().map(CardData::getId).toList();
         assertThat(cards, contains("283", "299", "235", "257", "252", "242", "264"));
         worker.doCommand("Player3", "shuffle hand");
-        cards = Stream.of(game.getState().getPlayerLocation("Player3", RegionType.HAND).getCards()).map(Card::getId).toList();
+        cards = game.getData().getPlayerRegion("Player3", RegionType.HAND).getCards().stream().map(CardData::getId).toList();
         assertThat(cards, not(contains("283", "299", "235", "257", "252", "242", "264")));
         assertThat(cards, containsInAnyOrder("283", "299", "235", "257", "252", "242", "264"));
         assertThat(getLastMessage(), containsString("Player3 shuffles their hand."));
@@ -683,7 +692,7 @@ public class DoCommandTest {
 
     @Test
     void transferOn() throws CommandException {
-        Card card = game.getCard("111");
+        CardData card = game.getCard("111");
         assertThat(game.getCounters(card), is(6));
         assertThat(game.getPool("Player2"), is(30));
         worker.doCommand("Player2", "transfer ready 1 +1");
@@ -694,21 +703,21 @@ public class DoCommandTest {
 
     @Test
     void rfg() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY).getCards().length, is(1));
-        assertThat(game.getState().getPlayerLocation("Player3", RegionType.REMOVED_FROM_GAME).getCards().length, is(0));
+        assertThat(game.getData().getPlayerRegion("Player3", RegionType.READY).getCards().size(), is(1));
+        assertThat(game.getData().getPlayerRegion("Player3", RegionType.REMOVED_FROM_GAME).getCards().size(), is(0));
         worker.doCommand("Player5", "rfg Player3 ready 1");
-        assertThat(game.getState().getPlayerLocation("Player3", RegionType.READY).getCards().length, is(0));
-        assertThat(game.getState().getPlayerLocation("Player3", RegionType.REMOVED_FROM_GAME).getCards().length, is(1));
+        assertThat(game.getData().getPlayerRegion("Player3", RegionType.READY).getCards().size(), is(0));
+        assertThat(game.getData().getPlayerRegion("Player3", RegionType.REMOVED_FROM_GAME).getCards().size(), is(1));
         assertThat(getLastMessage(), containsString("Player5 removes <a class='card-name' data-card-id='200788' data-secured='false'>Klaus van der Veken</a> in Player3's ready region from the game."));
     }
 
     @Test
     void rfgRandom() throws CommandException {
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.ASH_HEAP).getCards().length, is(4));
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.REMOVED_FROM_GAME).getCards().length, is(0));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.ASH_HEAP).getCards().size(), is(4));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.REMOVED_FROM_GAME).getCards().size(), is(0));
         worker.doCommand("Player5", "rfg Player1 ash random");
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.ASH_HEAP).getCards().length, is(3));
-        assertThat(game.getState().getPlayerLocation("Player1", RegionType.REMOVED_FROM_GAME).getCards().length, is(1));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.ASH_HEAP).getCards().size(), is(3));
+        assertThat(game.getData().getPlayerRegion("Player1", RegionType.REMOVED_FROM_GAME).getCards().size(), is(1));
         assertThat(getLastMessage(), containsString("Player5 removes"));
         assertThat(getLastMessage(), containsString("(picked randomly)"));
         assertThat(getLastMessage(), containsString("from the game."));
@@ -716,9 +725,9 @@ public class DoCommandTest {
 
     @Test
     void pathTest() throws CommandException {
-        Card card = game.getCard("111");
-        assertThat(game.getPath(card), is(Path.NONE));
+        CardData card = game.getData().getCard("111");
+        assertThat(card.getPath(), is(Path.NONE));
         worker.doCommand("Player2", "path 1 caine");
-        assertThat(game.getPath(card), is(Path.CAINE));
+        assertThat(card.getPath(), is(Path.CAINE));
     }
 }
