@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import net.deckserver.storage.json.cards.RegionType;
+import net.deckserver.game.enums.RegionType;
 
 import java.util.Collections;
 import java.util.LinkedList;

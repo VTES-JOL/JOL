@@ -2,8 +2,8 @@
 <%@page contentType="text/html" %>
 <%@page pageEncoding="UTF-8" %>
 <%@ page import="net.deckserver.dwr.model.JolGame" %>
-<%@ page import="net.deckserver.storage.json.cards.RegionType" %>
-<%@ page import="net.deckserver.dwr.model.JolAdmin" %>
+<%@ page import="net.deckserver.game.enums.RegionType" %>
+<%@ page import="net.deckserver.JolAdmin" %>
 <%@ page import="java.util.List" %>
 <%@ page import="net.deckserver.storage.json.game.CardData" %>
 <%
@@ -21,7 +21,7 @@
     String collapsed = startCollapsed ? "collapsed" : "";
     String regionStyle = region == RegionType.TORPOR ? "bg-danger-subtle" : (region == RegionType.READY ? "bg-success-subtle" : "bg-body-secondary");
     int size = game.getSize(player, region);
-    List<CardData> cards = game.getData().getPlayerRegion(player, region).getCards();
+    List<CardData> cards = game.data().getPlayerRegion(player, region).getCards();
     String regionName = region.xmlLabel().split(" ")[0];
     request.setAttribute("visible", isVisible);
     request.setAttribute("player", player);

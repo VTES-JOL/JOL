@@ -1,6 +1,6 @@
 package net.deckserver.servlet;
 
-import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.JolAdmin;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletContextEvent;

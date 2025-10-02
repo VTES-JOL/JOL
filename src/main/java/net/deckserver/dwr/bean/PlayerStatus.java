@@ -1,7 +1,7 @@
 package net.deckserver.dwr.bean;
 
 import lombok.Data;
-import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.JolGame;
 
 @Data

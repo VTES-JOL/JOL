@@ -1,5 +1,5 @@
 <%@ page import="net.deckserver.dwr.model.JolGame" %>
-<%@ page import="net.deckserver.storage.json.cards.RegionType" %>
+<%@ page import="net.deckserver.game.enums.RegionType" %>
 <%@ page import="net.deckserver.game.ui.CardDetail" %>
 <%@ page import="net.deckserver.storage.json.game.CardData" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>

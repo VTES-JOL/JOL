@@ -8,6 +8,7 @@
         </create>
         <convert converter="bean" match="net.deckserver.dwr.bean.*"/>
         <convert converter="bean" match="net.deckserver.storage.json.deck.*"/>
+        <convert converter="bean" match="net.deckserver.storage.json.game.*"/>
         <convert converter="bean" match="net.deckserver.storage.json.system.*"/>
     </allow>
 </dwr>

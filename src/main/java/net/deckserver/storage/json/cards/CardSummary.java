@@ -3,6 +3,7 @@ package net.deckserver.storage.json.cards;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import net.deckserver.game.enums.CardType;
 
 import java.util.*;
 import java.util.stream.Collectors;

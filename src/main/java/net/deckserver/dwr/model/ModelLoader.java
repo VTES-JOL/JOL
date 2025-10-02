@@ -1,20 +1,17 @@
 package net.deckserver.dwr.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.deckserver.game.interfaces.turn.GameAction;
-import net.deckserver.game.interfaces.turn.TurnRecorder;
-import net.deckserver.game.jaxb.XmlFileUtils;
+import net.deckserver.CardSearch;
+import net.deckserver.game.enums.CardType;
+import net.deckserver.game.enums.Clan;
+import net.deckserver.game.enums.RegionType;
+import net.deckserver.game.enums.Sect;
 import net.deckserver.game.jaxb.actions.GameActions;
 import net.deckserver.game.jaxb.state.GameCard;
 import net.deckserver.game.jaxb.state.GameState;
 import net.deckserver.game.jaxb.state.Notation;
-import net.deckserver.game.storage.turn.StoreTurnRecorder;
-import net.deckserver.game.ui.DsTurnRecorder;
-import net.deckserver.storage.json.cards.*;
-import net.deckserver.storage.json.game.CardData;
-import net.deckserver.storage.json.game.GameData;
-import net.deckserver.storage.json.game.PlayerData;
-import net.deckserver.storage.json.game.RegionData;
+import net.deckserver.storage.json.cards.CardSummary;
+import net.deckserver.storage.json.game.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +21,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class ModelLoader {
@@ -33,48 +32,31 @@ public final class ModelLoader {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static JolGame loadGame(String gameId) {
-        return loadGame(gameId, false);
-    }
-
-    public static JolGame loadGame(String gameId, boolean debugMode) {
         try {
             Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.json");
             GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
-            Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions.xml");
-            GameActions gameActions = XmlFileUtils.loadGameActions(gameActionsPath);
-            DsTurnRecorder deckServerActions = new DsTurnRecorder();
-            ModelLoader.createRecorder(deckServerActions, new StoreTurnRecorder(gameActions));
-            return new JolGame(gameId, gameData, deckServerActions);
+            return new JolGame(gameId, gameData);
         } catch (IOException e) {
-            logger.error("Error reading game file " + gameId, e);
+            logger.error("Error reading game file {}", gameId, e);
         }
-        return new JolGame(gameId, new GameData(), new DsTurnRecorder());
+        return new JolGame(gameId, new GameData());
     }
 
     public static JolGame loadSnapshot(String gameId, String turn) {
         try {
             Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game-" + turn + ".json");
             GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
-            Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions-" + turn + ".xml");
-            GameActions gameActions = XmlFileUtils.loadGameActions(gameActionsPath);
-            DsTurnRecorder deckServerActions = new DsTurnRecorder();
-            ModelLoader.createRecorder(deckServerActions, new StoreTurnRecorder(gameActions));
-            return new JolGame(gameId, gameData, deckServerActions);
+            return new JolGame(gameId, gameData);
         } catch (IOException e) {
             logger.error("Error reading game file", e);
         }
-        return new JolGame(gameId, new GameData(), new DsTurnRecorder());
+        return new JolGame(gameId, new GameData());
     }
 
     public static void saveGame(JolGame game) {
-        String gameId = game.getId();
+        String gameId = game.id();
         Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.json");
-        Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions.xml");
-        GameData deckServerState = game.getData();
-        TurnRecorder deckServerActions = game.getTurnRecorder();
-        GameActions gameActions = new GameActions();
-        ModelLoader.createRecorder(new StoreTurnRecorder(gameActions), deckServerActions);
-        XmlFileUtils.saveGameActions(gameActions, gameActionsPath);
+        GameData deckServerState = game.data();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             objectMapper.writeValue(gameStatePath.toFile(), deckServerState);
@@ -85,27 +67,13 @@ public final class ModelLoader {
 
     public static void saveGame(JolGame game, String turn) {
         turn = turn.replaceAll("\\.", "-");
-        String gameId = game.getId();
+        String gameId = game.id();
         Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game-" + turn + ".json");
-        Path gameActionsPath = BASE_PATH.resolve("games").resolve(gameId).resolve("actions-" + turn + ".xml");
-        GameActions gameActions = new GameActions();
-        ModelLoader.createRecorder(new StoreTurnRecorder(gameActions), game.getTurnRecorder());
-        XmlFileUtils.saveGameActions(gameActions, gameActionsPath);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            objectMapper.writeValue(gameStatePath.toFile(), game.getData());
+            objectMapper.writeValue(gameStatePath.toFile(), game.data());
         } catch (IOException e) {
             logger.error("Unable to save game file", e);
-        }
-    }
-
-    private static void createRecorder(TurnRecorder to, TurnRecorder orig) {
-        for (String turn : orig.getTurns()) {
-            to.addTurn(orig.getMethTurn(turn), turn);
-            GameAction[] actions = orig.getActions(turn);
-            for (GameAction action : actions) {
-                to.addCommand(turn, action.getText(), action.command());
-            }
         }
     }
 
@@ -294,7 +262,7 @@ public final class ModelLoader {
         CardData cardData = new CardData();
         cardData.setId(gameCard.getId());
         cardData.setCardId(gameCard.getCardid());
-        CardSummary summary = CardSearch.INSTANCE.get(gameCard.getCardid());
+        CardSummary summary = CardSearch.get(gameCard.getCardid());
         cardData.setName(summary.getDisplayName());
         if (CardType.permanentTypes().contains(summary.getCardType())) {
             cardData.setType(summary.getCardType());
@@ -309,7 +277,7 @@ public final class ModelLoader {
             if (!summary.getClans().isEmpty()) {
                 cardData.setClan(Clan.of(summary.getClans().getFirst()));
             }
-            cardData.setPath(net.deckserver.storage.json.cards.Path.of(summary.getPath()));
+            cardData.setPath(net.deckserver.game.enums.Path.of(summary.getPath()));
             cardData.setSect(Sect.of(summary.getSect()));
             cardData.setMinion(summary.isMinion());
             cardData.setPlaytest(summary.isPlayTest());
@@ -323,7 +291,6 @@ public final class ModelLoader {
                 }
             }
         }
-        // Populate notes - if blank use null
         String currentNotes = getNotation(gameCard.getNotation(), "notes", null);
         if (!StringUtils.isEmpty(currentNotes)) {
             cardData.setNotes(currentNotes);
@@ -336,5 +303,39 @@ public final class ModelLoader {
             Arrays.asList(disciplines.split(" ")).forEach(cardData::addDiscipline);
         }
         return cardData;
+    }
+
+    public static TurnHistory convertHistory(GameActions gameActions) {
+        Pattern ACTION_PATTERN = Pattern.compile("^(\\d{1,2}-\\w{3} \\d{2}:\\d{2})(?:\\s+\\[\\s*<\\s*([^>]+)\\s*>\\s*]|\\s+\\[([^\\]]+)])?\\s+(.*)$");
+        TurnHistory history = new TurnHistory();
+        gameActions.getTurn().forEach(turn -> {
+            TurnData turnData = new TurnData();
+            String label = turn.getLabel();
+            String player = turn.getName();
+            String turnId = label.replaceAll(player, "").trim();
+            turnData.setPlayer(player);
+            turnData.setTurnId(turnId);
+            turn.getAction().forEach(action -> {
+                ChatData chatData = new ChatData();
+                String text = action.getText();
+                Matcher matcher = ACTION_PATTERN.matcher(text.trim());
+                if (!matcher.matches()) {
+                    chatData.setMessage(text.trim());
+                    return;
+                }
+                chatData.setTimestamp(matcher.group(1));
+                String judgeName = matcher.group(2);
+                String regularName = matcher.group(3);
+                String playerName = judgeName != null ? "Judge - " + judgeName.trim() : regularName;
+                chatData.setSource(playerName);
+                chatData.setMessage(matcher.group(4));
+                if (!action.getCommand().isEmpty()) {
+                    chatData.setCommand(String.join(" ", action.getCommand()));
+                }
+                turnData.addChat(chatData);
+            });
+            history.addTurn(turnData);
+        });
+        return history;
     }
 }

@@ -1,6 +1,6 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.storage.json.cards.RegionType;
+import net.deckserver.game.enums.RegionType;
 import net.deckserver.storage.json.game.CardData;
 import net.deckserver.storage.json.game.RegionData;
 import org.apache.commons.lang3.StringUtils;
@@ -117,7 +117,7 @@ class CommandParser {
     }
 
     CardData findCardData(boolean greedy, boolean allowRandom, String player, RegionType region) throws CommandException {
-        RegionData regionData = game.getData().getPlayerRegion(player, region);
+        RegionData regionData = game.data().getPlayerRegion(player, region);
         var cards = regionData.getCards();
         CardData targetCard = null;
         boolean keepLooking = true;

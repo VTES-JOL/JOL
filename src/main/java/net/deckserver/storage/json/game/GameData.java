@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 import lombok.ToString;
-import net.deckserver.storage.json.cards.RegionType;
+import net.deckserver.game.enums.RegionType;
 
 import java.util.*;
 
@@ -61,18 +61,13 @@ public class GameData {
     }
 
     @JsonIgnore
-    public Collection<PlayerData> getPlayerData() {
-        return this.players.values();
-    }
-
-    @JsonIgnore
     public String getCurrentPlayerName() {
         return Optional.ofNullable(this.currentPlayer).map(PlayerData::getName).orElse(null);
     }
 
     @JsonIgnore
     public String getEdgePlayer() {
-        return this.edge != null ? this.edge.getName() : null;
+        return this.edge != null ? this.edge.getName() : "no one";
     }
 
     @JsonIgnore
@@ -104,11 +99,6 @@ public class GameData {
                 .forEach(cards::add);
 
         return cards;
-    }
-
-    @JsonIgnore
-    public RegionData getRegionFromCard(CardData card) {
-        return card.getRegion();
     }
 
     public void orderPlayers(List<String> newOrder) {
@@ -153,5 +143,10 @@ public class GameData {
                 first.setPredator(current);
             }
         }
+    }
+
+    @JsonIgnore
+    public String getTurnLabel() {
+        return String.format("%s %s", currentPlayer.getName(), turn);
     }
 }

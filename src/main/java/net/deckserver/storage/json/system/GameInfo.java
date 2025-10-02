@@ -1,8 +1,12 @@
 package net.deckserver.storage.json.system;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.deckserver.game.enums.GameFormat;
+import net.deckserver.game.enums.GameStatus;
+import net.deckserver.game.enums.Visibility;
 
 import java.time.OffsetDateTime;
 
@@ -27,6 +31,11 @@ public class GameInfo {
         this.status = status;
         this.gameFormat = gameFormat;
         this.version = CURRENT_VERSION;
+    }
+
+    @JsonIgnore
+    public boolean isPlayTest() {
+        return gameFormat == GameFormat.PLAYTEST;
     }
 
     @Getter

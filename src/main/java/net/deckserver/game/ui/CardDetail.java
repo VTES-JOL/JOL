@@ -1,10 +1,10 @@
 package net.deckserver.game.ui;
 
 import lombok.Data;
-import net.deckserver.storage.json.cards.Clan;
-import net.deckserver.storage.json.cards.Path;
-import net.deckserver.storage.json.cards.RegionType;
-import net.deckserver.storage.json.cards.Sect;
+import net.deckserver.game.enums.Clan;
+import net.deckserver.game.enums.Path;
+import net.deckserver.game.enums.RegionType;
+import net.deckserver.game.enums.Sect;
 import net.deckserver.storage.json.game.CardData;
 
 import java.io.Serializable;

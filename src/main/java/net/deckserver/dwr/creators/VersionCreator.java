@@ -1,6 +1,6 @@
 package net.deckserver.dwr.creators;
 
-import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 
 public class VersionCreator implements ViewCreator {

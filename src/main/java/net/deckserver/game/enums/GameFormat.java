@@ -1,4 +1,4 @@
-package net.deckserver.storage.json.system;
+package net.deckserver.game.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

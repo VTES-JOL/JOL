@@ -1,8 +1,7 @@
 package net.deckserver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.deckserver.dwr.model.JolAdmin;
-import net.deckserver.storage.json.system.GameFormat;
+import net.deckserver.game.enums.GameFormat;
 import net.deckserver.storage.json.system.TournamentData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;

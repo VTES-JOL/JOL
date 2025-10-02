@@ -2,10 +2,10 @@ package net.deckserver.game.storage.cards;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import net.deckserver.CardSearch;
 import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.game.storage.cards.importer.CryptImporter;
 import net.deckserver.game.storage.cards.importer.LibraryImporter;
-import net.deckserver.storage.json.cards.CardSearch;
 import net.deckserver.storage.json.cards.CardSummary;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -44,14 +44,14 @@ public class CardDatabaseBuilder {
         assert imagesPath.toFile().exists() : "Images path does not exist";
 
         List<CardSummary> cardSummaries = summaryCards.stream().map(SummaryCard::toCardSummary).toList();
-        CardSearch.INSTANCE.refresh(cardSummaries);
+        CardSearch.refresh(cardSummaries);
 
         for (SummaryCard summaryCard : summaryCards) {
             String id = summaryCard.getId();
             String outputPrefix = summaryCard.isPlayTest() ? "secured/" : "";
 
             summaryCard.getNames().forEach(name -> {
-                assert CardSearch.INSTANCE.findCardExact(name, true).isPresent() : String.format("Card %s does not exist", name);
+                assert CardSearch.findCardExact(name, true).isPresent() : String.format("Card %s does not exist", name);
             });
 
             // Process images

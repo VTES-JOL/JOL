@@ -1,6 +1,6 @@
 package net.deckserver.servlet;
 
-import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.JolAdmin;
 import net.deckserver.storage.json.cards.SecuredCardLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

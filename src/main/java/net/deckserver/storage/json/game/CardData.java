@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import net.deckserver.storage.json.cards.CardType;
-import net.deckserver.storage.json.cards.Clan;
-import net.deckserver.storage.json.cards.Path;
-import net.deckserver.storage.json.cards.Sect;
+import net.deckserver.game.enums.CardType;
+import net.deckserver.game.enums.Clan;
+import net.deckserver.game.enums.Path;
+import net.deckserver.game.enums.Sect;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

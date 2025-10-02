@@ -1,8 +1,8 @@
 package net.deckserver.dwr.creators;
 
+import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
-import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 
 class GameCreator implements ViewCreator {

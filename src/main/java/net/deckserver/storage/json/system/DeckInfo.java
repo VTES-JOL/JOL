@@ -3,6 +3,7 @@ package net.deckserver.storage.json.system;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.deckserver.game.enums.DeckFormat;
 
 import java.util.HashSet;
 import java.util.Set;

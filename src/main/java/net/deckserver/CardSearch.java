@@ -4,13 +4,16 @@
  * Created on September 24, 2003, 8:51 PM
  */
 
-package net.deckserver.storage.json.cards;
+package net.deckserver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import net.deckserver.storage.json.cards.CardSummary;
+import net.deckserver.storage.json.cards.SecuredCardLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,11 +31,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class CardSearch {
 
     private static final Logger logger = getLogger(CardSearch.class);
-    public static CardSearch INSTANCE = new CardSearch();
-    private final Map<String, String> nameKeys = new HashMap<>();
-    private final Map<String, CardSummary> cards = new HashMap<>();
+    private static final Map<String, String> nameKeys = new HashMap<>();
+    private static final Map<String, CardSummary> cards = new HashMap<>();
 
-    private CardSearch() {
+    static {
         ObjectMapper objectMapper = new ObjectMapper();
         CollectionType cardSummaryCollectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CardSummary.class);
         InputStream loader;
@@ -45,7 +47,7 @@ public class CardSearch {
                 logger.info("Using local stream");
             } catch (Exception e1) {
                 logger.error("Unable to read cards - using empty list");
-                return;
+                loader = new ByteArrayInputStream("[]".getBytes());
             }
         }
         try {
@@ -56,12 +58,12 @@ public class CardSearch {
         }
     }
 
-    public void refresh(List<CardSummary> cardList) {
+    public static void refresh(List<CardSummary> cardList) {
         logger.info("Using static list");
-        INSTANCE.init(cardList);
+        init(cardList);
     }
 
-    public Optional<CardSummary> findCardExact(String text, boolean includePlayTest) {
+    public static Optional<CardSummary> findCardExact(String text, boolean includePlayTest) {
         final String lowerText = StringUtils.stripAccents(text).toLowerCase();
         String key = nameKeys.get(lowerText);
         if (key != null) {
@@ -72,11 +74,11 @@ public class CardSearch {
         }
     }
 
-    public Optional<CardSummary> findCardExact(String text) {
+    public static Optional<CardSummary> findCardExact(String text) {
         return findCardExact(text, false);
     }
 
-    public Optional<CardSummary> findCard(String text) {
+    public static Optional<CardSummary> findCard(String text) {
         final String lowerText = StringUtils.stripAccents(text).toLowerCase();
         Optional<CardSummary> entry = Optional.empty();
         if (nameKeys.containsKey(lowerText)) {
@@ -91,11 +93,11 @@ public class CardSearch {
         return entry;
     }
 
-    public CardSummary get(String id) {
+    public static CardSummary get(String id) {
         return cards.get(id);
     }
 
-    private void init(List<CardSummary> cardList) {
+    private static void init(List<CardSummary> cardList) {
         boolean playtestEnabled = cardList.stream().anyMatch(CardSummary::isPlayTest);
         if (playtestEnabled) {
             logger.info("Playtest cards enabled");
@@ -109,12 +111,12 @@ public class CardSearch {
         logger.info("Read {} keys, {} cards", nameKeys.size(), cards.size());
     }
 
-    private InputStream getCloudfrontStream() throws Exception {
+    private static InputStream getCloudfrontStream() throws Exception {
         SecuredCardLoader loader = new SecuredCardLoader("/secured/cards.json");
         return loader.generateSignedUrl().openStream();
     }
 
-    private InputStream getLocalStream() throws Exception {
+    private static InputStream getLocalStream() throws Exception {
         return new FileInputStream(Paths.get("static/secured/cards.json").toFile());
     }
 }

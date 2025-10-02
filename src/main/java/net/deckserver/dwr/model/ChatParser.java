@@ -1,7 +1,7 @@
 package net.deckserver.dwr.model;
 
 import com.vdurmont.emoji.EmojiParser;
-import net.deckserver.storage.json.cards.CardSearch;
+import net.deckserver.CardSearch;
 import net.deckserver.storage.json.cards.CardSummary;
 import org.owasp.html.Sanitizers;
 
@@ -30,7 +30,7 @@ public class ChatParser {
         return parseTextForStyle(parsedForEmojis);
     }
 
-    public static String parseGameChat(String text, boolean isPlayTest) {
+    public static String parseGameChat(String text) {
         String parsedForCards = parseTextForCards(text, true);
         String parsedForDisciplines = parseTextForDisciplines(parsedForCards);
         String parsedForDActions = parseTextForDAction(parsedForDisciplines);
@@ -59,7 +59,7 @@ public class ChatParser {
             for (int x = 1; x <= matcher.groupCount(); x++) {
                 String match = matcher.group(x).trim().replaceAll("&#39;", "'").replaceAll("&#34;", "\"");
                 try {
-                    CardSearch.INSTANCE.findCardExact(match, includePlaytest).ifPresent(card -> matcher.appendReplacement(sb, generateCardLink(card)));
+                    CardSearch.findCardExact(match, includePlaytest).ifPresent(card -> matcher.appendReplacement(sb, generateCardLink(card)));
                 } catch (IllegalArgumentException e) {
                     // do nothing
                 }

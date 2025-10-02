@@ -6,7 +6,12 @@
 
 package net.deckserver.dwr.model;
 
-import net.deckserver.storage.json.cards.*;
+import net.deckserver.CardSearch;
+import net.deckserver.game.enums.Clan;
+import net.deckserver.game.enums.Path;
+import net.deckserver.game.enums.RegionType;
+import net.deckserver.game.enums.Sect;
+import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.game.CardData;
 
 import java.util.*;
@@ -170,7 +175,7 @@ public record DoCommand(JolGame game, GameModel model) {
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
         CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         boolean clear = cmdObj.consumeString("clear");
-        game.contestCard(targetCard.getId(), clear);
+        game.contestCard(player, targetCard.getId(), clear);
     }
 
     void transfer(CommandParser cmdObj, String player) throws CommandException {
@@ -236,7 +241,7 @@ public record DoCommand(JolGame game, GameModel model) {
             if (index < 1 || index > players.size()) throw new CommandException("Bad number : " + index);
             newOrder.add(players.get(index - 1));
         }
-        game.setOrder(newOrder);
+        game.setOrder(player, newOrder);
     }
 
     void lock(CommandParser cmdObj, String player) throws CommandException {
@@ -265,7 +270,7 @@ public record DoCommand(JolGame game, GameModel model) {
         CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         int amount = cmdObj.getAmount(0);
         if (amount == 0) throw new CommandException("Must specify an amount of blood");
-        game.changeCapacity(targetCard.getId(), amount, false);
+        game.changeCapacity(player, targetCard.getId(), amount, false);
     }
 
     void disciplines(CommandParser cmdObj, String player) throws CommandException {
@@ -273,7 +278,7 @@ public record DoCommand(JolGame game, GameModel model) {
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
         CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         if (cmdObj.consumeString("reset")) {
-            CardSummary card = CardSearch.INSTANCE.get(targetCard.getCardId());
+            CardSummary card = CardSearch.get(targetCard.getCardId());
             List<String> disciplines = card.getDisciplines();
             game.setDisciplines(player, targetCard.getId(), disciplines, false);
         } else {
@@ -311,7 +316,7 @@ public record DoCommand(JolGame game, GameModel model) {
         String targetPlayer = cmdObj.getPlayer(player);
         int amount = cmdObj.getAmount(0);
         if (amount != 0) {
-            game.changePool(targetPlayer, amount);
+            game.changePool(player, targetPlayer, amount);
         } else {
             throw new CommandException("Must specify an amount of pool.");
         }
@@ -381,7 +386,7 @@ public record DoCommand(JolGame game, GameModel model) {
             game.burnEdge(player);
         } else {
             String edge = cmdObj.getPlayer(player);
-            game.setEdge(edge);
+            game.setEdge(player, edge);
         }
     }
 
@@ -434,7 +439,7 @@ public record DoCommand(JolGame game, GameModel model) {
         String targetPlayer = cmdObj.getPlayer(player);
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
         CardData card = cmdObj.findCardData(false, targetPlayer, targetRegion);
-        game.setVotes(card.getId(), cmdObj.nextArg(), false);
+        game.setVotes(player, card.getId(), cmdObj.nextArg(), false);
     }
 
     void reveal() {

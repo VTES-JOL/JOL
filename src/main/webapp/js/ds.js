@@ -550,7 +550,6 @@ function selectDeckFilter() {
 function callbackFilterDecks(decks) {
     let deckList = $("#decks");
     deckList.empty();
-    console.log(decks);
     $.each(decks, function (index, deck) {
         const deckRow = $("<tr/>");
         const deckCell = $("<td/>").addClass("d-flex justify-content-between align-items-center");
@@ -727,11 +726,12 @@ function renderGameChat(data) {
     // Only scroll to bottom if scrollbar is at bottom (has not been scrolled up)
     let scrollToBottom = isScrolledToBottom(container);
     $.each(data, function (index, line) {
-        const dateAndTime = line.split(' ', 2);
+        const parts = line.split('||', 3);
+        const dateAndTime = parts[0].split(' ', 2);
         const date = dateAndTime[0];
         const time = dateAndTime[1];
-        //Strip off date and time; reattached later
-        line = line.slice(date.length + time.length + 2);
+        const player = parts[1];
+        const message = parts[2];
         let timestamp;
         if (date === gameChatLastDay)
             timestamp = time;
@@ -740,13 +740,8 @@ function renderGameChat(data) {
             timestamp = date + ' ' + time;
         }
         let timeSpan = $("<span/>").text(timestamp).addClass('chat-timestamp');
-        let playerLabel = '';
-        if (line[0] === '[') {
-            let player = line.split(']', 1)[0].slice(1); //Strip [
-            playerLabel = $('<b/>').text(player)[0].outerHTML;
-            line = line.slice(player.length + 3); //3 for [] and space
-        }
-        let lineElement = $('<p/>').addClass('chat').append(timeSpan, ' ', playerLabel, ' ', line);
+        let playerLabel = player === "null" ? '' : $("<b/>").text(player);
+        let lineElement = $('<p/>').addClass('chat').append(timeSpan, ' ', playerLabel, ' ', message);
         container.append(lineElement);
     });
     if (scrollToBottom)
@@ -978,7 +973,6 @@ function navigate(data) {
 
 function registerDeck(deckRow, deck) {
     let game = $(deckRow).closest('[data-name]').data('name');
-    console.log(game);
     DS.registerDeck(game, deck, {callback: processData, errorHandler: errorhandler});
 }
 
@@ -1303,7 +1297,6 @@ function addCardTooltips(parent) {
 }
 
 function details(event, tag) {
-    console.log(event);
     event.preventDefault();
     event.stopPropagation();
     $(`[aria-controls='${tag}'] i`).toggleClass("d-none");
@@ -1328,8 +1321,13 @@ function loadHistory(data) {
     let historyDiv = $("#gameHistory");
     historyDiv.empty();
     $.each(data, function (index, content) {
-        let turnContent = $("<p/>").addClass("chat").html(content);
-        historyDiv.append(turnContent);
+        const dateAndTime = content.timestamp;
+        const player = content.source;
+        const message = content.message;
+        let timeSpan = $("<span/>").text(dateAndTime).addClass('chat-timestamp');
+        let playerLabel = player === "null" ? '' : $("<b/>").text(player);
+        let lineElement = $('<p/>').addClass('chat').append(timeSpan, ' ', playerLabel, ' ', message);
+        historyDiv.append(lineElement);
     });
     addCardTooltips("#gameHistory");
 }
@@ -1383,7 +1381,6 @@ function toggleMobileView(event) {
     if (event) event.preventDefault();
     let $link = $('#toggleMobileViewLink').eq(0);
     let viewport = $('meta[name=viewport]').get(0);
-    console.log('before: ' + viewport.content)
     if (viewport.content === DESKTOP_VIEWPORT_CONTENT) {
         viewport.content = 'width=device-width, initial-scale=1, shrink-to-fit=no';
         $link.text('Desktop View');
@@ -1391,7 +1388,6 @@ function toggleMobileView(event) {
         viewport.content = DESKTOP_VIEWPORT_CONTENT;
         $link.text('Mobile View');
     }
-    console.log('after: ' + viewport.content)
     pointerCanHover = window.matchMedia("(hover: hover)").matches;
     $('body').scrollTop(0);
 }

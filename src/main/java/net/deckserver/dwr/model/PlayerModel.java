@@ -2,11 +2,12 @@ package net.deckserver.dwr.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.deckserver.DeckParser;
+import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.ChatEntryBean;
+import net.deckserver.game.enums.DeckFormat;
+import net.deckserver.game.enums.GameFormat;
+import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
-import net.deckserver.storage.json.system.DeckFormat;
-import net.deckserver.storage.json.system.GameFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

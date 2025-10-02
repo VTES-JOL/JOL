@@ -1,6 +1,6 @@
 package net.deckserver.jobs;
 
-import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.JolAdmin;
 
 public class ValidateGWJob implements Runnable {
     @Override

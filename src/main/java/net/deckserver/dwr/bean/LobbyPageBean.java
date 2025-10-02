@@ -1,9 +1,9 @@
 package net.deckserver.dwr.bean;
 
 import lombok.Getter;
-import net.deckserver.dwr.model.JolAdmin;
-import net.deckserver.storage.json.system.DeckFormat;
-import net.deckserver.storage.json.system.GameFormat;
+import net.deckserver.JolAdmin;
+import net.deckserver.game.enums.DeckFormat;
+import net.deckserver.game.enums.GameFormat;
 
 import java.time.OffsetDateTime;
 import java.util.Comparator;

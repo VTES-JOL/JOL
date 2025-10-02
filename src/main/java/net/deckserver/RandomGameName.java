@@ -10,15 +10,13 @@ import java.util.Random;
 
 public class RandomGameName {
 
+    private final static List<String> adjectives;
+    private final static List<String> verbs;
+    private final static List<String> nouns;
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(RandomGameName.class);
     private static final Random rand = new Random();
-    private static final RandomGameName INSTANCE = new RandomGameName();
 
-    final List<String> adjectives;
-    final List<String> verbs;
-    final List<String> nouns;
-
-    private RandomGameName() {
+    static {
         adjectives = IOUtils.readLines(Objects.requireNonNull(RandomGameName.class.getResourceAsStream("names_adjectives.txt")), StandardCharsets.UTF_8);
         logger.info("Loaded {} adjectives", adjectives.size());
         verbs = IOUtils.readLines(Objects.requireNonNull(RandomGameName.class.getResourceAsStream("names_verbs.txt")), StandardCharsets.UTF_8);
@@ -28,18 +26,18 @@ public class RandomGameName {
     }
 
     public static String generateName() {
-        return INSTANCE.getAdjective() + " " + INSTANCE.getVerb() + " " + INSTANCE.getNoun();
+        return getAdjective() + " " + getVerb() + " " + getNoun();
     }
 
-    public String getAdjective() {
+    public static String getAdjective() {
         return adjectives.get(rand.nextInt(adjectives.size()));
     }
 
-    public String getVerb() {
+    public static String getVerb() {
         return verbs.get(rand.nextInt(verbs.size()));
     }
 
-    public String getNoun() {
+    public static String getNoun() {
         return nouns.get(rand.nextInt(nouns.size()));
     }
 }

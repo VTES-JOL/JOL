@@ -1,8 +1,7 @@
-package net.deckserver;
+package net.deckserver.storage.json.deck;
 
-import net.deckserver.storage.json.cards.CardSearch;
+import net.deckserver.CardSearch;
 import net.deckserver.storage.json.cards.CardSummary;
-import net.deckserver.storage.json.deck.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +28,9 @@ public class DeckParser {
     private final static Pattern WINDOWS_QUOTE_PATTERN = Pattern.compile("`");
     private final static Pattern EXTRA_SPACE_PATTERN = Pattern.compile("\\s{2,}");
     private final static Pattern DISCIPLINE_PATTERN = Pattern.compile("\\s(-none-|none|abo|ani|aus|cel|chi|dai|def|dem|dom|for|inn|jud|mar|mel|myt|nec|obe|obf|obt|pot|pre|pro|qui|red|san|ser|spi|tem|tha|thn|val|ven|vic|vin|vis|viz)");
-    private final static CardSearch cardSearch = CardSearch.INSTANCE;
-    private static final Predicate<CardCount> IS_CRYPT = (item) -> cardSearch.get(String.valueOf(item.getId())).isCrypt();
+    private static final Predicate<CardCount> IS_CRYPT = (item) -> CardSearch.get(String.valueOf(item.getId())).isCrypt();
     private static final Predicate<CardCount> FOUND_CARD = (item) -> item.getId() != null;
-    private static final Function<CardCount, String> TYPE_MAPPER = (item) -> cardSearch.get(String.valueOf(item.getId())).getType();
+    private static final Function<CardCount, String> TYPE_MAPPER = (item) -> CardSearch.get(String.valueOf(item.getId())).getType();
 
     public static ExtendedDeck parseDeck(String contents) {
         Deck deck = new Deck();
@@ -73,7 +71,7 @@ public class DeckParser {
         boolean hasBannedCards = false;
         for (CardCount cardCount : deck.getCrypt().getCards()) {
             String id = String.valueOf(cardCount.getId());
-            CardSummary card = cardSearch.get(id);
+            CardSummary card = CardSearch.get(id);
             if (!card.getGroup().equalsIgnoreCase("ANY")) {
                 groups.add(card.getGroup());
             }
@@ -84,7 +82,7 @@ public class DeckParser {
         for (LibraryCard libraryCard : deck.getLibrary().getCards()) {
             for (CardCount cardCount : libraryCard.getCards()) {
                 String id = String.valueOf(cardCount.getId());
-                CardSummary card = cardSearch.get(id);
+                CardSummary card = CardSearch.get(id);
                 if (card.isBanned()) {
                     hasBannedCards = true;
                 }
@@ -109,10 +107,10 @@ public class DeckParser {
         if (countMatcher.find()) {
             count = Integer.parseInt(countMatcher.group(1));
             String cardName = countMatcher.group(2);
-            result = cardSearch.findCard(cardName);
+            result = CardSearch.findCard(cardName);
         } else {
             count = 1;
-            result = cardSearch.findCard(cleanLine);
+            result = CardSearch.findCard(cleanLine);
         }
 
         CardCount cardCount = result.map(cardEntry -> {

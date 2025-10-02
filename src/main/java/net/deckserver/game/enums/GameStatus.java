@@ -1,4 +1,4 @@
-package net.deckserver.storage.json.system;
+package net.deckserver.game.enums;
 
 public enum GameStatus {
     STARTING,

@@ -1,8 +1,8 @@
 package net.deckserver.game.validators;
 
+import net.deckserver.game.enums.GameFormat;
 import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.Deck;
-import net.deckserver.storage.json.system.GameFormat;
 import org.apache.commons.io.IOUtils;
 
 import java.nio.charset.StandardCharsets;

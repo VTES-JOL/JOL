@@ -1,8 +1,10 @@
 package net.deckserver.dwr.model;
 
+import net.deckserver.ChatService;
+import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.GameBean;
-import net.deckserver.game.interfaces.turn.GameAction;
-import net.deckserver.storage.json.cards.RegionType;
+import net.deckserver.game.enums.RegionType;
+import net.deckserver.storage.json.game.ChatData;
 import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 
@@ -18,6 +20,7 @@ public class GameView {
 
     private static final Logger logger = getLogger(GameView.class);
     private final String gameName;
+    private final String id;
     private final String playerName;
     private final Collection<String> chats = new ArrayList<>();
     private final Collection<String> collapsed = new HashSet<>();
@@ -36,10 +39,8 @@ public class GameView {
         this.playerName = playerName;
         JolAdmin admin = JolAdmin.INSTANCE;
         JolGame game = admin.getGame(gameName);
-        GameAction[] actions = game.getActions(game.getCurrentTurn());
-        for (GameAction action : actions) {
-            addChat(action.getText());
-        }
+        this.id = admin.getGameId(gameName);
+        ChatService.getChats(id).forEach(this::addChat);
         List<String> players = game.getPlayers();
         if (players.contains(this.playerName)) {
             isPlayer = true;
@@ -127,9 +128,7 @@ public class GameView {
 
         if (turnChanged) {
             resetChat = true;
-            List<String> gameTurns = game.getTurns();
-            for (int j = gameTurns.size(); j > 0; )
-                turns.add(gameTurns.get(--j));
+            turns = ChatService.getTurns(id);
         }
 
         if (stateChanged) {
@@ -157,7 +156,7 @@ public class GameView {
         boolean tc = turnChanged;
         clearAccess();
         String stamp = JolAdmin.getDate();
-        int logLength = game.getActions().length;
+        int logLength = ChatService.getTurn(id, game.getTurnLabel()).size();
         return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, globalNotes, privateNotes, label, phase,
                 chatReset, tc, turn, turns, state, phases, ping, pinged, stamp, gameName, logLength, currentPlayer);
     }
@@ -193,21 +192,8 @@ public class GameView {
         turnChanged = true;
     }
 
-    public void addChat(String chat) {
-        chats.add(chat);
-    }
-
     public void reset(boolean reload) {
         clearAccess();
-        if (reload) addChats(0);
-    }
-
-    public void addChats(int idx) {
-        JolGame game = JolAdmin.INSTANCE.getGame(gameName);
-        GameAction[] actions = game.getActions(game.getCurrentTurn());
-        for (int i = idx; i < actions.length; i++) {
-            chats.add(actions[i].getText());
-        }
     }
 
     public void reset() {
@@ -217,4 +203,8 @@ public class GameView {
         globalNotesChanged = phaseChanged = stateChanged = turnChanged = privateNotesChanged = true;
     }
 
+    public void addChat(ChatData chat) {
+        String formattedMessage = String.format("%s||%s||%s", chat.getTimestamp(), chat.getSource(), chat.getMessage());
+        chats.add(formattedMessage);
+    }
 }

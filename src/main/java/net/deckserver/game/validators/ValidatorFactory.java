@@ -1,7 +1,7 @@
 package net.deckserver.game.validators;
 
+import net.deckserver.game.enums.GameFormat;
 import net.deckserver.storage.json.deck.Deck;
-import net.deckserver.storage.json.system.GameFormat;
 
 import java.util.HashSet;
 import java.util.Set;

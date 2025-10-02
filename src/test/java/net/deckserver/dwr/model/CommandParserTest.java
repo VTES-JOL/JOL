@@ -1,7 +1,6 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.game.ui.DsTurnRecorder;
-import net.deckserver.storage.json.cards.RegionType;
+import net.deckserver.game.enums.RegionType;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.CardData;
 import net.deckserver.storage.json.game.GameData;
@@ -19,9 +18,9 @@ public class CommandParserTest {
 
     @BeforeEach
     public void setUp() {
-        game = ModelLoader.loadGame("command-test", true);
+        game = ModelLoader.loadGame("command-test");
 
-        game2 = new JolGame("id", new GameData("id", "test2"), new DsTurnRecorder());
+        game2 = new JolGame("id", new GameData("id", "test2"));
         game2.addPlayer("ShanDow", new Deck());
         game2.addPlayer("shade", new Deck());
         game2.addPlayer("ShanWod", new Deck());

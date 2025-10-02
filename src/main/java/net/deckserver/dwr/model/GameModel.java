@@ -1,6 +1,9 @@
 package net.deckserver.dwr.model;
 
 import lombok.Getter;
+import net.deckserver.ChatService;
+import net.deckserver.JolAdmin;
+import net.deckserver.storage.json.game.ChatData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
@@ -22,42 +25,21 @@ public class GameModel implements Comparable<GameModel> {
     private final boolean isPlayTest;
     private final Map<String, GameView> views = new HashMap<>();
 
-    public GameModel(String name) {
-        this.name = name;
-        this.isPlayTest = false;
-    }
-
-    public GameModel(String name, boolean isPlayTest) {
+    public GameModel(String name, String gameId, boolean isPlayTest) {
         this.name = name;
         this.isPlayTest = isPlayTest;
+        ChatService.subscribe(gameId, this);
     }
 
-    public synchronized String chat(String player, String chat) {
-        JolAdmin admin = JolAdmin.INSTANCE;
-        JolGame game = admin.getGame(name);
-        boolean isJudge = admin.isJudge(player) && !getPlayers().contains(player);
-        if (!getPlayers().contains(player) && !isJudge) {
-            return "Not authorized";
-        }
-        DoCommand commander = new DoCommand(game, this);
-        int idx = game.getActions(game.getCurrentTurn()).length;
-        String status = commander.doMessage(player, chat, isJudge);
-        addChats(idx);
-        admin.saveGameState(game);
-        return status;
-    }
-
-    public synchronized String endTurn(String player) {
+    public synchronized void endTurn(String player) {
         JolAdmin admin = JolAdmin.INSTANCE;
         JolGame game = admin.getGame(name);
         if (game.getActivePlayer().equals(player)) {
             game.newTurn();
-            resetChats();
             reloadNotes();
             admin.saveGameState(game);
             doReload(true, true, true);
         }
-        return "Ended turn";
     }
 
     public synchronized String submit(String player, String phase, String command, String chat, String ping) {
@@ -74,7 +56,6 @@ public class GameModel implements Comparable<GameModel> {
             boolean phaseChanged = false;
             boolean chatChanged = false;
             boolean turnChanged = false;
-            int idx = game.getActions(game.getCurrentTurn()).length;
             if (ping != null) {
                 boolean pingSuccessful = admin.pingPlayer(ping, name);
                 if (!pingSuccessful) {
@@ -115,7 +96,6 @@ public class GameModel implements Comparable<GameModel> {
                 METRICS.info(new ObjectArrayMessage(timestamp.getYear(), timestamp.getMonthValue(), timestamp.getDayOfMonth(), timestamp.getHour(), player, game.getName(), didCommand, didChat));
                 admin.clearPing(player, name);
             }
-            addChats(idx);
             if (stateChanged || phaseChanged || chatChanged) {
                 admin.saveGameState(game);
             }
@@ -165,15 +145,15 @@ public class GameModel implements Comparable<GameModel> {
         }
     }
 
-    private void addChats(int idx) {
+    public void addChat(ChatData chat) {
         for (GameView gameView : views.values()) {
-            gameView.addChats(idx);
+            gameView.addChat(chat);
         }
     }
 
-    private void resetChats() {
+    public void clearChats() {
         for (GameView gameView : views.values()) {
-            gameView.reset(false);
+            gameView.reset(true);
         }
     }
 

@@ -2,6 +2,7 @@ package net.deckserver.storage.json.system;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.deckserver.game.enums.PlayerRole;
 
 import java.util.HashSet;
 import java.util.Set;

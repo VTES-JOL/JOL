@@ -1,8 +1,8 @@
 package net.deckserver.dwr.bean;
 
 import lombok.Getter;
-import net.deckserver.dwr.model.JolAdmin;
-import net.deckserver.storage.json.system.DeckFormat;
+import net.deckserver.JolAdmin;
+import net.deckserver.game.enums.DeckFormat;
 
 import java.util.Set;
 

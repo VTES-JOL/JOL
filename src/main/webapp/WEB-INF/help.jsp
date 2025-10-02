@@ -1,4 +1,4 @@
-<%@ page import="net.deckserver.dwr.model.JolAdmin" %>
+<%@ page import="net.deckserver.JolAdmin" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!doctype html>

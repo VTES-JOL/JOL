@@ -4,7 +4,7 @@
  * Created on February 22, 2004, 3:50 PM
  */
 
-package net.deckserver.dwr.model;
+package net.deckserver;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,17 +20,17 @@ import com.google.common.collect.Table;
 import io.azam.ulidj.ULID;
 import lombok.Getter;
 import lombok.Setter;
-import net.deckserver.DeckParser;
-import net.deckserver.RandomGameName;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.GameStatusBean;
-import net.deckserver.game.ui.DsTurnRecorder;
+import net.deckserver.dwr.model.*;
+import net.deckserver.game.enums.*;
 import net.deckserver.game.validators.DeckValidator;
 import net.deckserver.game.validators.ValidationResult;
 import net.deckserver.game.validators.ValidatorFactory;
 import net.deckserver.jobs.*;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
+import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.GameData;
 import net.deckserver.storage.json.game.Timestamps;
@@ -333,8 +333,8 @@ public class JolAdmin {
     }
 
     public synchronized GameModel getGameModel(String name) {
-        boolean isPlayTest = games.getOrDefault(name, new GameInfo()).getGameFormat() == GameFormat.PLAYTEST;
-        return gmap.computeIfAbsent(name, n -> new GameModel(n, isPlayTest));
+        GameInfo gameInfo =  games.get(name);
+        return gmap.computeIfAbsent(name, n -> new GameModel(n, gameInfo.getId(), gameInfo.isPlayTest()));
     }
 
     public Set<String> getWho() {
@@ -378,11 +378,11 @@ public class JolAdmin {
                 .forEach(playerModel -> playerModel.chat(chatEntryBean));
     }
 
-    public synchronized void rollbackGame(String gameName, String turn) {
+    public synchronized void rollbackGame(String gameName, String adminName, String turn) {
         String id = loadGameInfo(gameName).getId();
         logger.info("Rolling back game {} for turn {}", gameName, turn);
         JolGame game = ModelLoader.loadSnapshot(id, turn);
-        game.addMessage("Game state rolled back by Admin.");
+        ChatService.sendMessage(id, "SYSTEM", "Game state rolled back by administrator: " + adminName);
         saveGameState(game, true);
         gameCache.refresh(gameName);
     }
@@ -885,8 +885,7 @@ public class JolAdmin {
     public void startGame(String gameName, List<String> players) {
         GameInfo gameInfo = games.get(gameName);
         GameData gameData = new GameData(gameInfo.getId(), gameName);
-        DsTurnRecorder actions = new DsTurnRecorder();
-        JolGame game = new JolGame(gameInfo.getId(), gameData, actions);
+        JolGame game = new JolGame(gameInfo.getId(), gameData);
         game.initGame(gameName);
         registrations.row(gameName).forEach((playerName, registration) -> {
             if (registration.getDeckId() != null) {
@@ -1090,7 +1089,8 @@ public class JolAdmin {
 
     public synchronized void endTurn(String gameName, String adminName) {
         JolGame game = getGame(gameName);
-        game.addMessage("Turn ended by admin " + adminName);
+        String id = loadGameInfo(gameName).getId();
+        ChatService.sendMessage(id, "SYSTEM", "Turn ended by administrator: " + adminName);
         game.newTurn();
     }
 
@@ -1127,10 +1127,6 @@ public class JolAdmin {
         deck.getDeck().setName(deckName);
         model.setDeck(deck);
         model.setContents(contents);
-    }
-
-    public synchronized List<String> getTurns(String gameName) {
-        return gameCache.get(gameName).getTurns().reversed();
     }
 
     public ExtendedDeck getDeck(String deckId) {
@@ -1285,7 +1281,7 @@ public class JolAdmin {
         logger.debug("Loading {}", gameName);
         GameInfo gameInfo = loadGameInfo(gameName);
         String gameId = gameInfo.getId();
-        return ModelLoader.loadGame(gameId, true);
+        return ModelLoader.loadGame(gameId);
     }
 
 }

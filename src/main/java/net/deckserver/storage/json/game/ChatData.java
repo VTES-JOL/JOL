@@ -10,6 +10,8 @@ import java.time.format.DateTimeFormatter;
 @Data
 public class ChatData {
 
+    private static final DateTimeFormatter SIMPLE_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm ");
+
     private String timestamp;
     private String message;
     private String source;
@@ -18,8 +20,8 @@ public class ChatData {
     public ChatData() {
     }
 
-    public ChatData(String timestamp, String message, String source, String command) {
-        this.timestamp = timestamp;
+    public ChatData(String message, String source, String command) {
+        this.timestamp = OffsetDateTime.now().format(SIMPLE_FORMAT);
         this.message = message;
         this.source = source;
         this.command = command;

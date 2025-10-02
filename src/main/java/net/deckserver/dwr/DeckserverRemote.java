@@ -1,15 +1,16 @@
 package net.deckserver.dwr;
 
 import com.google.common.base.Strings;
+import net.deckserver.ChatService;
+import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.DeckInfoBean;
 import net.deckserver.dwr.creators.UpdateFactory;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
-import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
-import net.deckserver.game.interfaces.turn.GameAction;
+import net.deckserver.game.enums.GameFormat;
 import net.deckserver.storage.json.deck.Deck;
-import net.deckserver.storage.json.system.GameFormat;
+import net.deckserver.storage.json.game.ChatData;
 import org.directwebremoting.WebContextFactory;
 
 import javax.servlet.http.HttpServletRequest;
@@ -157,15 +158,9 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-    public List<String> getHistory(String game, String turn) {
-        List<String> ret = new ArrayList<>();
-        if (game != null && turn != null) {
-            GameAction[] actions = admin.getGame(game).getActions(turn);
-            for (GameAction action : actions) {
-                ret.add(action.getText());
-            }
-        }
-        return ret;
+    public List<ChatData> getHistory(String game, String turn) {
+        String gameId = admin.getGameId(game);
+        return ChatService.getTurn(gameId, turn);
     }
 
     public Deck getGameDeck(String gameName) {
@@ -186,8 +181,9 @@ public class DeckserverRemote {
 
     public List<String> getGameTurns(String gameName) {
         String playerName = getPlayer(request);
+        String gameId = admin.getGameId(gameName);
         if (gameName != null && !Strings.isNullOrEmpty(playerName)) {
-            return admin.getTurns(gameName);
+            return ChatService.getTurns(gameId);
         }
         return new ArrayList<>();
     }
@@ -195,12 +191,8 @@ public class DeckserverRemote {
     public Map<String, Object> rollbackGame(String gameName, String turn) {
         String playerName = getPlayer(request);
         if (gameName != null && !Strings.isNullOrEmpty(playerName) && admin.isAdmin(playerName)) {
-            try {
-                String turnCode = turn.split(" ")[1].replaceAll("\\.", "-");
-                admin.rollbackGame(gameName, turnCode);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            String turnCode = turn.split(" ")[1].replaceAll("\\.", "-");
+            admin.rollbackGame(gameName, playerName, turnCode);
         }
         return UpdateFactory.getUpdate();
     }
@@ -229,15 +221,12 @@ public class DeckserverRemote {
 
     public Map<String, Object> gameChat(String gameName, String chat) {
         String player = getPlayer(request);
-        GameModel game = getModel(gameName);
-        Map<String, Object> ret = UpdateFactory.getUpdate();
+        String gameId = admin.getGameId(gameName);
         // only process a command if the player is in the game
         if (admin.isInGame(gameName, player)) {
-            String status = game.chat(player, chat);
-            ret = UpdateFactory.getUpdate();
-            ret.put("showStatus", status);
+            ChatService.sendMessage(gameId, player, chat);
         }
-        return ret;
+        return UpdateFactory.getUpdate();
     }
 
     public void updateGlobalNotes(String gameName, String notes) {

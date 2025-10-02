@@ -11,6 +11,7 @@ import net.deckserver.game.jaxb.state.GameState;
 import net.deckserver.storage.json.game.CardData;
 import net.deckserver.storage.json.game.GameData;
 import net.deckserver.storage.json.game.PlayerData;
+import net.deckserver.storage.json.game.TurnHistory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -134,8 +135,7 @@ public class GameDataConversion {
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            Path gamePath;
-            gamePath = Paths.get(BASE_PATH, "games", gameId, "game.json");
+            Path gamePath = Paths.get(BASE_PATH, "games", gameId, "game.json");
             mapper.writeValue(gamePath.toFile(), gameData);
         } catch (IOException e) {
             System.err.println("Something went wrong " + e);
@@ -147,11 +147,25 @@ public class GameDataConversion {
         GameState gameState = XmlFileUtils.loadGameState(Paths.get(BASE_PATH, "games", gameId, "game.xml"));
         GameData data = ModelLoader.convertGameState(gameState, gameId);
         GameActions gameActions = XmlFileUtils.loadGameActions(Paths.get(BASE_PATH, "games", gameId, "actions.xml"));
-        String turnLabel = gameActions.getTurn().getLast().getLabel();
-        String turn = turnLabel.substring(turnLabel.lastIndexOf(' ') + 1);
+        TurnHistory history = ModelLoader.convertHistory(gameActions);
+        String turnLabel = history.getCurrentTurnLabel();
+        String turn = history.getCurrentTurn();
         data.setTurn(turn);
         save(gameId, data);
+        save(gameId, history);
         return data;
+    }
+
+    private void save(String gameId, TurnHistory history) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            Path historyPath = Paths.get(BASE_PATH, "games", gameId, "history.json");
+            mapper.writeValue(historyPath.toFile(), history.getTurns());
+        } catch (IOException e) {
+            System.err.println("Something went wrong " + e);
+        }
     }
 
 }

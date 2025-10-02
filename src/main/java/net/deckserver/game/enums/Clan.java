@@ -1,4 +1,4 @@
-package net.deckserver.storage.json.cards;
+package net.deckserver.game.enums;
 
 import lombok.Getter;
 

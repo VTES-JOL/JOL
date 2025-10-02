@@ -2,9 +2,9 @@ package net.deckserver.dwr.bean;
 
 import com.google.common.base.Strings;
 import lombok.Getter;
-import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
-import net.deckserver.storage.json.system.DeckFormat;
+import net.deckserver.game.enums.DeckFormat;
 import net.deckserver.storage.json.system.TournamentRegistration;
 
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package net.deckserver.dwr.bean;
 
 import lombok.Getter;
-import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.JolAdmin;
 
 import java.time.format.DateTimeFormatter;
 

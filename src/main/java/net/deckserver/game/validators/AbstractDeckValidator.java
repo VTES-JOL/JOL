@@ -1,6 +1,6 @@
 package net.deckserver.game.validators;
 
-import net.deckserver.storage.json.cards.CardSearch;
+import net.deckserver.CardSearch;
 import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class AbstractDeckValidator implements DeckValidator {
-
-    private final static CardSearch cardSearch = CardSearch.INSTANCE;
 
     private Stream<CardCount> buildStream(Deck deck) {
         Stream<CardCount> cryptStream = deck.getCrypt().getCards().stream();
@@ -25,11 +23,11 @@ public abstract class AbstractDeckValidator implements DeckValidator {
                 .map(CardCount::getId)
                 .map(String::valueOf)
                 .distinct()
-                .map(cardSearch::get);
+                .map(CardSearch::get);
     }
 
     protected String getCardName(String id) {
-        return cardSearch.get(id).getDisplayName();
+        return CardSearch.get(id).getDisplayName();
     }
 
     protected Set<String> getGroups(Deck deck) {
@@ -39,7 +37,7 @@ public abstract class AbstractDeckValidator implements DeckValidator {
         }
         for (CardCount cardCount : deck.getCrypt().getCards()) {
             String id = String.valueOf(cardCount.getId());
-            CardSummary card = cardSearch.get(id);
+            CardSummary card = CardSearch.get(id);
             if (!card.getGroup().equalsIgnoreCase("ANY")) {
                 groups.add(card.getGroup());
             }
