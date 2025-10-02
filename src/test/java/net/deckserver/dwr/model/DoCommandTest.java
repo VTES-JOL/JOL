@@ -5,7 +5,6 @@ import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.Path;
 import net.deckserver.game.enums.RegionType;
 import net.deckserver.storage.json.game.CardData;
-import net.deckserver.storage.json.game.ChatData;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -13,13 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
+@SetEnvironmentVariable(key = "ENABLE_TEST_MODE", value = "true")
 public class DoCommandTest {
 
     private JolGame game;
@@ -28,16 +27,17 @@ public class DoCommandTest {
     @BeforeAll
     public static void init() {
         JolAdmin.INSTANCE.setup();
-        JolAdmin.INSTANCE.upgrade();
     }
 
     private String getLastMessage() {
-        String currentTurn = ChatService.getCurrentTurn("command-test");
-        return Optional.ofNullable(ChatService.getTurn("command-test", currentTurn).getLast()).map(ChatData::getMessage).orElse("");
+        return ChatService.getChats("command-test").getLast().getMessage();
     }
 
     @BeforeEach
     void setUp() {
+        // Clear the cache before each test to ensure clean state
+        ChatService.clearCache();
+
         game = ModelLoader.loadGame("command-test");
         worker = new DoCommand(game, new GameModel("Command Test", "command-test", true));
     }
@@ -121,7 +121,7 @@ public class DoCommandTest {
         assertThat(game.getVictoryPoints("Player2"), is(0.0));
         worker.doCommand("Player2", "vp withdraw");
         assertThat(game.getVictoryPoints("Player2"), is(0.5));
-        assertThat(getLastMessage(), containsString("Player2 withdraws."));
+        assertThat(getLastMessage(), containsString("Player2 withdraws and gains 0.5 victory points."));
     }
 
     @Test

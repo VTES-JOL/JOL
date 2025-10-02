@@ -18,27 +18,52 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ChatService {
 
     private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
     private static final String basePath = System.getenv("JOL_DATA");
+    private static final boolean TEST_MODE_ENABLED = System.getenv().getOrDefault("ENABLE_TEST_MODE", "false").equals("true");
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final LoadingCache<String, TurnHistory> historyCache = Caffeine.newBuilder()
-            .expireAfterAccess(5, TimeUnit.MINUTES)
-            .removalListener((String key, TurnHistory history, RemovalCause cause) -> saveHistory(key, history))
-            .build(ChatService::loadHistory);
     private static final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
-
     private static final Cleaner cleaner = Cleaner.create();
     private static final Cleaner.Cleanable cleanable;
+    private static volatile boolean isShuttingDown = false;
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, r -> {
+        Thread thread = new Thread(r, "ChatService-Persistence-Scheduler");
+        thread.setDaemon(true);
+        return thread;
+    });
+    private static final LoadingCache<String, TurnHistory> historyCache = Caffeine.newBuilder()
+            .expireAfterAccess(5, TimeUnit.MINUTES)
+            .removalListener((String key, TurnHistory history, RemovalCause cause) -> {
+                // Don't save during shutdown - it's handled explicitly
+                if (!isShuttingDown) {
+                    saveHistory(key, history);
+                }
+            })
+            .build(ChatService::loadHistory);
 
     static {
         objectMapper.findAndRegisterModules();
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         cleanable = cleaner.register(ChatService.class, new CacheCleanupAction(historyCache));
+        
+        // Start scheduled persistence task (every 5 minutes)
+        if (!TEST_MODE_ENABLED) {
+            scheduler.scheduleAtFixedRate(
+                    ChatService::persistAllCachedHistories,
+                    5, // Initial delay
+                    5, // Period
+                    TimeUnit.MINUTES
+            );
+            logger.info("Scheduled persistence task started (every 5 minutes)");
+        }
+        
         // Add shutdown hook for graceful shutdown
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.info("Shutting down ChatService...");
@@ -59,12 +84,65 @@ public class ChatService {
     }
 
     private static synchronized void saveHistory(String gameId, TurnHistory history) {
+        // Don't save in test mode
+        if (TEST_MODE_ENABLED) {
+            logger.debug("Skipping save for {} - test mode enabled", gameId);
+            return;
+        }
+
+        // Don't save during or after shutdown
+        if (isShuttingDown) {
+            logger.debug("Skipping save for {} - shutdown in progress", gameId);
+            return;
+        }
+
         try {
-            logger.debug("Saving history for {}", gameId);
+            // Don't save if history is null or has no turns
+            if (history == null || history.getTurns() == null || history.getTurns().isEmpty()) {
+                logger.debug("Skipping save for {} - history is empty", gameId);
+                return;
+            }
+
+            logger.debug("Saving history for {} with {} turns", gameId, history.getTurns().size());
             Path historyPath = Paths.get(basePath, "games", gameId, "history.json");
             objectMapper.writeValue(historyPath.toFile(), history.getTurns());
+            logger.debug("Successfully saved history for {}", gameId);
         } catch (Exception e) {
             logger.error("Unable to save history for {}", gameId, e);
+        }
+    }
+
+    /**
+     * Periodically persist all cached histories to disk.
+     * This reduces data loss in case of JVM crash or unexpected termination.
+     */
+    private static void persistAllCachedHistories() {
+        if (isShuttingDown) {
+            logger.debug("Skipping scheduled persistence - shutdown in progress");
+            return;
+        }
+
+        try {
+            Map<String, TurnHistory> snapshot = historyCache.asMap();
+            int persistedCount = 0;
+            
+            logger.debug("Starting scheduled persistence of {} cached histories", snapshot.size());
+            
+            for (Map.Entry<String, TurnHistory> entry : snapshot.entrySet()) {
+                String gameId = entry.getKey();
+                TurnHistory history = entry.getValue();
+                
+                if (history != null && history.getTurns() != null && !history.getTurns().isEmpty()) {
+                    saveHistory(gameId, history);
+                    persistedCount++;
+                }
+            }
+            
+            if (persistedCount > 0) {
+                logger.info("Scheduled persistence completed: {} histories saved", persistedCount);
+            }
+        } catch (Exception e) {
+            logger.error("Error during scheduled persistence: ", e);
         }
     }
 
@@ -128,13 +206,60 @@ public class ChatService {
      * Useful for shutdown hooks or explicit cleanup scenarios.
      */
     protected static void shutdown() {
+        // Don't persist in test mode
+        if (TEST_MODE_ENABLED) {
+            logger.info("ChatService shutdown skipped - test mode enabled");
+            return;
+        }
+
         try {
-            historyCache.asMap().forEach(ChatService::saveHistory);
+            logger.info("Starting ChatService shutdown...");
+            isShuttingDown = true;
+
+            // Shutdown the scheduler first
+            scheduler.shutdown();
+            try {
+                if (!scheduler.awaitTermination(10, TimeUnit.SECONDS)) {
+                    scheduler.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                scheduler.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+
+            // Save all entries explicitly
+            Map<String, TurnHistory> snapshot = new ConcurrentHashMap<>(historyCache.asMap());
+            logger.info("Saving {} history entries...", snapshot.size());
+
+            // Temporarily allow saves for explicit shutdown save
+            isShuttingDown = false;
+            snapshot.forEach((gameId, history) -> {
+                if (history != null && history.getTurns() != null && !history.getTurns().isEmpty()) {
+                    logger.debug("Shutdown: saving {} with {} turns", gameId, history.getTurns().size());
+                    saveHistory(gameId, history);
+                } else {
+                    logger.debug("Shutdown: skipping empty history for {}", gameId);
+                }
+            });
+            // Re-enable shutdown flag to prevent any further saves
+            isShuttingDown = true;
+
+            // Clear the cache - removal listener will be suppressed
             historyCache.invalidateAll();
             historyCache.cleanUp();
+
+            logger.info("ChatService shutdown completed.");
         } catch (Exception e) {
             logger.error("Error during ChatService shutdown: ", e);
         }
+    }
+
+    /**
+     * Clear the cache - useful for resetting state between tests
+     */
+    public static void clearCache() {
+        logger.debug("Clearing ChatService cache");
+        historyCache.invalidateAll();
     }
 
     /**

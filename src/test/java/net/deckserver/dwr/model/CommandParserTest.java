@@ -1,5 +1,6 @@
 package net.deckserver.dwr.model;
 
+import net.deckserver.ChatService;
 import net.deckserver.game.enums.RegionType;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.CardData;
@@ -11,6 +12,7 @@ import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
+@SetEnvironmentVariable(key = "ENABLE_TEST_MODE", value = "true")
 public class CommandParserTest {
 
     private JolGame game;

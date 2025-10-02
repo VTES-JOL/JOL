@@ -33,7 +33,6 @@ import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.GameData;
-import net.deckserver.storage.json.game.Timestamps;
 import net.deckserver.storage.json.system.*;
 import org.apache.commons.io.FileUtils;
 import org.mindrot.jbcrypt.BCrypt;
@@ -116,7 +115,6 @@ public class JolAdmin {
     private Map<OffsetDateTime, GameHistory> pastGames;
     private Map<String, PlayerInfo> players;
     private TournamentData tournamentRegistrations;
-    private Timestamps timestamps;
     private TypeFactory typeFactory;
     @Getter
     @Setter
@@ -133,14 +131,6 @@ public class JolAdmin {
 
     public static String getDate() {
         return OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
-    }
-
-    public boolean isInRole(String playerName, String role) {
-        return Optional.ofNullable(players.get(playerName))
-                .map(PlayerInfo::getRoles)
-                .stream()
-                .flatMap(Collection::stream)
-                .anyMatch(playerRole -> playerRole.equals(PlayerRole.valueOf(role)));
     }
 
     public int getRefreshInterval(String gameName) {
@@ -176,12 +166,7 @@ public class JolAdmin {
     }
 
     public synchronized void persistState() {
-        // Defensive cleanup to avoid null Map keys in JSON output
-        if (timestamps != null && timestamps.getGameTimestamps() != null) {
-            timestamps.getGameTimestamps().remove(null);
-        }
         writeFile("chats.json", chats);
-        writeFile("timestamps.json", timestamps);
         writeFile("games.json", games);
         writeFile("players.json", players);
         writeFile("registrations.json", registrations);
@@ -260,17 +245,6 @@ public class JolAdmin {
                         }
                     });
 
-            logger.debug("CLEAN - Timestamps");
-            Set<String> timestampGames = new HashSet<>();
-            timestamps.getGameTimestamps().keySet().forEach(gameName -> {
-                if (!games.containsKey(gameName)) {
-                    logger.info("Removing {} timestamp record", gameName);
-                    timestampGames.add(gameName);
-                }
-            });
-
-            timestampGames.forEach(timestamps::clearGame);
-
             invalidRegistrations.cellSet().forEach(cell -> {
                 String game = cell.getRowKey();
                 String player = cell.getColumnKey();
@@ -297,7 +271,7 @@ public class JolAdmin {
                 }
                 // clear out games from the recent game view if you are just a spectator and not playing
                 playerModel.getCurrentGames().stream()
-                        .filter(gameName -> notExistsGame(gameName))
+                        .filter(this::notExistsGame)
                         .peek(gameName -> logger.info("Removing {} from the list of recent games viewed by {}", gameName, playerModel.getPlayerName()))
                         .forEach(playerModel.getCurrentGames()::remove);
             });
@@ -333,7 +307,7 @@ public class JolAdmin {
     }
 
     public synchronized GameModel getGameModel(String name) {
-        GameInfo gameInfo =  games.get(name);
+        GameInfo gameInfo = games.get(name);
         return gmap.computeIfAbsent(name, n -> new GameModel(n, gameInfo.getId(), gameInfo.isPlayTest()));
     }
 
@@ -403,7 +377,6 @@ public class JolAdmin {
         players = readFile("players.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, PlayerInfo.class));
         chats = readFile("chats.json", typeFactory.constructCollectionType(List.class, ChatEntryBean.class));
         tournamentRegistrations = readFile("tournament.json", typeFactory.constructType(TournamentData.class));
-        timestamps = readFile("timestamps.json", typeFactory.constructType(Timestamps.class));
         message = readFile("message.json", typeFactory.constructType(String.class));
         loadRegistrations();
         loadDecks();
@@ -555,7 +528,7 @@ public class JolAdmin {
 
     public void saveGameState(JolGame game, boolean silent) {
         if (!silent) {
-            timestamps.setGameTimestamp(game.getName());
+            ActivityService.setGameTimestamp(game.getName());
         }
         ModelLoader.saveGame(game);
     }
@@ -706,29 +679,29 @@ public class JolAdmin {
 
     public void recordPlayerAccess(String playerName) {
         if (playerName != null) {
-            this.timestamps.recordPlayerAccess(playerName);
+            ActivityService.recordPlayerAccess(playerName);
             this.activeUsers.put(playerName, OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME));
         }
     }
 
     public synchronized void recordPlayerAccess(String playerName, String gameName) {
-        this.timestamps.recordPlayerAccess(playerName, gameName);
+        ActivityService.recordPlayerAccess(playerName, gameName);
     }
 
     public OffsetDateTime getGameTimeStamp(String gameName) {
-        return this.timestamps.getGameTimestamp(gameName);
+        return ActivityService.getGameTimestamp(gameName);
     }
 
     public OffsetDateTime getPlayerAccess(String playerName) {
-        return this.timestamps.getPlayerAccess(playerName);
+        return ActivityService.getPlayerAccess(playerName);
     }
 
     public OffsetDateTime getPlayerAccess(String playerName, String gameName) {
-        return this.timestamps.getPlayerAccess(playerName, gameName);
+        return ActivityService.getPlayerAccess(playerName, gameName);
     }
 
     public boolean isPlayerPinged(String playerName, String gameName) {
-        return this.timestamps.isPlayerPinged(playerName, gameName);
+        return ActivityService.isPlayerPinged(playerName, gameName);
     }
 
     public boolean pingPlayer(String playerName, String gameName) {
@@ -737,7 +710,7 @@ public class JolAdmin {
             return false;
         }
 
-        this.timestamps.pingPlayer(playerName, gameName);
+        ActivityService.pingPlayer(playerName, gameName);
 
         //Ping on Discord
         PlayerInfo player = loadPlayerInfo(playerName);
@@ -773,7 +746,7 @@ public class JolAdmin {
     }
 
     public void clearPing(String playerName, String gameName) {
-        this.timestamps.clearPing(playerName, gameName);
+        ActivityService.clearPing(playerName, gameName);
     }
 
     public Set<String> getGames() {
@@ -962,7 +935,7 @@ public class JolAdmin {
         Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId());
         registrations.row(gameName).clear();
         games.remove(gameName);
-        timestamps.clearGame(gameName);
+        ActivityService.clearGame(gameName);
         pmap.values().forEach(playerModel -> playerModel.removeGame(gameName));
         gmap.remove(gameName);
         try {
@@ -1082,8 +1055,8 @@ public class JolAdmin {
     }
 
     public boolean isCurrent(String player, String game) {
-        OffsetDateTime playerAccess = timestamps.getPlayerAccess(player, game);
-        OffsetDateTime gameLastUpdated = timestamps.getGameTimestamp(game);
+        OffsetDateTime playerAccess = ActivityService.getPlayerAccess(player, game);
+        OffsetDateTime gameLastUpdated = ActivityService.getGameTimestamp(game);
         return playerAccess.isAfter(gameLastUpdated);
     }
 
@@ -1099,7 +1072,7 @@ public class JolAdmin {
     }
 
     public List<String> getPings(String gameName) {
-        var entry = timestamps.getGameTimestamps().get(gameName);
+        var entry = ActivityService.getGameTimestamps().get(gameName);
         if (entry == null) {
             return List.of();
         }
@@ -1229,7 +1202,7 @@ public class JolAdmin {
         players.remove(playerInfo.getName());
     }
 
-    private boolean copyTournamentDeck(String playerId, String deckId, int round) {
+    private void copyTournamentDeck(String playerId, String deckId, int round) {
         Path tournamentPath = BASE_PATH.resolve("tournaments");
         try {
             if (!Files.exists(tournamentPath)) {
@@ -1239,10 +1212,8 @@ public class JolAdmin {
             Path roundPath = BASE_PATH.resolve("tournaments").resolve(String.format("%s-%d.json", playerId, round));
             logger.info("Copying tournament deck {} to {}", deckPath, roundPath);
             Files.copy(deckPath, roundPath, StandardCopyOption.REPLACE_EXISTING);
-            return true;
         } catch (IOException e) {
             logger.error("Unable to load deck for {}", deckId, e);
-            return false;
         }
     }
 
