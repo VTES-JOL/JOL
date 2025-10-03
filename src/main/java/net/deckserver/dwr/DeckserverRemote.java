@@ -1,7 +1,6 @@
 package net.deckserver.dwr;
 
 import com.google.common.base.Strings;
-import net.deckserver.ChatService;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.DeckInfoBean;
 import net.deckserver.dwr.creators.UpdateFactory;
@@ -9,6 +8,8 @@ import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.services.ChatService;
+import net.deckserver.services.PlayerService;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.ChatData;
 import org.directwebremoting.WebContextFactory;
@@ -291,13 +292,13 @@ public class DeckserverRemote {
 
     public Map<String, Object> updateProfile(String email, String discordID, String veknID) {
         String player = getPlayer(request);
-        admin.updateProfile(player, email, discordID, veknID);
+        PlayerService.updateProfile(player, email, discordID, veknID);
         return UpdateFactory.getUpdate();
     }
 
     public Map<String, Object> changePassword(String newPassword) {
         String player = getPlayer(request);
-        admin.changePassword(player, newPassword);
+        PlayerService.changePassword(player, newPassword);
         return UpdateFactory.getUpdate();
     }
 

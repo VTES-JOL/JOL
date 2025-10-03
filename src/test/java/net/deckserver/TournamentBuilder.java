@@ -2,6 +2,7 @@ package net.deckserver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.services.PlayerService;
 import net.deckserver.storage.json.system.TournamentData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -61,7 +62,7 @@ public class TournamentBuilder {
                 logger.info("{}: {}", gameName, players);
                 for (String player : players) {
                     System.out.println("Confirming player: " + player);
-                    assertTrue(admin.existsPlayer(player));
+                    assertTrue(PlayerService.existsPlayer(player));
                     String deckName = data.getRegistrations().get(player).getDecks().getFirst();
                     assertNotNull(deckName);
                     admin.registerTournamentDeck(gameName, player, deckName, round);

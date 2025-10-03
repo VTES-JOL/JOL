@@ -8,12 +8,12 @@ package net.deckserver.dwr.model;
 
 import com.google.common.base.Strings;
 import net.deckserver.CardSearch;
-import net.deckserver.ChatService;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.Clan;
 import net.deckserver.game.enums.Path;
 import net.deckserver.game.enums.RegionType;
 import net.deckserver.game.enums.Sect;
+import net.deckserver.services.ChatService;
 import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.CardData;

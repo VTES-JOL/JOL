@@ -1,4 +1,4 @@
-package net.deckserver;
+package net.deckserver.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

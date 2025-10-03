@@ -28,6 +28,10 @@ import net.deckserver.game.validators.DeckValidator;
 import net.deckserver.game.validators.ValidationResult;
 import net.deckserver.game.validators.ValidatorFactory;
 import net.deckserver.jobs.*;
+import net.deckserver.services.ChatService;
+import net.deckserver.services.PlayerActivityService;
+import net.deckserver.services.PlayerGameActivityService;
+import net.deckserver.services.PlayerService;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.DeckParser;
@@ -35,7 +39,6 @@ import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.GameData;
 import net.deckserver.storage.json.system.*;
 import org.apache.commons.io.FileUtils;
-import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +116,6 @@ public class JolAdmin {
             .build(this::loadGameState);
     private Properties properties;
     private Map<OffsetDateTime, GameHistory> pastGames;
-    private Map<String, PlayerInfo> players;
     private TournamentData tournamentRegistrations;
     private TypeFactory typeFactory;
     @Getter
@@ -168,7 +170,6 @@ public class JolAdmin {
     public synchronized void persistState() {
         writeFile("chats.json", chats);
         writeFile("games.json", games);
-        writeFile("players.json", players);
         writeFile("registrations.json", registrations);
         writeFile("decks.json", decks);
         writeFile("pastGames.json", pastGames);
@@ -374,7 +375,6 @@ public class JolAdmin {
         typeFactory = objectMapper.getTypeFactory();
         games = readFile("games.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, GameInfo.class));
         pastGames = readFile("pastGames.json", typeFactory.constructMapType(ConcurrentHashMap.class, OffsetDateTime.class, GameHistory.class));
-        players = readFile("players.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, PlayerInfo.class));
         chats = readFile("chats.json", typeFactory.constructCollectionType(List.class, ChatEntryBean.class));
         tournamentRegistrations = readFile("tournament.json", typeFactory.constructType(TournamentData.class));
         message = readFile("message.json", typeFactory.constructType(String.class));
@@ -384,7 +384,6 @@ public class JolAdmin {
         if (System.getenv().getOrDefault("ENABLE_GAMES_BUILDER", "false").equals("true")) {
             scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 10, TimeUnit.MINUTES);
         }
-        scheduler.scheduleAtFixedRate(new PersistStateJob(), 5, 5, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 2, 1, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new ValidateGWJob(), 1, 1, TimeUnit.DAYS);
     }
@@ -436,13 +435,8 @@ public class JolAdmin {
                 });
     }
 
-
     public String getVersion() {
         return properties.getProperty("version");
-    }
-
-    public boolean existsPlayer(String name) {
-        return name != null && players.containsKey(name);
     }
 
     public boolean notExistsGame(String name) {
@@ -533,35 +527,6 @@ public class JolAdmin {
         ModelLoader.saveGame(game);
     }
 
-    public boolean registerPlayer(String name, String password, String email) {
-        if (existsPlayer(name) || name.isEmpty())
-            return false;
-        String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
-        players.put(name, new PlayerInfo(name, ULID.random(), email, hash));
-        return true;
-    }
-
-    public synchronized void changePassword(String player, String password) {
-        String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
-        loadPlayerInfo(player).setHash(hash);
-    }
-
-    public synchronized void updateProfile(String playerName, String email, String discordID, String veknID) {
-        PlayerInfo playerInfo = loadPlayerInfo(playerName);
-        playerInfo.setDiscordId(discordID);
-        playerInfo.setEmail(email);
-        playerInfo.setVeknId(veknID);
-    }
-
-    public boolean authenticate(String playerName, String password) {
-        if (existsPlayer(playerName)) {
-            PlayerInfo playerInfo = loadPlayerInfo(playerName);
-            return BCrypt.checkpw(password, playerInfo.getHash());
-        } else {
-            return false;
-        }
-    }
-
     public long getRegisteredPlayerCount(String gameName) {
         return registrations.row(gameName).values().stream().filter(IS_REGISTERED).count();
     }
@@ -571,7 +536,7 @@ public class JolAdmin {
     }
 
     public synchronized void registerTournamentMultiDeck(String playerName, String... playerDecks) {
-        PlayerInfo playerInfo = players.get(playerName);
+        PlayerInfo playerInfo = PlayerService.get(playerName);
         String result = "Successfully registered for tournament";
         int round = 1;
         try {
@@ -600,7 +565,7 @@ public class JolAdmin {
 
     public void registerTournamentDeck(String gameName, String playerName, String deckName, int round) {
         logger.debug("Registering {} for {}", playerName, gameName);
-        PlayerInfo playerInfo = players.get(playerName);
+        PlayerInfo playerInfo = PlayerService.get(playerName);
         GameInfo gameInfo = games.get(gameName);
         String deckId = String.format("%s-%d", playerInfo.getId(), round);
         Path deckPath = BASE_PATH.resolve("tournaments").resolve(deckId + ".json");
@@ -713,7 +678,7 @@ public class JolAdmin {
         PlayerGameActivityService.pingPlayer(playerName, gameName);
 
         //Ping on Discord
-        PlayerInfo player = loadPlayerInfo(playerName);
+        PlayerInfo player = PlayerService.get(playerName);
         try {
             String discordId = player.getDiscordId();
             if (discordId != null && !discordId.isBlank()) {
@@ -762,48 +727,47 @@ public class JolAdmin {
     }
 
     public String getEmail(String player) {
-        return loadPlayerInfo(player).getEmail();
+        return PlayerService.get(player).getEmail();
     }
 
     public String getDiscordID(String player) {
-        return loadPlayerInfo(player).getDiscordId();
+        return PlayerService.get(player).getDiscordId();
     }
 
     public String getVeknID(String player) {
-        return loadPlayerInfo(player).getVeknId();
+        return PlayerService.get(player).getVeknId();
     }
 
     public synchronized void setImageTooltipPreference(String player, boolean value) {
-        loadPlayerInfo(player).setShowImages(value);
-        writeFile("players.json", players);
+        PlayerService.get(player).setShowImages(value);
     }
 
     public synchronized boolean getImageTooltipPreference(String player) {
         if (player == null) {
             return true;
         }
-        return loadPlayerInfo(player).isShowImages();
+        return PlayerService.get(player).isShowImages();
     }
 
     public synchronized boolean isAdmin(String player) {
-        return loadPlayerInfo(player).getRoles().contains(PlayerRole.ADMIN);
+        return PlayerService.get(player).getRoles().contains(PlayerRole.ADMIN);
     }
 
     public synchronized boolean isPlaytester(String player) {
-        return loadPlayerInfo(player).getRoles().contains(PlayerRole.PLAYTESTER);
+        return PlayerService.get(player).getRoles().contains(PlayerRole.PLAYTESTER);
     }
 
     public synchronized boolean isSuperUser(String playerName) {
-        return loadPlayerInfo(playerName).getRoles().contains(PlayerRole.SUPER_USER);
+        return PlayerService.get(playerName).getRoles().contains(PlayerRole.SUPER_USER);
     }
 
     public synchronized boolean isJudge(String playerName) {
-        return loadPlayerInfo(playerName).getRoles().contains(PlayerRole.JUDGE);
+        return PlayerService.get(playerName).getRoles().contains(PlayerRole.JUDGE);
     }
 
     public synchronized String getOwner(String gameName) {
         String playerName = loadGameInfo(gameName).getOwner();
-        if (!players.containsKey(playerName)) {
+        if (!PlayerService.existsPlayer(playerName)) {
             playerName = "SYSTEM";
         }
         return playerName;
@@ -814,7 +778,7 @@ public class JolAdmin {
     }
 
     public Set<String> getPlayers() {
-        return players.keySet();
+        return PlayerService.getPlayers();
     }
 
     public synchronized void invitePlayer(String gameName, String playerName) {
@@ -1012,22 +976,22 @@ public class JolAdmin {
     }
 
     public synchronized void setJudge(String playerName, boolean value) {
-        PlayerInfo info = players.get(playerName);
+        PlayerInfo info = PlayerService.get(playerName);
         setRole(info, PlayerRole.JUDGE, value);
     }
 
     public synchronized void setAdmin(String playerName, boolean value) {
-        PlayerInfo info = players.get(playerName);
+        PlayerInfo info = PlayerService.get(playerName);
         setRole(info, PlayerRole.ADMIN, value);
     }
 
     public synchronized void setPlaytester(String playerName, boolean value) {
-        PlayerInfo info = players.get(playerName);
+        PlayerInfo info = PlayerService.get(playerName);
         setRole(info, PlayerRole.PLAYTESTER, value);
     }
 
     public synchronized void setSuperUser(String playerName, boolean value) {
-        PlayerInfo info = players.get(playerName);
+        PlayerInfo info = PlayerService.get(playerName);
         setRole(info, PlayerRole.SUPER_USER, value);
     }
 
@@ -1107,7 +1071,7 @@ public class JolAdmin {
     }
 
     public List<GameFormat> getAvailableGameFormats(String playerName) {
-        Set<PlayerRole> roles = loadPlayerInfo(playerName).getRoles();
+        Set<PlayerRole> roles = PlayerService.get(playerName).getRoles();
         List<GameFormat> formats = new ArrayList<>(EnumSet.of(GameFormat.STANDARD, GameFormat.V5, GameFormat.DUEL));
         if (roles.contains(PlayerRole.PLAYTESTER)) {
             formats.add(GameFormat.PLAYTEST);
@@ -1178,7 +1142,7 @@ public class JolAdmin {
 
     private void archivePlayer(String playerName) {
         Path archivePath = BASE_PATH.resolve("archives");
-        PlayerInfo playerInfo = players.get(playerName);
+        PlayerInfo playerInfo = PlayerService.get(playerName);
         Map<String, DeckInfo> playerDecks = decks.row(playerName);
         try {
             if (!Files.exists(archivePath)) {
@@ -1199,7 +1163,7 @@ public class JolAdmin {
         } catch (IOException e) {
             logger.error("Unable to archive player {}", playerInfo.getId(), e);
         }
-        players.remove(playerInfo.getName());
+        PlayerService.remove(playerInfo.getName());
     }
 
     private void copyTournamentDeck(String playerId, String deckId, int round) {
@@ -1232,13 +1196,6 @@ public class JolAdmin {
 
     private DeckInfo loadDeckInfo(String playerName, String deckName) {
         return decks.get(playerName, deckName);
-    }
-
-    private PlayerInfo loadPlayerInfo(String playerName) {
-        if (players.containsKey(playerName)) {
-            return players.get(playerName);
-        }
-        throw new IllegalArgumentException("Player: " + playerName + " was not found.");
     }
 
     private GameInfo loadGameInfo(String gameName) {

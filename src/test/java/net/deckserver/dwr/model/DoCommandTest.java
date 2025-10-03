@@ -1,6 +1,6 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.ChatService;
+import net.deckserver.services.ChatService;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.Path;
 import net.deckserver.game.enums.RegionType;

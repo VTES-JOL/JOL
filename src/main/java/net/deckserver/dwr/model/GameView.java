@@ -1,9 +1,9 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.ChatService;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.GameBean;
 import net.deckserver.game.enums.RegionType;
+import net.deckserver.services.ChatService;
 import net.deckserver.storage.json.game.ChatData;
 import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;

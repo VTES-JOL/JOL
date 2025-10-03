@@ -1,6 +1,5 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.ChatService;
 import net.deckserver.game.enums.RegionType;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.CardData;
