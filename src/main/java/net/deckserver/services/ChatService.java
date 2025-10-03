@@ -117,12 +117,6 @@ public class ChatService extends PersistedService {
         historyCache.cleanUp();
     }
 
-    @Override
-    public void clearCache() {
-        logger.debug("Clearing ChatService cache");
-        historyCache.invalidateAll();
-    }
-
     public static synchronized void subscribe(String gameId, GameModel model) {
         gmap.put(gameId, model);
     }

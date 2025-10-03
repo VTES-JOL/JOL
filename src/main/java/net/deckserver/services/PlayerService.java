@@ -18,14 +18,13 @@ import java.util.Set;
 public class PlayerService extends PersistedService {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "players.json");
-    private static final PlayerService INSTANCE = new PlayerService();
-
     static {
         objectMapper.findAndRegisterModules();
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
+    private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "players.json");
+    private static final PlayerService INSTANCE = new PlayerService();
 
     private final Map<String, PlayerInfo> players = new HashMap<>();
 
@@ -87,11 +86,6 @@ public class PlayerService extends PersistedService {
     }
 
     @Override
-    public void clearCache() {
-
-    }
-
-    @Override
     protected void persist() {
         if (shouldSkipPersistence()) {
             logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
@@ -110,7 +104,7 @@ public class PlayerService extends PersistedService {
     @Override
     protected void load() {
         if (!Files.exists(PERSISTENCE_PATH)) {
-            logger.info("No existing player timestamps file found");
+            logger.info("No existing player file found");
             return;
         }
 

@@ -26,7 +26,7 @@ public abstract class PersistedService {
     protected final Cleaner.Cleanable cleanable;
 
     /**
-     * Constructor that initializes the service with scheduled persistence.
+     * Constructor that initialises the service with scheduled persistence.
      *
      * @param serviceName Name of the service (used for logging and thread naming)
      * @param persistenceIntervalMinutes How often to persist data (in minutes)
@@ -43,10 +43,10 @@ public abstract class PersistedService {
             return thread;
         });
 
-        // Register cleanup action with Cleaner
+        // Register a clean-up action with Cleaner
         this.cleanable = cleaner.register(this, new CleanupAction(this));
 
-        // Start scheduled persistence task if not in test mode
+        // Start a scheduled persistence task if not in test mode
         if (!testModeEnabled) {
             scheduler.scheduleAtFixedRate(
                     this::scheduledPersist,
@@ -58,7 +58,7 @@ public abstract class PersistedService {
                     serviceName, persistenceIntervalMinutes);
         }
 
-        // Add shutdown hook
+        // Add a shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.info("Shutting down {}...", serviceName);
             shutdown();
@@ -92,13 +92,13 @@ public abstract class PersistedService {
     protected abstract void persist();
 
     /**
-     * Load all data from disk.
+     * Load all data from the disk.
      * Subclasses must implement this to define their loading strategy.
      */
     protected abstract void load();
 
     /**
-     * Check if persistence should be skipped (e.g., due to test mode or shutdown).
+     * Check if persistence should be skipped (e.g. due to test mode or shutdown).
      *
      * @return true if persistence should be skipped
      */
@@ -140,10 +140,10 @@ public abstract class PersistedService {
             isShuttingDown = false;
             persist();
             
-            // Re-enable shutdown flag to prevent any further saves
+            // Re-enable a shutdown flag to prevent any further saves
             isShuttingDown = true;
 
-            // Additional cleanup
+            // Additional clean-up
             performAdditionalCleanup();
 
             logger.info("{} shutdown completed.", serviceName);
@@ -153,23 +153,17 @@ public abstract class PersistedService {
     }
 
     /**
-     * Perform any additional cleanup during shutdown.
-     * Subclasses can override this to add custom cleanup logic.
+     * Perform any additional clean-up during shutdown.
+     * Subclasses can override this to add custom clean-up logic.
      */
     protected void performAdditionalCleanup() {
         // Default: no additional cleanup
     }
 
     /**
-     * Clear all cached/in-memory data.
-     * Subclasses should implement this to define how to clear their state.
-     */
-    public abstract void clearCache();
-
-    /**
      * Get the base path for data storage.
      *
-     * @return The base path from JOL_DATA environment variable
+     * @return The base path from the JOL_DATA environment variable
      */
     protected String getBasePath() {
         return System.getenv("JOL_DATA");
@@ -194,7 +188,7 @@ public abstract class PersistedService {
     }
 
     /**
-     * Cleanup action that persists all data before the service is garbage collected.
+     * Clean-up action that persists all data before the service is rubbish collected.
      * This class must not hold a direct reference to the service instance to avoid
      * preventing garbage collection.
      */

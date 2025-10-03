@@ -42,7 +42,7 @@ public class AdminPageBean {
                 .filter(playerActivityStatus -> playerActivityStatus.online().isAfter(currentMonth))
                 .map(PlayerActivityStatus::getName)
                 .collect(Collectors.toList());
-        this.games = admin.getGames().stream()
+        this.games = admin.getGameNames().stream()
                 .sorted()
                 .filter(admin::isActive)
                 .collect(Collectors.toList());

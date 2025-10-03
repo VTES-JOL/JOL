@@ -18,26 +18,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 public class GameDataConversion {
 
     private static final String BASE_PATH = System.getenv().getOrDefault("JOL_DATA", "/data/games");
-
-    public static void main(String[] args) throws IOException {
-        System.out.println("Starting conversion on " + BASE_PATH);
-        Path gamesPath = Paths.get(BASE_PATH, "games");
-        GameDataConversion conversion = new GameDataConversion();
-        try (Stream<Path> stream = Files.list(gamesPath)) {
-            stream
-                    .filter(Files::isDirectory)
-                    .map(Path::getFileName)
-                    .map(Path::toString)
-                    .filter(conversion::hasGame)
-                    .map(conversion::convertGameData)
-                    .forEach(conversion::verify);
-        }
-    }
 
     public void convertGame(String gameId) {
         GameData data = convertGameData(gameId);
@@ -143,12 +127,10 @@ public class GameDataConversion {
     }
 
     private GameData convertGameData(String gameId) {
-        System.out.println("Converting " + gameId);
         GameState gameState = XmlFileUtils.loadGameState(Paths.get(BASE_PATH, "games", gameId, "game.xml"));
         GameData data = ModelLoader.convertGameState(gameState, gameId);
         GameActions gameActions = XmlFileUtils.loadGameActions(Paths.get(BASE_PATH, "games", gameId, "actions.xml"));
         TurnHistory history = ModelLoader.convertHistory(gameActions);
-        String turnLabel = history.getCurrentTurnLabel();
         String turn = history.getCurrentTurn();
         data.setTurn(turn);
         save(gameId, data);

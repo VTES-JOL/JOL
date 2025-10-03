@@ -38,7 +38,7 @@ public class NavBean {
             if (isAdmin) {
                 buttons.add("admin:Admin");
             }
-            admin.getGames(player).stream()
+            admin.getGameNames(player).stream()
                     .filter(admin::isActive)
                     .filter(game -> admin.isAlive(game, player))
                     .forEach(game -> {

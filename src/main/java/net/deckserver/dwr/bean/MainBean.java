@@ -23,7 +23,7 @@ public class MainBean {
         String playerName = model.getPlayerName();
         loggedIn = model.getPlayerName() != null;
         if (loggedIn) {
-            List<GameStatusBean> games = jolAdmin.getGames(playerName).stream()
+            List<GameStatusBean> games = jolAdmin.getGameNames(playerName).stream()
                     .filter(gameName -> jolAdmin.isRegistered(gameName, playerName))
                     .filter(jolAdmin::isActive)
                     .map(GameStatusBean::new)

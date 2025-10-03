@@ -21,17 +21,15 @@ import io.azam.ulidj.ULID;
 import lombok.Getter;
 import lombok.Setter;
 import net.deckserver.dwr.bean.ChatEntryBean;
-import net.deckserver.dwr.bean.GameStatusBean;
 import net.deckserver.dwr.model.*;
 import net.deckserver.game.enums.*;
 import net.deckserver.game.validators.DeckValidator;
 import net.deckserver.game.validators.ValidationResult;
 import net.deckserver.game.validators.ValidatorFactory;
-import net.deckserver.jobs.*;
-import net.deckserver.services.ChatService;
-import net.deckserver.services.PlayerActivityService;
-import net.deckserver.services.PlayerGameActivityService;
-import net.deckserver.services.PlayerService;
+import net.deckserver.jobs.GameDataConversion;
+import net.deckserver.jobs.PublicGamesBuilderJob;
+import net.deckserver.jobs.ValidateGWJob;
+import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.DeckParser;
@@ -68,6 +66,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+import static net.deckserver.services.GameService.*;
 
 public class JolAdmin {
 
@@ -82,10 +81,6 @@ public class JolAdmin {
                     System.getenv("DISCORD_PING_CHANNEL_ID")));
     private static final int CHAT_STORAGE = 1000;
     private static final int CHAT_DISCARD = 100;
-    private static final Predicate<GameInfo> ACTIVE_GAME = (info) -> info.getStatus().equals(GameStatus.ACTIVE);
-    private static final Predicate<GameInfo> STARTING_GAME = (info) -> info.getStatus().equals(GameStatus.STARTING);
-    private static final Predicate<GameInfo> PUBLIC_GAME = info -> info.getVisibility().equals(Visibility.PUBLIC);
-    private static final Predicate<GameInfo> TEST_GAME = info -> info.getOwner().equals("TEST");
     private static final Predicate<DeckInfo> MODERN_DECK = info -> DeckFormat.MODERN.equals(info.getFormat());
     private static final Predicate<DeckInfo> NO_TAGS = info -> info.getGameFormats().isEmpty();
     private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
@@ -110,7 +105,6 @@ public class JolAdmin {
             .connectTimeout(Duration.ofSeconds(5))
             .build();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    private Map<String, GameInfo> games;
     private final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
             .expireAfterAccess(30, TimeUnit.MINUTES)
             .build(this::loadGameState);
@@ -169,7 +163,6 @@ public class JolAdmin {
 
     public synchronized void persistState() {
         writeFile("chats.json", chats);
-        writeFile("games.json", games);
         writeFile("registrations.json", registrations);
         writeFile("decks.json", decks);
         writeFile("pastGames.json", pastGames);
@@ -177,119 +170,8 @@ public class JolAdmin {
         writeFile("message.json", message);
     }
 
-    public synchronized void cleanupGames() {
-        try {
-            logger.debug("CLEAN - Unregistered players");
-            Table<String, String, Boolean> invalidRegistrations = HashBasedTable.create();
-            games.values().stream()
-                    .filter(ACTIVE_GAME)
-                    .map(GameInfo::getName)
-                    .forEach(gameName -> {
-                        Map<String, RegistrationStatus> playerRegistrations = registrations.row(gameName);
-                        playerRegistrations.forEach((player, registration) -> {
-                            if (!isRegistered(gameName, player)) {
-                                logger.info("Removing unregistered player {} from active game {}", player, gameName);
-                                invalidRegistrations.put(gameName, player, Boolean.TRUE);
-                            }
-                        });
-                    });
-
-            logger.debug("CLEAN - Close finished games");
-            games.values().stream()
-                    .filter(ACTIVE_GAME)
-                    .filter(TEST_GAME.negate())
-                    .map(GameInfo::getName)
-                    .map(GameStatusBean::new)
-                    .forEach(gameStatus -> {
-                        long activePlayers = gameStatus.getActivePlayerCount();
-                        if (activePlayers == 0) {
-                            endGame(gameStatus.getName(), true);
-                            String message = String.format("{%s} has been closed.", gameStatus.getName());
-                            chat("SYSTEM", message);
-                        }
-                    });
-
-            logger.debug("CLEAN - Start ready games");
-            games.values().stream()
-                    .filter(STARTING_GAME)
-                    .map(GameInfo::getName)
-                    .forEach(gameName -> {
-                        long registeredPlayers = getRegisteredPlayerCount(gameName);
-                        if (registeredPlayers == 5) {
-                            try {
-                                startGame(gameName);
-                                logger.info("Started {}.", gameName);
-                            } catch (Exception e) {
-                                logger.error("Something went wrong starting {}", gameName, e);
-                                endGame(gameName, false);
-                            }
-                        }
-                        if (registeredPlayers > 5) {
-                            logger.info("Closing {} : Too many players", gameName);
-                            endGame(gameName, false);
-                        }
-                    });
-
-            logger.debug("CLEAN - Close Idle games and registrations");
-            games.values().stream()
-                    .filter(STARTING_GAME)
-                    .forEach(gameInfo -> {
-                        String gameName = gameInfo.getName();
-                        OffsetDateTime created = gameInfo.getCreated();
-                        if (created != null && created.plusDays(5).isBefore(OffsetDateTime.now())) {
-                            logger.info("Closing {} : Idle too long", gameName);
-                            if (getRegisteredPlayerCount(gameName) == 4) {
-                                startGame(gameName);
-                            } else {
-                                endGame(gameName, false);
-                            }
-                        }
-                    });
-
-            invalidRegistrations.cellSet().forEach(cell -> {
-                String game = cell.getRowKey();
-                String player = cell.getColumnKey();
-                registrations.remove(game, player);
-            });
-
-            // clear out any empty player/game names in registrations
-            if (registrations.containsColumn("")) {
-                logger.info("Removing bad player data from registrations");
-                registrations.column("").clear();
-            }
-            if (registrations.containsRow("")) {
-                logger.info("Removing bad game data from registrations");
-                registrations.row("").clear();
-            }
-
-            pmap.values().forEach(playerModel -> {
-                // Check current game exists still, this is the cause of people unable to login sometimes
-                // when the player model in session thinks they are in a game that's since been closed
-                String currentGame = playerModel.getCurrentGame();
-                if (currentGame != null && notExistsGame(currentGame)) {
-                    logger.info("Clearing out closed game {} for {}", playerModel.getCurrentGame(), playerModel.getPlayerName());
-                    playerModel.setView("main");
-                }
-                // clear out games from the recent game view if you are just a spectator and not playing
-                playerModel.getCurrentGames().stream()
-                        .filter(this::notExistsGame)
-                        .peek(gameName -> logger.info("Removing {} from the list of recent games viewed by {}", gameName, playerModel.getPlayerName()))
-                        .forEach(playerModel.getCurrentGames()::remove);
-            });
-
-            logger.debug("CLEAN - FINISH");
-            persistState();
-
-        } catch (Exception e) {
-            logger.error("Caught runtime exception", e);
-        }
-    }
-
     public synchronized void buildPublicGames() {
-        long publicGamesCount = games.values().stream()
-                .filter(STARTING_GAME)
-                .filter(PUBLIC_GAME)
-                .count();
+        long publicGamesCount = GameService.getGames(List.of(STARTING_GAME, PUBLIC_GAME)).size();
         long gamesNeeded = 5 - publicGamesCount;
         for (int x = 0; x < gamesNeeded; x++) {
             String gameName = RandomGameName.generateName();
@@ -308,7 +190,7 @@ public class JolAdmin {
     }
 
     public synchronized GameModel getGameModel(String name) {
-        GameInfo gameInfo = games.get(name);
+        GameInfo gameInfo = GameService.get(name);
         return gmap.computeIfAbsent(name, n -> new GameModel(n, gameInfo.getId(), gameInfo.isPlayTest()));
     }
 
@@ -331,10 +213,7 @@ public class JolAdmin {
         if (gameName.length() > 2 || notExistsGame(gameName)) {
             try {
                 String gameId = ULID.random();
-                games.put(gameName, new GameInfo(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), GameStatus.STARTING, format));
-                Path gamePath = BASE_PATH.resolve("games").resolve(gameId);
-                Files.createDirectory(gamePath);
-                writeFile("games.json", games);
+                GameService.create(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), format);
             } catch (Exception e) {
                 logger.error("Error creating game", e);
             }
@@ -354,7 +233,7 @@ public class JolAdmin {
     }
 
     public synchronized void rollbackGame(String gameName, String adminName, String turn) {
-        String id = loadGameInfo(gameName).getId();
+        String id = GameService.get(gameName).getId();
         logger.info("Rolling back game {} for turn {}", gameName, turn);
         JolGame game = ModelLoader.loadSnapshot(id, turn);
         ChatService.sendMessage(id, "SYSTEM", "Game state rolled back by administrator: " + adminName);
@@ -373,7 +252,6 @@ public class JolAdmin {
 
     public void setup() {
         typeFactory = objectMapper.getTypeFactory();
-        games = readFile("games.json", typeFactory.constructMapType(ConcurrentHashMap.class, String.class, GameInfo.class));
         pastGames = readFile("pastGames.json", typeFactory.constructMapType(ConcurrentHashMap.class, OffsetDateTime.class, GameHistory.class));
         chats = readFile("chats.json", typeFactory.constructCollectionType(List.class, ChatEntryBean.class));
         tournamentRegistrations = readFile("tournament.json", typeFactory.constructType(TournamentData.class));
@@ -384,7 +262,6 @@ public class JolAdmin {
         if (System.getenv().getOrDefault("ENABLE_GAMES_BUILDER", "false").equals("true")) {
             scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 10, TimeUnit.MINUTES);
         }
-        scheduler.scheduleAtFixedRate(new CleanupGamesJob(), 2, 1, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new ValidateGWJob(), 1, 1, TimeUnit.DAYS);
     }
 
@@ -407,14 +284,14 @@ public class JolAdmin {
         logger.info("Determining upgrades...");
         GameDataConversion conversion = new GameDataConversion();
         // Upgrade all games with no version
-        games.values().stream()
-                .filter(ACTIVE_GAME)
+        GameService.getGames(List.of(ACTIVE_GAME))
+                .stream()
                 .filter(Objects::nonNull)
                 // Version 1 is the first version where we store additional information in the game state
                 .filter(gameInfo -> gameInfo.getVersion().isOlderThan(GameInfo.Version.GAME_STATE))
                 // For every active game check the game state
                 .peek(gameInfo -> {
-                    logger.info("Upgrading game {}", gameInfo.getName());
+                    logger.info("Upgrading game {} - {}", gameInfo.getName(), gameInfo.getId());
                 })
                 .forEach(gameInfo -> {
                     conversion.convertGame(gameInfo.getId());
@@ -440,7 +317,7 @@ public class JolAdmin {
     }
 
     public boolean notExistsGame(String name) {
-        return name == null || !games.containsKey(name);
+        return name == null || !GameService.existsGame(name);
     }
 
     public DeckFormat getDeckFormat(String playerName, String deckName) {
@@ -566,7 +443,7 @@ public class JolAdmin {
     public void registerTournamentDeck(String gameName, String playerName, String deckName, int round) {
         logger.debug("Registering {} for {}", playerName, gameName);
         PlayerInfo playerInfo = PlayerService.get(playerName);
-        GameInfo gameInfo = games.get(gameName);
+        GameInfo gameInfo = GameService.get(gameName);
         String deckId = String.format("%s-%d", playerInfo.getId(), round);
         Path deckPath = BASE_PATH.resolve("tournaments").resolve(deckId + ".json");
         assert Files.exists(deckPath);
@@ -589,7 +466,7 @@ public class JolAdmin {
     public synchronized void registerDeck(String gameName, String playerName, String deckName) {
         deckName = deckName.trim();
         DeckInfo deckInfo = decks.get(playerName, deckName);
-        GameInfo gameInfo = loadGameInfo(gameName);
+        GameInfo gameInfo = GameService.get(gameName);
         String result = "Successfully registered " + deckName + " in game " + gameName;
         try {
             if (!gameInfo.getStatus().equals(GameStatus.STARTING)) {
@@ -714,11 +591,11 @@ public class JolAdmin {
         PlayerGameActivityService.clearPing(playerName, gameName);
     }
 
-    public Set<String> getGames() {
-        return games.keySet();
+    public Set<String> getGameNames() {
+        return GameService.getGameNames();
     }
 
-    public Set<String> getGames(String playerName) {
+    public Set<String> getGameNames(String playerName) {
         return registrations.column(playerName).keySet();
     }
 
@@ -766,7 +643,7 @@ public class JolAdmin {
     }
 
     public synchronized String getOwner(String gameName) {
-        String playerName = loadGameInfo(gameName).getOwner();
+        String playerName = GameService.get(gameName).getOwner();
         if (!PlayerService.existsPlayer(playerName)) {
             playerName = "SYSTEM";
         }
@@ -800,11 +677,11 @@ public class JolAdmin {
     }
 
     public synchronized boolean isStarting(String gameName) {
-        return loadGameInfo(gameName).getStatus().equals(GameStatus.STARTING);
+        return GameService.get(gameName).getStatus().equals(GameStatus.STARTING);
     }
 
     public boolean isActive(String gameName) {
-        return loadGameInfo(gameName).getStatus().equals(GameStatus.ACTIVE);
+        return GameService.get(gameName).getStatus().equals(GameStatus.ACTIVE);
     }
 
     public boolean isAlive(String gameName, String playerName) {
@@ -812,15 +689,15 @@ public class JolAdmin {
     }
 
     public boolean isPrivate(String gameName) {
-        return loadGameInfo(gameName).getVisibility().equals(Visibility.PRIVATE);
+        return GameService.get(gameName).getVisibility().equals(Visibility.PRIVATE);
     }
 
     public boolean isPublic(String gameName) {
-        return loadGameInfo(gameName).getVisibility().equals(Visibility.PUBLIC);
+        return GameService.get(gameName).getVisibility().equals(Visibility.PUBLIC);
     }
 
     public void startGame(String gameName, List<String> players) {
-        GameInfo gameInfo = games.get(gameName);
+        GameInfo gameInfo = GameService.get(gameName);
         GameData gameData = new GameData(gameInfo.getId(), gameName);
         JolGame game = new JolGame(gameInfo.getId(), gameData);
         game.initGame(gameName);
@@ -835,7 +712,6 @@ public class JolAdmin {
             saveGameState(game);
             gameInfo.setStatus(GameStatus.ACTIVE);
         }
-        writeFile("games.json", games);
     }
 
     public synchronized void startGame(String gameName) {
@@ -850,7 +726,7 @@ public class JolAdmin {
     }
 
     public synchronized void endGame(String gameName, boolean graceful) {
-        GameInfo gameInfo = games.get(gameName);
+        GameInfo gameInfo = GameService.get(gameName);
         // try and generate stats for game
         if (gameInfo.getStatus().equals(GameStatus.ACTIVE)) {
             JolGame gameData = getGame(gameName);
@@ -898,7 +774,7 @@ public class JolAdmin {
         // Clear out data
         Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId());
         registrations.row(gameName).clear();
-        games.remove(gameName);
+        GameService.remove(gameName);
         PlayerGameActivityService.clearGame(gameName);
         pmap.values().forEach(playerModel -> playerModel.removeGame(gameName));
         gmap.remove(gameName);
@@ -914,7 +790,7 @@ public class JolAdmin {
     }
 
     public String getGameId(String gameName) {
-        return loadGameInfo(gameName).getId();
+        return GameService.get(gameName).getId();
     }
 
     public void validateGW() {
@@ -1000,7 +876,7 @@ public class JolAdmin {
     }
 
     public OffsetDateTime getCreatedTime(String gameName) {
-        return Optional.ofNullable(games.get(gameName))
+        return Optional.ofNullable(GameService.get(gameName))
                 .map(GameInfo::getCreated)
                 .orElse(null);
     }
@@ -1026,13 +902,13 @@ public class JolAdmin {
 
     public synchronized void endTurn(String gameName, String adminName) {
         JolGame game = getGame(gameName);
-        String id = loadGameInfo(gameName).getId();
+        String id = GameService.get(gameName).getId();
         ChatService.sendMessage(id, "SYSTEM", "Turn ended by administrator: " + adminName);
         game.newTurn();
     }
 
     public synchronized boolean isOwner(String playerName, String gameName) {
-        return games.get(gameName).getOwner().equals(playerName);
+        return GameService.get(gameName).getOwner().equals(playerName);
     }
 
     public List<String> getPings(String gameName) {
@@ -1048,7 +924,7 @@ public class JolAdmin {
     }
 
     public String getFormat(String gameName) {
-        return games.get(gameName).getGameFormat().toString();
+        return GameService.get(gameName).getGameFormat().toString();
     }
 
     public synchronized void validateDeck(String playerName, String contents, GameFormat format) {
@@ -1080,7 +956,7 @@ public class JolAdmin {
     }
 
     public boolean isViewable(String gameName, String player) {
-        GameFormat format = games.get(gameName).getGameFormat();
+        GameFormat format = GameService.get(gameName).getGameFormat();
         return format != GameFormat.PLAYTEST || isPlaytester(player);
     }
 
@@ -1198,16 +1074,9 @@ public class JolAdmin {
         return decks.get(playerName, deckName);
     }
 
-    private GameInfo loadGameInfo(String gameName) {
-        if (games.containsKey(gameName)) {
-            return games.get(gameName);
-        }
-        throw new IllegalArgumentException("Game: " + gameName + " was not found.");
-    }
-
     private JolGame loadGameState(String gameName) {
         logger.debug("Loading {}", gameName);
-        GameInfo gameInfo = loadGameInfo(gameName);
+        GameInfo gameInfo = GameService.get(gameName);
         String gameId = gameInfo.getId();
         return ModelLoader.loadGame(gameId);
     }

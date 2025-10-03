@@ -29,7 +29,7 @@ public class PlayerActivityStatus {
                 .collect(Collectors.groupingBy(deckName -> admin.getDeckFormat(name, deckName), () -> new EnumMap<>(DeckFormat.class), Collectors.counting()));
         legacyDeckCount = Optional.ofNullable(collect.get(DeckFormat.LEGACY)).orElse(0L);
         modernDeckCount = Optional.ofNullable(collect.get(DeckFormat.MODERN)).orElse(0L);
-        activeGamesCount = admin.getGames(name).size();
+        activeGamesCount = admin.getGameNames(name).size();
     }
 
     @JsonIgnore

@@ -19,7 +19,7 @@ public class AllGamesBean {
 
     public AllGamesBean(PlayerModel model) {
         String player = model.getPlayerName();
-        this.games = JolAdmin.INSTANCE.getGames().stream()
+        this.games = JolAdmin.INSTANCE.getGameNames().stream()
                 .filter(JolAdmin.INSTANCE::isActive)
                 .filter(gameName -> JolAdmin.INSTANCE.isViewable(gameName, player))
                 .map(GameSummaryBean::new)

@@ -45,12 +45,6 @@ public class PlayerActivityService extends PersistedService {
     }
 
     @Override
-    public void clearCache() {
-        logger.debug("Clearing PlayerActivityService cache");
-        playerTimestamps.clear();
-    }
-
-    @Override
     protected void persist() {
         if (shouldSkipPersistence()) {
             logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");

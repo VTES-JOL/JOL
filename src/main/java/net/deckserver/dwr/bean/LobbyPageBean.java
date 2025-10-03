@@ -37,7 +37,7 @@ public class LobbyPageBean {
                 .map(PlayerActivityStatus::getName)
                 .collect(Collectors.toList());
 
-        myGames = admin.getGames().stream()
+        myGames = admin.getGameNames().stream()
                 .filter(Objects::nonNull)
                 .filter(admin::isPrivate)
                 .filter(gameName -> admin.isViewable(gameName, player))
@@ -45,7 +45,7 @@ public class LobbyPageBean {
                 .map(GameStatusBean::new)
                 .collect(Collectors.toList());
 
-        publicGames = admin.getGames().stream()
+        publicGames = admin.getGameNames().stream()
                 .filter(Objects::nonNull)
                 .filter(admin::isStarting)
                 .filter(admin::isPublic)
@@ -54,7 +54,7 @@ public class LobbyPageBean {
                 .sorted(Comparator.comparing(GameStatusBean::getCreated))
                 .collect(Collectors.toList());
 
-        invitedGames = admin.getGames().stream()
+        invitedGames = admin.getGameNames().stream()
                 .filter(Objects::nonNull)
                 .filter(admin::isStarting)
                 .filter(gameName -> admin.isInGame(gameName, player))
