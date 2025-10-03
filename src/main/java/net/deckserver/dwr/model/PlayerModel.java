@@ -6,6 +6,8 @@ import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.game.enums.DeckFormat;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.services.ChatService;
+import net.deckserver.services.GlobalChatService;
 import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import org.slf4j.Logger;
@@ -87,7 +89,7 @@ public class PlayerModel {
     }
 
     public void resetChats() {
-        List<ChatEntryBean> globalChat = JolAdmin.INSTANCE.getChats();
+        List<ChatEntryBean> globalChat = GlobalChatService.getChats();
         chats.addAll(globalChat);
     }
 

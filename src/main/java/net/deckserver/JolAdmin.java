@@ -14,14 +14,15 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.google.common.base.Strings;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import io.azam.ulidj.ULID;
 import lombok.Getter;
 import lombok.Setter;
-import net.deckserver.dwr.bean.ChatEntryBean;
-import net.deckserver.dwr.model.*;
+import net.deckserver.dwr.model.GameModel;
+import net.deckserver.dwr.model.JolGame;
+import net.deckserver.dwr.model.ModelLoader;
+import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.*;
 import net.deckserver.game.validators.DeckValidator;
 import net.deckserver.game.validators.ValidationResult;
@@ -79,8 +80,6 @@ public class JolAdmin {
                     "https://discord.com/api/v%s/channels/%s/messages",
                     System.getenv("DISCORD_API_VERSION"),
                     System.getenv("DISCORD_PING_CHANNEL_ID")));
-    private static final int CHAT_STORAGE = 1000;
-    private static final int CHAT_DISCARD = 100;
     private static final Predicate<DeckInfo> MODERN_DECK = info -> DeckFormat.MODERN.equals(info.getFormat());
     private static final Predicate<DeckInfo> NO_TAGS = info -> info.getGameFormats().isEmpty();
     private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
@@ -115,8 +114,6 @@ public class JolAdmin {
     @Getter
     @Setter
     private String message;
-    @Getter
-    private volatile List<ChatEntryBean> chats;
 
     public JolAdmin(String dir) {
         this.BASE_PATH = Paths.get(dir);
@@ -162,7 +159,6 @@ public class JolAdmin {
     }
 
     public synchronized void persistState() {
-        writeFile("chats.json", chats);
         writeFile("registrations.json", registrations);
         writeFile("decks.json", decks);
         writeFile("pastGames.json", pastGames);
@@ -185,7 +181,9 @@ public class JolAdmin {
         if (name == null) {
             return new PlayerModel(null, false);
         } else {
-            return pmap.computeIfAbsent(name, k -> new PlayerModel(k, true));
+            PlayerModel playerModel = pmap.computeIfAbsent(name, k -> new PlayerModel(k, true));
+            GlobalChatService.subscribe(playerModel);
+            return playerModel;
         }
     }
 
@@ -221,15 +219,7 @@ public class JolAdmin {
     }
 
     public synchronized void chat(String player, String message) {
-        String sanitize = ChatParser.sanitizeText(message);
-        String parsedMessage = ChatParser.parseGlobalChat(sanitize);
-        ChatEntryBean chatEntryBean = new ChatEntryBean(player, parsedMessage);
-        chats.add(chatEntryBean);
-        if (chats.size() > CHAT_STORAGE) {
-            chats = chats.subList(CHAT_DISCARD, CHAT_STORAGE);
-        }
-        pmap.values()
-                .forEach(playerModel -> playerModel.chat(chatEntryBean));
+        GlobalChatService.chat(player, message);
     }
 
     public synchronized void rollbackGame(String gameName, String adminName, String turn) {
@@ -253,7 +243,6 @@ public class JolAdmin {
     public void setup() {
         typeFactory = objectMapper.getTypeFactory();
         pastGames = readFile("pastGames.json", typeFactory.constructMapType(ConcurrentHashMap.class, OffsetDateTime.class, GameHistory.class));
-        chats = readFile("chats.json", typeFactory.constructCollectionType(List.class, ChatEntryBean.class));
         tournamentRegistrations = readFile("tournament.json", typeFactory.constructType(TournamentData.class));
         message = readFile("message.json", typeFactory.constructType(String.class));
         loadRegistrations();
@@ -290,9 +279,7 @@ public class JolAdmin {
                 // Version 1 is the first version where we store additional information in the game state
                 .filter(gameInfo -> gameInfo.getVersion().isOlderThan(GameInfo.Version.GAME_STATE))
                 // For every active game check the game state
-                .peek(gameInfo -> {
-                    logger.info("Upgrading game {} - {}", gameInfo.getName(), gameInfo.getId());
-                })
+                .peek(gameInfo -> logger.info("Upgrading game {} - {}", gameInfo.getName(), gameInfo.getId()))
                 .forEach(gameInfo -> {
                     conversion.convertGame(gameInfo.getId());
                     gameInfo.setVersion(GameInfo.Version.GAME_STATE);
@@ -879,15 +866,6 @@ public class JolAdmin {
         return Optional.ofNullable(GameService.get(gameName))
                 .map(GameInfo::getCreated)
                 .orElse(null);
-    }
-
-    public void resetView(String playerName) {
-        PlayerModel model = getPlayerModel(playerName);
-        model.resetChats();
-        String currentGame = model.getCurrentGame();
-        if (!Strings.isNullOrEmpty(currentGame)) {
-            getGameModel(currentGame).resetView(playerName);
-        }
     }
 
     public synchronized void resetView(String playerName, String gameName) {
