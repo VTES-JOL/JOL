@@ -528,7 +528,7 @@ public class JolAdmin {
 
     public void saveGameState(JolGame game, boolean silent) {
         if (!silent) {
-            ActivityService.setGameTimestamp(game.getName());
+            PlayerGameActivityService.setGameTimestamp(game.getName());
         }
         ModelLoader.saveGame(game);
     }
@@ -679,29 +679,29 @@ public class JolAdmin {
 
     public void recordPlayerAccess(String playerName) {
         if (playerName != null) {
-            ActivityService.recordPlayerAccess(playerName);
+            PlayerActivityService.recordPlayerAccess(playerName);
             this.activeUsers.put(playerName, OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME));
         }
     }
 
     public synchronized void recordPlayerAccess(String playerName, String gameName) {
-        ActivityService.recordPlayerAccess(playerName, gameName);
+        PlayerGameActivityService.recordPlayerAccess(playerName, gameName);
     }
 
     public OffsetDateTime getGameTimeStamp(String gameName) {
-        return ActivityService.getGameTimestamp(gameName);
+        return PlayerGameActivityService.getGameTimestamp(gameName);
     }
 
     public OffsetDateTime getPlayerAccess(String playerName) {
-        return ActivityService.getPlayerAccess(playerName);
+        return PlayerActivityService.getPlayerAccess(playerName);
     }
 
     public OffsetDateTime getPlayerAccess(String playerName, String gameName) {
-        return ActivityService.getPlayerAccess(playerName, gameName);
+        return PlayerGameActivityService.getPlayerAccess(playerName, gameName);
     }
 
     public boolean isPlayerPinged(String playerName, String gameName) {
-        return ActivityService.isPlayerPinged(playerName, gameName);
+        return PlayerGameActivityService.isPlayerPinged(playerName, gameName);
     }
 
     public boolean pingPlayer(String playerName, String gameName) {
@@ -710,7 +710,7 @@ public class JolAdmin {
             return false;
         }
 
-        ActivityService.pingPlayer(playerName, gameName);
+        PlayerGameActivityService.pingPlayer(playerName, gameName);
 
         //Ping on Discord
         PlayerInfo player = loadPlayerInfo(playerName);
@@ -746,7 +746,7 @@ public class JolAdmin {
     }
 
     public void clearPing(String playerName, String gameName) {
-        ActivityService.clearPing(playerName, gameName);
+        PlayerGameActivityService.clearPing(playerName, gameName);
     }
 
     public Set<String> getGames() {
@@ -935,7 +935,7 @@ public class JolAdmin {
         Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId());
         registrations.row(gameName).clear();
         games.remove(gameName);
-        ActivityService.clearGame(gameName);
+        PlayerGameActivityService.clearGame(gameName);
         pmap.values().forEach(playerModel -> playerModel.removeGame(gameName));
         gmap.remove(gameName);
         try {
@@ -1055,8 +1055,8 @@ public class JolAdmin {
     }
 
     public boolean isCurrent(String player, String game) {
-        OffsetDateTime playerAccess = ActivityService.getPlayerAccess(player, game);
-        OffsetDateTime gameLastUpdated = ActivityService.getGameTimestamp(game);
+        OffsetDateTime playerAccess = PlayerGameActivityService.getPlayerAccess(player, game);
+        OffsetDateTime gameLastUpdated = PlayerGameActivityService.getGameTimestamp(game);
         return playerAccess.isAfter(gameLastUpdated);
     }
 
@@ -1072,7 +1072,7 @@ public class JolAdmin {
     }
 
     public List<String> getPings(String gameName) {
-        var entry = ActivityService.getGameTimestamps().get(gameName);
+        var entry = PlayerGameActivityService.getGameTimestamps().get(gameName);
         if (entry == null) {
             return List.of();
         }

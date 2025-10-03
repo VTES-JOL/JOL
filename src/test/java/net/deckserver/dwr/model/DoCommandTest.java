@@ -35,9 +35,6 @@ public class DoCommandTest {
 
     @BeforeEach
     void setUp() {
-        // Clear the cache before each test to ensure clean state
-        ChatService.clearCache();
-
         game = ModelLoader.loadGame("command-test");
         worker = new DoCommand(game, new GameModel("Command Test", "command-test", true));
     }
