@@ -9,7 +9,9 @@ import net.deckserver.dwr.model.GameView;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.services.ChatService;
+import net.deckserver.services.DeckService;
 import net.deckserver.services.PlayerService;
+import net.deckserver.services.RegistrationService;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.ChatData;
 import org.directwebremoting.WebContextFactory;
@@ -53,7 +55,7 @@ public class DeckserverRemote {
         String playerName = getPlayer(request);
         PlayerModel model = admin.getPlayerModel(playerName);
         model.setDeckFilter(deckFilter);
-        return JolAdmin.INSTANCE.getDeckNames(playerName).stream()
+        return DeckService.getPlayerDeckNames(playerName).stream()
                 .map(deckName -> new DeckInfoBean(playerName, deckName))
                 .filter(deckInfoBean -> deckFilter.isEmpty() || deckInfoBean.getGameFormats().contains(deckFilter.toUpperCase()))
                 .sorted(Comparator.comparing(DeckInfoBean::getName, String.CASE_INSENSITIVE_ORDER))
@@ -73,7 +75,7 @@ public class DeckserverRemote {
     public Map<String, Object> invitePlayer(String game, String name) {
         String playerName = getPlayer(request);
         if (playerName != null) {
-            admin.invitePlayer(game, name);
+            RegistrationService.invitePlayer(game, name);
         }
         return UpdateFactory.getUpdate();
     }
@@ -175,7 +177,7 @@ public class DeckserverRemote {
     public Set<String> getGamePlayers(String gameName) {
         String playerName = getPlayer(request);
         if (gameName != null && !Strings.isNullOrEmpty(playerName)) {
-            return admin.getPlayers(gameName);
+            return RegistrationService.getPlayers(gameName);
         }
         return new HashSet<>();
     }
@@ -224,7 +226,7 @@ public class DeckserverRemote {
         String player = getPlayer(request);
         String gameId = admin.getGameId(gameName);
         // only process a command if the player is in the game
-        if (admin.isInGame(gameName, player)) {
+        if (RegistrationService.isInGame(gameName, player)) {
             ChatService.sendMessage(gameId, player, chat);
         }
         return UpdateFactory.getUpdate();
@@ -272,7 +274,7 @@ public class DeckserverRemote {
 
     public Map<String, Object> endPlayerTurn(String gameName) {
         String player = getPlayer(request);
-        boolean isPlaying = admin.getPlayers(gameName).contains(player);
+        boolean isPlaying = RegistrationService.getPlayers(gameName).contains(player);
         GameModel game = getModel(gameName);
         if (isPlaying) {
             game.endTurn(player);
@@ -282,7 +284,7 @@ public class DeckserverRemote {
 
     public Map<String, Object> endTurn(String gameName) {
         String player = getPlayer(request);
-        boolean isPlaying = admin.getPlayers(gameName).contains(player);
+        boolean isPlaying = RegistrationService.getPlayers(gameName).contains(player);
         boolean isAdmin = admin.isAdmin(player);
         if (!isPlaying && isAdmin) {
             admin.endTurn(gameName, player);
@@ -368,7 +370,6 @@ public class DeckserverRemote {
     public Map<String, Object> setMessage(String message) {
         String playerName = getPlayer(request);
         if (admin.isAdmin(playerName)) {
-            admin.setMessage(message);
         }
         return UpdateFactory.getUpdate();
     }

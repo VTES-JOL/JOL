@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.JolGame;
+import net.deckserver.services.RegistrationService;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,9 +36,9 @@ public class GameStatusBean {
         if (admin.isActive(gameName)) {
             this.gameStatus = "Active";
             registrations = Collections.emptyList();
-            this.players = admin.getPlayers(gameName).stream()
+            this.players = RegistrationService.getPlayers(gameName).stream()
                     .filter(playerName -> !Strings.isNullOrEmpty(playerName))
-                    .filter(playerName -> admin.isRegistered(gameName, playerName))
+                    .filter(playerName -> RegistrationService.isRegistered(gameName, playerName))
                     .map(playerName -> new PlayerStatus(gameName, playerName))
                     .collect(Collectors.toMap(PlayerStatus::getPlayerName, Function.identity()));
             JolGame game = admin.getGame(gameName);
@@ -48,7 +49,7 @@ public class GameStatusBean {
         } else {
             this.gameStatus = "Inviting";
             players = Collections.emptyMap();
-            registrations = admin.getPlayers(gameName).stream()
+            registrations = RegistrationService.getPlayers(gameName).stream()
                     .filter(playerName -> !Strings.isNullOrEmpty(playerName))
                     .map(playerName -> new RegistrationStatus(gameName, playerName))
                     .collect(Collectors.toList());

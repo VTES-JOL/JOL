@@ -9,16 +9,11 @@ package net.deckserver;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
 import io.azam.ulidj.ULID;
-import lombok.Getter;
-import lombok.Setter;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.JolGame;
 import net.deckserver.dwr.model.ModelLoader;
@@ -28,10 +23,7 @@ import net.deckserver.game.validators.DeckValidator;
 import net.deckserver.game.validators.ValidationResult;
 import net.deckserver.game.validators.ValidatorFactory;
 import net.deckserver.jobs.GameDataConversion;
-import net.deckserver.jobs.PublicGamesBuilderJob;
-import net.deckserver.jobs.ValidateGWJob;
 import net.deckserver.services.*;
-import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
@@ -60,11 +52,7 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static net.deckserver.services.GameService.*;
@@ -80,9 +68,6 @@ public class JolAdmin {
                     "https://discord.com/api/v%s/channels/%s/messages",
                     System.getenv("DISCORD_API_VERSION"),
                     System.getenv("DISCORD_PING_CHANNEL_ID")));
-    private static final Predicate<DeckInfo> MODERN_DECK = info -> DeckFormat.MODERN.equals(info.getFormat());
-    private static final Predicate<DeckInfo> NO_TAGS = info -> info.getGameFormats().isEmpty();
-    private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
     private static final DecimalFormat format = new DecimalFormat("0.#");
 
     static {
@@ -90,8 +75,6 @@ public class JolAdmin {
     }
 
     private final Path BASE_PATH;
-    private final Table<String, String, RegistrationStatus> registrations = HashBasedTable.create();
-    private final Table<String, String, DeckInfo> decks = HashBasedTable.create();
     private final ObjectMapper objectMapper;
     private final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
     private final Map<String, PlayerModel> pmap = new ConcurrentHashMap<>();
@@ -103,7 +86,6 @@ public class JolAdmin {
             .version(HttpClient.Version.HTTP_2)
             .connectTimeout(Duration.ofSeconds(5))
             .build();
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
             .expireAfterAccess(30, TimeUnit.MINUTES)
             .build(this::loadGameState);
@@ -111,9 +93,6 @@ public class JolAdmin {
     private Map<OffsetDateTime, GameHistory> pastGames;
     private TournamentData tournamentRegistrations;
     private TypeFactory typeFactory;
-    @Getter
-    @Setter
-    private String message;
 
     public JolAdmin(String dir) {
         this.BASE_PATH = Paths.get(dir);
@@ -140,30 +119,9 @@ public class JolAdmin {
         return this.pastGames;
     }
 
-    public void loadRegistrations() {
-        MapType registrationMapType = typeFactory.constructMapType(Map.class, String.class, RegistrationStatus.class);
-        Map<String, Map<String, RegistrationStatus>> registrationsMap = readFile("registrations.json", typeFactory.constructMapType(ConcurrentHashMap.class, typeFactory.constructType(String.class), registrationMapType));
-        registrationsMap.forEach((gameId, gameMap) -> {
-            gameMap.forEach((playerId, registration) -> {
-                registrations.put(gameId, playerId, registration);
-            });
-        });
-    }
-
-    public void loadDecks() {
-        MapType deckMapType = typeFactory.constructMapType(Map.class, String.class, DeckInfo.class);
-        Map<String, Map<String, DeckInfo>> decksMapFile = readFile("decks.json", typeFactory.constructMapType(ConcurrentHashMap.class, typeFactory.constructType(String.class), deckMapType));
-        decksMapFile.forEach((playerName, decksMap) -> {
-            decksMap.forEach((deckName, deckInfo) -> decks.put(playerName, deckName, deckInfo));
-        });
-    }
-
     public synchronized void persistState() {
-        writeFile("registrations.json", registrations);
-        writeFile("decks.json", decks);
         writeFile("pastGames.json", pastGames);
         writeFile("tournament.json", tournamentRegistrations);
-        writeFile("message.json", message);
     }
 
     public synchronized void buildPublicGames() {
@@ -234,7 +192,6 @@ public class JolAdmin {
     public void shutdown() {
         try {
             persistState();
-            scheduler.shutdownNow();
         } catch (Exception e) {
             logger.error("Unable to cleanly shutdown", e);
         }
@@ -244,29 +201,10 @@ public class JolAdmin {
         typeFactory = objectMapper.getTypeFactory();
         pastGames = readFile("pastGames.json", typeFactory.constructMapType(ConcurrentHashMap.class, OffsetDateTime.class, GameHistory.class));
         tournamentRegistrations = readFile("tournament.json", typeFactory.constructType(TournamentData.class));
-        message = readFile("message.json", typeFactory.constructType(String.class));
-        loadRegistrations();
-        loadDecks();
         loadProperties();
-        if (System.getenv().getOrDefault("ENABLE_GAMES_BUILDER", "false").equals("true")) {
-            scheduler.scheduleAtFixedRate(new PublicGamesBuilderJob(), 1, 10, TimeUnit.MINUTES);
-        }
-        scheduler.scheduleAtFixedRate(new ValidateGWJob(), 1, 1, TimeUnit.DAYS);
     }
 
     public void validate() {
-        logger.info("Validating deck state");
-        List<Table.Cell<String, String, DeckInfo>> invalidDecks = new ArrayList<>();
-        for (var cell : decks.cellSet()) {
-            DeckInfo deckInfo = cell.getValue();
-            String extension = DeckFormat.LEGACY.equals(deckInfo.getFormat()) ? "txt" : "json";
-            String deckFile = String.format("decks/%s.%s", deckInfo.getDeckId(), extension);
-            if (!Files.exists(BASE_PATH.resolve(deckFile))) {
-                logger.error("Unable to find deck {} for {}", deckFile, cell.getRowKey());
-                invalidDecks.add(cell);
-            }
-        }
-        invalidDecks.forEach(cell -> decks.remove(cell.getRowKey(), cell.getColumnKey()));
     }
 
     public void upgrade() {
@@ -285,18 +223,6 @@ public class JolAdmin {
                     gameInfo.setVersion(GameInfo.Version.GAME_STATE);
                 });
         persistState();
-
-        decks.values().stream()
-                .filter(MODERN_DECK)
-                .filter(NO_TAGS)
-                .filter(Objects::nonNull)
-                .forEach(deckInfo -> {
-                    ExtendedDeck deck = getDeck(deckInfo.getDeckId());
-                    Set<String> tags = ValidatorFactory.getTags(deck.getDeck());
-                    deckInfo.setGameFormats(tags);
-                    deckInfo.setFormat(DeckFormat.TAGGED);
-                    logger.info("Upgrading {} to {} with {} tags", deckInfo.getDeckId(), deckInfo.getFormat(), tags);
-                });
     }
 
     public String getVersion() {
@@ -316,28 +242,13 @@ public class JolAdmin {
     }
 
     public synchronized Deck getGameDeck(String gameName, String playerName) {
-        return Optional.ofNullable(registrations.get(gameName, playerName))
+        return Optional.ofNullable(RegistrationService.get(gameName, playerName))
                 .map(status -> {
                     String deckId = status.getDeckId();
                     String gameId = getGameId(gameName);
                     ExtendedDeck extendedDeck = readFile(String.format("games/%s/%s.json", gameId, deckId), typeFactory.constructType(ExtendedDeck.class));
                     return extendedDeck.getDeck();
                 }).orElse(null);
-    }
-
-    public String getDeckContents(String deckId) throws IOException {
-        ExtendedDeck deck = getDeck(deckId);
-        StringBuilder builder = new StringBuilder();
-        Consumer<CardCount> itemBuilder = cardCount -> builder.append(cardCount.getCount()).append(" x ").append(cardCount.getName()).append("\n");
-        deck.getDeck().getCrypt().getCards().forEach(itemBuilder);
-        builder.append("\n");
-        deck.getDeck().getLibrary().getCards().forEach(libraryCard -> libraryCard.getCards().forEach(itemBuilder));
-        return builder.toString();
-    }
-
-    public String getLegacyContents(String deckId) throws IOException {
-        Path deckPath = BASE_PATH.resolve("decks").resolve(deckId + ".txt");
-        return Files.readString(deckPath);
     }
 
     public synchronized void selectDeck(String playerName, String deckName) {
@@ -361,10 +272,10 @@ public class JolAdmin {
             playerModel.setDeck(deck);
             playerModel.setContents(contents);
             Set<String> tags = ValidatorFactory.getTags(deck.getDeck());
-            DeckInfo deckInfo = Optional.ofNullable(decks.get(playerName, deckName)).orElse(new DeckInfo(ULID.random(), deckName, DeckFormat.TAGGED, tags));
+            DeckInfo deckInfo = Optional.ofNullable(DeckService.get(playerName, deckName)).orElse(new DeckInfo(ULID.random(), deckName, DeckFormat.TAGGED, tags));
             deckInfo.setFormat(DeckFormat.MODERN);
             deckInfo.setGameFormats(tags);
-            decks.put(playerName, deckName, deckInfo);
+            DeckService.addDeck(playerName, deckName, deckInfo);
             writeFile(String.format("decks/%s.json", deckInfo.getDeckId()), deck);
         }
     }
@@ -372,7 +283,7 @@ public class JolAdmin {
     public synchronized void deleteDeck(String playerName, String deckName) {
         if (playerName != null && deckName != null) {
             getPlayerModel(playerName).clearDeck();
-            this.decks.remove(playerName, deckName);
+            DeckService.remove(playerName, deckName);
         }
     }
 
@@ -391,14 +302,6 @@ public class JolAdmin {
         ModelLoader.saveGame(game);
     }
 
-    public long getRegisteredPlayerCount(String gameName) {
-        return registrations.row(gameName).values().stream().filter(IS_REGISTERED).count();
-    }
-
-    public RegistrationStatus getRegistration(String gameName, String playerName) {
-        return registrations.get(gameName, playerName);
-    }
-
     public synchronized void registerTournamentMultiDeck(String playerName, String... playerDecks) {
         PlayerInfo playerInfo = PlayerService.get(playerName);
         String result = "Successfully registered for tournament";
@@ -409,7 +312,7 @@ public class JolAdmin {
             registration.setPlayerName(playerName);
             registration.setVeknId(playerInfo.getVeknId());
             for (String deckName : playerDecks) {
-                DeckInfo deckInfo = decks.get(playerName, deckName);
+                DeckInfo deckInfo = DeckService.get(playerName, deckName);
                 if (deckInfo == null) {
                     result = "Unable to find deck " + deckName;
                     throw new IllegalStateException(result);
@@ -446,13 +349,12 @@ public class JolAdmin {
         registration.setDeckName(deckName);
         registration.setValid(true);
         registration.setTimestamp(OffsetDateTime.now());
-        registrations.put(gameName, playerName, registration);
-        writeFile("registrations.json", registrations);
+        RegistrationService.put(gameName, playerName, registration);
     }
 
     public synchronized void registerDeck(String gameName, String playerName, String deckName) {
         deckName = deckName.trim();
-        DeckInfo deckInfo = decks.get(playerName, deckName);
+        DeckInfo deckInfo = DeckService.get(playerName, deckName);
         GameInfo gameInfo = GameService.get(gameName);
         String result = "Successfully registered " + deckName + " in game " + gameName;
         try {
@@ -468,16 +370,16 @@ public class JolAdmin {
                 result = "Unable to register legacy formats in new games.  Please edit, and save deck to convert to new format.";
                 throw new IllegalStateException(result);
             }
-            if (getRegisteredPlayerCount(gameName) >= 5) {
+            if (RegistrationService.getRegisteredPlayerCount(gameName) >= 5) {
                 result = "Unable to register deck.  Already has 5 players registered.";
                 throw new IllegalStateException(result);
             }
-            ExtendedDeck extendedDeck = getDeck(deckInfo.getDeckId());
+            ExtendedDeck extendedDeck = DeckService.getDeck(deckInfo.getDeckId());
             if (!validateDeck(extendedDeck.getDeck(), gameInfo.getGameFormat()).isValid()) {
                 result = "Unable to register deck.  Not valid for defined format.";
                 throw new IllegalStateException(result);
             }
-            RegistrationStatus registrationStatus = registrations.get(gameName, playerName);
+            RegistrationStatus registrationStatus = RegistrationService.get(gameName, playerName);
             if (registrationStatus == null) {
                 result = "Unable to register deck in game that has no invite";
                 throw new IllegalStateException(result);
@@ -495,7 +397,7 @@ public class JolAdmin {
             // Reset game time to current time to extend idle timeout
             gameInfo.setCreated(OffsetDateTime.now());
 
-            long registeredPlayers = getRegisteredPlayerCount(gameName);
+            long registeredPlayers = RegistrationService.getRegisteredPlayerCount(gameName);
             if (registeredPlayers == gameInfo.getGameFormat().getPlayerCount()) {
                 startGame(gameName);
             }
@@ -582,14 +484,6 @@ public class JolAdmin {
         return GameService.getGameNames();
     }
 
-    public Set<String> getGameNames(String playerName) {
-        return registrations.column(playerName).keySet();
-    }
-
-    public synchronized Set<String> getPlayers(String gameName) {
-        return registrations.row(gameName).keySet();
-    }
-
     public String getEmail(String player) {
         return PlayerService.get(player).getEmail();
     }
@@ -637,30 +531,10 @@ public class JolAdmin {
         return playerName;
     }
 
-    public Set<String> getDeckNames(String playerName) {
-        return decks.row(playerName).keySet();
-    }
-
-    public Set<String> getPlayers() {
-        return PlayerService.getPlayers();
-    }
-
-    public synchronized void invitePlayer(String gameName, String playerName) {
-        registrations.put(gameName, playerName, new RegistrationStatus(OffsetDateTime.now()));
-    }
-
     public synchronized void unInvitePlayer(String gameName, String playerName) {
         if (isStarting(gameName)) {
-            registrations.remove(gameName, playerName);
+            RegistrationService.remove(gameName, playerName);
         }
-    }
-
-    public synchronized boolean isInGame(String gameName, String playerName) {
-        return registrations.contains(gameName, playerName);
-    }
-
-    public boolean isRegistered(String gameName, String playerName) {
-        return registrations.contains(gameName, playerName) && Objects.requireNonNull(registrations.get(gameName, playerName)).getDeckId() != null;
     }
 
     public synchronized boolean isStarting(String gameName) {
@@ -688,7 +562,7 @@ public class JolAdmin {
         GameData gameData = new GameData(gameInfo.getId(), gameName);
         JolGame game = new JolGame(gameInfo.getId(), gameData);
         game.initGame(gameName);
-        registrations.row(gameName).forEach((playerName, registration) -> {
+        RegistrationService.getGameRegistrations(gameName).forEach((playerName, registration) -> {
             if (registration.getDeckId() != null) {
                 Deck deck = getGameDeck(gameName, playerName);
                 game.addPlayer(playerName, deck);
@@ -703,7 +577,7 @@ public class JolAdmin {
 
     public synchronized void startGame(String gameName) {
         List<String> players = new ArrayList<>();
-        registrations.row(gameName).forEach((playerName, registration) -> {
+        RegistrationService.getGameRegistrations(gameName).forEach((playerName, registration) -> {
             if (registration.getDeckId() != null) {
                 players.add(playerName);
             }
@@ -729,7 +603,7 @@ public class JolAdmin {
                 boolean hasVp = false;
                 for (String player : gameData.getPlayers()) {
                     PlayerResult result = new PlayerResult();
-                    String deckName = Optional.ofNullable(registrations.get(gameName, player)).map(RegistrationStatus::getDeckName).orElse("-- no deck name --");
+                    String deckName = Optional.ofNullable(RegistrationService.get(gameName, player)).map(RegistrationStatus::getDeckName).orElse("-- no deck name --");
                     double victoryPoints = gameData.getVictoryPoints(player);
                     if (victoryPoints > 0) {
                         hasVp = true;
@@ -760,7 +634,7 @@ public class JolAdmin {
         }
         // Clear out data
         Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId());
-        registrations.row(gameName).clear();
+        RegistrationService.remove(gameName);
         GameService.remove(gameName);
         PlayerGameActivityService.clearGame(gameName);
         pmap.values().forEach(playerModel -> playerModel.removeGame(gameName));
@@ -773,7 +647,7 @@ public class JolAdmin {
     }
 
     public String getDeckId(String playerName, String deckName) {
-        return decks.get(playerName, deckName).getDeckId();
+        return DeckService.get(playerName, deckName).getDeckId();
     }
 
     public String getGameId(String gameName) {
@@ -814,8 +688,8 @@ public class JolAdmin {
     }
 
     public synchronized void replacePlayer(String gameName, String existingPlayer, String newPlayer) {
-        RegistrationStatus existingRegistration = registrations.get(gameName, existingPlayer);
-        RegistrationStatus newRegistration = registrations.get(gameName, newPlayer);
+        RegistrationStatus existingRegistration = RegistrationService.get(gameName, existingPlayer);
+        RegistrationStatus newRegistration = RegistrationService.get(gameName, newPlayer);
         // Only replace player if existing player is in the game, and the new player isn't
         if (existingRegistration != null && newRegistration == null) {
             JolGame game = getGame(gameName);
@@ -823,13 +697,13 @@ public class JolAdmin {
             saveGameState(game);
             getGameModel(gameName).resetView(existingPlayer);
             // Set up the registrations
-            registrations.put(gameName, newPlayer, existingRegistration);
-            registrations.remove(gameName, existingPlayer);
+            RegistrationService.put(gameName, newPlayer, existingRegistration);
+            RegistrationService.remove(gameName, existingPlayer);
         }
     }
 
     public synchronized void deletePLayer(String playerName) {
-        Map<String, RegistrationStatus> playerRegistrations = registrations.column(playerName);
+        Map<String, RegistrationStatus> playerRegistrations = RegistrationService.getPlayerRegistrations(playerName);
         if (playerRegistrations.isEmpty()) {
             logger.info("Deleting unused player {}", playerName);
             archivePlayer(playerName);
@@ -920,10 +794,6 @@ public class JolAdmin {
         model.setContents(contents);
     }
 
-    public ExtendedDeck getDeck(String deckId) {
-        return readFile(String.format("decks/%s.json", deckId), typeFactory.constructType(ExtendedDeck.class));
-    }
-
     public List<GameFormat> getAvailableGameFormats(String playerName) {
         Set<PlayerRole> roles = PlayerService.get(playerName).getRoles();
         List<GameFormat> formats = new ArrayList<>(EnumSet.of(GameFormat.STANDARD, GameFormat.V5, GameFormat.DUEL));
@@ -997,7 +867,7 @@ public class JolAdmin {
     private void archivePlayer(String playerName) {
         Path archivePath = BASE_PATH.resolve("archives");
         PlayerInfo playerInfo = PlayerService.get(playerName);
-        Map<String, DeckInfo> playerDecks = decks.row(playerName);
+        Map<String, DeckInfo> playerDecks = DeckService.getPlayerDecks(playerName);
         try {
             if (!Files.exists(archivePath)) {
                 Files.createDirectory(archivePath);
@@ -1049,7 +919,7 @@ public class JolAdmin {
     }
 
     private DeckInfo loadDeckInfo(String playerName, String deckName) {
-        return decks.get(playerName, deckName);
+        return DeckService.get(playerName, deckName);
     }
 
     private JolGame loadGameState(String gameName) {

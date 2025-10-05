@@ -3,6 +3,7 @@ package net.deckserver.dwr.model;
 import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.services.ChatService;
+import net.deckserver.services.RegistrationService;
 import net.deckserver.storage.json.game.ChatData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -118,7 +119,7 @@ public class GameModel implements Comparable<GameModel> {
     }
 
     public synchronized Set<String> getPlayers() {
-        return JolAdmin.INSTANCE.getPlayers(name);
+        return RegistrationService.getPlayers(name);
     }
 
     public int compareTo(GameModel arg0) {

@@ -15,15 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerActivityService extends PersistedService {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    static {
-        objectMapper.findAndRegisterModules();
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-    }
     private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "player-timestamps.json");
     private static final PlayerActivityService INSTANCE = new PlayerActivityService();
-
 
     private final Map<String, OffsetDateTime> playerTimestamps = new ConcurrentHashMap<>();
 

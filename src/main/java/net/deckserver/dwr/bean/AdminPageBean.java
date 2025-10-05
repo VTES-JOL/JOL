@@ -3,6 +3,7 @@ package net.deckserver.dwr.bean;
 import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
+import net.deckserver.services.PlayerService;
 
 import java.time.OffsetDateTime;
 import java.util.Comparator;
@@ -20,7 +21,7 @@ public class AdminPageBean {
 
     public AdminPageBean(PlayerModel model) {
         JolAdmin admin = JolAdmin.INSTANCE;
-        List<String> currentPlayers = admin.getPlayers().stream().sorted().toList();
+        List<String> currentPlayers = PlayerService.getPlayers().stream().sorted().toList();
         List<PlayerActivityStatus> playerActivityStatuses = currentPlayers.stream()
                 .map(PlayerActivityStatus::new)
                 .sorted(Comparator.comparing(PlayerActivityStatus::getName, String.CASE_INSENSITIVE_ORDER))

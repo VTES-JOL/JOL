@@ -3,6 +3,7 @@ package net.deckserver.dwr.bean;
 import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
+import net.deckserver.services.RegistrationService;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,8 +24,8 @@ public class MainBean {
         String playerName = model.getPlayerName();
         loggedIn = model.getPlayerName() != null;
         if (loggedIn) {
-            List<GameStatusBean> games = jolAdmin.getGameNames(playerName).stream()
-                    .filter(gameName -> jolAdmin.isRegistered(gameName, playerName))
+            List<GameStatusBean> games = RegistrationService.getRegisteredGames(playerName).stream()
+                    .filter(gameName -> RegistrationService.isRegistered(gameName, playerName))
                     .filter(jolAdmin::isActive)
                     .map(GameStatusBean::new)
                     .sorted(Comparator.comparing(GameStatusBean::getName))

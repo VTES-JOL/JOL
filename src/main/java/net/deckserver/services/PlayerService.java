@@ -17,12 +17,6 @@ import java.util.Set;
 
 public class PlayerService extends PersistedService {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    static {
-        objectMapper.findAndRegisterModules();
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-    }
     private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "players.json");
     private static final PlayerService INSTANCE = new PlayerService();
 

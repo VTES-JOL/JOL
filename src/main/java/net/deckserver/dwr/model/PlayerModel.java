@@ -6,8 +6,9 @@ import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.game.enums.DeckFormat;
 import net.deckserver.game.enums.GameFormat;
-import net.deckserver.services.ChatService;
+import net.deckserver.services.DeckService;
 import net.deckserver.services.GlobalChatService;
+import net.deckserver.services.RegistrationService;
 import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import org.slf4j.Logger;
@@ -59,7 +60,7 @@ public class PlayerModel {
 
     public void enterGame(String gameName) {
         setView("game");
-        if (JolAdmin.INSTANCE.isInGame(gameName, player)) {
+        if (RegistrationService.isInGame(gameName, player)) {
             games.add(gameName);
         }
         if (!gameName.equals(this.game)) {
@@ -103,11 +104,11 @@ public class PlayerModel {
             String deckId = admin.getDeckId(player, deckName);
             DeckFormat deckFormat = admin.getDeckFormat(player, deckName);
             if (deckFormat.equals(DeckFormat.LEGACY)) {
-                this.contents = admin.getLegacyContents(deckId).trim();
+                this.contents = DeckService.getLegacyContents(deckId).trim();
                 this.deck = DeckParser.parseDeck(contents);
             } else {
-                this.contents = admin.getDeckContents(deckId).trim();
-                this.deck = admin.getDeck(deckId);
+                this.contents = DeckService.getDeckContents(deckId).trim();
+                this.deck = DeckService.getDeck(deckId);
             }
             this.deck.getDeck().setName(deckName);
         } catch (IOException e) {

@@ -1,5 +1,7 @@
 package net.deckserver.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +19,12 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class PersistedService {
 
+    protected static final ObjectMapper objectMapper = new ObjectMapper();
+    static {
+        objectMapper.findAndRegisterModules();
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+    }
     protected final Logger logger;
     protected final String serviceName;
     protected final boolean testModeEnabled;

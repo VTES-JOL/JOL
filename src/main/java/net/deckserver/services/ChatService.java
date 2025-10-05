@@ -20,16 +20,9 @@ import java.util.concurrent.TimeUnit;
 public class ChatService extends PersistedService {
 
     private static final ChatService INSTANCE = new ChatService();
-    private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
 
     private final LoadingCache<String, TurnHistory> historyCache;
-
-    static {
-        objectMapper.findAndRegisterModules();
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-    }
 
     private ChatService() {
         super("ChatService", 5); // 5 minute persistence interval

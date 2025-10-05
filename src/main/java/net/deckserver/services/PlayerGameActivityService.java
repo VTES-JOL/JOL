@@ -1,8 +1,6 @@
 package net.deckserver.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import net.deckserver.storage.json.game.GameTimestampEntry;
 
 import java.io.IOException;
@@ -16,12 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerGameActivityService extends PersistedService {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    static {
-        objectMapper.findAndRegisterModules();
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-    }
     private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "game-timestamps.json");
     private static final PlayerGameActivityService INSTANCE = new PlayerGameActivityService();
 

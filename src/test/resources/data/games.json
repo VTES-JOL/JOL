@@ -1,12 +1,12 @@
 {
-  "Test Game": {
-    "name": "Test Game",
-    "id": "01K6CP9GMWMG78RERJVA2QM0R3",
-    "owner": "Player5",
-    "visibility": "PUBLIC",
-    "status": "ACTIVE",
-    "gameFormat": "Standard",
-    "created": "2025-09-30T06:59:53.188022Z",
-    "version": "GAME_STATE"
+  "Test Game" : {
+    "name" : "Test Game",
+    "id" : "01K6CP9GMWMG78RERJVA2QM0R3",
+    "owner" : "Player5",
+    "visibility" : "PUBLIC",
+    "status" : "ACTIVE",
+    "gameFormat" : "Standard",
+    "created" : "2025-09-30T06:59:53.188022Z",
+    "version" : "GAME_STATE"
   }
 }

@@ -12,7 +12,7 @@ import java.util.Objects;
 public class DuelDeckValidator extends StandardDeckValidator {
 
     private static final List<String> validNames;
-    private final static int MIN_CRYPT = 12;
+    private final static int MIN_CRYPT = 6;
     private final static int MIN_LIBRARY = 40;
     private final static int MAX_LIBRARY = 60;
 
@@ -23,6 +23,9 @@ public class DuelDeckValidator extends StandardDeckValidator {
     @Override
     public ValidationResult validate(Deck deck) {
         ValidationResult result = new ValidationResult();
+        if (deck == null) {
+            return result;
+        }
         int cryptCount = deck.getCrypt().getCount();
         int libraryCount = deck.getLibrary().getCount();
         if (cryptCount < MIN_CRYPT) {

@@ -26,12 +26,6 @@ public class GameService extends PersistedService {
     public static final Predicate<GameInfo> PUBLIC_GAME = info -> info.getVisibility().equals(Visibility.PUBLIC);
     public static final Predicate<GameInfo> ACTIVE_GAME = (info) -> info.getStatus().equals(GameStatus.ACTIVE);
     private static final Logger logger = LoggerFactory.getLogger(GameService.class);
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    static {
-        objectMapper.findAndRegisterModules();
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-    }
     private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "games.json");
     private static final GameService INSTANCE = new GameService();
 

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.DeckFormat;
+import net.deckserver.services.DeckService;
+import net.deckserver.services.RegistrationService;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,12 +26,12 @@ public class PlayerActivityStatus {
         JolAdmin admin = JolAdmin.INSTANCE;
         this.name = name;
         this.lastOnline = admin.getPlayerAccess(name);
-        Map<DeckFormat, Long> collect = admin.getDeckNames(name)
+        Map<DeckFormat, Long> collect = DeckService.getPlayerDeckNames(name)
                 .stream()
                 .collect(Collectors.groupingBy(deckName -> admin.getDeckFormat(name, deckName), () -> new EnumMap<>(DeckFormat.class), Collectors.counting()));
         legacyDeckCount = Optional.ofNullable(collect.get(DeckFormat.LEGACY)).orElse(0L);
         modernDeckCount = Optional.ofNullable(collect.get(DeckFormat.MODERN)).orElse(0L);
-        activeGamesCount = admin.getGameNames(name).size();
+        activeGamesCount = RegistrationService.getPlayerGames(name).size();
     }
 
     @JsonIgnore

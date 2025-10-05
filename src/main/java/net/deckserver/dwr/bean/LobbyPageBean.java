@@ -4,6 +4,9 @@ import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.DeckFormat;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.services.DeckService;
+import net.deckserver.services.PlayerService;
+import net.deckserver.services.RegistrationService;
 
 import java.time.OffsetDateTime;
 import java.util.Comparator;
@@ -29,7 +32,7 @@ public class LobbyPageBean {
         playtester = admin.isPlaytester(player);
         gameFormats = admin.getAvailableGameFormats(player).stream().map(GameFormat::getLabel).toList();
 
-        players = admin.getPlayers().stream()
+        players = PlayerService.getPlayers().stream()
                 .sorted()
                 .map(PlayerActivityStatus::new)
                 .filter(playerActivityStatus -> playerActivityStatus.online().isAfter(currentMonth))
@@ -57,11 +60,11 @@ public class LobbyPageBean {
         invitedGames = admin.getGameNames().stream()
                 .filter(Objects::nonNull)
                 .filter(admin::isStarting)
-                .filter(gameName -> admin.isInGame(gameName, player))
+                .filter(gameName -> RegistrationService.isInGame(gameName, player))
                 .map(gameName -> new GameInviteStatus(gameName, player))
                 .collect(Collectors.toList());
 
-        decks = admin.getDeckNames(player).stream()
+        decks = DeckService.getPlayerDeckNames(player).stream()
                 .filter(Objects::nonNull)
                 .map(deckName -> new DeckInfoBean(player, deckName))
                 .filter(deckInfoBean -> !deckInfoBean.getDeckFormat().equals(DeckFormat.LEGACY.toString()))

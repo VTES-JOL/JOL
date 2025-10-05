@@ -3,6 +3,7 @@ package net.deckserver.dwr.bean;
 import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
+import net.deckserver.services.RegistrationService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +17,6 @@ public class NavBean {
     private final List<String> buttons = new ArrayList<>();
     private final String player;
     private final String target;
-    private final String message;
     private final String stamp;
     private boolean chats;
     private String game = null;
@@ -38,7 +38,7 @@ public class NavBean {
             if (isAdmin) {
                 buttons.add("admin:Admin");
             }
-            admin.getGameNames(player).stream()
+            RegistrationService.getPlayerGames(player).stream()
                     .filter(admin::isActive)
                     .filter(game -> admin.isAlive(game, player))
                     .forEach(game -> {
@@ -46,7 +46,6 @@ public class NavBean {
                         gameButtons.put("g" + game, game + current);
                     });
         }
-        message = JolAdmin.INSTANCE.getMessage();
         stamp = JolAdmin.getDate();
     }
 

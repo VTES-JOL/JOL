@@ -5,6 +5,7 @@ import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.DeckFormat;
+import net.deckserver.services.DeckService;
 import net.deckserver.storage.json.system.TournamentRegistration;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class TournamentBean {
         String player = model.getPlayerName();
         JolAdmin jolAdmin = JolAdmin.INSTANCE;
         this.idValid = !Strings.isNullOrEmpty(jolAdmin.getVeknID(player));
-        this.decks = jolAdmin.getDeckNames(model.getPlayerName()).stream()
+        this.decks = DeckService.getPlayerDeckNames(model.getPlayerName()).stream()
                 .filter(deckName -> jolAdmin.getDeckFormat(player, deckName) == DeckFormat.MODERN)
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .collect(Collectors.toList());

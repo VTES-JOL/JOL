@@ -31,6 +31,9 @@ public class StandardDeckValidator extends AbstractDeckValidator {
 
     public ValidationResult validate(Deck deck, boolean includePlaytestCards) {
         ValidationResult result = new ValidationResult();
+        if (deck == null) {
+            return result;
+        }
         Set<String> groups = getGroups(deck);
         int cryptCount = deck.getCrypt().getCount();
         int libraryCount = deck.getLibrary().getCount();

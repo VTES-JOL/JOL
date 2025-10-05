@@ -22,6 +22,9 @@ public class V5DeckValidator extends StandardDeckValidator {
     @Override
     public ValidationResult validate(Deck deck) {
         ValidationResult result = super.validate(deck);
+        if (deck == null) {
+            return result;
+        }
         Set<String> cardsInInvalidSets = checkAgainstWhitelist(deck, sets);
         Set<String> invalidCards = checkAgainstWhitelist(cardsInInvalidSets, cards);
         invalidCards.stream()
