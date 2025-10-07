@@ -50,8 +50,4 @@ public class PlayerData {
     public void addVictoryPoints(float points) {
         this.victoryPoints += points;
     }
-
-    public void removeVictoryPoints(float points) {
-        this.victoryPoints -= points;
-    }
 }

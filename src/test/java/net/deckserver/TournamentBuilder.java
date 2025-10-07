@@ -43,10 +43,6 @@ public class TournamentBuilder {
     @Test
     @Disabled
     public void testBuildTournament() throws Exception {
-
-        JolAdmin admin = JolAdmin.INSTANCE;
-        admin.setup();
-        assertNotNull(admin);
         Path tournamentFilePath = Paths.get(System.getenv("JOL_DATA")).resolve("tournament.json");
         TournamentData data = objectMapper.readValue(tournamentFilePath.toFile(), TournamentData.class);
         assertNotNull(data);
@@ -54,8 +50,8 @@ public class TournamentBuilder {
             List<List<String>> tables = data.getTables().get(round - 1);
             for (int table = 1; table <= tables.size(); table++) {
                 String gameName = String.format("Cardinal Benediction: Round %d - Table %d", round, table);
-                if (admin.notExistsGame(gameName)) {
-                    admin.createGame(gameName, false, GameFormat.STANDARD, "TOURNAMENT");
+                if (JolAdmin.notExistsGame(gameName)) {
+                    JolAdmin.createGame(gameName, false, GameFormat.STANDARD, "TOURNAMENT");
                 }
                 // Register players
                 List<String> players = tables.get(table - 1);
@@ -65,9 +61,9 @@ public class TournamentBuilder {
                     assertTrue(PlayerService.existsPlayer(player));
                     String deckName = data.getRegistrations().get(player).getDecks().getFirst();
                     assertNotNull(deckName);
-                    admin.registerTournamentDeck(gameName, player, deckName, round);
+                    //admin.registerTournamentDeck(gameName, player, deckName, round);
                 }
-                admin.startGame(gameName, players);
+                JolAdmin.startGame(gameName, players);
             }
         }
     }

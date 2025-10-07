@@ -6,10 +6,6 @@
 
 package net.deckserver;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -22,91 +18,46 @@ import net.deckserver.game.enums.*;
 import net.deckserver.game.validators.DeckValidator;
 import net.deckserver.game.validators.ValidationResult;
 import net.deckserver.game.validators.ValidatorFactory;
-import net.deckserver.jobs.GameDataConversion;
 import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.GameData;
 import net.deckserver.storage.json.system.*;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.math.RoundingMode;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
-import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-import static net.deckserver.services.GameService.*;
 
 public class JolAdmin {
 
-    public static final JolAdmin INSTANCE = new JolAdmin(System.getenv("JOL_DATA"));
     private static final Logger logger = LoggerFactory.getLogger(JolAdmin.class);
-    private static final String DISCORD_AUTHORIZATION_HEADER = String.format(
-            "Bot %s", System.getenv("DISCORD_BOT_TOKEN"));
-    private static final URI DISCORD_PING_CHANNEL_URI = URI.create(
-            String.format(
-                    "https://discord.com/api/v%s/channels/%s/messages",
-                    System.getenv("DISCORD_API_VERSION"),
-                    System.getenv("DISCORD_PING_CHANNEL_ID")));
-    private static final DecimalFormat format = new DecimalFormat("0.#");
 
-    static {
-        format.setRoundingMode(RoundingMode.DOWN);
-    }
-
-    private final Path BASE_PATH;
-    private final ObjectMapper objectMapper;
-    private final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
-    private final Map<String, PlayerModel> pmap = new ConcurrentHashMap<>();
+    private static final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
+    private static final Map<String, PlayerModel> pmap = new ConcurrentHashMap<>();
     // Cache of users / status
-    private final Cache<String, String> activeUsers = Caffeine.newBuilder()
+    private static final Cache<String, String> activeUsers = Caffeine.newBuilder()
             .expireAfterWrite(5, TimeUnit.MINUTES)
             .build();
-    private final HttpClient discord = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_2)
-            .connectTimeout(Duration.ofSeconds(5))
-            .build();
-    private final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
+    private static final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
             .expireAfterAccess(30, TimeUnit.MINUTES)
-            .build(this::loadGameState);
-    private Properties properties;
-    private Map<OffsetDateTime, GameHistory> pastGames;
-    private TournamentData tournamentRegistrations;
-    private TypeFactory typeFactory;
-
-    public JolAdmin(String dir) {
-        this.BASE_PATH = Paths.get(dir);
-        objectMapper = new ObjectMapper();
-        objectMapper.findAndRegisterModules();
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
+            .build(JolAdmin::loadGameState);
 
     public static String getDate() {
         return OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
     }
 
-    public int getRefreshInterval(String gameName) {
-        OffsetDateTime lastChanged = getGameTimeStamp(gameName);
+    public static int getRefreshInterval(String gameName) {
+        OffsetDateTime lastChanged = PlayerGameActivityService.getGameTimestamp(gameName);
         OffsetDateTime now = OffsetDateTime.now();
         long interval = Duration.between(lastChanged, now).getSeconds();
         if (interval < 60) return 5000;
@@ -115,27 +66,7 @@ public class JolAdmin {
         return 60000;
     }
 
-    public Map<OffsetDateTime, GameHistory> getHistory() {
-        return this.pastGames;
-    }
-
-    public synchronized void persistState() {
-        writeFile("pastGames.json", pastGames);
-        writeFile("tournament.json", tournamentRegistrations);
-    }
-
-    public synchronized void buildPublicGames() {
-        long publicGamesCount = GameService.getGames(List.of(STARTING_GAME, PUBLIC_GAME)).size();
-        long gamesNeeded = 5 - publicGamesCount;
-        for (int x = 0; x < gamesNeeded; x++) {
-            String gameName = RandomGameName.generateName();
-            createGame(gameName, true, GameFormat.STANDARD, "SYSTEM");
-            String message = String.format("New public game {%s} has been created.", gameName);
-            chat("SYSTEM", message);
-        }
-    }
-
-    public synchronized PlayerModel getPlayerModel(String name) {
+    public static synchronized PlayerModel getPlayerModel(String name) {
         if (name == null) {
             return new PlayerModel(null, false);
         } else {
@@ -145,16 +76,16 @@ public class JolAdmin {
         }
     }
 
-    public synchronized GameModel getGameModel(String name) {
+    public static synchronized GameModel getGameModel(String name) {
         GameInfo gameInfo = GameService.get(name);
         return gmap.computeIfAbsent(name, n -> new GameModel(n, gameInfo.getId(), gameInfo.isPlayTest()));
     }
 
-    public Set<String> getWho() {
+    public static Set<String> getWho() {
         return activeUsers.asMap().keySet();
     }
 
-    public void remove(String player) {
+    public static void remove(String player) {
         logger.debug("removing player");
         if (player != null) {
             pmap.remove(player);
@@ -164,7 +95,7 @@ public class JolAdmin {
         }
     }
 
-    public synchronized void createGame(String gameName, Boolean isPublic, GameFormat format, String playerName) {
+    public static synchronized void createGame(String gameName, Boolean isPublic, GameFormat format, String playerName) {
         logger.trace("Creating game {} for player {}", gameName, playerName);
         if (gameName.length() > 2 || notExistsGame(gameName)) {
             try {
@@ -176,11 +107,11 @@ public class JolAdmin {
         }
     }
 
-    public synchronized void chat(String player, String message) {
+    public static synchronized void chat(String player, String message) {
         GlobalChatService.chat(player, message);
     }
 
-    public synchronized void rollbackGame(String gameName, String adminName, String turn) {
+    public static synchronized void rollbackGame(String gameName, String adminName, String turn) {
         String id = GameService.get(gameName).getId();
         logger.info("Rolling back game {} for turn {}", gameName, turn);
         JolGame game = ModelLoader.loadSnapshot(id, turn);
@@ -189,81 +120,41 @@ public class JolAdmin {
         gameCache.refresh(gameName);
     }
 
-    public void shutdown() {
-        try {
-            persistState();
-        } catch (Exception e) {
-            logger.error("Unable to cleanly shutdown", e);
-        }
-    }
-
-    public void setup() {
-        typeFactory = objectMapper.getTypeFactory();
-        pastGames = readFile("pastGames.json", typeFactory.constructMapType(ConcurrentHashMap.class, OffsetDateTime.class, GameHistory.class));
-        tournamentRegistrations = readFile("tournament.json", typeFactory.constructType(TournamentData.class));
-        loadProperties();
-    }
-
-    public void validate() {
-    }
-
-    public void upgrade() {
-        logger.info("Determining upgrades...");
-        GameDataConversion conversion = new GameDataConversion();
-        // Upgrade all games with no version
-        GameService.getGames(List.of(ACTIVE_GAME))
-                .stream()
-                .filter(Objects::nonNull)
-                // Version 1 is the first version where we store additional information in the game state
-                .filter(gameInfo -> gameInfo.getVersion().isOlderThan(GameInfo.Version.GAME_STATE))
-                // For every active game check the game state
-                .peek(gameInfo -> logger.info("Upgrading game {} - {}", gameInfo.getName(), gameInfo.getId()))
-                .forEach(gameInfo -> {
-                    conversion.convertGame(gameInfo.getId());
-                    gameInfo.setVersion(GameInfo.Version.GAME_STATE);
-                });
-        persistState();
-    }
-
-    public String getVersion() {
-        return properties.getProperty("version");
-    }
-
-    public boolean notExistsGame(String name) {
+    public static boolean notExistsGame(String name) {
         return name == null || !GameService.existsGame(name);
     }
 
-    public DeckFormat getDeckFormat(String playerName, String deckName) {
-        return loadDeckInfo(playerName, deckName).getFormat();
+    public static DeckFormat getDeckFormat(String playerName, String deckName) {
+        return DeckService.get(playerName, deckName).getFormat();
     }
 
-    public Set<String> getTags(String playerName, String deckName) {
-        return loadDeckInfo(playerName, deckName).getGameFormats();
+    public static Set<String> getTags(String playerName, String deckName) {
+        return DeckService.get(playerName, deckName).getGameFormats();
     }
 
-    public synchronized Deck getGameDeck(String gameName, String playerName) {
+    public static synchronized Deck getGameDeck(String gameName, String playerName) {
         return Optional.ofNullable(RegistrationService.get(gameName, playerName))
                 .map(status -> {
                     String deckId = status.getDeckId();
                     String gameId = getGameId(gameName);
-                    ExtendedDeck extendedDeck = readFile(String.format("games/%s/%s.json", gameId, deckId), typeFactory.constructType(ExtendedDeck.class));
+                    ExtendedDeck extendedDeck = DeckService.getGameDeck(gameId, deckId);
                     return extendedDeck.getDeck();
                 }).orElse(null);
     }
 
-    public synchronized void selectDeck(String playerName, String deckName) {
+    public static synchronized void selectDeck(String playerName, String deckName) {
         if (playerName != null && deckName != null) {
             getPlayerModel(playerName).loadDeck(deckName);
         }
     }
 
-    public synchronized void newDeck(String playerName) {
+    public static synchronized void newDeck(String playerName) {
         if (playerName != null) {
             getPlayerModel(playerName).clearDeck();
         }
     }
 
-    public synchronized void saveDeck(String playerName, String deckName, String contents) {
+    public static synchronized void saveDeck(String playerName, String deckName, String contents) {
         if (playerName != null && contents != null && deckName != null) {
             deckName = deckName.trim();
             ExtendedDeck deck = DeckParser.parseDeck(contents);
@@ -276,83 +167,33 @@ public class JolAdmin {
             deckInfo.setFormat(DeckFormat.MODERN);
             deckInfo.setGameFormats(tags);
             DeckService.addDeck(playerName, deckName, deckInfo);
-            writeFile(String.format("decks/%s.json", deckInfo.getDeckId()), deck);
+            DeckService.saveDeck(deckInfo.getDeckId(), deck);
         }
     }
 
-    public synchronized void deleteDeck(String playerName, String deckName) {
+    public static synchronized void deleteDeck(String playerName, String deckName) {
         if (playerName != null && deckName != null) {
             getPlayerModel(playerName).clearDeck();
             DeckService.remove(playerName, deckName);
         }
     }
 
-    public synchronized JolGame getGame(String gameName) {
+    public static synchronized JolGame getGame(String gameName) {
         return gameCache.get(gameName);
     }
 
-    public void saveGameState(JolGame game) {
+    public static void saveGameState(JolGame game) {
         saveGameState(game, false);
     }
 
-    public void saveGameState(JolGame game, boolean silent) {
+    public static void saveGameState(JolGame game, boolean silent) {
         if (!silent) {
             PlayerGameActivityService.setGameTimestamp(game.getName());
         }
         ModelLoader.saveGame(game);
     }
 
-    public synchronized void registerTournamentMultiDeck(String playerName, String... playerDecks) {
-        PlayerInfo playerInfo = PlayerService.get(playerName);
-        String result = "Successfully registered for tournament";
-        int round = 1;
-        try {
-            List<String> deckNames = new ArrayList<>();
-            TournamentRegistration registration = new TournamentRegistration();
-            registration.setPlayerName(playerName);
-            registration.setVeknId(playerInfo.getVeknId());
-            for (String deckName : playerDecks) {
-                DeckInfo deckInfo = DeckService.get(playerName, deckName);
-                if (deckInfo == null) {
-                    result = "Unable to find deck " + deckName;
-                    throw new IllegalStateException(result);
-                }
-                copyTournamentDeck(playerInfo.getId(), deckInfo.getDeckId(), round++);
-                deckNames.add(deckName);
-            }
-            registration.setDecks(deckNames);
-            tournamentRegistrations.getRegistrations().put(playerName, registration);
-            writeFile("tournament.json", tournamentRegistrations);
-        } catch (IllegalStateException e) {
-            logger.error("Error registering tournament deck for {}", playerName, e);
-        } finally {
-            getPlayerModel(playerName).setMessage(result);
-        }
-    }
-
-    public void registerTournamentDeck(String gameName, String playerName, String deckName, int round) {
-        logger.debug("Registering {} for {}", playerName, gameName);
-        PlayerInfo playerInfo = PlayerService.get(playerName);
-        GameInfo gameInfo = GameService.get(gameName);
-        String deckId = String.format("%s-%d", playerInfo.getId(), round);
-        Path deckPath = BASE_PATH.resolve("tournaments").resolve(deckId + ".json");
-        assert Files.exists(deckPath);
-        try {
-            Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId()).resolve(deckId + ".json");
-            Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            logger.error("Unable to load deck for {}", deckId, e);
-            throw new RuntimeException(e);
-        }
-        RegistrationStatus registration = new RegistrationStatus();
-        registration.setDeckId(deckId);
-        registration.setDeckName(deckName);
-        registration.setValid(true);
-        registration.setTimestamp(OffsetDateTime.now());
-        RegistrationService.put(gameName, playerName, registration);
-    }
-
-    public synchronized void registerDeck(String gameName, String playerName, String deckName) {
+    public static synchronized void registerDeck(String gameName, String playerName, String deckName) {
         deckName = deckName.trim();
         DeckInfo deckInfo = DeckService.get(playerName, deckName);
         GameInfo gameInfo = GameService.get(gameName);
@@ -384,7 +225,7 @@ public class JolAdmin {
                 result = "Unable to register deck in game that has no invite";
                 throw new IllegalStateException(result);
             }
-            boolean copySuccess = copyDeck(deckInfo.getDeckId(), gameInfo.getId());
+            boolean copySuccess = DeckService.copyDeck(deckInfo.getDeckId(), gameInfo.getId());
             if (!copySuccess) {
                 result = "Unable to copy deck file to game";
                 throw new IllegalStateException(result);
@@ -394,7 +235,7 @@ public class JolAdmin {
             registrationStatus.setValid(true);
             registrationStatus.setSummary(extendedDeck.getStats().getSummary());
 
-            // Reset game time to current time to extend idle timeout
+            // Reset game time to the current time to extend idle timeout
             gameInfo.setCreated(OffsetDateTime.now());
 
             long registeredPlayers = RegistrationService.getRegisteredPlayerCount(gameName);
@@ -408,122 +249,93 @@ public class JolAdmin {
         }
     }
 
-    public void recordPlayerAccess(String playerName) {
+    public static void recordPlayerAccess(String playerName) {
         if (playerName != null) {
             PlayerActivityService.recordPlayerAccess(playerName);
-            this.activeUsers.put(playerName, OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME));
+            activeUsers.put(playerName, OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME));
         }
     }
 
-    public synchronized void recordPlayerAccess(String playerName, String gameName) {
+    public static synchronized void recordPlayerAccess(String playerName, String gameName) {
         PlayerGameActivityService.recordPlayerAccess(playerName, gameName);
     }
 
-    public OffsetDateTime getGameTimeStamp(String gameName) {
+    public static OffsetDateTime getGameTimeStamp(String gameName) {
         return PlayerGameActivityService.getGameTimestamp(gameName);
     }
 
-    public OffsetDateTime getPlayerAccess(String playerName) {
+    public static OffsetDateTime getPlayerAccess(String playerName) {
         return PlayerActivityService.getPlayerAccess(playerName);
     }
 
-    public OffsetDateTime getPlayerAccess(String playerName, String gameName) {
+    public static OffsetDateTime getPlayerAccess(String playerName, String gameName) {
         return PlayerGameActivityService.getPlayerAccess(playerName, gameName);
     }
 
-    public boolean isPlayerPinged(String playerName, String gameName) {
+    public static boolean isPlayerPinged(String playerName, String gameName) {
         return PlayerGameActivityService.isPlayerPinged(playerName, gameName);
     }
 
-    public boolean pingPlayer(String playerName, String gameName) {
+    public static boolean pingPlayer(String playerName, String gameName) {
         if (isPlayerPinged(playerName, gameName)) {
             logger.debug("{} already pinged for {}; not pinging again", playerName, gameName);
             return false;
         }
 
-        PlayerGameActivityService.pingPlayer(playerName, gameName);
-
-        //Ping on Discord
         PlayerInfo player = PlayerService.get(playerName);
-        try {
-            String discordId = player.getDiscordId();
-            if (discordId != null && !discordId.isBlank()) {
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(DISCORD_PING_CHANNEL_URI)
-                        .header("Content-type", "application/json")
-                        .header("Authorization", DISCORD_AUTHORIZATION_HEADER)
-                        .timeout(Duration.ofSeconds(10))
-                        .POST(
-                                HttpRequest.BodyPublishers.ofString(
-                                        String.format("{\"content\":\"<@!%s> to %s\"}", player.getDiscordId(), gameName)))
-                        .build();
-                discord.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                        .handle((response, exception) -> {
-                            if (exception == null) {
-                                int responseCode = response.statusCode();
-                                if (responseCode != 200) {
-                                    logger.warn(
-                                            "Non-200 response ({}) calling Discord ({}); response body: {}",
-                                            responseCode, response.uri(), response.body());
-                                }
-                            } else logger.error("Error calling Discord", exception);
-                            return null;
-                        });
-            }
-        } catch (Exception e) {
-            logger.error("Unable to ping player", e);
-        }
+        PlayerGameActivityService.pingPlayer(playerName, gameName);
+        DiscordService.pingPlayer(player.getDiscordId(), gameName);
         return true;
     }
 
-    public void clearPing(String playerName, String gameName) {
+    public static void clearPing(String playerName, String gameName) {
         PlayerGameActivityService.clearPing(playerName, gameName);
     }
 
-    public Set<String> getGameNames() {
+    public static Set<String> getGameNames() {
         return GameService.getGameNames();
     }
 
-    public String getEmail(String player) {
+    public static String getEmail(String player) {
         return PlayerService.get(player).getEmail();
     }
 
-    public String getDiscordID(String player) {
+    public static String getDiscordID(String player) {
         return PlayerService.get(player).getDiscordId();
     }
 
-    public String getVeknID(String player) {
+    public static String getVeknID(String player) {
         return PlayerService.get(player).getVeknId();
     }
 
-    public synchronized void setImageTooltipPreference(String player, boolean value) {
+    public static synchronized void setImageTooltipPreference(String player, boolean value) {
         PlayerService.get(player).setShowImages(value);
     }
 
-    public synchronized boolean getImageTooltipPreference(String player) {
+    public static synchronized boolean getImageTooltipPreference(String player) {
         if (player == null) {
             return true;
         }
         return PlayerService.get(player).isShowImages();
     }
 
-    public synchronized boolean isAdmin(String player) {
+    public static synchronized boolean isAdmin(String player) {
         return PlayerService.get(player).getRoles().contains(PlayerRole.ADMIN);
     }
 
-    public synchronized boolean isPlaytester(String player) {
+    public static synchronized boolean isPlaytester(String player) {
         return PlayerService.get(player).getRoles().contains(PlayerRole.PLAYTESTER);
     }
 
-    public synchronized boolean isSuperUser(String playerName) {
+    public static synchronized boolean isSuperUser(String playerName) {
         return PlayerService.get(playerName).getRoles().contains(PlayerRole.SUPER_USER);
     }
 
-    public synchronized boolean isJudge(String playerName) {
+    public static synchronized boolean isJudge(String playerName) {
         return PlayerService.get(playerName).getRoles().contains(PlayerRole.JUDGE);
     }
 
-    public synchronized String getOwner(String gameName) {
+    public static synchronized String getOwner(String gameName) {
         String playerName = GameService.get(gameName).getOwner();
         if (!PlayerService.existsPlayer(playerName)) {
             playerName = "SYSTEM";
@@ -531,37 +343,36 @@ public class JolAdmin {
         return playerName;
     }
 
-    public synchronized void unInvitePlayer(String gameName, String playerName) {
+    public static synchronized void unInvitePlayer(String gameName, String playerName) {
         if (isStarting(gameName)) {
             RegistrationService.remove(gameName, playerName);
         }
     }
 
-    public synchronized boolean isStarting(String gameName) {
+    public static synchronized boolean isStarting(String gameName) {
         return GameService.get(gameName).getStatus().equals(GameStatus.STARTING);
     }
 
-    public boolean isActive(String gameName) {
+    public static boolean isActive(String gameName) {
         return GameService.get(gameName).getStatus().equals(GameStatus.ACTIVE);
     }
 
-    public boolean isAlive(String gameName, String playerName) {
+    public static boolean isAlive(String gameName, String playerName) {
         return loadGameState(gameName).getPool(playerName) > 0;
     }
 
-    public boolean isPrivate(String gameName) {
+    public static boolean isPrivate(String gameName) {
         return GameService.get(gameName).getVisibility().equals(Visibility.PRIVATE);
     }
 
-    public boolean isPublic(String gameName) {
+    public static boolean isPublic(String gameName) {
         return GameService.get(gameName).getVisibility().equals(Visibility.PUBLIC);
     }
 
-    public void startGame(String gameName, List<String> players) {
+    public static void startGame(String gameName, List<String> players) {
         GameInfo gameInfo = GameService.get(gameName);
         GameData gameData = new GameData(gameInfo.getId(), gameName);
         JolGame game = new JolGame(gameInfo.getId(), gameData);
-        game.initGame(gameName);
         RegistrationService.getGameRegistrations(gameName).forEach((playerName, registration) -> {
             if (registration.getDeckId() != null) {
                 Deck deck = getGameDeck(gameName, playerName);
@@ -572,10 +383,11 @@ public class JolAdmin {
             game.startGame(players);
             saveGameState(game);
             gameInfo.setStatus(GameStatus.ACTIVE);
+            pingPlayer(game.getActivePlayer(), gameName);
         }
     }
 
-    public synchronized void startGame(String gameName) {
+    public static synchronized void startGame(String gameName) {
         List<String> players = new ArrayList<>();
         RegistrationService.getGameRegistrations(gameName).forEach((playerName, registration) -> {
             if (registration.getDeckId() != null) {
@@ -586,7 +398,7 @@ public class JolAdmin {
         startGame(gameName, players);
     }
 
-    public synchronized void endGame(String gameName, boolean graceful) {
+    public static synchronized void endGame(String gameName, boolean graceful) {
         GameInfo gameInfo = GameService.get(gameName);
         // try and generate stats for game
         if (gameInfo.getStatus().equals(GameStatus.ACTIVE)) {
@@ -610,7 +422,7 @@ public class JolAdmin {
                     }
                     result.setPlayerName(player);
                     result.setDeckName(deckName);
-                    result.setVictoryPoints(format.format(victoryPoints));
+                    result.setVictoryPoints(victoryPoints);
                     if (victoryPoints >= 2.0) {
                         if (winner == null) {
                             winner = result;
@@ -628,66 +440,28 @@ public class JolAdmin {
                     winner.setGameWin(true);
                 }
                 if (hasVp) {
-                    pastGames.put(OffsetDateTime.now(), history);
+                    HistoryService.addGame(OffsetDateTime.now(), history);
                 }
             }
         }
         // Clear out data
-        Path gamePath = BASE_PATH.resolve("games").resolve(gameInfo.getId());
         RegistrationService.remove(gameName);
-        GameService.remove(gameName);
+        GameService.remove(gameName, gameInfo.getId());
         PlayerGameActivityService.clearGame(gameName);
         pmap.values().forEach(playerModel -> playerModel.removeGame(gameName));
         gmap.remove(gameName);
-        try {
-            FileUtils.deleteDirectory(gamePath.toFile());
-        } catch (IOException e) {
-            logger.error("Unable to delete game directory", e);
-        }
+
     }
 
-    public String getDeckId(String playerName, String deckName) {
+    public static String getDeckId(String playerName, String deckName) {
         return DeckService.get(playerName, deckName).getDeckId();
     }
 
-    public String getGameId(String gameName) {
+    public static String getGameId(String gameName) {
         return GameService.get(gameName).getId();
     }
 
-    public void validateGW() {
-        pastGames.values().forEach(gameHistory -> {
-            PlayerResult winner = null;
-            PlayerResult previousWinner = gameHistory.getResults().stream().filter(PlayerResult::isGameWin).findFirst().orElse(null);
-            double topVP = 0.0;
-            for (PlayerResult result : gameHistory.getResults()) {
-                double victoryPoints = Double.parseDouble(result.getVictoryPoints());
-                if (victoryPoints >= 2.0) {
-                    if (winner == null) {
-                        logger.debug("{} - {} has {} VP and there is no current high score.", gameHistory.getName(), result.getPlayerName(), victoryPoints);
-                        winner = result;
-                        topVP = victoryPoints;
-                    } else if (victoryPoints > topVP) {
-                        logger.debug("{} - {} has {} VP, previous high score was {} on {} VP.", gameHistory.getName(), result.getPlayerName(), victoryPoints, winner.getPlayerName(), topVP);
-                        winner = result;
-                        topVP = victoryPoints;
-                    } else if (victoryPoints == topVP) {
-                        logger.debug("{} - tie between {} and {}. No winner.", gameHistory.getName(), result.getPlayerName(), winner.getPlayerName());
-                        winner = null;
-                    }
-                }
-            }
-            if (winner != null && previousWinner == null) {
-                logger.info("Found a winner for {} where there wasn't one before, now {} on {}", gameHistory.getName(), winner.getPlayerName(), winner.getVictoryPoints());
-                winner.setGameWin(true);
-            } else if (winner != null && winner != previousWinner) {
-                logger.info("Found a new winner for {}, previously {} on {}, now {} on {}", gameHistory.getName(), previousWinner.getPlayerName(), previousWinner.getVictoryPoints(), winner.getPlayerName(), winner.getVictoryPoints());
-                winner.setGameWin(true);
-                previousWinner.setGameWin(false);
-            }
-        });
-    }
-
-    public synchronized void replacePlayer(String gameName, String existingPlayer, String newPlayer) {
+    public static synchronized void replacePlayer(String gameName, String existingPlayer, String newPlayer) {
         RegistrationStatus existingRegistration = RegistrationService.get(gameName, existingPlayer);
         RegistrationStatus newRegistration = RegistrationService.get(gameName, newPlayer);
         // Only replace player if existing player is in the game, and the new player isn't
@@ -702,68 +476,60 @@ public class JolAdmin {
         }
     }
 
-    public synchronized void deletePLayer(String playerName) {
+    public static synchronized void deletePLayer(String playerName) {
         Map<String, RegistrationStatus> playerRegistrations = RegistrationService.getPlayerRegistrations(playerName);
         if (playerRegistrations.isEmpty()) {
             logger.info("Deleting unused player {}", playerName);
-            archivePlayer(playerName);
+            PlayerService.remove(playerName);
+            DeckService.getPlayerDecks(playerName).forEach((deckName, deckInfo) -> DeckService.remove(playerName, deckName));
         } else {
             logger.info("Unable to delete an active player - {}", playerName);
         }
     }
 
-    public synchronized void setJudge(String playerName, boolean value) {
+    public static synchronized void setJudge(String playerName, boolean value) {
         PlayerInfo info = PlayerService.get(playerName);
         setRole(info, PlayerRole.JUDGE, value);
     }
 
-    public synchronized void setAdmin(String playerName, boolean value) {
+    public static synchronized void setAdmin(String playerName, boolean value) {
         PlayerInfo info = PlayerService.get(playerName);
         setRole(info, PlayerRole.ADMIN, value);
     }
 
-    public synchronized void setPlaytester(String playerName, boolean value) {
+    public static synchronized void setPlaytester(String playerName, boolean value) {
         PlayerInfo info = PlayerService.get(playerName);
         setRole(info, PlayerRole.PLAYTESTER, value);
     }
 
-    public synchronized void setSuperUser(String playerName, boolean value) {
+    public static synchronized void setSuperUser(String playerName, boolean value) {
         PlayerInfo info = PlayerService.get(playerName);
         setRole(info, PlayerRole.SUPER_USER, value);
     }
 
-    public Collection<TournamentRegistration> getTournamentRegistrations() {
-        return tournamentRegistrations.getRegistrations().values();
-    }
-
-    public OffsetDateTime getCreatedTime(String gameName) {
+    public static OffsetDateTime getCreatedTime(String gameName) {
         return Optional.ofNullable(GameService.get(gameName))
                 .map(GameInfo::getCreated)
                 .orElse(null);
     }
 
-    public synchronized void resetView(String playerName, String gameName) {
+    public static synchronized void resetView(String playerName, String gameName) {
         getGameModel(gameName).resetView(playerName);
     }
 
-    public boolean isCurrent(String player, String game) {
-        OffsetDateTime playerAccess = PlayerGameActivityService.getPlayerAccess(player, game);
-        OffsetDateTime gameLastUpdated = PlayerGameActivityService.getGameTimestamp(game);
-        return playerAccess.isAfter(gameLastUpdated);
-    }
-
-    public synchronized void endTurn(String gameName, String adminName) {
+    public static synchronized void endTurn(String gameName, String adminName) {
         JolGame game = getGame(gameName);
         String id = GameService.get(gameName).getId();
         ChatService.sendMessage(id, "SYSTEM", "Turn ended by administrator: " + adminName);
         game.newTurn();
+        pingPlayer(game.getActivePlayer(), gameName);
     }
 
     public synchronized boolean isOwner(String playerName, String gameName) {
         return GameService.get(gameName).getOwner().equals(playerName);
     }
 
-    public List<String> getPings(String gameName) {
+    public static List<String> getPings(String gameName) {
         var entry = PlayerGameActivityService.getGameTimestamps().get(gameName);
         if (entry == null) {
             return List.of();
@@ -775,11 +541,18 @@ public class JolAdmin {
                 .toList();
     }
 
-    public String getFormat(String gameName) {
+    public static List<String> getPingList(String gameName) {
+        return getGame(gameName).getValidPlayers()
+                .stream()
+                .filter(player -> !JolAdmin.isPlayerPinged(player, gameName))
+                .collect(Collectors.toList());
+    }
+
+    public static String getFormat(String gameName) {
         return GameService.get(gameName).getGameFormat().toString();
     }
 
-    public synchronized void validateDeck(String playerName, String contents, GameFormat format) {
+    public static synchronized void validateDeck(String playerName, String contents, GameFormat format) {
         PlayerModel model = getPlayerModel(playerName);
         String deckName = model.getDeck().getDeck().getName();
         ExtendedDeck deck = DeckParser.parseDeck(contents);
@@ -794,7 +567,7 @@ public class JolAdmin {
         model.setContents(contents);
     }
 
-    public List<GameFormat> getAvailableGameFormats(String playerName) {
+    public static List<GameFormat> getAvailableGameFormats(String playerName) {
         Set<PlayerRole> roles = PlayerService.get(playerName).getRoles();
         List<GameFormat> formats = new ArrayList<>(EnumSet.of(GameFormat.STANDARD, GameFormat.V5, GameFormat.DUEL));
         if (roles.contains(PlayerRole.PLAYTESTER)) {
@@ -803,12 +576,12 @@ public class JolAdmin {
         return formats;
     }
 
-    public boolean isViewable(String gameName, String player) {
+    public static boolean isViewable(String gameName, String player) {
         GameFormat format = GameService.get(gameName).getGameFormat();
         return format != GameFormat.PLAYTEST || isPlaytester(player);
     }
 
-    private ValidationResult validateDeck(Deck deck, GameFormat gameFormat) {
+    private static ValidationResult validateDeck(Deck deck, GameFormat gameFormat) {
         try {
             Constructor<? extends DeckValidator> validatorConstructor = gameFormat.getDeckValidator().getConstructor();
             var validator = validatorConstructor.newInstance();
@@ -819,18 +592,7 @@ public class JolAdmin {
         }
     }
 
-    private void loadProperties() {
-        properties = new Properties();
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        try (InputStream resourceStream = loader.getResourceAsStream("version.properties")) {
-            properties.load(resourceStream);
-        } catch (IOException e) {
-            logger.error("Unable to load version.properties", e);
-            properties.setProperty("version", OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME));
-        }
-    }
-
-    private void setRole(PlayerInfo info, PlayerRole role, boolean enabled) {
+    private static void setRole(PlayerInfo info, PlayerRole role, boolean enabled) {
         if (enabled) {
             info.getRoles().add(role);
         } else {
@@ -838,91 +600,11 @@ public class JolAdmin {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> T readFile(String fileName, JavaType type) {
-        try {
-            logger.debug("Reading data from {}", fileName);
-            return objectMapper.readValue(BASE_PATH.resolve(fileName).toFile(), type);
-        } catch (IOException e) {
-            logger.error("Unable to read {}", fileName, e);
-            try {
-                return (T) type.getRawClass().getConstructor().newInstance();
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
-                     InvocationTargetException nsm) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void writeFile(String fileName, Object object) {
-        try {
-            logger.debug("Saving data to {}", fileName);
-            objectMapper.writeValue(BASE_PATH.resolve(fileName).toFile(), object);
-        } catch (IOException e) {
-            logger.error("Unable to write {}", fileName, e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void archivePlayer(String playerName) {
-        Path archivePath = BASE_PATH.resolve("archives");
-        PlayerInfo playerInfo = PlayerService.get(playerName);
-        Map<String, DeckInfo> playerDecks = DeckService.getPlayerDecks(playerName);
-        try {
-            if (!Files.exists(archivePath)) {
-                Files.createDirectory(archivePath);
-            }
-            for (DeckInfo deckInfo : playerDecks.values()) {
-                String extension = deckInfo.getFormat().equals(DeckFormat.MODERN) ? ".json" : ".txt";
-                Path deckPath = BASE_PATH.resolve("decks").resolve(deckInfo.getDeckId() + extension);
-                Path archiveDeckPath = archivePath.resolve(deckInfo.getDeckId() + extension);
-                Files.move(deckPath, archiveDeckPath);
-                logger.info("Archived Deck {}", deckInfo.getDeckId());
-            }
-            Path archivePlayerPath = archivePath.resolve(playerInfo.getId() + ".json");
-            objectMapper.writeValue(archivePlayerPath.toFile(), playerInfo);
-            Path archiveDecksPath = archivePath.resolve(playerInfo.getId() + "-decks.json");
-            objectMapper.writeValue(archiveDecksPath.toFile(), playerDecks);
-            logger.info("Archived Player {}", playerInfo.getId());
-        } catch (IOException e) {
-            logger.error("Unable to archive player {}", playerInfo.getId(), e);
-        }
-        PlayerService.remove(playerInfo.getName());
-    }
-
-    private void copyTournamentDeck(String playerId, String deckId, int round) {
-        Path tournamentPath = BASE_PATH.resolve("tournaments");
-        try {
-            if (!Files.exists(tournamentPath)) {
-                Files.createDirectory(tournamentPath);
-            }
-            Path deckPath = BASE_PATH.resolve("decks").resolve(deckId + ".json");
-            Path roundPath = BASE_PATH.resolve("tournaments").resolve(String.format("%s-%d.json", playerId, round));
-            logger.info("Copying tournament deck {} to {}", deckPath, roundPath);
-            Files.copy(deckPath, roundPath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            logger.error("Unable to load deck for {}", deckId, e);
-        }
-    }
-
-    private boolean copyDeck(String deckId, String gameId) {
-        try {
-            Path deckPath = BASE_PATH.resolve("decks").resolve(deckId + ".json");
-            Path gamePath = BASE_PATH.resolve("games").resolve(gameId).resolve(deckId + ".json");
-            logger.debug("Copying {} to {}", deckPath, gamePath);
-            Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
-            return true;
-        } catch (IOException e) {
-            logger.error("Unable to load deck for {}", deckId, e);
-            return false;
-        }
-    }
-
     private DeckInfo loadDeckInfo(String playerName, String deckName) {
         return DeckService.get(playerName, deckName);
     }
 
-    private JolGame loadGameState(String gameName) {
+    private static JolGame loadGameState(String gameName) {
         logger.debug("Loading {}", gameName);
         GameInfo gameInfo = GameService.get(gameName);
         String gameId = gameInfo.getId();

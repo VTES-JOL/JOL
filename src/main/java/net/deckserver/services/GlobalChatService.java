@@ -1,7 +1,6 @@
 package net.deckserver.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.dwr.model.PlayerModel;

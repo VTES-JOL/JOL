@@ -30,10 +30,9 @@ public class GameStatusBean {
     private final String turn;
 
     public GameStatusBean(String gameName) {
-        JolAdmin admin = JolAdmin.INSTANCE;
         this.name = gameName;
-        this.format = admin.getFormat(gameName);
-        if (admin.isActive(gameName)) {
+        this.format = JolAdmin.getFormat(gameName);
+        if (JolAdmin.isActive(gameName)) {
             this.gameStatus = "Active";
             registrations = Collections.emptyList();
             this.players = RegistrationService.getPlayers(gameName).stream()
@@ -41,7 +40,7 @@ public class GameStatusBean {
                     .filter(playerName -> RegistrationService.isRegistered(gameName, playerName))
                     .map(playerName -> new PlayerStatus(gameName, playerName))
                     .collect(Collectors.toMap(PlayerStatus::getPlayerName, Function.identity()));
-            JolGame game = admin.getGame(gameName);
+            JolGame game = JolAdmin.getGame(gameName);
             this.activePlayer = game.getActivePlayer();
             this.predator = game.getPredatorOf(activePlayer);
             this.prey = game.getPreyOf(activePlayer);
@@ -58,7 +57,7 @@ public class GameStatusBean {
             this.prey = null;
             this.turn = null;
         }
-        created = admin.getCreatedTime(gameName);
+        created = JolAdmin.getCreatedTime(gameName);
     }
 
     public long getActivePlayerCount() {

@@ -18,11 +18,11 @@ public class UserSummaryBean {
 
     public UserSummaryBean(String name) {
         this.name = name;
-        this.admin = JolAdmin.INSTANCE.isAdmin(name);
-        this.superUser = JolAdmin.INSTANCE.isSuperUser(name);
-        this.judge = JolAdmin.INSTANCE.isJudge(name);
-        this.playtester = JolAdmin.INSTANCE.isPlaytester(name);
-        this.lastOnline = JolAdmin.INSTANCE.getPlayerAccess(name).truncatedTo(ChronoUnit.SECONDS).format(ISO_OFFSET_DATE_TIME);
+        this.admin = JolAdmin.isAdmin(name);
+        this.superUser = JolAdmin.isSuperUser(name);
+        this.judge = JolAdmin.isJudge(name);
+        this.playtester = JolAdmin.isPlaytester(name);
+        this.lastOnline = JolAdmin.getPlayerAccess(name).truncatedTo(ChronoUnit.SECONDS).format(ISO_OFFSET_DATE_TIME);
     }
 
     public boolean isSpecialUser() {

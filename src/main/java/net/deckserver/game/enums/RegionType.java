@@ -1,6 +1,7 @@
 package net.deckserver.game.enums;
 
 import java.util.EnumSet;
+import java.util.Objects;
 
 public enum RegionType {
     READY("ready region", "Ready region", true, true),
@@ -65,5 +66,10 @@ public enum RegionType {
     public boolean otherVisibility() {
         return otherVisibility;
     }
+
+    public boolean isVisible(String owner, String viewer) {
+        return Objects.equals(owner, viewer) ? ownerVisibility : otherVisibility;
+    }
+
 
 }

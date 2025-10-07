@@ -20,24 +20,23 @@ public class MainBean {
     private final List<ChatEntryBean> chat;
 
     public MainBean(PlayerModel model) {
-        JolAdmin jolAdmin = JolAdmin.INSTANCE;
         String playerName = model.getPlayerName();
         loggedIn = model.getPlayerName() != null;
         if (loggedIn) {
             List<GameStatusBean> games = RegistrationService.getRegisteredGames(playerName).stream()
                     .filter(gameName -> RegistrationService.isRegistered(gameName, playerName))
-                    .filter(jolAdmin::isActive)
+                    .filter(JolAdmin::isActive)
                     .map(GameStatusBean::new)
                     .sorted(Comparator.comparing(GameStatusBean::getName))
                     .toList();
             this.games = games.stream()
-                    .filter(game -> jolAdmin.isAlive(game.getName(), playerName))
+                    .filter(game -> JolAdmin.isAlive(game.getName(), playerName))
                     .collect(Collectors.toList());
             this.ousted = games.stream()
-                    .filter(game -> !jolAdmin.isAlive(game.getName(), playerName))
+                    .filter(game -> !JolAdmin.isAlive(game.getName(), playerName))
                     .collect(Collectors.toList());
             chat = model.getChat();
-            who = JolAdmin.INSTANCE.getWho().stream()
+            who = JolAdmin.getWho().stream()
                     .sorted(Comparator.reverseOrder())
                     .map(UserSummaryBean::new)
                     .collect(Collectors.toList());

@@ -25,7 +25,6 @@ public class UpdateFactory {
         viewMap.put("profile", new ProfileCreator());
         viewMap.put("active", new AllGamesCreator());
         viewMap.put("super", new SuperCreator());
-        viewMap.put("tournament", new TournamentCreator());
         viewMap.put("version", new VersionCreator());
     }
 
@@ -34,10 +33,9 @@ public class UpdateFactory {
     }
 
     public static Map<String, Object> getUpdate() {
-        JolAdmin admin = JolAdmin.INSTANCE;
         String playerName = DeckserverRemote.getPlayer(WebContextFactory.get().getHttpServletRequest());
-        PlayerModel player = admin.getPlayerModel(playerName);
-        admin.recordPlayerAccess(player.getPlayerName());
+        PlayerModel player = JolAdmin.getPlayerModel(playerName);
+        JolAdmin.recordPlayerAccess(player.getPlayerName());
         Map<String, Object> object = Stream.of(player.getView(), "nav", "version")
                 .map(UpdateFactory::getView)
                 .filter(Objects::nonNull)

@@ -1,7 +1,5 @@
 package net.deckserver.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
@@ -14,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -133,7 +132,7 @@ public class ChatService extends PersistedService {
 
     public static synchronized void addTurn(String gameId, String player, String turnId) {
         INSTANCE.historyCache.get(gameId).addTurn(player, turnId);
-        gmap.get(gameId).clearChats();
+        Optional.ofNullable(gmap.get(gameId)).ifPresent(GameModel::clearChats);
     }
 
     public static synchronized void sendMessage(String gameId, String source, String message) {
@@ -158,6 +157,6 @@ public class ChatService extends PersistedService {
 
     private static synchronized void sendChat(String gameId, ChatData chat) {
         INSTANCE.historyCache.get(gameId).addChat(chat);
-        gmap.get(gameId).addChat(chat);
+        Optional.ofNullable(gmap.get(gameId)).ifPresent(model -> model.addChat(chat));
     }
 }

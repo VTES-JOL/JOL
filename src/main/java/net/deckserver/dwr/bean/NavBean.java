@@ -3,6 +3,7 @@ package net.deckserver.dwr.bean;
 import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
+import net.deckserver.services.PlayerGameActivityService;
 import net.deckserver.services.RegistrationService;
 
 import java.util.ArrayList;
@@ -22,14 +23,13 @@ public class NavBean {
     private String game = null;
 
     public NavBean(PlayerModel model) {
-        JolAdmin admin = JolAdmin.INSTANCE;
         player = model.getPlayerName();
         target = model.getView();
         if (target.equals("game"))
             game = model.getCurrentGame();
         if (player != null) {
             chats = model.hasChats();
-            boolean isAdmin = admin.isAdmin(player);
+            boolean isAdmin = JolAdmin.isAdmin(player);
             buttons.add("active:Watch");
             buttons.add("deck:Decks");
             buttons.add("profile:Profile");
@@ -39,10 +39,10 @@ public class NavBean {
                 buttons.add("admin:Admin");
             }
             RegistrationService.getPlayerGames(player).stream()
-                    .filter(admin::isActive)
-                    .filter(game -> admin.isAlive(game, player))
+                    .filter(JolAdmin::isActive)
+                    .filter(game -> JolAdmin.isAlive(game, player))
                     .forEach(game -> {
-                        String current = JolAdmin.INSTANCE.isCurrent(player, game) ? "" : "*";
+                        String current = PlayerGameActivityService.isCurrent(player, game) ? "" : "*";
                         gameButtons.put("g" + game, game + current);
                     });
         }

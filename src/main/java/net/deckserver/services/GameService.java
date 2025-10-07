@@ -1,12 +1,12 @@
 package net.deckserver.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.Visibility;
+import net.deckserver.jobs.GameDataConversion;
 import net.deckserver.storage.json.system.GameInfo;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -34,12 +34,7 @@ public class GameService extends PersistedService {
     private GameService() {
         super("GameService", 5);
         load();
-    }
-
-    public static List<GameInfo> getGames(List<Predicate<GameInfo>> filters) {
-        return INSTANCE.games.values().stream()
-                .filter(game -> filters.stream().allMatch(filter -> filter.test(game)))
-                .toList();
+        upgrade();
     }
 
     public static GameInfo get(String name) {
@@ -65,8 +60,14 @@ public class GameService extends PersistedService {
         return INSTANCE.games.keySet();
     }
 
-    public static void remove(String gameName) {
+    public static void remove(String gameName, String gameId) {
+        Path gamePath = Path.of(System.getenv("JOL_DATA"), "games", gameId);
         INSTANCE.games.remove(gameName);
+        try {
+            FileUtils.deleteDirectory(gamePath.toFile());
+        } catch (IOException e) {
+            logger.error("Unable to delete game directory", e);
+        }
     }
 
     private static GameInfo loadGameInfo(String gameName) {
@@ -74,6 +75,23 @@ public class GameService extends PersistedService {
             return INSTANCE.games.get(gameName);
         }
         throw new IllegalArgumentException("Game: " + gameName + " was not found.");
+    }
+
+    private void upgrade() {
+        logger.info("Determining upgrades...");
+        GameDataConversion conversion = new GameDataConversion();
+        // Upgrade all games with no version
+        games.values().stream()
+                .filter(ACTIVE_GAME)
+                .filter(Objects::nonNull)
+                // Version 1 is the first version where we store additional information in the game state
+                .filter(gameInfo -> gameInfo.getVersion().isOlderThan(GameInfo.Version.GAME_STATE))
+                // For every active game check the game state
+                .peek(gameInfo -> logger.info("Upgrading game {} - {}", gameInfo.getName(), gameInfo.getId()))
+                .forEach(gameInfo -> {
+                    conversion.convertGame(gameInfo.getId());
+                    gameInfo.setVersion(GameInfo.Version.GAME_STATE);
+                });
     }
 
     @Override

@@ -68,6 +68,13 @@ public class PlayerGameActivityService extends PersistedService {
         getOrCreateGameTimestampEntry(game).setTimestamp(OffsetDateTime.now());
     }
 
+    public static boolean isCurrent(String player, String game) {
+        OffsetDateTime playerAccess = getPlayerAccess(player, game);
+        OffsetDateTime gameLastUpdated = getGameTimestamp(game);
+        return playerAccess.isAfter(gameLastUpdated);
+    }
+
+
     private static GameTimestampEntry getExistingGameTimestampEntry(String game) {
         if (game == null || game.isBlank()) return null;
         return INSTANCE.gameTimestamps.get(game);

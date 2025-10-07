@@ -14,8 +14,7 @@ public class GameInviteStatus {
     public GameInviteStatus(String gameName, String playerName) {
         this.gameName = gameName;
         this.playerName = playerName;
-        JolAdmin admin = JolAdmin.INSTANCE;
-        this.format = admin.getFormat(gameName);
+        this.format = JolAdmin.getFormat(gameName);
         this.deckName = RegistrationService.isRegistered(gameName, playerName) ? RegistrationService.getRegistration(gameName, playerName).getDeckName() : null;
     }
 }

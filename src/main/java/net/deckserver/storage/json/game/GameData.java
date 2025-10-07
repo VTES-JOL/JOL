@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 import lombok.ToString;
+import net.deckserver.game.enums.Phase;
 import net.deckserver.game.enums.RegionType;
 
 import java.util.*;
@@ -28,7 +29,7 @@ public class GameData {
 
     private boolean orderOfPlayReversed = false;
     private String turn = "1.1";
-    private String phase;
+    private Phase phase;
     private String notes;
 
     private String timeoutRequestor;
@@ -101,8 +102,8 @@ public class GameData {
         return cards;
     }
 
-    public void orderPlayers(List<String> newOrder) {
-        if (!new HashSet<>(this.playerOrder).containsAll(newOrder)) {
+    public void orderPlayers(List<String> newOrder, boolean force) {
+        if (!force && !new HashSet<>(this.playerOrder).containsAll(newOrder)) {
             return;
         }
         this.playerOrder = newOrder;
@@ -149,4 +150,16 @@ public class GameData {
     public String getTurnLabel() {
         return String.format("%s %s", currentPlayer.getName(), turn);
     }
+
+    public void replacePlayer(String oldPlayer, String newPlayer) {
+        PlayerData playerData = players.get(oldPlayer);
+        playerData.setName(newPlayer);
+        players.remove(oldPlayer);
+        players.put(newPlayer, playerData);
+        int index = playerOrder.indexOf(oldPlayer);
+        if (index != -1) {
+            playerOrder.set(index, newPlayer);
+        }
+    }
+
 }

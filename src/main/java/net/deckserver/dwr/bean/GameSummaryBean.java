@@ -13,10 +13,9 @@ public class GameSummaryBean {
     private final String timestamp;
 
     public GameSummaryBean(String gameName) {
-        JolAdmin admin = JolAdmin.INSTANCE;
         this.gameName = gameName;
-        this.turn = admin.getGame(gameName).getCurrentTurn();
-        this.timestamp = admin.getGameTimeStamp(gameName).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        this.turn = JolAdmin.getGame(gameName).getCurrentTurn();
+        this.timestamp = JolAdmin.getGameTimeStamp(gameName).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 
 }

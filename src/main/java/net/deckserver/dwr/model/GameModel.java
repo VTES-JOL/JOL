@@ -2,6 +2,7 @@ package net.deckserver.dwr.model;
 
 import lombok.Getter;
 import net.deckserver.JolAdmin;
+import net.deckserver.game.enums.Phase;
 import net.deckserver.services.ChatService;
 import net.deckserver.services.RegistrationService;
 import net.deckserver.storage.json.game.ChatData;
@@ -33,24 +34,22 @@ public class GameModel implements Comparable<GameModel> {
     }
 
     public synchronized void endTurn(String player) {
-        JolAdmin admin = JolAdmin.INSTANCE;
-        JolGame game = admin.getGame(name);
+        JolGame game = JolAdmin.getGame(name);
         if (game.getActivePlayer().equals(player)) {
             game.newTurn();
             reloadNotes();
-            admin.saveGameState(game);
+            JolAdmin.saveGameState(game);
             doReload(true, true, true);
         }
     }
 
     public synchronized String submit(String player, String phase, String command, String chat, String ping) {
-        JolAdmin admin = JolAdmin.INSTANCE;
         // Only players and judges can issue commands.  A judge can't be a player
-        boolean isJudge = admin.isJudge(player) && !getPlayers().contains(player);
+        boolean isJudge = JolAdmin.isJudge(player) && !getPlayers().contains(player);
         if (!getPlayers().contains(player) && !isJudge) {
             return "Not authorized";
         }
-        JolGame game = admin.getGame(name);
+        JolGame game = JolAdmin.getGame(name);
         StringBuilder status = new StringBuilder();
         if (player != null) {
             boolean stateChanged = false;
@@ -58,7 +57,7 @@ public class GameModel implements Comparable<GameModel> {
             boolean chatChanged = false;
             boolean turnChanged = false;
             if (ping != null) {
-                boolean pingSuccessful = admin.pingPlayer(ping, name);
+                boolean pingSuccessful = JolAdmin.pingPlayer(ping, name);
                 if (!pingSuccessful) {
                     status.append("Player is already pinged");
                 }
@@ -66,7 +65,7 @@ public class GameModel implements Comparable<GameModel> {
             if (phase != null &&
                     game.getActivePlayer().equals(player)
                     && !game.getPhase().equals(phase)) {
-                game.setPhase(phase);
+                game.setPhase(Phase.valueOf(phase));
                 phaseChanged = true;
             }
             if (command != null || chat != null) {
@@ -95,10 +94,10 @@ public class GameModel implements Comparable<GameModel> {
                 }
                 OffsetDateTime timestamp = OffsetDateTime.now();
                 METRICS.info(new ObjectArrayMessage(timestamp.getYear(), timestamp.getMonthValue(), timestamp.getDayOfMonth(), timestamp.getHour(), player, game.getName(), didCommand, didChat));
-                admin.clearPing(player, name);
+                JolAdmin.clearPing(player, name);
             }
             if (stateChanged || phaseChanged || chatChanged) {
-                admin.saveGameState(game);
+                JolAdmin.saveGameState(game);
             }
             doReload(stateChanged, phaseChanged, turnChanged);
         }
@@ -127,22 +126,20 @@ public class GameModel implements Comparable<GameModel> {
     }
 
     public synchronized void updateGlobalNotes(String notes) {
-        JolAdmin admin = JolAdmin.INSTANCE;
-        JolGame game = admin.getGame(name);
+        JolGame game = JolAdmin.getGame(name);
         if (!game.getGlobalText().equals(notes)) {
             game.setGlobalText(notes);
             reloadNotes();
-            admin.saveGameState(game);
+            JolAdmin.saveGameState(game);
         }
     }
 
     public synchronized void updatePrivateNotes(String player, String notes) {
-        JolAdmin admin = JolAdmin.INSTANCE;
-        JolGame game = admin.getGame(name);
+        JolGame game = JolAdmin.getGame(name);
         if (!notes.equals(game.getPrivateNotes(player))) {
             game.setPrivateNotes(player, notes);
             views.get(player).privateNotesChanged();
-            admin.saveGameState(game, true);
+            JolAdmin.saveGameState(game, true);
         }
     }
 

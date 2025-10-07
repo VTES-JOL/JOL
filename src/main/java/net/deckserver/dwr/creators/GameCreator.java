@@ -13,7 +13,7 @@ class GameCreator implements ViewCreator {
 
     public Object createData(PlayerModel player) {
         String name = player.getCurrentGame();
-        GameModel game = JolAdmin.INSTANCE.getGameModel(name);
+        GameModel game = JolAdmin.getGameModel(name);
         GameView gameView = game.getView(player.getPlayerName());
         return gameView.create();
     }

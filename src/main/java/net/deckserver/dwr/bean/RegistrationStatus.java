@@ -1,7 +1,6 @@
 package net.deckserver.dwr.bean;
 
 import lombok.Getter;
-import net.deckserver.JolAdmin;
 import net.deckserver.services.RegistrationService;
 
 @Getter
@@ -15,7 +14,6 @@ public class RegistrationStatus {
     public RegistrationStatus(String game, String player) {
         this.player = player;
         this.gameName = game;
-        JolAdmin admin = JolAdmin.INSTANCE;
         net.deckserver.storage.json.system.RegistrationStatus status = RegistrationService.getRegistration(game, player);
         this.registered = status.getDeckId() != null;
         this.deckSummary = status.getSummary();

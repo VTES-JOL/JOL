@@ -24,11 +24,6 @@ public class DoCommandTest {
     private JolGame game;
     private DoCommand worker;
 
-    @BeforeAll
-    public static void init() {
-        JolAdmin.INSTANCE.setup();
-    }
-
     private String getLastMessage() {
         return ChatService.getChats("command-test").getLast().getMessage();
     }
@@ -159,15 +154,15 @@ public class DoCommandTest {
     @Test
     void label() throws CommandException {
         CardData card = game.getCard("111");
-        assertThat(game.getLabel(card), is(""));
+        assertNull(card.getNotes());
         worker.doCommand("Player5", "label PLayer2 ready 1 test");
-        assertThat(game.getLabel(card), is("test"));
+        assertThat(card.getNotes(), is("test"));
         assertThat(getLastMessage(), containsString("<a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>: \"test\""));
         worker.doCommand("Player5", "label Player2 ready 1");
-        assertThat(game.getLabel(card), is(""));
+        assertThat(card.getNotes(), is(""));
         assertThat(getLastMessage(), containsString("removes label from <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>"));
         worker.doCommand("Player5", "Label Player2 ready 1 again");
-        assertThat(game.getLabel(card), is("again"));
+        assertThat(card.getNotes(), is("again"));
         assertThat(getLastMessage(), containsString("<a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>: \"again\""));
     }
 
@@ -481,6 +476,14 @@ public class DoCommandTest {
         assertThat(game.data().getCard("208").getCards().size(), is(1));
         assertThat(game.data().getCard("246").getCards().size(), is(1));
         assertThrows(CommandException.class, () -> worker.doCommand("Player3", "move ready 1 ready 1.1.1"));
+        worker.doCommand("Player3", "move ready 1.1.1 ready 1");
+        assertThat(getLastMessage(), containsString("Player3 puts <a class='card-name' data-card-id='100199' data-secured='false'>Blood Doll</a> 1.1.1 on <a class='card-name' data-card-id='200788' data-secured='false'>Klaus van der Veken</a> in their ready region."));
+    }
+
+    @Test
+    void moveHidden() throws CommandException {
+        worker.doCommand("Player1", "move hand 4 research");
+        assertThat(getLastMessage(), containsString("Player1 moves card #4 in their hand to their research."));
     }
 
     @Test

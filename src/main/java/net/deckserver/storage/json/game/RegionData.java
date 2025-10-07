@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import net.deckserver.game.enums.RegionType;
 
+import javax.smartcardio.Card;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -90,5 +91,13 @@ public class RegionData {
     @JsonIgnore
     public CardData getCard(int i) {
         return cards.get(i);
+    }
+
+    public int size() {
+        int size = cards.size();
+        for (CardData card: cards) {
+            size += card.size();
+        }
+        return size;
     }
 }

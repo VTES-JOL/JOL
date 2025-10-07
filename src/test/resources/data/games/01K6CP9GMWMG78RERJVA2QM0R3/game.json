@@ -10,7 +10,7 @@
   ],
   "orderOfPlayReversed": false,
   "turn": null,
-  "phase": "Unlock",
+  "phase": "UNLOCK",
   "notes": null,
   "cards": {
     "06bc661b-9d19-4c42-a0ed-e28a2d8cc30d": {

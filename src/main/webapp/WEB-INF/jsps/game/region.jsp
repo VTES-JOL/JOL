@@ -15,8 +15,8 @@
     RegionType region = RegionType.valueOf(request.getParameter("region"));
     boolean simpleDisplay = RegionType.SIMPLE_REGIONS.contains(region);
     String regionId = playerIndex + "-" + region;
-    boolean startCollapsed = JolAdmin.INSTANCE.getGameModel(game.getName()).getView(viewer).isCollapsed(regionId);
-    boolean isVisible = game.isVisible(player, viewer, region);
+    boolean startCollapsed = JolAdmin.getGameModel(game.getName()).getView(viewer).isCollapsed(regionId);
+    boolean isVisible = region.isVisible(player, viewer);
     String show = startCollapsed ? "" : "show";
     String collapsed = startCollapsed ? "collapsed" : "";
     String regionStyle = region == RegionType.TORPOR ? "bg-danger-subtle" : (region == RegionType.READY ? "bg-success-subtle" : "bg-body-secondary");

@@ -44,7 +44,7 @@ public class LoginServlet extends HttpServlet {
         boolean authResult = PlayerService.authenticate(username, password);
         if (authResult) {
             request.getSession().setAttribute("meth", username);
-            boolean playTester = JolAdmin.INSTANCE.isPlaytester(username);
+            boolean playTester = JolAdmin.isPlaytester(username);
             if (playTester) {
                 setupPlaytestAuth(response);
             }

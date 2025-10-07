@@ -129,14 +129,14 @@ public record DoCommand(JolGame game, GameModel model) {
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
         CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         if (!cmdObj.hasMoreArgs()) {
-            game.setSect(targetCard, Sect.NONE);
+            game.setSect(targetCard.getId(), Sect.NONE);
         } else {
             String sectString = cmdObj.nextArg();
             Sect sect = Sect.startsWith(sectString);
             if (sect == null) {
                 throw new CommandException("Invalid sect");
             }
-            game.setSect(targetCard, sect);
+            game.setSect(targetCard.getId(), sect);
         }
     }
 
@@ -146,14 +146,14 @@ public record DoCommand(JolGame game, GameModel model) {
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
         CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         if (!cmdObj.hasMoreArgs()) {
-            game.setPath(targetCard, Path.NONE);
+            game.setPath(targetCard.getId(), Path.NONE);
         } else {
             String pathString = cmdObj.nextArg();
             Path path = Path.startsWith(pathString);
             if (Path.NONE.equals(path)) {
                 throw new CommandException("Invalid path");
             }
-            game.setPath(targetCard, path);
+            game.setPath(targetCard.getId(), path);
         }
     }
 
@@ -162,11 +162,11 @@ public record DoCommand(JolGame game, GameModel model) {
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
         CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         if (!cmdObj.hasMoreArgs()) {
-            game.setClan(targetCard, Clan.NONE);
+            game.setClan(targetCard.getId(), Clan.NONE);
         } else {
             String pathString = cmdObj.nextArg();
             Clan clan = Clan.startsWith(pathString);
-            game.setClan(targetCard, clan);
+            game.setClan(targetCard.getId(), clan);
         }
     }
 
@@ -185,6 +185,7 @@ public record DoCommand(JolGame game, GameModel model) {
         if (amount == 0) throw new CommandException("Must transfer an amount");
         int pool = game.getPool(player);
         if (pool - amount < 0) throw new CommandException("Invalid amount to transfer.  Not enough pool.");
+        if (card.getCounters() < amount) throw new CommandException("Not enough counters to transfer.");
         game.transfer(player, card.getId(), amount);
     }
 
@@ -356,7 +357,7 @@ public record DoCommand(JolGame game, GameModel model) {
 
     void influence(CommandParser cmdObj, String player) throws CommandException {
         CardData srcCard = cmdObj.findCardData(false, player, RegionType.UNCONTROLLED);
-        game.influenceCard(player, srcCard.getId(), player, RegionType.READY);
+        game.influenceCard(player, srcCard.getId());
     }
 
     void play(CommandParser cmdObj, String player) throws CommandException {

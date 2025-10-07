@@ -20,7 +20,7 @@ public class DeckPageBean {
         String playerName = model.getPlayerName();
         this.selectedDeck = model.getDeck();
         this.contents = model.getContents();
-        this.tags = JolAdmin.INSTANCE.getAvailableGameFormats(playerName).stream().map(GameFormat::getLabel).toList();
+        this.tags = JolAdmin.getAvailableGameFormats(playerName).stream().map(GameFormat::getLabel).toList();
         this.deckFilter = model.getDeckFilter();
     }
 

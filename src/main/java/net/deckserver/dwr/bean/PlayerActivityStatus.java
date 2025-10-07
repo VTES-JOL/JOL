@@ -23,12 +23,11 @@ public class PlayerActivityStatus {
     private final Integer activeGamesCount;
 
     public PlayerActivityStatus(String name) {
-        JolAdmin admin = JolAdmin.INSTANCE;
         this.name = name;
-        this.lastOnline = admin.getPlayerAccess(name);
+        this.lastOnline = JolAdmin.getPlayerAccess(name);
         Map<DeckFormat, Long> collect = DeckService.getPlayerDeckNames(name)
                 .stream()
-                .collect(Collectors.groupingBy(deckName -> admin.getDeckFormat(name, deckName), () -> new EnumMap<>(DeckFormat.class), Collectors.counting()));
+                .collect(Collectors.groupingBy(deckName -> JolAdmin.getDeckFormat(name, deckName), () -> new EnumMap<>(DeckFormat.class), Collectors.counting()));
         legacyDeckCount = Optional.ofNullable(collect.get(DeckFormat.LEGACY)).orElse(0L);
         modernDeckCount = Optional.ofNullable(collect.get(DeckFormat.MODERN)).orElse(0L);
         activeGamesCount = RegistrationService.getPlayerGames(name).size();

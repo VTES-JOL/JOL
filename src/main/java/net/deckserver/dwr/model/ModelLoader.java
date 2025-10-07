@@ -2,10 +2,7 @@ package net.deckserver.dwr.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.CardSearch;
-import net.deckserver.game.enums.CardType;
-import net.deckserver.game.enums.Clan;
-import net.deckserver.game.enums.RegionType;
-import net.deckserver.game.enums.Sect;
+import net.deckserver.game.enums.*;
 import net.deckserver.game.jaxb.actions.GameActions;
 import net.deckserver.game.jaxb.state.GameCard;
 import net.deckserver.game.jaxb.state.GameState;
@@ -66,6 +63,10 @@ public final class ModelLoader {
     }
 
     public static void saveGame(JolGame game, String turn) {
+        boolean testModeEnabled = System.getenv().getOrDefault("ENABLE_TEST_MODE", "false").equals("true");
+        if (testModeEnabled) {
+            return;
+        }
         turn = turn.replaceAll("\\.", "-");
         String gameId = game.id();
         Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game-" + turn + ".json");
@@ -211,8 +212,8 @@ public final class ModelLoader {
         return getNotation(state.getNotation(), "text", null);
     }
 
-    static String getPhase(GameState state) {
-        return getNotation(state.getNotation(), "phase", "Unlock");
+    static Phase getPhase(GameState state) {
+        return Phase.valueOf(getNotation(state.getNotation(), "phase", "Unlock"));
     }
 
     static RegionType getType(String regionName) {

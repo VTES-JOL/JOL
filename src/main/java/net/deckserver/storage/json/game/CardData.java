@@ -105,4 +105,12 @@ public class CardData {
     public String getOwnerName() {
         return this.owner.getName();
     }
+
+    public int size() {
+        int size = cards.size();
+        for (CardData card : cards) {
+            size += card.size();
+        }
+        return size;
+    }
 }

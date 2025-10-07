@@ -14,10 +14,9 @@ public class DeckInfoBean {
     private final Set<String> gameFormats;
 
     public DeckInfoBean(String playerName, String deckName) {
-        JolAdmin admin = JolAdmin.INSTANCE;
         this.name = deckName;
-        this.deckFormat = admin.getDeckFormat(playerName, deckName);
-        this.gameFormats = admin.getTags(playerName, deckName);
+        this.deckFormat = JolAdmin.getDeckFormat(playerName, deckName);
+        this.gameFormats = JolAdmin.getTags(playerName, deckName);
     }
 
     public String getDeckFormat() {

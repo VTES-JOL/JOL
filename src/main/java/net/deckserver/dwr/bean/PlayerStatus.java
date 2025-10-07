@@ -12,12 +12,11 @@ public class PlayerStatus {
     private boolean current;
 
     public PlayerStatus(String gameName, String playerName) {
-        JolAdmin admin = JolAdmin.INSTANCE;
         this.playerName = playerName;
-        JolGame game = admin.getGame(gameName);
+        JolGame game = JolAdmin.getGame(gameName);
         this.pool = game.getPool(playerName);
-        this.pinged = admin.isPlayerPinged(playerName, gameName);
-        this.current = admin.getPlayerAccess(playerName, gameName).isAfter(admin.getGameTimeStamp(gameName));
+        this.pinged = JolAdmin.isPlayerPinged(playerName, gameName);
+        this.current = JolAdmin.getPlayerAccess(playerName, gameName).isAfter(JolAdmin.getGameTimeStamp(gameName));
     }
 
     public boolean isOusted() {

@@ -1,4 +1,5 @@
 <%@ page import="net.deckserver.JolAdmin" %>
+<%@ page import="net.deckserver.services.VersionService" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!doctype html>
@@ -10,7 +11,7 @@
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" type="text/css"
-          href="${pageContext.request.contextPath}/css/styles.css?version=<%= JolAdmin.INSTANCE.getVersion() %>"/>
+          href="${pageContext.request.contextPath}/css/styles.css?version=<%= VersionService.getVersion() %>"/>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.min.css"/>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.structure.min.css"/>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.theme.min.css"/>

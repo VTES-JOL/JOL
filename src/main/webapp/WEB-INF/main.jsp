@@ -1,4 +1,5 @@
 <%@ page import="net.deckserver.JolAdmin" %>
+<%@ page import="net.deckserver.services.VersionService" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!doctype html>
@@ -14,7 +15,7 @@
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" type="text/css"
-          href="${pageContext.request.contextPath}/css/styles.css?version=<%= JolAdmin.INSTANCE.getVersion() %>"/>
+          href="${pageContext.request.contextPath}/css/styles.css?version=<%= VersionService.getVersion() %>"/>
     <link rel="stylesheet" type="text/css"
           href="${pageContext.request.contextPath}/css/<%= System.getenv().getOrDefault("TYPE", "dev") %>.css"/>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.min.css"/>
@@ -65,7 +66,7 @@
         <div class="container-fluid p-2 justify-content-center justify-content-md-between d-flex bg-secondary-subtle fw-bold">
             <span id="timeStamp" class="d-none d-md-inline"></span>
             <span id="message"></span>
-            <span class="d-none d-md-inline">Version: <%= JolAdmin.INSTANCE.getVersion() %></span>
+            <span class="d-none d-md-inline">Version: <%= VersionService.getVersion() %></span>
         </div>
     </footer>
 </div>
@@ -83,7 +84,7 @@
 <script src='${pageContext.request.contextPath}/dwr/engine.js'></script>
 <script src='${pageContext.request.contextPath}/dwr/interface/DS.js'></script>
 <script src='${pageContext.request.contextPath}/dwr/util.js'></script>
-<script src='${pageContext.request.contextPath}/js/ds.js?version=<%= JolAdmin.INSTANCE.getVersion() %>'></script>
-<script src="${pageContext.request.contextPath}/js/card-modal.js?version=<%= JolAdmin.INSTANCE.getVersion() %>"></script>
+<script src='${pageContext.request.contextPath}/js/ds.js?version=<%= VersionService.getVersion() %>'></script>
+<script src="${pageContext.request.contextPath}/js/card-modal.js?version=<%= VersionService.getVersion() %>"></script>
 </body>
 </html>

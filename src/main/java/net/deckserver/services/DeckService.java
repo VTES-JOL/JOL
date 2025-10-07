@@ -1,17 +1,12 @@
 package net.deckserver.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import io.azam.ulidj.ULID;
-import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.DeckFormat;
 import net.deckserver.game.validators.ValidatorFactory;
 import net.deckserver.storage.json.deck.CardCount;
-import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.system.DeckInfo;
 import org.slf4j.Logger;
@@ -21,9 +16,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -88,6 +83,38 @@ public class DeckService extends PersistedService {
     public static synchronized String getLegacyContents(String deckId) throws IOException {
         Path deckPath = Paths.get(System.getenv("JOL_DATA"), "decks", deckId + ".txt");
         return Files.readString(deckPath);
+    }
+
+    public static ExtendedDeck getGameDeck(String gameId, String deckId) {
+        try {
+            Path gameDeckPath = Paths.get(System.getenv("JOL_DATA"), String.format("games/%s/%s.json", gameId, deckId));
+            return objectMapper.readValue(gameDeckPath.toFile(), ExtendedDeck.class);
+        } catch (IOException e) {
+            return new ExtendedDeck();
+        }
+    }
+
+    public static void saveDeck(String deckId, ExtendedDeck deck) {
+        try {
+            Path deckPath = Paths.get(System.getenv("JOL_DATA"), "decks", deckId + ".json");
+            objectMapper.writeValue(deckPath.toFile(), deck);
+        } catch (IOException e) {
+            logger.error("Unable to save deck {}", deckId, e);
+        }
+    }
+
+    public static boolean copyDeck(String deckId, String gameId) {
+        try {
+            Path deckPath = Paths.get(System.getenv("JOL_DATA"), "decks", deckId + ".json");
+            Path gamePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, deckId + ".json");
+            logger.debug("Copying {} to {}", deckPath, gamePath);
+            Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
+            return true;
+        } catch (IOException e) {
+            logger.error("Unable to load deck for {}", deckId, e);
+            return false;
+        }
+
     }
 
     private void upgrade() {

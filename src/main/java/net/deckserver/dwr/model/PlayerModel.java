@@ -64,7 +64,7 @@ public class PlayerModel {
             games.add(gameName);
         }
         if (!gameName.equals(this.game)) {
-            JolAdmin.INSTANCE.getGameModel(gameName).resetView(player);
+            JolAdmin.getGameModel(gameName).resetView(player);
         }
         this.game = gameName;
     }
@@ -99,10 +99,9 @@ public class PlayerModel {
     }
 
     public void loadDeck(String deckName) {
-        JolAdmin admin = JolAdmin.INSTANCE;
         try {
-            String deckId = admin.getDeckId(player, deckName);
-            DeckFormat deckFormat = admin.getDeckFormat(player, deckName);
+            String deckId = JolAdmin.getDeckId(player, deckName);
+            DeckFormat deckFormat = JolAdmin.getDeckFormat(player, deckName);
             if (deckFormat.equals(DeckFormat.LEGACY)) {
                 this.contents = DeckService.getLegacyContents(deckId).trim();
                 this.deck = DeckParser.parseDeck(contents);

@@ -8,11 +8,7 @@ package net.deckserver.dwr.model;
 
 import com.google.common.base.Strings;
 import net.deckserver.CardSearch;
-import net.deckserver.JolAdmin;
-import net.deckserver.game.enums.Clan;
-import net.deckserver.game.enums.Path;
-import net.deckserver.game.enums.RegionType;
-import net.deckserver.game.enums.Sect;
+import net.deckserver.game.enums.*;
 import net.deckserver.services.ChatService;
 import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.Deck;
@@ -21,7 +17,6 @@ import net.deckserver.storage.json.game.GameData;
 import net.deckserver.storage.json.game.PlayerData;
 import net.deckserver.storage.json.game.RegionData;
 
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,14 +24,7 @@ import java.util.stream.Stream;
 
 public record JolGame(String id, GameData data) {
 
-    public static final String[] TURN_PHASES = new String[]{"Unlock", "Master", "Minion", "Influence", "Discard"};
-
-    private static final DecimalFormat format = new DecimalFormat("0.#");
     private static final Comparator<String> DISC_COMPARATOR = Comparator.comparing(s -> Character.isLowerCase(s.charAt(0)) ? 0 : 1);
-
-    static {
-        format.setRoundingMode(RoundingMode.DOWN);
-    }
 
     public void addPlayer(String name, Deck deck) {
         // Common code that doesn't rely on state
@@ -62,11 +50,9 @@ public record JolGame(String id, GameData data) {
         ChatService.sendCommand(id, player, player + " withdraws and gains 0.5 victory points.", "withdraw");
     }
 
-    public void updateVP(String targetPlayer, double amount) {
-        float currentVictoryPoints = data.getPlayer(targetPlayer).getVictoryPoints();
-        currentVictoryPoints += (float) amount;
-        data.getPlayer(targetPlayer).addVictoryPoints(currentVictoryPoints);
-        ChatService.sendCommand(id, targetPlayer, targetPlayer + " has " + (amount > 0 ? "gained " : "lost ") + format.format(Math.abs(amount)) + " victory points.", "vp", String.valueOf(amount));
+    public void updateVP(String targetPlayer, float amount) {
+        data.getPlayer(targetPlayer).addVictoryPoints(amount);
+        ChatService.sendCommand(id, targetPlayer, targetPlayer + " has " + (amount > 0 ? "gained " : "lost ") + DecimalFormat.getCompactNumberInstance().format(Math.abs(amount)) + " victory points.", "vp", String.valueOf(amount));
     }
 
     public double getVictoryPoints(String player) {
@@ -156,30 +142,33 @@ public record JolGame(String id, GameData data) {
 
     }
 
-    public void influenceCard(String player, String cardId, String destPlayer, RegionType destRegion) {
+    public void influenceCard(String player, String cardId) {
         String votesText = "";
         CardData card = data.getCard(cardId);
-        RegionData destination = data.getPlayerRegion(destPlayer, destRegion);
+        RegionData destination = data.getPlayerRegion(player, RegionType.READY);
         destination.addCard(card, true);
         if (!Strings.isNullOrEmpty(card.getVotes())) {
             votesText = ", votes: " + card.getVotes();
         }
-        ChatService.sendCommand(id, player, String.format("%s influences out %s%s.", player, getCardLink(card), votesText), "influence", card.getId(), destPlayer, destRegion.xmlLabel());
+        ChatService.sendCommand(id, player, String.format("%s influences out %s%s.", player, getCardLink(card), votesText), "influence", card.getId(), player, RegionType.READY.xmlLabel());
         List<CardData> cards = data.getUniqueCards(card);
         if (cards.size() > 1) {
             cards.forEach(c -> c.setContested(true));
         }
     }
 
-    public void setSect(CardData card, Sect sect) {
+    public void setSect(String cardId, Sect sect) {
+        CardData card = data.getCard(cardId);
         card.setSect(sect);
     }
 
-    public void setPath(CardData card, Path path) {
+    public void setPath(String cardId, Path path) {
+        CardData card = data.getCard(cardId);
         card.setPath(path);
     }
 
-    public void setClan(CardData card, Clan clan) {
+    public void setClan(String cardId, Clan clan) {
+        CardData card = data.getCard(cardId);
         card.setClan(clan);
     }
 
@@ -193,11 +182,10 @@ public record JolGame(String id, GameData data) {
 
     public void startGame(List<String> playerSeating) {
         List<String> players = data.getPlayerNames();
-        if (!new HashSet<>(players).containsAll(playerSeating)) {
+        if (playerSeating.size() != players.size() || !new HashSet<>(players).containsAll(playerSeating)) {
             throw new IllegalArgumentException("Player ordering not valid, does not contain current players");
         }
-        data.orderPlayers(playerSeating);
-        ChatService.sendSystemMessage(id, "Start game");
+        data.orderPlayers(playerSeating, false);
         for (String player : players) {
             PlayerData playerData = data.getPlayer(player);
             playerData.getRegion(RegionType.CRYPT).shuffle(0);
@@ -211,12 +199,6 @@ public record JolGame(String id, GameData data) {
         }
         data.updatePredatorMapping();
         newTurn();
-        JolAdmin.INSTANCE.pingPlayer(getActivePlayer(), getName());
-    }
-
-    public void initGame(String name) {
-        data.setName(name);
-        data.setEdge(null);
     }
 
     public void sendMsg(String player, String msg, boolean isJudge) {
@@ -239,19 +221,17 @@ public record JolGame(String id, GameData data) {
     }
 
     public void transfer(String player, String cardId, int amount) {
-        {
-            CardData card = data.getCard(cardId);
-            PlayerData playerData = data.getPlayer(player);
-            int counters = card.getCounters();
-            int pool = playerData.getPool();
-            int newCounters = counters + amount;
-            int newPool = pool - amount;
-            playerData.setPool(newPool);
-            card.setCounters(newCounters);
-            String direction = amount > 0 ? "onto" : "off";
-            String message = String.format("%s transferred %d blood %s %s. Currently: %d, Pool: %d", player, Math.abs(amount), direction, getCardName(card), newCounters, newPool);
-            ChatService.sendCommand(id, player, message, "transfer", card.getId(), String.valueOf(amount));
-        }
+        CardData card = data.getCard(cardId);
+        PlayerData playerData = data.getPlayer(player);
+        int counters = card.getCounters();
+        int pool = playerData.getPool();
+        int newCounters = counters + amount;
+        int newPool = pool - amount;
+        playerData.setPool(newPool);
+        card.setCounters(newCounters);
+        String direction = amount > 0 ? "onto" : "off";
+        String message = String.format("%s transferred %d blood %s %s. Currently: %d, Pool: %d", player, Math.abs(amount), direction, getCardName(card), newCounters, newPool);
+        ChatService.sendCommand(id, player, message, "transfer", card.getId(), String.valueOf(amount));
     }
 
     public void changeCounters(String player, String cardId, int incr, boolean quiet) {
@@ -268,17 +248,8 @@ public record JolGame(String id, GameData data) {
         }
     }
 
-    public boolean isVisible(String owner, String viewer, RegionType region) {
-        return Objects.equals(owner, viewer) ? region.ownerVisibility() : region.otherVisibility();
-    }
-
     public String getActivePlayer() {
         return data.getCurrentPlayerName();
-    }
-
-    private void setActivePlayer(String player) {
-        PlayerData playerData = data.getPlayer(player);
-        data.setCurrentPlayer(playerData);
     }
 
     public String getTurnLabel() {
@@ -351,7 +322,7 @@ public record JolGame(String id, GameData data) {
         int starting = playerData.getPool();
         int ending = starting + amount;
         playerData.setPool(ending);
-        if (ending < 0) {
+        if (ending <= 0) {
             data.updatePredatorMapping();
         }
         ChatService.sendCommand(id, source, player + "'s pool was " + starting + ", now is " + ending + ".", "pool", player, String.valueOf(amount));
@@ -371,10 +342,6 @@ public record JolGame(String id, GameData data) {
 
     public void setPrivateNotes(String player, String text) {
         data.getPlayer(player).setNotes(text);
-    }
-
-    public String getLabel(CardData card) {
-        return Optional.ofNullable(card.getNotes()).orElse("");
     }
 
     public void setLabel(String player, String cardId, String text, boolean quiet) {
@@ -489,20 +456,19 @@ public record JolGame(String id, GameData data) {
         }
         String turnId = String.format("%d.%d", round, index);
         // If we are reversed, choose predator, otherwise choose prey
-        setPhase(TURN_PHASES[0]);
-        data.setTurn(turnId);
         ChatService.addTurn(id, nextPlayer.getName(), turnId);
+        setPhase(Phase.UNLOCK);
+        data.setTurn(turnId);
         ModelLoader.saveGame(this, turnId);
-        JolAdmin.INSTANCE.pingPlayer(getActivePlayer(), getName());
     }
 
-    public String getPhase() {
-        return Optional.ofNullable(data.getPhase()).orElse("Unlock");
+    public Phase getPhase() {
+        return Optional.ofNullable(data.getPhase()).orElse(Phase.UNLOCK);
     }
 
-    public void setPhase(String phase) {
+    public void setPhase(Phase phase) {
         data.setPhase(phase);
-        sendMsg(getActivePlayer(), "START OF " + phase.toUpperCase() + " PHASE.", false);
+        sendMsg(getActivePlayer(), "START OF " + phase.toString() + " PHASE.", false);
     }
 
     public void changeCapacity(String source, String cardId, int change, boolean quiet) {
@@ -561,13 +527,11 @@ public record JolGame(String id, GameData data) {
         newDisciplines.sort(DISC_COMPARATOR.thenComparing(Comparator.naturalOrder()));
         discAdded.sort(DISC_COMPARATOR.thenComparing(Comparator.naturalOrder()));
         discRemoved.sort(DISC_COMPARATOR.thenComparing(Comparator.naturalOrder()));
-        {
-            CardData card = data.getCard(cardId);
-            if (!discAdded.isEmpty() || !discRemoved.isEmpty()) {
-                card.setDisciplines(newDisciplines);
-            } else {
-                throw new CommandException("No valid disciplines chosen.");
-            }
+        CardData card = data.getCard(cardId);
+        if (!discAdded.isEmpty() || !discRemoved.isEmpty()) {
+            card.setDisciplines(newDisciplines);
+        } else {
+            throw new CommandException("No valid disciplines chosen.");
         }
         String additionString = discAdded.isEmpty() ? "" : "added " + ChatParser.parseGlobalChat(discAdded.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" ")));
         String removalsString = discRemoved.isEmpty() ? "" : "removed " + ChatParser.parseGlobalChat(discRemoved.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" ")));
@@ -575,31 +539,9 @@ public record JolGame(String id, GameData data) {
 
     }
 
-    public List<String> getPingList() {
-        return getValidPlayers()
-                .stream()
-                .filter(player -> !JolAdmin.INSTANCE.isPlayerPinged(player, data.getName()))
-                .collect(Collectors.toList());
-    }
-
     public void replacePlayer(String oldPlayer, String newPlayer) {
-        if (getActivePlayer().equals(oldPlayer)) {
-            setActivePlayer(newPlayer);
-        }
-        {
-            List<String> reordered = new ArrayList<>(data.getPlayerOrder());
-            for (int i = 0; i < reordered.size(); i++) {
-                if (Objects.equals(reordered.get(i), oldPlayer)) {
-                    reordered.set(i, newPlayer);
-                }
-            }
-            data.orderPlayers(reordered);
-
-            PlayerData playerData = data.getPlayer(oldPlayer);
-            playerData.setName(newPlayer);
-            data.setTimeoutRequestor(null);
-        }
-
+        data.replacePlayer(oldPlayer, newPlayer);
+        data.setTimeoutRequestor(null);
         ChatService.sendSystemMessage(id, "Player " + newPlayer + " replaced " + oldPlayer);
     }
 
@@ -621,14 +563,14 @@ public record JolGame(String id, GameData data) {
 
     public void setOrder(String source, List<String> players) {
         {
-            data.orderPlayers(players);
+            data.orderPlayers(players, false);
         }
         StringBuilder order = new StringBuilder();
         for (String player : players) order.append(" ").append(player);
         ChatService.sendCommand(id, source, "Player order" + order, "order", order.toString());
     }
 
-    private List<String> getValidPlayers() {
+    public List<String> getValidPlayers() {
         return data.getCurrentPlayers()
                 .stream()
                 .map(PlayerData::getName)
@@ -708,13 +650,9 @@ public record JolGame(String id, GameData data) {
         } else {
             boolean looking = true;
             while (looking) {
-                List<? extends CardData> cards = parent.getCards();
-                for (int i = 0; i < cards.size(); i++) {
-                    if (id.equals(cards.get(i).getId())) {
-                        coordinates.add(String.valueOf(i + 1));
-                        break;
-                    }
-                }
+                List<String> idList = parent.getCards().stream().map(CardData::getId).toList();
+                int index = idList.indexOf(id);
+                coordinates.add(String.valueOf(index + 1));
                 if (parent.getParent() == null) {
                     looking = false;
                     coordinates.add(String.valueOf(card.getRegion().getCards().indexOf(parent) + 1));
@@ -780,7 +718,7 @@ public record JolGame(String id, GameData data) {
         _drawCard(player, srcRegion, destRegion, true);
     }
 
-    void moveToCard(String player, String srcCardId, String dstCardId) throws CommandException {
+    public void moveToCard(String player, String srcCardId, String dstCardId) throws CommandException {
         if (srcCardId.equals(dstCardId)) throw new CommandException("Can't move a card to itself");
         {
             CardData srcCard = data.getCard(srcCardId);

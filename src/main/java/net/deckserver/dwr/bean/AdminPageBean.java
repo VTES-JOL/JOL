@@ -20,7 +20,6 @@ public class AdminPageBean {
     private final List<GameActivityStatus> idleGames;
 
     public AdminPageBean(PlayerModel model) {
-        JolAdmin admin = JolAdmin.INSTANCE;
         List<String> currentPlayers = PlayerService.getPlayers().stream().sorted().toList();
         List<PlayerActivityStatus> playerActivityStatuses = currentPlayers.stream()
                 .map(PlayerActivityStatus::new)
@@ -43,9 +42,9 @@ public class AdminPageBean {
                 .filter(playerActivityStatus -> playerActivityStatus.online().isAfter(currentMonth))
                 .map(PlayerActivityStatus::getName)
                 .collect(Collectors.toList());
-        this.games = admin.getGameNames().stream()
+        this.games = JolAdmin.getGameNames().stream()
                 .sorted()
-                .filter(admin::isActive)
+                .filter(JolAdmin::isActive)
                 .collect(Collectors.toList());
         this.idleGames = this.games.stream()
                 .map(GameActivityStatus::new)

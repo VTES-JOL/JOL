@@ -26,11 +26,10 @@ public class LobbyPageBean {
     private final List<String> gameFormats;
 
     public LobbyPageBean(String player) {
-        JolAdmin admin = JolAdmin.INSTANCE;
         OffsetDateTime currentMonth = OffsetDateTime.now().minusMonths(1);
 
-        playtester = admin.isPlaytester(player);
-        gameFormats = admin.getAvailableGameFormats(player).stream().map(GameFormat::getLabel).toList();
+        playtester = JolAdmin.isPlaytester(player);
+        gameFormats = JolAdmin.getAvailableGameFormats(player).stream().map(GameFormat::getLabel).toList();
 
         players = PlayerService.getPlayers().stream()
                 .sorted()
@@ -40,26 +39,26 @@ public class LobbyPageBean {
                 .map(PlayerActivityStatus::getName)
                 .collect(Collectors.toList());
 
-        myGames = admin.getGameNames().stream()
+        myGames = JolAdmin.getGameNames().stream()
                 .filter(Objects::nonNull)
-                .filter(admin::isPrivate)
-                .filter(gameName -> admin.isViewable(gameName, player))
-                .filter(gameName -> player.equals(admin.getOwner(gameName)))
+                .filter(JolAdmin::isPrivate)
+                .filter(gameName -> JolAdmin.isViewable(gameName, player))
+                .filter(gameName -> player.equals(JolAdmin.getOwner(gameName)))
                 .map(GameStatusBean::new)
                 .collect(Collectors.toList());
 
-        publicGames = admin.getGameNames().stream()
+        publicGames = JolAdmin.getGameNames().stream()
                 .filter(Objects::nonNull)
-                .filter(admin::isStarting)
-                .filter(admin::isPublic)
-                .filter(gameName -> admin.isViewable(gameName, player))
+                .filter(JolAdmin::isStarting)
+                .filter(JolAdmin::isPublic)
+                .filter(gameName -> JolAdmin.isViewable(gameName, player))
                 .map(GameStatusBean::new)
                 .sorted(Comparator.comparing(GameStatusBean::getCreated))
                 .collect(Collectors.toList());
 
-        invitedGames = admin.getGameNames().stream()
+        invitedGames = JolAdmin.getGameNames().stream()
                 .filter(Objects::nonNull)
-                .filter(admin::isStarting)
+                .filter(JolAdmin::isStarting)
                 .filter(gameName -> RegistrationService.isInGame(gameName, player))
                 .map(gameName -> new GameInviteStatus(gameName, player))
                 .collect(Collectors.toList());
@@ -71,7 +70,7 @@ public class LobbyPageBean {
                 .sorted(Comparator.comparing(DeckInfoBean::getName, String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toList());
 
-        message = JolAdmin.INSTANCE.getPlayerModel(player).getMessage();
+        message = JolAdmin.getPlayerModel(player).getMessage();
 
     }
 
