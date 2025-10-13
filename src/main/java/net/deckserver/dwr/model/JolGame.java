@@ -7,9 +7,10 @@
 package net.deckserver.dwr.model;
 
 import com.google.common.base.Strings;
-import net.deckserver.CardSearch;
+import net.deckserver.services.CardService;
 import net.deckserver.game.enums.*;
 import net.deckserver.services.ChatService;
+import net.deckserver.services.ParserService;
 import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.CardData;
@@ -111,7 +112,7 @@ public record JolGame(String id, GameData data) {
 
         if (modes != null) {
             for (String mode : modes)
-                modeMessage.append(ChatParser.generateDisciplineLink(mode));
+                modeMessage.append(ParserService.generateDisciplineLink(mode));
             modeMessage.insert(0, " at ");
         }
         CardData card = data.getCard(cardId);
@@ -185,7 +186,7 @@ public record JolGame(String id, GameData data) {
         if (playerSeating.size() != players.size() || !new HashSet<>(players).containsAll(playerSeating)) {
             throw new IllegalArgumentException("Player ordering not valid, does not contain current players");
         }
-        data.orderPlayers(playerSeating, false);
+        data.orderPlayers(playerSeating);
         for (String player : players) {
             PlayerData playerData = data.getPlayer(player);
             playerData.getRegion(RegionType.CRYPT).shuffle(0);
@@ -202,9 +203,9 @@ public record JolGame(String id, GameData data) {
     }
 
     public void sendMsg(String player, String msg, boolean isJudge) {
-        msg = ChatParser.sanitizeText(msg);
+        msg = ParserService.sanitizeText(msg);
         // TODO : look at this
-        msg = ChatParser.parseGameChat(msg);
+        msg = ParserService.parseGameChat(msg);
         if (isJudge) {
             ChatService.sendJudgeMessage(id, player, msg);
         } else {
@@ -261,7 +262,7 @@ public record JolGame(String id, GameData data) {
     }
 
     public CardData hydrateCard(CardData card) {
-        CardSummary summary = CardSearch.get(card.getCardId());
+        CardSummary summary = CardService.get(card.getCardId());
         card.setName(summary.getName());
         card.setPlaytest(summary.isPlayTest());
         card.setUnique(summary.isUnique());
@@ -489,7 +490,7 @@ public record JolGame(String id, GameData data) {
             card.setDisciplines(disciplines);
             if (!quiet && !disciplines.isEmpty()) {
                 String disciplineList = disciplines.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" "));
-                String msg = ChatParser.parseGameChat(player + " reset " + getCardName(card) + " back to " + disciplineList);
+                String msg = ParserService.parseGameChat(player + " reset " + getCardName(card) + " back to " + disciplineList);
                 ChatService.sendCommand(id, player, msg, "disc", card.getId(), disciplines.toString());
             }
         }
@@ -533,8 +534,8 @@ public record JolGame(String id, GameData data) {
         } else {
             throw new CommandException("No valid disciplines chosen.");
         }
-        String additionString = discAdded.isEmpty() ? "" : "added " + ChatParser.parseGlobalChat(discAdded.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" ")));
-        String removalsString = discRemoved.isEmpty() ? "" : "removed " + ChatParser.parseGlobalChat(discRemoved.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" ")));
+        String additionString = discAdded.isEmpty() ? "" : "added " + ParserService.parseGlobalChat(discAdded.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" ")));
+        String removalsString = discRemoved.isEmpty() ? "" : "removed " + ParserService.parseGlobalChat(discRemoved.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" ")));
         ChatService.sendCommand(id, player, String.format("%s %s%s to %s.", player, additionString, removalsString, getCardName(data.getCard(cardId))), "disc", cardId, additionString, removalsString);
 
     }
@@ -562,9 +563,7 @@ public record JolGame(String id, GameData data) {
     }
 
     public void setOrder(String source, List<String> players) {
-        {
-            data.orderPlayers(players, false);
-        }
+        data.orderPlayers(players);
         StringBuilder order = new StringBuilder();
         for (String player : players) order.append(" ").append(player);
         ChatService.sendCommand(id, source, "Player order" + order, "order", order.toString());
@@ -575,6 +574,36 @@ public record JolGame(String id, GameData data) {
                 .stream()
                 .map(PlayerData::getName)
                 .collect(Collectors.toList());
+    }
+
+    public void show(String player, RegionType targetRegion, int amount, List<String> recipients) {
+        List<CardData> regionData = data.getPlayerRegion(player, targetRegion).getCards();
+        int max = Math.min(regionData.size(), amount);
+        List<CardData> cards = regionData.stream().limit(max).toList();
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("%d cards of %s's %s\n", max, player, targetRegion.description()));
+        for (int i = 0; i < cards.size(); i++) {
+            builder.append(String.format("%d %s\n", i + 1, cards.get(i).getName()));
+        }
+        String notes = builder.toString();
+        for (String recipient: recipients) {
+            PlayerData recipientData = data.getPlayer(recipient);
+            String privateNotes = recipientData.getNotes();
+            privateNotes += notes;
+            recipientData.setNotes(privateNotes);
+        }
+        String msg;
+        boolean self = recipients.size() == 1 && recipients.contains(player);
+        boolean all = recipients.size() == getValidPlayers().size();
+        if (self) {
+            msg = "%s looks at %d cards of their %s.";
+        } else if (all) {
+            msg = "%s shows everyone %d cards of their %s.";
+        } else {
+            msg = "%1$s shows %4$s %2$d cards of their %3$s.";
+        }
+        msg = String.format(msg, player, max, targetRegion.description(), String.join(", ", recipients));
+        ChatService.sendCommand(id, player, msg, "show", targetRegion.xmlLabel(), String.valueOf(max), String.join(" ", recipients));
     }
 
     private void _drawCard(String player, RegionType srcRegion, RegionType destRegion, boolean log) {

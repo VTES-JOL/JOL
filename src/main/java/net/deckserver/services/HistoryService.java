@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,25 +22,26 @@ public class HistoryService extends PersistedService {
     private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "pastGames.json");
     private static final HistoryService INSTANCE = new HistoryService();
 
-    private Map<OffsetDateTime, GameHistory> pastGames;
+    private final Map<OffsetDateTime, GameHistory> pastGames = new HashMap<>();
 
     private HistoryService() {
         super("HistoryService", 10);
+        load();
     }
 
-    public static Map<OffsetDateTime, GameHistory> getHistory() {
+    public static synchronized Map<OffsetDateTime, GameHistory> getHistory() {
         return INSTANCE.pastGames;
     }
 
-    public static void addGame(OffsetDateTime now, GameHistory history) {
+    public static synchronized void addGame(OffsetDateTime now, GameHistory history) {
         INSTANCE.pastGames.put(now, history);
     }
 
-    public static Collection<GameHistory> getGames() {
+    public static synchronized Collection<GameHistory> getGames() {
         return INSTANCE.pastGames.values();
     }
 
-    public static void validateGW() {
+    public static synchronized void validateGW() {
         HistoryService.getGames().forEach(gameHistory -> {
             PlayerResult winner = null;
             PlayerResult previousWinner = gameHistory.getResults().stream().filter(PlayerResult::isGameWin).findFirst().orElse(null);
@@ -74,6 +76,18 @@ public class HistoryService extends PersistedService {
 
     @Override
     protected void persist() {
+        if (shouldSkipPersistence()) {
+            logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
+            return;
+        }
+
+        try {
+            logger.debug("Persisting {} past games", pastGames.size());
+            objectMapper.writeValue(PERSISTENCE_PATH.toFile(), pastGames);
+            logger.debug("Successfully persisted past games");
+        } catch (IOException e) {
+            logger.error("Unable to save past games", e);
+        }
 
     }
 

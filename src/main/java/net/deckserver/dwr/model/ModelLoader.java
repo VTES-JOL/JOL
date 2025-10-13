@@ -1,7 +1,7 @@
 package net.deckserver.dwr.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.deckserver.CardSearch;
+import net.deckserver.services.CardService;
 import net.deckserver.game.enums.*;
 import net.deckserver.game.jaxb.actions.GameActions;
 import net.deckserver.game.jaxb.state.GameCard;
@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,18 +31,25 @@ public final class ModelLoader {
     private static final Path BASE_PATH = Paths.get(System.getenv("JOL_DATA"));
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static JolGame loadGame(String gameId) {
+    private static final ReadWriteLock rwLock = new ReentrantReadWriteLock();
+    private static final Lock readLock = rwLock.readLock();
+    private static final Lock writeLock = rwLock.writeLock();
+
+    public static synchronized JolGame loadGame(String gameId) {
+        readLock.lock();
         try {
             Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.json");
             GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
             return new JolGame(gameId, gameData);
         } catch (IOException e) {
             logger.error("Error reading game file {}", gameId, e);
+        } finally {
+            readLock.unlock();
         }
-        return new JolGame(gameId, new GameData());
+        return new JolGame(gameId, new GameData(gameId));
     }
 
-    public static JolGame loadSnapshot(String gameId, String turn) {
+    public static synchronized JolGame loadSnapshot(String gameId, String turn) {
         try {
             Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game-" + turn + ".json");
             GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
@@ -47,10 +57,11 @@ public final class ModelLoader {
         } catch (IOException e) {
             logger.error("Error reading game file", e);
         }
-        return new JolGame(gameId, new GameData());
+        return new JolGame(gameId, new GameData(gameId));
     }
 
-    public static void saveGame(JolGame game) {
+    public static synchronized void saveGame(JolGame game) {
+        writeLock.lock();
         String gameId = game.id();
         Path gameStatePath = BASE_PATH.resolve("games").resolve(gameId).resolve("game.json");
         GameData deckServerState = game.data();
@@ -59,10 +70,12 @@ public final class ModelLoader {
             objectMapper.writeValue(gameStatePath.toFile(), deckServerState);
         } catch (IOException e) {
             logger.error("Unable to save game file", e);
+        } finally {
+            writeLock.unlock();
         }
     }
 
-    public static void saveGame(JolGame game, String turn) {
+    public static synchronized void saveGame(JolGame game, String turn) {
         boolean testModeEnabled = System.getenv().getOrDefault("ENABLE_TEST_MODE", "false").equals("true");
         if (testModeEnabled) {
             return;
@@ -78,8 +91,8 @@ public final class ModelLoader {
         }
     }
 
-    public static GameData convertGameState(GameState gameState, String gameId) {
-        GameData data = new GameData();
+    public static synchronized GameData convertGameState(GameState gameState, String gameId) {
+        GameData data = new GameData(gameId);
         data.setId(gameId);
         data.setName(gameState.getName());
         Map<String, CardData> cardData = new HashMap<>();
@@ -126,7 +139,7 @@ public final class ModelLoader {
         data.setEdge(edge);
         data.setNotes(getNotes(gameState));
         data.setPhase(getPhase(gameState));
-        data.initRegion(cardData.values());
+        data.setCards(cardData);
         return data;
     }
 
@@ -213,7 +226,7 @@ public final class ModelLoader {
     }
 
     static Phase getPhase(GameState state) {
-        return Phase.valueOf(getNotation(state.getNotation(), "phase", "Unlock"));
+        return Phase.of(getNotation(state.getNotation(), "phase", "Unlock"));
     }
 
     static RegionType getType(String regionName) {
@@ -263,7 +276,7 @@ public final class ModelLoader {
         CardData cardData = new CardData();
         cardData.setId(gameCard.getId());
         cardData.setCardId(gameCard.getCardid());
-        CardSummary summary = CardSearch.get(gameCard.getCardid());
+        CardSummary summary = CardService.get(gameCard.getCardid());
         cardData.setName(summary.getDisplayName());
         if (CardType.permanentTypes().contains(summary.getCardType())) {
             cardData.setType(summary.getCardType());
@@ -309,9 +322,15 @@ public final class ModelLoader {
     public static TurnHistory convertHistory(GameActions gameActions) {
         Pattern ACTION_PATTERN = Pattern.compile("^(\\d{1,2}-\\w{3} \\d{2}:\\d{2})(?:\\s+\\[\\s*<\\s*([^>]+)\\s*>\\s*]|\\s+\\[([^\\]]+)])?\\s+(.*)$");
         TurnHistory history = new TurnHistory();
+        Set<String> turnLabels = new HashSet<>();
         gameActions.getTurn().forEach(turn -> {
             TurnData turnData = new TurnData();
             String label = turn.getLabel();
+            // Not sure how we get duplicates but keep the oldest one
+            if (turnLabels.contains(label)) {
+                return;
+            }
+            turnLabels.add(label);
             String player = turn.getName();
             String turnId = label.replaceAll(player, "").trim();
             turnData.setPlayer(player);

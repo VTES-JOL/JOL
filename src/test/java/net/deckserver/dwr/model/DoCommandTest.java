@@ -31,7 +31,7 @@ public class DoCommandTest {
     @BeforeEach
     void setUp() {
         game = ModelLoader.loadGame("command-test");
-        worker = new DoCommand(game, new GameModel("Command Test", "command-test", true));
+        worker = new DoCommand(game, new GameModel(game));
     }
 
     @Test
@@ -248,6 +248,7 @@ public class DoCommandTest {
         assertThat(game.data().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(8));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.HAND).getCards().get(7), hasProperty("id", is("143")));
         assertThat(getLastMessage(), containsString("Player2 draws from their library."));
+        assertThrows(CommandException.class, () -> worker.doCommand("Player2", "draw crypt 15"));
     }
 
     @Test
@@ -638,15 +639,14 @@ public class DoCommandTest {
     }
 
     @Test
-    @Disabled
     void showAll() throws CommandException {
         assertThat(game.getPrivateNotes("Player2"), is(""));
         worker.doCommand("Player3", "show library all");
-        assertThat(game.getPrivateNotes("Player1"), containsString("81 cards of Player3's LIBRARY"));
-        assertThat(game.getPrivateNotes("Player2"), containsString("81 cards of Player3's LIBRARY"));
-        assertThat(game.getPrivateNotes("Player3"), containsString("81 cards of Player3's LIBRARY"));
-        assertThat(game.getPrivateNotes("Player4"), containsString("81 cards of Player3's LIBRARY"));
-        assertThat(game.getPrivateNotes("Player5"), containsString("81 cards of Player3's LIBRARY"));
+        assertThat(game.getPrivateNotes("Player1"), containsString("81 cards of Player3's Library"));
+        assertThat(game.getPrivateNotes("Player2"), containsString("81 cards of Player3's Library"));
+        assertThat(game.getPrivateNotes("Player3"), containsString("81 cards of Player3's Library"));
+        assertThat(game.getPrivateNotes("Player4"), containsString("81 cards of Player3's Library"));
+        assertThat(game.getPrivateNotes("Player5"), containsString("81 cards of Player3's Library"));
         assertThat(getLastMessage(), containsString("Player3 shows everyone 81 cards of their Library."));
         worker.doCommand("Player3", "show hand all");
         assertThat(game.getPrivateNotes("Player2"), not(is("")));
@@ -654,7 +654,6 @@ public class DoCommandTest {
     }
 
     @Test
-    @Disabled
     void showPlayer() throws CommandException {
         assertThat(game.getPrivateNotes("Player4"), is(""));
         worker.doCommand("Player3", "show hand Player4 all");
@@ -663,12 +662,11 @@ public class DoCommandTest {
     }
 
     @Test
-    @Disabled
     void showSelf() throws CommandException {
         assertThat(game.getPrivateNotes("Player3"), is(""));
         worker.doCommand("Player3", "show hand");
         assertThat(game.getPrivateNotes("Player3"), not(is("")));
-        assertThat(getLastMessage(), containsString("Player3 looks at 7 cards of their Hand."));
+        assertThat(getLastMessage(), is("Player3 looks at 7 cards of their Hand."));
     }
 
     @Test

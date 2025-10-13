@@ -2,7 +2,7 @@
 <%@ page import="net.deckserver.game.enums.RegionType" %>
 <%@ page import="net.deckserver.game.ui.CardDetail" %>
 <%@ page import="net.deckserver.storage.json.cards.CardSummary" %>
-<%@ page import="net.deckserver.CardSearch" %>
+<%@ page import="net.deckserver.services.CardService" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.google.common.base.Strings" %>
 <%@ page import="net.deckserver.game.enums.Sect" %>
@@ -36,7 +36,7 @@
     boolean infernal = cardDetail.isInfernal();
     boolean secured = cardDetail.isPlaytest();
 
-    CardSummary cardSummary = CardSearch.get(cardDetail.getCardId());
+    CardSummary cardSummary = CardService.get(cardDetail.getCardId());
 
     boolean hasCapacity = capacity > 0;
     boolean hasVotes = !Strings.isNullOrEmpty(votes) && !votes.equals("0");

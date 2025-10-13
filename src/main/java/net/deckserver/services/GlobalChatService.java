@@ -2,7 +2,6 @@ package net.deckserver.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import net.deckserver.dwr.bean.ChatEntryBean;
-import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.dwr.model.PlayerModel;
 
 import java.io.IOException;
@@ -30,13 +29,13 @@ public class GlobalChatService extends PersistedService {
         load();
     }
 
-    public static void subscribe(PlayerModel model) {
+    public static synchronized void subscribe(PlayerModel model) {
         INSTANCE.playerModels.add(model);
     }
 
-    public static void chat(String player, String message) {
-        String sanitize = ChatParser.sanitizeText(message);
-        String parsedMessage = ChatParser.parseGlobalChat(sanitize);
+    public static synchronized void chat(String player, String message) {
+        String sanitize = ParserService.sanitizeText(message);
+        String parsedMessage = ParserService.parseGlobalChat(sanitize);
         ChatEntryBean chatEntryBean = new ChatEntryBean(player, parsedMessage);
         INSTANCE.chats.add(chatEntryBean);
         if (INSTANCE.chats.size() > CHAT_STORAGE) {
@@ -45,7 +44,7 @@ public class GlobalChatService extends PersistedService {
         INSTANCE.playerModels.forEach(playerModel -> playerModel.chat(chatEntryBean));
     }
 
-    public static List<ChatEntryBean> getChats() {
+    public static synchronized List<ChatEntryBean> getChats() {
         return INSTANCE.chats;
     }
 

@@ -35,11 +35,10 @@ public class GameView {
     private boolean isAdmin = false;
     private boolean isJudge = false;
 
-    public GameView(String gameName, String playerName) {
+    public GameView(JolGame game, String gameName, String playerName) {
         this.gameName = gameName;
         this.playerName = playerName;
-        JolGame game = JolAdmin.getGame(gameName);
-        this.id = JolAdmin.getGameId(gameName);
+        this.id = game.id();
         ChatService.getChats(id).forEach(this::addChat);
         List<String> players = game.getPlayers();
         if (players.contains(this.playerName)) {
@@ -117,7 +116,7 @@ public class GameView {
             privateNotes = game.getPrivateNotes(playerName);
         }
 
-        label = game.getCurrentTurn() + " - " + game.getPhase();
+        label = game.getTurnLabel() + " - " + game.getPhase();
         Phase phase = game.getPhase();
 
         if (!chats.isEmpty()) {
@@ -191,12 +190,8 @@ public class GameView {
         turnChanged = true;
     }
 
-    public void reset(boolean reload) {
-        clearAccess();
-    }
-
     public void reset() {
-        reset(true);
+        clearAccess();
         //Force the client to refresh all game data
         resetChat = true;
         globalNotesChanged = phaseChanged = stateChanged = turnChanged = privateNotesChanged = true;

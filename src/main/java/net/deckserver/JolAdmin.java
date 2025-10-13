@@ -77,8 +77,7 @@ public class JolAdmin {
     }
 
     public static synchronized GameModel getGameModel(String name) {
-        GameInfo gameInfo = GameService.get(name);
-        return gmap.computeIfAbsent(name, n -> new GameModel(n, gameInfo.getId(), gameInfo.isPlayTest()));
+        return gmap.computeIfAbsent(name, n -> new GameModel(getGame(name)));
     }
 
     public static Set<String> getWho() {
@@ -90,7 +89,7 @@ public class JolAdmin {
         if (player != null) {
             pmap.remove(player);
             for (GameModel gameModel : gmap.values()) {
-                gameModel.resetView(player);
+                JolAdmin.resetView(player, gameModel.getName());
             }
         }
     }
@@ -448,7 +447,6 @@ public class JolAdmin {
         RegistrationService.remove(gameName);
         GameService.remove(gameName, gameInfo.getId());
         PlayerGameActivityService.clearGame(gameName);
-        pmap.values().forEach(playerModel -> playerModel.removeGame(gameName));
         gmap.remove(gameName);
 
     }
@@ -469,7 +467,7 @@ public class JolAdmin {
             JolGame game = getGame(gameName);
             game.replacePlayer(existingPlayer, newPlayer);
             saveGameState(game);
-            getGameModel(gameName).resetView(existingPlayer);
+            resetView(existingPlayer, gameName);
             // Set up the registrations
             RegistrationService.put(gameName, newPlayer, existingRegistration);
             RegistrationService.remove(gameName, existingPlayer);

@@ -24,13 +24,13 @@ public class GameModel implements Comparable<GameModel> {
 
     @Getter
     private final String name;
-    private final boolean isPlayTest;
+    private final JolGame game;
     private final Map<String, GameView> views = new HashMap<>();
 
-    public GameModel(String name, String gameId, boolean isPlayTest) {
-        this.name = name;
-        this.isPlayTest = isPlayTest;
-        ChatService.subscribe(gameId, this);
+    public GameModel(JolGame game) {
+        this.name = game.getName();
+        this.game = game;
+        ChatService.subscribe(game.id(), this);
     }
 
     public synchronized void endTurn(String player) {
@@ -64,8 +64,8 @@ public class GameModel implements Comparable<GameModel> {
             }
             if (phase != null &&
                     game.getActivePlayer().equals(player)
-                    && !game.getPhase().equals(phase)) {
-                game.setPhase(Phase.valueOf(phase));
+                    && !game.getPhase().equals(Phase.of(phase))) {
+                game.setPhase(Phase.of(phase));
                 phaseChanged = true;
             }
             if (command != null || chat != null) {
@@ -107,7 +107,7 @@ public class GameModel implements Comparable<GameModel> {
     public GameView getView(String player) {
         if (!views.containsKey(player)) {
             synchronized (this) {
-                views.put(player, new GameView(name, player));
+                views.put(player, new GameView(game, name, player));
             }
         }
         return views.get(player);
@@ -151,7 +151,7 @@ public class GameModel implements Comparable<GameModel> {
 
     public void clearChats() {
         for (GameView gameView : views.values()) {
-            gameView.reset(true);
+            gameView.clearAccess();
         }
     }
 

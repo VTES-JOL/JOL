@@ -57,7 +57,7 @@ class JolGameTest {
     @Test
     void addPlayer() {
         // start new game
-        JolGame newGame = new JolGame("new-game", new GameData());
+        JolGame newGame = new JolGame("new-game", new GameData("new-game"));
         assertThat(newGame.getPlayers(), is(empty()));
         // add a new player
         newGame.addPlayer("Player1", deck1.getDeck());
@@ -248,12 +248,17 @@ class JolGameTest {
 
     @Test
     void shuffle() {
+        List<CardData> hand = getCards("Player2", RegionType.HAND);
+        assertThat(toCardIds(hand), contains("141", "183", "173", "150", "199", "147", "162"));
+        existingGame.shuffle("Player2", RegionType.HAND, hand.size());
+        assertThat(toCardIds(hand), containsInAnyOrder("141", "183", "173", "150", "199", "147", "162"));
+        assertThat(toCardIds(hand), not(contains("141", "183", "173", "150", "199", "147", "162")));
     }
 
     @Test
     void startGame() {
         // start new game
-        JolGame newGame = new JolGame("new-game", new GameData());
+        JolGame newGame = new JolGame("new-game", new GameData("new-game"));
         assertThat(newGame.getPlayers(), is(empty()));
         // add players
         newGame.addPlayer("Player1", deck1.getDeck());

@@ -1139,10 +1139,10 @@ function loadGame(data) {
         controlGrid.addClass("spectator");
     }
     let fetchFullLog = false;
-    if (data.logLength !== null) {
-        let myLogLength = gameChatOutput.children().length + (data.turn.length);
-        fetchFullLog = myLogLength < data.logLength;
-    }
+    // if (data.logLength !== null) {
+    //     let myLogLength = gameChatOutput.children().length + (data.turn.length);
+    //     fetchFullLog = myLogLength < data.logLength;
+    // }
 
     // enable chat controls if judge or player
     if (data.player || data.judge) {

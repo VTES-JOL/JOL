@@ -21,7 +21,6 @@ public class PlayerModel {
 
     private final static Logger logger = LoggerFactory.getLogger(PlayerModel.class);
     private final String player;
-    private final Set<String> games = new HashSet<>();
     private final List<ChatEntryBean> chats = new ArrayList<>();
     private String game = null;
     @Getter
@@ -50,27 +49,16 @@ public class PlayerModel {
         return player;
     }
 
-    public Set<String> getCurrentGames() {
-        return games;
-    }
-
     public String getCurrentGame() {
         return game;
     }
 
     public void enterGame(String gameName) {
         setView("game");
-        if (RegistrationService.isInGame(gameName, player)) {
-            games.add(gameName);
-        }
         if (!gameName.equals(this.game)) {
-            JolAdmin.getGameModel(gameName).resetView(player);
+            JolAdmin.resetView(player, gameName);
         }
         this.game = gameName;
-    }
-
-    public void removeGame(String gameName) {
-        games.remove(gameName);
     }
 
     public void setView(String view) {

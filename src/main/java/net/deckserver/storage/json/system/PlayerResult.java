@@ -1,5 +1,6 @@
 package net.deckserver.storage.json.system;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ public class PlayerResult {
     private Double victoryPoints;
     private boolean gameWin;
 
+    @JsonIgnore
     public String getVP() {
         return DecimalFormat.getCompactNumberInstance().format(victoryPoints);
     }

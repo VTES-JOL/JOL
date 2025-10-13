@@ -14,7 +14,7 @@ public class GameSummaryBean {
 
     public GameSummaryBean(String gameName) {
         this.gameName = gameName;
-        this.turn = JolAdmin.getGame(gameName).getCurrentTurn();
+        this.turn = JolAdmin.getGame(gameName).getTurnLabel();
         this.timestamp = JolAdmin.getGameTimeStamp(gameName).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 

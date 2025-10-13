@@ -6,11 +6,12 @@
 
 package net.deckserver.dwr.model;
 
-import net.deckserver.CardSearch;
+import net.deckserver.services.CardService;
 import net.deckserver.game.enums.Clan;
 import net.deckserver.game.enums.Path;
 import net.deckserver.game.enums.RegionType;
 import net.deckserver.game.enums.Sect;
+import net.deckserver.services.ParserService;
 import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.game.CardData;
 
@@ -197,41 +198,14 @@ public record DoCommand(JolGame game, GameModel model) {
     }
 
     void show(CommandParser cmdObj, String player) throws CommandException {
-//        RegionType targetRegion = cmdObj.getRegion(RegionType.LIBRARY);
-//        int amt = cmdObj.getNumber(100);
-//        boolean all = cmdObj.consumeString("all");
-//        List<String> recipients = all ? game.getPlayers() : Collections.singletonList(cmdObj.getPlayer(player));
-//        //game.show(player, targetRegion, amt, recipients);
-//        Location loc = game.getState().getPlayerLocation(player, targetRegion);
-//        List<? extends Card> cards = loc.getCards();
-//        StringBuilder buf = new StringBuilder();
-//        int len = Math.min(cards.size(), amt);
-//        buf.append(len);
-//        buf.append(" cards of ");
-//        buf.append(player);
-//        buf.append("'s ");
-//        buf.append(targetRegion);
-//        buf.append(":\n");
-//        for (int j = 0; j < len; j++) {
-//            buf.append("  ");
-//            buf.append(j + 1);
-//            buf.append(" ");
-//            buf.append(cards.get(j).getName());
-//            buf.append("\n");
-//        }
-//        String text = buf.toString();
-//        for (String recipient : recipients) {
-//            String old = game.getPrivateNotes(recipient);
-//            game.setPrivateNotes(recipient, old.isEmpty() ? text : old + "\n" + text);
-//            model.getView(recipient).privateNotesChanged();
-//        }
-//        String msg;
-//        if (player.equals(recipients.getFirst())) {
-//            msg = player + " looks at " + len + " cards of their " + targetRegion.description() + ".";
-//        } else {
-//            msg = player + " shows " + (recipients.size() > 1 ? "everyone" : recipients.getFirst()) + " " + len + " cards of their " + targetRegion.description() + ".";
-//        }
-//        game.addMessage(msg);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.LIBRARY);
+        int amount = cmdObj.getNumber(100);
+        boolean all = cmdObj.consumeString("all");
+        List<String> recipients = all ? game.getValidPlayers() : Collections.singletonList(cmdObj.getPlayer(player));
+        game.show(player, targetRegion, amount, recipients);
+        for (String recipient: recipients) {
+            model.getView(recipient).privateNotesChanged();
+        }
     }
 
     void order(CommandParser cmdObj, String player) throws CommandException {
@@ -279,7 +253,7 @@ public record DoCommand(JolGame game, GameModel model) {
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
         CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         if (cmdObj.consumeString("reset")) {
-            CardSummary card = CardSearch.get(targetCard.getCardId());
+            CardSummary card = CardService.get(targetCard.getCardId());
             List<String> disciplines = card.getDisciplines();
             game.setDisciplines(player, targetCard.getId(), disciplines, false);
         } else {
@@ -289,7 +263,7 @@ public record DoCommand(JolGame game, GameModel model) {
                 String next = cmdObj.nextArg();
                 String type = next.substring(0, 1);
                 String disc = next.substring(1);
-                if (!ChatParser.isDiscipline(disc.toLowerCase())) {
+                if (!ParserService.isDiscipline(disc.toLowerCase())) {
                     throw new CommandException("Not a valid discipline");
                 }
                 if (type.equals("+")) {
@@ -394,7 +368,9 @@ public record DoCommand(JolGame game, GameModel model) {
     void draw(CommandParser cmdObj, String player) throws CommandException {
         boolean crypt = cmdObj.consumeString("crypt") || cmdObj.consumeString("vamp");
         int count = cmdObj.getNumber(1);
+        int size = crypt ? game.getSize(player, RegionType.CRYPT) : game.getSize(player, RegionType.HAND);
         if (count <= 0) throw new CommandException("Must draw at least 1 card.");
+        if (count > size) throw new CommandException("Unable to draw, only " + size + " cards left.");
         for (int j = 0; j < count; j++) {
             if (crypt)
                 game.drawCard(player, RegionType.CRYPT, RegionType.UNCONTROLLED);

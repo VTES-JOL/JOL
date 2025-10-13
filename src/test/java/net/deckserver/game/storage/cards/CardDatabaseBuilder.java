@@ -2,13 +2,15 @@ package net.deckserver.game.storage.cards;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import net.deckserver.CardSearch;
-import net.deckserver.dwr.model.ChatParser;
+import net.deckserver.services.CardService;
+import net.deckserver.services.ParserService;
 import net.deckserver.game.storage.cards.importer.CryptImporter;
 import net.deckserver.game.storage.cards.importer.LibraryImporter;
 import net.deckserver.storage.json.cards.CardSummary;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,6 +25,7 @@ import java.util.stream.Stream;
 @Tag("CardDatabase")
 public class CardDatabaseBuilder {
 
+    private static final Logger logger = LoggerFactory.getLogger(CardDatabaseBuilder.class);
     private static final String LIBRARY_FILE = "vteslib";
     private static final String CRYPT_FILE = "vtescrypt";
     private static final String PLAYTEST = "_playtest";
@@ -44,14 +47,14 @@ public class CardDatabaseBuilder {
         assert imagesPath.toFile().exists() : "Images path does not exist";
 
         List<CardSummary> cardSummaries = summaryCards.stream().map(SummaryCard::toCardSummary).toList();
-        CardSearch.refresh(cardSummaries);
+        CardService.refresh(cardSummaries);
 
         for (SummaryCard summaryCard : summaryCards) {
             String id = summaryCard.getId();
             String outputPrefix = summaryCard.isPlayTest() ? "secured/" : "";
 
             summaryCard.getNames().forEach(name -> {
-                assert CardSearch.findCardExact(name, true).isPresent() : String.format("Card %s does not exist", name);
+                assert CardService.findCardExact(name, true).isPresent() : String.format("Card %s does not exist", name);
             });
 
             // Process images
@@ -65,7 +68,7 @@ public class CardDatabaseBuilder {
             }
 
             // Process HTML
-            String htmlText = ChatParser.parseSymbols(summaryCard.getHtmlText());
+            String htmlText = ParserService.parseSymbols(summaryCard.getHtmlText());
             Path outputHtmlPath = outputPath.resolve(outputPrefix).resolve("html").resolve(id);
             Files.createDirectories(outputHtmlPath.getParent());
             if (!outputHtmlPath.toFile().exists()) {
@@ -140,6 +143,9 @@ public class CardDatabaseBuilder {
         String group = Optional.ofNullable(card.getGroup())
                 .map(s -> String.format("g%s", s.toLowerCase()))
                 .orElse("");
-        return String.format("%s%s.jpg", name, group).toLowerCase();
+        String adv = card.getAdvanced() != null && card.getAdvanced() ? "adv" : "";
+        String imageName = String.format("%s%s%s.jpg", name, group, adv).toLowerCase();
+        logger.info("Found {} for card {} [{}]", imageName, card.getDisplayName(), card.getId());
+        return imageName;
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import net.deckserver.game.enums.Phase;
 import net.deckserver.game.enums.RegionType;
@@ -13,6 +14,7 @@ import java.util.*;
 @Data
 @JsonPropertyOrder({"id", "name", "playerOrder", "orderOfPlayReversed", "turn", "phase", "notes", "cards", "players", "currentPlayer", "edge"})
 @ToString(of = {"id", "name"})
+@NoArgsConstructor
 public class GameData {
     private String id;
     private String name;
@@ -43,17 +45,9 @@ public class GameData {
         this.id = id;
     }
 
-    public GameData() {
-        this.id = UUID.randomUUID().toString();
-    }
-
     public void addPlayer(PlayerData playerData) {
         this.players.put(playerData.getName(), playerData);
         this.playerOrder.add(playerData.getName());
-    }
-
-    public void initRegion(Collection<CardData> cardData) {
-        cardData.forEach(card -> this.cards.put(card.getId(), card));
     }
 
     @JsonIgnore
@@ -102,8 +96,8 @@ public class GameData {
         return cards;
     }
 
-    public void orderPlayers(List<String> newOrder, boolean force) {
-        if (!force && !new HashSet<>(this.playerOrder).containsAll(newOrder)) {
+    public void orderPlayers(List<String> newOrder) {
+        if (!new HashSet<>(this.playerOrder).containsAll(newOrder)) {
             return;
         }
         this.playerOrder = newOrder;

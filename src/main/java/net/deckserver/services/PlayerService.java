@@ -25,11 +25,11 @@ public class PlayerService extends PersistedService {
         load();
     }
 
-    public static boolean existsPlayer(String name) {
+    public static synchronized boolean existsPlayer(String name) {
         return name != null && INSTANCE.players.containsKey(name);
     }
 
-    public static boolean registerPlayer(String name, String password, String email) {
+    public static synchronized boolean registerPlayer(String name, String password, String email) {
         if (existsPlayer(name) || name.isEmpty())
             return false;
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
@@ -37,7 +37,7 @@ public class PlayerService extends PersistedService {
         return true;
     }
 
-    public static boolean authenticate(String playerName, String password) {
+    public static synchronized boolean authenticate(String playerName, String password) {
         if (existsPlayer(playerName)) {
             PlayerInfo playerInfo = loadPlayerInfo(playerName);
             return BCrypt.checkpw(password, playerInfo.getHash());
@@ -58,22 +58,22 @@ public class PlayerService extends PersistedService {
         playerInfo.setVeknId(veknID);
     }
 
-    private static PlayerInfo loadPlayerInfo(String playerName) {
+    private static synchronized PlayerInfo loadPlayerInfo(String playerName) {
         if (INSTANCE.players.containsKey(playerName)) {
             return INSTANCE.players.get(playerName);
         }
         throw new IllegalArgumentException("Player: " + playerName + " was not found.");
     }
 
-    public static PlayerInfo get(String playerName) {
+    public static synchronized PlayerInfo get(String playerName) {
         return loadPlayerInfo(playerName);
     }
 
-    public static Set<String> getPlayers() {
+    public static synchronized Set<String> getPlayers() {
         return INSTANCE.players.keySet();
     }
 
-    public static void remove(String name) {
+    public static synchronized void remove(String name) {
         INSTANCE.players.remove(name);
     }
 

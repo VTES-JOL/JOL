@@ -16,4 +16,13 @@ public enum Phase {
     public String getDescription() {
         return description;
     }
+
+    public static Phase of(String description) {
+        for (Phase phase: Phase.values()) {
+            if (phase.description.equals(description)) {
+                return phase;
+            }
+        }
+        throw new IllegalArgumentException("Not a valid phase");
+    }
 }

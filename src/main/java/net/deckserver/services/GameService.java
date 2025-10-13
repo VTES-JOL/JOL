@@ -41,7 +41,7 @@ public class GameService extends PersistedService {
         return INSTANCE.games.get(name);
     }
 
-    public static void create(String gameName, String gameId, String ownerName, Visibility visibility, GameFormat format) {
+    public static synchronized void create(String gameName, String gameId, String ownerName, Visibility visibility, GameFormat format) {
         GameInfo gameInfo = new GameInfo(gameName, gameId, ownerName, visibility, GameStatus.STARTING, format);
         INSTANCE.games.put(gameName, gameInfo);
         try {
@@ -52,15 +52,15 @@ public class GameService extends PersistedService {
         }
     }
 
-    public static boolean existsGame(String name) {
+    public static synchronized boolean existsGame(String name) {
         return INSTANCE.games.containsKey(name);
     }
 
-    public static Set<String> getGameNames() {
+    public static synchronized Set<String> getGameNames() {
         return INSTANCE.games.keySet();
     }
 
-    public static void remove(String gameName, String gameId) {
+    public static synchronized void remove(String gameName, String gameId) {
         Path gamePath = Path.of(System.getenv("JOL_DATA"), "games", gameId);
         INSTANCE.games.remove(gameName);
         try {

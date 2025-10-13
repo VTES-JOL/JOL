@@ -4,7 +4,7 @@
  * Created on September 24, 2003, 8:51 PM
  */
 
-package net.deckserver;
+package net.deckserver.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
@@ -28,9 +28,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * @author administrator
  */
-public class CardSearch {
+public class CardService {
 
-    private static final Logger logger = getLogger(CardSearch.class);
+    private static final Logger logger = getLogger(CardService.class);
     private static final Map<String, String> nameKeys = new HashMap<>();
     private static final Map<String, CardSummary> cards = new HashMap<>();
 

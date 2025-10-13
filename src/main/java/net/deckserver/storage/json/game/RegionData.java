@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import net.deckserver.game.enums.RegionType;
 
-import javax.smartcardio.Card;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,11 +35,6 @@ public class RegionData {
     }
 
     @JsonIgnore
-    public String getName() {
-        return String.format("%s - %s", player.getName(), type.description());
-    }
-
-    @JsonIgnore
     public String getOwner() {
         return player.getName();
     }
@@ -51,11 +45,7 @@ public class RegionData {
 
     @JsonIgnore
     public CardData getFirstCard() {
-        return cards.isEmpty() ? null : cards.getFirst();
-    }
-
-    public void shuffle() {
-        Collections.shuffle(cards);
+        return cards.getFirst();
     }
 
     public void shuffle(int limit) {

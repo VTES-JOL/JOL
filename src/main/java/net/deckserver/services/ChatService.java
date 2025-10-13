@@ -99,6 +99,7 @@ public class ChatService extends PersistedService {
             );
             return new TurnHistory(turns);
         } catch (Exception e) {
+            logger.error("Error loading turn history for {}", gameId, e);
             return new TurnHistory();
         }
     }

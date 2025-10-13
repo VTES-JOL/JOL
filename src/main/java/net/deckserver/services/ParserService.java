@@ -1,7 +1,6 @@
-package net.deckserver.dwr.model;
+package net.deckserver.services;
 
 import com.vdurmont.emoji.EmojiParser;
-import net.deckserver.CardSearch;
 import net.deckserver.storage.json.cards.CardSummary;
 import org.owasp.html.Sanitizers;
 
@@ -10,7 +9,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ChatParser {
+public class ParserService {
 
     private static final Pattern MARKUP_PATTERN = Pattern.compile("\\[(.*?)\\]");
     private static final Pattern STYLE_PATTERN = Pattern.compile("\\{(.*?)\\}");
@@ -59,7 +58,7 @@ public class ChatParser {
             for (int x = 1; x <= matcher.groupCount(); x++) {
                 String match = matcher.group(x).trim().replaceAll("&#39;", "'").replaceAll("&#34;", "\"");
                 try {
-                    CardSearch.findCardExact(match, includePlaytest).ifPresent(card -> matcher.appendReplacement(sb, generateCardLink(card)));
+                    CardService.findCardExact(match, includePlaytest).ifPresent(card -> matcher.appendReplacement(sb, generateCardLink(card)));
                 } catch (IllegalArgumentException e) {
                     // do nothing
                 }

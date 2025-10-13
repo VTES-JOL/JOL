@@ -32,23 +32,23 @@ public class RegistrationService extends PersistedService {
         load();
     }
 
-    public static void put(String gameName, String playerName, RegistrationStatus registration) {
+    public static synchronized void put(String gameName, String playerName, RegistrationStatus registration) {
         INSTANCE.registrations.put(gameName, playerName, registration);
     }
 
-    public static RegistrationStatus get(String gameName, String playerName) {
+    public static synchronized RegistrationStatus get(String gameName, String playerName) {
         return INSTANCE.registrations.get(gameName, playerName);
     }
 
-    public static long getRegisteredPlayerCount(String gameName) {
+    public static synchronized long getRegisteredPlayerCount(String gameName) {
         return INSTANCE.registrations.row(gameName).values().stream().filter(IS_REGISTERED).count();
     }
 
-    public static RegistrationStatus getRegistration(String gameName, String playerName) {
+    public static synchronized RegistrationStatus getRegistration(String gameName, String playerName) {
         return INSTANCE.registrations.get(gameName, playerName);
     }
 
-    public static Set<String> getRegisteredGames(String playerName) {
+    public static synchronized Set<String> getRegisteredGames(String playerName) {
         return INSTANCE.registrations.column(playerName).keySet();
     }
 
@@ -56,7 +56,7 @@ public class RegistrationService extends PersistedService {
         return INSTANCE.registrations.row(gameName).keySet();
     }
 
-    public static void remove(String gameName, String playerName) {
+    public static synchronized void remove(String gameName, String playerName) {
         INSTANCE.registrations.remove(gameName, playerName);
     }
 
@@ -64,27 +64,27 @@ public class RegistrationService extends PersistedService {
         return INSTANCE.registrations.contains(gameName, playerName);
     }
 
-    public static boolean isRegistered(String gameName, String playerName) {
+    public static synchronized boolean isRegistered(String gameName, String playerName) {
         return INSTANCE.registrations.contains(gameName, playerName) && Objects.requireNonNull(INSTANCE.registrations.get(gameName, playerName)).getDeckId() != null;
     }
 
-    public static void remove(String gameName) {
+    public static synchronized void remove(String gameName) {
         INSTANCE.registrations.row(gameName).clear();
     }
 
-    public static Map<String, RegistrationStatus> getPlayerRegistrations(String playerName) {
+    public static synchronized Map<String, RegistrationStatus> getPlayerRegistrations(String playerName) {
         return INSTANCE.registrations.column(playerName);
     }
 
-    public static Map<String, RegistrationStatus> getGameRegistrations(String gameName) {
+    public static synchronized Map<String, RegistrationStatus> getGameRegistrations(String gameName) {
         return INSTANCE.registrations.row(gameName);
     }
 
-    public static Set<String> getPlayerGames(String player) {
+    public static synchronized Set<String> getPlayerGames(String player) {
         return getPlayerRegistrations(player).keySet();
     }
 
-    public static void invitePlayer(String gameName, String playerName) {
+    public static synchronized void invitePlayer(String gameName, String playerName) {
         INSTANCE.registrations.put(gameName, playerName, new RegistrationStatus(OffsetDateTime.now()));
     }
 

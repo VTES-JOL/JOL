@@ -85,7 +85,7 @@ public class DeckService extends PersistedService {
         return Files.readString(deckPath);
     }
 
-    public static ExtendedDeck getGameDeck(String gameId, String deckId) {
+    public static synchronized ExtendedDeck getGameDeck(String gameId, String deckId) {
         try {
             Path gameDeckPath = Paths.get(System.getenv("JOL_DATA"), String.format("games/%s/%s.json", gameId, deckId));
             return objectMapper.readValue(gameDeckPath.toFile(), ExtendedDeck.class);
@@ -94,7 +94,7 @@ public class DeckService extends PersistedService {
         }
     }
 
-    public static void saveDeck(String deckId, ExtendedDeck deck) {
+    public static synchronized void saveDeck(String deckId, ExtendedDeck deck) {
         try {
             Path deckPath = Paths.get(System.getenv("JOL_DATA"), "decks", deckId + ".json");
             objectMapper.writeValue(deckPath.toFile(), deck);
@@ -103,7 +103,7 @@ public class DeckService extends PersistedService {
         }
     }
 
-    public static boolean copyDeck(String deckId, String gameId) {
+    public static synchronized boolean copyDeck(String deckId, String gameId) {
         try {
             Path deckPath = Paths.get(System.getenv("JOL_DATA"), "decks", deckId + ".json");
             Path gamePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, deckId + ".json");
