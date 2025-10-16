@@ -60,10 +60,6 @@ public class GameStatusBean {
         created = JolAdmin.getCreatedTime(gameName);
     }
 
-    public long getActivePlayerCount() {
-        return players.values().stream().filter(player -> !player.isOusted()).count();
-    }
-
     public String getCreated() {
         return Optional.ofNullable(created)
                 .map(value -> value.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))

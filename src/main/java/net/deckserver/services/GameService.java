@@ -1,10 +1,17 @@
 package net.deckserver.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import net.deckserver.dwr.model.JolGame;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.Visibility;
 import net.deckserver.jobs.GameDataConversion;
+import net.deckserver.storage.json.game.GameData;
+import net.deckserver.storage.json.game.GameSummary;
+import net.deckserver.storage.json.game.PlayerSummary;
 import net.deckserver.storage.json.system.GameInfo;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -14,10 +21,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
 
 public class GameService extends PersistedService {
@@ -28,8 +36,16 @@ public class GameService extends PersistedService {
     private static final Logger logger = LoggerFactory.getLogger(GameService.class);
     private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "games.json");
     private static final GameService INSTANCE = new GameService();
-
+    private static final ReadWriteLock rwLock = new ReentrantReadWriteLock();
+    private static final Lock readLock = rwLock.readLock();
+    private static final Lock writeLock = rwLock.writeLock();
+    private final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
+            .expireAfterAccess(30, TimeUnit.MINUTES)
+            .build(GameService::loadGame);
     private final Map<String, GameInfo> games = new HashMap<>();
+    private final LoadingCache<String, GameSummary> summaryMap = Caffeine.newBuilder()
+            .expireAfterAccess(30, TimeUnit.MINUTES)
+            .build(GameService::generateSummary);
 
     private GameService() {
         super("GameService", 5);
@@ -60,6 +76,26 @@ public class GameService extends PersistedService {
         return INSTANCE.games.keySet();
     }
 
+    public static synchronized List<String> getActiveGames() {
+        return INSTANCE.games.values().stream().filter(ACTIVE_GAME).map(GameInfo::getName).sorted().toList();
+    }
+
+    public static synchronized boolean isActive(String gameName) {
+        return get(gameName).getStatus().equals(GameStatus.ACTIVE);
+    }
+
+    public static synchronized boolean isStarting(String gameName) {
+        return get(gameName).getStatus().equals(GameStatus.STARTING);
+    }
+
+    public static synchronized boolean isPublic(String gameName) {
+        return get(gameName).getVisibility().equals(Visibility.PUBLIC);
+    }
+
+    public static synchronized boolean isPrivate(String gameName) {
+        return get(gameName).getVisibility().equals(Visibility.PRIVATE);
+    }
+
     public static synchronized void remove(String gameName, String gameId) {
         Path gamePath = Path.of(System.getenv("JOL_DATA"), "games", gameId);
         INSTANCE.games.remove(gameName);
@@ -70,11 +106,68 @@ public class GameService extends PersistedService {
         }
     }
 
-    private static GameInfo loadGameInfo(String gameName) {
-        if (INSTANCE.games.containsKey(gameName)) {
-            return INSTANCE.games.get(gameName);
+    public static synchronized JolGame loadGame(String gameId) {
+        readLock.lock();
+        try {
+            Path gameStatePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, "game.json");
+            GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
+            return new JolGame(gameId, gameData);
+        } catch (IOException e) {
+            logger.error("Error reading game file {}", gameId, e);
+        } finally {
+            readLock.unlock();
         }
-        throw new IllegalArgumentException("Game: " + gameName + " was not found.");
+        return new JolGame(gameId, new GameData(gameId));
+    }
+
+    public static synchronized JolGame loadSnapshot(String gameId, String turn) {
+        try {
+            Path gameStatePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, "game-" + turn + ".json");
+            GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
+            return new JolGame(gameId, gameData);
+        } catch (IOException e) {
+            logger.error("Error reading game file", e);
+        }
+        return new JolGame(gameId, new GameData(gameId));
+    }
+
+    public static synchronized void saveGame(JolGame game) {
+        writeLock.lock();
+        String gameId = game.id();
+        Path gameStatePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, "game.json");
+        GameData deckServerState = game.data();
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            objectMapper.writeValue(gameStatePath.toFile(), deckServerState);
+        } catch (IOException e) {
+            logger.error("Unable to save game file", e);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public static synchronized void saveGame(JolGame game, String turn) {
+        boolean testModeEnabled = System.getenv().getOrDefault("ENABLE_TEST_MODE", "false").equals("true");
+        if (testModeEnabled) {
+            return;
+        }
+        turn = turn.replaceAll("\\.", "-");
+        String gameId = game.id();
+        Path gameStatePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, "game-" + turn + ".json");
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            objectMapper.writeValue(gameStatePath.toFile(), game.data());
+        } catch (IOException e) {
+            logger.error("Unable to save game file", e);
+        }
+    }
+
+    public static JolGame getGame(String gameId) {
+        return INSTANCE.gameCache.get(gameId);
+    }
+
+    public static GameSummary getSummary(String gameName) {
+        return INSTANCE.summaryMap.get(gameName);
     }
 
     private void upgrade() {
@@ -92,6 +185,40 @@ public class GameService extends PersistedService {
                     conversion.convertGame(gameInfo.getId());
                     gameInfo.setVersion(GameInfo.Version.GAME_STATE);
                 });
+    }
+
+    private static GameSummary generateSummary(String gameName) {
+        GameInfo info = INSTANCE.games.get(gameName);
+        JolGame game = INSTANCE.gameCache.get(info.getId());
+        GameSummary summary = new GameSummary();
+        summary.setName(game.getName());
+        summary.setId(game.id());
+        summary.setPhase(game.getPhase().toString());
+        summary.setTurnLabel(game.getTurnLabel());
+        summary.setPlayers(game.getValidPlayers());
+        // build active player summary
+        String activePlayer = game.getActivePlayer();
+        PlayerSummary activePlayerSummary = new PlayerSummary();
+        activePlayerSummary.setName(activePlayer);
+        activePlayerSummary.setPool(game.getPool(activePlayer));
+        summary.setActivePlayer(activePlayerSummary);
+        // Build predator summary
+        String predator = game.getPredatorOf(activePlayer);
+        if (predator != null) {
+            PlayerSummary predatorSummary = new PlayerSummary();
+            predatorSummary.setName(predator);
+            predatorSummary.setPool(game.getPool(predator));
+            summary.setPredator(predatorSummary);
+        }
+        // Build prey summary
+        String prey = game.getPreyOf(activePlayer);
+        if (prey != null) {
+            PlayerSummary preySummary = new PlayerSummary();
+            preySummary.setName(prey);
+            preySummary.setPool(game.getPool(prey));
+            summary.setPrey(preySummary);
+        }
+        return summary;
     }
 
     @Override

@@ -523,6 +523,10 @@ public class JolAdmin {
         pingPlayer(game.getActivePlayer(), gameName);
     }
 
+    public static boolean isInRole(String username, String role) {
+        return PlayerService.get(username).getRoles().contains(PlayerRole.valueOf(role));
+    }
+
     public synchronized boolean isOwner(String playerName, String gameName) {
         return GameService.get(gameName).getOwner().equals(playerName);
     }
