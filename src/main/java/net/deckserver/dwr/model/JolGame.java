@@ -10,6 +10,7 @@ import com.google.common.base.Strings;
 import net.deckserver.services.CardService;
 import net.deckserver.game.enums.*;
 import net.deckserver.services.ChatService;
+import net.deckserver.services.GameService;
 import net.deckserver.services.ParserService;
 import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.Deck;
@@ -460,7 +461,7 @@ public record JolGame(String id, GameData data) {
         ChatService.addTurn(id, nextPlayer.getName(), turnId);
         setPhase(Phase.UNLOCK);
         data.setTurn(turnId);
-        ModelLoader.saveGame(this, turnId);
+        GameService.saveGame(this, turnId);
     }
 
     public Phase getPhase() {

@@ -16,6 +16,7 @@ public class PlayerInfo {
     private String hash;
     private String discordId;
     private String veknId;
+    private String countryCode;
     private Set<PlayerRole> roles = new HashSet<>();
     private boolean showImages = true;
 

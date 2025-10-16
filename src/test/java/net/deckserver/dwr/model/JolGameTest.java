@@ -6,6 +6,7 @@ import net.deckserver.game.enums.Phase;
 import net.deckserver.game.enums.RegionType;
 import net.deckserver.game.enums.Sect;
 import net.deckserver.services.ChatService;
+import net.deckserver.services.GameService;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.CardData;
 import net.deckserver.storage.json.game.GameData;
@@ -51,7 +52,7 @@ class JolGameTest {
 
     @BeforeEach
     void setUpGame() {
-        existingGame = ModelLoader.loadGame("command-test");
+        existingGame = GameService.loadGame("command-test");
     }
 
     @Test

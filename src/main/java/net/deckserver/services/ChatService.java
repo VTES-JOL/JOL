@@ -10,6 +10,7 @@ import net.deckserver.storage.json.game.TurnHistory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -99,7 +100,6 @@ public class ChatService extends PersistedService {
             );
             return new TurnHistory(turns);
         } catch (Exception e) {
-            logger.error("Error loading turn history for {}", gameId, e);
             return new TurnHistory();
         }
     }
@@ -124,6 +124,9 @@ public class ChatService extends PersistedService {
 
     public static synchronized List<ChatData> getChats(String gameId) {
         String turnLabel = INSTANCE.historyCache.get(gameId).getCurrentTurnLabel();
+        if (turnLabel == null) {
+            return new ArrayList<>();
+        }
         return INSTANCE.historyCache.get(gameId).getTurn(turnLabel).getChats();
     }
 

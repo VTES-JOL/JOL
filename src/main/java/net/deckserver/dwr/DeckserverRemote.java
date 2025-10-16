@@ -279,9 +279,9 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-    public Map<String, Object> updateProfile(String email, String discordID, String veknID) {
+    public Map<String, Object> updateProfile(String email, String discordID, String veknID, String country) {
         String player = getPlayer(request);
-        PlayerService.updateProfile(player, email, discordID, veknID);
+        PlayerService.updateProfile(player, email, discordID, veknID, country);
         return UpdateFactory.getUpdate();
     }
 

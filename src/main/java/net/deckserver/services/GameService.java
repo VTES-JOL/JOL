@@ -44,7 +44,8 @@ public class GameService extends PersistedService {
             .build(GameService::loadGame);
     private final Map<String, GameInfo> games = new HashMap<>();
     private final LoadingCache<String, GameSummary> summaryMap = Caffeine.newBuilder()
-            .expireAfterAccess(30, TimeUnit.MINUTES)
+            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .refreshAfterWrite(30, TimeUnit.SECONDS)
             .build(GameService::generateSummary);
 
     private GameService() {
@@ -78,6 +79,26 @@ public class GameService extends PersistedService {
 
     public static synchronized List<String> getActiveGames() {
         return INSTANCE.games.values().stream().filter(ACTIVE_GAME).map(GameInfo::getName).sorted().toList();
+    }
+
+    public static synchronized List<String> getStartingGames(boolean includePlayTest) {
+        return INSTANCE.games.values().stream()
+                .filter(STARTING_GAME)
+                .filter(info -> info.isPlayTest() && includePlayTest)
+                .map(GameInfo::getName
+                ).sorted().toList();
+    }
+
+    public static synchronized List<GameInfo> getGamesByOwner(String owner) {
+        return INSTANCE.games.values().stream().filter(info -> info.getOwner().equals(owner)).toList();
+    }
+
+    public static synchronized List<String> getActiveGames(String owner) {
+        return INSTANCE.games.values().stream()
+                .filter(ACTIVE_GAME)
+                .filter(info -> info.getOwner().equals(owner))
+                .map(GameInfo::getName)
+                .toList();
     }
 
     public static synchronized boolean isActive(String gameName) {
@@ -144,6 +165,8 @@ public class GameService extends PersistedService {
         } finally {
             writeLock.unlock();
         }
+        // update the cache
+        INSTANCE.gameCache.put(gameId, game);
     }
 
     public static synchronized void saveGame(JolGame game, String turn) {
@@ -188,6 +211,7 @@ public class GameService extends PersistedService {
     }
 
     private static GameSummary generateSummary(String gameName) {
+        logger.info("Regenerating summary for {}", gameName);
         GameInfo info = INSTANCE.games.get(gameName);
         JolGame game = INSTANCE.gameCache.get(info.getId());
         GameSummary summary = new GameSummary();
@@ -196,6 +220,7 @@ public class GameService extends PersistedService {
         summary.setPhase(game.getPhase().toString());
         summary.setTurnLabel(game.getTurnLabel());
         summary.setPlayers(game.getValidPlayers());
+        summary.setFormat(info.getGameFormat());
         // build active player summary
         String activePlayer = game.getActivePlayer();
         PlayerSummary activePlayerSummary = new PlayerSummary();

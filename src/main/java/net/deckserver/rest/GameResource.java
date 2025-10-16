@@ -20,8 +20,7 @@ public class GameResource {
 
     @GET
     public List<GameSummary> getActiveGames() {
-        return GameService.getGameNames().stream()
-                .filter(GameService::isActive)
+        return GameService.getActiveGames().stream()
                 .map(GameService::getSummary)
                 .sorted(Comparator.comparing(GameSummary::getName))
                 .toList();

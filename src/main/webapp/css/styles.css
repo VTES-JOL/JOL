@@ -40,7 +40,7 @@
     max-width: 28%;
 }
 
-.tippy-content {
+.tippy-box[data-theme~="cards"] .tippy-content {
     padding: 0;
 }
 

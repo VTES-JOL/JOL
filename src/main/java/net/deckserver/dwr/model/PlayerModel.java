@@ -35,7 +35,7 @@ public class PlayerModel {
     private String contents;
     @Getter
     @Setter
-    private String deckFilter = GameFormat.STANDARD.getLabel();
+    private String deckFilter = "ALL";
 
     public PlayerModel(String name, boolean loadChat) {
         this.player = name;

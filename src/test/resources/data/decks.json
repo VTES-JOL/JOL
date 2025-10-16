@@ -93,13 +93,13 @@
     "Ministry Duel" : {
       "deckId" : "01K6XXAA3YCS14XQB584NG4BY8",
       "deckName" : "Ministry Duel",
-      "format" : "MODERN",
+      "format" : "TAGGED",
       "gameFormats" : [ ]
     },
     "Gangrel Duel" : {
       "deckId" : "01K6XXBYA4XD3K6RGRDZ0YAD51",
       "deckName" : "Gangrel Duel",
-      "format" : "MODERN",
+      "format" : "TAGGED",
       "gameFormats" : [ ]
     }
   },

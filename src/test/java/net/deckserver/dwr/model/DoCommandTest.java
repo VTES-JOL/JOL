@@ -4,6 +4,7 @@ import net.deckserver.services.ChatService;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.Path;
 import net.deckserver.game.enums.RegionType;
+import net.deckserver.services.GameService;
 import net.deckserver.storage.json.game.CardData;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +31,7 @@ public class DoCommandTest {
 
     @BeforeEach
     void setUp() {
-        game = ModelLoader.loadGame("command-test");
+        game = GameService.loadGame("command-test");
         worker = new DoCommand(game, new GameModel(game));
     }
 

@@ -1,28 +1,55 @@
 package net.deckserver.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import io.azam.ulidj.ULID;
+import net.deckserver.game.enums.PlayerRole;
 import net.deckserver.storage.json.system.PlayerInfo;
+import net.deckserver.storage.json.system.UserSummary;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.time.OffsetDateTime;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class PlayerService extends PersistedService {
 
     private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "players.json");
     private static final PlayerService INSTANCE = new PlayerService();
-
+    private static final LoadingCache<String, UserSummary> activeUsers = Caffeine.newBuilder()
+            .expireAfterWrite(1, TimeUnit.HOURS)
+            .refreshAfterWrite(1, TimeUnit.MINUTES)
+            .build(PlayerService::generateSummary);
     private final Map<String, PlayerInfo> players = new HashMap<>();
 
     private PlayerService() {
         super("PlayerService", 5);
         load();
+    }
+
+    private static UserSummary generateSummary(String playerName) {
+        PlayerInfo playerInfo = get(playerName);
+        UserSummary userSummary = new UserSummary();
+        userSummary.setName(playerName);
+        userSummary.setLastOnline(OffsetDateTime.now());
+        userSummary.setRoles(playerInfo.getRoles().stream().map(PlayerRole::name).toList());
+        userSummary.setCountry(playerInfo.getCountryCode());
+        return userSummary;
+    }
+
+    public static List<UserSummary> activeUsers() {
+        return activeUsers.asMap().values().stream()
+                .sorted(Comparator.comparing(UserSummary::getLastOnline).reversed())
+                .toList();
+    }
+
+    public static void refreshActive(String playerName) {
+        activeUsers.get(playerName).setLastOnline(OffsetDateTime.now());
     }
 
     public static synchronized boolean existsPlayer(String name) {
@@ -51,11 +78,12 @@ public class PlayerService extends PersistedService {
         loadPlayerInfo(player).setHash(hash);
     }
 
-    public static synchronized void updateProfile(String playerName, String email, String discordID, String veknID) {
+    public static synchronized void updateProfile(String playerName, String email, String discordID, String veknID, String country) {
         PlayerInfo playerInfo = loadPlayerInfo(playerName);
         playerInfo.setDiscordId(discordID);
         playerInfo.setEmail(email);
         playerInfo.setVeknId(veknID);
+        playerInfo.setCountryCode(country);
     }
 
     private static synchronized PlayerInfo loadPlayerInfo(String playerName) {
@@ -101,7 +129,8 @@ public class PlayerService extends PersistedService {
         }
 
         try {
-            Map<String, PlayerInfo> loaded = objectMapper.readValue(PERSISTENCE_PATH.toFile(), new TypeReference<>() {});
+            Map<String, PlayerInfo> loaded = objectMapper.readValue(PERSISTENCE_PATH.toFile(), new TypeReference<>() {
+            });
             players.putAll(loaded);
             logger.info("Loaded {} players", players.size());
         } catch (IOException e) {

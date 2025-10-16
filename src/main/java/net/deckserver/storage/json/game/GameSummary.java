@@ -1,6 +1,7 @@
 package net.deckserver.storage.json.game;
 
 import lombok.Data;
+import net.deckserver.game.enums.GameFormat;
 
 import java.util.List;
 
@@ -13,6 +14,6 @@ public class GameSummary {
     private PlayerSummary activePlayer;
     private PlayerSummary predator;
     private PlayerSummary prey;
+    private GameFormat format;
     private List<String> players;
-    private boolean flagged;
 }

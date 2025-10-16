@@ -1,3 +1,5 @@
+<%@ page import="net.deckserver.services.CountryService" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div class="card shadow mb-2">
     <div class="card-header bg-body-secondary">
         <h5>Profile</h5>
@@ -5,12 +7,21 @@
     <div class="card-body">
         <label for="profileEmail" class="form-label">E-mail Address</label>
         <input type="email" name="email" id="profileEmail" class="form-control" autocomplete="email"/>
+
+        <label for="profileCountry" class="form-label">Country</label>
+        <select name="profileCountry" id="profileCountry" class="form-select">
+            <option value="">-- Don't display country --</option>
+            <c:forEach var="country" items="<%= CountryService.getCountryCodes() %>">
+                <option value="${country}">${CountryService.getCountry(country)}</option>
+            </c:forEach>
+        </select>
+
         <label for="veknID" class="form-label mt-2">VEKN ID</label>
-        <input type="text" name="veknID" id="veknID" class="form-control"
-               inputmode="numeric" pattern="[0-9]*" aria-describedby="veknIdHelp"/>
+        <input type="text" name="veknID" id="veknID" class="form-control" inputmode="numeric" pattern="[0-9]*" aria-describedby="veknIdHelp"/>
         <div class="form-text" id="veknIdHelp">
             Link your account to your VEKN ID in order to be able to play sanctioned tournaments.
         </div>
+
         <label for="discordID" class="form-label mt-2">Discord User ID</label>
         <input type="text" name="discordID" id="discordID" class="form-control"
                inputmode="numeric" pattern="[0-9]*" aria-describedby="discordIdHelp"/>
@@ -24,6 +35,7 @@
                 article</a>
             explains how to get your user ID from Discord.
         </div>
+
         <script>
             (function () {
                 function enforceDigitsOnly(el) {

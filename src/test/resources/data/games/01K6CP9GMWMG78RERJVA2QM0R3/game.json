@@ -9,7 +9,7 @@
     "Player2"
   ],
   "orderOfPlayReversed": false,
-  "turn": null,
+  "turn": "1.1",
   "phase": "UNLOCK",
   "notes": null,
   "cards": {

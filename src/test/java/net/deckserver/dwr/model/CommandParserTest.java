@@ -1,6 +1,7 @@
 package net.deckserver.dwr.model;
 
 import net.deckserver.game.enums.RegionType;
+import net.deckserver.services.GameService;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.CardData;
 import net.deckserver.storage.json.game.GameData;
@@ -19,7 +20,7 @@ public class CommandParserTest {
 
     @BeforeEach
     public void setUp() {
-        game = ModelLoader.loadGame("command-test");
+        game = GameService.loadGame("command-test");
 
         game2 = new JolGame("id", new GameData("id", "test2"));
         game2.addPlayer("ShanDow", new Deck());

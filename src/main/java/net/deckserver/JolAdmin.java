@@ -6,13 +6,11 @@
 
 package net.deckserver;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import io.azam.ulidj.ULID;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.JolGame;
-import net.deckserver.dwr.model.ModelLoader;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.*;
 import net.deckserver.game.validators.DeckValidator;
@@ -45,9 +43,6 @@ public class JolAdmin {
     private static final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
     private static final Map<String, PlayerModel> pmap = new ConcurrentHashMap<>();
     // Cache of users / status
-    private static final Cache<String, String> activeUsers = Caffeine.newBuilder()
-            .expireAfterWrite(5, TimeUnit.MINUTES)
-            .build();
     private static final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
             .expireAfterAccess(30, TimeUnit.MINUTES)
             .build(JolAdmin::loadGameState);
@@ -80,8 +75,8 @@ public class JolAdmin {
         return gmap.computeIfAbsent(name, n -> new GameModel(getGame(name)));
     }
 
-    public static Set<String> getWho() {
-        return activeUsers.asMap().keySet();
+    public static List<String> getWho() {
+        return PlayerService.activeUsers().stream().map(UserSummary::getName).toList();
     }
 
     public static void remove(String player) {
@@ -95,10 +90,13 @@ public class JolAdmin {
     }
 
     public static synchronized void createGame(String gameName, Boolean isPublic, GameFormat format, String playerName) {
+        createGame(gameName, isPublic, format, playerName, ULID.random());
+    }
+
+    public static synchronized void createGame(String gameName, Boolean isPublic, GameFormat format, String playerName, String gameId) {
         logger.trace("Creating game {} for player {}", gameName, playerName);
         if (gameName.length() > 2 || notExistsGame(gameName)) {
             try {
-                String gameId = ULID.random();
                 GameService.create(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), format);
             } catch (Exception e) {
                 logger.error("Error creating game", e);
@@ -113,7 +111,7 @@ public class JolAdmin {
     public static synchronized void rollbackGame(String gameName, String adminName, String turn) {
         String id = GameService.get(gameName).getId();
         logger.info("Rolling back game {} for turn {}", gameName, turn);
-        JolGame game = ModelLoader.loadSnapshot(id, turn);
+        JolGame game = GameService.loadSnapshot(id, turn);
         ChatService.sendMessage(id, "SYSTEM", "Game state rolled back by administrator: " + adminName);
         saveGameState(game, true);
         gameCache.refresh(gameName);
@@ -132,7 +130,7 @@ public class JolAdmin {
     }
 
     public static synchronized Deck getGameDeck(String gameName, String playerName) {
-        return Optional.ofNullable(RegistrationService.get(gameName, playerName))
+        return Optional.ofNullable(RegistrationService.getRegistration(gameName, playerName))
                 .map(status -> {
                     String deckId = status.getDeckId();
                     String gameId = getGameId(gameName);
@@ -189,7 +187,7 @@ public class JolAdmin {
         if (!silent) {
             PlayerGameActivityService.setGameTimestamp(game.getName());
         }
-        ModelLoader.saveGame(game);
+        GameService.saveGame(game);
     }
 
     public static synchronized void registerDeck(String gameName, String playerName, String deckName) {
@@ -219,8 +217,7 @@ public class JolAdmin {
                 result = "Unable to register deck.  Not valid for defined format.";
                 throw new IllegalStateException(result);
             }
-            RegistrationStatus registrationStatus = RegistrationService.get(gameName, playerName);
-            if (registrationStatus == null) {
+            if (!RegistrationService.isInvited(gameName, playerName)) {
                 result = "Unable to register deck in game that has no invite";
                 throw new IllegalStateException(result);
             }
@@ -229,10 +226,7 @@ public class JolAdmin {
                 result = "Unable to copy deck file to game";
                 throw new IllegalStateException(result);
             }
-            registrationStatus.setDeckId(deckInfo.getDeckId());
-            registrationStatus.setDeckName(deckInfo.getDeckName());
-            registrationStatus.setValid(true);
-            registrationStatus.setSummary(extendedDeck.getStats().getSummary());
+            RegistrationService.registerDeck(gameName, playerName, deckInfo.getDeckId(), deckName, extendedDeck.getStats().getSummary());
 
             // Reset game time to the current time to extend idle timeout
             gameInfo.setCreated(OffsetDateTime.now());
@@ -251,7 +245,7 @@ public class JolAdmin {
     public static void recordPlayerAccess(String playerName) {
         if (playerName != null) {
             PlayerActivityService.recordPlayerAccess(playerName);
-            activeUsers.put(playerName, OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME));
+            PlayerService.refreshActive(playerName);
         }
     }
 
@@ -344,7 +338,7 @@ public class JolAdmin {
 
     public static synchronized void unInvitePlayer(String gameName, String playerName) {
         if (isStarting(gameName)) {
-            RegistrationService.remove(gameName, playerName);
+            RegistrationService.removePlayer(gameName, playerName);
         }
     }
 
@@ -414,7 +408,7 @@ public class JolAdmin {
                 boolean hasVp = false;
                 for (String player : gameData.getPlayers()) {
                     PlayerResult result = new PlayerResult();
-                    String deckName = Optional.ofNullable(RegistrationService.get(gameName, player)).map(RegistrationStatus::getDeckName).orElse("-- no deck name --");
+                    String deckName = Optional.ofNullable(RegistrationService.getRegistration(gameName, player)).map(RegistrationStatus::getDeckName).orElse("-- no deck name --");
                     double victoryPoints = gameData.getVictoryPoints(player);
                     if (victoryPoints > 0) {
                         hasVp = true;
@@ -444,7 +438,7 @@ public class JolAdmin {
             }
         }
         // Clear out data
-        RegistrationService.remove(gameName);
+        RegistrationService.clearRegistrations(gameName);
         GameService.remove(gameName, gameInfo.getId());
         PlayerGameActivityService.clearGame(gameName);
         gmap.remove(gameName);
@@ -460,8 +454,8 @@ public class JolAdmin {
     }
 
     public static synchronized void replacePlayer(String gameName, String existingPlayer, String newPlayer) {
-        RegistrationStatus existingRegistration = RegistrationService.get(gameName, existingPlayer);
-        RegistrationStatus newRegistration = RegistrationService.get(gameName, newPlayer);
+        RegistrationStatus existingRegistration = RegistrationService.getRegistration(gameName, existingPlayer);
+        RegistrationStatus newRegistration = RegistrationService.getRegistration(gameName, newPlayer);
         // Only replace player if existing player is in the game, and the new player isn't
         if (existingRegistration != null && newRegistration == null) {
             JolGame game = getGame(gameName);
@@ -470,7 +464,7 @@ public class JolAdmin {
             resetView(existingPlayer, gameName);
             // Set up the registrations
             RegistrationService.put(gameName, newPlayer, existingRegistration);
-            RegistrationService.remove(gameName, existingPlayer);
+            RegistrationService.removePlayer(gameName, existingPlayer);
         }
     }
 
@@ -527,10 +521,6 @@ public class JolAdmin {
         return PlayerService.get(username).getRoles().contains(PlayerRole.valueOf(role));
     }
 
-    public synchronized boolean isOwner(String playerName, String gameName) {
-        return GameService.get(gameName).getOwner().equals(playerName);
-    }
-
     public static List<String> getPings(String gameName) {
         var entry = PlayerGameActivityService.getGameTimestamps().get(gameName);
         if (entry == null) {
@@ -556,7 +546,6 @@ public class JolAdmin {
 
     public static synchronized void validateDeck(String playerName, String contents, GameFormat format) {
         PlayerModel model = getPlayerModel(playerName);
-        String deckName = model.getDeck().getDeck().getName();
         ExtendedDeck deck = DeckParser.parseDeck(contents);
         ValidationResult result = validateDeck(deck.getDeck(), format);
         if (result.isValid()) {
@@ -564,7 +553,11 @@ public class JolAdmin {
         } else {
             deck.setErrors(result.getErrors());
         }
-        deck.getDeck().setName(deckName);
+        ExtendedDeck existingDeck = model.getDeck();
+        if (existingDeck != null) {
+            String deckName = model.getDeck().getDeck().getName();
+            deck.getDeck().setName(deckName);
+        }
         model.setDeck(deck);
         model.setContents(contents);
     }
@@ -610,7 +603,7 @@ public class JolAdmin {
         logger.debug("Loading {}", gameName);
         GameInfo gameInfo = GameService.get(gameName);
         String gameId = gameInfo.getId();
-        return ModelLoader.loadGame(gameId);
+        return GameService.loadGame(gameId);
     }
 
 }

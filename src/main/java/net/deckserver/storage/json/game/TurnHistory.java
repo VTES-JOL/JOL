@@ -51,6 +51,9 @@ public class TurnHistory {
 
     @JsonIgnore
     public String getCurrentTurnLabel() {
+        if (turns.isEmpty()) {
+            return null;
+        }
         return turns.getLast().getLabel();
     }
 

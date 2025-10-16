@@ -19,6 +19,7 @@ let profile = {
 };
 let pointerCanHover = window.matchMedia("(hover: hover)").matches;
 let scrollChat = false;
+const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
 function errorhandler(errorString, exception) {
     $("#connectionMessage").removeClass("d-none");
@@ -75,7 +76,7 @@ function createButton(config, fn, ...args) {
     }
     button.addClass(config.class);
     button.on('click', function () {
-        if (confirm(config.confirm)) {
+        if (!config.confirm || confirm(config.confirm)) {
             fn(...args, {callback: processData, errorHandler: errorhandler});
         }
     });
@@ -298,36 +299,23 @@ function callbackLobby(data) {
         gameHeader.append(gameName, buttonWrapper);
         gameItem.append(gameHeader, playerTable);
         currentGames.append(gameItem);
-        $.each(game.registrations, function (i, registration) {
+        $.each(game.players, function (k, v) {
             let registrationRow = $("<tr/>");
-            let player = $("<td/>").addClass("w-25").text(registration.player);
+            let player = $("<td/>").addClass("w-25").text(k);
             registrationRow.append(player);
-            let summary = $("<td/>").addClass("w-75").text(registration.deckSummary);
-            if (registration.registered && !registration.valid) {
-                summary.append($('<span/>').addClass("badge text-bg-warning").text('Invalid'));
-            }
+            let summary = $("<td/>").addClass("w-75").text(v);
             registrationRow.append(summary);
             playerTable.append(registrationRow);
         });
-
-        $.each(game.players, function (i, playerStatus) {
-            let playerRow = $("<tr/>");
-            let playerName = $("<td/>").text(playerStatus.playerName);
-            let pool = $("<td/>").text(playerStatus.pool + " pool");
-            playerRow.append(playerName);
-            playerRow.append(pool);
-            playerTable.append(playerRow);
-        })
     });
 
     publicGames.empty();
     $.each(data.publicGames, function (index, game) {
-        let created = moment(game.created).tz("UTC");
+        let created = moment(game.timestamp).tz("UTC");
         let expiry = created.add(5, 'days');
         let joinButton = createButton({
             class: "btn btn-outline-secondary btn-sm",
-            text: "Join",
-            confirm: "Join Game?"
+            text: "Join"
         }, DS.invitePlayer, game.name, player);
 
         let leaveButton = createButton({
@@ -482,6 +470,9 @@ function callbackProfile(data) {
         $('#discordID').val(data.discordID);
     if (profile.veknId !== data.veknID)
         $("#veknID").val(data.veknID);
+    if (profile.country !== data.country) {
+        $("#profileCountry").val(data.country);
+    }
     if (profile.updating) {
         let result = $('#profileUpdateResult');
         result.text('Done!');
@@ -875,25 +866,31 @@ function renderGameLink(game) {
 
 function renderOnline(div, who) {
     let container = $("#" + div);
+    tippy.hideAll({duration: 0});
     container.empty();
     if (who === null) {
         return;
     }
     $.each(who, function (index, player) {
-        let playerSpan = $("<span/>").text(player.name).addClass("badge mb-1 fs-6");
-        if (player.superUser) {
-            playerSpan.addClass("text-bg-secondary");
-        } else if (player.admin) {
-            playerSpan.addClass("text-bg-warning");
-        } else {
-            playerSpan.addClass("text-bg-light border border-secondary-subtle")
-        }
-        if (player.judge) {
-            playerSpan.addClass("border border-2 border-dark border-dotted");
-        }
-        container.append(playerSpan);
-        container.append(" ");
+        let lastOnline = moment(player.lastOnline).tz("UTC");
+        let sinceLastOnline = moment.duration(moment().diff(lastOnline)).asMinutes();
+        let flag = player.country ? `<span data-tippy-content="${regionNames.of(player.country)}" class="fi fi-${player.country.toLowerCase()} fis fs-3"></span>` : '';
+        let admin = player.roles.includes('ADMIN') ? '<i data-tippy-content="Administrator" class="bi bi-star-fill text-warning"></i>' : "";
+        let judge = player.roles.includes('JUDGE') ? '<i data-tippy-content="Judge" class="bi bi-person-raised-hand text-success"></i>' : "";
+        let offline = sinceLastOnline > 1 ? `<i data-tippy-content="Last Online: ${lastOnline.format('D-MMM HH:mm z')}" class="bi bi-clock-history"></i>` : "";
+        let playerDiv = `
+            <span class="border rounded-start p-0 border-secondary d-flex justify-content-between align-items-center">
+                <span class="d-flex align-items-center gap-2 px-2">
+                    <strong>${player.name}</strong>
+                    ${admin}
+                    ${judge}
+                    ${offline}
+                </span>
+                ${flag}                
+            </span>`;
+        container.append(playerDiv);
     });
+    tippy('[data-tippy-content]', { theme: 'light'});
 }
 
 function renderActiveGames(games) {
@@ -1266,7 +1263,7 @@ function addCardTooltips(parent) {
         onTrigger: function (instance, event) {
             event.stopPropagation();
         },
-        theme: "light",
+        theme: "cards",
         touch: "hold",
         onShow: function (instance) {
             tippy.hideAll({exclude: instance});
@@ -1344,7 +1341,8 @@ function updateProfile() {
     let email = $('#profileEmail').val();
     let discordID = $('#discordID').val();
     let veknID = $("#veknID").val();
-    DS.updateProfile(email, discordID, veknID, {callback: processData, errorHandler: updateProfileErrorHandler});
+    let country = $("#profileCountry").val();
+    DS.updateProfile(email, discordID, veknID, country, {callback: processData, errorHandler: updateProfileErrorHandler});
 }
 
 function updatePassword() {
