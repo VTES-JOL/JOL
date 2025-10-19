@@ -64,11 +64,11 @@ public class TournamentBuilder {
         Path tournamentFilePath = Paths.get(System.getenv("JOL_DATA")).resolve("tournament.json");
         TournamentData data = objectMapper.readValue(tournamentFilePath.toFile(), TournamentData.class);
         assertNotNull(data);
-        String gameName = "Cardinal Benediction Final Table";
+        String gameName = "Empires Fall Final Table";
         if (admin.notExistsGame(gameName)) {
             admin.createGame(gameName, false, "TOURNAMENT");
         }
-        List<String> players = List.of("gattsu", "cordovader", "Cooper", "preston", "Stolas");
+        List<String> players = List.of("JagerMelian", "cordovader", "kombainas", "Bezak Beast", "Stolas");
         logger.info("{}: {}", gameName, players);
         for (String player : players) {
             System.out.println("Confirming player: " + player);

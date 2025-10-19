@@ -16,3 +16,9 @@ src/test/resources/data/metrics/*
 # Environmental
 .local-docker-compose.yml
 .keys
+
+aws/
+csv/
+images/
+nginx/
+static/

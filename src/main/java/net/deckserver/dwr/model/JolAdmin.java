@@ -405,14 +405,14 @@ public class JolAdmin {
 
     public void validate() {
         logger.info("Validating game state");
-        games.values().stream().filter(ACTIVE_GAME)
-                .forEach(gameInfo -> {
-                    try {
-                        loadGameState(gameInfo.getName());
-                    } catch (Exception e) {
-                        logger.error("Unable to validate game {}", gameInfo.getName());
-                    }
-                });
+//        games.values().stream().filter(ACTIVE_GAME)
+//                .forEach(gameInfo -> {
+//                    try {
+//                        loadGameState(gameInfo.getName());
+//                    } catch (Exception e) {
+//                        logger.error("Unable to validate game {}", gameInfo.getName());
+//                    }
+//                });
     }
 
     public String getVersion() {
