@@ -28,6 +28,7 @@ public record DoCommand(JolGame game, GameModel model) {
     }
 
     public void doCommand(String player, String command) throws CommandException {
+        command = command.replaceAll("\\s{2,}", " ");
         String[] cmdStr = command.trim().split("[\\s\n\r\f\t]");
         String cmd = cmdStr[0];
         CommandParser cmdObj = new CommandParser(cmdStr, 1, game);
