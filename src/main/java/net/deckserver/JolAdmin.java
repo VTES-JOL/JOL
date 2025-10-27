@@ -277,7 +277,7 @@ public class JolAdmin {
 
         PlayerInfo player = PlayerService.get(playerName);
         PlayerGameActivityService.pingPlayer(playerName, gameName);
-        DiscordService.pingPlayer(player.getDiscordId(), gameName);
+        NotificationService.pingPlayer(playerName, player.getDiscordId(), gameName);
         return true;
     }
 

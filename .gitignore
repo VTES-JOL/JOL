@@ -21,6 +21,7 @@ aws/*
 # Environmental
 .local-docker-compose.yml
 .keys
+.
 
-# Nginx
-nginx/certs/*
+# Certs
+*.pem

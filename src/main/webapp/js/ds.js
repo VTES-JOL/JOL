@@ -17,6 +17,8 @@ let profile = {
     updating: false,
     imageTooltipPreference: true
 };
+let subscribed =  localStorage.getItem("notifications-subscribed") === "true";
+
 let pointerCanHover = window.matchMedia("(hover: hover)").matches;
 let scrollChat = false;
 const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
@@ -458,8 +460,8 @@ function registerforTournament() {
     });
 }
 
-function setImageTooltip(value) {
-    profile.imageTooltipPreference = value;
+function setImageTooltip() {
+    profile.imageTooltipPreference = $("#imageTooltips").is(':checked');
     DS.setUserPreferences(profile.imageTooltipPreference, {callback: processData, errorHandler: errorhandler});
 }
 
@@ -483,9 +485,11 @@ function callbackProfile(data) {
     }
     $("#playerPreferences .form-check-input").prop("checked", false);
     if (data.imageTooltipPreference) {
-        $("#imageTooltipPreference").prop("checked", true)
-    } else {
-        $("#textTooltipPreference").prop("checked", true)
+        $("#imageTooltips").prop("checked", true);
+    }
+
+    if (subscribed) {
+        $("#enableNotifications").prop("checked", true);
     }
 
     profile = data;

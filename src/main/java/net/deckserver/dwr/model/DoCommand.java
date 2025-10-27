@@ -187,7 +187,7 @@ public record DoCommand(JolGame game, GameModel model) {
         if (amount == 0) throw new CommandException("Must transfer an amount");
         int pool = game.getPool(player);
         if (pool - amount < 0) throw new CommandException("Invalid amount to transfer.  Not enough pool.");
-        if (card.getCounters() < amount) throw new CommandException("Not enough counters to transfer.");
+        if (amount < 0 && card.getCounters() < Math.abs(amount)) throw new CommandException("Not enough counters to transfer.");
         game.transfer(player, card.getId(), amount);
     }
 

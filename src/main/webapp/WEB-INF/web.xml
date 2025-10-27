@@ -37,6 +37,7 @@
         <url-pattern>/js/*</url-pattern>
         <url-pattern>/fonts/*</url-pattern>
         <url-pattern>/images/*</url-pattern>
+        <url-pattern>/sw.js</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
