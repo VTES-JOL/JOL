@@ -38,6 +38,10 @@ public class ChatService extends PersistedService {
                 .build(this::loadHistory);
     }
 
+    public static PersistedService getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     protected void persist() {
         if (shouldSkipPersistence()) {

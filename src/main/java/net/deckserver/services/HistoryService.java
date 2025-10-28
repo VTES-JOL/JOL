@@ -74,6 +74,10 @@ public class HistoryService extends PersistedService {
         });
     }
 
+    public static PersistedService getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     protected void persist() {
         if (shouldSkipPersistence()) {

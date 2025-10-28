@@ -1,5 +1,6 @@
 package net.deckserver.dwr.model;
 
+import net.deckserver.game.enums.Clan;
 import net.deckserver.services.ChatService;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.Path;
@@ -732,5 +733,13 @@ public class DoCommandTest {
         assertThat(card.getPath(), is(Path.NONE));
         worker.doCommand("Player2", "path 1 caine");
         assertThat(card.getPath(), is(Path.CAINE));
+    }
+
+    @Test
+    void clanTest() throws CommandException {
+        CardData card = game.data().getCard("111");
+        assertThat(card.getClan(), is(Clan.LASOMBRA));
+        worker.doCommand("Player2", "clan 1 brujah antitribu");
+        assertThat(card.getClan(), is(Clan.BRUJAH_ANTITRIBU));
     }
 }

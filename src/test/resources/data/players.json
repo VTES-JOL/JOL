@@ -18,7 +18,7 @@
     "discordId" : null,
     "veknId" : null,
     "countryCode" : null,
-    "roles" : [ "ADMIN", "PLAYTESTER" ],
+    "roles" : [ "PLAYTESTER", "ADMIN" ],
     "showImages" : true
   },
   "Player2" : {
@@ -29,7 +29,7 @@
     "discordId" : "",
     "veknId" : "",
     "countryCode" : "FR",
-    "roles" : [ "ADMIN", "PLAYTESTER" ],
+    "roles" : [ "PLAYTESTER", "ADMIN" ],
     "showImages" : true
   },
   "Player1" : {

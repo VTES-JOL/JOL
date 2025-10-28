@@ -90,6 +90,10 @@ public class PlayerGameActivityService extends PersistedService {
         return gameTimestampEntry;
     }
 
+    public static PersistedService getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     protected void persist() {
         if (shouldSkipPersistence()) {

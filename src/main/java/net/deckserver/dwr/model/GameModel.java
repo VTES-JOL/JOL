@@ -89,7 +89,7 @@ public class GameModel implements Comparable<GameModel> {
                 }
                 if (chat != null) {
                     didChat = true;
-                    status.append(commander.doMessage(player, chat, isJudge));
+                    commander.doMessage(player, chat, isJudge);
                     chatChanged = true;
                 }
                 OffsetDateTime timestamp = OffsetDateTime.now();
@@ -127,7 +127,7 @@ public class GameModel implements Comparable<GameModel> {
 
     public synchronized void updateGlobalNotes(String notes) {
         JolGame game = JolAdmin.getGame(name);
-        if (!game.getGlobalText().equals(notes)) {
+        if (!notes.equals(game.getGlobalText())) {
             game.setGlobalText(notes);
             reloadNotes();
             JolAdmin.saveGameState(game);

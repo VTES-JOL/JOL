@@ -166,8 +166,8 @@ public record DoCommand(JolGame game, GameModel model) {
         if (!cmdObj.hasMoreArgs()) {
             game.setClan(targetCard.getId(), Clan.NONE);
         } else {
-            String pathString = cmdObj.nextArg();
-            Clan clan = Clan.startsWith(pathString);
+            String clanString = cmdObj.remaining();
+            Clan clan = Clan.startsWith(clanString);
             game.setClan(targetCard.getId(), clan);
         }
     }

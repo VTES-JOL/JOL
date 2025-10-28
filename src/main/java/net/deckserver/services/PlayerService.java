@@ -3,6 +3,7 @@ package net.deckserver.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.collect.Streams;
 import io.azam.ulidj.ULID;
 import net.deckserver.game.enums.PlayerRole;
 import net.deckserver.storage.json.system.PlayerInfo;
@@ -16,6 +17,8 @@ import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class PlayerService extends PersistedService {
 
@@ -25,6 +28,7 @@ public class PlayerService extends PersistedService {
             .expireAfterWrite(1, TimeUnit.HOURS)
             .refreshAfterWrite(1, TimeUnit.MINUTES)
             .build(PlayerService::generateSummary);
+    private static final Predicate<UserSummary> RECENTLY_ONLINE = summary -> OffsetDateTime.parse(summary.getLastOnline()).plusMinutes(30).isAfter(OffsetDateTime.now());
     private final Map<String, PlayerInfo> players = new HashMap<>();
 
     private PlayerService() {
@@ -43,9 +47,10 @@ public class PlayerService extends PersistedService {
     }
 
     public static List<UserSummary> activeUsers() {
-        return activeUsers.asMap().values().stream()
-                .sorted(Comparator.comparing(UserSummary::getLastOnline).reversed())
-                .toList();
+        Map<Boolean, List<UserSummary>> users = activeUsers.asMap().values().stream()
+                .sorted(Comparator.comparing(UserSummary::getName, String.CASE_INSENSITIVE_ORDER))
+                .collect(Collectors.partitioningBy(RECENTLY_ONLINE));
+        return Streams.concat(users.get(true).stream(), users.get(false).stream()).toList();
     }
 
     public static void refreshActive(String playerName) {
@@ -103,6 +108,10 @@ public class PlayerService extends PersistedService {
 
     public static synchronized void remove(String name) {
         INSTANCE.players.remove(name);
+    }
+
+    public static PersistedService getInstance() {
+        return INSTANCE;
     }
 
     @Override

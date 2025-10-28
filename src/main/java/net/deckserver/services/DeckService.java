@@ -117,6 +117,10 @@ public class DeckService extends PersistedService {
 
     }
 
+    public static PersistedService getInstance() {
+        return INSTANCE;
+    }
+
     private void upgrade() {
         decks.values().stream()
                 .filter(MODERN_DECK)

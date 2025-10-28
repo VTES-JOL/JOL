@@ -878,10 +878,10 @@ function renderOnline(div, who) {
     $.each(who, function (index, player) {
         let lastOnline = moment(player.lastOnline).tz("UTC");
         let sinceLastOnline = moment.duration(moment().diff(lastOnline)).asMinutes();
-        let flag = player.country ? `<span data-tippy-content="${regionNames.of(player.country)}" class="fi fi-${player.country.toLowerCase()} fis fs-3"></span>` : '';
+        let flag = player.country ? `<span data-tippy-content="${regionNames.of(player.country)}" class="fi fi-${player.country.toLowerCase()} fis fs-3"></span>` : '<span class="fs-3">&nbsp;</span>';
         let admin = player.roles.includes('ADMIN') ? '<i data-tippy-content="Administrator" class="bi bi-star-fill text-warning"></i>' : "";
         let judge = player.roles.includes('JUDGE') ? '<i data-tippy-content="Judge" class="bi bi-person-raised-hand text-success"></i>' : "";
-        let offline = sinceLastOnline > 1 ? `<i data-tippy-content="Last Online: ${lastOnline.format('D-MMM HH:mm z')}" class="bi bi-clock-history"></i>` : "";
+        let offline = sinceLastOnline > 30 ? `<i data-tippy-content="Last Online: ${lastOnline.format('D-MMM HH:mm z')}" class="bi bi-clock-history"></i>` : "";
         let playerDiv = `
             <span class="border rounded-start p-0 border-secondary d-flex justify-content-between align-items-center">
                 <span class="d-flex align-items-center gap-2 px-2">
@@ -1022,7 +1022,7 @@ function doEndTurn() {
     return false;
 }
 
-function doSubmit() {
+function doSubmit(event) {
     const phaseSelect = $("#phase");
     const commandInput = $("#command");
     const chatInput = $("#chat");
@@ -1306,7 +1306,7 @@ function details(event, tag) {
 }
 
 function showStatus(data) {
-    if (data !== "") {
+    if (data) {
         $("#gameStatusMessage").html(data);
         bootstrap.Toast.getOrCreateInstance($("#liveToast")).show();
     }

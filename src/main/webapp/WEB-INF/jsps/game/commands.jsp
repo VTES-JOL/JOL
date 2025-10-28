@@ -27,7 +27,7 @@
                     <label for="ping" class="player-only">Ping</label>
                     <select id="ping" class="form-select form-select-sm mb-2 player-only"></select>
                     <div class="mt-2 d-flex justify-content-between">
-                        <button class="btn btn-secondary btn-sm" id="gameSubmit" type="submit" onclick="doSubmit()">
+                        <button class="btn btn-secondary btn-sm" id="gameSubmit" type="submit">
                             Submit
                         </button>
                         <button class="btn btn-warning btn-sm player-only" id="endTurn" type="button"

@@ -1,5 +1,6 @@
 package net.deckserver.storage.json.system;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.time.OffsetDateTime;
@@ -17,4 +18,5 @@ public class UserSummary {
     public String getLastOnline() {
         return lastOnline.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
+
 }

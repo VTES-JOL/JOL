@@ -119,6 +119,10 @@ public class RegistrationService extends PersistedService {
         return summary;
     }
 
+    public static PersistedService getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     protected void persist() {
         if (shouldSkipPersistence()) {

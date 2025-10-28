@@ -193,6 +193,10 @@ public class GameService extends PersistedService {
         return INSTANCE.summaryMap.get(gameName);
     }
 
+    public static PersistedService getInstance() {
+        return INSTANCE;
+    }
+
     private void upgrade() {
         logger.info("Determining upgrades...");
         GameDataConversion conversion = new GameDataConversion();

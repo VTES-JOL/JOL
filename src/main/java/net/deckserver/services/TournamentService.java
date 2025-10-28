@@ -6,6 +6,10 @@ public class TournamentService extends PersistedService {
         super("TournamentService", 10);
     }
 
+    public static PersistedService getInstance() {
+        return null;
+    }
+
     @Override
     protected void persist() {
 

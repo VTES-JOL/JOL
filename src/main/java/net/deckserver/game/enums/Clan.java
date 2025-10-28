@@ -49,7 +49,7 @@ public enum Clan {
     DEFENDER("Defender"),
     INNOCENT("Innocent"),
     JUDGE("Judge"),
-    MARTYR("Marryr"),
+    MARTYR("Martyr"),
     REDEEMER("Redeemer"),
     VISIONARY("Visionary"),
     NONE("");

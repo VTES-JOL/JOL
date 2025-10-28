@@ -190,6 +190,15 @@ class CommandParser {
         }
     }
 
+    String remaining() throws CommandException {
+        StringBuilder builder = new StringBuilder();
+        while (hasMoreArgs()) {
+            builder.append(nextArg());
+            builder.append(" ");
+        }
+        return builder.toString().trim();
+    }
+
     boolean consumeString(String val) {
         if (!hasMoreArgs()) return false;
         if (val.equalsIgnoreCase(args[ind])) {

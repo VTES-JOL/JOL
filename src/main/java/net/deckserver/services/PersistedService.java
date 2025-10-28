@@ -9,6 +9,7 @@ import java.lang.ref.Cleaner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Base class for services that require scheduled persistence, graceful shutdown,
@@ -16,6 +17,9 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * This class handles the lifecycle management (scheduling, shutdown, test mode)
  * while allowing subclasses to define their own persistence strategy.
+ * <p>
+ * NOTE: Shutdown should be triggered via ServletContextListener, not JVM shutdown hooks,
+ * to avoid classloader issues in servlet containers.
  */
 public abstract class PersistedService {
 
@@ -28,7 +32,7 @@ public abstract class PersistedService {
     protected final Logger logger;
     protected final String serviceName;
     protected final boolean testModeEnabled;
-    protected volatile boolean isShuttingDown = false;
+    protected final AtomicBoolean isShuttingDown = new AtomicBoolean(false);
     protected final ScheduledExecutorService scheduler;
     protected static final Cleaner cleaner = Cleaner.create();
     protected final Cleaner.Cleanable cleanable;
@@ -66,11 +70,7 @@ public abstract class PersistedService {
                     serviceName, persistenceIntervalMinutes);
         }
 
-        // Add a shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            logger.info("Shutting down {}...", serviceName);
-            shutdown();
-        }, serviceName + "-Shutdown-Hook"));
+        // DO NOT add shutdown hook here - use ServletContextListener instead
     }
 
     /**
@@ -78,7 +78,7 @@ public abstract class PersistedService {
      * Called automatically by the scheduler.
      */
     private void scheduledPersist() {
-        if (isShuttingDown) {
+        if (isShuttingDown.get()) {
             logger.debug("Skipping scheduled persistence - shutdown in progress");
             return;
         }
@@ -111,22 +111,28 @@ public abstract class PersistedService {
      * @return true if persistence should be skipped
      */
     protected boolean shouldSkipPersistence() {
-        return testModeEnabled || isShuttingDown;
+        return testModeEnabled || isShuttingDown.get();
     }
 
     /**
      * Gracefully shutdown the service, persisting all data and stopping the scheduler.
+     * This should be called from a ServletContextListener, not a JVM shutdown hook.
      */
-    protected void shutdown() {
+    public void shutdown() {
         // Skip shutdown in test mode
         if (testModeEnabled) {
             logger.info("{} shutdown skipped - test mode enabled", serviceName);
             return;
         }
 
+        // Prevent multiple shutdown calls
+        if (!isShuttingDown.compareAndSet(false, true)) {
+            logger.warn("{} shutdown already in progress", serviceName);
+            return;
+        }
+
         try {
             logger.info("Starting {} shutdown...", serviceName);
-            isShuttingDown = true;
 
             // Shutdown the scheduler first
             scheduler.shutdown();
@@ -141,15 +147,13 @@ public abstract class PersistedService {
                 logger.warn("{} scheduler shutdown interrupted", serviceName);
             }
 
-            // Perform final persistence
+            // Perform final persistence BEFORE classloader stops
             logger.info("Performing final persistence for {}...", serviceName);
-
-            // Temporarily allow saves for explicit shutdown save
-            isShuttingDown = false;
-            persist();
             
-            // Re-enable a shutdown flag to prevent any further saves
-            isShuttingDown = true;
+            // Temporarily allow saves for explicit shutdown save
+            isShuttingDown.set(false);
+            persist();
+            isShuttingDown.set(true);
 
             // Additional clean-up
             performAdditionalCleanup();
@@ -192,7 +196,7 @@ public abstract class PersistedService {
      * @return true if shutdown is in progress
      */
     protected boolean isShuttingDown() {
-        return isShuttingDown;
+        return isShuttingDown.get();
     }
 
     /**

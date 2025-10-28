@@ -48,6 +48,10 @@ public class GlobalChatService extends PersistedService {
         return INSTANCE.chats;
     }
 
+    public static PersistedService getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     protected void persist() {
         if (shouldSkipPersistence()) {

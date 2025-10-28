@@ -11,8 +11,8 @@
         <label for="profileCountry" class="form-label">Country</label>
         <select name="profileCountry" id="profileCountry" class="form-select">
             <option value="">-- Don't display country --</option>
-            <c:forEach var="country" items="<%= CountryService.getCountryCodes() %>">
-                <option value="${country}">${CountryService.getCountry(country)}</option>
+            <c:forEach var="country" items="<%= CountryService.getCountries() %>">
+                <option value="${CountryService.getCode(country)}">${country}</option>
             </c:forEach>
         </select>
 
