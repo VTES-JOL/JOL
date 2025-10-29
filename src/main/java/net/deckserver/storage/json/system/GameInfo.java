@@ -13,7 +13,7 @@ import java.time.OffsetDateTime;
 @Data
 @NoArgsConstructor
 public class GameInfo {
-    public static final Version CURRENT_VERSION = Version.GAME_STATE;
+    public static final Version CURRENT_VERSION = Version.DATA_FIX;
     private String name;
     private String id;
     private String owner;
@@ -41,7 +41,8 @@ public class GameInfo {
     @Getter
     public enum Version {
         INITIAL(0),
-        GAME_STATE(1);
+        GAME_STATE(1),
+        DATA_FIX(2);
 
         private final int version;
 

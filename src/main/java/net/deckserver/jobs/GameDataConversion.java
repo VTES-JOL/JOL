@@ -8,10 +8,14 @@ import net.deckserver.dwr.model.ModelLoader;
 import net.deckserver.game.jaxb.XmlFileUtils;
 import net.deckserver.game.jaxb.actions.GameActions;
 import net.deckserver.game.jaxb.state.GameState;
+import net.deckserver.services.CardService;
+import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.game.CardData;
 import net.deckserver.storage.json.game.GameData;
 import net.deckserver.storage.json.game.PlayerData;
 import net.deckserver.storage.json.game.TurnHistory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,10 +26,30 @@ import java.util.Objects;
 public class GameDataConversion {
 
     private static final String BASE_PATH = System.getenv().getOrDefault("JOL_DATA", "/data/games");
+    private static final Logger LOGGER = LoggerFactory.getLogger(GameDataConversion.class);
 
     public void convertGame(String gameId) {
         GameData data = convertGameData(gameId);
         verify(data);
+    }
+
+    public void checkCards(String gameName, String id) {
+        GameData data = load(id);
+        assert data != null;
+        data.getCards().values().forEach(card -> {
+            CardSummary summary = CardService.get(card.getCardId());
+            if (summary.hasBlood()) {
+                if (card.getDisciplines().isEmpty() && !summary.getDisciplines().isEmpty()) {
+                    LOGGER.info("Restoring missing disciplines on {} - {} ({})", gameName, card.getName(), card.getId());
+                    card.setDisciplines(summary.getDisciplines());
+                }
+                if (card.getCapacity() <= 0 && summary.getCapacity() > 0) {
+                    LOGGER.info("Restoring missing capacity on {} - {} ({})", gameName, card.getName(), card.getId());
+                    card.setCapacity(summary.getCapacity());
+                }
+            }
+        });
+        save(id, data);
     }
 
     private void verify(GameData gameData) {

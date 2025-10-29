@@ -212,6 +212,16 @@ public class GameService extends PersistedService {
                     conversion.convertGame(gameInfo.getId());
                     gameInfo.setVersion(GameInfo.Version.GAME_STATE);
                 });
+
+        games.values().stream()
+                .filter(ACTIVE_GAME)
+                .filter(Objects::nonNull)
+                .filter(gameInfo -> gameInfo.getVersion().isOlderThan(GameInfo.Version.DATA_FIX))
+                .peek(gameInfo -> logger.info("Error checking {} - {}", gameInfo.getName(), gameInfo.getId()))
+                .forEach(gameInfo -> {
+                    conversion.checkCards(gameInfo.getName(), gameInfo.getId());
+                    gameInfo.setVersion(GameInfo.Version.DATA_FIX);
+                });
     }
 
     private static GameSummary generateSummary(String gameName) {

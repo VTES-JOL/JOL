@@ -733,6 +733,11 @@ public class DoCommandTest {
         assertThat(card.getPath(), is(Path.NONE));
         worker.doCommand("Player2", "path 1 caine");
         assertThat(card.getPath(), is(Path.CAINE));
+        game.replacePlayer("Player5", "Bezak Beast");
+        CardData card2 = game.data().getCard("415");
+        assertThat(card2.getPath(), is(Path.NONE));
+        worker.doCommand("Player2", "path Bezak ready 1 power");
+        assertThat(card2.getPath(), is(Path.POWER_AND_THE_INNER_VOICE));
     }
 
     @Test
