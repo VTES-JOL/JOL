@@ -22,57 +22,72 @@ public class ChatService extends PersistedService {
     private static final ChatService INSTANCE = new ChatService();
     private static final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
 
-    private final LoadingCache<String, TurnHistory> historyCache;
+    private final LoadingCache<String, TurnHistory> historyCache = Caffeine.newBuilder()
+            .expireAfterAccess(5, TimeUnit.MINUTES)
+            .removalListener((String key, TurnHistory history, RemovalCause cause) -> {
+                // Don't save during shutdown - it's handled explicitly
+                if (!isShuttingDown()) {
+                    saveHistory(key, history);
+                }
+            })
+            .build(this::loadHistory);
 
     private ChatService() {
         super("ChatService", 5); // 5 minute persistence interval
-
-        this.historyCache = Caffeine.newBuilder()
-                .expireAfterAccess(5, TimeUnit.MINUTES)
-                .removalListener((String key, TurnHistory history, RemovalCause cause) -> {
-                    // Don't save during shutdown - it's handled explicitly
-                    if (!isShuttingDown()) {
-                        saveHistory(key, history);
-                    }
-                })
-                .build(this::loadHistory);
     }
 
     public static PersistedService getInstance() {
         return INSTANCE;
     }
 
-    @Override
-    protected void persist() {
-        if (shouldSkipPersistence()) {
-            logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
-            return;
-        }
-
-        Map<String, TurnHistory> snapshot = historyCache.asMap();
-        int persistedCount = 0;
-
-        logger.debug("Starting persistence of {} cached histories", snapshot.size());
-
-        for (Map.Entry<String, TurnHistory> entry : snapshot.entrySet()) {
-            String gameId = entry.getKey();
-            TurnHistory history = entry.getValue();
-
-            if (history != null && history.getTurns() != null && !history.getTurns().isEmpty()) {
-                saveHistory(gameId, history);
-                persistedCount++;
-            }
-        }
-
-        if (persistedCount > 0) {
-            logger.info("Persisted {} histories", persistedCount);
-        }
+    public static synchronized void subscribe(String gameId, GameModel model) {
+        gmap.put(gameId, model);
     }
 
-    @Override
-    protected void load() {
-        // ChatService loads on-demand via Caffeine cache
-        // No bulk loading needed
+    public static synchronized List<String> getTurns(String gameId) {
+        return INSTANCE.historyCache.get(gameId).getTurnLabels();
+    }
+
+    public static synchronized List<ChatData> getTurn(String gameId, String turnLabel) {
+        return INSTANCE.historyCache.get(gameId).getTurn(turnLabel).getChats();
+    }
+
+    public static synchronized List<ChatData> getChats(String gameId) {
+        String turnLabel = INSTANCE.historyCache.get(gameId).getCurrentTurnLabel();
+        if (turnLabel == null) {
+            return new ArrayList<>();
+        }
+        return INSTANCE.historyCache.get(gameId).getTurn(turnLabel).getChats();
+    }
+
+    public static synchronized void addTurn(String gameId, String player, String turnId) {
+        INSTANCE.historyCache.get(gameId).addTurn(player, turnId);
+        Optional.ofNullable(gmap.get(gameId)).ifPresent(GameModel::clearChats);
+    }
+
+    public static synchronized void sendMessage(String gameId, String source, String message) {
+        ChatData chatData = new ChatData(message, source, null);
+        sendChat(gameId, chatData);
+    }
+
+    public static synchronized void sendJudgeMessage(String gameId, String source, String message) {
+        ChatData chatData = new ChatData(message, "Judge - " + source, null);
+        sendChat(gameId, chatData);
+    }
+
+    public static synchronized void sendCommand(String gameId, String source, String message, String... command) {
+        ChatData chatData = new ChatData(message, source, String.join(" ", command));
+        sendChat(gameId, chatData);
+    }
+
+    public static synchronized void sendSystemMessage(String gameId, String message) {
+        ChatData chatData = new ChatData(message, "SYSTEM", null);
+        sendChat(gameId, chatData);
+    }
+
+    private static synchronized void sendChat(String gameId, ChatData chat) {
+        INSTANCE.historyCache.get(gameId).addChat(chat);
+        Optional.ofNullable(gmap.get(gameId)).ifPresent(model -> model.addChat(chat));
     }
 
     private void saveHistory(String gameId, TurnHistory history) {
@@ -109,62 +124,41 @@ public class ChatService extends PersistedService {
     }
 
     @Override
+    protected void persist() {
+        if (shouldSkipPersistence()) {
+            logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
+            return;
+        }
+
+        Map<String, TurnHistory> snapshot = historyCache.asMap();
+        int persistedCount = 0;
+
+        logger.debug("Starting persistence of {} cached histories", snapshot.size());
+
+        for (Map.Entry<String, TurnHistory> entry : snapshot.entrySet()) {
+            String gameId = entry.getKey();
+            TurnHistory history = entry.getValue();
+
+            if (history != null && history.getTurns() != null && !history.getTurns().isEmpty()) {
+                saveHistory(gameId, history);
+                persistedCount++;
+            }
+        }
+
+        if (persistedCount > 0) {
+            logger.info("Persisted {} histories", persistedCount);
+        }
+    }
+
+    @Override
+    protected void load() {
+        // ChatService loads on-demand via Caffeine cache
+        // No bulk loading needed
+    }
+
+    @Override
     protected void performAdditionalCleanup() {
         historyCache.invalidateAll();
         historyCache.cleanUp();
-    }
-
-    public static synchronized void subscribe(String gameId, GameModel model) {
-        gmap.put(gameId, model);
-    }
-
-    public static synchronized List<String> getTurns(String gameId) {
-        return INSTANCE.historyCache.get(gameId).getTurnLabels();
-    }
-
-    public static synchronized List<ChatData> getTurn(String gameId, String turnLabel) {
-        return INSTANCE.historyCache.get(gameId).getTurn(turnLabel).getChats();
-    }
-
-    public static synchronized List<ChatData> getChats(String gameId) {
-        String turnLabel = INSTANCE.historyCache.get(gameId).getCurrentTurnLabel();
-        if (turnLabel == null) {
-            return new ArrayList<>();
-        }
-        return INSTANCE.historyCache.get(gameId).getTurn(turnLabel).getChats();
-    }
-
-    public static synchronized String getCurrentTurn(String gameId) {
-        return INSTANCE.historyCache.get(gameId).getCurrentTurn();
-    }
-
-    public static synchronized void addTurn(String gameId, String player, String turnId) {
-        INSTANCE.historyCache.get(gameId).addTurn(player, turnId);
-        Optional.ofNullable(gmap.get(gameId)).ifPresent(GameModel::clearChats);
-    }
-
-    public static synchronized void sendMessage(String gameId, String source, String message) {
-        ChatData chatData = new ChatData(message, source, null);
-        sendChat(gameId, chatData);
-    }
-
-    public static synchronized void sendJudgeMessage(String gameId, String source, String message) {
-        ChatData chatData = new ChatData(message, "Judge - " + source, null);
-        sendChat(gameId, chatData);
-    }
-
-    public static synchronized void sendCommand(String gameId, String source, String message, String... command) {
-        ChatData chatData = new ChatData(message, source, String.join(" ", command));
-        sendChat(gameId, chatData);
-    }
-
-    public static synchronized void sendSystemMessage(String gameId, String message) {
-        ChatData chatData = new ChatData(message, "SYSTEM", null);
-        sendChat(gameId, chatData);
-    }
-
-    private static synchronized void sendChat(String gameId, ChatData chat) {
-        INSTANCE.historyCache.get(gameId).addChat(chat);
-        Optional.ofNullable(gmap.get(gameId)).ifPresent(model -> model.addChat(chat));
     }
 }

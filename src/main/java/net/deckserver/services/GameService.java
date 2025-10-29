@@ -217,7 +217,7 @@ public class GameService extends PersistedService {
                 .filter(ACTIVE_GAME)
                 .filter(Objects::nonNull)
                 .filter(gameInfo -> gameInfo.getVersion().isOlderThan(GameInfo.Version.DATA_FIX))
-                .peek(gameInfo -> logger.info("Error checking {} - {}", gameInfo.getName(), gameInfo.getId()))
+                .peek(gameInfo -> logger.info("Validating data {} - {}", gameInfo.getName(), gameInfo.getId()))
                 .forEach(gameInfo -> {
                     conversion.checkCards(gameInfo.getName(), gameInfo.getId());
                     gameInfo.setVersion(GameInfo.Version.DATA_FIX);
