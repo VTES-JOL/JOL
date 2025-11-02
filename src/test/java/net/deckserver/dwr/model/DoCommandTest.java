@@ -254,6 +254,21 @@ public class DoCommandTest {
     }
 
     @Test
+    void drawEmptyHand() throws CommandException {
+        assertThat(game.data().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(7));
+        worker.doCommand("Player2", "discard 1");
+        worker.doCommand("Player2", "discard 1");
+        worker.doCommand("Player2", "discard 1");
+        worker.doCommand("Player2", "discard 1");
+        worker.doCommand("Player2", "discard 1");
+        worker.doCommand("Player2", "discard 1");
+        worker.doCommand("Player2", "discard 1");
+        assertThat(game.data().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(0));
+        worker.doCommand("Player2", "draw");
+        assertThat(game.data().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(1));
+    }
+
+    @Test
     void drawCrypt() throws CommandException {
         assertThat(game.data().getPlayerRegion("Player2", RegionType.UNCONTROLLED).getCards().size(), is(3));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.CRYPT).getCards().getFirst(), hasProperty("id", is("105")));

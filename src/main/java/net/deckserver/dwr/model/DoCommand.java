@@ -369,7 +369,7 @@ public record DoCommand(JolGame game, GameModel model) {
     void draw(CommandParser cmdObj, String player) throws CommandException {
         boolean crypt = cmdObj.consumeString("crypt") || cmdObj.consumeString("vamp");
         int count = cmdObj.getNumber(1);
-        int size = crypt ? game.getSize(player, RegionType.CRYPT) : game.getSize(player, RegionType.HAND);
+        int size = crypt ? game.getSize(player, RegionType.CRYPT) : game.getSize(player, RegionType.LIBRARY);
         if (count <= 0) throw new CommandException("Must draw at least 1 card.");
         if (count > size) throw new CommandException("Unable to draw, only " + size + " cards left.");
         for (int j = 0; j < count; j++) {
