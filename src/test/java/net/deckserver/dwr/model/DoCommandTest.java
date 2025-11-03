@@ -402,6 +402,41 @@ public class DoCommandTest {
     }
 
     @Test
+    void influenceContest() throws CommandException {
+        CardData cardData = game.data().getCard("8");
+        assertThat(cardData.getRegion().getType(), is(RegionType.UNCONTROLLED));
+        assertFalse(cardData.isContested());
+        worker.doCommand("Player1", "influence 2");
+        assertFalse(cardData.isContested());
+        assertThat(cardData.getRegion().getType(), is(RegionType.READY));
+        CardData cardData2 = game.data().getCard("9999");
+        assertFalse(cardData2.isContested());
+        assertThat(cardData2.getRegion().getType(), is(RegionType.UNCONTROLLED));
+        worker.doCommand("Player5", "influence 5");
+        assertTrue(cardData.isContested());
+        assertTrue(cardData2.isContested());
+        assertThat(cardData2.getRegion().getType(), is(RegionType.READY));
+    }
+
+    @Test
+    void influenceNoContestIfOusted() throws CommandException{
+        CardData cardData = game.data().getCard("8");
+        assertThat(cardData.getRegion().getType(), is(RegionType.UNCONTROLLED));
+        assertFalse(cardData.isContested());
+        worker.doCommand("Player1", "influence 2");
+        assertFalse(cardData.isContested());
+        assertThat(cardData.getRegion().getType(), is(RegionType.READY));
+        worker.doCommand("Player1", "pool -29");
+        assertThat(game.data().getPlayer("Player1").getPool(), is(0));
+        assertTrue(game.data().getPlayer("Player1").isOusted());
+        CardData cardData2 = game.data().getCard("9999");
+        worker.doCommand("Player5", "influence 5");
+        assertFalse(cardData.isContested());
+        assertFalse(cardData2.isContested());
+        assertThat(cardData2.getRegion().getType(), is(RegionType.READY));
+    }
+
+    @Test
     void influenceAgain() throws CommandException {
         assertThat(game.data().getPlayerRegion("Player1", RegionType.UNCONTROLLED).getCards().size(), is(2));
         assertThat(game.data().getPlayerRegion("Player1", RegionType.READY).getCards().size(), is(3));
@@ -418,7 +453,7 @@ public class DoCommandTest {
 
     @Test
     void influenceNoCapacity() throws CommandException {
-        assertThat(game.data().getPlayerRegion("Player5", RegionType.UNCONTROLLED).getCards().size(), is(4));
+        assertThat(game.data().getPlayerRegion("Player5", RegionType.UNCONTROLLED).getCards().size(), is(5));
         assertThat(game.data().getPlayerRegion("Player5", RegionType.READY).getCards().size(), is(3));
         assertThat(game.data().getPlayerRegion("Player5", RegionType.UNCONTROLLED).getCards().get(3), hasProperty("id", is("442")));
         worker.doCommand("Player5", "influence 4");

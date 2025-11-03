@@ -4792,6 +4792,23 @@
       "cardId": "101547",
       "name": "Rat's Warning",
       "type": "NONE"
+    },
+    "9999": {
+      "id": "9999",
+      "region": "Player5-Uncontrolled region",
+      "owner": "Player5",
+      "cardId": "200315",
+      "name": "Dani",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "NOSFERATU_ANTITRIBU",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani"
+      ]
     }
   },
   "players": {
@@ -4808,7 +4825,8 @@
             "418",
             "413",
             "420",
-            "442"
+            "442",
+            "9999"
           ],
           "player": "Player5",
           "type": "UNCONTROLLED"

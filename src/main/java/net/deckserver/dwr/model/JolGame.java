@@ -325,6 +325,7 @@ public record JolGame(String id, GameData data) {
         int ending = starting + amount;
         playerData.setPool(ending);
         if (ending <= 0) {
+            playerData.setOusted(true);
             data.updatePredatorMapping();
         }
         ChatService.sendCommand(id, source, player + "'s pool was " + starting + ", now is " + ending + ".", "pool", player, String.valueOf(amount));

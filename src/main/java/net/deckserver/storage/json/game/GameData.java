@@ -88,6 +88,7 @@ public class GameData {
         }
 
         players.values().stream()
+                .filter(playerData -> !playerData.isOusted())
                 .map(playerData -> playerData.getRegion(RegionType.READY))
                 .flatMap(regionData -> regionData.getCards().stream())
                 .filter(c -> c.getName().equals(card.getName()))
