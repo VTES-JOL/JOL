@@ -214,9 +214,9 @@ class JolGameTest {
     @Test
     void influenceCard() {
         List<CardData> uncontrolled = getCards("Player5", RegionType.UNCONTROLLED);
-        assertThat(uncontrolled.size(), is(4));
-        existingGame.drawCard("Player5", RegionType.CRYPT, RegionType.UNCONTROLLED);
         assertThat(uncontrolled.size(), is(5));
+        existingGame.drawCard("Player5", RegionType.CRYPT, RegionType.UNCONTROLLED);
+        assertThat(uncontrolled.size(), is(6));
         assertThat(toCardIds(uncontrolled), hasItems("413", "412"));
         List<CardData> ready = getCards("Player5", RegionType.READY);
         assertThat(ready.size(), is(3));

@@ -72,11 +72,11 @@
                                                         style="font-size: 0.6rem;">CONTESTED</span></c:if>
                 </div>
                 <div class="d-flex align-items-center gap-1">
-                    <span>
-                        <c:forEach items="<%= disciplines %>" var="disc">
-                            <span class="icon ${disc}"></span>
-                        </c:forEach>
-                    </span>
+                    <c:forEach items="<%= disciplines %>" var="disc">
+                        <span class="icon ${disc}"></span>
+                    </c:forEach>
+                </div>
+                <div class="d-flex align-items-center gap-1">
                     <span class="badge bg-light text-black shadow border border-secondary-subtle"><%= label %></span>
                 </div>
             </div>
