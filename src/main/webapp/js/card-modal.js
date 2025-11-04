@@ -493,7 +493,7 @@ function showCardModal(event) {
                         // Update data-* for subsequent opens or actions if needed
                         target.data('clan', newDisplay);
                         // Send update to server
-                        sendCommand(['clan', modal.data('controller'), modal.data('region').split(' ')[0], modal.data('coordinates'), newKey.split('_')[0]].join(' ').trim());
+                        sendCommand(['clan', modal.data('controller').split(' ', 2)[0], modal.data('region').split(' ')[0], modal.data('coordinates'), newKey.split('_')[0]].join(' ').trim());
                     }
                 });
 
@@ -505,7 +505,7 @@ function showCardModal(event) {
                     minion: minion,
                     onChanged: function (newDisplay, newKey) {
                         target.data('path', newDisplay);
-                        sendCommand(['path', modal.data('controller'), modal.data('region').split(' ')[0], modal.data('coordinates'), newKey.split('_')[0]].join(' ').trim());
+                        sendCommand(['path', modal.data('controller').split(' ', 2)[0], modal.data('region').split(' ')[0], modal.data('coordinates'), newKey.split('_')[0]].join(' ').trim());
                     }
                 });
 
@@ -517,7 +517,7 @@ function showCardModal(event) {
                     minion: minion,
                     onChanged: function (newDisplay, newKey) {
                         target.data('sect', newDisplay);
-                        sendCommand(['sect', modal.data('controller'), modal.data('region').split(' ')[0], modal.data('coordinates'), newKey].join(' ').trim());
+                        sendCommand(['sect', modal.data('controller').split(' ', 2)[0], modal.data('region').split(' ')[0], modal.data('coordinates'), newKey].join(' ').trim());
                     }
                 });
 
