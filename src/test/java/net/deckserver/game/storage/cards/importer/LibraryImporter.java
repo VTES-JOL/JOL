@@ -44,6 +44,9 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final Pattern TROPHY_PATTERN = Pattern.compile("Master. Trophy.");
     private static final Pattern LOCATION_PATTERN = Pattern.compile("(Unique|Master:) location");
     private static final Pattern EQUIPEMENT_LOCATION_PATTERN = Pattern.compile("equipment card represents a location");
+    private static final Pattern MODE_OR_PATTERN = Pattern.compile("^\\[[A-Za-z]+\\]\\s+or\\s+\\[[A-Za-z]+\\](?=\\s|$)");
+    private static final Pattern MODE_PATTERN = Pattern.compile("^\\[[A-Za-z]+\\](\\[[A-Za-z]+\\])*(?=\\s|$)");
+    private static final Pattern DISCIPLINE_EXTRACTOR_PATTERN = Pattern.compile("\\[([A-Za-z]+)\\]");
 
     private static final List<String> DISCIPLINES = Arrays.asList("ani", "obe", "cel", "dom", "dem", "for", "san", "thn", "vic", "pro", "chi", "val", "mel", "nec", "obf", "obl", "pot", "qui", "pre", "ser", "tha", "aus", "vis", "abo", "myt", "dai", "spi", "tem", "obt", "str", "mal", "flight");
 
@@ -148,17 +151,28 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                 //HACK: Mirror's Visage superior
                 line = line.replace("]+", "] +");
 
-                String[] disciplinesAndText = line.split(" ", 2);
-                List<String> disciplines = Arrays
-                        .stream(disciplinesAndText[0].split("[\\[\\]]+"))
-                        .filter(d -> !d.isEmpty())
-                        .filter(d -> !d.equals(":")) //Death of the Drum
-                        .collect(Collectors.toList());
+                Matcher orMatcher = MODE_OR_PATTERN.matcher(line);
+                Matcher discMatcher = MODE_PATTERN.matcher(line);
 
-                if (DISCIPLINES.contains(disciplines.get(0).toLowerCase())) {
-                    mode.setDisciplines(disciplines);
-                    modeText = disciplinesAndText[1];
+                String prefix = null;
+                String remainder = line;
+                if (orMatcher.find()) {
+                    prefix = orMatcher.group();
+                    remainder = line.substring(orMatcher.end()).trim();
+                } else if (discMatcher.find()) {
+                    prefix = discMatcher.group();
+                    remainder = line.substring(discMatcher.end()).trim();
                 }
+
+                if (prefix != null) {
+                    List<String> disciplines = new ArrayList<>();
+                    Matcher m = DISCIPLINE_EXTRACTOR_PATTERN.matcher(prefix);
+                    while (m.find()) {
+                        disciplines.add(m.group(1));
+                    }
+                    mode.setDisciplines(disciplines);
+                }
+                modeText = remainder;
             }
             mode.setText(modeText.trim());
 

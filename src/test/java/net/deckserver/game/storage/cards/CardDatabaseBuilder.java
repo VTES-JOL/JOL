@@ -37,7 +37,7 @@ public class CardDatabaseBuilder {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         List<SummaryCard> coreCards = getCoreCards(Paths.get("csv/core"));
-        List<SummaryCard> playTestCards = getPlaytestCards(Paths.get("csv/playtest"));
+        List<SummaryCard> playTestCards = new ArrayList<>(); //getPlaytestCards(Paths.get("csv/playtest"));
 
         List<SummaryCard> summaryCards = Stream.of(coreCards, playTestCards).flatMap(List::stream).toList();
 
