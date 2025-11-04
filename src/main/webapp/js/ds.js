@@ -851,7 +851,7 @@ function renderMyGames(id, games) {
 }
 
 function renderPlayer(players, target) {
-    let pinged = players[target] && players[target]["pinged"] ? `<i class='bi-exclamation-triangle ms-1></i>` : "";
+    let pinged = players[target] && players[target]["pinged"] ? "<i class='bi-exclamation-triangle ms-1'></i>" : "";
     let playerName = players[target] ? players[target]["playerName"] : "";
     let template = `
         <span class='my-2 px-2 border-end border-start w-100 text-center'>
