@@ -29,7 +29,7 @@
                 <img class="img-fluid d-none d-md-inline" id="card-image" alt="card image" src=""/>
                 <div class="input-group mt-2">
                     <label for="card-label" class="input-group-text"><i class="bi bi-tag"></i></label>
-                    <input type="email" class="form-control" id="card-label"
+                    <input type="text" class="form-control" id="card-label"
                            placeholder="Add a label for all players to see." onchange="updateNotes();">
                 </div>
             </div>
