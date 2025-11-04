@@ -131,14 +131,14 @@ public record DoCommand(JolGame game, GameModel model) {
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
         CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         if (!cmdObj.hasMoreArgs()) {
-            game.setSect(targetCard.getId(), Sect.NONE);
+            game.setSect(player, targetCard.getId(), Sect.NONE, false);
         } else {
             String sectString = cmdObj.nextArg();
             Sect sect = Sect.startsWith(sectString);
             if (sect == null) {
                 throw new CommandException("Invalid sect");
             }
-            game.setSect(targetCard.getId(), sect);
+            game.setSect(player, targetCard.getId(), sect, false);
         }
     }
 
@@ -148,14 +148,14 @@ public record DoCommand(JolGame game, GameModel model) {
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
         CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         if (!cmdObj.hasMoreArgs()) {
-            game.setPath(targetCard.getId(), Path.NONE);
+            game.setPath(player, targetCard.getId(), Path.NONE, false);
         } else {
             String pathString = cmdObj.nextArg();
             Path path = Path.startsWith(pathString);
             if (Path.NONE.equals(path)) {
                 throw new CommandException("Invalid path");
             }
-            game.setPath(targetCard.getId(), path);
+            game.setPath(player, targetCard.getId(), path, false);
         }
     }
 
@@ -164,11 +164,11 @@ public record DoCommand(JolGame game, GameModel model) {
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
         CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         if (!cmdObj.hasMoreArgs()) {
-            game.setClan(targetCard.getId(), Clan.NONE);
+            game.setClan(player, targetCard.getId(), Clan.NONE, false);
         } else {
             String clanString = cmdObj.remaining();
             Clan clan = Clan.startsWith(clanString);
-            game.setClan(targetCard.getId(), clan);
+            game.setClan(player, targetCard.getId(), clan, false);
         }
     }
 

@@ -159,19 +159,31 @@ public record JolGame(String id, GameData data) {
         }
     }
 
-    public void setSect(String cardId, Sect sect) {
+    public void setSect(String player, String cardId, Sect sect, boolean quiet) {
         CardData card = data.getCard(cardId);
+        String oldSect = card.getSect().getDescription();
         card.setSect(sect);
+        if (!quiet) {
+            ChatService.sendCommand(id, player, String.format("%s changes sect of %s from %s to %s", player, getCardLink(card), oldSect, sect.getDescription()), "sect", card.getId(), player, sect.getDescription());
+        }
     }
 
-    public void setPath(String cardId, Path path) {
+    public void setPath(String player, String cardId, Path path, boolean quiet) {
         CardData card = data.getCard(cardId);
+        String oldPath = card.getPath().getDescription();
         card.setPath(path);
+        if (!quiet) {
+            ChatService.sendCommand(id, player, String.format("%s changes path of %s from %s to %s", player, getCardLink(card), oldPath, path.getDescription()), "path", card.getId(), player, path.getDescription());
+        }
     }
 
-    public void setClan(String cardId, Clan clan) {
+    public void setClan(String player, String cardId, Clan clan, boolean quiet) {
         CardData card = data.getCard(cardId);
+        String oldClan = card.getClan().getDescription();
         card.setClan(clan);
+        if (!quiet) {
+            ChatService.sendCommand(id, player, String.format("%s changes clan of %s from %s to %s", player, getCardLink(card), oldClan, clan.getDescription()), "clan", card.getId(), player, clan.getDescription());
+        }
     }
 
     public void shuffle(String player, RegionType type, int num) {
