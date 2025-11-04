@@ -318,7 +318,16 @@ public record DoCommand(JolGame game, GameModel model) {
         String srcPlayer = cmdObj.getPlayer(player);
         RegionType srcRegion = cmdObj.getRegion(RegionType.READY);
         CardData srcCard = cmdObj.findCardData(false, srcPlayer, srcRegion);
-        String destPlayer = cmdObj.getPlayer(player);
+        String destPlayer;
+        boolean predatorFlag = cmdObj.consumeString("predator");
+        boolean preyFlag = cmdObj.consumeString("prey");
+        if (predatorFlag) {
+            destPlayer = game.getPredatorOf(srcPlayer);
+        } else if (preyFlag) {
+            destPlayer = game.getPreyOf(srcPlayer);
+        } else {
+            destPlayer = cmdObj.getPlayer(player);
+        }
         RegionType destRegion = cmdObj.getRegion(RegionType.READY);
         CardData destCard = cmdObj.findCardData(false, false, destPlayer, destRegion);
         boolean top = Arrays.asList(cmdObj.args).contains("top");

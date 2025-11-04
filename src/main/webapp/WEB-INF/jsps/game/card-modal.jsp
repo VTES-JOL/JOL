@@ -172,6 +172,16 @@
                             onclick="removeFromGame();">
                         <span><i class="bi bi-escape"></i> Remove from Game</span>
                     </button>
+                    <button type="button" class="btn btn-outline-dark m-1" title="Move to Predator"
+                            data-region="ready"
+                            onclick="movePredator();">
+                        <span><i class="bi bi-arrow-left-circle"></i> Move to Predator</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-dark m-1" title="Move to Prey"
+                            data-region="ready"
+                            onclick="movePrey();">
+                        <span><i class="bi bi-arrow-right-circle"></i> Move to Prey</span>
+                    </button>
                 </div>
             </div>
         </div>

@@ -484,6 +484,16 @@ public class DoCommandTest {
     }
 
     @Test
+    void movePredator() throws CommandException {
+        assertThat(game.data().getPlayerRegion("Player5", RegionType.READY).getCards().size(), is(3));
+        assertThat(game.data().getPlayer("Player5").getPredator().getName(), is("Player4"));
+        assertThat(game.data().getPlayerRegion("Player4", RegionType.READY).getCards().size(), is(2));
+        worker.doCommand("Player5", "move ready 1 predator");
+        assertThat(game.data().getPlayerRegion("Player5", RegionType.READY).getCards().size(), is(2));
+        assertThat(game.data().getPlayerRegion("Player4", RegionType.READY).getCards().size(), is(3));
+    }
+
+    @Test
     void moveTopSort() throws CommandException {
         assertThat(game.data().getPlayerRegion("Player3", RegionType.READY).getCards().size(), is(1));
         worker.doCommand("Player3", "move ready 1 top");
