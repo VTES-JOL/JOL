@@ -39,6 +39,7 @@ public class GameModel implements Comparable<GameModel> {
             game.newTurn();
             reloadNotes();
             JolAdmin.saveGameState(game);
+            JolAdmin.pingPlayer(game.getActivePlayer(), name);
             doReload(true, true, true);
         }
     }

@@ -232,7 +232,7 @@ class JolGameTest {
     @Test
     void setSect() {
         assertThat(existingGame.getCard("6").getSect(), is(Sect.SABBAT));
-        existingGame.setSect("6", Sect.of("independent"));
+        existingGame.setSect("Player5", "6", Sect.of("independent"), false);
         assertThat(existingGame.getCard("6").getSect(), is(Sect.INDEPENDENT));
     }
 
@@ -243,7 +243,7 @@ class JolGameTest {
     @Test
     void setClan() {
         assertThat(existingGame.getCard("6").getClan(), is(Clan.PANDER));
-        existingGame.setClan("6", Clan.of("Brujah"));
+        existingGame.setClan("Player1", "6", Clan.of("Brujah"), false);
         assertThat(existingGame.getCard("6").getClan(), is(Clan.BRUJAH));
     }
 
