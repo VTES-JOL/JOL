@@ -305,8 +305,6 @@ function callbackLobby(data) {
             let registrationRow = $("<tr/>");
             let player = $("<td/>").addClass("w-25").text(k);
             registrationRow.append(player);
-            let summary = $("<td/>").addClass("w-75").text(v);
-            registrationRow.append(summary);
             playerTable.append(registrationRow);
         });
     });
