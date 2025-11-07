@@ -135,13 +135,14 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
                 sect = "Independent";
         }
         String textSect = null;
-        if (text.matches("^Sabbat.*?[:.]")) {
+        text = text.replaceAll("^Advanced, ", "").trim();
+        if (text.startsWith("Sabbat")) {
             textSect = "Sabbat";
-        } else if (text.matches("^(Independent anarch|Anarch).*?[:.]")) {
+        } else if (text.startsWith("Anarch")) {
             textSect = "Anarch";
-        } else if (text.matches("^Independent.*?[:.]")) {
+        } else if (text.startsWith("Independent")) {
             textSect = "Independent";
-        } else if (text.matches("^Camarilla.*?[:.]")) {
+        } else if (text.startsWith("Camarilla")) {
             textSect = "Camarilla";
         }
         if (textSect != null && !sect.equals(textSect)) {

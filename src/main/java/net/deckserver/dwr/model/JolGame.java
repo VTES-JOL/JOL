@@ -7,8 +7,8 @@
 package net.deckserver.dwr.model;
 
 import com.google.common.base.Strings;
-import net.deckserver.services.CardService;
 import net.deckserver.game.enums.*;
+import net.deckserver.services.CardService;
 import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
 import net.deckserver.services.ParserService;
@@ -134,7 +134,10 @@ public record JolGame(String id, GameData data) {
         if (destinationRegion.equals(RegionType.READY)) {
             List<CardData> cards = data.getUniqueCards(card);
             if (cards.size() > 1) {
-                cards.forEach(c -> c.setContested(true));
+                cards.forEach(c -> {
+                    c.setContested(true);
+                    ChatService.sendSystemMessage(id, String.format("%s is now contested.", getCardLink(c)));
+                });
             }
         }
 
@@ -155,7 +158,10 @@ public record JolGame(String id, GameData data) {
         ChatService.sendCommand(id, player, String.format("%s influences out %s%s.", player, getCardLink(card), votesText), "influence", card.getId(), player, RegionType.READY.xmlLabel());
         List<CardData> cards = data.getUniqueCards(card);
         if (cards.size() > 1) {
-            cards.forEach(c -> c.setContested(true));
+            cards.forEach(c -> {
+                c.setContested(true);
+                ChatService.sendSystemMessage(id, String.format("%s is now contested.", getCardLink(c)));
+            });
         }
     }
 
@@ -600,7 +606,7 @@ public record JolGame(String id, GameData data) {
             builder.append(String.format("%d %s\n", i + 1, cards.get(i).getName()));
         }
         String notes = builder.toString();
-        for (String recipient: recipients) {
+        for (String recipient : recipients) {
             PlayerData recipientData = data.getPlayer(recipient);
             String privateNotes = recipientData.getNotes();
             privateNotes += notes;
@@ -618,6 +624,27 @@ public record JolGame(String id, GameData data) {
         }
         msg = String.format(msg, player, max, targetRegion.description(), String.join(", ", recipients));
         ChatService.sendCommand(id, player, msg, "show", targetRegion.xmlLabel(), String.valueOf(max), String.join(" ", recipients));
+    }
+
+    public void moveToCard(String player, String srcCardId, String dstCardId) throws CommandException {
+        if (srcCardId.equals(dstCardId)) throw new CommandException("Can't move a card to itself");
+        {
+            CardData srcCard = data.getCard(srcCardId);
+            CardData dstCard = data.getCard(dstCardId);
+            CardData parentCard = dstCard.getParent();
+            while (parentCard != null) {
+                // No more parents, parent is a region
+                if (parentCard.getId().equals(srcCardId)) {
+                    throw new CommandException("Can't create card loop");
+                }
+                parentCard = parentCard.getParent();
+            }
+            RegionData dstRegion = dstCard.getRegion();
+
+            String message = String.format("%s puts %s on %s.", player, getCardName(srcCard, dstRegion), getTargetCardName(dstCard, player));
+            ChatService.sendCommand(id, player, message, "move", srcCard.getId(), dstCard.getId());
+            dstCard.add(srcCard, false);
+        }
     }
 
     private void _drawCard(String player, RegionType srcRegion, RegionType destRegion, boolean log) {
@@ -759,27 +786,6 @@ public record JolGame(String id, GameData data) {
 
     void drawCard(String player, RegionType srcRegion, RegionType destRegion) {
         _drawCard(player, srcRegion, destRegion, true);
-    }
-
-    public void moveToCard(String player, String srcCardId, String dstCardId) throws CommandException {
-        if (srcCardId.equals(dstCardId)) throw new CommandException("Can't move a card to itself");
-        {
-            CardData srcCard = data.getCard(srcCardId);
-            CardData dstCard = data.getCard(dstCardId);
-            CardData parentCard = dstCard.getParent();
-            while (parentCard != null) {
-                // No more parents, parent is a region
-                if (parentCard.getId().equals(srcCardId)) {
-                    throw new CommandException("Can't create card loop");
-                }
-                parentCard = parentCard.getParent();
-            }
-            RegionData dstRegion = dstCard.getRegion();
-
-            String message = String.format("%s puts %s on %s.", player, getCardName(srcCard, dstRegion), getTargetCardName(dstCard, player));
-            ChatService.sendCommand(id, player, message, "move", srcCard.getId(), dstCard.getId());
-            dstCard.add(srcCard, false);
-        }
     }
 
     void moveToRegion(String player, String cardId, String destPlayer, RegionType destRegion, boolean top) {

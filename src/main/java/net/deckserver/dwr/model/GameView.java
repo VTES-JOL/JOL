@@ -71,7 +71,7 @@ public class GameView {
         return collapsed.contains(region);
     }
 
-    public synchronized GameBean create() {
+    public  GameBean create() {
         HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
         JolGame game = JolAdmin.getGame(gameName);
 
@@ -159,23 +159,23 @@ public class GameView {
                 chatReset, tc, turn, turns, state, phases, ping, pinged, stamp, gameName, logLength, currentPlayer);
     }
 
-    public synchronized void clearAccess() {
+    public  void clearAccess() {
         globalNotesChanged = phaseChanged = turnChanged = stateChanged = privateNotesChanged = resetChat = false;
     }
 
-    public synchronized void globalChanged() {
+    public  void globalChanged() {
         globalNotesChanged = true;
     }
 
-    public synchronized void privateNotesChanged() {
+    public  void privateNotesChanged() {
         privateNotesChanged = true;
     }
 
-    public synchronized void phaseChanged() {
+    public  void phaseChanged() {
         phaseChanged = true;
     }
 
-    public synchronized void stateChanged() {
+    public  void stateChanged() {
         stateChanged = true;
     }
 

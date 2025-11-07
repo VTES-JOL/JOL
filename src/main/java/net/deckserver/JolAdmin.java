@@ -61,7 +61,7 @@ public class JolAdmin {
         return 60000;
     }
 
-    public static synchronized PlayerModel getPlayerModel(String name) {
+    public static PlayerModel getPlayerModel(String name) {
         if (name == null) {
             return new PlayerModel(null, false);
         } else {
@@ -71,7 +71,7 @@ public class JolAdmin {
         }
     }
 
-    public static synchronized GameModel getGameModel(String name) {
+    public static GameModel getGameModel(String name) {
         return gmap.computeIfAbsent(name, n -> new GameModel(getGame(name)));
     }
 
@@ -89,11 +89,11 @@ public class JolAdmin {
         }
     }
 
-    public static synchronized void createGame(String gameName, Boolean isPublic, GameFormat format, String playerName) {
+    public static void createGame(String gameName, Boolean isPublic, GameFormat format, String playerName) {
         createGame(gameName, isPublic, format, playerName, ULID.random());
     }
 
-    public static synchronized void createGame(String gameName, Boolean isPublic, GameFormat format, String playerName, String gameId) {
+    public static void createGame(String gameName, Boolean isPublic, GameFormat format, String playerName, String gameId) {
         logger.trace("Creating game {} for player {}", gameName, playerName);
         if (gameName.length() > 2 || notExistsGame(gameName)) {
             try {
@@ -104,11 +104,11 @@ public class JolAdmin {
         }
     }
 
-    public static synchronized void chat(String player, String message) {
+    public static void chat(String player, String message) {
         GlobalChatService.chat(player, message);
     }
 
-    public static synchronized void rollbackGame(String gameName, String adminName, String turn) {
+    public static void rollbackGame(String gameName, String adminName, String turn) {
         String id = GameService.get(gameName).getId();
         logger.info("Rolling back game {} for turn {}", gameName, turn);
         JolGame game = GameService.loadSnapshot(id, turn);
@@ -129,7 +129,7 @@ public class JolAdmin {
         return DeckService.get(playerName, deckName).getGameFormats();
     }
 
-    public static synchronized Deck getGameDeck(String gameName, String playerName) {
+    public static Deck getGameDeck(String gameName, String playerName) {
         return Optional.ofNullable(RegistrationService.getRegistration(gameName, playerName))
                 .map(status -> {
                     String deckId = status.getDeckId();
@@ -139,13 +139,13 @@ public class JolAdmin {
                 }).orElse(null);
     }
 
-    public static synchronized void selectDeck(String playerName, String deckName) {
+    public static void selectDeck(String playerName, String deckName) {
         if (playerName != null && deckName != null) {
             getPlayerModel(playerName).loadDeck(deckName);
         }
     }
 
-    public static synchronized void newDeck(String playerName) {
+    public static void newDeck(String playerName) {
         if (playerName != null) {
             getPlayerModel(playerName).clearDeck();
         }
@@ -382,11 +382,15 @@ public class JolAdmin {
 
     public static synchronized void startGame(String gameName) {
         List<String> players = new ArrayList<>();
+        List<String> invitedPlayers = new ArrayList<>();
         RegistrationService.getGameRegistrations(gameName).forEach((playerName, registration) -> {
             if (registration.getDeckId() != null) {
                 players.add(playerName);
+            } else {
+                invitedPlayers.add(playerName);
             }
         });
+        invitedPlayers.forEach((playerName) -> RegistrationService.removePlayer(gameName, playerName));
         Collections.shuffle(players, new SecureRandom());
         startGame(gameName, players);
     }
@@ -511,10 +515,12 @@ public class JolAdmin {
 
     public static synchronized void endTurn(String gameName, String adminName) {
         JolGame game = getGame(gameName);
+        GameModel gameModel = getGameModel(gameName);
         String id = GameService.get(gameName).getId();
         ChatService.sendMessage(id, "SYSTEM", "Turn ended by administrator: " + adminName);
         game.newTurn();
         pingPlayer(game.getActivePlayer(), gameName);
+        gameModel.doReload(true, true, true);
     }
 
     public static boolean isInRole(String username, String role) {
@@ -595,15 +601,15 @@ public class JolAdmin {
         }
     }
 
-    private DeckInfo loadDeckInfo(String playerName, String deckName) {
-        return DeckService.get(playerName, deckName);
-    }
-
     private static JolGame loadGameState(String gameName) {
         logger.debug("Loading {}", gameName);
         GameInfo gameInfo = GameService.get(gameName);
         String gameId = gameInfo.getId();
         return GameService.loadGame(gameId);
+    }
+
+    private DeckInfo loadDeckInfo(String playerName, String deckName) {
+        return DeckService.get(playerName, deckName);
     }
 
 }

@@ -29,19 +29,19 @@ public class HistoryService extends PersistedService {
         load();
     }
 
-    public static synchronized Map<OffsetDateTime, GameHistory> getHistory() {
+    public static  Map<OffsetDateTime, GameHistory> getHistory() {
         return INSTANCE.pastGames;
     }
 
-    public static synchronized void addGame(OffsetDateTime now, GameHistory history) {
+    public static  void addGame(OffsetDateTime now, GameHistory history) {
         INSTANCE.pastGames.put(now, history);
     }
 
-    public static synchronized Collection<GameHistory> getGames() {
+    public static  Collection<GameHistory> getGames() {
         return INSTANCE.pastGames.values();
     }
 
-    public static synchronized void validateGW() {
+    public static  void validateGW() {
         HistoryService.getGames().forEach(gameHistory -> {
             PlayerResult winner = null;
             PlayerResult previousWinner = gameHistory.getResults().stream().filter(PlayerResult::isGameWin).findFirst().orElse(null);

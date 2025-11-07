@@ -40,19 +40,19 @@ public class ChatService extends PersistedService {
         return INSTANCE;
     }
 
-    public static synchronized void subscribe(String gameId, GameModel model) {
+    public static  void subscribe(String gameId, GameModel model) {
         gmap.put(gameId, model);
     }
 
-    public static synchronized List<String> getTurns(String gameId) {
+    public static  List<String> getTurns(String gameId) {
         return INSTANCE.historyCache.get(gameId).getTurnLabels();
     }
 
-    public static synchronized List<ChatData> getTurn(String gameId, String turnLabel) {
+    public static  List<ChatData> getTurn(String gameId, String turnLabel) {
         return INSTANCE.historyCache.get(gameId).getTurn(turnLabel).getChats();
     }
 
-    public static synchronized List<ChatData> getChats(String gameId) {
+    public static  List<ChatData> getChats(String gameId) {
         String turnLabel = INSTANCE.historyCache.get(gameId).getCurrentTurnLabel();
         if (turnLabel == null) {
             return new ArrayList<>();
@@ -60,32 +60,32 @@ public class ChatService extends PersistedService {
         return INSTANCE.historyCache.get(gameId).getTurn(turnLabel).getChats();
     }
 
-    public static synchronized void addTurn(String gameId, String player, String turnId) {
+    public static  void addTurn(String gameId, String player, String turnId) {
         INSTANCE.historyCache.get(gameId).addTurn(player, turnId);
         Optional.ofNullable(gmap.get(gameId)).ifPresent(GameModel::clearChats);
     }
 
-    public static synchronized void sendMessage(String gameId, String source, String message) {
+    public static  void sendMessage(String gameId, String source, String message) {
         ChatData chatData = new ChatData(message, source, null);
         sendChat(gameId, chatData);
     }
 
-    public static synchronized void sendJudgeMessage(String gameId, String source, String message) {
+    public static  void sendJudgeMessage(String gameId, String source, String message) {
         ChatData chatData = new ChatData(message, "Judge - " + source, null);
         sendChat(gameId, chatData);
     }
 
-    public static synchronized void sendCommand(String gameId, String source, String message, String... command) {
+    public static  void sendCommand(String gameId, String source, String message, String... command) {
         ChatData chatData = new ChatData(message, source, String.join(" ", command));
         sendChat(gameId, chatData);
     }
 
-    public static synchronized void sendSystemMessage(String gameId, String message) {
+    public static  void sendSystemMessage(String gameId, String message) {
         ChatData chatData = new ChatData(message, "SYSTEM", null);
         sendChat(gameId, chatData);
     }
 
-    private static synchronized void sendChat(String gameId, ChatData chat) {
+    private static  void sendChat(String gameId, ChatData chat) {
         INSTANCE.historyCache.get(gameId).addChat(chat);
         Optional.ofNullable(gmap.get(gameId)).ifPresent(model -> model.addChat(chat));
     }

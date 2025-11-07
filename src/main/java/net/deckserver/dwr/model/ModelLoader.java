@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 public final class ModelLoader {
 
-    public static synchronized GameData convertGameState(GameState gameState, String gameId) {
+    public static  GameData convertGameState(GameState gameState, String gameId) {
         GameData data = new GameData(gameId);
         data.setId(gameId);
         data.setName(gameState.getName());

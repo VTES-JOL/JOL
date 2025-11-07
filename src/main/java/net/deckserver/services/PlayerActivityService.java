@@ -23,12 +23,12 @@ public class PlayerActivityService extends PersistedService {
         load(); // Load existing data on startup
     }
 
-    public static synchronized void recordPlayerAccess(String playerName) {
+    public static  void recordPlayerAccess(String playerName) {
         if (playerName == null || playerName.isBlank()) return;
         INSTANCE.playerTimestamps.put(playerName, OffsetDateTime.now());
     }
 
-    public static synchronized OffsetDateTime getPlayerAccess(String playerName) {
+    public static  OffsetDateTime getPlayerAccess(String playerName) {
         return INSTANCE.playerTimestamps.getOrDefault(
                 playerName,
                 OffsetDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)

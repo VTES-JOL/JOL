@@ -33,7 +33,7 @@ public class GameModel implements Comparable<GameModel> {
         ChatService.subscribe(game.id(), this);
     }
 
-    public synchronized void endTurn(String player) {
+    public void endTurn(String player) {
         JolGame game = JolAdmin.getGame(name);
         if (game.getActivePlayer().equals(player)) {
             game.newTurn();
@@ -44,7 +44,7 @@ public class GameModel implements Comparable<GameModel> {
         }
     }
 
-    public synchronized String submit(String player, String phase, String command, String chat, String ping) {
+    public String submit(String player, String phase, String command, String chat, String ping) {
         // Only players and judges can issue commands.  A judge can't be a player
         boolean isJudge = JolAdmin.isJudge(player) && !getPlayers().contains(player);
         if (!getPlayers().contains(player) && !isJudge) {
@@ -107,9 +107,7 @@ public class GameModel implements Comparable<GameModel> {
 
     public GameView getView(String player) {
         if (!views.containsKey(player)) {
-            synchronized (this) {
-                views.put(player, new GameView(game, name, player));
-            }
+            views.put(player, new GameView(game, name, player));
         }
         return views.get(player);
     }
@@ -118,7 +116,7 @@ public class GameModel implements Comparable<GameModel> {
         views.remove(player);
     }
 
-    public synchronized Set<String> getPlayers() {
+    public Set<String> getPlayers() {
         return RegistrationService.getPlayers(name);
     }
 
@@ -126,7 +124,7 @@ public class GameModel implements Comparable<GameModel> {
         return -name.compareToIgnoreCase(arg0.getName());
     }
 
-    public synchronized void updateGlobalNotes(String notes) {
+    public void updateGlobalNotes(String notes) {
         JolGame game = JolAdmin.getGame(name);
         if (!notes.equals(game.getGlobalText())) {
             game.setGlobalText(notes);
@@ -135,7 +133,7 @@ public class GameModel implements Comparable<GameModel> {
         }
     }
 
-    public synchronized void updatePrivateNotes(String player, String notes) {
+    public void updatePrivateNotes(String player, String notes) {
         JolGame game = JolAdmin.getGame(name);
         if (!notes.equals(game.getPrivateNotes(player))) {
             game.setPrivateNotes(player, notes);
@@ -156,7 +154,7 @@ public class GameModel implements Comparable<GameModel> {
         }
     }
 
-    private void doReload(boolean stateChanged, boolean phaseChanged, boolean turnChanged) {
+    public void doReload(boolean stateChanged, boolean phaseChanged, boolean turnChanged) {
         for (String key : (new ArrayList<>(views.keySet()))) {
             GameView view = views.get(key);
             if (stateChanged) view.stateChanged();

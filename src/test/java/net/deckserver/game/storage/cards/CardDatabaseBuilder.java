@@ -2,10 +2,10 @@ package net.deckserver.game.storage.cards;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import net.deckserver.services.CardService;
-import net.deckserver.services.ParserService;
 import net.deckserver.game.storage.cards.importer.CryptImporter;
 import net.deckserver.game.storage.cards.importer.LibraryImporter;
+import net.deckserver.services.CardService;
+import net.deckserver.services.ParserService;
 import net.deckserver.storage.json.cards.CardSummary;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -63,24 +63,18 @@ public class CardDatabaseBuilder {
             Path outputImagePath = outputPath.resolve(outputPrefix).resolve("images").resolve(id);
             assert inputImagePath.toFile().exists() : String.format("Image %s does not exist - %s", inputImagePath, summaryCard.getDisplayName());
             Files.createDirectories(outputImagePath.getParent());
-            if (!outputImagePath.toFile().exists()) {
-                Files.copy(inputImagePath, outputImagePath, StandardCopyOption.REPLACE_EXISTING);
-            }
+            Files.copy(inputImagePath, outputImagePath, StandardCopyOption.REPLACE_EXISTING);
 
             // Process HTML
             String htmlText = ParserService.parseSymbols(summaryCard.getHtmlText());
             Path outputHtmlPath = outputPath.resolve(outputPrefix).resolve("html").resolve(id);
             Files.createDirectories(outputHtmlPath.getParent());
-            if (!outputHtmlPath.toFile().exists()) {
-                Files.writeString(outputHtmlPath, htmlText);
-            }
+            Files.writeString(outputHtmlPath, htmlText);
 
             // Process JSON
             Path outputJsonPath = outputPath.resolve(outputPrefix).resolve("json").resolve(id);
             Files.createDirectories(outputJsonPath.getParent());
-            if (!outputJsonPath.toFile().exists()) {
-                mapper.writeValue(outputJsonPath.toFile(), summaryCard);
-            }
+            mapper.writeValue(outputJsonPath.toFile(), summaryCard);
 
             // Clear unneeded fields
             summaryCard.setOriginalText(null);
@@ -142,10 +136,11 @@ public class CardDatabaseBuilder {
                 .replaceAll("\\W", "");
         String group = Optional.ofNullable(card.getGroup())
                 .map(s -> String.format("g%s", s.toLowerCase()))
+                .map(s -> s.equals("gany") ? "any" : s)
                 .orElse("");
         String adv = card.getAdvanced() != null && card.getAdvanced() ? "adv" : "";
         String imageName = String.format("%s%s%s.jpg", name, group, adv).toLowerCase();
-        logger.info("Found {} for card {} [{}]", imageName, card.getDisplayName(), card.getId());
+        logger.debug("Found {} for card {} [{}]", imageName, card.getDisplayName(), card.getId());
         return imageName;
     }
 }

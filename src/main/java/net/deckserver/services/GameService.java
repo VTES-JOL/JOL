@@ -58,7 +58,7 @@ public class GameService extends PersistedService {
         return INSTANCE.games.get(name);
     }
 
-    public static synchronized void create(String gameName, String gameId, String ownerName, Visibility visibility, GameFormat format) {
+    public static void create(String gameName, String gameId, String ownerName, Visibility visibility, GameFormat format) {
         GameInfo gameInfo = new GameInfo(gameName, gameId, ownerName, visibility, GameStatus.STARTING, format);
         INSTANCE.games.put(gameName, gameInfo);
         try {
@@ -69,19 +69,27 @@ public class GameService extends PersistedService {
         }
     }
 
-    public static synchronized boolean existsGame(String name) {
+    public static boolean existsGame(String name) {
         return INSTANCE.games.containsKey(name);
     }
 
-    public static synchronized Set<String> getGameNames() {
+    public static Set<String> getGameNames() {
         return INSTANCE.games.keySet();
     }
 
-    public static synchronized List<String> getActiveGames() {
+    public static List<String> getActiveGames() {
         return INSTANCE.games.values().stream().filter(ACTIVE_GAME).map(GameInfo::getName).sorted().toList();
     }
 
-    public static synchronized List<String> getStartingGames(boolean includePlayTest) {
+    public static long getPublicGameCount(GameFormat format) {
+        return INSTANCE.games.values().stream()
+                .filter(STARTING_GAME)
+                .filter(PUBLIC_GAME)
+                .filter(info -> info.getGameFormat().equals(format))
+                .count();
+    }
+
+    public static List<String> getStartingGames(boolean includePlayTest) {
         return INSTANCE.games.values().stream()
                 .filter(STARTING_GAME)
                 .filter(info -> info.isPlayTest() && includePlayTest)
@@ -89,11 +97,11 @@ public class GameService extends PersistedService {
                 ).sorted().toList();
     }
 
-    public static synchronized List<GameInfo> getGamesByOwner(String owner) {
+    public static List<GameInfo> getGamesByOwner(String owner) {
         return INSTANCE.games.values().stream().filter(info -> info.getOwner().equals(owner)).toList();
     }
 
-    public static synchronized List<String> getActiveGames(String owner) {
+    public static List<String> getActiveGames(String owner) {
         return INSTANCE.games.values().stream()
                 .filter(ACTIVE_GAME)
                 .filter(info -> info.getOwner().equals(owner))
@@ -101,23 +109,23 @@ public class GameService extends PersistedService {
                 .toList();
     }
 
-    public static synchronized boolean isActive(String gameName) {
+    public static boolean isActive(String gameName) {
         return get(gameName).getStatus().equals(GameStatus.ACTIVE);
     }
 
-    public static synchronized boolean isStarting(String gameName) {
+    public static boolean isStarting(String gameName) {
         return get(gameName).getStatus().equals(GameStatus.STARTING);
     }
 
-    public static synchronized boolean isPublic(String gameName) {
+    public static boolean isPublic(String gameName) {
         return get(gameName).getVisibility().equals(Visibility.PUBLIC);
     }
 
-    public static synchronized boolean isPrivate(String gameName) {
+    public static boolean isPrivate(String gameName) {
         return get(gameName).getVisibility().equals(Visibility.PRIVATE);
     }
 
-    public static synchronized void remove(String gameName, String gameId) {
+    public static void remove(String gameName, String gameId) {
         Path gamePath = Path.of(System.getenv("JOL_DATA"), "games", gameId);
         INSTANCE.games.remove(gameName);
         try {
@@ -127,7 +135,7 @@ public class GameService extends PersistedService {
         }
     }
 
-    public static synchronized JolGame loadGame(String gameId) {
+    public static JolGame loadGame(String gameId) {
         readLock.lock();
         try {
             Path gameStatePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, "game.json");
@@ -141,7 +149,7 @@ public class GameService extends PersistedService {
         return new JolGame(gameId, new GameData(gameId));
     }
 
-    public static synchronized JolGame loadSnapshot(String gameId, String turn) {
+    public static JolGame loadSnapshot(String gameId, String turn) {
         try {
             Path gameStatePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, "game-" + turn + ".json");
             GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
@@ -152,7 +160,7 @@ public class GameService extends PersistedService {
         return new JolGame(gameId, new GameData(gameId));
     }
 
-    public static synchronized void saveGame(JolGame game) {
+    public static void saveGame(JolGame game) {
         writeLock.lock();
         String gameId = game.id();
         Path gameStatePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, "game.json");
@@ -169,7 +177,7 @@ public class GameService extends PersistedService {
         INSTANCE.gameCache.put(gameId, game);
     }
 
-    public static synchronized void saveGame(JolGame game, String turn) {
+    public static void saveGame(JolGame game, String turn) {
         boolean testModeEnabled = System.getenv().getOrDefault("ENABLE_TEST_MODE", "false").equals("true");
         if (testModeEnabled) {
             return;
@@ -197,35 +205,8 @@ public class GameService extends PersistedService {
         return INSTANCE;
     }
 
-    private void upgrade() {
-        logger.info("Determining upgrades...");
-        GameDataConversion conversion = new GameDataConversion();
-        // Upgrade all games with no version
-        games.values().stream()
-                .filter(ACTIVE_GAME)
-                .filter(Objects::nonNull)
-                // Version 1 is the first version where we store additional information in the game state
-                .filter(gameInfo -> gameInfo.getVersion().isOlderThan(GameInfo.Version.GAME_STATE))
-                // For every active game check the game state
-                .peek(gameInfo -> logger.info("Upgrading game {} - {}", gameInfo.getName(), gameInfo.getId()))
-                .forEach(gameInfo -> {
-                    conversion.convertGame(gameInfo.getId());
-                    gameInfo.setVersion(GameInfo.Version.GAME_STATE);
-                });
-
-        games.values().stream()
-                .filter(ACTIVE_GAME)
-                .filter(Objects::nonNull)
-                .filter(gameInfo -> gameInfo.getVersion().isOlderThan(GameInfo.Version.DATA_FIX))
-                .peek(gameInfo -> logger.info("Validating data {} - {}", gameInfo.getName(), gameInfo.getId()))
-                .forEach(gameInfo -> {
-                    conversion.checkCards(gameInfo.getName(), gameInfo.getId());
-                    gameInfo.setVersion(GameInfo.Version.DATA_FIX);
-                });
-    }
-
     private static GameSummary generateSummary(String gameName) {
-        logger.info("Regenerating summary for {}", gameName);
+        logger.debug("Regenerating summary for {}", gameName);
         GameInfo info = INSTANCE.games.get(gameName);
         JolGame game = INSTANCE.gameCache.get(info.getId());
         GameSummary summary = new GameSummary();
@@ -258,6 +239,33 @@ public class GameService extends PersistedService {
             summary.setPrey(preySummary);
         }
         return summary;
+    }
+
+    private void upgrade() {
+        logger.info("Determining upgrades...");
+        GameDataConversion conversion = new GameDataConversion();
+        // Upgrade all games with no version
+        games.values().stream()
+                .filter(ACTIVE_GAME)
+                .filter(Objects::nonNull)
+                // Version 1 is the first version where we store additional information in the game state
+                .filter(gameInfo -> gameInfo.getVersion().isOlderThan(GameInfo.Version.GAME_STATE))
+                // For every active game check the game state
+                .peek(gameInfo -> logger.info("Upgrading game {} - {}", gameInfo.getName(), gameInfo.getId()))
+                .forEach(gameInfo -> {
+                    conversion.convertGame(gameInfo.getId());
+                    gameInfo.setVersion(GameInfo.Version.GAME_STATE);
+                });
+
+        games.values().stream()
+                .filter(ACTIVE_GAME)
+                .filter(Objects::nonNull)
+                .filter(gameInfo -> gameInfo.getVersion().isOlderThan(GameInfo.Version.DATA_FIX))
+                .peek(gameInfo -> logger.info("Validating data {} - {}", gameInfo.getName(), gameInfo.getId()))
+                .forEach(gameInfo -> {
+                    conversion.checkCards(gameInfo.getName(), gameInfo.getId());
+                    gameInfo.setVersion(GameInfo.Version.DATA_FIX);
+                });
     }
 
     @Override

@@ -66,11 +66,11 @@ public class PlayerModel {
         this.game = null;
     }
 
-    public synchronized void chat(ChatEntryBean chat) {
+    public  void chat(ChatEntryBean chat) {
         chats.add(chat);
     }
 
-    public synchronized List<ChatEntryBean> getChat() {
+    public  List<ChatEntryBean> getChat() {
         List<ChatEntryBean> output = new ArrayList<>(chats);
         Collections.copy(output, chats);
         chats.clear();

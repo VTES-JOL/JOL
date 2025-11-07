@@ -53,7 +53,7 @@ public class LobbyPageBean {
                 .filter(JolAdmin::isPublic)
                 .filter(gameName -> JolAdmin.isViewable(gameName, player))
                 .map(GameStatusBean::new)
-                .sorted(Comparator.comparing(GameStatusBean::getCreated))
+                .sorted(Comparator.comparing(GameStatusBean::getFormat).thenComparing(GameStatusBean::getCreated))
                 .collect(Collectors.toList());
 
         invitedGames = JolAdmin.getGameNames().stream()

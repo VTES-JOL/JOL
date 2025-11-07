@@ -40,27 +40,27 @@ public class DeckService extends PersistedService {
         upgrade();
     }
 
-    public static synchronized DeckInfo get(String playerName, String deckName) {
+    public static  DeckInfo get(String playerName, String deckName) {
         return INSTANCE.decks.get(playerName, deckName);
     }
 
-    public static synchronized void addDeck(String playerName, String deckName, DeckInfo deckInfo) {
+    public static  void addDeck(String playerName, String deckName, DeckInfo deckInfo) {
         INSTANCE.decks.put(playerName, deckName, deckInfo);
     }
 
-    public static synchronized void remove(String playerName, String deckName) {
+    public static  void remove(String playerName, String deckName) {
         INSTANCE.decks.remove(playerName, deckName);
     }
 
-    public static synchronized Set<String> getPlayerDeckNames(String playerName) {
+    public static  Set<String> getPlayerDeckNames(String playerName) {
         return INSTANCE.decks.row(playerName).keySet();
     }
 
-    public static synchronized Map<String, DeckInfo> getPlayerDecks(String playerName) {
+    public static  Map<String, DeckInfo> getPlayerDecks(String playerName) {
         return INSTANCE.decks.row(playerName);
     }
 
-    public static synchronized ExtendedDeck getDeck(String deckId) {
+    public static  ExtendedDeck getDeck(String deckId) {
         String deckString = String.format("decks/%s.json", deckId);
         Path deckPath = Paths.get(System.getenv("JOL_DATA"), deckString);
         try {
@@ -70,7 +70,7 @@ public class DeckService extends PersistedService {
         }
     }
 
-    public static synchronized String getDeckContents(String deckId) throws IOException {
+    public static  String getDeckContents(String deckId) throws IOException {
         ExtendedDeck deck = getDeck(deckId);
         StringBuilder builder = new StringBuilder();
         Consumer<CardCount> itemBuilder = cardCount -> builder.append(cardCount.getCount()).append(" x ").append(cardCount.getName()).append("\n");
@@ -80,12 +80,12 @@ public class DeckService extends PersistedService {
         return builder.toString();
     }
 
-    public static synchronized String getLegacyContents(String deckId) throws IOException {
+    public static  String getLegacyContents(String deckId) throws IOException {
         Path deckPath = Paths.get(System.getenv("JOL_DATA"), "decks", deckId + ".txt");
         return Files.readString(deckPath);
     }
 
-    public static synchronized ExtendedDeck getGameDeck(String gameId, String deckId) {
+    public static  ExtendedDeck getGameDeck(String gameId, String deckId) {
         try {
             Path gameDeckPath = Paths.get(System.getenv("JOL_DATA"), String.format("games/%s/%s.json", gameId, deckId));
             return objectMapper.readValue(gameDeckPath.toFile(), ExtendedDeck.class);
@@ -94,7 +94,7 @@ public class DeckService extends PersistedService {
         }
     }
 
-    public static synchronized void saveDeck(String deckId, ExtendedDeck deck) {
+    public static  void saveDeck(String deckId, ExtendedDeck deck) {
         try {
             Path deckPath = Paths.get(System.getenv("JOL_DATA"), "decks", deckId + ".json");
             objectMapper.writeValue(deckPath.toFile(), deck);
@@ -103,7 +103,7 @@ public class DeckService extends PersistedService {
         }
     }
 
-    public static synchronized boolean copyDeck(String deckId, String gameId) {
+    public static  boolean copyDeck(String deckId, String gameId) {
         try {
             Path deckPath = Paths.get(System.getenv("JOL_DATA"), "decks", deckId + ".json");
             Path gamePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, deckId + ".json");

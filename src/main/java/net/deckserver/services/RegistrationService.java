@@ -42,39 +42,39 @@ public class RegistrationService extends PersistedService {
         load();
     }
 
-    public static synchronized void put(String gameName, String playerName, RegistrationStatus registration) {
+    public static  void put(String gameName, String playerName, RegistrationStatus registration) {
         INSTANCE.registrations.put(gameName, playerName, registration);
     }
 
-    public static synchronized long getRegisteredPlayerCount(String gameName) {
+    public static  long getRegisteredPlayerCount(String gameName) {
         return INSTANCE.registrations.row(gameName).values().stream().filter(IS_REGISTERED).count();
     }
 
-    public static synchronized RegistrationStatus getRegistration(String gameName, String playerName) {
+    public static  RegistrationStatus getRegistration(String gameName, String playerName) {
         return INSTANCE.registrations.get(gameName, playerName);
     }
 
-    public static synchronized Set<String> getRegisteredGames(String playerName) {
+    public static  Set<String> getRegisteredGames(String playerName) {
         return INSTANCE.registrations.column(playerName).keySet();
     }
 
-    public static synchronized Set<String> getPlayers(String gameName) {
+    public static  Set<String> getPlayers(String gameName) {
         return INSTANCE.registrations.row(gameName).keySet();
     }
 
-    public static synchronized void removePlayer(String gameName, String playerName) {
+    public static  void removePlayer(String gameName, String playerName) {
         INSTANCE.registrations.remove(gameName, playerName);
     }
 
-    public static synchronized boolean isInGame(String gameName, String playerName) {
+    public static  boolean isInGame(String gameName, String playerName) {
         return INSTANCE.registrations.contains(gameName, playerName);
     }
 
-    public static synchronized boolean isRegistered(String gameName, String playerName) {
+    public static  boolean isRegistered(String gameName, String playerName) {
         return INSTANCE.registrations.contains(gameName, playerName) && Objects.requireNonNull(INSTANCE.registrations.get(gameName, playerName)).getDeckId() != null;
     }
 
-    public static synchronized boolean isInvited(String gameName, String playerName) {
+    public static  boolean isInvited(String gameName, String playerName) {
         return INSTANCE.registrations.contains(gameName, playerName);
     }
 

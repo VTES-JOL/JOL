@@ -33,7 +33,7 @@
                            placeholder="Add a label for all players to see." onchange="updateNotes();">
                 </div>
             </div>
-            <div class="modal-footer d-flex flex-wrap justify-content-center">
+            <div class="modal-footer d-flex flex-column flex-wrap justify-content-center">
                 <div class="transfers-and-counters">
                     <div class="d-flex justify-content-between fs-5 rounded-pill align-items-center bg-danger-subtle gap-1">
                         <div class="counters badge rounded-pill text-bg-secondary fs-5 gap-1 d-flex align-items-center"
@@ -84,13 +84,6 @@
                             onclick="hunt();">
                         <span>Hunt</span>
                     </button>
-                    <button type="button" class="btn btn-outline-dark m-1" title="Torpor"
-                            data-region="ready"
-                            data-top-level-only
-                            data-minion-only
-                            onclick="torpor();">
-                        <span>Send to Torpor</span>
-                    </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Go Anarch"
                             data-region="ready" data-lock-state="unlocked"
                             data-top-level-only
@@ -134,6 +127,14 @@
                             onclick="block();">
                         <span><i class="bi bi-shield"></i> Block</span>
                     </button>
+                    <br/>
+                    <button type="button" class="btn btn-outline-dark m-1" title="Torpor"
+                            data-region="ready"
+                            data-top-level-only
+                            data-minion-only
+                            onclick="torpor();">
+                        <span>Send to Torpor</span>
+                    </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Burn"
                             data-region="ready torpor inactive"
                             onclick="burn();">
@@ -172,6 +173,7 @@
                             onclick="removeFromGame();">
                         <span><i class="bi bi-escape"></i> Remove from Game</span>
                     </button>
+                    <br/>
                     <button type="button" class="btn btn-outline-dark m-1" title="Move to Predator"
                             data-region="ready"
                             onclick="movePredator();">

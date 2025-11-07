@@ -29,11 +29,11 @@ public class GlobalChatService extends PersistedService {
         load();
     }
 
-    public static synchronized void subscribe(PlayerModel model) {
+    public static  void subscribe(PlayerModel model) {
         INSTANCE.playerModels.add(model);
     }
 
-    public static synchronized void chat(String player, String message) {
+    public static  void chat(String player, String message) {
         String sanitize = ParserService.sanitizeText(message);
         String parsedMessage = ParserService.parseGlobalChat(sanitize);
         ChatEntryBean chatEntryBean = new ChatEntryBean(player, parsedMessage);
@@ -44,7 +44,7 @@ public class GlobalChatService extends PersistedService {
         INSTANCE.playerModels.forEach(playerModel -> playerModel.chat(chatEntryBean));
     }
 
-    public static synchronized List<ChatEntryBean> getChats() {
+    public static  List<ChatEntryBean> getChats() {
         return INSTANCE.chats;
     }
 
