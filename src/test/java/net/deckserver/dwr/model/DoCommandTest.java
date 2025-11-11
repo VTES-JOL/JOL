@@ -416,6 +416,8 @@ public class DoCommandTest {
         assertTrue(cardData.isContested());
         assertTrue(cardData2.isContested());
         assertThat(cardData2.getRegion().getType(), is(RegionType.READY));
+        var chatData = ChatService.getChats(game.id());
+        assertThat(chatData.getLast().getMessage(), containsString("<a class='card-name' data-card-id='200315' data-secured='false'>Dani</a> is now contested."));
     }
 
     @Test
