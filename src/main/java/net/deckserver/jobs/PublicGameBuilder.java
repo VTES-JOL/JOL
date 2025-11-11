@@ -28,6 +28,6 @@ public class PublicGameBuilder implements Runnable{
                 }
             }
         }
-        logger.info("Finished building public games");
+        logger.debug("Finished building public games");
     }
 }
