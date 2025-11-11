@@ -403,7 +403,18 @@ function showCardModal(event) {
     let clan = target.data("clan");
     let owner = controller === player;
     if (cardId) {
-        $("#card-image").attr("src", `${BASE_URL}/${secured}images/${cardId}`);
+        if (profile.imageTooltipPreference) {
+            let content = `<img width="350" height="500" src="${BASE_URL}/${secured}images/${cardId}" alt="Loading..."/>`;
+            $("#card-image").html(content);
+        } else {
+            $.get({
+                dataType: "html",
+                url: `${BASE_URL}/${secured}html/${cardId}`, success: function (data) {
+                    let content = `<div class="p-2">${data}</div>`;
+                    $("#card-image").html(content);
+                }
+            });
+        }
         $.get({
             dataType: "json",
             url: `${BASE_URL}/${secured}json/${cardId}`, success: function (card) {

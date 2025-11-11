@@ -586,7 +586,9 @@ function renderDeck(data, div) {
     if (data.crypt) {
         render.append($("<h5/>").text("Crypt: (" + data.crypt['count'] + ")"));
         const crypt = $("<ul/>").addClass("deck-list");
-        $.each(data.crypt.cards, function (index, card) {
+        let cards = data.crypt.cards;
+        cards.sort((a,b) => a.name.localeCompare(b.name));
+        $.each(cards, function (index, card) {
             const cardRow = $("<li/>");
             const cardLink = $("<a/>").text(card.name).attr("data-card-id", card.id).addClass("card-name");
             if (card.comments === "playtest") {
@@ -602,7 +604,9 @@ function renderDeck(data, div) {
         $.each(data.library.cards, function (index, libraryCards) {
             render.append($("<h5/>").text(libraryCards.type + ": (" + libraryCards['count'] + ")"));
             const section = $("<ul/>").addClass("deck-list");
-            $.each(libraryCards.cards, function (index, card) {
+            let cards = libraryCards.cards;
+            cards.sort((a,b) => a.name.localeCompare(b.name));
+            $.each(cards, function (index, card) {
                 const cardRow = $("<li/>");
                 const cardLink = $("<a/>").text(card.name).attr("data-card-id", card.id).addClass("card-name");
                 if (card.comments === "playtest") {

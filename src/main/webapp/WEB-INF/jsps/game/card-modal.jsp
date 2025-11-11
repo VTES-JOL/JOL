@@ -26,7 +26,7 @@
                 </span>
             </div>
             <div class="modal-body">
-                <img class="img-fluid d-none d-md-inline" id="card-image" alt="card image" src=""/>
+                <div id="card-image"></div>
                 <div class="input-group mt-2">
                     <label for="card-label" class="input-group-text"><i class="bi bi-tag"></i></label>
                     <input type="text" class="form-control" id="card-label"
