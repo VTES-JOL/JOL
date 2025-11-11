@@ -136,8 +136,9 @@ public record JolGame(String id, GameData data) {
             if (cards.size() > 1) {
                 cards.forEach(c -> {
                     c.setContested(true);
-                    ChatService.sendSystemMessage(id, String.format("%s is now contested.", getCardLink(c)));
                 });
+                ChatService.sendSystemMessage(id, String.format("%s is now contested.", getCardLink(card)));
+
             }
         }
 
@@ -160,8 +161,8 @@ public record JolGame(String id, GameData data) {
         if (cards.size() > 1) {
             cards.forEach(c -> {
                 c.setContested(true);
-                ChatService.sendSystemMessage(id, String.format("%s is now contested.", getCardLink(c)));
             });
+            ChatService.sendSystemMessage(id, String.format("%s is now contested.", getCardLink(card)));
         }
     }
 
