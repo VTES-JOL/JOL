@@ -146,33 +146,29 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         List<LibraryCardMode> modes = new ArrayList<>(lines.size());
         for (String line : lines) {
             LibraryCardMode mode = new LibraryCardMode();
+            boolean orMode = false;
+            String prefix = null;
             String modeText = line;
+            List<String> disciplines = new ArrayList<>();
             if (line.startsWith("[")) {
-                //HACK: Mirror's Visage superior
-                line = line.replace("]+", "] +");
-
                 Matcher orMatcher = MODE_OR_PATTERN.matcher(line);
                 Matcher discMatcher = MODE_PATTERN.matcher(line);
 
-                String prefix = null;
-                String remainder = line;
                 if (orMatcher.find()) {
+                    orMode = true;
                     prefix = orMatcher.group();
-                    remainder = line.substring(orMatcher.end()).trim();
+                    modeText = line.substring(orMatcher.end()).trim();
                 } else if (discMatcher.find()) {
                     prefix = discMatcher.group();
-                    remainder = line.substring(discMatcher.end()).trim();
+                    modeText = line.substring(discMatcher.end()).trim();
                 }
 
                 if (prefix != null) {
-                    List<String> disciplines = new ArrayList<>();
                     Matcher m = DISCIPLINE_EXTRACTOR_PATTERN.matcher(prefix);
                     while (m.find()) {
                         disciplines.add(m.group(1));
                     }
-                    mode.setDisciplines(disciplines);
                 }
-                modeText = remainder;
             }
             mode.setText(modeText.trim());
 
@@ -206,8 +202,8 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                     if (disciplineString == null) {
                         reference = modes.get(modes.size() - 1);
                     } else {
-                        List<String> disciplines = Arrays.asList(disciplineString.split("[\\[\\]]+"));
-                        reference = modes.stream().filter(m -> m.getDisciplines().equals(disciplines)).findFirst().orElse(null);
+                        List<String> discReference = Arrays.asList(disciplineString.split("[\\[\\]]+"));
+                        reference = modes.stream().filter(m -> m.getDisciplines().equals(discReference)).findFirst().orElse(null);
                         if (reference == null) {
                             System.out.printf(
                                     "WARNING! %s: Could not find match for '%s' among modes [%s]%n",
@@ -219,7 +215,16 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                     }
                 }
             }
-            modes.add(mode);
+            if (orMode) {
+                for (String discipline : disciplines) {
+                    LibraryCardMode discMode = new LibraryCardMode(mode);
+                    discMode.setDisciplines(List.of(discipline));
+                    modes.add(discMode);
+                }
+            } else {
+                mode.setDisciplines(disciplines);
+                modes.add(mode);
+            }
         }
         card.setModes(modes);
     }

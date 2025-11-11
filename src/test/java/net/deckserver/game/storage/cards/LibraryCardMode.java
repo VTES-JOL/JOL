@@ -3,6 +3,7 @@ package net.deckserver.game.storage.cards;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -11,13 +12,19 @@ public class LibraryCardMode {
     /**
      * Disciplines required to use this mode.
      */
-    private List<String> disciplines;
+    private List<String> disciplines = new ArrayList<>();
 
     private String text;
     /**
      * Where the card is played, if not the ash heap.
      */
     private Target target;
+
+    public LibraryCardMode(LibraryCardMode mode) {
+        this.disciplines = new ArrayList<>(mode.getDisciplines());
+        this.text = mode.getText();
+        this.target = mode.getTarget();
+    }
 
     public enum Target {
         /**
