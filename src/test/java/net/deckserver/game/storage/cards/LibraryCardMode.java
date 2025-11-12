@@ -1,5 +1,6 @@
 package net.deckserver.game.storage.cards;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,11 +9,12 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class LibraryCardMode {
     /**
      * Disciplines required to use this mode.
      */
-    private List<String> disciplines = new ArrayList<>();
+    private List<String> disciplines;
 
     private String text;
     /**
@@ -21,7 +23,9 @@ public class LibraryCardMode {
     private Target target;
 
     public LibraryCardMode(LibraryCardMode mode) {
-        this.disciplines = new ArrayList<>(mode.getDisciplines());
+        if (mode.getDisciplines() != null) {
+            this.disciplines = new ArrayList<>(mode.getDisciplines());
+        }
         this.text = mode.getText();
         this.target = mode.getTarget();
     }

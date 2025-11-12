@@ -221,7 +221,9 @@ function showPlayCardModal(event) {
                         let mode = card.modes[i];
                         let button = modeTemplate.clone();
 
-                        button.data('disciplines', mode.disciplines);
+                        if (mode.disciplines && mode.disciplines.length > 0) {
+                            button.data('disciplines', mode.disciplines);
+                        }
                         button.data('target', mode.target);
 
                         let extendedPlayPanel = playCardModal.find(".extended-play-panel");
