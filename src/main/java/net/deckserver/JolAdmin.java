@@ -6,8 +6,6 @@
 
 package net.deckserver;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import io.azam.ulidj.ULID;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.JolGame;
@@ -31,7 +29,6 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
@@ -42,14 +39,6 @@ public class JolAdmin {
 
     private static final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
     private static final Map<String, PlayerModel> pmap = new ConcurrentHashMap<>();
-    // Cache of users / status
-    private static final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
-            .expireAfterAccess(30, TimeUnit.MINUTES)
-            .build(JolAdmin::loadGameState);
-
-    public static String getDate() {
-        return OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
-    }
 
     public static int getRefreshInterval(String gameName) {
         OffsetDateTime lastChanged = PlayerGameActivityService.getGameTimestamp(gameName);
@@ -72,11 +61,7 @@ public class JolAdmin {
     }
 
     public static GameModel getGameModel(String name) {
-        return gmap.computeIfAbsent(name, n -> new GameModel(getGame(name)));
-    }
-
-    public static List<String> getWho() {
-        return PlayerService.activeUsers().stream().map(UserSummary::getName).toList();
+        return gmap.computeIfAbsent(name, n -> new GameModel(GameService.getGameByName(name)));
     }
 
     public static void remove(String player) {
@@ -109,12 +94,9 @@ public class JolAdmin {
     }
 
     public static void rollbackGame(String gameName, String adminName, String turn) {
-        String id = GameService.get(gameName).getId();
-        logger.info("Rolling back game {} for turn {}", gameName, turn);
-        JolGame game = GameService.loadSnapshot(id, turn);
-        ChatService.sendMessage(id, "SYSTEM", "Game state rolled back by administrator: " + adminName);
-        saveGameState(game, true);
-        gameCache.refresh(gameName);
+        GameInfo gameInfo = GameService.get(gameName);
+        GameService.rollbackGame(gameName, turn);
+        ChatService.sendMessage(gameInfo.getId(), "SYSTEM", "Game state rolled back by administrator: " + adminName);
     }
 
     public static boolean notExistsGame(String name) {
@@ -173,10 +155,6 @@ public class JolAdmin {
             getPlayerModel(playerName).clearDeck();
             DeckService.remove(playerName, deckName);
         }
-    }
-
-    public static synchronized JolGame getGame(String gameName) {
-        return gameCache.get(gameName);
     }
 
     public static void saveGameState(JolGame game) {
@@ -289,18 +267,6 @@ public class JolAdmin {
         return GameService.getGameNames();
     }
 
-    public static String getEmail(String player) {
-        return PlayerService.get(player).getEmail();
-    }
-
-    public static String getDiscordID(String player) {
-        return PlayerService.get(player).getDiscordId();
-    }
-
-    public static String getVeknID(String player) {
-        return PlayerService.get(player).getVeknId();
-    }
-
     public static synchronized void setImageTooltipPreference(String player, boolean value) {
         PlayerService.get(player).setShowImages(value);
     }
@@ -399,7 +365,7 @@ public class JolAdmin {
         GameInfo gameInfo = GameService.get(gameName);
         // try and generate stats for game
         if (gameInfo.getStatus().equals(GameStatus.ACTIVE)) {
-            JolGame gameData = getGame(gameName);
+            JolGame gameData = GameService.getGameByName(gameName);
             if (gameData.getPlayers().size() >= 4 && graceful) {
                 GameHistory history = new GameHistory();
                 history.setName(gameName);
@@ -462,7 +428,7 @@ public class JolAdmin {
         RegistrationStatus newRegistration = RegistrationService.getRegistration(gameName, newPlayer);
         // Only replace player if existing player is in the game, and the new player isn't
         if (existingRegistration != null && newRegistration == null) {
-            JolGame game = getGame(gameName);
+            JolGame game = GameService.getGameByName(gameName);
             game.replacePlayer(existingPlayer, newPlayer);
             saveGameState(game);
             resetView(existingPlayer, gameName);
@@ -514,7 +480,7 @@ public class JolAdmin {
     }
 
     public static synchronized void endTurn(String gameName, String adminName) {
-        JolGame game = getGame(gameName);
+        JolGame game = GameService.getGameByName(gameName);
         GameModel gameModel = getGameModel(gameName);
         String id = GameService.get(gameName).getId();
         ChatService.sendMessage(id, "SYSTEM", "Turn ended by administrator: " + adminName);
@@ -540,7 +506,7 @@ public class JolAdmin {
     }
 
     public static List<String> getPingList(String gameName) {
-        return getGame(gameName).getValidPlayers()
+        return GameService.getGameByName(gameName).getValidPlayers()
                 .stream()
                 .filter(player -> !JolAdmin.isPlayerPinged(player, gameName))
                 .collect(Collectors.toList());

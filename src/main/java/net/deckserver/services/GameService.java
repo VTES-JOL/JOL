@@ -28,6 +28,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
 
+import static net.deckserver.JolAdmin.saveGameState;
+
 public class GameService extends PersistedService {
 
     public static final Predicate<GameInfo> STARTING_GAME = (info) -> info.getStatus().equals(GameStatus.STARTING);
@@ -160,6 +162,13 @@ public class GameService extends PersistedService {
         return new JolGame(gameId, new GameData(gameId));
     }
 
+    public static void rollbackGame(String gameName, String turn) {
+        String id = get(gameName).getId();
+        JolGame game = loadSnapshot(id, turn);
+        saveGameState(game, true);
+        INSTANCE.gameCache.refresh(gameName);
+    }
+
     public static void saveGame(JolGame game) {
         writeLock.lock();
         String gameId = game.id();
@@ -239,6 +248,11 @@ public class GameService extends PersistedService {
             summary.setPrey(preySummary);
         }
         return summary;
+    }
+
+    public static JolGame getGameByName(String gameName) {
+        GameInfo gameInfo = get(gameName);
+        return INSTANCE.gameCache.get(gameInfo.getId());
     }
 
     private void upgrade() {

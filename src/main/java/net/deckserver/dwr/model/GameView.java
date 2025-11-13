@@ -5,16 +5,19 @@ import net.deckserver.dwr.bean.GameBean;
 import net.deckserver.game.enums.Phase;
 import net.deckserver.game.enums.RegionType;
 import net.deckserver.services.ChatService;
+import net.deckserver.services.GameService;
 import net.deckserver.storage.json.game.ChatData;
 import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class GameView {
@@ -73,7 +76,7 @@ public class GameView {
 
     public  GameBean create() {
         HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
-        JolGame game = JolAdmin.getGame(gameName);
+        JolGame game = GameService.getGameByName(gameName);
 
         if (isPlayer) {
             JolAdmin.recordPlayerAccess(playerName, gameName);
@@ -153,7 +156,7 @@ public class GameView {
         boolean chatReset = resetChat;
         boolean tc = turnChanged;
         clearAccess();
-        String stamp = JolAdmin.getDate();
+        String stamp = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
         int logLength = ChatService.getTurn(id, game.getTurnLabel()).size();
         return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, globalNotes, privateNotes, label, phase.getDescription(),
                 chatReset, tc, turn, turns, state, phases, ping, pinged, stamp, gameName, logLength, currentPlayer);

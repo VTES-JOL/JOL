@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.Phase;
 import net.deckserver.services.ChatService;
+import net.deckserver.services.GameService;
 import net.deckserver.services.RegistrationService;
 import net.deckserver.storage.json.game.ChatData;
 import org.apache.logging.log4j.LogManager;
@@ -34,7 +35,7 @@ public class GameModel implements Comparable<GameModel> {
     }
 
     public void endTurn(String player) {
-        JolGame game = JolAdmin.getGame(name);
+        JolGame game = GameService.getGameByName(name);
         if (game.getActivePlayer().equals(player)) {
             game.newTurn();
             reloadNotes();
@@ -50,7 +51,7 @@ public class GameModel implements Comparable<GameModel> {
         if (!getPlayers().contains(player) && !isJudge) {
             return "Not authorized";
         }
-        JolGame game = JolAdmin.getGame(name);
+        JolGame game = GameService.getGameByName(name);
         StringBuilder status = new StringBuilder();
         if (player != null) {
             boolean stateChanged = false;
@@ -125,7 +126,7 @@ public class GameModel implements Comparable<GameModel> {
     }
 
     public void updateGlobalNotes(String notes) {
-        JolGame game = JolAdmin.getGame(name);
+        JolGame game = GameService.getGameByName(name);
         if (!notes.equals(game.getGlobalText())) {
             game.setGlobalText(notes);
             reloadNotes();
@@ -134,7 +135,7 @@ public class GameModel implements Comparable<GameModel> {
     }
 
     public void updatePrivateNotes(String player, String notes) {
-        JolGame game = JolAdmin.getGame(name);
+        JolGame game = GameService.getGameByName(name);
         if (!notes.equals(game.getPrivateNotes(player))) {
             game.setPrivateNotes(player, notes);
             views.get(player).privateNotesChanged();

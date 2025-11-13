@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.JolGame;
+import net.deckserver.services.GameService;
 import net.deckserver.services.RegistrationService;
 
 import java.time.OffsetDateTime;
@@ -40,7 +41,7 @@ public class GameStatusBean {
                     .filter(playerName -> RegistrationService.isRegistered(gameName, playerName))
                     .map(playerName -> new PlayerStatus(gameName, playerName))
                     .collect(Collectors.toMap(PlayerStatus::getPlayerName, Function.identity()));
-            JolGame game = JolAdmin.getGame(gameName);
+            JolGame game = GameService.getGameByName(gameName);
             this.activePlayer = game.getActivePlayer();
             this.predator = game.getPredatorOf(activePlayer);
             this.prey = game.getPreyOf(activePlayer);

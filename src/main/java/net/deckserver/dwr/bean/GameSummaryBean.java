@@ -2,6 +2,7 @@ package net.deckserver.dwr.bean;
 
 import lombok.Getter;
 import net.deckserver.JolAdmin;
+import net.deckserver.services.GameService;
 
 import java.time.format.DateTimeFormatter;
 
@@ -14,7 +15,7 @@ public class GameSummaryBean {
 
     public GameSummaryBean(String gameName) {
         this.gameName = gameName;
-        this.turn = JolAdmin.getGame(gameName).getTurnLabel();
+        this.turn = GameService.getGameByName(gameName).getTurnLabel();
         this.timestamp = JolAdmin.getGameTimeStamp(gameName).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 

@@ -6,10 +6,13 @@ import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.services.PlayerGameActivityService;
 import net.deckserver.services.RegistrationService;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
 @Getter
 public class NavBean {
@@ -46,7 +49,7 @@ public class NavBean {
                         gameButtons.put("g" + game, game + current);
                     });
         }
-        stamp = JolAdmin.getDate();
+        stamp = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
     }
 
 }
