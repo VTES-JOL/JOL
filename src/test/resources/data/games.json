@@ -1,1 +1,12 @@
-{"Test Game 2":{"name":"Test Game 2","id":"01JMZPDRR2ZT61P2XNWDY83ZQJ","owner":"Player1","visibility":"PRIVATE","status":"ACTIVE","created":"2025-02-25T23:18:42.126968Z"},"Command Test":{"name":"Command Test","id":"command-test","owner":"TEST","visibility":"PRIVATE","status":"ACTIVE","created":"2025-02-25T23:18:42.126968Z"},"Test Game":{"name":"Test Game","id":"01JHQ7QXHB7SR86F3RNVSXFVMN","owner":"Player1","visibility":"PRIVATE","status":"ACTIVE","created":"2025-01-16T09:41:50.128033Z"}}
+{
+  "Test Game" : {
+    "name" : "Test Game",
+    "id" : "01K6CP9GMWMG78RERJVA2QM0R3",
+    "owner" : "Player5",
+    "visibility" : "PUBLIC",
+    "status" : "ACTIVE",
+    "gameFormat" : "Standard",
+    "created" : "2025-09-30T06:59:53.188022Z",
+    "version" : "GAME_STATE"
+  }
+}

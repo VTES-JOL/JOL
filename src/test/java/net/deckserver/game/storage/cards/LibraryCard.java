@@ -1,14 +1,16 @@
 package net.deckserver.game.storage.cards;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class LibraryCard {
+public class LibraryCard extends BaseCard {
 
     private String id;
     private String key;
@@ -18,6 +20,7 @@ public class LibraryCard {
     private String displayName;
     private Set<String> names;
     private Set<String> partials;
+    private Set<String> sets;
 
     private boolean unique;
 
@@ -30,6 +33,7 @@ public class LibraryCard {
     private List<String> disciplines;
     private List<String> clans;
     private List<String> requirements;
+    private String path;
 
     // Other
     private Boolean burnOption;

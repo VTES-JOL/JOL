@@ -1,30 +1,26 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.game.interfaces.state.Card;
-import net.deckserver.game.interfaces.state.Location;
+import net.deckserver.game.enums.RegionType;
+import net.deckserver.storage.json.game.CardData;
+import net.deckserver.storage.json.game.RegionData;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Pattern;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Created by shannon on 23/08/2016.
  */
 class CommandParser {
 
-    private final static Logger logger = getLogger(CommandParser.class);
     private final static Pattern VALID_POSITION_PATTERN = Pattern.compile("(?<!-\\+)\\d+(?:\\.\\d+)*");
     private final static Pattern SPECIAL_POSITION_PATTERN = Pattern.compile("random");
 
     final String[] args;
-    private int ind;
     private final JolGame game;
+    private int ind;
 
     public CommandParser(String[] args, int ind, JolGame game) {
         this.args = args;
@@ -42,32 +38,15 @@ class CommandParser {
         return args[ind].split("\\.");
     }
 
-    String getRegion(String defaultRegion) throws CommandException {
+    RegionType getRegion(RegionType defaultRegion) {
         if (!hasMoreArgs()) return defaultRegion;
         String arg = args[ind++].toLowerCase();
-        logger.trace("Attempting to get region {}", arg);
-        if (JolGame.RFG.startsWith(arg))
-            return JolGame.RFG;
-        if (JolGame.READY_REGION.startsWith(arg))
-            return JolGame.READY_REGION;
-        if (JolGame.INACTIVE_REGION.startsWith(arg))
-            return JolGame.INACTIVE_REGION;
-        if (JolGame.UNCONTROLLED_REGION.startsWith(arg))
-            return JolGame.INACTIVE_REGION;
-        if (JolGame.ASH_HEAP.startsWith(arg))
-            return JolGame.ASH_HEAP;
-        if (JolGame.HAND.startsWith(arg))
-            return JolGame.HAND;
-        if (JolGame.LIBRARY.startsWith(arg))
-            return JolGame.LIBRARY;
-        if (JolGame.CRYPT.startsWith(arg))
-            return JolGame.CRYPT;
-        if (JolGame.TORPOR.startsWith(arg))
-            return JolGame.TORPOR;
-        if (JolGame.RESEARCH.startsWith(arg))
-            return JolGame.RESEARCH;
-        ind--;
-        return defaultRegion;
+        RegionType results = RegionType.startsWith(arg);
+        if (results == null) {
+            ind--;
+            return defaultRegion;
+        }
+        return results;
     }
 
     /*
@@ -137,13 +116,12 @@ class CommandParser {
 
     }
 
-    String findCard(boolean greedy, boolean allowRandom, String player, String region) throws CommandException {
-        Location location = game.getState().getPlayerLocation(player, region);
-        Card[] cards = location.getCards();
-        Card targetCard = null;
+    CardData findCardData(boolean greedy, boolean allowRandom, String player, RegionType region) throws CommandException {
+        RegionData regionData = game.data().getPlayerRegion(player, region);
+        var cards = regionData.getCards();
+        CardData targetCard = null;
         boolean keepLooking = true;
         while (keepLooking && hasMoreArgs()) {
-            // Get the position from the next arg
             String[] indexes = translateNextPosition(allowRandom);
             if (indexes.length == 0) {
                 break;
@@ -152,11 +130,11 @@ class CommandParser {
                 for (String index : indexes) {
                     int indexInt;
                     if ("random".equals(index)) {
-                        indexInt = new Random().nextInt(cards.length) + 1;
+                        indexInt = new Random().nextInt(cards.size()) + 1;
                     } else {
                         indexInt = Integer.parseInt(index);
                     }
-                    targetCard = cards[indexInt - 1];
+                    targetCard = cards.get(indexInt - 1);
                     cards = targetCard.getCards();
                 }
                 ind++;
@@ -166,13 +144,13 @@ class CommandParser {
         }
 
         if (targetCard == null && greedy) {
-            throw new CommandException("Invalid card position.");
+            throw new CommandException("Invalid card position");
         }
-        return Optional.ofNullable(targetCard).map(Card::getId).orElse(null);
+        return targetCard;
     }
 
-    String findCard(boolean allowRandom, String player, String region) throws CommandException {
-        return findCard(true, allowRandom, player, region);
+    CardData findCardData(boolean allowRandom, String player, RegionType region) throws CommandException {
+        return findCardData(true, allowRandom, player, region);
     }
 
     int getAmount(int amount) throws CommandException {
@@ -204,8 +182,21 @@ class CommandParser {
         return ind < args.length;
     }
 
-    String nextArg() {
-        return args[ind++];
+    String nextArg() throws CommandException {
+        try {
+            return args[ind++];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new CommandException("Command requires at least one argument.");
+        }
+    }
+
+    String remaining() throws CommandException {
+        StringBuilder builder = new StringBuilder();
+        while (hasMoreArgs()) {
+            builder.append(nextArg());
+            builder.append(" ");
+        }
+        return builder.toString().trim();
     }
 
     boolean consumeString(String val) {

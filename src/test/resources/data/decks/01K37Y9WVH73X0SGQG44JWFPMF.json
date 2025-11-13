@@ -1,0 +1,321 @@
+{
+  "deck": {
+    "id": null,
+    "name": "Power Pre-con",
+    "crypt": {
+      "count": 12,
+      "cards": [
+        {
+          "id": 210753,
+          "name": "Floortje Wolkendans",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210769,
+          "name": "Onkabetse, Arriviste",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210773,
+          "name": "Rexton \"Savage\" Abernathy",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210772,
+          "name": "Rasha Tarabzouni",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210747,
+          "name": "Damian",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210746,
+          "name": "Csongor Királyhidi",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210762,
+          "name": "Lyyli Yösydän",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210761,
+          "name": "Khin Aye",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210777,
+          "name": "Suwira",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210733,
+          "name": "Aaradhya, The Callous Tyrant",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210781,
+          "name": "Věnceslava, The Implacable",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210764,
+          "name": "Lika, The Purger",
+          "count": 1,
+          "comments": "playtest"
+        }
+      ]
+    },
+    "library": {
+      "count": 77,
+      "cards": [
+        {
+          "type": "Master",
+          "count": 12,
+          "cards": [
+            {
+              "id": 150048,
+              "name": "Unholy Sacrament",
+              "count": 3,
+              "comments": "playtest"
+            },
+            {
+              "id": 101091,
+              "name": "Legendary Vampire",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100165,
+              "name": "Black Forest Base",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 102121,
+              "name": "Villein",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 150042,
+              "name": "Privileged Position",
+              "count": 1,
+              "comments": "playtest"
+            },
+            {
+              "id": 101437,
+              "name": "Powerbase: Madrid",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100541,
+              "name": "Día de los Muertos",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100444,
+              "name": "Creepshow Casino",
+              "count": 1,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action",
+          "count": 8,
+          "cards": [
+            {
+              "id": 100640,
+              "name": "Enchant Kindred",
+              "count": 6,
+              "comments": null
+            },
+            {
+              "id": 102063,
+              "name": "Under Siege",
+              "count": 2,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action Modifier/Reaction",
+          "count": 3,
+          "cards": [
+            {
+              "id": 150047,
+              "name": "Absolute Tyranny",
+              "count": 3,
+              "comments": "playtest"
+            }
+          ]
+        },
+        {
+          "type": "Action Modifier",
+          "count": 23,
+          "cards": [
+            {
+              "id": 101008,
+              "name": "Iron Glare",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 102131,
+              "name": "Voter Captivation",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 101490,
+              "name": "Private Audience",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 100788,
+              "name": "Freak Drive",
+              "count": 4,
+              "comments": null
+            },
+            {
+              "id": 150043,
+              "name": "Unthinkable Humiliation",
+              "count": 2,
+              "comments": "playtest"
+            },
+            {
+              "id": 150041,
+              "name": "Magnetic Authority",
+              "count": 2,
+              "comments": "playtest"
+            },
+            {
+              "id": 150046,
+              "name": "Forceful Personality",
+              "count": 4,
+              "comments": "playtest"
+            },
+            {
+              "id": 100492,
+              "name": "Daring the Dawn",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 150045,
+              "name": "Relentlessness",
+              "count": 4,
+              "comments": "playtest"
+            }
+          ]
+        },
+        {
+          "type": "Combat",
+          "count": 6,
+          "cards": [
+            {
+              "id": 100307,
+              "name": "Catatonic Fear",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 101144,
+              "name": "Majesty",
+              "count": 3,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Political Action",
+          "count": 15,
+          "cards": [
+            {
+              "id": 101056,
+              "name": "Kine Resources Contested",
+              "count": 5,
+              "comments": null
+            },
+            {
+              "id": 100131,
+              "name": "Banishment",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 150039,
+              "name": "Empires Fall",
+              "count": 3,
+              "comments": "playtest"
+            },
+            {
+              "id": 100294,
+              "name": "Cardinal Benediction",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 150040,
+              "name": "Cold War",
+              "count": 2,
+              "comments": "playtest"
+            },
+            {
+              "id": 150044,
+              "name": "War of Ages",
+              "count": 2,
+              "comments": "playtest"
+            }
+          ]
+        },
+        {
+          "type": "Reaction",
+          "count": 10,
+          "cards": [
+            {
+              "id": 100518,
+              "name": "Deflection",
+              "count": 5,
+              "comments": null
+            },
+            {
+              "id": 101321,
+              "name": "On the Qui Vive",
+              "count": 5,
+              "comments": null
+            }
+          ]
+        }
+      ]
+    },
+    "comments": null
+  },
+  "stats": {
+    "cryptSize": 12,
+    "librarySize": 77,
+    "groups": [
+      "6"
+    ],
+    "bannedCards": false,
+    "summary": "Crypt: 12 Library: 77 Groups: 6"
+  },
+  "errors": []
+}

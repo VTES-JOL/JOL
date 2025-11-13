@@ -1,12 +1,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page import="net.deckserver.game.storage.state.RegionType" %>
+<%@ page import="net.deckserver.game.enums.RegionType" %>
 <%@ page import="net.deckserver.dwr.model.JolGame" %>
-<%@ page import="net.deckserver.game.interfaces.state.Card" %>
+<%@ page import="java.util.List" %>
+<%@ page import="net.deckserver.storage.json.game.CardData" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
     String player = (String) request.getAttribute("player");
     String viewer = (String) request.getAttribute("viewer");
-    Card[] cards = game.getState().getPlayerLocation(player, RegionType.HAND.xmlLabel()).getCards();
+    List<CardData> cards = game.data().getPlayerRegion(player, RegionType.HAND).getCards();
 %>
 <c:forEach items="<%= cards %>" var="card" varStatus="counter">
     <jsp:include page="card-simple.jsp">

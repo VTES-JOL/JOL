@@ -1,1 +1,76 @@
-{"deck":{"id":null,"name":null,"crypt":{"count":12,"cards":[{"id":200181,"name":"Béatrice \"Oracle171\" Tremblay","count":6,"comments":null},{"id":200105,"name":"Anne-Marie Bourgeois, Inconnu Recruiter","count":6,"comments":null}]},"library":{"count":7,"cards":[{"type":"Master","count":2,"cards":[{"id":100588,"name":"Dreams of the Sphinx","count":2,"comments":null}]},{"type":"Retainer","count":2,"cards":[{"id":101550,"name":"Raven Spy","count":2,"comments":null}]},{"type":"Ally","count":3,"cards":[{"id":100298,"name":"Carlton Van Wyk","count":3,"comments":null}]}]},"comments":""},"stats":{"cryptSize":12,"librarySize":7,"groups":["4","5"],"valid":false,"bannedCards":false,"summary":"Crypt: 12 Library: 7 Groups: 4/5"}}
+{
+  "deck": {
+    "id": null,
+    "name": null,
+    "crypt": {
+      "count": 12,
+      "cards": [
+        {
+          "id": 200181,
+          "name": "Béatrice \"Oracle171\" Tremblay",
+          "count": 6,
+          "comments": null
+        },
+        {
+          "id": 200105,
+          "name": "Anne-Marie Bourgeois, Inconnu Recruiter",
+          "count": 6,
+          "comments": null
+        }
+      ]
+    },
+    "library": {
+      "count": 7,
+      "cards": [
+        {
+          "type": "Master",
+          "count": 2,
+          "cards": [
+            {
+              "id": 100588,
+              "name": "Dreams of the Sphinx",
+              "count": 2,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Retainer",
+          "count": 2,
+          "cards": [
+            {
+              "id": 101550,
+              "name": "Raven Spy",
+              "count": 2,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Ally",
+          "count": 3,
+          "cards": [
+            {
+              "id": 100298,
+              "name": "Carlton Van Wyk",
+              "count": 3,
+              "comments": null
+            }
+          ]
+        }
+      ]
+    },
+    "comments": ""
+  },
+  "stats": {
+    "cryptSize": 12,
+    "librarySize": 7,
+    "groups": [
+      "4",
+      "5"
+    ],
+    "valid": false,
+    "bannedCards": false,
+    "summary": "Crypt: 12 Library: 7 Groups: 4/5"
+  }
+}

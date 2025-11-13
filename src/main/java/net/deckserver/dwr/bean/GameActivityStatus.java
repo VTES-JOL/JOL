@@ -1,7 +1,8 @@
 package net.deckserver.dwr.bean;
 
 import lombok.Getter;
-import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.JolAdmin;
+import net.deckserver.services.RegistrationService;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,12 +18,11 @@ public class GameActivityStatus {
     private final OffsetDateTime gameTimestamp;
 
     public GameActivityStatus(String gameName) {
-        JolAdmin admin = JolAdmin.INSTANCE;
         this.gameName = gameName;
-        gameTimestamp = admin.getGameTimeStamp(gameName);
-        Set<String> players = admin.getPlayers(gameName);
+        gameTimestamp = JolAdmin.getGameTimeStamp(gameName);
+        Set<String> players = RegistrationService.getPlayers(gameName);
         players.forEach(player -> {
-            OffsetDateTime playerTimestamp = admin.getPlayerAccess(player, gameName);
+            OffsetDateTime playerTimestamp = JolAdmin.getPlayerAccess(player, gameName);
             idlePlayers.put(player, playerTimestamp.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         });
     }

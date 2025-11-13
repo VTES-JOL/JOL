@@ -2,12 +2,11 @@ services:
   static:
     image: nginx
     container_name: static
-    labels:
-      - "traefik.http.routers.static.entrypoints=websecure"
-      - "traefik.http.routers.static.rule=Host(`static.deckserver.net`)"
-      - "traefik.http.routers.static.tls.certresolver=myresolver"
     ports:
-      - "80:80"
+      - "443:443"
     volumes:
-      - /Users/shannon/static:/usr/share/nginx/html
-      - ./static.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/conf/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/cors.txt:/etc/nginx/conf.d/cors.txt
+      - ./nginx/certs:/certs
+      - ./static:/var/static
+      - ./assets:/var/assets

@@ -12,11 +12,11 @@
         <RollingFile name="metrics" filePattern="${data}/metrics/%d{yyyy-MM}/%d{yyyy-MM-dd}.log" append="true">
             <ThresholdFilter level="DEBUG"/>
             <CsvParameterLayout quoteMode="NON_NUMERIC"/>
-            <TimeBasedTriggeringPolicy />
+            <TimeBasedTriggeringPolicy/>
         </RollingFile>
         <RollingFile name="commands" filePattern="${data}/commands/%d{yyyy-MM}/%d{yyyy-MM-dd}.log" append="true">
             <ThresholdFilter level="INFO"/>
-            <TimeBasedTriggeringPolicy />
+            <TimeBasedTriggeringPolicy/>
         </RollingFile>
         <Routing name="commands">
             <Routes pattern="$${ctx:DYNAMIC_LOG}">

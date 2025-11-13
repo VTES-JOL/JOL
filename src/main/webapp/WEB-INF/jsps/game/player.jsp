@@ -3,7 +3,7 @@
 <%@page pageEncoding="UTF-8" %>
 <%@page import="net.deckserver.dwr.model.JolGame" %>
 <%@ page import="java.text.DecimalFormat" %>
-<%@ page import="net.deckserver.game.storage.state.RegionType" %>
+<%@ page import="net.deckserver.game.enums.RegionType" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
     String viewer = (String) request.getAttribute("viewer");

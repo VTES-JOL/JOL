@@ -1,6 +1,6 @@
 package net.deckserver.servlet;
 
-import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.JolAdmin;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -13,8 +13,8 @@ public class LogoutServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String userName = (String)req.getSession().getAttribute("meth");
-        JolAdmin.INSTANCE.remove(userName);
+        String userName = (String) req.getSession().getAttribute("meth");
+        JolAdmin.remove(userName);
         req.getSession().removeAttribute("meth");
         resp.sendRedirect("/jol/");
     }

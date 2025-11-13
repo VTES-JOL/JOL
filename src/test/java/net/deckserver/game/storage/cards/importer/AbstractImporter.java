@@ -1,6 +1,7 @@
 package net.deckserver.game.storage.cards.importer;
 
 import lombok.extern.slf4j.Slf4j;
+import net.deckserver.game.storage.cards.BaseCard;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
@@ -12,15 +13,18 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Slf4j
-public abstract class AbstractImporter<T> {
+public abstract class AbstractImporter<T extends BaseCard> {
 
-    private final Path dataPath;
+    private final Path basePath;
+    private final String filePrefix;
 
-    public AbstractImporter(Path dataPath) {
-        this.dataPath = dataPath;
+    public AbstractImporter(Path basePath, String filePrefix) {
+        this.basePath = basePath;
+        this.filePrefix = filePrefix;
     }
 
     public List<T> read() throws Exception {
+        Path dataPath = basePath.resolve(filePrefix + ".csv");
         try (FileReader in = new FileReader(dataPath.toFile())) {
             Iterable<CSVRecord> records = CSVFormat.DEFAULT.builder()
                     .setHeader()

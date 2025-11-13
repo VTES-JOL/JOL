@@ -4,32 +4,47 @@
             <h2 style="position:relative;top:43%">Loading...</h2>
         </div>
         <div class="modal-content loaded" style="text-align:center">
-            <div class="modal-header">
-                <h5 class="modal-title d-flex justify-content-between align-items-center w-100">
-                    <span class="align-items-center">
-                        <span class="card-clan"></span>
-                        <span class="card-name" id="cardModalLabel">Maris Streck</span>
-                        <span class="votes mx-2" title="Votes">3</span>
-                    </span>
-                    <span class="card-label badge bg-light text-black shadow fs-6"></span>
-                </h5>
+            <div class="modal-header py-1 px-2 justify-content-between align-items-center">
+                <span class="d-flex align-items-center">
+                    <span class="card-clan m-2"></span>
+                    <label for="clan-select" class="d-none"></label>
+                    <select id="clan-select" class="form-select form-select-sm ms-2 card-clan-select d-none"
+                            style="width:auto"></select>
+                    <span class="card-name fs-5" id="cardModalLabel"></span>
+                    <span class="votes mx-2" title="Votes"></span>
+                </span>
+                <span class="d-flex align-items-center">
+                    <span class="card-path"></span>
+                    <label for="path-select" class="d-none"></label>
+                    <select id="path-select" class="form-select form-select-sm ms-2 card-path-select d-none"
+                            style="width:auto"></select>
+                    <span class="card-sect m-2"></span>
+                    <label for="sect-select" class="d-none"></label>
+                    <select id="sect-select" class="form-select form-select-sm ms-2 card-sect-select d-none"
+                            style="width:auto"></select>
+                    <span class="card-cost"></span>
+                </span>
             </div>
             <div class="modal-body">
-                <div class="d-flex align-items-center">
-                    <span class="discipline">a</span>
+                <div id="card-image"></div>
+                <div class="input-group mt-2">
+                    <label for="card-label" class="input-group-text"><i class="bi bi-tag"></i></label>
+                    <input type="text" class="form-control" id="card-label"
+                           placeholder="Add a label for all players to see." onchange="updateNotes();">
                 </div>
-                <div class="card-text text-start"></div>
             </div>
-            <div class="modal-footer d-flex flex-wrap justify-content-center">
+            <div class="modal-footer d-flex flex-column flex-wrap justify-content-center">
                 <div class="transfers-and-counters">
                     <div class="d-flex justify-content-between fs-5 rounded-pill align-items-center bg-danger-subtle gap-1">
                         <div class="counters badge rounded-pill text-bg-secondary fs-5 gap-1 d-flex align-items-center"
                              title="Counters; click right side to increase, left to decrease">
                         </div>
-                        <div class="transfers transfer-btn transfer-btn-left fs-3" title="Transfer one pool to this card"
+                        <div class="transfers transfer-btn transfer-btn-left fs-3"
+                             title="Transfer one pool to this card"
                              onclick="transferToCard();">&#9668;
                         </div>
-                        <div class="transfers transfer-btn transfer-btn-right fs-3" title="Transfer one blood to your pool"
+                        <div class="transfers transfer-btn transfer-btn-right fs-3"
+                             title="Transfer one blood to your pool"
                              onclick="transferToPool();">&#9658;
                         </div>
                         <div class="transfers badge rounded-pill text-bg-danger fs-5 card-modal-pool">99 pool</div>
@@ -69,13 +84,6 @@
                             onclick="hunt();">
                         <span>Hunt</span>
                     </button>
-                    <button type="button" class="btn btn-outline-dark m-1" title="Torpor"
-                            data-region="ready"
-                            data-top-level-only
-                            data-minion-only
-                            onclick="torpor();">
-                        <span>Send to Torpor</span>
-                    </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Go Anarch"
                             data-region="ready" data-lock-state="unlocked"
                             data-top-level-only
@@ -104,20 +112,28 @@
                             data-lock-state="unlocked"
                             data-region="ready torpor"
                             onclick="lock();">
-                        <span>&cudarrr; Lock</span>
+                        <span><i class="bi bi-lock"></i> Lock</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Unlock"
                             data-lock-state="locked"
                             data-region="ready torpor"
                             onclick="unlock();">
-                        <span style="transform: rotate(-90deg);">&#10548; Unlock</span>
+                        <span style="transform: rotate(-90deg);"><i class="bi bi-unlock"></i> Unlock</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Block"
                             data-region="ready" data-top-level-only
                             data-owner-only
                             data-minion-only
                             onclick="block();">
-                        <span>Block</span>
+                        <span><i class="bi bi-shield"></i> Block</span>
+                    </button>
+                    <br/>
+                    <button type="button" class="btn btn-outline-dark m-1" title="Torpor"
+                            data-region="ready"
+                            data-top-level-only
+                            data-minion-only
+                            onclick="torpor();">
+                        <span>Send to Torpor</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Burn"
                             data-region="ready torpor inactive"
@@ -156,6 +172,17 @@
                             data-owner-only
                             onclick="removeFromGame();">
                         <span><i class="bi bi-escape"></i> Remove from Game</span>
+                    </button>
+                    <br/>
+                    <button type="button" class="btn btn-outline-dark m-1" title="Move to Predator"
+                            data-region="ready"
+                            onclick="movePredator();">
+                        <span><i class="bi bi-arrow-left-circle"></i> Move to Predator</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-dark m-1" title="Move to Prey"
+                            data-region="ready"
+                            onclick="movePrey();">
+                        <span><i class="bi bi-arrow-right-circle"></i> Move to Prey</span>
                     </button>
                 </div>
             </div>

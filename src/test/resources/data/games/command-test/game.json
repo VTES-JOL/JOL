@@ -1,0 +1,5637 @@
+{
+  "id": "command-test",
+  "name": "Test Game",
+  "playerOrder": [
+    "Player2",
+    "Player4",
+    "Player5",
+    "Player3",
+    "Player1"
+  ],
+  "orderOfPlayReversed": false,
+  "turn": "1.1",
+  "phase": "UNLOCK",
+  "notes": "",
+  "cards": {
+    "1": {
+      "id": "1",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "201090",
+      "name": "Panagos Levidis",
+      "type": "VAMPIRE",
+      "capacity": 3,
+      "clan": "GANGREL",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "obf"
+      ]
+    },
+    "2": {
+      "id": "2",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "201457",
+      "name": "Vliam Andor",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "GANGREL",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani"
+      ]
+    },
+    "3": {
+      "id": "3",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "201169",
+      "name": "Raziya Samater",
+      "type": "VAMPIRE",
+      "capacity": 3,
+      "clan": "BRUJAH",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "pot"
+      ]
+    },
+    "4": {
+      "id": "4",
+      "region": "Player1-Uncontrolled region",
+      "owner": "Player1",
+      "cardId": "201025",
+      "name": "Muse",
+      "type": "VAMPIRE",
+      "capacity": 3,
+      "clan": "DAUGHTER_OF_CACOPHONY",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "for",
+        "mel"
+      ]
+    },
+    "5": {
+      "id": "5",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "200832",
+      "name": "Leon",
+      "type": "VAMPIRE",
+      "capacity": 3,
+      "clan": "GANGREL_ANTITRIBU",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "for"
+      ]
+    },
+    "6": {
+      "id": "6",
+      "region": "Player1-Ready region",
+      "owner": "Player1",
+      "cardId": "200519",
+      "name": "Gillian Krader",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "counters": 2,
+      "clan": "PANDER",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "dem"
+      ]
+    },
+    "7": {
+      "id": "7",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "201380",
+      "name": "Tommy",
+      "type": "VAMPIRE",
+      "capacity": 3,
+      "clan": "NOSFERATU_ANTITRIBU",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "pot"
+      ]
+    },
+    "8": {
+      "id": "8",
+      "region": "Player1-Uncontrolled region",
+      "owner": "Player1",
+      "cardId": "200315",
+      "name": "Dani",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "NOSFERATU_ANTITRIBU",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani"
+      ]
+    },
+    "9": {
+      "id": "9",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "201466",
+      "name": "Wendy Wade",
+      "type": "VAMPIRE",
+      "capacity": 3,
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "aus"
+      ]
+    },
+    "400": {
+      "id": "400",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101850",
+      "name": "Spirit's Touch",
+      "type": "NONE"
+    },
+    "401": {
+      "id": "401",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101949",
+      "name": "Telepathic Misdirection",
+      "type": "NONE"
+    },
+    "402": {
+      "id": "402",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101949",
+      "name": "Telepathic Misdirection",
+      "type": "NONE"
+    },
+    "403": {
+      "id": "403",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101949",
+      "name": "Telepathic Misdirection",
+      "type": "NONE"
+    },
+    "404": {
+      "id": "404",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101949",
+      "name": "Telepathic Misdirection",
+      "type": "NONE"
+    },
+    "405": {
+      "id": "405",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101948",
+      "name": "Telepathic Counter",
+      "type": "NONE"
+    },
+    "406": {
+      "id": "406",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101948",
+      "name": "Telepathic Counter",
+      "type": "NONE"
+    },
+    "407": {
+      "id": "407",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100863",
+      "name": "Guard Dogs",
+      "type": "NONE"
+    },
+    "408": {
+      "id": "408",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100863",
+      "name": "Guard Dogs",
+      "type": "NONE"
+    },
+    "409": {
+      "id": "409",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100863",
+      "name": "Guard Dogs",
+      "type": "NONE"
+    },
+    "410": {
+      "id": "410",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "201426",
+      "name": "Vardar Vardarian",
+      "type": "VAMPIRE",
+      "capacity": 6,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "cel",
+        "pre",
+        "OBF",
+        "QUI"
+      ]
+    },
+    "411": {
+      "id": "411",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "200818",
+      "name": "Layla bint-Nadr",
+      "type": "VAMPIRE",
+      "capacity": 5,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "qui",
+        "CEL",
+        "OBF"
+      ]
+    },
+    "412": {
+      "id": "412",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "200065",
+      "name": "Amaravati",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "chi",
+        "DOM",
+        "OBF",
+        "QUI"
+      ]
+    },
+    "413": {
+      "id": "413",
+      "region": "Player5-Uncontrolled region",
+      "owner": "Player5",
+      "cardId": "200065",
+      "name": "Amaravati",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "chi",
+        "DOM",
+        "OBF",
+        "QUI"
+      ]
+    },
+    "414": {
+      "id": "414",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "200065",
+      "name": "Amaravati",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "chi",
+        "DOM",
+        "OBF",
+        "QUI"
+      ]
+    },
+    "415": {
+      "id": "415",
+      "region": "Player5-Ready region",
+      "owner": "Player5",
+      "cardId": "200759",
+      "name": "Kashan",
+      "type": "VAMPIRE",
+      "capacity": 7,
+      "counters": 7,
+      "votes": "1",
+      "title": "1 vote",
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "obt",
+        "pre",
+        "CEL",
+        "OBF",
+        "QUI"
+      ]
+    },
+    "416": {
+      "id": "416",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "201078",
+      "name": "Olugbenga",
+      "type": "VAMPIRE",
+      "capacity": 7,
+      "votes": "2",
+      "title": "magaji",
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "cel",
+        "OBF",
+        "QUI"
+      ]
+    },
+    "417": {
+      "id": "417",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "201323",
+      "name": "Sukainah",
+      "type": "VAMPIRE",
+      "capacity": 3,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "qui"
+      ]
+    },
+    "418": {
+      "id": "418",
+      "cards": [
+        "16"
+      ],
+      "region": "Player5-Uncontrolled region",
+      "owner": "Player5",
+      "cardId": "200175",
+      "name": "Basir",
+      "type": "VAMPIRE",
+      "capacity": 1,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "qui"
+      ]
+    },
+    "419": {
+      "id": "419",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "200062",
+      "name": "Alu",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "obf"
+      ]
+    },
+    "420": {
+      "id": "420",
+      "region": "Player5-Uncontrolled region",
+      "owner": "Player5",
+      "cardId": "200445",
+      "name": "Evan Rogers",
+      "type": "VAMPIRE",
+      "capacity": 3,
+      "counters": 2,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "cel",
+        "qui"
+      ]
+    },
+    "421": {
+      "id": "421",
+      "region": "Player5-Crypt",
+      "owner": "Player5",
+      "cardId": "200748",
+      "name": "Kamau Jafari",
+      "type": "VAMPIRE",
+      "capacity": 4,
+      "clan": "ASSAMITE",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "obf",
+        "QUI"
+      ]
+    },
+    "300": {
+      "id": "300",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "NONE"
+    },
+    "422": {
+      "id": "422",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100037",
+      "name": "Alamut",
+      "type": "MASTER",
+      "unique": true
+    },
+    "301": {
+      "id": "301",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "NONE"
+    },
+    "423": {
+      "id": "423",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100037",
+      "name": "Alamut",
+      "type": "MASTER",
+      "unique": true
+    },
+    "302": {
+      "id": "302",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "NONE"
+    },
+    "424": {
+      "id": "424",
+      "region": "Player5-Ready region",
+      "owner": "Player5",
+      "cardId": "100037",
+      "name": "Alamut",
+      "type": "MASTER",
+      "unique": true
+    },
+    "303": {
+      "id": "303",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "NONE"
+    },
+    "304": {
+      "id": "304",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "NONE"
+    },
+    "425": {
+      "id": "425",
+      "parent": "451",
+      "region": "Player5-Ready region",
+      "owner": "Player5",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "426": {
+      "id": "426",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "305": {
+      "id": "305",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "NONE"
+    },
+    "427": {
+      "id": "427",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "306": {
+      "id": "306",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100618",
+      "name": "Elder Intervention",
+      "type": "NONE"
+    },
+    "428": {
+      "id": "428",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "307": {
+      "id": "307",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101949",
+      "name": "Telepathic Misdirection",
+      "type": "NONE"
+    },
+    "308": {
+      "id": "308",
+      "region": "Player4-Uncontrolled region",
+      "owner": "Player4",
+      "cardId": "200339",
+      "name": "Devin Bisley",
+      "type": "VAMPIRE",
+      "capacity": 5,
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "vic",
+        "ANI",
+        "AUS"
+      ]
+    },
+    "429": {
+      "id": "429",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101896",
+      "name": "Sudden Reversal",
+      "type": "MASTER"
+    },
+    "309": {
+      "id": "309",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "200850",
+      "name": "Lolita Houston",
+      "type": "VAMPIRE",
+      "capacity": 4,
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "VIC"
+      ]
+    },
+    "430": {
+      "id": "430",
+      "region": "Player5-Hand",
+      "owner": "Player5",
+      "cardId": "101896",
+      "name": "Sudden Reversal",
+      "type": "MASTER"
+    },
+    "310": {
+      "id": "310",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "200273",
+      "name": "Christine Boscacci",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "PANDER",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "dom",
+        "vic"
+      ]
+    },
+    "431": {
+      "id": "431",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100984",
+      "name": "Information Highway",
+      "type": "MASTER",
+      "unique": true
+    },
+    "311": {
+      "id": "311",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "201319",
+      "name": "Stravinsky",
+      "type": "VAMPIRE",
+      "capacity": 9,
+      "votes": "2",
+      "title": "archbishop",
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pot",
+        "ANI",
+        "AUS",
+        "VIC"
+      ]
+    },
+    "432": {
+      "id": "432",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100984",
+      "name": "Information Highway",
+      "type": "MASTER",
+      "unique": true
+    },
+    "312": {
+      "id": "312",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "201319",
+      "name": "Stravinsky",
+      "type": "VAMPIRE",
+      "capacity": 9,
+      "votes": "2",
+      "title": "archbishop",
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pot",
+        "ANI",
+        "AUS",
+        "VIC"
+      ]
+    },
+    "433": {
+      "id": "433",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100984",
+      "name": "Information Highway",
+      "type": "MASTER",
+      "unique": true
+    },
+    "313": {
+      "id": "313",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "200980",
+      "name": "Meshenka",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "P",
+      "title": "priscus",
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ANI",
+        "AUS",
+        "VIC"
+      ]
+    },
+    "434": {
+      "id": "434",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100984",
+      "name": "Information Highway",
+      "type": "MASTER",
+      "unique": true
+    },
+    "314": {
+      "id": "314",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "200980",
+      "name": "Meshenka",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "P",
+      "title": "priscus",
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ANI",
+        "AUS",
+        "VIC"
+      ]
+    },
+    "435": {
+      "id": "435",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100984",
+      "name": "Information Highway",
+      "type": "MASTER",
+      "unique": true
+    },
+    "315": {
+      "id": "315",
+      "region": "Player4-Uncontrolled region",
+      "owner": "Player4",
+      "cardId": "200603",
+      "name": "Horatio",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "vic"
+      ]
+    },
+    "436": {
+      "id": "436",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100906",
+      "name": "Heartblood of the Clan",
+      "type": "MASTER",
+      "unique": true
+    },
+    "316": {
+      "id": "316",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "200810",
+      "name": "Lambach",
+      "type": "VAMPIRE",
+      "capacity": 10,
+      "votes": "3",
+      "title": "cardinal",
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pre",
+        "ANI",
+        "AUS",
+        "DOM",
+        "VIC"
+      ]
+    },
+    "437": {
+      "id": "437",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100172",
+      "name": "Black Throne, The",
+      "type": "MASTER",
+      "unique": true
+    },
+    "317": {
+      "id": "317",
+      "region": "Player4-Uncontrolled region",
+      "owner": "Player4",
+      "cardId": "200810",
+      "name": "Lambach",
+      "type": "VAMPIRE",
+      "capacity": 10,
+      "votes": "3",
+      "title": "cardinal",
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pre",
+        "ANI",
+        "AUS",
+        "DOM",
+        "VIC"
+      ]
+    },
+    "438": {
+      "id": "438",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100172",
+      "name": "Black Throne, The",
+      "type": "MASTER",
+      "unique": true
+    },
+    "318": {
+      "id": "318",
+      "cards": [
+        "321"
+      ],
+      "region": "Player4-Ready region",
+      "owner": "Player4",
+      "cardId": "201244",
+      "name": "Sascha Vykos, The Angel of Caine",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "counters": 8,
+      "votes": "P",
+      "title": "priscus",
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "dom",
+        "AUS",
+        "THA",
+        "VIC"
+      ]
+    },
+    "439": {
+      "id": "439",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100799",
+      "name": "Gambit Accepted",
+      "type": "MASTER"
+    },
+    "319": {
+      "id": "319",
+      "region": "Player4-Crypt",
+      "owner": "Player4",
+      "cardId": "200844",
+      "name": "Little Tailor of Prague",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "clan": "TZIMISCE",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "dem",
+        "ANI",
+        "AUS",
+        "VIC"
+      ]
+    },
+    "440": {
+      "id": "440",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102165",
+      "name": "Web of Knives Recruit",
+      "type": "NONE"
+    },
+    "320": {
+      "id": "320",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101091",
+      "name": "Legendary Vampire",
+      "type": "MASTER",
+      "unique": true
+    },
+    "441": {
+      "id": "441",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102165",
+      "name": "Web of Knives Recruit",
+      "type": "NONE"
+    },
+    "200": {
+      "id": "200",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101578",
+      "name": "Redirection",
+      "type": "NONE"
+    },
+    "442": {
+      "id": "442",
+      "region": "Player5-Uncontrolled region",
+      "owner": "Player5",
+      "cardId": "102165",
+      "name": "Web of Knives Recruit",
+      "type": "NONE",
+      "counters": 3
+    },
+    "321": {
+      "id": "321",
+      "parent": "318",
+      "region": "Player4-Ready region",
+      "owner": "Player4",
+      "cardId": "101091",
+      "name": "Legendary Vampire",
+      "type": "MASTER",
+      "unique": true
+    },
+    "201": {
+      "id": "201",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101578",
+      "name": "Redirection",
+      "type": "NONE"
+    },
+    "322": {
+      "id": "322",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101091",
+      "name": "Legendary Vampire",
+      "type": "MASTER",
+      "unique": true
+    },
+    "443": {
+      "id": "443",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102165",
+      "name": "Web of Knives Recruit",
+      "type": "NONE"
+    },
+    "202": {
+      "id": "202",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100685",
+      "name": "Eyes of the Night",
+      "type": "NONE"
+    },
+    "323": {
+      "id": "323",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "444": {
+      "id": "444",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100885",
+      "name": "Haqim's Law: Leadership",
+      "type": "NONE"
+    },
+    "203": {
+      "id": "203",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100685",
+      "name": "Eyes of the Night",
+      "type": "NONE"
+    },
+    "324": {
+      "id": "324",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "445": {
+      "id": "445",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100885",
+      "name": "Haqim's Law: Leadership",
+      "type": "NONE"
+    },
+    "204": {
+      "id": "204",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100685",
+      "name": "Eyes of the Night",
+      "type": "NONE"
+    },
+    "325": {
+      "id": "325",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "446": {
+      "id": "446",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100885",
+      "name": "Haqim's Law: Leadership",
+      "type": "NONE"
+    },
+    "205": {
+      "id": "205",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101309",
+      "name": "Obedience",
+      "type": "NONE"
+    },
+    "326": {
+      "id": "326",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "447": {
+      "id": "447",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100885",
+      "name": "Haqim's Law: Leadership",
+      "type": "NONE"
+    },
+    "327": {
+      "id": "327",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100984",
+      "name": "Information Highway",
+      "type": "MASTER",
+      "unique": true
+    },
+    "448": {
+      "id": "448",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100885",
+      "name": "Haqim's Law: Leadership",
+      "type": "NONE"
+    },
+    "206": {
+      "id": "206",
+      "region": "Player3-Uncontrolled region",
+      "owner": "Player3",
+      "cardId": "200642",
+      "name": "Isabel de Leon",
+      "type": "VAMPIRE",
+      "capacity": 3,
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "AUS"
+      ]
+    },
+    "328": {
+      "id": "328",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101019",
+      "name": "Jake Washington",
+      "type": "MASTER",
+      "unique": true
+    },
+    "449": {
+      "id": "449",
+      "region": "Player5-Hand",
+      "owner": "Player5",
+      "cardId": "100885",
+      "name": "Haqim's Law: Leadership",
+      "type": "NONE"
+    },
+    "207": {
+      "id": "207",
+      "region": "Player3-Uncontrolled region",
+      "owner": "Player3",
+      "cardId": "200368",
+      "name": "Dorian Strack",
+      "type": "VAMPIRE",
+      "capacity": 4,
+      "counters": 2,
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "cel",
+        "AUS"
+      ]
+    },
+    "329": {
+      "id": "329",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101019",
+      "name": "Jake Washington",
+      "type": "MASTER",
+      "unique": true
+    },
+    "208": {
+      "id": "208",
+      "cards": [
+        "246",
+        "222"
+      ],
+      "region": "Player3-Ready region",
+      "owner": "Player3",
+      "cardId": "200788",
+      "name": "Klaus van der Veken",
+      "type": "VAMPIRE",
+      "capacity": 9,
+      "counters": 9,
+      "votes": "2",
+      "title": "prince",
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "obf",
+        "tha",
+        "CEL",
+        "PRE"
+      ]
+    },
+    "209": {
+      "id": "209",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200107",
+      "name": "Anson",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "2",
+      "title": "prince",
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "dom",
+        "CEL",
+        "PRE"
+      ]
+    },
+    "450": {
+      "id": "450",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "NONE"
+    },
+    "330": {
+      "id": "330",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101437",
+      "name": "Powerbase: Madrid",
+      "type": "MASTER",
+      "unique": true
+    },
+    "451": {
+      "id": "451",
+      "cards": [
+        "425"
+      ],
+      "region": "Player5-Ready region",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "NONE",
+      "capacity": 1,
+      "counters": 1
+    },
+    "331": {
+      "id": "331",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100588",
+      "name": "Dreams of the Sphinx",
+      "type": "MASTER",
+      "unique": true
+    },
+    "452": {
+      "id": "452",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "NONE"
+    },
+    "210": {
+      "id": "210",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200107",
+      "name": "Anson",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "2",
+      "title": "prince",
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "dom",
+        "CEL",
+        "PRE"
+      ]
+    },
+    "332": {
+      "id": "332",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101249",
+      "name": "Mr. Winthrop",
+      "type": "RETAINER",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true,
+      "unique": true
+    },
+    "453": {
+      "id": "453",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "NONE"
+    },
+    "211": {
+      "id": "211",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200330",
+      "name": "Delilah Easton",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pre"
+      ]
+    },
+    "333": {
+      "id": "333",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101943",
+      "name": "Tasha Morgan",
+      "type": "RETAINER",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true,
+      "unique": true
+    },
+    "454": {
+      "id": "454",
+      "region": "Player5-Hand",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "NONE"
+    },
+    "212": {
+      "id": "212",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200345",
+      "name": "Dieter Kleist",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus"
+      ]
+    },
+    "334": {
+      "id": "334",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101550",
+      "name": "Raven Spy",
+      "type": "RETAINER",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "455": {
+      "id": "455",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "NONE"
+    },
+    "213": {
+      "id": "213",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200910",
+      "name": "Marcellus",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "2",
+      "title": "prince",
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pro",
+        "AUS",
+        "CEL"
+      ]
+    },
+    "335": {
+      "id": "335",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101296",
+      "name": "Nose of the Hound",
+      "type": "NONE"
+    },
+    "456": {
+      "id": "456",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "NONE"
+    },
+    "214": {
+      "id": "214",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200478",
+      "name": "François Villon",
+      "type": "VAMPIRE",
+      "capacity": 10,
+      "votes": "2",
+      "title": "prince",
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "chi",
+        "obf",
+        "pot",
+        "AUS",
+        "CEL",
+        "PRE"
+      ]
+    },
+    "336": {
+      "id": "336",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101014",
+      "name": "Ivory Bow",
+      "type": "EQUIPMENT",
+      "unique": true
+    },
+    "457": {
+      "id": "457",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100633",
+      "name": "Embrace, The",
+      "type": "NONE"
+    },
+    "215": {
+      "id": "215",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200478",
+      "name": "François Villon",
+      "type": "VAMPIRE",
+      "capacity": 10,
+      "votes": "2",
+      "title": "prince",
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "chi",
+        "obf",
+        "pot",
+        "AUS",
+        "CEL",
+        "PRE"
+      ]
+    },
+    "337": {
+      "id": "337",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100324",
+      "name": "Changeling",
+      "type": "NONE"
+    },
+    "458": {
+      "id": "458",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102097",
+      "name": "Veil the Legions",
+      "type": "NONE"
+    },
+    "216": {
+      "id": "216",
+      "region": "Player3-Uncontrolled region",
+      "owner": "Player3",
+      "cardId": "200334",
+      "name": "Demetrius Slater",
+      "type": "VAMPIRE",
+      "capacity": 4,
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "cel",
+        "pre"
+      ]
+    },
+    "338": {
+      "id": "338",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100324",
+      "name": "Changeling",
+      "type": "NONE"
+    },
+    "459": {
+      "id": "459",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102097",
+      "name": "Veil the Legions",
+      "type": "NONE"
+    },
+    "217": {
+      "id": "217",
+      "region": "Player3-Crypt",
+      "owner": "Player3",
+      "cardId": "200924",
+      "name": "Mariana Gilbert",
+      "type": "VAMPIRE",
+      "capacity": 4,
+      "clan": "TOREADOR",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "cel",
+        "PRE"
+      ]
+    },
+    "339": {
+      "id": "339",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100324",
+      "name": "Changeling",
+      "type": "NONE"
+    },
+    "218": {
+      "id": "218",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100545",
+      "name": "Direct Intervention",
+      "type": "MASTER"
+    },
+    "219": {
+      "id": "219",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100545",
+      "name": "Direct Intervention",
+      "type": "MASTER"
+    },
+    "460": {
+      "id": "460",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102097",
+      "name": "Veil the Legions",
+      "type": "NONE"
+    },
+    "340": {
+      "id": "340",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100324",
+      "name": "Changeling",
+      "type": "NONE"
+    },
+    "461": {
+      "id": "461",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102097",
+      "name": "Veil the Legions",
+      "type": "NONE"
+    },
+    "341": {
+      "id": "341",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100324",
+      "name": "Changeling",
+      "type": "NONE"
+    },
+    "462": {
+      "id": "462",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "102097",
+      "name": "Veil the Legions",
+      "type": "NONE"
+    },
+    "220": {
+      "id": "220",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101219",
+      "name": "Minor Boon",
+      "type": "MASTER"
+    },
+    "342": {
+      "id": "342",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100290",
+      "name": "Canine Horde",
+      "type": "NONE"
+    },
+    "463": {
+      "id": "463",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101125",
+      "name": "Lost in Crowds",
+      "type": "NONE"
+    },
+    "221": {
+      "id": "221",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100085",
+      "name": "Archon Investigation",
+      "type": "MASTER"
+    },
+    "100": {
+      "id": "100",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100863",
+      "name": "Guard Dogs",
+      "type": "NONE"
+    },
+    "343": {
+      "id": "343",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100290",
+      "name": "Canine Horde",
+      "type": "NONE"
+    },
+    "464": {
+      "id": "464",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101125",
+      "name": "Lost in Crowds",
+      "type": "NONE"
+    },
+    "101": {
+      "id": "101",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100863",
+      "name": "Guard Dogs",
+      "type": "NONE"
+    },
+    "222": {
+      "id": "222",
+      "parent": "208",
+      "region": "Player3-Ready region",
+      "owner": "Player3",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "344": {
+      "id": "344",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100934",
+      "name": "Horrid Form",
+      "type": "NONE"
+    },
+    "465": {
+      "id": "465",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101125",
+      "name": "Lost in Crowds",
+      "type": "NONE"
+    },
+    "223": {
+      "id": "223",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "102": {
+      "id": "102",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100863",
+      "name": "Guard Dogs",
+      "type": "NONE"
+    },
+    "345": {
+      "id": "345",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100934",
+      "name": "Horrid Form",
+      "type": "NONE"
+    },
+    "466": {
+      "id": "466",
+      "region": "Player5-Hand",
+      "owner": "Player5",
+      "cardId": "101125",
+      "name": "Lost in Crowds",
+      "type": "NONE"
+    },
+    "224": {
+      "id": "224",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "103": {
+      "id": "103",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100863",
+      "name": "Guard Dogs",
+      "type": "NONE"
+    },
+    "104": {
+      "id": "104",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "200003",
+      "name": "Aaron Duggan, Cameron's Toady",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "obt"
+      ]
+    },
+    "346": {
+      "id": "346",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100934",
+      "name": "Horrid Form",
+      "type": "NONE"
+    },
+    "467": {
+      "id": "467",
+      "region": "Player5-Hand",
+      "owner": "Player5",
+      "cardId": "100362",
+      "name": "Cloak the Gathering",
+      "type": "NONE"
+    },
+    "225": {
+      "id": "225",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "105": {
+      "id": "105",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "200914",
+      "name": "Marconius",
+      "type": "VAMPIRE",
+      "capacity": 9,
+      "votes": "2",
+      "title": "archbishop",
+      "clan": "KIASYD",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pot",
+        "DOM",
+        "MYT",
+        "OBT"
+      ]
+    },
+    "347": {
+      "id": "347",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100934",
+      "name": "Horrid Form",
+      "type": "NONE"
+    },
+    "468": {
+      "id": "468",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100362",
+      "name": "Cloak the Gathering",
+      "type": "NONE"
+    },
+    "226": {
+      "id": "226",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "106": {
+      "id": "106",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "200914",
+      "name": "Marconius",
+      "type": "VAMPIRE",
+      "capacity": 9,
+      "votes": "2",
+      "title": "archbishop",
+      "clan": "KIASYD",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pot",
+        "DOM",
+        "MYT",
+        "OBT"
+      ]
+    },
+    "348": {
+      "id": "348",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100344",
+      "name": "Chiropteran Marauder",
+      "type": "NONE"
+    },
+    "469": {
+      "id": "469",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100362",
+      "name": "Cloak the Gathering",
+      "type": "NONE"
+    },
+    "227": {
+      "id": "227",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101654",
+      "name": "Rötschreck",
+      "type": "MASTER"
+    },
+    "107": {
+      "id": "107",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "200544",
+      "name": "Guido Lucciano",
+      "type": "VAMPIRE",
+      "capacity": 5,
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "dom",
+        "obf",
+        "OBT"
+      ]
+    },
+    "349": {
+      "id": "349",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100344",
+      "name": "Chiropteran Marauder",
+      "type": "NONE"
+    },
+    "228": {
+      "id": "228",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101654",
+      "name": "Rötschreck",
+      "type": "MASTER"
+    },
+    "108": {
+      "id": "108",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "200534",
+      "name": "Gratiano",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "P",
+      "title": "priscus",
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "obf",
+        "pot",
+        "DOM",
+        "OBT"
+      ]
+    },
+    "229": {
+      "id": "229",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101654",
+      "name": "Rötschreck",
+      "type": "MASTER"
+    },
+    "109": {
+      "id": "109",
+      "region": "Player2-Uncontrolled region",
+      "owner": "Player2",
+      "cardId": "200534",
+      "name": "Gratiano",
+      "type": "VAMPIRE",
+      "capacity": 8,
+      "votes": "P",
+      "title": "priscus",
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "obf",
+        "pot",
+        "DOM",
+        "OBT"
+      ]
+    },
+    "470": {
+      "id": "470",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100362",
+      "name": "Cloak the Gathering",
+      "type": "NONE"
+    },
+    "350": {
+      "id": "350",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100344",
+      "name": "Chiropteran Marauder",
+      "type": "NONE"
+    },
+    "471": {
+      "id": "471",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101491",
+      "name": "Procurer",
+      "type": "ALLY",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "351": {
+      "id": "351",
+      "region": "Player4-Hand",
+      "owner": "Player4",
+      "cardId": "100344",
+      "name": "Chiropteran Marauder",
+      "type": "NONE"
+    },
+    "472": {
+      "id": "472",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101491",
+      "name": "Procurer",
+      "type": "ALLY",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "230": {
+      "id": "230",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101654",
+      "name": "Rötschreck",
+      "type": "MASTER"
+    },
+    "110": {
+      "id": "110",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "201157",
+      "name": "Ramiro",
+      "type": "VAMPIRE",
+      "capacity": 4,
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "dom",
+        "obt",
+        "vic"
+      ]
+    },
+    "352": {
+      "id": "352",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100344",
+      "name": "Chiropteran Marauder",
+      "type": "NONE"
+    },
+    "473": {
+      "id": "473",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101491",
+      "name": "Procurer",
+      "type": "ALLY",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "231": {
+      "id": "231",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101654",
+      "name": "Rötschreck",
+      "type": "MASTER"
+    },
+    "111": {
+      "id": "111",
+      "region": "Player2-Ready region",
+      "owner": "Player2",
+      "cardId": "201337",
+      "name": "Talley, The Hound",
+      "type": "VAMPIRE",
+      "capacity": 6,
+      "counters": 6,
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "dom",
+        "OBT",
+        "POT"
+      ]
+    },
+    "353": {
+      "id": "353",
+      "region": "Player4-Hand",
+      "owner": "Player4",
+      "cardId": "100344",
+      "name": "Chiropteran Marauder",
+      "type": "NONE"
+    },
+    "474": {
+      "id": "474",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101491",
+      "name": "Procurer",
+      "type": "ALLY",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "232": {
+      "id": "232",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101654",
+      "name": "Rötschreck",
+      "type": "MASTER"
+    },
+    "112": {
+      "id": "112",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "200760",
+      "name": "Kassiym Malikhair",
+      "type": "VAMPIRE",
+      "capacity": 6,
+      "clan": "KIASYD",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "dom",
+        "for",
+        "MYT",
+        "OBT"
+      ]
+    },
+    "354": {
+      "id": "354",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100986",
+      "name": "Inner Essence",
+      "type": "NONE"
+    },
+    "475": {
+      "id": "475",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101491",
+      "name": "Procurer",
+      "type": "ALLY",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "233": {
+      "id": "233",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101145",
+      "name": "Major Boon",
+      "type": "MASTER"
+    },
+    "113": {
+      "id": "113",
+      "region": "Player2-Uncontrolled region",
+      "owner": "Player2",
+      "cardId": "201375",
+      "name": "Tobias Smith",
+      "type": "VAMPIRE",
+      "capacity": 7,
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "pot",
+        "DOM",
+        "OBT",
+        "PRE"
+      ]
+    },
+    "355": {
+      "id": "355",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100986",
+      "name": "Inner Essence",
+      "type": "NONE"
+    },
+    "476": {
+      "id": "476",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101491",
+      "name": "Procurer",
+      "type": "ALLY",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "234": {
+      "id": "234",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100698",
+      "name": "Fame",
+      "type": "MASTER",
+      "unique": true
+    },
+    "114": {
+      "id": "114",
+      "region": "Player2-Uncontrolled region",
+      "owner": "Player2",
+      "cardId": "200622",
+      "name": "Ignacio, The Black Priest",
+      "type": "VAMPIRE",
+      "capacity": 4,
+      "clan": "LASOMBRA",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "dom",
+        "obt",
+        "pot"
+      ]
+    },
+    "356": {
+      "id": "356",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100986",
+      "name": "Inner Essence",
+      "type": "NONE"
+    },
+    "477": {
+      "id": "477",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "235": {
+      "id": "235",
+      "region": "Player3-Hand",
+      "owner": "Player3",
+      "cardId": "101821",
+      "name": "Society Hunting Ground",
+      "type": "MASTER",
+      "unique": true
+    },
+    "115": {
+      "id": "115",
+      "region": "Player2-Crypt",
+      "owner": "Player2",
+      "cardId": "200734",
+      "name": "Julia Prima",
+      "type": "VAMPIRE",
+      "capacity": 7,
+      "clan": "KIASYD",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "aus",
+        "myt",
+        "DOM",
+        "OBT"
+      ]
+    },
+    "357": {
+      "id": "357",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100986",
+      "name": "Inner Essence",
+      "type": "NONE"
+    },
+    "478": {
+      "id": "478",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "236": {
+      "id": "236",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100095",
+      "name": "Art Museum",
+      "type": "MASTER",
+      "unique": true
+    },
+    "116": {
+      "id": "116",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101091",
+      "name": "Legendary Vampire",
+      "type": "MASTER",
+      "unique": true
+    },
+    "358": {
+      "id": "358",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100250",
+      "name": "Breath of the Dragon",
+      "type": "NONE"
+    },
+    "479": {
+      "id": "479",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "237": {
+      "id": "237",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101822",
+      "name": "Society of Leopold",
+      "type": "MASTER",
+      "unique": true
+    },
+    "117": {
+      "id": "117",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "102002",
+      "name": "Toy Chest Test",
+      "type": "MASTER"
+    },
+    "359": {
+      "id": "359",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100250",
+      "name": "Breath of the Dragon",
+      "type": "NONE"
+    },
+    "238": {
+      "id": "238",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101662",
+      "name": "Rumor Mill, Tabloid Newspaper, The",
+      "type": "MASTER",
+      "unique": true
+    },
+    "118": {
+      "id": "118",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "239": {
+      "id": "239",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100727",
+      "name": "Fifth Tradition: Hospitality",
+      "type": "NONE"
+    },
+    "119": {
+      "id": "119",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "10": {
+      "id": "10",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "201311",
+      "name": "Spleen, Georgio Gutterpunk",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "RAVNOS",
+      "sect": "INDEPENDENT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "chi"
+      ]
+    },
+    "11": {
+      "id": "11",
+      "cards": [
+        "14"
+      ],
+      "region": "Player1-Ready region",
+      "owner": "Player1",
+      "cardId": "201039",
+      "name": "Navar McClaren",
+      "locked": true,
+      "type": "VAMPIRE",
+      "capacity": 1,
+      "counters": 1,
+      "clan": "CAITIFF",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ANI"
+      ]
+    },
+    "12": {
+      "id": "12",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "200077",
+      "name": "Anastasia Grey",
+      "type": "VAMPIRE",
+      "capacity": 3,
+      "clan": "GANGREL",
+      "sect": "CAMARILLA",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "pro"
+      ]
+    },
+    "13": {
+      "id": "13",
+      "region": "Player1-Crypt",
+      "owner": "Player1",
+      "cardId": "201276",
+      "name": "Shannon Price, the Whisperer",
+      "type": "VAMPIRE",
+      "capacity": 3,
+      "clan": "NOSFERATU_ANTITRIBU",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani",
+        "obf"
+      ]
+    },
+    "14": {
+      "id": "14",
+      "parent": "11",
+      "region": "Player1-Ready region",
+      "owner": "Player1",
+      "cardId": "100070",
+      "name": "Animalism",
+      "type": "MASTER"
+    },
+    "15": {
+      "id": "15",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100070",
+      "name": "Animalism",
+      "type": "MASTER"
+    },
+    "16": {
+      "id": "16",
+      "parent": "418",
+      "region": "Player5-Uncontrolled region",
+      "owner": "Player1",
+      "cardId": "100245",
+      "name": "Brainwash",
+      "type": "MASTER"
+    },
+    "17": {
+      "id": "17",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100070",
+      "name": "Animalism",
+      "type": "MASTER"
+    },
+    "18": {
+      "id": "18",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100070",
+      "name": "Animalism",
+      "type": "MASTER"
+    },
+    "19": {
+      "id": "19",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100070",
+      "name": "Animalism",
+      "type": "MASTER"
+    },
+    "480": {
+      "id": "480",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "360": {
+      "id": "360",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101693",
+      "name": "Scorpion Sting",
+      "type": "NONE"
+    },
+    "481": {
+      "id": "481",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "361": {
+      "id": "361",
+      "region": "Player4-Hand",
+      "owner": "Player4",
+      "cardId": "101693",
+      "name": "Scorpion Sting",
+      "type": "NONE"
+    },
+    "482": {
+      "id": "482",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "240": {
+      "id": "240",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100727",
+      "name": "Fifth Tradition: Hospitality",
+      "type": "NONE"
+    },
+    "120": {
+      "id": "120",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "362": {
+      "id": "362",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "483": {
+      "id": "483",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "241": {
+      "id": "241",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101193",
+      "name": "Media Influence",
+      "type": "NONE"
+    },
+    "121": {
+      "id": "121",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "363": {
+      "id": "363",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "484": {
+      "id": "484",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "242": {
+      "id": "242",
+      "region": "Player3-Hand",
+      "owner": "Player3",
+      "cardId": "101193",
+      "name": "Media Influence",
+      "type": "NONE"
+    },
+    "122": {
+      "id": "122",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "364": {
+      "id": "364",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "485": {
+      "id": "485",
+      "region": "Player5-Hand",
+      "owner": "Player5",
+      "cardId": "100570",
+      "name": "Domain Challenge",
+      "type": "NONE"
+    },
+    "243": {
+      "id": "243",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "102179",
+      "name": "White Phosphorus Grenade",
+      "type": "EQUIPMENT"
+    },
+    "123": {
+      "id": "123",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "365": {
+      "id": "365",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "486": {
+      "id": "486",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100570",
+      "name": "Domain Challenge",
+      "type": "NONE"
+    },
+    "244": {
+      "id": "244",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "102179",
+      "name": "White Phosphorus Grenade",
+      "type": "EQUIPMENT"
+    },
+    "124": {
+      "id": "124",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100199",
+      "name": "Blood Doll",
+      "type": "MASTER"
+    },
+    "366": {
+      "id": "366",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "487": {
+      "id": "487",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "NONE"
+    },
+    "245": {
+      "id": "245",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101715",
+      "name": "Sengir Dagger",
+      "type": "EQUIPMENT",
+      "unique": true
+    },
+    "125": {
+      "id": "125",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100326",
+      "name": "Chanjelin Ward",
+      "type": "MASTER"
+    },
+    "367": {
+      "id": "367",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101196",
+      "name": "Meld with the Land",
+      "type": "NONE"
+    },
+    "488": {
+      "id": "488",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "NONE"
+    },
+    "246": {
+      "id": "246",
+      "parent": "208",
+      "region": "Player3-Ready region",
+      "owner": "Player3",
+      "cardId": "101014",
+      "name": "Ivory Bow",
+      "type": "EQUIPMENT",
+      "unique": true
+    },
+    "126": {
+      "id": "126",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100824",
+      "name": "Giant's Blood",
+      "type": "MASTER"
+    },
+    "368": {
+      "id": "368",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101196",
+      "name": "Meld with the Land",
+      "type": "NONE"
+    },
+    "489": {
+      "id": "489",
+      "region": "Player5-Hand",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "NONE"
+    },
+    "247": {
+      "id": "247",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101014",
+      "name": "Ivory Bow",
+      "type": "EQUIPMENT",
+      "unique": true
+    },
+    "127": {
+      "id": "127",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101067",
+      "name": "KRCG News Radio",
+      "type": "MASTER",
+      "unique": true
+    },
+    "369": {
+      "id": "369",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101196",
+      "name": "Meld with the Land",
+      "type": "NONE"
+    },
+    "248": {
+      "id": "248",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "102131",
+      "name": "Voter Captivation",
+      "type": "NONE"
+    },
+    "128": {
+      "id": "128",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100842",
+      "name": "Golconda: Inner Peace",
+      "type": "MASTER"
+    },
+    "249": {
+      "id": "249",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "102131",
+      "name": "Voter Captivation",
+      "type": "NONE"
+    },
+    "129": {
+      "id": "129",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100572",
+      "name": "Dominate",
+      "type": "MASTER"
+    },
+    "20": {
+      "id": "20",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100070",
+      "name": "Animalism",
+      "type": "MASTER"
+    },
+    "21": {
+      "id": "21",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100070",
+      "name": "Animalism",
+      "type": "MASTER"
+    },
+    "22": {
+      "id": "22",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100616",
+      "name": "Effective Management",
+      "type": "MASTER"
+    },
+    "23": {
+      "id": "23",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100616",
+      "name": "Effective Management",
+      "type": "MASTER"
+    },
+    "24": {
+      "id": "24",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100616",
+      "name": "Effective Management",
+      "type": "MASTER"
+    },
+    "25": {
+      "id": "25",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100616",
+      "name": "Effective Management",
+      "type": "MASTER"
+    },
+    "26": {
+      "id": "26",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100616",
+      "name": "Effective Management",
+      "type": "MASTER"
+    },
+    "27": {
+      "id": "27",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100515",
+      "name": "Deep Song",
+      "type": "NONE"
+    },
+    "28": {
+      "id": "28",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100515",
+      "name": "Deep Song",
+      "type": "NONE"
+    },
+    "29": {
+      "id": "29",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100515",
+      "name": "Deep Song",
+      "type": "NONE"
+    },
+    "490": {
+      "id": "490",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "NONE"
+    },
+    "370": {
+      "id": "370",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101196",
+      "name": "Meld with the Land",
+      "type": "NONE"
+    },
+    "491": {
+      "id": "491",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "NONE"
+    },
+    "371": {
+      "id": "371",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101196",
+      "name": "Meld with the Land",
+      "type": "NONE"
+    },
+    "492": {
+      "id": "492",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "NONE"
+    },
+    "250": {
+      "id": "250",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "102131",
+      "name": "Voter Captivation",
+      "type": "NONE"
+    },
+    "130": {
+      "id": "130",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100572",
+      "name": "Dominate",
+      "type": "MASTER"
+    },
+    "372": {
+      "id": "372",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101950",
+      "name": "Telepathic Tracking",
+      "type": "NONE"
+    },
+    "493": {
+      "id": "493",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "NONE"
+    },
+    "251": {
+      "id": "251",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "102131",
+      "name": "Voter Captivation",
+      "type": "NONE"
+    },
+    "131": {
+      "id": "131",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100572",
+      "name": "Dominate",
+      "type": "MASTER"
+    },
+    "373": {
+      "id": "373",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101950",
+      "name": "Telepathic Tracking",
+      "type": "NONE"
+    },
+    "494": {
+      "id": "494",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "NONE"
+    },
+    "252": {
+      "id": "252",
+      "region": "Player3-Hand",
+      "owner": "Player3",
+      "cardId": "100157",
+      "name": "Bewitching Oration",
+      "type": "NONE"
+    },
+    "132": {
+      "id": "132",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100588",
+      "name": "Dreams of the Sphinx",
+      "type": "MASTER",
+      "unique": true
+    },
+    "374": {
+      "id": "374",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101950",
+      "name": "Telepathic Tracking",
+      "type": "NONE"
+    },
+    "495": {
+      "id": "495",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100557",
+      "name": "Disputed Territory",
+      "type": "NONE"
+    },
+    "253": {
+      "id": "253",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100157",
+      "name": "Bewitching Oration",
+      "type": "NONE"
+    },
+    "133": {
+      "id": "133",
+      "region": "Player2-Ready region",
+      "owner": "Player2",
+      "cardId": "100908",
+      "name": "Heidelberg Castle, Germany",
+      "type": "MASTER",
+      "unique": true
+    },
+    "375": {
+      "id": "375",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "102144",
+      "name": "War Ghoul",
+      "type": "ALLY",
+      "clan": "TZIMISCE",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "496": {
+      "id": "496",
+      "region": "Player5-Library",
+      "owner": "Player5",
+      "cardId": "100557",
+      "name": "Disputed Territory",
+      "type": "NONE"
+    },
+    "254": {
+      "id": "254",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100157",
+      "name": "Bewitching Oration",
+      "type": "NONE"
+    },
+    "134": {
+      "id": "134",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101710",
+      "name": "Secret Passage",
+      "type": "MASTER"
+    },
+    "376": {
+      "id": "376",
+      "region": "Player4-Ready region",
+      "owner": "Player4",
+      "cardId": "102144",
+      "name": "War Ghoul",
+      "type": "ALLY",
+      "counters": 5,
+      "clan": "TZIMISCE",
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true
+    },
+    "255": {
+      "id": "255",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101692",
+      "name": "Scorn of Adonis",
+      "type": "NONE"
+    },
+    "135": {
+      "id": "135",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101710",
+      "name": "Secret Passage",
+      "type": "MASTER"
+    },
+    "377": {
+      "id": "377",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "256": {
+      "id": "256",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100031",
+      "name": "Aire of Elation",
+      "type": "NONE"
+    },
+    "136": {
+      "id": "136",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101634",
+      "name": "Riddle Phantastique",
+      "type": "NONE"
+    },
+    "378": {
+      "id": "378",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "257": {
+      "id": "257",
+      "region": "Player3-Hand",
+      "owner": "Player3",
+      "cardId": "100031",
+      "name": "Aire of Elation",
+      "type": "NONE"
+    },
+    "137": {
+      "id": "137",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101634",
+      "name": "Riddle Phantastique",
+      "type": "NONE"
+    },
+    "379": {
+      "id": "379",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101417",
+      "name": "Political Stranglehold",
+      "type": "NONE"
+    },
+    "258": {
+      "id": "258",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100031",
+      "name": "Aire of Elation",
+      "type": "NONE"
+    },
+    "138": {
+      "id": "138",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101698",
+      "name": "Scouting Mission",
+      "type": "NONE"
+    },
+    "259": {
+      "id": "259",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101779",
+      "name": "Sideslip",
+      "type": "NONE"
+    },
+    "139": {
+      "id": "139",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101698",
+      "name": "Scouting Mission",
+      "type": "NONE"
+    },
+    "30": {
+      "id": "30",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100515",
+      "name": "Deep Song",
+      "type": "NONE"
+    },
+    "31": {
+      "id": "31",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100515",
+      "name": "Deep Song",
+      "type": "NONE"
+    },
+    "32": {
+      "id": "32",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100515",
+      "name": "Deep Song",
+      "type": "NONE"
+    },
+    "33": {
+      "id": "33",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100515",
+      "name": "Deep Song",
+      "type": "NONE"
+    },
+    "34": {
+      "id": "34",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100515",
+      "name": "Deep Song",
+      "type": "NONE"
+    },
+    "35": {
+      "id": "35",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100515",
+      "name": "Deep Song",
+      "type": "NONE"
+    },
+    "36": {
+      "id": "36",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100515",
+      "name": "Deep Song",
+      "type": "NONE"
+    },
+    "37": {
+      "id": "37",
+      "region": "Player1-Ready region",
+      "owner": "Player1",
+      "cardId": "100298",
+      "name": "Carlton Van Wyk",
+      "locked": true,
+      "type": "ALLY",
+      "counters": 2,
+      "sect": "NONE",
+      "path": "NONE",
+      "minion": true,
+      "unique": true
+    },
+    "38": {
+      "id": "38",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101827",
+      "name": "Song of Serenity",
+      "type": "NONE"
+    },
+    "39": {
+      "id": "39",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101827",
+      "name": "Song of Serenity",
+      "type": "NONE"
+    },
+    "380": {
+      "id": "380",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100557",
+      "name": "Disputed Territory",
+      "type": "NONE"
+    },
+    "381": {
+      "id": "381",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100557",
+      "name": "Disputed Territory",
+      "type": "NONE"
+    },
+    "260": {
+      "id": "260",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101779",
+      "name": "Sideslip",
+      "type": "NONE"
+    },
+    "140": {
+      "id": "140",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101746",
+      "name": "Shadow Twin",
+      "type": "NONE"
+    },
+    "382": {
+      "id": "382",
+      "region": "Player4-Hand",
+      "owner": "Player4",
+      "cardId": "101402",
+      "name": "Plasmic Form",
+      "type": "NONE"
+    },
+    "261": {
+      "id": "261",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100020",
+      "name": "Acrobatics",
+      "type": "NONE"
+    },
+    "141": {
+      "id": "141",
+      "region": "Player2-Hand",
+      "owner": "Player2",
+      "cardId": "100852",
+      "name": "Graverobbing",
+      "type": "NONE"
+    },
+    "383": {
+      "id": "383",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101402",
+      "name": "Plasmic Form",
+      "type": "NONE"
+    },
+    "262": {
+      "id": "262",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100020",
+      "name": "Acrobatics",
+      "type": "NONE"
+    },
+    "142": {
+      "id": "142",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100852",
+      "name": "Graverobbing",
+      "type": "NONE"
+    },
+    "384": {
+      "id": "384",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101402",
+      "name": "Plasmic Form",
+      "type": "NONE"
+    },
+    "263": {
+      "id": "263",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100020",
+      "name": "Acrobatics",
+      "type": "NONE"
+    },
+    "143": {
+      "id": "143",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101801",
+      "name": "Slaughtering the Herd",
+      "type": "NONE"
+    },
+    "385": {
+      "id": "385",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101402",
+      "name": "Plasmic Form",
+      "type": "NONE"
+    },
+    "264": {
+      "id": "264",
+      "region": "Player3-Hand",
+      "owner": "Player3",
+      "cardId": "100020",
+      "name": "Acrobatics",
+      "type": "NONE"
+    },
+    "144": {
+      "id": "144",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101801",
+      "name": "Slaughtering the Herd",
+      "type": "NONE"
+    },
+    "386": {
+      "id": "386",
+      "region": "Player4-Hand",
+      "owner": "Player4",
+      "cardId": "101402",
+      "name": "Plasmic Form",
+      "type": "NONE"
+    },
+    "265": {
+      "id": "265",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100020",
+      "name": "Acrobatics",
+      "type": "NONE"
+    },
+    "145": {
+      "id": "145",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101801",
+      "name": "Slaughtering the Herd",
+      "type": "NONE"
+    },
+    "387": {
+      "id": "387",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101475",
+      "name": "Precognition",
+      "type": "NONE"
+    },
+    "266": {
+      "id": "266",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101144",
+      "name": "Majesty",
+      "type": "NONE"
+    },
+    "146": {
+      "id": "146",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101801",
+      "name": "Slaughtering the Herd",
+      "type": "NONE"
+    },
+    "388": {
+      "id": "388",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101559",
+      "name": "Read the Winds",
+      "type": "NONE"
+    },
+    "267": {
+      "id": "267",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101144",
+      "name": "Majesty",
+      "type": "NONE"
+    },
+    "147": {
+      "id": "147",
+      "region": "Player2-Hand",
+      "owner": "Player2",
+      "cardId": "100573",
+      "name": "Dominate Kine",
+      "type": "NONE"
+    },
+    "389": {
+      "id": "389",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101559",
+      "name": "Read the Winds",
+      "type": "NONE"
+    },
+    "268": {
+      "id": "268",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101144",
+      "name": "Majesty",
+      "type": "NONE"
+    },
+    "148": {
+      "id": "148",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100573",
+      "name": "Dominate Kine",
+      "type": "NONE"
+    },
+    "269": {
+      "id": "269",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101144",
+      "name": "Majesty",
+      "type": "NONE"
+    },
+    "149": {
+      "id": "149",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100573",
+      "name": "Dominate Kine",
+      "type": "NONE"
+    },
+    "40": {
+      "id": "40",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101827",
+      "name": "Song of Serenity",
+      "type": "NONE"
+    },
+    "41": {
+      "id": "41",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101827",
+      "name": "Song of Serenity",
+      "type": "NONE"
+    },
+    "42": {
+      "id": "42",
+      "region": "Player1-Hand",
+      "owner": "Player1",
+      "cardId": "101827",
+      "name": "Song of Serenity",
+      "type": "NONE"
+    },
+    "43": {
+      "id": "43",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101827",
+      "name": "Song of Serenity",
+      "type": "NONE"
+    },
+    "44": {
+      "id": "44",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101827",
+      "name": "Song of Serenity",
+      "type": "NONE"
+    },
+    "45": {
+      "id": "45",
+      "region": "Player1-Hand",
+      "owner": "Player1",
+      "cardId": "101827",
+      "name": "Song of Serenity",
+      "type": "NONE"
+    },
+    "46": {
+      "id": "46",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101827",
+      "name": "Song of Serenity",
+      "type": "NONE"
+    },
+    "47": {
+      "id": "47",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100290",
+      "name": "Canine Horde",
+      "type": "NONE"
+    },
+    "48": {
+      "id": "48",
+      "region": "Player1-Hand",
+      "owner": "Player1",
+      "cardId": "100290",
+      "name": "Canine Horde",
+      "type": "NONE"
+    },
+    "49": {
+      "id": "49",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100585",
+      "name": "Drawing Out the Beast",
+      "type": "NONE"
+    },
+    "390": {
+      "id": "390",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101559",
+      "name": "Read the Winds",
+      "type": "NONE"
+    },
+    "391": {
+      "id": "391",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101559",
+      "name": "Read the Winds",
+      "type": "NONE"
+    },
+    "270": {
+      "id": "270",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101144",
+      "name": "Majesty",
+      "type": "NONE"
+    },
+    "150": {
+      "id": "150",
+      "region": "Player2-Hand",
+      "owner": "Player2",
+      "cardId": "100573",
+      "name": "Dominate Kine",
+      "type": "NONE"
+    },
+    "392": {
+      "id": "392",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100598",
+      "name": "Eagle's Sight",
+      "type": "NONE"
+    },
+    "271": {
+      "id": "271",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101144",
+      "name": "Majesty",
+      "type": "NONE"
+    },
+    "151": {
+      "id": "151",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100573",
+      "name": "Dominate Kine",
+      "type": "NONE"
+    },
+    "393": {
+      "id": "393",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "100598",
+      "name": "Eagle's Sight",
+      "type": "NONE"
+    },
+    "272": {
+      "id": "272",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100043",
+      "name": "Amaranth",
+      "type": "NONE"
+    },
+    "152": {
+      "id": "152",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100573",
+      "name": "Dominate Kine",
+      "type": "NONE"
+    },
+    "394": {
+      "id": "394",
+      "region": "Player4-Hand",
+      "owner": "Player4",
+      "cardId": "100598",
+      "name": "Eagle's Sight",
+      "type": "NONE"
+    },
+    "273": {
+      "id": "273",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100043",
+      "name": "Amaranth",
+      "type": "NONE"
+    },
+    "153": {
+      "id": "153",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100703",
+      "name": "Far Mastery",
+      "type": "NONE"
+    },
+    "395": {
+      "id": "395",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "NONE"
+    },
+    "274": {
+      "id": "274",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101473",
+      "name": "Praxis Solomon",
+      "type": "NONE"
+    },
+    "154": {
+      "id": "154",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100703",
+      "name": "Far Mastery",
+      "type": "NONE"
+    },
+    "396": {
+      "id": "396",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "NONE"
+    },
+    "275": {
+      "id": "275",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "155": {
+      "id": "155",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101215",
+      "name": "Puppet Master",
+      "type": "NONE"
+    },
+    "397": {
+      "id": "397",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "NONE"
+    },
+    "276": {
+      "id": "276",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "156": {
+      "id": "156",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101215",
+      "name": "Puppet Master",
+      "type": "NONE"
+    },
+    "398": {
+      "id": "398",
+      "region": "Player4-Hand",
+      "owner": "Player4",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "NONE"
+    },
+    "277": {
+      "id": "277",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "157": {
+      "id": "157",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101215",
+      "name": "Puppet Master",
+      "type": "NONE"
+    },
+    "399": {
+      "id": "399",
+      "region": "Player4-Library",
+      "owner": "Player4",
+      "cardId": "101259",
+      "name": "My Enemy's Enemy",
+      "type": "NONE"
+    },
+    "278": {
+      "id": "278",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "158": {
+      "id": "158",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101215",
+      "name": "Puppet Master",
+      "type": "NONE"
+    },
+    "279": {
+      "id": "279",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "159": {
+      "id": "159",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101081",
+      "name": "Leather Jacket",
+      "type": "EQUIPMENT"
+    },
+    "50": {
+      "id": "50",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100585",
+      "name": "Drawing Out the Beast",
+      "type": "NONE"
+    },
+    "51": {
+      "id": "51",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100585",
+      "name": "Drawing Out the Beast",
+      "type": "NONE"
+    },
+    "52": {
+      "id": "52",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100585",
+      "name": "Drawing Out the Beast",
+      "type": "NONE"
+    },
+    "53": {
+      "id": "53",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100585",
+      "name": "Drawing Out the Beast",
+      "type": "NONE"
+    },
+    "54": {
+      "id": "54",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100029",
+      "name": "Aid from Bats",
+      "type": "NONE"
+    },
+    "55": {
+      "id": "55",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100029",
+      "name": "Aid from Bats",
+      "type": "NONE"
+    },
+    "56": {
+      "id": "56",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100029",
+      "name": "Aid from Bats",
+      "type": "NONE"
+    },
+    "57": {
+      "id": "57",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100029",
+      "name": "Aid from Bats",
+      "type": "NONE"
+    },
+    "58": {
+      "id": "58",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100029",
+      "name": "Aid from Bats",
+      "type": "NONE"
+    },
+    "59": {
+      "id": "59",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100029",
+      "name": "Aid from Bats",
+      "type": "NONE"
+    },
+    "280": {
+      "id": "280",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "160": {
+      "id": "160",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100177",
+      "name": "Blanket of Night",
+      "type": "NONE"
+    },
+    "281": {
+      "id": "281",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100131",
+      "name": "Banishment",
+      "type": "NONE"
+    },
+    "161": {
+      "id": "161",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100177",
+      "name": "Blanket of Night",
+      "type": "NONE"
+    },
+    "282": {
+      "id": "282",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100131",
+      "name": "Banishment",
+      "type": "NONE"
+    },
+    "162": {
+      "id": "162",
+      "region": "Player2-Hand",
+      "owner": "Player2",
+      "cardId": "100401",
+      "name": "Conditioning",
+      "type": "NONE"
+    },
+    "283": {
+      "id": "283",
+      "region": "Player3-Hand",
+      "owner": "Player3",
+      "cardId": "102004",
+      "name": "Tradition Upheld",
+      "type": "NONE"
+    },
+    "163": {
+      "id": "163",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101875",
+      "name": "Stone Travel",
+      "type": "NONE"
+    },
+    "284": {
+      "id": "284",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101990",
+      "name": "Toreador Justicar",
+      "type": "NONE"
+    },
+    "164": {
+      "id": "164",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101743",
+      "name": "Shadow Play",
+      "type": "NONE"
+    },
+    "285": {
+      "id": "285",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101467",
+      "name": "Praxis Seizure: Paris",
+      "type": "NONE"
+    },
+    "165": {
+      "id": "165",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101743",
+      "name": "Shadow Play",
+      "type": "NONE"
+    },
+    "286": {
+      "id": "286",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101451",
+      "name": "Praxis Seizure: Berlin",
+      "type": "NONE"
+    },
+    "166": {
+      "id": "166",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101743",
+      "name": "Shadow Play",
+      "type": "NONE"
+    },
+    "287": {
+      "id": "287",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "NONE"
+    },
+    "167": {
+      "id": "167",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101775",
+      "name": "Shroud of Night",
+      "type": "NONE"
+    },
+    "288": {
+      "id": "288",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100410",
+      "name": "Consanguineous Boon",
+      "type": "NONE"
+    },
+    "168": {
+      "id": "168",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101775",
+      "name": "Shroud of Night",
+      "type": "NONE"
+    },
+    "289": {
+      "id": "289",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100557",
+      "name": "Disputed Territory",
+      "type": "NONE"
+    },
+    "169": {
+      "id": "169",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100111",
+      "name": "Aura Absorption",
+      "type": "NONE"
+    },
+    "60": {
+      "id": "60",
+      "region": "Player1-Hand",
+      "owner": "Player1",
+      "cardId": "100029",
+      "name": "Aid from Bats",
+      "type": "NONE"
+    },
+    "61": {
+      "id": "61",
+      "region": "Player1-Hand",
+      "owner": "Player1",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "62": {
+      "id": "62",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "63": {
+      "id": "63",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "64": {
+      "id": "64",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "65": {
+      "id": "65",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "66": {
+      "id": "66",
+      "region": "Player1-Ash heap",
+      "owner": "Player1",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "67": {
+      "id": "67",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "68": {
+      "id": "68",
+      "region": "Player1-Hand",
+      "owner": "Player1",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "69": {
+      "id": "69",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "290": {
+      "id": "290",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101468",
+      "name": "Praxis Seizure: Rome",
+      "type": "NONE"
+    },
+    "170": {
+      "id": "170",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100111",
+      "name": "Aura Absorption",
+      "type": "NONE"
+    },
+    "291": {
+      "id": "291",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101471",
+      "name": "Praxis Seizure: Venice",
+      "type": "NONE"
+    },
+    "171": {
+      "id": "171",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101735",
+      "name": "Shadow Body",
+      "type": "NONE"
+    },
+    "292": {
+      "id": "292",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101470",
+      "name": "Praxis Seizure: Stockholm",
+      "type": "NONE"
+    },
+    "172": {
+      "id": "172",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101735",
+      "name": "Shadow Body",
+      "type": "NONE"
+    },
+    "293": {
+      "id": "293",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "100644",
+      "name": "Enhanced Senses",
+      "type": "NONE"
+    },
+    "173": {
+      "id": "173",
+      "region": "Player2-Hand",
+      "owner": "Player2",
+      "cardId": "101735",
+      "name": "Shadow Body",
+      "type": "NONE"
+    },
+    "294": {
+      "id": "294",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101259",
+      "name": "My Enemy's Enemy",
+      "type": "NONE"
+    },
+    "174": {
+      "id": "174",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101735",
+      "name": "Shadow Body",
+      "type": "NONE"
+    },
+    "295": {
+      "id": "295",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "NONE"
+    },
+    "175": {
+      "id": "175",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101735",
+      "name": "Shadow Body",
+      "type": "NONE"
+    },
+    "296": {
+      "id": "296",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "NONE"
+    },
+    "176": {
+      "id": "176",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100091",
+      "name": "Arms of the Abyss",
+      "type": "NONE"
+    },
+    "297": {
+      "id": "297",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "NONE"
+    },
+    "177": {
+      "id": "177",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100091",
+      "name": "Arms of the Abyss",
+      "type": "NONE"
+    },
+    "298": {
+      "id": "298",
+      "region": "Player3-Library",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "NONE"
+    },
+    "178": {
+      "id": "178",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100651",
+      "name": "Entombment",
+      "type": "NONE"
+    },
+    "299": {
+      "id": "299",
+      "region": "Player3-Hand",
+      "owner": "Player3",
+      "cardId": "101706",
+      "name": "Second Tradition: Domain",
+      "type": "NONE"
+    },
+    "179": {
+      "id": "179",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100602",
+      "name": "Earth Swords",
+      "type": "NONE"
+    },
+    "70": {
+      "id": "70",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "71": {
+      "id": "71",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "72": {
+      "id": "72",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "73": {
+      "id": "73",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "74": {
+      "id": "74",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100301",
+      "name": "Carrion Crows",
+      "type": "NONE"
+    },
+    "75": {
+      "id": "75",
+      "region": "Player1-Ash heap",
+      "owner": "Player1",
+      "cardId": "101693",
+      "name": "Scorpion Sting",
+      "type": "NONE"
+    },
+    "76": {
+      "id": "76",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101693",
+      "name": "Scorpion Sting",
+      "type": "NONE"
+    },
+    "77": {
+      "id": "77",
+      "region": "Player1-Hand",
+      "owner": "Player1",
+      "cardId": "101693",
+      "name": "Scorpion Sting",
+      "type": "NONE"
+    },
+    "78": {
+      "id": "78",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101693",
+      "name": "Scorpion Sting",
+      "type": "NONE"
+    },
+    "79": {
+      "id": "79",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101693",
+      "name": "Scorpion Sting",
+      "type": "NONE"
+    },
+    "180": {
+      "id": "180",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100013",
+      "name": "Absorb the Mind",
+      "type": "NONE"
+    },
+    "181": {
+      "id": "181",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100013",
+      "name": "Absorb the Mind",
+      "type": "NONE"
+    },
+    "182": {
+      "id": "182",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "183": {
+      "id": "183",
+      "region": "Player2-Hand",
+      "owner": "Player2",
+      "cardId": "101056",
+      "name": "Kine Resources Contested",
+      "type": "NONE"
+    },
+    "184": {
+      "id": "184",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100518",
+      "name": "Deflection",
+      "type": "NONE"
+    },
+    "185": {
+      "id": "185",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100518",
+      "name": "Deflection",
+      "type": "NONE"
+    },
+    "186": {
+      "id": "186",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100518",
+      "name": "Deflection",
+      "type": "NONE"
+    },
+    "187": {
+      "id": "187",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100518",
+      "name": "Deflection",
+      "type": "NONE"
+    },
+    "188": {
+      "id": "188",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100518",
+      "name": "Deflection",
+      "type": "NONE"
+    },
+    "189": {
+      "id": "189",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "NONE"
+    },
+    "80": {
+      "id": "80",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102012",
+      "name": "Trap",
+      "type": "NONE"
+    },
+    "81": {
+      "id": "81",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102012",
+      "name": "Trap",
+      "type": "NONE"
+    },
+    "82": {
+      "id": "82",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102012",
+      "name": "Trap",
+      "type": "NONE"
+    },
+    "83": {
+      "id": "83",
+      "region": "Player1-Ash heap",
+      "owner": "Player1",
+      "cardId": "102012",
+      "name": "Trap",
+      "type": "NONE"
+    },
+    "84": {
+      "id": "84",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102012",
+      "name": "Trap",
+      "type": "NONE"
+    },
+    "85": {
+      "id": "85",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102012",
+      "name": "Trap",
+      "type": "NONE"
+    },
+    "86": {
+      "id": "86",
+      "region": "Player1-Ash heap",
+      "owner": "Player1",
+      "cardId": "102012",
+      "name": "Trap",
+      "type": "NONE"
+    },
+    "87": {
+      "id": "87",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102012",
+      "name": "Trap",
+      "type": "NONE"
+    },
+    "88": {
+      "id": "88",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102012",
+      "name": "Trap",
+      "type": "NONE"
+    },
+    "89": {
+      "id": "89",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102012",
+      "name": "Trap",
+      "type": "NONE"
+    },
+    "190": {
+      "id": "190",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "NONE"
+    },
+    "191": {
+      "id": "191",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "NONE"
+    },
+    "192": {
+      "id": "192",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "NONE"
+    },
+    "193": {
+      "id": "193",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "NONE"
+    },
+    "194": {
+      "id": "194",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "102137",
+      "name": "Wake with Evening's Freshness",
+      "type": "NONE"
+    },
+    "195": {
+      "id": "195",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100760",
+      "name": "Forced Awakening",
+      "type": "NONE"
+    },
+    "196": {
+      "id": "196",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "100760",
+      "name": "Forced Awakening",
+      "type": "NONE"
+    },
+    "198": {
+      "id": "198",
+      "region": "Player2-Library",
+      "owner": "Player2",
+      "cardId": "101578",
+      "name": "Redirection",
+      "type": "NONE"
+    },
+    "199": {
+      "id": "199",
+      "region": "Player2-Hand",
+      "owner": "Player2",
+      "cardId": "101578",
+      "name": "Redirection",
+      "type": "NONE"
+    },
+    "90": {
+      "id": "90",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102012",
+      "name": "Trap",
+      "type": "NONE"
+    },
+    "91": {
+      "id": "91",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102012",
+      "name": "Trap",
+      "type": "NONE"
+    },
+    "92": {
+      "id": "92",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102012",
+      "name": "Trap",
+      "type": "NONE"
+    },
+    "93": {
+      "id": "93",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "102012",
+      "name": "Trap",
+      "type": "NONE"
+    },
+    "94": {
+      "id": "94",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100308",
+      "name": "Cats' Guidance",
+      "type": "NONE"
+    },
+    "95": {
+      "id": "95",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100308",
+      "name": "Cats' Guidance",
+      "type": "NONE"
+    },
+    "96": {
+      "id": "96",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "100308",
+      "name": "Cats' Guidance",
+      "type": "NONE"
+    },
+    "97": {
+      "id": "97",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101547",
+      "name": "Rat's Warning",
+      "type": "NONE"
+    },
+    "98": {
+      "id": "98",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101547",
+      "name": "Rat's Warning",
+      "type": "NONE"
+    },
+    "99": {
+      "id": "99",
+      "region": "Player1-Library",
+      "owner": "Player1",
+      "cardId": "101547",
+      "name": "Rat's Warning",
+      "type": "NONE"
+    },
+    "9999": {
+      "id": "9999",
+      "region": "Player5-Uncontrolled region",
+      "owner": "Player5",
+      "cardId": "200315",
+      "name": "Dani",
+      "type": "VAMPIRE",
+      "capacity": 2,
+      "clan": "NOSFERATU_ANTITRIBU",
+      "sect": "SABBAT",
+      "path": "NONE",
+      "minion": true,
+      "unique": true,
+      "disciplines": [
+        "ani"
+      ]
+    }
+  },
+  "players": {
+    "Player5": {
+      "name": "Player5",
+      "pool": 23,
+      "victoryPoints": 0.0,
+      "prey": "Player3",
+      "predator": "Player4",
+      "regions": {
+        "UNCONTROLLED": {
+          "id": "Player5-Uncontrolled region",
+          "cards": [
+            "418",
+            "413",
+            "420",
+            "442",
+            "9999"
+          ],
+          "player": "Player5",
+          "type": "UNCONTROLLED"
+        },
+        "CRYPT": {
+          "id": "Player5-Crypt",
+          "cards": [
+            "412",
+            "411",
+            "414",
+            "417",
+            "416",
+            "410",
+            "421",
+            "419"
+          ],
+          "player": "Player5",
+          "type": "CRYPT"
+        },
+        "LIBRARY": {
+          "id": "Player5-Library",
+          "cards": [
+            "426",
+            "441",
+            "437",
+            "481",
+            "460",
+            "438",
+            "468",
+            "490",
+            "492",
+            "459",
+            "494",
+            "469",
+            "433",
+            "439",
+            "496",
+            "448",
+            "465",
+            "435",
+            "482",
+            "423",
+            "473",
+            "493",
+            "472",
+            "453",
+            "491",
+            "477",
+            "480",
+            "447",
+            "461",
+            "427",
+            "487",
+            "483",
+            "452",
+            "475",
+            "455",
+            "471",
+            "431",
+            "432",
+            "446",
+            "429",
+            "456",
+            "445",
+            "444",
+            "463",
+            "436",
+            "434",
+            "457",
+            "479",
+            "458",
+            "478",
+            "443",
+            "428",
+            "488",
+            "470",
+            "440",
+            "462",
+            "476",
+            "484",
+            "474",
+            "464",
+            "486",
+            "450",
+            "422",
+            "495"
+          ],
+          "player": "Player5",
+          "type": "LIBRARY"
+        },
+        "HAND": {
+          "id": "Player5-Hand",
+          "cards": [
+            "489",
+            "466",
+            "485",
+            "454",
+            "430",
+            "467",
+            "449"
+          ],
+          "player": "Player5",
+          "type": "HAND"
+        },
+        "TORPOR": {
+          "id": "Player5-Torpor",
+          "player": "Player5",
+          "type": "TORPOR"
+        },
+        "REMOVED_FROM_GAME": {
+          "id": "Player5-Removed from Game",
+          "player": "Player5",
+          "type": "REMOVED_FROM_GAME"
+        },
+        "READY": {
+          "id": "Player5-Ready region",
+          "cards": [
+            "415",
+            "451",
+            "424"
+          ],
+          "player": "Player5",
+          "type": "READY"
+        },
+        "RESEARCH": {
+          "id": "Player5-Research Area",
+          "player": "Player5",
+          "type": "RESEARCH"
+        },
+        "ASH_HEAP": {
+          "id": "Player5-Ash heap",
+          "player": "Player5",
+          "type": "ASH_HEAP"
+        }
+      },
+      "ousted": false
+    },
+    "Player2": {
+      "name": "Player2",
+      "pool": 30,
+      "victoryPoints": 0.0,
+      "prey": "Player4",
+      "predator": "Player1",
+      "regions": {
+        "UNCONTROLLED": {
+          "id": "Player2-Uncontrolled region",
+          "cards": [
+            "114",
+            "113",
+            "109"
+          ],
+          "player": "Player2",
+          "type": "UNCONTROLLED"
+        },
+        "CRYPT": {
+          "id": "Player2-Crypt",
+          "cards": [
+            "105",
+            "115",
+            "104",
+            "112",
+            "106",
+            "110",
+            "108",
+            "107"
+          ],
+          "player": "Player2",
+          "type": "CRYPT"
+        },
+        "LIBRARY": {
+          "id": "Player2-Library",
+          "cards": [
+            "143",
+            "176",
+            "188",
+            "154",
+            "172",
+            "202",
+            "140",
+            "145",
+            "135",
+            "124",
+            "119",
+            "158",
+            "185",
+            "151",
+            "146",
+            "116",
+            "186",
+            "198",
+            "156",
+            "187",
+            "171",
+            "193",
+            "123",
+            "138",
+            "144",
+            "169",
+            "120",
+            "174",
+            "178",
+            "163",
+            "126",
+            "179",
+            "130",
+            "189",
+            "203",
+            "160",
+            "164",
+            "127",
+            "191",
+            "165",
+            "122",
+            "159",
+            "136",
+            "152",
+            "153",
+            "201",
+            "132",
+            "190",
+            "170",
+            "182",
+            "184",
+            "155",
+            "139",
+            "129",
+            "131",
+            "128",
+            "125",
+            "168",
+            "142",
+            "157",
+            "118",
+            "137",
+            "195",
+            "117",
+            "192",
+            "180",
+            "204",
+            "177",
+            "205",
+            "200",
+            "196",
+            "161",
+            "194",
+            "175",
+            "166",
+            "134",
+            "149",
+            "148",
+            "181",
+            "167",
+            "121"
+          ],
+          "player": "Player2",
+          "type": "LIBRARY"
+        },
+        "HAND": {
+          "id": "Player2-Hand",
+          "cards": [
+            "141",
+            "183",
+            "173",
+            "150",
+            "199",
+            "147",
+            "162"
+          ],
+          "player": "Player2",
+          "type": "HAND"
+        },
+        "TORPOR": {
+          "id": "Player2-Torpor",
+          "player": "Player2",
+          "type": "TORPOR"
+        },
+        "REMOVED_FROM_GAME": {
+          "id": "Player2-Removed from Game",
+          "player": "Player2",
+          "type": "REMOVED_FROM_GAME"
+        },
+        "READY": {
+          "id": "Player2-Ready region",
+          "cards": [
+            "111",
+            "133"
+          ],
+          "player": "Player2",
+          "type": "READY"
+        },
+        "RESEARCH": {
+          "id": "Player2-Research Area",
+          "player": "Player2",
+          "type": "RESEARCH"
+        },
+        "ASH_HEAP": {
+          "id": "Player2-Ash heap",
+          "player": "Player2",
+          "type": "ASH_HEAP"
+        }
+      },
+      "ousted": false
+    },
+    "Player1": {
+      "name": "Player1",
+      "pool": 29,
+      "victoryPoints": 0.0,
+      "prey": "Player2",
+      "predator": "Player3",
+      "regions": {
+        "UNCONTROLLED": {
+          "id": "Player1-Uncontrolled region",
+          "cards": [
+            "4",
+            "8"
+          ],
+          "player": "Player1",
+          "type": "UNCONTROLLED"
+        },
+        "CRYPT": {
+          "id": "Player1-Crypt",
+          "cards": [
+            "1",
+            "9",
+            "5",
+            "3",
+            "12",
+            "7",
+            "10",
+            "2",
+            "13"
+          ],
+          "player": "Player1",
+          "type": "CRYPT"
+        },
+        "LIBRARY": {
+          "id": "Player1-Library",
+          "cards": [
+            "100",
+            "47",
+            "91",
+            "81",
+            "57",
+            "54",
+            "53",
+            "27",
+            "93",
+            "69",
+            "18",
+            "23",
+            "85",
+            "79",
+            "78",
+            "65",
+            "102",
+            "95",
+            "88",
+            "17",
+            "89",
+            "67",
+            "41",
+            "82",
+            "74",
+            "94",
+            "63",
+            "34",
+            "70",
+            "55",
+            "28",
+            "52",
+            "51",
+            "40",
+            "80",
+            "33",
+            "35",
+            "62",
+            "26",
+            "39",
+            "31",
+            "101",
+            "20",
+            "58",
+            "97",
+            "64",
+            "90",
+            "24",
+            "87",
+            "59",
+            "50",
+            "71",
+            "72",
+            "73",
+            "43",
+            "46",
+            "38",
+            "19",
+            "22",
+            "98",
+            "103",
+            "56",
+            "25",
+            "44",
+            "21",
+            "76",
+            "96",
+            "32",
+            "15",
+            "99",
+            "29",
+            "92",
+            "30",
+            "49",
+            "36",
+            "84"
+          ],
+          "player": "Player1",
+          "type": "LIBRARY"
+        },
+        "HAND": {
+          "id": "Player1-Hand",
+          "cards": [
+            "45",
+            "48",
+            "68",
+            "42",
+            "60",
+            "77",
+            "61"
+          ],
+          "player": "Player1",
+          "type": "HAND"
+        },
+        "TORPOR": {
+          "id": "Player1-Torpor",
+          "player": "Player1",
+          "type": "TORPOR"
+        },
+        "REMOVED_FROM_GAME": {
+          "id": "Player1-Removed from Game",
+          "player": "Player1",
+          "type": "REMOVED_FROM_GAME"
+        },
+        "READY": {
+          "id": "Player1-Ready region",
+          "cards": [
+            "6",
+            "11",
+            "37"
+          ],
+          "player": "Player1",
+          "type": "READY"
+        },
+        "RESEARCH": {
+          "id": "Player1-Research Area",
+          "player": "Player1",
+          "type": "RESEARCH"
+        },
+        "ASH_HEAP": {
+          "id": "Player1-Ash heap",
+          "cards": [
+            "75",
+            "66",
+            "86",
+            "83"
+          ],
+          "player": "Player1",
+          "type": "ASH_HEAP"
+        }
+      },
+      "ousted": false,
+      "notes": "77 cards of Player1's library:\n            1 Guard Dogs\n            2 Canine Horde\n            3 Trap\n            4 Trap\n            5 Aid from Bats\n            6 Aid from Bats\n            7 Drawing Out the Beast\n            8 Deep Song\n            9 Trap\n            10 Carrion Crows\n            11 Animalism\n            12 Animalism\n            13 Effective Management\n            14 Trap\n            15 Scorpion Sting\n            16 Scorpion Sting\n            17 Carrion Crows\n            18 Guard Dogs\n            19 Cats' Guidance\n            20 Trap\n            21 Animalism\n            22 Trap\n            23 Carrion Crows\n            24 Song of Serenity\n            25 Trap\n            26 Carrion Crows\n            27 Cats' Guidance\n            28 Carrion Crows\n            29 Deep Song\n            30 Carrion Crows\n            31 Aid from Bats\n            32 Deep Song\n            33 Drawing Out the Beast\n            34 Drawing Out the Beast\n            35 Song of Serenity\n            36 Trap\n            37 Deep Song\n            38 Deep Song\n            39 Carrion Crows\n            40 Effective Management\n            41 Song of Serenity\n            42 Deep Song\n            43 Guard Dogs\n            44 Animalism\n            45 Aid from Bats\n            46 Rat's Warning\n            47 Carrion Crows\n            48 Trap\n            49 Effective Management\n            50 Trap\n            51 Aid from Bats\n            52 Drawing Out the Beast\n            53 Carrion Crows\n            54 Carrion Crows\n            55 Carrion Crows\n            56 Song of Serenity\n            57 Song of Serenity\n            58 Song of Serenity\n            59 Animalism\n            60 Effective Management\n            61 Rat's Warning\n            62 Guard Dogs\n            63 Aid from Bats\n            64 Effective Management\n            65 Song of Serenity\n            66 Animalism\n            67 Scorpion Sting\n            68 Cats' Guidance\n            69 Deep Song\n            70 Animalism\n            71 Rat's Warning\n            72 Deep Song\n            73 Trap\n            74 Deep Song\n            75 Drawing Out the Beast\n            76 Deep Song\n            77 Trap\n        "
+    },
+    "Player4": {
+      "name": "Player4",
+      "pool": 22,
+      "victoryPoints": 0.0,
+      "prey": "Player5",
+      "predator": "Player2",
+      "regions": {
+        "UNCONTROLLED": {
+          "id": "Player4-Uncontrolled region",
+          "cards": [
+            "315",
+            "308",
+            "317"
+          ],
+          "player": "Player4",
+          "type": "UNCONTROLLED"
+        },
+        "CRYPT": {
+          "id": "Player4-Crypt",
+          "cards": [
+            "319",
+            "310",
+            "313",
+            "314",
+            "309",
+            "316",
+            "311",
+            "312"
+          ],
+          "player": "Player4",
+          "type": "CRYPT"
+        },
+        "LIBRARY": {
+          "id": "Player4-Library",
+          "cards": [
+            "336",
+            "330",
+            "406",
+            "348",
+            "328",
+            "387",
+            "402",
+            "404",
+            "401",
+            "331",
+            "383",
+            "377",
+            "344",
+            "403",
+            "324",
+            "395",
+            "365",
+            "369",
+            "400",
+            "367",
+            "389",
+            "333",
+            "393",
+            "370",
+            "347",
+            "339",
+            "352",
+            "323",
+            "354",
+            "405",
+            "373",
+            "379",
+            "340",
+            "332",
+            "327",
+            "355",
+            "345",
+            "343",
+            "329",
+            "358",
+            "408",
+            "385",
+            "360",
+            "335",
+            "388",
+            "391",
+            "322",
+            "364",
+            "362",
+            "396",
+            "359",
+            "372",
+            "380",
+            "409",
+            "397",
+            "326",
+            "338",
+            "320",
+            "375",
+            "350",
+            "374",
+            "392",
+            "357",
+            "346",
+            "390",
+            "368",
+            "371",
+            "325",
+            "378",
+            "363",
+            "337",
+            "399",
+            "381",
+            "407",
+            "356",
+            "349",
+            "334",
+            "342",
+            "366",
+            "384",
+            "341"
+          ],
+          "player": "Player4",
+          "type": "LIBRARY"
+        },
+        "HAND": {
+          "id": "Player4-Hand",
+          "cards": [
+            "353",
+            "351",
+            "361",
+            "398",
+            "394",
+            "386",
+            "382"
+          ],
+          "player": "Player4",
+          "type": "HAND"
+        },
+        "TORPOR": {
+          "id": "Player4-Torpor",
+          "player": "Player4",
+          "type": "TORPOR"
+        },
+        "REMOVED_FROM_GAME": {
+          "id": "Player4-Removed from Game",
+          "player": "Player4",
+          "type": "REMOVED_FROM_GAME"
+        },
+        "READY": {
+          "id": "Player4-Ready region",
+          "cards": [
+            "318",
+            "376"
+          ],
+          "player": "Player4",
+          "type": "READY"
+        },
+        "RESEARCH": {
+          "id": "Player4-Research Area",
+          "player": "Player4",
+          "type": "RESEARCH"
+        },
+        "ASH_HEAP": {
+          "id": "Player4-Ash heap",
+          "player": "Player4",
+          "type": "ASH_HEAP"
+        }
+      },
+      "ousted": false
+    },
+    "Player3": {
+      "name": "Player3",
+      "pool": 30,
+      "victoryPoints": 0.0,
+      "prey": "Player1",
+      "predator": "Player5",
+      "regions": {
+        "UNCONTROLLED": {
+          "id": "Player3-Uncontrolled region",
+          "cards": [
+            "207",
+            "216",
+            "206"
+          ],
+          "player": "Player3",
+          "type": "UNCONTROLLED"
+        },
+        "CRYPT": {
+          "id": "Player3-Crypt",
+          "cards": [
+            "215",
+            "211",
+            "212",
+            "213",
+            "217",
+            "209",
+            "214",
+            "210"
+          ],
+          "player": "Player3",
+          "type": "CRYPT"
+        },
+        "LIBRARY": {
+          "id": "Player3-Library",
+          "cards": [
+            "218",
+            "249",
+            "255",
+            "304",
+            "228",
+            "236",
+            "291",
+            "285",
+            "300",
+            "219",
+            "274",
+            "245",
+            "268",
+            "303",
+            "220",
+            "250",
+            "276",
+            "248",
+            "253",
+            "238",
+            "225",
+            "294",
+            "267",
+            "229",
+            "270",
+            "280",
+            "254",
+            "243",
+            "227",
+            "277",
+            "297",
+            "281",
+            "288",
+            "265",
+            "284",
+            "292",
+            "259",
+            "256",
+            "260",
+            "237",
+            "289",
+            "234",
+            "266",
+            "295",
+            "306",
+            "258",
+            "240",
+            "230",
+            "272",
+            "239",
+            "263",
+            "273",
+            "296",
+            "282",
+            "307",
+            "247",
+            "231",
+            "293",
+            "233",
+            "302",
+            "286",
+            "279",
+            "251",
+            "241",
+            "301",
+            "287",
+            "269",
+            "224",
+            "223",
+            "278",
+            "221",
+            "226",
+            "305",
+            "290",
+            "271",
+            "244",
+            "262",
+            "298",
+            "261",
+            "232",
+            "275"
+          ],
+          "player": "Player3",
+          "type": "LIBRARY"
+        },
+        "HAND": {
+          "id": "Player3-Hand",
+          "cards": [
+            "283",
+            "299",
+            "235",
+            "257",
+            "252",
+            "242",
+            "264"
+          ],
+          "player": "Player3",
+          "type": "HAND"
+        },
+        "TORPOR": {
+          "id": "Player3-Torpor",
+          "player": "Player3",
+          "type": "TORPOR"
+        },
+        "REMOVED_FROM_GAME": {
+          "id": "Player3-Removed from Game",
+          "player": "Player3",
+          "type": "REMOVED_FROM_GAME"
+        },
+        "READY": {
+          "id": "Player3-Ready region",
+          "cards": [
+            "208"
+          ],
+          "player": "Player3",
+          "type": "READY"
+        },
+        "RESEARCH": {
+          "id": "Player3-Research Area",
+          "player": "Player3",
+          "type": "RESEARCH"
+        },
+        "ASH_HEAP": {
+          "id": "Player3-Ash heap",
+          "player": "Player3",
+          "type": "ASH_HEAP"
+        }
+      },
+      "ousted": false
+    }
+  },
+  "currentPlayer": "Player2",
+  "edge": null,
+  "timeoutRequestor": null
+}

@@ -1,7 +1,7 @@
 package net.deckserver.dwr.creators;
 
-import net.deckserver.dwr.model.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
+import net.deckserver.services.VersionService;
 
 public class VersionCreator implements ViewCreator {
     @Override
@@ -11,6 +11,6 @@ public class VersionCreator implements ViewCreator {
 
     @Override
     public Object createData(PlayerModel model) {
-        return JolAdmin.INSTANCE.getVersion();
+        return VersionService.getVersion();
     }
 }

@@ -17,8 +17,11 @@ let profile = {
     updating: false,
     imageTooltipPreference: true
 };
+let subscribed =  localStorage.getItem("notifications-subscribed") === "true";
+
 let pointerCanHover = window.matchMedia("(hover: hover)").matches;
 let scrollChat = false;
+const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
 function errorhandler(errorString, exception) {
     $("#connectionMessage").removeClass("d-none");
@@ -75,7 +78,7 @@ function createButton(config, fn, ...args) {
     }
     button.addClass(config.class);
     button.on('click', function () {
-        if (confirm(config.confirm)) {
+        if (!config.confirm || confirm(config.confirm)) {
             fn(...args, {callback: processData, errorHandler: errorhandler});
         }
     });
@@ -105,13 +108,19 @@ function callbackAdmin(data) {
             confirm: "Are you sure you want to remove this role?"
         }, DS.setSuperUser, value.name, false) : "";
         let superCell = $("<td/>").addClass("text-center").append(removeSuperButton);
+        let removePlaytestButton = value.playtester ? createButton({
+            html: '<i class="bi bi-x"></i>',
+            class: "btn btn-outline-secondary btn-sm",
+            confirm: "Are you sure you want to remove this role?"
+        }, DS.setPlaytest, value.name, false) : "";
+        let playtestCell = $("<td/>").addClass("text-center").append(removePlaytestButton);
         let removeAdminButton = value.admin ? createButton({
             html: '<i class="bi bi-x"></i>',
             class: "btn btn-outline-secondary btn-sm",
             confirm: "Are you sure you want to remove this role?"
         }, DS.setAdmin, value.name, false) : "";
         let adminCell = $("<td/>").addClass("text-center").append(removeAdminButton);
-        playerRow.append(nameCell, onlineCell, judgeCell, superCell, adminCell);
+        playerRow.append(nameCell, onlineCell, judgeCell, superCell, playtestCell, adminCell);
         userRoles.append(playerRow);
     })
     let adminReplacementList = $("#adminReplacementList");
@@ -143,13 +152,17 @@ function callbackAdmin(data) {
     })
 
     let adminGameList = $("#adminGameList");
+    let rollbackGamList = $("#rollbackGamesList");
     let endTurnList = $("#endTurnList");
     adminGameList.empty();
+    rollbackGamList.empty();
     $.each(data.games, function (index, value) {
         adminGameList.append($("<option/>", {value: value, text: value}));
         endTurnList.append($("<option/>", {value: value, text: value}));
+        rollbackGamList.append($("<option/>", {value: value, text: value}));
     })
     adminChangeGame();
+    rollbackChangeGame();
 
     let idleGameList = $("#idleGameList");
     idleGameList.empty();
@@ -189,12 +202,34 @@ function adminChangeGame() {
     DS.getGamePlayers(currentGame, {callback: setPlayers, errorHandler: errorhandler});
 }
 
+function rollbackChangeGame() {
+    let currentGame = $("#rollbackGamesList").val();
+    DS.getGameTurns(currentGame, {callback: setRollbackTurns, errorHandler: errorhandler});
+}
+
+function rollbackGame() {
+    let currentGame = $("#rollbackGamesList").val();
+    let currentTurn = $("#rollbackTurnsList").val();
+    if (confirm("Are you sure you want to rollback to turn " + currentTurn + " for " + currentGame)) {
+        DS.rollbackGame(currentGame, currentTurn, {callback: processData, errorHandler: errorhandler});
+    }
+}
+
 function setPlayers(data) {
     let adminReplacePlayerList = $("#adminReplacePlayerList");
     adminReplacePlayerList.empty();
     $.each(data, function (index, value) {
         let playerOption = $("<option/>", {value: value, text: value});
         adminReplacePlayerList.append(playerOption);
+    })
+}
+
+function setRollbackTurns(data) {
+    let rollbackTurnsList = $("#rollbackTurnsList");
+    rollbackTurnsList.empty();
+    $.each(data, function (index, value) {
+        let rollbackTurnOption = $("<option/>", {value: value, text: value});
+        rollbackTurnsList.append(rollbackTurnOption);
     })
 }
 
@@ -225,8 +260,12 @@ function callbackLobby(data) {
     let myGameList = $("#myGameList");
     let playerList = $("#playerList");
     let invitedGames = $("#invitedGames");
-    let invitedGamesList = $("#invitedGamesList");
-    let myDeckList = $("#myDeckList");
+    let createGameFormat = $("#gameFormat");
+
+    createGameFormat.empty();
+    $.each(data.gameFormats, function (index, value) {
+        createGameFormat.append($("<option/>", {value: value, text: value}));
+    })
 
     playerList.autocomplete({
         source: data.players,
@@ -244,8 +283,16 @@ function callbackLobby(data) {
         let gameItem = $("<li/>").addClass("list-group-item");
         let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
         let gameName = $("<h6/>").addClass("d-inline").text(game.name);
-        let startButton = game.gameStatus === 'Inviting' ? createButton({text: "Start", class: "btn btn-outline-secondary btn-sm", confirm: "Start Game?"}, DS.startGame, game.name) : "";
-        let endButton = createButton({text: "Close", class: "btn btn-outline-secondary btn-sm", confirm: "End Game?"}, DS.endGame, game.name);
+        let startButton = game.gameStatus === 'Inviting' ? createButton({
+            text: "Start",
+            class: "btn btn-outline-secondary btn-sm",
+            confirm: "Start Game?"
+        }, DS.startGame, game.name) : "";
+        let endButton = createButton({
+            text: "Close",
+            class: "btn btn-outline-secondary btn-sm",
+            confirm: "End Game?"
+        }, DS.endGame, game.name);
         let buttonWrapper = $("<span/>").addClass("d-flex justify-content-between align-items-center gap-1");
         let playerTable = $("<table/>").addClass("table table-bordered table-sm table-hover mt-2");
         let tableBody = $("<tbody/>");
@@ -254,97 +301,103 @@ function callbackLobby(data) {
         gameHeader.append(gameName, buttonWrapper);
         gameItem.append(gameHeader, playerTable);
         currentGames.append(gameItem);
-        $.each(game.registrations, function (i, registration) {
+        $.each(game.players, function (k, v) {
             let registrationRow = $("<tr/>");
-            let player = $("<td/>").addClass("w-25").text(registration.player);
+            let player = $("<td/>").addClass("w-25").text(k);
             registrationRow.append(player);
-            let summary = $("<td/>").addClass("w-75").text(registration.deckSummary);
-            if (registration.registered && !registration.valid) {
-                summary.append($('<span/>').addClass("badge text-bg-warning").text('Invalid'));
-            }
-            registrationRow.append(summary);
             playerTable.append(registrationRow);
         });
-
-        $.each(game.players, function (i, playerStatus) {
-            let playerRow = $("<tr/>");
-            let playerName = $("<td/>").text(playerStatus.playerName);
-            let pool = $("<td/>").text(playerStatus.pool + " pool");
-            playerRow.append(playerName);
-            playerRow.append(pool);
-            playerTable.append(playerRow);
-        })
     });
 
     publicGames.empty();
     $.each(data.publicGames, function (index, game) {
-        let created = moment(game.created).tz("UTC");
+        let created = moment(game.timestamp).tz("UTC");
         let expiry = created.add(5, 'days');
-        let gameItem = $("<li/>").addClass("list-group-item");
-        let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
-        let gameName = $("<h6/>").addClass("d-inline").text(game.name);
-        let expiryText = $("<span/>").text("Closes " + moment().to(expiry));
-        let buttonWrapper = $("<span/>").addClass("d-flex justify-content-between align-items-center gap-1");
         let joinButton = createButton({
             class: "btn btn-outline-secondary btn-sm",
-            text: "Join",
-            confirm: "Join Game?"
+            text: "Join"
         }, DS.invitePlayer, game.name, player);
 
-        buttonWrapper.append(expiryText, joinButton);
-        gameHeader.append(gameName, buttonWrapper);
-        gameItem.append(gameHeader);
-        publicGames.append(gameItem);
-        if (game.registrations.length > 0)
-        {
+        let leaveButton = createButton({
+            class: "btn btn-outline-secondary btn-sm",
+            text: "Leave",
+            confirm: "Leave Game?"
+        }, DS.unInvitePlayer, game.name, player);
+
+        let playerInGame = false;
+
+        let template = $(`
+        <li class='list-group-item'>
+            <div class="d-flex justify-content-between align-items-center">
+                <span>
+                    <span class="badge bg-secondary">${game.format}</span>
+                    <h6 class="mx-2 d-inline">${game.name}</h6>
+                </span>
+                <span class="d-flex justify-content-between align-items-center gap-1 game-join">
+                    <span>Closes ${moment().to(expiry)}</span>
+                </span>
+            </div>
+        </li>
+        `);
+        publicGames.append(template);
+        if (game.registrations.length > 0) {
             let playerTable = $("<table/>").addClass("table table-bordered table-sm table-hover mt-2");
             let tableBody = $("<tbody/>");
             playerTable.append(tableBody);
-            gameItem.append(playerTable);
+            template.append(playerTable);
             $.each(game.registrations, function (i, registration) {
                 let registrationRow = $("<tr/>");
                 let playerCell = $("<td/>").addClass("w-50").text(registration.player);
                 if (registration.player === player) {
-                    let leaveButton = registration.player === player ? createButton({
-                        class: "btn btn-outline-secondary btn-sm",
-                        text: "Leave",
-                        confirm: "Leave Game?"
-                    }, DS.unInvitePlayer, game.name, player) : "";
-                    buttonWrapper.append(leaveButton);
+                    playerInGame = true;
                 }
                 registrationRow.append(playerCell);
                 let summary = $("<td/>").addClass("w-50 text-center")
                 if (registration.registered) {
-                    summary.text("Registered");
-                }
-                if (!registration.valid && registration.registered) {
-                    summary.append($('<span/>').addClass("badge text-bg-warning pl-1").text('Invalid'));
+                    summary.append(`<i class="bi bi-check-circle text-success fs-6"></i>`);
                 }
                 registrationRow.append(summary);
                 tableBody.append(registrationRow);
-            });        }
+            });
+        }
+        template.find('.game-join').append(playerInGame ? leaveButton : joinButton);
     })
 
     invitedGames.empty();
-    invitedGamesList.empty();
     $.each(data.invitedGames, function (index, game) {
-        let gameItem = $("<li/>").addClass("list-group-item");
-        let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
-        let gameName = $("<span/>").text(game.gameName);
-        let deckSummary = $("<span/>").text(game.deckSummary);
-        if (game.registered && !game.valid) {
-            let errorMessage = $("<span/>").addClass("label label-warning left-margin").text("Invalid");
-            deckSummary.append(errorMessage);
-        }
-        gameHeader.append(gameName, deckSummary);
-        gameItem.append(gameHeader);
-        invitedGames.append(gameItem);
-        invitedGamesList.append(new Option(game.gameName, game.gameName));
+        let template = `
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="flex-grow-1 p-2 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-2">${game.gameName}</h5>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-secondary me-1">${game.format}</span>
+                        </div>
+                    </div>
+                    <span class="">${game.deckName || ''}</span>
+                </div>
+                <div>
+                    <div class="d-inline">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" >
+                            Choose Deck
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end invite-${game.format}" data-name="${game.gameName}">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        `;
+        invitedGames.append(template);
     });
 
-    myDeckList.empty();
     $.each(data.decks, function (index, deck) {
-        myDeckList.append(new Option(deck.name, deck.name));
+        $.each(deck.gameFormats, function (i, format) {
+            let dropDown = $(`ul .invite-${format}`);
+            let template = $(`<li><a class="dropdown-item">${deck.name}</a></li>`).on('click', function () {
+                registerDeck(this, deck.name);
+            });
+            dropDown.append(template);
+        })
     })
 
     // Registration Result
@@ -405,8 +458,8 @@ function registerforTournament() {
     });
 }
 
-function setImageTooltip(value) {
-    profile.imageTooltipPreference = value;
+function setImageTooltip() {
+    profile.imageTooltipPreference = $("#imageTooltips").is(':checked');
     DS.setUserPreferences(profile.imageTooltipPreference, {callback: processData, errorHandler: errorhandler});
 }
 
@@ -417,6 +470,9 @@ function callbackProfile(data) {
         $('#discordID').val(data.discordID);
     if (profile.veknId !== data.veknID)
         $("#veknID").val(data.veknID);
+    if (profile.country !== data.country) {
+        $("#profileCountry").val(data.country);
+    }
     if (profile.updating) {
         let result = $('#profileUpdateResult');
         result.text('Done!');
@@ -427,9 +483,11 @@ function callbackProfile(data) {
     }
     $("#playerPreferences .form-check-input").prop("checked", false);
     if (data.imageTooltipPreference) {
-        $("#imageTooltipPreference").prop("checked",true)
-    } else {
-        $("#textTooltipPreference").prop("checked",true)
+        $("#imageTooltips").prop("checked", true);
+    }
+
+    if (subscribed) {
+        $("#enableNotifications").prop("checked", true);
     }
 
     profile = data;
@@ -441,47 +499,33 @@ function callbackProfile(data) {
 }
 
 function callbackShowDecks(data) {
-    let decks = $("#decks");
-    decks.empty();
-    $.each(data.decks, function (index, deck) {
-        const deckRow = $("<tr/>");
-        const deckCell = $("<td/>").addClass("d-flex justify-content-between align-items-center");
-        const deckName = $("<span/>").text(deck.name).click(function () {
-            DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
-        });
-        const formatLabel = $("<span/>").text(deck.deckFormat).addClass("badge");
-        let formatStyle = deck.deckFormat === "MODERN" ? "text-bg-secondary" : "text-bg-warning";
-        formatLabel.addClass(formatStyle)
-        const deleteButton = $("<button/>").addClass("btn btn-sm btn-outline-secondary border p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
-            if (confirm("Delete deck?")) {
-                DS.deleteDeck(deck.name, {callback: processData, errorHandler: errorhandler});
-            }
-            event.stopPropagation();
-        });
-        let wrapper = $("<span/>").addClass("d-flex gap-1 align-items-center").append(formatLabel, deleteButton);
-        deckCell.append(deckName, wrapper);
-        deckRow.append(deckCell);
-        decks.append(deckRow);
-    });
+    let filter = $("#deckFilter");
+    let validatorFormat = $("#validatorFormat");
+    filter.empty();
+    validatorFormat.empty();
+    let currentFilter = data.deckFilter;
+    filter.append(new Option("All", ""));
+    $.each(data.tags, function (index, value) {
+        let selected = currentFilter.includes(value);
+        filter.append(new Option(value, value, selected, selected));
+        validatorFormat.append(new Option(value, value, selected, selected));
+    })
+    selectDeckFilter();
     const deckText = $("#deckText");
     const deckErrors = $("#deckErrors");
     const deckPreview = $("#deckPreview");
     const deckSummary = $("#deckSummary");
     const deckName = $("#deckName");
     if (data.selectedDeck) {
-        deckText.val(data.selectedDeck.contents);
+        deckText.val(data.contents);
         deckSummary.empty();
-        deckSummary.append($("<span/>").text(data.selectedDeck.details['stats']['summary']));
-        deckName.val(data.selectedDeck.details.deck['name']);
-        let validSpan = $("<span/>").addClass("badge badge-sm");
-        if (data.selectedDeck.details['stats']['valid']) {
-            validSpan.text("VALID").addClass("text-bg-success")
-        } else {
-            validSpan.text("INVALID").addClass("text-bg-warning");
-        }
-        deckSummary.append(validSpan);
-        deckErrors.html(data.selectedDeck.details.deck.comments.replace(/\n/g, "<br/>"));
-        renderDeck(data.selectedDeck.details.deck, "#deckPreview");
+        deckErrors.empty();
+        deckSummary.append($("<span/>").text(data.selectedDeck['stats']['summary']));
+        deckName.val(data.selectedDeck['deck']['name']);
+        $.each(data.selectedDeck.errors, function (i, error) {
+            deckErrors.append(error.replace(/\n/g), "<br/>");
+        })
+        renderDeck(data.selectedDeck.deck, "#deckPreview");
         addCardTooltips("#deckPreview");
     } else {
         deckText.val("");
@@ -489,6 +533,33 @@ function callbackShowDecks(data) {
         deckPreview.empty();
         deckName.val("");
     }
+}
+
+function selectDeckFilter() {
+    let filter = $("#deckFilter").val();
+    DS.filterDecks(filter, {callback: callbackFilterDecks, errorHandler: errorhandler});
+}
+
+function callbackFilterDecks(decks) {
+    let deckList = $("#decks");
+    deckList.empty();
+    $.each(decks, function (index, deck) {
+        const deckRow = $("<tr/>");
+        const deckCell = $("<td/>").addClass("d-flex justify-content-between align-items-center");
+        const deckName = $("<span/>").text(deck.name).click(function () {
+            DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
+        });
+        const deleteButton = $("<button/>").addClass("btn btn-sm btn-outline-secondary border p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
+            if (confirm("Delete deck?")) {
+                DS.deleteDeck(deck.name, {callback: processData, errorHandler: errorhandler});
+            }
+            event.stopPropagation();
+        });
+        let wrapper = $("<span/>").addClass("d-flex gap-1 align-items-center").append(deleteButton);
+        deckCell.append(deckName, wrapper);
+        deckRow.append(deckCell);
+        deckList.append(deckRow);
+    });
 }
 
 function callbackShowGameDeck(data) {
@@ -502,7 +573,6 @@ function callbackMain(data) {
         renderGlobalChat(data.chat);
         renderMyGames("#myGames", data.games);
         renderMyGames("#oustedGames", data.ousted);
-        $("#globalMessage").val(data.message);
         if (refresher) clearTimeout(refresher);
         refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
     } else {
@@ -516,9 +586,14 @@ function renderDeck(data, div) {
     if (data.crypt) {
         render.append($("<h5/>").text("Crypt: (" + data.crypt['count'] + ")"));
         const crypt = $("<ul/>").addClass("deck-list");
-        $.each(data.crypt.cards, function (index, card) {
+        let cards = data.crypt.cards;
+        cards.sort((a,b) => a.name.localeCompare(b.name));
+        $.each(cards, function (index, card) {
             const cardRow = $("<li/>");
             const cardLink = $("<a/>").text(card.name).attr("data-card-id", card.id).addClass("card-name");
+            if (card.comments === "playtest") {
+                cardLink.attr("data-secured", "true");
+            }
             cardRow.append(card['count'] + " x ").append(cardLink);
             crypt.append(cardRow);
         })
@@ -529,9 +604,14 @@ function renderDeck(data, div) {
         $.each(data.library.cards, function (index, libraryCards) {
             render.append($("<h5/>").text(libraryCards.type + ": (" + libraryCards['count'] + ")"));
             const section = $("<ul/>").addClass("deck-list");
-            $.each(libraryCards.cards, function (index, card) {
+            let cards = libraryCards.cards;
+            cards.sort((a,b) => a.name.localeCompare(b.name));
+            $.each(cards, function (index, card) {
                 const cardRow = $("<li/>");
                 const cardLink = $("<a/>").text(card.name).attr("data-card-id", card.id).addClass("card-name");
+                if (card.comments === "playtest") {
+                    cardLink.attr("data-secured", "true");
+                }
                 cardRow.append(card['count'] + " x ").append(cardLink);
                 section.append(cardRow);
             })
@@ -554,9 +634,13 @@ function newDeck() {
 function saveDeck() {
     const deckName = $("#deckName").val();
     const contents = $("#deckText").val();
-    if (confirm("Saving a deck will remove all lines with errors.  Are you sure?")) {
-        DS.saveDeck(deckName, contents, {callback: processData, errorHandler: errorhandler});
-    }
+    DS.saveDeck(deckName, contents, {callback: processData, errorHandler: errorhandler});
+}
+
+function validate() {
+    const contents = $("#deckText").val();
+    const validator = $("#validatorFormat").val();
+    DS.validate(contents, validator, {callback: processData, errorHandler: errorhandler})
 }
 
 function toggleVisible(s, h) {
@@ -638,11 +722,12 @@ function renderGameChat(data) {
     // Only scroll to bottom if scrollbar is at bottom (has not been scrolled up)
     let scrollToBottom = isScrolledToBottom(container);
     $.each(data, function (index, line) {
-        const dateAndTime = line.split(' ', 2);
+        const parts = line.split('||', 3);
+        const dateAndTime = parts[0].split(' ', 2);
         const date = dateAndTime[0];
         const time = dateAndTime[1];
-        //Strip off date and time; reattached later
-        line = line.slice(date.length + time.length + 2);
+        const player = parts[1];
+        const message = parts[2];
         let timestamp;
         if (date === gameChatLastDay)
             timestamp = time;
@@ -651,13 +736,8 @@ function renderGameChat(data) {
             timestamp = date + ' ' + time;
         }
         let timeSpan = $("<span/>").text(timestamp).addClass('chat-timestamp');
-        let playerLabel = '';
-        if (line[0] === '[') {
-            let player = line.split(']', 1)[0].slice(1); //Strip [
-            playerLabel = $('<b/>').text(player)[0].outerHTML;
-            line = line.slice(player.length + 3); //3 for [] and space
-        }
-        let lineElement = $('<p/>').addClass('chat').append(timeSpan, ' ', playerLabel, ' ', line);
+        let playerLabel = player === "null" ? '' : $("<b/>").text(player);
+        let lineElement = $('<p/>').addClass('chat').append(timeSpan, ' ', playerLabel, ' ', message);
         container.append(lineElement);
     });
     if (scrollToBottom)
@@ -740,7 +820,9 @@ function renderMyGames(id, games) {
     let ownGames = $(id);
     ownGames.empty();
     $.each(games, function (index, game) {
-        let gameRow = $("<li/>").addClass("list-group-item p-0 border").on('click', function() {doNav("g" + game.name);});
+        let gameRow = $("<li/>").addClass("list-group-item p-0 border").on('click', function () {
+            doNav("g" + game.name);
+        });
         let header = $("<div/>").addClass("d-flex p-2 justify-content-between w-100 border-bottom bg-body-tertiary");
         let title = $("<span/>").addClass("fw-bold").text(game.name);
         let turn = $("<small/>").text(game.turn).addClass("d-inline-block d-md-none d-xl-inline-block");
@@ -748,10 +830,10 @@ function renderMyGames(id, games) {
         let players = $("<div/>").addClass("players pb-2");
         let toggle = $("#myGamesDetailedMode");
         if (checked === "true") {
-            toggle.prop("checked",true);
+            toggle.prop("checked", true);
             players.removeClass("d-none");
         } else {
-            toggle.prop("checked",false);
+            toggle.prop("checked", false);
             players.addClass("d-none");
         }
         let predator = renderPlayer(game.players, game.predator);
@@ -771,14 +853,15 @@ function renderMyGames(id, games) {
 }
 
 function renderPlayer(players, target) {
-    let span = $("<span/>").addClass("my-2 px-2 border-end border-start w-100 text-center");
-    if (target !== "") {
-        span.text(players[target].playerName);
-        if (players[target].pinged) {
-            span.append("<i class='bi-exclamation-triangle ms-1'></i>");
-        }
-    }
-    return span;
+    let pinged = players[target] && players[target]["pinged"] ? "<i class='bi-exclamation-triangle ms-1'></i>" : "";
+    let playerName = players[target] ? players[target]["playerName"] : "";
+    let template = `
+        <span class='my-2 px-2 border-end border-start w-100 text-center'>
+            ${playerName}
+            ${pinged}
+        </span>
+    `
+    return $(template);
 }
 
 function renderGameLink(game) {
@@ -789,25 +872,31 @@ function renderGameLink(game) {
 
 function renderOnline(div, who) {
     let container = $("#" + div);
+    tippy.hideAll({duration: 0});
     container.empty();
     if (who === null) {
         return;
     }
     $.each(who, function (index, player) {
-        let playerSpan = $("<span/>").text(player.name).addClass("badge mb-1 fs-6");
-        if (player.superUser) {
-            playerSpan.addClass("text-bg-secondary");
-        } else if (player.admin) {
-            playerSpan.addClass("text-bg-warning");
-        } else {
-            playerSpan.addClass("text-bg-light border border-secondary-subtle")
-        }
-        if (player.judge) {
-            playerSpan.addClass("border border-2 border-dark border-dotted");
-        }
-        container.append(playerSpan);
-        container.append(" ");
+        let lastOnline = moment(player.lastOnline).tz("UTC");
+        let sinceLastOnline = moment.duration(moment().diff(lastOnline)).asMinutes();
+        let flag = player.country ? `<span data-tippy-content="${regionNames.of(player.country)}" class="fi fi-${player.country.toLowerCase()} fis fs-3"></span>` : '<span class="fs-3">&nbsp;</span>';
+        let admin = player.roles.includes('ADMIN') ? '<i data-tippy-content="Administrator" class="bi bi-star-fill text-warning"></i>' : "";
+        let judge = player.roles.includes('JUDGE') ? '<i data-tippy-content="Judge" class="bi bi-person-raised-hand text-success"></i>' : "";
+        let offline = sinceLastOnline > 30 ? `<i data-tippy-content="Last Online: ${lastOnline.format('D-MMM HH:mm z')}" class="bi bi-clock-history"></i>` : "";
+        let playerDiv = `
+            <span class="border rounded-start p-0 border-secondary d-flex justify-content-between align-items-center">
+                <span class="d-flex align-items-center gap-2 px-2">
+                    <strong>${player.name}</strong>
+                    ${admin}
+                    ${judge}
+                    ${offline}
+                </span>
+                ${flag}                
+            </span>`;
+        container.append(playerDiv);
     });
+    tippy('[data-tippy-content]', { theme: 'light'});
 }
 
 function renderActiveGames(games) {
@@ -844,7 +933,8 @@ function renderPastGames(history) {
                 playerRow.addClass("border-top")
             }
             let playerName = $("<td/>").text(value.playerName);
-            let deckName = $("<td/>").text(value.deckName);
+            let nameString = value.deckName.length > 50 ? (value.deckName.substring(0, 50) + "...") : value.deckName;
+            let deckName = $("<td/>").text(nameString);
             let score = $("<td/>").text((value.victoryPoints !== "0" ? value.victoryPoints + " VP" : "") + (value.gameWin ? ", 1 GW" : ""));
             playerRow.append(playerName, deckName, score);
             pastGames.append(playerRow);
@@ -883,23 +973,22 @@ function navigate(data) {
     renderDesktopViewButton();
 }
 
-function registerDeck() {
-    let regGame = $("#invitedGamesList").val();
-    let regDeck = $("#myDeckList").val();
-    DS.registerDeck(regGame, regDeck, {callback: processData, errorHandler: errorhandler});
+function registerDeck(deckRow, deck) {
+    let game = $(deckRow).closest('[data-name]').data('name');
+    DS.registerDeck(game, deck, {callback: processData, errorHandler: errorhandler});
 }
 
 function doCreateGame() {
     let newGameDiv = $("#newGameName");
-    let isPublic = $("#publicFlag");
+    let publicFlag = $("#publicFlag").val();
     let gameName = newGameDiv.val();
+    let format = $("#gameFormat").val();
     if (gameName.indexOf("\'") > -1 || gameName.indexOf("\"") > -1) {
         alert("Game name can not contain \' or \" characters in it");
         return;
     }
-    DS.createGame(gameName, isPublic.prop('checked'), {callback: processData, errorHandler: errorhandler});
+    DS.createGame(gameName, publicFlag, format, {callback: processData, errorHandler: errorhandler});
     newGameDiv.val('');
-    isPublic.prop('checked', false);
 }
 
 function updateMessage() {
@@ -928,39 +1017,40 @@ function doShowDeck() {
         DS.getGameDeck(game, {callback: callbackShowGameDeck, errorHandler: errorhandler});
 }
 
-function doSubmit() {
+function doEndTurn() {
+    if (confirm("Are you sure you want to end your turn?")) {
+        DS.endPlayerTurn(game, {callback: processData, errorHandler: errorhandler});
+    }
+    return false;
+}
+
+function doSubmit(event) {
     const phaseSelect = $("#phase");
     const commandInput = $("#command");
     const chatInput = $("#chat");
     const pingSelect = $("#ping");
-    const endTurnSelect = $("#endTurn");
 
     let phase = phaseSelect.val();
     let ping = pingSelect.val();
     const command = commandInput.val();
     const chat = chatInput.val();
-    const endTurn = endTurnSelect.val();
     phase = phase === "" ? null : phase;
     ping = ping === "" ? null : ping;
     commandInput.val("");
     chatInput.val("");
     pingSelect.val("");
-    endTurnSelect.val("No");
-    if (endTurn === "Yes") {
-        phaseSelect.val("Unlock");
-    }
-    DS.submitForm(game, phase, command, chat, ping, endTurn, {callback: processData, errorHandler: errorhandler});
+    DS.submitForm(game, phase, command, chat, ping, {callback: processData, errorHandler: errorhandler});
     return false;
 }
 
 function sendChat(message) {
-    DS.submitForm(game, null, '', message, null, 'No', {callback: processData, errorHandler: errorhandler});
+    DS.submitForm(game, null, '', message, null, {callback: processData, errorHandler: errorhandler});
     $('#quickChatModal').modal('hide');
     return false;
 }
 
 function sendCommand(command, message = '') {
-    DS.submitForm(game, null, command, message, null, 'No', {callback: processData, errorHandler: errorhandler});
+    DS.submitForm(game, null, command, message, null, {callback: processData, errorHandler: errorhandler});
     $('#quickCommandModal').modal('hide');
     return false;
 }
@@ -1046,16 +1136,16 @@ function loadGame(data) {
         $(".panel-secondary").addClass("d-none");
 
         // initial state for controls
-        playerControls.addClass("d-none");
+        playerControls.addClass("d-none").attr('disabled', true);
         chatControls.attr('disabled', true);
         globalNotes.attr('disabled', true);
         controlGrid.addClass("spectator");
     }
     let fetchFullLog = false;
-    if (data.logLength !== null) {
-        let myLogLength = gameChatOutput.children().length + (data.turn.length);
-        fetchFullLog = myLogLength < data.logLength;
-    }
+    // if (data.logLength !== null) {
+    //     let myLogLength = gameChatOutput.children().length + (data.turn.length);
+    //     fetchFullLog = myLogLength < data.logLength;
+    // }
 
     // enable chat controls if judge or player
     if (data.player || data.judge) {
@@ -1065,7 +1155,7 @@ function loadGame(data) {
 
     // If playing enable player controls
     if (data.player) {
-        playerControls.removeClass("d-none");
+        playerControls.removeClass("d-none").removeAttr('disabled');
         controlGrid.removeClass("spectator");
     }
 
@@ -1124,7 +1214,7 @@ function loadGame(data) {
         }
     }
 
-    $.each(data.pinged, function(index, pinged) {
+    $.each(data.pinged, function (index, pinged) {
         $(`.player[data-player='${pinged}']`).find(".pinged").removeClass("d-none");
     });
 
@@ -1155,67 +1245,60 @@ function addCardTooltips(parent) {
     //tippy tooltips to cards that already have a click handler that shows the card.
     //This fixes the bug where cards in hand required a double-tap to show the modal.
     tippy(linkSelector, {
-            placement: 'auto',
-            allowHTML: true,
-            appendTo: () => document.body,
-            popperOptions: {
-                strategy: 'fixed',
-                modifiers: [
-                    {
-                        name: 'flip',
-                        options: {
-                            fallbackPlacements: ['bottom', 'right'],
-                        },
+        placement: 'auto',
+        allowHTML: true,
+        appendTo: () => document.body,
+        popperOptions: {
+            strategy: 'fixed',
+            modifiers: [
+                {
+                    name: 'flip',
+                    options: {
+                        fallbackPlacements: ['bottom', 'right'],
                     },
-                    {
-                        name: 'preventOverflow',
-                        options: {
-                            altAxis: true,
-                            tether: false,
-                        },
+                },
+                {
+                    name: 'preventOverflow',
+                    options: {
+                        altAxis: true,
+                        tether: false,
                     },
-                ],
-            },
-            onTrigger: function (instance, event) {
-                event.stopPropagation();
-            },
-            theme: "light",
-            touch: "hold",
-            onShow: function (instance) {
-                tippy.hideAll({exclude: instance});
-                instance.setContent("Loading...");
-                let ref = $(instance.reference);
-                let cardId = ref.data('card-id');
-                if (cardId == null) { //Backwards compatibility in main chat
-                    cardId = instance.reference.title;
-                    ref.data('card-id', cardId);
-                    instance.reference.removeAttribute('title');
-                }
-                if (profile.imageTooltipPreference) {
-                    let content = `<img width="350" height="500" src="https://static.tornsignpost.org/images/${cardId}" alt="Loading..."/>`;
-                    instance.setContent(content);
-                } else {
-                    $.get({
-                        dataType: "html",
-                        url: "https://static.tornsignpost.org/html/" + cardId, success: function (data) {
-                            let content = `<div class="p-2">${data}</div>`;
-                            instance.setContent(content);
-                        }
-                    });
-                }
+                },
+            ],
+        },
+        onTrigger: function (instance, event) {
+            event.stopPropagation();
+        },
+        theme: "cards",
+        touch: "hold",
+        onShow: function (instance) {
+            tippy.hideAll({exclude: instance});
+            instance.setContent("Loading...");
+            let ref = $(instance.reference);
+            let cardId = ref.data('card-id');
+            let secured = ref.data('secured') || false ? "secured/" : "";
+            if (cardId == null) { //Backwards compatibility in main chat
+                cardId = instance.reference.title;
+                ref.data('card-id', cardId);
+                instance.reference.removeAttribute('title');
             }
-        });
-}
-
-function regionCommands(event, tag) {
-    let regionModal = $("#regionModal");
-    regionModal.find(".loaded").hide();
-    regionModal.find(".loading").show();
-    regionModal.modal('show');
+            if (profile.imageTooltipPreference) {
+                let content = `<img width="350" height="500" src="${BASE_URL}/${secured}images/${cardId}" alt="Loading..."/>`;
+                instance.setContent(content);
+            } else {
+                $.get({
+                    dataType: "html",
+                    url: `${BASE_URL}/${secured}html/${cardId}`, success: function (data) {
+                        let content = `<div class="p-2">${data}</div>`;
+                        instance.setContent(content);
+                    }
+                });
+            }
+        }
+    });
 }
 
 function details(event, tag) {
-    console.log(event);
     event.preventDefault();
     event.stopPropagation();
     $(`[aria-controls='${tag}'] i`).toggleClass("d-none");
@@ -1225,7 +1308,7 @@ function details(event, tag) {
 }
 
 function showStatus(data) {
-    if (data !== "") {
+    if (data) {
         $("#gameStatusMessage").html(data);
         bootstrap.Toast.getOrCreateInstance($("#liveToast")).show();
     }
@@ -1240,8 +1323,13 @@ function loadHistory(data) {
     let historyDiv = $("#gameHistory");
     historyDiv.empty();
     $.each(data, function (index, content) {
-        let turnContent = $("<p/>").addClass("chat").html(content);
-        historyDiv.append(turnContent);
+        const dateAndTime = content.timestamp;
+        const player = content.source;
+        const message = content.message;
+        let timeSpan = $("<span/>").text(dateAndTime).addClass('chat-timestamp');
+        let playerLabel = player === "null" ? '' : $("<b/>").text(player);
+        let lineElement = $('<p/>').addClass('chat').append(timeSpan, ' ', playerLabel, ' ', message);
+        historyDiv.append(lineElement);
     });
     addCardTooltips("#gameHistory");
 }
@@ -1259,7 +1347,8 @@ function updateProfile() {
     let email = $('#profileEmail').val();
     let discordID = $('#discordID').val();
     let veknID = $("#veknID").val();
-    DS.updateProfile(email, discordID, veknID, {callback: processData, errorHandler: updateProfileErrorHandler});
+    let country = $("#profileCountry").val();
+    DS.updateProfile(email, discordID, veknID, country, {callback: processData, errorHandler: updateProfileErrorHandler});
 }
 
 function updatePassword() {
@@ -1295,7 +1384,6 @@ function toggleMobileView(event) {
     if (event) event.preventDefault();
     let $link = $('#toggleMobileViewLink').eq(0);
     let viewport = $('meta[name=viewport]').get(0);
-    console.log('before: ' + viewport.content)
     if (viewport.content === DESKTOP_VIEWPORT_CONTENT) {
         viewport.content = 'width=device-width, initial-scale=1, shrink-to-fit=no';
         $link.text('Desktop View');
@@ -1303,7 +1391,6 @@ function toggleMobileView(event) {
         viewport.content = DESKTOP_VIEWPORT_CONTENT;
         $link.text('Mobile View');
     }
-    console.log('after: ' + viewport.content)
     pointerCanHover = window.matchMedia("(hover: hover)").matches;
     $('body').scrollTop(0);
 }

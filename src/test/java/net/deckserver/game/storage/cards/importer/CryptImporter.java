@@ -19,17 +19,27 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
     private static final int FIELD_ALIASES = 2;
     private static final int FIELD_TYPE = 3;
     private static final int FIELD_CLAN = 4;
-    private static final int FIELD_ADVANCED = 5;
-    private static final int FIELD_GROUP = 6;
-    private static final int FIELD_CAPACITY = 7;
-    private static final int FIELD_DISCIPLINES = 8;
-    private static final int FIELD_TEXT = 9;
-    private static final int FIELD_TITLE = 11;
-    private static final int FIELD_BANNED = 12;
-    Predicate<? super String> uniqueFilter = (text) -> text.contains("are not unique") || text.contains("non-unique");
+    private static final int FIELD_PATH = 5;
+    private static final int FIELD_ADVANCED = 6;
+    private static final int FIELD_GROUP = 7;
+    private static final int FIELD_CAPACITY = 8;
+    private static final int FIELD_DISCIPLINES = 9;
+    private static final int FIELD_TEXT = 10;
+    private static final int FIELD_SET = 11;
+    private static final int FIELD_TITLE = 12;
+    private static final int FIELD_BANNED = 13;
+    private final boolean playTestMode;
+    Predicate<? super String> UNIQUE_FILTER = (text) -> text.contains("are not unique") || text.contains("non-unique");
+    Predicate<String> INFERNAL_FILTER = (text) -> text.contains("Infernal.");
 
-    public CryptImporter(Path dataPath) {
-        super(dataPath);
+    public CryptImporter(Path basePath, String filePrefix) {
+        super(basePath, filePrefix);
+        this.playTestMode = false;
+    }
+
+    public CryptImporter(Path basePath, String filePrefix, boolean playTestMode) {
+        super(basePath, filePrefix);
+        this.playTestMode = playTestMode;
     }
 
     @Override
@@ -47,6 +57,7 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
         card.setDisplayName(names.getDisplayName());
         card.setName(names.getUniqueName());
         card.setNames(names.getNames());
+        card.setPlayTest(playTestMode);
         Utils.getClean(lineData[FIELD_TYPE]).ifPresent(card::setType);
         Utils.getClean(lineData[FIELD_CLAN]).ifPresent(card::setClan);
 
@@ -59,12 +70,15 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
                 .ifPresent(card::setDisciplines);
 
         Utils.getClean(lineData[FIELD_TEXT]).ifPresent(card::setText);
-        Utils.getClean(lineData[FIELD_TEXT]).map(String::toLowerCase).filter(uniqueFilter).ifPresent(s -> card.setUnique(false));
+        Utils.getClean(lineData[FIELD_TEXT]).map(String::toLowerCase).filter(UNIQUE_FILTER).ifPresent(s -> card.setUnique(false));
+        Utils.getClean(lineData[FIELD_TEXT]).filter(INFERNAL_FILTER).ifPresent(s -> card.setInfernal(true));
         Utils.getClean(lineData[FIELD_TITLE]).ifPresent(card::setTitle);
 
         Utils.getClean(lineData[FIELD_BANNED]).map(banned -> !banned.isEmpty()).ifPresent(card::setBanned);
+        Utils.getClean(lineData[FIELD_SET]).map(Utils::getSets).ifPresent(card::setSets);
 
         card.setSect(determineSect(card.getClan(), card.getText()));
+        Utils.getClean(lineData[FIELD_PATH]).ifPresent(card::setPath);
         Optional.ofNullable(card.getTitle()).map(this::determineVotes).ifPresent(card::setVotes);
 
         return card;
@@ -121,13 +135,14 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
                 sect = "Independent";
         }
         String textSect = null;
-        if (text.matches("^Sabbat.*?[:.]")) {
+        text = text.replaceAll("^Advanced, ", "").trim();
+        if (text.startsWith("Sabbat")) {
             textSect = "Sabbat";
-        } else if (text.matches("^(Independent anarch|Anarch).*?[:.]")) {
+        } else if (text.startsWith("Anarch")) {
             textSect = "Anarch";
-        } else if (text.matches("^Independent.*?[:.]")) {
+        } else if (text.startsWith("Independent")) {
             textSect = "Independent";
-        } else if (text.matches("^Camarilla.*?[:.]")) {
+        } else if (text.startsWith("Camarilla")) {
             textSect = "Camarilla";
         }
         if (textSect != null && !sect.equals(textSect)) {

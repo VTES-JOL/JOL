@@ -3,7 +3,7 @@ package net.deckserver.storage.json.cards;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import net.deckserver.game.storage.cards.CardType;
+import net.deckserver.game.enums.CardType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,26 +13,21 @@ import java.util.stream.Collectors;
 public class CardSummary {
 
     private String id;
+    private String icon;
     private String type;
-    private String htmlText;
-    private String originalText;
     private String displayName;
     private String name;
     private Set<String> names = new HashSet<>();
     private boolean crypt;
     private boolean unique;
-    private boolean burnOption;
     private String group;
     private String sect;
+    private String path;
     private List<String> clans = new ArrayList<>();
     private boolean banned;
-
-    //Library only
-    private String preamble;
-    private List<LibraryCardMode> modes;
-    private boolean doNotReplace;
-    private boolean multiMode;
-    private String cost;
+    private Set<String> sets = new HashSet<>();
+    private boolean playTest;
+    private String htmlText;
 
     //Crypt only
     private Integer capacity;
@@ -40,6 +35,7 @@ public class CardSummary {
     private String title;
     private String votes;
     private boolean advanced;
+    private boolean infernal;
 
     @JsonIgnore
     public boolean hasLife() {

@@ -3,7 +3,7 @@ package net.deckserver.game.storage.cards;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.deckserver.dwr.model.ChatParser;
+import net.deckserver.storage.json.cards.CardSummary;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class SummaryCard {
 
     private String id;
-    private String amaranthId;
+    private String icon;
     private String type;
     private String htmlText;
     private String originalText;
@@ -24,11 +24,14 @@ public class SummaryCard {
     private Set<String> names;
     private boolean crypt;
     private boolean unique;
-    private boolean burnOption;
+    private Boolean burnOption;
     private String group;
     private String sect;
+    private String path;
     private List<String> clans;
     private boolean banned;
+    private boolean playTest;
+    private Set<String> sets;
 
     //Library only
     private String preamble;
@@ -41,6 +44,7 @@ public class SummaryCard {
     private Integer capacity;
     private List<String> disciplines;
     private Boolean advanced;
+    private Boolean infernal;
 
     private String title;
 
@@ -56,11 +60,15 @@ public class SummaryCard {
         this.unique = cryptCard.isUnique();
         this.group = cryptCard.getGroup();
         this.sect = cryptCard.getSect();
+        this.path = cryptCard.getPath();
         this.clans = Collections.singletonList(cryptCard.getClan());
         this.title = cryptCard.getTitle();
         this.votes = cryptCard.getVotes();
         this.banned = cryptCard.isBanned();
+        this.playTest = cryptCard.isPlayTest();
+        this.sets = cryptCard.getSets();
         this.advanced = cryptCard.isAdvanced();
+        this.infernal = cryptCard.isInfernal();
 
         List<String> cardLines = new ArrayList<>();
         boolean vampire = cryptCard.getType().equals("Vampire");
@@ -81,8 +89,8 @@ public class SummaryCard {
                 .map(disciplines -> disciplines.stream().map(s -> "[" + s + "]").collect(Collectors.joining(" ")))
                 .ifPresent(disciplines -> cardLines.add(disciplinesLabel + disciplines));
         Optional.ofNullable(cryptCard.getText()).ifPresent(cardLines::add);
-        this.htmlText = ChatParser.parseText(String.join("<br/>", cardLines));
-        this.originalText = ChatParser.parseText(cryptCard.getText());
+        this.htmlText = String.join("<br/>", cardLines);
+        this.originalText = cryptCard.getText();
         this.capacity = cryptCard.getCapacity();
         this.disciplines = cryptCard.getDisciplines();
     }
@@ -97,6 +105,8 @@ public class SummaryCard {
         this.unique = libraryCard.isUnique();
         Optional.ofNullable(libraryCard.getBurnOption()).ifPresent(burnOption -> this.burnOption = burnOption);
         this.banned = libraryCard.isBanned();
+        this.playTest = libraryCard.isPlayTest();
+        this.sets = libraryCard.getSets();
 
         this.preamble = libraryCard.getPreamble();
         this.modes = libraryCard.getModes();
@@ -111,6 +121,7 @@ public class SummaryCard {
             this.cost = libraryCard.getConviction() + " conviction";
 
         this.clans = libraryCard.getClans();
+        this.path = libraryCard.getPath();
 
         List<String> cardLines = new ArrayList<>();
         Optional.ofNullable(libraryCard.getName()).ifPresent(name -> cardLines.add("Name: " + name));
@@ -125,7 +136,34 @@ public class SummaryCard {
         Optional.ofNullable(libraryCard.getConviction()).ifPresent(conviction -> cardLines.add("Cost: " + conviction + " conviction"));
         Optional.ofNullable(libraryCard.getDisciplines()).ifPresent(disciplines -> cardLines.add("Discipline: " + String.join("/", disciplines)));
         Optional.ofNullable(libraryCard.getText()).map(text -> text.replaceAll("\\n", "<br/>")).ifPresent(cardLines::add);
-        this.htmlText = ChatParser.parseText(String.join("<br/>", cardLines));
-        this.originalText = ChatParser.parseText(libraryCard.getText().replaceAll("\\n", "<br/>"));
+        this.htmlText = String.join("<br/>", cardLines);
+        this.originalText = libraryCard.getText().replaceAll("\\n", "<br/>");
+    }
+
+    public CardSummary toCardSummary() {
+        CardSummary cardSummary = new CardSummary();
+        cardSummary.setId(id);
+        cardSummary.setDisplayName(displayName);
+        cardSummary.setName(name);
+        cardSummary.setNames(names);
+        cardSummary.setType(type);
+        cardSummary.setCrypt(crypt);
+        cardSummary.setUnique(unique);
+        cardSummary.setGroup(group);
+        cardSummary.setSect(sect);
+        cardSummary.setPath(path);
+        cardSummary.setClans(clans);
+        cardSummary.setTitle(title);
+        cardSummary.setVotes(votes);
+        cardSummary.setBanned(banned);
+        cardSummary.setPlayTest(playTest);
+        cardSummary.setSets(sets);
+        cardSummary.setBanned(banned);
+        cardSummary.setAdvanced(Optional.ofNullable(advanced).orElse(false));
+        cardSummary.setInfernal(Optional.ofNullable(infernal).orElse(false));
+        cardSummary.setHtmlText(htmlText);
+        cardSummary.setCapacity(capacity);
+        cardSummary.setDisciplines(disciplines);
+        return cardSummary;
     }
 }

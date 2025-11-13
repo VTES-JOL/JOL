@@ -1,0 +1,39 @@
+[ {
+  "turnId" : "1.1",
+  "player" : "Player5",
+  "chats" : [ {
+    "timestamp" : "30-Sept 17:01",
+    "message" : "START OF UNLOCK PHASE.",
+    "source" : "Player5"
+  }, {
+    "timestamp" : "28-Oct 18:16 ",
+    "message" : "Player1 influences out <a class='card-name' data-card-id='200689' data-secured='false'>Jennie \"Cassie247\" Orne</a>.",
+    "source" : "Player1",
+    "command" : "influence ea115e43-d7e0-426a-b845-edcc472a25ae Player1 ready region"
+  }, {
+    "timestamp" : "28-Oct 18:18 ",
+    "message" : "Player2 transferred 1 blood onto card #1 in their inactive region. Currently: 1, Pool: 29",
+    "source" : "Player2",
+    "command" : "transfer 7cbd2d1c-ab3b-4036-b2d8-2247d114d8d0 1"
+  }, {
+    "timestamp" : "28-Oct 18:18 ",
+    "message" : "Player2 transferred 1 blood onto card #1 in their inactive region. Currently: 2, Pool: 28",
+    "source" : "Player2",
+    "command" : "transfer 7cbd2d1c-ab3b-4036-b2d8-2247d114d8d0 1"
+  }, {
+    "timestamp" : "28-Oct 18:18 ",
+    "message" : "Player2 transferred 1 blood onto card #1 in their inactive region. Currently: 3, Pool: 27",
+    "source" : "Player2",
+    "command" : "transfer 7cbd2d1c-ab3b-4036-b2d8-2247d114d8d0 1"
+  }, {
+    "timestamp" : "28-Oct 18:18 ",
+    "message" : "Player2 transferred 1 blood onto card #1 in their inactive region. Currently: 4, Pool: 26",
+    "source" : "Player2",
+    "command" : "transfer 7cbd2d1c-ab3b-4036-b2d8-2247d114d8d0 1"
+  }, {
+    "timestamp" : "28-Oct 18:19 ",
+    "message" : "Player2 influences out <a class='card-name' data-card-id='200622' data-secured='false'>Ignacio, The Black Priest</a>.",
+    "source" : "Player2",
+    "command" : "influence 7cbd2d1c-ab3b-4036-b2d8-2247d114d8d0 Player2 ready region"
+  } ]
+} ]

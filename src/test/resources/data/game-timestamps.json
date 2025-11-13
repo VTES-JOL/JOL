@@ -1,0 +1,13 @@
+{
+  "Test Game" : {
+    "timestamp" : "2025-10-28T18:29:03.172161+10:00",
+    "playerTimestamps" : {
+      "Player2" : "2025-10-28T18:29:53.555605+10:00",
+      "Player1" : "2025-10-28T18:18:37.951891+10:00"
+    },
+    "playerPings" : {
+      "Player1" : false,
+      "Player2" : false
+    }
+  }
+}

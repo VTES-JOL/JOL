@@ -1,7 +1,6 @@
 package net.deckserver.game.storage.cards.importer;
 
 import lombok.extern.slf4j.Slf4j;
-import net.deckserver.dwr.model.ChatParser;
 import net.deckserver.game.storage.cards.LibraryCard;
 import net.deckserver.game.storage.cards.LibraryCardMode;
 
@@ -22,13 +21,15 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final int FIELD_ALIASES = 2;
     private static final int FIELD_TYPE = 3;
     private static final int FIELD_REQUIREMENTS_CLAN = 4;
-    private static final int FIELD_REQUIREMENTS_DISCIPLINE = 5;
-    private static final int FIELD_POOL_COST = 6;
-    private static final int FIELD_BLOOD_COST = 7;
-    private static final int FIELD_CONVICTION_COST = 8;
-    private static final int FIELD_BURN_OPTION = 9;
-    private static final int FIELD_TEXT = 10;
-    private static final int FIELD_BANNED = 13;
+    private static final int FIELD_REQUIREMENTS_PATH = 5;
+    private static final int FIELD_REQUIREMENTS_DISCIPLINE = 6;
+    private static final int FIELD_POOL_COST = 7;
+    private static final int FIELD_BLOOD_COST = 8;
+    private static final int FIELD_CONVICTION_COST = 9;
+    private static final int FIELD_BURN_OPTION = 10;
+    private static final int FIELD_TEXT = 11;
+    private static final int FIELD_SET = 13;
+    private static final int FIELD_BANNED = 14;
 
     private static final Function<String, Boolean> BURN_OPTION = (text) -> text.equals("Y") || text.equalsIgnoreCase("Yes");
 
@@ -41,11 +42,24 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final Pattern AS_ABOVE_PATTERN = Pattern.compile("As (\\[(?<disc>.*)])? ?above.*");
     private static final Pattern REMOVE_FROM_GAME_PATTERN = Pattern.compile(".*[Rr]emove this card from the game.*");
     private static final Pattern TROPHY_PATTERN = Pattern.compile("Master. Trophy.");
+    private static final Pattern LOCATION_PATTERN = Pattern.compile("(Unique|Master:) location");
+    private static final Pattern EQUIPEMENT_LOCATION_PATTERN = Pattern.compile("equipment card represents a location");
+    private static final Pattern MODE_OR_PATTERN = Pattern.compile("^\\[[A-Za-z]+\\]\\s+or\\s+\\[[A-Za-z]+\\](?=\\s|$)");
+    private static final Pattern MODE_PATTERN = Pattern.compile("^\\[[A-Za-z]+\\](\\[[A-Za-z]+\\])*(?=\\s|$)");
+    private static final Pattern DISCIPLINE_EXTRACTOR_PATTERN = Pattern.compile("\\[([A-Za-z]+)\\]");
 
     private static final List<String> DISCIPLINES = Arrays.asList("ani", "obe", "cel", "dom", "dem", "for", "san", "thn", "vic", "pro", "chi", "val", "mel", "nec", "obf", "obl", "pot", "qui", "pre", "ser", "tha", "aus", "vis", "abo", "myt", "dai", "spi", "tem", "obt", "str", "mal", "flight");
 
-    public LibraryImporter(Path dataPath) {
-        super(dataPath);
+    private final boolean playTestMode;
+
+    public LibraryImporter(Path basePath, String filePrefix) {
+        super(basePath, filePrefix);
+        this.playTestMode = false;
+    }
+
+    public LibraryImporter(Path basePath, String filePrefix, boolean playTestMode) {
+        super(basePath, filePrefix);
+        this.playTestMode = playTestMode;
     }
 
     @Override
@@ -60,11 +74,13 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         card.setDisplayName(names.getDisplayName());
         card.setName(names.getUniqueName());
         card.setNames(names.getNames());
+        card.setPlayTest(playTestMode);
         Utils.split(lineData[FIELD_TYPE], "/").ifPresent(card::setType);
 
         // Calculate requirements
         Utils.split(lineData[FIELD_REQUIREMENTS_CLAN], "/").ifPresent(card::setClans);
         Utils.split(lineData[FIELD_REQUIREMENTS_DISCIPLINE], "/").ifPresent(card::setDisciplines);
+        Utils.getClean(lineData[FIELD_REQUIREMENTS_PATH]).ifPresent(card::setPath);
 
         // Calculate cost
         Utils.getClean(lineData[FIELD_POOL_COST]).ifPresent(card::setPool);
@@ -74,6 +90,8 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         Utils.getClean(lineData[FIELD_BURN_OPTION]).map(BURN_OPTION).ifPresent(card::setBurnOption);
         Utils.getClean(lineData[FIELD_TEXT]).ifPresent(card::setText);
         Utils.getClean(lineData[FIELD_BANNED]).map(banned -> !banned.isEmpty()).ifPresent(card::setBanned);
+
+        Utils.getClean(lineData[FIELD_SET]).map(Utils::getSets).ifPresent(card::setSets);
 
         List<String> lines = new ArrayList<>(Arrays.asList(card.getText().split("\n")));
         List<String> preambleLines = new ArrayList<>(1);
@@ -128,24 +146,31 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         List<LibraryCardMode> modes = new ArrayList<>(lines.size());
         for (String line : lines) {
             LibraryCardMode mode = new LibraryCardMode();
+            boolean orMode = false;
+            String prefix = null;
             String modeText = line;
+            List<String> disciplines = new ArrayList<>();
             if (line.startsWith("[")) {
-                //HACK: Mirror's Visage superior
-                line = line.replace("]+", "] +");
+                Matcher orMatcher = MODE_OR_PATTERN.matcher(line);
+                Matcher discMatcher = MODE_PATTERN.matcher(line);
 
-                String[] disciplinesAndText = line.split(" ", 2);
-                List<String> disciplines = Arrays
-                        .stream(disciplinesAndText[0].split("[\\[\\]]+"))
-                        .filter(d -> !d.isEmpty())
-                        .filter(d -> !d.equals(":")) //Death of the Drum
-                        .collect(Collectors.toList());
+                if (orMatcher.find()) {
+                    orMode = true;
+                    prefix = orMatcher.group();
+                    modeText = line.substring(orMatcher.end()).trim();
+                } else if (discMatcher.find()) {
+                    prefix = discMatcher.group();
+                    modeText = line.substring(discMatcher.end()).trim();
+                }
 
-                if (DISCIPLINES.contains(disciplines.get(0).toLowerCase())) {
-                    mode.setDisciplines(disciplines);
-                    modeText = disciplinesAndText[1];
+                if (prefix != null) {
+                    Matcher m = DISCIPLINE_EXTRACTOR_PATTERN.matcher(prefix);
+                    while (m.find()) {
+                        disciplines.add(m.group(1));
+                    }
                 }
             }
-            mode.setText(ChatParser.parseText(modeText));
+            mode.setText(modeText.trim());
 
             if (PUT_INTO_UNCONTROLLED_PATTERN.matcher(mode.getText()).matches())
                 mode.setTarget(LibraryCardMode.Target.INACTIVE_REGION);
@@ -177,8 +202,8 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                     if (disciplineString == null) {
                         reference = modes.get(modes.size() - 1);
                     } else {
-                        List<String> disciplines = Arrays.asList(disciplineString.split("[\\[\\]]+"));
-                        reference = modes.stream().filter(m -> m.getDisciplines().equals(disciplines)).findFirst().orElse(null);
+                        List<String> discReference = Arrays.asList(disciplineString.split("[\\[\\]]+"));
+                        reference = modes.stream().filter(m -> m.getDisciplines().equals(discReference)).findFirst().orElse(null);
                         if (reference == null) {
                             System.out.printf(
                                     "WARNING! %s: Could not find match for '%s' among modes [%s]%n",
@@ -190,7 +215,16 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                     }
                 }
             }
-            modes.add(mode);
+            if (orMode) {
+                for (String discipline : disciplines) {
+                    LibraryCardMode discMode = new LibraryCardMode(mode);
+                    discMode.setDisciplines(List.of(discipline));
+                    modes.add(discMode);
+                }
+            } else {
+                mode.setDisciplines(disciplines);
+                modes.add(mode);
+            }
         }
         card.setModes(modes);
     }

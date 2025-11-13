@@ -1,13 +1,18 @@
 package net.deckserver.dwr.bean;
 
 import lombok.Getter;
-import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
+import net.deckserver.services.PlayerGameActivityService;
+import net.deckserver.services.RegistrationService;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
 @Getter
 public class NavBean {
@@ -16,7 +21,6 @@ public class NavBean {
     private final List<String> buttons = new ArrayList<>();
     private final String player;
     private final String target;
-    private final String message;
     private final String stamp;
     private boolean chats;
     private String game = null;
@@ -28,22 +32,24 @@ public class NavBean {
             game = model.getCurrentGame();
         if (player != null) {
             chats = model.hasChats();
-            boolean admin = JolAdmin.INSTANCE.isAdmin(player);
+            boolean isAdmin = JolAdmin.isAdmin(player);
             buttons.add("active:Watch");
             buttons.add("deck:Decks");
             buttons.add("profile:Profile");
             buttons.add("lobby:Lobby");
 //            buttons.add("tournament:Tournament");
-            if (admin) {
+            if (isAdmin) {
                 buttons.add("admin:Admin");
             }
+            RegistrationService.getPlayerGames(player).stream()
+                    .filter(JolAdmin::isActive)
+                    .filter(game -> JolAdmin.isAlive(game, player))
+                    .forEach(game -> {
+                        String current = PlayerGameActivityService.isCurrent(player, game) ? "" : "*";
+                        gameButtons.put("g" + game, game + current);
+                    });
         }
-        for (String game : model.getCurrentGames()) {
-            String current = JolAdmin.INSTANCE.isCurrent(player, game) ? "" : "*";
-            gameButtons.put("g" + game, game + current);
-        }
-        message = JolAdmin.INSTANCE.getMessage();
-        stamp = JolAdmin.getDate();
+        stamp = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
     }
 
 }

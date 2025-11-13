@@ -1,6 +1,12 @@
 package net.deckserver.dwr.model;
 
 import lombok.Getter;
+import net.deckserver.JolAdmin;
+import net.deckserver.game.enums.Phase;
+import net.deckserver.services.ChatService;
+import net.deckserver.services.GameService;
+import net.deckserver.services.RegistrationService;
+import net.deckserver.storage.json.game.ChatData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
@@ -19,53 +25,49 @@ public class GameModel implements Comparable<GameModel> {
 
     @Getter
     private final String name;
+    private final JolGame game;
     private final Map<String, GameView> views = new HashMap<>();
 
-    public GameModel(String name) {
-        this.name = name;
+    public GameModel(JolGame game) {
+        this.name = game.getName();
+        this.game = game;
+        ChatService.subscribe(game.id(), this);
     }
 
-    public synchronized String chat(String player, String chat) {
-        JolAdmin admin = JolAdmin.INSTANCE;
-        JolGame game = admin.getGame(name);
-        boolean isJudge = admin.isJudge(player) && !getPlayers().contains(player);
-        if (!getPlayers().contains(player) && !isJudge) {
-            return "Not authorized";
+    public void endTurn(String player) {
+        JolGame game = GameService.getGameByName(name);
+        if (game.getActivePlayer().equals(player)) {
+            game.newTurn();
+            reloadNotes();
+            JolAdmin.saveGameState(game);
+            JolAdmin.pingPlayer(game.getActivePlayer(), name);
+            doReload(true, true, true);
         }
-        DoCommand commander = new DoCommand(game, this);
-        int idx = game.getActions(game.getCurrentTurn()).length;
-        String status = commander.doMessage(player, chat, isJudge);
-        addChats(idx);
-        admin.saveGameState(game);
-        return status;
     }
 
-    public synchronized String submit(String player, String phase, String command, String chat,
-                                      String ping, String endTurn) {
-        JolAdmin admin = JolAdmin.INSTANCE;
+    public String submit(String player, String phase, String command, String chat, String ping) {
         // Only players and judges can issue commands.  A judge can't be a player
-        boolean isJudge = admin.isJudge(player) && !getPlayers().contains(player);
+        boolean isJudge = JolAdmin.isJudge(player) && !getPlayers().contains(player);
         if (!getPlayers().contains(player) && !isJudge) {
             return "Not authorized";
         }
-        JolGame game = admin.getGame(name);
+        JolGame game = GameService.getGameByName(name);
         StringBuilder status = new StringBuilder();
         if (player != null) {
             boolean stateChanged = false;
             boolean phaseChanged = false;
             boolean chatChanged = false;
             boolean turnChanged = false;
-            int idx = game.getActions(game.getCurrentTurn()).length;
             if (ping != null) {
-                boolean pingSuccessful = admin.pingPlayer(ping, name);
+                boolean pingSuccessful = JolAdmin.pingPlayer(ping, name);
                 if (!pingSuccessful) {
                     status.append("Player is already pinged");
                 }
             }
             if (phase != null &&
                     game.getActivePlayer().equals(player)
-                    && !game.getPhase().equals(phase)) {
-                game.setPhase(phase);
+                    && !game.getPhase().equals(Phase.of(phase))) {
+                game.setPhase(Phase.of(phase));
                 phaseChanged = true;
             }
             if (command != null || chat != null) {
@@ -89,23 +91,15 @@ public class GameModel implements Comparable<GameModel> {
                 }
                 if (chat != null) {
                     didChat = true;
-                    status.append(commander.doMessage(player, chat, isJudge));
+                    commander.doMessage(player, chat, isJudge);
                     chatChanged = true;
                 }
                 OffsetDateTime timestamp = OffsetDateTime.now();
                 METRICS.info(new ObjectArrayMessage(timestamp.getYear(), timestamp.getMonthValue(), timestamp.getDayOfMonth(), timestamp.getHour(), player, game.getName(), didCommand, didChat));
-                admin.clearPing(player, name);
+                JolAdmin.clearPing(player, name);
             }
-            if (game.getActivePlayer().equals(player) && "Yes".equalsIgnoreCase(endTurn)) {
-                game.newTurn();
-                resetChats();
-                reloadNotes();
-                idx = 0; // reset the current action index for the new turn.
-                turnChanged = stateChanged = phaseChanged = true;
-            }
-            addChats(idx);
             if (stateChanged || phaseChanged || chatChanged) {
-                admin.saveGameState(game);
+                JolAdmin.saveGameState(game);
             }
             doReload(stateChanged, phaseChanged, turnChanged);
         }
@@ -114,9 +108,7 @@ public class GameModel implements Comparable<GameModel> {
 
     public GameView getView(String player) {
         if (!views.containsKey(player)) {
-            synchronized (this) {
-                views.put(player, new GameView(name, player));
-            }
+            views.put(player, new GameView(game, name, player));
         }
         return views.get(player);
     }
@@ -126,7 +118,7 @@ public class GameModel implements Comparable<GameModel> {
     }
 
     public Set<String> getPlayers() {
-        return JolAdmin.INSTANCE.getPlayers(name);
+        return RegistrationService.getPlayers(name);
     }
 
     public int compareTo(GameModel arg0) {
@@ -134,38 +126,36 @@ public class GameModel implements Comparable<GameModel> {
     }
 
     public void updateGlobalNotes(String notes) {
-        JolAdmin admin = JolAdmin.INSTANCE;
-        JolGame game = admin.getGame(name);
-        if (!game.getGlobalText().equals(notes)) {
+        JolGame game = GameService.getGameByName(name);
+        if (!notes.equals(game.getGlobalText())) {
             game.setGlobalText(notes);
             reloadNotes();
-            admin.saveGameState(game);
+            JolAdmin.saveGameState(game);
         }
     }
 
     public void updatePrivateNotes(String player, String notes) {
-        JolAdmin admin = JolAdmin.INSTANCE;
-        JolGame game = admin.getGame(name);
+        JolGame game = GameService.getGameByName(name);
         if (!notes.equals(game.getPrivateNotes(player))) {
             game.setPrivateNotes(player, notes);
             views.get(player).privateNotesChanged();
-            admin.saveGameState(game, true);
+            JolAdmin.saveGameState(game, true);
         }
     }
 
-    private void addChats(int idx) {
+    public void addChat(ChatData chat) {
         for (GameView gameView : views.values()) {
-            gameView.addChats(idx);
+            gameView.addChat(chat);
         }
     }
 
-    private void resetChats() {
+    public void clearChats() {
         for (GameView gameView : views.values()) {
-            gameView.reset(false);
+            gameView.clearAccess();
         }
     }
 
-    private void doReload(boolean stateChanged, boolean phaseChanged, boolean turnChanged) {
+    public void doReload(boolean stateChanged, boolean phaseChanged, boolean turnChanged) {
         for (String key : (new ArrayList<>(views.keySet()))) {
             GameView view = views.get(key);
             if (stateChanged) view.stateChanged();

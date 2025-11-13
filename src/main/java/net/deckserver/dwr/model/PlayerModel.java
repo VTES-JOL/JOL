@@ -1,8 +1,16 @@
 package net.deckserver.dwr.model;
 
 import lombok.Getter;
+import lombok.Setter;
+import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.ChatEntryBean;
-import net.deckserver.storage.json.system.DeckFormat;
+import net.deckserver.game.enums.DeckFormat;
+import net.deckserver.game.enums.GameFormat;
+import net.deckserver.services.DeckService;
+import net.deckserver.services.GlobalChatService;
+import net.deckserver.services.RegistrationService;
+import net.deckserver.storage.json.deck.DeckParser;
+import net.deckserver.storage.json.deck.ExtendedDeck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,14 +21,21 @@ public class PlayerModel {
 
     private final static Logger logger = LoggerFactory.getLogger(PlayerModel.class);
     private final String player;
-    private final Set<String> games = new HashSet<>();
     private final List<ChatEntryBean> chats = new ArrayList<>();
     private String game = null;
     @Getter
     private String view;
-    private String deckName;
-    private String contents;
+    @Setter
     private String message;
+    @Getter
+    @Setter
+    private ExtendedDeck deck;
+    @Getter
+    @Setter
+    private String contents;
+    @Getter
+    @Setter
+    private String deckFilter = "ALL";
 
     public PlayerModel(String name, boolean loadChat) {
         this.player = name;
@@ -34,27 +49,16 @@ public class PlayerModel {
         return player;
     }
 
-    public Set<String> getCurrentGames() {
-        return games;
-    }
-
     public String getCurrentGame() {
         return game;
     }
 
     public void enterGame(String gameName) {
         setView("game");
-        if (JolAdmin.INSTANCE.isInGame(gameName, player)) {
-            games.add(gameName);
-        }
         if (!gameName.equals(this.game)) {
-            JolAdmin.INSTANCE.getGameModel(gameName).resetView(player);
+            JolAdmin.resetView(player, gameName);
         }
         this.game = gameName;
-    }
-
-    public void removeGame(String gameName) {
-        games.remove(gameName);
     }
 
     public void setView(String view) {
@@ -62,11 +66,11 @@ public class PlayerModel {
         this.game = null;
     }
 
-    public synchronized void chat(ChatEntryBean chat) {
+    public  void chat(ChatEntryBean chat) {
         chats.add(chat);
     }
 
-    public synchronized List<ChatEntryBean> getChat() {
+    public  List<ChatEntryBean> getChat() {
         List<ChatEntryBean> output = new ArrayList<>(chats);
         Collections.copy(output, chats);
         chats.clear();
@@ -74,7 +78,7 @@ public class PlayerModel {
     }
 
     public void resetChats() {
-        List<ChatEntryBean> globalChat = JolAdmin.INSTANCE.getChats();
+        List<ChatEntryBean> globalChat = GlobalChatService.getChats();
         chats.addAll(globalChat);
     }
 
@@ -83,42 +87,27 @@ public class PlayerModel {
     }
 
     public void loadDeck(String deckName) {
-        JolAdmin admin = JolAdmin.INSTANCE;
         try {
-            this.deckName = deckName;
-            String deckId = admin.getDeckId(player, deckName);
-            DeckFormat deckFormat = admin.getDeckFormat(player, deckName);
+            String deckId = JolAdmin.getDeckId(player, deckName);
+            DeckFormat deckFormat = JolAdmin.getDeckFormat(player, deckName);
             if (deckFormat.equals(DeckFormat.LEGACY)) {
-                this.contents = admin.getLegacyContents(deckId).trim();
+                this.contents = DeckService.getLegacyContents(deckId).trim();
+                this.deck = DeckParser.parseDeck(contents);
             } else {
-                this.contents = admin.getDeckContents(deckId).trim();
+                this.contents = DeckService.getDeckContents(deckId).trim();
+                this.deck = DeckService.getDeck(deckId);
             }
+            this.deck.getDeck().setName(deckName);
         } catch (IOException e) {
             logger.error("Unable to set deck", e);
-            this.deckName = null;
+            this.deck = null;
             this.contents = null;
         }
     }
 
     public void clearDeck() {
-        this.deckName = null;
+        this.deck = null;
         this.contents = null;
-    }
-
-    public String getContents() {
-        return contents;
-    }
-
-    public void setContents(String contents) {
-        this.contents = contents;
-    }
-
-    public String getDeckName() {
-        return deckName;
-    }
-
-    public void setDeckName(String deckName) {
-        this.deckName = deckName;
     }
 
     public String getMessage() {
@@ -127,7 +116,4 @@ public class PlayerModel {
         return result;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

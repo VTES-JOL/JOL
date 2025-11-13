@@ -1,6 +1,6 @@
 package net.deckserver.rest;
 
-import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.JolAdmin;
 
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +39,7 @@ public class SecurityFilter implements ContainerRequestFilter {
 
                 @Override
                 public boolean isUserInRole(String role) {
-                    return JolAdmin.INSTANCE.isInRole(username, role);
+                    return JolAdmin.isInRole(username, role);
                 }
 
                 @Override

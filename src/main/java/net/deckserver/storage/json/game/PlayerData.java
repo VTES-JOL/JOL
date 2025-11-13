@@ -1,14 +1,10 @@
 package net.deckserver.storage.json.game;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import lombok.AccessLevel;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import net.deckserver.game.storage.state.RegionType;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import net.deckserver.game.enums.RegionType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +13,9 @@ import java.util.Map;
 @JsonIdentityReference
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Data
+@EqualsAndHashCode(exclude = {"prey", "predator"})
+@ToString(of = {"name"})
 public class PlayerData {
-    @Setter(AccessLevel.NONE)
     private String name;
     private int pool = 30;
     private float victoryPoints = 0.0f;
@@ -29,11 +26,11 @@ public class PlayerData {
     @JsonIdentityReference(alwaysAsId = true)
     private PlayerData predator;
 
-    @Getter(AccessLevel.NONE) @Setter(AccessLevel.NONE)
     private Map<RegionType, RegionData> regions = new HashMap<>();
 
     private boolean ousted = false;
     private String notes;
+    private String choice;
 
     public PlayerData(String name) {
         this.name = name;
@@ -45,7 +42,12 @@ public class PlayerData {
     public PlayerData() {
     }
 
+    @JsonIgnore
     public RegionData getRegion(RegionType type) {
         return this.regions.get(type);
+    }
+
+    public void addVictoryPoints(float points) {
+        this.victoryPoints += points;
     }
 }

@@ -1,26 +1,20 @@
 package net.deckserver.dwr.bean;
 
 import lombok.Data;
-import net.deckserver.dwr.model.JolAdmin;
+import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.JolGame;
+import net.deckserver.services.PlayerActivityService;
+import net.deckserver.services.PlayerGameActivityService;
 
 @Data
 public class PlayerStatus {
     private String playerName;
-    private int pool;
     private boolean pinged;
     private boolean current;
 
     public PlayerStatus(String gameName, String playerName) {
-        JolAdmin admin = JolAdmin.INSTANCE;
         this.playerName = playerName;
-        JolGame game = admin.getGame(gameName);
-        this.pool = game.getPool(playerName);
-        this.pinged = admin.isPlayerPinged(playerName, gameName);
-        this.current = admin.getPlayerAccess(playerName, gameName).isAfter(admin.getGameTimeStamp(gameName));
-    }
-
-    public boolean isOusted() {
-        return this.pool == 0;
+        this.pinged = PlayerGameActivityService.isPlayerPinged(playerName, gameName);
+        this.current = PlayerGameActivityService.getPlayerAccess(playerName, gameName).isAfter(PlayerGameActivityService.getGameTimestamp(gameName));
     }
 }

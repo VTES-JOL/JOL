@@ -1,25 +1,171 @@
 "use strict";
-var CLAN_CHARS = {
-    abomination: 'A', ahrimane: 'B', akunanse: 'C', assamite: 'n', baali: 'E',
-    blood_brother: 'F', brujah: 'o', brujah_antitribu: 'H', caitiff: 'I',
-    daughter_of_cacophony: 'J', follower_of_set: 'r', gangrel: 'p',
-    gangrel_antitribu: 'M', gargoyle: 'N', giovanni: 'O', guruhi: 'P',
-    harbinger_of_skulls: 'Q', ishtarri: 'R', kiasyd: 'S', lasombra: 'w',
-    malkavian: 'q', malkavian_antitribu: 'V', nagaraja: 'W', nosferatu: 's',
-    nosferatu_antitribu: 'Y', hecata: 'y', osebo: 'Z', pander: 'a', ravnos: 'x',
-    salubri: 'c', salubri_antitribu: 'd', samedi: 'e', toreador: 't',
-    toreador_antitribu: 'g', tremere: 'u', tremere_antitribu: 'i',
-    true_brujah: 'j', tzimisce: 'k', ventrue: 'v', ventrue_antitribu: 'm',
-    avenger: '1', defender: '2', innocent: '3', judge: '4', martyr: '5',
-    redeemer: '6', visionary: '7'
-};
+const CLANS = ["Abomination", "Ahrimane", "Akunanse", "Baali", "Banu Haqim", "Blood Brother", "Brujah", "Brujah Antitribu",
+    "Caitiff", "Daughter of Cacophony", "Gangrel", "Gangrel Antitribu", "Gargoyle", "Giovanni", "Guruhi", "Harbinger of Skulls",
+    "Ishtarri", "Kiasyd", "Lasombra", "Malkavian", "Malkavian Antitribu", "Nagaraja", "Nosferatu", "Nosferatu Antitribu",
+    "Hecata", "Ministry", "Osebo", "Pander", "Ravnos", "Salubri", "Salubri Antitribu", "Samedi", "Toreador", "Toreador Antitribu",
+    "Tremere", "Tremere Antitribu", "True Brujah", "Tzimisce", "Ventrue", "Ventrue Antitribu", "Avenger", "Defender", "Innocent",
+    "Judge", "Martyr", "Redeemer", "Visionary"];
+
+const PATHS = ['Death and the Soul', 'Power and the Inner Voice', 'Cathari', 'Caine', 'None'];
+const SECTS = ["Camarilla", "Sabbat", "Independent", "Laibon", "Anarch", "None"];
 
 function cardTypeCSSClass(cardType) {
     return cardType.toLowerCase().replace(' ', '_').replace('/', ' ');
 }
 
-function clanToKey(clan) {
-    return clan.toLowerCase().replace(/ /g, '_');
+function nameToKey(name) {
+    if (name.toLowerCase() === "none") {
+        return "";
+    }
+    return name.toLowerCase().replace(/ /g, '_');
+}
+
+// Helpers to convert between display and keys, and to sentence-case tooltips
+function sentenceCase(upperOrMixed) {
+    if (!upperOrMixed) return "";
+    const s = String(upperOrMixed).toLowerCase();
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function keyToDisplay(key) {
+    if (!key) return "None";
+    return key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+function buildIconSpan(kind, display) {
+    const key = nameToKey(display);
+    const $span = $("<span/>").addClass(kind).addClass(key);
+    if (kind === 'clan') {
+        // Tooltip should be sentence case of original DESCRIPTION (display)
+        $span.attr('title', sentenceCase(display));
+    }
+    if (kind === 'sect') {
+        $span.addClass('sect'); // ensure class hook
+        $span.attr('title', sentenceCase(display));
+    }
+    if (kind === 'path') {
+        $span.addClass('path');
+        $span.attr('title', sentenceCase(display));
+    }
+    return $span;
+}
+
+function fillSelect($select, options) {
+    $select.empty();
+    for (const opt of options) {
+        const val = nameToKey(opt);
+        const text = opt; // keep human-friendly
+        $select.append($("<option/>").attr('value', val).text(text));
+    }
+}
+
+// Toggle between icon and select for a field
+function enableInlinePicker(config) {
+    const {containerSel, selectSel, values, currentDisplay, minion, onChanged} = config;
+    const $container = $(containerSel);
+    const $select = $(selectSel);
+
+    // Small helpers to DRY logic and reduce DOM churn
+    function createNonePlaceholder() {
+        return $('<span/>')
+            .addClass('text-muted')
+            .css({cursor: 'pointer', 'border-radius': '4px', padding: '0 2px', margin: '0 2px'})
+            .attr('title', 'None')
+            .html('<i class="bi bi-ban"></i>')
+            .on('mouseenter.inlinePicker', function () {
+                $(this).css('box-shadow', '0 0 0.25rem 0.15rem rgba(108, 117, 125, 0.6)');
+            })
+            .on('mouseleave.inlinePicker', function () {
+                $(this).css('box-shadow', 'none');
+            });
+    }
+
+    function renderContainer(kind, display) {
+        const hasValue = display && display.toLowerCase() !== 'none';
+        if (hasValue) {
+            $container.html(buildIconSpan(kind, display));
+        } else {
+            $container.html(createNonePlaceholder());
+        }
+    }
+
+    function ensureOptions($sel, opts) {
+        // Only (re)build if counts differ or first/last differ (cheap check)
+        const existing = $sel[0].options;
+        const needsBuild =
+            existing.length !== opts.length ||
+            (opts.length > 0 &&
+                (existing[0]?.value !== nameToKey(opts[0]) ||
+                    existing[existing.length - 1]?.value !== nameToKey(opts[opts.length - 1])));
+        if (needsBuild) {
+            fillSelect($sel, opts);
+        }
+    }
+
+    function setSelectValue($sel, key) {
+        if ($sel.val() !== key) {
+            $sel.val(key);
+        }
+    }
+
+    // Determine kind based on container
+    const kind = $container.hasClass('card-clan') ? 'clan'
+        : ($container.hasClass('card-path') ? 'path' : 'sect');
+
+    // Early bail if not a minion
+    if (!minion) {
+        $container.addClass('d-none').empty();
+        $select.addClass('d-none');
+        return;
+    }
+    $container.removeClass('d-none');
+
+    // Common hover effect for container (Bootstrap secondary-like color)
+    $container
+        .css('border-radius', '4px')
+        .off('mouseenter.inlinePicker mouseleave.inlinePicker')
+        .on('mouseenter.inlinePicker', function () {
+            $(this).css('box-shadow', '0 0 0.25rem 0.15rem rgba(108, 117, 125, 0.6)');
+        })
+        .on('mouseleave.inlinePicker', function () {
+            $(this).css('box-shadow', 'none');
+        });
+
+    // Prepare select once (only if needed), and set current value
+    ensureOptions($select, values);
+    const currentKey = nameToKey(currentDisplay || "None");
+    setSelectValue($select, currentKey);
+
+    // Initial render
+    renderContainer(kind, currentDisplay);
+
+    // Click to switch to select
+    $container.off('click.inlinePicker').on('click.inlinePicker', function () {
+        $container.addClass('d-none');
+        $select.removeClass('d-none').focus();
+    });
+
+    // Change handler -> send update and re-render
+    $select.off('change.inlinePicker').on('change.inlinePicker', function () {
+        const newKey = $(this).val();
+        const newDisplay = keyToDisplay(newKey);
+        const trimmedKey = (newKey || '').split('_', 1)[0];
+
+        if (newDisplay !== currentDisplay) {
+            onChanged(newDisplay, trimmedKey);
+        }
+
+        // Switch back to icon reflecting new value (or None placeholder)
+        $select.addClass('d-none');
+        $container.removeClass('d-none');
+        renderContainer(kind, newDisplay);
+    });
+
+    // Blur -> revert without change
+    $select.off('blur.inlinePicker').on('blur.inlinePicker', function () {
+        $select.addClass('d-none');
+        $container.removeClass('d-none');
+    });
 }
 
 function showPlayCardModal(event) {
@@ -28,12 +174,13 @@ function showPlayCardModal(event) {
     playCardModal.find(".loading").show();
     let eventParent = $(event.target).parents(".list-group-item");
     let cardId = eventParent.data('card-id');
+    let secured = eventParent.data('secured') || false ? "secured/" : "";
     let coordinates = eventParent.data('coordinates');
     let region = eventParent.closest('[data-region]').data('region');
     if (cardId) {
         $.get({
             dataType: "json",
-            url: "https://static.tornsignpost.org/json/" + cardId, success: function (card) {
+            url: `${BASE_URL}/${secured}json/${cardId}`, success: function (card) {
                 playCardModal.data('hand-coord', coordinates);
                 playCardModal.data('region', region);
                 playCardModal.data('do-not-replace', region === "research" ? true : card.doNotReplace);
@@ -43,12 +190,18 @@ function showPlayCardModal(event) {
                     .addClass('icon card-type ' + cardTypeCSSClass(card.type));
                 playCardModal.find(".preamble").text(card.preamble || "");
                 playCardModal.find(".burn-option").toggle(card.burnOption || "");
+                playCardModal.find(".card-sect").text(card.sect || "");
+                let path = playCardModal.find(".card-path");
+                path.empty();
+                if (card.path != null) {
+                    path.append($("<span/>").addClass("path").addClass(nameToKey(card.path)));
+                }
 
                 let clan = playCardModal.find(".card-clan");
                 clan.empty();
                 if (card.clans != null) {
                     for (let c of card.clans)
-                        clan.append($("<span/>").addClass("clan").addClass(clanToKey(c)));
+                        clan.append($("<span/>").addClass("clan").addClass(nameToKey(c)));
                 }
 
                 var costText = null;
@@ -59,7 +212,7 @@ function showPlayCardModal(event) {
                 }
                 playCardModal.find(".card-cost").html(costText);
 
-                let  modeContainer = playCardModal.find(".card-modes");
+                let modeContainer = playCardModal.find(".card-modes");
                 modeContainer.empty();
 
                 if (card.modes && card.modes.length > 0) {
@@ -68,7 +221,9 @@ function showPlayCardModal(event) {
                         let mode = card.modes[i];
                         let button = modeTemplate.clone();
 
-                        button.data('disciplines', mode.disciplines);
+                        if (mode.disciplines && mode.disciplines.length > 0) {
+                            button.data('disciplines', mode.disciplines);
+                        }
                         button.data('target', mode.target);
 
                         let extendedPlayPanel = playCardModal.find(".extended-play-panel");
@@ -121,6 +276,16 @@ function showTargetPicker(target) {
     $('#targetPicker .modal-body').text(
         target === 'SELF' ? 'Who is playing this card?' : 'Pick target.');
     picker.show();
+
+    // Close when clicking outside of the picker
+    $(document).off('mousedown.targetPicker').on('mousedown.targetPicker', function (e) {
+        const $target = $(e.target);
+        const clickedInsidePicker = $target.closest('#targetPicker').length > 0;
+        const clickedCardOnTable = $target.closest('.list-group-item,[data-coordinates]').length > 0;
+        if (!clickedInsidePicker && !clickedCardOnTable) {
+            closeTargetPicker();
+        }
+    });
 
     let usePlayerSelector = target === 'MINION_YOU_CONTROL' || target === 'SELF';
     //"player" from js/ds.js
@@ -232,70 +397,88 @@ function showCardModal(event) {
     let locked = target.data('locked');
     let votes = target.data('votes');
     let contested = target.data('contested');
+    let secured = target.data('secured') || false ? "secured/" : "";
     let minion = target.data("minion");
     let disciplines = target.data("disciplines").trim().split(" ");
+    let sect = target.data("sect");
+    let path = target.data("path");
+    let clan = target.data("clan");
     let owner = controller === player;
     if (cardId) {
+        if (profile.imageTooltipPreference) {
+            let content = `<img width="350" height="500" src="${BASE_URL}/${secured}images/${cardId}" alt="Loading..."/>`;
+            $("#card-image").html(content);
+        } else {
+            $.get({
+                dataType: "html",
+                url: `${BASE_URL}/${secured}html/${cardId}`, success: function (data) {
+                    let content = `<div class="p-2">${data}</div>`;
+                    $("#card-image").html(content);
+                }
+            });
+        }
         $.get({
             dataType: "json",
-            url: "https://static.tornsignpost.org/json/" + cardId, success: function (card) {
-                var modal = $('#cardModal');
+            url: `${BASE_URL}/${secured}json/${cardId}`, success: function (card) {
+
+                const modal = $('#cardModal');
+                // Update fields used for commands
                 modal.data('controller', controller);
                 modal.data('region', region);
                 modal.data('coordinates', coordinates);
 
+                // Set Modal name to card name
                 $('#cardModal .card-name').text(card.displayName);
-                $('#cardModal .card-label').text(label).toggle(label.length > 0);
-                $('#cardModal .card-text').html(card.originalText);
+                // Display label
+                $('#card-label').val(label);
+                // Votes
                 $('#cardModal .votes').text(votes).addClass("badge rounded-pill text-bg-warning").toggle(votes > 0 || votes === 'P');
 
-                let clan = $("#cardModal .card-clan");
-                clan.empty();
-                if (card.clans != null) {
-                    for (let c of card.clans)
-                        clan.append($("<span/>").addClass("clan").addClass(clanToKey(c)));
+                // Cost
+                var costText = null;
+                if (card.cost != null) {
+                    let value = card.cost.split(" ")[0];
+                    let type = card.cost.split(" ")[1];
+                    costText = "<span class='icon " + type + value + "'></span>";
                 }
+                $('#cardModal .card-cost').html(costText);
 
-                let disciplineSpan = $('#cardModal .discipline');
-                disciplineSpan.empty();
-                if (disciplines.length < 0) {
-                    disciplines = card.disciplines;
-                }
-                if (disciplines.length > 0) {
-                    for (let d of disciplines) {
-                        disciplineSpan.append($("<span/>").addClass("icon").addClass(d));
-                    }
-                }
-
-                //If this is our inactive region, show capacity required to influence out.
-                //player is a global from ds.js - the logged-in player
+                // Set counters on card, capacity, and player pool
                 if (controller === player && capacity === 0 && card.capacity != null)
                     capacity = card.capacity;
                 setCounters(counters, capacity, card.type);
                 setPool(controllerPool);
 
+                // Reset buttons to default state
                 $('#cardModal .transfers').removeClass("d-none");
                 $('#cardModal .counters').removeClass("d-none");
                 $('#cardModal button').show();
+
+                //
                 $(`#cardModal button[data-region]`).each(function () {
                     let showThis = $(this).data("region").split(" ").includes(region);
                     if (!showThis) {
                         $(this).hide();
                     }
                 })
-
+                // Hide buttons not valid for lock state
                 $(`#cardModal button[data-lock-state][data-lock-state!="${locked ? "locked" : "unlocked"}"]`).hide();
+
+                // Hide buttons not valid for contested state
                 $(`#cardModal button[data-contested][data-contested!="${contested}"]`).hide();
 
+                // Hide buttons intended for owner only
                 if (!owner) {
                     $('#cardModal .transfers').addClass("d-none");
                     $("#cardModal button[data-owner-only]").hide();
                 }
 
+                // Hide buttons intended for use by top level cards
                 if (isChild) {
                     $(`#cardModal button[data-top-level-only]`).hide();
                 }
 
+                // Hide buttons intended for use by non-minion cards
                 if (minion) {
                     $(`#cardModal button[data-non-minion-only]`).hide();
                 } else {
@@ -303,14 +486,58 @@ function showCardModal(event) {
                     $(`#cardModal button[data-minion-only]`).hide();
                 }
 
+                // Hide counter-buttons if the card is in ashheap
                 if (region === "ashheap") {
                     $('#cardModal .counters').addClass("d-none");
                 }
 
+                // Render and wire up clan/path/sect inline pickers
+                const currentClan = clan && clan !== 'NONE' ? clan : 'None';
+                const currentSect = sect && sect !== 'NONE' ? sect : 'None';
+                const currentPath = path && path !== 'NONE' ? path : 'None';
+
+                enableInlinePicker({
+                    containerSel: '#cardModal .card-clan',
+                    selectSel: '#clan-select',
+                    values: CLANS,
+                    currentDisplay: currentClan,
+                    minion: minion,
+                    onChanged: function (newDisplay, newKey) {
+                        // Update data-* for subsequent opens or actions if needed
+                        target.data('clan', newDisplay);
+                        // Send update to server
+                        sendCommand(['clan', modal.data('controller').split(' ', 2)[0], modal.data('region').split(' ')[0], modal.data('coordinates'), newKey.split('_')[0]].join(' ').trim());
+                    }
+                });
+
+                enableInlinePicker({
+                    containerSel: '#cardModal .card-path',
+                    selectSel: '#path-select',
+                    values: PATHS,
+                    currentDisplay: currentPath,
+                    minion: minion,
+                    onChanged: function (newDisplay, newKey) {
+                        target.data('path', newDisplay);
+                        sendCommand(['path', modal.data('controller').split(' ', 2)[0], modal.data('region').split(' ')[0], modal.data('coordinates'), newKey.split('_')[0]].join(' ').trim());
+                    }
+                });
+
+                enableInlinePicker({
+                    containerSel: '#cardModal .card-sect',
+                    selectSel: '#sect-select',
+                    values: SECTS,
+                    currentDisplay: currentSect,
+                    minion: minion,
+                    onChanged: function (newDisplay, newKey) {
+                        target.data('sect', newDisplay);
+                        sendCommand(['sect', modal.data('controller').split(' ', 2)[0], modal.data('region').split(' ')[0], modal.data('coordinates'), newKey].join(' ').trim());
+                    }
+                });
+
                 $('#cardModal .loading').hide();
                 $('#cardModal .loaded').show();
                 tippy.hideAll({duration: 0});
-                $('#cardModal').modal('show');
+                modal.modal('show');
             }
         });
     }
@@ -467,6 +694,26 @@ function removeFromGame() {
     return doCardCommand('rfg');
 }
 
+function movePredator() {
+    let modal = $('#cardModal');
+    let region = $("#cardModal").data('region');
+    var player = modal.data('controller').split(' ', 2)[0]; //names with spaces do not work
+    let command = `move ${player} ${region} ${modal.data('coordinates')} predator`;
+    sendCommand(command);
+    modal.modal('hide');
+    return false;
+}
+
+function movePrey() {
+    let modal = $('#cardModal');
+    let region = $("#cardModal").data('region');
+    var player = modal.data('controller').split(' ', 2)[0]; //names with spaces do not work
+    let command = `move ${player} ${region} ${modal.data('coordinates')} prey`;
+    sendCommand(command);
+    modal.modal('hide');
+    return false;
+}
+
 function removeCounter(doCommand = true) {
     var modal = $('#cardModal');
     var counters = modal.data('counters');
@@ -517,6 +764,19 @@ function transferToCard() {
     setPool(pool - 1);
     addCounter(false);
     return false;
+}
+
+function updateNotes() {
+    var cardLabel = $("#card-label").val();
+    var modal = $('#cardModal');
+    var parts = new Array(5);
+    parts.push('label',
+        modal.data('controller').split(' ', 2)[0],
+        modal.data('region').split(' ')[0], //ready-region > ready
+        modal.data('coordinates'),
+        cardLabel);
+    var command = parts.join(' ');
+    sendCommand(command.trim());
 }
 
 function transferToPool() {

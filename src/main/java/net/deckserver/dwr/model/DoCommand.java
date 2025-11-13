@@ -6,31 +6,25 @@
 
 package net.deckserver.dwr.model;
 
-import net.deckserver.game.interfaces.state.Card;
-import net.deckserver.game.interfaces.state.Location;
-import net.deckserver.game.storage.cards.CardSearch;
+import net.deckserver.services.CardService;
+import net.deckserver.game.enums.Clan;
+import net.deckserver.game.enums.Path;
+import net.deckserver.game.enums.RegionType;
+import net.deckserver.game.enums.Sect;
+import net.deckserver.services.ParserService;
 import net.deckserver.storage.json.cards.CardSummary;
+import net.deckserver.storage.json.game.CardData;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
-public class DoCommand {
-
-    private final JolGame game;
-    private final GameModel model;
-
-    public DoCommand(JolGame game, GameModel model) {
-        this.game = game;
-        this.model = model;
-    }
+public record DoCommand(JolGame game, GameModel model) {
 
     public String doMessage(String player, String message, boolean isJudge) {
         if (message.isEmpty())
             return "No message received";
         game.sendMsg(player, message, isJudge);
-        return "Sent message";
+        return null;
     }
 
     public void doCommand(String player, String command) throws CommandException {
@@ -120,69 +114,99 @@ public class DoCommand {
             case "rfg":
                 rfg(cmdObj, player);
                 break;
+            case "path":
+                path(cmdObj, player);
+                break;
+            case "sect":
+                sect(cmdObj, player);
+                break;
+            case "clan":
+                clan(cmdObj, player);
+                break;
+        }
+    }
+
+    private void sect(CommandParser cmdObj, String player) throws CommandException {
+        String targetPlayer = cmdObj.getPlayer(player);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+        CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
+        if (!cmdObj.hasMoreArgs()) {
+            game.setSect(player, targetCard.getId(), Sect.NONE, false);
+        } else {
+            String sectString = cmdObj.nextArg();
+            Sect sect = Sect.startsWith(sectString);
+            if (sect == null) {
+                throw new CommandException("Invalid sect");
+            }
+            game.setSect(player, targetCard.getId(), sect, false);
+        }
+    }
+
+    private void
+    path(CommandParser cmdObj, String player) throws CommandException {
+        String targetPlayer = cmdObj.getPlayer(player);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+        CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
+        if (!cmdObj.hasMoreArgs()) {
+            game.setPath(player, targetCard.getId(), Path.NONE, false);
+        } else {
+            String pathString = cmdObj.nextArg();
+            Path path = Path.startsWith(pathString);
+            if (Path.NONE.equals(path)) {
+                throw new CommandException("Invalid path");
+            }
+            game.setPath(player, targetCard.getId(), path, false);
+        }
+    }
+
+    private void clan(CommandParser cmdObj, String player) throws CommandException {
+        String targetPlayer = cmdObj.getPlayer(player);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+        CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
+        if (!cmdObj.hasMoreArgs()) {
+            game.setClan(player, targetCard.getId(), Clan.NONE, false);
+        } else {
+            String clanString = cmdObj.remaining();
+            Clan clan = Clan.startsWith(clanString);
+            game.setClan(player, targetCard.getId(), clan, false);
         }
     }
 
     void contest(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
-        String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+        CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         boolean clear = cmdObj.consumeString("clear");
-        game.contestCard(targetCard, clear);
+        game.contestCard(player, targetCard.getId(), clear);
     }
 
     void transfer(CommandParser cmdObj, String player) throws CommandException {
-        String targetRegion = cmdObj.getRegion(JolGame.INACTIVE_REGION);
-        String card = cmdObj.findCard(false, player, targetRegion);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.UNCONTROLLED);
+        CardData card = cmdObj.findCardData(false, player, targetRegion);
         int amount = cmdObj.getAmount(1);
         if (amount == 0) throw new CommandException("Must transfer an amount");
         int pool = game.getPool(player);
         if (pool - amount < 0) throw new CommandException("Invalid amount to transfer.  Not enough pool.");
-        game.transfer(player, card, amount);
+        if (amount < 0 && card.getCounters() < Math.abs(amount)) throw new CommandException("Not enough counters to transfer.");
+        game.transfer(player, card.getId(), amount);
     }
 
     void shuffle(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
-        String targetRegion = cmdObj.getRegion(JolGame.LIBRARY);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.LIBRARY);
         int num = cmdObj.getNumber(0);
         game.shuffle(targetPlayer, targetRegion, num);
     }
 
     void show(CommandParser cmdObj, String player) throws CommandException {
-        String targetRegion = cmdObj.getRegion(JolGame.LIBRARY);
-        int amt = cmdObj.getNumber(100);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.LIBRARY);
+        int amount = cmdObj.getNumber(100);
         boolean all = cmdObj.consumeString("all");
-        List<String> recipients = all ? game.getPlayers() : Collections.singletonList(cmdObj.getPlayer(player));
-        Location loc = game.getState().getPlayerLocation(player, targetRegion);
-        Card[] cards = loc.getCards();
-        StringBuilder buf = new StringBuilder();
-        int len = Math.min(cards.length, amt);
-        buf.append(len);
-        buf.append(" cards of ");
-        buf.append(player);
-        buf.append("'s ");
-        buf.append(targetRegion);
-        buf.append(":\n");
-        for (int j = 0; j < len; j++) {
-            buf.append("  ");
-            buf.append(j + 1);
-            buf.append(" ");
-            buf.append(cards[j].getName());
-            buf.append("\n");
-        }
-        String text = buf.toString();
-        for (String recipient : recipients) {
-            String old = game.getPrivateNotes(recipient);
-            game.setPrivateNotes(recipient, old.isEmpty() ? text : old + "\n" + text);
+        List<String> recipients = all ? game.getValidPlayers() : Collections.singletonList(cmdObj.getPlayer(player));
+        game.show(player, targetRegion, amount, recipients);
+        for (String recipient: recipients) {
             model.getView(recipient).privateNotesChanged();
         }
-        String msg;
-        if (player.equals(recipients.getFirst())) {
-            msg = player + " looks at " + len + " cards of their " + targetRegion + ".";
-        } else {
-            msg = player + " shows " + (recipients.size() > 1 ? "everyone" : recipients.getFirst()) + " " + len + " cards of their " + targetRegion + ".";
-        }
-        game.addMessage(msg);
     }
 
     void order(CommandParser cmdObj, String player) throws CommandException {
@@ -193,16 +217,16 @@ public class DoCommand {
             if (index < 1 || index > players.size()) throw new CommandException("Bad number : " + index);
             newOrder.add(players.get(index - 1));
         }
-        game.setOrder(newOrder);
+        game.setOrder(player, newOrder);
     }
 
     void lock(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
-        String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String card = cmdObj.findCard(true, targetPlayer, targetRegion);
-        if (game.isTapped(card))
+        RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+        CardData card = cmdObj.findCardData(true, targetPlayer, targetRegion);
+        if (card.isLocked())
             throw new CommandException("Card is already locked");
-        game.setLocked(player, card, true);
+        game.setLocked(player, card.getId(), true);
     }
 
     void unlock(CommandParser cmdObj, String player) throws CommandException {
@@ -210,29 +234,29 @@ public class DoCommand {
         if (!cmdObj.hasMoreArgs()) {
             game.unlockAll(targetPlayer);
         } else {
-            String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-            String card = cmdObj.findCard(true, targetPlayer, targetRegion);
-            game.setLocked(player, card, false);
+            RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+            CardData card = cmdObj.findCardData(true, targetPlayer, targetRegion);
+            game.setLocked(player, card.getId(), false);
         }
     }
 
     void capacity(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
-        String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+        CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         int amount = cmdObj.getAmount(0);
         if (amount == 0) throw new CommandException("Must specify an amount of blood");
-        game.changeCapacity(targetCard, amount, false);
+        game.changeCapacity(player, targetCard.getId(), amount, false);
     }
 
     void disciplines(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
-        String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String targetCard = cmdObj.findCard(false, targetPlayer, targetRegion);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+        CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         if (cmdObj.consumeString("reset")) {
-            CardSummary card = CardSearch.INSTANCE.get(game.getCard(targetCard).getCardId());
+            CardSummary card = CardService.get(targetCard.getCardId());
             List<String> disciplines = card.getDisciplines();
-            game.setDisciplines(player, targetCard, disciplines, false);
+            game.setDisciplines(player, targetCard.getId(), disciplines, false);
         } else {
             Set<String> additions = new HashSet<>();
             Set<String> removals = new HashSet<>();
@@ -240,7 +264,7 @@ public class DoCommand {
                 String next = cmdObj.nextArg();
                 String type = next.substring(0, 1);
                 String disc = next.substring(1);
-                if (!ChatParser.isDiscipline(disc.toLowerCase())) {
+                if (!ParserService.isDiscipline(disc.toLowerCase())) {
                     throw new CommandException("Not a valid discipline");
                 }
                 if (type.equals("+")) {
@@ -251,24 +275,24 @@ public class DoCommand {
                     throw new CommandException("Need to specify + or - to change disciplines");
                 }
             }
-            game.setDisciplines(player, targetCard, additions, removals);
+            game.setDisciplines(player, targetCard.getId(), additions, removals);
         }
     }
 
     void blood(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
-        String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String targetCard = cmdObj.findCard(false, false, targetPlayer, targetRegion);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+        CardData targetCard = cmdObj.findCardData(false, false, targetPlayer, targetRegion);
         int amount = cmdObj.getAmount(0);
         if (amount == 0) throw new CommandException("Must specify an amount of blood");
-        game.changeCounters(player, targetCard, amount, false);
+        game.changeCounters(player, targetCard.getId(), amount, false);
     }
 
     void pool(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
         int amount = cmdObj.getAmount(0);
         if (amount != 0) {
-            game.changePool(targetPlayer, amount);
+            game.changePool(player, targetPlayer, amount);
         } else {
             throw new CommandException("Must specify an amount of pool.");
         }
@@ -276,40 +300,48 @@ public class DoCommand {
 
     void burn(CommandParser cmdObj, String player) throws CommandException {
         String srcPlayer = cmdObj.getPlayer(player);
-        String srcRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String cardId = cmdObj.findCard(true, srcPlayer, srcRegion);
+        RegionType srcRegion = cmdObj.getRegion(RegionType.READY);
+        CardData card = cmdObj.findCardData(true, srcPlayer, srcRegion);
         boolean random = Arrays.asList(cmdObj.args).contains("random");
-        boolean top = Arrays.asList(cmdObj.args).contains("top");
-        game.burn(player, cardId, srcPlayer, srcRegion, random);
+        game.burn(player, card.getId(), srcPlayer, srcRegion, random);
     }
 
     void rfg(CommandParser cmdObj, String player) throws CommandException {
         String srcPlayer = cmdObj.getPlayer(player);
-        String srcRegion = cmdObj.getRegion(JolGame.ASH_HEAP);
-        String cardId = cmdObj.findCard(true, srcPlayer, srcRegion);
+        RegionType srcRegion = cmdObj.getRegion(RegionType.ASH_HEAP);
+        CardData card = cmdObj.findCardData(true, srcPlayer, srcRegion);
         boolean random = Arrays.asList(cmdObj.args).contains("random");
-        game.rfg(player, cardId, srcPlayer, srcRegion, random);
+        game.rfg(player, card.getId(), srcPlayer, srcRegion, random);
     }
 
     void move(CommandParser cmdObj, String player) throws CommandException {
         String srcPlayer = cmdObj.getPlayer(player);
-        String srcRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String srcCard = cmdObj.findCard(false, srcPlayer, srcRegion);
-        String destPlayer = cmdObj.getPlayer(player);
-        String destRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String destCard = cmdObj.findCard(false, false, destPlayer, destRegion);
+        RegionType srcRegion = cmdObj.getRegion(RegionType.READY);
+        CardData srcCard = cmdObj.findCardData(false, srcPlayer, srcRegion);
+        String destPlayer;
+        boolean predatorFlag = cmdObj.consumeString("predator");
+        boolean preyFlag = cmdObj.consumeString("prey");
+        if (predatorFlag) {
+            destPlayer = game.getPredatorOf(srcPlayer);
+        } else if (preyFlag) {
+            destPlayer = game.getPreyOf(srcPlayer);
+        } else {
+            destPlayer = cmdObj.getPlayer(player);
+        }
+        RegionType destRegion = cmdObj.getRegion(RegionType.READY);
+        CardData destCard = cmdObj.findCardData(false, false, destPlayer, destRegion);
         boolean top = Arrays.asList(cmdObj.args).contains("top");
 
-        if (List.of(JolGame.READY_REGION, JolGame.INACTIVE_REGION, JolGame.TORPOR).contains(destRegion) && destCard != null) {
-            game.moveToCard(player, srcCard, destCard);
+        if (List.of(RegionType.READY, RegionType.UNCONTROLLED, RegionType.TORPOR).contains(destRegion) && destCard != null) {
+            game.moveToCard(player, srcCard.getId(), destCard.getId());
         } else {
-            game.moveToRegion(player, srcCard, destPlayer, destRegion, top);
+            game.moveToRegion(player, srcCard.getId(), destPlayer, destRegion, top);
         }
     }
 
     void influence(CommandParser cmdObj, String player) throws CommandException {
-        String srcCard = cmdObj.findCard(false, player, JolGame.INACTIVE_REGION);
-        game.influenceCard(player, srcCard, player, JolGame.READY_REGION);
+        CardData srcCard = cmdObj.findCardData(false, player, RegionType.UNCONTROLLED);
+        game.influenceCard(player, srcCard.getId());
     }
 
     void play(CommandParser cmdObj, String player) throws CommandException {
@@ -317,8 +349,8 @@ public class DoCommand {
         if (crypt) {
             throw new CommandException("Invalid command. Use influence instead");
         }
-        String srcRegion = cmdObj.getRegion(JolGame.HAND);
-        String srcCard = cmdObj.findCard(false, player, srcRegion);
+        RegionType srcRegion = cmdObj.getRegion(RegionType.HAND);
+        CardData srcCard = cmdObj.findCardData(false, player, srcRegion);
 
         String[] modes = null;
         boolean modeSpecified = cmdObj.consumeString("@");
@@ -326,11 +358,11 @@ public class DoCommand {
             modes = cmdObj.nextArg().split(",");
 
         String targetPlayer = cmdObj.getPlayer(player);
-        String targetRegion = cmdObj.getRegion(JolGame.ASH_HEAP);
-        String targetCard = cmdObj.findCard(false, false, targetPlayer, targetRegion);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.ASH_HEAP);
+        String targetCardId = Optional.ofNullable(cmdObj.findCardData(false, false, targetPlayer, targetRegion)).map(CardData::getId).orElse(null);
         boolean draw = cmdObj.consumeString("draw");
-        game.playCard(player, srcCard, targetPlayer, targetRegion, targetCard, modes);
-        if (draw) game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
+        game.playCard(player, srcCard.getId(), targetPlayer, targetRegion, targetCardId, modes);
+        if (draw) game.drawCard(player, RegionType.LIBRARY, RegionType.HAND);
     }
 
     void edge(CommandParser cmdObj, String player) throws CommandException {
@@ -339,32 +371,34 @@ public class DoCommand {
             game.burnEdge(player);
         } else {
             String edge = cmdObj.getPlayer(player);
-            game.setEdge(edge);
+            game.setEdge(player, edge);
         }
     }
 
     void draw(CommandParser cmdObj, String player) throws CommandException {
         boolean crypt = cmdObj.consumeString("crypt") || cmdObj.consumeString("vamp");
         int count = cmdObj.getNumber(1);
+        int size = crypt ? game.getSize(player, RegionType.CRYPT) : game.getSize(player, RegionType.LIBRARY);
         if (count <= 0) throw new CommandException("Must draw at least 1 card.");
+        if (count > size) throw new CommandException("Unable to draw, only " + size + " cards left.");
         for (int j = 0; j < count; j++) {
             if (crypt)
-                game.drawCard(player, JolGame.CRYPT, JolGame.INACTIVE_REGION);
+                game.drawCard(player, RegionType.CRYPT, RegionType.UNCONTROLLED);
             else
-                game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
+                game.drawCard(player, RegionType.LIBRARY, RegionType.HAND);
         }
     }
 
     void label(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
-        String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String card = cmdObj.findCard(false, targetPlayer, targetRegion);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+        CardData card = cmdObj.findCardData(false, targetPlayer, targetRegion);
         StringBuilder note = new StringBuilder();
         while (cmdObj.hasMoreArgs()) {
             note.append(" ");
             note.append(cmdObj.nextArg());
         }
-        game.setLabel(card, note.toString(), false);
+        game.setLabel(player, card.getId(), note.toString(), false);
     }
 
     void random(CommandParser cmdObj, String player) throws CommandException {
@@ -376,10 +410,10 @@ public class DoCommand {
 
     void discard(CommandParser cmdObj, String player) throws CommandException {
         boolean random = Arrays.asList(cmdObj.args).contains("random");
-        String card = cmdObj.findCard(true, player, JolGame.HAND);
-        game.discard(player, card, random);
+        CardData card = cmdObj.findCardData(true, player, RegionType.HAND);
+        game.discard(player, card.getId(), random);
         if (cmdObj.consumeString("draw")) {
-            game.drawCard(player, JolGame.LIBRARY, JolGame.HAND);
+            game.drawCard(player, RegionType.LIBRARY, RegionType.HAND);
         }
     }
 
@@ -390,9 +424,9 @@ public class DoCommand {
 
     void votes(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
-        String targetRegion = cmdObj.getRegion(JolGame.READY_REGION);
-        String card = cmdObj.findCard(false, targetPlayer, targetRegion);
-        game.setVotes(card, cmdObj.nextArg(), false);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+        CardData card = cmdObj.findCardData(false, targetPlayer, targetRegion);
+        game.setVotes(player, card.getId(), cmdObj.nextArg(), false);
     }
 
     void reveal() {
@@ -416,7 +450,7 @@ public class DoCommand {
         }
     }
 
-    void choose(CommandParser cmdObj, String player) {
+    void choose(CommandParser cmdObj, String player) throws CommandException {
         String choice = cmdObj.nextArg();
         game.setChoice(player, choice);
     }

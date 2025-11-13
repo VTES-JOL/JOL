@@ -1,12 +1,15 @@
 package net.deckserver.game.storage.cards;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class LibraryCardMode {
     /**
      * Disciplines required to use this mode.
@@ -14,6 +17,18 @@ public class LibraryCardMode {
     private List<String> disciplines;
 
     private String text;
+    /**
+     * Where the card is played, if not the ash heap.
+     */
+    private Target target;
+
+    public LibraryCardMode(LibraryCardMode mode) {
+        if (mode.getDisciplines() != null) {
+            this.disciplines = new ArrayList<>(mode.getDisciplines());
+        }
+        this.text = mode.getText();
+        this.target = mode.getTarget();
+    }
 
     public enum Target {
         /**
@@ -43,9 +58,4 @@ public class LibraryCardMode {
          */
         MINION_YOU_CONTROL
     }
-
-    /**
-     * Where the card is played, if not the ash heap.
-     */
-    private Target target;
 }

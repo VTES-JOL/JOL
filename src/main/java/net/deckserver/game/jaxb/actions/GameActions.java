@@ -1,6 +1,7 @@
 package net.deckserver.game.jaxb.actions;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +22,9 @@ public class GameActions {
     @XmlElement(required = true)
     protected String name;
     @XmlElement(required = true)
-    protected String counter;
+    protected String counter = "1";
     @XmlElement(name = "game-counter", required = true)
-    protected String gameCounter;
+    protected String gameCounter = "1";
     protected List<Turn> turn;
 
     /**

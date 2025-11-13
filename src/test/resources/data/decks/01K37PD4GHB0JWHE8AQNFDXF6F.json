@@ -1,0 +1,273 @@
+{
+  "deck": {
+    "id": null,
+    "name": "Cathari Pre-con",
+    "crypt": {
+      "count": 12,
+      "cards": [
+        {
+          "id": 210754,
+          "name": "Fotini Katsikaris",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210770,
+          "name": "Osvaldo Kühnemann",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210736,
+          "name": "Agnieszka, Tempter of Legions",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210752,
+          "name": "Fernão Barjaona, The Lustful",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210759,
+          "name": "Jürgen, The Libertine",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210758,
+          "name": "Jamila Omondi",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210778,
+          "name": "Ulisse Franchini",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210745,
+          "name": "Clementine",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210735,
+          "name": "Aelswith, The Irresistible",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210783,
+          "name": "Ximena",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210782,
+          "name": "Verrix, Naughty Boy",
+          "count": 1,
+          "comments": "playtest"
+        },
+        {
+          "id": 210748,
+          "name": "Devorah",
+          "count": 1,
+          "comments": "playtest"
+        }
+      ]
+    },
+    "library": {
+      "count": 77,
+      "cards": [
+        {
+          "type": "Master",
+          "count": 12,
+          "cards": [
+            {
+              "id": 100945,
+              "name": "Hungry Coyote, The",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 150016,
+              "name": "Terrifying Visage",
+              "count": 2,
+              "comments": "playtest"
+            },
+            {
+              "id": 100199,
+              "name": "Blood Doll",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 150020,
+              "name": "Forward Momentum",
+              "count": 1,
+              "comments": "playtest"
+            },
+            {
+              "id": 101225,
+              "name": "Misdirection",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 101384,
+              "name": "Pentex(TM) Subversion",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100058,
+              "name": "Anarch Troublemaker",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100588,
+              "name": "Dreams of the Sphinx",
+              "count": 1,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action",
+          "count": 16,
+          "cards": [
+            {
+              "id": 150018,
+              "name": "Enthrall",
+              "count": 8,
+              "comments": "playtest"
+            },
+            {
+              "id": 101211,
+              "name": "Mind Numb",
+              "count": 4,
+              "comments": null
+            },
+            {
+              "id": 100652,
+              "name": "Entrancement",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 102063,
+              "name": "Under Siege",
+              "count": 2,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action Modifier",
+          "count": 24,
+          "cards": [
+            {
+              "id": 150019,
+              "name": "Fever Pitch",
+              "count": 4,
+              "comments": "playtest"
+            },
+            {
+              "id": 150017,
+              "name": "Subversion",
+              "count": 5,
+              "comments": "playtest"
+            },
+            {
+              "id": 100788,
+              "name": "Freak Drive",
+              "count": 4,
+              "comments": null
+            },
+            {
+              "id": 150021,
+              "name": "Hedonism",
+              "count": 5,
+              "comments": "playtest"
+            },
+            {
+              "id": 150024,
+              "name": "Seeds of Terror",
+              "count": 6,
+              "comments": "playtest"
+            }
+          ]
+        },
+        {
+          "type": "Combat",
+          "count": 6,
+          "cards": [
+            {
+              "id": 150022,
+              "name": "Kiss of Cathari",
+              "count": 6,
+              "comments": "playtest"
+            }
+          ]
+        },
+        {
+          "type": "Reaction",
+          "count": 14,
+          "cards": [
+            {
+              "id": 101321,
+              "name": "On the Qui Vive",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 100680,
+              "name": "Eyes of Argus",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 101259,
+              "name": "My Enemy's Enemy",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 101949,
+              "name": "Telepathic Misdirection",
+              "count": 6,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action Modifier/Combat",
+          "count": 5,
+          "cards": [
+            {
+              "id": 150023,
+              "name": "Swift Cover",
+              "count": 5,
+              "comments": "playtest"
+            }
+          ]
+        }
+      ]
+    },
+    "comments": null
+  },
+  "stats": {
+    "cryptSize": 12,
+    "librarySize": 77,
+    "groups": [
+      "6"
+    ],
+    "bannedCards": false,
+    "summary": "Crypt: 12 Library: 77 Groups: 6"
+  },
+  "errors": []
+}

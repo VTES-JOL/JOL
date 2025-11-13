@@ -1,6 +1,6 @@
 package net.deckserver.game.jaxb.state;
 
-import javax.xml.bind.annotation.XmlRegistry;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 
 /**

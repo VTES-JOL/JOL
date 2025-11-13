@@ -1,0 +1,122 @@
+/*
+ * CardSearch.java
+ *
+ * Created on September 24, 2003, 8:51 PM
+ */
+
+package net.deckserver.services;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import net.deckserver.storage.json.cards.CardSummary;
+import net.deckserver.storage.json.cards.SecuredCardLoader;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.slf4j.LoggerFactory.getLogger;
+
+/**
+ * @author administrator
+ */
+public class CardService {
+
+    private static final Logger logger = getLogger(CardService.class);
+    private static final Map<String, String> nameKeys = new HashMap<>();
+    private static final Map<String, CardSummary> cards = new HashMap<>();
+
+    static {
+        ObjectMapper objectMapper = new ObjectMapper();
+        CollectionType cardSummaryCollectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CardSummary.class);
+        InputStream loader;
+        try {
+            loader = getCloudfrontStream();
+            logger.info("Using cloudfront stream");
+        } catch (Exception e) {
+            try {
+                loader = getLocalStream();
+                logger.info("Using local stream");
+            } catch (Exception e1) {
+                logger.error("Unable to read cards - using empty list");
+                loader = new ByteArrayInputStream("[]".getBytes());
+            }
+        }
+        try {
+            List<CardSummary> cardList = objectMapper.readValue(loader, cardSummaryCollectionType);
+            init(cardList);
+        } catch (IOException e) {
+            logger.error("Unable to read cards", e);
+        }
+    }
+
+    public static void refresh(List<CardSummary> cardList) {
+        logger.info("Using static list");
+        init(cardList);
+    }
+
+    public static Optional<CardSummary> findCardExact(String text, boolean includePlayTest) {
+        final String lowerText = StringUtils.stripAccents(text).toLowerCase();
+        String key = nameKeys.get(lowerText);
+        if (key != null) {
+            CardSummary entry = cards.get(key);
+            return Optional.of(entry).filter(summary -> includePlayTest || !summary.isPlayTest());
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<CardSummary> findCardExact(String text) {
+        return findCardExact(text, false);
+    }
+
+    public static Optional<CardSummary> findCard(String text) {
+        final String lowerText = StringUtils.stripAccents(text).toLowerCase();
+        Optional<CardSummary> entry = Optional.empty();
+        if (nameKeys.containsKey(lowerText)) {
+            entry = Optional.of(cards.get(nameKeys.get(lowerText)));
+        } else {
+            for (String name : nameKeys.keySet()) {
+                if (name.startsWith(lowerText)) {
+                    entry = Optional.of(cards.get(nameKeys.get(name)));
+                }
+            }
+        }
+        return entry;
+    }
+
+    public static CardSummary get(String id) {
+        return cards.get(id);
+    }
+
+    private static void init(List<CardSummary> cardList) {
+        boolean playtestEnabled = cardList.stream().anyMatch(CardSummary::isPlayTest);
+        if (playtestEnabled) {
+            logger.info("Playtest cards enabled");
+        }
+        cardList.forEach(card -> {
+            for (String name : card.getNames()) {
+                nameKeys.put(name.toLowerCase(), card.getId());
+            }
+            cards.put(card.getId(), card);
+        });
+        logger.info("Read {} keys, {} cards", nameKeys.size(), cards.size());
+    }
+
+    private static InputStream getCloudfrontStream() throws Exception {
+        SecuredCardLoader loader = new SecuredCardLoader("/secured/cards.json");
+        return loader.generateSignedUrl().openStream();
+    }
+
+    private static InputStream getLocalStream() throws Exception {
+        return new FileInputStream(Paths.get("static/secured/cards.json").toFile());
+    }
+}

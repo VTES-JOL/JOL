@@ -9,7 +9,7 @@ public class GameBean {
 
     private final List<String> ping;
     private final List<String> pinged;
-    private final int refresh;;
+    private final int refresh;
     private final String hand;
     private final String globalNotes;
     private final String privateNotes;
@@ -54,5 +54,4 @@ public class GameBean {
         this.logLength = logLength;
         this.currentPlayer = currentPlayer;
     }
-
 }

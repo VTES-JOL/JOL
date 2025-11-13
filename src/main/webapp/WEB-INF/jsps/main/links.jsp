@@ -9,8 +9,7 @@
             </li>
             <li class="list-group-item">
                 <a class="link-secondary" href="https://www.facebook.com/groups/jolstatus/" target="_blank">Facebook
-                    Status
-                    Group</a>
+                    Status Group</a>
             </li>
             <li class="list-group-item">
                 <a class="link-secondary" href="https://discord.gg/fJjac75" target="_blank">Discord Channel</a>
@@ -28,6 +27,10 @@
             </li>
             <li class="list-group-item">
                 <a class="link-secondary" href="https://github.com/VTES-JOL/JOL/issues" target="_blank">Report a bug</a>
+            </li>
+            <li class="list-group-item">
+                <a class="link-secondary" href="https://paypal.me/JOLVTES" target="_blank">Donations</a>
+                <div style="margin-left:1em;font-size:0.9em">Keep the server running</div>
             </li>
         </ul>
     </div>

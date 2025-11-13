@@ -2,8 +2,10 @@ package net.deckserver.dwr.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
-import net.deckserver.dwr.model.JolAdmin;
-import net.deckserver.storage.json.system.DeckFormat;
+import net.deckserver.JolAdmin;
+import net.deckserver.game.enums.DeckFormat;
+import net.deckserver.services.DeckService;
+import net.deckserver.services.RegistrationService;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,15 +23,14 @@ public class PlayerActivityStatus {
     private final Integer activeGamesCount;
 
     public PlayerActivityStatus(String name) {
-        JolAdmin admin = JolAdmin.INSTANCE;
         this.name = name;
-        this.lastOnline = admin.getPlayerAccess(name);
-        Map<DeckFormat, Long> collect = admin.getDeckNames(name)
+        this.lastOnline = JolAdmin.getPlayerAccess(name);
+        Map<DeckFormat, Long> collect = DeckService.getPlayerDeckNames(name)
                 .stream()
-                .collect(Collectors.groupingBy(deckName -> admin.getDeckFormat(name, deckName), () -> new EnumMap<>(DeckFormat.class), Collectors.counting()));
+                .collect(Collectors.groupingBy(deckName -> JolAdmin.getDeckFormat(name, deckName), () -> new EnumMap<>(DeckFormat.class), Collectors.counting()));
         legacyDeckCount = Optional.ofNullable(collect.get(DeckFormat.LEGACY)).orElse(0L);
         modernDeckCount = Optional.ofNullable(collect.get(DeckFormat.MODERN)).orElse(0L);
-        activeGamesCount = admin.getGames(name).size();
+        activeGamesCount = RegistrationService.getPlayerGames(name).size();
     }
 
     @JsonIgnore
