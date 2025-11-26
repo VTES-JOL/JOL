@@ -317,7 +317,7 @@ public class JolAdmin {
     }
 
     public static boolean isAlive(String gameName, String playerName) {
-        return loadGameState(gameName).getPool(playerName) > 0;
+        return GameService.getGameByName(gameName).getPool(playerName) > 0;
     }
 
     public static boolean isPrivate(String gameName) {
@@ -565,17 +565,6 @@ public class JolAdmin {
         } else {
             info.getRoles().remove(role);
         }
-    }
-
-    private static JolGame loadGameState(String gameName) {
-        logger.debug("Loading {}", gameName);
-        GameInfo gameInfo = GameService.get(gameName);
-        String gameId = gameInfo.getId();
-        return GameService.loadGame(gameId);
-    }
-
-    private DeckInfo loadDeckInfo(String playerName, String deckName) {
-        return DeckService.get(playerName, deckName);
     }
 
 }

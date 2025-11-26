@@ -28,6 +28,16 @@ public record JolGame(String id, GameData data) {
 
     private static final Comparator<String> DISC_COMPARATOR = Comparator.comparing(s -> Character.isLowerCase(s.charAt(0)) ? 0 : 1);
 
+    public JolGame {
+        // make sure ousted players are correctly set
+        data.getPlayers().values().stream()
+                .filter(playerData -> playerData.getPool() <= 0 && !playerData.isOusted())
+                .peek(playerData -> System.out.printf("Setting %s in %s to ousted.  Pool value is %d%n", playerData.getName(), data.getName(), playerData.getPool()))
+                .forEach(playerData -> playerData.setOusted(true));
+        // verify data on load
+        data.updatePredatorMapping();
+    }
+
     public void addPlayer(String name, Deck deck) {
         // Common code that doesn't rely on state
         List<String> cryptlist = new ArrayList<>();
@@ -218,8 +228,8 @@ public record JolGame(String id, GameData data) {
                 _drawCard(player, RegionType.LIBRARY, RegionType.HAND, false);
             }
         }
-        data.updatePredatorMapping();
         newTurn();
+        data.updatePredatorMapping();
     }
 
     public void sendMsg(String player, String msg, boolean isJudge) {
@@ -345,6 +355,9 @@ public record JolGame(String id, GameData data) {
         playerData.setPool(ending);
         if (ending <= 0) {
             playerData.setOusted(true);
+            data.updatePredatorMapping();
+        } else if (starting <= 0) {
+            playerData.setOusted(false);
             data.updatePredatorMapping();
         }
         ChatService.sendCommand(id, source, player + "'s pool was " + starting + ", now is " + ending + ".", "pool", player, String.valueOf(amount));

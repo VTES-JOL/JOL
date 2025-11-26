@@ -108,7 +108,7 @@ public class GameData {
     public List<PlayerData> getCurrentPlayers() {
         return this.playerOrder.stream()
                 .map(this.players::get)
-                .filter(playerData -> playerData.getPool() > 0)
+                .filter(playerData -> !playerData.isOusted())
                 .toList();
     }
 

@@ -293,6 +293,9 @@ public class GameService extends PersistedService {
             logger.debug("Persisting {} game data", games.size());
             objectMapper.writeValue(PERSISTENCE_PATH.toFile(), games);
             logger.debug("Successfully persisted game data");
+
+            gameCache.asMap().values().forEach(GameService::saveGame);
+            logger.debug("Successfully persisted {} games in cache", gameCache.estimatedSize());
         } catch (IOException e) {
             logger.error("Unable to save game data", e);
         }

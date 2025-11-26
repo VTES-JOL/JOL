@@ -496,6 +496,19 @@ public class DoCommandTest {
     }
 
     @Test
+    void movePredatorCheckOusted() throws CommandException {
+        assertThat(game.data().getPlayerRegion("Player5", RegionType.READY).getCards().size(), is(3));
+        assertThat(game.data().getPlayer("Player5").getPredator().getName(), is("Player4"));
+        worker.doCommand("Player5", "pool Player4 -30");
+        assertTrue(game.data().getPlayer("Player4").isOusted());
+        assertThat(game.data().getPlayer("Player5").getPredator().getName(), is("Player2"));
+        assertThat(game.data().getPlayerRegion("Player2", RegionType.READY).getCards().size(), is(2));
+        worker.doCommand("Player5", "move ready 1 predator");
+        assertThat(game.data().getPlayerRegion("Player5", RegionType.READY).getCards().size(), is(2));
+        assertThat(game.data().getPlayerRegion("Player2", RegionType.READY).getCards().size(), is(3));
+    }
+
+    @Test
     void moveTopSort() throws CommandException {
         assertThat(game.data().getPlayerRegion("Player3", RegionType.READY).getCards().size(), is(1));
         worker.doCommand("Player3", "move ready 1 top");
@@ -567,6 +580,38 @@ public class DoCommandTest {
         assertThat(game.getPool("Player2"), is(27));
         assertThat(getLastMessage(), containsString("Player2's pool was 30, now is 27."));
         assertThrows(CommandException.class, () -> worker.doCommand("Player4", "pool"));
+    }
+
+    @Test
+    void oustPlayer() throws CommandException {
+        assertThat(game.getPool("Player4"), is(22));
+        assertThat(game.getActivePlayer(), is("Player2"));
+        assertThat(game.data().getCurrentPlayer().getPrey().getName(), is("Player4"));
+        worker.doCommand("Player4", "pool -22");
+        assertThat(game.getPool("Player4"), is(0));
+        assertTrue(game.data().getPlayer("Player4").isOusted());
+        assertThat(game.getActivePlayer(), is("Player2"));
+        assertThat(game.data().getCurrentPlayer().getPrey().getName(), is("Player5"));
+        assertThat(getLastMessage(), containsString("Player4's pool was 22, now is 0."));
+    }
+
+    @Test
+    void negativePoolSkipFix() throws CommandException {
+        assertThat(game.getPool("Player4"), is(22));
+        assertThat(game.getActivePlayer(), is("Player2"));
+        assertThat(game.data().getCurrentPlayer().getPrey().getName(), is("Player4"));
+        worker.doCommand("Player4", "pool -22");
+        assertThat(game.getPool("Player4"), is(0));
+        assertTrue(game.data().getPlayer("Player4").isOusted());
+        assertThat(game.getActivePlayer(), is("Player2"));
+        assertThat(game.data().getCurrentPlayer().getPrey().getName(), is("Player5"));
+        assertThat(getLastMessage(), containsString("Player4's pool was 22, now is 0."));
+        worker.doCommand("Player4", "pool +22");
+        assertThat(game.getPool("Player4"), is(22));
+        assertFalse(game.data().getPlayer("Player4").isOusted());
+        assertThat(game.getActivePlayer(), is("Player2"));
+        assertThat(game.data().getCurrentPlayer().getPrey().getName(), is("Player4"));
+        assertThat(getLastMessage(), containsString("Player4's pool was 0, now is 22."));
     }
 
     @Test
