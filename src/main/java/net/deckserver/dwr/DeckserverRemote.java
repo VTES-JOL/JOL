@@ -10,7 +10,9 @@ import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.Deck;
+import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.ChatData;
+import net.deckserver.storage.json.system.DeckInfo;
 import org.directwebremoting.WebContextFactory;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,6 +62,19 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
+    public Map<String, Object> joinTournament(String game) {
+        String playerName = getPlayer(request);
+        String veknId = PlayerService.get(playerName).getVeknId();
+        TournamentService.joinTournament(game, playerName, veknId);
+        return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> leaveTournament(String game) {
+        String playerName = getPlayer(request);
+        TournamentService.leaveTournament(game, playerName);
+        return UpdateFactory.getUpdate();
+    }
+
     public Map<String, Object> invitePlayer(String game, String name) {
         String playerName = getPlayer(request);
         if (playerName != null) {
@@ -84,10 +99,12 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-    public Map<String, Object> registerTournamentDeck(String deck1, String deck2, String deck3) {
+    public Map<String, Object> registerTournamentDeck(String tournament, String deckName) {
         String playerName = getPlayer(request);
         if (!Strings.isNullOrEmpty(playerName)) {
-            // TODO tournament
+            DeckInfo deckInfo = DeckService.get(playerName, deckName);
+            ExtendedDeck deck = DeckService.getDeck(deckInfo.getDeckId());
+            TournamentService.registerDeck(tournament, playerName, deck);
         }
         return UpdateFactory.getUpdate();
     }

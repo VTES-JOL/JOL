@@ -1,1 +1,81 @@
-{"tables":[],"registrations":{}}
+{
+  "name": "Dominant Personality",
+  "registrationStart": "2025-09-01T00:00:00.000Z",
+  "registrationEnd": "2025-09-28T23:59:00.000Z",
+  "playStarts": "2025-10-01T00:00:00.000Z",
+  "playEnds": "2026-01-10T23:59:00.000Z",
+  "format": "SINGLE_DECK",
+  "deckFormat": "STANDARD",
+  "numberOfRounds": 3,
+  "finalEnabled": true,
+  "requiresId": true,
+  "rules": [
+    "Always indicated in Global Notes of your game if IRL events are preventing you for playing.",
+    "Players are expected to connect TWICE a day during week days (Mondays to Fridays) to ensure interaction with the tables are not delayed",
+    "Players can interact and play during weekend",
+    "Ensure you are clear on declarations of actions, blocks and/or terms of political actions"
+  ],
+  "specialRules": {
+    "condition": "The following JOL rules will be enforced for the duration of the rounds with the exception of the period between 22nd December and 4th January.",
+    "rules": [
+      "if a Methuselah hasn't put anything in global notes about being away, then 24 hours (within weekdays and not weekends) without responding is considered a non-response impulse will be pass. If they are receiving the impulse again game will stop for a week, no answer in one week will make the player to be removed from that table, VP and 6 pool to the predator will be considered by the judge team and might or might not be awarded depending on table balance.",
+      "For any question or query about applying this, players can call a judge who is not playing at the table to make a decision."
+    ]
+  },
+  "registrations": [
+    {"player": "acbishop", "vekn": "3810007", "deck": "Unmada Dementia Nicois style"},
+    {"player": "Tamurkhan", "vekn": "#1610008", "deck": "Flirting with the Devil"},
+    {"player": "Yurian", "vekn": "4960061", "deck": "Brujah bruise and bleed"},
+    {"player": "gattsu", "vekn": "8740016", "deck": "Need more Blood"},
+    {"player": "Bezak Beast", "vekn": "8740009", "deck": "SplitSpammers(weenies)"},
+    {"player": "shade_nz", "vekn": "3680026", "deck": "Nana v2"},
+    {"player": "Graystonw", "vekn": "GWU75", "deck": "Fifth Edition: Malkavian"},
+    {"player": "ALIENVAMPIREPRINCE", "vekn": "5950012", "deck": "DEER WALL"},
+    {"player": "Stolas", "vekn": "3600016", "deck": "Wordwood Imbued"},
+    {"player": "Thetmes", "vekn": "3200134", "deck": "Giovan'in your face!"},
+    {"player": "preston", "vekn": "2200095", "deck": "Ministry S&B"},
+    {"player": "chriss", "vekn": "2200009", "deck": "Masika Magic v2.1 focus on intercept"},
+    {"player": "jvamp", "vekn": "8740010", "deck": "g3) Platinum Propaganda v1.6"},
+    {"player": "TiJean", "vekn": "1003197", "deck": "Malg60"},
+    {"player": "HeeBGB", "vekn": "1000952", "deck": "DEMented_4-5"},
+    {"player": "Cooper", "vekn": "1000400", "deck": "SaulotbleedMarionette20"},
+    {"player": "kombainas", "vekn": "5250029", "deck": "Snake Charmers"},
+    {"player": "Snodig", "vekn": "2320006", "deck": "Unmada Bloat"},
+    {"player": "alf", "vekn": "1000460", "deck": "2025-09 Wee Comp Hack"},
+    {"player": "DocSeven", "vekn": "8450009", "deck": "Dianza"},
+    {"player": "Poppy", "vekn": "#9960011", "deck": "Lutz"},
+    {"player": "Porrima", "vekn": "8960008", "deck": "I understand people appreciate you if you play this kind of deck"},
+    {"player": "spare_teeth", "vekn": "5000040", "deck": "Brujah: Debate with Jack"},
+    {"player": "Igor Igggy", "vekn": "5940017", "deck": "ravnos bleed"},
+    {"player": "angrynewb", "vekn": "3340035", "deck": "The Evil Marko Experience"},
+    {"player": "cordovader", "vekn": "9290014", "deck": "(Ally) Turbo Corpses"},
+    {"player": "jonix", "vekn": "1007021", "deck": "Ur No Brujah V2"},
+    {"player": "Csongor G K", "vekn": "8740020", "deck": "Donno"}
+  ],
+  "rounds": {
+    "1" : {
+      "1" : [{"name": "Bezak Beast"}, {"name": "alf"}, {"name": "DocSeven"}, {"name": "gattsu"}, {"name": "cordovader"}],
+      "2" : [{"name": "angrynewb"}, {"name": "preston"}, {"name": "Thetmes"}, {"name": "Porrima"}, {"name": "Graystonw"}],
+      "3" : [{"name": "kombainas"}, {"name": "spare_teeth"}, {"name": "HeeBGB"}, {"name": "Yurian"}, {"name": "ALIENVAMPIREPRINCE"}],
+      "4" : [{"name": "Stolas"}, {"name": "Csongor G K"}, {"name": "TiJean"}, {"name": "shade_nz"}, {"name": "Tamurkhan"}],
+      "5" : [{"name": "jonix"}, {"name": "jvamp"}, {"name": "Igor Igggy"}, {"name": "Poppy"}],
+      "6" : [{"name": "acbishop"}, {"name": "Snodig"}, {"name": "chriss"}, {"name": "Cooper"}]
+    },
+    "2" : {
+      "1" : [{"name": "Snodig"}, {"name": "DocSeven"}, {"name": "Graystonw"}, {"name": "jonix"}, {"name": "Stolas"}],
+      "2" : [{"name": "jvamp"}, {"name": "Tamurkhan"}, {"name": "gattsu"}, {"name": "chriss"}, {"name": "kombainas"}],
+      "3" : [{"name": "spare_teeth"}, {"name": "Porrima"}, {"name": "Poppy"}, {"name": "acbishop"}, {"name": "Bezak Beast"}],
+      "4" : [{"name": "Igor Igggy"}, {"name": "TiJean"}, {"name": "Cooper"}, {"name": "HeeBGB"}, {"name": "preston"}],
+      "5" : [{"name": "Csongor G K"}, {"name": "ALIENVAMPIREPRINCE"}, {"name": "alf"}, {"name": "Thetmes"}],
+      "6" : [{"name": "shade_nz"}, {"name": "Yurian"}, {"name": "cordovader"}, {"name": "angrynewb"}]
+    },
+    "3" : {
+      "1" : [{"name": "Poppy"}, {"name": "kombainas"}, {"name": "shade_nz"}, {"name": "alf"}, {"name": "Snodig"}],
+      "2" : [{"name": "chriss"}, {"name": "Graystonw"}, {"name": "Yurian"}, {"name": "Igor Igggy"}, {"name": "Csongor G K"}],
+      "3" : [{"name": "cordovader"}, {"name": "Thetmes"}, {"name": "acbishop"}, {"name": "TiJean"}, {"name": "jvamp"}],
+      "4" : [{"name": "ALIENVAMPIREPRINCE"}, {"name": "Cooper"}, {"name": "angrynewb"}, {"name": "Bezak Beast"}, {"name": "jonix"}],
+      "5" : [{"name": "Tamurkhan"}, {"name": "HeeBGB"}, {"name": "Porrima"}, {"name": "DocSeven"}],
+      "6" : [{"name": "gattsu"}, {"name": "Stolas"}, {"name": "preston"}, {"name": "spare_teeth"}]
+    }
+  }
+}

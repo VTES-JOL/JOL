@@ -1,0 +1,28 @@
+[
+  {
+    "id" : "c6571040-8a5c-4acd-9f8e-726d9fa1016d",
+    "name": "Rage of Apedemak",
+    "registrationStart": "2025-12-01T00:00:00.000Z",
+    "registrationEnd": "2025-12-13T23:59:00.000Z",
+    "playStarts": "2025-12-15T00:00:00.000Z",
+    "playEnds": "2026-03-15T23:59:00.000Z",
+    "format": "SINGLE_DECK",
+    "deckFormat": "STANDARD",
+    "numberOfRounds": 3,
+    "finalEnabled": true,
+    "requiresId": true,
+    "rules": [
+      "Always indicated in Global Notes of your game if IRL events are preventing you for playing.",
+      "Players are expected to connect TWICE a day during week days (Mondays to Fridays) to ensure interaction with the tables are not delayed",
+      "Players can interact and play during weekend",
+      "Ensure you are clear on declarations of actions, blocks and/or terms of political actions"
+    ],
+    "specialRules": {
+      "condition": "The following JOL rules will be enforced for the duration of the rounds with the exception of the period between 22nd December and 4th January.",
+      "rules": [
+        "if a Methuselah hasn't put anything in global notes about being away, then 24 hours (within weekdays and not weekends) without responding is considered a non-response impulse will be pass. If they are receiving the impulse again game will stop for a week, no answer in one week will make the player to be removed from that table, VP and 6 pool to the predator will be considered by the judge team and might or might not be awarded depending on table balance.",
+        "For any question or query about applying this, players can call a judge who is not playing at the table to make a decision."
+      ]
+    }
+  }
+]

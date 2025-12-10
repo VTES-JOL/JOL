@@ -43,6 +43,7 @@ public class JolApplicationInitializer implements ServletContextListener {
         PlayerActivityService.getInstance().shutdown();
         PlayerGameActivityService.getInstance().shutdown();
         PlayerService.getInstance().shutdown();
+        TournamentService.getInstance().shutdown();
 
         scheduler.shutdown();
 
