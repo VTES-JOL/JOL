@@ -113,6 +113,17 @@ public class TournamentService extends PersistedService {
         });
     }
 
+    public static ExtendedDeck getTournamentDeck(String name, String deckId) {
+        TournamentDefinition definition = INSTANCE.tournaments.get(name);
+        Path deckPath = Paths.get(System.getenv("JOL_DATA"), "tournaments", definition.getId(), deckId + ".json");
+        try {
+            return objectMapper.readValue(deckPath.toFile(), ExtendedDeck.class);
+        } catch (IOException e) {
+            logger.error("Unable to read tournament deck");
+            return null;
+        }
+    }
+
     @Override
     protected void persist() {
         if (shouldSkipPersistence()) {

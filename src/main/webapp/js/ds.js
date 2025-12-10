@@ -466,14 +466,14 @@ function callbackTournament(data) {
         invitedGames.empty();
         $.each(data.registeredGames, function (index, game) {
             let template = `
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div class="flex-grow-1 p-2 d-flex justify-content-between align-items-center">
-                    <span class="d-flex justify-content-between align-items-center">
-                        <span class="badge bg-secondary">${game.format}</span>
-                        <span class="mx-2 d-inline fs-5">${game.name}</span>
-                    </span>
-                </div>
-                <div>
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center border-bottom mb-2">
+                    <div class="flex-grow-1 p-2 d-flex justify-content-between align-items-center">
+                        <span class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-secondary">${game.format}</span>
+                            <span class="mx-2 d-inline fs-5">${game.name}</span>
+                        </span>
+                    </div>
                     <div class="d-inline">
                         <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" >
                             Choose Deck
@@ -482,9 +482,14 @@ function callbackTournament(data) {
                         </ul>
                     </div>
                 </div>
+                <div id="tournamentDeck"/>
             </div>
         `;
             invitedGames.append(template);
+            if (game.deck) {
+                renderDeck(game.deck, "#tournamentDeck");
+            }
+            addCardTooltips("#tournamentDeck");
         });
 
         $.each(data.decks, function (index, deck) {
