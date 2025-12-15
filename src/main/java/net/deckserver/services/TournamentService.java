@@ -2,11 +2,9 @@ package net.deckserver.services;
 
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import net.deckserver.game.enums.GameStatus;
 import net.deckserver.storage.json.deck.ExtendedDeck;
-import net.deckserver.storage.json.system.TournamentDefinition;
-import net.deckserver.storage.json.system.TournamentInviteStatus;
-import net.deckserver.storage.json.system.TournamentMetadata;
-import net.deckserver.storage.json.system.TournamentRegistration;
+import net.deckserver.storage.json.system.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +20,10 @@ import java.util.function.Predicate;
 public class TournamentService extends PersistedService {
 
     private static final BiFunction<TournamentDefinition, String, Boolean> CONTAINS_PLAYER = (tournament, player) -> tournament.getRegistrations().stream().map(TournamentRegistration::getPlayer).toList().contains(player);
-    private static final Predicate<TournamentDefinition> IS_OPEN = t -> t.getRegistrationStart().isBefore(OffsetDateTime.now()) && t.getRegistrationEnd().isAfter(OffsetDateTime.now());
-    private static final Predicate<TournamentDefinition> IS_ACTIVE = t -> t.getPlayStarts().isBefore(OffsetDateTime.now()) && t.getPlayEnds().isAfter(OffsetDateTime.now());
+    private static final Predicate<TournamentDefinition> REGISTRATIONS_OPEN = t -> t.getRegistrationStart().isBefore(OffsetDateTime.now()) && t.getRegistrationEnd().isAfter(OffsetDateTime.now());
+    private static final Predicate<TournamentDefinition> PLAY_OPEN = t -> t.getPlayStarts().isBefore(OffsetDateTime.now()) && t.getPlayEnds().isAfter(OffsetDateTime.now());
+    private static final Predicate<TournamentDefinition> IS_STARTING = t -> t.getStatus().equals(GameStatus.STARTING);
+    private static final Predicate<TournamentDefinition> IS_ACTIVE = t -> t.getStatus().equals(GameStatus.ACTIVE);
     private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
     private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "tournaments.json");
     private static final TournamentService INSTANCE = new TournamentService();
@@ -36,21 +36,30 @@ public class TournamentService extends PersistedService {
 
     public static List<TournamentMetadata> getOpenTournaments() {
         return INSTANCE.tournaments.values().stream()
-                .filter(IS_OPEN)
+                .filter(REGISTRATIONS_OPEN)
                 .map(TournamentMetadata::new)
                 .toList();
     }
 
     public static List<TournamentMetadata> getOpenTournaments(String playerName) {
         return INSTANCE.tournaments.values().stream()
-                .filter(IS_OPEN)
+                .filter(REGISTRATIONS_OPEN)
                 .map(t -> new TournamentMetadata(t, playerName))
                 .toList();
     }
 
     public static List<TournamentMetadata> getActiveTournaments() {
         return INSTANCE.tournaments.values().stream()
+                .filter(PLAY_OPEN)
                 .filter(IS_ACTIVE)
+                .map(TournamentMetadata::new)
+                .toList();
+    }
+
+    public static List<TournamentMetadata> getTournamentsReadyToStart() {
+        return INSTANCE.tournaments.values().stream()
+                .filter(PLAY_OPEN)
+                .filter(IS_STARTING)
                 .map(TournamentMetadata::new)
                 .toList();
     }
@@ -92,7 +101,7 @@ public class TournamentService extends PersistedService {
 
     public static List<TournamentInviteStatus> getRegisteredTournaments(String playerName) {
         return INSTANCE.tournaments.values().stream()
-                .filter(IS_OPEN)
+                .filter(REGISTRATIONS_OPEN)
                 .filter(t -> CONTAINS_PLAYER.apply(t, playerName))
                 .map(t -> new TournamentInviteStatus(t, playerName))
                 .toList();
@@ -113,6 +122,14 @@ public class TournamentService extends PersistedService {
         });
     }
 
+    public static List<TournamentPlayer> getPlayers(String tournament, int round, int table) {
+        return INSTANCE.tournaments.get(tournament).getPlayers(round, table);
+    }
+
+    public static Optional<TournamentRegistration> getRegistrations(String tournament, String player) {
+        return INSTANCE.tournaments.get(tournament).getRegistration(player);
+    }
+
     public static ExtendedDeck getTournamentDeck(String name, String deckId) {
         TournamentDefinition definition = INSTANCE.tournaments.get(name);
         Path deckPath = Paths.get(System.getenv("JOL_DATA"), "tournaments", definition.getId(), deckId + ".json");
@@ -122,6 +139,10 @@ public class TournamentService extends PersistedService {
             logger.error("Unable to read tournament deck");
             return null;
         }
+    }
+
+    public static void startTournament(String tournamentName) {
+        INSTANCE.tournaments.get(tournamentName).setStatus(GameStatus.ACTIVE);
     }
 
     @Override

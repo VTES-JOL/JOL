@@ -22,6 +22,7 @@ public class GameInfo {
     private GameFormat gameFormat = GameFormat.STANDARD;
     private OffsetDateTime created = OffsetDateTime.now();
     private Version version = Version.INITIAL;
+    private String tournamentName;
 
     public GameInfo(String name, String id, String owner, Visibility visibility, GameStatus status, GameFormat gameFormat) {
         this.name = name;

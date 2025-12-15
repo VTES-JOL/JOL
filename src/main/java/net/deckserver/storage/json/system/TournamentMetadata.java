@@ -20,6 +20,8 @@ public class TournamentMetadata {
     private boolean registered;
     private boolean decksChosen;
     private long playerCount;
+    private int numberOfRounds;
+    private int numberOfTables;
 
     public TournamentMetadata(TournamentDefinition definition) {
         this.name = definition.getName();
@@ -31,6 +33,8 @@ public class TournamentMetadata {
         this.conditions = definition.getSpecialRules().getCondition();
         this.specialRules = definition.getSpecialRules().getRules();
         this.playerCount = definition.getPlayerCount();
+        this.numberOfRounds = definition.getNumberOfRounds();
+        this.numberOfTables = definition.getNumberOfTables();
     }
 
     public TournamentMetadata(TournamentDefinition definition, String player) {

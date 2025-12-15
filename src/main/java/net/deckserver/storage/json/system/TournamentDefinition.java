@@ -1,5 +1,6 @@
 package net.deckserver.storage.json.system;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.HashBasedTable;
@@ -9,6 +10,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.TournamentFormat;
 
 import java.time.OffsetDateTime;
@@ -34,10 +36,16 @@ public class TournamentDefinition {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private Table<Integer, Integer, List<TournamentPlayer>> rounds = HashBasedTable.create();
+    private GameStatus status = GameStatus.STARTING;
 
     @JsonIgnore
     public List<TournamentPlayer> getPlayers(int round, int table) {
         return rounds.get(round, table);
+    }
+
+    @JsonIgnore
+    public int getNumberOfTables() {
+        return rounds.columnKeySet().size();
     }
 
     @JsonIgnore
@@ -76,6 +84,11 @@ public class TournamentDefinition {
                 rounds.put(round, table, players);
             });
         });
+    }
+
+    @JsonGetter("rounds")
+    public Map<Integer, Map<Integer, List<TournamentPlayer>>> getRounds() {
+        return rounds.rowMap();
     }
 
     @JsonIgnore
