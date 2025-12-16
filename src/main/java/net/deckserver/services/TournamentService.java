@@ -64,12 +64,6 @@ public class TournamentService extends PersistedService {
                 .toList();
     }
 
-    public static TournamentMetadata getMetadata(String tournamentName) {
-        return Optional.ofNullable(INSTANCE.tournaments.get(tournamentName))
-                .map(TournamentMetadata::new)
-                .orElseThrow(() -> new IllegalArgumentException("No such tournament: " + tournamentName));
-    }
-
     public static PersistedService getInstance() {
         return INSTANCE;
     }
@@ -128,6 +122,10 @@ public class TournamentService extends PersistedService {
 
     public static Optional<TournamentRegistration> getRegistrations(String tournament, String player) {
         return INSTANCE.tournaments.get(tournament).getRegistration(player);
+    }
+
+    public static Set<TournamentRegistration> getRegistrations(String tournament) {
+        return INSTANCE.tournaments.get(tournament).getRegistrations();
     }
 
     public static ExtendedDeck getTournamentDeck(String name, String deckId) {

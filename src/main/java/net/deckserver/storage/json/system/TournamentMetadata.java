@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class TournamentMetadata {
+    private String id;
     private String name;
     private String deckFormat;
     private String registrationEndTime;
@@ -24,6 +25,7 @@ public class TournamentMetadata {
     private int numberOfTables;
 
     public TournamentMetadata(TournamentDefinition definition) {
+        this.id = definition.getId();
         this.name = definition.getName();
         this.deckFormat = definition.getDeckFormat().getLabel();
         this.registrationEndTime = definition.getRegistrationEnd().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);

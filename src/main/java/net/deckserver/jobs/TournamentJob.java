@@ -15,6 +15,11 @@ import net.deckserver.storage.json.system.TournamentRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,10 +29,11 @@ public class TournamentJob implements Runnable {
 
     @Override
     public void run() {
+        // Start tournaments
         List<TournamentMetadata> tournaments = TournamentService.getTournamentsReadyToStart();
         for (TournamentMetadata tournament : tournaments) {
             String tournamentName = tournament.getName();
-            log.info("Starting tournament " + tournamentName);
+            log.info("Starting tournament {}", tournamentName);
             for (int round = 1; round <= tournament.getNumberOfRounds(); round++) {
                 for (int table = 1; table <= tournament.getNumberOfTables(); table++) {
                     String gameName = String.format("%s: Round %d - Table %d", tournamentName, round, table);
@@ -57,6 +63,33 @@ public class TournamentJob implements Runnable {
             }
             // Start tournament
             TournamentService.startTournament(tournamentName);
+        }
+
+        // Check running tournaments have decks
+        List<TournamentMetadata> runningTournaments = TournamentService.getActiveTournaments();
+        for (TournamentMetadata tournament : runningTournaments) {
+            String tournamentName = tournament.getName();
+            for (int round = 1; round <= tournament.getNumberOfRounds(); round++) {
+                for (int table = 1; table <= tournament.getNumberOfTables(); table++) {
+                    String gameName = String.format("%s: Round %d - Table %d", tournamentName, round, table);
+                    String gameId = GameService.get(gameName).getId();
+                    List<TournamentPlayer> players = TournamentService.getPlayers(tournamentName, round, table);
+                    for (TournamentPlayer player : players) {
+                        String playerName = player.getName();
+                        var registration = TournamentService.getRegistrations(tournamentName, playerName).orElseThrow();
+                        Path gameDeckPath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, registration.getDeck() + ".json");
+                        Path tournamentDeckPath = Paths.get(System.getenv("JOL_DATA"), "tournaments", tournament.getId(), registration.getDeck() + ".json");
+                        if (!Files.exists(gameDeckPath)) {
+                            try {
+                                Files.copy(tournamentDeckPath, gameDeckPath, StandardCopyOption.REPLACE_EXISTING);
+                                log.info("Copying missing tournament game file for {} - {} Round {} - Table {}", tournamentName, playerName, round, table);
+                            } catch (IOException e) {
+                                log.error("Unable to copy tournament file");
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
