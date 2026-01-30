@@ -739,8 +739,10 @@ public class DoCommandTest {
     @Test
     void order() throws CommandException {
         assertThat(game.getPlayers(), contains("Player2", "Player4", "Player5", "Player3", "Player1"));
+        assertThat(game.data().getPlayer("Player2").getPrey().getName(), is("Player4"));
         worker.doCommand("Player1", "order 5 1 4 2 3");
         assertThat(game.getPlayers(), contains("Player1", "Player2", "Player3", "Player4", "Player5"));
+        assertThat(game.data().getPlayer("Player2").getPrey().getName(), is("Player3"));
         assertThat(getLastMessage(), containsString("Player order Player1 Player2 Player3 Player4 Player5"));
         assertThrows(CommandException.class, () -> worker.doCommand("Player1", "order Player1 Player2 Player3 Player4 Player5"));
         assertThrows(CommandException.class, () -> worker.doCommand("Player1", "order 6 5 4 3 2 1"));

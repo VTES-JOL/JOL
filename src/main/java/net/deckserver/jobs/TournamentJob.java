@@ -4,11 +4,10 @@ import net.deckserver.dwr.model.JolGame;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.Visibility;
-import net.deckserver.services.GameService;
-import net.deckserver.services.RegistrationService;
-import net.deckserver.services.TournamentService;
+import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.GameData;
+import net.deckserver.storage.json.system.GameInfo;
 import net.deckserver.storage.json.system.TournamentMetadata;
 import net.deckserver.storage.json.system.TournamentPlayer;
 import net.deckserver.storage.json.system.TournamentRegistration;
@@ -65,8 +64,39 @@ public class TournamentJob implements Runnable {
             TournamentService.startTournament(tournamentName);
         }
 
-        // Check running tournaments have decks
         List<TournamentMetadata> runningTournaments = TournamentService.getActiveTournaments();
+
+        // Create final tables
+        for (TournamentMetadata tournament : runningTournaments) {
+            String tournamentName = tournament.getName();
+            List<String> seeding = tournament.getFinalsSeeding();
+            String gameName = String.format("%s: Final Table", tournamentName);
+            GameInfo gameInfo = GameService.get(gameName);
+            if (gameInfo == null && !seeding.isEmpty()) {
+                String gameId = UUID.randomUUID().toString();
+                GameService.create(gameName, gameId, "SYSTEM", Visibility.PUBLIC, GameFormat.from(tournament.getDeckFormat()));
+                JolGame jolGame = new JolGame(gameId, new GameData(gameId, gameName));
+                for (String playerName : seeding) {
+                    String deckId = TournamentService.getRegistrations(tournamentName, playerName).map(TournamentRegistration::getDeck).orElseThrow();
+                    ExtendedDeck deck = TournamentService.getTournamentDeck(tournamentName, deckId);
+                    assert deck != null;
+                    // Create Registration
+                    RegistrationService.registerDeck(gameName, playerName, deckId, deck.getDeck().getName(), deck.getStats().getSummary());
+                    // Add player and deck
+                    jolGame.addPlayer(playerName, deck.getDeck());
+                    NotificationService.pingPlayer(playerName, null, gameName);
+                }
+                // Set order and start
+                jolGame.startGame(seeding);
+                // Save game
+                GameService.saveGame(jolGame);
+                // Update status
+                GameService.get(gameName).setStatus(GameStatus.ACTIVE);
+                GlobalChatService.chat("SYSTEM", String.format("Game %s started", gameName));
+            }
+        }
+
+        // Check running tournaments have decks
         for (TournamentMetadata tournament : runningTournaments) {
             String tournamentName = tournament.getName();
             for (int round = 1; round <= tournament.getNumberOfRounds(); round++) {

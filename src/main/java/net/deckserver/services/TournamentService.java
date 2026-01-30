@@ -21,7 +21,7 @@ public class TournamentService extends PersistedService {
 
     private static final BiFunction<TournamentDefinition, String, Boolean> CONTAINS_PLAYER = (tournament, player) -> tournament.getRegistrations().stream().map(TournamentRegistration::getPlayer).toList().contains(player);
     private static final Predicate<TournamentDefinition> REGISTRATIONS_OPEN = t -> t.getRegistrationStart().isBefore(OffsetDateTime.now()) && t.getRegistrationEnd().isAfter(OffsetDateTime.now());
-    private static final Predicate<TournamentDefinition> PLAY_OPEN = t -> t.getPlayStarts().isBefore(OffsetDateTime.now()) && t.getPlayEnds().isAfter(OffsetDateTime.now());
+    private static final Predicate<TournamentDefinition> PLAY_OPEN = t -> t.getPlayStarts().isBefore(OffsetDateTime.now()) && t.getPlayEnds().plusMonths(1).isAfter(OffsetDateTime.now());
     private static final Predicate<TournamentDefinition> IS_STARTING = t -> t.getStatus().equals(GameStatus.STARTING);
     private static final Predicate<TournamentDefinition> IS_ACTIVE = t -> t.getStatus().equals(GameStatus.ACTIVE);
     private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
@@ -134,7 +134,7 @@ public class TournamentService extends PersistedService {
         try {
             return objectMapper.readValue(deckPath.toFile(), ExtendedDeck.class);
         } catch (IOException e) {
-            logger.error("Unable to read tournament deck");
+            logger.error("Unable to read tournament deck {} {}", name, deckId);
             return null;
         }
     }

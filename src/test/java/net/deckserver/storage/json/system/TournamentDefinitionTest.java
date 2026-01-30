@@ -1,7 +1,6 @@
 package net.deckserver.storage.json.system;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -35,8 +34,16 @@ class TournamentDefinitionTest {
         assertThat(data.getRules().size(), is(4));
         assertNotNull(data.getSpecialRules());
         assertThat(data.getRegistrations().size(), is(28));
-        assertThat(data.getPlayers(2, 3), hasItem(hasName("spare_teeth")));
+        assertThat(data.getPlayers(2, 3), hasItem(hasName("Porrima")));
         assertThat(data.getPlayers(2, 3), not(hasItem(hasName("Tamurkhan"))));
+    }
+
+    @Test
+    public void getTableData() throws Exception {
+        TournamentDefinition data = objectMapper.readValue(Paths.get("src/test/resources/data/tournament.json").toFile(), TournamentDefinition.class);
+        assertNotNull(data);
+        assertThat(data.getNumberOfRounds(), is(3));
+        assertThat(data.getNumberOfTables(), is(6));
     }
 
     private Matcher<TournamentPlayer> hasName(String name) {
