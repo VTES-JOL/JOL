@@ -301,11 +301,16 @@ function callbackLobby(data) {
         gameHeader.append(gameName, buttonWrapper);
         gameItem.append(gameHeader, playerTable);
         currentGames.append(gameItem);
-        $.each(game.players, function (k, v) {
+        $.each(game.registrations, function (i, registration) {
             let registrationRow = $("<tr/>");
-            let player = $("<td/>").addClass("w-25").text(k);
-            registrationRow.append(player);
-            playerTable.append(registrationRow);
+            let playerCell = $("<td/>").addClass("w-25").text(registration.player);
+            registrationRow.append(playerCell);
+            let summary = $("<td/>").addClass("w-25 text-center")
+            if (registration.registered) {
+                summary.append(`<i class="bi bi-check-circle text-success fs-6"></i>`);
+            }
+            registrationRow.append(summary);
+            tableBody.append(registrationRow);
         });
     });
 
