@@ -313,7 +313,7 @@ public class JolAdmin {
     }
 
     public static boolean isActive(String gameName) {
-        return GameService.get(gameName).getStatus().equals(GameStatus.ACTIVE);
+        return Optional.ofNullable(GameService.get(gameName)).map(GameInfo::getStatus).map(status -> status.equals(GameStatus.ACTIVE)).orElse(false);
     }
 
     public static boolean isAlive(String gameName, String playerName) {

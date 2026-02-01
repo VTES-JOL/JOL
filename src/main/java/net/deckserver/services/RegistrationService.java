@@ -157,7 +157,7 @@ public class RegistrationService extends PersistedService {
             });
             logger.info("Loaded {} registrations", registrationsMap.size());
         } catch (IOException e) {
-            logger.error("Unable to registrations", e);
+            logger.error("Unable to load registrations", e);
         }
 
     }

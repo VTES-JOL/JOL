@@ -410,52 +410,103 @@ function callbackLobby(data) {
 }
 
 function callbackTournament(data) {
-    if (data.idValid) {
-        $("#validId").show();
-        $("#registrationPanel").show();
-        $("#registrationMessage").hide();
-        let tournamentRound1 = $("#tournamentRound1");
-        tournamentRound1.empty();
-        // let tournamentRound2 = $("#tournamentRound2");
-        // tournamentRound2.empty();
-        // let tournamentRound3 = $("#tournamentRound3");
-        // tournamentRound3.empty();
-        $.each(data.decks, function (index, deck) {
-            tournamentRound1.append($("<option/>", {value: deck, label: deck}));
-            // tournamentRound2.append($("<option/>", {value: deck, label: deck}));
-            // tournamentRound3.append($("<option/>", {value: deck, label: deck}));
+    let tournaments = $("#openTournaments");
+    tournaments.empty();
+
+    $.each(data.tournaments, function(index, tournament) {
+        let registrationEnds = moment(tournament.registrationEndTime).tz("UTC");
+        let rules = $("<ul/>");
+        $.each(tournament.rules, function(i, r) {
+            rules.append($("<li/>").text(r));
         })
-        if (data.registeredDecks.length > 0) {
-            tournamentRound1.val(data.registeredDecks[0]);
-            // tournamentRound2.val(data.registeredDecks[1]);
-            // tournamentRound3.val(data.registeredDecks[2]);
-            $("#tournamentRegisterButton").text("Update Registration")
-        }
-        let playerRegistrations = $("#playerRegistrations");
-        playerRegistrations.empty();
-        $.each(data.registrations, function (index, player) {
-            playerRegistrations.append($("<tr/>").append($("<td/>").text(player)));
+        let specialRules = $("<ul/>");
+        $.each(tournament.specialRules, function(i, r) {
+            specialRules.append($("<li/>").text(r));
         })
-        if (data.message) {
-            $("#tournamentRegistrationResult").text(data.message).addClass("label label-light");
+        let joinButton = createButton({
+            class: "btn btn-outline-secondary btn-sm",
+            text: "Join"
+        }, DS.joinTournament, tournament.name);
+
+        let leaveButton = createButton({
+            class: "btn btn-outline-secondary btn-sm",
+            text: "Leave",
+            confirm: "Leave Tournament?"
+        }, DS.leaveTournament, tournament.name);
+
+        let template = $(`
+        <li class='list-group-item'>
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-secondary">${tournament.deckFormat}</span>
+                    <span class="mx-2 d-inline fs-5">${tournament.name} - <small>${tournament.playerCount} registered</small></span>
+                </span>
+                <span class="d-flex justify-content-between align-items-center gap-1 game-join">
+                    <span>Closes ${moment().to(registrationEnds)}</span>
+                </span>
+            </div>
+            <div class="p-2">
+                <strong>Rules</strong>
+                ${rules.prop('outerHTML')}
+            </div>
+            <div class="p-2">
+                <strong>Special Rules:</strong> ${tournament.conditions || 'none'}
+                ${specialRules.prop('outerHTML')}
+            </div>
+        </li>
+        `);
+        if (data.veknLinked) {
+            template.find('.game-join').append(tournament.registered ? leaveButton : joinButton);
         } else {
-            $("#tournamentRegistrationResult").empty().removeClass("label label-light");
+            template.find('.game-join').append("<span class='badge bg-warning-subtle text-black'>Requires VEKN #</span>");
         }
-    } else {
-        $("#validID").hide();
-        $("#registrationPanel").hide();
-        $("#registrationMessage").show();
-    }
+        tournaments.append(template);
+
+        let invitedGames = $("#registeredTournaments");
+        invitedGames.empty();
+        $.each(data.registeredGames, function (index, game) {
+            let template = `
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center border-bottom mb-2">
+                    <div class="flex-grow-1 p-2 d-flex justify-content-between align-items-center">
+                        <span class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-secondary">${game.format}</span>
+                            <span class="mx-2 d-inline fs-5">${game.name}</span>
+                        </span>
+                    </div>
+                    <div class="d-inline">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" >
+                            Choose Deck
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end tournament-invite-${game.format}" data-name="${game.name}">
+                        </ul>
+                    </div>
+                </div>
+                <div id="tournamentDeck"/>
+            </div>
+        `;
+            invitedGames.append(template);
+            if (game.deck) {
+                renderDeck(game.deck, "#tournamentDeck");
+            }
+            addCardTooltips("#tournamentDeck");
+        });
+
+        $.each(data.decks, function (index, deck) {
+            $.each(deck.gameFormats, function (i, format) {
+                let dropDown = $(`ul .tournament-invite-${format}`);
+                let template = $(`<li><a class="dropdown-item">${deck.name}</a></li>`).on('click', function () {
+                    registerForTournament(this, deck.name);
+                });
+                dropDown.append(template);
+            })
+        })
+    });
 }
 
-function registerforTournament() {
-    let tournamentRound1 = $("#tournamentRound1").val();
-    // let tournamentRound2 = $("#tournamentRound2").val();
-    // let tournamentRound3 = $("#tournamentRound3").val();
-    DS.registerTournamentDeck(tournamentRound1, null, null, {
-        callback: processData,
-        errorHandler: errorhandler
-    });
+function registerForTournament(deckRow, deck) {
+    let game = $(deckRow).closest('[data-name]').data('name');
+    DS.registerTournamentDeck(game, deck, {callback: processData, errorHandler: errorhandler});
 }
 
 function setImageTooltip() {

@@ -1,1 +1,87 @@
-{"tables":[],"registrations":{}}
+{
+  "id": "aefc65f3-e638-471a-8240-2f69e2fee7b0",
+  "registrationStart": "2025-09-10T00:00:00Z",
+  "registrationEnd": "2025-09-28T23:59:00Z",
+  "playStarts": "2025-10-01T00:00:00Z",
+  "playEnds": "2026-01-10T23:59:00Z",
+  "format": "SINGLE_DECK",
+  "deckFormat": "Standard",
+  "numberOfRounds": 3,
+  "finalEnabled": true,
+  "requiresId": true,
+  "name": "Dominant Personality",
+  "rules": [
+    "Always indicated in Global Notes of your game if IRL events are preventing you for playing.",
+    "Players are expected to connect TWICE a day during week days (Mondays to Fridays) to ensure interaction with the tables are not delayed",
+    "Players can interact and play during weekend",
+    "Ensure you are clear on declarations of actions, blocks and/or terms of political actions"
+  ],
+  "specialRules": {
+    "condition": "The following JOL rules will be enforced for the duration of the rounds with the exception of the period between 22nd December and 4th January.",
+    "rules": [
+      "if a Methuselah hasn't put anything in global notes about being away, then 24 hours (within weekdays and not weekends) without responding is considered a non-response impulse will be pass. If they are receiving the impulse again game will stop for a week, no answer in one week will make the player to be removed from that table, VP and 6 pool to the predator will be considered by the judge team and might or might not be awarded depending on table balance.",
+      "For any question or query about applying this, players can call a judge who is not playing at the table to make a decision."
+    ]
+  },
+  "status": "STARTING",
+  "registrations": [
+    {"player": "acbishop", "vekn": "3810007", "deck": "16931dbc-84cf-41a3-a9e7-a87176a3385f"},
+    {"player": "Tamurkhan", "vekn": "1610008", "deck": "18185e40-550b-4886-9313-013c1c5cce98"},
+    {"player": "Yurian", "vekn": "4960061", "deck": "e9ed602a-b7d4-40d6-a6d8-a6beda488133"},
+    {"player": "gattsu", "vekn": "8740016", "deck": "a54135f5-4c2f-45c2-af96-73a895ff67fd"},
+    {"player": "Bezak Beast", "vekn": "8740009", "deck": "7c8644a1-5abf-4751-81d5-a7c932da07f3"},
+    {"player": "shade_nz", "vekn": "3680026", "deck": "5a4e581c-f152-4643-b10b-b157ab56e9a8"},
+    {"player": "Graystonw", "vekn": "8740019", "deck": "d457c18f-5ee5-497a-906a-5b65edd2ff8f"},
+    {"player": "ALIENVAMPIREPRINCE", "vekn": "5950012", "deck": "05ccf664-0fa4-49ea-a085-1928e1d231ed"},
+    {"player": "Stolas", "vekn": "3600016", "deck": "67d2373b-88f7-4a48-ac7c-c9f4b859209d"},
+    {"player": "Thetmes", "vekn": "3200134", "deck": "61655a45-cac7-4b7b-a93a-56492a190caf"},
+    {"player": "preston", "vekn": "2200095", "deck": "725908e0-137b-4ceb-9c36-249ef1922dc0"},
+    {"player": "chriss", "vekn": "2200009", "deck": "2c2148ea-091b-4de0-bed8-e9eb9ecefb70"},
+    {"player": "jvamp", "vekn": "8740010", "deck": "05456399-1de5-4536-bf44-5380fcd8e3c2"},
+    {"player": "TiJean", "vekn": "1003197", "deck": "453d64ef-ec23-4b8a-a265-23c7a1ee9ba5"},
+    {"player": "HeeBGB", "vekn": "1000952", "deck": "f1f333a5-9941-48e1-bd3b-781f2d6561e8"},
+    {"player": "Cooper", "vekn": "1000400", "deck": "620b87c3-0268-4749-b97e-af8c1690b5f7"},
+    {"player": "kombainas", "vekn": "5250029", "deck": "d8ac6057-7101-4485-9d95-affa062b7444"},
+    {"player": "Snodig", "vekn": "2320006", "deck": "25a05437-5295-4d0c-ac5e-f48deab95455"},
+    {"player": "alf", "vekn": "1000460", "deck": "d73821d0-c88d-4d52-be53-6c785bf0f61c"},
+    {"player": "DocSeven", "vekn": "8450009", "deck": "f03f7b09-bff8-42ef-8df9-40da2c9e6a60"},
+    {"player": "Poppy", "vekn": "9960011", "deck": "e4abefa1-c275-41c2-bc57-8a0e032762cd"},
+    {"player": "Porrima", "vekn": "8960008", "deck": "59f1c092-ad78-4aa0-a7fe-c2f89ffdc418"},
+    {"player": "spare_teeth", "vekn": "5000040", "deck": "69f541df-ac83-4763-bc06-4cdb14f6f7de"},
+    {"player": "Igor Igggy", "vekn": "5940017", "deck": "f95041a4-020c-4696-8660-bd648243e8e6"},
+    {"player": "angrynewb", "vekn": "3340035", "deck": "8d67b62c-0b20-4b15-8ffd-06a625515f79"},
+    {"player": "cordovader", "vekn": "9290014", "deck": "b7bc8130-1dc6-4a04-b37a-f74f5fd51ed9"},
+    {"player": "jonix", "vekn": "1007021", "deck": "1dbef585-89b8-4424-addd-764181a35f64"},
+    {"player": "Csongor G K", "vekn": "8740020", "deck": "7f85d59a-0b0b-4e8b-8c1b-7587d2b966dc"}
+  ],
+  "rounds": {
+    "1" : {
+      "1" : [{"name": "Bezak Beast"}, {"name": "alf", "vp": 1}, {"name": "DocSeven"}, {"name": "gattsu", "vp": 3, "gw": true}, {"name": "cordovader", "vp": 1}],
+      "2" : [{"name": "angrynewb", "vp": 3, "gw": true}, {"name": "preston"}, {"name": "Thetmes", "vp": 1}, {"name": "Porrima"}, {"name": "Graystonw"}],
+      "3" : [{"name": "kombainas", "vp": 3, "gw": true}, {"name": "spare_teeth"}, {"name": "HeeBGB", "vp": 2}, {"name": "Yurian"}, {"name": "ALIENVAMPIREPRINCE"}],
+      "4" : [{"name": "Stolas"}, {"name": "Csongor G K"}, {"name": "TiJean"}, {"name": "shade_nz", "vp": 5, "gw": true}, {"name": "Tamurkhan"}],
+      "5" : [{"name": "jonix"}, {"name": "jvamp", "vp": 2}, {"name": "Igor Igggy", "vp": 2}, {"name": "Poppy"}],
+      "6" : [{"name": "acbishop", "vp": 4, "gw": true}, {"name": "Snodig"}, {"name": "chriss"}, {"name": "Cooper"}]
+    },
+    "2" : {
+      "1" : [{"name": "Snodig", "vp": 2.5, "gw": true}, {"name": "DocSeven"}, {"name": "Graystonw"}, {"name": "jonix"}, {"name": "Stolas", "vp": 0.5}],
+      "2" : [{"name": "jvamp", "vp": 1}, {"name": "Tamurkhan"}, {"name": "gattsu", "vp": 4, "gw": true}, {"name": "chriss"}, {"name": "kombainas"}],
+      "3" : [{"name": "spare_teeth"}, {"name": "Porrima", "vp": 1}, {"name": "Poppy"}, {"name": "acbishop", "vp": 4, "gw": true}, {"name": "Bezak Beast"}],
+      "4" : [{"name": "Igor Igggy"}, {"name": "TiJean"}, {"name": "Cooper", "vp": 4, "gw": true}, {"name": "HeeBGB"}, {"name": "preston", "vp": 1}],
+      "5" : [{"name": "Csongor G K"}, {"name": "ALIENVAMPIREPRINCE", "vp": 2}, {"name": "alf", "vp": 2}, {"name": "Thetmes"}],
+      "6" : [{"name": "shade_nz", "vp": 1}, {"name": "Yurian", "vp": 1}, {"name": "cordovader"}, {"name": "angrynewb", "vp": 2, "gw": true}]
+    },
+    "3" : {
+      "1" : [{"name": "Poppy", "vp": 1}, {"name": "kombainas"}, {"name": "shade_nz", "vp": 3, "gw": true}, {"name": "alf", "vp": 1}, {"name": "Snodig"}],
+      "2" : [{"name": "chriss", "vp": 0.5}, {"name": "Graystonw"}, {"name": "Yurian", "vp": 0.5}, {"name": "Igor Igggy", "vp": 1.5}, {"name": "Csongor G K"}],
+      "3" : [{"name": "cordovader", "vp": 1}, {"name": "Thetmes"}, {"name": "acbishop"}, {"name": "TiJean", "vp": 4, "gw": true}, {"name": "jvamp"}],
+      "4" : [{"name": "ALIENVAMPIREPRINCE"}, {"name": "Cooper", "vp": 4, "gw": true}, {"name": "angrynewb"}, {"name": "Bezak Beast", "vp": 1}, {"name": "jonix"}],
+      "5" : [{"name": "Tamurkhan", "vp": 3, "gw": true}, {"name": "HeeBGB"}, {"name": "Porrima", "vp": 1}, {"name": "DocSeven"}],
+      "6" : [{"name": "gattsu", "vp": 1}, {"name": "Stolas"}, {"name": "preston", "vp": 3, "gw": true}, {"name": "spare_teeth"}]
+    }
+  },
+  "finals": {
+    "seeding" : ["shade_nz", "gattsu", "Cooper", "acbishop", "angrynewb"],
+    "seating" : []
+  }
+}

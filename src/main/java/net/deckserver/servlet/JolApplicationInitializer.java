@@ -2,6 +2,7 @@ package net.deckserver.servlet;
 
 import net.deckserver.jobs.GameCleanUp;
 import net.deckserver.jobs.PublicGameBuilder;
+import net.deckserver.jobs.TournamentJob;
 import net.deckserver.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ public class JolApplicationInitializer implements ServletContextListener {
         logger.info("Web application context initialized");
         scheduler.scheduleAtFixedRate(new PublicGameBuilder(), 1, 1, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new GameCleanUp(), 1, 1, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new TournamentJob(), 0, 1, TimeUnit.MINUTES);
     }
 
     @Override
@@ -43,6 +45,7 @@ public class JolApplicationInitializer implements ServletContextListener {
         PlayerActivityService.getInstance().shutdown();
         PlayerGameActivityService.getInstance().shutdown();
         PlayerService.getInstance().shutdown();
+        TournamentService.getInstance().shutdown();
 
         scheduler.shutdown();
 

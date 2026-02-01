@@ -598,6 +598,7 @@ public record JolGame(String id, GameData data) {
 
     public void setOrder(String source, List<String> players) {
         data.orderPlayers(players);
+        data.updatePredatorMapping();
         StringBuilder order = new StringBuilder();
         for (String player : players) order.append(" ").append(player);
         ChatService.sendCommand(id, source, "Player order" + order, "order", order.toString());
@@ -761,9 +762,11 @@ public record JolGame(String id, GameData data) {
     private List<CardData> unlockAll(RegionData regionData) {
         List<CardData> notUnlocked = new ArrayList<>();
         for (CardData card : regionData.getCards()) {
+            boolean inPlay = RegionType.IN_PLAY_REGIONS.contains(regionData.getType());
             // Don't unlock infernal cards in play regions
-            if (card.isInfernal() && RegionType.IN_PLAY_REGIONS.contains(regionData.getType())) {
+            if (card.isInfernal() && inPlay) {
                 notUnlocked.add(card);
+            } else if (card.isStunned() && inPlay) {
             } else {
                 card.setLocked(false);
             }

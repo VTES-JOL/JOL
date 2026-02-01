@@ -33,7 +33,7 @@
                             onclick="playCard(event)">Play
                     </button>
                 </div>
-                <div class="d-flex justify-content-center">
+                <div class="d-flex justify-content-center align-items-center">
                     <button type="button" class="btn btn-outline-danger round-button mx-1"
                             title="Discard"
                             onclick="discard(false);">
