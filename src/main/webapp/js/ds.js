@@ -386,8 +386,11 @@ function callbackLobby(data) {
                         <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" >
                             Choose Deck
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end invite-${game.format}" data-name="${game.gameName}">
-                        </ul>
+                        <div id="chooseDeckDropdown">
+                            <ul class="dropdown-menu dropdown-menu-end invite-${game.format}" data-name="${game.gameName}">
+                                <input class="form-control" id="searchDeckInput" type="text" placeholder="Search.." onkeyup="filterChooseDeck()">
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -412,6 +415,22 @@ function callbackLobby(data) {
         registerResult.text(data.message).addClass("badge text-bg-light");
     }
 
+}
+
+function filterChooseDeck() {
+    var input, filter, a, i;
+    input = document.getElementById('searchDeckInput');
+    filter = input.value.toUpperCase();
+    var div = document.getElementById("chooseDeckDropdown");
+    a = div.getElementsByTagName('a');
+    for (i = 0; i < a.length; i++) {
+        var txtValue = a[i].textContent || a[i].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            a[i].style.display = '';
+        } else {
+            a[i].style.display = 'none';
+        }
+    }
 }
 
 function callbackTournament(data) {
