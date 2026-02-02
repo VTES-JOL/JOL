@@ -659,6 +659,7 @@ function renderDeck(data, div) {
     let render = $(div);
     render.empty();
     if (data.crypt) {
+        render.append($("<h5/>").text("Deck: " + data.name + ""));
         render.append($("<h5/>").text("Crypt: (" + data.crypt['count'] + ")"));
         const crypt = $("<ul/>").addClass("deck-list");
         let cards = data.crypt.cards;
