@@ -952,6 +952,7 @@ function renderOnline(div, who) {
     if (who === null) {
         return;
     }
+    $("#online-users-header").replaceWith("<h5 id='online-users-header'>Online Users ("+who.length+"):");
     $.each(who, function (index, player) {
         let lastOnline = moment(player.lastOnline).tz("UTC");
         let sinceLastOnline = moment.duration(moment().diff(lastOnline)).asMinutes();
