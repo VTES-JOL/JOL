@@ -714,6 +714,10 @@ function movePrey() {
     return false;
 }
 
+function closeModal() {
+    $('#cardModal').modal('hide');
+}
+
 function removeCounter(doCommand = true) {
     var modal = $('#cardModal');
     var counters = modal.data('counters');
