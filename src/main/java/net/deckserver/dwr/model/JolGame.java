@@ -623,7 +623,7 @@ public record JolGame(String id, GameData data) {
         String notes = builder.toString();
         for (String recipient : recipients) {
             PlayerData recipientData = data.getPlayer(recipient);
-            String privateNotes = recipientData.getNotes();
+            String privateNotes = recipientData.getNotes() == null ? "" : recipientData.getNotes();
             privateNotes += notes;
             recipientData.setNotes(privateNotes);
         }
