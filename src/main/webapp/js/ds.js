@@ -1000,9 +1000,9 @@ function renderPastGames(history) {
         $.each(game.results, function (i, value) {
             let playerRow = $("<tr/>");
             if (firstPlayerRow) {
-                let gameName = $("<td/>").attr('rowspan', 5).text(game.name);
-                let gameStarted = $("<td/>").attr('rowspan', 5).text(startTime);
-                let gameFinished = $("<td/>").attr('rowspan', 5).text(endTime);
+                let gameName = $("<td/>").attr('rowspan', game.results.length).text(game.name);
+                let gameStarted = $("<td/>").attr('rowspan', game.results.length).text(startTime);
+                let gameFinished = $("<td/>").attr('rowspan', game.results.length).text(endTime);
                 playerRow.append(gameName, gameStarted, gameFinished);
                 playerRow.addClass("border-3 border-top border-bottom-0 border-start-0 border-end-0")
                 firstPlayerRow = false;
