@@ -13,9 +13,13 @@ import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.ChatData;
 import net.deckserver.storage.json.system.DeckInfo;
+import net.deckserver.storage.json.system.GameHistory;
+import net.deckserver.storage.json.system.PlayerResult;
 import org.directwebremoting.WebContextFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.*;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 public class DeckserverRemote {
@@ -376,6 +380,28 @@ public class DeckserverRemote {
         if (JolAdmin.isAdmin(playerName)) {
         }
         return UpdateFactory.getUpdate();
+    }
+
+    public String exportPastGamesAsCsv() {
+        String CSV_SEPARATOR = ";";
+        String content = "Game;Started;Ended;Player;Deck;GW;VP\n";
+        Map<OffsetDateTime, GameHistory> history = HistoryService.getHistory();
+        if(history.isEmpty() || history.values().isEmpty()){
+            return "NO DATA AVAILABLE";
+        }
+        for (GameHistory game : history.values()) {
+            for (PlayerResult player : game.getResults()) {
+                content += game.getName() + CSV_SEPARATOR;
+                content += (game.getStarted()) + CSV_SEPARATOR;
+                content += (game.getEnded()) + CSV_SEPARATOR;
+                content += (player.getPlayerName()) + CSV_SEPARATOR;
+                content += (player.getDeckName()) + CSV_SEPARATOR;
+                content += (player.isGameWin() ? "GW" : "") + CSV_SEPARATOR;
+                content += (String.valueOf(player.getVP()).replace(".", ","));
+                content += "\n";
+            }
+        }
+        return content;
     }
 
     private GameView getView(String name) {

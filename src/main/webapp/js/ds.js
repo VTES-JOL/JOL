@@ -1000,9 +1000,9 @@ function renderPastGames(history) {
         $.each(game.results, function (i, value) {
             let playerRow = $("<tr/>");
             if (firstPlayerRow) {
-                let gameName = $("<td/>").attr('rowspan', 5).text(game.name);
-                let gameStarted = $("<td/>").attr('rowspan', 5).text(startTime);
-                let gameFinished = $("<td/>").attr('rowspan', 5).text(endTime);
+                let gameName = $("<td/>").attr('rowspan', game.results.length).text(game.name);
+                let gameStarted = $("<td/>").attr('rowspan', game.results.length).text(startTime);
+                let gameFinished = $("<td/>").attr('rowspan', game.results.length).text(endTime);
                 playerRow.append(gameName, gameStarted, gameFinished);
                 playerRow.addClass("border-3 border-top border-bottom-0 border-start-0 border-end-0")
                 firstPlayerRow = false;
@@ -1470,4 +1470,20 @@ function toggleMobileView(event) {
     }
     pointerCanHover = window.matchMedia("(hover: hover)").matches;
     $('body').scrollTop(0);
+}
+
+function exportCsv() {
+    DS.exportPastGamesAsCsv({callback: createCsvDownloadLink, errorHandler: errorhandler});
+}
+
+function createCsvDownloadLink(data) {
+    let blob = new Blob([data], { type: 'text/csv' });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = 'data.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
 }
