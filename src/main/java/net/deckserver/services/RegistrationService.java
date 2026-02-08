@@ -95,7 +95,9 @@ public class RegistrationService extends PersistedService {
     }
 
     public static synchronized void invitePlayer(String gameName, String playerName) {
-        INSTANCE.registrations.put(gameName, playerName, new RegistrationStatus(OffsetDateTime.now()));
+        if(!RegistrationService.isInvited(gameName, playerName)) {
+            INSTANCE.registrations.put(gameName, playerName, new RegistrationStatus(OffsetDateTime.now()));
+        }
     }
 
     public static void registerDeck(String gameName, String playerName, String deckId, String deckName, String summary) {
