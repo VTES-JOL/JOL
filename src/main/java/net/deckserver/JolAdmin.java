@@ -80,7 +80,7 @@ public class JolAdmin {
 
     public static void createGame(String gameName, Boolean isPublic, GameFormat format, String playerName, String gameId) {
         logger.trace("Creating game {} for player {}", gameName, playerName);
-        if (gameName.length() > 2 || notExistsGame(gameName)) {
+        if (gameName.length() > 2 && notExistsGame(gameName)) {
             try {
                 GameService.create(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), format);
             } catch (Exception e) {

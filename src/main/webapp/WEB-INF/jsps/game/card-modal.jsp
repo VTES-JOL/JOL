@@ -23,7 +23,7 @@
                     <select id="sect-select" class="form-select form-select-sm ms-2 card-sect-select d-none"
                             style="width:auto"></select>
                     <span class="card-cost"></span>
-                    <button class="btn-close" title="Close" onclick="closeModal();">&times;</button>
+                    <button class="btn-close" title="Close" onclick="closeModal();"><i class="bi bi-x"></i></button>
                 </span>
             </div>
             <div class="modal-body">
