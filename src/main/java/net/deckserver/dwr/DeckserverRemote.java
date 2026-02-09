@@ -16,6 +16,7 @@ import net.deckserver.storage.json.system.DeckInfo;
 import org.directwebremoting.WebContextFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.*;
 
 public class DeckserverRemote {
@@ -332,12 +333,28 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
+    public Map<String, Object> renameDeck(String newDeckName, String oldDeckName) {
+        if(newDeckName == null || newDeckName.equals("") || newDeckName.equals(oldDeckName)) {
+            return UpdateFactory.getUpdate();
+        }
+        String playerName = getPlayer(request);
+        try {
+            JolAdmin.saveDeck(
+                    playerName,
+                    newDeckName,
+                    DeckService.getDeckContents(JolAdmin.getDeckId(playerName, oldDeckName)));
+            this.deleteDeck(oldDeckName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return UpdateFactory.getUpdate();
+    }
+
     public Map<String, Object> deleteDeck(String deckName) {
         String playerName = getPlayer(request);
         JolAdmin.deleteDeck(playerName, deckName);
         return UpdateFactory.getUpdate();
     }
-
 
     public Map<String, Object> setJudge(String name, boolean value) {
         String playerName = getPlayer(request);
