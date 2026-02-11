@@ -61,6 +61,11 @@ public class GameService extends PersistedService {
     }
 
     public static void create(String gameName, String gameId, String ownerName, Visibility visibility, GameFormat format) {
+        if(gameName == null || gameName.isEmpty()) {
+            logger.error("Game name is null or empty");
+            return;
+        }
+
         GameInfo gameInfo = new GameInfo(gameName, gameId, ownerName, visibility, GameStatus.STARTING, format);
         INSTANCE.games.put(gameName, gameInfo);
         try {
