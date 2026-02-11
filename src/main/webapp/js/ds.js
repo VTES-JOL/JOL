@@ -1471,3 +1471,19 @@ function toggleMobileView(event) {
     pointerCanHover = window.matchMedia("(hover: hover)").matches;
     $('body').scrollTop(0);
 }
+
+function exportCsv() {
+    DS.exportPastGamesAsCsv({callback: createCsvDownloadLink, errorHandler: errorhandler});
+}
+
+function createCsvDownloadLink(data) {
+    let blob = new Blob([data], { type: 'text/csv' });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = 'data.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+}
