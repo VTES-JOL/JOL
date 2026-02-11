@@ -43,7 +43,10 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final Pattern REMOVE_FROM_GAME_PATTERN = Pattern.compile(".*[Rr]emove this card from the game.*");
     private static final Pattern TROPHY_PATTERN = Pattern.compile("Master. Trophy.");
     private static final Pattern LOCATION_PATTERN = Pattern.compile("(Unique|Master:) location");
-    private static final Pattern EQUIPEMENT_LOCATION_PATTERN = Pattern.compile("equipment card represents a location");
+    private static final Pattern EQUIPEMENT_LOCATION_PATTERN = Pattern.compile("does not count as equipment");
+    private static final Pattern ONE_PER_ROUND_PATTERN = Pattern.compile("Only one (.*?) (?:may|can) each round.");
+    private static final Pattern ONE_PER_TURN_PATTERN = Pattern.compile("Only one (.*?) (?:may|can) be played each turn.");
+    private static final Pattern ONE_PER_GAME_PATTERN = Pattern.compile("Only one (.*?) can be played(?: or called)? (?:in|during) a game.");
     private static final Pattern MODE_OR_PATTERN = Pattern.compile("^\\[[A-Za-z]+\\]\\s+or\\s+\\[[A-Za-z]+\\](?=\\s|$)");
     private static final Pattern MODE_PATTERN = Pattern.compile("^\\[[A-Za-z]+\\](\\[[A-Za-z]+\\])*(?=\\s|$)");
     private static final Pattern DISCIPLINE_EXTRACTOR_PATTERN = Pattern.compile("\\[([A-Za-z]+)\\]");

@@ -766,7 +766,6 @@ public record JolGame(String id, GameData data) {
             // Don't unlock infernal cards in play regions
             if (card.isInfernal() && inPlay) {
                 notUnlocked.add(card);
-            } else if (card.isStunned() && inPlay) {
             } else {
                 card.setLocked(false);
             }
