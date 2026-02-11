@@ -624,14 +624,58 @@ function callbackFilterDecks(decks) {
         const deckName = $("<span/>").text(deck.name).click(function () {
             DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
         });
-        const deleteButton = $("<button/>").addClass("btn btn-sm btn-outline-secondary border p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
+
+        const renameButton = $("<button/>")
+            .attr("title", "Rename Deck")
+            .addClass("btn btn-sm btn-outline-secondary border p-1 d-none")
+            .css("font-size", "0.6rem")
+            .html("<i class=\"bi bi-pencil-square\"></i>")
+            .click(function (event) {
+                if (confirm("Rename deck?")) {
+                    DS.renameDeck(deckNameInput.val(), deck.name, {callback: processData, errorHandler: errorhandler});
+                }
+                event.stopPropagation();
+            });
+
+        const deckNameInput = $("<input/>")
+            .attr("id", "deckName-"+deck.deck)
+            .attr("type","text")
+            .val(deck.name)
+            .addClass("form-control w-100 d-none")
+            .focusout(function(event) {
+                deckName.toggleClass("d-none");
+                deckNameInput.toggleClass("d-none");
+                renameButton.toggleClass("d-none");
+                toggleInput.toggleClass("d-none");
+                event.stopPropagation();
+            })
+            .keyup(function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    renameButton.click();
+                }
+            });
+
+        const toggleInput = $("<button/>")
+            .attr("title", "Rename Deck")
+            .addClass("btn btn-sm btn-outline-secondary border p-1")
+            .css("font-size", "0.6rem")
+            .html("<i class=\"bi bi-pencil-square\"></i>").click(function (event) {
+            deckName.toggleClass("d-none");
+            deckNameInput.toggleClass("d-none");
+            renameButton.toggleClass("d-none");
+            toggleInput.toggleClass("d-none");
+        });
+
+        const deleteButton = $("<button/>").attr("title", "Delete Deck").addClass("btn btn-sm btn-outline-secondary border p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
             if (confirm("Delete deck?")) {
                 DS.deleteDeck(deck.name, {callback: processData, errorHandler: errorhandler});
             }
             event.stopPropagation();
         });
-        let wrapper = $("<span/>").addClass("d-flex gap-1 align-items-center").append(deleteButton);
-        deckCell.append(deckName, wrapper);
+
+        let wrapper = $("<span/>").addClass("d-flex gap-1 align-items-center").append(toggleInput).append(renameButton).append(deleteButton);
+        deckCell.append(deckName, deckNameInput, wrapper);
         deckRow.append(deckCell);
         deckList.append(deckRow);
     });
@@ -711,6 +755,11 @@ function saveDeck() {
     const deckName = $("#deckName").val();
     const contents = $("#deckText").val();
     DS.saveDeck(deckName, contents, {callback: processData, errorHandler: errorhandler});
+}
+
+function renameDeck() {
+    const deckName = $("#deckName").val();
+    DS.renameDeck(newDeckName, oldDeckName, {callback: processData, errorHandler: errorhandler});
 }
 
 function validate() {
