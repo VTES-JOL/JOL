@@ -399,7 +399,6 @@ function showCardModal(event) {
     let contested = target.data('contested');
     let secured = target.data('secured') || false ? "secured/" : "";
     let minion = target.data("minion");
-    let disciplines = target.data("disciplines").trim().split(" ");
     let sect = target.data("sect");
     let path = target.data("path");
     let clan = target.data("clan");
