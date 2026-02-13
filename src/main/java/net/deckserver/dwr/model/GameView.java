@@ -6,6 +6,7 @@ import net.deckserver.game.enums.Phase;
 import net.deckserver.game.enums.RegionType;
 import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
+import net.deckserver.services.PlayerService;
 import net.deckserver.storage.json.game.ChatData;
 import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
@@ -136,6 +137,7 @@ public class GameView {
             try {
                 request.setAttribute("game", game);
                 request.setAttribute("viewer", playerName);
+                request.setAttribute("edgeColor", PlayerService.get(playerName).getEdgeColor());
                 state = WebContextFactory.get().forwardToString("/WEB-INF/jsps/game/state.jsp");
             } catch (Exception e) {
                 logger.error("Error retrieving state:", e);

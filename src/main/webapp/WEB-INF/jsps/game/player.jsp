@@ -8,6 +8,7 @@
     JolGame game = (JolGame) request.getAttribute("game");
     String viewer = (String) request.getAttribute("viewer");
     String player = request.getParameter("player");
+    String edgeColor = (String) request.getAttribute("edgeColor");
     String playerIndex = request.getParameter("playerIndex");
     boolean active = game.getActivePlayer().equals(player);
     int pool = game.getPool(player);
@@ -28,7 +29,7 @@
                     <i class='bi-exclamation-triangle ms-2 pinged d-none'></i>
                 </span>
                 <c:if test="<%= edge %>">
-                    <span class="badge text-bg-light border border-secondary fw-bold align-items-center d-flex gap-1">
+                    <span class="badge border border-secondary fw-bold align-items-center d-flex gap-1" style="background: <%= edgeColor %>">
                         <i class="bi bi-chevron-left"></i>
                         Edge
                         <i class="bi bi-chevron-right"></i>

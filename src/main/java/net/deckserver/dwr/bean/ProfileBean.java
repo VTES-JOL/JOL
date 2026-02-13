@@ -13,6 +13,7 @@ public class ProfileBean {
     private final String discordID;
     private final String veknID;
     private final String country;
+    private final String edgeColor;
     private final boolean imageTooltipPreference;
 
     public ProfileBean(PlayerModel model) {
@@ -22,6 +23,7 @@ public class ProfileBean {
         this.discordID = playerInfo.getDiscordId();
         this.veknID = playerInfo.getVeknId();
         this.imageTooltipPreference = JolAdmin.getImageTooltipPreference(player);
+        this.edgeColor = JolAdmin.getEdgeColor(player);
         this.country = playerInfo.getCountryCode();
     }
 
