@@ -1485,5 +1485,14 @@ function createCsvDownloadLink(data) {
     document.body.appendChild(a);
     a.click();
     a.remove();
+}
 
+function toggleMode() {
+    let wrapper = $("#wrapper");
+    let theme = wrapper.attr("data-bs-theme");
+    if(theme != "dark") {
+        wrapper.attr("data-bs-theme","dark");
+    } else {
+        wrapper.removeAttr("data-bs-theme");
+    }
 }

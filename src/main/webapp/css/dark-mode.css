@@ -1,0 +1,100 @@
+[data-bs-theme="dark"] {
+    --bs-heading-color: #dee2e6;
+    --bs-success-bg-subtle: #203d33;
+    --bs-success-subtle: #05404d;
+    --text-bg-danger: #a31c29;
+    --text-bg-dark: #516374;
+    --bg-danger-subtle: #83212a;
+    --bs-danger-bg-subtle: #83212a;
+    --bs-white-rgb: #212529;
+    --text-bg-light: #181a1b;
+    --bg-body-secondary: #2b2e30;
+    --text-bg-success: #136840;
+    --text-bg-warning: #967000;
+    --bs-btn-bg: #695209;
+    --bs-modal-color: #dee2e6;
+    --btn-outline-dark: #dee2e6;
+
+    .container-fluid {
+        background-color: #25292b;
+        color: #dee2e6;
+    }
+
+    .list-group-item {
+        background-color: #181a1b;
+    }
+
+    .list-group-item:hover {
+        background-color: #222426;
+        cursor: pointer;
+    }
+
+    .card {
+        background-color: #181a1b;
+    }
+    .card-body {
+        background-color: #181a1b;
+    }
+
+    a.card-name {
+        text-decoration: none;
+        font-family: matrix, sans-serif;
+        color: #dee2e6;
+        cursor: pointer;
+    }
+
+    p.chat a {
+        background-color: #343a40;
+    }
+
+    div#globalChatOutput div span {
+        background-color: #343a40 !important;
+    }
+
+    span.card-name {
+        color: #dee2e6;
+    }
+
+    .modal-open {
+        color: #dee2e6;
+    }
+
+    .bg-light {
+        background-color: rgb(27 30 31) !important;
+        color:#dee2e6 !important;
+    }
+
+    .border-dark {
+        --bs-border-opacity: 1;
+        border-color: #787062 !important;
+    }
+
+    .modal-content {
+        color: #dee2e6;
+    }
+    .modal-footer {
+        color: #dee2e6;
+    }
+    .btn {
+        color: #dee2e6;
+    }
+    .btn-outline-dark  {
+        color: #dee2e6;
+        border-color: #dee2e6;
+        cursor: pointer;
+    }
+    .btn-outline-dark:hover  {
+        background-color: #222426;
+        cursor: pointer;
+    }
+
+    .btn:hover {
+        background-color: #222426;
+        cursor: pointer;
+    }
+
+    /*
+        Text -> #dee2e6
+        BG Body -> #25292b
+    */
+}
