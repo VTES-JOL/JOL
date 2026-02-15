@@ -93,6 +93,10 @@
         cursor: pointer;
     }
 
+    .fw-bold {
+        color: #dee2e6;
+    }
+
     /*
         Text -> #dee2e6
         BG Body -> #25292b
