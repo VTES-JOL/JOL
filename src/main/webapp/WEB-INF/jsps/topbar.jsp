@@ -29,6 +29,9 @@
                 </button>
             </form>
         </div>
+        <div id="darkMode" class="navbar-nav">
+            <a class="btn btn-link nav-item nav-link m-1" onclick="toggleMode()"><i class="bi bi-moon"></i></a>
+        </div>
     </div>
     <span id="connectionMessage" class="navbar-text text-warning d-none">Connection issue. Retrying...</span>
     <span class="p-2 fw-bold ms-2 rounded <%= environmentStyle%>"><%= environmentLabel %></span>
