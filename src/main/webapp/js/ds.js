@@ -409,6 +409,164 @@ function callbackLobby(data) {
 
 }
 
+function createTournament() {
+    //read out Tournament Details
+    let tourName = $("#tourName");
+    let regStart = $("#regStart");
+    let regEnd = $("#regEnd");
+    let playStart = $("#playStart");
+    let playEnd = $("#playEnd");
+    let tourFormat = $("#tourFormat");
+    let gameFormat = $("#gameFormat");
+    let rules = new Array();
+    $("#rulesDiv div label").each(function( index, rule ) {
+        rules.push(rule.textContent);
+    });
+    let specRulesCon = $("#specRulesCon");
+    let specRules = new Array();
+    $("#specRulesDiv div label").each(function( index, specRule ) {
+        specRules.push(specRule.textContent);
+    });
+    let numOfRounds = $("#numOfRounds");
+    let reqId = $("#reqId");
+    //create tournament
+    DS.createTournament(tourName.val(), regStart.val(), regEnd.val(), playStart.val(), playEnd.val(), tourFormat.val(), gameFormat.val(), rules, specRulesCon.val(), specRules, numOfRounds.val(), reqId.val());
+    //clear Form
+    tourName.val("");
+    regStart.val("");
+    regEnd.val("");
+    playStart.val("");
+    playEnd.val("");
+    tourFormat.val("");
+    gameFormat.val("");
+    specRulesCon.val("");
+    numOfRounds.val("");
+    $("#rulesDiv div label").each(function( index, rule ) {
+        rules.val("");
+    });
+    $("#specRulesDiv div label").each(function( index, specRule ) {
+        specRules.val("");
+    });
+}
+
+function closeTournament() {
+    let nameOfTournament = $("#nameOfTournament").val();
+    DS.closeTournament(nameOfTournament);
+}
+
+function startTournament() {
+    let nameOfTournament = $("#nameOfTournament").val();
+    DS.startTournament(nameOfTournament);
+}
+
+function addTournamentRule() {
+    addRule($("#ruleText"), $("#rulesDiv"))
+}
+
+function loadTournament() {
+    let nameOfTournament = $("#nameOfTournament option:selected").text();
+    DS.getTournamentRounds(nameOfTournament, {callback: callbackTournamentRounds, errorHandler: errorhandler});
+    DS.getTournamentPlayers(nameOfTournament, {callback: callbackTableManager, errorHandler: errorhandler});
+}
+
+function callbackTournamentRounds(data) {
+    let tourRounds = $("#tourRounds");
+    tourRounds.empty();
+    $.each(data, function (index, round) {
+        let div = $("<div/>");
+        let label = $("<label/>").text("Round "+round);
+        let createTableButton = $("<button/>").attr("id", "createTable-"+round)
+            .on('click', function () { createTable(round) })
+            .addClass("btn btn-outline-secondary btn-sm mt-2 w-100")
+            .text("Create Table");
+        let divForPlayers = $("<div/>").attr("id","tourPlayer-"+round);
+        let divForTabels = $("<div/>").addClass("card-body p-1 grid").attr("id","tableTour-"+round).css({"--bs-columns": "4", "--bs-gap": "0.5rem"});
+        div.append(label, createTableButton, divForPlayers, divForTabels);
+        tourRounds.append(div);
+    });
+}
+
+function callbackTableManager(data) {
+    $("#tourRounds div").each(function (index) {
+        let roundNumber = parseInt(index)+1;
+        let players = $("#"+"tourPlayer-"+roundNumber).addClass("card-body p-1 grid sortable").css({"--bs-columns": "4", "--bs-gap": "0.5rem"});
+        players.empty();
+        players.addClass("sortable"+roundNumber);
+        players.sortable({
+            connectWith: ".sortable"+roundNumber,
+            dropOnEmpty: true});
+        $.each(data, function(index, reg) {
+            let listItem = $("<li/>")
+                .text(reg.player)
+                .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center");
+            listItem.disableSelection();
+            players.append(listItem);
+        });
+    })
+}
+
+function createTable(round) {
+    let table = $("#"+"tableTour-"+round);
+    let divRound = $("<div/>").addClass("card-body p-1");
+    let label = $("<label/>").text("Table "+(table.find("ul").length+1))
+    let list = $("<ul/>").addClass("border list-group sortable"+round)
+        .attr("round", round)
+        .attr("table", table.find("ul").length+1)
+        .css("min-height","38px");
+    list.sortable({
+        connectWith: ".sortable"+round,
+        dropOnEmpty: true});
+    let removeTable = $("<button/>")
+        .text("Remove Table")
+        .addClass("btn btn-outline-secondary btn-sm mt-2")
+        .on('click', function () {
+            list.each(function(index, ul) {
+                $("#"+"tourPlayer-"+round).append($(ul).find("li"));
+            })
+            divRound.remove()
+        })
+    divRound.append(label, removeTable, list);
+    table.append(divRound);
+}
+
+function addSpecTournamentRule() {
+    addRule($("#specRuleText"), $("#specRulesDiv"))
+}
+
+function addRule(rulesInput, rulesCon) {
+    let ruleDiv =  $("<div/>");
+    ruleDiv.addClass("border");
+    let ruleLabel =  $("<label/>");
+    ruleLabel.addClass("form-label").text(rulesInput.val());
+    let removeButton = $("<button/>");
+    removeButton.text("Remove Rule");
+    removeButton.addClass("btn btn-outline-secondary btn-sm mt-2 form-control")
+    removeButton.on('click', function () {
+        ruleDiv.remove();
+        removeButton.remove();
+    });
+    rulesInput.val("");
+    ruleDiv.append(ruleLabel).append(removeButton)
+    rulesCon.append(ruleDiv);
+}
+
+function saveTables() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    $("#tourRounds ul").each(function(round, ul) {
+        let players = new Array();
+        $.each($(ul).find("li"), function(table, player) {
+            players.push(player.textContent);
+        })
+        let roundNumber = $(ul).attr("round");
+        let tableNumber = $(ul).attr("table");
+        DS.prepareTable(tournamentSelected, roundNumber, tableNumber, players, {callback: processData, errorHandler: errorhandler});
+    })
+    DS.saveTables(tournamentSelected);
+    //reset
+    let tourRounds = $("#tourRounds");
+    tourRounds.empty();
+}
+
 function callbackTournament(data) {
     let tournaments = $("#openTournaments");
     tournaments.empty();

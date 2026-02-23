@@ -8,15 +8,21 @@ import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.game.enums.TournamentFormat;
 import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.ChatData;
-import net.deckserver.storage.json.system.DeckInfo;
+import net.deckserver.storage.json.system.*;
 import org.directwebremoting.WebContextFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class DeckserverRemote {
 
@@ -107,6 +113,54 @@ public class DeckserverRemote {
             TournamentService.registerDeck(tournament, playerName, deck);
         }
         return UpdateFactory.getUpdate();
+    }
+
+    public void createTournament(String tourName, String regStart, String regEnd, String playStart, String playEnd, String tourFormat, String gameFormat, String[] rules, String specRulesCon, String[] specRules, String numberOfRounds, String reqId) {
+        TournamentDefinition newTournament = TournamentDefinitionCreator.newTourDef()
+                .withName(tourName)
+                .withRegStart(OffsetDateTime.of(LocalDate.parse(regStart), LocalTime.MIDNIGHT, ZoneOffset.UTC))
+                .withRegEnd(OffsetDateTime.of(LocalDate.parse(regEnd), LocalTime.MIDNIGHT, ZoneOffset.UTC))
+                .withPlayStart(OffsetDateTime.of(LocalDate.parse(playStart), LocalTime.MIDNIGHT, ZoneOffset.UTC))
+                .withPlayEnd(OffsetDateTime.of(LocalDate.parse(playEnd), LocalTime.MIDNIGHT, ZoneOffset.UTC))
+                .withTourFormat(TournamentFormat.valueOf(tourFormat))
+                .withDeckFormat(GameFormat.valueOf(gameFormat))
+                .withRules(rules)
+                .withSpecRules(specRulesCon, specRules)
+                .withNumberOfRounds(Integer.valueOf(numberOfRounds))
+                .withReqId(Boolean.getBoolean(reqId))
+                .getTourDef();
+        TournamentService.createTournament(newTournament);
+    }
+
+    public void closeTournament(String nameOfTournament){
+        TournamentService.closeTournament(nameOfTournament);
+    }
+    public void startTournament(String nameOfTournament){
+        TournamentService.setReadyToStart(nameOfTournament);
+    }
+
+    public Set<TournamentRegistration> getTournamentPlayers(String nameOfTournament) {
+        return TournamentService.getRegistrations(nameOfTournament);
+    }
+    public int[] getTournamentRounds(String nameOfTournament) {
+        return IntStream.range(1,TournamentService.getTournament(nameOfTournament).getNumberOfRounds()+1).toArray();
+    }
+
+    public void saveTables(String tourName) {
+        TournamentService.setRounds(tourName);
+    }
+
+    public void prepareTable(String tourName, String roundNumber, String tableNumber, String[] players) {
+        List<TournamentPlayer> playersOnTable = new ArrayList<>();
+        for(String player : players) {
+            Optional<TournamentRegistration> registrations = TournamentService.getRegistrations(tourName, player);
+            TournamentPlayer tournamentPlayer = new TournamentPlayer();
+            tournamentPlayer.setName(registrations.get().getPlayer());
+            playersOnTable.add(tournamentPlayer);
+        }
+        HashMap<Integer, List<TournamentPlayer>> table = new HashMap<>();
+        table.put(Integer.valueOf(tableNumber), playersOnTable);
+        TournamentService.prepareRounds(Integer.valueOf(roundNumber), table);
     }
 
     public Map<String, Object> startGame(String game) {

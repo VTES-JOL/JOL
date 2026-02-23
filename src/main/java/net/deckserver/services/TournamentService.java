@@ -23,11 +23,13 @@ public class TournamentService extends PersistedService {
     private static final Predicate<TournamentDefinition> REGISTRATIONS_OPEN = t -> t.getRegistrationStart().isBefore(OffsetDateTime.now()) && t.getRegistrationEnd().isAfter(OffsetDateTime.now());
     private static final Predicate<TournamentDefinition> PLAY_OPEN = t -> t.getPlayStarts().isBefore(OffsetDateTime.now()) && t.getPlayEnds().plusMonths(1).isAfter(OffsetDateTime.now());
     private static final Predicate<TournamentDefinition> IS_STARTING = t -> t.getStatus().equals(GameStatus.STARTING);
+    private static final Predicate<TournamentDefinition> IS_PREPARE = t -> t.getStatus()==null;
     private static final Predicate<TournamentDefinition> IS_ACTIVE = t -> t.getStatus().equals(GameStatus.ACTIVE);
     private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
     private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "tournaments.json");
     private static final TournamentService INSTANCE = new TournamentService();
     private final Map<String, TournamentDefinition> tournaments = new HashMap<>();
+    private final Map<Integer, Map<Integer, List<TournamentPlayer>>> rounds = new HashMap<>();
 
     private TournamentService() {
         super("TournamentService", 10);
@@ -60,6 +62,13 @@ public class TournamentService extends PersistedService {
         return INSTANCE.tournaments.values().stream()
                 .filter(PLAY_OPEN)
                 .filter(IS_STARTING)
+                .map(TournamentMetadata::new)
+                .toList();
+    }
+
+    public static List<TournamentMetadata> getTournamentsReadyToPrepare() {
+        return INSTANCE.tournaments.values().stream()
+                .filter(IS_PREPARE)
                 .map(TournamentMetadata::new)
                 .toList();
     }
@@ -141,6 +150,34 @@ public class TournamentService extends PersistedService {
 
     public static void startTournament(String tournamentName) {
         INSTANCE.tournaments.get(tournamentName).setStatus(GameStatus.ACTIVE);
+    }
+    public static void setReadyToStart(String tournamentName) {
+        INSTANCE.tournaments.get(tournamentName).setStatus(GameStatus.STARTING);
+    }
+
+    public static void closeTournament(String tournamentName) {
+        INSTANCE.tournaments.get(tournamentName).setStatus(GameStatus.CLOSED);
+    }
+
+    public static void createTournament(TournamentDefinition tournamentDefinition) {
+        INSTANCE.tournaments.put(tournamentDefinition.getName(), tournamentDefinition);
+    }
+
+    public static TournamentDefinition getTournament(String nameOfTournament) {
+        return INSTANCE.tournaments.get(nameOfTournament);
+    }
+
+    public static void setRounds(String tourName) {
+        getTournament(tourName).resetRounds();
+        getTournament(tourName).setRounds(INSTANCE.rounds);
+    }
+
+    public static void prepareRounds(Integer round, HashMap<Integer, List<TournamentPlayer>> table) {
+        if(INSTANCE.rounds.containsKey(round)){
+            INSTANCE.rounds.get(round).putAll(table);
+        } else {
+            INSTANCE.rounds.put(round, table);
+        }
     }
 
     @Override

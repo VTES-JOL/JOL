@@ -87,6 +87,10 @@ public class TournamentDefinition {
         });
     }
 
+    public void resetRounds() {
+        rounds.clear();
+    }
+
     @JsonGetter("rounds")
     public Map<Integer, Map<Integer, List<TournamentPlayer>>> getRounds() {
         return rounds.rowMap();
