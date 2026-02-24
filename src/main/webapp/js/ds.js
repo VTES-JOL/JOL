@@ -679,11 +679,6 @@ function callbackFinal(data) {
     $("#tourFinal").removeClass("d-none");
 }
 
-//DELETE ME
-function runTourJob() {
-    DS.runTourJob();
-}
-
 function callbackTournament(data) {
     let tournaments = $("#openTournaments");
     tournaments.empty();

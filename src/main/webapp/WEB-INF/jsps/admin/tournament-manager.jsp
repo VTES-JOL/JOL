@@ -19,7 +19,6 @@
     </select>
     <div class="d-flex justify-content-between">
       <button onclick="loadTournament()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Load Tournament</button>
-      <button onclick="runTourJob()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Run Job</button>
     </div>
     <div id="saveTables" class="d-flex justify-content-between d-none">
       <button onclick="saveTables()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Save Tables</button>

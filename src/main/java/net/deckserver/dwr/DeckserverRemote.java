@@ -218,10 +218,6 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-    public void runTourJob() {
-        new TournamentJob().run();
-    }
-
     public Map<String, Object> chat(String text) {
         String player = getPlayer(request);
         JolAdmin.chat(player, text);
