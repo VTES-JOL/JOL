@@ -1,6 +1,22 @@
+<%@ page import="net.deckserver.storage.json.system.TournamentMetadata" %>
+<%@ page import="net.deckserver.game.enums.GameStatus" %>
+<%@ page import="net.deckserver.services.TournamentService" %>
+<%@ page import="java.util.List" %><%
+    List<TournamentMetadata> loadAbleTournaments = TournamentService.getTournamentsWithStatus(List.of(GameStatus.STARTING));
+%>
 <div class="card shadow mt-2">
     <div class="card-header bg-body-secondary">
         <h5>Create Tournament</h5>
+    </div>
+    <div>
+        <label for="tourNameSelect" class="form-label">Choose Tournament:</label>
+        <select name="tourNameSelect" id="tourNameSelect" class="form-select">
+            <c:forEach items="<%= loadAbleTournaments %>" var="loadTour">
+                <option value=""></option>
+                <option value="${loadTour.id}">${loadTour.name}</option>
+            </c:forEach>
+        </select>
+        <button onclick="loadTournamentDetails()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Load Tournament Details</button>
     </div>
     <div class="card-body">
         <label for="tourName" class="form-label">Tournament Name:</label>

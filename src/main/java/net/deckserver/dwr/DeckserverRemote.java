@@ -8,7 +8,9 @@ import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.TournamentFormat;
+import net.deckserver.jobs.TournamentJob;
 import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
@@ -115,7 +117,11 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
+    /**
+     * Creates a new Tournament Definition and then creates or updates an existing Tournament
+     */
     public void createTournament(String tourName, String regStart, String regEnd, String playStart, String playEnd, String tourFormat, String gameFormat, String[] rules, String specRulesCon, String[] specRules, String numberOfRounds, String reqId) {
+        //Prepare Tournament Definition
         TournamentDefinition newTournament = TournamentDefinitionCreator.newTourDef()
                 .withName(tourName)
                 .withRegStart(OffsetDateTime.of(LocalDate.parse(regStart), LocalTime.MIDNIGHT, ZoneOffset.UTC))
@@ -125,31 +131,59 @@ public class DeckserverRemote {
                 .withTourFormat(TournamentFormat.valueOf(tourFormat))
                 .withDeckFormat(GameFormat.valueOf(gameFormat))
                 .withRules(rules)
+                .withStatus(GameStatus.STARTING)
                 .withSpecRules(specRulesCon, specRules)
                 .withNumberOfRounds(Integer.valueOf(numberOfRounds))
                 .withReqId(Boolean.getBoolean(reqId))
                 .getTourDef();
+        //create or replace existing Tournament (key -> Tournament Name)
         TournamentService.createTournament(newTournament);
     }
 
-    public void closeTournament(String nameOfTournament){
-        TournamentService.closeTournament(nameOfTournament);
-    }
-    public void startTournament(String nameOfTournament){
-        TournamentService.setReadyToStart(nameOfTournament);
+    public TournamentDefinition loadTournamentDetails(String tourName) {
+        return TournamentService.getTournament(tourName);
     }
 
+    /**
+     * Change the Tournament Status to GameStatus.CLOSED
+     */
+    public void closeTournament(String nameOfTournament){
+        TournamentService.setTournamentStatus(nameOfTournament, GameStatus.CLOSED);
+    }
+
+    /**
+     * Get all Registered Tournament Players from a Tournament
+     */
     public Set<TournamentRegistration> getTournamentPlayers(String nameOfTournament) {
         return TournamentService.getRegistrations(nameOfTournament);
     }
+
+    /**
+     * Get the number of Rounds for a Tournament as int[]
+     */
     public int[] getTournamentRounds(String nameOfTournament) {
         return IntStream.range(1,TournamentService.getTournament(nameOfTournament).getNumberOfRounds()+1).toArray();
     }
 
+    /**
+     * Save Table configuration for a Tournament
+     */
     public void saveTables(String tourName) {
         TournamentService.setRounds(tourName);
     }
 
+    /**
+     * Save Final seeding of a Tournament
+     */
+    public void saveFinal(String tourName, String[] players) {
+        TournamentFinals finals = new TournamentFinals();
+        finals.setSeeding(List.of(players));
+        TournamentService.getTournament(tourName).setFinals(finals);
+    }
+
+    /**
+     * Prepare Table Configuration for a Tournament
+     */
     public void prepareTable(String tourName, String roundNumber, String tableNumber, String[] players) {
         List<TournamentPlayer> playersOnTable = new ArrayList<>();
         for(String player : players) {
@@ -169,6 +203,10 @@ public class DeckserverRemote {
             JolAdmin.startGame(game);
         }
         return UpdateFactory.getUpdate();
+    }
+
+    public void runTourJob() {
+        new TournamentJob().run();
     }
 
     public Map<String, Object> chat(String text) {

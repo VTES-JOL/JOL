@@ -23,7 +23,6 @@ public class TournamentService extends PersistedService {
     private static final Predicate<TournamentDefinition> REGISTRATIONS_OPEN = t -> t.getRegistrationStart().isBefore(OffsetDateTime.now()) && t.getRegistrationEnd().isAfter(OffsetDateTime.now());
     private static final Predicate<TournamentDefinition> PLAY_OPEN = t -> t.getPlayStarts().isBefore(OffsetDateTime.now()) && t.getPlayEnds().plusMonths(1).isAfter(OffsetDateTime.now());
     private static final Predicate<TournamentDefinition> IS_STARTING = t -> t.getStatus().equals(GameStatus.STARTING);
-    private static final Predicate<TournamentDefinition> IS_PREPARE = t -> t.getStatus()==null;
     private static final Predicate<TournamentDefinition> IS_ACTIVE = t -> t.getStatus().equals(GameStatus.ACTIVE);
     private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
     private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "tournaments.json");
@@ -66,9 +65,16 @@ public class TournamentService extends PersistedService {
                 .toList();
     }
 
-    public static List<TournamentMetadata> getTournamentsReadyToPrepare() {
+    public static List<TournamentMetadata> getTournamentsStarting() {
         return INSTANCE.tournaments.values().stream()
-                .filter(IS_PREPARE)
+                .filter(t-> t.getStatus().equals(GameStatus.STARTING))
+                .map(TournamentMetadata::new)
+                .toList();
+    }
+
+    public static List<TournamentMetadata> getTournamentsWithStatus(List<GameStatus> status) {
+        return INSTANCE.tournaments.values().stream()
+                .filter(t-> status.contains(t.getStatus()))
                 .map(TournamentMetadata::new)
                 .toList();
     }
@@ -155,8 +161,8 @@ public class TournamentService extends PersistedService {
         INSTANCE.tournaments.get(tournamentName).setStatus(GameStatus.STARTING);
     }
 
-    public static void closeTournament(String tournamentName) {
-        INSTANCE.tournaments.get(tournamentName).setStatus(GameStatus.CLOSED);
+    public static void setTournamentStatus(String tournamentName, GameStatus status) {
+        INSTANCE.tournaments.get(tournamentName).setStatus(status);
     }
 
     public static void createTournament(TournamentDefinition tournamentDefinition) {
