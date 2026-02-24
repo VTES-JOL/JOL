@@ -1,22 +1,14 @@
-<%@ page import="net.deckserver.storage.json.system.TournamentMetadata" %>
-<%@ page import="net.deckserver.game.enums.GameStatus" %>
 <%@ page import="net.deckserver.services.TournamentService" %>
-<%@ page import="java.util.List" %><%
-    List<TournamentMetadata> loadAbleTournaments = TournamentService.getTournamentsWithStatus(List.of(GameStatus.STARTING));
+<%@ page import="net.deckserver.storage.json.system.TournamentMetadata" %>
+<%@ page import="java.util.List" %>
+<%@ page import="net.deckserver.game.enums.GameStatus" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+    List<TournamentMetadata> load = TournamentService.getTournamentsWithStatus(List.of(GameStatus.STARTING));
 %>
 <div class="card shadow mt-2">
     <div class="card-header bg-body-secondary">
         <h5>Create Tournament</h5>
-    </div>
-    <div>
-        <label for="tourNameSelect" class="form-label">Choose Tournament:</label>
-        <select name="tourNameSelect" id="tourNameSelect" class="form-select">
-            <c:forEach items="<%= loadAbleTournaments %>" var="loadTour">
-                <option value=""></option>
-                <option value="${loadTour.id}">${loadTour.name}</option>
-            </c:forEach>
-        </select>
-        <button onclick="loadTournamentDetails()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Load Tournament Details</button>
     </div>
     <div class="card-body">
         <label for="tourName" class="form-label">Tournament Name:</label>
@@ -64,5 +56,14 @@
         <button onclick="addSpecTournamentRule()" class="btn btn-outline-secondary btn-sm mt-2 form-control">Add Special Rule</button>
         <div id="specRulesDiv"></div>
         <button onclick="createTournament()" class="btn btn-outline-secondary btn-sm mt-2 form-control">Create Tournament</button>
+    </div>
+    <div>
+        <label for="tourNameSelect" class="form-label">Choose Tournament:</label>
+        <select name="tourNameSelect" id="tourNameSelect" class="form-select">
+            <c:forEach items="<%= load %>" var="loaded">
+                <option value="${loaded.id}">${loaded.name}</option>
+            </c:forEach>
+        </select>
+        <button onclick="loadTournamentDetails()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Load Tournament Details</button>
     </div>
 </div>

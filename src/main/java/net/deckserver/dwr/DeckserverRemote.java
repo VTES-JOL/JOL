@@ -10,6 +10,7 @@ import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.TournamentFormat;
+import net.deckserver.storage.json.system.TournamentDetails;
 import net.deckserver.jobs.TournamentJob;
 import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.Deck;
@@ -140,8 +141,12 @@ public class DeckserverRemote {
         TournamentService.createTournament(newTournament);
     }
 
-    public TournamentDefinition loadTournamentDetails(String tourName) {
-        return TournamentService.getTournament(tourName);
+    public TournamentDetails loadTournamentDetails(String tourName) {
+        return new TournamentDetails(TournamentService.getTournament(tourName));
+    }
+
+    public String getRoundsForTournamentCsv(String tourName) {
+        return RoundsDetails.exportPastGamesAsCsv(TournamentService.getTournament(tourName).getRounds());
     }
 
     /**
@@ -156,6 +161,14 @@ public class DeckserverRemote {
      */
     public Set<TournamentRegistration> getTournamentPlayers(String nameOfTournament) {
         return TournamentService.getRegistrations(nameOfTournament);
+    }
+
+    public Boolean tournamentAlreadyActive (String nameOfTournament) {
+        if(TournamentService.getTournament(nameOfTournament).getStatus().equals(GameStatus.ACTIVE))
+            return true;
+        if(TournamentService.getTournament(nameOfTournament).getStatus().equals(GameStatus.STARTING))
+            return false;
+        return null;
     }
 
     /**
@@ -478,5 +491,4 @@ public class DeckserverRemote {
     private GameModel getModel(String name) {
         return JolAdmin.getGameModel(name);
     }
-
 }

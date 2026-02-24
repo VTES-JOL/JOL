@@ -11,4 +11,8 @@ public enum TournamentFormat {
     TournamentFormat(String description) {
         this.description = description;
     }
+
+    public String getDescription() {
+        return description;
+    }
 }

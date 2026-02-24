@@ -456,7 +456,7 @@ function resetForm() {
 }
 
 function loadTournamentDetails() {
-    let nameOfTournament = $("#tourNameSelect").val();
+    let nameOfTournament = $("#tourNameSelect option:selected").text();
     DS.loadTournamentDetails(nameOfTournament, {callback: callbackLoadTournamentDetails, errorHandler: errorhandler});
 }
 
@@ -465,20 +465,27 @@ function closeTournament() {
     DS.closeTournament(nameOfTournament);
 }
 
-function addTournamentRule() {
-    addRule($("#ruleText"), $("#rulesDiv"))
-}
-
 function loadTournament() {
     let nameOfTournament = $("#nameOfTournament option:selected").text();
-    DS.getTournamentRounds(nameOfTournament, {callback: callbackTournamentRounds, errorHandler: errorhandler});
-    DS.getTournamentPlayers(nameOfTournament, {callback: callbackTableManager, errorHandler: errorhandler});
+    DS.tournamentAlreadyActive(nameOfTournament, {callback: callbackStatusTournament, errorHandler: errorhandler});
+
 }
 
-function loadFinal() {
+function callbackStatusTournament(isActive) {
     let nameOfTournament = $("#nameOfTournament option:selected").text();
-    DS.getTournamentPlayers(nameOfTournament, {callback: callbackFinal, errorHandler: errorhandler});
+    if(isActive) {
+        let nameOfTournament = $("#nameOfTournament option:selected").text();
+        DS.getTournamentPlayers(nameOfTournament, {callback: callbackFinal, errorHandler: errorhandler});
+        $("#saveFinal").removeClass("d-none");
+        $("#saveTables").addClass("d-none");
+    } else {
+        DS.getTournamentRounds(nameOfTournament, {callback: callbackTournamentRounds, errorHandler: errorhandler});
+        DS.getTournamentPlayers(nameOfTournament, {callback: callbackTableManager, errorHandler: errorhandler});
+        $("#saveFinal").addClass("d-none");
+        $("#saveTables").removeClass("d-none");
+    }
 }
+
 
 function saveFinal() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
@@ -500,17 +507,30 @@ function callbackLoadTournamentDetails(data) {
     let playEnd = $("#playEnd");
     let tourFormat = $("#tourFormat");
     let gameFormat = $("#gameFormat");
-    let rules = new Array();
     let specRulesCon = $("#specRulesCon");
-    let specRules = new Array();
     let numOfRounds = $("#numOfRounds");
     let reqId = $("#reqId");
+    let rulesDiv = $("#rulesDiv");
+    let specRulesDiv = $("#specRulesDiv");
 
     tourName.val(data.name);
-    regStart.val(data.registrationStart);
-    regEnd.val(data.registrationEnd);
+    regStart.val(data.regStart);
+    regEnd.val(data.regEnd);
     playStart.val(data.playStart);
     playEnd.val(data.playEnd);
+    tourFormat.val(data.tourFormat);
+    gameFormat.val(data.gameFormat);
+    specRulesCon.val(data.specRulesCon);
+    numOfRounds.val(data.numRounds);
+    reqId.val(data.reqId)
+
+    $.each(data.rules, function(index, rule) {
+        addRule(rule, rulesDiv);
+    });
+    $.each(data.specRules, function(index, rule) {
+        addRule(rule, specRulesDiv);
+    });
+
 }
 
 function callbackTournamentRounds(data) {
@@ -572,15 +592,23 @@ function createTable(round) {
     table.append(divRound);
 }
 
+function addTournamentRule() {
+    var ruleText = $("#ruleText");
+    addRule(ruleText.val(), $("#rulesDiv"))
+    ruleText.val("");
+}
+
 function addSpecTournamentRule() {
-    addRule($("#specRuleText"), $("#specRulesDiv"))
+    let specRuleText = $("#specRuleText");
+    addRule(specRuleText.val(), $("#specRulesDiv"))
+    specRuleText.val("");
 }
 
 function addRule(rulesInput, rulesCon) {
     let ruleDiv =  $("<div/>");
     ruleDiv.addClass("border");
     let ruleLabel =  $("<label/>");
-    ruleLabel.addClass("form-label").text(rulesInput.val());
+    ruleLabel.addClass("form-label").text(rulesInput);
     let removeButton = $("<button/>");
     removeButton.text("Remove Rule");
     removeButton.addClass("btn btn-outline-secondary btn-sm mt-2 form-control")
@@ -588,7 +616,6 @@ function addRule(rulesInput, rulesCon) {
         ruleDiv.remove();
         removeButton.remove();
     });
-    rulesInput.val("");
     ruleDiv.append(ruleLabel).append(removeButton)
     rulesCon.append(ruleDiv);
 }
@@ -613,6 +640,22 @@ function saveTables() {
     //reset
     let tourRounds = $("#tourRounds");
     tourRounds.empty();
+}
+
+function downloadCurrentTables() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    DS.getRoundsForTournamentCsv(tournamentSelected, {callback: createCsvDownloadLink, errorHandler: errorhandler});
+}
+
+function createCsvDownloadLink(data) {
+    let blob = new Blob([data], { type: 'text/csv' });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = 'rounds.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
 }
 
 function callbackFinal(data) {
