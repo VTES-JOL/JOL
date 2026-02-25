@@ -10,6 +10,7 @@
     <div class="card-header bg-body-secondary">
         <h5>Create Tournament</h5>
     </div>
+    <div id="tourMsg" class="badge text-bg-light fs-5"></div>
     <div class="card-body">
         <label for="tourName" class="form-label">Tournament Name:</label>
         <input id="tourName" size="50" class="form-control"/>

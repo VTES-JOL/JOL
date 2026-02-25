@@ -429,8 +429,18 @@ function createTournament() {
     let numOfRounds = $("#numOfRounds");
     let reqId = $("#reqId");
     //create tournament
-    DS.createTournament(tourName.val(), regStart.val(), regEnd.val(), playStart.val(), playEnd.val(), tourFormat.val(), gameFormat.val(), rules, specRulesCon.val(), specRules, numOfRounds.val(), reqId.val());
-    resetForm();
+    DS.createTournament(tourName.val(), regStart.val(), regEnd.val(), playStart.val(), playEnd.val(), tourFormat.val(), gameFormat.val(), rules, specRulesCon.val(), specRules, numOfRounds.val(), reqId.val(),
+        {callback: callbackCreateTournament, errorHandler: errorhandler});
+}
+
+function callbackCreateTournament(success) {
+    let msg = $("#tourMsg");
+    if(success) {
+        resetForm();
+        msg.text("Tournament created successfully").addClass("text-success").removeClass("text-warning");
+    } else {
+        msg.text("Tournament creation failed").addClass("text-warning").removeClass("text-success");
+    }
 }
 
 function resetForm() {

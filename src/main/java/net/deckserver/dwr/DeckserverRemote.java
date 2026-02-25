@@ -122,24 +122,29 @@ public class DeckserverRemote {
     /**
      * Creates a new Tournament Definition and then creates or updates an existing Tournament
      */
-    public void createTournament(String tourName, String regStart, String regEnd, String playStart, String playEnd, String tourFormat, String gameFormat, String[] rules, String specRulesCon, String[] specRules, String numberOfRounds, String reqId) {
-        //Prepare Tournament Definition
-        TournamentDefinition newTournament = TournamentDefinitionCreator.newTourDef()
-                .withName(tourName)
-                .withRegStart(OffsetDateTime.of(LocalDate.parse(regStart), LocalTime.MIDNIGHT, ZoneOffset.UTC))
-                .withRegEnd(OffsetDateTime.of(LocalDate.parse(regEnd), LocalTime.MIDNIGHT, ZoneOffset.UTC))
-                .withPlayStart(OffsetDateTime.of(LocalDate.parse(playStart), LocalTime.MIDNIGHT, ZoneOffset.UTC))
-                .withPlayEnd(OffsetDateTime.of(LocalDate.parse(playEnd), LocalTime.MIDNIGHT, ZoneOffset.UTC))
-                .withTourFormat(TournamentFormat.valueOf(tourFormat))
-                .withDeckFormat(GameFormat.from(gameFormat))
-                .withRules(rules)
-                .withStatus(GameStatus.STARTING)
-                .withSpecRules(specRulesCon, specRules)
-                .withNumberOfRounds(Integer.valueOf(numberOfRounds))
-                .withReqId(Boolean.getBoolean(reqId))
-                .getTourDef();
-        //create or replace existing Tournament (key -> Tournament Name)
-        TournamentService.createTournament(newTournament);
+    public boolean createTournament(String tourName, String regStart, String regEnd, String playStart, String playEnd, String tourFormat, String gameFormat, String[] rules, String specRulesCon, String[] specRules, String numberOfRounds, String reqId) {
+        try {
+            //Prepare Tournament Definition
+            TournamentDefinition newTournament = TournamentDefinitionCreator.newTourDef()
+                    .withName(tourName)
+                    .withRegStart(OffsetDateTime.of(LocalDate.parse(regStart), LocalTime.MIDNIGHT, ZoneOffset.UTC))
+                    .withRegEnd(OffsetDateTime.of(LocalDate.parse(regEnd), LocalTime.MIDNIGHT, ZoneOffset.UTC))
+                    .withPlayStart(OffsetDateTime.of(LocalDate.parse(playStart), LocalTime.MIDNIGHT, ZoneOffset.UTC))
+                    .withPlayEnd(OffsetDateTime.of(LocalDate.parse(playEnd), LocalTime.MIDNIGHT, ZoneOffset.UTC))
+                    .withTourFormat(TournamentFormat.valueOf(tourFormat))
+                    .withDeckFormat(GameFormat.from(gameFormat))
+                    .withRules(rules)
+                    .withStatus(GameStatus.STARTING)
+                    .withSpecRules(specRulesCon, specRules)
+                    .withNumberOfRounds(Integer.valueOf(numberOfRounds))
+                    .withReqId(Boolean.getBoolean(reqId))
+                    .getTourDef();
+            //create or replace existing Tournament (key -> Tournament Name)
+            TournamentService.createTournament(newTournament);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public TournamentDetails loadTournamentDetails(String tourName) {
