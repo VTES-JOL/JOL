@@ -27,6 +27,9 @@
     <div id="saveFinal" class="d-flex justify-content-between d-none">
       <button onclick="saveFinal()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Save Final</button>
     </div>
+    <div id="setFinalSeating" class="d-flex justify-content-between d-none">
+      <button onclick="setFinalSeating()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Set Final Seating</button>
+    </div>
     <div id="tourRounds"></div>
     <div id="tourFinal" class="d-none">
       <ul id="finalPlayers" class="card-body p-1 grid sortableFinal"></ul>

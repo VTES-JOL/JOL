@@ -6,6 +6,7 @@ import net.deckserver.dwr.bean.DeckInfoBean;
 import net.deckserver.dwr.creators.UpdateFactory;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
+import net.deckserver.dwr.model.JolGame;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
@@ -189,9 +190,11 @@ public class DeckserverRemote {
      * Save Final seeding of a Tournament
      */
     public void saveFinal(String tourName, String[] players) {
-        TournamentFinals finals = new TournamentFinals();
-        finals.setSeeding(List.of(players));
-        TournamentService.getTournament(tourName).setFinals(finals);
+        if(GameService.getGameByName(tourName)==null) {
+            TournamentFinals finals = new TournamentFinals();
+            finals.setSeeding(List.of(players));
+            TournamentService.getTournament(tourName).setFinals(finals);
+        }
     }
 
     /**
@@ -208,6 +211,20 @@ public class DeckserverRemote {
         HashMap<Integer, List<TournamentPlayer>> table = new HashMap<>();
         table.put(Integer.valueOf(tableNumber), playersOnTable);
         TournamentService.prepareRounds(Integer.valueOf(roundNumber), table);
+    }
+
+    public void setFinalSeating(String tourName, String[] players) {
+        JolGame gameByName = GameService.getGameByName(tourName);
+        gameByName.setOrder("Tournament Manager", List.of(players));
+    }
+
+    public Boolean gameAlreadyStarted(String tourName) {
+        try {
+            GameService.getGameByName(tourName);
+        } catch (NullPointerException ex) {
+            return false;
+        }
+        return true;
     }
 
     public Map<String, Object> startGame(String game) {

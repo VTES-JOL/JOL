@@ -476,12 +476,13 @@ function callbackStatusTournament(isActive) {
     if(isActive) {
         let nameOfTournament = $("#nameOfTournament option:selected").text();
         DS.getTournamentPlayers(nameOfTournament, {callback: callbackFinal, errorHandler: errorhandler});
-        $("#saveFinal").removeClass("d-none");
         $("#saveTables").addClass("d-none");
+        DS.gameAlreadyStarted(nameOfTournament, {callback: callbackSaveButton, errorHandler: errorhandler});
     } else {
         DS.getTournamentRounds(nameOfTournament, {callback: callbackTournamentRounds, errorHandler: errorhandler});
         DS.getTournamentPlayers(nameOfTournament, {callback: callbackTableManager, errorHandler: errorhandler});
         $("#saveFinal").addClass("d-none");
+        $("#setFinalSeating").addClass("d-none");
         $("#saveTables").removeClass("d-none");
     }
 }
@@ -494,6 +495,17 @@ function saveFinal() {
         players.push(player.textContent);
     })
     DS.saveFinal(tournamentSelected, players, {callback: processData, errorHandler: errorhandler});
+    //reset
+    $("#tourFinal").empty().addClass("d-none");
+}
+
+function setFinalSeating() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    let players = new Array();
+    $.each($("#finalTable").find("li"), function(index, player) {
+        players.push(player.textContent);
+    })
+    DS.setFinalSeating(tournamentSelected, players, {callback: processData, errorHandler: errorhandler});
     //reset
     $("#tourFinal").empty().addClass("d-none");
 }
@@ -677,6 +689,14 @@ function callbackFinal(data) {
         connectWith: ".sortableFinal",
         dropOnEmpty: true});
     $("#tourFinal").removeClass("d-none");
+}
+
+function callbackSaveButton(isStarted) {
+    if(isStarted) {
+        $("#setFinalSeating").removeClass("d-none");
+    } else {
+        $("#saveFinal").removeClass("d-none");
+    }
 }
 
 function callbackTournament(data) {
