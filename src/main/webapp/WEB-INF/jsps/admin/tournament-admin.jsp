@@ -50,12 +50,12 @@
         <label for="ruleText" class="form-label">Tournament Rules:</label>
         <input id="ruleText" size="50" class="form-control"/>
         <button onclick="addTournamentRule()" class="btn btn-outline-secondary btn-sm mt-2 form-control">Add Rule</button>
-        <div id="rulesDiv"></div>
-        <label for="specRulesCon" class="form-label">Special Rules</label>
+        <div id="rulesDiv" class="m-1"></div>
+        <label for="specRulesCon" class="form-label">Special Rules:</label>
         <textarea id="specRulesCon" name="specRulesCon" rows="4" cols="50" class="form-control">The following JOL rules will be enforced for the duration of the rounds with the exception of the period between <Date> and <Date>.</textarea>
         <input id="specRuleText" size="50" class="form-control"/>
         <button onclick="addSpecTournamentRule()" class="btn btn-outline-secondary btn-sm mt-2 form-control">Add Special Rule</button>
-        <div id="specRulesDiv"></div>
+        <div id="specRulesDiv" class="m-1"></div>
         <button onclick="createTournament()" class="btn btn-outline-secondary btn-sm mt-2 form-control">Create Tournament</button>
     </div>
     <div class="card-footer bg-body-secondary">

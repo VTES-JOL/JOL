@@ -628,12 +628,12 @@ function addSpecTournamentRule() {
 
 function addRule(rulesInput, rulesCon) {
     let ruleDiv =  $("<div/>");
-    ruleDiv.addClass("border");
+    ruleDiv.addClass("border rounded m-1");
     let ruleLabel =  $("<label/>");
-    ruleLabel.addClass("form-label").text(rulesInput);
+    ruleLabel.addClass("form-label m-1").text(rulesInput);
     let removeButton = $("<button/>");
     removeButton.text("Remove Rule");
-    removeButton.addClass("btn btn-outline-secondary btn-sm mt-2 form-control")
+    removeButton.addClass("btn btn-outline-secondary btn-sm mt-2 form-control m-1")
     removeButton.on('click', function () {
         ruleDiv.remove();
         removeButton.remove();
