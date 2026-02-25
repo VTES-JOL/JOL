@@ -47,7 +47,7 @@
             <option value="DUEL">Duel</option>
             <option value="PLAYTEST">Playtest</option>
         </select>
-        <label for="ruleText" class="form-label">Tournament Rules</label>
+        <label for="ruleText" class="form-label">Tournament Rules:</label>
         <input id="ruleText" size="50" class="form-control"/>
         <button onclick="addTournamentRule()" class="btn btn-outline-secondary btn-sm mt-2 form-control">Add Rule</button>
         <div id="rulesDiv"></div>
@@ -58,7 +58,10 @@
         <div id="specRulesDiv"></div>
         <button onclick="createTournament()" class="btn btn-outline-secondary btn-sm mt-2 form-control">Create Tournament</button>
     </div>
-    <div>
+    <div class="card-footer bg-body-secondary">
+        <h5>Load Tournament</h5>
+    </div>
+    <div class="card-body">
         <label for="tourNameSelect" class="form-label">Choose Tournament:</label>
         <select name="tourNameSelect" id="tourNameSelect" class="form-select">
             <c:forEach items="<%= load %>" var="loaded">
