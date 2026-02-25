@@ -15,7 +15,8 @@ let profile = {
     email: "",
     discordID: "",
     updating: false,
-    imageTooltipPreference: true
+    imageTooltipPreference: true,
+    edgeColor: "#FFFFFF"
 };
 let subscribed =  localStorage.getItem("notifications-subscribed") === "true";
 
@@ -46,6 +47,10 @@ function init(data) {
 
 function setPreferences(value) {
     profile.imageTooltipPreference = value;
+}
+
+function setEdgeColorPref(value) {
+    profile.edgeColor = value;
 }
 
 function processData(a) {
@@ -538,6 +543,11 @@ function setImageTooltip() {
     DS.setUserPreferences(profile.imageTooltipPreference, {callback: processData, errorHandler: errorhandler});
 }
 
+function setEdgeColor() {
+    profile.edgeColor = $("#edgecolorpicker").val();
+    DS.setEdgeColor(profile.edgeColor, {callback: processData, errorHandler: errorhandler});
+}
+
 function callbackProfile(data) {
     if (profile.email !== data.email)
         $('#profileEmail').val(data.email);
@@ -560,6 +570,8 @@ function callbackProfile(data) {
     if (data.imageTooltipPreference) {
         $("#imageTooltips").prop("checked", true);
     }
+
+    $("#edgecolorpicker").val(data.edgeColor);
 
     if (subscribed) {
         $("#enableNotifications").prop("checked", true);

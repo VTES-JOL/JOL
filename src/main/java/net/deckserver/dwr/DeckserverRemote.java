@@ -141,14 +141,22 @@ public class DeckserverRemote {
             JolAdmin.resetView(playerName, currentGame);
         }
         boolean imagePreferences = JolAdmin.getImageTooltipPreference(playerName);
+        String edgeColor = JolAdmin.getEdgeColor(playerName);
         Map<String, Object> update = UpdateFactory.getUpdate();
         update.put("setPreferences", imagePreferences);
+        update.put("setEdgeColorPref", edgeColor);
         return update;
     }
 
     public Map<String, Object> setUserPreferences(boolean imageTooltips) {
         String playerName = getPlayer(request);
         JolAdmin.setImageTooltipPreference(playerName, imageTooltips);
+        return UpdateFactory.getUpdate();
+    }
+
+    public Map<String, Object> setEdgeColor(String color) {
+        String playerName = getPlayer(request);
+        JolAdmin.setEdgeColor(playerName, color);
         return UpdateFactory.getUpdate();
     }
 
