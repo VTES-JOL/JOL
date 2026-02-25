@@ -31,6 +31,9 @@ public class TournamentJob implements Runnable {
         // Start tournaments
         List<TournamentMetadata> tournaments = TournamentService.getTournamentsReadyToStart();
         for (TournamentMetadata tournament : tournaments) {
+            //dont setup the tournament games if no rounds have been created
+            if(!tournament.isRoundsConfig())
+                return;
             String tournamentName = tournament.getName();
             log.info("Starting tournament {}", tournamentName);
             for (int round = 1; round <= tournament.getNumberOfRounds(); round++) {

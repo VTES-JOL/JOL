@@ -131,7 +131,7 @@ public class DeckserverRemote {
                 .withPlayStart(OffsetDateTime.of(LocalDate.parse(playStart), LocalTime.MIDNIGHT, ZoneOffset.UTC))
                 .withPlayEnd(OffsetDateTime.of(LocalDate.parse(playEnd), LocalTime.MIDNIGHT, ZoneOffset.UTC))
                 .withTourFormat(TournamentFormat.valueOf(tourFormat))
-                .withDeckFormat(GameFormat.valueOf(gameFormat))
+                .withDeckFormat(GameFormat.from(gameFormat))
                 .withRules(rules)
                 .withStatus(GameStatus.STARTING)
                 .withSpecRules(specRulesCon, specRules)
