@@ -1316,6 +1316,80 @@ function loadGame(data) {
         addCardTooltips("#hand");
     }
 
+    // drag and drop
+    //add sortable to highest order list and connect to sublists
+    let startPlayer;
+    $(".sortable1").each(function (index, region) {
+        let regionName = region.id.substring(2);
+        if(region.id.indexOf("READY")>-1) {
+            $(region).sortable({
+                connectWith: ".sortable1, .sortable2, .drop-zone",
+                handle: ".bi-grip-vertical",
+                dropOnEmpty: true,
+                start: function (event, ui) {
+                    startPlayer = ui.item.closest(".player").attr("data-player");
+                },
+                stop: function (event, ui) {
+                    let playerName = ui.item.closest(".player").attr("data-player");
+                    if(playerName==startPlayer) {
+                        let newPos;
+                        if(ui.item.parent("ol").hasClass("region")) {
+                            ui.item.parent("ol").children("li").each(function (index, li) {
+                                if(li===ui.item[0]) {
+                                    newPos = index;
+                                }
+                            });
+                            DS.swapCardsInRegion(data.name, playerName, regionName, ui.item.attr("data-coordinates"), newPos, {callback: processData, errorHandler: errorhandler});
+                        } else {
+                            DS.attachRegionCard(data.name, playerName, regionName, ui.item.attr("data-coordinates"), ui.item.parents("li").attr("data-coordinates"), {callback: processData, errorHandler: errorhandler});
+                        }
+                    } else {
+                        DS.doReload(data.name, {callback: processData, errorHandler: errorhandler});
+                    }
+                }
+            });
+            $(region).disableSelection();
+        }
+        //add drag and drop to all sub lists and connect to parent list
+        $(".sortable2").sortable({
+            handle: ".bi-grip-vertical",
+            dropOnEmpty: true,
+            connectWith: ".sortable1, .drop-zone, .sortable2 ",
+            start: function (event, ui) {
+                startPlayer = ui.item.closest(".player").attr("data-player");
+            },
+            stop: function (event, ui) {
+                let playerName = ui.item.closest(".player").attr("data-player");
+                if(playerName==startPlayer) {
+                    let newPos;
+                    if(ui.item.parent("ol").hasClass("region")) {
+                        ui.item.parent("ol").children("li").each(function (index, li) {
+                            if(li===ui.item[0]) {
+                                newPos = index;
+                            }
+                        });
+                        DS.detachRegionCard(data.name, playerName, "READY", ui.item.attr("data-coordinates"), newPos, {callback: processData, errorHandler: errorhandler});
+                    } else {
+                        DS.attachRegionCard(data.name, playerName, "READY", ui.item.attr("data-coordinates"), ui.item.parents("li").attr("data-coordinates"), {callback: processData, errorHandler: errorhandler});
+                    }
+                } else {
+                    DS.doReload(data.name, {callback: processData, errorHandler: errorhandler});
+                }
+            }
+        });
+        $(".sortable2").disableSelection();
+        //create a drop zone
+        $(".drop-zone").droppable({
+            accept: ".dropable-item",
+        });
+        $(".drop-zone").sortable({
+            handle: ".bi-grip-vertical",
+            connectWith: '.drop-zone, .sortable1, .sortable2',
+        });
+        $(".drop-zone").disableSelection();
+
+    });
+
     // Setup polling
     if (refresher) clearTimeout(refresher);
     if (data.refresh > 0 || fetchFullLog) {

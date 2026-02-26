@@ -46,6 +46,7 @@
     // Red: hasBlood || hasCapacity
     String counterStyle = (cardSummary.hasLife() && RegionType.OTHER_VISIBLE_REGIONS.contains(region)) ? "text-bg-success" : ((cardSummary.hasBlood() || hasCapacity) ? "text-bg-danger" : "text-bg-secondary");
     String regionStyle = region == RegionType.TORPOR ? "opacity-75" : "";
+    boolean regionDragDrop = region == RegionType.READY ? true : false;
     String contestedStyle = contested ? "bg-warning-subtle" : "";
     String counterText = counters + (capacity > 0 ? " / " + capacity : "");
     String attributes = cardDetail.buildAttributes(region, index, true);
@@ -56,7 +57,7 @@
     request.setAttribute("cards", cards);
 %>
 <li <%= attributes %> onclick="<%= showAction %>"
-                      class="list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1 <%= regionStyle%> <%= shadowStyle %> <%= contestedStyle %>">
+                      class="list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1 dropable-item <%= regionStyle%> <%= shadowStyle %> <%= contestedStyle %>">
     <div class="mx-1 me-auto w-100">
         <div class="d-flex justify-content-between">
             <div class="d-flex flex-column">
@@ -102,7 +103,7 @@
                 </div>
             </div>
         </div>
-        <ol class="list-group list-group-numbered ms-n3">
+        <ol class="list-group list-group-numbered ms-n3 sortable2 drop-zone" style="min-height: 10px">
             <c:forEach items="<%= cards %>" var="card" varStatus="counter">
                 <c:if test="${!player.equals(card.owner)}">
                     <c:set var="visible" value="true"/>
@@ -130,4 +131,5 @@
             </c:forEach>
         </ol>
     </div>
+    <c:if test="<%= regionDragDrop %>"><i class="bi bi-grip-vertical" draggable="true"></i></c:if>
 </li>

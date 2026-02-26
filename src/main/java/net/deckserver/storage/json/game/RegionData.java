@@ -72,6 +72,31 @@ public class RegionData {
         card.setParent(null);
         card.setRegion(this);
     }
+    public void addCard(CardData card, int pos) {
+        // Remove from parent first, if it exists
+        if (card.getParent() != null) {
+            card.getParent().remove(card);
+        }
+        // Remove from region if it exists
+        if (card.getRegion() != null) {
+            card.getRegion().removeCard(card);
+        }
+        // Add new Card to correct position
+        LinkedList<CardData> newCardsOrder = new LinkedList<>();
+        for(int i = 0; i<cards.size();i++){
+            if(i == pos) {
+                newCardsOrder.add(card);
+            }
+            newCardsOrder.add(cards.get(i));
+        }
+        //add card to last position if currently missing
+        if(this.cards.size()==newCardsOrder.size()) {
+            newCardsOrder.add(card);
+        }
+        this.cards = newCardsOrder;
+        card.setParent(null);
+        card.setRegion(this);
+    }
 
     public void removeCard(CardData card) {
         cards.remove(card);

@@ -6,12 +6,16 @@ import net.deckserver.dwr.bean.DeckInfoBean;
 import net.deckserver.dwr.creators.UpdateFactory;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
+import net.deckserver.dwr.model.JolGame;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.game.enums.RegionType;
 import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
+import net.deckserver.storage.json.game.CardData;
 import net.deckserver.storage.json.game.ChatData;
+import net.deckserver.storage.json.game.RegionData;
 import net.deckserver.storage.json.system.DeckInfo;
 import net.deckserver.storage.json.system.GameHistory;
 import net.deckserver.storage.json.system.PlayerResult;
@@ -419,6 +423,75 @@ public class DeckserverRemote {
         return writer.toString();
     }
 
+    /**
+     * Swap two cards in a given Region
+     * @param gameName - Name where cards should be swapped
+     * @param player - Player whom card shall be swapped
+     * @param region - Region where the cards shall be swapped
+     * @param oldPos - Old Position of the Card
+     * @param newPos - New Positon of the Card
+     * @return Map with View to Update
+     */
+    public Map<String, Object> swapCardsInRegion(String gameName, String player, String region, int oldPos, int newPos) {
+        //get Game & Region & Cards
+        JolGame game = GameService.getGameByName(gameName);
+        RegionData playerRegion = game.data().getPlayerRegion(player, RegionType.valueOf(region));
+        LinkedList<CardData> cards = (LinkedList<CardData>) playerRegion.getCards();
+        CardData cardData = getCard(cards, String.valueOf(oldPos));
+        //swap pos in collection
+        Collections.swap(cards, oldPos-1, newPos);
+        sendChatMessage(game.id(), player, cardData.getName(), String.valueOf(oldPos), String.valueOf(newPos+1), region);
+        //reload State
+        return doReload(gameName);
+    }
+
+    /**
+     * Detach a Card from another card to a Region
+     *
+     * @param gameName - Name where cards should be detached
+     * @param player - Player whom card shall be detached
+     * @param region - Region where the cards shall be detached
+     * @param oldPos - Old Position of the Card
+     * @param newPos - New Positon of the Card
+     * @return Map with View to Update
+     */
+    public Map<String, Object> detachRegionCard(String gameName, String player, String region, String oldPos, int newPos) {
+        //get Game & Region & Cards
+        JolGame game = GameService.getGameByName(gameName);
+        RegionData playerRegion = game.data().getPlayerRegion(player, RegionType.valueOf(region));
+        LinkedList<CardData> cards = (LinkedList<CardData>) playerRegion.getCards();
+        //get Card
+        CardData cardData = getCard(cards, oldPos);
+        //detach Card
+        playerRegion.addCard(cardData, newPos);
+        sendChatMessage(game.id(), player, cardData.getName(), oldPos, String.valueOf(newPos+1), region);
+        //reload State
+        return doReload(gameName);
+    }
+
+    /**
+     * Attach Card to another Card in a given Region
+     * @param gameName - Name where cards should be attached
+     * @param player - Player whom card shall be attached
+     * @param region - Region where the cards shall be attached
+     * @param oldPos - Old Position of the Card
+     * @param newPos - New Positon of the Card
+     * @return Map with View to Update
+     */
+    public Map<String, Object> attachRegionCard(String gameName, String player, String region, String oldPos, String newPos) {
+        //get Game & Region & Cards
+        JolGame game = GameService.getGameByName(gameName);
+        RegionData playerRegion = game.data().getPlayerRegion(player, RegionType.valueOf(region));
+        LinkedList<CardData> cards = (LinkedList<CardData>) playerRegion.getCards();
+        //get card
+        CardData cardData = getCard(cards, oldPos);
+        //attach Card
+        getCard(cards, newPos).add(cardData, true);
+        sendChatMessage(game.id(), player, cardData.getName(), oldPos, newPos, region);
+        //reload State
+        return doReload(gameName);
+    }
+
     private GameView getView(String name) {
         String player = getPlayer(request);
         return getModel(name).getView(player);
@@ -428,4 +501,27 @@ public class DeckserverRemote {
         return JolAdmin.getGameModel(name);
     }
 
+    public Map<String, Object> doReload(String name) {
+        //reload State
+        getModel(name).doReload(true,false,false);
+        return UpdateFactory.getUpdate();
+    }
+
+    private CardData getCard(LinkedList<CardData> cards, String pos) {
+        LinkedList<CardData> targetCards = cards;
+        if(pos.contains(".")){
+            String[] split = pos.split("\\.");
+            int lastCard = Integer.valueOf(split[split.length-1]);
+            for(int i = 0; i < split.length-1; i++) {
+                targetCards = targetCards.get(Integer.valueOf(split[i])-1).getCards();
+            }
+            return targetCards.get(lastCard-1);
+        } else {
+            return cards.get(Integer.valueOf(pos)-1);
+        }
+    }
+
+    private void sendChatMessage(String id, String playerName, String cardName, String oldPos, String newPos, String region) {
+        ChatService.sendMessage(id, playerName, playerName + " moves "+cardName+" from "+oldPos+" to "+newPos+" of their "+region+" region.");
+    }
 }

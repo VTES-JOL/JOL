@@ -42,7 +42,7 @@
             </span>
         </div>
         <ol id="<%= regionId %>"
-            class="region list-group list-group-flush list-group-numbered <%= regionStyle %> collapse <%= show %>">
+            class="region sortable1 list-group list-group-flush list-group-numbered drop-zone<%= regionStyle %> collapse <%= show %>">
             <c:forEach items="<%= cards %>" var="card" varStatus="counter">
                 <c:if test="${!player.equals(card.ownerName)}">
                     <c:set var="visible" value="true"/>
