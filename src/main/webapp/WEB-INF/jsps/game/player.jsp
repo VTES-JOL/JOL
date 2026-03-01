@@ -4,6 +4,7 @@
 <%@page import="net.deckserver.dwr.model.JolGame" %>
 <%@ page import="java.text.DecimalFormat" %>
 <%@ page import="net.deckserver.game.enums.RegionType" %>
+<%@ page import="java.util.Objects" %>
 <%
     JolGame game = (JolGame) request.getAttribute("game");
     String viewer = (String) request.getAttribute("viewer");
@@ -18,6 +19,7 @@
     String activeStyle = active ? "text-bg-light border-dark border-2" : (isPlayer ? "border-secondary border-2" : "");
     String activeHeaderStyle = active ? "bg-info-subtle" : "";
     String poolStyle = pool == 0 ? "text-bg-dark" : pool < 0 ? "text-bg-warning" : "text-bg-danger";
+    String edgeTextColor = Objects.equals(edgeColor, "#ffffff") ? "black" : "white";
 %>
 <div class="col-xl col-lg-3 col-md-4 col-sm-6 g-2 player" data-player="<%= player %>" data-pool="<%= pool %>"
      data-vp="<%= vp %>" data-edge="<%= edge %>">
@@ -29,7 +31,8 @@
                     <i class='bi-exclamation-triangle ms-2 pinged d-none'></i>
                 </span>
                 <c:if test="<%= edge %>">
-                    <span class="badge border border-secondary fw-bold align-items-center d-flex gap-1" style="background: <%= edgeColor %>">
+                    <span class="badge border border-secondary fw-bold align-items-center d-flex gap-1"
+                          style="background: <%= edgeColor %>; color: <%=  edgeTextColor %>">
                         <i class="bi bi-chevron-left"></i>
                         Edge
                         <i class="bi bi-chevron-right"></i>
