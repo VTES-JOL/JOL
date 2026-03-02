@@ -870,6 +870,8 @@ function renderGlobalChat(data) {
         let timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp).addClass('chat-timestamp');
         let playerLabel = globalChatLastPlayer === chat.player && globalChatLastDay === day ? "" : "<b>" + chat.player + "</b> ";
         let message = $("<span/>").html(" " + playerLabel + chat.message);
+        if(message.text().includes("@"+player))
+            message.addClass("text-warning");
 
         if (chat.player !== player) {
             onlySelfChat = false;
