@@ -45,6 +45,11 @@
                         <span><i class="bi bi-recycle"></i> Discard + Draw</span>
                     </button>
                 </div>
+                <div class="input-group mt-2">
+                    <label for="playCardModal-label" class="input-group-text"><i class="bi bi-tag"></i></label>
+                    <input type="text" class="form-control" id="playCardModal-label"
+                           placeholder="Add a label for all players to see." onchange="updateNotesHand();">
+                </div>
             </div>
         </div>
     </div>
