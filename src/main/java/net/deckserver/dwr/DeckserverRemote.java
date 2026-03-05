@@ -6,11 +6,15 @@ import net.deckserver.dwr.bean.DeckInfoBean;
 import net.deckserver.dwr.creators.UpdateFactory;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
+import net.deckserver.dwr.model.JolGame;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.game.enums.RegionType;
 import net.deckserver.services.*;
+import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
+import net.deckserver.storage.json.game.CardData;
 import net.deckserver.storage.json.game.ChatData;
 import net.deckserver.storage.json.system.DeckInfo;
 import net.deckserver.storage.json.system.GameHistory;
@@ -18,14 +22,17 @@ import net.deckserver.storage.json.system.PlayerResult;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.QuoteMode;
+import org.apache.commons.lang3.tuple.Pair;
 import org.directwebremoting.WebContextFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.awt.print.Book;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DeckserverRemote {
 
@@ -194,6 +201,14 @@ public class DeckserverRemote {
             return JolAdmin.getGameDeck(gameName, playerName);
         }
         return null;
+    }
+
+    public List<CardCount> getLib(String gameName) {
+        JolGame game = GameService.getGameByName(gameName);
+        String playerName = getPlayer(request);
+        return game.data().getPlayerRegion(playerName, RegionType.LIBRARY).getCards().stream()
+                .map(card -> new CardCount(Integer.valueOf(card.getCardId()), card.getName(), 0, null))
+                .collect(Collectors.toList());
     }
 
     public Set<String> getGamePlayers(String gameName) {

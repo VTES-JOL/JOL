@@ -9,8 +9,28 @@
         <label for="globalNotes" class="d-none"></label>
         <textarea id="globalNotes" class="form-control scrollable" onblur="sendGlobalNotes();"
                   placeholder="Global Notes"></textarea>
-        <label for="privateNotes" class="d-none"></label>
-        <textarea id="privateNotes" class="form-control scrollable player-only" onblur="sendPrivateNotes();"
-                  placeholder="Private Notes"></textarea>
+        <div class="border-top-1 border border-dark" onmouseover="removeDnone('quickAction')" onmouseleave="addDnone('quickAction')">
+            <div id="quickAction" class="d-none" onmouseleave="addDnone('quickAction')">
+                <a onclick="sendCommand('unlock')"><i class="bi bi-unlock"></i></a>
+                <a onclick="toggleDisplay('deckBody');" title="Library"><i class="bi bi-stack"></i></a>
+                <a onclick="toggleDisplay('privateNotesDiv');" title="Privates Notes"><i class="bi bi-journal"></i></a>
+                <button type="button" class="btn-sm btn-outline-success bg-success-subtle" onclick="sendCommand('pool +1')">
+                    +1
+                </button>
+                <button type="button" class="btn-sm btn-outline-danger bg-danger-subtle" onclick="sendCommand('pool -1')">
+                    -1
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body d-flex p-0 scrollable">
+        <div id="deckBody" class="d-none d-flex w-100">
+            <ol id="deckBodyList" class="list-group list-group-numbered p-0 w-100"></ol>
+        </div>
+        <div id="privateNotesDiv" class="card-body d-flex p-0 w-100">
+            <label for="privateNotes" class="d-none"></label>
+            <textarea id="privateNotes" class="form-control player-only" onblur="sendPrivateNotes();"
+                      placeholder="Private Notes"></textarea>
+        </div>
     </div>
 </div>
