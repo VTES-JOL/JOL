@@ -33,7 +33,11 @@
                     <button type="button" class="btn btn-outline-secondary m-1" onclick="sendCommand('shuffle')">
                         Shuffle
                     </button>
+                    <button type="button" class="btn btn-outline-secondary m-1" onclick="sendCommand('show lib');">
+                        Show Lib
+                    </button>
                 </div>
+                <br/>
                 <h6 class="m-1 d-inline btn pe-none bg-secondary-subtle">Crypt</h6>
                 <div class="d-inline">
                     <button type="button" class="btn btn-outline-secondary m-1" onclick="sendCommand('draw crypt')">Draw

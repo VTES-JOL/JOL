@@ -1,6 +1,7 @@
 package net.deckserver.dwr.bean;
 
 import lombok.Getter;
+import net.deckserver.storage.json.game.CardSimple;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ public class GameBean {
     private final String hand;
     private final String globalNotes;
     private final String privateNotes;
+    private final List<CardSimple> shownCards;
     private final String label;
     private final String phase;
     private final List<String> turn;
@@ -29,7 +31,7 @@ public class GameBean {
     private final int logLength;
     private final String currentPlayer;
 
-    public GameBean(boolean isPlayer, boolean isAdmin, boolean isJudge, int refresh, String hand, String globalNotes, String privateNotes,
+    public GameBean(boolean isPlayer, boolean isAdmin, boolean isJudge, int refresh, String hand, String globalNotes, String privateNotes, List<CardSimple> shownCards,
                     String label, String phase, boolean resetChat, boolean turnChanged, List<String> turn, List<String> turns, String state, List<String> phases,
                     List<String> ping, List<String> pinged, String stamp, String name, int logLength, String currentPlayer) {
         this.ping = ping;
@@ -41,6 +43,7 @@ public class GameBean {
         this.hand = hand;
         this.globalNotes = globalNotes;
         this.privateNotes = privateNotes;
+        this.shownCards = shownCards;
         this.label = label;
         this.phase = phase;
         this.resetChat = resetChat;

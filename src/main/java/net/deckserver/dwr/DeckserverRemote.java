@@ -6,11 +6,15 @@ import net.deckserver.dwr.bean.DeckInfoBean;
 import net.deckserver.dwr.creators.UpdateFactory;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
+import net.deckserver.dwr.model.JolGame;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.game.enums.RegionType;
 import net.deckserver.services.*;
+import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
+import net.deckserver.storage.json.game.CardSimple;
 import net.deckserver.storage.json.game.ChatData;
 import net.deckserver.storage.json.system.DeckInfo;
 import net.deckserver.storage.json.system.GameHistory;
@@ -26,6 +30,7 @@ import java.io.StringWriter;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DeckserverRemote {
 
@@ -194,6 +199,14 @@ public class DeckserverRemote {
             return JolAdmin.getGameDeck(gameName, playerName);
         }
         return null;
+    }
+
+    public List<CardCount> getLib(String gameName) {
+        JolGame game = GameService.getGameByName(gameName);
+        String playerName = getPlayer(request);
+        return game.data().getPlayerRegion(playerName, RegionType.LIBRARY).getCards().stream()
+                .map(card -> new CardCount(Integer.valueOf(card.getCardId()), card.getName(), 0, null))
+                .collect(Collectors.toList());
     }
 
     public Set<String> getGamePlayers(String gameName) {
@@ -393,6 +406,12 @@ public class DeckserverRemote {
         if (JolAdmin.isAdmin(playerName)) {
         }
         return UpdateFactory.getUpdate();
+    }
+
+    public List<CardSimple> removeShownCards(String name) {
+        String playerName = getPlayer(request);
+        GameService.getGameByName(name).setShownCards(playerName, null);
+        return null;
     }
 
     public String exportPastGamesAsCsv() throws IOException {
