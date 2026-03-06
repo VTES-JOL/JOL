@@ -870,7 +870,7 @@ function renderGlobalChat(data) {
         let timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp).addClass('chat-timestamp');
         let playerLabel = globalChatLastPlayer === chat.player && globalChatLastDay === day ? "" : "<b>" + chat.player + "</b> ";
         //replace player name with colored player name
-        let msg = chat.message.replaceAll("&#64;"+player, "<span style='background-color: #D4D7F9'>@"+player+"</span>");
+        let msg = chat.message.replaceAll("&#64;"+player, "<span style='background-color: #D4D7F9; color:black'>@"+player+"</span>");
         let message = $("<span/>").html(" " + playerLabel + msg);
 
         if (chat.player !== player) {
