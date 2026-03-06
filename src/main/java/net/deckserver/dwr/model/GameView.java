@@ -7,6 +7,7 @@ import net.deckserver.game.enums.RegionType;
 import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;
+import net.deckserver.storage.json.game.CardSimple;
 import net.deckserver.storage.json.game.ChatData;
 import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
@@ -90,6 +91,7 @@ public class GameView {
         String hand = null;
         String globalNotes = null;
         String privateNotes = null;
+        List<CardSimple> shownCards = null;
         String label;
         List<String> turn = new ArrayList<>();
         List<String> turns = new ArrayList<>();
@@ -118,6 +120,7 @@ public class GameView {
 
         if (privateNotesChanged) {
             privateNotes = game.getPrivateNotes(playerName);
+            shownCards = game.getShownCards(playerName);
         }
 
         label = game.getTurnLabel() + " - " + game.getPhase();
@@ -160,7 +163,7 @@ public class GameView {
         clearAccess();
         String stamp = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
         int logLength = ChatService.getTurn(id, game.getTurnLabel()).size();
-        return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, globalNotes, privateNotes, label, phase.getDescription(),
+        return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, globalNotes, privateNotes, shownCards,label, phase.getDescription(),
                 chatReset, tc, turn, turns, state, phases, ping, pinged, stamp, gameName, logLength, currentPlayer);
     }
 

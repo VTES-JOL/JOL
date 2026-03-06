@@ -14,7 +14,7 @@ import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
-import net.deckserver.storage.json.game.CardData;
+import net.deckserver.storage.json.game.CardSimple;
 import net.deckserver.storage.json.game.ChatData;
 import net.deckserver.storage.json.system.DeckInfo;
 import net.deckserver.storage.json.system.GameHistory;
@@ -22,11 +22,9 @@ import net.deckserver.storage.json.system.PlayerResult;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.QuoteMode;
-import org.apache.commons.lang3.tuple.Pair;
 import org.directwebremoting.WebContextFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.awt.print.Book;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.time.OffsetDateTime;
@@ -408,6 +406,12 @@ public class DeckserverRemote {
         if (JolAdmin.isAdmin(playerName)) {
         }
         return UpdateFactory.getUpdate();
+    }
+
+    public List<CardSimple> removeShownCards(String name) {
+        String playerName = getPlayer(request);
+        GameService.getGameByName(name).setShownCards(playerName, null);
+        return null;
     }
 
     public String exportPastGamesAsCsv() throws IOException {

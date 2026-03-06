@@ -1131,11 +1131,7 @@ function doSubmit(event) {
     commandInput.val("");
     chatInput.val("");
     pingSelect.val("");
-    if(command.toLowerCase() == "show lib" || command.toLowerCase() == "show lib "+player){
-        showLib();
-    } else {
-        DS.submitForm(game, phase, command, chat, ping, {callback: processData, errorHandler: errorhandler});
-    }
+    DS.submitForm(game, phase, command, chat, ping, {callback: processData, errorHandler: errorhandler});
     return false;
 }
 
@@ -1151,45 +1147,56 @@ function sendCommand(command, message = '') {
     return false;
 }
 
-function showLib() {
-    DS.getLib(game, {callback: callbackShowLib, errorHandler: errorhandler});
-    sendCommand("show lib");
-}
-
 function callbackShowLib(data) {
     let deckModal = $("#deckBodyList");
-    $('#quickCommandModal').modal('hide');
+    let deckBody =  $("#deckBody");
+    let cardOwner = $("#cardOwner");
+    //empty owner/region of previous shown cards
     deckModal.empty();
-    $("#deckBody").removeClass("d-none");
-
-    $.each(data, function (index, card) {
-        const div = $("<div/>").addClass("mx-1 me-auto w-100 align-items-center");
-        const divLink = $("<div/>").addClass("d-flex justify-content-between align-items-center w-100");
-        const divButton = $("<div/>");
-        const cardRow = $("<li/>").addClass("flex-grow-1 list-group-item d-flex justify-content-between align-items-center p-1 shadow");
-        const cardLink = $("<a/>").text(card.name).attr("data-card-id", card.id).addClass("card-name");
-        const sendHand = $("<a/>").attr("title", "Draw").addClass("link-dark").on("click", function () {
-            let target = cardRow.index()+1;
-            sendCommand('move lib '+ target +' hand');
-            cardRow.remove();
-        }).append($("<i/>").addClass("bi bi-card-list text-decoration-none"));
-        const play = $("<a/>").attr("title", "Play").addClass("link-dark").on("click", function () {
-            let target = cardRow.index()+1;
-            sendCommand('move lib '+ target +' ready');
-            cardRow.remove();
-        }).append($("<i/>").addClass("bi bi-play"));
-        const discard = $("<a/>").attr("title", "Discard").addClass("link-dark").on("click", function () {
-            let target = cardRow.index()+1;
-            sendCommand('move lib '+ target +' ash');
-            cardRow.remove();
-        }).append($("<i/>").addClass("bi bi-trash"));
-        divButton.append(sendHand, play, discard);
-        divLink.append(cardLink, divButton);
-        div.append(divLink);
-        cardRow.append(div);
-        deckModal.append(cardRow);
-    })
-    addCardTooltips("#deckBodyList");
+    cardOwner.empty()
+    //display none all elements in case shown cards have been cleared
+    deckBody.addClass("d-none");
+    cardOwner.addClass("d-none");
+    //description who owns and where cards are from
+    if (data != null && data[0].owner==player) {
+        cardOwner.text(data[0].owner+" looks at "+data.length+" cards of their "+data[0].region+".");
+    } else if(data != null) {
+        cardOwner.text(data[0].owner+" shows "+data.length+" cards of their "+data[0].region+".");
+    }
+    //only display and render shown Cards if some are to show
+    if(data!=null) {
+        toggleDisplay(".shownCards")
+        $.each(data, function (index, card) {
+            const div = $("<div/>").addClass("mx-1 me-auto w-100 align-items-center");
+            const divLink = $("<div/>").addClass("d-flex justify-content-between align-items-center w-100");
+            const divButton = $("<div/>");
+            const cardRow = $("<li/>").addClass("flex-grow-1 list-group-item d-flex justify-content-between align-items-center p-1 shadow");
+            const cardLink = $("<a/>").text(card.name).attr("data-card-id", card.id).addClass("card-name");
+            if(card.owner==player) {
+                const sendHand = $("<a/>").attr("title", "Draw").addClass("link-dark").on("click", function () {
+                    let target = cardRow.index()+1;
+                    sendCommand('move '+card.region+' '+ target +' hand');
+                    cardRow.remove();
+                }).append($("<i/>").addClass("bi bi-card-list text-decoration-none"));
+                const play = $("<a/>").attr("title", "Play").addClass("link-dark").on("click", function () {
+                    let target = cardRow.index()+1;
+                    sendCommand('move '+card.region+' '+ target +' ready');
+                    cardRow.remove();
+                }).append($("<i/>").addClass("bi bi-play"));
+                const discard = $("<a/>").attr("title", "Discard").addClass("link-dark").on("click", function () {
+                    let target = cardRow.index()+1;
+                    sendCommand('move '+card.region+' '+ target +' ash');
+                    cardRow.remove();
+                }).append($("<i/>").addClass("bi bi-trash"));
+                divButton.append(sendHand, play, discard);
+            }
+            divLink.append(cardLink, divButton);
+            div.append(divLink);
+            cardRow.append(div);
+            deckModal.append(cardRow);
+        })
+        addCardTooltips("#deckBodyList");
+    }
 }
 
 function closeShowLib() {
@@ -1323,6 +1330,7 @@ function loadGame(data) {
     //like another player has shown you some cards.
     if (data.privateNotes) {
         privateNotes.val(data.privateNotes);
+        callbackShowLib(data.shownCards);
     }
 
     if (data.turns.length > 0) {
@@ -1560,12 +1568,15 @@ function toggleMode() {
         wrapper.removeAttr("data-bs-theme");
     }
 }
-function toggleDisplay(id) {
-    $("#"+id).toggleClass("d-none");
+function toggleDisplay(identifier) {
+    $(identifier).toggleClass("d-none");
 }
 function addDnone(id) {
     $("#"+id).addClass("d-none");
 }
 function removeDnone(id) {
     $("#"+id).removeClass("d-none");
+}
+function removeShownCards() {
+    DS.removeShownCards(game, {callback: callbackShowLib, errorHandler: errorhandler});
 }

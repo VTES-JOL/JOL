@@ -7,6 +7,7 @@ import lombok.ToString;
 import net.deckserver.game.enums.RegionType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
@@ -31,6 +32,7 @@ public class PlayerData {
     private boolean ousted = false;
     private String notes;
     private String choice;
+    private List<CardSimple> shownCards;
 
     public PlayerData(String name) {
         this.name = name;

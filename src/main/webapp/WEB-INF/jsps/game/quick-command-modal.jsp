@@ -33,7 +33,7 @@
                     <button type="button" class="btn btn-outline-secondary m-1" onclick="sendCommand('shuffle')">
                         Shuffle
                     </button>
-                    <button type="button" class="btn btn-outline-secondary m-1" onclick="showLib();">
+                    <button type="button" class="btn btn-outline-secondary m-1" onclick="sendCommand('show lib');">
                         Show Lib
                     </button>
                 </div>

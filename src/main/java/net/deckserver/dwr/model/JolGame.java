@@ -14,10 +14,7 @@ import net.deckserver.services.GameService;
 import net.deckserver.services.ParserService;
 import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.Deck;
-import net.deckserver.storage.json.game.CardData;
-import net.deckserver.storage.json.game.GameData;
-import net.deckserver.storage.json.game.PlayerData;
-import net.deckserver.storage.json.game.RegionData;
+import net.deckserver.storage.json.game.*;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -379,6 +376,13 @@ public record JolGame(String id, GameData data) {
         data.getPlayer(player).setNotes(text);
     }
 
+    public List<CardSimple> getShownCards(String player) {
+        return Optional.ofNullable(data.getPlayer(player)).get().getShownCards();
+    }
+    public void setShownCards(String player, List<CardSimple> shownCards) {
+        data.getPlayer(player).setShownCards(shownCards);
+    }
+
     public void setLabel(String player, String cardId, String text, boolean quiet) {
         CardData card = data.getCard(cardId);
         String cardName = getCardName(card);
@@ -626,6 +630,7 @@ public record JolGame(String id, GameData data) {
             String privateNotes = recipientData.getNotes() == null ? "" : recipientData.getNotes();
             privateNotes += notes;
             recipientData.setNotes(privateNotes);
+            recipientData.setShownCards(cards.stream().map(card ->new CardSimple(card.getCardId(), card.getName(), card.getOwnerName(), targetRegion.description())).collect(Collectors.toList()));
         }
         String msg;
         boolean self = recipients.size() == 1 && recipients.contains(player);
