@@ -12,6 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,6 +34,7 @@ public class CardDatabaseBuilder {
     private static final String LIBRARY_FILE = "vteslib";
     private static final String CRYPT_FILE = "vtescrypt";
     private static final String PLAYTEST = "_playtest";
+    private static final String KRCG_CARD_IMAGE_BASE_URL = "https://static.krcg.org/card/";
 
     @Test
     public void buildCardDatabase() throws Exception {
@@ -49,6 +55,10 @@ public class CardDatabaseBuilder {
         List<CardSummary> cardSummaries = summaryCards.stream().map(SummaryCard::toCardSummary).toList();
         CardService.refresh(cardSummaries);
 
+        HttpClient httpClient = HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .build();
+
         for (SummaryCard summaryCard : summaryCards) {
             String id = summaryCard.getId();
             String outputPrefix = summaryCard.isPlayTest() ? "secured/" : "";
@@ -58,12 +68,29 @@ public class CardDatabaseBuilder {
             });
 
             // Process images
-            String inputPrefix = summaryCard.isPlayTest() ? "playtest" : "core";
-            Path inputImagePath = imagesPath.resolve(inputPrefix).resolve(generateImageName(summaryCard));
             Path outputImagePath = outputPath.resolve(outputPrefix).resolve("images").resolve(id);
-            assert inputImagePath.toFile().exists() : String.format("Image %s does not exist - %s", inputImagePath, summaryCard.getDisplayName());
             Files.createDirectories(outputImagePath.getParent());
-            Files.copy(inputImagePath, outputImagePath, StandardCopyOption.REPLACE_EXISTING);
+
+            if (Files.exists(outputImagePath)) {
+                logger.debug("Skipping image download/copy (already exists): {}", outputImagePath);
+            } else if (summaryCard.isPlayTest()) {
+                String inputPrefix = "playtest";
+                Path inputImagePath = imagesPath.resolve(inputPrefix).resolve(generateImageName(summaryCard));
+                assert inputImagePath.toFile().exists() : String.format("Image %s does not exist - %s", inputImagePath, summaryCard.getDisplayName());
+                Files.copy(inputImagePath, outputImagePath, StandardCopyOption.REPLACE_EXISTING);
+            } else {
+                URI imageUri = URI.create(KRCG_CARD_IMAGE_BASE_URL + generateImageName(summaryCard));
+                HttpRequest request = HttpRequest.newBuilder(imageUri)
+                        .GET()
+                        .header("User-Agent", "DeckServer-CardDatabaseBuilder")
+                        .build();
+                logger.info("Downloading missing image for {}", summaryCard.getDisplayName());
+
+                HttpResponse<Path> response = httpClient.send(request, HttpResponse.BodyHandlers.ofFile(outputImagePath));
+                if (response.statusCode() != 200) {
+                    throw new IllegalStateException("Failed to download image " + imageUri + " (HTTP " + response.statusCode() + ") for " + summaryCard.getDisplayName());
+                }
+            }
 
             // Process HTML
             String htmlText = ParserService.parseSymbols(summaryCard.getHtmlText());
