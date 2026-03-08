@@ -138,6 +138,7 @@ public class GameView {
                 request.setAttribute("game", game);
                 request.setAttribute("viewer", playerName);
                 request.setAttribute("edgeColor", PlayerService.get(playerName).getEdgeColor());
+                request.setAttribute("edgeTextColor", colorIsDark(PlayerService.get(playerName).getEdgeColor())?"white":"black");
                 state = WebContextFactory.get().forwardToString("/WEB-INF/jsps/game/state.jsp");
             } catch (Exception e) {
                 logger.error("Error retrieving state:", e);
@@ -205,5 +206,13 @@ public class GameView {
     public void addChat(ChatData chat) {
         String formattedMessage = String.format("%s||%s||%s", chat.getTimestamp(), chat.getSource(), chat.getMessage());
         chats.add(formattedMessage);
+    }
+
+    private boolean colorIsDark(String bgColor) {
+        String color = (bgColor.charAt(0) == '#') ? bgColor.substring(1, 7) : bgColor;
+        int r = Integer.parseInt(color.substring(0, 2), 16); // hexToR
+        int g = Integer.parseInt(color.substring(2, 4), 16); // hexToG
+        int b = Integer.parseInt(color.substring(4, 6), 16); // hexToB
+        return ((r * 0.299) + (g * 0.587) + (b * 0.114)) <= 186;
     }
 }
