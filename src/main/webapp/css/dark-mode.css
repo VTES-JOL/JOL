@@ -92,6 +92,12 @@
         background-color: #222426;
         cursor: pointer;
     }
+    .fw-bold {
+        color: #dee2e6;
+    }
+    #state span {
+        color: #dee2e6;
+    }
 
     /*
         Text -> #dee2e6
