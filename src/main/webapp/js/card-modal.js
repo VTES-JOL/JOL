@@ -177,6 +177,7 @@ function showPlayCardModal(event) {
     let secured = eventParent.data('secured') || false ? "secured/" : "";
     let coordinates = eventParent.data('coordinates');
     let region = eventParent.closest('[data-region]').data('region');
+    let label = eventParent.data('label');
     if (cardId) {
         $.get({
             dataType: "json",
@@ -256,6 +257,8 @@ function showPlayCardModal(event) {
                 playCardModal.modal('show');
             }
         });
+        // Display label
+        $('#playCardModal-label').val(label);
     }
 }
 
@@ -399,7 +402,6 @@ function showCardModal(event) {
     let contested = target.data('contested');
     let secured = target.data('secured') || false ? "secured/" : "";
     let minion = target.data("minion");
-    let disciplines = target.data("disciplines").trim().split(" ");
     let sect = target.data("sect");
     let path = target.data("path");
     let clan = target.data("clan");
@@ -714,6 +716,10 @@ function movePrey() {
     return false;
 }
 
+function closeModal() {
+    $('#cardModal').modal('hide');
+}
+
 function removeCounter(doCommand = true) {
     var modal = $('#cardModal');
     var counters = modal.data('counters');
@@ -774,6 +780,18 @@ function updateNotes() {
         modal.data('controller').split(' ', 2)[0],
         modal.data('region').split(' ')[0], //ready-region > ready
         modal.data('coordinates'),
+        cardLabel);
+    var command = parts.join(' ');
+    sendCommand(command.trim());
+}
+function updateNotesHand() {
+    var cardLabel = $("#playCardModal-label").val();
+    let modal = $('#playCardModal');
+    var parts = new Array(5);
+    parts.push('label',
+        player,
+        'hand',
+        modal.data('hand-coord'),
         cardLabel);
     var command = parts.join(' ');
     sendCommand(command.trim());

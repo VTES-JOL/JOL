@@ -144,6 +144,8 @@ public class CryptImporter extends AbstractImporter<CryptCard> {
             textSect = "Independent";
         } else if (text.startsWith("Camarilla")) {
             textSect = "Camarilla";
+        } else if (text.startsWith("Laibon")) {
+            textSect = "Laibon";
         }
         if (textSect != null && !sect.equals(textSect)) {
             log.debug("Overwriting {} with {} because of [{}]", sect, textSect, text);

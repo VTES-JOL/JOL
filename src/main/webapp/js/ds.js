@@ -15,7 +15,8 @@ let profile = {
     email: "",
     discordID: "",
     updating: false,
-    imageTooltipPreference: true
+    imageTooltipPreference: true,
+    edgeColor: "#FFFFFF"
 };
 let subscribed =  localStorage.getItem("notifications-subscribed") === "true";
 
@@ -46,6 +47,10 @@ function init(data) {
 
 function setPreferences(value) {
     profile.imageTooltipPreference = value;
+}
+
+function setEdgeColorPref(value) {
+    profile.edgeColor = value;
 }
 
 function processData(a) {
@@ -301,11 +306,16 @@ function callbackLobby(data) {
         gameHeader.append(gameName, buttonWrapper);
         gameItem.append(gameHeader, playerTable);
         currentGames.append(gameItem);
-        $.each(game.players, function (k, v) {
+        $.each(game.registrations, function (i, registration) {
             let registrationRow = $("<tr/>");
-            let player = $("<td/>").addClass("w-25").text(k);
-            registrationRow.append(player);
-            playerTable.append(registrationRow);
+            let playerCell = $("<td/>").addClass("w-25").text(registration.player);
+            registrationRow.append(playerCell);
+            let summary = $("<td/>").addClass("w-25 text-center")
+            if (registration.registered) {
+                summary.append(`<i class="bi bi-check-circle text-success fs-6"></i>`);
+            }
+            registrationRow.append(summary);
+            tableBody.append(registrationRow);
         });
     });
 
@@ -381,8 +391,11 @@ function callbackLobby(data) {
                         <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" >
                             Choose Deck
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end invite-${game.format}" data-name="${game.gameName}">
-                        </ul>
+                        <div id="chooseDeckDropdown">
+                            <ul class="dropdown-menu dropdown-menu-end invite-${game.format}" data-name="${game.gameName}">
+                                <input class="form-control" id="searchDeckInput" type="text" placeholder="Search.." onkeyup="filterChooseDeck()">
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -709,6 +722,22 @@ function callbackSaveButton(isStarted) {
     }
 }
 
+function filterChooseDeck() {
+    var input, filter, a, i;
+    input = document.getElementById('searchDeckInput');
+    filter = input.value.toUpperCase();
+    var div = document.getElementById("chooseDeckDropdown");
+    a = div.getElementsByTagName('a');
+    for (i = 0; i < a.length; i++) {
+        var txtValue = a[i].textContent || a[i].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            a[i].style.display = '';
+        } else {
+            a[i].style.display = 'none';
+        }
+    }
+}
+
 function callbackTournament(data) {
     let tournaments = $("#openTournaments");
     tournaments.empty();
@@ -814,6 +843,11 @@ function setImageTooltip() {
     DS.setUserPreferences(profile.imageTooltipPreference, {callback: processData, errorHandler: errorhandler});
 }
 
+function setEdgeColor() {
+    profile.edgeColor = $("#edgecolorpicker").val();
+    DS.setEdgeColor(profile.edgeColor, {callback: processData, errorHandler: errorhandler});
+}
+
 function callbackProfile(data) {
     if (profile.email !== data.email)
         $('#profileEmail').val(data.email);
@@ -836,6 +870,8 @@ function callbackProfile(data) {
     if (data.imageTooltipPreference) {
         $("#imageTooltips").prop("checked", true);
     }
+
+    $("#edgecolorpicker").val(data.edgeColor);
 
     if (subscribed) {
         $("#enableNotifications").prop("checked", true);
@@ -922,8 +958,8 @@ function callbackMain(data) {
     if (data.loggedIn) {
         renderOnline('onlinePlayers', data.who);
         renderGlobalChat(data.chat);
-        renderMyGames("#myGames", data.games);
-        renderMyGames("#oustedGames", data.ousted);
+        renderMyGames("myGames", data.games);
+        renderMyGames("oustedGames", data.ousted);
         if (refresher) clearTimeout(refresher);
         refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
     } else {
@@ -935,6 +971,7 @@ function renderDeck(data, div) {
     let render = $(div);
     render.empty();
     if (data.crypt) {
+        render.append($("<h5/>").text("Deck: " + data.name + ""));
         render.append($("<h5/>").text("Crypt: (" + data.crypt['count'] + ")"));
         const crypt = $("<ul/>").addClass("deck-list");
         let cards = data.crypt.cards;
@@ -1132,7 +1169,9 @@ function renderGlobalChat(data) {
         let chatLine = $("<p/>").addClass("chat");
         let timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp).addClass('chat-timestamp');
         let playerLabel = globalChatLastPlayer === chat.player && globalChatLastDay === day ? "" : "<b>" + chat.player + "</b> ";
-        let message = $("<span/>").html(" " + playerLabel + chat.message);
+        //replace player name with colored player name
+        let msg = chat.message.replaceAll("&#64;"+player, "<span style='background-color: #D4D7F9; color:black'>@"+player+"</span>");
+        let message = $("<span/>").html(" " + playerLabel + msg);
 
         if (chat.player !== player) {
             onlySelfChat = false;
@@ -1168,8 +1207,11 @@ function toggleDetailedMode(elem) {
 
 function renderMyGames(id, games) {
     let checked = localStorage.getItem("jol-details") || "true";
-    let ownGames = $(id);
+    let ownGames = $("#"+id);
+    let headerText = id === "myGames" ? "Active Games" : "Ousted Games";
     ownGames.empty();
+    $("#"+id+"-header").text(headerText+" ("+games.length+"):");
+
     $.each(games, function (index, game) {
         let gameRow = $("<li/>").addClass("list-group-item p-0 border").on('click', function () {
             doNav("g" + game.name);
@@ -1228,6 +1270,7 @@ function renderOnline(div, who) {
     if (who === null) {
         return;
     }
+    $("#online-users-header").text("Online Users ("+who.length+"):");
     $.each(who, function (index, player) {
         let lastOnline = moment(player.lastOnline).tz("UTC");
         let sinceLastOnline = moment.duration(moment().diff(lastOnline)).asMinutes();
@@ -1274,9 +1317,9 @@ function renderPastGames(history) {
         $.each(game.results, function (i, value) {
             let playerRow = $("<tr/>");
             if (firstPlayerRow) {
-                let gameName = $("<td/>").attr('rowspan', 5).text(game.name);
-                let gameStarted = $("<td/>").attr('rowspan', 5).text(startTime);
-                let gameFinished = $("<td/>").attr('rowspan', 5).text(endTime);
+                let gameName = $("<td/>").attr('rowspan', game.results.length).text(game.name);
+                let gameStarted = $("<td/>").attr('rowspan', game.results.length).text(startTime);
+                let gameFinished = $("<td/>").attr('rowspan', game.results.length).text(endTime);
                 playerRow.append(gameName, gameStarted, gameFinished);
                 playerRow.addClass("border-3 border-top border-bottom-0 border-start-0 border-end-0")
                 firstPlayerRow = false;
@@ -1744,4 +1787,29 @@ function toggleMobileView(event) {
     }
     pointerCanHover = window.matchMedia("(hover: hover)").matches;
     $('body').scrollTop(0);
+}
+
+function exportCsv() {
+    DS.exportPastGamesAsCsv({callback: createCsvDownloadLink, errorHandler: errorhandler});
+}
+
+function createCsvDownloadLink(data) {
+    let blob = new Blob([data], { type: 'text/csv' });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = 'data.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
+
+function toggleMode() {
+    let wrapper = $("#wrapper");
+    let theme = wrapper.attr("data-bs-theme");
+    if(theme != "dark") {
+        wrapper.attr("data-bs-theme","dark");
+    } else {
+        wrapper.removeAttr("data-bs-theme");
+    }
 }

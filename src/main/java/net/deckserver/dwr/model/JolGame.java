@@ -623,7 +623,7 @@ public record JolGame(String id, GameData data) {
         String notes = builder.toString();
         for (String recipient : recipients) {
             PlayerData recipientData = data.getPlayer(recipient);
-            String privateNotes = recipientData.getNotes();
+            String privateNotes = recipientData.getNotes() == null ? "" : recipientData.getNotes();
             privateNotes += notes;
             recipientData.setNotes(privateNotes);
         }
@@ -766,7 +766,6 @@ public record JolGame(String id, GameData data) {
             // Don't unlock infernal cards in play regions
             if (card.isInfernal() && inPlay) {
                 notUnlocked.add(card);
-            } else if (card.isStunned() && inPlay) {
             } else {
                 card.setLocked(false);
             }

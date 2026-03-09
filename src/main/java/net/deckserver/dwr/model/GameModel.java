@@ -74,6 +74,11 @@ public class GameModel implements Comparable<GameModel> {
                 DoCommand commander = new DoCommand(game, this);
                 boolean didCommand = false;
                 boolean didChat = false;
+                if (chat != null) {
+                    didChat = true;
+                    commander.doMessage(player, chat, isJudge);
+                    chatChanged = true;
+                }
                 if (command != null) {
                     didCommand = true;
                     String[] commands = command.split(";");
@@ -88,11 +93,6 @@ public class GameModel implements Comparable<GameModel> {
                         }
                     }
                     stateChanged = true;
-                }
-                if (chat != null) {
-                    didChat = true;
-                    commander.doMessage(player, chat, isJudge);
-                    chatChanged = true;
                 }
                 OffsetDateTime timestamp = OffsetDateTime.now();
                 METRICS.info(new ObjectArrayMessage(timestamp.getYear(), timestamp.getMonthValue(), timestamp.getDayOfMonth(), timestamp.getHour(), player, game.getName(), didCommand, didChat));

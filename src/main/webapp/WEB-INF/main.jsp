@@ -17,6 +17,8 @@
     <link rel="stylesheet" type="text/css"
           href="${pageContext.request.contextPath}/css/styles.css?version=<%= VersionService.getVersion() %>"/>
     <link rel="stylesheet" type="text/css"
+          href="${pageContext.request.contextPath}/css/dark-mode.css?version=<%= VersionService.getVersion() %>"/>
+    <link rel="stylesheet" type="text/css"
           href="${pageContext.request.contextPath}/css/<%= System.getenv().getOrDefault("TYPE", "dev") %>.css"/>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.min.css"/>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.structure.min.css"/>
