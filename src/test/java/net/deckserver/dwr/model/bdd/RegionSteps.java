@@ -2,27 +2,19 @@ package net.deckserver.dwr.model.bdd;
 
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
 import net.deckserver.game.enums.RegionType;
 import net.deckserver.storage.json.game.CardData;
 
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BurnCommandSteps {
+public class RegionSteps {
 
     private final CommandContext context;
 
-    public BurnCommandSteps() {
+    public RegionSteps() {
         this.context = CommandContext.getInstance();
-    }
-
-    @Given("{string} will enter the command {string}")
-    public void playerWillEnterTheCommand(String player, String command) {
-        context.setPendingCommand(command);
     }
 
     @Given("{string} has {int} cards in their {string}")
@@ -33,18 +25,6 @@ public class BurnCommandSteps {
         context.rememberRegionSize(player, regionName, actual);
     }
 
-    @Given("the card in {string} is {string}")
-    public void theCardInSourceIs(String source, String expectedCardName) {
-        RegionRef ref = parseRegionRef(source);
-        int position = parseBurnPosition(context.getPendingCommand());
-
-        List<? extends CardData> cards = context.game().data().getPlayerRegion(ref.player(), ref.region()).getCards();
-        CardData card = cards.get(position - 1);
-
-        assertEquals(expectedCardName, card.getName());
-        context.rememberRegionSize(ref.player(), ref.regionKey(), cards.size());
-    }
-
     @Given("the ash heap for {string} is empty")
     public void ashHeapForSourceIsEmpty(String source) {
         RegionRef ref = parseRegionRef(source);
@@ -53,9 +33,18 @@ public class BurnCommandSteps {
         context.rememberRegionSize(ref.player(), "ash heap", ashHeapSize);
     }
 
-    @When("{string} enters the command {string}")
-    public void playerEntersTheCommand(String player, String command) {
-        context.execute(player, command);
+    @Given("the card in {string} is {string}")
+    public void theCardInSourceIs(String source, String expectedCardName) {
+        RegionRef ref = parseRegionRef(source);
+
+        String pendingCommand = context.getPendingCommand();
+        int position = parsePosition(pendingCommand);
+
+        List<? extends CardData> cards = context.game().data().getPlayerRegion(ref.player(), ref.region()).getCards();
+        CardData card = cards.get(position - 1);
+
+        assertEquals(expectedCardName, card.getName());
+        context.rememberRegionSize(ref.player(), ref.regionKey(), cards.size());
     }
 
     @Then("1 card has been burned from {string}")
@@ -72,12 +61,14 @@ public class BurnCommandSteps {
         assertEquals(ashHeapBefore + 1, ashHeapAfter);
     }
 
-    @Then("the last chat message contains {string}")
-    public void lastChatMessageContains(String expectedText) {
-        assertThat(context.lastMessage(), containsString(expectedText));
-    }
+    private int parsePosition(String command) {
+        if (command == null || command.isBlank()) {
+            throw new IllegalStateException(
+                    "No pending command is available in CommandContext. " +
+                            "The step \"the card in ... is ...\" depends on the command being stored before it runs."
+            );
+        }
 
-    private int parseBurnPosition(String command) {
         String[] args = command.trim().split("\\s+");
         for (String arg : args) {
             if ("top".equalsIgnoreCase(arg)) {
@@ -87,7 +78,7 @@ public class BurnCommandSteps {
                 return Integer.parseInt(arg);
             }
         }
-        throw new IllegalStateException("Unable to determine burn position from command: " + command);
+        throw new IllegalStateException("Unable to determine position from command: " + command);
     }
 
     private RegionRef parseRegionRef(String source) {
