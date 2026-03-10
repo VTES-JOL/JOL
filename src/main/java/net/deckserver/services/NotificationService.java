@@ -117,7 +117,7 @@ public class NotificationService {
 
     private static KeyPair loadKey() {
         Security.addProvider(new BouncyCastleProvider());
-        Path keyPath = Paths.get(System.getenv("JOL_DATA"), "vapid_private.pem");
+        Path keyPath = DataPaths.path("vapid_private.pem");
         try (FileInputStream stream = new FileInputStream(keyPath.toFile()); InputStreamReader reader = new InputStreamReader(stream)) {
             PEMParser pemParser = new PEMParser(reader);
             PEMKeyPair pemKeyPair = (PEMKeyPair) pemParser.readObject();

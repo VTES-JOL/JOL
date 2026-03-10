@@ -175,10 +175,10 @@ public abstract class PersistedService {
     /**
      * Get the base path for data storage.
      *
-     * @return The base path from the JOL_DATA environment variable
+     * @return The base path from the DataPaths service
      */
     protected String getBasePath() {
-        return System.getenv("JOL_DATA");
+        return DataPaths.baseDir().toString();
     }
 
     /**

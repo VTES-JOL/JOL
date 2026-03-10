@@ -36,7 +36,7 @@ public class GameService extends PersistedService {
     public static final Predicate<GameInfo> PUBLIC_GAME = info -> info.getVisibility().equals(Visibility.PUBLIC);
     public static final Predicate<GameInfo> ACTIVE_GAME = (info) -> info.getStatus().equals(GameStatus.ACTIVE);
     private static final Logger logger = LoggerFactory.getLogger(GameService.class);
-    private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "games.json");
+    private static final Path PERSISTENCE_PATH = DataPaths.path("games.json");
     private static final GameService INSTANCE = new GameService();
     private static final ReadWriteLock rwLock = new ReentrantReadWriteLock();
     private static final Lock readLock = rwLock.readLock();
@@ -61,7 +61,7 @@ public class GameService extends PersistedService {
     }
 
     public static void create(String gameName, String gameId, String ownerName, Visibility visibility, GameFormat format) {
-        if(gameName == null || gameName.isEmpty()) {
+        if (gameName == null || gameName.isEmpty()) {
             logger.error("Game name is null or empty");
             return;
         }
@@ -69,7 +69,7 @@ public class GameService extends PersistedService {
         GameInfo gameInfo = new GameInfo(gameName, gameId, ownerName, visibility, GameStatus.STARTING, format);
         INSTANCE.games.put(gameName, gameInfo);
         try {
-            Path gamePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId);
+            Path gamePath = DataPaths.path("games", gameId);
             Files.createDirectory(gamePath);
         } catch (IOException e) {
             logger.error("Error creating game directory", e);
@@ -133,7 +133,7 @@ public class GameService extends PersistedService {
     }
 
     public static void remove(String gameName, String gameId) {
-        Path gamePath = Path.of(System.getenv("JOL_DATA"), "games", gameId);
+        Path gamePath = DataPaths.path("games", gameId);
         INSTANCE.games.remove(gameName);
         try {
             FileUtils.deleteDirectory(gamePath.toFile());
@@ -145,7 +145,7 @@ public class GameService extends PersistedService {
     public static JolGame loadGame(String gameId) {
         readLock.lock();
         try {
-            Path gameStatePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, "game.json");
+            Path gameStatePath = DataPaths.path("games", gameId, "game.json");
             GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
             return new JolGame(gameId, gameData);
         } catch (IOException e) {
@@ -158,7 +158,7 @@ public class GameService extends PersistedService {
 
     public static JolGame loadSnapshot(String gameId, String turn) {
         try {
-            Path gameStatePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, "game-" + turn + ".json");
+            Path gameStatePath = DataPaths.path("games", gameId, "game-" + turn + ".json");
             GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
             return new JolGame(gameId, gameData);
         } catch (IOException e) {
@@ -177,7 +177,7 @@ public class GameService extends PersistedService {
     public static void saveGame(JolGame game) {
         writeLock.lock();
         String gameId = game.id();
-        Path gameStatePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, "game.json");
+        Path gameStatePath = DataPaths.path("games", gameId, "game.json");
         GameData deckServerState = game.data();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -198,7 +198,7 @@ public class GameService extends PersistedService {
         }
         turn = turn.replaceAll("\\.", "-");
         String gameId = game.id();
-        Path gameStatePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, "game-" + turn + ".json");
+        Path gameStatePath = DataPaths.path("games", gameId, "game-" + turn + ".json");
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             objectMapper.writeValue(gameStatePath.toFile(), game.data());

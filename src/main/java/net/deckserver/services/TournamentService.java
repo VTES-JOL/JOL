@@ -25,7 +25,7 @@ public class TournamentService extends PersistedService {
     private static final Predicate<TournamentDefinition> IS_STARTING = t -> t.getStatus().equals(GameStatus.STARTING);
     private static final Predicate<TournamentDefinition> IS_ACTIVE = t -> t.getStatus().equals(GameStatus.ACTIVE);
     private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
-    private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "tournaments.json");
+    private static final Path PERSISTENCE_PATH = DataPaths.path("tournaments.json");
     private static final TournamentService INSTANCE = new TournamentService();
     private final Map<String, TournamentDefinition> tournaments = new HashMap<>();
 
@@ -82,7 +82,7 @@ public class TournamentService extends PersistedService {
         if (def.isOpenForRegistration()) {
             registration.ifPresent(reg -> {
                 // clean up deck file
-                Path deckPath = Paths.get(System.getenv("JOL_DATA"), "tournaments", def.getId(), reg.getDeck() + ".json");
+                Path deckPath = DataPaths.path("tournaments", def.getId(), reg.getDeck() + ".json");
                 try {
                     Files.delete(deckPath);
                 } catch (IOException e) {
@@ -106,7 +106,7 @@ public class TournamentService extends PersistedService {
         definition.getRegistration(player).ifPresent(reg -> {
             String deckId = UUID.randomUUID().toString();
             try {
-                Path deckPath = Paths.get(System.getenv("JOL_DATA"), "tournaments", definition.getId(), deckId + ".json");
+                Path deckPath = DataPaths.path("tournaments", definition.getId(), deckId + ".json");
                 Files.createDirectories(deckPath.getParent());
                 objectMapper.writeValue(deckPath.toFile(), deck);
                 reg.setDeck(deckId);
@@ -130,7 +130,7 @@ public class TournamentService extends PersistedService {
 
     public static ExtendedDeck getTournamentDeck(String name, String deckId) {
         TournamentDefinition definition = INSTANCE.tournaments.get(name);
-        Path deckPath = Paths.get(System.getenv("JOL_DATA"), "tournaments", definition.getId(), deckId + ".json");
+        Path deckPath = DataPaths.path("tournaments", definition.getId(), deckId + ".json");
         try {
             return objectMapper.readValue(deckPath.toFile(), ExtendedDeck.class);
         } catch (IOException e) {

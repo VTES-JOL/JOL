@@ -9,6 +9,7 @@ import net.deckserver.game.jaxb.XmlFileUtils;
 import net.deckserver.game.jaxb.actions.GameActions;
 import net.deckserver.game.jaxb.state.GameState;
 import net.deckserver.services.CardService;
+import net.deckserver.services.DataPaths;
 import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.game.CardData;
 import net.deckserver.storage.json.game.GameData;
@@ -25,7 +26,7 @@ import java.util.Objects;
 
 public class GameDataConversion {
 
-    private static final String BASE_PATH = System.getenv().getOrDefault("JOL_DATA", "/data/games");
+    private static final String BASE_PATH = DataPaths.baseDir().toString();
     private static final Logger LOGGER = LoggerFactory.getLogger(GameDataConversion.class);
 
     public void convertGame(String gameId) {

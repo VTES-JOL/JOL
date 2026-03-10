@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerGameActivityService extends PersistedService {
 
-    private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "game-timestamps.json");
+    private static final Path PERSISTENCE_PATH = DataPaths.path("game-timestamps.json");
     private static final PlayerGameActivityService INSTANCE = new PlayerGameActivityService();
 
     private final Map<String, GameTimestampEntry> gameTimestamps = new ConcurrentHashMap<>();
