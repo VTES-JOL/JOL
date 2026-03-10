@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class HistoryService extends PersistedService {
 
     private static final Logger logger = LoggerFactory.getLogger(HistoryService.class);
-    private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "pastGames.json");
+    private static final Path PERSISTENCE_PATH = DataPaths.path("pastGames.json");
     private static final HistoryService INSTANCE = new HistoryService();
 
     private final Map<OffsetDateTime, GameHistory> pastGames = new HashMap<>();

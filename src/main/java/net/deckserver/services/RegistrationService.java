@@ -29,7 +29,7 @@ public class RegistrationService extends PersistedService {
 
     private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
     private static final Logger logger = LoggerFactory.getLogger(RegistrationService.class);
-    private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "registrations.json");
+    private static final Path PERSISTENCE_PATH = DataPaths.path("registrations.json");
     private final static RegistrationService INSTANCE = new RegistrationService();
     private final Table<String, String, RegistrationStatus> registrations = HashBasedTable.create();
     private final LoadingCache<String, RegistrationSummary> summaryMap = Caffeine.newBuilder()

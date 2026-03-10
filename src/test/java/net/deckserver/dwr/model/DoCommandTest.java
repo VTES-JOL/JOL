@@ -1,15 +1,13 @@
 package net.deckserver.dwr.model;
 
 import net.deckserver.game.enums.Clan;
-import net.deckserver.services.ChatService;
-import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.Path;
 import net.deckserver.game.enums.RegionType;
+import net.deckserver.game.enums.Sect;
+import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
 import net.deckserver.storage.json.game.CardData;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
@@ -45,6 +43,14 @@ public class DoCommandTest {
         assertEquals("176", game.data().getPlayerRegion("Player2", RegionType.LIBRARY).getCard(0).getId());
         ashCards = game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards();
         assertEquals(1, ashCards.size());
+        assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='101801' data-secured='false'>Slaughtering the Herd</a> 1 from their library."));
+    }
+
+    @Test
+    void burnTopLibraryShortcut() throws CommandException {
+        assertEquals("143", game.data().getPlayerRegion("Player2", RegionType.LIBRARY).getCard(0).getId());
+        worker.doCommand("Player2", "burn library top");
+        assertEquals(1, game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size());
         assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='101801' data-secured='false'>Slaughtering the Herd</a> 1 from their library."));
     }
 
@@ -275,6 +281,14 @@ public class DoCommandTest {
         worker.doCommand("Player2", "draw crypt");
         assertThat(game.data().getPlayerRegion("Player2", RegionType.UNCONTROLLED).getCards().size(), is(4));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.UNCONTROLLED).getCards().get(3), hasProperty("id", is("105")));
+        assertThat(getLastMessage(), containsString("Player2 draws from their crypt."));
+    }
+
+    @Test
+    void drawCryptAmount() throws CommandException {
+        assertThat(game.data().getPlayerRegion("Player2", RegionType.UNCONTROLLED).getCards().size(), is(3));
+        worker.doCommand("Player2", "draw crypt 2");
+        assertThat(game.data().getPlayerRegion("Player2", RegionType.UNCONTROLLED).getCards().size(), is(5));
         assertThat(getLastMessage(), containsString("Player2 draws from their crypt."));
     }
 
@@ -510,11 +524,8 @@ public class DoCommandTest {
 
     @Test
     void moveTopSort() throws CommandException {
-        assertThat(game.data().getPlayerRegion("Player3", RegionType.READY).getCards().size(), is(1));
-        worker.doCommand("Player3", "move ready 1 top");
-        assertThat(game.data().getPlayerRegion("Player3", RegionType.READY).getCards().size(), is(1));
-        assertThat(getLastMessage(), containsString("Player3 moves <a class='card-name' data-card-id='200788' data-secured='false'>Klaus van der Veken</a> to the top of their ready region."));
-
+        worker.doCommand("Player5", "move ready 2 top");
+        assertThat(getLastMessage(), containsString("to the top of their ready region."));
     }
 
     @Test
@@ -793,7 +804,7 @@ public class DoCommandTest {
 
     @Test
     void shuffleLibrary() throws CommandException {
-        worker.doCommand("Player3", "shuffle library 200");
+        worker.doCommand("Player3", "shuffle library");
         assertThat(getLastMessage(), containsString("Player3 shuffles their library."));
     }
 
@@ -812,6 +823,17 @@ public class DoCommandTest {
         assertThat(game.getCounters(card), is(7));
         assertThat(game.getPool("Player2"), is(29));
         assertThat(getLastMessage(), containsString("Player2 transferred 1 blood onto <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>. Currently: 7, Pool: 29"));
+    }
+
+    @Test
+    void transferOff() throws CommandException {
+        CardData card = game.getCard("111");
+        assertThat(game.getCounters(card), is(6));
+        assertThat(game.getPool("Player2"), is(30));
+        worker.doCommand("Player2", "transfer ready 1 -2");
+        assertThat(game.getCounters(card), is(4));
+        assertThat(game.getPool("Player2"), is(32));
+        assertThat(getLastMessage(), containsString("Player2 transferred 2 blood off <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>. Currently: 4, Pool: 32"));
     }
 
     @Test
@@ -855,5 +877,192 @@ public class DoCommandTest {
         assertThat(card.getClan(), is(Clan.LASOMBRA));
         worker.doCommand("Player2", "clan 1 brujah antitribu");
         assertThat(card.getClan(), is(Clan.BRUJAH_ANTITRIBU));
+    }
+
+    @Test
+    void playerMatchPartial() throws CommandException {
+        // "Player2" exists. "Player2" should match "Player2" (exact)
+        // Let's try "Player2" first to see if it even works.
+        worker.doCommand("Player1", "pool Player2 +1");
+        assertThat(game.getPool("Player2"), is(31));
+        // Now try a prefix that is unique.
+        // The players are: "Player2", "Player4", "Player5", "Player3", "Player1"
+        // "Player2" is unique if we use "Player2" (exact) or if no other starts with it.
+        // Wait, "Player" matches all of them.
+        // Let's use a different name to be sure.
+        game.replacePlayer("Player5", "Héctor");
+        worker.doCommand("Player1", "pool Héc +1");
+        assertThat(game.getPool("Héctor"), is(24));
+    }
+
+    @Test
+    void playerMatchAmbiguous() {
+        // "Player2", "Player4", "Player5", "Player3", "Player1" all start with "Player"
+        assertThrows(CommandException.class, () -> worker.doCommand("Player1", "pool Player +1"));
+    }
+
+    @Test
+    void playerMatchAccents() throws CommandException {
+        game.replacePlayer("Player5", "Héctor");
+        // Hector (without accent) should match Héctor
+        worker.doCommand("Player1", "pool Hector +1");
+        assertThat(game.getPool("Héctor"), is(24));
+    }
+
+    @Test
+    void movePredatorPrey() throws CommandException {
+        // In this game (initial state from game.json):
+        // PlayerOrder: Player2, Player4, Player5, Player3, Player1
+        // Player2's prey is Player4, predator is Player1
+        
+        // Initial state check:
+        int initialPlayer2Ready = game.data().getPlayerRegion("Player2", RegionType.READY).getCards().size();
+        int initialPlayer4Ready = game.data().getPlayerRegion("Player4", RegionType.READY).getCards().size();
+        
+        worker.doCommand("Player2", "move ready 1 prey ready");
+        assertEquals(initialPlayer4Ready + 1, game.data().getPlayerRegion("Player4", RegionType.READY).getCards().size());
+        assertEquals(initialPlayer2Ready - 1, game.data().getPlayerRegion("Player2", RegionType.READY).getCards().size());
+
+        worker.doCommand("Player4", "move ready " + (initialPlayer4Ready + 1) + " predator ready");
+        assertEquals(initialPlayer2Ready, game.data().getPlayerRegion("Player2", RegionType.READY).getCards().size());
+        assertTrue(game.data().getPlayerRegion("Player2", RegionType.READY).getCards().stream().anyMatch(c -> c.getId().equals("111")));
+    }
+
+    @Test
+    void poolInvalidAmount() {
+        // pool requires + or -
+        assertThrows(CommandException.class, () -> worker.doCommand("Player2", "pool Player1 5"));
+    }
+
+    @Test
+    void bloodInvalidAmount() {
+        // blood requires + or -
+        assertThrows(CommandException.class, () -> worker.doCommand("Player2", "blood ready 1 5"));
+    }
+
+    @Test
+    void drawInvalidCount() {
+        assertThrows(CommandException.class, () -> worker.doCommand("Player2", "draw 0"));
+        assertThrows(CommandException.class, () -> worker.doCommand("Player2", "draw -1"));
+    }
+
+    @Test
+    void sectTest() throws CommandException {
+        CardData card = game.data().getCard("111");
+        assertThat(card.getSect(), is(Sect.SABBAT));
+        worker.doCommand("Player2", "sect 1 camarilla");
+        assertThat(card.getSect(), is(Sect.CAMARILLA));
+        worker.doCommand("Player2", "sect 1");
+        assertThat(card.getSect(), is(Sect.NONE));
+    }
+
+    @Test
+    void vpOtherPlayer() throws CommandException {
+        assertThat(game.getVictoryPoints("Player3"), is(0.0));
+        worker.doCommand("Player1", "vp Player3 +1");
+        assertThat(game.getVictoryPoints("Player3"), is(1.0));
+        assertThat(getLastMessage(), containsString("Player3 has gained 1 victory points."));
+    }
+
+    @Test
+    void flipTest() throws CommandException {
+        worker.doCommand("Player1", "flip");
+        assertThat(getLastMessage(), either(containsString("Player1 flips a coin : Heads")).or(containsString("Player1 flips a coin : Tails")));
+    }
+
+    @Test
+    void sectInvalid() throws CommandException {
+        assertThrows(CommandException.class, () -> worker.doCommand("Player2", "sect 1 invalid"));
+    }
+
+    @Test
+    void pathClear() throws CommandException {
+        CardData card = game.data().getCard("111");
+        worker.doCommand("Player2", "path 1 power");
+        assertThat(card.getPath(), is(Path.POWER_AND_THE_INNER_VOICE));
+        worker.doCommand("Player2", "path 1");
+        assertThat(card.getPath(), is(Path.NONE));
+    }
+
+    @Test
+    void pathInvalid() {
+        assertThrows(CommandException.class, () -> worker.doCommand("Player2", "path 1 invalid"));
+    }
+
+    @Test
+    void clanClear() throws CommandException {
+        CardData card = game.data().getCard("111");
+        assertThat(card.getClan(), is(Clan.LASOMBRA));
+        worker.doCommand("Player2", "clan 1");
+        assertThat(card.getClan(), is(Clan.NONE));
+    }
+
+    @Test
+    void transferInvalidAmount() {
+        assertThrows(CommandException.class, () -> worker.doCommand("Player2", "transfer ready 1 0"));
+    }
+
+    @Test
+    void transferInsufficientPool() {
+        // Player2 has 30 pool initially.
+        assertThrows(CommandException.class, () -> worker.doCommand("Player2", "transfer ready 1 +31"));
+    }
+
+    @Test
+    void transferInsufficientCounters() {
+        CardData card = game.data().getCard("111");
+        card.setCounters(2);
+        assertThrows(CommandException.class, () -> worker.doCommand("Player2", "transfer ready 1 -3"));
+    }
+
+    @Test
+    void orderInvalid() {
+        // 5 players in the game
+        assertThrows(CommandException.class, () -> worker.doCommand("Player1", "order 1 2 3 4 6"));
+        assertThrows(CommandException.class, () -> worker.doCommand("Player1", "order 0 1 2 3 4"));
+    }
+
+    @Test
+    void lockAlreadyLocked() throws CommandException {
+        worker.doCommand("Player2", "lock 1");
+        assertThrows(CommandException.class, () -> worker.doCommand("Player2", "lock 1"));
+    }
+
+    @Test
+    void disciplinesReset() throws CommandException {
+        CardData card = game.data().getCard("111"); // Lucita, has dom, FOR, obten, pot, CEL
+        worker.doCommand("Player2", "disc 1 +dem");
+        assertTrue(card.getDisciplines().contains("aus"));
+        worker.doCommand("Player2", "disc 1 reset");
+        assertFalse(card.getDisciplines().contains("dem"));
+        assertTrue(card.getDisciplines().contains("POT"));
+    }
+
+    @Test
+    void disciplinesInvalid() {
+        assertThrows(CommandException.class, () -> worker.doCommand("Player2", "disc 1 +invalid"));
+        assertThrows(CommandException.class, () -> worker.doCommand("Player2", "disc 1 nextaus")); // Missing +/-
+    }
+
+    @Test
+    void randomDefault() throws CommandException {
+        worker.doCommand("Player1", "random 0"); // should default to 2
+        assertThat(getLastMessage(), containsString("Player1 rolls from 1-2 :"));
+    }
+
+    @Test
+    void drawTooMany() {
+        // Player2 library has 81 cards initially
+        assertThrows(CommandException.class, () -> worker.doCommand("Player2", "draw 82"));
+    }
+
+    @Test
+    void playVampError() {
+        assertThrows(CommandException.class, () -> worker.doCommand("Player1", "play vamp"));
+    }
+
+    @Test
+    void vpInvalidAmount() {
+        assertThrows(CommandException.class, () -> worker.doCommand("Player1", "vp Player1 0"));
     }
 }

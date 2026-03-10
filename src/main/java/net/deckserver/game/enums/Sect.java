@@ -1,6 +1,7 @@
 package net.deckserver.game.enums;
 
 import lombok.Getter;
+import net.deckserver.dwr.model.CommandException;
 
 @Getter
 public enum Sect {
@@ -31,12 +32,12 @@ public enum Sect {
         return NONE;
     }
 
-    public static Sect startsWith(String description) {
+    public static Sect startsWith(String description) throws CommandException {
         for (Sect sect : Sect.values()) {
             if (sect.description.toLowerCase().startsWith(description.toLowerCase())) {
                 return sect;
             }
         }
-        return NONE;
+        throw new CommandException("Invalid sect");
     }
 }

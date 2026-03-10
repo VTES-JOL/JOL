@@ -10,9 +10,8 @@ import net.deckserver.dwr.model.JolGame;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
+import net.deckserver.game.enums.PlayerRole;
 import net.deckserver.game.enums.TournamentFormat;
-import net.deckserver.storage.json.system.TournamentDetails;
-import net.deckserver.jobs.TournamentJob;
 import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
@@ -28,6 +27,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.time.OffsetDateTime;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -472,35 +472,11 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-
-    public Map<String, Object> setJudge(String name, boolean value) {
+    public Map<String, Object> setRole(String player, String role, boolean value) {
         String playerName = getPlayer(request);
+        PlayerInfo target = PlayerService.get(player);
         if (JolAdmin.isAdmin(playerName)) {
-            JolAdmin.setJudge(name, value);
-        }
-        return UpdateFactory.getUpdate();
-    }
-
-    public Map<String, Object> setAdmin(String name, boolean value) {
-        String playerName = getPlayer(request);
-        if (JolAdmin.isAdmin(playerName)) {
-            JolAdmin.setAdmin(name, value);
-        }
-        return UpdateFactory.getUpdate();
-    }
-
-    public Map<String, Object> setPlaytest(String name, boolean value) {
-        String playerName = getPlayer(request);
-        if (JolAdmin.isAdmin(playerName)) {
-            JolAdmin.setPlaytester(name, value);
-        }
-        return UpdateFactory.getUpdate();
-    }
-
-    public Map<String, Object> setSuperUser(String name, boolean value) {
-        String playerName = getPlayer(request);
-        if (JolAdmin.isAdmin(playerName)) {
-            JolAdmin.setSuperUser(name, value);
+            JolAdmin.setRole(target, PlayerRole.valueOf(role), value);
         }
         return UpdateFactory.getUpdate();
     }

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class PlayerService extends PersistedService {
 
-    private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "players.json");
+    private static final Path PERSISTENCE_PATH = DataPaths.path("players.json");
     private static final PlayerService INSTANCE = new PlayerService();
     private static final LoadingCache<String, UserSummary> activeUsers = Caffeine.newBuilder()
             .expireAfterWrite(1, TimeUnit.HOURS)

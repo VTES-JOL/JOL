@@ -29,7 +29,7 @@ public class DeckService extends PersistedService {
     public static final Predicate<DeckInfo> MODERN_DECK = info -> DeckFormat.MODERN.equals(info.getFormat());
     public static final Predicate<DeckInfo> NO_TAGS = info -> info.getGameFormats().isEmpty();
     private static final Logger logger = LoggerFactory.getLogger(DeckService.class);
-    private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "decks.json");
+    private static final Path PERSISTENCE_PATH = DataPaths.path("decks.json");
     private static final DeckService INSTANCE = new DeckService();
 
     private final Table<String, String, DeckInfo> decks = HashBasedTable.create();
@@ -62,7 +62,7 @@ public class DeckService extends PersistedService {
 
     public static  ExtendedDeck getDeck(String deckId) {
         String deckString = String.format("decks/%s.json", deckId);
-        Path deckPath = Paths.get(System.getenv("JOL_DATA"), deckString);
+        Path deckPath = DataPaths.baseDir().resolve(deckString);
         try {
             return objectMapper.readValue(deckPath.toFile(), ExtendedDeck.class);
         } catch (IOException e) {
@@ -81,13 +81,13 @@ public class DeckService extends PersistedService {
     }
 
     public static  String getLegacyContents(String deckId) throws IOException {
-        Path deckPath = Paths.get(System.getenv("JOL_DATA"), "decks", deckId + ".txt");
+        Path deckPath = DataPaths.path("decks", deckId + ".txt");
         return Files.readString(deckPath);
     }
 
     public static  ExtendedDeck getGameDeck(String gameId, String deckId) {
         try {
-            Path gameDeckPath = Paths.get(System.getenv("JOL_DATA"), String.format("games/%s/%s.json", gameId, deckId));
+            Path gameDeckPath = DataPaths.path("games", gameId, deckId + ".json");
             return objectMapper.readValue(gameDeckPath.toFile(), ExtendedDeck.class);
         } catch (IOException e) {
             return new ExtendedDeck();
@@ -96,7 +96,7 @@ public class DeckService extends PersistedService {
 
     public static  void saveDeck(String deckId, ExtendedDeck deck) {
         try {
-            Path deckPath = Paths.get(System.getenv("JOL_DATA"), "decks", deckId + ".json");
+            Path deckPath = DataPaths.path("decks", deckId + ".json");
             objectMapper.writeValue(deckPath.toFile(), deck);
         } catch (IOException e) {
             logger.error("Unable to save deck {}", deckId, e);
@@ -105,8 +105,8 @@ public class DeckService extends PersistedService {
 
     public static  boolean copyDeck(String deckId, String gameId) {
         try {
-            Path deckPath = Paths.get(System.getenv("JOL_DATA"), "decks", deckId + ".json");
-            Path gamePath = Paths.get(System.getenv("JOL_DATA"), "games", gameId, deckId + ".json");
+            Path deckPath = DataPaths.path("decks", deckId + ".json");
+            Path gamePath = DataPaths.path("games", gameId, deckId + ".json");
             logger.debug("Copying {} to {}", deckPath, gamePath);
             Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
             return true;

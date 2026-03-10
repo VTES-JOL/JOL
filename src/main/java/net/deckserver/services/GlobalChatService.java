@@ -18,7 +18,7 @@ public class GlobalChatService extends PersistedService {
     private static final int CHAT_STORAGE = 1000;
     private static final int CHAT_DISCARD = 100;
 
-    private static final Path PERSISTENCE_PATH = Paths.get(System.getenv("JOL_DATA"), "chats.json");
+    private static final Path PERSISTENCE_PATH = DataPaths.path("chats.json");
     private static final GlobalChatService INSTANCE = new GlobalChatService();
 
     private List<ChatEntryBean> chats = new ArrayList<>();

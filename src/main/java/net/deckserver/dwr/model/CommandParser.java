@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 class CommandParser {
 
     private final static Pattern VALID_POSITION_PATTERN = Pattern.compile("(?<!-\\+)\\d+(?:\\.\\d+)*");
-    private final static Pattern SPECIAL_POSITION_PATTERN = Pattern.compile("random");
+    private final static Pattern SPECIAL_POSITION_PATTERN = Pattern.compile("random|top");
 
     final String[] args;
     private final JolGame game;
@@ -34,6 +34,9 @@ class CommandParser {
         }
         if (!allowRandom && "random".equals(args[ind])) {
             throw new CommandException("Unable to use random.");
+        }
+        if ("top".equals(args[ind])) {
+            return new String[]{"1"};
         }
         return args[ind].split("\\.");
     }
