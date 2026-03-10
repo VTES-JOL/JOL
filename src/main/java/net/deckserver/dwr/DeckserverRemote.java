@@ -8,12 +8,14 @@ import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.game.enums.PlayerRole;
 import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.ChatData;
 import net.deckserver.storage.json.system.DeckInfo;
 import net.deckserver.storage.json.system.GameHistory;
+import net.deckserver.storage.json.system.PlayerInfo;
 import net.deckserver.storage.json.system.PlayerResult;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -355,35 +357,11 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-
-    public Map<String, Object> setJudge(String name, boolean value) {
+    public Map<String, Object> setRole(String player, String role, boolean value) {
         String playerName = getPlayer(request);
+        PlayerInfo target = PlayerService.get(player);
         if (JolAdmin.isAdmin(playerName)) {
-            JolAdmin.setJudge(name, value);
-        }
-        return UpdateFactory.getUpdate();
-    }
-
-    public Map<String, Object> setAdmin(String name, boolean value) {
-        String playerName = getPlayer(request);
-        if (JolAdmin.isAdmin(playerName)) {
-            JolAdmin.setAdmin(name, value);
-        }
-        return UpdateFactory.getUpdate();
-    }
-
-    public Map<String, Object> setPlaytest(String name, boolean value) {
-        String playerName = getPlayer(request);
-        if (JolAdmin.isAdmin(playerName)) {
-            JolAdmin.setPlaytester(name, value);
-        }
-        return UpdateFactory.getUpdate();
-    }
-
-    public Map<String, Object> setSuperUser(String name, boolean value) {
-        String playerName = getPlayer(request);
-        if (JolAdmin.isAdmin(playerName)) {
-            JolAdmin.setSuperUser(name, value);
+            JolAdmin.setRole(target, PlayerRole.valueOf(role), value);
         }
         return UpdateFactory.getUpdate();
     }

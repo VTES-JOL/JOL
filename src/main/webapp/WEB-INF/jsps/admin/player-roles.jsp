@@ -11,6 +11,7 @@
             <th>Super User</th>
             <th>Playtester</th>
             <th>Admin</th>
+            <th>Tournament Admin</th>
         </tr>
         </thead>
         <tbody id="userRoles"></tbody>

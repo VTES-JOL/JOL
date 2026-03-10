@@ -7,10 +7,11 @@
         <select id="adminPlayerList" class="form-select"></select>
         <label for="adminRoleList" class="form-label">Roles</label>
         <select id="adminRoleList" class="form-select">
-            <option value="Judge">Judge</option>
-            <option value="SuperUser">Super User</option>
-            <option value="Admin">Admin</option>
-            <option value="Playtest">Playtester</option>
+            <option value="JUDGE">Judge</option>
+            <option value="SUPER_USER">Super User</option>
+            <option value="ADMIN">Admin</option>
+            <option value="TOURNAMENT_ADMIN">Tournament Admin</option>
+            <option value="PLAYTESTER">Playtester</option>
         </select>
         <button onclick="addRole()" class="btn btn-outline-secondary btn-sm mt-2">Add Role</button>
     </div>
