@@ -135,9 +135,6 @@ public record DoCommand(JolGame game, GameModel model) {
         } else {
             String sectString = cmdObj.nextArg();
             Sect sect = Sect.startsWith(sectString);
-            if (sect == null) {
-                throw new CommandException("Invalid sect");
-            }
             game.setSect(player, targetCard.getId(), sect, false);
         }
     }

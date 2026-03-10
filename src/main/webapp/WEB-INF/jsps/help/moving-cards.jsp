@@ -10,7 +10,7 @@
         <div class="card-header">
             <h5 class="mt-2 fs-6">Tips</h5>
         </div>
-        <uL class="list-group list-group-flush">
+        <ul class="list-group list-group-flush">
             <li class="list-group-item">When clicking a card name in the hand, or other playable regions a list of modes
                 are available to choose from.
             </li>
@@ -23,7 +23,7 @@
             <li class="list-group-item">Sensible defaults for target regions have been chosen, though not every card has
                 been implemented correctly this way.
             </li>
-        </uL>
+        </ul>
     </div>
     <hr class="my-4"/>
     <h4>Drawing cards</h4>
@@ -33,11 +33,11 @@
         <div class="card-header">
             <h5 class="mt-2 fs-6">Tips</h5>
         </div>
-        <uL class="list-group list-group-flush">
+        <ul class="list-group list-group-flush">
             <li class="list-group-item">Shortcuts to draw a single card from the library, or crypt are available in the
                 Quick Commands.
             </li>
-        </uL>
+        </ul>
     </div>
     <hr class="my-4"/>
     <h4>Discarding cards</h4>
@@ -47,12 +47,12 @@
         <div class="card-header">
             <h5 class="mt-2 fs-6">Tips</h5>
         </div>
-        <uL class="list-group list-group-flush">
+        <ul class="list-group list-group-flush">
             <li class="list-group-item">There is a shortcut to discard a random card in the Quick Commands.</li>
             <li class="list-group-item">Clicking on a card in hand will display a shortcut to both discard, and discard
                 and redraw.
             </li>
-        </uL>
+        </ul>
     </div>
     <hr class="my-4"/>
     <h4>Burning cards</h4>
@@ -62,9 +62,9 @@
         <div class="card-header">
             <h5 class="mt-2 fs-6">Tips</h5>
         </div>
-        <uL class="list-group list-group-flush">
+        <ul class="list-group list-group-flush">
             <li class="list-group-item">Clicking a card in play will have a shortcut to burn this card.</li>
-        </uL>
+        </ul>
     </div>
     <hr class="my-4"/>
     <h4>Moving cards</h4>
@@ -75,12 +75,15 @@
         <div class="card-header">
             <h5 class="mt-2 fs-6">Tips</h5>
         </div>
-        <uL class="list-group list-group-flush">
+        <ul class="list-group list-group-flush">
             <li class="list-group-item">There is currently no way to move cards via clicking, yet.</li>
             <li class="list-group-item">Valid target regions for moving include "ready", "uncontrolled", "hand",
                 "library", "crypt", "ashheap", "torpor", and "rfg". Use "rfg" when a card is removed from the game.
             </li>
-        </uL>
+            <li class="list-group-item">Keywords <code>prey</code> and <code>predator</code> can be used as a shortcut for
+                destination players.
+            </li>
+        </ul>
     </div>
     <hr class="my-4"/>
     <h4>Shuffling</h4>
@@ -90,9 +93,9 @@
         <div class="card-header">
             <h5 class="mt-2 fs-6">Tips</h5>
         </div>
-        <uL class="list-group list-group-flush">
+        <ul class="list-group list-group-flush">
             <li class="list-group-item">There is a shortcut to shuffle library, or crypt in the Quick Commands.</li>
-        </uL>
+        </ul>
     </div>
     <hr class="my-4"/>
     <h4>Command Reference</h4>
@@ -104,7 +107,7 @@
                 <h5 class="mt-2">Play</h5>
             </div>
             <div class="card-body">
-                <h6 class="card-title fs-5">play [SOURCE] [@ discipline/s] [DESTINATION] [draw]</h6>
+                <h6 class="card-title fs-5">play [SOURCE] [@ DISCIPLINES] [DESTINATION] [draw]</h6>
                 <p class="card-text">
                     Use this to play cards from your hand, or another region such as research<br/>
                     This command can have optional information added such as the disciplines to play with, or whether
@@ -119,7 +122,7 @@
                         <td>The default player is always yourself. The default region is hand.</td>
                     </tr>
                     <tr>
-                        <th>@ discipline/s</th>
+                        <th>@ DISCIPLINES</th>
                         <td>Use this keyword combined with 1 or more discipline codes to provide context to other
                             players about the mode you wish to play this card as
                         </td>
@@ -138,6 +141,7 @@
                 </table>
                 <table class="table table-bordered">
                     <caption class="caption-top">Examples</caption>
+                    <tbody>
                     <tr>
                         <th>play 2 draw</th>
                         <td>move hand #2 to your ash-heap and redraw. ( Combat cards )</td>
@@ -162,7 +166,7 @@
                     </tr>
                     <tr>
                         <th>play 1 Lilith ready 2</th>
-                        <td>move hand #1 to card # in Lilith's ready region ( Fame )</td>
+                        <td>move hand #1 to card #2 in Lilith's ready region ( Fame )</td>
                     </tr>
                     <tr>
                         <th>play 1 @ ani</th>
@@ -175,6 +179,7 @@
                                 class="icon FOR"></span> in the chat log.
                         </td>
                     </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -203,10 +208,12 @@
                 </table>
                 <table class="table table-bordered">
                     <caption class="caption-top">Examples</caption>
+                    <tbody>
                     <tr>
                         <th>influence 2</th>
                         <td>play uncontrolled #2 to your ready region.</td>
                     </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -219,7 +226,7 @@
                 <h5 class="mt-2">Draw</h5>
             </div>
             <div class="card-body">
-                <h6 class="card-title fs-5">draw [crypt] [amount]</h6>
+                <h6 class="card-title fs-5">draw [crypt] [AMOUNT]</h6>
                 <p class="card-text">
                     Use this to draw cards from either the library, or crypt. They will go into the hand, or
                     uncontrolled regions respectfully.
@@ -232,13 +239,14 @@
                         <td>This modifies the draw command to draw from crypt into uncontrolled region.</td>
                     </tr>
                     <tr>
-                        <th>amount</th>
+                        <th>AMOUNT</th>
                         <td>The number of cards to draw.</td>
                     </tr>
                     </tbody>
                 </table>
                 <table class="table table-bordered">
                     <caption class="caption-top">Examples</caption>
+                    <tbody>
                     <tr>
                         <th>draw</th>
                         <td>draw 1 card from your library into your hand.</td>
@@ -255,6 +263,7 @@
                         <th>draw crypt 4</th>
                         <td>Draw 4 cards from your crypt into your uncontrolled region.</td>
                     </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -291,6 +300,7 @@
                 </table>
                 <table class="table table-bordered">
                     <caption class="caption-top">Examples</caption>
+                    <tbody>
                     <tr>
                         <th>discard 3</th>
                         <td>discards card #3 from your hand without replacing.</td>
@@ -307,6 +317,7 @@
                         <th>discard random draw</th>
                         <td>discards a random card from hand and replaces it with a new card from your library.</td>
                     </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -333,12 +344,13 @@
                     </tr>
                     <tr>
                         <th>top</th>
-                        <td>Optionally use top instead of specifying position 1 when determining source.</td>
+                        <td>Optionally use <code>top</code> instead of specifying position 1 when determining source.</td>
                     </tr>
                     </tbody>
                 </table>
                 <table class="table table-bordered">
                     <caption class="caption-top">Examples</caption>
+                    <tbody>
                     <tr>
                         <th>burn ready 2</th>
                         <td>Burns card #2 in your ready region. Useful for master cards that come into play.</td>
@@ -357,6 +369,7 @@
                         <th>burn crypt top</th>
                         <td>Burns the top card of your crypt.</td>
                     </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -382,11 +395,13 @@
                     </tr>
                     <tr>
                         <th>DESTINATION</th>
-                        <td>The default player is yourself. The default region is the ready region.</td>
+                        <td>The default player is yourself. The default region is the ready region.
+                            Keywords <code>prey</code> and <code>predator</code> are also supported.
+                        </td>
                     </tr>
                     <tr>
                         <th>top</th>
-                        <td>You can optionally use the keyword top to move the card to the top of the target
+                        <td>You can optionally use the keyword <code>top</code> to move the card to the top of the target
                             region/card.
                         </td>
                     </tr>
@@ -394,6 +409,7 @@
                 </table>
                 <table class="table table-bordered">
                     <caption class="caption-top">Examples</caption>
+                    <tbody>
                     <tr>
                         <th>move 1</th>
                         <td>Moves ready #1 to the last spot in your ready region. Useful for re-ordering your regions.
@@ -440,6 +456,11 @@
                         <th>move library 1 hand</th>
                         <td>Moves the top card from your library to your hand. Useful for Heart of Nizchetus.</td>
                     </tr>
+                    <tr>
+                        <th>move 1 prey ready</th>
+                        <td>Moves your card #1 to your prey's ready region.</td>
+                    </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -452,7 +473,7 @@
                 <h5 class="mt-2">Shuffle</h5>
             </div>
             <div class="card-body">
-                <h6 class="card-title fs-5">shuffle [SOURCE] [amount]</h6>
+                <h6 class="card-title fs-5">shuffle [SOURCE] [AMOUNT]</h6>
                 <p class="card-text">
                     Shuffle a particular stack of cards.
                 </p>
@@ -464,13 +485,14 @@
                         <td>The default player is yourself. The default region is the library.</td>
                     </tr>
                     <tr>
-                        <th>amount</th>
+                        <th>AMOUNT</th>
                         <td>The amount of cards to shuffle.</td>
                     </tr>
                     </tbody>
                 </table>
                 <table class="table table-bordered">
                     <caption class="caption-top">Examples</caption>
+                    <tbody>
                     <tr>
                         <th>shuffle</th>
                         <td>Shuffle your library.</td>
@@ -489,6 +511,7 @@
                             cards.
                         </td>
                     </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
