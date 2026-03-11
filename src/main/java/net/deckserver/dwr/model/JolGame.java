@@ -333,14 +333,14 @@ public record JolGame(String id, GameData data) {
     }
 
     public void setEdge(String source, String player) {
-        ChatService.sendCommand(id, source, String.format("gains the edge from %s.", getEdge()), "edge", player);
+        ChatService.sendCommand(id, source, String.format("%s gains the edge from %s.", player, getEdge()), "edge", player);
         PlayerData playerData = data.getPlayer(player);
         data.setEdge(playerData);
     }
 
     public void burnEdge(String player) {
         data.setEdge(null);
-        ChatService.sendCommand(id, player, String.format("burns the edge."), "edge", "burn");
+        ChatService.sendCommand(id, player, String.format("%s burns the edge.", player), "edge", "burn");
     }
 
     public int getPool(String player) {
@@ -360,7 +360,7 @@ public record JolGame(String id, GameData data) {
             playerData.setOusted(false);
             data.updatePredatorMapping();
         }
-        ChatService.sendCommand(id, source, "'s pool was " + starting + ", now is " + ending + ".", "pool", player, String.valueOf(amount));
+        ChatService.sendCommand(id, source, player + "'s pool was " + starting + ", now is " + ending + ".", "pool", source, String.valueOf(amount));
     }
 
     public String getGlobalText() {
@@ -635,7 +635,7 @@ public record JolGame(String id, GameData data) {
         } else if (all) {
             msg = "shows everyone %d cards of their %s.";
         } else {
-            msg = "shows %4$s %2$d cards of their %3$s.";
+            msg = "shows %3$s %1$d cards of their %2$s.";
         }
         msg = String.format(msg, max, targetRegion.description(), String.join(", ", recipients));
         ChatService.sendCommand(id, player, msg, "show", targetRegion.xmlLabel(), String.valueOf(max), String.join(" ", recipients));

@@ -43,7 +43,7 @@ public class DoCommandTest {
         assertEquals("176", game.data().getPlayerRegion("Player2", RegionType.LIBRARY).getCard(0).getId());
         ashCards = game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards();
         assertEquals(1, ashCards.size());
-        assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='101801' data-secured='false'>Slaughtering the Herd</a> 1 from their library."));
+        assertThat(getLastMessage(), containsString("burns <a class='card-name' data-card-id='101801' data-secured='false'>Slaughtering the Herd</a> 1 from their library."));
     }
 
     @Test
@@ -52,7 +52,7 @@ public class DoCommandTest {
         assertEquals(0, game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size());
         worker.doCommand("Player2", "burn ready 1");
         assertEquals(1, game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size());
-        assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a> from their ready region."));
+        assertThat(getLastMessage(), containsString("burns <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a> from their ready region."));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class DoCommandTest {
         assertEquals("111", game.data().getPlayerRegion("Player2", RegionType.READY).getCard(0).getId());
         worker.doCommand("Player2", "burn ready random");
         assertEquals(1, game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size());
-        assertThat(getLastMessage(), containsString("Player2 burns"));
+        assertThat(getLastMessage(), containsString("burns"));
         assertThat(getLastMessage(), containsString("(picked randomly)"));
         assertThat(getLastMessage(), containsString("from their ready region."));
     }
@@ -71,7 +71,7 @@ public class DoCommandTest {
         assertEquals(0, game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size());
         worker.doCommand("Player3", "burn Player2 ready 1");
         assertEquals(1, game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size());
-        assertThat(getLastMessage(), containsString("Player3 burns <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a> from Player2's ready region"));
+        assertThat(getLastMessage(), containsString("burns <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a> from Player2's ready region"));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class DoCommandTest {
         worker.doCommand("Player2", "timeout");
         requestor = game.data().getTimeoutRequestor();
         assertThat(requestor, is("Player2"));
-        assertThat(getLastMessage(), containsString("Player2 has requested that the game be timed out."));
+        assertThat(getLastMessage(), containsString("has requested that the game be timed out."));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class DoCommandTest {
         assertThat(game.getVictoryPoints("Player2"), is(0.0));
         worker.doCommand("Player2", "vp withdraw");
         assertThat(game.getVictoryPoints("Player2"), is(0.5));
-        assertThat(getLastMessage(), containsString("Player2 withdraws and gains 0.5 victory points."));
+        assertThat(getLastMessage(), containsString("withdraws and gains 0.5 victory points."));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class DoCommandTest {
         worker.doCommand("Player3", "choose 5");
         choice = game.data().getPlayer("Player3").getChoice();
         assertThat(choice, is("5"));
-        assertThat(getLastMessage(), containsString("Player3 has made their choice."));
+        assertThat(getLastMessage(), containsString("has made their choice."));
     }
 
     @Test
@@ -192,9 +192,9 @@ public class DoCommandTest {
     @Test
     void random() throws CommandException {
         worker.doCommand("Player1", "random 6");
-        assertThat(getLastMessage(), containsString("Player1 rolls from 1-6"));
+        assertThat(getLastMessage(), containsString("rolls from 1-6"));
         worker.doCommand("Player1", "random 0");
-        assertThat(getLastMessage(), containsString("Player1 rolls from 1-2"));
+        assertThat(getLastMessage(), containsString("rolls from 1-2"));
     }
 
     @Test
@@ -203,7 +203,7 @@ public class DoCommandTest {
         worker.doCommand("Player5", "flip");
         worker.doCommand("Player5", "flip");
         worker.doCommand("Player5", "flip");
-        assertThat(getLastMessage(), containsString("Player5 flips a coin : "));
+        assertThat(getLastMessage(), containsString("flips a coin : "));
     }
 
     @Test
@@ -215,7 +215,7 @@ public class DoCommandTest {
         assertThat(game.data().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(6));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(1));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().getFirst(), hasProperty("id", is("141")));
-        assertThat(getLastMessage(), containsString("Player2 discards <a class='card-name' data-card-id='100852' data-secured='false'>Graverobbing</a>"));
+        assertThat(getLastMessage(), containsString("discards <a class='card-name' data-card-id='100852' data-secured='false'>Graverobbing</a>"));
     }
 
     @Test
@@ -226,7 +226,7 @@ public class DoCommandTest {
         assertThat(game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(1));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().getFirst(), hasProperty("id", is("141")));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(7));
-        assertThat(getLastMessage(), containsString("Player2 draws from their library."));
+        assertThat(getLastMessage(), containsString("draws from their library."));
     }
 
     @Test
@@ -236,7 +236,7 @@ public class DoCommandTest {
         worker.doCommand("Player2", "discard random");
         assertThat(game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(1));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(6));
-        assertThat(getLastMessage(), containsString("Player2 discards"));
+        assertThat(getLastMessage(), containsString("discards"));
         assertThat(getLastMessage(), containsString("(picked randomly)"));
     }
 
@@ -247,7 +247,7 @@ public class DoCommandTest {
         worker.doCommand("Player2", "draw");
         assertThat(game.data().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(8));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.HAND).getCards().get(7), hasProperty("id", is("143")));
-        assertThat(getLastMessage(), containsString("Player2 draws from their library."));
+        assertThat(getLastMessage(), containsString("draws from their library."));
         assertThrows(CommandException.class, () -> worker.doCommand("Player2", "draw crypt 15"));
     }
 
@@ -273,7 +273,7 @@ public class DoCommandTest {
         worker.doCommand("Player2", "draw crypt");
         assertThat(game.data().getPlayerRegion("Player2", RegionType.UNCONTROLLED).getCards().size(), is(4));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.UNCONTROLLED).getCards().get(3), hasProperty("id", is("105")));
-        assertThat(getLastMessage(), containsString("Player2 draws from their crypt."));
+        assertThat(getLastMessage(), containsString("draws from their crypt."));
     }
 
     @Test
@@ -281,7 +281,7 @@ public class DoCommandTest {
         assertThat(game.data().getPlayerRegion("Player2", RegionType.UNCONTROLLED).getCards().size(), is(3));
         worker.doCommand("Player2", "draw crypt 2");
         assertThat(game.data().getPlayerRegion("Player2", RegionType.UNCONTROLLED).getCards().size(), is(5));
-        assertThat(getLastMessage(), containsString("Player2 draws from their crypt."));
+        assertThat(getLastMessage(), containsString("draws from their crypt."));
     }
 
     @Test
@@ -322,7 +322,7 @@ public class DoCommandTest {
         assertThat(game.data().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(6));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(1));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().getFirst(), hasProperty("id", is("141")));
-        assertThat(getLastMessage(), containsString("Player2 plays <a class='card-name' data-card-id='100852' data-secured='false'>Graverobbing</a>."));
+        assertThat(getLastMessage(), containsString("plays <a class='card-name' data-card-id='100852' data-secured='false'>Graverobbing</a>."));
     }
 
     @Test
@@ -334,7 +334,7 @@ public class DoCommandTest {
         assertThat(game.data().getPlayerRegion("Player2", RegionType.HAND).getCards().size(), is(6));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size(), is(1));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().getFirst(), hasProperty("id", is("173")));
-        assertThat(getLastMessage(), containsString("Player2 plays <a class='card-name' data-card-id='101735' data-secured='false'>Shadow Body</a> at <span class='icon obt'></span>."));
+        assertThat(getLastMessage(), containsString("plays <a class='card-name' data-card-id='101735' data-secured='false'>Shadow Body</a> at <span class='icon obt'></span>."));
     }
 
     @Test
@@ -346,7 +346,7 @@ public class DoCommandTest {
         assertThat(game.data().getPlayerRegion("Player5", RegionType.HAND).getCards().size(), is(6));
         assertThat(game.data().getPlayerRegion("Player5", RegionType.READY).getCards().size(), is(4));
         assertThat(game.data().getPlayerRegion("Player5", RegionType.READY).getCards().get(3), hasProperty("id", is("454")));
-        assertThat(getLastMessage(), containsString("Player5 plays <a class='card-name' data-card-id='100633' data-secured='false'>Embrace, The</a> to their ready region."));
+        assertThat(getLastMessage(), containsString("plays <a class='card-name' data-card-id='100633' data-secured='false'>Embrace, The</a> to their ready region."));
     }
 
     @Test
@@ -356,7 +356,7 @@ public class DoCommandTest {
         worker.doCommand("Player5", "play 4 ready draw");
         assertThat(game.data().getPlayerRegion("Player5", RegionType.HAND).getCards().size(), is(7));
         assertThat(game.data().getPlayerRegion("Player5", RegionType.READY).getCards().get(3), hasProperty("id", is("454")));
-        assertThat(getLastMessage(), containsString("Player5 draws from their library."));
+        assertThat(getLastMessage(), containsString("draws from their library."));
     }
 
     @Test
@@ -366,7 +366,7 @@ public class DoCommandTest {
         worker.doCommand("Player1", "play library 11 ready 1");
         assertThat(game.data().getCard("6").getCards().size(), is(1));
         assertThat(game.data().getCard("6").getCards().getFirst(), hasProperty("id", is("18")));
-        assertThat(getLastMessage(), containsString("Player1 plays <a class='card-name' data-card-id='100070' data-secured='false'>Animalism</a> from their library on <a class='card-name' data-card-id='200519' data-secured='false'>Gillian Krader</a> in their ready region."));
+        assertThat(getLastMessage(), containsString("plays <a class='card-name' data-card-id='100070' data-secured='false'>Animalism</a> from their library on <a class='card-name' data-card-id='200519' data-secured='false'>Gillian Krader</a> in their ready region."));
     }
 
     @Test
@@ -376,7 +376,7 @@ public class DoCommandTest {
         worker.doCommand("Player1", "play library 11 Player2 ready 1");
         assertThat(game.getCard("111").getCards().size(), is(1));
         assertThat(game.getCard("111").getCards().getFirst(), hasProperty("id", is("18")));
-        assertThat(getLastMessage(), containsString("Player1 plays <a class='card-name' data-card-id='100070' data-secured='false'>Animalism</a> from their library on <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a> in Player2's ready region."));
+        assertThat(getLastMessage(), containsString("plays <a class='card-name' data-card-id='100070' data-secured='false'>Animalism</a> from their library on <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a> in Player2's ready region."));
     }
 
     @Test
@@ -387,7 +387,7 @@ public class DoCommandTest {
         worker.doCommand("Player1", "play library 11 Player2 ready");
         assertThat(game.data().getPlayerRegion("Player2", RegionType.READY).getCards().size(), is(3));
         assertThat(game.data().getPlayerRegion("Player2", RegionType.READY).getCards().get(2), hasProperty("id", is("18")));
-        assertThat(getLastMessage(), containsString("Player1 plays <a class='card-name' data-card-id='100070' data-secured='false'>Animalism</a> from their library to Player2's ready region."));
+        assertThat(getLastMessage(), containsString("plays <a class='card-name' data-card-id='100070' data-secured='false'>Animalism</a> from their library to Player2's ready region."));
     }
 
     @Test
@@ -404,7 +404,7 @@ public class DoCommandTest {
         assertThat(game.data().getPlayerRegion("Player1", RegionType.READY).getCards().size(), is(4));
         assertThat(game.data().getPlayerRegion("Player1", RegionType.READY).getCards().getFirst(), hasProperty("id", is("4")));
         assertThat(game.data().getPlayerRegion("Player1", RegionType.UNCONTROLLED).getCards().size(), is(1));
-        assertThat(getLastMessage(), containsString("Player1 influences out <a class='card-name' data-card-id='201025' data-secured='false'>Muse</a>."));
+        assertThat(getLastMessage(), containsString("influences out <a class='card-name' data-card-id='201025' data-secured='false'>Muse</a>."));
     }
 
     @Test
@@ -456,7 +456,7 @@ public class DoCommandTest {
         worker.doCommand("Player1", "influence 2");
         assertThat(game.data().getPlayerRegion("Player1", RegionType.UNCONTROLLED).getCards().size(), is(1));
         assertThat(game.data().getPlayerRegion("Player1", RegionType.READY).getCards().getFirst(), hasProperty("id", is("4")));
-        assertThat(getLastMessage(), containsString("Player1 influences out <a class='card-name' data-card-id='201025' data-secured='false'>Muse</a>."));
+        assertThat(getLastMessage(), containsString("influences out <a class='card-name' data-card-id='201025' data-secured='false'>Muse</a>."));
     }
 
     @Test
@@ -466,7 +466,7 @@ public class DoCommandTest {
         assertThat(game.data().getPlayerRegion("Player5", RegionType.UNCONTROLLED).getCards().get(3), hasProperty("id", is("442")));
         worker.doCommand("Player5", "influence 4");
         assertThat(game.data().getPlayerRegion("Player5", RegionType.READY).getCards().getFirst(), hasProperty("id", is("442")));
-        assertThat(getLastMessage(), containsString("Player5 influences out <a class='card-name' data-card-id='102165' data-secured='false'>Web of Knives Recruit</a>."));
+        assertThat(getLastMessage(), containsString("influences out <a class='card-name' data-card-id='102165' data-secured='false'>Web of Knives Recruit</a>."));
     }
 
     @Test
@@ -478,7 +478,7 @@ public class DoCommandTest {
         assertThat(game.data().getPlayerRegion("Player4", RegionType.READY).getCards().size(), is(3));
         assertThat(game.data().getPlayerRegion("Player4", RegionType.READY).getCards().getFirst(), hasProperty("id", is("317")));
         assertThat(game.data().getPlayerRegion("Player4", RegionType.UNCONTROLLED).getCards().size(), is(2));
-        assertThat(getLastMessage(), containsString("Player4 influences out <a class='card-name' data-card-id='200810' data-secured='false'>Lambach</a>, votes: 3."));
+        assertThat(getLastMessage(), containsString("influences out <a class='card-name' data-card-id='200810' data-secured='false'>Lambach</a>, votes: 3."));
     }
 
     @Test
@@ -488,7 +488,7 @@ public class DoCommandTest {
         worker.doCommand("Player5", "move Player3 ready 1 ready");
         assertThat(game.data().getPlayerRegion("Player5", RegionType.READY).getCards().size(), is(4));
         assertThat(game.data().getPlayerRegion("Player3", RegionType.READY).getCards().size(), is(0));
-        assertThat(getLastMessage(), containsString("Player5 moves <a class='card-name' data-card-id='200788' data-secured='false'>Klaus van der Veken</a> to Player5's ready region."));
+        assertThat(getLastMessage(), containsString("moves <a class='card-name' data-card-id='200788' data-secured='false'>Klaus van der Veken</a> to Player5's ready region."));
     }
 
     @Test
@@ -529,7 +529,7 @@ public class DoCommandTest {
         assertThat(game.data().getPlayerRegion("Player5", RegionType.LIBRARY).getCards().size(), is(65));
         assertThat(game.data().getPlayerRegion("Player5", RegionType.HAND).getCards().size(), is(6));
         assertThat(game.data().getPlayerRegion("Player5", RegionType.LIBRARY).getCards().getFirst(), hasProperty("id", is("489")));
-        assertThat(getLastMessage(), containsString("Player5 moves card #1 in their hand to the top of their library."));
+        assertThat(getLastMessage(), containsString("moves card #1 in their hand to the top of their library."));
     }
 
     @Test
@@ -539,7 +539,7 @@ public class DoCommandTest {
         worker.doCommand("Player1", "move Player3 ready 1.1 ready 3");
         assertThat(game.data().getPlayerRegion("Player3", RegionType.READY).getCards().getFirst().getCards().size(), is(1));
         assertThat(game.data().getPlayerRegion("Player1", RegionType.READY).getCards().get(2).getCards().size(), is(1));
-        assertThat(getLastMessage(), containsString("Player1 puts <a class='card-name' data-card-id='101014' data-secured='false'>Ivory Bow</a> on <a class='card-name' data-card-id='100298' data-secured='false'>Carlton Van Wyk</a> in their ready region."));
+        assertThat(getLastMessage(), containsString("puts <a class='card-name' data-card-id='101014' data-secured='false'>Ivory Bow</a> on <a class='card-name' data-card-id='100298' data-secured='false'>Carlton Van Wyk</a> in their ready region."));
     }
 
     @Test
@@ -553,18 +553,18 @@ public class DoCommandTest {
         assertThat(game.data().getCard("208").getCards().size(), is(2));
         assertThat(game.data().getCard("246").getCards().size(), is(0));
         worker.doCommand("Player3", "move ready 1.2 ready 1.1");
-        assertThat(getLastMessage(), containsString("Player3 puts <a class='card-name' data-card-id='100199' data-secured='false'>Blood Doll</a> 1.2 on <a class='card-name' data-card-id='101014' data-secured='false'>Ivory Bow</a> in their ready region."));
+        assertThat(getLastMessage(), containsString("puts <a class='card-name' data-card-id='100199' data-secured='false'>Blood Doll</a> 1.2 on <a class='card-name' data-card-id='101014' data-secured='false'>Ivory Bow</a> in their ready region."));
         assertThat(game.data().getCard("208").getCards().size(), is(1));
         assertThat(game.data().getCard("246").getCards().size(), is(1));
         assertThrows(CommandException.class, () -> worker.doCommand("Player3", "move ready 1 ready 1.1.1"));
         worker.doCommand("Player3", "move ready 1.1.1 ready 1");
-        assertThat(getLastMessage(), containsString("Player3 puts <a class='card-name' data-card-id='100199' data-secured='false'>Blood Doll</a> 1.1.1 on <a class='card-name' data-card-id='200788' data-secured='false'>Klaus van der Veken</a> in their ready region."));
+        assertThat(getLastMessage(), containsString("puts <a class='card-name' data-card-id='100199' data-secured='false'>Blood Doll</a> 1.1.1 on <a class='card-name' data-card-id='200788' data-secured='false'>Klaus van der Veken</a> in their ready region."));
     }
 
     @Test
     void moveHidden() throws CommandException {
         worker.doCommand("Player1", "move hand 4 research");
-        assertThat(getLastMessage(), containsString("Player1 moves card #4 in their hand to their research."));
+        assertThat(getLastMessage(), containsString("moves card #4 in their hand to their research."));
     }
 
     @Test
@@ -595,7 +595,7 @@ public class DoCommandTest {
         assertTrue(game.data().getPlayer("Player4").isOusted());
         assertThat(game.getActivePlayer(), is("Player2"));
         assertThat(game.data().getCurrentPlayer().getPrey().getName(), is("Player5"));
-        assertThat(getLastMessage(), containsString("Player4's pool was 22, now is 0."));
+        assertThat(getLastMessage(), containsString("pool was 22, now is 0."));
     }
 
     @Test
@@ -608,13 +608,13 @@ public class DoCommandTest {
         assertTrue(game.data().getPlayer("Player4").isOusted());
         assertThat(game.getActivePlayer(), is("Player2"));
         assertThat(game.data().getCurrentPlayer().getPrey().getName(), is("Player5"));
-        assertThat(getLastMessage(), containsString("Player4's pool was 22, now is 0."));
+        assertThat(getLastMessage(), containsString("pool was 22, now is 0."));
         worker.doCommand("Player4", "pool +22");
         assertThat(game.getPool("Player4"), is(22));
         assertFalse(game.data().getPlayer("Player4").isOusted());
         assertThat(game.getActivePlayer(), is("Player2"));
         assertThat(game.data().getCurrentPlayer().getPrey().getName(), is("Player4"));
-        assertThat(getLastMessage(), containsString("Player4's pool was 0, now is 22."));
+        assertThat(getLastMessage(), containsString("pool was 0, now is 22."));
     }
 
     @Test
@@ -636,7 +636,7 @@ public class DoCommandTest {
         assertThat(game.getCounters(card), is(6));
         worker.doCommand("Player2", "blood ready 1 +1");
         assertThat(game.getCounters(card), is(7));
-        assertThat(getLastMessage(), containsString("Player2 adds 1 blood to <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>, now 7."));
+        assertThat(getLastMessage(), containsString("adds 1 blood to <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>, now 7."));
         assertThrows(CommandException.class, () -> worker.doCommand("Player2", "blood ready 2"));
     }
 
@@ -658,22 +658,22 @@ public class DoCommandTest {
         assertThat(game.getDisciplines(card), contains("aus", "dom", "OBT", "POT"));
         worker.doCommand("Player2", "disc ready 1 +ani");
         assertThat(game.getDisciplines(card), contains("ani", "aus", "dom", "OBT", "POT"));
-        assertThat(getLastMessage(), containsString("Player2 added <span class='icon ani'></span> to <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>."));
+        assertThat(getLastMessage(), containsString("added <span class='icon ani'></span> to <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>."));
         worker.doCommand("Player2", "disc ready 1 -obt");
         assertThat(game.getDisciplines(card), contains("ani", "aus", "dom", "obt", "POT"));
-        assertThat(getLastMessage(), containsString("Player2 removed <span class='icon obt'></span> to <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>."));
+        assertThat(getLastMessage(), containsString("removed <span class='icon obt'></span> to <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>."));
         worker.doCommand("Player2", "disc ready 1 +dom");
         assertThat(game.getDisciplines(card), contains("ani", "aus", "obt", "DOM", "POT"));
-        assertThat(getLastMessage(), containsString("Player2 added <span class='icon DOM'></span> to <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>."));
+        assertThat(getLastMessage(), containsString("added <span class='icon DOM'></span> to <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>."));
         worker.doCommand("Player2", "disc ready 1 +ani");
         assertThat(game.getDisciplines(card), contains("aus", "obt", "ANI", "DOM", "POT"));
-        assertThat(getLastMessage(), containsString("Player2 added <span class='icon ANI'></span> to <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>."));
+        assertThat(getLastMessage(), containsString("added <span class='icon ANI'></span> to <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>."));
         worker.doCommand("Player2", "disc ready 1 reset");
         assertThat(game.getDisciplines(card), contains("aus", "dom", "OBT", "POT"));
-        assertThat(getLastMessage(), containsString("Player2 reset <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a> back to <span class='icon aus'></span> <span class='icon dom'></span> <span class='icon OBT'></span> <span class='icon POT'></span>"));
+        assertThat(getLastMessage(), containsString("reset <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a> back to <span class='icon aus'></span> <span class='icon dom'></span> <span class='icon OBT'></span> <span class='icon POT'></span>"));
         worker.doCommand("Player2", "disc ready 1 +ani +dom");
         assertThat(game.getDisciplines(card), contains("ani", "aus", "DOM", "OBT", "POT"));
-        assertThat(getLastMessage(), containsString("Player2 added <span class='icon ani'></span> <span class='icon DOM'></span> to <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>."));
+        assertThat(getLastMessage(), containsString("added <span class='icon ani'></span> <span class='icon DOM'></span> to <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>."));
         worker.doCommand("Player2", "disc ready 2 reset");
         assertThrows(CommandException.class, () -> worker.doCommand("Player2", "disc ready 1 +blah"));
         assertThrows(CommandException.class, () -> worker.doCommand("Player2", "disc ready 1 aani"));
@@ -705,7 +705,7 @@ public class DoCommandTest {
         assertThat(card1.isLocked(), is(false));
         assertThat(card2.isLocked(), is(false));
         assertThat(card3.isLocked(), is(false));
-        assertThat(getLastMessage(), containsString("Player1 unlocks."));
+        assertThat(getLastMessage(), containsString("unlocks."));
     }
 
     @Test
@@ -720,7 +720,7 @@ public class DoCommandTest {
         assertThat(card1.isLocked(), is(false));
         assertThat(card2.isLocked(), is(false));
         assertThat(card3.isLocked(), is(true));
-        assertThat(getLastMessage(), containsString("Player1 unlocks <a class='card-name' data-card-id='201039' data-secured='false'>Navar McClaren</a>."));
+        assertThat(getLastMessage(), containsString("unlocks <a class='card-name' data-card-id='201039' data-secured='false'>Navar McClaren</a>."));
     }
 
     @Test
@@ -735,7 +735,7 @@ public class DoCommandTest {
         assertThat(card1.isLocked(), is(true));
         assertThat(card2.isLocked(), is(true));
         assertThat(card3.isLocked(), is(true));
-        assertThat(getLastMessage(), containsString("Player1 locks <a class='card-name' data-card-id='200519' data-secured='false'>Gillian Krader</a>."));
+        assertThat(getLastMessage(), containsString("locks <a class='card-name' data-card-id='200519' data-secured='false'>Gillian Krader</a>."));
         assertThrows(CommandException.class, () -> worker.doCommand("Player1", "lock ready 1"));
     }
 
@@ -761,10 +761,10 @@ public class DoCommandTest {
         assertThat(game.getPrivateNotes("Player3"), containsString("81 cards of Player3's Library"));
         assertThat(game.getPrivateNotes("Player4"), containsString("81 cards of Player3's Library"));
         assertThat(game.getPrivateNotes("Player5"), containsString("81 cards of Player3's Library"));
-        assertThat(getLastMessage(), containsString("Player3 shows everyone 81 cards of their Library."));
+        assertThat(getLastMessage(), containsString("shows everyone 81 cards of their Library."));
         worker.doCommand("Player3", "show hand all");
         assertThat(game.getPrivateNotes("Player2"), not(is("")));
-        assertThat(getLastMessage(), containsString("Player3 shows everyone 7 cards of their Hand."));
+        assertThat(getLastMessage(), containsString("shows everyone 7 cards of their Hand."));
     }
 
     @Test
@@ -772,7 +772,7 @@ public class DoCommandTest {
         assertThat(game.getPrivateNotes("Player4"), is(""));
         worker.doCommand("Player3", "show hand Player4 all");
         assertThat(game.getPrivateNotes("Player4"), not(is("")));
-        assertThat(getLastMessage(), containsString("Player3 shows Player4 7 cards of their Hand."));
+        assertThat(getLastMessage(), containsString("shows Player4 7 cards of their Hand."));
     }
 
     @Test
@@ -780,7 +780,7 @@ public class DoCommandTest {
         assertThat(game.getPrivateNotes("Player3"), is(""));
         worker.doCommand("Player3", "show hand");
         assertThat(game.getPrivateNotes("Player3"), not(is("")));
-        assertThat(getLastMessage(), is("Player3 looks at 7 cards of their Hand."));
+        assertThat(getLastMessage(), is("looks at 7 cards of their Hand."));
     }
 
     @Test
@@ -791,19 +791,19 @@ public class DoCommandTest {
         cards = game.data().getPlayerRegion("Player3", RegionType.HAND).getCards().stream().map(CardData::getId).toList();
         assertThat(cards, not(contains("283", "299", "235", "257", "252", "242", "264")));
         assertThat(cards, containsInAnyOrder("283", "299", "235", "257", "252", "242", "264"));
-        assertThat(getLastMessage(), containsString("Player3 shuffles their hand."));
+        assertThat(getLastMessage(), containsString("shuffles their hand."));
     }
 
     @Test
     void shuffleLibrary() throws CommandException {
         worker.doCommand("Player3", "shuffle library");
-        assertThat(getLastMessage(), containsString("Player3 shuffles their library."));
+        assertThat(getLastMessage(), containsString("shuffles their library."));
     }
 
     @Test
     void shufflePartial() throws CommandException {
         worker.doCommand("Player3", "shuffle library 7");
-        assertThat(getLastMessage(), containsString("Player3 shuffles the first 7 cards of their library."));
+        assertThat(getLastMessage(), containsString("shuffles the first 7 cards of their library."));
     }
 
     @Test
@@ -814,7 +814,7 @@ public class DoCommandTest {
         worker.doCommand("Player2", "transfer ready 1 +1");
         assertThat(game.getCounters(card), is(7));
         assertThat(game.getPool("Player2"), is(29));
-        assertThat(getLastMessage(), containsString("Player2 transferred 1 blood onto <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>. Currently: 7, Pool: 29"));
+        assertThat(getLastMessage(), containsString("transferred 1 blood onto <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>. Currently: 7, Pool: 29"));
     }
 
     @Test
@@ -825,7 +825,7 @@ public class DoCommandTest {
         worker.doCommand("Player2", "transfer ready 1 -2");
         assertThat(game.getCounters(card), is(4));
         assertThat(game.getPool("Player2"), is(32));
-        assertThat(getLastMessage(), containsString("Player2 transferred 2 blood off <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>. Currently: 4, Pool: 32"));
+        assertThat(getLastMessage(), containsString("transferred 2 blood off <a class='card-name' data-card-id='201337' data-secured='false'>Talley, The Hound</a>. Currently: 4, Pool: 32"));
     }
 
     @Test
@@ -835,7 +835,7 @@ public class DoCommandTest {
         worker.doCommand("Player5", "rfg Player3 ready 1");
         assertThat(game.data().getPlayerRegion("Player3", RegionType.READY).getCards().size(), is(0));
         assertThat(game.data().getPlayerRegion("Player3", RegionType.REMOVED_FROM_GAME).getCards().size(), is(1));
-        assertThat(getLastMessage(), containsString("Player5 removes <a class='card-name' data-card-id='200788' data-secured='false'>Klaus van der Veken</a> in Player3's ready region from the game."));
+        assertThat(getLastMessage(), containsString("removes <a class='card-name' data-card-id='200788' data-secured='false'>Klaus van der Veken</a> in Player3's ready region from the game."));
     }
 
     @Test
@@ -845,7 +845,7 @@ public class DoCommandTest {
         worker.doCommand("Player5", "rfg Player1 ash random");
         assertThat(game.data().getPlayerRegion("Player1", RegionType.ASH_HEAP).getCards().size(), is(3));
         assertThat(game.data().getPlayerRegion("Player1", RegionType.REMOVED_FROM_GAME).getCards().size(), is(1));
-        assertThat(getLastMessage(), containsString("Player5 removes"));
+        assertThat(getLastMessage(), containsString("removes"));
         assertThat(getLastMessage(), containsString("(picked randomly)"));
         assertThat(getLastMessage(), containsString("from the game."));
     }
@@ -959,7 +959,7 @@ public class DoCommandTest {
     @Test
     void flipTest() throws CommandException {
         worker.doCommand("Player1", "flip");
-        assertThat(getLastMessage(), either(containsString("Player1 flips a coin : Heads")).or(containsString("Player1 flips a coin : Tails")));
+        assertThat(getLastMessage(), either(containsString("flips a coin : Heads")).or(containsString("flips a coin : Tails")));
     }
 
     @Test
@@ -1039,7 +1039,7 @@ public class DoCommandTest {
     @Test
     void randomDefault() throws CommandException {
         worker.doCommand("Player1", "random 0"); // should default to 2
-        assertThat(getLastMessage(), containsString("Player1 rolls from 1-2 :"));
+        assertThat(getLastMessage(), containsString("rolls from 1-2 :"));
     }
 
     @Test
