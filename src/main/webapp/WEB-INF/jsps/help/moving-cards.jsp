@@ -342,10 +342,6 @@
                         <th>SOURCE</th>
                         <td>The default player is yourself. The default region is the ready region.</td>
                     </tr>
-                    <tr>
-                        <th>top</th>
-                        <td>Optionally use <code>top</code> instead of specifying position 1 when determining source.</td>
-                    </tr>
                     </tbody>
                 </table>
                 <table class="table table-bordered">
