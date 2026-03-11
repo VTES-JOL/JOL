@@ -819,8 +819,10 @@ function renderGameChat(data) {
         const dateAndTime = parts[0].split(' ', 2);
         const date = dateAndTime[0];
         const time = dateAndTime[1];
-        const player = parts[1];
-        const message = parts[2];
+        const playerSource = parts[1];
+        const message = parts[2]
+            .replaceAll("&#64;"+player, "<span style='background-color: #D4D7F9; color:black'>@"+player+"</span>")
+            .replaceAll("&#64;All", "<span style='background-color: #D4D7F9; color:black'>@All</span>");
         let timestamp;
         if (date === gameChatLastDay)
             timestamp = time;
@@ -829,7 +831,7 @@ function renderGameChat(data) {
             timestamp = date + ' ' + time;
         }
         let timeSpan = $("<span/>").text(timestamp).addClass('chat-timestamp');
-        let playerLabel = player === "null" ? '' : $("<b/>").text(player);
+        let playerLabel = playerSource === "null" ? '' : $("<b/>").text(playerSource);
         let lineElement = $('<p/>').addClass('chat').append(timeSpan, ' ', playerLabel, ' ', message);
         container.append(lineElement);
     });
@@ -875,7 +877,9 @@ function renderGlobalChat(data) {
         let timeOutput = $("<span/>").text(timestamp).attr("title", userTimestamp).addClass('chat-timestamp');
         let playerLabel = globalChatLastPlayer === chat.player && globalChatLastDay === day ? "" : "<b>" + chat.player + "</b> ";
         //replace player name with colored player name
-        let msg = chat.message.replaceAll("&#64;"+player, "<span style='background-color: #D4D7F9; color:black'>@"+player+"</span>");
+        let msg = chat.message
+            .replaceAll("&#64;"+player, "<span style='background-color: #D4D7F9; color:black'>@"+player+"</span>")
+            .replaceAll("&#64;All", "<span style='background-color: #D4D7F9; color:black'>@All</span>");
         let message = $("<span/>").html(" " + playerLabel + msg);
 
         if (chat.player !== player) {
@@ -1423,10 +1427,12 @@ function loadHistory(data) {
     historyDiv.empty();
     $.each(data, function (index, content) {
         const dateAndTime = content.timestamp;
-        const player = content.source;
-        const message = content.message;
+        const playerSource = content.source;
+        const message = content.message
+            .replaceAll("&#64;"+player, "<span style='background-color: #D4D7F9; color:black'>@"+player+"</span>")
+            .replaceAll("&#64;All", "<span style='background-color: #D4D7F9; color:black'>@All</span>");
         let timeSpan = $("<span/>").text(dateAndTime).addClass('chat-timestamp');
-        let playerLabel = player === "null" ? '' : $("<b/>").text(player);
+        let playerLabel = playerSource === "null" ? '' : $("<b/>").text(playerSource);
         let lineElement = $('<p/>').addClass('chat').append(timeSpan, ' ', playerLabel, ' ', message);
         historyDiv.append(lineElement);
     });
