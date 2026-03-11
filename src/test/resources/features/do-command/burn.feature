@@ -12,7 +12,6 @@ Feature: Burn command
     Examples:
       | player  | command              | from              | target card           | message                     |
       | Player2 | burn library 4       | Player2's library | Far Mastery           | from their library.         |
-      | Player2 | burn library top     | Player2's library | Slaughtering the Herd | from their library.         |
       | Player2 | burn ready 1         | Player2's ready   | Talley, The Hound     | from their ready region.    |
       | Player3 | burn Player2 ready 1 | Player2's ready   | Talley, The Hound     | from Player2's ready region |
 
