@@ -356,7 +356,7 @@
                 <h5 class="mt-2">Disciplines</h5>
             </div>
             <div class="card-body">
-                <h6 class="card-title fs-5">disciplines [PLAYER] [REGION] [CARD] [+|-DISC] [reset]</h6>
+                <h6 class="card-title fs-5">disc [PLAYER] [REGION] [CARD] [+|-DISC] [reset]</h6>
                 <p class="card-text">
                     Adds or removes disciplines from a card, or resets them to the card's printed values.
                 </p>
@@ -364,15 +364,15 @@
                     <caption class="caption-top">Examples</caption>
                     <tbody>
                     <tr>
-                        <th>disciplines 1 +aus</th>
+                        <th>disc 1 +aus</th>
                         <td>Adds basic Auspex to your card #1.</td>
                     </tr>
                     <tr>
-                        <th>disciplines 1 +AUS -dom</th>
+                        <th>disc 1 +AUS -dom</th>
                         <td>Adds superior Auspex and removes Dominate from your card #1.</td>
                     </tr>
                     <tr>
-                        <th>disciplines 1 reset</th>
+                        <th>disc 1 reset</th>
                         <td>Resets disciplines on your card #1 to printed values.</td>
                     </tr>
                     </tbody>

@@ -47,14 +47,6 @@ public class DoCommandTest {
     }
 
     @Test
-    void burnTopLibraryShortcut() throws CommandException {
-        assertEquals("143", game.data().getPlayerRegion("Player2", RegionType.LIBRARY).getCard(0).getId());
-        worker.doCommand("Player2", "burn library top");
-        assertEquals(1, game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size());
-        assertThat(getLastMessage(), containsString("Player2 burns <a class='card-name' data-card-id='101801' data-secured='false'>Slaughtering the Herd</a> 1 from their library."));
-    }
-
-    @Test
     void burnReady() throws CommandException {
         assertEquals("111", game.data().getPlayerRegion("Player2", RegionType.READY).getCard(0).getId());
         assertEquals(0, game.data().getPlayerRegion("Player2", RegionType.ASH_HEAP).getCards().size());

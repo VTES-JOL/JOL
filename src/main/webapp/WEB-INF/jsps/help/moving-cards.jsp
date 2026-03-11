@@ -362,11 +362,11 @@
                         </td>
                     </tr>
                     <tr>
-                        <th>burn Lilith library top</th>
+                        <th>burn Lilith library 1</th>
                         <td>Burns the top card from Lilith's library. Useful for cards like The Slaughterhouse.</td>
                     </tr>
                     <tr>
-                        <th>burn crypt top</th>
+                        <th>burn crypt 1</th>
                         <td>Burns the top card of your crypt.</td>
                     </tr>
                     </tbody>
