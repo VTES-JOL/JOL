@@ -573,10 +573,10 @@ function callbackTournamentRounds(data) {
     tourRounds.empty();
     $.each(data, function (index, round) {
         let div = $("<div/>").attr("id","tourAllTables");
-        let label = $("<label/>").text("Round "+round);
+        let label = $("<span/>").addClass("h4").text("Round "+round);
         let createTableButton = $("<button/>").attr("id", "createTable-"+round)
             .on('click', function () { createTable(round) })
-            .addClass("btn btn-outline-secondary btn-sm mt-2 w-100")
+            .addClass("btn btn-outline-secondary bg-info btn-sm mt-2 w-100")
             .text("Create Table");
         let divForPlayers = $("<div/>").attr("id","tourPlayer-"+round);
         let divForTabels = $("<div/>").addClass("card-body p-1 grid").attr("id","tableTour-"+round).css({"--bs-columns": "3", "--bs-gap": "0.5rem"});
@@ -606,23 +606,15 @@ function callbackTableManager(data) {
 
 function createTable(round) {
     let table = $("#"+"tableTour-"+round);
-    let divRound = $("<div/>").addClass("card-body p-1");
-    let label = $("<label/>").text("Table");
+    let divRound = $("<div/>").addClass("card-body border border-success p-1");
+    let label = $("<span/>").addClass("h5").text("Table");
     let list = $("<ul/>").addClass("border list-group sortable"+round)
         .attr("round", round)
         .css("min-height","38px");
     list.sortable({
         connectWith: ".sortable"+round,
         dropOnEmpty: true});
-    let removeTable = $("<button/>")
-        .text("Remove Table")
-        .addClass("btn btn-outline-secondary btn-sm mt-2")
-        .on('click', function () {
-            list.each(function(index, ul) {
-                $("#"+"tourPlayer-"+round).append($(ul).find("li"));
-            })
-            divRound.remove()
-        })
+    let removeTable = removeTableButton(round, divRound, list)
     divRound.append(label, removeTable, list);
     table.append(divRound);
 }
@@ -693,23 +685,15 @@ function callbackShowTables(data) {
         let tables = $("#"+"tableTour-"+indexRound);
         tables.empty();
         $.each(round, function (indexTable, table) {
-            let divRound = $("<div/>").addClass("card-body p-1");
-            let label = $("<label/>").text("Table");
+            let divRound = $("<div/>").addClass("card-body border border-success p-1");
+            let label = $("<span/>").text("Table").addClass("h5").append($("<br/>"));
             let list = $("<ul/>").addClass("border list-group sortable"+indexRound)
                 .attr("round", indexRound)
                 .css("min-height","38px");
             list.sortable({
                 connectWith: ".sortable"+indexRound,
                 dropOnEmpty: true});
-            let removeTable = $("<button/>")
-                .text("Remove Table")
-                .addClass("btn btn-outline-secondary btn-sm mt-2")
-                .on('click', function () {
-                    list.each(function(index, ul) {
-                        $("#"+"tourPlayer-"+indexRound).append($(ul).find("li"));
-                    })
-                    divRound.remove()
-                })
+            let removeTable = removeTableButton(indexRound, divRound, list)
             $.each(table, function(index, player) {
                 let listItem = $("<li/>")
                     .text(player.name)
@@ -723,6 +707,18 @@ function callbackShowTables(data) {
             DS.getRegDelta(tournamentSelected, indexRound, {callback: callbackShowPlayers, errorHandler: errorhandler});
         })
     })
+}
+
+function removeTableButton(indexRound, divRound, list) {
+    return $("<button/>")
+        .text("Remove Table")
+        .addClass("btn btn-outline-secondary bg-warning btn-sm mt-1 mb-1")
+        .on('click', function () {
+            list.each(function(index, ul) {
+                $("#"+"tourPlayer-"+indexRound).append($(ul).find("li"));
+            })
+            divRound.remove()
+        });
 }
 
 function callbackShowPlayers(data) {

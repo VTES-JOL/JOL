@@ -518,12 +518,16 @@ public class DeckserverRemote {
     }
 
     public Map<Integer, List<String>> getRegDelta(String tourName, int roundNumber) {
+        //create List of all Players assigned to a Table
         List<String> tablePlayers = new ArrayList<>();
         getRoundsForTournament(tourName).get(roundNumber).values().stream()
                 .forEach(tournamentPlayers ->
                         tablePlayers.addAll(tournamentPlayers.stream().map(TournamentPlayer::getName).collect(Collectors.toList())));
+        //get all Players registered
         List<String> regPlayers = getTournamentPlayers(tourName).stream().map(TournamentRegistration::getPlayer).collect(Collectors.toList());
+        //get Delta of registered Players minus the players assigned to a table
         regPlayers.removeAll(tablePlayers);
+        //create a Map with the round number as key and the delta as value
         HashMap<Integer, List<String>> regPlayersMap = new HashMap<>();
         regPlayersMap.put(roundNumber, regPlayers);
         return regPlayersMap;
