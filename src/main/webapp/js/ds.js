@@ -579,7 +579,10 @@ function callbackTournamentRounds(data) {
             .addClass("btn btn-outline-secondary text-dark bg-info btn-sm mt-2 w-100")
             .text("Create Table");
         let divForPlayers = $("<div/>").attr("id","tourPlayer-"+round);
-        let divForTabels = $("<div/>").addClass("card-body p-1 grid").attr("id","tableTour-"+round).css({"--bs-columns": "3", "--bs-gap": "0.5rem"});
+        let divForTabels = $("<ol/>").addClass("card-body p-1 grid").attr("id","tableTour-"+round)
+            .css({"--bs-columns": "3", "--bs-gap": "0.5rem"})
+            .css("list-style-position","inside");
+        divForTabels.sortable();
         div.append(label, createTableButton, divForPlayers, divForTabels);
         tourRounds.append(div);
     });
@@ -606,7 +609,8 @@ function callbackTableManager(data) {
 
 function createTable(round) {
     let table = $("#"+"tableTour-"+round);
-    let divRound = $("<div/>").addClass("card-body border border-success p-1");
+    let divRound = $("<li/>")
+        .addClass("card-body text-center border border-success p-1");
     let label = $("<span/>").addClass("h5").text("Table");
     let list = $("<ul/>").addClass("border list-group sortable"+round)
         .attr("round", round)
@@ -685,7 +689,7 @@ function callbackShowTables(data) {
         let tables = $("#"+"tableTour-"+indexRound);
         tables.empty();
         $.each(round, function (indexTable, table) {
-            let divRound = $("<div/>").addClass("card-body border border-success p-1");
+            let divRound = $("<li/>").addClass("card-body text-center border border-success p-1");
             let label = $("<span/>").text("Table").addClass("h5").append($("<br/>"));
             let list = $("<ul/>").addClass("border list-group sortable"+indexRound)
                 .attr("round", indexRound)
