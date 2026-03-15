@@ -12,7 +12,6 @@ import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.TournamentFormat;
 import net.deckserver.storage.json.system.TournamentDetails;
-import net.deckserver.jobs.TournamentJob;
 import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
@@ -28,7 +27,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.time.OffsetDateTime;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class DeckserverRemote {
@@ -510,6 +511,26 @@ public class DeckserverRemote {
         if (JolAdmin.isAdmin(playerName)) {
         }
         return UpdateFactory.getUpdate();
+    }
+
+    public Map<Integer, Map<Integer, List<TournamentPlayer>>> getRoundsForTournament(String tourName) {
+        return TournamentService.getTournament(tourName).getRounds();
+    }
+
+    public Map<Integer, List<String>> getRegDelta(String tourName, int roundNumber) {
+        //create List of all Players assigned to a Table
+        List<String> tablePlayers = new ArrayList<>();
+        getRoundsForTournament(tourName).get(roundNumber).values().stream()
+                .forEach(tournamentPlayers ->
+                        tablePlayers.addAll(tournamentPlayers.stream().map(TournamentPlayer::getName).collect(Collectors.toList())));
+        //get all Players registered
+        List<String> regPlayers = getTournamentPlayers(tourName).stream().map(TournamentRegistration::getPlayer).collect(Collectors.toList());
+        //get Delta of registered Players minus the players assigned to a table
+        regPlayers.removeAll(tablePlayers);
+        //create a Map with the round number as key and the delta as value
+        HashMap<Integer, List<String>> regPlayersMap = new HashMap<>();
+        regPlayersMap.put(roundNumber, regPlayers);
+        return regPlayersMap;
     }
 
     public String exportPastGamesAsCsv() throws IOException {
