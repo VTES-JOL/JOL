@@ -576,7 +576,7 @@ function callbackTournamentRounds(data) {
         let label = $("<span/>").addClass("h4").text("Round "+round);
         let createTableButton = $("<button/>").attr("id", "createTable-"+round)
             .on('click', function () { createTable(round) })
-            .addClass("btn btn-outline-secondary bg-info btn-sm mt-2 w-100")
+            .addClass("btn btn-outline-secondary text-dark bg-info btn-sm mt-2 w-100")
             .text("Create Table");
         let divForPlayers = $("<div/>").attr("id","tourPlayer-"+round);
         let divForTabels = $("<div/>").addClass("card-body p-1 grid").attr("id","tableTour-"+round).css({"--bs-columns": "3", "--bs-gap": "0.5rem"});
@@ -712,7 +712,7 @@ function callbackShowTables(data) {
 function removeTableButton(indexRound, divRound, list) {
     return $("<button/>")
         .text("Remove Table")
-        .addClass("btn btn-outline-secondary bg-warning btn-sm mt-1 mb-1")
+        .addClass("btn btn-outline-secondary text-dark bg-warning btn-sm mt-1 mb-1")
         .on('click', function () {
             list.each(function(index, ul) {
                 $("#"+"tourPlayer-"+indexRound).append($(ul).find("li"));
