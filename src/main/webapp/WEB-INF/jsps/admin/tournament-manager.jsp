@@ -23,6 +23,7 @@
     <div id="saveTables" class="d-flex justify-content-between d-none">
       <button onclick="saveTables()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Save Tables</button>
       <button onclick="downloadCurrentTables()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Download Tables</button>
+      <button onclick="showCurrentTables()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Show Tables</button>
     </div>
     <div id="saveFinal" class="d-flex justify-content-between d-none">
       <button onclick="saveFinal()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Save Final</button>
