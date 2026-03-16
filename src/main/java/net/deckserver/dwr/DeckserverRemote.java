@@ -171,7 +171,7 @@ public class DeckserverRemote {
     /**
      * Get all Registered Tournament Players from a Tournament
      */
-    public Set<TournamentRegistration> getTournamentPlayers(String nameOfTournament) {
+    public List<TournamentRegistration> getTournamentPlayers(String nameOfTournament) {
         return TournamentService.getRegistrations(nameOfTournament);
     }
 

@@ -139,8 +139,8 @@ public class TournamentService extends PersistedService {
         return INSTANCE.tournaments.get(tournament).getRegistration(player);
     }
 
-    public static Set<TournamentRegistration> getRegistrations(String tournament) {
-        return INSTANCE.tournaments.get(tournament).getRegistrations();
+    public static List<TournamentRegistration> getRegistrations(String tournament) {
+        return INSTANCE.tournaments.get(tournament).getRegistrations().stream().sorted(Comparator.comparing(TournamentRegistration::getPlayer, String.CASE_INSENSITIVE_ORDER)).toList();
     }
 
     public static ExtendedDeck getTournamentDeck(String name, String deckId) {
