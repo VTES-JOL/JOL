@@ -138,6 +138,7 @@ public class JolAdmin {
             deckName = deckName.trim();
             ExtendedDeck deck = DeckParser.parseDeck(contents);
             deck.getDeck().setName(deckName);
+            deck.getDeck().setAuthor(playerName);
             PlayerModel playerModel = getPlayerModel(playerName);
             playerModel.setDeck(deck);
             playerModel.setContents(contents);

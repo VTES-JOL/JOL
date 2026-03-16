@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Objects;
@@ -40,29 +39,28 @@ public class DeckService extends PersistedService {
         upgrade();
     }
 
-    public static  DeckInfo get(String playerName, String deckName) {
+    public static DeckInfo get(String playerName, String deckName) {
         return INSTANCE.decks.get(playerName, deckName);
     }
 
-    public static  void addDeck(String playerName, String deckName, DeckInfo deckInfo) {
+    public static void addDeck(String playerName, String deckName, DeckInfo deckInfo) {
         INSTANCE.decks.put(playerName, deckName, deckInfo);
     }
 
-    public static  void remove(String playerName, String deckName) {
+    public static void remove(String playerName, String deckName) {
         INSTANCE.decks.remove(playerName, deckName);
     }
 
-    public static  Set<String> getPlayerDeckNames(String playerName) {
+    public static Set<String> getPlayerDeckNames(String playerName) {
         return INSTANCE.decks.row(playerName).keySet();
     }
 
-    public static  Map<String, DeckInfo> getPlayerDecks(String playerName) {
+    public static Map<String, DeckInfo> getPlayerDecks(String playerName) {
         return INSTANCE.decks.row(playerName);
     }
 
-    public static  ExtendedDeck getDeck(String deckId) {
-        String deckString = String.format("decks/%s.json", deckId);
-        Path deckPath = DataPaths.baseDir().resolve(deckString);
+    public static ExtendedDeck getDeck(String deckId) {
+        Path deckPath = DataPaths.path("decks", deckId + ".json");
         try {
             return objectMapper.readValue(deckPath.toFile(), ExtendedDeck.class);
         } catch (IOException e) {
@@ -70,7 +68,7 @@ public class DeckService extends PersistedService {
         }
     }
 
-    public static  String getDeckContents(String deckId) throws IOException {
+    public static String getDeckContents(String deckId) throws IOException {
         ExtendedDeck deck = getDeck(deckId);
         StringBuilder builder = new StringBuilder();
         Consumer<CardCount> itemBuilder = cardCount -> builder.append(cardCount.getCount()).append(" x ").append(cardCount.getName()).append("\n");
@@ -80,12 +78,12 @@ public class DeckService extends PersistedService {
         return builder.toString();
     }
 
-    public static  String getLegacyContents(String deckId) throws IOException {
+    public static String getLegacyContents(String deckId) throws IOException {
         Path deckPath = DataPaths.path("decks", deckId + ".txt");
         return Files.readString(deckPath);
     }
 
-    public static  ExtendedDeck getGameDeck(String gameId, String deckId) {
+    public static ExtendedDeck getGameDeck(String gameId, String deckId) {
         try {
             Path gameDeckPath = DataPaths.path("games", gameId, deckId + ".json");
             return objectMapper.readValue(gameDeckPath.toFile(), ExtendedDeck.class);
@@ -94,7 +92,7 @@ public class DeckService extends PersistedService {
         }
     }
 
-    public static  void saveDeck(String deckId, ExtendedDeck deck) {
+    public static void saveDeck(String deckId, ExtendedDeck deck) {
         try {
             Path deckPath = DataPaths.path("decks", deckId + ".json");
             objectMapper.writeValue(deckPath.toFile(), deck);
@@ -103,7 +101,7 @@ public class DeckService extends PersistedService {
         }
     }
 
-    public static  boolean copyDeck(String deckId, String gameId) {
+    public static boolean copyDeck(String deckId, String gameId) {
         try {
             Path deckPath = DataPaths.path("decks", deckId + ".json");
             Path gamePath = DataPaths.path("games", gameId, deckId + ".json");
