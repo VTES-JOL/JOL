@@ -32,13 +32,15 @@ public class NavBean {
             game = model.getCurrentGame();
         if (player != null) {
             chats = model.hasChats();
-            boolean isAdmin = JolAdmin.isAdmin(player);
             buttons.add("active:Watch");
             buttons.add("deck:Decks");
             buttons.add("profile:Profile");
             buttons.add("lobby:Lobby");
             buttons.add("tournament:Tournament");
-            if (isAdmin) {
+            if (JolAdmin.isTournamentAdmin(player)) {
+                buttons.add("tournamentAdmin:Tournament Admin");
+            }
+            if (JolAdmin.isAdmin(player)) {
                 buttons.add("admin:Admin");
             }
             RegistrationService.getPlayerGames(player).stream()

@@ -8,11 +8,9 @@
         <jsp:include page="replace-player.jsp"/>
         <jsp:include page="end-turn.jsp"/>
         <jsp:include page="rollback-game.jsp"/>
-        <jsp:include page="idle-games.jsp"/>
-        <jsp:include page="idle-players.jsp"/>
     </div>
     <div class="col-sm-4">
-        <jsp:include page="tournament-manager.jsp"/>
-        <jsp:include page="tournament-admin.jsp"/>
+        <jsp:include page="idle-games.jsp"/>
+        <jsp:include page="idle-players.jsp"/>
     </div>
 </div>

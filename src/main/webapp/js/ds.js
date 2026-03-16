@@ -612,6 +612,10 @@ function callbackTableManager(data) {
     })
 }
 
+function callbackTournamentAdmin(data) {
+
+}
+
 function createTable(round) {
     let table = $("#"+"tableTour-"+round);
     let divRound = $("<li/>")

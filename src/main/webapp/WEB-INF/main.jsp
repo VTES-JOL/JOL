@@ -56,6 +56,10 @@
             <jsp:include page="/WEB-INF/jsps/admin/layout.jsp"/>
         </div>
 
+        <div id="tournamentAdmin" style="display: none;">
+            <jsp:include page="/WEB-INF/jsps/tournament-admin/layout.jsp"/>
+        </div>
+
         <div id="tournament" style="display: none">
             <jsp:include page="/WEB-INF/jsps/tournament/layout.jsp"/>
         </div>

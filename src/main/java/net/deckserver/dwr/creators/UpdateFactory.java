@@ -22,6 +22,7 @@ public class UpdateFactory {
         viewMap.put("deck", new DeckCreator());
         viewMap.put("lobby", new LobbyCreator());
         viewMap.put("admin", new AdminCreator());
+        viewMap.put("tournamentAdmin", new TournamentAdminCreator());
         viewMap.put("profile", new ProfileCreator());
         viewMap.put("active", new AllGamesCreator());
         viewMap.put("super", new SuperCreator());
