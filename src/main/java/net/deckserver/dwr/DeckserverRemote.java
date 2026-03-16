@@ -495,20 +495,29 @@ public class DeckserverRemote {
         return TournamentService.getTournament(tourName).getRounds();
     }
 
-    public Map<Integer, List<String>> getRegDelta(String tourName, int roundNumber) {
-        //create List of all Players assigned to a Table
-        List<String> tablePlayers = new ArrayList<>();
+    public Map<Integer, List<TournamentRegistration>> getRegDelta(String tourName, int roundNumber) {
+        //create Set of all Players assigned to a Table
+        List<TournamentRegistration> tablePlayers = new ArrayList<>();
         getRoundsForTournament(tourName).get(roundNumber).values().stream()
                 .forEach(tournamentPlayers ->
-                        tablePlayers.addAll(tournamentPlayers.stream().map(TournamentPlayer::getName).collect(Collectors.toList())));
+                        tablePlayers.addAll(tournamentPlayers.stream().map(player -> {
+                            TournamentRegistration tournamentRegistration = new TournamentRegistration();
+                            tournamentRegistration.setPlayer(player.getName());
+                            tournamentRegistration.setVekn(PlayerService.get(player.getName()).getVeknId());
+                            return tournamentRegistration;
+                        }).collect(Collectors.toSet())));
         //get all Players registered
-        List<String> regPlayers = getTournamentPlayers(tourName).stream().map(TournamentRegistration::getPlayer).collect(Collectors.toList());
+        List<TournamentRegistration> regPlayers = getTournamentPlayers(tourName).stream().collect(Collectors.toList());
         //get Delta of registered Players minus the players assigned to a table
         regPlayers.removeAll(tablePlayers);
         //create a Map with the round number as key and the delta as value
-        HashMap<Integer, List<String>> regPlayersMap = new HashMap<>();
+        HashMap<Integer, List<TournamentRegistration>> regPlayersMap = new HashMap<>();
         regPlayersMap.put(roundNumber, regPlayers);
         return regPlayersMap;
+    }
+
+    public String getVekn(String playerName) {
+        return PlayerService.get(playerName).getVeknId();
     }
 
     public String exportPastGamesAsCsv() throws IOException {
