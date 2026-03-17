@@ -577,17 +577,20 @@ function callbackTournamentRounds(data) {
     let tourRounds = $("#tourRounds");
     tourRounds.empty();
     $.each(data, function (index, round) {
-        let div = $("<div/>").attr("id","tourAllTables");
+        let div = $("<div/>").attr("id","tourAllTables-"+round);
         let label = $("<span/>").addClass("h4").text("Round "+round);
         let createTableButton = $("<button/>").attr("id", "createTable-"+round)
             .on('click', function () { createTable(round) })
             .addClass("btn btn-outline-secondary text-dark bg-info btn-sm mt-2 w-100")
             .text("Create Table");
         let divForPlayers = $("<div/>").attr("id","tourPlayer-"+round);
-        let divForTabels = $("<ol/>").addClass("card-body p-1 grid").attr("id","tableTour-"+round)
-            .css({"--bs-columns": "3", "--bs-gap": "0.5rem"})
-            .css("list-style-position","inside");
-        divForTabels.sortable();
+        let divForTabels = $("<ol/>").addClass("card-body p-1 grid")
+            .attr("id","tableTour-"+round)
+            .css({"--bs-columns": "4", "--bs-gap": "0.5rem"})
+            .css("list-style-position","inside")
+        divForTabels.sortable({
+            handle: ".bi-grip-vertical",
+            dropOnEmpty: true});
         div.append(label, createTableButton, divForPlayers, divForTabels);
         tourRounds.append(div);
     });
@@ -596,16 +599,20 @@ function callbackTournamentRounds(data) {
 function callbackTableManager(data) {
     $("#tourRounds div").each(function (index) {
         let roundNumber = parseInt(index)+1;
-        let players = $("#"+"tourPlayer-"+roundNumber).addClass("card-body p-1 grid sortable").css({"--bs-columns": "3", "--bs-gap": "0.5rem"});
+        let players = $("#"+"tourPlayer-"+roundNumber)
+            .addClass("card-body p-1 grid sortable")
+            .css({"--bs-columns": "4", "--bs-gap": "0.5rem"});
         players.empty();
         players.addClass("sortable"+roundNumber);
         players.sortable({
             connectWith: ".sortable"+roundNumber,
+            handle: ".bi-grip-vertical",
             dropOnEmpty: true});
         $.each(data, function(index, reg) {
             let listItem = $("<li/>")
-                .text(reg.player)
-                .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center");
+                .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center")
+                .append("<div class='d-flex flex-column'><span data-player='"+reg.player+"'>"+reg.player+"</span><span class='fw-bold'>"+reg.vekn+"</span></div>")
+                .append("<i class='bi bi-grip-vertical'></i>");
             listItem.disableSelection();
             players.append(listItem);
         });
@@ -619,13 +626,15 @@ function callbackTournamentAdmin(data) {
 function createTable(round) {
     let table = $("#"+"tableTour-"+round);
     let divRound = $("<li/>")
-        .addClass("card-body text-center border border-success p-1");
-    let label = $("<span/>").addClass("h5").text("Table");
+        .addClass("card-body border border-success p-1")
+        .append("<i class='bi bi-grip-vertical'></i>");
+    let label = $("<span/>").addClass("h5").text("Table").append($("<br/>"));
     let list = $("<ul/>").addClass("border list-group sortable"+round)
         .attr("round", round)
         .css("min-height","38px");
     list.sortable({
         connectWith: ".sortable"+round,
+        handle: ".bi-grip-vertical",
         dropOnEmpty: true});
     let removeTable = removeTableButton(round, divRound, list)
     divRound.append(label, removeTable, list);
@@ -662,19 +671,16 @@ function addRule(rulesInput, rulesCon) {
 
 function saveTables() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
-    let tableNumber = 1;
-    let lastRoundNumber;
-    $("#tourRounds ul").each(function(round, ul) {
+    DS.resetTables();
+    $("#tourRounds ul").each(function(index, ul) {
         let players = new Array();
+        let tableNumber;
         $.each($(ul).find("li"), function(table, player) {
-            players.push(player.textContent);
+            players.push($(player).find("[data-player]").attr("data-player"));
+            tableNumber = $(ul).parents("li").index()+1;
         })
-        if(lastRoundNumber < $(ul).attr("round")) {
-            tableNumber = 1;
-        }
-        DS.prepareTable(tournamentSelected, $(ul).attr("round"), tableNumber, players, {callback: processData, errorHandler: errorhandler});
-        tableNumber++
-        lastRoundNumber = $(ul).attr("round");
+        let round = $(ul).attr("round");
+        DS.prepareTable(tournamentSelected, round , tableNumber, players);
     })
     DS.saveTables(tournamentSelected);
     //reset
@@ -698,19 +704,25 @@ function callbackShowTables(data) {
         let tables = $("#"+"tableTour-"+indexRound);
         tables.empty();
         $.each(round, function (indexTable, table) {
-            let divRound = $("<li/>").addClass("card-body text-center border border-success p-1");
+            let divRound = $("<li/>").addClass("card-body border border-success p-1")
+                .append("<i class='bi bi-grip-vertical'></i>");
             let label = $("<span/>").text("Table").addClass("h5").append($("<br/>"));
             let list = $("<ul/>").addClass("border list-group sortable"+indexRound)
                 .attr("round", indexRound)
                 .css("min-height","38px");
             list.sortable({
                 connectWith: ".sortable"+indexRound,
+                handle: ".bi-grip-vertical",
                 dropOnEmpty: true});
             let removeTable = removeTableButton(indexRound, divRound, list)
             $.each(table, function(index, player) {
                 let listItem = $("<li/>")
-                    .text(player.name)
                     .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center");
+                DS.getVekn(player.name, {callback: function setVeknId (veknId) {
+                        listItem
+                            .append("<div class='d-flex flex-column'><span data-player='"+player.name+"'>"+player.name+"</span><span class='fw-bold'>"+veknId+"</span></div>")
+                            .append("<i class='bi bi-grip-vertical'></i>");
+                    }, errorHandler: errorhandler});
                 listItem.disableSelection();
                 list.append(listItem);
             });
@@ -736,16 +748,20 @@ function removeTableButton(indexRound, divRound, list) {
 
 function callbackShowPlayers(data) {
     $.each(data, function(index, round) {
-        let players = $("#"+"tourPlayer-"+index).addClass("card-body p-1 grid sortable").css({"--bs-columns": "3", "--bs-gap": "0.5rem"});
+        let players = $("#"+"tourPlayer-"+index)
+            .addClass("card-body p-1 grid sortable")
+            .css({"--bs-columns": "4", "--bs-gap": "0.5rem"});
         players.empty();
         players.addClass("sortable"+index);
         players.sortable({
             connectWith: ".sortable"+index,
+            handle: ".bi-grip-vertical",
             dropOnEmpty: true});
         $.each(round, function(index, player) {
             let listItem = $("<li/>")
-                .text(player)
-                .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center");
+                .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center")
+                .append("<div class='d-flex flex-column'><span data-player='"+player.player+"'>"+player.player+"</span><span class='fw-bold'>"+player.vekn+"</span></div>")
+                .append("<i class='bi bi-grip-vertical'></i>");
             listItem.disableSelection();
             players.append(listItem);
         })
@@ -764,15 +780,17 @@ function createCsvDownloadLink(data) {
 }
 
 function callbackFinal(data) {
-    let players = $("#finalPlayers").css({"--bs-columns": "3", "--bs-gap": "0.5rem"});
+    let players = $("#finalPlayers").css({"--bs-columns": "4", "--bs-gap": "0.5rem"});
     players.empty();
     players.sortable({
         connectWith: ".sortableFinal",
+        handle: ".bi-grip-vertical",
         dropOnEmpty: true});
     $.each(data, function(index, reg) {
         let listItem = $("<li/>")
             .text(reg.player)
-            .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center");
+            .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center")
+            .append("<i class='bi bi-grip-vertical'></i>");;
         listItem.disableSelection();
         players.append(listItem);
     });
@@ -780,6 +798,7 @@ function callbackFinal(data) {
     let list = $("#finalTable")
     list.sortable({
         connectWith: ".sortableFinal",
+        handle: ".bi-grip-vertical",
         dropOnEmpty: true});
     $("#tourFinal").removeClass("d-none");
 }

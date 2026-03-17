@@ -178,7 +178,11 @@ public class TournamentService extends PersistedService {
         getTournament(tourName).setRounds(INSTANCE.rounds);
     }
 
-    public static void prepareRounds(Integer round, HashMap<Integer, List<TournamentPlayer>> table) {
+    public static void clearRounds() {
+         INSTANCE.rounds.clear();
+    }
+
+    public static void prepareRounds(Integer round, Map<Integer, List<TournamentPlayer>> table) {
         if(INSTANCE.rounds.containsKey(round)){
             INSTANCE.rounds.get(round).putAll(table);
         } else {
