@@ -198,6 +198,13 @@ public class DeckserverRemote {
     }
 
     /**
+     * Clear rounds in Tournamen Service
+     */
+    public void resetTables() {
+        TournamentService.clearRounds();
+    }
+
+    /**
      * Save Final seeding of a Tournament
      */
     public void saveFinal(String tourName, String[] players) {

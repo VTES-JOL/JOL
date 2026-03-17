@@ -577,7 +577,7 @@ function callbackTournamentRounds(data) {
     let tourRounds = $("#tourRounds");
     tourRounds.empty();
     $.each(data, function (index, round) {
-        let div = $("<div/>").attr("id","tourAllTables");
+        let div = $("<div/>").attr("id","tourAllTables-"+round);
         let label = $("<span/>").addClass("h4").text("Round "+round);
         let createTableButton = $("<button/>").attr("id", "createTable-"+round)
             .on('click', function () { createTable(round) })
@@ -586,9 +586,8 @@ function callbackTournamentRounds(data) {
         let divForPlayers = $("<div/>").attr("id","tourPlayer-"+round);
         let divForTabels = $("<ol/>").addClass("card-body p-1 grid")
             .attr("id","tableTour-"+round)
-            .css({"--bs-columns": "3", "--bs-gap": "0.5rem"})
+            .css({"--bs-columns": "4", "--bs-gap": "0.5rem"})
             .css("list-style-position","inside")
-            .append("<i class='bi bi-grip-vertical'></i>");
         divForTabels.sortable({
             handle: ".bi-grip-vertical",
             dropOnEmpty: true});
@@ -602,7 +601,7 @@ function callbackTableManager(data) {
         let roundNumber = parseInt(index)+1;
         let players = $("#"+"tourPlayer-"+roundNumber)
             .addClass("card-body p-1 grid sortable")
-            .css({"--bs-columns": "3", "--bs-gap": "0.5rem"});
+            .css({"--bs-columns": "4", "--bs-gap": "0.5rem"});
         players.empty();
         players.addClass("sortable"+roundNumber);
         players.sortable({
@@ -629,7 +628,7 @@ function createTable(round) {
     let divRound = $("<li/>")
         .addClass("card-body border border-success p-1")
         .append("<i class='bi bi-grip-vertical'></i>");
-    let label = $("<span/>").addClass("h5").text("Table");
+    let label = $("<span/>").addClass("h5").text("Table").append($("<br/>"));
     let list = $("<ul/>").addClass("border list-group sortable"+round)
         .attr("round", round)
         .css("min-height","38px");
@@ -672,19 +671,16 @@ function addRule(rulesInput, rulesCon) {
 
 function saveTables() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
-    let tableNumber = 1;
-    let lastRoundNumber;
-    $("#tourRounds ul").each(function(round, ul) {
+    DS.resetTables();
+    $("#tourRounds ul").each(function(index, ul) {
         let players = new Array();
+        let tableNumber;
         $.each($(ul).find("li"), function(table, player) {
             players.push($(player).find("[data-player]").attr("data-player"));
+            tableNumber = $(ul).parents("li").index()+1;
         })
-        if(lastRoundNumber < $(ul).attr("round")) {
-            tableNumber = 1;
-        }
-        DS.prepareTable(tournamentSelected, $(ul).attr("round"), tableNumber, players, {callback: processData, errorHandler: errorhandler});
-        tableNumber++
-        lastRoundNumber = $(ul).attr("round");
+        let round = $(ul).attr("round");
+        DS.prepareTable(tournamentSelected, round , tableNumber, players);
     })
     DS.saveTables(tournamentSelected);
     //reset
@@ -754,7 +750,7 @@ function callbackShowPlayers(data) {
     $.each(data, function(index, round) {
         let players = $("#"+"tourPlayer-"+index)
             .addClass("card-body p-1 grid sortable")
-            .css({"--bs-columns": "3", "--bs-gap": "0.5rem"});
+            .css({"--bs-columns": "4", "--bs-gap": "0.5rem"});
         players.empty();
         players.addClass("sortable"+index);
         players.sortable({
@@ -784,7 +780,7 @@ function createCsvDownloadLink(data) {
 }
 
 function callbackFinal(data) {
-    let players = $("#finalPlayers").css({"--bs-columns": "3", "--bs-gap": "0.5rem"});
+    let players = $("#finalPlayers").css({"--bs-columns": "4", "--bs-gap": "0.5rem"});
     players.empty();
     players.sortable({
         connectWith: ".sortableFinal",
