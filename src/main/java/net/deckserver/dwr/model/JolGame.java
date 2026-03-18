@@ -75,6 +75,7 @@ public record JolGame(String id, GameData data) {
         data.getCurrentPlayers().forEach(playerData -> {
             playerData.addVictoryPoints(0.5f);
             playerData.setPool(0);
+            playerData.setOusted(true);
         });
         ChatService.sendSystemMessage(id, "Game has timed out.  Surviving players have been awarded ½ VP.");
     }
