@@ -131,7 +131,7 @@ public class DeckserverRemote {
      */
     public boolean createTournament(String tourName, String regStart, String regEnd, String playStart, String playEnd, String tourFormat, String gameFormat, String[] rules, String specRulesCon, String[] specRules, String numberOfRounds, String reqId) {
         try {
-            Set<TournamentRegistration> registrations = TournamentService.getRegistrations(tourName).stream().collect(Collectors.toSet());
+            Set<TournamentRegistration> existingRegistrations = new HashSet<>(TournamentService.getRegistrations(tourName));
             //Prepare Tournament Definition
             TournamentDefinition newTournament = TournamentDefinitionCreator.newTourDef()
                     .withName(tourName)
@@ -144,14 +144,15 @@ public class DeckserverRemote {
                     .withRules(rules)
                     .withStatus(GameStatus.STARTING)
                     .withSpecRules(specRulesCon, specRules)
-                    .withNumberOfRounds(Integer.valueOf(numberOfRounds))
+                    .withNumberOfRounds(Integer.parseInt(numberOfRounds))
                     .withReqId(Boolean.getBoolean(reqId))
-                    .withRegistrations(registrations)
+                    .withRegistrations(existingRegistrations)
                     .getTourDef();
             //create or replace existing Tournament (key -> Tournament Name)
             TournamentService.createTournament(newTournament);
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -206,30 +207,30 @@ public class DeckserverRemote {
      * @param rounds
      * @throws JsonProcessingException
      */
-    public void saveTables(String tourName, String rounds) {
+    public void saveTables(String tourName, Map<Integer, Map<Integer, List<String>>> rounds) {
         //final new Rounds Table Config
         Map<Integer, Map<Integer, List<TournamentPlayer>>> newRoundsConfig = new HashMap<>();
-        try {
-            //replace String values with Integer keys and List<TournamenPlayer>
-            new ObjectMapper().readValue(rounds, Map.class).forEach((key, value   ) -> {
-                try {
-                    Map<Integer, List<TournamentPlayer>> tournamentPlayers = new HashMap<>();
-                    Map<String, List<String>> table = new ObjectMapper().readValue((String)value, Map.class);
-                    table.forEach((s, list) -> {
-                        tournamentPlayers.put(Integer.valueOf(s), list.stream().map(player -> {
-                            TournamentPlayer tp = new TournamentPlayer();
-                            tp.setName(player);
-                            return tp;
-                        }).collect(Collectors.toList()));
-                    });
-                    newRoundsConfig.put(Integer.valueOf((String) key), tournamentPlayers);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            //replace String values with Integer keys and List<TournamenPlayer>
+//            new ObjectMapper().readValue(rounds, Map.class).forEach((key, value   ) -> {
+//                try {
+//                    Map<Integer, List<TournamentPlayer>> tournamentPlayers = new HashMap<>();
+//                    Map<String, List<String>> table = new ObjectMapper().readValue((String)value, Map.class);
+//                    table.forEach((s, list) -> {
+//                        tournamentPlayers.put(Integer.valueOf(s), list.stream().map(player -> {
+//                            TournamentPlayer tp = new TournamentPlayer();
+//                            tp.setName(player);
+//                            return tp;
+//                        }).collect(Collectors.toList()));
+//                    });
+//                    newRoundsConfig.put(Integer.valueOf((String) key), tournamentPlayers);
+//                } catch (JsonProcessingException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            });
+//        } catch (JsonProcessingException e) {
+//            throw new RuntimeException(e);
+//        }
         //save new round Config
         TournamentService.getTournament(tourName).setRounds(newRoundsConfig);
     }

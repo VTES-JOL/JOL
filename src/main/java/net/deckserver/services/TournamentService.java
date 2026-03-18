@@ -139,7 +139,10 @@ public class TournamentService extends PersistedService {
     }
 
     public static List<TournamentRegistration> getRegistrations(String tournament) {
-        return INSTANCE.tournaments.get(tournament).getRegistrations().stream().sorted(Comparator.comparing(TournamentRegistration::getPlayer, String.CASE_INSENSITIVE_ORDER)).toList();
+        return Optional.ofNullable(INSTANCE.tournaments.get(tournament))
+                .map(TournamentDefinition::getRegistrations)
+                .orElse(new HashSet<>())
+                .stream().sorted(Comparator.comparing(TournamentRegistration::getPlayer, String.CASE_INSENSITIVE_ORDER)).toList();
     }
 
     public static ExtendedDeck getTournamentDeck(String name, String deckId) {
