@@ -618,6 +618,40 @@ public class DoCommandTest {
     }
 
     @Test
+    void playerSkipOnOust() throws CommandException {
+        // *Player2* -> Player4 -> Player5 -> Player3 -> Player1
+        assertThat(game.getPool("Player4"), is(22));
+        assertThat(game.getActivePlayer(), is("Player2"));
+        assertThat(game.data().getCurrentPlayer().getPrey().getName(), is("Player4"));
+        worker.doCommand("Player4", "pool -22");
+        assertThat(game.getPool("Player4"), is(0));
+        assertTrue(game.data().getPlayer("Player4").isOusted());
+        assertThat(game.getActivePlayer(), is("Player2"));
+        // *Player2* -> Player5 -> Player3 -> Player1
+        assertThat(game.data().getCurrentPlayer().getPrey().getName(), is("Player5"));
+        assertThat(getLastMessage(), containsString("pool was 22, now is 0."));
+        game.newTurn();
+        // Player2 -> *Player5* -> Player3 -> Player1
+        assertThat(game.getActivePlayer(), is("Player5"));
+        assertThat(game.getValidPlayers().size(), is(4));
+        worker.doCommand("Player4", "pool +22");
+        assertFalse(game.data().getPlayer("Player4").isOusted());
+        assertThat(game.getValidPlayers().size(), is(5));
+        game.newTurn();
+        // Player2 -> Player4 -> Player5 -> *Player3* -> Player1
+        assertThat(game.getActivePlayer(), is("Player3"));
+        game.newTurn();
+        // Player2 -> Player4 -> Player5 -> Player3 -> *Player1*
+        assertThat(game.getActivePlayer(), is("Player1"));
+        game.newTurn();
+        // *Player2* -> Player4 -> Player5 -> Player3 -> Player1
+        assertThat(game.getActivePlayer(), is("Player2"));
+        game.newTurn();
+        // Player2 -> *Player4* -> Player5 -> Player3 -> Player1
+        assertThat(game.getActivePlayer(), is("Player4"));
+    }
+
+    @Test
     void poolNeedsSign() {
         assertThrows(CommandException.class, () -> worker.doCommand("Player4", "pool 3"));
     }

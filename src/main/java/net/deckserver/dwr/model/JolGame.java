@@ -75,6 +75,7 @@ public record JolGame(String id, GameData data) {
         data.getCurrentPlayers().forEach(playerData -> {
             playerData.addVictoryPoints(0.5f);
             playerData.setPool(0);
+            playerData.setOusted(true);
         });
         ChatService.sendSystemMessage(id, "Game has timed out.  Surviving players have been awarded ½ VP.");
     }
@@ -212,6 +213,10 @@ public record JolGame(String id, GameData data) {
     }
 
     public void startGame(List<String> playerSeating) {
+        startGame(playerSeating, false);
+    }
+
+    public void startGame(List<String> playerSeating, boolean tournamentMode) {
         List<String> players = data.getPlayerNames();
         if (playerSeating.size() != players.size() || !new HashSet<>(players).containsAll(playerSeating)) {
             throw new IllegalArgumentException("Player ordering not valid, does not contain current players");
@@ -221,11 +226,19 @@ public record JolGame(String id, GameData data) {
             PlayerData playerData = data.getPlayer(player);
             playerData.getRegion(RegionType.CRYPT).shuffle(0);
             playerData.getRegion(RegionType.LIBRARY).shuffle(0);
-            for (int j = 0; j < 4; j++) {
-                _drawCard(player, RegionType.CRYPT, RegionType.UNCONTROLLED, false);
+            if (!tournamentMode) {
+                for (int j = 0; j < 4; j++) {
+                    _drawCard(player, RegionType.CRYPT, RegionType.UNCONTROLLED, false);
+                }
+            } else {
+                for (int j = 0; j < 3; j++) {
+                    _drawCard(player, RegionType.CRYPT, RegionType.READY, false);
+                }
             }
-            for (int j = 0; j < 7; j++) {
-                _drawCard(player, RegionType.LIBRARY, RegionType.HAND, false);
+            if (!tournamentMode) {
+                for (int j = 0; j < 7; j++) {
+                    _drawCard(player, RegionType.LIBRARY, RegionType.HAND, false);
+                }
             }
         }
         newTurn();

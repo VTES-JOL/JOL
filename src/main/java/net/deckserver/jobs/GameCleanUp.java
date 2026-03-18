@@ -44,8 +44,9 @@ public class GameCleanUp implements Runnable {
         // Close finished games
         GameService.getActiveGames()
                 .forEach(gameName -> {
-                    GameSummary summary = GameService.getSummary(gameName);
-                    if (summary.getPlayers().isEmpty()) {
+                    GameInfo info = GameService.get(gameName);
+                    JolGame game = GameService.getGame(info.getId());
+                    if (game.getValidPlayers().isEmpty()) {
                         logger.info("Closing finished game {}", gameName);
                         JolAdmin.endGame(gameName, true);
                         GlobalChatService.chat("SYSTEM", String.format("%s has been closed.", gameName));
