@@ -1,5 +1,7 @@
 package net.deckserver.dwr;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.DeckInfoBean;
@@ -13,7 +15,6 @@ import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.PlayerRole;
 import net.deckserver.game.enums.TournamentFormat;
 import net.deckserver.storage.json.system.TournamentDetails;
-import net.deckserver.jobs.TournamentJob;
 import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
@@ -130,6 +131,7 @@ public class DeckserverRemote {
      */
     public boolean createTournament(String tourName, String regStart, String regEnd, String playStart, String playEnd, String tourFormat, String gameFormat, String[] rules, String specRulesCon, String[] specRules, String numberOfRounds, String reqId) {
         try {
+            Set<TournamentRegistration> registrations = TournamentService.getRegistrations(tourName).stream().collect(Collectors.toSet());
             //Prepare Tournament Definition
             TournamentDefinition newTournament = TournamentDefinitionCreator.newTourDef()
                     .withName(tourName)
@@ -144,6 +146,7 @@ public class DeckserverRemote {
                     .withSpecRules(specRulesCon, specRules)
                     .withNumberOfRounds(Integer.valueOf(numberOfRounds))
                     .withReqId(Boolean.getBoolean(reqId))
+                    .withRegistrations(registrations)
                     .getTourDef();
             //create or replace existing Tournament (key -> Tournament Name)
             TournamentService.createTournament(newTournament);
@@ -191,17 +194,44 @@ public class DeckserverRemote {
     }
 
     /**
-     * Save Table configuration for a Tournament
+     * Clear rounds in Tournamen Service
      */
-    public void saveTables(String tourName) {
-        TournamentService.setRounds(tourName);
+    public void resetTables(String tourName) {
+        TournamentService.getTournament(tourName).resetRounds();
     }
 
     /**
-     * Clear rounds in Tournamen Service
+     * Saves current UI Tables
+     * @param tourName
+     * @param rounds
+     * @throws JsonProcessingException
      */
-    public void resetTables() {
-        TournamentService.clearRounds();
+    public void saveTables(String tourName, String rounds) {
+        //final new Rounds Table Config
+        Map<Integer, Map<Integer, List<TournamentPlayer>>> newRoundsConfig = new HashMap<>();
+        try {
+            //replace String values with Integer keys and List<TournamenPlayer>
+            new ObjectMapper().readValue(rounds, Map.class).forEach((key, value   ) -> {
+                try {
+                    Map<Integer, List<TournamentPlayer>> tournamentPlayers = new HashMap<>();
+                    Map<String, List<String>> table = new ObjectMapper().readValue((String)value, Map.class);
+                    table.forEach((s, list) -> {
+                        tournamentPlayers.put(Integer.valueOf(s), list.stream().map(player -> {
+                            TournamentPlayer tp = new TournamentPlayer();
+                            tp.setName(player);
+                            return tp;
+                        }).collect(Collectors.toList()));
+                    });
+                    newRoundsConfig.put(Integer.valueOf((String) key), tournamentPlayers);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        //save new round Config
+        TournamentService.getTournament(tourName).setRounds(newRoundsConfig);
     }
 
     /**
@@ -213,22 +243,6 @@ public class DeckserverRemote {
             finals.setSeeding(List.of(players));
             TournamentService.getTournament(tourName).setFinals(finals);
         }
-    }
-
-    /**
-     * Prepare Table Configuration for a Tournament
-     */
-    public void prepareTable(String tourName, String roundNumber, String tableNumber, String[] players) {
-        List<TournamentPlayer> playersOnTable = new ArrayList<>();
-        for(String player : players) {
-            Optional<TournamentRegistration> registrations = TournamentService.getRegistrations(tourName, player);
-            TournamentPlayer tournamentPlayer = new TournamentPlayer();
-            tournamentPlayer.setName(registrations.get().getPlayer());
-            playersOnTable.add(tournamentPlayer);
-        }
-        HashMap<Integer, List<TournamentPlayer>> table = new HashMap<>();
-        table.put(Integer.valueOf(tableNumber), playersOnTable);
-        TournamentService.prepareRounds(Integer.valueOf(roundNumber), table);
     }
 
     public void setFinalSeating(String tourName, String[] players) {
@@ -502,7 +516,7 @@ public class DeckserverRemote {
         return TournamentService.getTournament(tourName).getRounds();
     }
 
-    public Map<Integer, List<TournamentRegistration>> getRegDelta(String tourName, int roundNumber) {
+    public Map<Integer, List<TournamentRegistration>> getRegDelta(String tourName, Integer roundNumber) {
         //create Set of all Players assigned to a Table
         List<TournamentRegistration> tablePlayers = new ArrayList<>();
         getRoundsForTournament(tourName).get(roundNumber).values().stream()
@@ -510,7 +524,6 @@ public class DeckserverRemote {
                         tablePlayers.addAll(tournamentPlayers.stream().map(player -> {
                             TournamentRegistration tournamentRegistration = new TournamentRegistration();
                             tournamentRegistration.setPlayer(player.getName());
-                            tournamentRegistration.setVekn(PlayerService.get(player.getName()).getVeknId());
                             return tournamentRegistration;
                         }).collect(Collectors.toSet())));
         //get all Players registered

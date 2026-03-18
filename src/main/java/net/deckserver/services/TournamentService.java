@@ -28,7 +28,6 @@ public class TournamentService extends PersistedService {
     private static final Path PERSISTENCE_PATH = DataPaths.path("tournaments.json");
     private static final TournamentService INSTANCE = new TournamentService();
     private final Map<String, TournamentDefinition> tournaments = new HashMap<>();
-    private final Map<Integer, Map<Integer, List<TournamentPlayer>>> rounds = new HashMap<>();
 
     private TournamentService() {
         super("TournamentService", 10);
@@ -171,23 +170,6 @@ public class TournamentService extends PersistedService {
 
     public static TournamentDefinition getTournament(String nameOfTournament) {
         return INSTANCE.tournaments.get(nameOfTournament);
-    }
-
-    public static void setRounds(String tourName) {
-        getTournament(tourName).resetRounds();
-        getTournament(tourName).setRounds(INSTANCE.rounds);
-    }
-
-    public static void clearRounds() {
-         INSTANCE.rounds.clear();
-    }
-
-    public static void prepareRounds(Integer round, Map<Integer, List<TournamentPlayer>> table) {
-        if(INSTANCE.rounds.containsKey(round)){
-            INSTANCE.rounds.get(round).putAll(table);
-        } else {
-            INSTANCE.rounds.put(round, table);
-        }
     }
 
     @Override
