@@ -671,7 +671,8 @@ function addRule(rulesInput, rulesCon) {
 
 function saveTables() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
-    DS.resetTables();
+    DS.resetTables(tournamentSelected);
+    let rounds = new Map();
     $("#tourRounds ul").each(function(index, ul) {
         let players = new Array();
         let tableNumber;
@@ -680,12 +681,32 @@ function saveTables() {
             tableNumber = $(ul).parents("li").index()+1;
         })
         let round = $(ul).attr("round");
-        DS.prepareTable(tournamentSelected, round , tableNumber, players);
+        if(rounds.get(round)==null) {
+            rounds.set(round, new Map().set(tableNumber, players));
+        } else {
+            rounds.get(round).set(tableNumber, players);
+        }
     })
-    DS.saveTables(tournamentSelected);
+    DS.saveTables(tournamentSelected, mapmaptojson(rounds));
     //reset
     let tourRounds = $("#tourRounds");
     tourRounds.empty();
+    $("#saveTables").addClass("d-none");
+}
+
+function mapmaptojson(map) {
+    const jsonObj = {};
+    map.forEach((value, key) => {
+            jsonObj[key] = maptojson(value);
+        });
+    return JSON.stringify(jsonObj);
+}
+function maptojson(map) {
+    const jsonObj = {};
+    map.forEach((value, key) => {
+            jsonObj[key] = value;
+        });
+    return JSON.stringify(jsonObj);
 }
 
 function downloadCurrentTables() {
