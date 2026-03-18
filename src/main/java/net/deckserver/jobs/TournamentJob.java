@@ -87,12 +87,13 @@ public class TournamentJob implements Runnable {
                     NotificationService.pingPlayer(playerName, null, gameName);
                 }
                 // Set order and start
-                jolGame.startGame(seeding);
+                jolGame.startGame(seeding, true);
                 // Save game
                 GameService.saveGame(jolGame);
                 // Update status
                 GameService.get(gameName).setStatus(GameStatus.ACTIVE);
                 GlobalChatService.chat("SYSTEM", String.format("Game %s started", gameName));
+                ChatService.sendSystemMessage(gameId, "Finals Seating has been activated.");
             }
         }
 
