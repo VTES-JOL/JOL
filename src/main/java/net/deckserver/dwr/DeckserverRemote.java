@@ -14,6 +14,7 @@ import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.PlayerRole;
 import net.deckserver.game.enums.TournamentFormat;
+import net.deckserver.storage.json.game.CardSimple;
 import net.deckserver.storage.json.system.TournamentDetails;
 import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.Deck;
@@ -157,6 +158,18 @@ public class DeckserverRemote {
         }
     }
 
+    public void createTournamentTables(String tourName) {
+        TournamentService.createTournamentTables(tourName);
+    }
+
+    public void createFinalTable(String tourName) {
+        TournamentService.createFinal(tourName);
+    }
+
+    public void setFinalSeeding(String tourName, String[] seeding) {
+        TournamentService.getTournament(tourName).getFinals().setSeeding(List.of(seeding));
+    }
+
     public TournamentDetails loadTournamentDetails(String tourName) {
         return new TournamentDetails(TournamentService.getTournament(tourName));
     }
@@ -239,16 +252,25 @@ public class DeckserverRemote {
      * Save Final seeding of a Tournament
      */
     public void saveFinal(String tourName, String[] players) {
-        if(GameService.getGameByName(tourName)==null) {
+        if(!GameService.existsGame(String.format("%s: Final Table", tourName))) {
             TournamentFinals finals = new TournamentFinals();
             finals.setSeeding(List.of(players));
             TournamentService.getTournament(tourName).setFinals(finals);
         }
     }
 
-    public void setFinalSeating(String tourName, String[] players) {
-        JolGame gameByName = GameService.getGameByName(tourName);
-        gameByName.setOrder("Tournament Manager", List.of(players));
+    public List<String> loadFinalSeeding(String tourName) {
+        return TournamentService.getTournament(tourName).getFinals().getSeeding();
+    }
+
+    public List<CardSimple> loadCrypt(String tourName, String player) {
+        String deck = TournamentService.getRegistrations(tourName, player).get().getDeck();
+        return TournamentService.getRandomCrypt(tourName, deck);
+    }
+
+    public String cryptCount(String tourName, String player) {
+        String deck = TournamentService.getRegistrations(tourName, player).get().getDeck();
+        return String.valueOf(TournamentService.getCryptCount(tourName, deck)-3);
     }
 
     public Boolean gameAlreadyStarted(String tourName) {

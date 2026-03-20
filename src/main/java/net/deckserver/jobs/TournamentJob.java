@@ -28,6 +28,46 @@ public class TournamentJob implements Runnable {
 
     @Override
     public void run() {
+
+        // Start tournaments -> disabled will be done manually
+        //startTournament();
+
+        // Create final tables -> disabled will be done manually
+        //startFinals();
+
+        // Check running tournaments have decks
+        checkForDecks();
+    }
+
+    private void checkForDecks() {
+        // Check running tournaments have decks
+        List<TournamentMetadata> runningTournaments = TournamentService.getActiveTournaments();
+        for (TournamentMetadata tournament : runningTournaments) {
+            String tournamentName = tournament.getName();
+            for (int round = 1; round <= tournament.getNumberOfRounds(); round++) {
+                for (int table = 1; table <= tournament.getNumberOfTables(); table++) {
+                    String gameName = String.format("%s: Round %d - Table %d", tournamentName, round, table);
+                    String gameId = GameService.get(gameName).getId();
+                    List<TournamentPlayer> players = TournamentService.getPlayers(tournamentName, round, table);
+                    for (TournamentPlayer player : players) {
+                        String playerName = player.getName();
+                        var registration = TournamentService.getRegistrations(tournamentName, playerName).orElseThrow();
+                        Path gameDeckPath = DataPaths.path("games", gameId, registration.getDeck() + ".json");
+                        Path tournamentDeckPath = DataPaths.path("tournaments", tournament.getId(), registration.getDeck() + ".json");                        if (!Files.exists(gameDeckPath)) {
+                            try {
+                                Files.copy(tournamentDeckPath, gameDeckPath, StandardCopyOption.REPLACE_EXISTING);
+                                log.info("Copying missing tournament game file for {} - {} Round {} - Table {}", tournamentName, playerName, round, table);
+                            } catch (IOException e) {
+                                log.error("Unable to copy tournament file");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void startTournament() {
         // Start tournaments
         List<TournamentMetadata> tournaments = TournamentService.getTournamentsReadyToStart();
         for (TournamentMetadata tournament : tournaments) {
@@ -66,9 +106,10 @@ public class TournamentJob implements Runnable {
             // Start tournament
             TournamentService.startTournament(tournamentName);
         }
+    }
 
+    private void startFinals() {
         List<TournamentMetadata> runningTournaments = TournamentService.getActiveTournaments();
-
         // Create final tables
         for (TournamentMetadata tournament : runningTournaments) {
             String tournamentName = tournament.getName();
@@ -97,31 +138,6 @@ public class TournamentJob implements Runnable {
                 GameService.get(gameName).setStatus(GameStatus.ACTIVE);
                 GlobalChatService.chat("SYSTEM", String.format("Game %s started", gameName));
                 ChatService.sendSystemMessage(gameId, "Finals Seating has been activated.");
-            }
-        }
-
-        // Check running tournaments have decks
-        for (TournamentMetadata tournament : runningTournaments) {
-            String tournamentName = tournament.getName();
-            for (int round = 1; round <= tournament.getNumberOfRounds(); round++) {
-                for (int table = 1; table <= tournament.getNumberOfTables(); table++) {
-                    String gameName = String.format("%s: Round %d - Table %d", tournamentName, round, table);
-                    String gameId = GameService.get(gameName).getId();
-                    List<TournamentPlayer> players = TournamentService.getPlayers(tournamentName, round, table);
-                    for (TournamentPlayer player : players) {
-                        String playerName = player.getName();
-                        var registration = TournamentService.getRegistrations(tournamentName, playerName).orElseThrow();
-                        Path gameDeckPath = DataPaths.path("games", gameId, registration.getDeck() + ".json");
-                        Path tournamentDeckPath = DataPaths.path("tournaments", tournament.getId(), registration.getDeck() + ".json");                        if (!Files.exists(gameDeckPath)) {
-                            try {
-                                Files.copy(tournamentDeckPath, gameDeckPath, StandardCopyOption.REPLACE_EXISTING);
-                                log.info("Copying missing tournament game file for {} - {} Round {} - Table {}", tournamentName, playerName, round, table);
-                            } catch (IOException e) {
-                                log.error("Unable to copy tournament file");
-                            }
-                        }
-                    }
-                }
             }
         }
     }
