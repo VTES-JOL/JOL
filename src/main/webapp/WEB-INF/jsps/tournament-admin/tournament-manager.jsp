@@ -20,11 +20,15 @@
     <div class="d-flex justify-content-between">
       <button onclick="loadTournament()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Load Tournament</button>
     </div>
-    <div id="saveTables" class="d-flex justify-content-between d-none">
-      <button onclick="saveTables()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Save Tables</button>
-      <button onclick="downloadCurrentTables()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Download Tables</button>
-      <button onclick="showCurrentTables()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Show Tables</button>
-      <button onclick="createTournamentTables()" class="btn btn-outline-success btn-sm mt-2 w-100">Create Tables</button>
+    <div id="saveTables" class="d-none">
+      <div class="d-flex justify-content-between w-100">
+        <button onclick="saveTables()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Save Tables</button>
+        <button onclick="downloadCurrentTables()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Download Tables</button>
+        <button onclick="showCurrentTables()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Show Tables</button>
+      </div>
+      <div class="d-flex justify-content-between w-100">
+        <button onclick="createTournamentTables()" class="btn btn-outline-success btn-sm mt-2 w-100">Create Rounds</button>
+      </div>
     </div>
     <div id="saveFinal" class="d-none">
       <div class="d-flex justify-content-between w-100">
