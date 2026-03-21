@@ -496,7 +496,7 @@ function closeTournament() {
 function loadTournament() {
     let nameOfTournament = $("#nameOfTournament option:selected").text();
     DS.tournamentAlreadyActive(nameOfTournament, {callback: callbackStatusTournament, errorHandler: errorhandler});
-
+    resetTournamentManager();
 }
 
 function callbackStatusTournament(isActive) {
@@ -515,27 +515,37 @@ function callbackStatusTournament(isActive) {
     }
 }
 
-
 function saveFinal() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
     let players = new Array();
     $.each($("#finalTable").find("li"), function(index, player) {
         players.push(player.textContent);
     })
-    DS.saveFinal(tournamentSelected, players, {callback: processData, errorHandler: errorhandler});
-    //reset
-    $("#tourFinal").empty().addClass("d-none");
+    if(players.length === 5) {
+        DS.saveFinal(tournamentSelected, players, {callback: processData, errorHandler: errorhandler});
+        //reset
+        $("#tourFinal").empty().addClass("d-none");
+    }
 }
 
 function setFinalSeating() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
     let players = new Array();
-    $.each($("#finalTable").find("li"), function(index, player) {
-        players.push(player.textContent);
+    $.each($("#finalTableSeeding > li"), function(index, player) {
+        players.push($(player).attr("data-player"));
     })
-    DS.setFinalSeating(tournamentSelected, players, {callback: processData, errorHandler: errorhandler});
+    if(players.length === 5) {
+        DS.setFinalSeeding(tournamentSelected, players, {callback: processData, errorHandler: errorhandler});
+        //reset
+        $("#finalTableSeeding").empty().addClass("d-none");
+    }
+}
+
+function startFinal() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    DS.createFinalTable(tournamentSelected, {callback: processData, errorHandler: errorhandler});
     //reset
-    $("#tourFinal").empty().addClass("d-none");
+    $("#saveFinal").addClass("d-none");
 }
 
 function callbackLoadTournamentDetails(data) {
@@ -688,10 +698,8 @@ function saveTables() {
         }
     })
     DS.saveTables(tournamentSelected, mapmaptojson(rounds));
-    //reset
-    let tourRounds = $("#tourRounds");
-    tourRounds.empty();
-    $("#saveTables").addClass("d-none");
+    //reset Tournament Manager
+    resetTournamentManager();
 }
 
 function mapmaptojson(map) {
@@ -707,6 +715,14 @@ function maptojson(map) {
             jsonObj[key] = value;
         });
     return JSON.stringify(jsonObj);
+}
+
+function resetTournamentManager() {
+    //reset
+    let tourRounds = $("#tourRounds");
+    tourRounds.empty();
+    $("#saveTables").addClass("d-none");
+    $("#saveFinal").addClass("d-none");
 }
 
 function downloadCurrentTables() {
@@ -846,6 +862,53 @@ function filterChooseDeck() {
             a[i].style.display = 'none';
         }
     }
+}
+
+function createTournamentTables() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    DS.createTournamentTables(tournamentSelected);
+    //reset Tournament Manager
+    resetTournamentManager();
+}
+
+function startFinalSeeding() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    DS.loadFinalSeeding(tournamentSelected, {callback: callbackFinalSeeding, errorHandler: errorhandler});
+}
+
+function callbackFinalSeeding(data) {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    let header = $("#finalSeedingHeader");
+    header.text("Final Tabel Seeding - "+tournamentSelected);
+    let finalSeeding = $("#finalTableSeeding")
+    finalSeeding.empty();
+    $.each(data, function(index, player) {
+        DS.loadCrypt(tournamentSelected, player, {callback: function callbackCrypt(crypt) {
+            DS.cryptCount(tournamentSelected, player, {callback: function callbackCryptCount(count) {
+                let listItem = $("<li/>").attr("data-player", player)
+                    .append("<span class ='fw-bold'>"+player+"</span>")
+                    .append("<span> ["+count+"]</span>")
+                    .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center")
+                let ul = $("<ul/>").addClass("d-flex w-100 text-center justify-content-between");
+                $.each(crypt, function(cardIndex, card) {
+                    const cardLink = $("<a/>").text(card.name).attr("data-card-id", card.id).addClass("card-name");
+                    let li = $("<li/>")
+                        .addClass( "list-group-item align-items-center p-2 shadow text-center w-100")
+                        .append(cardLink);
+                    ul.append(li);
+                })
+                listItem.append(ul).append("<i class='bi bi-grip-vertical'></i>");
+                listItem.disableSelection();
+                finalSeeding.append(listItem);
+                addCardTooltips("ul");
+            }, errorHandler: errorhandler});
+        }, errorHandler: errorhandler});
+    })
+    finalSeeding.sortable({
+        connectWith: ".sortableFinal",
+        handle: ".bi-grip-vertical",
+        dropOnEmpty: true});
+    $("#tourFinal").removeClass("d-none");
 }
 
 function callbackTournament(data) {

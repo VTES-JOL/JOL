@@ -2,8 +2,13 @@ package net.deckserver.services;
 
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import net.deckserver.dwr.model.JolGame;
+import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
+import net.deckserver.game.enums.Visibility;
 import net.deckserver.storage.json.deck.ExtendedDeck;
+import net.deckserver.storage.json.game.CardSimple;
+import net.deckserver.storage.json.game.GameData;
 import net.deckserver.storage.json.system.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +21,7 @@ import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class TournamentService extends PersistedService {
 
@@ -55,6 +61,14 @@ public class TournamentService extends PersistedService {
                 .map(TournamentMetadata::new)
                 .toList();
     }
+    private static TournamentMetadata getActiveTournament(String tourName) {
+        return INSTANCE.tournaments.values().stream()
+                .filter(PLAY_OPEN)
+                .filter(IS_ACTIVE)
+                .filter(t -> t.getName().equals(tourName))
+                .map(TournamentMetadata::new)
+                .findFirst().get();
+    }
 
     public static List<TournamentMetadata> getTournamentsReadyToStart() {
         return INSTANCE.tournaments.values().stream()
@@ -62,6 +76,15 @@ public class TournamentService extends PersistedService {
                 .filter(IS_STARTING)
                 .map(TournamentMetadata::new)
                 .toList();
+    }
+
+    public static TournamentMetadata getTournamentReadyToStart(String tourName) {
+        return INSTANCE.tournaments.values().stream()
+                .filter(PLAY_OPEN)
+                .filter(IS_STARTING)
+                .filter(t -> t.getName().equals(tourName))
+                .map(TournamentMetadata::new)
+                .findFirst().get();
     }
 
     public static List<TournamentMetadata> getTournamentsStarting() {
@@ -156,9 +179,22 @@ public class TournamentService extends PersistedService {
         }
     }
 
+    public static List<CardSimple> getRandomCrypt(String tourName, String deck) {
+        List<CardSimple> cryptlist = new ArrayList<>();
+        getTournamentDeck(tourName, deck).getDeck().getCrypt().getCards().forEach(cardCount -> cryptlist.addAll(Collections.nCopies(cardCount.getCount(), new CardSimple(String.valueOf(cardCount.getId()), cardCount.getName(), null, null))));
+        Collections.shuffle(cryptlist);
+        return cryptlist.stream().limit(3).collect(Collectors.toList());
+    }
+    public static int getCryptCount(String tourName, String deck) {
+        List<String> cryptlist = new ArrayList<>();
+        getTournamentDeck(tourName, deck).getDeck().getCrypt().getCards().forEach(cardCount -> cryptlist.addAll(Collections.nCopies(cardCount.getCount(), String.valueOf(cardCount.getId()))));
+        return cryptlist.size();
+    }
+
     public static void startTournament(String tournamentName) {
         INSTANCE.tournaments.get(tournamentName).setStatus(GameStatus.ACTIVE);
     }
+
     public static void setReadyToStart(String tournamentName) {
         INSTANCE.tournaments.get(tournamentName).setStatus(GameStatus.STARTING);
     }
@@ -173,6 +209,75 @@ public class TournamentService extends PersistedService {
 
     public static TournamentDefinition getTournament(String nameOfTournament) {
         return INSTANCE.tournaments.get(nameOfTournament);
+    }
+
+    public static void createTournamentTables(String tourName) {
+        // Start tournaments
+        TournamentMetadata tournament = getTournamentReadyToStart(tourName);
+        //dont setup the tournament games if no rounds have been created
+        if (!tournament.isRoundsConfig())
+            return;
+        String tournamentName = tournament.getName();
+        for (int round = 1; round <= tournament.getNumberOfRounds(); round++) {
+            for (int table = 1; table <= tournament.getNumberOfTables(); table++) {
+                String gameName = String.format("%s: Round %d - Table %d", tournamentName, round, table);
+                String gameId = UUID.randomUUID().toString();
+                // Create Game
+                GameService.create(gameName, gameId, "SYSTEM", Visibility.PUBLIC, GameFormat.from(tournament.getDeckFormat()));
+                JolGame jolGame = new JolGame(gameId, new GameData(gameId, gameName));
+                List<TournamentPlayer> players = getPlayers(tournamentName, round, table);
+                for (TournamentPlayer player : players) {
+                    String playerName = player.getName();
+                    TournamentRegistration registration = getRegistrations(tournamentName, playerName).orElseThrow();
+                    String deckId = registration.getDeck();
+                    ExtendedDeck deck = getTournamentDeck(tournamentName, deckId);
+                    assert deck != null;
+                    // Create Registration
+                    RegistrationService.registerDeck(gameName, playerName, deckId, deck.getDeck().getName(), deck.getStats().getSummary());
+                    // Add player and deck
+                    jolGame.addPlayer(playerName, deck.getDeck());
+                }
+                // Set order and start
+                jolGame.startGame(players.stream().map(TournamentPlayer::getName).toList());
+                // Save game
+                GameService.saveGame(jolGame);
+                // Update status
+                GameService.get(gameName).setStatus(GameStatus.ACTIVE);
+            }
+        }
+        // Start tournament
+        startTournament(tournamentName);
+    }
+
+    public static void createFinal(String tourName) {
+        // Start tournaments
+        TournamentMetadata tournament = getActiveTournament(tourName);
+        String tournamentName = tournament.getName();
+        List<String> seeding = tournament.getFinalsSeeding();
+        String gameName = String.format("%s: Final Table", tournamentName);
+        GameInfo gameInfo = GameService.get(gameName);
+        if (gameInfo == null && !seeding.isEmpty()) {
+            String gameId = UUID.randomUUID().toString();
+            GameService.create(gameName, gameId, "SYSTEM", Visibility.PUBLIC, GameFormat.from(tournament.getDeckFormat()));
+            JolGame jolGame = new JolGame(gameId, new GameData(gameId, gameName));
+            for (String playerName : seeding) {
+                String deckId = getRegistrations(tournamentName, playerName).map(TournamentRegistration::getDeck).orElseThrow();
+                ExtendedDeck deck = getTournamentDeck(tournamentName, deckId);
+                assert deck != null;
+                // Create Registration
+                RegistrationService.registerDeck(gameName, playerName, deckId, deck.getDeck().getName(), deck.getStats().getSummary());
+                // Add player and deck
+                jolGame.addPlayer(playerName, deck.getDeck());
+                NotificationService.pingPlayer(playerName, null, gameName);
+            }
+            // Set order and start
+            jolGame.startGame(seeding);
+            // Save game
+            GameService.saveGame(jolGame);
+            // Update status
+            GameService.get(gameName).setStatus(GameStatus.ACTIVE);
+            GlobalChatService.chat("SYSTEM", String.format("Game %s started", gameName));
+        }
     }
 
     @Override
