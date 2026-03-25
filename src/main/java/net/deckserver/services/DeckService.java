@@ -7,15 +7,18 @@ import com.google.common.collect.Table;
 import net.deckserver.game.enums.DeckFormat;
 import net.deckserver.game.validators.ValidatorFactory;
 import net.deckserver.storage.json.deck.CardCount;
+import net.deckserver.storage.json.deck.Crypt;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.system.DeckInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.services.cloudfront.endpoints.internal.Value;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -90,6 +93,15 @@ public class DeckService extends PersistedService {
         } catch (IOException e) {
             return new ExtendedDeck();
         }
+    }
+
+    public static String getDeckComments(String playerName, String deckName) {
+        String comments = getDeck(get(playerName, deckName).getDeckId()).getDeck().getComments();
+        return comments == null ? "" : comments;
+    }
+
+    public static List<Integer> getDeckCrypt(String playerName, String deckName) {
+        return getDeck(get(playerName, deckName).getDeckId()).getDeck().getCrypt().getCards().stream().map(CardCount::getId).toList();
     }
 
     public static void saveDeck(String deckId, ExtendedDeck deck) {

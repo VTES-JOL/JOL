@@ -10,6 +10,8 @@ import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.PlayerRole;
 import net.deckserver.services.*;
+import net.deckserver.storage.json.cards.CardSummary;
+import net.deckserver.storage.json.deck.Crypt;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.ChatData;
@@ -345,9 +347,9 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-    public Map<String, Object> saveDeck(String deckName, String contents) {
+    public Map<String, Object> saveDeck(String deckName, String contents, String comment) {
         String playerName = getPlayer(request);
-        JolAdmin.saveDeck(playerName, deckName, contents);
+        JolAdmin.saveDeck(playerName, deckName, contents, comment);
         return UpdateFactory.getUpdate();
     }
 

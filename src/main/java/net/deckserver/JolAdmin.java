@@ -111,6 +111,31 @@ public class JolAdmin {
         return DeckService.get(playerName, deckName).getGameFormats();
     }
 
+    public static String getDeckComment(String playerName, String deckName) {
+        return DeckService.getDeckComments(playerName, deckName);
+    }
+
+    public static Set<String> getCryptClans(String playerName, String deckName) {
+        Set<String> clans = new HashSet<>();
+        DeckService.getDeckCrypt(playerName, deckName).stream().forEach(id -> {
+            try {
+                CardService.get(String.valueOf(id)).getClans()
+                        .forEach(clan -> {
+                            if(!clans.contains(clan)){
+                                clans.add(clan.replace(" ", "_").toLowerCase());
+                            }
+                        });
+            } catch (NullPointerException e) {
+                logger.error("Error getting clan for card {}", id);
+            }
+        });
+        return clans;
+    }
+
+    public static void setDeckComment(String playerName, String gameName, String comments) {
+        getGameDeck(gameName, playerName).setComments(comments);
+    }
+
     public static Deck getGameDeck(String gameName, String playerName) {
         return Optional.ofNullable(RegistrationService.getRegistration(gameName, playerName))
                 .map(status -> {
@@ -133,12 +158,13 @@ public class JolAdmin {
         }
     }
 
-    public static synchronized void saveDeck(String playerName, String deckName, String contents) {
+    public static synchronized void saveDeck(String playerName, String deckName, String contents, String comment) {
         if (playerName != null && contents != null && deckName != null) {
             deckName = deckName.trim();
             ExtendedDeck deck = DeckParser.parseDeck(contents);
             deck.getDeck().setName(deckName);
             deck.getDeck().setAuthor(playerName);
+            deck.getDeck().setComments(comment);
             PlayerModel playerModel = getPlayerModel(playerName);
             playerModel.setDeck(deck);
             playerModel.setContents(contents);

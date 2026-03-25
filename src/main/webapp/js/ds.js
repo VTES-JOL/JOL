@@ -637,18 +637,28 @@ function callbackFilterDecks(decks) {
     deckList.empty();
     $.each(decks, function (index, deck) {
         const deckRow = $("<tr/>");
-        const deckCell = $("<td/>").addClass("d-flex justify-content-between align-items-center");
+        const deckCell = $("<td/>")
         const deckName = $("<span/>").text(deck.name).click(function () {
             DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
         });
+        const clanTag = $("<div/>");
+        $.each(deck.clans, function (index, clan) {
+            clanTag.append($("<span/>").addClass("clan "+clan));
+        });
+        const deckComment = $("<div/>").append($("<span/>")
+            .addClass("badge bg-light text-black shadow border border-secondary-subtle text-wrap")
+            .text(deck.comments));
         const deleteButton = $("<button/>").addClass("btn btn-sm btn-outline-secondary border p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
             if (confirm("Delete deck?")) {
                 DS.deleteDeck(deck.name, {callback: processData, errorHandler: errorhandler});
             }
             event.stopPropagation();
         });
-        let wrapper = $("<span/>").addClass("d-flex gap-1 align-items-center").append(deleteButton);
-        deckCell.append(deckName, wrapper);
+        let wrapper = $("<div/>").addClass("d-flex justify-content-between align-items-center")
+            .append(deckName)
+            .append(clanTag)
+            .append($("<span/>").addClass("d-flex gap-1 align-items-center").append(deleteButton));
+        deckCell.append(wrapper, deckComment);
         deckRow.append(deckCell);
         deckList.append(deckRow);
     });
@@ -711,6 +721,17 @@ function renderDeck(data, div) {
             render.append(section);
         })
     }
+    if(div === "#gameDeck") {
+        if(data.comments!="") {
+            let comments = $("<div/>")
+                .addClass("border m-1 p-2")
+                .append($("<span/>").text(data.comments));
+            render.append(comments);
+        }
+    }
+    if(div === "#deckPreview") {
+        $("#deckComment").val(data.comments)
+    }
 }
 
 function parseDeck() {
@@ -721,13 +742,15 @@ function parseDeck() {
 
 function newDeck() {
     $("#deckName").val("");
+    $("#deckComment").val("");
     DS.newDeck({callback: processData, errorHandler: errorhandler});
 }
 
 function saveDeck() {
     const deckName = $("#deckName").val();
     const contents = $("#deckText").val();
-    DS.saveDeck(deckName, contents, {callback: processData, errorHandler: errorhandler});
+    const comment = $("#deckComment").val();
+    DS.saveDeck(deckName, contents, comment, {callback: processData, errorHandler: errorhandler});
 }
 
 function validate() {
