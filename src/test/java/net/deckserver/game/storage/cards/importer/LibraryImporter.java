@@ -35,9 +35,8 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
 
     private static final Pattern PUT_INTO_PLAY_PATTERN = Pattern.compile(".*[Pp]ut this card in(?:to)? play.*");
     private static final Pattern PUT_INTO_UNCONTROLLED_PATTERN = Pattern.compile(".*[Pp]ut this card in(?:to)? play in your uncontrolled region.*");
-    private static final Pattern PUT_ON_ACTING_PATTERN = Pattern.compile(".*[Pp]ut this card on the acting.*");
     private static final Pattern PUT_ON_CONTROLLED_PATTERN = Pattern.compile(".*[Pp]ut this card on a minion you control.*");
-    private static final Pattern PUT_ON_SELF_PATTERN = Pattern.compile(".*[Pp]ut this card on this.*");
+    private static final Pattern PUT_ON_SELF_PATTERN = Pattern.compile(".*[Pp]ut this card(?: (?:with|and) .*?)? on (this|the acting).*");
     private static final Pattern PUT_ON_SOMETHING_PATTERN = Pattern.compile(".*[Pp]ut this card on.*");
     private static final Pattern AS_ABOVE_PATTERN = Pattern.compile("As (\\[(?<disc>.*)])? ?above.*");
     private static final Pattern REMOVE_FROM_GAME_PATTERN = Pattern.compile(".*[Rr]emove this card from the game.*");
@@ -50,9 +49,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final Pattern MODE_OR_PATTERN = Pattern.compile("^\\[[A-Za-z]+\\]\\s+or\\s+\\[[A-Za-z]+\\](?=\\s|$)");
     private static final Pattern MODE_PATTERN = Pattern.compile("^\\[[A-Za-z]+\\](\\[[A-Za-z]+\\])*(?=\\s|$)");
     private static final Pattern DISCIPLINE_EXTRACTOR_PATTERN = Pattern.compile("\\[([A-Za-z]+)\\]");
-
     private static final List<String> DISCIPLINES = Arrays.asList("ani", "obe", "cel", "dom", "dem", "for", "san", "thn", "vic", "pro", "chi", "val", "mel", "nec", "obf", "obl", "pot", "qui", "pre", "ser", "tha", "aus", "vis", "abo", "myt", "dai", "spi", "tem", "obt", "str", "mal", "flight");
-
     private final boolean playTestMode;
 
     public LibraryImporter(Path basePath, String filePrefix) {
@@ -176,34 +173,24 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
             mode.setText(modeText.trim());
 
             if (PUT_INTO_UNCONTROLLED_PATTERN.matcher(mode.getText()).matches())
-                mode.setTarget(LibraryCardMode.Target.INACTIVE_REGION);
-            else if (card.getType().stream().anyMatch("equipment"::equalsIgnoreCase)
-                    || card.getType().stream().anyMatch("retainer"::equalsIgnoreCase)
-                    || ((card.getType().stream().anyMatch("action"::equalsIgnoreCase)
-                    || card.getType().stream().anyMatch("action modifier"::equalsIgnoreCase))
-                    && PUT_ON_ACTING_PATTERN.matcher(mode.getText()).matches())
-                    || PUT_ON_SELF_PATTERN.matcher(mode.getText()).matches())
-                mode.setTarget(LibraryCardMode.Target.SELF);
+                setMode(card, mode, LibraryCardMode.Target.INACTIVE_REGION);
+            else if (PUT_ON_SELF_PATTERN.matcher(mode.getText()).matches())
+                setMode(card, mode, LibraryCardMode.Target.SELF);
             else if (REMOVE_FROM_GAME_PATTERN.matcher(mode.getText()).matches())
-                mode.setTarget(LibraryCardMode.Target.REMOVE_FROM_GAME);
+                setMode(card, mode, LibraryCardMode.Target.REMOVE_FROM_GAME);
             else if (PUT_ON_CONTROLLED_PATTERN.matcher(mode.getText()).matches())
-                mode.setTarget(LibraryCardMode.Target.MINION_YOU_CONTROL);
+                setMode(card, mode, LibraryCardMode.Target.MINION_YOU_CONTROL);
             else if (PUT_ON_SOMETHING_PATTERN.matcher(mode.getText()).matches())
-                mode.setTarget(LibraryCardMode.Target.SOMETHING);
-            else if ((card.getType().stream().anyMatch("master"::equalsIgnoreCase)
-                    && card.getPreamble() != null
-                    && (card.getPreamble().toLowerCase().contains("location") || card.getPreamble().toLowerCase().contains("trophy")))
-                    || card.getType().stream().anyMatch("ally"::equalsIgnoreCase)
-                    || card.getType().stream().anyMatch("event"::equalsIgnoreCase)
-                    || PUT_INTO_PLAY_PATTERN.matcher(mode.getText()).matches())
-                mode.setTarget(LibraryCardMode.Target.READY_REGION);
+                setMode(card, mode, LibraryCardMode.Target.SOMETHING);
+            else if (PUT_INTO_PLAY_PATTERN.matcher(mode.getText()).matches())
+                setMode(card, mode, LibraryCardMode.Target.READY_REGION);
             else {
                 Matcher matcher = AS_ABOVE_PATTERN.matcher(modeText);
                 if (matcher.matches()) {
                     String disciplineString = matcher.group("disc");
                     LibraryCardMode reference;
                     if (disciplineString == null) {
-                        reference = modes.get(modes.size() - 1);
+                        reference = modes.getLast();
                     } else {
                         List<String> discReference = Arrays.asList(disciplineString.split("[\\[\\]]+"));
                         reference = modes.stream().filter(m -> m.getDisciplines().equals(discReference)).findFirst().orElse(null);
@@ -218,6 +205,8 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
                     }
                 }
             }
+
+
             if (orMode) {
                 for (String discipline : disciplines) {
                     LibraryCardMode discMode = new LibraryCardMode(mode);
@@ -230,5 +219,12 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
             }
         }
         card.setModes(modes);
+    }
+
+    private void setMode(LibraryCard card, LibraryCardMode mode, LibraryCardMode.Target target) {
+        if (mode.getTarget() != null) {
+            log.error("Mode of {} is being overwritten from {} with {} - check targeting rules", card.getDisplayName(), mode.getTarget(), target);
+        }
+        mode.setTarget(target);
     }
 }
