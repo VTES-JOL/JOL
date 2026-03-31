@@ -8,6 +8,7 @@
     JolGame game = (JolGame) request.getAttribute("game");
     String viewer = (String) request.getAttribute("viewer");
     String player = request.getParameter("player");
+    String flag = request.getParameter("flag");
     String edgeColor = (String) request.getAttribute("edgeColor");
     String edgeTextColor = (String) request.getAttribute("edgeTextColor");
     String playerIndex = request.getParameter("playerIndex");
@@ -27,6 +28,7 @@
             <h6 class="d-flex justify-content-between align-items-center mb-0 lh-base">
                 <span class="fw-bold">
                     <span><%= player %></span>
+                    <span data-tippy-content="<%= flag %>" class="fi fi-gb fis fs-6"></span>
                     <i class='bi-exclamation-triangle ms-2 pinged d-none'></i>
                 </span>
                 <c:if test="<%= edge %>">
