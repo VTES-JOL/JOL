@@ -1323,7 +1323,9 @@ function loadGame(data) {
 
     // Render hand
     if (data.hand !== null) {
-        $("#hand").html(data.hand);
+        let hand = $("#hand");
+        hand.html(data.hand);
+        $("#handHeader").text("Hand ("+hand.find("li").length+")");
         addCardTooltips("#hand");
     }
 
