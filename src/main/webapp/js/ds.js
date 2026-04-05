@@ -292,7 +292,7 @@ function callbackLobby(data) {
         myGameList.append(new Option(game.name, game.name));
         let gameItem = $("<li/>").addClass("list-group-item");
         let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
-        let gameName = $("<h6/>").addClass("d-inline").text(game.name);
+        let gameName = $("<h6/>").addClass("d-inline text-break").text(game.name);
         let startButton = game.gameStatus === 'Inviting' ? createButton({
             text: "Start",
             class: "btn btn-outline-secondary btn-sm",
@@ -346,7 +346,7 @@ function callbackLobby(data) {
             <div class="d-flex justify-content-between align-items-center">
                 <span>
                     <span class="badge bg-secondary">${game.format}</span>
-                    <h6 class="mx-2 d-inline">${game.name}</h6>
+                    <h6 class="mx-2 d-inline text-break">${game.name}</h6>
                 </span>
                 <span class="d-flex justify-content-between align-items-center gap-1 game-join">
                     <span>Closes ${moment().to(expiry)}</span>
@@ -384,7 +384,7 @@ function callbackLobby(data) {
             <div class="list-group-item d-flex justify-content-between align-items-center">
                 <div class="flex-grow-1 p-2 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="mb-2">${game.gameName}</h5>
+                        <h5 class="mb-2 text-break">${game.gameName}</h5>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="badge bg-secondary me-1">${game.format}</span>
                         </div>
@@ -926,7 +926,7 @@ function renderMyGames(id, games) {
             doNav("g" + game.name);
         });
         let header = $("<div/>").addClass("d-flex p-2 justify-content-between w-100 border-bottom bg-body-tertiary");
-        let title = $("<span/>").addClass("fw-bold").text(game.name);
+        let title = $("<span/>").addClass("fw-bold text-break").text(game.name);
         let turn = $("<small/>").text(game.turn).addClass("d-inline-block d-md-none d-xl-inline-block");
         header.append(title, turn);
         let players = $("<div/>").addClass("players pb-2");
