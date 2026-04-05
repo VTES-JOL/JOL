@@ -345,9 +345,9 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
-    public Map<String, Object> saveDeck(String deckName, String contents) {
+    public Map<String, Object> saveDeck(String deckName, String contents, String comment) {
         String playerName = getPlayer(request);
-        JolAdmin.saveDeck(playerName, deckName, contents);
+        JolAdmin.saveDeck(playerName, deckName, contents, comment);
         return UpdateFactory.getUpdate();
     }
 
