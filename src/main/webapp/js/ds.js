@@ -641,10 +641,6 @@ function callbackFilterDecks(decks) {
         const deckName = $("<span/>").text(deck.name).click(function () {
             DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
         });
-        const clanTag = $("<div/>");
-        $.each(deck.clans, function (index, clan) {
-            clanTag.append($("<span/>").addClass("clan "+clan));
-        });
         const deckComment = $("<div/>").append($("<span/>")
             .addClass("badge bg-light text-black shadow border border-secondary-subtle text-wrap")
             .text(deck.comments));
@@ -656,7 +652,6 @@ function callbackFilterDecks(decks) {
         });
         let wrapper = $("<div/>").addClass("d-flex justify-content-between align-items-center")
             .append(deckName)
-            .append(clanTag)
             .append($("<span/>").addClass("d-flex gap-1 align-items-center").append(deleteButton));
         deckCell.append(wrapper, deckComment);
         deckRow.append(deckCell);

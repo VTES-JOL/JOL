@@ -16,15 +16,12 @@ public class DeckInfoBean {
     private final Set<String> gameFormats;
     @Getter
     private final String comments;
-    @Getter
-    private final Set<String> clans;
 
     public DeckInfoBean(String playerName, String deckName) {
         this.name = deckName;
         this.deckFormat = JolAdmin.getDeckFormat(playerName, deckName);
         this.gameFormats = JolAdmin.getTags(playerName, deckName);
         this.comments = JolAdmin.getDeckComment(playerName, deckName).split("\n")[0];
-        this.clans = JolAdmin.getCryptClans(playerName, deckName);
     }
 
     public String getDeckFormat() {

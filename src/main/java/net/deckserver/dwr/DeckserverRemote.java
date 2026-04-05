@@ -10,8 +10,6 @@ import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.PlayerRole;
 import net.deckserver.services.*;
-import net.deckserver.storage.json.cards.CardSummary;
-import net.deckserver.storage.json.deck.Crypt;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.ChatData;

@@ -100,10 +100,6 @@ public class DeckService extends PersistedService {
         return comments == null ? "" : comments;
     }
 
-    public static List<Integer> getDeckCrypt(String playerName, String deckName) {
-        return getDeck(get(playerName, deckName).getDeckId()).getDeck().getCrypt().getCards().stream().map(CardCount::getId).toList();
-    }
-
     public static void saveDeck(String deckId, ExtendedDeck deck) {
         try {
             Path deckPath = DataPaths.path("decks", deckId + ".json");
