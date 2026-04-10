@@ -22,6 +22,7 @@ public class GameData {
     private List<String> playerOrder = new ArrayList<>();
     private Map<String, PlayerData> players = new HashMap<>();
     private Map<String, CardData> cards = new HashMap<>();
+    private Set<String> openHand = new HashSet<>();
 
     @JsonIdentityReference(alwaysAsId = true)
     private PlayerData currentPlayer;
@@ -110,6 +111,18 @@ public class GameData {
                 .map(this.players::get)
                 .filter(playerData -> !playerData.isOusted() || playerData.getPool() > 0)
                 .toList();
+    }
+
+    public void addPlayerToOpenHand(String playerName) {
+        this.openHand.add(playerName);
+    }
+
+    public void removePlayerFromOpenHand(String playerName) {
+        this.openHand.remove(playerName);
+    }
+
+    public Boolean isPlayerOpenHand(String playerName) {
+        return this.openHand.contains(playerName);
     }
 
     public void initRegion(RegionData crypt, List<CardData> cryptCards) {
