@@ -463,6 +463,18 @@ public record JolGame(String id, GameData data) {
         ChatService.sendCommand(id, player, message, "lock", card.getId(), String.valueOf(locked));
     }
 
+    public void setOpenHand(String player) {
+        String message = "";
+        if(data.isPlayerOpenHand(player)) {
+            data.removePlayerFromOpenHand(player);
+            message = "NO longer plays now with an open hand";
+        } else {
+            data.addPlayerToOpenHand(player);
+            message = "plays now with an open hand";
+        }
+        ChatService.sendCommand(id, player, message, "open");
+    }
+
     public void unlockAll(String player) {
         StringBuilder notUnlockedString = new StringBuilder();
         for (RegionType regionType : RegionType.values()) {
