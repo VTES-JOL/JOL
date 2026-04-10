@@ -14,7 +14,9 @@
     String label = request.getParameter("label");
     RegionType region = RegionType.valueOf(request.getParameter("region"));
     boolean simpleDisplay = RegionType.SIMPLE_REGIONS.contains(region);
-    boolean openHand = game.data().isPlayerOpenHand(player) && region.equals(RegionType.HAND);
+    boolean hand = region == RegionType.HAND;
+    boolean openHand = game.data().isPlayerOpenHand(player) && hand;
+    boolean hiddenHand = !game.data().isPlayerOpenHand(player) && hand;
     String regionId = playerIndex + "-" + region;
     boolean startCollapsed = JolAdmin.getGameModel(game.getName()).getView(viewer).isCollapsed(regionId);
     boolean isVisible = region.isVisible(player, viewer);
@@ -40,6 +42,12 @@
                 </button>
                 <span class="fw-bold"><%= label %></span>
                 <span>( <%= size %> )</span>
+                <c:if test="<%= openHand %>">
+                    <i class="bi bi-eye"></i>
+                </c:if>
+                <c:if test="<%= hiddenHand %>">
+                    <i class="bi bi-eye-slash"></i>
+                </c:if>
             </span>
         </div>
         <ol id="<%= regionId %>"
