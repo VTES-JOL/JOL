@@ -148,7 +148,7 @@ banjo
 bank
 bankbook
 banker
-banu Haqim
+banu haqim
 bar
 barbara
 barber
@@ -363,7 +363,6 @@ cd
 ceiling
 celery
 celeste
-cell
 cell
 cellar
 cello
