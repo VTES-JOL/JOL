@@ -5,9 +5,7 @@ import net.deckserver.game.storage.cards.LibraryCard;
 import net.deckserver.game.storage.cards.LibraryCardMode;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,7 +39,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final Pattern AS_ABOVE_PATTERN = Pattern.compile("As (\\[(?<disc>.*)])? ?above.*");
     private static final Pattern REMOVE_FROM_GAME_PATTERN = Pattern.compile(".*[Rr]emove this card from the game.*");
     private static final Pattern TROPHY_PATTERN = Pattern.compile("Master. Trophy.");
-    private static final Pattern LOCATION_PATTERN = Pattern.compile("(Unique|Master:) location");
+    private static final Pattern LOCATION_PATTERN = Pattern.compile("(?i)\\b(?:master:\\s*)?(?:unique\\s+)?location\\b");
     private static final Pattern EQUIPEMENT_LOCATION_PATTERN = Pattern.compile("does not count as equipment");
     private static final Pattern ONE_PER_ROUND_PATTERN = Pattern.compile("Only one (.*?) (?:may|can) each round.");
     private static final Pattern ONE_PER_TURN_PATTERN = Pattern.compile("Only one (.*?) (?:may|can) be played each turn.");
@@ -50,6 +48,8 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     private static final Pattern MODE_PATTERN = Pattern.compile("^\\[[A-Za-z]+\\](\\[[A-Za-z]+\\])*(?=\\s|$)");
     private static final Pattern DISCIPLINE_EXTRACTOR_PATTERN = Pattern.compile("\\[([A-Za-z]+)\\]");
     private static final List<String> DISCIPLINES = Arrays.asList("ani", "obe", "cel", "dom", "dem", "for", "san", "thn", "vic", "pro", "chi", "val", "mel", "nec", "obf", "obl", "pot", "qui", "pre", "ser", "tha", "aus", "vis", "abo", "myt", "dai", "spi", "tem", "obt", "str", "mal", "flight");
+    private static final Set<String> SELF_TYPES = Set.of("Equipment", "Retainer");
+    private static final Set<String> READY_TYPES = Set.of("Ally", "Event");
     private final boolean playTestMode;
 
     public LibraryImporter(Path basePath, String filePrefix) {
@@ -60,6 +60,19 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
     public LibraryImporter(Path basePath, String filePrefix, boolean playTestMode) {
         super(basePath, filePrefix);
         this.playTestMode = playTestMode;
+    }
+
+    @Override
+    public List<LibraryCard> read() throws Exception {
+        List<LibraryCard> cards = super.read();
+        cards.stream().filter(card -> !Collections.disjoint(card.getType(), Set.of("Master", "Action", "Equipment"))).forEach(card -> {
+            List<LibraryCardMode> emptyModes = card.getModes().stream().filter(mode -> mode.getTarget() == null).toList();
+            if (!emptyModes.isEmpty()) {
+                System.out.println(card.getDisplayName());
+                emptyModes.forEach(System.out::println);
+            }
+        });
+        return cards;
     }
 
     @Override
@@ -96,7 +109,7 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         List<String> lines = new ArrayList<>(Arrays.asList(card.getText().split("\n")));
         List<String> preambleLines = new ArrayList<>(1);
 
-        switch (card.getType().get(0).toLowerCase()) {
+        switch (card.getType().getFirst().toLowerCase()) {
             case "conviction":
                 return parsePowerOrConviction(card, LibraryCardMode.Target.SOMETHING);
             case "power":
@@ -104,8 +117,8 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         }
 
         //Some cards like Make the Misere have two lines of preamble
-        while (!(lines.size() == 1 || lines.get(0).startsWith("[")))
-            preambleLines.add(lines.remove(0));
+        while (!(lines.size() == 1 || lines.getFirst().startsWith("[")))
+            preambleLines.add(lines.removeFirst());
 
         if (!preambleLines.isEmpty()) {
             String preamble = String.join("\n", preambleLines);
@@ -121,6 +134,13 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         }
         setModes(card, lines);
         return card;
+    }
+
+    private void setMode(LibraryCard card, LibraryCardMode mode, LibraryCardMode.Target target) {
+        if (mode.getTarget() != null) {
+            log.error("Mode of {} is being overwritten from {} with {} - check targeting rules", card.getDisplayName(), mode.getTarget(), target);
+        }
+        mode.setTarget(target);
     }
 
     /**
@@ -172,17 +192,22 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
             }
             mode.setText(modeText.trim());
 
-            if (PUT_INTO_UNCONTROLLED_PATTERN.matcher(mode.getText()).matches())
+            if (PUT_INTO_UNCONTROLLED_PATTERN.matcher(modeText).matches())
                 setMode(card, mode, LibraryCardMode.Target.INACTIVE_REGION);
-            else if (PUT_ON_SELF_PATTERN.matcher(mode.getText()).matches())
+            else if (PUT_ON_SELF_PATTERN.matcher(modeText).matches() || card.getType().stream().anyMatch(SELF_TYPES::contains))
                 setMode(card, mode, LibraryCardMode.Target.SELF);
-            else if (REMOVE_FROM_GAME_PATTERN.matcher(mode.getText()).matches())
+            else if (REMOVE_FROM_GAME_PATTERN.matcher(modeText).matches())
                 setMode(card, mode, LibraryCardMode.Target.REMOVE_FROM_GAME);
-            else if (PUT_ON_CONTROLLED_PATTERN.matcher(mode.getText()).matches())
+            else if (PUT_ON_CONTROLLED_PATTERN.matcher(modeText).matches())
                 setMode(card, mode, LibraryCardMode.Target.MINION_YOU_CONTROL);
-            else if (PUT_ON_SOMETHING_PATTERN.matcher(mode.getText()).matches())
+            else if (PUT_ON_SOMETHING_PATTERN.matcher(modeText).matches())
                 setMode(card, mode, LibraryCardMode.Target.SOMETHING);
-            else if (PUT_INTO_PLAY_PATTERN.matcher(mode.getText()).matches())
+            else if ((card.getType().stream().anyMatch("master"::equalsIgnoreCase)
+                    && card.getPreamble() != null
+                    && (card.getPreamble().toLowerCase().contains("location") || card.getPreamble().toLowerCase().contains("trophy")))
+                    || card.getType().stream().anyMatch("ally"::equalsIgnoreCase)
+                    || card.getType().stream().anyMatch("event"::equalsIgnoreCase)
+                    || PUT_INTO_PLAY_PATTERN.matcher(mode.getText()).matches())
                 setMode(card, mode, LibraryCardMode.Target.READY_REGION);
             else {
                 Matcher matcher = AS_ABOVE_PATTERN.matcher(modeText);
@@ -219,12 +244,5 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
             }
         }
         card.setModes(modes);
-    }
-
-    private void setMode(LibraryCard card, LibraryCardMode mode, LibraryCardMode.Target target) {
-        if (mode.getTarget() != null) {
-            log.error("Mode of {} is being overwritten from {} with {} - check targeting rules", card.getDisplayName(), mode.getTarget(), target);
-        }
-        mode.setTarget(target);
     }
 }
