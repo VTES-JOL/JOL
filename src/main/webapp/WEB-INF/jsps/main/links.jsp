@@ -29,7 +29,7 @@
                 <a class="link-secondary" href="https://github.com/VTES-JOL/JOL/issues" target="_blank">Report a bug</a>
             </li>
             <li class="list-group-item">
-                <a class="link-secondary" href="https://paypal.me/JOLVTES" target="_blank">Donations</a>
+                <a class="link-secondary" href="https://www.paypal.com/donate/?hosted_button_id=A8PKSSCTV92A2" target="_blank">Donations</a>
                 <div style="margin-left:1em;font-size:0.9em">Keep the server running</div>
             </li>
         </ul>
