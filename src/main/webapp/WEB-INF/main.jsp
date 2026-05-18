@@ -56,6 +56,10 @@
             <jsp:include page="/WEB-INF/jsps/admin/layout.jsp"/>
         </div>
 
+        <div id="tournamentAdmin" style="display: none;">
+            <jsp:include page="/WEB-INF/jsps/tournament-admin/layout.jsp"/>
+        </div>
+
         <div id="tournament" style="display: none">
             <jsp:include page="/WEB-INF/jsps/tournament/layout.jsp"/>
         </div>
@@ -88,6 +92,7 @@
 <script src='${pageContext.request.contextPath}/dwr/interface/DS.js'></script>
 <script src='${pageContext.request.contextPath}/dwr/util.js'></script>
 <script src='${pageContext.request.contextPath}/js/ds.js?version=<%= VersionService.getVersion() %>'></script>
+<script src="${pageContext.request.contextPath}/js/jquery.ui.touch-punch.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/card-modal.js?version=<%= VersionService.getVersion() %>"></script>
 <script>
     <jsp:include page="notification.jsp"/>

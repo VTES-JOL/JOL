@@ -293,6 +293,10 @@ public class JolAdmin {
         return PlayerService.get(player).getRoles().contains(PlayerRole.ADMIN);
     }
 
+    public static synchronized boolean isTournamentAdmin(String player) {
+        return PlayerService.get(player).getRoles().contains(PlayerRole.TOURNAMENT_ADMIN);
+    }
+
     public static synchronized boolean isPlaytester(String player) {
         return PlayerService.get(player).getRoles().contains(PlayerRole.PLAYTESTER);
     }

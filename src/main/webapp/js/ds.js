@@ -424,7 +424,448 @@ function callbackLobby(data) {
     if (data.message) {
         registerResult.text(data.message).addClass("badge text-bg-light");
     }
+}
 
+function createTournament() {
+    //read out Tournament Details
+    let tourName = $("#tourName");
+    let regStart = $("#regStart");
+    let regEnd = $("#regEnd");
+    let playStart = $("#playStart");
+    let playEnd = $("#playEnd");
+    let tourFormat = $("#tourFormat");
+    let gameFormat = $("#gameFormat");
+    let rules = new Array();
+    $("#rulesDiv div label").each(function( index, rule ) {
+        rules.push(rule.textContent);
+    });
+    let specRulesCon = $("#specRulesCon");
+    let specRules = new Array();
+    $("#specRulesDiv div label").each(function( index, specRule ) {
+        specRules.push(specRule.textContent);
+    });
+    let numOfRounds = $("#numOfRounds");
+    let reqId = $("#reqId");
+    //create tournament
+    DS.createTournament(tourName.val(), regStart.val(), regEnd.val(), playStart.val(), playEnd.val(), tourFormat.val(), gameFormat.val(), rules, specRulesCon.val(), specRules, numOfRounds.val(), reqId.val(),
+        {callback: callbackCreateTournament, errorHandler: errorhandler});
+}
+
+function callbackCreateTournament(success) {
+    let msg = $("#tourMsg");
+    if(success) {
+        resetForm();
+        msg.text("Tournament created successfully").addClass("text-success").removeClass("text-warning");
+    } else {
+        msg.text("Tournament creation failed").addClass("text-warning").removeClass("text-success");
+    }
+}
+
+function resetForm() {
+    let tourName = $("#tourName");
+    let regStart = $("#regStart");
+    let regEnd = $("#regEnd");
+    let playStart = $("#playStart");
+    let playEnd = $("#playEnd");
+    let rulesDiv = $("#rulesDiv");
+    let specRulesCon = $("#specRulesCon");
+    let specRulesDiv = $("#specRulesDiv");
+    let numOfRounds = $("#numOfRounds");
+    //clear Form
+    tourName.val("");
+    regStart.val("");
+    regEnd.val("");
+    playStart.val("");
+    playEnd.val("");
+    specRulesCon.val("");
+    numOfRounds.val("");
+    rulesDiv.empty();
+    specRulesDiv.empty();
+}
+
+function loadTournamentDetails() {
+    let nameOfTournament = $("#tourNameSelect option:selected").text();
+    DS.loadTournamentDetails(nameOfTournament, {callback: callbackLoadTournamentDetails, errorHandler: errorhandler});
+}
+
+function closeTournament() {
+    let nameOfTournament = $("#nameOfTournament").val();
+    DS.closeTournament(nameOfTournament);
+}
+
+function loadTournament() {
+    let nameOfTournament = $("#nameOfTournament option:selected").text();
+    DS.tournamentAlreadyActive(nameOfTournament, {callback: callbackStatusTournament, errorHandler: errorhandler});
+    resetTournamentManager();
+}
+
+function callbackStatusTournament(isActive) {
+    let nameOfTournament = $("#nameOfTournament option:selected").text();
+    if(isActive) {
+        let nameOfTournament = $("#nameOfTournament option:selected").text();
+        DS.getTournamentPlayers(nameOfTournament, {callback: callbackFinal, errorHandler: errorhandler});
+        DS.gameAlreadyStarted(nameOfTournament, {callback: callbackSaveButton, errorHandler: errorhandler});
+        showTablesReadOnly(nameOfTournament);
+    } else {
+        DS.getTournamentRounds(nameOfTournament, {callback: callbackTournamentRounds, errorHandler: errorhandler});
+        DS.getTournamentPlayers(nameOfTournament, {callback: callbackTableManager, errorHandler: errorhandler});
+        $("#saveFinal").addClass("d-none");
+        $("#setFinalSeating").addClass("d-none");
+        $("#saveTables").removeClass("d-none");
+    }
+}
+
+function saveFinal() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    let players = new Array();
+    $.each($("#finalTable").find("li"), function(index, player) {
+        players.push(player.textContent);
+    })
+    if(players.length === 5) {
+        DS.saveFinal(tournamentSelected, players, {callback: processData, errorHandler: errorhandler});
+        //reset
+        $("#tourFinal").empty().addClass("d-none");
+    }
+}
+
+function setFinalSeating() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    let players = new Array();
+    $.each($("#finalTableSeeding > li"), function(index, player) {
+        players.push($(player).attr("data-player"));
+    })
+    if(players.length === 5) {
+        DS.setFinalSeeding(tournamentSelected, players, {callback: processData, errorHandler: errorhandler});
+        //reset
+        $("#finalTableSeeding").empty().addClass("d-none");
+    }
+}
+
+function startFinal() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    DS.createFinalTable(tournamentSelected, {callback: processData, errorHandler: errorhandler});
+    //reset
+    $("#saveFinal").addClass("d-none");
+}
+
+function callbackLoadTournamentDetails(data) {
+    resetForm();
+    let tourName = $("#tourName");
+    let regStart = $("#regStart");
+    let regEnd = $("#regEnd");
+    let playStart = $("#playStart");
+    let playEnd = $("#playEnd");
+    let tourFormat = $("#tourFormat");
+    let gameFormat = $("#gameFormat");
+    let specRulesCon = $("#specRulesCon");
+    let numOfRounds = $("#numOfRounds");
+    let reqId = $("#reqId");
+    let rulesDiv = $("#rulesDiv");
+    let specRulesDiv = $("#specRulesDiv");
+
+    tourName.val(data.name);
+    regStart.val(data.regStart);
+    regEnd.val(data.regEnd);
+    playStart.val(data.playStart);
+    playEnd.val(data.playEnd);
+    tourFormat.val(data.tourFormat);
+    gameFormat.val(data.gameFormat);
+    specRulesCon.val(data.specRulesCon);
+    numOfRounds.val(data.numRounds);
+    reqId.val(data.reqId)
+
+    $.each(data.rules, function(index, rule) {
+        addRule(rule, rulesDiv);
+    });
+    $.each(data.specRules, function(index, rule) {
+        addRule(rule, specRulesDiv);
+    });
+
+}
+
+function callbackTournamentRounds(data) {
+    let tourRounds = $("#tourRounds");
+    tourRounds.empty();
+    $.each(data, function (index, round) {
+        let div = $("<div/>").attr("id","tourAllTables-"+round);
+        let label = $("<span/>").addClass("h4").text("Round "+round);
+        let createTableButton = $("<button/>").attr("id", "createTable-"+round)
+            .on('click', function () { createTable(round) })
+            .addClass("btn btn-outline-secondary text-dark bg-info btn-sm mt-2 w-100")
+            .text("Create Table");
+        let divForPlayers = $("<div/>").attr("id","tourPlayer-"+round);
+        let divForTabels = $("<ol/>").addClass("card-body p-1 grid")
+            .attr("id","tableTour-"+round)
+            .css({"--bs-columns": "4", "--bs-gap": "0.5rem"})
+            .css("list-style-position","inside")
+        divForTabels.sortable({
+            handle: ".bi-grip-vertical",
+            dropOnEmpty: true});
+        div.append(label, createTableButton, divForPlayers, divForTabels);
+        tourRounds.append(div);
+    });
+}
+
+function callbackTableManager(data) {
+    $("#tourRounds div").each(function (index) {
+        let roundNumber = parseInt(index)+1;
+        let players = $("#"+"tourPlayer-"+roundNumber)
+            .addClass("card-body p-1 grid sortable")
+            .css({"--bs-columns": "4", "--bs-gap": "0.5rem"});
+        players.empty();
+        players.addClass("sortable"+roundNumber);
+        players.sortable({
+            connectWith: ".sortable"+roundNumber,
+            handle: ".bi-grip-vertical",
+            dropOnEmpty: true});
+        $.each(data, function(index, reg) {
+            let playerSpan = $("<span/>").attr("data-player", reg.player).text(reg.player);
+            let veknSpan = $("<span/>").addClass("fw-bold").text(reg.vekn);
+            let playerDiv = $("<div/>").addClass("d-flex flex-column").append(playerSpan, veknSpan);
+            let listItem = $("<li/>")
+                .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center")
+                .append(playerDiv)
+                .append("<i class='bi bi-grip-vertical'></i>");
+            listItem.disableSelection();
+            players.append(listItem);
+        });
+    })
+}
+
+function callbackTournamentAdmin(data) {
+
+}
+
+function createTable(round) {
+    let table = $("#"+"tableTour-"+round);
+    let divRound = $("<li/>")
+        .addClass("card-body border border-success p-1")
+        .append("<i class='bi bi-grip-vertical'></i>");
+    let label = $("<span/>").addClass("h5").text("Table").append($("<br/>"));
+    let list = $("<ul/>").addClass("border list-group sortable"+round)
+        .attr("round", round)
+        .css("min-height","38px");
+    list.sortable({
+        connectWith: ".sortable"+round,
+        handle: ".bi-grip-vertical",
+        dropOnEmpty: true});
+    let removeTable = removeTableButton(round, divRound, list)
+    divRound.append(label, removeTable, list);
+    table.append(divRound);
+}
+
+function addTournamentRule() {
+    var ruleText = $("#ruleText");
+    addRule(ruleText.val(), $("#rulesDiv"))
+    ruleText.val("");
+}
+
+function addSpecTournamentRule() {
+    let specRuleText = $("#specRuleText");
+    addRule(specRuleText.val(), $("#specRulesDiv"))
+    specRuleText.val("");
+}
+
+function addRule(rulesInput, rulesCon) {
+    let ruleDiv =  $("<div/>");
+    ruleDiv.addClass("border rounded m-1");
+    let ruleLabel =  $("<label/>");
+    ruleLabel.addClass("form-label m-1").text(rulesInput);
+    let removeButton = $("<button/>");
+    removeButton.text("Remove Rule");
+    removeButton.addClass("btn btn-outline-secondary btn-sm mt-2 form-control m-1")
+    removeButton.on('click', function () {
+        ruleDiv.remove();
+        removeButton.remove();
+    });
+    ruleDiv.append(ruleLabel).append(removeButton)
+    rulesCon.append(ruleDiv);
+}
+
+function saveTables() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    DS.resetTables(tournamentSelected);
+    let rounds = {};
+    $("#tourRounds ul[round]").each(function(index, ul) {
+        let players = [];
+        let round = $(ul).attr("round");
+        let tableNumber = $(ul).closest("li").index() + 1;
+        $(ul).find("li [data-player]").each(function(i, el) {
+            let name = $(el).attr("data-player");
+            if (name) players.push(name);
+        });
+        if (round) {
+            if (!rounds[round]) rounds[round] = {};
+            rounds[round][tableNumber] = players;
+        }
+    });
+    DS.saveTables(tournamentSelected, rounds);
+    resetTournamentManager();
+}
+
+function resetTournamentManager() {
+    //reset
+    let tourRounds = $("#tourRounds");
+    tourRounds.empty();
+    $("#saveTables").addClass("d-none");
+    $("#saveFinal").addClass("d-none");
+}
+
+function downloadCurrentTables() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    DS.getRoundsForTournamentCsv(tournamentSelected, {callback: createCsvDownloadLink, errorHandler: errorhandler});
+}
+function showCurrentTables() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    DS.getRoundsForTournament(tournamentSelected, {callback: callbackShowTables, errorHandler: errorhandler});
+}
+
+function callbackShowTables(data) {
+    $.each(data, function (indexRound, round) {
+        let players = $("#"+"tourPlayer-"+indexRound);
+        players.empty();
+        let tables = $("#"+"tableTour-"+indexRound);
+        tables.empty();
+        $.each(round, function (indexTable, table) {
+            let divRound = $("<li/>").addClass("card-body border border-success p-1")
+                .append("<i class='bi bi-grip-vertical'></i>");
+            let label = $("<span/>").text("Table").addClass("h5").append($("<br/>"));
+            let list = $("<ul/>").addClass("border list-group sortable"+indexRound)
+                .attr("round", indexRound)
+                .css("min-height","38px");
+            list.sortable({
+                connectWith: ".sortable"+indexRound,
+                handle: ".bi-grip-vertical",
+                dropOnEmpty: true});
+            let removeTable = removeTableButton(indexRound, divRound, list)
+            $.each(table, function(index, player) {
+                let listItem = $("<li/>")
+                    .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center");
+                DS.getVekn(player.name, {callback: function setVeknId(veknId) {
+                        let nameSpan = $("<span/>").attr("data-player", player.name).text(player.name);
+                        let veknSpan = $("<span/>").addClass("fw-bold").text(veknId);
+                        let playerDiv = $("<div/>").addClass("d-flex flex-column").append(nameSpan, veknSpan);
+                        listItem.append(playerDiv).append("<i class='bi bi-grip-vertical'></i>");
+                    }, errorHandler: errorhandler});
+                listItem.disableSelection();
+                list.append(listItem);
+            });
+            divRound.append(label, removeTable, list);
+            tables.append(divRound);
+            let tournamentSelected = $("#nameOfTournament option:selected").text();
+            DS.getRegDelta(tournamentSelected, indexRound, {callback: callbackShowPlayers, errorHandler: errorhandler});
+        })
+    })
+}
+
+function showTablesReadOnly(tourName) {
+    DS.getRoundsForTournament(tourName, {callback: callbackShowTablesReadOnly, errorHandler: errorhandler});
+}
+
+function callbackShowTablesReadOnly(data) {
+    let tourRounds = $("#tourRounds");
+    tourRounds.empty();
+    $.each(data, function (indexRound, round) {
+        let label = $("<span/>").addClass("h4").text("Round " + indexRound);
+        let tableList = $("<ol/>").addClass("card-body p-1 grid")
+            .css({"--bs-columns": "4", "--bs-gap": "0.5rem"})
+            .css("list-style-position", "inside");
+        $.each(round, function (indexTable, table) {
+            let tableLabel = $("<span/>").addClass("h5").text("Table " + indexTable).append($("<br/>"));
+            let playerList = $("<ul/>").addClass("border list-group").css("min-height", "38px");
+            $.each(table, function (index, player) {
+                let listItem = $("<li/>").addClass("border rounded p-2 border-secondary");
+                DS.getVekn(player.name, {callback: function(veknId) {
+                    let nameSpan = $("<span/>").text(player.name);
+                    let veknSpan = $("<span/>").addClass("fw-bold ms-2").text(veknId);
+                    listItem.append(nameSpan, veknSpan);
+                }, errorHandler: errorhandler});
+                playerList.append(listItem);
+            });
+            tableList.append($("<li/>").addClass("card-body border border-success p-1").append(tableLabel, playerList));
+        });
+        tourRounds.append($("<div/>").append(label, tableList));
+    });
+}
+
+function removeTableButton(indexRound, divRound, list) {
+    return $("<button/>")
+        .text("Remove Table")
+        .addClass("btn btn-outline-secondary text-dark bg-warning btn-sm mt-1 mb-1")
+        .on('click', function () {
+            list.each(function(index, ul) {
+                $("#"+"tourPlayer-"+indexRound).append($(ul).find("li"));
+            })
+            divRound.remove()
+        });
+}
+
+function callbackShowPlayers(data) {
+    $.each(data, function(index, round) {
+        let players = $("#"+"tourPlayer-"+index)
+            .addClass("card-body p-1 grid sortable")
+            .css({"--bs-columns": "4", "--bs-gap": "0.5rem"});
+        players.empty();
+        players.addClass("sortable"+index);
+        players.sortable({
+            connectWith: ".sortable"+index,
+            handle: ".bi-grip-vertical",
+            dropOnEmpty: true});
+        $.each(round, function(index, player) {
+            let playerSpan = $("<span/>").attr("data-player", player.player).text(player.player);
+            let veknSpan = $("<span/>").addClass("fw-bold").text(player.vekn);
+            let playerDiv = $("<div/>").addClass("d-flex flex-column").append(playerSpan, veknSpan);
+            let listItem = $("<li/>")
+                .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center")
+                .append(playerDiv)
+                .append("<i class='bi bi-grip-vertical'></i>");
+            listItem.disableSelection();
+            players.append(listItem);
+        })
+    });
+}
+
+function createCsvDownloadLink(data) {
+    let blob = new Blob([data], { type: 'text/csv' });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = 'rounds.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
+
+function callbackFinal(data) {
+    let players = $("#finalPlayers").css({"--bs-columns": "4", "--bs-gap": "0.5rem"});
+    players.empty();
+    players.sortable({
+        connectWith: ".sortableFinal",
+        handle: ".bi-grip-vertical",
+        dropOnEmpty: true});
+    $.each(data, function(index, reg) {
+        let listItem = $("<li/>")
+            .text(reg.player)
+            .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center")
+            .append("<i class='bi bi-grip-vertical'></i>");;
+        listItem.disableSelection();
+        players.append(listItem);
+    });
+
+    let list = $("#finalTable")
+    list.sortable({
+        connectWith: ".sortableFinal",
+        handle: ".bi-grip-vertical",
+        dropOnEmpty: true});
+    $("#tourFinal").removeClass("d-none");
+}
+
+function callbackSaveButton(isStarted) {
+    if(isStarted) {
+        $("#setFinalSeating").removeClass("d-none");
+    } else {
+        $("#saveFinal").removeClass("d-none");
+    }
 }
 
 function filterChooseDeck() {
@@ -441,6 +882,65 @@ function filterChooseDeck() {
             a[i].style.display = 'none';
         }
     }
+}
+
+function createTournamentTables() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    DS.createTournamentTables(tournamentSelected);
+    //reset Tournament Manager
+    resetTournamentManager();
+}
+
+function startFinalSeeding() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    DS.loadFinalSeeding(tournamentSelected, {callback: callbackFinalSeeding, errorHandler: errorhandler});
+}
+
+function callbackFinalSeeding(data) {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    let header = $("#finalSeedingHeader");
+    header.text("Final Table Seeding - " + tournamentSelected);
+    let finalSeeding = $("#finalTableSeeding");
+    finalSeeding.empty();
+    $("#tourFinal").removeClass("d-none");
+
+    if (data.length === 0) {
+        finalSeeding.sortable({connectWith: ".sortableFinal", handle: ".bi-grip-vertical", dropOnEmpty: true});
+        return;
+    }
+
+    let pending = data.length;
+    $.each(data, function(index, player) {
+        DS.loadCrypt(tournamentSelected, player, {callback: function callbackCrypt(crypt) {
+            DS.cryptCount(tournamentSelected, player, {callback: function callbackCryptCount(count) {
+                let playerSpan = $("<span/>").addClass("fw-bold").text(player);
+                let countSpan = $("<span/>").text(" [" + count + "]");
+                let listItem = $("<li/>").attr("data-player", player)
+                    .append(playerSpan)
+                    .append(countSpan)
+                    .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center");
+                let ul = $("<ul/>").addClass("d-flex w-100 text-center justify-content-between");
+                $.each(crypt, function(cardIndex, card) {
+                    const cardLink = $("<a/>").text(card.name).attr("data-card-id", card.id).addClass("card-name");
+                    let li = $("<li/>")
+                        .addClass("list-group-item align-items-center p-2 shadow text-center w-100")
+                        .append(cardLink);
+                    ul.append(li);
+                });
+                listItem.append(ul).append("<i class='bi bi-grip-vertical'></i>");
+                listItem.disableSelection();
+                finalSeeding.append(listItem);
+                addCardTooltips(listItem);
+                if (--pending === 0) {
+                    finalSeeding.sortable({
+                        connectWith: ".sortableFinal",
+                        handle: ".bi-grip-vertical",
+                        dropOnEmpty: true
+                    });
+                }
+            }, errorHandler: errorhandler});
+        }, errorHandler: errorhandler});
+    });
 }
 
 function callbackTournament(data) {

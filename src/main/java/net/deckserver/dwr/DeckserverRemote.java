@@ -6,17 +6,19 @@ import net.deckserver.dwr.bean.DeckInfoBean;
 import net.deckserver.dwr.creators.UpdateFactory;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
+import net.deckserver.dwr.model.JolGame;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.PlayerRole;
+import net.deckserver.game.enums.TournamentFormat;
+import net.deckserver.storage.json.game.CardSimple;
+import net.deckserver.storage.json.system.TournamentDetails;
 import net.deckserver.services.*;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.ChatData;
-import net.deckserver.storage.json.system.DeckInfo;
-import net.deckserver.storage.json.system.GameHistory;
-import net.deckserver.storage.json.system.PlayerInfo;
-import net.deckserver.storage.json.system.PlayerResult;
+import net.deckserver.storage.json.system.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.QuoteMode;
@@ -26,8 +28,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.time.OffsetDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class DeckserverRemote {
 
@@ -118,6 +123,157 @@ public class DeckserverRemote {
             TournamentService.registerDeck(tournament, playerName, deck);
         }
         return UpdateFactory.getUpdate();
+    }
+
+    /**
+     * Creates a new Tournament Definition and then creates or updates an existing Tournament
+     */
+    public boolean createTournament(String tourName, String regStart, String regEnd, String playStart, String playEnd, String tourFormat, String gameFormat, String[] rules, String specRulesCon, String[] specRules, String numberOfRounds, String reqId) {
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return false;
+        try {
+            Set<TournamentRegistration> existingRegistrations = new HashSet<>(TournamentService.getRegistrations(tourName));
+            //Prepare Tournament Definition
+            TournamentDefinition newTournament = TournamentDefinitionCreator.newTourDef()
+                    .withName(tourName)
+                    .withRegStart(OffsetDateTime.of(LocalDate.parse(regStart), LocalTime.MIDNIGHT, ZoneOffset.UTC))
+                    .withRegEnd(OffsetDateTime.of(LocalDate.parse(regEnd), LocalTime.MIDNIGHT, ZoneOffset.UTC))
+                    .withPlayStart(OffsetDateTime.of(LocalDate.parse(playStart), LocalTime.MIDNIGHT, ZoneOffset.UTC))
+                    .withPlayEnd(OffsetDateTime.of(LocalDate.parse(playEnd), LocalTime.MIDNIGHT, ZoneOffset.UTC))
+                    .withTourFormat(TournamentFormat.valueOf(tourFormat))
+                    .withDeckFormat(GameFormat.from(gameFormat))
+                    .withRules(rules)
+                    .withStatus(GameStatus.STARTING)
+                    .withSpecRules(specRulesCon, specRules)
+                    .withNumberOfRounds(Integer.parseInt(numberOfRounds))
+                    .withReqId(Boolean.parseBoolean(reqId))
+                    .withRegistrations(existingRegistrations)
+                    .getTourDef();
+            //create or replace existing Tournament (key -> Tournament Name)
+            TournamentService.createTournament(newTournament);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void createTournamentTables(String tourName) {
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
+        TournamentService.createTournamentTables(tourName);
+    }
+
+    public void createFinalTable(String tourName) {
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
+        TournamentService.createFinal(tourName);
+    }
+
+    public void setFinalSeeding(String tourName, String[] seeding) {
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
+        TournamentService.getTournament(tourName).getFinals().setSeeding(List.of(seeding));
+    }
+
+    public TournamentDetails loadTournamentDetails(String tourName) {
+        return new TournamentDetails(TournamentService.getTournament(tourName));
+    }
+
+    public String getRoundsForTournamentCsv(String tourName) {
+        return RoundsDetails.exportPastGamesAsCsv(TournamentService.getTournament(tourName).getRounds());
+    }
+
+    /**
+     * Change the Tournament Status to GameStatus.CLOSED
+     */
+    public void closeTournament(String nameOfTournament){
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
+        TournamentService.setTournamentStatus(nameOfTournament, GameStatus.CLOSED);
+    }
+
+    /**
+     * Get all Registered Tournament Players from a Tournament
+     */
+    public List<TournamentRegistration> getTournamentPlayers(String nameOfTournament) {
+        return TournamentService.getRegistrations(nameOfTournament);
+    }
+
+    public Boolean tournamentAlreadyActive(String nameOfTournament) {
+        GameStatus status = TournamentService.getTournament(nameOfTournament).getStatus();
+        return status.equals(GameStatus.ACTIVE);
+    }
+
+    /**
+     * Get the number of Rounds for a Tournament as int[]
+     */
+    public int[] getTournamentRounds(String nameOfTournament) {
+        return IntStream.range(1,TournamentService.getTournament(nameOfTournament).getNumberOfRounds()+1).toArray();
+    }
+
+    /**
+     * Clear rounds in Tournament Service
+     */
+    public void resetTables(String tourName) {
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
+        TournamentService.getTournament(tourName).resetRounds();
+    }
+
+    /**
+     * Saves the current UI table assignments for a tournament round.
+     * Receives a map of round → table → player names, converts player name strings
+     * to TournamentPlayer objects, and persists the full rounds configuration.
+     */
+    public void saveTables(String tourName, Map<Integer, Map<Integer, List<String>>> rounds) {
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
+        Map<Integer, Map<Integer, List<TournamentPlayer>>> newRoundsConfig = new HashMap<>();
+        rounds.forEach((round, tableMap) -> {
+            Map<Integer, List<TournamentPlayer>> tournamentPlayers = new HashMap<>();
+            tableMap.forEach((table, players) -> {
+                List<TournamentPlayer> playerList = players.stream()
+                        .filter(name -> name != null && !name.isEmpty())
+                        .map(name -> {
+                            TournamentPlayer tp = new TournamentPlayer();
+                            tp.setName(name);
+                            return tp;
+                        })
+                        .collect(Collectors.toList());
+                tournamentPlayers.put(table, playerList);
+            });
+            newRoundsConfig.put(round, tournamentPlayers);
+        });
+        TournamentService.getTournament(tourName).setRounds(newRoundsConfig);
+    }
+
+    /**
+     * Save Final seeding of a Tournament
+     */
+    public void saveFinal(String tourName, String[] players) {
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
+        if(!GameService.existsGame(String.format("%s: Final Table", tourName))) {
+            TournamentFinals finals = new TournamentFinals();
+            finals.setSeeding(List.of(players));
+            TournamentService.getTournament(tourName).setFinals(finals);
+        }
+    }
+
+    public List<String> loadFinalSeeding(String tourName) {
+        return TournamentService.getTournament(tourName).getFinals().getSeeding();
+    }
+
+    public List<CardSimple> loadCrypt(String tourName, String player) {
+        String deck = TournamentService.getRegistrations(tourName, player).get().getDeck();
+        return TournamentService.getRandomCrypt(tourName, deck);
+    }
+
+    public String cryptCount(String tourName, String player) {
+        String deck = TournamentService.getRegistrations(tourName, player).get().getDeck();
+        return String.valueOf(TournamentService.getCryptCount(tourName, deck)-3);
+    }
+
+    public Boolean gameAlreadyStarted(String tourName) {
+        try {
+            GameService.getGameByName(tourName);
+        } catch (NullPointerException ex) {
+            return false;
+        }
+        return true;
     }
 
     public Map<String, Object> startGame(String game) {
@@ -373,6 +529,37 @@ public class DeckserverRemote {
         return UpdateFactory.getUpdate();
     }
 
+    public Map<Integer, Map<Integer, List<TournamentPlayer>>> getRoundsForTournament(String tourName) {
+        return TournamentService.getTournament(tourName).getRounds();
+    }
+
+    public Map<Integer, List<TournamentRegistration>> getRegDelta(String tourName, Integer roundNumber) {
+        HashMap<Integer, List<TournamentRegistration>> regPlayersMap = new HashMap<>();
+        Map<Integer, List<TournamentPlayer>> roundTables = getRoundsForTournament(tourName).get(roundNumber);
+        if (roundTables == null) {
+            // No tables assigned yet for this round — all registered players are unassigned
+            regPlayersMap.put(roundNumber, new ArrayList<>(getTournamentPlayers(tourName)));
+            return regPlayersMap;
+        }
+        // Collect all players already assigned to a table in this round
+        List<TournamentRegistration> tablePlayers = new ArrayList<>();
+        roundTables.values().forEach(tournamentPlayers ->
+                tablePlayers.addAll(tournamentPlayers.stream().map(player -> {
+                    TournamentRegistration tr = new TournamentRegistration();
+                    tr.setPlayer(player.getName());
+                    return tr;
+                }).collect(Collectors.toSet())));
+        // Return registered players minus those already assigned
+        List<TournamentRegistration> regPlayers = new ArrayList<>(getTournamentPlayers(tourName));
+        regPlayers.removeAll(tablePlayers);
+        regPlayersMap.put(roundNumber, regPlayers);
+        return regPlayersMap;
+    }
+
+    public String getVekn(String playerName) {
+        return PlayerService.get(playerName).getVeknId();
+    }
+
     public String exportPastGamesAsCsv() throws IOException {
         CSVFormat format = CSVFormat.DEFAULT.builder()
                 .setHeader("Game", "Started", "Ended", "Player", "Deck", "GW", "VP")
@@ -405,5 +592,4 @@ public class DeckserverRemote {
     private GameModel getModel(String name) {
         return JolAdmin.getGameModel(name);
     }
-
 }
