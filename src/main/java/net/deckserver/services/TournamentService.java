@@ -284,6 +284,7 @@ public class TournamentService extends PersistedService {
     protected void persist() {
         if (shouldSkipPersistence()) {
             logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
+            return;
         }
 
         try {

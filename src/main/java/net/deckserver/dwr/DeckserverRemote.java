@@ -1,7 +1,5 @@
 package net.deckserver.dwr;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.DeckInfoBean;
@@ -131,6 +129,7 @@ public class DeckserverRemote {
      * Creates a new Tournament Definition and then creates or updates an existing Tournament
      */
     public boolean createTournament(String tourName, String regStart, String regEnd, String playStart, String playEnd, String tourFormat, String gameFormat, String[] rules, String specRulesCon, String[] specRules, String numberOfRounds, String reqId) {
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return false;
         try {
             Set<TournamentRegistration> existingRegistrations = new HashSet<>(TournamentService.getRegistrations(tourName));
             //Prepare Tournament Definition
@@ -146,7 +145,7 @@ public class DeckserverRemote {
                     .withStatus(GameStatus.STARTING)
                     .withSpecRules(specRulesCon, specRules)
                     .withNumberOfRounds(Integer.parseInt(numberOfRounds))
-                    .withReqId(Boolean.getBoolean(reqId))
+                    .withReqId(Boolean.parseBoolean(reqId))
                     .withRegistrations(existingRegistrations)
                     .getTourDef();
             //create or replace existing Tournament (key -> Tournament Name)
@@ -159,14 +158,17 @@ public class DeckserverRemote {
     }
 
     public void createTournamentTables(String tourName) {
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
         TournamentService.createTournamentTables(tourName);
     }
 
     public void createFinalTable(String tourName) {
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
         TournamentService.createFinal(tourName);
     }
 
     public void setFinalSeeding(String tourName, String[] seeding) {
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
         TournamentService.getTournament(tourName).getFinals().setSeeding(List.of(seeding));
     }
 
@@ -182,6 +184,7 @@ public class DeckserverRemote {
      * Change the Tournament Status to GameStatus.CLOSED
      */
     public void closeTournament(String nameOfTournament){
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
         TournamentService.setTournamentStatus(nameOfTournament, GameStatus.CLOSED);
     }
 
@@ -192,12 +195,9 @@ public class DeckserverRemote {
         return TournamentService.getRegistrations(nameOfTournament);
     }
 
-    public Boolean tournamentAlreadyActive (String nameOfTournament) {
-        if(TournamentService.getTournament(nameOfTournament).getStatus().equals(GameStatus.ACTIVE))
-            return true;
-        if(TournamentService.getTournament(nameOfTournament).getStatus().equals(GameStatus.STARTING))
-            return false;
-        return null;
+    public Boolean tournamentAlreadyActive(String nameOfTournament) {
+        GameStatus status = TournamentService.getTournament(nameOfTournament).getStatus();
+        return status.equals(GameStatus.ACTIVE);
     }
 
     /**
@@ -208,43 +208,36 @@ public class DeckserverRemote {
     }
 
     /**
-     * Clear rounds in Tournamen Service
+     * Clear rounds in Tournament Service
      */
     public void resetTables(String tourName) {
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
         TournamentService.getTournament(tourName).resetRounds();
     }
 
     /**
-     * Saves current UI Tables
-     * @param tourName
-     * @param rounds
-     * @throws JsonProcessingException
+     * Saves the current UI table assignments for a tournament round.
+     * Receives a map of round → table → player names, converts player name strings
+     * to TournamentPlayer objects, and persists the full rounds configuration.
      */
     public void saveTables(String tourName, Map<Integer, Map<Integer, List<String>>> rounds) {
-        //final new Rounds Table Config
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
         Map<Integer, Map<Integer, List<TournamentPlayer>>> newRoundsConfig = new HashMap<>();
-//        try {
-//            //replace String values with Integer keys and List<TournamenPlayer>
-//            new ObjectMapper().readValue(rounds, Map.class).forEach((key, value   ) -> {
-//                try {
-//                    Map<Integer, List<TournamentPlayer>> tournamentPlayers = new HashMap<>();
-//                    Map<String, List<String>> table = new ObjectMapper().readValue((String)value, Map.class);
-//                    table.forEach((s, list) -> {
-//                        tournamentPlayers.put(Integer.valueOf(s), list.stream().map(player -> {
-//                            TournamentPlayer tp = new TournamentPlayer();
-//                            tp.setName(player);
-//                            return tp;
-//                        }).collect(Collectors.toList()));
-//                    });
-//                    newRoundsConfig.put(Integer.valueOf((String) key), tournamentPlayers);
-//                } catch (JsonProcessingException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            });
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-        //save new round Config
+        rounds.forEach((round, tableMap) -> {
+            Map<Integer, List<TournamentPlayer>> tournamentPlayers = new HashMap<>();
+            tableMap.forEach((table, players) -> {
+                List<TournamentPlayer> playerList = players.stream()
+                        .filter(name -> name != null && !name.isEmpty())
+                        .map(name -> {
+                            TournamentPlayer tp = new TournamentPlayer();
+                            tp.setName(name);
+                            return tp;
+                        })
+                        .collect(Collectors.toList());
+                tournamentPlayers.put(table, playerList);
+            });
+            newRoundsConfig.put(round, tournamentPlayers);
+        });
         TournamentService.getTournament(tourName).setRounds(newRoundsConfig);
     }
 
@@ -252,6 +245,7 @@ public class DeckserverRemote {
      * Save Final seeding of a Tournament
      */
     public void saveFinal(String tourName, String[] players) {
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
         if(!GameService.existsGame(String.format("%s: Final Table", tourName))) {
             TournamentFinals finals = new TournamentFinals();
             finals.setSeeding(List.of(players));
@@ -540,21 +534,24 @@ public class DeckserverRemote {
     }
 
     public Map<Integer, List<TournamentRegistration>> getRegDelta(String tourName, Integer roundNumber) {
-        //create Set of all Players assigned to a Table
-        List<TournamentRegistration> tablePlayers = new ArrayList<>();
-        getRoundsForTournament(tourName).get(roundNumber).values().stream()
-                .forEach(tournamentPlayers ->
-                        tablePlayers.addAll(tournamentPlayers.stream().map(player -> {
-                            TournamentRegistration tournamentRegistration = new TournamentRegistration();
-                            tournamentRegistration.setPlayer(player.getName());
-                            return tournamentRegistration;
-                        }).collect(Collectors.toSet())));
-        //get all Players registered
-        List<TournamentRegistration> regPlayers = getTournamentPlayers(tourName).stream().collect(Collectors.toList());
-        //get Delta of registered Players minus the players assigned to a table
-        regPlayers.removeAll(tablePlayers);
-        //create a Map with the round number as key and the delta as value
         HashMap<Integer, List<TournamentRegistration>> regPlayersMap = new HashMap<>();
+        Map<Integer, List<TournamentPlayer>> roundTables = getRoundsForTournament(tourName).get(roundNumber);
+        if (roundTables == null) {
+            // No tables assigned yet for this round — all registered players are unassigned
+            regPlayersMap.put(roundNumber, new ArrayList<>(getTournamentPlayers(tourName)));
+            return regPlayersMap;
+        }
+        // Collect all players already assigned to a table in this round
+        List<TournamentRegistration> tablePlayers = new ArrayList<>();
+        roundTables.values().forEach(tournamentPlayers ->
+                tablePlayers.addAll(tournamentPlayers.stream().map(player -> {
+                    TournamentRegistration tr = new TournamentRegistration();
+                    tr.setPlayer(player.getName());
+                    return tr;
+                }).collect(Collectors.toSet())));
+        // Return registered players minus those already assigned
+        List<TournamentRegistration> regPlayers = new ArrayList<>(getTournamentPlayers(tourName));
+        regPlayers.removeAll(tablePlayers);
         regPlayersMap.put(roundNumber, regPlayers);
         return regPlayersMap;
     }
