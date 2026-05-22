@@ -594,14 +594,14 @@ function callbackTournamentRounds(data) {
             .addClass("btn btn-outline-secondary text-dark bg-info btn-sm mt-2 w-100")
             .text("Create Table");
         let divForPlayers = $("<div/>").attr("id","tourPlayer-"+round);
-        let divForTabels = $("<ol/>").addClass("card-body p-1 grid")
+        let divForTables = $("<ol/>").addClass("card-body p-1 grid")
             .attr("id","tableTour-"+round)
             .css({"--bs-columns": "4", "--bs-gap": "0.5rem"})
             .css("list-style-position","inside")
-        divForTabels.sortable({
+        divForTables.sortable({
             handle: ".bi-grip-vertical",
             dropOnEmpty: true});
-        div.append(label, createTableButton, divForPlayers, divForTabels);
+        div.append(label, createTableButton, divForPlayers, divForTables);
         tourRounds.append(div);
     });
 }
