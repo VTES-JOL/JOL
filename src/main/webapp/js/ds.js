@@ -885,10 +885,12 @@ function filterChooseDeck() {
 }
 
 function createTournamentTables() {
-    let tournamentSelected = $("#nameOfTournament option:selected").text();
-    DS.createTournamentTables(tournamentSelected);
-    //reset Tournament Manager
-    resetTournamentManager();
+    if (confirm("Are you sure you want to create the Tournament Tables?")) {
+        let tournamentSelected = $("#nameOfTournament option:selected").text();
+        DS.createTournamentTables(tournamentSelected);
+        //reset Tournament Manager
+        resetTournamentManager();
+    }
 }
 
 function startFinalSeeding() {
