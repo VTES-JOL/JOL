@@ -6,7 +6,6 @@ import net.deckserver.dwr.bean.DeckInfoBean;
 import net.deckserver.dwr.creators.UpdateFactory;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
-import net.deckserver.dwr.model.JolGame;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
@@ -189,10 +188,12 @@ public class DeckserverRemote {
     }
 
     /**
-     * Get all Registered Tournament Players from a Tournament
+     * Get all Registered Tournament Players from a Tournament who registered a Deck
      */
     public List<TournamentRegistration> getTournamentPlayers(String nameOfTournament) {
-        return TournamentService.getRegistrations(nameOfTournament);
+        return TournamentService.getRegistrations(nameOfTournament).stream()
+                .filter(player -> player.getDeck()!=null)
+                .collect(Collectors.toList());
     }
 
     public Boolean tournamentAlreadyActive(String nameOfTournament) {
