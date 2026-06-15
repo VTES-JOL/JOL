@@ -10,10 +10,14 @@ import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.CardSimple;
 import net.deckserver.storage.json.game.GameData;
 import net.deckserver.storage.json.system.*;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -209,6 +213,41 @@ public class TournamentService extends PersistedService {
 
     public static TournamentDefinition getTournament(String nameOfTournament) {
         return INSTANCE.tournaments.get(nameOfTournament);
+    }
+
+    public static void importRoundsFromCsv(String tourName, String csvData) throws IOException {
+        TournamentDefinition tournament = INSTANCE.tournaments.get(tourName);
+        if (tournament == null) return;
+
+        CSVFormat format = CSVFormat.DEFAULT.builder()
+                .setHeader("Round", "Table", "Player")
+                .setSkipHeaderRecord(true)
+                .setTrim(true)
+                .build();
+
+        Map<Integer, Map<Integer, List<TournamentPlayer>>> rounds = new HashMap<>();
+        try (CSVParser parser = CSVParser.parse(new StringReader(csvData), format)) {
+            for (CSVRecord record : parser) {
+                int round = Integer.parseInt(record.get("Round"));
+                int table = Integer.parseInt(record.get("Table"));
+                String playerName = record.get("Player");
+                if (playerName == null || playerName.isEmpty()) continue;
+
+                TournamentPlayer tp = new TournamentPlayer();
+                tp.setName(playerName);
+                rounds
+                    .computeIfAbsent(round, r -> new HashMap<>())
+                    .computeIfAbsent(table, t -> new ArrayList<>())
+                    .add(tp);
+            }
+        }
+
+        tournament.setRounds(rounds);
+        INSTANCE.persist();
+    }
+
+    public static void save() {
+        INSTANCE.persist();
     }
 
     public static void createTournamentTables(String tourName) {
