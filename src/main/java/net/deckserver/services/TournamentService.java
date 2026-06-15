@@ -278,6 +278,8 @@ public class TournamentService extends PersistedService {
                 }
                 // Set order and start
                 jolGame.startGame(players.stream().map(TournamentPlayer::getName).toList());
+                String playerName = players.getFirst().getName();
+                PlayerGameActivityService.pingPlayer(playerName, gameName);
                 // Save game
                 GameService.saveGame(jolGame);
                 // Update status
