@@ -588,7 +588,9 @@ function callbackTournamentRounds(data) {
     tourRounds.empty();
     $.each(data, function (index, round) {
         let div = $("<div/>").attr("id","tourAllTables-"+round);
-        let label = $("<span/>").addClass("h4").text("Round "+round);
+        let label = $("<span/>").addClass("h4").text("Round "+round)
+            .append($("<i/>").addClass("bi bi-sort-numeric-down").on("click", () => sortPlayerVekn(round)))
+            .append($("<i/>").addClass("bi bi-sort-alpha-down").on("click", () => sortPlayerNames(round)));
         let createTableButton = $("<button/>").attr("id", "createTable-"+round)
             .on('click', function () { createTable(round) })
             .addClass("btn btn-outline-secondary text-dark bg-info btn-sm mt-2 w-100")
@@ -624,6 +626,8 @@ function callbackTableManager(data) {
             let playerDiv = $("<div/>").addClass("d-flex flex-column").append(playerSpan, veknSpan);
             let listItem = $("<li/>")
                 .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center")
+                .attr("data-vekn", reg.vekn)
+                .attr("data-player", reg.player)
                 .append(playerDiv)
                 .append("<i class='bi bi-grip-vertical'></i>");
             listItem.disableSelection();
@@ -642,7 +646,7 @@ function createTable(round) {
         .addClass("card-body border border-success p-1")
         .append("<i class='bi bi-grip-vertical'></i>");
     let label = $("<span/>").addClass("h5").text("Table").append($("<br/>"));
-    let list = $("<ul/>").addClass("border list-group sortable"+round)
+    let list = $("<ul/>").addClass("border list-group table-size-max table-size-min sortable"+round)
         .attr("round", round)
         .css("min-height","38px");
     list.sortable({
@@ -820,7 +824,7 @@ function callbackShowPlayers(data) {
                 .append(playerDiv)
                 .append("<i class='bi bi-grip-vertical'></i>");
             listItem.disableSelection();
-            players.append(listItem);
+            players.append(playerIcon).append(listItem);
         })
     });
 }
@@ -2025,4 +2029,30 @@ function toggleMode() {
     } else {
         wrapper.removeAttr("data-bs-theme");
     }
+}
+
+function sortPlayerVekn(round) {
+    const ul = document.getElementById("tourPlayer-"+round);
+
+    const items = [...ul.querySelectorAll('li')];
+
+    items.sort((a, b) => {
+        return Number(a.dataset.vekn) - Number(b.dataset.vekn);
+    });
+
+    ul.append(...items);
+}
+
+function sortPlayerNames(round) {
+    const ul = document.getElementById("tourPlayer-"+round);
+
+    [...ul.children]
+        .sort((a, b) =>
+            a.dataset.player.localeCompare(
+                b.dataset.player,
+                undefined,
+                { sensitivity: 'base' }
+            )
+        )
+        .forEach(li => ul.appendChild(li));
 }
