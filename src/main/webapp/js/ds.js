@@ -703,6 +703,32 @@ function saveTables() {
     resetTournamentManager();
 }
 
+function importTables() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    let csvData = $("#importTablesCsv").val().trim();
+    let errorDiv = $("#importTablesError");
+
+    if (!csvData) {
+        errorDiv.text("Please paste CSV data before importing.").removeClass("d-none");
+        return;
+    }
+    errorDiv.addClass("d-none");
+
+    DS.importTables(tournamentSelected, csvData, {
+        callback: function() {
+            bootstrap.Modal.getInstance(document.getElementById("importTablesModal")).hide();
+            $("#importTablesCsv").val("");
+            let msg = $("#importTablesMsg");
+            msg.text("Tables imported successfully.").removeClass("d-none alert-danger").addClass("alert alert-success");
+            setTimeout(function() { msg.addClass("d-none"); }, 4000);
+            resetTournamentManager();
+        },
+        errorHandler: function(msg) {
+            errorDiv.text("Import failed: " + msg).removeClass("d-none");
+        }
+    });
+}
+
 function resetTournamentManager() {
     //reset
     let tourRounds = $("#tourRounds");

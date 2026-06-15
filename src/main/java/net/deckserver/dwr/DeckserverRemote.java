@@ -239,7 +239,19 @@ public class DeckserverRemote {
             });
             newRoundsConfig.put(round, tournamentPlayers);
         });
-        TournamentService.getTournament(tourName).setRounds(newRoundsConfig);
+        TournamentDefinition tournament = TournamentService.getTournament(tourName);
+        if (tournament == null) return;
+        tournament.setRounds(newRoundsConfig);
+        TournamentService.save();
+    }
+
+    public void importTables(String tourName, String csvData) {
+        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
+        try {
+            TournamentService.importRoundsFromCsv(tourName, csvData);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to import tournament tables from CSV", e);
+        }
     }
 
     /**
