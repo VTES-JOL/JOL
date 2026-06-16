@@ -15,6 +15,7 @@ import net.deckserver.game.validators.DeckValidator;
 import net.deckserver.game.validators.ValidationResult;
 import net.deckserver.game.validators.ValidatorFactory;
 import net.deckserver.services.*;
+import net.deckserver.ws.WebSocketRegistry;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
@@ -83,6 +84,7 @@ public class JolAdmin {
         if (gameName.length() > 2 && notExistsGame(gameName)) {
             try {
                 GameService.create(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), format);
+                WebSocketRegistry.notifyMain();
             } catch (Exception e) {
                 logger.error("Error creating game", e);
             }
@@ -176,6 +178,7 @@ public class JolAdmin {
             PlayerGameActivityService.setGameTimestamp(game.getName());
         }
         GameService.saveGame(game);
+        WebSocketRegistry.notifyGame(game.id());
     }
 
     public static synchronized void registerDeck(String gameName, String playerName, String deckName) {
@@ -436,7 +439,7 @@ public class JolAdmin {
         GameService.remove(gameName, gameInfo.getId());
         PlayerGameActivityService.clearGame(gameName);
         gmap.remove(gameName);
-
+        WebSocketRegistry.notifyMain();
     }
 
     public static String getDeckId(String playerName, String deckName) {

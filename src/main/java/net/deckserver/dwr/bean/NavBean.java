@@ -30,7 +30,7 @@ public class NavBean {
         player = model.getPlayerName();
         target = model.getView();
         if (target.equals("game"))
-            game = model.getCurrentGame();
+            game = GameService.get(model.getCurrentGame()).getId();
         if (player != null) {
             chats = model.hasChats();
             buttons.add("active:Watch");

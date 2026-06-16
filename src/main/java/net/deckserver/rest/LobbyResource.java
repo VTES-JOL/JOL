@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.services.RegistrationService;
+import net.deckserver.ws.WebSocketRegistry;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -43,6 +44,7 @@ public class LobbyResource extends BaseResource {
         String playerName = username();
         if (playerName != null) {
             RegistrationService.invitePlayer(game, body.player());
+            WebSocketRegistry.notifyMain();
         }
         return update(playerName);
     }
@@ -54,6 +56,7 @@ public class LobbyResource extends BaseResource {
         String playerName = username();
         if (playerName != null) {
             JolAdmin.unInvitePlayer(game, player);
+            WebSocketRegistry.notifyMain();
         }
         return update(playerName);
     }
@@ -65,6 +68,7 @@ public class LobbyResource extends BaseResource {
         String playerName = username();
         if (!Strings.isNullOrEmpty(playerName)) {
             JolAdmin.registerDeck(game, playerName, body.deckName());
+            WebSocketRegistry.notifyMain();
         }
         return update(playerName);
     }

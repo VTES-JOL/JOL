@@ -117,6 +117,8 @@ const DS = {
 let version = null;
 let refresher = null;
 let game = null;
+let ws = null;
+let wsConnected = false;
 let player = null;
 let currentPage = 'main';
 let currentOption = "notes";
@@ -168,7 +170,55 @@ function init(data) {
     processData(data);
     $("h4.collapse").click(function () {
         $(this).next().slideToggle();
-    })
+    });
+    initWebSocket();
+}
+
+function initWebSocket() {
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const url = `${proto}//${location.host}/jol/ws/updates`;
+    console.log('[WS] Connecting to', url);
+    ws = new WebSocket(url);
+
+    ws.onopen = () => {
+        wsConnected = true;
+        if (refresher) clearTimeout(refresher);
+        console.log('[WS] Connected — push notifications active, polling suspended');
+    };
+
+    ws.onmessage = (evt) => {
+        const msg = JSON.parse(evt.data);
+        console.log('[WS] Notification received:', msg, '(currentPage=' + currentPage + ', game=' + game + ')');
+        if (refresher) clearTimeout(refresher);
+        if (msg.type === 'game') {
+            if (currentPage === 'game' && game === msg.id) {
+                console.log('[WS] Triggering game refresh');
+                refreshState(false);
+            } else if (currentPage === 'main') {
+                console.log('[WS] Game changed, refreshing main page');
+                DS.doPoll({callback: processData, errorHandler: errorhandler});
+            }
+        } else if (msg.type === 'main' && currentPage === 'main') {
+            console.log('[WS] Main state changed, refreshing');
+            DS.doPoll({callback: processData, errorHandler: errorhandler});
+        }
+    };
+
+    ws.onclose = (evt) => {
+        wsConnected = false;
+        console.log('[WS] Connection closed (code=' + evt.code + '), falling back to polling, reconnecting in 5s');
+        if (currentPage === 'main') {
+            DS.doPoll({callback: processData, errorHandler: errorhandler});
+        } else if (currentPage === 'game' && game) {
+            refreshState(false);
+        }
+        setTimeout(initWebSocket, 5000);
+    };
+
+    ws.onerror = (evt) => {
+        console.error('[WS] Connection error', evt);
+        ws.close();
+    };
 }
 
 function setPreferences(value) {
@@ -293,10 +343,10 @@ function callbackAdmin(data) {
     let endTurnList = $("#endTurnList");
     adminGameList.empty();
     rollbackGamList.empty();
-    $.each(data.games, function (index, value) {
-        adminGameList.append($("<option/>", {value: value, text: value}));
-        endTurnList.append($("<option/>", {value: value, text: value}));
-        rollbackGamList.append($("<option/>", {value: value, text: value}));
+    $.each(data.games, function (id, name) {
+        adminGameList.append($("<option/>", {value: id, text: name}));
+        endTurnList.append($("<option/>", {value: id, text: name}));
+        rollbackGamList.append($("<option/>", {value: id, text: name}));
     })
     adminChangeGame();
     rollbackChangeGame();
@@ -1329,7 +1379,9 @@ function callbackMain(data) {
         renderMyGames("myGames", data.games);
         renderMyGames("oustedGames", data.ousted);
         if (refresher) clearTimeout(refresher);
-        refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
+        if (!wsConnected) {
+            refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
+        }
     } else {
         document.location = "/jol/";
     }
@@ -2014,17 +2066,12 @@ function loadGame(data) {
         addCardTooltips("#hand");
     }
 
-    // Setup polling
+    // Setup polling — immediate if log is incomplete, fallback timer when WebSocket is not connected
     if (refresher) clearTimeout(refresher);
-    if (data.refresh > 0 || fetchFullLog) {
-
-        //If we're missing anything from the log, fetch the whole thing from
-        //server immediately
-        let timeout = data.refresh;
-        if (fetchFullLog) {
-            timeout = 0;
-        }
-        refresher = setTimeout("refreshState(" + fetchFullLog + ")", timeout);
+    if (fetchFullLog) {
+        refreshState(true);
+    } else if (!wsConnected && data.refresh > 0) {
+        refresher = setTimeout("refreshState(false)", data.refresh);
     }
 
 }

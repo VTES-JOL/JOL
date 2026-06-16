@@ -3,11 +3,14 @@ package net.deckserver.dwr.bean;
 import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
+import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;
 
 import java.time.OffsetDateTime;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
@@ -16,7 +19,7 @@ public class AdminPageBean {
     private final List<UserSummaryBean> userRoles;
     private final List<PlayerActivityStatus> players;
     private final List<String> substitutes;
-    private final List<String> games;
+    private final Map<String, String> games; // id → name
     private final List<GameActivityStatus> idleGames;
 
     public AdminPageBean(PlayerModel model) {
@@ -42,11 +45,17 @@ public class AdminPageBean {
                 .filter(playerActivityStatus -> playerActivityStatus.online().isAfter(currentMonth))
                 .map(PlayerActivityStatus::getName)
                 .collect(Collectors.toList());
-        this.games = JolAdmin.getGameNames().stream()
+        List<String> activeGameNames = JolAdmin.getGameNames().stream()
                 .sorted()
                 .filter(JolAdmin::isActive)
-                .collect(Collectors.toList());
-        this.idleGames = this.games.stream()
+                .toList();
+        this.games = activeGameNames.stream()
+                .collect(Collectors.toMap(
+                        name -> GameService.get(name).getId(),
+                        name -> name,
+                        (a, b) -> a,
+                        LinkedHashMap::new));
+        this.idleGames = activeGameNames.stream()
                 .map(GameActivityStatus::new)
                 .filter(gameActivityStatus -> gameActivityStatus.timestamp().isBefore(currentMonth))
                 .sorted(Comparator.comparing(GameActivityStatus::timestamp))
