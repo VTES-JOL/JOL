@@ -1034,3 +1034,11 @@ a.card-name {
 .sect.sabbat:before {
     content: "Sabbat";
 }
+
+.table-size-min:has( > li:nth-child(3)) {
+    color: green;
+}
+
+.table-size-max:has( > li:nth-child(6)) {
+    color: red;
+}
