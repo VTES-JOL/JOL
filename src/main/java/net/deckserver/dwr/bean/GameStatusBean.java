@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class GameStatusBean {
 
     private final String name;
+    private final String gameId;
     private final String gameStatus;
     private final List<RegistrationStatus> registrations;
     private final Map<String, PlayerStatus> players;
@@ -32,6 +33,7 @@ public class GameStatusBean {
 
     public GameStatusBean(String gameName) {
         this.name = gameName;
+        this.gameId = GameService.get(gameName).getId();
         this.format = JolAdmin.getFormat(gameName);
         if (JolAdmin.isActive(gameName)) {
             this.gameStatus = "Active";

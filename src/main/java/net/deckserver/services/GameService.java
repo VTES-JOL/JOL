@@ -60,6 +60,14 @@ public class GameService extends PersistedService {
         return INSTANCE.games.get(name);
     }
 
+    public static String getNameByGameId(String gameId) {
+        return INSTANCE.games.values().stream()
+                .filter(info -> gameId.equals(info.getId()))
+                .map(GameInfo::getName)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No game with id: " + gameId));
+    }
+
     public static void create(String gameName, String gameId, String ownerName, Visibility visibility, GameFormat format) {
         if (gameName == null || gameName.isEmpty()) {
             logger.error("Game name is null or empty");

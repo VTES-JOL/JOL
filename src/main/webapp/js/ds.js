@@ -310,7 +310,7 @@ function callbackAdmin(data) {
             let row = $("<tr/>");
             if (firstPlayerRow) {
                 let nameCell = $("<td/>").attr('rowspan', playerCount).text(game.gameName).on('click', function () {
-                    doNav('g' + game.gameName);
+                    doNav('g' + game.gameId);
                 });
                 let timestampCell = $("<td/>").attr('rowspan', playerCount).text(moment(game.gameTimestamp).tz("UTC").format("D-MMM-YY HH:mm z"));
                 row.append(nameCell, timestampCell);
@@ -324,7 +324,7 @@ function callbackAdmin(data) {
                     text: "Close",
                     class: "btn btn-outline-secondary btn-sm",
                     confirm: "Are you sure you want to end this game?"
-                }, DS.endGame, game.gameName);
+                }, DS.endGame, game.gameId);
                 endGameCell.append(endGameButton);
                 row.append(endGameCell);
                 firstPlayerRow = false;
@@ -428,7 +428,7 @@ function callbackLobby(data) {
             text: "Close",
             class: "btn btn-outline-secondary btn-sm",
             confirm: "End Game?"
-        }, DS.endGame, game.name);
+        }, DS.endGame, game.gameId);
         let buttonWrapper = $("<span/>").addClass("d-flex justify-content-between align-items-center gap-1");
         let playerTable = $("<table/>").addClass("table table-bordered table-sm table-hover mt-2");
         let tableBody = $("<tbody/>");
@@ -1602,7 +1602,7 @@ function renderMyGames(id, games) {
 
     $.each(games, function (index, game) {
         let gameRow = $("<li/>").addClass("list-group-item p-0 border").on('click', function () {
-            doNav("g" + game.name);
+            doNav("g" + game.gameId);
         });
         let header = $("<div/>").addClass("d-flex p-2 justify-content-between w-100 border-bottom bg-body-tertiary");
         let title = $("<span/>").addClass("fw-bold text-break").text(game.name);
@@ -1647,7 +1647,7 @@ function renderPlayer(players, target) {
 
 function renderGameLink(game) {
     return $("<a/>").text(game.gameName).on('click', function () {
-        doNav("g" + game.gameName);
+        doNav("g" + game.gameId);
     });
 }
 

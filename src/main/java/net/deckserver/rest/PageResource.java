@@ -2,6 +2,7 @@ package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
+import net.deckserver.services.GameService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -34,7 +35,8 @@ public class PageResource extends BaseResource {
         String target = body != null ? body.target() : null;
         if (target != null) {
             if (target.startsWith("g")) {
-                player.enterGame(target.substring(1));
+                String gameName = GameService.getNameByGameId(target.substring(1));
+                player.enterGame(gameName);
             } else {
                 player.setView(target);
             }

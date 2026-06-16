@@ -2,6 +2,7 @@ package net.deckserver.dwr.bean;
 
 import lombok.Getter;
 import net.deckserver.JolAdmin;
+import net.deckserver.services.GameService;
 import net.deckserver.services.RegistrationService;
 
 import java.time.OffsetDateTime;
@@ -14,11 +15,13 @@ import java.util.Set;
 public class GameActivityStatus {
 
     private final String gameName;
+    private final String gameId;
     private final Map<String, String> idlePlayers = new HashMap<>();
     private final OffsetDateTime gameTimestamp;
 
     public GameActivityStatus(String gameName) {
         this.gameName = gameName;
+        this.gameId = GameService.get(gameName).getId();
         gameTimestamp = JolAdmin.getGameTimeStamp(gameName);
         Set<String> players = RegistrationService.getPlayers(gameName);
         players.forEach(player -> {

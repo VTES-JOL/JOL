@@ -3,6 +3,7 @@ package net.deckserver.dwr.bean;
 import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
+import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerGameActivityService;
 import net.deckserver.services.RegistrationService;
 
@@ -48,7 +49,8 @@ public class NavBean {
                     .filter(game -> JolAdmin.isAlive(game, player))
                     .forEach(game -> {
                         String current = PlayerGameActivityService.isCurrent(player, game) ? "" : "*";
-                        gameButtons.put("g" + game, game + current);
+                        String gameId = GameService.get(game).getId();
+                        gameButtons.put("g" + gameId, game + current);
                     });
         }
         stamp = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
