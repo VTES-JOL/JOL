@@ -104,6 +104,7 @@ public class GameView {
             try {
                 request.setAttribute("game", game);
                 request.setAttribute("player", playerName);
+                request.setAttribute("flag", PlayerService.get(playerName).getCountryCode());
                 request.setAttribute("viewer", playerName);
                 hand = WebContextFactory.get().forwardToString("/WEB-INF/jsps/game/hand.jsp");
             } catch (Exception e) {
