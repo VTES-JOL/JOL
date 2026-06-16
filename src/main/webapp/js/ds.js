@@ -22,6 +22,8 @@ let subscribed =  localStorage.getItem("notifications-subscribed") === "true";
 
 let pointerCanHover = window.matchMedia("(hover: hover)").matches;
 let scrollChat = false;
+let lastReceivedGlobalNotes = null;
+let lastReceivedPrivateNotes = null;
 const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
 function errorhandler(errorString, exception) {
@@ -1761,6 +1763,8 @@ function loadGame(data) {
         chat.empty();
         command.empty();
         currentOption = "notes";
+        lastReceivedGlobalNotes = null;
+        lastReceivedPrivateNotes = null;
         gameChatLastDay = null;
         // initial state for cards
         $(".panel-default").removeClass("d-none");
@@ -1804,14 +1808,18 @@ function loadGame(data) {
         addCardTooltips("#gameChatOutput");
     }
 
-    // Global Notes
-    if (data.globalNotes) {
+    // Global Notes — only update from server if the value has changed since we last received it.
+    // This prevents a race condition where endPlayerTurn responds before updateGlobalNotes is
+    // processed, causing stale server data to overwrite the user's unsaved notes.
+    if (data.globalNotes && data.globalNotes !== lastReceivedGlobalNotes) {
+        lastReceivedGlobalNotes = data.globalNotes;
         globalNotes.val(data.globalNotes);
     }
 
-    //Only clobber your private notes with the server's if something has changed,
-    //like another player has shown you some cards.
-    if (data.privateNotes) {
+    // Only update private notes if the server value has changed since we last received it,
+    // e.g. another player revealed cards. Same race-condition guard as globalNotes.
+    if (data.privateNotes && data.privateNotes !== lastReceivedPrivateNotes) {
+        lastReceivedPrivateNotes = data.privateNotes;
         privateNotes.val(data.privateNotes);
     }
 
