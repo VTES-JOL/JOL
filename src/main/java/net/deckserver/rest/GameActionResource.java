@@ -11,6 +11,7 @@ import net.deckserver.storage.json.game.ChatData;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.*;
 
 @Path("/game/{id}")
@@ -119,7 +120,13 @@ public class GameActionResource extends BaseResource {
     public Map<String, Object> rollbackGame(RollbackRequest body) {
         String player = username();
         if (gameName() != null && JolAdmin.isAdmin(player)) {
-            String turnCode = body.turn().split(" ")[1].replaceAll("\\.", "-");
+            String turn = body.turn();
+            String[] parts = (turn != null) ? turn.split(" ") : new String[0];
+            if (parts.length < 2) {
+                throw new WebApplicationException(
+                        Response.status(Response.Status.BAD_REQUEST).entity("Invalid turn format").build());
+            }
+            String turnCode = parts[1].replaceAll("\\.", "-");
             JolAdmin.rollbackGame(gameName(), player, turnCode);
         }
         return update(player);

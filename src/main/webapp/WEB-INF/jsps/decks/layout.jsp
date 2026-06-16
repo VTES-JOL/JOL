@@ -1,4 +1,4 @@
-<div class='row mt-2 g-2'>
+<div class='row mt-1 g-2'>
     <div class='col-md-4 col-lg-3'>
         <jsp:include page="deck-list.jsp"/>
     </div>

@@ -14,6 +14,7 @@ import net.deckserver.storage.json.system.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -236,16 +237,18 @@ public class TournamentResource extends BaseResource {
     @GET
     @Path("{name}/crypt")
     public List<CardSimple> loadCrypt(@PathParam("name") String tourName, @QueryParam("player") String player) {
-        String deck = TournamentService.getRegistrations(tourName, player).get().getDeck();
-        return TournamentService.getRandomCrypt(tourName, deck);
+        TournamentRegistration reg = TournamentService.getRegistrations(tourName, player)
+                .orElseThrow(() -> new WebApplicationException(Response.Status.NOT_FOUND));
+        return TournamentService.getRandomCrypt(tourName, reg.getDeck());
     }
 
     /** Replaces DS.cryptCount() */
     @GET
     @Path("{name}/crypt-count")
     public String cryptCount(@PathParam("name") String tourName, @QueryParam("player") String player) {
-        String deck = TournamentService.getRegistrations(tourName, player).get().getDeck();
-        return String.valueOf(TournamentService.getCryptCount(tourName, deck) - 3);
+        TournamentRegistration reg = TournamentService.getRegistrations(tourName, player)
+                .orElseThrow(() -> new WebApplicationException(Response.Status.NOT_FOUND));
+        return String.valueOf(TournamentService.getCryptCount(tourName, reg.getDeck()) - 3);
     }
 
     /** Replaces DS.tournamentAlreadyActive() */

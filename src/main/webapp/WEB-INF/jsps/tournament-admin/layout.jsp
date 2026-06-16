@@ -1,4 +1,4 @@
-<div class="row mt-2 g-2">
+<div class="row mt-1 g-2">
     <div class="col-lg-4">
         <jsp:include page="tournament-list.jsp"/>
     </div>

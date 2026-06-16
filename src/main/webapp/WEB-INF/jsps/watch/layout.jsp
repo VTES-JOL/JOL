@@ -1,4 +1,4 @@
-<div class="row mt-2 g-2">
+<div class="row mt-1 g-2">
     <div class="col-12">
         <div class="card shadow">
             <div class="card-header bg-body-secondary p-0">

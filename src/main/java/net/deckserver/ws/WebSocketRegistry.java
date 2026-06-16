@@ -20,8 +20,11 @@ public class WebSocketRegistry {
             s.remove(session);
             if (s.isEmpty()) sessions.remove(playerName);
         }
-        // remove from any game room this session was watching
-        gameSessions.values().forEach(set -> set.remove(session));
+        // remove from any game room this session was watching; evict empty sets
+        gameSessions.entrySet().removeIf(entry -> {
+            entry.getValue().remove(session);
+            return entry.getValue().isEmpty();
+        });
     }
 
     public static void joinGame(String gameId, Session session) {

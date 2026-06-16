@@ -104,14 +104,18 @@ public class GameView {
         pinged = JolAdmin.getPings(gameName);
 
         if (isPlayer && stateChanged) {
-            try {
-                request.setAttribute("game", game);
-                request.setAttribute("player", playerName);
-                request.setAttribute("viewer", playerName);
-                hand = JspRenderer.render(request, response, "/WEB-INF/jsps/game/hand.jsp");
-            } catch (Exception e) {
-                logger.error("Error retrieving hand", e);
-                hand = "Error retrieving hand.";
+            if (request == null || response == null) {
+                logger.error("GameView.create() called without RequestContext set — hand fragment skipped");
+            } else {
+                try {
+                    request.setAttribute("game", game);
+                    request.setAttribute("player", playerName);
+                    request.setAttribute("viewer", playerName);
+                    hand = JspRenderer.render(request, response, "/WEB-INF/jsps/game/hand.jsp");
+                } catch (Exception e) {
+                    logger.error("Error retrieving hand", e);
+                    hand = "Error retrieving hand.";
+                }
             }
         }
 
@@ -137,15 +141,19 @@ public class GameView {
         }
 
         if (stateChanged) {
-            try {
-                request.setAttribute("game", game);
-                request.setAttribute("viewer", playerName);
-                request.setAttribute("edgeColor", PlayerService.get(playerName).getEdgeColor());
-                request.setAttribute("edgeTextColor", colorIsDark(PlayerService.get(playerName).getEdgeColor())?"white":"black");
-                state = JspRenderer.render(request, response, "/WEB-INF/jsps/game/state.jsp");
-            } catch (Exception e) {
-                logger.error("Error retrieving state:", e);
-                hand = "Error retrieving state.";
+            if (request == null || response == null) {
+                logger.error("GameView.create() called without RequestContext set — state fragment skipped");
+            } else {
+                try {
+                    request.setAttribute("game", game);
+                    request.setAttribute("viewer", playerName);
+                    request.setAttribute("edgeColor", PlayerService.get(playerName).getEdgeColor());
+                    request.setAttribute("edgeTextColor", colorIsDark(PlayerService.get(playerName).getEdgeColor())?"white":"black");
+                    state = JspRenderer.render(request, response, "/WEB-INF/jsps/game/state.jsp");
+                } catch (Exception e) {
+                    logger.error("Error retrieving state:", e);
+                    hand = "Error retrieving state.";
+                }
             }
         }
 

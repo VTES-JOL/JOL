@@ -1,4 +1,4 @@
-<div class="row mt-2 g-2">
+<div class="row mt-1 g-2">
     <div class="col-md-6 col-lg-4">
         <jsp:include page="create-game.jsp"/>
         <jsp:include page="private-game-list.jsp"/>

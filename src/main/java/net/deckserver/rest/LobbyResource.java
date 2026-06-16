@@ -3,6 +3,7 @@ package net.deckserver.rest;
 import com.google.common.base.Strings;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.services.GameService;
 import net.deckserver.services.RegistrationService;
 import net.deckserver.ws.WebSocketRegistry;
 
@@ -31,8 +32,11 @@ public class LobbyResource extends BaseResource {
     @Path("games/{name}/start")
     public Map<String, Object> startGame(@PathParam("name") String game) {
         String playerName = username();
-        if ((JolAdmin.getOwner(game).equals(playerName) || JolAdmin.isSuperUser(playerName)) && JolAdmin.isStarting(game)) {
-            JolAdmin.startGame(game);
+        if (GameService.existsGame(game)) {
+            String owner = JolAdmin.getOwner(game);
+            if ((playerName.equals(owner) || JolAdmin.isSuperUser(playerName)) && JolAdmin.isStarting(game)) {
+                JolAdmin.startGame(game);
+            }
         }
         return update(playerName);
     }
