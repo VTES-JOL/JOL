@@ -7,7 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet({"/", "/main.jsp"})
+@WebServlet({"/", "/main.jsp", "/main", "/lobby", "/deck", "/admin", "/game/*",
+        "/tournament", "/tournamentAdmin", "/profile", "/active", "/watch", "/super"})
 public class MainServlet extends HttpServlet {
 
     @Override

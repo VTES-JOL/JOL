@@ -88,9 +88,6 @@
 <script src="${pageContext.request.contextPath}/js/popper.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/tippy.all.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>
-<script src='${pageContext.request.contextPath}/dwr/engine.js'></script>
-<script src='${pageContext.request.contextPath}/dwr/interface/DS.js'></script>
-<script src='${pageContext.request.contextPath}/dwr/util.js'></script>
 <script src='${pageContext.request.contextPath}/js/ds.js?version=<%= VersionService.getVersion() %>'></script>
 <script src="${pageContext.request.contextPath}/js/jquery.ui.touch-punch.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/card-modal.js?version=<%= VersionService.getVersion() %>"></script>

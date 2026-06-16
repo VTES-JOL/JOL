@@ -16,12 +16,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.directwebremoting</groupId>
-            <artifactId>dwr</artifactId>
-            <version>3.0.2-RELEASE</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.vdurmont</groupId>
             <artifactId>emoji-java</artifactId>
             <version>5.1.1</version>

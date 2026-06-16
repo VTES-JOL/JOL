@@ -4,14 +4,16 @@ import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.GameBean;
 import net.deckserver.game.enums.Phase;
 import net.deckserver.game.enums.RegionType;
+import net.deckserver.servlet.JspRenderer;
+import net.deckserver.servlet.RequestContext;
 import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.storage.json.game.ChatData;
-import org.directwebremoting.WebContextFactory;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -76,7 +78,8 @@ public class GameView {
     }
 
     public  GameBean create() {
-        HttpServletRequest request = WebContextFactory.get().getHttpServletRequest();
+        HttpServletRequest request = RequestContext.getRequest();
+        HttpServletResponse response = RequestContext.getResponse();
         JolGame game = GameService.getGameByName(gameName);
 
         if (isPlayer) {
@@ -105,7 +108,7 @@ public class GameView {
                 request.setAttribute("game", game);
                 request.setAttribute("player", playerName);
                 request.setAttribute("viewer", playerName);
-                hand = WebContextFactory.get().forwardToString("/WEB-INF/jsps/game/hand.jsp");
+                hand = JspRenderer.render(request, response, "/WEB-INF/jsps/game/hand.jsp");
             } catch (Exception e) {
                 logger.error("Error retrieving hand", e);
                 hand = "Error retrieving hand.";
@@ -139,7 +142,7 @@ public class GameView {
                 request.setAttribute("viewer", playerName);
                 request.setAttribute("edgeColor", PlayerService.get(playerName).getEdgeColor());
                 request.setAttribute("edgeTextColor", colorIsDark(PlayerService.get(playerName).getEdgeColor())?"white":"black");
-                state = WebContextFactory.get().forwardToString("/WEB-INF/jsps/game/state.jsp");
+                state = JspRenderer.render(request, response, "/WEB-INF/jsps/game/state.jsp");
             } catch (Exception e) {
                 logger.error("Error retrieving state:", e);
                 hand = "Error retrieving state.";

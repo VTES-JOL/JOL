@@ -1,4 +1,119 @@
 "use strict";
+
+// ---------------------------------------------------------------------------
+// REST API client — replaces DWR-generated DS.js
+// ---------------------------------------------------------------------------
+const _ctx = '/jol/api';
+
+function _enc(s) { return encodeURIComponent(s); }
+
+function apiCall(method, path, body, opts) {
+    const init = { method, headers: {'Content-Type': 'application/json'} };
+    if (body !== null && body !== undefined) init.body = JSON.stringify(body);
+    return fetch(_ctx + path, init)
+        .then(r => {
+            if (!r.ok) return r.text().then(msg => { throw new Error(msg || r.statusText); });
+            if (r.status === 204) return {};
+            return r.json();
+        })
+        .then(data => opts?.callback && opts.callback(data))
+        .catch(err => opts?.errorHandler && opts.errorHandler(String(err)));
+}
+
+function apiGet(path, opts) { return apiCall('GET', path, null, opts); }
+function apiPost(path, body, opts) { return apiCall('POST', path, body, opts); }
+function apiPut(path, body, opts) { return apiCall('PUT', path, body, opts); }
+function apiDel(path, opts) { return apiCall('DELETE', path, null, opts); }
+
+function apiGetText(path, opts) {
+    return fetch(_ctx + path)
+        .then(r => { if (!r.ok) throw new Error(r.statusText); return r.text(); })
+        .then(data => opts?.callback && opts.callback(data))
+        .catch(err => opts?.errorHandler && opts.errorHandler(String(err)));
+}
+
+const DS = {
+    // Navigation / polling
+    navigate:                (target, opts) => apiPost('/navigate', {target}, opts),
+    doPoll:                  (opts) => apiGet('/poll', opts),
+
+    // Global chat
+    chat:                    (text, opts) => apiPost('/chat', {text}, opts),
+
+    // Lobby
+    createGame:              (name, publicFlag, format, opts) => apiPost('/lobby/games', {name, publicFlag, format}, opts),
+    startGame:               (game, opts) => apiPost(`/lobby/games/${_enc(game)}/start`, {}, opts),
+    invitePlayer:            (game, player, opts) => apiPost(`/lobby/games/${_enc(game)}/invite`, {player}, opts),
+    unInvitePlayer:          (game, player, opts) => apiDel(`/lobby/games/${_enc(game)}/invite/${_enc(player)}`, opts),
+    registerDeck:            (gameName, deckName, opts) => apiPost(`/lobby/games/${_enc(gameName)}/deck`, {deckName}, opts),
+
+    // Game actions
+    submitForm:              (game, phase, command, chat, ping, opts) => apiPost(`/game/${_enc(game)}/submit`, {phase, command, chat, ping}, opts),
+    endPlayerTurn:           (game, opts) => apiPost(`/game/${_enc(game)}/end-turn`, {}, opts),
+    endTurn:                 (game, opts) => apiPost(`/game/${_enc(game)}/force-end-turn`, {}, opts),
+    endGame:                 (name, opts) => apiDel(`/game/${_enc(name)}`, opts),
+    gameChat:                (game, chat, opts) => apiPost(`/game/${_enc(game)}/chat`, {chat}, opts),
+    doToggle:                (game, id, opts) => apiPost(`/game/${_enc(game)}/toggle/${_enc(id)}`, {}, opts),
+    updateGlobalNotes:       (game, notes, opts) => apiPut(`/game/${_enc(game)}/notes/global`, {notes}, opts),
+    updatePrivateNotes:      (game, notes, opts) => apiPut(`/game/${_enc(game)}/notes/private`, {notes}, opts),
+    getState:                (game, forceLoad, opts) => apiPost(`/game/${_enc(game)}/state`, {forceLoad}, opts),
+    rollbackGame:            (game, turn, opts) => apiPost(`/game/${_enc(game)}/rollback`, {turn}, opts),
+    replacePlayer:           (game, existingPlayer, newPlayer, opts) => apiPut(`/game/${_enc(game)}/replace-player`, {existingPlayer, newPlayer}, opts),
+    getGameDeck:             (game, opts) => apiGet(`/game/${_enc(game)}/deck`, opts),
+    getGamePlayers:          (game, opts) => apiGet(`/game/${_enc(game)}/players`, opts),
+    getGameTurns:            (game, opts) => apiGet(`/game/${_enc(game)}/turns`, opts),
+    getHistory:              (game, turn, opts) => apiGet(`/game/${_enc(game)}/history?turn=${_enc(turn || '')}`, opts),
+
+    // Decks
+    filterDecks:             (filter, opts) => apiGet(`/decks?filter=${_enc(filter || '')}`, opts),
+    saveDeck:                (deckName, contents, comment, opts) => apiPost('/decks', {deckName, contents, comment}, opts),
+    deleteDeck:              (deckName, opts) => apiDel(`/decks/${_enc(deckName)}`, opts),
+    loadDeck:                (deckName, opts) => apiPost('/decks/load', {deckName}, opts),
+    newDeck:                 (opts) => apiPost('/decks/new', {}, opts),
+    validate:                (contents, format, opts) => apiPost('/decks/validate', {contents, format}, opts),
+    parseDeck:               (deckName, contents, opts) => apiPost('/decks/validate', {contents, format: ''}, opts),
+
+    // User profile
+    updateProfile:           (email, discordID, veknID, country, opts) => apiPut('/user/profile', {email, discordID, veknID, country}, opts),
+    changePassword:          (newPassword, opts) => apiPut('/user/password', {newPassword}, opts),
+    setUserPreferences:      (imageTooltips, opts) => apiPut('/user/preferences', {imageTooltips}, opts),
+    setEdgeColor:            (color, opts) => apiPut('/user/edge-color', {color}, opts),
+
+    // Admin
+    setRole:                 (player, role, value, opts) => apiPut(`/admin/player/${_enc(player)}/role`, {role, value}, opts),
+    deletePlayer:            (playerName, opts) => apiDel(`/admin/player/${_enc(playerName)}`, opts),
+    setMessage:              (message, opts) => apiPost('/admin/message', {message}, opts),
+    getVekn:                 (playerName, opts) => apiGet(`/admin/player/${_enc(playerName)}/vekn`, opts),
+    exportPastGamesAsCsv:    (opts) => apiGetText('/admin/export/games.csv', opts),
+
+    // Tournament
+    createTournament:        (tourName, regStart, regEnd, playStart, playEnd, tourFormat, gameFormat, rules, specRulesCon, specRules, numberOfRounds, reqId, opts) =>
+                                 apiPost('/tournament', {tourName, regStart, regEnd, playStart, playEnd, tourFormat, gameFormat, rules, specRulesCon, specRules, numberOfRounds, reqId}, opts),
+    loadTournamentDetails:   (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/details`, opts),
+    getRoundsForTournament:  (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/rounds`, opts),
+    getRoundsForTournamentCsv: (tourName, opts) => apiGetText(`/tournament/${_enc(tourName)}/rounds/csv`, opts),
+    getTournamentPlayers:    (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/players`, opts),
+    createTournamentTables:  (tourName, opts) => apiPost(`/tournament/${_enc(tourName)}/tables`, {}, opts),
+    saveTables:              (tourName, rounds, opts) => apiPut(`/tournament/${_enc(tourName)}/rounds`, rounds, opts),
+    importTables:            (tourName, csvData, opts) => apiPost(`/tournament/${_enc(tourName)}/rounds/import`, {csvData}, opts),
+    createFinalTable:        (tourName, opts) => apiPost(`/tournament/${_enc(tourName)}/final`, {}, opts),
+    setFinalSeeding:         (tourName, seeding, opts) => apiPut(`/tournament/${_enc(tourName)}/seeding`, seeding, opts),
+    loadFinalSeeding:        (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/seeding`, opts),
+    closeTournament:         (tourName, opts) => apiPost(`/tournament/${_enc(tourName)}/close`, {}, opts),
+    joinTournament:          (game, opts) => apiPost(`/tournament/${_enc(game)}/join`, {}, opts),
+    leaveTournament:         (game, opts) => apiPost(`/tournament/${_enc(game)}/leave`, {}, opts),
+    registerTournamentDeck:  (tournament, deckName, opts) => apiPost(`/tournament/${_enc(tournament)}/deck`, {deckName}, opts),
+    resetTables:             (tourName, opts) => apiDel(`/tournament/${_enc(tourName)}/rounds`, opts),
+    saveFinal:               (tourName, players, opts) => apiPut(`/tournament/${_enc(tourName)}/final-players`, players, opts),
+    getRegDelta:             (tourName, round, opts) => apiGet(`/tournament/${_enc(tourName)}/round-delta?round=${round}`, opts),
+    loadCrypt:               (tourName, player, opts) => apiGet(`/tournament/${_enc(tourName)}/crypt?player=${_enc(player)}`, opts),
+    cryptCount:              (tourName, player, opts) => apiGet(`/tournament/${_enc(tourName)}/crypt-count?player=${_enc(player)}`, opts),
+    tournamentAlreadyActive: (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/status`, opts),
+    gameAlreadyStarted:      (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/game-started`, opts),
+    getTournamentRounds:     (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/rounds-count`, opts),
+};
+// ---------------------------------------------------------------------------
+
 let version = null;
 let refresher = null;
 let game = null;
@@ -28,7 +143,9 @@ const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
 function errorhandler(errorString, exception) {
     $("#connectionMessage").removeClass("d-none");
-    refresher = setTimeout("DS.init({callback: processData, errorHandler: errorhandler})", 5000);
+    refresher = setTimeout(function() {
+        DS.navigate(null, {callback: processData, errorHandler: errorhandler});
+    }, 5000);
 }
 
 $(document).ready(function () {
@@ -37,7 +154,14 @@ $(document).ready(function () {
         links: [],
         version: '2024b'
     });
-    DS.init({callback: init, errorHandler: errorhandler});
+    const parts = window.location.pathname.replace(/^\/jol\//, '').split('/');
+    let initialTarget = parts[0] || 'main';
+    if (initialTarget === 'game' && parts[1]) initialTarget = 'g' + decodeURIComponent(parts[1]);
+    DS.navigate(initialTarget, {callback: init, errorHandler: errorhandler});
+    window.addEventListener('popstate', function(e) {
+        const t = e.state && e.state.target ? e.state.target : 'main';
+        DS.navigate(t, {callback: processData, errorHandler: errorhandler});
+    });
 });
 
 function init(data) {
@@ -1029,45 +1153,45 @@ function callbackTournament(data) {
             template.find('.game-join').append("<span class='badge bg-warning-subtle text-black'>Requires VEKN #</span>");
         }
         tournaments.append(template);
+    });
 
-        let invitedGames = $("#registeredTournaments");
-        invitedGames.empty();
-        $.each(data.registeredGames, function (index, game) {
-            let template = `
-            <div class="list-group-item">
-                <div class="d-flex justify-content-between align-items-center border-bottom mb-2">
-                    <div class="flex-grow-1 p-2 d-flex justify-content-between align-items-center">
-                        <span class="d-flex justify-content-between align-items-center">
-                            <span class="badge bg-secondary">${game.format}</span>
-                            <span class="mx-2 d-inline fs-5">${game.name}</span>
-                        </span>
-                    </div>
-                    <div class="d-inline">
-                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" >
-                            Choose Deck
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end tournament-invite-${game.format}" data-name="${game.name}">
-                        </ul>
-                    </div>
+    let invitedGames = $("#registeredTournaments");
+    invitedGames.empty();
+    $.each(data.registeredGames, function (index, game) {
+        let template = `
+        <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center border-bottom mb-2">
+                <div class="flex-grow-1 p-2 d-flex justify-content-between align-items-center">
+                    <span class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-secondary">${game.format}</span>
+                        <span class="mx-2 d-inline fs-5">${game.name}</span>
+                    </span>
                 </div>
-                <div id="tournamentDeck"/>
+                <div class="d-inline">
+                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" >
+                        Choose Deck
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end tournament-invite-${game.format}" data-name="${game.name}">
+                    </ul>
+                </div>
             </div>
-        `;
-            invitedGames.append(template);
-            if (game.deck) {
-                renderDeck(game.deck, "#tournamentDeck");
-            }
-            addCardTooltips("#tournamentDeck");
-        });
+            <div id="tournamentDeck"/>
+        </div>
+    `;
+        invitedGames.append(template);
+        if (game.deck) {
+            renderDeck(game.deck, "#tournamentDeck");
+        }
+        addCardTooltips("#tournamentDeck");
+    });
 
-        $.each(data.decks, function (index, deck) {
-            $.each(deck.gameFormats, function (i, format) {
-                let dropDown = $(`ul .tournament-invite-${format}`);
-                let template = $(`<li><a class="dropdown-item">${deck.name}</a></li>`).on('click', function () {
-                    registerForTournament(this, deck.name);
-                });
-                dropDown.append(template);
-            })
+    $.each(data.decks, function (index, deck) {
+        $.each(deck.gameFormats, function (i, format) {
+            let dropDown = $(`ul .tournament-invite-${format}`);
+            let template = $(`<li><a class="dropdown-item">${deck.name}</a></li>`).on('click', function () {
+                registerForTournament(this, deck.name);
+            });
+            dropDown.append(template);
         })
     });
 }
@@ -1304,6 +1428,8 @@ function doGlobalChat() {
 }
 
 function doNav(target) {
+    const urlPath = target.startsWith('g') ? 'game/' + encodeURIComponent(target.substring(1)) : target;
+    history.pushState({target}, '', '/jol/' + urlPath);
     $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
     if (refresher) clearTimeout(refresher);
     scrollChat = true;
@@ -1317,10 +1443,10 @@ function renderButton(data) {
     $.each(data, function (i, value) {
         let key = value.split(":")[0];
         let label = value.split(":")[1];
-        let button = $("<a/>").addClass("nav-item nav-link").text(label).click(key, function () {
-            DS.navigate(key, {callback: processData, errorHandler: errorhandler});
-            if (refresher) clearTimeout(refresher);
-            $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
+        const keyPath = key.startsWith('g') ? 'game/' + encodeURIComponent(key.substring(1)) : key;
+        let button = $("<a/>").addClass("nav-item nav-link").attr("href", "/jol/" + keyPath).text(label).click(key, function (e) {
+            e.preventDefault();
+            doNav(key);
         });
         if (game === label || currentPage.toLowerCase() === key.toLowerCase()) {
             button.addClass("active");
@@ -1334,9 +1460,10 @@ function renderGameButtons(data) {
     let newActivity = false;
     $.each(data, function (key, value) {
         let li = $("<li/>");
-        let button = $("<a/>").addClass("dropdown-item").text(value).click(key, function () {
-            DS.navigate(key, {callback: processData, errorHandler: errorhandler});
-            $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
+        const keyPath = key.startsWith('g') ? 'game/' + encodeURIComponent(key.substring(1)) : key;
+        let button = $("<a/>").addClass("dropdown-item").attr("href", "/jol/" + keyPath).text(value).click(key, function (e) {
+            e.preventDefault();
+            doNav(key);
         });
         if (game === value || currentPage.toLowerCase() === key.toLowerCase()) {
             button.addClass("active");
@@ -2017,15 +2144,15 @@ function updateProfile() {
 }
 
 function updatePassword() {
-    let profileNewPassword = dwr.util.getValue("profileNewPassword");
-    let profileConfirmPassword = dwr.util.getValue("profileConfirmPassword");
+    let profileNewPassword = $('#profileNewPassword').val();
+    let profileConfirmPassword = $('#profileConfirmPassword').val();
     if (!profileNewPassword && !profileConfirmPassword) {
-        dwr.util.setValue("profilePasswordError", "Enter a new password.");
+        $('#profilePasswordError').val("Enter a new password.");
     } else if (profileNewPassword !== profileConfirmPassword) {
-        dwr.util.setValue("profilePasswordError", "Password confirmation does not match.");
+        $('#profilePasswordError').val("Password confirmation does not match.");
     } else {
         DS.changePassword(profileNewPassword, {callback: processData, errorHandler: errorhandler});
-        dwr.util.setValue("profilePasswordError", "Password updated");
+        $('#profilePasswordError').val("Password updated");
     }
 }
 
