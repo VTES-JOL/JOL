@@ -1,5 +1,6 @@
 package net.deckserver.ws;
 
+import net.deckserver.services.VersionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +65,14 @@ public class JolWebSocketEndpoint {
         // and {"type":"leave","game":"<gameId>"} when leaving, so the server can
         // target game notifications to only the sessions watching that game.
         try {
-            if (message.contains("\"join\"")) {
+            if (message.contains("\"ping\"")) {
+                String ver = VersionService.getVersion();
+                String pong = ver != null
+                        ? "{\"type\":\"pong\",\"version\":\"" + ver + "\"}"
+                        : "{\"type\":\"pong\"}";
+                if (ws.isOpen()) ws.getBasicRemote().sendText(pong);
+                return;
+            } else if (message.contains("\"join\"")) {
                 String gameId = extractGameId(message);
                 if (gameId != null) WebSocketRegistry.joinGame(gameId, ws);
             } else if (message.contains("\"leave\"")) {
@@ -89,7 +97,18 @@ public class JolWebSocketEndpoint {
         String playerName = (String) ws.getUserProperties().get(PLAYER_KEY);
         if (playerName != null) {
             WebSocketRegistry.unregister(playerName, ws);
-            log.info("WebSocket closed for player {} — {} {}", playerName, reason.getCloseCode(), reason.getReasonPhrase());
+            CloseReason.CloseCode closeCode = reason == null ? null : reason.getCloseCode();
+            String reasonPhrase = reason == null ? "" : reason.getReasonPhrase();
+            if (reasonPhrase == null) reasonPhrase = "";
+            if (CloseReason.CloseCodes.CLOSED_ABNORMALLY.equals(closeCode)) {
+                log.warn("WebSocket closed abnormally for player {} (session {}, code {})", playerName, ws.getId(), closeCode);
+            } else {
+                log.info("WebSocket closed for player {} (session {}, code {}{})",
+                        playerName,
+                        ws.getId(),
+                        closeCode,
+                        reasonPhrase.isBlank() ? "" : ", reason " + reasonPhrase);
+            }
         }
     }
 

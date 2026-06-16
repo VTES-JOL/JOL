@@ -120,6 +120,8 @@ let refresher = null;
 let game = null;
 let ws = null;
 let wsConnected = false;
+let wsHeartbeat = null;
+let wsReconnect = null;
 let player = null;
 let currentPage = 'main';
 let USER_TIMEZONE = moment.tz.guess();
@@ -182,6 +184,14 @@ function init(data) {
 }
 
 function initWebSocket() {
+    if (wsReconnect) {
+        clearTimeout(wsReconnect);
+        wsReconnect = null;
+    }
+    if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+        return;
+    }
+
     const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
     const url = `${proto}//${location.host}/jol/ws/updates`;
     console.log('[WS] Connecting to', url);
@@ -194,10 +204,20 @@ function initWebSocket() {
         console.log('[WS] Connected — push notifications active, polling suspended');
         // Re-join the game room if we're already on a game page (e.g. after reconnect)
         if (currentPage === 'game' && game) wsJoinGame(game);
+        if (wsHeartbeat) clearInterval(wsHeartbeat);
+        wsHeartbeat = setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({type: 'ping'}));
+            }
+        }, 30000);
     };
 
     ws.onmessage = (evt) => {
         const msg = JSON.parse(evt.data);
+        if (msg.type === 'pong') {
+            if (msg.version) checkVersion(msg.version);
+            return;
+        }
         console.log('[WS] Notification received:', msg, '(currentPage=' + currentPage + ', game=' + game + ')');
         if (refresher) clearTimeout(refresher);
         if (msg.type === 'game') {
@@ -216,6 +236,14 @@ function initWebSocket() {
 
     ws.onclose = (evt) => {
         wsConnected = false;
+        if (wsHeartbeat) {
+            clearInterval(wsHeartbeat);
+            wsHeartbeat = null;
+        }
+        if (evt.code === 1008 || evt.reason === 'Unauthorized') {
+            location.href = '/jol/login';
+            return;
+        }
         $("#wsStatus").removeClass("d-none");
         console.log('[WS] Connection closed (code=' + evt.code + '), falling back to polling, reconnecting in 5s');
         if (currentPage === 'main') {
@@ -223,7 +251,7 @@ function initWebSocket() {
         } else if (currentPage === 'game' && game) {
             refreshState(false);
         }
-        setTimeout(initWebSocket, 5000);
+        wsReconnect = setTimeout(initWebSocket, 5000);
     };
 
     ws.onerror = (evt) => {
