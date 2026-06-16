@@ -1315,6 +1315,7 @@ function callbackProfile(data) {
     $('#profilePasswordError').val('');
     $('#profileNewPassword').val('');
     $('#profileConfirmPassword').val('');
+    updateNavUserDisplay();
 }
 
 function enterEditMode() {
@@ -1439,6 +1440,13 @@ function callbackShowGameDeck(data) {
 
 function callbackMain(data) {
     if (data.loggedIn) {
+        if (data.who && player) {
+            const me = data.who.find(p => p.name === player);
+            if (me && me.country && !profile.country) {
+                profile.country = me.country;
+                updateNavUserDisplay();
+            }
+        }
         renderOnline('onlinePlayers', data.who);
         renderGlobalChat(data.chat);
         renderMyGames("myGames", data.games);
@@ -1558,6 +1566,18 @@ function doNav(target) {
     $('#targetPicker').hide();
     DS.navigate(target, {callback: processData, errorHandler: errorhandler});
     return false;
+}
+
+function updateNavUserDisplay() {
+    $('#navUserName').text(player || '');
+    const country = profile && profile.country;
+    const flagEl = $('#navUserFlag');
+    flagEl.empty();
+    if (country) {
+        flagEl.html(`<span class="fi fi-${country.toLowerCase()} fis rounded-1"></span>`);
+    } else {
+        flagEl.html('<i class="bi bi-person-circle text-secondary"></i>');
+    }
 }
 
 function renderButton(data) {
@@ -1892,15 +1912,16 @@ function navigate(data) {
     $('#gameButtonsNav').hide();
     $('#titleLink').text(TITLE + (data.chats ? ' *' : ''));
     if (data.player === null) {
-        $('#logout').hide();
+        $('#userMenu').addClass('d-none');
         $("#gameRow").hide();
         player = null;
     } else {
         renderButton(data.buttons);
         renderGameButtons(data.gameButtons);
-        $('#logout').show();
+        $('#userMenu').removeClass('d-none');
         $("#gameRow").show();
         player = data.player;
+        updateNavUserDisplay();
     }
     $("#message").html(data.message)
     let timestamp = moment(data.stamp).tz("UTC").format("D-MMM HH:mm z");
@@ -2297,30 +2318,22 @@ function updatePassword() {
 
 function renderDesktopViewButton() {
     let viewport = $('meta[name=viewport]').get(0);
-    let text = (
-        viewport.content === DESKTOP_VIEWPORT_CONTENT
-            ? 'Mobile' : 'Desktop') + ' View';
-    let button = $('<a/>')
-        .attr('id', 'toggleMobileViewLink')
-        .addClass('nav-item nav-link')
-        .text(text)
-        .click(function () {
-            toggleMobileView();
-            $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
-        });
-    $('#buttons').append(button);
+    let isDesktop = viewport.content === DESKTOP_VIEWPORT_CONTENT;
+    $('#desktopViewLabel').text(isDesktop ? 'Mobile View' : 'Desktop View');
+    $('#desktopViewIcon').attr('class', isDesktop ? 'bi bi-phone me-2' : 'bi bi-display me-2');
 }
 
 function toggleMobileView(event) {
     if (event) event.preventDefault();
-    let $link = $('#toggleMobileViewLink').eq(0);
     let viewport = $('meta[name=viewport]').get(0);
     if (viewport.content === DESKTOP_VIEWPORT_CONTENT) {
         viewport.content = 'width=device-width, initial-scale=1, shrink-to-fit=no';
-        $link.text('Desktop View');
+        $('#desktopViewLabel').text('Desktop View');
+        $('#desktopViewIcon').attr('class', 'bi bi-display me-2');
     } else {
         viewport.content = DESKTOP_VIEWPORT_CONTENT;
-        $link.text('Mobile View');
+        $('#desktopViewLabel').text('Mobile View');
+        $('#desktopViewIcon').attr('class', 'bi bi-phone me-2');
     }
     pointerCanHover = window.matchMedia("(hover: hover)").matches;
     $('body').scrollTop(0);

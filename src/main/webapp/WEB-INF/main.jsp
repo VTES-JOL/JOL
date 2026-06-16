@@ -1,5 +1,10 @@
 <%@ page import="net.deckserver.JolAdmin" %>
 <%@ page import="net.deckserver.services.VersionService" %>
+<%
+    String environment = System.getenv().getOrDefault("TYPE", "dev");
+    String environmentLabel = environment.equals("dev") ? "Development" : (environment.equals("test") ? "Test System" : "");
+    boolean showEnvLabel = !environmentLabel.isEmpty();
+%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!doctype html>
@@ -70,10 +75,15 @@
 
     </div>
     <footer class="footer d-none d-sm-block" id="footer">
-        <div class="container-fluid p-2 justify-content-center justify-content-md-between d-flex bg-secondary-subtle fw-bold">
+        <div class="container-fluid p-2 justify-content-center justify-content-md-between d-flex align-items-center bg-secondary-subtle fw-bold">
             <span id="timeStamp" class="d-none d-md-inline"></span>
             <span id="message"></span>
-            <span class="d-none d-md-inline">Version: <%= VersionService.getVersion() %></span>
+            <span class="d-none d-md-inline d-flex align-items-center gap-2">
+                <% if (showEnvLabel) { %>
+                <span class="badge text-bg-<%= environment.equals("dev") ? "danger" : "warning" %> fw-semibold"><%= environmentLabel %></span>
+                <% } %>
+                Version: <%= VersionService.getVersion() %>
+            </span>
         </div>
     </footer>
 </div>

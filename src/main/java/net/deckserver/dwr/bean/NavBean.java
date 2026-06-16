@@ -35,7 +35,6 @@ public class NavBean {
             chats = model.hasChats();
             buttons.add("active:Watch");
             buttons.add("deck:Decks");
-            buttons.add("profile:Profile");
             buttons.add("lobby:Lobby");
             buttons.add("tournament:Tournament");
             if (JolAdmin.isTournamentAdmin(player)) {

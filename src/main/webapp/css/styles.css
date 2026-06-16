@@ -207,6 +207,19 @@ p.chat {
     border-bottom: none;
 }
 
+.user-menu-toggle {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 2rem !important;
+    transition: background-color 0.15s ease;
+    opacity: 1 !important;
+    color: #fff !important;
+}
+
+.user-menu-toggle:hover,
+.user-menu-toggle[aria-expanded="true"] {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
 h1, h2, h3, h4, h5 {
     font-family: 'IM Fell English', serif;
 }
