@@ -1,6 +1,6 @@
 <div class="card shadow mt-2">
     <div class="card-header bg-body-secondary">
-        <h5>Add Role</h5>
+        <span class="fw-semibold">Add Role</span>
     </div>
     <div class="card-body">
         <label for="adminPlayerList" class="form-label">Players</label>

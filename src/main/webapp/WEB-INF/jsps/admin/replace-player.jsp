@@ -1,6 +1,6 @@
 <div class="card shadow">
     <div class="card-header bg-body-secondary">
-        <h5>Replace Player</h5>
+        <span class="fw-semibold">Replace Player</span>
     </div>
     <div class="card-body">
         <label for="adminGameList" class="form-label">Games</label>

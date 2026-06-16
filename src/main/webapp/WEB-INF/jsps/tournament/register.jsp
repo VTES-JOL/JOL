@@ -1,6 +1,6 @@
 <div class="card shadow">
-    <div class="card-header bg-body-secondary">
-        <h5>Deck selection</h5>
+    <div class="card-header bg-body-secondary d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Deck Selection</span>
     </div>
-    <ul class="list-group list-group-flush" id="registeredTournaments"></ul>
+    <ul class="list-group list-group-flush scrollable mhd-70" id="registeredTournaments"></ul>
 </div>

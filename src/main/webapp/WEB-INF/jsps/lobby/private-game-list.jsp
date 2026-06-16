@@ -1,8 +1,8 @@
 <div class="card shadow">
-    <div class="card-header bg-body-secondary">
-        <h5>My Games</h5>
+    <div class="card-header bg-body-secondary d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">My Games</span>
     </div>
-    <ul class="list-group list-group-flush" id="currentGames"></ul>
+    <ul class="list-group list-group-flush scrollable mhd-70" id="currentGames"></ul>
     <div class="card-footer">
         <label for="playerList" class="form-label">Players</label>
         <input class="form-control" id="playerList" placeholder="Start typing a player name"/>

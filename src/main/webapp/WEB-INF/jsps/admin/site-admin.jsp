@@ -1,6 +1,6 @@
 <div class="card shadow">
     <div class="card-header bg-body-secondary">
-        <h5>Site Admin</h5>
+        <span class="fw-semibold">Site Admin</span>
     </div>
     <div class="card-body">
         <label for="globalMessage" class="form-label">Message</label>

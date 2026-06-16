@@ -1,10 +1,8 @@
 <div class="card shadow">
-    <div class="card-header bg-body-secondary">
-        <h5>Register Deck</h5>
+    <div class="card-header bg-body-secondary d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Register Deck</span>
     </div>
-    <div class="card-body p-0">
-        <ul class="list-group list-group-flush" id="invitedGames"></ul>
-    </div>
+    <ul class="list-group list-group-flush scrollable mhd-70" id="invitedGames"></ul>
     <div class="card-footer">
         <span id="registerResult" class="fs-6"></span>
     </div>

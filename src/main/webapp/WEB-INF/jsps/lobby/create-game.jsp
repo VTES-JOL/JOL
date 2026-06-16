@@ -1,6 +1,6 @@
 <div class="card shadow mb-2">
     <div class="card-header bg-body-secondary">
-        <h5>Create Game</h5>
+        <span class="fw-semibold">Create Game</span>
     </div>
     <div class="card-body">
         <div class="mb-1">

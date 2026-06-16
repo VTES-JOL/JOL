@@ -272,6 +272,13 @@ function callbackAllGames(data) {
     renderPastGames(data.history);
 }
 
+$(document).on('shown.bs.tab', '[data-bs-target="#pastGamesPane"]', function () {
+    $('#exportCsvBtn').removeClass('d-none');
+});
+$(document).on('hidden.bs.tab', '[data-bs-target="#pastGamesPane"]', function () {
+    $('#exportCsvBtn').addClass('d-none');
+});
+
 function createButton(config, fn, ...args) {
     let button = $("<button/>");
     if (config.text) {
@@ -641,17 +648,36 @@ function createTournament() {
     let numOfRounds = $("#numOfRounds");
     let reqId = $("#reqId");
     //create tournament
-    DS.createTournament(tourName.val(), regStart.val(), regEnd.val(), playStart.val(), playEnd.val(), tourFormat.val(), gameFormat.val(), rules, specRulesCon.val(), specRules, numOfRounds.val(), reqId.val(),
-        {callback: callbackCreateTournament, errorHandler: errorhandler});
+    let name = tourName.val();
+    DS.createTournament(name, regStart.val(), regEnd.val(), playStart.val(), playEnd.val(), tourFormat.val(), gameFormat.val(), rules, specRulesCon.val(), specRules, numOfRounds.val(), reqId.val(),
+        {callback: function(success) { callbackCreateTournament(success, name); }, errorHandler: errorhandler});
 }
 
-function callbackCreateTournament(success) {
+function callbackCreateTournament(success, name) {
     let msg = $("#tourMsg");
     if(success) {
+        addTournamentToAdminList(name, "STARTING");
         resetForm();
         msg.text("Tournament created successfully").addClass("text-success").removeClass("text-warning");
     } else {
         msg.text("Tournament creation failed").addClass("text-warning").removeClass("text-success");
+    }
+}
+
+function addTournamentToAdminList(name, status) {
+    let badge = status === "ACTIVE"
+        ? $('<span class="badge text-bg-success">Active</span>')
+        : $('<span class="badge text-bg-secondary">Draft</span>');
+    let item = $('<li class="list-group-item d-flex justify-content-between align-items-center tournament-admin-entry" style="cursor:pointer">')
+        .attr('data-name', name)
+        .attr('data-status', status)
+        .on('click', function() { tournamentAdminClick(this); })
+        .append($('<span>').text(name))
+        .append(badge);
+    $('#tournamentAdminList').append(item);
+    // Keep hidden select in sync so existing callbacks continue to work
+    if ($('#nameOfTournament option[value="' + name + '"]').length === 0) {
+        $('#nameOfTournament').append($('<option>').val(name).text(name));
     }
 }
 
@@ -677,9 +703,8 @@ function resetForm() {
     specRulesDiv.empty();
 }
 
-function loadTournamentDetails() {
-    let nameOfTournament = $("#tourNameSelect option:selected").text();
-    DS.loadTournamentDetails(nameOfTournament, {callback: callbackLoadTournamentDetails, errorHandler: errorhandler});
+function loadTournamentDetails(name) {
+    DS.loadTournamentDetails(name, {callback: callbackLoadTournamentDetails, errorHandler: errorhandler});
 }
 
 function closeTournament() {
@@ -687,10 +712,16 @@ function closeTournament() {
     DS.closeTournament(nameOfTournament);
 }
 
-function loadTournament() {
-    let nameOfTournament = $("#nameOfTournament option:selected").text();
-    DS.tournamentAlreadyActive(nameOfTournament, {callback: callbackStatusTournament, errorHandler: errorhandler});
+function loadTournament(name) {
+    let sel = $("#nameOfTournament");
+    if (sel.find(`option[value="${name}"]`).length === 0) {
+        sel.append($("<option>").val(name).text(name));
+    }
+    sel.val(name);
+    $("#tourTablesTitle").text(name);
+    DS.tournamentAlreadyActive(name, {callback: callbackStatusTournament, errorHandler: errorhandler});
     resetTournamentManager();
+    enterTourTablesMode();
 }
 
 function callbackStatusTournament(isActive) {
@@ -774,7 +805,7 @@ function callbackLoadTournamentDetails(data) {
     $.each(data.specRules, function(index, rule) {
         addRule(rule, specRulesDiv);
     });
-
+    enterTourEditMode();
 }
 
 function callbackTournamentRounds(data) {
@@ -832,6 +863,37 @@ function callbackTableManager(data) {
 
 function callbackTournamentAdmin(data) {
 
+}
+
+function enterTourEditMode() {
+    $("#tourEditCol").removeClass("d-none");
+    $("#tourTablesCol").addClass("d-none");
+}
+
+function enterTourTablesMode() {
+    $("#tourTablesCol").removeClass("d-none");
+    $("#tourEditCol").addClass("d-none");
+}
+
+function exitTourMode() {
+    $("#tourEditCol").addClass("d-none");
+    $("#tourTablesCol").addClass("d-none");
+}
+
+function newTournament() {
+    resetForm();
+    $("#tourMsg").text("").removeClass("text-success text-warning");
+    enterTourEditMode();
+}
+
+function tournamentAdminClick(el) {
+    let name = $(el).data("name");
+    let status = $(el).data("status");
+    if (status === "ACTIVE") {
+        loadTournament(name);
+    } else {
+        loadTournamentDetails(name);
+    }
 }
 
 function createTable(round) {
