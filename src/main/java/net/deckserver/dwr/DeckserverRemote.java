@@ -166,11 +166,6 @@ public class DeckserverRemote {
         TournamentService.createFinal(tourName);
     }
 
-    public void setFinalSeeding(String tourName, String[] seeding) {
-        if (!JolAdmin.isTournamentAdmin(getPlayer(request))) return;
-        TournamentService.getTournament(tourName).getFinals().setSeeding(List.of(seeding));
-    }
-
     public TournamentDetails loadTournamentDetails(String tourName) {
         return new TournamentDetails(TournamentService.getTournament(tourName));
     }
@@ -194,6 +189,19 @@ public class DeckserverRemote {
         return TournamentService.getRegistrations(nameOfTournament).stream()
                 .filter(player -> player.getDeck()!=null)
                 .collect(Collectors.toList());
+    }
+
+    public List<TournamentRegistration> getFinalPlayers(String nameOfTournament) {
+        List<TournamentRegistration> tournamentPlayers = getTournamentPlayers(nameOfTournament);
+        List<String> finalPlayers = TournamentService.getTournament(nameOfTournament).getFinals().getSeeding();
+        List<TournamentRegistration> finalTournamentPlayers = new ArrayList<>();
+        //find final Players in Tournament Registration and keep seeding Order
+        for(String finalPlayer : finalPlayers){
+            finalTournamentPlayers.add(tournamentPlayers.stream()
+                    .filter(player -> Objects.equals(player.getPlayer(), finalPlayer))
+                    .findFirst().get());
+        }
+        return finalTournamentPlayers;
     }
 
     public Boolean tournamentAlreadyActive(String nameOfTournament) {
@@ -567,6 +575,18 @@ public class DeckserverRemote {
         regPlayers.removeAll(tablePlayers);
         regPlayersMap.put(roundNumber, regPlayers);
         return regPlayersMap;
+    }
+
+    /**
+     * Return all
+     * @param tourName
+     * @return all Players not in the Final
+     */
+    public List<TournamentRegistration> getFinalDelta(String tourName) {
+        List<TournamentRegistration> regPlayers = getTournamentPlayers(tourName);
+        List<TournamentRegistration> finalPlayers = getFinalPlayers(tourName);
+        regPlayers.removeIf(reg -> finalPlayers.contains(reg));
+        return regPlayers;
     }
 
     public String getVekn(String playerName) {
