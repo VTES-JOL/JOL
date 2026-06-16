@@ -25,6 +25,9 @@
         </div>
         <label for="deckText" class="form-label">Contents</label>
         <textarea id="deckText" class="form-control"></textarea>
+        <label for="deckComment" class="form-label">Comment</label>
+        <textarea id="deckComment" class="form-control scrollable player-only"
+                  placeholder="Deck Comment"></textarea>
     </div>
 </div>
 <div class="card shadow mt-2">
