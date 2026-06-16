@@ -1,11 +1,15 @@
-<div class='row mt-2'>
-    <div class='col-lg-4 col-md-6 order-md-1'>
+<div class='row mt-2 g-2'>
+    <div class='col-md-4 col-lg-3'>
         <jsp:include page="deck-list.jsp"/>
     </div>
-    <div class="col-lg-4 col-md-12 mt-2 mt-lg-0 order-md-3">
-        <jsp:include page="deck-editor.jsp"/>
-    </div>
-    <div class="col-lg-4 col-md-6 order-md-2">
-        <jsp:include page="deck-preview.jsp"/>
+    <div class="col-md-8 col-lg-9">
+        <div class="row g-2">
+            <div class="col-12 d-none" id="deckEditorCol">
+                <jsp:include page="deck-editor.jsp"/>
+            </div>
+            <div class="col-12" id="deckPreviewCol">
+                <jsp:include page="deck-preview.jsp"/>
+            </div>
+        </div>
     </div>
 </div>

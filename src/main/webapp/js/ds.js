@@ -1317,6 +1317,25 @@ function callbackProfile(data) {
     $('#profileConfirmPassword').val('');
 }
 
+function enterEditMode() {
+    $("#deckEditorCol").removeClass("d-none");
+    $("#deckPreviewCol").addClass("d-none");
+}
+
+function exitEditMode() {
+    $("#deckEditorCol").addClass("d-none");
+    $("#deckPreviewCol").removeClass("d-none");
+}
+
+function filterDeckList() {
+    let text = $("#deckTextFilter").val().toLowerCase();
+    $("#decks tr").each(function () {
+        let name = ($(this).data("name") || "").toLowerCase();
+        let comment = ($(this).data("comment") || "").toLowerCase();
+        $(this).toggle(!text || name.includes(text) || comment.includes(text));
+    });
+}
+
 function callbackShowDecks(data) {
     let filter = $("#deckFilter");
     let validatorFormat = $("#validatorFormat");
@@ -1335,15 +1354,36 @@ function callbackShowDecks(data) {
     const deckPreview = $("#deckPreview");
     const deckSummary = $("#deckSummary");
     const deckName = $("#deckName");
+    const deckValidation = $("#deckValidation");
+    const deckValidationBadge = $("#deckValidationBadge");
+    const deckValidationErrors = $("#deckValidationErrors");
     if (data.selectedDeck) {
         deckText.val(data.contents);
         deckSummary.empty();
         deckErrors.empty();
-        deckSummary.append($("<span/>").text(data.selectedDeck['stats']['summary']));
+        deckValidationBadge.empty();
+        deckValidationErrors.empty();
+        deckSummary.text(data.selectedDeck['stats']['summary']);
         deckName.val(data.selectedDeck['deck']['name']);
-        $.each(data.selectedDeck.errors, function (i, error) {
-            deckErrors.append(error.replace(/\n/g), "<br/>");
-        })
+        $("#deckPreviewTitle").text(data.selectedDeck['deck']['name'] || "Preview");
+        const errors = data.selectedDeck.errors;
+        if (errors && errors.length > 0) {
+            deckValidation.removeClass("d-none");
+            deckValidationBadge.append(
+                $("<span/>").addClass("badge bg-warning-subtle text-warning-emphasis border border-warning-subtle")
+                    .html('<i class="bi bi-exclamation-triangle me-1"></i>Invalid')
+            );
+            $.each(errors, function (i, error) {
+                deckValidationErrors.append($("<div/>").text(error));
+                deckErrors.append($("<div/>").text(error));
+            });
+        } else {
+            deckValidation.removeClass("d-none");
+            deckValidationBadge.append(
+                $("<span/>").addClass("badge bg-success-subtle text-success-emphasis border border-success-subtle")
+                    .html('<i class="bi bi-check-circle me-1"></i>Valid')
+            );
+        }
         renderDeck(data.selectedDeck.deck, "#deckPreview");
         addCardTooltips("#deckPreview");
     } else {
@@ -1351,6 +1391,8 @@ function callbackShowDecks(data) {
         deckErrors.text("");
         deckPreview.empty();
         deckName.val("");
+        $("#deckPreviewTitle").text("Preview");
+        deckValidation.addClass("d-none");
     }
 }
 
@@ -1363,15 +1405,13 @@ function callbackFilterDecks(decks) {
     let deckList = $("#decks");
     deckList.empty();
     $.each(decks, function (index, deck) {
-        const deckRow = $("<tr/>");
-        const deckCell = $("<td/>")
-        const deckName = $("<span/>").text(deck.name).click(function () {
+        const deckRow = $("<tr/>").data("name", deck.name).data("comment", deck.comments || "");
+        const deckCell = $("<td/>");
+        const deckName = $("<span/>").addClass("deck-name-link").text(deck.name).click(function () {
+            exitEditMode();
             DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
         });
-        const deckComment = $("<div/>").append($("<span/>")
-            .addClass("badge bg-light text-black shadow border border-secondary-subtle text-wrap")
-            .text(deck.comments));
-        const deleteButton = $("<button/>").addClass("btn btn-sm btn-outline-secondary border p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
+        const deleteButton = $("<button/>").addClass("btn btn-sm btn-outline-secondary p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
             if (confirm("Delete deck?")) {
                 DS.deleteDeck(deck.name, {callback: processData, errorHandler: errorhandler});
             }
@@ -1379,11 +1419,17 @@ function callbackFilterDecks(decks) {
         });
         let wrapper = $("<div/>").addClass("d-flex justify-content-between align-items-center")
             .append(deckName)
-            .append($("<span/>").addClass("d-flex gap-1 align-items-center").append(deleteButton));
-        deckCell.append(wrapper, deckComment);
+            .append(deleteButton);
+        deckCell.append(wrapper);
+        if (deck.comments) {
+            deckCell.append(
+                $("<div/>").addClass("text-muted small text-truncate").text(deck.comments)
+            );
+        }
         deckRow.append(deckCell);
         deckList.append(deckRow);
     });
+    filterDeckList();
 }
 
 function callbackShowGameDeck(data) {
@@ -1410,8 +1456,10 @@ function renderDeck(data, div) {
     let render = $(div);
     render.empty();
     if (data.crypt) {
-        render.append($("<h5/>").text("Deck: " + data.name + ""));
-        render.append($("<h5/>").text("Crypt: (" + data.crypt['count'] + ")"));
+        if (div === "#gameDeck") {
+            render.append($("<div/>").addClass("fw-semibold small text-muted mt-1 mb-1").text("Deck: " + data.name));
+        }
+        render.append($("<div/>").addClass("fw-semibold small text-muted mt-1").text("Crypt (" + data.crypt['count'] + ")"));
         const crypt = $("<ul/>").addClass("deck-list");
         let cards = data.crypt.cards;
         cards.sort((a,b) => a.name.localeCompare(b.name));
@@ -1427,9 +1475,9 @@ function renderDeck(data, div) {
         render.append(crypt);
     }
     if (data.library) {
-        render.append($("<h5/>").text("Library: (" + data.library['count'] + ")"));
+        render.append($("<div/>").addClass("fw-semibold small text-muted mt-2").text("Library (" + data.library['count'] + ")"));
         $.each(data.library.cards, function (index, libraryCards) {
-            render.append($("<h5/>").text(libraryCards.type + ": (" + libraryCards['count'] + ")"));
+            render.append($("<div/>").addClass("fw-semibold small text-muted mt-1").text(libraryCards.type + " (" + libraryCards['count'] + ")"));
             const section = $("<ul/>").addClass("deck-list");
             let cards = libraryCards.cards;
             cards.sort((a,b) => a.name.localeCompare(b.name));
@@ -1445,16 +1493,16 @@ function renderDeck(data, div) {
             render.append(section);
         })
     }
-    if(div === "#gameDeck") {
-        if(data.comments!="") {
+    if (div === "#gameDeck") {
+        if (data.comments != "") {
             let comments = $("<div/>")
-                .addClass("border m-1 p-2")
+                .addClass("border m-1 p-2 small text-muted")
                 .append($("<span/>").text(data.comments));
             render.append(comments);
         }
     }
-    if(div === "#deckPreview") {
-        $("#deckComment").val(data.comments)
+    if (div === "#deckPreview") {
+        $("#deckComment").val(data.comments);
     }
 }
 
@@ -1467,14 +1515,17 @@ function parseDeck() {
 function newDeck() {
     $("#deckName").val("");
     $("#deckComment").val("");
-    DS.newDeck({callback: processData, errorHandler: errorhandler});
+    DS.newDeck({callback: function(data) { processData(data); enterEditMode(); }, errorHandler: errorhandler});
 }
 
 function saveDeck() {
     const deckName = $("#deckName").val();
     const contents = $("#deckText").val();
     const comment = $("#deckComment").val();
-    DS.saveDeck(deckName, contents, comment, {callback: processData, errorHandler: errorhandler});
+    DS.saveDeck(deckName, contents, comment, {
+        callback: function(data) { exitEditMode(); processData(data); },
+        errorHandler: errorhandler
+    });
 }
 
 function validate() {

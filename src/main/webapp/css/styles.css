@@ -152,12 +152,10 @@ html, body {
 }
 
 #deckText {
-    height: 50vh;
+    height: 40vh;
 }
 
 #deckErrors {
-    height: 15vh;
-    overflow-y: scroll;
 }
 
 :root {
