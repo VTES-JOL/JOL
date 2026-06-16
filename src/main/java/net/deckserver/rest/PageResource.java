@@ -30,7 +30,9 @@ public class PageResource extends BaseResource {
     public Map<String, Object> navigate(NavigateRequest body) {
         String playerName = username();
         PlayerModel player = JolAdmin.getPlayerModel(playerName);
-        player.resetChats();
+        if (body != null && body.init()) {
+            player.resetChats();
+        }
 
         String target = body != null ? body.target() : null;
         if (target != null) {
@@ -62,6 +64,6 @@ public class PageResource extends BaseResource {
         return update(player);
     }
 
-    public record NavigateRequest(String target) {}
+    public record NavigateRequest(String target, boolean init) {}
     public record ChatRequest(String text) {}
 }

@@ -34,6 +34,7 @@ function apiGetText(path, opts) {
 
 const DS = {
     // Navigation / polling
+    init:                    (target, opts) => apiPost('/navigate', {target, init: true}, opts),
     navigate:                (target, opts) => apiPost('/navigate', {target}, opts),
     doPoll:                  (opts) => apiGet('/poll', opts),
 
@@ -162,7 +163,7 @@ $(document).ready(function () {
     const parts = window.location.pathname.replace(/^\/jol\//, '').split('/');
     let initialTarget = parts[0] || 'main';
     if (initialTarget === 'game' && parts[1]) initialTarget = 'g' + decodeURIComponent(parts[1]);
-    DS.navigate(initialTarget, {callback: init, errorHandler: errorhandler});
+    DS.init(initialTarget, {callback: init, errorHandler: errorhandler});
     window.addEventListener('popstate', function(e) {
         const t = e.state && e.state.target ? e.state.target : 'main';
         DS.navigate(t, {callback: processData, errorHandler: errorhandler});
@@ -944,7 +945,6 @@ function addRule(rulesInput, rulesCon) {
 
 function saveTables() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
-    DS.resetTables(tournamentSelected);
     let rounds = {};
     $("#tourRounds ul[round]").each(function(index, ul) {
         let players = [];
