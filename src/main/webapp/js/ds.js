@@ -12,7 +12,7 @@ function apiCall(method, path, body, opts) {
     if (body !== null && body !== undefined) init.body = JSON.stringify(body);
     return fetch(_ctx + path, init)
         .then(r => {
-            if (!r.ok) return r.text().then(msg => { throw new Error(msg || r.statusText); });
+            if (!r.ok) return r.text().then(msg => { throw new Error(`${r.status}: ${msg || r.statusText}`); });
             if (r.status === 204) return {};
             return r.json();
         })
@@ -121,7 +121,6 @@ let ws = null;
 let wsConnected = false;
 let player = null;
 let currentPage = 'main';
-let currentOption = "notes";
 let USER_TIMEZONE = moment.tz.guess();
 let gameChatLastDay = null;
 let globalChatLastPlayer = null;
@@ -143,7 +142,11 @@ let lastReceivedGlobalNotes = null;
 let lastReceivedPrivateNotes = null;
 const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
-function errorhandler(errorString, exception) {
+function errorhandler(errorString) {
+    if (errorString && errorString.startsWith('401')) {
+        location.href = '/jol/';
+        return;
+    }
     $("#connectionMessage").removeClass("d-none");
     refresher = setTimeout(function() {
         DS.navigate(null, {callback: processData, errorHandler: errorhandler});
@@ -167,6 +170,9 @@ $(document).ready(function () {
 });
 
 function init(data) {
+    if (localStorage.getItem("jol-theme") === "dark") {
+        $("#wrapper").attr("data-bs-theme", "dark");
+    }
     processData(data);
     $("h4.collapse").click(function () {
         $(this).next().slideToggle();
@@ -182,6 +188,7 @@ function initWebSocket() {
 
     ws.onopen = () => {
         wsConnected = true;
+        $("#wsStatus").addClass("d-none");
         if (refresher) clearTimeout(refresher);
         console.log('[WS] Connected — push notifications active, polling suspended');
         // Re-join the game room if we're already on a game page (e.g. after reconnect)
@@ -208,6 +215,7 @@ function initWebSocket() {
 
     ws.onclose = (evt) => {
         wsConnected = false;
+        $("#wsStatus").removeClass("d-none");
         console.log('[WS] Connection closed (code=' + evt.code + '), falling back to polling, reconnecting in 5s');
         if (currentPage === 'main') {
             DS.doPoll({callback: processData, errorHandler: errorhandler});
@@ -240,9 +248,13 @@ const processDataHandlers = {
 
 function processData(a) {
     $("#connectionMessage").addClass("d-none");
-    for (let key in a) {
+    for (const key in a) {
         const fn = processDataHandlers[key];
-        if (fn) fn(a[key]);
+        if (fn) {
+            fn(a[key]);
+        } else {
+            console.warn('[processData] unhandled key:', key);
+        }
     }
 }
 
@@ -274,10 +286,6 @@ function createButton(config, fn, ...args) {
         }
     });
     return button;
-}
-
-function callbackSelectGame(data) {
-
 }
 
 function callbackAdmin(data) {
@@ -363,16 +371,16 @@ function callbackAdmin(data) {
 
     let idleGameList = $("#idleGameList");
     idleGameList.empty();
-    $.each(data.idleGames, function (index, game) {
-        let playerCount = Object.keys(game.idlePlayers).length;
+    $.each(data.idleGames, function (index, gameEntry) {
+        let playerCount = Object.keys(gameEntry.idlePlayers).length;
         let firstPlayerRow = true;
-        $.each(game.idlePlayers, function (key, value) {
+        $.each(gameEntry.idlePlayers, function (key, value) {
             let row = $("<tr/>");
             if (firstPlayerRow) {
-                let nameCell = $("<td/>").attr('rowspan', playerCount).text(game.gameName).on('click', function () {
-                    doNav('g' + game.gameId);
+                let nameCell = $("<td/>").attr('rowspan', playerCount).text(gameEntry.gameName).on('click', function () {
+                    doNav('g' + gameEntry.gameId);
                 });
-                let timestampCell = $("<td/>").attr('rowspan', playerCount).text(moment(game.gameTimestamp).tz("UTC").format("D-MMM-YY HH:mm z"));
+                let timestampCell = $("<td/>").attr('rowspan', playerCount).text(moment(gameEntry.gameTimestamp).tz("UTC").format("D-MMM-YY HH:mm z"));
                 row.append(nameCell, timestampCell);
             }
             let playerCell = $("<td/>").text(key);
@@ -384,7 +392,7 @@ function callbackAdmin(data) {
                     text: "Close",
                     class: "btn btn-outline-secondary btn-sm",
                     confirm: "Are you sure you want to end this game?"
-                }, DS.endGame, game.gameId);
+                }, DS.endGame, gameEntry.gameId);
                 endGameCell.append(endGameButton);
                 row.append(endGameCell);
                 firstPlayerRow = false;
@@ -474,21 +482,21 @@ function callbackLobby(data) {
 
     currentGames.empty();
     myGameList.empty();
-    $.each(data.myGames, function (index, game) {
-        myGameList.append(new Option(game.name, game.name));
+    $.each(data.myGames, function (index, gameEntry) {
+        myGameList.append(new Option(gameEntry.name, gameEntry.name));
         let gameItem = $("<li/>").addClass("list-group-item");
         let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
-        let gameName = $("<h6/>").addClass("d-inline text-break").text(game.name);
-        let startButton = game.gameStatus === 'Inviting' ? createButton({
+        let gameName = $("<h6/>").addClass("d-inline text-break").text(gameEntry.name);
+        let startButton = gameEntry.gameStatus === 'Inviting' ? createButton({
             text: "Start",
             class: "btn btn-outline-secondary btn-sm",
             confirm: "Start Game?"
-        }, DS.startGame, game.name) : "";
+        }, DS.startGame, gameEntry.name) : "";
         let endButton = createButton({
             text: "Close",
             class: "btn btn-outline-secondary btn-sm",
             confirm: "End Game?"
-        }, DS.endGame, game.gameId);
+        }, DS.endGame, gameEntry.gameId);
         let buttonWrapper = $("<span/>").addClass("d-flex justify-content-between align-items-center gap-1");
         let playerTable = $("<table/>").addClass("table table-bordered table-sm table-hover mt-2");
         let tableBody = $("<tbody/>");
@@ -497,7 +505,7 @@ function callbackLobby(data) {
         gameHeader.append(gameName, buttonWrapper);
         gameItem.append(gameHeader, playerTable);
         currentGames.append(gameItem);
-        $.each(game.registrations, function (i, registration) {
+        $.each(gameEntry.registrations, function (i, registration) {
             let registrationRow = $("<tr/>");
             let playerCell = $("<td/>").addClass("w-25").text(registration.player);
             registrationRow.append(playerCell);
@@ -511,19 +519,19 @@ function callbackLobby(data) {
     });
 
     publicGames.empty();
-    $.each(data.publicGames, function (index, game) {
-        let created = moment(game.timestamp).tz("UTC");
+    $.each(data.publicGames, function (index, gameEntry) {
+        let created = moment(gameEntry.timestamp).tz("UTC");
         let expiry = created.add(5, 'days');
         let joinButton = createButton({
             class: "btn btn-outline-secondary btn-sm",
             text: "Join"
-        }, DS.invitePlayer, game.name, player);
+        }, DS.invitePlayer, gameEntry.name, player);
 
         let leaveButton = createButton({
             class: "btn btn-outline-secondary btn-sm",
             text: "Leave",
             confirm: "Leave Game?"
-        }, DS.unInvitePlayer, game.name, player);
+        }, DS.unInvitePlayer, gameEntry.name, player);
 
         let playerInGame = false;
 
@@ -531,8 +539,8 @@ function callbackLobby(data) {
         <li class='list-group-item'>
             <div class="d-flex justify-content-between align-items-center">
                 <span>
-                    <span class="badge bg-secondary">${game.format}</span>
-                    <h6 class="mx-2 d-inline text-break">${game.name}</h6>
+                    <span class="badge bg-secondary">${gameEntry.format}</span>
+                    <h6 class="mx-2 d-inline text-break">${gameEntry.name}</h6>
                 </span>
                 <span class="d-flex justify-content-between align-items-center gap-1 game-join">
                     <span>Closes ${moment().to(expiry)}</span>
@@ -541,12 +549,12 @@ function callbackLobby(data) {
         </li>
         `);
         publicGames.append(template);
-        if (game.registrations.length > 0) {
+        if (gameEntry.registrations.length > 0) {
             let playerTable = $("<table/>").addClass("table table-bordered table-sm table-hover mt-2");
             let tableBody = $("<tbody/>");
             playerTable.append(tableBody);
             template.append(playerTable);
-            $.each(game.registrations, function (i, registration) {
+            $.each(gameEntry.registrations, function (i, registration) {
                 let registrationRow = $("<tr/>");
                 let playerCell = $("<td/>").addClass("w-50").text(registration.player);
                 if (registration.player === player) {
@@ -565,17 +573,17 @@ function callbackLobby(data) {
     })
 
     invitedGames.empty();
-    $.each(data.invitedGames, function (index, game) {
+    $.each(data.invitedGames, function (index, gameEntry) {
         let template = `
             <div class="list-group-item d-flex justify-content-between align-items-center">
                 <div class="flex-grow-1 p-2 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="mb-2 text-break">${game.gameName}</h5>
+                        <h5 class="mb-2 text-break">${gameEntry.gameName}</h5>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="badge bg-secondary me-1">${game.format}</span>
+                            <span class="badge bg-secondary me-1">${gameEntry.format}</span>
                         </div>
                     </div>
-                    <span class="">${game.deckName || ''}</span>
+                    <span class="">${gameEntry.deckName || ''}</span>
                 </div>
                 <div>
                     <div class="d-inline">
@@ -583,7 +591,7 @@ function callbackLobby(data) {
                             Choose Deck
                         </button>
                         <div id="chooseDeckDropdown">
-                            <ul class="dropdown-menu dropdown-menu-end invite-${game.format}" data-name="${game.gameName}">
+                            <ul class="dropdown-menu dropdown-menu-end invite-${gameEntry.format}" data-name="${gameEntry.gameName}">
                                 <input class="form-control" id="searchDeckInput" type="text" placeholder="Search.." onkeyup="filterChooseDeck()">
                             </ul>
                         </div>
@@ -929,7 +937,7 @@ function resetTournamentManager() {
 
 function downloadCurrentTables() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
-    DS.getRoundsForTournamentCsv(tournamentSelected, {callback: createCsvDownloadLink, errorHandler: errorhandler});
+    DS.getRoundsForTournamentCsv(tournamentSelected, {callback: (data) => createCsvDownloadLink(data, 'rounds.csv'), errorHandler: errorhandler});
 }
 function showCurrentTables() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
@@ -989,10 +997,10 @@ function callbackShowTablesReadOnly(data) {
         $.each(round, function (indexTable, table) {
             let tableLabel = $("<span/>").addClass("h5").text("Table " + indexTable).append($("<br/>"));
             let playerList = $("<ul/>").addClass("border list-group").css("min-height", "38px");
-            $.each(table, function (index, player) {
+            $.each(table, function (index, playerEntry) {
                 let listItem = $("<li/>").addClass("border rounded p-2 border-secondary");
-                DS.getVekn(player.name, {callback: function(veknId) {
-                    let nameSpan = $("<span/>").text(player.name);
+                DS.getVekn(playerEntry.name, {callback: function(veknId) {
+                    let nameSpan = $("<span/>").text(playerEntry.name);
                     let veknSpan = $("<span/>").addClass("fw-bold ms-2").text(veknId);
                     listItem.append(nameSpan, veknSpan);
                 }, errorHandler: errorhandler});
@@ -1036,20 +1044,21 @@ function callbackShowPlayers(data) {
                 .append(playerDiv)
                 .append("<i class='bi bi-grip-vertical'></i>");
             listItem.disableSelection();
-            players.append(playerIcon).append(listItem);
+            players.append(listItem);
         })
     });
 }
 
-function createCsvDownloadLink(data) {
-    let blob = new Blob([data], { type: 'text/csv' });
-    let url = URL.createObjectURL(blob);
-    let a = document.createElement('a');
+function createCsvDownloadLink(data, filename = 'export.csv') {
+    const blob = new Blob([data], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
     a.href = url;
-    a.download = 'rounds.csv';
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     a.remove();
+    URL.revokeObjectURL(url);
 }
 
 function callbackFinal(data) {
@@ -1217,21 +1226,21 @@ function callbackTournament(data) {
 
     let invitedGames = $("#registeredTournaments");
     invitedGames.empty();
-    $.each(data.registeredGames, function (index, game) {
+    $.each(data.registeredGames, function (index, gameEntry) {
         let template = `
         <div class="list-group-item">
             <div class="d-flex justify-content-between align-items-center border-bottom mb-2">
                 <div class="flex-grow-1 p-2 d-flex justify-content-between align-items-center">
                     <span class="d-flex justify-content-between align-items-center">
-                        <span class="badge bg-secondary">${game.format}</span>
-                        <span class="mx-2 d-inline fs-5">${game.name}</span>
+                        <span class="badge bg-secondary">${gameEntry.format}</span>
+                        <span class="mx-2 d-inline fs-5">${gameEntry.name}</span>
                     </span>
                 </div>
                 <div class="d-inline">
                     <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" >
                         Choose Deck
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end tournament-invite-${game.format}" data-name="${game.name}">
+                    <ul class="dropdown-menu dropdown-menu-end tournament-invite-${gameEntry.format}" data-name="${gameEntry.name}">
                     </ul>
                 </div>
             </div>
@@ -1239,8 +1248,8 @@ function callbackTournament(data) {
         </div>
     `;
         invitedGames.append(template);
-        if (game.deck) {
-            renderDeck(game.deck, "#tournamentDeck");
+        if (gameEntry.deck) {
+            renderDeck(gameEntry.deck, "#tournamentDeck");
         }
         addCardTooltips("#tournamentDeck");
     });
@@ -1390,7 +1399,7 @@ function callbackMain(data) {
         renderMyGames("oustedGames", data.ousted);
         if (refresher) clearTimeout(refresher);
         if (!wsConnected) {
-            refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
+            refresher = setTimeout(() => DS.doPoll({callback: processData, errorHandler: errorhandler}), 5000);
         }
     } else {
         document.location = "/jol/";
@@ -1662,13 +1671,13 @@ function renderMyGames(id, games) {
     ownGames.empty();
     $("#"+id+"-header").text(headerText+" ("+games.length+"):");
 
-    $.each(games, function (index, game) {
+    $.each(games, function (index, gameEntry) {
         let gameRow = $("<li/>").addClass("list-group-item p-0 border").on('click', function () {
-            doNav("g" + game.gameId);
+            doNav("g" + gameEntry.gameId);
         });
         let header = $("<div/>").addClass("d-flex p-2 justify-content-between w-100 border-bottom bg-body-tertiary");
-        let title = $("<span/>").addClass("fw-bold text-break").text(game.name);
-        let turn = $("<small/>").text(game.turn).addClass("d-inline-block d-md-none d-xl-inline-block");
+        let title = $("<span/>").addClass("fw-bold text-break").text(gameEntry.name);
+        let turn = $("<small/>").text(gameEntry.turn).addClass("d-inline-block d-md-none d-xl-inline-block");
         header.append(title, turn);
         let players = $("<div/>").addClass("players pb-2");
         let toggle = $("#myGamesDetailedMode");
@@ -1679,11 +1688,11 @@ function renderMyGames(id, games) {
             toggle.prop("checked", false);
             players.addClass("d-none");
         }
-        let predator = renderPlayer(game.players, game.predator);
-        let activePlayer = renderPlayer(game.players, game.activePlayer);
-        let prey = renderPlayer(game.players, game.prey);
+        let predator = renderPlayer(gameEntry.players, gameEntry.predator);
+        let activePlayer = renderPlayer(gameEntry.players, gameEntry.activePlayer);
+        let prey = renderPlayer(gameEntry.players, gameEntry.prey);
         activePlayer.addClass("fw-semibold");
-        let self = game.players[player];
+        let self = gameEntry.players[player];
         if (self.pinged) {
             title.prepend($("<i/>").addClass('me-2 text-danger bi-exclamation-triangle'));
         } else if (!self.current) {
@@ -1707,9 +1716,9 @@ function renderPlayer(players, target) {
     return $(template);
 }
 
-function renderGameLink(game) {
-    return $("<a/>").text(game.gameName).on('click', function () {
-        doNav("g" + game.gameId);
+function renderGameLink(gameEntry) {
+    return $("<a/>").text(gameEntry.gameName).on('click', function () {
+        doNav("g" + gameEntry.gameId);
     });
 }
 
@@ -1721,22 +1730,22 @@ function renderOnline(div, who) {
         return;
     }
     $("#online-users-header").text("Online Users ("+who.length+"):");
-    $.each(who, function (index, player) {
-        let lastOnline = moment(player.lastOnline).tz("UTC");
+    $.each(who, function (index, playerEntry) {
+        let lastOnline = moment(playerEntry.lastOnline).tz("UTC");
         let sinceLastOnline = moment.duration(moment().diff(lastOnline)).asMinutes();
-        let flag = player.country ? `<span data-tippy-content="${regionNames.of(player.country)}" class="fi fi-${player.country.toLowerCase()} fis fs-3"></span>` : '<span class="fs-3">&nbsp;</span>';
-        let admin = player.roles.includes('ADMIN') ? '<i data-tippy-content="Administrator" class="bi bi-star-fill text-warning"></i>' : "";
-        let judge = player.roles.includes('JUDGE') ? '<i data-tippy-content="Judge" class="bi bi-person-raised-hand text-success"></i>' : "";
+        let flag = playerEntry.country ? `<span data-tippy-content="${regionNames.of(playerEntry.country)}" class="fi fi-${playerEntry.country.toLowerCase()} fis fs-3"></span>` : '<span class="fs-3">&nbsp;</span>';
+        let admin = playerEntry.roles.includes('ADMIN') ? '<i data-tippy-content="Administrator" class="bi bi-star-fill text-warning"></i>' : "";
+        let judge = playerEntry.roles.includes('JUDGE') ? '<i data-tippy-content="Judge" class="bi bi-person-raised-hand text-success"></i>' : "";
         let offline = sinceLastOnline > 30 ? `<i data-tippy-content="Last Online: ${lastOnline.format('D-MMM HH:mm z')}" class="bi bi-clock-history"></i>` : "";
         let playerDiv = `
             <span class="border rounded-start p-0 border-secondary d-flex justify-content-between align-items-center">
                 <span class="d-flex align-items-center gap-2 px-2">
-                    <strong>${player.name}</strong>
+                    <strong>${playerEntry.name}</strong>
                     ${admin}
                     ${judge}
                     ${offline}
                 </span>
-                ${flag}                
+                ${flag}
             </span>`;
         container.append(playerDiv);
     });
@@ -1746,11 +1755,11 @@ function renderOnline(div, who) {
 function renderActiveGames(games) {
     let activeGames = $("#activeGames tbody");
     activeGames.empty();
-    $.each(games, function (index, game) {
+    $.each(games, function (index, gameEntry) {
         let gameRow = $("<tr/>");
-        let gameLink = $("<td/>").html(renderGameLink(game));
-        let turn = $("<td/>").text(game.turn);
-        let timestamp = $("<td/>").text(moment(game.timestamp).tz("UTC").format("D-MMM HH:mm z"));
+        let gameLink = $("<td/>").html(renderGameLink(gameEntry));
+        let turn = $("<td/>").text(gameEntry.turn);
+        let timestamp = $("<td/>").text(moment(gameEntry.timestamp).tz("UTC").format("D-MMM HH:mm z"));
         gameRow.append(gameLink, turn, timestamp);
         activeGames.append(gameRow);
     });
@@ -1759,17 +1768,17 @@ function renderActiveGames(games) {
 function renderPastGames(history) {
     let pastGames = $("#pastGames tbody");
     pastGames.empty();
-    $.each(history, function (index, game) {
-        let startTime = moment(game.started, moment.ISO_8601)
-        startTime = startTime.isValid ? startTime.tz("UTC").format("D-MMM-YYYY HH:mm z") : game.started
-        let endTime = moment(game.ended, moment.ISO_8601).tz("UTC").format("D-MMM-YYYY HH:mm z");
+    $.each(history, function (index, gameEntry) {
+        let startTime = moment(gameEntry.started, moment.ISO_8601)
+        startTime = startTime.isValid ? startTime.tz("UTC").format("D-MMM-YYYY HH:mm z") : gameEntry.started
+        let endTime = moment(gameEntry.ended, moment.ISO_8601).tz("UTC").format("D-MMM-YYYY HH:mm z");
         let firstPlayerRow = true;
-        $.each(game.results, function (i, value) {
+        $.each(gameEntry.results, function (i, value) {
             let playerRow = $("<tr/>");
             if (firstPlayerRow) {
-                let gameName = $("<td/>").attr('rowspan', game.results.length).text(game.name);
-                let gameStarted = $("<td/>").attr('rowspan', game.results.length).text(startTime);
-                let gameFinished = $("<td/>").attr('rowspan', game.results.length).text(endTime);
+                let gameName = $("<td/>").attr('rowspan', gameEntry.results.length).text(gameEntry.name);
+                let gameStarted = $("<td/>").attr('rowspan', gameEntry.results.length).text(startTime);
+                let gameFinished = $("<td/>").attr('rowspan', gameEntry.results.length).text(endTime);
                 playerRow.append(gameName, gameStarted, gameFinished);
                 playerRow.addClass("border-3 border-top border-bottom-0 border-start-0 border-end-0")
                 firstPlayerRow = false;
@@ -1895,12 +1904,11 @@ function doSubmit(event) {
     const chatInput = $("#chat");
     const pingSelect = $("#ping");
 
-    let phase = phaseSelect.val();
-    let ping = pingSelect.val();
+    let phase = phaseSelect.val() || null;
+    let ping = pingSelect.val() || null;
     const command = commandInput.val();
     const chat = chatInput.val();
-    phase = phase === "" ? null : phase;
-    ping = ping === "" ? null : ping;
+    if (!command && !chat && !phase) return false;
     commandInput.val("");
     chatInput.val("");
     pingSelect.val("");
@@ -1925,12 +1933,12 @@ function sendCommand(command, message = '') {
 }
 
 function sendGlobalNotes() {
-    DS.updateGlobalNotes(game, $("#globalNotes").val());
+    DS.updateGlobalNotes(game, $("#globalNotes").val(), {errorHandler: errorhandler});
     return false;
 }
 
 function sendPrivateNotes() {
-    DS.updatePrivateNotes(game, $("#privateNotes").val());
+    DS.updatePrivateNotes(game, $("#privateNotes").val(), {errorHandler: errorhandler});
     return false;
 }
 
@@ -1965,14 +1973,9 @@ function loadGame(data) {
     let endTurn = $("#endTurn");
     if (data.phases.length > 0) {
         phaseSelect.empty();
-        phaseSelect.removeAttr('disabled');
-        endTurn.removeAttr('disabled');
-
-        if (phaseSelect.children('option').length !== data.phases.length) {
-            $.each(data.phases, function (index, value) {
-                phase.append(new Option(value, value));
-            });
-        }
+        phaseSelect.prop('disabled', false);
+        endTurn.prop('disabled', false);
+        data.phases.forEach(p => phaseSelect.append(new Option(p, p)));
         if (data.phase) {
             phaseSelect.val(data.phase);
         }
@@ -1998,7 +2001,6 @@ function loadGame(data) {
         privateNotes.val("");
         chat.empty();
         command.empty();
-        currentOption = "notes";
         lastReceivedGlobalNotes = null;
         lastReceivedPrivateNotes = null;
         gameChatLastDay = null;
@@ -2007,33 +2009,29 @@ function loadGame(data) {
         $(".panel-secondary").addClass("d-none");
 
         // initial state for controls
-        playerControls.addClass("d-none").attr('disabled', true);
-        chatControls.attr('disabled', true);
-        globalNotes.attr('disabled', true);
+        playerControls.addClass("d-none").prop('disabled', true);
+        chatControls.prop('disabled', true);
+        globalNotes.prop('disabled', true);
         controlGrid.addClass("spectator");
     }
-    let fetchFullLog = false;
-    // if (data.logLength !== null) {
-    //     let myLogLength = gameChatOutput.children().length + (data.turn.length);
-    //     fetchFullLog = myLogLength < data.logLength;
-    // }
+    const fetchFullLog = false;
 
     // enable chat controls if judge or player
     if (data.player || data.judge) {
-        globalNotes.removeAttr('disabled');
-        chatControls.removeAttr('disabled');
+        globalNotes.prop('disabled', false);
+        chatControls.prop('disabled', false);
     }
 
     // If playing enable player controls
     if (data.player) {
-        playerControls.removeClass("d-none").removeAttr('disabled');
+        playerControls.removeClass("d-none").prop('disabled', false);
         controlGrid.removeClass("spectator");
     }
 
     // if not the current player disable phase select and end turn
     if (player !== data.currentPlayer) {
-        phaseSelect.attr('disabled', true);
-        endTurn.attr('disabled', true);
+        phaseSelect.prop('disabled', true);
+        endTurn.prop('disabled', true);
     }
 
     //If we're missing any messages from the log, skip adding this batch and
@@ -2060,12 +2058,9 @@ function loadGame(data) {
     }
 
     if (data.turns.length > 0) {
-        let turnSelect = $("#historySelect");
+        const turnSelect = $("#historySelect");
         turnSelect.empty();
-        data.turns.shift();
-        $.each(data.turns, function (index, turn) {
-            turnSelect.append($(new Option(turn, turn)));
-        });
+        data.turns.slice(1).forEach(turn => turnSelect.append(new Option(turn, turn)));
     }
 
     // Render state
@@ -2106,16 +2101,16 @@ function loadGame(data) {
     if (fetchFullLog) {
         refreshState(true);
     } else if (!wsConnected && data.refresh > 0) {
-        refresher = setTimeout("refreshState(false)", data.refresh);
+        refresher = setTimeout(() => refreshState(false), data.refresh);
     }
 
 }
 
 function addCardTooltips(parent) {
-    let linkSelector = `${parent} a.card-name`;
-    //On devices without pointer hover capabilities, like phones, do not bind
-    //tippy tooltips to cards that already have a click handler that shows the card.
-    //This fixes the bug where cards in hand required a double-tap to show the modal.
+    const linkSelector = `${parent} a.card-name`;
+    // On touch-only devices, skip tippy on elements with a click handler (e.g. cards in hand)
+    // so that tapping to show the card modal doesn't require a double-tap.
+    if (!pointerCanHover && $(linkSelector).closest('[onclick]').length) return;
     tippy(linkSelector, {
         placement: 'auto',
         allowHTML: true,
@@ -2170,7 +2165,7 @@ function addCardTooltips(parent) {
     });
 }
 
-function details(event, tag) {
+function togglePanel(event, tag) {
     event.preventDefault();
     event.stopPropagation();
     $(`[aria-controls='${tag}'] i`).toggleClass("d-none");
@@ -2229,12 +2224,12 @@ function updatePassword() {
     let profileNewPassword = $('#profileNewPassword').val();
     let profileConfirmPassword = $('#profileConfirmPassword').val();
     if (!profileNewPassword && !profileConfirmPassword) {
-        $('#profilePasswordError').val("Enter a new password.");
+        $('#profilePasswordError').text("Enter a new password.");
     } else if (profileNewPassword !== profileConfirmPassword) {
-        $('#profilePasswordError').val("Password confirmation does not match.");
+        $('#profilePasswordError').text("Password confirmation does not match.");
     } else {
         DS.changePassword(profileNewPassword, {callback: processData, errorHandler: errorhandler});
-        $('#profilePasswordError').val("Password updated");
+        $('#profilePasswordError').text("Password updated.");
     }
 }
 
@@ -2270,28 +2265,18 @@ function toggleMobileView(event) {
 }
 
 function exportCsv() {
-    DS.exportPastGamesAsCsv({callback: createCsvDownloadLink, errorHandler: errorhandler});
-}
-
-function createCsvDownloadLink(data) {
-    let blob = new Blob([data], { type: 'text/csv' });
-    let url = URL.createObjectURL(blob);
-    let a = document.createElement('a');
-    a.href = url;
-    a.download = 'data.csv';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    DS.exportPastGamesAsCsv({callback: (data) => createCsvDownloadLink(data, 'past-games.csv'), errorHandler: errorhandler});
 }
 
 function toggleMode() {
-    let wrapper = $("#wrapper");
-    let theme = wrapper.attr("data-bs-theme");
-    if(theme != "dark") {
-        wrapper.attr("data-bs-theme","dark");
+    const wrapper = $("#wrapper");
+    const isDark = wrapper.attr("data-bs-theme") !== "dark";
+    if (isDark) {
+        wrapper.attr("data-bs-theme", "dark");
     } else {
         wrapper.removeAttr("data-bs-theme");
     }
+    localStorage.setItem("jol-theme", isDark ? "dark" : "");
 }
 
 function sortPlayerVekn(round) {

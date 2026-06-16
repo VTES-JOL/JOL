@@ -34,5 +34,6 @@
         </div>
     </div>
     <span id="connectionMessage" class="navbar-text text-warning d-none">Connection issue. Retrying...</span>
+    <span id="wsStatus" class="navbar-text text-warning d-none" title="Real-time updates unavailable — using polling"><i class="bi bi-wifi-off"></i></span>
     <span class="p-2 fw-bold ms-2 rounded <%= environmentStyle%>"><%= environmentLabel %></span>
 </nav>
