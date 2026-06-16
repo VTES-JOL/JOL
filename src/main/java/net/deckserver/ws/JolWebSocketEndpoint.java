@@ -9,6 +9,7 @@ import javax.websocket.EndpointConfig;
 import javax.websocket.HandshakeResponse;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
+import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.HandshakeRequest;
@@ -55,6 +56,32 @@ public class JolWebSocketEndpoint {
         ws.getUserProperties().put(PLAYER_KEY, playerName);
         WebSocketRegistry.register(playerName, ws);
         log.info("WebSocket opened for player {} (session {})", playerName, ws.getId());
+    }
+
+    @OnMessage
+    public void onMessage(Session ws, String message) {
+        // Clients send {"type":"join","game":"<gameId>"} when entering a game page,
+        // and {"type":"leave","game":"<gameId>"} when leaving, so the server can
+        // target game notifications to only the sessions watching that game.
+        try {
+            if (message.contains("\"join\"")) {
+                String gameId = extractGameId(message);
+                if (gameId != null) WebSocketRegistry.joinGame(gameId, ws);
+            } else if (message.contains("\"leave\"")) {
+                String gameId = extractGameId(message);
+                if (gameId != null) WebSocketRegistry.leaveGame(gameId, ws);
+            }
+        } catch (Exception e) {
+            log.warn("WebSocket onMessage parse error: {}", e.getMessage());
+        }
+    }
+
+    private static String extractGameId(String message) {
+        int idx = message.indexOf("\"game\":\"");
+        if (idx < 0) return null;
+        int start = idx + 8;
+        int end = message.indexOf('"', start);
+        return end > start ? message.substring(start, end) : null;
     }
 
     @OnClose

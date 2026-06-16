@@ -184,6 +184,8 @@ function initWebSocket() {
         wsConnected = true;
         if (refresher) clearTimeout(refresher);
         console.log('[WS] Connected — push notifications active, polling suspended');
+        // Re-join the game room if we're already on a game page (e.g. after reconnect)
+        if (currentPage === 'game' && game) wsJoinGame(game);
     };
 
     ws.onmessage = (evt) => {
@@ -229,10 +231,18 @@ function setEdgeColorPref(value) {
     profile.edgeColor = value;
 }
 
+const processDataHandlers = {
+    checkVersion, navigate, loadGame,
+    callbackMain, callbackLobby, callbackShowDecks, callbackAdmin,
+    callbackProfile, callbackTournament, callbackTournamentAdmin,
+    callbackAllGames, showStatus, setPreferences, setEdgeColorPref,
+};
+
 function processData(a) {
     $("#connectionMessage").addClass("d-none");
-    for (let b in a) {
-        eval(b + '(a[b]);');
+    for (let key in a) {
+        const fn = processDataHandlers[key];
+        if (fn) fn(a[key]);
     }
 }
 
@@ -1776,13 +1786,34 @@ function renderPastGames(history) {
     })
 }
 
+function wsJoinGame(gameId) {
+    if (ws && ws.readyState === WebSocket.OPEN && gameId) {
+        ws.send(JSON.stringify({type: 'join', game: gameId}));
+    }
+}
+
+function wsLeaveGame(gameId) {
+    if (ws && ws.readyState === WebSocket.OPEN && gameId) {
+        ws.send(JSON.stringify({type: 'leave', game: gameId}));
+    }
+}
+
 function navigate(data) {
     if (data.target !== currentPage) {
+        // Leave current game room before switching pages
+        if (currentPage === 'game' && game) wsLeaveGame(game);
         $("#" + currentPage).hide();
         $("#" + data.target).show();
         currentPage = data.target;
     }
+    const prevGame = game;
     game = data.game;
+    if (currentPage === 'game') {
+        // Leave the old game room if switching games on the same page
+        if (prevGame && prevGame !== game) wsLeaveGame(prevGame);
+        // Join the new game room so the server sends targeted notifications
+        if (game && game !== prevGame) wsJoinGame(game);
+    }
     $("#buttons").empty();
     $('#gameButtons').empty();
     // Always hide the My Games item to start.
@@ -1873,7 +1904,11 @@ function doSubmit(event) {
     commandInput.val("");
     chatInput.val("");
     pingSelect.val("");
-    DS.submitForm(game, phase, command, chat, ping, {callback: processData, errorHandler: errorhandler});
+    const submitBtn = $("#gameSubmit").prop("disabled", true);
+    DS.submitForm(game, phase, command, chat, ping, {
+        callback: (data) => { submitBtn.prop("disabled", false); processData(data); },
+        errorHandler: (err, ex) => { submitBtn.prop("disabled", false); errorhandler(err, ex); }
+    });
     return false;
 }
 
@@ -2009,17 +2044,17 @@ function loadGame(data) {
         addCardTooltips("#gameChatOutput");
     }
 
-    // Global Notes — only update from server if the value has changed since we last received it.
-    // This prevents a race condition where endPlayerTurn responds before updateGlobalNotes is
-    // processed, causing stale server data to overwrite the user's unsaved notes.
-    if (data.globalNotes && data.globalNotes !== lastReceivedGlobalNotes) {
+    // Global Notes — only update from server if the value has changed since we last received it,
+    // and the user doesn't currently have the field focused (typing in progress).
+    if (data.globalNotes && data.globalNotes !== lastReceivedGlobalNotes
+            && document.activeElement !== globalNotes[0]) {
         lastReceivedGlobalNotes = data.globalNotes;
         globalNotes.val(data.globalNotes);
     }
 
-    // Only update private notes if the server value has changed since we last received it,
-    // e.g. another player revealed cards. Same race-condition guard as globalNotes.
-    if (data.privateNotes && data.privateNotes !== lastReceivedPrivateNotes) {
+    // Same guards for private notes.
+    if (data.privateNotes && data.privateNotes !== lastReceivedPrivateNotes
+            && document.activeElement !== privateNotes[0]) {
         lastReceivedPrivateNotes = data.privateNotes;
         privateNotes.val(data.privateNotes);
     }

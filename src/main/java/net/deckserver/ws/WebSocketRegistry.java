@@ -7,6 +7,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class WebSocketRegistry {
 
     private static final ConcurrentHashMap<String, CopyOnWriteArraySet<Session>> sessions = new ConcurrentHashMap<>();
+    // gameId -> sessions watching that game
+    private static final ConcurrentHashMap<String, CopyOnWriteArraySet<Session>> gameSessions = new ConcurrentHashMap<>();
 
     public static void register(String playerName, Session session) {
         sessions.computeIfAbsent(playerName, k -> new CopyOnWriteArraySet<>()).add(session);
@@ -18,10 +20,28 @@ public class WebSocketRegistry {
             s.remove(session);
             if (s.isEmpty()) sessions.remove(playerName);
         }
+        // remove from any game room this session was watching
+        gameSessions.values().forEach(set -> set.remove(session));
+    }
+
+    public static void joinGame(String gameId, Session session) {
+        gameSessions.computeIfAbsent(gameId, k -> new CopyOnWriteArraySet<>()).add(session);
+    }
+
+    public static void leaveGame(String gameId, Session session) {
+        CopyOnWriteArraySet<Session> s = gameSessions.get(gameId);
+        if (s != null) {
+            s.remove(session);
+            if (s.isEmpty()) gameSessions.remove(gameId);
+        }
     }
 
     public static void notifyGame(String gameId) {
-        broadcast("{\"type\":\"game\",\"id\":\"" + gameId + "\"}");
+        String message = "{\"type\":\"game\",\"id\":\"" + gameId + "\"}";
+        CopyOnWriteArraySet<Session> targets = gameSessions.get(gameId);
+        if (targets != null) {
+            targets.forEach(session -> send(session, message));
+        }
     }
 
     public static void notifyMain() {
@@ -29,10 +49,12 @@ public class WebSocketRegistry {
     }
 
     private static void broadcast(String message) {
-        sessions.values().forEach(set -> set.forEach(session -> {
-            try {
-                if (session.isOpen()) session.getBasicRemote().sendText(message);
-            } catch (Exception ignored) {}
-        }));
+        sessions.values().forEach(set -> set.forEach(session -> send(session, message)));
+    }
+
+    private static void send(Session session, String message) {
+        try {
+            if (session.isOpen()) session.getBasicRemote().sendText(message);
+        } catch (Exception ignored) {}
     }
 }
