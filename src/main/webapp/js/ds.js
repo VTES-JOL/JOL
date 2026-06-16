@@ -1613,11 +1613,7 @@ function renderGlobalChat(data) {
     $.each(data, function (index, chat) {
         let day = moment(chat.timestamp).tz("UTC").format("D MMMM");
         if (globalChatLastDay !== day) {
-            let dayBreak = $('<div style="height: .9rem; margin-bottom: .6rem; margin-top: -.3rem; border-bottom: 1px solid #dcc; text-align: center">'
-                + '<span style="font-size: .8rem; background-color: #fff; padding: 0 .5rem; color: #b99; font-weight: bold">'
-                + day
-                + '</span>'
-                + '</div>');
+            let dayBreak = $('<div class="chat-day-break"><span class="chat-day-label">' + day + '</span></div>');
             container.append(dayBreak);
         }
 
@@ -1628,8 +1624,8 @@ function renderGlobalChat(data) {
         let playerLabel = globalChatLastPlayer === chat.player && globalChatLastDay === day ? "" : "<b>" + chat.player + "</b> ";
         //replace player name with colored player name
         let msg = chat.message
-            .replaceAll("&#64;"+player, "<span style='background-color: #D4D7F9; color:black'>@"+player+"</span>")
-            .replaceAll("&#64;All", "<span style='background-color: #D4D7F9; color:black'>@All</span>");
+            .replaceAll("&#64;"+player, "<span class='chat-mention'>@"+player+"</span>")
+            .replaceAll("&#64;All", "<span class='chat-mention'>@All</span>");
         let message = $("<span/>").html(" " + playerLabel + msg);
 
         if (chat.player !== player) {
@@ -1653,53 +1649,61 @@ function renderGlobalChat(data) {
     }
 }
 
-function toggleDetailedMode(elem) {
-    let checked = elem.checked;
-    localStorage.setItem("jol-details", checked);
-    let playersDiv = $(".players");
-    if (checked) {
-        playersDiv.removeClass("d-none");
-    } else {
-        playersDiv.addClass("d-none");
-    }
-}
-
 function renderMyGames(id, games) {
-    let checked = localStorage.getItem("jol-details") || "true";
-    let ownGames = $("#"+id);
-    let headerText = id === "myGames" ? "Active Games" : "Ousted Games";
+    let ownGames = $("#" + id);
+    let countBadge = $("#" + id + "-count");
     ownGames.empty();
-    $("#"+id+"-header").text(headerText+" ("+games.length+"):");
+    countBadge.text(games.length);
 
     $.each(games, function (index, gameEntry) {
-        let gameRow = $("<li/>").addClass("list-group-item p-0 border").on('click', function () {
-            doNav("g" + gameEntry.gameId);
-        });
-        let header = $("<div/>").addClass("d-flex p-2 justify-content-between w-100 border-bottom bg-body-tertiary");
-        let title = $("<span/>").addClass("fw-bold text-break").text(gameEntry.name);
-        let turn = $("<small/>").text(gameEntry.turn).addClass("d-inline-block d-md-none d-xl-inline-block");
-        header.append(title, turn);
-        let players = $("<div/>").addClass("players pb-2");
-        let toggle = $("#myGamesDetailedMode");
-        if (checked === "true") {
-            toggle.prop("checked", true);
-            players.removeClass("d-none");
-        } else {
-            toggle.prop("checked", false);
-            players.addClass("d-none");
-        }
-        let predator = renderPlayer(gameEntry.players, gameEntry.predator);
-        let activePlayer = renderPlayer(gameEntry.players, gameEntry.activePlayer);
-        let prey = renderPlayer(gameEntry.players, gameEntry.prey);
-        activePlayer.addClass("fw-semibold");
         let self = gameEntry.players[player];
-        if (self.pinged) {
-            title.prepend($("<i/>").addClass('me-2 text-danger bi-exclamation-triangle'));
-        } else if (!self.current) {
-            title.prepend($("<i/>").addClass('me-2 bi-bell'));
+        let pinged = self && self.pinged;
+        let needsAttention = self && !self.current;
+
+        let gameRow = $("<li/>")
+            .addClass("list-group-item game-entry px-2 py-2")
+            .on('click', function () { doNav("g" + gameEntry.gameId); });
+
+        if (pinged) {
+            gameRow.addClass("border-start border-3 border-danger");
+        } else if (needsAttention) {
+            gameRow.addClass("border-start border-3 border-primary-subtle");
         }
-        players.append(predator, activePlayer, prey);
-        gameRow.append(header, players);
+
+        let nameRow = $("<div/>").addClass("d-flex align-items-center justify-content-between");
+        let title = $("<span/>").addClass("fw-bold text-break").text(gameEntry.name);
+        if (pinged) {
+            title.prepend($("<i/>").addClass("me-1 text-danger bi-exclamation-triangle"));
+        } else if (needsAttention) {
+            title.prepend($("<i/>").addClass("me-1 bi-bell"));
+        }
+        nameRow.append(title);
+        if (gameEntry.turn) {
+            nameRow.append($("<small/>").addClass("text-muted ms-2 text-nowrap").text(gameEntry.turn));
+        }
+        gameRow.append(nameRow);
+
+        if (id === "myGames" && gameEntry.predator) {
+            let pred = gameEntry.players[gameEntry.predator];
+            let active = gameEntry.players[gameEntry.activePlayer];
+            let prey = gameEntry.players[gameEntry.prey];
+            let predName = pred ? pred.playerName : gameEntry.predator;
+            let activeName = active ? active.playerName : gameEntry.activePlayer;
+            let preyName = prey ? prey.playerName : gameEntry.prey;
+
+            let seatRow = $("<div/>").addClass("d-flex align-items-center gap-1 text-muted small mt-1");
+            seatRow.append($("<i/>").addClass("bi bi-arrow-left-short"));
+            seatRow.append($("<span/>").text(predName));
+            if (pred && pred.pinged) seatRow.append($("<i/>").addClass("bi-exclamation-triangle text-danger"));
+            seatRow.append($("<span/>").addClass("mx-1 text-body-tertiary").text("·"));
+            seatRow.append($("<strong/>").text(activeName));
+            seatRow.append($("<span/>").addClass("mx-1 text-body-tertiary").text("·"));
+            seatRow.append($("<span/>").text(preyName));
+            if (prey && prey.pinged) seatRow.append($("<i/>").addClass("bi-exclamation-triangle text-danger"));
+            seatRow.append($("<i/>").addClass("bi bi-arrow-right-short"));
+            gameRow.append(seatRow);
+        }
+
         ownGames.append(gameRow);
     });
 }
@@ -1729,26 +1733,33 @@ function renderOnline(div, who) {
     if (who === null) {
         return;
     }
-    $("#online-users-header").text("Online Users ("+who.length+"):");
+    $("#online-users-header").text("Online (" + who.length + ")");
     $.each(who, function (index, playerEntry) {
         let lastOnline = moment(playerEntry.lastOnline).tz("UTC");
         let sinceLastOnline = moment.duration(moment().diff(lastOnline)).asMinutes();
-        let flag = playerEntry.country ? `<span data-tippy-content="${regionNames.of(playerEntry.country)}" class="fi fi-${playerEntry.country.toLowerCase()} fis fs-3"></span>` : '<span class="fs-3">&nbsp;</span>';
+        let flag = playerEntry.country
+            ? `<span data-tippy-content="${regionNames.of(playerEntry.country)}" class="fi fi-${playerEntry.country.toLowerCase()} fis"></span>`
+            : "";
         let admin = playerEntry.roles.includes('ADMIN') ? '<i data-tippy-content="Administrator" class="bi bi-star-fill text-warning"></i>' : "";
         let judge = playerEntry.roles.includes('JUDGE') ? '<i data-tippy-content="Judge" class="bi bi-person-raised-hand text-success"></i>' : "";
-        let offline = sinceLastOnline > 30 ? `<i data-tippy-content="Last Online: ${lastOnline.format('D-MMM HH:mm z')}" class="bi bi-clock-history"></i>` : "";
-        let playerDiv = `
-            <span class="border rounded-start p-0 border-secondary d-flex justify-content-between align-items-center">
-                <span class="d-flex align-items-center gap-2 px-2">
-                    <strong>${playerEntry.name}</strong>
-                    ${admin}
-                    ${judge}
-                    ${offline}
-                </span>
-                ${flag}
-            </span>`;
+        let offline = sinceLastOnline > 60
+            ? `<i data-tippy-content="Last Online: ${lastOnline.format('D-MMM HH:mm z')}" class="bi bi-clock-history text-muted"></i>`
+            : "";
+        let playerDiv = `<div class="online-player-row">
+            ${flag}
+            <span class="flex-grow-1 text-truncate">${playerEntry.name}</span>
+            ${admin}${judge}${offline}
+        </div>`;
         container.append(playerDiv);
     });
+
+    if (who.length > 8) {
+        let collapseEl = document.getElementById("onlinePlayersList");
+        if (collapseEl && bootstrap.Collapse) {
+            bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false }).hide();
+        }
+    }
+
     tippy('[data-tippy-content]', { theme: 'light'});
 }
 

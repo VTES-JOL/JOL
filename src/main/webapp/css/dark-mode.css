@@ -43,12 +43,14 @@
         cursor: pointer;
     }
 
+    --jol-mention-bg: #3a3f6e;
+    --jol-mention-fg: #dee2e6;
+    --jol-day-break-border: #444;
+    --jol-day-label-bg: #25292b;
+    --jol-day-label-color: #888;
+
     p.chat a {
         background-color: #343a40;
-    }
-
-    div#globalChatOutput div span {
-        background-color: #343a40 !important;
     }
 
     span.card-name {
