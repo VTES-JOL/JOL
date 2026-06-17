@@ -4,5 +4,6 @@
   </div>
   <div class="col-8">
     <jsp:include page="tournament-manager.jsp"/>
+    <jsp:include page="tournament-final.jsp"/>
   </div>
 </div>

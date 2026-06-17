@@ -532,6 +532,13 @@ function saveFinal() {
     $("#tourFinal").addClass("d-none");
 }
 
+function startSeeding() {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    if(!$("#finalSeeding-"+tournamentSelected.replace(/\s+/g, '')).is(":visible")){
+       DS.loadFinalSeeding(tournamentSelected, { callback: callbackFinalSeeding, errorHandler: errorhandler});
+    }
+}
+
 function startFinal() {
     if (confirm("Are you sure you want to START the FINAL?")) {
         let tournamentSelected = $("#nameOfTournament option:selected").text();
@@ -942,17 +949,17 @@ function createTournamentTables() {
 }
 
 function callbackFinalSeeding(data) {
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
     let activTournaments = $("#finalSeeding");
-    let card = $("<div/>").addClass("card shadow mb-2").attr("id", "finalSeeding-"+data.name);
+    let card = $("<div/>").addClass("card shadow mb-2").attr("id", "finalSeeding-"+tournamentSelected.replace(/\s+/g, ''));
     let header = $("<div/>").addClass("card-header bg-body-secondary")
-        .append("<h5/>").text("Final Table Seeding - " + data.name);
+        .append("<h5/>").text("Final Table Seeding - " + tournamentSelected);
     let finalSeeding = $("<div/>").addClass("card-body");
-    let finalSeedingTable = $("<ol/>").attr("id", "finalSeedingTable-"+data.name).addClass('border list-group');
+    let finalSeedingTable = $("<ol/>").attr("id", "finalSeedingTable-"+tournamentSelected.replace(/\s+/g, '')).addClass('border list-group');
     finalSeeding.append(finalSeedingTable);
-    let seeding = data.finalsSeeding;
-    $.each(seeding, function(index, player) {
-        DS.loadCrypt(data.name, player, {callback: function callbackCrypt(crypt) {
-            DS.cryptCount(data.name, player, {callback: function callbackCryptCount(count) {
+    $.each(data, function(index, player) {
+        DS.loadCrypt(tournamentSelected, player, {callback: function callbackCrypt(crypt) {
+            DS.cryptCount(tournamentSelected, player, {callback: function callbackCryptCount(count) {
                 let rank = index+1;
                 let playerSpan = $("<span/>").addClass("fw-bold").text(player +" Rank: "+ rank);
                 let countSpan = $("<span/>").text(" [" + count + "]");
@@ -1072,12 +1079,6 @@ function callbackTournament(data) {
                 dropDown.append(template);
             })
         })
-    });
-    //create final table
-    let activTournaments = $("#finalSeeding");
-    activTournaments.empty();
-    $.each(data.activeTournaments, function(index, active) {
-        callbackFinalSeeding(active);
     });
 }
 
