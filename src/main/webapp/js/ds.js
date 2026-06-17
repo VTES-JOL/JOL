@@ -1074,11 +1074,11 @@ function callbackTournament(data) {
         })
     });
     //create final table
-    let activTournaments = $("#finalSeeding");
-    activTournaments.empty();
-    $.each(data.activeTournaments, function(index, active) {
-        callbackFinalSeeding(active);
-    });
+    // let activTournaments = $("#finalSeeding");
+    // activTournaments.empty();
+    // $.each(data.activeTournaments, function(index, active) {
+    //     callbackFinalSeeding(active);
+    // });
 }
 
 function registerForTournament(deckRow, deck) {
