@@ -34,9 +34,6 @@
     <div id="saveFinal" class="d-none">
       <div class="d-flex justify-content-between w-100">
         <button onclick="saveFinal()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Save Final</button>
-        <button onclick="startFinalSeeding()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Start Seeding</button>
-      </div>
-      <div class="d-flex justify-content-between w-100">
         <button onclick="startFinal()" class="btn btn-outline-success btn-sm mt-2 w-100">Start Final</button>
       </div>
     </div>

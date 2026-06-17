@@ -20,6 +20,7 @@ public class TournamentBean {
 
     private boolean veknLinked;
     private final List<TournamentMetadata> tournaments;
+    private final List<TournamentMetadata> activeTournaments;
     private final List<TournamentInviteStatus> registeredGames;
     private final List<DeckInfoBean> decks;
 
@@ -27,6 +28,7 @@ public class TournamentBean {
         String playerName = model.getPlayerName();
         veknLinked = !StringUtils.isEmpty(PlayerService.get(playerName).getVeknId());
         tournaments = TournamentService.getOpenTournaments(playerName);
+        activeTournaments = TournamentService.getActiveTournaments();
         registeredGames = TournamentService.getRegisteredTournaments(playerName);
         decks = DeckService.getPlayerDeckNames(playerName).stream()
                 .filter(Objects::nonNull)
