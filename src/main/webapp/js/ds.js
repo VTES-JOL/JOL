@@ -523,11 +523,9 @@ function saveFinal() {
     $.each($("#finalTable").find("li"), function(index, player) {
         players.push(player.firstChild.firstChild.textContent);
     })
-    if(players.length === 5) {
-        DS.saveFinal(tournamentSelected, players, {callback: processData, errorHandler: errorhandler});
-        //reset
-        $("#tourFinal").addClass("d-none");
-    }
+    DS.saveFinal(tournamentSelected, players, {callback: processData, errorHandler: errorhandler});
+    //reset
+    $("#tourFinal").addClass("d-none");
 }
 
 function startFinal() {
@@ -939,29 +937,24 @@ function createTournamentTables() {
     }
 }
 
-function startFinalSeeding() {
-    if (confirm("Are you sure you want to START the FINAL SEEDING?")) {
-        let tournamentSelected = $("#nameOfTournament option:selected").text();
-        DS.loadFinalSeeding(tournamentSelected, {callback: callbackFinalSeeding, errorHandler: errorhandler});
-    }
-}
-
 function callbackFinalSeeding(data) {
-    let tournamentSelected = $("#nameOfTournament option:selected").text();
-    let header = $("#finalSeedingHeader");
-    header.text("Final Table Seeding - " + tournamentSelected);
-    let finalSeeding = $("#finalTableSeeding");
-    finalSeeding.empty();
-    finalSeeding.sortable({connectWith: ".sortableFinalSeeding", handle: ".bi-grip-vertical", dropOnEmpty: true});
-    $("#finalSeeding").removeClass("d-none");
-
-    let pending = data.length;
-    $.each(data, function(index, player) {
-        DS.loadCrypt(tournamentSelected, player, {callback: function callbackCrypt(crypt) {
-            DS.cryptCount(tournamentSelected, player, {callback: function callbackCryptCount(count) {
-                let playerSpan = $("<span/>").addClass("fw-bold").text(player);
+    let activTournaments = $("#finalSeeding");
+    let card = $("<div/>").addClass("card shadow mb-2").attr("id", "finalSeeding-"+data.name);
+    let header = $("<div/>").addClass("card-header bg-body-secondary")
+        .append("<h5/>").text("Final Table Seeding - " + data.name);
+    let finalSeeding = $("<div/>").addClass("card-body");
+    let finalSeedingTable = $("<ol/>").attr("id", "finalSeedingTable-"+data.name).addClass('border list-group');
+    finalSeeding.append(finalSeedingTable);
+    let seeding = data.finalsSeeding;
+    $.each(seeding, function(index, player) {
+        DS.loadCrypt(data.name, player, {callback: function callbackCrypt(crypt) {
+            DS.cryptCount(data.name, player, {callback: function callbackCryptCount(count) {
+                let rank = index+1;
+                let playerSpan = $("<span/>").addClass("fw-bold").text(player +" Rank: "+ rank);
                 let countSpan = $("<span/>").text(" [" + count + "]");
-                let listItem = $("<li/>").attr("data-player", player)
+                let listItem = $("<li/>")
+                    .attr("data-rank", rank)
+                    .attr("data-player", player)
                     .append(playerSpan)
                     .append(countSpan)
                     .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center");
@@ -973,20 +966,14 @@ function callbackFinalSeeding(data) {
                         .append(cardLink);
                     ul.append(li);
                 });
-                listItem.append(ul).append("<i class='bi bi-grip-vertical'></i>");
-                listItem.disableSelection();
-                finalSeeding.append(listItem);
+                listItem.append(ul);
+                finalSeedingTable.append(listItem);
                 addCardTooltips(listItem);
-                if (--pending === 0) {
-                    finalSeeding.sortable({
-                        connectWith: ".sortableFinal",
-                        handle: ".bi-grip-vertical",
-                        dropOnEmpty: true
-                    });
-                }
             }, errorHandler: errorhandler});
         }, errorHandler: errorhandler});
     });
+    card.append(header).append(finalSeedingTable);
+    activTournaments.append(card);
 }
 
 function callbackTournament(data) {
@@ -1081,6 +1068,12 @@ function callbackTournament(data) {
                 dropDown.append(template);
             })
         })
+    });
+    //create final table
+    let activTournaments = $("#finalSeeding");
+    activTournaments.empty();
+    $.each(data.activeTournaments, function(index, active) {
+        callbackFinalSeeding(active);
     });
 }
 
