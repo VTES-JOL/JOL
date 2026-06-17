@@ -27,6 +27,10 @@ let lastReceivedPrivateNotes = null;
 const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
 function errorhandler(errorString, exception) {
+    if (errorString && errorString.startsWith('401')) {
+        location.href = '/jol/login';
+        return;
+    }
     $("#connectionMessage").removeClass("d-none");
     refresher = setTimeout("DS.init({callback: processData, errorHandler: errorhandler})", 5000);
 }
