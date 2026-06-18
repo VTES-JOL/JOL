@@ -21,6 +21,7 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -275,6 +276,16 @@ public class TournamentService extends PersistedService {
                     RegistrationService.registerDeck(gameName, playerName, deckId, deck.getDeck().getName(), deck.getStats().getSummary());
                     // Add player and deck
                     jolGame.addPlayer(playerName, deck.getDeck());
+                    // Copy deck into game folder
+                    Path gameDeckPath = DataPaths.path("games", gameId, deckId + ".json");
+                    Path tournamentDeckPath = DataPaths.path("tournaments", tournament.getId(), deckId + ".json");                        if (!Files.exists(gameDeckPath)) {
+                        try {
+                            Files.copy(tournamentDeckPath, gameDeckPath, StandardCopyOption.REPLACE_EXISTING);
+                        } catch (IOException e) {
+                            logger.error("Unable to copy tournament file");
+                        }
+                    }
+
                 }
                 // Set order and start
                 jolGame.startGame(players.stream().map(TournamentPlayer::getName).toList());
