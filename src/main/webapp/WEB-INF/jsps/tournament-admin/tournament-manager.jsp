@@ -31,18 +31,20 @@
     <div id="saveFinal" class="d-none">
       <div class="d-flex gap-1 flex-wrap mt-2">
         <button onclick="saveFinal()" class="btn btn-outline-secondary btn-sm">Save Final</button>
-        <button onclick="startFinalSeeding()" class="btn btn-outline-secondary btn-sm">Start Seeding</button>
-        <button onclick="setFinalSeating()" class="btn btn-outline-secondary btn-sm">Set Seating</button>
+        <button onclick="startSeeding()" class="btn btn-outline-secondary btn-sm">Start Seeding</button>
         <button onclick="startFinal()" class="btn btn-outline-success btn-sm">Start Final</button>
       </div>
     </div>
+    <div id="finalStartedMsg" class="d-none alert alert-info mt-2">Finals already started — see seating below.</div>
     <div id="importTablesMsg" class="d-none alert mt-2"></div>
     <div id="tourRounds" class="scrollable mhd-70 mt-2"></div>
     <div id="tourFinal" class="d-none">
+      <span class="h4">Tournament Players</span>
       <ul id="finalPlayers" class="card-body p-1 grid sortableFinal"></ul>
       <div>
         <div class="card-body p-1">
-          <span>Final Table</span>
+          <span class="h4">Final Table</span>
+          <i class="bi bi-shuffle" onclick="shuffleSeeding()"></i>
           <ul id="finalTable" class="border list-group sortableFinal" style="min-height: 38px"></ul>
         </div>
       </div>

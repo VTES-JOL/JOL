@@ -105,6 +105,7 @@ const DS = {
     leaveTournament:         (game, opts) => apiPost(`/tournament/${_enc(game)}/leave`, {}, opts),
     registerTournamentDeck:  (tournament, deckName, opts) => apiPost(`/tournament/${_enc(tournament)}/deck`, {deckName}, opts),
     resetTables:             (tourName, opts) => apiDel(`/tournament/${_enc(tourName)}/rounds`, opts),
+    getFinalPlayers:         (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/final-players`, opts),
     saveFinal:               (tourName, players, opts) => apiPut(`/tournament/${_enc(tourName)}/final-players`, players, opts),
     getRegDelta:             (tourName, round, opts) => apiGet(`/tournament/${_enc(tourName)}/round-delta?round=${round}`, opts),
     loadCrypt:               (tourName, player, opts) => apiGet(`/tournament/${_enc(tourName)}/crypt?player=${_enc(player)}`, opts),
@@ -147,7 +148,7 @@ const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
 function errorhandler(errorString) {
     if (errorString && errorString.startsWith('401')) {
-        location.href = '/jol/';
+        location.href = '/jol/login';
         return;
     }
     $("#connectionMessage").removeClass("d-none");
@@ -757,8 +758,8 @@ function callbackStatusTournament(isActive) {
     let nameOfTournament = $("#nameOfTournament option:selected").text();
     if(isActive) {
         let nameOfTournament = $("#nameOfTournament option:selected").text();
-        DS.getTournamentPlayers(nameOfTournament, {callback: callbackFinal, errorHandler: errorhandler});
         DS.gameAlreadyStarted(nameOfTournament, {callback: callbackSaveButton, errorHandler: errorhandler});
+        DS.getFinalPlayers(nameOfTournament, {callback: loadFinalTable, errorHandler: errorhandler})
         showTablesReadOnly(nameOfTournament);
     } else {
         DS.getTournamentRounds(nameOfTournament, {callback: callbackTournamentRounds, errorHandler: errorhandler});
@@ -773,33 +774,27 @@ function saveFinal() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
     let players = new Array();
     $.each($("#finalTable").find("li"), function(index, player) {
-        players.push(player.textContent);
+        players.push(player.firstChild.firstChild.textContent);
     })
-    if(players.length === 5) {
-        DS.saveFinal(tournamentSelected, players, {callback: processData, errorHandler: errorhandler});
-        //reset
-        $("#tourFinal").empty().addClass("d-none");
-    }
+    DS.saveFinal(tournamentSelected, players, {callback: processData, errorHandler: errorhandler});
+    //reset
+    $("#tourFinal").addClass("d-none");
 }
 
-function setFinalSeating() {
+function startSeeding() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
-    let players = new Array();
-    $.each($("#finalTableSeeding > li"), function(index, player) {
-        players.push($(player).attr("data-player"));
-    })
-    if(players.length === 5) {
-        DS.setFinalSeeding(tournamentSelected, players, {callback: processData, errorHandler: errorhandler});
-        //reset
-        $("#finalTableSeeding").empty().addClass("d-none");
+    if(!$("#finalSeeding-"+tournamentSelected.replace(/\s+/g, '')).is(":visible")){
+       DS.loadFinalSeeding(tournamentSelected, { callback: callbackFinalSeeding, errorHandler: errorhandler});
     }
 }
 
 function startFinal() {
-    let tournamentSelected = $("#nameOfTournament option:selected").text();
-    DS.createFinalTable(tournamentSelected, {callback: processData, errorHandler: errorhandler});
-    //reset
-    $("#saveFinal").addClass("d-none");
+    if (confirm("Are you sure you want to START the FINAL?")) {
+        let tournamentSelected = $("#nameOfTournament option:selected").text();
+        DS.createFinalTable(tournamentSelected, {callback: processData, errorHandler: errorhandler});
+        //reset
+        $("#saveFinal").addClass("d-none");
+    }
 }
 
 function callbackLoadTournamentDetails(data) {
@@ -972,24 +967,26 @@ function addRule(rulesInput, rulesCon) {
 }
 
 function saveTables() {
-    let tournamentSelected = $("#nameOfTournament option:selected").text();
-    let rounds = {};
-    $("#tourRounds ul[round]").each(function(index, ul) {
-        let players = [];
-        let round = $(ul).attr("round");
-        let tableNumber = $(ul).closest("li").index() + 1;
-        $(ul).find("li [data-player]").each(function(i, el) {
-            let name = $(el).attr("data-player");
-            if (name) players.push(name);
+    if (confirm("Are you sure you want to SAVE the Tournament Tables?")) {
+        let tournamentSelected = $("#nameOfTournament option:selected").text();
+        DS.resetTables(tournamentSelected);
+        let rounds = {};
+        $("#tourRounds ul[round]").each(function(index, ul) {
+            let players = [];
+            let round = $(ul).attr("round");
+            let tableNumber = $(ul).closest("li").index() + 1;
+            $(ul).find("li [data-player]").each(function(i, el) {
+                let name = $(el).attr("data-player");
+                if (name) players.push(name);
+            });
+            if (round) {
+                if (!rounds[round]) rounds[round] = {};
+                rounds[round][tableNumber] = players;
+            }
         });
-        if (round) {
-            if (!rounds[round]) rounds[round] = {};
-            rounds[round][tableNumber] = players;
-        }
-    });
-    DS.saveTables(tournamentSelected, rounds);
-    resetTournamentManager();
-}
+        DS.saveTables(tournamentSelected, rounds);
+        resetTournamentManager();
+    }
 
 function importTables() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
@@ -1017,12 +1014,16 @@ function importTables() {
     });
 }
 
+}
+
 function resetTournamentManager() {
     //reset
     let tourRounds = $("#tourRounds");
     tourRounds.empty();
     $("#saveTables").addClass("d-none");
     $("#saveFinal").addClass("d-none");
+    $("#finalStartedMsg").addClass("d-none");
+    $("#tourFinal").addClass("d-none");
 }
 
 function downloadCurrentTables() {
@@ -1070,6 +1071,30 @@ function callbackShowTables(data) {
             DS.getRegDelta(tournamentSelected, indexRound, {callback: callbackShowPlayers, errorHandler: errorhandler});
         })
     })
+}
+
+function loadFinalTable(data) {
+    //show final tabel
+    $("#tourFinal").removeClass("d-none");
+    let final = $("#finalTable");
+    final.empty();
+    final.sortable({
+                connectWith: ".sortableFinal",
+                handle: ".bi-grip-vertical",
+                dropOnEmpty: true});
+    $.each(data, function(index, player) {
+        let playerSpan = $("<span/>").attr("data-player", player.player).text(player.player);
+        let veknSpan = $("<span/>").addClass("fw-bold").text(player.vekn);
+        let playerDiv = $("<div/>").addClass("d-flex flex-column").append(playerSpan, veknSpan);
+        let listItem = $("<li/>")
+            .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center")
+            .append(playerDiv)
+            .append("<i class='bi bi-grip-vertical'></i>");
+        listItem.disableSelection();
+        final.append(listItem);
+    });
+    let tournamentSelected = $("#nameOfTournament option:selected").text();
+    DS.getFinalDelta(tournamentSelected, {callback: callbackFinal, errorHandler: errorhandler});
 }
 
 function showTablesReadOnly(tourName) {
@@ -1159,25 +1184,23 @@ function callbackFinal(data) {
         handle: ".bi-grip-vertical",
         dropOnEmpty: true});
     $.each(data, function(index, reg) {
+        let playerSpan = $("<span/>").attr("data-player", reg.player).text(reg.player);
+        let veknSpan = $("<span/>").addClass("fw-bold").text(reg.vekn);
+        let playerDiv = $("<div/>").addClass("d-flex flex-column").append(playerSpan, veknSpan);
         let listItem = $("<li/>")
-            .text(reg.player)
             .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center")
-            .append("<i class='bi bi-grip-vertical'></i>");;
+            .append(playerDiv)
+            .append("<i class='bi bi-grip-vertical'></i>");
         listItem.disableSelection();
         players.append(listItem);
     });
 
-    let list = $("#finalTable")
-    list.sortable({
-        connectWith: ".sortableFinal",
-        handle: ".bi-grip-vertical",
-        dropOnEmpty: true});
     $("#tourFinal").removeClass("d-none");
 }
 
 function callbackSaveButton(isStarted) {
     if(isStarted) {
-        $("#setFinalSeating").removeClass("d-none");
+        $("#finalStartedMsg").removeClass("d-none");
     } else {
         $("#saveFinal").removeClass("d-none");
     }
@@ -1208,31 +1231,24 @@ function createTournamentTables() {
     }
 }
 
-function startFinalSeeding() {
-    let tournamentSelected = $("#nameOfTournament option:selected").text();
-    DS.loadFinalSeeding(tournamentSelected, {callback: callbackFinalSeeding, errorHandler: errorhandler});
-}
-
 function callbackFinalSeeding(data) {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
-    let header = $("#finalSeedingHeader");
-    header.text("Final Table Seeding - " + tournamentSelected);
-    let finalSeeding = $("#finalTableSeeding");
-    finalSeeding.empty();
-    $("#tourFinal").removeClass("d-none");
-
-    if (data.length === 0) {
-        finalSeeding.sortable({connectWith: ".sortableFinal", handle: ".bi-grip-vertical", dropOnEmpty: true});
-        return;
-    }
-
-    let pending = data.length;
+    let activTournaments = $("#finalSeeding");
+    let card = $("<div/>").addClass("card shadow mb-2").attr("id", "finalSeeding-"+tournamentSelected.replace(/\s+/g, ''));
+    let header = $("<div/>").addClass("card-header bg-body-secondary")
+        .append("<h5/>").text("Final Table Seeding - " + tournamentSelected);
+    let finalSeeding = $("<div/>").addClass("card-body");
+    let finalSeedingTable = $("<ol/>").attr("id", "finalSeedingTable-"+tournamentSelected.replace(/\s+/g, '')).addClass('border list-group');
+    finalSeeding.append(finalSeedingTable);
     $.each(data, function(index, player) {
         DS.loadCrypt(tournamentSelected, player, {callback: function callbackCrypt(crypt) {
             DS.cryptCount(tournamentSelected, player, {callback: function callbackCryptCount(count) {
-                let playerSpan = $("<span/>").addClass("fw-bold").text(player);
+                let rank = index+1;
+                let playerSpan = $("<span/>").addClass("fw-bold").text(player +" Rank: "+ rank);
                 let countSpan = $("<span/>").text(" [" + count + "]");
-                let listItem = $("<li/>").attr("data-player", player)
+                let listItem = $("<li/>")
+                    .attr("data-rank", rank)
+                    .attr("data-player", player)
                     .append(playerSpan)
                     .append(countSpan)
                     .addClass("border rounded p-2 border-secondary d-flex justify-content-between align-items-center");
@@ -1244,20 +1260,14 @@ function callbackFinalSeeding(data) {
                         .append(cardLink);
                     ul.append(li);
                 });
-                listItem.append(ul).append("<i class='bi bi-grip-vertical'></i>");
-                listItem.disableSelection();
-                finalSeeding.append(listItem);
+                listItem.append(ul);
+                finalSeedingTable.append(listItem);
                 addCardTooltips(listItem);
-                if (--pending === 0) {
-                    finalSeeding.sortable({
-                        connectWith: ".sortableFinal",
-                        handle: ".bi-grip-vertical",
-                        dropOnEmpty: true
-                    });
-                }
             }, errorHandler: errorhandler});
         }, errorHandler: errorhandler});
     });
+    card.append(header).append(finalSeedingTable);
+    activTournaments.append(card);
 }
 
 function callbackTournament(data) {
@@ -1592,7 +1602,7 @@ function renderDeck(data, div) {
         })
     }
     if (div === "#gameDeck") {
-        if (data.comments != "") {
+        if (data.comments !== "") {
             let comments = $("<div/>")
                 .addClass("border m-1 p-2 small text-muted")
                 .append($("<span/>").text(data.comments));
@@ -2442,6 +2452,16 @@ function toggleMode() {
         wrapper.removeAttr("data-bs-theme");
     }
     localStorage.setItem("jol-theme", isDark ? "dark" : "");
+}
+
+function shuffleSeeding() {
+    const ul = document.getElementById("finalTable");
+    const count = ul.children.length;
+    const start = Math.floor(Math.random() * count);
+
+    for (let i = 0; i < start; i++) {
+        ul.appendChild(ul.firstElementChild);
+    }
 }
 
 function sortPlayerVekn(round) {

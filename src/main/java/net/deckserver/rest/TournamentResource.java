@@ -198,6 +198,21 @@ public class TournamentResource extends BaseResource {
         TournamentService.getTournament(tourName).resetRounds();
     }
 
+    /** Replaces DS.getFinalPlayers() */
+    @GET
+    @Path("{name}/final-players")
+    public List<TournamentRegistration> getFinalPlayers(@PathParam("name") String tourName) {
+        List<TournamentRegistration> tournamentPlayers = getTournamentPlayers(tourName);
+        List<String> seeding = TournamentService.getTournament(tourName).getFinals().getSeeding();
+        return seeding.stream()
+                .map(name -> tournamentPlayers.stream()
+                        .filter(p -> Objects.equals(p.getPlayer(), name))
+                        .findFirst()
+                        .orElse(null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
     /** Replaces DS.saveFinal() */
     @PUT
     @Path("{name}/final-players")
