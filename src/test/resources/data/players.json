@@ -43,7 +43,7 @@
     "discordId" : "",
     "veknId" : "777777",
     "countryCode" : "GB",
-    "roles" : [ "SUPER_USER", "PLAYTESTER" ],
+    "roles" : [ "PLAYTESTER", "SUPER_USER" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF"
   },
@@ -67,7 +67,7 @@
     "discordId" : "",
     "veknId" : "111111",
     "countryCode" : "US",
-    "roles" : [ "JUDGE", "SUPER_USER", "PLAYTESTER" ],
+    "roles" : [ "PLAYTESTER", "JUDGE", "SUPER_USER" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF"
   },
@@ -91,7 +91,7 @@
     "discordId" : "",
     "veknId" : "333333",
     "countryCode" : "GB",
-    "roles" : [ "SUPER_USER", "PLAYTESTER" ],
+    "roles" : [ "PLAYTESTER", "SUPER_USER" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF"
   }

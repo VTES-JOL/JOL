@@ -129,7 +129,7 @@
     "deck" : "e479728b-2e7b-45ad-80bd-bbe990e04f2e"
   } ],
   "finals" : {
-    "seeding" : [ ],
+    "seeding" : [ "Player8", "Player1", "Player6", "Player5", "Player4" ],
     "seating" : [ ]
   },
   "status" : "ACTIVE",

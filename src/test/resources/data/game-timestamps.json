@@ -1,16 +1,19 @@
 {
-  "Rounds are being played: Round 2 - Table 1" : {
-    "timestamp" : "2026-06-19T01:04:26.173244Z",
-    "playerTimestamps" : { },
-    "playerPings" : {
-      "Player4" : true
-    }
-  },
   "Rounds are being played: Round 2 - Table 2" : {
     "timestamp" : "2026-06-19T01:04:26.183605Z",
     "playerTimestamps" : { },
     "playerPings" : {
       "Player7" : true
+    }
+  },
+  "Rounds are being played: Round 1 - Table 1" : {
+    "timestamp" : "2026-06-19T02:45:59.640858Z",
+    "playerTimestamps" : {
+      "Player2" : "2026-06-19T03:01:23.008165Z"
+    },
+    "playerPings" : {
+      "Player1" : true,
+      "Player2" : false
     }
   },
   "Rounds are being played: Round 1 - Table 2" : {
@@ -20,14 +23,11 @@
       "Player5" : true
     }
   },
-  "Rounds are being played: Round 1 - Table 1" : {
-    "timestamp" : "2026-06-19T02:45:59.640858Z",
-    "playerTimestamps" : {
-      "Player2" : "2026-06-19T13:01:23.008165+10:00"
-    },
+  "Rounds are being played: Round 2 - Table 1" : {
+    "timestamp" : "2026-06-19T01:04:26.173244Z",
+    "playerTimestamps" : { },
     "playerPings" : {
-      "Player1" : true,
-      "Player2" : false
+      "Player4" : true
     }
   },
   "Test Game" : {

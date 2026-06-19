@@ -156,11 +156,35 @@ html, body {
     overflow: auto;
 }
 
-#tournamentAdmin {
+/* Pass through definite height from #content to inner page wrappers */
+#main, #deck, #active, #tournament {
+    height: 100%;
+}
+
+#tournamentAdmin,
+#main,
+#deck,
+#tournament,
+#active {
     height: 100%;
     display: flex;
     flex-direction: column;
     padding: 0.5rem 0;
+}
+
+/* Full-height tab panes: tab-content fills remaining card space, active pane scrolls */
+.tab-content-fill {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.tab-content-fill > .tab-pane {
+    height: 100%;
+}
+
+.tab-content-fill > .tab-pane.active.show {
+    overflow-y: auto;
 }
 
 #deckText {

@@ -1,4 +1,4 @@
-<div class="card shadow">
+<div class="card shadow flex-fill d-flex flex-column">
     <div class="card-header bg-body-secondary p-0">
         <ul class="nav nav-tabs card-header-tabs ms-0 border-0" role="tablist">
             <li class="nav-item" role="presentation">
@@ -15,7 +15,7 @@
             </li>
         </ul>
     </div>
-    <div class="tab-content">
+    <div class="tab-content tab-content-fill">
         <div class="tab-pane fade show active" id="myGamesPane" role="tabpanel">
             <ul class="list-group list-group-flush" id="myGames"></ul>
         </div>
