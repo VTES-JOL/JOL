@@ -1,9 +1,9 @@
 [ {
   "id" : "78dc3f99-63b5-4216-b40e-209443d91898",
   "registrationStart" : "2026-06-15T00:00:00Z",
-  "registrationEnd" : "2026-06-22T00:00:00Z",
-  "playStarts" : "2026-06-29T00:00:00Z",
-  "playEnds" : "2026-07-27T00:00:00Z",
+  "registrationEnd" : "2030-12-31T00:00:00Z",
+  "playStarts" : "2031-01-01T00:00:00Z",
+  "playEnds" : "2031-12-31T00:00:00Z",
   "format" : "SINGLE_DECK",
   "deckFormat" : "Standard",
   "numberOfRounds" : 2,
@@ -105,7 +105,7 @@
     "deck" : "e479728b-2e7b-45ad-80bd-bbe990e04f2e"
   } ],
   "finals" : {
-    "seeding" : [ ],
+    "seeding" : [ "Player1", "Player2", "Player3", "Player4", "Player5" ],
     "seating" : [ ]
   },
   "status" : "ACTIVE",
