@@ -41,12 +41,16 @@ public class GameCleanUp implements Runnable {
                     });
                 });
 
-        // Close finished games
+        // Close finished games (skip tournament games — their lifecycle is managed by tournament admin)
         GameService.getActiveGames()
                 .forEach(gameName -> {
                     GameInfo info = GameService.get(gameName);
                     JolGame game = GameService.getGame(info.getId());
                     if (game.getValidPlayers().isEmpty()) {
+                        if (info.getTournamentName() != null && !info.getTournamentName().isEmpty()) {
+                            logger.info("Skipping cleanup of finished tournament game {}", gameName);
+                            return;
+                        }
                         logger.info("Closing finished game {}", gameName);
                         JolAdmin.endGame(gameName, true);
                         GlobalChatService.chat("SYSTEM", String.format("%s has been closed.", gameName));

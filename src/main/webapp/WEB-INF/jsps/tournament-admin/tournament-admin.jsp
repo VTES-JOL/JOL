@@ -2,9 +2,12 @@
 <div class="card shadow">
     <div class="card-header bg-body-secondary d-flex justify-content-between align-items-center">
         <span class="fw-semibold">Tournament</span>
-        <span class="d-flex gap-1">
+        <span class="d-flex gap-1 align-items-center">
             <div id="tourMsg" class="badge text-bg-light me-1"></div>
             <button class="btn btn-sm btn-outline-secondary" onclick="createTournament()">Save <i class="bi-floppy"></i></button>
+            <span id="publishBtnContainer" style="display:none">
+                <button class="btn btn-sm btn-success" onclick="publishTournament()">Publish <i class="bi-send"></i></button>
+            </span>
             <button class="btn btn-sm btn-outline-secondary" onclick="exitTourMode()">Cancel</button>
         </span>
     </div>

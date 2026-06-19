@@ -113,6 +113,8 @@ const DS = {
     tournamentAlreadyActive: (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/status`, opts),
     gameAlreadyStarted:      (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/game-started`, opts),
     getTournamentRounds:     (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/rounds-count`, opts),
+    publishTournament:       (tourName, opts) => apiPost(`/tournament/${_enc(tourName)}/publish`, {}, opts),
+    getRoundSummary:         (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/round-summary`, opts),
 };
 // ---------------------------------------------------------------------------
 
@@ -686,25 +688,32 @@ function createTournament() {
 function callbackCreateTournament(success, name) {
     let msg = $("#tourMsg");
     if(success) {
-        addTournamentToAdminList(name, "STARTING");
-        resetForm();
-        msg.text("Tournament created successfully").addClass("text-success").removeClass("text-warning");
+        let regEnd = $("#regEnd").val();
+        let playStart = $("#playStart").val();
+        let playEnd = $("#playEnd").val();
+        addTournamentToAdminList(name, "EDIT", regEnd, playStart, playEnd);
+        msg.text("Tournament saved as draft").addClass("text-success").removeClass("text-warning");
+        loadTournamentDetails(name);
     } else {
         msg.text("Tournament creation failed").addClass("text-warning").removeClass("text-success");
     }
 }
 
-function addTournamentToAdminList(name, status) {
-    let badge = status === "ACTIVE"
-        ? $('<span class="badge text-bg-success">Active</span>')
-        : $('<span class="badge text-bg-secondary">Draft</span>');
+function addTournamentToAdminList(name, status, regEnd, playStart, playEnd) {
+    let badge;
+    if (status === "ACTIVE") badge = $('<span class="badge text-bg-success">Active</span>');
+    else if (status === "STARTING") badge = $('<span class="badge text-bg-secondary">Starting</span>');
+    else badge = $('<span class="badge text-bg-warning">Draft</span>');
     let item = $('<li class="list-group-item d-flex justify-content-between align-items-center tournament-admin-entry" style="cursor:pointer">')
         .attr('data-name', name)
         .attr('data-status', status)
+        .attr('data-reg-end', regEnd || '')
+        .attr('data-play-start', playStart || '')
+        .attr('data-play-end', playEnd || '')
         .on('click', function() { tournamentAdminClick(this); })
         .append($('<span>').text(name))
         .append(badge);
-    $('#tournamentAdminList').append(item);
+    $('#tournamentAdminList').prepend(item);
     // Keep hidden select in sync so existing callbacks continue to work
     if ($('#nameOfTournament option[value="' + name + '"]').length === 0) {
         $('#nameOfTournament').append($('<option>').val(name).text(name));
@@ -829,6 +838,11 @@ function callbackLoadTournamentDetails(data) {
     $.each(data.specRules, function(index, rule) {
         addRule(rule, specRulesDiv);
     });
+    if (data.status === "EDIT") {
+        $("#publishBtnContainer").show();
+    } else {
+        $("#publishBtnContainer").hide();
+    }
     enterTourEditMode();
 }
 
@@ -907,17 +921,156 @@ function exitTourMode() {
 function newTournament() {
     resetForm();
     $("#tourMsg").text("").removeClass("text-success text-warning");
+    $("#publishBtnContainer").hide();
     enterTourEditMode();
 }
 
 function tournamentAdminClick(el) {
     let name = $(el).data("name");
     let status = $(el).data("status");
-    if (status === "ACTIVE") {
-        loadTournament(name);
-    } else {
+    let regEnd = new Date($(el).data("reg-end"));
+    let playEnd = new Date($(el).data("play-end"));
+    let now = new Date();
+
+    if (status === "EDIT") {
         loadTournamentDetails(name);
+    } else if (status === "STARTING") {
+        if (now > regEnd) {
+            loadTournament(name);
+        } else {
+            loadTournamentDetails(name);
+        }
+    } else if (status === "ACTIVE") {
+        if (now <= playEnd) {
+            loadTournamentReadOnly(name);
+        } else {
+            loadFinalsAdmin(name);
+        }
     }
+}
+
+function publishTournament() {
+    let name = $("#tourName").val();
+    if (!name) return;
+    if (!confirm("Publish \"" + name + "\"? Players will be able to see and register for this tournament.")) return;
+    DS.publishTournament(name, {
+        callback: function(success) {
+            if (success) {
+                $("#tourMsg").text("Tournament published").addClass("text-success").removeClass("text-warning");
+                $("#publishBtnContainer").hide();
+                let item = $('#tournamentAdminList .tournament-admin-entry[data-name="' + name + '"]');
+                item.attr('data-status', 'STARTING');
+                item.find('.badge').removeClass('text-bg-warning').addClass('text-bg-secondary').text('Starting');
+            } else {
+                $("#tourMsg").text("Publish failed").addClass("text-warning").removeClass("text-success");
+            }
+        },
+        errorHandler: errorhandler
+    });
+}
+
+function loadTournamentReadOnly(name) {
+    let sel = $("#nameOfTournament");
+    if (sel.find(`option[value="${name}"]`).length === 0) {
+        sel.append($("<option>").val(name).text(name));
+    }
+    sel.val(name);
+    $("#tourTablesTitle").text(name);
+    resetTournamentManager();
+    enterTourTablesMode();
+    DS.getRoundSummary(name, {callback: callbackRoundSummaryReadOnly, errorHandler: errorhandler});
+}
+
+function callbackRoundSummaryReadOnly(data) {
+    let tourRounds = $("#tourRounds");
+    tourRounds.empty();
+    $.each(data, function(round, tables) {
+        let label = $("<span/>").addClass("h4").text("Round " + round);
+        let tableList = $("<div/>").addClass("row g-2 mt-1");
+        $.each(tables, function(table, players) {
+            let tableLabel = $("<div/>").addClass("fw-semibold mb-1").text("Table " + table);
+            let playerTable = $("<table/>").addClass("table table-sm table-bordered mb-0");
+            let thead = $("<thead/>").append(
+                $("<tr/>").append(
+                    $("<th/>").text("Player"),
+                    $("<th/>").text("Pool"),
+                    $("<th/>").text("VP"),
+                    $("<th/>").text("GW")
+                )
+            );
+            let tbody = $("<tbody/>");
+            $.each(players, function(i, p) {
+                let gwBadge = p.gw ? $("<span/>").addClass("badge text-bg-success").text("GW") : "";
+                tbody.append($("<tr/>").append(
+                    $("<td/>").text(p.name),
+                    $("<td/>").text(p.pool),
+                    $("<td/>").text(p.vp),
+                    $("<td/>").append(gwBadge)
+                ));
+            });
+            playerTable.append(thead, tbody);
+            let col = $("<div/>").addClass("col-lg-3 col-md-4 col-6")
+                .append($("<div/>").addClass("card p-2").append(tableLabel, playerTable));
+            tableList.append(col);
+        });
+        tourRounds.append($("<div/>").addClass("mb-3").append(label, tableList));
+    });
+}
+
+function loadFinalsAdmin(name) {
+    let sel = $("#nameOfTournament");
+    if (sel.find(`option[value="${name}"]`).length === 0) {
+        sel.append($("<option>").val(name).text(name));
+    }
+    sel.val(name);
+    $("#tourTablesTitle").text(name);
+    resetTournamentManager();
+    enterTourTablesMode();
+    DS.loadFinalSeeding(name, {
+        callback: function(seeding) {
+            if (seeding && seeding.length > 0) {
+                DS.getFinalPlayers(name, {callback: loadFinalTable, errorHandler: errorhandler});
+                DS.gameAlreadyStarted(name, {callback: callbackSaveButton, errorHandler: errorhandler});
+                $("#saveFinal").removeClass("d-none");
+            } else {
+                showFinalistSelection(name);
+            }
+        },
+        errorHandler: errorhandler
+    });
+}
+
+function showFinalistSelection(tourName) {
+    DS.getTournamentPlayers(tourName, {
+        callback: function(players) {
+            let tourRounds = $("#tourRounds");
+            tourRounds.empty();
+            let heading = $("<p/>").addClass("mb-2").text("Select 5 players for the finals:");
+            let playerList = $("<div/>").attr("id", "finalistCheckboxes").addClass("mb-3");
+            $.each(players, function(i, reg) {
+                let id = "finalist-" + i;
+                let row = $("<div/>").addClass("form-check")
+                    .append($("<input/>").addClass("form-check-input finalist-check").attr({type:"checkbox", id, value: reg.player}))
+                    .append($("<label/>").addClass("form-check-label").attr("for", id).text(reg.player + (reg.vekn ? " (" + reg.vekn + ")" : "")));
+                playerList.append(row);
+            });
+            let saveBtn = $("<button/>").addClass("btn btn-success btn-sm").text("Save Finals Selection")
+                .on("click", function() {
+                    let selected = [];
+                    $(".finalist-check:checked").each(function() { selected.push($(this).val()); });
+                    if (selected.length !== 5) {
+                        alert("Please select exactly 5 players for the finals.");
+                        return;
+                    }
+                    DS.saveFinal(tourName, selected, {
+                        callback: function() { loadFinalsAdmin(tourName); },
+                        errorHandler: errorhandler
+                    });
+                });
+            tourRounds.append(heading, playerList, saveBtn);
+        },
+        errorHandler: errorhandler
+    });
 }
 
 function createTable(round) {

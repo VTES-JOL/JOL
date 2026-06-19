@@ -135,6 +135,22 @@ public class TournamentService extends PersistedService {
         }
     }
 
+    public static void clearRegistrations(String tournamentName) {
+        TournamentDefinition def = INSTANCE.tournaments.get(tournamentName);
+        if (def == null) return;
+        def.getRegistrations().forEach(reg -> {
+            if (reg.getDeck() != null) {
+                Path deckPath = DataPaths.path("tournaments", def.getId(), reg.getDeck() + ".json");
+                try {
+                    Files.delete(deckPath);
+                } catch (IOException e) {
+                    logger.error("Unable to delete deck file for player {} in tournament {}", reg.getPlayer(), tournamentName);
+                }
+            }
+        });
+        def.getRegistrations().clear();
+    }
+
     public static List<TournamentInviteStatus> getRegisteredTournaments(String playerName) {
         return INSTANCE.tournaments.values().stream()
                 .filter(REGISTRATIONS_OPEN)
@@ -293,8 +309,9 @@ public class TournamentService extends PersistedService {
                 PlayerGameActivityService.pingPlayer(playerName, gameName);
                 // Save game
                 GameService.saveGame(jolGame);
-                // Update status
+                // Update status and link to tournament
                 GameService.get(gameName).setStatus(GameStatus.ACTIVE);
+                GameService.get(gameName).setTournamentName(tournamentName);
             }
         }
         // Start tournament
@@ -326,8 +343,9 @@ public class TournamentService extends PersistedService {
             jolGame.startGame(seeding);
             // Save game
             GameService.saveGame(jolGame);
-            // Update status
+            // Update status and link to tournament
             GameService.get(gameName).setStatus(GameStatus.ACTIVE);
+            GameService.get(gameName).setTournamentName(tournamentName);
             GlobalChatService.chat("SYSTEM", String.format("Game %s started", gameName));
         }
     }

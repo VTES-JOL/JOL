@@ -19,6 +19,7 @@ public class TournamentDetails {
     List<String> rules;
     String specRulesCon;
     List<String> specRules;
+    String status;
 
     public TournamentDetails(TournamentDefinition tournament) {
         this.name = tournament.getName();
@@ -34,5 +35,6 @@ public class TournamentDetails {
         this.tourFormat = tournament.getFormat().name();
         this.gameFormat = tournament.getDeckFormat().name();
         this.reqId = String.valueOf(tournament.isRequiresId());
+        this.status = tournament.getStatus().name();
     }
 }

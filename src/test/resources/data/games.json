@@ -6,7 +6,7 @@
     "visibility" : "PUBLIC",
     "status" : "STARTING",
     "gameFormat" : "Playtest",
-    "created" : "2026-06-16T16:18:29.039591+10:00",
+    "created" : "2026-06-16T06:18:29.039591Z",
     "version" : "DATA_FIX",
     "tournamentName" : null
   },
@@ -17,7 +17,7 @@
     "visibility" : "PUBLIC",
     "status" : "STARTING",
     "gameFormat" : "Playtest",
-    "created" : "2026-06-16T16:18:29.039669+10:00",
+    "created" : "2026-06-16T06:18:29.039669Z",
     "version" : "DATA_FIX",
     "tournamentName" : null
   },
@@ -28,7 +28,7 @@
     "visibility" : "PUBLIC",
     "status" : "STARTING",
     "gameFormat" : "Playtest",
-    "created" : "2026-06-16T16:18:29.040312+10:00",
+    "created" : "2026-06-16T06:18:29.040312Z",
     "version" : "DATA_FIX",
     "tournamentName" : null
   },
@@ -50,7 +50,7 @@
     "visibility" : "PUBLIC",
     "status" : "STARTING",
     "gameFormat" : "V5",
-    "created" : "2026-06-16T16:18:29.038932+10:00",
+    "created" : "2026-06-16T06:18:29.038932Z",
     "version" : "DATA_FIX",
     "tournamentName" : null
   },
@@ -61,7 +61,7 @@
     "visibility" : "PUBLIC",
     "status" : "STARTING",
     "gameFormat" : "V5",
-    "created" : "2026-06-16T16:18:29.039234+10:00",
+    "created" : "2026-06-16T06:18:29.039234Z",
     "version" : "DATA_FIX",
     "tournamentName" : null
   },
@@ -72,7 +72,7 @@
     "visibility" : "PUBLIC",
     "status" : "STARTING",
     "gameFormat" : "Duel",
-    "created" : "2026-06-16T16:18:29.037731+10:00",
+    "created" : "2026-06-16T06:18:29.037731Z",
     "version" : "DATA_FIX",
     "tournamentName" : null
   },
@@ -83,7 +83,7 @@
     "visibility" : "PUBLIC",
     "status" : "STARTING",
     "gameFormat" : "Standard",
-    "created" : "2026-06-16T16:18:29.036929+10:00",
+    "created" : "2026-06-16T06:18:29.036929Z",
     "version" : "DATA_FIX",
     "tournamentName" : null
   },
@@ -94,7 +94,7 @@
     "visibility" : "PUBLIC",
     "status" : "STARTING",
     "gameFormat" : "Standard",
-    "created" : "2026-06-16T16:18:29.037282+10:00",
+    "created" : "2026-06-16T06:18:29.037282Z",
     "version" : "DATA_FIX",
     "tournamentName" : null
   },
@@ -105,7 +105,7 @@
     "visibility" : "PUBLIC",
     "status" : "STARTING",
     "gameFormat" : "Duel",
-    "created" : "2026-06-16T16:18:29.038214+10:00",
+    "created" : "2026-06-16T06:18:29.038214Z",
     "version" : "DATA_FIX",
     "tournamentName" : null
   },
@@ -116,7 +116,7 @@
     "visibility" : "PUBLIC",
     "status" : "STARTING",
     "gameFormat" : "V5",
-    "created" : "2026-06-16T16:18:29.039431+10:00",
+    "created" : "2026-06-16T06:18:29.039431Z",
     "version" : "DATA_FIX",
     "tournamentName" : null
   },
@@ -127,7 +127,7 @@
     "visibility" : "PUBLIC",
     "status" : "STARTING",
     "gameFormat" : "Standard",
-    "created" : "2026-06-16T16:18:28.988618+10:00",
+    "created" : "2026-06-16T06:18:28.988618Z",
     "version" : "DATA_FIX",
     "tournamentName" : null
   },
@@ -138,7 +138,7 @@
     "visibility" : "PUBLIC",
     "status" : "STARTING",
     "gameFormat" : "Duel",
-    "created" : "2026-06-16T16:18:29.038693+10:00",
+    "created" : "2026-06-16T06:18:29.038693Z",
     "version" : "DATA_FIX",
     "tournamentName" : null
   }

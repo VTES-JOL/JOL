@@ -119,6 +119,7 @@ html, body {
 
 .mhd-70 {
     max-height: 70dvh;
+    min-height: 70dvh;
 }
 
 .mhd-80 {

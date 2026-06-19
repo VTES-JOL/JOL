@@ -8,6 +8,7 @@ import net.deckserver.services.DeckService;
 import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.services.TournamentService;
+import net.deckserver.dwr.model.JolGame;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.CardSimple;
 import net.deckserver.storage.json.system.*;
@@ -31,6 +32,16 @@ public class TournamentResource extends BaseResource {
     public boolean createTournament(CreateTournamentRequest body) {
         if (!JolAdmin.isTournamentAdmin(username())) return false;
         try {
+            TournamentDefinition current = TournamentService.getTournament(body.tourName());
+            GameStatus existingStatus = Optional.ofNullable(current)
+                    .map(TournamentDefinition::getStatus)
+                    .orElse(GameStatus.EDIT);
+            if (current != null && existingStatus == GameStatus.STARTING) {
+                GameFormat newFormat = GameFormat.from(body.gameFormat());
+                if (!newFormat.equals(current.getDeckFormat())) {
+                    TournamentService.clearRegistrations(body.tourName());
+                }
+            }
             Set<TournamentRegistration> existing = new HashSet<>(TournamentService.getRegistrations(body.tourName()));
             TournamentDefinition def = TournamentDefinitionCreator.newTourDef()
                     .withName(body.tourName())
@@ -41,7 +52,7 @@ public class TournamentResource extends BaseResource {
                     .withTourFormat(TournamentFormat.valueOf(body.tourFormat()))
                     .withDeckFormat(GameFormat.from(body.gameFormat()))
                     .withRules(body.rules())
-                    .withStatus(GameStatus.STARTING)
+                    .withStatus(existingStatus)
                     .withSpecRules(body.specRulesCon(), body.specRules())
                     .withNumberOfRounds(Integer.parseInt(body.numberOfRounds()))
                     .withReqId(Boolean.parseBoolean(body.reqId()))
@@ -53,6 +64,48 @@ public class TournamentResource extends BaseResource {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /** Publish tournament: moves status from EDIT to STARTING */
+    @POST
+    @Path("{name}/publish")
+    public boolean publishTournament(@PathParam("name") String tourName) {
+        if (!JolAdmin.isTournamentAdmin(username())) return false;
+        TournamentDefinition def = TournamentService.getTournament(tourName);
+        if (def == null || !def.getStatus().equals(GameStatus.EDIT)) return false;
+        TournamentService.setTournamentStatus(tourName, GameStatus.STARTING);
+        TournamentService.save();
+        return true;
+    }
+
+    /** Round summary with live pool data for the read-only active view */
+    @GET
+    @Path("{name}/round-summary")
+    public Map<Integer, Map<Integer, List<PlayerRoundSummary>>> getRoundSummary(@PathParam("name") String tourName) {
+        TournamentDefinition def = TournamentService.getTournament(tourName);
+        Map<Integer, Map<Integer, List<PlayerRoundSummary>>> result = new HashMap<>();
+        if (def.getRounds() == null) return result;
+        def.getRounds().forEach((round, tables) -> {
+            Map<Integer, List<PlayerRoundSummary>> tableMap = new HashMap<>();
+            tables.forEach((table, players) -> {
+                String gameName = String.format("%s: Round %d - Table %d", tourName, round, table);
+                JolGame game = null;
+                try { game = GameService.getGameByName(gameName); } catch (Exception ignored) {}
+                JolGame finalGame = game;
+                List<PlayerRoundSummary> summaries = players.stream()
+                        .map(tp -> {
+                            int pool = 30;
+                            if (finalGame != null) {
+                                try { pool = finalGame.getPool(tp.getName()); } catch (Exception ignored) {}
+                            }
+                            return new PlayerRoundSummary(tp.getName(), tp.getVp(), tp.isGw(), pool);
+                        })
+                        .collect(Collectors.toList());
+                tableMap.put(table, summaries);
+            });
+            result.put(round, tableMap);
+        });
+        return result;
     }
 
     /** Replaces DS.loadTournamentDetails() */
@@ -297,4 +350,5 @@ public class TournamentResource extends BaseResource {
                                           String specRulesCon, String[] specRules, String numberOfRounds, String reqId) {}
     public record ImportTablesRequest(String csvData) {}
     public record RegisterDeckRequest(String deckName) {}
+    public record PlayerRoundSummary(String name, float vp, boolean gw, int pool) {}
 }

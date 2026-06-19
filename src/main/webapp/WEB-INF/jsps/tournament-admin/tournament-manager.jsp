@@ -4,7 +4,7 @@
 <%@ page import="net.deckserver.game.enums.GameStatus" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
-  List<TournamentMetadata> prepare = TournamentService.getTournamentsWithStatus(List.of(GameStatus.ACTIVE, GameStatus.STARTING));
+  List<TournamentMetadata> prepare = TournamentService.getTournamentsWithStatus(List.of(GameStatus.ACTIVE, GameStatus.STARTING, GameStatus.EDIT));
 %>
 <%-- Hidden select preserved so existing JS callbacks that read #nameOfTournament continue to work --%>
 <select id="nameOfTournament" class="d-none">
