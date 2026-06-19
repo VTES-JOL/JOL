@@ -1,17 +1,5 @@
-<%@ page import="net.deckserver.services.TournamentService" %>
-<%@ page import="net.deckserver.storage.json.system.TournamentMetadata" %>
-<%@ page import="java.util.List" %>
-<%@ page import="net.deckserver.game.enums.GameStatus" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%
-  List<TournamentMetadata> prepare = TournamentService.getTournamentsWithStatus(List.of(GameStatus.ACTIVE, GameStatus.STARTING, GameStatus.EDIT));
-%>
 <%-- Hidden select preserved so existing JS callbacks that read #nameOfTournament continue to work --%>
-<select id="nameOfTournament" class="d-none">
-  <c:forEach items="<%= prepare %>" var="tour">
-    <option value="${tour.name}">${tour.name}</option>
-  </c:forEach>
-</select>
+<select id="nameOfTournament" class="d-none"></select>
 
 <div class="card shadow">
   <div class="card-header bg-body-secondary d-flex justify-content-between align-items-center">

@@ -1,1 +1,106 @@
-{ }
+{
+  "2026-06-19T12:28:37.526099+10:00" : {
+    "name" : "Test - Finals Seeding: Round 1 - Table 1",
+    "started" : "2026-06-19T02:14:00.649857Z",
+    "ended" : "2026-06-19T12:28:37.525501+10:00",
+    "results" : [ {
+      "playerName" : "Player1",
+      "deckName" : "-- no deck name --",
+      "victoryPoints" : 3.0,
+      "gameWin" : true
+    }, {
+      "playerName" : "Player2",
+      "deckName" : "-- no deck name --",
+      "victoryPoints" : 0.0,
+      "gameWin" : false
+    }, {
+      "playerName" : "Player3",
+      "deckName" : "-- no deck name --",
+      "victoryPoints" : 0.0,
+      "gameWin" : false
+    }, {
+      "playerName" : "Player4",
+      "deckName" : "-- no deck name --",
+      "victoryPoints" : 1.0,
+      "gameWin" : false
+    } ]
+  },
+  "2026-06-19T12:29:55.079036+10:00" : {
+    "name" : "Test - Finals Seeding: Round 2 - Table 2",
+    "started" : "2026-06-19T02:14:00.958456Z",
+    "ended" : "2026-06-19T12:29:55.078921+10:00",
+    "results" : [ {
+      "playerName" : "Player4",
+      "deckName" : "-- no deck name --",
+      "victoryPoints" : 1.0,
+      "gameWin" : false
+    }, {
+      "playerName" : "Player7",
+      "deckName" : "Ravnos Wall",
+      "victoryPoints" : 1.0,
+      "gameWin" : false
+    }, {
+      "playerName" : "Player2",
+      "deckName" : "-- no deck name --",
+      "victoryPoints" : 0.0,
+      "gameWin" : false
+    }, {
+      "playerName" : "Player5",
+      "deckName" : "-- no deck name --",
+      "victoryPoints" : 1.0,
+      "gameWin" : false
+    } ]
+  },
+  "2026-06-19T12:33:17.409820+10:00" : {
+    "name" : "Test - Finals Seeding: Round 2 - Table 1",
+    "started" : "2026-06-19T02:14:00.948283Z",
+    "ended" : "2026-06-19T12:33:17.409717+10:00",
+    "results" : [ {
+      "playerName" : "Player8",
+      "deckName" : "Weapons of War",
+      "victoryPoints" : 4.0,
+      "gameWin" : true
+    }, {
+      "playerName" : "Player3",
+      "deckName" : "-- no deck name --",
+      "victoryPoints" : 0.0,
+      "gameWin" : false
+    }, {
+      "playerName" : "Player6",
+      "deckName" : "Gangrel Anarch",
+      "victoryPoints" : 0.0,
+      "gameWin" : false
+    }, {
+      "playerName" : "Player1",
+      "deckName" : "-- no deck name --",
+      "victoryPoints" : 0.0,
+      "gameWin" : false
+    } ]
+  },
+  "2026-06-19T12:33:10.174749+10:00" : {
+    "name" : "Test - Finals Seeding: Round 1 - Table 2",
+    "started" : "2026-06-19T02:14:00.937037Z",
+    "ended" : "2026-06-19T12:33:10.17467+10:00",
+    "results" : [ {
+      "playerName" : "Player5",
+      "deckName" : "-- no deck name --",
+      "victoryPoints" : 0.0,
+      "gameWin" : false
+    }, {
+      "playerName" : "Player6",
+      "deckName" : "Gangrel Anarch",
+      "victoryPoints" : 3.0,
+      "gameWin" : true
+    }, {
+      "playerName" : "Player7",
+      "deckName" : "Ravnos Wall",
+      "victoryPoints" : 0.0,
+      "gameWin" : false
+    }, {
+      "playerName" : "Player8",
+      "deckName" : "Weapons of War",
+      "victoryPoints" : 1.0,
+      "gameWin" : false
+    } ]
+  }
+}

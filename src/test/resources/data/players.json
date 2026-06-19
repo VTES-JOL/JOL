@@ -19,7 +19,7 @@
     "discordId" : null,
     "veknId" : "77777",
     "countryCode" : null,
-    "roles" : [ "ADMIN", "PLAYTESTER" ],
+    "roles" : [ "PLAYTESTER", "ADMIN" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF"
   },
@@ -55,7 +55,7 @@
     "discordId" : "",
     "veknId" : "222222",
     "countryCode" : "BD",
-    "roles" : [ "ADMIN", "TOURNAMENT_ADMIN", "PLAYTESTER" ],
+    "roles" : [ "PLAYTESTER", "ADMIN", "TOURNAMENT_ADMIN" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF"
   },

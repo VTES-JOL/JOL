@@ -115,6 +115,7 @@ const DS = {
     getTournamentRounds:     (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/rounds-count`, opts),
     publishTournament:       (tourName, opts) => apiPost(`/tournament/${_enc(tourName)}/publish`, {}, opts),
     getRoundSummary:         (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/round-summary`, opts),
+    closeTableGame:          (tourName, round, table, opts) => apiPost(`/tournament/${_enc(tourName)}/round/${round}/table/${table}/close`, {}, opts),
     getAllRegisteredPlayers:  (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/registered`, opts),
 };
 // ---------------------------------------------------------------------------
@@ -906,7 +907,31 @@ function callbackTableManager(data) {
 }
 
 function callbackTournamentAdmin(data) {
-
+    let list = $('#tournamentAdminList');
+    list.empty();
+    let sel = $('#nameOfTournament');
+    let current = sel.val();
+    sel.empty();
+    (data.tournaments || []).forEach(function(t) {
+        let badge;
+        if (t.status === 'ACTIVE') badge = $('<span class="badge text-bg-success">Active</span>');
+        else if (t.status === 'STARTING') badge = $('<span class="badge text-bg-secondary">Starting</span>');
+        else badge = $('<span class="badge text-bg-warning">Draft</span>');
+        let item = $('<li class="list-group-item d-flex justify-content-between align-items-center tournament-admin-entry" style="cursor:pointer">')
+            .attr('data-name', t.name)
+            .attr('data-status', t.status)
+            .attr('data-reg-end', t.registrationEndTime || '')
+            .attr('data-play-start', t.startTime || '')
+            .attr('data-play-end', t.endTime || '')
+            .on('click', function() { tournamentAdminClick(this); })
+            .append($('<span>').text(t.name))
+            .append(badge);
+        list.append(item);
+        sel.append($('<option>').val(t.name).text(t.name));
+    });
+    if (current && sel.find(`option[value="${CSS.escape(current)}"]`).length > 0) {
+        sel.val(current);
+    }
 }
 
 function enterTourEditMode() {
@@ -990,6 +1015,7 @@ function loadTournamentReadOnly(name) {
 function callbackRoundSummaryReadOnly(data) {
     let tourRounds = $("#tourRounds");
     tourRounds.empty();
+    let tourName = $("#nameOfTournament").val();
     $.each(data, function(round, tables) {
         let label = $("<span/>").addClass("h4").text("Round " + round);
         let tableList = $("<div/>").addClass("row g-2 mt-1");
@@ -1005,6 +1031,7 @@ function callbackRoundSummaryReadOnly(data) {
                 )
             );
             let tbody = $("<tbody/>");
+            let allDone = players.every(p => p.pool <= 0);
             $.each(players, function(i, p) {
                 let gwBadge = p.gw ? $("<span/>").addClass("badge text-bg-success").text("GW") : "";
                 tbody.append($("<tr/>").append(
@@ -1015,8 +1042,26 @@ function callbackRoundSummaryReadOnly(data) {
                 ));
             });
             playerTable.append(thead, tbody);
-            let col = $("<div/>").addClass("col-lg-3 col-md-4 col-6")
-                .append($("<div/>").addClass("card p-2").append(tableLabel, playerTable));
+            let cardBody = $("<div/>").addClass("card p-2").append(tableLabel, playerTable);
+            if (allDone) {
+                let closeBtn = $("<button/>")
+                    .addClass("btn btn-sm btn-outline-danger mt-2 w-100")
+                    .text("Close Table")
+                    .on("click", (function(r, t) {
+                        return function() {
+                            if (!confirm("Close table and record VP/GW results?")) return;
+                            DS.closeTableGame(tourName, r, t, {
+                                callback: function(ok) {
+                                    if (ok) DS.getRoundSummary(tourName, {callback: callbackRoundSummaryReadOnly, errorHandler: errorhandler});
+                                    else alert("Could not close table — game may already be closed.");
+                                },
+                                errorHandler: errorhandler
+                            });
+                        };
+                    })(round, table));
+                cardBody.append(closeBtn);
+            }
+            let col = $("<div/>").addClass("col-lg-3 col-md-4 col-6").append(cardBody);
             tableList.append(col);
         });
         tourRounds.append($("<div/>").addClass("mb-3").append(label, tableList));
@@ -1384,9 +1429,15 @@ function filterChooseDeck() {
 function createTournamentTables() {
     if (confirm("Are you sure you want to create the Tournament Tables?")) {
         let tournamentSelected = $("#nameOfTournament option:selected").text();
-        DS.createTournamentTables(tournamentSelected);
-        //reset Tournament Manager
-        resetTournamentManager();
+        DS.createTournamentTables(tournamentSelected, {
+            callback: function() {
+                let item = $('#tournamentAdminList .tournament-admin-entry[data-name="' + tournamentSelected + '"]');
+                item.attr('data-status', 'ACTIVE');
+                item.find('.badge').removeClass('text-bg-secondary').addClass('text-bg-success').text('Active');
+                resetTournamentManager();
+            },
+            errorHandler: errorhandler
+        });
     }
 }
 

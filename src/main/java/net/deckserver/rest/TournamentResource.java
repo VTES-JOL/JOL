@@ -95,10 +95,12 @@ public class TournamentResource extends BaseResource {
                 List<PlayerRoundSummary> summaries = players.stream()
                         .map(tp -> {
                             int pool = 30;
+                            float vp = tp.getVp();
                             if (finalGame != null) {
                                 try { pool = finalGame.getPool(tp.getName()); } catch (Exception ignored) {}
+                                try { vp = (float) finalGame.getVictoryPoints(tp.getName()); } catch (Exception ignored) {}
                             }
-                            return new PlayerRoundSummary(tp.getName(), tp.getVp(), tp.isGw(), pool);
+                            return new PlayerRoundSummary(tp.getName(), vp, tp.isGw(), pool);
                         })
                         .collect(Collectors.toList());
                 tableMap.put(table, summaries);
@@ -106,6 +108,66 @@ public class TournamentResource extends BaseResource {
             result.put(round, tableMap);
         });
         return result;
+    }
+
+    /** Close a finished table game, snapshot live VP/GW into tournament data, then end the game. */
+    @POST
+    @Path("{name}/round/{round}/table/{table}/close")
+    public boolean closeTableGame(
+            @PathParam("name") String tourName,
+            @PathParam("round") int round,
+            @PathParam("table") int table) {
+        if (!JolAdmin.isTournamentAdmin(username())) return false;
+        TournamentDefinition def = TournamentService.getTournament(tourName);
+        if (def == null) return false;
+
+        String gameName = String.format("%s: Round %d - Table %d", tourName, round, table);
+        JolGame game = null;
+        try { game = GameService.getGameByName(gameName); } catch (Exception ignored) {}
+        if (game == null) return false;
+
+        List<TournamentPlayer> players = def.getPlayers(round, table);
+        if (players == null || players.isEmpty()) return false;
+
+        // Guard: only close when every player is at 0 pool
+        final JolGame g = game;
+        boolean allDone = players.stream().allMatch(tp -> {
+            try { return g.getPool(tp.getName()) <= 0; } catch (Exception ignored) { return true; }
+        });
+        if (!allDone) return false;
+
+        // Determine GW winner — same logic as JolAdmin.endGame
+        String gwWinner = null;
+        double topVP = 0.0;
+        for (TournamentPlayer tp : players) {
+            double vp;
+            try { vp = g.getVictoryPoints(tp.getName()); } catch (Exception ignored) { vp = 0; }
+            if (vp >= 2.0) {
+                if (gwWinner == null) {
+                    gwWinner = tp.getName();
+                    topVP = vp;
+                } else if (vp > topVP) {
+                    gwWinner = tp.getName();
+                    topVP = vp;
+                } else {
+                    gwWinner = null;
+                }
+            }
+        }
+
+        // Snapshot live VP and GW into the stored TournamentPlayer records
+        String finalGwWinner = gwWinner;
+        for (TournamentPlayer tp : players) {
+            double vp;
+            try { vp = g.getVictoryPoints(tp.getName()); } catch (Exception ignored) { vp = tp.getVp(); }
+            tp.setVp((float) vp);
+            tp.setGw(tp.getName().equals(finalGwWinner));
+        }
+        TournamentService.save();
+
+        // End game via standard flow (also writes GameHistory)
+        JolAdmin.endGame(gameName, true);
+        return true;
     }
 
     /** Replaces DS.loadTournamentDetails() */
