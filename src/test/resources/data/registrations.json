@@ -1,5 +1,5 @@
 {
-  "Test - Active Mode: Round 2 - Table 1" : {
+  "Rounds are being played: Round 2 - Table 1" : {
     "Player4" : {
       "deckId" : "466a1464-a7bb-48ff-b22a-b0b546d8a54b",
       "valid" : false,
@@ -27,7 +27,7 @@
       "timestamp" : "2026-06-19T01:04:26.168267Z"
     }
   },
-  "Test - Active Mode: Round 2 - Table 2" : {
+  "Rounds are being played: Round 2 - Table 2" : {
     "Player7" : {
       "deckId" : "5ccb62a8-6602-4231-9361-7e5c272c509f",
       "deckName" : "Ravnos Wall",
@@ -54,7 +54,7 @@
       "timestamp" : "2026-06-19T01:04:26.179407Z"
     }
   },
-  "Test - Active Mode: Round 1 - Table 2" : {
+  "Rounds are being played: Round 1 - Table 2" : {
     "Player5" : {
       "deckId" : "6a516821-2c2a-48b1-8c4b-bf37a63d8700",
       "valid" : false,
@@ -83,7 +83,7 @@
       "timestamp" : "2026-06-19T01:04:26.157272Z"
     }
   },
-  "Test - Active Mode: Round 1 - Table 1" : {
+  "Rounds are being played: Round 1 - Table 1" : {
     "Player1" : {
       "deckId" : "6bcea4ff-0148-48f9-8bcf-0b44fe40d93b",
       "valid" : false,

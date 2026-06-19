@@ -12,6 +12,7 @@
         </span>
     </div>
     <div class="card-body p-2 flex-fill overflow-auto px-3" style="min-height: 0">
+        <input type="hidden" id="originalTourName"/>
         <div>
             <div class="row mb-2">
                 <label class="col-form-label col-3" for="tourName">Name</label>

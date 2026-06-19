@@ -21,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class TournamentLifecycleTest {
 
-    private static final String DRAFT_TOURNAMENT = "Test - Draft Mode";
-    private static final String REGISTRATION_OPEN_TOURNAMENT = "Test - Registration Open";
-    private static final String SEATING_PHASE_TOURNAMENT = "Test - Table Seating Mode";
-    private static final String ACTIVE_TOURNAMENT = "Test - Active Mode";
+    private static final String DRAFT_TOURNAMENT = "Work in Progress Tournament Design";
+    private static final String REGISTRATION_OPEN_TOURNAMENT = "Registrations Open";
+    private static final String SEATING_PHASE_TOURNAMENT = "Setup Round Seating";
+    private static final String ACTIVE_TOURNAMENT = "Rounds are being played";
 
     // --- Phase: EDIT (Draft) ---
 

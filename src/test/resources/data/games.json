@@ -65,8 +65,8 @@
     "version" : "DATA_FIX",
     "tournamentName" : null
   },
-  "Test - Active Mode: Round 2 - Table 1" : {
-    "name" : "Test - Active Mode: Round 2 - Table 1",
+  "Rounds are being played: Round 2 - Table 1" : {
+    "name" : "Rounds are being played: Round 2 - Table 1",
     "id" : "a0c19435-7dff-4cdc-876f-099144c8e59c",
     "owner" : "SYSTEM",
     "visibility" : "PUBLIC",
@@ -74,7 +74,7 @@
     "gameFormat" : "Standard",
     "created" : "2026-06-19T01:04:26.166076Z",
     "version" : "DATA_FIX",
-    "tournamentName" : "Test - Active Mode"
+    "tournamentName" : "Rounds are being played"
   },
   "Silly betting head" : {
     "name" : "Silly betting head",
@@ -87,8 +87,8 @@
     "version" : "DATA_FIX",
     "tournamentName" : null
   },
-  "Test - Active Mode: Round 2 - Table 2" : {
-    "name" : "Test - Active Mode: Round 2 - Table 2",
+  "Rounds are being played: Round 2 - Table 2" : {
+    "name" : "Rounds are being played: Round 2 - Table 2",
     "id" : "4041449d-1ce5-4c5c-97f7-44375ccd486d",
     "owner" : "SYSTEM",
     "visibility" : "PUBLIC",
@@ -96,7 +96,7 @@
     "gameFormat" : "Standard",
     "created" : "2026-06-19T01:04:26.176619Z",
     "version" : "DATA_FIX",
-    "tournamentName" : "Test - Active Mode"
+    "tournamentName" : "Rounds are being played"
   },
   "Rusty cryopreserving collision" : {
     "name" : "Rusty cryopreserving collision",
@@ -131,8 +131,8 @@
     "version" : "DATA_FIX",
     "tournamentName" : null
   },
-  "Test - Active Mode: Round 1 - Table 2" : {
-    "name" : "Test - Active Mode: Round 1 - Table 2",
+  "Rounds are being played: Round 1 - Table 2" : {
+    "name" : "Rounds are being played: Round 1 - Table 2",
     "id" : "b815d837-e729-4928-b0ed-73339e960bba",
     "owner" : "SYSTEM",
     "visibility" : "PUBLIC",
@@ -140,10 +140,10 @@
     "gameFormat" : "Standard",
     "created" : "2026-06-19T01:04:26.154332Z",
     "version" : "DATA_FIX",
-    "tournamentName" : "Test - Active Mode"
+    "tournamentName" : "Rounds are being played"
   },
-  "Test - Active Mode: Round 1 - Table 1" : {
-    "name" : "Test - Active Mode: Round 1 - Table 1",
+  "Rounds are being played: Round 1 - Table 1" : {
+    "name" : "Rounds are being played: Round 1 - Table 1",
     "id" : "8104cc59-b606-4f91-a3ee-2266811eed09",
     "owner" : "SYSTEM",
     "visibility" : "PUBLIC",
@@ -151,7 +151,7 @@
     "gameFormat" : "Standard",
     "created" : "2026-06-19T01:04:25.844991Z",
     "version" : "DATA_FIX",
-    "tournamentName" : "Test - Active Mode"
+    "tournamentName" : "Rounds are being played"
   },
   "Speedy dollying gauge" : {
     "name" : "Speedy dollying gauge",

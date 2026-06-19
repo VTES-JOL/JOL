@@ -88,8 +88,8 @@ const DS = {
     exportPastGamesAsCsv:    (opts) => apiGetText('/admin/export/games.csv', opts),
 
     // Tournament
-    createTournament:        (tourName, regStart, regEnd, playStart, playEnd, tourFormat, gameFormat, rules, specRulesCon, specRules, numberOfRounds, reqId, opts) =>
-                                 apiPost('/tournament', {tourName, regStart, regEnd, playStart, playEnd, tourFormat, gameFormat, rules, specRulesCon, specRules, numberOfRounds, reqId}, opts),
+    createTournament:        (tourName, regStart, regEnd, playStart, playEnd, tourFormat, gameFormat, rules, specRulesCon, specRules, numberOfRounds, reqId, originalName, opts) =>
+                                 apiPost('/tournament', {tourName, regStart, regEnd, playStart, playEnd, tourFormat, gameFormat, rules, specRulesCon, specRules, numberOfRounds, reqId, originalName}, opts),
     loadTournamentDetails:   (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/details`, opts),
     getRoundsForTournament:  (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/rounds`, opts),
     getRoundsForTournamentCsv: (tourName, opts) => apiGetText(`/tournament/${_enc(tourName)}/rounds/csv`, opts),
@@ -684,18 +684,29 @@ function createTournament() {
     let reqId = $("#reqId");
     //create tournament
     let name = tourName.val();
-    DS.createTournament(name, regStart.val(), regEnd.val(), playStart.val(), playEnd.val(), tourFormat.val(), gameFormat.val(), rules, specRulesCon.val(), specRules, numOfRounds.val(), reqId.val(),
-        {callback: function(success) { callbackCreateTournament(success, name); }, errorHandler: errorhandler});
+    let originalName = $("#originalTourName").val();
+    DS.createTournament(name, regStart.val(), regEnd.val(), playStart.val(), playEnd.val(), tourFormat.val(), gameFormat.val(), rules, specRulesCon.val(), specRules, numOfRounds.val(), reqId.val(), originalName,
+        {callback: function(success) { callbackCreateTournament(success, name, originalName); }, errorHandler: errorhandler});
 }
 
-function callbackCreateTournament(success, name) {
+function callbackCreateTournament(success, name, originalName) {
     let msg = $("#tourMsg");
     if(success) {
         let regEnd = $("#regEnd").val();
         let playStart = $("#playStart").val();
         let playEnd = $("#playEnd").val();
-        addTournamentToAdminList(name, "EDIT", regEnd, playStart, playEnd);
-        msg.text("Tournament saved as draft").addClass("text-success").removeClass("text-warning");
+        let isRename = originalName && originalName !== name;
+        if (isRename) {
+            // Update the existing list item instead of adding a duplicate
+            let item = $('#tournamentAdminList .tournament-admin-entry[data-name="' + originalName + '"]');
+            item.attr('data-name', name).find('span:first').text(name);
+            let opt = $('#nameOfTournament option[value="' + originalName + '"]');
+            opt.val(name).text(name);
+        } else {
+            addTournamentToAdminList(name, "EDIT", regEnd, playStart, playEnd);
+        }
+        $("#originalTourName").val(name);
+        msg.text("Tournament saved").addClass("text-success").removeClass("text-warning");
         loadTournamentDetails(name);
     } else {
         msg.text("Tournament creation failed").addClass("text-warning").removeClass("text-success");
@@ -830,6 +841,7 @@ function callbackLoadTournamentDetails(data) {
     let specRulesDiv = $("#specRulesDiv");
 
     tourName.val(data.name);
+    $("#originalTourName").val(data.name);
     regStart.val(data.regStart);
     regEnd.val(data.regEnd);
     playStart.val(data.playStart);
@@ -952,6 +964,7 @@ function exitTourMode() {
 
 function newTournament() {
     resetForm();
+    $("#originalTourName").val("");
     $("#tourMsg").text("").removeClass("text-success text-warning");
     $("#publishBtnContainer").hide();
     enterTourEditMode();

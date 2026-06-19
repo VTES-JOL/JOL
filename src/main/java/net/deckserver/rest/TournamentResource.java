@@ -32,17 +32,30 @@ public class TournamentResource extends BaseResource {
     public boolean createTournament(CreateTournamentRequest body) {
         if (!JolAdmin.isTournamentAdmin(username())) return false;
         try {
+            String originalName = body.originalName() != null ? body.originalName() : "";
+            boolean isRename = !originalName.isEmpty() && !originalName.equals(body.tourName());
+
+            // Resolve the existing definition: by current name, or by original name when renaming
             TournamentDefinition current = TournamentService.getTournament(body.tourName());
+            if (current == null && isRename) {
+                current = TournamentService.getTournament(originalName);
+            }
+
             GameStatus existingStatus = Optional.ofNullable(current)
                     .map(TournamentDefinition::getStatus)
                     .orElse(GameStatus.EDIT);
+            String lookupName = (current != null && isRename) ? originalName : body.tourName();
             if (current != null && existingStatus == GameStatus.STARTING) {
                 GameFormat newFormat = GameFormat.from(body.gameFormat());
                 if (!newFormat.equals(current.getDeckFormat())) {
-                    TournamentService.clearRegistrations(body.tourName());
+                    TournamentService.clearRegistrations(lookupName);
                 }
             }
-            Set<TournamentRegistration> existing = new HashSet<>(TournamentService.getRegistrations(body.tourName()));
+
+            Set<TournamentRegistration> existingRegs = current != null
+                    ? new HashSet<>(current.getRegistrations())
+                    : new HashSet<>();
+
             TournamentDefinition def = TournamentDefinitionCreator.newTourDef()
                     .withName(body.tourName())
                     .withRegStart(OffsetDateTime.of(LocalDate.parse(body.regStart()), LocalTime.MIDNIGHT, ZoneOffset.UTC))
@@ -56,8 +69,22 @@ public class TournamentResource extends BaseResource {
                     .withSpecRules(body.specRulesCon(), body.specRules())
                     .withNumberOfRounds(Integer.parseInt(body.numberOfRounds()))
                     .withReqId(Boolean.parseBoolean(body.reqId()))
-                    .withRegistrations(existing)
+                    .withRegistrations(existingRegs)
                     .getTourDef();
+
+            // Preserve id, rounds and finals from the existing entry so deck file paths and
+            // seating data survive both normal saves and renames
+            if (current != null) {
+                def.setId(current.getId());
+                def.setRounds(current.getRounds());
+                def.setFinals(current.getFinals());
+            }
+
+            // Remove the old entry before inserting under the new name
+            if (isRename) {
+                TournamentService.removeTournament(originalName);
+            }
+
             TournamentService.createTournament(def);
             return true;
         } catch (Exception e) {
@@ -459,7 +486,8 @@ public class TournamentResource extends BaseResource {
 
     public record CreateTournamentRequest(String tourName, String regStart, String regEnd, String playStart,
                                           String playEnd, String tourFormat, String gameFormat, String[] rules,
-                                          String specRulesCon, String[] specRules, String numberOfRounds, String reqId) {}
+                                          String specRulesCon, String[] specRules, String numberOfRounds, String reqId,
+                                          String originalName) {}
     public record ImportTablesRequest(String csvData) {}
     public record RegisterDeckRequest(String deckName) {}
     public record PlayerRoundSummary(String name, float vp, boolean gw, int pool) {}

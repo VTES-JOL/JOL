@@ -238,6 +238,10 @@ public class TournamentService extends PersistedService {
         INSTANCE.tournaments.put(tournamentDefinition.getName(), tournamentDefinition);
     }
 
+    public static void removeTournament(String name) {
+        INSTANCE.tournaments.remove(name);
+    }
+
     public static TournamentDefinition getTournament(String nameOfTournament) {
         return INSTANCE.tournaments.get(nameOfTournament);
     }
