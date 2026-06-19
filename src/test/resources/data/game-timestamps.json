@@ -1,4 +1,32 @@
 {
+  "Test - Active Mode: Round 2 - Table 1" : {
+    "timestamp" : "2026-06-19T01:04:26.173244Z",
+    "playerTimestamps" : { },
+    "playerPings" : {
+      "Player4" : true
+    }
+  },
+  "Test - Active Mode: Round 2 - Table 2" : {
+    "timestamp" : "2026-06-19T01:04:26.183605Z",
+    "playerTimestamps" : { },
+    "playerPings" : {
+      "Player7" : true
+    }
+  },
+  "Test - Active Mode: Round 1 - Table 2" : {
+    "timestamp" : "2026-06-19T01:04:26.162287Z",
+    "playerTimestamps" : { },
+    "playerPings" : {
+      "Player5" : true
+    }
+  },
+  "Test - Active Mode: Round 1 - Table 1" : {
+    "timestamp" : "2026-06-19T01:04:26.148429Z",
+    "playerTimestamps" : { },
+    "playerPings" : {
+      "Player1" : true
+    }
+  },
   "Test Game" : {
     "timestamp" : "2025-10-28T08:29:03.172161Z",
     "playerTimestamps" : {

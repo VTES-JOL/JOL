@@ -43,7 +43,7 @@
     "discordId" : "",
     "veknId" : "777777",
     "countryCode" : "GB",
-    "roles" : [ "PLAYTESTER", "SUPER_USER" ],
+    "roles" : [ "SUPER_USER", "PLAYTESTER" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF"
   },
@@ -54,7 +54,7 @@
     "hash" : "$2a$13$j.GCBBqMuxI.0o4jlFh7HeckVhqyhVs/ecV1TWuqXk4klelNllSaG",
     "discordId" : "",
     "veknId" : "222222",
-    "countryCode" : "FR",
+    "countryCode" : "BD",
     "roles" : [ "ADMIN", "TOURNAMENT_ADMIN", "PLAYTESTER" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF"
@@ -67,7 +67,7 @@
     "discordId" : "",
     "veknId" : "111111",
     "countryCode" : "US",
-    "roles" : [ "JUDGE", "PLAYTESTER", "SUPER_USER" ],
+    "roles" : [ "SUPER_USER", "JUDGE", "PLAYTESTER" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF"
   },
@@ -91,7 +91,7 @@
     "discordId" : "",
     "veknId" : "333333",
     "countryCode" : "GB",
-    "roles" : [ "PLAYTESTER", "SUPER_USER" ],
+    "roles" : [ "SUPER_USER", "PLAYTESTER" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF"
   }

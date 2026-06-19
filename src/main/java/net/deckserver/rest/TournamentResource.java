@@ -130,13 +130,20 @@ public class TournamentResource extends BaseResource {
         return RoundsDetails.exportPastGamesAsCsv(TournamentService.getTournament(tourName).getRounds());
     }
 
-    /** Replaces DS.getTournamentPlayers() */
+    /** Replaces DS.getTournamentPlayers() — registered players with decks (used for table creation) */
     @GET
     @Path("{name}/players")
     public List<TournamentRegistration> getTournamentPlayers(@PathParam("name") String tourName) {
         return TournamentService.getRegistrations(tourName).stream()
                 .filter(p -> p.getDeck() != null)
                 .collect(Collectors.toList());
+    }
+
+    /** All registered players regardless of deck status — used for seating assignment */
+    @GET
+    @Path("{name}/registered")
+    public List<TournamentRegistration> getAllRegisteredPlayers(@PathParam("name") String tourName) {
+        return new ArrayList<>(TournamentService.getRegistrations(tourName));
     }
 
     /** Replaces DS.createTournamentTables() */

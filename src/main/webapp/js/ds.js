@@ -115,6 +115,7 @@ const DS = {
     getTournamentRounds:     (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/rounds-count`, opts),
     publishTournament:       (tourName, opts) => apiPost(`/tournament/${_enc(tourName)}/publish`, {}, opts),
     getRoundSummary:         (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/round-summary`, opts),
+    getAllRegisteredPlayers:  (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/registered`, opts),
 };
 // ---------------------------------------------------------------------------
 
@@ -771,8 +772,13 @@ function callbackStatusTournament(isActive) {
         DS.getFinalPlayers(nameOfTournament, {callback: loadFinalTable, errorHandler: errorhandler})
         showTablesReadOnly(nameOfTournament);
     } else {
-        DS.getTournamentRounds(nameOfTournament, {callback: callbackTournamentRounds, errorHandler: errorhandler});
-        DS.getTournamentPlayers(nameOfTournament, {callback: callbackTableManager, errorHandler: errorhandler});
+        DS.getTournamentRounds(nameOfTournament, {
+            callback: function(rounds) {
+                callbackTournamentRounds(rounds);
+                DS.getAllRegisteredPlayers(nameOfTournament, {callback: callbackTableManager, errorHandler: errorhandler});
+            },
+            errorHandler: errorhandler
+        });
         $("#saveFinal").addClass("d-none");
         $("#setFinalSeating").addClass("d-none");
         $("#saveTables").removeClass("d-none");
@@ -1423,99 +1429,144 @@ function callbackFinalSeeding(data) {
     activTournaments.append(card);
 }
 
+let _tournamentData = null;
+
 function callbackTournament(data) {
-    let tournaments = $("#openTournaments");
-    tournaments.empty();
+    _tournamentData = data;
+    let list = $("#playerTournamentList");
+    list.empty();
+    $("#openTourDetail").addClass("d-none");
+    $("#finalsTourDetail").addClass("d-none");
 
     $.each(data.tournaments, function(index, tournament) {
         let registrationEnds = moment(tournament.registrationEndTime).tz("UTC");
-        let rules = $("<ul/>");
-        $.each(tournament.rules, function(i, r) {
-            rules.append($("<li/>").text(r));
-        })
-        let specialRules = $("<ul/>");
-        $.each(tournament.specialRules, function(i, r) {
-            specialRules.append($("<li/>").text(r));
-        })
-        let joinButton = createButton({
-            class: "btn btn-outline-secondary btn-sm",
-            text: "Join"
-        }, DS.joinTournament, tournament.name);
+        let badge = tournament.registered
+            ? $("<span class='badge text-bg-success ms-2'>Registered</span>")
+            : $("<span class='badge text-bg-secondary ms-2'>Open</span>");
+        let item = $("<li/>")
+            .addClass("list-group-item list-group-item-action d-flex justify-content-between align-items-center")
+            .css("cursor", "pointer")
+            .attr("data-type", "open")
+            .attr("data-name", tournament.name)
+            .append(
+                $("<span/>").addClass("d-flex align-items-center")
+                    .append($("<span/>").addClass("badge bg-secondary me-2").text(tournament.deckFormat))
+                    .append($("<span/>").text(tournament.name))
+                    .append(badge)
+            )
+            .append($("<small/>").addClass("text-muted").text("Closes " + moment().to(registrationEnds)))
+            .on("click", function() { showOpenTournamentDetail(tournament, data); });
+        list.append(item);
+    });
 
-        let leaveButton = createButton({
-            class: "btn btn-outline-secondary btn-sm",
-            text: "Leave",
-            confirm: "Leave Tournament?"
-        }, DS.leaveTournament, tournament.name);
+    $.each(data.finalsInvites, function(index, tournament) {
+        let item = $("<li/>")
+            .addClass("list-group-item list-group-item-action d-flex justify-content-between align-items-center")
+            .css("cursor", "pointer")
+            .attr("data-type", "finals")
+            .attr("data-name", tournament.name)
+            .append(
+                $("<span/>").addClass("d-flex align-items-center")
+                    .append($("<span/>").addClass("badge text-bg-danger me-2").text("Finals"))
+                    .append($("<span/>").text(tournament.name))
+            )
+            .on("click", function() { showFinalsTournamentDetail(tournament); });
+        list.append(item);
+    });
 
-        let template = $(`
-        <li class='list-group-item'>
-            <div class="d-flex justify-content-between align-items-center">
-                <span class="d-flex justify-content-between align-items-center">
-                    <span class="badge bg-secondary">${tournament.deckFormat}</span>
-                    <span class="mx-2 d-inline fs-5">${tournament.name} - <small>${tournament.playerCount} registered</small></span>
-                </span>
-                <span class="d-flex justify-content-between align-items-center gap-1 game-join">
-                    <span>Closes ${moment().to(registrationEnds)}</span>
-                </span>
-            </div>
-            <div class="p-2">
-                <strong>Rules</strong>
-                ${rules.prop('outerHTML')}
-            </div>
-            <div class="p-2">
-                <strong>Special Rules:</strong> ${tournament.conditions || 'none'}
-                ${specialRules.prop('outerHTML')}
-            </div>
-        </li>
-        `);
-        if (data.veknLinked) {
-            template.find('.game-join').append(tournament.registered ? leaveButton : joinButton);
+    if (list.children().length === 0) {
+        list.append($("<li/>").addClass("list-group-item text-muted small").text("No tournaments available."));
+    }
+}
+
+function showOpenTournamentDetail(tournament, data) {
+    $("#finalsTourDetail").addClass("d-none");
+    $("#playerTournamentList .list-group-item").removeClass("active");
+    $(`#playerTournamentList [data-name="${tournament.name}"][data-type="open"]`).addClass("active");
+
+    $("#openTourName").text(tournament.name);
+
+    // Join / Leave button
+    let joinBtn = $("#openTourJoinBtn").empty();
+    if (data.veknLinked) {
+        if (tournament.registered) {
+            joinBtn.append(createButton({class: "btn btn-outline-secondary btn-sm", text: "Leave", confirm: "Leave Tournament?"}, DS.leaveTournament, tournament.name));
         } else {
-            template.find('.game-join').append("<span class='badge bg-warning-subtle text-black'>Requires VEKN #</span>");
+            joinBtn.append(createButton({class: "btn btn-outline-secondary btn-sm", text: "Join"}, DS.joinTournament, tournament.name));
         }
-        tournaments.append(template);
+    } else {
+        joinBtn.append("<span class='badge bg-warning-subtle text-black'>Requires VEKN #</span>");
+    }
+
+    // Rules
+    let rulesDiv = $("#openTourRules").empty();
+    let registrationEnds = moment(tournament.registrationEndTime).tz("UTC");
+    rulesDiv.append($("<p/>").addClass("text-muted small mb-1").text("Registration closes " + moment().to(registrationEnds)));
+    if (tournament.rules && tournament.rules.length) {
+        let ul = $("<ul/>");
+        $.each(tournament.rules, function(i, r) { ul.append($("<li/>").text(r)); });
+        rulesDiv.append($("<strong/>").text("Rules"), ul);
+    }
+    if (tournament.conditions) {
+        let specUl = $("<ul/>");
+        $.each(tournament.specialRules || [], function(i, r) { specUl.append($("<li/>").text(r)); });
+        rulesDiv.append($("<strong/>").text("Special Rules: "), $("<span/>").text(tournament.conditions), specUl);
+    }
+
+    // Deck selection (only if registered)
+    let deckSection = $("#openTourDeckSection");
+    if (tournament.registered) {
+        deckSection.removeClass("d-none");
+        let reg = (data.registeredGames || []).find(g => g.name === tournament.name);
+        let format = reg ? reg.format : tournament.deckFormat;
+        $("#openTourDeckLabel").text(reg && reg.deck ? "Current deck: " + reg.deck.name : "No deck selected");
+
+        let dropdownDiv = $("#openTourDeckDropdown").empty();
+        let toggleBtn = $("<button/>")
+            .addClass("btn btn-outline-secondary btn-sm dropdown-toggle")
+            .attr({type: "button", "data-bs-toggle": "dropdown", "aria-expanded": "false", "data-bs-auto-close": "outside"})
+            .text("Choose Deck");
+        let dropdownMenu = $("<ul/>").addClass("dropdown-menu dropdown-menu-end").attr("data-name", tournament.name);
+        $.each(data.decks || [], function(i, deck) {
+            if (deck.gameFormats && deck.gameFormats.includes(format)) {
+                dropdownMenu.append(
+                    $("<li/>").append(
+                        $("<a/>").addClass("dropdown-item").text(deck.name).on("click", function() {
+                            DS.registerTournamentDeck(tournament.name, deck.name, {callback: processData, errorHandler: errorhandler});
+                        })
+                    )
+                );
+            }
+        });
+        dropdownDiv.append(toggleBtn, dropdownMenu);
+
+        let deckPreview = $("#openTourDeckPreview").empty();
+        if (reg && reg.deck) {
+            renderDeck(reg.deck, "#openTourDeckPreview");
+            addCardTooltips("#openTourDeckPreview");
+        }
+    } else {
+        deckSection.addClass("d-none");
+    }
+
+    $("#openTourDetail").removeClass("d-none");
+}
+
+function showFinalsTournamentDetail(tournament) {
+    $("#openTourDetail").addClass("d-none");
+    $("#playerTournamentList .list-group-item").removeClass("active");
+    $(`#playerTournamentList [data-name="${tournament.name}"][data-type="finals"]`).addClass("active");
+
+    $("#finalsTourName").text(tournament.name + " — Finals");
+    let seedingList = $("#finalsSeedingList").empty();
+    $.each(tournament.finalsSeeding || [], function(i, player) {
+        seedingList.append(
+            $("<li/>").addClass("list-group-item d-flex justify-content-between align-items-center")
+                .append($("<span/>").text(player))
+        );
     });
 
-    let invitedGames = $("#registeredTournaments");
-    invitedGames.empty();
-    $.each(data.registeredGames, function (index, gameEntry) {
-        let template = `
-        <div class="list-group-item">
-            <div class="d-flex justify-content-between align-items-center border-bottom mb-2">
-                <div class="flex-grow-1 p-2 d-flex justify-content-between align-items-center">
-                    <span class="d-flex justify-content-between align-items-center">
-                        <span class="badge bg-secondary">${gameEntry.format}</span>
-                        <span class="mx-2 d-inline fs-5">${gameEntry.name}</span>
-                    </span>
-                </div>
-                <div class="d-inline">
-                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" >
-                        Choose Deck
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end tournament-invite-${gameEntry.format}" data-name="${gameEntry.name}">
-                    </ul>
-                </div>
-            </div>
-            <div id="tournamentDeck"/>
-        </div>
-    `;
-        invitedGames.append(template);
-        if (gameEntry.deck) {
-            renderDeck(gameEntry.deck, "#tournamentDeck");
-        }
-        addCardTooltips("#tournamentDeck");
-    });
-
-    $.each(data.decks, function (index, deck) {
-        $.each(deck.gameFormats, function (i, format) {
-            let dropDown = $(`ul .tournament-invite-${format}`);
-            let template = $(`<li><a class="dropdown-item">${deck.name}</a></li>`).on('click', function () {
-                registerForTournament(this, deck.name);
-            });
-            dropDown.append(template);
-        })
-    });
+    $("#finalsTourDetail").removeClass("d-none");
 }
 
 function registerForTournament(deckRow, deck) {
