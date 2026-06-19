@@ -116,6 +116,7 @@ const DS = {
     publishTournament:       (tourName, opts) => apiPost(`/tournament/${_enc(tourName)}/publish`, {}, opts),
     getRoundSummary:         (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/round-summary`, opts),
     closeTableGame:          (tourName, round, table, opts) => apiPost(`/tournament/${_enc(tourName)}/round/${round}/table/${table}/close`, {}, opts),
+    getStandings:            (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/standings`, opts),
     getAllRegisteredPlayers:  (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/registered`, opts),
 };
 // ---------------------------------------------------------------------------
@@ -1092,17 +1093,20 @@ function loadFinalsAdmin(name) {
 }
 
 function showFinalistSelection(tourName) {
-    DS.getTournamentPlayers(tourName, {
-        callback: function(players) {
+    DS.getStandings(tourName, {
+        callback: function(standings) {
             let tourRounds = $("#tourRounds");
             tourRounds.empty();
             let heading = $("<p/>").addClass("mb-2").text("Select 5 players for the finals:");
             let playerList = $("<div/>").attr("id", "finalistCheckboxes").addClass("mb-3");
-            $.each(players, function(i, reg) {
+            $.each(standings, function(i, s) {
                 let id = "finalist-" + i;
+                let labelText = s.rank + ". " + s.player
+                    + (s.vekn ? " (" + s.vekn + ")" : "")
+                    + " — " + s.gw + " GW, " + s.vp + " VP";
                 let row = $("<div/>").addClass("form-check")
-                    .append($("<input/>").addClass("form-check-input finalist-check").attr({type:"checkbox", id, value: reg.player}))
-                    .append($("<label/>").addClass("form-check-label").attr("for", id).text(reg.player + (reg.vekn ? " (" + reg.vekn + ")" : "")));
+                    .append($("<input/>").addClass("form-check-input finalist-check").attr({type:"checkbox", id, value: s.player}))
+                    .append($("<label/>").addClass("form-check-label").attr("for", id).text(labelText));
                 playerList.append(row);
             });
             let saveBtn = $("<button/>").addClass("btn btn-success btn-sm").text("Save Finals Selection")

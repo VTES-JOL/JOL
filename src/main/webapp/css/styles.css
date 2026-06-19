@@ -156,6 +156,13 @@ html, body {
     overflow: auto;
 }
 
+#tournamentAdmin {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0;
+}
+
 #deckText {
     height: 40vh;
 }

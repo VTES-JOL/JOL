@@ -414,10 +414,54 @@ public class TournamentResource extends BaseResource {
         return IntStream.range(1, TournamentService.getTournament(tourName).getNumberOfRounds() + 1).toArray();
     }
 
+    /** Aggregated standings for finalist selection: VP and GW totalled across all rounds, competition-ranked. */
+    @GET
+    @Path("{name}/standings")
+    public List<PlayerStanding> getStandings(@PathParam("name") String tourName) {
+        TournamentDefinition def = TournamentService.getTournament(tourName);
+        if (def == null || def.getRounds() == null || def.getRounds().isEmpty()) return List.of();
+
+        Map<String, Float> vpTotals = new LinkedHashMap<>();
+        Map<String, Integer> gwCounts = new LinkedHashMap<>();
+
+        def.getRegistrations().forEach(reg -> {
+            vpTotals.put(reg.getPlayer(), 0f);
+            gwCounts.put(reg.getPlayer(), 0);
+        });
+        def.getRounds().values().forEach(tables -> tables.values().forEach(players -> players.forEach(tp -> {
+            vpTotals.merge(tp.getName(), tp.getVp(), Float::sum);
+            if (tp.isGw()) gwCounts.merge(tp.getName(), 1, Integer::sum);
+        })));
+
+        Map<String, String> veknByPlayer = def.getRegistrations().stream()
+                .collect(Collectors.toMap(TournamentRegistration::getPlayer, r -> r.getVekn() != null ? r.getVekn() : "", (a, b) -> a));
+
+        List<String> sorted = new ArrayList<>(vpTotals.keySet());
+        sorted.sort(Comparator
+                .<String>comparingInt(p -> -gwCounts.getOrDefault(p, 0))
+                .thenComparingDouble(p -> -vpTotals.getOrDefault(p, 0f)));
+
+        List<PlayerStanding> standings = new ArrayList<>();
+        int rank = 1;
+        for (int i = 0; i < sorted.size(); i++) {
+            if (i > 0) {
+                String prev = sorted.get(i - 1), curr = sorted.get(i);
+                boolean sameTier = gwCounts.getOrDefault(prev, 0).equals(gwCounts.getOrDefault(curr, 0))
+                        && Float.compare(vpTotals.getOrDefault(prev, 0f), vpTotals.getOrDefault(curr, 0f)) == 0;
+                if (!sameTier) rank = i + 1;
+            }
+            String player = sorted.get(i);
+            standings.add(new PlayerStanding(player, veknByPlayer.getOrDefault(player, ""),
+                    gwCounts.getOrDefault(player, 0), vpTotals.getOrDefault(player, 0f), rank));
+        }
+        return standings;
+    }
+
     public record CreateTournamentRequest(String tourName, String regStart, String regEnd, String playStart,
                                           String playEnd, String tourFormat, String gameFormat, String[] rules,
                                           String specRulesCon, String[] specRules, String numberOfRounds, String reqId) {}
     public record ImportTablesRequest(String csvData) {}
     public record RegisterDeckRequest(String deckName) {}
     public record PlayerRoundSummary(String name, float vp, boolean gw, int pool) {}
+    public record PlayerStanding(String player, String vekn, int gw, float vp, int rank) {}
 }

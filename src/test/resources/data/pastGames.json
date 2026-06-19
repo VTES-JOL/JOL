@@ -25,32 +25,6 @@
       "gameWin" : false
     } ]
   },
-  "2026-06-19T12:29:55.079036+10:00" : {
-    "name" : "Test - Finals Seeding: Round 2 - Table 2",
-    "started" : "2026-06-19T02:14:00.958456Z",
-    "ended" : "2026-06-19T12:29:55.078921+10:00",
-    "results" : [ {
-      "playerName" : "Player4",
-      "deckName" : "-- no deck name --",
-      "victoryPoints" : 1.0,
-      "gameWin" : false
-    }, {
-      "playerName" : "Player7",
-      "deckName" : "Ravnos Wall",
-      "victoryPoints" : 1.0,
-      "gameWin" : false
-    }, {
-      "playerName" : "Player2",
-      "deckName" : "-- no deck name --",
-      "victoryPoints" : 0.0,
-      "gameWin" : false
-    }, {
-      "playerName" : "Player5",
-      "deckName" : "-- no deck name --",
-      "victoryPoints" : 1.0,
-      "gameWin" : false
-    } ]
-  },
   "2026-06-19T12:33:17.409820+10:00" : {
     "name" : "Test - Finals Seeding: Round 2 - Table 1",
     "started" : "2026-06-19T02:14:00.948283Z",
@@ -74,6 +48,32 @@
       "playerName" : "Player1",
       "deckName" : "-- no deck name --",
       "victoryPoints" : 0.0,
+      "gameWin" : false
+    } ]
+  },
+  "2026-06-19T12:29:55.079036+10:00" : {
+    "name" : "Test - Finals Seeding: Round 2 - Table 2",
+    "started" : "2026-06-19T02:14:00.958456Z",
+    "ended" : "2026-06-19T12:29:55.078921+10:00",
+    "results" : [ {
+      "playerName" : "Player4",
+      "deckName" : "-- no deck name --",
+      "victoryPoints" : 1.0,
+      "gameWin" : false
+    }, {
+      "playerName" : "Player7",
+      "deckName" : "Ravnos Wall",
+      "victoryPoints" : 1.0,
+      "gameWin" : false
+    }, {
+      "playerName" : "Player2",
+      "deckName" : "-- no deck name --",
+      "victoryPoints" : 0.0,
+      "gameWin" : false
+    }, {
+      "playerName" : "Player5",
+      "deckName" : "-- no deck name --",
+      "victoryPoints" : 1.0,
       "gameWin" : false
     } ]
   },

@@ -1,483 +1,395 @@
-[
-  {
-    "id": "9dbe50e9-65c1-412e-a861-84400e28fff0",
-    "registrationStart": "2026-06-07T00:00:00Z",
-    "registrationEnd": "2026-06-18T00:00:00Z",
-    "playStarts": "2026-06-18T01:00:00Z",
-    "playEnds": "2026-06-19:00:00Z",
-    "format": "SINGLE_DECK",
-    "deckFormat": "Standard",
-    "numberOfRounds": 2,
-    "finalEnabled": false,
-    "requiresId": true,
-    "name": "Test - Finals Seeding",
-    "rules": [],
-    "specialRules": {
-      "condition": "",
-      "rules": []
+[ {
+  "id" : "9dbe50e9-65c1-412e-a861-84400e28fff0",
+  "registrationStart" : "2026-06-07T00:00:00Z",
+  "registrationEnd" : "2026-06-18T00:00:00Z",
+  "playStarts" : "2026-06-18T01:00:00Z",
+  "playEnds" : "2026-06-19T00:00:00Z",
+  "format" : "SINGLE_DECK",
+  "deckFormat" : "Standard",
+  "numberOfRounds" : 2,
+  "finalEnabled" : false,
+  "requiresId" : true,
+  "name" : "Test - Finals Seeding",
+  "rules" : [ ],
+  "specialRules" : {
+    "condition" : "",
+    "rules" : [ ]
+  },
+  "registrations" : [ {
+    "player" : "Player3",
+    "vekn" : "333333",
+    "deck" : "761f7e8d-7996-4819-bbcb-4431573c894d"
+  }, {
+    "player" : "Player2",
+    "vekn" : "123456",
+    "deck" : "01b06c05-23c3-4cd1-99cd-e1f32af8a1d2"
+  }, {
+    "player" : "Player5",
+    "vekn" : "77777",
+    "deck" : "6a516821-2c2a-48b1-8c4b-bf37a63d8700"
+  }, {
+    "player" : "Player4",
+    "vekn" : "444444",
+    "deck" : "466a1464-a7bb-48ff-b22a-b0b546d8a54b"
+  }, {
+    "player" : "Player1",
+    "vekn" : "111111",
+    "deck" : "6bcea4ff-0148-48f9-8bcf-0b44fe40d93b"
+  }, {
+    "player" : "Player7",
+    "vekn" : "777777",
+    "deck" : "5ccb62a8-6602-4231-9361-7e5c272c509f"
+  }, {
+    "player" : "Player6",
+    "vekn" : "666666",
+    "deck" : "73d40569-f846-4d4c-9469-482a7ec2a7aa"
+  }, {
+    "player" : "Player8",
+    "vekn" : "888888",
+    "deck" : "e479728b-2e7b-45ad-80bd-bbe990e04f2e"
+  } ],
+  "finals" : {
+    "seeding" : [ ],
+    "seating" : [ ]
+  },
+  "status" : "ACTIVE",
+  "rounds" : {
+    "1" : {
+      "1" : [ {
+        "name" : "Player1",
+        "vp" : 3.0,
+        "gw" : true
+      }, {
+        "name" : "Player2",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player3",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player4",
+        "vp" : 1.0,
+        "gw" : false
+      } ],
+      "2" : [ {
+        "name" : "Player5",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player6",
+        "vp" : 3.0,
+        "gw" : true
+      }, {
+        "name" : "Player7",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player8",
+        "vp" : 1.0,
+        "gw" : false
+      } ]
     },
-    "registrations": [
-      {
-        "player": "Player3",
-        "vekn": "333333",
-        "deck": "761f7e8d-7996-4819-bbcb-4431573c894d"
-      },
-      {
-        "player": "Player2",
-        "vekn": "123456",
-        "deck": "01b06c05-23c3-4cd1-99cd-e1f32af8a1d2"
-      },
-      {
-        "player": "Player5",
-        "vekn": "77777",
-        "deck": "6a516821-2c2a-48b1-8c4b-bf37a63d8700"
-      },
-      {
-        "player": "Player4",
-        "vekn": "444444",
-        "deck": "466a1464-a7bb-48ff-b22a-b0b546d8a54b"
-      },
-      {
-        "player": "Player1",
-        "vekn": "111111",
-        "deck": "6bcea4ff-0148-48f9-8bcf-0b44fe40d93b"
-      },
-      {
-        "player": "Player7",
-        "vekn": "777777",
-        "deck": "5ccb62a8-6602-4231-9361-7e5c272c509f"
-      },
-      {
-        "player": "Player6",
-        "vekn": "666666",
-        "deck": "73d40569-f846-4d4c-9469-482a7ec2a7aa"
-      },
-      {
-        "player": "Player8",
-        "vekn": "888888",
-        "deck": "e479728b-2e7b-45ad-80bd-bbe990e04f2e"
-      }
-    ],
-    "finals": {
-      "seeding": [],
-      "seating": []
-    },
-    "status": "ACTIVE",
-    "rounds": {
-      "1": {
-        "1": [
-          {
-            "name": "Player1",
-            "vp": 3.0,
-            "gw": true
-          },
-          {
-            "name": "Player2",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player3",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player4",
-            "vp": 1.0,
-            "gw": false
-          }
-        ],
-        "2": [
-          {
-            "name": "Player5",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player6",
-            "vp": 3.0,
-            "gw": true
-          },
-          {
-            "name": "Player7",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player8",
-            "vp": 1.0,
-            "gw": false
-          }
-        ]
-      },
-      "2": {
-        "1": [
-          {
-            "name": "Player8",
-            "vp": 4.0,
-            "gw": true
-          },
-          {
-            "name": "Player3",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player6",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player1",
-            "vp": 0.0,
-            "gw": false
-          }
-        ],
-        "2": [
-          {
-            "name": "Player4",
-            "vp": 1.0,
-            "gw": false
-          },
-          {
-            "name": "Player7",
-            "vp": 1.0,
-            "gw": false
-          },
-          {
-            "name": "Player2",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player5",
-            "vp": 2.0,
-            "gw": true
-          }
-        ]
-      }
+    "2" : {
+      "1" : [ {
+        "name" : "Player8",
+        "vp" : 4.0,
+        "gw" : true
+      }, {
+        "name" : "Player3",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player6",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player1",
+        "vp" : 0.0,
+        "gw" : false
+      } ],
+      "2" : [ {
+        "name" : "Player4",
+        "vp" : 1.0,
+        "gw" : false
+      }, {
+        "name" : "Player7",
+        "vp" : 1.0,
+        "gw" : false
+      }, {
+        "name" : "Player2",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player5",
+        "vp" : 2.0,
+        "gw" : true
+      } ]
     }
-  },
-  {
-    "id": "78dc3f99-63b5-4216-b40e-209443d91898",
-    "registrationStart": "2026-06-15T00:00:00Z",
-    "registrationEnd": "2030-12-31T00:00:00Z",
-    "playStarts": "2031-01-01T00:00:00Z",
-    "playEnds": "2031-12-31T00:00:00Z",
-    "format": "SINGLE_DECK",
-    "deckFormat": "Standard",
-    "numberOfRounds": 2,
-    "finalEnabled": false,
-    "requiresId": true,
-    "name": "Test - Registration Open",
-    "rules": [],
-    "specialRules": {
-      "condition": "",
-      "rules": []
-    },
-    "registrations": [
-      {
-        "player": "Player3",
-        "vekn": "333333",
-        "deck": "761f7e8d-7996-4819-bbcb-4431573c894d"
-      },
-      {
-        "player": "Player2",
-        "vekn": "123456",
-        "deck": "a101f2a2-b3e0-4089-829b-f0ddbb15e63f"
-      },
-      {
-        "player": "Player5",
-        "vekn": "77777",
-        "deck": "6a516821-2c2a-48b1-8c4b-bf37a63d8700"
-      },
-      {
-        "player": "Player4",
-        "vekn": "444444",
-        "deck": "466a1464-a7bb-48ff-b22a-b0b546d8a54b"
-      },
-      {
-        "player": "Player1",
-        "vekn": "111111",
-        "deck": "6bcea4ff-0148-48f9-8bcf-0b44fe40d93b"
-      },
-      {
-        "player": "Player7",
-        "vekn": "777777",
-        "deck": "5ccb62a8-6602-4231-9361-7e5c272c509f"
-      },
-      {
-        "player": "Player6",
-        "vekn": "666666",
-        "deck": "73d40569-f846-4d4c-9469-482a7ec2a7aa"
-      },
-      {
-        "player": "Player8",
-        "vekn": "888888",
-        "deck": "e479728b-2e7b-45ad-80bd-bbe990e04f2e"
-      }
-    ],
-    "finals": {
-      "seeding": [],
-      "seating": []
-    },
-    "status": "STARTING",
-    "rounds": {}
-  },
-  {
-    "id": "7328f484-6370-4379-9903-3305cf44f309",
-    "registrationStart": "2026-06-07T00:00:00Z",
-    "registrationEnd": "2026-06-18T00:00:00Z",
-    "playStarts": "2026-06-29T00:00:00Z",
-    "playEnds": "2026-07-27T00:00:00Z",
-    "format": "SINGLE_DECK",
-    "deckFormat": "Standard",
-    "numberOfRounds": 2,
-    "finalEnabled": false,
-    "requiresId": true,
-    "name": "Test - Active Mode",
-    "rules": [],
-    "specialRules": {
-      "condition": "",
-      "rules": []
-    },
-    "registrations": [
-      {
-        "player": "Player3",
-        "vekn": "333333",
-        "deck": "761f7e8d-7996-4819-bbcb-4431573c894d"
-      },
-      {
-        "player": "Player2",
-        "vekn": "123456",
-        "deck": "01b06c05-23c3-4cd1-99cd-e1f32af8a1d2"
-      },
-      {
-        "player": "Player5",
-        "vekn": "77777",
-        "deck": "6a516821-2c2a-48b1-8c4b-bf37a63d8700"
-      },
-      {
-        "player": "Player4",
-        "vekn": "444444",
-        "deck": "466a1464-a7bb-48ff-b22a-b0b546d8a54b"
-      },
-      {
-        "player": "Player1",
-        "vekn": "111111",
-        "deck": "6bcea4ff-0148-48f9-8bcf-0b44fe40d93b"
-      },
-      {
-        "player": "Player7",
-        "vekn": "777777",
-        "deck": "5ccb62a8-6602-4231-9361-7e5c272c509f"
-      },
-      {
-        "player": "Player6",
-        "vekn": "666666",
-        "deck": "73d40569-f846-4d4c-9469-482a7ec2a7aa"
-      },
-      {
-        "player": "Player8",
-        "vekn": "888888",
-        "deck": "e479728b-2e7b-45ad-80bd-bbe990e04f2e"
-      }
-    ],
-    "finals": {
-      "seeding": [
-        "Player1",
-        "Player2",
-        "Player3",
-        "Player4",
-        "Player5"
-      ],
-      "seating": []
-    },
-    "status": "ACTIVE",
-    "rounds": {
-      "1": {
-        "1": [
-          {
-            "name": "Player1",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player2",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player3",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player4",
-            "vp": 0.0,
-            "gw": false
-          }
-        ],
-        "2": [
-          {
-            "name": "Player5",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player6",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player7",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player8",
-            "vp": 0.0,
-            "gw": false
-          }
-        ]
-      },
-      "2": {
-        "1": [
-          {
-            "name": "Player4",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player8",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player6",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player1",
-            "vp": 0.0,
-            "gw": false
-          }
-        ],
-        "2": [
-          {
-            "name": "Player7",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player3",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player5",
-            "vp": 0.0,
-            "gw": false
-          },
-          {
-            "name": "Player2",
-            "vp": 0.0,
-            "gw": false
-          }
-        ]
-      }
-    }
-  },
-  {
-    "id": "10b790d4-2174-4512-bad7-12b9f012bd1e",
-    "registrationStart": "2026-06-15T00:00:00Z",
-    "registrationEnd": "2026-06-22T00:00:00Z",
-    "playStarts": "2026-06-29T00:00:00Z",
-    "playEnds": "2026-07-27T00:00:00Z",
-    "format": "SINGLE_DECK",
-    "deckFormat": "Standard",
-    "numberOfRounds": 2,
-    "finalEnabled": false,
-    "requiresId": true,
-    "name": "Test - Draft Mode",
-    "rules": [],
-    "specialRules": {
-      "condition": "",
-      "rules": []
-    },
-    "registrations": [],
-    "finals": {
-      "seeding": [],
-      "seating": []
-    },
-    "status": "EDIT",
-    "rounds": {}
-  },
-  {
-    "id": "1f32b111-1809-45bc-854c-35ec4eff9ee8",
-    "registrationStart": "2026-06-07T00:00:00Z",
-    "registrationEnd": "2026-06-18T00:00:00Z",
-    "playStarts": "2026-06-29T00:00:00Z",
-    "playEnds": "2026-07-27T00:00:00Z",
-    "format": "SINGLE_DECK",
-    "deckFormat": "Standard",
-    "numberOfRounds": 2,
-    "finalEnabled": false,
-    "requiresId": true,
-    "name": "Test - Table Seating Mode",
-    "rules": [],
-    "specialRules": {
-      "condition": "",
-      "rules": []
-    },
-    "registrations": [
-      {
-        "player": "Player3",
-        "vekn": "333333",
-        "deck": "761f7e8d-7996-4819-bbcb-4431573c894d"
-      },
-      {
-        "player": "Player2",
-        "vekn": "123456",
-        "deck": "01b06c05-23c3-4cd1-99cd-e1f32af8a1d2"
-      },
-      {
-        "player": "Player5",
-        "vekn": "77777",
-        "deck": "6a516821-2c2a-48b1-8c4b-bf37a63d8700"
-      },
-      {
-        "player": "Player4",
-        "vekn": "444444",
-        "deck": "466a1464-a7bb-48ff-b22a-b0b546d8a54b"
-      },
-      {
-        "player": "Player1",
-        "vekn": "111111",
-        "deck": "6bcea4ff-0148-48f9-8bcf-0b44fe40d93b"
-      },
-      {
-        "player": "Player7",
-        "vekn": "777777",
-        "deck": "5ccb62a8-6602-4231-9361-7e5c272c509f"
-      },
-      {
-        "player": "Player6",
-        "vekn": "666666",
-        "deck": "73d40569-f846-4d4c-9469-482a7ec2a7aa"
-      },
-      {
-        "player": "Player8",
-        "vekn": "888888",
-        "deck": "e479728b-2e7b-45ad-80bd-bbe990e04f2e"
-      }
-    ],
-    "finals": {
-      "seeding": [],
-      "seating": []
-    },
-    "status": "STARTING",
-    "rounds": {}
   }
-]
+}, {
+  "id" : "78dc3f99-63b5-4216-b40e-209443d91898",
+  "registrationStart" : "2026-06-15T00:00:00Z",
+  "registrationEnd" : "2030-12-31T00:00:00Z",
+  "playStarts" : "2031-01-01T00:00:00Z",
+  "playEnds" : "2031-12-31T00:00:00Z",
+  "format" : "SINGLE_DECK",
+  "deckFormat" : "Standard",
+  "numberOfRounds" : 2,
+  "finalEnabled" : false,
+  "requiresId" : true,
+  "name" : "Test - Registration Open",
+  "rules" : [ ],
+  "specialRules" : {
+    "condition" : "",
+    "rules" : [ ]
+  },
+  "registrations" : [ {
+    "player" : "Player3",
+    "vekn" : "333333",
+    "deck" : "761f7e8d-7996-4819-bbcb-4431573c894d"
+  }, {
+    "player" : "Player2",
+    "vekn" : "123456",
+    "deck" : "a101f2a2-b3e0-4089-829b-f0ddbb15e63f"
+  }, {
+    "player" : "Player5",
+    "vekn" : "77777",
+    "deck" : "6a516821-2c2a-48b1-8c4b-bf37a63d8700"
+  }, {
+    "player" : "Player4",
+    "vekn" : "444444",
+    "deck" : "466a1464-a7bb-48ff-b22a-b0b546d8a54b"
+  }, {
+    "player" : "Player1",
+    "vekn" : "111111",
+    "deck" : "6bcea4ff-0148-48f9-8bcf-0b44fe40d93b"
+  }, {
+    "player" : "Player7",
+    "vekn" : "777777",
+    "deck" : "5ccb62a8-6602-4231-9361-7e5c272c509f"
+  }, {
+    "player" : "Player6",
+    "vekn" : "666666",
+    "deck" : "73d40569-f846-4d4c-9469-482a7ec2a7aa"
+  }, {
+    "player" : "Player8",
+    "vekn" : "888888",
+    "deck" : "e479728b-2e7b-45ad-80bd-bbe990e04f2e"
+  } ],
+  "finals" : {
+    "seeding" : [ ],
+    "seating" : [ ]
+  },
+  "status" : "STARTING",
+  "rounds" : { }
+}, {
+  "id" : "7328f484-6370-4379-9903-3305cf44f309",
+  "registrationStart" : "2026-06-07T00:00:00Z",
+  "registrationEnd" : "2026-06-18T00:00:00Z",
+  "playStarts" : "2026-06-29T00:00:00Z",
+  "playEnds" : "2026-07-27T00:00:00Z",
+  "format" : "SINGLE_DECK",
+  "deckFormat" : "Standard",
+  "numberOfRounds" : 2,
+  "finalEnabled" : false,
+  "requiresId" : true,
+  "name" : "Test - Active Mode",
+  "rules" : [ ],
+  "specialRules" : {
+    "condition" : "",
+    "rules" : [ ]
+  },
+  "registrations" : [ {
+    "player" : "Player3",
+    "vekn" : "333333",
+    "deck" : "761f7e8d-7996-4819-bbcb-4431573c894d"
+  }, {
+    "player" : "Player2",
+    "vekn" : "123456",
+    "deck" : "01b06c05-23c3-4cd1-99cd-e1f32af8a1d2"
+  }, {
+    "player" : "Player5",
+    "vekn" : "77777",
+    "deck" : "6a516821-2c2a-48b1-8c4b-bf37a63d8700"
+  }, {
+    "player" : "Player4",
+    "vekn" : "444444",
+    "deck" : "466a1464-a7bb-48ff-b22a-b0b546d8a54b"
+  }, {
+    "player" : "Player1",
+    "vekn" : "111111",
+    "deck" : "6bcea4ff-0148-48f9-8bcf-0b44fe40d93b"
+  }, {
+    "player" : "Player7",
+    "vekn" : "777777",
+    "deck" : "5ccb62a8-6602-4231-9361-7e5c272c509f"
+  }, {
+    "player" : "Player6",
+    "vekn" : "666666",
+    "deck" : "73d40569-f846-4d4c-9469-482a7ec2a7aa"
+  }, {
+    "player" : "Player8",
+    "vekn" : "888888",
+    "deck" : "e479728b-2e7b-45ad-80bd-bbe990e04f2e"
+  } ],
+  "finals" : {
+    "seeding" : [ "Player1", "Player2", "Player3", "Player4", "Player5" ],
+    "seating" : [ ]
+  },
+  "status" : "ACTIVE",
+  "rounds" : {
+    "1" : {
+      "1" : [ {
+        "name" : "Player1",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player2",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player3",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player4",
+        "vp" : 0.0,
+        "gw" : false
+      } ],
+      "2" : [ {
+        "name" : "Player5",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player6",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player7",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player8",
+        "vp" : 0.0,
+        "gw" : false
+      } ]
+    },
+    "2" : {
+      "1" : [ {
+        "name" : "Player4",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player8",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player6",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player1",
+        "vp" : 0.0,
+        "gw" : false
+      } ],
+      "2" : [ {
+        "name" : "Player7",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player3",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player5",
+        "vp" : 0.0,
+        "gw" : false
+      }, {
+        "name" : "Player2",
+        "vp" : 0.0,
+        "gw" : false
+      } ]
+    }
+  }
+}, {
+  "id" : "10b790d4-2174-4512-bad7-12b9f012bd1e",
+  "registrationStart" : "2026-06-15T00:00:00Z",
+  "registrationEnd" : "2026-06-22T00:00:00Z",
+  "playStarts" : "2026-06-29T00:00:00Z",
+  "playEnds" : "2026-07-27T00:00:00Z",
+  "format" : "SINGLE_DECK",
+  "deckFormat" : "Standard",
+  "numberOfRounds" : 2,
+  "finalEnabled" : false,
+  "requiresId" : true,
+  "name" : "Test - Draft Mode",
+  "rules" : [ ],
+  "specialRules" : {
+    "condition" : "",
+    "rules" : [ ]
+  },
+  "registrations" : [ ],
+  "finals" : {
+    "seeding" : [ ],
+    "seating" : [ ]
+  },
+  "status" : "EDIT",
+  "rounds" : { }
+}, {
+  "id" : "1f32b111-1809-45bc-854c-35ec4eff9ee8",
+  "registrationStart" : "2026-06-07T00:00:00Z",
+  "registrationEnd" : "2026-06-18T00:00:00Z",
+  "playStarts" : "2026-06-29T00:00:00Z",
+  "playEnds" : "2026-07-27T00:00:00Z",
+  "format" : "SINGLE_DECK",
+  "deckFormat" : "Standard",
+  "numberOfRounds" : 2,
+  "finalEnabled" : false,
+  "requiresId" : true,
+  "name" : "Test - Table Seating Mode",
+  "rules" : [ ],
+  "specialRules" : {
+    "condition" : "",
+    "rules" : [ ]
+  },
+  "registrations" : [ {
+    "player" : "Player3",
+    "vekn" : "333333",
+    "deck" : "761f7e8d-7996-4819-bbcb-4431573c894d"
+  }, {
+    "player" : "Player2",
+    "vekn" : "123456",
+    "deck" : "01b06c05-23c3-4cd1-99cd-e1f32af8a1d2"
+  }, {
+    "player" : "Player5",
+    "vekn" : "77777",
+    "deck" : "6a516821-2c2a-48b1-8c4b-bf37a63d8700"
+  }, {
+    "player" : "Player4",
+    "vekn" : "444444",
+    "deck" : "466a1464-a7bb-48ff-b22a-b0b546d8a54b"
+  }, {
+    "player" : "Player1",
+    "vekn" : "111111",
+    "deck" : "6bcea4ff-0148-48f9-8bcf-0b44fe40d93b"
+  }, {
+    "player" : "Player7",
+    "vekn" : "777777",
+    "deck" : "5ccb62a8-6602-4231-9361-7e5c272c509f"
+  }, {
+    "player" : "Player6",
+    "vekn" : "666666",
+    "deck" : "73d40569-f846-4d4c-9469-482a7ec2a7aa"
+  }, {
+    "player" : "Player8",
+    "vekn" : "888888",
+    "deck" : "e479728b-2e7b-45ad-80bd-bbe990e04f2e"
+  } ],
+  "finals" : {
+    "seeding" : [ ],
+    "seating" : [ ]
+  },
+  "status" : "STARTING",
+  "rounds" : { }
+} ]

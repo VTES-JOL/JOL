@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<div class="card shadow">
+<div class="card shadow flex-fill d-flex flex-column">
     <div class="card-header bg-body-secondary d-flex justify-content-between align-items-center">
         <span class="fw-semibold">Tournament</span>
         <span class="d-flex gap-1 align-items-center">
@@ -11,8 +11,8 @@
             <button class="btn btn-sm btn-outline-secondary" onclick="exitTourMode()">Cancel</button>
         </span>
     </div>
-    <div class="card-body p-2">
-        <div class="scrollable mhd-70 px-1">
+    <div class="card-body p-2 flex-fill overflow-auto px-3" style="min-height: 0">
+        <div>
             <div class="row mb-2">
                 <label class="col-form-label col-3" for="tourName">Name</label>
                 <div class="col-9"><input id="tourName" class="form-control form-control-sm"/></div>
