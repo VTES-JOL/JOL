@@ -6,11 +6,9 @@
     <div class="card-body p-2">
         <input id="deckTextFilter" type="text" class="form-control form-control-sm rounded-pill mb-1"
                placeholder="Filter by name or comment..." oninput="filterDeckList()">
-        <select id="deckFilter" class="form-select form-select-sm" onchange="selectDeckFilter()"></select>
-    </div>
-    <div class="flex-fill overflow-auto" style="min-height: 0; overflow-x: clip;">
-        <table class="table table-sm table-hover mb-0">
-            <tbody id="decks"></tbody>
-        </table>
+        <select id="deckFilter" class="form-select form-select-sm mb-2" onchange="selectDeckFilter()"></select>
+        <div class="flex-fill overflow-auto" style="min-height: 0; overflow-x: clip;">
+            <div id="decks" class="list-group list-group-flush"></div>
+        </div>
     </div>
 </div>

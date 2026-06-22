@@ -1702,7 +1702,7 @@ function exitEditMode() {
 
 function filterDeckList() {
     let text = $("#deckTextFilter").val().toLowerCase();
-    $("#decks tr").each(function () {
+    $("#decks .list-group-item").each(function () {
         let name = ($(this).data("name") || "").toLowerCase();
         let comment = ($(this).data("comment") || "").toLowerCase();
         $(this).toggle(!text || name.includes(text) || comment.includes(text));
@@ -1778,8 +1778,8 @@ function callbackFilterDecks(decks) {
     let deckList = $("#decks");
     deckList.empty();
     $.each(decks, function (index, deck) {
-        const deckRow = $("<tr/>").data("name", deck.name).data("comment", deck.comments || "");
-        const deckCell = $("<td/>");
+        const deckRow = $("<div/>").addClass("list-group-item list-group-item-action py-1 px-2")
+            .data("name", deck.name).data("comment", deck.comments || "");
         const deckName = $("<span/>").addClass("deck-name-link").text(deck.name).click(function () {
             exitEditMode();
             DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
@@ -1790,16 +1790,16 @@ function callbackFilterDecks(decks) {
             }
             event.stopPropagation();
         });
-        let wrapper = $("<div/>").addClass("d-flex justify-content-between align-items-center")
-            .append(deckName)
-            .append(deleteButton);
-        deckCell.append(wrapper);
+        deckRow.append(
+            $("<div/>").addClass("d-flex justify-content-between align-items-center")
+                .append(deckName)
+                .append(deleteButton)
+        );
         if (deck.comments) {
-            deckCell.append(
+            deckRow.append(
                 $("<div/>").addClass("text-muted small text-truncate").text(deck.comments)
             );
         }
-        deckRow.append(deckCell);
         deckList.append(deckRow);
     });
     filterDeckList();
