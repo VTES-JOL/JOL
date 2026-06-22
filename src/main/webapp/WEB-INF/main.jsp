@@ -33,59 +33,45 @@
     <link rel="shortcut icon" href="https://static.deckserver.net/assets/images/favicon.ico"/>
     <link href="https://fonts.googleapis.com/css?family=IM+Fell+English" rel="stylesheet">
 </head>
-<body>
-<div id="wrapper">
-    <jsp:include page="/WEB-INF/jsps/topbar.jsp"/>
-    <div id="content" class="container-fluid">
-        <div id="main">
-            <jsp:include page="/WEB-INF/jsps/main/layout.jsp"/>
-        </div>
-
-        <div id="game" style="display :none;">
-            <jsp:include page="/WEB-INF/jsps/game/layout.jsp"/>
-        </div>
-
-        <div id="active" style="display:none;">
-            <jsp:include page="/WEB-INF/jsps/watch/layout.jsp"/>
-        </div>
-
-        <div id="deck" style="display :none;">
-            <jsp:include page="/WEB-INF/jsps/decks/layout.jsp"/>
-        </div>
-
-        <div id="lobby" style="display :none;">
-            <jsp:include page="/WEB-INF/jsps/lobby/layout.jsp"/>
-        </div>
-
-        <div id="admin" style="display: none;">
-            <jsp:include page="/WEB-INF/jsps/admin/layout.jsp"/>
-        </div>
-
-        <div id="tournamentAdmin" style="display: none;">
-            <jsp:include page="/WEB-INF/jsps/tournament-admin/layout.jsp"/>
-        </div>
-
-        <div id="tournament" style="display: none">
-            <jsp:include page="/WEB-INF/jsps/tournament/layout.jsp"/>
-        </div>
-
-        <div id="profile" style="display:none">
-            <jsp:include page="/WEB-INF/jsps/profile/layout.jsp"/>
-        </div>
-
+<body class="h-100 d-flex flex-column">
+<jsp:include page="/WEB-INF/jsps/topbar.jsp"/>
+<div id="content" class="container-fluid">
+    <div id="main">
+        <jsp:include page="/WEB-INF/jsps/main/layout.jsp"/>
     </div>
-    <footer class="footer d-none d-sm-block" id="footer">
-        <div class="container-fluid p-2 justify-content-center justify-content-md-between d-flex align-items-center bg-secondary-subtle fw-bold">
-            <span id="timeStamp" class="d-none d-md-inline"></span>
-            <span id="message"></span>
-            <span class="d-none d-md-inline d-flex align-items-center gap-2">
-                <% if (showEnvLabel) { %>
-                <span class="badge text-bg-<%= environment.equals("dev") ? "danger" : "warning" %> fw-semibold"><%= environmentLabel %></span>
-                <% } %>
-                Version: <%= VersionService.getVersion() %>
-            </span>
-        </div>
-    </footer>
+
+    <div id="game" style="display :none;">
+        <jsp:include page="/WEB-INF/jsps/game/layout.jsp"/>
+    </div>
+
+    <div id="active" style="display:none;">
+        <jsp:include page="/WEB-INF/jsps/watch/layout.jsp"/>
+    </div>
+
+    <div id="deck" style="display :none;">
+        <jsp:include page="/WEB-INF/jsps/decks/layout.jsp"/>
+    </div>
+
+    <div id="lobby" style="display :none;">
+        <jsp:include page="/WEB-INF/jsps/lobby/layout.jsp"/>
+    </div>
+
+    <div id="admin" style="display: none;">
+        <jsp:include page="/WEB-INF/jsps/admin/layout.jsp"/>
+    </div>
+
+    <div id="tournamentAdmin" style="display: none;">
+        <jsp:include page="/WEB-INF/jsps/tournament-admin/layout.jsp"/>
+    </div>
+
+    <div id="tournament" style="display: none">
+        <jsp:include page="/WEB-INF/jsps/tournament/layout.jsp"/>
+    </div>
+
+    <div id="profile" style="display:none">
+        <jsp:include page="/WEB-INF/jsps/profile/layout.jsp"/>
+    </div>
+
 </div>
 
 <!-- Bootstrap -->
