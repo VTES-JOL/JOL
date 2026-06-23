@@ -1,7 +1,7 @@
 <h5 class="w-100 d-flex justify-content-between align-items-center">
     <span id="gameTitle" class="fs-5 user-select-all"></span>
 </h5>
-<div class="container-fluid my-1 g-0">
+<div class="container-fluid my-1 g-0 flex-grow-1 min-h-0 overflow-y-auto">
     <div class="control-grid">
         <jsp:include page="hand-card.jsp"/>
         <jsp:include page="commands.jsp"/>
