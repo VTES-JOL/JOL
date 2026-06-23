@@ -89,6 +89,7 @@ public class PlayerService extends PersistedService {
         playerInfo.setEmail(email);
         playerInfo.setVeknId(veknID);
         playerInfo.setCountryCode(country);
+        refreshActive(playerName);
     }
 
     private static  PlayerInfo loadPlayerInfo(String playerName) {

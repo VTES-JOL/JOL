@@ -134,6 +134,7 @@ let USER_TIMEZONE = moment.tz.guess();
 let gameChatLastDay = null;
 let globalChatLastPlayer = null;
 let globalChatLastDay = null;
+let globalChatLastTimestamp = null;
 let TITLE = 'V:TES Online';
 let DESKTOP_VIEWPORT_CONTENT = 'width=1024';
 let profile = {
@@ -2169,6 +2170,10 @@ function renderGlobalChat(data) {
     let onlySelfChat = true;
 
     $.each(data, function (index, chat) {
+        if (globalChatLastTimestamp !== null && chat.timestamp <= globalChatLastTimestamp) {
+            return;
+        }
+
         let day = moment(chat.timestamp).tz("UTC").format("D MMMM");
         if (globalChatLastDay !== day) {
             let dayBreak = $('<div class="chat-day-break"><span class="chat-day-label">' + day + '</span></div>');
@@ -2194,6 +2199,7 @@ function renderGlobalChat(data) {
         container.append(chatLine);
         globalChatLastPlayer = chat.player;
         globalChatLastDay = day;
+        globalChatLastTimestamp = chat.timestamp;
     });
     addCardTooltips("#globalChatOutput");
 
