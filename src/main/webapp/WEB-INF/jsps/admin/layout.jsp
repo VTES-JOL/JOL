@@ -1,6 +1,5 @@
-<div class="row mt-1 g-2">
+<div class="row g-2">
     <div class="col-sm-4">
-        <jsp:include page="add-role.jsp"/>
         <jsp:include page="player-roles.jsp"/>
     </div>
     <div class="col-sm-4">

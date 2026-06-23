@@ -109,6 +109,43 @@
       "timestamp" : "2026-06-19T01:04:26.168267Z"
     }
   },
+  "Rusty cryopreserving collision" : {
+    "Player2" : {
+      "deckId" : "01GR3EV0ZHC36EK47BQMFDSAPB",
+      "deckName" : "LasombraKiasyd Bleed",
+      "valid" : false,
+      "summary" : "Crypt: 12 Library: 90 Groups: 2/3",
+      "timestamp" : "2026-06-23T00:42:22.351605Z"
+    }
+  },
+  "Example Game" : {
+    "Player2" : {
+      "deckId" : "01GR3EV0ZHC36EK47BQMFDSAPB",
+      "deckName" : "LasombraKiasyd Bleed",
+      "valid" : false,
+      "summary" : "Crypt: 12 Library: 90 Groups: 2/3",
+      "timestamp" : "2026-06-23T00:44:03.915315Z"
+    },
+    "Player3" : {
+      "valid" : false,
+      "timestamp" : "2026-06-23T00:41:27.892099Z"
+    },
+    "Player4" : {
+      "valid" : false,
+      "timestamp" : "2026-06-23T00:41:41.520889Z"
+    },
+    "Player1" : {
+      "deckId" : "01JZ2ATMRDXB2SJ72APSZVJYXE",
+      "deckName" : "V5 Hecata",
+      "valid" : false,
+      "summary" : "Crypt: 12 Library: 77 Groups: 6",
+      "timestamp" : "2026-06-23T00:43:46.952388Z"
+    },
+    "Player5" : {
+      "valid" : false,
+      "timestamp" : "2026-06-23T00:41:53.10799Z"
+    }
+  },
   "Test Game" : {
     "Player5" : {
       "deckId" : "01GR3EV0H7W4RWRZJ7XZK3RVRY",

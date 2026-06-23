@@ -1,4 +1,4 @@
-<div class="card shadow">
+<div class="card shadow mt-2">
     <div class="card-header bg-body-secondary d-flex justify-content-between align-items-center">
         <span class="fw-semibold">Idle Games</span>
     </div>

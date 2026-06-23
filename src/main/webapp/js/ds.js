@@ -337,36 +337,17 @@ function callbackAdmin(data) {
         let playerRow = $("<tr/>");
         let nameCell = $("<td/>").text(value.name);
         let onlineCell = $("<td/>").text(moment(value.lastOnline).tz("UTC").format("D-MMM-YY HH:mm z"));
-        let removeJudgeButton = value.roles.includes("JUDGE") ? createButton({
-            html: '<i class="bi bi-x"></i>',
-            class: "btn btn-outline-secondary btn-sm",
-            confirm: "Are you sure you want to remove this role?"
-        }, DS.setRole, value.name, "JUDGE", false) : "";
-        let judgeCell = $("<td/>").addClass("text-center").append(removeJudgeButton);
-        let removeSuperButton = value.roles.includes("SUPER_USER") ? createButton({
-            html: '<i class="bi bi-x"></i>',
-            class: "btn btn-outline-secondary btn-sm",
-            confirm: "Are you sure you want to remove this role?"
-        }, DS.setRole, value.name, "SUPER_USER", false) : "";
-        let superCell = $("<td/>").addClass("text-center").append(removeSuperButton);
-        let removePlaytestButton = value.roles.includes("SUPER_USER") ? createButton({
-            html: '<i class="bi bi-x"></i>',
-            class: "btn btn-outline-secondary btn-sm",
-            confirm: "Are you sure you want to remove this role?"
-        }, DS.setRole, value.name, "PLAYTESTER", false) : "";
-        let playtestCell = $("<td/>").addClass("text-center").append(removePlaytestButton);
-        let removeAdminButton = value.roles.includes("PLAYTESTER") ? createButton({
-            html: '<i class="bi bi-x"></i>',
-            class: "btn btn-outline-secondary btn-sm",
-            confirm: "Are you sure you want to remove this role?"
-        }, DS.setRole, value.name, "ADMIN", false) : "";
-        let adminCell = $("<td/>").addClass("text-center").append(removeAdminButton);
-        let removeTournamentButton = value.roles.includes("TOURNAMENT_ADMIN") ? createButton({
-            html: '<i class="bi bi-x"></i>',
-            class: "btn btn-outline-secondary btn-sm",
-            confirm: "Are you sure you want to remove this role?"
-        }, DS.setRole, value.name, "TOURNAMENT_ADMIN", false) : "";
-        let tournamentCell = $("<td/>").addClass("text-center").append(removeTournamentButton);
+        function roleCell(role) {
+            let btn = value.roles.includes(role)
+                ? createButton({html: '<i class="bi bi-x"></i>', class: "btn btn-outline-secondary btn-sm", confirm: "Are you sure you want to remove this role?"}, DS.setRole, value.name, role, false)
+                : createButton({html: '<i class="bi bi-plus"></i>', class: "btn btn-outline-secondary btn-sm role-add-btn"}, DS.setRole, value.name, role, true);
+            return $("<td/>").addClass("text-center").append(btn);
+        }
+        let judgeCell = roleCell("JUDGE");
+        let superCell = roleCell("SUPER_USER");
+        let playtestCell = roleCell("PLAYTESTER");
+        let adminCell = roleCell("ADMIN");
+        let tournamentCell = roleCell("TOURNAMENT_ADMIN");
         playerRow.append(nameCell, onlineCell, judgeCell, superCell, playtestCell, adminCell, tournamentCell);
         userRoles.append(playerRow);
     })
@@ -1911,11 +1892,13 @@ function callbackFilterDecks(decks) {
     deckList.empty();
     $.each(decks, function (index, deck) {
         const deckRow = $("<div/>").addClass("list-group-item list-group-item-action py-1 px-2")
-            .data("name", deck.name).data("comment", deck.comments || "");
-        const deckName = $("<span/>").addClass("deck-name-link").text(deck.name).click(function () {
-            exitEditMode();
-            DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
-        });
+            .data("name", deck.name).data("comment", deck.comments || "")
+            .css("cursor", "pointer")
+            .click(function () {
+                exitEditMode();
+                DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
+            });
+        const deckName = $("<span/>").addClass("deck-name-link").text(deck.name);
         const deleteButton = $("<button/>").addClass("btn btn-sm btn-outline-secondary p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
             if (confirm("Delete deck?")) {
                 DS.deleteDeck(deck.name, {callback: processData, errorHandler: errorhandler});
