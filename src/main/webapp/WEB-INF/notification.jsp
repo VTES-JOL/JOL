@@ -96,15 +96,17 @@ function sendSubscriptionToServer(subscription) {
         auth: auth ? btoa(String.fromCharCode.apply(null, new Uint8Array(auth))) : ''
     };
 
-    console.log('Sending subscription data:', subscriptionData);
-
-    localStorage.setItem("notifications-subscribed", "true");
     return fetch('/jol/api/subscription', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(subscriptionData)
+    }).then(r => {
+        if (!r.ok) throw new Error(r.statusText);
+        localStorage.setItem("notifications-subscribed", "true");
+    }).catch(err => {
+        console.error('Failed to register push subscription:', err);
     });
 }
 

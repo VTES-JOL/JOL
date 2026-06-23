@@ -1,0 +1,44 @@
+[ {
+  "turnId" : "1.1",
+  "player" : "Player1",
+  "chats" : [ {
+    "timestamp" : "19-June 11:04 ",
+    "message" : "START OF UNLOCK PHASE.",
+    "source" : "Player1"
+  }, {
+    "timestamp" : "19-June 12:45 ",
+    "message" : "Player2 has gained 2 victory points.",
+    "source" : "Player2",
+    "command" : "vp 2.0"
+  }, {
+    "timestamp" : "19-June 12:45 ",
+    "message" : "Player4 has gained 1 victory points.",
+    "source" : "Player4",
+    "command" : "vp 1.0"
+  }, {
+    "timestamp" : "19-June 12:45 ",
+    "message" : "Player3 has gained 1 victory points.",
+    "source" : "Player3",
+    "command" : "vp 1.0"
+  }, {
+    "timestamp" : "19-June 12:45 ",
+    "message" : "Player1's pool was 30, now is 0.",
+    "source" : "Player2",
+    "command" : "pool Player2 -30"
+  }, {
+    "timestamp" : "19-June 12:45 ",
+    "message" : "Player2's pool was 30, now is 0.",
+    "source" : "Player2",
+    "command" : "pool Player2 -30"
+  }, {
+    "timestamp" : "19-June 12:45 ",
+    "message" : "Player3's pool was 30, now is 0.",
+    "source" : "Player2",
+    "command" : "pool Player2 -30"
+  }, {
+    "timestamp" : "19-June 12:45 ",
+    "message" : "Player4's pool was 30, now is 0.",
+    "source" : "Player2",
+    "command" : "pool Player2 -30"
+  } ]
+} ]

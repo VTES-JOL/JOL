@@ -28,9 +28,6 @@ public class NotificationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response handleSubscription(Subscription subscription) {
         String playerName = getPlayerName();
-        logger.info("Endpoint: {}", subscription.getEndpoint());
-        logger.info("Key: {}", subscription.getKey());
-        logger.info("Auth: {}", subscription.getAuth());
 
         // Validate the subscription data
         if (subscription.getEndpoint() == null || subscription.getEndpoint().isEmpty()) {

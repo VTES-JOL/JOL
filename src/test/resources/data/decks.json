@@ -15,6 +15,22 @@
       "gameFormats" : [ "STANDARD" ]
     }
   },
+  "Player8" : {
+    "Weapons of War" : {
+      "deckId" : "01KVEMVYWW0REQWR5PHWEVXF3G",
+      "deckName" : "Weapons of War",
+      "format" : "MODERN",
+      "gameFormats" : [ "PLAYTEST", "STANDARD" ]
+    }
+  },
+  "Player7" : {
+    "Ravnos Wall" : {
+      "deckId" : "01KVEMSAFXP3Z6CGRP4MF1FP6D",
+      "deckName" : "Ravnos Wall",
+      "format" : "MODERN",
+      "gameFormats" : [ "PLAYTEST", "STANDARD" ]
+    }
+  },
   "Player2" : {
     "LasombraKiasyd Bleed" : {
       "deckId" : "01GR3EV0ZHC36EK47BQMFDSAPB",
@@ -31,8 +47,8 @@
     "Cathari Pre-con" : {
       "deckId" : "01K37PD4GHB0JWHE8AQNFDXF6F",
       "deckName" : "Cathari Pre-con",
-      "format" : "MODERN",
-      "gameFormats" : [ "PLAYTEST" ]
+      "format" : "TAGGED",
+      "gameFormats" : [ ]
     }
   },
   "Player1" : {
@@ -58,7 +74,7 @@
       "deckId" : "01JZ2ATMRDXB2SJ72APSZVJYXE",
       "deckName" : "V5 Hecata",
       "format" : "MODERN",
-      "gameFormats" : [ "V5_STRICT", "STANDARD", "V5" ]
+      "gameFormats" : [ "STANDARD", "V5" ]
     },
     "Caine Pre-con" : {
       "deckId" : "01K37P9CJXR5CTC5HQ0QZWRKXA",

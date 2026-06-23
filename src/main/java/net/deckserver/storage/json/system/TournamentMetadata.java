@@ -25,6 +25,7 @@ public class TournamentMetadata {
     private int numberOfTables;
     private List<String> finalsSeeding;
     private boolean roundsConfig;
+    private String status;
 
     public TournamentMetadata(TournamentDefinition definition) {
         this.id = definition.getId();
@@ -40,7 +41,8 @@ public class TournamentMetadata {
         this.numberOfRounds = definition.getNumberOfRounds();
         this.numberOfTables = definition.getNumberOfTables();
         this.finalsSeeding = definition.getFinals().getSeeding();
-        this.roundsConfig = definition.getRounds() == null || definition.getRounds().isEmpty() ? false : true;
+        this.roundsConfig = definition.getRounds() != null && !definition.getRounds().isEmpty();
+        this.status = definition.getStatus().name();
     }
 
     public TournamentMetadata(TournamentDefinition definition, String player) {

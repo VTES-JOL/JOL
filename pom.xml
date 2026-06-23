@@ -4,7 +4,7 @@
 
     <groupId>deckserver.net</groupId>
     <artifactId>jol-legacy</artifactId>
-    <version>1.7.17-NB3</version>
+    <version>1.8.5-NB3</version>
 
     <packaging>war</packaging>
 
@@ -15,12 +15,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.directwebremoting</groupId>
-            <artifactId>dwr</artifactId>
-            <version>3.0.2-RELEASE</version>
-        </dependency>
-
         <dependency>
             <groupId>com.vdurmont</groupId>
             <artifactId>emoji-java</artifactId>
@@ -246,6 +240,13 @@
         </dependency>
 
         <dependency>
+            <groupId>javax.websocket</groupId>
+            <artifactId>javax.websocket-api</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <version>1.2</version>
@@ -327,6 +328,11 @@
                         <groupId>org.redisson</groupId>
                         <artifactId>redisson-tomcat-9</artifactId>
                         <version>3.39.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.tomcat.embed</groupId>
+                        <artifactId>tomcat-embed-websocket</artifactId>
+                        <version>9.0.56</version>
                     </dependency>
                 </dependencies>
             </plugin>

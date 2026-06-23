@@ -48,6 +48,7 @@ public class TournamentService extends PersistedService {
     public static List<TournamentMetadata> getOpenTournaments() {
         return INSTANCE.tournaments.values().stream()
                 .filter(REGISTRATIONS_OPEN)
+                .filter(IS_STARTING)
                 .map(TournamentMetadata::new)
                 .toList();
     }
@@ -55,6 +56,7 @@ public class TournamentService extends PersistedService {
     public static List<TournamentMetadata> getOpenTournaments(String playerName) {
         return INSTANCE.tournaments.values().stream()
                 .filter(REGISTRATIONS_OPEN)
+                .filter(IS_STARTING)
                 .map(t -> new TournamentMetadata(t, playerName))
                 .toList();
     }
@@ -85,11 +87,11 @@ public class TournamentService extends PersistedService {
 
     public static TournamentMetadata getTournamentReadyToStart(String tourName) {
         return INSTANCE.tournaments.values().stream()
-                .filter(PLAY_OPEN)
                 .filter(IS_STARTING)
                 .filter(t -> t.getName().equals(tourName))
                 .map(TournamentMetadata::new)
-                .findFirst().get();
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No STARTING tournament found with name: " + tourName));
     }
 
     public static List<TournamentMetadata> getTournamentsStarting() {
@@ -133,6 +135,30 @@ public class TournamentService extends PersistedService {
                 def.getRegistrations().remove(reg);
             });
         }
+    }
+
+    public static void clearRegistrations(String tournamentName) {
+        TournamentDefinition def = INSTANCE.tournaments.get(tournamentName);
+        if (def == null) return;
+        def.getRegistrations().forEach(reg -> {
+            if (reg.getDeck() != null) {
+                Path deckPath = DataPaths.path("tournaments", def.getId(), reg.getDeck() + ".json");
+                try {
+                    Files.delete(deckPath);
+                } catch (IOException e) {
+                    logger.error("Unable to delete deck file for player {} in tournament {}", reg.getPlayer(), tournamentName);
+                }
+            }
+        });
+        def.getRegistrations().clear();
+    }
+
+    public static List<TournamentMetadata> getFinalsInvites(String playerName) {
+        return INSTANCE.tournaments.values().stream()
+                .filter(IS_ACTIVE)
+                .filter(t -> t.getFinals().getSeeding().contains(playerName))
+                .map(TournamentMetadata::new)
+                .toList();
     }
 
     public static List<TournamentInviteStatus> getRegisteredTournaments(String playerName) {
@@ -210,6 +236,10 @@ public class TournamentService extends PersistedService {
 
     public static void createTournament(TournamentDefinition tournamentDefinition) {
         INSTANCE.tournaments.put(tournamentDefinition.getName(), tournamentDefinition);
+    }
+
+    public static void removeTournament(String name) {
+        INSTANCE.tournaments.remove(name);
     }
 
     public static TournamentDefinition getTournament(String nameOfTournament) {
@@ -293,8 +323,9 @@ public class TournamentService extends PersistedService {
                 PlayerGameActivityService.pingPlayer(playerName, gameName);
                 // Save game
                 GameService.saveGame(jolGame);
-                // Update status
+                // Update status and link to tournament
                 GameService.get(gameName).setStatus(GameStatus.ACTIVE);
+                GameService.get(gameName).setTournamentName(tournamentName);
             }
         }
         // Start tournament
@@ -326,8 +357,9 @@ public class TournamentService extends PersistedService {
             jolGame.startGame(seeding);
             // Save game
             GameService.saveGame(jolGame);
-            // Update status
+            // Update status and link to tournament
             GameService.get(gameName).setStatus(GameStatus.ACTIVE);
+            GameService.get(gameName).setTournamentName(tournamentName);
             GlobalChatService.chat("SYSTEM", String.format("Game %s started", gameName));
         }
     }

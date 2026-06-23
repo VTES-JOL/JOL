@@ -1,0 +1,296 @@
+{
+  "deck": {
+    "id": null,
+    "name": null,
+    "crypt": {
+      "count": 12,
+      "cards": [
+        {
+          "id": 201728,
+          "name": "Tommaso Sforza",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201719,
+          "name": "Hiromitsu Asano",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201718,
+          "name": "Gebeyehu Abdu",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201717,
+          "name": "Alek König",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201723,
+          "name": "Monica Giovanni",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201722,
+          "name": "Marchesa Liliana",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201721,
+          "name": "Lenelle, Mambo of Birmingham",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201720,
+          "name": "Holliday \"Burgundy\" Hall",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201727,
+          "name": "Peter St. John",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201726,
+          "name": "Parijat, the Dark Oracle",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201725,
+          "name": "\"Mother\" Anja Giovanni",
+          "count": 1,
+          "comments": null
+        },
+        {
+          "id": 201724,
+          "name": "Mora, the Death Seer",
+          "count": 1,
+          "comments": null
+        }
+      ]
+    },
+    "library": {
+      "count": 77,
+      "cards": [
+        {
+          "type": "Master",
+          "count": 12,
+          "cards": [
+            {
+              "id": 102289,
+              "name": "Family Gathering",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 100435,
+              "name": "Coven, The",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 102277,
+              "name": "Oblivion",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100327,
+              "name": "Channel 10",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 102121,
+              "name": "Villein",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 101388,
+              "name": "Perfectionist",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 100444,
+              "name": "Creepshow Casino",
+              "count": 1,
+              "comments": null
+            },
+            {
+              "id": 102287,
+              "name": "Biotech Company Hunting Ground",
+              "count": 1,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action",
+          "count": 10,
+          "cards": [
+            {
+              "id": 102291,
+              "name": "Pit of Contemplation",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 102290,
+              "name": "Gate of Acheron, The",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 102295,
+              "name": "Shroud of Decay",
+              "count": 6,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Action Modifier",
+          "count": 20,
+          "cards": [
+            {
+              "id": 102288,
+              "name": "Consign to Oblivion",
+              "count": 4,
+              "comments": null
+            },
+            {
+              "id": 100788,
+              "name": "Freak Drive",
+              "count": 4,
+              "comments": null
+            },
+            {
+              "id": 102281,
+              "name": "Shadow Cloak",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 102280,
+              "name": "Shadow Cast",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 102282,
+              "name": "Stygian Shroud",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 102285,
+              "name": "Where the Veil Thins",
+              "count": 3,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Combat",
+          "count": 8,
+          "cards": [
+            {
+              "id": 101649,
+              "name": "Rolling with the Punches",
+              "count": 4,
+              "comments": null
+            },
+            {
+              "id": 102279,
+              "name": "Pass Through Shadow",
+              "count": 4,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Ally",
+          "count": 12,
+          "cards": [
+            {
+              "id": 102292,
+              "name": "Screamer",
+              "count": 2,
+              "comments": null
+            },
+            {
+              "id": 102296,
+              "name": "Spectral Servitor",
+              "count": 4,
+              "comments": null
+            },
+            {
+              "id": 102286,
+              "name": "Aggressive Corpse",
+              "count": 6,
+              "comments": null
+            }
+          ]
+        },
+        {
+          "type": "Reaction",
+          "count": 15,
+          "cards": [
+            {
+              "id": 101475,
+              "name": "Precognition",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 102294,
+              "name": "Shadow Sentinel",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 100680,
+              "name": "Eyes of Argus",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 101949,
+              "name": "Telepathic Misdirection",
+              "count": 3,
+              "comments": null
+            },
+            {
+              "id": 102284,
+              "name": "Truth in Darkness",
+              "count": 3,
+              "comments": null
+            }
+          ]
+        }
+      ]
+    },
+    "comments": ""
+  },
+  "stats": {
+    "cryptSize": 12,
+    "librarySize": 77,
+    "groups": [
+      "6"
+    ],
+    "bannedCards": false,
+    "summary": "Crypt: 12 Library: 77 Groups: 6"
+  }
+}

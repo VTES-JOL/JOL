@@ -29,7 +29,7 @@
                 </h6>
             </div>
             <div class="card-body px-0 py-0">
-                <div class="p-2 bg-success-subtle " type="button" onclick="details('4-READY');"
+                <div class="p-2 bg-success-subtle " type="button" onclick="togglePanel(event, '4-READY');"
                      data-bs-toggle="collapse" data-bs-target="#4-READY" aria-expanded="true" aria-controls="4-READY">
                     <span class="fw-bold">Ready</span>
                     <span>( 8 )</span>

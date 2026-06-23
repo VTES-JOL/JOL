@@ -1,14 +1,141 @@
 "use strict";
+
+// ---------------------------------------------------------------------------
+// REST API client — replaces DWR-generated DS.js
+// ---------------------------------------------------------------------------
+const _ctx = '/jol/api';
+
+function _enc(s) { return encodeURIComponent(s); }
+
+function apiCall(method, path, body, opts) {
+    const init = { method, headers: {'Content-Type': 'application/json'} };
+    if (body !== null && body !== undefined) init.body = JSON.stringify(body);
+    return fetch(_ctx + path, init)
+        .then(r => {
+            if (!r.ok) return r.text().then(msg => { throw new Error(`${r.status}: ${msg || r.statusText}`); });
+            if (r.status === 204) return {};
+            return r.json();
+        })
+        .then(data => opts?.callback && opts.callback(data))
+        .catch(err => opts?.errorHandler && opts.errorHandler(String(err)));
+}
+
+function apiGet(path, opts) { return apiCall('GET', path, null, opts); }
+function apiPost(path, body, opts) { return apiCall('POST', path, body, opts); }
+function apiPut(path, body, opts) { return apiCall('PUT', path, body, opts); }
+function apiDel(path, opts) { return apiCall('DELETE', path, null, opts); }
+
+function apiGetText(path, opts) {
+    return fetch(_ctx + path)
+        .then(r => { if (!r.ok) throw new Error(r.statusText); return r.text(); })
+        .then(data => opts?.callback && opts.callback(data))
+        .catch(err => opts?.errorHandler && opts.errorHandler(String(err)));
+}
+
+const DS = {
+    // Navigation / polling
+    init:                    (target, opts) => apiPost('/navigate', {target, init: true}, opts),
+    navigate:                (target, opts) => apiPost('/navigate', {target}, opts),
+    doPoll:                  (opts) => apiGet('/poll', opts),
+
+    // Global chat
+    chat:                    (text, opts) => apiPost('/chat', {text}, opts),
+
+    // Lobby
+    createGame:              (name, publicFlag, format, opts) => apiPost('/lobby/games', {name, publicFlag, format}, opts),
+    startGame:               (game, opts) => apiPost(`/lobby/games/${_enc(game)}/start`, {}, opts),
+    invitePlayer:            (game, player, opts) => apiPost(`/lobby/games/${_enc(game)}/invite`, {player}, opts),
+    unInvitePlayer:          (game, player, opts) => apiDel(`/lobby/games/${_enc(game)}/invite/${_enc(player)}`, opts),
+    registerDeck:            (gameName, deckName, opts) => apiPost(`/lobby/games/${_enc(gameName)}/deck`, {deckName}, opts),
+
+    // Game actions
+    submitForm:              (game, phase, command, chat, ping, opts) => apiPost(`/game/${_enc(game)}/submit`, {phase, command, chat, ping}, opts),
+    endPlayerTurn:           (game, opts) => apiPost(`/game/${_enc(game)}/end-turn`, {}, opts),
+    endTurn:                 (game, opts) => apiPost(`/game/${_enc(game)}/force-end-turn`, {}, opts),
+    endGame:                 (name, opts) => apiDel(`/game/${_enc(name)}`, opts),
+    gameChat:                (game, chat, opts) => apiPost(`/game/${_enc(game)}/chat`, {chat}, opts),
+    doToggle:                (game, id, opts) => apiPost(`/game/${_enc(game)}/toggle/${_enc(id)}`, {}, opts),
+    updateGlobalNotes:       (game, notes, opts) => apiPut(`/game/${_enc(game)}/notes/global`, {notes}, opts),
+    updatePrivateNotes:      (game, notes, opts) => apiPut(`/game/${_enc(game)}/notes/private`, {notes}, opts),
+    getState:                (game, forceLoad, opts) => apiPost(`/game/${_enc(game)}/state`, {forceLoad}, opts),
+    rollbackGame:            (game, turn, opts) => apiPost(`/game/${_enc(game)}/rollback`, {turn}, opts),
+    replacePlayer:           (game, existingPlayer, newPlayer, opts) => apiPut(`/game/${_enc(game)}/replace-player`, {existingPlayer, newPlayer}, opts),
+    getGameDeck:             (game, opts) => apiGet(`/game/${_enc(game)}/deck`, opts),
+    getGamePlayers:          (game, opts) => apiGet(`/game/${_enc(game)}/players`, opts),
+    getGameTurns:            (game, opts) => apiGet(`/game/${_enc(game)}/turns`, opts),
+    getHistory:              (game, turn, opts) => apiGet(`/game/${_enc(game)}/history?turn=${_enc(turn || '')}`, opts),
+
+    // Decks
+    filterDecks:             (filter, opts) => apiGet(`/decks?filter=${_enc(filter || '')}`, opts),
+    saveDeck:                (deckName, contents, comment, opts) => apiPost('/decks', {deckName, contents, comment}, opts),
+    deleteDeck:              (deckName, opts) => apiDel(`/decks/${_enc(deckName)}`, opts),
+    loadDeck:                (deckName, opts) => apiPost('/decks/load', {deckName}, opts),
+    newDeck:                 (opts) => apiPost('/decks/new', {}, opts),
+    validate:                (contents, format, opts) => apiPost('/decks/validate', {contents, format}, opts),
+    parseDeck:               (deckName, contents, opts) => apiPost('/decks/validate', {contents, format: ''}, opts),
+
+    // User profile
+    updateProfile:           (email, discordID, veknID, country, opts) => apiPut('/user/profile', {email, discordID, veknID, country}, opts),
+    changePassword:          (newPassword, opts) => apiPut('/user/password', {newPassword}, opts),
+    setUserPreferences:      (imageTooltips, opts) => apiPut('/user/preferences', {imageTooltips}, opts),
+    setEdgeColor:            (color, opts) => apiPut('/user/edge-color', {color}, opts),
+
+    // Admin
+    setRole:                 (player, role, value, opts) => apiPut(`/admin/player/${_enc(player)}/role`, {role, value}, opts),
+    deletePlayer:            (playerName, opts) => apiDel(`/admin/player/${_enc(playerName)}`, opts),
+    setMessage:              (message, opts) => apiPost('/admin/message', {message}, opts),
+    getVekn:                 (playerName, opts) => apiGet(`/admin/player/${_enc(playerName)}/vekn`, opts),
+    exportPastGamesAsCsv:    (opts) => apiGetText('/admin/export/games.csv', opts),
+
+    // Tournament
+    createTournament:        (tourName, regStart, regEnd, playStart, playEnd, tourFormat, gameFormat, rules, specRulesCon, specRules, numberOfRounds, reqId, originalName, opts) =>
+                                 apiPost('/tournament', {tourName, regStart, regEnd, playStart, playEnd, tourFormat, gameFormat, rules, specRulesCon, specRules, numberOfRounds, reqId, originalName}, opts),
+    loadTournamentDetails:   (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/details`, opts),
+    getRoundsForTournament:  (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/rounds`, opts),
+    getRoundsForTournamentCsv: (tourName, opts) => apiGetText(`/tournament/${_enc(tourName)}/rounds/csv`, opts),
+    getTournamentPlayers:    (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/players`, opts),
+    createTournamentTables:  (tourName, opts) => apiPost(`/tournament/${_enc(tourName)}/tables`, {}, opts),
+    saveTables:              (tourName, rounds, opts) => apiPut(`/tournament/${_enc(tourName)}/rounds`, rounds, opts),
+    importTables:            (tourName, csvData, opts) => apiPost(`/tournament/${_enc(tourName)}/rounds/import`, {csvData}, opts),
+    createFinalTable:        (tourName, opts) => apiPost(`/tournament/${_enc(tourName)}/final`, {}, opts),
+    setFinalSeeding:         (tourName, seeding, opts) => apiPut(`/tournament/${_enc(tourName)}/seeding`, seeding, opts),
+    loadFinalSeeding:        (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/seeding`, opts),
+    closeTournament:         (tourName, opts) => apiPost(`/tournament/${_enc(tourName)}/close`, {}, opts),
+    joinTournament:          (game, opts) => apiPost(`/tournament/${_enc(game)}/join`, {}, opts),
+    leaveTournament:         (game, opts) => apiPost(`/tournament/${_enc(game)}/leave`, {}, opts),
+    registerTournamentDeck:  (tournament, deckName, opts) => apiPost(`/tournament/${_enc(tournament)}/deck`, {deckName}, opts),
+    resetTables:             (tourName, opts) => apiDel(`/tournament/${_enc(tourName)}/rounds`, opts),
+    getFinalPlayers:         (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/final-players`, opts),
+    saveFinal:               (tourName, players, opts) => apiPut(`/tournament/${_enc(tourName)}/final-players`, players, opts),
+    getRegDelta:             (tourName, round, opts) => apiGet(`/tournament/${_enc(tourName)}/round-delta?round=${round}`, opts),
+    getFinalDelta:           (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/final-delta`, opts),
+    loadCrypt:               (tourName, player, opts) => apiGet(`/tournament/${_enc(tourName)}/crypt?player=${_enc(player)}`, opts),
+    cryptCount:              (tourName, player, opts) => apiGet(`/tournament/${_enc(tourName)}/crypt-count?player=${_enc(player)}`, opts),
+    tournamentAlreadyActive: (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/status`, opts),
+    gameAlreadyStarted:      (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/game-started`, opts),
+    getTournamentRounds:     (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/rounds-count`, opts),
+    publishTournament:       (tourName, opts) => apiPost(`/tournament/${_enc(tourName)}/publish`, {}, opts),
+    getRoundSummary:         (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/round-summary`, opts),
+    closeTableGame:          (tourName, round, table, opts) => apiPost(`/tournament/${_enc(tourName)}/round/${round}/table/${table}/close`, {}, opts),
+    getStandings:            (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/standings`, opts),
+    getAllRegisteredPlayers:  (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/registered`, opts),
+};
+// ---------------------------------------------------------------------------
+
 let version = null;
 let refresher = null;
 let game = null;
+let ws = null;
+let wsConnected = false;
+let wsHeartbeat = null;
+let wsReconnect = null;
 let player = null;
 let currentPage = 'main';
-let currentOption = "notes";
 let USER_TIMEZONE = moment.tz.guess();
 let gameChatLastDay = null;
 let globalChatLastPlayer = null;
 let globalChatLastDay = null;
+let globalChatLastTimestamp = null;
 let TITLE = 'V:TES Online';
 let DESKTOP_VIEWPORT_CONTENT = 'width=1024';
 let profile = {
@@ -26,13 +153,15 @@ let lastReceivedGlobalNotes = null;
 let lastReceivedPrivateNotes = null;
 const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
-function errorhandler(errorString, exception) {
+function errorhandler(errorString) {
     if (errorString && errorString.startsWith('401')) {
         location.href = '/jol/login';
         return;
     }
     $("#connectionMessage").removeClass("d-none");
-    refresher = setTimeout("DS.init({callback: processData, errorHandler: errorhandler})", 5000);
+    refresher = setTimeout(function() {
+        DS.navigate(null, {callback: processData, errorHandler: errorhandler});
+    }, 5000);
 }
 
 $(document).ready(function () {
@@ -41,14 +170,102 @@ $(document).ready(function () {
         links: [],
         version: '2024b'
     });
-    DS.init({callback: init, errorHandler: errorhandler});
+    const parts = window.location.pathname.replace(/^\/jol\//, '').split('/');
+    let initialTarget = parts[0] || 'main';
+    if (initialTarget === 'game' && parts[1]) initialTarget = 'g' + decodeURIComponent(parts[1]);
+    DS.init(initialTarget, {callback: init, errorHandler: errorhandler});
+    window.addEventListener('popstate', function(e) {
+        const t = e.state && e.state.target ? e.state.target : 'main';
+        DS.navigate(t, {callback: processData, errorHandler: errorhandler});
+    });
 });
 
 function init(data) {
+    if (localStorage.getItem("jol-theme") === "dark") {
+        $("#wrapper").attr("data-bs-theme", "dark");
+    }
     processData(data);
     $("h4.collapse").click(function () {
         $(this).next().slideToggle();
-    })
+    });
+    initWebSocket();
+}
+
+function initWebSocket() {
+    if (wsReconnect) {
+        clearTimeout(wsReconnect);
+        wsReconnect = null;
+    }
+    if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+        return;
+    }
+
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const url = `${proto}//${location.host}/jol/ws/updates`;
+    console.log('[WS] Connecting to', url);
+    ws = new WebSocket(url);
+
+    ws.onopen = () => {
+        wsConnected = true;
+        $("#wsStatus").addClass("d-none");
+        if (refresher) clearTimeout(refresher);
+        console.log('[WS] Connected — push notifications active, polling suspended');
+        // Re-join the game room if we're already on a game page (e.g. after reconnect)
+        if (currentPage === 'game' && game) wsJoinGame(game);
+        if (wsHeartbeat) clearInterval(wsHeartbeat);
+        wsHeartbeat = setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({type: 'ping'}));
+            }
+        }, 30000);
+    };
+
+    ws.onmessage = (evt) => {
+        const msg = JSON.parse(evt.data);
+        if (msg.type === 'pong') {
+            if (msg.version) checkVersion(msg.version);
+            return;
+        }
+        console.log('[WS] Notification received:', msg, '(currentPage=' + currentPage + ', game=' + game + ')');
+        if (refresher) clearTimeout(refresher);
+        if (msg.type === 'game') {
+            if (currentPage === 'game' && game === msg.id) {
+                console.log('[WS] Triggering game refresh');
+                refreshState(false);
+            } else if (currentPage === 'main') {
+                console.log('[WS] Game changed, refreshing main page');
+                DS.doPoll({callback: processData, errorHandler: errorhandler});
+            }
+        } else if (msg.type === 'main' && currentPage === 'main') {
+            console.log('[WS] Main state changed, refreshing');
+            DS.doPoll({callback: processData, errorHandler: errorhandler});
+        }
+    };
+
+    ws.onclose = (evt) => {
+        wsConnected = false;
+        if (wsHeartbeat) {
+            clearInterval(wsHeartbeat);
+            wsHeartbeat = null;
+        }
+        if (evt.code === 1008 || evt.reason === 'Unauthorized') {
+            location.href = '/jol/login';
+            return;
+        }
+        $("#wsStatus").removeClass("d-none");
+        console.log('[WS] Connection closed (code=' + evt.code + '), falling back to polling, reconnecting in 5s');
+        if (currentPage === 'main') {
+            DS.doPoll({callback: processData, errorHandler: errorhandler});
+        } else if (currentPage === 'game' && game) {
+            refreshState(false);
+        }
+        wsReconnect = setTimeout(initWebSocket, 5000);
+    };
+
+    ws.onerror = (evt) => {
+        console.error('[WS] Connection error', evt);
+        ws.close();
+    };
 }
 
 function setPreferences(value) {
@@ -59,10 +276,22 @@ function setEdgeColorPref(value) {
     profile.edgeColor = value;
 }
 
+const processDataHandlers = {
+    checkVersion, navigate, loadGame,
+    callbackMain, callbackLobby, callbackShowDecks, callbackAdmin,
+    callbackProfile, callbackTournament, callbackTournamentAdmin,
+    callbackAllGames, showStatus, setPreferences, setEdgeColorPref,
+};
+
 function processData(a) {
     $("#connectionMessage").addClass("d-none");
-    for (let b in a) {
-        eval(b + '(a[b]);');
+    for (const key in a) {
+        const fn = processDataHandlers[key];
+        if (fn) {
+            fn(a[key]);
+        } else {
+            console.warn('[processData] unhandled key:', key);
+        }
     }
 }
 
@@ -80,6 +309,13 @@ function callbackAllGames(data) {
     renderPastGames(data.history);
 }
 
+$(document).on('shown.bs.tab', '[data-bs-target="#pastGamesPane"]', function () {
+    $('#exportCsvBtn').removeClass('d-none');
+});
+$(document).on('hidden.bs.tab', '[data-bs-target="#pastGamesPane"]', function () {
+    $('#exportCsvBtn').addClass('d-none');
+});
+
 function createButton(config, fn, ...args) {
     let button = $("<button/>");
     if (config.text) {
@@ -96,10 +332,6 @@ function createButton(config, fn, ...args) {
     return button;
 }
 
-function callbackSelectGame(data) {
-
-}
-
 function callbackAdmin(data) {
     let userRoles = $("#userRoles")
     userRoles.empty();
@@ -107,36 +339,17 @@ function callbackAdmin(data) {
         let playerRow = $("<tr/>");
         let nameCell = $("<td/>").text(value.name);
         let onlineCell = $("<td/>").text(moment(value.lastOnline).tz("UTC").format("D-MMM-YY HH:mm z"));
-        let removeJudgeButton = value.roles.includes("JUDGE") ? createButton({
-            html: '<i class="bi bi-x"></i>',
-            class: "btn btn-outline-secondary btn-sm",
-            confirm: "Are you sure you want to remove this role?"
-        }, DS.setRole, value.name, "JUDGE", false) : "";
-        let judgeCell = $("<td/>").addClass("text-center").append(removeJudgeButton);
-        let removeSuperButton = value.roles.includes("SUPER_USER") ? createButton({
-            html: '<i class="bi bi-x"></i>',
-            class: "btn btn-outline-secondary btn-sm",
-            confirm: "Are you sure you want to remove this role?"
-        }, DS.setRole, value.name, "SUPER_USER", false) : "";
-        let superCell = $("<td/>").addClass("text-center").append(removeSuperButton);
-        let removePlaytestButton = value.roles.includes("SUPER_USER") ? createButton({
-            html: '<i class="bi bi-x"></i>',
-            class: "btn btn-outline-secondary btn-sm",
-            confirm: "Are you sure you want to remove this role?"
-        }, DS.setRole, value.name, "PLAYTESTER", false) : "";
-        let playtestCell = $("<td/>").addClass("text-center").append(removePlaytestButton);
-        let removeAdminButton = value.roles.includes("PLAYTESTER") ? createButton({
-            html: '<i class="bi bi-x"></i>',
-            class: "btn btn-outline-secondary btn-sm",
-            confirm: "Are you sure you want to remove this role?"
-        }, DS.setRole, value.name, "ADMIN", false) : "";
-        let adminCell = $("<td/>").addClass("text-center").append(removeAdminButton);
-        let removeTournamentButton = value.roles.includes("TOURNAMENT_ADMIN") ? createButton({
-            html: '<i class="bi bi-x"></i>',
-            class: "btn btn-outline-secondary btn-sm",
-            confirm: "Are you sure you want to remove this role?"
-        }, DS.setRole, value.name, "TOURNAMENT_ADMIN", false) : "";
-        let tournamentCell = $("<td/>").addClass("text-center").append(removeTournamentButton);
+        function roleCell(role) {
+            let btn = value.roles.includes(role)
+                ? createButton({html: '<i class="bi bi-x"></i>', class: "btn btn-outline-secondary btn-sm", confirm: "Are you sure you want to remove this role?"}, DS.setRole, value.name, role, false)
+                : createButton({html: '<i class="bi bi-plus"></i>', class: "btn btn-outline-secondary btn-sm role-add-btn"}, DS.setRole, value.name, role, true);
+            return $("<td/>").addClass("text-center").append(btn);
+        }
+        let judgeCell = roleCell("JUDGE");
+        let superCell = roleCell("SUPER_USER");
+        let playtestCell = roleCell("PLAYTESTER");
+        let adminCell = roleCell("ADMIN");
+        let tournamentCell = roleCell("TOURNAMENT_ADMIN");
         playerRow.append(nameCell, onlineCell, judgeCell, superCell, playtestCell, adminCell, tournamentCell);
         userRoles.append(playerRow);
     })
@@ -173,26 +386,26 @@ function callbackAdmin(data) {
     let endTurnList = $("#endTurnList");
     adminGameList.empty();
     rollbackGamList.empty();
-    $.each(data.games, function (index, value) {
-        adminGameList.append($("<option/>", {value: value, text: value}));
-        endTurnList.append($("<option/>", {value: value, text: value}));
-        rollbackGamList.append($("<option/>", {value: value, text: value}));
+    $.each(data.games, function (id, name) {
+        adminGameList.append($("<option/>", {value: id, text: name}));
+        endTurnList.append($("<option/>", {value: id, text: name}));
+        rollbackGamList.append($("<option/>", {value: id, text: name}));
     })
     adminChangeGame();
     rollbackChangeGame();
 
     let idleGameList = $("#idleGameList");
     idleGameList.empty();
-    $.each(data.idleGames, function (index, game) {
-        let playerCount = Object.keys(game.idlePlayers).length;
+    $.each(data.idleGames, function (index, gameEntry) {
+        let playerCount = Object.keys(gameEntry.idlePlayers).length;
         let firstPlayerRow = true;
-        $.each(game.idlePlayers, function (key, value) {
+        $.each(gameEntry.idlePlayers, function (key, value) {
             let row = $("<tr/>");
             if (firstPlayerRow) {
-                let nameCell = $("<td/>").attr('rowspan', playerCount).text(game.gameName).on('click', function () {
-                    doNav('g' + game.gameName);
+                let nameCell = $("<td/>").attr('rowspan', playerCount).text(gameEntry.gameName).on('click', function () {
+                    doNav('g' + gameEntry.gameId);
                 });
-                let timestampCell = $("<td/>").attr('rowspan', playerCount).text(moment(game.gameTimestamp).tz("UTC").format("D-MMM-YY HH:mm z"));
+                let timestampCell = $("<td/>").attr('rowspan', playerCount).text(moment(gameEntry.gameTimestamp).tz("UTC").format("D-MMM-YY HH:mm z"));
                 row.append(nameCell, timestampCell);
             }
             let playerCell = $("<td/>").text(key);
@@ -204,7 +417,7 @@ function callbackAdmin(data) {
                     text: "Close",
                     class: "btn btn-outline-secondary btn-sm",
                     confirm: "Are you sure you want to end this game?"
-                }, DS.endGame, game.gameName);
+                }, DS.endGame, gameEntry.gameId);
                 endGameCell.append(endGameButton);
                 row.append(endGameCell);
                 firstPlayerRow = false;
@@ -270,166 +483,298 @@ function addRole() {
     DS.setRole(player, role, true, {callback:processData});
 }
 
+// Lobby state
+let _lobbyGames = [];
+let _lobbyCurrentGame = null;
+let _lobbyPlayers = [];
+let _lobbyDecks = [];
+
 function callbackLobby(data) {
-    let currentGames = $("#currentGames");
-    let publicGames = $("#publicGames");
-    let myGameList = $("#myGameList");
-    let playerList = $("#playerList");
-    let invitedGames = $("#invitedGames");
-    let createGameFormat = $("#gameFormat");
+    _lobbyGames = data.games || [];
+    _lobbyPlayers = data.players || [];
+    _lobbyDecks = data.decks || [];
 
-    createGameFormat.empty();
+    // Populate format dropdown in create panel
+    let createFormat = $("#lobbyGameFormat");
+    createFormat.empty();
     $.each(data.gameFormats, function (index, value) {
-        createGameFormat.append($("<option/>", {value: value, text: value}));
-    })
+        createFormat.append($("<option/>", {value: value, text: value}));
+    });
 
-    playerList.autocomplete({
-        source: data.players,
+    // Player autocomplete for both create and detail invite inputs
+    $("#lobbyInviteInput, #lobbyDetailInviteInput").autocomplete({
+        source: _lobbyPlayers,
         change: function (event, ui) {
-            if (ui.item === null) {
-                $(this).val((ui.item ? ui.item.id : ""));
-            }
+            if (ui.item === null) $(this).val("");
         }
     });
 
-    currentGames.empty();
-    myGameList.empty();
-    $.each(data.myGames, function (index, game) {
-        myGameList.append(new Option(game.name, game.name));
-        let gameItem = $("<li/>").addClass("list-group-item");
-        let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
-        let gameName = $("<h6/>").addClass("d-inline text-break").text(game.name);
-        let startButton = game.gameStatus === 'Inviting' ? createButton({
-            text: "Start",
-            class: "btn btn-outline-secondary btn-sm",
-            confirm: "Start Game?"
-        }, DS.startGame, game.name) : "";
-        let endButton = createButton({
-            text: "Close",
-            class: "btn btn-outline-secondary btn-sm",
-            confirm: "End Game?"
-        }, DS.endGame, game.name);
-        let buttonWrapper = $("<span/>").addClass("d-flex justify-content-between align-items-center gap-1");
-        let playerTable = $("<table/>").addClass("table table-bordered table-sm table-hover mt-2");
-        let tableBody = $("<tbody/>");
-        buttonWrapper.append(startButton, endButton);
-        playerTable.append(tableBody);
-        gameHeader.append(gameName, buttonWrapper);
-        gameItem.append(gameHeader, playerTable);
-        currentGames.append(gameItem);
-        $.each(game.registrations, function (i, registration) {
-            let registrationRow = $("<tr/>");
-            let playerCell = $("<td/>").addClass("w-25").text(registration.player);
-            registrationRow.append(playerCell);
-            let summary = $("<td/>").addClass("w-25 text-center")
-            if (registration.registered) {
-                summary.append(`<i class="bi bi-check-circle text-success fs-6"></i>`);
-            }
-            registrationRow.append(summary);
-            tableBody.append(registrationRow);
-        });
-    });
+    // Render unified game list
+    let list = $("#lobbyGameList").empty();
+    $.each(_lobbyGames, function (index, game) {
+        let visClass = game.visibility === "PUBLIC" ? "bg-success-subtle text-success-emphasis border border-success-subtle"
+                                                    : "bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle";
+        let relLabel = {OWNER: "Owner", REGISTERED: "Registered", INVITED: "Invited", OPEN: "Open"}[game.playerRelationship] || "";
+        let relClass = {
+            OWNER: "text-primary", REGISTERED: "text-success", INVITED: "text-warning-emphasis", OPEN: "text-muted"
+        }[game.playerRelationship] || "text-muted";
 
-    publicGames.empty();
-    $.each(data.publicGames, function (index, game) {
-        let created = moment(game.timestamp).tz("UTC");
-        let expiry = created.add(5, 'days');
-        let joinButton = createButton({
-            class: "btn btn-outline-secondary btn-sm",
-            text: "Join"
-        }, DS.invitePlayer, game.name, player);
+        let registeredCount = game.registrations.filter(r => r.registered).length;
+        let totalCount = game.registrations.length;
+        let playerCount = totalCount > 0 ? `${registeredCount}/${totalCount} <i class="bi bi-person"></i>` : "";
+        let countdown = game.visibility === "PUBLIC"
+            ? `<small class="text-muted">closes ${moment().to(moment(game.created).add(5, 'days'))}</small>`
+            : "";
 
-        let leaveButton = createButton({
-            class: "btn btn-outline-secondary btn-sm",
-            text: "Leave",
-            confirm: "Leave Game?"
-        }, DS.unInvitePlayer, game.name, player);
-
-        let playerInGame = false;
-
-        let template = $(`
-        <li class='list-group-item'>
-            <div class="d-flex justify-content-between align-items-center">
-                <span>
+        let item = $(`
+            <a href="#" class="list-group-item list-group-item-action px-3 py-2">
+                <div class="d-flex justify-content-between align-items-start">
+                    <span class="fw-semibold text-break me-2">${game.name}</span>
+                    <span class="badge ${visClass} text-nowrap">${game.visibility}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-1">
                     <span class="badge bg-secondary">${game.format}</span>
-                    <h6 class="mx-2 d-inline text-break">${game.name}</h6>
-                </span>
-                <span class="d-flex justify-content-between align-items-center gap-1 game-join">
-                    <span>Closes ${moment().to(expiry)}</span>
-                </span>
-            </div>
-        </li>
-        `);
-        publicGames.append(template);
-        if (game.registrations.length > 0) {
-            let playerTable = $("<table/>").addClass("table table-bordered table-sm table-hover mt-2");
-            let tableBody = $("<tbody/>");
-            playerTable.append(tableBody);
-            template.append(playerTable);
-            $.each(game.registrations, function (i, registration) {
-                let registrationRow = $("<tr/>");
-                let playerCell = $("<td/>").addClass("w-50").text(registration.player);
-                if (registration.player === player) {
-                    playerInGame = true;
-                }
-                registrationRow.append(playerCell);
-                let summary = $("<td/>").addClass("w-50 text-center")
-                if (registration.registered) {
-                    summary.append(`<i class="bi bi-check-circle text-success fs-6"></i>`);
-                }
-                registrationRow.append(summary);
-                tableBody.append(registrationRow);
-            });
-        }
-        template.find('.game-join').append(playerInGame ? leaveButton : joinButton);
-    })
-
-    invitedGames.empty();
-    $.each(data.invitedGames, function (index, game) {
-        let template = `
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div class="flex-grow-1 p-2 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-2 text-break">${game.gameName}</h5>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="badge bg-secondary me-1">${game.format}</span>
-                        </div>
-                    </div>
-                    <span class="">${game.deckName || ''}</span>
+                    <small class="${relClass}">${relLabel}</small>
                 </div>
-                <div>
-                    <div class="d-inline">
-                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" >
-                            Choose Deck
-                        </button>
-                        <div id="chooseDeckDropdown">
-                            <ul class="dropdown-menu dropdown-menu-end invite-${game.format}" data-name="${game.gameName}">
-                                <input class="form-control" id="searchDeckInput" type="text" placeholder="Search.." onkeyup="filterChooseDeck()">
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        invitedGames.append(template);
+                ${countdown || playerCount ? `<div class="d-flex justify-content-between align-items-center mt-1">
+                    <span class="small text-muted">${playerCount}</span>
+                    ${countdown}
+                </div>` : ""}
+            </a>
+        `).on('click', function (e) {
+            e.preventDefault();
+            selectLobbyGame(game);
+        });
+        list.append(item);
     });
 
-    $.each(data.decks, function (index, deck) {
-        $.each(deck.gameFormats, function (i, format) {
-            let dropDown = $(`ul .invite-${format}`);
-            let template = $(`<li><a class="dropdown-item">${deck.name}</a></li>`).on('click', function () {
-                registerDeck(this, deck.name);
-            });
-            dropDown.append(template);
-        })
-    })
-
-    // Registration Result
-    let registerResult = $("#registerResult");
-    registerResult.empty();
-    if (data.message) {
-        registerResult.text(data.message).addClass("badge text-bg-light");
+    // If a game was selected before refresh, re-select it by name to update detail panel
+    if (_lobbyCurrentGame) {
+        let refreshed = _lobbyGames.find(g => g.name === _lobbyCurrentGame.name);
+        if (refreshed) {
+            selectLobbyGame(refreshed);
+        }
     }
+
+    if (data.message) {
+        let msg = $("#lobbyDetailMsg");
+        msg.text(data.message).removeClass("d-none");
+        setTimeout(() => msg.addClass("d-none"), 4000);
+    }
+}
+
+function newLobbyGame() {
+    _lobbyCurrentGame = null;
+    $("#lobbyGameName").val("");
+    $("#lobbyPendingInvites").empty();
+    $("#lobbyCreateError").text("");
+    toggleLobbyInviteSection();
+    $("#lobbyCreateCol").removeClass("d-none");
+    $("#lobbyDetailCol").addClass("d-none");
+    $("#lobbyEmptyCol").addClass("d-none");
+}
+
+function toggleLobbyInviteSection() {
+    let isPrivate = $("#lobbyPublicFlag").val() === "PRIVATE";
+    $("#lobbyInviteSection").toggleClass("d-none", !isPrivate);
+}
+
+function addLobbyPendingInvite() {
+    let name = $("#lobbyInviteInput").val().trim();
+    if (!name) return;
+    let existing = $("#lobbyPendingInvites li").map(function() { return $(this).data("player"); }).get();
+    if (existing.includes(name)) return;
+    let item = $(`<li class="list-group-item d-flex justify-content-between align-items-center py-1 px-2">
+        <span>${name}</span>
+        <button type="button" class="btn-close btn-sm" aria-label="Remove"></button>
+    </li>`).data("player", name);
+    item.find(".btn-close").on("click", function() { item.remove(); });
+    $("#lobbyPendingInvites").append(item);
+    $("#lobbyInviteInput").val("").autocomplete("close");
+}
+
+function doCreateLobbyGame() {
+    let gameName = $("#lobbyGameName").val().trim();
+    let publicFlag = $("#lobbyPublicFlag").val();
+    let format = $("#lobbyGameFormat").val();
+    if (!gameName) { $("#lobbyCreateError").text("Name is required."); return; }
+    if (gameName.indexOf("'") > -1 || gameName.indexOf('"') > -1) {
+        $("#lobbyCreateError").text("Name cannot contain ' or \" characters.");
+        return;
+    }
+    let pendingInvites = $("#lobbyPendingInvites li").map(function() { return $(this).data("player"); }).get();
+    DS.createGame(gameName, publicFlag, format, {
+        callback: function(data) {
+            processData(data);
+            let newGame = (_lobbyGames || []).find(g => g.name === gameName);
+            if (newGame) {
+                selectLobbyGame(newGame);
+                // Fire invites sequentially for private games
+                if (publicFlag === "PRIVATE") {
+                    pendingInvites.forEach(function(p) {
+                        DS.invitePlayer(gameName, p, {callback: processData, errorHandler: errorhandler});
+                    });
+                }
+            }
+        },
+        errorHandler: errorhandler
+    });
+    $("#lobbyGameName").val("");
+    $("#lobbyPendingInvites").empty();
+}
+
+function selectLobbyGame(game) {
+    _lobbyCurrentGame = game;
+
+    // Header
+    $("#lobbyDetailName").text(game.name);
+    $("#lobbyDetailFormatBadge").text(game.format);
+    let visEl = $("#lobbyDetailVisibilityBadge");
+    if (game.visibility === "PUBLIC") {
+        visEl.text("Public").removeClass("bg-secondary").addClass("bg-success");
+    } else {
+        visEl.text("Private").removeClass("bg-success").addClass("bg-secondary");
+    }
+
+    // Action buttons — all hidden first
+    $("#lobbyDetailStartBtn, #lobbyDetailCloseBtn, #lobbyDetailJoinBtn, #lobbyDetailLeaveBtn").addClass("d-none");
+    if (game.playerRelationship === "OWNER") {
+        if (game.gameStatus === "Inviting") $("#lobbyDetailStartBtn").removeClass("d-none");
+        $("#lobbyDetailCloseBtn").removeClass("d-none");
+    } else if (game.playerRelationship === "OPEN") {
+        $("#lobbyDetailJoinBtn").removeClass("d-none");
+    } else if (game.playerRelationship === "REGISTERED" || game.playerRelationship === "INVITED") {
+        $("#lobbyDetailLeaveBtn").removeClass("d-none");
+    }
+
+    // Player table
+    let tbody = $("#lobbyDetailPlayerBody").empty();
+    $.each(game.registrations, function (i, reg) {
+        let statusIcon = reg.registered
+            ? `<i class="bi bi-check-circle text-success"></i>`
+            : `<i class="bi bi-hourglass text-muted"></i>`;
+        let removeBtn = "";
+        if (game.playerRelationship === "OWNER") {
+            removeBtn = `<button class="btn btn-sm btn-outline-danger py-0 px-1 remove-invite-btn" data-player="${reg.player}"><i class="bi bi-x"></i></button>`;
+        }
+        let row = $(`<tr>
+            <td>${reg.player}</td>
+            <td class="text-center">${statusIcon}</td>
+            <td class="text-end">${removeBtn}</td>
+        </tr>`);
+        row.find(".remove-invite-btn").on("click", function() {
+            let p = $(this).data("player");
+            DS.unInvitePlayer(_lobbyCurrentGame.name, p, {callback: processData, errorHandler: errorhandler});
+        });
+        tbody.append(row);
+    });
+
+    // Invite section (owner only)
+    let inviteSection = $("#lobbyDetailInviteSection");
+    if (game.playerRelationship === "OWNER") {
+        inviteSection.removeClass("d-none");
+        $("#lobbyDetailInviteInput").val("").autocomplete({
+            source: _lobbyPlayers,
+            change: function(e, ui) { if (!ui.item) $(this).val(""); }
+        });
+    } else {
+        inviteSection.addClass("d-none");
+    }
+
+    // Deck registration section: show when the current player is in the registrations list
+    // (covers INVITED/REGISTERED relationships, and also owners who invited themselves)
+    let playerInRegistrations = game.registrations.some(r => r.player === player);
+    let deckSection = $("#lobbyDetailDeckSection");
+    if (playerInRegistrations) {
+        deckSection.removeClass("d-none");
+        let myReg = game.registrations.find(r => r.player === player);
+        let registeredName = myReg && myReg.deckName ? myReg.deckName : null;
+        $("#lobbyRegisteredDeckName").text(registeredName || "");
+
+        // Populate deck dropdown filtered by game format
+        let dropdown = $("#lobbyDeckDropdown");
+        // Remove previous deck items (keep search input)
+        dropdown.find("li:not(:first-child)").remove();
+        $.each(_lobbyDecks, function(i, deck) {
+            if (deck.gameFormats && deck.gameFormats.includes(game.format)) {
+                let li = $(`<li><a class="dropdown-item" href="#">${deck.name}</a></li>`);
+                li.find("a").on("click", function(e) {
+                    e.preventDefault();
+                    DS.registerDeck(_lobbyCurrentGame.name, deck.name, {callback: processData, errorHandler: errorhandler});
+                });
+                dropdown.append(li);
+            }
+        });
+
+        // Show deck preview if registered
+        if (registeredName) {
+            DS.loadDeck(registeredName, {
+                callback: function(deckData) {
+                    if (deckData && deckData.selectedDeck) {
+                        renderDeck(deckData.selectedDeck.deck, "#lobbyDeckPreview");
+                        addCardTooltips("#lobbyDeckPreview");
+                        $("#lobbyDeckPreviewSection").removeClass("d-none");
+                    }
+                },
+                errorHandler: function() {}
+            });
+        } else {
+            $("#lobbyDeckPreviewSection").addClass("d-none");
+            $("#lobbyDeckPreview").empty();
+        }
+    } else {
+        deckSection.addClass("d-none");
+        $("#lobbyDeckPreviewSection").addClass("d-none");
+        $("#lobbyDeckPreview").empty();
+    }
+
+    $("#lobbyDetailMsg").addClass("d-none");
+    $("#lobbyDetailCol").removeClass("d-none");
+    $("#lobbyCreateCol").addClass("d-none");
+    $("#lobbyEmptyCol").addClass("d-none");
+}
+
+function exitLobbyDetail() {
+    _lobbyCurrentGame = null;
+    $("#lobbyDetailCol").addClass("d-none");
+    $("#lobbyCreateCol").addClass("d-none");
+    $("#lobbyEmptyCol").removeClass("d-none");
+}
+
+function filterLobbyDeckList() {
+    let filter = $("#lobbyDeckSearch").val().toUpperCase();
+    $("#lobbyDeckDropdown li:not(:first-child) a").each(function() {
+        let txt = $(this).text().toUpperCase();
+        $(this).closest("li").toggle(txt.includes(filter));
+    });
+}
+
+function startLobbyGame() {
+    if (!_lobbyCurrentGame || !confirm("Start Game?")) return;
+    DS.startGame(_lobbyCurrentGame.name, {callback: processData, errorHandler: errorhandler});
+}
+
+function closeLobbyGame() {
+    if (!_lobbyCurrentGame || !confirm("Close Game?")) return;
+    DS.endGame(_lobbyCurrentGame.gameId, {callback: processData, errorHandler: errorhandler});
+}
+
+function joinLobbyGame() {
+    if (!_lobbyCurrentGame) return;
+    DS.invitePlayer(_lobbyCurrentGame.name, player, {callback: processData, errorHandler: errorhandler});
+}
+
+function leaveLobbyGame() {
+    if (!_lobbyCurrentGame || !confirm("Leave Game?")) return;
+    DS.unInvitePlayer(_lobbyCurrentGame.name, player, {callback: processData, errorHandler: errorhandler});
+}
+
+function inviteLobbyPlayer() {
+    if (!_lobbyCurrentGame) return;
+    let p = $("#lobbyDetailInviteInput").val().trim();
+    if (!p) return;
+    DS.invitePlayer(_lobbyCurrentGame.name, p, {callback: processData, errorHandler: errorhandler});
+    $("#lobbyDetailInviteInput").val("");
 }
 
 function createTournament() {
@@ -453,17 +798,54 @@ function createTournament() {
     let numOfRounds = $("#numOfRounds");
     let reqId = $("#reqId");
     //create tournament
-    DS.createTournament(tourName.val(), regStart.val(), regEnd.val(), playStart.val(), playEnd.val(), tourFormat.val(), gameFormat.val(), rules, specRulesCon.val(), specRules, numOfRounds.val(), reqId.val(),
-        {callback: callbackCreateTournament, errorHandler: errorhandler});
+    let name = tourName.val();
+    let originalName = $("#originalTourName").val();
+    DS.createTournament(name, regStart.val(), regEnd.val(), playStart.val(), playEnd.val(), tourFormat.val(), gameFormat.val(), rules, specRulesCon.val(), specRules, numOfRounds.val(), reqId.val(), originalName,
+        {callback: function(success) { callbackCreateTournament(success, name, originalName); }, errorHandler: errorhandler});
 }
 
-function callbackCreateTournament(success) {
+function callbackCreateTournament(success, name, originalName) {
     let msg = $("#tourMsg");
     if(success) {
-        resetForm();
-        msg.text("Tournament created successfully").addClass("text-success").removeClass("text-warning");
+        let regEnd = $("#regEnd").val();
+        let playStart = $("#playStart").val();
+        let playEnd = $("#playEnd").val();
+        let isRename = originalName && originalName !== name;
+        if (isRename) {
+            // Update the existing list item instead of adding a duplicate
+            let item = $('#tournamentAdminList .tournament-admin-entry[data-name="' + originalName + '"]');
+            item.attr('data-name', name).find('span:first').text(name);
+            let opt = $('#nameOfTournament option[value="' + originalName + '"]');
+            opt.val(name).text(name);
+        } else {
+            addTournamentToAdminList(name, "EDIT", regEnd, playStart, playEnd);
+        }
+        $("#originalTourName").val(name);
+        msg.text("Tournament saved").addClass("text-success").removeClass("text-warning");
+        loadTournamentDetails(name);
     } else {
         msg.text("Tournament creation failed").addClass("text-warning").removeClass("text-success");
+    }
+}
+
+function addTournamentToAdminList(name, status, regEnd, playStart, playEnd) {
+    let badge;
+    if (status === "ACTIVE") badge = $('<span class="badge text-bg-success">Active</span>');
+    else if (status === "STARTING") badge = $('<span class="badge text-bg-secondary">Starting</span>');
+    else badge = $('<span class="badge text-bg-warning">Draft</span>');
+    let item = $('<li class="list-group-item d-flex justify-content-between align-items-center tournament-admin-entry" style="cursor:pointer">')
+        .attr('data-name', name)
+        .attr('data-status', status)
+        .attr('data-reg-end', regEnd || '')
+        .attr('data-play-start', playStart || '')
+        .attr('data-play-end', playEnd || '')
+        .on('click', function() { tournamentAdminClick(this); })
+        .append($('<span>').text(name))
+        .append(badge);
+    $('#tournamentAdminList').prepend(item);
+    // Keep hidden select in sync so existing callbacks continue to work
+    if ($('#nameOfTournament option[value="' + name + '"]').length === 0) {
+        $('#nameOfTournament').append($('<option>').val(name).text(name));
     }
 }
 
@@ -489,20 +871,25 @@ function resetForm() {
     specRulesDiv.empty();
 }
 
-function loadTournamentDetails() {
-    let nameOfTournament = $("#tourNameSelect option:selected").text();
-    DS.loadTournamentDetails(nameOfTournament, {callback: callbackLoadTournamentDetails, errorHandler: errorhandler});
+function loadTournamentDetails(name) {
+    DS.loadTournamentDetails(name, {callback: callbackLoadTournamentDetails, errorHandler: errorhandler});
 }
 
 function closeTournament() {
     let nameOfTournament = $("#nameOfTournament").val();
-    DS.closeTournament(nameOfTournament);
+    DS.closeTournament(nameOfTournament, {callback: processData, errorHandler: errorhandler});
 }
 
-function loadTournament() {
-    let nameOfTournament = $("#nameOfTournament option:selected").text();
-    DS.tournamentAlreadyActive(nameOfTournament, {callback: callbackStatusTournament, errorHandler: errorhandler});
+function loadTournament(name) {
+    let sel = $("#nameOfTournament");
+    if (sel.find(`option[value="${name}"]`).length === 0) {
+        sel.append($("<option>").val(name).text(name));
+    }
+    sel.val(name);
+    $("#tourTablesTitle").text(name);
+    DS.tournamentAlreadyActive(name, {callback: callbackStatusTournament, errorHandler: errorhandler});
     resetTournamentManager();
+    enterTourTablesMode();
 }
 
 function callbackStatusTournament(isActive) {
@@ -513,8 +900,13 @@ function callbackStatusTournament(isActive) {
         DS.getFinalPlayers(nameOfTournament, {callback: loadFinalTable, errorHandler: errorhandler})
         showTablesReadOnly(nameOfTournament);
     } else {
-        DS.getTournamentRounds(nameOfTournament, {callback: callbackTournamentRounds, errorHandler: errorhandler});
-        DS.getTournamentPlayers(nameOfTournament, {callback: callbackTableManager, errorHandler: errorhandler});
+        DS.getTournamentRounds(nameOfTournament, {
+            callback: function(rounds) {
+                callbackTournamentRounds(rounds);
+                DS.getAllRegisteredPlayers(nameOfTournament, {callback: callbackTableManager, errorHandler: errorhandler});
+            },
+            errorHandler: errorhandler
+        });
         $("#saveFinal").addClass("d-none");
         $("#setFinalSeating").addClass("d-none");
         $("#saveTables").removeClass("d-none");
@@ -564,6 +956,7 @@ function callbackLoadTournamentDetails(data) {
     let specRulesDiv = $("#specRulesDiv");
 
     tourName.val(data.name);
+    $("#originalTourName").val(data.name);
     regStart.val(data.regStart);
     regEnd.val(data.regEnd);
     playStart.val(data.playStart);
@@ -580,7 +973,12 @@ function callbackLoadTournamentDetails(data) {
     $.each(data.specRules, function(index, rule) {
         addRule(rule, specRulesDiv);
     });
-
+    if (data.status === "EDIT") {
+        $("#publishBtnContainer").show();
+    } else {
+        $("#publishBtnContainer").hide();
+    }
+    enterTourEditMode();
 }
 
 function callbackTournamentRounds(data) {
@@ -637,7 +1035,225 @@ function callbackTableManager(data) {
 }
 
 function callbackTournamentAdmin(data) {
+    let list = $('#tournamentAdminList');
+    list.empty();
+    let sel = $('#nameOfTournament');
+    let current = sel.val();
+    sel.empty();
+    (data.tournaments || []).forEach(function(t) {
+        let badge;
+        if (t.status === 'ACTIVE') badge = $('<span class="badge text-bg-success">Active</span>');
+        else if (t.status === 'STARTING') badge = $('<span class="badge text-bg-secondary">Starting</span>');
+        else badge = $('<span class="badge text-bg-warning">Draft</span>');
+        let item = $('<li class="list-group-item d-flex justify-content-between align-items-center tournament-admin-entry" style="cursor:pointer">')
+            .attr('data-name', t.name)
+            .attr('data-status', t.status)
+            .attr('data-reg-end', t.registrationEndTime || '')
+            .attr('data-play-start', t.startTime || '')
+            .attr('data-play-end', t.endTime || '')
+            .on('click', function() { tournamentAdminClick(this); })
+            .append($('<span>').text(t.name))
+            .append(badge);
+        list.append(item);
+        sel.append($('<option>').val(t.name).text(t.name));
+    });
+    if (current && sel.find(`option[value="${CSS.escape(current)}"]`).length > 0) {
+        sel.val(current);
+    }
+}
 
+function enterTourEditMode() {
+    $("#tourEditCol").removeClass("d-none");
+    $("#tourTablesCol").addClass("d-none");
+}
+
+function enterTourTablesMode() {
+    $("#tourTablesCol").removeClass("d-none");
+    $("#tourEditCol").addClass("d-none");
+}
+
+function exitTourMode() {
+    $("#tourEditCol").addClass("d-none");
+    $("#tourTablesCol").addClass("d-none");
+}
+
+function newTournament() {
+    resetForm();
+    $("#originalTourName").val("");
+    $("#tourMsg").text("").removeClass("text-success text-warning");
+    $("#publishBtnContainer").hide();
+    enterTourEditMode();
+}
+
+function tournamentAdminClick(el) {
+    let name = $(el).data("name");
+    let status = $(el).data("status");
+    let regEnd = new Date($(el).data("reg-end"));
+    let playEnd = new Date($(el).data("play-end"));
+    let now = new Date();
+
+    if (status === "EDIT") {
+        loadTournamentDetails(name);
+    } else if (status === "STARTING") {
+        if (now > regEnd) {
+            loadTournament(name);
+        } else {
+            loadTournamentDetails(name);
+        }
+    } else if (status === "ACTIVE") {
+        if (now <= playEnd) {
+            loadTournamentReadOnly(name);
+        } else {
+            loadFinalsAdmin(name);
+        }
+    }
+}
+
+function publishTournament() {
+    let name = $("#tourName").val();
+    if (!name) return;
+    if (!confirm("Publish \"" + name + "\"? Players will be able to see and register for this tournament.")) return;
+    DS.publishTournament(name, {
+        callback: function(success) {
+            if (success) {
+                $("#tourMsg").text("Tournament published").addClass("text-success").removeClass("text-warning");
+                $("#publishBtnContainer").hide();
+                let item = $('#tournamentAdminList .tournament-admin-entry[data-name="' + name + '"]');
+                item.attr('data-status', 'STARTING');
+                item.find('.badge').removeClass('text-bg-warning').addClass('text-bg-secondary').text('Starting');
+            } else {
+                $("#tourMsg").text("Publish failed").addClass("text-warning").removeClass("text-success");
+            }
+        },
+        errorHandler: errorhandler
+    });
+}
+
+function loadTournamentReadOnly(name) {
+    let sel = $("#nameOfTournament");
+    if (sel.find(`option[value="${name}"]`).length === 0) {
+        sel.append($("<option>").val(name).text(name));
+    }
+    sel.val(name);
+    $("#tourTablesTitle").text(name);
+    resetTournamentManager();
+    enterTourTablesMode();
+    DS.getRoundSummary(name, {callback: callbackRoundSummaryReadOnly, errorHandler: errorhandler});
+}
+
+function callbackRoundSummaryReadOnly(data) {
+    let tourRounds = $("#tourRounds");
+    tourRounds.empty();
+    let tourName = $("#nameOfTournament").val();
+    $.each(data, function(round, tables) {
+        let label = $("<span/>").addClass("h4").text("Round " + round);
+        let tableList = $("<div/>").addClass("row g-2 mt-1");
+        $.each(tables, function(table, players) {
+            let tableLabel = $("<div/>").addClass("fw-semibold mb-1").text("Table " + table);
+            let playerTable = $("<table/>").addClass("table table-sm table-bordered mb-0");
+            let thead = $("<thead/>").append(
+                $("<tr/>").append(
+                    $("<th/>").text("Player"),
+                    $("<th/>").text("Pool"),
+                    $("<th/>").text("VP"),
+                    $("<th/>").text("GW")
+                )
+            );
+            let tbody = $("<tbody/>");
+            let allDone = players.every(p => p.pool <= 0);
+            $.each(players, function(i, p) {
+                let gwBadge = p.gw ? $("<span/>").addClass("badge text-bg-success").text("GW") : "";
+                tbody.append($("<tr/>").append(
+                    $("<td/>").text(p.name),
+                    $("<td/>").text(p.pool),
+                    $("<td/>").text(p.vp),
+                    $("<td/>").append(gwBadge)
+                ));
+            });
+            playerTable.append(thead, tbody);
+            let cardBody = $("<div/>").addClass("card p-2").append(tableLabel, playerTable);
+            if (allDone) {
+                let closeBtn = $("<button/>")
+                    .addClass("btn btn-sm btn-outline-danger mt-2 w-100")
+                    .text("Close Table")
+                    .on("click", (function(r, t) {
+                        return function() {
+                            if (!confirm("Close table and record VP/GW results?")) return;
+                            DS.closeTableGame(tourName, r, t, {
+                                callback: function(ok) {
+                                    if (ok) DS.getRoundSummary(tourName, {callback: callbackRoundSummaryReadOnly, errorHandler: errorhandler});
+                                    else alert("Could not close table — game may already be closed.");
+                                },
+                                errorHandler: errorhandler
+                            });
+                        };
+                    })(round, table));
+                cardBody.append(closeBtn);
+            }
+            let col = $("<div/>").addClass("col-lg-3 col-md-4 col-6").append(cardBody);
+            tableList.append(col);
+        });
+        tourRounds.append($("<div/>").addClass("mb-3").append(label, tableList));
+    });
+}
+
+function loadFinalsAdmin(name) {
+    let sel = $("#nameOfTournament");
+    if (sel.find(`option[value="${name}"]`).length === 0) {
+        sel.append($("<option>").val(name).text(name));
+    }
+    sel.val(name);
+    $("#tourTablesTitle").text(name);
+    resetTournamentManager();
+    enterTourTablesMode();
+    DS.loadFinalSeeding(name, {
+        callback: function(seeding) {
+            if (seeding && seeding.length > 0) {
+                DS.getFinalPlayers(name, {callback: loadFinalTable, errorHandler: errorhandler});
+                DS.gameAlreadyStarted(name, {callback: callbackSaveButton, errorHandler: errorhandler});
+                $("#saveFinal").removeClass("d-none");
+            } else {
+                showFinalistSelection(name);
+            }
+        },
+        errorHandler: errorhandler
+    });
+}
+
+function showFinalistSelection(tourName) {
+    DS.getStandings(tourName, {
+        callback: function(standings) {
+            let tourRounds = $("#tourRounds");
+            tourRounds.empty();
+            let heading = $("<p/>").addClass("mb-2").text("Select 5 players for the finals:");
+            let playerList = $("<div/>").attr("id", "finalistCheckboxes").addClass("mb-3");
+            $.each(standings, function(i, s) {
+                let id = "finalist-" + i;
+                let labelText = s.rank + ". " + s.player
+                    + (s.vekn ? " (" + s.vekn + ")" : "")
+                    + " — " + s.gw + " GW, " + s.vp + " VP";
+                let row = $("<div/>").addClass("form-check")
+                    .append($("<input/>").addClass("form-check-input finalist-check").attr({type:"checkbox", id, value: s.player}))
+                    .append($("<label/>").addClass("form-check-label").attr("for", id).text(labelText));
+                playerList.append(row);
+            });
+            let saveBtn = $("<button/>").addClass("btn btn-success btn-sm").text("Save Finals Selection")
+                .on("click", function() {
+                    let selected = [];
+                    $(".finalist-check:checked").each(function() { selected.push($(this).val()); });
+                    if (selected.length !== 5) {
+                        alert("Please select exactly 5 players for the finals.");
+                        return;
+                    }
+                    DS.saveFinal(tourName, selected, {
+                        callback: function() { loadFinalsAdmin(tourName); },
+                        errorHandler: errorhandler
+                    });
+                });
+            tourRounds.append(heading, playerList, saveBtn);
+        },
+        errorHandler: errorhandler
+    });
 }
 
 function createTable(round) {
@@ -704,9 +1320,10 @@ function saveTables() {
                 rounds[round][tableNumber] = players;
             }
         });
-        DS.saveTables(tournamentSelected, rounds);
+        DS.saveTables(tournamentSelected, rounds, {callback: processData, errorHandler: errorhandler});
         resetTournamentManager();
     }
+}
 
 function importTables() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
@@ -734,19 +1351,19 @@ function importTables() {
     });
 }
 
-}
-
 function resetTournamentManager() {
     //reset
     let tourRounds = $("#tourRounds");
     tourRounds.empty();
     $("#saveTables").addClass("d-none");
     $("#saveFinal").addClass("d-none");
+    $("#finalStartedMsg").addClass("d-none");
+    $("#tourFinal").addClass("d-none");
 }
 
 function downloadCurrentTables() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
-    DS.getRoundsForTournamentCsv(tournamentSelected, {callback: createCsvDownloadLink, errorHandler: errorhandler});
+    DS.getRoundsForTournamentCsv(tournamentSelected, {callback: (data) => createCsvDownloadLink(data, 'rounds.csv'), errorHandler: errorhandler});
 }
 function showCurrentTables() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
@@ -830,10 +1447,10 @@ function callbackShowTablesReadOnly(data) {
         $.each(round, function (indexTable, table) {
             let tableLabel = $("<span/>").addClass("h5").text("Table " + indexTable).append($("<br/>"));
             let playerList = $("<ul/>").addClass("border list-group").css("min-height", "38px");
-            $.each(table, function (index, player) {
+            $.each(table, function (index, playerEntry) {
                 let listItem = $("<li/>").addClass("border rounded p-2 border-secondary");
-                DS.getVekn(player.name, {callback: function(veknId) {
-                    let nameSpan = $("<span/>").text(player.name);
+                DS.getVekn(playerEntry.name, {callback: function(veknId) {
+                    let nameSpan = $("<span/>").text(playerEntry.name);
                     let veknSpan = $("<span/>").addClass("fw-bold ms-2").text(veknId);
                     listItem.append(nameSpan, veknSpan);
                 }, errorHandler: errorhandler});
@@ -877,20 +1494,21 @@ function callbackShowPlayers(data) {
                 .append(playerDiv)
                 .append("<i class='bi bi-grip-vertical'></i>");
             listItem.disableSelection();
-            players.append(playerIcon).append(listItem);
+            players.append(listItem);
         })
     });
 }
 
-function createCsvDownloadLink(data) {
-    let blob = new Blob([data], { type: 'text/csv' });
-    let url = URL.createObjectURL(blob);
-    let a = document.createElement('a');
+function createCsvDownloadLink(data, filename = 'export.csv') {
+    const blob = new Blob([data], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
     a.href = url;
-    a.download = 'rounds.csv';
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     a.remove();
+    URL.revokeObjectURL(url);
 }
 
 function callbackFinal(data) {
@@ -917,7 +1535,7 @@ function callbackFinal(data) {
 
 function callbackSaveButton(isStarted) {
     if(isStarted) {
-        $("#setFinalSeating").removeClass("d-none");
+        $("#finalStartedMsg").removeClass("d-none");
     } else {
         $("#saveFinal").removeClass("d-none");
     }
@@ -942,9 +1560,15 @@ function filterChooseDeck() {
 function createTournamentTables() {
     if (confirm("Are you sure you want to create the Tournament Tables?")) {
         let tournamentSelected = $("#nameOfTournament option:selected").text();
-        DS.createTournamentTables(tournamentSelected);
-        //reset Tournament Manager
-        resetTournamentManager();
+        DS.createTournamentTables(tournamentSelected, {
+            callback: function() {
+                let item = $('#tournamentAdminList .tournament-admin-entry[data-name="' + tournamentSelected + '"]');
+                item.attr('data-status', 'ACTIVE');
+                item.find('.badge').removeClass('text-bg-secondary').addClass('text-bg-success').text('Active');
+                resetTournamentManager();
+            },
+            errorHandler: errorhandler
+        });
     }
 }
 
@@ -987,99 +1611,144 @@ function callbackFinalSeeding(data) {
     activTournaments.append(card);
 }
 
+let _tournamentData = null;
+
 function callbackTournament(data) {
-    let tournaments = $("#openTournaments");
-    tournaments.empty();
+    _tournamentData = data;
+    let list = $("#playerTournamentList");
+    list.empty();
+    $("#openTourDetail").addClass("d-none");
+    $("#finalsTourDetail").addClass("d-none");
 
     $.each(data.tournaments, function(index, tournament) {
         let registrationEnds = moment(tournament.registrationEndTime).tz("UTC");
-        let rules = $("<ul/>");
-        $.each(tournament.rules, function(i, r) {
-            rules.append($("<li/>").text(r));
-        })
-        let specialRules = $("<ul/>");
-        $.each(tournament.specialRules, function(i, r) {
-            specialRules.append($("<li/>").text(r));
-        })
-        let joinButton = createButton({
-            class: "btn btn-outline-secondary btn-sm",
-            text: "Join"
-        }, DS.joinTournament, tournament.name);
-
-        let leaveButton = createButton({
-            class: "btn btn-outline-secondary btn-sm",
-            text: "Leave",
-            confirm: "Leave Tournament?"
-        }, DS.leaveTournament, tournament.name);
-
-        let template = $(`
-        <li class='list-group-item'>
-            <div class="d-flex justify-content-between align-items-center">
-                <span class="d-flex justify-content-between align-items-center">
-                    <span class="badge bg-secondary">${tournament.deckFormat}</span>
-                    <span class="mx-2 d-inline fs-5">${tournament.name} - <small>${tournament.playerCount} registered</small></span>
-                </span>
-                <span class="d-flex justify-content-between align-items-center gap-1 game-join">
-                    <span>Closes ${moment().to(registrationEnds)}</span>
-                </span>
-            </div>
-            <div class="p-2">
-                <strong>Rules</strong>
-                ${rules.prop('outerHTML')}
-            </div>
-            <div class="p-2">
-                <strong>Special Rules:</strong> ${tournament.conditions || 'none'}
-                ${specialRules.prop('outerHTML')}
-            </div>
-        </li>
-        `);
-        if (data.veknLinked) {
-            template.find('.game-join').append(tournament.registered ? leaveButton : joinButton);
-        } else {
-            template.find('.game-join').append("<span class='badge bg-warning-subtle text-black'>Requires VEKN #</span>");
-        }
-        tournaments.append(template);
-
-        let invitedGames = $("#registeredTournaments");
-        invitedGames.empty();
-        $.each(data.registeredGames, function (index, game) {
-            let template = `
-            <div class="list-group-item">
-                <div class="d-flex justify-content-between align-items-center border-bottom mb-2">
-                    <div class="flex-grow-1 p-2 d-flex justify-content-between align-items-center">
-                        <span class="d-flex justify-content-between align-items-center">
-                            <span class="badge bg-secondary">${game.format}</span>
-                            <span class="mx-2 d-inline fs-5">${game.name}</span>
-                        </span>
-                    </div>
-                    <div class="d-inline">
-                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" >
-                            Choose Deck
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end tournament-invite-${game.format}" data-name="${game.name}">
-                        </ul>
-                    </div>
-                </div>
-                <div id="tournamentDeck"/>
-            </div>
-        `;
-            invitedGames.append(template);
-            if (game.deck) {
-                renderDeck(game.deck, "#tournamentDeck");
-            }
-            addCardTooltips("#tournamentDeck");
-        });
-
-        $.each(data.decks, function (index, deck) {
-            $.each(deck.gameFormats, function (i, format) {
-                let dropDown = $(`ul .tournament-invite-${format}`);
-                let template = $(`<li><a class="dropdown-item">${deck.name}</a></li>`).on('click', function () {
-                    registerForTournament(this, deck.name);
-                });
-                dropDown.append(template);
-            })
-        })
+        let badge = tournament.registered
+            ? $("<span class='badge text-bg-success ms-2'>Registered</span>")
+            : $("<span class='badge text-bg-secondary ms-2'>Open</span>");
+        let item = $("<li/>")
+            .addClass("list-group-item list-group-item-action d-flex justify-content-between align-items-center")
+            .css("cursor", "pointer")
+            .attr("data-type", "open")
+            .attr("data-name", tournament.name)
+            .append(
+                $("<span/>").addClass("d-flex align-items-center")
+                    .append($("<span/>").addClass("badge bg-secondary me-2").text(tournament.deckFormat))
+                    .append($("<span/>").text(tournament.name))
+                    .append(badge)
+            )
+            .append($("<small/>").addClass("text-muted").text("Closes " + moment().to(registrationEnds)))
+            .on("click", function() { showOpenTournamentDetail(tournament, data); });
+        list.append(item);
     });
+
+    $.each(data.finalsInvites, function(index, tournament) {
+        let item = $("<li/>")
+            .addClass("list-group-item list-group-item-action d-flex justify-content-between align-items-center")
+            .css("cursor", "pointer")
+            .attr("data-type", "finals")
+            .attr("data-name", tournament.name)
+            .append(
+                $("<span/>").addClass("d-flex align-items-center")
+                    .append($("<span/>").addClass("badge text-bg-danger me-2").text("Finals"))
+                    .append($("<span/>").text(tournament.name))
+            )
+            .on("click", function() { showFinalsTournamentDetail(tournament); });
+        list.append(item);
+    });
+
+    if (list.children().length === 0) {
+        list.append($("<li/>").addClass("list-group-item text-muted small").text("No tournaments available."));
+    }
+}
+
+function showOpenTournamentDetail(tournament, data) {
+    $("#finalsTourDetail").addClass("d-none");
+    $("#playerTournamentList .list-group-item").removeClass("active");
+    $(`#playerTournamentList [data-name="${tournament.name}"][data-type="open"]`).addClass("active");
+
+    $("#openTourName").text(tournament.name);
+
+    // Join / Leave button
+    let joinBtn = $("#openTourJoinBtn").empty();
+    if (data.veknLinked) {
+        if (tournament.registered) {
+            joinBtn.append(createButton({class: "btn btn-outline-secondary btn-sm", text: "Leave", confirm: "Leave Tournament?"}, DS.leaveTournament, tournament.name));
+        } else {
+            joinBtn.append(createButton({class: "btn btn-outline-secondary btn-sm", text: "Join"}, DS.joinTournament, tournament.name));
+        }
+    } else {
+        joinBtn.append("<span class='badge bg-warning-subtle text-black'>Requires VEKN #</span>");
+    }
+
+    // Rules
+    let rulesDiv = $("#openTourRules").empty();
+    let registrationEnds = moment(tournament.registrationEndTime).tz("UTC");
+    rulesDiv.append($("<p/>").addClass("text-muted small mb-1").text("Registration closes " + moment().to(registrationEnds)));
+    if (tournament.rules && tournament.rules.length) {
+        let ul = $("<ul/>");
+        $.each(tournament.rules, function(i, r) { ul.append($("<li/>").text(r)); });
+        rulesDiv.append($("<strong/>").text("Rules"), ul);
+    }
+    if (tournament.conditions) {
+        let specUl = $("<ul/>");
+        $.each(tournament.specialRules || [], function(i, r) { specUl.append($("<li/>").text(r)); });
+        rulesDiv.append($("<strong/>").text("Special Rules: "), $("<span/>").text(tournament.conditions), specUl);
+    }
+
+    // Deck selection (only if registered)
+    let deckSection = $("#openTourDeckSection");
+    if (tournament.registered) {
+        deckSection.removeClass("d-none");
+        let reg = (data.registeredGames || []).find(g => g.name === tournament.name);
+        let format = reg ? reg.format : tournament.deckFormat;
+        $("#openTourDeckLabel").text(reg && reg.deck ? "Current deck: " + reg.deck.name : "No deck selected");
+
+        let dropdownDiv = $("#openTourDeckDropdown").empty();
+        let toggleBtn = $("<button/>")
+            .addClass("btn btn-outline-secondary btn-sm dropdown-toggle")
+            .attr({type: "button", "data-bs-toggle": "dropdown", "aria-expanded": "false", "data-bs-auto-close": "outside"})
+            .text("Choose Deck");
+        let dropdownMenu = $("<ul/>").addClass("dropdown-menu dropdown-menu-end").attr("data-name", tournament.name);
+        $.each(data.decks || [], function(i, deck) {
+            if (deck.gameFormats && deck.gameFormats.includes(format)) {
+                dropdownMenu.append(
+                    $("<li/>").append(
+                        $("<a/>").addClass("dropdown-item").text(deck.name).on("click", function() {
+                            DS.registerTournamentDeck(tournament.name, deck.name, {callback: processData, errorHandler: errorhandler});
+                        })
+                    )
+                );
+            }
+        });
+        dropdownDiv.append(toggleBtn, dropdownMenu);
+
+        let deckPreview = $("#openTourDeckPreview").empty();
+        if (reg && reg.deck) {
+            renderDeck(reg.deck, "#openTourDeckPreview");
+            addCardTooltips("#openTourDeckPreview");
+        }
+    } else {
+        deckSection.addClass("d-none");
+    }
+
+    $("#openTourDetail").removeClass("d-none");
+}
+
+function showFinalsTournamentDetail(tournament) {
+    $("#openTourDetail").addClass("d-none");
+    $("#playerTournamentList .list-group-item").removeClass("active");
+    $(`#playerTournamentList [data-name="${tournament.name}"][data-type="finals"]`).addClass("active");
+
+    $("#finalsTourName").text(tournament.name + " — Finals");
+    let seedingList = $("#finalsSeedingList").empty();
+    $.each(tournament.finalsSeeding || [], function(i, player) {
+        seedingList.append(
+            $("<li/>").addClass("list-group-item d-flex justify-content-between align-items-center")
+                .append($("<span/>").text(player))
+        );
+    });
+
+    $("#finalsTourDetail").removeClass("d-none");
 }
 
 function registerForTournament(deckRow, deck) {
@@ -1132,6 +1801,26 @@ function callbackProfile(data) {
     $('#profilePasswordError').val('');
     $('#profileNewPassword').val('');
     $('#profileConfirmPassword').val('');
+    updateNavUserDisplay();
+}
+
+function enterEditMode() {
+    $("#deckEditorCol").removeClass("d-none");
+    $("#deckPreviewCol").addClass("d-none");
+}
+
+function exitEditMode() {
+    $("#deckEditorCol").addClass("d-none");
+    $("#deckPreviewCol").removeClass("d-none");
+}
+
+function filterDeckList() {
+    let text = $("#deckTextFilter").val().toLowerCase();
+    $("#decks .list-group-item").each(function () {
+        let name = ($(this).data("name") || "").toLowerCase();
+        let comment = ($(this).data("comment") || "").toLowerCase();
+        $(this).toggle(!text || name.includes(text) || comment.includes(text));
+    });
 }
 
 function callbackShowDecks(data) {
@@ -1152,15 +1841,36 @@ function callbackShowDecks(data) {
     const deckPreview = $("#deckPreview");
     const deckSummary = $("#deckSummary");
     const deckName = $("#deckName");
+    const deckValidation = $("#deckValidation");
+    const deckValidationBadge = $("#deckValidationBadge");
+    const deckValidationErrors = $("#deckValidationErrors");
     if (data.selectedDeck) {
         deckText.val(data.contents);
         deckSummary.empty();
         deckErrors.empty();
-        deckSummary.append($("<span/>").text(data.selectedDeck['stats']['summary']));
+        deckValidationBadge.empty();
+        deckValidationErrors.empty();
+        deckSummary.text(data.selectedDeck['stats']['summary']);
         deckName.val(data.selectedDeck['deck']['name']);
-        $.each(data.selectedDeck.errors, function (i, error) {
-            deckErrors.append(error.replace(/\n/g), "<br/>");
-        })
+        $("#deckPreviewTitle").text(data.selectedDeck['deck']['name'] || "Preview");
+        const errors = data.selectedDeck.errors;
+        if (errors && errors.length > 0) {
+            deckValidation.removeClass("d-none");
+            deckValidationBadge.append(
+                $("<span/>").addClass("badge bg-warning-subtle text-warning-emphasis border border-warning-subtle")
+                    .html('<i class="bi bi-exclamation-triangle me-1"></i>Invalid')
+            );
+            $.each(errors, function (i, error) {
+                deckValidationErrors.append($("<div/>").text(error));
+                deckErrors.append($("<div/>").text(error));
+            });
+        } else {
+            deckValidation.removeClass("d-none");
+            deckValidationBadge.append(
+                $("<span/>").addClass("badge bg-success-subtle text-success-emphasis border border-success-subtle")
+                    .html('<i class="bi bi-check-circle me-1"></i>Valid')
+            );
+        }
         renderDeck(data.selectedDeck.deck, "#deckPreview");
         addCardTooltips("#deckPreview");
     } else {
@@ -1168,6 +1878,8 @@ function callbackShowDecks(data) {
         deckErrors.text("");
         deckPreview.empty();
         deckName.val("");
+        $("#deckPreviewTitle").text("Preview");
+        deckValidation.addClass("d-none");
     }
 }
 
@@ -1180,27 +1892,33 @@ function callbackFilterDecks(decks) {
     let deckList = $("#decks");
     deckList.empty();
     $.each(decks, function (index, deck) {
-        const deckRow = $("<tr/>");
-        const deckCell = $("<td/>")
-        const deckName = $("<span/>").text(deck.name).click(function () {
-            DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
-        });
-        const deckComment = $("<div/>").append($("<span/>")
-            .addClass("badge bg-light text-black shadow border border-secondary-subtle text-wrap")
-            .text(deck.comments));
-        const deleteButton = $("<button/>").addClass("btn btn-sm btn-outline-secondary border p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
+        const deckRow = $("<div/>").addClass("list-group-item list-group-item-action py-1 px-2")
+            .data("name", deck.name).data("comment", deck.comments || "")
+            .css("cursor", "pointer")
+            .click(function () {
+                exitEditMode();
+                DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
+            });
+        const deckName = $("<span/>").addClass("deck-name-link").text(deck.name);
+        const deleteButton = $("<button/>").addClass("btn btn-sm btn-outline-secondary p-1").css("font-size", "0.6rem").html("<i class='bi-trash'></i>").click(function (event) {
             if (confirm("Delete deck?")) {
                 DS.deleteDeck(deck.name, {callback: processData, errorHandler: errorhandler});
             }
             event.stopPropagation();
         });
-        let wrapper = $("<div/>").addClass("d-flex justify-content-between align-items-center")
-            .append(deckName)
-            .append($("<span/>").addClass("d-flex gap-1 align-items-center").append(deleteButton));
-        deckCell.append(wrapper, deckComment);
-        deckRow.append(deckCell);
+        deckRow.append(
+            $("<div/>").addClass("d-flex justify-content-between align-items-center")
+                .append(deckName)
+                .append(deleteButton)
+        );
+        if (deck.comments) {
+            deckRow.append(
+                $("<div/>").addClass("text-muted small text-truncate").text(deck.comments)
+            );
+        }
         deckList.append(deckRow);
     });
+    filterDeckList();
 }
 
 function callbackShowGameDeck(data) {
@@ -1210,12 +1928,21 @@ function callbackShowGameDeck(data) {
 
 function callbackMain(data) {
     if (data.loggedIn) {
+        if (data.who && player) {
+            const me = data.who.find(p => p.name === player);
+            if (me && me.country && !profile.country) {
+                profile.country = me.country;
+                updateNavUserDisplay();
+            }
+        }
         renderOnline('onlinePlayers', data.who);
         renderGlobalChat(data.chat);
         renderMyGames("myGames", data.games);
         renderMyGames("oustedGames", data.ousted);
         if (refresher) clearTimeout(refresher);
-        refresher = setTimeout("DS.doPoll({callback: processData, errorHandler: errorhandler})", 5000);
+        if (!wsConnected) {
+            refresher = setTimeout(() => DS.doPoll({callback: processData, errorHandler: errorhandler}), 5000);
+        }
     } else {
         document.location = "/jol/";
     }
@@ -1225,8 +1952,10 @@ function renderDeck(data, div) {
     let render = $(div);
     render.empty();
     if (data.crypt) {
-        render.append($("<h5/>").text("Deck: " + data.name + ""));
-        render.append($("<h5/>").text("Crypt: (" + data.crypt['count'] + ")"));
+        if (div === "#gameDeck") {
+            render.append($("<div/>").addClass("fw-semibold small text-muted mt-1 mb-1").text("Deck: " + data.name));
+        }
+        render.append($("<div/>").addClass("fw-semibold small text-muted mt-1").text("Crypt (" + data.crypt['count'] + ")"));
         const crypt = $("<ul/>").addClass("deck-list");
         let cards = data.crypt.cards;
         cards.sort((a,b) => a.name.localeCompare(b.name));
@@ -1242,9 +1971,9 @@ function renderDeck(data, div) {
         render.append(crypt);
     }
     if (data.library) {
-        render.append($("<h5/>").text("Library: (" + data.library['count'] + ")"));
+        render.append($("<div/>").addClass("fw-semibold small text-muted mt-2").text("Library (" + data.library['count'] + ")"));
         $.each(data.library.cards, function (index, libraryCards) {
-            render.append($("<h5/>").text(libraryCards.type + ": (" + libraryCards['count'] + ")"));
+            render.append($("<div/>").addClass("fw-semibold small text-muted mt-1").text(libraryCards.type + " (" + libraryCards['count'] + ")"));
             const section = $("<ul/>").addClass("deck-list");
             let cards = libraryCards.cards;
             cards.sort((a,b) => a.name.localeCompare(b.name));
@@ -1260,16 +1989,16 @@ function renderDeck(data, div) {
             render.append(section);
         })
     }
-    if(div === "#gameDeck") {
-        if(data.comments!="") {
+    if (div === "#gameDeck") {
+        if (data.comments !== "") {
             let comments = $("<div/>")
-                .addClass("border m-1 p-2")
+                .addClass("border m-1 p-2 small text-muted")
                 .append($("<span/>").text(data.comments));
             render.append(comments);
         }
     }
-    if(div === "#deckPreview") {
-        $("#deckComment").val(data.comments)
+    if (div === "#deckPreview") {
+        $("#deckComment").val(data.comments);
     }
 }
 
@@ -1282,14 +2011,17 @@ function parseDeck() {
 function newDeck() {
     $("#deckName").val("");
     $("#deckComment").val("");
-    DS.newDeck({callback: processData, errorHandler: errorhandler});
+    DS.newDeck({callback: function(data) { processData(data); enterEditMode(); }, errorHandler: errorhandler});
 }
 
 function saveDeck() {
     const deckName = $("#deckName").val();
     const contents = $("#deckText").val();
     const comment = $("#deckComment").val();
-    DS.saveDeck(deckName, contents, comment, {callback: processData, errorHandler: errorhandler});
+    DS.saveDeck(deckName, contents, comment, {
+        callback: function(data) { exitEditMode(); processData(data); },
+        errorHandler: errorhandler
+    });
 }
 
 function validate() {
@@ -1314,6 +2046,8 @@ function doGlobalChat() {
 }
 
 function doNav(target) {
+    const urlPath = target.startsWith('g') ? 'game/' + encodeURIComponent(target.substring(1)) : target;
+    history.pushState({target}, '', '/jol/' + urlPath);
     $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
     if (refresher) clearTimeout(refresher);
     scrollChat = true;
@@ -1322,15 +2056,27 @@ function doNav(target) {
     return false;
 }
 
+function updateNavUserDisplay() {
+    $('#navUserName').text(player || '');
+    const country = profile && profile.country;
+    const flagEl = $('#navUserFlag');
+    flagEl.empty();
+    if (country) {
+        flagEl.html(`<span class="fi fi-${country.toLowerCase()} fis rounded-1"></span>`);
+    } else {
+        flagEl.html('<i class="bi bi-person-circle text-secondary"></i>');
+    }
+}
+
 function renderButton(data) {
     let buttonsDiv = $("#buttons");
     $.each(data, function (i, value) {
         let key = value.split(":")[0];
         let label = value.split(":")[1];
-        let button = $("<a/>").addClass("nav-item nav-link").text(label).click(key, function () {
-            DS.navigate(key, {callback: processData, errorHandler: errorhandler});
-            if (refresher) clearTimeout(refresher);
-            $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
+        const keyPath = key.startsWith('g') ? 'game/' + encodeURIComponent(key.substring(1)) : key;
+        let button = $("<a/>").addClass("nav-item nav-link").attr("href", "/jol/" + keyPath).text(label).click(key, function (e) {
+            e.preventDefault();
+            doNav(key);
         });
         if (game === label || currentPage.toLowerCase() === key.toLowerCase()) {
             button.addClass("active");
@@ -1344,9 +2090,10 @@ function renderGameButtons(data) {
     let newActivity = false;
     $.each(data, function (key, value) {
         let li = $("<li/>");
-        let button = $("<a/>").addClass("dropdown-item").text(value).click(key, function () {
-            DS.navigate(key, {callback: processData, errorHandler: errorhandler});
-            $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
+        const keyPath = key.startsWith('g') ? 'game/' + encodeURIComponent(key.substring(1)) : key;
+        let button = $("<a/>").addClass("dropdown-item").attr("href", "/jol/" + keyPath).text(value).click(key, function (e) {
+            e.preventDefault();
+            doNav(key);
         });
         if (game === value || currentPage.toLowerCase() === key.toLowerCase()) {
             button.addClass("active");
@@ -1423,13 +2170,13 @@ function renderGlobalChat(data) {
     let onlySelfChat = true;
 
     $.each(data, function (index, chat) {
+        if (globalChatLastTimestamp !== null && chat.timestamp <= globalChatLastTimestamp) {
+            return;
+        }
+
         let day = moment(chat.timestamp).tz("UTC").format("D MMMM");
         if (globalChatLastDay !== day) {
-            let dayBreak = $('<div style="height: .9rem; margin-bottom: .6rem; margin-top: -.3rem; border-bottom: 1px solid #dcc; text-align: center">'
-                + '<span style="font-size: .8rem; background-color: #fff; padding: 0 .5rem; color: #b99; font-weight: bold">'
-                + day
-                + '</span>'
-                + '</div>');
+            let dayBreak = $('<div class="chat-day-break"><span class="chat-day-label">' + day + '</span></div>');
             container.append(dayBreak);
         }
 
@@ -1440,8 +2187,8 @@ function renderGlobalChat(data) {
         let playerLabel = globalChatLastPlayer === chat.player && globalChatLastDay === day ? "" : "<b>" + chat.player + "</b> ";
         //replace player name with colored player name
         let msg = chat.message
-            .replaceAll("&#64;"+player, "<span style='background-color: #D4D7F9; color:black'>@"+player+"</span>")
-            .replaceAll("&#64;All", "<span style='background-color: #D4D7F9; color:black'>@All</span>");
+            .replaceAll("&#64;"+player, "<span class='chat-mention'>@"+player+"</span>")
+            .replaceAll("&#64;All", "<span class='chat-mention'>@All</span>");
         let message = $("<span/>").html(" " + playerLabel + msg);
 
         if (chat.player !== player) {
@@ -1452,6 +2199,7 @@ function renderGlobalChat(data) {
         container.append(chatLine);
         globalChatLastPlayer = chat.player;
         globalChatLastDay = day;
+        globalChatLastTimestamp = chat.timestamp;
     });
     addCardTooltips("#globalChatOutput");
 
@@ -1465,53 +2213,61 @@ function renderGlobalChat(data) {
     }
 }
 
-function toggleDetailedMode(elem) {
-    let checked = elem.checked;
-    localStorage.setItem("jol-details", checked);
-    let playersDiv = $(".players");
-    if (checked) {
-        playersDiv.removeClass("d-none");
-    } else {
-        playersDiv.addClass("d-none");
-    }
-}
-
 function renderMyGames(id, games) {
-    let checked = localStorage.getItem("jol-details") || "true";
-    let ownGames = $("#"+id);
-    let headerText = id === "myGames" ? "Active Games" : "Ousted Games";
+    let ownGames = $("#" + id);
+    let countBadge = $("#" + id + "-count");
     ownGames.empty();
-    $("#"+id+"-header").text(headerText+" ("+games.length+"):");
+    countBadge.text(games.length);
 
-    $.each(games, function (index, game) {
-        let gameRow = $("<li/>").addClass("list-group-item p-0 border").on('click', function () {
-            doNav("g" + game.name);
-        });
-        let header = $("<div/>").addClass("d-flex p-2 justify-content-between w-100 border-bottom bg-body-tertiary");
-        let title = $("<span/>").addClass("fw-bold text-break").text(game.name);
-        let turn = $("<small/>").text(game.turn).addClass("d-inline-block d-md-none d-xl-inline-block");
-        header.append(title, turn);
-        let players = $("<div/>").addClass("players pb-2");
-        let toggle = $("#myGamesDetailedMode");
-        if (checked === "true") {
-            toggle.prop("checked", true);
-            players.removeClass("d-none");
-        } else {
-            toggle.prop("checked", false);
-            players.addClass("d-none");
+    $.each(games, function (index, gameEntry) {
+        let self = gameEntry.players[player];
+        let pinged = self && self.pinged;
+        let needsAttention = self && !self.current;
+
+        let gameRow = $("<li/>")
+            .addClass("list-group-item game-entry px-2 py-2")
+            .on('click', function () { doNav("g" + gameEntry.gameId); });
+
+        if (pinged) {
+            gameRow.addClass("border-start border-3 border-danger");
+        } else if (needsAttention) {
+            gameRow.addClass("border-start border-3 border-primary-subtle");
         }
-        let predator = renderPlayer(game.players, game.predator);
-        let activePlayer = renderPlayer(game.players, game.activePlayer);
-        let prey = renderPlayer(game.players, game.prey);
-        activePlayer.addClass("fw-semibold");
-        let self = game.players[player];
-        if (self.pinged) {
-            title.prepend($("<i/>").addClass('me-2 text-danger bi-exclamation-triangle'));
-        } else if (!self.current) {
-            title.prepend($("<i/>").addClass('me-2 bi-bell'));
+
+        let nameRow = $("<div/>").addClass("d-flex align-items-center justify-content-between");
+        let title = $("<span/>").addClass("fw-bold text-break").text(gameEntry.name);
+        if (pinged) {
+            title.prepend($("<i/>").addClass("me-1 text-danger bi-exclamation-triangle"));
+        } else if (needsAttention) {
+            title.prepend($("<i/>").addClass("me-1 bi-bell"));
         }
-        players.append(predator, activePlayer, prey);
-        gameRow.append(header, players);
+        nameRow.append(title);
+        if (gameEntry.turn) {
+            nameRow.append($("<small/>").addClass("text-muted ms-2 text-nowrap").text(gameEntry.turn));
+        }
+        gameRow.append(nameRow);
+
+        if (id === "myGames" && gameEntry.predator) {
+            let pred = gameEntry.players[gameEntry.predator];
+            let active = gameEntry.players[gameEntry.activePlayer];
+            let prey = gameEntry.players[gameEntry.prey];
+            let predName = pred ? pred.playerName : gameEntry.predator;
+            let activeName = active ? active.playerName : gameEntry.activePlayer;
+            let preyName = prey ? prey.playerName : gameEntry.prey;
+
+            let seatRow = $("<div/>").addClass("d-flex align-items-center gap-1 text-muted small mt-1");
+            seatRow.append($("<i/>").addClass("bi bi-arrow-left-short"));
+            seatRow.append($("<span/>").text(predName));
+            if (pred && pred.pinged) seatRow.append($("<i/>").addClass("bi-exclamation-triangle text-danger"));
+            seatRow.append($("<span/>").addClass("mx-1 text-body-tertiary").text("·"));
+            seatRow.append($("<strong/>").text(activeName));
+            seatRow.append($("<span/>").addClass("mx-1 text-body-tertiary").text("·"));
+            seatRow.append($("<span/>").text(preyName));
+            if (prey && prey.pinged) seatRow.append($("<i/>").addClass("bi-exclamation-triangle text-danger"));
+            seatRow.append($("<i/>").addClass("bi bi-arrow-right-short"));
+            gameRow.append(seatRow);
+        }
+
         ownGames.append(gameRow);
     });
 }
@@ -1528,9 +2284,9 @@ function renderPlayer(players, target) {
     return $(template);
 }
 
-function renderGameLink(game) {
-    return $("<a/>").text(game.gameName).on('click', function () {
-        doNav("g" + game.gameName);
+function renderGameLink(gameEntry) {
+    return $("<a/>").text(gameEntry.gameName).on('click', function () {
+        doNav("g" + gameEntry.gameId);
     });
 }
 
@@ -1541,37 +2297,44 @@ function renderOnline(div, who) {
     if (who === null) {
         return;
     }
-    $("#online-users-header").text("Online Users ("+who.length+"):");
-    $.each(who, function (index, player) {
-        let lastOnline = moment(player.lastOnline).tz("UTC");
+    $("#online-users-header").text("Online (" + who.length + ")");
+    $.each(who, function (index, playerEntry) {
+        let lastOnline = moment(playerEntry.lastOnline).tz("UTC");
         let sinceLastOnline = moment.duration(moment().diff(lastOnline)).asMinutes();
-        let flag = player.country ? `<span data-tippy-content="${regionNames.of(player.country)}" class="fi fi-${player.country.toLowerCase()} fis fs-3"></span>` : '<span class="fs-3">&nbsp;</span>';
-        let admin = player.roles.includes('ADMIN') ? '<i data-tippy-content="Administrator" class="bi bi-star-fill text-warning"></i>' : "";
-        let judge = player.roles.includes('JUDGE') ? '<i data-tippy-content="Judge" class="bi bi-person-raised-hand text-success"></i>' : "";
-        let offline = sinceLastOnline > 30 ? `<i data-tippy-content="Last Online: ${lastOnline.format('D-MMM HH:mm z')}" class="bi bi-clock-history"></i>` : "";
-        let playerDiv = `
-            <span class="border rounded-start p-0 border-secondary d-flex justify-content-between align-items-center">
-                <span class="d-flex align-items-center gap-2 px-2">
-                    <strong>${player.name}</strong>
-                    ${admin}
-                    ${judge}
-                    ${offline}
-                </span>
-                ${flag}                
-            </span>`;
+        let flag = playerEntry.country
+            ? `<span data-tippy-content="${regionNames.of(playerEntry.country)}" class="fi fi-${playerEntry.country.toLowerCase()} fis"></span>`
+            : "";
+        let admin = playerEntry.roles.includes('ADMIN') ? '<i data-tippy-content="Administrator" class="bi bi-star-fill text-warning"></i>' : "";
+        let judge = playerEntry.roles.includes('JUDGE') ? '<i data-tippy-content="Judge" class="bi bi-person-raised-hand text-success"></i>' : "";
+        let offline = sinceLastOnline > 60
+            ? `<i data-tippy-content="Last Online: ${lastOnline.format('D-MMM HH:mm z')}" class="bi bi-clock-history text-muted"></i>`
+            : "";
+        let playerDiv = `<div class="online-player-row">
+            ${flag}
+            <span class="flex-grow-1 text-truncate">${playerEntry.name}</span>
+            ${admin}${judge}${offline}
+        </div>`;
         container.append(playerDiv);
     });
+
+    if (who.length > 8) {
+        let collapseEl = document.getElementById("onlinePlayersList");
+        if (collapseEl && bootstrap.Collapse) {
+            bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false }).hide();
+        }
+    }
+
     tippy('[data-tippy-content]', { theme: 'light'});
 }
 
 function renderActiveGames(games) {
     let activeGames = $("#activeGames tbody");
     activeGames.empty();
-    $.each(games, function (index, game) {
+    $.each(games, function (index, gameEntry) {
         let gameRow = $("<tr/>");
-        let gameLink = $("<td/>").html(renderGameLink(game));
-        let turn = $("<td/>").text(game.turn);
-        let timestamp = $("<td/>").text(moment(game.timestamp).tz("UTC").format("D-MMM HH:mm z"));
+        let gameLink = $("<td/>").html(renderGameLink(gameEntry));
+        let turn = $("<td/>").text(gameEntry.turn);
+        let timestamp = $("<td/>").text(moment(gameEntry.timestamp).tz("UTC").format("D-MMM HH:mm z"));
         gameRow.append(gameLink, turn, timestamp);
         activeGames.append(gameRow);
     });
@@ -1580,17 +2343,17 @@ function renderActiveGames(games) {
 function renderPastGames(history) {
     let pastGames = $("#pastGames tbody");
     pastGames.empty();
-    $.each(history, function (index, game) {
-        let startTime = moment(game.started, moment.ISO_8601)
-        startTime = startTime.isValid ? startTime.tz("UTC").format("D-MMM-YYYY HH:mm z") : game.started
-        let endTime = moment(game.ended, moment.ISO_8601).tz("UTC").format("D-MMM-YYYY HH:mm z");
+    $.each(history, function (index, gameEntry) {
+        let startTime = moment(gameEntry.started, moment.ISO_8601)
+        startTime = startTime.isValid ? startTime.tz("UTC").format("D-MMM-YYYY HH:mm z") : gameEntry.started
+        let endTime = moment(gameEntry.ended, moment.ISO_8601).tz("UTC").format("D-MMM-YYYY HH:mm z");
         let firstPlayerRow = true;
-        $.each(game.results, function (i, value) {
+        $.each(gameEntry.results, function (i, value) {
             let playerRow = $("<tr/>");
             if (firstPlayerRow) {
-                let gameName = $("<td/>").attr('rowspan', game.results.length).text(game.name);
-                let gameStarted = $("<td/>").attr('rowspan', game.results.length).text(startTime);
-                let gameFinished = $("<td/>").attr('rowspan', game.results.length).text(endTime);
+                let gameName = $("<td/>").attr('rowspan', gameEntry.results.length).text(gameEntry.name);
+                let gameStarted = $("<td/>").attr('rowspan', gameEntry.results.length).text(startTime);
+                let gameFinished = $("<td/>").attr('rowspan', gameEntry.results.length).text(endTime);
                 playerRow.append(gameName, gameStarted, gameFinished);
                 playerRow.addClass("border-3 border-top border-bottom-0 border-start-0 border-end-0")
                 firstPlayerRow = false;
@@ -1607,13 +2370,34 @@ function renderPastGames(history) {
     })
 }
 
+function wsJoinGame(gameId) {
+    if (ws && ws.readyState === WebSocket.OPEN && gameId) {
+        ws.send(JSON.stringify({type: 'join', game: gameId}));
+    }
+}
+
+function wsLeaveGame(gameId) {
+    if (ws && ws.readyState === WebSocket.OPEN && gameId) {
+        ws.send(JSON.stringify({type: 'leave', game: gameId}));
+    }
+}
+
 function navigate(data) {
     if (data.target !== currentPage) {
+        // Leave current game room before switching pages
+        if (currentPage === 'game' && game) wsLeaveGame(game);
         $("#" + currentPage).hide();
         $("#" + data.target).show();
         currentPage = data.target;
     }
+    const prevGame = game;
     game = data.game;
+    if (currentPage === 'game') {
+        // Leave the old game room if switching games on the same page
+        if (prevGame && prevGame !== game) wsLeaveGame(prevGame);
+        // Join the new game room so the server sends targeted notifications
+        if (game && game !== prevGame) wsJoinGame(game);
+    }
     $("#buttons").empty();
     $('#gameButtons').empty();
     // Always hide the My Games item to start.
@@ -1621,15 +2405,16 @@ function navigate(data) {
     $('#gameButtonsNav').hide();
     $('#titleLink').text(TITLE + (data.chats ? ' *' : ''));
     if (data.player === null) {
-        $('#logout').hide();
+        $('#userMenu').addClass('d-none');
         $("#gameRow").hide();
         player = null;
     } else {
         renderButton(data.buttons);
         renderGameButtons(data.gameButtons);
-        $('#logout').show();
+        $('#userMenu').removeClass('d-none');
         $("#gameRow").show();
         player = data.player;
+        updateNavUserDisplay();
     }
     $("#message").html(data.message)
     let timestamp = moment(data.stamp).tz("UTC").format("D-MMM HH:mm z");
@@ -1695,16 +2480,19 @@ function doSubmit(event) {
     const chatInput = $("#chat");
     const pingSelect = $("#ping");
 
-    let phase = phaseSelect.val();
-    let ping = pingSelect.val();
+    let phase = phaseSelect.val() || null;
+    let ping = pingSelect.val() || null;
     const command = commandInput.val();
     const chat = chatInput.val();
-    phase = phase === "" ? null : phase;
-    ping = ping === "" ? null : ping;
+    if (!command && !chat && !phase) return false;
     commandInput.val("");
     chatInput.val("");
     pingSelect.val("");
-    DS.submitForm(game, phase, command, chat, ping, {callback: processData, errorHandler: errorhandler});
+    const submitBtn = $("#gameSubmit").prop("disabled", true);
+    DS.submitForm(game, phase, command, chat, ping, {
+        callback: (data) => { submitBtn.prop("disabled", false); processData(data); },
+        errorHandler: (err, ex) => { submitBtn.prop("disabled", false); errorhandler(err, ex); }
+    });
     return false;
 }
 
@@ -1721,12 +2509,12 @@ function sendCommand(command, message = '') {
 }
 
 function sendGlobalNotes() {
-    DS.updateGlobalNotes(game, $("#globalNotes").val());
+    DS.updateGlobalNotes(game, $("#globalNotes").val(), {errorHandler: errorhandler});
     return false;
 }
 
 function sendPrivateNotes() {
-    DS.updatePrivateNotes(game, $("#privateNotes").val());
+    DS.updatePrivateNotes(game, $("#privateNotes").val(), {errorHandler: errorhandler});
     return false;
 }
 
@@ -1761,14 +2549,9 @@ function loadGame(data) {
     let endTurn = $("#endTurn");
     if (data.phases.length > 0) {
         phaseSelect.empty();
-        phaseSelect.removeAttr('disabled');
-        endTurn.removeAttr('disabled');
-
-        if (phaseSelect.children('option').length !== data.phases.length) {
-            $.each(data.phases, function (index, value) {
-                phase.append(new Option(value, value));
-            });
-        }
+        phaseSelect.prop('disabled', false);
+        endTurn.prop('disabled', false);
+        data.phases.forEach(p => phaseSelect.append(new Option(p, p)));
         if (data.phase) {
             phaseSelect.val(data.phase);
         }
@@ -1794,7 +2577,6 @@ function loadGame(data) {
         privateNotes.val("");
         chat.empty();
         command.empty();
-        currentOption = "notes";
         lastReceivedGlobalNotes = null;
         lastReceivedPrivateNotes = null;
         gameChatLastDay = null;
@@ -1803,33 +2585,29 @@ function loadGame(data) {
         $(".panel-secondary").addClass("d-none");
 
         // initial state for controls
-        playerControls.addClass("d-none").attr('disabled', true);
-        chatControls.attr('disabled', true);
-        globalNotes.attr('disabled', true);
+        playerControls.addClass("d-none").prop('disabled', true);
+        chatControls.prop('disabled', true);
+        globalNotes.prop('disabled', true);
         controlGrid.addClass("spectator");
     }
-    let fetchFullLog = false;
-    // if (data.logLength !== null) {
-    //     let myLogLength = gameChatOutput.children().length + (data.turn.length);
-    //     fetchFullLog = myLogLength < data.logLength;
-    // }
+    const fetchFullLog = false;
 
     // enable chat controls if judge or player
     if (data.player || data.judge) {
-        globalNotes.removeAttr('disabled');
-        chatControls.removeAttr('disabled');
+        globalNotes.prop('disabled', false);
+        chatControls.prop('disabled', false);
     }
 
     // If playing enable player controls
     if (data.player) {
-        playerControls.removeClass("d-none").removeAttr('disabled');
+        playerControls.removeClass("d-none").prop('disabled', false);
         controlGrid.removeClass("spectator");
     }
 
     // if not the current player disable phase select and end turn
     if (player !== data.currentPlayer) {
-        phaseSelect.attr('disabled', true);
-        endTurn.attr('disabled', true);
+        phaseSelect.prop('disabled', true);
+        endTurn.prop('disabled', true);
     }
 
     //If we're missing any messages from the log, skip adding this batch and
@@ -1840,28 +2618,25 @@ function loadGame(data) {
         addCardTooltips("#gameChatOutput");
     }
 
-    // Global Notes — only update from server if the value has changed since we last received it.
-    // This prevents a race condition where endPlayerTurn responds before updateGlobalNotes is
-    // processed, causing stale server data to overwrite the user's unsaved notes.
-    if (data.globalNotes && data.globalNotes !== lastReceivedGlobalNotes) {
+    // Global Notes — only update from server if the value has changed since we last received it,
+    // and the user doesn't currently have the field focused (typing in progress).
+    if (data.globalNotes && data.globalNotes !== lastReceivedGlobalNotes
+            && document.activeElement !== globalNotes[0]) {
         lastReceivedGlobalNotes = data.globalNotes;
         globalNotes.val(data.globalNotes);
     }
 
-    // Only update private notes if the server value has changed since we last received it,
-    // e.g. another player revealed cards. Same race-condition guard as globalNotes.
-    if (data.privateNotes && data.privateNotes !== lastReceivedPrivateNotes) {
+    // Same guards for private notes.
+    if (data.privateNotes && data.privateNotes !== lastReceivedPrivateNotes
+            && document.activeElement !== privateNotes[0]) {
         lastReceivedPrivateNotes = data.privateNotes;
         privateNotes.val(data.privateNotes);
     }
 
     if (data.turns.length > 0) {
-        let turnSelect = $("#historySelect");
+        const turnSelect = $("#historySelect");
         turnSelect.empty();
-        data.turns.shift();
-        $.each(data.turns, function (index, turn) {
-            turnSelect.append($(new Option(turn, turn)));
-        });
+        data.turns.slice(1).forEach(turn => turnSelect.append(new Option(turn, turn)));
     }
 
     // Render state
@@ -1897,26 +2672,21 @@ function loadGame(data) {
         addCardTooltips("#hand");
     }
 
-    // Setup polling
+    // Setup polling — immediate if log is incomplete, fallback timer when WebSocket is not connected
     if (refresher) clearTimeout(refresher);
-    if (data.refresh > 0 || fetchFullLog) {
-
-        //If we're missing anything from the log, fetch the whole thing from
-        //server immediately
-        let timeout = data.refresh;
-        if (fetchFullLog) {
-            timeout = 0;
-        }
-        refresher = setTimeout("refreshState(" + fetchFullLog + ")", timeout);
+    if (fetchFullLog) {
+        refreshState(true);
+    } else if (!wsConnected && data.refresh > 0) {
+        refresher = setTimeout(() => refreshState(false), data.refresh);
     }
 
 }
 
 function addCardTooltips(parent) {
-    let linkSelector = `${parent} a.card-name`;
-    //On devices without pointer hover capabilities, like phones, do not bind
-    //tippy tooltips to cards that already have a click handler that shows the card.
-    //This fixes the bug where cards in hand required a double-tap to show the modal.
+    const linkSelector = `${parent} a.card-name`;
+    // On touch-only devices, skip tippy on elements with a click handler (e.g. cards in hand)
+    // so that tapping to show the card modal doesn't require a double-tap.
+    if (!pointerCanHover && $(linkSelector).closest('[onclick]').length) return;
     tippy(linkSelector, {
         placement: 'auto',
         allowHTML: true,
@@ -1971,7 +2741,7 @@ function addCardTooltips(parent) {
     });
 }
 
-function details(event, tag) {
+function togglePanel(event, tag) {
     event.preventDefault();
     event.stopPropagation();
     $(`[aria-controls='${tag}'] i`).toggleClass("d-none");
@@ -2027,72 +2797,54 @@ function updateProfile() {
 }
 
 function updatePassword() {
-    let profileNewPassword = dwr.util.getValue("profileNewPassword");
-    let profileConfirmPassword = dwr.util.getValue("profileConfirmPassword");
+    let profileNewPassword = $('#profileNewPassword').val();
+    let profileConfirmPassword = $('#profileConfirmPassword').val();
     if (!profileNewPassword && !profileConfirmPassword) {
-        dwr.util.setValue("profilePasswordError", "Enter a new password.");
+        $('#profilePasswordError').text("Enter a new password.");
     } else if (profileNewPassword !== profileConfirmPassword) {
-        dwr.util.setValue("profilePasswordError", "Password confirmation does not match.");
+        $('#profilePasswordError').text("Password confirmation does not match.");
     } else {
         DS.changePassword(profileNewPassword, {callback: processData, errorHandler: errorhandler});
-        dwr.util.setValue("profilePasswordError", "Password updated");
+        $('#profilePasswordError').text("Password updated.");
     }
 }
 
 function renderDesktopViewButton() {
     let viewport = $('meta[name=viewport]').get(0);
-    let text = (
-        viewport.content === DESKTOP_VIEWPORT_CONTENT
-            ? 'Mobile' : 'Desktop') + ' View';
-    let button = $('<a/>')
-        .attr('id', 'toggleMobileViewLink')
-        .addClass('nav-item nav-link')
-        .text(text)
-        .click(function () {
-            toggleMobileView();
-            $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
-        });
-    $('#buttons').append(button);
+    let isDesktop = viewport.content === DESKTOP_VIEWPORT_CONTENT;
+    $('#desktopViewLabel').text(isDesktop ? 'Mobile View' : 'Desktop View');
+    $('#desktopViewIcon').attr('class', isDesktop ? 'bi bi-phone me-2' : 'bi bi-display me-2');
 }
 
 function toggleMobileView(event) {
     if (event) event.preventDefault();
-    let $link = $('#toggleMobileViewLink').eq(0);
     let viewport = $('meta[name=viewport]').get(0);
     if (viewport.content === DESKTOP_VIEWPORT_CONTENT) {
         viewport.content = 'width=device-width, initial-scale=1, shrink-to-fit=no';
-        $link.text('Desktop View');
+        $('#desktopViewLabel').text('Desktop View');
+        $('#desktopViewIcon').attr('class', 'bi bi-display me-2');
     } else {
         viewport.content = DESKTOP_VIEWPORT_CONTENT;
-        $link.text('Mobile View');
+        $('#desktopViewLabel').text('Mobile View');
+        $('#desktopViewIcon').attr('class', 'bi bi-phone me-2');
     }
     pointerCanHover = window.matchMedia("(hover: hover)").matches;
     $('body').scrollTop(0);
 }
 
 function exportCsv() {
-    DS.exportPastGamesAsCsv({callback: createCsvDownloadLink, errorHandler: errorhandler});
-}
-
-function createCsvDownloadLink(data) {
-    let blob = new Blob([data], { type: 'text/csv' });
-    let url = URL.createObjectURL(blob);
-    let a = document.createElement('a');
-    a.href = url;
-    a.download = 'data.csv';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    DS.exportPastGamesAsCsv({callback: (data) => createCsvDownloadLink(data, 'past-games.csv'), errorHandler: errorhandler});
 }
 
 function toggleMode() {
-    let wrapper = $("#wrapper");
-    let theme = wrapper.attr("data-bs-theme");
-    if(theme != "dark") {
-        wrapper.attr("data-bs-theme","dark");
+    const wrapper = $("#wrapper");
+    const isDark = wrapper.attr("data-bs-theme") !== "dark";
+    if (isDark) {
+        wrapper.attr("data-bs-theme", "dark");
     } else {
         wrapper.removeAttr("data-bs-theme");
     }
+    localStorage.setItem("jol-theme", isDark ? "dark" : "");
 }
 
 function shuffleSeeding() {

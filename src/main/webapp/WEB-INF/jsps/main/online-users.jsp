@@ -1,8 +1,11 @@
-<div class="card shadow flex-md-grow-1 flex-lg-grow-0">
-    <div class="card-header bg-body-secondary">
-        <h5 id="online-users-header">Online Users:</h5>
+<div class="card shadow">
+    <div class="card-header bg-body-secondary p-0">
+        <button class="btn btn-link text-body-secondary text-decoration-none w-100 text-start px-2 py-1"
+                data-bs-toggle="collapse" data-bs-target="#onlinePlayersList" aria-expanded="true">
+            <span id="online-users-header" class="fw-semibold small">Online Users</span>
+        </button>
     </div>
-    <div id="onlinePlayers" class="card-body p-1 grid" style="--bs-columns: 2; --bs-gap: 0.5rem;">
-
+    <div id="onlinePlayersList" class="collapse show">
+        <div id="onlinePlayers" class="card-body p-1"></div>
     </div>
 </div>

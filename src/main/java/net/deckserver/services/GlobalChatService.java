@@ -3,6 +3,7 @@ package net.deckserver.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.model.PlayerModel;
+import net.deckserver.ws.WebSocketRegistry;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,6 +43,7 @@ public class GlobalChatService extends PersistedService {
             INSTANCE.chats = INSTANCE.chats.subList(CHAT_DISCARD, CHAT_STORAGE);
         }
         INSTANCE.playerModels.forEach(playerModel -> playerModel.chat(chatEntryBean));
+        WebSocketRegistry.notifyMain();
     }
 
     public static  List<ChatEntryBean> getChats() {

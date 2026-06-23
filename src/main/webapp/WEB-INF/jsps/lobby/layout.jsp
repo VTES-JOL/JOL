@@ -1,12 +1,17 @@
-<div class="row mt-2">
-    <div class="col-md-6 col-lg-4 mt-2 mt-md-0">
-        <jsp:include page="create-game.jsp"/>
-        <jsp:include page="private-game-list.jsp"/>
+<div class="lobby-layout">
+    <div class="lobby-col-left">
+        <jsp:include page="game-list.jsp"/>
     </div>
-    <div class="col-md-6 col-lg-4 mt-2 mt-md-0">
-        <jsp:include page="public-game-list.jsp"/>
-    </div>
-    <div class="col-md-6 col-lg-4 offset-md-6 offset-lg-0">
-        <jsp:include page="register-deck.jsp"/>
+    <div class="lobby-col-right">
+        <div class="d-none d-flex flex-column flex-fill min-h-0" id="lobbyCreateCol">
+            <jsp:include page="game-create.jsp"/>
+        </div>
+        <div class="d-none d-flex flex-column flex-fill min-h-0" id="lobbyDetailCol">
+            <jsp:include page="game-detail.jsp"/>
+        </div>
+        <div class="d-flex flex-column flex-fill align-items-center justify-content-center text-muted min-h-0" id="lobbyEmptyCol">
+            <i class="bi bi-controller fs-1 mb-2"></i>
+            <span>Select a game or create a new one</span>
+        </div>
     </div>
 </div>

@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -45,6 +46,7 @@ public class GameService extends PersistedService {
             .expireAfterAccess(30, TimeUnit.MINUTES)
             .build(GameService::loadGame);
     private final Map<String, GameInfo> games = new HashMap<>();
+    private final ConcurrentHashMap<String, String> idToName = new ConcurrentHashMap<>();
     private final LoadingCache<String, GameSummary> summaryMap = Caffeine.newBuilder()
             .expireAfterWrite(30, TimeUnit.MINUTES)
             .refreshAfterWrite(30, TimeUnit.SECONDS)
@@ -60,6 +62,12 @@ public class GameService extends PersistedService {
         return INSTANCE.games.get(name);
     }
 
+    public static String getNameByGameId(String gameId) {
+        String name = INSTANCE.idToName.get(gameId);
+        if (name == null) throw new IllegalArgumentException("No game with id: " + gameId);
+        return name;
+    }
+
     public static void create(String gameName, String gameId, String ownerName, Visibility visibility, GameFormat format) {
         if (gameName == null || gameName.isEmpty()) {
             logger.error("Game name is null or empty");
@@ -68,6 +76,7 @@ public class GameService extends PersistedService {
 
         GameInfo gameInfo = new GameInfo(gameName, gameId, ownerName, visibility, GameStatus.STARTING, format);
         INSTANCE.games.put(gameName, gameInfo);
+        INSTANCE.idToName.put(gameId, gameName);
         try {
             Path gamePath = DataPaths.path("games", gameId);
             Files.createDirectory(gamePath);
@@ -135,6 +144,7 @@ public class GameService extends PersistedService {
     public static void remove(String gameName, String gameId) {
         Path gamePath = DataPaths.path("games", gameId);
         INSTANCE.games.remove(gameName);
+        INSTANCE.idToName.remove(gameId);
         try {
             FileUtils.deleteDirectory(gamePath.toFile());
         } catch (IOException e) {
@@ -317,6 +327,7 @@ public class GameService extends PersistedService {
             Map<String, GameInfo> loaded = objectMapper.readValue(PERSISTENCE_PATH.toFile(), new TypeReference<>() {
             });
             games.putAll(loaded);
+            games.forEach((name, info) -> idToName.put(info.getId(), name));
             logger.info("Loaded {} games", games.size());
         } catch (IOException e) {
             logger.error("Unable to load games.", e);

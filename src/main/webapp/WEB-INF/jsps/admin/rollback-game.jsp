@@ -1,6 +1,6 @@
 <div class="card shadow mt-2">
     <div class="card-header bg-body-secondary">
-        <h5>Rollback Game</h5>
+        <span class="fw-semibold">Rollback Game</span>
     </div>
     <div class="card-body">
         <label for="rollbackGamesList" class="form-label">Games</label>

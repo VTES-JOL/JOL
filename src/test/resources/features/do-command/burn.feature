@@ -21,6 +21,6 @@ Feature: Burn command
     When "Player2" enters the command "burn ready random"
     Then "Player2" has 1 cards in their "ready"
     And "Player2" has 1 cards in their "ash heap"
-    And the last chat message contains "Player2 burns"
+    And the last chat message contains "burns"
     And the last chat message contains "(picked randomly)"
     And the last chat message contains "from their ready region."

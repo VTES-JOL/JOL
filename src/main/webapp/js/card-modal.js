@@ -315,11 +315,11 @@ function pickTarget(event) {
         return;
     }
     let targetAnchor = $(event.target).parents(".list-group-item");
-    let player = targetAnchor.closest('[data-player]').data('player').split(' ', 1)[0];
+    let targetPlayer = targetAnchor.closest('[data-player]').data('player').split(' ', 1)[0];
     let region = targetAnchor.closest('[data-region]').data('region');
     let coords = targetAnchor.data('coordinates');
     let modal = $('#playCardModal');
-    modal.data('target', player + ' ' + region + ' ' + coords);
+    modal.data('target', targetPlayer + ' ' + region + ' ' + coords);
     tippy.hideAll({duration: 0});
 
     let modesSelected = $('#playCardModal .card-modes button.active');
@@ -587,8 +587,8 @@ function doCardCommand(commandKeyword, message = '', commandTail = '', closeModa
     var parts = new Array(5);
     parts.push(commandKeyword);
     if (!omitPlayer) {
-        var player = modal.data('controller').split(' ', 2)[0]; //names with spaces do not work
-        parts.push(player);
+        var controllerName = modal.data('controller').split(' ', 2)[0]; //names with spaces do not work
+        parts.push(controllerName);
     }
     parts.push(
         modal.data('region').split(' ')[0], //ready-region > ready
@@ -699,8 +699,8 @@ function removeFromGame() {
 function movePredator() {
     let modal = $('#cardModal');
     let region = $("#cardModal").data('region');
-    var player = modal.data('controller').split(' ', 2)[0]; //names with spaces do not work
-    let command = `move ${player} ${region} ${modal.data('coordinates')} predator`;
+    var controllerName = modal.data('controller').split(' ', 2)[0]; //names with spaces do not work
+    let command = `move ${controllerName} ${region} ${modal.data('coordinates')} predator`;
     sendCommand(command);
     modal.modal('hide');
     return false;
@@ -709,8 +709,8 @@ function movePredator() {
 function movePrey() {
     let modal = $('#cardModal');
     let region = $("#cardModal").data('region');
-    var player = modal.data('controller').split(' ', 2)[0]; //names with spaces do not work
-    let command = `move ${player} ${region} ${modal.data('coordinates')} prey`;
+    var controllerName = modal.data('controller').split(' ', 2)[0]; //names with spaces do not work
+    let command = `move ${controllerName} ${region} ${modal.data('coordinates')} prey`;
     sendCommand(command);
     modal.modal('hide');
     return false;

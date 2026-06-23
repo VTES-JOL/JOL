@@ -1,48 +1,32 @@
-<%@ page import="net.deckserver.services.TournamentService" %>
-<%@ page import="net.deckserver.storage.json.system.TournamentMetadata" %>
-<%@ page import="java.util.List" %>
-<%@ page import="net.deckserver.game.enums.GameStatus" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%
-  List<TournamentMetadata> prepare = TournamentService.getTournamentsWithStatus(List.of(GameStatus.ACTIVE, GameStatus.STARTING));
-%>
-<div class="card shadow mt-2">
-  <div class="card-header bg-body-secondary">
-    <h5>Tournament Tables</h5>
+<%-- Hidden select preserved so existing JS callbacks that read #nameOfTournament continue to work --%>
+<select id="nameOfTournament" class="d-none"></select>
+
+<div class="card shadow flex-fill d-flex flex-column">
+  <div class="card-header bg-body-secondary d-flex justify-content-between align-items-center">
+    <span class="fw-semibold" id="tourTablesTitle">Tournament Tables</span>
+    <button class="btn btn-sm btn-outline-secondary" onclick="exitTourMode()">Close</button>
   </div>
-  <div class="card-body">
-    <label for="nameOfTournament" class="form-label">Choose Tournament:</label>
-    <select name="nameOfTournament" id="nameOfTournament" class="form-select">
-      <c:forEach items="<%= prepare %>" var="tour">
-        <option value="${tour.name}">${tour.name}</option>
-      </c:forEach>
-    </select>
-    <div class="d-flex justify-content-between">
-      <button onclick="loadTournament()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Load Tournament</button>
-    </div>
+  <div class="card-body d-flex flex-column p-2 flex-fill min-h-0">
     <div id="saveTables" class="d-none">
-      <div class="d-flex justify-content-between w-100">
-        <button onclick="saveTables()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Save Tables</button>
-        <button onclick="downloadCurrentTables()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Download Tables</button>
-        <button onclick="showCurrentTables()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Show Tables</button>
-        <button data-bs-toggle="modal" data-bs-target="#importTablesModal" class="btn btn-outline-primary btn-sm mt-2 w-100">Import Tables</button>
-      </div>
-      <div class="d-flex justify-content-between w-100">
-        <button onclick="createTournamentTables()" class="btn btn-outline-success btn-sm mt-2 w-100">Create Rounds</button>
+      <div class="d-flex gap-1 flex-wrap">
+        <button onclick="saveTables()" class="btn btn-outline-secondary btn-sm">Save Tables</button>
+        <button onclick="downloadCurrentTables()" class="btn btn-outline-secondary btn-sm">Download</button>
+        <button onclick="showCurrentTables()" class="btn btn-outline-secondary btn-sm">Show Tables</button>
+        <button data-bs-toggle="modal" data-bs-target="#importTablesModal" class="btn btn-outline-primary btn-sm">Import</button>
+        <button onclick="createTournamentTables()" class="btn btn-outline-success btn-sm">Create Rounds</button>
       </div>
     </div>
     <div id="saveFinal" class="d-none">
-      <div class="d-flex justify-content-between w-100">
-        <button onclick="saveFinal()" class="btn btn-outline-secondary btn-sm mt-2 w-100">Save Final</button>
-        <button onclick="startSeeding()" class="btn btn-outline-success btn-sm mt-2 w-100">Start Seeding</button>
-      </div>
-      <div>
-        <button onclick="startFinal()" class="btn btn-outline-success btn-sm mt-2 w-100">Start Final</button>
+      <div class="d-flex gap-1 flex-wrap mt-2">
+        <button onclick="saveFinal()" class="btn btn-outline-secondary btn-sm">Save Final</button>
+        <button onclick="startSeeding()" class="btn btn-outline-secondary btn-sm">Start Seeding</button>
+        <button onclick="startFinal()" class="btn btn-outline-success btn-sm">Start Final</button>
       </div>
     </div>
+    <div id="finalStartedMsg" class="d-none alert alert-info mt-2">Finals already started — see seating below.</div>
     <div id="importTablesMsg" class="d-none alert mt-2"></div>
-    <div id="tourRounds"></div>
-    <div id="tourFinal" class="d-none">
+    <div id="tourRounds" class="flex-fill overflow-auto mt-2 min-h-0"></div>
+    <div id="tourFinal" class="d-none flex-fill overflow-auto min-h-0">
       <span class="h4">Tournament Players</span>
       <ul id="finalPlayers" class="card-body p-1 grid sortableFinal"></ul>
       <div>
