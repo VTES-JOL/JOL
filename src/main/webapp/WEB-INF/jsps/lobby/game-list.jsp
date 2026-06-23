@@ -5,7 +5,7 @@
             New <i class="bi-plus-circle"></i>
         </button>
     </div>
-    <div class="flex-fill overflow-auto min-h-0">
+    <div class="flex-fill min-h-0" style="overflow-y: auto; overflow-x: clip;">
         <div id="lobbyGameList" class="list-group list-group-flush"></div>
     </div>
 </div>

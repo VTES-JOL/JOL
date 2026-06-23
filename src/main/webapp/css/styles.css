@@ -205,6 +205,46 @@ body * {
     }
 }
 
+/* Lobby page flex layout */
+.lobby-layout {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 0.5rem;
+}
+
+.lobby-col-left,
+.lobby-col-right {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.lobby-col-left > .card {
+    min-height: 0;
+}
+
+@media (min-width: 768px) {
+    .lobby-layout {
+        flex-direction: row;
+    }
+    .lobby-col-left {
+        flex: 0 0 33.333%;
+        min-width: 0;
+    }
+    .lobby-col-right {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+}
+
+@media (min-width: 992px) {
+    .lobby-col-left {
+        flex: 0 0 25%;
+    }
+}
+
 /* Deck page flex layout */
 .deck-layout {
     display: flex;

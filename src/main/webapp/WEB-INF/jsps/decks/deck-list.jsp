@@ -7,7 +7,7 @@
         <input id="deckTextFilter" type="text" class="form-control form-control-sm rounded-pill mb-1"
                placeholder="Filter by name or comment..." oninput="filterDeckList()">
         <select id="deckFilter" class="form-select form-select-sm mb-2" onchange="selectDeckFilter()"></select>
-        <div class="flex-fill overflow-auto" style="min-height: 0; overflow-x: clip;">
+        <div class="flex-fill min-h-0" style="overflow-y: auto; overflow-x: clip;">
             <div id="decks" class="list-group list-group-flush"></div>
         </div>
     </div>

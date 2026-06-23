@@ -1,8 +1,8 @@
-<div class="row g-2 flex-fill align-items-stretch min-h-0">
-    <div class="col-md-4 col-lg-3 d-flex flex-column min-h-0">
+<div class="lobby-layout">
+    <div class="lobby-col-left">
         <jsp:include page="game-list.jsp"/>
     </div>
-    <div class="col-md-8 col-lg-9 d-flex flex-column min-h-0">
+    <div class="lobby-col-right">
         <div class="d-none d-flex flex-column flex-fill min-h-0" id="lobbyCreateCol">
             <jsp:include page="game-create.jsp"/>
         </div>
