@@ -137,17 +137,6 @@ body * {
     overflow: hidden;
 }
 
-/* Pass through definite height from #content to inner page wrappers */
-#main,
-#deck,
-#active,
-#tournament,
-#tournamentAdmin,
-#lobby {
-    height: 100%;
-    min-height: 0;
-}
-
 #tournamentAdmin,
 #main,
 #deck,
@@ -173,6 +162,7 @@ body * {
 .main-col-center {
     display: flex;
     flex-direction: column;
+    flex: 1 1 0;
     min-height: 0;
 }
 

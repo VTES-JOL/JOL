@@ -81,10 +81,10 @@ public class GameActionResource extends BaseResource {
 
     /** Replaces DS.doToggle() */
     @POST
-    @Path("toggle/{id}")
-    public Map<String, Object> doToggle(@PathParam("id") String id) {
+    @Path("toggle/{toggleId}")
+    public Map<String, Object> doToggle(@PathParam("toggleId") String toggleId) {
         String player = username();
-        getView(player).toggleCollapsed(id);
+        getView(player).toggleCollapsed(toggleId);
         return update(player);
     }
 
