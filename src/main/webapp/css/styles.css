@@ -161,9 +161,97 @@ body * {
     padding: 0.5rem 0;
 }
 
-#main > .row,
-#main > .row > [class*="col-"] {
+.main-layout {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
     min-height: 0;
+    gap: 0.5rem;
+}
+
+.main-col-left,
+.main-col-center {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.main-col-left > .card,
+.main-col-center > .card,
+.main-col-center > .card > .card-body {
+    min-height: 0;
+}
+
+.main-col-right {
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 0;
+}
+
+@media (min-width: 768px) {
+    .main-layout {
+        flex-direction: row;
+    }
+    .main-col-left {
+        flex: 0 0 33.333%;
+        min-width: 0;
+    }
+    .main-col-center {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+}
+
+@media (min-width: 992px) {
+    .main-col-left {
+        flex: 0 0 25%;
+    }
+    .main-col-right {
+        display: flex;
+        flex: 0 0 25%;
+        min-width: 0;
+    }
+}
+
+/* Deck page flex layout */
+.deck-layout {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 0.5rem;
+}
+
+.deck-col-left,
+.deck-col-right {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.deck-col-left > .card {
+    min-height: 0;
+}
+
+@media (min-width: 768px) {
+    .deck-layout {
+        flex-direction: row;
+    }
+    .deck-col-left {
+        flex: 0 0 33.333%;
+        min-width: 0;
+    }
+    .deck-col-right {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+}
+
+@media (min-width: 992px) {
+    .deck-col-left {
+        flex: 0 0 25%;
+    }
 }
 
 /* Full-height tab panes: tab-content fills remaining card space, active pane scrolls */
