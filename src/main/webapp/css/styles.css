@@ -62,22 +62,12 @@
     --bs-card-cap-padding-x: 0.5rem;
 }
 
-.hidden-card {
-    position: relative;
-    top: 0.2rem;
-}
-
 .badge {
     --bs-badge-font-weight: 400;
 }
 
 body * {
     font-family: "Times New Roman", Times, serif;
-}
-
-html, body {
-    height: 100%;
-    margin: 0;
 }
 
 @media only screen and (orientation: landscape) and (max-height: 576px) {
@@ -100,10 +90,6 @@ html, body {
     padding: 0 !important;
 }
 
-.border-dotted {
-    border-style: dotted !important;
-}
-
 #playCardModal .icon, #playCardModal .clan {
     font-size: 2rem;
 }
@@ -113,17 +99,9 @@ html, body {
     padding-right: 0.3rem;
 }
 
-.mhd-50 {
-    max-height: 50dvh;
-}
-
 .mhd-70 {
     max-height: 70dvh;
     min-height: 70dvh;
-}
-
-.mhd-80 {
-    max-height: 80dvh;
 }
 
 .mhd-85 {
@@ -135,8 +113,9 @@ html, body {
     min-height: 90dvh;
 }
 
-.mhd-100 {
-    max-height: 100dvh;
+#globalChatOutput {
+    min-height: 0;
+    overflow-y: auto;
 }
 
 #globalChat {
@@ -153,13 +132,19 @@ html, body {
 }
 
 #content {
-    flex: 1;
-    overflow: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
 }
 
 /* Pass through definite height from #content to inner page wrappers */
-#main, #deck, #active, #tournament {
+#main,
+#deck,
+#active,
+#tournament,
+#tournamentAdmin {
     height: 100%;
+    min-height: 0;
 }
 
 #tournamentAdmin,
@@ -168,9 +153,15 @@ html, body {
 #tournament,
 #active {
     height: 100%;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     padding: 0.5rem 0;
+}
+
+#main > .row,
+#main > .row > [class*="col-"] {
+    min-height: 0;
 }
 
 /* Full-height tab panes: tab-content fills remaining card space, active pane scrolls */
@@ -192,8 +183,6 @@ html, body {
     height: 40vh;
 }
 
-#deckErrors {
-}
 
 :root {
     --jol-mention-bg: #d4d7f9;
@@ -288,10 +277,6 @@ nav * {
     background-color: mediumseagreen !important;
 }
 
-.button-hover:hover {
-    font-weight: 1000;
-}
-
 .chat-timestamp {
     color: #888;
     font-size: smaller;
@@ -339,20 +324,6 @@ a.card-name {
     height: 20rem;
 }
 
-@media (min-width: 576px) {
-    .w-sm-25 {
-        width: 25% !important;
-    }
-
-    .w-sm-50 {
-        width: 50% !important;
-    }
-
-    .w-sm-75 {
-        width: 75% !important;
-    }
-}
-
 @media (min-width: 768px) {
     .control-grid {
         grid-template-areas: 'hand commands info' 'chat chat chat';
@@ -360,10 +331,6 @@ a.card-name {
 
     .spectator {
         grid-template-areas: 'commands info' 'chat chat';
-    }
-
-    .w-md-25 {
-        width: 25% !important;
     }
 
     .w-md-33 {
@@ -374,13 +341,6 @@ a.card-name {
         width: 50% !important;
     }
 
-    .w-md-66 {
-        width: 66% !important;
-    }
-
-    .w-md-75 {
-        width: 75% !important;
-    }
 }
 
 @media (min-width: 992px) {
@@ -388,13 +348,6 @@ a.card-name {
         width: 25% !important;
     }
 
-    .w-lg-50 {
-        width: 50% !important;
-    }
-
-    .w-lg-75 {
-        width: 75% !important;
-    }
 }
 
 @media (min-width: 1200px) {
@@ -410,17 +363,6 @@ a.card-name {
         width: 20% !important;
     }
 
-    .w-xl-25 {
-        width: 25% !important;
-    }
-
-    .w-xl-50 {
-        width: 50% !important;
-    }
-
-    .w-xl-75 {
-        width: 75% !important;
-    }
 }
 
 .hand {

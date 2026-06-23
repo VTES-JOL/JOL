@@ -8,7 +8,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-100 mh-100 ">
 <head>
     <title>V:TES Online</title>
     <script>
@@ -33,7 +33,7 @@
     <link rel="shortcut icon" href="https://static.deckserver.net/assets/images/favicon.ico"/>
     <link href="https://fonts.googleapis.com/css?family=IM+Fell+English" rel="stylesheet">
 </head>
-<body class="h-100 d-flex flex-column">
+<body class="h-100 mh-100 d-flex flex-column">
 <jsp:include page="/WEB-INF/jsps/topbar.jsp"/>
 <div id="content" class="container-fluid">
     <div id="main">
