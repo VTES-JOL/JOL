@@ -3,7 +3,7 @@
         <span class="fw-semibold">New Game</span>
         <button class="btn btn-sm btn-outline-secondary" onclick="exitLobbyDetail()">Cancel</button>
     </div>
-    <div class="card-body p-3 overflow-auto" style="min-height: 0">
+    <div class="card-body p-3 overflow-auto min-h-0">
         <div class="mb-3">
             <label for="lobbyGameName" class="form-label">Name</label>
             <input type="text" class="form-control" id="lobbyGameName" maxlength="60"

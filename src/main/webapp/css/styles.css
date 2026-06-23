@@ -386,12 +386,8 @@ a.card-name {
     cursor: pointer;
 }
 
-.players {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 33%));
-    justify-items: center;
-    justify-content: center;
-    align-items: baseline;
+.min-h-0 {
+    min-height: 0;
 }
 
 .control-grid {
@@ -1160,18 +1156,3 @@ a.card-name {
     content: "Sabbat";
 }
 
-.role-add-btn {
-    visibility: hidden;
-}
-
-tr:hover .role-add-btn {
-    visibility: visible;
-}
-
-.table-size-min:has( > li:nth-child(3)) {
-    color: green;
-}
-
-.table-size-max:has( > li:nth-child(6)) {
-    color: red;
-}

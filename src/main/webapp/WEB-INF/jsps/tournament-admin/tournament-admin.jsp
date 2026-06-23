@@ -11,7 +11,7 @@
             <button class="btn btn-sm btn-outline-secondary" onclick="exitTourMode()">Cancel</button>
         </span>
     </div>
-    <div class="card-body p-2 flex-fill overflow-auto px-3" style="min-height: 0">
+    <div class="card-body p-2 flex-fill overflow-auto px-3 min-h-0">
         <input type="hidden" id="originalTourName"/>
         <div>
             <div class="row mb-2">

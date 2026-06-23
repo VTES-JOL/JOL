@@ -13,6 +13,8 @@ import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.CardSimple;
 import net.deckserver.storage.json.system.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -26,6 +28,8 @@ import java.util.stream.IntStream;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TournamentResource extends BaseResource {
+
+    private static final Logger log = LoggerFactory.getLogger(TournamentResource.class);
 
     /** Replaces DS.createTournament() */
     @POST
@@ -88,7 +92,7 @@ public class TournamentResource extends BaseResource {
             TournamentService.createTournament(def);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to create tournament '{}'", body.tourName(), e);
             return false;
         }
     }
@@ -395,6 +399,18 @@ public class TournamentResource extends BaseResource {
         regPlayers.removeAll(tablePlayers);
         result.put(roundNumber, regPlayers);
         return result;
+    }
+
+    /** Returns registered players not yet placed in the finals seeding (used by DS.getFinalDelta()) */
+    @GET
+    @Path("{name}/final-delta")
+    public List<TournamentRegistration> getFinalDelta(@PathParam("name") String tourName) {
+        List<TournamentRegistration> regPlayers = new ArrayList<>(getTournamentPlayers(tourName));
+        List<String> seeding = TournamentService.getTournament(tourName).getFinals().getSeeding();
+        if (seeding != null) {
+            regPlayers.removeIf(r -> seeding.contains(r.getPlayer()));
+        }
+        return regPlayers;
     }
 
     /** Replaces DS.loadCrypt() */

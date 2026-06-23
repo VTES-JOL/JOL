@@ -6,7 +6,7 @@
     <span class="fw-semibold" id="tourTablesTitle">Tournament Tables</span>
     <button class="btn btn-sm btn-outline-secondary" onclick="exitTourMode()">Close</button>
   </div>
-  <div class="card-body d-flex flex-column p-2 flex-fill" style="min-height: 0">
+  <div class="card-body d-flex flex-column p-2 flex-fill min-h-0">
     <div id="saveTables" class="d-none">
       <div class="d-flex gap-1 flex-wrap">
         <button onclick="saveTables()" class="btn btn-outline-secondary btn-sm">Save Tables</button>
@@ -25,8 +25,8 @@
     </div>
     <div id="finalStartedMsg" class="d-none alert alert-info mt-2">Finals already started — see seating below.</div>
     <div id="importTablesMsg" class="d-none alert mt-2"></div>
-    <div id="tourRounds" class="flex-fill overflow-auto mt-2" style="min-height: 0"></div>
-    <div id="tourFinal" class="d-none flex-fill overflow-auto" style="min-height: 0">
+    <div id="tourRounds" class="flex-fill overflow-auto mt-2 min-h-0"></div>
+    <div id="tourFinal" class="d-none flex-fill overflow-auto min-h-0">
       <span class="h4">Tournament Players</span>
       <ul id="finalPlayers" class="card-body p-1 grid sortableFinal"></ul>
       <div>

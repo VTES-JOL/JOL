@@ -19,7 +19,7 @@
     "discordId" : null,
     "veknId" : "77777",
     "countryCode" : null,
-    "roles" : [ "PLAYTESTER", "ADMIN" ],
+    "roles" : [ "ADMIN", "PLAYTESTER" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF"
   },
@@ -55,7 +55,7 @@
     "discordId" : "",
     "veknId" : "222222",
     "countryCode" : "AU",
-    "roles" : [ "TOURNAMENT_ADMIN", "JUDGE", "PLAYTESTER", "ADMIN" ],
+    "roles" : [ "ADMIN", "JUDGE", "TOURNAMENT_ADMIN", "PLAYTESTER" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF"
   },
@@ -67,7 +67,7 @@
     "discordId" : "",
     "veknId" : "111111",
     "countryCode" : "US",
-    "roles" : [ "SUPER_USER", "JUDGE", "PLAYTESTER" ],
+    "roles" : [ "JUDGE", "SUPER_USER", "PLAYTESTER" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF"
   },

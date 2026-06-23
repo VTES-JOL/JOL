@@ -6,7 +6,7 @@
             <button class="btn btn-sm btn-outline-secondary" onclick="exitEditMode()">Cancel</button>
         </span>
     </div>
-    <div class="card-body p-2 flex-fill overflow-auto px-3" style="min-height: 0">
+    <div class="card-body p-2 flex-fill overflow-auto px-3 min-h-0">
         <div class="row mb-2">
             <label class="col-form-label col-2" for="deckName">Name</label>
             <div class="col-10">

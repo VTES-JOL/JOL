@@ -2,7 +2,7 @@
   "Rounds are being played: Round 2 - Table 2" : {
     "timestamp" : "2026-06-19T01:04:26.183605Z",
     "playerTimestamps" : {
-      "Player2" : "2026-06-23T11:49:37.516745+10:00"
+      "Player2" : "2026-06-23T01:50:46.390161Z"
     },
     "playerPings" : {
       "Player7" : true
@@ -11,7 +11,7 @@
   "Rounds are being played: Round 1 - Table 1" : {
     "timestamp" : "2026-06-19T02:45:59.640858Z",
     "playerTimestamps" : {
-      "Player2" : "2026-06-19T03:01:23.008165Z"
+      "Player2" : "2026-06-23T01:50:54.919368Z"
     },
     "playerPings" : {
       "Player1" : true,
@@ -35,7 +35,7 @@
   "Test Game" : {
     "timestamp" : "2025-10-28T08:29:03.172161Z",
     "playerTimestamps" : {
-      "Player2" : "2025-10-28T08:29:53.555605Z",
+      "Player2" : "2026-06-23T01:50:49.237826Z",
       "Player1" : "2026-06-22T02:29:56.424846Z"
     },
     "playerPings" : {

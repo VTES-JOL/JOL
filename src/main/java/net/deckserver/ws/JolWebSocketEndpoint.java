@@ -1,5 +1,7 @@
 package net.deckserver.ws;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.services.VersionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,7 @@ public class JolWebSocketEndpoint {
 
     private static final Logger log = LoggerFactory.getLogger(JolWebSocketEndpoint.class);
     private static final String PLAYER_KEY = "playerName";
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     static {
         log.info("JolWebSocketEndpoint class loaded — endpoint registered at /ws/updates");
@@ -65,31 +68,29 @@ public class JolWebSocketEndpoint {
         // and {"type":"leave","game":"<gameId>"} when leaving, so the server can
         // target game notifications to only the sessions watching that game.
         try {
-            if (message.contains("\"ping\"")) {
-                String ver = VersionService.getVersion();
-                String pong = ver != null
-                        ? "{\"type\":\"pong\",\"version\":\"" + ver + "\"}"
-                        : "{\"type\":\"pong\"}";
-                if (ws.isOpen()) ws.getBasicRemote().sendText(pong);
-                return;
-            } else if (message.contains("\"join\"")) {
-                String gameId = extractGameId(message);
-                if (gameId != null) WebSocketRegistry.joinGame(gameId, ws);
-            } else if (message.contains("\"leave\"")) {
-                String gameId = extractGameId(message);
-                if (gameId != null) WebSocketRegistry.leaveGame(gameId, ws);
+            JsonNode node = MAPPER.readTree(message);
+            String type = node.path("type").asText();
+            switch (type) {
+                case "ping" -> {
+                    String ver = VersionService.getVersion();
+                    String pong = ver != null
+                            ? "{\"type\":\"pong\",\"version\":\"" + ver + "\"}"
+                            : "{\"type\":\"pong\"}";
+                    if (ws.isOpen()) ws.getBasicRemote().sendText(pong);
+                }
+                case "join" -> {
+                    String gameId = node.path("game").asText(null);
+                    if (gameId != null) WebSocketRegistry.joinGame(gameId, ws);
+                }
+                case "leave" -> {
+                    String gameId = node.path("game").asText(null);
+                    if (gameId != null) WebSocketRegistry.leaveGame(gameId, ws);
+                }
+                default -> log.debug("WebSocket unknown message type '{}' from session {}", type, ws.getId());
             }
         } catch (Exception e) {
-            log.warn("WebSocket onMessage parse error: {}", e.getMessage());
+            log.warn("WebSocket onMessage parse error from session {}: {}", ws.getId(), e.getMessage());
         }
-    }
-
-    private static String extractGameId(String message) {
-        int idx = message.indexOf("\"game\":\"");
-        if (idx < 0) return null;
-        int start = idx + 8;
-        int end = message.indexOf('"', start);
-        return end > start ? message.substring(start, end) : null;
     }
 
     @OnClose

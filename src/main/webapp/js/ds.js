@@ -108,6 +108,7 @@ const DS = {
     getFinalPlayers:         (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/final-players`, opts),
     saveFinal:               (tourName, players, opts) => apiPut(`/tournament/${_enc(tourName)}/final-players`, players, opts),
     getRegDelta:             (tourName, round, opts) => apiGet(`/tournament/${_enc(tourName)}/round-delta?round=${round}`, opts),
+    getFinalDelta:           (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/final-delta`, opts),
     loadCrypt:               (tourName, player, opts) => apiGet(`/tournament/${_enc(tourName)}/crypt?player=${_enc(player)}`, opts),
     cryptCount:              (tourName, player, opts) => apiGet(`/tournament/${_enc(tourName)}/crypt-count?player=${_enc(player)}`, opts),
     tournamentAlreadyActive: (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/status`, opts),
@@ -876,7 +877,7 @@ function loadTournamentDetails(name) {
 
 function closeTournament() {
     let nameOfTournament = $("#nameOfTournament").val();
-    DS.closeTournament(nameOfTournament);
+    DS.closeTournament(nameOfTournament, {callback: processData, errorHandler: errorhandler});
 }
 
 function loadTournament(name) {
@@ -1319,9 +1320,10 @@ function saveTables() {
                 rounds[round][tableNumber] = players;
             }
         });
-        DS.saveTables(tournamentSelected, rounds);
+        DS.saveTables(tournamentSelected, rounds, {callback: processData, errorHandler: errorhandler});
         resetTournamentManager();
     }
+}
 
 function importTables() {
     let tournamentSelected = $("#nameOfTournament option:selected").text();
@@ -1347,8 +1349,6 @@ function importTables() {
             errorDiv.text("Import failed: " + msg).removeClass("d-none");
         }
     });
-}
-
 }
 
 function resetTournamentManager() {

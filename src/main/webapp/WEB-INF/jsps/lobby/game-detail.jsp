@@ -1,4 +1,4 @@
-<div class="card shadow flex-fill d-flex flex-column" style="min-height: 0">
+<div class="card shadow flex-fill d-flex flex-column min-h-0">
     <div class="card-header bg-body-secondary d-flex justify-content-between align-items-center">
         <span class="d-flex align-items-center gap-2">
             <span class="fw-semibold" id="lobbyDetailName"></span>
@@ -23,7 +23,7 @@
             </button>
         </span>
     </div>
-    <div class="card-body p-0 d-flex flex-column overflow-auto" style="min-height: 0">
+    <div class="card-body p-0 d-flex flex-column overflow-auto min-h-0">
         <!-- Players / registrations -->
         <div class="p-3 border-bottom">
             <div class="fw-semibold small text-muted mb-2">Players</div>
@@ -67,7 +67,7 @@
         </div>
 
         <!-- Deck preview -->
-        <div id="lobbyDeckPreviewSection" class="p-3 d-none flex-fill overflow-auto" style="min-height: 0">
+        <div id="lobbyDeckPreviewSection" class="p-3 d-none flex-fill overflow-auto min-h-0">
             <div class="fw-semibold small text-muted mb-2">Registered Deck</div>
             <div id="lobbyDeckPreview"></div>
         </div>

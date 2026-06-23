@@ -1,4 +1,4 @@
-<div class="row g-2 flex-fill align-items-stretch" style="min-height: 0">
+<div class="row g-2 flex-fill align-items-stretch min-h-0">
     <div class="col-12 d-flex flex-column">
         <div class="card shadow flex-fill d-flex flex-column">
             <div class="card-header bg-body-secondary p-0">

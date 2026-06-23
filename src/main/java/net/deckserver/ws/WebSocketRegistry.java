@@ -1,11 +1,14 @@
 package net.deckserver.ws;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.websocket.Session;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 public class WebSocketRegistry {
 
+    private static final Logger log = LoggerFactory.getLogger(WebSocketRegistry.class);
     private static final ConcurrentHashMap<String, CopyOnWriteArraySet<Session>> sessions = new ConcurrentHashMap<>();
     // gameId -> sessions watching that game
     private static final ConcurrentHashMap<String, CopyOnWriteArraySet<Session>> gameSessions = new ConcurrentHashMap<>();
@@ -58,6 +61,18 @@ public class WebSocketRegistry {
     private static void send(Session session, String message) {
         try {
             if (session.isOpen()) session.getBasicRemote().sendText(message);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            log.warn("WebSocket send failed for session {}, removing: {}", session.getId(), e.getMessage());
+            evict(session);
+        }
+    }
+
+    private static void evict(Session session) {
+        sessions.values().forEach(set -> set.remove(session));
+        sessions.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+        gameSessions.entrySet().removeIf(entry -> {
+            entry.getValue().remove(session);
+            return entry.getValue().isEmpty();
+        });
     }
 }
