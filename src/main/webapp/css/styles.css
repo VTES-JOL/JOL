@@ -142,7 +142,8 @@ body * {
 #deck,
 #active,
 #tournament,
-#tournamentAdmin {
+#tournamentAdmin,
+#lobby {
     height: 100%;
     min-height: 0;
 }
@@ -151,7 +152,8 @@ body * {
 #main,
 #deck,
 #tournament,
-#active {
+#active,
+#lobby {
     height: 100%;
     min-height: 0;
     display: flex;

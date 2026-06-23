@@ -500,166 +500,298 @@ function addRole() {
     DS.setRole(player, role, true, {callback:processData});
 }
 
+// Lobby state
+let _lobbyGames = [];
+let _lobbyCurrentGame = null;
+let _lobbyPlayers = [];
+let _lobbyDecks = [];
+
 function callbackLobby(data) {
-    let currentGames = $("#currentGames");
-    let publicGames = $("#publicGames");
-    let myGameList = $("#myGameList");
-    let playerList = $("#playerList");
-    let invitedGames = $("#invitedGames");
-    let createGameFormat = $("#gameFormat");
+    _lobbyGames = data.games || [];
+    _lobbyPlayers = data.players || [];
+    _lobbyDecks = data.decks || [];
 
-    createGameFormat.empty();
+    // Populate format dropdown in create panel
+    let createFormat = $("#lobbyGameFormat");
+    createFormat.empty();
     $.each(data.gameFormats, function (index, value) {
-        createGameFormat.append($("<option/>", {value: value, text: value}));
-    })
+        createFormat.append($("<option/>", {value: value, text: value}));
+    });
 
-    playerList.autocomplete({
-        source: data.players,
+    // Player autocomplete for both create and detail invite inputs
+    $("#lobbyInviteInput, #lobbyDetailInviteInput").autocomplete({
+        source: _lobbyPlayers,
         change: function (event, ui) {
-            if (ui.item === null) {
-                $(this).val((ui.item ? ui.item.id : ""));
-            }
+            if (ui.item === null) $(this).val("");
         }
     });
 
-    currentGames.empty();
-    myGameList.empty();
-    $.each(data.myGames, function (index, gameEntry) {
-        myGameList.append(new Option(gameEntry.name, gameEntry.name));
-        let gameItem = $("<li/>").addClass("list-group-item");
-        let gameHeader = $("<div/>").addClass("d-flex justify-content-between align-items-center");
-        let gameName = $("<h6/>").addClass("d-inline text-break").text(gameEntry.name);
-        let startButton = gameEntry.gameStatus === 'Inviting' ? createButton({
-            text: "Start",
-            class: "btn btn-outline-secondary btn-sm",
-            confirm: "Start Game?"
-        }, DS.startGame, gameEntry.name) : "";
-        let endButton = createButton({
-            text: "Close",
-            class: "btn btn-outline-secondary btn-sm",
-            confirm: "End Game?"
-        }, DS.endGame, gameEntry.gameId);
-        let buttonWrapper = $("<span/>").addClass("d-flex justify-content-between align-items-center gap-1");
-        let playerTable = $("<table/>").addClass("table table-bordered table-sm table-hover mt-2");
-        let tableBody = $("<tbody/>");
-        buttonWrapper.append(startButton, endButton);
-        playerTable.append(tableBody);
-        gameHeader.append(gameName, buttonWrapper);
-        gameItem.append(gameHeader, playerTable);
-        currentGames.append(gameItem);
-        $.each(gameEntry.registrations, function (i, registration) {
-            let registrationRow = $("<tr/>");
-            let playerCell = $("<td/>").addClass("w-25").text(registration.player);
-            registrationRow.append(playerCell);
-            let summary = $("<td/>").addClass("w-25 text-center")
-            if (registration.registered) {
-                summary.append(`<i class="bi bi-check-circle text-success fs-6"></i>`);
-            }
-            registrationRow.append(summary);
-            tableBody.append(registrationRow);
+    // Render unified game list
+    let list = $("#lobbyGameList").empty();
+    $.each(_lobbyGames, function (index, game) {
+        let visClass = game.visibility === "PUBLIC" ? "bg-success-subtle text-success-emphasis border border-success-subtle"
+                                                    : "bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle";
+        let relLabel = {OWNER: "Owner", REGISTERED: "Registered", INVITED: "Invited", OPEN: "Open"}[game.playerRelationship] || "";
+        let relClass = {
+            OWNER: "text-primary", REGISTERED: "text-success", INVITED: "text-warning-emphasis", OPEN: "text-muted"
+        }[game.playerRelationship] || "text-muted";
+
+        let registeredCount = game.registrations.filter(r => r.registered).length;
+        let totalCount = game.registrations.length;
+        let playerCount = totalCount > 0 ? `${registeredCount}/${totalCount} <i class="bi bi-person"></i>` : "";
+        let countdown = game.visibility === "PUBLIC"
+            ? `<small class="text-muted">closes ${moment().to(moment(game.created).add(5, 'days'))}</small>`
+            : "";
+
+        let item = $(`
+            <a href="#" class="list-group-item list-group-item-action px-3 py-2">
+                <div class="d-flex justify-content-between align-items-start">
+                    <span class="fw-semibold text-break me-2">${game.name}</span>
+                    <span class="badge ${visClass} text-nowrap">${game.visibility}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-1">
+                    <span class="badge bg-secondary">${game.format}</span>
+                    <small class="${relClass}">${relLabel}</small>
+                </div>
+                ${countdown || playerCount ? `<div class="d-flex justify-content-between align-items-center mt-1">
+                    <span class="small text-muted">${playerCount}</span>
+                    ${countdown}
+                </div>` : ""}
+            </a>
+        `).on('click', function (e) {
+            e.preventDefault();
+            selectLobbyGame(game);
         });
+        list.append(item);
     });
 
-    publicGames.empty();
-    $.each(data.publicGames, function (index, gameEntry) {
-        let created = moment(gameEntry.timestamp).tz("UTC");
-        let expiry = created.add(5, 'days');
-        let joinButton = createButton({
-            class: "btn btn-outline-secondary btn-sm",
-            text: "Join"
-        }, DS.invitePlayer, gameEntry.name, player);
-
-        let leaveButton = createButton({
-            class: "btn btn-outline-secondary btn-sm",
-            text: "Leave",
-            confirm: "Leave Game?"
-        }, DS.unInvitePlayer, gameEntry.name, player);
-
-        let playerInGame = false;
-
-        let template = $(`
-        <li class='list-group-item'>
-            <div class="d-flex justify-content-between align-items-center">
-                <span>
-                    <span class="badge bg-secondary">${gameEntry.format}</span>
-                    <h6 class="mx-2 d-inline text-break">${gameEntry.name}</h6>
-                </span>
-                <span class="d-flex justify-content-between align-items-center gap-1 game-join">
-                    <span>Closes ${moment().to(expiry)}</span>
-                </span>
-            </div>
-        </li>
-        `);
-        publicGames.append(template);
-        if (gameEntry.registrations.length > 0) {
-            let playerTable = $("<table/>").addClass("table table-bordered table-sm table-hover mt-2");
-            let tableBody = $("<tbody/>");
-            playerTable.append(tableBody);
-            template.append(playerTable);
-            $.each(gameEntry.registrations, function (i, registration) {
-                let registrationRow = $("<tr/>");
-                let playerCell = $("<td/>").addClass("w-50").text(registration.player);
-                if (registration.player === player) {
-                    playerInGame = true;
-                }
-                registrationRow.append(playerCell);
-                let summary = $("<td/>").addClass("w-50 text-center")
-                if (registration.registered) {
-                    summary.append(`<i class="bi bi-check-circle text-success fs-6"></i>`);
-                }
-                registrationRow.append(summary);
-                tableBody.append(registrationRow);
-            });
+    // If a game was selected before refresh, re-select it by name to update detail panel
+    if (_lobbyCurrentGame) {
+        let refreshed = _lobbyGames.find(g => g.name === _lobbyCurrentGame.name);
+        if (refreshed) {
+            selectLobbyGame(refreshed);
         }
-        template.find('.game-join').append(playerInGame ? leaveButton : joinButton);
-    })
+    }
 
-    invitedGames.empty();
-    $.each(data.invitedGames, function (index, gameEntry) {
-        let template = `
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div class="flex-grow-1 p-2 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-2 text-break">${gameEntry.gameName}</h5>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="badge bg-secondary me-1">${gameEntry.format}</span>
-                        </div>
-                    </div>
-                    <span class="">${gameEntry.deckName || ''}</span>
-                </div>
-                <div>
-                    <div class="d-inline">
-                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" >
-                            Choose Deck
-                        </button>
-                        <div id="chooseDeckDropdown">
-                            <ul class="dropdown-menu dropdown-menu-end invite-${gameEntry.format}" data-name="${gameEntry.gameName}">
-                                <input class="form-control" id="searchDeckInput" type="text" placeholder="Search.." onkeyup="filterChooseDeck()">
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        invitedGames.append(template);
+    if (data.message) {
+        let msg = $("#lobbyDetailMsg");
+        msg.text(data.message).removeClass("d-none");
+        setTimeout(() => msg.addClass("d-none"), 4000);
+    }
+}
+
+function newLobbyGame() {
+    _lobbyCurrentGame = null;
+    $("#lobbyGameName").val("");
+    $("#lobbyPendingInvites").empty();
+    $("#lobbyCreateError").text("");
+    toggleLobbyInviteSection();
+    $("#lobbyCreateCol").removeClass("d-none");
+    $("#lobbyDetailCol").addClass("d-none");
+    $("#lobbyEmptyCol").addClass("d-none");
+}
+
+function toggleLobbyInviteSection() {
+    let isPrivate = $("#lobbyPublicFlag").val() === "PRIVATE";
+    $("#lobbyInviteSection").toggleClass("d-none", !isPrivate);
+}
+
+function addLobbyPendingInvite() {
+    let name = $("#lobbyInviteInput").val().trim();
+    if (!name) return;
+    let existing = $("#lobbyPendingInvites li").map(function() { return $(this).data("player"); }).get();
+    if (existing.includes(name)) return;
+    let item = $(`<li class="list-group-item d-flex justify-content-between align-items-center py-1 px-2">
+        <span>${name}</span>
+        <button type="button" class="btn-close btn-sm" aria-label="Remove"></button>
+    </li>`).data("player", name);
+    item.find(".btn-close").on("click", function() { item.remove(); });
+    $("#lobbyPendingInvites").append(item);
+    $("#lobbyInviteInput").val("").autocomplete("close");
+}
+
+function doCreateLobbyGame() {
+    let gameName = $("#lobbyGameName").val().trim();
+    let publicFlag = $("#lobbyPublicFlag").val();
+    let format = $("#lobbyGameFormat").val();
+    if (!gameName) { $("#lobbyCreateError").text("Name is required."); return; }
+    if (gameName.indexOf("'") > -1 || gameName.indexOf('"') > -1) {
+        $("#lobbyCreateError").text("Name cannot contain ' or \" characters.");
+        return;
+    }
+    let pendingInvites = $("#lobbyPendingInvites li").map(function() { return $(this).data("player"); }).get();
+    DS.createGame(gameName, publicFlag, format, {
+        callback: function(data) {
+            processData(data);
+            let newGame = (_lobbyGames || []).find(g => g.name === gameName);
+            if (newGame) {
+                selectLobbyGame(newGame);
+                // Fire invites sequentially for private games
+                if (publicFlag === "PRIVATE") {
+                    pendingInvites.forEach(function(p) {
+                        DS.invitePlayer(gameName, p, {callback: processData, errorHandler: errorhandler});
+                    });
+                }
+            }
+        },
+        errorHandler: errorhandler
+    });
+    $("#lobbyGameName").val("");
+    $("#lobbyPendingInvites").empty();
+}
+
+function selectLobbyGame(game) {
+    _lobbyCurrentGame = game;
+
+    // Header
+    $("#lobbyDetailName").text(game.name);
+    $("#lobbyDetailFormatBadge").text(game.format);
+    let visEl = $("#lobbyDetailVisibilityBadge");
+    if (game.visibility === "PUBLIC") {
+        visEl.text("Public").removeClass("bg-secondary").addClass("bg-success");
+    } else {
+        visEl.text("Private").removeClass("bg-success").addClass("bg-secondary");
+    }
+
+    // Action buttons — all hidden first
+    $("#lobbyDetailStartBtn, #lobbyDetailCloseBtn, #lobbyDetailJoinBtn, #lobbyDetailLeaveBtn").addClass("d-none");
+    if (game.playerRelationship === "OWNER") {
+        if (game.gameStatus === "Inviting") $("#lobbyDetailStartBtn").removeClass("d-none");
+        $("#lobbyDetailCloseBtn").removeClass("d-none");
+    } else if (game.playerRelationship === "OPEN") {
+        $("#lobbyDetailJoinBtn").removeClass("d-none");
+    } else if (game.playerRelationship === "REGISTERED" || game.playerRelationship === "INVITED") {
+        $("#lobbyDetailLeaveBtn").removeClass("d-none");
+    }
+
+    // Player table
+    let tbody = $("#lobbyDetailPlayerBody").empty();
+    $.each(game.registrations, function (i, reg) {
+        let statusIcon = reg.registered
+            ? `<i class="bi bi-check-circle text-success"></i>`
+            : `<i class="bi bi-hourglass text-muted"></i>`;
+        let removeBtn = "";
+        if (game.playerRelationship === "OWNER") {
+            removeBtn = `<button class="btn btn-sm btn-outline-danger py-0 px-1 remove-invite-btn" data-player="${reg.player}"><i class="bi bi-x"></i></button>`;
+        }
+        let row = $(`<tr>
+            <td>${reg.player}</td>
+            <td class="text-center">${statusIcon}</td>
+            <td class="text-end">${removeBtn}</td>
+        </tr>`);
+        row.find(".remove-invite-btn").on("click", function() {
+            let p = $(this).data("player");
+            DS.unInvitePlayer(_lobbyCurrentGame.name, p, {callback: processData, errorHandler: errorhandler});
+        });
+        tbody.append(row);
     });
 
-    $.each(data.decks, function (index, deck) {
-        $.each(deck.gameFormats, function (i, format) {
-            let dropDown = $(`ul .invite-${format}`);
-            let template = $(`<li><a class="dropdown-item">${deck.name}</a></li>`).on('click', function () {
-                registerDeck(this, deck.name);
-            });
-            dropDown.append(template);
-        })
-    })
-
-    // Registration Result
-    let registerResult = $("#registerResult");
-    registerResult.empty();
-    if (data.message) {
-        registerResult.text(data.message).addClass("badge text-bg-light");
+    // Invite section (owner only)
+    let inviteSection = $("#lobbyDetailInviteSection");
+    if (game.playerRelationship === "OWNER") {
+        inviteSection.removeClass("d-none");
+        $("#lobbyDetailInviteInput").val("").autocomplete({
+            source: _lobbyPlayers,
+            change: function(e, ui) { if (!ui.item) $(this).val(""); }
+        });
+    } else {
+        inviteSection.addClass("d-none");
     }
+
+    // Deck registration section: show when the current player is in the registrations list
+    // (covers INVITED/REGISTERED relationships, and also owners who invited themselves)
+    let playerInRegistrations = game.registrations.some(r => r.player === player);
+    let deckSection = $("#lobbyDetailDeckSection");
+    if (playerInRegistrations) {
+        deckSection.removeClass("d-none");
+        let myReg = game.registrations.find(r => r.player === player);
+        let registeredName = myReg && myReg.deckName ? myReg.deckName : null;
+        $("#lobbyRegisteredDeckName").text(registeredName || "");
+
+        // Populate deck dropdown filtered by game format
+        let dropdown = $("#lobbyDeckDropdown");
+        // Remove previous deck items (keep search input)
+        dropdown.find("li:not(:first-child)").remove();
+        $.each(_lobbyDecks, function(i, deck) {
+            if (deck.gameFormats && deck.gameFormats.includes(game.format)) {
+                let li = $(`<li><a class="dropdown-item" href="#">${deck.name}</a></li>`);
+                li.find("a").on("click", function(e) {
+                    e.preventDefault();
+                    DS.registerDeck(_lobbyCurrentGame.name, deck.name, {callback: processData, errorHandler: errorhandler});
+                });
+                dropdown.append(li);
+            }
+        });
+
+        // Show deck preview if registered
+        if (registeredName) {
+            DS.loadDeck(registeredName, {
+                callback: function(deckData) {
+                    if (deckData && deckData.selectedDeck) {
+                        renderDeck(deckData.selectedDeck.deck, "#lobbyDeckPreview");
+                        addCardTooltips("#lobbyDeckPreview");
+                        $("#lobbyDeckPreviewSection").removeClass("d-none");
+                    }
+                },
+                errorHandler: function() {}
+            });
+        } else {
+            $("#lobbyDeckPreviewSection").addClass("d-none");
+            $("#lobbyDeckPreview").empty();
+        }
+    } else {
+        deckSection.addClass("d-none");
+        $("#lobbyDeckPreviewSection").addClass("d-none");
+        $("#lobbyDeckPreview").empty();
+    }
+
+    $("#lobbyDetailMsg").addClass("d-none");
+    $("#lobbyDetailCol").removeClass("d-none");
+    $("#lobbyCreateCol").addClass("d-none");
+    $("#lobbyEmptyCol").addClass("d-none");
+}
+
+function exitLobbyDetail() {
+    _lobbyCurrentGame = null;
+    $("#lobbyDetailCol").addClass("d-none");
+    $("#lobbyCreateCol").addClass("d-none");
+    $("#lobbyEmptyCol").removeClass("d-none");
+}
+
+function filterLobbyDeckList() {
+    let filter = $("#lobbyDeckSearch").val().toUpperCase();
+    $("#lobbyDeckDropdown li:not(:first-child) a").each(function() {
+        let txt = $(this).text().toUpperCase();
+        $(this).closest("li").toggle(txt.includes(filter));
+    });
+}
+
+function startLobbyGame() {
+    if (!_lobbyCurrentGame || !confirm("Start Game?")) return;
+    DS.startGame(_lobbyCurrentGame.name, {callback: processData, errorHandler: errorhandler});
+}
+
+function closeLobbyGame() {
+    if (!_lobbyCurrentGame || !confirm("Close Game?")) return;
+    DS.endGame(_lobbyCurrentGame.gameId, {callback: processData, errorHandler: errorhandler});
+}
+
+function joinLobbyGame() {
+    if (!_lobbyCurrentGame) return;
+    DS.invitePlayer(_lobbyCurrentGame.name, player, {callback: processData, errorHandler: errorhandler});
+}
+
+function leaveLobbyGame() {
+    if (!_lobbyCurrentGame || !confirm("Leave Game?")) return;
+    DS.unInvitePlayer(_lobbyCurrentGame.name, player, {callback: processData, errorHandler: errorhandler});
+}
+
+function inviteLobbyPlayer() {
+    if (!_lobbyCurrentGame) return;
+    let p = $("#lobbyDetailInviteInput").val().trim();
+    if (!p) return;
+    DS.invitePlayer(_lobbyCurrentGame.name, p, {callback: processData, errorHandler: errorhandler});
+    $("#lobbyDetailInviteInput").val("");
 }
 
 function createTournament() {
