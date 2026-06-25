@@ -285,6 +285,40 @@ body * {
     }
 }
 
+.tour-admin-layout {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 0.5rem;
+}
+
+.tour-admin-col-left,
+.tour-admin-col-right {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.tour-admin-col-left > .card,
+.tour-admin-col-right > div > .card {
+    min-height: 0;
+}
+
+@media (min-width: 992px) {
+    .tour-admin-layout {
+        flex-direction: row;
+    }
+    .tour-admin-col-left {
+        flex: 0 0 33.333%;
+        min-width: 0;
+    }
+    .tour-admin-col-right {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+}
+
 /* Full-height tab panes: tab-content fills remaining card space, active pane scrolls */
 .tab-content-fill {
     flex: 1;

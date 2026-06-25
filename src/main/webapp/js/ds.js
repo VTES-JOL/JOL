@@ -1906,11 +1906,16 @@ function callbackFilterDecks(decks) {
             }
             event.stopPropagation();
         });
-        deckRow.append(
-            $("<div/>").addClass("d-flex justify-content-between align-items-center")
-                .append(deckName)
-                .append(deleteButton)
-        );
+        const nameGroup = $("<span/>").addClass("d-flex align-items-center gap-1").append(deckName);
+        if (deck.deckFormat === 'LEGACY') {
+            const legacyIcon = $("<i/>").addClass("bi bi-exclamation-triangle-fill text-warning")
+                .attr("data-tippy-content", "Legacy format: not all features are available. Resave the deck to upgrade.");
+            nameGroup.prepend(legacyIcon);
+        }
+        const nameRow = $("<div/>").addClass("d-flex justify-content-between align-items-center")
+            .append(nameGroup)
+            .append(deleteButton);
+        deckRow.append(nameRow);
         if (deck.comments) {
             deckRow.append(
                 $("<div/>").addClass("text-muted small text-truncate").text(deck.comments)
@@ -1918,6 +1923,7 @@ function callbackFilterDecks(decks) {
         }
         deckList.append(deckRow);
     });
+    tippy('[data-tippy-content]', {theme: 'light'});
     filterDeckList();
 }
 

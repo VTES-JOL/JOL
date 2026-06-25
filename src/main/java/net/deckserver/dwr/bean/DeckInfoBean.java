@@ -21,7 +21,11 @@ public class DeckInfoBean {
         this.name = deckName;
         this.deckFormat = JolAdmin.getDeckFormat(playerName, deckName);
         this.gameFormats = JolAdmin.getTags(playerName, deckName);
-        this.comments = JolAdmin.getDeckComment(playerName, deckName).split("\n")[0];
+        if (this.deckFormat != DeckFormat.LEGACY) {
+            this.comments = JolAdmin.getDeckComment(playerName, deckName).split("\n")[0];
+        } else {
+            this.comments = "";
+        }
     }
 
     public String getDeckFormat() {
