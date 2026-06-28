@@ -176,7 +176,7 @@ $(document).ready(function () {
     DS.init(initialTarget, {callback: init, errorHandler: errorhandler});
     window.addEventListener('popstate', function(e) {
         const t = e.state && e.state.target ? e.state.target : 'main';
-        DS.navigate(t, {callback: processData, errorHandler: errorhandler});
+        navigateOrInit(t);
     });
 });
 
@@ -2051,6 +2051,17 @@ function doGlobalChat() {
     DS.chat(chatLine, {callback: processData, errorHandler: errorhandler});
 }
 
+function navigateOrInit(target) {
+    // If navigating to main with no chat history loaded yet (e.g. initial load was on a game URL),
+    // request full chat history via init:true so the history isn't blank.
+    const needsInit = target === 'main' && $("#globalChatOutput").children().length === 0;
+    if (needsInit) {
+        DS.init(target, {callback: processData, errorHandler: errorhandler});
+    } else {
+        DS.navigate(target, {callback: processData, errorHandler: errorhandler});
+    }
+}
+
 function doNav(target) {
     const urlPath = target.startsWith('g') ? 'game/' + encodeURIComponent(target.substring(1)) : target;
     history.pushState({target}, '', '/jol/' + urlPath);
@@ -2058,7 +2069,7 @@ function doNav(target) {
     if (refresher) clearTimeout(refresher);
     scrollChat = true;
     $('#targetPicker').hide();
-    DS.navigate(target, {callback: processData, errorHandler: errorhandler});
+    navigateOrInit(target);
     return false;
 }
 
