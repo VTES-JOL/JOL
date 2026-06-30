@@ -4,11 +4,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import jakarta.persistence.EntityManager;
 import net.deckserver.dwr.model.JolGame;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.Visibility;
 import net.deckserver.jobs.GameDataConversion;
+import net.deckserver.jpa.JpaFactory;
+import net.deckserver.jpa.repository.GameChatRepository;
+import net.deckserver.jpa.repository.GameInfoRepository;
+import net.deckserver.jpa.repository.GameStateRepository;
 import net.deckserver.storage.json.game.GameData;
 import net.deckserver.storage.json.game.GameSummary;
 import net.deckserver.storage.json.game.PlayerSummary;
@@ -38,6 +43,9 @@ public class GameService extends PersistedService {
     public static final Predicate<GameInfo> ACTIVE_GAME = (info) -> info.getStatus().equals(GameStatus.ACTIVE);
     private static final Logger logger = LoggerFactory.getLogger(GameService.class);
     private static final Path PERSISTENCE_PATH = DataPaths.path("games.json");
+    private static final GameInfoRepository gameInfoRepository = new GameInfoRepository();
+    private static final GameStateRepository gameStateRepository = new GameStateRepository();
+    private static final GameChatRepository gameChatRepository = new GameChatRepository();
     private static final GameService INSTANCE = new GameService();
     private static final ReadWriteLock rwLock = new ReentrantReadWriteLock();
     private static final Lock readLock = rwLock.readLock();
@@ -83,6 +91,7 @@ public class GameService extends PersistedService {
         } catch (IOException e) {
             logger.error("Error creating game directory", e);
         }
+        INSTANCE.jpaWrite(em -> gameInfoRepository.save(em, gameInfo));
     }
 
     public static boolean existsGame(String name) {
@@ -150,11 +159,26 @@ public class GameService extends PersistedService {
         } catch (IOException e) {
             logger.error("Unable to delete game directory", e);
         }
+        INSTANCE.jpaWrite(em -> {
+            gameChatRepository.delete(em, gameId);
+            gameStateRepository.delete(em, gameId);
+            gameInfoRepository.delete(em, gameName);
+        });
     }
 
     public static JolGame loadGame(String gameId) {
         readLock.lock();
         try {
+            if (JpaFactory.isEnabled()) {
+                try (EntityManager em = JpaFactory.createEntityManager()) {
+                    GameData gameData = gameStateRepository.load(em, gameId);
+                    if (gameData != null) {
+                        return new JolGame(gameId, gameData);
+                    }
+                } catch (Exception e) {
+                    logger.error("JPA load failed for game {}, falling back to file", gameId, e);
+                }
+            }
             Path gameStatePath = DataPaths.path("games", gameId, "game.json");
             GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
             return new JolGame(gameId, gameData);
@@ -199,6 +223,14 @@ public class GameService extends PersistedService {
         }
         // update the cache
         INSTANCE.gameCache.put(gameId, game);
+        // dual-write to JPA
+        String gameName = INSTANCE.idToName.get(gameId);
+        if (gameName != null) {
+            GameInfo info = INSTANCE.games.get(gameName);
+            if (info != null) {
+                INSTANCE.jpaWrite(em -> gameStateRepository.save(em, game));
+            }
+        }
     }
 
     public static void saveGame(JolGame game, String turn) {
@@ -295,6 +327,9 @@ public class GameService extends PersistedService {
                     conversion.checkCards(gameInfo.getName(), gameInfo.getId());
                     gameInfo.setVersion(GameInfo.Version.DATA_FIX);
                 });
+
+        // Bulk-sync all game infos to JPA after upgrades have been applied
+        jpaWrite(em -> games.values().forEach(g -> gameInfoRepository.save(em, g)));
     }
 
     @Override
@@ -314,23 +349,46 @@ public class GameService extends PersistedService {
         } catch (IOException e) {
             logger.error("Unable to save game data", e);
         }
+
+        // Sync any in-memory GameInfo mutations (e.g. status changes from JolAdmin) to JPA
+        jpaWrite(em -> games.values().forEach(g -> gameInfoRepository.save(em, g)));
     }
 
     @Override
     protected void load() {
+        if (JpaFactory.isEnabled()) {
+            try (EntityManager em = JpaFactory.createEntityManager()) {
+                Map<String, GameInfo> loaded = gameInfoRepository.findAll(em);
+                games.putAll(loaded);
+                games.forEach((name, info) -> idToName.put(info.getId(), name));
+                logger.info("Loaded {} games from JPA", games.size());
+            } catch (Exception e) {
+                logger.error("JPA load failed for GameService", e);
+            }
+            return;
+        }
         if (!Files.exists(PERSISTENCE_PATH)) {
             logger.info("No existing games file found");
             return;
         }
-
         try {
-            Map<String, GameInfo> loaded = objectMapper.readValue(PERSISTENCE_PATH.toFile(), new TypeReference<>() {
-            });
+            Map<String, GameInfo> loaded = objectMapper.readValue(PERSISTENCE_PATH.toFile(), new TypeReference<>() {});
             games.putAll(loaded);
             games.forEach((name, info) -> idToName.put(info.getId(), name));
             logger.info("Loaded {} games", games.size());
         } catch (IOException e) {
             logger.error("Unable to load games.", e);
+        }
+    }
+
+    private void jpaWrite(java.util.function.Consumer<EntityManager> action) {
+        if (!JpaFactory.isEnabled()) return;
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            em.getTransaction().begin();
+            action.accept(em);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("JPA write failed for GameService", e);
         }
     }
 }

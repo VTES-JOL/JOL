@@ -2,10 +2,14 @@ package net.deckserver.services;
 
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import jakarta.persistence.EntityManager;
 import net.deckserver.dwr.model.JolGame;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.Visibility;
+import net.deckserver.jpa.JpaFactory;
+import net.deckserver.jpa.entity.TournamentRegistrationEntity;
+import net.deckserver.jpa.repository.TournamentRepository;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.CardSimple;
 import net.deckserver.storage.json.game.GameData;
@@ -37,6 +41,7 @@ public class TournamentService extends PersistedService {
     private static final Predicate<TournamentDefinition> IS_ACTIVE = t -> t.getStatus().equals(GameStatus.ACTIVE);
     private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
     private static final Path PERSISTENCE_PATH = DataPaths.path("tournaments.json");
+    private static final TournamentRepository tournamentRepository = new TournamentRepository();
     private static final TournamentService INSTANCE = new TournamentService();
     private final Map<String, TournamentDefinition> tournaments = new HashMap<>();
 
@@ -117,6 +122,7 @@ public class TournamentService extends PersistedService {
         if (def.isOpenForRegistration()) {
             TournamentRegistration registration = def.getRegistration(playerName).orElseGet(() -> new TournamentRegistration(playerName, vekn));
             def.getRegistrations().add(registration);
+            INSTANCE.jpaWrite(em -> tournamentRepository.save(em, def));
         }
     }
 
@@ -133,6 +139,7 @@ public class TournamentService extends PersistedService {
                     logger.error("Unable to delete deck file");
                 }
                 def.getRegistrations().remove(reg);
+                INSTANCE.jpaWrite(em -> tournamentRepository.save(em, def));
             });
         }
     }
@@ -223,23 +230,33 @@ public class TournamentService extends PersistedService {
     }
 
     public static void startTournament(String tournamentName) {
-        INSTANCE.tournaments.get(tournamentName).setStatus(GameStatus.ACTIVE);
+        TournamentDefinition def = INSTANCE.tournaments.get(tournamentName);
+        def.setStatus(GameStatus.ACTIVE);
+        INSTANCE.jpaWrite(em -> tournamentRepository.save(em, def));
     }
 
     public static void setReadyToStart(String tournamentName) {
-        INSTANCE.tournaments.get(tournamentName).setStatus(GameStatus.STARTING);
+        TournamentDefinition def = INSTANCE.tournaments.get(tournamentName);
+        def.setStatus(GameStatus.STARTING);
+        INSTANCE.jpaWrite(em -> tournamentRepository.save(em, def));
     }
 
     public static void setTournamentStatus(String tournamentName, GameStatus status) {
-        INSTANCE.tournaments.get(tournamentName).setStatus(status);
+        TournamentDefinition def = INSTANCE.tournaments.get(tournamentName);
+        def.setStatus(status);
+        INSTANCE.jpaWrite(em -> tournamentRepository.save(em, def));
     }
 
     public static void createTournament(TournamentDefinition tournamentDefinition) {
         INSTANCE.tournaments.put(tournamentDefinition.getName(), tournamentDefinition);
+        INSTANCE.jpaWrite(em -> tournamentRepository.save(em, tournamentDefinition));
     }
 
     public static void removeTournament(String name) {
-        INSTANCE.tournaments.remove(name);
+        TournamentDefinition def = INSTANCE.tournaments.remove(name);
+        if (def != null) {
+            INSTANCE.jpaWrite(em -> tournamentRepository.delete(em, def.getId()));
+        }
     }
 
     public static TournamentDefinition getTournament(String nameOfTournament) {
@@ -378,16 +395,30 @@ public class TournamentService extends PersistedService {
         } catch (IOException e) {
             logger.error("Unable to save tournaments");
         }
+
+        jpaWrite(em -> tournaments.values().forEach(t -> tournamentRepository.save(em, t)));
     }
 
     @Override
     protected void load() {
+        if (JpaFactory.isEnabled()) {
+            try (EntityManager em = JpaFactory.createEntityManager()) {
+                tournamentRepository.findAll(em).forEach(entity -> {
+                    List<TournamentRegistrationEntity> regs = tournamentRepository.findRegistrations(em, entity.getTournamentId());
+                    TournamentDefinition def = tournamentRepository.toDefinition(entity, regs);
+                    tournaments.put(def.getName(), def);
+                });
+                logger.info("Loaded {} tournaments from JPA", tournaments.size());
+            } catch (Exception e) {
+                logger.error("JPA load failed for TournamentService", e);
+            }
+            return;
+        }
         TypeFactory typeFactory = objectMapper.getTypeFactory();
         if (!Files.exists(PERSISTENCE_PATH)) {
             logger.info("No existing tournaments file found");
             return;
         }
-
         try {
             CollectionType collectionType = typeFactory.constructCollectionType(List.class, TournamentDefinition.class);
             List<TournamentDefinition> tournamentsList = objectMapper.readValue(PERSISTENCE_PATH.toFile(), collectionType);
@@ -395,6 +426,17 @@ public class TournamentService extends PersistedService {
             logger.info("Loaded {} tournaments", tournamentsList.size());
         } catch (IOException e) {
             logger.error("Unable to load tournaments", e);
+        }
+    }
+
+    private void jpaWrite(java.util.function.Consumer<EntityManager> action) {
+        if (!JpaFactory.isEnabled()) return;
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            em.getTransaction().begin();
+            action.accept(em);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("JPA write failed for TournamentService", e);
         }
     }
 }

@@ -3,7 +3,10 @@ package net.deckserver.services;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import jakarta.persistence.EntityManager;
 import net.deckserver.dwr.model.GameModel;
+import net.deckserver.jpa.JpaFactory;
+import net.deckserver.jpa.repository.GameChatRepository;
 import net.deckserver.storage.json.game.ChatData;
 import net.deckserver.storage.json.game.TurnData;
 import net.deckserver.storage.json.game.TurnHistory;
@@ -21,6 +24,7 @@ public class ChatService extends PersistedService {
 
     private static final ChatService INSTANCE = new ChatService();
     private static final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
+    private static final GameChatRepository gameChatRepository = new GameChatRepository();
 
     private final LoadingCache<String, TurnHistory> historyCache = Caffeine.newBuilder()
             .expireAfterAccess(5, TimeUnit.MINUTES)
@@ -108,9 +112,29 @@ public class ChatService extends PersistedService {
         } catch (Exception e) {
             logger.error("Unable to save history for {}", gameId, e);
         }
+
+        if (JpaFactory.isEnabled()) {
+            try (EntityManager em = JpaFactory.createEntityManager()) {
+                em.getTransaction().begin();
+                gameChatRepository.save(em, gameId, history.getTurns());
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                logger.error("JPA write failed for chat history {}", gameId, e);
+            }
+        }
     }
 
     private TurnHistory loadHistory(String gameId) {
+        if (JpaFactory.isEnabled()) {
+            try (EntityManager em = JpaFactory.createEntityManager()) {
+                List<TurnData> turns = gameChatRepository.load(em, gameId);
+                if (!turns.isEmpty()) {
+                    return new TurnHistory(turns);
+                }
+            } catch (Exception e) {
+                logger.error("JPA load failed for game chat {}, falling back to file", gameId, e);
+            }
+        }
         try {
             Path historyPath = Paths.get(getBasePath(), "games", gameId, "history.json");
             List<TurnData> turns = objectMapper.readValue(

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+                 https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
+             version="3.2">
+
+    <persistence-unit name="jol-test-pu" transaction-type="RESOURCE_LOCAL">
+        <class>net.deckserver.jpa.entity.PlayerEntity</class>
+        <class>net.deckserver.jpa.entity.GameInfoEntity</class>
+        <class>net.deckserver.jpa.entity.RegistrationEntity</class>
+        <class>net.deckserver.jpa.entity.DeckInfoEntity</class>
+        <class>net.deckserver.jpa.entity.DeckContentEntity</class>
+        <class>net.deckserver.jpa.entity.TournamentEntity</class>
+        <class>net.deckserver.jpa.entity.TournamentRegistrationEntity</class>
+        <class>net.deckserver.jpa.entity.GameStateEntity</class>
+        <class>net.deckserver.jpa.entity.GameChatEntity</class>
+        <class>net.deckserver.jpa.entity.PlayerActivityEntity</class>
+        <class>net.deckserver.jpa.entity.GameActivityEntity</class>
+        <class>net.deckserver.jpa.entity.GlobalChatEntity</class>
+
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+
+        <properties>
+            <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+            <property name="jakarta.persistence.jdbc.url"
+                      value="jdbc:h2:mem:jol-test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;NON_KEYWORDS=VALUE"/>
+            <property name="jakarta.persistence.jdbc.user" value="sa"/>
+            <property name="jakarta.persistence.jdbc.password" value=""/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+            <property name="hibernate.show_sql" value="false"/>
+        </properties>
+    </persistence-unit>
+
+</persistence>

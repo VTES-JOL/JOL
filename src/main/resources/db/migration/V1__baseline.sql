@@ -1,0 +1,2 @@
+-- Baseline migration: establishes Flyway history table.
+-- Entity tables are added in subsequent versioned migrations (V2, V3, ...).

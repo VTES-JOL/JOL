@@ -6,6 +6,9 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import jakarta.persistence.EntityManager;
+import net.deckserver.jpa.JpaFactory;
+import net.deckserver.jpa.repository.RegistrationRepository;
 import net.deckserver.storage.json.game.GameSummary;
 import net.deckserver.storage.json.game.RegistrationSummary;
 import net.deckserver.storage.json.system.RegistrationStatus;
@@ -30,6 +33,7 @@ public class RegistrationService extends PersistedService {
     private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
     private static final Logger logger = LoggerFactory.getLogger(RegistrationService.class);
     private static final Path PERSISTENCE_PATH = DataPaths.path("registrations.json");
+    private static final RegistrationRepository registrationRepository = new RegistrationRepository();
     private final static RegistrationService INSTANCE = new RegistrationService();
     private final Table<String, String, RegistrationStatus> registrations = HashBasedTable.create();
     private final LoadingCache<String, RegistrationSummary> summaryMap = Caffeine.newBuilder()
@@ -44,6 +48,7 @@ public class RegistrationService extends PersistedService {
 
     public static  void put(String gameName, String playerName, RegistrationStatus registration) {
         INSTANCE.registrations.put(gameName, playerName, registration);
+        INSTANCE.jpaWrite(em -> registrationRepository.save(em, gameName, playerName, registration));
     }
 
     public static  long getRegisteredPlayerCount(String gameName) {
@@ -64,6 +69,7 @@ public class RegistrationService extends PersistedService {
 
     public static  void removePlayer(String gameName, String playerName) {
         INSTANCE.registrations.remove(gameName, playerName);
+        INSTANCE.jpaWrite(em -> registrationRepository.delete(em, gameName, playerName));
     }
 
     public static  boolean isInGame(String gameName, String playerName) {
@@ -80,6 +86,7 @@ public class RegistrationService extends PersistedService {
 
     public static synchronized void clearRegistrations(String gameName) {
         INSTANCE.registrations.row(gameName).clear();
+        INSTANCE.jpaWrite(em -> registrationRepository.deleteAllForGame(em, gameName));
     }
 
     public static synchronized Map<String, RegistrationStatus> getPlayerRegistrations(String playerName) {
@@ -96,7 +103,9 @@ public class RegistrationService extends PersistedService {
 
     public static synchronized void invitePlayer(String gameName, String playerName) {
         if(!RegistrationService.isInvited(gameName, playerName)) {
-            INSTANCE.registrations.put(gameName, playerName, new RegistrationStatus(OffsetDateTime.now()));
+            RegistrationStatus status = new RegistrationStatus(OffsetDateTime.now());
+            INSTANCE.registrations.put(gameName, playerName, status);
+            INSTANCE.jpaWrite(em -> registrationRepository.save(em, gameName, playerName, status));
         }
     }
 
@@ -105,6 +114,7 @@ public class RegistrationService extends PersistedService {
         registrationStatus.setSummary(summary);
         registrationStatus.setDeckName(deckName);
         INSTANCE.registrations.put(gameName, playerName, registrationStatus);
+        INSTANCE.jpaWrite(em -> registrationRepository.save(em, gameName, playerName, registrationStatus));
     }
 
     public static RegistrationSummary getSummary(String gameName) {
@@ -143,24 +153,42 @@ public class RegistrationService extends PersistedService {
 
     @Override
     protected void load() {
+        if (JpaFactory.isEnabled()) {
+            try (EntityManager em = JpaFactory.createEntityManager()) {
+                registrationRepository.findAll(em).forEach(entity ->
+                        registrations.put(entity.getGameName(), entity.getPlayerName(),
+                                entity.toRegistrationStatus()));
+                logger.info("Loaded {} registrations from JPA", registrations.size());
+            } catch (Exception e) {
+                logger.error("JPA load failed for RegistrationService", e);
+            }
+            return;
+        }
         TypeFactory typeFactory = objectMapper.getTypeFactory();
         if (!Files.exists(PERSISTENCE_PATH)) {
             logger.info("No existing registrations file found");
             return;
         }
-
         try {
             MapType registrationMapType = typeFactory.constructMapType(Map.class, String.class, RegistrationStatus.class);
             Map<String, Map<String, RegistrationStatus>> registrationsMap = objectMapper.readValue(PERSISTENCE_PATH.toFile(), typeFactory.constructMapType(ConcurrentHashMap.class, typeFactory.constructType(String.class), registrationMapType));
-            registrationsMap.forEach((gameId, gameMap) -> {
-                gameMap.forEach((playerId, registration) -> {
-                    registrations.put(gameId, playerId, registration);
-                });
-            });
+            registrationsMap.forEach((gameId, gameMap) ->
+                    gameMap.forEach((playerId, registration) ->
+                            registrations.put(gameId, playerId, registration)));
             logger.info("Loaded {} registrations", registrationsMap.size());
         } catch (IOException e) {
             logger.error("Unable to load registrations", e);
         }
+    }
 
+    private void jpaWrite(java.util.function.Consumer<EntityManager> action) {
+        if (!JpaFactory.isEnabled()) return;
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            em.getTransaction().begin();
+            action.accept(em);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("JPA write failed for RegistrationService", e);
+        }
     }
 }

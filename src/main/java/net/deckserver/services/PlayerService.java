@@ -5,7 +5,10 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.Streams;
 import io.azam.ulidj.ULID;
+import jakarta.persistence.EntityManager;
 import net.deckserver.game.enums.PlayerRole;
+import net.deckserver.jpa.JpaFactory;
+import net.deckserver.jpa.repository.PlayerRepository;
 import net.deckserver.storage.json.system.PlayerInfo;
 import net.deckserver.storage.json.system.UserSummary;
 import org.mindrot.jbcrypt.BCrypt;
@@ -23,6 +26,7 @@ import java.util.stream.Collectors;
 public class PlayerService extends PersistedService {
 
     private static final Path PERSISTENCE_PATH = DataPaths.path("players.json");
+    private static final PlayerRepository playerRepository = new PlayerRepository();
     private static final PlayerService INSTANCE = new PlayerService();
     private static final LoadingCache<String, UserSummary> activeUsers = Caffeine.newBuilder()
             .expireAfterWrite(1, TimeUnit.HOURS)
@@ -65,7 +69,9 @@ public class PlayerService extends PersistedService {
         if (existsPlayer(name) || name.isEmpty())
             return false;
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
-        INSTANCE.players.put(name, new PlayerInfo(name, ULID.random(), email, hash));
+        PlayerInfo player = new PlayerInfo(name, ULID.random(), email, hash);
+        INSTANCE.players.put(name, player);
+        INSTANCE.jpaWrite(em -> playerRepository.save(em, player));
         return true;
     }
 
@@ -80,7 +86,9 @@ public class PlayerService extends PersistedService {
 
     public static  void changePassword(String player, String password) {
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
-        loadPlayerInfo(player).setHash(hash);
+        PlayerInfo info = loadPlayerInfo(player);
+        info.setHash(hash);
+        INSTANCE.jpaWrite(em -> playerRepository.save(em, info));
     }
 
     public static  void updateProfile(String playerName, String email, String discordID, String veknID, String country) {
@@ -90,6 +98,7 @@ public class PlayerService extends PersistedService {
         playerInfo.setVeknId(veknID);
         playerInfo.setCountryCode(country);
         refreshActive(playerName);
+        INSTANCE.jpaWrite(em -> playerRepository.save(em, playerInfo));
     }
 
     private static  PlayerInfo loadPlayerInfo(String playerName) {
@@ -109,6 +118,7 @@ public class PlayerService extends PersistedService {
 
     public static  void remove(String name) {
         INSTANCE.players.remove(name);
+        INSTANCE.jpaWrite(em -> playerRepository.delete(em, name));
     }
 
     public static PersistedService getInstance() {
@@ -133,18 +143,37 @@ public class PlayerService extends PersistedService {
 
     @Override
     protected void load() {
+        if (JpaFactory.isEnabled()) {
+            try (EntityManager em = JpaFactory.createEntityManager()) {
+                Map<String, PlayerInfo> loaded = playerRepository.findAll(em);
+                players.putAll(loaded);
+                logger.info("Loaded {} players from JPA", players.size());
+            } catch (Exception e) {
+                logger.error("JPA load failed for PlayerService", e);
+            }
+            return;
+        }
         if (!Files.exists(PERSISTENCE_PATH)) {
             logger.info("No existing player file found");
             return;
         }
-
         try {
-            Map<String, PlayerInfo> loaded = objectMapper.readValue(PERSISTENCE_PATH.toFile(), new TypeReference<>() {
-            });
+            Map<String, PlayerInfo> loaded = objectMapper.readValue(PERSISTENCE_PATH.toFile(), new TypeReference<>() {});
             players.putAll(loaded);
             logger.info("Loaded {} players", players.size());
         } catch (IOException e) {
             logger.error("Unable to load players.", e);
+        }
+    }
+
+    private void jpaWrite(java.util.function.Consumer<EntityManager> action) {
+        if (!JpaFactory.isEnabled()) return;
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            em.getTransaction().begin();
+            action.accept(em);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("JPA write failed for PlayerService", e);
         }
     }
 }
