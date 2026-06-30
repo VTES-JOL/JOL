@@ -36,6 +36,9 @@ public class RegistrationEntity {
     @Column(name = "registered_at")
     private OffsetDateTime registeredAt;
 
+    @Column(name = "deck_content", columnDefinition = "TEXT")
+    private String deckContent;
+
     public RegistrationEntity() {}
 
     public static RegistrationEntity from(String gameId, String playerId, RegistrationStatus status) {
@@ -46,6 +49,7 @@ public class RegistrationEntity {
         entity.valid = status.isValid();
         entity.summary = status.getSummary();
         entity.registeredAt = status.getTimestamp();
+        entity.deckContent = status.getDeckContent();
         return entity;
     }
 
@@ -56,10 +60,13 @@ public class RegistrationEntity {
         status.setValid(valid);
         status.setSummary(summary);
         status.setTimestamp(registeredAt);
+        status.setDeckContent(deckContent);
         return status;
     }
 
     public RegistrationId getId() { return id; }
+    public String getDeckContent() { return deckContent; }
+    public void setDeckContent(String deckContent) { this.deckContent = deckContent; }
 
     public String getGameName() { return game != null ? game.getGameName() : null; }
     public String getPlayerName() { return player != null ? player.getPlayerName() : null; }

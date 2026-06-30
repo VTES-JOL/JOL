@@ -59,7 +59,7 @@ public class TournamentRepository {
 
     public List<TournamentRegistrationEntity> findRegistrations(EntityManager em, String tournamentId) {
         return em.createQuery(
-                        "SELECT r FROM TournamentRegistrationEntity r WHERE r.tournamentId = :id",
+                        "SELECT r FROM TournamentRegistrationEntity r JOIN FETCH r.player WHERE r.tournamentId = :id",
                         TournamentRegistrationEntity.class)
                 .setParameter("id", tournamentId)
                 .getResultList();

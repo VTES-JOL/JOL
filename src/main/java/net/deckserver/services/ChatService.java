@@ -1,5 +1,6 @@
 package net.deckserver.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
@@ -11,8 +12,9 @@ import net.deckserver.storage.json.game.ChatData;
 import net.deckserver.storage.json.game.TurnData;
 import net.deckserver.storage.json.game.TurnHistory;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +31,6 @@ public class ChatService extends PersistedService {
     private final LoadingCache<String, TurnHistory> historyCache = Caffeine.newBuilder()
             .expireAfterAccess(5, TimeUnit.MINUTES)
             .removalListener((String key, TurnHistory history, RemovalCause cause) -> {
-                // Don't save during shutdown - it's handled explicitly
                 if (!isShuttingDown()) {
                     saveHistory(key, history);
                 }
@@ -37,26 +38,26 @@ public class ChatService extends PersistedService {
             .build(this::loadHistory);
 
     private ChatService() {
-        super("ChatService", 5); // 5 minute persistence interval
+        super("ChatService", 5);
     }
 
     public static PersistedService getInstance() {
         return INSTANCE;
     }
 
-    public static  void subscribe(String gameId, GameModel model) {
+    public static void subscribe(String gameId, GameModel model) {
         gmap.put(gameId, model);
     }
 
-    public static  List<String> getTurns(String gameId) {
+    public static List<String> getTurns(String gameId) {
         return INSTANCE.historyCache.get(gameId).getTurnLabels();
     }
 
-    public static  List<ChatData> getTurn(String gameId, String turnLabel) {
+    public static List<ChatData> getTurn(String gameId, String turnLabel) {
         return INSTANCE.historyCache.get(gameId).getTurn(turnLabel).getChats();
     }
 
-    public static  List<ChatData> getChats(String gameId) {
+    public static List<ChatData> getChats(String gameId) {
         String turnLabel = INSTANCE.historyCache.get(gameId).getCurrentTurnLabel();
         if (turnLabel == null) {
             return new ArrayList<>();
@@ -64,87 +65,70 @@ public class ChatService extends PersistedService {
         return INSTANCE.historyCache.get(gameId).getTurn(turnLabel).getChats();
     }
 
-    public static  void addTurn(String gameId, String player, String turnId) {
+    public static void addTurn(String gameId, String player, String turnId) {
         INSTANCE.historyCache.get(gameId).addTurn(player, turnId);
         Optional.ofNullable(gmap.get(gameId)).ifPresent(GameModel::clearChats);
     }
 
-    public static  void sendMessage(String gameId, String source, String message) {
-        ChatData chatData = new ChatData(message, source, null);
-        sendChat(gameId, chatData);
+    public static void sendMessage(String gameId, String source, String message) {
+        sendChat(gameId, new ChatData(message, source, null));
     }
 
-    public static  void sendJudgeMessage(String gameId, String source, String message) {
-        ChatData chatData = new ChatData(message, "Judge - " + source, null);
-        sendChat(gameId, chatData);
+    public static void sendJudgeMessage(String gameId, String source, String message) {
+        sendChat(gameId, new ChatData(message, "Judge - " + source, null));
     }
 
-    public static  void sendCommand(String gameId, String source, String message, String... command) {
-        ChatData chatData = new ChatData(message, source, String.join(" ", command));
-        sendChat(gameId, chatData);
+    public static void sendCommand(String gameId, String source, String message, String... command) {
+        sendChat(gameId, new ChatData(message, source, String.join(" ", command)));
     }
 
-    public static  void sendSystemMessage(String gameId, String message) {
-        ChatData chatData = new ChatData(message, "SYSTEM", null);
-        sendChat(gameId, chatData);
+    public static void sendSystemMessage(String gameId, String message) {
+        sendChat(gameId, new ChatData(message, "SYSTEM", null));
     }
 
-    private static  void sendChat(String gameId, ChatData chat) {
+    private static void sendChat(String gameId, ChatData chat) {
         INSTANCE.historyCache.get(gameId).addChat(chat);
         Optional.ofNullable(gmap.get(gameId)).ifPresent(model -> model.addChat(chat));
     }
 
     private void saveHistory(String gameId, TurnHistory history) {
-        if (shouldSkipPersistence()) {
+        if (shouldSkipPersistence()) return;
+        if (history == null || history.getTurns() == null || history.getTurns().isEmpty()) {
+            logger.debug("Skipping save for {} - history is empty", gameId);
             return;
         }
-
-        try {
-            if (history == null || history.getTurns() == null || history.getTurns().isEmpty()) {
-                logger.debug("Skipping save for {} - history is empty", gameId);
-                return;
-            }
-
-            logger.debug("Saving history for {} with {} turns", gameId, history.getTurns().size());
-            Path historyPath = Paths.get(getBasePath(), "games", gameId, "history.json");
-            objectMapper.writeValue(historyPath.toFile(), history.getTurns());
-            logger.debug("Successfully saved history for {}", gameId);
+        logger.debug("Saving history for {} with {} turns", gameId, history.getTurns().size());
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            em.getTransaction().begin();
+            gameChatRepository.save(em, gameId, history.getTurns());
+            em.getTransaction().commit();
         } catch (Exception e) {
-            logger.error("Unable to save history for {}", gameId, e);
-        }
-
-        if (JpaFactory.isEnabled()) {
-            try (EntityManager em = JpaFactory.createEntityManager()) {
-                em.getTransaction().begin();
-                gameChatRepository.save(em, gameId, history.getTurns());
-                em.getTransaction().commit();
-            } catch (Exception e) {
-                logger.error("JPA write failed for chat history {}", gameId, e);
-            }
+            logger.error("JPA write failed for chat history {}", gameId, e);
         }
     }
 
     private TurnHistory loadHistory(String gameId) {
-        if (JpaFactory.isEnabled()) {
-            try (EntityManager em = JpaFactory.createEntityManager()) {
-                List<TurnData> turns = gameChatRepository.load(em, gameId);
-                if (!turns.isEmpty()) {
-                    return new TurnHistory(turns);
+        if (testModeEnabled) {
+            Path historyPath = DataPaths.path("games", gameId, "history.json");
+            if (Files.exists(historyPath)) {
+                try {
+                    List<TurnData> turns = objectMapper.readValue(historyPath.toFile(), new TypeReference<>() {});
+                    if (!turns.isEmpty()) return new TurnHistory(turns);
+                } catch (IOException e) {
+                    logger.error("Error reading history fixture for {}", gameId, e);
                 }
-            } catch (Exception e) {
-                logger.error("JPA load failed for game chat {}, falling back to file", gameId, e);
             }
-        }
-        try {
-            Path historyPath = Paths.get(getBasePath(), "games", gameId, "history.json");
-            List<TurnData> turns = objectMapper.readValue(
-                    historyPath.toFile(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, TurnData.class)
-            );
-            return new TurnHistory(turns);
-        } catch (Exception e) {
             return new TurnHistory();
         }
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            List<TurnData> turns = gameChatRepository.load(em, gameId);
+            if (!turns.isEmpty()) {
+                return new TurnHistory(turns);
+            }
+        } catch (Exception e) {
+            logger.error("JPA load failed for game chat {}", gameId, e);
+        }
+        return new TurnHistory();
     }
 
     @Override
@@ -153,22 +137,15 @@ public class ChatService extends PersistedService {
             logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
             return;
         }
-
         Map<String, TurnHistory> snapshot = historyCache.asMap();
         int persistedCount = 0;
-
-        logger.debug("Starting persistence of {} cached histories", snapshot.size());
-
         for (Map.Entry<String, TurnHistory> entry : snapshot.entrySet()) {
-            String gameId = entry.getKey();
             TurnHistory history = entry.getValue();
-
             if (history != null && history.getTurns() != null && !history.getTurns().isEmpty()) {
-                saveHistory(gameId, history);
+                saveHistory(entry.getKey(), history);
                 persistedCount++;
             }
         }
-
         if (persistedCount > 0) {
             logger.info("Persisted {} histories", persistedCount);
         }
@@ -176,8 +153,7 @@ public class ChatService extends PersistedService {
 
     @Override
     protected void load() {
-        // ChatService loads on-demand via Caffeine cache
-        // No bulk loading needed
+        // on-demand via Caffeine cache
     }
 
     @Override

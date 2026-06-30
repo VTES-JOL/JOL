@@ -18,17 +18,12 @@ public final class JpaFactory {
     private static final Logger logger = LoggerFactory.getLogger(JpaFactory.class);
     private static volatile EntityManagerFactory emf;
     private static volatile HikariDataSource dataSource;
-    private static volatile boolean disabled = true;
 
     private JpaFactory() {}
 
     public static void initialize() {
         String url = System.getenv().getOrDefault("JOL_DB_URL",
-                System.getProperty("jol.db.url", ""));
-        if (url.isBlank()) {
-            logger.info("JOL_DB_URL not set — JPA disabled, using file-based persistence");
-            return;
-        }
+                System.getProperty("jol.db.url", "jdbc:postgresql://localhost:5432/jol"));
 
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(url);
@@ -45,7 +40,6 @@ public final class JpaFactory {
         props.put("hibernate.hbm2ddl.auto", "validate");
         emf = Persistence.createEntityManagerFactory("jol-pu", props);
 
-        disabled = false;
         logger.info("JPA initialized against {}", url);
     }
 
@@ -58,12 +52,8 @@ public final class JpaFactory {
         logger.info("Flyway migrations applied");
     }
 
-    public static boolean isEnabled() {
-        return !disabled && emf != null;
-    }
-
     public static EntityManager createEntityManager() {
-        if (!isEnabled()) throw new IllegalStateException("JPA not initialized");
+        if (emf == null) throw new IllegalStateException("JPA not initialized");
         return emf.createEntityManager();
     }
 
@@ -74,7 +64,6 @@ public final class JpaFactory {
         if (dataSource != null) {
             dataSource.close();
         }
-        disabled = true;
         logger.info("JPA shut down");
     }
 }

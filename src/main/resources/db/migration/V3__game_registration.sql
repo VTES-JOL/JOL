@@ -21,6 +21,7 @@ CREATE TABLE jol_registration (
     valid       BOOLEAN      NOT NULL DEFAULT FALSE,
     summary     TEXT,
     registered_at TIMESTAMP WITH TIME ZONE,
+    deck_content  TEXT,
     CONSTRAINT pk_jol_registration PRIMARY KEY (game_id, player_id),
     CONSTRAINT fk_jol_registration_game   FOREIGN KEY (game_id)   REFERENCES jol_game   (game_id),
     CONSTRAINT fk_jol_registration_player FOREIGN KEY (player_id) REFERENCES jol_player (player_id)

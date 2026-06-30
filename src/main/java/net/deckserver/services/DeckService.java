@@ -9,19 +9,16 @@ import net.deckserver.game.enums.DeckFormat;
 import net.deckserver.game.validators.ValidatorFactory;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.repository.DeckRepository;
+import net.deckserver.jpa.repository.RegistrationRepository;
 import net.deckserver.storage.json.deck.CardCount;
-import net.deckserver.storage.json.deck.Crypt;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.system.DeckInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.services.cloudfront.endpoints.internal.Value;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -34,8 +31,8 @@ public class DeckService extends PersistedService {
     public static final Predicate<DeckInfo> MODERN_DECK = info -> DeckFormat.MODERN.equals(info.getFormat());
     public static final Predicate<DeckInfo> NO_TAGS = info -> info.getGameFormats().isEmpty();
     private static final Logger logger = LoggerFactory.getLogger(DeckService.class);
-    private static final Path PERSISTENCE_PATH = DataPaths.path("decks.json");
     private static final DeckRepository deckRepository = new DeckRepository();
+    private static final RegistrationRepository registrationRepository = new RegistrationRepository();
     private static final DeckService INSTANCE = new DeckService();
 
     private final Table<String, String, DeckInfo> decks = HashBasedTable.create();
@@ -69,10 +66,18 @@ public class DeckService extends PersistedService {
     }
 
     public static ExtendedDeck getDeck(String deckId) {
-        Path deckPath = DataPaths.path("decks", deckId + ".json");
-        try {
-            return objectMapper.readValue(deckPath.toFile(), ExtendedDeck.class);
-        } catch (IOException e) {
+        if (INSTANCE.testModeEnabled) {
+            Path deckPath = DataPaths.path("decks", deckId + ".json");
+            try {
+                return objectMapper.readValue(deckPath.toFile(), ExtendedDeck.class);
+            } catch (IOException e) {
+                return new ExtendedDeck();
+            }
+        }
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            return deckRepository.findContent(em, deckId);
+        } catch (Exception e) {
+            logger.error("JPA read failed for deck {}", deckId, e);
             return new ExtendedDeck();
         }
     }
@@ -93,12 +98,23 @@ public class DeckService extends PersistedService {
     }
 
     public static ExtendedDeck getGameDeck(String gameId, String deckId) {
-        try {
+        if (INSTANCE.testModeEnabled) {
             Path gameDeckPath = DataPaths.path("games", gameId, deckId + ".json");
-            return objectMapper.readValue(gameDeckPath.toFile(), ExtendedDeck.class);
-        } catch (IOException e) {
-            return new ExtendedDeck();
+            try {
+                return objectMapper.readValue(gameDeckPath.toFile(), ExtendedDeck.class);
+            } catch (IOException e) {
+                return new ExtendedDeck();
+            }
         }
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            var entity = registrationRepository.findByGameAndDeck(em, gameId, deckId);
+            if (entity != null && entity.getDeckContent() != null) {
+                return objectMapper.readValue(entity.getDeckContent(), ExtendedDeck.class);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to load game deck {}/{}", gameId, deckId, e);
+        }
+        return new ExtendedDeck();
     }
 
     public static String getDeckComments(String playerName, String deckName) {
@@ -107,27 +123,12 @@ public class DeckService extends PersistedService {
     }
 
     public static void saveDeck(String deckId, ExtendedDeck deck) {
-        try {
-            Path deckPath = DataPaths.path("decks", deckId + ".json");
-            objectMapper.writeValue(deckPath.toFile(), deck);
-        } catch (IOException e) {
-            logger.error("Unable to save deck {}", deckId, e);
-        }
         INSTANCE.jpaWrite(em -> deckRepository.saveContent(em, deckId, deck));
     }
 
     public static boolean copyDeck(String deckId, String gameId) {
-        try {
-            Path deckPath = DataPaths.path("decks", deckId + ".json");
-            Path gamePath = DataPaths.path("games", gameId, deckId + ".json");
-            logger.debug("Copying {} to {}", deckPath, gamePath);
-            Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
-            return true;
-        } catch (IOException e) {
-            logger.error("Unable to load deck for {}", deckId, e);
-            return false;
-        }
-
+        // deck content is stored in jol_registration.deck_content at registration time
+        return true;
     }
 
     public static PersistedService getInstance() {
@@ -146,58 +147,48 @@ public class DeckService extends PersistedService {
                     deckInfo.setFormat(DeckFormat.TAGGED);
                     logger.info("Upgrading {} to {} with {} tags", deckInfo.getDeckId(), deckInfo.getFormat(), tags);
                 });
-
-        // Bulk-sync all deck metadata to JPA after upgrades
         jpaWrite(em -> decks.cellSet().forEach(cell ->
                 deckRepository.saveDeckInfo(em, cell.getRowKey(), cell.getColumnKey(), cell.getValue())));
     }
 
     @Override
     protected void persist() {
-        if (shouldSkipPersistence()) {
-            logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
-            return;
-        }
-
-        try {
-            logger.debug("Persisting {} decks", decks.size());
-            objectMapper.writeValue(PERSISTENCE_PATH.toFile(), decks);
-            logger.debug("Successfully persisted decks");
-        } catch (IOException e) {
-            logger.error("Unable to save decks", e);
-        }
+        // all mutations are write-through; no background flush needed
     }
 
     @Override
     protected void load() {
-        if (JpaFactory.isEnabled()) {
-            try (EntityManager em = JpaFactory.createEntityManager()) {
-                deckRepository.findAllDeckInfos(em).forEach(entity ->
-                        decks.put(entity.getPlayerName(), entity.getId().getDeckName(), entity.toDeckInfo()));
-                logger.info("Loaded {} decks from JPA", decks.size());
-            } catch (Exception e) {
-                logger.error("JPA load failed for DeckService", e);
-            }
+        if (testModeEnabled) {
+            loadFromFile();
             return;
         }
-        TypeFactory typeFactory = objectMapper.getTypeFactory();
-        if (!Files.exists(PERSISTENCE_PATH)) {
-            logger.info("No existing decks file found");
-            return;
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            deckRepository.findAllDeckInfos(em).forEach(entity ->
+                    decks.put(entity.getPlayerName(), entity.getId().getDeckName(), entity.toDeckInfo()));
+            logger.info("Loaded {} decks from JPA", decks.size());
+        } catch (Exception e) {
+            logger.error("JPA load failed for DeckService", e);
         }
+    }
+
+    private void loadFromFile() {
+        Path path = DataPaths.path("decks.json");
+        if (!Files.exists(path)) return;
         try {
+            TypeFactory typeFactory = objectMapper.getTypeFactory();
             MapType deckMapType = typeFactory.constructMapType(Map.class, String.class, DeckInfo.class);
-            Map<String, Map<String, DeckInfo>> decksMapFile = objectMapper.readValue(PERSISTENCE_PATH.toFile(), typeFactory.constructMapType(ConcurrentHashMap.class, typeFactory.constructType(String.class), deckMapType));
-            decksMapFile.forEach((playerName, decksMap) ->
+            Map<String, Map<String, DeckInfo>> map = objectMapper.readValue(path.toFile(),
+                    typeFactory.constructMapType(ConcurrentHashMap.class, typeFactory.constructType(String.class), deckMapType));
+            map.forEach((playerName, decksMap) ->
                     decksMap.forEach((deckName, deckInfo) -> decks.put(playerName, deckName, deckInfo)));
-            logger.info("Loaded {} decks", decks.size());
+            logger.info("Loaded {} decks from file", decks.size());
         } catch (IOException e) {
-            logger.error("Unable to decks", e);
+            logger.error("Unable to load decks from file", e);
         }
     }
 
     private void jpaWrite(java.util.function.Consumer<EntityManager> action) {
-        if (!JpaFactory.isEnabled()) return;
+        if (testModeEnabled) return;
         try (EntityManager em = JpaFactory.createEntityManager()) {
             em.getTransaction().begin();
             action.accept(em);

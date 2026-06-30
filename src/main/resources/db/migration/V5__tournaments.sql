@@ -25,6 +25,7 @@ CREATE TABLE jol_tournament_registration (
     player_id       VARCHAR(36)  NOT NULL,
     vekn            VARCHAR(50),
     deck_id         VARCHAR(36),
+    deck_content    TEXT,
     CONSTRAINT pk_jol_tournament_registration PRIMARY KEY (id),
     CONSTRAINT uq_jol_tournament_player UNIQUE (tournament_id, player_id),
     CONSTRAINT fk_jol_tournament_reg_tournament FOREIGN KEY (tournament_id) REFERENCES jol_tournament (tournament_id) ON DELETE CASCADE

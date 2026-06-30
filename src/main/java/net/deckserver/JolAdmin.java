@@ -212,12 +212,7 @@ public class JolAdmin {
                 result = "Unable to register deck in game that has no invite";
                 throw new IllegalStateException(result);
             }
-            boolean copySuccess = DeckService.copyDeck(deckInfo.getDeckId(), gameInfo.getId());
-            if (!copySuccess) {
-                result = "Unable to copy deck file to game";
-                throw new IllegalStateException(result);
-            }
-            RegistrationService.registerDeck(gameName, playerName, deckInfo.getDeckId(), deckName, extendedDeck.getStats().getSummary());
+            RegistrationService.registerDeck(gameName, playerName, deckInfo.getDeckId(), deckName, extendedDeck.getStats().getSummary(), extendedDeck);
 
             // Reset game time to the current time to extend idle timeout
             gameInfo.setCreated(OffsetDateTime.now());

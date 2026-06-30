@@ -208,6 +208,45 @@ FROM tournament_reg_staging s
 JOIN jol_player p USING (player_name);
 SQL
 
+# Populate deck_content from tournaments/{tournament_id}/{deck_id}.json snapshots
+TOURN_DECK_CSV=$(mktemp)
+python3 - "$DATA/tournaments" <<'PYEOF' > "$TOURN_DECK_CSV"
+import sys, csv, os
+
+tournaments_dir = sys.argv[1]
+writer = csv.writer(sys.stdout)
+
+if not os.path.isdir(tournaments_dir):
+    sys.exit(0)
+
+for tourn_entry in os.scandir(tournaments_dir):
+    if not tourn_entry.is_dir():
+        continue
+    tournament_id = tourn_entry.name
+    for f in os.scandir(tourn_entry.path):
+        if not f.name.endswith('.json'):
+            continue
+        deck_id = f.name[:-5]
+        try:
+            content = open(f.path, encoding='utf-8', errors='replace').read()
+            writer.writerow([tournament_id, deck_id, content])
+        except Exception as e:
+            print(f'WARN: skipping {f.path}: {e}', file=sys.stderr)
+PYEOF
+psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -v ON_ERROR_STOP=1 <<SQL
+CREATE TEMP TABLE tourn_deck_staging (
+  tournament_id VARCHAR(36),
+  deck_id       VARCHAR(36),
+  deck_content  TEXT
+);
+\copy tourn_deck_staging(tournament_id,deck_id,deck_content) FROM '$TOURN_DECK_CSV' WITH (FORMAT csv, NULL '');
+UPDATE jol_tournament_registration r
+SET deck_content = s.deck_content
+FROM tourn_deck_staging s
+WHERE r.tournament_id = s.tournament_id AND r.deck_id = s.deck_id;
+SQL
+rm -f "$TOURN_DECK_CSV"
+
 success "$(jq 'length' "$DATA/tournaments.json") tournaments"
 
 # ── 6. Games ─────────────────────────────────────────────────────────────────
@@ -277,6 +316,49 @@ FROM reg_staging s
 JOIN jol_game   g ON g.game_name   = s.game_name
 JOIN jol_player p ON p.player_name = s.player_name;
 SQL
+
+# Populate deck_content from games/{game_id}/{deck_id}.json snapshots
+GAME_DECK_CSV=$(mktemp)
+python3 - "$DATA/games" <<'PYEOF' > "$GAME_DECK_CSV"
+import sys, csv, os
+
+games_dir = sys.argv[1]
+writer = csv.writer(sys.stdout)
+
+if not os.path.isdir(games_dir):
+    sys.exit(0)
+
+for game_entry in os.scandir(games_dir):
+    if not game_entry.is_dir():
+        continue
+    game_id = game_entry.name
+    for f in os.scandir(game_entry.path):
+        name = f.name
+        # skip known non-deck files: game state, turn snapshots, chat history, XML
+        if not name.endswith('.json'):
+            continue
+        if name in ('game.json', 'history.json') or name.startswith('game-'):
+            continue
+        deck_id = name[:-5]
+        try:
+            content = open(f.path, encoding='utf-8', errors='replace').read()
+            writer.writerow([game_id, deck_id, content])
+        except Exception as e:
+            print(f'WARN: skipping {f.path}: {e}', file=sys.stderr)
+PYEOF
+psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -v ON_ERROR_STOP=1 <<SQL
+CREATE TEMP TABLE game_deck_staging (
+  game_id      VARCHAR(36),
+  deck_id      VARCHAR(36),
+  deck_content TEXT
+);
+\copy game_deck_staging(game_id,deck_id,deck_content) FROM '$GAME_DECK_CSV' WITH (FORMAT csv, NULL '');
+UPDATE jol_registration r
+SET deck_content = s.deck_content
+FROM game_deck_staging s
+WHERE r.game_id = s.game_id AND r.deck_id = s.deck_id;
+SQL
+rm -f "$GAME_DECK_CSV"
 
 success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM jol_registration;') registrations"
 

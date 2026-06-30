@@ -14,11 +14,6 @@ import net.deckserver.storage.json.system.TournamentRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,31 +35,7 @@ public class TournamentJob implements Runnable {
     }
 
     private void checkForDecks() {
-        // Check running tournaments have decks
-        List<TournamentMetadata> runningTournaments = TournamentService.getActiveTournaments();
-        for (TournamentMetadata tournament : runningTournaments) {
-            String tournamentName = tournament.getName();
-            for (int round = 1; round <= tournament.getNumberOfRounds(); round++) {
-                for (int table = 1; table <= tournament.getNumberOfTables(); table++) {
-                    String gameName = String.format("%s: Round %d - Table %d", tournamentName, round, table);
-                    String gameId = GameService.get(gameName).getId();
-                    List<TournamentPlayer> players = TournamentService.getPlayers(tournamentName, round, table);
-                    for (TournamentPlayer player : players) {
-                        String playerName = player.getName();
-                        var registration = TournamentService.getRegistrations(tournamentName, playerName).orElseThrow();
-                        Path gameDeckPath = DataPaths.path("games", gameId, registration.getDeck() + ".json");
-                        Path tournamentDeckPath = DataPaths.path("tournaments", tournament.getId(), registration.getDeck() + ".json");                        if (!Files.exists(gameDeckPath)) {
-                            try {
-                                Files.copy(tournamentDeckPath, gameDeckPath, StandardCopyOption.REPLACE_EXISTING);
-                                log.info("Copying missing tournament game file for {} - {} Round {} - Table {}", tournamentName, playerName, round, table);
-                            } catch (IOException e) {
-                                log.error("Unable to copy tournament file");
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        // Deck content is stored in jol_registration.deck_content — no file copies needed
     }
 
     private void startTournament() {
@@ -90,12 +61,9 @@ public class TournamentJob implements Runnable {
                         String deckId = registration.getDeck();
                         ExtendedDeck deck = TournamentService.getTournamentDeck(tournamentName, deckId);
                         assert deck != null;
-                        // Create Registration
-                        RegistrationService.registerDeck(gameName, playerName, deckId, deck.getDeck().getName(), deck.getStats().getSummary());
-                        // Add player and deck
+                        RegistrationService.registerDeck(gameName, playerName, deckId, deck.getDeck().getName(), deck.getStats().getSummary(), deck);
                         jolGame.addPlayer(playerName, deck.getDeck());
                     }
-                    // Set order and start
                     jolGame.startGame(players.stream().map(TournamentPlayer::getName).toList());
                     // Save game
                     GameService.saveGame(jolGame);
@@ -124,9 +92,7 @@ public class TournamentJob implements Runnable {
                     String deckId = TournamentService.getRegistrations(tournamentName, playerName).map(TournamentRegistration::getDeck).orElseThrow();
                     ExtendedDeck deck = TournamentService.getTournamentDeck(tournamentName, deckId);
                     assert deck != null;
-                    // Create Registration
-                    RegistrationService.registerDeck(gameName, playerName, deckId, deck.getDeck().getName(), deck.getStats().getSummary());
-                    // Add player and deck
+                    RegistrationService.registerDeck(gameName, playerName, deckId, deck.getDeck().getName(), deck.getStats().getSummary(), deck);
                     jolGame.addPlayer(playerName, deck.getDeck());
                     NotificationService.pingPlayer(playerName, null, gameName);
                 }

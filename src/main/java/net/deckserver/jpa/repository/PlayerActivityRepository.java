@@ -30,7 +30,7 @@ public class PlayerActivityRepository {
     }
 
     public List<PlayerActivityEntity> findAll(EntityManager em) {
-        return em.createQuery("SELECT p FROM PlayerActivityEntity p", PlayerActivityEntity.class)
+        return em.createQuery("SELECT p FROM PlayerActivityEntity p JOIN FETCH p.player", PlayerActivityEntity.class)
                 .getResultList();
     }
 }

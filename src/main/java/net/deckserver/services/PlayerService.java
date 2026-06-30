@@ -16,7 +16,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +24,6 @@ import java.util.stream.Collectors;
 
 public class PlayerService extends PersistedService {
 
-    private static final Path PERSISTENCE_PATH = DataPaths.path("players.json");
     private static final PlayerRepository playerRepository = new PlayerRepository();
     private static final PlayerService INSTANCE = new PlayerService();
     private static final LoadingCache<String, UserSummary> activeUsers = Caffeine.newBuilder()
@@ -61,11 +59,11 @@ public class PlayerService extends PersistedService {
         activeUsers.get(playerName).setLastOnline(OffsetDateTime.now());
     }
 
-    public static  boolean existsPlayer(String name) {
+    public static boolean existsPlayer(String name) {
         return name != null && INSTANCE.players.containsKey(name);
     }
 
-    public static  boolean registerPlayer(String name, String password, String email) {
+    public static boolean registerPlayer(String name, String password, String email) {
         if (existsPlayer(name) || name.isEmpty())
             return false;
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
@@ -75,7 +73,7 @@ public class PlayerService extends PersistedService {
         return true;
     }
 
-    public static  boolean authenticate(String playerName, String password) {
+    public static boolean authenticate(String playerName, String password) {
         if (existsPlayer(playerName)) {
             PlayerInfo playerInfo = loadPlayerInfo(playerName);
             return BCrypt.checkpw(password, playerInfo.getHash());
@@ -84,14 +82,14 @@ public class PlayerService extends PersistedService {
         }
     }
 
-    public static  void changePassword(String player, String password) {
+    public static void changePassword(String player, String password) {
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
         PlayerInfo info = loadPlayerInfo(player);
         info.setHash(hash);
         INSTANCE.jpaWrite(em -> playerRepository.save(em, info));
     }
 
-    public static  void updateProfile(String playerName, String email, String discordID, String veknID, String country) {
+    public static void updateProfile(String playerName, String email, String discordID, String veknID, String country) {
         PlayerInfo playerInfo = loadPlayerInfo(playerName);
         playerInfo.setDiscordId(discordID);
         playerInfo.setEmail(email);
@@ -101,22 +99,22 @@ public class PlayerService extends PersistedService {
         INSTANCE.jpaWrite(em -> playerRepository.save(em, playerInfo));
     }
 
-    private static  PlayerInfo loadPlayerInfo(String playerName) {
+    private static PlayerInfo loadPlayerInfo(String playerName) {
         if (INSTANCE.players.containsKey(playerName)) {
             return INSTANCE.players.get(playerName);
         }
         throw new IllegalArgumentException("Player: " + playerName + " was not found.");
     }
 
-    public static  PlayerInfo get(String playerName) {
+    public static PlayerInfo get(String playerName) {
         return loadPlayerInfo(playerName);
     }
 
-    public static  Set<String> getPlayers() {
+    public static Set<String> getPlayers() {
         return INSTANCE.players.keySet();
     }
 
-    public static  void remove(String name) {
+    public static void remove(String name) {
         INSTANCE.players.remove(name);
         INSTANCE.jpaWrite(em -> playerRepository.delete(em, name));
     }
@@ -127,47 +125,38 @@ public class PlayerService extends PersistedService {
 
     @Override
     protected void persist() {
-        if (shouldSkipPersistence()) {
-            logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
-            return;
-        }
-
-        try {
-            logger.debug("Persisting {} player data", players.size());
-            objectMapper.writeValue(PERSISTENCE_PATH.toFile(), players);
-            logger.debug("Successfully persisted player data");
-        } catch (IOException e) {
-            logger.error("Unable to save player data", e);
-        }
+        // all mutations are write-through; no background file flush needed
     }
 
     @Override
     protected void load() {
-        if (JpaFactory.isEnabled()) {
-            try (EntityManager em = JpaFactory.createEntityManager()) {
-                Map<String, PlayerInfo> loaded = playerRepository.findAll(em);
-                players.putAll(loaded);
-                logger.info("Loaded {} players from JPA", players.size());
-            } catch (Exception e) {
-                logger.error("JPA load failed for PlayerService", e);
-            }
+        if (testModeEnabled) {
+            loadFromFile();
             return;
         }
-        if (!Files.exists(PERSISTENCE_PATH)) {
-            logger.info("No existing player file found");
-            return;
-        }
-        try {
-            Map<String, PlayerInfo> loaded = objectMapper.readValue(PERSISTENCE_PATH.toFile(), new TypeReference<>() {});
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            Map<String, PlayerInfo> loaded = playerRepository.findAll(em);
             players.putAll(loaded);
-            logger.info("Loaded {} players", players.size());
+            logger.info("Loaded {} players from JPA", players.size());
+        } catch (Exception e) {
+            logger.error("JPA load failed for PlayerService", e);
+        }
+    }
+
+    private void loadFromFile() {
+        Path path = DataPaths.path("players.json");
+        if (!Files.exists(path)) return;
+        try {
+            Map<String, PlayerInfo> loaded = objectMapper.readValue(path.toFile(), new TypeReference<>() {});
+            players.putAll(loaded);
+            logger.info("Loaded {} players from file", players.size());
         } catch (IOException e) {
-            logger.error("Unable to load players.", e);
+            logger.error("Unable to load players from file", e);
         }
     }
 
     private void jpaWrite(java.util.function.Consumer<EntityManager> action) {
-        if (!JpaFactory.isEnabled()) return;
+        if (testModeEnabled) return;
         try (EntityManager em = JpaFactory.createEntityManager()) {
             em.getTransaction().begin();
             action.accept(em);

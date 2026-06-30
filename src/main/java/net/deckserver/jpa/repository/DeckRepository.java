@@ -65,6 +65,17 @@ public class DeckRepository {
         }
     }
 
+    public ExtendedDeck findContent(EntityManager em, String deckId) {
+        DeckContentEntity entity = em.find(DeckContentEntity.class, deckId);
+        if (entity == null) return new ExtendedDeck();
+        try {
+            return mapper.readValue(entity.getContent(), ExtendedDeck.class);
+        } catch (JsonProcessingException e) {
+            logger.error("Failed to deserialize deck content for {}", deckId, e);
+            return new ExtendedDeck();
+        }
+    }
+
     public List<DeckInfoEntity> findAllDeckInfos(EntityManager em) {
         return em.createQuery("SELECT d FROM DeckInfoEntity d", DeckInfoEntity.class).getResultList();
     }

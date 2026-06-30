@@ -33,7 +33,8 @@ public class GameInfoRepository {
     }
 
     public Map<String, GameInfo> findAll(EntityManager em) {
-        List<GameInfoEntity> entities = em.createQuery("SELECT g FROM GameInfoEntity g", GameInfoEntity.class)
+        List<GameInfoEntity> entities = em.createQuery(
+                        "SELECT g FROM GameInfoEntity g LEFT JOIN FETCH g.owner", GameInfoEntity.class)
                 .getResultList();
         return entities.stream()
                 .collect(Collectors.toMap(GameInfoEntity::getGameName, GameInfoEntity::toGameInfo));

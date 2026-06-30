@@ -1,5 +1,6 @@
 package net.deckserver.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -9,16 +10,13 @@ import com.google.common.collect.Table;
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.repository.RegistrationRepository;
-import net.deckserver.storage.json.game.GameSummary;
+import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.RegistrationSummary;
 import net.deckserver.storage.json.system.RegistrationStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.Map;
@@ -31,8 +29,6 @@ import java.util.function.Predicate;
 public class RegistrationService extends PersistedService {
 
     private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
-    private static final Logger logger = LoggerFactory.getLogger(RegistrationService.class);
-    private static final Path PERSISTENCE_PATH = DataPaths.path("registrations.json");
     private static final RegistrationRepository registrationRepository = new RegistrationRepository();
     private final static RegistrationService INSTANCE = new RegistrationService();
     private final Table<String, String, RegistrationStatus> registrations = HashBasedTable.create();
@@ -46,41 +42,41 @@ public class RegistrationService extends PersistedService {
         load();
     }
 
-    public static  void put(String gameName, String playerName, RegistrationStatus registration) {
+    public static void put(String gameName, String playerName, RegistrationStatus registration) {
         INSTANCE.registrations.put(gameName, playerName, registration);
         INSTANCE.jpaWrite(em -> registrationRepository.save(em, gameName, playerName, registration));
     }
 
-    public static  long getRegisteredPlayerCount(String gameName) {
+    public static long getRegisteredPlayerCount(String gameName) {
         return INSTANCE.registrations.row(gameName).values().stream().filter(IS_REGISTERED).count();
     }
 
-    public static  RegistrationStatus getRegistration(String gameName, String playerName) {
+    public static RegistrationStatus getRegistration(String gameName, String playerName) {
         return INSTANCE.registrations.get(gameName, playerName);
     }
 
-    public static  Set<String> getRegisteredGames(String playerName) {
+    public static Set<String> getRegisteredGames(String playerName) {
         return INSTANCE.registrations.column(playerName).keySet();
     }
 
-    public static  Set<String> getPlayers(String gameName) {
+    public static Set<String> getPlayers(String gameName) {
         return INSTANCE.registrations.row(gameName).keySet();
     }
 
-    public static  void removePlayer(String gameName, String playerName) {
+    public static void removePlayer(String gameName, String playerName) {
         INSTANCE.registrations.remove(gameName, playerName);
         INSTANCE.jpaWrite(em -> registrationRepository.delete(em, gameName, playerName));
     }
 
-    public static  boolean isInGame(String gameName, String playerName) {
+    public static boolean isInGame(String gameName, String playerName) {
         return INSTANCE.registrations.contains(gameName, playerName);
     }
 
-    public static  boolean isRegistered(String gameName, String playerName) {
+    public static boolean isRegistered(String gameName, String playerName) {
         return INSTANCE.registrations.contains(gameName, playerName) && Objects.requireNonNull(INSTANCE.registrations.get(gameName, playerName)).getDeckId() != null;
     }
 
-    public static  boolean isInvited(String gameName, String playerName) {
+    public static boolean isInvited(String gameName, String playerName) {
         return INSTANCE.registrations.contains(gameName, playerName);
     }
 
@@ -102,17 +98,24 @@ public class RegistrationService extends PersistedService {
     }
 
     public static synchronized void invitePlayer(String gameName, String playerName) {
-        if(!RegistrationService.isInvited(gameName, playerName)) {
+        if (!RegistrationService.isInvited(gameName, playerName)) {
             RegistrationStatus status = new RegistrationStatus(OffsetDateTime.now());
             INSTANCE.registrations.put(gameName, playerName, status);
             INSTANCE.jpaWrite(em -> registrationRepository.save(em, gameName, playerName, status));
         }
     }
 
-    public static void registerDeck(String gameName, String playerName, String deckId, String deckName, String summary) {
+    public static void registerDeck(String gameName, String playerName, String deckId, String deckName, String summary, ExtendedDeck deck) {
         RegistrationStatus registrationStatus = new RegistrationStatus(deckId);
         registrationStatus.setSummary(summary);
         registrationStatus.setDeckName(deckName);
+        if (deck != null) {
+            try {
+                registrationStatus.setDeckContent(objectMapper.writeValueAsString(deck));
+            } catch (JsonProcessingException e) {
+                INSTANCE.logger.error("Failed to serialize deck content for registration {}/{}", gameName, playerName, e);
+            }
+        }
         INSTANCE.registrations.put(gameName, playerName, registrationStatus);
         INSTANCE.jpaWrite(em -> registrationRepository.save(em, gameName, playerName, registrationStatus));
     }
@@ -137,52 +140,43 @@ public class RegistrationService extends PersistedService {
 
     @Override
     protected void persist() {
-        if (shouldSkipPersistence()) {
-            logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
-            return;
-        }
-
-        try {
-            logger.debug("Persisting {} registrations", registrations.size());
-            objectMapper.writeValue(PERSISTENCE_PATH.toFile(), registrations);
-            logger.debug("Successfully persisted registrations");
-        } catch (IOException e) {
-            logger.error("Unable to save registrations", e);
-        }
+        // all mutations are write-through; no background flush needed
     }
 
     @Override
     protected void load() {
-        if (JpaFactory.isEnabled()) {
-            try (EntityManager em = JpaFactory.createEntityManager()) {
-                registrationRepository.findAll(em).forEach(entity ->
-                        registrations.put(entity.getGameName(), entity.getPlayerName(),
-                                entity.toRegistrationStatus()));
-                logger.info("Loaded {} registrations from JPA", registrations.size());
-            } catch (Exception e) {
-                logger.error("JPA load failed for RegistrationService", e);
-            }
+        if (testModeEnabled) {
+            loadFromFile();
             return;
         }
-        TypeFactory typeFactory = objectMapper.getTypeFactory();
-        if (!Files.exists(PERSISTENCE_PATH)) {
-            logger.info("No existing registrations file found");
-            return;
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            registrationRepository.findAll(em).forEach(entity ->
+                    registrations.put(entity.getGameName(), entity.getPlayerName(),
+                            entity.toRegistrationStatus()));
+            logger.info("Loaded {} registrations from JPA", registrations.size());
+        } catch (Exception e) {
+            logger.error("JPA load failed for RegistrationService", e);
         }
+    }
+
+    private void loadFromFile() {
+        Path path = DataPaths.path("registrations.json");
+        if (!Files.exists(path)) return;
         try {
+            TypeFactory typeFactory = objectMapper.getTypeFactory();
             MapType registrationMapType = typeFactory.constructMapType(Map.class, String.class, RegistrationStatus.class);
-            Map<String, Map<String, RegistrationStatus>> registrationsMap = objectMapper.readValue(PERSISTENCE_PATH.toFile(), typeFactory.constructMapType(ConcurrentHashMap.class, typeFactory.constructType(String.class), registrationMapType));
-            registrationsMap.forEach((gameId, gameMap) ->
-                    gameMap.forEach((playerId, registration) ->
-                            registrations.put(gameId, playerId, registration)));
-            logger.info("Loaded {} registrations", registrationsMap.size());
+            Map<String, Map<String, RegistrationStatus>> map = objectMapper.readValue(path.toFile(),
+                    typeFactory.constructMapType(ConcurrentHashMap.class, typeFactory.constructType(String.class), registrationMapType));
+            map.forEach((gameId, gameMap) ->
+                    gameMap.forEach((playerId, reg) -> registrations.put(gameId, playerId, reg)));
+            logger.info("Loaded {} registrations from file", registrations.size());
         } catch (IOException e) {
-            logger.error("Unable to load registrations", e);
+            logger.error("Unable to load registrations from file", e);
         }
     }
 
     private void jpaWrite(java.util.function.Consumer<EntityManager> action) {
-        if (!JpaFactory.isEnabled()) return;
+        if (testModeEnabled) return;
         try (EntityManager em = JpaFactory.createEntityManager()) {
             em.getTransaction().begin();
             action.accept(em);

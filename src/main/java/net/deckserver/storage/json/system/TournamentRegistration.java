@@ -11,6 +11,7 @@ public class TournamentRegistration {
     private String player;
     private String vekn;
     private String deck;
+    private String deckContent;
 
     public TournamentRegistration(String name, String vekn) {
         this.player = name;

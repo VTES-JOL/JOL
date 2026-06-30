@@ -147,10 +147,8 @@ public abstract class PersistedService {
                 logger.warn("{} scheduler shutdown interrupted", serviceName);
             }
 
-            // Perform final persistence BEFORE classloader stops
+            // Perform final JPA flush BEFORE classloader stops
             logger.info("Performing final persistence for {}...", serviceName);
-            
-            // Temporarily allow saves for explicit shutdown save
             isShuttingDown.set(false);
             persist();
             isShuttingDown.set(true);

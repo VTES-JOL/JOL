@@ -47,14 +47,33 @@ public class RegistrationRepository {
 
     public List<RegistrationEntity> findAllForGame(EntityManager em, String gameName) {
         return em.createQuery(
-                "SELECT r FROM RegistrationEntity r JOIN r.game g WHERE g.gameName = :gameName",
+                "SELECT r FROM RegistrationEntity r JOIN FETCH r.player JOIN r.game g WHERE g.gameName = :gameName",
                 RegistrationEntity.class)
                 .setParameter("gameName", gameName)
                 .getResultList();
     }
 
+    public List<RegistrationEntity> findAllForPlayer(EntityManager em, String playerName) {
+        return em.createQuery(
+                "SELECT r FROM RegistrationEntity r JOIN FETCH r.game g LEFT JOIN FETCH g.owner WHERE r.player.playerName = :playerName",
+                RegistrationEntity.class)
+                .setParameter("playerName", playerName)
+                .getResultList();
+    }
+
+    public RegistrationEntity findByGameAndDeck(EntityManager em, String gameId, String deckId) {
+        return em.createQuery(
+                "SELECT r FROM RegistrationEntity r JOIN r.game g WHERE g.gameId = :gameId AND r.deckId = :deckId",
+                RegistrationEntity.class)
+                .setParameter("gameId", gameId)
+                .setParameter("deckId", deckId)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
+    }
+
     public List<RegistrationEntity> findAll(EntityManager em) {
-        return em.createQuery("SELECT r FROM RegistrationEntity r", RegistrationEntity.class)
+        return em.createQuery("SELECT r FROM RegistrationEntity r JOIN FETCH r.player JOIN FETCH r.game", RegistrationEntity.class)
                 .getResultList();
     }
 }

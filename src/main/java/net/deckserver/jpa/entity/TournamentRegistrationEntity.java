@@ -30,6 +30,9 @@ public class TournamentRegistrationEntity {
     @Column(name = "deck_id")
     private String deckId;
 
+    @Column(name = "deck_content", columnDefinition = "TEXT")
+    private String deckContent;
+
     public TournamentRegistrationEntity() {}
 
     public static TournamentRegistrationEntity from(String tournamentId, String playerId, TournamentRegistration reg) {
@@ -38,6 +41,7 @@ public class TournamentRegistrationEntity {
         entity.playerId = playerId;
         entity.vekn = reg.getVekn();
         entity.deckId = reg.getDeck();
+        entity.deckContent = reg.getDeckContent();
         return entity;
     }
 
@@ -45,8 +49,12 @@ public class TournamentRegistrationEntity {
         String name = player != null ? player.getPlayerName() : playerId;
         TournamentRegistration reg = new TournamentRegistration(name, vekn);
         reg.setDeck(deckId);
+        reg.setDeckContent(deckContent);
         return reg;
     }
+
+    public String getDeckContent() { return deckContent; }
+    public void setDeckContent(String deckContent) { this.deckContent = deckContent; }
 
     public Long getId() { return id; }
     public String getTournamentId() { return tournamentId; }

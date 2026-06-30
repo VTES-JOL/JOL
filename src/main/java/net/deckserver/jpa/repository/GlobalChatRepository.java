@@ -40,7 +40,7 @@ public class GlobalChatRepository {
 
     public List<GlobalChatEntity> findRecent(EntityManager em, int limit) {
         return em.createQuery(
-                        "SELECT c FROM GlobalChatEntity c ORDER BY c.id DESC", GlobalChatEntity.class)
+                        "SELECT c FROM GlobalChatEntity c JOIN FETCH c.player ORDER BY c.id DESC", GlobalChatEntity.class)
                 .setMaxResults(limit)
                 .getResultList();
     }
