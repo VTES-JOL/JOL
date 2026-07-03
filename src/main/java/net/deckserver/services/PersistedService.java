@@ -210,15 +210,6 @@ public abstract class PersistedService {
     }
 
     /**
-     * Get the base path for data storage.
-     *
-     * @return The base path from the DataPaths service
-     */
-    protected String getBasePath() {
-        return DataPaths.baseDir().toString();
-    }
-
-    /**
      * Check if test mode is enabled.
      *
      * @return true if test mode is enabled

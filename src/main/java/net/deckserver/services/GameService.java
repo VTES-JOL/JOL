@@ -1,6 +1,5 @@
 package net.deckserver.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import jakarta.persistence.EntityManager;
@@ -11,18 +10,15 @@ import net.deckserver.game.enums.Visibility;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.repository.GameChatRepository;
 import net.deckserver.jpa.repository.GameInfoRepository;
+import net.deckserver.jpa.repository.GameSnapshotRepository;
 import net.deckserver.jpa.repository.GameStateRepository;
 import net.deckserver.storage.json.game.GameData;
 import net.deckserver.storage.json.game.GameSummary;
 import net.deckserver.storage.json.game.PlayerSummary;
 import net.deckserver.storage.json.system.GameInfo;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -39,6 +35,7 @@ public class GameService extends PersistedService {
     private static final GameInfoRepository gameInfoRepository = new GameInfoRepository();
     private static final GameStateRepository gameStateRepository = new GameStateRepository();
     private static final GameChatRepository gameChatRepository = new GameChatRepository();
+    private static final GameSnapshotRepository gameSnapshotRepository = new GameSnapshotRepository();
     private static final GameService INSTANCE = new GameService();
     private final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
             .expireAfterAccess(30, TimeUnit.MINUTES)
@@ -73,13 +70,6 @@ public class GameService extends PersistedService {
         GameInfo gameInfo = new GameInfo(gameName, gameId, ownerName, visibility, GameStatus.STARTING, format);
         INSTANCE.games.put(gameName, gameInfo);
         INSTANCE.idToName.put(gameId, gameName);
-        // game directory is still needed for turn snapshots (saveGame with turn param)
-        try {
-            Path gamePath = DataPaths.path("games", gameId);
-            Files.createDirectory(gamePath);
-        } catch (IOException e) {
-            logger.error("Error creating game directory", e);
-        }
         INSTANCE.jpaWrite(em -> gameInfoRepository.save(em, gameInfo));
     }
 
@@ -140,15 +130,10 @@ public class GameService extends PersistedService {
     }
 
     public static void remove(String gameName, String gameId) {
-        Path gamePath = DataPaths.path("games", gameId);
         INSTANCE.games.remove(gameName);
         INSTANCE.idToName.remove(gameId);
-        try {
-            FileUtils.deleteDirectory(gamePath.toFile());
-        } catch (IOException e) {
-            logger.error("Unable to delete game directory", e);
-        }
         INSTANCE.jpaWrite(em -> {
+            gameSnapshotRepository.deleteAllForGame(em, gameId);
             gameChatRepository.delete(em, gameId);
             gameStateRepository.delete(em, gameId);
             gameInfoRepository.delete(em, gameName);
@@ -170,14 +155,14 @@ public class GameService extends PersistedService {
     }
 
     public static JolGame loadSnapshot(String gameId, String turn) {
-        try {
-            Path gameStatePath = DataPaths.path("games", gameId, "game-" + turn + ".json");
-            GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            GameData gameData = gameSnapshotRepository.load(em, gameId, snapshotTurn(turn));
+            if (gameData == null) {
+                // a missing snapshot must fail the rollback, not roll back to an empty game
+                throw new IllegalStateException("No snapshot for game " + gameId + " turn " + turn);
+            }
             return new JolGame(gameId, gameData);
-        } catch (IOException e) {
-            logger.error("Error reading game snapshot file", e);
         }
-        return new JolGame(gameId, new GameData(gameId));
     }
 
     public static void rollbackGame(String gameName, String turn) {
@@ -200,17 +185,13 @@ public class GameService extends PersistedService {
     }
 
     public static void saveGame(JolGame game, String turn) {
-        // File snapshot for rollback — intentionally file-based
-        if (INSTANCE.testModeEnabled) return;
-        turn = turn.replaceAll("\\.", "-");
-        String gameId = game.id();
-        Path gameStatePath = DataPaths.path("games", gameId, "game-" + turn + ".json");
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            objectMapper.writeValue(gameStatePath.toFile(), game.data());
-        } catch (IOException e) {
-            logger.error("Unable to save game snapshot", e);
-        }
+        String snapshotTurn = snapshotTurn(turn);
+        INSTANCE.jpaWrite(em -> gameSnapshotRepository.save(em, game.id(), snapshotTurn, game.data()));
+    }
+
+    // turn labels are normalized the same way the legacy game-<turn>.json filenames were
+    private static String snapshotTurn(String turn) {
+        return turn.replaceAll("\\.", "-");
     }
 
     public static JolGame getGame(String gameId) {

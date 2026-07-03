@@ -17,8 +17,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.Security;
 import java.time.Duration;
@@ -96,6 +94,11 @@ public class NotificationService {
                 86400
         );
 
+        if (keyPair == null) {
+            logger.warn("VAPID key not configured (set VAPID_KEY_FILE) — skipping push notification");
+            return;
+        }
+
         // Instantiate the push service and configure it
         PushService pushService = new PushService();
         pushService.setKeyPair(keyPair);
@@ -115,15 +118,25 @@ public class NotificationService {
         }
     }
 
+    /**
+     * Loads the VAPID key pair from the PEM file named by the VAPID_KEY_FILE env var
+     * (same pattern as KEY_FILE for CloudFront signing). Returns null when unset or
+     * unreadable — web push is then disabled rather than failing class initialization.
+     */
     private static KeyPair loadKey() {
+        String keyFile = System.getenv("VAPID_KEY_FILE");
+        if (keyFile == null || keyFile.isBlank()) {
+            logger.warn("VAPID_KEY_FILE not set — web push notifications disabled");
+            return null;
+        }
         Security.addProvider(new BouncyCastleProvider());
-        Path keyPath = DataPaths.path("vapid_private.pem");
-        try (FileInputStream stream = new FileInputStream(keyPath.toFile()); InputStreamReader reader = new InputStreamReader(stream)) {
+        try (FileInputStream stream = new FileInputStream(keyFile); InputStreamReader reader = new InputStreamReader(stream)) {
             PEMParser pemParser = new PEMParser(reader);
             PEMKeyPair pemKeyPair = (PEMKeyPair) pemParser.readObject();
             return new JcaPEMKeyConverter().getKeyPair(pemKeyPair);
         } catch (IOException e) {
-            throw new RuntimeException("Could not read private key");
+            logger.error("Could not read VAPID key from {} — web push notifications disabled", keyFile, e);
+            return null;
         }
     }
 }

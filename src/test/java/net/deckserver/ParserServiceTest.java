@@ -2,14 +2,12 @@ package net.deckserver;
 
 import net.deckserver.services.ParserService;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ParserServiceTest {
 
     @Test
-    @SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
     public void testParseCard() throws Exception {
 
 

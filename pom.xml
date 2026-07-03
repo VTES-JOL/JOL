@@ -9,7 +9,6 @@
     <packaging>war</packaging>
 
     <properties>
-        <JOL_DATA>${basedir}/src/test/resources</JOL_DATA>
         <JOL_VERSION>${project.version}</JOL_VERSION>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

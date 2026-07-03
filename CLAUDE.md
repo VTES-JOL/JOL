@@ -8,10 +8,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Build WAR
 ./mvnw clean package
 
-# Run locally (Tomcat 9, app served at /jol)
-JOL_DATA=src/test/resources/data ./mvnw tomcat9:run
+# Start local Postgres (required), then optionally load fixture data
+docker compose -f local-docker-compose.yml up -d db
+./migrate-to-db.sh src/test/resources/data   # reset DB + import fixture data
 
-# Run all tests (excludes "Builder" group by default)
+# Run locally (Tomcat 9, app served at /jol)
+JOL_DB_PASSWORD=jol ./mvnw tomcat9:run
+
+# Run all tests (excludes "Builder" group by default; uses in-memory H2, no Postgres needed)
 ./mvnw test
 
 # Run a single test class
@@ -21,7 +25,7 @@ JOL_DATA=src/test/resources/data ./mvnw tomcat9:run
 ./mvnw test -Dtest=RunCucumberTest
 ```
 
-Tests require `JOL_DATA` and `ENABLE_TEST_MODE=true` — these are set via `@SetEnvironmentVariable` on the test classes, so no manual setup is needed when running via Maven.
+Tests require `ENABLE_TEST_MODE=true` — set via `@SetEnvironmentVariable` on the test classes, so no manual setup is needed when running via Maven. Service-level tests boot an in-memory H2 database populated from `src/test/resources/data` by `JolServiceExtension`/`JolFixtureLoader`.
 
 The `Builder` tag is excluded from the default test run — these are `CardDatabaseBuilder` tests that regenerate static card JSON/HTML for the nginx static server.
 
@@ -29,8 +33,12 @@ The `Builder` tag is excluded from the default test run — these are `CardDatab
 
 | Variable | Purpose |
 |---|---|
-| `JOL_DATA` | Path to data directory (required) |
-| `ENABLE_TEST_MODE` | Disables scheduled persistence (set to `true` in tests) |
+| `JOL_DB_URL` | JDBC URL (default `jdbc:postgresql://localhost:5432/jol`) |
+| `JOL_DB_USER` / `JOL_DB_PASSWORD` | Database credentials (default user `jol`) |
+| `JOL_DB_POOL_SIZE` | HikariCP max pool size (default 10) |
+| `JOL_LOGS` | Log directory (default `target`) |
+| `VAPID_KEY_FILE` | Path to VAPID private key PEM; web push disabled when unset |
+| `ENABLE_TEST_MODE` | Disables scheduled persistence and JPA writes (set to `true` in tests) |
 | `ENABLE_CAPTCHA` | Set to `false` for local dev |
 | `JOL_RECAPTCHA_KEY` / `JOL_RECAPTCHA_SECRET` | reCAPTCHA credentials |
 | `DISCORD_BOT_TOKEN` / `DISCORD_PING_CHANNEL_ID` | Discord integration |
@@ -38,14 +46,14 @@ The `Builder` tag is excluded from the default test run — these are `CardDatab
 
 ## Architecture Overview
 
-This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deckserver.net), packaged as a Java WAR deployed on Tomcat 9. It uses **no database** — all state is persisted as JSON/XML files under `JOL_DATA`.
+This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deckserver.net), packaged as a Java WAR deployed on Tomcat 9. State is persisted in **PostgreSQL** via JPA (Hibernate 7 + Flyway + HikariCP); services hold authoritative in-memory copies and write through to the DB (single-node assumption — see `PersistedService` javadoc). `migrate-to-db.sh` (repo root) resets the DB and imports the legacy `JOL_DATA` JSON files.
 
 ### Request Flow
 
 1. Browser calls hand-written `ds.js` (a fetch-based REST client) which posts to `/jol/api/...`
 2. Jersey JAX-RS resources (`net.deckserver.rest`) handle each endpoint and delegate to **`JolAdmin`** or services
 3. `JolAdmin` manages in-memory `GameModel` / `PlayerModel` maps and routes to **`JolGame`** or **`DoCommand`**
-4. Services persist state back to JSON files on a schedule (via `PersistedService`) or on demand
+4. Services write through to PostgreSQL immediately (`PersistedService.jpaWrite`), or flush write-behind caches on a schedule (game state, activity timestamps)
 5. Server-push notifications are sent over WebSocket (`/ws/updates`) via `WebSocketRegistry`
 
 ### Package Map
@@ -63,11 +71,15 @@ This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deck
     - `ModelLoader` — converts between UI objects and XML/JSON data objects
     - `CommandParser` — tokenises command strings
 - **`net.deckserver.services`** — static service singletons
-  - `PersistedService` — abstract base: scheduled JSON persistence, test-mode bypass, graceful shutdown (call `shutdown()` from `ServletContextListener`, not JVM hooks)
-  - `DataPaths` — resolves `JOL_DATA` env var; use `DataPaths.path(...)` to build file paths
+  - `PersistedService` — abstract base: `jpaWrite()` transaction helper, optional scheduled flush (interval 0 = write-through only), test-mode bypass, graceful shutdown (call `shutdown()` from `ServletContextListener`, not JVM hooks)
   - `GameService`, `PlayerService`, `DeckService`, `CardService`, `ChatService`, etc.
+- **`net.deckserver.jpa`** — persistence layer
+  - `JpaFactory` — HikariCP + Flyway + EntityManagerFactory lifecycle; env-driven connection config
+  - `entity/` — one entity per table (`jol_player`, `jol_game`, `jol_game_state`, `jol_game_snapshot`, `jol_registration`, `jol_deck_*`, `jol_tournament*`, `jol_game_history`, chat/activity tables)
+  - `repository/` — plain repositories taking an `EntityManager`; callers own the transaction (via `PersistedService.jpaWrite`)
+  - Migrations live in `src/main/resources/db/migration/` (Flyway, `hbm2ddl=validate` in prod; H2 tests use `create-drop`)
 - **`net.deckserver.storage.json`**
-  - `system/` — top-level data files: `GameInfo`, `PlayerInfo`, `DeckInfo`, `GameHistory`, tournament classes
+  - `system/` — top-level data objects: `GameInfo`, `PlayerInfo`, `DeckInfo`, `GameHistory`, tournament classes
   - `game/` — in-game state: `GameData`, `PlayerData`, `RegionData`, `CardData`, `TurnData`
   - `deck/` — deck structure: `Deck`, `Crypt`, `Library`, `DeckParser`
   - `cards/` — `CardSummary`, `SecuredCardLoader`
@@ -91,24 +103,26 @@ This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deck
 - **`net.deckserver.ws`** — WebSocket push
   - `JolWebSocketEndpoint` — `@ServerEndpoint("/ws/updates")`; shares HTTP session auth; handles join/leave/ping frames
   - `WebSocketRegistry` — tracks player→session mapping; `notifyMain()` / `notifyGame(gameId)` push update signals to clients
-- **`net.deckserver.jobs`** — background jobs: `GameCleanUp`, `PublicGameBuilder`, `TournamentJob`, `GameDataConversion`
+- **`net.deckserver.jobs`** — background jobs: `GameCleanUp`, `PublicGameBuilder`, `TournamentJob`
 - **`net.deckserver.push`** — Web Push notification support
 
-### Data File Layout (under `JOL_DATA`)
+### Database Layout (PostgreSQL, Flyway-managed)
 
 ```
-games.json          # Map<name, GameInfo>
-players.json        # Map<name, PlayerInfo>
-decks.json          # Map<playerName, Map<deckName, DeckInfo>>
-registrations.json  # Map<gameName, Map<playerName, RegistrationStatus>>
-pastGames.json      # Map<timestamp, GameHistory>
-tournament.json     # TournamentData
-chats.json          # List<ChatEntry>
-timestamps.json     # Timestamps
-decks/              # *.json  — deck files (ULID-named)
-games/<uuid>/       # game.json, game.xml, actions.xml, <deckId>.json
-cards/              # vtescrypt.csv, vteslib.csv  (VEKN official)
+jol_player / jol_player_role        # players + roles
+jol_game                            # game metadata (name, id, owner, status, format)
+jol_game_state                      # serialized GameData JSON, @Version optimistic locking
+jol_game_snapshot                   # per-turn state snapshots for admin rollback
+jol_game_chat                       # serialized turn history JSON
+jol_registration                    # game registrations incl. deck snapshot (deck_content)
+jol_deck_info / jol_deck_format / jol_deck_content   # decks; legacy decks store raw text in content
+jol_tournament / jol_tournament_registration          # tournaments incl. deck snapshots
+jol_player_activity / jol_game_activity               # timestamps (write-behind, 1-min flush)
+jol_global_chat                     # lobby chat (trimmed to last 1000)
+jol_game_history                    # past game results (pastGames.json successor)
 ```
+
+Legacy file data under the old `JOL_DATA` directory is imported by `migrate-to-db.sh`.
 
 ### Frontend + API Notes
 
@@ -119,6 +133,6 @@ cards/              # vtescrypt.csv, vteslib.csv  (VEKN official)
 
 ### Deployment
 
-- Docker: `docker-compose.yml` for production, `local-docker-compose.yml` for local static/app server
+- Docker: `docker-compose.yml` for production (prod + test apps, each with its own `postgres:16` service; DB passwords from compose `.env`), `local-docker-compose.yml` for local Postgres/static server
 - Session clustering: Redisson (Redis) Tomcat session manager (configured in `tomcat9-maven-plugin` dependencies)
 - AWS CloudFront SDK included for CDN invalidation

@@ -2656,9 +2656,17 @@ function loadGame(data) {
         data.turns.slice(1).forEach(turn => turnSelect.append(new Option(turn, turn)));
     }
 
-    // Render state
+    // Render state — morph the new fragment into the live DOM instead of replacing it,
+    // so scroll position, focus, collapse state, and open tooltips survive the update.
     if (data.state !== null) {
-        $("#state").html(data.state);
+        const stateEl = document.getElementById("state");
+        if (window.morphdom && stateEl) {
+            const wrapper = document.createElement("div");
+            wrapper.innerHTML = data.state;
+            morphdom(stateEl, wrapper, {childrenOnly: true});
+        } else {
+            $("#state").html(data.state);
+        }
         addCardTooltips("#state");
     }
 
@@ -2735,11 +2743,13 @@ function addCardTooltips(parent) {
             tippy.hideAll({exclude: instance});
             instance.setContent("Loading...");
             let ref = $(instance.reference);
-            let cardId = ref.data('card-id');
-            let secured = ref.data('secured') || false ? "secured/" : "";
+            // read attributes live (not via .data(), which caches) — morphdom can reuse
+            // a DOM node for a different card, changing data-card-id in place
+            let cardId = ref.attr('data-card-id');
+            let secured = ref.attr('data-secured') === 'true' ? "secured/" : "";
             if (cardId == null) { //Backwards compatibility in main chat
                 cardId = instance.reference.title;
-                ref.data('card-id', cardId);
+                ref.attr('data-card-id', cardId);
                 instance.reference.removeAttribute('title');
             }
             if (profile.imageTooltipPreference) {

@@ -517,6 +517,33 @@ for entry in os.scandir(games_dir):
 PYEOF
 success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM jol_game_chat;') game chat histories"
 
+# ── 10b. Game turn snapshots (rollback) ───────────────────────────────────────
+log "Loading game turn snapshots..."
+python3 - "$DATA/games" <<PYEOF | copy_into jol_game_snapshot "game_id,turn,state,created_at"
+import sys, csv, os, datetime
+
+games_dir  = sys.argv[1]
+loaded_ids = set("""$LOADED_GAME_IDS""".split())
+
+writer = csv.writer(sys.stdout)
+now    = datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+for entry in os.scandir(games_dir):
+    if not entry.is_dir() or entry.name not in loaded_ids:
+        continue
+    for f in os.scandir(entry.path):
+        # snapshot files are game-<turn>.json (turn label with dots normalized to dashes)
+        if not (f.name.startswith('game-') and f.name.endswith('.json')):
+            continue
+        turn = f.name[5:-5]
+        try:
+            state = open(f.path, encoding='utf-8', errors='replace').read()
+            writer.writerow([entry.name, turn, state, now])
+        except Exception as e:
+            print(f'WARN: skipping {f.path}: {e}', file=sys.stderr)
+PYEOF
+success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM jol_game_snapshot;') game snapshots"
+
 # ── 11. Game activity ─────────────────────────────────────────────────────────
 log "Loading game activity..."
 # game-timestamps.json is keyed by game_name; stage through a temp table to resolve game_id.
@@ -589,7 +616,7 @@ for tbl in jol_player jol_player_role jol_player_activity \
             jol_game jol_registration \
             jol_deck_info jol_deck_format jol_deck_content \
             jol_tournament jol_tournament_registration \
-            jol_game_state jol_game_chat \
+            jol_game_state jol_game_chat jol_game_snapshot \
             jol_game_activity jol_global_chat jol_game_history; do
   n=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM $tbl;")
   printf "  %-35s %s rows\n" "$tbl" "$n"
