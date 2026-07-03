@@ -13,9 +13,31 @@ services:
       JOL_DATA: /data
       TYPE: "prod"
       JDK_JAVA_OPTIONS: -Djava.security.egd=file:/dev/./urandom -Xmx2048m
+      JOL_DB_URL: jdbc:postgresql://prod-db:5432/jol
+      JOL_DB_USER: jol
+      JOL_DB_PASSWORD: ${PROD_DB_PASSWORD:?set PROD_DB_PASSWORD in .env}
+    depends_on:
+      prod-db:
+        condition: service_healthy
     volumes:
       - prod-data:/data
       - prod-app:/usr/local/tomcat/webapps
+  prod-db:
+    image: postgres:16
+    container_name: prod-db
+    networks:
+      - web
+    environment:
+      POSTGRES_DB: jol
+      POSTGRES_USER: jol
+      POSTGRES_PASSWORD: ${PROD_DB_PASSWORD:?set PROD_DB_PASSWORD in .env}
+    volumes:
+      - prod-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jol -d jol"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   test:
     image: tomcat:9-jdk21-corretto
     container_name: test
@@ -30,9 +52,31 @@ services:
       JOL_DATA: /data
       TYPE: "test"
       _JAVA_OPTIONS: -Djava.security.egd=file:/dev/./urandom
+      JOL_DB_URL: jdbc:postgresql://test-db:5432/jol
+      JOL_DB_USER: jol
+      JOL_DB_PASSWORD: ${TEST_DB_PASSWORD:?set TEST_DB_PASSWORD in .env}
+    depends_on:
+      test-db:
+        condition: service_healthy
     volumes:
       - test-data:/data
       - test-app:/usr/local/tomcat/webapps
+  test-db:
+    image: postgres:16
+    container_name: test-db
+    networks:
+      - web
+    environment:
+      POSTGRES_DB: jol
+      POSTGRES_USER: jol
+      POSTGRES_PASSWORD: ${TEST_DB_PASSWORD:?set TEST_DB_PASSWORD in .env}
+    volumes:
+      - test-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jol -d jol"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   static:
     image: nginx
     container_name: static
@@ -53,9 +97,13 @@ volumes:
     external: true
   prod-app:
     external: true
+  prod-db-data:
+    external: true
   test-data:
     external: true
   test-app:
+    external: true
+  test-db-data:
     external: true
   static-data:
     external: true

@@ -65,6 +65,15 @@ public class DeckRepository {
         }
     }
 
+    /**
+     * Raw column value, without parsing — legacy decks migrated from decks/&lt;id&gt;.txt
+     * hold plain text here, not ExtendedDeck JSON.
+     */
+    public String findRawContent(EntityManager em, String deckId) {
+        DeckContentEntity entity = em.find(DeckContentEntity.class, deckId);
+        return entity != null ? entity.getContent() : null;
+    }
+
     public ExtendedDeck findContent(EntityManager em, String deckId) {
         DeckContentEntity entity = em.find(DeckContentEntity.class, deckId);
         if (entity == null) return new ExtendedDeck();

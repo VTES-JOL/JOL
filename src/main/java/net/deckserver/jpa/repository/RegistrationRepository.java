@@ -47,7 +47,7 @@ public class RegistrationRepository {
 
     public List<RegistrationEntity> findAllForGame(EntityManager em, String gameName) {
         return em.createQuery(
-                "SELECT r FROM RegistrationEntity r JOIN FETCH r.player JOIN r.game g WHERE g.gameName = :gameName",
+                "SELECT r FROM RegistrationEntity r JOIN FETCH r.player JOIN FETCH r.game g LEFT JOIN FETCH g.owner WHERE g.gameName = :gameName",
                 RegistrationEntity.class)
                 .setParameter("gameName", gameName)
                 .getResultList();

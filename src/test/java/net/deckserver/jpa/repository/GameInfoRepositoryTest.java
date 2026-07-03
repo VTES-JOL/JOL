@@ -25,7 +25,7 @@ class GameInfoRepositoryTest {
 
     @BeforeAll
     static void setUpEmf() {
-        emf = Persistence.createEntityManagerFactory("jol-test-pu");
+        emf = Persistence.createEntityManagerFactory("jol-repo-test-pu");
         // Seed the owner player once — persists for the lifetime of the in-memory DB
         EntityManager seed = emf.createEntityManager();
         seed.getTransaction().begin();

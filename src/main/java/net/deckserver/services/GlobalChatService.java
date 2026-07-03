@@ -44,15 +44,7 @@ public class GlobalChatService extends PersistedService {
         }
         INSTANCE.playerModels.forEach(playerModel -> playerModel.chat(chatEntryBean));
         WebSocketRegistry.notifyMain();
-        if (!INSTANCE.testModeEnabled) {
-            try (EntityManager em = JpaFactory.createEntityManager()) {
-                em.getTransaction().begin();
-                globalChatRepository.insert(em, chatEntryBean);
-                em.getTransaction().commit();
-            } catch (Exception e) {
-                INSTANCE.logger.error("JPA write failed for global chat", e);
-            }
-        }
+        INSTANCE.jpaWrite(em -> globalChatRepository.insert(em, chatEntryBean));
     }
 
     public static List<ChatEntryBean> getChats() {
@@ -69,18 +61,11 @@ public class GlobalChatService extends PersistedService {
             logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
             return;
         }
-        try (EntityManager em = JpaFactory.createEntityManager()) {
-            em.getTransaction().begin();
-            globalChatRepository.trim(em);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            logger.error("JPA trim failed for global chat", e);
-        }
+        jpaWrite(globalChatRepository::trim);
     }
 
     @Override
     protected void load() {
-        if (testModeEnabled) return;
         try (EntityManager em = JpaFactory.createEntityManager()) {
             List<GlobalChatEntity> recent = globalChatRepository.findRecent(em, CHAT_STORAGE);
             chats.addAll(recent.reversed().stream()

@@ -1,6 +1,5 @@
 package net.deckserver.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
@@ -12,9 +11,6 @@ import net.deckserver.storage.json.game.ChatData;
 import net.deckserver.storage.json.game.TurnData;
 import net.deckserver.storage.json.game.TurnHistory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -98,28 +94,10 @@ public class ChatService extends PersistedService {
             return;
         }
         logger.debug("Saving history for {} with {} turns", gameId, history.getTurns().size());
-        try (EntityManager em = JpaFactory.createEntityManager()) {
-            em.getTransaction().begin();
-            gameChatRepository.save(em, gameId, history.getTurns());
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            logger.error("JPA write failed for chat history {}", gameId, e);
-        }
+        jpaWrite(em -> gameChatRepository.save(em, gameId, history.getTurns()));
     }
 
     private TurnHistory loadHistory(String gameId) {
-        if (testModeEnabled) {
-            Path historyPath = DataPaths.path("games", gameId, "history.json");
-            if (Files.exists(historyPath)) {
-                try {
-                    List<TurnData> turns = objectMapper.readValue(historyPath.toFile(), new TypeReference<>() {});
-                    if (!turns.isEmpty()) return new TurnHistory(turns);
-                } catch (IOException e) {
-                    logger.error("Error reading history fixture for {}", gameId, e);
-                }
-            }
-            return new TurnHistory();
-        }
         try (EntityManager em = JpaFactory.createEntityManager()) {
             List<TurnData> turns = gameChatRepository.load(em, gameId);
             if (!turns.isEmpty()) {

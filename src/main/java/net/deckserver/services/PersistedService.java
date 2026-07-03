@@ -2,6 +2,8 @@ package net.deckserver.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import jakarta.persistence.EntityManager;
+import net.deckserver.jpa.JpaFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
  * Base class for services that require scheduled persistence, graceful shutdown,
@@ -20,6 +23,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <p>
  * NOTE: Shutdown should be triggered via ServletContextListener, not JVM shutdown hooks,
  * to avoid classloader issues in servlet containers.
+ * <p>
+ * NOTE: The in-memory state held by these services is authoritative and the database is
+ * a write-through copy. This assumes a single app node — a second node would diverge
+ * immediately, so scaling out requires moving reads to the database first.
  */
 public abstract class PersistedService {
 
@@ -41,7 +48,8 @@ public abstract class PersistedService {
      * Constructor that initialises the service with scheduled persistence.
      *
      * @param serviceName Name of the service (used for logging and thread naming)
-     * @param persistenceIntervalMinutes How often to persist data (in minutes)
+     * @param persistenceIntervalMinutes How often to persist data (in minutes);
+     *                                   0 for write-through services that need no background flush
      */
     protected PersistedService(String serviceName, int persistenceIntervalMinutes) {
         this.serviceName = serviceName;
@@ -59,7 +67,7 @@ public abstract class PersistedService {
         this.cleanable = cleaner.register(this, new CleanupAction(this));
 
         // Start a scheduled persistence task if not in test mode
-        if (!testModeEnabled) {
+        if (!testModeEnabled && persistenceIntervalMinutes > 0) {
             scheduler.scheduleAtFixedRate(
                     this::scheduledPersist,
                     persistenceIntervalMinutes,
@@ -112,6 +120,37 @@ public abstract class PersistedService {
      */
     protected boolean shouldSkipPersistence() {
         return testModeEnabled || isShuttingDown.get();
+    }
+
+    /**
+     * Run a write action in its own transaction, rolling back on failure.
+     * In test mode the write is skipped and treated as successful — the in-memory
+     * state is authoritative there.
+     *
+     * @return true if the write committed (or was skipped in test mode); false if it
+     * failed and was rolled back — callers that mutated in-memory state first should
+     * revert it to stay consistent with the database.
+     */
+    protected boolean jpaWrite(Consumer<EntityManager> action) {
+        if (testModeEnabled) return true;
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            try {
+                em.getTransaction().begin();
+                action.accept(em);
+                em.getTransaction().commit();
+                return true;
+            } catch (Exception e) {
+                logger.error("{} JPA write failed", serviceName, e);
+                try {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                } catch (Exception rollbackError) {
+                    logger.error("{} rollback failed", serviceName, rollbackError);
+                }
+                return false;
+            }
+        }
     }
 
     /**

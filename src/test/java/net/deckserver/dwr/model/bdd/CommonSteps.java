@@ -1,9 +1,11 @@
 package net.deckserver.dwr.model.bdd;
 
 import io.cucumber.java.Before;
+import io.cucumber.java.BeforeAll;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import net.deckserver.services.JolServiceExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -15,6 +17,11 @@ public class CommonSteps {
 
     public CommonSteps() {
         this.context = CommandContext.getInstance();
+    }
+
+    @BeforeAll
+    public static void initH2() throws Exception {
+        JolServiceExtension.ensureInitialized();
     }
 
     @Before

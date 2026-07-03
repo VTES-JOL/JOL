@@ -27,7 +27,7 @@ class TournamentRepositoryTest {
 
     @BeforeAll
     static void setUpEmf() {
-        emf = Persistence.createEntityManagerFactory("jol-test-pu");
+        emf = Persistence.createEntityManagerFactory("jol-repo-test-pu");
         EntityManager seed = emf.createEntityManager();
         seed.getTransaction().begin();
         PlayerRepository playerRepo = new PlayerRepository();

@@ -22,7 +22,7 @@ class PlayerRepositoryTest {
 
     @BeforeAll
     static void setUpEmf() {
-        emf = Persistence.createEntityManagerFactory("jol-test-pu");
+        emf = Persistence.createEntityManagerFactory("jol-repo-test-pu");
     }
 
     @AfterAll

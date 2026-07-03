@@ -8,6 +8,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.util.List;
@@ -16,7 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
+@ExtendWith(JolServiceExtension.class)
 @SetEnvironmentVariable(key = "ENABLE_TEST_MODE", value = "true")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class TournamentLifecycleTest {

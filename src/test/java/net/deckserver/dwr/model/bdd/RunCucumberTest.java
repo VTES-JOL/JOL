@@ -13,7 +13,6 @@ import org.junitpioneer.jupiter.SetEnvironmentVariable;
 @SelectClasspathResource("features/do-command")
 @ConfigurationParameter(key = Constants.GLUE_PROPERTY_NAME, value = "net.deckserver.dwr.model.bdd")
 @ConfigurationParameter(key = Constants.PLUGIN_PROPERTY_NAME, value = "pretty")
-@SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
 @SetEnvironmentVariable(key = "ENABLE_TEST_MODE", value = "true")
 public class RunCucumberTest {
 }

@@ -1,14 +1,10 @@
 package net.deckserver.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.repository.GameActivityRepository;
 import net.deckserver.storage.json.game.GameTimestampEntry;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
@@ -54,15 +50,7 @@ public class PlayerGameActivityService extends PersistedService {
     public static void clearGame(String gameName) {
         if (gameName == null || gameName.isBlank()) return;
         INSTANCE.gameTimestamps.remove(gameName);
-        if (!INSTANCE.testModeEnabled) {
-            try (EntityManager em = JpaFactory.createEntityManager()) {
-                em.getTransaction().begin();
-                gameActivityRepository.delete(em, gameName);
-                em.getTransaction().commit();
-            } catch (Exception e) {
-                INSTANCE.logger.error("JPA write failed for PlayerGameActivityService.clearGame", e);
-            }
-        }
+        INSTANCE.jpaWrite(em -> gameActivityRepository.delete(em, gameName));
     }
 
     public static OffsetDateTime getGameTimestamp(String game) {
@@ -106,29 +94,11 @@ public class PlayerGameActivityService extends PersistedService {
             return;
         }
         logger.debug("Persisting {} game timestamps", gameTimestamps.size());
-        try (EntityManager em = JpaFactory.createEntityManager()) {
-            em.getTransaction().begin();
-            gameActivityRepository.saveAll(em, gameTimestamps);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            logger.error("JPA write failed for PlayerGameActivityService", e);
-        }
+        jpaWrite(em -> gameActivityRepository.saveAll(em, gameTimestamps));
     }
 
     @Override
     protected void load() {
-        if (testModeEnabled) {
-            Path path = DataPaths.path("game-timestamps.json");
-            if (!Files.exists(path)) return;
-            try {
-                Map<String, GameTimestampEntry> loaded = objectMapper.readValue(path.toFile(), new TypeReference<>() {});
-                gameTimestamps.putAll(loaded);
-                logger.info("Loaded {} game timestamps from file", gameTimestamps.size());
-            } catch (IOException e) {
-                logger.error("Unable to load game timestamps from file", e);
-            }
-            return;
-        }
         try (EntityManager em = JpaFactory.createEntityManager()) {
             gameTimestamps.putAll(gameActivityRepository.findAllAsMap(em));
             logger.info("Loaded {} game timestamps from JPA", gameTimestamps.size());

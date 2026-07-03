@@ -29,7 +29,7 @@ public final class JpaFactory {
         hikariConfig.setJdbcUrl(url);
         hikariConfig.setUsername(System.getenv().getOrDefault("JOL_DB_USER", "jol"));
         hikariConfig.setPassword(System.getenv().getOrDefault("JOL_DB_PASSWORD", ""));
-        hikariConfig.setMaximumPoolSize(10);
+        hikariConfig.setMaximumPoolSize(Integer.parseInt(System.getenv().getOrDefault("JOL_DB_POOL_SIZE", "10")));
         hikariConfig.setPoolName("jol-pool");
         dataSource = new HikariDataSource(hikariConfig);
 
@@ -50,6 +50,10 @@ public final class JpaFactory {
                 .load();
         flyway.migrate();
         logger.info("Flyway migrations applied");
+    }
+
+    public static void initializeWithEmf(EntityManagerFactory providedEmf) {
+        emf = providedEmf;
     }
 
     public static EntityManager createEntityManager() {

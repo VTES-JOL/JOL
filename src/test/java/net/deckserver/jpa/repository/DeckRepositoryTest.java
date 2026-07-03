@@ -29,7 +29,7 @@ class DeckRepositoryTest {
 
     @BeforeAll
     static void setUpEmf() {
-        emf = Persistence.createEntityManagerFactory("jol-test-pu");
+        emf = Persistence.createEntityManagerFactory("jol-repo-test-pu");
         PLAYER1_ID = UUID.randomUUID().toString();
         EntityManager seed = emf.createEntityManager();
         seed.getTransaction().begin();

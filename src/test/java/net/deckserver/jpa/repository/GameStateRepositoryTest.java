@@ -36,7 +36,7 @@ class GameStateRepositoryTest {
 
     @BeforeAll
     static void setUpEmf() {
-        emf = Persistence.createEntityManagerFactory("jol-test-pu");
+        emf = Persistence.createEntityManagerFactory("jol-repo-test-pu");
         // Seed player + game rows required by FK constraints
         EntityManager setup = emf.createEntityManager();
         setup.getTransaction().begin();

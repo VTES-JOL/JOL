@@ -564,6 +564,22 @@ SQL
 
 success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM jol_global_chat;') chat entries"
 
+# ── 13. Game history ──────────────────────────────────────────────────────────
+log "Loading game history..."
+if [[ -f "$DATA/pastGames.json" ]]; then
+  jq -r 'to_entries[] | [
+    .key,
+    .value.name,
+    (.value.started // ""),
+    (.value.ended // ""),
+    ((.value.results // []) | tojson)
+  ] | @csv' "$DATA/pastGames.json" \
+  | copy_into jol_game_history "recorded_at,game_name,started,ended,results"
+  success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM jol_game_history;') game histories"
+else
+  echo "  ⚠ no pastGames.json found — skipping game history"
+fi
+
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo
 echo "════════════════════════════════════════"
@@ -574,7 +590,7 @@ for tbl in jol_player jol_player_role jol_player_activity \
             jol_deck_info jol_deck_format jol_deck_content \
             jol_tournament jol_tournament_registration \
             jol_game_state jol_game_chat \
-            jol_game_activity jol_global_chat; do
+            jol_game_activity jol_global_chat jol_game_history; do
   n=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM $tbl;")
   printf "  %-35s %s rows\n" "$tbl" "$n"
 done

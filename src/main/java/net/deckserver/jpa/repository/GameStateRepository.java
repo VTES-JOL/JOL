@@ -29,8 +29,7 @@ public class GameStateRepository {
         try {
             state = mapper.writeValueAsString(data);
         } catch (JsonProcessingException e) {
-            logger.error("Failed to serialize GameData for game {}", game.id(), e);
-            return;
+            throw new IllegalStateException("Failed to serialize GameData for game " + game.id(), e);
         }
 
         GameStateEntity existing = em.find(GameStateEntity.class, game.id());
@@ -43,9 +42,7 @@ public class GameStateRepository {
         entity.setPlayerCount(data.getPlayerOrder().size());
         entity.setUpdatedAt(OffsetDateTime.now());
 
-        if (existing != null) {
-            em.merge(entity);
-        } else {
+        if (existing == null) {
             em.persist(entity);
         }
     }
@@ -63,8 +60,8 @@ public class GameStateRepository {
         try {
             return mapper.readValue(entity.getState(), GameData.class);
         } catch (JsonProcessingException e) {
-            logger.error("Failed to deserialize GameData for game {}", gameId, e);
-            return null;
+            // must not be conflated with "no row" — callers treat null as a brand-new game
+            throw new IllegalStateException("Failed to deserialize GameData for game " + gameId, e);
         }
     }
 }

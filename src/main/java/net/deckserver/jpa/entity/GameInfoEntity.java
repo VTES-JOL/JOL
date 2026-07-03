@@ -43,6 +43,8 @@ public class GameInfoEntity {
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
+    // application-level data-format version (GameInfo.Version ordinal), NOT a JPA
+    // @Version — optimistic locking lives on GameStateEntity
     @Column(name = "version", nullable = false)
     private int version;
 

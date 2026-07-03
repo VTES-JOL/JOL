@@ -1,8 +1,6 @@
 package net.deckserver.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import jakarta.persistence.EntityManager;
 import net.deckserver.dwr.model.JolGame;
 import net.deckserver.game.enums.GameFormat;
@@ -23,10 +21,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -41,7 +38,7 @@ public class TournamentService extends PersistedService {
     private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
     private static final TournamentRepository tournamentRepository = new TournamentRepository();
     private static final TournamentService INSTANCE = new TournamentService();
-    private final Map<String, TournamentDefinition> tournaments = new HashMap<>();
+    private final Map<String, TournamentDefinition> tournaments = new ConcurrentHashMap<>();
 
     private TournamentService() {
         super("TournamentService", 10);
@@ -189,15 +186,6 @@ public class TournamentService extends PersistedService {
 
     public static ExtendedDeck getTournamentDeck(String name, String deckId) {
         TournamentDefinition definition = INSTANCE.tournaments.get(name);
-        if (INSTANCE.testModeEnabled) {
-            Path deckPath = DataPaths.path("tournaments", definition.getId(), deckId + ".json");
-            try {
-                return objectMapper.readValue(deckPath.toFile(), ExtendedDeck.class);
-            } catch (IOException e) {
-                logger.error("Unable to read tournament deck file {} {}", name, deckId);
-                return null;
-            }
-        }
         return definition.getRegistrations().stream()
                 .filter(r -> deckId.equals(r.getDeck()))
                 .map(r -> {
@@ -368,10 +356,6 @@ public class TournamentService extends PersistedService {
 
     @Override
     protected void load() {
-        if (testModeEnabled) {
-            loadFromFile();
-            return;
-        }
         try (EntityManager em = JpaFactory.createEntityManager()) {
             tournamentRepository.findAll(em).forEach(entity -> {
                 List<TournamentRegistrationEntity> regs = tournamentRepository.findRegistrations(em, entity.getTournamentId());
@@ -381,31 +365,6 @@ public class TournamentService extends PersistedService {
             logger.info("Loaded {} tournaments from JPA", tournaments.size());
         } catch (Exception e) {
             logger.error("JPA load failed for TournamentService", e);
-        }
-    }
-
-    private void loadFromFile() {
-        Path path = DataPaths.path("tournaments.json");
-        if (!Files.exists(path)) return;
-        try {
-            TypeFactory typeFactory = objectMapper.getTypeFactory();
-            CollectionType collectionType = typeFactory.constructCollectionType(List.class, TournamentDefinition.class);
-            List<TournamentDefinition> list = objectMapper.readValue(path.toFile(), collectionType);
-            list.forEach(t -> tournaments.put(t.getName(), t));
-            logger.info("Loaded {} tournaments from file", tournaments.size());
-        } catch (IOException e) {
-            logger.error("Unable to load tournaments from file", e);
-        }
-    }
-
-    private void jpaWrite(java.util.function.Consumer<EntityManager> action) {
-        if (testModeEnabled) return;
-        try (EntityManager em = JpaFactory.createEntityManager()) {
-            em.getTransaction().begin();
-            action.accept(em);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            logger.error("JPA write failed for TournamentService", e);
         }
     }
 }

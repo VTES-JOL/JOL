@@ -1,6 +1,5 @@
 package net.deckserver.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.Streams;
@@ -13,11 +12,9 @@ import net.deckserver.storage.json.system.PlayerInfo;
 import net.deckserver.storage.json.system.UserSummary;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -31,10 +28,10 @@ public class PlayerService extends PersistedService {
             .refreshAfterWrite(1, TimeUnit.MINUTES)
             .build(PlayerService::generateSummary);
     private static final Predicate<UserSummary> RECENTLY_ONLINE = summary -> OffsetDateTime.parse(summary.getLastOnline()).plusMinutes(30).isAfter(OffsetDateTime.now());
-    private final Map<String, PlayerInfo> players = new HashMap<>();
+    private final Map<String, PlayerInfo> players = new ConcurrentHashMap<>();
 
     private PlayerService() {
-        super("PlayerService", 5);
+        super("PlayerService", 0);
         load();
     }
 
@@ -69,7 +66,10 @@ public class PlayerService extends PersistedService {
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
         PlayerInfo player = new PlayerInfo(name, ULID.random(), email, hash);
         INSTANCE.players.put(name, player);
-        INSTANCE.jpaWrite(em -> playerRepository.save(em, player));
+        if (!INSTANCE.jpaWrite(em -> playerRepository.save(em, player))) {
+            INSTANCE.players.remove(name);
+            return false;
+        }
         return true;
     }
 
@@ -130,39 +130,12 @@ public class PlayerService extends PersistedService {
 
     @Override
     protected void load() {
-        if (testModeEnabled) {
-            loadFromFile();
-            return;
-        }
         try (EntityManager em = JpaFactory.createEntityManager()) {
             Map<String, PlayerInfo> loaded = playerRepository.findAll(em);
             players.putAll(loaded);
             logger.info("Loaded {} players from JPA", players.size());
         } catch (Exception e) {
             logger.error("JPA load failed for PlayerService", e);
-        }
-    }
-
-    private void loadFromFile() {
-        Path path = DataPaths.path("players.json");
-        if (!Files.exists(path)) return;
-        try {
-            Map<String, PlayerInfo> loaded = objectMapper.readValue(path.toFile(), new TypeReference<>() {});
-            players.putAll(loaded);
-            logger.info("Loaded {} players from file", players.size());
-        } catch (IOException e) {
-            logger.error("Unable to load players from file", e);
-        }
-    }
-
-    private void jpaWrite(java.util.function.Consumer<EntityManager> action) {
-        if (testModeEnabled) return;
-        try (EntityManager em = JpaFactory.createEntityManager()) {
-            em.getTransaction().begin();
-            action.accept(em);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            logger.error("JPA write failed for PlayerService", e);
         }
     }
 }

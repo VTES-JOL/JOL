@@ -1,8 +1,6 @@
 package net.deckserver.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.type.MapType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.HashBasedTable;
@@ -14,9 +12,6 @@ import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.RegistrationSummary;
 import net.deckserver.storage.json.system.RegistrationStatus;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.Map;
@@ -38,7 +33,7 @@ public class RegistrationService extends PersistedService {
             .build(RegistrationService::generateSummary);
 
     private RegistrationService() {
-        super("RegistrationService", 1);
+        super("RegistrationService", 0);
         load();
     }
 
@@ -145,10 +140,6 @@ public class RegistrationService extends PersistedService {
 
     @Override
     protected void load() {
-        if (testModeEnabled) {
-            loadFromFile();
-            return;
-        }
         try (EntityManager em = JpaFactory.createEntityManager()) {
             registrationRepository.findAll(em).forEach(entity ->
                     registrations.put(entity.getGameName(), entity.getPlayerName(),
@@ -156,33 +147,6 @@ public class RegistrationService extends PersistedService {
             logger.info("Loaded {} registrations from JPA", registrations.size());
         } catch (Exception e) {
             logger.error("JPA load failed for RegistrationService", e);
-        }
-    }
-
-    private void loadFromFile() {
-        Path path = DataPaths.path("registrations.json");
-        if (!Files.exists(path)) return;
-        try {
-            TypeFactory typeFactory = objectMapper.getTypeFactory();
-            MapType registrationMapType = typeFactory.constructMapType(Map.class, String.class, RegistrationStatus.class);
-            Map<String, Map<String, RegistrationStatus>> map = objectMapper.readValue(path.toFile(),
-                    typeFactory.constructMapType(ConcurrentHashMap.class, typeFactory.constructType(String.class), registrationMapType));
-            map.forEach((gameId, gameMap) ->
-                    gameMap.forEach((playerId, reg) -> registrations.put(gameId, playerId, reg)));
-            logger.info("Loaded {} registrations from file", registrations.size());
-        } catch (IOException e) {
-            logger.error("Unable to load registrations from file", e);
-        }
-    }
-
-    private void jpaWrite(java.util.function.Consumer<EntityManager> action) {
-        if (testModeEnabled) return;
-        try (EntityManager em = JpaFactory.createEntityManager()) {
-            em.getTransaction().begin();
-            action.accept(em);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            logger.error("JPA write failed for RegistrationService", e);
         }
     }
 }
