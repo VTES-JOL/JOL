@@ -335,22 +335,21 @@ function createButton(config, fn, ...args) {
 function callbackAdmin(data) {
     let userRoles = $("#userRoles")
     userRoles.empty();
+    const ROLE_LABELS = {JUDGE: "J", SUPER_USER: "SU", PLAYTESTER: "PT", ADMIN: "A", TOURNAMENT_ADMIN: "TA"};
+    const ROLE_NAMES  = {JUDGE: "Judge", SUPER_USER: "Super User", PLAYTESTER: "Playtester", ADMIN: "Admin", TOURNAMENT_ADMIN: "Tournament Admin"};
     $.each(data.userRoles, function (index, value) {
         let playerRow = $("<tr/>");
         let nameCell = $("<td/>").text(value.name);
         let onlineCell = $("<td/>").text(moment(value.lastOnline).tz("UTC").format("D-MMM-YY HH:mm z"));
-        function roleCell(role) {
+        let rolesCell = $("<td/>").addClass("d-flex flex-wrap gap-1");
+        Object.keys(ROLE_LABELS).forEach(function(role) {
             let btn = value.roles.includes(role)
-                ? createButton({html: '<i class="bi bi-x"></i>', class: "btn btn-outline-secondary btn-sm", confirm: "Are you sure you want to remove this role?"}, DS.setRole, value.name, role, false)
-                : createButton({html: '<i class="bi bi-plus"></i>', class: "btn btn-outline-secondary btn-sm role-add-btn"}, DS.setRole, value.name, role, true);
-            return $("<td/>").addClass("text-center").append(btn);
-        }
-        let judgeCell = roleCell("JUDGE");
-        let superCell = roleCell("SUPER_USER");
-        let playtestCell = roleCell("PLAYTESTER");
-        let adminCell = roleCell("ADMIN");
-        let tournamentCell = roleCell("TOURNAMENT_ADMIN");
-        playerRow.append(nameCell, onlineCell, judgeCell, superCell, playtestCell, adminCell, tournamentCell);
+                ? createButton({text: ROLE_LABELS[role], class: "btn btn-secondary btn-sm", confirm: "Are you sure you want to remove this role?"}, DS.setRole, value.name, role, false)
+                : createButton({text: ROLE_LABELS[role], class: "btn btn-outline-secondary btn-sm"}, DS.setRole, value.name, role, true);
+            btn.attr("title", ROLE_NAMES[role]);
+            rolesCell.append(btn);
+        });
+        playerRow.append(nameCell, onlineCell, rolesCell);
         userRoles.append(playerRow);
     })
     let adminReplacementList = $("#adminReplacementList");
@@ -386,6 +385,7 @@ function callbackAdmin(data) {
     let endTurnList = $("#endTurnList");
     adminGameList.empty();
     rollbackGamList.empty();
+    endTurnList.empty();
     $.each(data.games, function (id, name) {
         adminGameList.append($("<option/>", {value: id, text: name}));
         endTurnList.append($("<option/>", {value: id, text: name}));
