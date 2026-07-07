@@ -8,7 +8,7 @@
             <label class="form-check-label" for="imageTooltips">Enable Image tooltips</label>
         </div>
         <div class="d-flex justify-content-start align-items-center">
-            <input type="color" id="edgecolorpicker" onchange="setEdgeColor()" style="width:8%;">
+            <input type="color" id="edgecolorpicker" onchange="setEdgeColor()" style="min-width:44px;height:44px;">
             <label class="form-check-label m-1" for="edgecolorpicker">Choose Edge Color</label>
         </div>
 <%--        <div class="form-check form-switch">--%>

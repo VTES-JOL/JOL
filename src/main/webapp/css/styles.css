@@ -83,11 +83,12 @@ body * {
 .custom-modal {
     position: fixed;
     top: 25%;
-    left: 40%;
-    transform: translate(-40%, -50%);
-    width: 100%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(28rem, 95vw);
     height: fit-content;
     padding: 0 !important;
+    z-index: 1055;
 }
 
 #playCardModal .icon, #playCardModal .clan {
@@ -174,7 +175,7 @@ body * {
 }
 
 .main-col-right {
-    display: none;
+    display: flex;
     flex-direction: column;
     gap: 0.5rem;
     min-height: 0;
@@ -410,7 +411,7 @@ nav * {
 }
 
 .scrollable {
-    overflow-x: clip;
+    overflow-x: auto;
     overflow-y: scroll;
     overflow-wrap: break-word;
     overscroll-behavior: contain;
@@ -459,12 +460,18 @@ a.card-name {
     display: grid;
     grid-gap: 0.5rem;
     grid-auto-columns: minmax(10rem, 1fr);
-    grid-auto-rows: minmax(0px, 22rem);
+    grid-auto-rows: auto;
     grid-template-areas: 'hand commands' 'chat chat' 'info info';
 }
 
+@media (min-width: 768px) {
+    .control-grid {
+        grid-auto-rows: minmax(0px, 22rem);
+    }
+}
+
 #gameHistory {
-    height: 17rem;
+    height: 12rem;
 }
 
 .spectator {
@@ -472,7 +479,7 @@ a.card-name {
 }
 
 .game-chat {
-    height: 20rem;
+    height: 14rem;
 }
 
 @media (min-width: 768px) {

@@ -2753,7 +2753,7 @@ function addCardTooltips(parent) {
                 instance.reference.removeAttribute('title');
             }
             if (profile.imageTooltipPreference) {
-                let content = `<img width="350" height="500" src="${BASE_URL}/${secured}images/${cardId}" alt="Loading..."/>`;
+                let content = `<img style="max-width:100%;height:auto;" src="${BASE_URL}/${secured}images/${cardId}" alt="Loading..."/>`;
                 instance.setContent(content);
             } else {
                 $.get({

@@ -1,7 +1,7 @@
 <div class="container-fluid pt-2">
     <h2>V:TES Online - Help</h2>
     <div class="mt-2">
-        <nav class="nav nav-pills" id="helpTab" role="tablist">
+        <nav class="nav nav-pills flex-wrap" id="helpTab" role="tablist">
             <a class="nav-link active" data-bs-toggle="tab" href="#deck" type="button" role="tab" aria-selected="true"
                id="help1" data-bs-target="#panel1" aria-controls="panel1">Creating a deck</a>
             <a class="nav-link" data-bs-toggle="tab" href="#join" type="button" role="tab" aria-selected="false"

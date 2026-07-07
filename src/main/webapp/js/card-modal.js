@@ -408,7 +408,7 @@ function showCardModal(event) {
     let owner = controller === player;
     if (cardId) {
         if (profile.imageTooltipPreference) {
-            let content = `<img width="350" height="500" src="${BASE_URL}/${secured}images/${cardId}" alt="Loading..."/>`;
+            let content = `<img style="max-width:100%;height:auto;" src="${BASE_URL}/${secured}images/${cardId}" alt="Loading..."/>`;
             $("#card-image").html(content);
         } else {
             $.get({

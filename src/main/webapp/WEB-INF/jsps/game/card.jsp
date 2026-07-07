@@ -68,8 +68,7 @@
                     </a>
                     <c:if test="<%= hasVotes %>"><span
                             class="badge rounded-pill text-bg-warning "><%= votes %></span></c:if>
-                    <c:if test="<%= contested %>"><span class="badge text-bg-warning p-1 px-2"
-                                                        style="font-size: 0.6rem;">CONTESTED</span></c:if>
+                    <c:if test="<%= contested %>"><span class="badge text-bg-warning p-1 px-2">CONTESTED</span></c:if>
                 </div>
                 <div class="d-flex align-items-center gap-1">
                     <c:forEach items="<%= disciplines %>" var="disc">
@@ -83,7 +82,7 @@
             <div class="d-flex flex-column">
                 <div class="d-flex justify-content-end align-items-center gap-1">
                     <c:if test="<%= infernal %>"><i class="bi bi-fire text-danger fs-6"></i></c:if>
-                    <c:if test="<%= locked %>"><span class="badge text-bg-dark p-1 px-2" style="font-size: 0.6rem;">LOCKED</span></c:if>
+                    <c:if test="<%= locked %>"><span class="badge text-bg-dark p-1 px-2">LOCKED</span></c:if>
                     <c:if test="<%= counters > 0 || capacity > 0%>"><span
                             class="badge rounded-pill shadow <%= counterStyle%>"><%= counterText%></span></c:if>
                 </div>
