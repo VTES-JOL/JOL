@@ -1,0 +1,18 @@
+http:
+  routers:
+    app:
+      entryPoints:
+        - websecure
+      rule: "Host(`dev.deckserver.net`)"
+      service: app
+      tls: {}
+  services:
+    app:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:8080"
+
+tls:
+  certificates:
+    - certFile: /certs/certificate.pem
+      keyFile: /certs/private_key_nopass.pem

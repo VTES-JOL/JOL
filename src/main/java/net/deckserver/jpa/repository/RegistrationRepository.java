@@ -19,7 +19,7 @@ public class RegistrationRepository {
         RegistrationId pk = new RegistrationId(game.getGameId(), player.getPlayerId());
         RegistrationEntity existing = em.find(RegistrationEntity.class, pk);
         if (existing != null) {
-            em.merge(RegistrationEntity.from(game.getGameId(), player.getPlayerId(), status));
+            existing.update(status);
         } else {
             em.persist(RegistrationEntity.from(game.getGameId(), player.getPlayerId(), status));
         }

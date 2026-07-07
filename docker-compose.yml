@@ -1,4 +1,25 @@
 services:
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik
+    restart: unless-stopped
+    networks:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    command:
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=admin@deckserver.net"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
   prod:
     image: tomcat:9-jdk21-corretto
     container_name: prod
@@ -79,18 +100,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-  static:
-    image: nginx
-    container_name: static
-    networks:
-      - web
-    labels:
-      - "traefik.http.routers.static.entrypoints=websecure"
-      - "traefik.http.routers.static.rule=Host(`static.deckserver.net`)"
-      - "traefik.http.routers.static.tls.certresolver=myresolver"
-    volumes:
-      - static-data:/usr/share/nginx/html
-      - ./nginx/:/etc/nginx/conf.d/
 networks:
   web:
     external: true
@@ -107,5 +116,5 @@ volumes:
     external: true
   test-db-data:
     external: true
-  static-data:
+  letsencrypt:
     external: true

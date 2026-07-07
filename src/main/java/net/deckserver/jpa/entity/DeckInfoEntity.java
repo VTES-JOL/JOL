@@ -52,6 +52,11 @@ public class DeckInfoEntity {
         return info;
     }
 
+    public void update(DeckInfo info) {
+        this.format = info.getFormat();
+        this.gameFormats = new HashSet<>(info.getGameFormats());
+    }
+
     public DeckInfoId getId() { return id; }
     public String getDeckId() { return deckId; }
     public String getPlayerName() { return player != null ? player.getPlayerName() : null; }

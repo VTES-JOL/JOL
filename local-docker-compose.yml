@@ -2,6 +2,8 @@ services:
   db:
     image: postgres:16
     container_name: jol-db
+    networks:
+      - local-web
     ports:
       - "5432:5432"
     environment:
@@ -11,22 +13,52 @@ services:
     volumes:
       - jol-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U jol -d jol"]
+      test: [ "CMD-SHELL", "pg_isready -U jol -d jol" ]
       interval: 5s
       timeout: 5s
       retries: 5
 
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik-local
+    networks:
+      - local-web
+    ports:
+      - "80:80"
+      - "443:443"
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.network=local-web"
+      - "--providers.file.filename=/traefik/dynamic.yml"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik:/traefik:ro
+      - ./nginx/certs:/certs:ro
+
   static:
     image: nginx
     container_name: static
-    ports:
-      - "443:443"
+    networks:
+      - local-web
+    labels:
+      - "traefik.http.routers.static.entrypoints=websecure"
+      - "traefik.http.routers.static.rule=Host(`static.dev.deckserver.net`)"
+      - "traefik.http.routers.static.tls=true"
+      - "traefik.http.services.static.loadbalancer.server.port=80"
     volumes:
       - ./nginx/conf/default.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/cors.txt:/etc/nginx/conf.d/cors.txt
       - ./nginx/certs:/certs
       - ./static:/var/static
       - ./assets:/var/assets
+
+networks:
+  local-web:
+    name: local-web
 
 volumes:
   jol-db-data:

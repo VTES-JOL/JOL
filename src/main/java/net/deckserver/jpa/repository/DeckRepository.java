@@ -34,7 +34,7 @@ public class DeckRepository {
         DeckInfoId pk = new DeckInfoId(player.getPlayerId(), deckName);
         DeckInfoEntity existing = em.find(DeckInfoEntity.class, pk);
         if (existing != null) {
-            em.merge(DeckInfoEntity.from(player.getPlayerId(), deckName, info));
+            existing.update(info);
         } else {
             em.persist(DeckInfoEntity.from(player.getPlayerId(), deckName, info));
         }

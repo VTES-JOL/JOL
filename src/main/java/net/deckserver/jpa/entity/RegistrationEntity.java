@@ -66,6 +66,15 @@ public class RegistrationEntity {
         return status;
     }
 
+    public void update(RegistrationStatus status) {
+        this.deckId = status.getDeckId();
+        this.deckName = status.getDeckName();
+        this.valid = status.isValid();
+        this.summary = status.getSummary();
+        this.registeredAt = status.getTimestamp();
+        this.deckContent = status.getDeckContent();
+    }
+
     public RegistrationId getId() { return id; }
     public String getDeckContent() { return deckContent; }
     public void setDeckContent(String deckContent) { this.deckContent = deckContent; }

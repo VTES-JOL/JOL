@@ -19,7 +19,7 @@ public class GameInfoRepository {
         }
         GameInfoEntity existing = em.find(GameInfoEntity.class, info.getName());
         if (existing != null) {
-            em.merge(GameInfoEntity.from(info, ownerId));
+            existing.update(info, ownerId);
         } else {
             em.persist(GameInfoEntity.from(info, ownerId));
         }

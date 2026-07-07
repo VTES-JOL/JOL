@@ -88,6 +88,15 @@ public class GameInfoEntity {
                 .orElse(GameInfo.Version.INITIAL);
     }
 
+    public void update(GameInfo info, String ownerId) {
+        this.ownerId = ownerId;
+        this.visibility = info.getVisibility();
+        this.status = info.getStatus();
+        this.gameFormat = info.getGameFormat();
+        this.version = info.getVersion().getVersion();
+        this.tournamentName = info.getTournamentName();
+    }
+
     public String getGameName() { return gameName; }
 
     public String getGameId() { return gameId; }
