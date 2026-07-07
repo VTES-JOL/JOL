@@ -1,6 +1,9 @@
 <div class="card shadow flex-fill d-flex flex-column min-h-0">
     <div class="card-header bg-body-secondary d-flex justify-content-between align-items-center">
-        <span class="fw-semibold" id="deckPreviewTitle">Preview</span>
+        <span class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-secondary d-md-none" onclick="exitDeckDetail()"><i class="bi bi-arrow-left"></i></button>
+            <span class="fw-semibold" id="deckPreviewTitle">Preview</span>
+        </span>
         <span class="d-flex align-items-center gap-2">
             <span id="deckSummary" class="text-muted small"></span>
             <button class="btn btn-sm btn-outline-secondary" onclick="enterEditMode()">Edit <i class="bi-pencil"></i></button>

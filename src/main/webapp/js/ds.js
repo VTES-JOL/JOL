@@ -572,6 +572,7 @@ function newLobbyGame() {
     $("#lobbyCreateCol").removeClass("d-none");
     $("#lobbyDetailCol").addClass("d-none");
     $("#lobbyEmptyCol").addClass("d-none");
+    $(".lobby-layout").addClass("detail-open");
 }
 
 function toggleLobbyInviteSection() {
@@ -625,6 +626,8 @@ function doCreateLobbyGame() {
 
 function selectLobbyGame(game) {
     _lobbyCurrentGame = game;
+    $("#lobbyDetailCol .card-body").scrollTop(0);
+    $(".lobby-layout").addClass("detail-open");
 
     // Header
     $("#lobbyDetailName").text(game.name);
@@ -739,6 +742,7 @@ function exitLobbyDetail() {
     $("#lobbyDetailCol").addClass("d-none");
     $("#lobbyCreateCol").addClass("d-none");
     $("#lobbyEmptyCol").removeClass("d-none");
+    $(".lobby-layout").removeClass("detail-open");
 }
 
 function filterLobbyDeckList() {
@@ -1065,16 +1069,23 @@ function callbackTournamentAdmin(data) {
 function enterTourEditMode() {
     $("#tourEditCol").removeClass("d-none");
     $("#tourTablesCol").addClass("d-none");
+    $(".tour-admin-layout").addClass("detail-open");
 }
 
 function enterTourTablesMode() {
     $("#tourTablesCol").removeClass("d-none");
     $("#tourEditCol").addClass("d-none");
+    $(".tour-admin-layout").addClass("detail-open");
 }
 
 function exitTourMode() {
     $("#tourEditCol").addClass("d-none");
     $("#tourTablesCol").addClass("d-none");
+    $(".tour-admin-layout").removeClass("detail-open");
+}
+
+function exitTourAdminDetail() {
+    exitTourMode();
 }
 
 function newTournament() {
@@ -1807,11 +1818,19 @@ function callbackProfile(data) {
 function enterEditMode() {
     $("#deckEditorCol").removeClass("d-none");
     $("#deckPreviewCol").addClass("d-none");
+    $(".deck-layout").addClass("detail-open");
 }
 
 function exitEditMode() {
     $("#deckEditorCol").addClass("d-none");
     $("#deckPreviewCol").removeClass("d-none");
+    $(".deck-layout").addClass("detail-open");
+}
+
+function exitDeckDetail() {
+    $("#deckEditorCol").addClass("d-none");
+    $("#deckPreviewCol").removeClass("d-none");
+    $(".deck-layout").removeClass("detail-open");
 }
 
 function filterDeckList() {
@@ -1897,6 +1916,7 @@ function callbackFilterDecks(decks) {
             .css("cursor", "pointer")
             .click(function () {
                 exitEditMode();
+                $("#deckPreviewCol .card-body").scrollTop(0);
                 DS.loadDeck(deck.name, {callback: processData, errorHandler: errorhandler});
             });
         const deckName = $("<span/>").addClass("deck-name-link").text(deck.name);
@@ -2406,6 +2426,8 @@ function navigate(data) {
         $("#" + currentPage).hide();
         $("#" + data.target).show();
         currentPage = data.target;
+        window.scrollTo(0, 0);
+        $(".lobby-layout, .deck-layout, .tour-admin-layout").removeClass("detail-open");
     }
     const prevGame = game;
     game = data.game;

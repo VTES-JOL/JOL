@@ -1,6 +1,9 @@
-<div class="card shadow flex-fill d-flex flex-column">
+<div class="card shadow flex-fill d-flex flex-column min-h-0">
     <div class="card-header bg-body-secondary d-flex justify-content-between align-items-center">
-        <span class="fw-semibold">Edit Deck</span>
+        <span class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-secondary d-md-none" onclick="exitDeckDetail()"><i class="bi bi-arrow-left"></i></button>
+            <span class="fw-semibold">Edit Deck</span>
+        </span>
         <span class="d-flex gap-1">
             <button class="btn btn-sm btn-outline-secondary" onclick="saveDeck()">Save <i class="bi-floppy"></i></button>
             <button class="btn btn-sm btn-outline-secondary" onclick="exitEditMode()">Cancel</button>

@@ -1,7 +1,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div class="card shadow flex-fill d-flex flex-column">
     <div class="card-header bg-body-secondary d-flex justify-content-between align-items-center">
-        <span class="fw-semibold">Tournament</span>
+        <span class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-secondary d-lg-none" onclick="exitTourAdminDetail()"><i class="bi bi-arrow-left"></i></button>
+            <span class="fw-semibold">Tournament</span>
+        </span>
         <span class="d-flex gap-1 align-items-center">
             <div id="tourMsg" class="badge text-bg-light me-1"></div>
             <button class="btn btn-sm btn-outline-secondary" onclick="createTournament()">Save <i class="bi-floppy"></i></button>

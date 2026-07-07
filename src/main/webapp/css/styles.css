@@ -320,6 +320,27 @@ body * {
     }
 }
 
+/* Mobile master/detail: show only one panel at a time below the two-column breakpoint */
+@media (max-width: 767px) {
+    /* Default: show only the master list, hide the detail/right column */
+    .lobby-col-right,
+    .deck-col-right { display: none; }
+
+    /* detail-open: hide master, show detail full-width */
+    .lobby-layout.detail-open .lobby-col-left,
+    .deck-layout.detail-open .deck-col-left { display: none; }
+
+    .lobby-layout.detail-open .lobby-col-right,
+    .deck-layout.detail-open .deck-col-right { display: flex; flex: 1 1 auto; }
+}
+
+@media (max-width: 991px) {
+    .tour-admin-col-right { display: none; }
+
+    .tour-admin-layout.detail-open .tour-admin-col-left { display: none; }
+    .tour-admin-layout.detail-open .tour-admin-col-right { display: flex; flex: 1 1 auto; }
+}
+
 /* Full-height tab panes: tab-content fills remaining card space, active pane scrolls */
 .tab-content-fill {
     flex: 1;
