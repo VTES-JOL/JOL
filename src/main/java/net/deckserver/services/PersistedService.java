@@ -13,6 +13,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Base class for services that require scheduled persistence, graceful shutdown,
@@ -120,6 +121,19 @@ public abstract class PersistedService {
      */
     protected boolean shouldSkipPersistence() {
         return testModeEnabled || isShuttingDown.get();
+    }
+
+    /**
+     * Run a read action against a short-lived EntityManager, returning the result.
+     * Returns null on failure — callers should treat null as "not found" and log if needed.
+     */
+    protected <T> T jpaRead(Function<EntityManager, T> action) {
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            return action.apply(em);
+        } catch (Exception e) {
+            logger.error("{} JPA read failed", serviceName, e);
+            return null;
+        }
     }
 
     /**

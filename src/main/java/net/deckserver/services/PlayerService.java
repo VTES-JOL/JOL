@@ -76,7 +76,8 @@ public class PlayerService extends PersistedService {
     public static boolean authenticate(String playerName, String password) {
         if (existsPlayer(playerName)) {
             PlayerInfo playerInfo = loadPlayerInfo(playerName);
-            return BCrypt.checkpw(password, playerInfo.getHash());
+            String hash = playerInfo.getHash();
+            return hash != null && BCrypt.checkpw(password, hash);
         } else {
             return false;
         }

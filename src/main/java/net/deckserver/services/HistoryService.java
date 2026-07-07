@@ -1,7 +1,6 @@
 package net.deckserver.services;
 
-import jakarta.persistence.EntityManager;
-import net.deckserver.jpa.JpaFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
 import net.deckserver.jpa.repository.GameHistoryRepository;
 import net.deckserver.storage.json.system.GameHistory;
 import net.deckserver.storage.json.system.PlayerResult;
@@ -11,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class HistoryService extends PersistedService {
 
@@ -19,28 +17,37 @@ public class HistoryService extends PersistedService {
     private static final GameHistoryRepository gameHistoryRepository = new GameHistoryRepository();
     private static final HistoryService INSTANCE = new HistoryService();
 
-    private final Map<OffsetDateTime, GameHistory> pastGames = new ConcurrentHashMap<>();
-
     private HistoryService() {
         super("HistoryService", 0);
-        load();
     }
 
-    public static  Map<OffsetDateTime, GameHistory> getHistory() {
-        return INSTANCE.pastGames;
+    public static Map<OffsetDateTime, GameHistory> getHistory() {
+        Map<OffsetDateTime, GameHistory> result = INSTANCE.jpaRead(em -> gameHistoryRepository.findAll(em));
+        return result != null ? result : Map.of();
     }
 
-    public static  void addGame(OffsetDateTime now, GameHistory history) {
-        INSTANCE.pastGames.put(now, history);
+    public static void addGame(OffsetDateTime now, GameHistory history) {
         INSTANCE.jpaWrite(em -> gameHistoryRepository.save(em, now, history));
     }
 
-    public static  Collection<GameHistory> getGames() {
-        return INSTANCE.pastGames.values();
+    public static Collection<GameHistory> getGames() {
+        return getHistory().values();
     }
 
-    public static  void validateGW() {
-        INSTANCE.pastGames.forEach((recordedAt, gameHistory) -> {
+    public static void validateGW() {
+        INSTANCE.jpaRead(em -> gameHistoryRepository.findAllEntities(em)).forEach(entity -> {
+            GameHistory gameHistory;
+            try {
+                gameHistory = new GameHistory();
+                gameHistory.setName(entity.getGameName());
+                gameHistory.setStarted(entity.getStarted());
+                gameHistory.setEnded(entity.getEnded());
+                gameHistory.setResults(objectMapper.readValue(entity.getResults(), new TypeReference<>() {}));
+            } catch (Exception e) {
+                logger.error("Failed to deserialise game history for validation: {}", entity.getGameName(), e);
+                return;
+            }
+
             PlayerResult winner = null;
             PlayerResult previousWinner = gameHistory.getResults().stream().filter(PlayerResult::isGameWin).findFirst().orElse(null);
             double topVP = 0.0;
@@ -73,7 +80,12 @@ public class HistoryService extends PersistedService {
                 changed = true;
             }
             if (changed) {
-                INSTANCE.jpaWrite(em -> gameHistoryRepository.save(em, recordedAt, gameHistory));
+                try {
+                    entity.setResults(objectMapper.writeValueAsString(gameHistory.getResults()));
+                    INSTANCE.jpaWrite(em -> gameHistoryRepository.update(em, entity));
+                } catch (Exception e) {
+                    logger.error("Failed to serialise updated results for {}", gameHistory.getName(), e);
+                }
             }
         });
     }
@@ -89,11 +101,6 @@ public class HistoryService extends PersistedService {
 
     @Override
     protected void load() {
-        try (EntityManager em = JpaFactory.createEntityManager()) {
-            pastGames.putAll(gameHistoryRepository.findAll(em));
-            logger.info("Loaded {} game histories from JPA", pastGames.size());
-        } catch (Exception e) {
-            logger.error("JPA load failed for HistoryService", e);
-        }
+        // no startup load needed — reads go directly to JPA
     }
 }

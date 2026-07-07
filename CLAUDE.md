@@ -68,7 +68,6 @@ This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deck
     - `GameModel` — in-memory per-game view; held in `JolAdmin.gmap`
     - `PlayerModel` — in-memory per-player state; held in `JolAdmin.pmap`
     - `GameView` — player-centric view with toggle/changed state flags
-    - `ModelLoader` — converts between UI objects and XML/JSON data objects
     - `CommandParser` — tokenises command strings
 - **`net.deckserver.services`** — static service singletons
   - `PersistedService` — abstract base: `jpaWrite()` transaction helper, optional scheduled flush (interval 0 = write-through only), test-mode bypass, graceful shutdown (call `shutdown()` from `ServletContextListener`, not JVM hooks)
@@ -85,11 +84,12 @@ This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deck
   - `cards/` — `CardSummary`, `SecuredCardLoader`
 - **`net.deckserver.game`**
   - `enums/` — domain enums: `RegionType`, `CardType`, `Clan`, `Phase`, `GameStatus`, etc.
-  - `jaxb/` — legacy XML serialization for `game.xml` (state) and `actions.xml` (chat history) via JaxB; `XmlFileUtils` wraps load/save
+  - `ui/` — `CardDetail`: rich per-card view object used by game model
   - `validators/` — deck validation: `StandardDeckValidator`, `V5DeckValidator`, `DuelDeckValidator`, `PlayTestValidator` all extend `AbstractDeckValidator`; use `ValidatorFactory`
 - **`net.deckserver.servlet`** — JSP/Servlet entry points: `LoginServlet`, `LogoutServlet`, `RegisterServlet`, `MainServlet`; JSP templates under `WEB-INF/jsps/`
   - `JspRenderer` — renders a JSP to a String (replaces DWR's `WebContextFactory.forwardToString()`)
   - `RequestContext` — thread-local holder for `HttpServletRequest`/`HttpServletResponse` used by `UpdateFactory`
+  - `DwrCompatibilityServlet` — catches lingering `/jol/dwr/**` requests from pre-migration browsers and forces a hard reload
 - **`net.deckserver.rest`** — Jersey JAX-RS REST API (`/jol/api/...`); fully replaces DWR
   - `BaseResource` — base class: injects `SecurityContext` + HTTP context, calls `UpdateFactory`
   - `PageResource` — `POST /navigate`, `GET /poll`, `POST /chat`
@@ -99,6 +99,10 @@ This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deck
   - `UserResource` — profile, password, preferences
   - `AdminResource` — roles, player management, CSV export
   - `TournamentResource` — full tournament lifecycle
+  - `GameResource` — `GET /games` (lobby game list)
+  - `PlayerResource` — `GET /me` (current player profile)
+  - `NotificationResource` — `POST /subscription` (web push subscriptions)
+  - `SystemResource` — `GET /stats`
   - `SecurityFilter` — rejects unauthenticated API calls with 401
 - **`net.deckserver.ws`** — WebSocket push
   - `JolWebSocketEndpoint` — `@ServerEndpoint("/ws/updates")`; shares HTTP session auth; handles join/leave/ping frames

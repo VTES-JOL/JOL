@@ -57,6 +57,15 @@ public class GameHistoryRepository {
         }
     }
 
+    public List<GameHistoryEntity> findAllEntities(EntityManager em) {
+        return em.createQuery("SELECT h FROM GameHistoryEntity h ORDER BY h.recordedAt", GameHistoryEntity.class)
+                .getResultList();
+    }
+
+    public void update(EntityManager em, GameHistoryEntity entity) {
+        em.merge(entity);
+    }
+
     private GameHistory toGameHistory(GameHistoryEntity entity) {
         GameHistory history = new GameHistory();
         history.setName(entity.getGameName());

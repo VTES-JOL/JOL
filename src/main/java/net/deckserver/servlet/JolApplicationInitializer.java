@@ -40,10 +40,8 @@ public class JolApplicationInitializer implements ServletContextListener {
 
         RegistrationService.getInstance().shutdown();
         ChatService.getInstance().shutdown();
-        DeckService.getInstance().shutdown();
         GameService.getInstance().shutdown();
         GlobalChatService.getInstance().shutdown();
-        HistoryService.getInstance().shutdown();
         PlayerActivityService.getInstance().shutdown();
         PlayerGameActivityService.getInstance().shutdown();
         PlayerService.getInstance().shutdown();

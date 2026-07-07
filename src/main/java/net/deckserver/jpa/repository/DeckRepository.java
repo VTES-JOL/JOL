@@ -13,7 +13,9 @@ import net.deckserver.storage.json.system.DeckInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DeckRepository {
 
@@ -83,6 +85,31 @@ public class DeckRepository {
             logger.error("Failed to deserialize deck content for {}", deckId, e);
             return new ExtendedDeck();
         }
+    }
+
+    public DeckInfo findByPlayerAndName(EntityManager em, String playerName, String deckName) {
+        return em.createQuery(
+                        "SELECT d FROM DeckInfoEntity d JOIN FETCH d.player p " +
+                        "WHERE p.playerName = :playerName AND d.id.deckName = :deckName",
+                        DeckInfoEntity.class)
+                .setParameter("playerName", playerName)
+                .setParameter("deckName", deckName)
+                .getResultStream()
+                .findFirst()
+                .map(DeckInfoEntity::toDeckInfo)
+                .orElse(null);
+    }
+
+    public Map<String, DeckInfo> findByPlayerName(EntityManager em, String playerName) {
+        Map<String, DeckInfo> result = new LinkedHashMap<>();
+        em.createQuery(
+                        "SELECT d FROM DeckInfoEntity d JOIN FETCH d.player p " +
+                        "WHERE p.playerName = :playerName",
+                        DeckInfoEntity.class)
+                .setParameter("playerName", playerName)
+                .getResultList()
+                .forEach(e -> result.put(e.getId().getDeckName(), e.toDeckInfo()));
+        return result;
     }
 
     public List<DeckInfoEntity> findAllDeckInfos(EntityManager em) {

@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "jol_game_history",
-        uniqueConstraints = @UniqueConstraint(name = "uq_jol_game_history_recorded_at", columnNames = "recorded_at"))
+@Table(name = "jol_game_history")
 public class GameHistoryEntity {
 
     @Id
