@@ -8,6 +8,6 @@
     <div class="card-body p-2 overflow-hidden">
         <label for="historySelect">History:</label>
         <select id="historySelect" class="form-select form-select-sm mb-1" onchange="getHistory()"></select>
-        <div id="gameHistory" class="bg-white p-1 scrollable"></div>
+        <div id="gameHistory" class="p-1 scrollable"></div>
     </div>
 </div>

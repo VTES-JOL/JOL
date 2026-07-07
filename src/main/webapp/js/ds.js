@@ -2565,13 +2565,6 @@ function toggleChat() {
     }
 }
 
-function toggleNotes() {
-    $("#notesCard").toggleClass("d-none");
-    $("#gameDeckCard").toggleClass("d-none");
-    if ($("#gameDeck").children().length === 0) {
-        doShowDeck();
-    }
-}
 
 function loadGame(data) {
     // //Reset on game change
@@ -2604,7 +2597,6 @@ function loadGame(data) {
     let privateNotes = $("#privateNotes");
     let playerControls = $(".player-only");
     let globalNotes = $("#globalNotes");
-    let controlGrid = $(".control-grid");
     let chatControls = $(".can-chat");
 
     // Chat Log
@@ -2627,7 +2619,6 @@ function loadGame(data) {
         playerControls.addClass("d-none").prop('disabled', true);
         chatControls.prop('disabled', true);
         globalNotes.prop('disabled', true);
-        controlGrid.addClass("spectator");
     }
     const fetchFullLog = false;
 
@@ -2640,7 +2631,6 @@ function loadGame(data) {
     // If playing enable player controls
     if (data.player) {
         playerControls.removeClass("d-none").prop('disabled', false);
-        controlGrid.removeClass("spectator");
     }
 
     // if not the current player disable phase select and end turn
