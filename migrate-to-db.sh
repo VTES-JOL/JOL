@@ -107,7 +107,7 @@ CREATE TABLE flyway_schema_history (
 SQL
 
 rank=1
-for migration_file in "$MIGRATIONS"/V*.sql; do
+while IFS= read -r migration_file; do
   script_name=$(basename "$migration_file")
   version="${script_name%%__*}"; version="${version#V}"
   description="${script_name#*__}"; description="${description%.sql}"; description="${description//_/ }"
@@ -120,7 +120,7 @@ for migration_file in "$MIGRATIONS"/V*.sql; do
 
   echo "  ✓ V$version: $description"
   rank=$((rank + 1))
-done
+done < <(printf '%s\n' "$MIGRATIONS"/V*.sql | sort -V)
 
 # ── 3. Players ───────────────────────────────────────────────────────────────
 log "Loading players..."
