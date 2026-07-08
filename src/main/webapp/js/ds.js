@@ -2517,18 +2517,14 @@ function doSubmit(event) {
     const phaseSelect = $("#phase");
     const commandInput = $("#command");
     const chatInput = $("#chat");
-    const pingSelect = $("#ping");
-
     let phase = phaseSelect.val() || null;
-    let ping = pingSelect.val() || null;
     const command = commandInput.val();
     const chat = chatInput.val();
     if (!command && !chat && !phase) return false;
     commandInput.val("");
     chatInput.val("");
-    pingSelect.val("");
     const submitBtn = $("#gameSubmit").prop("disabled", true);
-    DS.submitForm(game, phase, command, chat, ping, {
+    DS.submitForm(game, phase, command, chat, null, {
         callback: (data) => { submitBtn.prop("disabled", false); processData(data); },
         errorHandler: (err, ex) => { submitBtn.prop("disabled", false); errorhandler(err, ex); }
     });
@@ -2557,6 +2553,10 @@ function sendPrivateNotes() {
     return false;
 }
 
+function doPing(targetPlayer) {
+    DS.submitForm(game, null, '', '', targetPlayer, {callback: processData, errorHandler: errorhandler});
+}
+
 function toggleChat() {
     $("#gameChatCard").toggleClass("d-none");
     $("#historyCard").toggleClass("d-none");
@@ -2570,7 +2570,6 @@ function loadGame(data) {
     // //Reset on game change
     const gameTitle = $("#gameTitle");
     if (gameTitle.text() !== data.name) {
-        $("#ping").empty();
         gameChatLastDay = null;
     }
     gameTitle.text(data.name);
@@ -2683,22 +2682,10 @@ function loadGame(data) {
     }
 
     // Pings
-    if (data.ping !== null) {
-        let pingSelect = $("#ping");
-
-        //+1 for the empty option
-        if (pingSelect.children('option').length !== data.ping.length + 1) {
-            pingSelect.empty();
-            pingSelect.append(new Option("", ""));
-            $.each(data.ping, function (index, value) {
-                let option = new Option(value, value);
-                pingSelect.append(option);
-            });
-        }
-    }
-
     $.each(data.pinged, function (index, pinged) {
-        $(`.player[data-player='${pinged}']`).find(".pinged").removeClass("d-none");
+        const playerEl = $(`.player[data-player='${pinged}']`);
+        playerEl.find(".pinged").removeClass("d-none");
+        playerEl.find(".ping-btn i").removeClass("bi-bell text-secondary").addClass("bi-exclamation-triangle text-danger");
     });
 
     // Render hand

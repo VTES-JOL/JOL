@@ -25,9 +25,16 @@
     <div class="card shadow-lg <%= activeStyle %>">
         <div class="card-header <%= activeHeaderStyle %> <%= activeStyle %>">
             <h6 class="d-flex justify-content-between align-items-center mb-0 lh-base">
-                <span class="fw-bold">
+                <span class="fw-bold d-flex align-items-center gap-1">
                     <span><%= player %></span>
-                    <i class='bi-exclamation-triangle ms-2 pinged d-none'></i>
+                    <% if (isPlayer) { %>
+                    <i class="bi bi-exclamation-triangle text-danger pinged d-none"></i>
+                    <% } else { %>
+                    <button type="button" class="btn btn-sm btn-link p-0 lh-1 text-secondary ping-btn"
+                            onclick="doPing('<%= player %>')" title="Ping <%= player %>">
+                        <i class="bi bi-bell"></i>
+                    </button>
+                    <% } %>
                 </span>
                 <c:if test="<%= edge %>">
                     <span class="badge border border-secondary fw-bold align-items-center d-flex gap-1"
