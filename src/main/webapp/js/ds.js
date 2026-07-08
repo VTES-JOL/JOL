@@ -2854,7 +2854,7 @@ function exportCsv() {
 }
 
 function toggleMode() {
-    const wrapper = $("#wrapper");
+    const wrapper = $("body");
     const isDark = wrapper.attr("data-bs-theme") !== "dark";
     if (isDark) {
         wrapper.attr("data-bs-theme", "dark");
