@@ -2514,21 +2514,52 @@ function doEndTurn() {
 }
 
 function doSubmit(event) {
-    const phaseSelect = $("#phase");
     const commandInput = $("#command");
     const chatInput = $("#chat");
-    let phase = phaseSelect.val() || null;
     const command = commandInput.val();
     const chat = chatInput.val();
-    if (!command && !chat && !phase) return false;
+    if (!command && !chat) return false;
     commandInput.val("");
     chatInput.val("");
-    const submitBtn = $("#gameSubmit").prop("disabled", true);
-    DS.submitForm(game, phase, command, chat, null, {
-        callback: (data) => { submitBtn.prop("disabled", false); processData(data); },
-        errorHandler: (err, ex) => { submitBtn.prop("disabled", false); errorhandler(err, ex); }
+    DS.submitForm(game, null, command, chat, null, {
+        callback: processData,
+        errorHandler: errorhandler
     });
     return false;
+}
+
+const ALL_PHASES = ['Unlock', 'Master', 'Minion', 'Influence', 'Discard'];
+const PHASE_ABBR = { Unlock: 'Unl', Master: 'Mst', Minion: 'Min', Influence: 'Inf', Discard: 'Dsc' };
+
+function renderPhaseIndicator(currentPhase, remainingPhases, canAct) {
+    const el = document.getElementById('phaseIndicator');
+    if (!el) return;
+    const remaining = new Set(remainingPhases || []);
+    el.innerHTML = ALL_PHASES.map(p => {
+        const isCurrent = p === currentPhase;
+        const isUpcoming = !isCurrent && remaining.has(p);
+        const isPast = !isCurrent && !isUpcoming;
+        const stateClass = isCurrent ? 'phase-current' : isUpcoming ? 'phase-upcoming' : 'phase-done';
+        const disabled = (isPast || !canAct) ? 'disabled' : '';
+        const onclick = (!isPast && canAct) ? `onclick="doSetPhase('${p}')"` : '';
+        return `<button class="phase-pill ${stateClass}" ${onclick} ${disabled}><span class="phase-name-full">${p}</span><span class="phase-name-abbr">${PHASE_ABBR[p]}</span></button>`;
+    }).join('');
+}
+
+function doSetPhase(phase) {
+    DS.submitForm(game, phase, null, null, null, {callback: processData, errorHandler: errorhandler});
+}
+
+function toggleHandSidebar() {
+    document.getElementById('game').classList.toggle('sidebar-hidden');
+}
+
+function toggleGameChat() {
+    const area = document.getElementById('gameChatArea');
+    const btn = document.getElementById('chatToggleBtn');
+    if (!area) return;
+    area.classList.toggle('chat-hidden');
+    if (btn) btn.classList.toggle('active', !area.classList.contains('chat-hidden'));
 }
 
 function sendChat(message) {
@@ -2576,16 +2607,11 @@ function loadGame(data) {
     $("#gameLabel").text(data.label);
 
     // Phases
-    let phaseSelect = $("#phase");
     let endTurn = $("#endTurn");
-    if (data.phases.length > 0) {
-        phaseSelect.empty();
-        phaseSelect.prop('disabled', false);
-        endTurn.prop('disabled', false);
-        data.phases.forEach(p => phaseSelect.append(new Option(p, p)));
-        if (data.phase) {
-            phaseSelect.val(data.phase);
-        }
+    if (data.phases && data.phases.length > 0) {
+        const isCurrentPlayer = player === data.currentPlayer;
+        endTurn.prop('disabled', !isCurrentPlayer);
+        renderPhaseIndicator(data.phase, data.phases, isCurrentPlayer);
     }
 
     let chat = $("#chat");
@@ -2630,12 +2656,6 @@ function loadGame(data) {
     // If playing enable player controls
     if (data.player) {
         playerControls.removeClass("d-none").prop('disabled', false);
-    }
-
-    // if not the current player disable phase select and end turn
-    if (player !== data.currentPlayer) {
-        phaseSelect.prop('disabled', true);
-        endTurn.prop('disabled', true);
     }
 
     //If we're missing any messages from the log, skip adding this batch and

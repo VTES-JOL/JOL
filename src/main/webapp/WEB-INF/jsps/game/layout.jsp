@@ -3,9 +3,17 @@
             data-bs-toggle="offcanvas" data-bs-target="#gameSidebarOffcanvas" aria-controls="gameSidebarOffcanvas">
         <i class="bi bi-layout-sidebar"></i>
     </button>
+    <button class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex me-1" type="button"
+            onclick="toggleHandSidebar()" title="Toggle Hand">
+        <i class="bi bi-layout-sidebar"></i>
+    </button>
     <span id="gameTitle" class="fs-5 user-select-all text-truncate flex-grow-1"></span>
     <span id="gameLabel" class="badge bg-secondary ms-2 flex-shrink-0"></span>
-    <button class="btn btn-sm btn-outline-secondary ms-2 flex-shrink-0 d-none d-md-inline-flex" type="button"
+    <button class="btn btn-sm btn-outline-secondary ms-2 flex-shrink-0 d-none d-md-inline-flex"
+            id="chatToggleBtn" onclick="toggleGameChat()" title="Toggle Chat">
+        <i class="bi bi-chat-dots"></i>
+    </button>
+    <button class="btn btn-sm btn-outline-secondary ms-1 flex-shrink-0 d-none d-md-inline-flex" type="button"
             data-bs-toggle="modal" data-bs-target="#notesModal" title="Notes">
         <i class="bi bi-journal-text me-1"></i>Notes
     </button>
@@ -26,15 +34,33 @@
         </div>
         <div class="offcanvas-body p-0">
             <jsp:include page="hand-card.jsp"/>
-            <jsp:include page="commands.jsp"/>
-            <jsp:include page="game-chat.jsp"/>
-            <jsp:include page="history.jsp"/>
         </div>
     </div>
 
     <div class="game-state-area">
         <div class="row gy-1 gx-2" id="state"></div>
     </div>
+</div>
+
+<%-- Phase + command bar: desktop only, players only (hidden for observers via player-only) --%>
+<div class="game-phasecmd-bar player-only" id="gamePhaseCmdBar">
+    <div id="phaseIndicator" class="phase-steps"></div>
+    <form onsubmit="return doSubmit()" autocomplete="off" id="gameForm" class="phase-cmd-form">
+        <div class="input-group input-group-sm">
+            <button type="button" class="btn btn-outline-secondary player-only"
+                    data-bs-toggle="modal" data-bs-target="#quickCommandModal" tabindex="-1">...</button>
+            <input type="text" class="form-control player-only" id="command"
+                   placeholder="Enter game command">
+        </div>
+    </form>
+    <button class="btn btn-sm btn-warning player-only ms-2 flex-shrink-0" id="endTurn" type="button"
+            onclick="doEndTurn()">End Turn</button>
+</div>
+
+<%-- Chat panel: desktop bottom, visible by default, toggled by topbar button --%>
+<div class="game-chat-area d-none d-md-block" id="gameChatArea">
+    <jsp:include page="game-chat.jsp"/>
+    <jsp:include page="history.jsp"/>
 </div>
 
 <div class="game-mobile-bar d-flex d-md-none border-top">
