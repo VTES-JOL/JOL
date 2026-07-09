@@ -67,16 +67,18 @@
     <jsp:include page="history.jsp"/>
 </div>
 
+<jsp:include page="mobile-quick-panel.jsp"/>
+
 <div class="game-mobile-bar d-flex d-md-none border-top">
     <button class="flex-fill btn btn-link text-body py-2 game-mobile-chat-btn" type="button"
             onclick="toggleMobileChat()">
         <i class="bi bi-chat-dots fs-5 d-block"></i>
         <small>Chat</small>
     </button>
-    <button class="flex-fill btn btn-link text-body py-2 player-only" type="button"
-            data-bs-toggle="modal" data-bs-target="#quickCommandModal">
+    <button class="flex-fill btn btn-link text-body py-2 game-mobile-quick-btn" type="button"
+            onclick="toggleQuickPanel()">
         <i class="bi bi-lightning-charge fs-5 d-block"></i>
-        <small>Command</small>
+        <small>Quick</small>
     </button>
     <button class="flex-fill btn btn-link text-body py-2 player-only" type="button"
             data-bs-toggle="modal" data-bs-target="#deckModal" onclick="doShowDeck()">

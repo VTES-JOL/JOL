@@ -100,6 +100,26 @@ body * {
     z-index: 1055;
 }
 
+.modal-content.loading {
+    height: 30vh;
+    text-align: center;
+}
+
+.modal-loading-msg {
+    position: relative;
+    top: 43%;
+}
+
+.card-clan-select,
+.card-path-select,
+.card-sect-select {
+    width: auto;
+}
+
+.rotate-n90 {
+    transform: rotate(-90deg);
+}
+
 #playCardModal .icon, #playCardModal .clan {
     font-size: 2rem;
 }
@@ -214,47 +234,8 @@ body * {
     }
 }
 
-/* Lobby page flex layout */
-.lobby-layout {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    min-height: 0;
-    gap: 0.5rem;
-}
-
-.lobby-col-left,
-.lobby-col-right {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-}
-
-.lobby-col-left > .card {
-    min-height: 0;
-}
-
-@media (min-width: 768px) {
-    .lobby-layout {
-        flex-direction: row;
-    }
-    .lobby-col-left {
-        flex: 0 0 33.333%;
-        min-width: 0;
-    }
-    .lobby-col-right {
-        flex: 1 1 auto;
-        min-width: 0;
-    }
-}
-
-@media (min-width: 992px) {
-    .lobby-col-left {
-        flex: 0 0 25%;
-    }
-}
-
-/* Deck page flex layout */
+/* Lobby and deck page share identical two-column flex layout */
+.lobby-layout,
 .deck-layout {
     display: flex;
     flex-direction: column;
@@ -263,25 +244,29 @@ body * {
     gap: 0.5rem;
 }
 
-.deck-col-left,
-.deck-col-right {
+.lobby-col-left, .lobby-col-right,
+.deck-col-left, .deck-col-right {
     display: flex;
     flex-direction: column;
     min-height: 0;
 }
 
+.lobby-col-left > .card,
 .deck-col-left > .card {
     min-height: 0;
 }
 
 @media (min-width: 768px) {
+    .lobby-layout,
     .deck-layout {
         flex-direction: row;
     }
+    .lobby-col-left,
     .deck-col-left {
         flex: 0 0 33.333%;
         min-width: 0;
     }
+    .lobby-col-right,
     .deck-col-right {
         flex: 1 1 auto;
         min-width: 0;
@@ -289,6 +274,7 @@ body * {
 }
 
 @media (min-width: 992px) {
+    .lobby-col-left,
     .deck-col-left {
         flex: 0 0 25%;
     }
@@ -718,7 +704,8 @@ a.card-name {
 /* Compact buttons in quick-command and quick-chat modals on mobile */
 @media (max-width: 767px) {
     #quickCommandModal .modal-body .btn,
-    #quickChatModal .modal-body .btn {
+    #quickChatModal .modal-body .btn,
+    .game-quick-panel .btn {
         --bs-btn-padding-y: 0.2rem;
         --bs-btn-padding-x: 0.45rem;
         --bs-btn-font-size: 0.72rem;
@@ -760,6 +747,41 @@ a.card-name {
 .game-chat-output {
     flex: 1 1 auto;
     min-height: 0;
+}
+
+/* Mobile combined quick panel (chat + commands) */
+.game-quick-panel {
+    display: none;
+    flex-shrink: 0;
+    max-height: 50vh;
+    overflow-y: auto;
+    border-top: 1px solid var(--bs-border-color);
+    overscroll-behavior: contain;
+}
+
+.game-quick-panel.quick-panel-open {
+    display: block;
+}
+
+@media (min-width: 768px) {
+    .game-quick-panel {
+        display: none !important;
+    }
+}
+
+.game-quick-panel-section + .game-quick-panel-section {
+    border-top: 1px solid var(--bs-border-color-translucent);
+}
+
+.game-quick-panel-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--bs-secondary-color);
+    padding: 0.3rem 0.6rem;
+    background: var(--bs-tertiary-bg);
+    border-bottom: 1px solid var(--bs-border-color-translucent);
 }
 
 /* Mobile bottom action bar */

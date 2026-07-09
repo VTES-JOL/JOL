@@ -41,7 +41,7 @@
                 </a>
             </span>
             <span class="d-flex gap-1 align-items-center">
-                <span class="badge bg-body-secondary text-body shadow border-secondary-subtle"><%= label %></span>
+                <span class="badge bg-body-secondary text-body shadow border border-secondary-subtle"><%= label %></span>
                 <span class="icon card-type <%= typeClass%>"></span>
                 <c:if test="<%= cardSummary.hasBlood() %>">
                     <span>

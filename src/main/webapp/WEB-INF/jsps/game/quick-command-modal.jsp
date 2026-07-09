@@ -21,7 +21,7 @@
                             onclick="sendCommand('vp +1; pool +6')">Ousted prey!
                     </button>
                 </div>
-                <h6 class="m-1 d-inline btn pe-none bg-secondary-subtle">Library/Hand</h6>
+                <span class="m-1 d-inline btn pe-none bg-secondary-subtle">Library/Hand</span>
                 <div class="d-inline">
                     <button type="button" class="btn btn-outline-secondary m-1" onclick="sendCommand('draw')">Draw
                     </button>
@@ -32,7 +32,7 @@
                         Shuffle
                     </button>
                 </div>
-                <h6 class="m-1 d-inline btn pe-none bg-secondary-subtle">Crypt</h6>
+                <span class="m-1 d-inline btn pe-none bg-secondary-subtle">Crypt</span>
                 <div class="d-inline">
                     <button type="button" class="btn btn-outline-secondary m-1" onclick="sendCommand('draw crypt')">Draw
                         crypt
@@ -63,7 +63,7 @@
                                 onclick="sendCommand('pool -1')">-1
                         </button>
                     </div>
-                    <h6 class="d-lg-inline btn pe-none bg-secondary-subtle m-2">Pool</h6>
+                    <span class="d-lg-inline btn pe-none bg-secondary-subtle m-2">Pool</span>
                     <div class="d-lg-inline d-block">
                         <button type="button" class="btn btn-outline-success bg-success-subtle m-1"
                                 onclick="sendCommand('pool +1')">+1

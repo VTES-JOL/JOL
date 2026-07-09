@@ -1,27 +1,24 @@
 <div class="modal" id="cardModal" tabindex="-1" role="dialog" aria-labelledby="cardModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <div class="modal-content loading" style="height:30vh;text-align:center">
-            <h2 style="position:relative;top:43%">Loading...</h2>
+        <div class="modal-content loading">
+            <h2 class="modal-loading-msg">Loading...</h2>
         </div>
-        <div class="modal-content loaded" style="text-align:center">
+        <div class="modal-content loaded text-center">
             <div class="modal-header py-1 px-2 justify-content-between align-items-center">
                 <span class="d-flex align-items-center">
                     <span class="card-clan m-2"></span>
                     <label for="clan-select" class="d-none"></label>
-                    <select id="clan-select" class="form-select form-select-sm ms-2 card-clan-select d-none"
-                            style="width:auto"></select>
+                    <select id="clan-select" class="form-select form-select-sm ms-2 card-clan-select d-none"></select>
                     <span class="card-name fs-5" id="cardModalLabel"></span>
                     <span class="votes mx-2" title="Votes"></span>
                 </span>
                 <span class="d-flex align-items-center">
                     <span class="card-path"></span>
                     <label for="path-select" class="d-none"></label>
-                    <select id="path-select" class="form-select form-select-sm ms-2 card-path-select d-none"
-                            style="width:auto"></select>
+                    <select id="path-select" class="form-select form-select-sm ms-2 card-path-select d-none"></select>
                     <span class="card-sect m-2"></span>
                     <label for="sect-select" class="d-none"></label>
-                    <select id="sect-select" class="form-select form-select-sm ms-2 card-sect-select d-none"
-                            style="width:auto"></select>
+                    <select id="sect-select" class="form-select form-select-sm ms-2 card-sect-select d-none"></select>
                     <span class="card-cost"></span>
                     <button class="btn-close" title="Close" onclick="closeModal();"></button>
                 </span>
@@ -119,7 +116,7 @@
                             data-lock-state="locked"
                             data-region="ready torpor"
                             onclick="unlock();">
-                        <span style="transform: rotate(-90deg);"><i class="bi bi-unlock"></i> Unlock</span>
+                        <span class="d-inline-block rotate-n90"><i class="bi bi-unlock"></i> Unlock</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Block"
                             data-region="ready" data-top-level-only

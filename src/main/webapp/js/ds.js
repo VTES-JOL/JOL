@@ -2167,8 +2167,8 @@ function renderGameChat(data) {
         const time = dateAndTime[1];
         const playerSource = parts[1];
         const message = parts[2]
-            .replaceAll("&#64;"+player, "<span style='background-color: #D4D7F9; color:black'>@"+player+"</span>")
-            .replaceAll("&#64;All", "<span style='background-color: #D4D7F9; color:black'>@All</span>");
+            .replaceAll("&#64;"+player, `<span class="chat-mention">@${player}</span>`)
+            .replaceAll("&#64;All", '<span class="chat-mention">@All</span>');
         let timestamp;
         if (date === gameChatLastDay)
             timestamp = time;
@@ -2572,6 +2572,15 @@ function toggleGameChat() {
     if (btn) btn.classList.toggle('active', !area.classList.contains('chat-hidden'));
 }
 
+function toggleQuickPanel() {
+    const panel = document.getElementById('gameMobileQuickPanel');
+    if (!panel) return;
+    const isOpen = panel.classList.toggle('quick-panel-open');
+    document.querySelectorAll('.game-mobile-quick-btn').forEach(btn => {
+        btn.classList.toggle('active', isOpen);
+    });
+}
+
 function toggleMobileChat() {
     const area = document.getElementById('gameChatArea');
     if (!area) return;
@@ -2838,8 +2847,8 @@ function loadHistory(data) {
         const dateAndTime = content.timestamp;
         const playerSource = content.source;
         const message = content.message
-            .replaceAll("&#64;"+player, "<span style='background-color: #D4D7F9; color:black'>@"+player+"</span>")
-            .replaceAll("&#64;All", "<span style='background-color: #D4D7F9; color:black'>@All</span>");
+            .replaceAll("&#64;"+player, `<span class="chat-mention">@${player}</span>`)
+            .replaceAll("&#64;All", '<span class="chat-mention">@All</span>');
         let timeSpan = $("<span/>").text(dateAndTime).addClass('chat-timestamp');
         let playerLabel = playerSource === "null" ? '' : $("<b/>").text(playerSource);
         let lineElement = $('<p/>').addClass('chat').append(timeSpan, ' ', playerLabel, ' ', message);

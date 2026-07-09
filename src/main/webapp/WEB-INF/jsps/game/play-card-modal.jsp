@@ -1,9 +1,9 @@
 <div class="modal" id="playCardModal" tabindex="-1" role="dialog" aria-labelledby="playCardModalLabel">
     <div class="modal-dialog" role="document">
-        <div class="modal-content loading" style="height:30vh;text-align:center">
-            <h2 style="position:relative;top:43%">Loading...</h2>
+        <div class="modal-content loading">
+            <h2 class="modal-loading-msg">Loading...</h2>
         </div>
-        <div class="modal-content loaded" style="text-align:center">
+        <div class="modal-content loaded text-center">
             <div class="modal-header">
                 <h5 class="modal-title">
                     <span class="card-type"></span>
@@ -26,10 +26,10 @@
                         <span class="mode-text"></span>
                     </button>
                 </div>
-                <div class="extended-play-panel" style="display:none">
+                <div class="extended-play-panel d-none">
                     <hr/>
                     <button id="playCardModalPlayButton" type="button"
-                            class="btn btn-outline-secondary mb-2" style="white-space:normal"
+                            class="btn btn-outline-secondary mb-2 text-wrap"
                             onclick="playCard(event)">Play
                     </button>
                 </div>

@@ -229,13 +229,13 @@ function showPlayCardModal(event) {
 
                         let extendedPlayPanel = playCardModal.find(".extended-play-panel");
                         if (card.multiMode) {
-                            extendedPlayPanel.show();
+                            extendedPlayPanel.removeClass('d-none');
                             let playButton = $('#playCardModalPlayButton');
                             playButton.prop('disabled', true);
                             playButton.text('Select one or more disciplines');
                             button.on('click', multiModeButtonClicked);
                         } else {
-                            extendedPlayPanel.hide();
+                            extendedPlayPanel.addClass('d-none');
                             button.on('click', modeClicked);
                         }
 
