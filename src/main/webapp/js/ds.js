@@ -2024,6 +2024,10 @@ function saveDeck() {
     const deckName = $("#deckName").val();
     const contents = $("#deckText").val();
     const comment = $("#deckComment").val();
+    if(deckName === "") {
+        alert("Please enter a name for the deck");
+        return;
+    }
     DS.saveDeck(deckName, contents, comment, {
         callback: function(data) { exitEditMode(); processData(data); },
         errorHandler: errorhandler
