@@ -77,7 +77,7 @@ body * {
 }
 
 .player .card {
-    background-color: #ddd;
+    background-color: var(--bs-secondary-bg);
 }
 
 .custom-modal {
@@ -439,7 +439,7 @@ nav * {
 }
 
 .list-group-item:hover {
-    background-color: #eee;
+    background-color: var(--bs-tertiary-bg);
     cursor: pointer;
 }
 
@@ -454,7 +454,7 @@ nav * {
 }
 
 .chat-timestamp {
-    color: #888;
+    color: var(--bs-secondary-color);
     font-size: smaller;
 }
 
@@ -462,7 +462,7 @@ p.chat a {
     display: inline;
     padding: 0.1rem 0.3rem 0.1rem 0.3rem;
     border-radius: 0.4rem;
-    background-color: #ddd;
+    background-color: var(--bs-secondary-bg);
 }
 
 a.card-name {
@@ -474,6 +474,18 @@ a.card-name {
 
 .min-h-0 {
     min-height: 0;
+}
+
+/* ── Game screen color tokens ── */
+:root {
+    --game-accent: #8b0000;
+    --game-accent-fg: #fff;
+    --game-accent-hover: #6d0000;
+}
+
+[data-bs-theme="dark"] {
+    --game-accent: #c0392b;
+    --game-accent-hover: #a93226;
 }
 
 /* ── Game screen: sidebar layout ── */
@@ -578,8 +590,8 @@ a.card-name {
 }
 
 .phase-pill.phase-current {
-    background: var(--bs-primary);
-    color: #fff;
+    background: var(--game-accent);
+    color: var(--game-accent-fg);
 }
 
 .phase-pill.phase-upcoming {
@@ -603,6 +615,19 @@ a.card-name {
 .phase-cmd-form {
     flex: 1;
     min-width: 0;
+}
+
+.btn-game-action {
+    background-color: var(--game-accent);
+    color: var(--game-accent-fg);
+    border-color: var(--game-accent);
+}
+
+.btn-game-action:hover,
+.btn-game-action:focus {
+    background-color: var(--game-accent-hover);
+    border-color: var(--game-accent-hover);
+    color: var(--game-accent-fg);
 }
 
 /* ── Chat bottom panel ── */
@@ -641,7 +666,7 @@ a.card-name {
     padding: 0.2rem 0.6rem;
     border-bottom: 1px solid var(--bs-border-color-translucent);
     flex-shrink: 0;
-    background: var(--bs-body-bg);
+    background: var(--bs-tertiary-bg);
 }
 
 .game-chat-subheader-title {

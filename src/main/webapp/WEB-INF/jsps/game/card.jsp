@@ -76,7 +76,7 @@
                     </c:forEach>
                 </div>
                 <div class="d-flex align-items-center gap-1">
-                    <span class="badge bg-light text-black shadow border border-secondary-subtle"><%= label %></span>
+                    <span class="badge bg-body-secondary text-body shadow border border-secondary-subtle"><%= label %></span>
                 </div>
             </div>
             <div class="d-flex flex-column">

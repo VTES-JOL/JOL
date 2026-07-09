@@ -53,7 +53,7 @@
                    placeholder="Enter game command">
         </div>
     </form>
-    <button class="btn btn-sm btn-warning player-only ms-2 flex-shrink-0" id="endTurn" type="button"
+    <button class="btn btn-sm btn-game-action player-only ms-2 flex-shrink-0" id="endTurn" type="button"
             onclick="doEndTurn()">End Turn</button>
 </div>
 

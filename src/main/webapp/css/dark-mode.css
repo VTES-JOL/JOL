@@ -49,10 +49,6 @@
     --jol-day-label-bg: #25292b;
     --jol-day-label-color: #888;
 
-    p.chat a {
-        background-color: #343a40;
-    }
-
     span.card-name {
         color: #dee2e6;
     }
@@ -63,7 +59,7 @@
 
     .bg-light {
         background-color: rgb(27 30 31) !important;
-        color:#dee2e6 !important;
+        color: #dee2e6 !important;
     }
 
     .border-dark {
@@ -77,28 +73,15 @@
     .modal-footer {
         color: #dee2e6;
     }
-    .btn {
-        color: #dee2e6;
-    }
-    .btn-outline-dark  {
+
+    .btn-outline-dark {
         color: #dee2e6;
         border-color: #dee2e6;
         cursor: pointer;
     }
-    .btn-outline-dark:hover  {
+    .btn-outline-dark:hover {
         background-color: #222426;
         cursor: pointer;
-    }
-
-    .btn:hover {
-        background-color: #222426;
-        cursor: pointer;
-    }
-    .fw-bold {
-        color: #dee2e6;
-    }
-    #state span {
-        color: #dee2e6;
     }
 
     /*

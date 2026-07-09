@@ -16,7 +16,7 @@
     double vp = game.getVictoryPoints(player);
     boolean edge = player.equals(game.getEdge());
     boolean isPlayer = viewer.equals(player);
-    String activeStyle = active ? "text-bg-light border-dark border-2" : (isPlayer ? "border-secondary border-2" : "");
+    String activeStyle = active ? "border-info border-2" : (isPlayer ? "border-secondary border-2" : "");
     String activeHeaderStyle = active ? "bg-info-subtle" : "";
     String poolStyle = pool == 0 ? "text-bg-dark" : pool < 0 ? "text-bg-warning" : "text-bg-danger";
 %>

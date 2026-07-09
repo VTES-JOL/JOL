@@ -31,7 +31,7 @@
 %>
 
 <c:if test="<%=!cards.isEmpty() %>">
-    <div class="mb-2 text-bg-light" data-region="<%= regionName %>">
+    <div class="mb-2 bg-body text-body" data-region="<%= regionName %>">
         <div class="p-2 d-flex justify-content-between align-items-center <%= regionStyle %>">
             <span>
                 <button class="btn btn-sm p-0 <%= collapsed %>" onclick="togglePanel(event, '<%= regionId %>');"
