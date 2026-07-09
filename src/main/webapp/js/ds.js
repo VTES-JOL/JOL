@@ -182,7 +182,7 @@ $(document).ready(function () {
 
 function init(data) {
     if (localStorage.getItem("jol-theme") === "dark") {
-        $("#wrapper").attr("data-bs-theme", "dark");
+        $("html").attr("data-bs-theme", "dark");
     }
     processData(data);
     $("h4.collapse").click(function () {
@@ -2883,12 +2883,12 @@ function exportCsv() {
 }
 
 function toggleMode() {
-    const wrapper = $("#wrapper");
-    const isDark = wrapper.attr("data-bs-theme") !== "dark";
+    const html = $("html");
+    const isDark = html.attr("data-bs-theme") !== "dark";
     if (isDark) {
-        wrapper.attr("data-bs-theme", "dark");
+        html.attr("data-bs-theme", "dark");
     } else {
-        wrapper.removeAttr("data-bs-theme");
+        html.removeAttr("data-bs-theme");
     }
     localStorage.setItem("jol-theme", isDark ? "dark" : "");
 }

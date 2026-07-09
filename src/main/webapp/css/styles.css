@@ -26,6 +26,15 @@
 :root {
     --bs-body-font-size: 0.9rem;
     --bs-body-line-height: 1.3;
+
+    /* Warm stone palette */
+    --bs-body-bg: #f4f1ec;
+    --bs-body-color: #2a2520;
+    --bs-secondary-bg: #e9e4dc;
+    --bs-tertiary-bg: #ddd8ce;
+    --bs-border-color: #c8c0b4;
+    --bs-border-color-translucent: rgba(200, 192, 180, 0.3);
+    --bs-secondary-color: #6b6560;
 }
 
 .ratio-7x10 {
@@ -361,11 +370,11 @@ body * {
 
 
 :root {
-    --jol-mention-bg: #d4d7f9;
-    --jol-mention-fg: #000;
-    --jol-day-break-border: #dcc;
-    --jol-day-label-bg: #fff;
-    --jol-day-label-color: #b99;
+    --jol-mention-bg: #f0dede;
+    --jol-mention-fg: #2a2520;
+    --jol-day-break-border: #c8c0b4;
+    --jol-day-label-bg: #f4f1ec;
+    --jol-day-label-color: #8a7a72;
 }
 
 p.chat {
@@ -478,14 +487,14 @@ a.card-name {
 
 /* ── Game screen color tokens ── */
 :root {
-    --game-accent: #8b0000;
+    --game-accent: #7a1f1f;
     --game-accent-fg: #fff;
-    --game-accent-hover: #6d0000;
+    --game-accent-hover: #601818;
 }
 
 [data-bs-theme="dark"] {
-    --game-accent: #c0392b;
-    --game-accent-hover: #a93226;
+    --game-accent: #b83535;
+    --game-accent-hover: #9a2b2b;
 }
 
 /* ── Game screen: sidebar layout ── */

@@ -1,91 +1,101 @@
 [data-bs-theme="dark"] {
-    --bs-heading-color: #dee2e6;
-    --bs-success-bg-subtle: #203d33;
-    --bs-success-subtle: #05404d;
-    --text-bg-danger: #a31c29;
-    --text-bg-dark: #516374;
-    --bg-danger-subtle: #83212a;
-    --bs-danger-bg-subtle: #83212a;
-    --bs-white-rgb: #212529;
-    --text-bg-light: #181a1b;
-    --bg-body-secondary: #2b2e30;
-    --text-bg-success: #136840;
-    --text-bg-warning: #967000;
-    --bs-btn-bg: #695209;
-    --bs-modal-color: #dee2e6;
-    --btn-outline-dark: #dee2e6;
+    /* Warm charcoal palette */
+    --bs-body-bg: #1a1816;
+    --bs-body-color: #ddd8d0;
+    --bs-secondary-bg: #252321;
+    --bs-tertiary-bg: #2e2c29;
+    --bs-border-color: #403d38;
+    --bs-border-color-translucent: rgba(64, 61, 56, 0.4);
+    --bs-secondary-color: rgba(221, 216, 208, 0.65);
+    --bs-heading-color: #ddd8d0;
+
+    /* Semantic adjustments for dark warm bg */
+    --bs-success-bg-subtle: #1e3328;
+    --bs-danger-bg-subtle: #38201f;
+    --bs-warning-bg-subtle: #38320f;
+    --bs-info-bg-subtle: #1a2d38;
+    --bs-modal-color: #ddd8d0;
+    --btn-outline-dark: #ddd8d0;
+
+    /* Chat tokens */
+    --jol-mention-bg: #3d2222;
+    --jol-mention-fg: #ddd8d0;
+    --jol-day-break-border: #403d38;
+    --jol-day-label-bg: #1a1816;
+    --jol-day-label-color: #6b6560;
 
     .container-fluid {
-        background-color: #25292b;
-        color: #dee2e6;
+        background-color: #1a1816;
+        color: #ddd8d0;
     }
 
     .list-group-item {
-        background-color: #181a1b;
+        background-color: #252321;
     }
 
     .list-group-item:hover {
-        background-color: #222426;
+        background-color: #2e2c29;
         cursor: pointer;
     }
 
     .card {
-        background-color: #181a1b;
+        background-color: #252321;
     }
     .card-body {
-        background-color: #181a1b;
+        background-color: #252321;
     }
 
     a.card-name {
         text-decoration: none;
         font-family: matrix, sans-serif;
-        color: #dee2e6;
+        color: #ddd8d0;
         cursor: pointer;
     }
 
-    --jol-mention-bg: #3a3f6e;
-    --jol-mention-fg: #dee2e6;
-    --jol-day-break-border: #444;
-    --jol-day-label-bg: #25292b;
-    --jol-day-label-color: #888;
-
     span.card-name {
-        color: #dee2e6;
+        color: #ddd8d0;
     }
 
     .modal-open {
-        color: #dee2e6;
+        color: #ddd8d0;
     }
 
+    .modal-content {
+        color: #ddd8d0;
+    }
+    .modal-footer {
+        color: #ddd8d0;
+    }
+
+    /* bg-light in this context is used for region wrappers — map to dark surface */
     .bg-light {
-        background-color: rgb(27 30 31) !important;
-        color: #dee2e6 !important;
+        background-color: #252321 !important;
+        color: #ddd8d0 !important;
     }
 
     .border-dark {
         --bs-border-opacity: 1;
-        border-color: #787062 !important;
-    }
-
-    .modal-content {
-        color: #dee2e6;
-    }
-    .modal-footer {
-        color: #dee2e6;
+        border-color: #5a5550 !important;
     }
 
     .btn-outline-dark {
-        color: #dee2e6;
-        border-color: #dee2e6;
+        color: #ddd8d0;
+        border-color: #ddd8d0;
         cursor: pointer;
     }
     .btn-outline-dark:hover {
-        background-color: #222426;
+        background-color: #2e2c29;
         cursor: pointer;
     }
 
+    p.chat a {
+        background-color: #2e2c29;
+    }
+
     /*
-        Text -> #dee2e6
-        BG Body -> #25292b
+        Text    → #ddd8d0
+        BG Body → #1a1816
+        Surface → #252321
+        Raised  → #2e2c29
     */
 }
