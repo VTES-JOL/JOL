@@ -534,6 +534,7 @@ a.card-name {
         overflow-y: auto;
         overflow-x: hidden;
         align-self: flex-start; /* auto-height: sidebar only as tall as hand content */
+        max-height: 100%; /* allow scroll when hand exceeds game-layout height */
     }
 
     #gameSidebarOffcanvas .offcanvas-header {

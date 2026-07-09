@@ -23,7 +23,7 @@
     <div class="mx-1 me-auto w-100 align-items-center">
         <div class="d-flex justify-content-between align-items-center w-100">
             <div class="d-flex flex-column">
-                <span>*********</span>
+                <span class="fst-italic text-body-secondary">Hidden</span>
             </div>
             <div class="d-flex flex-column">
                 <div class="d-flex justify-content-end align-items-center gap-1">

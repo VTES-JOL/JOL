@@ -10,7 +10,8 @@
         <form onsubmit="return doSubmit()" autocomplete="off">
             <div class="input-group input-group-sm">
                 <button type="button" class="btn btn-outline-secondary player-only" data-bs-toggle="modal"
-                        data-bs-target="#quickChatModal" tabindex="-1">...
+                        data-bs-target="#quickChatModal" tabindex="-1" aria-label="Quick chat">
+                    <i class="bi bi-chat-square-text"></i>
                 </button>
                 <input type="text" class="form-control form-control-sm can-chat" id="chat"
                        placeholder="Chat to other players">

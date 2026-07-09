@@ -18,12 +18,12 @@
     boolean isPlayer = viewer.equals(player);
     String activeStyle = active ? "border-info border-2" : (isPlayer ? "border-secondary border-2" : "");
     String activeHeaderStyle = active ? "bg-info-subtle" : "";
-    String poolStyle = pool == 0 ? "text-bg-dark" : pool < 0 ? "text-bg-warning" : "text-bg-danger";
+    String poolStyle = pool == 0 ? "text-bg-secondary" : pool < 0 ? "text-bg-warning" : "text-bg-danger";
 %>
 <div class="col-xl col-lg-3 col-md-4 col-sm-6 g-2 player" data-player="<%= player %>" data-pool="<%= pool %>"
      data-vp="<%= vp %>" data-edge="<%= edge %>">
     <div class="card shadow-lg <%= activeStyle %>">
-        <div class="card-header <%= activeHeaderStyle %> <%= activeStyle %>">
+        <div class="card-header <%= activeHeaderStyle %>">
             <h6 class="d-flex justify-content-between align-items-center mb-0 lh-base">
                 <span class="fw-bold d-flex align-items-center gap-1">
                     <span><%= player %></span>

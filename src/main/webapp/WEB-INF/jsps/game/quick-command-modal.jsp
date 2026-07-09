@@ -3,10 +3,8 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="quickCommandModalLabel">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    <span>Quick Command</span>
-                </h5>
+                <h5 class="modal-title" id="quickCommandModalLabel">Quick Command</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div>
@@ -19,7 +17,7 @@
                     </button>
                     <button type="button" class="btn btn-outline-secondary m-1" onclick="sendCommand('open')">Toggle Open Hand
                     </button>
-                    <button type="button" class="btn btn-warning m-1" title="Gain 1 VP and 6 pool."
+                    <button type="button" class="btn btn-success m-1" title="Gain 1 VP and 6 pool."
                             onclick="sendCommand('vp +1; pool +6')">Ousted prey!
                     </button>
                 </div>

@@ -5,13 +5,13 @@
     </button>
     <button class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex me-1" type="button"
             onclick="toggleHandSidebar()" title="Toggle Hand">
-        <i class="bi bi-layout-sidebar"></i>
+        <i class="bi bi-layout-sidebar me-1"></i>Hand
     </button>
     <span id="gameTitle" class="fs-5 user-select-all text-truncate flex-grow-1"></span>
     <span id="gameLabel" class="badge bg-secondary ms-2 flex-shrink-0"></span>
-    <button class="btn btn-sm btn-outline-secondary ms-2 flex-shrink-0 d-none d-md-inline-flex"
+    <button class="btn btn-sm btn-outline-secondary ms-2 flex-shrink-0 d-none d-md-inline-flex active"
             id="chatToggleBtn" onclick="toggleGameChat()" title="Toggle Chat">
-        <i class="bi bi-chat-dots"></i>
+        <i class="bi bi-chat-dots me-1"></i>Chat
     </button>
     <button class="btn btn-sm btn-outline-secondary ms-1 flex-shrink-0 d-none d-md-inline-flex" type="button"
             data-bs-toggle="modal" data-bs-target="#notesModal" title="Notes">
@@ -45,10 +45,14 @@
 <%-- Phase + command bar: desktop only, players only (hidden for observers via player-only) --%>
 <div class="game-phasecmd-bar player-only" id="gamePhaseCmdBar">
     <div id="phaseIndicator" class="phase-steps"></div>
+    <span id="currentPlayerLabel" class="text-body-secondary small flex-shrink-0 d-none"></span>
     <form onsubmit="return doSubmit()" autocomplete="off" id="gameForm" class="phase-cmd-form">
         <div class="input-group input-group-sm">
             <button type="button" class="btn btn-outline-secondary player-only"
-                    data-bs-toggle="modal" data-bs-target="#quickCommandModal" tabindex="-1">...</button>
+                    data-bs-toggle="modal" data-bs-target="#quickCommandModal"
+                    tabindex="-1" aria-label="Quick commands">
+                <i class="bi bi-lightning-charge"></i>
+            </button>
             <input type="text" class="form-control player-only" id="command"
                    placeholder="Enter game command">
         </div>

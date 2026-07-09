@@ -2531,7 +2531,7 @@ function doSubmit(event) {
 const ALL_PHASES = ['Unlock', 'Master', 'Minion', 'Influence', 'Discard'];
 const PHASE_ABBR = { Unlock: 'Unl', Master: 'Mst', Minion: 'Min', Influence: 'Inf', Discard: 'Dsc' };
 
-function renderPhaseIndicator(currentPhase, remainingPhases, canAct) {
+function renderPhaseIndicator(currentPhase, remainingPhases, canAct, currentPlayer) {
     const el = document.getElementById('phaseIndicator');
     if (!el) return;
     const remaining = new Set(remainingPhases || []);
@@ -2544,6 +2544,16 @@ function renderPhaseIndicator(currentPhase, remainingPhases, canAct) {
         const onclick = (!isPast && canAct) ? `onclick="doSetPhase('${p}')"` : '';
         return `<button class="phase-pill ${stateClass}" ${onclick} ${disabled}><span class="phase-name-full">${p}</span><span class="phase-name-abbr">${PHASE_ABBR[p]}</span></button>`;
     }).join('');
+
+    const label = document.getElementById('currentPlayerLabel');
+    if (label) {
+        if (!canAct && currentPlayer) {
+            label.textContent = `Waiting for ${currentPlayer}`;
+            label.classList.remove('d-none');
+        } else {
+            label.classList.add('d-none');
+        }
+    }
 }
 
 function doSetPhase(phase) {
@@ -2611,7 +2621,7 @@ function loadGame(data) {
     if (data.phases && data.phases.length > 0) {
         const isCurrentPlayer = player === data.currentPlayer;
         endTurn.prop('disabled', !isCurrentPlayer);
-        renderPhaseIndicator(data.phase, data.phases, isCurrentPlayer);
+        renderPhaseIndicator(data.phase, data.phases, isCurrentPlayer, data.currentPlayer);
     }
 
     let chat = $("#chat");

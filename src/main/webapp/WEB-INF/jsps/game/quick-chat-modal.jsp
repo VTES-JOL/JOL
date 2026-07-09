@@ -3,10 +3,8 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="quickChatModalLabel">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    <span>Quick Chat</span>
-                </h5>
+                <h5 class="modal-title" id="quickChatModalLabel">Quick Chat</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <button type="button" class="btn btn-outline-secondary m-1" onclick="sendChat('Block?')">Block?</button>
