@@ -555,6 +555,58 @@ a.card-name {
     padding: 0.5rem;
 }
 
+@media (max-width: 767px) {
+    .game-state-area {
+        padding: 0.25rem;
+        font-size: 0.8rem;
+    }
+
+    /* Player card header */
+    .game-state-area .card-header {
+        padding: 0.2rem 0.4rem;
+    }
+
+    .game-state-area .card-header h6 {
+        font-size: 0.8rem;
+    }
+
+    /* Card body: reduce vertical padding between regions */
+    .game-state-area .card-body {
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+    }
+
+    /* Region section headers */
+    .game-state-area [data-region] > div:first-child {
+        padding: 0.2rem 0.35rem !important;
+    }
+
+    /* Card list items (card.jsp uses px-2 pt-2 pb-1; card-simple/hidden use p-1) */
+    .game-state-area .list-group-item {
+        padding: 0.2rem 0.35rem !important;
+    }
+
+    /* Discipline, pool, blood icons */
+    .game-state-area .icon {
+        font-size: 0.9rem;
+    }
+
+    .game-state-area .icon.card-type {
+        font-size: 1rem;
+    }
+
+    /* Clan symbols */
+    .game-state-area .clan {
+        font-size: 1.1rem;
+    }
+
+    /* All badges: pool, VP, counters, type label, LOCKED, CONTESTED */
+    .game-state-area .badge {
+        font-size: 0.6rem;
+        padding: 0.15rem 0.3rem;
+    }
+}
+
 /* ── Phase + command bar ── */
 /* Hidden on mobile; on desktop shown only when player-only class is not d-none */
 .game-phasecmd-bar {
@@ -642,6 +694,7 @@ a.card-name {
 
 /* ── Chat bottom panel ── */
 .game-chat-area {
+    display: none; /* hidden on mobile by default; shown via .chat-mobile-open or at md+ */
     flex-shrink: 0;
     height: 15rem;
     border-top: 1px solid var(--bs-border-color);
@@ -649,10 +702,27 @@ a.card-name {
     position: relative;
 }
 
-/* User-toggled hide: scoped to desktop so mobile d-none d-md-block still applies */
+.game-chat-area.chat-mobile-open {
+    display: block;
+}
+
 @media (min-width: 768px) {
+    .game-chat-area {
+        display: block;
+    }
     .game-chat-area.chat-hidden {
         display: none !important;
+    }
+}
+
+/* Compact buttons in quick-command and quick-chat modals on mobile */
+@media (max-width: 767px) {
+    #quickCommandModal .modal-body .btn,
+    #quickChatModal .modal-body .btn {
+        --bs-btn-padding-y: 0.2rem;
+        --bs-btn-padding-x: 0.45rem;
+        --bs-btn-font-size: 0.72rem;
+        margin: 0.2rem !important;
     }
 }
 

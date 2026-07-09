@@ -2572,6 +2572,19 @@ function toggleGameChat() {
     if (btn) btn.classList.toggle('active', !area.classList.contains('chat-hidden'));
 }
 
+function toggleMobileChat() {
+    const area = document.getElementById('gameChatArea');
+    if (!area) return;
+    const isOpen = area.classList.toggle('chat-mobile-open');
+    document.querySelectorAll('.game-mobile-chat-btn').forEach(btn => {
+        btn.classList.toggle('active', isOpen);
+    });
+    if (isOpen) {
+        const output = document.getElementById('gameChatOutput');
+        if (output) output.scrollTop = output.scrollHeight;
+    }
+}
+
 function sendChat(message) {
     DS.submitForm(game, null, '', message, null, {callback: processData, errorHandler: errorhandler});
     $('#quickChatModal').modal('hide');

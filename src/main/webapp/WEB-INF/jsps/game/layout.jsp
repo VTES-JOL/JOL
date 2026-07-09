@@ -62,14 +62,14 @@
 </div>
 
 <%-- Chat panel: desktop bottom, visible by default, toggled by topbar button --%>
-<div class="game-chat-area d-none d-md-block" id="gameChatArea">
+<div class="game-chat-area" id="gameChatArea">
     <jsp:include page="game-chat.jsp"/>
     <jsp:include page="history.jsp"/>
 </div>
 
 <div class="game-mobile-bar d-flex d-md-none border-top">
-    <button class="flex-fill btn btn-link text-body py-2" type="button"
-            data-bs-toggle="modal" data-bs-target="#quickChatModal">
+    <button class="flex-fill btn btn-link text-body py-2 game-mobile-chat-btn" type="button"
+            onclick="toggleMobileChat()">
         <i class="bi bi-chat-dots fs-5 d-block"></i>
         <small>Chat</small>
     </button>
