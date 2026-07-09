@@ -5,7 +5,7 @@
             <span id="online-users-header" class="fw-semibold small">Online Users</span>
         </button>
     </div>
-    <div id="onlinePlayersList" class="collapse show">
+    <div id="onlinePlayersList" class="collapse show overflow-y-auto">
         <div id="onlinePlayers" class="card-body p-1"></div>
     </div>
 </div>
