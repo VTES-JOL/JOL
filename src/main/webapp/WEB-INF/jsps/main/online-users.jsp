@@ -1,4 +1,4 @@
-<div class="card shadow">
+<div class="card shadow overflow-y-auto">
     <div class="card-header bg-body-secondary p-0">
         <button class="btn btn-link text-body-secondary text-decoration-none w-100 text-start px-2 py-1"
                 data-bs-toggle="collapse" data-bs-target="#onlinePlayersList" aria-expanded="true">
