@@ -26,12 +26,11 @@ public class GameBean {
     private final boolean judge;
     private final String stamp;
     private final String name;
-    private final int logLength;
     private final String currentPlayer;
 
     public GameBean(boolean isPlayer, boolean isAdmin, boolean isJudge, int refresh, String hand, String globalNotes, String privateNotes,
                     String label, String phase, boolean resetChat, boolean turnChanged, List<String> turn, List<String> turns, String state, List<String> phases,
-                    List<String> ping, List<String> pinged, String stamp, String name, int logLength, String currentPlayer) {
+                    List<String> ping, List<String> pinged, String stamp, String name, String currentPlayer) {
         this.ping = ping;
         this.pinged = pinged;
         this.refresh = refresh;
@@ -51,7 +50,6 @@ public class GameBean {
         this.phases = phases;
         this.stamp = stamp;
         this.name = name;
-        this.logLength = logLength;
         this.currentPlayer = currentPlayer;
     }
 }

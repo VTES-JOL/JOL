@@ -49,11 +49,13 @@ const DS = {
     registerDeck:            (gameName, deckName, opts) => apiPost(`/lobby/games/${_enc(gameName)}/deck`, {deckName}, opts),
 
     // Game actions
-    submitForm:              (game, phase, command, chat, ping, opts) => apiPost(`/game/${_enc(game)}/submit`, {phase, command, chat, ping}, opts),
+    gameChat:                (game, chat, opts) => apiPost(`/game/${_enc(game)}/chat`, {chat}, opts),
+    gameCommand:             (game, command, opts) => apiPost(`/game/${_enc(game)}/command`, {command}, opts),
+    gamePhaseChange:         (game, phase, opts) => apiPost(`/game/${_enc(game)}/phase`, {phase}, opts),
+    gamePing:                (game, targetPlayer, opts) => apiPost(`/game/${_enc(game)}/ping`, {targetPlayer}, opts),
     endPlayerTurn:           (game, opts) => apiPost(`/game/${_enc(game)}/end-turn`, {}, opts),
     endTurn:                 (game, opts) => apiPost(`/game/${_enc(game)}/force-end-turn`, {}, opts),
     endGame:                 (name, opts) => apiDel(`/game/${_enc(name)}`, opts),
-    gameChat:                (game, chat, opts) => apiPost(`/game/${_enc(game)}/chat`, {chat}, opts),
     doToggle:                (game, id, opts) => apiPost(`/game/${_enc(game)}/toggle/${_enc(id)}`, {}, opts),
     updateGlobalNotes:       (game, notes, opts) => apiPut(`/game/${_enc(game)}/notes/global`, {notes}, opts),
     updatePrivateNotes:      (game, notes, opts) => apiPut(`/game/${_enc(game)}/notes/private`, {notes}, opts),
@@ -2516,15 +2518,13 @@ function doEndTurn() {
 function doSubmit(event) {
     const commandInput = $("#command");
     const chatInput = $("#chat");
-    const command = commandInput.val();
-    const chat = chatInput.val();
+    const command = commandInput.val().trim();
+    const chat = chatInput.val().trim();
     if (!command && !chat) return false;
     commandInput.val("");
     chatInput.val("");
-    DS.submitForm(game, null, command, chat, null, {
-        callback: processData,
-        errorHandler: errorhandler
-    });
+    if (command) DS.gameCommand(game, command, {callback: processData, errorHandler: errorhandler});
+    if (chat) DS.gameChat(game, chat, {callback: processData, errorHandler: errorhandler});
     return false;
 }
 
@@ -2557,7 +2557,7 @@ function renderPhaseIndicator(currentPhase, remainingPhases, canAct, currentPlay
 }
 
 function doSetPhase(phase) {
-    DS.submitForm(game, phase, null, null, null, {callback: processData, errorHandler: errorhandler});
+    DS.gamePhaseChange(game, phase, {callback: processData, errorHandler: errorhandler});
 }
 
 function toggleHandSidebar() {
@@ -2595,14 +2595,19 @@ function toggleMobileChat() {
 }
 
 function sendChat(message) {
-    DS.submitForm(game, null, '', message, null, {callback: processData, errorHandler: errorhandler});
+    DS.gameChat(game, message, {callback: processData, errorHandler: errorhandler});
     $('#quickChatModal').modal('hide');
+    const panel = document.getElementById('gameMobileQuickPanel');
+    if (panel?.classList.contains('quick-panel-open')) toggleQuickPanel();
     return false;
 }
 
 function sendCommand(command, message = '') {
-    DS.submitForm(game, null, command, message, null, {callback: processData, errorHandler: errorhandler});
+    DS.gameCommand(game, command, {callback: processData, errorHandler: errorhandler});
+    if (message) DS.gameChat(game, message, {callback: processData, errorHandler: errorhandler});
     $('#quickCommandModal').modal('hide');
+    const panel = document.getElementById('gameMobileQuickPanel');
+    if (panel?.classList.contains('quick-panel-open')) toggleQuickPanel();
     return false;
 }
 
@@ -2617,7 +2622,7 @@ function sendPrivateNotes() {
 }
 
 function doPing(targetPlayer) {
-    DS.submitForm(game, null, '', '', targetPlayer, {callback: processData, errorHandler: errorhandler});
+    DS.gamePing(game, targetPlayer, {callback: processData, errorHandler: errorhandler});
 }
 
 function toggleChat() {
@@ -2637,14 +2642,6 @@ function loadGame(data) {
     }
     gameTitle.text(data.name);
     $("#gameLabel").text(data.label);
-
-    // Phases
-    let endTurn = $("#endTurn");
-    if (data.phases && data.phases.length > 0) {
-        const isCurrentPlayer = player === data.currentPlayer;
-        endTurn.prop('disabled', !isCurrentPlayer);
-        renderPhaseIndicator(data.phase, data.phases, isCurrentPlayer, data.currentPlayer);
-    }
 
     let chat = $("#chat");
     let command = $("#command");
@@ -2688,6 +2685,12 @@ function loadGame(data) {
     // If playing enable player controls
     if (data.player) {
         playerControls.removeClass("d-none").prop('disabled', false);
+        // Apply turn-specific state after blanket enable so isMyTurn wins
+        const isMyTurn = player === data.currentPlayer;
+        $("#endTurn").prop('disabled', !isMyTurn);
+        if (data.phases && data.phases.length > 0) {
+            renderPhaseIndicator(data.phase, data.phases, isMyTurn, data.currentPlayer);
+        }
     }
 
     //If we're missing any messages from the log, skip adding this batch and

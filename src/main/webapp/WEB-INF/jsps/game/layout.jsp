@@ -90,6 +90,11 @@
         <i class="bi bi-journal-text fs-5 d-block"></i>
         <small>Notes</small>
     </button>
+    <button class="flex-fill btn btn-link text-body py-2 player-only" type="button"
+            onclick="doEndTurn()">
+        <i class="bi bi-skip-end fs-5 d-block"></i>
+        <small>End Turn</small>
+    </button>
 </div>
 
 <div class="toast-container position-fixed top-0 end-0 p-3">
@@ -110,4 +115,3 @@
 <jsp:include page="card-modal.jsp"/>
 <jsp:include page="notes-modal.jsp"/>
 <jsp:include page="deck-modal.jsp"/>
-<jsp:include page="region-modal.jsp"/>

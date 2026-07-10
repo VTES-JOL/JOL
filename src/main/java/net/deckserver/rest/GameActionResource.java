@@ -26,21 +26,46 @@ public class GameActionResource extends BaseResource {
         return GameService.getNameByGameId(gameId);
     }
 
-    /** Replaces DS.submitForm() */
     @POST
-    @Path("submit")
-    public Map<String, Object> submitForm(SubmitRequest body) {
+    @Path("command")
+    public Map<String, Object> gameCommand(CommandRequest body) {
         String player = username();
         GameModel game = getModel();
         boolean isPlaying = game.getPlayers().contains(player);
         boolean canJudge = JolAdmin.isJudge(player) && !game.getPlayers().contains(player);
         String status = null;
         if (isPlaying || canJudge) {
-            status = game.submit(player, ne(body.phase()), ne(body.command()), ne(body.chat()), ne(body.ping()));
+            status = game.submit(player, null, ne(body.command()), null, null);
         }
         Map<String, Object> ret = update(player);
         if (isPlaying || canJudge) ret.put("showStatus", status);
         return ret;
+    }
+
+    @POST
+    @Path("phase")
+    public Map<String, Object> gamePhaseChange(PhaseRequest body) {
+        String player = username();
+        GameModel game = getModel();
+        boolean isPlaying = game.getPlayers().contains(player);
+        String status = null;
+        if (isPlaying) {
+            status = game.submit(player, ne(body.phase()), null, null, null);
+        }
+        Map<String, Object> ret = update(player);
+        if (isPlaying) ret.put("showStatus", status);
+        return ret;
+    }
+
+    @POST
+    @Path("ping")
+    public Map<String, Object> gamePing(PingRequest body) {
+        String player = username();
+        GameModel game = getModel();
+        if (game.getPlayers().contains(player)) {
+            game.submit(player, null, null, null, ne(body.targetPlayer()));
+        }
+        return update(player);
     }
 
     /** Replaces DS.endPlayerTurn() — player ends their own turn */
@@ -67,13 +92,15 @@ public class GameActionResource extends BaseResource {
         return update(player);
     }
 
-    /** Replaces DS.gameChat() */
     @POST
     @Path("chat")
     public Map<String, Object> gameChat(ChatRequest body) {
         String player = username();
-        String gameId = JolAdmin.getGameId(gameName());
-        if (RegistrationService.isInGame(gameName(), player)) {
+        GameModel game = getModel();
+        boolean isPlaying = game.getPlayers().contains(player);
+        boolean canJudge = JolAdmin.isJudge(player) && !game.getPlayers().contains(player);
+        if (isPlaying || canJudge) {
+            String gameId = JolAdmin.getGameId(gameName());
             ChatService.sendMessage(gameId, player, body.chat());
         }
         return update(player);
@@ -212,7 +239,9 @@ public class GameActionResource extends BaseResource {
         return "".equals(arg) ? null : arg;
     }
 
-    public record SubmitRequest(String phase, String command, String chat, String ping) {}
+    public record CommandRequest(String command) {}
+    public record PhaseRequest(String phase) {}
+    public record PingRequest(String targetPlayer) {}
     public record ChatRequest(String chat) {}
     public record NotesRequest(String notes) {}
     public record RollbackRequest(String turn) {}

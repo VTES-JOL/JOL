@@ -428,6 +428,7 @@ function showCardModal(event) {
                 modal.data('controller', controller);
                 modal.data('region', region);
                 modal.data('coordinates', coordinates);
+                modal.data('card-element', target);
 
                 // Set Modal name to card name
                 $('#cardModal .card-name').text(card.displayName);
@@ -601,10 +602,12 @@ function doCardCommand(commandKeyword, message = '', commandTail = '', closeModa
 }
 
 function lock(message = '') {
+    $('#cardModal').data('card-element')?.data('locked', true);
     return doCardCommand('lock', message);
 }
 
 function unlock(message = '') {
+    $('#cardModal').data('card-element')?.data('locked', false);
     return doCardCommand('unlock', message);
 }
 

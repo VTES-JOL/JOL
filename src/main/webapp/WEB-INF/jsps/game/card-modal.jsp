@@ -116,7 +116,7 @@
                             data-lock-state="locked"
                             data-region="ready torpor"
                             onclick="unlock();">
-                        <span class="d-inline-block rotate-n90"><i class="bi bi-unlock"></i> Unlock</span>
+                        <span class="d-inline-block"><i class="bi bi-unlock"></i> Unlock</span>
                     </button>
                     <button type="button" class="btn btn-outline-dark m-1" title="Block"
                             data-region="ready" data-top-level-only

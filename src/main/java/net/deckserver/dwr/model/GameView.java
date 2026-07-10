@@ -152,7 +152,7 @@ public class GameView {
                     state = JspRenderer.render(request, response, "/WEB-INF/jsps/game/state.jsp");
                 } catch (Exception e) {
                     logger.error("Error retrieving state:", e);
-                    hand = "Error retrieving state.";
+                    state = "Error retrieving state.";
                 }
             }
         }
@@ -171,9 +171,8 @@ public class GameView {
         boolean tc = turnChanged;
         clearAccess();
         String stamp = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
-        int logLength = ChatService.getTurn(id, game.getTurnLabel()).size();
         return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, globalNotes, privateNotes, label, phase.getDescription(),
-                chatReset, tc, turn, turns, state, phases, ping, pinged, stamp, gameName, logLength, currentPlayer);
+                chatReset, tc, turn, turns, state, phases, ping, pinged, stamp, gameName, currentPlayer);
     }
 
     public  void clearAccess() {

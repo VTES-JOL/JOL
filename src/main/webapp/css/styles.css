@@ -652,6 +652,12 @@ a.card-name {
     background: var(--bs-tertiary-bg);
 }
 
+.phase-pill:disabled {
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.55;
+}
+
 /* Abbreviate phase names at small desktop widths to prevent overflow */
 .phase-name-abbr { display: none; }
 
