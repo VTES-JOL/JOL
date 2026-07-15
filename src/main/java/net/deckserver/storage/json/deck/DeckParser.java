@@ -35,10 +35,11 @@ public class DeckParser {
     public static ExtendedDeck parseDeck(String contents) {
         Deck deck = new Deck();
 
-        List<CardCount> cardCounts = contents.lines()
-                .map(DeckParser::parseLine)
-                .flatMap(Optional::stream)
-                .toList();
+        List<String> rawLines = contents.lines().toList();
+        List<CardCount> cardCounts = new ArrayList<>();
+        for (int i = 0; i < rawLines.size(); i++) {
+            parseLine(rawLines.get(i), i + 1).ifPresent(cardCounts::add);
+        }
         List<CardCount> foundCards = cardCounts.stream().filter(FOUND_CARD).toList();
         List<CardCount> cryptCards = foundCards.stream().filter(IS_CRYPT)
                 .collect(collectingAndThen(groupingBy(CardCount::getId, reducing(CARD_MERGE)), CARD_MAPPER));
@@ -93,7 +94,7 @@ public class DeckParser {
         return new ExtendedDeck(deck, stats, errors);
     }
 
-    private static Optional<CardCount> parseLine(String deckLine) throws IllegalArgumentException {
+    private static Optional<CardCount> parseLine(String deckLine, int lineNumber) throws IllegalArgumentException {
         final String cleanLine = sanitizeLine(deckLine);
         Matcher countMatcher = COUNT_PATTERN.matcher(cleanLine);
         if (cleanLine.isEmpty()) {
@@ -125,7 +126,7 @@ public class DeckParser {
             return found;
         }).orElseGet(() -> {
             CardCount error = new CardCount();
-            error.setComments(deckLine);
+            error.setComments("Line " + lineNumber + ": " + deckLine.trim());
             logger.debug("[{}] can't be mapped to a card", cleanLine);
             return error;
         });

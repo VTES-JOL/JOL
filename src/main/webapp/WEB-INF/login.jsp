@@ -42,7 +42,7 @@
                     </div>
                     <div class="form-floating mb-3">
                         <input type="password" class="form-control" id="dspassin" name="password"
-                               autocomplete="password" placeholder="Password">
+                               autocomplete="current-password" placeholder="Password">
                         <label for="dspassin">Password</label>
                     </div>
                     <%--                        <c:if test='<%= System.getenv().getOrDefault("ENABLE_CAPTCHA", "true").equals("true") %>'>--%>
@@ -74,7 +74,7 @@
                     </div>
                     <div class="form-floating mb-3">
                         <input type="password" class="form-control" id="newpassword" name="newpassword"
-                               placeholder="Password">
+                               autocomplete="new-password" placeholder="Password">
                         <label for="newpassword">Password</label>
                     </div>
                     <div class="form-floating mb-3">

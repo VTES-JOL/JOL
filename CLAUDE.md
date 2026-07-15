@@ -11,6 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Start local Postgres (required), then optionally load fixture data
 docker compose -f local-docker-compose.yml up -d db
 ./migrate-to-db.sh src/test/resources/data   # reset DB + import fixture data
+./load-test-fixtures.sh                      # shorthand for the line above; resets local `db` to Player1-5 fixture data
 
 # Run locally (Tomcat 9, app served at /jol)
 JOL_DB_PASSWORD=jol ./mvnw tomcat9:run

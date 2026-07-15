@@ -37,6 +37,19 @@
     --bs-secondary-color: #6b6560;
 }
 
+/* Bootstrap hardcodes --bs-btn-color to #6c757d (4.16:1 on our warm bg, fails WCAG AA) */
+#loginForm .btn-outline-secondary,
+#registerForm .btn-outline-secondary {
+    --bs-btn-color: #4a4038;
+    --bs-btn-border-color: #4a4038;
+    --bs-btn-hover-bg: #4a4038;
+    --bs-btn-hover-border-color: #4a4038;
+    --bs-btn-active-bg: #4a4038;
+    --bs-btn-active-border-color: #4a4038;
+    --bs-btn-disabled-color: #4a4038;
+    --bs-btn-disabled-border-color: #4a4038;
+}
+
 .ratio-7x10 {
     --bs-aspect-ratio: calc(88 / 63 * 100%);
     aspect-ratio: 63 / 88;

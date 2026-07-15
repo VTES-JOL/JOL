@@ -2059,7 +2059,18 @@ function saveDeck() {
 function validate() {
     const contents = $("#deckText").val();
     const validator = $("#validatorFormat").val();
-    DS.validate(contents, validator, {callback: processData, errorHandler: errorhandler})
+    const nameBeforeValidate = $("#deckName").val();
+    DS.validate(contents, validator, {
+        callback: function (data) {
+            processData(data);
+            // Validate doesn't persist the deck, so the server has no name to echo back
+            // for an unsaved deck — restore whatever the user had typed before it's lost.
+            if (nameBeforeValidate && $("#deckName").val() === "") {
+                $("#deckName").val(nameBeforeValidate);
+            }
+        },
+        errorHandler: errorhandler
+    })
 }
 
 function toggleVisible(s, h) {

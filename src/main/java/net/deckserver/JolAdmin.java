@@ -521,12 +521,14 @@ public class JolAdmin {
     public static synchronized void validateDeck(String playerName, String contents, GameFormat format) {
         PlayerModel model = getPlayerModel(playerName);
         ExtendedDeck deck = DeckParser.parseDeck(contents);
+        List<String> errors = new ArrayList<>();
+        deck.getErrors().forEach(line -> errors.add("Unrecognized card — " + line));
         ValidationResult result = validateDeck(deck.getDeck(), format);
-        if (result.isValid()) {
-            deck.setErrors(List.of("No errors found.  Deck is valid for " + format.getLabel() + "."));
-        } else {
-            deck.setErrors(result.getErrors());
+        errors.addAll(result.getErrors());
+        if (errors.isEmpty()) {
+            errors.add("No errors found.  Deck is valid for " + format.getLabel() + ".");
         }
+        deck.setErrors(errors);
         ExtendedDeck existingDeck = model.getDeck();
         if (existingDeck != null) {
             String deckName = model.getDeck().getDeck().getName();

@@ -25,8 +25,15 @@
                 <button class="btn btn-outline-secondary btn-sm w-100" onclick="validate()">Validate</button>
             </div>
         </div>
-        <label for="deckText" class="form-label small text-muted mb-1">Contents</label>
-        <textarea id="deckText" class="form-control form-control-sm mb-2"></textarea>
+        <div class="d-flex justify-content-between align-items-baseline mb-1">
+            <label for="deckText" class="form-label small text-muted mb-0">Contents</label>
+            <span class="small text-muted">
+                One card per line: <code>4 x Theo Bell</code> or <code>Theo Bell (ADV)</code> for a single copy -
+                <a href="${pageContext.request.contextPath}/help#deckFormat" target="_blank">full format guide</a>
+            </span>
+        </div>
+        <textarea id="deckText" class="form-control form-control-sm mb-2"
+                  placeholder="4 x Theo Bell&#10;4 Anarch Troublemaker&#10;Fame&#10;&#10;# lines starting with # are comments"></textarea>
         <label for="deckComment" class="form-label small text-muted mb-1">Comment</label>
         <textarea id="deckComment" class="form-control form-control-sm scrollable player-only"
                   placeholder="Deck comment..." rows="3"></textarea>
