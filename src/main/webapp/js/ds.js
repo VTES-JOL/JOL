@@ -77,8 +77,10 @@ const DS = {
     // User profile
     updateProfile:           (email, discordID, veknID, country, opts) => apiPut('/user/profile', {email, discordID, veknID, country}, opts),
     changePassword:          (newPassword, opts) => apiPut('/user/password', {newPassword}, opts),
-    setUserPreferences:      (imageTooltips, opts) => apiPut('/user/preferences', {imageTooltips}, opts),
+    setUserPreferences:      (imageTooltips, notificationsEnabled, opts) => apiPut('/user/preferences', {imageTooltips, notificationsEnabled}, opts),
     setEdgeColor:            (color, opts) => apiPut('/user/edge-color', {color}, opts),
+    addSubscription:         (subscription, opts) => apiPost('/subscription', subscription, opts),
+    removeSubscription:      (endpoint, opts) => apiCall('DELETE', '/subscription', {endpoint}, opts),
 
     // Admin
     setRole:                 (player, role, value, opts) => apiPut(`/admin/player/${_enc(player)}/role`, {role, value}, opts),
@@ -145,7 +147,7 @@ let profile = {
     imageTooltipPreference: true,
     edgeColor: "#FFFFFF"
 };
-let subscribed =  localStorage.getItem("notifications-subscribed") === "true";
+let swRegistration = null;
 
 let pointerCanHover = window.matchMedia("(hover: hover)").matches;
 let scrollChat = false;
@@ -1758,7 +1760,7 @@ function registerForTournament(deckRow, deck) {
 
 function setImageTooltip() {
     profile.imageTooltipPreference = $("#imageTooltips").is(':checked');
-    DS.setUserPreferences(profile.imageTooltipPreference, {callback: processData, errorHandler: errorhandler});
+    DS.setUserPreferences(profile.imageTooltipPreference, profile.notificationsEnabled, {callback: processData, errorHandler: errorhandler});
 }
 
 function setEdgeColor() {
@@ -1791,7 +1793,9 @@ function callbackProfile(data) {
 
     $("#edgecolorpicker").val(data.edgeColor);
 
-    if (subscribed) {
+    if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+        $("#enableNotifications").prop("disabled", true).closest(".form-check").attr("title", "Notifications are not supported in this browser.");
+    } else if (data.notificationsEnabled) {
         $("#enableNotifications").prop("checked", true);
     }
 
@@ -1802,6 +1806,146 @@ function callbackProfile(data) {
     $('#profileNewPassword').val('');
     $('#profileConfirmPassword').val('');
     updateNavUserDisplay();
+}
+
+// ---------------------------------------------------------------------------
+// Web push notifications
+// ---------------------------------------------------------------------------
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = atob(base64);
+    return Uint8Array.from([...rawData].map(ch => ch.charCodeAt(0)));
+}
+
+function registerServiceWorker() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        return Promise.resolve(null);
+    }
+    if (swRegistration) return Promise.resolve(swRegistration);
+    return navigator.serviceWorker.register('/jol/sw.js')
+        .then(function (registration) {
+            swRegistration = registration;
+            navigator.serviceWorker.addEventListener('message', function (event) {
+                if (event.data && event.data.type === 'notification-navigate' && event.data.url) {
+                    const path = event.data.url.replace(/^\/jol\//, '');
+                    const parts = path.split('/');
+                    const target = parts[0] === 'game' && parts[1] ? 'g' + decodeURIComponent(parts[1]) : (parts[0] || 'main');
+                    doNav(target);
+                }
+            });
+            return registration;
+        })
+        .catch(function (err) {
+            console.warn('Service worker registration failed', err);
+            return null;
+        });
+}
+
+function subscribeToPush() {
+    return registerServiceWorker().then(function (registration) {
+        if (!registration) throw new Error('Push messaging is not supported in this browser.');
+        return registration.pushManager.getSubscription().then(function (existing) {
+            return existing || registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+            });
+        });
+    }).then(function (subscription) {
+        const key = subscription.getKey ? subscription.getKey('p256dh') : null;
+        const auth = subscription.getKey ? subscription.getKey('auth') : null;
+        const subscriptionData = {
+            endpoint: subscription.endpoint,
+            key: key ? btoa(String.fromCharCode.apply(null, new Uint8Array(key))) : '',
+            auth: auth ? btoa(String.fromCharCode.apply(null, new Uint8Array(auth))) : ''
+        };
+        return new Promise(function (resolve, reject) {
+            DS.addSubscription(subscriptionData, {
+                callback: function () { resolve(subscription); },
+                errorHandler: function (err) { reject(new Error(err)); }
+            });
+        });
+    });
+}
+
+function unsubscribeFromPush() {
+    return registerServiceWorker().then(function (registration) {
+        return registration ? registration.pushManager.getSubscription() : null;
+    }).then(function (subscription) {
+        if (!subscription) return null;
+        const endpoint = subscription.endpoint;
+        return subscription.unsubscribe().then(function () {
+            return new Promise(function (resolve) {
+                DS.removeSubscription(endpoint, {callback: resolve, errorHandler: resolve});
+            });
+        });
+    });
+}
+
+function toggleNotifications() {
+    const enabling = $("#enableNotifications").is(":checked");
+    if (enabling) {
+        if (!('Notification' in window)) {
+            alert('Notifications are not supported in this browser.');
+            $("#enableNotifications").prop("checked", false);
+            return;
+        }
+        if (Notification.permission === 'denied') {
+            alert('Notifications are blocked for this site in your browser settings.');
+            $("#enableNotifications").prop("checked", false);
+            return;
+        }
+        Notification.requestPermission().then(function (permission) {
+            if (permission !== 'granted') {
+                $("#enableNotifications").prop("checked", false);
+                return;
+            }
+            subscribeToPush().then(function () {
+                DS.setUserPreferences(profile.imageTooltipPreference, true, {callback: processData, errorHandler: errorhandler});
+            }).catch(function (err) {
+                console.error('Unable to subscribe to push notifications', err);
+                $("#enableNotifications").prop("checked", false);
+            });
+        });
+    } else {
+        unsubscribeFromPush().finally(function () {
+            DS.setUserPreferences(profile.imageTooltipPreference, false, {callback: processData, errorHandler: errorhandler});
+        });
+    }
+}
+
+function enableNotificationsFromBanner() {
+    if (!('Notification' in window)) return;
+    Notification.requestPermission().then(function (permission) {
+        if (permission !== 'granted') return;
+        subscribeToPush().then(function () {
+            $("#enableNotifications").prop("checked", true);
+            $("#notificationsBanner").addClass("d-none");
+        }).catch(function (err) {
+            console.error('Unable to subscribe to push notifications', err);
+        });
+    });
+}
+
+function dismissNotificationsBanner() {
+    localStorage.setItem("notifications-banner-dismissed", "true");
+    $("#notificationsBanner").addClass("d-none");
+}
+
+function checkNotificationBanner(notificationsEnabled, hasSubscriptions) {
+    if (!notificationsEnabled || !hasSubscriptions || localStorage.getItem("notifications-banner-dismissed") === "true") {
+        $("#notificationsBanner").addClass("d-none");
+        return;
+    }
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        return;
+    }
+    registerServiceWorker().then(function (registration) {
+        return registration ? registration.pushManager.getSubscription() : null;
+    }).then(function (subscription) {
+        $("#notificationsBanner").toggleClass("d-none", !!subscription);
+    });
 }
 
 function enterEditMode() {
@@ -2338,13 +2482,6 @@ function renderOnline(div, who) {
         container.append(playerDiv);
     });
 
-    if (who.length > 8) {
-        let collapseEl = document.getElementById("onlinePlayersList");
-        if (collapseEl && bootstrap.Collapse) {
-            bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false }).hide();
-        }
-    }
-
     tippy('[data-tippy-content]', { theme: 'light'});
 }
 
@@ -2436,6 +2573,7 @@ function navigate(data) {
         $("#gameRow").show();
         player = data.player;
         updateNavUserDisplay();
+        checkNotificationBanner(data.notificationsEnabled, data.hasSubscriptions);
     }
     $("#message").html(data.message)
     let timestamp = moment(data.stamp).tz("UTC").format("D-MMM HH:mm z");

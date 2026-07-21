@@ -20,6 +20,7 @@ public class PlayerInfo {
     private Set<PlayerRole> roles = new HashSet<>();
     private boolean showImages = true;
     private String edgeColor = "#FFFFFF";
+    private boolean notificationsEnabled = false;
 
     public PlayerInfo(String name, String id, String email, String hash) {
         this.name = name;

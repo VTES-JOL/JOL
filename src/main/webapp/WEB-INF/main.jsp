@@ -35,6 +35,11 @@
 </head>
 <body class="h-100 mh-100 d-flex flex-column">
 <jsp:include page="/WEB-INF/jsps/topbar.jsp"/>
+<div id="notificationsBanner" class="alert alert-info alert-dismissible d-none mb-0 text-center" role="alert">
+    You have notifications enabled on another browser. Enable them here too?
+    <button type="button" class="btn btn-sm btn-primary ms-2" onclick="enableNotificationsFromBanner()">Enable</button>
+    <button type="button" class="btn-close" aria-label="Close" onclick="dismissNotificationsBanner()"></button>
+</div>
 <div id="content" class="container-fluid">
     <div id="main">
         <jsp:include page="/WEB-INF/jsps/main/layout.jsp"/>

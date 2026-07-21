@@ -6,6 +6,7 @@ import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerGameActivityService;
 import net.deckserver.services.RegistrationService;
+import net.deckserver.services.SubscriptionService;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ public class NavBean {
     private final String stamp;
     private boolean chats;
     private String game = null;
+    private boolean notificationsEnabled;
+    private boolean hasSubscriptions;
 
     public NavBean(PlayerModel model) {
         player = model.getPlayerName();
@@ -32,6 +35,8 @@ public class NavBean {
         if (target.equals("game"))
             game = GameService.get(model.getCurrentGame()).getId();
         if (player != null) {
+            notificationsEnabled = JolAdmin.getNotificationPreference(player);
+            hasSubscriptions = SubscriptionService.hasSubscriptions(player);
             chats = model.hasChats();
             buttons.add("active:Watch");
             buttons.add("deck:Decks");

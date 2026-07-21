@@ -301,6 +301,17 @@ public class JolAdmin {
         return PlayerService.get(player).getEdgeColor();
     }
 
+    public static synchronized void setNotificationPreference(String player, boolean value) {
+        PlayerService.get(player).setNotificationsEnabled(value);
+    }
+
+    public static synchronized boolean getNotificationPreference(String player) {
+        if (player == null) {
+            return false;
+        }
+        return PlayerService.get(player).isNotificationsEnabled();
+    }
+
     public static synchronized boolean isAdmin(String player) {
         return PlayerService.get(player).getRoles().contains(PlayerRole.ADMIN);
     }

@@ -1,5 +1,6 @@
 package net.deckserver.push;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.security.*;
@@ -63,6 +64,7 @@ public class Subscription {
     /**
      * Returns the base64 encoded auth string as a byte[]
      */
+    @JsonIgnore
     public byte[] getAuthAsBytes() {
         return Base64.getDecoder().decode(getAuth());
     }
@@ -70,6 +72,7 @@ public class Subscription {
     /**
      * Returns the base64 encoded public key string as a byte[]
      */
+    @JsonIgnore
     public byte[] getKeyAsBytes() {
         return Base64.getDecoder().decode(getKey());
     }
@@ -77,6 +80,7 @@ public class Subscription {
     /**
      * Returns the base64 encoded public key as a PublicKey object
      */
+    @JsonIgnore
     public PublicKey getUserPublicKey()
             throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
         KeyFactory kf = KeyFactory.getInstance("ECDH", BouncyCastleProvider.PROVIDER_NAME);

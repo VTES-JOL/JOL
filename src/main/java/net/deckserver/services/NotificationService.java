@@ -1,6 +1,8 @@
 package net.deckserver.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.push.Subscription;
+import net.deckserver.storage.json.system.GameInfo;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -18,12 +20,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.Security;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class NotificationService {
     private static final String DISCORD_AUTHORIZATION_HEADER = String.format("Bot %s", System.getenv("DISCORD_BOT_TOKEN"));
@@ -33,8 +33,11 @@ public class NotificationService {
             .version(HttpClient.Version.HTTP_2)
             .connectTimeout(Duration.ofSeconds(5))
             .build();
-    private static final Map<String, Subscription> subscriptionMap = new HashMap<>();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final KeyPair keyPair = loadKey();
+
+    private record PushPayload(String title, String body, String gameId, String url) {
+    }
 
     public static void pingPlayer(String playerName, String discordId, String gameName) {
         try {
@@ -61,30 +64,51 @@ public class NotificationService {
                             return null;
                         });
             }
-            if (subscriptionMap.containsKey(playerName)) {
-                logger.info("Sending message via subscription for player: {}", playerName);
-                String message = String.format("It's your turn to act in %s.", gameName);
-                Subscription subscription = subscriptionMap.get(playerName);
+
+            if (!PlayerService.get(playerName).isNotificationsEnabled()) {
+                logger.debug("Notifications disabled for player: {}", playerName);
+                return;
+            }
+
+            List<Subscription> subscriptions = SubscriptionService.getSubscriptions(playerName);
+            if (subscriptions.isEmpty()) {
+                logger.debug("No subscriptions found for player: {}", playerName);
+                return;
+            }
+
+            byte[] payload = buildPayload(gameName);
+            for (Subscription subscription : subscriptions) {
                 try {
-                    sendPushMessage(subscription, message.getBytes());
-                    logger.info("Push notification sent successfully to {}", playerName);
+                    int statusCode = sendPushMessage(subscription, payload);
+                    if (statusCode == 404 || statusCode == 410) {
+                        logger.info("Subscription for {} is no longer valid (status {}); removing endpoint {}",
+                                playerName, statusCode, subscription.getEndpoint());
+                        SubscriptionService.removeSubscription(playerName, subscription.getEndpoint());
+                    } else {
+                        logger.info("Push notification sent to {} (endpoint {})", playerName, subscription.getEndpoint());
+                    }
                 } catch (Exception pushException) {
-                    logger.error("Failed to send push notification to {}", playerName, pushException);
+                    logger.error("Failed to send push notification to {} (endpoint {})", playerName, subscription.getEndpoint(), pushException);
                 }
-            } else {
-                logger.debug("No subscription found for player: {}", playerName);
             }
         } catch (Exception e) {
             logger.error("Unable to ping player", e);
         }
     }
 
-    public static void registerSubscription(String playerName, Subscription subscription) {
-        logger.info("Registering {} for notifications", playerName);
-        subscriptionMap.put(playerName, subscription);
+    private static byte[] buildPayload(String gameName) throws Exception {
+        GameInfo gameInfo = GameService.get(gameName);
+        String gameId = gameInfo != null ? gameInfo.getId() : null;
+        PushPayload payload = new PushPayload(
+                "Your Turn",
+                String.format("It's your turn to act in %s.", gameName),
+                gameId,
+                gameId != null ? "/jol/game/" + gameId : "/jol/"
+        );
+        return objectMapper.writeValueAsBytes(payload);
     }
 
-    public static void sendPushMessage(Subscription sub, byte[] payload) throws Exception {
+    public static int sendPushMessage(Subscription sub, byte[] payload) throws Exception {
         logger.info("Attempting to send push notification to endpoint: {}", sub.getEndpoint());
 
         // Create a notification with the endpoint, userPublicKey from the subscription and a custom payload
@@ -110,9 +134,11 @@ public class NotificationService {
         int statusCode = response.getStatusLine().getStatusCode();
         logger.info("Push notification sent. Status: {}, Response: {}", statusCode, response);
 
-        if (statusCode != 201 && statusCode != 200) {
+        if (statusCode != 201 && statusCode != 200 && statusCode != 404 && statusCode != 410) {
             logger.error("Push notification failed with status {}: {}", statusCode, response.getEntity().getContent());
         }
+
+        return statusCode;
     }
 
     private static KeyPair loadKey() {

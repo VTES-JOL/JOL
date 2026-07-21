@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.services.PlayerService;
+import net.deckserver.services.SubscriptionService;
 import net.deckserver.storage.json.system.PlayerInfo;
 
 @Getter
@@ -15,6 +16,8 @@ public class ProfileBean {
     private final String country;
     private final String edgeColor;
     private final boolean imageTooltipPreference;
+    private final boolean notificationsEnabled;
+    private final boolean hasSubscriptions;
 
     public ProfileBean(PlayerModel model) {
         String player = model.getPlayerName();
@@ -25,6 +28,8 @@ public class ProfileBean {
         this.imageTooltipPreference = JolAdmin.getImageTooltipPreference(player);
         this.edgeColor = JolAdmin.getEdgeColor(player);
         this.country = playerInfo.getCountryCode();
+        this.notificationsEnabled = JolAdmin.getNotificationPreference(player);
+        this.hasSubscriptions = SubscriptionService.hasSubscriptions(player);
     }
 
 }

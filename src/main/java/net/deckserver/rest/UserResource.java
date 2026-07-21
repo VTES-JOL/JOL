@@ -36,6 +36,7 @@ public class UserResource extends BaseResource {
     public Map<String, Object> setUserPreferences(PreferencesRequest body) {
         String player = username();
         JolAdmin.setImageTooltipPreference(player, body.imageTooltips());
+        JolAdmin.setNotificationPreference(player, body.notificationsEnabled());
         return update(player);
     }
 
@@ -50,6 +51,6 @@ public class UserResource extends BaseResource {
 
     public record ProfileRequest(String email, String discordID, String veknID, String country) {}
     public record PasswordRequest(String newPassword) {}
-    public record PreferencesRequest(boolean imageTooltips) {}
+    public record PreferencesRequest(boolean imageTooltips, boolean notificationsEnabled) {}
     public record EdgeColorRequest(String color) {}
 }
