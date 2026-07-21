@@ -26,6 +26,17 @@ import java.time.Duration;
 import java.util.List;
 
 public class NotificationService {
+
+    static {
+        // web-push looks up the "BC" provider by name internally (Cipher/KeyPairGenerator).
+        // On a Tomcat redeploy without a JVM restart, a stale provider instance from the
+        // previous webapp's classloader can remain registered under the same name, causing
+        // "class configured for KeyFactory (provider: BC) cannot be found". Removing any
+        // existing registration before re-adding ours ensures it's always this classloader's copy.
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
     private static final String DISCORD_AUTHORIZATION_HEADER = String.format("Bot %s", System.getenv("DISCORD_BOT_TOKEN"));
     private static final URI DISCORD_PING_CHANNEL_URI = URI.create(String.format("https://discord.com/api/v%s/channels/%s/messages", System.getenv("DISCORD_API_VERSION"), System.getenv("DISCORD_PING_CHANNEL_ID")));
     private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
@@ -34,6 +45,7 @@ public class NotificationService {
             .connectTimeout(Duration.ofSeconds(5))
             .build();
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final BouncyCastleProvider BC_PROVIDER = new BouncyCastleProvider();
     private static final KeyPair keyPair = loadKey();
 
     private record PushPayload(String title, String body, String gameId, String url) {
@@ -142,12 +154,11 @@ public class NotificationService {
     }
 
     private static KeyPair loadKey() {
-        Security.addProvider(new BouncyCastleProvider());
         Path keyPath = DataPaths.path("vapid_private.pem");
         try (FileInputStream stream = new FileInputStream(keyPath.toFile()); InputStreamReader reader = new InputStreamReader(stream)) {
             PEMParser pemParser = new PEMParser(reader);
             PEMKeyPair pemKeyPair = (PEMKeyPair) pemParser.readObject();
-            return new JcaPEMKeyConverter().getKeyPair(pemKeyPair);
+            return new JcaPEMKeyConverter().setProvider(BC_PROVIDER).getKeyPair(pemKeyPair);
         } catch (IOException e) {
             throw new RuntimeException("Could not read private key");
         }

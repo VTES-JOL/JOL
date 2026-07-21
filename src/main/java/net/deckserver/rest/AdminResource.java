@@ -3,6 +3,7 @@ package net.deckserver.rest;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.PlayerRole;
 import net.deckserver.services.PlayerService;
+import net.deckserver.services.SiteNotesService;
 import net.deckserver.storage.json.system.PlayerInfo;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -92,6 +93,29 @@ public class AdminResource extends BaseResource {
         return writer.toString();
     }
 
+    /** Sets the global site notes shown on the main page. */
+    @PUT
+    @Path("site-notes")
+    public Map<String, Object> setSiteNotes(SiteNotesRequest body) {
+        String playerName = username();
+        if (JolAdmin.isAdmin(playerName)) {
+            SiteNotesService.setNotes(body.notes());
+        }
+        return update(playerName);
+    }
+
+    /** Clears the global site notes. */
+    @DELETE
+    @Path("site-notes")
+    public Map<String, Object> clearSiteNotes() {
+        String playerName = username();
+        if (JolAdmin.isAdmin(playerName)) {
+            SiteNotesService.clear();
+        }
+        return update(playerName);
+    }
+
     public record SetRoleRequest(String role, boolean value) {}
     public record MessageRequest(String message) {}
+    public record SiteNotesRequest(String notes) {}
 }

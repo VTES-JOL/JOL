@@ -88,6 +88,8 @@ const DS = {
     setMessage:              (message, opts) => apiPost('/admin/message', {message}, opts),
     getVekn:                 (playerName, opts) => apiGet(`/admin/player/${_enc(playerName)}/vekn`, opts),
     exportPastGamesAsCsv:    (opts) => apiGetText('/admin/export/games.csv', opts),
+    updateSiteNotes:         (notes, opts) => apiPut('/admin/site-notes', {notes}, opts),
+    clearSiteNotes:          (opts) => apiDel('/admin/site-notes', opts),
 
     // Tournament
     createTournament:        (tourName, regStart, regEnd, playStart, playEnd, tourFormat, gameFormat, rules, specRulesCon, specRules, numberOfRounds, reqId, originalName, opts) =>
@@ -153,6 +155,7 @@ let pointerCanHover = window.matchMedia("(hover: hover)").matches;
 let scrollChat = false;
 let lastReceivedGlobalNotes = null;
 let lastReceivedPrivateNotes = null;
+let lastReceivedSiteNotes = null;
 const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
 function errorhandler(errorString) {
@@ -427,6 +430,22 @@ function callbackAdmin(data) {
             idleGameList.append(row);
         })
     })
+
+    let siteNotesText = $("#siteNotesText");
+    if (data.siteNotes !== lastReceivedSiteNotes && document.activeElement !== siteNotesText[0]) {
+        lastReceivedSiteNotes = data.siteNotes;
+        siteNotesText.val(data.siteNotes);
+    }
+}
+
+function adminSaveSiteNotes() {
+    DS.updateSiteNotes($("#siteNotesText").val(), {callback: processData, errorHandler: errorhandler});
+}
+
+function adminClearSiteNotes() {
+    if (confirm("Clear the site notes?")) {
+        DS.clearSiteNotes({callback: processData, errorHandler: errorhandler});
+    }
 }
 
 function adminChangeGame() {
@@ -2089,6 +2108,12 @@ function callbackMain(data) {
         renderGlobalChat(data.chat);
         renderMyGames("myGames", data.games);
         renderMyGames("oustedGames", data.ousted);
+        if (data.notes) {
+            $("#siteNotesContent").html(data.notes);
+            $("#siteNotesPanel").removeClass("d-none");
+        } else {
+            $("#siteNotesPanel").addClass("d-none");
+        }
         if (refresher) clearTimeout(refresher);
         if (!wsConnected) {
             refresher = setTimeout(() => DS.doPoll({callback: processData, errorHandler: errorhandler}), 5000);

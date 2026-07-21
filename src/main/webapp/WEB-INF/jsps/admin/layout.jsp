@@ -9,5 +9,6 @@
     </div>
     <div class="col-sm-4">
         <jsp:include page="idle-games.jsp"/>
+        <jsp:include page="site-notes.jsp"/>
     </div>
 </div>

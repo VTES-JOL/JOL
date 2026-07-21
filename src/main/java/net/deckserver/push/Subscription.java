@@ -22,6 +22,8 @@ import java.util.Map;
 @ToString(of = {"auth", "key", "endpoint"})
 public class Subscription {
 
+    private static final BouncyCastleProvider BC_PROVIDER = new BouncyCastleProvider();
+
     private String auth;
     private String key;
     @Setter
@@ -82,8 +84,8 @@ public class Subscription {
      */
     @JsonIgnore
     public PublicKey getUserPublicKey()
-            throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
-        KeyFactory kf = KeyFactory.getInstance("ECDH", BouncyCastleProvider.PROVIDER_NAME);
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+        KeyFactory kf = KeyFactory.getInstance("ECDH", BC_PROVIDER);
         ECNamedCurveParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec("secp256r1");
         ECPoint point = ecSpec.getCurve().decodePoint(getKeyAsBytes());
         ECPublicKeySpec pubSpec = new ECPublicKeySpec(point, ecSpec);

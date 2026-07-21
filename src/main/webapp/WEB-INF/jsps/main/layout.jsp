@@ -8,6 +8,7 @@
         <jsp:include page="global-chat.jsp"/>
     </div>
     <div class="main-col-right">
+        <jsp:include page="site-notes.jsp"/>
         <jsp:include page="online-users.jsp"/>
         <jsp:include page="resources.jsp"/>
     </div>
