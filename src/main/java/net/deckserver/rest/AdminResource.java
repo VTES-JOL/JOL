@@ -18,7 +18,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Path("/admin")
 @Produces(MediaType.APPLICATION_JSON)
@@ -91,6 +97,52 @@ public class AdminResource extends BaseResource {
             }
         }
         return writer.toString();
+    }
+
+    @GET
+    @Path("stats")
+    public Map<String, List<String>> getStatsPerPlayer() {
+        Map<OffsetDateTime, GameHistory> history = HistoryService.getHistory();
+        Map<String, Integer> gw = new HashMap<>();
+        Map<String, Double> vp = new HashMap<>();
+        Map<String, Integer> games = new HashMap<>();
+        for (GameHistory game : history.values()) {
+            for (PlayerResult player : game.getResults()) {
+                //GW
+                if(gw.containsKey(player.getPlayerName()) && player.isGameWin()){
+                    gw.put(player.getPlayerName(), gw.get(player.getPlayerName()) + 1);
+                } else if( !gw.containsKey(player.getPlayerName()) && player.isGameWin()) {
+                    gw.put(player.getPlayerName(), 1);
+                }
+                //VP
+                if(vp.containsKey(player.getPlayerName())){
+                    vp.put(player.getPlayerName(), vp.get(player.getPlayerName()) + player.getVictoryPoints());
+                } else if( !vp.containsKey(player.getPlayerName())) {
+                    vp.put(player.getPlayerName(), player.getVictoryPoints());
+                }
+                //Games
+                if(games.containsKey(player.getPlayerName())){
+                    games.put(player.getPlayerName(), games.get(player.getPlayerName()) + 1);
+                } else if( !games.containsKey(player.getPlayerName())) {
+                    games.put(player.getPlayerName(), 1);
+                }
+            }
+        }
+
+        Set<String> allKeys = Stream.of(games, gw, vp)
+                .flatMap(map -> map.keySet().stream())
+                .collect(Collectors.toSet());
+
+        return allKeys.stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        key -> Stream.of(
+                                        String.valueOf(games.get(key)),
+                                        String.valueOf(gw.get(key) == null ? "-" :gw.get(key)),
+                                        String.valueOf(vp.get(key) == null ? "-" :vp.get(key)),
+                                        gw.get(key) != null ? Math.round((Double.valueOf(gw.get(key)) / Double.valueOf(games.get(key))) * 100) +"%" : "-",
+                                        String.valueOf(vp.get(key) / Double.valueOf(games.get(key))))
+                                .toList()));
     }
 
     /** Sets the global site notes shown on the main page. */
