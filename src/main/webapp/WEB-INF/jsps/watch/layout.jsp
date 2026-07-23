@@ -13,6 +13,12 @@
                     Past Games
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link px-3 py-2" data-bs-toggle="tab"
+                        data-bs-target="#statGamesPane" type="button" role="tab">
+                    Statistics
+                </button>
+            </li>
             <li class="ms-auto d-flex align-items-center pe-2">
                 <button class="btn btn-outline-secondary btn-sm d-none" id="exportCsvBtn"
                         onclick="exportCsv()">Export CSV <i class="bi-download"></i></button>
@@ -40,6 +46,21 @@
                     <th>Started</th>
                     <th>Ended</th>
                     <th colspan="3">Results</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="tab-pane fade" id="statGamesPane" role="tabpanel">
+            <table id="statsGames" class="table table-sm table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Number of Games</th>
+                    <th>GW Total</th>
+                    <th>VP Total</th>
+                    <th>% Win Rate</th>
+                    <th>Average VP</th>
                 </tr>
                 </thead>
                 <tbody></tbody>
