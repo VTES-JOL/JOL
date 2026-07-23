@@ -59,8 +59,8 @@
                     <th>Number of Games</th>
                     <th>GW Total</th>
                     <th>VP Total</th>
-                    <th>GW %</th>
-                    <th>Average VP per Game</th>
+                    <th>% Win Rate</th>
+                    <th>Average VP</th>
                 </tr>
                 </thead>
                 <tbody></tbody>
