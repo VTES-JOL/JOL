@@ -55,12 +55,12 @@
             <table id="statsGames" class="table table-sm table-hover mb-0">
                 <thead>
                 <tr>
-                    <th>Player</th>
-                    <th>Number of Games</th>
-                    <th>GW Total</th>
-                    <th>VP Total</th>
-                    <th>% Win Rate</th>
-                    <th>Average VP</th>
+                    <th>Player <i class="bi bi-filter" onclick="sortTable(0)"></i></th>
+                    <th>Number of Games <i class="bi bi-filter" onclick="sortTable(1)"></i></th>
+                    <th>GW Total <i class="bi bi-filter" onclick="sortTable(2)"></i></th>
+                    <th>VP Total <i class="bi bi-filter" onclick="sortTable(3)"></i></th>
+                    <th>% Win Rate <i class="bi bi-filter" onclick="sortPercentageTable(4)"></i></th>
+                    <th>Average VP <i class="bi bi-filter" onclick="sortTable(5)"></i></th>
                 </tr>
                 </thead>
                 <tbody></tbody>

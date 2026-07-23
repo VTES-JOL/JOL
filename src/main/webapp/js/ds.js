@@ -3089,3 +3089,51 @@ function sortPlayerNames(round) {
         )
         .forEach(li => ul.appendChild(li));
 }
+
+let sortDirection = {};
+
+function sortTable(columnIndex) {
+    const table = document.getElementById("statsGames");
+    const tbody = table.tBodies[0];
+    const rows = Array.from(tbody.rows);
+
+    sortDirection[columnIndex] = !sortDirection[columnIndex];
+
+    rows.sort((a, b) => {
+        let x = a.cells[columnIndex].innerText.toLowerCase();
+        let y = b.cells[columnIndex].innerText.toLowerCase();
+
+        // Numeric sorting
+        if (!isNaN(x) && !isNaN(y)) {
+            x = Number(x);
+            y = Number(y);
+        }
+
+        return sortDirection[columnIndex]
+            ? x > y ? 1 : -1
+            : x < y ? 1 : -1;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function sortPercentageTable(columnIndex) {
+    const table = document.getElementById("statsGames");
+    const tbody = table.tBodies[0];
+    const rows = Array.from(tbody.rows);
+
+    sortDirection[columnIndex] = !sortDirection[columnIndex];
+
+    rows.sort((a, b) => {
+        const aValue = parseFloat(a.cells[columnIndex].innerText.replace("%", ""));
+        const bValue = parseFloat(b.cells[columnIndex].innerText.replace("%", ""));
+
+        if (sortDirection[columnIndex]) {
+            return aValue - bValue; // ascending
+        } else {
+            return bValue - aValue; // descending
+        }
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+}

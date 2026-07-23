@@ -140,8 +140,8 @@ public class AdminResource extends BaseResource {
                                         String.valueOf(games.get(key)),
                                         String.valueOf(gw.get(key) == null ? "-" :gw.get(key)),
                                         String.valueOf(vp.get(key) == null ? "-" :vp.get(key)),
-                                        gw.get(key) != null ? Math.round((Double.valueOf(gw.get(key)) / Double.valueOf(games.get(key))) * 100) +"%" : "-",
-                                        String.valueOf(vp.get(key) / Double.valueOf(games.get(key))))
+                                        gw.get(key) != null ? Math.round((Double.valueOf(gw.get(key)) / Double.valueOf(games.get(key))) * 100) +"%" : "0%",
+                                        String.valueOf(Math.floor(vp.get(key) / Double.valueOf(games.get(key)) * 100) / 100))
                                 .toList()));
     }
 
