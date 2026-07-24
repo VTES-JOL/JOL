@@ -3,8 +3,15 @@ package net.deckserver.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.push.Subscription;
 import net.deckserver.storage.json.system.GameInfo;
+import nl.martijndwars.webpush.Encoding;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
@@ -47,6 +54,16 @@ public class NotificationService {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final BouncyCastleProvider BC_PROVIDER = new BouncyCastleProvider();
     private static final KeyPair keyPair = loadKey();
+    // web-push's PushService.send() spins up a fresh async client per call with no timeout;
+    // we build the request via PushService but execute it ourselves so a stalled push
+    // relay can't hang the request thread indefinitely.
+    private static final CloseableHttpClient pushHttpClient = HttpClients.custom()
+            .setDefaultRequestConfig(RequestConfig.custom()
+                    .setConnectTimeout(5000)
+                    .setConnectionRequestTimeout(5000)
+                    .setSocketTimeout(10000)
+                    .build())
+            .build();
 
     private record PushPayload(String title, String body, String gameId, String url) {
     }
@@ -92,15 +109,25 @@ public class NotificationService {
             for (Subscription subscription : subscriptions) {
                 try {
                     int statusCode = sendPushMessage(subscription, payload);
-                    if (statusCode == 404 || statusCode == 410) {
+                    if (statusCode == 200 || statusCode == 201) {
+                        SubscriptionService.recordSuccess(playerName, subscription.getEndpoint());
+                        logger.info("Push notification sent to {} (endpoint {})", playerName, subscription.getEndpoint());
+                    } else if (statusCode == 404 || statusCode == 410) {
                         logger.info("Subscription for {} is no longer valid (status {}); removing endpoint {}",
                                 playerName, statusCode, subscription.getEndpoint());
                         SubscriptionService.removeSubscription(playerName, subscription.getEndpoint());
                     } else {
-                        logger.info("Push notification sent to {} (endpoint {})", playerName, subscription.getEndpoint());
+                        logger.warn("Push notification to {} failed with status {} (endpoint {})",
+                                playerName, statusCode, subscription.getEndpoint());
+                        if (SubscriptionService.recordFailure(playerName, subscription.getEndpoint())) {
+                            logger.warn("Removing endpoint {} for {} after repeated failures", subscription.getEndpoint(), playerName);
+                        }
                     }
                 } catch (Exception pushException) {
                     logger.error("Failed to send push notification to {} (endpoint {})", playerName, subscription.getEndpoint(), pushException);
+                    if (SubscriptionService.recordFailure(playerName, subscription.getEndpoint())) {
+                        logger.warn("Removing endpoint {} for {} after repeated failures", subscription.getEndpoint(), playerName);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -140,17 +167,21 @@ public class NotificationService {
         // Use your website URL or a mailto: URL
         pushService.setSubject("mailto:admin@deckserver.net");
 
-        // Send the notification
-        var response = pushService.send(notification);
+        // Build the request via the library, but execute it ourselves with our timed-out,
+        // reused client, using the modern AES128GCM encoding (the library's PushService.send()
+        // defaults to the legacy AESGCM encoding, which some push relays no longer accept).
+        HttpPost post = pushService.preparePost(notification, Encoding.AES128GCM);
+        try (CloseableHttpResponse response = pushHttpClient.execute(post)) {
+            int statusCode = response.getStatusLine().getStatusCode();
+            logger.info("Push notification sent. Status: {}, Response: {}", statusCode, response);
 
-        int statusCode = response.getStatusLine().getStatusCode();
-        logger.info("Push notification sent. Status: {}, Response: {}", statusCode, response);
+            if (statusCode != 201 && statusCode != 200 && statusCode != 404 && statusCode != 410) {
+                logger.error("Push notification failed with status {}: {}", statusCode,
+                        response.getEntity() != null ? EntityUtils.toString(response.getEntity()) : "");
+            }
 
-        if (statusCode != 201 && statusCode != 200 && statusCode != 404 && statusCode != 410) {
-            logger.error("Push notification failed with status {}: {}", statusCode, response.getEntity().getContent());
+            return statusCode;
         }
-
-        return statusCode;
     }
 
     private static KeyPair loadKey() {

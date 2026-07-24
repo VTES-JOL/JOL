@@ -28,6 +28,8 @@ public class Subscription {
     private String key;
     @Setter
     private String endpoint;
+    @Setter
+    private int failureCount = 0;
 
     public Subscription() {}
 
