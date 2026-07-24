@@ -134,6 +134,7 @@ let ws = null;
 let wsConnected = false;
 let wsHeartbeat = null;
 let wsReconnect = null;
+let wsPongTimeout = null;
 let player = null;
 let currentPage = 'main';
 let USER_TIMEZONE = moment.tz.guess();
@@ -184,6 +185,17 @@ $(document).ready(function () {
         const t = e.state && e.state.target ? e.state.target : 'main';
         navigateOrInit(t);
     });
+    // A backgrounded/suspended tab can lose its WebSocket silently (no onclose
+    // fires until the OS actually tears down the socket), so wsConnected can be
+    // stale. When the tab becomes visible again, reconnect if needed and always
+    // do one catch-up round trip so we don't miss anything sent while away.
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState !== 'visible') return;
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            initWebSocket();
+        }
+        resync();
+    });
 });
 
 function init(data) {
@@ -212,16 +224,25 @@ function initWebSocket() {
     ws = new WebSocket(url);
 
     ws.onopen = () => {
+        const wasConnected = wsConnected;
         wsConnected = true;
         $("#wsStatus").addClass("d-none");
         if (refresher) clearTimeout(refresher);
         console.log('[WS] Connected — push notifications active, polling suspended');
         // Re-join the game room if we're already on a game page (e.g. after reconnect)
         if (currentPage === 'game' && game) wsJoinGame(game);
+        // Catch up on anything that happened while disconnected (e.g. tab was
+        // backgrounded and the socket died silently, without an onclose event).
+        if (!wasConnected) resync();
         if (wsHeartbeat) clearInterval(wsHeartbeat);
         wsHeartbeat = setInterval(() => {
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({type: 'ping'}));
+                if (wsPongTimeout) clearTimeout(wsPongTimeout);
+                wsPongTimeout = setTimeout(() => {
+                    console.warn('[WS] Pong timeout — connection appears dead, forcing reconnect');
+                    if (ws) ws.close();
+                }, 10000);
             }
         }, 30000);
     };
@@ -229,6 +250,10 @@ function initWebSocket() {
     ws.onmessage = (evt) => {
         const msg = JSON.parse(evt.data);
         if (msg.type === 'pong') {
+            if (wsPongTimeout) {
+                clearTimeout(wsPongTimeout);
+                wsPongTimeout = null;
+            }
             if (msg.version) checkVersion(msg.version);
             return;
         }
@@ -254,17 +279,17 @@ function initWebSocket() {
             clearInterval(wsHeartbeat);
             wsHeartbeat = null;
         }
+        if (wsPongTimeout) {
+            clearTimeout(wsPongTimeout);
+            wsPongTimeout = null;
+        }
         if (evt.code === 1008 || evt.reason === 'Unauthorized') {
             location.href = '/jol/login';
             return;
         }
         $("#wsStatus").removeClass("d-none");
         console.log('[WS] Connection closed (code=' + evt.code + '), falling back to polling, reconnecting in 5s');
-        if (currentPage === 'main') {
-            DS.doPoll({callback: processData, errorHandler: errorhandler});
-        } else if (currentPage === 'game' && game) {
-            refreshState(false);
-        }
+        resync();
         wsReconnect = setTimeout(initWebSocket, 5000);
     };
 
@@ -272,6 +297,15 @@ function initWebSocket() {
         console.error('[WS] Connection error', evt);
         ws.close();
     };
+}
+
+// Single catch-up round trip for whatever page is currently showing.
+function resync() {
+    if (currentPage === 'main') {
+        DS.doPoll({callback: processData, errorHandler: errorhandler});
+    } else if (currentPage === 'game' && game) {
+        refreshState(false);
+    }
 }
 
 function setPreferences(value) {
