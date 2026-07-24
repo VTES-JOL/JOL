@@ -100,8 +100,8 @@ public class AdminResource extends BaseResource {
     }
 
     @GET
-    @Path("stats")
-    public Map<String, List<String>> getStatsPerPlayer() {
+    @Path("stats/{treshold}")
+    public Map<String, List<String>> getStatsPerPlayer(@PathParam("treshold") int treshold) {
         Map<OffsetDateTime, GameHistory> history = HistoryService.getHistory();
         Map<String, Integer> gw = new HashMap<>();
         Map<String, Double> vp = new HashMap<>();
@@ -138,10 +138,11 @@ public class AdminResource extends BaseResource {
                         Function.identity(),
                         key -> Stream.of(
                                         String.valueOf(games.get(key)),
-                                        String.valueOf(gw.get(key) == null ? "-" :gw.get(key)),
-                                        String.valueOf(vp.get(key) == null ? "-" :vp.get(key)),
-                                        gw.get(key) != null ? Math.round((Double.valueOf(gw.get(key)) / Double.valueOf(games.get(key))) * 100) +"%" : "0%",
+                                        String.valueOf(gw.get(key) == null ? "-" : gw.get(key)),
+                                        String.valueOf(vp.get(key) == null ? "-" : vp.get(key)),
+                                        gw.get(key) != null ? Math.round((Double.valueOf(gw.get(key)) / Double.valueOf(games.get(key))) * 100) + "%" : "0%",
                                         String.valueOf(Math.floor(vp.get(key) / Double.valueOf(games.get(key)) * 100) / 100))
+                                .filter( value -> games.get(key) >= treshold)
                                 .toList()));
     }
 

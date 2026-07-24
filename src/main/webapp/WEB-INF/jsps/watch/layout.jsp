@@ -56,7 +56,10 @@
                 <thead>
                 <tr>
                     <th>Player <i class="bi bi-filter" onclick="sortTable(0)"></i></th>
-                    <th>Number of Games <i class="bi bi-filter" onclick="sortTable(1)"></i></th>
+                    <th>Number of Games <i class="bi bi-filter" onclick="sortTable(1)"></i>
+                        <input type="number" id="gameThreshold" min="0" value="0"
+                               oninput="renderStats(document.getElementById('gameThreshold').value)" style="width: 45px; height: 25px;">
+                    </th>
                     <th>GW Total <i class="bi bi-filter" onclick="sortTable(2)"></i></th>
                     <th>VP Total <i class="bi bi-filter" onclick="sortTable(3)"></i></th>
                     <th>% Win Rate <i class="bi bi-filter" onclick="sortPercentageTable(4)"></i></th>

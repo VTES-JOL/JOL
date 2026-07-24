@@ -88,7 +88,7 @@ const DS = {
     setMessage:              (message, opts) => apiPost('/admin/message', {message}, opts),
     getVekn:                 (playerName, opts) => apiGet(`/admin/player/${_enc(playerName)}/vekn`, opts),
     exportPastGamesAsCsv:    (opts) => apiGetText('/admin/export/games.csv', opts),
-    stats:                   (opts) => apiGet('/admin/stats', opts),
+    stats:                   (treshold, opts) => apiGet(`/admin/stats/${_enc(treshold)}`, opts),
     updateSiteNotes:         (notes, opts) => apiPut('/admin/site-notes', {notes}, opts),
     clearSiteNotes:          (opts) => apiDel('/admin/site-notes', opts),
 
@@ -313,7 +313,7 @@ function checkVersion(newVersion) {
 function callbackAllGames(data) {
     renderActiveGames(data.games);
     renderPastGames(data.history);
-    renderStats();
+    renderStats(0);
 }
 
 $(document).on('shown.bs.tab', '[data-bs-target="#pastGamesPane"]', function () {
@@ -3022,24 +3022,26 @@ function exportCsv() {
     DS.exportPastGamesAsCsv({callback: (data) => createCsvDownloadLink(data, 'past-games.csv'), errorHandler: errorhandler});
 }
 
-function renderStats() {
-    DS.stats({callback: (data) => createStats(data), errorHandler: errorhandler});
+function renderStats(treshold) {
+    DS.stats(treshold,{callback: (data) => createStats(data), errorHandler: errorhandler});
 }
 
 function createStats(stats) {
     let statsGames = $("#statsGames tbody");
     statsGames.empty();
     $.each(stats, function (index, playerEntry) {
-        let playerRow = $("<tr/>");
-        playerRow.addClass("border-top")
-        let playerName = $("<td/>").text(index);
-        let games = $("<td/>").text(playerEntry[0]);
-        let gw = $("<td/>").text(playerEntry[1]);
-        let vp = $("<td/>").text(playerEntry[2]);
-        let gwRat = $("<td/>").text(playerEntry[3]);
-        let vpRat = $("<td/>").text(playerEntry[4]);
-        playerRow.append(playerName, games, gw, vp, gwRat, vpRat);
-        statsGames.append(playerRow);
+        if(playerEntry.length > 0) {
+            let playerRow = $("<tr/>");
+            playerRow.addClass("border-top")
+            let playerName = $("<td/>").text(index);
+            let games = $("<td/>").text(playerEntry[0]);
+            let gw = $("<td/>").text(playerEntry[1]);
+            let vp = $("<td/>").text(playerEntry[2]);
+            let gwRat = $("<td/>").text(playerEntry[3]);
+            let vpRat = $("<td/>").text(playerEntry[4]);
+            playerRow.append(playerName, games, gw, vp, gwRat, vpRat);
+            statsGames.append(playerRow);
+        }
     })
 }
 
