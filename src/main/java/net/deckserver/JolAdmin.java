@@ -55,9 +55,7 @@ public class JolAdmin {
         if (name == null) {
             return new PlayerModel(null, false);
         } else {
-            PlayerModel playerModel = pmap.computeIfAbsent(name, k -> new PlayerModel(k, true));
-            GlobalChatService.subscribe(playerModel);
-            return playerModel;
+            return pmap.computeIfAbsent(name, k -> new PlayerModel(k, true));
         }
     }
 

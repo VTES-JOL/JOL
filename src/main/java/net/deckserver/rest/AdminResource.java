@@ -117,7 +117,7 @@ public class AdminResource extends BaseResource {
                 //VP
                 if(vp.containsKey(player.getPlayerName())){
                     vp.put(player.getPlayerName(), vp.get(player.getPlayerName()) + player.getVictoryPoints());
-                } else if( !vp.containsKey(player.getPlayerName())) {
+                } else {
                     vp.put(player.getPlayerName(), player.getVictoryPoints());
                 }
                 //Games
@@ -138,6 +138,10 @@ public class AdminResource extends BaseResource {
                         Function.identity(),
                         key -> Stream.of(
                                         String.valueOf(games.get(key)),
+                                        String.valueOf(gw.get(key) == null ? "-" :gw.get(key)),
+                                        String.valueOf(vp.get(key) == null ? "-" :vp.get(key)),
+                                        gw.get(key) != null ? Math.round((Double.valueOf(gw.get(key)) / Double.valueOf(games.get(key))) * 100) +"%" : "-",
+                                        String.format("%.2f", vp.get(key) / Double.valueOf(games.get(key))))
                                         String.valueOf(gw.get(key) == null ? "-" : gw.get(key)),
                                         String.valueOf(vp.get(key) == null ? "-" : vp.get(key)),
                                         gw.get(key) != null ? Math.round((Double.valueOf(gw.get(key)) / Double.valueOf(games.get(key))) * 100) + "%" : "0%",
