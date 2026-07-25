@@ -88,7 +88,7 @@ const DS = {
     setMessage:              (message, opts) => apiPost('/admin/message', {message}, opts),
     getVekn:                 (playerName, opts) => apiGet(`/admin/player/${_enc(playerName)}/vekn`, opts),
     exportPastGamesAsCsv:    (opts) => apiGetText('/admin/export/games.csv', opts),
-    stats:                   (treshold, opts) => apiGet(`/admin/stats/${_enc(treshold)}`, opts),
+    stats:                   (treshold, fromDate, toDate, opts) => apiPost(`/admin/stats`, {treshold, fromDate, toDate}, opts),
     updateSiteNotes:         (notes, opts) => apiPut('/admin/site-notes', {notes}, opts),
     clearSiteNotes:          (opts) => apiDel('/admin/site-notes', opts),
 
@@ -347,7 +347,7 @@ function checkVersion(newVersion) {
 function callbackAllGames(data) {
     renderActiveGames(data.games);
     renderPastGames(data.history);
-    renderStats(0);
+    renderStats();
 }
 
 $(document).on('shown.bs.tab', '[data-bs-target="#pastGamesPane"]', function () {
@@ -3056,8 +3056,24 @@ function exportCsv() {
     DS.exportPastGamesAsCsv({callback: (data) => createCsvDownloadLink(data, 'past-games.csv'), errorHandler: errorhandler});
 }
 
-function renderStats(treshold) {
-    DS.stats(treshold,{callback: (data) => createStats(data), errorHandler: errorhandler});
+function renderStatsFor(from, to) {
+    $('#fromDate').val(from);
+    $('#toDate').val(to);
+    renderStats();
+}
+
+function renderStats() {
+    let treshold = $('#gameThreshold').val();
+    let fromDate = $('#fromDate').val();
+    let toDate = $('#toDate').val();
+
+    DS.stats(treshold, fromDate, toDate, {
+        callback: (data) => {
+            createStats(data);
+            filterPlayer();
+        },
+        errorHandler: errorhandler
+    });
 }
 
 function createStats(stats) {
@@ -3172,4 +3188,19 @@ function sortPercentageTable(columnIndex) {
     });
 
     rows.forEach(row => tbody.appendChild(row));
+}
+
+function filterPlayer() {
+    const filter = document.getElementById("playerNameFilter").value.toLowerCase();
+    const rows = document.querySelectorAll("#statsGames tbody tr");
+
+    rows.forEach(row => {
+        const name = row.querySelector("td:nth-child(1)").textContent.toLowerCase();
+
+        if (name.includes(filter)) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
 }

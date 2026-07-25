@@ -51,23 +51,62 @@
                 <tbody></tbody>
             </table>
         </div>
-        <div class="tab-pane fade" id="statGamesPane" role="tabpanel">
-            <table id="statsGames" class="table table-sm table-hover mb-0">
-                <thead>
-                <tr>
-                    <th>Player <i class="bi bi-filter" onclick="sortTable(0)"></i></th>
-                    <th>Number of Games <i class="bi bi-filter" onclick="sortTable(1)"></i>
-                        <input type="number" id="gameThreshold" min="0" value="0"
-                               oninput="renderStats(document.getElementById('gameThreshold').value)" style="width: 45px; height: 25px;">
-                    </th>
-                    <th>GW Total <i class="bi bi-filter" onclick="sortTable(2)"></i></th>
-                    <th>VP Total <i class="bi bi-filter" onclick="sortTable(3)"></i></th>
-                    <th>% Win Rate <i class="bi bi-filter" onclick="sortPercentageTable(4)"></i></th>
-                    <th>Average VP <i class="bi bi-filter" onclick="sortTable(5)"></i></th>
-                </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+        <div class="tab-pane fade overflow-hidden" id="statGamesPane" role="tabpanel">
+            <div class="container mt-3">
+                <div class="row align-items-center g-2">
+                    <div class="col-auto">
+                        <label for="fromDate" class="form-label mb-0">From</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" class="form-control" id="fromDate">
+                    </div>
+
+                    <div class="col-auto">
+                        <label for="toDate" class="form-label mb-0">To</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" class="form-control" id="toDate">
+                    </div>
+
+                    <div class="col-auto">
+                        <button onclick="renderStats()" type="button" class="btn btn-outline-secondary btn-sm">Search</button>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                onclick="renderStatsFor(new Date().getFullYear()-1 + '-01-01', new Date().getFullYear()-1 + '-12-31')">
+                            Last Year
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                onclick="renderStatsFor(new Date().getFullYear() + '-01-01', new Date().getFullYear() + '-12-31')">
+                            Current Year
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="overflow-auto" style="max-height: 100vh;">
+                <table id="statsGames" class="table table-sm mb-0">
+                    <thead>
+                    <tr>
+                        <th class="sticky-top bg-white">Player
+                            <input type="text" id="playerNameFilter"
+                                   oninput="filterPlayer()">
+                            <i class="bi bi-filter" onclick="sortTable(0)"></i></th>
+                        <th class="sticky-top bg-white">Number of Games
+                            <input type="number" id="gameThreshold" min="0" value="0"
+                                   oninput="renderStats()" style="width: 45px; height: 25px;">
+                            <i class="bi bi-filter" onclick="sortTable(1)"></i>
+                        </th>
+                        <th class="sticky-top bg-white">GW Total <i class="bi bi-filter" onclick="sortTable(2)"></i></th>
+                        <th class="sticky-top bg-white">VP Total <i class="bi bi-filter" onclick="sortTable(3)"></i></th>
+                        <th class="sticky-top bg-white">% Win Rate <i class="bi bi-filter" onclick="sortPercentageTable(4)"></i></th>
+                        <th class="sticky-top bg-white">Average VP <i class="bi bi-filter" onclick="sortTable(5)"></i></th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
