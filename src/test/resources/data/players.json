@@ -9,7 +9,8 @@
     "countryCode" : null,
     "roles" : [ ],
     "showImages" : true,
-    "edgeColor" : "#FFFFFF"
+    "edgeColor" : "#FFFFFF",
+    "notificationsEnabled" : false
   },
   "Player5" : {
     "name" : "Player5",
@@ -21,7 +22,8 @@
     "countryCode" : null,
     "roles" : [ "ADMIN", "PLAYTESTER" ],
     "showImages" : true,
-    "edgeColor" : "#FFFFFF"
+    "edgeColor" : "#FFFFFF",
+    "notificationsEnabled" : false
   },
   "Player8" : {
     "name" : "Player8",
@@ -33,7 +35,8 @@
     "countryCode" : "AU",
     "roles" : [ "PLAYTESTER" ],
     "showImages" : true,
-    "edgeColor" : "#FFFFFF"
+    "edgeColor" : "#FFFFFF",
+    "notificationsEnabled" : false
   },
   "Player7" : {
     "name" : "Player7",
@@ -45,7 +48,8 @@
     "countryCode" : "GB",
     "roles" : [ "SUPER_USER", "PLAYTESTER" ],
     "showImages" : true,
-    "edgeColor" : "#FFFFFF"
+    "edgeColor" : "#FFFFFF",
+    "notificationsEnabled" : false
   },
   "Player2" : {
     "name" : "Player2",
@@ -55,9 +59,10 @@
     "discordId" : "",
     "veknId" : "222222",
     "countryCode" : "AU",
-    "roles" : [ "ADMIN", "JUDGE", "TOURNAMENT_ADMIN", "PLAYTESTER" ],
+    "roles" : [ "JUDGE", "TOURNAMENT_ADMIN", "ADMIN", "PLAYTESTER" ],
     "showImages" : true,
-    "edgeColor" : "#FFFFFF"
+    "edgeColor" : "#FFFFFF",
+    "notificationsEnabled" : false
   },
   "Player1" : {
     "name" : "Player1",
@@ -69,7 +74,8 @@
     "countryCode" : "US",
     "roles" : [ "JUDGE", "SUPER_USER", "PLAYTESTER" ],
     "showImages" : true,
-    "edgeColor" : "#FFFFFF"
+    "edgeColor" : "#FFFFFF",
+    "notificationsEnabled" : false
   },
   "Player4" : {
     "name" : "Player4",
@@ -81,7 +87,8 @@
     "countryCode" : "AU",
     "roles" : [ "PLAYTESTER" ],
     "showImages" : true,
-    "edgeColor" : "#FFFFFF"
+    "edgeColor" : "#FFFFFF",
+    "notificationsEnabled" : false
   },
   "Player3" : {
     "name" : "Player3",
@@ -93,6 +100,7 @@
     "countryCode" : "GB",
     "roles" : [ "SUPER_USER", "PLAYTESTER" ],
     "showImages" : true,
-    "edgeColor" : "#FFFFFF"
+    "edgeColor" : "#FFFFFF",
+    "notificationsEnabled" : false
   }
 }

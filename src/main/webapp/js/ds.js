@@ -79,8 +79,10 @@ const DS = {
     // User profile
     updateProfile:           (email, discordID, veknID, country, opts) => apiPut('/user/profile', {email, discordID, veknID, country}, opts),
     changePassword:          (newPassword, opts) => apiPut('/user/password', {newPassword}, opts),
-    setUserPreferences:      (imageTooltips, opts) => apiPut('/user/preferences', {imageTooltips}, opts),
+    setUserPreferences:      (imageTooltips, notificationsEnabled, opts) => apiPut('/user/preferences', {imageTooltips, notificationsEnabled}, opts),
     setEdgeColor:            (color, opts) => apiPut('/user/edge-color', {color}, opts),
+    addSubscription:         (subscription, opts) => apiPost('/subscription', subscription, opts),
+    removeSubscription:      (endpoint, opts) => apiCall('DELETE', '/subscription', {endpoint}, opts),
 
     // Admin
     setRole:                 (player, role, value, opts) => apiPut(`/admin/player/${_enc(player)}/role`, {role, value}, opts),
@@ -88,6 +90,9 @@ const DS = {
     setMessage:              (message, opts) => apiPost('/admin/message', {message}, opts),
     getVekn:                 (playerName, opts) => apiGet(`/admin/player/${_enc(playerName)}/vekn`, opts),
     exportPastGamesAsCsv:    (opts) => apiGetText('/admin/export/games.csv', opts),
+    stats:                   (treshold, fromDate, toDate, opts) => apiPost(`/admin/stats`, {treshold, fromDate, toDate}, opts),
+    updateSiteNotes:         (notes, opts) => apiPut('/admin/site-notes', {notes}, opts),
+    clearSiteNotes:          (opts) => apiDel('/admin/site-notes', opts),
 
     // Tournament
     createTournament:        (tourName, regStart, regEnd, playStart, playEnd, tourFormat, gameFormat, rules, specRulesCon, specRules, numberOfRounds, reqId, originalName, opts) =>
@@ -131,6 +136,7 @@ let ws = null;
 let wsConnected = false;
 let wsHeartbeat = null;
 let wsReconnect = null;
+let wsPongTimeout = null;
 let player = null;
 let currentPage = 'main';
 let USER_TIMEZONE = moment.tz.guess();
@@ -147,12 +153,13 @@ let profile = {
     imageTooltipPreference: true,
     edgeColor: "#FFFFFF"
 };
-let subscribed =  localStorage.getItem("notifications-subscribed") === "true";
+let swRegistration = null;
 
 let pointerCanHover = window.matchMedia("(hover: hover)").matches;
 let scrollChat = false;
 let lastReceivedGlobalNotes = null;
 let lastReceivedPrivateNotes = null;
+let lastReceivedSiteNotes = null;
 const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
 function errorhandler(errorString) {
@@ -179,6 +186,17 @@ $(document).ready(function () {
     window.addEventListener('popstate', function(e) {
         const t = e.state && e.state.target ? e.state.target : 'main';
         navigateOrInit(t);
+    });
+    // A backgrounded/suspended tab can lose its WebSocket silently (no onclose
+    // fires until the OS actually tears down the socket), so wsConnected can be
+    // stale. When the tab becomes visible again, reconnect if needed and always
+    // do one catch-up round trip so we don't miss anything sent while away.
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState !== 'visible') return;
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            initWebSocket();
+        }
+        resync();
     });
 });
 
@@ -208,16 +226,25 @@ function initWebSocket() {
     ws = new WebSocket(url);
 
     ws.onopen = () => {
+        const wasConnected = wsConnected;
         wsConnected = true;
         $("#wsStatus").addClass("d-none");
         if (refresher) clearTimeout(refresher);
         console.log('[WS] Connected — push notifications active, polling suspended');
         // Re-join the game room if we're already on a game page (e.g. after reconnect)
         if (currentPage === 'game' && game) wsJoinGame(game);
+        // Catch up on anything that happened while disconnected (e.g. tab was
+        // backgrounded and the socket died silently, without an onclose event).
+        if (!wasConnected) resync();
         if (wsHeartbeat) clearInterval(wsHeartbeat);
         wsHeartbeat = setInterval(() => {
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({type: 'ping'}));
+                if (wsPongTimeout) clearTimeout(wsPongTimeout);
+                wsPongTimeout = setTimeout(() => {
+                    console.warn('[WS] Pong timeout — connection appears dead, forcing reconnect');
+                    if (ws) ws.close();
+                }, 10000);
             }
         }, 30000);
     };
@@ -225,6 +252,10 @@ function initWebSocket() {
     ws.onmessage = (evt) => {
         const msg = JSON.parse(evt.data);
         if (msg.type === 'pong') {
+            if (wsPongTimeout) {
+                clearTimeout(wsPongTimeout);
+                wsPongTimeout = null;
+            }
             if (msg.version) checkVersion(msg.version);
             return;
         }
@@ -250,17 +281,17 @@ function initWebSocket() {
             clearInterval(wsHeartbeat);
             wsHeartbeat = null;
         }
+        if (wsPongTimeout) {
+            clearTimeout(wsPongTimeout);
+            wsPongTimeout = null;
+        }
         if (evt.code === 1008 || evt.reason === 'Unauthorized') {
             location.href = '/jol/login';
             return;
         }
         $("#wsStatus").removeClass("d-none");
         console.log('[WS] Connection closed (code=' + evt.code + '), falling back to polling, reconnecting in 5s');
-        if (currentPage === 'main') {
-            DS.doPoll({callback: processData, errorHandler: errorhandler});
-        } else if (currentPage === 'game' && game) {
-            refreshState(false);
-        }
+        resync();
         wsReconnect = setTimeout(initWebSocket, 5000);
     };
 
@@ -268,6 +299,15 @@ function initWebSocket() {
         console.error('[WS] Connection error', evt);
         ws.close();
     };
+}
+
+// Single catch-up round trip for whatever page is currently showing.
+function resync() {
+    if (currentPage === 'main') {
+        DS.doPoll({callback: processData, errorHandler: errorhandler});
+    } else if (currentPage === 'game' && game) {
+        refreshState(false);
+    }
 }
 
 function setPreferences(value) {
@@ -309,6 +349,7 @@ function checkVersion(newVersion) {
 function callbackAllGames(data) {
     renderActiveGames(data.games);
     renderPastGames(data.history);
+    renderStats();
 }
 
 $(document).on('shown.bs.tab', '[data-bs-target="#pastGamesPane"]', function () {
@@ -427,6 +468,22 @@ function callbackAdmin(data) {
             idleGameList.append(row);
         })
     })
+
+    let siteNotesText = $("#siteNotesText");
+    if (data.siteNotes !== lastReceivedSiteNotes && document.activeElement !== siteNotesText[0]) {
+        lastReceivedSiteNotes = data.siteNotes;
+        siteNotesText.val(data.siteNotes);
+    }
+}
+
+function adminSaveSiteNotes() {
+    DS.updateSiteNotes($("#siteNotesText").val(), {callback: processData, errorHandler: errorhandler});
+}
+
+function adminClearSiteNotes() {
+    if (confirm("Clear the site notes?")) {
+        DS.clearSiteNotes({callback: processData, errorHandler: errorhandler});
+    }
 }
 
 function adminChangeGame() {
@@ -440,9 +497,10 @@ function rollbackChangeGame() {
 }
 
 function rollbackGame() {
-    let currentGame = $("#rollbackGamesList option:selected").text();
+    let currentGame = $("#rollbackGamesList").val();
+    let currentGameName = $("#rollbackGamesList option:selected").text();
     let currentTurn = $("#rollbackTurnsList").val();
-    if (confirm("Are you sure you want to rollback to turn " + currentTurn + " for " + currentGame)) {
+    if (confirm("Are you sure you want to rollback to turn " + currentTurn + " for " + currentGameName)) {
         DS.rollbackGame(currentGame, currentTurn, {callback: processData, errorHandler: errorhandler});
     }
 }
@@ -1554,22 +1612,6 @@ function callbackSaveButton(isStarted) {
     }
 }
 
-function filterChooseDeck() {
-    var input, filter, a, i;
-    input = document.getElementById('searchDeckInput');
-    filter = input.value.toUpperCase();
-    var div = document.getElementById("chooseDeckDropdown");
-    a = div.getElementsByTagName('a');
-    for (i = 0; i < a.length; i++) {
-        var txtValue = a[i].textContent || a[i].innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            a[i].style.display = '';
-        } else {
-            a[i].style.display = 'none';
-        }
-    }
-}
-
 function createTournamentTables() {
     if (confirm("Are you sure you want to create the Tournament Tables?")) {
         let tournamentSelected = $("#nameOfTournament option:selected").text();
@@ -1764,14 +1806,9 @@ function showFinalsTournamentDetail(tournament) {
     $("#finalsTourDetail").removeClass("d-none");
 }
 
-function registerForTournament(deckRow, deck) {
-    let game = $(deckRow).closest('[data-name]').data('name');
-    DS.registerTournamentDeck(game, deck, {callback: processData, errorHandler: errorhandler});
-}
-
 function setImageTooltip() {
     profile.imageTooltipPreference = $("#imageTooltips").is(':checked');
-    DS.setUserPreferences(profile.imageTooltipPreference, {callback: processData, errorHandler: errorhandler});
+    DS.setUserPreferences(profile.imageTooltipPreference, profile.notificationsEnabled, {callback: processData, errorHandler: errorhandler});
 }
 
 function setEdgeColor() {
@@ -1804,7 +1841,9 @@ function callbackProfile(data) {
 
     $("#edgecolorpicker").val(data.edgeColor);
 
-    if (subscribed) {
+    if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+        $("#enableNotifications").prop("disabled", true).closest(".form-check").attr("title", "Notifications are not supported in this browser.");
+    } else if (data.notificationsEnabled) {
         $("#enableNotifications").prop("checked", true);
     }
 
@@ -1815,6 +1854,146 @@ function callbackProfile(data) {
     $('#profileNewPassword').val('');
     $('#profileConfirmPassword').val('');
     updateNavUserDisplay();
+}
+
+// ---------------------------------------------------------------------------
+// Web push notifications
+// ---------------------------------------------------------------------------
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = atob(base64);
+    return Uint8Array.from([...rawData].map(ch => ch.charCodeAt(0)));
+}
+
+function registerServiceWorker() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        return Promise.resolve(null);
+    }
+    if (swRegistration) return Promise.resolve(swRegistration);
+    return navigator.serviceWorker.register('/jol/sw.js')
+        .then(function (registration) {
+            swRegistration = registration;
+            navigator.serviceWorker.addEventListener('message', function (event) {
+                if (event.data && event.data.type === 'notification-navigate' && event.data.url) {
+                    const path = event.data.url.replace(/^\/jol\//, '');
+                    const parts = path.split('/');
+                    const target = parts[0] === 'game' && parts[1] ? 'g' + decodeURIComponent(parts[1]) : (parts[0] || 'main');
+                    doNav(target);
+                }
+            });
+            return registration;
+        })
+        .catch(function (err) {
+            console.warn('Service worker registration failed', err);
+            return null;
+        });
+}
+
+function subscribeToPush() {
+    return registerServiceWorker().then(function (registration) {
+        if (!registration) throw new Error('Push messaging is not supported in this browser.');
+        return registration.pushManager.getSubscription().then(function (existing) {
+            return existing || registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+            });
+        });
+    }).then(function (subscription) {
+        const key = subscription.getKey ? subscription.getKey('p256dh') : null;
+        const auth = subscription.getKey ? subscription.getKey('auth') : null;
+        const subscriptionData = {
+            endpoint: subscription.endpoint,
+            key: key ? btoa(String.fromCharCode.apply(null, new Uint8Array(key))) : '',
+            auth: auth ? btoa(String.fromCharCode.apply(null, new Uint8Array(auth))) : ''
+        };
+        return new Promise(function (resolve, reject) {
+            DS.addSubscription(subscriptionData, {
+                callback: function () { resolve(subscription); },
+                errorHandler: function (err) { reject(new Error(err)); }
+            });
+        });
+    });
+}
+
+function unsubscribeFromPush() {
+    return registerServiceWorker().then(function (registration) {
+        return registration ? registration.pushManager.getSubscription() : null;
+    }).then(function (subscription) {
+        if (!subscription) return null;
+        const endpoint = subscription.endpoint;
+        return subscription.unsubscribe().then(function () {
+            return new Promise(function (resolve) {
+                DS.removeSubscription(endpoint, {callback: resolve, errorHandler: resolve});
+            });
+        });
+    });
+}
+
+function toggleNotifications() {
+    const enabling = $("#enableNotifications").is(":checked");
+    if (enabling) {
+        if (!('Notification' in window)) {
+            alert('Notifications are not supported in this browser.');
+            $("#enableNotifications").prop("checked", false);
+            return;
+        }
+        if (Notification.permission === 'denied') {
+            alert('Notifications are blocked for this site in your browser settings.');
+            $("#enableNotifications").prop("checked", false);
+            return;
+        }
+        Notification.requestPermission().then(function (permission) {
+            if (permission !== 'granted') {
+                $("#enableNotifications").prop("checked", false);
+                return;
+            }
+            subscribeToPush().then(function () {
+                DS.setUserPreferences(profile.imageTooltipPreference, true, {callback: processData, errorHandler: errorhandler});
+            }).catch(function (err) {
+                console.error('Unable to subscribe to push notifications', err);
+                $("#enableNotifications").prop("checked", false);
+            });
+        });
+    } else {
+        unsubscribeFromPush().finally(function () {
+            DS.setUserPreferences(profile.imageTooltipPreference, false, {callback: processData, errorHandler: errorhandler});
+        });
+    }
+}
+
+function enableNotificationsFromBanner() {
+    if (!('Notification' in window)) return;
+    Notification.requestPermission().then(function (permission) {
+        if (permission !== 'granted') return;
+        subscribeToPush().then(function () {
+            $("#enableNotifications").prop("checked", true);
+            $("#notificationsBanner").addClass("d-none");
+        }).catch(function (err) {
+            console.error('Unable to subscribe to push notifications', err);
+        });
+    });
+}
+
+function dismissNotificationsBanner() {
+    localStorage.setItem("notifications-banner-dismissed", "true");
+    $("#notificationsBanner").addClass("d-none");
+}
+
+function checkNotificationBanner(notificationsEnabled, hasSubscriptions) {
+    if (!notificationsEnabled || !hasSubscriptions || localStorage.getItem("notifications-banner-dismissed") === "true") {
+        $("#notificationsBanner").addClass("d-none");
+        return;
+    }
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        return;
+    }
+    registerServiceWorker().then(function (registration) {
+        return registration ? registration.pushManager.getSubscription() : null;
+    }).then(function (subscription) {
+        $("#notificationsBanner").toggleClass("d-none", !!subscription);
+    });
 }
 
 function enterEditMode() {
@@ -1967,6 +2146,12 @@ function callbackMain(data) {
         renderGlobalChat(data.chat);
         renderMyGames("myGames", data.games);
         renderMyGames("oustedGames", data.ousted);
+        if (data.notes) {
+            $("#siteNotesContent").html(data.notes);
+            $("#siteNotesPanel").removeClass("d-none");
+        } else {
+            $("#siteNotesPanel").addClass("d-none");
+        }
         if (refresher) clearTimeout(refresher);
         if (!wsConnected) {
             refresher = setTimeout(() => DS.doPoll({callback: processData, errorHandler: errorhandler}), 5000);
@@ -2071,11 +2256,6 @@ function validate() {
         },
         errorHandler: errorhandler
     })
-}
-
-function toggleVisible(s, h) {
-    $("#" + h).hide();
-    $("#" + s).show();
 }
 
 function doGlobalChat() {
@@ -2326,18 +2506,6 @@ function renderMyGames(id, games) {
     });
 }
 
-function renderPlayer(players, target) {
-    let pinged = players[target] && players[target]["pinged"] ? "<i class='bi-exclamation-triangle ms-1'></i>" : "";
-    let playerName = players[target] ? players[target]["playerName"] : "";
-    let template = `
-        <span class='my-2 px-2 border-end border-start w-100 text-center'>
-            ${playerName}
-            ${pinged}
-        </span>
-    `
-    return $(template);
-}
-
 function renderGameLink(gameEntry) {
     return $("<a/>").text(gameEntry.gameName).on('click', function () {
         doNav("g" + gameEntry.gameId);
@@ -2370,13 +2538,6 @@ function renderOnline(div, who) {
         </div>`;
         container.append(playerDiv);
     });
-
-    if (who.length > 8) {
-        let collapseEl = document.getElementById("onlinePlayersList");
-        if (collapseEl && bootstrap.Collapse) {
-            bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false }).hide();
-        }
-    }
 
     tippy('[data-tippy-content]', { theme: 'light'});
 }
@@ -2471,41 +2632,13 @@ function navigate(data) {
         $("#gameRow").show();
         player = data.player;
         updateNavUserDisplay();
+        checkNotificationBanner(data.notificationsEnabled, data.hasSubscriptions);
     }
     $("#message").html(data.message)
     let timestamp = moment(data.stamp).tz("UTC").format("D-MMM HH:mm z");
     let userTimestamp = moment(data.stamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
     $('#timeStamp').text(timestamp).attr("title", userTimestamp);
     renderDesktopViewButton();
-}
-
-function registerDeck(deckRow, deck) {
-    let game = $(deckRow).closest('[data-name]').data('name');
-    DS.registerDeck(game, deck, {callback: processData, errorHandler: errorhandler});
-}
-
-function doCreateGame() {
-    let newGameDiv = $("#newGameName");
-    let publicFlag = $("#publicFlag").val();
-    let gameName = newGameDiv.val();
-    let format = $("#gameFormat").val();
-    if (gameName.indexOf("\'") > -1 || gameName.indexOf("\"") > -1) {
-        alert("Game name can not contain \' or \" characters in it");
-        return;
-    }
-    DS.createGame(gameName, publicFlag, format, {callback: processData, errorHandler: errorhandler});
-    newGameDiv.val('');
-}
-
-function updateMessage() {
-    let globalMessage = $("#globalMessage");
-    DS.setMessage(globalMessage.val(), {callback: processData, errorHandler: errorhandler});
-}
-
-function invitePlayer() {
-    let game = $("#myGameList").val();
-    let player = $("#playerList").val();
-    DS.invitePlayer(game, player, {callback: processData, errorHandler: errorhandler});
 }
 
 function refreshState(force) {
@@ -2932,6 +3065,45 @@ function exportCsv() {
     DS.exportPastGamesAsCsv({callback: (data) => createCsvDownloadLink(data, 'past-games.csv'), errorHandler: errorhandler});
 }
 
+function renderStatsFor(from, to) {
+    $('#fromDate').val(from);
+    $('#toDate').val(to);
+    renderStats();
+}
+
+function renderStats() {
+    let treshold = $('#gameThreshold').val();
+    let fromDate = $('#fromDate').val();
+    let toDate = $('#toDate').val();
+
+    DS.stats(treshold, fromDate, toDate, {
+        callback: (data) => {
+            createStats(data);
+            filterPlayer();
+        },
+        errorHandler: errorhandler
+    });
+}
+
+function createStats(stats) {
+    let statsGames = $("#statsGames tbody");
+    statsGames.empty();
+    $.each(stats, function (index, playerEntry) {
+        if(playerEntry.length > 0) {
+            let playerRow = $("<tr/>");
+            playerRow.addClass("border-top")
+            let playerName = $("<td/>").text(index);
+            let games = $("<td/>").text(playerEntry[0]);
+            let gw = $("<td/>").text(playerEntry[1]);
+            let vp = $("<td/>").text(playerEntry[2]);
+            let gwRat = $("<td/>").text(playerEntry[3]);
+            let vpRat = $("<td/>").text(playerEntry[4]);
+            playerRow.append(playerName, games, gw, vp, gwRat, vpRat);
+            statsGames.append(playerRow);
+        }
+    })
+}
+
 function toggleMode() {
     const html = $("html");
     const isDark = html.attr("data-bs-theme") !== "dark";
@@ -2977,4 +3149,67 @@ function sortPlayerNames(round) {
             )
         )
         .forEach(li => ul.appendChild(li));
+}
+
+let sortDirection = {};
+
+function sortTable(columnIndex) {
+    const table = document.getElementById("statsGames");
+    const tbody = table.tBodies[0];
+    const rows = Array.from(tbody.rows);
+
+    sortDirection[columnIndex] = !sortDirection[columnIndex];
+
+    rows.sort((a, b) => {
+        let x = a.cells[columnIndex].innerText.toLowerCase();
+        let y = b.cells[columnIndex].innerText.toLowerCase();
+
+        // Numeric sorting
+        if (!isNaN(x) && !isNaN(y)) {
+            x = Number(x);
+            y = Number(y);
+        }
+
+        return sortDirection[columnIndex]
+            ? x > y ? 1 : -1
+            : x < y ? 1 : -1;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function sortPercentageTable(columnIndex) {
+    const table = document.getElementById("statsGames");
+    const tbody = table.tBodies[0];
+    const rows = Array.from(tbody.rows);
+
+    sortDirection[columnIndex] = !sortDirection[columnIndex];
+
+    rows.sort((a, b) => {
+        const aValue = parseFloat(a.cells[columnIndex].innerText.replace("%", ""));
+        const bValue = parseFloat(b.cells[columnIndex].innerText.replace("%", ""));
+
+        if (sortDirection[columnIndex]) {
+            return aValue - bValue; // ascending
+        } else {
+            return bValue - aValue; // descending
+        }
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function filterPlayer() {
+    const filter = document.getElementById("playerNameFilter").value.toLowerCase();
+    const rows = document.querySelectorAll("#statsGames tbody tr");
+
+    rows.forEach(row => {
+        const name = row.querySelector("td:nth-child(1)").textContent.toLowerCase();
+
+        if (name.includes(filter)) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
 }

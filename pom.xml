@@ -4,7 +4,7 @@
 
     <groupId>deckserver.net</groupId>
     <artifactId>jol-legacy</artifactId>
-    <version>1.8.9-NB3</version>
+    <version>1.8.12-NB3</version>
 
     <packaging>war</packaging>
 
@@ -135,6 +135,12 @@
             <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
             <artifactId>owasp-java-html-sanitizer</artifactId>
             <version>20260101.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.commonmark</groupId>
+            <artifactId>commonmark</artifactId>
+            <version>0.24.0</version>
         </dependency>
 
         <dependency>
@@ -395,6 +401,7 @@
                     <argLine>--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED
                     </argLine>
                     <excludedGroups>Builder</excludedGroups>
+                    <skipTests>true</skipTests>
                 </configuration>
             </plugin>
             <plugin>

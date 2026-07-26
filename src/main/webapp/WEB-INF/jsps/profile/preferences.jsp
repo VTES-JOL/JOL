@@ -11,9 +11,9 @@
             <input type="color" id="edgecolorpicker" onchange="setEdgeColor()" style="min-width:44px;height:44px;">
             <label class="form-check-label m-1" for="edgecolorpicker">Choose Edge Color</label>
         </div>
-<%--        <div class="form-check form-switch">--%>
-<%--            <input class="form-check-input" type="checkbox" role="switch" id="enableNotifications" switch onclick="enableNotifications()">--%>
-<%--            <label class="form-check-label" for="enableNotifications">Enable notifications</label>--%>
-<%--        </div>--%>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="enableNotifications" switch onclick="toggleNotifications()">
+            <label class="form-check-label" for="enableNotifications">Enable notifications</label>
+        </div>
     </div>
 </div>

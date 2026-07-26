@@ -43,6 +43,7 @@ The `Builder` tag is excluded from the default test run — these are `CardDatab
 | `ENABLE_CAPTCHA` | Set to `false` for local dev |
 | `JOL_RECAPTCHA_KEY` / `JOL_RECAPTCHA_SECRET` | reCAPTCHA credentials |
 | `DISCORD_BOT_TOKEN` / `DISCORD_PING_CHANNEL_ID` | Discord integration |
+| `VAPID_PUBLIC_KEY` | Web push (VAPID) public key, embedded client-side in `notification.jsp` for `pushManager.subscribe()`. Set via `.keys` (see `docker-compose.yml`'s `env_file`). The matching private key is **not** an env var — `NotificationService` reads it from `<JOL_DATA>/vapid_private.pem`, so that file must be copied into the `JOL_DATA` volume (e.g. from `notifications/vapid_private.pem`) for any environment that needs to send pushes. |
 | `TYPE` | Visual env label (`dev`, `prod`, etc.) |
 
 ## Architecture Overview

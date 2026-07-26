@@ -2,17 +2,17 @@ package net.deckserver.services;
 
 import jakarta.persistence.EntityManager;
 import net.deckserver.dwr.bean.ChatEntryBean;
-import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.entity.GlobalChatEntity;
 import net.deckserver.jpa.repository.GlobalChatRepository;
 import net.deckserver.ws.WebSocketRegistry;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
 public class GlobalChatService extends PersistedService {
 
@@ -21,34 +21,47 @@ public class GlobalChatService extends PersistedService {
 
     private static final GlobalChatRepository globalChatRepository = new GlobalChatRepository();
     private static final GlobalChatService INSTANCE = new GlobalChatService();
-
     private List<ChatEntryBean> chats = new ArrayList<>();
-    private final Set<PlayerModel> playerModels = new HashSet<>();
 
     private GlobalChatService() {
         super("GlobalChatService", 5);
         load();
     }
 
-    public static void subscribe(PlayerModel model) {
-        INSTANCE.playerModels.add(model);
-    }
-
-    public static void chat(String player, String message) {
+    public static synchronized void chat(String player, String message) {
         String sanitize = ParserService.sanitizeText(message);
         String parsedMessage = ParserService.parseGlobalChat(sanitize);
         ChatEntryBean chatEntryBean = new ChatEntryBean(player, parsedMessage);
         INSTANCE.chats.add(chatEntryBean);
         if (INSTANCE.chats.size() > CHAT_STORAGE) {
-            INSTANCE.chats = INSTANCE.chats.subList(CHAT_DISCARD, CHAT_STORAGE);
+            INSTANCE.chats = new ArrayList<>(INSTANCE.chats.subList(CHAT_DISCARD, CHAT_STORAGE));
         }
-        INSTANCE.playerModels.forEach(playerModel -> playerModel.chat(chatEntryBean));
         WebSocketRegistry.notifyMain();
         INSTANCE.jpaWrite(em -> globalChatRepository.insert(em, chatEntryBean));
     }
 
-    public static List<ChatEntryBean> getChats() {
-        return INSTANCE.chats;
+    /** Returns chat entries strictly after the given cursor timestamp (ISO offset date-time), or all entries if cursor is null. */
+    public static synchronized List<ChatEntryBean> getChatsSince(String cursor) {
+        if (cursor == null) {
+            return new ArrayList<>(INSTANCE.chats);
+        }
+        OffsetDateTime cursorTime = OffsetDateTime.parse(cursor, ISO_OFFSET_DATE_TIME);
+        return INSTANCE.chats.stream()
+                .filter(entry -> OffsetDateTime.parse(entry.getTimestamp(), ISO_OFFSET_DATE_TIME).isAfter(cursorTime))
+                .collect(Collectors.toList());
+    }
+
+    /** Non-destructive check for whether any chat entry exists after the given cursor timestamp. */
+    public static synchronized boolean hasChatsSince(String cursor) {
+        if (INSTANCE.chats.isEmpty()) {
+            return false;
+        }
+        if (cursor == null) {
+            return true;
+        }
+        OffsetDateTime cursorTime = OffsetDateTime.parse(cursor, ISO_OFFSET_DATE_TIME);
+        OffsetDateTime lastTime = OffsetDateTime.parse(INSTANCE.chats.get(INSTANCE.chats.size() - 1).getTimestamp(), ISO_OFFSET_DATE_TIME);
+        return lastTime.isAfter(cursorTime);
     }
 
     public static PersistedService getInstance() {

@@ -29,6 +29,13 @@ services:
       - "traefik.http.routers.prod.entrypoints=websecure"
       - "traefik.http.routers.prod.rule=Host(`www.deckserver.net`) || Host(`deckserver.net`)"
       - "traefik.http.routers.prod.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.prod-root-redirect.redirectregex.regex=^(https?://[^/]+)/$$"
+      - "traefik.http.middlewares.prod-root-redirect.redirectregex.replacement=$${1}/jol/"
+      - "traefik.http.middlewares.prod-root-redirect.redirectregex.permanent=true"
+      - "traefik.http.routers.prod-root.entrypoints=websecure"
+      - "traefik.http.routers.prod-root.rule=(Host(`www.deckserver.net`) || Host(`deckserver.net`)) && Path(`/`)"
+      - "traefik.http.routers.prod-root.tls.certresolver=myresolver"
+      - "traefik.http.routers.prod-root.middlewares=prod-root-redirect"
     env_file: .keys
     environment:
       JOL_LOGS: /data

@@ -13,6 +13,9 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#adminIdlePlayersTab" role="tab">Idle Players</button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#adminSiteNotesTab" role="tab">Site Notes</button>
+            </li>
         </ul>
     </div>
     <div class="tab-content">
@@ -31,6 +34,9 @@
         </div>
         <div class="tab-pane fade" id="adminIdlePlayersTab" role="tabpanel">
             <jsp:include page="idle-players.jsp"/>
+        </div>
+        <div class="tab-pane fade" id="adminSiteNotesTab" role="tabpanel">
+            <jsp:include page="site-notes.jsp"/>
         </div>
     </div>
 </div>

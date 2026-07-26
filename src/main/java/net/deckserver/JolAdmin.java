@@ -55,9 +55,7 @@ public class JolAdmin {
         if (name == null) {
             return new PlayerModel(null, false);
         } else {
-            PlayerModel playerModel = pmap.computeIfAbsent(name, k -> new PlayerModel(k, true));
-            GlobalChatService.subscribe(playerModel);
-            return playerModel;
+            return pmap.computeIfAbsent(name, k -> new PlayerModel(k, true));
         }
     }
 
@@ -294,6 +292,17 @@ public class JolAdmin {
             return "#FFFFFF";
         }
         return PlayerService.get(player).getEdgeColor();
+    }
+
+    public static synchronized void setNotificationPreference(String player, boolean value) {
+        PlayerService.get(player).setNotificationsEnabled(value);
+    }
+
+    public static synchronized boolean getNotificationPreference(String player) {
+        if (player == null) {
+            return false;
+        }
+        return PlayerService.get(player).isNotificationsEnabled();
     }
 
     public static synchronized boolean isAdmin(String player) {

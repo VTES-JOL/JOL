@@ -5,6 +5,7 @@ import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;
+import net.deckserver.services.SiteNotesService;
 
 import java.time.OffsetDateTime;
 import java.util.Comparator;
@@ -21,6 +22,7 @@ public class AdminPageBean {
     private final List<String> substitutes;
     private final Map<String, String> games; // id → name
     private final List<GameActivityStatus> idleGames;
+    private final String siteNotes;
 
     public AdminPageBean(PlayerModel model) {
         List<String> currentPlayers = PlayerService.getPlayers().stream().sorted().toList();
@@ -60,5 +62,6 @@ public class AdminPageBean {
                 .filter(gameActivityStatus -> gameActivityStatus.timestamp().isBefore(currentMonth))
                 .sorted(Comparator.comparing(GameActivityStatus::timestamp))
                 .collect(Collectors.toList());
+        this.siteNotes = SiteNotesService.getRawNotes();
     }
 }

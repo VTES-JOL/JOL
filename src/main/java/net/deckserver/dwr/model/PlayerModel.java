@@ -5,23 +5,21 @@ import lombok.Setter;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.game.enums.DeckFormat;
-import net.deckserver.game.enums.GameFormat;
 import net.deckserver.services.DeckService;
 import net.deckserver.services.GlobalChatService;
-import net.deckserver.services.RegistrationService;
 import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
 
 public class PlayerModel {
 
     private final static Logger logger = LoggerFactory.getLogger(PlayerModel.class);
     private final String player;
-    private final List<ChatEntryBean> chats = new ArrayList<>();
+    private String lastSeenChat = null;
     private String game = null;
     @Getter
     private String view;
@@ -66,24 +64,20 @@ public class PlayerModel {
         this.game = null;
     }
 
-    public  void chat(ChatEntryBean chat) {
-        chats.add(chat);
-    }
-
-    public  List<ChatEntryBean> getChat() {
-        List<ChatEntryBean> output = new ArrayList<>(chats);
-        Collections.copy(output, chats);
-        chats.clear();
+    public List<ChatEntryBean> getChat() {
+        List<ChatEntryBean> output = GlobalChatService.getChatsSince(lastSeenChat);
+        if (!output.isEmpty()) {
+            lastSeenChat = output.get(output.size() - 1).getTimestamp();
+        }
         return output;
     }
 
     public void resetChats() {
-        List<ChatEntryBean> globalChat = GlobalChatService.getChats();
-        chats.addAll(globalChat);
+        lastSeenChat = null;
     }
 
     public boolean hasChats() {
-        return !chats.isEmpty();
+        return GlobalChatService.hasChatsSince(lastSeenChat);
     }
 
     public void loadDeck(String deckName) {
