@@ -1599,22 +1599,6 @@ function callbackSaveButton(isStarted) {
     }
 }
 
-function filterChooseDeck() {
-    var input, filter, a, i;
-    input = document.getElementById('searchDeckInput');
-    filter = input.value.toUpperCase();
-    var div = document.getElementById("chooseDeckDropdown");
-    a = div.getElementsByTagName('a');
-    for (i = 0; i < a.length; i++) {
-        var txtValue = a[i].textContent || a[i].innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            a[i].style.display = '';
-        } else {
-            a[i].style.display = 'none';
-        }
-    }
-}
-
 function createTournamentTables() {
     if (confirm("Are you sure you want to create the Tournament Tables?")) {
         let tournamentSelected = $("#nameOfTournament option:selected").text();
@@ -1807,11 +1791,6 @@ function showFinalsTournamentDetail(tournament) {
     });
 
     $("#finalsTourDetail").removeClass("d-none");
-}
-
-function registerForTournament(deckRow, deck) {
-    let game = $(deckRow).closest('[data-name]').data('name');
-    DS.registerTournamentDeck(game, deck, {callback: processData, errorHandler: errorhandler});
 }
 
 function setImageTooltip() {
@@ -2246,11 +2225,6 @@ function validate() {
     DS.validate(contents, validator, {callback: processData, errorHandler: errorhandler})
 }
 
-function toggleVisible(s, h) {
-    $("#" + h).hide();
-    $("#" + s).show();
-}
-
 function doGlobalChat() {
     let chatInput = $("#globalChat");
     let chatLine = chatInput.val();
@@ -2499,18 +2473,6 @@ function renderMyGames(id, games) {
     });
 }
 
-function renderPlayer(players, target) {
-    let pinged = players[target] && players[target]["pinged"] ? "<i class='bi-exclamation-triangle ms-1'></i>" : "";
-    let playerName = players[target] ? players[target]["playerName"] : "";
-    let template = `
-        <span class='my-2 px-2 border-end border-start w-100 text-center'>
-            ${playerName}
-            ${pinged}
-        </span>
-    `
-    return $(template);
-}
-
 function renderGameLink(gameEntry) {
     return $("<a/>").text(gameEntry.gameName).on('click', function () {
         doNav("g" + gameEntry.gameId);
@@ -2642,35 +2604,6 @@ function navigate(data) {
     let userTimestamp = moment(data.stamp).tz(USER_TIMEZONE).format("D-MMM HH:mm z");
     $('#timeStamp').text(timestamp).attr("title", userTimestamp);
     renderDesktopViewButton();
-}
-
-function registerDeck(deckRow, deck) {
-    let game = $(deckRow).closest('[data-name]').data('name');
-    DS.registerDeck(game, deck, {callback: processData, errorHandler: errorhandler});
-}
-
-function doCreateGame() {
-    let newGameDiv = $("#newGameName");
-    let publicFlag = $("#publicFlag").val();
-    let gameName = newGameDiv.val();
-    let format = $("#gameFormat").val();
-    if (gameName.indexOf("\'") > -1 || gameName.indexOf("\"") > -1) {
-        alert("Game name can not contain \' or \" characters in it");
-        return;
-    }
-    DS.createGame(gameName, publicFlag, format, {callback: processData, errorHandler: errorhandler});
-    newGameDiv.val('');
-}
-
-function updateMessage() {
-    let globalMessage = $("#globalMessage");
-    DS.setMessage(globalMessage.val(), {callback: processData, errorHandler: errorhandler});
-}
-
-function invitePlayer() {
-    let game = $("#myGameList").val();
-    let player = $("#playerList").val();
-    DS.invitePlayer(game, player, {callback: processData, errorHandler: errorhandler});
 }
 
 function refreshState(force) {
