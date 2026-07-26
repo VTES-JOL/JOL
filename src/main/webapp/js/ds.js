@@ -89,6 +89,7 @@ const DS = {
     getVekn:                 (playerName, opts) => apiGet(`/admin/player/${_enc(playerName)}/vekn`, opts),
     exportPastGamesAsCsv:    (opts) => apiGetText('/admin/export/games.csv', opts),
     stats:                   (treshold, fromDate, toDate, opts) => apiPost(`/admin/stats`, {treshold, fromDate, toDate}, opts),
+    statsPerDeck:            (treshold, fromDate, toDate, opts) => apiPost(`/admin/stats/deck`, {treshold, fromDate, toDate}, opts),
     updateSiteNotes:         (notes, opts) => apiPut('/admin/site-notes', {notes}, opts),
     clearSiteNotes:          (opts) => apiDel('/admin/site-notes', opts),
 
@@ -3064,19 +3065,45 @@ function renderStatsFor(from, to) {
 
 function renderStats() {
     let treshold = $('#gameThreshold').val();
+    let tresholdDeck = $('#gameThresholdDeck').val();
     let fromDate = $('#fromDate').val();
     let toDate = $('#toDate').val();
 
-    DS.stats(treshold, fromDate, toDate, {
-        callback: (data) => {
-            createStats(data);
-            filterPlayer();
-        },
-        errorHandler: errorhandler
-    });
+    if ($('#playerStatsTab').hasClass('active')) {
+        DS.stats(treshold, fromDate, toDate, {
+            callback: (data) => {
+                createStats(data);
+                filterName('#statsGames tbody tr', 'playerNameFilter', 1);
+            },
+            errorHandler: errorhandler
+        });
+    } else if($('#deckStatsTab').hasClass('active')) {
+        DS.statsPerDeck(tresholdDeck, fromDate, toDate, {
+            callback: (data) => {
+                createStatsPerDeck(data);
+                filterName('#statsDeckGames tbody tr', 'deckNameFilter', 1);
+            }, errorHandler: errorhandler});
+    }
 }
 
-function createStats(stats) {
+function createStatsPerDeck(stats) {
+    let statsGames = $("#statsDeckGames tbody");
+    statsGames.empty();
+    $.each(stats, function (index, deckEntry) {
+        if(deckEntry.length > 0) {
+            let playerRow = $("<tr/>");
+            playerRow.addClass("border-top")
+            let deckName = $("<td/>").text(index);
+            let games = $("<td/>").text(deckEntry[0]);
+            let gw = $("<td/>").text(deckEntry[1]);
+            let vp = $("<td/>").text(deckEntry[2]);
+            let gwRat = $("<td/>").text(deckEntry[3]);
+            let vpRat = $("<td/>").text(deckEntry[4]);
+            playerRow.append(deckName, games, gw, vp, gwRat, vpRat);
+            statsGames.append(playerRow);
+        }
+    })
+}function createStats(stats) {
     let statsGames = $("#statsGames tbody");
     statsGames.empty();
     $.each(stats, function (index, playerEntry) {
@@ -3144,8 +3171,8 @@ function sortPlayerNames(round) {
 
 let sortDirection = {};
 
-function sortTable(columnIndex) {
-    const table = document.getElementById("statsGames");
+function sortTable(columnIndex, id) {
+    const table = document.getElementById(id);
     const tbody = table.tBodies[0];
     const rows = Array.from(tbody.rows);
 
@@ -3169,8 +3196,8 @@ function sortTable(columnIndex) {
     rows.forEach(row => tbody.appendChild(row));
 }
 
-function sortPercentageTable(columnIndex) {
-    const table = document.getElementById("statsGames");
+function sortPercentageTable(columnIndex, id) {
+    const table = document.getElementById(id);
     const tbody = table.tBodies[0];
     const rows = Array.from(tbody.rows);
 
@@ -3190,12 +3217,12 @@ function sortPercentageTable(columnIndex) {
     rows.forEach(row => tbody.appendChild(row));
 }
 
-function filterPlayer() {
-    const filter = document.getElementById("playerNameFilter").value.toLowerCase();
-    const rows = document.querySelectorAll("#statsGames tbody tr");
+function filterName(column, id, index) {
+    const filter = document.getElementById(id).value.toLowerCase();
+    const rows = document.querySelectorAll(column);
 
     rows.forEach(row => {
-        const name = row.querySelector("td:nth-child(1)").textContent.toLowerCase();
+        const name = row.querySelector("td:nth-child("+index+")").textContent.toLowerCase();
 
         if (name.includes(filter)) {
             row.style.display = "";

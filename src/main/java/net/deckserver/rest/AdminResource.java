@@ -19,10 +19,7 @@ import java.io.StringWriter;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -117,7 +114,41 @@ public class AdminResource extends BaseResource {
                 }
             }
         }
+        Set<String> allKeys = Stream.of(games, gw, vp)
+                .flatMap(map -> map.keySet().stream())
+                .collect(Collectors.toSet());
 
+        return allKeys.stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        key -> Stream.of(
+                                        String.valueOf(games.get(key)),
+                                        String.valueOf(gw.get(key) == null ? "-" :gw.get(key)),
+                                        String.valueOf(vp.get(key) == null ? "-" :vp.get(key)),
+                                        gw.get(key) != null ? Math.round((Double.valueOf(gw.get(key)) / Double.valueOf(games.get(key))) * 100) +"%" : "0%",
+                                        String.format("%.2f", vp.get(key) / Double.valueOf(games.get(key))))
+                                .filter( value -> games.get(key) >= body.treshold())
+                                .toList()));
+    }
+
+    @POST
+    @Path("stats/deck")
+    public Map<String, List<String>> getStatsPerDeck(StatsRequest body) {
+        Map<OffsetDateTime, GameHistory> history = HistoryService.getHistory();
+        Map<String, Integer> gw = new HashMap<>();
+        Map<String, String> player = new HashMap<>();
+        Map<String, Double> vp = new HashMap<>();
+        Map<String, Integer> games = new HashMap<>();
+        for (GameHistory game : history.values()) {
+            if(body.fromDate().isEmpty() || body.toDate().isEmpty()) {
+                generateStatsPerDeck(game, gw, vp, games, player);
+            } else {
+                LocalDate ended = OffsetDateTime.parse(game.getEnded()).toLocalDate();
+                if(ended.isAfter(LocalDate.parse(body.fromDate())) && ended.isBefore(LocalDate.parse(body.toDate()))) {
+                    generateStatsPerDeck(game, gw, vp, games, player);
+                }
+            }
+        }
         Set<String> allKeys = Stream.of(games, gw, vp)
                 .flatMap(map -> map.keySet().stream())
                 .collect(Collectors.toSet());
@@ -163,7 +194,6 @@ public class AdminResource extends BaseResource {
     public record StatsRequest(int treshold, String fromDate, String toDate) {}
 
     private void generateStats(GameHistory game, Map<String, Integer> gw, Map<String, Double> vp, Map<String, Integer> games) {
-
         for (PlayerResult player : game.getResults()) {
             String name = player.getPlayerName();
 
@@ -171,6 +201,17 @@ public class AdminResource extends BaseResource {
             vp.merge(name, player.getVictoryPoints() > 6 ? 6: player.getVictoryPoints(), Double::sum);
 
             if (player.isGameWin()) {
+                gw.merge(name, 1, Integer::sum);
+            }
+        }
+    }
+    private void generateStatsPerDeck(GameHistory game, Map<String, Integer> gw, Map<String, Double> vp, Map<String, Integer> games, Map<String, String> player) {
+        for (PlayerResult result : game.getResults()) {
+            String name = result.getDeckName() + " / "+ result.getPlayerName();
+            games.merge(name, 1, Integer::sum);
+            vp.merge(name, result.getVictoryPoints() > 6 ? 6: result.getVictoryPoints(), Double::sum);
+
+            if (result.isGameWin()) {
                 gw.merge(name, 1, Integer::sum);
             }
         }
