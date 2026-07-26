@@ -495,9 +495,10 @@ function rollbackChangeGame() {
 }
 
 function rollbackGame() {
-    let currentGame = $("#rollbackGamesList option:selected").text();
+    let currentGame = $("#rollbackGamesList").val();
+    let currentGameName = $("#rollbackGamesList option:selected").text();
     let currentTurn = $("#rollbackTurnsList").val();
-    if (confirm("Are you sure you want to rollback to turn " + currentTurn + " for " + currentGame)) {
+    if (confirm("Are you sure you want to rollback to turn " + currentTurn + " for " + currentGameName)) {
         DS.rollbackGame(currentGame, currentTurn, {callback: processData, errorHandler: errorhandler});
     }
 }
