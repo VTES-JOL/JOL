@@ -88,7 +88,7 @@ const DS = {
     setMessage:              (message, opts) => apiPost('/admin/message', {message}, opts),
     getVekn:                 (playerName, opts) => apiGet(`/admin/player/${_enc(playerName)}/vekn`, opts),
     exportPastGamesAsCsv:    (opts) => apiGetText('/admin/export/games.csv', opts),
-    stats:                   (opts) => apiGet('/admin/stats', opts),
+    stats:                   (treshold, fromDate, toDate, opts) => apiPost(`/admin/stats`, {treshold, fromDate, toDate}, opts),
     updateSiteNotes:         (notes, opts) => apiPut('/admin/site-notes', {notes}, opts),
     clearSiteNotes:          (opts) => apiDel('/admin/site-notes', opts),
 
@@ -3056,24 +3056,42 @@ function exportCsv() {
     DS.exportPastGamesAsCsv({callback: (data) => createCsvDownloadLink(data, 'past-games.csv'), errorHandler: errorhandler});
 }
 
+function renderStatsFor(from, to) {
+    $('#fromDate').val(from);
+    $('#toDate').val(to);
+    renderStats();
+}
+
 function renderStats() {
-    DS.stats({callback: (data) => createStats(data), errorHandler: errorhandler});
+    let treshold = $('#gameThreshold').val();
+    let fromDate = $('#fromDate').val();
+    let toDate = $('#toDate').val();
+
+    DS.stats(treshold, fromDate, toDate, {
+        callback: (data) => {
+            createStats(data);
+            filterPlayer();
+        },
+        errorHandler: errorhandler
+    });
 }
 
 function createStats(stats) {
     let statsGames = $("#statsGames tbody");
     statsGames.empty();
     $.each(stats, function (index, playerEntry) {
-        let playerRow = $("<tr/>");
-        playerRow.addClass("border-top")
-        let playerName = $("<td/>").text(index);
-        let games = $("<td/>").text(playerEntry[0]);
-        let gw = $("<td/>").text(playerEntry[1]);
-        let vp = $("<td/>").text(playerEntry[2]);
-        let gwRat = $("<td/>").text(playerEntry[3]);
-        let vpRat = $("<td/>").text(playerEntry[4]);
-        playerRow.append(playerName, games, gw, vp, gwRat, vpRat);
-        statsGames.append(playerRow);
+        if(playerEntry.length > 0) {
+            let playerRow = $("<tr/>");
+            playerRow.addClass("border-top")
+            let playerName = $("<td/>").text(index);
+            let games = $("<td/>").text(playerEntry[0]);
+            let gw = $("<td/>").text(playerEntry[1]);
+            let vp = $("<td/>").text(playerEntry[2]);
+            let gwRat = $("<td/>").text(playerEntry[3]);
+            let vpRat = $("<td/>").text(playerEntry[4]);
+            playerRow.append(playerName, games, gw, vp, gwRat, vpRat);
+            statsGames.append(playerRow);
+        }
     })
 }
 
@@ -3122,4 +3140,67 @@ function sortPlayerNames(round) {
             )
         )
         .forEach(li => ul.appendChild(li));
+}
+
+let sortDirection = {};
+
+function sortTable(columnIndex) {
+    const table = document.getElementById("statsGames");
+    const tbody = table.tBodies[0];
+    const rows = Array.from(tbody.rows);
+
+    sortDirection[columnIndex] = !sortDirection[columnIndex];
+
+    rows.sort((a, b) => {
+        let x = a.cells[columnIndex].innerText.toLowerCase();
+        let y = b.cells[columnIndex].innerText.toLowerCase();
+
+        // Numeric sorting
+        if (!isNaN(x) && !isNaN(y)) {
+            x = Number(x);
+            y = Number(y);
+        }
+
+        return sortDirection[columnIndex]
+            ? x > y ? 1 : -1
+            : x < y ? 1 : -1;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function sortPercentageTable(columnIndex) {
+    const table = document.getElementById("statsGames");
+    const tbody = table.tBodies[0];
+    const rows = Array.from(tbody.rows);
+
+    sortDirection[columnIndex] = !sortDirection[columnIndex];
+
+    rows.sort((a, b) => {
+        const aValue = parseFloat(a.cells[columnIndex].innerText.replace("%", ""));
+        const bValue = parseFloat(b.cells[columnIndex].innerText.replace("%", ""));
+
+        if (sortDirection[columnIndex]) {
+            return aValue - bValue; // ascending
+        } else {
+            return bValue - aValue; // descending
+        }
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function filterPlayer() {
+    const filter = document.getElementById("playerNameFilter").value.toLowerCase();
+    const rows = document.querySelectorAll("#statsGames tbody tr");
+
+    rows.forEach(row => {
+        const name = row.querySelector("td:nth-child(1)").textContent.toLowerCase();
+
+        if (name.includes(filter)) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
 }
