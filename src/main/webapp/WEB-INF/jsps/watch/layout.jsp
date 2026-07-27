@@ -69,7 +69,8 @@
                     </div>
 
                     <div class="col-auto">
-                        <button onclick="renderStats()" type="button" class="btn btn-outline-secondary btn-sm">Search</button>
+                        <button onclick="renderStats()" type="button" class="btn btn-outline-secondary btn-sm">Search
+                        </button>
                     </div>
                     <div class="col-auto">
                         <button type="button" class="btn btn-outline-secondary btn-sm"
@@ -83,30 +84,106 @@
                             Current Year
                         </button>
                     </div>
+                    <div class="form-check form-switch col-auto m-2 pt-1">
+                        <input class="form-check-input" type="checkbox" role="switch" id="onlyTournaments" switch="" onclick="renderStats()">
+                        <label class="form-check-label" for="onlyTournaments">Only Tournaments</label>
+                    </div>
                 </div>
             </div>
-            <div class="overflow-auto" style="max-height: 100vh;">
-                <table id="statsGames" class="table table-sm mb-0">
-                    <thead>
-                    <tr>
-                        <th class="sticky-top bg-white">Player
-                            <input type="text" id="playerNameFilter"
-                                   oninput="filterPlayer()">
-                            <i class="bi bi-filter" onclick="sortTable(0)"></i></th>
-                        <th class="sticky-top bg-white">Number of Games
-                            <input type="number" id="gameThreshold" min="0" value="0"
-                                   oninput="renderStats()" style="width: 45px; height: 25px;">
-                            <i class="bi bi-filter" onclick="sortTable(1)"></i>
-                        </th>
-                        <th class="sticky-top bg-white">GW Total <i class="bi bi-filter" onclick="sortTable(2)"></i></th>
-                        <th class="sticky-top bg-white">VP Total <i class="bi bi-filter" onclick="sortTable(3)"></i></th>
-                        <th class="sticky-top bg-white">% Win Rate <i class="bi bi-filter" onclick="sortPercentageTable(4)"></i></th>
-                        <th class="sticky-top bg-white">Average VP <i class="bi bi-filter" onclick="sortTable(5)"></i></th>
-                    </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <ul class="nav nav-tabs mt-3">
+                <li class="nav-item">
+                    <button id="playerStatsTab"
+                            class="nav-link active"
+                            data-bs-toggle="tab"
+                            data-bs-target="#playerStatsPane">
+                        Player Statistics
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button id="deckStatsTab"
+                            class="nav-link"
+                            onclick="renderStats()"
+                            data-bs-toggle="tab"
+                            data-bs-target="#deckStatsPane">
+                        Deck Statistics
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-3">
+
+                <!-- Player Stats -->
+
+                <div class="tab-pane fade show active"
+                     id="playerStatsPane">
+
+                    <div class="overflow-auto" style="max-height:100vh;">
+                        <table id="statsGames" class="table table-sm mb-0">
+                            <thead>
+                            <tr>
+                                <th class="sticky-top bg-white">Player
+                                    <input type="text" id="playerNameFilter"
+                                           oninput="filterName('#statsGames tbody tr', 'playerNameFilter', 1)">
+                                    <i class="bi bi-filter" onclick="sortTable(0, 'statsGames')"></i></th>
+                                <th class="sticky-top bg-white">Number of Games
+                                    <input type="number" id="gameThreshold" min="0" value="0"
+                                           oninput="renderStats()" style="width: 45px; height: 25px;">
+                                    <i class="bi bi-filter" onclick="sortTable(1, 'statsGames')"></i>
+                                </th>
+                                <th class="sticky-top bg-white">GW Total <i class="bi bi-filter"
+                                                                            onclick="sortTable(2, 'statsGames')"></i></th>
+                                <th class="sticky-top bg-white">VP Total <i class="bi bi-filter"
+                                                                            onclick="sortTable(3, 'statsGames')"></i></th>
+                                <th class="sticky-top bg-white">% Win Rate <i class="bi bi-filter"
+                                                                              onclick="sortPercentageTable(4, 'statsGames')"></i></th>
+                                <th class="sticky-top bg-white">Average VP <i class="bi bi-filter"
+                                                                              onclick="sortTable(5), 'statsGames'"></i></th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <!-- Deck Stats -->
+
+                <div class="tab-pane fade"
+                     id="deckStatsPane">
+
+                    <div class="overflow-auto" style="max-height:100vh;">
+                        <table id="statsDeckGames" class="table table-sm mb-0">
+                            <thead>
+                            <tr>
+                                <th class="sticky-top bg-white">Deck / Player
+                                    <input type="text" id="deckNameFilter"
+                                           oninput="filterName('#statsDeckGames tbody tr', 'deckNameFilter', 1)">
+                                    <i class="bi bi-filter" onclick="sortTable(0, 'statsDeckGames')"></i></th>
+                                <th class="sticky-top bg-white">Number of Games
+                                    <input type="number" id="gameThresholdDeck" min="0" value="0"
+                                           oninput="renderStats()" style="width: 45px; height: 25px;">
+                                    <i class="bi bi-filter" onclick="sortTable(1, 'statsDeckGames')"></i>
+                                </th>
+                                <th class="sticky-top bg-white">GW Total <i class="bi bi-filter"
+                                                                            onclick="sortTable(2, 'statsDeckGames')"></i></th>
+                                <th class="sticky-top bg-white">VP Total <i class="bi bi-filter"
+                                                                            onclick="sortTable(3, 'statsDeckGames')"></i></th>
+                                <th class="sticky-top bg-white">% Win Rate <i class="bi bi-filter"
+                                                                              onclick="sortPercentageTable(4, 'statsDeckGames')"></i></th>
+                                <th class="sticky-top bg-white">Average VP <i class="bi bi-filter"
+                                                                              onclick="sortTable(5, 'statsDeckGames')"></i></th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                </div>
+
             </div>
+
         </div>
     </div>
+</div>
 </div>
