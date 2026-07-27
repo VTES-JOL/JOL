@@ -181,7 +181,7 @@ public class GameService extends PersistedService {
         String id = get(gameName).getId();
         JolGame game = loadSnapshot(id, turn);
         saveGameState(game, true);
-        INSTANCE.gameCache.refresh(gameName);
+        INSTANCE.gameCache.refresh(id);
     }
 
     public static void saveGame(JolGame game) {
