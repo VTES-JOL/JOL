@@ -84,6 +84,10 @@
                             Current Year
                         </button>
                     </div>
+                    <div class="form-check form-switch col-auto m-2 pt-1">
+                        <input class="form-check-input" type="checkbox" role="switch" id="onlyTournaments" switch="" onclick="renderStats()">
+                        <label class="form-check-label" for="onlyTournaments">Only Tournaments</label>
+                    </div>
                 </div>
             </div>
             <ul class="nav nav-tabs mt-3">

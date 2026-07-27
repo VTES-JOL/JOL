@@ -88,8 +88,8 @@ const DS = {
     setMessage:              (message, opts) => apiPost('/admin/message', {message}, opts),
     getVekn:                 (playerName, opts) => apiGet(`/admin/player/${_enc(playerName)}/vekn`, opts),
     exportPastGamesAsCsv:    (opts) => apiGetText('/admin/export/games.csv', opts),
-    stats:                   (treshold, fromDate, toDate, opts) => apiPost(`/admin/stats`, {treshold, fromDate, toDate}, opts),
-    statsPerDeck:            (treshold, fromDate, toDate, opts) => apiPost(`/admin/stats/deck`, {treshold, fromDate, toDate}, opts),
+    stats:                   (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/admin/stats`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsPerDeck:            (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/admin/stats/deck`, {treshold, fromDate, toDate, isTourney}, opts),
     updateSiteNotes:         (notes, opts) => apiPut('/admin/site-notes', {notes}, opts),
     clearSiteNotes:          (opts) => apiDel('/admin/site-notes', opts),
 
@@ -3068,9 +3068,10 @@ function renderStats() {
     let tresholdDeck = $('#gameThresholdDeck').val();
     let fromDate = $('#fromDate').val();
     let toDate = $('#toDate').val();
+    let isTourney = $("#onlyTournaments").prop("checked");
 
     if ($('#playerStatsTab').hasClass('active')) {
-        DS.stats(treshold, fromDate, toDate, {
+        DS.stats(treshold, fromDate, toDate, isTourney, {
             callback: (data) => {
                 createStats(data);
                 filterName('#statsGames tbody tr', 'playerNameFilter', 1);
@@ -3078,7 +3079,7 @@ function renderStats() {
             errorHandler: errorhandler
         });
     } else if($('#deckStatsTab').hasClass('active')) {
-        DS.statsPerDeck(tresholdDeck, fromDate, toDate, {
+        DS.statsPerDeck(tresholdDeck, fromDate, toDate, isTourney,{
             callback: (data) => {
                 createStatsPerDeck(data);
                 filterName('#statsDeckGames tbody tr', 'deckNameFilter', 1);
