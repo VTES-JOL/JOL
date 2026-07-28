@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
-@Table(name = "jol_game")
+@Table(name = "game")
 public class GameInfoEntity {
 
     @Id

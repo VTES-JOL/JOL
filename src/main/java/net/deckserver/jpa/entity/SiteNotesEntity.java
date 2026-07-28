@@ -6,7 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "jol_site_notes")
+@Table(name = "site_notes")
 public class SiteNotesEntity {
 
     public static final short SINGLETON_ID = 1;

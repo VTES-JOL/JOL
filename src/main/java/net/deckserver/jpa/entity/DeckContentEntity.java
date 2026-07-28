@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "jol_deck_content")
+@Table(name = "deck_content")
 public class DeckContentEntity {
 
     @Id

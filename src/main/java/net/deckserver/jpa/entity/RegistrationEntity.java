@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "jol_registration")
+@Table(name = "registration")
 public class RegistrationEntity {
 
     @EmbeddedId
@@ -36,7 +36,7 @@ public class RegistrationEntity {
     @Column(name = "registered_at")
     private OffsetDateTime registeredAt;
 
-    // deliberate copy of jol_deck_content: a snapshot of the deck as registered,
+    // deliberate copy of deck_content: a snapshot of the deck as registered,
     // immune to later edits or deletion of the player's deck
     @Column(name = "deck_content", columnDefinition = "TEXT")
     private String deckContent;

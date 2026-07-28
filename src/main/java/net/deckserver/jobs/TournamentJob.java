@@ -35,7 +35,7 @@ public class TournamentJob implements Runnable {
     }
 
     private void checkForDecks() {
-        // Deck content is stored in jol_registration.deck_content — no file copies needed
+        // Deck content is stored in registration.deck_content — no file copies needed
     }
 
     private void startTournament() {

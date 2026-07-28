@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "jol_game_state")
+@Table(name = "game_state")
 public class GameStateEntity {
 
     @Id

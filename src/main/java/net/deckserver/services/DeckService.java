@@ -101,7 +101,7 @@ public class DeckService extends PersistedService {
     }
 
     public static boolean copyDeck(String deckId, String gameId) {
-        // deck content is stored in jol_registration.deck_content at registration time
+        // deck content is stored in registration.deck_content at registration time
         return true;
     }
 

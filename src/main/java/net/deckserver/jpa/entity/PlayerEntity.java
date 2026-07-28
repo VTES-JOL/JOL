@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "jol_player")
+@Table(name = "player")
 public class PlayerEntity {
 
     @Id
@@ -41,7 +41,7 @@ public class PlayerEntity {
     private String edgeColor = "#FFFFFF";
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "jol_player_role",
+    @CollectionTable(name = "player_role",
             joinColumns = @JoinColumn(name = "player_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "role")

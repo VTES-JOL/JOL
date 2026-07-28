@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "jol_deck_info")
+@Table(name = "deck_info")
 public class DeckInfoEntity {
 
     @EmbeddedId
@@ -27,7 +27,7 @@ public class DeckInfoEntity {
     private DeckFormat format;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "jol_deck_format",
+    @CollectionTable(name = "deck_format",
             joinColumns = @JoinColumn(name = "deck_id", referencedColumnName = "deck_id"))
     @Column(name = "format_tag")
     private Set<String> gameFormats = new HashSet<>();

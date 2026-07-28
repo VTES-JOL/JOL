@@ -135,18 +135,18 @@ jq -r 'to_entries[] | [
   (if .value.showImages then "true" else "false" end),
   (.value.edgeColor // "#FFFFFF")
 ] | @csv' "$DATA/players.json" \
-| copy_into jol_player "player_name,player_id,email,password_hash,discord_id,vekn_id,country_code,show_images,edge_color"
+| copy_into player "player_name,player_id,email,password_hash,discord_id,vekn_id,country_code,show_images,edge_color"
 
 # player_id is available directly in players.json — emit it without a staging table
 jq -r 'to_entries[] | .value.id as $id | .value.roles[] | [$id, .] | @csv' "$DATA/players.json" \
-| copy_into jol_player_role "player_id,role"
+| copy_into player_role "player_id,role"
 
 PLAYER_COUNT=$(jq 'length' "$DATA/players.json")
 success "$PLAYER_COUNT players"
 
 # ── 4. Player activity ───────────────────────────────────────────────────────
 log "Loading player activity..."
-# player-timestamps.json is keyed by player_name; join to jol_player to get player_id.
+# player-timestamps.json is keyed by player_name; join to player to get player_id.
 jq -r 'to_entries[] | [.key, .value] | @csv' "$DATA/player-timestamps.json" > "$PLAYER_ACTIVITY_CSV"
 
 psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -v ON_ERROR_STOP=1 <<SQL
@@ -155,10 +155,10 @@ CREATE TEMP TABLE player_activity_staging (
   last_seen   TIMESTAMP WITH TIME ZONE
 );
 \copy player_activity_staging(player_name,last_seen) FROM '$PLAYER_ACTIVITY_CSV' WITH (FORMAT csv, NULL '');
-INSERT INTO jol_player_activity (player_id, last_seen)
+INSERT INTO player_activity (player_id, last_seen)
 SELECT p.player_id, s.last_seen
 FROM player_activity_staging s
-JOIN jol_player p USING (player_name);
+JOIN player p USING (player_name);
 SQL
 
 success "$(jq 'length' "$DATA/player-timestamps.json") player timestamps"
@@ -183,7 +183,7 @@ jq -r '.[] | [
   ((.rounds // {}) | tojson),
   ((.finals // {}) | tojson)
 ] | @csv' "$DATA/tournaments.json" \
-| copy_into jol_tournament \
+| copy_into tournament \
   "tournament_id,name,registration_start,registration_end,play_starts,play_ends,format,deck_format,number_of_rounds,final_enabled,requires_id,status,rules,special_rules,rounds,finals"
 
 # tournament registrations reference player_name; stage and join to resolve player_id.
@@ -202,10 +202,10 @@ CREATE TEMP TABLE tournament_reg_staging (
   deck_id       VARCHAR(36)
 );
 \copy tournament_reg_staging(tournament_id,player_name,vekn,deck_id) FROM '$TOURNAMENT_REG_CSV' WITH (FORMAT csv, NULL '');
-INSERT INTO jol_tournament_registration (tournament_id, player_id, vekn, deck_id)
+INSERT INTO tournament_registration (tournament_id, player_id, vekn, deck_id)
 SELECT s.tournament_id, p.player_id, NULLIF(s.vekn,''), NULLIF(s.deck_id,'')
 FROM tournament_reg_staging s
-JOIN jol_player p USING (player_name);
+JOIN player p USING (player_name);
 SQL
 
 # Populate deck_content from tournaments/{tournament_id}/{deck_id}.json snapshots
@@ -240,7 +240,7 @@ CREATE TEMP TABLE tourn_deck_staging (
   deck_content  TEXT
 );
 \copy tourn_deck_staging(tournament_id,deck_id,deck_content) FROM '$TOURN_DECK_CSV' WITH (FORMAT csv, NULL '');
-UPDATE jol_tournament_registration r
+UPDATE tournament_registration r
 SET deck_content = s.deck_content
 FROM tourn_deck_staging s
 WHERE r.tournament_id = s.tournament_id AND r.deck_id = s.deck_id;
@@ -277,13 +277,13 @@ CREATE TEMP TABLE games_staging (
   tournament_name VARCHAR(255)
 );
 \copy games_staging(game_name,game_id,owner_name,visibility,status,game_format,created_at,version,tournament_name) FROM '$GAMES_CSV' WITH (FORMAT csv, NULL '');
-INSERT INTO jol_game (game_name, game_id, owner_id, visibility, status, game_format, created_at, version, tournament_name)
+INSERT INTO game (game_name, game_id, owner_id, visibility, status, game_format, created_at, version, tournament_name)
 SELECT s.game_name, s.game_id, p.player_id, s.visibility, s.status, s.game_format, s.created_at, s.version, NULLIF(s.tournament_name,'')
 FROM games_staging s
-LEFT JOIN jol_player p ON p.player_name = s.owner_name AND s.owner_name <> '';
+LEFT JOIN player p ON p.player_name = s.owner_name AND s.owner_name <> '';
 SQL
 
-GAME_COUNT=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM jol_game;")
+GAME_COUNT=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM game;")
 success "$GAME_COUNT games loaded"
 
 # ── 7. Registrations ─────────────────────────────────────────────────────────
@@ -310,11 +310,11 @@ CREATE TEMP TABLE reg_staging (
   registered_at TIMESTAMP WITH TIME ZONE
 );
 \copy reg_staging(game_name,player_name,deck_id,deck_name,valid,summary,registered_at) FROM '$REG_CSV' WITH (FORMAT csv, NULL '');
-INSERT INTO jol_registration (game_id, player_id, deck_id, deck_name, valid, summary, registered_at)
+INSERT INTO registration (game_id, player_id, deck_id, deck_name, valid, summary, registered_at)
 SELECT g.game_id, p.player_id, NULLIF(s.deck_id,''), NULLIF(s.deck_name,''), s.valid, NULLIF(s.summary,''), s.registered_at
 FROM reg_staging s
-JOIN jol_game   g ON g.game_name   = s.game_name
-JOIN jol_player p ON p.player_name = s.player_name;
+JOIN game   g ON g.game_name   = s.game_name
+JOIN player p ON p.player_name = s.player_name;
 SQL
 
 # Populate deck_content from games/{game_id}/{deck_id}.json snapshots
@@ -353,14 +353,14 @@ CREATE TEMP TABLE game_deck_staging (
   deck_content TEXT
 );
 \copy game_deck_staging(game_id,deck_id,deck_content) FROM '$GAME_DECK_CSV' WITH (FORMAT csv, NULL '');
-UPDATE jol_registration r
+UPDATE registration r
 SET deck_content = s.deck_content
 FROM game_deck_staging s
 WHERE r.game_id = s.game_id AND r.deck_id = s.deck_id;
 SQL
 rm -f "$GAME_DECK_CSV"
 
-success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM jol_registration;') registrations"
+success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM registration;') registrations"
 
 # ── 8. Decks ──────────────────────────────────────────────────────────────────
 log "Loading deck info..."
@@ -376,7 +376,7 @@ jq '[
   }
 ] | unique_by(.deckId)' "$DATA/decks.json" > "$DEDUPED_DECKS_FILE"
 
-# Stage by player_name; JOIN jol_player to resolve player_id.
+# Stage by player_name; JOIN player to resolve player_id.
 jq -r '.[] | [.player, .name, .deckId, .format] | @csv' "$DEDUPED_DECKS_FILE" > "$DECK_INFO_CSV"
 
 psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -v ON_ERROR_STOP=1 <<SQL
@@ -387,10 +387,10 @@ CREATE TEMP TABLE deck_info_staging (
   format      VARCHAR(20)
 );
 \copy deck_info_staging(player_name,deck_name,deck_id,format) FROM '$DECK_INFO_CSV' WITH (FORMAT csv, NULL '');
-INSERT INTO jol_deck_info (player_id, deck_name, deck_id, format)
+INSERT INTO deck_info (player_id, deck_name, deck_id, format)
 SELECT p.player_id, s.deck_name, s.deck_id, s.format
 FROM deck_info_staging s
-JOIN jol_player p USING (player_name);
+JOIN player p USING (player_name);
 SQL
 
 DECK_FORMAT_CSV=$(mktemp)
@@ -402,15 +402,15 @@ CREATE TEMP TABLE deck_format_staging (
   format_tag VARCHAR(50)
 );
 \copy deck_format_staging(deck_id,format_tag) FROM '$DECK_FORMAT_CSV' WITH (FORMAT csv, NULL '');
-INSERT INTO jol_deck_format (deck_id, format_tag)
+INSERT INTO deck_format (deck_id, format_tag)
 SELECT s.deck_id, s.format_tag
 FROM deck_format_staging s
-WHERE EXISTS (SELECT 1 FROM jol_deck_info d WHERE d.deck_id = s.deck_id);
+WHERE EXISTS (SELECT 1 FROM deck_info d WHERE d.deck_id = s.deck_id);
 SQL
 rm -f "$DECK_FORMAT_CSV"
 
 log "Loading deck content..."
-LOADED_DECK_IDS=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT deck_id FROM jol_deck_info;")
+LOADED_DECK_IDS=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT deck_id FROM deck_info;")
 DECK_CONTENT_CSV=$(mktemp)
 python3 - "$DATA/decks" <<PYEOF > "$DECK_CONTENT_CSV"
 import json, csv, os, sys
@@ -435,24 +435,24 @@ for deck in deduped:
             break
 PYEOF
 psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -v ON_ERROR_STOP=1 \
-  -c "\copy jol_deck_content(deck_id,content) FROM '$DECK_CONTENT_CSV' WITH (FORMAT csv, NULL '')"
+  -c "\copy deck_content(deck_id,content) FROM '$DECK_CONTENT_CSV' WITH (FORMAT csv, NULL '')"
 rm -f "$DECK_CONTENT_CSV"
 
-DECK_COUNT=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM jol_deck_info;")
-CONTENT_COUNT=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM jol_deck_content;")
+DECK_COUNT=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM deck_info;")
+CONTENT_COUNT=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM deck_content;")
 success "$DECK_COUNT decks ($CONTENT_COUNT with content)"
 
 # ── 9. Game states ────────────────────────────────────────────────────────────
 log "Loading game states..."
 # Only load states for game_ids that were actually inserted
-LOADED_GAME_IDS=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT game_id FROM jol_game;")
-python3 - "$DATA/games" <<PYEOF | copy_into jol_game_state \
+LOADED_GAME_IDS=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT game_id FROM game;")
+python3 - "$DATA/games" <<PYEOF | copy_into game_state \
   "game_id,state,current_player,turn,phase,player_count,updated_at"
 import sys, json, csv, os, datetime
 
 games_dir  = sys.argv[1]
 
-# Only process game_ids that were actually inserted into jol_game
+# Only process game_ids that were actually inserted into game
 loaded_ids = set("""$LOADED_GAME_IDS""".split())
 
 writer  = csv.writer(sys.stdout)
@@ -485,11 +485,11 @@ for entry in os.scandir(games_dir):
 
 print(f"  loaded {loaded} game states", file=sys.stderr)
 PYEOF
-success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM jol_game_state;') game states"
+success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM game_state;') game states"
 
 # ── 10. Game chat ─────────────────────────────────────────────────────────────
 log "Loading game chat..."
-python3 - "$DATA/games" <<PYEOF | copy_into jol_game_chat "game_id,history,updated_at"
+python3 - "$DATA/games" <<PYEOF | copy_into game_chat "game_id,history,updated_at"
 import sys, json, csv, os, datetime
 
 games_dir  = sys.argv[1]
@@ -515,11 +515,11 @@ for entry in os.scandir(games_dir):
     except Exception as e:
         print(f"WARN: skipping {history_json}: {e}", file=sys.stderr)
 PYEOF
-success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM jol_game_chat;') game chat histories"
+success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM game_chat;') game chat histories"
 
 # ── 10b. Game turn snapshots (rollback) ───────────────────────────────────────
 log "Loading game turn snapshots..."
-python3 - "$DATA/games" <<PYEOF | copy_into jol_game_snapshot "game_id,turn,state,created_at"
+python3 - "$DATA/games" <<PYEOF | copy_into game_snapshot "game_id,turn,state,created_at"
 import sys, csv, os, datetime
 
 games_dir  = sys.argv[1]
@@ -542,7 +542,7 @@ for entry in os.scandir(games_dir):
         except Exception as e:
             print(f'WARN: skipping {f.path}: {e}', file=sys.stderr)
 PYEOF
-success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM jol_game_snapshot;') game snapshots"
+success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM game_snapshot;') game snapshots"
 
 # ── 11. Game activity ─────────────────────────────────────────────────────────
 log "Loading game activity..."
@@ -562,17 +562,17 @@ CREATE TEMP TABLE activity_staging (
   player_pings      TEXT
 );
 \copy activity_staging(game_name,last_updated,player_timestamps,player_pings) FROM '$ACTIVITY_CSV' WITH (FORMAT csv, NULL '');
-INSERT INTO jol_game_activity (game_id, last_updated, player_timestamps, player_pings)
+INSERT INTO game_activity (game_id, last_updated, player_timestamps, player_pings)
 SELECT g.game_id, s.last_updated, COALESCE(s.player_timestamps,'{}'), COALESCE(s.player_pings,'{}')
 FROM activity_staging s
-JOIN jol_game g USING (game_name);
+JOIN game g USING (game_name);
 SQL
 
-success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM jol_game_activity;') game activity entries"
+success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM game_activity;') game activity entries"
 
 # ── 12. Global chat ───────────────────────────────────────────────────────────
 log "Loading global chat (last 1000 entries)..."
-# chats.json has player_name; join to jol_player to resolve player_id.
+# chats.json has player_name; join to player to resolve player_id.
 # Chat from unknown/deleted players is silently dropped.
 jq -r '.[-1000:] | .[] | [.player, .message, .timestamp] | @csv' "$DATA/chats.json" > "$GLOBAL_CHAT_CSV"
 
@@ -583,13 +583,13 @@ CREATE TEMP TABLE global_chat_staging (
   posted_at   TIMESTAMP WITH TIME ZONE
 );
 \copy global_chat_staging(player_name,message,posted_at) FROM '$GLOBAL_CHAT_CSV' WITH (FORMAT csv, NULL '');
-INSERT INTO jol_global_chat (player_id, message, posted_at)
+INSERT INTO global_chat (player_id, message, posted_at)
 SELECT p.player_id, s.message, s.posted_at
 FROM global_chat_staging s
-JOIN jol_player p USING (player_name);
+JOIN player p USING (player_name);
 SQL
 
-success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM jol_global_chat;') chat entries"
+success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM global_chat;') chat entries"
 
 # ── 13. Game history ──────────────────────────────────────────────────────────
 log "Loading game history..."
@@ -601,8 +601,8 @@ if [[ -f "$DATA/pastGames.json" ]]; then
     (.value.ended // ""),
     ((.value.results // []) | tojson)
   ] | @csv' "$DATA/pastGames.json" \
-  | copy_into jol_game_history "recorded_at,game_name,started,ended,results"
-  success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM jol_game_history;') game histories"
+  | copy_into game_history "recorded_at,game_name,started,ended,results"
+  success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM game_history;') game histories"
 else
   echo "  ⚠ no pastGames.json found — skipping game history"
 fi
@@ -612,12 +612,12 @@ echo
 echo "════════════════════════════════════════"
 echo " Migration complete"
 echo "════════════════════════════════════════"
-for tbl in jol_player jol_player_role jol_player_activity \
-            jol_game jol_registration \
-            jol_deck_info jol_deck_format jol_deck_content \
-            jol_tournament jol_tournament_registration \
-            jol_game_state jol_game_chat jol_game_snapshot \
-            jol_game_activity jol_global_chat jol_game_history; do
+for tbl in player player_role player_activity \
+            game registration \
+            deck_info deck_format deck_content \
+            tournament tournament_registration \
+            game_state game_chat game_snapshot \
+            game_activity global_chat game_history; do
   n=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM $tbl;")
   printf "  %-35s %s rows\n" "$tbl" "$n"
 done

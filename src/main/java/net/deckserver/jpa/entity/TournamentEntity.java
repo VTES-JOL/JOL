@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "jol_tournament")
+@Table(name = "tournament")
 public class TournamentEntity {
 
     @Id

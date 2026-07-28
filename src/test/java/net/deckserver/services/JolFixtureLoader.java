@@ -102,7 +102,7 @@ class JolFixtureLoader {
         try (var dirs = Files.list(gamesDir)) {
             dirs.filter(Files::isDirectory).forEach(gameDir -> {
                 String gameId = gameDir.getFileName().toString();
-                // Insert a synthetic jol_game entry for test-only game directories
+                // Insert a synthetic game entry for test-only game directories
                 if (!insertedGameIds.contains(gameId)) {
                     GameInfoEntity synthetic = buildSyntheticGame(gameId);
                     em.persist(synthetic);

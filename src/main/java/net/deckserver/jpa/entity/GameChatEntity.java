@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "jol_game_chat")
+@Table(name = "game_chat")
 public class GameChatEntity {
 
     @Id
