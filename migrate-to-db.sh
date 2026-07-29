@@ -187,10 +187,12 @@ jq -r '.[] | [
   "tournament_id,name,registration_start,registration_end,play_starts,play_ends,format,deck_format,number_of_rounds,final_enabled,requires_id,status,rules,special_rules,rounds,finals"
 
 # tournament registrations reference player_name; stage and join to resolve player_id.
+# vekn is sometimes stored as "#1610008" or a full player-registry URL instead of a bare
+# ID — extract the trailing digit run so only the numeric VEKN ID is imported.
 jq -r '.[] | .id as $tid | .registrations[] | [
   $tid,
   .player,
-  (.vekn // ""),
+  ((.vekn // "") | [scan("[0-9]+")] | last // ""),
   (.deck // "")
 ] | @csv' "$DATA/tournaments.json" > "$TOURNAMENT_REG_CSV"
 
