@@ -88,6 +88,10 @@
                 <button onclick="addSpecTournamentRule()" class="btn btn-outline-secondary btn-sm">Add</button>
             </div>
             <div id="specRulesDiv" class="mb-2"></div>
+            <div class="mt-2">
+                <strong>Registered Players</strong>
+                <ul id="tourRegisteredPlayers" class="list-unstyled small mb-0"></ul>
+            </div>
         </div>
     </div>
 </div>

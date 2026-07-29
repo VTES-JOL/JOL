@@ -1037,6 +1037,17 @@ function callbackLoadTournamentDetails(data) {
     } else {
         $("#publishBtnContainer").hide();
     }
+
+    DS.getAllRegisteredPlayers(data.name, {
+        callback: function(registrations) {
+            let list = $("#tourRegisteredPlayers").empty();
+            $.each(registrations || [], function(i, reg) {
+                list.append($("<li/>").text(reg.player + (reg.vekn ? " (" + reg.vekn + ")" : "")));
+            });
+        },
+        errorHandler: errorhandler
+    });
+
     enterTourEditMode();
 }
 
