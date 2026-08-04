@@ -34,11 +34,11 @@ public class DeckService extends PersistedService {
     }
 
     public static void addDeck(String playerName, String deckName, DeckInfo deckInfo) {
-        INSTANCE.jpaWrite(em -> deckRepository.saveDeckInfo(em, playerName, deckName, deckInfo));
+        INSTANCE.requireJpaWrite(em -> deckRepository.saveDeckInfo(em, playerName, deckName, deckInfo));
     }
 
     public static void remove(String playerName, String deckName) {
-        INSTANCE.jpaWrite(em -> deckRepository.delete(em, playerName, deckName));
+        INSTANCE.requireJpaWrite(em -> deckRepository.delete(em, playerName, deckName));
     }
 
     public static Set<String> getPlayerDeckNames(String playerName) {
@@ -97,7 +97,7 @@ public class DeckService extends PersistedService {
     }
 
     public static void saveDeck(String deckId, ExtendedDeck deck) {
-        INSTANCE.jpaWrite(em -> deckRepository.saveContent(em, deckId, deck));
+        INSTANCE.requireJpaWrite(em -> deckRepository.saveContent(em, deckId, deck));
     }
 
     public static boolean copyDeck(String deckId, String gameId) {
@@ -113,7 +113,7 @@ public class DeckService extends PersistedService {
         // Migrate any MODERN decks with no game-format tags to TAGGED format.
         // Runs at startup; results are persisted immediately so the query returns
         // nothing on subsequent boots.
-        jpaWrite(em -> {
+        requireJpaWrite(em -> {
             em.createQuery(
                             "SELECT d FROM DeckInfoEntity d JOIN FETCH d.player " +
                             "WHERE d.format = :format AND d.gameFormats IS EMPTY",

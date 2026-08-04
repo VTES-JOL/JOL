@@ -213,7 +213,7 @@ public class JolAdmin {
             RegistrationService.registerDeck(gameName, playerName, deckInfo.getDeckId(), deckName, extendedDeck.getStats().getSummary(), extendedDeck);
 
             // Reset game time to the current time to extend idle timeout
-            gameInfo.setCreated(OffsetDateTime.now());
+            GameService.updateGameInfo(gameName, info -> info.setCreated(OffsetDateTime.now()));
 
             long registeredPlayers = RegistrationService.getRegisteredPlayerCount(gameName);
             if (registeredPlayers == gameInfo.getGameFormat().getPlayerCount()) {
@@ -274,10 +274,11 @@ public class JolAdmin {
     }
 
     public static synchronized void setImageTooltipPreference(String player, boolean value) {
-        PlayerService.get(player).setShowImages(value);
+        PlayerService.setImageTooltipPreference(player, value);
     }
+
     public static synchronized void setEdgeColor(String player, String value) {
-        PlayerService.get(player).setEdgeColor(value);
+        PlayerService.setEdgeColor(player, value);
     }
 
     public static synchronized boolean getImageTooltipPreference(String player) {
@@ -295,7 +296,7 @@ public class JolAdmin {
     }
 
     public static synchronized void setNotificationPreference(String player, boolean value) {
-        PlayerService.get(player).setNotificationsEnabled(value);
+        PlayerService.setNotificationPreference(player, value);
     }
 
     public static synchronized boolean getNotificationPreference(String player) {
@@ -372,7 +373,7 @@ public class JolAdmin {
         if (!game.getPlayers().isEmpty() && game.getPlayers().size() <= 5) {
             game.startGame(players);
             saveGameState(game);
-            gameInfo.setStatus(GameStatus.ACTIVE);
+            GameService.updateGameInfo(gameName, info -> info.setStatus(GameStatus.ACTIVE));
             pingPlayer(game.getActivePlayer(), gameName);
         }
     }
@@ -573,11 +574,7 @@ public class JolAdmin {
     }
 
     public static void setRole(PlayerInfo info, PlayerRole role, boolean enabled) {
-        if (enabled) {
-            info.getRoles().add(role);
-        } else {
-            info.getRoles().remove(role);
-        }
+        PlayerService.setRole(info.getName(), role, enabled);
     }
 
 }

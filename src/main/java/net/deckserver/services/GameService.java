@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static net.deckserver.JolAdmin.saveGameState;
@@ -56,6 +57,24 @@ public class GameService extends PersistedService {
         return INSTANCE.games.get(name);
     }
 
+    public static boolean updateGameInfo(String gameName, Consumer<GameInfo> mutation) {
+        GameInfo gameInfo = INSTANCE.games.get(gameName);
+        if (gameInfo == null) return false;
+        GameInfo snapshot = copyGameInfo(gameInfo);
+        return INSTANCE.jpaWriteWithRollback(
+                () -> mutation.accept(gameInfo),
+                em -> gameInfoRepository.save(em, gameInfo),
+                () -> INSTANCE.games.put(gameName, snapshot));
+    }
+
+    private static GameInfo copyGameInfo(GameInfo source) {
+        try {
+            return objectMapper.readValue(objectMapper.writeValueAsString(source), GameInfo.class);
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to copy game info " + source.getName(), e);
+        }
+    }
+
     public static String getNameByGameId(String gameId) {
         String name = INSTANCE.idToName.get(gameId);
         if (name == null) throw new IllegalArgumentException("No game with id: " + gameId);
@@ -68,9 +87,12 @@ public class GameService extends PersistedService {
             return;
         }
         GameInfo gameInfo = new GameInfo(gameName, gameId, ownerName, visibility, GameStatus.STARTING, format);
-        INSTANCE.games.put(gameName, gameInfo);
-        INSTANCE.idToName.put(gameId, gameName);
-        INSTANCE.jpaWrite(em -> gameInfoRepository.save(em, gameInfo));
+        INSTANCE.jpaWriteThenMutate(
+                em -> gameInfoRepository.save(em, gameInfo),
+                () -> {
+                    INSTANCE.games.put(gameName, gameInfo);
+                    INSTANCE.idToName.put(gameId, gameName);
+                });
     }
 
     public static boolean existsGame(String name) {
@@ -130,14 +152,17 @@ public class GameService extends PersistedService {
     }
 
     public static void remove(String gameName, String gameId) {
-        INSTANCE.games.remove(gameName);
-        INSTANCE.idToName.remove(gameId);
-        INSTANCE.jpaWrite(em -> {
-            gameSnapshotRepository.deleteAllForGame(em, gameId);
-            gameChatRepository.delete(em, gameId);
-            gameStateRepository.delete(em, gameId);
-            gameInfoRepository.delete(em, gameName);
-        });
+        INSTANCE.jpaWriteThenMutate(
+                em -> {
+                    gameSnapshotRepository.deleteAllForGame(em, gameId);
+                    gameChatRepository.delete(em, gameId);
+                    gameStateRepository.delete(em, gameId);
+                    gameInfoRepository.delete(em, gameName);
+                },
+                () -> {
+                    INSTANCE.games.remove(gameName);
+                    INSTANCE.idToName.remove(gameId);
+                });
     }
 
     public static JolGame loadGame(String gameId) {
@@ -175,18 +200,16 @@ public class GameService extends PersistedService {
         // compute() makes cache-put + DB write atomic per game, so a concurrent save of
         // the same game can't interleave (GameStateEntity is @Version-ed; an interleaved
         // save would fail with an optimistic lock conflict and be dropped).
-        INSTANCE.gameCache.asMap().compute(game.id(), (id, previous) -> {
-            String gameName = INSTANCE.idToName.get(id);
-            if (gameName != null && INSTANCE.games.containsKey(gameName)) {
-                INSTANCE.jpaWrite(em -> gameStateRepository.save(em, game));
-            }
-            return game;
-        });
+        String gameName = INSTANCE.idToName.get(game.id());
+        if (gameName != null && INSTANCE.games.containsKey(gameName)) {
+            INSTANCE.requireJpaWrite(em -> gameStateRepository.save(em, game));
+        }
+        INSTANCE.gameCache.put(game.id(), game);
     }
 
     public static void saveGame(JolGame game, String turn) {
         String snapshotTurn = snapshotTurn(turn);
-        INSTANCE.jpaWrite(em -> gameSnapshotRepository.save(em, game.id(), snapshotTurn, game.data()));
+        INSTANCE.requireJpaWrite(em -> gameSnapshotRepository.save(em, game.id(), snapshotTurn, game.data()));
     }
 
     // turn labels are normalized the same way the legacy game-<turn>.json filenames were
@@ -254,7 +277,7 @@ public class GameService extends PersistedService {
         gameCache.asMap().values().forEach(GameService::saveGame);
         logger.debug("Persisted {} games in cache", gameCache.estimatedSize());
         // Sync any in-memory GameInfo mutations to JPA
-        jpaWrite(em -> games.values().forEach(g -> gameInfoRepository.save(em, g)));
+        requireJpaWrite(em -> games.values().forEach(g -> gameInfoRepository.save(em, g)));
     }
 
     @Override

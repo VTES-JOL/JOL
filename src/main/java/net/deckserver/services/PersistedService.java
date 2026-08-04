@@ -168,6 +168,37 @@ public abstract class PersistedService {
     }
 
     /**
+     * Persist first, then publish the in-memory mutation. Test mode still applies
+     * the memory mutation because no database write is expected there.
+     */
+    protected boolean jpaWriteThenMutate(Consumer<EntityManager> action, Runnable mutation) {
+        if (testModeEnabled || jpaWrite(action)) {
+            mutation.run();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * For APIs that must mutate an existing object before it can be saved, roll
+     * the local state back if the database write fails.
+     */
+    protected boolean jpaWriteWithRollback(Runnable mutation, Consumer<EntityManager> action, Runnable rollback) {
+        mutation.run();
+        if (testModeEnabled || jpaWrite(action)) {
+            return true;
+        }
+        rollback.run();
+        return false;
+    }
+
+    protected void requireJpaWrite(Consumer<EntityManager> action) {
+        if (!jpaWrite(action)) {
+            throw new IllegalStateException(serviceName + " JPA write failed");
+        }
+    }
+
+    /**
      * Gracefully shutdown the service, persisting all data and stopping the scheduler.
      * This should be called from a ServletContextListener, not a JVM shutdown hook.
      */

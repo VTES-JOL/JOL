@@ -1,6 +1,7 @@
 package net.deckserver.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import net.deckserver.jpa.entity.GameHistoryEntity;
 import net.deckserver.jpa.repository.GameHistoryRepository;
 import net.deckserver.storage.json.system.GameHistory;
 import net.deckserver.storage.json.system.PlayerResult;
@@ -27,7 +28,7 @@ public class HistoryService extends PersistedService {
     }
 
     public static void addGame(OffsetDateTime now, GameHistory history) {
-        INSTANCE.jpaWrite(em -> gameHistoryRepository.save(em, now, history));
+        INSTANCE.requireJpaWrite(em -> gameHistoryRepository.save(em, now, history));
     }
 
     public static Collection<GameHistory> getGames() {
@@ -35,7 +36,9 @@ public class HistoryService extends PersistedService {
     }
 
     public static void validateGW() {
-        INSTANCE.jpaRead(em -> gameHistoryRepository.findAllEntities(em)).forEach(entity -> {
+        Collection<GameHistoryEntity> entities = INSTANCE.jpaRead(em -> gameHistoryRepository.findAllEntities(em));
+        if (entities == null) return;
+        entities.forEach(entity -> {
             GameHistory gameHistory;
             try {
                 gameHistory = new GameHistory();
@@ -82,7 +85,7 @@ public class HistoryService extends PersistedService {
             if (changed) {
                 try {
                     entity.setResults(objectMapper.writeValueAsString(gameHistory.getResults()));
-                    INSTANCE.jpaWrite(em -> gameHistoryRepository.update(em, entity));
+                    INSTANCE.requireJpaWrite(em -> gameHistoryRepository.update(em, entity));
                 } catch (Exception e) {
                     logger.error("Failed to serialise updated results for {}", gameHistory.getName(), e);
                 }

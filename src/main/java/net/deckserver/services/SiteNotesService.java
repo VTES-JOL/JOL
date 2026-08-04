@@ -36,9 +36,12 @@ public class SiteNotesService extends PersistedService {
     }
 
     public static void setNotes(String notes) {
-        INSTANCE.notes = notes == null ? "" : notes;
-        WebSocketRegistry.notifyMain();
-        INSTANCE.jpaWrite(em -> siteNotesRepository.save(em, INSTANCE.notes));
+        String updatedNotes = notes == null ? "" : notes;
+        if (INSTANCE.jpaWriteThenMutate(
+                em -> siteNotesRepository.save(em, updatedNotes),
+                () -> INSTANCE.notes = updatedNotes)) {
+            WebSocketRegistry.notifyMain();
+        }
     }
 
     public static void clear() {

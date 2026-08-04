@@ -32,12 +32,16 @@ public class GlobalChatService extends PersistedService {
         String sanitize = ParserService.sanitizeText(message);
         String parsedMessage = ParserService.parseGlobalChat(sanitize);
         ChatEntryBean chatEntryBean = new ChatEntryBean(player, parsedMessage);
-        INSTANCE.chats.add(chatEntryBean);
-        if (INSTANCE.chats.size() > CHAT_STORAGE) {
-            INSTANCE.chats = new ArrayList<>(INSTANCE.chats.subList(CHAT_DISCARD, CHAT_STORAGE));
+        if (INSTANCE.jpaWriteThenMutate(
+                em -> globalChatRepository.insert(em, chatEntryBean),
+                () -> {
+                    INSTANCE.chats.add(chatEntryBean);
+                    if (INSTANCE.chats.size() > CHAT_STORAGE) {
+                        INSTANCE.chats = new ArrayList<>(INSTANCE.chats.subList(CHAT_DISCARD, CHAT_STORAGE));
+                    }
+                })) {
+            WebSocketRegistry.notifyMain();
         }
-        WebSocketRegistry.notifyMain();
-        INSTANCE.jpaWrite(em -> globalChatRepository.insert(em, chatEntryBean));
     }
 
     /** Returns chat entries strictly after the given cursor timestamp (ISO offset date-time), or all entries if cursor is null. */
@@ -74,7 +78,7 @@ public class GlobalChatService extends PersistedService {
             logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
             return;
         }
-        jpaWrite(globalChatRepository::trim);
+        requireJpaWrite(globalChatRepository::trim);
     }
 
     @Override

@@ -68,7 +68,7 @@ public class TournamentJob implements Runnable {
                     // Save game
                     GameService.saveGame(jolGame);
                     // Update status
-                    GameService.get(gameName).setStatus(GameStatus.ACTIVE);
+                    GameService.updateGameInfo(gameName, info -> info.setStatus(GameStatus.ACTIVE));
                 }
             }
             // Start tournament
@@ -101,7 +101,7 @@ public class TournamentJob implements Runnable {
                 // Save game
                 GameService.saveGame(jolGame);
                 // Update status
-                GameService.get(gameName).setStatus(GameStatus.ACTIVE);
+                GameService.updateGameInfo(gameName, info -> info.setStatus(GameStatus.ACTIVE));
                 GlobalChatService.chat("SYSTEM", String.format("Game %s started", gameName));
                 ChatService.sendSystemMessage(gameId, "Finals Seating has been activated.");
             }

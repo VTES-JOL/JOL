@@ -38,8 +38,9 @@ public class RegistrationService extends PersistedService {
     }
 
     public static void put(String gameName, String playerName, RegistrationStatus registration) {
-        INSTANCE.registrations.put(gameName, playerName, registration);
-        INSTANCE.jpaWrite(em -> registrationRepository.save(em, gameName, playerName, registration));
+        INSTANCE.jpaWriteThenMutate(
+                em -> registrationRepository.save(em, gameName, playerName, registration),
+                () -> INSTANCE.registrations.put(gameName, playerName, registration));
     }
 
     public static long getRegisteredPlayerCount(String gameName) {
@@ -59,8 +60,9 @@ public class RegistrationService extends PersistedService {
     }
 
     public static void removePlayer(String gameName, String playerName) {
-        INSTANCE.registrations.remove(gameName, playerName);
-        INSTANCE.jpaWrite(em -> registrationRepository.delete(em, gameName, playerName));
+        INSTANCE.jpaWriteThenMutate(
+                em -> registrationRepository.delete(em, gameName, playerName),
+                () -> INSTANCE.registrations.remove(gameName, playerName));
     }
 
     public static boolean isInGame(String gameName, String playerName) {
@@ -76,8 +78,9 @@ public class RegistrationService extends PersistedService {
     }
 
     public static synchronized void clearRegistrations(String gameName) {
-        INSTANCE.registrations.row(gameName).clear();
-        INSTANCE.jpaWrite(em -> registrationRepository.deleteAllForGame(em, gameName));
+        INSTANCE.jpaWriteThenMutate(
+                em -> registrationRepository.deleteAllForGame(em, gameName),
+                () -> INSTANCE.registrations.row(gameName).clear());
     }
 
     public static synchronized Map<String, RegistrationStatus> getPlayerRegistrations(String playerName) {
@@ -95,8 +98,9 @@ public class RegistrationService extends PersistedService {
     public static synchronized void invitePlayer(String gameName, String playerName) {
         if (!RegistrationService.isInvited(gameName, playerName)) {
             RegistrationStatus status = new RegistrationStatus(OffsetDateTime.now());
-            INSTANCE.registrations.put(gameName, playerName, status);
-            INSTANCE.jpaWrite(em -> registrationRepository.save(em, gameName, playerName, status));
+            INSTANCE.jpaWriteThenMutate(
+                    em -> registrationRepository.save(em, gameName, playerName, status),
+                    () -> INSTANCE.registrations.put(gameName, playerName, status));
         }
     }
 
@@ -111,8 +115,9 @@ public class RegistrationService extends PersistedService {
                 INSTANCE.logger.error("Failed to serialize deck content for registration {}/{}", gameName, playerName, e);
             }
         }
-        INSTANCE.registrations.put(gameName, playerName, registrationStatus);
-        INSTANCE.jpaWrite(em -> registrationRepository.save(em, gameName, playerName, registrationStatus));
+        INSTANCE.jpaWriteThenMutate(
+                em -> registrationRepository.save(em, gameName, playerName, registrationStatus),
+                () -> INSTANCE.registrations.put(gameName, playerName, registrationStatus));
     }
 
     public static RegistrationSummary getSummary(String gameName) {

@@ -17,13 +17,16 @@ public class PlayerActivityService extends PersistedService {
     private final Map<String, OffsetDateTime> playerTimestamps = new ConcurrentHashMap<>();
 
     private PlayerActivityService() {
-        super("PlayerActivityService", 1);
+        super("PlayerActivityService", 0);
         load();
     }
 
     public static void recordPlayerAccess(String playerName) {
         if (playerName == null || playerName.isBlank()) return;
-        INSTANCE.playerTimestamps.put(playerName, OffsetDateTime.now());
+        OffsetDateTime timestamp = OffsetDateTime.now();
+        INSTANCE.jpaWriteThenMutate(
+                em -> playerActivityRepository.save(em, playerName, timestamp),
+                () -> INSTANCE.playerTimestamps.put(playerName, timestamp));
     }
 
     public static OffsetDateTime getPlayerAccess(String playerName) {
@@ -39,12 +42,7 @@ public class PlayerActivityService extends PersistedService {
 
     @Override
     protected void persist() {
-        if (shouldSkipPersistence()) {
-            logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
-            return;
-        }
-        logger.debug("Persisting {} player timestamps", playerTimestamps.size());
-        jpaWrite(em -> playerActivityRepository.saveAll(em, playerTimestamps));
+        // all mutations are write-through; no background flush needed
     }
 
     @Override

@@ -116,9 +116,10 @@ public class TournamentService extends PersistedService {
     public static void joinTournament(String game, String playerName, String vekn) {
         TournamentDefinition def = INSTANCE.tournaments.get(game);
         if (def.isOpenForRegistration()) {
-            TournamentRegistration registration = def.getRegistration(playerName).orElseGet(() -> new TournamentRegistration(playerName, vekn));
-            def.getRegistrations().add(registration);
-            INSTANCE.jpaWrite(em -> tournamentRepository.save(em, def));
+            saveTournamentMutation(game, updated -> {
+                TournamentRegistration registration = updated.getRegistration(playerName).orElseGet(() -> new TournamentRegistration(playerName, vekn));
+                updated.getRegistrations().add(registration);
+            });
         }
     }
 
@@ -126,17 +127,14 @@ public class TournamentService extends PersistedService {
         TournamentDefinition def = INSTANCE.tournaments.get(tournament);
         Optional<TournamentRegistration> registration = def.getRegistration(playerName);
         if (def.isOpenForRegistration()) {
-            registration.ifPresent(reg -> {
-                def.getRegistrations().remove(reg);
-                INSTANCE.jpaWrite(em -> tournamentRepository.save(em, def));
-            });
+            registration.ifPresent(reg -> saveTournamentMutation(tournament, updated -> updated.getRegistrations().remove(reg)));
         }
     }
 
     public static void clearRegistrations(String tournamentName) {
         TournamentDefinition def = INSTANCE.tournaments.get(tournamentName);
         if (def == null) return;
-        def.getRegistrations().clear();
+        saveTournamentMutation(tournamentName, updated -> updated.getRegistrations().clear());
     }
 
     public static List<TournamentMetadata> getFinalsInvites(String playerName) {
@@ -157,7 +155,8 @@ public class TournamentService extends PersistedService {
 
     public static void registerDeck(String tournament, String player, ExtendedDeck deck) {
         TournamentDefinition definition = INSTANCE.tournaments.get(tournament);
-        definition.getRegistration(player).ifPresent(reg -> {
+        if (definition == null || definition.getRegistration(player).isEmpty()) return;
+        saveTournamentMutation(tournament, updated -> updated.getRegistration(player).ifPresent(reg -> {
             String deckId = UUID.randomUUID().toString();
             reg.setDeck(deckId);
             try {
@@ -165,8 +164,7 @@ public class TournamentService extends PersistedService {
             } catch (JsonProcessingException e) {
                 logger.error("Unable to serialize tournament deck {} for {}", deckId, player, e);
             }
-            INSTANCE.jpaWrite(em -> tournamentRepository.save(em, definition));
-        });
+        }));
     }
 
     public static List<TournamentPlayer> getPlayers(String tournament, int round, int table) {
@@ -218,32 +216,29 @@ public class TournamentService extends PersistedService {
     }
 
     public static void startTournament(String tournamentName) {
-        TournamentDefinition def = INSTANCE.tournaments.get(tournamentName);
-        def.setStatus(GameStatus.ACTIVE);
-        INSTANCE.jpaWrite(em -> tournamentRepository.save(em, def));
+        saveTournamentMutation(tournamentName, def -> def.setStatus(GameStatus.ACTIVE));
     }
 
     public static void setReadyToStart(String tournamentName) {
-        TournamentDefinition def = INSTANCE.tournaments.get(tournamentName);
-        def.setStatus(GameStatus.STARTING);
-        INSTANCE.jpaWrite(em -> tournamentRepository.save(em, def));
+        saveTournamentMutation(tournamentName, def -> def.setStatus(GameStatus.STARTING));
     }
 
     public static void setTournamentStatus(String tournamentName, GameStatus status) {
-        TournamentDefinition def = INSTANCE.tournaments.get(tournamentName);
-        def.setStatus(status);
-        INSTANCE.jpaWrite(em -> tournamentRepository.save(em, def));
+        saveTournamentMutation(tournamentName, def -> def.setStatus(status));
     }
 
     public static void createTournament(TournamentDefinition tournamentDefinition) {
-        INSTANCE.tournaments.put(tournamentDefinition.getName(), tournamentDefinition);
-        INSTANCE.jpaWrite(em -> tournamentRepository.save(em, tournamentDefinition));
+        INSTANCE.jpaWriteThenMutate(
+                em -> tournamentRepository.save(em, tournamentDefinition),
+                () -> INSTANCE.tournaments.put(tournamentDefinition.getName(), tournamentDefinition));
     }
 
     public static void removeTournament(String name) {
-        TournamentDefinition def = INSTANCE.tournaments.remove(name);
+        TournamentDefinition def = INSTANCE.tournaments.get(name);
         if (def != null) {
-            INSTANCE.jpaWrite(em -> tournamentRepository.delete(em, def.getId()));
+            INSTANCE.jpaWriteThenMutate(
+                    em -> tournamentRepository.delete(em, def.getId()),
+                    () -> INSTANCE.tournaments.remove(name));
         }
     }
 
@@ -278,12 +273,29 @@ public class TournamentService extends PersistedService {
             }
         }
 
-        tournament.setRounds(rounds);
-        INSTANCE.persist();
+        saveTournamentMutation(tourName, updated -> updated.setRounds(rounds));
     }
 
     public static void save() {
         INSTANCE.persist();
+    }
+
+    private static boolean saveTournamentMutation(String tournamentName, java.util.function.Consumer<TournamentDefinition> mutation) {
+        TournamentDefinition current = INSTANCE.tournaments.get(tournamentName);
+        if (current == null) return false;
+        TournamentDefinition snapshot = copyTournament(current);
+        return INSTANCE.jpaWriteWithRollback(
+                () -> mutation.accept(current),
+                em -> tournamentRepository.save(em, current),
+                () -> INSTANCE.tournaments.put(tournamentName, snapshot));
+    }
+
+    private static TournamentDefinition copyTournament(TournamentDefinition source) {
+        try {
+            return objectMapper.readValue(objectMapper.writeValueAsString(source), TournamentDefinition.class);
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to copy tournament " + source.getName(), e);
+        }
     }
 
     public static void createTournamentTables(String tourName) {
@@ -311,8 +323,10 @@ public class TournamentService extends PersistedService {
                 String playerName = players.getFirst().getName();
                 PlayerGameActivityService.pingPlayer(playerName, gameName);
                 GameService.saveGame(jolGame);
-                GameService.get(gameName).setStatus(GameStatus.ACTIVE);
-                GameService.get(gameName).setTournamentName(tournamentName);
+                GameService.updateGameInfo(gameName, info -> {
+                    info.setStatus(GameStatus.ACTIVE);
+                    info.setTournamentName(tournamentName);
+                });
             }
         }
         startTournament(tournamentName);
@@ -338,8 +352,10 @@ public class TournamentService extends PersistedService {
             }
             jolGame.startGame(seeding);
             GameService.saveGame(jolGame);
-            GameService.get(gameName).setStatus(GameStatus.ACTIVE);
-            GameService.get(gameName).setTournamentName(tournamentName);
+            GameService.updateGameInfo(gameName, info -> {
+                info.setStatus(GameStatus.ACTIVE);
+                info.setTournamentName(tournamentName);
+            });
             GlobalChatService.chat("SYSTEM", String.format("Game %s started", gameName));
         }
     }
@@ -351,7 +367,7 @@ public class TournamentService extends PersistedService {
             return;
         }
         logger.debug("Persisting {} tournaments via JPA", tournaments.size());
-        jpaWrite(em -> tournaments.values().forEach(t -> tournamentRepository.save(em, t)));
+        requireJpaWrite(em -> tournaments.values().forEach(t -> tournamentRepository.save(em, t)));
     }
 
     @Override

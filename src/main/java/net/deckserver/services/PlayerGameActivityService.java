@@ -18,13 +18,13 @@ public class PlayerGameActivityService extends PersistedService {
     private final Map<String, GameTimestampEntry> gameTimestamps = new ConcurrentHashMap<>();
 
     private PlayerGameActivityService() {
-        super("PlayerGameActivityService", 1);
+        super("PlayerGameActivityService", 0);
         load();
     }
 
     public static void recordPlayerAccess(String playerName, String gameName) {
         if (playerName == null || playerName.isBlank() || gameName == null || gameName.isBlank()) return;
-        getOrCreateGameTimestampEntry(gameName).recordPlayerAccess(playerName);
+        updateGameTimestampEntry(gameName, entry -> entry.recordPlayerAccess(playerName));
     }
 
     public static OffsetDateTime getPlayerAccess(String playerName, String gameName) {
@@ -39,18 +39,19 @@ public class PlayerGameActivityService extends PersistedService {
 
     public static void pingPlayer(String playerName, String gameName) {
         if (playerName == null || playerName.isBlank() || gameName == null || gameName.isBlank()) return;
-        getOrCreateGameTimestampEntry(gameName).setPlayerPing(playerName);
+        updateGameTimestampEntry(gameName, entry -> entry.setPlayerPing(playerName));
     }
 
     public static void clearPing(String playerName, String gameName) {
         if (playerName == null || playerName.isBlank() || gameName == null || gameName.isBlank()) return;
-        getOrCreateGameTimestampEntry(gameName).clearPlayerPing(playerName);
+        updateGameTimestampEntry(gameName, entry -> entry.clearPlayerPing(playerName));
     }
 
     public static void clearGame(String gameName) {
         if (gameName == null || gameName.isBlank()) return;
-        INSTANCE.gameTimestamps.remove(gameName);
-        INSTANCE.jpaWrite(em -> gameActivityRepository.delete(em, gameName));
+        INSTANCE.jpaWriteThenMutate(
+                em -> gameActivityRepository.delete(em, gameName),
+                () -> INSTANCE.gameTimestamps.remove(gameName));
     }
 
     public static OffsetDateTime getGameTimestamp(String game) {
@@ -64,7 +65,7 @@ public class PlayerGameActivityService extends PersistedService {
 
     public static void setGameTimestamp(String game) {
         if (game == null || game.isBlank()) return;
-        getOrCreateGameTimestampEntry(game).setTimestamp(OffsetDateTime.now());
+        updateGameTimestampEntry(game, entry -> entry.setTimestamp(OffsetDateTime.now()));
     }
 
     public static boolean isCurrent(String player, String game) {
@@ -78,9 +79,22 @@ public class PlayerGameActivityService extends PersistedService {
         return INSTANCE.gameTimestamps.get(game);
     }
 
-    private static GameTimestampEntry getOrCreateGameTimestampEntry(String game) {
-        if (game == null || game.isBlank()) return null;
-        return INSTANCE.gameTimestamps.computeIfAbsent(game, k -> new GameTimestampEntry());
+    private static void updateGameTimestampEntry(String game, java.util.function.Consumer<GameTimestampEntry> mutation) {
+        GameTimestampEntry updated = copyOf(INSTANCE.gameTimestamps.get(game));
+        mutation.accept(updated);
+        INSTANCE.jpaWriteThenMutate(
+                em -> gameActivityRepository.save(em, game, updated),
+                () -> INSTANCE.gameTimestamps.put(game, updated));
+    }
+
+    private static GameTimestampEntry copyOf(GameTimestampEntry source) {
+        GameTimestampEntry copy = new GameTimestampEntry();
+        if (source != null) {
+            copy.setTimestamp(source.getTimestamp());
+            copy.setPlayerTimestamps(new ConcurrentHashMap<>(source.getPlayerTimestamps()));
+            copy.setPlayerPings(new ConcurrentHashMap<>(source.getPlayerPings()));
+        }
+        return copy;
     }
 
     public static PersistedService getInstance() {
@@ -89,12 +103,7 @@ public class PlayerGameActivityService extends PersistedService {
 
     @Override
     protected void persist() {
-        if (shouldSkipPersistence()) {
-            logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
-            return;
-        }
-        logger.debug("Persisting {} game timestamps", gameTimestamps.size());
-        jpaWrite(em -> gameActivityRepository.saveAll(em, gameTimestamps));
+        // all mutations are write-through; no background flush needed
     }
 
     @Override

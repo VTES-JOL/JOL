@@ -65,12 +65,9 @@ public class PlayerService extends PersistedService {
             return false;
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
         PlayerInfo player = new PlayerInfo(name, ULID.random(), email, hash);
-        INSTANCE.players.put(name, player);
-        if (!INSTANCE.jpaWrite(em -> playerRepository.save(em, player))) {
-            INSTANCE.players.remove(name);
-            return false;
-        }
-        return true;
+        return INSTANCE.jpaWriteThenMutate(
+                em -> playerRepository.save(em, player),
+                () -> INSTANCE.players.put(name, player));
     }
 
     public static boolean authenticate(String playerName, String password) {
@@ -86,18 +83,80 @@ public class PlayerService extends PersistedService {
     public static void changePassword(String player, String password) {
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
         PlayerInfo info = loadPlayerInfo(player);
-        info.setHash(hash);
-        INSTANCE.jpaWrite(em -> playerRepository.save(em, info));
+        String previousHash = info.getHash();
+        INSTANCE.jpaWriteWithRollback(
+                () -> info.setHash(hash),
+                em -> playerRepository.save(em, info),
+                () -> info.setHash(previousHash));
     }
 
     public static void updateProfile(String playerName, String email, String discordID, String veknID, String country) {
         PlayerInfo playerInfo = loadPlayerInfo(playerName);
-        playerInfo.setDiscordId(discordID);
-        playerInfo.setEmail(email);
-        playerInfo.setVeknId(veknID);
-        playerInfo.setCountryCode(country);
-        refreshActive(playerName);
-        INSTANCE.jpaWrite(em -> playerRepository.save(em, playerInfo));
+        String previousDiscordId = playerInfo.getDiscordId();
+        String previousEmail = playerInfo.getEmail();
+        String previousVeknId = playerInfo.getVeknId();
+        String previousCountryCode = playerInfo.getCountryCode();
+        if (INSTANCE.jpaWriteWithRollback(
+                () -> {
+                    playerInfo.setDiscordId(discordID);
+                    playerInfo.setEmail(email);
+                    playerInfo.setVeknId(veknID);
+                    playerInfo.setCountryCode(country);
+                },
+                em -> playerRepository.save(em, playerInfo),
+                () -> {
+                    playerInfo.setDiscordId(previousDiscordId);
+                    playerInfo.setEmail(previousEmail);
+                    playerInfo.setVeknId(previousVeknId);
+                    playerInfo.setCountryCode(previousCountryCode);
+                })) {
+            refreshActive(playerName);
+        }
+    }
+
+    public static void setImageTooltipPreference(String playerName, boolean value) {
+        PlayerInfo playerInfo = loadPlayerInfo(playerName);
+        boolean previousValue = playerInfo.isShowImages();
+        INSTANCE.jpaWriteWithRollback(
+                () -> playerInfo.setShowImages(value),
+                em -> playerRepository.save(em, playerInfo),
+                () -> playerInfo.setShowImages(previousValue));
+    }
+
+    public static void setEdgeColor(String playerName, String value) {
+        PlayerInfo playerInfo = loadPlayerInfo(playerName);
+        String previousValue = playerInfo.getEdgeColor();
+        INSTANCE.jpaWriteWithRollback(
+                () -> playerInfo.setEdgeColor(value),
+                em -> playerRepository.save(em, playerInfo),
+                () -> playerInfo.setEdgeColor(previousValue));
+    }
+
+    public static void setNotificationPreference(String playerName, boolean value) {
+        PlayerInfo playerInfo = loadPlayerInfo(playerName);
+        boolean previousValue = playerInfo.isNotificationsEnabled();
+        INSTANCE.jpaWriteWithRollback(
+                () -> playerInfo.setNotificationsEnabled(value),
+                em -> playerRepository.save(em, playerInfo),
+                () -> playerInfo.setNotificationsEnabled(previousValue));
+    }
+
+    public static void setRole(String playerName, PlayerRole role, boolean enabled) {
+        PlayerInfo playerInfo = loadPlayerInfo(playerName);
+        Set<PlayerRole> previousRoles = new HashSet<>(playerInfo.getRoles());
+        INSTANCE.jpaWriteWithRollback(
+                () -> {
+                    if (enabled) {
+                        playerInfo.getRoles().add(role);
+                    } else {
+                        playerInfo.getRoles().remove(role);
+                    }
+                },
+                em -> playerRepository.save(em, playerInfo),
+                () -> {
+                    playerInfo.getRoles().clear();
+                    playerInfo.getRoles().addAll(previousRoles);
+                });
     }
 
     private static PlayerInfo loadPlayerInfo(String playerName) {
@@ -116,8 +175,9 @@ public class PlayerService extends PersistedService {
     }
 
     public static void remove(String name) {
-        INSTANCE.players.remove(name);
-        INSTANCE.jpaWrite(em -> playerRepository.delete(em, name));
+        INSTANCE.jpaWriteThenMutate(
+                em -> playerRepository.delete(em, name),
+                () -> INSTANCE.players.remove(name));
     }
 
     public static PersistedService getInstance() {

@@ -62,8 +62,14 @@ public class ChatService extends PersistedService {
     }
 
     public static void addTurn(String gameId, String player, String turnId) {
-        INSTANCE.historyCache.get(gameId).addTurn(player, turnId);
-        Optional.ofNullable(gmap.get(gameId)).ifPresent(GameModel::clearChats);
+        TurnHistory history = INSTANCE.historyCache.get(gameId);
+        TurnHistory snapshot = copyHistory(history);
+        if (INSTANCE.jpaWriteWithRollback(
+                () -> history.addTurn(player, turnId),
+                em -> gameChatRepository.save(em, gameId, history.getTurns()),
+                () -> INSTANCE.historyCache.put(gameId, snapshot))) {
+            Optional.ofNullable(gmap.get(gameId)).ifPresent(GameModel::clearChats);
+        }
     }
 
     public static void sendMessage(String gameId, String source, String message) {
@@ -83,8 +89,35 @@ public class ChatService extends PersistedService {
     }
 
     private static void sendChat(String gameId, ChatData chat) {
-        INSTANCE.historyCache.get(gameId).addChat(chat);
-        Optional.ofNullable(gmap.get(gameId)).ifPresent(model -> model.addChat(chat));
+        TurnHistory history = INSTANCE.historyCache.get(gameId);
+        TurnHistory snapshot = copyHistory(history);
+        if (INSTANCE.jpaWriteWithRollback(
+                () -> history.addChat(chat),
+                em -> gameChatRepository.save(em, gameId, history.getTurns()),
+                () -> INSTANCE.historyCache.put(gameId, snapshot))) {
+            Optional.ofNullable(gmap.get(gameId)).ifPresent(model -> model.addChat(chat));
+        }
+    }
+
+    private static TurnHistory copyHistory(TurnHistory history) {
+        TurnHistory copy = new TurnHistory();
+        copy.setCurrentPlayer(history.getCurrentPlayer());
+        copy.setCurrentTurn(history.getCurrentTurn());
+        history.getTurnMap().forEach((label, turn) -> {
+            TurnData turnCopy = new TurnData();
+            turnCopy.setPlayer(turn.getPlayer());
+            turnCopy.setTurnId(turn.getTurnId());
+            turn.getChats().forEach(chat -> {
+                ChatData chatCopy = new ChatData();
+                chatCopy.setTimestamp(chat.getTimestamp());
+                chatCopy.setMessage(chat.getMessage());
+                chatCopy.setSource(chat.getSource());
+                chatCopy.setCommand(chat.getCommand());
+                turnCopy.getChats().add(chatCopy);
+            });
+            copy.getTurnMap().put(label, turnCopy);
+        });
+        return copy;
     }
 
     private void saveHistory(String gameId, TurnHistory history) {
@@ -94,7 +127,7 @@ public class ChatService extends PersistedService {
             return;
         }
         logger.debug("Saving history for {} with {} turns", gameId, history.getTurns().size());
-        jpaWrite(em -> gameChatRepository.save(em, gameId, history.getTurns()));
+        requireJpaWrite(em -> gameChatRepository.save(em, gameId, history.getTurns()));
     }
 
     private TurnHistory loadHistory(String gameId) {
