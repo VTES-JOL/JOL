@@ -90,6 +90,7 @@ const DS = {
     exportPastGamesAsCsv:    (opts) => apiGetText('/admin/export/games.csv', opts),
     stats:                   (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/admin/stats`, {treshold, fromDate, toDate, isTourney}, opts),
     statsPerDeck:            (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/admin/stats/deck`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsPerNation:          (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/admin/stats/nation`, {treshold, fromDate, toDate, isTourney}, opts),
     updateSiteNotes:         (notes, opts) => apiPut('/admin/site-notes', {notes}, opts),
     clearSiteNotes:          (opts) => apiDel('/admin/site-notes', opts),
 
@@ -3008,9 +3009,23 @@ function renderStatsFor(from, to) {
     renderStats();
 }
 
+function resetStats() {
+    $('#fromDate').val('');
+    $('#toDate').val('');
+    $('#gameThreshold').val('');
+    $('#gameThresholdDeck').val('');
+    $('#gameThresholdNation').val('');
+    $("#onlyTournaments").prop("checked", false);
+    $("#deckNameFilter").val('');
+    $("#playerNameFilter").val('');
+    renderStats();
+}
+
+
 function renderStats() {
     let treshold = $('#gameThreshold').val();
     let tresholdDeck = $('#gameThresholdDeck').val();
+    let gameThresholdNation = $('#gameThresholdNation').val();
     let fromDate = $('#fromDate').val();
     let toDate = $('#toDate').val();
     let isTourney = $("#onlyTournaments").prop("checked");
@@ -3028,6 +3043,12 @@ function renderStats() {
             callback: (data) => {
                 createStatsPerDeck(data);
                 filterName('#statsDeckGames tbody tr', 'deckNameFilter', 1);
+            }, errorHandler: errorhandler});
+    } else if($('#nationStatsTab').hasClass('active')) {
+        DS.statsPerNation(gameThresholdNation, fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createStatsPerNation(data);
+                filterName('#statsNationGames tbody tr', 'nationNameFilter', 1);
             }, errorHandler: errorhandler});
     }
 }
@@ -3049,7 +3070,31 @@ function createStatsPerDeck(stats) {
             statsGames.append(playerRow);
         }
     })
-}function createStats(stats) {
+}
+
+function createStatsPerNation(stats) {
+    let statsGames = $("#statsNationGames tbody");
+    statsGames.empty();
+    $.each(stats, function (index, countryEntry) {
+        if(countryEntry.length > 0) {
+            let playerRow = $("<tr/>");
+            playerRow.addClass("border-top")
+            let flag = countryEntry
+                ? `<span data-tippy-content="${regionNames.of(index)}" class="fi fi-${index.toLowerCase()} fis"></span>`
+                : "";
+            let countryName = $("<td/>").text(regionNames.of(index) + " / ").append(flag);
+            let games = $("<td/>").text(countryEntry[0]);
+            let gw = $("<td/>").text(countryEntry[1]);
+            let vp = $("<td/>").text(countryEntry[2]);
+            let gwRat = $("<td/>").text(countryEntry[3]);
+            let vpRat = $("<td/>").text(countryEntry[4]);
+            playerRow.append(countryName, games, gw, vp, gwRat, vpRat);
+            statsGames.append(playerRow);
+        }
+    })
+}
+
+function createStats(stats) {
     let statsGames = $("#statsGames tbody");
     statsGames.empty();
     $.each(stats, function (index, playerEntry) {

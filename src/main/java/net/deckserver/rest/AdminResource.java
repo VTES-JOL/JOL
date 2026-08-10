@@ -120,6 +120,12 @@ public class AdminResource extends BaseResource {
         return getStats(body, this::generateStatsPerDeck);
     }
 
+    @POST
+    @Path("stats/nation")
+    public Map<String, List<String>> getStatsPerNation(StatsRequest body) {
+        return getStats(body, this::generateStatsPerNation);
+    }
+
     /**
      * Sets the global site notes shown on the main page.
      */
@@ -228,6 +234,22 @@ public class AdminResource extends BaseResource {
             vp.merge(name, result.getVictoryPoints() > 6 ? 6 : result.getVictoryPoints(), Double::sum);
             if (result.isGameWin()) {
                 gw.merge(name, 1, Integer::sum);
+            }
+        }
+    }
+    private void generateStatsPerNation(GameHistory game, Map<String, Integer> gw, Map<String, Double> vp, Map<String, Integer> games) {
+        for (PlayerResult result : game.getResults()) {
+            try {
+                String name = PlayerService.get(result.getPlayerName()).getCountryCode();
+                //merge
+                games.merge(name, 1, Integer::sum);
+                vp.merge(name, result.getVictoryPoints() > 6 ? 6 : result.getVictoryPoints(), Double::sum);
+                if (result.isGameWin()) {
+                    gw.merge(name, 1, Integer::sum);
+                }
+
+            } catch (Exception e) {
+                //Player not found
             }
         }
     }
