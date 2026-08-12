@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class GameStatusBean {
 
     private final String name;
+    private final String gameId;
     private final String gameStatus;
     private final List<RegistrationStatus> registrations;
     private final Map<String, PlayerStatus> players;
@@ -29,17 +30,27 @@ public class GameStatusBean {
     private final String predator;
     private final String prey;
     private final String turn;
+    private final String visibility;
+    private final String owner;
+    private final String playerRelationship;
 
     public GameStatusBean(String gameName) {
+        this(gameName, null);
+    }
+
+    public GameStatusBean(String gameName, String playerName) {
         this.name = gameName;
+        this.gameId = GameService.get(gameName).getId();
         this.format = JolAdmin.getFormat(gameName);
+        this.owner = JolAdmin.getOwner(gameName);
+        this.visibility = JolAdmin.isPublic(gameName) ? "PUBLIC" : "PRIVATE";
         if (JolAdmin.isActive(gameName)) {
             this.gameStatus = "Active";
             registrations = Collections.emptyList();
             this.players = RegistrationService.getPlayers(gameName).stream()
-                    .filter(playerName -> !Strings.isNullOrEmpty(playerName))
-                    .filter(playerName -> RegistrationService.isRegistered(gameName, playerName))
-                    .map(playerName -> new PlayerStatus(gameName, playerName))
+                    .filter(p -> !Strings.isNullOrEmpty(p))
+                    .filter(p -> RegistrationService.isRegistered(gameName, p))
+                    .map(p -> new PlayerStatus(gameName, p))
                     .collect(Collectors.toMap(PlayerStatus::getPlayerName, Function.identity()));
             JolGame game = GameService.getGameByName(gameName);
             this.activePlayer = game.getActivePlayer();
@@ -50,8 +61,8 @@ public class GameStatusBean {
             this.gameStatus = "Inviting";
             players = Collections.emptyMap();
             registrations = RegistrationService.getPlayers(gameName).stream()
-                    .filter(playerName -> !Strings.isNullOrEmpty(playerName))
-                    .map(playerName -> new RegistrationStatus(gameName, playerName))
+                    .filter(p -> !Strings.isNullOrEmpty(p))
+                    .map(p -> new RegistrationStatus(gameName, p))
                     .collect(Collectors.toList());
             this.activePlayer = null;
             this.predator = null;
@@ -59,6 +70,17 @@ public class GameStatusBean {
             this.turn = null;
         }
         created = JolAdmin.getCreatedTime(gameName);
+        if (playerName == null) {
+            this.playerRelationship = null;
+        } else if (this.owner.equals(playerName)) {
+            this.playerRelationship = "OWNER";
+        } else if (RegistrationService.isRegistered(gameName, playerName)) {
+            this.playerRelationship = "REGISTERED";
+        } else if (RegistrationService.isInGame(gameName, playerName)) {
+            this.playerRelationship = "INVITED";
+        } else {
+            this.playerRelationship = "OPEN";
+        }
     }
 
     public String getCreated() {

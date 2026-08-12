@@ -1,5 +1,6 @@
 package net.deckserver.push;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.security.*;
@@ -21,10 +22,14 @@ import java.util.Map;
 @ToString(of = {"auth", "key", "endpoint"})
 public class Subscription {
 
+    private static final BouncyCastleProvider BC_PROVIDER = new BouncyCastleProvider();
+
     private String auth;
     private String key;
     @Setter
     private String endpoint;
+    @Setter
+    private int failureCount = 0;
 
     public Subscription() {}
 
@@ -63,6 +68,7 @@ public class Subscription {
     /**
      * Returns the base64 encoded auth string as a byte[]
      */
+    @JsonIgnore
     public byte[] getAuthAsBytes() {
         return Base64.getDecoder().decode(getAuth());
     }
@@ -70,6 +76,7 @@ public class Subscription {
     /**
      * Returns the base64 encoded public key string as a byte[]
      */
+    @JsonIgnore
     public byte[] getKeyAsBytes() {
         return Base64.getDecoder().decode(getKey());
     }
@@ -77,9 +84,10 @@ public class Subscription {
     /**
      * Returns the base64 encoded public key as a PublicKey object
      */
+    @JsonIgnore
     public PublicKey getUserPublicKey()
-            throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
-        KeyFactory kf = KeyFactory.getInstance("ECDH", BouncyCastleProvider.PROVIDER_NAME);
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+        KeyFactory kf = KeyFactory.getInstance("ECDH", BC_PROVIDER);
         ECNamedCurveParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec("secp256r1");
         ECPoint point = ecSpec.getCurve().decodePoint(getKeyAsBytes());
         ECPublicKeySpec pubSpec = new ECPublicKeySpec(point, ecSpec);

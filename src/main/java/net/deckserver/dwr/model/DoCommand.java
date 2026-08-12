@@ -123,6 +123,9 @@ public record DoCommand(JolGame game, GameModel model) {
             case "clan":
                 clan(cmdObj, player);
                 break;
+            case "open":
+                open(player);
+                break;
         }
     }
 
@@ -451,4 +454,9 @@ public record DoCommand(JolGame game, GameModel model) {
         String choice = cmdObj.nextArg();
         game.setChoice(player, choice);
     }
+
+    void open(String player) {
+        game.setOpenHand(player);
+    }
+
 }

@@ -19,6 +19,8 @@
                     <button type="button" class="btn btn-outline-secondary m-1" onclick="sendCommand('edge burn')">Burn
                         edge
                     </button>
+                    <button type="button" class="btn btn-outline-secondary m-1" onclick="sendCommand('open')">Toggle Open Hand
+                    </button>
                     <button type="button" class="btn btn-warning m-1" title="Gain 1 VP and 6 pool."
                             onclick="sendCommand('vp +1; pool +6')">Ousted prey!
                     </button>

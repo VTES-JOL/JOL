@@ -13,4 +13,5 @@ public class Deck {
     private Library library = new Library();
     private String comments;
     private String player;
+    private String author;
 }

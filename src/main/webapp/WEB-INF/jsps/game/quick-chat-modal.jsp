@@ -21,6 +21,7 @@
                 <button type="button" class="btn btn-outline-secondary m-1" onclick="sendChat('2')">2</button>
                 <button type="button" class="btn btn-outline-secondary m-1" onclick="sendChat('3')">3</button>
                 <button type="button" class="btn btn-outline-secondary m-1" onclick="sendChat('4')">4</button>
+                <button type="button" class="btn btn-outline-secondary m-1" onclick="sendChat('5')">5</button>
                 <br/>
                 <button type="button" class="btn btn-outline-danger m-1" onclick="sendChat('No pre-range')">No pre-range</button>
                 <button type="button" class="btn btn-outline-danger m-1" onclick="sendChat('No maneuver')">No maneuver</button>

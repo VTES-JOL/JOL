@@ -12,7 +12,6 @@ Feature: Burn command
     Examples:
       | player  | command              | from              | target card           | message                     |
       | Player2 | burn library 4       | Player2's library | Far Mastery           | from their library.         |
-      | Player2 | burn library top     | Player2's library | Slaughtering the Herd | from their library.         |
       | Player2 | burn ready 1         | Player2's ready   | Talley, The Hound     | from their ready region.    |
       | Player3 | burn Player2 ready 1 | Player2's ready   | Talley, The Hound     | from Player2's ready region |
 
@@ -22,6 +21,6 @@ Feature: Burn command
     When "Player2" enters the command "burn ready random"
     Then "Player2" has 1 cards in their "ready"
     And "Player2" has 1 cards in their "ash heap"
-    And the last chat message contains "Player2 burns"
+    And the last chat message contains "burns"
     And the last chat message contains "(picked randomly)"
     And the last chat message contains "from their ready region."

@@ -6,6 +6,7 @@ import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.services.RegistrationService;
+import net.deckserver.services.SiteNotesService;
 import net.deckserver.storage.json.system.UserSummary;
 
 import java.util.Collections;
@@ -20,6 +21,7 @@ public class MainBean {
     private final List<UserSummary> who;
     private final boolean loggedIn;
     private final List<ChatEntryBean> chat;
+    private final String notes;
 
     public MainBean(PlayerModel model) {
         String playerName = model.getPlayerName();
@@ -40,11 +42,13 @@ public class MainBean {
                     .collect(Collectors.toList());
             chat = model.getChat();
             who = PlayerService.activeUsers();
+            notes = SiteNotesService.getNotesHtml();
         } else {
             this.games = Collections.emptyList();
             this.ousted = Collections.emptyList();
             this.chat = Collections.emptyList();
             this.who = Collections.emptyList();
+            this.notes = "";
         }
     }
 

@@ -1,6 +1,6 @@
 <div class="card shadow mt-2">
     <div class="card-header bg-body-secondary">
-        <h5>End Turn</h5>
+        <span class="fw-semibold">End Turn</span>
     </div>
     <div class="card-body">
         <label for="endTurnList" class="form-label">Games</label>

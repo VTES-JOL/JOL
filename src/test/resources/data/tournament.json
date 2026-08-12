@@ -1,9 +1,9 @@
 {
   "id": "aefc65f3-e638-471a-8240-2f69e2fee7b0",
-  "registrationStart": "2025-09-10T00:00:00Z",
-  "registrationEnd": "2025-09-28T23:59:00Z",
-  "playStarts": "2025-10-01T00:00:00Z",
-  "playEnds": "2026-01-10T23:59:00Z",
+  "registrationStart": "2026-06-01T00:00:00Z",
+  "registrationEnd": "2026-12-31T23:59:00Z",
+  "playStarts": "2026-07-01T00:00:00Z",
+  "playEnds": "2027-06-30T23:59:00Z",
   "format": "SINGLE_DECK",
   "deckFormat": "Standard",
   "numberOfRounds": 3,

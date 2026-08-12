@@ -1,0 +1,297 @@
+{
+  "deck" : {
+    "id" : null,
+    "name" : "Weapons of War",
+    "crypt" : {
+      "count" : 12,
+      "cards" : [ {
+        "id" : 201666,
+        "name" : "Aniel",
+        "count" : 1,
+        "comments" : null
+      }, {
+        "id" : 201686,
+        "name" : "Seraphina",
+        "count" : 1,
+        "comments" : null
+      }, {
+        "id" : 201685,
+        "name" : "Sakhar",
+        "count" : 2,
+        "comments" : null
+      }, {
+        "id" : 201668,
+        "name" : "Castellan",
+        "count" : 1,
+        "comments" : null
+      }, {
+        "id" : 201673,
+        "name" : "Ilonka",
+        "count" : 2,
+        "comments" : null
+      }, {
+        "id" : 201663,
+        "name" : "Abaddon",
+        "count" : 4,
+        "comments" : null
+      }, {
+        "id" : 201676,
+        "name" : "Malachi",
+        "count" : 1,
+        "comments" : null
+      } ]
+    },
+    "library" : {
+      "count" : 90,
+      "cards" : [ {
+        "type" : "Master",
+        "count" : 15,
+        "cards" : [ {
+          "id" : 102113,
+          "name" : "Vessel",
+          "count" : 2,
+          "comments" : null
+        }, {
+          "id" : 102257,
+          "name" : "Saulot's Avenging Fist",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 101536,
+          "name" : "Rack, The",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 101811,
+          "name" : "Smiling Jack, The Anarch",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 101780,
+          "name" : "Sight Beyond Sight",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 102121,
+          "name" : "Villein",
+          "count" : 2,
+          "comments" : null
+        }, {
+          "id" : 100824,
+          "name" : "Giant's Blood",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 100698,
+          "name" : "Fame",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 102189,
+          "name" : "WMRH Talk Radio",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 101564,
+          "name" : "Rebel",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 102252,
+          "name" : "Meditative Grove",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 100444,
+          "name" : "Creepshow Casino",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 101439,
+          "name" : "Powerbase: Montreal",
+          "count" : 1,
+          "comments" : null
+        } ]
+      }, {
+        "type" : "Action",
+        "count" : 6,
+        "cards" : [ {
+          "id" : 102248,
+          "name" : "Feast of the Soul's Secrets",
+          "count" : 2,
+          "comments" : null
+        }, {
+          "id" : 100072,
+          "name" : "Anonymous Freight",
+          "count" : 4,
+          "comments" : null
+        } ]
+      }, {
+        "type" : "Action/Combat",
+        "count" : 6,
+        "cards" : [ {
+          "id" : 102262,
+          "name" : "Touch of Valeren",
+          "count" : 6,
+          "comments" : null
+        } ]
+      }, {
+        "type" : "Equipment",
+        "count" : 7,
+        "cards" : [ {
+          "id" : 100448,
+          "name" : "Crimson Sentinel, The",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 100176,
+          "name" : "Blade of Enoch",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 100032,
+          "name" : "AK-47",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 100243,
+          "name" : "Bowl of Convergence",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 102261,
+          "name" : "Sword of the Archangel",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 101703,
+          "name" : "Seal of Veddartha",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 101014,
+          "name" : "Ivory Bow",
+          "count" : 1,
+          "comments" : null
+        } ]
+      }, {
+        "type" : "Action Modifier",
+        "count" : 17,
+        "cards" : [ {
+          "id" : 100788,
+          "name" : "Freak Drive",
+          "count" : 6,
+          "comments" : null
+        }, {
+          "id" : 102263,
+          "name" : "Unleashing the Bestial Soul",
+          "count" : 4,
+          "comments" : null
+        }, {
+          "id" : 100761,
+          "name" : "Forced March",
+          "count" : 2,
+          "comments" : null
+        }, {
+          "id" : 102250,
+          "name" : "Forced Confessional",
+          "count" : 3,
+          "comments" : null
+        }, {
+          "id" : 100765,
+          "name" : "Foreshadowing Destruction",
+          "count" : 2,
+          "comments" : null
+        } ]
+      }, {
+        "type" : "Combat",
+        "count" : 15,
+        "cards" : [ {
+          "id" : 101649,
+          "name" : "Rolling with the Punches",
+          "count" : 6,
+          "comments" : null
+        }, {
+          "id" : 102071,
+          "name" : "Unflinching Persistence",
+          "count" : 2,
+          "comments" : null
+        }, {
+          "id" : 100918,
+          "name" : "Hidden Strength",
+          "count" : 5,
+          "comments" : null
+        }, {
+          "id" : 101790,
+          "name" : "Skin of Night",
+          "count" : 2,
+          "comments" : null
+        } ]
+      }, {
+        "type" : "Event",
+        "count" : 1,
+        "cards" : [ {
+          "id" : 101305,
+          "name" : "NRA PAC",
+          "count" : 1,
+          "comments" : null
+        } ]
+      }, {
+        "type" : "Reaction",
+        "count" : 23,
+        "cards" : [ {
+          "id" : 101475,
+          "name" : "Precognition",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 100644,
+          "name" : "Enhanced Senses",
+          "count" : 4,
+          "comments" : null
+        }, {
+          "id" : 100598,
+          "name" : "Eagle's Sight",
+          "count" : 2,
+          "comments" : null
+        }, {
+          "id" : 101321,
+          "name" : "On the Qui Vive",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 100680,
+          "name" : "Eyes of Argus",
+          "count" : 8,
+          "comments" : null
+        }, {
+          "id" : 101259,
+          "name" : "My Enemy's Enemy",
+          "count" : 4,
+          "comments" : null
+        }, {
+          "id" : 101850,
+          "name" : "Spirit's Touch",
+          "count" : 1,
+          "comments" : null
+        }, {
+          "id" : 101949,
+          "name" : "Telepathic Misdirection",
+          "count" : 2,
+          "comments" : null
+        } ]
+      } ]
+    },
+    "comments" : "",
+    "player" : null,
+    "author" : "Player8"
+  },
+  "stats" : {
+    "cryptSize" : 12,
+    "librarySize" : 90,
+    "groups" : [ "7" ],
+    "bannedCards" : false,
+    "summary" : "Crypt: 12 Library: 90 Groups: 7"
+  },
+  "errors" : [ ]
+}

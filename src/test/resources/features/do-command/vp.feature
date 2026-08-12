@@ -10,7 +10,7 @@ Feature: Victory point command
       | player  | command        | target  | before | after | message                                   |
       | Player2 | vp +1          | Player2 | 0.0    | 1.0   | Player2 has gained 1 victory points.      |
       | Player1 | vp Player3 +1  | Player3 | 0.0    | 1.0   | Player3 has gained 1 victory points.      |
-      | Player2 | vp withdraw    | Player2 | 0.0    | 0.5   | Player2 withdraws and gains 0.5 victory points. |
+      | Player2 | vp withdraw    | Player2 | 0.0    | 0.5   | withdraws and gains 0.5 victory points. |
 
   Scenario Outline: Reject invalid victory point commands
     Given "<target>" has <before> victory points

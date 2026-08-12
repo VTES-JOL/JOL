@@ -1,11 +1,12 @@
 package net.deckserver.rest;
 
 import net.deckserver.push.Subscription;
-import net.deckserver.services.NotificationService;
+import net.deckserver.services.SubscriptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -28,9 +29,6 @@ public class NotificationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response handleSubscription(Subscription subscription) {
         String playerName = getPlayerName();
-        logger.info("Endpoint: {}", subscription.getEndpoint());
-        logger.info("Key: {}", subscription.getKey());
-        logger.info("Auth: {}", subscription.getAuth());
 
         // Validate the subscription data
         if (subscription.getEndpoint() == null || subscription.getEndpoint().isEmpty()) {
@@ -52,8 +50,23 @@ public class NotificationResource {
                     .build();
         }
 
-        NotificationService.registerSubscription(playerName, subscription);
+        SubscriptionService.addSubscription(playerName, subscription);
         logger.info("Successfully registered subscription for {}", playerName);
+        return Response.ok(Map.of("status", "ok")).build();
+    }
+
+    @DELETE
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response removeSubscription(Map<String, String> body) {
+        String playerName = getPlayerName();
+        String endpoint = body.get("endpoint");
+        if (endpoint == null || endpoint.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", "Missing endpoint"))
+                    .build();
+        }
+        SubscriptionService.removeSubscription(playerName, endpoint);
+        logger.info("Removed subscription for {}", playerName);
         return Response.ok(Map.of("status", "ok")).build();
     }
 

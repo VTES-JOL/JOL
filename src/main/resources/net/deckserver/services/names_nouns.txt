@@ -1,4 +1,5 @@
 aardvark
+abyss
 abyssinian
 accelerator
 accordion
@@ -21,8 +22,6 @@ adult
 advantage
 advertisement
 advice
-afghanistan
-africa
 aftermath
 afternoon
 aftershave
@@ -40,7 +39,6 @@ alarm
 albatross
 alcohol
 algebra
-algeria
 alibi
 alley
 alligator
@@ -51,10 +49,11 @@ alto
 aluminium
 aluminum
 ambulance
-america
 amount
 amusement
+anarch
 anatomy
+ancilla
 anethesiologist
 anger
 angle
@@ -64,12 +63,15 @@ anime
 ankle
 answer
 ant
+antagonist
 antarctica
 anteater
+antediluvian
 antelope
 anthony
 anthropology
 apartment
+apocalyptic
 apology
 apparatus
 apparel
@@ -86,20 +88,17 @@ archeology
 archer
 architecture
 area
-argentina
 argument
 aries
 arithmetic
 arm
 armadillo
 armchair
-armenian
 army
 arrow
 art
 ash
 ashtray
-asia
 asparagus
 asphalt
 asterisk
@@ -114,12 +113,12 @@ attic
 attraction
 august
 aunt
-australia
-australian
+autarkis
 author
 authorisation
 authority
 authorization
+avenger
 avenue
 babies
 baboon
@@ -144,12 +143,12 @@ bamboo
 banana
 band
 bandana
-bangladesh
 bangle
 banjo
 bank
 bankbook
 banker
+banu haqim
 bar
 barbara
 barber
@@ -178,6 +177,7 @@ bean
 bear
 beard
 beast
+beasts
 beat
 beautician
 beauty
@@ -194,7 +194,6 @@ beggar
 beginner
 begonia
 behavior
-belgian
 belief
 believe
 bell
@@ -222,6 +221,7 @@ black
 bladder
 blade
 blanket
+blanks
 blinker
 blizzard
 block
@@ -263,7 +263,6 @@ branch
 brand
 brandy
 brass
-brazil
 bread
 break
 breakfast
@@ -271,7 +270,6 @@ breath
 brian
 brick
 bridge
-british
 broccoli
 brochure
 broker
@@ -294,7 +292,6 @@ bulldozer
 bumper
 bun
 burglar
-burma
 burn
 burst
 bus
@@ -305,11 +302,14 @@ butcher
 butter
 button
 buzzard
+bystander
+c-clamp
 cabbage
 cabinet
 cable
 cactus
 cafe
+cainite
 cake
 calculator
 calculus
@@ -320,8 +320,6 @@ camel
 camera
 camp
 can
-canada
-canadian
 cancer
 candle
 cannon
@@ -361,7 +359,6 @@ cauliflower
 cause
 caution
 cave
-c-clamp
 cd
 ceiling
 celery
@@ -409,13 +406,12 @@ chill
 chime
 chimpanzee
 chin
-china
-chinese
 chive
 chocolate
 chord
 christmas
 christopher
+chronicle
 chronometer
 church
 cicada
@@ -463,7 +459,6 @@ cold
 collar
 college
 collision
-colombia
 colon
 colony
 color
@@ -490,12 +485,13 @@ condor
 cone
 confirmation
 conga
-congo
 conifer
 connection
+consensus
 consonant
 continent
 control
+conviction
 cook
 cooking
 copper
@@ -508,6 +504,7 @@ corn
 cornet
 correspondent
 cost
+coterie
 cotton
 couch
 cougar
@@ -532,6 +529,7 @@ creator
 creature
 credit
 creditor
+creed
 creek
 crib
 cricket
@@ -549,7 +547,6 @@ crown
 crush
 cry
 cub
-cuban
 cucumber
 cultivator
 cup
@@ -599,6 +596,7 @@ decision
 decrease
 dedication
 deer
+defender
 defense
 deficit
 degree
@@ -621,6 +619,7 @@ detail
 detective
 development
 dew
+diablerie
 diamond
 diaphragm
 dibble
@@ -705,6 +704,7 @@ ease
 east
 edge
 edger
+edges
 editor
 editorial
 education
@@ -714,13 +714,15 @@ effect
 egg
 eggnog
 eggplant
-egypt
 eight
 elbow
 element
 elephant
 elizabeth
 ellipse
+elohim
+elysium
+embrace
 emery
 employee
 employer
@@ -731,7 +733,6 @@ energy
 engine
 engineer
 engineering
-english
 enquiry
 entrance
 environment
@@ -743,23 +744,21 @@ era
 error
 estimate
 ethernet
-ethiopia
 euphonium
-europe
 evening
 event
+ex-husband
+ex-wife
 examination
 example
 exchange
 exclamation
 exhaust
-ex-husband
 existence
 expansion
 experience
 expert
 explanation
-ex-wife
 eye
 eyebrow
 eyelash
@@ -770,6 +769,7 @@ fact
 factory
 fahrenheit
 fairies
+faith
 fall
 family
 fan
@@ -804,6 +804,7 @@ fifth
 fight
 fighter
 file
+final
 find
 fine
 finger
@@ -821,6 +822,7 @@ flare
 flat
 flavor
 flax
+fledgling
 flesh
 flight
 flock
@@ -854,12 +856,11 @@ fox
 foxglove
 fragrance
 frame
-france
 freckle
 freeze
 freezer
 freighter
-french
+frenzy
 freon
 friction
 friday
@@ -889,6 +890,7 @@ gazelle
 gear
 gearshift
 geese
+gehenna
 gemini
 gender
 geography
@@ -896,10 +898,8 @@ geology
 geometry
 george
 geranium
-german
-germany
-ghana
 ghost
+ghoul
 giant
 giraffe
 girdle
@@ -940,8 +940,6 @@ gray
 grease
 great-grandfather
 great-grandmother
-greece
-greek
 green
 grenade
 grey
@@ -952,7 +950,6 @@ group
 grouse
 growth
 guarantee
-guatemalan
 guide
 guilty
 guitar
@@ -985,6 +982,7 @@ hardware
 harmonica
 harmony
 harp
+harpy
 hat
 hate
 hawk
@@ -996,6 +994,7 @@ hearing
 heart
 heat
 heaven
+hecata
 hedge
 height
 helen
@@ -1006,6 +1005,7 @@ helmet
 help
 hemp
 hen
+hermit
 heron
 herring
 hexagon
@@ -1028,6 +1028,7 @@ horn
 horse
 hose
 hospital
+host
 hot
 hour
 hourglass
@@ -1037,6 +1038,7 @@ hub
 hubcap
 humidity
 humor
+hunter-net
 hurricane
 hyacinth
 hydrant
@@ -1055,15 +1057,15 @@ imprisonment
 improvement
 impulse
 inch
+incidents
 income
 increase
 index
-india
-indonesia
 industry
 ink
 innocent
 input
+inquisition
 insect
 instruction
 instrument
@@ -1077,22 +1079,15 @@ intestine
 invention
 inventory
 invoice
-iran
-iraq
 iris
 iron
 island
-israel
-italian
-italy
 jacket
 jaguar
 jail
 jam
 james
 january
-japan
-japanese
 jar
 jasmine
 jason
@@ -1130,7 +1125,6 @@ karen
 kayak
 kendo
 kenneth
-kenya
 ketchup
 kettle
 kettledrum
@@ -1143,6 +1137,8 @@ kidney
 kilogram
 kilometer
 kimberly
+kindred
+kine
 kiss
 kitchen
 kite
@@ -1155,7 +1151,6 @@ knight
 knot
 knowledge
 kohlrabi
-korean
 laborer
 lace
 ladybug
@@ -1168,6 +1163,7 @@ landmine
 language
 larch
 lasagna
+lasombra
 latency
 latex
 lathe
@@ -1224,6 +1220,7 @@ lock
 locket
 locust
 look
+lore
 loss
 lotion
 love
@@ -1251,8 +1248,8 @@ mail
 mailbox
 mailman
 makeup
-malaysia
 male
+malkavian
 mall
 mallet
 man
@@ -1270,12 +1267,13 @@ margin
 maria
 marimba
 mark
-mark
 market
 married
+martyr
 mary
 mascara
 mask
+masquerade
 mass
 match
 math
@@ -1298,8 +1296,6 @@ metal
 meteorology
 meter
 methane
-mexican
-mexico
 mice
 michael
 michelle
@@ -1314,8 +1310,8 @@ millisecond
 mimosa
 mind
 mine
-minibus
 mini-skirt
+minibus
 minister
 mint
 minute
@@ -1334,8 +1330,6 @@ monkey
 month
 moon
 morning
-morocco
-mosque
 mosquito
 mother
 mother-in-law
@@ -1354,7 +1348,6 @@ museum
 music
 musician
 mustard
-myanmar
 nail
 name
 nancy
@@ -1365,7 +1358,7 @@ neck
 need
 needle
 neon
-nepal
+neonate
 nephew
 nerve
 nest
@@ -1377,17 +1370,14 @@ newsstand
 nic
 nickel
 niece
-nigeria
 night
 nitrogen
 node
 noise
 noodle
 north
-north america
-north korea
-norwegian
 nose
+nosferatu
 note
 notebook
 notify
@@ -1453,7 +1443,6 @@ pain
 paint
 pair
 pajama
-pakistan
 palm
 pamphlet
 pan
@@ -1470,6 +1459,7 @@ pantyhose
 paper
 paperback
 parade
+paradox
 parallelogram
 parcel
 parent
@@ -1521,12 +1511,10 @@ peripheral
 permission
 persian
 person
-peru
 pest
 pet
 pharmacist
 pheasant
-philippines
 philosophy
 phone
 physician
@@ -1573,10 +1561,8 @@ pocket
 poet
 point
 poison
-poland
 police
 policeman
-polish
 politician
 pollution
 polo
@@ -1605,6 +1591,8 @@ prepared
 pressure
 price
 priest
+primogen
+prince
 print
 printer
 prison
@@ -1679,6 +1667,7 @@ rat
 rate
 raven
 ravioli
+ravnos
 ray
 rayon
 reaction
@@ -1690,14 +1679,17 @@ record
 recorder
 rectangle
 red
+redeemer
 reduction
 refrigerator
 refund
+regnant
 regret
 reindeer
 relation
 relative
 religion
+reliquary
 relish
 reminder
 repair
@@ -1730,13 +1722,10 @@ road
 roadway
 roast
 robert
-robin
 rock
 rocket
 rod
 roll
-romania
-romanian
 ronald
 roof
 room
@@ -1752,8 +1741,6 @@ rubber
 rugby
 rule
 run
-russia
-russian
 rutabaga
 ruth
 sack
@@ -1778,7 +1765,6 @@ sardine
 satin
 saturday
 sauce
-saudi arabia
 sausage
 save
 saw
@@ -1810,6 +1796,7 @@ seashore
 season
 seat
 second
+second sight
 secretary
 secure
 security
@@ -1821,6 +1808,7 @@ selection
 self
 semicircle
 semicolon
+seneschal
 sense
 sentence
 separated
@@ -1828,11 +1816,11 @@ september
 servant
 server
 session
-sex
 shade
 shadow
 shake
 shallot
+shambler
 shame
 shampoo
 shape
@@ -1844,6 +1832,7 @@ sheep
 sheet
 shelf
 shell
+sheriff
 shield
 shingle
 ship
@@ -1858,8 +1847,6 @@ shovel
 show
 shrimp
 shrine
-siamese
-siberian
 side
 sideboard
 sidecar
@@ -1873,6 +1860,7 @@ sing
 singer
 single
 sink
+sipper
 sister
 sister-in-law
 size
@@ -1924,15 +1912,11 @@ sort
 sound
 soup
 sousaphone
-south africa
-south america
-south korea
 soy
 soybean
 space
 spade
 spaghetti
-spain
 spandex
 spark
 sparrow
@@ -1946,6 +1930,7 @@ spike
 spinach
 spleen
 sponge
+spooks
 spoon
 spot
 spring
@@ -1972,17 +1957,17 @@ stem
 step
 step-aunt
 step-brother
-stepdaughter
 step-daughter
 step-father
 step-grandfather
 step-grandmother
-stepmother
 step-mother
 step-sister
-stepson
 step-son
 step-uncle
+stepdaughter
+stepmother
+stepson
 steven
 stew
 stick
@@ -2014,7 +1999,6 @@ submarine
 substance
 subway
 success
-sudan
 suede
 sugar
 suggestion
@@ -2040,19 +2024,17 @@ swan
 sweater
 sweatshirt
 sweatshop
-swedish
 sweets
 swim
 swimming
 swing
-swiss
 switch
 sword
 swordfish
 sycamore
-syria
 syrup
 system
+t-shirt
 table
 tablecloth
 tabletop
@@ -2060,11 +2042,9 @@ tachometer
 tadpole
 tail
 tailor
-taiwan
 talk
 tank
 tanker
-tanzania
 target
 taste
 taurus
@@ -2092,14 +2072,15 @@ test
 text
 textbook
 texture
-thailand
 theater
 theory
 thermometer
+thin-blood
 thing
 thistle
 thomas
 thought
+thrall
 thread
 thrill
 throat
@@ -2127,15 +2108,17 @@ toast
 toe
 toenail
 toilet
-tomato
 tom-tom
+tomato
 ton
 tongue
 tooth
 toothbrush
 toothpaste
 top
+torment
 tornado
+torpor
 tortellini
 tortoise
 touch
@@ -2155,6 +2138,7 @@ trapezoid
 tray
 treatment
 tree
+tremere
 trial
 triangle
 trick
@@ -2168,7 +2152,6 @@ trowel
 truck
 trumpet
 trunk
-t-shirt
 tsunami
 tub
 tuba
@@ -2177,9 +2160,6 @@ tugboat
 tulip
 tuna
 tune
-turkey
-turkey
-turkish
 turn
 turnip
 turnover
@@ -2192,9 +2172,7 @@ twine
 twist
 typhoon
 tyvek
-uganda
-ukraine
-ukrainian
+umbra
 umbrella
 uncle
 underclothes
@@ -2202,11 +2180,9 @@ underpants
 undershirt
 underwear
 unit
-united kingdom
 unshielded
 use
 utensil
-uzbekistan
 vacation
 vacuum
 valley
@@ -2219,8 +2195,6 @@ vegetarian
 veil
 vein
 velvet
-venezuela
-venezuelan
 verdict
 vermicelli
 verse
@@ -2228,17 +2202,18 @@ vessel
 vest
 veterinarian
 vibraphone
-vietnam
 view
 vinyl
 viola
 violet
 violin
 virgo
+virtue
 viscose
 vise
 vision
 visitor
+vitae
 voice
 volcano
 volleyball
@@ -2252,6 +2227,7 @@ wallaby
 wallet
 walrus
 war
+warlocks
 warm
 wash
 washer
@@ -2264,6 +2240,7 @@ waterfall
 wave
 wax
 way
+wayward
 wealth
 weapon
 weasel
@@ -2326,7 +2303,6 @@ yellow
 yew
 yogurt
 yoke
-yugoslavian
 zebra
 zephyr
 zinc

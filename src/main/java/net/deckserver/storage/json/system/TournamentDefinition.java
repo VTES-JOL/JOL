@@ -37,7 +37,7 @@ public class TournamentDefinition {
     @Setter(AccessLevel.NONE)
     private Table<Integer, Integer, List<TournamentPlayer>> rounds = HashBasedTable.create();
     private TournamentFinals finals = new TournamentFinals();
-    private GameStatus status = GameStatus.STARTING;
+    private GameStatus status = GameStatus.EDIT;
 
     @JsonIgnore
     public List<TournamentPlayer> getPlayers(int round, int table) {
@@ -85,6 +85,10 @@ public class TournamentDefinition {
                 rounds.put(round, table, players);
             });
         });
+    }
+
+    public void resetRounds() {
+        rounds.clear();
     }
 
     @JsonGetter("rounds")

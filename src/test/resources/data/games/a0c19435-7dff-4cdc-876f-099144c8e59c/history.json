@@ -1,0 +1,9 @@
+[ {
+  "turnId" : "1.1",
+  "player" : "Player4",
+  "chats" : [ {
+    "timestamp" : "19-June 11:04 ",
+    "message" : "START OF UNLOCK PHASE.",
+    "source" : "Player4"
+  } ]
+} ]

@@ -15,6 +15,7 @@ import net.deckserver.game.validators.DeckValidator;
 import net.deckserver.game.validators.ValidationResult;
 import net.deckserver.game.validators.ValidatorFactory;
 import net.deckserver.services.*;
+import net.deckserver.ws.WebSocketRegistry;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
@@ -54,9 +55,7 @@ public class JolAdmin {
         if (name == null) {
             return new PlayerModel(null, false);
         } else {
-            PlayerModel playerModel = pmap.computeIfAbsent(name, k -> new PlayerModel(k, true));
-            GlobalChatService.subscribe(playerModel);
-            return playerModel;
+            return pmap.computeIfAbsent(name, k -> new PlayerModel(k, true));
         }
     }
 
@@ -83,6 +82,7 @@ public class JolAdmin {
         if (gameName.length() > 2 && notExistsGame(gameName)) {
             try {
                 GameService.create(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), format);
+                WebSocketRegistry.notifyMain();
             } catch (Exception e) {
                 logger.error("Error creating game", e);
             }
@@ -111,6 +111,14 @@ public class JolAdmin {
         return DeckService.get(playerName, deckName).getGameFormats();
     }
 
+    public static String getDeckComment(String playerName, String deckName) {
+        return DeckService.getDeckComments(playerName, deckName);
+    }
+
+    public static void setDeckComment(String playerName, String gameName, String comments) {
+        getGameDeck(gameName, playerName).setComments(comments);
+    }
+
     public static Deck getGameDeck(String gameName, String playerName) {
         return Optional.ofNullable(RegistrationService.getRegistration(gameName, playerName))
                 .map(status -> {
@@ -133,11 +141,13 @@ public class JolAdmin {
         }
     }
 
-    public static synchronized void saveDeck(String playerName, String deckName, String contents) {
+    public static synchronized void saveDeck(String playerName, String deckName, String contents, String comment) {
         if (playerName != null && contents != null && deckName != null) {
             deckName = deckName.trim();
             ExtendedDeck deck = DeckParser.parseDeck(contents);
             deck.getDeck().setName(deckName);
+            deck.getDeck().setAuthor(playerName);
+            deck.getDeck().setComments(comment);
             PlayerModel playerModel = getPlayerModel(playerName);
             playerModel.setDeck(deck);
             playerModel.setContents(contents);
@@ -166,6 +176,7 @@ public class JolAdmin {
             PlayerGameActivityService.setGameTimestamp(game.getName());
         }
         GameService.saveGame(game);
+        WebSocketRegistry.notifyGame(game.id());
     }
 
     public static synchronized void registerDeck(String gameName, String playerName, String deckName) {
@@ -288,8 +299,23 @@ public class JolAdmin {
         return PlayerService.get(player).getEdgeColor();
     }
 
+    public static synchronized void setNotificationPreference(String player, boolean value) {
+        PlayerService.get(player).setNotificationsEnabled(value);
+    }
+
+    public static synchronized boolean getNotificationPreference(String player) {
+        if (player == null) {
+            return false;
+        }
+        return PlayerService.get(player).isNotificationsEnabled();
+    }
+
     public static synchronized boolean isAdmin(String player) {
         return PlayerService.get(player).getRoles().contains(PlayerRole.ADMIN);
+    }
+
+    public static synchronized boolean isTournamentAdmin(String player) {
+        return PlayerService.get(player).getRoles().contains(PlayerRole.TOURNAMENT_ADMIN);
     }
 
     public static synchronized boolean isPlaytester(String player) {
@@ -422,7 +448,7 @@ public class JolAdmin {
         GameService.remove(gameName, gameInfo.getId());
         PlayerGameActivityService.clearGame(gameName);
         gmap.remove(gameName);
-
+        WebSocketRegistry.notifyMain();
     }
 
     public static String getDeckId(String playerName, String deckName) {

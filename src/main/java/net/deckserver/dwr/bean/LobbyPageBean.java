@@ -17,9 +17,7 @@ import java.util.stream.Collectors;
 @Getter
 public class LobbyPageBean {
     private final List<String> players;
-    private final List<GameStatusBean> myGames;
-    private final List<GameStatusBean> publicGames;
-    private final List<GameInviteStatus> invitedGames;
+    private final List<GameStatusBean> games;
     private final List<DeckInfoBean> decks;
     private final String message;
     private final boolean playtester;
@@ -39,28 +37,17 @@ public class LobbyPageBean {
                 .map(PlayerActivityStatus::getName)
                 .collect(Collectors.toList());
 
-        myGames = JolAdmin.getGameNames().stream()
+        // Unified game list: owner's private games (any status) + public starting games + invited private starting games
+        games = JolAdmin.getGameNames().stream()
                 .filter(Objects::nonNull)
-                .filter(JolAdmin::isPrivate)
                 .filter(gameName -> JolAdmin.isViewable(gameName, player))
-                .filter(gameName -> player.equals(JolAdmin.getOwner(gameName)))
-                .map(GameStatusBean::new)
-                .collect(Collectors.toList());
-
-        publicGames = JolAdmin.getGameNames().stream()
-                .filter(Objects::nonNull)
-                .filter(JolAdmin::isStarting)
-                .filter(JolAdmin::isPublic)
-                .filter(gameName -> JolAdmin.isViewable(gameName, player))
-                .map(GameStatusBean::new)
+                .filter(gameName ->
+                        (JolAdmin.isPrivate(gameName) && player.equals(JolAdmin.getOwner(gameName)))
+                        || (JolAdmin.isStarting(gameName) && JolAdmin.isPublic(gameName))
+                        || (JolAdmin.isStarting(gameName) && RegistrationService.isInGame(gameName, player)))
+                .distinct()
+                .map(gameName -> new GameStatusBean(gameName, player))
                 .sorted(Comparator.comparing(GameStatusBean::getFormat).thenComparing(GameStatusBean::getCreated))
-                .collect(Collectors.toList());
-
-        invitedGames = JolAdmin.getGameNames().stream()
-                .filter(Objects::nonNull)
-                .filter(JolAdmin::isStarting)
-                .filter(gameName -> RegistrationService.isInGame(gameName, player))
-                .map(gameName -> new GameInviteStatus(gameName, player))
                 .collect(Collectors.toList());
 
         decks = DeckService.getPlayerDeckNames(player).stream()

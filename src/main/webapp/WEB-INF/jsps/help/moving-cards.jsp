@@ -342,10 +342,6 @@
                         <th>SOURCE</th>
                         <td>The default player is yourself. The default region is the ready region.</td>
                     </tr>
-                    <tr>
-                        <th>top</th>
-                        <td>Optionally use <code>top</code> instead of specifying position 1 when determining source.</td>
-                    </tr>
                     </tbody>
                 </table>
                 <table class="table table-bordered">
@@ -362,11 +358,11 @@
                         </td>
                     </tr>
                     <tr>
-                        <th>burn Lilith library top</th>
+                        <th>burn Lilith library 1</th>
                         <td>Burns the top card from Lilith's library. Useful for cards like The Slaughterhouse.</td>
                     </tr>
                     <tr>
-                        <th>burn crypt top</th>
+                        <th>burn crypt 1</th>
                         <td>Burns the top card of your crypt.</td>
                     </tr>
                     </tbody>
