@@ -835,7 +835,7 @@ public record JolGame(String id, GameData data) {
             RegionData sourceRegion = card.getRegion();
             RegionData destinationRegion = data.getPlayerRegion(destPlayer, destRegion);
             boolean sameOwner = Stream.of(sourceRegion.getOwner(), destinationRegion.getOwner()).allMatch(c -> c.equals(player));
-            String topMessage = top ? "the top of " : "";
+            String topMessage = top ? "the top of " : "the bottom of ";
             String playerName = sameOwner ? "their" : destinationRegion.getOwner() + "'s";
             String message = String.format("moves %s to %s%s %s.", getCardName(card, destinationRegion), topMessage, playerName, destRegion.xmlLabel());
             ChatService.sendCommand(id, player, message, "move", card.getId(), destPlayer, destRegion.xmlLabel(), top ? "top" : "bottom");

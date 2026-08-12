@@ -377,6 +377,18 @@ function discard(replace = true) {
     return false;
 }
 
+function moveLibraryFromHand(top) {
+    let modal = $('#playCardModal');
+    let handIndex = modal.data('hand-coord');
+    let command = 'move hand ' + handIndex + ' library';
+    if (top) {
+        command += " top";
+    }
+    sendCommand(command);
+    modal.modal('hide');
+    return false;
+}
+
 function multiModeButtonClicked(event) {
     let modes = $('#playCardModal .card-modes button.active').length;
     let playButton = $('#playCardModalPlayButton');
