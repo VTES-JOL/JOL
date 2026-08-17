@@ -1,6 +1,7 @@
 package net.deckserver.servlet;
 
 import net.deckserver.Recaptcha;
+import net.deckserver.services.AuthService;
 import net.deckserver.services.PlayerService;
 
 import javax.servlet.annotation.WebServlet;
@@ -21,7 +22,7 @@ public class RegisterServlet extends HttpServlet {
         String captchaResponse = request.getParameter("cf-turnstile-response");
         boolean verify = Recaptcha.verify(captchaResponse);
         if (verify && PlayerService.registerPlayer(player, password, email)) {
-            request.getSession().setAttribute("meth", player);
+            AuthService.issueTokens(player, false, request, response);
         }
         response.sendRedirect("/jol/");
     }

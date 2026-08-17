@@ -1,6 +1,7 @@
 package net.deckserver.servlet;
 
 import net.deckserver.JolAdmin;
+import net.deckserver.services.AuthService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.storage.json.cards.SecuredCardLoader;
 import org.slf4j.Logger;
@@ -43,7 +44,8 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         boolean authResult = PlayerService.authenticate(username, password);
         if (authResult) {
-            request.getSession().setAttribute("meth", username);
+            boolean remember = request.getParameter("remember") != null;
+            AuthService.issueTokens(username, remember, request, response);
             boolean playTester = JolAdmin.isPlaytester(username);
             if (playTester) {
                 setupPlaytestAuth(response);

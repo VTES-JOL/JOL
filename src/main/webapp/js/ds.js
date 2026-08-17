@@ -7,16 +7,32 @@ const _ctx = '/jol/api';
 
 function _enc(s) { return encodeURIComponent(s); }
 
+// Access tokens are short-lived; on a 401 we silently exchange the refresh cookie
+// for a new one via /auth/refresh and retry the original call exactly once.
+let _refreshing = null;
+function _refresh() {
+    if (!_refreshing) {
+        _refreshing = fetch(_ctx + '/auth/refresh', { method: 'POST' })
+            .finally(() => { _refreshing = null; });
+    }
+    return _refreshing;
+}
+
 function apiCall(method, path, body, opts) {
     const init = { method, headers: {'Content-Type': 'application/json'} };
     if (body !== null && body !== undefined) init.body = JSON.stringify(body);
     return fetch(_ctx + path, init)
         .then(r => {
+            if (r.status === 401 && !opts?._retried) {
+                return _refresh().then(rr => rr.ok
+                    ? apiCall(method, path, body, Object.assign({}, opts, {_retried: true}))
+                    : Promise.reject(new Error('401: Unauthorized')));
+            }
             if (!r.ok) return r.text().then(msg => { throw new Error(`${r.status}: ${msg || r.statusText}`); });
             if (r.status === 204) return {};
             return r.json();
         })
-        .then(data => opts?.callback && opts.callback(data))
+        .then(data => { if (data !== undefined && opts?.callback) opts.callback(data); })
         .catch(err => opts?.errorHandler && opts.errorHandler(String(err)));
 }
 
@@ -962,7 +978,7 @@ function callbackStatusTournament(isActive) {
         DS.getTournamentRounds(nameOfTournament, {
             callback: function(rounds) {
                 callbackTournamentRounds(rounds);
-                DS.getAllRegisteredPlayers(nameOfTournament, {callback: callbackTableManager, errorHandler: errorhandler});
+                DS.getTournamentPlayers(nameOfTournament, {callback: callbackTableManager, errorHandler: errorhandler});
             },
             errorHandler: errorhandler
         });

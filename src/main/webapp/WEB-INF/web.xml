@@ -37,14 +37,6 @@
         <url-pattern>/test</url-pattern>
     </servlet-mapping>
 
-    <session-config>
-        <session-timeout>600</session-timeout>
-        <cookie-config>
-            <http-only>true</http-only>
-            <secure>true</secure>
-        </cookie-config>
-    </session-config>
-
     <welcome-file-list>
         <welcome-file>login.jsp</welcome-file>
     </welcome-file-list>

@@ -30,6 +30,7 @@ public class JolApplicationInitializer implements ServletContextListener {
         scheduler.scheduleAtFixedRate(new PublicGameBuilder(), 1, 1, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new GameCleanUp(), 1, 1, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new TournamentJob(), 0, 1, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(RefreshTokenService::cleanupExpired, 5, 1440, TimeUnit.MINUTES);
     }
 
     @Override
@@ -45,6 +46,7 @@ public class JolApplicationInitializer implements ServletContextListener {
         PlayerActivityService.getInstance().shutdown();
         PlayerGameActivityService.getInstance().shutdown();
         PlayerService.getInstance().shutdown();
+        RefreshTokenService.getInstance().shutdown();
         SiteNotesService.getInstance().shutdown();
         SubscriptionService.getInstance().shutdown();
         TournamentService.getInstance().shutdown();

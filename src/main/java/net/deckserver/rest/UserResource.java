@@ -2,9 +2,11 @@ package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
 import net.deckserver.services.PlayerService;
+import net.deckserver.services.RefreshTokenService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 import java.util.Map;
 
 @Path("/user")
@@ -49,6 +51,32 @@ public class UserResource extends BaseResource {
         return update(player);
     }
 
+    /** "Remembered" devices for the current user, from the refresh-token store. */
+    @GET
+    @Path("devices")
+    public List<DeviceSummary> listDevices() {
+        return RefreshTokenService.list(username()).stream()
+                .map(t -> new DeviceSummary(t.getId(), t.getDeviceLabel(), t.getCreatedAt(), t.getLastUsedAt()))
+                .toList();
+    }
+
+    /** Log out one specific remembered device without affecting others. */
+    @DELETE
+    @Path("devices/{id}")
+    public Map<String, Object> revokeDevice(@PathParam("id") String id) {
+        RefreshTokenService.revoke(username(), id);
+        return update();
+    }
+
+    /** Log out every device at once. */
+    @POST
+    @Path("logout-all")
+    public Map<String, Object> logoutAllDevices() {
+        RefreshTokenService.revokeAll(username());
+        return update();
+    }
+
+    public record DeviceSummary(String id, String deviceLabel, long createdAt, long lastUsedAt) {}
     public record ProfileRequest(String email, String discordID, String veknID, String country) {}
     public record PasswordRequest(String newPassword) {}
     public record PreferencesRequest(boolean imageTooltips, boolean notificationsEnabled) {}
