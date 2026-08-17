@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -242,9 +243,17 @@ public class TournamentResource extends BaseResource {
     /** Replaces DS.createTournamentTables() */
     @POST
     @Path("{name}/tables")
-    public void createTournamentTables(@PathParam("name") String tourName) {
-        if (!JolAdmin.isTournamentAdmin(username())) return;
-        TournamentService.createTournamentTables(tourName);
+    public Response createTournamentTables(@PathParam("name") String tourName) {
+        if (!JolAdmin.isTournamentAdmin(username())) return Response.status(Response.Status.FORBIDDEN).build();
+        try {
+            TournamentService.createTournamentTables(tourName);
+            return Response.noContent().build();
+        } catch (IllegalStateException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            log.error("Unexpected error creating tournament tables for {}", tourName, e);
+            return Response.serverError().entity("Failed to create tournament tables").build();
+        }
     }
 
     /** Replaces DS.saveTables() */
@@ -273,12 +282,16 @@ public class TournamentResource extends BaseResource {
     /** Replaces DS.importTables() */
     @POST
     @Path("{name}/rounds/import")
-    public void importTables(@PathParam("name") String tourName, ImportTablesRequest body) {
-        if (!JolAdmin.isTournamentAdmin(username())) return;
+    public Response importTables(@PathParam("name") String tourName, ImportTablesRequest body) {
+        if (!JolAdmin.isTournamentAdmin(username())) return Response.status(Response.Status.FORBIDDEN).build();
         try {
             TournamentService.importRoundsFromCsv(tourName, body.csvData());
+            return Response.noContent().build();
+        } catch (IOException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to import tournament tables from CSV", e);
+            log.error("Unexpected error importing tournament tables for {}", tourName, e);
+            return Response.serverError().entity("Failed to import tournament tables from CSV").build();
         }
     }
 

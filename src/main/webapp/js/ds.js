@@ -1396,6 +1396,9 @@ function saveTables() {
 }
 
 function importTables() {
+    if (!confirm("Import Tournament Tables from CSV? This replaces the current round/table assignments, and if the tournament has already started, existing tables/games for it will be deleted.")) {
+        return;
+    }
     let tournamentSelected = $("#nameOfTournament option:selected").text();
     let csvData = $("#importTablesCsv").val().trim();
     let errorDiv = $("#importTablesError");
@@ -1614,6 +1617,8 @@ function callbackSaveButton(isStarted) {
 function createTournamentTables() {
     if (confirm("Are you sure you want to create the Tournament Tables?")) {
         let tournamentSelected = $("#nameOfTournament option:selected").text();
+        let errorDiv = $("#createTablesError");
+        errorDiv.addClass("d-none");
         DS.createTournamentTables(tournamentSelected, {
             callback: function() {
                 let item = $('#tournamentAdminList .tournament-admin-entry[data-name="' + tournamentSelected + '"]');
@@ -1621,7 +1626,9 @@ function createTournamentTables() {
                 item.find('.badge').removeClass('text-bg-secondary').addClass('text-bg-success').text('Active');
                 resetTournamentManager();
             },
-            errorHandler: errorhandler
+            errorHandler: function(msg) {
+                errorDiv.text("Failed to create tables: " + msg).removeClass("d-none");
+            }
         });
     }
 }

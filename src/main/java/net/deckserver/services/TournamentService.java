@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import net.deckserver.dwr.model.JolGame;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
+import net.deckserver.game.enums.TournamentFormat;
 import net.deckserver.game.enums.Visibility;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.CardSimple;
@@ -13,6 +14,7 @@ import net.deckserver.storage.json.system.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -250,6 +252,8 @@ public class TournamentService extends PersistedService {
         TournamentDefinition tournament = INSTANCE.tournaments.get(tourName);
         if (tournament == null) return;
 
+        String cleaned = sanitizeCsvData(csvData);
+
         CSVFormat format = CSVFormat.DEFAULT.builder()
                 .setHeader("Round", "Table", "Player")
                 .setSkipHeaderRecord(true)
@@ -257,10 +261,10 @@ public class TournamentService extends PersistedService {
                 .build();
 
         Map<Integer, Map<Integer, List<TournamentPlayer>>> rounds = new HashMap<>();
-        try (CSVParser parser = CSVParser.parse(new StringReader(csvData), format)) {
+        try (CSVParser parser = CSVParser.parse(new StringReader(cleaned), format)) {
             for (CSVRecord record : parser) {
-                int round = Integer.parseInt(record.get("Round"));
-                int table = Integer.parseInt(record.get("Table"));
+                int round = parseIntColumn(record, "Round");
+                int table = parseIntColumn(record, "Table");
                 String playerName = record.get("Player");
                 if (playerName == null || playerName.isEmpty()) continue;
 
@@ -273,61 +277,186 @@ public class TournamentService extends PersistedService {
             }
         }
 
+        // Only clear out already-created games once the whole CSV has parsed
+        // successfully, so a bad import leaves prior tournament state untouched.
+        if (tournament.getStatus() == GameStatus.STARTING) {
+            clearTournamentGames(tourName);
+        }
         tournament.setRounds(rounds);
         INSTANCE.persist();
+    }
+
+    private static String sanitizeCsvData(String csvData) {
+        String cleaned = StringUtils.stripStart(csvData, "﻿");
+        return cleaned
+                .replace('“', '"').replace('”', '"')
+                .replace('‘', '\'').replace('’', '\'');
+    }
+
+    private static int parseIntColumn(CSVRecord record, String column) throws IOException {
+        String raw = record.get(column);
+        try {
+            return Integer.parseInt(raw.trim());
+        } catch (NumberFormatException e) {
+            throw new IOException(String.format(
+                    "Invalid CSV data at record %d, column '%s': value '%s' is not a valid integer",
+                    record.getRecordNumber(), column, raw));
+        }
+    }
+
+    private static void clearTournamentGames(String tournamentName) {
+        List<GameInfo> games = GameService.getGamesByTournament(tournamentName);
+        for (GameInfo game : games) {
+            GameService.remove(game.getName(), game.getId());
+        }
+        if (!games.isEmpty()) {
+            logger.info("Cleared {} stale game(s) for tournament '{}' during round re-import", games.size(), tournamentName);
+        }
     }
 
     public static void save() {
         INSTANCE.persist();
     }
 
+    /**
+     * Checks every player seated in any round/table against their tournament deck registration,
+     * without creating anything. Used to fail fast (and name every affected player at once)
+     * before {@link #createTournamentTables} starts creating games.
+     * <p>
+     * A {@code SINGLE_DECK} tournament uses one registration for the whole event, so a missing
+     * deck fails identically in every round - each player is reported once, with no round number.
+     * A {@code MULTI_DECK} tournament reports each round separately, since which round is affected
+     * is meaningful information for the admin fixing it.
+     */
+    private static List<String> validateTournamentPlayerDecks(TournamentMetadata tournament) {
+        String tournamentName = tournament.getName();
+        boolean singleDeck = isSingleDeck(tournamentName);
+
+        List<String> issues = new ArrayList<>();
+        Set<String> checked = new LinkedHashSet<>();
+        for (int round = 1; round <= tournament.getNumberOfRounds(); round++) {
+            for (int table = 1; table <= tournament.getNumberOfTables(); table++) {
+                List<TournamentPlayer> players = getPlayers(tournamentName, round, table);
+                if (players == null) continue;
+                int currentRound = round;
+                for (TournamentPlayer player : players) {
+                    String playerName = player.getName();
+                    String dedupeKey = singleDeck ? playerName : currentRound + ":" + playerName;
+                    if (!checked.add(dedupeKey)) continue;
+
+                    describePlayerDeckIssue(tournamentName, playerName).ifPresent(reason -> issues.add(
+                            singleDeck
+                                    ? "%s (%s)".formatted(playerName, reason)
+                                    : "Round %d: %s (%s)".formatted(currentRound, playerName, reason)));
+                }
+            }
+        }
+        return issues;
+    }
+
+    private static boolean isSingleDeck(String tournamentName) {
+        TournamentDefinition definition = INSTANCE.tournaments.get(tournamentName);
+        return definition == null || definition.getFormat() == TournamentFormat.SINGLE_DECK;
+    }
+
+    private static Optional<String> describePlayerDeckIssue(String tournamentName, String playerName) {
+        Optional<TournamentRegistration> registration = getRegistrations(tournamentName, playerName);
+        if (registration.isEmpty()) {
+            return Optional.of("no registration found");
+        }
+
+        String deckId = registration.get().getDeck();
+        if (deckId == null || deckId.isBlank()) {
+            return Optional.of("no deck selected");
+        }
+
+        ExtendedDeck deck = getTournamentDeck(tournamentName, deckId);
+        if (deck == null) {
+            return Optional.of("deck file '%s' missing or unreadable".formatted(deckId));
+        }
+        if (deck.getDeck() == null) {
+            return Optional.of("deck '%s' has no deck data".formatted(deckId));
+        }
+        if (deck.getStats() == null || deck.getStats().getSummary() == null) {
+            return Optional.of("deck '%s' has no stats summary".formatted(deckId));
+        }
+        return Optional.empty();
+    }
+
     public static void createTournamentTables(String tourName) {
         // Start tournaments
         TournamentMetadata tournament = getTournamentReadyToStart(tourName);
-        //dont setup the tournament games if no rounds have been created
-        if (!tournament.isRoundsConfig())
+
+        // dont setup the tournament games if no rounds have been created
+        if (!tournament.isRoundsConfig()) {
             return;
+        }
+
         String tournamentName = tournament.getName();
+
+        List<String> deckIssues = validateTournamentPlayerDecks(tournament);
+        if (!deckIssues.isEmpty()) {
+            throw new IllegalStateException(
+                    "Cannot create tournament tables for '%s'. The following players have deck issues: %s"
+                            .formatted(tournamentName, String.join("; ", deckIssues)));
+        }
+
         for (int round = 1; round <= tournament.getNumberOfRounds(); round++) {
             for (int table = 1; table <= tournament.getNumberOfTables(); table++) {
                 String gameName = String.format("%s: Round %d - Table %d", tournamentName, round, table);
                 String gameId = UUID.randomUUID().toString();
+
+                List<TournamentPlayer> players = getPlayers(tournamentName, round, table);
+                if (players == null || players.isEmpty()) {
+                    logger.warn("Skipping tournament table creation for tournament '{}', round {}, table {} because no players were found",
+                            tournamentName, round, table);
+                    continue;
+                }
+
                 // Create Game
                 GameService.create(gameName, gameId, "SYSTEM", Visibility.PUBLIC, GameFormat.from(tournament.getDeckFormat()));
                 JolGame jolGame = new JolGame(gameId, new GameData(gameId, gameName));
-                List<TournamentPlayer> players = getPlayers(tournamentName, round, table);
+
                 for (TournamentPlayer player : players) {
                     String playerName = player.getName();
                     TournamentRegistration registration = getRegistrations(tournamentName, playerName).orElseThrow();
                     String deckId = registration.getDeck();
                     ExtendedDeck deck = getTournamentDeck(tournamentName, deckId);
-                    assert deck != null;
+
                     // Create Registration
                     RegistrationService.registerDeck(gameName, playerName, deckId, deck.getDeck().getName(), deck.getStats().getSummary());
+
                     // Add player and deck
                     jolGame.addPlayer(playerName, deck.getDeck());
+
                     // Copy deck into game folder
                     Path gameDeckPath = DataPaths.path("games", gameId, deckId + ".json");
-                    Path tournamentDeckPath = DataPaths.path("tournaments", tournament.getId(), deckId + ".json");                        if (!Files.exists(gameDeckPath)) {
+                    Path tournamentDeckPath = DataPaths.path("tournaments", tournament.getId(), deckId + ".json");
+
+                    if (!Files.exists(gameDeckPath)) {
                         try {
                             Files.copy(tournamentDeckPath, gameDeckPath, StandardCopyOption.REPLACE_EXISTING);
                         } catch (IOException e) {
-                            logger.error("Unable to copy tournament file");
+                            logger.error("Unable to copy tournament deck file '{}' to game deck file '{}'",
+                                    tournamentDeckPath, gameDeckPath, e);
                         }
                     }
-
                 }
+
                 // Set order and start
                 jolGame.startGame(players.stream().map(TournamentPlayer::getName).toList());
                 String playerName = players.getFirst().getName();
                 PlayerGameActivityService.pingPlayer(playerName, gameName);
+
                 // Save game
                 GameService.saveGame(jolGame);
+
                 // Update status and link to tournament
                 GameService.get(gameName).setStatus(GameStatus.ACTIVE);
                 GameService.get(gameName).setTournamentName(tournamentName);
             }
         }
+
         // Start tournament
         startTournament(tournamentName);
     }
