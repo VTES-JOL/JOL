@@ -352,6 +352,10 @@ public class JolAdmin {
         return Optional.ofNullable(GameService.get(gameName)).map(GameInfo::getStatus).map(status -> status.equals(GameStatus.ACTIVE)).orElse(false);
     }
 
+    public static boolean isTournament(String gameName) {
+        return Optional.ofNullable(GameService.get(gameName)).map(GameInfo::getTournamentName).map(tournament -> tournament != null).orElse(false);
+    }
+
     public static boolean isAlive(String gameName, String playerName) {
         return GameService.getGameByName(gameName).getPool(playerName) > 0;
     }

@@ -10,6 +10,7 @@ import net.deckserver.services.SiteNotesService;
 import net.deckserver.storage.json.system.UserSummary;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class MainBean {
 
     private final List<GameStatusBean> games;
+    private final List<GameStatusBean> tournament;
     private final List<GameStatusBean> ousted;
     private final List<UserSummary> who;
     private final boolean loggedIn;
@@ -36,6 +38,11 @@ public class MainBean {
                     .filter(gameName -> GameService.getSummary(gameName).getPlayers().contains(playerName))
                     .map(GameStatusBean::new)
                     .collect(Collectors.toList());
+            this.tournament = games.stream()
+                    .filter(JolAdmin::isTournament)
+                    .filter(gameName -> GameService.getSummary(gameName).getPlayers().contains(playerName))
+                    .map(GameStatusBean::new)
+                    .collect(Collectors.toList());
             this.ousted = games.stream()
                     .filter(gameName -> !GameService.getSummary(gameName).getPlayers().contains(playerName))
                     .map(GameStatusBean::new)
@@ -45,6 +52,7 @@ public class MainBean {
             notes = SiteNotesService.getNotesHtml();
         } else {
             this.games = Collections.emptyList();
+            this.tournament = Collections.emptyList();
             this.ousted = Collections.emptyList();
             this.chat = Collections.emptyList();
             this.who = Collections.emptyList();

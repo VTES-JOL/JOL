@@ -2158,6 +2158,7 @@ function callbackMain(data) {
         renderOnline('onlinePlayers', data.who);
         renderGlobalChat(data.chat);
         renderMyGames("myGames", data.games);
+        renderMyGames("tournamentGames", data.tournament);
         renderMyGames("oustedGames", data.ousted);
         if (data.notes) {
             $("#siteNotesContent").html(data.notes);
@@ -2483,7 +2484,7 @@ function renderMyGames(id, games) {
         }
         gameRow.append(nameRow);
 
-        if (id === "myGames" && gameEntry.predator) {
+        if ((id === "myGames" || id === "tournamentGames") && gameEntry.predator) {
             let pred = gameEntry.players[gameEntry.predator];
             let active = gameEntry.players[gameEntry.activePlayer];
             let prey = gameEntry.players[gameEntry.prey];
@@ -2554,6 +2555,19 @@ function renderActiveGames(games) {
         let timestamp = $("<td/>").text(moment(gameEntry.timestamp).tz("UTC").format("D-MMM HH:mm z"));
         gameRow.append(gameLink, turn, timestamp);
         activeGames.append(gameRow);
+    });
+}
+
+function renderTournamentGames(games) {
+    let tournamentGames = $("#tournamentGames tbody");
+    tournamentGames.empty();
+    $.each(games, function (index, gameEntry) {
+        let gameRow = $("<tr/>");
+        let gameLink = $("<td/>").html(renderGameLink(gameEntry));
+        let turn = $("<td/>").text(gameEntry.turn);
+        let timestamp = $("<td/>").text(moment(gameEntry.timestamp).tz("UTC").format("D-MMM HH:mm z"));
+        gameRow.append(gameLink, turn, timestamp);
+        tournamentGames.append(gameRow);
     });
 }
 
