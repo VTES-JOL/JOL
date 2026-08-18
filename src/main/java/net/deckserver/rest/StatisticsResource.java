@@ -75,6 +75,7 @@ public class StatisticsResource {
         Map<String, Double> vpMax = new HashMap<>();
         Map<String, Integer> games = new HashMap<>();
         Map<String, Set<String>> opponents = new HashMap<>();
+        Map<String, Map<String, Integer>> opponentCounts = new HashMap<>();
 
         // Win streak
         Map<String, Integer> currentWinStreak = new HashMap<>();
@@ -94,6 +95,7 @@ public class StatisticsResource {
                                 games,
                                 vpMax,
                                 opponents,
+                                opponentCounts,
                                 currentWinStreak,
                                 maxWinStreak
                         )
@@ -130,6 +132,7 @@ public class StatisticsResource {
                                                 Collections.emptySet()
                                         ).size()
                                 ),
+                                getMostPlayedOpponent(opponentCounts, key),
                                 String.valueOf(
                                         maxWinStreak.getOrDefault(key, 0)
                                 )
@@ -144,12 +147,13 @@ public class StatisticsResource {
             Map<String, Integer> games,
             Map<String, Double> vpMax,
             Map<String, Set<String>> opponents,
+            Map<String, Map<String, Integer>> opponentCounts,
             Map<String, Integer> currentWinStreak,
             Map<String, Integer> maxWinStreak) {
 
         for (PlayerResult result : game.getResults()) {
             String name = result.getPlayerName();
-            populateStats(game, name, result, gw, vp, games, vpMax, opponents, currentWinStreak, maxWinStreak);
+            populateStats(game, name, result, gw, vp, games, vpMax, opponents, opponentCounts, currentWinStreak, maxWinStreak);
         }
     }
     private void generateStatsPerDeck(
@@ -159,12 +163,13 @@ public class StatisticsResource {
             Map<String, Integer> games,
             Map<String, Double> vpMax,
             Map<String, Set<String>> opponents,
+            Map<String, Map<String, Integer>> opponentCounts,
             Map<String, Integer> currentWinStreak,
             Map<String, Integer> maxWinStreak
     ) {
         for (PlayerResult result : game.getResults()) {
             String name = result.getDeckName() + " / " + result.getPlayerName();
-            populateStats(game, name, result, gw, vp, games, vpMax, opponents, currentWinStreak, maxWinStreak);
+            populateStats(game, name, result, gw, vp, games, vpMax, opponents, opponentCounts, currentWinStreak, maxWinStreak);
         }
     }
 
@@ -175,13 +180,14 @@ public class StatisticsResource {
             Map<String, Integer> games,
             Map<String, Double> vpMax,
             Map<String, Set<String>> opponents,
+            Map<String, Map<String, Integer>> opponentCounts,
             Map<String, Integer> currentWinStreak,
             Map<String, Integer> maxWinStreak
     ) {
         for (PlayerResult result : game.getResults()) {
             try {
                 String name = PlayerService.get(result.getPlayerName()).getCountryCode();
-                populateStats(game, name, result, gw, vp, games, vpMax, opponents, currentWinStreak, maxWinStreak);
+                populateStats(game, name, result, gw, vp, games, vpMax, opponents, opponentCounts, currentWinStreak, maxWinStreak);
             } catch (Exception e) {
                 //Player not found
             }
@@ -197,6 +203,7 @@ public class StatisticsResource {
             Map<String, Integer> games,
             Map<String, Double> vpMax,
             Map<String, Set<String>> opponents,
+            Map<String, Map<String, Integer>> opponentCounts,
             Map<String, Integer> currentWinStreak,
             Map<String, Integer> maxWinStreak){
         games.merge(name, 1, Integer::sum);
@@ -213,17 +220,22 @@ public class StatisticsResource {
             currentWinStreak.put(name, 0);
         }
         // Add all other players as opponents
+        String playerName = result.getPlayerName();
         game.getResults().stream()
                 .map(PlayerResult::getPlayerName)
-                .filter(opponent -> !opponent.equals(name))
-                .forEach(opponent ->
-                        opponents
-                                .computeIfAbsent(
-                                        name,
-                                        k -> new HashSet<>()
-                                )
-                                .add(opponent)
-                );
+                .filter(opponent -> !opponent.equals(playerName))
+                .forEach(opponent -> {
+
+                    // Unique opponents
+                    opponents
+                            .computeIfAbsent(playerName, k -> new HashSet<>())
+                            .add(opponent);
+
+                    // Number of games against each opponent
+                    opponentCounts
+                            .computeIfAbsent(playerName, k -> new HashMap<>())
+                            .merge(opponent, 1, Integer::sum);
+                });
     }
 
     //Get Opponents Statistics
@@ -387,6 +399,11 @@ public class StatisticsResource {
                                     PlayerResult::getDeckName
                             );
 
+                            String bestNation = getBestByGw(
+                                    endedGames,
+                                    this::getCountryCode
+                            );
+
                             return new JolStats(
                                     started,
                                     ended,
@@ -400,7 +417,8 @@ public class StatisticsResource {
                                             : String.format("%.2f", vp / ended),
                                     formatDuration(avgDurationMinutes),
                                     bestPlayer,
-                                    bestDeck
+                                    bestDeck,
+                                    bestNation
                             );
                         },
                         (a, b) -> a,
@@ -436,6 +454,16 @@ public class StatisticsResource {
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .collect(Collectors.joining(" / "))
                 + " (" + maxGw + " GW)";
+    }
+
+    private String getCountryCode(PlayerResult result) {
+        try {
+            return PlayerService
+                    .get(result.getPlayerName())
+                    .getCountryCode();
+        } catch (Exception e) {
+            return "-";
+        }
     }
 
     private List<DeckMatchup> getDeckMatchs(Collection<GameHistory> games, String playerName, StatsRequest body) {
@@ -561,6 +589,19 @@ public class StatisticsResource {
         return mins + "m";
     }
 
+    private String getMostPlayedOpponent(
+            Map<String, Map<String, Integer>> opponentCounts,
+            String playerName) {
+
+        return opponentCounts
+                .getOrDefault(playerName, Collections.emptyMap())
+                .entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .map(entry -> entry.getKey() + " (" + entry.getValue() + ")")
+                .orElse("-");
+    }
+
     @FunctionalInterface
     private interface StatsGenerator {
         void generate(GameHistory game,
@@ -569,6 +610,7 @@ public class StatisticsResource {
                       Map<String, Integer> games,
                       Map<String, Double> vpMax,
                       Map<String, Set<String>> opponents,
+                      Map<String, Map<String, Integer>> opponentCounts,
                       Map<String, Integer> currentWinStreak,
                       Map<String, Integer> maxWinStreak);
     }
@@ -590,6 +632,7 @@ public class StatisticsResource {
             String avgVp,
             String highestVp,
             String uniqueOpponents,
+            String mostPlayedOpponent,
             String winStreak
     ) {
     }
@@ -602,7 +645,8 @@ public class StatisticsResource {
             String avgVp,
             String avgDuration,
             String bestPlayer,
-            String bestDeck
+            String bestDeck,
+            String bestNation
     ) {
     }
     public record OpponentStats(

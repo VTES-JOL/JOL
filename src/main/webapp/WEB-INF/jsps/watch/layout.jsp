@@ -189,8 +189,11 @@
                                 <th class="sticky-top bg-white">Unique Opponents <i class="bi bi-filter"
                                                                               onclick="sortTable(7, 'statsGames')"></i>
                                 </th>
+                                <th class="sticky-top bg-white">Most played Opponent <i class="bi bi-filter"
+                                                                              onclick="sortTable(8, 'statsGames')"></i>
+                                </th>
                                 <th class="sticky-top bg-white">Highest Win Streak <i class="bi bi-filter"
-                                                                                      onclick="sortTable(8, 'statsGames')"></i>
+                                                                                      onclick="sortTable(9, 'statsGames')"></i>
                                 </th>
                             </tr>
                             </thead>
@@ -206,7 +209,7 @@
                         <table id="statsDeckGames" class="table table-bordered table-sm mb-0">
                             <thead>
                             <tr>
-                                <th class="sticky-top bg-white">Deck / Player
+                                <th class="sticky-top bg-white w-25">Deck / Player
                                     <input type="text" id="deckNameFilter"
                                            oninput="filterName('#statsDeckGames tbody tr', 'deckNameFilter', 1)">
                                     <i class="bi bi-filter" onclick="sortTable(0, 'statsDeckGames')"></i></th>
@@ -230,11 +233,8 @@
                                 <th class="sticky-top bg-white">Highest VP <i class="bi bi-filter"
                                                                               onclick="sortTable(6, 'statsDeckGames')"></i>
                                 </th>
-                                <th class="sticky-top bg-white">Unique Opponents <i class="bi bi-filter"
-                                                                                   onclick="sortTable(7, 'statsGames')"></i>
-                                </th>
                                 <th class="sticky-top bg-white">Highest Win Streak <i class="bi bi-filter"
-                                                                                      onclick="sortTable(8, 'statsGames')"></i>
+                                                                                      onclick="sortTable(9, 'statsDeckGames')"></i>
                                 </th>
                             </tr>
                             </thead>
@@ -266,13 +266,10 @@
                                 <th class="sticky-top bg-white">Average VP <i class="bi bi-filter"
                                                                               onclick="sortTable(5, 'statsNationGames')"></i></th>
                                 <th class="sticky-top bg-white">Highest VP <i class="bi bi-filter"
-                                                                              onclick="sortTable(6, 'statsDeckGames')"></i>
-                                </th>
-                                <th class="sticky-top bg-white">Unique Opponents <i class="bi bi-filter"
-                                                                                    onclick="sortTable(7, 'statsGames')"></i>
+                                                                              onclick="sortTable(6, 'statsNationGames')"></i>
                                 </th>
                                 <th class="sticky-top bg-white">Highest Win Streak <i class="bi bi-filter"
-                                                                                    onclick="sortTable(8, 'statsGames')"></i>
+                                                                                    onclick="sortTable(9, 'statsNationGames')"></i>
                                 </th>
                             </tr>
                             </thead>
@@ -346,6 +343,8 @@
                                     <i class="bi bi-filter" onclick="sortTable(9, 'statsJolGames')"></i></th>
                                 <th class="sticky-top bg-white w-25">Deck of the Month
                                     <i class="bi bi-filter" onclick="sortTable(10, 'statsJolGames')"></i></th>
+                                <th class="sticky-top bg-white">Nation of the Month
+                                    <i class="bi bi-filter" onclick="sortTable(11, 'statsJolGames')"></i></th>
                             </tr>
                             </thead>
                             <tbody></tbody>

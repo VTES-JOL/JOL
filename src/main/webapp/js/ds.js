@@ -3132,8 +3132,13 @@ function createStats(stats, tableId) {
             let vpRat = $("<td/>").text(entry.avgVp);
             let highestVp = $("<td/>").text(entry.highestVp);
             let uniqueOpp = $("<td/>").text(entry.uniqueOpponents);
+            let mostOpp = $("<td/>").text(entry.mostPlayedOpponent);
             let maxWinStreak = $("<td/>").text(entry.winStreak);
-            row.append(name, games, gw, vp, gwRat, vpRat, highestVp, uniqueOpp,maxWinStreak);
+            if(tableId === "#statsGames tbody") {
+                row.append(name, games, gw, vp, gwRat, vpRat, highestVp, uniqueOpp, mostOpp, maxWinStreak);
+            } else {
+                row.append(name, games, gw, vp, gwRat, vpRat, highestVp, maxWinStreak);
+            }
             table.append(row);
         }
     })
@@ -3196,7 +3201,22 @@ function createStatsJol(stats) {
         let avgDuration = $("<td/>").text(entry.avgDuration);
         let bestPlayer = $("<td/>").text(entry.bestPlayer);
         let bestDeck = $("<td/>").text(entry.bestDeck);
-        row.append(name, started, ended, net, wins, winRate, vps, avgVp, avgDuration, bestPlayer, bestDeck);
+        let bestNation = "-";
+        if (entry.bestNation && entry.bestNation !== "-") {
+            let parts = entry.bestNation.match(/^([A-Z]{2})\s*\((\d+)\s*GW\)$/);
+            if (parts) {
+                let countryCode = parts[1];
+                let gw = parts[2];
+                let countryName = regionNames.of(countryCode);
+
+                bestNation = $("<td/>")
+                    .append($(`<span data-tippy-content="${countryName}"class="fi fi-${countryCode.toLowerCase()} fis"></span>`))
+                    .append(" " + countryName + " (" + gw + " GW)");
+            }
+        } else {
+            bestNation = $("<td/>").text("-");
+        }
+        row.append(name, started, ended, net, wins, winRate, vps, avgVp, avgDuration, bestPlayer, bestDeck, bestNation);
         table.append(row);
     })
 }
