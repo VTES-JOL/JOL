@@ -3131,7 +3131,9 @@ function createStats(stats, tableId) {
             let gwRat = $("<td/>").text(entry.winRate);
             let vpRat = $("<td/>").text(entry.avgVp);
             let highestVp = $("<td/>").text(entry.highestVp);
-            row.append(name, games, gw, vp, gwRat, vpRat, highestVp);
+            let uniqueOpp = $("<td/>").text(entry.uniqueOpponents);
+            let maxWinStreak = $("<td/>").text(entry.winStreak);
+            row.append(name, games, gw, vp, gwRat, vpRat, highestVp, uniqueOpp,maxWinStreak);
             table.append(row);
         }
     })

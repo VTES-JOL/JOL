@@ -186,6 +186,12 @@
                                 <th class="sticky-top bg-white">Highest VP <i class="bi bi-filter"
                                                                               onclick="sortTable(6, 'statsGames')"></i>
                                 </th>
+                                <th class="sticky-top bg-white">Unique Opponents <i class="bi bi-filter"
+                                                                              onclick="sortTable(7, 'statsGames')"></i>
+                                </th>
+                                <th class="sticky-top bg-white">Highest Win Streak <i class="bi bi-filter"
+                                                                                      onclick="sortTable(8, 'statsGames')"></i>
+                                </th>
                             </tr>
                             </thead>
                             <tbody></tbody>
@@ -224,6 +230,12 @@
                                 <th class="sticky-top bg-white">Highest VP <i class="bi bi-filter"
                                                                               onclick="sortTable(6, 'statsDeckGames')"></i>
                                 </th>
+                                <th class="sticky-top bg-white">Unique Opponents <i class="bi bi-filter"
+                                                                                   onclick="sortTable(7, 'statsGames')"></i>
+                                </th>
+                                <th class="sticky-top bg-white">Highest Win Streak <i class="bi bi-filter"
+                                                                                      onclick="sortTable(8, 'statsGames')"></i>
+                                </th>
                             </tr>
                             </thead>
                             <tbody></tbody>
@@ -253,6 +265,15 @@
                                                                               onclick="sortPercentageTable(4, 'statsNationGames')"></i></th>
                                 <th class="sticky-top bg-white">Average VP <i class="bi bi-filter"
                                                                               onclick="sortTable(5, 'statsNationGames')"></i></th>
+                                <th class="sticky-top bg-white">Highest VP <i class="bi bi-filter"
+                                                                              onclick="sortTable(6, 'statsDeckGames')"></i>
+                                </th>
+                                <th class="sticky-top bg-white">Unique Opponents <i class="bi bi-filter"
+                                                                                    onclick="sortTable(7, 'statsGames')"></i>
+                                </th>
+                                <th class="sticky-top bg-white">Highest Win Streak <i class="bi bi-filter"
+                                                                                    onclick="sortTable(8, 'statsGames')"></i>
+                                </th>
                             </tr>
                             </thead>
                             <tbody></tbody>

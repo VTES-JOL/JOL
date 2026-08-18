@@ -74,12 +74,29 @@ public class StatisticsResource {
         Map<String, Double> vp = new HashMap<>();
         Map<String, Double> vpMax = new HashMap<>();
         Map<String, Integer> games = new HashMap<>();
+        Map<String, Set<String>> opponents = new HashMap<>();
+
+        // Win streak
+        Map<String, Integer> currentWinStreak = new HashMap<>();
+        Map<String, Integer> maxWinStreak = new HashMap<>();
 
         history.values().stream()
                 .filter(game -> !body.isTourney() || isTournamentGame(game))
                 .filter(game -> isInDateRange(game, body))
+                .sorted(Comparator.comparing(
+                        game -> OffsetDateTime.parse(game.getEnded())
+                ))
                 .forEach(game ->
-                        generator.generate(game, gw, vp, games, vpMax)
+                        generator.generate(
+                                game,
+                                gw,
+                                vp,
+                                games,
+                                vpMax,
+                                opponents,
+                                currentWinStreak,
+                                maxWinStreak
+                        )
                 );
 
         Set<String> allKeys = Stream.of(games, gw, vp)
@@ -90,55 +107,123 @@ public class StatisticsResource {
                 .filter(key -> games.get(key) >= body.treshold())
                 .collect(Collectors.toMap(
                         Function.identity(),
-                        key -> new StatsDto (
+                        key -> new StatsDto(
                                 String.valueOf(games.get(key)),
                                 String.valueOf(gw.get(key) == null ? "-" : gw.get(key)),
                                 String.valueOf(vp.get(key) == null ? "-" : vp.get(key)),
-                                gw.get(key) != null ? Math.round((Double.valueOf(gw.get(key)) / Double.valueOf(games.get(key))) * 100) + "%" : "0%",
-                                String.format("%.2f", vp.get(key) / Double.valueOf(games.get(key))),
-                                String.valueOf(vpMax.get(key) == null ? "-" : vpMax.get(key)))));
+                                gw.get(key) != null
+                                        ? Math.round(
+                                        (Double.valueOf(gw.get(key))
+                                                / Double.valueOf(games.get(key))) * 100
+                                ) + "%"
+                                        : "0%",
+                                String.format(
+                                        "%.2f",
+                                        vp.get(key) / Double.valueOf(games.get(key))
+                                ),
+                                String.valueOf(
+                                        vpMax.get(key) == null ? "-" : vpMax.get(key)
+                                ),
+                                String.valueOf(
+                                        opponents.getOrDefault(
+                                                key,
+                                                Collections.emptySet()
+                                        ).size()
+                                ),
+                                String.valueOf(
+                                        maxWinStreak.getOrDefault(key, 0)
+                                )
+                        )
+                ));
     }
 
-    private void generateStats(GameHistory game, Map<String, Integer> gw, Map<String, Double> vp, Map<String, Integer> games, Map<String, Double> vpMax) {
+    private void generateStats(
+            GameHistory game,
+            Map<String, Integer> gw,
+            Map<String, Double> vp,
+            Map<String, Integer> games,
+            Map<String, Double> vpMax,
+            Map<String, Set<String>> opponents,
+            Map<String, Integer> currentWinStreak,
+            Map<String, Integer> maxWinStreak) {
+
         for (PlayerResult result : game.getResults()) {
             String name = result.getPlayerName();
-            games.merge(name, 1, Integer::sum);
-            vp.merge(name, result.getVictoryPoints() > 6 ? 6 : result.getVictoryPoints(), Double::sum);
-            vpMax.merge(name, result.getVictoryPoints() > 6 ? 6 : result.getVictoryPoints(), Math::max);
-            if (result.isGameWin()) {
-                gw.merge(name, 1, Integer::sum);
-            }
+            populateStats(game, name, result, gw, vp, games, vpMax, opponents, currentWinStreak, maxWinStreak);
+        }
+    }
+    private void generateStatsPerDeck(
+            GameHistory game,
+            Map<String, Integer> gw,
+            Map<String, Double> vp,
+            Map<String, Integer> games,
+            Map<String, Double> vpMax,
+            Map<String, Set<String>> opponents,
+            Map<String, Integer> currentWinStreak,
+            Map<String, Integer> maxWinStreak
+    ) {
+        for (PlayerResult result : game.getResults()) {
+            String name = result.getDeckName() + " / " + result.getPlayerName();
+            populateStats(game, name, result, gw, vp, games, vpMax, opponents, currentWinStreak, maxWinStreak);
         }
     }
 
-    private void generateStatsPerDeck(GameHistory game, Map<String, Integer> gw, Map<String, Double> vp, Map<String, Integer> games, Map<String, Double> vpMax) {
-        for (PlayerResult result : game.getResults()) {
-            String name = result.getDeckName() + " / " + result.getPlayerName();
-            //merge
-            games.merge(name, 1, Integer::sum);
-            vp.merge(name, result.getVictoryPoints() > 6 ? 6 : result.getVictoryPoints(), Double::sum);
-            vpMax.merge(name, result.getVictoryPoints() > 6 ? 6 : result.getVictoryPoints(), Math::max);
-            if (result.isGameWin()) {
-                gw.merge(name, 1, Integer::sum);
-            }
-        }
-    }
-    private void generateStatsPerNation(GameHistory game, Map<String, Integer> gw, Map<String, Double> vp, Map<String, Integer> games,  Map<String, Double> vpMax) {
+    private void generateStatsPerNation(
+            GameHistory game,
+            Map<String, Integer> gw,
+            Map<String, Double> vp,
+            Map<String, Integer> games,
+            Map<String, Double> vpMax,
+            Map<String, Set<String>> opponents,
+            Map<String, Integer> currentWinStreak,
+            Map<String, Integer> maxWinStreak
+    ) {
         for (PlayerResult result : game.getResults()) {
             try {
                 String name = PlayerService.get(result.getPlayerName()).getCountryCode();
-                //merge
-                games.merge(name, 1, Integer::sum);
-                vp.merge(name, result.getVictoryPoints() > 6 ? 6 : result.getVictoryPoints(), Double::sum);
-                vpMax.merge(name, result.getVictoryPoints() > 6 ? 6 : result.getVictoryPoints(), Math::max);
-                if (result.isGameWin()) {
-                    gw.merge(name, 1, Integer::sum);
-                }
-
+                populateStats(game, name, result, gw, vp, games, vpMax, opponents, currentWinStreak, maxWinStreak);
             } catch (Exception e) {
                 //Player not found
             }
         }
+    }
+
+    private void populateStats(
+            GameHistory game,
+            String name,
+            PlayerResult result,
+            Map<String, Integer> gw,
+            Map<String, Double> vp,
+            Map<String, Integer> games,
+            Map<String, Double> vpMax,
+            Map<String, Set<String>> opponents,
+            Map<String, Integer> currentWinStreak,
+            Map<String, Integer> maxWinStreak){
+        games.merge(name, 1, Integer::sum);
+        vp.merge(name, result.getVictoryPoints() > 6 ? 6 : result.getVictoryPoints(), Double::sum);
+        vpMax.merge(name, result.getVictoryPoints() > 6 ? 6 : result.getVictoryPoints(), Math::max);
+        if (result.isGameWin()) {
+            gw.merge(name, 1, Integer::sum);
+            // Current streak +1
+            int streak = currentWinStreak.merge(name, 1, Integer::sum);
+            // Update Maximum win streak
+            maxWinStreak.merge(name, streak, Math::max);
+        } else {
+            // Loss ends Win Streak
+            currentWinStreak.put(name, 0);
+        }
+        // Add all other players as opponents
+        game.getResults().stream()
+                .map(PlayerResult::getPlayerName)
+                .filter(opponent -> !opponent.equals(name))
+                .forEach(opponent ->
+                        opponents
+                                .computeIfAbsent(
+                                        name,
+                                        k -> new HashSet<>()
+                                )
+                                .add(opponent)
+                );
     }
 
     //Get Opponents Statistics
@@ -482,7 +567,10 @@ public class StatisticsResource {
                       Map<String, Integer> gw,
                       Map<String, Double> vp,
                       Map<String, Integer> games,
-                      Map<String, Double> vpMax);
+                      Map<String, Double> vpMax,
+                      Map<String, Set<String>> opponents,
+                      Map<String, Integer> currentWinStreak,
+                      Map<String, Integer> maxWinStreak);
     }
 
     //Records for returting rest call Dto's
@@ -500,7 +588,9 @@ public class StatisticsResource {
             String vpCount,
             String winRate,
             String avgVp,
-            String highestVp
+            String highestVp,
+            String uniqueOpponents,
+            String winStreak
     ) {
     }
     public record JolStats(
