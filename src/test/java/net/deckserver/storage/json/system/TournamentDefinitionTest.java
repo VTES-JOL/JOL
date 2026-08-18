@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -44,6 +46,22 @@ class TournamentDefinitionTest {
         assertNotNull(data);
         assertThat(data.getNumberOfRounds(), is(3));
         assertThat(data.getNumberOfTables(), is(6));
+    }
+
+    @Test
+    public void setRoundsReplacesRatherThanMerges() {
+        TournamentDefinition data = new TournamentDefinition();
+        TournamentPlayer first = new TournamentPlayer();
+        first.setName("Player1");
+        data.setRounds(Map.of(1, Map.of(1, List.of(first)), 2, Map.of(1, List.of(first))));
+        assertThat(data.getPlayers(2, 1), hasItem(hasName("Player1")));
+
+        TournamentPlayer second = new TournamentPlayer();
+        second.setName("Player2");
+        data.setRounds(Map.of(1, Map.of(1, List.of(second))));
+
+        assertThat(data.getPlayers(1, 1), hasItem(hasName("Player2")));
+        assertThat(data.getPlayers(2, 1), is(nullValue()));
     }
 
     private Matcher<TournamentPlayer> hasName(String name) {

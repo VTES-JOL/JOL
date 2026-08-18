@@ -1,5 +1,7 @@
 package net.deckserver.servlet;
 
+import net.deckserver.services.AuthService;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -13,7 +15,7 @@ public class MainServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (req.getSession().getAttribute("meth") == null) {
+        if (AuthService.authenticate(req, resp).isEmpty()) {
             resp.sendRedirect("/jol/login");
         } else {
             req.getRequestDispatcher("/WEB-INF/main.jsp").forward(req, resp);

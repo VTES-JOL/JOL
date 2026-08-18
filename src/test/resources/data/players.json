@@ -20,7 +20,7 @@
     "discordId" : null,
     "veknId" : "77777",
     "countryCode" : null,
-    "roles" : [ "ADMIN", "PLAYTESTER" ],
+    "roles" : [ "PLAYTESTER", "ADMIN" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF",
     "notificationsEnabled" : false
@@ -46,7 +46,7 @@
     "discordId" : "",
     "veknId" : "777777",
     "countryCode" : "GB",
-    "roles" : [ "SUPER_USER", "PLAYTESTER" ],
+    "roles" : [ "PLAYTESTER", "SUPER_USER" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF",
     "notificationsEnabled" : false
@@ -59,7 +59,7 @@
     "discordId" : "",
     "veknId" : "222222",
     "countryCode" : "AU",
-    "roles" : [ "JUDGE", "TOURNAMENT_ADMIN", "ADMIN", "PLAYTESTER" ],
+    "roles" : [ "JUDGE", "PLAYTESTER", "TOURNAMENT_ADMIN", "ADMIN" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF",
     "notificationsEnabled" : false
@@ -72,7 +72,7 @@
     "discordId" : "",
     "veknId" : "111111",
     "countryCode" : "US",
-    "roles" : [ "JUDGE", "SUPER_USER", "PLAYTESTER" ],
+    "roles" : [ "JUDGE", "PLAYTESTER", "SUPER_USER" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF",
     "notificationsEnabled" : false
@@ -98,7 +98,7 @@
     "discordId" : "",
     "veknId" : "333333",
     "countryCode" : "GB",
-    "roles" : [ "SUPER_USER", "PLAYTESTER" ],
+    "roles" : [ "PLAYTESTER", "SUPER_USER" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF",
     "notificationsEnabled" : false

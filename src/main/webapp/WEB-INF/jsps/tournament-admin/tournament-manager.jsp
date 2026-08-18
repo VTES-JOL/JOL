@@ -25,6 +25,7 @@
     </div>
     <div id="finalStartedMsg" class="d-none alert alert-info mt-2">Finals already started — see seating below.</div>
     <div id="importTablesMsg" class="d-none alert mt-2"></div>
+    <div id="createTablesError" class="d-none alert alert-danger mt-2"></div>
     <div id="tourRounds" class="flex-fill overflow-auto mt-2 min-h-0"></div>
     <div id="tourFinal" class="d-none flex-fill overflow-auto min-h-0">
       <span class="h4">Tournament Players</span>

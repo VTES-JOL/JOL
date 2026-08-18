@@ -1,0 +1,12 @@
+{
+  "Player1" : [ {
+    "id" : "01M07899DN5DV7MC8TFE71C3F6",
+    "playerName" : "Player1",
+    "secretHash" : "512a318aa1b2a5f4f7e0e951ccd3888b4860c850d932a0bbb50ec3ab4082b225",
+    "deviceLabel" : "curl/8.7.1",
+    "createdAt" : 1786949969333,
+    "lastUsedAt" : 1786949969333,
+    "expiresAt" : 1789541969333,
+    "remember" : true
+  } ]
+}

@@ -117,6 +117,10 @@ public class GameService extends PersistedService {
         return INSTANCE.games.values().stream().filter(info -> info.getOwner().equals(owner)).toList();
     }
 
+    public static List<GameInfo> getGamesByTournament(String tournamentName) {
+        return INSTANCE.games.values().stream().filter(info -> tournamentName.equals(info.getTournamentName())).toList();
+    }
+
     public static List<String> getActiveGames(String owner) {
         return INSTANCE.games.values().stream()
                 .filter(ACTIVE_GAME)

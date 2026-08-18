@@ -2,11 +2,11 @@ package net.deckserver.ws;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.deckserver.services.AuthService;
 import net.deckserver.services.VersionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpSession;
 import javax.websocket.CloseReason;
 import javax.websocket.EndpointConfig;
 import javax.websocket.HandshakeResponse;
@@ -19,6 +19,8 @@ import javax.websocket.server.HandshakeRequest;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 @ServerEndpoint(value = "/ws/updates", configurator = JolWebSocketEndpoint.Configurator.class)
 public class JolWebSocketEndpoint {
@@ -34,18 +36,26 @@ public class JolWebSocketEndpoint {
     public static class Configurator extends ServerEndpointConfig.Configurator {
         @Override
         public void modifyHandshake(ServerEndpointConfig config, HandshakeRequest request, HandshakeResponse response) {
-            HttpSession httpSession = (HttpSession) request.getHttpSession();
-            if (httpSession == null) {
-                log.warn("WebSocket handshake: no HTTP session found");
-                return;
-            }
-            Object player = httpSession.getAttribute("meth");
-            if (player != null) {
-                log.debug("WebSocket handshake: authenticated as {}", player);
-                config.getUserProperties().put(PLAYER_KEY, player.toString());
+            List<String> cookieHeaders = request.getHeaders().getOrDefault("Cookie", List.of());
+            Optional<String> username = extractCookie(cookieHeaders, "jol_at").flatMap(AuthService::parseAccessToken);
+            if (username.isPresent()) {
+                log.debug("WebSocket handshake: authenticated as {}", username.get());
+                config.getUserProperties().put(PLAYER_KEY, username.get());
             } else {
-                log.warn("WebSocket handshake: session exists but no 'meth' attribute (not logged in)");
+                log.warn("WebSocket handshake: no valid access token cookie found");
             }
+        }
+
+        private static Optional<String> extractCookie(List<String> cookieHeaders, String name) {
+            for (String header : cookieHeaders) {
+                for (String part : header.split(";")) {
+                    String[] kv = part.strip().split("=", 2);
+                    if (kv.length == 2 && kv[0].equals(name)) {
+                        return Optional.of(kv[1]);
+                    }
+                }
+            }
+            return Optional.empty();
         }
     }
 

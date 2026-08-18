@@ -48,6 +48,10 @@
                     <%--                        <c:if test='<%= System.getenv().getOrDefault("ENABLE_CAPTCHA", "true").equals("true") %>'>--%>
                     <%--                            <div class="cf-turnstile" data-sitekey="<%= System.getenv().get("JOL_RECAPTCHA_KEY") %>" data-theme="light"></div>--%>
                     <%--                        </c:if>--%>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember" checked>
+                        <label class="form-check-label" for="remember">Remember me</label>
+                    </div>
                     <button type="submit" id="loginBtn" name="login" value="Log in"
                             class="btn btn-outline-secondary btn-lg mt-2">Log In
                     </button>

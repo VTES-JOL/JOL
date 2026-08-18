@@ -7,16 +7,32 @@ const _ctx = '/jol/api';
 
 function _enc(s) { return encodeURIComponent(s); }
 
+// Access tokens are short-lived; on a 401 we silently exchange the refresh cookie
+// for a new one via /auth/refresh and retry the original call exactly once.
+let _refreshing = null;
+function _refresh() {
+    if (!_refreshing) {
+        _refreshing = fetch(_ctx + '/auth/refresh', { method: 'POST' })
+            .finally(() => { _refreshing = null; });
+    }
+    return _refreshing;
+}
+
 function apiCall(method, path, body, opts) {
     const init = { method, headers: {'Content-Type': 'application/json'} };
     if (body !== null && body !== undefined) init.body = JSON.stringify(body);
     return fetch(_ctx + path, init)
         .then(r => {
+            if (r.status === 401 && !opts?._retried) {
+                return _refresh().then(rr => rr.ok
+                    ? apiCall(method, path, body, Object.assign({}, opts, {_retried: true}))
+                    : Promise.reject(new Error('401: Unauthorized')));
+            }
             if (!r.ok) return r.text().then(msg => { throw new Error(`${r.status}: ${msg || r.statusText}`); });
             if (r.status === 204) return {};
             return r.json();
         })
-        .then(data => opts?.callback && opts.callback(data))
+        .then(data => { if (data !== undefined && opts?.callback) opts.callback(data); })
         .catch(err => opts?.errorHandler && opts.errorHandler(String(err)));
 }
 
@@ -963,7 +979,7 @@ function callbackStatusTournament(isActive) {
         DS.getTournamentRounds(nameOfTournament, {
             callback: function(rounds) {
                 callbackTournamentRounds(rounds);
-                DS.getAllRegisteredPlayers(nameOfTournament, {callback: callbackTableManager, errorHandler: errorhandler});
+                DS.getTournamentPlayers(nameOfTournament, {callback: callbackTableManager, errorHandler: errorhandler});
             },
             errorHandler: errorhandler
         });
@@ -1397,6 +1413,9 @@ function saveTables() {
 }
 
 function importTables() {
+    if (!confirm("Import Tournament Tables from CSV? This replaces the current round/table assignments, and if the tournament has already started, existing tables/games for it will be deleted.")) {
+        return;
+    }
     let tournamentSelected = $("#nameOfTournament option:selected").text();
     let csvData = $("#importTablesCsv").val().trim();
     let errorDiv = $("#importTablesError");
@@ -1615,6 +1634,8 @@ function callbackSaveButton(isStarted) {
 function createTournamentTables() {
     if (confirm("Are you sure you want to create the Tournament Tables?")) {
         let tournamentSelected = $("#nameOfTournament option:selected").text();
+        let errorDiv = $("#createTablesError");
+        errorDiv.addClass("d-none");
         DS.createTournamentTables(tournamentSelected, {
             callback: function() {
                 let item = $('#tournamentAdminList .tournament-admin-entry[data-name="' + tournamentSelected + '"]');
@@ -1622,7 +1643,9 @@ function createTournamentTables() {
                 item.find('.badge').removeClass('text-bg-secondary').addClass('text-bg-success').text('Active');
                 resetTournamentManager();
             },
-            errorHandler: errorhandler
+            errorHandler: function(msg) {
+                errorDiv.text("Failed to create tables: " + msg).removeClass("d-none");
+            }
         });
     }
 }

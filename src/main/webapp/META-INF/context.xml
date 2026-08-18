@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="/jol">
-    <CookieProcessor/>
+    <CookieProcessor sameSiteCookies="lax"/>
     <!--    <Manager className="org.redisson.tomcat.RedissonSessionManager"-->
     <!--             configPath="${catalina.base}/conf/redisson.yaml"-->
     <!--             readMode="REDIS"-->

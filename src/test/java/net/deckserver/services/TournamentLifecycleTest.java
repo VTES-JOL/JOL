@@ -1,8 +1,14 @@
 package net.deckserver.services;
 
+import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
+import net.deckserver.game.enums.TournamentFormat;
+import net.deckserver.game.enums.Visibility;
+import net.deckserver.storage.json.system.GameInfo;
+import net.deckserver.storage.json.system.TournamentDefinition;
 import net.deckserver.storage.json.system.TournamentInviteStatus;
 import net.deckserver.storage.json.system.TournamentMetadata;
+import net.deckserver.storage.json.system.TournamentPlayer;
 import net.deckserver.storage.json.system.TournamentRegistration;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -10,7 +16,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
+import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -235,5 +246,129 @@ class TournamentLifecycleTest {
     @Order(24)
     void clear_registrations_on_one_tournament_does_not_affect_others() {
         assertThat(TournamentService.getRegistrations(SEATING_PHASE_TOURNAMENT), hasSize(8));
+    }
+
+    // --- Round CSV import ---
+
+    @Test
+    @Order(25)
+    void import_rounds_from_csv_parses_well_formed_data() throws IOException {
+        String csv = """
+                Round,Table,Player
+                1,1,Player1
+                1,1,Player2
+                """;
+
+        TournamentService.importRoundsFromCsv(SEATING_PHASE_TOURNAMENT, csv);
+
+        List<TournamentPlayer> players = TournamentService.getPlayers(SEATING_PHASE_TOURNAMENT, 1, 1);
+        assertThat(players.stream().map(TournamentPlayer::getName).toList(),
+                containsInAnyOrder("Player1", "Player2"));
+    }
+
+    @Test
+    @Order(26)
+    void import_rounds_from_csv_tolerates_bom_and_curly_quotes() throws IOException {
+        String csv = "﻿Round,Table,Player\n” 7 ”,”2”,Player3\n";
+
+        TournamentService.importRoundsFromCsv(SEATING_PHASE_TOURNAMENT, csv);
+
+        List<TournamentPlayer> players = TournamentService.getPlayers(SEATING_PHASE_TOURNAMENT, 7, 2);
+        assertThat(players.stream().map(TournamentPlayer::getName).toList(), hasItem("Player3"));
+    }
+
+    @Test
+    @Order(27)
+    void import_rounds_from_csv_throws_helpful_error_and_leaves_state_untouched() {
+        String csv = "Round,Table,Player\n1,1,Player1\nabc,2,Player2\n";
+
+        Map<Integer, Map<Integer, List<TournamentPlayer>>> before = TournamentService.getTournament(SEATING_PHASE_TOURNAMENT).getRounds();
+
+        IOException exception = assertThrows(IOException.class,
+                () -> TournamentService.importRoundsFromCsv(SEATING_PHASE_TOURNAMENT, csv));
+
+        assertThat(exception.getMessage(), allOf(
+                containsString("record 2"),
+                containsString("'Round'"),
+                containsString("abc")));
+        assertThat(TournamentService.getTournament(SEATING_PHASE_TOURNAMENT).getRounds(), is(before));
+    }
+
+    @Test
+    @Order(28)
+    void import_rounds_from_csv_clears_stale_games_for_starting_tournament() throws IOException {
+        String gameName = SEATING_PHASE_TOURNAMENT + ": Round 1 - Table 1";
+        String gameId = UUID.randomUUID().toString();
+        GameService.create(gameName, gameId, "SYSTEM", Visibility.PUBLIC, GameFormat.STANDARD);
+        GameService.get(gameName).setTournamentName(SEATING_PHASE_TOURNAMENT);
+        assertThat(GameService.getGamesByTournament(SEATING_PHASE_TOURNAMENT), hasSize(1));
+
+        TournamentDefinition tournament = TournamentService.getTournament(SEATING_PHASE_TOURNAMENT);
+        assertThat(tournament.getStatus(), is(GameStatus.STARTING));
+
+        TournamentService.importRoundsFromCsv(SEATING_PHASE_TOURNAMENT, "Round,Table,Player\n1,1,Player1\n");
+
+        assertThat(GameService.getGamesByTournament(SEATING_PHASE_TOURNAMENT), is(empty()));
+    }
+
+    @Test
+    @Order(29)
+    void create_tournament_tables_fails_fast_and_names_player_missing_registration() throws IOException {
+        TournamentService.importRoundsFromCsv(SEATING_PHASE_TOURNAMENT, "Round,Table,Player\n1,1,PlayerGhost\n");
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> TournamentService.createTournamentTables(SEATING_PHASE_TOURNAMENT));
+
+        assertThat(exception.getMessage(), allOf(
+                containsString("PlayerGhost"),
+                containsString("no registration found")));
+        assertThat(GameService.existsGame(SEATING_PHASE_TOURNAMENT + ": Round 1 - Table 1"), is(false));
+    }
+
+    @Test
+    @Order(30)
+    void create_tournament_tables_reports_single_deck_issue_once_across_rounds() throws IOException {
+        String tourName = "Single Deck Validation Test";
+        TournamentService.createTournament(newTournament(tourName, TournamentFormat.SINGLE_DECK));
+        TournamentService.importRoundsFromCsv(tourName, "Round,Table,Player\n1,1,PlayerGhost\n2,1,PlayerGhost\n");
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> TournamentService.createTournamentTables(tourName));
+
+        assertThat(occurrences(exception.getMessage(), "PlayerGhost"), is(1));
+        assertThat(exception.getMessage(), not(containsString("Round ")));
+    }
+
+    @Test
+    @Order(31)
+    void create_tournament_tables_reports_multi_deck_issue_per_round() throws IOException {
+        String tourName = "Multi Deck Validation Test";
+        TournamentService.createTournament(newTournament(tourName, TournamentFormat.MULTI_DECK));
+        TournamentService.importRoundsFromCsv(tourName, "Round,Table,Player\n1,1,PlayerGhost\n2,1,PlayerGhost\n");
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> TournamentService.createTournamentTables(tourName));
+
+        assertThat(occurrences(exception.getMessage(), "PlayerGhost"), is(2));
+        assertThat(exception.getMessage(), allOf(containsString("Round 1:"), containsString("Round 2:")));
+    }
+
+    private static TournamentDefinition newTournament(String name, TournamentFormat format) {
+        TournamentDefinition def = new TournamentDefinition();
+        def.setName(name);
+        def.setFormat(format);
+        def.setDeckFormat(GameFormat.STANDARD);
+        def.setNumberOfRounds(2);
+        def.setStatus(GameStatus.STARTING);
+        OffsetDateTime now = OffsetDateTime.now();
+        def.setRegistrationStart(now.minusDays(2));
+        def.setRegistrationEnd(now.minusDays(1));
+        def.setPlayStarts(now.minusHours(1));
+        def.setPlayEnds(now.plusDays(1));
+        return def;
+    }
+
+    private static int occurrences(String text, String needle) {
+        return (int) Pattern.compile(Pattern.quote(needle)).matcher(text).results().count();
     }
 }
