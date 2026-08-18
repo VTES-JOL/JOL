@@ -104,8 +104,13 @@ const DS = {
     setMessage:              (message, opts) => apiPost('/admin/message', {message}, opts),
     getVekn:                 (playerName, opts) => apiGet(`/admin/player/${_enc(playerName)}/vekn`, opts),
     exportPastGamesAsCsv:    (opts) => apiGetText('/admin/export/games.csv', opts),
-    stats:                   (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/admin/stats`, {treshold, fromDate, toDate, isTourney}, opts),
-    statsPerDeck:            (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/admin/stats/deck`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsPerPlayer:          (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/players`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsPerDeck:            (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/decks`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsPerNation:          (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/nations`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsPerOpponent:        (playerName, treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/performance/${_enc(playerName)}/players`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsPerGame:            (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/games`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsJol:                (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/jol`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsPerformanceDeck:    (playerName, treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/performance/${_enc(playerName)}/decks`, {treshold, fromDate, toDate, isTourney}, opts),
     updateSiteNotes:         (notes, opts) => apiPut('/admin/site-notes', {notes}, opts),
     clearSiteNotes:          (opts) => apiDel('/admin/site-notes', opts),
 
@@ -364,7 +369,6 @@ function checkVersion(newVersion) {
 function callbackAllGames(data) {
     renderActiveGames(data.games);
     renderPastGames(data.history);
-    renderStats();
 }
 
 $(document).on('shown.bs.tab', '[data-bs-target="#pastGamesPane"]', function () {
@@ -3025,6 +3029,26 @@ function exportCsv() {
     DS.exportPastGamesAsCsv({callback: (data) => createCsvDownloadLink(data, 'past-games.csv'), errorHandler: errorhandler});
 }
 
+function resetStats() {
+    $('#fromDate').val('');
+    $('#toDate').val('');
+    $('#gameThreshold').val('');
+    $('#gameThresholdDeck').val('');
+    $('#gameThresholdNation').val('');
+    $("#onlyTournaments").prop("checked", false);
+    $("#deckNameFilter").val('');
+    $("#playerNameFilter").val('');
+    $("#nationNameFilter").val('');
+    $("#personalNameFilter").val('');
+    $("#personalDeckNameFilter").val('');
+    $("#personalOpponentNameFilter").val('');
+    $("#personalGamesNameFilter").val('');
+    $("#gameNameFilter").val('');
+    $("#gamePlayerFilter").val('');
+    $("#monthFilter").val('');
+    renderStats();
+}
+
 function renderStatsFor(from, to) {
     $('#fromDate').val(from);
     $('#toDate').val(to);
@@ -3034,14 +3058,15 @@ function renderStatsFor(from, to) {
 function renderStats() {
     let treshold = $('#gameThreshold').val();
     let tresholdDeck = $('#gameThresholdDeck').val();
+    let gameThresholdNation = $('#gameThresholdNation').val();
     let fromDate = $('#fromDate').val();
     let toDate = $('#toDate').val();
     let isTourney = $("#onlyTournaments").prop("checked");
 
     if ($('#playerStatsTab').hasClass('active')) {
-        DS.stats(treshold, fromDate, toDate, isTourney, {
+        DS.statsPerPlayer(treshold, fromDate, toDate, isTourney, {
             callback: (data) => {
-                createStats(data);
+                createStats(data, "#statsGames tbody");
                 filterName('#statsGames tbody tr', 'playerNameFilter', 1);
             },
             errorHandler: errorhandler
@@ -3049,45 +3074,144 @@ function renderStats() {
     } else if($('#deckStatsTab').hasClass('active')) {
         DS.statsPerDeck(tresholdDeck, fromDate, toDate, isTourney,{
             callback: (data) => {
-                createStatsPerDeck(data);
+                createStats(data, "#statsDeckGames tbody");
                 filterName('#statsDeckGames tbody tr', 'deckNameFilter', 1);
+            }, errorHandler: errorhandler});
+    } else if($('#nationStatsTab').hasClass('active')) {
+        DS.statsPerNation(gameThresholdNation, fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createStats(data, "#statsNationGames  tbody");
+                filterName('#statsNationGames  tbody tr', 'nationNameFilter', 1);
+            }, errorHandler: errorhandler});
+    } else if($('#personalStatsTab').hasClass('active')) {
+        DS.statsPerOpponent(player, 0, fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createStatsPersonal(data);
+                filterName('#statsPersonalGames tbody tr', 'personalNameFilter', 1);
+            }, errorHandler: errorhandler});
+        DS.statsPerformanceDeck(player, 0, fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createStatsPersonalDeck(data);
+            }
+        })
+    } else if($('#gameStatsTab').hasClass('active')) {
+        DS.statsPerGame(0, fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createStatsGame(data);
+                filterName('#statsGameGames tbody tr', 'gameNameFilter', 1);
+            }, errorHandler: errorhandler});
+    } else if($('#jolStatsTab').hasClass('active')) {
+        DS.statsJol(0, fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createStatsJol(data);
+                filterName('#statsJolGames tbody tr', 'monthFilter', 1);
             }, errorHandler: errorhandler});
     }
 }
 
-function createStatsPerDeck(stats) {
-    let statsGames = $("#statsDeckGames tbody");
-    statsGames.empty();
-    $.each(stats, function (index, deckEntry) {
-        if(deckEntry.length > 0) {
-            let playerRow = $("<tr/>");
-            playerRow.addClass("border-top")
-            let deckName = $("<td/>").text(index);
-            let games = $("<td/>").text(deckEntry[0]);
-            let gw = $("<td/>").text(deckEntry[1]);
-            let vp = $("<td/>").text(deckEntry[2]);
-            let gwRat = $("<td/>").text(deckEntry[3]);
-            let vpRat = $("<td/>").text(deckEntry[4]);
-            playerRow.append(deckName, games, gw, vp, gwRat, vpRat);
-            statsGames.append(playerRow);
+function createStats(stats, tableId) {
+    let table = $(tableId);
+    table.empty();
+    $.each(stats, function (index, entry) {
+        if(entry != null) {
+            let row = $("<tr/>");
+            row.addClass("border-top")
+            let name = "";
+            if(tableId === "#statsNationGames  tbody") {
+                let flag = entry
+                    ? `<span data-tippy-content="${regionNames.of(index)}" class="fi fi-${index.toLowerCase()} fis"></span>`
+                    : "";
+                name = $("<td/>").text(regionNames.of(index) + " / ").append(flag);
+            } else {
+                name = $("<td/>").text(index);
+            }
+            let games = $("<td/>").text(entry.allGames);
+            let gw = $("<td/>").text(entry.gwCount);
+            let vp = $("<td/>").text(entry.vpCount);
+            let gwRat = $("<td/>").text(entry.winRate);
+            let vpRat = $("<td/>").text(entry.avgVp);
+            let highestVp = $("<td/>").text(entry.highestVp);
+            row.append(name, games, gw, vp, gwRat, vpRat, highestVp);
+            table.append(row);
         }
     })
-}function createStats(stats) {
-    let statsGames = $("#statsGames tbody");
-    statsGames.empty();
-    $.each(stats, function (index, playerEntry) {
-        if(playerEntry.length > 0) {
-            let playerRow = $("<tr/>");
-            playerRow.addClass("border-top")
-            let playerName = $("<td/>").text(index);
-            let games = $("<td/>").text(playerEntry[0]);
-            let gw = $("<td/>").text(playerEntry[1]);
-            let vp = $("<td/>").text(playerEntry[2]);
-            let gwRat = $("<td/>").text(playerEntry[3]);
-            let vpRat = $("<td/>").text(playerEntry[4]);
-            playerRow.append(playerName, games, gw, vp, gwRat, vpRat);
-            statsGames.append(playerRow);
-        }
+}
+
+function createStatsPersonal(stats) {
+    let table = $("#statsPersonalGames tbody");
+    table.empty();
+    $.each(stats, function (index, entry) {
+        let row = $("<tr/>");
+        row.addClass("border-top")
+        let name = $("<td/>").text(entry.opponent);
+        let games = $("<td/>").text(entry.games);
+        let wins = $("<td/>").text(entry.wins);
+        let winRate = $("<td/>").text(entry.winRate);
+        let winOpponent = $("<td/>").text(entry.winOpponent);
+        let winRateOpponent = $("<td/>").text(entry.winRateOpponent);
+        let winOther = $("<td/>").text(entry.winOther);
+        let losses = $("<td/>").text(entry.losses);
+        row.append(name, games, wins, winRate, winOpponent, winRateOpponent, winOther, losses);
+        table.append(row);
+    })
+}
+
+function createStatsPersonalDeck(stats) {
+    let table = $("#statsPersonalDecks tbody");
+    table.empty();
+    $.each(stats, function (index, entry) {
+        let row = $("<tr/>");
+        row.addClass("border-top")
+        let deckName = $("<td/>").text(entry.deckName);
+        let opponentDeckName = $("<td/>").text(entry.opponentDeckName);
+        let gameNames = $("<td/>").text(entry.gameNames);
+        let games = $("<td/>").text(entry.games);
+        let totalWins = $("<td/>").text(entry.totalWins);
+        let totalVP = $("<td/>").text(entry.totalVP);
+        let averageVP = $("<td/>").text(entry.averageVP);
+        let opponentTotalVP = $("<td/>").text(entry.opponentTotalVP);
+        let opponentAverageVP = $("<td/>").text(entry.opponentAverageVP);
+        let vpDifference = $("<td/>").text(entry.vpDifference);
+        row.append(deckName, opponentDeckName, gameNames, games, totalWins, totalVP, averageVP, opponentTotalVP, opponentAverageVP, vpDifference);
+        table.append(row);
+    })
+}
+
+function createStatsJol(stats) {
+    let table = $("#statsJolGames tbody");
+    table.empty();
+    $.each(stats, function (index, entry) {
+        let row = $("<tr/>");
+        row.addClass("border-top")
+        let name = $("<td/>").text(index);
+        let started = $("<td/>").text(entry.gamesStartedPerMonth);
+        let ended = $("<td/>").text(entry.gamesEndedPerMonth);
+        let net =  $("<td/>").text(entry.gamesStartedPerMonth - entry.gamesEndedPerMonth);
+        let wins = $("<td/>").text(entry.winsPerMonth);
+        let winRate = $("<td/>").text(entry.winRate);
+        let vps = $("<td/>").text(entry.vpPerMonth);
+        let avgVp = $("<td/>").text(entry.avgVp);
+        let avgDuration = $("<td/>").text(entry.avgDuration);
+        let bestPlayer = $("<td/>").text(entry.bestPlayer);
+        let bestDeck = $("<td/>").text(entry.bestDeck);
+        row.append(name, started, ended, net, wins, winRate, vps, avgVp, avgDuration, bestPlayer, bestDeck);
+        table.append(row);
+    })
+}
+
+function createStatsGame(stats) {
+    let table = $("#statsGameGames tbody");
+    table.empty();
+    $.each(stats, function (index, entry) {
+        let row = $("<tr/>");
+        row.addClass("border-top")
+        let gameName = $("<td/>").text(entry.gameName);
+        let players = $("<td/>").text(entry.players);
+        let duration = $("<td/>").text(entry.duration);
+        let isGw = $("<td/>").html(entry.hasGw ? '<i class="bi bi-check-circle text-success"></i>' : '<i class="bi bi-x-circle text-danger"></i>');
+        let vps = $("<td/>").text(entry.vps);
+        row.append(gameName, players, duration, isGw, vps);
+        table.append(row);
     })
 }
 
@@ -3199,4 +3323,61 @@ function filterName(column, id, index) {
             row.style.display = "none";
         }
     });
+}
+
+function durationToSeconds(duration) {
+    const match = duration.match(
+        /(?:(\d+)d)?\s*(?:(\d+)h)?\s*(?:(\d+)m)?\s*(?:(\d+)s)?/
+    );
+
+    if (!match) return 0;
+
+    return Number(match[1] || 0) * 86400
+        + Number(match[2] || 0) * 3600
+        + Number(match[3] || 0) * 60
+        + Number(match[4] || 0);
+}
+
+function sortTableByDuration(columnIndex) {
+    const tbody = document.querySelector("#statsGameGames tbody");
+
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+
+    sortDirection[columnIndex] = !sortDirection[columnIndex];
+
+    rows.sort((a, b) => {
+        const durationA = a.cells[columnIndex].textContent.trim();
+        const durationB = b.cells[columnIndex].textContent.trim();
+
+        if (sortDirection[columnIndex]) {
+            return durationToSeconds(durationA)
+                - durationToSeconds(durationB) // ascending
+        } else {
+            return durationToSeconds(durationB)
+                - durationToSeconds(durationA) // descending
+        }
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function sortTableByBoolean(columnIndex) {
+    const tbody = document.querySelector("#statsGameGames tbody");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+
+    sortDirection[columnIndex] = !sortDirection[columnIndex];
+
+    rows.sort((a, b) => {
+        const aValue = a.cells[columnIndex]
+            .querySelector(".bi-check-circle") !== null;
+
+        const bValue = b.cells[columnIndex]
+            .querySelector(".bi-check-circle") !== null;
+
+        return sortDirection[columnIndex]
+            ? Number(aValue) - Number(bValue)
+            : Number(bValue) - Number(aValue);
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
 }
