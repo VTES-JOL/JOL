@@ -26,7 +26,8 @@ public class TournamentBean {
 
     public TournamentBean(PlayerModel model) {
         String playerName = model.getPlayerName();
-        veknLinked = !StringUtils.isEmpty(PlayerService.get(playerName).getVeknId());
+        String veknId = PlayerService.get(playerName).getVeknId();
+        veknLinked = !StringUtils.isEmpty(veknId) && veknId.matches("[0-9]+");
         tournaments = TournamentService.getOpenTournaments(playerName);
         registeredGames = TournamentService.getRegisteredTournaments(playerName);
         finalsInvites = TournamentService.getFinalsInvites(playerName);
