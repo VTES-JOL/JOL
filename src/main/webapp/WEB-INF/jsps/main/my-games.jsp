@@ -8,6 +8,12 @@
                 </button>
             </li>
             <li class="nav-item" role="presentation">
+                <button class="nav-link px-3 py-2" id="tournamentTab" data-bs-toggle="tab"
+                        data-bs-target="#tournamentGamesPane" type="button" role="tab">
+                    Tournament <span class="badge rounded-pill bg-secondary ms-1" id="tournamentGames-count">0</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
                 <button class="nav-link px-3 py-2" id="oustedTab" data-bs-toggle="tab"
                         data-bs-target="#oustedGamesPane" type="button" role="tab">
                     Ousted <span class="badge rounded-pill bg-secondary ms-1" id="oustedGames-count">0</span>
@@ -18,6 +24,9 @@
     <div class="tab-content tab-content-fill">
         <div class="tab-pane fade show active" id="myGamesPane" role="tabpanel">
             <ul class="list-group list-group-flush" id="myGames"></ul>
+        </div>
+        <div class="tab-pane fade" id="tournamentGamesPane" role="tabpanel">
+            <ul class="list-group list-group-flush" id="tournamentGames"></ul>
         </div>
         <div class="tab-pane fade" id="oustedGamesPane" role="tabpanel">
             <ul class="list-group list-group-flush" id="oustedGames"></ul>
