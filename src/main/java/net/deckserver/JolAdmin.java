@@ -353,7 +353,12 @@ public class JolAdmin {
     }
 
     public static boolean isAlive(String gameName, String playerName) {
-        return GameService.getGameByName(gameName).getPool(playerName) > 0;
+        try {
+            return GameService.getGameByName(gameName).getPool(playerName) > 0;
+        } catch (NullPointerException e) {
+            logger.error("Unable to check if {} is alive in {}", playerName, gameName);
+            return false;
+        }
     }
 
     public static boolean isPrivate(String gameName) {

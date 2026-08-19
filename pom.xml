@@ -383,7 +383,7 @@
                     <argLine>--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED
                     </argLine>
                     <excludedGroups>Builder</excludedGroups>
-                    <skipTests>true</skipTests>
+                    <skipTests>false</skipTests>
                 </configuration>
             </plugin>
             <plugin>
