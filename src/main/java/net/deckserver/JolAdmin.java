@@ -218,7 +218,7 @@ public class JolAdmin {
             RegistrationService.registerDeck(gameName, playerName, deckInfo.getDeckId(), deckName, extendedDeck.getStats().getSummary());
 
             // Reset game time to the current time to extend idle timeout
-            gameInfo.setCreated(OffsetDateTime.now());
+            gameInfo.setUpdated(OffsetDateTime.now());
 
             long registeredPlayers = RegistrationService.getRegisteredPlayerCount(gameName);
             if (registeredPlayers == gameInfo.getGameFormat().getPlayerCount()) {
@@ -410,7 +410,7 @@ public class JolAdmin {
             if (gameData.getPlayers().size() >= 4 && graceful) {
                 GameHistory history = new GameHistory();
                 history.setName(gameName);
-                String startTime = gameInfo.getCreated() != null ? gameInfo.getCreated().format(ISO_OFFSET_DATE_TIME) : " --- ";
+                String startTime = gameInfo.getUpdated() != null ? gameInfo.getUpdated().format(ISO_OFFSET_DATE_TIME) : " --- ";
                 String endTime = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
                 history.setStarted(startTime);
                 history.setEnded(endTime);
@@ -490,9 +490,9 @@ public class JolAdmin {
         }
     }
 
-    public static OffsetDateTime getCreatedTime(String gameName) {
+    public static OffsetDateTime getUpdatedTime(String gameName) {
         return Optional.ofNullable(GameService.get(gameName))
-                .map(GameInfo::getCreated)
+                .map(GameInfo::getUpdated)
                 .orElse(null);
     }
 

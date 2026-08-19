@@ -1,5 +1,6 @@
 package net.deckserver.storage.json.system;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Getter;
@@ -20,7 +21,8 @@ public class GameInfo {
     private Visibility visibility;
     private GameStatus status;
     private GameFormat gameFormat = GameFormat.STANDARD;
-    private OffsetDateTime created = OffsetDateTime.now();
+    @JsonAlias("created")
+    private OffsetDateTime updated = OffsetDateTime.now();
     private Version version = Version.INITIAL;
     private String tournamentName;
 

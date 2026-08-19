@@ -69,7 +69,7 @@ public class GameStatusBean {
             this.prey = null;
             this.turn = null;
         }
-        created = JolAdmin.getCreatedTime(gameName);
+        created = JolAdmin.getUpdatedTime(gameName);
         if (playerName == null) {
             this.playerRelationship = null;
         } else if (this.owner.equals(playerName)) {

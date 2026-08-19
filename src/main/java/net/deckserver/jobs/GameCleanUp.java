@@ -17,12 +17,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
 public class GameCleanUp implements Runnable {
+
+    private static final int STALE_LOBBY_DAYS = 5;
 
     public static final Logger logger = LoggerFactory.getLogger(GameCleanUp.class);
 
@@ -60,6 +63,21 @@ public class GameCleanUp implements Runnable {
         // Remove invalid players from games
         invalidRegistrations.cellSet().forEach(registration -> {
             RegistrationService.removePlayer(registration.getRowKey(), registration.getColumnKey());
+        });
+
+        // Remove public lobby games that have been idle for too long (deck registration extends the window)
+        OffsetDateTime staleCutoff = OffsetDateTime.now().minusDays(STALE_LOBBY_DAYS);
+        List<GameInfo> staleLobbyGames = GameService.getGameNames().stream()
+                .map(GameService::get)
+                .filter(GameService.STARTING_GAME)
+                .filter(GameService.PUBLIC_GAME)
+                .filter(info -> info.getUpdated() != null && info.getUpdated().isBefore(staleCutoff))
+                .toList();
+
+        staleLobbyGames.forEach(info -> {
+            logger.info("Removing stale lobby game {}", info.getName());
+            GameService.remove(info.getName(), info.getId());
+            RegistrationService.clearRegistrations(info.getName());
         });
     }
 }
