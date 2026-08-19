@@ -202,6 +202,31 @@ public class TournamentResource extends BaseResource {
         return true;
     }
 
+    /**
+     * Destructively rebuilds a single round/table on an ACTIVE tournament from a small CSV subset
+     * (every row must target this exact round/table). Deletes the existing game and its data for
+     * that table and replaces just that table's seating - all other rounds/tables are untouched.
+     * Irreversible; the admin UI gates this behind a type-to-confirm prompt.
+     */
+    @POST
+    @Path("{name}/round/{round}/table/{table}/recreate")
+    public Response recreateTable(
+            @PathParam("name") String tourName,
+            @PathParam("round") int round,
+            @PathParam("table") int table,
+            RecreateTableRequest body) {
+        if (!JolAdmin.isTournamentAdmin(username())) return Response.status(Response.Status.FORBIDDEN).build();
+        try {
+            TournamentService.recreateTable(tourName, round, table, body.csvData());
+            return Response.noContent().build();
+        } catch (IllegalStateException | IOException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            log.error("Unexpected error recreating table for {} round {} table {}", tourName, round, table, e);
+            return Response.serverError().entity("Failed to recreate tournament table").build();
+        }
+    }
+
     /** Replaces DS.loadTournamentDetails() */
     @GET
     @Path("{name}/details")
@@ -518,6 +543,7 @@ public class TournamentResource extends BaseResource {
                                           String specRulesCon, String[] specRules, String numberOfRounds, String reqId,
                                           String originalName) {}
     public record ImportTablesRequest(String csvData) {}
+    public record RecreateTableRequest(String csvData) {}
     public record RegisterDeckRequest(String deckName) {}
     public record PlayerRoundSummary(String name, float vp, boolean gw, int pool) {}
     public record PlayerStanding(String player, String vekn, int gw, float vp, int rank) {}

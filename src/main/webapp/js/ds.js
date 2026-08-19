@@ -139,6 +139,7 @@ const DS = {
     publishTournament:       (tourName, opts) => apiPost(`/tournament/${_enc(tourName)}/publish`, {}, opts),
     getRoundSummary:         (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/round-summary`, opts),
     closeTableGame:          (tourName, round, table, opts) => apiPost(`/tournament/${_enc(tourName)}/round/${round}/table/${table}/close`, {}, opts),
+    recreateTable:           (tourName, round, table, csvData, opts) => apiPost(`/tournament/${_enc(tourName)}/round/${round}/table/${table}/recreate`, {csvData}, opts),
     getStandings:            (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/standings`, opts),
     getAllRegisteredPlayers:  (tourName, opts) => apiGet(`/tournament/${_enc(tourName)}/registered`, opts),
 };
@@ -1276,6 +1277,13 @@ function callbackRoundSummaryReadOnly(data) {
                     })(round, table));
                 cardBody.append(closeBtn);
             }
+            let recreateBtn = $("<button/>")
+                .addClass("btn btn-sm btn-outline-danger mt-2 w-100")
+                .text("Recreate Table")
+                .on("click", (function(r, t) {
+                    return function() { openRecreateTableModal(tourName, r, t); };
+                })(round, table));
+            cardBody.append(recreateBtn);
             let col = $("<div/>").addClass("col-lg-3 col-md-4 col-6").append(cardBody);
             tableList.append(col);
         });
@@ -1436,6 +1444,48 @@ function importTables() {
         },
         errorHandler: function(msg) {
             errorDiv.text("Import failed: " + msg).removeClass("d-none");
+        }
+    });
+}
+
+function openRecreateTableModal(tourName, round, table) {
+    let gameName = tourName + ": Round " + round + " - Table " + table;
+    $("#recreateTableModal").data({tourName, round, table, gameName});
+    $("#recreateTableGameName, #recreateTableGameNameEcho").text(gameName);
+    $("#recreateTableCsv").val("");
+    $("#recreateTableConfirm").val("");
+    $("#recreateTableSubmit").prop("disabled", true);
+    $("#recreateTableError").addClass("d-none");
+    new bootstrap.Modal(document.getElementById("recreateTableModal")).show();
+}
+
+$(document).on("input", "#recreateTableConfirm", function() {
+    let expected = $("#recreateTableModal").data("gameName");
+    $("#recreateTableSubmit").prop("disabled", $(this).val() !== expected);
+});
+
+function recreateTable() {
+    let modalData = $("#recreateTableModal").data();
+    let csvData = $("#recreateTableCsv").val().trim();
+    let errorDiv = $("#recreateTableError");
+
+    if (!csvData) {
+        errorDiv.text("Please paste CSV data before recreating.").removeClass("d-none");
+        return;
+    }
+    if ($("#recreateTableConfirm").val() !== modalData.gameName) {
+        errorDiv.text("Confirmation text does not match.").removeClass("d-none");
+        return;
+    }
+    errorDiv.addClass("d-none");
+
+    DS.recreateTable(modalData.tourName, modalData.round, modalData.table, csvData, {
+        callback: function() {
+            bootstrap.Modal.getInstance(document.getElementById("recreateTableModal")).hide();
+            DS.getRoundSummary(modalData.tourName, {callback: callbackRoundSummaryReadOnly, errorHandler: errorhandler});
+        },
+        errorHandler: function(msg) {
+            errorDiv.text("Recreate failed: " + msg).removeClass("d-none");
         }
     });
 }

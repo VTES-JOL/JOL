@@ -149,6 +149,8 @@ public class GameService extends PersistedService {
         Path gamePath = DataPaths.path("games", gameId);
         INSTANCE.games.remove(gameName);
         INSTANCE.idToName.remove(gameId);
+        INSTANCE.gameCache.invalidate(gameId);
+        INSTANCE.summaryMap.invalidate(gameName);
         try {
             FileUtils.deleteDirectory(gamePath.toFile());
         } catch (IOException e) {

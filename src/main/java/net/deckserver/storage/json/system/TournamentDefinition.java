@@ -92,6 +92,11 @@ public class TournamentDefinition {
         rounds.clear();
     }
 
+    @JsonIgnore
+    public void setTable(int round, int table, List<TournamentPlayer> players) {
+        rounds.put(round, table, players);
+    }
+
     @JsonGetter("rounds")
     public Map<Integer, Map<Integer, List<TournamentPlayer>>> getRounds() {
         return rounds.rowMap();

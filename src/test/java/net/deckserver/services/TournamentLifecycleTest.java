@@ -1,9 +1,11 @@
 package net.deckserver.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.TournamentFormat;
 import net.deckserver.game.enums.Visibility;
+import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.system.GameInfo;
 import net.deckserver.storage.json.system.TournamentDefinition;
 import net.deckserver.storage.json.system.TournamentInviteStatus;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -351,6 +354,110 @@ class TournamentLifecycleTest {
 
         assertThat(occurrences(exception.getMessage(), "PlayerGhost"), is(2));
         assertThat(exception.getMessage(), allOf(containsString("Round 1:"), containsString("Round 2:")));
+    }
+
+    // --- Recreate a single round/table on an ACTIVE tournament ---
+
+    @Test
+    @Order(32)
+    void recreate_table_requires_active_tournament() {
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> TournamentService.recreateTable(SEATING_PHASE_TOURNAMENT, 1, 1, "Round,Table,Player\n1,1,Player1\n"));
+
+        assertThat(exception.getMessage(), containsString("not ACTIVE"));
+    }
+
+    @Test
+    @Order(33)
+    void recreate_table_rejects_csv_rows_for_a_different_table() throws IOException {
+        String tourName = "Recreate Table Mismatch";
+        seatActiveTournamentWithTwoTables(tourName);
+        String gameName = tourName + ": Round 1 - Table 1";
+
+        IOException exception = assertThrows(IOException.class,
+                () -> TournamentService.recreateTable(tourName, 1, 1, "Round,Table,Player\n1,2,PlayerX\n"));
+
+        assertThat(exception.getMessage(), allOf(containsString("Table 2"), containsString("Table 1")));
+        assertThat(GameService.existsGame(gameName), is(true));
+    }
+
+    @Test
+    @Order(34)
+    void recreate_table_rejects_player_already_seated_at_another_table_in_same_round() throws IOException {
+        String tourName = "Recreate Table Conflict";
+        seatActiveTournamentWithTwoTables(tourName);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> TournamentService.recreateTable(tourName, 1, 1, "Round,Table,Player\n1,1,Player5\n1,1,Player2\n"));
+
+        assertThat(exception.getMessage(), allOf(containsString("Player5"), containsString("table 2")));
+        assertThat(TournamentService.getPlayers(tourName, 1, 1).stream().map(TournamentPlayer::getName).toList(),
+                containsInAnyOrder("Player1", "Player2", "Player3", "Player4"));
+    }
+
+    @Test
+    @Order(35)
+    void recreate_table_fails_fast_for_missing_registration_and_leaves_state_untouched() throws IOException {
+        String tourName = "Recreate Table Deck Issue";
+        seatActiveTournamentWithTwoTables(tourName);
+        String gameName = tourName + ": Round 1 - Table 1";
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> TournamentService.recreateTable(tourName, 1, 1, "Round,Table,Player\n1,1,PlayerGhost\n"));
+
+        assertThat(exception.getMessage(), allOf(containsString("PlayerGhost"), containsString("no registration found")));
+        assertThat(GameService.existsGame(gameName), is(true));
+        assertThat(TournamentService.getPlayers(tourName, 1, 1).stream().map(TournamentPlayer::getName).toList(),
+                containsInAnyOrder("Player1", "Player2", "Player3", "Player4"));
+    }
+
+    @Test
+    @Order(36)
+    void recreate_table_replaces_game_and_seating_leaving_other_tables_untouched() throws IOException {
+        String tourName = "Recreate Table Happy Path";
+        seatActiveTournamentWithTwoTables(tourName);
+        String gameName = tourName + ": Round 1 - Table 1";
+        GameInfo before = GameService.get(gameName);
+
+        TournamentService.recreateTable(tourName, 1, 1, "Round,Table,Player\n1,1,Player1\n1,1,Player3\n");
+
+        GameInfo after = GameService.get(gameName);
+        assertThat(after, is(notNullValue()));
+        assertThat(after.getId(), not(is(before.getId())));
+        assertThat(TournamentService.getPlayers(tourName, 1, 1).stream().map(TournamentPlayer::getName).toList(),
+                containsInAnyOrder("Player1", "Player3"));
+        assertThat(TournamentService.getPlayers(tourName, 1, 2).stream().map(TournamentPlayer::getName).toList(),
+                containsInAnyOrder("Player5", "Player6"));
+        assertThat(GameService.existsGame(tourName + ": Round 1 - Table 2"), is(true));
+    }
+
+    /** Builds an ACTIVE tournament with two real tables (Round 1: Table 1 = Players 1-4, Table 2 = Players 5-6). */
+    private static void seatActiveTournamentWithTwoTables(String tourName) throws IOException {
+        TournamentDefinition def = newTournament(tourName, TournamentFormat.SINGLE_DECK);
+        def.setRegistrationStart(OffsetDateTime.now().minusDays(2));
+        def.setRegistrationEnd(OffsetDateTime.now().plusDays(1));
+        TournamentService.createTournament(def);
+
+        ExtendedDeck deck = loadTestDeck("deck1.json");
+        for (String player : List.of("Player1", "Player2", "Player3", "Player4", "Player5", "Player6")) {
+            TournamentService.joinTournament(tourName, player, "00000000");
+            TournamentService.registerDeck(tourName, player, deck);
+        }
+
+        TournamentService.importRoundsFromCsv(tourName, """
+                Round,Table,Player
+                1,1,Player1
+                1,1,Player2
+                1,1,Player3
+                1,1,Player4
+                1,2,Player5
+                1,2,Player6
+                """);
+        TournamentService.createTournamentTables(tourName);
+    }
+
+    private static ExtendedDeck loadTestDeck(String fileName) throws IOException {
+        return new ObjectMapper().readValue(Paths.get("src/test/resources/data/decks/" + fileName).toFile(), ExtendedDeck.class);
     }
 
     private static TournamentDefinition newTournament(String name, TournamentFormat format) {

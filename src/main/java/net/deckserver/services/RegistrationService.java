@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -60,6 +61,10 @@ public class RegistrationService extends PersistedService {
 
     public static  Set<String> getPlayers(String gameName) {
         return INSTANCE.registrations.row(gameName).keySet();
+    }
+
+    public static Set<String> getRegisteredGameNames() {
+        return new HashSet<>(INSTANCE.registrations.rowKeySet());
     }
 
     public static  void removePlayer(String gameName, String playerName) {
