@@ -106,3 +106,78 @@ export interface IdleGame {
   gameTimestamp: string;
   idlePlayers: Record<string, string>; // player -> last-access timestamp
 }
+
+// GET /jol/api/tournament/admin-list — net.deckserver.storage.json.system.TournamentMetadata.
+export interface TournamentMetadata {
+  id: string;
+  name: string;
+  deckFormat: string;
+  registrationEndTime: string;
+  startTime: string;
+  endTime: string;
+  rules: string[];
+  conditions: string;
+  specialRules: string[];
+  registered: boolean;
+  decksChosen: boolean;
+  playerCount: number;
+  numberOfRounds: number;
+  numberOfTables: number;
+  finalsSeeding: string[];
+  roundsConfig: boolean;
+  status: 'EDIT' | 'STARTING' | 'ACTIVE' | 'CLOSED';
+}
+
+// GET /jol/api/tournament/{name}/details — net.deckserver.storage.json.system.TournamentDetails.
+export interface TournamentDetails {
+  name: string;
+  regStart: string;
+  regEnd: string;
+  playStart: string;
+  playEnd: string;
+  numRounds: number;
+  reqId: string;
+  tourFormat: string;
+  gameFormat: string;
+  rules: string[];
+  specRulesCon: string;
+  specRules: string[];
+  status: string;
+}
+
+// net.deckserver.storage.json.system.TournamentRegistration.
+export interface TournamentRegistration {
+  player: string;
+  vekn: string | null;
+  deck: string | null;
+}
+
+// net.deckserver.storage.json.system.TournamentPlayer.
+export interface TournamentPlayer {
+  name: string;
+  vp: number;
+  gw: boolean;
+}
+
+// TournamentResource.PlayerRoundSummary.
+export interface PlayerRoundSummary {
+  name: string;
+  vp: number;
+  gw: boolean;
+  pool: number;
+}
+
+// TournamentResource.PlayerStanding.
+export interface PlayerStanding {
+  player: string;
+  vekn: string;
+  gw: number;
+  vp: number;
+  rank: number;
+}
+
+// net.deckserver.storage.json.game.CardSimple (only the fields the finals seeding view reads).
+export interface CardSimple {
+  id: string;
+  name: string;
+}

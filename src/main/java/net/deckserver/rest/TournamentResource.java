@@ -32,6 +32,21 @@ public class TournamentResource extends BaseResource {
 
     private static final Logger log = LoggerFactory.getLogger(TournamentResource.class);
 
+    private static final Map<String, Integer> ADMIN_STATUS_ORDER = Map.of("ACTIVE", 0, "STARTING", 1, "EDIT", 2);
+
+    /** Dedicated, envelope-free list read for the React tournamentAdmin page — mirrors TournamentAdminBean. */
+    @GET
+    @Path("admin-list")
+    public List<TournamentMetadata> getAdminList() {
+        if (!JolAdmin.isTournamentAdmin(username())) throw new ForbiddenException("Tournament admin role required");
+        return TournamentService.getTournamentsWithStatus(List.of(GameStatus.EDIT, GameStatus.STARTING, GameStatus.ACTIVE))
+                .stream()
+                .sorted(Comparator
+                        .comparingInt((TournamentMetadata t) -> ADMIN_STATUS_ORDER.getOrDefault(t.getStatus(), 3))
+                        .thenComparing(TournamentMetadata::getName, String.CASE_INSENSITIVE_ORDER))
+                .toList();
+    }
+
     /** Replaces DS.createTournament() */
     @POST
     public boolean createTournament(CreateTournamentRequest body) {
