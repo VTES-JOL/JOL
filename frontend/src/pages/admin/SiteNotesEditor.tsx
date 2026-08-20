@@ -1,0 +1,47 @@
+import { useEffect, useState } from 'react';
+import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { api } from '../../api/client';
+
+export function SiteNotesEditor({ notes, onSaved }: { notes: string; onSaved: () => void }) {
+  const [text, setText] = useState(notes);
+
+  useEffect(() => setText(notes), [notes]);
+
+  const save = () => {
+    api
+      .put('/admin-page/site-notes', { notes: text })
+      .then(onSaved)
+      .catch((err) => console.error('Failed to save site notes', err));
+  };
+
+  const clear = () => {
+    if (!confirm('Clear the site notes?')) return;
+    api.del('/admin-page/site-notes').then(onSaved).catch((err) => console.error('Failed to clear site notes', err));
+  };
+
+  return (
+    <Card className="mt-2">
+      <CardHeader>
+        <CardTitle>Site Notes</CardTitle>
+      </CardHeader>
+      <div className="card-body">
+        <label htmlFor="siteNotesText" className="form-label">
+          Markdown
+        </label>
+        <textarea
+          id="siteNotesText"
+          className="form-control"
+          rows={6}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <button onClick={save} className="btn btn-outline-secondary btn-sm mt-2">
+          Save
+        </button>
+        <button onClick={clear} className="btn btn-outline-danger btn-sm mt-2">
+          Clear
+        </button>
+      </div>
+    </Card>
+  );
+}

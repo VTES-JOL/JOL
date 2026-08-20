@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { TopBar } from './components/TopBar';
 import { MainPage } from './pages/MainPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { AdminPage } from './pages/AdminPage';
 import { NavProvider } from './nav/NavContext';
 import { ReconnectingOverlay } from './components/ReconnectingOverlay';
 import { useConnectivity } from './api/useConnectivity';
@@ -36,6 +37,7 @@ export function App() {
             <Route path="/jol/main" element={<MainPage />} />
             <Route path="/jol/main.jsp" element={<MainPage />} />
             <Route path="/jol/profile" element={<ProfilePage />} />
+            <Route path="/jol/admin" element={<AdminPage />} />
           </Routes>
           {!online && <ReconnectingOverlay everConnected={everConnected} />}
         </div>

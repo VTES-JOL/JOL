@@ -82,3 +82,27 @@ export interface CountryOption {
   code: string;
   name: string;
 }
+
+// GET /jol/api/admin-page — net.deckserver.dwr.bean.AdminPageBean. `players`
+// (dead idle-players.jsp, never included by admin/layout.jsp) is omitted —
+// not ported, see AdminPage.tsx.
+export interface AdminPage {
+  userRoles: UserRole[];
+  substitutes: string[];
+  games: Record<string, string>; // gameId -> gameName
+  idleGames: IdleGame[];
+  siteNotes: string;
+}
+
+export interface UserRole {
+  name: string;
+  roles: string[];
+  lastOnline: string;
+}
+
+export interface IdleGame {
+  gameName: string;
+  gameId: string;
+  gameTimestamp: string;
+  idlePlayers: Record<string, string>; // player -> last-access timestamp
+}
