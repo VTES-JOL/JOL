@@ -4,6 +4,8 @@ import net.deckserver.services.HistoryService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.storage.json.system.GameHistory;
 import net.deckserver.storage.json.system.PlayerResult;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -187,6 +189,9 @@ public class StatisticsResource {
         for (PlayerResult result : game.getResults()) {
             try {
                 String name = PlayerService.get(result.getPlayerName()).getCountryCode();
+                if (StringUtils.isBlank(name)) {
+                    continue;
+                }
                 populateStats(game, name, result, gw, vp, games, vpMax, opponents, opponentCounts, currentWinStreak, maxWinStreak);
             } catch (Exception e) {
                 //Player not found
@@ -422,7 +427,7 @@ public class StatisticsResource {
                             );
                         },
                         (a, b) -> a,
-                        TreeMap::new
+                        () -> new TreeMap<YearMonth, JolStats>(Comparator.reverseOrder())
                 ));
     }
 
