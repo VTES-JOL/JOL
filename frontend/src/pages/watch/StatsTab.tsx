@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNav } from '../../nav/useNav';
+import { useAuth } from '../../nav/useAuth';
 import { PlayerStats } from './stats/PlayerStats';
 import { DeckStats } from './stats/DeckStats';
 import { NationStats } from './stats/NationStats';
@@ -23,7 +23,7 @@ function currentYear() {
 }
 
 export function StatsTab() {
-  const nav = useNav();
+  const { player } = useAuth();
   const [subTab, setSubTab] = useState<StatsSubTab>('player');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
@@ -107,8 +107,8 @@ export function StatsTab() {
         {subTab === 'player' && <PlayerStats fromDate={fromDate} toDate={toDate} isTourney={isTourney} />}
         {subTab === 'deck' && <DeckStats fromDate={fromDate} toDate={toDate} isTourney={isTourney} />}
         {subTab === 'nation' && <NationStats fromDate={fromDate} toDate={toDate} isTourney={isTourney} />}
-        {subTab === 'personal' && nav?.player && (
-          <PersonalStats player={nav.player} fromDate={fromDate} toDate={toDate} isTourney={isTourney} />
+        {subTab === 'personal' && player && (
+          <PersonalStats player={player} fromDate={fromDate} toDate={toDate} isTourney={isTourney} />
         )}
         {subTab === 'game' && <GameStats fromDate={fromDate} toDate={toDate} isTourney={isTourney} />}
         {subTab === 'jol' && <JolStats fromDate={fromDate} toDate={toDate} isTourney={isTourney} />}

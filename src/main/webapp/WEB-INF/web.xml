@@ -25,6 +25,17 @@
         <url-pattern>/fonts/*</url-pattern>
         <url-pattern>/images/*</url-pattern>
         <url-pattern>/sw.js</url-pattern>
+        <!--
+          MainServlet's url-pattern "/" makes it the servlet-spec "default
+          servlet" for anything not otherwise mapped — without this entry,
+          /react/* (the built React app's static assets, staged into the WAR
+          root by maven-war-plugin from target/react-dist) falls through to
+          MainServlet instead of being served as a file, which forwards back
+          to /react/index.html and recurses into itself (StackOverflowError).
+          Local dev never hit this because Vite intercepts every React-owned
+          path itself and never lets these requests reach Tomcat.
+        -->
+        <url-pattern>/react/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
@@ -37,8 +48,13 @@
         <url-pattern>/test</url-pattern>
     </servlet-mapping>
 
-    <welcome-file-list>
-        <welcome-file>login.jsp</welcome-file>
-    </welcome-file-list>
+    <!--
+      No welcome-file-list: MainServlet's exact "/" mapping already handles
+      the context root (servlet-spec exact mappings take precedence over
+      welcome-file resolution), so a welcome-file here was already dead
+      weight even before login.jsp — which it pointed at — was deleted in
+      favor of the React login page (LoginServlet forwards "/login" to
+      /react/index.html directly).
+    -->
 
 </web-app>

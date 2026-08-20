@@ -3,6 +3,8 @@ import { api } from './client';
 interface ConfigResponse {
   baseUrl: string;
   vapidPublicKey: string | null;
+  captchaEnabled: boolean;
+  captchaSiteKey: string | null;
 }
 
 // GET /jol/api/config only ever needs to happen once per page load — cache
@@ -36,4 +38,11 @@ export function getBaseUrl(): Promise<string> {
 // /config is a normal proxied API call, not a static asset Vite fakes.
 export function getVapidPublicKey(): Promise<string | null> {
   return getConfig().then((c) => c.vapidPublicKey);
+}
+
+// ENABLE_CAPTCHA=false in local dev (see CLAUDE.md) means the login page
+// skips loading Turnstile entirely, matching the server skipping
+// verification for the same env var (AuthResource.register).
+export function getCaptchaConfig(): Promise<{ enabled: boolean; siteKey: string | null }> {
+  return getConfig().then((c) => ({ enabled: c.captchaEnabled, siteKey: c.captchaSiteKey }));
 }

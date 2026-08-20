@@ -1,4 +1,6 @@
+import { Link } from 'react-router-dom';
 import type { GameSummary } from '../../api/types';
+import { pathForGame } from '../../routes';
 
 const TIMESTAMP_FORMAT = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'UTC',
@@ -27,7 +29,7 @@ export function ActiveGamesTab({ games }: { games: GameSummary[] }) {
             {games.map((g) => (
               <tr key={g.gameId}>
                 <td>
-                  <a href={`/jol/game/${g.gameId}`}>{g.gameName}</a>
+                  <Link to={pathForGame(g.gameId)}>{g.gameName}</Link>
                 </td>
                 <td>{g.turn}</td>
                 <td>{TIMESTAMP_FORMAT.format(new Date(g.timestamp))} UTC</td>

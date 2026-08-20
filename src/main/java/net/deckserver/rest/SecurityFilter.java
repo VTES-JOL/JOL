@@ -17,14 +17,19 @@ import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Optional;
+import java.util.Set;
 
 @Provider
 @Priority(Priorities.AUTHORIZATION)
 public class SecurityFilter implements ContainerRequestFilter {
 
-    // Must stay unauthenticated: it's exactly what a client calls when its access token
-    // has expired, so it authenticates itself via the refresh cookie.
-    private static final String REFRESH_PATH = "auth/refresh";
+    // Must stay reachable without a valid access token: auth/refresh is exactly
+    // what a client calls when its token has expired; login/register run before
+    // any token exists at all; logout must still clear cookies even if the
+    // access token already expired; config carries only non-secret values
+    // (base URL, VAPID public key, captcha site key) the login page needs
+    // before it has any session.
+    private static final Set<String> PUBLIC_PATHS = Set.of("auth/refresh", "auth/login", "auth/register", "auth/logout", "config");
 
     @Context
     UriInfo uriInfo;
@@ -37,7 +42,7 @@ public class SecurityFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        if (REFRESH_PATH.equals(uriInfo.getPath())) {
+        if (PUBLIC_PATHS.contains(uriInfo.getPath())) {
             return;
         }
 

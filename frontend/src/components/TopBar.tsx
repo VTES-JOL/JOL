@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNav } from '../nav/useNav';
-import { isConverted, pathForGame, pathForView } from '../routes';
+import { pathForGame, pathForView } from '../routes';
+import { logout as logoutRequest } from '../pages/login/authApi';
 
 function toggleDarkMode() {
   const isDark = document.body.getAttribute('data-bs-theme') !== 'dark';
@@ -14,11 +15,12 @@ function toggleDarkMode() {
 }
 
 function logout() {
-  const form = document.createElement('form');
-  form.method = 'post';
-  form.action = '/jol/logout';
-  document.body.appendChild(form);
-  form.submit();
+  // Hard redirect (not client-side navigation) is deliberate: the whole
+  // authenticated shell (NavProvider et al.) needs a clean remount once
+  // logged out, same as legacy's full-page form POST did.
+  logoutRequest().finally(() => {
+    window.location.href = '/jol/login';
+  });
 }
 
 // Bootstrap's JS bundle (which normally drives data-bs-toggle="dropdown")
@@ -91,35 +93,23 @@ export function TopBar() {
               style={{ left: 0, right: 'auto' }}
               aria-labelledby="myGamesLink"
             >
-              {Object.entries(nav?.gameButtons ?? {}).map(([id, label]) =>
-                isConverted('game') ? (
-                  <li key={id}>
-                    <Link className="dropdown-item" to={pathForGame(id.slice(1))}>
-                      {label}
-                    </Link>
-                  </li>
-                ) : (
-                  <li key={id}>
-                    <a className="dropdown-item" href={`/jol/game/${id.slice(1)}`}>
-                      {label}
-                    </a>
-                  </li>
-                ),
-              )}
+              {Object.entries(nav?.gameButtons ?? {}).map(([id, label]) => (
+                <li key={id}>
+                  <Link className="dropdown-item" to={pathForGame(id.slice(1))}>
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
         <div className="navbar-nav">
           {(nav?.buttons ?? []).map((entry) => {
             const [view, label] = entry.split(':');
-            return isConverted(view) ? (
+            return (
               <Link key={view} className="nav-link" to={pathForView(view)}>
                 {label}
               </Link>
-            ) : (
-              <a key={view} className="nav-link" href={pathForView(view)}>
-                {label}
-              </a>
             );
           })}
         </div>
@@ -160,15 +150,9 @@ export function TopBar() {
               style={{ right: 0, left: 'auto' }}
             >
               <li>
-                {isConverted('profile') ? (
-                  <Link className="dropdown-item" to={pathForView('profile')}>
-                    <i className="bi bi-person-circle me-2"></i>Profile
-                  </Link>
-                ) : (
-                  <a className="dropdown-item" href={pathForView('profile')}>
-                    <i className="bi bi-person-circle me-2"></i>Profile
-                  </a>
-                )}
+                <Link className="dropdown-item" to={pathForView('profile')}>
+                  <i className="bi bi-person-circle me-2"></i>Profile
+                </Link>
               </li>
               <li>
                 <hr className="dropdown-divider" />

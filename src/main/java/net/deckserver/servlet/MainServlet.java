@@ -8,28 +8,27 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Set;
 
+// Every top-level view (main/profile/admin/tournamentAdmin/tournament/
+// active/lobby/deck/game) has been ported to React (frontend/, bundled into
+// the WAR at /react/*) — this servlet no longer branches between the legacy
+// JSP shell and React per path, it just gates auth and always forwards to
+// React. "/game" is wildcard-mapped ("/game/*") since getServletPath()
+// returns just "/game" regardless of which game id follows.
+//
+// "/watch" and "/super" used to be mapped here too, but neither corresponds
+// to a real nav-linked view (dead aliases predating this migration) — see
+// the React migration plan for how each route above was converted.
 @WebServlet({"/", "/main.jsp", "/main", "/lobby", "/deck", "/admin", "/game/*",
-        "/tournament", "/tournamentAdmin", "/profile", "/active", "/watch", "/super"})
+        "/tournament", "/tournamentAdmin", "/profile", "/active"})
 public class MainServlet extends HttpServlet {
-
-    // Paths whose view has been ported to React (frontend/, bundled into WAR at
-    // /react/*). Grows by one entry per route as it's converted — see the React
-    // migration plan. Everything else still forwards to the legacy JSP shell.
-    // "/game" is wildcard-mapped ("/game/*" below) — getServletPath() returns
-    // just "/game" regardless of which game id follows, so this one entry
-    // covers every /jol/game/<id> URL.
-    private static final Set<String> REACT_ROUTES = Set.of("", "/", "/main", "/main.jsp", "/profile", "/admin", "/tournamentAdmin", "/tournament", "/active", "/lobby", "/deck", "/game");
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (AuthService.authenticate(req, resp).isEmpty()) {
             resp.sendRedirect("/jol/login");
-        } else if (REACT_ROUTES.contains(req.getServletPath())) {
-            req.getRequestDispatcher("/react/index.html").forward(req, resp);
         } else {
-            req.getRequestDispatcher("/WEB-INF/main.jsp").forward(req, resp);
+            req.getRequestDispatcher("/react/index.html").forward(req, resp);
         }
     }
 }

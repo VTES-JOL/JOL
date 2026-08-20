@@ -5,11 +5,13 @@ import { serveCardAssets } from './serveCardAssets.js'
 
 const BACKEND = 'http://localhost:8080'
 
-// Exact paths this frontend owns — must mirror MainServlet.REACT_ROUTES
-// (Java) exactly. Everything else under /jol/ is proxied to the real
-// backend (tomcat9:run) below, so unconverted JSP routes, static assets
-// (css/js/images/fonts), and the REST API/WebSocket all keep working.
-const FRONTEND_ROUTES = new Set(['/jol', '/jol/', '/jol/main', '/jol/main.jsp', '/jol/profile', '/jol/admin', '/jol/tournamentAdmin', '/jol/tournament', '/jol/active', '/jol/lobby', '/jol/deck'])
+// Exact paths this frontend owns — must mirror MainServlet's @WebServlet
+// mapping plus LoginServlet's "/login" (Java) exactly. Everything else under
+// /jol/ is proxied to the real backend (tomcat9:run) below: static assets
+// (css/js/images/fonts) and the REST API/WebSocket all keep working through
+// that proxy. register/logout have no GET page of their own anymore — both
+// are REST calls (AuthResource) the login page itself makes.
+const FRONTEND_ROUTES = new Set(['/jol', '/jol/', '/jol/main', '/jol/main.jsp', '/jol/profile', '/jol/admin', '/jol/tournamentAdmin', '/jol/tournament', '/jol/active', '/jol/lobby', '/jol/deck', '/jol/login'])
 
 // Served in prod from inside the WAR at /jol/react/*, forwarded there by
 // MainServlet for converted routes. In dev, Vite terminates TLS itself and
@@ -61,8 +63,8 @@ export default defineConfig({
             return path
           }
           // /jol/game/<id> — the id is dynamic, so this can't live in the
-          // static FRONTEND_ROUTES set above (mirrors MainServlet.REACT_ROUTES
-          // treating any /game/<id> as React-owned, same reasoning there).
+          // static FRONTEND_ROUTES set above (mirrors MainServlet's "/game/*"
+          // wildcard mapping treating any /game/<id> as React-owned).
           if (path.startsWith('/jol/game/')) return path
           if (FRONTEND_ROUTES.has(path)) return path
           return undefined // fall through to the proxy target above

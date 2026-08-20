@@ -1,6 +1,8 @@
+import { Link } from 'react-router-dom';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import type { IdleGame } from '../../api/types';
+import { pathForGame } from '../../routes';
 import { adminTimestamp } from './adminFormatting';
 
 export function IdleGames({ idleGames, onSaved }: { idleGames: IdleGame[]; onSaved: () => void }) {
@@ -35,7 +37,7 @@ export function IdleGames({ idleGames, onSaved }: { idleGames: IdleGame[]; onSav
                 <tr key={`${g.gameId}-${player}`}>
                   {i === 0 && (
                     <td rowSpan={players.length}>
-                      <a href={`/jol/game/${g.gameId}`}>{g.gameName}</a>
+                      <Link to={pathForGame(g.gameId)}>{g.gameName}</Link>
                     </td>
                   )}
                   {i === 0 && <td rowSpan={players.length}>{adminTimestamp(g.gameTimestamp)}</td>}

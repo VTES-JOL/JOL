@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../api/client';
 import type { CardSnapshot, GameSnapshot } from '../api/types';
-import { useNav } from '../nav/useNav';
+import { useAuth } from '../nav/useAuth';
 import { useGameSocket } from '../ws/useGameSocket';
 import { PlayerBoard } from './game/PlayerBoard';
 import { HandStrip } from './game/HandStrip';
@@ -23,7 +23,7 @@ import { buildPlayCommand, type HandCardContext, type Submission, type TableCard
 // form) and Phase 3 (quick-command/quick-chat modals).
 export function GamePage() {
   const { gameId } = useParams<{ gameId: string }>();
-  const nav = useNav();
+  const { player: viewerName } = useAuth();
   const [game, setGame] = useState<GameSnapshot | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [showDeck, setShowDeck] = useState(false);
@@ -43,8 +43,6 @@ export function GamePage() {
   useGameSocket(gameId ?? null, refresh);
 
   if (!game || !gameId) return null;
-
-  const viewerName = nav?.player ?? null;
 
   const submit = (submission: Submission) => {
     api

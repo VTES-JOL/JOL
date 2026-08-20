@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { Deck, GameStatusBean, LobbyPage } from '../../api/types';
-import { useNav } from '../../nav/useNav';
+import { useAuth } from '../../nav/useAuth';
 import { useSimpleDropdown } from '../../hooks/useSimpleDropdown';
 import { DeckPreview } from '../../components/DeckPreview';
 
@@ -20,7 +20,7 @@ export function GameDetail({
   onClose: () => void;
   onChanged: (updated: LobbyPage) => void;
 }) {
-  const nav = useNav();
+  const { player } = useAuth();
   const [inviteInput, setInviteInput] = useState('');
   const [deckSearch, setDeckSearch] = useState('');
   const [preview, setPreview] = useState<Deck | null>(null);
@@ -39,17 +39,17 @@ export function GameDetail({
   };
 
   const joinGame = () => {
-    if (!nav?.player) return;
+    if (!player) return;
     api
-      .post<LobbyPage>(`/lobby/player/games/${encodedName}/invite`, { player: nav.player })
+      .post<LobbyPage>(`/lobby/player/games/${encodedName}/invite`, { player })
       .then(onChanged)
       .catch((err) => console.error('Failed to join game', err));
   };
 
   const leaveGame = () => {
-    if (!nav?.player || !confirm('Leave Game?')) return;
+    if (!player || !confirm('Leave Game?')) return;
     api
-      .del<LobbyPage>(`/lobby/player/games/${encodedName}/invite/${encodeURIComponent(nav.player)}`)
+      .del<LobbyPage>(`/lobby/player/games/${encodedName}/invite/${encodeURIComponent(player)}`)
       .then(onChanged)
       .catch((err) => console.error('Failed to leave game', err));
   };
@@ -79,7 +79,7 @@ export function GameDetail({
     deckDropdown.setOpen(false);
   };
 
-  const myRegistration = game.registrations.find((r) => r.player === nav?.player);
+  const myRegistration = game.registrations.find((r) => r.player === player);
   const playerInRegistrations = myRegistration !== undefined;
 
   const [visibleMessage, setVisibleMessage] = useState<string | null>(null);

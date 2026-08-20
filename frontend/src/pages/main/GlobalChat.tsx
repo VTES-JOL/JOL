@@ -3,7 +3,7 @@ import { api } from '../../api/client';
 import type { ChatEntry } from '../../api/types';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { useJolSocket } from '../../ws/useJolSocket';
-import { useNav } from '../../nav/useNav';
+import { useAuth } from '../../nav/useAuth';
 import { useCardTooltips } from '../../hooks/useCardTooltips';
 import { dayLabel, highlightMentions, localTimeTitle, utcTime } from './chatFormatting';
 
@@ -33,7 +33,7 @@ function buildRenderedEntries(entries: ChatEntry[], player: string | null): Rend
 }
 
 export function GlobalChat() {
-  const nav = useNav();
+  const { player } = useAuth();
   const [entries, setEntries] = useState<ChatEntry[]>([]);
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
@@ -50,7 +50,7 @@ export function GlobalChat() {
   // message, mirroring ds.js's `scrollChat` flag.
   const forceScrollRef = useRef(true);
 
-  const rendered = useMemo(() => buildRenderedEntries(entries, nav?.player ?? null), [entries, nav?.player]);
+  const rendered = useMemo(() => buildRenderedEntries(entries, player), [entries, player]);
   useCardTooltips(outputRef, [entries]);
 
   const appendChat = (delta: ChatEntry[]) => {

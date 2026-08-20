@@ -1,8 +1,10 @@
 import {useState} from 'react';
+import {Link} from 'react-router-dom';
 import type {GamesSummary, GameStatusBean} from '../../api/types';
 import {Card, CardHeader, CardTitle} from '../../components/Card';
 import {useApiPoll} from './useApiPoll';
-import {useNav} from '../../nav/useNav';
+import {useAuth} from '../../nav/useAuth';
+import {pathForGame} from '../../routes';
 
 type TabId = 'myGames' | 'tournamentGames' | 'oustedGames';
 
@@ -44,7 +46,7 @@ function GameRow({game, player, showSeatRow}: { game: GameStatusBean; player: st
 
     return (
         <li className={`list-group-item game-entry px-2 py-2 ${borderClass}`}>
-            <a href={`/jol/game/${game.gameId}`} className="d-block text-decoration-none text-reset">
+            <Link to={pathForGame(game.gameId)} className="d-block text-decoration-none text-reset">
                 <div className="d-flex align-items-center justify-content-between">
           <span className="fw-bold text-break">
             {pinged && <i className="me-1 text-danger bi-exclamation-triangle"/>}
@@ -54,7 +56,7 @@ function GameRow({game, player, showSeatRow}: { game: GameStatusBean; player: st
                     {game.turn && <small className="text-muted ms-2 text-nowrap">{game.turn}</small>}
                 </div>
                 {showSeatRow && game.predator && <SeatRow game={game}/>}
-            </a>
+            </Link>
         </li>
     );
 }
@@ -62,7 +64,7 @@ function GameRow({game, player, showSeatRow}: { game: GameStatusBean; player: st
 const EMPTY: GamesSummary = {games: [], tournament: [], ousted: []};
 
 export function GamesPanel() {
-    const nav = useNav();
+    const {player} = useAuth();
     const summary = useApiPoll<GamesSummary>('/main/games', EMPTY, 'main:games');
     const [activeTab, setActiveTab] = useState<TabId>('myGames');
 
@@ -105,7 +107,7 @@ export function GamesPanel() {
                     >
                         <ul className="list-group list-group-flush">
                             {summary[tab.field].map((game) => (
-                                <GameRow key={game.name} game={game} player={nav?.player ?? null}
+                                <GameRow key={game.name} game={game} player={player}
                                          showSeatRow={tab.showSeatRow}/>
                             ))}
                         </ul>
