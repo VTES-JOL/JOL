@@ -350,3 +350,27 @@ export interface LobbyPage {
   playtester: boolean;
   gameFormats: string[];
 }
+
+// net.deckserver.storage.json.deck.DeckStats.
+export interface DeckStats {
+  cryptSize: number;
+  librarySize: number;
+  groups: string[];
+  bannedCards: boolean;
+  summary: string;
+}
+
+// net.deckserver.storage.json.deck.ExtendedDeck.
+export interface ExtendedDeck {
+  deck: Deck;
+  stats: DeckStats;
+  errors: string[];
+}
+
+// GET/PUT /jol/api/decks/player — net.deckserver.dwr.bean.DeckPageBean.
+export interface DeckPage {
+  selectedDeck: ExtendedDeck | null;
+  contents: string | null;
+  tags: string[];
+  deckFilter: string;
+}

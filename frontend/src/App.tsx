@@ -7,6 +7,7 @@ import { TournamentAdminPage } from './pages/TournamentAdminPage';
 import { TournamentPage } from './pages/TournamentPage';
 import { WatchPage } from './pages/WatchPage';
 import { LobbyPage } from './pages/LobbyPage';
+import { DeckPage } from './pages/DeckPage';
 import { NavProvider } from './nav/NavContext';
 import { ReconnectingOverlay } from './components/ReconnectingOverlay';
 import { useConnectivity } from './api/useConnectivity';
@@ -46,6 +47,7 @@ export function App() {
             <Route path="/jol/tournament" element={<TournamentPage />} />
             <Route path="/jol/active" element={<WatchPage />} />
             <Route path="/jol/lobby" element={<LobbyPage />} />
+            <Route path="/jol/deck" element={<DeckPage />} />
           </Routes>
           {!online && <ReconnectingOverlay everConnected={everConnected} />}
         </div>
