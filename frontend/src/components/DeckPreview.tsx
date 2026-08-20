@@ -1,6 +1,6 @@
 import { useRef } from 'react';
-import type { CardCount, Deck } from '../../api/types';
-import { useCardTooltips } from '../../hooks/useCardTooltips';
+import type { CardCount, Deck } from '../api/types';
+import { useCardTooltips } from '../hooks/useCardTooltips';
 
 const sortByName = (cards: CardCount[]) => [...cards].sort((a, b) => a.name.localeCompare(b.name));
 
@@ -25,7 +25,8 @@ function CardList({ cards }: { cards: CardCount[] }) {
 
 // Mirrors ds.js's renderDeck() for the "#deckPreview"/plain-preview case
 // (the "#gameDeck" variant's extra deck-name header and comments box belong
-// to the not-yet-converted game page).
+// to the not-yet-converted game page). Shared by the tournament and lobby
+// pages, both of which just need a read-only view of someone's deck.
 export function DeckPreview({ deck }: { deck: Deck }) {
   const ref = useRef<HTMLDivElement>(null);
   useCardTooltips(ref, [deck]);

@@ -1,8 +1,8 @@
 import { Card, CardHeader } from '../../components/Card';
 import { api } from '../../api/client';
 import type { DeckInfoBean, TournamentBean, TournamentInviteStatus, TournamentMetadata } from '../../api/types';
-import { relativeTime } from './relativeTime';
-import { DeckPreview } from './DeckPreview';
+import { relativeTime } from '../../lib/relativeTime';
+import { DeckPreview } from '../../components/DeckPreview';
 import { useSimpleDropdown } from '../../hooks/useSimpleDropdown';
 
 export function OpenTournamentDetail({

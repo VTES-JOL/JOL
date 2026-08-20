@@ -37,6 +37,16 @@ export interface PlayerStatus {
   current: boolean;
 }
 
+// net.deckserver.dwr.bean.RegistrationStatus.
+export interface RegistrationStatus {
+  player: string;
+  gameName: string;
+  registered: boolean;
+  deckName: string | null;
+  deckSummary: string | null;
+  valid: boolean;
+}
+
 export interface GameStatusBean {
   name: string;
   gameId: string;
@@ -45,6 +55,7 @@ export interface GameStatusBean {
   owner: string;
   visibility: 'PUBLIC' | 'PRIVATE';
   players: Record<string, PlayerStatus>;
+  registrations: RegistrationStatus[];
   activePlayer: string | null;
   predator: string | null;
   prey: string | null;
@@ -328,4 +339,14 @@ export interface JolStats {
   bestPlayer: string;
   bestDeck: string;
   bestNation: string;
+}
+
+// GET /jol/api/lobby/player/games — net.deckserver.dwr.bean.LobbyPageBean.
+export interface LobbyPage {
+  players: string[];
+  games: GameStatusBean[];
+  decks: DeckInfoBean[];
+  message: string | null;
+  playtester: boolean;
+  gameFormats: string[];
 }

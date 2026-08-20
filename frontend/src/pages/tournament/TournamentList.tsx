@@ -1,5 +1,5 @@
 import type { TournamentMetadata } from '../../api/types';
-import { relativeTime } from './relativeTime';
+import { relativeTime } from '../../lib/relativeTime';
 
 export type Selection = { type: 'open' | 'finals'; name: string } | null;
 

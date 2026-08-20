@@ -9,7 +9,7 @@ const BACKEND = 'http://localhost:8080'
 // (Java) exactly. Everything else under /jol/ is proxied to the real
 // backend (tomcat9:run) below, so unconverted JSP routes, static assets
 // (css/js/images/fonts), and the REST API/WebSocket all keep working.
-const FRONTEND_ROUTES = new Set(['/jol', '/jol/', '/jol/main', '/jol/main.jsp', '/jol/profile', '/jol/admin', '/jol/tournamentAdmin', '/jol/tournament', '/jol/active'])
+const FRONTEND_ROUTES = new Set(['/jol', '/jol/', '/jol/main', '/jol/main.jsp', '/jol/profile', '/jol/admin', '/jol/tournamentAdmin', '/jol/tournament', '/jol/active', '/jol/lobby'])
 
 // Served in prod from inside the WAR at /jol/react/*, forwarded there by
 // MainServlet for converted routes. In dev, Vite terminates TLS itself and

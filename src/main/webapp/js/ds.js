@@ -10,7 +10,7 @@ const _ctx = '/jol/api';
 // (pushState + AJAX) can't render those views itself, so any navigation
 // landing on one must be a real page load instead, letting MainServlet route
 // it to /react/index.html.
-const REACT_VIEWS = ['main', 'profile', 'admin', 'tournamentAdmin', 'tournament', 'active'];
+const REACT_VIEWS = ['main', 'profile', 'admin', 'tournamentAdmin', 'tournament', 'active', 'lobby'];
 
 function _enc(s) { return encodeURIComponent(s); }
 
