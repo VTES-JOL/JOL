@@ -229,3 +229,103 @@ export interface LibraryCard {
   count: number;
   cards: CardCount[];
 }
+
+// GET /jol/api/watch — net.deckserver.dwr.bean.AllGamesBean.
+export interface AllGames {
+  games: GameSummary[];
+  history: GameHistory[];
+}
+
+// net.deckserver.dwr.bean.GameSummaryBean.
+export interface GameSummary {
+  gameName: string;
+  gameId: string;
+  turn: string;
+  timestamp: string;
+}
+
+// net.deckserver.storage.json.system.GameHistory.
+export interface GameHistory {
+  name: string;
+  started: string;
+  ended: string;
+  results: PlayerResult[];
+}
+
+// net.deckserver.storage.json.system.PlayerResult.
+export interface PlayerResult {
+  playerName: string;
+  deckName: string;
+  victoryPoints: number;
+  gameWin: boolean;
+}
+
+// StatisticsResource.StatsRequest.
+export interface StatsRequest {
+  treshold: number;
+  fromDate: string;
+  toDate: string;
+  isTourney: boolean;
+}
+
+// StatisticsResource.StatsDto — response of /stats/players, /stats/decks, /stats/nations.
+export interface StatsDto {
+  allGames: string;
+  gwCount: string;
+  vpCount: string;
+  winRate: string;
+  avgVp: string;
+  highestVp: string;
+  uniqueOpponents: string;
+  mostPlayedOpponent: string;
+  winStreak: string;
+}
+
+// StatisticsResource.OpponentStats — response of /stats/performance/{player}/players.
+export interface OpponentStats {
+  opponent: string;
+  games: number;
+  wins: number;
+  winRate: string;
+  winOpponent: number;
+  winRateOpponent: string;
+  winOther: number;
+  losses: number;
+}
+
+// StatisticsResource.DeckMatchup — response of /stats/performance/{player}/decks.
+export interface DeckMatchup {
+  deckName: string;
+  gameNames: string;
+  opponentDeckName: string;
+  games: number;
+  totalWins: number;
+  totalVP: string;
+  averageVP: string;
+  opponentTotalVP: string;
+  opponentAverageVP: string;
+  vpDifference: string;
+}
+
+// StatisticsResource.GameDuration — response of /stats/games.
+export interface GameDuration {
+  gameName: string;
+  players: string;
+  duration: string;
+  hasGw: boolean;
+  vps: number;
+}
+
+// StatisticsResource.JolStats — response of /stats/jol (keyed by YearMonth string, e.g. "2026-08").
+export interface JolStats {
+  gamesStartedPerMonth: number;
+  gamesEndedPerMonth: number;
+  winsPerMonth: number;
+  winRate: string;
+  vpPerMonth: number;
+  avgVp: string;
+  avgDuration: string;
+  bestPlayer: string;
+  bestDeck: string;
+  bestNation: string;
+}
