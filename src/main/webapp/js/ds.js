@@ -109,7 +109,8 @@ const DS = {
     statsPerNation:          (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/nations`, {treshold, fromDate, toDate, isTourney}, opts),
     statsPerOpponent:        (playerName, treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/performance/${_enc(playerName)}/players`, {treshold, fromDate, toDate, isTourney}, opts),
     statsPerGame:            (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/games`, {treshold, fromDate, toDate, isTourney}, opts),
-    statsJol:                (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/jol`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsJolMonth:           (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/jol/month`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsJolClans:            (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/jol/clans`, {treshold, fromDate, toDate, isTourney}, opts),
     statsPerformanceDeck:    (playerName, treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/performance/${_enc(playerName)}/decks`, {treshold, fromDate, toDate, isTourney}, opts),
     updateSiteNotes:         (notes, opts) => apiPut('/admin/site-notes', {notes}, opts),
     clearSiteNotes:          (opts) => apiDel('/admin/site-notes', opts),
@@ -3165,11 +3166,17 @@ function renderStats() {
                 filterName('#statsGameGames tbody tr', 'gameNameFilter', 1);
             }, errorHandler: errorhandler});
     } else if($('#jolStatsTab').hasClass('active')) {
-        DS.statsJol(0, fromDate, toDate, isTourney,{
+        DS.statsJolMonth(0, fromDate, toDate, isTourney,{
             callback: (data) => {
-                createStatsJol(data);
-                filterName('#statsJolGames tbody tr', 'monthFilter', 1);
+                createStatsJolMonth(data);
+                filterName('#statsJolGames tbody tr', 'clanFilter', 1);
             }, errorHandler: errorhandler});
+        // DS.statsJolClans(0, fromDate, toDate, isTourney,{
+        //     callback: (data) => {
+        //         createStatsJolClan(data);
+        //         filterName('#statsJolClans tbody tr', 'monthFilter', 1);
+        //     }, errorHandler: errorhandler});
+
     }
 }
 
@@ -3248,7 +3255,7 @@ function createStatsPersonalDeck(stats) {
     })
 }
 
-function createStatsJol(stats) {
+function createStatsJolMonth(stats) {
     let table = $("#statsJolGames tbody");
     table.empty();
     $.each(stats, function (index, entry) {
@@ -3281,6 +3288,65 @@ function createStatsJol(stats) {
             bestNation = $("<td/>").text("-");
         }
         row.append(name, started, ended, net, wins, winRate, vps, avgVp, avgDuration, bestPlayer, bestDeck, bestNation);
+        table.append(row);
+    })
+    loadChart(stats);
+}
+
+
+let jolChart;
+function loadChart(data) {
+    const months = Object.keys(data);
+    const stats = Object.values(data);
+
+    if (jolChart) {
+        jolChart.destroy();
+    }
+
+    jolChart = new Chart(document.getElementById('myChart'), {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [
+                {
+                    label: 'Games Started',
+                    data: stats.map(stat => stat.gamesStartedPerMonth),
+                    tension: 0.3
+                },
+                {
+                    label: 'Games Ended',
+                    data: stats.map(stat => stat.gamesEndedPerMonth),
+                    tension: 0.3
+                },
+                {
+                    label: 'Wins',
+                    data: stats.map(stat => stat.winsPerMonth),
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function createStatsJolClan(stats) {
+
+    let table = $("#statsJolClans tbody");
+    table.empty();
+    $.each(stats, function (index, entry) {
+        let row = $("<tr/>");
+        row.addClass("border-top")
+        let name = $("<td/>").text(entry.key);
+        let count = $("<td/>").text(entry.value);
+        row.append(name, count);
         table.append(row);
     })
 }
@@ -3358,8 +3424,8 @@ function sortTable(columnIndex, id) {
     sortDirection[columnIndex] = !sortDirection[columnIndex];
 
     rows.sort((a, b) => {
-        let x = a.cells[columnIndex].innerText.toLowerCase();
-        let y = b.cells[columnIndex].innerText.toLowerCase();
+        let x = a.cells[columnIndex]?.innerText.toLowerCase()??"";
+        let y = b.cells[columnIndex]?.innerText.toLowerCase()??"";
 
         // Numeric sorting
         if (!isNaN(x) && !isNaN(y)) {

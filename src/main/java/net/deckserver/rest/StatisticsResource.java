@@ -1,7 +1,11 @@
 package net.deckserver.rest;
 
+import net.deckserver.services.CardService;
+import net.deckserver.services.DeckService;
 import net.deckserver.services.HistoryService;
 import net.deckserver.services.PlayerService;
+import net.deckserver.storage.json.cards.CardSummary;
+import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.system.GameHistory;
 import net.deckserver.storage.json.system.PlayerResult;
 import org.apache.commons.lang3.StringUtils;
@@ -55,14 +59,35 @@ public class StatisticsResource {
     }
 
     @POST
-    @Path("/jol")
-    public Map<YearMonth, JolStats> getStatsJol(StatsRequest body) {
+    @Path("/jol/month")
+    public Map<YearMonth, JolStats> getStatsJolMonth(StatsRequest body) {
         return getJolStats(HistoryService.getHistory().values(), body);
     }
     @POST
     @Path("/performance/{playerName}/decks")
     public List<DeckMatchup> getDeckPerformance(@PathParam("playerName") String playerName, StatsRequest body) {
         return getDeckMatchs(HistoryService.getHistory().values(), playerName, body);
+    }
+    @POST
+    @Path("/jol/clans")
+    public Map<String, Long> getStatsJolClans(StatsRequest body) {
+        return getClanPerformance(HistoryService.getHistory().values(), body);
+    }
+
+    private Map<String, Long> getClanPerformance(Collection<GameHistory> values, StatsRequest body) {
+        return values.stream()
+                //filter games in date range and tournament games
+                .filter(game -> isInDateRange(game, body))
+                .filter(game -> !body.isTourney() || isTournamentGame(game))
+                .flatMap(gameHistory -> gameHistory.getResults().stream())
+                .map(PlayerResult::getDeckName).distinct().toList().stream()
+                .map(DeckService::getDeck)
+                .filter(Objects::nonNull)
+                .flatMap(deck -> deck.getDeck().getCrypt().getCards().stream())
+                .map(card -> CardService.get(card.getName()))
+                .filter(Objects::nonNull)
+                .flatMap(cardSummary -> cardSummary.getClans().stream())
+                .collect(Collectors.groupingBy(clan -> clan, Collectors.counting()));
     }
 
     //Request Body for Statistics
