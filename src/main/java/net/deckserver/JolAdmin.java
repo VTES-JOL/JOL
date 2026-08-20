@@ -83,6 +83,7 @@ public class JolAdmin {
             try {
                 GameService.create(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), format);
                 WebSocketRegistry.notifyMain();
+                WebSocketRegistry.notifyMainScope("games");
             } catch (Exception e) {
                 logger.error("Error creating game", e);
             }
@@ -91,6 +92,10 @@ public class JolAdmin {
 
     public static void chat(String player, String message) {
         GlobalChatService.chat(player, message);
+    }
+
+    public static void chat(String player, String message, String excludeClientId) {
+        GlobalChatService.chat(player, message, excludeClientId);
     }
 
     public static void rollbackGame(String gameName, String adminName, String turn) {
@@ -458,6 +463,7 @@ public class JolAdmin {
         PlayerGameActivityService.clearGame(gameName);
         gmap.remove(gameName);
         WebSocketRegistry.notifyMain();
+        WebSocketRegistry.notifyMainScope("games");
     }
 
     public static String getDeckId(String playerName, String deckName) {

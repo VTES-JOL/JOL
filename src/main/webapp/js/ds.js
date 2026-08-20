@@ -5,6 +5,13 @@
 // ---------------------------------------------------------------------------
 const _ctx = '/jol/api';
 
+// Views ported to the React app (frontend/) — kept in sync with
+// MainServlet.REACT_ROUTES. This legacy shell's own SPA-style navigation
+// (pushState + AJAX) can't render those views itself, so any navigation
+// landing on one must be a real page load instead, letting MainServlet route
+// it to /react/index.html.
+const REACT_VIEWS = ['main', 'profile'];
+
 function _enc(s) { return encodeURIComponent(s); }
 
 // Access tokens are short-lived; on a 401 we silently exchange the refresh cookie
@@ -203,9 +210,21 @@ $(document).ready(function () {
     const parts = window.location.pathname.replace(/^\/jol\//, '').split('/');
     let initialTarget = parts[0] || 'main';
     if (initialTarget === 'game' && parts[1]) initialTarget = 'g' + decodeURIComponent(parts[1]);
+    if (REACT_VIEWS.includes(initialTarget)) {
+        // MainServlet should have routed this to /react/index.html already;
+        // getting here means this legacy shell was loaded directly for a
+        // React-owned view (e.g. stale cache) — force a real reload so it's
+        // routed correctly instead of rendering the legacy view.
+        window.location.reload();
+        return;
+    }
     DS.init(initialTarget, {callback: init, errorHandler: errorhandler});
     window.addEventListener('popstate', function(e) {
         const t = e.state && e.state.target ? e.state.target : 'main';
+        if (REACT_VIEWS.includes(t)) {
+            window.location.reload();
+            return;
+        }
         navigateOrInit(t);
     });
     // A backgrounded/suspended tab can lose its WebSocket silently (no onclose
@@ -2338,6 +2357,10 @@ function navigateOrInit(target) {
 
 function doNav(target) {
     const urlPath = target.startsWith('g') ? 'game/' + encodeURIComponent(target.substring(1)) : target;
+    if (REACT_VIEWS.includes(target)) {
+        window.location.href = '/jol/' + urlPath;
+        return false;
+    }
     history.pushState({target}, '', '/jol/' + urlPath);
     $('#navbarNavAltMarkup').collapse('hide'); //Collapse the navbar
     if (refresher) clearTimeout(refresher);

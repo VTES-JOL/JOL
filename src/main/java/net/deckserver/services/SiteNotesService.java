@@ -39,6 +39,7 @@ public class SiteNotesService extends PersistedService {
     public static void setNotes(String notes) {
         INSTANCE.notes = notes == null ? "" : notes;
         WebSocketRegistry.notifyMain();
+        WebSocketRegistry.notifyMainScope("notes");
     }
 
     public static void clear() {

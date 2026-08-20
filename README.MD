@@ -29,8 +29,15 @@ Run the `tomcat9:run` goal after setting up the environment variables you need:
 
 The app is served at `http://localhost:8080/jol`.
 
+#### Frontend (React)
+Some routes (starting with `/main`) are served by a React app under `frontend/` instead of the legacy JSP/jQuery pages — see [Frontend Architecture](#frontend-architecture) below for how the two coexist. To run it alongside `tomcat9:run` for local development:
+```
+cd frontend && npm install && npm run dev
+```
+This starts a Vite dev server (self-signed HTTPS via `@vitejs/plugin-basic-ssl` — required because login cookies are `Secure`) that proxies everything it doesn't own straight through to `tomcat9:run`, and serves local card images/HTML/JSON itself (see `frontend/serveCardAssets.ts`) in place of the old nginx-based static asset setup. See `frontend/vite.config.ts`'s top comment for details.
+
 ### Tests
-`./mvnw test` runs the full suite (Cucumber BDD scenarios included) except the `Builder`-tagged group, which regenerates the static card JSON/HTML used by the nginx static server and isn't part of normal test runs.
+`./mvnw test` runs the full suite (Cucumber BDD scenarios included) except the `Builder`-tagged group, which regenerates the static card JSON/HTML served from `static.deckserver.net` and isn't part of normal test runs.
 
 `./mvnw test -Dtest=DoCommandTest` runs a single test class.
 
@@ -90,11 +97,10 @@ No database anywhere — every durable piece of state above is a file under `JOL
 * jBCrypt - password hashing for `PlayerInfo.hash`
 * Caffeine - in-memory caching, e.g. active-user summaries and hot `JolGame` lookups
 * jQuery - DOM manipulation and event wiring in `ds.js` and the page JS
-* Nginx - static file server hosted at `static.deckserver.net`
-  * `CardDatabaseBuilder.java` (test-scope) parses the VEKN-supplied crypt/library CSVs and generates the static JSON/HTML consumed by tooltips and modals, plus card images
+* Vite / React / TypeScript - incrementally replacing the JSP/jQuery frontend one route at a time, see [Frontend Architecture](#frontend-architecture) below
+  * `CardDatabaseBuilder.java` (test-scope) parses the VEKN-supplied crypt/library CSVs and generates the static JSON/HTML consumed by tooltips and modals, plus card images, served from `static.deckserver.net` (nginx) in prod and by `frontend/serveCardAssets.ts` (Vite) in local dev
 * Docker - runs the application server on deckserver.net, fronted by Traefik for TLS termination and routing
   * `docker-compose.yml` - production config (`prod`, `test`, and `static` nginx containers), each with its own persistent named volume for `JOL_DATA`
-  * `local-docker-compose.yml` - local config for the static data and/or application server
 
 ### Frontend Architecture
 There is no client-side router or virtual DOM — the browser loads one real page (`main.jsp`, which contains every panel: lobby, game, decks, admin, etc., toggled by CSS), and after that everything is driven by polling/pushed JSON that gets stitched into the existing DOM by jQuery. The whole cycle lives in `src/main/webapp/js/ds.js`.

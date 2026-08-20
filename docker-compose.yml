@@ -51,7 +51,6 @@ services:
       - "traefik.http.routers.static.tls.certresolver=myresolver"
     volumes:
       - static-data:/usr/share/nginx/html
-      - ./nginx/:/etc/nginx/conf.d/
 networks:
   web:
     external: true

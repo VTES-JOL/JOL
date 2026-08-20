@@ -1,11 +1,14 @@
 package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
+import net.deckserver.dwr.bean.ChatEntryBean;
+import net.deckserver.dwr.bean.NavBean;
 import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.services.GameService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 import java.util.Map;
 
 @Path("/")
@@ -18,6 +21,15 @@ public class PageResource extends BaseResource {
     @Path("poll")
     public Map<String, Object> poll() {
         return update();
+    }
+
+    /** Targeted read for the top bar (used on every page) — replaces polling the whole envelope for it. */
+    @GET
+    @Path("nav")
+    public NavBean nav() {
+        String playerName = username();
+        JolAdmin.recordPlayerAccess(playerName);
+        return new NavBean(JolAdmin.getPlayerModel(playerName));
     }
 
     /**
@@ -55,13 +67,18 @@ public class PageResource extends BaseResource {
         return result;
     }
 
-    /** Replaces DS.chat() — global chat */
+    /**
+     * Replaces DS.chat() — global chat. Returns the sender's own chat delta
+     * directly (same PlayerModel.getChat() cursor MainResource#chat() reads)
+     * rather than the whole page envelope, so the caller doesn't need a
+     * second round trip to see the message it just sent.
+     */
     @POST
     @Path("chat")
-    public Map<String, Object> chat(ChatRequest body) {
+    public List<ChatEntryBean> chat(ChatRequest body) {
         String player = username();
-        JolAdmin.chat(player, body.text());
-        return update(player);
+        JolAdmin.chat(player, body.text(), clientId());
+        return JolAdmin.getPlayerModel(player).getChat();
     }
 
     public record NavigateRequest(String target, boolean init) {}

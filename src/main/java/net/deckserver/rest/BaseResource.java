@@ -24,6 +24,16 @@ public abstract class BaseResource {
         return sc.getUserPrincipal().getName();
     }
 
+    /**
+     * Per-browser-tab id sent by the frontend on every request (see
+     * frontend/src/api/client.ts), correlating this REST call with the same
+     * tab's WebSocket session — lets a handler exclude its own caller from a
+     * broadcast it triggers. Null for any client that doesn't send it.
+     */
+    protected String clientId() {
+        return httpRequest.getHeader("X-Client-Id");
+    }
+
     protected Map<String, Object> update(String playerName) {
         RequestContext.set(httpRequest, httpResponse);
         try {

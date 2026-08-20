@@ -28,7 +28,18 @@ public class GlobalChatService extends PersistedService {
         load();
     }
 
-    public static synchronized void chat(String player, String message) {
+    public static void chat(String player, String message) {
+        chat(player, message, null);
+    }
+
+    /**
+     * excludeClientId skips notifying the caller's own WS session (see
+     * WebSocketRegistry.notifyMainScope) — REST callers who already have the
+     * fresh state from their own response should pass it; background jobs
+     * and other non-REST callers (PublicGameBuilder, GameCleanUp, ...) have
+     * no client to exclude and use the two-arg overload above.
+     */
+    public static synchronized void chat(String player, String message, String excludeClientId) {
         String sanitize = ParserService.sanitizeText(message);
         String parsedMessage = ParserService.parseGlobalChat(sanitize);
         ChatEntryBean chatEntryBean = new ChatEntryBean(player, parsedMessage);
@@ -37,6 +48,14 @@ public class GlobalChatService extends PersistedService {
             INSTANCE.chats = new ArrayList<>(INSTANCE.chats.subList(CHAT_DISCARD, CHAT_STORAGE));
         }
         WebSocketRegistry.notifyMain();
+        WebSocketRegistry.notifyMainScope("chat", excludeClientId);
+    }
+
+    /** Most recent chat entries, independent of any player's read cursor — for populating history on first load. */
+    public static synchronized List<ChatEntryBean> getRecentChats(int limit) {
+        int size = INSTANCE.chats.size();
+        int from = Math.max(0, size - limit);
+        return new ArrayList<>(INSTANCE.chats.subList(from, size));
     }
 
     /** Returns chat entries strictly after the given cursor timestamp (ISO offset date-time), or all entries if cursor is null. */

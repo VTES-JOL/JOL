@@ -1,18 +1,13 @@
 package net.deckserver.dwr.bean;
 
 import lombok.Getter;
-import net.deckserver.JolAdmin;
 import net.deckserver.dwr.model.PlayerModel;
-import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;
-import net.deckserver.services.RegistrationService;
 import net.deckserver.services.SiteNotesService;
 import net.deckserver.storage.json.system.UserSummary;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 public class MainBean {
@@ -29,24 +24,10 @@ public class MainBean {
         String playerName = model.getPlayerName();
         loggedIn = model.getPlayerName() != null;
         if (loggedIn) {
-            List<String> games = RegistrationService.getRegisteredGames(playerName).stream()
-                    .filter(gameName -> RegistrationService.isRegistered(gameName, playerName))
-                    .filter(GameService::isActive)
-                    .sorted()
-                    .toList();
-            this.games = games.stream()
-                    .filter(gameName -> GameService.getSummary(gameName).getPlayers().contains(playerName))
-                    .map(GameStatusBean::new)
-                    .collect(Collectors.toList());
-            this.tournament = games.stream()
-                    .filter(JolAdmin::isTournament)
-                    .filter(gameName -> GameService.getSummary(gameName).getPlayers().contains(playerName))
-                    .map(GameStatusBean::new)
-                    .collect(Collectors.toList());
-            this.ousted = games.stream()
-                    .filter(gameName -> !GameService.getSummary(gameName).getPlayers().contains(playerName))
-                    .map(GameStatusBean::new)
-                    .collect(Collectors.toList());
+            GamesSummaryBean summary = new GamesSummaryBean(playerName);
+            this.games = summary.getGames();
+            this.tournament = summary.getTournament();
+            this.ousted = summary.getOusted();
             chat = model.getChat();
             who = PlayerService.activeUsers();
             notes = SiteNotesService.getNotesHtml();

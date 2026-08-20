@@ -76,6 +76,14 @@ public class PlayerModel {
         lastSeenChat = null;
     }
 
+    /** Marks a batch of history (already shown to the player some other way) as seen, so a
+     * subsequent getChat() only returns what's genuinely new after it — not a re-delivery. */
+    public void markChatsSeenThrough(List<ChatEntryBean> entries) {
+        if (!entries.isEmpty()) {
+            lastSeenChat = entries.get(entries.size() - 1).getTimestamp();
+        }
+    }
+
     public boolean hasChats() {
         return GlobalChatService.hasChatsSince(lastSeenChat);
     }

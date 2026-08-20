@@ -9,6 +9,12 @@ import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Legacy ds.js-facing endpoints only — each PUT here returns the full
+ * UpdateFactory envelope (via {@code update()}) that DS.updateProfile/
+ * DS.changePassword/... still expect. The React profile page has its own
+ * dedicated, envelope-free equivalents in {@link ProfileResource}.
+ */
 @Path("/user")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

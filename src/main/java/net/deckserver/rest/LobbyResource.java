@@ -49,6 +49,7 @@ public class LobbyResource extends BaseResource {
         if (playerName != null) {
             RegistrationService.invitePlayer(game, body.player());
             WebSocketRegistry.notifyMain();
+            WebSocketRegistry.notifyMainScope("games");
         }
         return update(playerName);
     }
@@ -61,6 +62,7 @@ public class LobbyResource extends BaseResource {
         if (playerName != null) {
             JolAdmin.unInvitePlayer(game, player);
             WebSocketRegistry.notifyMain();
+            WebSocketRegistry.notifyMainScope("games");
         }
         return update(playerName);
     }
@@ -73,6 +75,7 @@ public class LobbyResource extends BaseResource {
         if (!Strings.isNullOrEmpty(playerName)) {
             JolAdmin.registerDeck(game, playerName, body.deckName());
             WebSocketRegistry.notifyMain();
+            WebSocketRegistry.notifyMainScope("games");
         }
         return update(playerName);
     }

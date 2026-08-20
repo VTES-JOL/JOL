@@ -77,6 +77,10 @@ public class JolWebSocketEndpoint {
         // Clients send {"type":"join","game":"<gameId>"} when entering a game page,
         // and {"type":"leave","game":"<gameId>"} when leaving, so the server can
         // target game notifications to only the sessions watching that game.
+        // {"type":"hello","clientId":"<uuid>"} tags this session with a per-browser-tab
+        // id (generated once in frontend/src/ws/socket.ts) so a REST call from that same
+        // tab can ask to be excluded from a broadcast it triggered — see
+        // WebSocketRegistry.notifyMainScope(scope, excludeClientId).
         try {
             JsonNode node = MAPPER.readTree(message);
             String type = node.path("type").asText();
@@ -95,6 +99,10 @@ public class JolWebSocketEndpoint {
                 case "leave" -> {
                     String gameId = node.path("game").asText(null);
                     if (gameId != null) WebSocketRegistry.leaveGame(gameId, ws);
+                }
+                case "hello" -> {
+                    String clientId = node.path("clientId").asText(null);
+                    if (clientId != null) WebSocketRegistry.registerClientId(clientId, ws);
                 }
                 default -> log.debug("WebSocket unknown message type '{}' from session {}", type, ws.getId());
             }
