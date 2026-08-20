@@ -374,3 +374,125 @@ export interface DeckPage {
   tags: string[];
   deckFilter: string;
 }
+
+// net.deckserver.dwr.bean.CardSnapshot — recursive; children of a visible
+// card are always visible too, see GameSnapshotFactory's javadoc. When
+// `visible` is false every field below `counters` is absent.
+export interface CardSnapshot {
+  id: string;
+  visible: boolean;
+  counters: number;
+  cardId?: string;
+  name?: string;
+  advanced?: boolean;
+  disciplines?: string[];
+  capacity?: number;
+  votes?: string | null;
+  contested?: boolean;
+  locked?: boolean;
+  infernal?: boolean;
+  playtest?: boolean;
+  clan?: string;
+  sect?: string;
+  path?: string;
+  label?: string;
+  minion?: boolean;
+  typeClass?: string;
+  clanClasses?: string[];
+  hasBlood?: boolean;
+  hasLife?: boolean;
+  cards?: CardSnapshot[];
+}
+
+// net.deckserver.dwr.bean.RegionSnapshot.
+export interface RegionSnapshot {
+  type: string; // RegionType name, e.g. "READY"
+  commandKey: string; // short key used in commands, e.g. "ready"/"inactive"/"ashheap"/"rfg"
+  label: string;
+  simple: boolean;
+  openHand: boolean;
+  hiddenHand: boolean;
+  cards: CardSnapshot[];
+}
+
+// net.deckserver.dwr.bean.PlayerSnapshot.
+export interface PlayerSnapshot {
+  name: string;
+  pool: number;
+  victoryPoints: number;
+  active: boolean;
+  edge: boolean;
+  pinged: boolean;
+  regions: RegionSnapshot[];
+}
+
+// GET /jol/api/game/{id}/history?turn=X — net.deckserver.storage.json.game.ChatData.
+export interface ChatData {
+  timestamp: string;
+  message: string;
+  source: string;
+  command?: string;
+}
+
+// GET /jol/api/game/{id}/view (+ POST view/submit, POST view/end-turn) —
+// net.deckserver.dwr.bean.GameSnapshot.
+export interface GameSnapshot {
+  id: string;
+  name: string;
+  players: PlayerSnapshot[];
+  currentPlayer: string;
+  edgePlayer: string;
+  turn: string;
+  turnLabel: string;
+  phase: string;
+  phases: string[];
+  turns: string[];
+  pingOptions: string[];
+  player: boolean;
+  admin: boolean;
+  judge: boolean;
+  globalNotes: string | null;
+  privateNotes: string | null;
+  edgeColor: string;
+  edgeTextColor: 'white' | 'black';
+  status: string | null;
+  stamp: string;
+}
+
+// net.deckserver.storage.json.cards.LibraryCardMode (via the static per-card
+// JSON at {baseUrl}/[secured/]json/{cardId} — SummaryCard's serialized form,
+// same static asset useCardTooltips already fetches for images/html; not
+// part of this app's own REST API).
+export type CardModeTarget = 'READY_REGION' | 'SELF' | 'SOMETHING' | 'REMOVE_FROM_GAME' | 'INACTIVE_REGION' | 'MINION_YOU_CONTROL';
+
+export interface CardMode {
+  disciplines: string[] | null;
+  text: string;
+  target: CardModeTarget | null;
+}
+
+// SummaryCard — the static per-card definition (rules text, play modes,
+// clan/discipline requirements), distinct from CardSnapshot (per-instance
+// game state) and CardSummary-derived display fields already in CardSnapshot.
+export interface CardDefinition {
+  id: string;
+  displayName: string;
+  name: string;
+  type: string;
+  crypt: boolean;
+  burnOption?: boolean;
+  sect?: string;
+  path?: string;
+  clans?: string[];
+  preamble?: string;
+  modes?: CardMode[];
+  doNotReplace?: boolean;
+  multiMode?: boolean;
+  cost?: string;
+  capacity?: number;
+  disciplines?: string[];
+  advanced?: boolean;
+  infernal?: boolean;
+  votes?: string;
+  title?: string;
+}

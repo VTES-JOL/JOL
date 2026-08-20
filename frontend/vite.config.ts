@@ -60,6 +60,10 @@ export default defineConfig({
           if (path.startsWith('/jol/@') || path.startsWith('/jol/src/') || path.startsWith('/jol/node_modules/')) {
             return path
           }
+          // /jol/game/<id> — the id is dynamic, so this can't live in the
+          // static FRONTEND_ROUTES set above (mirrors MainServlet.REACT_ROUTES
+          // treating any /game/<id> as React-owned, same reasoning there).
+          if (path.startsWith('/jol/game/')) return path
           if (FRONTEND_ROUTES.has(path)) return path
           return undefined // fall through to the proxy target above
         },

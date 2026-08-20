@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNav } from '../nav/useNav';
-import { isConverted, pathForView } from '../routes';
+import { isConverted, pathForGame, pathForView } from '../routes';
 
 function toggleDarkMode() {
   const isDark = document.body.getAttribute('data-bs-theme') !== 'dark';
@@ -91,13 +91,21 @@ export function TopBar() {
               style={{ left: 0, right: 'auto' }}
               aria-labelledby="myGamesLink"
             >
-              {Object.entries(nav?.gameButtons ?? {}).map(([id, label]) => (
-                <li key={id}>
-                  <a className="dropdown-item" href={`/jol/game/${id.slice(1)}`}>
-                    {label}
-                  </a>
-                </li>
-              ))}
+              {Object.entries(nav?.gameButtons ?? {}).map(([id, label]) =>
+                isConverted('game') ? (
+                  <li key={id}>
+                    <Link className="dropdown-item" to={pathForGame(id.slice(1))}>
+                      {label}
+                    </Link>
+                  </li>
+                ) : (
+                  <li key={id}>
+                    <a className="dropdown-item" href={`/jol/game/${id.slice(1)}`}>
+                      {label}
+                    </a>
+                  </li>
+                ),
+              )}
             </ul>
           </div>
         </div>

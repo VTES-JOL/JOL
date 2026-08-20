@@ -12,6 +12,13 @@ const _ctx = '/jol/api';
 // it to /react/index.html.
 const REACT_VIEWS = ['main', 'profile', 'admin', 'tournamentAdmin', 'tournament', 'active', 'lobby', 'deck'];
 
+// Game targets are "g<gameId>", never a fixed string, so REACT_VIEWS can't
+// list them — matches MainServlet.REACT_ROUTES treating any /game/<id> as
+// React-owned regardless of which game.
+function isReactTarget(target) {
+    return REACT_VIEWS.includes(target) || (typeof target === 'string' && target.startsWith('g'));
+}
+
 function _enc(s) { return encodeURIComponent(s); }
 
 // Access tokens are short-lived; on a 401 we silently exchange the refresh cookie
@@ -210,7 +217,7 @@ $(document).ready(function () {
     const parts = window.location.pathname.replace(/^\/jol\//, '').split('/');
     let initialTarget = parts[0] || 'main';
     if (initialTarget === 'game' && parts[1]) initialTarget = 'g' + decodeURIComponent(parts[1]);
-    if (REACT_VIEWS.includes(initialTarget)) {
+    if (isReactTarget(initialTarget)) {
         // MainServlet should have routed this to /react/index.html already;
         // getting here means this legacy shell was loaded directly for a
         // React-owned view (e.g. stale cache) — force a real reload so it's
@@ -221,7 +228,7 @@ $(document).ready(function () {
     DS.init(initialTarget, {callback: init, errorHandler: errorhandler});
     window.addEventListener('popstate', function(e) {
         const t = e.state && e.state.target ? e.state.target : 'main';
-        if (REACT_VIEWS.includes(t)) {
+        if (isReactTarget(t)) {
             window.location.reload();
             return;
         }
@@ -2357,7 +2364,7 @@ function navigateOrInit(target) {
 
 function doNav(target) {
     const urlPath = target.startsWith('g') ? 'game/' + encodeURIComponent(target.substring(1)) : target;
-    if (REACT_VIEWS.includes(target)) {
+    if (isReactTarget(target)) {
         window.location.href = '/jol/' + urlPath;
         return false;
     }

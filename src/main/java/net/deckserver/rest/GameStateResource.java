@@ -1,0 +1,78 @@
+package net.deckserver.rest;
+
+import net.deckserver.JolAdmin;
+import net.deckserver.dwr.bean.GameSnapshot;
+import net.deckserver.dwr.model.GameModel;
+import net.deckserver.dwr.model.GameSnapshotFactory;
+import net.deckserver.services.GameService;
+import net.deckserver.services.RegistrationService;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+
+/**
+ * Dedicated, envelope-free reads/writes for the React game page — same role
+ * every other *PageResource/*StateResource plays elsewhere. Deliberately
+ * separate from GameActionResource (still shared with legacy ds.js/card-modal.js,
+ * still returns the UpdateFactory envelope for submit/end-turn) — but calls the
+ * exact same unchanged GameModel methods, then serializes the result through
+ * GameSnapshotFactory instead of GameView's HTML-fragment rendering.
+ *
+ * Phase 1 scope only: full-board read, the free-text Command/Chat/Phase/Ping
+ * form, and ending your own turn. Card-click interactions (card-modal.js) are
+ * a later phase — see the migration plan.
+ */
+@Path("/game/{id}")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class GameStateResource extends BaseResource {
+
+    @PathParam("id")
+    private String gameId;
+
+    private String gameName() {
+        return GameService.getNameByGameId(gameId);
+    }
+
+    private GameModel getModel() {
+        return JolAdmin.getGameModel(gameName());
+    }
+
+    @GET
+    @Path("view")
+    public GameSnapshot getView() {
+        return GameSnapshotFactory.build(getModel(), username(), null);
+    }
+
+    @POST
+    @Path("view/submit")
+    public GameSnapshot submit(SubmitRequest body) {
+        String player = username();
+        GameModel game = getModel();
+        boolean isPlaying = game.getPlayers().contains(player);
+        boolean canJudge = JolAdmin.isJudge(player) && !isPlaying;
+        String status = null;
+        if (isPlaying || canJudge) {
+            status = game.submit(player, ne(body.phase()), ne(body.command()), ne(body.chat()), ne(body.ping()));
+        }
+        return GameSnapshotFactory.build(game, player, status);
+    }
+
+    @POST
+    @Path("view/end-turn")
+    public GameSnapshot endTurn() {
+        String player = username();
+        GameModel game = getModel();
+        boolean isPlaying = RegistrationService.getPlayers(gameName()).contains(player);
+        if (isPlaying) {
+            game.endTurn(player);
+        }
+        return GameSnapshotFactory.build(game, player, null);
+    }
+
+    private static String ne(String arg) {
+        return "".equals(arg) ? null : arg;
+    }
+
+    public record SubmitRequest(String phase, String command, String chat, String ping) {}
+}

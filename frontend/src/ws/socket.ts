@@ -6,6 +6,7 @@ import { checkNow } from '../api/connectivity';
 type Listener = (data: Record<string, unknown>) => void;
 
 const listeners = new Map<string, Set<Listener>>();
+const openListeners = new Set<() => void>();
 let socket: WebSocket | null = null;
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -38,6 +39,10 @@ function connect() {
     // is back — check immediately rather than waiting for connectivity's own
     // backoff-scheduled poll, which could be up to 30s away by this point.
     checkNow();
+    // e.g. re-sending {type:'join', game: id} after a reconnect — the server
+    // only tracks room membership per live session, so it doesn't survive a
+    // dropped/reopened socket on its own.
+    openListeners.forEach((listener) => listener());
   };
   socket.onmessage = (event) => {
     try {
@@ -61,6 +66,18 @@ export function subscribe(type: string, listener: Listener): () => void {
     listeners.get(type)?.delete(listener);
     if (listeners.get(type)?.size === 0) listeners.delete(type);
   };
+}
+
+export function send(message: Record<string, unknown>) {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify(message));
+  }
+}
+
+// Re-invoked every time the socket (re)connects — see the onopen comment above.
+export function onOpen(listener: () => void): () => void {
+  openListeners.add(listener);
+  return () => openListeners.delete(listener);
 }
 
 export function disconnect() {

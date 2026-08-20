@@ -17,7 +17,10 @@ public class MainServlet extends HttpServlet {
     // Paths whose view has been ported to React (frontend/, bundled into WAR at
     // /react/*). Grows by one entry per route as it's converted — see the React
     // migration plan. Everything else still forwards to the legacy JSP shell.
-    private static final Set<String> REACT_ROUTES = Set.of("", "/", "/main", "/main.jsp", "/profile", "/admin", "/tournamentAdmin", "/tournament", "/active", "/lobby", "/deck");
+    // "/game" is wildcard-mapped ("/game/*" below) — getServletPath() returns
+    // just "/game" regardless of which game id follows, so this one entry
+    // covers every /jol/game/<id> URL.
+    private static final Set<String> REACT_ROUTES = Set.of("", "/", "/main", "/main.jsp", "/profile", "/admin", "/tournamentAdmin", "/tournament", "/active", "/lobby", "/deck", "/game");
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

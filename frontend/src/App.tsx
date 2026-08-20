@@ -8,6 +8,7 @@ import { TournamentPage } from './pages/TournamentPage';
 import { WatchPage } from './pages/WatchPage';
 import { LobbyPage } from './pages/LobbyPage';
 import { DeckPage } from './pages/DeckPage';
+import { GamePage } from './pages/GamePage';
 import { NavProvider } from './nav/NavContext';
 import { ReconnectingOverlay } from './components/ReconnectingOverlay';
 import { useConnectivity } from './api/useConnectivity';
@@ -48,6 +49,7 @@ export function App() {
             <Route path="/jol/active" element={<WatchPage />} />
             <Route path="/jol/lobby" element={<LobbyPage />} />
             <Route path="/jol/deck" element={<DeckPage />} />
+            <Route path="/jol/game/:gameId" element={<GamePage />} />
           </Routes>
           {!online && <ReconnectingOverlay everConnected={everConnected} />}
         </div>
