@@ -110,8 +110,12 @@ const DS = {
     statsPerOpponent:        (playerName, treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/performance/${_enc(playerName)}/players`, {treshold, fromDate, toDate, isTourney}, opts),
     statsPerGame:            (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/games`, {treshold, fromDate, toDate, isTourney}, opts),
     statsJolMonth:           (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/jol/month`, {treshold, fromDate, toDate, isTourney}, opts),
-    statsJolClans:            (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/jol/clans`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsJolClans:           (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/jol/clans`, {treshold, fromDate, toDate, isTourney}, opts),
     statsPerformanceDeck:    (playerName, treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/performance/${_enc(playerName)}/decks`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsMetricsPlayer:      (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/metrics/player`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsMetricsGame:        (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/metrics/game`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsCommandsPlayer:     (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/commands/player`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsCommandsGame:       (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/commands/game`, {treshold, fromDate, toDate, isTourney}, opts),
     updateSiteNotes:         (notes, opts) => apiPut('/admin/site-notes', {notes}, opts),
     clearSiteNotes:          (opts) => apiDel('/admin/site-notes', opts),
 
@@ -3145,7 +3149,7 @@ function renderStats() {
     } else if($('#nationStatsTab').hasClass('active')) {
         DS.statsPerNation(gameThresholdNation, fromDate, toDate, isTourney,{
             callback: (data) => {
-                createStats(data, "#statsNationGames  tbody");
+                createStats(data, "#statsNationGames tbody");
                 filterName('#statsNationGames  tbody tr', 'nationNameFilter', 1);
             }, errorHandler: errorhandler});
     } else if($('#personalStatsTab').hasClass('active')) {
@@ -3165,19 +3169,93 @@ function renderStats() {
                 createStatsGame(data);
                 filterName('#statsGameGames tbody tr', 'gameNameFilter', 1);
             }, errorHandler: errorhandler});
-    } else if($('#jolStatsTab').hasClass('active')) {
-        DS.statsJolMonth(0, fromDate, toDate, isTourney,{
+    } else if($('#jolMonthlyTab').hasClass('active')) {
+        DS.statsJolMonth(0, fromDate, toDate, isTourney, {
             callback: (data) => {
                 createStatsJolMonth(data);
                 filterName('#statsJolGames tbody tr', 'clanFilter', 1);
+            }, errorHandler: errorhandler
+        });
+    }else if($('#jolMetricsTab').hasClass('active')) {
+        DS.statsMetricsPlayer(fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createMetrics(data, "#playerMetrics tbody");
             }, errorHandler: errorhandler});
-        // DS.statsJolClans(0, fromDate, toDate, isTourney,{
-        //     callback: (data) => {
-        //         createStatsJolClan(data);
-        //         filterName('#statsJolClans tbody tr', 'monthFilter', 1);
-        //     }, errorHandler: errorhandler});
-
+        DS.statsMetricsGame(fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createMetrics(data, "#gamesMetrics tbody");
+            }, errorHandler: errorhandler});
+        DS.statsCommandsPlayer(fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createCommands(data, "#playerCommands tbody");
+            }, errorHandler: errorhandler});
+        DS.statsCommandsGame(fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createCommands(data, "#gamesCommandos tbody");
+            }, errorHandler: errorhandler});
     }
+}
+
+function createMetrics(data, target) {
+    let table = $(target);
+    table.empty();
+    $.each(data, function (index, count) {
+        let row = $("<tr/>");
+        row.addClass("border-top")
+        let name = $("<td/>").text(index);
+        let activity = $("<td/>").text(count[0]);
+        let chat = $("<td/>").text(count[1]);
+        let command = $("<td/>").text(count[2]);
+        let both = $("<td/>").text(count[3]);
+        let ping = $("<td/>").text(count[4]);
+        row.append(name, activity, chat, command, both, ping);
+        table.append(row);
+    })
+}
+
+function createCommands(data, target) {
+    let commands = $(target);
+    commands.empty();
+    $.each(data, function (index, count) {
+        let row = $("<tr/>");
+        row.addClass("border-top")
+        let name = $("<td/>").text(index);
+        let timeout = $("<td/>").text(count[0]);
+        let vp = $("<td/>").text(count[1]);
+        let choose = $("<td/>").text(count[2]);
+        let reveal = $("<td/>").text(count[3]);
+        let label = $("<td/>").text(count[4]);
+        let votes = $("<td/>").text(count[5]);
+        let random = $("<td/>").text(count[6]);
+        let flip = $("<td/>").text(count[7]);
+        let discard = $("<td/>").text(count[8]);
+        let draw = $("<td/>").text(count[9]);
+        let edge = $("<td/>").text(count[10]);
+        let play = $("<td/>").text(count[11]);
+        let influence = $("<td/>").text(count[12]);
+        let move = $("<td/>").text(count[13]);
+        let burn = $("<td/>").text(count[14]);
+        let pool = $("<td/>").text(count[15]);
+        let blood = $("<td/>").text(count[16]);
+        let contest = $("<td/>").text(count[17]);
+        let disc = $("<td/>").text(count[18]);
+        let capacity = $("<td/>").text(count[19]);
+        let unlock = $("<td/>").text(count[20]);
+        let lock = $("<td/>").text(count[21]);
+        let order = $("<td/>").text(count[22]);
+        let show = $("<td/>").text(count[23]);
+        let shuffle = $("<td/>").text(count[24]);
+        let transfer = $("<td/>").text(count[25]);
+        let rfg = $("<td/>").text(count[26]);
+        let path = $("<td/>").text(count[27]);
+        let sect = $("<td/>").text(count[28]);
+        let clan = $("<td/>").text(count[29]);
+        let open = $("<td/>").text(count[30]);
+        row.append(name, timeout, vp, choose, reveal, label, votes, random, flip, discard, draw, edge, play, influence, move, burn, pool, blood, contest, disc, capacity, unlock, lock, order, show, shuffle, transfer, rfg, path, sect, clan, open);
+        commands.append(row);
+        row.append(name, started, ended, net, wins, winRate, vps, avgVp, avgDuration, bestPlayer, bestDeck, bestNation);
+        table.append(row);
+    })
 }
 
 function createStats(stats, tableId) {

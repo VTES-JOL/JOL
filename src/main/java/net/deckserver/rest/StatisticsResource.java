@@ -1,9 +1,6 @@
 package net.deckserver.rest;
 
-import net.deckserver.services.CardService;
-import net.deckserver.services.DeckService;
-import net.deckserver.services.HistoryService;
-import net.deckserver.services.PlayerService;
+import net.deckserver.services.*;
 import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.system.GameHistory;
@@ -72,6 +69,46 @@ public class StatisticsResource {
     @Path("/jol/clans")
     public Map<String, Long> getStatsJolClans(StatsRequest body) {
         return getClanPerformance(HistoryService.getHistory().values(), body);
+    }
+
+    @POST
+    @Path("/metrics/player")
+    public Map<String, List<Long>> getMetricsPlayer(StatsRequest body) {
+        return getMetrics(
+                body,
+                MetricsService.loadMetrics(),
+                MetricsService.PlayerMetricDto::playerName
+        );
+    }
+
+    @POST
+    @Path("/metrics/game")
+    public Map<String, List<Long>> getMetricsGame(StatsRequest body) {
+        return getMetrics(
+                body,
+                MetricsService.loadMetrics(),
+                MetricsService.PlayerMetricDto::gameName
+        );
+    }
+
+    @POST
+    @Path("/commands/player")
+    public Map<String, List<Long>> getCommandsPlayer(StatsRequest body) {
+        return getCommands(
+                body,
+                MetricsService.loadCommands(),
+                MetricsService.CommandMetricDto::playerName
+        );
+    }
+
+    @POST
+    @Path("/commands/game")
+    public Map<String, List<Long>> getCommandsGame(StatsRequest body) {
+        return getCommands(
+                body,
+                MetricsService.loadCommands(),
+                MetricsService.CommandMetricDto::game
+        );
     }
 
     private Map<String, Long> getClanPerformance(Collection<GameHistory> values, StatsRequest body) {
@@ -452,7 +489,7 @@ public class StatisticsResource {
                             );
                         },
                         (a, b) -> a,
-                        () -> new TreeMap<YearMonth, JolStats>(Comparator.reverseOrder())
+                        () -> new TreeMap<YearMonth, JolStats>()
                 ));
     }
 
@@ -570,6 +607,171 @@ public class StatisticsResource {
                                         String.CASE_INSENSITIVE_ORDER)
                 )
                 .toList();
+    }
+
+    //METRICS AND COMMANDS
+    private Map<String, List<Long>> getMetrics(
+            StatsRequest body,
+            List<MetricsService.PlayerMetricDto> load,
+            Function<MetricsService.PlayerMetricDto, String> keyExtractor) {
+        return load.stream()
+                .filter(data -> {
+                    if(!body.fromDate().equals("") && !body.toDate().equals("")) {
+                        return data.timestamp().toLocalDate().isAfter(LocalDate.parse(body.fromDate())) &&
+                                data.timestamp().toLocalDate().isBefore(LocalDate.parse(body.toDate()));
+                    }
+                    return true;
+                })
+                .filter(data -> {
+                    if(body.isTourney()) {
+                        return data.gameName().contains("Final Table") ||
+                                Pattern.compile("Round\\s+\\d+\\s*-\\s*Table\\s+\\d+").matcher(data.gameName()).find();
+                    }
+                    return true;
+                })
+                .collect(Collectors.groupingBy(
+                        keyExtractor,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                list -> List.of(
+                                        (long) list.size(),
+                                        list.stream()
+                                                .filter(MetricsService.PlayerMetricDto::didChat)
+                                                .count(),
+                                        list.stream()
+                                                .filter(MetricsService.PlayerMetricDto::didCommand)
+                                                .count(),
+                                        list.stream()
+                                                .filter(dto -> dto.didCommand() && dto.didChat())
+                                                .count(),
+                                        list.stream()
+                                                .filter(dto -> dto.didPing())
+                                                .count()
+                                )
+                        )
+                ));
+    }
+
+    private Map<String, List<Long>> getCommands(
+            StatsRequest body,
+            List<MetricsService.CommandMetricDto> load,
+            Function<MetricsService.CommandMetricDto, String> keyExtractor) {
+        return load.stream()
+                .filter(data -> {
+                    if(!body.fromDate().equals("") && !body.toDate().equals("")) {
+                        return data.timestamp().toLocalDate().isAfter(LocalDate.parse(body.fromDate())) &&
+                                data.timestamp().toLocalDate().isBefore(LocalDate.parse(body.toDate()));
+                    }
+                    return true;
+                })
+                .filter(data -> {
+                    if(body.isTourney()) {
+                        return data.game().contains("Final Table") ||
+                                Pattern.compile("Round\\s+\\d+\\s*-\\s*Table\\s+\\d+").matcher(data.game()).find();
+                    }
+                    return true;
+                })
+                .collect(Collectors.groupingBy(
+                        keyExtractor,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                list -> List.of(
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("timeout"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("vp"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("choose"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("reveal"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("label"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("votes"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("random"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("flip"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("discard"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("draw"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("edge"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("play"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("influence"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("move"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("burn"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("pool"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("blood"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("contest"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("disc"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("capacity"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("unlock"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("lock"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("order"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("show"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("shuffle"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("transfer"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("rfg"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("path"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("sect"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("clan"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("open"))
+                                                .count()
+                                )
+                        )
+                ));
     }
 
     // Utils for checking Game History Relevance
