@@ -341,6 +341,7 @@ public class StatisticsResource {
                             0,
                             0,
                             "",
+                            "",
                             0,
                             "",
                             0,
@@ -354,12 +355,14 @@ public class StatisticsResource {
                 int losses = current.losses() + (player.isGameWin() ? 0 : 1);
                 double winRate = 0;
                 double winRateOpp = 0;
+                double oppWinRate = 0;
 
                 if(losses!=0) {
                     winRate = (double) wins / gamesPlayed;
                 }
                 if(wins+winOpponent!=0) {
                     winRateOpp = (double) wins / (wins + winOpponent);
+                    oppWinRate = (double) winOpponent / (wins + winOpponent);
                 }
 
                 result.put(
@@ -369,8 +372,9 @@ public class StatisticsResource {
                                 gamesPlayed,
                                 wins,
                                 winRate != 0 ? Math.round(winRate * 100) + "%" : "0%",
-                                winOpponent,
                                 winRateOpp != 0 ? Math.round(winRateOpp * 100) + "%" : "0%",
+                                winOpponent,
+                                oppWinRate!= 0 ? Math.round(oppWinRate * 100) + "%" : "0%",
                                 gamesPlayed - wins - winOpponent,
                                 losses
                         )
@@ -886,8 +890,9 @@ public class StatisticsResource {
             int games,
             int wins,
             String winRate,
-            int winOpponent,
             String winRateOpponent,
+            int winOpponent,
+            String oppWinRate,
             int winOther,
             int losses
     ) {

@@ -40,7 +40,7 @@
                     <div id="jolChartCollapse" class="accordion-collapse collapse show" aria-labelledby="jolChartHeading">
                         <div class="accordion-body">
                             <div style="height: 350px;">
-                                <canvas id="myChart"></canvas>
+                                <canvas id="jolChart"></canvas>
                             </div>
                         </div>
                     </div>

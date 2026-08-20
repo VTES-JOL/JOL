@@ -11,9 +11,9 @@
     </li>
     <li class="nav-item">
         <button class="nav-link"
-                id="personalOpponentTab"
+                id="personalDeckTab"
                 data-bs-toggle="tab"
-                data-bs-target="#personalOpponentPane"
+                data-bs-target="#personalDeckPane"
                 type="button">
             Deck Performance
         </button>
@@ -25,90 +25,192 @@
     <!-- Opponent -->
     <div class="tab-pane fade show active" id="personalOverviewPane">
         <div class="overflow-auto pb-3" style="height:73vh;">
-            <table id="statsPersonalGames" class="table table-bordered table-sm mb-0">
-                <thead>
-                <tr>
-                    <th class="sticky-top bg-white">Opponent
-                        <input type="text" id="personalNameFilter"
-                               oninput="filterName('#statsPersonalGames tbody tr', 'personalNameFilter', 0)">
-                        <i class="bi bi-filter" onclick="sortTable(0, 'statsPersonalGames')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">Number of Games
-                        <i class="bi bi-filter" onclick="sortTable(1, 'statsPersonalGames')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">Wins
-                        <i class="bi bi-filter" onclick="sortTable(2, 'statsPersonalGames')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">Win Rate
-                        <i class="bi bi-filter"
-                           onclick="sortPercentageTable(3, 'statsPersonalGames')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">Opponent Won
-                        <i class="bi bi-filter" onclick="sortTable(4, 'statsPersonalGames')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">Win Rate Against Opponent
-                        <i class="bi bi-filter"
-                           onclick="sortPercentageTable(5, 'statsPersonalGames')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">Other player won
-                        <i class="bi bi-filter" onclick="sortTable(6, 'statsPersonalGames')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">Losses
-                        <i class="bi bi-filter" onclick="sortTable(7, 'statsPersonalGames')"></i>
-                    </th>
-                </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <!-- Chart Accordion -->
+            <div class="accordion mb-3" id="personalChartAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="personalChartHeading">
+                        <button class="accordion-button"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#personalChartCollapse"
+                                aria-expanded="true"
+                                aria-controls="personalChartCollapse">
+                            Top 10
+                        </button>
+                    </h2>
+                    <div id="personalChartCollapse" class="accordion-collapse collapse show"
+                         aria-labelledby="personalChartHeading">
+                        <div class="accordion-body">
+                            <div style="height: 350px;">
+                                <canvas id="personalChart"></canvas>
+                            </div>
+                            <div class="text-center mt-3">
+                                <span id="personalChartLegend" class="fw-bold">Archenemy: PlayerName</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion" id="personalTableAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="personalTableHeading">
+                        <button class="accordion-button"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#personalTableCollapse"
+                                aria-expanded="true"
+                                aria-controls="personalTableCollapse">
+                            Table
+                        </button>
+                    </h2>
+                    <div id="personalTableCollapse" class="accordion-collapse collapse show"
+                         aria-labelledby="personalTableHeading">
+                        <div class="accordion-body p-0">
+                            <table id="statsPersonalGames" class="table table-bordered table-sm mb-0">
+                                <thead>
+                                <tr>
+                                    <th class="sticky-top bg-white">Opponent
+                                        <input type="text" id="personalNameFilter"
+                                               oninput="filterName('#statsPersonalGames tbody tr', 'personalNameFilter', 0)">
+                                        <i class="bi bi-filter" onclick="sortTable(0, 'statsPersonalGames')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Number of Games
+                                        <i class="bi bi-filter" onclick="sortTable(1, 'statsPersonalGames')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Wins
+                                        <i class="bi bi-filter" onclick="sortTable(2, 'statsPersonalGames')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Win Rate Overall
+                                        <i class="bi bi-filter"
+                                           onclick="sortPercentageTable(3, 'statsPersonalGames')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Win Rate Against Opponent
+                                        <i class="bi bi-filter"
+                                           onclick="sortPercentageTable(4, 'statsPersonalGames')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Opponent Won
+                                        <i class="bi bi-filter" onclick="sortTable(5, 'statsPersonalGames')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Win Rate Opponent Against You
+                                        <i class="bi bi-filter"
+                                           onclick="sortPercentageTable(6, 'statsPersonalGames')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Other player won
+                                        <i class="bi bi-filter" onclick="sortTable(7, 'statsPersonalGames')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Losses
+                                        <i class="bi bi-filter" onclick="sortTable(8, 'statsPersonalGames')"></i>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-    <!-- Deck Performance -->
-    <div class="tab-pane fade" id="personalOpponentPane">
+    <!-- Deck -->
+    <div class="tab-pane fade" id="personalDeckPane">
         <div class="overflow-auto pb-3" style="height:73vh;">
-            <table id="statsPersonalDecks" class="table table-bordered table-sm mb-0">
-                <thead>
-                <tr>
-                    <th class="sticky-top bg-white">Deck
-                        <input type="text" id="personalDeckNameFilter"
-                               oninput="filterName('#statsPersonalDecks tbody tr', 'personalDeckNameFilter', 1)">
-                        <i class="bi bi-filter" onclick="sortTable(0, 'statsPersonalDecks')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">Opponent Deck
-                        <input type="text" id="personalOpponentNameFilter"
-                               oninput="filterName('#statsPersonalDecks tbody tr', 'personalOpponentNameFilter', 2)">
-                        <i class="bi bi-filter" onclick="sortTable(1, 'statsPersonalDecks')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">Game Names
-                        <input type="text" id="personalGamesNameFilter"
-                               oninput="filterName('#statsPersonalDecks tbody tr', 'personalGamesNameFilter', 3)">
-                        <i class="bi bi-filter" onclick="sortTable(2, 'statsPersonalDecks')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">Games
-                        <i class="bi bi-filter" onclick="sortTable(3, 'statsPersonalDecks')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">Wins
-                        <i class="bi bi-filter" onclick="sortTable(4, 'statsPersonalDecks')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">VP
-                        <i class="bi bi-filter" onclick="sortTable(5, 'statsPersonalDecks')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">Avg VP
-                        <i class="bi bi-filter" onclick="sortTable(6, 'statsPersonalDecks')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">Opponent VP
-                        <i class="bi bi-filter" onclick="sortTable(7, 'statsPersonalDecks')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">Opponent Avg VP
-                        <i class="bi bi-filter" onclick="sortTable(8, 'statsPersonalDecks')"></i>
-                    </th>
-                    <th class="sticky-top bg-white">VP Difference
-                        <i class="bi bi-filter" onclick="sortTable(9, 'statsPersonalDecks')"></i>
-                    </th>
-                </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <!-- Chart Accordion -->
+            <div class="accordion mb-3" id="personalDeckChartAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="personalDeckChartHeading">
+                        <button class="accordion-button"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#personalDeckChartCollapse"
+                                aria-expanded="true"
+                                aria-controls="personalDeckChartCollapse">
+                            Top 10
+                        </button>
+                    </h2>
+                    <div id="personalDeckChartCollapse" class="accordion-collapse collapse show"
+                         aria-labelledby="personalDeckChartHeading">
+                        <div class="accordion-body">
+                            <div style="height: 350px;">
+                                <canvas id="personalDeckChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion" id="personalDeckTableAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="personalDeckTableHeading">
+                        <button class="accordion-button"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#personalDeckTableCollapse"
+                                aria-expanded="true"
+                                aria-controls="personalDeckTableCollapse">
+                            Table
+                        </button>
+                    </h2>
+                    <div id="personalDeckTableCollapse" class="accordion-collapse collapse show"
+                         aria-labelledby="personalDeckTableHeading">
+                        <div class="accordion-body p-0">
+                            <table id="statsPersonalDecks" class="table table-bordered table-sm mb-0">
+                                <thead>
+                                <tr>
+                                    <th class="sticky-top bg-white">Deck
+                                        <input type="text" id="personalDeckNameFilter"
+                                               oninput="filterName('#statsPersonalDecks tbody tr', 'personalDeckNameFilter', 1)">
+                                        <i class="bi bi-filter"
+                                           onclick="sortTable(0, 'statsPersonalDecks')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Opponent Deck
+                                        <input type="text" id="personalOpponentNameFilter"
+                                               oninput="filterName('#statsPersonalDecks tbody tr', 'personalOpponentNameFilter', 2)">
+                                        <i class="bi bi-filter"
+                                           onclick="sortTable(1, 'statsPersonalDecks')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Game Names
+                                        <input type="text" id="personalGamesNameFilter"
+                                               oninput="filterName('#statsPersonalDecks tbody tr', 'personalGamesNameFilter', 3)">
+                                        <i class="bi bi-filter"
+                                           onclick="sortTable(2, 'statsPersonalDecks')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Games
+                                        <i class="bi bi-filter"
+                                           onclick="sortTable(3, 'statsPersonalDecks')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Wins
+                                        <i class="bi bi-filter"
+                                           onclick="sortTable(4, 'statsPersonalDecks')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">VP
+                                        <i class="bi bi-filter"
+                                           onclick="sortTable(5, 'statsPersonalDecks')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Avg VP
+                                        <i class="bi bi-filter"
+                                           onclick="sortTable(6, 'statsPersonalDecks')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Opponent VP
+                                        <i class="bi bi-filter"
+                                           onclick="sortTable(7, 'statsPersonalDecks')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">Opponent Avg VP
+                                        <i class="bi bi-filter"
+                                           onclick="sortTable(8, 'statsPersonalDecks')"></i>
+                                    </th>
+                                    <th class="sticky-top bg-white">VP Difference
+                                        <i class="bi bi-filter"
+                                           onclick="sortTable(9, 'statsPersonalDecks')"></i>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

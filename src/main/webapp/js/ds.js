@@ -3303,13 +3303,16 @@ function createStatsPersonal(stats) {
         let games = $("<td/>").text(entry.games);
         let wins = $("<td/>").text(entry.wins);
         let winRate = $("<td/>").text(entry.winRate);
+        let winRateAgainstOpponent = $("<td/>").text(entry.winRateOpponent);
         let winOpponent = $("<td/>").text(entry.winOpponent);
-        let winRateOpponent = $("<td/>").text(entry.winRateOpponent);
+        let winRateOpponent = $("<td/>").text(entry.oppWinRate);
         let winOther = $("<td/>").text(entry.winOther);
         let losses = $("<td/>").text(entry.losses);
-        row.append(name, games, wins, winRate, winOpponent, winRateOpponent, winOther, losses);
+        row.append(name, games, wins, winRate, winRateAgainstOpponent, winOpponent, winRateOpponent, winOther, losses);
         table.append(row);
     })
+
+    loadPersonalChart(stats);
 }
 
 function createStatsPersonalDeck(stats) {
@@ -3331,6 +3334,8 @@ function createStatsPersonalDeck(stats) {
         row.append(deckName, opponentDeckName, gameNames, games, totalWins, totalVP, averageVP, opponentTotalVP, opponentAverageVP, vpDifference);
         table.append(row);
     })
+
+    loadPersonalDeckChart(stats);
 }
 
 function createStatsJolMonth(stats) {
@@ -3368,51 +3373,230 @@ function createStatsJolMonth(stats) {
         row.append(name, started, ended, net, wins, winRate, vps, avgVp, avgDuration, bestPlayer, bestDeck, bestNation);
         table.append(row);
     })
-    loadChart(stats);
+    loadJolChart(stats);
 }
 
 
 let jolChart;
-function loadChart(data) {
-    const months = Object.keys(data);
-    const stats = Object.values(data);
 
-    if (jolChart) {
-        jolChart.destroy();
+function loadJolChart(data) {
+    const months = Object.keys(data);
+    const stats= Object.values(data);
+
+if (jolChart) {
+    jolChart.destroy();
+}
+
+jolChart = new Chart(document.getElementById('jolChart'), {
+    type: 'line',
+    data: {
+        labels: months,
+        datasets: [
+            {
+                label: 'Games Started',
+                data: stats.map(stat => stat.gamesStartedPerMonth),
+                tension: 0.3
+            },
+            {
+                label: 'Games Ended',
+                data: stats.map(stat => stat.gamesEndedPerMonth),
+                tension: 0.3
+            },
+            {
+                label: 'Wins',
+                data: stats.map(stat => stat.winsPerMonth),
+                tension: 0.3
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+}
+
+let personalChart;
+
+function loadPersonalChart(data) {
+    const top10 = Object.values(data)
+        .sort((a, b) => b.games - a.games)
+        .slice(0, 10);
+
+    if (personalChart) {
+        personalChart.destroy();
     }
 
-    jolChart = new Chart(document.getElementById('myChart'), {
-        type: 'line',
+    personalChart = new Chart(document.getElementById('personalChart'), {
+        type: 'bar',
+
         data: {
-            labels: months,
+            labels: top10.map(stat => stat.opponent),
+
             datasets: [
                 {
-                    label: 'Games Started',
-                    data: stats.map(stat => stat.gamesStartedPerMonth),
-                    tension: 0.3
+                    label: 'Games',
+                    data: top10.map(stat => stat.games)
                 },
                 {
-                    label: 'Games Ended',
-                    data: stats.map(stat => stat.gamesEndedPerMonth),
-                    tension: 0.3
+                    label: 'You Won',
+                    data: top10.map(stat => stat.wins)
                 },
                 {
-                    label: 'Wins',
-                    data: stats.map(stat => stat.winsPerMonth),
-                    tension: 0.3
+                    label: 'Opponent Won',
+                    data: top10.map(stat => stat.winOpponent)
+                },
+                {
+                    label: 'Someone Other Won',
+                    data: top10.map(stat => stat.winOther)
                 }
             ]
         },
+
         options: {
             responsive: true,
             maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    display: true
+                },
+
+                datalabels: {
+                    color: '#000',
+                    anchor: 'end',
+                    align: 'top',
+                    font: {
+                        weight: 'bold',
+                        size: 12
+                    },
+                    formatter: value => value
+                }
+            },
+
             scales: {
+                x: {
+                    ticks: {
+                        autoSkip: false
+                    }
+                },
+
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        },
+
+        plugins: [ChartDataLabels]
+    });
+}
+
+let personalDeckChart;
+
+function loadPersonalDeckChart(data) {
+
+    // Aggregate games by deck
+    const aggregated = {};
+
+    Object.values(data).forEach(stat => {
+        const deck = stat.deck;
+
+        if (!aggregated[deck]) {
+            aggregated[deck] = {
+                deck: deck,
+                games: 0,
+                wins: 0,
+                vp: 0,
+                opponentVp: 0
+            };
+        }
+
+        aggregated[deck].games += stat.games;
+        aggregated[deck].wins += stat.wins;
+        aggregated[deck].vp += stat.vp;
+        aggregated[deck].opponentVp += stat.opponentVp;
+    });
+
+    // Calculate derived values
+    const decks = Object.values(aggregated).map(stat => ({
+        ...stat,
+        winRate: stat.games > 0
+            ? (stat.wins / stat.games) * 100
+            : 0,
+        vpDifference: stat.vp - stat.opponentVp
+    }));
+
+    // Top 10 by number of games
+    const top10 = decks
+        .sort((a, b) => b.games - a.games)
+        .slice(0, 10);
+
+    if (personalDeckChart) {
+        personalDeckChart.destroy();
+    }
+
+    personalDeckChart = new Chart(
+        document.getElementById('personalDeckChart'),
+        {
+            type: 'bar',
+
+            data: {
+                labels: top10.map(stat => stat.deck),
+
+                datasets: [
+                    {
+                        label: 'Games',
+                        data: top10.map(stat => stat.games)
+                    },
+                    {
+                        label: 'Wins',
+                        data: top10.map(stat => stat.wins)
+                    }
+                ]
+            },
+
+            options: {
+                indexAxis: 'y',
+
+                responsive: true,
+                maintainAspectRatio: false,
+
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                },
+
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            afterBody: function(context) {
+                                const stat = top10[context[0].dataIndex];
+
+                                return [
+                                    `Win Rate: ${stat.winRate.toFixed(1)}%`,
+                                    `VP: ${stat.vp.toFixed(2)}`,
+                                    `Opponent VP: ${stat.opponentVp.toFixed(2)}`,
+                                    `VP Difference: ${stat.vpDifference.toFixed(2)}`
+                                ];
+                            }
+                        }
+                    }
                 }
             }
         }
-    });
+    );
 }
 
 function createStatsJolClan(stats) {
