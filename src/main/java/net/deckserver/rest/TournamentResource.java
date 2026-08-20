@@ -1,6 +1,7 @@
 package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
+import net.deckserver.dwr.bean.TournamentBean;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.TournamentFormat;
@@ -394,6 +395,47 @@ public class TournamentResource extends BaseResource {
         ExtendedDeck deck = DeckService.getDeck(deckInfo.getDeckId());
         TournamentService.registerDeck(tournament, playerName, deck);
         return update(playerName);
+    }
+
+    /** Dedicated, envelope-free list read for the React tournament (player-facing) page — mirrors TournamentBean. */
+    @GET
+    @Path("player-list")
+    public TournamentBean getPlayerList() {
+        return new TournamentBean(JolAdmin.getPlayerModel(username()));
+    }
+
+    /**
+     * Dedicated equivalents of join/leave/deck above, for the React player-facing
+     * page — same underlying calls, but returning the fresh TournamentBean
+     * directly instead of the shared UpdateFactory envelope those endpoints
+     * return for ds.js's DS.joinTournament/DS.leaveTournament/DS.registerTournamentDeck,
+     * which are still in use by the legacy tournament view.
+     */
+    @POST
+    @Path("{name}/player/join")
+    public TournamentBean joinTournamentReact(@PathParam("name") String tourName) {
+        String playerName = username();
+        String veknId = PlayerService.get(playerName).getVeknId();
+        TournamentService.joinTournament(tourName, playerName, veknId);
+        return getPlayerList();
+    }
+
+    @POST
+    @Path("{name}/player/leave")
+    public TournamentBean leaveTournamentReact(@PathParam("name") String tourName) {
+        String playerName = username();
+        TournamentService.leaveTournament(tourName, playerName);
+        return getPlayerList();
+    }
+
+    @POST
+    @Path("{name}/player/deck")
+    public TournamentBean registerTournamentDeckReact(@PathParam("name") String tourName, RegisterDeckRequest body) {
+        String playerName = username();
+        DeckInfo deckInfo = DeckService.get(playerName, body.deckName());
+        ExtendedDeck deck = DeckService.getDeck(deckInfo.getDeckId());
+        TournamentService.registerDeck(tourName, playerName, deck);
+        return getPlayerList();
     }
 
     /** Replaces DS.resetTables() */

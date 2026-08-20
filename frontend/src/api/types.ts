@@ -181,3 +181,51 @@ export interface CardSimple {
   id: string;
   name: string;
 }
+
+// GET /jol/api/tournament/player-list — net.deckserver.dwr.bean.TournamentBean.
+export interface TournamentBean {
+  veknLinked: boolean;
+  tournaments: TournamentMetadata[];
+  registeredGames: TournamentInviteStatus[];
+  finalsInvites: TournamentMetadata[];
+  decks: DeckInfoBean[];
+}
+
+// net.deckserver.storage.json.system.TournamentInviteStatus.
+export interface TournamentInviteStatus {
+  name: string;
+  deck: Deck | null;
+  format: string;
+}
+
+// net.deckserver.dwr.bean.DeckInfoBean.
+export interface DeckInfoBean {
+  name: string;
+  deckFormat: string;
+  gameFormats: string[];
+  comments: string;
+}
+
+// net.deckserver.storage.json.deck.{Deck,Crypt,Library,LibraryCard,CardCount}.
+export interface Deck {
+  id: string;
+  name: string;
+  crypt: { count: number; cards: CardCount[] };
+  library: { count: number; cards: LibraryCard[] };
+  comments: string;
+  player: string;
+  author: string;
+}
+
+export interface CardCount {
+  id: number;
+  name: string;
+  count: number;
+  comments: string;
+}
+
+export interface LibraryCard {
+  type: string;
+  count: number;
+  cards: CardCount[];
+}
