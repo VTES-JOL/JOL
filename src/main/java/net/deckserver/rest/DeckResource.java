@@ -10,14 +10,13 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 @Path("/decks")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class DeckResource extends BaseResource {
 
-    /** Replaces DS.filterDecks() */
+    /** Replaces DS.filterDecks() — also used directly by the React deck page (DeckPage.tsx). */
     @GET
     public List<DeckInfoBean> filterDecks(@QueryParam("filter") @DefaultValue("") String filter) {
         String playerName = username();
@@ -30,48 +29,43 @@ public class DeckResource extends BaseResource {
                 .toList();
     }
 
-    /** Replaces DS.saveDeck() */
+    /**
+     * Replaces DS.saveDeck() — ds.js/main.jsp are themselves unreachable now
+     * (MainServlet forwards every path to /react/index.html unconditionally),
+     * so nothing left consumes the old UpdateFactory envelope; the React
+     * deck page uses DeckPageResource's dedicated equivalents instead.
+     */
     @POST
-    public Map<String, Object> saveDeck(SaveDeckRequest body) {
-        String playerName = username();
-        JolAdmin.saveDeck(playerName, body.deckName(), body.contents(), body.comment());
-        return update(playerName);
+    public void saveDeck(SaveDeckRequest body) {
+        JolAdmin.saveDeck(username(), body.deckName(), body.contents(), body.comment());
     }
 
     /** Replaces DS.deleteDeck() */
     @DELETE
     @Path("{name}")
-    public Map<String, Object> deleteDeck(@PathParam("name") String deckName) {
-        String playerName = username();
-        JolAdmin.deleteDeck(playerName, deckName);
-        return update(playerName);
+    public void deleteDeck(@PathParam("name") String deckName) {
+        JolAdmin.deleteDeck(username(), deckName);
     }
 
     /** Replaces DS.loadDeck() */
     @POST
     @Path("load")
-    public Map<String, Object> loadDeck(LoadDeckRequest body) {
-        String playerName = username();
-        JolAdmin.selectDeck(playerName, body.deckName());
-        return update(playerName);
+    public void loadDeck(LoadDeckRequest body) {
+        JolAdmin.selectDeck(username(), body.deckName());
     }
 
     /** Replaces DS.newDeck() */
     @POST
     @Path("new")
-    public Map<String, Object> newDeck() {
-        String playerName = username();
-        JolAdmin.newDeck(playerName);
-        return update(playerName);
+    public void newDeck() {
+        JolAdmin.newDeck(username());
     }
 
     /** Replaces DS.validate() */
     @POST
     @Path("validate")
-    public Map<String, Object> validate(ValidateRequest body) {
-        String playerName = username();
-        JolAdmin.validateDeck(playerName, body.contents(), GameFormat.from(body.format()));
-        return update(playerName);
+    public void validate(ValidateRequest body) {
+        JolAdmin.validateDeck(username(), body.contents(), GameFormat.from(body.format()));
     }
 
     public record SaveDeckRequest(String deckName, String contents, String comment) {}

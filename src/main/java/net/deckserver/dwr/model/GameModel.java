@@ -3,17 +3,14 @@ package net.deckserver.dwr.model;
 import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.Phase;
-import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
 import net.deckserver.services.RegistrationService;
-import net.deckserver.storage.json.game.ChatData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.message.ObjectArrayMessage;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -31,17 +28,14 @@ public class GameModel implements Comparable<GameModel> {
     public GameModel(JolGame game) {
         this.name = game.getName();
         this.game = game;
-        ChatService.subscribe(game.id(), this);
     }
 
     public void endTurn(String player) {
         JolGame game = GameService.getGameByName(name);
         if (game.getActivePlayer().equals(player)) {
             game.newTurn();
-            reloadNotes();
             JolAdmin.saveGameState(game);
             JolAdmin.pingPlayer(game.getActivePlayer(), name);
-            doReload(true, true, true);
         }
     }
 
@@ -57,7 +51,6 @@ public class GameModel implements Comparable<GameModel> {
             boolean stateChanged = false;
             boolean phaseChanged = false;
             boolean chatChanged = false;
-            boolean turnChanged = false;
             if (ping != null) {
                 boolean pingSuccessful = JolAdmin.pingPlayer(ping, name);
                 if (!pingSuccessful) {
@@ -101,7 +94,6 @@ public class GameModel implements Comparable<GameModel> {
             if (stateChanged || phaseChanged || chatChanged) {
                 JolAdmin.saveGameState(game);
             }
-            doReload(stateChanged, phaseChanged, turnChanged);
         }
         return status.toString();
     }
@@ -129,7 +121,6 @@ public class GameModel implements Comparable<GameModel> {
         JolGame game = GameService.getGameByName(name);
         if (!notes.equals(game.getGlobalText())) {
             game.setGlobalText(notes);
-            reloadNotes();
             JolAdmin.saveGameState(game);
         }
     }
@@ -138,37 +129,7 @@ public class GameModel implements Comparable<GameModel> {
         JolGame game = GameService.getGameByName(name);
         if (!notes.equals(game.getPrivateNotes(player))) {
             game.setPrivateNotes(player, notes);
-            views.get(player).privateNotesChanged();
             JolAdmin.saveGameState(game, true);
-        }
-    }
-
-    public void addChat(ChatData chat) {
-        for (GameView gameView : views.values()) {
-            gameView.addChat(chat);
-        }
-    }
-
-    public void clearChats() {
-        for (GameView gameView : views.values()) {
-            gameView.clearAccess();
-        }
-    }
-
-    public void doReload(boolean stateChanged, boolean phaseChanged, boolean turnChanged) {
-        for (String key : (new ArrayList<>(views.keySet()))) {
-            GameView view = views.get(key);
-            if (stateChanged) view.stateChanged();
-            if (phaseChanged) view.phaseChanged();
-            if (turnChanged) view.turnChanged();
-        }
-    }
-
-    private void reloadNotes() {
-        for (String key : (new ArrayList<>(views.keySet()))) {
-            GameView view = views.get(key);
-            view.globalChanged();
-            view.privateNotesChanged();
         }
     }
 

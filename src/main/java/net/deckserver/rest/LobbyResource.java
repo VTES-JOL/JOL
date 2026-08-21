@@ -11,7 +11,6 @@ import net.deckserver.ws.WebSocketRegistry;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.Map;
 
 @Path("/lobby")
 @Produces(MediaType.APPLICATION_JSON)
@@ -109,21 +108,26 @@ public class LobbyResource extends BaseResource {
         return JolAdmin.getGameDeck(game, username());
     }
 
-    /** Replaces DS.createGame() */
+    /**
+     * Replaces DS.createGame() — ds.js/main.jsp are themselves unreachable
+     * now (MainServlet forwards every path to /react/index.html
+     * unconditionally), so nothing left consumes the old UpdateFactory
+     * envelope; the React lobby page uses the player/games/* equivalents
+     * above instead.
+     */
     @POST
     @Path("games")
-    public Map<String, Object> createGame(CreateGameRequest body) {
+    public void createGame(CreateGameRequest body) {
         String playerName = username();
         if (!Strings.isNullOrEmpty(playerName)) {
             JolAdmin.createGame(body.name(), "PUBLIC".equals(body.publicFlag()), GameFormat.from(body.format()), playerName);
         }
-        return update(playerName);
     }
 
     /** Replaces DS.startGame() */
     @POST
     @Path("games/{name}/start")
-    public Map<String, Object> startGame(@PathParam("name") String game) {
+    public void startGame(@PathParam("name") String game) {
         String playerName = username();
         if (GameService.existsGame(game)) {
             String owner = JolAdmin.getOwner(game);
@@ -131,46 +135,40 @@ public class LobbyResource extends BaseResource {
                 JolAdmin.startGame(game);
             }
         }
-        return update(playerName);
     }
 
     /** Replaces DS.invitePlayer() */
     @POST
     @Path("games/{name}/invite")
-    public Map<String, Object> invitePlayer(@PathParam("name") String game, InviteRequest body) {
-        String playerName = username();
-        if (playerName != null) {
+    public void invitePlayer(@PathParam("name") String game, InviteRequest body) {
+        if (username() != null) {
             RegistrationService.invitePlayer(game, body.player());
             WebSocketRegistry.notifyMain();
             WebSocketRegistry.notifyMainScope("games");
         }
-        return update(playerName);
     }
 
     /** Replaces DS.unInvitePlayer() */
     @DELETE
     @Path("games/{name}/invite/{player}")
-    public Map<String, Object> unInvitePlayer(@PathParam("name") String game, @PathParam("player") String player) {
-        String playerName = username();
-        if (playerName != null) {
+    public void unInvitePlayer(@PathParam("name") String game, @PathParam("player") String player) {
+        if (username() != null) {
             JolAdmin.unInvitePlayer(game, player);
             WebSocketRegistry.notifyMain();
             WebSocketRegistry.notifyMainScope("games");
         }
-        return update(playerName);
     }
 
     /** Replaces DS.registerDeck() */
     @POST
     @Path("games/{name}/deck")
-    public Map<String, Object> registerDeck(@PathParam("name") String game, RegisterDeckRequest body) {
+    public void registerDeck(@PathParam("name") String game, RegisterDeckRequest body) {
         String playerName = username();
         if (!Strings.isNullOrEmpty(playerName)) {
             JolAdmin.registerDeck(game, playerName, body.deckName());
             WebSocketRegistry.notifyMain();
             WebSocketRegistry.notifyMainScope("games");
         }
-        return update(playerName);
     }
 
     public record CreateGameRequest(String name, String publicFlag, String format) {}

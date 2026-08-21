@@ -204,9 +204,6 @@ public record DoCommand(JolGame game, GameModel model) {
         boolean all = cmdObj.consumeString("all");
         List<String> recipients = all ? game.getValidPlayers() : Collections.singletonList(cmdObj.getPlayer(player));
         game.show(player, targetRegion, amount, recipients);
-        for (String recipient: recipients) {
-            model.getView(recipient).privateNotesChanged();
-        }
     }
 
     void order(CommandParser cmdObj, String player) throws CommandException {

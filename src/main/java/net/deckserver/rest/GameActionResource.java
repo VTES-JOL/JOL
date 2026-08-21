@@ -12,7 +12,8 @@ import net.deckserver.storage.json.game.ChatData;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 @Path("/game/{id}")
 @Produces(MediaType.APPLICATION_JSON)
@@ -26,66 +27,62 @@ public class GameActionResource extends BaseResource {
         return GameService.getNameByGameId(gameId);
     }
 
-    /** Replaces DS.submitForm() */
+    /**
+     * Replaces DS.submitForm() — ds.js/main.jsp are themselves unreachable now
+     * (MainServlet forwards every path to /react/index.html unconditionally),
+     * so nothing left consumes the old UpdateFactory envelope or its
+     * "showStatus" entry; the React game page submits through
+     * GameStateResource's dedicated /game/{id}/view/submit instead.
+     */
     @POST
     @Path("submit")
-    public Map<String, Object> submitForm(SubmitRequest body) {
+    public void submitForm(SubmitRequest body) {
         String player = username();
         GameModel game = getModel();
         boolean isPlaying = game.getPlayers().contains(player);
         boolean canJudge = JolAdmin.isJudge(player) && !game.getPlayers().contains(player);
-        String status = null;
         if (isPlaying || canJudge) {
-            status = game.submit(player, ne(body.phase()), ne(body.command()), ne(body.chat()), ne(body.ping()));
+            game.submit(player, ne(body.phase()), ne(body.command()), ne(body.chat()), ne(body.ping()));
         }
-        Map<String, Object> ret = update(player);
-        if (isPlaying || canJudge) ret.put("showStatus", status);
-        return ret;
     }
 
     /** Replaces DS.endPlayerTurn() — player ends their own turn */
     @POST
     @Path("end-turn")
-    public Map<String, Object> endPlayerTurn() {
+    public void endPlayerTurn() {
         String player = username();
-        boolean isPlaying = RegistrationService.getPlayers(gameName()).contains(player);
-        if (isPlaying) {
+        if (RegistrationService.getPlayers(gameName()).contains(player)) {
             getModel().endTurn(player);
         }
-        return update(player);
     }
 
     /** Replaces DS.endTurn() — admin forces turn end */
     @POST
     @Path("force-end-turn")
-    public Map<String, Object> forceEndTurn() {
+    public void forceEndTurn() {
         String player = username();
         boolean isPlaying = RegistrationService.getPlayers(gameName()).contains(player);
         if (!isPlaying && JolAdmin.isAdmin(player)) {
             JolAdmin.endTurn(gameName(), player);
         }
-        return update(player);
     }
 
     /** Replaces DS.gameChat() */
     @POST
     @Path("chat")
-    public Map<String, Object> gameChat(ChatRequest body) {
+    public void gameChat(ChatRequest body) {
         String player = username();
         String gameId = JolAdmin.getGameId(gameName());
         if (RegistrationService.isInGame(gameName(), player)) {
             ChatService.sendMessage(gameId, player, body.chat());
         }
-        return update(player);
     }
 
     /** Replaces DS.doToggle() */
     @POST
     @Path("toggle/{toggleId}")
-    public Map<String, Object> doToggle(@PathParam("toggleId") String toggleId) {
-        String player = username();
-        getView(player).toggleCollapsed(toggleId);
-        return update(player);
+    public void doToggle(@PathParam("toggleId") String toggleId) {
+        getView(username()).toggleCollapsed(toggleId);
     }
 
     /** Replaces DS.updateGlobalNotes() */
@@ -117,7 +114,7 @@ public class GameActionResource extends BaseResource {
     /** Replaces DS.rollbackGame() — admin only */
     @POST
     @Path("rollback")
-    public Map<String, Object> rollbackGame(RollbackRequest body) {
+    public void rollbackGame(RollbackRequest body) {
         String player = username();
         if (gameName() != null && JolAdmin.isAdmin(player)) {
             String turn = body.turn();
@@ -129,41 +126,26 @@ public class GameActionResource extends BaseResource {
             String turnCode = parts[1].replaceAll("\\.", "-");
             JolAdmin.rollbackGame(gameName(), player, turnCode);
         }
-        return update(player);
     }
 
     /** Replaces DS.replacePlayer() — admin only */
     @PUT
     @Path("replace-player")
-    public Map<String, Object> replacePlayer(ReplacePlayerRequest body) {
-        String player = username();
-        if (JolAdmin.isAdmin(player)) {
+    public void replacePlayer(ReplacePlayerRequest body) {
+        if (JolAdmin.isAdmin(username())) {
             JolAdmin.replacePlayer(gameName(), body.existingPlayer(), body.newPlayer());
         }
-        return update(player);
     }
 
     /** Replaces DS.endGame() */
     @DELETE
-    public Map<String, Object> endGame() {
+    public void endGame() {
         String playerName = username();
-        boolean isOwner = net.deckserver.services.GameService.get(gameName()).getOwner().equals(playerName);
+        boolean isOwner = GameService.get(gameName()).getOwner().equals(playerName);
         boolean isAdmin = JolAdmin.isAdmin(playerName);
         if (isOwner || isAdmin) {
             JolAdmin.endGame(gameName(), true);
         }
-        return update(playerName);
-    }
-
-    /** Replaces DS.getState() */
-    @POST
-    @Path("state")
-    public Map<String, Object> getState(StateRequest body) {
-        String player = username();
-        if (body != null && body.forceLoad()) {
-            getView(player).reset();
-        }
-        return update(player);
     }
 
     /** Replaces DS.getGameDeck() */
@@ -217,5 +199,4 @@ public class GameActionResource extends BaseResource {
     public record NotesRequest(String notes) {}
     public record RollbackRequest(String turn) {}
     public record ReplacePlayerRequest(String existingPlayer, String newPlayer) {}
-    public record StateRequest(boolean forceLoad) {}
 }

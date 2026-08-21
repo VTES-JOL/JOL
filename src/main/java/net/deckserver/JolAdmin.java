@@ -512,12 +512,10 @@ public class JolAdmin {
 
     public static synchronized void endTurn(String gameName, String adminName) {
         JolGame game = GameService.getGameByName(gameName);
-        GameModel gameModel = getGameModel(gameName);
         String id = GameService.get(gameName).getId();
         ChatService.sendMessage(id, "SYSTEM", "Turn ended by administrator: " + adminName);
         game.newTurn();
         pingPlayer(game.getActivePlayer(), gameName);
-        gameModel.doReload(true, true, true);
     }
 
     public static boolean isInRole(String username, String role) {

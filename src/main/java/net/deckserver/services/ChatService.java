@@ -3,7 +3,6 @@ package net.deckserver.services;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
-import net.deckserver.dwr.model.GameModel;
 import net.deckserver.storage.json.game.ChatData;
 import net.deckserver.storage.json.game.TurnData;
 import net.deckserver.storage.json.game.TurnHistory;
@@ -13,14 +12,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class ChatService extends PersistedService {
 
     private static final ChatService INSTANCE = new ChatService();
-    private static final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
 
     private final LoadingCache<String, TurnHistory> historyCache = Caffeine.newBuilder()
             .expireAfterAccess(5, TimeUnit.MINUTES)
@@ -40,10 +36,6 @@ public class ChatService extends PersistedService {
         return INSTANCE;
     }
 
-    public static  void subscribe(String gameId, GameModel model) {
-        gmap.put(gameId, model);
-    }
-
     public static  List<String> getTurns(String gameId) {
         return INSTANCE.historyCache.get(gameId).getTurnLabels();
     }
@@ -52,6 +44,7 @@ public class ChatService extends PersistedService {
         return INSTANCE.historyCache.get(gameId).getTurn(turnLabel).getChats();
     }
 
+    /** The current turn's chat log — used by tests to assert on the latest message. */
     public static  List<ChatData> getChats(String gameId) {
         String turnLabel = INSTANCE.historyCache.get(gameId).getCurrentTurnLabel();
         if (turnLabel == null) {
@@ -62,7 +55,6 @@ public class ChatService extends PersistedService {
 
     public static  void addTurn(String gameId, String player, String turnId) {
         INSTANCE.historyCache.get(gameId).addTurn(player, turnId);
-        Optional.ofNullable(gmap.get(gameId)).ifPresent(GameModel::clearChats);
     }
 
     public static  void sendMessage(String gameId, String source, String message) {
@@ -87,7 +79,6 @@ public class ChatService extends PersistedService {
 
     private static  void sendChat(String gameId, ChatData chat) {
         INSTANCE.historyCache.get(gameId).addChat(chat);
-        Optional.ofNullable(gmap.get(gameId)).ifPresent(model -> model.addChat(chat));
     }
 
     private void saveHistory(String gameId, TurnHistory history) {

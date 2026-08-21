@@ -33,17 +33,18 @@ import java.util.stream.Stream;
 public class AdminResource extends BaseResource {
 
     /**
-     * Replaces DS.setRole()
+     * Replaces DS.setRole() — ds.js/main.jsp are themselves unreachable now
+     * (MainServlet forwards every path to /react/index.html unconditionally),
+     * so nothing left consumes the old UpdateFactory envelope; the React
+     * admin page uses AdminPageResource's dedicated equivalents instead.
      */
     @PUT
     @Path("player/{name}/role")
-    public Map<String, Object> setRole(@PathParam("name") String player, SetRoleRequest body) {
-        String playerName = username();
+    public void setRole(@PathParam("name") String player, SetRoleRequest body) {
         PlayerInfo target = PlayerService.get(player);
-        if (JolAdmin.isAdmin(playerName)) {
+        if (JolAdmin.isAdmin(username())) {
             JolAdmin.setRole(target, PlayerRole.valueOf(body.role()), body.value());
         }
-        return update(playerName);
     }
 
     /**
@@ -51,12 +52,10 @@ public class AdminResource extends BaseResource {
      */
     @DELETE
     @Path("player/{name}")
-    public Map<String, Object> deletePlayer(@PathParam("name") String targetPlayer) {
-        String player = username();
-        if (JolAdmin.isAdmin(player)) {
+    public void deletePlayer(@PathParam("name") String targetPlayer) {
+        if (JolAdmin.isAdmin(username())) {
             JolAdmin.deletePLayer(targetPlayer);
         }
-        return update(player);
     }
 
     /**
@@ -64,10 +63,8 @@ public class AdminResource extends BaseResource {
      */
     @POST
     @Path("message")
-    public Map<String, Object> setMessage(MessageRequest body) {
-        String playerName = username();
+    public void setMessage(MessageRequest body) {
         // message setting is a no-op in current impl but retained for compatibility
-        return update(playerName);
     }
 
     /**
@@ -115,12 +112,10 @@ public class AdminResource extends BaseResource {
      */
     @PUT
     @Path("site-notes")
-    public Map<String, Object> setSiteNotes(SiteNotesRequest body) {
-        String playerName = username();
-        if (JolAdmin.isAdmin(playerName)) {
+    public void setSiteNotes(SiteNotesRequest body) {
+        if (JolAdmin.isAdmin(username())) {
             SiteNotesService.setNotes(body.notes());
         }
-        return update(playerName);
     }
 
     /**
@@ -128,12 +123,10 @@ public class AdminResource extends BaseResource {
      */
     @DELETE
     @Path("site-notes")
-    public Map<String, Object> clearSiteNotes() {
-        String playerName = username();
-        if (JolAdmin.isAdmin(playerName)) {
+    public void clearSiteNotes() {
+        if (JolAdmin.isAdmin(username())) {
             SiteNotesService.clear();
         }
-        return update(playerName);
     }
 
     public record SetRoleRequest(String role, boolean value) {

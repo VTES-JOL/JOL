@@ -1,55 +1,24 @@
 package net.deckserver.dwr.model;
 
-import net.deckserver.JolAdmin;
-import net.deckserver.dwr.bean.GameBean;
-import net.deckserver.game.enums.Phase;
 import net.deckserver.game.enums.RegionType;
-import net.deckserver.servlet.JspRenderer;
-import net.deckserver.servlet.RequestContext;
-import net.deckserver.services.ChatService;
-import net.deckserver.services.GameService;
-import net.deckserver.services.PlayerService;
-import net.deckserver.storage.json.game.ChatData;
-import org.slf4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-import static org.slf4j.LoggerFactory.getLogger;
-
+// Used to hold per-viewer region-collapse UI state (toggleCollapsed/
+// isCollapsed) for a game, read/written by GameActionResource's doToggle
+// endpoint. Previously also carried a hand/state JSP-fragment cache and
+// dirty-flag tracking for GameView.create() (called only from the legacy
+// DWR-era GameCreator/UpdateFactory) — removed along with UpdateFactory and
+// its *Creator classes, since create() was their only caller and nothing
+// else read those fragments/flags.
 public class GameView {
 
-    private static final Logger logger = getLogger(GameView.class);
-    private final String gameName;
-    private final String id;
-    private final String playerName;
-    private final Collection<String> chats = new ArrayList<>();
     private final Collection<String> collapsed = new HashSet<>();
-    private boolean stateChanged = true;
-    private boolean phaseChanged = true;
-    private boolean globalNotesChanged = true;
-    private boolean privateNotesChanged = true;
-    private boolean turnChanged = true;
-    private boolean resetChat = true;
-    private boolean isPlayer = false;
-    private boolean isAdmin = false;
-    private boolean isJudge = false;
 
     public GameView(JolGame game, String gameName, String playerName) {
-        this.gameName = gameName;
-        this.playerName = playerName;
-        this.id = game.id();
-        ChatService.getChats(id).forEach(this::addChat);
         List<String> players = game.getPlayers();
-        if (players.contains(this.playerName)) {
-            isPlayer = true;
-        }
         for (int i = 0; i < players.size(); ) {
             boolean ousted = game.getPool(players.get(i)) < 1;
             i++;
@@ -65,135 +34,10 @@ public class GameView {
                 collapsed.add(i + "-" + RegionType.UNCONTROLLED);
             }
         }
-        if (!isPlayer && (JolAdmin.getOwner(gameName).equals(playerName))) {
-            isAdmin = true;
-        }
-        if (!isPlayer && (JolAdmin.isJudge(playerName))) {
-            isJudge = true;
-        }
     }
 
     public boolean isCollapsed(String region) {
         return collapsed.contains(region);
-    }
-
-    public  GameBean create() {
-        HttpServletRequest request = RequestContext.getRequest();
-        HttpServletResponse response = RequestContext.getResponse();
-        JolGame game = GameService.getGameByName(gameName);
-
-        if (isPlayer) {
-            JolAdmin.recordPlayerAccess(playerName, gameName);
-        }
-
-        int refresh = JolAdmin.getRefreshInterval(gameName);
-
-        List<String> ping;
-        List<String> pinged;
-        String hand = null;
-        String globalNotes = null;
-        String privateNotes = null;
-        String label;
-        List<String> turn = new ArrayList<>();
-        List<String> turns = new ArrayList<>();
-        String state = null;
-        List<String> phases = new ArrayList<>();
-        String currentPlayer = game.getActivePlayer();
-
-        ping = JolAdmin.getPingList(gameName);
-        pinged = JolAdmin.getPings(gameName);
-
-        if (isPlayer && stateChanged) {
-            if (request == null || response == null) {
-                logger.error("GameView.create() called without RequestContext set — hand fragment skipped");
-            } else {
-                try {
-                    request.setAttribute("game", game);
-                    request.setAttribute("player", playerName);
-                    request.setAttribute("viewer", playerName);
-                    hand = JspRenderer.render(request, response, "/WEB-INF/jsps/game/hand.jsp");
-                } catch (Exception e) {
-                    logger.error("Error retrieving hand", e);
-                    hand = "Error retrieving hand.";
-                }
-            }
-        }
-
-        if (globalNotesChanged) {
-            globalNotes = game.getGlobalText();
-        }
-
-        if (privateNotesChanged) {
-            privateNotes = game.getPrivateNotes(playerName);
-        }
-
-        label = game.getTurnLabel() + " - " + game.getPhase();
-        Phase phase = game.getPhase();
-
-        if (!chats.isEmpty()) {
-            turn.addAll(chats);
-            chats.clear();
-        }
-
-        if (turnChanged) {
-            resetChat = true;
-            turns = ChatService.getTurns(id);
-        }
-
-        if (stateChanged) {
-            if (request == null || response == null) {
-                logger.error("GameView.create() called without RequestContext set — state fragment skipped");
-            } else {
-                try {
-                    request.setAttribute("game", game);
-                    request.setAttribute("viewer", playerName);
-                    request.setAttribute("edgeColor", PlayerService.get(playerName).getEdgeColor());
-                    request.setAttribute("edgeTextColor", colorIsDark(PlayerService.get(playerName).getEdgeColor())?"white":"black");
-                    state = JspRenderer.render(request, response, "/WEB-INF/jsps/game/state.jsp");
-                } catch (Exception e) {
-                    logger.error("Error retrieving state:", e);
-                    hand = "Error retrieving state.";
-                }
-            }
-        }
-
-        if (phaseChanged) {
-            boolean show = false;
-            for (Phase p : Phase.values()) {
-                if (phase.equals(p))
-                    show = true;
-                if (show)
-                    phases.add(p.getDescription());
-            }
-        }
-
-        boolean chatReset = resetChat;
-        boolean tc = turnChanged;
-        clearAccess();
-        String stamp = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
-        int logLength = ChatService.getTurn(id, game.getTurnLabel()).size();
-        return new GameBean(isPlayer, isAdmin, isJudge, refresh, hand, globalNotes, privateNotes, label, phase.getDescription(),
-                chatReset, tc, turn, turns, state, phases, ping, pinged, stamp, gameName, logLength, currentPlayer);
-    }
-
-    public  void clearAccess() {
-        globalNotesChanged = phaseChanged = turnChanged = stateChanged = privateNotesChanged = resetChat = false;
-    }
-
-    public  void globalChanged() {
-        globalNotesChanged = true;
-    }
-
-    public  void privateNotesChanged() {
-        privateNotesChanged = true;
-    }
-
-    public  void phaseChanged() {
-        phaseChanged = true;
-    }
-
-    public  void stateChanged() {
-        stateChanged = true;
     }
 
     public void toggleCollapsed(String id) {
@@ -201,29 +45,5 @@ public class GameView {
             collapsed.remove(id);
         else
             collapsed.add(id);
-    }
-
-    public void turnChanged() {
-        turnChanged = true;
-    }
-
-    public void reset() {
-        clearAccess();
-        //Force the client to refresh all game data
-        resetChat = true;
-        globalNotesChanged = phaseChanged = stateChanged = turnChanged = privateNotesChanged = true;
-    }
-
-    public void addChat(ChatData chat) {
-        String formattedMessage = String.format("%s||%s||%s", chat.getTimestamp(), chat.getSource(), chat.getMessage());
-        chats.add(formattedMessage);
-    }
-
-    private boolean colorIsDark(String bgColor) {
-        String color = (bgColor.charAt(0) == '#') ? bgColor.substring(1, 7) : bgColor;
-        int r = Integer.parseInt(color.substring(0, 2), 16); // hexToR
-        int g = Integer.parseInt(color.substring(2, 4), 16); // hexToG
-        int b = Integer.parseInt(color.substring(4, 6), 16); // hexToB
-        return ((r * 0.299) + (g * 0.587) + (b * 0.114)) <= 186;
     }
 }
