@@ -3,15 +3,7 @@
 // a plain nor a %BASE_URL%-prefixed href survives both dev and build
 // unchanged. import.meta.env.BASE_URL is a plain string Vite sets correctly
 // in both modes, with no HTML attribute-rewriting involved.
-const SHEETS = [
-  'css/bootstrap.min.css',
-  'css/styles.css',
-  'css/dark-mode.css',
-  'css/jquery-ui.min.css',
-  'css/jquery-ui.structure.min.css',
-  'css/jquery-ui.theme.min.css',
-  'css/light.css',
-];
+const SHEETS = ['css/bootstrap.min.css', 'css/styles.css', 'css/dark-mode.css', 'css/light.css'];
 
 /**
  * Returns once every stylesheet has actually loaded (or failed — one bad

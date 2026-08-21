@@ -367,37 +367,11 @@ public class TournamentResource extends BaseResource {
         TournamentService.setTournamentStatus(tourName, GameStatus.CLOSED);
     }
 
-    /**
-     * Replaces DS.joinTournament() — ds.js/main.jsp are themselves
-     * unreachable now (MainServlet forwards every path to /react/index.html
-     * unconditionally), so nothing left consumes the old UpdateFactory
-     * envelope; the React tournament page uses the player/join equivalent
-     * below instead.
-     */
-    @POST
-    @Path("{name}/join")
-    public void joinTournament(@PathParam("name") String tourName) {
-        String playerName = username();
-        String veknId = PlayerService.get(playerName).getVeknId();
-        TournamentService.joinTournament(tourName, playerName, veknId);
-    }
-
-    /** Replaces DS.leaveTournament() */
-    @POST
-    @Path("{name}/leave")
-    public void leaveTournament(@PathParam("name") String tourName) {
-        TournamentService.leaveTournament(tourName, username());
-    }
-
-    /** Replaces DS.registerTournamentDeck() */
-    @POST
-    @Path("{name}/deck")
-    public void registerTournamentDeck(@PathParam("name") String tournament, RegisterDeckRequest body) {
-        String playerName = username();
-        DeckInfo deckInfo = DeckService.get(playerName, body.deckName());
-        ExtendedDeck deck = DeckService.getDeck(deckInfo.getDeckId());
-        TournamentService.registerDeck(tournament, playerName, deck);
-    }
+    // joinTournament/leaveTournament/registerTournamentDeck (the legacy
+    // "{name}/join|leave|deck" trio) were ds.js-only and deleted along with
+    // ds.js/main.jsp themselves, which were the sole callers — the React
+    // tournament page uses the player/join|leave|deck equivalents below
+    // instead.
 
     /** Dedicated, envelope-free list read for the React tournament (player-facing) page — mirrors TournamentBean. */
     @GET

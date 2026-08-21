@@ -13,14 +13,12 @@ import javax.ws.rs.core.MediaType;
 /**
  * Dedicated, envelope-free reads/writes for the React game page — same role
  * every other *PageResource/*StateResource plays elsewhere. Deliberately
- * separate from GameActionResource (still shared with legacy ds.js/card-modal.js,
- * still returns the UpdateFactory envelope for submit/end-turn) — but calls the
- * exact same unchanged GameModel methods, then serializes the result through
- * GameSnapshotFactory instead of GameView's HTML-fragment rendering.
- *
- * Phase 1 scope only: full-board read, the free-text Command/Chat/Phase/Ping
- * form, and ending your own turn. Card-click interactions (card-modal.js) are
- * a later phase — see the migration plan.
+ * separate from GameActionResource (whose ds.js-only submit/end-turn/chat/
+ * toggle/rollback/replace-player/end-game methods were deleted outright once
+ * ds.js/main.jsp themselves became unreachable) — this resource calls the
+ * same GameModel methods directly, then serializes the result through
+ * GameSnapshotFactory instead of GameView's now-removed HTML-fragment
+ * rendering (see GameView.create()'s removal).
  */
 @Path("/game/{id}")
 @Produces(MediaType.APPLICATION_JSON)

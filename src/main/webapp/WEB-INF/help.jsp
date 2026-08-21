@@ -12,19 +12,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" type="text/css"
           href="${pageContext.request.contextPath}/css/styles.css?version=<%= VersionService.getVersion() %>"/>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.min.css"/>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.structure.min.css"/>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/jquery-ui.theme.min.css"/>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/light.css"/>
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/favicon.ico"/>
     <link href="https://fonts.googleapis.com/css?family=IM+Fell+English" rel="stylesheet">
 </head>
 <body class="bg-secondary-subtle">
 <script src="${pageContext.request.contextPath}/js/jquery-3.7.1.min.js"></script>
-<script src="${pageContext.request.contextPath}/js/jquery-throttle.min.js"></script>
-<script src="${pageContext.request.contextPath}/js/jquery-ui.min.js"></script>
-<script src='${pageContext.request.contextPath}/js/moment-with-locales.min.js'></script>
-<script src='${pageContext.request.contextPath}/js/moment-timezone-with-data.min.js'></script>
 <script src="${pageContext.request.contextPath}/js/popper.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/tippy.all.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>

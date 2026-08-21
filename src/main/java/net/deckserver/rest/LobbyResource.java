@@ -108,68 +108,10 @@ public class LobbyResource extends BaseResource {
         return JolAdmin.getGameDeck(game, username());
     }
 
-    /**
-     * Replaces DS.createGame() — ds.js/main.jsp are themselves unreachable
-     * now (MainServlet forwards every path to /react/index.html
-     * unconditionally), so nothing left consumes the old UpdateFactory
-     * envelope; the React lobby page uses the player/games/* equivalents
-     * above instead.
-     */
-    @POST
-    @Path("games")
-    public void createGame(CreateGameRequest body) {
-        String playerName = username();
-        if (!Strings.isNullOrEmpty(playerName)) {
-            JolAdmin.createGame(body.name(), "PUBLIC".equals(body.publicFlag()), GameFormat.from(body.format()), playerName);
-        }
-    }
-
-    /** Replaces DS.startGame() */
-    @POST
-    @Path("games/{name}/start")
-    public void startGame(@PathParam("name") String game) {
-        String playerName = username();
-        if (GameService.existsGame(game)) {
-            String owner = JolAdmin.getOwner(game);
-            if ((playerName.equals(owner) || JolAdmin.isSuperUser(playerName)) && JolAdmin.isStarting(game)) {
-                JolAdmin.startGame(game);
-            }
-        }
-    }
-
-    /** Replaces DS.invitePlayer() */
-    @POST
-    @Path("games/{name}/invite")
-    public void invitePlayer(@PathParam("name") String game, InviteRequest body) {
-        if (username() != null) {
-            RegistrationService.invitePlayer(game, body.player());
-            WebSocketRegistry.notifyMain();
-            WebSocketRegistry.notifyMainScope("games");
-        }
-    }
-
-    /** Replaces DS.unInvitePlayer() */
-    @DELETE
-    @Path("games/{name}/invite/{player}")
-    public void unInvitePlayer(@PathParam("name") String game, @PathParam("player") String player) {
-        if (username() != null) {
-            JolAdmin.unInvitePlayer(game, player);
-            WebSocketRegistry.notifyMain();
-            WebSocketRegistry.notifyMainScope("games");
-        }
-    }
-
-    /** Replaces DS.registerDeck() */
-    @POST
-    @Path("games/{name}/deck")
-    public void registerDeck(@PathParam("name") String game, RegisterDeckRequest body) {
-        String playerName = username();
-        if (!Strings.isNullOrEmpty(playerName)) {
-            JolAdmin.registerDeck(game, playerName, body.deckName());
-            WebSocketRegistry.notifyMain();
-            WebSocketRegistry.notifyMainScope("games");
-        }
-    }
+    // createGame/startGame/invitePlayer/unInvitePlayer/registerDeck (the
+    // legacy "games/*" quintet) were ds.js-only and deleted along with
+    // ds.js/main.jsp themselves, which were the sole callers — the React
+    // lobby page uses the player/games/* equivalents above instead.
 
     public record CreateGameRequest(String name, String publicFlag, String format) {}
     public record InviteRequest(String player) {}
