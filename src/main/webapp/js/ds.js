@@ -368,7 +368,8 @@ function checkVersion(newVersion) {
 }
 
 function callbackAllGames(data) {
-    renderActiveGames(data.games);
+    renderActiveGames(data.games, "#activeGames tbody");
+    renderActiveGames(data.tournaments, "#tournamentGames tbody");
     renderPastGames(data.history);
 }
 
@@ -2599,8 +2600,8 @@ function renderOnline(div, who) {
     tippy('[data-tippy-content]', { theme: 'light'});
 }
 
-function renderActiveGames(games) {
-    let activeGames = $("#activeGames tbody");
+function renderActiveGames(games, tableId) {
+    let activeGames = $(tableId);
     activeGames.empty();
     $.each(games, function (index, gameEntry) {
         let gameRow = $("<tr/>");
