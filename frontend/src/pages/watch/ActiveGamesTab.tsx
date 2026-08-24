@@ -12,7 +12,7 @@ const TIMESTAMP_FORMAT = new Intl.DateTimeFormat('en-GB', {
 
 export function ActiveGamesTab({ games }: { games: GameSummary[] }) {
   return (
-    <div className="card shadow flex-fill d-flex flex-column">
+    <div className="card shadow flex-fill d-flex flex-column min-h-0">
       <div className="card-header bg-body-secondary d-flex justify-content-between align-items-center">
         <span className="fw-semibold">Active Games</span>
       </div>

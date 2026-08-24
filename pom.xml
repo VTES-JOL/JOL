@@ -439,6 +439,7 @@
                 <version>1.15.1</version>
                 <configuration>
                     <workingDirectory>frontend</workingDirectory>
+                    <installDirectory>${project.build.directory}</installDirectory>
                     <skip>${skip.frontend}</skip>
                 </configuration>
                 <executions>

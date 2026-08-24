@@ -35,7 +35,7 @@ export function PastGamesTab({ history }: { history: GameHistory[] }) {
   };
 
   return (
-    <div className="card shadow flex-fill d-flex flex-column">
+    <div className="card shadow flex-fill d-flex flex-column min-h-0">
       <div className="card-header bg-body-secondary d-flex justify-content-between align-items-center">
         <span className="fw-semibold">Past Games</span>
         <button className="btn btn-outline-secondary btn-sm" onClick={exportCsv}>
