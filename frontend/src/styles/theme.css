@@ -1,0 +1,95 @@
+/* Site-wide tokens and typography — everything here applies regardless of
+   which page/component is mounted, so it lives here rather than co-located
+   with any one component. Page- and component-specific styles live next to
+   their .tsx file instead (e.g. pages/MainPage.css, pages/help/HelpPage.css) —
+   see main.tsx for the full list of what's imported globally vs. per-component. */
+
+:root {
+    --bs-body-font-size: 0.9rem;
+    --bs-body-line-height: 1.3;
+    --jol-mention-bg: #d4d7f9;
+    --jol-mention-fg: #000;
+    --jol-day-break-border: #dcc;
+    --jol-day-label-bg: #fff;
+    --jol-day-label-color: #b99;
+}
+
+body * {
+    font-family: "Times New Roman", Times, serif;
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: 'IM Fell English', serif;
+}
+
+nav * {
+    font-family: 'IM Fell English', serif;
+}
+
+/* Bootstrap component tweaks that apply everywhere that component is used,
+   not to any one page. */
+.form-control, .form-select {
+    line-height: 1rem;
+}
+
+.dropdown-item.active {
+    background-color: var(--bs-secondary);
+}
+
+.card {
+    --bs-card-cap-padding-y: 0.2rem;
+    --bs-card-cap-padding-x: 0.5rem;
+}
+
+.badge {
+    --bs-badge-font-weight: 400;
+}
+
+.list-group-item:hover {
+    background-color: #eee;
+    cursor: pointer;
+}
+
+/* Generic layout utilities used across many unrelated pages. */
+.min-h-0 {
+    min-height: 0;
+}
+
+.scrollable {
+    overflow-x: clip;
+    overflow-y: scroll;
+    overflow-wrap: break-word;
+    overscroll-behavior: contain;
+    height: 100%;
+}
+
+.mhd-70 {
+    max-height: 70dvh;
+    min-height: 70dvh;
+}
+
+/* Full-height tab panes: tab-content fills remaining card space, active pane
+   scrolls. Extends Bootstrap's own .tab-pane; used by WatchPage.tsx,
+   pages/main/GamesPanel.tsx, and pages/watch/StatsTab.tsx — no single owner. */
+.tab-content-fill {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.tab-content-fill > .tab-pane {
+    height: 100%;
+}
+
+.tab-content-fill > .tab-pane.active.show {
+    overflow-y: auto;
+}
+
+/* The app shell's content area (App.tsx) and the pre-auth login shell
+   (LoginPage.tsx) both use this id for the same "fill remaining height,
+   scroll internally" behavior. */
+#content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}

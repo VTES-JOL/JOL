@@ -5,6 +5,7 @@ import {Card, CardHeader, CardTitle} from '../../components/Card';
 import {useApiPoll} from './useApiPoll';
 import {useAuth} from '../../nav/useAuth';
 import {pathForGame} from '../../routes';
+import './GamesPanel.css';
 
 type TabId = 'myGames' | 'tournamentGames' | 'oustedGames';
 

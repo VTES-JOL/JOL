@@ -5,6 +5,7 @@ import { TournamentAdminList } from './tournamentAdmin/TournamentAdminList';
 import { TournamentEditor } from './tournamentAdmin/TournamentEditor';
 import { TournamentManager } from './tournamentAdmin/TournamentManager';
 import { showError } from '../components/toast';
+import './TournamentAdminPage.css';
 
 type View = { mode: 'edit'; name: string | null } | { mode: 'tables'; tournament: TournamentMetadata } | null;
 

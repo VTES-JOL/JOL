@@ -18,6 +18,7 @@ import { CardActionModal } from './game/CardActionModal';
 import { TargetPicker } from './game/TargetPicker';
 import { findCardByCoordinate } from './game/coordinates';
 import { buildPlayCommand, type HandCardContext, type Submission, type TableCardContext } from './game/cardCommands';
+import './GamePage.css';
 
 // Phase 2 of the game route conversion — card-modal.js's click-to-act
 // interactions (play-card modal, on-table action modal, cross-card target

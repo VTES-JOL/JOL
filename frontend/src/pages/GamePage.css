@@ -1,0 +1,53 @@
+/* The game table's grid layout: HandStrip/CommandForm/GameChatPanel or
+   HistoryPanel/DeckPanel or NotesPanel are the grid items assigned to these
+   named areas, so this file is really the layout contract those children
+   (pages/game/*.tsx) all rely on rather than something owned solely by
+   GamePage.tsx itself — it's imported once here since GamePage is what
+   mounts all of them together. */
+.control-grid {
+    display: grid;
+    grid-gap: 0.5rem;
+    grid-auto-columns: minmax(10rem, 1fr);
+    grid-auto-rows: minmax(0px, 22rem);
+    grid-template-areas: 'hand commands' 'chat chat' 'info info';
+}
+
+@media (min-width: 768px) {
+    .control-grid {
+        grid-template-areas: 'hand commands info' 'chat chat chat';
+    }
+}
+
+@media (min-width: 1200px) {
+    .control-grid {
+        grid-template-areas: 'hand commands chat chat chat info info';
+    }
+}
+
+.hand {
+    grid-area: hand;
+}
+
+.commands {
+    grid-area: commands;
+}
+
+#gameChatCard {
+    grid-area: chat;
+}
+
+#historyCard {
+    grid-area: chat;
+}
+
+#gameDeckCard {
+    grid-area: info;
+}
+
+#notesCard {
+    grid-area: info;
+}
+
+#globalNotes, #privateNotes {
+    height: 50%;
+}

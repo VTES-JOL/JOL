@@ -1,6 +1,7 @@
 import type { CardSnapshot, GameSnapshot, PlayerSnapshot } from '../../api/types';
 import { Region } from './Region';
 import type { HandCardContext, TableCardContext } from './cardCommands';
+import './PlayerBoard.css';
 
 const REGION_ORDER = ['READY', 'TORPOR', 'UNCONTROLLED', 'ASH_HEAP', 'REMOVED_FROM_GAME', 'RESEARCH', 'LIBRARY', 'CRYPT', 'HAND'];
 // GameView's default-collapsed set — see Region.tsx's comment on why this is

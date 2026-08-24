@@ -1,9 +1,17 @@
-// Loads the site's existing (non-Vite) stylesheets at runtime rather than via
+// Loads the site's third-party/theme stylesheets at runtime rather than via
 // <link> tags in index.html — see the comment in index.html for why: neither
 // a plain nor a %BASE_URL%-prefixed href survives both dev and build
 // unchanged. import.meta.env.BASE_URL is a plain string Vite sets correctly
 // in both modes, with no HTML attribute-rewriting involved.
-const SHEETS = ['css/bootstrap.min.css', 'css/styles.css', 'css/dark-mode.css', 'css/light.css'];
+//
+// App-authored CSS (fonts, tokens, card visuals, every component's own
+// styles) is NOT here — it's plain Vite-bundled `import './Foo.css'`
+// alongside its owning component (see main.tsx for the few truly global
+// ones), which is both simpler and avoids the async-fetch race this
+// mechanism has: a JS-appended <link> tag doesn't block rendering, so
+// anything render-critical needs an inline-style belt-and-braces fallback
+// (see e.g. GlobalChat.tsx) the way bundled CSS never does.
+const SHEETS = ['css/bootstrap.min.css', 'css/dark-mode.css', 'css/light.css'];
 
 /**
  * Returns once every stylesheet has actually loaded (or failed — one bad

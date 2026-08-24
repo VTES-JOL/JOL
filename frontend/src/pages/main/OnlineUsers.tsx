@@ -3,6 +3,7 @@ import {api} from '../../api/client';
 import type {UserSummary} from '../../api/types';
 import {Card, CardHeader, CardTitle} from '../../components/Card';
 import {useSimpleTooltips} from '../../hooks/useSimpleTooltips';
+import './OnlineUsers.css';
 
 // No WS scope for this one, deliberately — "online" (PlayerService.activeUsers())
 // is a 30-minute HTTP-activity-recency roster, not a WebSocket presence concept;

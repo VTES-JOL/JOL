@@ -6,9 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
     <title>V:TES Online</title>
     <!--
-      The site's existing CSS (bootstrap.min.css, styles.css, ...) isn't part
-      of the Vite project — it's served by Tomcat/nginx from webapp/css — so
-      it's injected at runtime from src/legacyStyles.ts instead of linked here.
+      The site's third-party/theme CSS (bootstrap.min.css, dark-mode.css,
+      light.css) isn't part of the Vite project — it's served by Tomcat/nginx
+      from webapp/css — so it's injected at runtime from src/legacyStyles.ts
+      instead of linked here. App-authored CSS is plain Vite-bundled imports
+      instead (see main.tsx and each component's co-located .css file).
       Neither a plain leading-slash href nor %BASE_URL% survives both dev and
       build unchanged: dev's html middleware unconditionally prepends `base`
       to any leading-slash href/src (even one already produced by a %BASE_URL%

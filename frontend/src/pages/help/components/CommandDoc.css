@@ -1,0 +1,40 @@
+.help-command-syntax {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--bs-font-monospace);
+    font-size: 0.95rem;
+}
+
+.help-command-placeholder {
+    font-family: var(--bs-body-font-family);
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+}
+
+.help-command-heading {
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--bs-secondary-color);
+    margin-bottom: 0.35rem;
+}
+
+.help-command-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+
+.help-command-row-label {
+    flex: 0 0 auto;
+    min-width: 9rem;
+    font-family: var(--bs-font-monospace);
+    font-size: 0.85rem;
+    font-weight: 600;
+}

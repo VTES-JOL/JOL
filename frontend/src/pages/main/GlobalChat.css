@@ -1,0 +1,50 @@
+/* Chat rendering — primarily this component's own markup, but .chat-mention
+   and .chat-timestamp are also targeted by server-generated chat HTML
+   (chatFormatting.ts's highlightMentions(), and GameChatLog.tsx's own
+   rendering), so these class names stay global rather than component-scoped. */
+
+#globalChatOutput {
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.hover-success:hover {
+    background-color: mediumseagreen !important;
+}
+
+p.chat {
+    margin: 0;
+}
+
+p.chat a {
+    display: inline;
+    padding: 0.1rem 0.3rem 0.1rem 0.3rem;
+    border-radius: 0.4rem;
+    background-color: #ddd;
+}
+
+.chat-day-break {
+    height: .9rem;
+    margin-bottom: .6rem;
+    margin-top: -.3rem;
+    border-bottom: 1px solid var(--jol-day-break-border);
+    text-align: center;
+}
+
+.chat-day-label {
+    font-size: .8rem;
+    background-color: var(--jol-day-label-bg);
+    padding: 0 .5rem;
+    color: var(--jol-day-label-color);
+    font-weight: bold;
+}
+
+.chat-mention {
+    background-color: var(--jol-mention-bg);
+    color: var(--jol-mention-fg);
+}
+
+.chat-timestamp {
+    color: #888;
+    font-size: smaller;
+}

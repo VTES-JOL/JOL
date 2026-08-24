@@ -6,6 +6,7 @@ import { DeckEditor } from './deck/DeckEditor';
 import { DeckPreviewPanel } from './deck/DeckPreviewPanel';
 import { showError } from '../components/toast';
 import { PageLoading } from '../components/PageLoading';
+import './DeckPage.css';
 
 export function DeckPage() {
   const [data, setData] = useState<DeckPageData | null>(null);

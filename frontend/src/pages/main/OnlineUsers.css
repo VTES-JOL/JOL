@@ -1,0 +1,11 @@
+.online-player-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.15rem 0.25rem;
+    border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+
+.online-player-row:last-child {
+    border-bottom: none;
+}

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { childrenOfType } from './mdxChildren';
+import './CommandDoc.css';
 
 export interface CommandOptionProps {
   name: string;

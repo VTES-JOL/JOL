@@ -3,6 +3,7 @@ import { GlobalChat } from './main/GlobalChat';
 import { OnlineUsers } from './main/OnlineUsers';
 import { Resources } from './main/Resources';
 import { SiteNotes } from './main/SiteNotes';
+import './MainPage.css';
 
 // No page-level data fetching or setup left here at all: every child below
 // owns its data through a dedicated endpoint (/main/games, /main/online,
@@ -16,8 +17,8 @@ import { SiteNotes } from './main/SiteNotes';
 // height constraint — confirmed empirically: with three .col-lg-* stretched
 // across one .row, every column rendered at its tallest child's *content*
 // height instead of the row's own (correctly min-height:0-constrained)
-// box height. .main-layout/.main-col-* are the site's own existing classes
-// (styles.css) built for exactly this — a plain (non-wrapping) flex row
+// box height. .main-layout/.main-col-* are this page's own classes
+// (MainPage.css) built for exactly this — a plain (non-wrapping) flex row
 // that legacy's own main/layout.jsp already used for this same panel set.
 export function MainPage() {
   return (

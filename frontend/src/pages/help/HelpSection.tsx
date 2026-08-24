@@ -6,6 +6,7 @@ import { helpMdxComponents } from './mdxComponents';
 import { useCardTooltips } from '../../hooks/useCardTooltips';
 import { PageLoading } from '../../components/PageLoading';
 import { pathForHelp } from '../../routes';
+import './HelpSection.css';
 
 type MdxModule = { default: ComponentType<MDXProps> };
 

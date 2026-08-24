@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { getCaptchaConfig } from '../api/config';
 import { login, register } from './login/authApi';
 import { TurnstileWidget } from './login/TurnstileWidget';
+import './LoginPage.css';
 
 // Mirrors login.jsp — the one page reachable while logged out, so it's a
 // standalone route outside NavProvider/TopBar (see App.tsx): NavProvider's

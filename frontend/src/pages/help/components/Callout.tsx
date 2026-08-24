@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import './Callout.css';
 
 // A single visually-distinct aside for a tip/note in the middle of prose —
 // replaces the old JSP's habit of nesting a whole extra Bootstrap `card`

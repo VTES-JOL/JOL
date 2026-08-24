@@ -7,6 +7,7 @@ import { useAuth } from '../../nav/useAuth';
 import { useCardTooltips } from '../../hooks/useCardTooltips';
 import { dayLabel, highlightMentions, localTimeTitle, utcTime } from './chatFormatting';
 import { showError } from '../../components/toast';
+import './GlobalChat.css';
 
 const AT_BOTTOM_THRESHOLD_PX = 20;
 
@@ -130,12 +131,12 @@ export function GlobalChat() {
       </CardHeader>
       <div className="card-body position-relative flex-fill d-flex flex-column p-2" style={{ minHeight: 0 }}>
         {/*
-          overflowY/minHeight inline, not left to the matching #globalChatOutput
-          rule in the site's own styles.css: that stylesheet is injected via a
-          JS-appended <link> tag (legacyStyles.ts) which doesn't block
-          rendering, so relying on it alone for the one property that makes
-          this element actually scroll (instead of growing and dragging every
-          ancestor's height along with it) is a real race, not just belt-and-braces.
+          overflowY/minHeight inline as well as in the co-located
+          #globalChatOutput rule (GlobalChat.css) — belt-and-braces so the
+          element still scrolls correctly (instead of growing and dragging
+          every ancestor's height along with it) even before the stylesheet
+          paints, matching every other scroll container in the app that sets
+          this inline.
         */}
         <div
           id="globalChatOutput"

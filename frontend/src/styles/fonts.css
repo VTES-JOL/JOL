@@ -1,0 +1,14 @@
+@font-face {
+    font-family: 'jol';
+    src: url('https://static.deckserver.net/assets/fonts/ankha2.otf') format('opentype')
+}
+
+@font-face {
+    font-family: 'clans';
+    src: url('https://static.deckserver.net/assets/fonts/vtes-clans.otf') format("opentype");
+}
+
+@font-face {
+    font-family: 'matrix';
+    src: url('https://static.deckserver.net/assets/fonts/MatrixIIOT-Book.otf') format('opentype');
+}

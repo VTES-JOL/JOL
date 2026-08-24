@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useNav } from '../nav/useNav';
 import { pathForGame, pathForView, pathForHelp } from '../routes';
 import { logout as logoutRequest } from '../pages/login/authApi';
+import './TopBar.css';
 
 function toggleDarkMode() {
   const isDark = document.body.getAttribute('data-bs-theme') !== 'dark';
@@ -118,6 +119,11 @@ export function TopBar() {
             );
           })}
         </div>
+        <div className="navbar-nav">
+          <Link className="nav-link" to={pathForHelp()} onClick={() => setMobileOpen(false)}>
+            Help
+          </Link>
+        </div>
       </div>
       <div className="d-flex align-items-center gap-1 ms-auto">
         {nav?.player && (
@@ -161,11 +167,6 @@ export function TopBar() {
               </li>
               <li>
                 <hr className="dropdown-divider" />
-              </li>
-              <li>
-                <Link className="dropdown-item" to={pathForHelp()} onClick={() => setOpen(null)}>
-                  <i className="bi bi-question-circle me-2"></i>Help
-                </Link>
               </li>
               <li>
                 <a
