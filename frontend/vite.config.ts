@@ -7,6 +7,13 @@ import { serveCardAssets } from './serveCardAssets.js'
 
 const BACKEND = 'http://localhost:8080'
 
+// One id per `vite build` invocation (config is re-evaluated fresh each
+// time), shared between the bundle itself (`define` below) and the
+// version.json a running client polls — see updateCheck.ts. Not meaningful
+// in `vite dev` (the id would just be "now" for the whole dev session), but
+// harmless there since updateCheck.ts skips polling entirely in dev.
+const buildId = Date.now().toString(36)
+
 // Exact paths this frontend owns — must mirror MainServlet's @WebServlet
 // mapping plus LoginServlet's "/login" (Java) exactly. Everything else under
 // /jol/ is proxied to the real backend (tomcat9:run) below: static assets
@@ -42,7 +49,30 @@ export default defineConfig({
   // several help sections — which plain CommonMark (MDX's default) doesn't
   // parse; without it a `| a | b |` block renders as a literal paragraph of
   // pipe characters instead of a <table>.
-  plugins: [mdx({ remarkPlugins: [remarkGfm] }), react(), basicSsl(), serveCardAssets()],
+  plugins: [
+    mdx({ remarkPlugins: [remarkGfm] }),
+    react(),
+    basicSsl(),
+    serveCardAssets(),
+    // Emits version.json into outDir root, next to index.html/assets/ — same
+    // place the hashed JS/CSS land, so it's reachable through whatever
+    // already serves those in prod (see MainServlet/web.xml's /react/*
+    // static mapping) without needing its own route.
+    {
+      name: 'emit-version-json',
+      apply: 'build',
+      generateBundle() {
+        this.emitFile({
+          type: 'asset',
+          fileName: 'version.json',
+          source: JSON.stringify({ buildId }),
+        })
+      },
+    },
+  ],
+  define: {
+    __BUILD_ID__: JSON.stringify(buildId),
+  },
   server: {
     // Deliberately not port 443: binding it needs root (or an OS-specific
     // privileged-port workaround — pf redirect on macOS, setcap/authbind on

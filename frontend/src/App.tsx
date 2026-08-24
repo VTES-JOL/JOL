@@ -18,7 +18,11 @@ import { NavProvider } from './nav/NavContext';
 import { ReconnectingOverlay } from './components/ReconnectingOverlay';
 import { DialogHost } from './components/DialogHost';
 import { ToastHost } from './components/ToastHost';
+import { UpdateBanner } from './components/UpdateBanner';
+import { ChunkErrorBoundary } from './components/ChunkErrorBoundary';
 import { useConnectivity } from './api/useConnectivity';
+import { useEffect } from 'react';
+import { startUpdateCheck } from './updateCheck';
 
 // The authenticated app shell: NavProvider's /nav fetch requires a valid
 // session (SecurityFilter), so this must never mount for a logged-out
@@ -72,14 +76,21 @@ function AuthenticatedApp() {
 }
 
 export function App() {
+  useEffect(() => {
+    startUpdateCheck();
+  }, []);
+
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/jol/login" element={<LoginPage />} />
-        <Route path="/*" element={<AuthenticatedApp />} />
-      </Routes>
+      <ChunkErrorBoundary>
+        <Routes>
+          <Route path="/jol/login" element={<LoginPage />} />
+          <Route path="/*" element={<AuthenticatedApp />} />
+        </Routes>
+      </ChunkErrorBoundary>
       <DialogHost />
       <ToastHost />
+      <UpdateBanner />
     </BrowserRouter>
   );
 }

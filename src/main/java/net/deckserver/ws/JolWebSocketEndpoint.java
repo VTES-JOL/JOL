@@ -3,7 +3,6 @@ package net.deckserver.ws;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.services.AuthService;
-import net.deckserver.services.VersionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,11 +85,7 @@ public class JolWebSocketEndpoint {
             String type = node.path("type").asText();
             switch (type) {
                 case "ping" -> {
-                    String ver = VersionService.getVersion();
-                    String pong = ver != null
-                            ? "{\"type\":\"pong\",\"version\":\"" + ver + "\"}"
-                            : "{\"type\":\"pong\"}";
-                    if (ws.isOpen()) ws.getBasicRemote().sendText(pong);
+                    if (ws.isOpen()) ws.getBasicRemote().sendText("{\"type\":\"pong\"}");
                 }
                 case "join" -> {
                     String gameId = node.path("game").asText(null);

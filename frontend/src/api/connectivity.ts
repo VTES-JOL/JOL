@@ -70,12 +70,32 @@ export function reportFailure() {
   if (state.online && !offlineDebounceTimer) {
     offlineDebounceTimer = setTimeout(() => {
       offlineDebounceTimer = null;
-      if (failing) {
+      // Don't just trust `failing` here — it can have been set by a request
+      // that was already in flight *before* the backend came back (e.g. one
+      // that started right before a successful checkNow()/health-check tick
+      // flipped us back online, then rejected afterward). Confirm with a
+      // fresh check rather than committing to "offline" off a stale signal,
+      // otherwise a manual "Retry now" that genuinely worked can flip right
+      // back to offline moments later, looking like the retry did nothing.
+      if (failing) verifyStillDown();
+    }, OFFLINE_DEBOUNCE_MS);
+  }
+}
+
+function verifyStillDown() {
+  fetch(`${API_BASE}/config`, { credentials: 'include' })
+    .then((res) => {
+      if (res.ok) {
+        reportSuccess();
+      } else {
         setState({ online: false });
         startHealthCheck();
       }
-    }, OFFLINE_DEBOUNCE_MS);
-  }
+    })
+    .catch(() => {
+      setState({ online: false });
+      startHealthCheck();
+    });
 }
 
 /**
