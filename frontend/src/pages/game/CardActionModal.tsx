@@ -4,6 +4,7 @@ import { fetchCardDefinition } from './cardDefinitions';
 import { cardActions, type Submission, type TableCardContext } from './cardCommands';
 import { CardImage } from './CardImage';
 import { showError } from '../../components/toast';
+import { Modal } from '../../components/Modal';
 
 const CLANS = [
   'Abomination', 'Ahrimane', 'Akunanse', 'Baali', 'Banu Haqim', 'Blood Brother', 'Brujah', 'Brujah Antitribu',
@@ -171,112 +172,108 @@ export function CardActionModal({
   };
 
   return (
-    <div className="modal d-block" tabIndex={-1} style={{ background: 'rgba(0,0,0,0.5)' }}>
-      <div className="modal-dialog" role="document">
-        <div className="modal-content" style={{ textAlign: 'center' }}>
-          {!definition ? (
-            <div style={{ height: '30vh' }} className="d-flex align-items-center justify-content-center">
-              <h2>Loading...</h2>
+    <Modal onClose={onClose} contentStyle={{ textAlign: 'center' }}>
+      {!definition ? (
+        <div style={{ height: '30vh' }} className="d-flex align-items-center justify-content-center">
+          <h2>Loading...</h2>
+        </div>
+      ) : (
+        <>
+          <div className="modal-header py-1 px-2 justify-content-between align-items-center">
+            <span className="d-flex align-items-center">
+              {minion && (
+                <InlinePicker
+                  value={card.clan}
+                  values={CLANS}
+                  kind="clan"
+                  onChange={(key) => doAction((c) => cardActions.clan(c, key), false)}
+                />
+              )}
+              <span className="card-name fs-5">{definition.displayName}</span>
+              {hasVotes && <span className="badge rounded-pill text-bg-warning mx-2">{card.votes}</span>}
+            </span>
+            <span className="d-flex align-items-center">
+              {minion && (
+                <InlinePicker
+                  value={card.path}
+                  values={PATHS}
+                  kind="path"
+                  onChange={(key) => doAction((c) => cardActions.path(c, key), false)}
+                />
+              )}
+              {minion && (
+                <InlinePicker
+                  value={card.sect}
+                  values={SECTS}
+                  kind="sect"
+                  onChange={(key) => doAction((c) => cardActions.sect(c, key), false)}
+                />
+              )}
+              <button className="btn-close" title="Close" onClick={onClose} />
+            </span>
+          </div>
+          <div className="modal-body">
+            <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={definition.displayName} />
+            <div className="input-group mt-2">
+              <label className="input-group-text">
+                <i className="bi bi-tag" />
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Add a label for all players to see."
+                value={label}
+                onChange={(e) => setLabel(e.target.value)}
+                onBlur={() => doAction((c) => cardActions.label(c, label), false)}
+              />
             </div>
-          ) : (
-            <>
-              <div className="modal-header py-1 px-2 justify-content-between align-items-center">
-                <span className="d-flex align-items-center">
-                  {minion && (
-                    <InlinePicker
-                      value={card.clan}
-                      values={CLANS}
-                      kind="clan"
-                      onChange={(key) => doAction((c) => cardActions.clan(c, key), false)}
-                    />
-                  )}
-                  <span className="card-name fs-5">{definition.displayName}</span>
-                  {hasVotes && <span className="badge rounded-pill text-bg-warning mx-2">{card.votes}</span>}
-                </span>
-                <span className="d-flex align-items-center">
-                  {minion && (
-                    <InlinePicker
-                      value={card.path}
-                      values={PATHS}
-                      kind="path"
-                      onChange={(key) => doAction((c) => cardActions.path(c, key), false)}
-                    />
-                  )}
-                  {minion && (
-                    <InlinePicker
-                      value={card.sect}
-                      values={SECTS}
-                      kind="sect"
-                      onChange={(key) => doAction((c) => cardActions.sect(c, key), false)}
-                    />
-                  )}
-                  <button className="btn-close" title="Close" onClick={onClose} />
-                </span>
-              </div>
-              <div className="modal-body">
-                <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={definition.displayName} />
-                <div className="input-group mt-2">
-                  <label className="input-group-text">
-                    <i className="bi bi-tag" />
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Add a label for all players to see."
-                    value={label}
-                    onChange={(e) => setLabel(e.target.value)}
-                    onBlur={() => doAction((c) => cardActions.label(c, label), false)}
-                  />
-                </div>
-              </div>
-              <div className="modal-footer d-flex flex-column flex-wrap justify-content-center">
-                {(showCounters || showTransfers) && (
-                  <div className="d-flex justify-content-between fs-5 rounded-pill align-items-center bg-danger-subtle gap-1 p-1">
-                    {showCounters && (
-                      <div
-                        className="badge rounded-pill text-bg-secondary fs-5 gap-1 d-flex align-items-center"
-                        title="Counters; click right side to increase, left to decrease"
-                        style={{ cursor: 'pointer' }}
-                        onClick={(e) => vialClick(e, () => doAction(cardActions.addCounter, false), () => doAction(cardActions.removeCounter, false))}
-                      >
-                        <i className="bi bi-dash-lg" />
-                        {card.counters}
-                        <i className="bi bi-plus-lg" />
-                      </div>
-                    )}
-                    {showTransfers && (
-                      <>
-                        <div className="fs-3" style={{ cursor: 'pointer' }} title="Transfer one pool to this card" onClick={() => doAction(cardActions.transferToCard, false)}>
-                          &#9668;
-                        </div>
-                        <div className="fs-3" style={{ cursor: 'pointer' }} title="Transfer one blood to your pool" onClick={() => doAction(cardActions.transferToPool, false)}>
-                          &#9658;
-                        </div>
-                        <div className="badge rounded-pill text-bg-danger fs-5">{ctx.controllerPool} pool</div>
-                      </>
-                    )}
+          </div>
+          <div className="modal-footer d-flex flex-column flex-wrap justify-content-center">
+            {(showCounters || showTransfers) && (
+              <div className="d-flex justify-content-between fs-5 rounded-pill align-items-center bg-danger-subtle gap-1 p-1">
+                {showCounters && (
+                  <div
+                    className="badge rounded-pill text-bg-secondary fs-5 gap-1 d-flex align-items-center"
+                    title="Counters; click right side to increase, left to decrease"
+                    style={{ cursor: 'pointer' }}
+                    onClick={(e) => vialClick(e, () => doAction(cardActions.addCounter, false), () => doAction(cardActions.removeCounter, false))}
+                  >
+                    <i className="bi bi-dash-lg" />
+                    {card.counters}
+                    <i className="bi bi-plus-lg" />
                   </div>
                 )}
-                <div className="mt-2">
-                  {BUTTONS.map((btn) =>
-                    buttonVisible(btn, ctx.regionCommandKey, locked, contested, isOwner, ctx.isChild, minion) ? (
-                      <button
-                        key={btn.key}
-                        type="button"
-                        className="btn btn-outline-dark m-1"
-                        title={btn.title}
-                        onClick={() => doAction(btn.action)}
-                      >
-                        {btn.label}
-                      </button>
-                    ) : null,
-                  )}
-                </div>
+                {showTransfers && (
+                  <>
+                    <div className="fs-3" style={{ cursor: 'pointer' }} title="Transfer one pool to this card" onClick={() => doAction(cardActions.transferToCard, false)}>
+                      &#9668;
+                    </div>
+                    <div className="fs-3" style={{ cursor: 'pointer' }} title="Transfer one blood to your pool" onClick={() => doAction(cardActions.transferToPool, false)}>
+                      &#9658;
+                    </div>
+                    <div className="badge rounded-pill text-bg-danger fs-5">{ctx.controllerPool} pool</div>
+                  </>
+                )}
               </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+            )}
+            <div className="mt-2">
+              {BUTTONS.map((btn) =>
+                buttonVisible(btn, ctx.regionCommandKey, locked, contested, isOwner, ctx.isChild, minion) ? (
+                  <button
+                    key={btn.key}
+                    type="button"
+                    className="btn btn-outline-dark m-1"
+                    title={btn.title}
+                    onClick={() => doAction(btn.action)}
+                  >
+                    {btn.label}
+                  </button>
+                ) : null,
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </Modal>
   );
 }

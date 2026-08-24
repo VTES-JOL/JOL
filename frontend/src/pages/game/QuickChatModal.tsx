@@ -1,3 +1,5 @@
+import { Modal } from '../../components/Modal';
+
 const ROWS: string[][] = [
   ['Block?', 'No block', 'Blocked', 'Yes', 'No', 'Wait', '1', '2', '3', '4', '5'],
   ['No pre-range', 'No maneuver', 'No pre, no maneuver', 'Long', 'Close'],
@@ -24,26 +26,22 @@ export function QuickChatModal({ onSend, onClose }: { onSend: (message: string) 
   };
 
   return (
-    <div className="modal d-block" tabIndex={-1} style={{ background: 'rgba(0,0,0,0.5)' }}>
-      <div className="modal-dialog modal-lg" role="document">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">Quick Chat</h5>
-            <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
-          </div>
-          <div className="modal-body">
-            {ROWS.map((row, i) => (
-              <div key={i}>
-                {row.map((message) => (
-                  <button key={message} type="button" className={`btn ${ROW_STYLE[i]} m-1`} onClick={() => send(message)}>
-                    {LABELS[message] ?? message}
-                  </button>
-                ))}
-              </div>
+    <Modal size="lg" onClose={onClose}>
+      <div className="modal-header">
+        <h5 className="modal-title">Quick Chat</h5>
+        <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
+      </div>
+      <div className="modal-body">
+        {ROWS.map((row, i) => (
+          <div key={i}>
+            {row.map((message) => (
+              <button key={message} type="button" className={`btn ${ROW_STYLE[i]} m-1`} onClick={() => send(message)}>
+                {LABELS[message] ?? message}
+              </button>
             ))}
           </div>
-        </div>
+        ))}
       </div>
-    </div>
+    </Modal>
   );
 }

@@ -4,6 +4,7 @@ import { fetchCardDefinition } from './cardDefinitions';
 import { buildDiscardCommand, buildHandLabelCommand, buildPlayCommand, needsTargetPicker, type HandCardContext } from './cardCommands';
 import { CardImage } from './CardImage';
 import { showError } from '../../components/toast';
+import { Modal } from '../../components/Modal';
 
 export interface PendingTarget {
   ctx: HandCardContext;
@@ -96,96 +97,92 @@ export function PlayCardModal({
   };
 
   return (
-    <div className="modal d-block" tabIndex={-1} style={{ background: 'rgba(0,0,0,0.5)' }}>
-      <div className="modal-dialog" role="document">
-        <div className="modal-content" style={{ textAlign: 'center' }}>
-          {!definition ? (
-            <div style={{ height: '30vh' }} className="d-flex align-items-center justify-content-center">
-              <h2>Loading...</h2>
-            </div>
-          ) : (
-            <>
-              <div className="modal-header">
-                <h5 className="modal-title">
-                  <span className={`icon card-type ${definition.type?.toLowerCase().replace(/ /g, '_').replace('/', ' ')}`} />{' '}
-                  <span className="card-name">{definition.displayName}</span>
-                </h5>
-                <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
-              </div>
-              <div className="modal-body">
-                <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={definition.displayName} />
-                <div className="requirements d-flex justify-content-center gap-2">
-                  {(definition.clans ?? []).map((clan) => (
-                    <span key={clan} className={`clan ${clan.toLowerCase().replace(/ /g, '_')}`} title={clan} />
-                  ))}
-                  {definition.cost && <span>Cost: {definition.cost}</span>}
-                </div>
-                {definition.preamble && <p className="mb-2">{definition.preamble}</p>}
-                <div className="d-grid gap-2">
-                  {(definition.modes ?? []).map((mode, i) =>
-                    definition.multiMode ? (
-                      <button
-                        key={i}
-                        type="button"
-                        className={`btn mb-2 ${selected.has(i) ? 'btn-dark' : 'btn-outline-dark'}`}
-                        onClick={() =>
-                          setSelected((prev) => {
-                            const next = new Set(prev);
-                            if (next.has(i)) next.delete(i);
-                            else next.add(i);
-                            return next;
-                          })
-                        }
-                      >
-                        {(mode.disciplines ?? []).map((d) => (
-                          <span key={d} className={`icon ${d}`} />
-                        ))}{' '}
-                        <span dangerouslySetInnerHTML={{ __html: mode.text }} />
-                      </button>
-                    ) : (
-                      <button key={i} type="button" className="btn btn-outline-dark mb-2" onClick={() => play(mode)}>
-                        {(mode.disciplines ?? []).map((d) => (
-                          <span key={d} className={`icon ${d}`} />
-                        ))}{' '}
-                        <span dangerouslySetInnerHTML={{ __html: mode.text }} />
-                      </button>
-                    ),
-                  )}
-                </div>
-                {definition.multiMode && (
-                  <div className="mt-2">
-                    <hr />
-                    <button type="button" className="btn btn-outline-secondary mb-2" disabled={selected.size < 1} onClick={playMulti}>
-                      {selected.size < 1 ? 'Select one or more disciplines' : 'Play'}
-                    </button>
-                  </div>
-                )}
-                <div className="d-flex justify-content-center align-items-center mt-2">
-                  <button type="button" className="btn btn-outline-danger mx-1" title="Discard" onClick={() => discard(false)}>
-                    <i className="bi bi-trash" /> Discard
-                  </button>
-                  <button type="button" className="btn btn-outline-danger mx-1" title="Discard and replace" onClick={() => discard(true)}>
-                    <i className="bi bi-recycle" /> Discard + Draw
-                  </button>
-                </div>
-                <div className="input-group mt-2">
-                  <label className="input-group-text">
-                    <i className="bi bi-tag" />
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Add a label for all players to see."
-                    value={label}
-                    onChange={(e) => setLabel(e.target.value)}
-                    onBlur={updateLabel}
-                  />
-                </div>
-              </div>
-            </>
-          )}
+    <Modal onClose={onClose} contentStyle={{ textAlign: 'center' }}>
+      {!definition ? (
+        <div style={{ height: '30vh' }} className="d-flex align-items-center justify-content-center">
+          <h2>Loading...</h2>
         </div>
-      </div>
-    </div>
+      ) : (
+        <>
+          <div className="modal-header">
+            <h5 className="modal-title">
+              <span className={`icon card-type ${definition.type?.toLowerCase().replace(/ /g, '_').replace('/', ' ')}`} />{' '}
+              <span className="card-name">{definition.displayName}</span>
+            </h5>
+            <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
+          </div>
+          <div className="modal-body">
+            <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={definition.displayName} />
+            <div className="requirements d-flex justify-content-center gap-2">
+              {(definition.clans ?? []).map((clan) => (
+                <span key={clan} className={`clan ${clan.toLowerCase().replace(/ /g, '_')}`} title={clan} />
+              ))}
+              {definition.cost && <span>Cost: {definition.cost}</span>}
+            </div>
+            {definition.preamble && <p className="mb-2">{definition.preamble}</p>}
+            <div className="d-grid gap-2">
+              {(definition.modes ?? []).map((mode, i) =>
+                definition.multiMode ? (
+                  <button
+                    key={i}
+                    type="button"
+                    className={`btn mb-2 ${selected.has(i) ? 'btn-dark' : 'btn-outline-dark'}`}
+                    onClick={() =>
+                      setSelected((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(i)) next.delete(i);
+                        else next.add(i);
+                        return next;
+                      })
+                    }
+                  >
+                    {(mode.disciplines ?? []).map((d) => (
+                      <span key={d} className={`icon ${d}`} />
+                    ))}{' '}
+                    <span dangerouslySetInnerHTML={{ __html: mode.text }} />
+                  </button>
+                ) : (
+                  <button key={i} type="button" className="btn btn-outline-dark mb-2" onClick={() => play(mode)}>
+                    {(mode.disciplines ?? []).map((d) => (
+                      <span key={d} className={`icon ${d}`} />
+                    ))}{' '}
+                    <span dangerouslySetInnerHTML={{ __html: mode.text }} />
+                  </button>
+                ),
+              )}
+            </div>
+            {definition.multiMode && (
+              <div className="mt-2">
+                <hr />
+                <button type="button" className="btn btn-outline-secondary mb-2" disabled={selected.size < 1} onClick={playMulti}>
+                  {selected.size < 1 ? 'Select one or more disciplines' : 'Play'}
+                </button>
+              </div>
+            )}
+            <div className="d-flex justify-content-center align-items-center mt-2">
+              <button type="button" className="btn btn-outline-danger mx-1" title="Discard" onClick={() => discard(false)}>
+                <i className="bi bi-trash" /> Discard
+              </button>
+              <button type="button" className="btn btn-outline-danger mx-1" title="Discard and replace" onClick={() => discard(true)}>
+                <i className="bi bi-recycle" /> Discard + Draw
+              </button>
+            </div>
+            <div className="input-group mt-2">
+              <label className="input-group-text">
+                <i className="bi bi-tag" />
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Add a label for all players to see."
+                value={label}
+                onChange={(e) => setLabel(e.target.value)}
+                onBlur={updateLabel}
+              />
+            </div>
+          </div>
+        </>
+      )}
+    </Modal>
   );
 }

@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { api } from '../../api/client';
 import { confirmDialog } from '../../components/dialog';
+import { Modal } from '../../components/Modal';
 
-// Plain conditionally-rendered overlay rather than bootstrap.Modal — this
-// app doesn't load Bootstrap's JS bundle (see TopBar's dropdown comments),
-// so every modal here is hand-rolled the same way.
 export function ImportTablesModal({
   tournamentName,
   onClose,
@@ -39,37 +37,33 @@ export function ImportTablesModal({
   };
 
   return (
-    <div className="modal d-block" tabIndex={-1} style={{ background: 'rgba(0,0,0,0.5)' }}>
-      <div className="modal-dialog modal-lg">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">Import Tables from CSV</h5>
-            <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
-          </div>
-          <div className="modal-body">
-            <p className="text-muted small">
-              Paste CSV data with columns <code>Round</code>, <code>Table</code>, <code>Player</code>. The header row
-              is required.
-            </p>
-            <textarea
-              className="form-control font-monospace"
-              rows={14}
-              placeholder={'"Round","Table","Player"\n"1","1","PlayerOne"\n"1","1","PlayerTwo"'}
-              value={csvData}
-              onChange={(e) => setCsvData(e.target.value)}
-            />
-            {error && <div className="alert alert-danger mt-2">{error}</div>}
-          </div>
-          <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={onClose}>
-              Cancel
-            </button>
-            <button type="button" className="btn btn-primary" onClick={submit}>
-              Import
-            </button>
-          </div>
-        </div>
+    <Modal size="lg" onClose={onClose}>
+      <div className="modal-header">
+        <h5 className="modal-title">Import Tables from CSV</h5>
+        <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
       </div>
-    </div>
+      <div className="modal-body">
+        <p className="text-muted small">
+          Paste CSV data with columns <code>Round</code>, <code>Table</code>, <code>Player</code>. The header row is
+          required.
+        </p>
+        <textarea
+          className="form-control font-monospace"
+          rows={14}
+          placeholder={'"Round","Table","Player"\n"1","1","PlayerOne"\n"1","1","PlayerTwo"'}
+          value={csvData}
+          onChange={(e) => setCsvData(e.target.value)}
+        />
+        {error && <div className="alert alert-danger mt-2">{error}</div>}
+      </div>
+      <div className="modal-footer">
+        <button type="button" className="btn btn-secondary" onClick={onClose}>
+          Cancel
+        </button>
+        <button type="button" className="btn btn-primary" onClick={submit}>
+          Import
+        </button>
+      </div>
+    </Modal>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { GameSnapshot } from '../../api/types';
 import { showError } from '../../components/toast';
+import { Panel } from './Panel';
 
 // Mirrors notes.jsp — saves on blur (not every keystroke), matching legacy's
 // updateNotes()/updateNotesHand() triggers. PUT .../notes/global and
@@ -37,37 +38,32 @@ export function NotesPanel({
   };
 
   return (
-    <div className="card shadow notes" id="notesCard">
-      <div className="card-header bg-body-secondary justify-content-between d-flex align-items-center">
-        <span>Notes</span>
-        {game.player && (
-          <button className="border-0 shadow rounded-pill bg-light" onClick={onToggleDeck}>
-            <i className="bi bi-info-lg me-2" />
-            Deck
-          </button>
-        )}
-      </div>
-      <div className="card-body p-0">
+    <Panel
+      id="notesCard"
+      className="notes"
+      bodyClassName="p-0"
+      title="Notes"
+      toggle={game.player ? { icon: 'bi-info-lg', label: 'Deck', onClick: onToggleDeck } : undefined}
+    >
+      <textarea
+        id="globalNotes"
+        className="form-control scrollable"
+        placeholder="Global Notes"
+        disabled={!(game.player || game.judge)}
+        value={globalNotes}
+        onChange={(e) => setGlobalNotes(e.target.value)}
+        onBlur={saveGlobal}
+      />
+      {game.player && (
         <textarea
-          id="globalNotes"
+          id="privateNotes"
           className="form-control scrollable"
-          placeholder="Global Notes"
-          disabled={!(game.player || game.judge)}
-          value={globalNotes}
-          onChange={(e) => setGlobalNotes(e.target.value)}
-          onBlur={saveGlobal}
+          placeholder="Private Notes"
+          value={privateNotes}
+          onChange={(e) => setPrivateNotes(e.target.value)}
+          onBlur={savePrivate}
         />
-        {game.player && (
-          <textarea
-            id="privateNotes"
-            className="form-control scrollable"
-            placeholder="Private Notes"
-            value={privateNotes}
-            onChange={(e) => setPrivateNotes(e.target.value)}
-            onBlur={savePrivate}
-          />
-        )}
-      </div>
-    </div>
+      )}
+    </Panel>
   );
 }

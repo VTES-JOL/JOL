@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { ChatData, GameSnapshot } from '../../api/types';
 import { GameChatLog } from './GameChatLog';
+import { Panel } from './Panel';
 
 export function GameChatPanel({
   gameId,
@@ -26,20 +27,15 @@ export function GameChatPanel({
   }, [gameId, game.turnLabel, game.stamp]);
 
   return (
-    <div className="card shadow chat" id="gameChatCard">
-      <div className="card-header bg-body-secondary justify-content-between d-flex align-items-center">
-        <span>Game Chat</span>
-        <span>
-          <span className="px-2">{`${game.turnLabel} - ${game.phase}`}</span>
-          <button className="border-0 shadow rounded-pill bg-light" onClick={onToggleHistory}>
-            <i className="bi bi-clock-history me-2" />
-            History
-          </button>
-        </span>
-      </div>
-      <div className="card-body p-0 game-chat">
-        <GameChatLog lines={lines} viewerName={viewerName} />
-      </div>
-    </div>
+    <Panel
+      id="gameChatCard"
+      className="chat"
+      bodyClassName="p-0 game-chat"
+      title="Game Chat"
+      headerExtra={<span className="px-2">{`${game.turnLabel} - ${game.phase}`}</span>}
+      toggle={{ icon: 'bi-clock-history', label: 'History', onClick: onToggleHistory }}
+    >
+      <GameChatLog lines={lines} viewerName={viewerName} />
+    </Panel>
   );
 }
