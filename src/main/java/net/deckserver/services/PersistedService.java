@@ -29,6 +29,17 @@ public abstract class PersistedService {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
+    /**
+     * Whether ENABLE_TEST_MODE is set. Computed once and shared everywhere, so that
+     * static-context call sites (services exposing only static methods) have a single
+     * canonical way to check the flag instead of each re-implementing the env lookup.
+     */
+    private static final boolean TEST_MODE = System.getenv().getOrDefault("ENABLE_TEST_MODE", "false").equals("true");
+
+    public static boolean isTestMode() {
+        return TEST_MODE;
+    }
+
     protected final Logger logger;
     protected final String serviceName;
     protected final boolean testModeEnabled;
@@ -46,7 +57,7 @@ public abstract class PersistedService {
     protected PersistedService(String serviceName, int persistenceIntervalMinutes) {
         this.serviceName = serviceName;
         this.logger = LoggerFactory.getLogger(getClass());
-        this.testModeEnabled = System.getenv().getOrDefault("ENABLE_TEST_MODE", "false").equals("true");
+        this.testModeEnabled = TEST_MODE;
 
         // Create scheduler with daemon thread
         this.scheduler = Executors.newScheduledThreadPool(1, r -> {

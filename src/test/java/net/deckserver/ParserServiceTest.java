@@ -10,6 +10,7 @@ public class ParserServiceTest {
 
     @Test
     @SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
+    @SetEnvironmentVariable(key = "ENABLE_TEST_MODE", value = "true")
     public void testParseCard() throws Exception {
 
 

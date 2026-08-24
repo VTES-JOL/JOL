@@ -12,6 +12,8 @@ import net.deckserver.storage.json.system.TournamentInviteStatus;
 import net.deckserver.storage.json.system.TournamentMetadata;
 import net.deckserver.storage.json.system.TournamentPlayer;
 import net.deckserver.storage.json.system.TournamentRegistration;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -19,10 +21,13 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -39,6 +44,15 @@ class TournamentLifecycleTest {
     private static final String REGISTRATION_OPEN_TOURNAMENT = "Registrations Open";
     private static final String SEATING_PHASE_TOURNAMENT = "Setup Round Seating";
     private static final String ACTIVE_TOURNAMENT = "Rounds are being played";
+
+    /**
+     * Tournaments this test class creates ad-hoc (real deck/game files get written for
+     * these - registerDeck/createTable have no in-memory cache backstop, so they can't
+     * be no-op'd under ENABLE_TEST_MODE without breaking the read-after-write flow
+     * these tests rely on). Cleaned up in {@link #cleanUpCreatedTournaments()} so they
+     * don't linger as untracked files under src/test/resources/data.
+     */
+    private static final Set<String> createdTournaments = new HashSet<>();
 
     // --- Phase: EDIT (Draft) ---
 
@@ -433,6 +447,7 @@ class TournamentLifecycleTest {
 
     /** Builds an ACTIVE tournament with two real tables (Round 1: Table 1 = Players 1-4, Table 2 = Players 5-6). */
     private static void seatActiveTournamentWithTwoTables(String tourName) throws IOException {
+        createdTournaments.add(tourName);
         TournamentDefinition def = newTournament(tourName, TournamentFormat.SINGLE_DECK);
         def.setRegistrationStart(OffsetDateTime.now().minusDays(2));
         def.setRegistrationEnd(OffsetDateTime.now().plusDays(1));
@@ -477,5 +492,25 @@ class TournamentLifecycleTest {
 
     private static int occurrences(String text, String needle) {
         return (int) Pattern.compile(Pattern.quote(needle)).matcher(text).results().count();
+    }
+
+    @AfterAll
+    static void cleanUpCreatedTournaments() {
+        for (String tourName : createdTournaments) {
+            TournamentDefinition def = TournamentService.getTournament(tourName);
+            if (def == null) continue;
+            for (GameInfo game : GameService.getGamesByTournament(tourName)) {
+                deleteDirectoryQuietly(DataPaths.path("games", game.getId()));
+            }
+            deleteDirectoryQuietly(DataPaths.path("tournaments", def.getId()));
+        }
+    }
+
+    private static void deleteDirectoryQuietly(Path path) {
+        try {
+            FileUtils.deleteDirectory(path.toFile());
+        } catch (IOException ignored) {
+            // best-effort test cleanup
+        }
     }
 }

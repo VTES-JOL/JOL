@@ -191,25 +191,26 @@ public class GameService extends PersistedService {
     }
 
     public static void saveGame(JolGame game) {
-        writeLock.lock();
         String gameId = game.id();
-        Path gameStatePath = DataPaths.path("games", gameId, "game.json");
-        GameData deckServerState = game.data();
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            objectMapper.writeValue(gameStatePath.toFile(), deckServerState);
-        } catch (IOException e) {
-            logger.error("Unable to save game file", e);
-        } finally {
-            writeLock.unlock();
+        if (!isTestMode()) {
+            writeLock.lock();
+            Path gameStatePath = DataPaths.path("games", gameId, "game.json");
+            GameData deckServerState = game.data();
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                objectMapper.writeValue(gameStatePath.toFile(), deckServerState);
+            } catch (IOException e) {
+                logger.error("Unable to save game file", e);
+            } finally {
+                writeLock.unlock();
+            }
         }
         // update the cache
         INSTANCE.gameCache.put(gameId, game);
     }
 
     public static void saveGame(JolGame game, String turn) {
-        boolean testModeEnabled = System.getenv().getOrDefault("ENABLE_TEST_MODE", "false").equals("true");
-        if (testModeEnabled) {
+        if (isTestMode()) {
             return;
         }
         turn = turn.replaceAll("\\.", "-");
@@ -277,6 +278,10 @@ public class GameService extends PersistedService {
     }
 
     private void upgrade() {
+        if (isTestMode()) {
+            logger.debug("Skipping data upgrade - test mode enabled");
+            return;
+        }
         logger.info("Determining upgrades...");
         GameDataConversion conversion = new GameDataConversion();
         // Upgrade all games with no version

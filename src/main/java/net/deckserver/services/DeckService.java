@@ -101,6 +101,9 @@ public class DeckService extends PersistedService {
     }
 
     public static void saveDeck(String deckId, ExtendedDeck deck) {
+        if (isTestMode()) {
+            return;
+        }
         try {
             Path deckPath = DataPaths.path("decks", deckId + ".json");
             objectMapper.writeValue(deckPath.toFile(), deck);
@@ -110,6 +113,9 @@ public class DeckService extends PersistedService {
     }
 
     public static boolean copyDeck(String deckId, String gameId) {
+        if (isTestMode()) {
+            return true;
+        }
         try {
             Path deckPath = DataPaths.path("decks", deckId + ".json");
             Path gamePath = DataPaths.path("games", gameId, deckId + ".json");

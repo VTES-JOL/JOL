@@ -28,6 +28,10 @@ public class JolApplicationInitializer implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         logger.info("Web application context initialized");
+        if (PersistedService.isTestMode()) {
+            logger.info("Skipping scheduled job registration - test mode enabled");
+            return;
+        }
         scheduler.scheduleAtFixedRate(new PublicGameBuilder(), 1, 1, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new GameCleanUp(), 1, 1, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(new TournamentJob(), 0, 1, TimeUnit.MINUTES);
