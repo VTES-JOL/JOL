@@ -28,6 +28,16 @@ jobs:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
           cache: maven
+      # CardService falls back to static/secured/cards.json (gitignored — it's
+      # regenerated locally by the CardDatabaseBuilder Builder-tagged test,
+      # which needs network access this runner doesn't have) whenever the
+      # CloudFront fetch above it fails, which it always does here since
+      # KEY_ID/KEY_FILE/BASE_URL aren't set. Stage a small curated fixture —
+      # just the cards test fixture data under src/test/resources/data
+      # actually references — at that path so card lookups resolve real data
+      # instead of an empty list.
+      - name: Stage test card fixture
+        run: mkdir -p static/secured && cp src/test/resources/data/cards/cards.json static/secured/cards.json
       # Bound to prepare-package (see pom.xml's frontend-maven-plugin
       # comment), so this never touches Node/npm — that's covered by
       # frontend-check below.
@@ -102,6 +112,11 @@ jobs:
       - name: Install Playwright browsers
         working-directory: frontend
         run: npx playwright install --with-deps chromium
+      # See backend-test's "Stage test card fixture" step — the Tomcat
+      # instance playwright.config.ts boots below hits the same CardService
+      # fallback path, so it needs the fixture staged here too.
+      - name: Stage test card fixture
+        run: mkdir -p static/secured && cp src/test/resources/data/cards/cards.json static/secured/cards.json
       # playwright.config.ts's webServer entries start both Tomcat (against
       # a disposable copy of the test fixture data, so this never touches
       # checked-in files — see frontend/README.md's Testing section) and the
