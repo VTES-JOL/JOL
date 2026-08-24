@@ -3,6 +3,7 @@ import { api } from '../../../api/client';
 import type { JolStats as JolStatsDto } from '../../../api/types';
 import { SortIcon, useTableSort } from '../statsUtils';
 import { useSimpleTooltips } from '../../../hooks/useSimpleTooltips';
+import { showError } from '../../../components/toast';
 
 const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 const BEST_NATION_PATTERN = /^([A-Z]{2})\s*\((\d+)\s*GW\)$/;
@@ -32,7 +33,10 @@ export function JolStats({ fromDate, toDate, isTourney }: { fromDate: string; to
     api
       .post<Record<string, JolStatsDto>>('/stats/jol', { treshold: 0, fromDate, toDate, isTourney })
       .then(setData)
-      .catch((err) => console.error('Failed to load JOL stats', err));
+      .catch((err) => {
+        console.error('Failed to load JOL stats', err);
+        showError('Failed to load JOL stats.');
+      });
   }, [fromDate, toDate, isTourney]);
 
   const rows: Row[] = Object.entries(data).map(([month, dto]) => ({ month, ...dto }));

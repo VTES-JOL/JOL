@@ -4,6 +4,7 @@ import type { TournamentMetadata } from '../api/types';
 import { TournamentAdminList } from './tournamentAdmin/TournamentAdminList';
 import { TournamentEditor } from './tournamentAdmin/TournamentEditor';
 import { TournamentManager } from './tournamentAdmin/TournamentManager';
+import { showError } from '../components/toast';
 
 type View = { mode: 'edit'; name: string | null } | { mode: 'tables'; tournament: TournamentMetadata } | null;
 
@@ -34,7 +35,10 @@ export function TournamentAdminPage() {
           return updated ? { mode: 'tables', tournament: updated } : prev;
         });
       })
-      .catch((err) => console.error('Failed to load tournament admin list', err));
+      .catch((err) => {
+        console.error('Failed to load tournament admin list', err);
+        showError('Failed to load tournament admin list.');
+      });
   };
 
   useEffect(refreshList, []);

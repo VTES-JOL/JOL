@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
+import { confirmDialog } from '../../components/dialog';
+import { showError } from '../../components/toast';
 
 export function SiteNotesEditor({ notes, onSaved }: { notes: string; onSaved: () => void }) {
   const [text, setText] = useState(notes);
@@ -11,12 +13,21 @@ export function SiteNotesEditor({ notes, onSaved }: { notes: string; onSaved: ()
     api
       .put('/admin-page/site-notes', { notes: text })
       .then(onSaved)
-      .catch((err) => console.error('Failed to save site notes', err));
+      .catch((err) => {
+        console.error('Failed to save site notes', err);
+        showError('Failed to save site notes.');
+      });
   };
 
-  const clear = () => {
-    if (!confirm('Clear the site notes?')) return;
-    api.del('/admin-page/site-notes').then(onSaved).catch((err) => console.error('Failed to clear site notes', err));
+  const clear = async () => {
+    if (!(await confirmDialog('Clear the site notes?'))) return;
+    api
+      .del('/admin-page/site-notes')
+      .then(onSaved)
+      .catch((err) => {
+        console.error('Failed to clear site notes', err);
+        showError('Failed to clear site notes.');
+      });
   };
 
   return (

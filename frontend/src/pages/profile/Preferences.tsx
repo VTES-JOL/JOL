@@ -3,6 +3,8 @@ import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import type { Profile } from '../../api/types';
 import { isPushSupported, subscribeToPush, unsubscribeFromPush } from '../../push/pushNotifications';
+import { alertDialog } from '../../components/dialog';
+import { showError } from '../../components/toast';
 
 export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (updated: Profile) => void }) {
   const [notificationsBusy, setNotificationsBusy] = useState(false);
@@ -19,11 +21,11 @@ export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (
     api.put<Profile>('/profile/edge-color', { color: e.target.value }).then(onSaved);
   };
 
-  const toggleNotifications = (e: ChangeEvent<HTMLInputElement>) => {
+  const toggleNotifications = async (e: ChangeEvent<HTMLInputElement>) => {
     const enabling = e.target.checked;
     if (enabling) {
       if (Notification.permission === 'denied') {
-        alert('Notifications are blocked for this site in your browser settings.');
+        await alertDialog('Notifications are blocked for this site in your browser settings.');
         return;
       }
       setNotificationsBusy(true);
@@ -32,7 +34,10 @@ export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (
           if (permission !== 'granted') return;
           return subscribeToPush().then(() => setUserPreferences(profile.imageTooltipPreference, true));
         })
-        .catch((err) => console.error('Unable to subscribe to push notifications', err))
+        .catch((err) => {
+          console.error('Unable to subscribe to push notifications', err);
+          showError('Unable to subscribe to push notifications.');
+        })
         .finally(() => setNotificationsBusy(false));
     } else {
       setNotificationsBusy(true);

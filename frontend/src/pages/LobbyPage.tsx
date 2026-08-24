@@ -4,6 +4,9 @@ import type { GameStatusBean, LobbyPage as LobbyPageData } from '../api/types';
 import { GameList } from './lobby/GameList';
 import { GameCreateForm } from './lobby/GameCreateForm';
 import { GameDetail } from './lobby/GameDetail';
+import { showError } from '../components/toast';
+import { PageLoading } from '../components/PageLoading';
+import { EmptyState } from '../components/EmptyState';
 
 type View = { mode: 'create' } | { mode: 'detail'; gameName: string } | null;
 
@@ -15,7 +18,10 @@ export function LobbyPage() {
     api
       .get<LobbyPageData>('/lobby/player/games')
       .then(setData)
-      .catch((err) => console.error('Failed to load lobby', err));
+      .catch((err) => {
+        console.error('Failed to load lobby', err);
+        showError('Failed to load lobby.');
+      });
   };
 
   useEffect(refresh, []);
@@ -24,7 +30,7 @@ export function LobbyPage() {
 
   const selectGame = (game: GameStatusBean) => setView({ mode: 'detail', gameName: game.name });
 
-  if (!data) return null;
+  if (!data) return <PageLoading />;
 
   const selectedGame = view?.mode === 'detail' ? data.games.find((g) => g.name === view.gameName) : null;
 
@@ -60,12 +66,7 @@ export function LobbyPage() {
             onChanged={applyUpdate}
           />
         )}
-        {!view && (
-          <div className="d-flex flex-column flex-fill align-items-center justify-content-center text-muted min-h-0">
-            <i className="bi bi-controller fs-1 mb-2" />
-            <span>Select a game or create a new one</span>
-          </div>
-        )}
+        {!view && <EmptyState icon="bi-controller" message="Select a game or create a new one" />}
       </div>
     </div>
   );

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { PlayerRoundSummary } from '../../api/types';
+import { alertDialog, confirmDialog } from '../../components/dialog';
+import { showError } from '../../components/toast';
 import { RecreateTableModal } from './RecreateTableModal';
 
 type Summary = Record<number, Record<number, PlayerRoundSummary[]>>;
@@ -13,21 +15,27 @@ export function RoundSummary({ tournamentName }: { tournamentName: string }) {
     api
       .get<Summary>(`/tournament/${encodeURIComponent(tournamentName)}/round-summary`)
       .then(setSummary)
-      .catch((err) => console.error('Failed to load round summary', err));
+      .catch((err) => {
+        console.error('Failed to load round summary', err);
+        showError('Failed to load round summary.');
+      });
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(load, [tournamentName]);
 
-  const closeTable = (round: number, table: number) => {
-    if (!confirm('Close table and record VP/GW results?')) return;
+  const closeTable = async (round: number, table: number) => {
+    if (!(await confirmDialog('Close table and record VP/GW results?'))) return;
     api
       .post<boolean>(`/tournament/${encodeURIComponent(tournamentName)}/round/${round}/table/${table}/close`)
       .then((ok) => {
         if (ok) load();
-        else alert('Could not close table — game may already be closed.');
+        else alertDialog('Could not close table — game may already be closed.');
       })
-      .catch((err) => console.error('Failed to close table', err));
+      .catch((err) => {
+        console.error('Failed to close table', err);
+        showError('Failed to close table.');
+      });
   };
 
   return (

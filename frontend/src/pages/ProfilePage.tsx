@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import type { CountryOption, Profile } from '../api/types';
 import { useNavRefresh } from '../nav/useNav';
+import { showError } from '../components/toast';
+import { PageLoading } from '../components/PageLoading';
 import { ProfileEditor } from './profile/ProfileEditor';
 import { AccountEditor } from './profile/AccountEditor';
 import { Preferences } from './profile/Preferences';
@@ -12,7 +14,13 @@ export function ProfilePage() {
   const refreshNav = useNavRefresh();
 
   useEffect(() => {
-    api.get<Profile>('/profile').then(setProfile).catch((err) => console.error('Failed to load profile', err));
+    api
+      .get<Profile>('/profile')
+      .then(setProfile)
+      .catch((err) => {
+        console.error('Failed to load profile', err);
+        showError('Failed to load profile.');
+      });
   }, []);
   useEffect(() => {
     api
@@ -29,7 +37,7 @@ export function ProfilePage() {
     refreshNav();
   };
 
-  if (!profile) return null;
+  if (!profile) return <PageLoading />;
 
   return (
     <div className="row mt-2 p-3">

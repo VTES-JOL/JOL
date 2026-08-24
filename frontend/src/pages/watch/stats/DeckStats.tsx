@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
 import type { StatsDto } from '../../../api/types';
 import { StatsDtoTable } from './StatsDtoTable';
+import { showError } from '../../../components/toast';
 
 export function DeckStats({ fromDate, toDate, isTourney }: { fromDate: string; toDate: string; isTourney: boolean }) {
   const [data, setData] = useState<Record<string, StatsDto>>({});
@@ -12,7 +13,10 @@ export function DeckStats({ fromDate, toDate, isTourney }: { fromDate: string; t
     api
       .post<Record<string, StatsDto>>('/stats/decks', { treshold: Number(threshold) || 0, fromDate, toDate, isTourney })
       .then(setData)
-      .catch((err) => console.error('Failed to load deck stats', err));
+      .catch((err) => {
+        console.error('Failed to load deck stats', err);
+        showError('Failed to load deck stats.');
+      });
   }, [threshold, fromDate, toDate, isTourney]);
 
   return (

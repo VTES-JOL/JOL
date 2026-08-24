@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from '../../api/client';
+import { confirmDialog } from '../../components/dialog';
 
 // Plain conditionally-rendered overlay rather than bootstrap.Modal — this
 // app doesn't load Bootstrap's JS bundle (see TopBar's dropdown comments),
@@ -16,16 +17,17 @@ export function ImportTablesModal({
   const [csvData, setCsvData] = useState('');
   const [error, setError] = useState('');
 
-  const submit = () => {
+  const submit = async () => {
     const trimmed = csvData.trim();
     if (!trimmed) {
       setError('Please paste CSV data before importing.');
       return;
     }
     if (
-      !confirm(
+      !(await confirmDialog(
         'Import Tournament Tables from CSV? This replaces the current round/table assignments, and if the tournament has already started, existing tables/games for it will be deleted.',
-      )
+        { danger: true },
+      ))
     ) {
       return;
     }

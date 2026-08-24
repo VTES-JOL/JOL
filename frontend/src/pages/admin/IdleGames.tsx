@@ -3,15 +3,20 @@ import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import type { IdleGame } from '../../api/types';
 import { pathForGame } from '../../routes';
+import { confirmDialog } from '../../components/dialog';
+import { showError } from '../../components/toast';
 import { adminTimestamp } from './adminFormatting';
 
 export function IdleGames({ idleGames, onSaved }: { idleGames: IdleGame[]; onSaved: () => void }) {
-  const closeGame = (gameId: string) => {
-    if (!confirm('Are you sure you want to end this game?')) return;
+  const closeGame = async (gameId: string) => {
+    if (!(await confirmDialog('Are you sure you want to end this game?'))) return;
     api
       .del(`/admin-page/games/${encodeURIComponent(gameId)}`)
       .then(onSaved)
-      .catch((err) => console.error('Failed to end game', err));
+      .catch((err) => {
+        console.error('Failed to end game', err);
+        showError('Failed to end game.');
+      });
   };
 
   return (

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import type { TournamentDetails, TournamentRegistration } from '../../api/types';
+import { confirmDialog } from '../../components/dialog';
+import { showError } from '../../components/toast';
 
 const DEFAULT_SPEC_RULES_CON =
   'The following JOL rules will be enforced for the duration of the rounds with the exception of the period between <Date> and <Date>.';
@@ -98,11 +100,17 @@ export function TournamentEditor({
         });
         setOriginalName(data.name);
       })
-      .catch((err) => console.error('Failed to load tournament details', err));
+      .catch((err) => {
+        console.error('Failed to load tournament details', err);
+        showError('Failed to load tournament details.');
+      });
     api
       .get<TournamentRegistration[]>(`/tournament/${encodeURIComponent(tournamentName)}/registered`)
       .then(setRegisteredPlayers)
-      .catch((err) => console.error('Failed to load registered players', err));
+      .catch((err) => {
+        console.error('Failed to load registered players', err);
+        showError('Failed to load registered players.');
+      });
   }, [tournamentName]);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((prev) => ({ ...prev, [key]: value }));
@@ -139,9 +147,9 @@ export function TournamentEditor({
       });
   };
 
-  const publish = () => {
+  const publish = async () => {
     if (!form.name) return;
-    if (!confirm(`Publish "${form.name}"? Players will be able to see and register for this tournament.`)) return;
+    if (!(await confirmDialog(`Publish "${form.name}"? Players will be able to see and register for this tournament.`))) return;
     api
       .post<boolean>(`/tournament/${encodeURIComponent(form.name)}/publish`)
       .then((success) => {

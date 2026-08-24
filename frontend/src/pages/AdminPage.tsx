@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { api } from '../api/client';
+import { api, ApiError } from '../api/client';
 import type { AdminPage as AdminPageData } from '../api/types';
+import { showError } from '../components/toast';
+import { PageLoading } from '../components/PageLoading';
 import { PlayerRoles } from './admin/PlayerRoles';
 import { ReplacePlayer } from './admin/ReplacePlayer';
 import { EndTurn } from './admin/EndTurn';
@@ -14,17 +16,34 @@ import { SiteNotesEditor } from './admin/SiteNotesEditor';
 // refetch-after-each-mutation covers it.
 export function AdminPage() {
   const [data, setData] = useState<AdminPageData | null>(null);
+  const [forbidden, setForbidden] = useState(false);
 
   const refresh = () => {
     api
       .get<AdminPageData>('/admin-page')
       .then(setData)
-      .catch((err) => console.error('Failed to load admin page', err));
+      .catch((err) => {
+        if (err instanceof ApiError && err.status === 403) {
+          setForbidden(true);
+        } else {
+          console.error('Failed to load admin page', err);
+          showError('Failed to load admin page.');
+        }
+      });
   };
 
   useEffect(refresh, []);
 
-  if (!data) return null;
+  if (forbidden) {
+    return (
+      <div className="p-4 text-center text-muted">
+        <i className="bi bi-shield-lock fs-1 d-block mb-2" />
+        <p className="mb-0">You don't have access to this page.</p>
+      </div>
+    );
+  }
+
+  if (!data) return <PageLoading />;
 
   return (
     <div className="row g-2 p-3">

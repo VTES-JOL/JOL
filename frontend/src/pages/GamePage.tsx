@@ -4,6 +4,8 @@ import { api } from '../api/client';
 import type { CardSnapshot, GameSnapshot } from '../api/types';
 import { useAuth } from '../nav/useAuth';
 import { useGameSocket } from '../ws/useGameSocket';
+import { showError } from '../components/toast';
+import { PageLoading } from '../components/PageLoading';
 import { PlayerBoard } from './game/PlayerBoard';
 import { HandStrip } from './game/HandStrip';
 import { CommandForm } from './game/CommandForm';
@@ -36,13 +38,16 @@ export function GamePage() {
     api
       .get<GameSnapshot>(`/game/${gameId}/view`)
       .then(setGame)
-      .catch((err) => console.error('Failed to load game', err));
+      .catch((err) => {
+        console.error('Failed to load game', err);
+        showError('Failed to load game.');
+      });
   };
 
   useEffect(refresh, [gameId]);
   useGameSocket(gameId ?? null, refresh);
 
-  if (!game || !gameId) return null;
+  if (!game || !gameId) return <PageLoading />;
 
   const submit = (submission: Submission) => {
     api
@@ -53,7 +58,10 @@ export function GamePage() {
         ping: null,
       })
       .then(setGame)
-      .catch((err) => console.error('Failed to submit', err));
+      .catch((err) => {
+        console.error('Failed to submit', err);
+        showError('Failed to submit.');
+      });
   };
 
   // cardOnTableClicked()'s dual role: while a target pick is pending, a

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { Deck } from '../../api/types';
 import { DeckPreview } from '../../components/DeckPreview';
+import { showError } from '../../components/toast';
 
 // Mirrors game-deck.jsp/doShowDeck() — GET .../deck is already a dedicated,
 // envelope-free endpoint. Fetched once (like legacy's own html==="" cache
@@ -13,7 +14,10 @@ export function DeckPanel({ gameId, onToggleNotes }: { gameId: string; onToggleN
     api
       .get<Deck>(`/game/${gameId}/deck`)
       .then(setDeck)
-      .catch((err) => console.error('Failed to load game deck', err));
+      .catch((err) => {
+        console.error('Failed to load game deck', err);
+        showError('Failed to load game deck.');
+      });
   }, [gameId]);
 
   return (

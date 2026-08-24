@@ -4,6 +4,9 @@ import type { TournamentBean } from '../api/types';
 import { TournamentList, type Selection } from './tournament/TournamentList';
 import { OpenTournamentDetail } from './tournament/OpenTournamentDetail';
 import { FinalsTournamentDetail } from './tournament/FinalsTournamentDetail';
+import { showError } from '../components/toast';
+import { PageLoading } from '../components/PageLoading';
+import { EmptyState } from '../components/EmptyState';
 
 export function TournamentPage() {
   const [data, setData] = useState<TournamentBean | null>(null);
@@ -13,12 +16,15 @@ export function TournamentPage() {
     api
       .get<TournamentBean>('/tournament/player-list')
       .then(setData)
-      .catch((err) => console.error('Failed to load tournaments', err));
+      .catch((err) => {
+        console.error('Failed to load tournaments', err);
+        showError('Failed to load tournaments.');
+      });
   };
 
   useEffect(refresh, []);
 
-  if (!data) return null;
+  if (!data) return <PageLoading />;
 
   const openTournament = selection?.type === 'open' ? data.tournaments.find((t) => t.name === selection.name) : null;
   const finalsTournament =
@@ -45,6 +51,7 @@ export function TournamentPage() {
           />
         )}
         {finalsTournament && <FinalsTournamentDetail tournament={finalsTournament} />}
+        {!openTournament && !finalsTournament && <EmptyState icon="bi-trophy" message="Select a tournament" />}
       </div>
     </div>
   );

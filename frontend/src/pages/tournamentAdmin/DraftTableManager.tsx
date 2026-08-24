@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { TournamentPlayer, TournamentRegistration } from '../../api/types';
+import { confirmDialog } from '../../components/dialog';
+import { showError } from '../../components/toast';
 import { RoundColumn } from './RoundColumn';
 import type { DragPayload } from './dragDrop';
 import { ImportTablesModal } from './ImportTablesModal';
@@ -69,7 +71,10 @@ export function DraftTableManager({
         });
         setState({ pools, tables });
       })
-      .catch((err) => console.error('Failed to load tournament tables', err));
+      .catch((err) => {
+        console.error('Failed to load tournament tables', err);
+        showError('Failed to load tournament tables.');
+      });
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -129,8 +134,8 @@ export function DraftTableManager({
     }));
   };
 
-  const saveTables = () => {
-    if (!confirm('Are you sure you want to SAVE the Tournament Tables?')) return;
+  const saveTables = async () => {
+    if (!(await confirmDialog('Are you sure you want to SAVE the Tournament Tables?'))) return;
     const body: Record<number, Record<number, string[]>> = {};
     roundNumbers.forEach((round) => {
       const tables = state.tables[round] ?? [];
@@ -143,18 +148,24 @@ export function DraftTableManager({
     api
       .put(`/tournament/${encodeURIComponent(tournamentName)}/rounds`, body)
       .then(load)
-      .catch((err) => console.error('Failed to save tournament tables', err));
+      .catch((err) => {
+        console.error('Failed to save tournament tables', err);
+        showError('Failed to save tournament tables.');
+      });
   };
 
   const downloadTables = () => {
     api
       .getText(`/tournament/${encodeURIComponent(tournamentName)}/rounds/csv`)
       .then((data) => downloadCsv(data, 'rounds.csv'))
-      .catch((err) => console.error('Failed to export tournament tables', err));
+      .catch((err) => {
+        console.error('Failed to export tournament tables', err);
+        showError('Failed to export tournament tables.');
+      });
   };
 
-  const createTables = () => {
-    if (!confirm('Are you sure you want to create the Tournament Tables?')) return;
+  const createTables = async () => {
+    if (!(await confirmDialog('Are you sure you want to create the Tournament Tables?'))) return;
     setCreateError('');
     api
       .post(`/tournament/${encodeURIComponent(tournamentName)}/tables`)

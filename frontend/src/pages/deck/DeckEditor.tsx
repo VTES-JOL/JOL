@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { ExtendedDeck } from '../../api/types';
+import { alertDialog } from '../../components/dialog';
 
 export function DeckEditor({
   selectedDeck,
@@ -33,9 +34,9 @@ export function DeckEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDeck, contents]);
 
-  const save = () => {
+  const save = async () => {
     if (!name.trim()) {
-      alert('Please enter a name for the deck');
+      await alertDialog('Please enter a name for the deck');
       return;
     }
     onSave(name, text, comment);

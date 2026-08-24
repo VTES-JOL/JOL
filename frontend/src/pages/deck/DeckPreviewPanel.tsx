@@ -16,7 +16,16 @@ export function DeckPreviewPanel({ selectedDeck, onEdit }: { selectedDeck: Exten
         </span>
       </div>
       <div className="card-body p-2 flex-fill d-flex flex-column overflow-auto min-h-0">
-        <div className="flex-fill px-1 min-h-0">{selectedDeck && <DeckPreview deck={selectedDeck.deck} />}</div>
+        <div className="flex-fill px-1 min-h-0 d-flex flex-column">
+          {selectedDeck ? (
+            <DeckPreview deck={selectedDeck.deck} />
+          ) : (
+            <div className="flex-fill d-flex flex-column align-items-center justify-content-center text-muted">
+              <i className="bi bi-collection fs-1 mb-2" />
+              <span>Select a deck to preview</span>
+            </div>
+          )}
+        </div>
         {selectedDeck && (
           <div className="mt-2">
             <div>

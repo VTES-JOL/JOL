@@ -4,6 +4,8 @@ import type { DeckInfoBean, TournamentBean, TournamentInviteStatus, TournamentMe
 import { relativeTime } from '../../lib/relativeTime';
 import { DeckPreview } from '../../components/DeckPreview';
 import { useSimpleDropdown } from '../../hooks/useSimpleDropdown';
+import { confirmDialog } from '../../components/dialog';
+import { showError } from '../../components/toast';
 
 export function OpenTournamentDetail({
   tournament,
@@ -22,22 +24,31 @@ export function OpenTournamentDetail({
     api
       .post<TournamentBean>(`/tournament/${encodeURIComponent(tournament.name)}/player/join`)
       .then(onChanged)
-      .catch((err) => console.error('Failed to join tournament', err));
+      .catch((err) => {
+        console.error('Failed to join tournament', err);
+        showError('Failed to join tournament.');
+      });
   };
 
-  const leave = () => {
-    if (!confirm('Leave Tournament?')) return;
+  const leave = async () => {
+    if (!(await confirmDialog('Leave Tournament?'))) return;
     api
       .post<TournamentBean>(`/tournament/${encodeURIComponent(tournament.name)}/player/leave`)
       .then(onChanged)
-      .catch((err) => console.error('Failed to leave tournament', err));
+      .catch((err) => {
+        console.error('Failed to leave tournament', err);
+        showError('Failed to leave tournament.');
+      });
   };
 
   const chooseDeck = (deckName: string) => {
     api
       .post<TournamentBean>(`/tournament/${encodeURIComponent(tournament.name)}/player/deck`, { deckName })
       .then(onChanged)
-      .catch((err) => console.error('Failed to register tournament deck', err));
+      .catch((err) => {
+        console.error('Failed to register tournament deck', err);
+        showError('Failed to register tournament deck.');
+      });
   };
 
   const registration = registeredGames.find((g) => g.name === tournament.name);

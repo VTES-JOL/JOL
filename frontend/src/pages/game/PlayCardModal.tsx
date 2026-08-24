@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import type { CardDefinition, CardMode, CardModeTarget, CardSnapshot } from '../../api/types';
 import { fetchCardDefinition } from './cardDefinitions';
 import { buildDiscardCommand, buildHandLabelCommand, buildPlayCommand, needsTargetPicker, type HandCardContext } from './cardCommands';
+import { CardImage } from './CardImage';
+import { showError } from '../../components/toast';
 
 export interface PendingTarget {
   ctx: HandCardContext;
@@ -39,7 +41,10 @@ export function PlayCardModal({
     setSelected(new Set());
     fetchCardDefinition(card.cardId ?? '', !!card.playtest)
       .then(setDefinition)
-      .catch((err) => console.error('Failed to load card definition', err));
+      .catch((err) => {
+        console.error('Failed to load card definition', err);
+        showError('Failed to load card details.');
+      });
   }, [card.cardId, card.playtest]);
 
   const doNotReplace = ctx.regionCommandKey === 'research' ? true : !!definition?.doNotReplace;
@@ -108,6 +113,7 @@ export function PlayCardModal({
                 <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
               </div>
               <div className="modal-body">
+                <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={definition.displayName} />
                 <div className="requirements d-flex justify-content-center gap-2">
                   {(definition.clans ?? []).map((clan) => (
                     <span key={clan} className={`clan ${clan.toLowerCase().replace(/ /g, '_')}`} title={clan} />

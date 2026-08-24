@@ -3,6 +3,7 @@ import { api } from '../../../api/client';
 import type { StatsDto } from '../../../api/types';
 import { StatsDtoTable } from './StatsDtoTable';
 import { useSimpleTooltips } from '../../../hooks/useSimpleTooltips';
+import { showError } from '../../../components/toast';
 
 const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
@@ -16,7 +17,10 @@ export function NationStats({ fromDate, toDate, isTourney }: { fromDate: string;
     api
       .post<Record<string, StatsDto>>('/stats/nations', { treshold: Number(threshold) || 0, fromDate, toDate, isTourney })
       .then(setData)
-      .catch((err) => console.error('Failed to load nation stats', err));
+      .catch((err) => {
+        console.error('Failed to load nation stats', err);
+        showError('Failed to load nation stats.');
+      });
   }, [threshold, fromDate, toDate, isTourney]);
 
   useSimpleTooltips(ref, [data]);

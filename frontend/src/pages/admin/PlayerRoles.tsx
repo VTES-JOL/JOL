@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import type { UserRole } from '../../api/types';
+import { confirmDialog } from '../../components/dialog';
+import { showError } from '../../components/toast';
 import { adminTimestamp } from './adminFormatting';
 
 const ROLES: { value: string; label: string }[] = [
@@ -34,12 +36,15 @@ export function PlayerRoles({
     if (!player && substitutes.length > 0) setPlayer(substitutes[0]);
   }, [substitutes, player]);
 
-  const toggleRole = (targetPlayer: string, targetRole: string, hasRole: boolean) => {
-    if (hasRole && !confirm('Are you sure you want to remove this role?')) return;
+  const toggleRole = async (targetPlayer: string, targetRole: string, hasRole: boolean) => {
+    if (hasRole && !(await confirmDialog('Are you sure you want to remove this role?'))) return;
     api
       .put(`/admin-page/roles/${encodeURIComponent(targetPlayer)}`, { role: targetRole, value: !hasRole })
       .then(onSaved)
-      .catch((err) => console.error('Failed to update role', err));
+      .catch((err) => {
+        console.error('Failed to update role', err);
+        showError('Failed to update role.');
+      });
   };
 
   const addRole = () => {
@@ -47,7 +52,10 @@ export function PlayerRoles({
     api
       .put(`/admin-page/roles/${encodeURIComponent(player)}`, { role, value: true })
       .then(onSaved)
-      .catch((err) => console.error('Failed to add role', err));
+      .catch((err) => {
+        console.error('Failed to add role', err);
+        showError('Failed to add role.');
+      });
   };
 
   return (

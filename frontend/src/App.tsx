@@ -12,6 +12,8 @@ import { GamePage } from './pages/GamePage';
 import { LoginPage } from './pages/LoginPage';
 import { NavProvider } from './nav/NavContext';
 import { ReconnectingOverlay } from './components/ReconnectingOverlay';
+import { DialogHost } from './components/DialogHost';
+import { ToastHost } from './components/ToastHost';
 import { useConnectivity } from './api/useConnectivity';
 
 // The authenticated app shell: NavProvider's /nav fetch requires a valid
@@ -68,6 +70,8 @@ export function App() {
         <Route path="/jol/login" element={<LoginPage />} />
         <Route path="/*" element={<AuthenticatedApp />} />
       </Routes>
+      <DialogHost />
+      <ToastHost />
     </BrowserRouter>
   );
 }

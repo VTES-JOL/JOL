@@ -4,6 +4,7 @@ import type { AllGames } from '../api/types';
 import { ActiveGamesTab } from './watch/ActiveGamesTab';
 import { PastGamesTab } from './watch/PastGamesTab';
 import { StatsTab } from './watch/StatsTab';
+import { showError } from '../components/toast';
 
 type MainTab = 'active' | 'past' | 'stats';
 
@@ -15,7 +16,10 @@ export function WatchPage() {
     api
       .get<AllGames>('/watch')
       .then(setData)
-      .catch((err) => console.error('Failed to load watch page', err));
+      .catch((err) => {
+        console.error('Failed to load watch page', err);
+        showError('Failed to load watch page.');
+      });
   }, []);
 
   return (

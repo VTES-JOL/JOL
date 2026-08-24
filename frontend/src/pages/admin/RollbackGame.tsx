@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
+import { confirmDialog } from '../../components/dialog';
+import { showError } from '../../components/toast';
 
 export function RollbackGame({ games, onSaved }: { games: Record<string, string>; onSaved: () => void }) {
   const gameIds = Object.keys(games);
@@ -22,13 +24,16 @@ export function RollbackGame({ games, onSaved }: { games: Record<string, string>
       .catch((err) => console.error('Failed to load game turns', err));
   }, [gameId]);
 
-  const submit = () => {
+  const submit = async () => {
     if (!gameId || !turn) return;
-    if (!confirm(`Are you sure you want to rollback to turn ${turn} for ${games[gameId]}`)) return;
+    if (!(await confirmDialog(`Are you sure you want to rollback to turn ${turn} for ${games[gameId]}`))) return;
     api
       .post(`/admin-page/games/${encodeURIComponent(gameId)}/rollback`, { turn })
       .then(onSaved)
-      .catch((err) => console.error('Failed to rollback game', err));
+      .catch((err) => {
+        console.error('Failed to rollback game', err);
+        showError('Failed to rollback game.');
+      });
   };
 
   return (

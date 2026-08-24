@@ -54,6 +54,12 @@ function useDropdown() {
 export function TopBar() {
   const nav = useNav();
   const { open, setOpen, rootRef } = useDropdown();
+  // Bootstrap's JS bundle isn't loaded (see the dropdown comment above), so
+  // the "collapse" hamburger toggle needs the same hand-rolled state as the
+  // two dropdowns rather than data-bs-toggle="collapse", which does nothing
+  // without it — this was previously dead on any viewport narrow enough to
+  // show the toggler at all.
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <nav ref={rootRef} className="navbar navbar-expand-lg bg-dark px-2" id="navbar" data-bs-theme="dark">
@@ -63,15 +69,14 @@ export function TopBar() {
       <button
         className="navbar-toggler"
         type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNavAltMarkup"
         aria-controls="navbarNavAltMarkup"
-        aria-expanded="false"
+        aria-expanded={mobileOpen}
         aria-label="Toggle navigation"
+        onClick={() => setMobileOpen((prev) => !prev)}
       >
         <span className="navbar-toggler-icon"></span>
       </button>
-      <div className="collapse navbar-collapse navbar-nav" id="navbarNavAltMarkup">
+      <div className={`collapse navbar-collapse navbar-nav ${mobileOpen ? 'show' : ''}`} id="navbarNavAltMarkup">
         <div className="navbar-nav">
           <div className={`nav-item dropdown ${open === 'games' ? 'show' : ''}`}>
             <a
@@ -95,7 +100,7 @@ export function TopBar() {
             >
               {Object.entries(nav?.gameButtons ?? {}).map(([id, label]) => (
                 <li key={id}>
-                  <Link className="dropdown-item" to={pathForGame(id.slice(1))}>
+                  <Link className="dropdown-item" to={pathForGame(id.slice(1))} onClick={() => setMobileOpen(false)}>
                     {label}
                   </Link>
                 </li>
@@ -107,7 +112,7 @@ export function TopBar() {
           {(nav?.buttons ?? []).map((entry) => {
             const [view, label] = entry.split(':');
             return (
-              <Link key={view} className="nav-link" to={pathForView(view)}>
+              <Link key={view} className="nav-link" to={pathForView(view)} onClick={() => setMobileOpen(false)}>
                 {label}
               </Link>
             );

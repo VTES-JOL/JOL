@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { PlayerStanding, TournamentRegistration } from '../../api/types';
+import { alertDialog, confirmDialog } from '../../components/dialog';
+import { showError } from '../../components/toast';
 import { draggableChip, dropTarget, type DragPayload } from './dragDrop';
 
 // tournament-admin/tournament-final.jsp's #finalSeeding crypt-reveal panel
@@ -32,7 +34,10 @@ function FinalistSelection({ tournamentName, onSaved }: { tournamentName: string
     api
       .get<PlayerStanding[]>(`/tournament/${encodeURIComponent(tournamentName)}/standings`)
       .then(setStandings)
-      .catch((err) => console.error('Failed to load standings', err));
+      .catch((err) => {
+        console.error('Failed to load standings', err);
+        showError('Failed to load standings.');
+      });
   }, [tournamentName]);
 
   const toggle = (player: string) => {
@@ -44,15 +49,18 @@ function FinalistSelection({ tournamentName, onSaved }: { tournamentName: string
     });
   };
 
-  const save = () => {
+  const save = async () => {
     if (selected.size !== 5) {
-      alert('Please select exactly 5 players for the finals.');
+      await alertDialog('Please select exactly 5 players for the finals.');
       return;
     }
     api
       .put(`/tournament/${encodeURIComponent(tournamentName)}/final-players`, [...selected])
       .then(onSaved)
-      .catch((err) => console.error('Failed to save finalist selection', err));
+      .catch((err) => {
+        console.error('Failed to save finalist selection', err);
+        showError('Failed to save finalist selection.');
+      });
   };
 
   return (
@@ -98,7 +106,10 @@ function FinalTableBuilder({ tournamentName, onSaved }: { tournamentName: string
         setPool(delta);
         setStarted(isStarted);
       })
-      .catch((err) => console.error('Failed to load final table', err));
+      .catch((err) => {
+        console.error('Failed to load final table', err);
+        showError('Failed to load final table.');
+      });
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -133,15 +144,21 @@ function FinalTableBuilder({ tournamentName, onSaved }: { tournamentName: string
         onSaved();
         load();
       })
-      .catch((err) => console.error('Failed to save final table', err));
+      .catch((err) => {
+        console.error('Failed to save final table', err);
+        showError('Failed to save final table.');
+      });
   };
 
-  const startFinal = () => {
-    if (!confirm('Are you sure you want to START the FINAL?')) return;
+  const startFinal = async () => {
+    if (!(await confirmDialog('Are you sure you want to START the FINAL?'))) return;
     api
       .post(`/tournament/${encodeURIComponent(tournamentName)}/final`)
       .then(load)
-      .catch((err) => console.error('Failed to start final', err));
+      .catch((err) => {
+        console.error('Failed to start final', err);
+        showError('Failed to start final.');
+      });
   };
 
   if (started) {
@@ -189,7 +206,10 @@ export function FinalsManager({ tournamentName }: { tournamentName: string }) {
     api
       .get<string[]>(`/tournament/${encodeURIComponent(tournamentName)}/seeding`)
       .then(setSeeding)
-      .catch((err) => console.error('Failed to load finals seeding', err));
+      .catch((err) => {
+        console.error('Failed to load finals seeding', err);
+        showError('Failed to load finals seeding.');
+      });
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
+import { showError } from '../../components/toast';
 
 export function AccountEditor() {
   const [newPassword, setNewPassword] = useState('');
@@ -16,10 +17,17 @@ export function AccountEditor() {
       setMessage('Password confirmation does not match.');
       return;
     }
-    api.put('/profile/password', { newPassword }).catch((err) => console.error('Failed to change password', err));
-    setMessage('Password updated.');
-    setNewPassword('');
-    setConfirmPassword('');
+    api
+      .put('/profile/password', { newPassword })
+      .then(() => {
+        setMessage('Password updated.');
+        setNewPassword('');
+        setConfirmPassword('');
+      })
+      .catch((err) => {
+        console.error('Failed to change password', err);
+        showError('Failed to change password.');
+      });
   };
 
   return (

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { GameSnapshot } from '../../api/types';
+import { showError } from '../../components/toast';
 
 // Mirrors notes.jsp — saves on blur (not every keystroke), matching legacy's
 // updateNotes()/updateNotesHand() triggers. PUT .../notes/global and
@@ -22,11 +23,17 @@ export function NotesPanel({
   useEffect(() => setPrivateNotes(game.privateNotes ?? ''), [game.privateNotes]);
 
   const saveGlobal = () => {
-    api.put(`/game/${gameId}/notes/global`, { notes: globalNotes }).catch((err) => console.error('Failed to save notes', err));
+    api.put(`/game/${gameId}/notes/global`, { notes: globalNotes }).catch((err) => {
+      console.error('Failed to save notes', err);
+      showError('Failed to save notes.');
+    });
   };
 
   const savePrivate = () => {
-    api.put(`/game/${gameId}/notes/private`, { notes: privateNotes }).catch((err) => console.error('Failed to save private notes', err));
+    api.put(`/game/${gameId}/notes/private`, { notes: privateNotes }).catch((err) => {
+      console.error('Failed to save private notes', err);
+      showError('Failed to save private notes.');
+    });
   };
 
   return (

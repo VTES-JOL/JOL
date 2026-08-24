@@ -6,6 +6,7 @@ import { useJolSocket } from '../../ws/useJolSocket';
 import { useAuth } from '../../nav/useAuth';
 import { useCardTooltips } from '../../hooks/useCardTooltips';
 import { dayLabel, highlightMentions, localTimeTitle, utcTime } from './chatFormatting';
+import { showError } from '../../components/toast';
 
 const AT_BOTTOM_THRESHOLD_PX = 20;
 
@@ -115,7 +116,10 @@ export function GlobalChat() {
         forceScrollRef.current = true;
         appendChat(delta);
       })
-      .catch((err) => console.error('Failed to send chat message', err))
+      .catch((err) => {
+        console.error('Failed to send chat message', err);
+        showError('Failed to send chat message.');
+      })
       .finally(() => setSending(false));
   };
 

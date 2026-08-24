@@ -2,6 +2,8 @@ import { useEffect, useState, type MouseEvent, type ReactNode } from 'react';
 import type { CardDefinition } from '../../api/types';
 import { fetchCardDefinition } from './cardDefinitions';
 import { cardActions, type Submission, type TableCardContext } from './cardCommands';
+import { CardImage } from './CardImage';
+import { showError } from '../../components/toast';
 
 const CLANS = [
   'Abomination', 'Ahrimane', 'Akunanse', 'Baali', 'Banu Haqim', 'Blood Brother', 'Brujah', 'Brujah Antitribu',
@@ -141,7 +143,10 @@ export function CardActionModal({
     setDefinition(null);
     fetchCardDefinition(card.cardId ?? '', !!card.playtest)
       .then(setDefinition)
-      .catch((err) => console.error('Failed to load card definition', err));
+      .catch((err) => {
+        console.error('Failed to load card definition', err);
+        showError('Failed to load card details.');
+      });
   }, [card.cardId, card.playtest]);
 
   useEffect(() => setLabel(card.label ?? ''), [card.label]);
@@ -209,6 +214,7 @@ export function CardActionModal({
                 </span>
               </div>
               <div className="modal-body">
+                <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={definition.displayName} />
                 <div className="input-group mt-2">
                   <label className="input-group-text">
                     <i className="bi bi-tag" />

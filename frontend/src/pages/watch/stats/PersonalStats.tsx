@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
 import type { DeckMatchup, OpponentStats } from '../../../api/types';
 import { SortIcon, useTableSort } from '../statsUtils';
+import { showError } from '../../../components/toast';
 
 interface OpponentRow extends OpponentStats, Record<string, unknown> {}
 
@@ -28,7 +29,10 @@ function OpponentPerformance({
         isTourney,
       })
       .then(setData)
-      .catch((err) => console.error('Failed to load opponent stats', err));
+      .catch((err) => {
+        console.error('Failed to load opponent stats', err);
+        showError('Failed to load opponent stats.');
+      });
   }, [player, fromDate, toDate, isTourney]);
 
   const rows = Object.values(data) as OpponentRow[];
@@ -112,7 +116,10 @@ function DeckPerformance({
         isTourney,
       })
       .then(setData)
-      .catch((err) => console.error('Failed to load deck performance', err));
+      .catch((err) => {
+        console.error('Failed to load deck performance', err);
+        showError('Failed to load deck performance.');
+      });
   }, [player, fromDate, toDate, isTourney]);
 
   const { sorted, toggle } = useTableSort(data as unknown as (DeckMatchup & Record<string, unknown>)[]);

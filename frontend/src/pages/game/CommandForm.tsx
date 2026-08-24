@@ -3,6 +3,8 @@ import { api } from '../../api/client';
 import type { GameSnapshot } from '../../api/types';
 import { QuickCommandModal } from './QuickCommandModal';
 import { QuickChatModal } from './QuickChatModal';
+import { confirmDialog } from '../../components/dialog';
+import { showError } from '../../components/toast';
 
 // Mirrors commands.jsp/doSubmit()/doEndTurn() plus the quick-command/
 // quick-chat modals (Phase 3) — free-text Command, Chat, Phase, Ping,
@@ -53,7 +55,10 @@ export function CommandForm({
         setPing('');
         onUpdated(updated);
       })
-      .catch((err) => console.error('Failed to submit', err))
+      .catch((err) => {
+        console.error('Failed to submit', err);
+        showError('Failed to submit.');
+      })
       .finally(() => setSubmitting(false));
   };
 
@@ -61,22 +66,31 @@ export function CommandForm({
     api
       .post<GameSnapshot>(`/game/${gameId}/view/submit`, { phase: null, command: quickCommand, chat: null, ping: null })
       .then(onUpdated)
-      .catch((err) => console.error('Failed to submit', err));
+      .catch((err) => {
+        console.error('Failed to submit', err);
+        showError('Failed to submit.');
+      });
   };
 
   const sendQuickChat = (message: string) => {
     api
       .post<GameSnapshot>(`/game/${gameId}/view/submit`, { phase: null, command: null, chat: message, ping: null })
       .then(onUpdated)
-      .catch((err) => console.error('Failed to submit', err));
+      .catch((err) => {
+        console.error('Failed to submit', err);
+        showError('Failed to submit.');
+      });
   };
 
-  const endTurn = () => {
-    if (!confirm('Are you sure you want to end your turn?')) return;
+  const endTurn = async () => {
+    if (!(await confirmDialog('Are you sure you want to end your turn?'))) return;
     api
       .post<GameSnapshot>(`/game/${gameId}/view/end-turn`)
       .then(onUpdated)
-      .catch((err) => console.error('Failed to end turn', err));
+      .catch((err) => {
+        console.error('Failed to end turn', err);
+        showError('Failed to end turn.');
+      });
   };
 
   return (

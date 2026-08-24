@@ -1,18 +1,23 @@
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
+import { confirmDialog } from '../../components/dialog';
+import { showError } from '../../components/toast';
 
 export function EndTurn({ games, onSaved }: { games: Record<string, string>; onSaved: () => void }) {
   const gameIds = Object.keys(games);
   const [gameId, setGameId] = useState(gameIds[0] ?? '');
 
-  const submit = () => {
+  const submit = async () => {
     if (!gameId) return;
-    if (!confirm(`Are you sure you want to end turn for ${games[gameId]}`)) return;
+    if (!(await confirmDialog(`Are you sure you want to end turn for ${games[gameId]}`))) return;
     api
       .post(`/admin-page/games/${encodeURIComponent(gameId)}/end-turn`)
       .then(onSaved)
-      .catch((err) => console.error('Failed to end turn', err));
+      .catch((err) => {
+        console.error('Failed to end turn', err);
+        showError('Failed to end turn.');
+      });
   };
 
   return (

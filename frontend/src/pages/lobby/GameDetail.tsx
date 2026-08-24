@@ -4,6 +4,8 @@ import type { Deck, GameStatusBean, LobbyPage } from '../../api/types';
 import { useAuth } from '../../nav/useAuth';
 import { useSimpleDropdown } from '../../hooks/useSimpleDropdown';
 import { DeckPreview } from '../../components/DeckPreview';
+import { confirmDialog } from '../../components/dialog';
+import { showError } from '../../components/toast';
 
 export function GameDetail({
   game,
@@ -28,14 +30,26 @@ export function GameDetail({
 
   const encodedName = encodeURIComponent(game.name);
 
-  const startGame = () => {
-    if (!confirm('Start Game?')) return;
-    api.post<LobbyPage>(`/lobby/player/games/${encodedName}/start`).then(onChanged).catch((err) => console.error('Failed to start game', err));
+  const startGame = async () => {
+    if (!(await confirmDialog('Start Game?'))) return;
+    api
+      .post<LobbyPage>(`/lobby/player/games/${encodedName}/start`)
+      .then(onChanged)
+      .catch((err) => {
+        console.error('Failed to start game', err);
+        showError('Failed to start game.');
+      });
   };
 
-  const closeGame = () => {
-    if (!confirm('Close Game?')) return;
-    api.del<LobbyPage>(`/lobby/player/games/${encodedName}`).then(onChanged).catch((err) => console.error('Failed to close game', err));
+  const closeGame = async () => {
+    if (!(await confirmDialog('Close Game?', { danger: true }))) return;
+    api
+      .del<LobbyPage>(`/lobby/player/games/${encodedName}`)
+      .then(onChanged)
+      .catch((err) => {
+        console.error('Failed to close game', err);
+        showError('Failed to close game.');
+      });
   };
 
   const joinGame = () => {
@@ -43,15 +57,21 @@ export function GameDetail({
     api
       .post<LobbyPage>(`/lobby/player/games/${encodedName}/invite`, { player })
       .then(onChanged)
-      .catch((err) => console.error('Failed to join game', err));
+      .catch((err) => {
+        console.error('Failed to join game', err);
+        showError('Failed to join game.');
+      });
   };
 
-  const leaveGame = () => {
-    if (!player || !confirm('Leave Game?')) return;
+  const leaveGame = async () => {
+    if (!player || !(await confirmDialog('Leave Game?'))) return;
     api
       .del<LobbyPage>(`/lobby/player/games/${encodedName}/invite/${encodeURIComponent(player)}`)
       .then(onChanged)
-      .catch((err) => console.error('Failed to leave game', err));
+      .catch((err) => {
+        console.error('Failed to leave game', err);
+        showError('Failed to leave game.');
+      });
   };
 
   const invitePlayer = () => {
@@ -60,7 +80,10 @@ export function GameDetail({
     api
       .post<LobbyPage>(`/lobby/player/games/${encodedName}/invite`, { player: p })
       .then(onChanged)
-      .catch((err) => console.error('Failed to invite player', err));
+      .catch((err) => {
+        console.error('Failed to invite player', err);
+        showError('Failed to invite player.');
+      });
     setInviteInput('');
   };
 
@@ -68,14 +91,20 @@ export function GameDetail({
     api
       .del<LobbyPage>(`/lobby/player/games/${encodedName}/invite/${encodeURIComponent(p)}`)
       .then(onChanged)
-      .catch((err) => console.error('Failed to remove invite', err));
+      .catch((err) => {
+        console.error('Failed to remove invite', err);
+        showError('Failed to remove invite.');
+      });
   };
 
   const registerDeck = (deckName: string) => {
     api
       .post<LobbyPage>(`/lobby/player/games/${encodedName}/deck`, { deckName })
       .then(onChanged)
-      .catch((err) => console.error('Failed to register deck', err));
+      .catch((err) => {
+        console.error('Failed to register deck', err);
+        showError('Failed to register deck.');
+      });
     deckDropdown.setOpen(false);
   };
 

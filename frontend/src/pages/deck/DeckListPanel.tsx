@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { DeckInfoBean } from '../../api/types';
 import { useSimpleTooltips } from '../../hooks/useSimpleTooltips';
+import { confirmDialog } from '../../components/dialog';
 
 export function DeckListPanel({
   decks,
@@ -79,9 +80,9 @@ export function DeckListPanel({
                   <button
                     className="btn btn-sm btn-outline-secondary p-1"
                     style={{ fontSize: '0.6rem' }}
-                    onClick={(e) => {
+                    onClick={async (e) => {
                       e.stopPropagation();
-                      if (confirm('Delete deck?')) onDelete(d.name);
+                      if (await confirmDialog('Delete deck?', { danger: true })) onDelete(d.name);
                     }}
                   >
                     <i className="bi-trash" />
