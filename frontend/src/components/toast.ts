@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
 // App-wide toast notifications for surfacing failures that previously only
 // went to console.error — a user clicking "Save" against a flaky connection
@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 // dialog.ts/connectivity.ts (callable from plain event handlers/.catch()
 // with no component tree position of their own), but a list rather than a
 // single pending item since more than one can be relevant at once.
+// useToasts() reads it via useSyncExternalStore — see useConnectivity.ts's
+// comment for why that's required over useState+useEffect.
 export interface Toast {
   id: number;
   message: string;
@@ -44,14 +46,17 @@ export function dismissToast(id: number) {
   notify();
 }
 
-export function useToasts(): Toast[] {
-  const [, setTick] = useState(0);
-  useEffect(() => {
-    const listener = () => setTick((t) => t + 1);
-    listeners.add(listener);
-    return () => {
-      listeners.delete(listener);
-    };
-  }, []);
+function subscribe(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+function getSnapshot(): Toast[] {
   return toasts;
+}
+
+export function useToasts(): Toast[] {
+  return useSyncExternalStore(subscribe, getSnapshot);
 }

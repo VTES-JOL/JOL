@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
 // A single, app-wide confirm/alert dialog replacing native confirm()/alert()
 // — those are jarring OS-chrome dialogs that break the app's visual identity
 // (see DialogHost.tsx, mounted once in App.tsx). Modeled on connectivity.ts's
 // module-level-state-plus-listeners pattern rather than React context, since
 // these need to be callable from plain event handlers with no component
-// tree position of their own.
+// tree position of their own. useDialogRequest() reads it via
+// useSyncExternalStore (see useConnectivity.ts's comment for why that's
+// required over useState+useEffect: the latter has a real gap between the
+// initial render's captured value and the effect attaching its listener).
 interface DialogRequest {
   message: string;
   title?: string;
@@ -46,16 +49,19 @@ export function alertDialog(message: string, options?: { title?: string }): Prom
   });
 }
 
-export function useDialogRequest(): DialogRequest | null {
-  const [, setTick] = useState(0);
-  useEffect(() => {
-    const listener = () => setTick((t) => t + 1);
-    listeners.add(listener);
-    return () => {
-      listeners.delete(listener);
-    };
-  }, []);
+function subscribe(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+function getSnapshot(): DialogRequest | null {
   return current;
+}
+
+export function useDialogRequest(): DialogRequest | null {
+  return useSyncExternalStore(subscribe, getSnapshot);
 }
 
 export function resolveDialog(value: boolean) {

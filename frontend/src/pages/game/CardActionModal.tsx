@@ -40,8 +40,8 @@ interface ButtonConfig {
 const BUTTONS: ButtonConfig[] = [
   { key: 'influence', label: 'Influence', title: 'Influence', regions: ['inactive'], topLevelOnly: true, ownerOnly: true, minionOnly: true, action: cardActions.influence },
   { key: 'bleed', label: 'Bleed', title: 'Bleed', regions: ['ready'], lockState: 'unlocked', topLevelOnly: true, ownerOnly: true, minionOnly: true, action: cardActions.bleed },
-  { key: 'contest', label: 'Contest', title: 'Contest', regions: ['ready', 'torpor'], contested: false, action: (ctx) => cardActions.contest(ctx, true) },
-  { key: 'clear-contest', label: 'Clear Contest', title: 'Clear Contest', regions: ['ready', 'torpor'], contested: true, action: (ctx) => cardActions.contest(ctx, false) },
+  { key: 'contest', label: 'Contest', title: 'Contest', regions: ['ready', 'torpor'], contested: false, action: (ctx) => cardActions.contest(ctx, false) },
+  { key: 'clear-contest', label: 'Clear Contest', title: 'Clear Contest', regions: ['ready', 'torpor'], contested: true, action: (ctx) => cardActions.contest(ctx, true) },
   { key: 'hunt', label: 'Hunt', title: 'Hunt', regions: ['ready'], lockState: 'unlocked', topLevelOnly: true, ownerOnly: true, minionOnly: true, action: cardActions.hunt },
   { key: 'go-anarch', label: 'Go Anarch', title: 'Go Anarch', regions: ['ready'], lockState: 'unlocked', topLevelOnly: true, ownerOnly: true, minionOnly: true, action: cardActions.goAnarch },
   { key: 'leave-torpor', label: 'Leave Torpor', title: 'Leave Torpor', regions: ['torpor'], lockState: 'unlocked', topLevelOnly: true, ownerOnly: true, minionOnly: true, action: cardActions.leaveTorpor },
