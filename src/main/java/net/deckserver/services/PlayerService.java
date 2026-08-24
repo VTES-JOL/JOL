@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.Normalizer;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -57,21 +58,35 @@ public class PlayerService extends PersistedService {
         activeUsers.get(playerName).setLastOnline(OffsetDateTime.now());
     }
 
+    /**
+     * Player names are compared with plain String.equals()/HashMap semantics everywhere in this
+     * codebase. A name like "Jipé" can arrive as either the precomposed NFC codepoint or an NFD
+     * "e" + combining-accent sequence depending on the client's browser/OS/keyboard - visually
+     * identical but not equal as Strings. Canonicalizing to NFC at every entry point keeps a
+     * single player identity mapped to one consistent HashMap key everywhere it's stored or
+     * looked up (players.json, registrations, GameData), instead of silently splitting into two.
+     */
+    public static String canonicalize(String name) {
+        return name == null ? null : Normalizer.normalize(name, Normalizer.Form.NFC);
+    }
+
     public static  boolean existsPlayer(String name) {
-        return name != null && INSTANCE.players.containsKey(name);
+        return name != null && INSTANCE.players.containsKey(canonicalize(name));
     }
 
     public static  boolean registerPlayer(String name, String password, String email) {
-        if (existsPlayer(name) || name.isEmpty())
+        String canonicalName = canonicalize(name);
+        if (existsPlayer(canonicalName) || canonicalName.isEmpty())
             return false;
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
-        INSTANCE.players.put(name, new PlayerInfo(name, ULID.random(), email, hash));
+        INSTANCE.players.put(canonicalName, new PlayerInfo(canonicalName, ULID.random(), email, hash));
         return true;
     }
 
     public static  boolean authenticate(String playerName, String password) {
-        if (existsPlayer(playerName)) {
-            PlayerInfo playerInfo = loadPlayerInfo(playerName);
+        String canonicalName = canonicalize(playerName);
+        if (existsPlayer(canonicalName)) {
+            PlayerInfo playerInfo = loadPlayerInfo(canonicalName);
             return BCrypt.checkpw(password, playerInfo.getHash());
         } else {
             return false;
@@ -93,8 +108,9 @@ public class PlayerService extends PersistedService {
     }
 
     private static  PlayerInfo loadPlayerInfo(String playerName) {
-        if (INSTANCE.players.containsKey(playerName)) {
-            return INSTANCE.players.get(playerName);
+        String canonicalName = canonicalize(playerName);
+        if (INSTANCE.players.containsKey(canonicalName)) {
+            return INSTANCE.players.get(canonicalName);
         }
         throw new IllegalArgumentException("Player: " + playerName + " was not found.");
     }

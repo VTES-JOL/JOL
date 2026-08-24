@@ -5,6 +5,7 @@ import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.GameView;
 import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
+import net.deckserver.services.PlayerService;
 import net.deckserver.services.RegistrationService;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.ChatData;
@@ -138,7 +139,7 @@ public class GameActionResource extends BaseResource {
     public Map<String, Object> replacePlayer(ReplacePlayerRequest body) {
         String player = username();
         if (JolAdmin.isAdmin(player)) {
-            JolAdmin.replacePlayer(gameName(), body.existingPlayer(), body.newPlayer());
+            JolAdmin.replacePlayer(gameName(), PlayerService.canonicalize(body.existingPlayer()), PlayerService.canonicalize(body.newPlayer()));
         }
         return update(player);
     }

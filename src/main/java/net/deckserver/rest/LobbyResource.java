@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.services.GameService;
+import net.deckserver.services.PlayerService;
 import net.deckserver.services.RegistrationService;
 import net.deckserver.ws.WebSocketRegistry;
 
@@ -47,8 +48,11 @@ public class LobbyResource extends BaseResource {
     public Map<String, Object> invitePlayer(@PathParam("name") String game, InviteRequest body) {
         String playerName = username();
         if (playerName != null) {
-            RegistrationService.invitePlayer(game, body.player());
-            WebSocketRegistry.notifyMain();
+            String invitee = PlayerService.canonicalize(body.player());
+            if (PlayerService.existsPlayer(invitee)) {
+                RegistrationService.invitePlayer(game, invitee);
+                WebSocketRegistry.notifyMain();
+            }
         }
         return update(playerName);
     }
@@ -59,7 +63,7 @@ public class LobbyResource extends BaseResource {
     public Map<String, Object> unInvitePlayer(@PathParam("name") String game, @PathParam("player") String player) {
         String playerName = username();
         if (playerName != null) {
-            JolAdmin.unInvitePlayer(game, player);
+            JolAdmin.unInvitePlayer(game, PlayerService.canonicalize(player));
             WebSocketRegistry.notifyMain();
         }
         return update(playerName);

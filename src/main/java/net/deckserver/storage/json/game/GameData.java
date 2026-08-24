@@ -16,6 +16,7 @@ import java.util.*;
 @ToString(of = {"id", "name"})
 @NoArgsConstructor
 public class GameData {
+
     private String id;
     private String name;
 

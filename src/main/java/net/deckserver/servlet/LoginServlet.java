@@ -40,7 +40,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         request.setCharacterEncoding("UTF-8");
-        String username = request.getParameter("username");
+        String username = PlayerService.canonicalize(request.getParameter("username"));
         String password = request.getParameter("password");
         boolean authResult = PlayerService.authenticate(username, password);
         if (authResult) {
