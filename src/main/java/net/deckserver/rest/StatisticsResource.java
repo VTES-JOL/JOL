@@ -61,14 +61,21 @@ public class StatisticsResource {
         return getJolStats(HistoryService.getHistory().values(), body);
     }
     @POST
-    @Path("/performance/{playerName}/decks")
-    public List<DeckMatchup> getDeckPerformance(@PathParam("playerName") String playerName, StatsRequest body) {
-        return getDeckMatchs(HistoryService.getHistory().values(), playerName, body);
-    }
-    @POST
     @Path("/jol/clans")
     public Map<String, Long> getStatsJolClans(StatsRequest body) {
         return getClanPerformance(HistoryService.getHistory().values(), body);
+    }
+
+    @GET
+    @Path("/jol/kpis")
+    public MetricsService.JolFacts getStatsJolKpis() {
+        return MetricsService.getStats();
+    }
+
+    @POST
+    @Path("/performance/{playerName}/decks")
+    public List<DeckMatchup> getDeckPerformance(@PathParam("playerName") String playerName, StatsRequest body) {
+        return getDeckMatchs(HistoryService.getHistory().values(), playerName, body);
     }
 
     @POST
@@ -107,7 +114,7 @@ public class StatisticsResource {
         return getCommands(
                 body,
                 MetricsService.loadCommands(),
-                MetricsService.CommandMetricDto::game
+                MetricsService.CommandMetricDto::gameName
         );
     }
 
@@ -661,6 +668,8 @@ public class StatisticsResource {
             List<MetricsService.CommandMetricDto> load,
             Function<MetricsService.CommandMetricDto, String> keyExtractor) {
         return load.stream()
+                .filter(Objects::nonNull)
+                .filter(cmd -> Objects.equals(cmd.status(),"INFO"))
                 .filter(data -> {
                     if(!body.fromDate().equals("") && !body.toDate().equals("")) {
                         return data.timestamp().toLocalDate().isAfter(LocalDate.parse(body.fromDate())) &&
@@ -670,8 +679,8 @@ public class StatisticsResource {
                 })
                 .filter(data -> {
                     if(body.isTourney()) {
-                        return data.game().contains("Final Table") ||
-                                Pattern.compile("Round\\s+\\d+\\s*-\\s*Table\\s+\\d+").matcher(data.game()).find();
+                        return data.gameName().contains("Final Table") ||
+                                Pattern.compile("Round\\s+\\d+\\s*-\\s*Table\\s+\\d+").matcher(data.gameName()).find();
                     }
                     return true;
                 })
@@ -772,6 +781,9 @@ public class StatisticsResource {
                                                 .count(),
                                         list.stream()
                                                 .filter(cmd -> cmd.command().startsWith("open"))
+                                                .count(),
+                                        list.stream()
+                                                .filter(cmd -> cmd.command().startsWith("ping"))
                                                 .count()
                                 )
                         )
@@ -779,7 +791,7 @@ public class StatisticsResource {
     }
 
     // Utils for checking Game History Relevance
-    private boolean isTournamentGame(GameHistory game) {
+    private static boolean isTournamentGame(GameHistory game) {
         return game.getName().contains("Final Table") ||
                 Pattern.compile("Round\\s+\\d+\\s*-\\s*Table\\s+\\d+").matcher(game.getName()).find();
     }

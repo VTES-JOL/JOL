@@ -11,6 +11,16 @@
     </li>
     <li class="nav-item">
         <button class="nav-link"
+                id="jolKpiTab"
+                onclick="renderStats()"
+                data-bs-toggle="tab"
+                data-bs-target="#jolKpiPane"
+                type="button">
+            KPI's
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link"
                 id="jolMetricsTab"
                 onclick="renderStats()"
                 data-bs-toggle="tab"
@@ -37,7 +47,8 @@
                             Chart
                         </button>
                     </h2>
-                    <div id="jolChartCollapse" class="accordion-collapse collapse show" aria-labelledby="jolChartHeading">
+                    <div id="jolChartCollapse" class="accordion-collapse collapse show"
+                         aria-labelledby="jolChartHeading">
                         <div class="accordion-body">
                             <div style="height: 350px;">
                                 <canvas id="jolChart"></canvas>
@@ -110,16 +121,17 @@
             <div class="accordion mb-3" id="jolPlayerMetricsAccordion">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="jolPlayerMetricsHeading">
-                        <button class="accordion-button"
+                        <button class="accordion-button collapsed"
                                 type="button"
                                 data-bs-toggle="collapse"
                                 data-bs-target="#jolPlayerMetricsCollapse"
-                                aria-expanded="true"
+                                aria-expanded="false"
                                 aria-controls="jolPlayerMetricsCollapse">
                             Player Metrics
                         </button>
                     </h2>
-                    <div id="jolPlayerMetricsCollapse" class="accordion-collapse collapse show"
+                    <div id="jolPlayerMetricsCollapse" class="accordion-collapse collapse"
+                         data-bs-parent="#jolMetricsPane"
                          aria-labelledby="jolPlayerMetricsHeading">
                         <div class="accordion-body p-0">
                             <div class="overflow-auto" style="max-height:100vh;">
@@ -164,6 +176,7 @@
                         </button>
                     </h2>
                     <div id="jolGamesMetricsCollapse" class="accordion-collapse collapse"
+                         data-bs-parent="#jolMetricsPane"
                          aria-labelledby="jolGamesMetricsHeading">
                         <div class="accordion-body p-0">
                             <div class="overflow-auto" style="max-height:100vh;">
@@ -209,13 +222,14 @@
                         </button>
                     </h2>
                     <div id="jolPlayerCommandsCollapse" class="accordion-collapse collapse"
+                         data-bs-parent="#jolMetricsPane"
                          aria-labelledby="jolPlayerCommandsHeading">
                         <div class="accordion-body p-0">
                             <div class="overflow-auto" style="max-height:100vh;">
                                 <table id="playerCommands" class="table table-sm mb-0">
                                     <thead>
                                     <tr>
-                                        <th class="sticky-top bg-white">Player
+                                        <th class="sticky-top bg-white w-25">Player
                                             <input type="text" id="playerCommandFilter"
                                                    oninput="filterName('#playerCommands tbody tr', 'playerCommandFilter', 1)">
                                             <i class="bi bi-filter" onclick="sortTable(0, 'playerCommands')"></i>
@@ -313,6 +327,9 @@
                                         <th class="sticky-top bg-white">Open
                                             <i class="bi bi-filter" onclick="sortTable(31, 'playerCommands')"></i>
                                         </th>
+                                        <th class="sticky-top bg-white">Ping
+                                            <i class="bi bi-filter" onclick="sortTable(32, 'playerCommands')"></i>
+                                        </th>
                                     </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -333,13 +350,14 @@
                         </button>
                     </h2>
                     <div id="jolGameCommandsCollapse" class="accordion-collapse collapse"
+                         data-bs-parent="#jolMetricsPane"
                          aria-labelledby="jolGameCommandsHeading">
                         <div class="accordion-body p-0">
                             <div class="overflow-auto" style="max-height:100vh;">
                                 <table id="gameCommands" class="table table-sm mb-0">
                                     <thead>
                                     <tr>
-                                        <th class="sticky-top bg-white">Game
+                                        <th class="sticky-top bg-white w-15">Game
                                             <input type="text" id="gameCommandFilter"
                                                    oninput="filterName('#gameCommands tbody tr', 'gameCommandFilter', 1)">
                                             <i class="bi bi-filter" onclick="sortTable(0, 'gameCommands')"></i>
@@ -437,6 +455,9 @@
                                         <th class="sticky-top bg-white">Open
                                             <i class="bi bi-filter" onclick="sortTable(31, 'gameCommands')"></i>
                                         </th>
+                                        <th class="sticky-top bg-white">Ping
+                                            <i class="bi bi-filter" onclick="sortTable(32, 'gameCommands')"></i>
+                                        </th>
                                     </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -448,6 +469,48 @@
             </div>
         </div>
     </div>
-</div>
 
+    <div class="tab-pane fade" id="jolKpiPane">
+        <div class="row">
+            <div class="col-sm-3 p-3">
+                <div class="card border-dark mb-3">
+                    <div class="card-header">GAMES</div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" id="activeGamesKpi"></li>
+                        <li class="list-group-item" id="tournamentGamesKpi"></li>
+                        <li class="list-group-item" id="pastGamesKpi"></li>
+                        <li class="list-group-item" id="pastTournamentKpi"></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-3 p-3">
+                <div class="card border-dark mb-3">
+                    <div class="card-header">DECKS</div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" id="decksKpi"></li>
+                        <li class="list-group-item" id="decksByPlayerKpi"></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-3 p-3">
+                <div class="card border-dark mb-3">
+                    <div class="card-header">PLAYER</div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" id="gamesByPlayerKpi"></li>
+                        <li class="list-group-item" id="tournamentsByPlayerKpi"></li>
+                        <li class="list-group-item" id="oustedByPlayerKpi"></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-3 p-3">
+                <div class="card border-dark mb-3">
+                    <div class="card-header">NATION</div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" id="nationsByPlayerKpi"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 

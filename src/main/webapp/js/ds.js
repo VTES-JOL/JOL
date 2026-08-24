@@ -116,6 +116,7 @@ const DS = {
     statsMetricsGame:        (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/metrics/game`, {treshold, fromDate, toDate, isTourney}, opts),
     statsCommandsPlayer:     (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/commands/player`, {treshold, fromDate, toDate, isTourney}, opts),
     statsCommandsGame:       (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/commands/game`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsJolKpis:               (opts) => apiGet(`/stats/jol/kpis`,  opts),
     updateSiteNotes:         (notes, opts) => apiPut('/admin/site-notes', {notes}, opts),
     clearSiteNotes:          (opts) => apiDel('/admin/site-notes', opts),
 
@@ -3180,7 +3181,8 @@ function renderStats() {
         DS.statsMetricsPlayer(0, fromDate, toDate, isTourney,{
             callback: (data) => {
                 createMetrics(data, "#playerMetrics tbody");
-            }, errorHandler: errorhandler});
+            }, errorHandler: errorhandler
+        });
         DS.statsMetricsGame(0, fromDate, toDate, isTourney,{
             callback: (data) => {
                 createMetrics(data, "#gamesMetrics tbody");
@@ -3191,9 +3193,30 @@ function renderStats() {
             }, errorHandler: errorhandler});
         DS.statsCommandsGame(0, fromDate, toDate, isTourney,{
             callback: (data) => {
-                createCommands(data, "#gamesCommandos tbody");
+                createCommands(data, "#gameCommands tbody");
+            }, errorHandler: errorhandler});
+    } else if($('#jolKpiTab').hasClass('active')) {
+        DS.statsJolKpis({
+            callback: (data) => {
+                createKpis(data);
             }, errorHandler: errorhandler});
     }
+}
+
+function createKpis(kpis) {
+    $('#activeGamesKpi').text("ACTIVE: "+ kpis.activeGames);
+    $('#tournamentGamesKpi').text("TOURNAMENTS: "+ kpis.tournamentGames);
+    $('#pastGamesKpi').text("PAST: "+ kpis.pastGames);
+    $('#pastTournamentKpi').text("PAST TOURNAMENT: "+ kpis.pastTournament);
+
+    $('#decksKpi').text("ALL DECKS:" + kpis.decks);
+    $('#decksByPlayerKpi').text("MOST DECKS: " + Object.values(kpis.decksByPlayer)[0]);
+
+    $('#gamesByPlayerKpi').text("WITH MOST ACTIVE GAMES: " + Object.values(kpis.gamesByPlayer)[0]);
+    $('#tournamentsByPlayerKpi').text("WITH MOST TOURNAMENT GAMES: " + Object.values(kpis.tournamentsByPlayer)[0]);
+    $('#oustedByPlayerKpi').text("WITH MOST OUSTED GAMES: " + Object.values(kpis.oustedByPlayer)[0]);
+
+    $('#nationsByPlayerKpi').text("WITH MOST PLAYERS:" + Object.values(kpis.nationsByPlayer)[0]);
 }
 
 function createMetrics(data, target) {
@@ -3251,10 +3274,9 @@ function createCommands(data, target) {
         let sect = $("<td/>").text(count[28]);
         let clan = $("<td/>").text(count[29]);
         let open = $("<td/>").text(count[30]);
-        row.append(name, timeout, vp, choose, reveal, label, votes, random, flip, discard, draw, edge, play, influence, move, burn, pool, blood, contest, disc, capacity, unlock, lock, order, show, shuffle, transfer, rfg, path, sect, clan, open);
+        let ping = $("<td/>").text(count[31]);
+        row.append(name, timeout, vp, choose, reveal, label, votes, random, flip, discard, draw, edge, play, influence, move, burn, pool, blood, contest, disc, capacity, unlock, lock, order, show, shuffle, transfer, rfg, path, sect, clan, open, ping);
         commands.append(row);
-        row.append(name, started, ended, net, wins, winRate, vps, avgVp, avgDuration, bestPlayer, bestDeck, bestNation);
-        table.append(row);
     })
 }
 
