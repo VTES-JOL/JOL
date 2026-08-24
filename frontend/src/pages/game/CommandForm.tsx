@@ -29,6 +29,17 @@ export function CommandForm({
   const [submitting, setSubmitting] = useState(false);
   const [showQuickCommand, setShowQuickCommand] = useState(false);
   const [showQuickChat, setShowQuickChat] = useState(false);
+  // Deliberately local, not read off `game.status` — the submit response's
+  // status is transient (server never persists it), but `game` itself gets
+  // clobbered by the very next refresh this same submit triggers: saving
+  // game state always fires a WebSocket push to everyone in the room,
+  // including the submitter, and GamePage's plain GET /view refetch in
+  // response to it always carries status: null. That refetch typically lands
+  // within the same tick as this request's own response, so a status read
+  // from `game.status` would flash (or never render at all) regardless of
+  // who is watching. Keeping it here instead means it survives until this
+  // player's own next submit.
+  const [status, setStatus] = useState('');
 
   useEffect(() => setPhase(game.phases[0] ?? ''), [game.phases]);
 
@@ -53,6 +64,7 @@ export function CommandForm({
         setCommand('');
         setChat('');
         setPing('');
+        setStatus(updated.status ?? '');
         onUpdated(updated);
       })
       .catch((err) => {
@@ -65,7 +77,10 @@ export function CommandForm({
   const sendQuickCommand = (quickCommand: string) => {
     api
       .post<GameSnapshot>(`/game/${gameId}/view/submit`, { phase: null, command: quickCommand, chat: null, ping: null })
-      .then(onUpdated)
+      .then((updated) => {
+        setStatus(updated.status ?? '');
+        onUpdated(updated);
+      })
       .catch((err) => {
         console.error('Failed to submit', err);
         showError('Failed to submit.');
@@ -75,7 +90,10 @@ export function CommandForm({
   const sendQuickChat = (message: string) => {
     api
       .post<GameSnapshot>(`/game/${gameId}/view/submit`, { phase: null, command: null, chat: message, ping: null })
-      .then(onUpdated)
+      .then((updated) => {
+        setStatus(updated.status ?? '');
+        onUpdated(updated);
+      })
       .catch((err) => {
         console.error('Failed to submit', err);
         showError('Failed to submit.');
@@ -178,7 +196,7 @@ export function CommandForm({
             </button>
           )}
         </form>
-        {game.status && <div className="text-danger small mt-2">{game.status}</div>}
+        {status && <div className="text-danger small mt-2">{status}</div>}
       </div>
       {showQuickCommand && <QuickCommandModal onSend={sendQuickCommand} onClose={() => setShowQuickCommand(false)} />}
       {showQuickChat && <QuickChatModal onSend={sendQuickChat} onClose={() => setShowQuickChat(false)} />}
