@@ -23,6 +23,16 @@ cd frontend && npm install && npm run dev
 
 # Run Cucumber BDD tests
 ./mvnw test -Dtest=RunCucumberTest
+
+# Frontend: type-check + build, lint, unit/component tests (from frontend/)
+npm run build
+npm run lint
+npm run test
+
+# Frontend: end-to-end tests (Playwright) — starts both Tomcat (against a
+# disposable copy of the test fixture data) and the Vite dev server itself;
+# see frontend/README.md's Testing section for details
+npm run test:e2e
 ```
 
 Tests require `JOL_DATA` and `ENABLE_TEST_MODE=true` — these are set via `@SetEnvironmentVariable` on the test classes, so no manual setup is needed when running via Maven.
@@ -38,9 +48,9 @@ The `Builder` tag is excluded from the default test run — these are `CardDatab
 | `ENABLE_CAPTCHA` | Set to `false` for local dev |
 | `JOL_RECAPTCHA_KEY` / `JOL_RECAPTCHA_SECRET` | reCAPTCHA credentials |
 | `DISCORD_BOT_TOKEN` / `DISCORD_PING_CHANNEL_ID` | Discord integration |
-| `VAPID_PUBLIC_KEY` | Web push (VAPID) public key, embedded client-side in `notification.jsp` for `pushManager.subscribe()`. Set via `.keys` (see `docker-compose.yml`'s `env_file`). The matching private key is **not** an env var — `NotificationService` reads it from `<JOL_DATA>/vapid_private.pem`, so that file must be copied into the `JOL_DATA` volume (e.g. from `notifications/vapid_private.pem`) for any environment that needs to send pushes. |
+| `VAPID_PUBLIC_KEY` | Web push (VAPID) public key, fetched via `GET /jol/api/config` (`ConfigResource`) and used client-side by `frontend/src/push/pushNotifications.ts` for `pushManager.subscribe()`. Set via `.keys` (see `docker-compose.yml`'s `env_file`). The matching private key is **not** an env var — `NotificationService` reads it from `<JOL_DATA>/vapid_private.pem`, so that file must be copied into the `JOL_DATA` volume (e.g. from `notifications/vapid_private.pem`) for any environment that needs to send pushes. |
 | `TYPE` | Visual env label (`dev`, `prod`, etc.) |
-| `BASE_URL` | Origin card images/HTML/JSON tooltips are fetched from — embedded client-side (`main.jsp`'s `BASE_URL` script global, read by `ds.js`/`card-modal.js`) and exposed via `GET /jol/api/config` (`ConfigResource`, read by the React app's `getBaseUrl()` for **non-`/main` pages** — `/main` itself always uses a relative path in dev regardless of this var, see `frontend/src/api/config.ts`). Defaults to `https://static.dev.deckserver.net`, which never resolves to anything reachable in local dev (it was only ever an `/etc/hosts` entry pointing at a now-removed local nginx container) — **for local dev, set `BASE_URL=https://localhost:5173`** so legacy (non-`/main`) pages' card tooltips resolve to the Vite dev server instead, which serves the same local `static/` directory itself (`frontend/serveCardAssets.ts`). Unset in prod (`docker-compose.yml`), where the real default is correct. |
+| `BASE_URL` | Origin card images/HTML/JSON tooltips are fetched from — exposed via `GET /jol/api/config` (`ConfigResource`), read by the React app's `getBaseUrl()` (`frontend/src/api/config.ts`). Only matters for a production build: in `npm run dev`, `getBaseUrl()` unconditionally returns a relative path instead, since Vite's own `serveCardAssets.ts` already serves the local `static/` directory directly — this env var is never consulted in dev at all. Defaults to `https://static.dev.deckserver.net`, which never resolves to anything reachable outside prod (it was only ever an `/etc/hosts` entry pointing at a now-removed local nginx container). Unset in prod (`docker-compose.yml`), where the real default is correct. |
 
 ## Architecture Overview
 
@@ -48,24 +58,24 @@ This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deck
 
 ### Request Flow
 
-1. Browser calls hand-written `ds.js` (a fetch-based REST client) which posts to `/jol/api/...`
-2. Jersey JAX-RS resources (`net.deckserver.rest`) handle each endpoint and delegate to **`JolAdmin`** or services
-3. `JolAdmin` manages in-memory `GameModel` / `PlayerModel` maps and routes to **`JolGame`** or **`DoCommand`**
-4. Services persist state back to JSON files on a schedule (via `PersistedService`) or on demand
-5. Server-push notifications are sent over WebSocket (`/ws/updates`) via `WebSocketRegistry`
+1. Browser loads the React SPA (`frontend/`, bundled into the WAR at `/react/*`) — every top-level view (`/main`, `/lobby`, `/game/*`, etc.) is forwarded there by `MainServlet` once `AuthService` confirms a session; `/login` is served unauthenticated by `LoginServlet`
+2. The SPA's `api/client.ts` (a thin fetch wrapper) calls `/jol/api/...` directly — there's no hand-written JS shim between them anymore (the old `ds.js` client and every legacy JSP it drove were deleted wholesale in the React migration)
+3. Jersey JAX-RS resources (`net.deckserver.rest`) handle each endpoint and delegate to **`JolAdmin`** or services
+4. `JolAdmin` manages in-memory `GameModel` / `PlayerModel` maps and routes to **`JolGame`** or **`DoCommand`**
+5. Services persist state back to JSON files on a schedule (via `PersistedService`) or on demand
+6. Server-push notifications are sent over WebSocket (`/ws/updates`) via `WebSocketRegistry`; the SPA treats each push as a signal to re-fetch (`ws/useGameSocket.ts`, `ws/useJolSocket.ts`), not as a payload carrier itself
 
 ### Package Map
 
 - **`net.deckserver`** — `JolAdmin` (singleton orchestrator); `Recaptcha`
 - **`net.deckserver.dwr`**
-  - `bean/` — JSON response objects returned to the frontend
-  - `creators/` — populate beans for each page/view (`GameCreator`, `LobbyCreator`, etc.); `UpdateFactory` builds the full page-update response
+  - `bean/` — JSON response objects returned to the frontend (`GameSnapshot`, `LobbyPageBean`, `NavBean`, etc.), built directly by `net.deckserver.rest` resources and factories (e.g. `GameSnapshotFactory`) — the old `creators/` package and `UpdateFactory`/`JspRenderer`/`RequestContext` (which built one shared page-update response and rendered JSP fragments into it) were removed once every view had its own dedicated REST endpoint
   - `model/` — core game logic
     - `JolGame` — record holding game id + `GameData`; all game state mutation methods
     - `DoCommand` — record; parses and executes player text commands (e.g. `burn library 1`)
     - `GameModel` — in-memory per-game view; held in `JolAdmin.gmap`
     - `PlayerModel` — in-memory per-player state; held in `JolAdmin.pmap`
-    - `GameView` — player-centric view with toggle/changed state flags
+    - `GameView` — per-player region collapse/expand state (client now owns most of what this used to track — see `PlayerBoard.tsx`'s comment on `ALWAYS_COLLAPSED`)
     - `ModelLoader` — converts between UI objects and XML/JSON data objects
     - `CommandParser` — tokenises command strings
 - **`net.deckserver.services`** — static service singletons
@@ -81,18 +91,19 @@ This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deck
   - `enums/` — domain enums: `RegionType`, `CardType`, `Clan`, `Phase`, `GameStatus`, etc.
   - `jaxb/` — legacy XML serialization for `game.xml` (state) and `actions.xml` (chat history) via JaxB; `XmlFileUtils` wraps load/save
   - `validators/` — deck validation: `StandardDeckValidator`, `V5DeckValidator`, `DuelDeckValidator`, `PlayTestValidator` all extend `AbstractDeckValidator`; use `ValidatorFactory`
-- **`net.deckserver.servlet`** — JSP/Servlet entry points: `LoginServlet`, `LogoutServlet`, `RegisterServlet`, `MainServlet`; JSP templates under `WEB-INF/jsps/`
-  - `JspRenderer` — renders a JSP to a String (replaces DWR's `WebContextFactory.forwardToString()`)
-  - `RequestContext` — thread-local holder for `HttpServletRequest`/`HttpServletResponse` used by `UpdateFactory`
-- **`net.deckserver.rest`** — Jersey JAX-RS REST API (`/jol/api/...`); fully replaces DWR
-  - `BaseResource` — base class: injects `SecurityContext` + HTTP context, calls `UpdateFactory`
-  - `PageResource` — `POST /navigate`, `GET /poll`, `POST /chat`
-  - `LobbyResource` — `POST /lobby/games`, deck registration, invites
-  - `GameActionResource` — submit commands, end turn, toggle, notes, state, history
-  - `DeckResource` — deck CRUD and validation
-  - `UserResource` — profile, password, preferences
-  - `AdminResource` — roles, player management, CSV export
-  - `TournamentResource` — full tournament lifecycle
+- **`net.deckserver.servlet`** — no JSPs left (every one was deleted along with `ds.js`/`card-modal.js` once its React equivalent shipped — see Frontend + API Notes below)
+  - `MainServlet` — `@WebServlet` on every top-level view path (`/`, `/main`, `/lobby`, `/game/*`, etc.); gates auth via `AuthService`, then always forwards to `/react/index.html`
+  - `LoginServlet` — serves `/login` unauthenticated, forwarding to the same `/react/index.html` (the SPA renders the login page itself based on route)
+  - `DwrCompatibilityServlet` — catches stray `/jol/dwr/**` calls from browser tabs still running the pre-migration client and forces a hard reload
+  - `JolApplicationInitializer` — Jersey/Jakarta servlet bootstrap
+- **`net.deckserver.rest`** — Jersey JAX-RS REST API (`/jol/api/...`); the SPA's sole backend interface
+  - `BaseResource` — base class: injects `SecurityContext` + HTTP context
+  - `PageResource` — `GET /nav` (polled by `frontend/src/nav/NavContext.tsx` for the authenticated shell's nav state), `POST /chat`
+  - `LobbyResource` — `/lobby/player/games` CRUD (create/start/close), deck registration, invites
+  - `GameActionResource` / `GameStateResource` — the former holds what's still shared with the old DWR-era surface (deck/players/turns/history/notes); the latter is the SPA-only `/game/{id}/view` + `view/submit` + `view/end-turn` used by `GamePage.tsx`
+  - `DeckResource` / `DeckPageResource` — deck CRUD, validation, and the deck-editor page's combined view
+  - `AuthResource` — login/register/logout (replaces the old JSP form POSTs)
+  - `ProfileResource`, `AdminResource`, `AdminPageResource`, `TournamentResource`, `MainResource`, `WatchResource`, `StatisticsResource`, `ConfigResource`, `NotificationResource` — one resource per SPA page/concern, each returning that page's own bean directly (see `frontend/src/api/types.ts` for the mirrored shapes)
   - `SecurityFilter` — rejects unauthenticated API calls with 401
 - **`net.deckserver.ws`** — WebSocket push
   - `JolWebSocketEndpoint` — `@ServerEndpoint("/ws/updates")`; shares HTTP session auth; handles join/leave/ping frames
@@ -118,10 +129,13 @@ cards/              # vtescrypt.csv, vteslib.csv  (VEKN official)
 
 ### Frontend + API Notes
 
-- `src/main/webapp/js/ds.js` is a hand-written fetch-based REST client. It exposes the same `DS.*` surface the old DWR code did, so JSPs and game JS didn't need to change call sites. New API methods go in `ds.js` + the matching JAX-RS resource.
-- Responses from JAX-RS resources are `Map<String, Object>` built by `UpdateFactory.getUpdate(playerName)` — same bean structure as before. `RequestContext.set(req, res)` must be called before `UpdateFactory` so `JspRenderer` can render JSP fragments into the response.
-- WebSocket at `/ws/updates` (Tomcat JSR-356) carries lightweight push signals — clients re-poll the REST API on receipt rather than receiving full payloads over the socket.
+The entire client is now `frontend/` — a Vite/TypeScript/React SPA. Every legacy JSP, and the hand-written `ds.js`/`card-modal.js` REST client/tooltip JS that drove them, were deleted outright once each view had a React equivalent; there's no incremental JSP-vs-React branching left anywhere in the request path (see `MainServlet`/`LoginServlet` above). See `frontend/README.md` for the frontend project's own structure, scripts, and testing setup — this section only covers how it fits into the wider app.
+
+- New API methods go in `frontend/src/api/client.ts` (or a page-specific API module, e.g. `pages/login/authApi.ts`) + the matching JAX-RS resource. Add the response shape to `frontend/src/api/types.ts`, kept as hand-written mirrors of the Java beans — update both sides together when a bean's shape changes.
+- JAX-RS resources return the bean directly (e.g. `GameSnapshot`, `LobbyPageBean`) — no shared envelope; each SPA page fetches only what it needs from its own dedicated endpoint(s).
+- WebSocket at `/ws/updates` (Tomcat JSR-356) carries lightweight push signals — the SPA re-fetches the relevant REST endpoint on receipt (`frontend/src/ws/useGameSocket.ts`, `useJolSocket.ts`) rather than receiving full payloads over the socket. Because a state-saving action also notifies the actor's own session, any state derived only from a full-snapshot refresh (not the mutating request's own response) can be overwritten by that self-triggered refetch within the same round trip — see `CommandForm.tsx`'s `status` field for a concrete case (server-side command-validation errors are kept in local component state instead of read off the snapshot, for exactly this reason).
 - Card HTML/JSON for tooltips/modals is generated by `CardDatabaseBuilder` (test-scope) and served statically from `static.deckserver.net` (CloudFront/nginx in prod). Local dev serves the same `static/` directory directly via `frontend/serveCardAssets.ts` (Vite) — no local nginx/Docker layer needed.
+- The built SPA lands at `target/react-dist` (via `frontend-maven-plugin`) and is copied into the WAR at `/react/*` by `maven-war-plugin` — see `web.xml`'s `/react/*` static mapping and its comment for why that mapping has to exist explicitly (without it, requests for the SPA's own hashed asset files recurse into `MainServlet` and stack-overflow).
 
 ### Deployment
 
