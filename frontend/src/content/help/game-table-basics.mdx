@@ -1,0 +1,31 @@
+# Game Table Basics
+
+<p className="help-lede">Commands are how everything at the table happens — this is how they find the card you mean.</p>
+
+## Command Basics
+
+Every action that changes the state of a game can be typed as a command. Some of the same actions are also available by clicking, but understanding commands unlocks more complicated card interactions, and lets you do things click-to-play doesn't cover yet.
+
+## Targeting a Card
+
+JOL locates a card using **`[PLAYER] [REGION] [INDEX]`**. `INDEX` is the card's position within the region, counting from 1 — and when a card sits on top of another (equipment, blood counters, allies), the same index chain can walk down into that stack: `2 2` means "the 2nd card in the region, then the 2nd card stacked on it."
+
+<RegionExample label="Ready" type="READY">
+  <CardExample name="Leumeah" cardId="201526" clan="brujah" capacity={6} counters={6} label="3" disciplines="pot,for,cel,PRE" locked />
+  <CardExample name="Casey Snyder" cardId="201521" clan="gangrel" capacity={6} counters={6} label="2" disciplines="for,cel,ani,PRO">
+    <CardExample name="Raven Spy" cardId="101550" counters={1} />
+    <CardExample name="Dog Pack" cardId="100568" counters={1} />
+    <CardExample name="Sniper Rifle" cardId="101816" />
+  </CardExample>
+</RegionExample>
+
+| Target | Card chosen |
+| --- | --- |
+| `caine ready 1` | <CardLink id="201526">Leumeah</CardLink> |
+| `caine ready 2 2` | <CardLink id="100568">Dog Pack</CardLink> |
+
+Most commands that touch a card use exactly this format. Some fill in a default `PLAYER` or `REGION` when you leave it out — see each command's reference below for what its defaults are.
+
+<Callout title="Tip">
+  Type just the region and index to target one of your own cards — most commands default `PLAYER` to yourself, so `move 2 1 ready 1` (see [Playing & Moving Cards](/jol/help/playing-and-moving-cards)) never needs your own name in it.
+</Callout>

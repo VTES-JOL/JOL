@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import basicSsl from '@vitejs/plugin-basic-ssl'
+import mdx from '@mdx-js/rollup'
+import remarkGfm from 'remark-gfm'
 import { serveCardAssets } from './serveCardAssets.js'
 
 const BACKEND = 'http://localhost:8080'
@@ -11,7 +13,7 @@ const BACKEND = 'http://localhost:8080'
 // (css/js/images/fonts) and the REST API/WebSocket all keep working through
 // that proxy. register/logout have no GET page of their own anymore — both
 // are REST calls (AuthResource) the login page itself makes.
-const FRONTEND_ROUTES = new Set(['/jol', '/jol/', '/jol/main', '/jol/main.jsp', '/jol/profile', '/jol/admin', '/jol/tournamentAdmin', '/jol/tournament', '/jol/active', '/jol/lobby', '/jol/deck', '/jol/login'])
+const FRONTEND_ROUTES = new Set(['/jol', '/jol/', '/jol/main', '/jol/main.jsp', '/jol/profile', '/jol/admin', '/jol/tournamentAdmin', '/jol/tournament', '/jol/active', '/jol/lobby', '/jol/deck', '/jol/login', '/jol/help'])
 
 // Served in prod from inside the WAR at /jol/react/*, forwarded there by
 // MainServlet for converted routes. In dev, Vite terminates TLS itself and
@@ -33,7 +35,14 @@ const FRONTEND_ROUTES = new Set(['/jol', '/jol/', '/jol/main', '/jol/main.jsp', 
 // developer can or should have a copy of locally.
 export default defineConfig({
   base: '/jol/',
-  plugins: [react(), basicSsl(), serveCardAssets()],
+  // mdx() must run before react() — it compiles content/help/*.mdx into
+  // plain JSX-emitting JS (via the automatic jsx-runtime), which react()'s
+  // babel transform then needs to see already in place. remark-gfm enables
+  // GitHub-flavored markdown extensions — tables in particular, used by
+  // several help sections — which plain CommonMark (MDX's default) doesn't
+  // parse; without it a `| a | b |` block renders as a literal paragraph of
+  // pipe characters instead of a <table>.
+  plugins: [mdx({ remarkPlugins: [remarkGfm] }), react(), basicSsl(), serveCardAssets()],
   server: {
     // Deliberately not port 443: binding it needs root (or an OS-specific
     // privileged-port workaround — pf redirect on macOS, setcap/authbind on
@@ -62,10 +71,12 @@ export default defineConfig({
           if (path.startsWith('/jol/@') || path.startsWith('/jol/src/') || path.startsWith('/jol/node_modules/')) {
             return path
           }
-          // /jol/game/<id> — the id is dynamic, so this can't live in the
-          // static FRONTEND_ROUTES set above (mirrors MainServlet's "/game/*"
-          // wildcard mapping treating any /game/<id> as React-owned).
+          // /jol/game/<id> and /jol/help/<section> — both have a dynamic
+          // trailing segment, so they can't live in the static FRONTEND_ROUTES
+          // set above (mirrors MainServlet's "/game/*"/"/help/*" wildcard
+          // mappings treating any such path as React-owned).
           if (path.startsWith('/jol/game/')) return path
+          if (path.startsWith('/jol/help/')) return path
           if (FRONTEND_ROUTES.has(path)) return path
           return undefined // fall through to the proxy target above
         },

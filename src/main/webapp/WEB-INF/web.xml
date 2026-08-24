@@ -8,15 +8,9 @@
     <display-name>V:TES Online</display-name>
     <description>Vtes Online Web Client</description>
 
-    <servlet>
-        <servlet-name>help</servlet-name>
-        <jsp-file>/WEB-INF/help.jsp</jsp-file>
-    </servlet>
-
     <servlet-mapping>
         <servlet-name>default</servlet-name>
         <url-pattern>/css/*</url-pattern>
-        <url-pattern>/js/*</url-pattern>
         <url-pattern>/fonts/*</url-pattern>
         <url-pattern>/images/*</url-pattern>
         <url-pattern>/sw.js</url-pattern>
@@ -31,11 +25,6 @@
           path itself and never lets these requests reach Tomcat.
         -->
         <url-pattern>/react/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>help</servlet-name>
-        <url-pattern>/help</url-pattern>
     </servlet-mapping>
 
     <!--

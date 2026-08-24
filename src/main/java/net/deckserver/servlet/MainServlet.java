@@ -20,7 +20,7 @@ import java.io.IOException;
 // to a real nav-linked view (dead aliases predating this migration) — see
 // the React migration plan for how each route above was converted.
 @WebServlet({"/", "/main.jsp", "/main", "/lobby", "/deck", "/admin", "/game/*",
-        "/tournament", "/tournamentAdmin", "/profile", "/active"})
+        "/tournament", "/tournamentAdmin", "/profile", "/active", "/help", "/help/*"})
 public class MainServlet extends HttpServlet {
 
     @Override

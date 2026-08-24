@@ -1,0 +1,45 @@
+# Deck Editor
+
+<p className="help-lede">How JOL parses card names and deck lists, and what the editor checks for you.</p>
+
+## Card Names
+
+JOL uses text-based deck lists, so each card needs one or more unambiguous ways to be written. Names come from the [VEKN official card list](https://www.vekn.net/images/stories/downloads/cardlist.txt), and several rules combine to generate the full set of names JOL will accept:
+
+| Rule               | Description                                                                                                                | Example                                                                                   | Valid names                                                                                          |
+|--------------------|----------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| Official name      | The name as printed in the official card list.                                                                             | <CardLink id="201257">Sébastien Goulet</CardLink>                                         | <CardLink id="201257">Sébastien Goulet</CardLink>                                                    |
+| Aliases            | Every **AKA** entry in the card list is also a valid name.                                                                 | <CardLink id="201257">Sébastian Goulet</CardLink>                                         | <CardLink id="201257">Sébastian Goulet</CardLink>, <CardLink id="201257">Sébastien Goulet</CardLink> |
+| Unicode characters | Any name/alias with accented characters also gets a plain-ASCII alias.                                                     | <CardLink id="201257">Sebastian Goulet</CardLink>                                         | Any accented or unaccented spelling above                                                            |
+| Comma names        | Cards printed as `Name, The` can also be typed with `The` first.                                                           | <CardLink id="200101">Ankou, The</CardLink>                                               | <CardLink id="200101">The Ankou</CardLink>, <CardLink id="200101">Ankou, The</CardLink>              |
+| Advanced           | Advanced vampires get an `(ADV)` suffix.                                                                                   | <CardLink id="201363">Theo Bell <i className="icon adv" /></CardLink>                     | <CardLink id="201363">Theo Bell (ADV)</CardLink>                                                     |
+| Grouping           | Vampires that share a name across groups can be told apart with `(G#)` — always valid to include, even when not ambiguous. | <CardLink id="201362">Theo Bell</CardLink><br/><CardLink id="201613">Theo Bell</CardLink> | <CardLink id="201362">Theo Bell</CardLink>, <CardLink id="201613">Theo Bell (G6)</CardLink>          |
+
+These rules combine — <CardLink id="200101">Ankou, The</CardLink> group 5 accepts `Ankou, The`, `Ankou, The (G5)`, `The Ankou`, and `The Ankou (G5)`; <CardLink id="201257">Sébastien Goulet</CardLink> group 3 accepts all 8 combinations of accented/unaccented spelling, alias, and group suffix.
+
+## Deck Format
+
+The editor looks for four line patterns; anything else is discarded when the deck is parsed:
+
+| Line format       | Meaning                                          |
+|-------------------|--------------------------------------------------|
+| `4 x Theo Bell`   | A count, the letter `x`, then the card name.     |
+| `4 Theo Bell`     | A count and the card name — the `x` is optional. |
+| `Theo Bell (ADV)` | A single copy of the card, with no count.        |
+| *(blank line)*    | Skipped.                                         |
+
+Counts of the same card are combined once parsing finishes — the deck is simplified automatically when you save.
+
+<DeckPreviewExample name="Example paste" crypt="4 x Theo Bell, 3 x Theo Bell (ADV)" valid library="" />
+
+Pasting the four lines `Theo Bell` / `Theo Bell` / `2 x Theo Bell` / `2 Theo Bell (ADV)` / `1 x Theo Bell (G2 ADV)` produces the deck above — every mention of the base card combines into one `4 x` line, and the advanced copies combine separately.
+
+## Using the Deck Editor
+
+The built-in editor is intentionally basic — there's no card search. For building a list, a dedicated deck-building site is faster: [VDB](https://vdb.im/), [Amaranth](https://amaranth.vtes.co.nz/), or [VTES Decks](https://vtesdecks.com/). Paste the finished list into JOL to register it for play.
+
+What the editor *does* do is validate as you type: it flags any line it can't match to a card, and shows a live preview with the running crypt/library counts and group range.
+
+<DeckPreviewExample name="Assamite Bleed Vote" crypt="12 x Ur-Shulgi" library="70 x Blood Doll" valid />
+
+Decks saved before this text format existed are marked <span className="badge text-bg-warning">LEGACY</span> next to their name in your deck list — they haven't been machine-parsed, so you'll need to open one, check the contents by eye, and save it to convert it to the <span className="badge text-bg-secondary">MODERN</span> format the game requires before it can be registered to a game.

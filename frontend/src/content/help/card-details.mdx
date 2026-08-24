@@ -1,0 +1,91 @@
+# Card Details & Labels
+
+<p className="help-lede">Locking, labeling, and adjusting the details tracked on a card in play.</p>
+
+## Locking & Unlocking
+
+A card used to perform an action is usually locked automatically once that action succeeds — untapped-vampire icons like the lock badge below track this. At the start of your turn you'd typically unlock everything you control.
+
+<CardExample name="Leumeah" clan="brujah" capacity={6} counters={6} disciplines="pot,for,cel,PRE" locked />
+
+<Callout title="Tip">
+  Clicking a card in play offers the option to lock or unlock it. Quick Commands has an "Unlock All" shortcut for unlocking everything you control at once.
+</Callout>
+
+## Adding Information to a Card
+
+You can add a custom text label, change a card's clan, or adjust its capacity, to reflect game state changes from library cards or special abilities.
+
+<Callout title="Tip">
+  Labels are handy for tracking a temporary effect or a specific card state. When changing disciplines, use <code>+</code> to add one and <code>-</code> to remove one.
+</Callout>
+
+## Contesting
+
+When two or more players have the same unique card in play, it needs to be marked contested.
+
+<CardExample name="Parity Shift" contested label="Contested" />
+
+## Command Reference
+
+<CommandDoc name="Votes" syntax="votes [PLAYER] [REGION] [INDEX] [AMOUNT]" description="Set or modify the number of votes on a minion.">
+  <CommandOption name="AMOUNT">Add/remove votes (e.g. <code>+1</code>, <code>-1</code>), set an exact number (e.g. <code>3</code>), or set to Priscus with <code>priscus</code>/<code>P</code>. <code>0</code> clears votes entirely.</CommandOption>
+  <CommandExample cmd="votes 1 +1">Add 1 vote to your minion #1 in the ready region.</CommandExample>
+  <CommandExample cmd="votes 2 P">Set the votes on your minion #2 to Priscus.</CommandExample>
+  <CommandExample cmd="votes Caine ready 1 3">Set the votes on Caine's minion #1 to 3.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Sect" syntax="sect [PLAYER] [REGION] [INDEX] [SECT]" description="Change the sect of a card.">
+  <CommandOption name="SECT">The new sect (e.g. <code>camarilla</code>, <code>anarch</code>, <code>sabbat</code>, <code>independent</code>). Leave it out to clear the sect.</CommandOption>
+  <CommandExample cmd="sect 1 camarilla">Set your card #1's sect to Camarilla.</CommandExample>
+  <CommandExample cmd="sect 2">Clear the sect from your card #2.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Path" syntax="path [PLAYER] [REGION] [INDEX] [PATH]" description="Change the path of a card.">
+  <CommandExample cmd="path 1 caine">Set your card #1's path to Path of Caine.</CommandExample>
+  <CommandExample cmd="path 2">Clear the path from your card #2.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Flip" syntax="flip" description="Perform a coin flip.">
+  <CommandExample cmd="flip">Announces either "Heads" or "Tails" to the game.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Lock" syntax="lock [PLAYER] [REGION] [CARD]" description="Lock a card.">
+  <CommandOption name="PLAYER">Defaults to yourself.</CommandOption>
+  <CommandOption name="REGION">Defaults to your ready region.</CommandOption>
+  <CommandOption name="CARD">Position of the card in the region.</CommandOption>
+  <CommandExample cmd="lock 1">Lock your card #1 in the ready region.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Unlock" syntax="unlock [PLAYER] [REGION] [CARD]" description="Unlock a card — or, with no card given, unlock every card you control.">
+  <CommandOption name="PLAYER">Defaults to yourself.</CommandOption>
+  <CommandOption name="REGION">Defaults to your ready region.</CommandOption>
+  <CommandOption name="CARD">Position of the card in the region. Leave it out to unlock ALL of your cards.</CommandOption>
+  <CommandExample cmd="unlock">Unlock every card you control.</CommandExample>
+  <CommandExample cmd="unlock 2">Unlock your card #2 in the ready region.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Label" syntax="label [PLAYER] [REGION] [CARD] [TEXT]" description="Add a text label to a card.">
+  <CommandExample cmd="label 1 +1 strength">Add the label "+1 strength" to your card #1.</CommandExample>
+  <CommandExample cmd="label 2">Clear the label from your card #2.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Clan" syntax="clan [PLAYER] [REGION] [CARD] [CLAN]" description="Change the clan of a card.">
+  <CommandExample cmd="clan 1 Tremere">Set your card #1's clan to Tremere.</CommandExample>
+  <CommandExample cmd="clan 1">Clear the clan from your card #1.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Capacity" syntax="capacity [PLAYER] [REGION] [CARD] [AMOUNT]" description="Adjust a vampire's capacity. Requires an explicit + or - prefix.">
+  <CommandExample cmd="capacity 1 +1">Increase the capacity of your card #1 by 1.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Disciplines" syntax="disc [PLAYER] [REGION] [CARD] [+|-DISC] [reset]" description="Add or remove disciplines from a card, or reset them to the card's printed values.">
+  <CommandExample cmd="disc 1 +aus">Add basic Auspex to your card #1.</CommandExample>
+  <CommandExample cmd="disc 1 +AUS -dom">Add superior Auspex and remove Dominate from your card #1.</CommandExample>
+  <CommandExample cmd="disc 1 reset">Reset the disciplines on your card #1 to its printed values.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Contest" syntax="contest [PLAYER] [REGION] [CARD] [clear]" description="Mark a card as contested, or clear that state.">
+  <CommandExample cmd="contest 1">Mark your card #1 as contested.</CommandExample>
+  <CommandExample cmd="contest 1 clear">Clear the contested state from your card #1.</CommandExample>
+</CommandDoc>

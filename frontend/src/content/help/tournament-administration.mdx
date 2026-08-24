@@ -1,0 +1,50 @@
+# Tournament Administration
+
+<p className="help-lede">Running a tournament from setup through to a finished final table. This is for tournament organizers — it doesn't cover general site administration.</p>
+
+A tournament moves through four stages, and the admin screen shows you a different tool for each one automatically based on the tournament's status and dates.
+
+## 1. Create & Configure
+
+From the tournament list, start a new tournament. This opens the editor, where you set:
+
+- **Name**, plus the **Reg Start**/**Reg End** and **Play Start**/**Play End** dates.
+- **Rounds** — 2 or 3 rounds of Swiss-style play before finals.
+- **VEKN ID** — whether registration requires one.
+- **Format** — Single Deck or Multi-Deck.
+- **Game** — Standard, V5, Duel, or Playtest rules.
+- **Tournament Rules** and a **Special Rules Condition** with its own **Special Rules** list, each built up one entry at a time.
+
+<Callout title="Tip">
+  **Save** just stores your changes — the tournament stays invisible to players (status `EDIT`). **Publish** is the separate step that opens it for registration; confirm the prompt, since players can immediately see and register once you do.
+</Callout>
+
+While a tournament is open for registration, the editor also lists everyone who has signed up so far, with their VEKN ID.
+
+## 2. Seat the Rounds
+
+Once registration closes, selecting the tournament switches you from the editor to the **table manager**. For each round, unseated players sit in a pool; drag them onto a table to seat them, or back into the pool to unseat them. Each round needs its own tables — use **Create Table** to add one, and the trash/remove option on a table to dissolve it back into the pool.
+
+- The pool can be sorted by VEKN ID or by name using the two sort icons next to a round's heading.
+- **Save Tables** stores your draft seating without creating anything yet — safe to do repeatedly while you're still arranging players.
+- **Download** exports the current draft as a CSV.
+- **Import** accepts a pasted CSV (`Round`,`Table`,`Player` columns, header row required) to load or replace the draft seating in one paste — useful for seating tools run outside JOL.
+- **Create Rounds** is the step that actually creates the games. It's a real, confirmed action: once you've created a round's tables, the games exist and players can start playing.
+
+## 3. Run the Rounds
+
+While a round is in progress, the table manager shows a live **round summary**: one panel per table, with each seated player's remaining pool, VP, and whether they've scored a Game Win.
+
+- Once every player at a table has 0 pool left, a **Close Table** button appears — use it to record that table's final VP/GW results against the tournament standings.
+- **Recreate Table** is there for mistakes: it's destructive — the existing game and all of its history (turns, pool, VP) are deleted and replaced by a fresh game seated from a CSV you paste in. You have to type the game's full name to confirm before it will run.
+
+## 4. Finals
+
+Once every round has finished, the same screen switches to **finals**.
+
+1. **Select finalists** — the standings are shown ranked by Game Wins then VP; tick exactly 5 players and save the selection.
+2. **Seat the final table** — drag the 5 finalists from the player pool into the final table (or use the shuffle button to randomize the order), then either **Save Final** to store the seating for later, or **Start Final** to create the final game immediately. Starting is a confirmed action, same as creating rounds.
+
+<Callout title="Tip">
+  Each stage only becomes available once its prerequisite dates/results are in — you can't skip ahead to finals before every round table has been closed out.
+</Callout>

@@ -7,3 +7,7 @@ export function pathForView(view: string): string {
 export function pathForGame(gameId: string): string {
   return `/jol/game/${gameId}`;
 }
+
+export function pathForHelp(section?: string): string {
+  return section ? `/jol/help/${section}` : '/jol/help';
+}

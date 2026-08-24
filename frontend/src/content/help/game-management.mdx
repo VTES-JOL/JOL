@@ -1,0 +1,49 @@
+# Game Management
+
+<p className="help-lede">Victory points, timeouts, seating order, the edge, and hidden information.</p>
+
+## Command Reference
+
+<CommandDoc name="Victory Points" syntax="vp [PLAYER] [AMOUNT / withdraw]" description="Modify victory points, or withdraw from the game.">
+  <CommandOption name="PLAYER">Defaults to yourself.</CommandOption>
+  <CommandOption name="AMOUNT">Add or remove victory points (e.g. <code>+1</code>, <code>-1</code>).</CommandOption>
+  <CommandOption name="withdraw">Withdraw from the game and gain 0.5 VP.</CommandOption>
+  <CommandExample cmd="vp +1">Gain 1 victory point.</CommandExample>
+  <CommandExample cmd="vp Player2 -1">Player2 loses 1 victory point.</CommandExample>
+  <CommandExample cmd="vp withdraw">Withdraw from the game.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Timeout" syntax="timeout" description="Request a game timeout. If every remaining player requests one, the game ends and survivors each gain 0.5 VP.">
+  <CommandExample cmd="timeout">Request to time out the game.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Seating Order" syntax="order [NUMBER] [NUMBER] ..." description="Change the seating order of the players. Each number is a player's current seat position, starting from 1.">
+  <CommandExample cmd="order 5 1 4 2 3">Set the new seating order using the listed original positions.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Edge" syntax="edge [PLAYER / burn]" description="Give the edge to a player, or burn it so no one has it.">
+  <CommandExample cmd="edge">Give yourself the edge.</CommandExample>
+  <CommandExample cmd="edge Player2">Give Player2 the edge.</CommandExample>
+  <CommandExample cmd="edge burn">Burn the edge.</CommandExample>
+</CommandDoc>
+
+## Hidden Information
+
+<CommandDoc name="Choose" syntax="choose [CHOICE]" description="Make a hidden choice — for a vote or an effect that needs one.">
+  <CommandExample cmd="choose 5">Set your hidden choice to "5".</CommandExample>
+  <CommandExample cmd="choose Aye">Set your hidden choice to "Aye".</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Reveal" syntax="reveal" description="Reveal every player's hidden choice, then clear them all.">
+  <CommandExample cmd="reveal">Announce all hidden choices and clear them.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Show" syntax="show [PLAYER] [REGION] [AMOUNT] [all]" description="Reveal a number of cards — or all of them — from one of your regions to another player, or to everyone.">
+  <CommandOption name="PLAYER">The recipient. Defaults to yourself if omitted, or everyone if <code>all</code> is given.</CommandOption>
+  <CommandOption name="REGION">Source region. Defaults to your library.</CommandOption>
+  <CommandOption name="AMOUNT">Number of cards to show. Defaults to 100.</CommandOption>
+  <CommandOption name="all">Show to every player instead of one.</CommandOption>
+  <CommandExample cmd="show library all">Show up to 100 cards from your library to everyone.</CommandExample>
+  <CommandExample cmd="show hand Player2 all">Show all of your hand to Player2.</CommandExample>
+  <CommandExample cmd="show hand">Show your hand cards to yourself — a handy way to clear public notes.</CommandExample>
+</CommandDoc>

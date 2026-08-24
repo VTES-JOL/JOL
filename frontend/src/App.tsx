@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { TopBar } from './components/TopBar';
 import { MainPage } from './pages/MainPage';
 import { ProfilePage } from './pages/ProfilePage';
@@ -10,6 +10,10 @@ import { LobbyPage } from './pages/LobbyPage';
 import { DeckPage } from './pages/DeckPage';
 import { GamePage } from './pages/GamePage';
 import { LoginPage } from './pages/LoginPage';
+import { HelpPage } from './pages/help/HelpPage';
+import { HelpSection } from './pages/help/HelpSection';
+import { HELP_SECTIONS } from './content/help/meta';
+import { pathForHelp } from './routes';
 import { NavProvider } from './nav/NavContext';
 import { ReconnectingOverlay } from './components/ReconnectingOverlay';
 import { DialogHost } from './components/DialogHost';
@@ -56,6 +60,10 @@ function AuthenticatedApp() {
           <Route path="/jol/lobby" element={<LobbyPage />} />
           <Route path="/jol/deck" element={<DeckPage />} />
           <Route path="/jol/game/:gameId" element={<GamePage />} />
+          <Route path={pathForHelp()} element={<HelpPage />}>
+            <Route index element={<Navigate to={pathForHelp(HELP_SECTIONS[0].slug)} replace />} />
+            <Route path=":section" element={<HelpSection />} />
+          </Route>
         </Routes>
         {!online && <ReconnectingOverlay everConnected={everConnected} />}
       </div>

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNav } from '../nav/useNav';
-import { pathForGame, pathForView } from '../routes';
+import { pathForGame, pathForView, pathForHelp } from '../routes';
 import { logout as logoutRequest } from '../pages/login/authApi';
 
 function toggleDarkMode() {
@@ -163,9 +163,9 @@ export function TopBar() {
                 <hr className="dropdown-divider" />
               </li>
               <li>
-                <a className="dropdown-item" href="/jol/help" target="_blank" rel="noreferrer">
+                <Link className="dropdown-item" to={pathForHelp()} onClick={() => setOpen(null)}>
                   <i className="bi bi-question-circle me-2"></i>Help
-                </a>
+                </Link>
               </li>
               <li>
                 <a

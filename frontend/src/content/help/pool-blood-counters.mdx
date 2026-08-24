@@ -1,0 +1,66 @@
+# Pool, Blood & Counters
+
+<p className="help-lede">Tracking pool, blood, and the transfers between them.</p>
+
+## Managing Pool
+
+`pool` adds or removes pool from a player.
+
+<Callout title="Tip">
+  Quick Commands has presets for common pool costs/gains. Pool and blood amounts always need an explicit <code>+</code> or <code>-</code> prefix.
+</Callout>
+
+## Managing Blood / Counters
+
+JOL only has one counter type, standing in for blood/life/generic counters, colored by what the card is:
+
+<RegionExample label="Ready" type="READY">
+  <CardExample name="Vampire" clan="brujah" capacity={6} counters={4} counterType="blood" />
+  <CardExample name="Ally / Retainer / Imbued" counters={2} counterType="life" />
+  <CardExample name="Everything else" counters={1} />
+</RegionExample>
+
+- Vampires show **red** blood counters.
+- Imbued, allies, and retainers show **green** life counters.
+- Everything else shows a plain grey counter.
+
+`blood` changes the counters on a card.
+
+<Callout title="Tip">
+  Clicking a card in play offers options to change its blood/counter value directly.
+</Callout>
+
+## Transfers
+
+`transfer` is a shortcut that moves pool and blood at once, for the influence phase — a positive amount moves pool to blood, a negative amount moves blood back to pool. There's no enforced maximum, so you're responsible for tracking how many transfers you have left.
+
+<Callout title="Tip">
+  Clicking a card in play shows shortcut arrows to transfer pool to and from it.
+</Callout>
+
+## Command Reference
+
+<CommandDoc name="Pool" syntax="pool [PLAYER] [AMOUNT]" description="Add or remove pool from a player.">
+  <CommandOption name="PLAYER">Defaults to yourself.</CommandOption>
+  <CommandOption name="AMOUNT">Pool to add (+) or remove (-).</CommandOption>
+  <CommandExample cmd="pool +2">Add 2 pool to yourself.</CommandExample>
+  <CommandExample cmd="pool -1">Remove 1 pool from yourself.</CommandExample>
+  <CommandExample cmd="pool Lilith -2">Remove 2 pool from Lilith.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Blood / Counters" syntax="blood [PLAYER] [REGION] [CARD] [AMOUNT]" description="Add or remove counters from a card.">
+  <CommandOption name="PLAYER">Defaults to yourself.</CommandOption>
+  <CommandOption name="REGION">Defaults to your ready region.</CommandOption>
+  <CommandOption name="CARD">Position of the card in the region.</CommandOption>
+  <CommandOption name="AMOUNT">Counters to add (+) or remove (-).</CommandOption>
+  <CommandExample cmd="blood 1 +2">Add 2 blood to your card #1 in the ready region.</CommandExample>
+  <CommandExample cmd="blood 2 -1">Remove 1 blood from your card #2 in the ready region.</CommandExample>
+  <CommandExample cmd="blood Lilith ready 1 -2">Remove 2 blood from Lilith's card #1 in her ready region.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Transfer" syntax="transfer [CARD] [AMOUNT]" description="Transfer pool to or from a card in your uncontrolled region.">
+  <CommandOption name="CARD">Position of the card in your uncontrolled region.</CommandOption>
+  <CommandOption name="AMOUNT">Positive (+) transfers pool to blood; negative (-) transfers blood back to pool.</CommandOption>
+  <CommandExample cmd="transfer 1 +1">Transfer 1 pool onto card #1 in your uncontrolled region.</CommandExample>
+  <CommandExample cmd="transfer 2 -2">Transfer 2 blood from card #2 in your uncontrolled region back to your pool.</CommandExample>
+</CommandDoc>
