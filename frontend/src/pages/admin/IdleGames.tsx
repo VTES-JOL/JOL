@@ -4,19 +4,13 @@ import { api } from '../../api/client';
 import type { IdleGame } from '../../api/types';
 import { pathForGame } from '../../routes';
 import { confirmDialog } from '../../components/dialog';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 import { adminTimestamp } from './adminFormatting';
 
 export function IdleGames({ idleGames, onSaved }: { idleGames: IdleGame[]; onSaved: () => void }) {
   const closeGame = async (gameId: string) => {
     if (!(await confirmDialog('Are you sure you want to end this game?'))) return;
-    api
-      .del(`/admin-page/games/${encodeURIComponent(gameId)}`)
-      .then(onSaved)
-      .catch((err) => {
-        console.error('Failed to end game', err);
-        showError('Failed to end game.');
-      });
+    runRequest(api.del(`/admin-page/games/${encodeURIComponent(gameId)}`), 'Failed to end game', onSaved);
   };
 
   return (

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 
 export function ReplacePlayer({
   games,
@@ -38,13 +38,11 @@ export function ReplacePlayer({
 
   const submit = () => {
     if (!gameId || !existingPlayer || !newPlayer) return;
-    api
-      .put(`/admin-page/games/${encodeURIComponent(gameId)}/replace-player`, { existingPlayer, newPlayer })
-      .then(onSaved)
-      .catch((err) => {
-        console.error('Failed to replace player', err);
-        showError('Failed to replace player.');
-      });
+    runRequest(
+      api.put(`/admin-page/games/${encodeURIComponent(gameId)}/replace-player`, { existingPlayer, newPlayer }),
+      'Failed to replace player',
+      onSaved,
+    );
   };
 
   return (

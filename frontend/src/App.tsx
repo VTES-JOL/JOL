@@ -1,20 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { lazy, Suspense, useEffect } from 'react';
 import { queryClient } from './api/queryClient';
 import { useQueryInvalidation } from './ws/useQueryInvalidation';
 import { TopBar } from './components/TopBar';
 import { MainPage } from './pages/MainPage';
-import { ProfilePage } from './pages/ProfilePage';
-import { AdminPage } from './pages/AdminPage';
-import { TournamentAdminPage } from './pages/TournamentAdminPage';
-import { TournamentPage } from './pages/TournamentPage';
-import { WatchPage } from './pages/WatchPage';
-import { LobbyPage } from './pages/LobbyPage';
-import { DeckPage } from './pages/DeckPage';
-import { GamePage } from './pages/GamePage';
 import { LoginPage } from './pages/LoginPage';
-import { HelpPage } from './pages/help/HelpPage';
-import { HelpSection } from './pages/help/HelpSection';
 import { HELP_SECTIONS } from './content/help/meta';
 import { pathForHelp } from './routes';
 import { ReconnectingOverlay } from './components/ReconnectingOverlay';
@@ -22,9 +13,27 @@ import { DialogHost } from './components/DialogHost';
 import { ToastHost } from './components/ToastHost';
 import { UpdateBanner } from './components/UpdateBanner';
 import { ChunkErrorBoundary } from './components/ChunkErrorBoundary';
+import { PageLoading } from './components/PageLoading';
 import { useConnectivity } from './api/useConnectivity';
-import { useEffect } from 'react';
 import { startUpdateCheck } from './updateCheck';
+
+// Route-level code splitting: MainPage/LoginPage are eager (the former is
+// what every session lands on right after auth; the latter renders before
+// any session exists at all), everything else is a separate chunk fetched
+// on first navigation there. ChunkErrorBoundary (wrapping <Routes> below)
+// already exists to catch a stale tab whose chunk no longer exists after a
+// deploy — see its own comment — so these lazy chunks share that same
+// backstop rather than needing one of their own.
+const ProfilePage = lazy(() => import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const AdminPage = lazy(() => import('./pages/AdminPage').then((m) => ({ default: m.AdminPage })));
+const TournamentAdminPage = lazy(() => import('./pages/TournamentAdminPage').then((m) => ({ default: m.TournamentAdminPage })));
+const TournamentPage = lazy(() => import('./pages/TournamentPage').then((m) => ({ default: m.TournamentPage })));
+const WatchPage = lazy(() => import('./pages/WatchPage').then((m) => ({ default: m.WatchPage })));
+const LobbyPage = lazy(() => import('./pages/LobbyPage').then((m) => ({ default: m.LobbyPage })));
+const DeckPage = lazy(() => import('./pages/DeckPage').then((m) => ({ default: m.DeckPage })));
+const GamePage = lazy(() => import('./pages/GamePage').then((m) => ({ default: m.GamePage })));
+const HelpPage = lazy(() => import('./pages/help/HelpPage').then((m) => ({ default: m.HelpPage })));
+const HelpSection = lazy(() => import('./pages/help/HelpSection').then((m) => ({ default: m.HelpSection })));
 
 // The authenticated app shell: TopBar's /nav fetch (useNav) requires a valid
 // session (SecurityFilter), so this must never mount for a logged-out
@@ -55,23 +64,25 @@ function AuthenticatedApp() {
           catches its own fetch failures independently, so nothing crashes
           underneath, it just harmlessly keeps retrying on its own triggers.
         */}
-        <Routes>
-          <Route path="/jol/" element={<MainPage />} />
-          <Route path="/jol/main" element={<MainPage />} />
-          <Route path="/jol/main.jsp" element={<MainPage />} />
-          <Route path="/jol/profile" element={<ProfilePage />} />
-          <Route path="/jol/admin" element={<AdminPage />} />
-          <Route path="/jol/tournamentAdmin" element={<TournamentAdminPage />} />
-          <Route path="/jol/tournament" element={<TournamentPage />} />
-          <Route path="/jol/active" element={<WatchPage />} />
-          <Route path="/jol/lobby" element={<LobbyPage />} />
-          <Route path="/jol/deck" element={<DeckPage />} />
-          <Route path="/jol/game/:gameId" element={<GamePage />} />
-          <Route path={pathForHelp()} element={<HelpPage />}>
-            <Route index element={<Navigate to={pathForHelp(HELP_SECTIONS[0].slug)} replace />} />
-            <Route path=":section" element={<HelpSection />} />
-          </Route>
-        </Routes>
+        <Suspense fallback={<PageLoading />}>
+          <Routes>
+            <Route path="/jol/" element={<MainPage />} />
+            <Route path="/jol/main" element={<MainPage />} />
+            <Route path="/jol/main.jsp" element={<MainPage />} />
+            <Route path="/jol/profile" element={<ProfilePage />} />
+            <Route path="/jol/admin" element={<AdminPage />} />
+            <Route path="/jol/tournamentAdmin" element={<TournamentAdminPage />} />
+            <Route path="/jol/tournament" element={<TournamentPage />} />
+            <Route path="/jol/active" element={<WatchPage />} />
+            <Route path="/jol/lobby" element={<LobbyPage />} />
+            <Route path="/jol/deck" element={<DeckPage />} />
+            <Route path="/jol/game/:gameId" element={<GamePage />} />
+            <Route path={pathForHelp()} element={<HelpPage />}>
+              <Route index element={<Navigate to={pathForHelp(HELP_SECTIONS[0].slug)} replace />} />
+              <Route path=":section" element={<HelpSection />} />
+            </Route>
+          </Routes>
+        </Suspense>
         {!online && <ReconnectingOverlay everConnected={everConnected} />}
       </div>
     </>

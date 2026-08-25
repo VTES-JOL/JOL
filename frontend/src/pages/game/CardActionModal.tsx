@@ -3,7 +3,7 @@ import type { CardDefinition } from '../../api/types';
 import { fetchCardDefinition } from './cardDefinitions';
 import { cardActions, type Submission, type TableCardContext } from './cardCommands';
 import { CardImage } from './CardImage';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 import { Modal } from '../../components/Modal';
 
 const CLANS = [
@@ -142,12 +142,7 @@ export function CardActionModal({
 
   useEffect(() => {
     setDefinition(null);
-    fetchCardDefinition(card.cardId ?? '', !!card.playtest)
-      .then(setDefinition)
-      .catch((err) => {
-        console.error('Failed to load card definition', err);
-        showError('Failed to load card details.');
-      });
+    runRequest(fetchCardDefinition(card.cardId ?? '', !!card.playtest), 'Failed to load card details', setDefinition);
   }, [card.cardId, card.playtest]);
 
   useEffect(() => setLabel(card.label ?? ''), [card.label]);

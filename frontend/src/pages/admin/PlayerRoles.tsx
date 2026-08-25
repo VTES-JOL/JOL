@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import type { UserRole } from '../../api/types';
 import { confirmDialog } from '../../components/dialog';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 import { adminTimestamp } from './adminFormatting';
 
 const ROLES: { value: string; label: string }[] = [
@@ -38,24 +38,16 @@ export function PlayerRoles({
 
   const toggleRole = async (targetPlayer: string, targetRole: string, hasRole: boolean) => {
     if (hasRole && !(await confirmDialog('Are you sure you want to remove this role?'))) return;
-    api
-      .put(`/admin-page/roles/${encodeURIComponent(targetPlayer)}`, { role: targetRole, value: !hasRole })
-      .then(onSaved)
-      .catch((err) => {
-        console.error('Failed to update role', err);
-        showError('Failed to update role.');
-      });
+    runRequest(
+      api.put(`/admin-page/roles/${encodeURIComponent(targetPlayer)}`, { role: targetRole, value: !hasRole }),
+      'Failed to update role',
+      onSaved,
+    );
   };
 
   const addRole = () => {
     if (!player) return;
-    api
-      .put(`/admin-page/roles/${encodeURIComponent(player)}`, { role, value: true })
-      .then(onSaved)
-      .catch((err) => {
-        console.error('Failed to add role', err);
-        showError('Failed to add role.');
-      });
+    runRequest(api.put(`/admin-page/roles/${encodeURIComponent(player)}`, { role, value: true }), 'Failed to add role', onSaved);
   };
 
   return (

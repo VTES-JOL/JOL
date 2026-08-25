@@ -1,6 +1,6 @@
 import { api } from '../../api/client';
 import type { GameHistory } from '../../api/types';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 
 const DATE_FORMAT = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'UTC',
@@ -25,13 +25,7 @@ function downloadCsv(data: string, filename: string) {
 
 export function PastGamesTab({ history }: { history: GameHistory[] }) {
   const exportCsv = () => {
-    api
-      .getText('/admin/export/games.csv')
-      .then((data) => downloadCsv(data, 'past-games.csv'))
-      .catch((err) => {
-        console.error('Failed to export past games', err);
-        showError('Failed to export past games.');
-      });
+    runRequest(api.getText('/admin/export/games.csv'), 'Failed to export past games', (data) => downloadCsv(data, 'past-games.csv'));
   };
 
   return (

@@ -5,7 +5,7 @@ import { api } from '../api/client';
 import type { CardSnapshot, GameSnapshot } from '../api/types';
 import { useAuth } from '../nav/useAuth';
 import { useGameSocket } from '../ws/useGameSocket';
-import { showError } from '../components/toast';
+import { runRequest } from '../api/mutate';
 import { PageLoading } from '../components/PageLoading';
 import { PlayerBoard } from './game/PlayerBoard';
 import { HandStrip } from './game/HandStrip';
@@ -47,18 +47,16 @@ export function GamePage() {
   if (!game || !gameId) return <PageLoading />;
 
   const submit = (submission: Submission) => {
-    api
-      .post<GameSnapshot>(`/game/${gameId}/view/submit`, {
+    runRequest(
+      api.post<GameSnapshot>(`/game/${gameId}/view/submit`, {
         phase: null,
         command: submission.command ?? null,
         chat: submission.chat ?? null,
         ping: null,
-      })
-      .then(applyUpdate)
-      .catch((err) => {
-        console.error('Failed to submit', err);
-        showError('Failed to submit.');
-      });
+      }),
+      'Failed to submit',
+      applyUpdate,
+    );
   };
 
   // cardOnTableClicked()'s dual role: while a target pick is pending, a

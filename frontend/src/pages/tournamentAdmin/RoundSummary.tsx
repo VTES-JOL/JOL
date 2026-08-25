@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import type { PlayerRoundSummary } from '../../api/types';
 import { alertDialog, confirmDialog } from '../../components/dialog';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 import { RecreateTableModal } from './RecreateTableModal';
 
 type Summary = Record<number, Record<number, PlayerRoundSummary[]>>;
@@ -28,16 +28,14 @@ export function RoundSummary({ tournamentName }: { tournamentName: string }) {
 
   const closeTable = async (round: number, table: number) => {
     if (!(await confirmDialog('Close table and record VP/GW results?'))) return;
-    api
-      .post<boolean>(`/tournament/${encodeURIComponent(tournamentName)}/round/${round}/table/${table}/close`)
-      .then((ok) => {
+    runRequest(
+      api.post<boolean>(`/tournament/${encodeURIComponent(tournamentName)}/round/${round}/table/${table}/close`),
+      'Failed to close table',
+      (ok) => {
         if (ok) refresh();
         else alertDialog('Could not close table — game may already be closed.');
-      })
-      .catch((err) => {
-        console.error('Failed to close table', err);
-        showError('Failed to close table.');
-      });
+      },
+    );
   };
 
   return (

@@ -117,6 +117,15 @@ jobs:
       # fallback path, so it needs the fixture staged here too.
       - name: Stage test card fixture
         run: mkdir -p static/secured && cp src/test/resources/data/cards/cards.json static/secured/cards.json
+      # tomcat9:run (invoked directly by playwright.config.ts's webServer
+      # below) isn't bound to the Maven lifecycle, so it never runs the
+      # prepare-package step (pom.xml's ensure-react-dist-exists) that
+      # normally guarantees this directory exists. Without it, Tomcat's
+      # react/ DirResourceSet fails to initialize and the whole context
+      # fails to start — even though e2e specs hit the Vite dev server, not
+      # this directory's contents, so an empty dir is all that's needed here.
+      - name: Ensure target/react-dist exists for Tomcat's webResources
+        run: mkdir -p target/react-dist
       # playwright.config.ts's webServer entries start both Tomcat (against
       # a disposable copy of the test fixture data, so this never touches
       # checked-in files — see frontend/README.md's Testing section) and the

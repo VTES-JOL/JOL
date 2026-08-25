@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import type { Deck, GameStatusBean, LobbyPage } from '../../api/types';
 import { useAuth } from '../../nav/useAuth';
 import { useSimpleDropdown } from '../../hooks/useSimpleDropdown';
 import { DeckPreview } from '../../components/DeckPreview';
 import { confirmDialog } from '../../components/dialog';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 
 export function GameDetail({
   game,
@@ -25,86 +26,51 @@ export function GameDetail({
   const { player } = useAuth();
   const [inviteInput, setInviteInput] = useState('');
   const [deckSearch, setDeckSearch] = useState('');
-  const [preview, setPreview] = useState<Deck | null>(null);
   const deckDropdown = useSimpleDropdown<HTMLDivElement>();
 
   const encodedName = encodeURIComponent(game.name);
 
   const startGame = async () => {
     if (!(await confirmDialog('Start Game?'))) return;
-    api
-      .post<LobbyPage>(`/lobby/player/games/${encodedName}/start`)
-      .then(onChanged)
-      .catch((err) => {
-        console.error('Failed to start game', err);
-        showError('Failed to start game.');
-      });
+    runRequest(api.post<LobbyPage>(`/lobby/player/games/${encodedName}/start`), 'Failed to start game', onChanged);
   };
 
   const closeGame = async () => {
     if (!(await confirmDialog('Close Game?', { danger: true }))) return;
-    api
-      .del<LobbyPage>(`/lobby/player/games/${encodedName}`)
-      .then(onChanged)
-      .catch((err) => {
-        console.error('Failed to close game', err);
-        showError('Failed to close game.');
-      });
+    runRequest(api.del<LobbyPage>(`/lobby/player/games/${encodedName}`), 'Failed to close game', onChanged);
   };
 
   const joinGame = () => {
     if (!player) return;
-    api
-      .post<LobbyPage>(`/lobby/player/games/${encodedName}/invite`, { player })
-      .then(onChanged)
-      .catch((err) => {
-        console.error('Failed to join game', err);
-        showError('Failed to join game.');
-      });
+    runRequest(api.post<LobbyPage>(`/lobby/player/games/${encodedName}/invite`, { player }), 'Failed to join game', onChanged);
   };
 
   const leaveGame = async () => {
     if (!player || !(await confirmDialog('Leave Game?'))) return;
-    api
-      .del<LobbyPage>(`/lobby/player/games/${encodedName}/invite/${encodeURIComponent(player)}`)
-      .then(onChanged)
-      .catch((err) => {
-        console.error('Failed to leave game', err);
-        showError('Failed to leave game.');
-      });
+    runRequest(
+      api.del<LobbyPage>(`/lobby/player/games/${encodedName}/invite/${encodeURIComponent(player)}`),
+      'Failed to leave game',
+      onChanged,
+    );
   };
 
   const invitePlayer = () => {
     const p = inviteInput.trim();
     if (!p) return;
-    api
-      .post<LobbyPage>(`/lobby/player/games/${encodedName}/invite`, { player: p })
-      .then(onChanged)
-      .catch((err) => {
-        console.error('Failed to invite player', err);
-        showError('Failed to invite player.');
-      });
+    runRequest(api.post<LobbyPage>(`/lobby/player/games/${encodedName}/invite`, { player: p }), 'Failed to invite player', onChanged);
     setInviteInput('');
   };
 
   const removeInvite = (p: string) => {
-    api
-      .del<LobbyPage>(`/lobby/player/games/${encodedName}/invite/${encodeURIComponent(p)}`)
-      .then(onChanged)
-      .catch((err) => {
-        console.error('Failed to remove invite', err);
-        showError('Failed to remove invite.');
-      });
+    runRequest(
+      api.del<LobbyPage>(`/lobby/player/games/${encodedName}/invite/${encodeURIComponent(p)}`),
+      'Failed to remove invite',
+      onChanged,
+    );
   };
 
   const registerDeck = (deckName: string) => {
-    api
-      .post<LobbyPage>(`/lobby/player/games/${encodedName}/deck`, { deckName })
-      .then(onChanged)
-      .catch((err) => {
-        console.error('Failed to register deck', err);
-        showError('Failed to register deck.');
-      });
+    runRequest(api.post<LobbyPage>(`/lobby/player/games/${encodedName}/deck`, { deckName }), 'Failed to register deck', onChanged);
     deckDropdown.setOpen(false);
   };
 
@@ -119,17 +85,14 @@ export function GameDetail({
     return () => clearTimeout(timeout);
   }, [message]);
 
-  useEffect(() => {
-    if (myRegistration?.deckName) {
-      api
-        .get<Deck>(`/lobby/player/games/${encodedName}/deck`)
-        .then(setPreview)
-        .catch(() => setPreview(null));
-    } else {
-      setPreview(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [game.name, myRegistration?.deckName]);
+  const { data: preview } = useQuery({
+    queryKey: ['lobby', game.name, 'deck', myRegistration?.deckName],
+    queryFn: () => api.get<Deck>(`/lobby/player/games/${encodedName}/deck`),
+    enabled: !!myRegistration?.deckName,
+    // Matches the original silent .catch(() => setPreview(null)) — a failed
+    // preview fetch just means no preview shown, not worth a toast.
+    meta: { silent: true },
+  });
 
   return (
     <div className="card shadow flex-fill d-flex flex-column min-h-0">

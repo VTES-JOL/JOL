@@ -3,7 +3,7 @@ import { api } from '../../../api/client';
 import type { StatsDto } from '../../../api/types';
 import { StatsDtoTable } from './StatsDtoTable';
 import { useSimpleTooltips } from '../../../hooks/useSimpleTooltips';
-import { showError } from '../../../components/toast';
+import { runRequest } from '../../../api/mutate';
 
 const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
@@ -14,13 +14,11 @@ export function NationStats({ fromDate, toDate, isTourney }: { fromDate: string;
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    api
-      .post<Record<string, StatsDto>>('/stats/nations', { treshold: Number(threshold) || 0, fromDate, toDate, isTourney })
-      .then(setData)
-      .catch((err) => {
-        console.error('Failed to load nation stats', err);
-        showError('Failed to load nation stats.');
-      });
+    runRequest(
+      api.post<Record<string, StatsDto>>('/stats/nations', { treshold: Number(threshold) || 0, fromDate, toDate, isTourney }),
+      'Failed to load nation stats',
+      setData,
+    );
   }, [threshold, fromDate, toDate, isTourney]);
 
   useSimpleTooltips(ref, [data]);

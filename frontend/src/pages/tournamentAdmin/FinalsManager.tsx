@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import type { PlayerStanding, TournamentRegistration } from '../../api/types';
 import { alertDialog, confirmDialog } from '../../components/dialog';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 import { draggableChip, dropTarget, type DragPayload } from './dragDrop';
 
 // tournament-admin/tournament-final.jsp's #finalSeeding crypt-reveal panel
@@ -27,18 +28,12 @@ function Chip({ registration, from }: { registration: TournamentRegistration; fr
 }
 
 function FinalistSelection({ tournamentName, onSaved }: { tournamentName: string; onSaved: () => void }) {
-  const [standings, setStandings] = useState<PlayerStanding[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    api
-      .get<PlayerStanding[]>(`/tournament/${encodeURIComponent(tournamentName)}/standings`)
-      .then(setStandings)
-      .catch((err) => {
-        console.error('Failed to load standings', err);
-        showError('Failed to load standings.');
-      });
-  }, [tournamentName]);
+  const { data: standings = [] } = useQuery({
+    queryKey: ['tournament', tournamentName, 'standings'],
+    queryFn: () => api.get<PlayerStanding[]>(`/tournament/${encodeURIComponent(tournamentName)}/standings`),
+  });
 
   const toggle = (player: string) => {
     setSelected((prev) => {
@@ -54,13 +49,11 @@ function FinalistSelection({ tournamentName, onSaved }: { tournamentName: string
       await alertDialog('Please select exactly 5 players for the finals.');
       return;
     }
-    api
-      .put(`/tournament/${encodeURIComponent(tournamentName)}/final-players`, [...selected])
-      .then(onSaved)
-      .catch((err) => {
-        console.error('Failed to save finalist selection', err);
-        showError('Failed to save finalist selection.');
-      });
+    runRequest(
+      api.put(`/tournament/${encodeURIComponent(tournamentName)}/final-players`, [...selected]),
+      'Failed to save finalist selection',
+      onSaved,
+    );
   };
 
   return (
@@ -91,29 +84,33 @@ function FinalistSelection({ tournamentName, onSaved }: { tournamentName: string
 }
 
 function FinalTableBuilder({ tournamentName, onSaved }: { tournamentName: string; onSaved: () => void }) {
+  const queryClient = useQueryClient();
   const [pool, setPool] = useState<TournamentRegistration[]>([]);
   const [table, setTable] = useState<TournamentRegistration[]>([]);
-  const [started, setStarted] = useState(false);
 
-  const load = () => {
-    Promise.all([
-      api.get<TournamentRegistration[]>(`/tournament/${encodeURIComponent(tournamentName)}/final-players`),
-      api.get<TournamentRegistration[]>(`/tournament/${encodeURIComponent(tournamentName)}/final-delta`),
-      api.get<boolean>(`/tournament/${encodeURIComponent(tournamentName)}/game-started`),
-    ])
-      .then(([finalPlayers, delta, isStarted]) => {
-        setTable(finalPlayers);
-        setPool(delta);
-        setStarted(isStarted);
-      })
-      .catch((err) => {
-        console.error('Failed to load final table', err);
-        showError('Failed to load final table.');
-      });
-  };
+  const queryKey = ['tournament', tournamentName, 'final-table'];
+  const { data } = useQuery({
+    queryKey,
+    queryFn: () =>
+      Promise.all([
+        api.get<TournamentRegistration[]>(`/tournament/${encodeURIComponent(tournamentName)}/final-players`),
+        api.get<TournamentRegistration[]>(`/tournament/${encodeURIComponent(tournamentName)}/final-delta`),
+        api.get<boolean>(`/tournament/${encodeURIComponent(tournamentName)}/game-started`),
+      ]).then(([finalPlayers, delta, isStarted]) => ({ finalPlayers, delta, isStarted })),
+  });
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(load, [tournamentName]);
+  const started = data?.isStarted ?? false;
+
+  // Query data is the source of truth on (re)load; pool/table are then a
+  // local editable buffer the drag-and-drop below mutates freely, same as
+  // DraftTableManager's round state.
+  useEffect(() => {
+    if (!data) return;
+    setTable(data.finalPlayers);
+    setPool(data.delta);
+  }, [data]);
+
+  const load = () => queryClient.invalidateQueries({ queryKey });
 
   const move = (payload: DragPayload, to: 'pool' | 'table') => {
     if (payload.from === to) return;
@@ -135,30 +132,22 @@ function FinalTableBuilder({ tournamentName, onSaved }: { tournamentName: string
   };
 
   const saveFinal = () => {
-    api
-      .put(
+    runRequest(
+      api.put(
         `/tournament/${encodeURIComponent(tournamentName)}/final-players`,
         table.map((r) => r.player),
-      )
-      .then(() => {
+      ),
+      'Failed to save final table',
+      () => {
         onSaved();
         load();
-      })
-      .catch((err) => {
-        console.error('Failed to save final table', err);
-        showError('Failed to save final table.');
-      });
+      },
+    );
   };
 
   const startFinal = async () => {
     if (!(await confirmDialog('Are you sure you want to START the FINAL?'))) return;
-    api
-      .post(`/tournament/${encodeURIComponent(tournamentName)}/final`)
-      .then(load)
-      .catch((err) => {
-        console.error('Failed to start final', err);
-        showError('Failed to start final.');
-      });
+    runRequest(api.post(`/tournament/${encodeURIComponent(tournamentName)}/final`), 'Failed to start final', load);
   };
 
   if (started) {
@@ -200,22 +189,17 @@ function FinalTableBuilder({ tournamentName, onSaved }: { tournamentName: string
 }
 
 export function FinalsManager({ tournamentName }: { tournamentName: string }) {
-  const [seeding, setSeeding] = useState<string[] | null>(null);
+  const queryClient = useQueryClient();
+  const queryKey = ['tournament', tournamentName, 'seeding'];
 
-  const load = () => {
-    api
-      .get<string[]>(`/tournament/${encodeURIComponent(tournamentName)}/seeding`)
-      .then(setSeeding)
-      .catch((err) => {
-        console.error('Failed to load finals seeding', err);
-        showError('Failed to load finals seeding.');
-      });
-  };
+  const { data: seeding } = useQuery({
+    queryKey,
+    queryFn: () => api.get<string[]>(`/tournament/${encodeURIComponent(tournamentName)}/seeding`),
+  });
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(load, [tournamentName]);
+  const load = () => queryClient.invalidateQueries({ queryKey });
 
-  if (seeding === null) return null;
+  if (seeding === undefined) return null;
 
   return (
     <div className="flex-fill overflow-auto mt-2 min-h-0">

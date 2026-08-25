@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import type { TournamentDetails, TournamentRegistration } from '../../api/types';
 import { confirmDialog } from '../../components/dialog';
-import { showError } from '../../components/toast';
 
 const DEFAULT_SPEC_RULES_CON =
   'The following JOL rules will be enforced for the duration of the rounds with the exception of the period between <Date> and <Date>.';
@@ -40,6 +40,15 @@ const BLANK: FormState = {
   status: 'EDIT',
 };
 
+function FormRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="row mb-2">
+      <label className="col-form-label col-3">{label}</label>
+      <div className="col-9">{children}</div>
+    </div>
+  );
+}
+
 function RuleList({ rules, onRemove }: { rules: string[]; onRemove: (i: number) => void }) {
   return (
     <div className="mb-2">
@@ -61,57 +70,74 @@ function RuleList({ rules, onRemove }: { rules: string[]; onRemove: (i: number) 
 export function TournamentEditor({
   tournamentName,
   onSaved,
+  onDirtyChange,
 }: {
   tournamentName: string | null;
   onSaved: () => void;
+  // Lets the parent guard navigation away from unsaved edits (see
+  // TournamentAdminPage's selectTournament/newTournament) — this component
+  // has no say over `tournamentName` itself, so it can't block the prop
+  // change that would otherwise silently discard the form.
+  onDirtyChange?: (dirty: boolean) => void;
 }) {
+  const queryClient = useQueryClient();
   const [form, setForm] = useState<FormState>(BLANK);
+  // The last-loaded (or last-saved) form contents — `form` is compared
+  // against this to derive dirtiness, below.
+  const [baseline, setBaseline] = useState<FormState>(BLANK);
   const [originalName, setOriginalName] = useState('');
-  const [registeredPlayers, setRegisteredPlayers] = useState<TournamentRegistration[]>([]);
   const [ruleText, setRuleText] = useState('');
   const [specRuleText, setSpecRuleText] = useState('');
   const [msg, setMsg] = useState<{ text: string; kind: 'success' | 'warning' } | null>(null);
 
+  const { data: details } = useQuery({
+    queryKey: ['tournament', 'details', tournamentName],
+    queryFn: () => api.get<TournamentDetails>(`/tournament/${encodeURIComponent(tournamentName!)}/details`),
+    enabled: !!tournamentName,
+  });
+
+  const { data: registeredPlayers = [] } = useQuery({
+    queryKey: ['tournament', 'registered', tournamentName],
+    queryFn: () => api.get<TournamentRegistration[]>(`/tournament/${encodeURIComponent(tournamentName!)}/registered`),
+    enabled: !!tournamentName,
+  });
+
   useEffect(() => {
     if (!tournamentName) {
       setForm(BLANK);
+      setBaseline(BLANK);
       setOriginalName('');
-      setRegisteredPlayers([]);
       setMsg(null);
       return;
     }
-    api
-      .get<TournamentDetails>(`/tournament/${encodeURIComponent(tournamentName)}/details`)
-      .then((data) => {
-        setForm({
-          name: data.name,
-          regStart: data.regStart,
-          regEnd: data.regEnd,
-          playStart: data.playStart,
-          playEnd: data.playEnd,
-          numOfRounds: String(data.numRounds),
-          reqId: data.reqId,
-          tourFormat: data.tourFormat,
-          gameFormat: data.gameFormat,
-          rules: data.rules ?? [],
-          specRulesCon: data.specRulesCon,
-          specRules: data.specRules ?? [],
-          status: data.status,
-        });
-        setOriginalName(data.name);
-      })
-      .catch((err) => {
-        console.error('Failed to load tournament details', err);
-        showError('Failed to load tournament details.');
-      });
-    api
-      .get<TournamentRegistration[]>(`/tournament/${encodeURIComponent(tournamentName)}/registered`)
-      .then(setRegisteredPlayers)
-      .catch((err) => {
-        console.error('Failed to load registered players', err);
-        showError('Failed to load registered players.');
-      });
-  }, [tournamentName]);
+    if (!details) return;
+    const loaded: FormState = {
+      name: details.name,
+      regStart: details.regStart,
+      regEnd: details.regEnd,
+      playStart: details.playStart,
+      playEnd: details.playEnd,
+      numOfRounds: String(details.numRounds),
+      reqId: details.reqId,
+      tourFormat: details.tourFormat,
+      gameFormat: details.gameFormat,
+      rules: details.rules ?? [],
+      specRulesCon: details.specRulesCon,
+      specRules: details.specRules ?? [],
+      status: details.status,
+    };
+    setForm(loaded);
+    setBaseline(loaded);
+    setOriginalName(details.name);
+  }, [tournamentName, details]);
+
+  const dirty = JSON.stringify(form) !== JSON.stringify(baseline);
+  useEffect(() => {
+    onDirtyChange?.(dirty);
+    // onDirtyChange isn't expected to be referentially stable across parent
+    // renders — only re-notify when dirtiness itself actually changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dirty]);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -135,7 +161,9 @@ export function TournamentEditor({
       .then((success) => {
         if (success) {
           setOriginalName(form.name);
+          setBaseline(form);
           setMsg({ text: 'Tournament saved', kind: 'success' });
+          queryClient.invalidateQueries({ queryKey: ['tournament'] });
           onSaved();
         } else {
           setMsg({ text: 'Tournament creation failed', kind: 'warning' });
@@ -155,7 +183,9 @@ export function TournamentEditor({
       .then((success) => {
         if (success) {
           setForm((prev) => ({ ...prev, status: 'STARTING' }));
+          setBaseline((prev) => ({ ...prev, status: 'STARTING' }));
           setMsg({ text: 'Tournament published', kind: 'success' });
+          queryClient.invalidateQueries({ queryKey: ['tournament'] });
           onSaved();
         } else {
           setMsg({ text: 'Publish failed', kind: 'warning' });
@@ -202,109 +232,70 @@ export function TournamentEditor({
         </span>
       </CardHeader>
       <div className="card-body p-2 flex-fill overflow-auto px-3 min-h-0">
-        <div className="row mb-2">
-          <label className="col-form-label col-3">Name</label>
-          <div className="col-9">
-            <input className="form-control form-control-sm" value={form.name} onChange={(e) => set('name', e.target.value)} />
-          </div>
-        </div>
-        <div className="row mb-2">
-          <label className="col-form-label col-3">Reg Start</label>
-          <div className="col-9">
-            <input
-              type="date"
-              className="form-control form-control-sm"
-              value={form.regStart}
-              onChange={(e) => set('regStart', e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="row mb-2">
-          <label className="col-form-label col-3">Reg End</label>
-          <div className="col-9">
-            <input
-              type="date"
-              className="form-control form-control-sm"
-              value={form.regEnd}
-              onChange={(e) => set('regEnd', e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="row mb-2">
-          <label className="col-form-label col-3">Play Start</label>
-          <div className="col-9">
-            <input
-              type="date"
-              className="form-control form-control-sm"
-              value={form.playStart}
-              onChange={(e) => set('playStart', e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="row mb-2">
-          <label className="col-form-label col-3">Play End</label>
-          <div className="col-9">
-            <input
-              type="date"
-              className="form-control form-control-sm"
-              value={form.playEnd}
-              onChange={(e) => set('playEnd', e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="row mb-2">
-          <label className="col-form-label col-3">Rounds</label>
-          <div className="col-9">
-            <select
-              className="form-select form-select-sm"
-              value={form.numOfRounds}
-              onChange={(e) => set('numOfRounds', e.target.value)}
-            >
-              {[2, 3].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="row mb-2">
-          <label className="col-form-label col-3">VEKN ID</label>
-          <div className="col-9">
-            <select className="form-select form-select-sm" value={form.reqId} onChange={(e) => set('reqId', e.target.value)}>
-              <option value="true">Required</option>
-              <option value="false">Not Required</option>
-            </select>
-          </div>
-        </div>
-        <div className="row mb-2">
-          <label className="col-form-label col-3">Format</label>
-          <div className="col-9">
-            <select
-              className="form-select form-select-sm"
-              value={form.tourFormat}
-              onChange={(e) => set('tourFormat', e.target.value)}
-            >
-              <option value="SINGLE_DECK">Single Deck</option>
-              <option value="MULTI_DECK">Multi-Deck</option>
-            </select>
-          </div>
-        </div>
-        <div className="row mb-2">
-          <label className="col-form-label col-3">Game</label>
-          <div className="col-9">
-            <select
-              className="form-select form-select-sm"
-              value={form.gameFormat}
-              onChange={(e) => set('gameFormat', e.target.value)}
-            >
-              <option value="STANDARD">Standard</option>
-              <option value="V5">V5</option>
-              <option value="DUEL">Duel</option>
-              <option value="PLAYTEST">Playtest</option>
-            </select>
-          </div>
-        </div>
+        <FormRow label="Name">
+          <input className="form-control form-control-sm" value={form.name} onChange={(e) => set('name', e.target.value)} />
+        </FormRow>
+        <FormRow label="Reg Start">
+          <input
+            type="date"
+            className="form-control form-control-sm"
+            value={form.regStart}
+            onChange={(e) => set('regStart', e.target.value)}
+          />
+        </FormRow>
+        <FormRow label="Reg End">
+          <input
+            type="date"
+            className="form-control form-control-sm"
+            value={form.regEnd}
+            onChange={(e) => set('regEnd', e.target.value)}
+          />
+        </FormRow>
+        <FormRow label="Play Start">
+          <input
+            type="date"
+            className="form-control form-control-sm"
+            value={form.playStart}
+            onChange={(e) => set('playStart', e.target.value)}
+          />
+        </FormRow>
+        <FormRow label="Play End">
+          <input
+            type="date"
+            className="form-control form-control-sm"
+            value={form.playEnd}
+            onChange={(e) => set('playEnd', e.target.value)}
+          />
+        </FormRow>
+        <FormRow label="Rounds">
+          <select className="form-select form-select-sm" value={form.numOfRounds} onChange={(e) => set('numOfRounds', e.target.value)}>
+            {[2, 3].map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </FormRow>
+        <FormRow label="VEKN ID">
+          <select className="form-select form-select-sm" value={form.reqId} onChange={(e) => set('reqId', e.target.value)}>
+            <option value="true">Required</option>
+            <option value="false">Not Required</option>
+          </select>
+        </FormRow>
+        <FormRow label="Format">
+          <select className="form-select form-select-sm" value={form.tourFormat} onChange={(e) => set('tourFormat', e.target.value)}>
+            <option value="SINGLE_DECK">Single Deck</option>
+            <option value="MULTI_DECK">Multi-Deck</option>
+          </select>
+        </FormRow>
+        <FormRow label="Game">
+          <select className="form-select form-select-sm" value={form.gameFormat} onChange={(e) => set('gameFormat', e.target.value)}>
+            <option value="STANDARD">Standard</option>
+            <option value="V5">V5</option>
+            <option value="DUEL">Duel</option>
+            <option value="PLAYTEST">Playtest</option>
+          </select>
+        </FormRow>
         <label className="form-label small text-muted mb-1">Tournament Rules</label>
         <div className="input-group input-group-sm mb-1">
           <input

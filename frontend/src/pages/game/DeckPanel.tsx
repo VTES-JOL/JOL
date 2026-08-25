@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { Deck } from '../../api/types';
 import { DeckPreview } from '../../components/DeckPreview';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 import { Panel } from './Panel';
 
 // Mirrors game-deck.jsp/doShowDeck() — GET .../deck is already a dedicated,
@@ -12,13 +12,7 @@ export function DeckPanel({ gameId, onToggleNotes }: { gameId: string; onToggleN
   const [deck, setDeck] = useState<Deck | null>(null);
 
   useEffect(() => {
-    api
-      .get<Deck>(`/game/${gameId}/deck`)
-      .then(setDeck)
-      .catch((err) => {
-        console.error('Failed to load game deck', err);
-        showError('Failed to load game deck.');
-      });
+    runRequest(api.get<Deck>(`/game/${gameId}/deck`), 'Failed to load game deck', setDeck);
   }, [gameId]);
 
   return (

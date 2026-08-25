@@ -5,7 +5,7 @@ import type { DeckInfoBean, DeckPage as DeckPageData } from '../api/types';
 import { DeckListPanel } from './deck/DeckListPanel';
 import { DeckEditor } from './deck/DeckEditor';
 import { DeckPreviewPanel } from './deck/DeckPreviewPanel';
-import { showError } from '../components/toast';
+import { runRequest } from '../api/mutate';
 import { PageLoading } from '../components/PageLoading';
 import './DeckPage.css';
 
@@ -45,66 +45,40 @@ export function DeckPage() {
   const refreshDeckList = () => queryClient.invalidateQueries({ queryKey: ['decks', 'list'] });
 
   const newDeck = () => {
-    api
-      .post<DeckPageData>('/decks/player/new')
-      .then((page) => {
-        applyPage(page);
-        setEditing(true);
-      })
-      .catch((err) => {
-        console.error('Failed to start new deck', err);
-        showError('Failed to start new deck.');
-      });
+    runRequest(api.post<DeckPageData>('/decks/player/new'), 'Failed to start new deck', (page) => {
+      applyPage(page);
+      setEditing(true);
+    });
   };
 
   const loadDeck = (deckName: string) => {
-    api
-      .post<DeckPageData>('/decks/player/load', { deckName })
-      .then((page) => {
-        applyPage(page);
-        setEditing(false);
-      })
-      .catch((err) => {
-        console.error('Failed to load deck', err);
-        showError('Failed to load deck.');
-      });
+    runRequest(api.post<DeckPageData>('/decks/player/load', { deckName }), 'Failed to load deck', (page) => {
+      applyPage(page);
+      setEditing(false);
+    });
   };
 
   const deleteDeck = (deckName: string) => {
-    api
-      .del<DeckPageData>(`/decks/player/${encodeURIComponent(deckName)}`)
-      .then((page) => {
-        applyPage(page);
-        refreshDeckList();
-      })
-      .catch((err) => {
-        console.error('Failed to delete deck', err);
-        showError('Failed to delete deck.');
-      });
+    runRequest(api.del<DeckPageData>(`/decks/player/${encodeURIComponent(deckName)}`), 'Failed to delete deck', (page) => {
+      applyPage(page);
+      refreshDeckList();
+    });
   };
 
   const saveDeck = (deckName: string, contents: string, comment: string) => {
-    api
-      .post<DeckPageData>('/decks/player', { deckName, contents, comment })
-      .then((page) => {
+    runRequest(
+      api.post<DeckPageData>('/decks/player', { deckName, contents, comment }),
+      'Failed to save deck',
+      (page) => {
         applyPage(page);
         setEditing(false);
         refreshDeckList();
-      })
-      .catch((err) => {
-        console.error('Failed to save deck', err);
-        showError('Failed to save deck.');
-      });
+      },
+    );
   };
 
   const validate = (contents: string, format: string) => {
-    api
-      .post<DeckPageData>('/decks/player/validate', { contents, format })
-      .then(applyPage)
-      .catch((err) => {
-        console.error('Failed to validate deck', err);
-        showError('Failed to validate deck.');
-      });
+    runRequest(api.post<DeckPageData>('/decks/player/validate', { contents, format }), 'Failed to validate deck', applyPage);
   };
 
   return (

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import type { TournamentPlayer, TournamentRegistration } from '../../api/types';
 import { confirmDialog } from '../../components/dialog';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 import { RoundColumn } from './RoundColumn';
 import type { DragPayload } from './dragDrop';
 import { ImportTablesModal } from './ImportTablesModal';
@@ -33,52 +34,53 @@ export function DraftTableManager({
   roundsConfig: boolean;
   onCreatedTables: () => void;
 }) {
-  const [roundNumbers, setRoundNumbers] = useState<number[]>([]);
-  const [playerVekn, setPlayerVekn] = useState<Record<string, string>>({});
+  const queryClient = useQueryClient();
   const [state, setState] = useState<RoundsState>({ pools: {}, tables: {} });
   const [showImport, setShowImport] = useState(false);
   const [createError, setCreateError] = useState('');
 
-  const load = () => {
-    Promise.all([
-      api.get<number[]>(`/tournament/${encodeURIComponent(tournamentName)}/rounds-count`),
-      api.get<TournamentRegistration[]>(`/tournament/${encodeURIComponent(tournamentName)}/players`),
-      roundsConfig
-        ? api.get<Record<number, Record<number, TournamentPlayer[]>>>(
-            `/tournament/${encodeURIComponent(tournamentName)}/rounds`,
-          )
-        : Promise.resolve(null),
-    ])
-      .then(([rounds, registrations, existingRounds]) => {
-        setRoundNumbers(rounds);
-        const vekn: Record<string, string> = {};
-        registrations.forEach((r) => (vekn[r.player] = r.vekn ?? ''));
-        setPlayerVekn(vekn);
+  const queryKey = ['tournament', tournamentName, 'draft-tables', roundsConfig];
+  const { data } = useQuery({
+    queryKey,
+    queryFn: () =>
+      Promise.all([
+        api.get<number[]>(`/tournament/${encodeURIComponent(tournamentName)}/rounds-count`),
+        api.get<TournamentRegistration[]>(`/tournament/${encodeURIComponent(tournamentName)}/players`),
+        roundsConfig
+          ? api.get<Record<number, Record<number, TournamentPlayer[]>>>(
+              `/tournament/${encodeURIComponent(tournamentName)}/rounds`,
+            )
+          : Promise.resolve(null),
+      ]).then(([rounds, registrations, existingRounds]) => ({ rounds, registrations, existingRounds })),
+  });
 
-        const fullRoster = registrations.map((r) => r.player);
-        const pools: Record<number, string[]> = {};
-        const tables: Record<number, string[][]> = {};
-        rounds.forEach((round) => {
-          const existingTables = existingRounds?.[round];
-          const tableList = existingTables
-            ? Object.keys(existingTables)
-                .sort((a, b) => Number(a) - Number(b))
-                .map((t) => existingTables[Number(t)].map((p) => p.name))
-            : [];
-          tables[round] = tableList;
-          const seated = new Set(tableList.flat());
-          pools[round] = fullRoster.filter((p) => !seated.has(p));
-        });
-        setState({ pools, tables });
-      })
-      .catch((err) => {
-        console.error('Failed to load tournament tables', err);
-        showError('Failed to load tournament tables.');
-      });
-  };
+  const roundNumbers = data?.rounds ?? [];
+  const playerVekn: Record<string, string> = {};
+  data?.registrations.forEach((r) => (playerVekn[r.player] = r.vekn ?? ''));
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(load, [tournamentName]);
+  // Query data is the source of truth on (re)load; `state` is then a local
+  // editable buffer the drag-and-drop below mutates freely.
+  useEffect(() => {
+    if (!data) return;
+    const { rounds, registrations, existingRounds } = data;
+    const fullRoster = registrations.map((r) => r.player);
+    const pools: Record<number, string[]> = {};
+    const tables: Record<number, string[][]> = {};
+    rounds.forEach((round) => {
+      const existingTables = existingRounds?.[round];
+      const tableList = existingTables
+        ? Object.keys(existingTables)
+            .sort((a, b) => Number(a) - Number(b))
+            .map((t) => existingTables[Number(t)].map((p) => p.name))
+        : [];
+      tables[round] = tableList;
+      const seated = new Set(tableList.flat());
+      pools[round] = fullRoster.filter((p) => !seated.has(p));
+    });
+    setState({ pools, tables });
+  }, [data]);
+
+  const load = () => queryClient.invalidateQueries({ queryKey });
 
   const move = (round: number, payload: DragPayload, to: 'pool' | number) => {
     if (payload.from === to) return;
@@ -145,23 +147,15 @@ export function DraftTableManager({
       });
       body[round] = tableMap;
     });
-    api
-      .put(`/tournament/${encodeURIComponent(tournamentName)}/rounds`, body)
-      .then(load)
-      .catch((err) => {
-        console.error('Failed to save tournament tables', err);
-        showError('Failed to save tournament tables.');
-      });
+    runRequest(api.put(`/tournament/${encodeURIComponent(tournamentName)}/rounds`, body), 'Failed to save tournament tables', load);
   };
 
   const downloadTables = () => {
-    api
-      .getText(`/tournament/${encodeURIComponent(tournamentName)}/rounds/csv`)
-      .then((data) => downloadCsv(data, 'rounds.csv'))
-      .catch((err) => {
-        console.error('Failed to export tournament tables', err);
-        showError('Failed to export tournament tables.');
-      });
+    runRequest(
+      api.getText(`/tournament/${encodeURIComponent(tournamentName)}/rounds/csv`),
+      'Failed to export tournament tables',
+      (data) => downloadCsv(data, 'rounds.csv'),
+    );
   };
 
   const createTables = async () => {

@@ -4,7 +4,7 @@ import { api } from '../../api/client';
 import type { Profile } from '../../api/types';
 import { isPushSupported, subscribeToPush, unsubscribeFromPush } from '../../push/pushNotifications';
 import { alertDialog } from '../../components/dialog';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 
 export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (updated: Profile) => void }) {
   const [notificationsBusy, setNotificationsBusy] = useState(false);
@@ -29,16 +29,13 @@ export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (
         return;
       }
       setNotificationsBusy(true);
-      Notification.requestPermission()
-        .then((permission) => {
+      runRequest(
+        Notification.requestPermission().then((permission) => {
           if (permission !== 'granted') return;
           return subscribeToPush().then(() => setUserPreferences(profile.imageTooltipPreference, true));
-        })
-        .catch((err) => {
-          console.error('Unable to subscribe to push notifications', err);
-          showError('Unable to subscribe to push notifications.');
-        })
-        .finally(() => setNotificationsBusy(false));
+        }),
+        'Unable to subscribe to push notifications',
+      ).finally(() => setNotificationsBusy(false));
     } else {
       setNotificationsBusy(true);
       unsubscribeFromPush()

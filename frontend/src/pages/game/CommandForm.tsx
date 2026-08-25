@@ -4,7 +4,7 @@ import type { GameSnapshot } from '../../api/types';
 import { QuickCommandModal } from './QuickCommandModal';
 import { QuickChatModal } from './QuickChatModal';
 import { confirmDialog } from '../../components/dialog';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 
 // Mirrors commands.jsp/doSubmit()/doEndTurn() plus the quick-command/
 // quick-chat modals (Phase 3) — free-text Command, Chat, Phase, Ping,
@@ -53,62 +53,49 @@ export function CommandForm({
   const submit = () => {
     if (!command && !chat && !phase) return;
     setSubmitting(true);
-    api
-      .post<GameSnapshot>(`/game/${gameId}/view/submit`, {
+    runRequest(
+      api.post<GameSnapshot>(`/game/${gameId}/view/submit`, {
         phase: phase || null,
         command: command || null,
         chat: chat || null,
         ping: ping || null,
-      })
-      .then((updated) => {
+      }),
+      'Failed to submit',
+      (updated) => {
         setCommand('');
         setChat('');
         setPing('');
         setStatus(updated.status ?? '');
         onUpdated(updated);
-      })
-      .catch((err) => {
-        console.error('Failed to submit', err);
-        showError('Failed to submit.');
-      })
-      .finally(() => setSubmitting(false));
+      },
+    ).finally(() => setSubmitting(false));
   };
 
   const sendQuickCommand = (quickCommand: string) => {
-    api
-      .post<GameSnapshot>(`/game/${gameId}/view/submit`, { phase: null, command: quickCommand, chat: null, ping: null })
-      .then((updated) => {
+    runRequest(
+      api.post<GameSnapshot>(`/game/${gameId}/view/submit`, { phase: null, command: quickCommand, chat: null, ping: null }),
+      'Failed to submit',
+      (updated) => {
         setStatus(updated.status ?? '');
         onUpdated(updated);
-      })
-      .catch((err) => {
-        console.error('Failed to submit', err);
-        showError('Failed to submit.');
-      });
+      },
+    );
   };
 
   const sendQuickChat = (message: string) => {
-    api
-      .post<GameSnapshot>(`/game/${gameId}/view/submit`, { phase: null, command: null, chat: message, ping: null })
-      .then((updated) => {
+    runRequest(
+      api.post<GameSnapshot>(`/game/${gameId}/view/submit`, { phase: null, command: null, chat: message, ping: null }),
+      'Failed to submit',
+      (updated) => {
         setStatus(updated.status ?? '');
         onUpdated(updated);
-      })
-      .catch((err) => {
-        console.error('Failed to submit', err);
-        showError('Failed to submit.');
-      });
+      },
+    );
   };
 
   const endTurn = async () => {
     if (!(await confirmDialog('Are you sure you want to end your turn?'))) return;
-    api
-      .post<GameSnapshot>(`/game/${gameId}/view/end-turn`)
-      .then(onUpdated)
-      .catch((err) => {
-        console.error('Failed to end turn', err);
-        showError('Failed to end turn.');
-      });
+    runRequest(api.post<GameSnapshot>(`/game/${gameId}/view/end-turn`), 'Failed to end turn', onUpdated);
   };
 
   return (

@@ -3,7 +3,7 @@ import type { CardDefinition, CardMode, CardModeTarget, CardSnapshot } from '../
 import { fetchCardDefinition } from './cardDefinitions';
 import { buildDiscardCommand, buildHandLabelCommand, buildPlayCommand, needsTargetPicker, type HandCardContext } from './cardCommands';
 import { CardImage } from './CardImage';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 import { Modal } from '../../components/Modal';
 
 export interface PendingTarget {
@@ -40,12 +40,7 @@ export function PlayCardModal({
   useEffect(() => {
     setDefinition(null);
     setSelected(new Set());
-    fetchCardDefinition(card.cardId ?? '', !!card.playtest)
-      .then(setDefinition)
-      .catch((err) => {
-        console.error('Failed to load card definition', err);
-        showError('Failed to load card details.');
-      });
+    runRequest(fetchCardDefinition(card.cardId ?? '', !!card.playtest), 'Failed to load card details', setDefinition);
   }, [card.cardId, card.playtest]);
 
   const doNotReplace = ctx.regionCommandKey === 'research' ? true : !!definition?.doNotReplace;

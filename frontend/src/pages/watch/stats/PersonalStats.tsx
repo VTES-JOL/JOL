@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
 import type { DeckMatchup, OpponentStats } from '../../../api/types';
 import { SortIcon, useTableSort } from '../statsUtils';
-import { showError } from '../../../components/toast';
+import { runRequest } from '../../../api/mutate';
 
 interface OpponentRow extends OpponentStats, Record<string, unknown> {}
 
@@ -21,18 +21,16 @@ function OpponentPerformance({
   const [nameFilter, setNameFilter] = useState('');
 
   useEffect(() => {
-    api
-      .post<Record<string, OpponentStats>>(`/stats/performance/${encodeURIComponent(player)}/players`, {
+    runRequest(
+      api.post<Record<string, OpponentStats>>(`/stats/performance/${encodeURIComponent(player)}/players`, {
         treshold: 0,
         fromDate,
         toDate,
         isTourney,
-      })
-      .then(setData)
-      .catch((err) => {
-        console.error('Failed to load opponent stats', err);
-        showError('Failed to load opponent stats.');
-      });
+      }),
+      'Failed to load opponent stats',
+      setData,
+    );
   }, [player, fromDate, toDate, isTourney]);
 
   const rows = Object.values(data) as OpponentRow[];
@@ -108,18 +106,16 @@ function DeckPerformance({
   const [gamesFilter, setGamesFilter] = useState('');
 
   useEffect(() => {
-    api
-      .post<DeckMatchup[]>(`/stats/performance/${encodeURIComponent(player)}/decks`, {
+    runRequest(
+      api.post<DeckMatchup[]>(`/stats/performance/${encodeURIComponent(player)}/decks`, {
         treshold: 0,
         fromDate,
         toDate,
         isTourney,
-      })
-      .then(setData)
-      .catch((err) => {
-        console.error('Failed to load deck performance', err);
-        showError('Failed to load deck performance.');
-      });
+      }),
+      'Failed to load deck performance',
+      setData,
+    );
   }, [player, fromDate, toDate, isTourney]);
 
   const { sorted, toggle } = useTableSort(data as unknown as (DeckMatchup & Record<string, unknown>)[]);

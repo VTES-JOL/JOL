@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
 import type { GameDuration } from '../../../api/types';
 import { SortIcon, useTableSort } from '../statsUtils';
-import { showError } from '../../../components/toast';
+import { runRequest } from '../../../api/mutate';
 
 export function GameStats({ fromDate, toDate, isTourney }: { fromDate: string; toDate: string; isTourney: boolean }) {
   const [data, setData] = useState<GameDuration[]>([]);
@@ -10,13 +10,7 @@ export function GameStats({ fromDate, toDate, isTourney }: { fromDate: string; t
   const [playerFilter, setPlayerFilter] = useState('');
 
   useEffect(() => {
-    api
-      .post<GameDuration[]>('/stats/games', { treshold: 0, fromDate, toDate, isTourney })
-      .then(setData)
-      .catch((err) => {
-        console.error('Failed to load game stats', err);
-        showError('Failed to load game stats.');
-      });
+    runRequest(api.post<GameDuration[]>('/stats/games', { treshold: 0, fromDate, toDate, isTourney }), 'Failed to load game stats', setData);
   }, [fromDate, toDate, isTourney]);
 
   const { sorted, toggle } = useTableSort(data as unknown as (GameDuration & Record<string, unknown>)[]);

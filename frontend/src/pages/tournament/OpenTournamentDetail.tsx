@@ -5,7 +5,7 @@ import { relativeTime } from '../../lib/relativeTime';
 import { DeckPreview } from '../../components/DeckPreview';
 import { useSimpleDropdown } from '../../hooks/useSimpleDropdown';
 import { confirmDialog } from '../../components/dialog';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 
 export function OpenTournamentDetail({
   tournament,
@@ -21,34 +21,20 @@ export function OpenTournamentDetail({
   onChanged: (updated: TournamentBean) => void;
 }) {
   const join = () => {
-    api
-      .post<TournamentBean>(`/tournament/${encodeURIComponent(tournament.name)}/player/join`)
-      .then(onChanged)
-      .catch((err) => {
-        console.error('Failed to join tournament', err);
-        showError('Failed to join tournament.');
-      });
+    runRequest(api.post<TournamentBean>(`/tournament/${encodeURIComponent(tournament.name)}/player/join`), 'Failed to join tournament', onChanged);
   };
 
   const leave = async () => {
     if (!(await confirmDialog('Leave Tournament?'))) return;
-    api
-      .post<TournamentBean>(`/tournament/${encodeURIComponent(tournament.name)}/player/leave`)
-      .then(onChanged)
-      .catch((err) => {
-        console.error('Failed to leave tournament', err);
-        showError('Failed to leave tournament.');
-      });
+    runRequest(api.post<TournamentBean>(`/tournament/${encodeURIComponent(tournament.name)}/player/leave`), 'Failed to leave tournament', onChanged);
   };
 
   const chooseDeck = (deckName: string) => {
-    api
-      .post<TournamentBean>(`/tournament/${encodeURIComponent(tournament.name)}/player/deck`, { deckName })
-      .then(onChanged)
-      .catch((err) => {
-        console.error('Failed to register tournament deck', err);
-        showError('Failed to register tournament deck.');
-      });
+    runRequest(
+      api.post<TournamentBean>(`/tournament/${encodeURIComponent(tournament.name)}/player/deck`, { deckName }),
+      'Failed to register tournament deck',
+      onChanged,
+    );
   };
 
   const registration = registeredGames.find((g) => g.name === tournament.name);

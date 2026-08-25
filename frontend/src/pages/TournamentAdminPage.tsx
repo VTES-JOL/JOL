@@ -1,13 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useRef, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { TournamentMetadata } from '../api/types';
 import { TournamentAdminList } from './tournamentAdmin/TournamentAdminList';
 import { TournamentEditor } from './tournamentAdmin/TournamentEditor';
 import { TournamentManager } from './tournamentAdmin/TournamentManager';
-import { showError } from '../components/toast';
+import { confirmDialog } from '../components/dialog';
 import './TournamentAdminPage.css';
 
-type View = { mode: 'edit'; name: string | null } | { mode: 'tables'; tournament: TournamentMetadata } | null;
+type View = { mode: 'edit'; name: string | null } | { mode: 'tables'; name: string } | null;
+
+// Shares the ['tournament'] WS invalidation key with the player-facing
+// TournamentPage (see TournamentResource's player/join, /leave, /deck
+// handlers) — TanStack Query's default prefix matching means a push there
+// also refreshes this list, on top of the explicit refreshList() calls below
+// after admin-only mutations (which the backend doesn't push for).
+const TOURNAMENT_ADMIN_LIST_KEY = ['tournament', 'admin-list'];
 
 // Mirrors ds.js's tournamentAdminClick(): EDIT tournaments (and STARTING ones
 // still inside their own registration window) open the editor; STARTING
@@ -17,52 +25,64 @@ function decide(t: TournamentMetadata): View {
   const now = new Date();
   const regEnd = new Date(t.registrationEndTime);
   if (t.status === 'EDIT') return { mode: 'edit', name: t.name };
-  if (t.status === 'STARTING') return now > regEnd ? { mode: 'tables', tournament: t } : { mode: 'edit', name: t.name };
-  return { mode: 'tables', tournament: t };
+  if (t.status === 'STARTING') return now > regEnd ? { mode: 'tables', name: t.name } : { mode: 'edit', name: t.name };
+  return { mode: 'tables', name: t.name };
 }
 
 export function TournamentAdminPage() {
-  const [tournaments, setTournaments] = useState<TournamentMetadata[]>([]);
+  const queryClient = useQueryClient();
   const [view, setView] = useState<View>(null);
+  // Set by TournamentEditor's onDirtyChange — a ref, not state, since it's
+  // only ever read at the moment of a new selection, never during render.
+  const editorDirtyRef = useRef(false);
 
-  const refreshList = () => {
-    api
-      .get<TournamentMetadata[]>('/tournament/admin-list')
-      .then((list) => {
-        setTournaments(list);
-        setView((prev) => {
-          if (prev?.mode !== 'tables') return prev;
-          const updated = list.find((t) => t.name === prev.tournament.name);
-          return updated ? { mode: 'tables', tournament: updated } : prev;
-        });
-      })
-      .catch((err) => {
-        console.error('Failed to load tournament admin list', err);
-        showError('Failed to load tournament admin list.');
-      });
+  const { data: tournaments = [] } = useQuery({
+    queryKey: TOURNAMENT_ADMIN_LIST_KEY,
+    queryFn: () => api.get<TournamentMetadata[]>('/tournament/admin-list'),
+  });
+
+  const refreshList = () => queryClient.invalidateQueries({ queryKey: TOURNAMENT_ADMIN_LIST_KEY });
+
+  // Derived from the live query result each render instead of a copy
+  // snapshotted into `view` — so it never goes stale relative to `tournaments`.
+  const tablesTournament = view?.mode === 'tables' ? tournaments.find((t) => t.name === view.name) : null;
+
+  // TournamentEditor can't guard its own `tournamentName` prop changing out
+  // from under it, so the confirm has to live here, at the two places that
+  // actually change it.
+  const confirmDiscardIfDirty = async () => !editorDirtyRef.current || confirmDialog('Discard unsaved changes?');
+
+  const selectTournament = async (t: TournamentMetadata) => {
+    if (!(await confirmDiscardIfDirty())) return;
+    setView(decide(t));
   };
 
-  useEffect(refreshList, []);
+  const newTournament = async () => {
+    if (!(await confirmDiscardIfDirty())) return;
+    setView({ mode: 'edit', name: null });
+  };
 
   return (
     <div className="tour-admin-layout p-3">
       <div className="tour-admin-col-left">
-        <TournamentAdminList
-          tournaments={tournaments}
-          onSelect={(t) => setView(decide(t))}
-          onNew={() => setView({ mode: 'edit', name: null })}
-        />
+        <TournamentAdminList tournaments={tournaments} onSelect={selectTournament} onNew={newTournament} />
       </div>
       <div className="tour-admin-col-right">
         {view?.mode === 'edit' && (
           <div className="d-flex flex-column flex-fill min-h-0">
-            <TournamentEditor tournamentName={view.name} onSaved={refreshList} />
+            <TournamentEditor
+              tournamentName={view.name}
+              onSaved={refreshList}
+              onDirtyChange={(dirty) => {
+                editorDirtyRef.current = dirty;
+              }}
+            />
           </div>
         )}
-        {view?.mode === 'tables' && (
+        {tablesTournament && (
           <div className="d-flex flex-column flex-fill min-h-0">
             <TournamentManager
-              tournament={view.tournament}
+              tournament={tablesTournament}
               onClose={() => setView(null)}
               onChanged={refreshList}
             />

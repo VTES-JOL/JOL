@@ -7,7 +7,7 @@ import { subscribe } from '../../ws/socket';
 import { useAuth } from '../../nav/useAuth';
 import { useCardTooltips } from '../../hooks/useCardTooltips';
 import { dayLabel, highlightMentions, localTimeTitle, utcTime } from './chatFormatting';
-import { showError } from '../../components/toast';
+import { runRequest } from '../../api/mutate';
 import './GlobalChat.css';
 
 const AT_BOTTOM_THRESHOLD_PX = 20;
@@ -144,18 +144,11 @@ export function GlobalChat() {
     setSending(true);
     // The POST response already carries this message in its own delta — no
     // need for a second round trip to see what was just sent.
-    api
-      .post<ChatEntry[]>('/chat', { text: message })
-      .then((delta) => {
-        setText('');
-        forceScrollRef.current = true;
-        appendChat(delta);
-      })
-      .catch((err) => {
-        console.error('Failed to send chat message', err);
-        showError('Failed to send chat message.');
-      })
-      .finally(() => setSending(false));
+    runRequest(api.post<ChatEntry[]>('/chat', { text: message }), 'Failed to send chat message', (delta) => {
+      setText('');
+      forceScrollRef.current = true;
+      appendChat(delta);
+    }).finally(() => setSending(false));
   };
 
   return (
