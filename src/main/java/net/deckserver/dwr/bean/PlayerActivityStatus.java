@@ -5,11 +5,14 @@ import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.DeckFormat;
 import net.deckserver.services.DeckService;
+import net.deckserver.services.PlayerService;
 import net.deckserver.services.RegistrationService;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,5 +43,17 @@ public class PlayerActivityStatus {
 
     public String getLastOnline() {
         return lastOnline.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+    }
+
+    /** Names of players seen within the last month, most-recently-online first — shared by admin/lobby "who's around" pickers. */
+    public static List<String> recentlyActiveNames() {
+        OffsetDateTime currentMonth = OffsetDateTime.now().minusMonths(1);
+        return PlayerService.getPlayers().stream()
+                .sorted()
+                .map(PlayerActivityStatus::new)
+                .filter(status -> status.online().isAfter(currentMonth))
+                .sorted(Comparator.comparing(PlayerActivityStatus::getLastOnline))
+                .map(PlayerActivityStatus::getName)
+                .toList();
     }
 }

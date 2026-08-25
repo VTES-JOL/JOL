@@ -2,7 +2,8 @@ package net.deckserver.rest;
 
 import com.google.common.base.Strings;
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.bean.LobbyPageBean;
+import net.deckserver.dwr.bean.GameStatusBean;
+import net.deckserver.dwr.bean.PlayerActivityStatus;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.services.GameService;
 import net.deckserver.services.RegistrationService;
@@ -11,55 +12,70 @@ import net.deckserver.ws.WebSocketRegistry;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
+/**
+ * Dedicated, envelope-free reads/writes for the React lobby page. One
+ * targeted GET per widget (GameList/GameCreateForm/GameDetail on
+ * LobbyPage.tsx) rather than one combined page bean, so registering a deck
+ * doesn't force the games list to refetch and vice versa — see
+ * AdminPageResource for the same pattern applied to the admin page.
+ */
 @Path("/lobby")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class LobbyResource extends BaseResource {
 
-    /** Targeted read for the React lobby page — mirrors LobbyPageBean, standalone. */
+    /** Unified game list: owner's private games (any status) + public starting games + invited private starting games. */
     @GET
     @Path("player/games")
-    public LobbyPageBean getLobby() {
-        return new LobbyPageBean(username(), null);
+    public List<GameStatusBean> games() {
+        String player = username();
+        return JolAdmin.getGameNames().stream()
+                .filter(Objects::nonNull)
+                .filter(gameName -> JolAdmin.isViewable(gameName, player))
+                .filter(gameName ->
+                        (JolAdmin.isPrivate(gameName) && player.equals(JolAdmin.getOwner(gameName)))
+                        || (JolAdmin.isStarting(gameName) && JolAdmin.isPublic(gameName))
+                        || (JolAdmin.isStarting(gameName) && RegistrationService.isInGame(gameName, player)))
+                .distinct()
+                .map(gameName -> new GameStatusBean(gameName, player))
+                .sorted(Comparator.comparing(GameStatusBean::getFormat).thenComparing(GameStatusBean::getCreated))
+                .toList();
     }
 
-    /**
-     * Proof-of-concept TanStack Query invalidation push (see
-     * WebSocketRegistry.notifyInvalidate) — every other tab's ['lobby']
-     * query gets invalidated; this tab already has the fresh bean in the
-     * mutating call's own response, so it's excluded.
-     */
-    private LobbyPageBean getLobbyAndInvalidate() {
-        return getLobbyAndInvalidate(null);
+    /** Recently-active player names, for the invite-player datalists on GameCreateForm/GameDetail. */
+    @GET
+    @Path("players")
+    public List<String> players() {
+        return PlayerActivityStatus.recentlyActiveNames();
     }
 
-    private LobbyPageBean getLobbyAndInvalidate(String message) {
+    @GET
+    @Path("game-formats")
+    public List<String> gameFormats() {
+        return JolAdmin.getAvailableGameFormats(username()).stream().map(GameFormat::getLabel).toList();
+    }
+
+    private void notifyLobby() {
         WebSocketRegistry.notifyInvalidate(List.of("lobby"), clientId());
-        return new LobbyPageBean(username(), message);
     }
 
-    /**
-     * Dedicated equivalents of the five mutations below, for the React lobby
-     * page — same underlying calls, but returning the fresh LobbyPageBean
-     * directly instead of the shared UpdateFactory envelope those return for
-     * ds.js's DS.createGame/DS.startGame/DS.invitePlayer/DS.unInvitePlayer/
-     * DS.registerDeck, which are still in use by the legacy lobby view.
-     */
     @POST
     @Path("player/games")
-    public LobbyPageBean createGameReact(CreateGameRequest body) {
+    public void createGameReact(CreateGameRequest body) {
         String playerName = username();
         if (!Strings.isNullOrEmpty(playerName)) {
             JolAdmin.createGame(body.name(), "PUBLIC".equals(body.publicFlag()), GameFormat.from(body.format()), playerName);
         }
-        return getLobbyAndInvalidate();
+        notifyLobby();
     }
 
     @POST
     @Path("player/games/{name}/start")
-    public LobbyPageBean startGameReact(@PathParam("name") String game) {
+    public void startGameReact(@PathParam("name") String game) {
         String playerName = username();
         if (GameService.existsGame(game)) {
             String owner = JolAdmin.getOwner(game);
@@ -67,52 +83,53 @@ public class LobbyResource extends BaseResource {
                 JolAdmin.startGame(game);
             }
         }
-        return getLobbyAndInvalidate();
+        notifyLobby();
     }
 
     @DELETE
     @Path("player/games/{name}")
-    public LobbyPageBean closeGameReact(@PathParam("name") String game) {
+    public void closeGameReact(@PathParam("name") String game) {
         String playerName = username();
         String owner = JolAdmin.getOwner(game);
         if (playerName.equals(owner) || JolAdmin.isAdmin(playerName)) {
             JolAdmin.endGame(game, true);
         }
-        return getLobbyAndInvalidate();
+        notifyLobby();
     }
 
     @POST
     @Path("player/games/{name}/invite")
-    public LobbyPageBean invitePlayerReact(@PathParam("name") String game, InviteRequest body) {
+    public void invitePlayerReact(@PathParam("name") String game, InviteRequest body) {
         String playerName = username();
         if (playerName != null) {
             RegistrationService.invitePlayer(game, body.player());
             WebSocketRegistry.notifyInvalidate(List.of("main-games"));
         }
-        return getLobbyAndInvalidate();
+        notifyLobby();
     }
 
     @DELETE
     @Path("player/games/{name}/invite/{player}")
-    public LobbyPageBean unInvitePlayerReact(@PathParam("name") String game, @PathParam("player") String player) {
+    public void unInvitePlayerReact(@PathParam("name") String game, @PathParam("player") String player) {
         String playerName = username();
         if (playerName != null) {
             JolAdmin.unInvitePlayer(game, player);
             WebSocketRegistry.notifyInvalidate(List.of("main-games"));
         }
-        return getLobbyAndInvalidate();
+        notifyLobby();
     }
 
     @POST
     @Path("player/games/{name}/deck")
-    public LobbyPageBean registerDeckReact(@PathParam("name") String game, RegisterDeckRequest body) {
+    public RegisterDeckResponse registerDeckReact(@PathParam("name") String game, RegisterDeckRequest body) {
         String playerName = username();
         String message = null;
         if (!Strings.isNullOrEmpty(playerName)) {
             message = JolAdmin.registerDeck(game, playerName, body.deckName());
             WebSocketRegistry.notifyInvalidate(List.of("main-games"));
         }
-        return getLobbyAndInvalidate(message);
+        notifyLobby();
+        return new RegisterDeckResponse(message);
     }
 
     /** The current player's registered deck for this game — no side effects (unlike DS.loadDeck()). */
@@ -130,4 +147,5 @@ public class LobbyResource extends BaseResource {
     public record CreateGameRequest(String name, String publicFlag, String format) {}
     public record InviteRequest(String player) {}
     public record RegisterDeckRequest(String deckName) {}
+    public record RegisterDeckResponse(String message) {}
 }

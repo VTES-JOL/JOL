@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import type { GameHistory } from '../../api/types';
 import { runRequest } from '../../api/mutate';
@@ -23,7 +24,12 @@ function downloadCsv(data: string, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-export function PastGamesTab({ history }: { history: GameHistory[] }) {
+export function PastGamesTab() {
+  const { data: history = [] } = useQuery({
+    queryKey: ['watch', 'history'],
+    queryFn: () => api.get<GameHistory[]>('/watch/history'),
+  });
+
   const exportCsv = () => {
     runRequest(api.getText('/admin/export/games.csv'), 'Failed to export past games', (data) => downloadCsv(data, 'past-games.csv'));
   };

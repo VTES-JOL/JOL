@@ -1,22 +1,28 @@
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import { runRequest } from '../../api/mutate';
 
-export function ReplacePlayer({
-  games,
-  substitutes,
-  onSaved,
-}: {
-  games: Record<string, string>;
-  substitutes: string[];
-  onSaved: () => void;
-}) {
+export function ReplacePlayer() {
+  const { data: games = {} } = useQuery({
+    queryKey: ['admin-page', 'games'],
+    queryFn: () => api.get<Record<string, string>>('/admin-page/games'),
+  });
+  const { data: substitutes = [] } = useQuery({
+    queryKey: ['admin-page', 'substitutes'],
+    queryFn: () => api.get<string[]>('/admin-page/substitutes'),
+  });
   const gameIds = Object.keys(games);
-  const [gameId, setGameId] = useState(gameIds[0] ?? '');
+  const [gameId, setGameId] = useState('');
   const [players, setPlayers] = useState<string[]>([]);
   const [existingPlayer, setExistingPlayer] = useState('');
   const [newPlayer, setNewPlayer] = useState('');
+
+  useEffect(() => {
+    if (!gameId && gameIds.length > 0) setGameId(gameIds[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameIds.length]);
 
   useEffect(() => {
     if (!newPlayer && substitutes.length > 0) setNewPlayer(substitutes[0]);
@@ -41,7 +47,6 @@ export function ReplacePlayer({
     runRequest(
       api.put(`/admin-page/games/${encodeURIComponent(gameId)}/replace-player`, { existingPlayer, newPlayer }),
       'Failed to replace player',
-      onSaved,
     );
   };
 

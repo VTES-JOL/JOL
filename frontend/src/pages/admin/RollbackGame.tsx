@@ -1,14 +1,24 @@
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import { confirmDialog } from '../../components/dialog';
 import { runRequest } from '../../api/mutate';
 
-export function RollbackGame({ games, onSaved }: { games: Record<string, string>; onSaved: () => void }) {
+export function RollbackGame() {
+  const { data: games = {} } = useQuery({
+    queryKey: ['admin-page', 'games'],
+    queryFn: () => api.get<Record<string, string>>('/admin-page/games'),
+  });
   const gameIds = Object.keys(games);
-  const [gameId, setGameId] = useState(gameIds[0] ?? '');
+  const [gameId, setGameId] = useState('');
   const [turns, setTurns] = useState<string[]>([]);
   const [turn, setTurn] = useState('');
+
+  useEffect(() => {
+    if (!gameId && gameIds.length > 0) setGameId(gameIds[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameIds.length]);
 
   useEffect(() => {
     if (!gameId) {
@@ -27,7 +37,7 @@ export function RollbackGame({ games, onSaved }: { games: Record<string, string>
   const submit = async () => {
     if (!gameId || !turn) return;
     if (!(await confirmDialog(`Are you sure you want to rollback to turn ${turn} for ${games[gameId]}`))) return;
-    runRequest(api.post(`/admin-page/games/${encodeURIComponent(gameId)}/rollback`, { turn }), 'Failed to rollback game', onSaved);
+    runRequest(api.post(`/admin-page/games/${encodeURIComponent(gameId)}/rollback`, { turn }), 'Failed to rollback game');
   };
 
   return (

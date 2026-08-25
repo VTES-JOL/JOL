@@ -1,21 +1,20 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../../api/client';
-import type { LobbyPage } from '../../api/types';
 
-export function GameCreateForm({
-  players,
-  gameFormats,
-  onCancel,
-  onCreated,
-}: {
-  players: string[];
-  gameFormats: string[];
-  onCancel: () => void;
-  onCreated: (updated: LobbyPage, gameName: string) => void;
-}) {
+export function GameCreateForm({ onCancel, onCreated }: { onCancel: () => void; onCreated: (gameName: string) => void }) {
+  const { data: players = [] } = useQuery({
+    queryKey: ['lobby', 'players'],
+    queryFn: () => api.get<string[]>('/lobby/players'),
+  });
+  const { data: gameFormats = [] } = useQuery({
+    queryKey: ['lobby', 'game-formats'],
+    queryFn: () => api.get<string[]>('/lobby/game-formats'),
+  });
+
   const [name, setName] = useState('');
   const [visibility, setVisibility] = useState<'PRIVATE' | 'PUBLIC'>('PRIVATE');
-  const [format, setFormat] = useState(gameFormats[0] ?? '');
+  const [format, setFormat] = useState('');
   const [inviteInput, setInviteInput] = useState('');
   const [pendingInvites, setPendingInvites] = useState<string[]>([]);
   const [error, setError] = useState('');
@@ -29,7 +28,7 @@ export function GameCreateForm({
 
   const removeInvite = (p: string) => setPendingInvites((prev) => prev.filter((x) => x !== p));
 
-  const create = () => {
+  const create = async () => {
     const trimmedName = name.trim();
     if (!trimmedName) {
       setError('Name is required.');
@@ -40,23 +39,18 @@ export function GameCreateForm({
       return;
     }
     setError('');
-    api
-      .post<LobbyPage>('/lobby/player/games', { name: trimmedName, publicFlag: visibility, format })
-      .then((updated) => {
-        const invites =
-          visibility === 'PRIVATE'
-            ? pendingInvites.reduce(
-                (chain, p) =>
-                  chain.then(() =>
-                    api.post<LobbyPage>(`/lobby/player/games/${encodeURIComponent(trimmedName)}/invite`, { player: p }),
-                  ),
-                Promise.resolve(updated),
-              )
-            : Promise.resolve(updated);
-        return invites;
-      })
-      .then((finalState) => onCreated(finalState, trimmedName))
-      .catch((err) => setError(err.message ?? 'Failed to create game.'));
+    try {
+      await api.post('/lobby/player/games', { name: trimmedName, publicFlag: visibility, format: format || gameFormats[0] });
+      if (visibility === 'PRIVATE') {
+        for (const p of pendingInvites) {
+          await api.post(`/lobby/player/games/${encodeURIComponent(trimmedName)}/invite`, { player: p });
+        }
+      }
+      onCreated(trimmedName);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create game.');
+      return;
+    }
     setName('');
     setPendingInvites([]);
   };
@@ -94,7 +88,7 @@ export function GameCreateForm({
         </div>
         <div className="mb-3">
           <label className="form-label">Format</label>
-          <select className="form-select" value={format} onChange={(e) => setFormat(e.target.value)}>
+          <select className="form-select" value={format || gameFormats[0] || ''} onChange={(e) => setFormat(e.target.value)}>
             {gameFormats.map((f) => (
               <option key={f} value={f}>
                 {f}

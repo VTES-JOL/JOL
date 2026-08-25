@@ -1,31 +1,38 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
-import type { TournamentBean } from '../api/types';
+import type { TournamentList as TournamentListData } from '../api/types';
 import { TournamentList, type Selection } from './tournament/TournamentList';
 import { OpenTournamentDetail } from './tournament/OpenTournamentDetail';
 import { FinalsTournamentDetail } from './tournament/FinalsTournamentDetail';
 import { PageLoading } from '../components/PageLoading';
 import { EmptyState } from '../components/EmptyState';
 
-const TOURNAMENT_QUERY_KEY = ['tournament', 'player-list'];
+const TOURNAMENT_LIST_QUERY_KEY = ['tournament', 'list'];
 
+// Each widget below fetches its own slice (see tournament/*.tsx) —
+// registering a tournament deck no longer forces the tournament list to
+// refetch, and vice versa. See TournamentResource for the backend side of
+// this split (was previously one combined TournamentBean).
 export function TournamentPage() {
   const queryClient = useQueryClient();
   const [selection, setSelection] = useState<Selection>(null);
 
   const { data } = useQuery({
-    queryKey: TOURNAMENT_QUERY_KEY,
-    queryFn: () => api.get<TournamentBean>('/tournament/player-list'),
+    queryKey: TOURNAMENT_LIST_QUERY_KEY,
+    queryFn: () => api.get<TournamentListData>('/tournament/list'),
   });
-
-  const applyUpdate = (updated: TournamentBean) => queryClient.setQueryData(TOURNAMENT_QUERY_KEY, updated);
 
   if (!data) return <PageLoading />;
 
   const openTournament = selection?.type === 'open' ? data.tournaments.find((t) => t.name === selection.name) : null;
   const finalsTournament =
     selection?.type === 'finals' ? data.finalsInvites.find((t) => t.name === selection.name) : null;
+
+  // Join/leave change tournament.registered on the list itself; deck
+  // registration doesn't, so it only needs to invalidate ['tournament','registered'].
+  const refreshList = () => queryClient.invalidateQueries({ queryKey: TOURNAMENT_LIST_QUERY_KEY });
+  const refreshRegistered = () => queryClient.invalidateQueries({ queryKey: ['tournament', 'registered'] });
 
   return (
     <div className="row g-2 flex-fill align-items-stretch min-h-0 p-3">
@@ -41,10 +48,11 @@ export function TournamentPage() {
         {openTournament && (
           <OpenTournamentDetail
             tournament={openTournament}
-            veknLinked={data.veknLinked}
-            registeredGames={data.registeredGames}
-            decks={data.decks}
-            onChanged={applyUpdate}
+            onJoinedOrLeft={() => {
+              refreshList();
+              refreshRegistered();
+            }}
+            onDeckChanged={refreshRegistered}
           />
         )}
         {finalsTournament && <FinalsTournamentDetail tournament={finalsTournament} />}

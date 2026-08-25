@@ -1,21 +1,30 @@
 import { useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
+import type { SiteNotes } from '../../api/types';
 import { confirmDialog } from '../../components/dialog';
 import { runRequest } from '../../api/mutate';
 
-export function SiteNotesEditor({ notes, onSaved }: { notes: string; onSaved: () => void }) {
-  const [text, setText] = useState(notes);
+export function SiteNotesEditor() {
+  const queryClient = useQueryClient();
+  const { data } = useQuery({
+    queryKey: ['admin-page', 'site-notes'],
+    queryFn: () => api.get<SiteNotes>('/admin-page/site-notes'),
+  });
+  const [text, setText] = useState('');
 
-  useEffect(() => setText(notes), [notes]);
+  useEffect(() => setText(data?.notes ?? ''), [data]);
+
+  const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin-page', 'site-notes'] });
 
   const save = () => {
-    runRequest(api.put('/admin-page/site-notes', { notes: text }), 'Failed to save site notes', onSaved);
+    runRequest(api.put('/admin-page/site-notes', { notes: text }), 'Failed to save site notes', refresh);
   };
 
   const clear = async () => {
     if (!(await confirmDialog('Clear the site notes?'))) return;
-    runRequest(api.del('/admin-page/site-notes'), 'Failed to clear site notes', onSaved);
+    runRequest(api.del('/admin-page/site-notes'), 'Failed to clear site notes', refresh);
   };
 
   return (

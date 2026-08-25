@@ -1,17 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import { confirmDialog } from '../../components/dialog';
 import { runRequest } from '../../api/mutate';
 
-export function EndTurn({ games, onSaved }: { games: Record<string, string>; onSaved: () => void }) {
+export function EndTurn() {
+  const { data: games = {} } = useQuery({
+    queryKey: ['admin-page', 'games'],
+    queryFn: () => api.get<Record<string, string>>('/admin-page/games'),
+  });
   const gameIds = Object.keys(games);
-  const [gameId, setGameId] = useState(gameIds[0] ?? '');
+  const [gameId, setGameId] = useState('');
+
+  useEffect(() => {
+    if (!gameId && gameIds.length > 0) setGameId(gameIds[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameIds.length]);
 
   const submit = async () => {
     if (!gameId) return;
     if (!(await confirmDialog(`Are you sure you want to end turn for ${games[gameId]}`))) return;
-    runRequest(api.post(`/admin-page/games/${encodeURIComponent(gameId)}/end-turn`), 'Failed to end turn', onSaved);
+    runRequest(api.post(`/admin-page/games/${encodeURIComponent(gameId)}/end-turn`), 'Failed to end turn');
   };
 
   return (

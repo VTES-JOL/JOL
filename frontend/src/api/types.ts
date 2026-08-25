@@ -92,15 +92,9 @@ export interface CountryOption {
   name: string;
 }
 
-// GET /jol/api/admin-page — net.deckserver.dwr.bean.AdminPageBean. `players`
-// (dead idle-players.jsp, never included by admin/layout.jsp) is omitted —
-// not ported, see AdminPage.tsx.
-export interface AdminPage {
-  userRoles: UserRole[];
-  substitutes: string[];
-  games: Record<string, string>; // gameId -> gameName
-  idleGames: IdleGame[];
-  siteNotes: string;
+// GET /jol/api/admin-page/site-notes — net.deckserver.rest.AdminPageResource.SiteNotesResponse.
+export interface SiteNotes {
+  notes: string;
 }
 
 export interface UserRole {
@@ -191,13 +185,16 @@ export interface CardSimple {
   name: string;
 }
 
-// GET /jol/api/tournament/player-list — net.deckserver.dwr.bean.TournamentBean.
-export interface TournamentBean {
-  veknLinked: boolean;
+// GET /jol/api/tournament/list — net.deckserver.rest.TournamentResource.TournamentListResponse.
+export interface TournamentList {
   tournaments: TournamentMetadata[];
-  registeredGames: TournamentInviteStatus[];
   finalsInvites: TournamentMetadata[];
-  decks: DeckInfoBean[];
+}
+
+// GET /jol/api/tournament/registered — net.deckserver.rest.TournamentResource.TournamentRegisteredResponse.
+export interface TournamentRegistered {
+  veknLinked: boolean;
+  registeredGames: TournamentInviteStatus[];
 }
 
 // net.deckserver.storage.json.system.TournamentInviteStatus.
@@ -237,12 +234,6 @@ export interface LibraryCard {
   type: string;
   count: number;
   cards: CardCount[];
-}
-
-// GET /jol/api/watch — net.deckserver.dwr.bean.AllGamesBean.
-export interface AllGames {
-  games: GameSummary[];
-  history: GameHistory[];
 }
 
 // net.deckserver.dwr.bean.GameSummaryBean.
@@ -337,16 +328,6 @@ export interface JolStats {
   bestPlayer: string;
   bestDeck: string;
   bestNation: string;
-}
-
-// GET /jol/api/lobby/player/games — net.deckserver.dwr.bean.LobbyPageBean.
-export interface LobbyPage {
-  players: string[];
-  games: GameStatusBean[];
-  decks: DeckInfoBean[];
-  message: string | null;
-  playtester: boolean;
-  gameFormats: string[];
 }
 
 // net.deckserver.storage.json.deck.DeckStats.

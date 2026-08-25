@@ -1,6 +1,7 @@
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader } from '../../components/Card';
 import { api } from '../../api/client';
-import type { DeckInfoBean, TournamentBean, TournamentInviteStatus, TournamentMetadata } from '../../api/types';
+import type { DeckInfoBean, TournamentMetadata, TournamentRegistered } from '../../api/types';
 import { relativeTime } from '../../lib/relativeTime';
 import { DeckPreview } from '../../components/DeckPreview';
 import { useSimpleDropdown } from '../../hooks/useSimpleDropdown';
@@ -9,31 +10,41 @@ import { runRequest } from '../../api/mutate';
 
 export function OpenTournamentDetail({
   tournament,
-  veknLinked,
-  registeredGames,
-  decks,
-  onChanged,
+  onJoinedOrLeft,
+  onDeckChanged,
 }: {
   tournament: TournamentMetadata;
-  veknLinked: boolean;
-  registeredGames: TournamentInviteStatus[];
-  decks: DeckInfoBean[];
-  onChanged: (updated: TournamentBean) => void;
+  onJoinedOrLeft: () => void;
+  onDeckChanged: () => void;
 }) {
+  const { data: registered } = useQuery({
+    queryKey: ['tournament', 'registered'],
+    queryFn: () => api.get<TournamentRegistered>('/tournament/registered'),
+  });
+  const veknLinked = registered?.veknLinked ?? false;
+  const registeredGames = registered?.registeredGames ?? [];
+  // registrable=true excludes LEGACY-format decks, matching the old
+  // server-side TournamentBean.decks filter — legacy decks can't be
+  // registered to a tournament.
+  const { data: decks = [] } = useQuery({
+    queryKey: ['decks', 'registrable'],
+    queryFn: () => api.get<DeckInfoBean[]>('/decks?registrable=true'),
+  });
+
   const join = () => {
-    runRequest(api.post<TournamentBean>(`/tournament/${encodeURIComponent(tournament.name)}/player/join`), 'Failed to join tournament', onChanged);
+    runRequest(api.post(`/tournament/${encodeURIComponent(tournament.name)}/player/join`), 'Failed to join tournament', onJoinedOrLeft);
   };
 
   const leave = async () => {
     if (!(await confirmDialog('Leave Tournament?'))) return;
-    runRequest(api.post<TournamentBean>(`/tournament/${encodeURIComponent(tournament.name)}/player/leave`), 'Failed to leave tournament', onChanged);
+    runRequest(api.post(`/tournament/${encodeURIComponent(tournament.name)}/player/leave`), 'Failed to leave tournament', onJoinedOrLeft);
   };
 
   const chooseDeck = (deckName: string) => {
     runRequest(
-      api.post<TournamentBean>(`/tournament/${encodeURIComponent(tournament.name)}/player/deck`, { deckName }),
+      api.post(`/tournament/${encodeURIComponent(tournament.name)}/player/deck`, { deckName }),
       'Failed to register tournament deck',
-      onChanged,
+      onDeckChanged,
     );
   };
 

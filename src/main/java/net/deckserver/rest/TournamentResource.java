@@ -1,7 +1,6 @@
 package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.bean.TournamentBean;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.TournamentFormat;
@@ -15,6 +14,7 @@ import net.deckserver.storage.json.game.CardSimple;
 import net.deckserver.storage.json.system.*;
 import net.deckserver.ws.WebSocketRegistry;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
@@ -374,48 +374,61 @@ public class TournamentResource extends BaseResource {
     // tournament page uses the player/join|leave|deck equivalents below
     // instead.
 
-    /** Dedicated, envelope-free list read for the React tournament (player-facing) page — mirrors TournamentBean. */
+    /**
+     * Dedicated, envelope-free reads for the React tournament (player-facing)
+     * page — one GET per widget (TournamentList / OpenTournamentDetail)
+     * rather than one combined TournamentBean, so registering a deck doesn't
+     * force the tournament list to refetch — see AdminPageResource for the
+     * same pattern applied to the admin page.
+     */
     @GET
-    @Path("player-list")
-    public TournamentBean getPlayerList() {
-        return new TournamentBean(username());
+    @Path("list")
+    public TournamentListResponse getTournamentList() {
+        String playerName = username();
+        return new TournamentListResponse(
+                TournamentService.getOpenTournaments(playerName),
+                TournamentService.getFinalsInvites(playerName));
+    }
+
+    @GET
+    @Path("registered")
+    public TournamentRegisteredResponse getRegistered() {
+        String playerName = username();
+        String veknId = PlayerService.get(playerName).getVeknId();
+        boolean veknLinked = !StringUtils.isEmpty(veknId) && veknId.matches("[0-9]+");
+        return new TournamentRegisteredResponse(veknLinked, TournamentService.getRegisteredTournaments(playerName));
     }
 
     /**
      * Dedicated equivalents of join/leave/deck above, for the React player-facing
-     * page — same underlying calls, but returning the fresh TournamentBean
-     * directly instead of the shared UpdateFactory envelope those endpoints
-     * return for ds.js's DS.joinTournament/DS.leaveTournament/DS.registerTournamentDeck,
-     * which are still in use by the legacy tournament view.
+     * page — same underlying calls as ds.js's DS.joinTournament/DS.leaveTournament/
+     * DS.registerTournamentDeck, which are still in use by the legacy tournament view.
      */
     @POST
     @Path("{name}/player/join")
-    public TournamentBean joinTournamentReact(@PathParam("name") String tourName) {
+    public void joinTournamentReact(@PathParam("name") String tourName) {
         String playerName = username();
         String veknId = PlayerService.get(playerName).getVeknId();
         TournamentService.joinTournament(tourName, playerName, veknId);
         WebSocketRegistry.notifyInvalidate(List.of("tournament"), clientId());
-        return getPlayerList();
     }
 
     @POST
     @Path("{name}/player/leave")
-    public TournamentBean leaveTournamentReact(@PathParam("name") String tourName) {
+    public void leaveTournamentReact(@PathParam("name") String tourName) {
         String playerName = username();
         TournamentService.leaveTournament(tourName, playerName);
         WebSocketRegistry.notifyInvalidate(List.of("tournament"), clientId());
-        return getPlayerList();
     }
 
     @POST
     @Path("{name}/player/deck")
-    public TournamentBean registerTournamentDeckReact(@PathParam("name") String tourName, RegisterDeckRequest body) {
+    public void registerTournamentDeckReact(@PathParam("name") String tourName, RegisterDeckRequest body) {
         String playerName = username();
         DeckInfo deckInfo = DeckService.get(playerName, body.deckName());
         ExtendedDeck deck = DeckService.getDeck(deckInfo.getDeckId());
         TournamentService.registerDeck(tourName, playerName, deck);
         WebSocketRegistry.notifyInvalidate(List.of("tournament"), clientId());
-        return getPlayerList();
     }
 
     /** Replaces DS.resetTables() */
@@ -582,6 +595,8 @@ public class TournamentResource extends BaseResource {
     public record ImportTablesRequest(String csvData) {}
     public record RecreateTableRequest(String csvData) {}
     public record RegisterDeckRequest(String deckName) {}
+    public record TournamentListResponse(List<TournamentMetadata> tournaments, List<TournamentMetadata> finalsInvites) {}
+    public record TournamentRegisteredResponse(boolean veknLinked, List<TournamentInviteStatus> registeredGames) {}
     public record PlayerRoundSummary(String name, float vp, boolean gw, int pool) {}
     public record PlayerStanding(String player, String vekn, int gw, float vp, int rank) {}
 }

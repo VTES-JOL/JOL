@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import type { UserRole } from '../../api/types';
@@ -17,37 +18,42 @@ const ROLES: { value: string; label: string }[] = [
 // Column order matches player-roles.jsp's table header.
 const COLUMNS = ['JUDGE', 'SUPER_USER', 'PLAYTESTER', 'ADMIN', 'TOURNAMENT_ADMIN'];
 
-export function PlayerRoles({
-  userRoles,
-  substitutes,
-  onSaved,
-}: {
-  userRoles: UserRole[];
-  substitutes: string[];
-  onSaved: () => void;
-}) {
+export function PlayerRoles() {
+  const queryClient = useQueryClient();
   const [player, setPlayer] = useState('');
   const [role, setRole] = useState(ROLES[0].value);
 
-  // Recently-active players list (same source as the replace-player dropdown,
-  // matching ds.js's callbackAdmin exactly) only arrives after the page's
-  // first fetch — default to the first one once it does.
+  const { data: userRoles = [] } = useQuery({
+    queryKey: ['admin-page', 'user-roles'],
+    queryFn: () => api.get<UserRole[]>('/admin-page/user-roles'),
+  });
+  // Same source as the replace-player dropdown — TanStack Query dedupes the
+  // identical concurrent fetch rather than issuing it twice.
+  const { data: substitutes = [] } = useQuery({
+    queryKey: ['admin-page', 'substitutes'],
+    queryFn: () => api.get<string[]>('/admin-page/substitutes'),
+  });
+
+  // Recently-active players list only arrives after the page's first fetch —
+  // default to the first one once it does.
   useEffect(() => {
     if (!player && substitutes.length > 0) setPlayer(substitutes[0]);
   }, [substitutes, player]);
+
+  const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin-page', 'user-roles'] });
 
   const toggleRole = async (targetPlayer: string, targetRole: string, hasRole: boolean) => {
     if (hasRole && !(await confirmDialog('Are you sure you want to remove this role?'))) return;
     runRequest(
       api.put(`/admin-page/roles/${encodeURIComponent(targetPlayer)}`, { role: targetRole, value: !hasRole }),
       'Failed to update role',
-      onSaved,
+      refresh,
     );
   };
 
   const addRole = () => {
     if (!player) return;
-    runRequest(api.put(`/admin-page/roles/${encodeURIComponent(player)}`, { role, value: true }), 'Failed to add role', onSaved);
+    runRequest(api.put(`/admin-page/roles/${encodeURIComponent(player)}`, { role, value: true }), 'Failed to add role', refresh);
   };
 
   return (

@@ -1,7 +1,9 @@
 package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.bean.AdminPageBean;
+import net.deckserver.dwr.bean.GameActivityStatus;
+import net.deckserver.dwr.bean.PlayerActivityStatus;
+import net.deckserver.dwr.bean.UserSummaryBean;
 import net.deckserver.game.enums.PlayerRole;
 import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;
@@ -11,6 +13,12 @@ import net.deckserver.storage.json.system.PlayerInfo;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.OffsetDateTime;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Dedicated, envelope-free reads/writes for the React admin page — same role
@@ -21,10 +29,16 @@ import javax.ws.rs.core.Response;
  * this duplicates against the same JolAdmin methods rather than depending on
  * those shared endpoints.
  *
- * AdminCreator/AdminPageBean has no server-side admin check today (the
- * legacy page is gated only by hiding the nav link) — these endpoints add
- * one, since that's a plain correctness improvement in code being written
- * fresh, not a behavior change to any existing endpoint.
+ * One targeted GET per admin tool (PlayerRoles/ReplacePlayer/EndTurn/
+ * RollbackGame/IdleGames/SiteNotesEditor on AdminPage.tsx) rather than one
+ * combined page bean, so editing one tool doesn't force every sibling tool
+ * to refetch — see MainResource for the same pattern applied to the
+ * dashboard page.
+ *
+ * AdminCreator/AdminPageBean had no server-side admin check historically
+ * (the legacy page was gated only by hiding the nav link) — these endpoints
+ * add one, since that's a plain correctness improvement in code being
+ * written fresh, not a behavior change to any existing endpoint.
  */
 @Path("admin-page")
 @Produces(MediaType.APPLICATION_JSON)
@@ -38,18 +52,69 @@ public class AdminPageResource extends BaseResource {
     }
 
     @GET
-    public AdminPageBean page() {
+    @Path("user-roles")
+    public List<UserSummaryBean> userRoles() {
         requireAdmin();
-        return new AdminPageBean();
+        return PlayerService.getPlayers().stream()
+                .sorted()
+                .map(UserSummaryBean::new)
+                .filter(UserSummaryBean::isSpecialUser)
+                .sorted(Comparator.comparing(UserSummaryBean::getName, String.CASE_INSENSITIVE_ORDER))
+                .toList();
+    }
+
+    @GET
+    @Path("substitutes")
+    public List<String> substitutes() {
+        requireAdmin();
+        return PlayerActivityStatus.recentlyActiveNames();
+    }
+
+    /** id -> name, for the game-picker dropdowns shared by ReplacePlayer/EndTurn/RollbackGame. */
+    @GET
+    @Path("games")
+    public Map<String, String> games() {
+        requireAdmin();
+        return activeGameNames().stream()
+                .collect(Collectors.toMap(
+                        name -> GameService.get(name).getId(),
+                        name -> name,
+                        (a, b) -> a,
+                        LinkedHashMap::new));
+    }
+
+    @GET
+    @Path("idle-games")
+    public List<GameActivityStatus> idleGames() {
+        requireAdmin();
+        OffsetDateTime currentMonth = OffsetDateTime.now().minusMonths(1);
+        return activeGameNames().stream()
+                .map(GameActivityStatus::new)
+                .filter(gameActivityStatus -> gameActivityStatus.timestamp().isBefore(currentMonth))
+                .sorted(Comparator.comparing(GameActivityStatus::timestamp))
+                .toList();
+    }
+
+    private List<String> activeGameNames() {
+        return JolAdmin.getGameNames().stream()
+                .sorted()
+                .filter(JolAdmin::isActive)
+                .toList();
+    }
+
+    @GET
+    @Path("site-notes")
+    public SiteNotesResponse siteNotes() {
+        requireAdmin();
+        return new SiteNotesResponse(SiteNotesService.getRawNotes());
     }
 
     @PUT
     @Path("roles/{name}")
-    public AdminPageBean setRole(@PathParam("name") String player, RoleRequest body) {
+    public void setRole(@PathParam("name") String player, RoleRequest body) {
         requireAdmin();
         PlayerInfo target = PlayerService.get(player);
         JolAdmin.setRole(target, PlayerRole.valueOf(body.role()), body.value());
-        return page();
     }
 
     @PUT
@@ -106,6 +171,7 @@ public class AdminPageResource extends BaseResource {
 
     public record RoleRequest(String role, boolean value) {}
     public record SiteNotesRequest(String notes) {}
+    public record SiteNotesResponse(String notes) {}
     public record RollbackRequest(String turn) {}
     public record ReplacePlayerRequest(String existingPlayer, String newPlayer) {}
 }

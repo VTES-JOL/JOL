@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import type { IdleGame } from '../../api/types';
@@ -7,10 +8,19 @@ import { confirmDialog } from '../../components/dialog';
 import { runRequest } from '../../api/mutate';
 import { adminTimestamp } from './adminFormatting';
 
-export function IdleGames({ idleGames, onSaved }: { idleGames: IdleGame[]; onSaved: () => void }) {
+export function IdleGames() {
+  const queryClient = useQueryClient();
+  const { data: idleGames = [] } = useQuery({
+    queryKey: ['admin-page', 'idle-games'],
+    queryFn: () => api.get<IdleGame[]>('/admin-page/idle-games'),
+  });
+
   const closeGame = async (gameId: string) => {
     if (!(await confirmDialog('Are you sure you want to end this game?'))) return;
-    runRequest(api.del(`/admin-page/games/${encodeURIComponent(gameId)}`), 'Failed to end game', onSaved);
+    runRequest(api.del(`/admin-page/games/${encodeURIComponent(gameId)}`), 'Failed to end game', () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-page', 'games'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-page', 'idle-games'] });
+    });
   };
 
   return (

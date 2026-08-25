@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../api/client';
-import type { Deck, GameStatusBean, LobbyPage } from '../../api/types';
+import type { Deck, DeckInfoBean, GameStatusBean } from '../../api/types';
 import { useAuth } from '../../nav/useAuth';
 import { useSimpleDropdown } from '../../hooks/useSimpleDropdown';
 import { DeckPreview } from '../../components/DeckPreview';
@@ -10,45 +10,51 @@ import { runRequest } from '../../api/mutate';
 
 export function GameDetail({
   game,
-  players,
-  decks,
-  message,
   onClose,
   onChanged,
 }: {
   game: GameStatusBean;
-  players: string[];
-  decks: LobbyPage['decks'];
-  message: string | null;
   onClose: () => void;
-  onChanged: (updated: LobbyPage) => void;
+  onChanged: () => void;
 }) {
   const { player } = useAuth();
   const [inviteInput, setInviteInput] = useState('');
   const [deckSearch, setDeckSearch] = useState('');
   const deckDropdown = useSimpleDropdown<HTMLDivElement>();
 
+  const { data: players = [] } = useQuery({
+    queryKey: ['lobby', 'players'],
+    queryFn: () => api.get<string[]>('/lobby/players'),
+  });
+  // registrable=true excludes LEGACY-format decks, matching the old
+  // server-side LobbyPageBean.decks filter — legacy decks can't be
+  // registered to a new game (see JolAdmin.registerDeck).
+  const { data: decks = [] } = useQuery({
+    queryKey: ['decks', 'registrable'],
+    queryFn: () => api.get<DeckInfoBean[]>('/decks?registrable=true'),
+  });
+
   const encodedName = encodeURIComponent(game.name);
 
   const startGame = async () => {
     if (!(await confirmDialog('Start Game?'))) return;
-    runRequest(api.post<LobbyPage>(`/lobby/player/games/${encodedName}/start`), 'Failed to start game', onChanged);
+    runRequest(api.post(`/lobby/player/games/${encodedName}/start`), 'Failed to start game', onChanged);
   };
 
   const closeGame = async () => {
     if (!(await confirmDialog('Close Game?', { danger: true }))) return;
-    runRequest(api.del<LobbyPage>(`/lobby/player/games/${encodedName}`), 'Failed to close game', onChanged);
+    runRequest(api.del(`/lobby/player/games/${encodedName}`), 'Failed to close game', onChanged);
   };
 
   const joinGame = () => {
     if (!player) return;
-    runRequest(api.post<LobbyPage>(`/lobby/player/games/${encodedName}/invite`, { player }), 'Failed to join game', onChanged);
+    runRequest(api.post(`/lobby/player/games/${encodedName}/invite`, { player }), 'Failed to join game', onChanged);
   };
 
   const leaveGame = async () => {
     if (!player || !(await confirmDialog('Leave Game?'))) return;
     runRequest(
-      api.del<LobbyPage>(`/lobby/player/games/${encodedName}/invite/${encodeURIComponent(player)}`),
+      api.del(`/lobby/player/games/${encodedName}/invite/${encodeURIComponent(player)}`),
       'Failed to leave game',
       onChanged,
     );
@@ -57,33 +63,39 @@ export function GameDetail({
   const invitePlayer = () => {
     const p = inviteInput.trim();
     if (!p) return;
-    runRequest(api.post<LobbyPage>(`/lobby/player/games/${encodedName}/invite`, { player: p }), 'Failed to invite player', onChanged);
+    runRequest(api.post(`/lobby/player/games/${encodedName}/invite`, { player: p }), 'Failed to invite player', onChanged);
     setInviteInput('');
   };
 
   const removeInvite = (p: string) => {
     runRequest(
-      api.del<LobbyPage>(`/lobby/player/games/${encodedName}/invite/${encodeURIComponent(p)}`),
+      api.del(`/lobby/player/games/${encodedName}/invite/${encodeURIComponent(p)}`),
       'Failed to remove invite',
       onChanged,
     );
   };
 
+  const [visibleMessage, setVisibleMessage] = useState<string | null>(null);
+  useEffect(() => {
+    if (!visibleMessage) return;
+    const timeout = setTimeout(() => setVisibleMessage(null), 4000);
+    return () => clearTimeout(timeout);
+  }, [visibleMessage]);
+
   const registerDeck = (deckName: string) => {
-    runRequest(api.post<LobbyPage>(`/lobby/player/games/${encodedName}/deck`, { deckName }), 'Failed to register deck', onChanged);
+    runRequest(
+      api.post<{ message: string | null }>(`/lobby/player/games/${encodedName}/deck`, { deckName }),
+      'Failed to register deck',
+      (result) => {
+        onChanged();
+        setVisibleMessage(result.message);
+      },
+    );
     deckDropdown.setOpen(false);
   };
 
   const myRegistration = game.registrations.find((r) => r.player === player);
   const playerInRegistrations = myRegistration !== undefined;
-
-  const [visibleMessage, setVisibleMessage] = useState<string | null>(null);
-  useEffect(() => {
-    if (!message) return;
-    setVisibleMessage(message);
-    const timeout = setTimeout(() => setVisibleMessage(null), 4000);
-    return () => clearTimeout(timeout);
-  }, [message]);
 
   const { data: preview } = useQuery({
     queryKey: ['lobby', game.name, 'deck', myRegistration?.deckName],

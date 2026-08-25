@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReplacePlayer } from './ReplacePlayer';
 import { api } from '../../api/client';
 import { showError } from '../../components/toast';
@@ -19,21 +20,47 @@ beforeEach(() => {
   vi.mocked(showError).mockReset();
 });
 
+function renderWithClient(
+  games: Record<string, string>,
+  substitutes: string[],
+  gamePlayers: Record<string, string[]> = {},
+) {
+  vi.mocked(api.get).mockImplementation((path: string) => {
+    if (path === '/admin-page/games') return Promise.resolve(games);
+    if (path === '/admin-page/substitutes') return Promise.resolve(substitutes);
+    const match = /^\/game\/([^/]+)\/players$/.exec(path);
+    if (match) return Promise.resolve(gamePlayers[match[1]] ?? []);
+    return Promise.resolve([]);
+  });
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <ReplacePlayer />
+    </QueryClientProvider>,
+  );
+}
+
 describe('ReplacePlayer', () => {
   it('loads the first game\'s players on mount and defaults the substitute to the first entry', async () => {
-    vi.mocked(api.get).mockResolvedValue(['Player1', 'Player2']);
-    render(<ReplacePlayer games={{ g1: 'Game One', g2: 'Game Two' }} substitutes={['Sub1', 'Sub2']} onSaved={vi.fn()} />);
+    renderWithClient(
+      { g1: 'Game One', g2: 'Game Two' },
+      ['Sub1', 'Sub2'],
+      { g1: ['Player1', 'Player2'] },
+    );
 
-    expect(api.get).toHaveBeenCalledWith('/game/g1/players');
+    await waitFor(() => expect(api.get).toHaveBeenCalledWith('/game/g1/players'));
     await waitFor(() => expect(screen.getByLabelText('Player to replace:')).toHaveValue('Player1'));
     expect(screen.getByLabelText('Substitute')).toHaveValue('Sub1');
   });
 
   it('reloads players when a different game is selected', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce(['Player1']).mockResolvedValueOnce(['Player3', 'Player4']);
     const user = userEvent.setup();
-    render(<ReplacePlayer games={{ g1: 'Game One', g2: 'Game Two' }} substitutes={['Sub1']} onSaved={vi.fn()} />);
-    await waitFor(() => expect(api.get).toHaveBeenCalledTimes(1));
+    renderWithClient(
+      { g1: 'Game One', g2: 'Game Two' },
+      ['Sub1'],
+      { g1: ['Player1'], g2: ['Player3', 'Player4'] },
+    );
+    await waitFor(() => expect(screen.getByLabelText('Player to replace:')).toHaveValue('Player1'));
 
     await user.selectOptions(screen.getByLabelText('Games'), 'g2');
 
@@ -41,12 +68,10 @@ describe('ReplacePlayer', () => {
     await waitFor(() => expect(screen.getByLabelText('Player to replace:')).toHaveValue('Player3'));
   });
 
-  it('submits the replacement and calls onSaved', async () => {
-    vi.mocked(api.get).mockResolvedValue(['Player1', 'Player2']);
+  it('submits the replacement', async () => {
     vi.mocked(api.put).mockResolvedValue(undefined);
-    const onSaved = vi.fn();
     const user = userEvent.setup();
-    render(<ReplacePlayer games={{ g1: 'Game One' }} substitutes={['Sub1']} onSaved={onSaved} />);
+    renderWithClient({ g1: 'Game One' }, ['Sub1'], { g1: ['Player1', 'Player2'] });
     await waitFor(() => expect(screen.getByLabelText('Player to replace:')).toHaveValue('Player1'));
 
     await user.click(screen.getByRole('button', { name: 'Replace player' }));
@@ -55,27 +80,23 @@ describe('ReplacePlayer', () => {
       existingPlayer: 'Player1',
       newPlayer: 'Sub1',
     });
-    await waitFor(() => expect(onSaved).toHaveBeenCalled());
   });
 
-  it('shows a toast and does not call onSaved when the replace call fails', async () => {
-    vi.mocked(api.get).mockResolvedValue(['Player1']);
+  it('shows a toast when the replace call fails', async () => {
     vi.mocked(api.put).mockRejectedValue(new Error('boom'));
-    const onSaved = vi.fn();
     const user = userEvent.setup();
-    render(<ReplacePlayer games={{ g1: 'Game One' }} substitutes={['Sub1']} onSaved={onSaved} />);
+    renderWithClient({ g1: 'Game One' }, ['Sub1'], { g1: ['Player1'] });
     await waitFor(() => expect(screen.getByLabelText('Player to replace:')).toHaveValue('Player1'));
 
     await user.click(screen.getByRole('button', { name: 'Replace player' }));
 
     await waitFor(() => expect(showError).toHaveBeenCalledWith('Failed to replace player.'));
-    expect(onSaved).not.toHaveBeenCalled();
   });
 
   it('does not submit when there are no games at all', async () => {
-    render(<ReplacePlayer games={{}} substitutes={[]} onSaved={vi.fn()} />);
+    renderWithClient({}, []);
+    await waitFor(() => expect(api.get).toHaveBeenCalledWith('/admin-page/games'));
 
-    expect(api.get).not.toHaveBeenCalled();
     await userEvent.setup().click(screen.getByRole('button', { name: 'Replace player' }));
     expect(api.put).not.toHaveBeenCalled();
   });
