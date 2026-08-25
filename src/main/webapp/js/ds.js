@@ -3305,7 +3305,8 @@ function createCommands(data, target) {
         let clan = $("<td/>").text(count[29]);
         let open = $("<td/>").text(count[30]);
         let ping = $("<td/>").text(count[31]);
-        row.append(name, timeout, vp, choose, reveal, label, votes, random, flip, discard, draw, edge, play, influence, move, burn, pool, blood, contest, disc, capacity, unlock, lock, order, show, shuffle, transfer, rfg, path, sect, clan, open, ping);
+        let all = $("<td/>").text(count[32]);
+        row.append(name, timeout, vp, choose, reveal, label, votes, random, flip, discard, draw, edge, play, influence, move, burn, pool, blood, contest, disc, capacity, unlock, lock, order, show, shuffle, transfer, rfg, path, sect, clan, open, ping, all);
         commands.append(row);
     })
 }

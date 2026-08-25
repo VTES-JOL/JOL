@@ -340,6 +340,9 @@
                                         <th class="sticky-top bg-white">Ping
                                             <i class="bi bi-filter" onclick="sortTable(32, 'playerCommands')"></i>
                                         </th>
+                                        <th class="sticky-top bg-white">All
+                                            <i class="bi bi-filter" onclick="sortTable(33, 'playerCommands')"></i>
+                                        </th>
                                     </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -467,6 +470,9 @@
                                         </th>
                                         <th class="sticky-top bg-white">Ping
                                             <i class="bi bi-filter" onclick="sortTable(32, 'gameCommands')"></i>
+                                        </th>
+                                        <th class="sticky-top bg-white">All
+                                            <i class="bi bi-filter" onclick="sortTable(33, 'gameCommands')"></i>
                                         </th>
                                     </tr>
                                     </thead>

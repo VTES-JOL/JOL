@@ -883,7 +883,8 @@ public class StatisticsResource {
                                                 .count(),
                                         list.stream()
                                                 .filter(cmd -> cmd.command().startsWith("ping"))
-                                                .count()
+                                                .count(),
+                                        list.stream().count()
                                 )
                         )
                 ));
