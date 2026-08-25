@@ -40,7 +40,7 @@ public class GameActionResource extends BaseResource {
         boolean isPlaying = game.getPlayers().contains(player);
         boolean canJudge = JolAdmin.isJudge(player) && !game.getPlayers().contains(player);
         if (isPlaying || canJudge) {
-            game.updateGlobalNotes(body.notes());
+            game.updateGlobalNotes(body.notes(), clientId());
             JolAdmin.recordPlayerAccess(player, gameName());
         }
     }
@@ -52,7 +52,7 @@ public class GameActionResource extends BaseResource {
         String player = username();
         GameModel game = getModel();
         if (game.getPlayers().contains(player)) {
-            game.updatePrivateNotes(player, body.notes());
+            game.updatePrivateNotes(player, body.notes(), clientId());
             JolAdmin.recordPlayerAccess(player, gameName());
         }
     }

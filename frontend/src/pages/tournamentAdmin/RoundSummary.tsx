@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import type { PlayerRoundSummary } from '../../api/types';
 import { alertDialog, confirmDialog } from '../../components/dialog';
@@ -7,29 +8,30 @@ import { RecreateTableModal } from './RecreateTableModal';
 
 type Summary = Record<number, Record<number, PlayerRoundSummary[]>>;
 
+// Pool/VP/GW change as each table's games progress, but there's no WS signal
+// for in-game action (this page doesn't join any game's room) — poll so
+// results stay current while a round is in progress.
+const ROUND_SUMMARY_POLL_MS = 20_000;
+
 export function RoundSummary({ tournamentName }: { tournamentName: string }) {
-  const [summary, setSummary] = useState<Summary>({});
+  const queryClient = useQueryClient();
   const [recreateTarget, setRecreateTarget] = useState<{ round: number; table: number } | null>(null);
 
-  const load = () => {
-    api
-      .get<Summary>(`/tournament/${encodeURIComponent(tournamentName)}/round-summary`)
-      .then(setSummary)
-      .catch((err) => {
-        console.error('Failed to load round summary', err);
-        showError('Failed to load round summary.');
-      });
-  };
+  const queryKey = ['tournament', tournamentName, 'round-summary'];
+  const { data: summary = {} } = useQuery<Summary>({
+    queryKey,
+    queryFn: () => api.get<Summary>(`/tournament/${encodeURIComponent(tournamentName)}/round-summary`),
+    refetchInterval: ROUND_SUMMARY_POLL_MS,
+  });
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(load, [tournamentName]);
+  const refresh = () => queryClient.invalidateQueries({ queryKey });
 
   const closeTable = async (round: number, table: number) => {
     if (!(await confirmDialog('Close table and record VP/GW results?'))) return;
     api
       .post<boolean>(`/tournament/${encodeURIComponent(tournamentName)}/round/${round}/table/${table}/close`)
       .then((ok) => {
-        if (ok) load();
+        if (ok) refresh();
         else alertDialog('Could not close table — game may already be closed.');
       })
       .catch((err) => {
@@ -99,7 +101,7 @@ export function RoundSummary({ tournamentName }: { tournamentName: string }) {
           onClose={() => setRecreateTarget(null)}
           onRecreated={() => {
             setRecreateTarget(null);
-            load();
+            refresh();
           }}
         />
       )}

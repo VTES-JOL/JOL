@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { DeckInfoBean, DeckPage as DeckPageData } from '../api/types';
 import { DeckListPanel } from './deck/DeckListPanel';
@@ -8,42 +9,46 @@ import { showError } from '../components/toast';
 import { PageLoading } from '../components/PageLoading';
 import './DeckPage.css';
 
+const PAGE_QUERY_KEY = ['decks', 'page'];
+
 export function DeckPage() {
-  const [data, setData] = useState<DeckPageData | null>(null);
-  const [decks, setDecks] = useState<DeckInfoBean[]>([]);
+  const queryClient = useQueryClient();
   const [deckFilter, setDeckFilter] = useState('');
   const [editing, setEditing] = useState(false);
 
-  useEffect(() => {
-    api
-      .get<DeckPageData>('/decks/player')
-      .then((page) => {
-        setData(page);
-        setDeckFilter(page.deckFilter);
-      })
-      .catch((err) => {
-        console.error('Failed to load deck page', err);
-        showError('Failed to load deck page.');
-      });
-  }, []);
+  const { data } = useQuery({
+    queryKey: PAGE_QUERY_KEY,
+    queryFn: () => api.get<DeckPageData>('/decks/player'),
+  });
 
+  // Seed the filter from the page's saved preference on first load only —
+  // later mutations (new/load/save/delete/validate) also write into this
+  // same query's cache via setQueryData below, and re-seeding from those
+  // would stomp whatever the user has since typed into the filter box.
+  const [hasSeededFilter, setHasSeededFilter] = useState(false);
   useEffect(() => {
-    api
-      .get<DeckInfoBean[]>(`/decks?filter=${encodeURIComponent(deckFilter)}`)
-      .then(setDecks)
-      .catch((err) => {
-        console.error('Failed to load deck list', err);
-        showError('Failed to load deck list.');
-      });
-  }, [deckFilter]);
+    if (data && !hasSeededFilter) {
+      setDeckFilter(data.deckFilter);
+      setHasSeededFilter(true);
+    }
+  }, [data, hasSeededFilter]);
+
+  const { data: decks = [] } = useQuery({
+    queryKey: ['decks', 'list', deckFilter],
+    queryFn: () => api.get<DeckInfoBean[]>(`/decks?filter=${encodeURIComponent(deckFilter)}`),
+    enabled: hasSeededFilter,
+  });
 
   if (!data) return <PageLoading />;
+
+  const applyPage = (page: DeckPageData) => queryClient.setQueryData(PAGE_QUERY_KEY, page);
+  const refreshDeckList = () => queryClient.invalidateQueries({ queryKey: ['decks', 'list'] });
 
   const newDeck = () => {
     api
       .post<DeckPageData>('/decks/player/new')
       .then((page) => {
-        setData(page);
+        applyPage(page);
         setEditing(true);
       })
       .catch((err) => {
@@ -56,7 +61,7 @@ export function DeckPage() {
     api
       .post<DeckPageData>('/decks/player/load', { deckName })
       .then((page) => {
-        setData(page);
+        applyPage(page);
         setEditing(false);
       })
       .catch((err) => {
@@ -69,11 +74,8 @@ export function DeckPage() {
     api
       .del<DeckPageData>(`/decks/player/${encodeURIComponent(deckName)}`)
       .then((page) => {
-        setData(page);
-        api
-          .get<DeckInfoBean[]>(`/decks?filter=${encodeURIComponent(deckFilter)}`)
-          .then(setDecks)
-          .catch((err) => console.error('Failed to reload deck list', err));
+        applyPage(page);
+        refreshDeckList();
       })
       .catch((err) => {
         console.error('Failed to delete deck', err);
@@ -85,12 +87,9 @@ export function DeckPage() {
     api
       .post<DeckPageData>('/decks/player', { deckName, contents, comment })
       .then((page) => {
-        setData(page);
+        applyPage(page);
         setEditing(false);
-        api
-          .get<DeckInfoBean[]>(`/decks?filter=${encodeURIComponent(deckFilter)}`)
-          .then(setDecks)
-          .catch((err) => console.error('Failed to reload deck list', err));
+        refreshDeckList();
       })
       .catch((err) => {
         console.error('Failed to save deck', err);
@@ -101,7 +100,7 @@ export function DeckPage() {
   const validate = (contents: string, format: string) => {
     api
       .post<DeckPageData>('/decks/player/validate', { contents, format })
-      .then(setData)
+      .then(applyPage)
       .catch((err) => {
         console.error('Failed to validate deck', err);
         showError('Failed to validate deck.');

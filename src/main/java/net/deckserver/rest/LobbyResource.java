@@ -11,6 +11,7 @@ import net.deckserver.ws.WebSocketRegistry;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 @Path("/lobby")
 @Produces(MediaType.APPLICATION_JSON)
@@ -22,6 +23,17 @@ public class LobbyResource extends BaseResource {
     @Path("player/games")
     public LobbyPageBean getLobby() {
         return new LobbyPageBean(username());
+    }
+
+    /**
+     * Proof-of-concept TanStack Query invalidation push (see
+     * WebSocketRegistry.notifyInvalidate) — every other tab's ['lobby']
+     * query gets invalidated; this tab already has the fresh bean in the
+     * mutating call's own response, so it's excluded.
+     */
+    private LobbyPageBean getLobbyAndInvalidate() {
+        WebSocketRegistry.notifyInvalidate(List.of("lobby"), clientId());
+        return getLobby();
     }
 
     /**
@@ -38,7 +50,7 @@ public class LobbyResource extends BaseResource {
         if (!Strings.isNullOrEmpty(playerName)) {
             JolAdmin.createGame(body.name(), "PUBLIC".equals(body.publicFlag()), GameFormat.from(body.format()), playerName);
         }
-        return getLobby();
+        return getLobbyAndInvalidate();
     }
 
     @POST
@@ -51,7 +63,7 @@ public class LobbyResource extends BaseResource {
                 JolAdmin.startGame(game);
             }
         }
-        return getLobby();
+        return getLobbyAndInvalidate();
     }
 
     @DELETE
@@ -62,7 +74,7 @@ public class LobbyResource extends BaseResource {
         if (playerName.equals(owner) || JolAdmin.isAdmin(playerName)) {
             JolAdmin.endGame(game, true);
         }
-        return getLobby();
+        return getLobbyAndInvalidate();
     }
 
     @POST
@@ -74,7 +86,7 @@ public class LobbyResource extends BaseResource {
             WebSocketRegistry.notifyMain();
             WebSocketRegistry.notifyMainScope("games");
         }
-        return getLobby();
+        return getLobbyAndInvalidate();
     }
 
     @DELETE
@@ -86,7 +98,7 @@ public class LobbyResource extends BaseResource {
             WebSocketRegistry.notifyMain();
             WebSocketRegistry.notifyMainScope("games");
         }
-        return getLobby();
+        return getLobbyAndInvalidate();
     }
 
     @POST
@@ -98,7 +110,7 @@ public class LobbyResource extends BaseResource {
             WebSocketRegistry.notifyMain();
             WebSocketRegistry.notifyMainScope("games");
         }
-        return getLobby();
+        return getLobbyAndInvalidate();
     }
 
     /** The current player's registered deck for this game — no side effects (unlike DS.loadDeck()). */

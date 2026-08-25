@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { CardSnapshot, GameSnapshot } from '../api/types';
 import { useAuth } from '../nav/useAuth';
@@ -27,26 +28,21 @@ import './GamePage.css';
 export function GamePage() {
   const { gameId } = useParams<{ gameId: string }>();
   const { player: viewerName } = useAuth();
-  const [game, setGame] = useState<GameSnapshot | null>(null);
+  const queryClient = useQueryClient();
   const [showHistory, setShowHistory] = useState(false);
   const [showDeck, setShowDeck] = useState(false);
   const [playModal, setPlayModal] = useState<{ ctx: HandCardContext; card: CardSnapshot } | null>(null);
   const [tableModal, setTableModal] = useState<TableCardContext | null>(null);
   const [pendingTarget, setPendingTarget] = useState<PendingTarget | null>(null);
 
-  const refresh = () => {
-    if (!gameId) return;
-    api
-      .get<GameSnapshot>(`/game/${gameId}/view`)
-      .then(setGame)
-      .catch((err) => {
-        console.error('Failed to load game', err);
-        showError('Failed to load game.');
-      });
-  };
+  const { data: game } = useQuery({
+    queryKey: ['game', gameId],
+    queryFn: () => api.get<GameSnapshot>(`/game/${gameId}/view`),
+    enabled: !!gameId,
+  });
+  useGameSocket(gameId ?? null);
 
-  useEffect(refresh, [gameId]);
-  useGameSocket(gameId ?? null, refresh);
+  const applyUpdate = (updated: GameSnapshot) => queryClient.setQueryData(['game', gameId], updated);
 
   if (!game || !gameId) return <PageLoading />;
 
@@ -58,7 +54,7 @@ export function GamePage() {
         chat: submission.chat ?? null,
         ping: null,
       })
-      .then(setGame)
+      .then(applyUpdate)
       .catch((err) => {
         console.error('Failed to submit', err);
         showError('Failed to submit.');
@@ -97,7 +93,7 @@ export function GamePage() {
       <div className="container-fluid my-1 g-0 flex-grow-1 min-h-0 overflow-y-auto">
         <div className="control-grid">
           <HandStrip game={game} viewerName={viewerName} onPlayCardClick={handlePlayCardClick} />
-          <CommandForm gameId={gameId} game={game} viewerName={viewerName} onUpdated={setGame} />
+          <CommandForm gameId={gameId} game={game} viewerName={viewerName} onUpdated={applyUpdate} />
           {showHistory ? (
             <HistoryPanel gameId={gameId} game={game} viewerName={viewerName} onToggleChat={() => setShowHistory(false)} />
           ) : (

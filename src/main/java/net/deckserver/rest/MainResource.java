@@ -12,6 +12,7 @@ import net.deckserver.storage.json.system.UserSummary;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
@@ -59,11 +60,22 @@ public class MainResource extends BaseResource {
         return recent;
     }
 
-    /** Delta since this player's last read — same semantics as PlayerModel.getChat(). */
+    /**
+     * Delta since the given cursor (an entry's timestamp from a prior
+     * response, or omitted for none) — the client supplies its own cursor
+     * explicitly rather than relying on server-tracked read state, so this
+     * is a pure function of {@code since} and safe for TanStack Query to
+     * call repeatedly (e.g. on WS-triggered refetch) without losing anything.
+     * Still calls markChatsSeenThrough so the nav unread-badge (hasChats())
+     * keeps working exactly as before.
+     */
     @GET
     @Path("chat")
-    public List<ChatEntryBean> chat() {
-        return JolAdmin.getPlayerModel(username()).getChat();
+    public List<ChatEntryBean> chat(@QueryParam("since") String since) {
+        PlayerModel model = JolAdmin.getPlayerModel(username());
+        List<ChatEntryBean> result = GlobalChatService.getChatsSince(since);
+        model.markChatsSeenThrough(result);
+        return result;
     }
 
     public record NotesResponse(String notes) {}

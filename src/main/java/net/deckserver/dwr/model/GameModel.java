@@ -30,16 +30,16 @@ public class GameModel implements Comparable<GameModel> {
         this.game = game;
     }
 
-    public void endTurn(String player) {
+    public void endTurn(String player, String excludeClientId) {
         JolGame game = GameService.getGameByName(name);
         if (game.getActivePlayer().equals(player)) {
             game.newTurn();
-            JolAdmin.saveGameState(game);
+            JolAdmin.saveGameState(game, false, excludeClientId);
             JolAdmin.pingPlayer(game.getActivePlayer(), name);
         }
     }
 
-    public String submit(String player, String phase, String command, String chat, String ping) {
+    public String submit(String player, String phase, String command, String chat, String ping, String excludeClientId) {
         // Only players and judges can issue commands.  A judge can't be a player
         boolean isJudge = JolAdmin.isJudge(player) && !getPlayers().contains(player);
         if (!getPlayers().contains(player) && !isJudge) {
@@ -92,7 +92,7 @@ public class GameModel implements Comparable<GameModel> {
                 JolAdmin.clearPing(player, name);
             }
             if (stateChanged || phaseChanged || chatChanged) {
-                JolAdmin.saveGameState(game);
+                JolAdmin.saveGameState(game, false, excludeClientId);
             }
         }
         return status.toString();
@@ -117,19 +117,19 @@ public class GameModel implements Comparable<GameModel> {
         return -name.compareToIgnoreCase(arg0.getName());
     }
 
-    public void updateGlobalNotes(String notes) {
+    public void updateGlobalNotes(String notes, String excludeClientId) {
         JolGame game = GameService.getGameByName(name);
         if (!notes.equals(game.getGlobalText())) {
             game.setGlobalText(notes);
-            JolAdmin.saveGameState(game);
+            JolAdmin.saveGameState(game, false, excludeClientId);
         }
     }
 
-    public void updatePrivateNotes(String player, String notes) {
+    public void updatePrivateNotes(String player, String notes, String excludeClientId) {
         JolGame game = GameService.getGameByName(name);
         if (!notes.equals(game.getPrivateNotes(player))) {
             game.setPrivateNotes(player, notes);
-            JolAdmin.saveGameState(game, true);
+            JolAdmin.saveGameState(game, true, excludeClientId);
         }
     }
 

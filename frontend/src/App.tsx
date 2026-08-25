@@ -1,4 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './api/queryClient';
+import { useQueryInvalidation } from './ws/useQueryInvalidation';
 import { TopBar } from './components/TopBar';
 import { MainPage } from './pages/MainPage';
 import { ProfilePage } from './pages/ProfilePage';
@@ -14,7 +17,6 @@ import { HelpPage } from './pages/help/HelpPage';
 import { HelpSection } from './pages/help/HelpSection';
 import { HELP_SECTIONS } from './content/help/meta';
 import { pathForHelp } from './routes';
-import { NavProvider } from './nav/NavContext';
 import { ReconnectingOverlay } from './components/ReconnectingOverlay';
 import { DialogHost } from './components/DialogHost';
 import { ToastHost } from './components/ToastHost';
@@ -24,15 +26,16 @@ import { useConnectivity } from './api/useConnectivity';
 import { useEffect } from 'react';
 import { startUpdateCheck } from './updateCheck';
 
-// The authenticated app shell: NavProvider's /nav fetch requires a valid
+// The authenticated app shell: TopBar's /nav fetch (useNav) requires a valid
 // session (SecurityFilter), so this must never mount for a logged-out
-// visitor — see the /jol/login route below, kept outside NavProvider/TopBar
-// entirely so it can render before any session exists.
+// visitor — see the /jol/login route below, kept outside TopBar entirely so
+// it can render before any session exists.
 function AuthenticatedApp() {
   const { online, everConnected } = useConnectivity();
+  useQueryInvalidation();
 
   return (
-    <NavProvider>
+    <>
       <TopBar />
       {/*
         minHeight: 0 overrides flex items' default min-height:auto, which
@@ -71,7 +74,7 @@ function AuthenticatedApp() {
         </Routes>
         {!online && <ReconnectingOverlay everConnected={everConnected} />}
       </div>
-    </NavProvider>
+    </>
   );
 }
 
@@ -81,16 +84,18 @@ export function App() {
   }, []);
 
   return (
-    <BrowserRouter>
-      <ChunkErrorBoundary>
-        <Routes>
-          <Route path="/jol/login" element={<LoginPage />} />
-          <Route path="/*" element={<AuthenticatedApp />} />
-        </Routes>
-      </ChunkErrorBoundary>
-      <DialogHost />
-      <ToastHost />
-      <UpdateBanner />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <ChunkErrorBoundary>
+          <Routes>
+            <Route path="/jol/login" element={<LoginPage />} />
+            <Route path="/*" element={<AuthenticatedApp />} />
+          </Routes>
+        </ChunkErrorBoundary>
+        <DialogHost />
+        <ToastHost />
+        <UpdateBanner />
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }

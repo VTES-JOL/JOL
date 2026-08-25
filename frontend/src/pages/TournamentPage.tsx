@@ -1,28 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { TournamentBean } from '../api/types';
 import { TournamentList, type Selection } from './tournament/TournamentList';
 import { OpenTournamentDetail } from './tournament/OpenTournamentDetail';
 import { FinalsTournamentDetail } from './tournament/FinalsTournamentDetail';
-import { showError } from '../components/toast';
 import { PageLoading } from '../components/PageLoading';
 import { EmptyState } from '../components/EmptyState';
 
+const TOURNAMENT_QUERY_KEY = ['tournament', 'player-list'];
+
 export function TournamentPage() {
-  const [data, setData] = useState<TournamentBean | null>(null);
+  const queryClient = useQueryClient();
   const [selection, setSelection] = useState<Selection>(null);
 
-  const refresh = () => {
-    api
-      .get<TournamentBean>('/tournament/player-list')
-      .then(setData)
-      .catch((err) => {
-        console.error('Failed to load tournaments', err);
-        showError('Failed to load tournaments.');
-      });
-  };
+  const { data } = useQuery({
+    queryKey: TOURNAMENT_QUERY_KEY,
+    queryFn: () => api.get<TournamentBean>('/tournament/player-list'),
+  });
 
-  useEffect(refresh, []);
+  const applyUpdate = (updated: TournamentBean) => queryClient.setQueryData(TOURNAMENT_QUERY_KEY, updated);
 
   if (!data) return <PageLoading />;
 
@@ -47,7 +44,7 @@ export function TournamentPage() {
             veknLinked={data.veknLinked}
             registeredGames={data.registeredGames}
             decks={data.decks}
-            onChanged={setData}
+            onChanged={applyUpdate}
           />
         )}
         {finalsTournament && <FinalsTournamentDetail tournament={finalsTournament} />}

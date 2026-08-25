@@ -84,6 +84,8 @@ public class JolAdmin {
                 GameService.create(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), format);
                 WebSocketRegistry.notifyMain();
                 WebSocketRegistry.notifyMainScope("games");
+                WebSocketRegistry.notifyInvalidate(List.of("nav"));
+                WebSocketRegistry.notifyInvalidate(List.of("watch"));
             } catch (Exception e) {
                 logger.error("Error creating game", e);
             }
@@ -177,11 +179,15 @@ public class JolAdmin {
     }
 
     public static void saveGameState(JolGame game, boolean silent) {
+        saveGameState(game, silent, null);
+    }
+
+    public static void saveGameState(JolGame game, boolean silent, String excludeClientId) {
         if (!silent) {
             PlayerGameActivityService.setGameTimestamp(game.getName());
         }
         GameService.saveGame(game);
-        WebSocketRegistry.notifyGame(game.id());
+        WebSocketRegistry.notifyGame(game.id(), excludeClientId);
     }
 
     public static synchronized void registerDeck(String gameName, String playerName, String deckName) {
@@ -393,6 +399,10 @@ public class JolAdmin {
             saveGameState(game);
             gameInfo.setStatus(GameStatus.ACTIVE);
             pingPlayer(game.getActivePlayer(), gameName);
+            WebSocketRegistry.notifyMain();
+            WebSocketRegistry.notifyMainScope("games");
+            WebSocketRegistry.notifyInvalidate(List.of("nav"));
+            WebSocketRegistry.notifyInvalidate(List.of("watch"));
         }
     }
 
@@ -459,11 +469,14 @@ public class JolAdmin {
         }
         // Clear out data
         RegistrationService.clearRegistrations(gameName);
+        WebSocketRegistry.notifyGame(gameInfo.getId());
         GameService.remove(gameName, gameInfo.getId());
         PlayerGameActivityService.clearGame(gameName);
         gmap.remove(gameName);
         WebSocketRegistry.notifyMain();
         WebSocketRegistry.notifyMainScope("games");
+        WebSocketRegistry.notifyInvalidate(List.of("nav"));
+        WebSocketRegistry.notifyInvalidate(List.of("watch"));
     }
 
     public static String getDeckId(String playerName, String deckName) {
@@ -515,6 +528,7 @@ public class JolAdmin {
         String id = GameService.get(gameName).getId();
         ChatService.sendMessage(id, "SYSTEM", "Turn ended by administrator: " + adminName);
         game.newTurn();
+        saveGameState(game);
         pingPlayer(game.getActivePlayer(), gameName);
     }
 

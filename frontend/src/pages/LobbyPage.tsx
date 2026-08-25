@@ -1,32 +1,38 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { GameStatusBean, LobbyPage as LobbyPageData } from '../api/types';
 import { GameList } from './lobby/GameList';
 import { GameCreateForm } from './lobby/GameCreateForm';
 import { GameDetail } from './lobby/GameDetail';
-import { showError } from '../components/toast';
 import { PageLoading } from '../components/PageLoading';
 import { EmptyState } from '../components/EmptyState';
 
 type View = { mode: 'create' } | { mode: 'detail'; gameName: string } | null;
 
+const LOBBY_QUERY_KEY = ['lobby'];
+
+// Prototype of the TanStack Query approach (see LobbyResource.getLobbyAndInvalidate
+// and ws/useQueryInvalidation.ts on the backend/bridge side). Compared to
+// every other page in this app:
+//  - no manual useEffect(refresh, []) — useQuery owns the initial fetch,
+//    caching, and re-fetch-on-error/refocus policy
+//  - no useJolSocket('main:games', refresh) here — useQueryInvalidation,
+//    mounted once near the app root, invalidates ['lobby'] for us whenever
+//    the backend pushes {"type":"invalidate","key":["lobby"]}
+//  - mutation responses write straight into the cache via setQueryData
+//    instead of local setState, so this component no longer owns the data
+//    at all — the query cache does
 export function LobbyPage() {
-  const [data, setData] = useState<LobbyPageData | null>(null);
+  const queryClient = useQueryClient();
   const [view, setView] = useState<View>(null);
 
-  const refresh = () => {
-    api
-      .get<LobbyPageData>('/lobby/player/games')
-      .then(setData)
-      .catch((err) => {
-        console.error('Failed to load lobby', err);
-        showError('Failed to load lobby.');
-      });
-  };
+  const { data } = useQuery({
+    queryKey: LOBBY_QUERY_KEY,
+    queryFn: () => api.get<LobbyPageData>('/lobby/player/games'),
+  });
 
-  useEffect(refresh, []);
-
-  const applyUpdate = (updated: LobbyPageData) => setData(updated);
+  const applyUpdate = (updated: LobbyPageData) => queryClient.setQueryData(LOBBY_QUERY_KEY, updated);
 
   const selectGame = (game: GameStatusBean) => setView({ mode: 'detail', gameName: game.name });
 

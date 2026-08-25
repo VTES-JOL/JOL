@@ -3,6 +3,7 @@ package net.deckserver.ws;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.websocket.Session;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -62,10 +63,33 @@ public class WebSocketRegistry {
     }
 
     public static void notifyGame(String gameId) {
-        String message = "{\"type\":\"game\",\"id\":\"" + gameId + "\"}";
+        notifyGame(gameId, null);
+    }
+
+    /**
+     * Same as notifyGame(gameId), but skips the single WS session tagged with
+     * excludeClientId — mirrors notifyMainScope(scope, excludeClientId): a
+     * caller whose own REST response already carries the fresh game state
+     * doesn't need its own action to also trigger a self-refetch race. Every
+     * other session watching this game, including that same player's other
+     * tabs, is unaffected.
+     *
+     * Uses the same {"type":"invalidate","key":[...]} envelope as
+     * notifyInvalidate (see below), just room-scoped to gameSessions instead
+     * of broadcast to every session — ws/useQueryInvalidation.ts's generic
+     * bridge handles this the same way it handles Lobby's pushes, with no
+     * per-page message-type handling needed. Replaces the old
+     * {"type":"game","id":...} shape outright (ws/useGameSocket.ts was its
+     * only consumer, so there's nothing else to keep working).
+     */
+    public static void notifyGame(String gameId, String excludeClientId) {
+        Session exclude = excludeClientId == null ? null : clientSessions.get(excludeClientId);
+        String message = "{\"type\":\"invalidate\",\"key\":" + toJsonArray(List.of("game", gameId)) + "}";
         CopyOnWriteArraySet<Session> targets = gameSessions.get(gameId);
         if (targets != null) {
-            targets.forEach(session -> send(session, message));
+            targets.forEach(session -> {
+                if (session != exclude) send(session, message);
+            });
         }
     }
 
@@ -97,6 +121,37 @@ public class WebSocketRegistry {
         sessions.values().forEach(set -> set.forEach(session -> {
             if (session != exclude) send(session, message);
         }));
+    }
+
+    /**
+     * TanStack-Query-friendly push: instead of a scope string the frontend
+     * has to translate into a query key (see notifyMainScope), this carries
+     * the query key itself, so the frontend bridge (ws/useQueryInvalidation.ts)
+     * is a direct queryClient.invalidateQueries({queryKey: key}) with no
+     * lookup table. Broadcasts to every session — for anything room-scoped
+     * (e.g. a single game), see notifyGame instead, which uses the same
+     * envelope but targets gameSessions. Coexists with notifyMain/
+     * notifyMainScope for pages not yet migrated (Lobby, Nav so far).
+     */
+    public static void notifyInvalidate(List<String> key) {
+        notifyInvalidate(key, null);
+    }
+
+    public static void notifyInvalidate(List<String> key, String excludeClientId) {
+        Session exclude = excludeClientId == null ? null : clientSessions.get(excludeClientId);
+        String message = "{\"type\":\"invalidate\",\"key\":" + toJsonArray(key) + "}";
+        sessions.values().forEach(set -> set.forEach(session -> {
+            if (session != exclude) send(session, message);
+        }));
+    }
+
+    private static String toJsonArray(List<String> items) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < items.size(); i++) {
+            if (i > 0) sb.append(",");
+            sb.append("\"").append(items.get(i)).append("\"");
+        }
+        return sb.append("]").toString();
     }
 
     private static void broadcast(String message) {

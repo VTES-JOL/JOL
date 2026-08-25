@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, ApiError } from '../api/client';
 import type { AdminPage as AdminPageData } from '../api/types';
-import { showError } from '../components/toast';
 import { PageLoading } from '../components/PageLoading';
 import { PlayerRoles } from './admin/PlayerRoles';
 import { ReplacePlayer } from './admin/ReplacePlayer';
@@ -10,29 +9,26 @@ import { RollbackGame } from './admin/RollbackGame';
 import { IdleGames } from './admin/IdleGames';
 import { SiteNotesEditor } from './admin/SiteNotesEditor';
 
+const ADMIN_PAGE_QUERY_KEY = ['admin-page'];
+
 // No WebSocket subscription — admin actions here are only ever triggered by
 // the admin viewing this page themselves (unlike main's chat/games, nothing
 // external needs to push a refresh), so a plain fetch-on-mount plus
 // refetch-after-each-mutation covers it.
 export function AdminPage() {
-  const [data, setData] = useState<AdminPageData | null>(null);
-  const [forbidden, setForbidden] = useState(false);
+  const queryClient = useQueryClient();
 
-  const refresh = () => {
-    api
-      .get<AdminPageData>('/admin-page')
-      .then(setData)
-      .catch((err) => {
-        if (err instanceof ApiError && err.status === 403) {
-          setForbidden(true);
-        } else {
-          console.error('Failed to load admin page', err);
-          showError('Failed to load admin page.');
-        }
-      });
-  };
+  const { data, error } = useQuery({
+    queryKey: ADMIN_PAGE_QUERY_KEY,
+    queryFn: () => api.get<AdminPageData>('/admin-page'),
+    retry: false,
+    // Handled below via `error` instead of the global toast — a 403 here
+    // just means "not an admin", not a load failure worth alarming about.
+    meta: { silent: true },
+  });
 
-  useEffect(refresh, []);
+  const forbidden = error instanceof ApiError && error.status === 403;
+  const refresh = () => queryClient.invalidateQueries({ queryKey: ADMIN_PAGE_QUERY_KEY });
 
   if (forbidden) {
     return (

@@ -1,39 +1,33 @@
-import { useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { CountryOption, Profile } from '../api/types';
 import { useNavRefresh } from '../nav/useNav';
-import { showError } from '../components/toast';
 import { PageLoading } from '../components/PageLoading';
 import { ProfileEditor } from './profile/ProfileEditor';
 import { AccountEditor } from './profile/AccountEditor';
 import { Preferences } from './profile/Preferences';
 
+const PROFILE_QUERY_KEY = ['profile'];
+
 export function ProfilePage() {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [countries, setCountries] = useState<CountryOption[]>([]);
+  const queryClient = useQueryClient();
   const refreshNav = useNavRefresh();
 
-  useEffect(() => {
-    api
-      .get<Profile>('/profile')
-      .then(setProfile)
-      .catch((err) => {
-        console.error('Failed to load profile', err);
-        showError('Failed to load profile.');
-      });
-  }, []);
-  useEffect(() => {
-    api
-      .get<CountryOption[]>('/profile/countries')
-      .then(setCountries)
-      .catch((err) => console.error('Failed to load countries', err));
-  }, []);
+  const { data: profile } = useQuery({
+    queryKey: PROFILE_QUERY_KEY,
+    queryFn: () => api.get<Profile>('/profile'),
+  });
+  const { data: countries = [] } = useQuery({
+    queryKey: ['profile', 'countries'],
+    queryFn: () => api.get<CountryOption[]>('/profile/countries'),
+    staleTime: Infinity,
+  });
 
   // Each ProfileResource PUT returns the updated bean directly — apply it
   // without a second round trip, and pull the TopBar's country flag in
   // immediately rather than waiting for the next unrelated /nav refresh.
   const onSaved = (updated: Profile) => {
-    setProfile(updated);
+    queryClient.setQueryData(PROFILE_QUERY_KEY, updated);
     refreshNav();
   };
 

@@ -51,7 +51,7 @@ public class GameStateResource extends BaseResource {
         boolean canJudge = JolAdmin.isJudge(player) && !isPlaying;
         String status = null;
         if (isPlaying || canJudge) {
-            status = game.submit(player, ne(body.phase()), ne(body.command()), ne(body.chat()), ne(body.ping()));
+            status = game.submit(player, ne(body.phase()), ne(body.command()), ne(body.chat()), ne(body.ping()), clientId());
         }
         return GameSnapshotFactory.build(game, player, status);
     }
@@ -63,7 +63,7 @@ public class GameStateResource extends BaseResource {
         GameModel game = getModel();
         boolean isPlaying = RegistrationService.getPlayers(gameName()).contains(player);
         if (isPlaying) {
-            game.endTurn(player);
+            game.endTurn(player, clientId());
         }
         return GameSnapshotFactory.build(game, player, null);
     }

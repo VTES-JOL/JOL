@@ -49,6 +49,8 @@ public class GlobalChatService extends PersistedService {
         }
         WebSocketRegistry.notifyMain();
         WebSocketRegistry.notifyMainScope("chat", excludeClientId);
+        WebSocketRegistry.notifyInvalidate(List.of("nav"), excludeClientId);
+        WebSocketRegistry.notifyInvalidate(List.of("main-chat"), excludeClientId);
     }
 
     /** Most recent chat entries, independent of any player's read cursor — for populating history on first load. */

@@ -1,8 +1,9 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import type { ChatEntry } from '../../api/types';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
-import { useJolSocket } from '../../ws/useJolSocket';
+import { subscribe } from '../../ws/socket';
 import { useAuth } from '../../nav/useAuth';
 import { useCardTooltips } from '../../hooks/useCardTooltips';
 import { dayLabel, highlightMentions, localTimeTitle, utcTime } from './chatFormatting';
@@ -55,28 +56,61 @@ export function GlobalChat() {
   const rendered = useMemo(() => buildRenderedEntries(entries, player), [entries, player]);
   useCardTooltips(outputRef, [entries]);
 
+  // Tracks the last-seen entry's timestamp for the delta fetch below — a
+  // ref (not state) since it's only ever read from event handlers, never
+  // during render.
+  const cursorRef = useRef<string | null>(null);
+
   const appendChat = (delta: ChatEntry[]) => {
-    if (delta.length > 0) setEntries((log) => [...log, ...delta]);
+    if (delta.length === 0) return;
+    setEntries((log) => [...log, ...delta]);
+    cursorRef.current = delta[delta.length - 1].timestamp;
   };
 
-  const refresh = () => {
-    api
-      .get<ChatEntry[]>('/main/chat')
-      .then(appendChat)
-      .catch((err) => console.error('Failed to load /main/chat', err));
-  };
-
+  // First load only: /main/chat/history ignores this player's read cursor
+  // entirely and returns recent history unconditionally (marking it seen
+  // server-side) — using the delta endpoint here would show nothing
+  // whenever the cursor already happens to be caught up. staleTime:
+  // Infinity since this is a one-shot load, never meant to be refetched.
+  //
+  // Deliberately NOT keyed ['main-chat', 'history'] — the generic
+  // useQueryInvalidation.ts bridge does prefix matching, so any query
+  // whose key starts with ['main-chat'] gets force-refetched (bypassing
+  // staleTime) on every chat push, which would replace `entries` wholesale
+  // via the effect below at the same time the WS handler further down
+  // appends the same message again. A key with no shared prefix keeps
+  // this query outside the invalidation system entirely, as intended.
+  const { data: history } = useQuery({
+    queryKey: ['main-chat-history'],
+    queryFn: () => api.get<ChatEntry[]>('/main/chat/history'),
+    staleTime: Infinity,
+  });
   useEffect(() => {
-    // First load only: /main/chat/history ignores this player's read cursor
-    // entirely and returns recent history unconditionally (marking it seen
-    // server-side) — using the delta endpoint here would show nothing
-    // whenever the cursor already happens to be caught up.
-    api
-      .get<ChatEntry[]>('/main/chat/history')
-      .then(setEntries)
-      .catch((err) => console.error('Failed to load /main/chat/history', err));
-  }, []);
-  useJolSocket('main:chat', refresh);
+    if (!history) return;
+    setEntries(history);
+    if (history.length > 0) cursorRef.current = history[history.length - 1].timestamp;
+  }, [history]);
+
+  useEffect(
+    () =>
+      // Deliberately NOT routed through ws/useQueryInvalidation.ts's generic
+      // invalidateQueries bridge: chat is an ever-growing, append-only log,
+      // not a "refetch replaces the cache" resource — a blind invalidate
+      // would need a plain useQuery backing the full log, and GET /main/chat
+      // is a stateful delta-since-cursor endpoint that can't be one (see
+      // MainResource.chat()'s doc comment). Subscribe directly to the same
+      // underlying WS envelope instead, and merge the delta by hand.
+      subscribe('invalidate', (msg) => {
+        const key = msg.key;
+        if (!Array.isArray(key) || key.length !== 1 || key[0] !== 'main-chat') return;
+        const since = cursorRef.current;
+        api
+          .get<ChatEntry[]>(`/main/chat${since ? `?since=${encodeURIComponent(since)}` : ''}`)
+          .then(appendChat)
+          .catch((err) => console.error('Failed to load /main/chat', err));
+      }),
+    [],
+  );
 
   const scrollToBottom = () => {
     const el = outputRef.current;

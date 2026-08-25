@@ -13,6 +13,7 @@ import net.deckserver.dwr.model.JolGame;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.CardSimple;
 import net.deckserver.storage.json.system.*;
+import net.deckserver.ws.WebSocketRegistry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -393,6 +394,9 @@ public class TournamentResource extends BaseResource {
         String playerName = username();
         String veknId = PlayerService.get(playerName).getVeknId();
         TournamentService.joinTournament(tourName, playerName, veknId);
+        WebSocketRegistry.notifyMain();
+        WebSocketRegistry.notifyMainScope("tournament");
+        WebSocketRegistry.notifyInvalidate(List.of("tournament"), clientId());
         return getPlayerList();
     }
 
@@ -401,6 +405,9 @@ public class TournamentResource extends BaseResource {
     public TournamentBean leaveTournamentReact(@PathParam("name") String tourName) {
         String playerName = username();
         TournamentService.leaveTournament(tourName, playerName);
+        WebSocketRegistry.notifyMain();
+        WebSocketRegistry.notifyMainScope("tournament");
+        WebSocketRegistry.notifyInvalidate(List.of("tournament"), clientId());
         return getPlayerList();
     }
 
@@ -411,6 +418,9 @@ public class TournamentResource extends BaseResource {
         DeckInfo deckInfo = DeckService.get(playerName, body.deckName());
         ExtendedDeck deck = DeckService.getDeck(deckInfo.getDeckId());
         TournamentService.registerDeck(tourName, playerName, deck);
+        WebSocketRegistry.notifyMain();
+        WebSocketRegistry.notifyMainScope("tournament");
+        WebSocketRegistry.notifyInvalidate(List.of("tournament"), clientId());
         return getPlayerList();
     }
 
