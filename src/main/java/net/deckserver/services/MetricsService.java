@@ -1,30 +1,26 @@
 package net.deckserver.services;
 
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.bean.GameStatusBean;
-import net.deckserver.dwr.bean.GameSummaryBean;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.GameSummary;
 import net.deckserver.storage.json.system.GameHistory;
 import net.deckserver.storage.json.system.PlayerInfo;
+import net.deckserver.storage.json.system.PlayerResult;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.event.WindowFocusListener;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class MetricsService {
 
@@ -34,39 +30,66 @@ public class MetricsService {
     private static final Logger logger = LoggerFactory.getLogger(MetricsService.class);
 
     public static JolFacts getStats() {
-        Set<String> gameNames = JolAdmin.getGameNames();
-        long activeGames = gameNames.stream()
-                .filter(JolAdmin::isActive)
-                .count();
-        long tournamentGames = gameNames.stream()
+        Set<String> allGames = JolAdmin.getGameNames();
+        Set<String> allActiveGames = allGames.stream().filter(JolAdmin::isActive).collect(Collectors.toSet());
+        //Number of all active Games
+        long activeGames = allActiveGames.stream().count();
+        //Number of all active tournament Games
+        long tournamentGames = allActiveGames.stream()
                 .filter(JolAdmin::isTournament)
                 .count();
-        long pastGames = HistoryService.getGames().stream()
+        Collection<GameHistory> histories = HistoryService.getGames();
+        //Active Games Last Month
+        long activeLastMonth = getAllActiveGamesLastMonth(histories);
+        String activeChangeMonth = activeLastMonth == 0
+                ? (activeGames == 0 ? "0.0%" : "100.0%")
+                : String.format(
+                "%+.1f%%",
+                ((double) activeGames - activeLastMonth)
+                        / activeLastMonth * 100
+        );
+        //Active Tournament Games Last Month
+        long activeTourLastMonth = getAllActiveGamesLastMonth(histories.stream()
+                .filter(game -> isTournamentGame(game)).toList());
+        String activeTourChangeMonth = activeTourLastMonth == 0
+                ? (tournamentGames == 0 ? "0.0%" : "100.0%")
+                : String.format(
+                "%+.1f%%",
+                ((double) tournamentGames - activeTourLastMonth)
+                        / activeTourLastMonth * 100
+        );
+        //Number of all past Games
+        long pastGames = histories.stream()
                 .count();
-        long pastTournament = HistoryService.getGames().stream()
+        //Number of all past Tournament Games
+        long pastTournament = histories.stream()
                 .filter(game -> isTournamentGame(game))
                 .count();
-
         List<ExtendedDeck> allDecks = DeckService.getDecks();
+        //Number of all decks ever created
         long deckCount = allDecks.size();
 
-        List<GameSummary> allGamesSummary = gameNames.stream()
+        //Summary of all Active Games
+        List<GameSummary> allGamesSummary = allActiveGames.stream()
                 .map(gameName -> {
                     try {
                         return GameService.getSummary(gameName);
                     } catch (Exception ex) {
-                        return null;/*no game found*/}
+                        return null;/*no game found*/
+                    }
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-
+        //Player and Count of Active Games
         Map<String, Long> gamesByPlayer = allGamesSummary.stream()
                 .flatMap(game -> game.getPlayers().stream())
                 .collect(Collectors.groupingBy(
                         Function.identity(),
                         Collectors.counting()
                 ));
+        Map<String, Long> pastByPlayer = getAllPastGamesLastMonth(histories);
 
+        //Player and Count of Ousted Games
         Map<String, Long> oustedByPlayer = allGamesSummary.stream()
                 .flatMap(game -> game.getPlayers().stream())
                 .distinct()
@@ -76,7 +99,7 @@ public class MetricsService {
                                 .filter(game -> !game.getPlayers().contains(playerName))
                                 .count()
                 ));
-
+        //Player and Count of Active Tournament Games
         Map<String, Long> tournamentsByPlayer = allGamesSummary.stream()
                 .filter(game -> game.getName().contains("Final Table") ||
                         Pattern.compile("Round\\s+\\d+\\s*-\\s*Table\\s+\\d+").matcher(game.getName()).find())
@@ -85,7 +108,9 @@ public class MetricsService {
                         Function.identity(),
                         Collectors.counting()
                 ));
+        Map<String, Long> pastTournamentByPlayer = getAllPastGamesLastMonth(histories.stream().filter(game -> isTournamentGame(game)).toList());
 
+        //Player and Count of Decks
         Map<String, Long> decksByPlayer = allDecks.stream()
                 .map(deck -> deck.getDeck().getAuthor())
                 .filter(Objects::nonNull)
@@ -96,7 +121,7 @@ public class MetricsService {
 
         List<PlayerInfo> allPlayers = PlayerService.getPlayers().stream()
                 .map(player -> PlayerService.get(player)).collect(Collectors.toList());
-
+        //Nation and Count of Players
         Map<String, Long> nationsByPlayer = allPlayers.stream().map(PlayerInfo::getCountryCode)
                 .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(
@@ -104,7 +129,21 @@ public class MetricsService {
                         Collectors.counting()
                 ));
 
-        return new JolFacts(activeGames, tournamentGames, pastGames, pastTournament, deckCount, sort(gamesByPlayer), sort(tournamentsByPlayer), sort(oustedByPlayer), sort(decksByPlayer), sort(nationsByPlayer));
+        return new JolFacts(
+                activeGames,
+                activeChangeMonth,
+                tournamentGames,
+                activeTourChangeMonth,
+                pastGames,
+                pastTournament,
+                deckCount,
+                sort(gamesByPlayer),
+                sort(pastByPlayer),
+                sort(tournamentsByPlayer),
+                sort(pastTournamentByPlayer),
+                sort(oustedByPlayer),
+                sort(decksByPlayer),
+                sort(nationsByPlayer));
     }
 
 
@@ -225,6 +264,44 @@ public class MetricsService {
                 Pattern.compile("Round\\s+\\d+\\s*-\\s*Table\\s+\\d+").matcher(game.getName()).find();
     }
 
+    private static long getAllActiveGamesLastMonth(Collection<GameHistory> games) {
+        YearMonth lastMonth = YearMonth.now().minusMonths(1);
+
+        Instant startOfLastMonth = lastMonth.atDay(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        Instant startOfCurrentMonth = YearMonth.now().atDay(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        return games.stream()
+                .filter(game -> {
+                    Instant started = Instant.parse(game.getStarted());
+                    Instant ended = Instant.parse(game.getEnded());
+
+                    return started.isBefore(startOfCurrentMonth)
+                            && !ended.isBefore(startOfLastMonth)
+                            && ended.isBefore(startOfCurrentMonth);
+                })
+                .count();
+    }
+
+    public static Map<String, Long> getAllPastGamesLastMonth(Collection<GameHistory> history) {
+        YearMonth lastMonth = YearMonth.now().minusMonths(1);
+        Instant startOfLastMonth = lastMonth.atDay(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+        Instant startOfCurrentMonth = YearMonth.now().atDay(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        return history.stream()
+                .filter(game -> {
+                    Instant ended = Instant.parse(game.getEnded());
+
+                    return !ended.isBefore(startOfLastMonth)
+                            && ended.isBefore(startOfCurrentMonth);
+                })
+                .flatMap(game -> game.getResults().stream())
+                .collect(Collectors.groupingBy(
+                        PlayerResult::getPlayerName,
+                        Collectors.counting()
+                ));
+    }
+
     private static String[] splitCsvLine(String line) {
         List<String> values = new ArrayList<>();
         StringBuilder current = new StringBuilder();
@@ -256,8 +333,19 @@ public class MetricsService {
                                    String command) {
     }
 
-    public record JolFacts(Long activeGames, Long tournamentGames, Long pastGames, Long pastTournament, Long decks, Map<String, Long> gamesByPlayer,
-                           Map<String, Long> tournamentsByPlayer, Map<String, Long> oustedByPlayer,
-                           Map<String, Long> decksByPlayer, Map<String, Long> nationsByPlayer) {
+    public record JolFacts(Long activeGames,
+                           String activeChangeMonth,
+                           Long tournamentGames,
+                           String activeTourChangeMonth,
+                           Long pastGames,
+                           Long pastTournament,
+                           Long decks,
+                           Map<String, Long> gamesByPlayer,
+                           Map<String, Long> pastByPlayer,
+                           Map<String, Long> tournamentsByPlayer,
+                           Map<String, Long> pastTournamentByPlayer,
+                           Map<String, Long> oustedByPlayer,
+                           Map<String, Long> decksByPlayer,
+                           Map<String, Long> nationsByPlayer) {
     }
 }

@@ -13,7 +13,7 @@
 
       </th>
       <th class="sticky-top bg-white">Duration
-        <i class="bi bi-filter" onclick="sortTableByDuration(2)"></i>
+        <i class="bi bi-filter" onclick="sortTableByDuration(2, '#statsGameGames tbody')"></i>
       </th>
       </th>
       <th class="sticky-top bg-white">GW?

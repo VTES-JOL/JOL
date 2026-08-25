@@ -63,9 +63,9 @@ public class GameModel implements Comparable<GameModel> {
                 didPing = true;
                 boolean pingSuccessful = JolAdmin.pingPlayer(ping, name);
                 if (pingSuccessful) {
-                    COMMANDS.info("[{}] {}", player, "ping");
+                    COMMANDS.info("[{}] {}", player, "ping " + ping);
                 } else {
-                    COMMANDS.error("[{}] {}", player, "ping");
+                    COMMANDS.error("[{}] {}", player, "ping " + ping);
                     status.append("Player is already pinged");
                 }
             }

@@ -18,6 +18,15 @@
             Deck Performance
         </button>
     </li>
+    <li class="nav-item">
+        <button class="nav-link"
+                id="personalReactionTab"
+                data-bs-toggle="tab"
+                data-bs-target="#personalReactionPane"
+                type="button">
+            Reaction Performance
+        </button>
+    </li>
 </ul>
 
 <!-- Personal Statistics Sub-Tab Content -->
@@ -160,6 +169,40 @@
                     <th class="sticky-top bg-white">VP Difference
                         <i class="bi bi-filter"
                            onclick="sortTable(9, 'statsPersonalDecks')"></i>
+                    </th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Reaction -->
+    <div class="tab-pane fade" id="personalReactionPane">
+        <div class="overflow-auto pb-3" style="height:73vh;">
+            <table id="statsPersonalReaction" class="table table-bordered table-sm mb-0">
+                <thead>
+                <tr>
+                    <th class="sticky-top bg-white">Game
+                        <input type="text" id="personalGameFilter"
+                               oninput="filterName('#statsPersonalReaction tbody tr', 'personalGameFilter', 1)">
+                        <i class="bi bi-filter"
+                           onclick="sortTable(0, 'statsPersonalReaction')"></i>
+                    </th>
+                    <th class="sticky-top bg-white">From
+                        <i class="bi bi-filter"
+                           onclick="sortTable(1, 'statsPersonalDecks')"></i>
+                    </th>
+                    <th class="sticky-top bg-white">Command
+                        <i class="bi bi-filter"
+                           onclick="sortTable(2, 'statsPersonalDecks')"></i>
+                    </th>
+                    <th class="sticky-top bg-white">Response
+                        <i class="bi bi-filter"
+                           onclick="sortTable(3, 'statsPersonalDecks')"></i>
+                    </th>
+                    <th class="sticky-top bg-white">Reaction
+                        <i class="bi bi-filter"
+                           onclick="sortTable(4, 'statsPersonalDecks')"></i>
                     </th>
                 </tr>
                 </thead>

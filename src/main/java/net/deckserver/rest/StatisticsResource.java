@@ -1,12 +1,9 @@
 package net.deckserver.rest;
 
 import net.deckserver.services.*;
-import net.deckserver.storage.json.cards.CardSummary;
-import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.system.GameHistory;
 import net.deckserver.storage.json.system.PlayerResult;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -16,6 +13,7 @@ import java.time.OffsetDateTime;
 import java.time.YearMonth;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -118,6 +116,100 @@ public class StatisticsResource {
         );
     }
 
+    @POST
+    @Path("/commands/reaction/ping")
+    public Map<String, List<Reaction>> getPingReaction(StatsRequest body) {
+        return getPingReaction(body, MetricsService.loadCommands()).stream()
+                .collect(Collectors.groupingBy(
+                        Reaction::targetPlayer));
+    }
+
+    @POST
+    @Path("/reaction/{playerName}")
+    public List<Reaction> getCommandsReaction(@PathParam("playerName") String playerName, StatsRequest body) {
+        return getPlayerReaction(body, MetricsService.loadCommands()).stream()
+                .filter(reaction -> Objects.equals(reaction.targetPlayer(), playerName)).toList();
+    }
+    @POST
+    @Path("/reaction/avg")
+    public Map<String, String> getCommandsReactionAvg(StatsRequest body) {
+        return getPlayerReaction(body, MetricsService.loadCommands()).stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(
+                        Reaction::fromPlayer,
+                        Collectors.collectingAndThen(
+                                Collectors.averagingLong(
+                                        r -> parseReactionTime(r.reactionTime())
+                                ),
+                                avg -> formatDuration(avg)
+                        )
+                ));
+    }
+
+    private List<Reaction> getPlayerReaction(StatsRequest body, List<MetricsService.CommandMetricDto> commands) {
+        List<Reaction> reactions = new ArrayList<>();
+        List<MetricsService.CommandMetricDto> cmds = commands.stream()
+                .filter(Objects::nonNull)
+                .filter(game -> isInDateRange(game.timestamp().toLocalDate(), body))
+                .filter(game -> !body.isTourney() || isTournamentGame(game.gameName()))
+                .toList();
+        for (int i = 1; i < cmds.size(); i++) {
+            MetricsService.CommandMetricDto previous = cmds.get(i - 1);
+            MetricsService.CommandMetricDto current = cmds.get(i);
+
+            if (previous.gameName().equals(current.gameName())
+                    && !previous.playerName().equals(current.playerName())) {
+                reactions.add(new Reaction(
+                        current.gameName(),
+                        previous.playerName(),
+                        current.playerName(),
+                        previous.timestamp().toString(),
+                        current.timestamp().toString(),
+                        previous.command(),
+                        current.command(),
+                        getDuration(Duration.between(
+                                previous.timestamp(),
+                                current.timestamp()
+                        ))
+                ));
+            }
+        }
+        return reactions;
+    }
+
+    private List<Reaction> getPingReaction(StatsRequest body, List<MetricsService.CommandMetricDto> commandMetricDtos) {
+        List<MetricsService.CommandMetricDto> commands = MetricsService.loadCommands();
+        return commands.stream()
+                .filter(game -> isInDateRange(game.timestamp().toLocalDate(), body))
+                .filter(game -> !body.isTourney() || isTournamentGame(game.gameName()))
+                .filter(c -> c.command().startsWith("ping "))
+                .flatMap(cmd -> {
+                    String targetPlayer = cmd.command()
+                            .substring("ping ".length())
+                            .trim();
+                    return commands.stream()
+                            .filter(c -> c.playerName().equals(targetPlayer))
+                            .filter(c -> c.gameName().equals(cmd.gameName()))
+                            .filter(c -> c.timestamp().isAfter(cmd.timestamp()))
+                            .min(Comparator.comparing(MetricsService.CommandMetricDto::timestamp))
+                            .map(response -> new Reaction(
+                                    cmd.gameName(),
+                                    cmd.playerName(),
+                                    targetPlayer,
+                                    cmd.timestamp().toString(),
+                                    response.timestamp().toString(),
+                                    cmd.command(),
+                                    response.command(),
+                                    getDuration(Duration.between(
+                                            cmd.timestamp(),
+                                            response.timestamp()
+                                    ))
+                            ))
+                            .stream();
+                })
+                .toList();
+    }
+
     private Map<String, Long> getClanPerformance(Collection<GameHistory> values, StatsRequest body) {
         return values.stream()
                 //filter games in date range and tournament games
@@ -144,6 +236,7 @@ public class StatisticsResource {
         Map<String, Integer> gw = new HashMap<>();
         Map<String, Double> vp = new HashMap<>();
         Map<String, Double> vpMax = new HashMap<>();
+        Map<String, Long> nationPlayers = new HashMap<>();
         Map<String, Integer> games = new HashMap<>();
         Map<String, Set<String>> opponents = new HashMap<>();
         Map<String, Map<String, Integer>> opponentCounts = new HashMap<>();
@@ -168,7 +261,8 @@ public class StatisticsResource {
                                 opponents,
                                 opponentCounts,
                                 currentWinStreak,
-                                maxWinStreak
+                                maxWinStreak,
+                                nationPlayers
                         )
                 );
 
@@ -206,7 +300,8 @@ public class StatisticsResource {
                                 getMostPlayedOpponent(opponentCounts, key),
                                 String.valueOf(
                                         maxWinStreak.getOrDefault(key, 0)
-                                )
+                                ),
+                                nationPlayers.get(key) == null ? "-" : String.valueOf(nationPlayers.get(key))
                         )
                 ));
     }
@@ -220,7 +315,8 @@ public class StatisticsResource {
             Map<String, Set<String>> opponents,
             Map<String, Map<String, Integer>> opponentCounts,
             Map<String, Integer> currentWinStreak,
-            Map<String, Integer> maxWinStreak) {
+            Map<String, Integer> maxWinStreak,
+            Map<String, Long> nationPlayers) {
 
         for (PlayerResult result : game.getResults()) {
             String name = result.getPlayerName();
@@ -236,7 +332,8 @@ public class StatisticsResource {
             Map<String, Set<String>> opponents,
             Map<String, Map<String, Integer>> opponentCounts,
             Map<String, Integer> currentWinStreak,
-            Map<String, Integer> maxWinStreak
+            Map<String, Integer> maxWinStreak,
+            Map<String, Long> nationPlayers
     ) {
         for (PlayerResult result : game.getResults()) {
             String name = result.getDeckName() + " / " + result.getPlayerName();
@@ -253,11 +350,13 @@ public class StatisticsResource {
             Map<String, Set<String>> opponents,
             Map<String, Map<String, Integer>> opponentCounts,
             Map<String, Integer> currentWinStreak,
-            Map<String, Integer> maxWinStreak
+            Map<String, Integer> maxWinStreak,
+            Map<String, Long> nationPlayers
     ) {
         for (PlayerResult result : game.getResults()) {
             try {
                 String name = PlayerService.get(result.getPlayerName()).getCountryCode();
+                nationPlayers.merge(name, 1L, Long::sum);
                 if (StringUtils.isBlank(name)) {
                     continue;
                 }
@@ -792,20 +891,26 @@ public class StatisticsResource {
 
     // Utils for checking Game History Relevance
     private static boolean isTournamentGame(GameHistory game) {
-        return game.getName().contains("Final Table") ||
-                Pattern.compile("Round\\s+\\d+\\s*-\\s*Table\\s+\\d+").matcher(game.getName()).find();
+        return isTournamentGame(game.getName());
+    }
+    private static boolean isTournamentGame(String gameName) {
+        return gameName.contains("Final Table") ||
+                Pattern.compile("Round\\s+\\d+\\s*-\\s*Table\\s+\\d+").matcher(gameName).find();
     }
 
     private boolean isInDateRange(GameHistory game, StatsRequest body) {
+        return isInDateRange(OffsetDateTime.parse(game.getEnded()).toLocalDate(), body);
+    }
+
+    private boolean isInDateRange(LocalDate timestamp, StatsRequest body) {
         //without from or to value return all games
         if (body.fromDate().isEmpty() || body.toDate().isEmpty()) {
             return true;
         }
         //otherwise check if game is in date range
-        LocalDate ended = OffsetDateTime.parse(game.getEnded()).toLocalDate();
         LocalDate from = LocalDate.parse(body.fromDate());
         LocalDate to = LocalDate.parse(body.toDate());
-        return !ended.isBefore(from) && !ended.isAfter(to);
+        return !timestamp.isBefore(from) && !timestamp.isAfter(to);
     }
 
     private String getDuration(Duration duration) {
@@ -850,6 +955,20 @@ public class StatisticsResource {
                 .orElse("-");
     }
 
+    private static long parseReactionTime(String value) {
+        String[] parts = value.trim().split("\\s+");
+
+        long days = Long.parseLong(parts[0].substring(0, parts[0].length() - 1));
+        long hours = Long.parseLong(parts[1].substring(0, parts[1].length() - 1));
+        long minutes = Long.parseLong(parts[2].substring(0, parts[2].length() - 1));
+        long seconds = Long.parseLong(parts[3].substring(0, parts[3].length() - 1));
+
+        return days * 86400L
+                + hours * 3600L
+                + minutes * 60L
+                + seconds;
+    }
+
     @FunctionalInterface
     private interface StatsGenerator {
         void generate(GameHistory game,
@@ -860,7 +979,9 @@ public class StatisticsResource {
                       Map<String, Set<String>> opponents,
                       Map<String, Map<String, Integer>> opponentCounts,
                       Map<String, Integer> currentWinStreak,
-                      Map<String, Integer> maxWinStreak);
+                      Map<String, Integer> maxWinStreak,
+                      Map<String, Long> nationPlayers
+                      );
     }
 
     //Records for returting rest call Dto's
@@ -881,7 +1002,8 @@ public class StatisticsResource {
             String highestVp,
             String uniqueOpponents,
             String mostPlayedOpponent,
-            String winStreak
+            String winStreak,
+            String playerCount
     ) {
     }
     public record JolStats(
@@ -926,8 +1048,14 @@ public class StatisticsResource {
             String opponentAverageVP,
             String vpDifference
     ) {}
-    public record PlayerMonthlyWins(
-            String playerName,
-            int gw
+    public record Reaction(
+            String gameName,
+            String fromPlayer,
+            String targetPlayer,
+            String fromTimestamp,
+            String toTimestamp,
+            String fromCommand,
+            String toCommand,
+            String reactionTime
     ) {}
 }

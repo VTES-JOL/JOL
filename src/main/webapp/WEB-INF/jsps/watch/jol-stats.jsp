@@ -29,6 +29,16 @@
             Metrics & Command
         </button>
     </li>
+    <li class="nav-item">
+        <button class="nav-link"
+                id="jolReactionTab"
+                onclick="renderStats()"
+                data-bs-toggle="tab"
+                data-bs-target="#jolReactionPane"
+                type="button">
+            Reaction
+        </button>
+    </li>
 </ul>
 
 <div class="tab-content">
@@ -357,7 +367,7 @@
                                 <table id="gameCommands" class="table table-sm mb-0">
                                     <thead>
                                     <tr>
-                                        <th class="sticky-top bg-white w-15">Game
+                                        <th class="sticky-top bg-white">Game
                                             <input type="text" id="gameCommandFilter"
                                                    oninput="filterName('#gameCommands tbody tr', 'gameCommandFilter', 1)">
                                             <i class="bi bi-filter" onclick="sortTable(0, 'gameCommands')"></i>
@@ -471,37 +481,173 @@
     </div>
 
     <div class="tab-pane fade" id="jolKpiPane">
-        <div class="row">
-            <div class="col-sm-3 p-3">
-                <div class="card border-dark mb-3">
-                    <div class="card-header">GAMES</div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item" id="activeGamesKpi"></li>
-                        <li class="list-group-item" id="tournamentGamesKpi"></li>
-                        <li class="list-group-item" id="pastGamesKpi"></li>
-                        <li class="list-group-item" id="pastTournamentKpi"></li>
-                    </ul>
+        <div class="row g-4 p-3">
+            <!-- ACTIVE -->
+            <div class="col-12 col-md-3">
+                <div class="card stats-card">
+                    <div class="card-header">
+                        <div class="fs-4 text-dark">ACTIVE GAMES</div>
+                    </div>
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <div class="fs-2 text-dark" id="activeGamesKpi"></div>
+                            <div class="mt-3">
+                                <span  id="activeGamesLastMonthChangeKpi"></span>
+                                &nbsp; Since last month
+                            </div>
+                        </div>
+
+                        <div class="text-danger fs-1">
+                            <i class="bi bi-bar-chart-line-fill"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <!-- TOURNAMENT -->
+            <div class="col-12 col-md-3">
+                <div class="card stats-card">
+                    <div class="card-header">
+                        <div class="fs-4 text-dark">TOURNAMENT GAMES</div>
+                    </div>
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <div class="fs-2 text-dark" id="tournamentGamesKpi"></div>
+                            <div class="mt-3">
+                                <span id="tournamentGamesLastMonthChangeKpi"></span>
+                                &nbsp; Since last month
+                            </div>
+                        </div>
+
+                        <div class="text-success fs-1">
+                            <i class="bi bi-trophy-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- PAST -->
+            <div class="col-12 col-md-3">
+                <div class="card stats-card">
+                    <div class="card-header">
+                        <div class="fs-4 text-dark">PAST GAMES</div>
+                    </div>
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <div class="fs-2 text-dark" id="pastGamesKpi"></div>
+                        </div>
+
+                        <div class="text-body-tertiary fs-1">
+                            <i class="bi bi-bar-chart-line-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- PAST TOURNAMET-->
+            <div class="col-12 col-md-3">
+                <div class="card stats-card">
+                    <div class="card-header">
+                        <div class="fs-4 text-dark">PAST TOURNAMENT GAMES</div>
+                    </div>
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <div class="fs-2 text-dark" id="pastTournamentKpi"></div>
+                        </div>
+
+                        <div class="text-body-tertiary fs-1">
+                            <i class="bi bi-trophy-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row g-4 p-3">
+            <!-- MOST ACTIVE GAMES -->
+            <div class="col-12 col-md-3">
+                <div class="card stats-card">
+                    <div class="card-header">
+                        <div class="fs-4 text-dark">MOST ACTIVE GAMES</div>
+                    </div>
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <div class="fs-2 text-dark" id="gamesByPlayerKpi"></div>
+                            <div class="mt-3">
+                                <span  id="highestActiveLastMonthKpi"></span>
+                                &nbsp; highest last month
+                            </div>
+                        </div>
+
+                        <div class="text-primary fs-1">
+                            <i class="bi bi-bar-chart-line-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- TOURNAMET -->
+            <div class="col-12 col-md-3">
+                <div class="card stats-card">
+                    <div class="card-header">
+                        <div class="fs-4 text-dark">MOST TOURNAMENT GAMES</div>
+                    </div>
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <div class="fs-2 text-dark" id="tournamentsByPlayerKpi"></div>
+                            <div class="mt-3">
+                                <span  id="highestTournamentLastMonthKpi"></span>
+                                &nbsp; highest last month
+                            </div>
+                        </div>
+
+                        <div class="text-primary fs-1">
+                            <i class="bi bi-trophy-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- OUSTED -->
+            <div class="col-12 col-md-3">
+                <div class="card stats-card">
+                    <div class="card-header">
+                        <div class="fs-4 text-dark">MOST OUSTED GAMES</div>
+                    </div>
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <div class="fs-2 text-dark" id="oustedByPlayerKpi"></div>
+                        </div>
+
+                        <div class="text-primary fs-1">
+                            <i class="bi bi-0-circle-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- DECK -->
+            <div class="col-12 col-md-3">
+                <div class="card stats-card">
+                    <div class="card-header">
+                        <div class="fs-4 text-dark">MOST DECKS</div>
+                    </div>
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <div class="fs-2 text-dark" id="decksByPlayerKpi"></div>
+                        </div>
+
+                        <div class="text-primary fs-1">
+                            <i class="bi bi-stack"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
             <div class="col-sm-3 p-3">
                 <div class="card border-dark mb-3">
                     <div class="card-header">DECKS</div>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item" id="decksKpi"></li>
-                        <li class="list-group-item" id="decksByPlayerKpi"></li>
                     </ul>
                 </div>
             </div>
-            <div class="col-sm-3 p-3">
-                <div class="card border-dark mb-3">
-                    <div class="card-header">PLAYER</div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item" id="gamesByPlayerKpi"></li>
-                        <li class="list-group-item" id="tournamentsByPlayerKpi"></li>
-                        <li class="list-group-item" id="oustedByPlayerKpi"></li>
-                    </ul>
-                </div>
-            </div>
+
             <div class="col-sm-3 p-3">
                 <div class="card border-dark mb-3">
                     <div class="card-header">NATION</div>
@@ -510,6 +656,24 @@
                     </ul>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="jolReactionPane">
+        <div class="overflow-auto pb-3" style="height:78vh;">
+            <table id="statsJolReaction" class="table table-bordered table-sm mb-0">
+                <thead>
+                <tr>
+                    <th class="sticky-top bg-white">Player
+                        <input type="text" id="playerReactionFilter"
+                               oninput="filterName('#statsJolReaction tbody tr', 'playerReactionFilter', 1)">
+                        <i class="bi bi-filter" onclick="sortTable(0, 'statsJolReaction')"></i></th>
+                    <th class="sticky-top bg-white">Avg Reaction Time
+                        <i class="bi bi-filter" onclick="sortTableByDuration(1,'#statsJolReaction tbody')"></i></th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 </div>

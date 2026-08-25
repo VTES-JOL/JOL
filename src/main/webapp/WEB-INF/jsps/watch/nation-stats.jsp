@@ -15,20 +15,25 @@
             <div id="nationChartCollapse" class="accordion-collapse collapse show"
                  aria-labelledby="nationChartHeading">
                 <div class="accordion-body">
-                    <div class="row g-3">
-                        <div class="col-12 col-lg-4">
+                    <div class="row g-4">
+                        <div class="col-12 col-lg-3">
                             <div style="height: 350px;">
                                 <canvas id="nationChartGames"></canvas>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-4">
+                        <div class="col-12 col-lg-3">
                             <div style="height: 350px;">
                                 <canvas id="nationChartWins"></canvas>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-4">
+                        <div class="col-12 col-lg-3">
                             <div style="height: 350px;">
                                 <canvas id="nationChartVp"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-3">
+                            <div style="height: 350px;">
+                                <canvas id="nationChartPlayers"></canvas>
                             </div>
                         </div>
                     </div>
@@ -81,6 +86,8 @@
                             </th>
                             <th class="sticky-top bg-white">Highest Win Streak <i class="bi bi-filter"
                                                                                   onclick="sortTable(7, 'statsNationGames')"></i>
+                            </th><th class="sticky-top bg-white">Players Count <i class="bi bi-filter"
+                                                                                  onclick="sortTable(8, 'statsNationGames')"></i>
                             </th>
                         </tr>
                         </thead>
