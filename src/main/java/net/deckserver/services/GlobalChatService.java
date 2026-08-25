@@ -109,7 +109,7 @@ public class GlobalChatService extends PersistedService {
     }
 
     @Override
-    protected void persist() {
+    protected synchronized void persist() {
         if (shouldSkipPersistence()) {
             logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
             return;

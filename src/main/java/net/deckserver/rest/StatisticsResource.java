@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 @Path("/stats")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class StatisticsResource {
+public class StatisticsResource extends BaseResource {
 
     @POST
     @Path("/players")
@@ -193,7 +193,7 @@ public class StatisticsResource {
                     continue;
                 }
                 populateStats(game, name, result, gw, vp, games, vpMax, opponents, opponentCounts, currentWinStreak, maxWinStreak);
-            } catch (Exception e) {
+            } catch (IllegalArgumentException e) {
                 //Player not found
             }
         }
@@ -466,7 +466,7 @@ public class StatisticsResource {
             return PlayerService
                     .get(result.getPlayerName())
                     .getCountryCode();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return "-";
         }
     }

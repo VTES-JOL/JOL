@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -40,7 +41,7 @@ public class TournamentService extends PersistedService {
     private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
     private static final Path PERSISTENCE_PATH = DataPaths.path("tournaments.json");
     private static final TournamentService INSTANCE = new TournamentService();
-    private final Map<String, TournamentDefinition> tournaments = new HashMap<>();
+    private final Map<String, TournamentDefinition> tournaments = new ConcurrentHashMap<>();
 
     private TournamentService() {
         super("TournamentService", 10);
@@ -76,7 +77,8 @@ public class TournamentService extends PersistedService {
                 .filter(IS_ACTIVE)
                 .filter(t -> t.getName().equals(tourName))
                 .map(TournamentMetadata::new)
-                .findFirst().get();
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No ACTIVE tournament found with name: " + tourName));
     }
 
     public static List<TournamentMetadata> getTournamentsReadyToStart() {
@@ -115,7 +117,7 @@ public class TournamentService extends PersistedService {
     }
 
     public static void joinTournament(String game, String playerName, String vekn) {
-        TournamentDefinition def = INSTANCE.tournaments.get(game);
+        TournamentDefinition def = requireTournament(game);
         if (def.isOpenForRegistration()) {
             TournamentRegistration registration = def.getRegistration(playerName).orElseGet(() -> new TournamentRegistration(playerName, vekn));
             def.getRegistrations().add(registration);
@@ -123,7 +125,7 @@ public class TournamentService extends PersistedService {
     }
 
     public static void leaveTournament(String tournament, String playerName) {
-        TournamentDefinition def = INSTANCE.tournaments.get(tournament);
+        TournamentDefinition def = requireTournament(tournament);
         Optional<TournamentRegistration> registration = def.getRegistration(playerName);
         if (def.isOpenForRegistration()) {
             registration.ifPresent(reg -> {
@@ -225,15 +227,23 @@ public class TournamentService extends PersistedService {
     }
 
     public static void startTournament(String tournamentName) {
-        INSTANCE.tournaments.get(tournamentName).setStatus(GameStatus.ACTIVE);
+        requireTournament(tournamentName).setStatus(GameStatus.ACTIVE);
     }
 
     public static void setReadyToStart(String tournamentName) {
-        INSTANCE.tournaments.get(tournamentName).setStatus(GameStatus.STARTING);
+        requireTournament(tournamentName).setStatus(GameStatus.STARTING);
     }
 
     public static void setTournamentStatus(String tournamentName, GameStatus status) {
-        INSTANCE.tournaments.get(tournamentName).setStatus(status);
+        requireTournament(tournamentName).setStatus(status);
+    }
+
+    private static TournamentDefinition requireTournament(String tournamentName) {
+        TournamentDefinition def = INSTANCE.tournaments.get(tournamentName);
+        if (def == null) {
+            throw new IllegalStateException("No tournament found with name: " + tournamentName);
+        }
+        return def;
     }
 
     public static void createTournament(TournamentDefinition tournamentDefinition) {
@@ -483,10 +493,7 @@ public class TournamentService extends PersistedService {
      * explicit confirmation before invoking it.
      */
     public static void recreateTable(String tourName, int round, int table, String csvData) throws IOException {
-        TournamentDefinition definition = INSTANCE.tournaments.get(tourName);
-        if (definition == null) {
-            throw new IllegalStateException("No tournament found with name: " + tourName);
-        }
+        TournamentDefinition definition = requireTournament(tourName);
         if (definition.getStatus() != GameStatus.ACTIVE) {
             throw new IllegalStateException("Tournament '%s' is not ACTIVE - cannot recreate a table".formatted(tourName));
         }

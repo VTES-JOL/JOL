@@ -55,11 +55,19 @@ public class CardService {
             init(cardList);
         } catch (IOException e) {
             logger.error("Unable to read cards", e);
+        } finally {
+            try {
+                loader.close();
+            } catch (IOException e) {
+                logger.warn("Unable to close card data stream", e);
+            }
         }
     }
 
     public static void refresh(List<CardSummary> cardList) {
         logger.info("Using static list");
+        nameKeys.clear();
+        cards.clear();
         init(cardList);
     }
 

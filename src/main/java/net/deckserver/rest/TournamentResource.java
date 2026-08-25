@@ -36,6 +36,20 @@ public class TournamentResource extends BaseResource {
 
     private static final Map<String, Integer> ADMIN_STATUS_ORDER = Map.of("ACTIVE", 0, "STARTING", 1, "EDIT", 2);
 
+    private void requireTournamentAdmin() {
+        if (!JolAdmin.isTournamentAdmin(username())) {
+            throw new ForbiddenException("Tournament admin role required");
+        }
+    }
+
+    private TournamentDefinition requireTournament(String tourName) {
+        TournamentDefinition def = TournamentService.getTournament(tourName);
+        if (def == null) {
+            throw new NotFoundException("No such tournament: " + tourName);
+        }
+        return def;
+    }
+
     /** Dedicated, envelope-free list read for the React tournamentAdmin page — mirrors TournamentAdminBean. */
     @GET
     @Path("admin-list")
@@ -52,7 +66,7 @@ public class TournamentResource extends BaseResource {
     /** Replaces DS.createTournament() */
     @POST
     public boolean createTournament(CreateTournamentRequest body) {
-        if (!JolAdmin.isTournamentAdmin(username())) return false;
+        requireTournamentAdmin();
         try {
             String originalName = body.originalName() != null ? body.originalName() : "";
             boolean isRename = !originalName.isEmpty() && !originalName.equals(body.tourName());
@@ -119,9 +133,9 @@ public class TournamentResource extends BaseResource {
     @POST
     @Path("{name}/publish")
     public boolean publishTournament(@PathParam("name") String tourName) {
-        if (!JolAdmin.isTournamentAdmin(username())) return false;
-        TournamentDefinition def = TournamentService.getTournament(tourName);
-        if (def == null || !def.getStatus().equals(GameStatus.EDIT)) return false;
+        requireTournamentAdmin();
+        TournamentDefinition def = requireTournament(tourName);
+        if (!def.getStatus().equals(GameStatus.EDIT)) return false;
         TournamentService.setTournamentStatus(tourName, GameStatus.STARTING);
         TournamentService.save();
         return true;
@@ -131,7 +145,7 @@ public class TournamentResource extends BaseResource {
     @GET
     @Path("{name}/round-summary")
     public Map<Integer, Map<Integer, List<PlayerRoundSummary>>> getRoundSummary(@PathParam("name") String tourName) {
-        TournamentDefinition def = TournamentService.getTournament(tourName);
+        TournamentDefinition def = requireTournament(tourName);
         Map<Integer, Map<Integer, List<PlayerRoundSummary>>> result = new HashMap<>();
         if (def.getRounds() == null) return result;
         def.getRounds().forEach((round, tables) -> {
@@ -166,9 +180,8 @@ public class TournamentResource extends BaseResource {
             @PathParam("name") String tourName,
             @PathParam("round") int round,
             @PathParam("table") int table) {
-        if (!JolAdmin.isTournamentAdmin(username())) return false;
-        TournamentDefinition def = TournamentService.getTournament(tourName);
-        if (def == null) return false;
+        requireTournamentAdmin();
+        TournamentDefinition def = requireTournament(tourName);
 
         String gameName = String.format("%s: Round %d - Table %d", tourName, round, table);
         JolGame game = null;
@@ -248,14 +261,14 @@ public class TournamentResource extends BaseResource {
     @GET
     @Path("{name}/details")
     public TournamentDetails loadTournamentDetails(@PathParam("name") String tourName) {
-        return new TournamentDetails(TournamentService.getTournament(tourName));
+        return new TournamentDetails(requireTournament(tourName));
     }
 
     /** Replaces DS.getRoundsForTournament() */
     @GET
     @Path("{name}/rounds")
     public Map<Integer, Map<Integer, List<TournamentPlayer>>> getRounds(@PathParam("name") String tourName) {
-        return TournamentService.getTournament(tourName).getRounds();
+        return requireTournament(tourName).getRounds();
     }
 
     /** Replaces DS.getRoundsForTournamentCsv() */
@@ -263,7 +276,7 @@ public class TournamentResource extends BaseResource {
     @Path("{name}/rounds/csv")
     @Produces(MediaType.TEXT_PLAIN)
     public String getRoundsCsv(@PathParam("name") String tourName) {
-        return RoundsDetails.exportPastGamesAsCsv(TournamentService.getTournament(tourName).getRounds());
+        return RoundsDetails.exportPastGamesAsCsv(requireTournament(tourName).getRounds());
     }
 
     /** Replaces DS.getTournamentPlayers() — registered players with decks (used for table creation) */
@@ -302,7 +315,7 @@ public class TournamentResource extends BaseResource {
     @PUT
     @Path("{name}/rounds")
     public void saveTables(@PathParam("name") String tourName, Map<Integer, Map<Integer, List<String>>> rounds) {
-        if (!JolAdmin.isTournamentAdmin(username())) return;
+        requireTournamentAdmin();
         Map<Integer, Map<Integer, List<TournamentPlayer>>> config = new HashMap<>();
         rounds.forEach((round, tableMap) -> {
             Map<Integer, List<TournamentPlayer>> tables = new HashMap<>();
@@ -315,8 +328,7 @@ public class TournamentResource extends BaseResource {
             });
             config.put(round, tables);
         });
-        TournamentDefinition tournament = TournamentService.getTournament(tourName);
-        if (tournament == null) return;
+        TournamentDefinition tournament = requireTournament(tourName);
         tournament.setRounds(config);
         TournamentService.save();
     }
@@ -341,7 +353,7 @@ public class TournamentResource extends BaseResource {
     @POST
     @Path("{name}/final")
     public void createFinalTable(@PathParam("name") String tourName) {
-        if (!JolAdmin.isTournamentAdmin(username())) return;
+        requireTournamentAdmin();
         TournamentService.createFinal(tourName);
     }
 
@@ -349,22 +361,22 @@ public class TournamentResource extends BaseResource {
     @PUT
     @Path("{name}/seeding")
     public void setFinalSeeding(@PathParam("name") String tourName, List<String> seeding) {
-        if (!JolAdmin.isTournamentAdmin(username())) return;
-        TournamentService.getTournament(tourName).getFinals().setSeeding(seeding);
+        requireTournamentAdmin();
+        requireTournament(tourName).getFinals().setSeeding(seeding);
     }
 
     /** Replaces DS.loadFinalSeeding() */
     @GET
     @Path("{name}/seeding")
     public List<String> loadFinalSeeding(@PathParam("name") String tourName) {
-        return TournamentService.getTournament(tourName).getFinals().getSeeding();
+        return requireTournament(tourName).getFinals().getSeeding();
     }
 
     /** Replaces DS.closeTournament() */
     @POST
     @Path("{name}/close")
     public void closeTournament(@PathParam("name") String tourName) {
-        if (!JolAdmin.isTournamentAdmin(username())) return;
+        requireTournamentAdmin();
         TournamentService.setTournamentStatus(tourName, GameStatus.CLOSED);
     }
 
@@ -435,8 +447,8 @@ public class TournamentResource extends BaseResource {
     @DELETE
     @Path("{name}/rounds")
     public void resetTables(@PathParam("name") String tourName) {
-        if (!JolAdmin.isTournamentAdmin(username())) return;
-        TournamentService.getTournament(tourName).resetRounds();
+        requireTournamentAdmin();
+        requireTournament(tourName).resetRounds();
     }
 
     /** Replaces DS.getFinalPlayers() */
@@ -458,11 +470,11 @@ public class TournamentResource extends BaseResource {
     @PUT
     @Path("{name}/final-players")
     public void saveFinal(@PathParam("name") String tourName, List<String> players) {
-        if (!JolAdmin.isTournamentAdmin(username())) return;
+        requireTournamentAdmin();
         if (!GameService.existsGame(String.format("%s: Final Table", tourName))) {
             TournamentFinals finals = new TournamentFinals();
             finals.setSeeding(players);
-            TournamentService.getTournament(tourName).setFinals(finals);
+            requireTournament(tourName).setFinals(finals);
         }
     }
 
@@ -494,7 +506,7 @@ public class TournamentResource extends BaseResource {
     @Path("{name}/final-delta")
     public List<TournamentRegistration> getFinalDelta(@PathParam("name") String tourName) {
         List<TournamentRegistration> regPlayers = new ArrayList<>(getTournamentPlayers(tourName));
-        List<String> seeding = TournamentService.getTournament(tourName).getFinals().getSeeding();
+        List<String> seeding = requireTournament(tourName).getFinals().getSeeding();
         if (seeding != null) {
             regPlayers.removeIf(r -> seeding.contains(r.getPlayer()));
         }
@@ -523,26 +535,21 @@ public class TournamentResource extends BaseResource {
     @GET
     @Path("{name}/status")
     public boolean tournamentAlreadyActive(@PathParam("name") String tourName) {
-        return TournamentService.getTournament(tourName).getStatus().equals(GameStatus.ACTIVE);
+        return requireTournament(tourName).getStatus().equals(GameStatus.ACTIVE);
     }
 
     /** Replaces DS.gameAlreadyStarted() */
     @GET
     @Path("{name}/game-started")
     public boolean gameAlreadyStarted(@PathParam("name") String tourName) {
-        try {
-            GameService.getGameByName(tourName);
-        } catch (NullPointerException ex) {
-            return false;
-        }
-        return true;
+        return GameService.existsGame(tourName);
     }
 
     /** Replaces DS.getTournamentRounds() */
     @GET
     @Path("{name}/rounds-count")
     public int[] getTournamentRounds(@PathParam("name") String tourName) {
-        return IntStream.range(1, TournamentService.getTournament(tourName).getNumberOfRounds() + 1).toArray();
+        return IntStream.range(1, requireTournament(tourName).getNumberOfRounds() + 1).toArray();
     }
 
     /** Aggregated standings for finalist selection: VP and GW totalled across all rounds, competition-ranked. */

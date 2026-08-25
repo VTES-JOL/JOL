@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,7 +22,7 @@ public class HistoryService extends PersistedService {
     private static final Path PERSISTENCE_PATH = DataPaths.path("pastGames.json");
     private static final HistoryService INSTANCE = new HistoryService();
 
-    private final Map<OffsetDateTime, GameHistory> pastGames = new HashMap<>();
+    private final Map<OffsetDateTime, GameHistory> pastGames = new ConcurrentHashMap<>();
 
     private HistoryService() {
         super("HistoryService", 10);
@@ -30,7 +30,7 @@ public class HistoryService extends PersistedService {
     }
 
     public static  Map<OffsetDateTime, GameHistory> getHistory() {
-        return INSTANCE.pastGames;
+        return Collections.unmodifiableMap(INSTANCE.pastGames);
     }
 
     public static  void addGame(OffsetDateTime now, GameHistory history) {

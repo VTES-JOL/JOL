@@ -39,10 +39,11 @@ public class GameActionResource extends BaseResource {
         GameModel game = getModel();
         boolean isPlaying = game.getPlayers().contains(player);
         boolean canJudge = JolAdmin.isJudge(player) && !game.getPlayers().contains(player);
-        if (isPlaying || canJudge) {
-            game.updateGlobalNotes(body.notes(), clientId());
-            JolAdmin.recordPlayerAccess(player, gameName());
+        if (!isPlaying && !canJudge) {
+            throw new ForbiddenException("Must be a player in this game or a judge to update notes");
         }
+        game.updateGlobalNotes(body.notes(), clientId());
+        JolAdmin.recordPlayerAccess(player, gameName());
     }
 
     /** Replaces DS.updatePrivateNotes() */
@@ -51,10 +52,11 @@ public class GameActionResource extends BaseResource {
     public void updatePrivateNotes(NotesRequest body) {
         String player = username();
         GameModel game = getModel();
-        if (game.getPlayers().contains(player)) {
-            game.updatePrivateNotes(player, body.notes(), clientId());
-            JolAdmin.recordPlayerAccess(player, gameName());
+        if (!game.getPlayers().contains(player)) {
+            throw new ForbiddenException("Must be a player in this game to update notes");
         }
+        game.updatePrivateNotes(player, body.notes(), clientId());
+        JolAdmin.recordPlayerAccess(player, gameName());
     }
 
     /** Replaces DS.getGameDeck() */

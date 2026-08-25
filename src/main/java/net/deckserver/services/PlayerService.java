@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ public class PlayerService extends PersistedService {
             .refreshAfterWrite(1, TimeUnit.MINUTES)
             .build(PlayerService::generateSummary);
     private static final Predicate<UserSummary> RECENTLY_ONLINE = summary -> OffsetDateTime.parse(summary.getLastOnline()).plusMinutes(30).isAfter(OffsetDateTime.now());
-    private final Map<String, PlayerInfo> players = new HashMap<>();
+    private final Map<String, PlayerInfo> players = new ConcurrentHashMap<>();
 
     private PlayerService() {
         super("PlayerService", 5);
@@ -62,11 +63,10 @@ public class PlayerService extends PersistedService {
     }
 
     public static  boolean registerPlayer(String name, String password, String email) {
-        if (existsPlayer(name) || name.isEmpty())
+        if (name.isEmpty())
             return false;
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
-        INSTANCE.players.put(name, new PlayerInfo(name, ULID.random(), email, hash));
-        return true;
+        return INSTANCE.players.putIfAbsent(name, new PlayerInfo(name, ULID.random(), email, hash)) == null;
     }
 
     public static  boolean authenticate(String playerName, String password) {

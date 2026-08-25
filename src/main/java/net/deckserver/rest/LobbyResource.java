@@ -12,6 +12,7 @@ import net.deckserver.ws.WebSocketRegistry;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -77,12 +78,17 @@ public class LobbyResource extends BaseResource {
     @Path("player/games/{name}/start")
     public void startGameReact(@PathParam("name") String game) {
         String playerName = username();
-        if (GameService.existsGame(game)) {
-            String owner = JolAdmin.getOwner(game);
-            if ((playerName.equals(owner) || JolAdmin.isSuperUser(playerName)) && JolAdmin.isStarting(game)) {
-                JolAdmin.startGame(game);
-            }
+        if (!GameService.existsGame(game)) {
+            throw new NotFoundException("No such game: " + game);
         }
+        String owner = JolAdmin.getOwner(game);
+        if (!playerName.equals(owner) && !JolAdmin.isSuperUser(playerName)) {
+            throw new ForbiddenException("Only the game owner or a super user can start this game");
+        }
+        if (!JolAdmin.isStarting(game)) {
+            throw new WebApplicationException(Response.status(Response.Status.CONFLICT).entity("Game is not in starting status").build());
+        }
+        JolAdmin.startGame(game);
         notifyLobby();
     }
 
@@ -90,33 +96,44 @@ public class LobbyResource extends BaseResource {
     @Path("player/games/{name}")
     public void closeGameReact(@PathParam("name") String game) {
         String playerName = username();
-        String owner = JolAdmin.getOwner(game);
-        if (playerName.equals(owner) || JolAdmin.isAdmin(playerName)) {
-            JolAdmin.endGame(game, true);
+        if (!GameService.existsGame(game)) {
+            throw new NotFoundException("No such game: " + game);
         }
+        String owner = JolAdmin.getOwner(game);
+        if (!playerName.equals(owner) && !JolAdmin.isAdmin(playerName)) {
+            throw new ForbiddenException("Only the game owner or an admin can close this game");
+        }
+        JolAdmin.endGame(game, true);
         notifyLobby();
     }
 
     @POST
     @Path("player/games/{name}/invite")
     public void invitePlayerReact(@PathParam("name") String game, InviteRequest body) {
-        String playerName = username();
-        if (playerName != null) {
-            RegistrationService.invitePlayer(game, body.player());
-            WebSocketRegistry.notifyInvalidate(List.of("main-games"));
-        }
+        requireOwnerOrAdmin(game);
+        RegistrationService.invitePlayer(game, body.player());
+        WebSocketRegistry.notifyInvalidate(List.of("main-games"));
         notifyLobby();
     }
 
     @DELETE
     @Path("player/games/{name}/invite/{player}")
     public void unInvitePlayerReact(@PathParam("name") String game, @PathParam("player") String player) {
-        String playerName = username();
-        if (playerName != null) {
-            JolAdmin.unInvitePlayer(game, player);
-            WebSocketRegistry.notifyInvalidate(List.of("main-games"));
-        }
+        requireOwnerOrAdmin(game);
+        JolAdmin.unInvitePlayer(game, player);
+        WebSocketRegistry.notifyInvalidate(List.of("main-games"));
         notifyLobby();
+    }
+
+    private void requireOwnerOrAdmin(String game) {
+        if (!GameService.existsGame(game)) {
+            throw new NotFoundException("No such game: " + game);
+        }
+        String playerName = username();
+        String owner = JolAdmin.getOwner(game);
+        if (!playerName.equals(owner) && !JolAdmin.isAdmin(playerName)) {
+            throw new ForbiddenException("Only the game owner or an admin can manage invites for this game");
+        }
     }
 
     @POST

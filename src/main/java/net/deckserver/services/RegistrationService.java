@@ -43,43 +43,43 @@ public class RegistrationService extends PersistedService {
         load();
     }
 
-    public static  void put(String gameName, String playerName, RegistrationStatus registration) {
+    public static synchronized void put(String gameName, String playerName, RegistrationStatus registration) {
         INSTANCE.registrations.put(gameName, playerName, registration);
     }
 
-    public static  long getRegisteredPlayerCount(String gameName) {
+    public static synchronized long getRegisteredPlayerCount(String gameName) {
         return INSTANCE.registrations.row(gameName).values().stream().filter(IS_REGISTERED).count();
     }
 
-    public static  RegistrationStatus getRegistration(String gameName, String playerName) {
+    public static synchronized RegistrationStatus getRegistration(String gameName, String playerName) {
         return INSTANCE.registrations.get(gameName, playerName);
     }
 
-    public static  Set<String> getRegisteredGames(String playerName) {
-        return INSTANCE.registrations.column(playerName).keySet();
+    public static synchronized Set<String> getRegisteredGames(String playerName) {
+        return new HashSet<>(INSTANCE.registrations.column(playerName).keySet());
     }
 
-    public static  Set<String> getPlayers(String gameName) {
-        return INSTANCE.registrations.row(gameName).keySet();
+    public static synchronized Set<String> getPlayers(String gameName) {
+        return new HashSet<>(INSTANCE.registrations.row(gameName).keySet());
     }
 
-    public static Set<String> getRegisteredGameNames() {
+    public static synchronized Set<String> getRegisteredGameNames() {
         return new HashSet<>(INSTANCE.registrations.rowKeySet());
     }
 
-    public static  void removePlayer(String gameName, String playerName) {
+    public static synchronized void removePlayer(String gameName, String playerName) {
         INSTANCE.registrations.remove(gameName, playerName);
     }
 
-    public static  boolean isInGame(String gameName, String playerName) {
+    public static synchronized boolean isInGame(String gameName, String playerName) {
         return INSTANCE.registrations.contains(gameName, playerName);
     }
 
-    public static  boolean isRegistered(String gameName, String playerName) {
+    public static synchronized boolean isRegistered(String gameName, String playerName) {
         return INSTANCE.registrations.contains(gameName, playerName) && Objects.requireNonNull(INSTANCE.registrations.get(gameName, playerName)).getDeckId() != null;
     }
 
-    public static  boolean isInvited(String gameName, String playerName) {
+    public static synchronized boolean isInvited(String gameName, String playerName) {
         return INSTANCE.registrations.contains(gameName, playerName);
     }
 
@@ -88,11 +88,11 @@ public class RegistrationService extends PersistedService {
     }
 
     public static synchronized Map<String, RegistrationStatus> getPlayerRegistrations(String playerName) {
-        return INSTANCE.registrations.column(playerName);
+        return Map.copyOf(INSTANCE.registrations.column(playerName));
     }
 
     public static synchronized Map<String, RegistrationStatus> getGameRegistrations(String gameName) {
-        return INSTANCE.registrations.row(gameName);
+        return Map.copyOf(INSTANCE.registrations.row(gameName));
     }
 
     public static synchronized Set<String> getPlayerGames(String player) {
@@ -105,7 +105,7 @@ public class RegistrationService extends PersistedService {
         }
     }
 
-    public static void registerDeck(String gameName, String playerName, String deckId, String deckName, String summary) {
+    public static synchronized void registerDeck(String gameName, String playerName, String deckId, String deckName, String summary) {
         RegistrationStatus registrationStatus = new RegistrationStatus(deckId);
         registrationStatus.setSummary(summary);
         registrationStatus.setDeckName(deckName);
@@ -131,7 +131,7 @@ public class RegistrationService extends PersistedService {
     }
 
     @Override
-    protected void persist() {
+    protected synchronized void persist() {
         if (shouldSkipPersistence()) {
             logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
             return;
@@ -147,7 +147,7 @@ public class RegistrationService extends PersistedService {
     }
 
     @Override
-    protected void load() {
+    protected synchronized void load() {
         TypeFactory typeFactory = objectMapper.getTypeFactory();
         if (!Files.exists(PERSISTENCE_PATH)) {
             logger.info("No existing registrations file found");

@@ -52,7 +52,6 @@ public class NotificationService {
             .connectTimeout(Duration.ofSeconds(5))
             .build();
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final BouncyCastleProvider BC_PROVIDER = new BouncyCastleProvider();
     private static final KeyPair keyPair = loadKey();
     // web-push's PushService.send() spins up a fresh async client per call with no timeout;
     // we build the request via PushService but execute it ourselves so a stalled push
@@ -189,7 +188,7 @@ public class NotificationService {
         try (FileInputStream stream = new FileInputStream(keyPath.toFile()); InputStreamReader reader = new InputStreamReader(stream)) {
             PEMParser pemParser = new PEMParser(reader);
             PEMKeyPair pemKeyPair = (PEMKeyPair) pemParser.readObject();
-            return new JcaPEMKeyConverter().setProvider(BC_PROVIDER).getKeyPair(pemKeyPair);
+            return new JcaPEMKeyConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME).getKeyPair(pemKeyPair);
         } catch (IOException e) {
             throw new RuntimeException("Could not read private key");
         }

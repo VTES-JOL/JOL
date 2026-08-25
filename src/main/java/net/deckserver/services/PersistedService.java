@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.Cleaner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -45,8 +44,6 @@ public abstract class PersistedService {
     protected final boolean testModeEnabled;
     protected final AtomicBoolean isShuttingDown = new AtomicBoolean(false);
     protected final ScheduledExecutorService scheduler;
-    protected static final Cleaner cleaner = Cleaner.create();
-    protected final Cleaner.Cleanable cleanable;
 
     /**
      * Constructor that initialises the service with scheduled persistence.
@@ -65,9 +62,6 @@ public abstract class PersistedService {
             thread.setDaemon(true);
             return thread;
         });
-
-        // Register a clean-up action with Cleaner
-        this.cleanable = cleaner.register(this, new CleanupAction(this));
 
         // Start a scheduled persistence task if not in test mode
         if (!testModeEnabled) {
@@ -208,37 +202,5 @@ public abstract class PersistedService {
      */
     protected boolean isShuttingDown() {
         return isShuttingDown.get();
-    }
-
-    /**
-     * Clean-up action that persists all data before the service is rubbish collected.
-     * This class must not hold a direct reference to the service instance to avoid
-     * preventing garbage collection.
-     */
-    protected static class CleanupAction implements Runnable {
-        private final String serviceName;
-        private final Logger logger;
-        private final PersistFunction persistFunction;
-
-        protected CleanupAction(PersistedService service) {
-            this.serviceName = service.serviceName;
-            this.logger = service.logger;
-            this.persistFunction = service::persist;
-        }
-
-        @Override
-        public void run() {
-            try {
-                persistFunction.persist();
-                logger.info("{} cache cleanup completed.", serviceName);
-            } catch (Exception e) {
-                logger.error("{} error during cache cleanup: ", serviceName, e);
-            }
-        }
-
-        @FunctionalInterface
-        protected interface PersistFunction {
-            void persist();
-        }
     }
 }

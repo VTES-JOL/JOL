@@ -45,7 +45,7 @@ public class GameService extends PersistedService {
     private final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
             .expireAfterAccess(30, TimeUnit.MINUTES)
             .build(GameService::loadGame);
-    private final Map<String, GameInfo> games = new HashMap<>();
+    private final Map<String, GameInfo> games = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, String> idToName = new ConcurrentHashMap<>();
     private final LoadingCache<String, GameSummary> summaryMap = Caffeine.newBuilder()
             .expireAfterWrite(30, TimeUnit.MINUTES)

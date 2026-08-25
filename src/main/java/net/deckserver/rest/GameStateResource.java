@@ -49,10 +49,10 @@ public class GameStateResource extends BaseResource {
         GameModel game = getModel();
         boolean isPlaying = game.getPlayers().contains(player);
         boolean canJudge = JolAdmin.isJudge(player) && !isPlaying;
-        String status = null;
-        if (isPlaying || canJudge) {
-            status = game.submit(player, ne(body.phase()), ne(body.command()), ne(body.chat()), ne(body.ping()), clientId());
+        if (!isPlaying && !canJudge) {
+            throw new ForbiddenException("Must be a player in this game or a judge to submit");
         }
+        String status = game.submit(player, ne(body.phase()), ne(body.command()), ne(body.chat()), ne(body.ping()), clientId());
         return GameSnapshotFactory.build(game, player, status);
     }
 
@@ -62,9 +62,10 @@ public class GameStateResource extends BaseResource {
         String player = username();
         GameModel game = getModel();
         boolean isPlaying = RegistrationService.getPlayers(gameName()).contains(player);
-        if (isPlaying) {
-            game.endTurn(player, clientId());
+        if (!isPlaying) {
+            throw new ForbiddenException("Must be a player in this game to end the turn");
         }
+        game.endTurn(player, clientId());
         return GameSnapshotFactory.build(game, player, null);
     }
 

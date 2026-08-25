@@ -13,6 +13,7 @@ public class JacksonConfig implements ContextResolver<ObjectMapper> {
 
     public JacksonConfig() {
         mapper = new ObjectMapper();
+        mapper.findAndRegisterModules();
         mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
     }
 

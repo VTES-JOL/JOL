@@ -60,7 +60,7 @@ public class PlayerGameActivityService extends PersistedService {
     }
 
     public static  Map<String, GameTimestampEntry> getGameTimestamps() {
-        return INSTANCE.gameTimestamps;
+        return Map.copyOf(INSTANCE.gameTimestamps);
     }
 
     public static  void setGameTimestamp(String game) {

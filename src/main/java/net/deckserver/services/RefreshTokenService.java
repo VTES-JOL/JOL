@@ -86,7 +86,9 @@ public class RefreshTokenService extends PersistedService {
                 if (!info.getId().equals(id)) continue;
 
                 long now = System.currentTimeMillis();
-                if (info.getExpiresAt() < now || !info.getSecretHash().equals(hash(secret))) {
+                if (info.getExpiresAt() < now || !MessageDigest.isEqual(
+                        HexFormat.of().parseHex(info.getSecretHash()),
+                        HexFormat.of().parseHex(hash(secret)))) {
                     tokens.remove(info);
                     return Optional.empty();
                 }
