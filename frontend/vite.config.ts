@@ -15,7 +15,7 @@ const BACKEND = 'http://localhost:8080'
 const buildId = Date.now().toString(36)
 
 // Exact paths this frontend owns — must mirror MainServlet's @WebServlet
-// mapping plus LoginServlet's "/login" (Java) exactly. Everything else under
+// mapping (including "/login") exactly. Everything else under
 // /jol/ is proxied to the real backend (tomcat9:run) below: static assets
 // (css/js/images/fonts) and the REST API/WebSocket all keep working through
 // that proxy. register/logout have no GET page of their own anymore — both

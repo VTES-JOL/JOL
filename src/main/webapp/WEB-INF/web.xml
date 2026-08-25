@@ -32,8 +32,9 @@
       the context root (servlet-spec exact mappings take precedence over
       welcome-file resolution), so a welcome-file here was already dead
       weight even before login.jsp — which it pointed at — was deleted in
-      favor of the React login page (LoginServlet forwards "/login" to
-      /react/index.html directly).
+      favor of the React login page (MainServlet forwards "/login" to
+      /react/index.html directly, without the auth gate it applies to
+      every other mapping).
     -->
 
 </web-app>
