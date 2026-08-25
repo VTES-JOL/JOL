@@ -89,7 +89,6 @@ This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deck
   - `cards/` — `CardSummary`, `SecuredCardLoader`
 - **`net.deckserver.game`**
   - `enums/` — domain enums: `RegionType`, `CardType`, `Clan`, `Phase`, `GameStatus`, etc.
-  - `jaxb/` — legacy XML serialization for `game.xml` (state) and `actions.xml` (chat history) via JaxB; `XmlFileUtils` wraps load/save
   - `validators/` — deck validation: `StandardDeckValidator`, `V5DeckValidator`, `DuelDeckValidator`, `PlayTestValidator` all extend `AbstractDeckValidator`; use `ValidatorFactory`
 - **`net.deckserver.servlet`** — no JSPs left (every one was deleted along with `ds.js`/`card-modal.js` once its React equivalent shipped — see Frontend + API Notes below)
   - `MainServlet` — `@WebServlet` on every top-level view path (`/`, `/main`, `/lobby`, `/game/*`, etc.); gates auth via `AuthService`, then always forwards to `/react/index.html`

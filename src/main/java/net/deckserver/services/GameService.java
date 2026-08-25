@@ -284,19 +284,6 @@ public class GameService extends PersistedService {
         }
         logger.info("Determining upgrades...");
         GameDataConversion conversion = new GameDataConversion();
-        // Upgrade all games with no version
-        games.values().stream()
-                .filter(ACTIVE_GAME)
-                .filter(Objects::nonNull)
-                // Version 1 is the first version where we store additional information in the game state
-                .filter(gameInfo -> gameInfo.getVersion().isOlderThan(GameInfo.Version.GAME_STATE))
-                // For every active game check the game state
-                .peek(gameInfo -> logger.info("Upgrading game {} - {}", gameInfo.getName(), gameInfo.getId()))
-                .forEach(gameInfo -> {
-                    conversion.convertGame(gameInfo.getId());
-                    gameInfo.setVersion(GameInfo.Version.GAME_STATE);
-                });
-
         games.values().stream()
                 .filter(ACTIVE_GAME)
                 .filter(Objects::nonNull)

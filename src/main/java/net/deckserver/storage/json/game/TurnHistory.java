@@ -3,7 +3,6 @@ package net.deckserver.storage.json.game;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.deckserver.game.jaxb.actions.Turn;
 
 import java.util.*;
 import java.util.stream.Collectors;
