@@ -1,8 +1,9 @@
 import {useState} from 'react';
+import {useQuery} from '@tanstack/react-query';
 import {Link} from 'react-router-dom';
+import {api} from '../../api/client';
 import type {GamesSummary, GameStatusBean} from '../../api/types';
 import {Card, CardHeader, CardTitle} from '../../components/Card';
-import {useApiPoll} from './useApiPoll';
 import {useAuth} from '../../nav/useAuth';
 import {pathForGame} from '../../routes';
 import './GamesPanel.css';
@@ -66,7 +67,10 @@ const EMPTY: GamesSummary = {games: [], tournament: [], ousted: []};
 
 export function GamesPanel() {
     const {player} = useAuth();
-    const summary = useApiPoll<GamesSummary>('/main/games', EMPTY, 'main:games');
+    const {data: summary = EMPTY} = useQuery({
+        queryKey: ['main-games'],
+        queryFn: () => api.get<GamesSummary>('/main/games'),
+    });
     const [activeTab, setActiveTab] = useState<TabId>('myGames');
 
     return (

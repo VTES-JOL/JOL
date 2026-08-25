@@ -68,7 +68,7 @@ public class WebSocketRegistry {
 
     /**
      * Same as notifyGame(gameId), but skips the single WS session tagged with
-     * excludeClientId — mirrors notifyMainScope(scope, excludeClientId): a
+     * excludeClientId — mirrors notifyInvalidate(key, excludeClientId): a
      * caller whose own REST response already carries the fresh game state
      * doesn't need its own action to also trigger a self-refetch race. Every
      * other session watching this game, including that same player's other
@@ -93,45 +93,13 @@ public class WebSocketRegistry {
         }
     }
 
-    public static void notifyMain() {
-        broadcast("{\"type\":\"main\"}");
-    }
-
     /**
-     * Scoped sibling of notifyMain() — always fired alongside it, never
-     * instead of it, so unconverted views relying on the generic "main"
-     * signal are unaffected. Lets React widgets subscribe to only the slice
-     * that actually changed (e.g. "chat", "games", "notes") instead of
-     * refetching everything on every unrelated update.
-     */
-    public static void notifyMainScope(String scope) {
-        notifyMainScope(scope, null);
-    }
-
-    /**
-     * Same as notifyMainScope(scope), but skips the single WS session tagged
-     * with excludeClientId — for a caller whose own REST response already
-     * carries the fresh state, so its own re-notification would just be a
-     * redundant, always-empty-or-stale-by-definition refetch. Every *other*
-     * session, including that same player's other tabs, is unaffected.
-     */
-    public static void notifyMainScope(String scope, String excludeClientId) {
-        Session exclude = excludeClientId == null ? null : clientSessions.get(excludeClientId);
-        String message = "{\"type\":\"main:" + scope + "\"}";
-        sessions.values().forEach(set -> set.forEach(session -> {
-            if (session != exclude) send(session, message);
-        }));
-    }
-
-    /**
-     * TanStack-Query-friendly push: instead of a scope string the frontend
-     * has to translate into a query key (see notifyMainScope), this carries
-     * the query key itself, so the frontend bridge (ws/useQueryInvalidation.ts)
-     * is a direct queryClient.invalidateQueries({queryKey: key}) with no
+     * TanStack-Query-friendly push: carries the query key itself, so the
+     * frontend bridge (ws/useQueryInvalidation.ts) is a direct
+     * queryClient.invalidateQueries({queryKey: key}) with no scope-string
      * lookup table. Broadcasts to every session — for anything room-scoped
      * (e.g. a single game), see notifyGame instead, which uses the same
-     * envelope but targets gameSessions. Coexists with notifyMain/
-     * notifyMainScope for pages not yet migrated (Lobby, Nav so far).
+     * envelope but targets gameSessions.
      */
     public static void notifyInvalidate(List<String> key) {
         notifyInvalidate(key, null);
@@ -152,10 +120,6 @@ public class WebSocketRegistry {
             sb.append("\"").append(items.get(i)).append("\"");
         }
         return sb.append("]").toString();
-    }
-
-    private static void broadcast(String message) {
-        sessions.values().forEach(set -> set.forEach(session -> send(session, message)));
     }
 
     private static void send(Session session, String message) {

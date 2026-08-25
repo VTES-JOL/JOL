@@ -79,7 +79,7 @@ public class JolWebSocketEndpoint {
         // {"type":"hello","clientId":"<uuid>"} tags this session with a per-browser-tab
         // id (generated once in frontend/src/ws/socket.ts) so a REST call from that same
         // tab can ask to be excluded from a broadcast it triggered — see
-        // WebSocketRegistry.notifyMainScope(scope, excludeClientId).
+        // WebSocketRegistry.notifyInvalidate(key, excludeClientId).
         try {
             JsonNode node = MAPPER.readTree(message);
             String type = node.path("type").asText();

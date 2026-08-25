@@ -1,6 +1,6 @@
 // Thin wrapper around /jol/ws/updates (see JolWebSocketEndpoint). Auth rides the
 // jol_at cookie automatically since the handshake is same-origin. Messages are
-// small JSON envelopes: {"type":"main"}, {"type":"game","id":...}, {"type":"pong"}.
+// small JSON envelopes: {"type":"invalidate","key":[...]}, {"type":"pong"}.
 import { checkNow } from '../api/connectivity';
 
 type Listener = (data: Record<string, unknown>) => void;
@@ -14,7 +14,7 @@ let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 // stable across reconnects) — sent to client.ts as a header on every REST
 // call too, so a handler whose own response already carries fresh state can
 // ask the server to skip re-notifying this same tab over the socket. See
-// WebSocketRegistry.notifyMainScope(scope, excludeClientId).
+// WebSocketRegistry.notifyInvalidate(key, excludeClientId).
 export const CLIENT_ID = crypto.randomUUID();
 
 function wsUrl(): string {

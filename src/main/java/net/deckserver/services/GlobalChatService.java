@@ -34,7 +34,7 @@ public class GlobalChatService extends PersistedService {
 
     /**
      * excludeClientId skips notifying the caller's own WS session (see
-     * WebSocketRegistry.notifyMainScope) — REST callers who already have the
+     * WebSocketRegistry.notifyInvalidate) — REST callers who already have the
      * fresh state from their own response should pass it; background jobs
      * and other non-REST callers (PublicGameBuilder, GameCleanUp, ...) have
      * no client to exclude and use the two-arg overload above.
@@ -47,8 +47,6 @@ public class GlobalChatService extends PersistedService {
         if (INSTANCE.chats.size() > CHAT_STORAGE) {
             INSTANCE.chats = new ArrayList<>(INSTANCE.chats.subList(CHAT_DISCARD, CHAT_STORAGE));
         }
-        WebSocketRegistry.notifyMain();
-        WebSocketRegistry.notifyMainScope("chat", excludeClientId);
         WebSocketRegistry.notifyInvalidate(List.of("nav"), excludeClientId);
         WebSocketRegistry.notifyInvalidate(List.of("main-chat"), excludeClientId);
     }

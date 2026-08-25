@@ -12,14 +12,14 @@ type View = { mode: 'create' } | { mode: 'detail'; gameName: string } | null;
 
 const LOBBY_QUERY_KEY = ['lobby'];
 
-// Prototype of the TanStack Query approach (see LobbyResource.getLobbyAndInvalidate
-// and ws/useQueryInvalidation.ts on the backend/bridge side). Compared to
-// every other page in this app:
+// First page converted to the TanStack Query approach now used app-wide (see
+// LobbyResource.getLobbyAndInvalidate and ws/useQueryInvalidation.ts on the
+// backend/bridge side):
 //  - no manual useEffect(refresh, []) — useQuery owns the initial fetch,
 //    caching, and re-fetch-on-error/refocus policy
-//  - no useJolSocket('main:games', refresh) here — useQueryInvalidation,
-//    mounted once near the app root, invalidates ['lobby'] for us whenever
-//    the backend pushes {"type":"invalidate","key":["lobby"]}
+//  - no manual WS subscription here — useQueryInvalidation, mounted once
+//    near the app root, invalidates ['lobby'] for us whenever the backend
+//    pushes {"type":"invalidate","key":["lobby"]}
 //  - mutation responses write straight into the cache via setQueryData
 //    instead of local setState, so this component no longer owns the data
 //    at all — the query cache does

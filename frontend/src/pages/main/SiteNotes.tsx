@@ -1,9 +1,14 @@
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { api } from '../../api/client';
 import type { NotesResponse } from '../../api/types';
-import { useApiPoll } from './useApiPoll';
 
 export function SiteNotes() {
-  const { notes } = useApiPoll<NotesResponse>('/main/notes', { notes: '' }, 'main:notes');
+  const { data } = useQuery({
+    queryKey: ['main-notes'],
+    queryFn: () => api.get<NotesResponse>('/main/notes'),
+  });
+  const notes = data?.notes;
 
   if (!notes) return null;
   return (

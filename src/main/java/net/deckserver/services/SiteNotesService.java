@@ -8,6 +8,7 @@ import org.commonmark.parser.Parser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class SiteNotesService extends PersistedService {
 
@@ -38,8 +39,7 @@ public class SiteNotesService extends PersistedService {
 
     public static void setNotes(String notes) {
         INSTANCE.notes = notes == null ? "" : notes;
-        WebSocketRegistry.notifyMain();
-        WebSocketRegistry.notifyMainScope("notes");
+        WebSocketRegistry.notifyInvalidate(List.of("main-notes"));
     }
 
     public static void clear() {

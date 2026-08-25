@@ -82,10 +82,9 @@ public class JolAdmin {
         if (gameName.length() > 2 && notExistsGame(gameName)) {
             try {
                 GameService.create(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), format);
-                WebSocketRegistry.notifyMain();
-                WebSocketRegistry.notifyMainScope("games");
                 WebSocketRegistry.notifyInvalidate(List.of("nav"));
                 WebSocketRegistry.notifyInvalidate(List.of("watch"));
+                WebSocketRegistry.notifyInvalidate(List.of("main-games"));
             } catch (Exception e) {
                 logger.error("Error creating game", e);
             }
@@ -399,10 +398,9 @@ public class JolAdmin {
             saveGameState(game);
             gameInfo.setStatus(GameStatus.ACTIVE);
             pingPlayer(game.getActivePlayer(), gameName);
-            WebSocketRegistry.notifyMain();
-            WebSocketRegistry.notifyMainScope("games");
             WebSocketRegistry.notifyInvalidate(List.of("nav"));
             WebSocketRegistry.notifyInvalidate(List.of("watch"));
+            WebSocketRegistry.notifyInvalidate(List.of("main-games"));
         }
     }
 
@@ -473,10 +471,9 @@ public class JolAdmin {
         GameService.remove(gameName, gameInfo.getId());
         PlayerGameActivityService.clearGame(gameName);
         gmap.remove(gameName);
-        WebSocketRegistry.notifyMain();
-        WebSocketRegistry.notifyMainScope("games");
         WebSocketRegistry.notifyInvalidate(List.of("nav"));
         WebSocketRegistry.notifyInvalidate(List.of("watch"));
+        WebSocketRegistry.notifyInvalidate(List.of("main-games"));
     }
 
     public static String getDeckId(String playerName, String deckName) {
