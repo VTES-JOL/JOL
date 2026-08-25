@@ -40,7 +40,7 @@ public class AdminPageResource extends BaseResource {
     @GET
     public AdminPageBean page() {
         requireAdmin();
-        return new AdminPageBean(JolAdmin.getPlayerModel(username()));
+        return new AdminPageBean();
     }
 
     @PUT

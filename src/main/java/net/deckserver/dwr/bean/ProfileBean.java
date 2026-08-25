@@ -2,7 +2,6 @@ package net.deckserver.dwr.bean;
 
 import lombok.Getter;
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.services.PlayerService;
 import net.deckserver.services.SubscriptionService;
 import net.deckserver.storage.json.system.PlayerInfo;
@@ -19,8 +18,7 @@ public class ProfileBean {
     private final boolean notificationsEnabled;
     private final boolean hasSubscriptions;
 
-    public ProfileBean(PlayerModel model) {
-        String player = model.getPlayerName();
+    public ProfileBean(String player) {
         PlayerInfo playerInfo = PlayerService.get(player);
         this.email = playerInfo.getEmail();
         this.discordID = playerInfo.getDiscordId();

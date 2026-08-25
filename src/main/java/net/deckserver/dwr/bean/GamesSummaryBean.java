@@ -8,12 +8,7 @@ import net.deckserver.services.RegistrationService;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * A player's active/tournament/ousted game lists — extracted out of MainBean
- * so a targeted "just the games" read (MainResource) doesn't have to go
- * through MainBean's constructor, which also calls PlayerModel.getChat() and
- * would silently consume its stateful delta cursor as a side effect.
- */
+/** A player's active/tournament/ousted game lists — a targeted "just the games" read for MainResource. */
 @Getter
 public class GamesSummaryBean {
 

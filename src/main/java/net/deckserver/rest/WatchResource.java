@@ -1,6 +1,5 @@
 package net.deckserver.rest;
 
-import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.AllGamesBean;
 
 import javax.ws.rs.GET;
@@ -20,6 +19,6 @@ public class WatchResource extends BaseResource {
 
     @GET
     public AllGamesBean getAllGames() {
-        return new AllGamesBean(JolAdmin.getPlayerModel(username()));
+        return new AllGamesBean(username());
     }
 }

@@ -2,8 +2,8 @@ package net.deckserver.dwr.bean;
 
 import lombok.Getter;
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.services.GameService;
+import net.deckserver.services.GlobalChatService;
 import net.deckserver.services.PlayerGameActivityService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.services.RegistrationService;
@@ -23,24 +23,19 @@ public class NavBean {
     private final Map<String, String> gameButtons = new HashMap<>();
     private final List<String> buttons = new ArrayList<>();
     private final String player;
-    private final String target;
     private final String stamp;
     private boolean chats;
-    private String game = null;
     private boolean notificationsEnabled;
     private boolean hasSubscriptions;
     private String country = null;
 
-    public NavBean(PlayerModel model) {
-        player = model.getPlayerName();
-        target = model.getView();
-        if (target.equals("game"))
-            game = GameService.get(model.getCurrentGame()).getId();
+    public NavBean(String playerName) {
+        player = playerName;
         if (player != null) {
             country = PlayerService.get(player).getCountryCode();
             notificationsEnabled = JolAdmin.getNotificationPreference(player);
             hasSubscriptions = SubscriptionService.hasSubscriptions(player);
-            chats = model.hasChats();
+            chats = GlobalChatService.hasUnseenChats(player);
             buttons.add("active:Watch");
             buttons.add("deck:Decks");
             buttons.add("lobby:Lobby");

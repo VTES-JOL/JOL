@@ -10,33 +10,27 @@ import { PageLoading } from '../components/PageLoading';
 import './DeckPage.css';
 
 const PAGE_QUERY_KEY = ['decks', 'page'];
+const DECK_FILTER_STORAGE_KEY = 'deckFilter';
 
 export function DeckPage() {
   const queryClient = useQueryClient();
-  const [deckFilter, setDeckFilter] = useState('');
+  // Remembered per-browser (not per-player-on-the-server) — a SPA-appropriate
+  // home for a UI preference like this.
+  const [deckFilter, setDeckFilter] = useState(() => localStorage.getItem(DECK_FILTER_STORAGE_KEY) ?? '');
   const [editing, setEditing] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem(DECK_FILTER_STORAGE_KEY, deckFilter);
+  }, [deckFilter]);
 
   const { data } = useQuery({
     queryKey: PAGE_QUERY_KEY,
     queryFn: () => api.get<DeckPageData>('/decks/player'),
   });
 
-  // Seed the filter from the page's saved preference on first load only —
-  // later mutations (new/load/save/delete/validate) also write into this
-  // same query's cache via setQueryData below, and re-seeding from those
-  // would stomp whatever the user has since typed into the filter box.
-  const [hasSeededFilter, setHasSeededFilter] = useState(false);
-  useEffect(() => {
-    if (data && !hasSeededFilter) {
-      setDeckFilter(data.deckFilter);
-      setHasSeededFilter(true);
-    }
-  }, [data, hasSeededFilter]);
-
   const { data: decks = [] } = useQuery({
     queryKey: ['decks', 'list', deckFilter],
     queryFn: () => api.get<DeckInfoBean[]>(`/decks?filter=${encodeURIComponent(deckFilter)}`),
-    enabled: hasSeededFilter,
   });
 
   if (!data) return <PageLoading />;
@@ -77,8 +71,8 @@ export function DeckPage() {
     );
   };
 
-  const validate = (contents: string, format: string) => {
-    runRequest(api.post<DeckPageData>('/decks/player/validate', { contents, format }), 'Failed to validate deck', applyPage);
+  const validate = (name: string, contents: string, format: string) => {
+    runRequest(api.post<DeckPageData>('/decks/player/validate', { name, contents, format }), 'Failed to validate deck', applyPage);
   };
 
   return (

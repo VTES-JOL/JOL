@@ -2,7 +2,6 @@ package net.deckserver.dwr.bean;
 
 import lombok.Getter;
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.services.HistoryService;
 import net.deckserver.storage.json.system.GameHistory;
 
@@ -18,8 +17,7 @@ public class AllGamesBean {
     private final List<GameSummaryBean> games;
     private final List<GameHistory> history;
 
-    public AllGamesBean(PlayerModel model) {
-        String player = model.getPlayerName();
+    public AllGamesBean(String player) {
         this.games = JolAdmin.getGameNames().stream()
                 .filter(JolAdmin::isActive)
                 .filter(gameName -> JolAdmin.isViewable(gameName, player))

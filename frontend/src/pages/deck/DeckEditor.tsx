@@ -16,7 +16,7 @@ export function DeckEditor({
   tags: string[];
   deckFilter: string;
   onSave: (name: string, contents: string, comment: string) => void;
-  onValidate: (contents: string, format: string) => void;
+  onValidate: (name: string, contents: string, format: string) => void;
   onCancel: () => void;
 }) {
   const [name, setName] = useState(selectedDeck?.deck.name ?? '');
@@ -79,7 +79,7 @@ export function DeckEditor({
             </select>
           </div>
           <div className="col-3">
-            <button className="btn btn-outline-secondary btn-sm w-100" onClick={() => onValidate(text, format)}>
+            <button className="btn btn-outline-secondary btn-sm w-100" onClick={() => onValidate(name, text, format)}>
               Validate
             </button>
           </div>

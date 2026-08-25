@@ -1,7 +1,6 @@
 package net.deckserver.dwr.bean;
 
 import lombok.Getter;
-import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.DeckFormat;
 import net.deckserver.services.DeckService;
 import net.deckserver.services.PlayerService;
@@ -24,8 +23,7 @@ public class TournamentBean {
     private final List<TournamentMetadata> finalsInvites;
     private final List<DeckInfoBean> decks;
 
-    public TournamentBean(PlayerModel model) {
-        String playerName = model.getPlayerName();
+    public TournamentBean(String playerName) {
         String veknId = PlayerService.get(playerName).getVeknId();
         veknLinked = !StringUtils.isEmpty(veknId) && veknId.matches("[0-9]+");
         tournaments = TournamentService.getOpenTournaments(playerName);

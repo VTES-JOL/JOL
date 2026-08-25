@@ -22,7 +22,7 @@ public class LobbyResource extends BaseResource {
     @GET
     @Path("player/games")
     public LobbyPageBean getLobby() {
-        return new LobbyPageBean(username());
+        return new LobbyPageBean(username(), null);
     }
 
     /**
@@ -32,8 +32,12 @@ public class LobbyResource extends BaseResource {
      * mutating call's own response, so it's excluded.
      */
     private LobbyPageBean getLobbyAndInvalidate() {
+        return getLobbyAndInvalidate(null);
+    }
+
+    private LobbyPageBean getLobbyAndInvalidate(String message) {
         WebSocketRegistry.notifyInvalidate(List.of("lobby"), clientId());
-        return getLobby();
+        return new LobbyPageBean(username(), message);
     }
 
     /**
@@ -103,11 +107,12 @@ public class LobbyResource extends BaseResource {
     @Path("player/games/{name}/deck")
     public LobbyPageBean registerDeckReact(@PathParam("name") String game, RegisterDeckRequest body) {
         String playerName = username();
+        String message = null;
         if (!Strings.isNullOrEmpty(playerName)) {
-            JolAdmin.registerDeck(game, playerName, body.deckName());
+            message = JolAdmin.registerDeck(game, playerName, body.deckName());
             WebSocketRegistry.notifyInvalidate(List.of("main-games"));
         }
-        return getLobbyAndInvalidate();
+        return getLobbyAndInvalidate(message);
     }
 
     /** The current player's registered deck for this game — no side effects (unlike DS.loadDeck()). */

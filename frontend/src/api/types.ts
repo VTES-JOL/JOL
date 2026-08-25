@@ -4,10 +4,8 @@
 
 export interface NavBean {
   player: string | null;
-  target: string;
   stamp: string;
   chats: boolean;
-  game: string | null;
   notificationsEnabled: boolean;
   hasSubscriptions: boolean;
   country: string | null;
@@ -372,7 +370,6 @@ export interface DeckPage {
   selectedDeck: ExtendedDeck | null;
   contents: string | null;
   tags: string[];
-  deckFilter: string;
 }
 
 // net.deckserver.dwr.bean.CardSnapshot — recursive; children of a visible

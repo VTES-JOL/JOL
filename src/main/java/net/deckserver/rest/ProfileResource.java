@@ -25,7 +25,7 @@ public class ProfileResource extends BaseResource {
 
     @GET
     public ProfileBean profile() {
-        return new ProfileBean(JolAdmin.getPlayerModel(username()));
+        return new ProfileBean(username());
     }
 
     @GET

@@ -7,9 +7,9 @@
 package net.deckserver;
 
 import io.azam.ulidj.ULID;
+import net.deckserver.dwr.model.DeckEdit;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.JolGame;
-import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.game.enums.*;
 import net.deckserver.game.validators.DeckValidator;
 import net.deckserver.game.validators.ValidationResult;
@@ -24,6 +24,7 @@ import net.deckserver.storage.json.system.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.security.SecureRandom;
 import java.time.Duration;
@@ -39,7 +40,6 @@ public class JolAdmin {
     private static final Logger logger = LoggerFactory.getLogger(JolAdmin.class);
 
     private static final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
-    private static final Map<String, PlayerModel> pmap = new ConcurrentHashMap<>();
 
     public static int getRefreshInterval(String gameName) {
         OffsetDateTime lastChanged = PlayerGameActivityService.getGameTimestamp(gameName);
@@ -51,14 +51,6 @@ public class JolAdmin {
         return 60000;
     }
 
-    public static PlayerModel getPlayerModel(String name) {
-        if (name == null) {
-            return new PlayerModel(null, false);
-        } else {
-            return pmap.computeIfAbsent(name, k -> new PlayerModel(k, true));
-        }
-    }
-
     public static GameModel getGameModel(String name) {
         return gmap.computeIfAbsent(name, n -> new GameModel(GameService.getGameByName(name)));
     }
@@ -66,7 +58,6 @@ public class JolAdmin {
     public static void remove(String player) {
         logger.debug("removing player");
         if (player != null) {
-            pmap.remove(player);
             for (GameModel gameModel : gmap.values()) {
                 JolAdmin.resetView(player, gameModel.getName());
             }
@@ -135,42 +126,57 @@ public class JolAdmin {
                 }).orElse(null);
     }
 
-    public static void selectDeck(String playerName, String deckName) {
-        if (playerName != null && deckName != null) {
-            getPlayerModel(playerName).loadDeck(deckName);
+    public static DeckEdit selectDeck(String playerName, String deckName) {
+        if (playerName == null || deckName == null) {
+            return DeckEdit.EMPTY;
         }
-    }
-
-    public static void newDeck(String playerName) {
-        if (playerName != null) {
-            getPlayerModel(playerName).clearDeck();
-        }
-    }
-
-    public static synchronized void saveDeck(String playerName, String deckName, String contents, String comment) {
-        if (playerName != null && contents != null && deckName != null) {
-            deckName = deckName.trim();
-            ExtendedDeck deck = DeckParser.parseDeck(contents);
+        try {
+            String deckId = getDeckId(playerName, deckName);
+            DeckFormat deckFormat = getDeckFormat(playerName, deckName);
+            ExtendedDeck deck;
+            String contents;
+            if (deckFormat.equals(DeckFormat.LEGACY)) {
+                contents = DeckService.getLegacyContents(deckId).trim();
+                deck = DeckParser.parseDeck(contents);
+            } else {
+                contents = DeckService.getDeckContents(deckId).trim();
+                deck = DeckService.getDeck(deckId);
+            }
             deck.getDeck().setName(deckName);
-            deck.getDeck().setAuthor(playerName);
-            deck.getDeck().setComments(comment);
-            PlayerModel playerModel = getPlayerModel(playerName);
-            playerModel.setDeck(deck);
-            playerModel.setContents(contents);
-            Set<String> tags = ValidatorFactory.getTags(deck.getDeck());
-            DeckInfo deckInfo = Optional.ofNullable(DeckService.get(playerName, deckName)).orElse(new DeckInfo(ULID.random(), deckName, DeckFormat.TAGGED, tags));
-            deckInfo.setFormat(DeckFormat.MODERN);
-            deckInfo.setGameFormats(tags);
-            DeckService.addDeck(playerName, deckName, deckInfo);
-            DeckService.saveDeck(deckInfo.getDeckId(), deck);
+            return new DeckEdit(deck, contents);
+        } catch (IOException e) {
+            logger.error("Unable to load deck", e);
+            return DeckEdit.EMPTY;
         }
     }
 
-    public static synchronized void deleteDeck(String playerName, String deckName) {
+    public static DeckEdit newDeck(String playerName) {
+        return DeckEdit.EMPTY;
+    }
+
+    public static synchronized DeckEdit saveDeck(String playerName, String deckName, String contents, String comment) {
+        if (playerName == null || contents == null || deckName == null) {
+            return DeckEdit.EMPTY;
+        }
+        deckName = deckName.trim();
+        ExtendedDeck deck = DeckParser.parseDeck(contents);
+        deck.getDeck().setName(deckName);
+        deck.getDeck().setAuthor(playerName);
+        deck.getDeck().setComments(comment);
+        Set<String> tags = ValidatorFactory.getTags(deck.getDeck());
+        DeckInfo deckInfo = Optional.ofNullable(DeckService.get(playerName, deckName)).orElse(new DeckInfo(ULID.random(), deckName, DeckFormat.TAGGED, tags));
+        deckInfo.setFormat(DeckFormat.MODERN);
+        deckInfo.setGameFormats(tags);
+        DeckService.addDeck(playerName, deckName, deckInfo);
+        DeckService.saveDeck(deckInfo.getDeckId(), deck);
+        return new DeckEdit(deck, contents);
+    }
+
+    public static synchronized DeckEdit deleteDeck(String playerName, String deckName) {
         if (playerName != null && deckName != null) {
-            getPlayerModel(playerName).clearDeck();
             DeckService.remove(playerName, deckName);
         }
+        return DeckEdit.EMPTY;
     }
 
     public static void saveGameState(JolGame game) {
@@ -189,7 +195,7 @@ public class JolAdmin {
         WebSocketRegistry.notifyGame(game.id(), excludeClientId);
     }
 
-    public static synchronized void registerDeck(String gameName, String playerName, String deckName) {
+    public static synchronized String registerDeck(String gameName, String playerName, String deckName) {
         deckName = deckName.trim();
         DeckInfo deckInfo = DeckService.get(playerName, deckName);
         GameInfo gameInfo = GameService.get(gameName);
@@ -236,9 +242,8 @@ public class JolAdmin {
             }
         } catch (IllegalStateException exception) {
             logger.debug(exception.getMessage());
-        } finally {
-            getPlayerModel(playerName).setMessage(result);
         }
+        return result;
     }
 
     public static void recordPlayerAccess(String playerName) {
@@ -556,8 +561,7 @@ public class JolAdmin {
         return GameService.get(gameName).getGameFormat().toString();
     }
 
-    public static synchronized void validateDeck(String playerName, String contents, GameFormat format) {
-        PlayerModel model = getPlayerModel(playerName);
+    public static synchronized DeckEdit validateDeck(String deckName, String contents, GameFormat format) {
         ExtendedDeck deck = DeckParser.parseDeck(contents);
         ValidationResult result = validateDeck(deck.getDeck(), format);
         if (result.isValid()) {
@@ -565,13 +569,10 @@ public class JolAdmin {
         } else {
             deck.setErrors(result.getErrors());
         }
-        ExtendedDeck existingDeck = model.getDeck();
-        if (existingDeck != null) {
-            String deckName = model.getDeck().getDeck().getName();
+        if (deckName != null && !deckName.isBlank()) {
             deck.getDeck().setName(deckName);
         }
-        model.setDeck(deck);
-        model.setContents(contents);
+        return new DeckEdit(deck, contents);
     }
 
     public static List<GameFormat> getAvailableGameFormats(String playerName) {

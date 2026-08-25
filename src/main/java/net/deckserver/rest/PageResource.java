@@ -3,6 +3,7 @@ package net.deckserver.rest;
 import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.NavBean;
+import net.deckserver.services.GlobalChatService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -19,12 +20,12 @@ public class PageResource extends BaseResource {
     public NavBean nav() {
         String playerName = username();
         JolAdmin.recordPlayerAccess(playerName);
-        return new NavBean(JolAdmin.getPlayerModel(playerName));
+        return new NavBean(playerName);
     }
 
     /**
      * Replaces DS.chat() — global chat. Returns the sender's own chat delta
-     * directly (same PlayerModel.getChat() cursor MainResource#chat() reads)
+     * directly (same GlobalChatService read cursor MainResource#chat() reads)
      * rather than the whole page envelope, so the caller doesn't need a
      * second round trip to see the message it just sent.
      */
@@ -33,7 +34,7 @@ public class PageResource extends BaseResource {
     public List<ChatEntryBean> chat(ChatRequest body) {
         String player = username();
         JolAdmin.chat(player, body.text(), clientId());
-        return JolAdmin.getPlayerModel(player).getChat();
+        return GlobalChatService.getUnseenChats(player);
     }
 
     public record ChatRequest(String text) {}

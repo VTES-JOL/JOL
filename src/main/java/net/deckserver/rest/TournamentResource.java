@@ -378,7 +378,7 @@ public class TournamentResource extends BaseResource {
     @GET
     @Path("player-list")
     public TournamentBean getPlayerList() {
-        return new TournamentBean(JolAdmin.getPlayerModel(username()));
+        return new TournamentBean(username());
     }
 
     /**

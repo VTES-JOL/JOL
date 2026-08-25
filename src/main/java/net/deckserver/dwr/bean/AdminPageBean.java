@@ -2,7 +2,6 @@ package net.deckserver.dwr.bean;
 
 import lombok.Getter;
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.services.SiteNotesService;
@@ -24,7 +23,7 @@ public class AdminPageBean {
     private final List<GameActivityStatus> idleGames;
     private final String siteNotes;
 
-    public AdminPageBean(PlayerModel model) {
+    public AdminPageBean() {
         List<String> currentPlayers = PlayerService.getPlayers().stream().sorted().toList();
         List<PlayerActivityStatus> playerActivityStatuses = currentPlayers.stream()
                 .map(PlayerActivityStatus::new)

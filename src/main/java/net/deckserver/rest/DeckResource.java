@@ -1,8 +1,6 @@
 package net.deckserver.rest;
 
-import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.DeckInfoBean;
-import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.services.DeckService;
 
 import javax.ws.rs.DefaultValue;
@@ -25,8 +23,6 @@ public class DeckResource extends BaseResource {
     @GET
     public List<DeckInfoBean> filterDecks(@QueryParam("filter") @DefaultValue("") String filter) {
         String playerName = username();
-        PlayerModel model = JolAdmin.getPlayerModel(playerName);
-        model.setDeckFilter(filter);
         return DeckService.getPlayerDeckNames(playerName).stream()
                 .map(deckName -> new DeckInfoBean(playerName, deckName))
                 .filter(d -> filter.isEmpty() || d.getGameFormats().contains(filter.toUpperCase()))

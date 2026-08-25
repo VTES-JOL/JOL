@@ -23,7 +23,7 @@ public class LobbyPageBean {
     private final boolean playtester;
     private final List<String> gameFormats;
 
-    public LobbyPageBean(String player) {
+    public LobbyPageBean(String player, String message) {
         OffsetDateTime currentMonth = OffsetDateTime.now().minusMonths(1);
 
         playtester = JolAdmin.isPlaytester(player);
@@ -57,8 +57,7 @@ public class LobbyPageBean {
                 .sorted(Comparator.comparing(DeckInfoBean::getName, String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toList());
 
-        message = JolAdmin.getPlayerModel(player).getMessage();
-
+        this.message = message;
     }
 
 }

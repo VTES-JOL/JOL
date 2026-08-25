@@ -1,9 +1,7 @@
 package net.deckserver.rest;
 
-import net.deckserver.JolAdmin;
 import net.deckserver.dwr.bean.ChatEntryBean;
 import net.deckserver.dwr.bean.GamesSummaryBean;
-import net.deckserver.dwr.model.PlayerModel;
 import net.deckserver.services.GlobalChatService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.services.SiteNotesService;
@@ -54,9 +52,8 @@ public class MainResource extends BaseResource {
     @GET
     @Path("chat/history")
     public List<ChatEntryBean> chatHistory() {
-        PlayerModel model = JolAdmin.getPlayerModel(username());
         List<ChatEntryBean> recent = GlobalChatService.getRecentChats(CHAT_HISTORY_LIMIT);
-        model.markChatsSeenThrough(recent);
+        GlobalChatService.markSeen(username(), recent);
         return recent;
     }
 
@@ -66,15 +63,14 @@ public class MainResource extends BaseResource {
      * explicitly rather than relying on server-tracked read state, so this
      * is a pure function of {@code since} and safe for TanStack Query to
      * call repeatedly (e.g. on WS-triggered refetch) without losing anything.
-     * Still calls markChatsSeenThrough so the nav unread-badge (hasChats())
+     * Still calls markSeen so the nav unread-badge (hasUnseenChats())
      * keeps working exactly as before.
      */
     @GET
     @Path("chat")
     public List<ChatEntryBean> chat(@QueryParam("since") String since) {
-        PlayerModel model = JolAdmin.getPlayerModel(username());
         List<ChatEntryBean> result = GlobalChatService.getChatsSince(since);
-        model.markChatsSeenThrough(result);
+        GlobalChatService.markSeen(username(), result);
         return result;
     }
 

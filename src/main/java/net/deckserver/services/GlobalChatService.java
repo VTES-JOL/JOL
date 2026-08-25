@@ -10,6 +10,8 @@ import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
@@ -21,6 +23,7 @@ public class GlobalChatService extends PersistedService {
 
     private static final Path PERSISTENCE_PATH = DataPaths.path("chats.json");
     private static final GlobalChatService INSTANCE = new GlobalChatService();
+    private static final Map<String, String> lastSeenByPlayer = new ConcurrentHashMap<>();
     private List<ChatEntryBean> chats = new ArrayList<>();
 
     private GlobalChatService() {
@@ -80,6 +83,25 @@ public class GlobalChatService extends PersistedService {
         OffsetDateTime cursorTime = OffsetDateTime.parse(cursor, ISO_OFFSET_DATE_TIME);
         OffsetDateTime lastTime = OffsetDateTime.parse(INSTANCE.chats.get(INSTANCE.chats.size() - 1).getTimestamp(), ISO_OFFSET_DATE_TIME);
         return lastTime.isAfter(cursorTime);
+    }
+
+    /** This player's chat delta since their last read, advancing their cursor to match — replaces PlayerModel.getChat(). */
+    public static synchronized List<ChatEntryBean> getUnseenChats(String player) {
+        List<ChatEntryBean> result = getChatsSince(lastSeenByPlayer.get(player));
+        markSeen(player, result);
+        return result;
+    }
+
+    /** Advances this player's read cursor to the last entry in the batch — replaces PlayerModel.markChatsSeenThrough(). */
+    public static synchronized void markSeen(String player, List<ChatEntryBean> entries) {
+        if (!entries.isEmpty()) {
+            lastSeenByPlayer.put(player, entries.get(entries.size() - 1).getTimestamp());
+        }
+    }
+
+    /** Non-destructive check for the nav unread badge — replaces PlayerModel.hasChats(). */
+    public static synchronized boolean hasUnseenChats(String player) {
+        return hasChatsSince(lastSeenByPlayer.get(player));
     }
 
     public static PersistedService getInstance() {
