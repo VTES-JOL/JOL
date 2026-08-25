@@ -1,7 +1,7 @@
 package net.deckserver.game.enums;
 
 import lombok.Getter;
-import net.deckserver.dwr.model.CommandException;
+import net.deckserver.game.model.CommandException;
 
 @Getter
 public enum Sect {

@@ -1,9 +1,9 @@
 package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.bean.GameSnapshot;
-import net.deckserver.dwr.model.GameModel;
-import net.deckserver.dwr.model.GameSnapshotFactory;
+import net.deckserver.rest.bean.GameSnapshot;
+import net.deckserver.game.model.GameModel;
+import net.deckserver.rest.bean.GameSnapshotFactory;
 import net.deckserver.services.GameService;
 import net.deckserver.services.RegistrationService;
 

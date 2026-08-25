@@ -7,9 +7,9 @@
 package net.deckserver;
 
 import io.azam.ulidj.ULID;
-import net.deckserver.dwr.model.DeckEdit;
-import net.deckserver.dwr.model.GameModel;
-import net.deckserver.dwr.model.JolGame;
+import net.deckserver.rest.bean.DeckEdit;
+import net.deckserver.game.model.GameModel;
+import net.deckserver.game.model.JolGame;
 import net.deckserver.game.enums.*;
 import net.deckserver.game.validators.DeckValidator;
 import net.deckserver.game.validators.ValidationResult;

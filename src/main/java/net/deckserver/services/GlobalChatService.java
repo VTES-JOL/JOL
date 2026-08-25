@@ -1,7 +1,7 @@
 package net.deckserver.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import net.deckserver.dwr.bean.ChatEntryBean;
+import net.deckserver.rest.bean.ChatEntryBean;
 import net.deckserver.ws.WebSocketRegistry;
 
 import java.io.IOException;

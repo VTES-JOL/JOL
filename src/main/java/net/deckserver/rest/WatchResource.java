@@ -1,7 +1,7 @@
 package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.bean.GameSummaryBean;
+import net.deckserver.rest.bean.GameSummaryBean;
 import net.deckserver.services.HistoryService;
 import net.deckserver.storage.json.system.GameHistory;
 

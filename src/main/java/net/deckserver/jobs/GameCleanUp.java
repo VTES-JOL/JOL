@@ -3,7 +3,7 @@ package net.deckserver.jobs;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.model.JolGame;
+import net.deckserver.game.model.JolGame;
 import net.deckserver.services.GameService;
 import net.deckserver.services.GlobalChatService;
 import net.deckserver.services.HistoryService;

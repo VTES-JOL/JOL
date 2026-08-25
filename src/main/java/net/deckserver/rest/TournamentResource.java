@@ -8,7 +8,7 @@ import net.deckserver.services.DeckService;
 import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.services.TournamentService;
-import net.deckserver.dwr.model.JolGame;
+import net.deckserver.game.model.JolGame;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.CardSimple;
 import net.deckserver.storage.json.system.*;

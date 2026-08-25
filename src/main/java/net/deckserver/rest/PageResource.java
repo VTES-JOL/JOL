@@ -1,8 +1,8 @@
 package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.bean.ChatEntryBean;
-import net.deckserver.dwr.bean.NavBean;
+import net.deckserver.rest.bean.ChatEntryBean;
+import net.deckserver.rest.bean.NavBean;
 import net.deckserver.services.GlobalChatService;
 
 import javax.ws.rs.*;

@@ -1,7 +1,7 @@
 package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.model.GameModel;
+import net.deckserver.game.model.GameModel;
 import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
 import net.deckserver.services.RegistrationService;

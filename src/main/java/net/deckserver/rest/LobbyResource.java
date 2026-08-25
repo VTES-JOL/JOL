@@ -2,8 +2,8 @@ package net.deckserver.rest;
 
 import com.google.common.base.Strings;
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.bean.GameStatusBean;
-import net.deckserver.dwr.bean.PlayerActivityStatus;
+import net.deckserver.rest.bean.GameStatusBean;
+import net.deckserver.rest.bean.PlayerActivityStatus;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.services.GameService;
 import net.deckserver.services.RegistrationService;

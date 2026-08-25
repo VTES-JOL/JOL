@@ -1,6 +1,6 @@
 package net.deckserver.rest;
 
-import net.deckserver.dwr.bean.DeckInfoBean;
+import net.deckserver.rest.bean.DeckInfoBean;
 import net.deckserver.game.enums.DeckFormat;
 import net.deckserver.services.DeckService;
 

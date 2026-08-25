@@ -68,16 +68,6 @@ This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deck
 ### Package Map
 
 - **`net.deckserver`** — `JolAdmin` (singleton orchestrator); `Recaptcha`
-- **`net.deckserver.dwr`**
-  - `bean/` — JSON response objects returned to the frontend (`GameSnapshot`, `LobbyPageBean`, `NavBean`, etc.), built directly by `net.deckserver.rest` resources and factories (e.g. `GameSnapshotFactory`) — the old `creators/` package and `UpdateFactory`/`JspRenderer`/`RequestContext` (which built one shared page-update response and rendered JSP fragments into it) were removed once every view had its own dedicated REST endpoint
-  - `model/` — core game logic
-    - `JolGame` — record holding game id + `GameData`; all game state mutation methods
-    - `DoCommand` — record; parses and executes player text commands (e.g. `burn library 1`)
-    - `GameModel` — in-memory per-game view; held in `JolAdmin.gmap`
-    - `PlayerModel` — in-memory per-player state; held in `JolAdmin.pmap`
-    - `GameView` — per-player region collapse/expand state (client now owns most of what this used to track — see `PlayerBoard.tsx`'s comment on `ALWAYS_COLLAPSED`)
-    - `ModelLoader` — converts between UI objects and XML/JSON data objects
-    - `CommandParser` — tokenises command strings
 - **`net.deckserver.services`** — static service singletons
   - `PersistedService` — abstract base: scheduled JSON persistence, test-mode bypass, graceful shutdown (call `shutdown()` from `ServletContextListener`, not JVM hooks)
   - `DataPaths` — resolves `JOL_DATA` env var; use `DataPaths.path(...)` to build file paths
@@ -90,12 +80,19 @@ This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deck
 - **`net.deckserver.game`**
   - `enums/` — domain enums: `RegionType`, `CardType`, `Clan`, `Phase`, `GameStatus`, etc.
   - `validators/` — deck validation: `StandardDeckValidator`, `V5DeckValidator`, `DuelDeckValidator`, `PlayTestValidator` all extend `AbstractDeckValidator`; use `ValidatorFactory`
+  - `model/` — core game logic
+    - `JolGame` — record holding game id + `GameData`; all game state mutation methods
+    - `DoCommand` — record; parses and executes player text commands (e.g. `burn library 1`)
+    - `GameModel` — in-memory per-game view; held in `JolAdmin.gmap`
+    - `GameView` — per-player region collapse/expand state (client now owns most of what this used to track — see `PlayerBoard.tsx`'s comment on `ALWAYS_COLLAPSED`)
+    - `CommandParser` — tokenises command strings
 - **`net.deckserver.servlet`** — no JSPs left (every one was deleted along with `ds.js`/`card-modal.js` once its React equivalent shipped — see Frontend + API Notes below)
   - `MainServlet` — `@WebServlet` on every top-level view path (`/`, `/main`, `/lobby`, `/game/*`, etc.); gates auth via `AuthService`, then always forwards to `/react/index.html`
   - `LoginServlet` — serves `/login` unauthenticated, forwarding to the same `/react/index.html` (the SPA renders the login page itself based on route)
   - `DwrCompatibilityServlet` — catches stray `/jol/dwr/**` calls from browser tabs still running the pre-migration client and forces a hard reload
   - `JolApplicationInitializer` — Jersey/Jakarta servlet bootstrap
 - **`net.deckserver.rest`** — Jersey JAX-RS REST API (`/jol/api/...`); the SPA's sole backend interface
+  - `bean/` — JSON response objects returned to the frontend (`GameSnapshot`, `NavBean`, `DeckEdit`, etc.), built directly by `net.deckserver.rest` resources and factories (e.g. `GameSnapshotFactory`) — the old `creators/` package and `UpdateFactory`/`JspRenderer`/`RequestContext` (which built one shared page-update response and rendered JSP fragments into it) were removed once every view had its own dedicated REST endpoint
   - `BaseResource` — base class: injects `SecurityContext` + HTTP context
   - `PageResource` — `GET /nav` (polled by `frontend/src/nav/NavContext.tsx` for the authenticated shell's nav state), `POST /chat`
   - `LobbyResource` — `/lobby/player/games` CRUD (create/start/close), deck registration, invites

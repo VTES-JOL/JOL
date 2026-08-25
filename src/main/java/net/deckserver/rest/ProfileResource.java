@@ -1,7 +1,7 @@
 package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.bean.ProfileBean;
+import net.deckserver.rest.bean.ProfileBean;
 import net.deckserver.services.CountryService;
 import net.deckserver.services.PlayerService;
 

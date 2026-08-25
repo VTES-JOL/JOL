@@ -1,7 +1,7 @@
 package net.deckserver.jobs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.deckserver.dwr.model.JolGame;
+import net.deckserver.game.model.JolGame;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.TournamentFormat;

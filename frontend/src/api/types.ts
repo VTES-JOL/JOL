@@ -1,4 +1,4 @@
-// Hand-written mirrors of net.deckserver.dwr.bean.* — kept intentionally minimal,
+// Hand-written mirrors of net.deckserver.rest.bean.* — kept intentionally minimal,
 // only the fields the React pages actually read. Update alongside the Java bean
 // when its shape changes.
 
@@ -35,7 +35,7 @@ export interface PlayerStatus {
   current: boolean;
 }
 
-// net.deckserver.dwr.bean.RegistrationStatus.
+// net.deckserver.rest.bean.RegistrationStatus.
 export interface RegistrationStatus {
   player: string;
   gameName: string;
@@ -62,7 +62,7 @@ export interface GameStatusBean {
   playerRelationship: PlayerRelationship;
 }
 
-// GET /jol/api/main/games — net.deckserver.dwr.bean.GamesSummaryBean.
+// GET /jol/api/main/games — net.deckserver.rest.bean.GamesSummaryBean.
 export interface GamesSummary {
   games: GameStatusBean[];
   tournament: GameStatusBean[];
@@ -74,7 +74,7 @@ export interface NotesResponse {
   notes: string;
 }
 
-// GET/PUT /jol/api/profile (+ /preferences, /edge-color) — ProfileResource, net.deckserver.dwr.bean.ProfileBean.
+// GET/PUT /jol/api/profile (+ /preferences, /edge-color) — ProfileResource, net.deckserver.rest.bean.ProfileBean.
 export interface Profile {
   email: string | null;
   discordID: string | null;
@@ -204,7 +204,7 @@ export interface TournamentInviteStatus {
   format: string;
 }
 
-// net.deckserver.dwr.bean.DeckInfoBean.
+// net.deckserver.rest.bean.DeckInfoBean.
 export interface DeckInfoBean {
   name: string;
   deckFormat: string;
@@ -236,7 +236,7 @@ export interface LibraryCard {
   cards: CardCount[];
 }
 
-// net.deckserver.dwr.bean.GameSummaryBean.
+// net.deckserver.rest.bean.GameSummaryBean.
 export interface GameSummary {
   gameName: string;
   gameId: string;
@@ -346,14 +346,14 @@ export interface ExtendedDeck {
   errors: string[];
 }
 
-// GET/PUT /jol/api/decks/player — net.deckserver.dwr.bean.DeckPageBean.
+// GET/PUT /jol/api/decks/player — net.deckserver.rest.bean.DeckPageBean.
 export interface DeckPage {
   selectedDeck: ExtendedDeck | null;
   contents: string | null;
   tags: string[];
 }
 
-// net.deckserver.dwr.bean.CardSnapshot — recursive; children of a visible
+// net.deckserver.rest.bean.CardSnapshot — recursive; children of a visible
 // card are always visible too, see GameSnapshotFactory's javadoc. When
 // `visible` is false every field below `counters` is absent.
 export interface CardSnapshot {
@@ -382,7 +382,7 @@ export interface CardSnapshot {
   cards?: CardSnapshot[];
 }
 
-// net.deckserver.dwr.bean.RegionSnapshot.
+// net.deckserver.rest.bean.RegionSnapshot.
 export interface RegionSnapshot {
   type: string; // RegionType name, e.g. "READY"
   commandKey: string; // short key used in commands, e.g. "ready"/"inactive"/"ashheap"/"rfg"
@@ -393,7 +393,7 @@ export interface RegionSnapshot {
   cards: CardSnapshot[];
 }
 
-// net.deckserver.dwr.bean.PlayerSnapshot.
+// net.deckserver.rest.bean.PlayerSnapshot.
 export interface PlayerSnapshot {
   name: string;
   pool: number;
@@ -413,7 +413,7 @@ export interface ChatData {
 }
 
 // GET /jol/api/game/{id}/view (+ POST view/submit, POST view/end-turn) —
-// net.deckserver.dwr.bean.GameSnapshot.
+// net.deckserver.rest.bean.GameSnapshot.
 export interface GameSnapshot {
   id: string;
   name: string;

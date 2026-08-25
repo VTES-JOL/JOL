@@ -1,9 +1,9 @@
 package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.bean.GameActivityStatus;
-import net.deckserver.dwr.bean.PlayerActivityStatus;
-import net.deckserver.dwr.bean.UserSummaryBean;
+import net.deckserver.rest.bean.GameActivityStatus;
+import net.deckserver.rest.bean.PlayerActivityStatus;
+import net.deckserver.rest.bean.UserSummaryBean;
 import net.deckserver.game.enums.PlayerRole;
 import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;

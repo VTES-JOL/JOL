@@ -1,7 +1,7 @@
 package net.deckserver.rest;
 
-import net.deckserver.dwr.bean.ChatEntryBean;
-import net.deckserver.dwr.bean.GamesSummaryBean;
+import net.deckserver.rest.bean.ChatEntryBean;
+import net.deckserver.rest.bean.GamesSummaryBean;
 import net.deckserver.services.GlobalChatService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.services.SiteNotesService;

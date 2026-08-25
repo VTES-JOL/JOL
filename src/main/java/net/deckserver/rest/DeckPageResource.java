@@ -1,8 +1,8 @@
 package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
-import net.deckserver.dwr.bean.DeckPageBean;
-import net.deckserver.dwr.model.DeckEdit;
+import net.deckserver.rest.bean.DeckPageBean;
+import net.deckserver.rest.bean.DeckEdit;
 import net.deckserver.game.enums.GameFormat;
 
 import javax.ws.rs.*;
