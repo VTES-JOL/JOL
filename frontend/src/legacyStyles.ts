@@ -1,8 +1,14 @@
 // Loads the site's third-party/theme stylesheets at runtime rather than via
 // <link> tags in index.html — see the comment in index.html for why: neither
 // a plain nor a %BASE_URL%-prefixed href survives both dev and build
-// unchanged. import.meta.env.BASE_URL is a plain string Vite sets correctly
-// in both modes, with no HTML attribute-rewriting involved.
+// unchanged.
+//
+// These are served from webapp/css, mapped at /jol/css/* (web.xml) —
+// deliberately NOT import.meta.env.BASE_URL: that's '/jol/react/' in a
+// production build (where the React bundle's own assets land), which would
+// point here at '/jol/react/css/...' and 404. /jol/css/* sits at the
+// context root in both dev (proxied straight through by vite.config.ts) and
+// prod, so the prefix is hardcoded to match instead.
 //
 // App-authored CSS (fonts, tokens, card visuals, every component's own
 // styles) is NOT here — it's plain Vite-bundled `import './Foo.css'`
@@ -11,7 +17,7 @@
 // mechanism has: a JS-appended <link> tag doesn't block rendering, so
 // anything render-critical needs an inline-style belt-and-braces fallback
 // (see e.g. GlobalChat.tsx) the way bundled CSS never does.
-const SHEETS = ['css/bootstrap.min.css', 'css/dark-mode.css', 'css/light.css'];
+const SHEETS = ['/jol/css/bootstrap.min.css', '/jol/css/dark-mode.css', '/jol/css/light.css'];
 
 /**
  * Returns once every stylesheet has actually loaded (or failed — one bad
@@ -30,7 +36,7 @@ export function loadLegacyStyles(): Promise<void> {
           const link = document.createElement('link');
           link.rel = 'stylesheet';
           link.type = 'text/css';
-          link.href = `${import.meta.env.BASE_URL}${path}`;
+          link.href = path;
           link.onload = () => resolve();
           link.onerror = () => resolve();
           document.head.appendChild(link);

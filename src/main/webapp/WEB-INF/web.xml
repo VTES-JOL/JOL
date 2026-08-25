@@ -18,7 +18,7 @@
           Explicit mapping so /react/* (the built React app's static assets,
           staged into the WAR root by maven-war-plugin from target/react-dist)
           is always served as a file, not treated as unmapped. Nothing else
-          claims "/" or "/react/*" — every top-level view route is rewritten
+          claims "/react/*" — every top-level view route is rewritten
           to /react/index.html by the RewriteValve (see context.xml and
           rewrite.config) before dispatch reaches servlet mapping at all, and
           those rewrite rules deliberately exclude /react/* itself. Local dev
@@ -26,14 +26,33 @@
           React-owned path itself and never lets these requests reach Tomcat.
         -->
         <url-pattern>/react/*</url-pattern>
+        <!--
+          "/" (catch-all fallback) — required for any path that matches none
+          of the patterns above (e.g. /ws/updates, the JSR-356 WebSocket
+          endpoint — see net.deckserver.ws.JolWebSocketEndpoint). Without a
+          Wrapper matching *something*, Tomcat's StandardContextValve returns
+          404 before the filter chain is even built, so Filters mapped to
+          "/*" (WsFilter included) never run at all — confirmed empirically
+          in prod: a request-logging diagnostic filter mapped to "/*" never
+          saw requests for any path outside the explicit patterns above,
+          websocket handshake included, until this mapping was added.
+        -->
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
 
     <!--
-      No welcome-file-list: the RewriteValve's "^/$" rule already rewrites
-      the context root to /react/index.html before servlet mapping runs, so
-      a welcome-file here would be redundant. There's no auth gate anywhere
-      in that path anymore — see AuthGate (frontend/src/App.tsx) for where
-      "should this visitor see the login page or the app" is now decided.
+      Handles the bare context root ("/jol/"). Not done via RewriteValve
+      (see WEB-INF/rewrite.config's comment) — every ^/?$-style pattern tried
+      threw a NullPointerException inside Tomcat's own RewriteValve (9.0.102)
+      instead of just not matching, so this uses the plain servlet-spec
+      welcome-file mechanism instead, pointing straight at the real
+      /react/index.html resource (see the /react/* mapping above). There's no
+      auth gate anywhere in that path — see AuthGate (frontend/src/App.tsx)
+      for where "should this visitor see the login page or the app" is
+      decided.
     -->
+    <welcome-file-list>
+        <welcome-file>react/index.html</welcome-file>
+    </welcome-file-list>
 
 </web-app>

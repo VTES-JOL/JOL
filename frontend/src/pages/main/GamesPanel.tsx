@@ -78,7 +78,7 @@ export function GamesPanel() {
             <CardHeader>
                 <CardTitle>Games List</CardTitle>
             </CardHeader>
-            <ul className="nav nav-tabs card-header-tabs ms-0 border-0 bg-secondary-subtle" role="tablist">
+            <ul className="nav nav-tabs ms-0 border-0 bg-secondary-subtle" role="tablist">
                 {TABS.map((tab) => (
                     <li key={tab.id} className="nav-item" role="presentation">
                         <button

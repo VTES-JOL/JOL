@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type { ChatData } from '../../api/types';
 import { highlightMentions } from '../main/chatFormatting';
 import { useCardTooltips } from '../../hooks/useCardTooltips';
@@ -10,6 +10,11 @@ import { useCardTooltips } from '../../hooks/useCardTooltips';
 export function GameChatLog({ lines, viewerName }: { lines: ChatData[]; viewerName: string | null }) {
   const ref = useRef<HTMLDivElement>(null);
   useCardTooltips(ref, [lines]);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [lines]);
 
   return (
     <div ref={ref} className="bg-white p-1 scrollable">
