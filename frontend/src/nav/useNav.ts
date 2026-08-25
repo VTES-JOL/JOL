@@ -4,17 +4,39 @@ import type { NavBean } from '../api/types';
 
 const NAV_QUERY_KEY = ['nav'];
 
+// Shared query definition backing both useNav() and useNavAuthState() below —
+// TanStack Query's cache dedups this same queryKey across every simultaneous
+// caller (these two hooks, GlobalChat's mention detection), so there's only
+// ever one /nav fetch in flight regardless of how many components read it.
+// retry is disabled at the query-key level (see queryClient.ts) so a
+// logged-out visitor's AuthGate check fails fast instead of sitting through
+// TanStack Query's default retry/backoff before it can redirect to /login.
+function useNavQuery() {
+  return useQuery({ queryKey: NAV_QUERY_KEY, queryFn: () => api.get<NavBean>('/nav') });
+}
+
 /**
- * Query-cache-backed replacement for the old NavContext/NavProvider —
- * TanStack Query's cache already dedups this same queryKey across every
- * simultaneous caller (this hook, useAuth, GlobalChat's mention detection),
- * so no Provider is needed to get the single-shared-fetch behavior the old
- * comment on NavProvider described. Kept as a hook (not a raw useQuery call
- * at each site) so callers don't need to know the query key.
+ * Query-cache-backed replacement for the old NavContext/NavProvider — kept
+ * as a hook (not a raw useQuery call at each site) so callers don't need to
+ * know the query key.
  */
 export function useNav(): NavBean | null {
-  const { data } = useQuery({ queryKey: NAV_QUERY_KEY, queryFn: () => api.get<NavBean>('/nav') });
+  const { data } = useNavQuery();
   return data ?? null;
+}
+
+/**
+ * Full auth-check state for AuthGate (see App.tsx) — distinguishes "still
+ * waiting on the first /nav response" from "confirmed logged out", which a
+ * plain NavBean | null can't (both collapse to null). AuthGate itself
+ * doesn't need to redirect on 'unauthenticated': the failed /nav fetch
+ * already triggered client.ts's global 401 handler.
+ */
+export function useNavAuthState(): { status: 'loading' | 'authenticated' | 'unauthenticated' } {
+  const { data, isLoading, isError } = useNavQuery();
+  if (isError) return { status: 'unauthenticated' };
+  if (data) return { status: 'authenticated' };
+  return { status: isLoading ? 'loading' : 'unauthenticated' };
 }
 
 // For pages that mutate something /nav reflects (e.g. profile's country,

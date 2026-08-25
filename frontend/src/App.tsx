@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, type ReactNode } from 'react';
 import { queryClient } from './api/queryClient';
 import { useQueryInvalidation } from './ws/useQueryInvalidation';
 import { TopBar } from './components/TopBar';
@@ -16,6 +16,7 @@ import { ChunkErrorBoundary } from './components/ChunkErrorBoundary';
 import { PageLoading } from './components/PageLoading';
 import { useConnectivity } from './api/useConnectivity';
 import { startUpdateCheck } from './updateCheck';
+import { useNavAuthState } from './nav/useNav';
 
 // Route-level code splitting: MainPage/LoginPage are eager (the former is
 // what every session lands on right after auth; the latter renders before
@@ -38,7 +39,9 @@ const HelpSection = lazy(() => import('./pages/help/HelpSection').then((m) => ({
 // The authenticated app shell: TopBar's /nav fetch (useNav) requires a valid
 // session (SecurityFilter), so this must never mount for a logged-out
 // visitor — see the /jol/login route below, kept outside TopBar entirely so
-// it can render before any session exists.
+// it can render before any session exists. AuthGate (below) is what
+// enforces that: it only renders this once /nav has actually confirmed a
+// session, rather than trusting the server to have gated the page already.
 function AuthenticatedApp() {
   const { online, everConnected } = useConnectivity();
   useQueryInvalidation();
@@ -89,6 +92,21 @@ function AuthenticatedApp() {
   );
 }
 
+// No servlet gates auth server-side before index.html gets served — Tomcat's
+// RewriteValve (see rewrite.config) serves it unconditionally for every
+// route below /jol/login owns — so this is the actual gate: it holds off
+// mounting AuthenticatedApp — and therefore TopBar and every page's own API
+// calls — until /nav has confirmed a session. On a failed check it renders
+// nothing rather than redirecting itself: the failed /nav fetch already
+// triggered client.ts's global 401 handler (window.location.href =
+// '/jol/login'), so a second, competing redirect here would be redundant.
+function AuthGate({ children }: { children: ReactNode }) {
+  const { status } = useNavAuthState();
+  if (status === 'loading') return <PageLoading />;
+  if (status === 'unauthenticated') return null;
+  return <>{children}</>;
+}
+
 export function App() {
   useEffect(() => {
     startUpdateCheck();
@@ -100,7 +118,14 @@ export function App() {
         <ChunkErrorBoundary>
           <Routes>
             <Route path="/jol/login" element={<LoginPage />} />
-            <Route path="/*" element={<AuthenticatedApp />} />
+            <Route
+              path="/*"
+              element={
+                <AuthGate>
+                  <AuthenticatedApp />
+                </AuthGate>
+              }
+            />
           </Routes>
         </ChunkErrorBoundary>
         <DialogHost />

@@ -1,5 +1,6 @@
-// Every top-level view is now React-owned (mirrors MainServlet's
-// @WebServlet mapping) — path helpers for React Router <Link>s.
+// Every top-level view is now React-owned (mirrors the route list Tomcat's
+// RewriteValve serves index.html for — see rewrite.config) — path helpers
+// for React Router <Link>s.
 export function pathForView(view: string): string {
   return view === 'main' ? '/jol/' : `/jol/${view}`;
 }

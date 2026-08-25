@@ -47,8 +47,8 @@ export function AdminPage() {
         <RollbackGame />
       </div>
       <div className="col-sm-4">
-        <IdleGames />
         <SiteNotesEditor />
+        <IdleGames />
       </div>
     </div>
   );

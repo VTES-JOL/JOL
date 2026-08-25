@@ -14,16 +14,17 @@ const BACKEND = 'http://localhost:8080'
 // harmless there since updateCheck.ts skips polling entirely in dev.
 const buildId = Date.now().toString(36)
 
-// Exact paths this frontend owns — must mirror MainServlet's @WebServlet
-// mapping (including "/login") exactly. Everything else under
+// Exact paths this frontend owns — must mirror the route list Tomcat's
+// RewriteValve serves index.html for (see rewrite.config), plus "/login"
+// exactly. Everything else under
 // /jol/ is proxied to the real backend (tomcat9:run) below: static assets
 // (css/js/images/fonts) and the REST API/WebSocket all keep working through
 // that proxy. register/logout have no GET page of their own anymore — both
 // are REST calls (AuthResource) the login page itself makes.
 const FRONTEND_ROUTES = new Set(['/jol', '/jol/', '/jol/main', '/jol/main.jsp', '/jol/profile', '/jol/admin', '/jol/tournamentAdmin', '/jol/tournament', '/jol/active', '/jol/lobby', '/jol/deck', '/jol/login', '/jol/help'])
 
-// Served in prod from inside the WAR at /jol/react/*, forwarded there by
-// MainServlet for converted routes. In dev, Vite terminates TLS itself and
+// Served in prod from inside the WAR at /jol/react/*, rewritten there by
+// Tomcat's RewriteValve for converted routes. In dev, Vite terminates TLS itself and
 // proxies everything it doesn't own straight to tomcat9:run — no nginx/
 // Docker layer needed for frontend dev. AuthService's cookies are
 // unconditionally `Secure`, which is why this needs to be HTTPS at all, even
@@ -40,8 +41,15 @@ const FRONTEND_ROUTES = new Set(['/jol', '/jol/', '/jol/main', '/jol/main.jsp', 
 // This deliberately does NOT use nginx/certs/ — that's a real AWS-issued
 // certificate for the team's actual dev.deckserver.net, not something every
 // developer can or should have a copy of locally.
-export default defineConfig({
-  base: '/jol/',
+export default defineConfig(({ command }) => ({
+  // In dev this must stay '/jol/' — the proxy's bypass() above matches
+  // Vite's own dev-module-graph requests by their '/jol/@...'/'/jol/src/...'
+  // prefixes, which are derived from this same base. In a production build,
+  // maven-war-plugin copies target/react-dist into the WAR under react/ (see
+  // web.xml's /react/* static mapping), so the built index.html/assets need
+  // to reference themselves at '/jol/react/' to match where they actually
+  // land — otherwise the page loads but its own JS bundle 404s.
+  base: command === 'build' ? '/jol/react/' : '/jol/',
   // mdx() must run before react() — it compiles content/help/*.mdx into
   // plain JSX-emitting JS (via the automatic jsx-runtime), which react()'s
   // babel transform then needs to see already in place. remark-gfm enables
@@ -56,8 +64,8 @@ export default defineConfig({
     serveCardAssets(),
     // Emits version.json into outDir root, next to index.html/assets/ — same
     // place the hashed JS/CSS land, so it's reachable through whatever
-    // already serves those in prod (see MainServlet/web.xml's /react/*
-    // static mapping) without needing its own route.
+    // already serves those in prod (see web.xml's /react/* static mapping)
+    // without needing its own route.
     {
       name: 'emit-version-json',
       apply: 'build',
@@ -103,8 +111,8 @@ export default defineConfig({
           }
           // /jol/game/<id> and /jol/help/<section> — both have a dynamic
           // trailing segment, so they can't live in the static FRONTEND_ROUTES
-          // set above (mirrors MainServlet's "/game/*"/"/help/*" wildcard
-          // mappings treating any such path as React-owned).
+          // set above (mirrors rewrite.config's "/game/*"/"/help/*" wildcard
+          // rules treating any such path as React-owned).
           if (path.startsWith('/jol/game/')) return path
           if (path.startsWith('/jol/help/')) return path
           if (FRONTEND_ROUTES.has(path)) return path
@@ -117,4 +125,4 @@ export default defineConfig({
     outDir: '../target/react-dist',
     emptyOutDir: true,
   },
-})
+}))

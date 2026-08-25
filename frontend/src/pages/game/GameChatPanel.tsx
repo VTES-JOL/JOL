@@ -30,7 +30,7 @@ export function GameChatPanel({
     <Panel
       id="gameChatCard"
       className="chat"
-      bodyClassName="p-0 game-chat"
+      bodyClassName="p-0 game-chat overflow-hidden"
       title="Game Chat"
       headerExtra={<span className="px-2">{`${game.turnLabel} - ${game.phase}`}</span>}
       toggle={{ icon: 'bi-clock-history', label: 'History', onClick: onToggleHistory }}

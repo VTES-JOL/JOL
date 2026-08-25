@@ -25,3 +25,9 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+// AuthGate (App.tsx) reads this query's error state to decide whether to
+// redirect to /login — retrying a 401 (the default: 3 attempts w/ backoff)
+// would make every logged-out page load sit for several seconds before the
+// gate can redirect, instead of failing fast like the old server-side 302 did.
+queryClient.setQueryDefaults(['nav'], { retry: false });
