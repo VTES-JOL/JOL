@@ -3,6 +3,7 @@ package net.deckserver.ws;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.services.AuthService;
+import net.deckserver.services.VersionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +86,14 @@ public class JolWebSocketEndpoint {
             String type = node.path("type").asText();
             switch (type) {
                 case "ping" -> {
-                    if (ws.isOpen()) ws.getBasicRemote().sendText("{\"type\":\"pong\"}");
+                    // "version" lets a pre-React tab still running the old ds.js
+                    // frontend (e.g. one open when this backend redeploys) detect
+                    // the change and prompt itself to reload — see VersionService.
+                    String ver = VersionService.getVersion();
+                    String pong = ver != null
+                            ? "{\"type\":\"pong\",\"version\":\"" + ver + "\"}"
+                            : "{\"type\":\"pong\"}";
+                    if (ws.isOpen()) ws.getBasicRemote().sendText(pong);
                 }
                 case "join" -> {
                     String gameId = node.path("game").asText(null);
