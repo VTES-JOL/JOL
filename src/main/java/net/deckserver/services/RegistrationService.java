@@ -1,28 +1,23 @@
 package net.deckserver.services;
 
-import com.fasterxml.jackson.databind.type.MapType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import net.deckserver.storage.json.game.GameSummary;
+import jakarta.persistence.EntityManager;
+import net.deckserver.jpa.JpaFactory;
+import net.deckserver.jpa.repository.RegistrationRepository;
 import net.deckserver.storage.json.game.RegistrationSummary;
 import net.deckserver.storage.json.system.RegistrationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
@@ -30,7 +25,7 @@ public class RegistrationService extends PersistedService {
 
     private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
     private static final Logger logger = LoggerFactory.getLogger(RegistrationService.class);
-    private static final Path PERSISTENCE_PATH = DataPaths.path("registrations.json");
+    private static final RegistrationRepository registrationRepository = new RegistrationRepository();
     private final static RegistrationService INSTANCE = new RegistrationService();
     private final Table<String, String, RegistrationStatus> registrations = HashBasedTable.create();
     private final LoadingCache<String, RegistrationSummary> summaryMap = Caffeine.newBuilder()
@@ -39,12 +34,14 @@ public class RegistrationService extends PersistedService {
             .build(RegistrationService::generateSummary);
 
     private RegistrationService() {
-        super("RegistrationService", 1);
+        super("RegistrationService", 0);
         load();
     }
 
     public static synchronized void put(String gameName, String playerName, RegistrationStatus registration) {
-        INSTANCE.registrations.put(gameName, playerName, registration);
+        INSTANCE.jpaWriteThenMutate(
+                em -> registrationRepository.save(em, gameName, playerName, registration),
+                () -> INSTANCE.registrations.put(gameName, playerName, registration));
     }
 
     public static synchronized long getRegisteredPlayerCount(String gameName) {
@@ -68,7 +65,9 @@ public class RegistrationService extends PersistedService {
     }
 
     public static synchronized void removePlayer(String gameName, String playerName) {
-        INSTANCE.registrations.remove(gameName, playerName);
+        INSTANCE.jpaWriteThenMutate(
+                em -> registrationRepository.delete(em, gameName, playerName),
+                () -> INSTANCE.registrations.remove(gameName, playerName));
     }
 
     public static synchronized boolean isInGame(String gameName, String playerName) {
@@ -84,7 +83,9 @@ public class RegistrationService extends PersistedService {
     }
 
     public static synchronized void clearRegistrations(String gameName) {
-        INSTANCE.registrations.row(gameName).clear();
+        INSTANCE.jpaWriteThenMutate(
+                em -> registrationRepository.deleteAllForGame(em, gameName),
+                () -> INSTANCE.registrations.row(gameName).clear());
     }
 
     public static synchronized Map<String, RegistrationStatus> getPlayerRegistrations(String playerName) {
@@ -100,16 +101,22 @@ public class RegistrationService extends PersistedService {
     }
 
     public static synchronized void invitePlayer(String gameName, String playerName) {
-        if(!RegistrationService.isInvited(gameName, playerName)) {
-            INSTANCE.registrations.put(gameName, playerName, new RegistrationStatus(OffsetDateTime.now()));
+        if (!RegistrationService.isInvited(gameName, playerName)) {
+            RegistrationStatus status = new RegistrationStatus(OffsetDateTime.now());
+            INSTANCE.jpaWriteThenMutate(
+                    em -> registrationRepository.save(em, gameName, playerName, status),
+                    () -> INSTANCE.registrations.put(gameName, playerName, status));
         }
     }
 
-    public static synchronized void registerDeck(String gameName, String playerName, String deckId, String deckName, String summary) {
+    public static synchronized void registerDeck(String gameName, String playerName, String deckId, String deckName, String summary, String deckContent) {
         RegistrationStatus registrationStatus = new RegistrationStatus(deckId);
         registrationStatus.setSummary(summary);
         registrationStatus.setDeckName(deckName);
-        INSTANCE.registrations.put(gameName, playerName, registrationStatus);
+        registrationStatus.setDeckContent(deckContent);
+        INSTANCE.jpaWriteThenMutate(
+                em -> registrationRepository.save(em, gameName, playerName, registrationStatus),
+                () -> INSTANCE.registrations.put(gameName, playerName, registrationStatus));
     }
 
     public static RegistrationSummary getSummary(String gameName) {
@@ -131,41 +138,19 @@ public class RegistrationService extends PersistedService {
     }
 
     @Override
-    protected synchronized void persist() {
-        if (shouldSkipPersistence()) {
-            logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
-            return;
-        }
-
-        try {
-            logger.debug("Persisting {} registrations", registrations.size());
-            objectMapper.writeValue(PERSISTENCE_PATH.toFile(), registrations);
-            logger.debug("Successfully persisted registrations");
-        } catch (IOException e) {
-            logger.error("Unable to save registrations", e);
-        }
+    protected void persist() {
+        // all mutations are write-through; no background flush needed
     }
 
     @Override
-    protected synchronized void load() {
-        TypeFactory typeFactory = objectMapper.getTypeFactory();
-        if (!Files.exists(PERSISTENCE_PATH)) {
-            logger.info("No existing registrations file found");
-            return;
+    protected void load() {
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            registrationRepository.findAll(em).forEach(entity ->
+                    registrations.put(entity.getGameName(), entity.getPlayerName(),
+                            entity.toRegistrationStatus()));
+            logger.info("Loaded {} registrations from JPA", registrations.size());
+        } catch (Exception e) {
+            logger.error("JPA load failed for RegistrationService", e);
         }
-
-        try {
-            MapType registrationMapType = typeFactory.constructMapType(Map.class, String.class, RegistrationStatus.class);
-            Map<String, Map<String, RegistrationStatus>> registrationsMap = objectMapper.readValue(PERSISTENCE_PATH.toFile(), typeFactory.constructMapType(ConcurrentHashMap.class, typeFactory.constructType(String.class), registrationMapType));
-            registrationsMap.forEach((gameId, gameMap) -> {
-                gameMap.forEach((playerId, registration) -> {
-                    registrations.put(gameId, playerId, registration);
-                });
-            });
-            logger.info("Loaded {} registrations", registrationsMap.size());
-        } catch (IOException e) {
-            logger.error("Unable to load registrations", e);
-        }
-
     }
 }

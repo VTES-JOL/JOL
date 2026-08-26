@@ -1,19 +1,17 @@
 package net.deckserver.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.Streams;
 import io.azam.ulidj.ULID;
+import jakarta.persistence.EntityManager;
 import net.deckserver.game.enums.PlayerRole;
+import net.deckserver.jpa.JpaFactory;
+import net.deckserver.jpa.repository.PlayerRepository;
 import net.deckserver.storage.json.system.PlayerInfo;
 import net.deckserver.storage.json.system.UserSummary;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class PlayerService extends PersistedService {
 
-    private static final Path PERSISTENCE_PATH = DataPaths.path("players.json");
+    private static final PlayerRepository playerRepository = new PlayerRepository();
     private static final PlayerService INSTANCE = new PlayerService();
     private static final LoadingCache<String, UserSummary> activeUsers = Caffeine.newBuilder()
             .expireAfterWrite(1, TimeUnit.HOURS)
@@ -33,7 +31,7 @@ public class PlayerService extends PersistedService {
     private final Map<String, PlayerInfo> players = new ConcurrentHashMap<>();
 
     private PlayerService() {
-        super("PlayerService", 5);
+        super("PlayerService", 0);
         load();
     }
 
@@ -58,57 +56,128 @@ public class PlayerService extends PersistedService {
         activeUsers.get(playerName).setLastOnline(OffsetDateTime.now());
     }
 
-    public static  boolean existsPlayer(String name) {
+    public static boolean existsPlayer(String name) {
         return name != null && INSTANCE.players.containsKey(name);
     }
 
-    public static  boolean registerPlayer(String name, String password, String email) {
-        if (name.isEmpty())
+    public static boolean registerPlayer(String name, String password, String email) {
+        if (existsPlayer(name) || name.isEmpty())
             return false;
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
-        return INSTANCE.players.putIfAbsent(name, new PlayerInfo(name, ULID.random(), email, hash)) == null;
+        PlayerInfo player = new PlayerInfo(name, ULID.random(), email, hash);
+        return INSTANCE.jpaWriteThenMutate(
+                em -> playerRepository.save(em, player),
+                () -> INSTANCE.players.put(name, player));
     }
 
-    public static  boolean authenticate(String playerName, String password) {
+    public static boolean authenticate(String playerName, String password) {
         if (existsPlayer(playerName)) {
             PlayerInfo playerInfo = loadPlayerInfo(playerName);
-            return BCrypt.checkpw(password, playerInfo.getHash());
+            String hash = playerInfo.getHash();
+            return hash != null && BCrypt.checkpw(password, hash);
         } else {
             return false;
         }
     }
 
-    public static  void changePassword(String player, String password) {
+    public static void changePassword(String player, String password) {
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
-        loadPlayerInfo(player).setHash(hash);
+        PlayerInfo info = loadPlayerInfo(player);
+        String previousHash = info.getHash();
+        INSTANCE.jpaWriteWithRollback(
+                () -> info.setHash(hash),
+                em -> playerRepository.save(em, info),
+                () -> info.setHash(previousHash));
     }
 
-    public static  void updateProfile(String playerName, String email, String discordID, String veknID, String country) {
+    public static void updateProfile(String playerName, String email, String discordID, String veknID, String country) {
         PlayerInfo playerInfo = loadPlayerInfo(playerName);
-        playerInfo.setDiscordId(discordID);
-        playerInfo.setEmail(email);
-        playerInfo.setVeknId(veknID);
-        playerInfo.setCountryCode(country);
-        refreshActive(playerName);
+        String previousDiscordId = playerInfo.getDiscordId();
+        String previousEmail = playerInfo.getEmail();
+        String previousVeknId = playerInfo.getVeknId();
+        String previousCountryCode = playerInfo.getCountryCode();
+        if (INSTANCE.jpaWriteWithRollback(
+                () -> {
+                    playerInfo.setDiscordId(discordID);
+                    playerInfo.setEmail(email);
+                    playerInfo.setVeknId(veknID);
+                    playerInfo.setCountryCode(country);
+                },
+                em -> playerRepository.save(em, playerInfo),
+                () -> {
+                    playerInfo.setDiscordId(previousDiscordId);
+                    playerInfo.setEmail(previousEmail);
+                    playerInfo.setVeknId(previousVeknId);
+                    playerInfo.setCountryCode(previousCountryCode);
+                })) {
+            refreshActive(playerName);
+        }
     }
 
-    private static  PlayerInfo loadPlayerInfo(String playerName) {
+    public static void setImageTooltipPreference(String playerName, boolean value) {
+        PlayerInfo playerInfo = loadPlayerInfo(playerName);
+        boolean previousValue = playerInfo.isShowImages();
+        INSTANCE.jpaWriteWithRollback(
+                () -> playerInfo.setShowImages(value),
+                em -> playerRepository.save(em, playerInfo),
+                () -> playerInfo.setShowImages(previousValue));
+    }
+
+    public static void setEdgeColor(String playerName, String value) {
+        PlayerInfo playerInfo = loadPlayerInfo(playerName);
+        String previousValue = playerInfo.getEdgeColor();
+        INSTANCE.jpaWriteWithRollback(
+                () -> playerInfo.setEdgeColor(value),
+                em -> playerRepository.save(em, playerInfo),
+                () -> playerInfo.setEdgeColor(previousValue));
+    }
+
+    public static void setNotificationPreference(String playerName, boolean value) {
+        PlayerInfo playerInfo = loadPlayerInfo(playerName);
+        boolean previousValue = playerInfo.isNotificationsEnabled();
+        INSTANCE.jpaWriteWithRollback(
+                () -> playerInfo.setNotificationsEnabled(value),
+                em -> playerRepository.save(em, playerInfo),
+                () -> playerInfo.setNotificationsEnabled(previousValue));
+    }
+
+    public static void setRole(String playerName, PlayerRole role, boolean enabled) {
+        PlayerInfo playerInfo = loadPlayerInfo(playerName);
+        Set<PlayerRole> previousRoles = new HashSet<>(playerInfo.getRoles());
+        INSTANCE.jpaWriteWithRollback(
+                () -> {
+                    if (enabled) {
+                        playerInfo.getRoles().add(role);
+                    } else {
+                        playerInfo.getRoles().remove(role);
+                    }
+                },
+                em -> playerRepository.save(em, playerInfo),
+                () -> {
+                    playerInfo.getRoles().clear();
+                    playerInfo.getRoles().addAll(previousRoles);
+                });
+    }
+
+    private static PlayerInfo loadPlayerInfo(String playerName) {
         if (INSTANCE.players.containsKey(playerName)) {
             return INSTANCE.players.get(playerName);
         }
         throw new IllegalArgumentException("Player: " + playerName + " was not found.");
     }
 
-    public static  PlayerInfo get(String playerName) {
+    public static PlayerInfo get(String playerName) {
         return loadPlayerInfo(playerName);
     }
 
-    public static  Set<String> getPlayers() {
+    public static Set<String> getPlayers() {
         return INSTANCE.players.keySet();
     }
 
-    public static  void remove(String name) {
-        INSTANCE.players.remove(name);
+    public static void remove(String name) {
+        INSTANCE.jpaWriteThenMutate(
+                em -> playerRepository.delete(em, name),
+                () -> INSTANCE.players.remove(name));
     }
 
     public static PersistedService getInstance() {
@@ -117,34 +186,17 @@ public class PlayerService extends PersistedService {
 
     @Override
     protected void persist() {
-        if (shouldSkipPersistence()) {
-            logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
-            return;
-        }
-
-        try {
-            logger.debug("Persisting {} player data", players.size());
-            objectMapper.writeValue(PERSISTENCE_PATH.toFile(), players);
-            logger.debug("Successfully persisted player data");
-        } catch (IOException e) {
-            logger.error("Unable to save player data", e);
-        }
+        // all mutations are write-through; no background file flush needed
     }
 
     @Override
     protected void load() {
-        if (!Files.exists(PERSISTENCE_PATH)) {
-            logger.info("No existing player file found");
-            return;
-        }
-
-        try {
-            Map<String, PlayerInfo> loaded = objectMapper.readValue(PERSISTENCE_PATH.toFile(), new TypeReference<>() {
-            });
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            Map<String, PlayerInfo> loaded = playerRepository.findAll(em);
             players.putAll(loaded);
-            logger.info("Loaded {} players", players.size());
-        } catch (IOException e) {
-            logger.error("Unable to load players.", e);
+            logger.info("Loaded {} players from JPA", players.size());
+        } catch (Exception e) {
+            logger.error("JPA load failed for PlayerService", e);
         }
     }
 }

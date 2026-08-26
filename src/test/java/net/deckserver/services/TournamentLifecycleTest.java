@@ -8,26 +8,23 @@ import net.deckserver.game.enums.Visibility;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.system.GameInfo;
 import net.deckserver.storage.json.system.TournamentDefinition;
+import net.deckserver.storage.json.system.TournamentFinals;
 import net.deckserver.storage.json.system.TournamentInviteStatus;
 import net.deckserver.storage.json.system.TournamentMetadata;
 import net.deckserver.storage.json.system.TournamentPlayer;
 import net.deckserver.storage.json.system.TournamentRegistration;
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -37,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
 @SetEnvironmentVariable(key = "ENABLE_TEST_MODE", value = "true")
+@ExtendWith(JolServiceExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class TournamentLifecycleTest {
 
@@ -44,15 +42,6 @@ class TournamentLifecycleTest {
     private static final String REGISTRATION_OPEN_TOURNAMENT = "Registrations Open";
     private static final String SEATING_PHASE_TOURNAMENT = "Setup Round Seating";
     private static final String ACTIVE_TOURNAMENT = "Rounds are being played";
-
-    /**
-     * Tournaments this test class creates ad-hoc (real deck/game files get written for
-     * these - registerDeck/createTable have no in-memory cache backstop, so they can't
-     * be no-op'd under ENABLE_TEST_MODE without breaking the read-after-write flow
-     * these tests rely on). Cleaned up in {@link #cleanUpCreatedTournaments()} so they
-     * don't linger as untracked files under src/test/resources/data.
-     */
-    private static final Set<String> createdTournaments = new HashSet<>();
 
     // --- Phase: EDIT (Draft) ---
 
@@ -445,9 +434,78 @@ class TournamentLifecycleTest {
         assertThat(GameService.existsGame(tourName + ": Round 1 - Table 2"), is(true));
     }
 
+    // --- Mutation write-through (regression coverage for the direct-mutation-bypasses-JPA bugs) ---
+
+    @Test
+    void setFinalsSeeding_persistsThroughTheServiceLayer() {
+        String tourName = "Mutation Test - Seeding " + UUID.randomUUID();
+        TournamentDefinition def = newTournament(tourName, TournamentFormat.SINGLE_DECK);
+        TournamentService.createTournament(def);
+
+        TournamentService.setFinalsSeeding(tourName, List.of("Player1", "Player2"));
+
+        assertThat(TournamentService.getTournament(tourName).getFinals().getSeeding(),
+                contains("Player1", "Player2"));
+    }
+
+    @Test
+    void setFinals_replacesTheWholeFinalsObject() {
+        String tourName = "Mutation Test - Finals " + UUID.randomUUID();
+        TournamentDefinition def = newTournament(tourName, TournamentFormat.SINGLE_DECK);
+        TournamentService.createTournament(def);
+
+        TournamentFinals finals = new TournamentFinals();
+        finals.setSeeding(List.of("Player3", "Player4"));
+        TournamentService.setFinals(tourName, finals);
+
+        assertThat(TournamentService.getTournament(tourName).getFinals().getSeeding(),
+                contains("Player3", "Player4"));
+    }
+
+    @Test
+    void setRounds_andResetRounds_persistThroughTheServiceLayer() {
+        String tourName = "Mutation Test - Rounds " + UUID.randomUUID();
+        TournamentDefinition def = newTournament(tourName, TournamentFormat.SINGLE_DECK);
+        TournamentService.createTournament(def);
+
+        TournamentPlayer p1 = new TournamentPlayer();
+        p1.setName("Player1");
+        Map<Integer, Map<Integer, List<TournamentPlayer>>> rounds = Map.of(1, Map.of(1, List.of(p1)));
+        TournamentService.setRounds(tourName, rounds);
+
+        assertThat(TournamentService.getPlayers(tourName, 1, 1).stream().map(TournamentPlayer::getName).toList(),
+                contains("Player1"));
+
+        TournamentService.resetRounds(tourName);
+
+        assertThat(TournamentService.getPlayers(tourName, 1, 1), is(nullValue()));
+    }
+
+    @Test
+    void recordTableResults_snapshotsVpAndGwOntoTheStoredPlayerRecords() {
+        String tourName = "Mutation Test - Table Results " + UUID.randomUUID();
+        TournamentDefinition def = newTournament(tourName, TournamentFormat.SINGLE_DECK);
+        TournamentService.createTournament(def);
+
+        TournamentPlayer p1 = new TournamentPlayer();
+        p1.setName("Player1");
+        TournamentPlayer p2 = new TournamentPlayer();
+        p2.setName("Player2");
+        TournamentService.setRounds(tourName, Map.of(1, Map.of(1, List.of(p1, p2))));
+
+        TournamentService.recordTableResults(tourName, 1, 1, Map.of("Player1", 2.0, "Player2", 1.0), "Player1");
+
+        List<TournamentPlayer> players = TournamentService.getPlayers(tourName, 1, 1);
+        TournamentPlayer storedP1 = players.stream().filter(p -> p.getName().equals("Player1")).findFirst().orElseThrow();
+        TournamentPlayer storedP2 = players.stream().filter(p -> p.getName().equals("Player2")).findFirst().orElseThrow();
+        assertThat(storedP1.getVp(), equalTo(2.0f));
+        assertThat(storedP1.isGw(), is(true));
+        assertThat(storedP2.getVp(), equalTo(1.0f));
+        assertThat(storedP2.isGw(), is(false));
+    }
+
     /** Builds an ACTIVE tournament with two real tables (Round 1: Table 1 = Players 1-4, Table 2 = Players 5-6). */
     private static void seatActiveTournamentWithTwoTables(String tourName) throws IOException {
-        createdTournaments.add(tourName);
         TournamentDefinition def = newTournament(tourName, TournamentFormat.SINGLE_DECK);
         def.setRegistrationStart(OffsetDateTime.now().minusDays(2));
         def.setRegistrationEnd(OffsetDateTime.now().plusDays(1));
@@ -494,23 +552,4 @@ class TournamentLifecycleTest {
         return (int) Pattern.compile(Pattern.quote(needle)).matcher(text).results().count();
     }
 
-    @AfterAll
-    static void cleanUpCreatedTournaments() {
-        for (String tourName : createdTournaments) {
-            TournamentDefinition def = TournamentService.getTournament(tourName);
-            if (def == null) continue;
-            for (GameInfo game : GameService.getGamesByTournament(tourName)) {
-                deleteDirectoryQuietly(DataPaths.path("games", game.getId()));
-            }
-            deleteDirectoryQuietly(DataPaths.path("tournaments", def.getId()));
-        }
-    }
-
-    private static void deleteDirectoryQuietly(Path path) {
-        try {
-            FileUtils.deleteDirectory(path.toFile());
-        } catch (IOException ignored) {
-            // best-effort test cleanup
-        }
-    }
 }

@@ -137,7 +137,6 @@ public class TournamentResource extends BaseResource {
         TournamentDefinition def = requireTournament(tourName);
         if (!def.getStatus().equals(GameStatus.EDIT)) return false;
         TournamentService.setTournamentStatus(tourName, GameStatus.STARTING);
-        TournamentService.save();
         return true;
     }
 
@@ -218,14 +217,13 @@ public class TournamentResource extends BaseResource {
         }
 
         // Snapshot live VP and GW into the stored TournamentPlayer records
-        String finalGwWinner = gwWinner;
+        Map<String, Double> vpByPlayer = new HashMap<>();
         for (TournamentPlayer tp : players) {
             double vp;
             try { vp = g.getVictoryPoints(tp.getName()); } catch (Exception ignored) { vp = tp.getVp(); }
-            tp.setVp((float) vp);
-            tp.setGw(tp.getName().equals(finalGwWinner));
+            vpByPlayer.put(tp.getName(), vp);
         }
-        TournamentService.save();
+        TournamentService.recordTableResults(tourName, round, table, vpByPlayer, gwWinner);
 
         // End game via standard flow (also writes GameHistory)
         JolAdmin.endGame(gameName, true);
@@ -328,9 +326,8 @@ public class TournamentResource extends BaseResource {
             });
             config.put(round, tables);
         });
-        TournamentDefinition tournament = requireTournament(tourName);
-        tournament.setRounds(config);
-        TournamentService.save();
+        requireTournament(tourName);
+        TournamentService.setRounds(tourName, config);
     }
 
     /** Replaces DS.importTables() */
@@ -362,7 +359,8 @@ public class TournamentResource extends BaseResource {
     @Path("{name}/seeding")
     public void setFinalSeeding(@PathParam("name") String tourName, List<String> seeding) {
         requireTournamentAdmin();
-        requireTournament(tourName).getFinals().setSeeding(seeding);
+        requireTournament(tourName);
+        TournamentService.setFinalsSeeding(tourName, seeding);
     }
 
     /** Replaces DS.loadFinalSeeding() */
@@ -448,7 +446,8 @@ public class TournamentResource extends BaseResource {
     @Path("{name}/rounds")
     public void resetTables(@PathParam("name") String tourName) {
         requireTournamentAdmin();
-        requireTournament(tourName).resetRounds();
+        requireTournament(tourName);
+        TournamentService.resetRounds(tourName);
     }
 
     /** Replaces DS.getFinalPlayers() */
@@ -472,9 +471,10 @@ public class TournamentResource extends BaseResource {
     public void saveFinal(@PathParam("name") String tourName, List<String> players) {
         requireTournamentAdmin();
         if (!GameService.existsGame(String.format("%s: Final Table", tourName))) {
+            requireTournament(tourName);
             TournamentFinals finals = new TournamentFinals();
             finals.setSeeding(players);
-            requireTournament(tourName).setFinals(finals);
+            TournamentService.setFinals(tourName, finals);
         }
     }
 

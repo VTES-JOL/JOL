@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16
+    container_name: jol-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: jol
+      POSTGRES_USER: jol
+      POSTGRES_PASSWORD: jol
+    volumes:
+      - jol-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U jol -d jol" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  jol-db-data:

@@ -2,6 +2,7 @@ package net.deckserver.services;
 
 import net.deckserver.storage.json.system.RefreshTokenInfo;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import static org.hamcrest.Matchers.*;
 
 @SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
 @SetEnvironmentVariable(key = "ENABLE_TEST_MODE", value = "true")
+@ExtendWith(JolServiceExtension.class)
 class RefreshTokenServiceTest {
 
     @Test

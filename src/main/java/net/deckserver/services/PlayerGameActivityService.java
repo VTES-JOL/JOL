@@ -1,12 +1,10 @@
 package net.deckserver.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.persistence.EntityManager;
+import net.deckserver.jpa.JpaFactory;
+import net.deckserver.jpa.repository.GameActivityRepository;
 import net.deckserver.storage.json.game.GameTimestampEntry;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
@@ -14,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerGameActivityService extends PersistedService {
 
-    private static final Path PERSISTENCE_PATH = DataPaths.path("game-timestamps.json");
+    private static final GameActivityRepository gameActivityRepository = new GameActivityRepository();
     private static final PlayerGameActivityService INSTANCE = new PlayerGameActivityService();
 
     private final Map<String, GameTimestampEntry> gameTimestamps = new ConcurrentHashMap<>();
@@ -24,6 +22,9 @@ public class PlayerGameActivityService extends PersistedService {
         load(); // Load existing data on startup
     }
 
+    // Called on essentially every game view/action - kept as an in-memory write with a
+    // batched flush rather than a per-call JPA write-through, for the same reason as
+    // PlayerActivityService.recordPlayerAccess.
     public static  void recordPlayerAccess(String playerName, String gameName) {
         if (playerName == null || playerName.isBlank() || gameName == null || gameName.isBlank()) return;
         getOrCreateGameTimestampEntry(gameName).recordPlayerAccess(playerName);
@@ -49,6 +50,7 @@ public class PlayerGameActivityService extends PersistedService {
         getOrCreateGameTimestampEntry(gameName).clearPlayerPing(playerName);
     }
 
+    /** In-memory only - the DB row is deleted by GameService.remove (games.game_id FK), always called alongside this. */
     public static   void clearGame(String gameName) {
         if (gameName == null || gameName.isBlank()) return;
         INSTANCE.gameTimestamps.remove(gameName);
@@ -101,32 +103,17 @@ public class PlayerGameActivityService extends PersistedService {
             return;
         }
 
-        try {
-            logger.debug("Persisting {} game timestamps", gameTimestamps.size());
-            objectMapper.writeValue(PERSISTENCE_PATH.toFile(), gameTimestamps);
-            logger.debug("Successfully persisted game timestamps");
-        } catch (IOException e) {
-            logger.error("Unable to save game timestamps", e);
-        }
+        logger.debug("Persisting {} game timestamps", gameTimestamps.size());
+        requireJpaWrite(em -> gameActivityRepository.saveAll(em, gameTimestamps));
     }
 
     @Override
     protected void load() {
-        if (!Files.exists(PERSISTENCE_PATH)) {
-            logger.info("No existing game timestamps file found");
-            return;
-        }
-
-        try {
-            Map<String, GameTimestampEntry> loaded = objectMapper.readValue(
-                    PERSISTENCE_PATH.toFile(),
-                    new TypeReference<>() {
-                    }
-            );
-            gameTimestamps.putAll(loaded);
-            logger.info("Loaded {} game timestamps", gameTimestamps.size());
-        } catch (IOException e) {
-            logger.error("Unable to load game timestamps", e);
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            gameTimestamps.putAll(gameActivityRepository.findAllAsMap(em));
+            logger.info("Loaded {} game timestamps from JPA", gameTimestamps.size());
+        } catch (Exception e) {
+            logger.error("JPA load failed for PlayerGameActivityService", e);
         }
     }
 }

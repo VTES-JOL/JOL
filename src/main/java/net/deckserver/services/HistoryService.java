@@ -1,48 +1,56 @@
 package net.deckserver.services;
 
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
+import net.deckserver.jpa.entity.GameHistoryEntity;
+import net.deckserver.jpa.repository.GameHistoryRepository;
 import net.deckserver.storage.json.system.GameHistory;
 import net.deckserver.storage.json.system.PlayerResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class HistoryService extends PersistedService {
 
     private static final Logger logger = LoggerFactory.getLogger(HistoryService.class);
-    private static final Path PERSISTENCE_PATH = DataPaths.path("pastGames.json");
+    private static final GameHistoryRepository gameHistoryRepository = new GameHistoryRepository();
     private static final HistoryService INSTANCE = new HistoryService();
 
-    private final Map<OffsetDateTime, GameHistory> pastGames = new ConcurrentHashMap<>();
-
     private HistoryService() {
-        super("HistoryService", 10);
-        load();
+        super("HistoryService", 0);
     }
 
-    public static  Map<OffsetDateTime, GameHistory> getHistory() {
-        return Collections.unmodifiableMap(INSTANCE.pastGames);
+    public static Map<OffsetDateTime, GameHistory> getHistory() {
+        Map<OffsetDateTime, GameHistory> result = INSTANCE.jpaRead(gameHistoryRepository::findAll);
+        return result != null ? result : Map.of();
     }
 
-    public static  void addGame(OffsetDateTime now, GameHistory history) {
-        INSTANCE.pastGames.put(now, history);
+    public static void addGame(OffsetDateTime now, GameHistory history) {
+        INSTANCE.requireJpaWriteAlways(em -> gameHistoryRepository.save(em, now, history));
     }
 
-    public static  Collection<GameHistory> getGames() {
-        return INSTANCE.pastGames.values();
+    public static Collection<GameHistory> getGames() {
+        return getHistory().values();
     }
 
-    public static  void validateGW() {
-        HistoryService.getGames().forEach(gameHistory -> {
+    public static void validateGW() {
+        Collection<GameHistoryEntity> entities = INSTANCE.jpaRead(gameHistoryRepository::findAllEntities);
+        if (entities == null) return;
+        entities.forEach(entity -> {
+            GameHistory gameHistory;
+            try {
+                gameHistory = new GameHistory();
+                gameHistory.setName(entity.getGameName());
+                gameHistory.setStarted(entity.getStarted());
+                gameHistory.setEnded(entity.getEnded());
+                gameHistory.setResults(objectMapper.readValue(entity.getResults(), new TypeReference<>() {}));
+            } catch (Exception e) {
+                logger.error("Failed to deserialise game history for validation: {}", entity.getGameName(), e);
+                return;
+            }
+
             PlayerResult winner = null;
             PlayerResult previousWinner = gameHistory.getResults().stream().filter(PlayerResult::isGameWin).findFirst().orElse(null);
             double topVP = 0.0;
@@ -63,13 +71,24 @@ public class HistoryService extends PersistedService {
                     }
                 }
             }
+            boolean changed = false;
             if (winner != null && previousWinner == null) {
                 logger.info("Found a winner for {} where there wasn't one before, now {} on {}", gameHistory.getName(), winner.getPlayerName(), winner.getVictoryPoints());
                 winner.setGameWin(true);
+                changed = true;
             } else if (winner != null && winner != previousWinner) {
                 logger.info("Found a new winner for {}, previously {} on {}, now {} on {}", gameHistory.getName(), previousWinner.getPlayerName(), previousWinner.getVictoryPoints(), winner.getPlayerName(), winner.getVictoryPoints());
                 winner.setGameWin(true);
                 previousWinner.setGameWin(false);
+                changed = true;
+            }
+            if (changed) {
+                try {
+                    entity.setResults(objectMapper.writeValueAsString(gameHistory.getResults()));
+                    INSTANCE.requireJpaWriteAlways(em -> gameHistoryRepository.update(em, entity));
+                } catch (Exception e) {
+                    logger.error("Failed to serialise updated results for {}", gameHistory.getName(), e);
+                }
             }
         });
     }
@@ -80,35 +99,11 @@ public class HistoryService extends PersistedService {
 
     @Override
     protected void persist() {
-        if (shouldSkipPersistence()) {
-            logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
-            return;
-        }
-
-        try {
-            logger.debug("Persisting {} past games", pastGames.size());
-            objectMapper.writeValue(PERSISTENCE_PATH.toFile(), pastGames);
-            logger.debug("Successfully persisted past games");
-        } catch (IOException e) {
-            logger.error("Unable to save past games", e);
-        }
-
+        // all mutations are write-through; no background flush needed
     }
 
     @Override
     protected void load() {
-        if (!Files.exists(PERSISTENCE_PATH)) {
-            logger.info("No existing game histories file found");
-            return;
-        }
-
-        try {
-            TypeFactory typeFactory = objectMapper.getTypeFactory();
-            Map<OffsetDateTime, GameHistory> loaded = objectMapper.readValue(PERSISTENCE_PATH.toFile(), typeFactory.constructMapType(ConcurrentHashMap.class, OffsetDateTime.class, GameHistory.class));
-            pastGames.putAll(loaded);
-            logger.info("Loaded {} game histories", loaded.size());
-        } catch (IOException e) {
-            logger.error("Unable to load game history.", e);
-        }
+        // no startup load needed — reads go directly to JPA
     }
 }

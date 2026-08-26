@@ -1,13 +1,12 @@
 package net.deckserver.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import io.azam.ulidj.ULID;
+import jakarta.persistence.EntityManager;
+import net.deckserver.jpa.JpaFactory;
+import net.deckserver.jpa.repository.RefreshTokenRepository;
 import net.deckserver.storage.json.system.RefreshTokenInfo;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -30,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RefreshTokenService extends PersistedService {
 
-    private static final Path PERSISTENCE_PATH = DataPaths.path("refreshTokens.json");
+    private static final RefreshTokenRepository refreshTokenRepository = new RefreshTokenRepository();
     private static final RefreshTokenService INSTANCE = new RefreshTokenService();
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final long TTL_REMEMBER_MILLIS = TimeUnit.DAYS.toMillis(30);
@@ -40,7 +39,7 @@ public class RefreshTokenService extends PersistedService {
     private final Map<String, List<RefreshTokenInfo>> tokensByPlayer = new HashMap<>();
 
     private RefreshTokenService() {
-        super("RefreshTokenService", 5);
+        super("RefreshTokenService", 0);
         load();
     }
 
@@ -67,7 +66,9 @@ public class RefreshTokenService extends PersistedService {
         info.setExpiresAt(now + ttl);
         info.setRemember(remember);
 
-        INSTANCE.tokensByPlayer.computeIfAbsent(playerName, k -> new ArrayList<>()).add(info);
+        INSTANCE.jpaWriteThenMutate(
+                em -> refreshTokenRepository.save(em, playerName, info),
+                () -> INSTANCE.tokensByPlayer.computeIfAbsent(playerName, k -> new ArrayList<>()).add(info));
         return new Issued(id + "." + secret, id);
     }
 
@@ -89,15 +90,32 @@ public class RefreshTokenService extends PersistedService {
                 if (info.getExpiresAt() < now || !MessageDigest.isEqual(
                         HexFormat.of().parseHex(info.getSecretHash()),
                         HexFormat.of().parseHex(hash(secret)))) {
-                    tokens.remove(info);
+                    INSTANCE.jpaWriteThenMutate(
+                            em -> refreshTokenRepository.delete(em, id),
+                            () -> tokens.remove(info));
                     return Optional.empty();
                 }
 
+                String previousSecretHash = info.getSecretHash();
+                long previousLastUsedAt = info.getLastUsedAt();
+                long previousExpiresAt = info.getExpiresAt();
+
                 String newSecret = randomSecret();
-                info.setSecretHash(hash(newSecret));
-                info.setLastUsedAt(now);
-                long ttl = info.isRemember() ? TTL_REMEMBER_MILLIS : TTL_SESSION_MILLIS;
-                info.setExpiresAt(Math.min(now + ttl, info.getCreatedAt() + ABSOLUTE_MAX_AGE_MILLIS));
+                long newExpiresAt = Math.min(now + (info.isRemember() ? TTL_REMEMBER_MILLIS : TTL_SESSION_MILLIS),
+                        info.getCreatedAt() + ABSOLUTE_MAX_AGE_MILLIS);
+
+                INSTANCE.jpaWriteWithRollback(
+                        () -> {
+                            info.setSecretHash(hash(newSecret));
+                            info.setLastUsedAt(now);
+                            info.setExpiresAt(newExpiresAt);
+                        },
+                        em -> refreshTokenRepository.save(em, info.getPlayerName(), info),
+                        () -> {
+                            info.setSecretHash(previousSecretHash);
+                            info.setLastUsedAt(previousLastUsedAt);
+                            info.setExpiresAt(previousExpiresAt);
+                        });
 
                 return Optional.of(new Rotated(info.getPlayerName(), id + "." + newSecret, info.isRemember()));
             }
@@ -109,16 +127,24 @@ public class RefreshTokenService extends PersistedService {
         if (cookieValue == null) return;
         int dot = cookieValue.indexOf('.');
         String id = dot < 0 ? cookieValue : cookieValue.substring(0, dot);
-        INSTANCE.tokensByPlayer.values().forEach(tokens -> tokens.removeIf(t -> t.getId().equals(id)));
+        INSTANCE.jpaWriteThenMutate(
+                em -> refreshTokenRepository.delete(em, id),
+                () -> INSTANCE.tokensByPlayer.values().forEach(tokens -> tokens.removeIf(t -> t.getId().equals(id))));
     }
 
     public static synchronized void revoke(String playerName, String id) {
-        List<RefreshTokenInfo> tokens = INSTANCE.tokensByPlayer.get(playerName);
-        if (tokens != null) tokens.removeIf(t -> t.getId().equals(id));
+        INSTANCE.jpaWriteThenMutate(
+                em -> refreshTokenRepository.delete(em, id),
+                () -> {
+                    List<RefreshTokenInfo> tokens = INSTANCE.tokensByPlayer.get(playerName);
+                    if (tokens != null) tokens.removeIf(t -> t.getId().equals(id));
+                });
     }
 
     public static synchronized void revokeAll(String playerName) {
-        INSTANCE.tokensByPlayer.remove(playerName);
+        INSTANCE.jpaWriteThenMutate(
+                em -> refreshTokenRepository.deleteAllForPlayer(em, playerName),
+                () -> INSTANCE.tokensByPlayer.remove(playerName));
     }
 
     public static synchronized List<RefreshTokenInfo> list(String playerName) {
@@ -127,8 +153,12 @@ public class RefreshTokenService extends PersistedService {
 
     public static synchronized void cleanupExpired() {
         long now = System.currentTimeMillis();
-        INSTANCE.tokensByPlayer.values().forEach(tokens -> tokens.removeIf(t -> t.getExpiresAt() < now));
-        INSTANCE.tokensByPlayer.entrySet().removeIf(e -> e.getValue().isEmpty());
+        INSTANCE.jpaWriteThenMutate(
+                em -> refreshTokenRepository.deleteExpired(em, now),
+                () -> {
+                    INSTANCE.tokensByPlayer.values().forEach(tokens -> tokens.removeIf(t -> t.getExpiresAt() < now));
+                    INSTANCE.tokensByPlayer.entrySet().removeIf(e -> e.getValue().isEmpty());
+                });
     }
 
     private static String randomSecret() {
@@ -148,30 +178,20 @@ public class RefreshTokenService extends PersistedService {
 
     @Override
     protected void persist() {
-        if (shouldSkipPersistence()) {
-            logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
-            return;
-        }
-        try {
-            objectMapper.writeValue(PERSISTENCE_PATH.toFile(), tokensByPlayer);
-        } catch (IOException e) {
-            logger.error("Unable to save refresh token data", e);
-        }
+        // all mutations are write-through; no background flush needed
     }
 
     @Override
     protected void load() {
-        if (!Files.exists(PERSISTENCE_PATH)) {
-            logger.info("No existing refresh token file found");
-            return;
-        }
-        try {
-            Map<String, List<RefreshTokenInfo>> loaded = objectMapper.readValue(PERSISTENCE_PATH.toFile(), new TypeReference<>() {
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            refreshTokenRepository.findAll(em).forEach(entity -> {
+                RefreshTokenInfo info = entity.toRefreshTokenInfo();
+                tokensByPlayer.computeIfAbsent(info.getPlayerName(), k -> new ArrayList<>()).add(info);
             });
-            tokensByPlayer.putAll(loaded);
-            logger.info("Loaded refresh tokens for {} players", tokensByPlayer.size());
-        } catch (IOException e) {
-            logger.error("Unable to load refresh token data", e);
+            logger.info("Loaded refresh tokens for {} players from JPA",
+                    tokensByPlayer.size());
+        } catch (Exception e) {
+            logger.error("JPA load failed for RefreshTokenService", e);
         }
     }
 }

@@ -3,12 +3,13 @@ package net.deckserver.services;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import jakarta.persistence.EntityManager;
+import net.deckserver.jpa.JpaFactory;
+import net.deckserver.jpa.repository.GameChatRepository;
 import net.deckserver.storage.json.game.ChatData;
 import net.deckserver.storage.json.game.TurnData;
 import net.deckserver.storage.json.game.TurnHistory;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class ChatService extends PersistedService {
 
     private static final ChatService INSTANCE = new ChatService();
+    private static final GameChatRepository gameChatRepository = new GameChatRepository();
 
     private final LoadingCache<String, TurnHistory> historyCache = Caffeine.newBuilder()
             .expireAfterAccess(5, TimeUnit.MINUTES)
@@ -86,32 +88,25 @@ public class ChatService extends PersistedService {
             return;
         }
 
-        try {
-            if (history == null || history.getTurns() == null || history.getTurns().isEmpty()) {
-                logger.debug("Skipping save for {} - history is empty", gameId);
-                return;
-            }
-
-            logger.debug("Saving history for {} with {} turns", gameId, history.getTurns().size());
-            Path historyPath = Paths.get(getBasePath(), "games", gameId, "history.json");
-            objectMapper.writeValue(historyPath.toFile(), history.getTurns());
-            logger.debug("Successfully saved history for {}", gameId);
-        } catch (Exception e) {
-            logger.error("Unable to save history for {}", gameId, e);
+        if (history == null || history.getTurns() == null || history.getTurns().isEmpty()) {
+            logger.debug("Skipping save for {} - history is empty", gameId);
+            return;
         }
+
+        logger.debug("Saving history for {} with {} turns", gameId, history.getTurns().size());
+        requireJpaWrite(em -> gameChatRepository.save(em, gameId, history.getTurns()));
     }
 
     private TurnHistory loadHistory(String gameId) {
-        try {
-            Path historyPath = Paths.get(getBasePath(), "games", gameId, "history.json");
-            List<TurnData> turns = objectMapper.readValue(
-                    historyPath.toFile(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, TurnData.class)
-            );
-            return new TurnHistory(turns);
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            List<TurnData> turns = gameChatRepository.load(em, gameId);
+            if (!turns.isEmpty()) {
+                return new TurnHistory(turns);
+            }
         } catch (Exception e) {
-            return new TurnHistory();
+            logger.error("JPA load failed for game chat {}", gameId, e);
         }
+        return new TurnHistory();
     }
 
     @Override

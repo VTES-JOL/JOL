@@ -1,32 +1,29 @@
 package net.deckserver.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import jakarta.persistence.EntityManager;
 import net.deckserver.game.model.JolGame;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.Visibility;
-import net.deckserver.jobs.GameDataConversion;
+import net.deckserver.jpa.JpaFactory;
+import net.deckserver.jpa.repository.GameActivityRepository;
+import net.deckserver.jpa.repository.GameChatRepository;
+import net.deckserver.jpa.repository.GameInfoRepository;
+import net.deckserver.jpa.repository.GameSnapshotRepository;
+import net.deckserver.jpa.repository.GameStateRepository;
 import net.deckserver.storage.json.game.GameData;
 import net.deckserver.storage.json.game.GameSummary;
 import net.deckserver.storage.json.game.PlayerSummary;
 import net.deckserver.storage.json.system.GameInfo;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static net.deckserver.JolAdmin.saveGameState;
@@ -37,11 +34,12 @@ public class GameService extends PersistedService {
     public static final Predicate<GameInfo> PUBLIC_GAME = info -> info.getVisibility().equals(Visibility.PUBLIC);
     public static final Predicate<GameInfo> ACTIVE_GAME = (info) -> info.getStatus().equals(GameStatus.ACTIVE);
     private static final Logger logger = LoggerFactory.getLogger(GameService.class);
-    private static final Path PERSISTENCE_PATH = DataPaths.path("games.json");
+    private static final GameInfoRepository gameInfoRepository = new GameInfoRepository();
+    private static final GameStateRepository gameStateRepository = new GameStateRepository();
+    private static final GameChatRepository gameChatRepository = new GameChatRepository();
+    private static final GameSnapshotRepository gameSnapshotRepository = new GameSnapshotRepository();
+    private static final GameActivityRepository gameActivityRepository = new GameActivityRepository();
     private static final GameService INSTANCE = new GameService();
-    private static final ReadWriteLock rwLock = new ReentrantReadWriteLock();
-    private static final Lock readLock = rwLock.readLock();
-    private static final Lock writeLock = rwLock.writeLock();
     private final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
             .expireAfterAccess(30, TimeUnit.MINUTES)
             .build(GameService::loadGame);
@@ -55,11 +53,33 @@ public class GameService extends PersistedService {
     private GameService() {
         super("GameService", 5);
         load();
-        upgrade();
     }
 
     public static GameInfo get(String name) {
         return INSTANCE.games.get(name);
+    }
+
+    /**
+     * The only supported way to mutate a GameInfo already in the cache — writes through
+     * to JPA and rolls the in-memory mutation back if that write fails, so a caller never
+     * ends up with local state ahead of the database.
+     */
+    public static boolean updateGameInfo(String gameName, Consumer<GameInfo> mutation) {
+        GameInfo gameInfo = INSTANCE.games.get(gameName);
+        if (gameInfo == null) return false;
+        GameInfo snapshot = copyGameInfo(gameInfo);
+        return INSTANCE.jpaWriteWithRollback(
+                () -> mutation.accept(gameInfo),
+                em -> gameInfoRepository.save(em, gameInfo),
+                () -> INSTANCE.games.put(gameName, snapshot));
+    }
+
+    private static GameInfo copyGameInfo(GameInfo source) {
+        try {
+            return objectMapper.readValue(objectMapper.writeValueAsString(source), GameInfo.class);
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to copy game info " + source.getName(), e);
+        }
     }
 
     public static String getNameByGameId(String gameId) {
@@ -73,16 +93,13 @@ public class GameService extends PersistedService {
             logger.error("Game name is null or empty");
             return;
         }
-
         GameInfo gameInfo = new GameInfo(gameName, gameId, ownerName, visibility, GameStatus.STARTING, format);
-        INSTANCE.games.put(gameName, gameInfo);
-        INSTANCE.idToName.put(gameId, gameName);
-        try {
-            Path gamePath = DataPaths.path("games", gameId);
-            Files.createDirectory(gamePath);
-        } catch (IOException e) {
-            logger.error("Error creating game directory", e);
-        }
+        INSTANCE.jpaWriteThenMutate(
+                em -> gameInfoRepository.save(em, gameInfo),
+                () -> {
+                    INSTANCE.games.put(gameName, gameInfo);
+                    INSTANCE.idToName.put(gameId, gameName);
+                });
     }
 
     public static boolean existsGame(String name) {
@@ -146,41 +163,46 @@ public class GameService extends PersistedService {
     }
 
     public static void remove(String gameName, String gameId) {
-        Path gamePath = DataPaths.path("games", gameId);
-        INSTANCE.games.remove(gameName);
-        INSTANCE.idToName.remove(gameId);
-        INSTANCE.gameCache.invalidate(gameId);
-        INSTANCE.summaryMap.invalidate(gameName);
-        try {
-            FileUtils.deleteDirectory(gamePath.toFile());
-        } catch (IOException e) {
-            logger.error("Unable to delete game directory", e);
-        }
+        INSTANCE.jpaWriteThenMutate(
+                em -> {
+                    gameSnapshotRepository.deleteAllForGame(em, gameId);
+                    gameChatRepository.delete(em, gameId);
+                    gameStateRepository.delete(em, gameId);
+                    // must run before gameInfoRepository.delete - looks up the game row by name first
+                    gameActivityRepository.delete(em, gameName);
+                    gameInfoRepository.delete(em, gameName);
+                },
+                () -> {
+                    INSTANCE.games.remove(gameName);
+                    INSTANCE.idToName.remove(gameId);
+                    INSTANCE.gameCache.invalidate(gameId);
+                    INSTANCE.summaryMap.invalidate(gameName);
+                });
     }
 
     public static JolGame loadGame(String gameId) {
-        readLock.lock();
-        try {
-            Path gameStatePath = DataPaths.path("games", gameId, "game.json");
-            GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
-            return new JolGame(gameId, gameData);
-        } catch (IOException e) {
-            logger.error("Error reading game file {}", gameId, e);
-        } finally {
-            readLock.unlock();
+        // Load failures must propagate: falling back to an empty GameData here would
+        // cache an empty game, and the scheduled write-through could then overwrite
+        // the real DB row with it. Caffeine serializes loads per key.
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            GameData gameData = gameStateRepository.load(em, gameId);
+            if (gameData != null) {
+                return new JolGame(gameId, gameData);
+            }
         }
+        // no row — a game that has never been saved legitimately starts empty
         return new JolGame(gameId, new GameData(gameId));
     }
 
     public static JolGame loadSnapshot(String gameId, String turn) {
-        try {
-            Path gameStatePath = DataPaths.path("games", gameId, "game-" + turn + ".json");
-            GameData gameData = objectMapper.readValue(gameStatePath.toFile(), GameData.class);
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            GameData gameData = gameSnapshotRepository.load(em, gameId, snapshotTurn(turn));
+            if (gameData == null) {
+                // a missing snapshot must fail the rollback, not roll back to an empty game
+                throw new IllegalStateException("No snapshot for game " + gameId + " turn " + turn);
+            }
             return new JolGame(gameId, gameData);
-        } catch (IOException e) {
-            logger.error("Error reading game file", e);
         }
-        return new JolGame(gameId, new GameData(gameId));
     }
 
     public static void rollbackGame(String gameName, String turn) {
@@ -191,37 +213,24 @@ public class GameService extends PersistedService {
     }
 
     public static void saveGame(JolGame game) {
-        String gameId = game.id();
-        if (!isTestMode()) {
-            writeLock.lock();
-            Path gameStatePath = DataPaths.path("games", gameId, "game.json");
-            GameData deckServerState = game.data();
-            ObjectMapper objectMapper = new ObjectMapper();
-            try {
-                objectMapper.writeValue(gameStatePath.toFile(), deckServerState);
-            } catch (IOException e) {
-                logger.error("Unable to save game file", e);
-            } finally {
-                writeLock.unlock();
-            }
+        // compute() makes cache-put + DB write atomic per game, so a concurrent save of
+        // the same game can't interleave (GameStateEntity is @Version-ed; an interleaved
+        // save would fail with an optimistic lock conflict and be dropped).
+        String gameName = INSTANCE.idToName.get(game.id());
+        if (gameName != null && INSTANCE.games.containsKey(gameName)) {
+            INSTANCE.requireJpaWrite(em -> gameStateRepository.save(em, game));
         }
-        // update the cache
-        INSTANCE.gameCache.put(gameId, game);
+        INSTANCE.gameCache.put(game.id(), game);
     }
 
     public static void saveGame(JolGame game, String turn) {
-        if (isTestMode()) {
-            return;
-        }
-        turn = turn.replaceAll("\\.", "-");
-        String gameId = game.id();
-        Path gameStatePath = DataPaths.path("games", gameId, "game-" + turn + ".json");
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            objectMapper.writeValue(gameStatePath.toFile(), game.data());
-        } catch (IOException e) {
-            logger.error("Unable to save game file", e);
-        }
+        String snapshotTurn = snapshotTurn(turn);
+        INSTANCE.requireJpaWrite(em -> gameSnapshotRepository.save(em, game.id(), snapshotTurn, game.data()));
+    }
+
+    // turn labels are normalized the same way the legacy game-<turn>.json filenames were
+    private static String snapshotTurn(String turn) {
+        return turn.replaceAll("\\.", "-");
     }
 
     public static JolGame getGame(String gameId) {
@@ -277,58 +286,29 @@ public class GameService extends PersistedService {
         return INSTANCE.gameCache.get(gameInfo.getId());
     }
 
-    private void upgrade() {
-        if (isTestMode()) {
-            logger.debug("Skipping data upgrade - test mode enabled");
-            return;
-        }
-        logger.info("Determining upgrades...");
-        GameDataConversion conversion = new GameDataConversion();
-        games.values().stream()
-                .filter(ACTIVE_GAME)
-                .filter(Objects::nonNull)
-                .filter(gameInfo -> gameInfo.getVersion().isOlderThan(GameInfo.Version.DATA_FIX))
-                .peek(gameInfo -> logger.info("Validating data {} - {}", gameInfo.getName(), gameInfo.getId()))
-                .forEach(gameInfo -> {
-                    conversion.checkCards(gameInfo.getName(), gameInfo.getId());
-                    gameInfo.setVersion(GameInfo.Version.DATA_FIX);
-                });
-    }
-
     @Override
     protected void persist() {
         if (shouldSkipPersistence()) {
             logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
             return;
         }
-
-        try {
-            logger.debug("Persisting {} game data", games.size());
-            objectMapper.writeValue(PERSISTENCE_PATH.toFile(), games);
-            logger.debug("Successfully persisted game data");
-
-            gameCache.asMap().values().forEach(GameService::saveGame);
-            logger.debug("Successfully persisted {} games in cache", gameCache.estimatedSize());
-        } catch (IOException e) {
-            logger.error("Unable to save game data", e);
-        }
+        // Flush cached game states to JPA
+        gameCache.asMap().values().forEach(GameService::saveGame);
+        logger.debug("Persisted {} games in cache", gameCache.estimatedSize());
+        // Belt-and-braces: every known GameInfo mutation site goes through updateGameInfo
+        // (which write-throughs immediately), but this catches any future direct mutation.
+        requireJpaWrite(em -> games.values().forEach(g -> gameInfoRepository.save(em, g)));
     }
 
     @Override
     protected void load() {
-        if (!Files.exists(PERSISTENCE_PATH)) {
-            logger.info("No existing games file found");
-            return;
-        }
-
-        try {
-            Map<String, GameInfo> loaded = objectMapper.readValue(PERSISTENCE_PATH.toFile(), new TypeReference<>() {
-            });
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            Map<String, GameInfo> loaded = gameInfoRepository.findAll(em);
             games.putAll(loaded);
             games.forEach((name, info) -> idToName.put(info.getId(), name));
-            logger.info("Loaded {} games", games.size());
-        } catch (IOException e) {
-            logger.error("Unable to load games.", e);
+            logger.info("Loaded {} games from JPA", games.size());
+        } catch (Exception e) {
+            logger.error("JPA load failed for GameService", e);
         }
     }
 }

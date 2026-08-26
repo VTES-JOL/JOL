@@ -15,6 +15,7 @@ public class RegistrationStatus {
     private boolean valid;
     private String summary;
     private OffsetDateTime timestamp;
+    private String deckContent;
 
     public RegistrationStatus(String deckId) {
         this.deckId = deckId;

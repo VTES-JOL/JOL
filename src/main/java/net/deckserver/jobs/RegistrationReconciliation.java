@@ -2,6 +2,7 @@ package net.deckserver.jobs;
 
 import net.deckserver.game.model.JolGame;
 import net.deckserver.game.enums.GameStatus;
+import net.deckserver.services.DeckService;
 import net.deckserver.services.GameService;
 import net.deckserver.services.RegistrationService;
 import net.deckserver.services.TournamentService;
@@ -91,6 +92,7 @@ public class RegistrationReconciliation implements Runnable {
         }
 
         logger.info("Restoring missing registration for '{}' in active game '{}'", player, gameName);
-        RegistrationService.registerDeck(gameName, player, deckId, deck.getDeck().getName(), deck.getStats().getSummary());
+        RegistrationService.registerDeck(gameName, player, deckId, deck.getDeck().getName(),
+                deck.getStats().getSummary(), DeckService.serializeDeck(deck));
     }
 }

@@ -76,8 +76,9 @@ public class GameCleanUp implements Runnable {
 
         staleLobbyGames.forEach(info -> {
             logger.info("Removing stale lobby game {}", info.getName());
-            GameService.remove(info.getName(), info.getId());
+            // registrations first - they FK-reference the game row and must be cleared before it
             RegistrationService.clearRegistrations(info.getName());
+            GameService.remove(info.getName(), info.getId());
         });
     }
 }

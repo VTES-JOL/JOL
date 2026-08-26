@@ -1,11 +1,9 @@
 package net.deckserver.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.persistence.EntityManager;
+import net.deckserver.jpa.JpaFactory;
+import net.deckserver.jpa.repository.PlayerActivityRepository;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
@@ -13,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerActivityService extends PersistedService {
 
-    private static final Path PERSISTENCE_PATH = DataPaths.path("player-timestamps.json");
+    private static final PlayerActivityRepository playerActivityRepository = new PlayerActivityRepository();
     private static final PlayerActivityService INSTANCE = new PlayerActivityService();
 
     private final Map<String, OffsetDateTime> playerTimestamps = new ConcurrentHashMap<>();
@@ -23,6 +21,9 @@ public class PlayerActivityService extends PersistedService {
         load(); // Load existing data on startup
     }
 
+    // Called on essentially every request (e.g. the nav poll every logged-in tab runs
+    // continuously) - kept as an in-memory write with a batched flush rather than a
+    // per-call JPA write-through, which would put every poll on the DB's write path.
     public static  void recordPlayerAccess(String playerName) {
         if (playerName == null || playerName.isBlank()) return;
         INSTANCE.playerTimestamps.put(playerName, OffsetDateTime.now());
@@ -46,28 +47,18 @@ public class PlayerActivityService extends PersistedService {
             return;
         }
 
-        try {
-            logger.debug("Persisting {} player timestamps", playerTimestamps.size());
-            objectMapper.writeValue(PERSISTENCE_PATH.toFile(), playerTimestamps);
-            logger.debug("Successfully persisted player timestamps");
-        } catch (IOException e) {
-            logger.error("Unable to save player timestamps", e);
-        }
+        logger.debug("Persisting {} player timestamps", playerTimestamps.size());
+        requireJpaWrite(em -> playerActivityRepository.saveAll(em, playerTimestamps));
     }
 
     @Override
     protected void load() {
-        if (!Files.exists(PERSISTENCE_PATH)) {
-            logger.info("No existing player timestamps file found");
-            return;
-        }
-
-        try {
-            Map<String, OffsetDateTime> loaded = objectMapper.readValue(PERSISTENCE_PATH.toFile(), new TypeReference<>() {});
-            playerTimestamps.putAll(loaded);
-            logger.info("Loaded {} player timestamps", playerTimestamps.size());
-        } catch (IOException e) {
-            logger.error("Unable to load player timestamps", e);
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            playerActivityRepository.findAll(em).forEach(entity ->
+                    playerTimestamps.put(entity.getPlayerName(), entity.getLastSeen()));
+            logger.info("Loaded {} player timestamps from JPA", playerTimestamps.size());
+        } catch (Exception e) {
+            logger.error("JPA load failed for PlayerActivityService", e);
         }
     }
 }

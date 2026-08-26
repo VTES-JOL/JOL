@@ -135,8 +135,15 @@ public final class AuthService {
         return ua.length() > 200 ? ua.substring(0, 200) : ua;
     }
 
+    /**
+     * Loads the JWT signing key from the PEM-adjacent file named by the JWT_SECRET_FILE
+     * env var (same pattern as VAPID_KEY_FILE for web push), generating and persisting a
+     * new one on first run if the file doesn't exist yet. Falls back to a directory next
+     * to the working directory when unset, so local dev/test need no configuration.
+     */
     private static SecretKey loadOrCreateKey() {
-        Path path = DataPaths.path("jwt_secret.key");
+        String keyFile = System.getenv("JWT_SECRET_FILE");
+        Path path = Path.of(keyFile != null && !keyFile.isBlank() ? keyFile : "jwt_secret.key");
         try {
             byte[] keyBytes;
             if (Files.exists(path)) {

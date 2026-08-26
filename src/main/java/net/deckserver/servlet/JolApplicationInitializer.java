@@ -4,6 +4,7 @@ import net.deckserver.jobs.GameCleanUp;
 import net.deckserver.jobs.PublicGameBuilder;
 import net.deckserver.jobs.RegistrationReconciliation;
 import net.deckserver.jobs.TournamentJob;
+import net.deckserver.jpa.JpaFactory;
 import net.deckserver.services.*;
 import net.deckserver.ws.JolWebSocketEndpoint;
 import org.slf4j.Logger;
@@ -31,6 +32,13 @@ public class JolApplicationInitializer implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         logger.info("Web application context initialized");
+
+        // Test runs initialize JPA themselves against H2 (JolServiceExtension) before
+        // any service singleton is touched; skip here to avoid clobbering that with a
+        // real Postgres connection attempt.
+        if (!PersistedService.isTestMode()) {
+            JpaFactory.initialize();
+        }
 
         // Explicit registration rather than relying on @ServerEndpoint annotation
         // scanning to find JolWebSocketEndpoint — observed in prod (official
@@ -88,5 +96,8 @@ public class JolApplicationInitializer implements ServletContextListener {
 
         scheduler.shutdown();
 
+        if (!PersistedService.isTestMode()) {
+            JpaFactory.shutdown();
+        }
     }
 }

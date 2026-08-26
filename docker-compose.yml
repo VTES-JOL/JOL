@@ -17,12 +17,35 @@ services:
       - "traefik.http.routers.prod-root.middlewares=prod-root-redirect"
     env_file: .keys
     environment:
-      JOL_DATA: /data
       TYPE: "prod"
       JDK_JAVA_OPTIONS: -Djava.security.egd=file:/dev/./urandom -Xmx2048m
+      JOL_DB_URL: jdbc:postgresql://prod-db:5432/jol
+      JOL_DB_USER: jol
+      JOL_DB_PASSWORD: ${PROD_DB_PASSWORD:?set PROD_DB_PASSWORD in .env}
+      VAPID_KEY_FILE: /data/vapid_private.pem
+      JWT_SECRET_FILE: /data/jwt_secret.key
+    depends_on:
+      prod-db:
+        condition: service_healthy
     volumes:
       - prod-data:/data
       - prod-app:/usr/local/tomcat/webapps
+  prod-db:
+    image: postgres:16
+    container_name: prod-db
+    networks:
+      - web
+    environment:
+      POSTGRES_DB: jol
+      POSTGRES_USER: jol
+      POSTGRES_PASSWORD: ${PROD_DB_PASSWORD:?set PROD_DB_PASSWORD in .env}
+    volumes:
+      - prod-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jol -d jol"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   test:
     image: tomcat:9-jdk21-corretto
     container_name: test
@@ -40,17 +63,6 @@ services:
     volumes:
       - test-data:/data
       - test-app:/usr/local/tomcat/webapps
-  static:
-    image: nginx
-    container_name: static
-    networks:
-      - web
-    labels:
-      - "traefik.http.routers.static.entrypoints=websecure"
-      - "traefik.http.routers.static.rule=Host(`static.deckserver.net`)"
-      - "traefik.http.routers.static.tls.certresolver=myresolver"
-    volumes:
-      - static-data:/usr/share/nginx/html
 networks:
   web:
     external: true
@@ -63,5 +75,5 @@ volumes:
     external: true
   test-app:
     external: true
-  static-data:
+  prod-db-data:
     external: true

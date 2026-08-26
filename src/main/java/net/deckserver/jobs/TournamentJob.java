@@ -14,11 +14,6 @@ import net.deckserver.storage.json.system.TournamentRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,37 +29,6 @@ public class TournamentJob implements Runnable {
 
         // Create final tables -> disabled will be done manually
         //startFinals();
-
-        // Check running tournaments have decks
-        checkForDecks();
-    }
-
-    private void checkForDecks() {
-        // Check running tournaments have decks
-        List<TournamentMetadata> runningTournaments = TournamentService.getActiveTournaments();
-        for (TournamentMetadata tournament : runningTournaments) {
-            String tournamentName = tournament.getName();
-            for (int round = 1; round <= tournament.getNumberOfRounds(); round++) {
-                for (int table = 1; table <= tournament.getNumberOfTables(); table++) {
-                    String gameName = String.format("%s: Round %d - Table %d", tournamentName, round, table);
-                    String gameId = GameService.get(gameName).getId();
-                    List<TournamentPlayer> players = TournamentService.getPlayers(tournamentName, round, table);
-                    for (TournamentPlayer player : players) {
-                        String playerName = player.getName();
-                        var registration = TournamentService.getRegistrations(tournamentName, playerName).orElseThrow();
-                        Path gameDeckPath = DataPaths.path("games", gameId, registration.getDeck() + ".json");
-                        Path tournamentDeckPath = DataPaths.path("tournaments", tournament.getId(), registration.getDeck() + ".json");                        if (!Files.exists(gameDeckPath)) {
-                            try {
-                                Files.copy(tournamentDeckPath, gameDeckPath, StandardCopyOption.REPLACE_EXISTING);
-                                log.info("Copying missing tournament game file for {} - {} Round {} - Table {}", tournamentName, playerName, round, table);
-                            } catch (IOException e) {
-                                log.error("Unable to copy tournament file");
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private void startTournament() {
@@ -91,7 +55,8 @@ public class TournamentJob implements Runnable {
                         ExtendedDeck deck = TournamentService.getTournamentDeck(tournamentName, deckId);
                         assert deck != null;
                         // Create Registration
-                        RegistrationService.registerDeck(gameName, playerName, deckId, deck.getDeck().getName(), deck.getStats().getSummary());
+                        RegistrationService.registerDeck(gameName, playerName, deckId, deck.getDeck().getName(),
+                                deck.getStats().getSummary(), DeckService.serializeDeck(deck));
                         // Add player and deck
                         jolGame.addPlayer(playerName, deck.getDeck());
                     }
@@ -100,7 +65,7 @@ public class TournamentJob implements Runnable {
                     // Save game
                     GameService.saveGame(jolGame);
                     // Update status
-                    GameService.get(gameName).setStatus(GameStatus.ACTIVE);
+                    GameService.updateGameInfo(gameName, info -> info.setStatus(GameStatus.ACTIVE));
                 }
             }
             // Start tournament
@@ -125,7 +90,8 @@ public class TournamentJob implements Runnable {
                     ExtendedDeck deck = TournamentService.getTournamentDeck(tournamentName, deckId);
                     assert deck != null;
                     // Create Registration
-                    RegistrationService.registerDeck(gameName, playerName, deckId, deck.getDeck().getName(), deck.getStats().getSummary());
+                    RegistrationService.registerDeck(gameName, playerName, deckId, deck.getDeck().getName(),
+                            deck.getStats().getSummary(), DeckService.serializeDeck(deck));
                     // Add player and deck
                     jolGame.addPlayer(playerName, deck.getDeck());
                     NotificationService.pingPlayer(playerName, null, gameName);
@@ -135,7 +101,7 @@ public class TournamentJob implements Runnable {
                 // Save game
                 GameService.saveGame(jolGame);
                 // Update status
-                GameService.get(gameName).setStatus(GameStatus.ACTIVE);
+                GameService.updateGameInfo(gameName, info -> info.setStatus(GameStatus.ACTIVE));
                 GlobalChatService.chat("SYSTEM", String.format("Game %s started", gameName));
                 ChatService.sendSystemMessage(gameId, "Finals Seating has been activated.");
             }

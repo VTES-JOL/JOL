@@ -25,3 +25,6 @@ aws/*
 
 # Certs
 *.pem
+
+# Auto-generated local JWT signing key (see AuthService.loadOrCreateKey)
+jwt_secret.key

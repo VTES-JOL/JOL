@@ -26,7 +26,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Path;
 import java.security.KeyPair;
 import java.security.Security;
 import java.time.Duration;
@@ -95,6 +94,11 @@ public class NotificationService {
 
             if (!PlayerService.get(playerName).isNotificationsEnabled()) {
                 logger.debug("Notifications disabled for player: {}", playerName);
+                return;
+            }
+
+            if (keyPair == null) {
+                logger.debug("VAPID key not configured — skipping push notification for {}", playerName);
                 return;
             }
 
@@ -183,14 +187,24 @@ public class NotificationService {
         }
     }
 
+    /**
+     * Loads the VAPID key pair from the PEM file named by the VAPID_KEY_FILE env var.
+     * Returns null when unset or unreadable — web push is then disabled rather than
+     * failing class initialization for an otherwise-optional feature.
+     */
     private static KeyPair loadKey() {
-        Path keyPath = DataPaths.path("vapid_private.pem");
-        try (FileInputStream stream = new FileInputStream(keyPath.toFile()); InputStreamReader reader = new InputStreamReader(stream)) {
+        String keyFile = System.getenv("VAPID_KEY_FILE");
+        if (keyFile == null || keyFile.isBlank()) {
+            logger.warn("VAPID_KEY_FILE not set — web push notifications disabled");
+            return null;
+        }
+        try (FileInputStream stream = new FileInputStream(keyFile); InputStreamReader reader = new InputStreamReader(stream)) {
             PEMParser pemParser = new PEMParser(reader);
             PEMKeyPair pemKeyPair = (PEMKeyPair) pemParser.readObject();
             return new JcaPEMKeyConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME).getKeyPair(pemKeyPair);
         } catch (IOException e) {
-            throw new RuntimeException("Could not read private key");
+            logger.error("Could not read VAPID key from {} — web push notifications disabled", keyFile, e);
+            return null;
         }
     }
 }

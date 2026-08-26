@@ -8,14 +8,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Build WAR
 ./mvnw clean package
 
+# Start local Postgres (required), then optionally load fixture data
+docker compose -f local-docker-compose.yml up -d db
+./migrate-to-db.sh src/test/resources/data   # reset DB + import fixture data
+./load-test-fixtures.sh                      # shorthand for the line above; resets local `db` to Player1-5 fixture data
+
 # Run locally (Tomcat 9, app served at /jol)
-JOL_DATA=src/test/resources/data ./mvnw tomcat9:run
+JOL_DB_PASSWORD=jol ./mvnw tomcat9:run
 
 # Run the React frontend dev server alongside it (separate terminal) —
 # see frontend/vite.config.ts's top comment for how this proxies to Tomcat
 cd frontend && npm install && npm run dev
 
-# Run all tests (excludes "Builder" group by default)
+# Run all tests (excludes "Builder" group by default; uses in-memory H2, no Postgres needed)
 ./mvnw test
 
 # Run a single test class
@@ -35,7 +40,7 @@ npm run test
 npm run test:e2e
 ```
 
-Tests require `JOL_DATA` and `ENABLE_TEST_MODE=true` — these are set via `@SetEnvironmentVariable` on the test classes, so no manual setup is needed when running via Maven.
+Tests require `ENABLE_TEST_MODE=true` — set via `@SetEnvironmentVariable` on the test classes, so no manual setup is needed when running via Maven. Service-level tests boot an in-memory H2 database populated from `src/test/resources/data` by `JolServiceExtension`/`JolFixtureLoader` (see `src/test/resources/META-INF/persistence.xml`) — register any new JPA entity in both persistence units there, not just the main one, or JPA-backed tests fail with "Unknown entity type".
 
 The `Builder` tag is excluded from the default test run — these are `CardDatabaseBuilder` tests that regenerate static card JSON/HTML served from `static.deckserver.net`.
 
@@ -43,18 +48,22 @@ The `Builder` tag is excluded from the default test run — these are `CardDatab
 
 | Variable | Purpose |
 |---|---|
-| `JOL_DATA` | Path to data directory (required) |
-| `ENABLE_TEST_MODE` | Disables scheduled persistence (set to `true` in tests) |
+| `JOL_DB_URL` | JDBC URL (default `jdbc:postgresql://localhost:5432/jol`) |
+| `JOL_DB_USER` / `JOL_DB_PASSWORD` | Database credentials (default user `jol`) |
+| `JOL_DB_POOL_SIZE` | HikariCP max pool size (default 10) |
+| `ENABLE_TEST_MODE` | Skips `JpaFactory.initialize()` at startup (test classes initialize their own H2 instance via `JolServiceExtension` instead) and makes every service's write-through methods (`PersistedService.jpaWrite`/`jpaWriteThenMutate`/`jpaWriteWithRollback`) a no-op that only updates in-memory state — so tests never touch a real database. Set to `true` in tests. |
 | `ENABLE_CAPTCHA` | Set to `false` for local dev |
 | `JOL_RECAPTCHA_KEY` / `JOL_RECAPTCHA_SECRET` | reCAPTCHA credentials |
 | `DISCORD_BOT_TOKEN` / `DISCORD_PING_CHANNEL_ID` | Discord integration |
-| `VAPID_PUBLIC_KEY` | Web push (VAPID) public key, fetched via `GET /jol/api/config` (`ConfigResource`) and used client-side by `frontend/src/push/pushNotifications.ts` for `pushManager.subscribe()`. Set via `.keys` (see `docker-compose.yml`'s `env_file`). The matching private key is **not** an env var — `NotificationService` reads it from `<JOL_DATA>/vapid_private.pem`, so that file must be copied into the `JOL_DATA` volume (e.g. from `notifications/vapid_private.pem`) for any environment that needs to send pushes. |
+| `VAPID_PUBLIC_KEY` | Web push (VAPID) public key, fetched via `GET /jol/api/config` (`ConfigResource`) and used client-side by `frontend/src/push/pushNotifications.ts` for `pushManager.subscribe()`. Set via `.keys` (see `docker-compose.yml`'s `env_file`). |
+| `VAPID_KEY_FILE` | Path to the VAPID private key PEM file. `NotificationService` reads it at startup; web push is silently disabled (not a startup failure) when unset or unreadable. In `docker-compose.yml` this points at `/data/vapid_private.pem` on the persisted `prod-data` volume — that file must be copied there manually (e.g. from `notifications/vapid_private.pem`) for any environment that needs to send pushes. |
+| `JWT_SECRET_FILE` | Path to the JWT signing key file (base64, HMAC). `AuthService` generates and writes one on first run if the file doesn't exist yet. Falls back to `jwt_secret.key` in the working directory when unset — fine for local dev, but set explicitly in any environment where the working directory isn't stable/persistent. |
 | `TYPE` | Visual env label (`dev`, `prod`, etc.) |
 | `BASE_URL` | Origin card images/HTML/JSON tooltips are fetched from — exposed via `GET /jol/api/config` (`ConfigResource`), read by the React app's `getBaseUrl()` (`frontend/src/api/config.ts`). Only matters for a production build: in `npm run dev`, `getBaseUrl()` unconditionally returns a relative path instead, since Vite's own `serveCardAssets.ts` already serves the local `static/` directory directly — this env var is never consulted in dev at all. Defaults to `https://static.dev.deckserver.net`, which never resolves to anything reachable outside prod (it was only ever an `/etc/hosts` entry pointing at a now-removed local nginx container). Unset in prod (`docker-compose.yml`), where the real default is correct. |
 
 ## Architecture Overview
 
-This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deckserver.net), packaged as a Java WAR deployed on Tomcat 9. It uses **no database** — all state is persisted as JSON/XML files under `JOL_DATA`.
+This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deckserver.net), packaged as a Java WAR deployed on Tomcat 9. State is persisted in **PostgreSQL** via JPA (Hibernate 7 + Flyway + HikariCP): each service holds an authoritative in-memory copy and writes through to the DB on mutation (single-node assumption — see `PersistedService`'s javadoc). `migrate-to-db.sh` (repo root) resets the DB and imports the legacy `JOL_DATA` JSON files — useful for seeding a fresh Postgres from an old JSON snapshot, but the running app itself never reads those files.
 
 ### Request Flow
 
@@ -62,18 +71,21 @@ This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deck
 2. The SPA's `api/client.ts` (a thin fetch wrapper) calls `/jol/api/...` directly — there's no hand-written JS shim between them anymore (the old `ds.js` client and every legacy JSP it drove were deleted wholesale in the React migration)
 3. Jersey JAX-RS resources (`net.deckserver.rest`) handle each endpoint and delegate to **`JolAdmin`** or services
 4. `JolAdmin` manages in-memory `GameModel` / `PlayerModel` maps and routes to **`JolGame`** or **`DoCommand`**
-5. Services persist state back to JSON files on a schedule (via `PersistedService`) or on demand
+5. Services write through to PostgreSQL immediately (`PersistedService.jpaWrite`/`jpaWriteThenMutate`/`jpaWriteWithRollback`), or batch-flush on a schedule for high-frequency, low-value writes (`PlayerActivityService`/`PlayerGameActivityService` — see their class comments for why those two specifically stay batched rather than write-through)
 6. Server-push notifications are sent over WebSocket (`/ws/updates`) via `WebSocketRegistry`; the SPA treats each push as a signal to re-fetch (`ws/useGameSocket.ts`, `ws/useJolSocket.ts`), not as a payload carrier itself
 
 ### Package Map
 
 - **`net.deckserver`** — `JolAdmin` (singleton orchestrator); `Recaptcha`
 - **`net.deckserver.services`** — static service singletons
-  - `PersistedService` — abstract base: scheduled JSON persistence, test-mode bypass, graceful shutdown (call `shutdown()` from `ServletContextListener`, not JVM hooks)
-  - `DataPaths` — resolves `JOL_DATA` env var; use `DataPaths.path(...)` to build file paths
-  - `GameService`, `PlayerService`, `DeckService`, `CardService`, `ChatService`, etc.
-- **`net.deckserver.storage.json`**
-  - `system/` — top-level data files: `GameInfo`, `PlayerInfo`, `DeckInfo`, `GameHistory`, tournament classes
+  - `PersistedService` — abstract base: graceful shutdown (call `shutdown()` from `ServletContextListener`, not JVM hooks), test-mode bypass, and the `jpaRead`/`jpaWrite`/`jpaWriteThenMutate`/`jpaWriteWithRollback`/`jpaWriteAlways` helpers every service's mutations go through
+  - `GameService`, `PlayerService`, `DeckService`, `CardService`, `ChatService`, etc. — most hold an authoritative in-memory copy backed by write-through JPA; a few (`DeckService`, `HistoryService`) have no cache at all and read straight from JPA on every call
+- **`net.deckserver.jpa`** — the JPA layer the services above delegate to
+  - `JpaFactory` — bootstraps HikariCP + Flyway (`db/migration/`) + the `EntityManagerFactory`; `initialize()` for the real app, `initializeWithEmf()` for tests (see `JolServiceExtension`)
+  - `entity/` — one `@Entity` per table (`PlayerEntity`, `GameInfoEntity`, `GameStateEntity`, `RegistrationEntity`, `DeckInfoEntity`/`DeckContentEntity`, `TournamentEntity`/`TournamentRegistrationEntity`, `GameChatEntity`, `GlobalChatEntity`, `GameHistoryEntity`, `GameSnapshotEntity`, `PlayerActivityEntity`/`GameActivityEntity`, `SiteNotesEntity`, `SubscriptionEntity`, `RefreshTokenEntity`)
+  - `repository/` — one per entity/aggregate, holding the actual JPQL/`EntityManager` calls; services never touch `EntityManager` directly except via these
+- **`net.deckserver.storage.json`** — these classes are the domain/API model now, not a file format — every one is still what services hold in memory and what REST beans wrap, just no longer what gets serialized to disk
+  - `system/` — `GameInfo`, `PlayerInfo`, `DeckInfo`, `GameHistory`, `RefreshTokenInfo`, tournament classes
   - `game/` — in-game state: `GameData`, `PlayerData`, `RegionData`, `CardData`, `TurnData`
   - `deck/` — deck structure: `Deck`, `Crypt`, `Library`, `DeckParser`
   - `cards/` — `CardSummary`, `SecuredCardLoader`
@@ -104,24 +116,14 @@ This is a **Vampire: The Eternal Struggle (VTES) online card game server** (deck
 - **`net.deckserver.ws`** — WebSocket push
   - `JolWebSocketEndpoint` — `@ServerEndpoint("/ws/updates")`; shares HTTP session auth; handles join/leave/ping frames
   - `WebSocketRegistry` — tracks player→session mapping; `notifyMain()` / `notifyGame(gameId)` push update signals to clients
-- **`net.deckserver.jobs`** — background jobs: `GameCleanUp`, `PublicGameBuilder`, `TournamentJob`, `GameDataConversion`
+- **`net.deckserver.jobs`** — background jobs: `GameCleanUp`, `PublicGameBuilder`, `TournamentJob`, `RegistrationReconciliation`
 - **`net.deckserver.push`** — Web Push notification support
 
-### Data File Layout (under `JOL_DATA`)
+### Database Schema
 
-```
-games.json          # Map<name, GameInfo>
-players.json        # Map<name, PlayerInfo>
-decks.json          # Map<playerName, Map<deckName, DeckInfo>>
-registrations.json  # Map<gameName, Map<playerName, RegistrationStatus>>
-pastGames.json      # Map<timestamp, GameHistory>
-tournament.json     # TournamentData
-chats.json          # List<ChatEntry>
-timestamps.json     # Timestamps
-decks/              # *.json  — deck files (ULID-named)
-games/<uuid>/       # game.json, game.xml, actions.xml, <deckId>.json
-cards/              # vtescrypt.csv, vteslib.csv  (VEKN official)
-```
+Tables live in one Postgres database, versioned by Flyway migrations under `src/main/resources/db/migration/` (`V1__baseline.sql` onward — add a new `V<n>__description.sql` file for schema changes, never edit a merged one). Roughly: `player`/`player_role`/`player_activity`, `game`/`game_state`/`game_snapshot`/`game_chat`/`game_activity`/`game_history`, `deck_info`/`deck_content`, `registration`, `tournament`/`tournament_registration`, `global_chat`, `site_notes`, `subscription`, `refresh_token`. Most large free-form structures (game state, deck content, tournament rounds/rules) are stored as a JSON/text blob in a single column rather than fully normalized — the JPA entity's `toXxx()`/`from()` methods handle the (de)serialization against the matching `net.deckserver.storage.json.*` class.
+
+`cards/` (VEKN's `vtescrypt.csv`/`vteslib.csv`) and the generated `static/` tooltip assets are unrelated to this schema — see `CardService`/`CardDatabaseBuilder`, untouched by the JPA migration.
 
 ### Frontend + API Notes
 
@@ -135,6 +137,6 @@ The entire client is now `frontend/` — a Vite/TypeScript/React SPA. Every lega
 
 ### Deployment
 
-- Docker: `docker-compose.yml` runs `prod`, `test`, and `static` (nginx, serving prebuilt card assets from a named volume) containers in production, fronted by Traefik for TLS termination and routing
+- Docker: `docker-compose.yml` runs `prod` (+ its own `prod-db` Postgres), `test`, and `static` (nginx, serving prebuilt card assets from a named volume) containers in production, fronted by Traefik for TLS termination and routing. `local-docker-compose.yml` is dev-only and much smaller — just a local Postgres `db` service; it has no Traefik/nginx, since the Vite dev server's own proxy (see `frontend/vite.config.ts`) already covers local routing
 - Session clustering: Redisson (Redis) Tomcat session manager (configured in `tomcat9-maven-plugin` dependencies)
 - AWS CloudFront SDK included for CDN invalidation

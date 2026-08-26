@@ -6,9 +6,11 @@ import net.deckserver.game.enums.RegionType;
 import net.deckserver.game.enums.Sect;
 import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
+import net.deckserver.services.JolServiceExtension;
 import net.deckserver.storage.json.game.CardData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SetEnvironmentVariable(key = "JOL_DATA", value = "src/test/resources/data")
 @SetEnvironmentVariable(key = "ENABLE_TEST_MODE", value = "true")
+@ExtendWith(JolServiceExtension.class)
 public class DoCommandTest {
 
     private JolGame game;

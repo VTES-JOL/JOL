@@ -2,6 +2,8 @@ package net.deckserver.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import jakarta.persistence.EntityManager;
+import net.deckserver.jpa.JpaFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +11,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Base class for services that require scheduled persistence, graceful shutdown,
@@ -19,6 +23,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <p>
  * NOTE: Shutdown should be triggered via ServletContextListener, not JVM shutdown hooks,
  * to avoid classloader issues in servlet containers.
+ * <p>
+ * NOTE: The in-memory state held by these services is authoritative and the database is
+ * a write-through copy. This assumes a single app node — a second node would diverge
+ * immediately, so scaling out requires moving reads to the database first.
  */
 public abstract class PersistedService {
 
@@ -49,7 +57,8 @@ public abstract class PersistedService {
      * Constructor that initialises the service with scheduled persistence.
      *
      * @param serviceName Name of the service (used for logging and thread naming)
-     * @param persistenceIntervalMinutes How often to persist data (in minutes)
+     * @param persistenceIntervalMinutes How often to persist data (in minutes);
+     *                                   0 for write-through services that need no background flush
      */
     protected PersistedService(String serviceName, int persistenceIntervalMinutes) {
         this.serviceName = serviceName;
@@ -64,7 +73,7 @@ public abstract class PersistedService {
         });
 
         // Start a scheduled persistence task if not in test mode
-        if (!testModeEnabled) {
+        if (!testModeEnabled && persistenceIntervalMinutes > 0) {
             scheduler.scheduleAtFixedRate(
                     this::scheduledPersist,
                     persistenceIntervalMinutes,
@@ -117,6 +126,115 @@ public abstract class PersistedService {
      */
     protected boolean shouldSkipPersistence() {
         return testModeEnabled || isShuttingDown.get();
+    }
+
+    /**
+     * Run a read action against a short-lived EntityManager, returning the result.
+     * Returns null on failure — callers should treat null as "not found" and log if needed.
+     */
+    protected <T> T jpaRead(Function<EntityManager, T> action) {
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            return action.apply(em);
+        } catch (Exception e) {
+            logger.error("{} JPA read failed", serviceName, e);
+            return null;
+        }
+    }
+
+    /**
+     * Run a write action in its own transaction, rolling back on failure.
+     * In test mode the write is skipped and treated as successful — the in-memory
+     * state is authoritative there.
+     *
+     * @return true if the write committed (or was skipped in test mode); false if it
+     * failed and was rolled back — callers that mutated in-memory state first should
+     * revert it to stay consistent with the database.
+     */
+    protected boolean jpaWrite(Consumer<EntityManager> action) {
+        if (testModeEnabled) return true;
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            try {
+                em.getTransaction().begin();
+                action.accept(em);
+                em.getTransaction().commit();
+                return true;
+            } catch (Exception e) {
+                logger.error("{} JPA write failed", serviceName, e);
+                try {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                } catch (Exception rollbackError) {
+                    logger.error("{} rollback failed", serviceName, rollbackError);
+                }
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Persist first, then publish the in-memory mutation. Test mode still applies
+     * the memory mutation because no database write is expected there.
+     */
+    protected boolean jpaWriteThenMutate(Consumer<EntityManager> action, Runnable mutation) {
+        if (testModeEnabled || jpaWrite(action)) {
+            mutation.run();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * For APIs that must mutate an existing object before it can be saved, roll
+     * the local state back if the database write fails.
+     */
+    protected boolean jpaWriteWithRollback(Runnable mutation, Consumer<EntityManager> action, Runnable rollback) {
+        mutation.run();
+        if (testModeEnabled || jpaWrite(action)) {
+            return true;
+        }
+        rollback.run();
+        return false;
+    }
+
+    protected void requireJpaWrite(Consumer<EntityManager> action) {
+        if (!jpaWrite(action)) {
+            throw new IllegalStateException(serviceName + " JPA write failed");
+        }
+    }
+
+    /**
+     * Like {@link #jpaWrite}, but always executes — even in test mode. For services
+     * with no in-memory cache of their own (reads go straight to JPA on every call,
+     * e.g. DeckService), skipping the write in test mode would leave nothing for a
+     * subsequent read to find; the H2 test database itself is the only state such a
+     * service has, so it isn't optional there the way it is for write-through caches.
+     */
+    protected boolean jpaWriteAlways(Consumer<EntityManager> action) {
+        try (EntityManager em = JpaFactory.createEntityManager()) {
+            try {
+                em.getTransaction().begin();
+                action.accept(em);
+                em.getTransaction().commit();
+                return true;
+            } catch (Exception e) {
+                logger.error("{} JPA write failed", serviceName, e);
+                try {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                } catch (Exception rollbackError) {
+                    logger.error("{} rollback failed", serviceName, rollbackError);
+                }
+                return false;
+            }
+        }
+    }
+
+    protected void requireJpaWriteAlways(Consumer<EntityManager> action) {
+        if (!jpaWriteAlways(action)) {
+            throw new IllegalStateException(serviceName + " JPA write failed");
+        }
     }
 
     /**
@@ -175,15 +293,6 @@ public abstract class PersistedService {
      */
     protected void performAdditionalCleanup() {
         // Default: no additional cleanup
-    }
-
-    /**
-     * Get the base path for data storage.
-     *
-     * @return The base path from the DataPaths service
-     */
-    protected String getBasePath() {
-        return DataPaths.baseDir().toString();
     }
 
     /**

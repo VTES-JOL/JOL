@@ -8,7 +8,6 @@ import net.deckserver.game.enums.PlayerRole;
 import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.services.SiteNotesService;
-import net.deckserver.storage.json.system.PlayerInfo;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -113,8 +112,7 @@ public class AdminPageResource extends BaseResource {
     @Path("roles/{name}")
     public void setRole(@PathParam("name") String player, RoleRequest body) {
         requireAdmin();
-        PlayerInfo target = PlayerService.get(player);
-        JolAdmin.setRole(target, PlayerRole.valueOf(body.role()), body.value());
+        JolAdmin.setRole(player, PlayerRole.valueOf(body.role()), body.value());
     }
 
     @PUT

@@ -118,12 +118,8 @@ public class JolAdmin {
 
     public static Deck getGameDeck(String gameName, String playerName) {
         return Optional.ofNullable(RegistrationService.getRegistration(gameName, playerName))
-                .map(status -> {
-                    String deckId = status.getDeckId();
-                    String gameId = getGameId(gameName);
-                    ExtendedDeck extendedDeck = DeckService.getGameDeck(gameId, deckId);
-                    return extendedDeck.getDeck();
-                }).orElse(null);
+                .map(status -> DeckService.deserializeDeck(status.getDeckContent()).getDeck())
+                .orElse(null);
     }
 
     public static DeckEdit selectDeck(String playerName, String deckName) {
@@ -226,15 +222,11 @@ public class JolAdmin {
                 result = "Unable to register deck in game that has no invite";
                 throw new IllegalStateException(result);
             }
-            boolean copySuccess = DeckService.copyDeck(deckInfo.getDeckId(), gameInfo.getId());
-            if (!copySuccess) {
-                result = "Unable to copy deck file to game";
-                throw new IllegalStateException(result);
-            }
-            RegistrationService.registerDeck(gameName, playerName, deckInfo.getDeckId(), deckName, extendedDeck.getStats().getSummary());
+            RegistrationService.registerDeck(gameName, playerName, deckInfo.getDeckId(), deckName,
+                    extendedDeck.getStats().getSummary(), DeckService.serializeDeck(extendedDeck));
 
             // Reset game time to the current time to extend idle timeout
-            gameInfo.setUpdated(OffsetDateTime.now());
+            GameService.updateGameInfo(gameName, info -> info.setUpdated(OffsetDateTime.now()));
 
             long registeredPlayers = RegistrationService.getRegisteredPlayerCount(gameName);
             if (registeredPlayers == gameInfo.getGameFormat().getPlayerCount()) {
@@ -294,10 +286,10 @@ public class JolAdmin {
     }
 
     public static synchronized void setImageTooltipPreference(String player, boolean value) {
-        PlayerService.get(player).setShowImages(value);
+        PlayerService.setImageTooltipPreference(player, value);
     }
     public static synchronized void setEdgeColor(String player, String value) {
-        PlayerService.get(player).setEdgeColor(value);
+        PlayerService.setEdgeColor(player, value);
     }
 
     public static synchronized boolean getImageTooltipPreference(String player) {
@@ -315,7 +307,7 @@ public class JolAdmin {
     }
 
     public static synchronized void setNotificationPreference(String player, boolean value) {
-        PlayerService.get(player).setNotificationsEnabled(value);
+        PlayerService.setNotificationPreference(player, value);
     }
 
     public static synchronized boolean getNotificationPreference(String player) {
@@ -401,7 +393,7 @@ public class JolAdmin {
         if (!game.getPlayers().isEmpty() && game.getPlayers().size() <= 5) {
             game.startGame(players);
             saveGameState(game);
-            gameInfo.setStatus(GameStatus.ACTIVE);
+            GameService.updateGameInfo(gameName, info -> info.setStatus(GameStatus.ACTIVE));
             pingPlayer(game.getActivePlayer(), gameName);
             WebSocketRegistry.notifyInvalidate(List.of("nav"));
             WebSocketRegistry.notifyInvalidate(List.of("watch"));
@@ -600,12 +592,8 @@ public class JolAdmin {
         }
     }
 
-    public static void setRole(PlayerInfo info, PlayerRole role, boolean enabled) {
-        if (enabled) {
-            info.getRoles().add(role);
-        } else {
-            info.getRoles().remove(role);
-        }
+    public static void setRole(String playerName, PlayerRole role, boolean enabled) {
+        PlayerService.setRole(playerName, role, enabled);
     }
 
 }
