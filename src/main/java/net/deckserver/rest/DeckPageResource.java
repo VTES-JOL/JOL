@@ -5,8 +5,8 @@ import net.deckserver.rest.bean.DeckPageBean;
 import net.deckserver.rest.bean.DeckEdit;
 import net.deckserver.game.enums.GameFormat;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 
 /**
  * Dedicated, envelope-free reads/writes for the React deck page — same role

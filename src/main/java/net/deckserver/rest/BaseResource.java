@@ -1,9 +1,8 @@
 package net.deckserver.rest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.SecurityContext;
 
 public abstract class BaseResource {
 
@@ -11,10 +10,7 @@ public abstract class BaseResource {
     protected SecurityContext sc;
 
     @Context
-    protected HttpServletRequest httpRequest;
-
-    @Context
-    protected HttpServletResponse httpResponse;
+    protected HttpHeaders headers;
 
     protected String username() {
         return sc.getUserPrincipal().getName();
@@ -27,6 +23,6 @@ public abstract class BaseResource {
      * broadcast it triggers. Null for any client that doesn't send it.
      */
     protected String clientId() {
-        return httpRequest.getHeader("X-Client-Id");
+        return headers.getHeaderString("X-Client-Id");
     }
 }

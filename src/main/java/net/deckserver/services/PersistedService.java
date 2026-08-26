@@ -2,17 +2,24 @@ package net.deckserver.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import io.quarkus.arc.Arc;
+import io.quarkus.runtime.ShutdownEvent;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.event.Observes;
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.JpaFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Base class for services that require scheduled persistence, graceful shutdown,
@@ -46,6 +53,42 @@ public abstract class PersistedService {
     public static boolean isTestMode() {
         return TEST_MODE;
     }
+
+    /**
+     * Resolves the CDI-managed singleton for a PersistedService subclass —
+     * shared by every subclass's private {@code instance()} accessor.
+     * <p>
+     * Under Quarkus (`quarkus:dev`, or once the app is deployed for real),
+     * Arc's container is running and this is a cheap lookup of the
+     * `@Startup`-eagerly-created `@Singleton` bean (not `@ApplicationScoped`
+     * — that's a CDI "normal scope", meaning `Instance.get()` returns a
+     * client proxy whose direct field access silently misses the real
+     * instance's state; see {@link ChatService}'s `instance()` javadoc for
+     * how this was actually discovered). Plain JUnit tests
+     * never bootstrap Quarkus's runtime at all (no `@QuarkusTest` — that's
+     * a deliberate choice, not an oversight: see JolServiceExtension, which
+     * keeps this test suite fast by avoiding a full Quarkus boot per test
+     * class), so `Arc.container()` returns null there — in that case this
+     * falls back to a plain lazily-created singleton, cached per type,
+     * exactly matching what the old `private static final X INSTANCE = new X()`
+     * field used to provide.
+     */
+    @SuppressWarnings("unchecked")
+    protected static <T extends PersistedService> T resolve(Class<T> type, Supplier<T> fallbackFactory) {
+        if (Arc.container() != null) {
+            return Arc.container().instance(type).get();
+        }
+        // No CDI container means no automatic @PostConstruct either — call
+        // initialize() explicitly so the fallback path still loads data on
+        // first use, exactly like the old constructor-calls-load() pattern.
+        return (T) FALLBACK_INSTANCES.computeIfAbsent(type, t -> {
+            T created = fallbackFactory.get();
+            created.initialize();
+            return created;
+        });
+    }
+
+    private static final Map<Class<?>, PersistedService> FALLBACK_INSTANCES = new ConcurrentHashMap<>();
 
     protected final Logger logger;
     protected final String serviceName;
@@ -85,6 +128,37 @@ public abstract class PersistedService {
         }
 
         // DO NOT add shutdown hook here - use ServletContextListener instead
+    }
+
+    /**
+     * Runs after CDI construction/injection completes — the single place
+     * {@link #load()} is invoked from now (subclass constructors used to
+     * call it directly; centralized here since it's identical boilerplate
+     * in every subclass, and CDI's own lifecycle guarantees this runs before
+     * any other bean can observe a fully-constructed instance).
+     */
+    @PostConstruct
+    protected void initialize() {
+        load();
+    }
+
+    /**
+     * CDI-managed graceful shutdown, replacing the explicit
+     * JolApplicationInitializer.contextDestroyed() call to {@link #shutdown()}
+     * (still present for now, harmless double-call-guarded by
+     * isShuttingDown — see {@link #shutdown()} — until that class is retired).
+     * <p>
+     * Deliberately {@code @Observes ShutdownEvent}, not {@code @PreDestroy}:
+     * confirmed empirically that {@code @PreDestroy} races against Arc's own
+     * context teardown — Quarkus's Hibernate ORM extension had already closed
+     * its EntityManagerFactory by the time some services' {@code @PreDestroy}
+     * fired, so their final {@link #shutdown()}-triggered persist() threw
+     * "EntityManagerFactory is closed". ShutdownEvent is explicitly documented
+     * as firing before Quarkus tears down extensions, giving this a real
+     * chance to flush pending writes.
+     */
+    protected void onCdiDestroy(@Observes ShutdownEvent ev) {
+        shutdown();
     }
 
     /**

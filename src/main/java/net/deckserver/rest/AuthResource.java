@@ -9,21 +9,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.cloudfront.cookie.CookiesForCustomPolicy;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.Response;
+
+import java.util.List;
 
 /**
  * Login/register/logout, replacing LoginServlet/RegisterServlet/LogoutServlet's
  * doPost handlers now that login.jsp is gone — the React login page (served
  * statically, unauthenticated) calls these directly instead of submitting an
  * HTML form. All three are excluded from SecurityFilter's auth requirement
- * (see PUBLIC_PATHS there): login/register run before any token exists, and
+ * (see PUBLIC_PATHS there): login/register run before any token exists at all;
  * logout must still clear cookies even if the access token already expired.
  */
 @Path("/auth")
@@ -32,18 +34,16 @@ public class AuthResource {
     private static final Logger logger = LoggerFactory.getLogger(AuthResource.class);
 
     @Context
-    HttpServletRequest httpRequest;
+    HttpHeaders headers;
 
-    @Context
-    HttpServletResponse httpResponse;
-
-    /** Called by ds.js/api/client.ts after any API call gets a 401 — silently mints a new access token off the refresh cookie. */
+    /** Called by api/client.ts after any API call gets a 401 — silently mints a new access token off the refresh cookie. */
     @POST
     @Path("refresh")
     public Response refresh() {
-        return AuthService.authenticate(httpRequest, httpResponse)
-                .map(username -> Response.ok().build())
-                .orElseGet(() -> Response.status(Response.Status.UNAUTHORIZED).build());
+        AuthService.AuthResult result = AuthService.authenticate(headers);
+        Response response = (result.username().isPresent() ? Response.ok() : Response.status(Response.Status.UNAUTHORIZED)).build();
+        attachCookies(response, result.cookiesToSet());
+        return response;
     }
 
     @POST
@@ -53,11 +53,12 @@ public class AuthResource {
         if (!PlayerService.authenticate(request.username(), request.password())) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-        AuthService.issueTokens(request.username(), request.remember(), httpRequest, httpResponse);
+        Response response = Response.ok().build();
+        attachCookies(response, AuthService.issueTokens(request.username(), request.remember(), headers));
         if (JolAdmin.isPlaytester(request.username())) {
-            setupPlaytestAuth(httpResponse);
+            attachPlaytestAuthCookies(response);
         }
-        return Response.ok().build();
+        return response;
     }
 
     @POST
@@ -74,23 +75,33 @@ public class AuthResource {
         if (!PlayerService.registerPlayer(request.username(), request.password(), request.email())) {
             return Response.status(Response.Status.CONFLICT).build();
         }
-        AuthService.issueTokens(request.username(), false, httpRequest, httpResponse);
-        return Response.ok().build();
+        Response response = Response.ok().build();
+        attachCookies(response, AuthService.issueTokens(request.username(), false, headers));
+        return response;
     }
 
     @POST
     @Path("logout")
     public Response logout() {
-        AuthService.currentUsername(httpRequest).ifPresent(JolAdmin::remove);
-        AuthService.clearAuth(httpRequest, httpResponse);
-        return Response.ok().build();
+        AuthService.currentUsername(headers).ifPresent(JolAdmin::remove);
+        Response response = Response.ok().build();
+        attachCookies(response, AuthService.clearAuth(headers));
+        return response;
     }
 
     private boolean captchaEnabled() {
         return System.getenv().getOrDefault("ENABLE_CAPTCHA", "true").equals("true");
     }
 
-    private void setupPlaytestAuth(HttpServletResponse response) {
+    // MultivaluedMap.add is unambiguously additive, unlike ResponseBuilder.header()
+    // chaining — mutating the already-built Response's own header map directly
+    // lets this compose cleanly with attachPlaytestAuthCookies's raw Set-Cookie
+    // strings on the same response.
+    private void attachCookies(Response response, List<NewCookie> cookies) {
+        cookies.forEach(c -> response.getHeaders().add(HttpHeaders.SET_COOKIE, c));
+    }
+
+    private void attachPlaytestAuthCookies(Response response) {
         logger.info("Setting up playtest auth cookies");
         SecuredCardLoader cardLoader = new SecuredCardLoader("/secured/*");
         try {
@@ -98,9 +109,9 @@ public class AuthResource {
             if (!devMode) {
                 String additionalSettings = ";HttpOnly; Domain=deckserver.net; Path=/; Secure;";
                 CookiesForCustomPolicy cookies = cardLoader.generateCookies();
-                response.addHeader("Set-Cookie", cookies.policyHeaderValue() + additionalSettings);
-                response.addHeader("Set-Cookie", cookies.signatureHeaderValue() + additionalSettings);
-                response.addHeader("Set-Cookie", cookies.keyPairIdHeaderValue() + additionalSettings);
+                response.getHeaders().add(HttpHeaders.SET_COOKIE, cookies.policyHeaderValue() + additionalSettings);
+                response.getHeaders().add(HttpHeaders.SET_COOKIE, cookies.signatureHeaderValue() + additionalSettings);
+                response.getHeaders().add(HttpHeaders.SET_COOKIE, cookies.keyPairIdHeaderValue() + additionalSettings);
             }
         } catch (Exception e) {
             logger.error("Unable to set playtest auth cookies", e);

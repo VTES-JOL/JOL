@@ -1,5 +1,8 @@
 package net.deckserver.services;
 
+import io.quarkus.runtime.Startup;
+import jakarta.inject.Singleton;
+
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.Streams;
@@ -19,10 +22,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+@Singleton
+@Startup
 public class PlayerService extends PersistedService {
 
     private static final PlayerRepository playerRepository = new PlayerRepository();
-    private static final PlayerService INSTANCE = new PlayerService();
+    private static PlayerService instance() {
+        return resolve(PlayerService.class, PlayerService::new);
+    }
     private static final LoadingCache<String, UserSummary> activeUsers = Caffeine.newBuilder()
             .expireAfterWrite(1, TimeUnit.HOURS)
             .refreshAfterWrite(1, TimeUnit.MINUTES)
@@ -30,9 +37,8 @@ public class PlayerService extends PersistedService {
     private static final Predicate<UserSummary> RECENTLY_ONLINE = summary -> OffsetDateTime.parse(summary.getLastOnline()).plusMinutes(30).isAfter(OffsetDateTime.now());
     private final Map<String, PlayerInfo> players = new ConcurrentHashMap<>();
 
-    private PlayerService() {
+    PlayerService() {
         super("PlayerService", 0);
-        load();
     }
 
     private static UserSummary generateSummary(String playerName) {
@@ -57,7 +63,7 @@ public class PlayerService extends PersistedService {
     }
 
     public static boolean existsPlayer(String name) {
-        return name != null && INSTANCE.players.containsKey(name);
+        return name != null && instance().players.containsKey(name);
     }
 
     public static boolean registerPlayer(String name, String password, String email) {
@@ -65,9 +71,9 @@ public class PlayerService extends PersistedService {
             return false;
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
         PlayerInfo player = new PlayerInfo(name, ULID.random(), email, hash);
-        return INSTANCE.jpaWriteThenMutate(
+        return instance().jpaWriteThenMutate(
                 em -> playerRepository.save(em, player),
-                () -> INSTANCE.players.put(name, player));
+                () -> instance().players.put(name, player));
     }
 
     public static boolean authenticate(String playerName, String password) {
@@ -84,7 +90,7 @@ public class PlayerService extends PersistedService {
         String hash = BCrypt.hashpw(password, BCrypt.gensalt(13));
         PlayerInfo info = loadPlayerInfo(player);
         String previousHash = info.getHash();
-        INSTANCE.jpaWriteWithRollback(
+        instance().jpaWriteWithRollback(
                 () -> info.setHash(hash),
                 em -> playerRepository.save(em, info),
                 () -> info.setHash(previousHash));
@@ -96,7 +102,7 @@ public class PlayerService extends PersistedService {
         String previousEmail = playerInfo.getEmail();
         String previousVeknId = playerInfo.getVeknId();
         String previousCountryCode = playerInfo.getCountryCode();
-        if (INSTANCE.jpaWriteWithRollback(
+        if (instance().jpaWriteWithRollback(
                 () -> {
                     playerInfo.setDiscordId(discordID);
                     playerInfo.setEmail(email);
@@ -117,7 +123,7 @@ public class PlayerService extends PersistedService {
     public static void setImageTooltipPreference(String playerName, boolean value) {
         PlayerInfo playerInfo = loadPlayerInfo(playerName);
         boolean previousValue = playerInfo.isShowImages();
-        INSTANCE.jpaWriteWithRollback(
+        instance().jpaWriteWithRollback(
                 () -> playerInfo.setShowImages(value),
                 em -> playerRepository.save(em, playerInfo),
                 () -> playerInfo.setShowImages(previousValue));
@@ -126,7 +132,7 @@ public class PlayerService extends PersistedService {
     public static void setEdgeColor(String playerName, String value) {
         PlayerInfo playerInfo = loadPlayerInfo(playerName);
         String previousValue = playerInfo.getEdgeColor();
-        INSTANCE.jpaWriteWithRollback(
+        instance().jpaWriteWithRollback(
                 () -> playerInfo.setEdgeColor(value),
                 em -> playerRepository.save(em, playerInfo),
                 () -> playerInfo.setEdgeColor(previousValue));
@@ -135,7 +141,7 @@ public class PlayerService extends PersistedService {
     public static void setNotificationPreference(String playerName, boolean value) {
         PlayerInfo playerInfo = loadPlayerInfo(playerName);
         boolean previousValue = playerInfo.isNotificationsEnabled();
-        INSTANCE.jpaWriteWithRollback(
+        instance().jpaWriteWithRollback(
                 () -> playerInfo.setNotificationsEnabled(value),
                 em -> playerRepository.save(em, playerInfo),
                 () -> playerInfo.setNotificationsEnabled(previousValue));
@@ -144,7 +150,7 @@ public class PlayerService extends PersistedService {
     public static void setRole(String playerName, PlayerRole role, boolean enabled) {
         PlayerInfo playerInfo = loadPlayerInfo(playerName);
         Set<PlayerRole> previousRoles = new HashSet<>(playerInfo.getRoles());
-        INSTANCE.jpaWriteWithRollback(
+        instance().jpaWriteWithRollback(
                 () -> {
                     if (enabled) {
                         playerInfo.getRoles().add(role);
@@ -160,8 +166,8 @@ public class PlayerService extends PersistedService {
     }
 
     private static PlayerInfo loadPlayerInfo(String playerName) {
-        if (INSTANCE.players.containsKey(playerName)) {
-            return INSTANCE.players.get(playerName);
+        if (instance().players.containsKey(playerName)) {
+            return instance().players.get(playerName);
         }
         throw new IllegalArgumentException("Player: " + playerName + " was not found.");
     }
@@ -171,17 +177,17 @@ public class PlayerService extends PersistedService {
     }
 
     public static Set<String> getPlayers() {
-        return INSTANCE.players.keySet();
+        return instance().players.keySet();
     }
 
     public static void remove(String name) {
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> playerRepository.delete(em, name),
-                () -> INSTANCE.players.remove(name));
+                () -> instance().players.remove(name));
     }
 
     public static PersistedService getInstance() {
-        return INSTANCE;
+        return instance();
     }
 
     @Override

@@ -12,9 +12,11 @@ concurrency:
 
 env:
   JAVA_VERSION: '21'
-  # Must match pom.xml's frontend-maven-plugin <nodeVersion> — that plugin
-  # installs its own pinned Node for `mvn package`, but jobs below run plain
-  # npm directly and need a matching one from setup-node instead.
+  # quarkus.quinoa.package-manager-install=false (application.properties) —
+  # Quinoa uses whatever Node is already on PATH rather than installing its
+  # own pinned one, so every job that triggers a Quinoa build (package, e2e;
+  # not backend-test, which never touches Quinoa/frontend at all) needs
+  # setup-node too, matching this version.
   NODE_VERSION: '22.17.0'
 
 jobs:
@@ -38,9 +40,9 @@ jobs:
       # instead of an empty list.
       - name: Stage test card fixture
         run: mkdir -p static/secured && cp src/test/resources/data/cards/cards.json static/secured/cards.json
-      # Bound to prepare-package (see pom.xml's frontend-maven-plugin
-      # comment), so this never touches Node/npm — that's covered by
-      # frontend-check below.
+      # Plain `mvn test` never triggers Quinoa's build (that only runs as
+      # part of quarkus:build/quarkus:dev or full packaging — see the
+      # package/e2e jobs below), so this needs no Node/npm at all.
       - name: Run backend tests
         run: ./mvnw --batch-mode --no-transfer-progress test
 
@@ -49,24 +51,24 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: frontend
+        working-directory: src/main/webui
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: src/main/webui/package-lock.json
       - run: npm ci
       - run: npm run lint
       - run: npm run test
-      # tsc -b + vite build — the same build `mvn package` triggers via
-      # frontend-maven-plugin, run here too so a type error or broken build
-      # fails fast without needing a full Maven build to surface it.
+      # tsc -b + vite build — the same build Quinoa triggers as part of
+      # `mvn package`, run here too so a type error or broken build fails
+      # fast without needing a full Maven build to surface it.
       - run: npm run build
 
   package:
-    name: Build WAR (bundles the built frontend into the WAR)
+    name: Build the Quarkus app (bundles the built frontend in via Quinoa)
     needs: [backend-test, frontend-check]
     runs-on: ubuntu-latest
     steps:
@@ -76,24 +78,50 @@ jobs:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
           cache: maven
-      # No setup-node here: frontend-maven-plugin installs its own pinned
-      # Node (see pom.xml) as part of the build. Tests already ran in the
-      # two jobs above, so this only needs to prove the packaging step
-      # itself — including the frontend build + maven-war-plugin staging
-      # target/react-dist into WEB-INF/../react/ — still succeeds.
-      - name: Build WAR
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: src/main/webui/package-lock.json
+      # Tests already ran in the two jobs above, so this only needs to prove
+      # the packaging step itself — including Quinoa's frontend build —
+      # still succeeds.
+      - name: Build
         run: ./mvnw --batch-mode --no-transfer-progress clean package -DskipTests
-      - name: Upload WAR
+      # target/quarkus-app/ is the actual runnable artifact ("fast jar" mode,
+      # Quarkus's default) — run it with `java -jar quarkus-app/quarkus-run.jar`.
+      # Not target/jol.jar: that's the plain pre-Quarkus-augmentation jar,
+      # not runnable standalone.
+      - name: Upload runnable app
         uses: actions/upload-artifact@v4
         with:
-          name: jol-war
-          path: target/jol.war
+          name: jol-quarkus-app
+          path: target/quarkus-app/
           retention-days: 7
 
   e2e:
     name: End-to-end tests (Playwright)
     needs: [backend-test, frontend-check]
     runs-on: ubuntu-latest
+    # Matches local-docker-compose.yml's db service — playwright.config.ts's
+    # webServer command runs ./load-test-fixtures.sh against it (via psql,
+    # preinstalled on ubuntu-latest) before starting quarkus:dev, the same
+    # reset a developer runs locally, so these specs always start from known
+    # fixture state instead of accumulating drift across CI runs.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: jol
+          POSTGRES_USER: jol
+          POSTGRES_PASSWORD: jol
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U jol -d jol"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -105,40 +133,29 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: src/main/webui/package-lock.json
       - name: Install frontend deps
-        working-directory: frontend
+        working-directory: src/main/webui
         run: npm ci
       - name: Install Playwright browsers
-        working-directory: frontend
+        working-directory: src/main/webui
         run: npx playwright install --with-deps chromium
-      # See backend-test's "Stage test card fixture" step — the Tomcat
+      # See backend-test's "Stage test card fixture" step — the quarkus:dev
       # instance playwright.config.ts boots below hits the same CardService
       # fallback path, so it needs the fixture staged here too.
       - name: Stage test card fixture
         run: mkdir -p static/secured && cp src/test/resources/data/cards/cards.json static/secured/cards.json
-      # tomcat9:run (invoked directly by playwright.config.ts's webServer
-      # below) isn't bound to the Maven lifecycle, so it never runs the
-      # prepare-package step (pom.xml's ensure-react-dist-exists) that
-      # normally guarantees this directory exists. Without it, Tomcat's
-      # react/ DirResourceSet fails to initialize and the whole context
-      # fails to start — even though e2e specs hit the Vite dev server, not
-      # this directory's contents, so an empty dir is all that's needed here.
-      - name: Ensure target/react-dist exists for Tomcat's webResources
-        run: mkdir -p target/react-dist
-      # playwright.config.ts's webServer entries start both Tomcat (against
-      # a disposable copy of the test fixture data, so this never touches
-      # checked-in files — see frontend/README.md's Testing section) and the
-      # Vite dev server themselves; first Tomcat boot here is a cold start
-      # (fresh dependency resolution), hence the generous per-server timeout
-      # already configured there.
+      # playwright.config.ts's webServer entry resets Postgres to fixture
+      # data and starts quarkus:dev itself; first boot here is a cold start
+      # (fresh Maven + npm dependency resolution), hence the generous
+      # per-server timeout already configured there.
       - name: Run E2E tests
-        working-directory: frontend
+        working-directory: src/main/webui
         run: npm run test:e2e
       - name: Upload Playwright traces on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-traces
-          path: frontend/test-results/
+          path: src/main/webui/test-results/
           retention-days: 7

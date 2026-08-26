@@ -1,5 +1,8 @@
 package net.deckserver.services;
 
+import io.quarkus.runtime.Startup;
+import jakarta.inject.Singleton;
+
 import io.azam.ulidj.ULID;
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.JpaFactory;
@@ -27,10 +30,14 @@ import java.util.concurrent.TimeUnit;
  * stored hash means an old, already-rotated-away token was replayed, so the row
  * is revoked defensively.
  */
+@Singleton
+@Startup
 public class RefreshTokenService extends PersistedService {
 
     private static final RefreshTokenRepository refreshTokenRepository = new RefreshTokenRepository();
-    private static final RefreshTokenService INSTANCE = new RefreshTokenService();
+    private static RefreshTokenService instance() {
+        return resolve(RefreshTokenService.class, RefreshTokenService::new);
+    }
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final long TTL_REMEMBER_MILLIS = TimeUnit.DAYS.toMillis(30);
     private static final long TTL_SESSION_MILLIS = TimeUnit.HOURS.toMillis(12);
@@ -38,13 +45,12 @@ public class RefreshTokenService extends PersistedService {
 
     private final Map<String, List<RefreshTokenInfo>> tokensByPlayer = new HashMap<>();
 
-    private RefreshTokenService() {
+    RefreshTokenService() {
         super("RefreshTokenService", 0);
-        load();
     }
 
     public static PersistedService getInstance() {
-        return INSTANCE;
+        return instance();
     }
 
     public record Issued(String cookieValue, String id) {
@@ -66,9 +72,9 @@ public class RefreshTokenService extends PersistedService {
         info.setExpiresAt(now + ttl);
         info.setRemember(remember);
 
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> refreshTokenRepository.save(em, playerName, info),
-                () -> INSTANCE.tokensByPlayer.computeIfAbsent(playerName, k -> new ArrayList<>()).add(info));
+                () -> instance().tokensByPlayer.computeIfAbsent(playerName, k -> new ArrayList<>()).add(info));
         return new Issued(id + "." + secret, id);
     }
 
@@ -82,7 +88,7 @@ public class RefreshTokenService extends PersistedService {
         String id = cookieValue.substring(0, dot);
         String secret = cookieValue.substring(dot + 1);
 
-        for (List<RefreshTokenInfo> tokens : INSTANCE.tokensByPlayer.values()) {
+        for (List<RefreshTokenInfo> tokens : instance().tokensByPlayer.values()) {
             for (RefreshTokenInfo info : tokens) {
                 if (!info.getId().equals(id)) continue;
 
@@ -90,7 +96,7 @@ public class RefreshTokenService extends PersistedService {
                 if (info.getExpiresAt() < now || !MessageDigest.isEqual(
                         HexFormat.of().parseHex(info.getSecretHash()),
                         HexFormat.of().parseHex(hash(secret)))) {
-                    INSTANCE.jpaWriteThenMutate(
+                    instance().jpaWriteThenMutate(
                             em -> refreshTokenRepository.delete(em, id),
                             () -> tokens.remove(info));
                     return Optional.empty();
@@ -104,7 +110,7 @@ public class RefreshTokenService extends PersistedService {
                 long newExpiresAt = Math.min(now + (info.isRemember() ? TTL_REMEMBER_MILLIS : TTL_SESSION_MILLIS),
                         info.getCreatedAt() + ABSOLUTE_MAX_AGE_MILLIS);
 
-                INSTANCE.jpaWriteWithRollback(
+                instance().jpaWriteWithRollback(
                         () -> {
                             info.setSecretHash(hash(newSecret));
                             info.setLastUsedAt(now);
@@ -127,37 +133,37 @@ public class RefreshTokenService extends PersistedService {
         if (cookieValue == null) return;
         int dot = cookieValue.indexOf('.');
         String id = dot < 0 ? cookieValue : cookieValue.substring(0, dot);
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> refreshTokenRepository.delete(em, id),
-                () -> INSTANCE.tokensByPlayer.values().forEach(tokens -> tokens.removeIf(t -> t.getId().equals(id))));
+                () -> instance().tokensByPlayer.values().forEach(tokens -> tokens.removeIf(t -> t.getId().equals(id))));
     }
 
     public static synchronized void revoke(String playerName, String id) {
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> refreshTokenRepository.delete(em, id),
                 () -> {
-                    List<RefreshTokenInfo> tokens = INSTANCE.tokensByPlayer.get(playerName);
+                    List<RefreshTokenInfo> tokens = instance().tokensByPlayer.get(playerName);
                     if (tokens != null) tokens.removeIf(t -> t.getId().equals(id));
                 });
     }
 
     public static synchronized void revokeAll(String playerName) {
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> refreshTokenRepository.deleteAllForPlayer(em, playerName),
-                () -> INSTANCE.tokensByPlayer.remove(playerName));
+                () -> instance().tokensByPlayer.remove(playerName));
     }
 
     public static synchronized List<RefreshTokenInfo> list(String playerName) {
-        return List.copyOf(INSTANCE.tokensByPlayer.getOrDefault(playerName, List.of()));
+        return List.copyOf(instance().tokensByPlayer.getOrDefault(playerName, List.of()));
     }
 
     public static synchronized void cleanupExpired() {
         long now = System.currentTimeMillis();
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> refreshTokenRepository.deleteExpired(em, now),
                 () -> {
-                    INSTANCE.tokensByPlayer.values().forEach(tokens -> tokens.removeIf(t -> t.getExpiresAt() < now));
-                    INSTANCE.tokensByPlayer.entrySet().removeIf(e -> e.getValue().isEmpty());
+                    instance().tokensByPlayer.values().forEach(tokens -> tokens.removeIf(t -> t.getExpiresAt() < now));
+                    instance().tokensByPlayer.entrySet().removeIf(e -> e.getValue().isEmpty());
                 });
     }
 

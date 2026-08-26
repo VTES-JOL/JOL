@@ -2,22 +2,22 @@ package net.deckserver.services;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.NewCookie;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import javax.crypto.SecretKey;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,44 +31,37 @@ class AuthServiceTest {
     @Test
     void issueTokens_setsHttpOnlySecureCookies_andAccessTokenResolvesUsername() {
         String player = uniquePlayer();
-        List<Cookie> issuedCookies = new ArrayList<>();
 
-        AuthService.issueTokens(player, true, request(null, "/jol", "JUnit-Agent"), response(issuedCookies));
+        List<NewCookie> issuedCookies = AuthService.issueTokens(player, true, headers(Map.of(), "JUnit-Agent"));
 
         assertThat(issuedCookies, hasSize(2));
-        for (Cookie cookie : issuedCookies) {
-            assertThat(cookie.getSecure(), is(true));
+        for (NewCookie cookie : issuedCookies) {
+            assertThat(cookie.isSecure(), is(true));
             assertThat(cookie.isHttpOnly(), is(true));
+            // MicroProfile Config resolves application.properties via plain
+            // classpath discovery, independent of whether Quarkus's own
+            // runtime/CDI container is running — so quarkus.http.root-path
+            // resolves here too, even in this plain JUnit test.
             assertThat(cookie.getPath(), is("/jol"));
         }
 
-        Cookie accessCookie = issuedCookies.stream().filter(AuthServiceTest::looksLikeJwt).findFirst().orElseThrow();
+        NewCookie accessCookie = issuedCookies.stream().filter(AuthServiceTest::looksLikeJwt).findFirst().orElseThrow();
         assertThat(AuthService.parseAccessToken(accessCookie.getValue()), is(Optional.of(player)));
     }
 
     @Test
-    void issueTokens_defaultsCookiePathToRoot_whenContextPathEmpty() {
-        List<Cookie> issuedCookies = new ArrayList<>();
-
-        AuthService.issueTokens(uniquePlayer(), false, request(null, "", "JUnit-Agent"), response(issuedCookies));
-
-        assertThat(issuedCookies, everyItem(hasProperty("path", is("/"))));
-    }
-
-    @Test
     void currentUsername_returnsEmpty_whenNoCookiePresent() {
-        assertThat(AuthService.currentUsername(request(null, "/jol", "JUnit-Agent")), is(Optional.empty()));
+        assertThat(AuthService.currentUsername(headers(Map.of(), "JUnit-Agent")), is(Optional.empty()));
     }
 
     @Test
     void currentUsername_returnsUsername_forValidAccessToken() {
         String player = uniquePlayer();
-        List<Cookie> issuedCookies = new ArrayList<>();
-        AuthService.issueTokens(player, false, request(null, "/jol", "JUnit-Agent"), response(issuedCookies));
-        Cookie accessCookie = issuedCookies.stream().filter(AuthServiceTest::looksLikeJwt).findFirst().orElseThrow();
+        List<NewCookie> issuedCookies = AuthService.issueTokens(player, false, headers(Map.of(), "JUnit-Agent"));
+        NewCookie accessCookie = issuedCookies.stream().filter(AuthServiceTest::looksLikeJwt).findFirst().orElseThrow();
 
         Optional<String> resolved = AuthService.currentUsername(
-                request(new Cookie[]{accessCookie}, "/jol", "JUnit-Agent"));
+                headers(Map.of(accessCookie.getName(), toRequestCookie(accessCookie)), "JUnit-Agent"));
 
         assertThat(resolved, is(Optional.of(player)));
     }
@@ -76,12 +69,11 @@ class AuthServiceTest {
     @Test
     void currentUsername_returnsEmpty_forTamperedToken() {
         String player = uniquePlayer();
-        List<Cookie> issuedCookies = new ArrayList<>();
-        AuthService.issueTokens(player, false, request(null, "/jol", "JUnit-Agent"), response(issuedCookies));
-        Cookie accessCookie = issuedCookies.stream().filter(AuthServiceTest::looksLikeJwt).findFirst().orElseThrow();
-        Cookie tampered = new Cookie(accessCookie.getName(), accessCookie.getValue() + "x");
+        List<NewCookie> issuedCookies = AuthService.issueTokens(player, false, headers(Map.of(), "JUnit-Agent"));
+        NewCookie accessCookie = issuedCookies.stream().filter(AuthServiceTest::looksLikeJwt).findFirst().orElseThrow();
+        Cookie tampered = new Cookie.Builder(accessCookie.getName()).value(accessCookie.getValue() + "x").build();
 
-        assertThat(AuthService.currentUsername(request(new Cookie[]{tampered}, "/jol", "JUnit-Agent")),
+        assertThat(AuthService.currentUsername(headers(Map.of(tampered.getName(), tampered), "JUnit-Agent")),
                 is(Optional.empty()));
     }
 
@@ -100,43 +92,38 @@ class AuthServiceTest {
     @Test
     void authenticate_returnsUsername_withoutRotation_whenAccessTokenValid() {
         String player = uniquePlayer();
-        List<Cookie> issuedCookies = new ArrayList<>();
-        AuthService.issueTokens(player, false, request(null, "/jol", "JUnit-Agent"), response(issuedCookies));
-        Cookie accessCookie = issuedCookies.stream().filter(AuthServiceTest::looksLikeJwt).findFirst().orElseThrow();
+        List<NewCookie> issuedCookies = AuthService.issueTokens(player, false, headers(Map.of(), "JUnit-Agent"));
+        NewCookie accessCookie = issuedCookies.stream().filter(AuthServiceTest::looksLikeJwt).findFirst().orElseThrow();
 
-        List<Cookie> secondResponseCookies = new ArrayList<>();
-        Optional<String> result = AuthService.authenticate(
-                request(new Cookie[]{accessCookie}, "/jol", "JUnit-Agent"), response(secondResponseCookies));
+        AuthService.AuthResult result = AuthService.authenticate(
+                headers(Map.of(accessCookie.getName(), toRequestCookie(accessCookie)), "JUnit-Agent"));
 
-        assertThat(result, is(Optional.of(player)));
+        assertThat(result.username(), is(Optional.of(player)));
         assertThat("a valid access token should short-circuit before touching the refresh flow",
-                secondResponseCookies, is(empty()));
+                result.cookiesToSet(), is(empty()));
     }
 
     @Test
     void authenticate_returnsEmpty_whenNoCookiesAtAll() {
-        List<Cookie> responseCookies = new ArrayList<>();
-        Optional<String> result = AuthService.authenticate(
-                request(null, "/jol", "JUnit-Agent"), response(responseCookies));
+        AuthService.AuthResult result = AuthService.authenticate(headers(Map.of(), "JUnit-Agent"));
 
-        assertThat(result, is(Optional.empty()));
-        assertThat(responseCookies, is(empty()));
+        assertThat(result.username(), is(Optional.empty()));
+        assertThat(result.cookiesToSet(), is(empty()));
     }
 
     @Test
     void authenticate_silentlyRefreshesAndRotates_whenAccessExpiredButRefreshValid() {
         String player = uniquePlayer();
         RefreshTokenService.Issued issued = RefreshTokenService.issue(player, "JUnit-Agent", true);
-        Cookie refreshCookie = new Cookie("jol_rt", issued.cookieValue());
+        Cookie refreshCookie = new Cookie.Builder("jol_rt").value(issued.cookieValue()).build();
 
-        List<Cookie> responseCookies = new ArrayList<>();
-        Optional<String> result = AuthService.authenticate(
-                request(new Cookie[]{refreshCookie}, "/jol", "JUnit-Agent"), response(responseCookies));
+        AuthService.AuthResult result = AuthService.authenticate(
+                headers(Map.of("jol_rt", refreshCookie), "JUnit-Agent"));
 
-        assertThat(result, is(Optional.of(player)));
-        assertThat(responseCookies, hasSize(2));
-        Cookie newAccess = responseCookies.stream().filter(AuthServiceTest::looksLikeJwt).findFirst().orElseThrow();
-        Cookie newRefresh = responseCookies.stream().filter(c -> !looksLikeJwt(c)).findFirst().orElseThrow();
+        assertThat(result.username(), is(Optional.of(player)));
+        assertThat(result.cookiesToSet(), hasSize(2));
+        NewCookie newAccess = result.cookiesToSet().stream().filter(AuthServiceTest::looksLikeJwt).findFirst().orElseThrow();
+        NewCookie newRefresh = result.cookiesToSet().stream().filter(c -> !looksLikeJwt(c)).findFirst().orElseThrow();
         assertThat(AuthService.parseAccessToken(newAccess.getValue()), is(Optional.of(player)));
         assertThat("refresh token must rotate on use", newRefresh.getValue(), not(equalTo(issued.cookieValue())));
 
@@ -146,27 +133,25 @@ class AuthServiceTest {
 
     @Test
     void authenticate_clearsRefreshCookie_whenRefreshTokenInvalid() {
-        Cookie bogusRefresh = new Cookie("jol_rt", "not-a-real-token.value");
+        Cookie bogusRefresh = new Cookie.Builder("jol_rt").value("not-a-real-token.value").build();
 
-        List<Cookie> responseCookies = new ArrayList<>();
-        Optional<String> result = AuthService.authenticate(
-                request(new Cookie[]{bogusRefresh}, "/jol", "JUnit-Agent"), response(responseCookies));
+        AuthService.AuthResult result = AuthService.authenticate(
+                headers(Map.of("jol_rt", bogusRefresh), "JUnit-Agent"));
 
-        assertThat(result, is(Optional.empty()));
-        assertThat(responseCookies, hasSize(1));
-        assertThat(responseCookies.get(0).getMaxAge(), is(0));
+        assertThat(result.username(), is(Optional.empty()));
+        assertThat(result.cookiesToSet(), hasSize(1));
+        assertThat(result.cookiesToSet().get(0).getMaxAge(), is(0));
     }
 
     @Test
     void clearAuth_revokesRefreshToken_andClearsBothCookies() {
         String player = uniquePlayer();
         RefreshTokenService.Issued issued = RefreshTokenService.issue(player, "JUnit-Agent", true);
-        Cookie refreshCookie = new Cookie("jol_rt", issued.cookieValue());
-        Cookie accessCookie = new Cookie("jol_at", "irrelevant");
+        Cookie refreshCookie = new Cookie.Builder("jol_rt").value(issued.cookieValue()).build();
+        Cookie accessCookie = new Cookie.Builder("jol_at").value("irrelevant").build();
 
-        List<Cookie> responseCookies = new ArrayList<>();
-        AuthService.clearAuth(request(new Cookie[]{accessCookie, refreshCookie}, "/jol", "JUnit-Agent"),
-                response(responseCookies));
+        List<NewCookie> responseCookies = AuthService.clearAuth(
+                headers(Map.of("jol_at", accessCookie, "jol_rt", refreshCookie), "JUnit-Agent"));
 
         assertThat(responseCookies, hasSize(2));
         assertThat(responseCookies, everyItem(hasProperty("maxAge", is(0))));
@@ -174,8 +159,12 @@ class AuthServiceTest {
                 RefreshTokenService.validateAndRotate(issued.cookieValue()), is(Optional.empty()));
     }
 
-    private static boolean looksLikeJwt(Cookie cookie) {
+    private static boolean looksLikeJwt(NewCookie cookie) {
         return AuthService.parseAccessToken(cookie.getValue()).isPresent();
+    }
+
+    private static Cookie toRequestCookie(NewCookie newCookie) {
+        return new Cookie.Builder(newCookie.getName()).value(newCookie.getValue()).build();
     }
 
     private static String uniquePlayer() {
@@ -184,38 +173,23 @@ class AuthServiceTest {
 
     private static SecretKey loadTestSigningKey() throws Exception {
         Path keyFile = Path.of("src", "test", "resources", "data", "jwt_secret.key");
-        byte[] keyBytes = Base64.getDecoder().decode(Files.readString(keyFile).strip());
+        byte[] keyBytes = java.util.Base64.getDecoder().decode(Files.readString(keyFile).strip());
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    private static HttpServletRequest request(Cookie[] cookies, String contextPath, String userAgent) {
-        return (HttpServletRequest) Proxy.newProxyInstance(
+    /** Minimal HttpHeaders fake — AuthService only calls getCookies() and getHeaderString("User-Agent"). */
+    private static HttpHeaders headers(Map<String, Cookie> cookies, String userAgent) {
+        return (HttpHeaders) Proxy.newProxyInstance(
                 AuthServiceTest.class.getClassLoader(),
-                new Class<?>[]{HttpServletRequest.class},
+                new Class<?>[]{HttpHeaders.class},
                 (proxy, method, args) -> switch (method.getName()) {
                     case "getCookies" -> cookies;
-                    case "getContextPath" -> contextPath;
-                    case "getHeader" -> "User-Agent".equals(args[0]) ? userAgent : null;
-                    case "toString" -> "FakeHttpServletRequest";
+                    case "getHeaderString" -> "User-Agent".equals(args[0]) ? userAgent : null;
+                    case "getMediaType" -> MediaType.APPLICATION_JSON_TYPE;
+                    case "toString" -> "FakeHttpHeaders";
                     case "equals" -> proxy == args[0];
                     case "hashCode" -> System.identityHashCode(proxy);
                     default -> defaultReturn(method.getReturnType());
-                });
-    }
-
-    private static HttpServletResponse response(List<Cookie> sink) {
-        return (HttpServletResponse) Proxy.newProxyInstance(
-                AuthServiceTest.class.getClassLoader(),
-                new Class<?>[]{HttpServletResponse.class},
-                (proxy, method, args) -> {
-                    if ("addCookie".equals(method.getName())) {
-                        sink.add((Cookie) args[0]);
-                        return null;
-                    }
-                    if ("toString".equals(method.getName())) return "FakeHttpServletResponse";
-                    if ("equals".equals(method.getName())) return proxy == args[0];
-                    if ("hashCode".equals(method.getName())) return System.identityHashCode(proxy);
-                    return defaultReturn(method.getReturnType());
                 });
     }
 

@@ -1,5 +1,8 @@
 package net.deckserver.services;
 
+import io.quarkus.runtime.Startup;
+import jakarta.inject.Singleton;
+
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import jakarta.persistence.EntityManager;
@@ -28,6 +31,8 @@ import java.util.function.Predicate;
 
 import static net.deckserver.JolAdmin.saveGameState;
 
+@Singleton
+@Startup
 public class GameService extends PersistedService {
 
     public static final Predicate<GameInfo> STARTING_GAME = (info) -> info.getStatus().equals(GameStatus.STARTING);
@@ -39,7 +44,9 @@ public class GameService extends PersistedService {
     private static final GameChatRepository gameChatRepository = new GameChatRepository();
     private static final GameSnapshotRepository gameSnapshotRepository = new GameSnapshotRepository();
     private static final GameActivityRepository gameActivityRepository = new GameActivityRepository();
-    private static final GameService INSTANCE = new GameService();
+    private static GameService instance() {
+        return resolve(GameService.class, GameService::new);
+    }
     private final LoadingCache<String, JolGame> gameCache = Caffeine.newBuilder()
             .expireAfterAccess(30, TimeUnit.MINUTES)
             .build(GameService::loadGame);
@@ -50,13 +57,12 @@ public class GameService extends PersistedService {
             .refreshAfterWrite(30, TimeUnit.SECONDS)
             .build(GameService::generateSummary);
 
-    private GameService() {
+    GameService() {
         super("GameService", 5);
-        load();
     }
 
     public static GameInfo get(String name) {
-        return INSTANCE.games.get(name);
+        return instance().games.get(name);
     }
 
     /**
@@ -65,13 +71,13 @@ public class GameService extends PersistedService {
      * ends up with local state ahead of the database.
      */
     public static boolean updateGameInfo(String gameName, Consumer<GameInfo> mutation) {
-        GameInfo gameInfo = INSTANCE.games.get(gameName);
+        GameInfo gameInfo = instance().games.get(gameName);
         if (gameInfo == null) return false;
         GameInfo snapshot = copyGameInfo(gameInfo);
-        return INSTANCE.jpaWriteWithRollback(
+        return instance().jpaWriteWithRollback(
                 () -> mutation.accept(gameInfo),
                 em -> gameInfoRepository.save(em, gameInfo),
-                () -> INSTANCE.games.put(gameName, snapshot));
+                () -> instance().games.put(gameName, snapshot));
     }
 
     private static GameInfo copyGameInfo(GameInfo source) {
@@ -83,7 +89,7 @@ public class GameService extends PersistedService {
     }
 
     public static String getNameByGameId(String gameId) {
-        String name = INSTANCE.idToName.get(gameId);
+        String name = instance().idToName.get(gameId);
         if (name == null) throw new IllegalArgumentException("No game with id: " + gameId);
         return name;
     }
@@ -94,28 +100,28 @@ public class GameService extends PersistedService {
             return;
         }
         GameInfo gameInfo = new GameInfo(gameName, gameId, ownerName, visibility, GameStatus.STARTING, format);
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> gameInfoRepository.save(em, gameInfo),
                 () -> {
-                    INSTANCE.games.put(gameName, gameInfo);
-                    INSTANCE.idToName.put(gameId, gameName);
+                    instance().games.put(gameName, gameInfo);
+                    instance().idToName.put(gameId, gameName);
                 });
     }
 
     public static boolean existsGame(String name) {
-        return INSTANCE.games.containsKey(name);
+        return instance().games.containsKey(name);
     }
 
     public static Set<String> getGameNames() {
-        return INSTANCE.games.keySet();
+        return instance().games.keySet();
     }
 
     public static List<String> getActiveGames() {
-        return INSTANCE.games.values().stream().filter(ACTIVE_GAME).map(GameInfo::getName).sorted().toList();
+        return instance().games.values().stream().filter(ACTIVE_GAME).map(GameInfo::getName).sorted().toList();
     }
 
     public static long getPublicGameCount(GameFormat format) {
-        return INSTANCE.games.values().stream()
+        return instance().games.values().stream()
                 .filter(STARTING_GAME)
                 .filter(PUBLIC_GAME)
                 .filter(info -> info.getGameFormat().equals(format))
@@ -123,7 +129,7 @@ public class GameService extends PersistedService {
     }
 
     public static List<String> getStartingGames(boolean includePlayTest) {
-        return INSTANCE.games.values().stream()
+        return instance().games.values().stream()
                 .filter(STARTING_GAME)
                 .filter(info -> info.isPlayTest() && includePlayTest)
                 .map(GameInfo::getName
@@ -131,15 +137,15 @@ public class GameService extends PersistedService {
     }
 
     public static List<GameInfo> getGamesByOwner(String owner) {
-        return INSTANCE.games.values().stream().filter(info -> info.getOwner().equals(owner)).toList();
+        return instance().games.values().stream().filter(info -> info.getOwner().equals(owner)).toList();
     }
 
     public static List<GameInfo> getGamesByTournament(String tournamentName) {
-        return INSTANCE.games.values().stream().filter(info -> tournamentName.equals(info.getTournamentName())).toList();
+        return instance().games.values().stream().filter(info -> tournamentName.equals(info.getTournamentName())).toList();
     }
 
     public static List<String> getActiveGames(String owner) {
-        return INSTANCE.games.values().stream()
+        return instance().games.values().stream()
                 .filter(ACTIVE_GAME)
                 .filter(info -> info.getOwner().equals(owner))
                 .map(GameInfo::getName)
@@ -163,7 +169,7 @@ public class GameService extends PersistedService {
     }
 
     public static void remove(String gameName, String gameId) {
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> {
                     gameSnapshotRepository.deleteAllForGame(em, gameId);
                     gameChatRepository.delete(em, gameId);
@@ -173,10 +179,10 @@ public class GameService extends PersistedService {
                     gameInfoRepository.delete(em, gameName);
                 },
                 () -> {
-                    INSTANCE.games.remove(gameName);
-                    INSTANCE.idToName.remove(gameId);
-                    INSTANCE.gameCache.invalidate(gameId);
-                    INSTANCE.summaryMap.invalidate(gameName);
+                    instance().games.remove(gameName);
+                    instance().idToName.remove(gameId);
+                    instance().gameCache.invalidate(gameId);
+                    instance().summaryMap.invalidate(gameName);
                 });
     }
 
@@ -209,7 +215,7 @@ public class GameService extends PersistedService {
         String id = get(gameName).getId();
         JolGame game = loadSnapshot(id, turn);
         saveGameState(game, true);
-        INSTANCE.gameCache.refresh(id);
+        instance().gameCache.refresh(id);
     }
 
     public static void saveGame(JolGame game) {
@@ -217,16 +223,16 @@ public class GameService extends PersistedService {
         // based on a stale version fails with an optimistic lock conflict. The cache put below
         // is NOT similarly guarded, though: it's a plain put, not a compute(), so two concurrent
         // saveGame() calls can still race on which one's put lands last in the cache.
-        String gameName = INSTANCE.idToName.get(game.id());
-        if (gameName != null && INSTANCE.games.containsKey(gameName)) {
-            INSTANCE.requireJpaWrite(em -> gameStateRepository.save(em, game));
+        String gameName = instance().idToName.get(game.id());
+        if (gameName != null && instance().games.containsKey(gameName)) {
+            instance().requireJpaWrite(em -> gameStateRepository.save(em, game));
         }
-        INSTANCE.gameCache.put(game.id(), game);
+        instance().gameCache.put(game.id(), game);
     }
 
     public static void saveGame(JolGame game, String turn) {
         String snapshotTurn = snapshotTurn(turn);
-        INSTANCE.requireJpaWrite(em -> gameSnapshotRepository.save(em, game.id(), snapshotTurn, game.data()));
+        instance().requireJpaWrite(em -> gameSnapshotRepository.save(em, game.id(), snapshotTurn, game.data()));
     }
 
     // turn labels are normalized the same way the legacy game-<turn>.json filenames were
@@ -235,21 +241,21 @@ public class GameService extends PersistedService {
     }
 
     public static JolGame getGame(String gameId) {
-        return INSTANCE.gameCache.get(gameId);
+        return instance().gameCache.get(gameId);
     }
 
     public static GameSummary getSummary(String gameName) {
-        return INSTANCE.summaryMap.get(gameName);
+        return instance().summaryMap.get(gameName);
     }
 
     public static PersistedService getInstance() {
-        return INSTANCE;
+        return instance();
     }
 
     private static GameSummary generateSummary(String gameName) {
         logger.debug("Regenerating summary for {}", gameName);
-        GameInfo info = INSTANCE.games.get(gameName);
-        JolGame game = INSTANCE.gameCache.get(info.getId());
+        GameInfo info = instance().games.get(gameName);
+        JolGame game = instance().gameCache.get(info.getId());
         GameSummary summary = new GameSummary();
         summary.setName(game.getName());
         summary.setId(game.id());
@@ -284,7 +290,7 @@ public class GameService extends PersistedService {
 
     public static JolGame getGameByName(String gameName) {
         GameInfo gameInfo = get(gameName);
-        return INSTANCE.gameCache.get(gameInfo.getId());
+        return instance().gameCache.get(gameInfo.getId());
     }
 
     @Override

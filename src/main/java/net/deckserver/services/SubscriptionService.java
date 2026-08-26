@@ -1,5 +1,8 @@
 package net.deckserver.services;
 
+import io.quarkus.runtime.Startup;
+import jakarta.inject.Singleton;
+
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.repository.SubscriptionRepository;
@@ -11,33 +14,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Singleton
+@Startup
 public class SubscriptionService extends PersistedService {
 
     private static final int MAX_CONSECUTIVE_FAILURES = 5;
     private static final SubscriptionRepository subscriptionRepository = new SubscriptionRepository();
-    private static final SubscriptionService INSTANCE = new SubscriptionService();
+    private static SubscriptionService instance() {
+        return resolve(SubscriptionService.class, SubscriptionService::new);
+    }
     private final Map<String, List<Subscription>> subscriptions = new HashMap<>();
 
-    private SubscriptionService() {
+    SubscriptionService() {
         super("SubscriptionService", 0);
-        load();
     }
 
     public static synchronized void addSubscription(String playerName, Subscription subscription) {
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> subscriptionRepository.upsert(em, playerName, subscription),
                 () -> {
-                    List<Subscription> playerSubscriptions = INSTANCE.subscriptions.computeIfAbsent(playerName, name -> new ArrayList<>());
+                    List<Subscription> playerSubscriptions = instance().subscriptions.computeIfAbsent(playerName, name -> new ArrayList<>());
                     playerSubscriptions.removeIf(existing -> existing.getEndpoint().equals(subscription.getEndpoint()));
                     playerSubscriptions.add(subscription);
                 });
     }
 
     public static synchronized void removeSubscription(String playerName, String endpoint) {
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> subscriptionRepository.delete(em, playerName, endpoint),
                 () -> {
-                    List<Subscription> playerSubscriptions = INSTANCE.subscriptions.get(playerName);
+                    List<Subscription> playerSubscriptions = instance().subscriptions.get(playerName);
                     if (playerSubscriptions != null) {
                         playerSubscriptions.removeIf(existing -> existing.getEndpoint().equals(endpoint));
                     }
@@ -45,17 +51,17 @@ public class SubscriptionService extends PersistedService {
     }
 
     public static synchronized List<Subscription> getSubscriptions(String playerName) {
-        return List.copyOf(INSTANCE.subscriptions.getOrDefault(playerName, List.of()));
+        return List.copyOf(instance().subscriptions.getOrDefault(playerName, List.of()));
     }
 
     public static synchronized boolean hasSubscriptions(String playerName) {
-        return !INSTANCE.subscriptions.getOrDefault(playerName, List.of()).isEmpty();
+        return !instance().subscriptions.getOrDefault(playerName, List.of()).isEmpty();
     }
 
     public static synchronized void recordSuccess(String playerName, String endpoint) {
         findSubscription(playerName, endpoint).ifPresent(sub -> {
             int previousFailureCount = sub.getFailureCount();
-            INSTANCE.jpaWriteWithRollback(
+            instance().jpaWriteWithRollback(
                     () -> sub.setFailureCount(0),
                     em -> subscriptionRepository.upsert(em, playerName, sub),
                     () -> sub.setFailureCount(previousFailureCount));
@@ -76,10 +82,10 @@ public class SubscriptionService extends PersistedService {
         int previousFailureCount = subscription.getFailureCount();
         int updatedFailureCount = previousFailureCount + 1;
         if (updatedFailureCount >= MAX_CONSECUTIVE_FAILURES) {
-            if (INSTANCE.jpaWriteThenMutate(
+            if (instance().jpaWriteThenMutate(
                     em -> subscriptionRepository.delete(em, playerName, endpoint),
                     () -> {
-                        List<Subscription> playerSubscriptions = INSTANCE.subscriptions.get(playerName);
+                        List<Subscription> playerSubscriptions = instance().subscriptions.get(playerName);
                         if (playerSubscriptions != null) {
                             playerSubscriptions.removeIf(existing -> existing.getEndpoint().equals(endpoint));
                         }
@@ -89,7 +95,7 @@ public class SubscriptionService extends PersistedService {
             subscription.setFailureCount(previousFailureCount);
             return false;
         }
-        INSTANCE.jpaWriteWithRollback(
+        instance().jpaWriteWithRollback(
                 () -> subscription.setFailureCount(updatedFailureCount),
                 em -> subscriptionRepository.upsert(em, playerName, subscription),
                 () -> subscription.setFailureCount(previousFailureCount));
@@ -97,13 +103,13 @@ public class SubscriptionService extends PersistedService {
     }
 
     private static Optional<Subscription> findSubscription(String playerName, String endpoint) {
-        return INSTANCE.subscriptions.getOrDefault(playerName, List.of()).stream()
+        return instance().subscriptions.getOrDefault(playerName, List.of()).stream()
                 .filter(sub -> sub.getEndpoint().equals(endpoint))
                 .findFirst();
     }
 
     public static PersistedService getInstance() {
-        return INSTANCE;
+        return instance();
     }
 
     @Override

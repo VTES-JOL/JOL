@@ -1,6 +1,8 @@
 package net.deckserver.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.quarkus.runtime.Startup;
+import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
 import net.deckserver.game.enums.DeckFormat;
 import net.deckserver.game.validators.ValidatorFactory;
@@ -18,35 +20,40 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
+@Singleton
+@Startup
 public class DeckService extends PersistedService {
 
     private static final Logger logger = LoggerFactory.getLogger(DeckService.class);
     private static final DeckRepository deckRepository = new DeckRepository();
-    private static final DeckService INSTANCE = new DeckService();
 
-    private DeckService() {
+    private static DeckService instance() {
+        return resolve(DeckService.class, DeckService::new);
+    }
+
+    DeckService() {
         super("DeckService", 0);
         upgrade();
     }
 
     public static DeckInfo get(String playerName, String deckName) {
-        return INSTANCE.jpaRead(em -> deckRepository.findByPlayerAndName(em, playerName, deckName));
+        return instance().jpaRead(em -> deckRepository.findByPlayerAndName(em, playerName, deckName));
     }
 
     public static void addDeck(String playerName, String deckName, DeckInfo deckInfo) {
-        INSTANCE.requireJpaWriteAlways(em -> deckRepository.saveDeckInfo(em, playerName, deckName, deckInfo));
+        instance().requireJpaWriteAlways(em -> deckRepository.saveDeckInfo(em, playerName, deckName, deckInfo));
     }
 
     public static void remove(String playerName, String deckName) {
-        INSTANCE.requireJpaWriteAlways(em -> deckRepository.delete(em, playerName, deckName));
+        instance().requireJpaWriteAlways(em -> deckRepository.delete(em, playerName, deckName));
     }
 
     public static Set<String> getPlayerDeckNames(String playerName) {
-        return INSTANCE.jpaRead(em -> deckRepository.findByPlayerName(em, playerName).keySet());
+        return instance().jpaRead(em -> deckRepository.findByPlayerName(em, playerName).keySet());
     }
 
     public static Map<String, DeckInfo> getPlayerDecks(String playerName) {
-        return INSTANCE.jpaRead(em -> deckRepository.findByPlayerName(em, playerName));
+        return instance().jpaRead(em -> deckRepository.findByPlayerName(em, playerName));
     }
 
     public static ExtendedDeck getDeck(String deckId) {
@@ -89,7 +96,7 @@ public class DeckService extends PersistedService {
     }
 
     public static void saveDeck(String deckId, ExtendedDeck deck) {
-        INSTANCE.requireJpaWriteAlways(em -> deckRepository.saveContent(em, deckId, deck));
+        instance().requireJpaWriteAlways(em -> deckRepository.saveContent(em, deckId, deck));
     }
 
     /**
@@ -119,7 +126,7 @@ public class DeckService extends PersistedService {
     }
 
     public static PersistedService getInstance() {
-        return INSTANCE;
+        return instance();
     }
 
     private void upgrade() {

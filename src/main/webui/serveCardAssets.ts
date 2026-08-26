@@ -2,7 +2,9 @@ import type { Plugin } from 'vite'
 import { createReadStream, existsSync, statSync } from 'node:fs'
 import { join, normalize } from 'node:path'
 
-const STATIC_ROOT = normalize(new URL('../static', import.meta.url).pathname)
+// This file lives at src/main/webui/ (Quinoa's default ui-dir) — three
+// levels below the repo root, where the actual static/ directory is.
+const STATIC_ROOT = normalize(new URL('../../../static', import.meta.url).pathname)
 
 const CONTENT_TYPES: Record<string, string> = {
   images: 'image/jpeg',
@@ -11,7 +13,13 @@ const CONTENT_TYPES: Record<string, string> = {
   icons: 'image/svg+xml',
 }
 
-const ASSET_PATH = /^\/(secured\/)?(images|html|json|icons)\/(.+)$/
+// Leading /jol matches quarkus.http.root-path (application.properties) and
+// getBaseUrl()'s dev-mode return value (api/config.ts) — both requests
+// arriving here via Quinoa's forwarding, and this plugin's own match
+// against them, have to agree on that prefix. Vite's dev server passes the
+// raw incoming request URL (including it) through to configureServer
+// middlewares unchanged — it doesn't strip `base` before this runs.
+const ASSET_PATH = /^\/jol\/(secured\/)?(images|html|json|icons)\/(.+)$/
 
 /**
  * Dev-only: serves the locally-generated static/ directory (card images/

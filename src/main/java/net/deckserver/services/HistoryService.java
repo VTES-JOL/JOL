@@ -1,5 +1,8 @@
 package net.deckserver.services;
 
+import io.quarkus.runtime.Startup;
+import jakarta.inject.Singleton;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import net.deckserver.jpa.entity.GameHistoryEntity;
 import net.deckserver.jpa.repository.GameHistoryRepository;
@@ -12,23 +15,27 @@ import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.Map;
 
+@Singleton
+@Startup
 public class HistoryService extends PersistedService {
 
     private static final Logger logger = LoggerFactory.getLogger(HistoryService.class);
     private static final GameHistoryRepository gameHistoryRepository = new GameHistoryRepository();
-    private static final HistoryService INSTANCE = new HistoryService();
+    private static HistoryService instance() {
+        return resolve(HistoryService.class, HistoryService::new);
+    }
 
-    private HistoryService() {
+    HistoryService() {
         super("HistoryService", 0);
     }
 
     public static Map<OffsetDateTime, GameHistory> getHistory() {
-        Map<OffsetDateTime, GameHistory> result = INSTANCE.jpaRead(gameHistoryRepository::findAll);
+        Map<OffsetDateTime, GameHistory> result = instance().jpaRead(gameHistoryRepository::findAll);
         return result != null ? result : Map.of();
     }
 
     public static void addGame(OffsetDateTime now, GameHistory history) {
-        INSTANCE.requireJpaWriteAlways(em -> gameHistoryRepository.save(em, now, history));
+        instance().requireJpaWriteAlways(em -> gameHistoryRepository.save(em, now, history));
     }
 
     public static Collection<GameHistory> getGames() {
@@ -36,7 +43,7 @@ public class HistoryService extends PersistedService {
     }
 
     public static void validateGW() {
-        Collection<GameHistoryEntity> entities = INSTANCE.jpaRead(gameHistoryRepository::findAllEntities);
+        Collection<GameHistoryEntity> entities = instance().jpaRead(gameHistoryRepository::findAllEntities);
         if (entities == null) return;
         entities.forEach(entity -> {
             GameHistory gameHistory;
@@ -85,7 +92,7 @@ public class HistoryService extends PersistedService {
             if (changed) {
                 try {
                     entity.setResults(objectMapper.writeValueAsString(gameHistory.getResults()));
-                    INSTANCE.requireJpaWriteAlways(em -> gameHistoryRepository.update(em, entity));
+                    instance().requireJpaWriteAlways(em -> gameHistoryRepository.update(em, entity));
                 } catch (Exception e) {
                     logger.error("Failed to serialise updated results for {}", gameHistory.getName(), e);
                 }
@@ -94,7 +101,7 @@ public class HistoryService extends PersistedService {
     }
 
     public static PersistedService getInstance() {
-        return INSTANCE;
+        return instance();
     }
 
     @Override

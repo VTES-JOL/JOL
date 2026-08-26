@@ -1,5 +1,8 @@
 package net.deckserver.services;
 
+import io.quarkus.runtime.Startup;
+import jakarta.inject.Singleton;
+
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.repository.PlayerActivityRepository;
@@ -9,16 +12,19 @@ import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Singleton
+@Startup
 public class PlayerActivityService extends PersistedService {
 
     private static final PlayerActivityRepository playerActivityRepository = new PlayerActivityRepository();
-    private static final PlayerActivityService INSTANCE = new PlayerActivityService();
+    private static PlayerActivityService instance() {
+        return resolve(PlayerActivityService.class, PlayerActivityService::new);
+    }
 
     private final Map<String, OffsetDateTime> playerTimestamps = new ConcurrentHashMap<>();
 
-    private PlayerActivityService() {
+    PlayerActivityService() {
         super("PlayerActivityService", 1); // 1 minute persistence interval
-        load(); // Load existing data on startup
     }
 
     // Called on essentially every request (e.g. the nav poll every logged-in tab runs
@@ -26,18 +32,18 @@ public class PlayerActivityService extends PersistedService {
     // per-call JPA write-through, which would put every poll on the DB's write path.
     public static  void recordPlayerAccess(String playerName) {
         if (playerName == null || playerName.isBlank()) return;
-        INSTANCE.playerTimestamps.put(playerName, OffsetDateTime.now());
+        instance().playerTimestamps.put(playerName, OffsetDateTime.now());
     }
 
     public static  OffsetDateTime getPlayerAccess(String playerName) {
-        return INSTANCE.playerTimestamps.getOrDefault(
+        return instance().playerTimestamps.getOrDefault(
                 playerName,
                 OffsetDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)
         );
     }
 
     public static PersistedService getInstance() {
-        return INSTANCE;
+        return instance();
     }
 
     @Override

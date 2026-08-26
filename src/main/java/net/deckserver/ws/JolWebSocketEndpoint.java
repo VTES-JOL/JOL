@@ -7,17 +7,17 @@ import net.deckserver.services.VersionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.websocket.CloseReason;
-import javax.websocket.EndpointConfig;
-import javax.websocket.HandshakeResponse;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.HandshakeRequest;
-import javax.websocket.server.ServerEndpoint;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.HandshakeResponse;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.HandshakeRequest;
+import jakarta.websocket.server.ServerEndpoint;
+import jakarta.websocket.server.ServerEndpointConfig;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -38,11 +38,23 @@ public class JolWebSocketEndpoint {
         public void modifyHandshake(ServerEndpointConfig config, HandshakeRequest request, HandshakeResponse response) {
             List<String> cookieHeaders = request.getHeaders().getOrDefault("Cookie", List.of());
             Optional<String> username = extractCookie(cookieHeaders, "jol_at").flatMap(AuthService::parseAccessToken);
+            // getUserProperties() is one map shared across every handshake for this
+            // whole @ServerEndpoint deployment, not a fresh one per connection —
+            // confirmed the hard way under Quarkus/Undertow (see
+            // quarkus-poc/FINDINGS.md's Phase 3 section): leaving this untouched on
+            // a failed handshake let a later unauthenticated connection silently
+            // inherit whichever username the *previous successful* handshake left
+            // behind, indefinitely, with zero concurrency required to reproduce it.
+            // Always writing — never just conditionally on success — closes that.
             if (username.isPresent()) {
                 log.debug("WebSocket handshake: authenticated as {}", username.get());
                 config.getUserProperties().put(PLAYER_KEY, username.get());
             } else {
                 log.warn("WebSocket handshake: no valid access token cookie found");
+                // .remove, not .put(key, null) — some Map implementations
+                // (this one may be a ConcurrentHashMap under the hood) throw
+                // NullPointerException on a null value.
+                config.getUserProperties().remove(PLAYER_KEY);
             }
         }
 

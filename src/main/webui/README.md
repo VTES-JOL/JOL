@@ -1,8 +1,8 @@
-# frontend
+# frontend (src/main/webui)
 
-The React SPA for [V:TES Online](https://deckserver.net) — replaces the legacy JSP/jQuery/DWR client entirely. Built with Vite + TypeScript + React Router, bundled into the Java WAR at `/react/*` and served for every top-level view (see `../CLAUDE.md` for how the backend wires this in).
+The React SPA for [V:TES Online](https://deckserver.net) — replaces the legacy JSP/jQuery/DWR client entirely. Built with Vite + TypeScript + React Router, served directly by Quarkus via the Quinoa extension (see `../../../CLAUDE.md` for how the backend wires this in). Lives at `src/main/webui` — Quinoa's own default location for a project's frontend, not a repo-root `frontend/` directory the way it did before the Quarkus migration.
 
-For build/run commands, environment variables, and the overall system architecture (backend + frontend together), see the root [`CLAUDE.md`](../CLAUDE.md). This file covers only the frontend project itself.
+For build/run commands, environment variables, and the overall system architecture (backend + frontend together), see the root [`CLAUDE.md`](../../../CLAUDE.md). This file covers only the frontend project itself.
 
 ## Development
 
@@ -11,14 +11,14 @@ npm install
 npm run dev
 ```
 
-Requires the backend running alongside it (`JOL_DATA=src/test/resources/data ./mvnw tomcat9:run` from the repo root) — Vite proxies everything it doesn't own itself (the REST API, WebSocket, static card assets) through to Tomcat on `:8080`. See `vite.config.ts`'s top comment for exactly which paths are frontend-owned vs. proxied, and why dev runs over HTTPS with a self-signed cert.
+Requires the backend running instead, from the repo root — `JOL_DB_PASSWORD=jol ENABLE_CAPTCHA=false ./mvnw quarkus:dev`, which starts this frontend's own `npm run dev` as a subprocess automatically (via Quinoa) and proxies to it. Running `npm run dev` standalone from here is only useful for iterating on the frontend build config itself; for actually using the app, run `quarkus:dev` from the repo root instead.
 
 ## Scripts
 
 | Script | Purpose |
 |---|---|
-| `npm run dev` | Vite dev server (HTTPS, proxies to Tomcat) |
-| `npm run build` | Type-check (`tsc -b`) then production build to `../target/react-dist` |
+| `npm run dev` | Vite dev server (started automatically by `quarkus:dev` via Quinoa — see above) |
+| `npm run build` | Type-check (`tsc -b`) then production build to `dist/` (Quinoa's default expected location) |
 | `npm run lint` | `oxlint` |
 | `npm run test` | Unit/component tests (Vitest) |
 | `npm run test:e2e` | End-to-end tests (Playwright) — see below |
@@ -28,15 +28,15 @@ Requires the backend running alongside it (`JOL_DATA=src/test/resources/data ./m
 
 **Unit/component tests** (Vitest + React Testing Library, `src/**/*.test.ts(x)`) run in `jsdom` — see `vitest.config.ts` and `src/test/setup.ts`. Pure logic (`coordinates.test.ts`, `cardCommands.test.ts`) and component behavior (`LoginPage.test.tsx`, `CommandForm.test.tsx`, `ReplacePlayer.test.tsx`) both live alongside the code they test. `api/client.ts`'s `api` object is the usual mock seam — components call it directly rather than through a context/DI layer, so `vi.mock('../../api/client')` is enough.
 
-**End-to-end tests** (`e2e/*.spec.ts`, Playwright) drive a real browser against the actual app — Vite dev server proxying to a real Tomcat backend, not a mocked environment. `playwright.config.ts`'s `webServer` entries start both automatically:
+**End-to-end tests** (`e2e/*.spec.ts`, Playwright) drive a real browser against the actual app — one `quarkus:dev` process, not a mocked environment. `playwright.config.ts`'s `webServer` entry starts it automatically:
 
 ```bash
 npm run test:e2e
 ```
 
-The backend entry copies `src/test/resources/data` into `../target/e2e-data` (gitignored) before starting Tomcat against that copy, rather than pointing `JOL_DATA` at the real fixture directory — these specs submit real chat/commands, which the running server persists back to disk, and that would otherwise dirty checked-in fixture files on every run. Test credentials are `Player1`..`Player5` / `password` (see root `CLAUDE.md`'s test data note); `e2e/game.spec.ts` drives "Test Game," a fixture game all five are already registered in.
+Requires local Postgres already running (`docker compose -f local-docker-compose.yml up -d db` from the repo root) — unlike the old Tomcat/JSON-file setup, state now lives there, not in a directory Playwright can copy/discard per run. The `webServer` command resets it to the `Player1`..`Player5` fixture set (`./load-test-fixtures.sh`) before every run instead, so these specs — which submit real chat/commands, mutating that data — always start from known state. `e2e/game.spec.ts` drives "Test Game," a fixture game all five are already registered in.
 
-Cold start (first Maven dependency resolution + Tomcat boot) can take a couple of minutes; subsequent runs reuse the already-running server if one is up (`reuseExistingServer: true`) — kill anything on `:8080` first if you want a clean run against fresh fixture data.
+Cold start (first Maven/npm dependency resolution + Quarkus boot) can take a couple of minutes; subsequent runs reuse the already-running server if one is up (`reuseExistingServer: true`) — kill anything on `:8443` first if you want a guaranteed-clean run.
 
 ## Project layout
 

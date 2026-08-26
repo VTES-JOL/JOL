@@ -1,5 +1,8 @@
 package net.deckserver.services;
 
+import io.quarkus.runtime.Startup;
+import jakarta.inject.Singleton;
+
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.entity.GlobalChatEntity;
@@ -17,19 +20,22 @@ import java.util.stream.Collectors;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
+@Singleton
+@Startup
 public class GlobalChatService extends PersistedService {
 
     private static final int CHAT_STORAGE = 1000;
     private static final int CHAT_DISCARD = 100;
 
     private static final GlobalChatRepository globalChatRepository = new GlobalChatRepository();
-    private static final GlobalChatService INSTANCE = new GlobalChatService();
+    private static GlobalChatService instance() {
+        return resolve(GlobalChatService.class, GlobalChatService::new);
+    }
     private static final Map<String, String> lastSeenByPlayer = new ConcurrentHashMap<>();
     private List<ChatEntryBean> chats = new ArrayList<>();
 
-    private GlobalChatService() {
+    GlobalChatService() {
         super("GlobalChatService", 5);
-        load();
     }
 
     public static void chat(String player, String message) {
@@ -47,12 +53,12 @@ public class GlobalChatService extends PersistedService {
         String sanitize = ParserService.sanitizeText(message);
         String parsedMessage = ParserService.parseGlobalChat(sanitize);
         ChatEntryBean chatEntryBean = new ChatEntryBean(player, parsedMessage);
-        if (INSTANCE.jpaWriteThenMutate(
+        if (instance().jpaWriteThenMutate(
                 em -> globalChatRepository.insert(em, chatEntryBean),
                 () -> {
-                    INSTANCE.chats.add(chatEntryBean);
-                    if (INSTANCE.chats.size() > CHAT_STORAGE) {
-                        INSTANCE.chats = new ArrayList<>(INSTANCE.chats.subList(CHAT_DISCARD, CHAT_STORAGE));
+                    instance().chats.add(chatEntryBean);
+                    if (instance().chats.size() > CHAT_STORAGE) {
+                        instance().chats = new ArrayList<>(instance().chats.subList(CHAT_DISCARD, CHAT_STORAGE));
                     }
                 })) {
             WebSocketRegistry.notifyInvalidate(List.of("nav"), excludeClientId);
@@ -62,32 +68,32 @@ public class GlobalChatService extends PersistedService {
 
     /** Most recent chat entries, independent of any player's read cursor — for populating history on first load. */
     public static synchronized List<ChatEntryBean> getRecentChats(int limit) {
-        int size = INSTANCE.chats.size();
+        int size = instance().chats.size();
         int from = Math.max(0, size - limit);
-        return new ArrayList<>(INSTANCE.chats.subList(from, size));
+        return new ArrayList<>(instance().chats.subList(from, size));
     }
 
     /** Returns chat entries strictly after the given cursor timestamp (ISO offset date-time), or all entries if cursor is null. */
     public static synchronized List<ChatEntryBean> getChatsSince(String cursor) {
         if (cursor == null) {
-            return new ArrayList<>(INSTANCE.chats);
+            return new ArrayList<>(instance().chats);
         }
         OffsetDateTime cursorTime = OffsetDateTime.parse(cursor, ISO_OFFSET_DATE_TIME);
-        return INSTANCE.chats.stream()
+        return instance().chats.stream()
                 .filter(entry -> OffsetDateTime.parse(entry.getTimestamp(), ISO_OFFSET_DATE_TIME).isAfter(cursorTime))
                 .collect(Collectors.toList());
     }
 
     /** Non-destructive check for whether any chat entry exists after the given cursor timestamp. */
     public static synchronized boolean hasChatsSince(String cursor) {
-        if (INSTANCE.chats.isEmpty()) {
+        if (instance().chats.isEmpty()) {
             return false;
         }
         if (cursor == null) {
             return true;
         }
         OffsetDateTime cursorTime = OffsetDateTime.parse(cursor, ISO_OFFSET_DATE_TIME);
-        OffsetDateTime lastTime = OffsetDateTime.parse(INSTANCE.chats.get(INSTANCE.chats.size() - 1).getTimestamp(), ISO_OFFSET_DATE_TIME);
+        OffsetDateTime lastTime = OffsetDateTime.parse(instance().chats.get(instance().chats.size() - 1).getTimestamp(), ISO_OFFSET_DATE_TIME);
         return lastTime.isAfter(cursorTime);
     }
 
@@ -111,7 +117,7 @@ public class GlobalChatService extends PersistedService {
     }
 
     public static PersistedService getInstance() {
-        return INSTANCE;
+        return instance();
     }
 
     @Override

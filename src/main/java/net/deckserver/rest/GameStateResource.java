@@ -7,8 +7,8 @@ import net.deckserver.rest.bean.GameSnapshotFactory;
 import net.deckserver.services.GameService;
 import net.deckserver.services.RegistrationService;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 
 /**
  * Dedicated, envelope-free reads/writes for the React game page — same role

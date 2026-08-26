@@ -3,6 +3,8 @@ package net.deckserver.services;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import io.quarkus.runtime.Startup;
+import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.repository.GameChatRepository;
@@ -15,9 +17,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+@Singleton
+@Startup
 public class ChatService extends PersistedService {
 
-    private static final ChatService INSTANCE = new ChatService();
+    // CDI-backed replacement for the old `private static final ChatService
+    // INSTANCE = new ChatService()` singleton field — @Startup forces Arc to
+    // eagerly create this bean at application startup (same "ready before
+    // any caller touches it" guarantee the static field used to provide).
+    // @Singleton, not @ApplicationScoped: the latter is a CDI "normal scope",
+    // meaning Instance.get() returns a client proxy — fine for method calls,
+    // but direct field access (e.g. instance().historyCache) silently reads
+    // the proxy's own empty field instead of the real bean's, since proxies
+    // only intercept methods. Confirmed the hard way (see
+    // quarkus-poc/FINDINGS.md's Phase 3 section: login worked against an
+    // empty in-memory player map despite "Loaded 9 players from JPA" logging
+    // successfully at startup — two different objects). @Singleton is a CDI
+    // pseudo-scope: no proxy, Instance.get() returns the real instance.
+    private static ChatService instance() {
+        return resolve(ChatService.class, ChatService::new);
+    }
+
     private static final GameChatRepository gameChatRepository = new GameChatRepository();
 
     private final LoadingCache<String, TurnHistory> historyCache = Caffeine.newBuilder()
@@ -30,33 +50,33 @@ public class ChatService extends PersistedService {
             })
             .build(this::loadHistory);
 
-    private ChatService() {
+    ChatService() {
         super("ChatService", 5); // 5 minute persistence interval
     }
 
     public static PersistedService getInstance() {
-        return INSTANCE;
+        return instance();
     }
 
     public static  List<String> getTurns(String gameId) {
-        return INSTANCE.historyCache.get(gameId).getTurnLabels();
+        return instance().historyCache.get(gameId).getTurnLabels();
     }
 
     public static  List<ChatData> getTurn(String gameId, String turnLabel) {
-        return INSTANCE.historyCache.get(gameId).getTurn(turnLabel).getChats();
+        return instance().historyCache.get(gameId).getTurn(turnLabel).getChats();
     }
 
     /** The current turn's chat log — used by tests to assert on the latest message. */
     public static  List<ChatData> getChats(String gameId) {
-        String turnLabel = INSTANCE.historyCache.get(gameId).getCurrentTurnLabel();
+        String turnLabel = instance().historyCache.get(gameId).getCurrentTurnLabel();
         if (turnLabel == null) {
             return new ArrayList<>();
         }
-        return INSTANCE.historyCache.get(gameId).getTurn(turnLabel).getChats();
+        return instance().historyCache.get(gameId).getTurn(turnLabel).getChats();
     }
 
     public static  void addTurn(String gameId, String player, String turnId) {
-        INSTANCE.historyCache.get(gameId).addTurn(player, turnId);
+        instance().historyCache.get(gameId).addTurn(player, turnId);
     }
 
     public static  void sendMessage(String gameId, String source, String message) {
@@ -80,7 +100,7 @@ public class ChatService extends PersistedService {
     }
 
     private static  void sendChat(String gameId, ChatData chat) {
-        INSTANCE.historyCache.get(gameId).addChat(chat);
+        instance().historyCache.get(gameId).addChat(chat);
     }
 
     private void saveHistory(String gameId, TurnHistory history) {

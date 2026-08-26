@@ -1,5 +1,8 @@
 package net.deckserver.services;
 
+import io.quarkus.runtime.Startup;
+import jakarta.inject.Singleton;
+
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.HashBasedTable;
@@ -21,79 +24,82 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
+@Singleton
+@Startup
 public class RegistrationService extends PersistedService {
 
     private static final Predicate<RegistrationStatus> IS_REGISTERED = status -> status.getDeckId() != null;
     private static final Logger logger = LoggerFactory.getLogger(RegistrationService.class);
     private static final RegistrationRepository registrationRepository = new RegistrationRepository();
-    private final static RegistrationService INSTANCE = new RegistrationService();
+    private static RegistrationService instance() {
+        return resolve(RegistrationService.class, RegistrationService::new);
+    }
     private final Table<String, String, RegistrationStatus> registrations = HashBasedTable.create();
     private final LoadingCache<String, RegistrationSummary> summaryMap = Caffeine.newBuilder()
             .expireAfterWrite(30, TimeUnit.MINUTES)
             .refreshAfterWrite(30, TimeUnit.SECONDS)
             .build(RegistrationService::generateSummary);
 
-    private RegistrationService() {
+    RegistrationService() {
         super("RegistrationService", 0);
-        load();
     }
 
     public static synchronized void put(String gameName, String playerName, RegistrationStatus registration) {
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> registrationRepository.save(em, gameName, playerName, registration),
-                () -> INSTANCE.registrations.put(gameName, playerName, registration));
+                () -> instance().registrations.put(gameName, playerName, registration));
     }
 
     public static synchronized long getRegisteredPlayerCount(String gameName) {
-        return INSTANCE.registrations.row(gameName).values().stream().filter(IS_REGISTERED).count();
+        return instance().registrations.row(gameName).values().stream().filter(IS_REGISTERED).count();
     }
 
     public static synchronized RegistrationStatus getRegistration(String gameName, String playerName) {
-        return INSTANCE.registrations.get(gameName, playerName);
+        return instance().registrations.get(gameName, playerName);
     }
 
     public static synchronized Set<String> getRegisteredGames(String playerName) {
-        return new HashSet<>(INSTANCE.registrations.column(playerName).keySet());
+        return new HashSet<>(instance().registrations.column(playerName).keySet());
     }
 
     public static synchronized Set<String> getPlayers(String gameName) {
-        return new HashSet<>(INSTANCE.registrations.row(gameName).keySet());
+        return new HashSet<>(instance().registrations.row(gameName).keySet());
     }
 
     public static synchronized Set<String> getRegisteredGameNames() {
-        return new HashSet<>(INSTANCE.registrations.rowKeySet());
+        return new HashSet<>(instance().registrations.rowKeySet());
     }
 
     public static synchronized void removePlayer(String gameName, String playerName) {
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> registrationRepository.delete(em, gameName, playerName),
-                () -> INSTANCE.registrations.remove(gameName, playerName));
+                () -> instance().registrations.remove(gameName, playerName));
     }
 
     public static synchronized boolean isInGame(String gameName, String playerName) {
-        return INSTANCE.registrations.contains(gameName, playerName);
+        return instance().registrations.contains(gameName, playerName);
     }
 
     public static synchronized boolean isRegistered(String gameName, String playerName) {
-        return INSTANCE.registrations.contains(gameName, playerName) && Objects.requireNonNull(INSTANCE.registrations.get(gameName, playerName)).getDeckId() != null;
+        return instance().registrations.contains(gameName, playerName) && Objects.requireNonNull(instance().registrations.get(gameName, playerName)).getDeckId() != null;
     }
 
     public static synchronized boolean isInvited(String gameName, String playerName) {
-        return INSTANCE.registrations.contains(gameName, playerName);
+        return instance().registrations.contains(gameName, playerName);
     }
 
     public static synchronized void clearRegistrations(String gameName) {
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> registrationRepository.deleteAllForGame(em, gameName),
-                () -> INSTANCE.registrations.row(gameName).clear());
+                () -> instance().registrations.row(gameName).clear());
     }
 
     public static synchronized Map<String, RegistrationStatus> getPlayerRegistrations(String playerName) {
-        return Map.copyOf(INSTANCE.registrations.column(playerName));
+        return Map.copyOf(instance().registrations.column(playerName));
     }
 
     public static synchronized Map<String, RegistrationStatus> getGameRegistrations(String gameName) {
-        return Map.copyOf(INSTANCE.registrations.row(gameName));
+        return Map.copyOf(instance().registrations.row(gameName));
     }
 
     public static synchronized Set<String> getPlayerGames(String player) {
@@ -103,9 +109,9 @@ public class RegistrationService extends PersistedService {
     public static synchronized void invitePlayer(String gameName, String playerName) {
         if (!RegistrationService.isInvited(gameName, playerName)) {
             RegistrationStatus status = new RegistrationStatus(OffsetDateTime.now());
-            INSTANCE.jpaWriteThenMutate(
+            instance().jpaWriteThenMutate(
                     em -> registrationRepository.save(em, gameName, playerName, status),
-                    () -> INSTANCE.registrations.put(gameName, playerName, status));
+                    () -> instance().registrations.put(gameName, playerName, status));
         }
     }
 
@@ -114,13 +120,13 @@ public class RegistrationService extends PersistedService {
         registrationStatus.setSummary(summary);
         registrationStatus.setDeckName(deckName);
         registrationStatus.setDeckContent(deckContent);
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> registrationRepository.save(em, gameName, playerName, registrationStatus),
-                () -> INSTANCE.registrations.put(gameName, playerName, registrationStatus));
+                () -> instance().registrations.put(gameName, playerName, registrationStatus));
     }
 
     public static RegistrationSummary getSummary(String gameName) {
-        return INSTANCE.summaryMap.get(gameName);
+        return instance().summaryMap.get(gameName);
     }
 
     private static RegistrationSummary generateSummary(String gameName) {
@@ -135,7 +141,7 @@ public class RegistrationService extends PersistedService {
     }
 
     public static PersistedService getInstance() {
-        return INSTANCE;
+        return instance();
     }
 
     @Override

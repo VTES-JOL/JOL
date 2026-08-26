@@ -7,8 +7,8 @@ import net.deckserver.storage.json.system.PlayerResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;

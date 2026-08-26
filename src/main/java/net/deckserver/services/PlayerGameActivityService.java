@@ -1,5 +1,8 @@
 package net.deckserver.services;
 
+import io.quarkus.runtime.Startup;
+import jakarta.inject.Singleton;
+
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.repository.GameActivityRepository;
@@ -10,16 +13,19 @@ import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Singleton
+@Startup
 public class PlayerGameActivityService extends PersistedService {
 
     private static final GameActivityRepository gameActivityRepository = new GameActivityRepository();
-    private static final PlayerGameActivityService INSTANCE = new PlayerGameActivityService();
+    private static PlayerGameActivityService instance() {
+        return resolve(PlayerGameActivityService.class, PlayerGameActivityService::new);
+    }
 
     private final Map<String, GameTimestampEntry> gameTimestamps = new ConcurrentHashMap<>();
 
-    private PlayerGameActivityService() {
+    PlayerGameActivityService() {
         super("PlayerGameActivityService", 1); // 1 minute persistence interval
-        load(); // Load existing data on startup
     }
 
     // Called on essentially every game view/action - kept as an in-memory write with a
@@ -53,7 +59,7 @@ public class PlayerGameActivityService extends PersistedService {
     /** In-memory only - the DB row is deleted by GameService.remove (games.game_id FK), always called alongside this. */
     public static   void clearGame(String gameName) {
         if (gameName == null || gameName.isBlank()) return;
-        INSTANCE.gameTimestamps.remove(gameName);
+        instance().gameTimestamps.remove(gameName);
     }
 
     public static  OffsetDateTime getGameTimestamp(String game) {
@@ -62,7 +68,7 @@ public class PlayerGameActivityService extends PersistedService {
     }
 
     public static  Map<String, GameTimestampEntry> getGameTimestamps() {
-        return Map.copyOf(INSTANCE.gameTimestamps);
+        return Map.copyOf(instance().gameTimestamps);
     }
 
     public static  void setGameTimestamp(String game) {
@@ -79,21 +85,21 @@ public class PlayerGameActivityService extends PersistedService {
 
     private static  GameTimestampEntry getExistingGameTimestampEntry(String game) {
         if (game == null || game.isBlank()) return null;
-        return INSTANCE.gameTimestamps.get(game);
+        return instance().gameTimestamps.get(game);
     }
 
     private static  GameTimestampEntry getOrCreateGameTimestampEntry(String game) {
         if (game == null || game.isBlank()) return null;
-        GameTimestampEntry gameTimestampEntry = INSTANCE.gameTimestamps.get(game);
+        GameTimestampEntry gameTimestampEntry = instance().gameTimestamps.get(game);
         if (gameTimestampEntry == null) {
             gameTimestampEntry = new GameTimestampEntry();
-            INSTANCE.gameTimestamps.put(game, gameTimestampEntry);
+            instance().gameTimestamps.put(game, gameTimestampEntry);
         }
         return gameTimestampEntry;
     }
 
     public static PersistedService getInstance() {
-        return INSTANCE;
+        return instance();
     }
 
     @Override

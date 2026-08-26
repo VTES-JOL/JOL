@@ -5,8 +5,8 @@ import net.deckserver.rest.bean.ProfileBean;
 import net.deckserver.services.CountryService;
 import net.deckserver.services.PlayerService;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 
 /**

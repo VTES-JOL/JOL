@@ -1,5 +1,8 @@
 package net.deckserver.services;
 
+import io.quarkus.runtime.Startup;
+import jakarta.inject.Singleton;
+
 import jakarta.persistence.EntityManager;
 import net.deckserver.game.model.JolGame;
 import net.deckserver.game.enums.GameFormat;
@@ -30,6 +33,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+@Singleton
+@Startup
 public class TournamentService extends PersistedService {
 
     private static final BiFunction<TournamentDefinition, String, Boolean> CONTAINS_PLAYER = (tournament, player) -> tournament.getRegistrations().stream().map(TournamentRegistration::getPlayer).toList().contains(player);
@@ -39,16 +44,17 @@ public class TournamentService extends PersistedService {
     private static final Predicate<TournamentDefinition> IS_ACTIVE = t -> t.getStatus().equals(GameStatus.ACTIVE);
     private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
     private static final TournamentRepository tournamentRepository = new TournamentRepository();
-    private static final TournamentService INSTANCE = new TournamentService();
+    private static TournamentService instance() {
+        return resolve(TournamentService.class, TournamentService::new);
+    }
     private final Map<String, TournamentDefinition> tournaments = new ConcurrentHashMap<>();
 
-    private TournamentService() {
+    TournamentService() {
         super("TournamentService", 10);
-        load();
     }
 
     public static List<TournamentMetadata> getOpenTournaments() {
-        return INSTANCE.tournaments.values().stream()
+        return instance().tournaments.values().stream()
                 .filter(REGISTRATIONS_OPEN)
                 .filter(IS_STARTING)
                 .map(TournamentMetadata::new)
@@ -56,7 +62,7 @@ public class TournamentService extends PersistedService {
     }
 
     public static List<TournamentMetadata> getOpenTournaments(String playerName) {
-        return INSTANCE.tournaments.values().stream()
+        return instance().tournaments.values().stream()
                 .filter(REGISTRATIONS_OPEN)
                 .filter(IS_STARTING)
                 .map(t -> new TournamentMetadata(t, playerName))
@@ -64,14 +70,14 @@ public class TournamentService extends PersistedService {
     }
 
     public static List<TournamentMetadata> getActiveTournaments() {
-        return INSTANCE.tournaments.values().stream()
+        return instance().tournaments.values().stream()
                 .filter(PLAY_OPEN)
                 .filter(IS_ACTIVE)
                 .map(TournamentMetadata::new)
                 .toList();
     }
     private static TournamentMetadata getActiveTournament(String tourName) {
-        return INSTANCE.tournaments.values().stream()
+        return instance().tournaments.values().stream()
                 .filter(PLAY_OPEN)
                 .filter(IS_ACTIVE)
                 .filter(t -> t.getName().equals(tourName))
@@ -81,7 +87,7 @@ public class TournamentService extends PersistedService {
     }
 
     public static List<TournamentMetadata> getTournamentsReadyToStart() {
-        return INSTANCE.tournaments.values().stream()
+        return instance().tournaments.values().stream()
                 .filter(PLAY_OPEN)
                 .filter(IS_STARTING)
                 .map(TournamentMetadata::new)
@@ -89,7 +95,7 @@ public class TournamentService extends PersistedService {
     }
 
     public static TournamentMetadata getTournamentReadyToStart(String tourName) {
-        return INSTANCE.tournaments.values().stream()
+        return instance().tournaments.values().stream()
                 .filter(IS_STARTING)
                 .filter(t -> t.getName().equals(tourName))
                 .map(TournamentMetadata::new)
@@ -98,21 +104,21 @@ public class TournamentService extends PersistedService {
     }
 
     public static List<TournamentMetadata> getTournamentsStarting() {
-        return INSTANCE.tournaments.values().stream()
+        return instance().tournaments.values().stream()
                 .filter(t-> t.getStatus().equals(GameStatus.STARTING))
                 .map(TournamentMetadata::new)
                 .toList();
     }
 
     public static List<TournamentMetadata> getTournamentsWithStatus(List<GameStatus> status) {
-        return INSTANCE.tournaments.values().stream()
+        return instance().tournaments.values().stream()
                 .filter(t-> status.contains(t.getStatus()))
                 .map(TournamentMetadata::new)
                 .toList();
     }
 
     public static PersistedService getInstance() {
-        return INSTANCE;
+        return instance();
     }
 
     public static void joinTournament(String game, String playerName, String vekn) {
@@ -134,13 +140,13 @@ public class TournamentService extends PersistedService {
     }
 
     public static void clearRegistrations(String tournamentName) {
-        TournamentDefinition def = INSTANCE.tournaments.get(tournamentName);
+        TournamentDefinition def = instance().tournaments.get(tournamentName);
         if (def == null) return;
         saveTournamentMutation(tournamentName, updated -> updated.getRegistrations().clear());
     }
 
     public static List<TournamentMetadata> getFinalsInvites(String playerName) {
-        return INSTANCE.tournaments.values().stream()
+        return instance().tournaments.values().stream()
                 .filter(IS_ACTIVE)
                 .filter(t -> t.getFinals().getSeeding().contains(playerName))
                 .map(TournamentMetadata::new)
@@ -148,7 +154,7 @@ public class TournamentService extends PersistedService {
     }
 
     public static List<TournamentInviteStatus> getRegisteredTournaments(String playerName) {
-        return INSTANCE.tournaments.values().stream()
+        return instance().tournaments.values().stream()
                 .filter(REGISTRATIONS_OPEN)
                 .filter(t -> CONTAINS_PLAYER.apply(t, playerName))
                 .map(t -> new TournamentInviteStatus(t, playerName))
@@ -156,7 +162,7 @@ public class TournamentService extends PersistedService {
     }
 
     public static void registerDeck(String tournament, String player, ExtendedDeck deck) {
-        TournamentDefinition definition = INSTANCE.tournaments.get(tournament);
+        TournamentDefinition definition = instance().tournaments.get(tournament);
         if (definition == null || definition.getRegistration(player).isEmpty()) return;
         String deckId = UUID.randomUUID().toString();
         String deckContent;
@@ -173,22 +179,22 @@ public class TournamentService extends PersistedService {
     }
 
     public static List<TournamentPlayer> getPlayers(String tournament, int round, int table) {
-        return INSTANCE.tournaments.get(tournament).getPlayers(round, table);
+        return instance().tournaments.get(tournament).getPlayers(round, table);
     }
 
     public static Optional<TournamentRegistration> getRegistrations(String tournament, String player) {
-        return INSTANCE.tournaments.get(tournament).getRegistration(player);
+        return instance().tournaments.get(tournament).getRegistration(player);
     }
 
     public static List<TournamentRegistration> getRegistrations(String tournament) {
-        return Optional.ofNullable(INSTANCE.tournaments.get(tournament))
+        return Optional.ofNullable(instance().tournaments.get(tournament))
                 .map(TournamentDefinition::getRegistrations)
                 .orElse(new HashSet<>())
                 .stream().sorted(Comparator.comparing(TournamentRegistration::getPlayer, String.CASE_INSENSITIVE_ORDER)).toList();
     }
 
     public static ExtendedDeck getTournamentDeck(String name, String deckId) {
-        TournamentDefinition definition = INSTANCE.tournaments.get(name);
+        TournamentDefinition definition = instance().tournaments.get(name);
         return definition.getRegistrations().stream()
                 .filter(r -> deckId.equals(r.getDeck()))
                 .map(r -> {
@@ -265,7 +271,7 @@ public class TournamentService extends PersistedService {
     }
 
     private static TournamentDefinition requireTournament(String tournamentName) {
-        TournamentDefinition def = INSTANCE.tournaments.get(tournamentName);
+        TournamentDefinition def = instance().tournaments.get(tournamentName);
         if (def == null) {
             throw new IllegalStateException("No tournament found with name: " + tournamentName);
         }
@@ -273,26 +279,26 @@ public class TournamentService extends PersistedService {
     }
 
     public static void createTournament(TournamentDefinition tournamentDefinition) {
-        INSTANCE.jpaWriteThenMutate(
+        instance().jpaWriteThenMutate(
                 em -> tournamentRepository.save(em, tournamentDefinition),
-                () -> INSTANCE.tournaments.put(tournamentDefinition.getName(), tournamentDefinition));
+                () -> instance().tournaments.put(tournamentDefinition.getName(), tournamentDefinition));
     }
 
     public static void removeTournament(String name) {
-        TournamentDefinition def = INSTANCE.tournaments.get(name);
+        TournamentDefinition def = instance().tournaments.get(name);
         if (def != null) {
-            INSTANCE.jpaWriteThenMutate(
+            instance().jpaWriteThenMutate(
                     em -> tournamentRepository.delete(em, def.getId()),
-                    () -> INSTANCE.tournaments.remove(name));
+                    () -> instance().tournaments.remove(name));
         }
     }
 
     public static TournamentDefinition getTournament(String nameOfTournament) {
-        return INSTANCE.tournaments.get(nameOfTournament);
+        return instance().tournaments.get(nameOfTournament);
     }
 
     public static void importRoundsFromCsv(String tourName, String csvData) throws IOException {
-        TournamentDefinition tournament = INSTANCE.tournaments.get(tourName);
+        TournamentDefinition tournament = instance().tournaments.get(tourName);
         if (tournament == null) return;
 
         String cleaned = sanitizeCsvData(csvData);
@@ -364,13 +370,13 @@ public class TournamentService extends PersistedService {
      * back to the pre-mutation snapshot otherwise.
      */
     private static boolean saveTournamentMutation(String tournamentName, Consumer<TournamentDefinition> mutation) {
-        TournamentDefinition current = INSTANCE.tournaments.get(tournamentName);
+        TournamentDefinition current = instance().tournaments.get(tournamentName);
         if (current == null) return false;
         TournamentDefinition snapshot = copyTournament(current);
-        return INSTANCE.jpaWriteWithRollback(
+        return instance().jpaWriteWithRollback(
                 () -> mutation.accept(current),
                 em -> tournamentRepository.save(em, current),
-                () -> INSTANCE.tournaments.put(tournamentName, snapshot));
+                () -> instance().tournaments.put(tournamentName, snapshot));
     }
 
     private static TournamentDefinition copyTournament(TournamentDefinition source) {
@@ -418,7 +424,7 @@ public class TournamentService extends PersistedService {
     }
 
     private static boolean isSingleDeck(String tournamentName) {
-        TournamentDefinition definition = INSTANCE.tournaments.get(tournamentName);
+        TournamentDefinition definition = instance().tournaments.get(tournamentName);
         return definition == null || definition.getFormat() == TournamentFormat.SINGLE_DECK;
     }
 

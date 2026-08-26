@@ -8,8 +8,8 @@ import net.deckserver.services.RegistrationService;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.ChatData;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Set;
 

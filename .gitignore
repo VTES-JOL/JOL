@@ -29,3 +29,7 @@ aws/*
 
 # Auto-generated local JWT signing key (see AuthService.loadOrCreateKey)
 jwt_secret.key
+
+# Dev-only self-signed HTTPS keystore (see application.properties's comment
+# for the keytool command that regenerates it)
+src/main/resources/dev-keystore.p12
