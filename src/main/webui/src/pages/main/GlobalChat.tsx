@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import type { ChatEntry } from '../../api/types';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
@@ -37,6 +37,7 @@ function buildRenderedEntries(entries: ChatEntry[], player: string | null): Rend
 
 export function GlobalChat() {
   const { player } = useAuth();
+  const queryClient = useQueryClient();
   const [entries, setEntries] = useState<ChatEntry[]>([]);
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
@@ -65,6 +66,14 @@ export function GlobalChat() {
     if (delta.length === 0) return;
     setEntries((log) => [...log, ...delta]);
     cursorRef.current = delta[delta.length - 1].timestamp;
+    // Keep the ['main-chat-history'] cache in sync with what's actually been
+    // seen — its staleTime: Infinity means a remounted GlobalChat (e.g. after
+    // navigating away and back) reads straight from this cache with no
+    // refetch, so without this it would reset `entries` back to whatever was
+    // cached at the very first load, silently dropping every message
+    // appended since (including any card-link messages, which is why hover
+    // on them "stopped working" — the message itself was gone).
+    queryClient.setQueryData<ChatEntry[]>(['main-chat-history'], (old) => [...(old ?? []), ...delta]);
   };
 
   // First load only: /main/chat/history ignores this player's read cursor

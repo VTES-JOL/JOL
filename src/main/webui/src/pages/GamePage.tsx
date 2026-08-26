@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
@@ -7,6 +7,7 @@ import { useAuth } from '../nav/useAuth';
 import { useGameSocket } from '../ws/useGameSocket';
 import { runRequest } from '../api/mutate';
 import { PageLoading } from '../components/PageLoading';
+import { useCardTooltips } from '../hooks/useCardTooltips';
 import { PlayerBoard } from './game/PlayerBoard';
 import { HandStrip } from './game/HandStrip';
 import { CommandForm } from './game/CommandForm';
@@ -34,6 +35,7 @@ export function GamePage() {
   const [playModal, setPlayModal] = useState<{ ctx: HandCardContext; card: CardSnapshot } | null>(null);
   const [tableModal, setTableModal] = useState<TableCardContext | null>(null);
   const [pendingTarget, setPendingTarget] = useState<PendingTarget | null>(null);
+  const boardRef = useRef<HTMLDivElement>(null);
 
   const { data: game } = useQuery({
     queryKey: ['game', gameId],
@@ -41,6 +43,7 @@ export function GamePage() {
     enabled: !!gameId,
   });
   useGameSocket(gameId ?? null);
+  useCardTooltips(boardRef, [game]);
 
   const applyUpdate = (updated: GameSnapshot) => queryClient.setQueryData(['game', gameId], updated);
 
@@ -103,7 +106,7 @@ export function GamePage() {
             <NotesPanel gameId={gameId} game={game} onToggleDeck={() => setShowDeck(true)} />
           )}
         </div>
-        <div className="row gx-2">
+        <div className="row gx-2" ref={boardRef}>
           <div className="col-12 row gy-1 gx-2">
             {game.players.map((player) => (
               <PlayerBoard
