@@ -98,8 +98,17 @@
             </div>
             <ul class="nav nav-tabs mt-3">
                 <li class="nav-item">
-                    <button id="playerStatsTab"
+                    <button id="kpiStatsTab"
                             class="nav-link active"
+                            onclick="renderStats()"
+                            data-bs-toggle="tab"
+                            data-bs-target="#kpiStatsPane">
+                        KPI's
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button id="playerStatsTab"
+                            class="nav-link"
                             onclick="renderStats()"
                             data-bs-toggle="tab"
                             data-bs-target="#playerStatsPane">
@@ -154,8 +163,12 @@
             </ul>
 
             <div class="tab-content mt-3">
+                <!-- KPIs -->
+                <div class="tab-pane fade show active" id="kpiStatsPane">
+                    <jsp:include page="kpis.jsp"/>
+                </div>
                 <!-- Player Stats -->
-                <div class="tab-pane fade show active" id="playerStatsPane">
+                <div class="tab-pane fade" id="playerStatsPane">
                     <jsp:include page="player-stats.jsp"/>
                 </div>
                 <!-- Deck Stats -->

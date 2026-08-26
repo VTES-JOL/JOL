@@ -113,12 +113,12 @@ const DS = {
     statsJolClans:           (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/jol/clans`, {treshold, fromDate, toDate, isTourney}, opts),
     statsPerformanceDeck:    (playerName, treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/performance/${_enc(playerName)}/decks`, {treshold, fromDate, toDate, isTourney}, opts),
     statsReactionPlayer:     (playerName, treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/reaction/${_enc(playerName)}`, {treshold, fromDate, toDate, isTourney}, opts),
-    statsReactionAvg:    (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/reaction/avg`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsReactionAvg:        (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/reaction/avg`, {treshold, fromDate, toDate, isTourney}, opts),
     statsMetricsPlayer:      (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/metrics/player`, {treshold, fromDate, toDate, isTourney}, opts),
     statsMetricsGame:        (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/metrics/game`, {treshold, fromDate, toDate, isTourney}, opts),
     statsCommandsPlayer:     (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/commands/player`, {treshold, fromDate, toDate, isTourney}, opts),
     statsCommandsGame:       (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/commands/game`, {treshold, fromDate, toDate, isTourney}, opts),
-    statsJolKpis:               (opts) => apiGet(`/stats/jol/kpis`,  opts),
+    statsJolKpis:            (playerName, opts) => apiGet(`/stats/jol/kpis/${_enc(playerName)}`,  opts),
     updateSiteNotes:         (notes, opts) => apiPut('/admin/site-notes', {notes}, opts),
     clearSiteNotes:          (opts) => apiDel('/admin/site-notes', opts),
 
@@ -3101,6 +3101,11 @@ function exportCsv() {
     DS.exportPastGamesAsCsv({callback: (data) => createCsvDownloadLink(data, 'past-games.csv'), errorHandler: errorhandler});
 }
 
+function toggleLoading(target) {
+    $("#loadingScreen").toggleClass("d-none");
+    $(target).toggleClass("d-none");
+}
+
 function resetStats() {
     $('#fromDate').val('');
     $('#toDate').val('');
@@ -3135,13 +3140,27 @@ function renderStats() {
     let toDate = $('#toDate').val();
     let isTourney = $("#onlyTournaments").prop("checked");
 
-    if ($('#playerStatsTab').hasClass('active')) {
+    if($('#kpiStatsTab').hasClass('active')) {
+        toggleLoading("#kpiContainer")
+        DS.statsJolKpis(player, {
+            callback: (data) => {
+                createKpis(data);
+                toggleLoading("#kpiContainer");
+            },
+             errorHandler: (error) => {
+                 toggleLoading("#kpiContainer");
+                 errorhandler(error);
+             }
+         });
+    } else if ($('#playerStatsTab').hasClass('active')) {
         DS.statsPerPlayer(treshold, fromDate, toDate, isTourney, {
             callback: (data) => {
                 createStats(data, "#statsGames tbody");
                 filterName('#statsGames tbody tr', 'playerNameFilter', 1);
             },
-            errorHandler: errorhandler
+            errorHandler: (error) => {
+                errorhandler(error);
+            }
         });
     } else if($('#deckStatsTab').hasClass('active')) {
         DS.statsPerDeck(tresholdDeck, fromDate, toDate, isTourney,{
@@ -3209,30 +3228,61 @@ function renderStats() {
             callback: (data) => {
                 createCommands(data, "#gameCommands tbody");
             }, errorHandler: errorhandler});
-    } else if($('#jolKpiTab').hasClass('active')) {
-        DS.statsJolKpis({
-            callback: (data) => {
-                createKpis(data);
-            }, errorHandler: errorhandler});
     }
 }
 
 function createKpis(kpis) {
     //Active Games Card
-    $('#activeGamesKpi').text(kpis.activeGames);
-    $('#activeGamesLastMonthChangeKpi')
-        .append(kpis.activeChangeMonth >=0 ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>')
-        .addClass(kpis.activeChangeMonth >=0 ? 'text-success' : 'text-danger')
-        .append(kpis.activeChangeMonth);
+    $('#currentMonthActiveGames').text(kpis.activeGames[0]);
+    $('#currentMonthActiveGamesChange')
+        .empty()
+        .append(kpis.activeChangeMonth[0] >=0 ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>')
+        .addClass(kpis.activeChangeMonth[0] >=0 ? 'text-success' : 'text-danger')
+        .append(kpis.activeChangeMonth[0] + " since last month");
+    $('#lastMonthActiveGames').text(kpis.activeGames[1]);
+    $('#lastMonthActiveGamesChange')
+        .empty()
+        .append(kpis.activeChangeMonth[1] >=0 ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>')
+        .addClass(kpis.activeChangeMonth[1] >=0 ? 'text-success' : 'text-danger')
+        .append(kpis.activeChangeMonth[1] + " since last month");
+    $('#beforeLastMonthActiveGames').text(kpis.activeGames[2]);
+    $('#beforeLastMonthActiveGamesChange')
+        .empty()
+        .append(kpis.activeChangeMonth[2] >=0 ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>')
+        .addClass(kpis.activeChangeMonth[2] >=0 ? 'text-success' : 'text-danger')
+        .append(kpis.activeChangeMonth[2] + " since last month");
     //Tournament Games Card
-    $('#tournamentGamesKpi').text(kpis.tournamentGames);
-    $('#tournamentGamesLastMonthChangeKpi')
-        .append(kpis.activeTourChangeMonth >=0 ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>')
-        .addClass(kpis.activeTourChangeMonth >=0 ? 'text-success' : 'text-danger')
-        .append(kpis.activeTourChangeMonth);
+    $('#currentMonthActiveTournamentGames').text(kpis.tournamentGames[0]);
+    $('#currentMonthActiveTournamentGamesChange')
+        .empty()
+        .append(kpis.activeTourChangeMonth[0] >=0 ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>')
+        .addClass(kpis.activeTourChangeMonth[0] >=0 ? 'text-success' : 'text-danger')
+        .append(kpis.activeTourChangeMonth[0]+" since last month");
+    $('#lastMonthActiveTournamentGames').text(kpis.tournamentGames[1]);
+    $('#lastMonthActiveTournamentGamesChange')
+        .empty()
+        .append(kpis.activeTourChangeMonth[1] >=0 ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>')
+        .addClass(kpis.activeTourChangeMonth[1] >=0 ? 'text-success' : 'text-danger')
+        .append(kpis.activeTourChangeMonth[1]+" since last month");
+    $('#beforeLastMonthActiveTournamentGames').text(kpis.tournamentGames[2]);
+    $('#beforeLastMonthActiveTournamentGamesChange')
+        .empty()
+        .append(kpis.activeTourChangeMonth[2] >=0 ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>')
+        .addClass(kpis.activeTourChangeMonth[2] >=0 ? 'text-success' : 'text-danger')
+        .append(kpis.activeTourChangeMonth[2] + " since last month");
     //PAST GAMES CARD
-    $('#pastGamesKpi').text(kpis.pastGames);
-    $('#pastTournamentKpi').text(kpis.pastTournament);
+    $('#currentMonthPastGames').text(kpis.pastGames);
+    $('#currentMonthPastTournamentGames').text(kpis.pastTournament);
+
+    fillTop(kpis.top3PlayersByWins[0], "currentMonthTop");
+    fillTop(kpis.top3PlayersByWins[1], "lastMonthTop");
+    fillTop(kpis.top3PlayersByWins[2], "beforeLastMonthTop");
+    fillTop(kpis.top3DecksByWins[0], "currentMonthTopDecks");
+    fillTop(kpis.top3DecksByWins[1], "lastMonthTopDecks");
+    fillTop(kpis.top3DecksByWins[2], "beforeLastMonthTopDecks");
+    fillTop(kpis.top3NationsByWins[0], "currentMonthTopNations");
+    fillTop(kpis.top3NationsByWins[1], "lastMonthTopNations");
+    fillTop(kpis.top3NationsByWins[2], "beforeLastMonthTopNations");
 
     $('#decksKpi').text("ALL DECKS:" + kpis.decks);
 
@@ -3247,6 +3297,144 @@ function createKpis(kpis) {
     $('#decksByPlayerKpi').text(Object.values(kpis.decksByPlayer)[0]);
 
     $('#nationsByPlayerKpi').text("MOST PLAYERS:" + Object.values(kpis.nationsByPlayer)[0]);
+
+    //Activity
+    fillMonthlyActivity('currentMonth', kpis.monthlyActivity[0]);
+    fillMonthlyActivity('lastMonth', kpis.monthlyActivity[1]);
+    fillMonthlyActivity('monthBeforeLast', kpis.monthlyActivity[2]);
+    fillOverallOverview(kpis.overallOverviewDto);
+    fillPeakActivity(kpis.peakActivityDays, '#peakActivityDays');
+    fillPeakActivity(kpis.peakActivityHours, '#peakActivityHours');
+    fillPlayerActivity(kpis.playerActivityOverviewDto);
+    fillChatCommandRatios(kpis.chatCommandRatioDto);
+}
+
+function fillTop(top, target) {
+    const topPlayers = $(`#${target}`);
+    const isNations = target.toLowerCase().includes("nations");
+    topPlayers.innerHTML = top.map((player, index) => {
+        const [key, value] = Object.entries(player)[0];
+        const display = isNations
+            ? `<span class="fi fi-${key.toLowerCase()} me-2"></span>`
+            : key;
+        return `
+        <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+            <div>
+                <span class="fw-semibold me-2">${index + 1}.</span>
+                ${display}
+            </div>
+
+            <span class="text-body-secondary small">
+                ${value} wins
+            </span>
+        </div>
+    `;
+    }).join("");
+}
+
+function fillChatCommandRatios(data) {
+    const container = $('#chatCommandRatioPlayers');
+    container.empty();
+
+    data.forEach((player, index) => {
+        container.append(`
+            <div class="list-group-item px-0">
+                <div class="d-flex justify-content-between">
+                    <span>
+                        <span class="fw-semibold me-2">
+                            ${index + 1}.
+                        </span>
+                        ${player.playerName}
+                    </span>
+
+                    <span class="fw-semibold">
+                        ${Number(player.ratio).toFixed(2)}
+                    </span>
+                </div>
+
+                <div class="small text-body-secondary">
+                    ${Number(player.chat).toLocaleString()} chat
+                    &nbsp;·&nbsp;
+                    ${Number(player.command).toLocaleString()} commands
+                </div>
+            </div>
+        `);
+    });
+}
+function fillPlayerActivity(data) {
+    $('#playerActivityName').text(data.playerName);
+    $('#playerTotalActivity').text(data.totalActivity.toLocaleString());
+    $('#playerChat').text(data.totalChat.toLocaleString());
+    $('#playerCommand').text(data.totalCmd.toLocaleString());
+    $('#totalUniqueGames').text(data.totalUniqueGames.toLocaleString());
+    $('#averageUniqueGamesPerMonth').text(data.averageUniqueGamesPerMonth.toFixed(2));
+    fillPeakActivity(data.mostActiveDaysOfWeek, '#playerActivityDays');
+    fillPeakActivity(data.mostActiveHours, '#playerActivityHours');
+}
+
+function fillPeakActivity(data, target) {
+    const container = $(target);
+    container.empty();
+
+    Object.entries(data)
+        .sort(([, eventsA], [, eventsB]) => Number(eventsB) - Number(eventsA))
+        .forEach(([key, events], index) => {
+            const displayTime = target === '#peakActivityHours' || target === '#playerActivityHours' ? `${key}:00` : key;
+            container.append(`
+                <div class="list-group-item d-flex justify-content-between px-0">
+                    <span>
+                        <span class="fw-semibold me-2">${index + 1}.</span>
+                        ${displayTime}
+                    </span>
+                    <span class="text-body-secondary">
+                        ${Number(events).toLocaleString()} events
+                    </span>
+                </div>
+            `);
+        });
+}
+
+function fillOverallOverview(data) {
+    $('#overallTotalActivity').text(data.totalActivity.toLocaleString());
+    $('#overallChat').text(data.totalChat.toLocaleString());
+    $('#overallCommand').text(data.totalCmd.toLocaleString());
+    $('#overallUniqueUsers').text(data.uniqueUsers.toLocaleString());
+    $('#overallMostActivePlayer').text(data.mostActivePlayer);
+    $('#overallMostActivePlayerEvents').text(data.mostActivePlayerEvents.toLocaleString());
+    $('#overallMostActiveGame').text(data.mostActiveGame);
+    $('#overallMostActiveGameEvents').text(data.mostActiveGameEvents[0].toLocaleString());
+    $('#overallMostActiveGameChat').text(data.mostActiveGameEvents[1].toLocaleString());
+    $('#overallMostActiveGameCommand').text(data.mostActiveGameEvents[2].toLocaleString());
+}
+
+function fillMonthlyActivity(prefix, data) {
+    $(`#${prefix}Label`).text(data.month);
+    $(`#${prefix}TotalActivity`).text(data.totalActivity.toLocaleString());
+    $(`#${prefix}Chat`).text(data.totalChat.toLocaleString());
+    $(`#${prefix}Command`).text(data.totalCommand.toLocaleString());
+    $(`#${prefix}UniqueUsers`).text(data.uniqueUsers.toLocaleString());
+    $(`#${prefix}MostActiveDay`).text(data.mostActiveDay);
+    $(`#${prefix}MostActiveDayEvents`).text(data.mostActiveDayEvents.toLocaleString());
+    $(`#${prefix}MostActiveHour`).text(`${data.mostActiveHour}:00`);
+    $(`#${prefix}MostActiveHourEvents`).text(data.mostActiveHourEvents.toLocaleString());
+
+    const topPlayers = $(`#${prefix}TopPlayers`);
+
+    topPlayers.empty();
+
+    Object.entries(data.topPlayers).forEach(([playerName, events], index) => {
+        topPlayers.append(`
+        <div class="list-group-item d-flex justify-content-between px-0">
+            <span>
+                <span class="fw-semibold me-2">${index + 1}.</span>
+                ${playerName}
+            </span>
+            <span class="text-body-secondary">
+                ${events.toLocaleString()} events
+            </span>
+        </div>
+    `);
+    });
 }
 
 function createMetrics(data, target) {
