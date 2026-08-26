@@ -91,7 +91,7 @@ export function GamePage() {
       <h5 className="w-100 d-flex justify-content-between align-items-center">
         <span className="fs-5 user-select-all">{game.name}</span>
       </h5>
-      <div className="container-fluid my-1 g-0 flex-grow-1 min-h-0 overflow-y-auto">
+      <div className="container-fluid my-1 g-0 flex-grow-1 min-h-0 overflow-y-auto" ref={boardRef}>
         <div className="control-grid">
           <HandStrip game={game} viewerName={viewerName} onPlayCardClick={handlePlayCardClick} />
           <CommandForm gameId={gameId} game={game} viewerName={viewerName} onUpdated={applyUpdate} />
@@ -106,7 +106,7 @@ export function GamePage() {
             <NotesPanel gameId={gameId} game={game} onToggleDeck={() => setShowDeck(true)} />
           )}
         </div>
-        <div className="row gx-2" ref={boardRef}>
+        <div className="row gx-2">
           <div className="col-12 row gy-1 gx-2">
             {game.players.map((player) => (
               <PlayerBoard

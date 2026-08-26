@@ -3,6 +3,27 @@ import tippy, { hideAll, type Instance } from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import { getBaseUrl } from '../api/config';
 
+const PLACEHOLDER_WIDTH = 250;
+const PLACEHOLDER_HEIGHT = 358;
+
+function cardImagePlaceholder(label: string): HTMLElement {
+  const el = document.createElement('div');
+  el.className = 'd-flex flex-column align-items-center justify-content-center gap-2 text-white-50 bg-dark';
+  el.style.width = `${PLACEHOLDER_WIDTH}px`;
+  el.style.height = `${PLACEHOLDER_HEIGHT}px`;
+
+  const icon = document.createElement('i');
+  icon.className = 'bi bi-image';
+  icon.style.fontSize = '2.5rem';
+
+  const text = document.createElement('span');
+  text.className = 'px-2 text-center small';
+  text.textContent = label || 'Image unavailable';
+
+  el.append(icon, text);
+  return el;
+}
+
 /**
  * Attaches a hoverable card-image tooltip to every `a.card-name[data-card-id]`
  * link inside containerRef — ParserService.parseGlobalChat already renders
@@ -56,9 +77,19 @@ export function useCardTooltips(containerRef: RefObject<HTMLElement | null>, dep
             const cardId = link.dataset.cardId;
             const secured = link.dataset.secured === 'true' ? 'secured/' : '';
             getBaseUrl().then((baseUrl) => {
-              instance.setContent(
-                `<img width="250" height="358" src="${baseUrl}/${secured}images/${cardId}" alt="${link.textContent ?? ''}" />`,
-              );
+              const img = document.createElement('img');
+              img.width = PLACEHOLDER_WIDTH;
+              img.height = PLACEHOLDER_HEIGHT;
+              img.alt = link.textContent ?? '';
+              // A missing/broken card asset otherwise renders as the
+              // browser's default broken-image icon with the alt text next
+              // to it — this swaps it for a plain placeholder instead, so a
+              // gap in the local static/ card-asset mirror (see
+              // serveCardAssets.ts) doesn't look like the tooltip itself is
+              // malfunctioning.
+              img.onerror = () => instance.setContent(cardImagePlaceholder(img.alt));
+              img.src = `${baseUrl}/${secured}images/${cardId}`;
+              instance.setContent(img);
             });
           },
         }),

@@ -29,6 +29,18 @@
         </Routing>
     </Appenders>
 
+    <!--
+      No Root logger here: this file only governs log4j2's own
+      LoggerContext, which only net.deckserver.metrics/commands below ever
+      reach — GameModel obtains those two via org.apache.logging.log4j's
+      native LogManager (not SLF4J), specifically to get the per-game
+      dynamic file routing below (Quarkus's own logging has no equivalent
+      for that). Every other class logs via SLF4J, which Quarkus's own
+      org.jboss.slf4j:slf4j-jboss-logmanager binding wins over this file's
+      log4j-slf4j2-impl for — so a Root logger/console appender here would
+      never actually be reached by app code. See application.properties'
+      quarkus.log.console.format for that logging's equivalent config.
+    -->
     <Loggers>
         <Logger name="net.deckserver.metrics" level="INFO" additivity="false">
             <AppenderRef ref="metrics"/>
@@ -37,9 +49,6 @@
             <AppenderRef ref="commands"/>
             <AppenderRef ref="console" level="error"/>
         </Logger>
-        <Root level="INFO">
-            <AppenderRef ref="console"/>
-        </Root>
     </Loggers>
 
 </Configuration>

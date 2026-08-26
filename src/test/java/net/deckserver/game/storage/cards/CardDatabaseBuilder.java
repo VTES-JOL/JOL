@@ -67,30 +67,30 @@ public class CardDatabaseBuilder {
                 assert CardService.findCardExact(name, true).isPresent() : String.format("Card %s does not exist", name);
             });
 
-//            // Process images
-//            Path outputImagePath = outputPath.resolve(outputPrefix).resolve("images").resolve(id);
-//            Files.createDirectories(outputImagePath.getParent());
-//
-//            if (Files.exists(outputImagePath)) {
-//                logger.debug("Skipping image download/copy (already exists): {}", outputImagePath);
-//            } else if (summaryCard.isPlayTest()) {
-//                String inputPrefix = "playtest";
-//                Path inputImagePath = imagesPath.resolve(inputPrefix).resolve(generateImageName(summaryCard));
-//                assert inputImagePath.toFile().exists() : String.format("Image %s does not exist - %s", inputImagePath, summaryCard.getDisplayName());
-//                Files.copy(inputImagePath, outputImagePath, StandardCopyOption.REPLACE_EXISTING);
-//            } else {
-//                URI imageUri = URI.create(KRCG_CARD_IMAGE_BASE_URL + generateImageName(summaryCard));
-//                HttpRequest request = HttpRequest.newBuilder(imageUri)
-//                        .GET()
-//                        .header("User-Agent", "DeckServer-CardDatabaseBuilder")
-//                        .build();
-//                logger.info("Downloading missing image for {}", summaryCard.getDisplayName());
-//
-//                HttpResponse<Path> response = httpClient.send(request, HttpResponse.BodyHandlers.ofFile(outputImagePath));
-//                if (response.statusCode() != 200) {
-//                    throw new IllegalStateException("Failed to download image " + imageUri + " (HTTP " + response.statusCode() + ") for " + summaryCard.getDisplayName());
-//                }
-//            }
+            // Process images
+            Path outputImagePath = outputPath.resolve(outputPrefix).resolve("images").resolve(id);
+            Files.createDirectories(outputImagePath.getParent());
+
+            if (Files.exists(outputImagePath)) {
+                logger.info("Skipping image download/copy (already exists): {}", outputImagePath);
+            } else if (summaryCard.isPlayTest()) {
+                String inputPrefix = "playtest";
+                Path inputImagePath = imagesPath.resolve(inputPrefix).resolve(generateImageName(summaryCard));
+                assert inputImagePath.toFile().exists() : String.format("Image %s does not exist - %s", inputImagePath, summaryCard.getDisplayName());
+                Files.copy(inputImagePath, outputImagePath, StandardCopyOption.REPLACE_EXISTING);
+            } else {
+                URI imageUri = URI.create(KRCG_CARD_IMAGE_BASE_URL + generateImageName(summaryCard));
+                HttpRequest request = HttpRequest.newBuilder(imageUri)
+                        .GET()
+                        .header("User-Agent", "DeckServer-CardDatabaseBuilder")
+                        .build();
+                logger.info("Downloading missing image for {}", summaryCard.getDisplayName());
+
+                HttpResponse<Path> response = httpClient.send(request, HttpResponse.BodyHandlers.ofFile(outputImagePath));
+                if (response.statusCode() != 200) {
+                    throw new IllegalStateException("Failed to download image " + imageUri + " (HTTP " + response.statusCode() + ") for " + summaryCard.getDisplayName());
+                }
+            }
 
             // Process HTML
             String htmlText = ParserService.parseSymbols(summaryCard.getHtmlText());

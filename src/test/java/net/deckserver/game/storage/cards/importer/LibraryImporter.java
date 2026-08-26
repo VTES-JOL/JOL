@@ -68,8 +68,8 @@ public class LibraryImporter extends AbstractImporter<LibraryCard> {
         cards.stream().filter(card -> !Collections.disjoint(card.getType(), Set.of("Master", "Action", "Equipment"))).forEach(card -> {
             List<LibraryCardMode> emptyModes = card.getModes().stream().filter(mode -> mode.getTarget() == null).toList();
             if (!emptyModes.isEmpty()) {
-                System.out.println(card.getDisplayName());
-                emptyModes.forEach(System.out::println);
+//                System.out.println(card.getDisplayName());
+//                emptyModes.forEach(System.out::println);
             }
         });
         return cards;

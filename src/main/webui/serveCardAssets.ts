@@ -47,8 +47,21 @@ export function serveCardAssets(): Plugin {
 
         const [, secured, kind, rest] = match
         const filePath = normalize(join(STATIC_ROOT, secured ? 'secured' : '', kind, rest))
+        // A real 404 here, not next() — matching ASSET_PATH already means
+        // this is definitively a card-asset request, never a SPA route, so
+        // falling through just let Quinoa's SPA-routing catch-all serve
+        // index.html for it instead. That came back 200 text/html, which a
+        // browser <img> silently accepts as "loaded" with a 0x0 natural
+        // size — no failed-request signal, so onError-based fallback UI
+        // (CardImage.tsx, useCardTooltips.ts) never fired and a missing
+        // card asset just looked like a blank/broken image inconsistently,
+        // depending on which cards happened to be present in the local
+        // static/ mirror (see FINDINGS.md-style bug writeup this fixes).
         if (!filePath.startsWith(STATIC_ROOT) || !existsSync(filePath) || !statSync(filePath).isFile()) {
-          return next()
+          res.statusCode = 404
+          res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+          res.end('Not found')
+          return
         }
 
         res.setHeader('Content-Type', CONTENT_TYPES[kind] ?? 'application/octet-stream')
