@@ -1,6 +1,6 @@
 # V:TES Online (deckserver.net)
 
-Online client and game server for Vampire: The Eternal Struggle. Java WAR deployed on Tomcat 9. No database — all state is persisted as JSON (and, for a shrinking set of legacy games, XML) files under a `JOL_DATA` directory.
+Online client and game server for Vampire: The Eternal Struggle. Java WAR deployed on Tomcat 9. State is persisted in **PostgreSQL** via JPA (Hibernate + Flyway + HikariCP) — see [Storage Mechanics](#storage-mechanics) below. (An older JSON-file-per-directory storage model predates this; [Migrating JSON Data to PostgreSQL](#migrating-json-data-to-postgresql) covers moving an existing `JOL_DATA` directory over.)
 
 # Requirements
 * Java 21 (Corretto recommended — Lombok's annotation processing breaks on newer JDKs)
@@ -15,161 +15,179 @@ Install Java 21 as per your operating system.
 
 ### Run
 #### Environment Variables
-* `JOL_DATA` ( required ) - points to the game data directory, example data is available at `src/test/resources/data`. Can also be set via the `jol.data` system property, which takes precedence.
-* `ENABLE_TEST_MODE` - disables scheduled persistence; set automatically by `@SetEnvironmentVariable` in tests, default: `false`
+* `JOL_DB_URL` - JDBC URL, default `jdbc:postgresql://localhost:5432/jol`
+* `JOL_DB_USER` / `JOL_DB_PASSWORD` - database credentials, default user `jol`
+* `JOL_DB_POOL_SIZE` - HikariCP max pool size, default `10`
+* `ENABLE_TEST_MODE` - skips `JpaFactory.initialize()` at startup (tests initialize their own H2 instance instead — see [Tests](#tests) below) and makes every service's write-through methods a no-op that only updates in-memory state, so tests never touch a real database; set automatically by `@SetEnvironmentVariable` in tests, default: `false`
 * `ENABLE_CAPTCHA` - disable Cloudflare Turnstile for local development if required, default: `true`
 * `JOL_RECAPTCHA_KEY` / `JOL_RECAPTCHA_SECRET` - Cloudflare Turnstile site key / secret key, required when captcha is enabled (named "recaptcha" for historical reasons — this is Turnstile, not Google reCAPTCHA)
 * `DISCORD_BOT_TOKEN` / `DISCORD_PING_CHANNEL_ID` / `DISCORD_API_VERSION` - required for Discord integration - bot token, channel id to post pings, and Discord API version (e.g. `10`); there is no code-level default for any of the three
-* `VAPID_PUBLIC_KEY` - required for web push notifications - VAPID public key embedded client-side in `notification.jsp`. The matching private key is **not** an env var — `NotificationService` reads it from `<JOL_DATA>/vapid_private.pem`
+* `VAPID_PUBLIC_KEY` - required for web push notifications - VAPID public key embedded client-side in `frontend/src/push/pushNotifications.ts` for `pushManager.subscribe()`
+* `VAPID_KEY_FILE` - path to the VAPID private key PEM file; `NotificationService` reads it at startup, and web push is silently disabled (not a startup failure) when unset or unreadable
+* `JWT_SECRET_FILE` - path to the JWT signing key file (base64, HMAC); `AuthService` generates and writes one on first run if the file doesn't exist yet, falling back to `jwt_secret.key` in the working directory when unset (fine for local dev, but set explicitly anywhere the working directory isn't stable/persistent)
 * `BASE_URL` / `KEY_ID` / `KEY_FILE` - required for CloudFront-signed secured card image URLs - distribution base URL, key pair id, and path to the CloudFront private key file, used by `SecuredCardLoader`
-* `TYPE` - visual/environment label (`dev`, `test`, `prod`, ...), default: `dev` - also selects which `css/<TYPE>.css` stylesheet is loaded
+* `TYPE` - visual/environment label (`dev`, `test`, `prod`, ...), default: `dev`
 
-Run the `tomcat9:run` goal after setting up the environment variables you need:
-`JOL_DATA=src/test/resources/data ./mvnw tomcat9:run`
+Start a local Postgres and load fixture data, then run the `tomcat9:run` goal (see [Migrating JSON Data to PostgreSQL](#migrating-json-data-to-postgresql) below for the two commands referenced here):
+```bash
+docker compose -f local-docker-compose.yml up -d db
+./load-test-fixtures.sh                    # resets the local db to Player1-5 fixture data
+JOL_DB_PASSWORD=jol ./mvnw tomcat9:run
+```
 
 The app is served at `http://localhost:8080/jol`.
 
 #### Frontend (React)
-Some routes (starting with `/main`) are served by a React app under `frontend/` instead of the legacy JSP/jQuery pages — see [Frontend Architecture](#frontend-architecture) below for how the two coexist. To run it alongside `tomcat9:run` for local development:
+The entire client is `frontend/` — a Vite/TypeScript/React SPA; there's no legacy JSP/jQuery page left anywhere in the request path. See [Frontend Architecture](#frontend-architecture) below for how it fits into the wider app, and `frontend/README.md` for the frontend project's own structure and testing setup. To run it alongside `tomcat9:run` for local development:
 ```
 cd frontend && npm install && npm run dev
 ```
 This starts a Vite dev server (self-signed HTTPS via `@vitejs/plugin-basic-ssl` — required because login cookies are `Secure`) that proxies everything it doesn't own straight through to `tomcat9:run`, and serves local card images/HTML/JSON itself (see `frontend/serveCardAssets.ts`) in place of the old nginx-based static asset setup. See `frontend/vite.config.ts`'s top comment for details.
 
 ### Tests
-`./mvnw test` runs the full suite (Cucumber BDD scenarios included) except the `Builder`-tagged group, which regenerates the static card JSON/HTML served from `static.deckserver.net` and isn't part of normal test runs.
+`./mvnw test` runs the full suite (Cucumber BDD scenarios included) except the `Builder`-tagged group, which regenerates the static card JSON/HTML served from `static.deckserver.net` and isn't part of normal test runs. Service-level tests boot an in-memory H2 database populated from `src/test/resources/data` by `JolServiceExtension`/`JolFixtureLoader` (see `src/test/resources/META-INF/persistence.xml`) — register any new JPA entity in both persistence units there, not just the main one, or JPA-backed tests fail with "Unknown entity type".
 
 `./mvnw test -Dtest=DoCommandTest` runs a single test class.
 
-### Data Structure
-Everything below lives under `JOL_DATA`.
-* `games.json` - hashmap of Game Name -> `GameInfo.java`
-* `pastGames.json` - hashmap of Timestamp -> `GameHistory.java`
-* `players.json` - hashmap of Player Name -> `PlayerInfo.java`
-* `chats.json` - list of global chat entries
-* `decks.json` - hashmap of Player Name -> Deck Name -> `DeckInfo.java`
-* `registrations.json` - hashmap of Game Name -> Player Name -> `RegistrationStatus.java`
-* `tournaments.json` - hashmap of tournament data; per-tournament detail lives under `tournaments/<uuid>/`
-* `game-timestamps.json` / `player-timestamps.json` - last-activity tracking, per game and per player
-* `site-notes.md` - admin-editable site banner/notes shown to players
-* `subscriptions.json` - web push subscription records
-* `jwt_secret.key` - HMAC signing key for login access tokens, generated on first boot and reused thereafter — losing it forces every active access token to be re-issued via its refresh token (or a fresh login if that's also gone)
-* `refreshTokens.json` - "remember me" refresh tokens, one row per logged-in device, keyed by player name
-* `vapid_private.pem` - private half of the web push VAPID key pair (see `VAPID_PUBLIC_KEY` above)
-* `decks/` - `*.json`, modern-format decks, ULID-named
-* `games/<uuid>/` - `game.json` (state) and `history.json` (chat/action history) for current games, plus one `<deckId>.json` per registered deck. A small number of not-yet-migrated legacy games still carry `game.xml`/`actions.xml` instead (see `GameDataConversion`)
+### Database Schema
+Tables live in one Postgres database, versioned by Flyway migrations under `src/main/resources/db/migration/` (`V1__baseline.sql` onward — add a new `V<n>__description.sql` file for schema changes, never edit a merged one).
+* `player` / `player_role` - accounts, hashed passwords (jBCrypt), and roles
+* `player_activity` / `game_activity` - last-activity tracking, per player and per game
+* `game` - one row per game (name, status, format, owner, tournament link, ...)
+* `game_state` - the live `GameData` for each game, as a JSON blob column
+* `game_snapshot` - one row per turn, used for rollback
+* `game_chat` - the chat/action history for a game, as a JSON blob column
+* `game_history` - past-game VP/GW results
+* `registration` - who's registered which deck into which game, including a frozen `deck_content` snapshot of the deck as registered (independent of later edits to the player's own deck)
+* `deck_info` / `deck_format` / `deck_content` - a player's decks: metadata, format tags, and the deck's own content
+* `tournament` / `tournament_registration` - tournament definitions and player registrations, same frozen-deck-snapshot pattern as `registration`
+* `global_chat` - site-wide chat
+* `site_notes` - admin-editable site banner/notes shown to players (singleton row)
+* `subscription` - web push subscription records
+* `refresh_token` - "remember me" refresh tokens, one row per logged-in device (see [Authentication](#authentication) below)
 
-Card data (crypt/library text, images) is *not* read from `JOL_DATA` at runtime — `CardService` fetches a pre-built `cards.json` from CloudFront (`static.deckserver.net`), falling back to a local `static/secured/cards.json` if that's unreachable. That file is generated from VEKN's official `vtescrypt.csv`/`vteslib.csv` by the test-scope `CardDatabaseBuilder` (the `Builder`-tagged tests).
+Most large free-form structures (game state, deck content, tournament rounds/rules) are stored as a JSON/text blob in a single column rather than fully normalized — each JPA entity's `toXxx()`/`from()` methods handle the (de)serialization against a matching `net.deckserver.storage.json.*` class, which is now the domain/API model rather than a file format: it's still what services hold in memory and what REST beans wrap, just no longer what gets serialized to disk.
+
+Card data (crypt/library text, images) is *not* in this database at all — `CardService` fetches a pre-built `cards.json` from CloudFront (`static.deckserver.net`), falling back to a local `static/secured/cards.json` if that's unreachable. That file is generated from VEKN's official `vtescrypt.csv`/`vteslib.csv` by the test-scope `CardDatabaseBuilder` (the `Builder`-tagged tests). Keeping it out of the database means it stays identical across every deployment without needing to be synced.
 
 ### Storage Mechanics
-No database anywhere — every durable piece of state above is a file under `JOL_DATA`, and the pattern is the same for all of them:
+Each `*Service` singleton (`PlayerService`, `GameService`, `TournamentService`, ...) extends `PersistedService`, which provides the `jpaRead`/`jpaWrite`/`jpaWriteThenMutate`/`jpaWriteWithRollback`/`jpaWriteAlways` helpers every service's persistence goes through — but not all in the same way:
 
-1. Each `*Service` singleton (`PlayerService`, `GameService`, `RefreshTokenService`, ...) extends `PersistedService`, which loads its JSON file into an in-memory `Map` exactly once, in its private constructor.
-2. All reads and mutations happen against that in-memory map — there's no per-request disk I/O on the hot path; `PlayerService.get(name)` is a `HashMap` lookup, not a file read.
-3. Persistence is write-behind, not synchronous: `PersistedService` schedules a `persist()` flush on a fixed interval per service (`PlayerService`/`GameService` every 5 minutes, `TournamentService` every 10, etc.) via a daemon `ScheduledExecutorService`, backed by a `Cleaner`-registered fallback and an explicit flush from `JolApplicationInitializer.contextDestroyed()` on graceful shutdown. `ENABLE_TEST_MODE=true` skips scheduled persistence entirely so tests don't fight the filesystem.
-4. **Consequence:** a hard crash (as opposed to a graceful shutdown) can lose up to one persistence interval's worth of writes — there's no write-ahead log or journal. This trades durability guarantees for operational simplicity, which is a reasonable call for a game server where the worst case is replaying a turn, not losing money.
+1. **Write-through with an in-memory cache** (most services): the constructor loads its table into an in-memory `Map` once; reads are plain map lookups (`PlayerService.get(name)` is a `HashMap` lookup, not a query), and every mutation writes to Postgres *and* the map together via `jpaWriteThenMutate` (persist first, then publish the in-memory change) or `jpaWriteWithRollback` (mutate optimistically, roll the map back if the write fails).
+2. **Stateless, no cache** (`DeckService`, `HistoryService`): every read is a live query — there's no cache to keep warm because a deck or history record is read far less often relative to how large its content is, so a full-table cache isn't worth holding.
+3. **Batched write-behind** (`PlayerActivityService`, `PlayerGameActivityService` only): these two are hit on essentially every request (a nav poll, a game view), so a synchronous DB write per call would put every poll on the write path. They keep the in-memory-map design and flush on a fixed interval instead (see each class's own comment for why), same pattern write-through services used to follow entirely before the migration.
+4. `ENABLE_TEST_MODE=true` skips `JpaFactory.initialize()` and makes every write helper a no-op that only updates in-memory state, so tests run against an in-memory H2 instance (see [Tests](#tests) above) without ever touching Postgres for the assertion itself.
 
-**Games are the one exception with real substructure**, since a game is too much state for a single flat map entry: `games/<uuid>/game.json` holds the live `GameData`, `history.json` holds the chat/action log, and each registered deck gets its own `<deckId>.json` alongside them. `GameService` still follows the same load-into-memory-then-persist-on-schedule pattern underneath, just keyed by directory instead of by map entry.
+**Single-node assumption:** the in-memory copy each write-through service holds is treated as authoritative, with the database as a write-through copy of it — a second app node would diverge from the first immediately, so scaling out would mean moving reads to the database first. Graceful shutdown (`JolApplicationInitializer.contextDestroyed()`) flushes every batched service and closes the JPA `EntityManagerFactory`/HikariCP pool cleanly; call `shutdown()` from there, not a JVM shutdown hook.
 
-**Legacy XML is a shrinking remnant, not the design:** a small number of pre-migration games were never converted from the old `game.xml`/`actions.xml` (JaxB) format to JSON. `GameDataConversion` (`net.deckserver.jobs`) reads those on the fly; all new games are JSON-only, and this code path should be treated as obsolete-in-progress rather than something to build new features against.
+### Migrating JSON Data to PostgreSQL
 
-**Cards are the other exception** — crypt/library data isn't in `JOL_DATA` at all (see above); keeping it out of the per-instance data directory means it stays identical across every deployment without needing to be synced.
+`migrate-to-db.sh` (repo root) is a one-shot script that resets a target Postgres database and imports an existing `JOL_DATA` JSON directory into it — used both for local development against fixture data and for a real cutover of production/test data.
+
+**Prerequisites:** `psql`, `jq`, `python3` on whatever machine runs the script (see below for running it inside a container instead, if the target host doesn't have them installed directly).
+
+**Usage:**
+```bash
+./migrate-to-db.sh [--player-data-only] [DATA_DIR]
+```
+* `DATA_DIR` defaults to `~/data`.
+* Connection is via the standard `PGHOST`/`PGPORT`/`PGDATABASE`/`PGUSER`/`PGPASSWORD` env vars (defaults: `localhost:5432/jol`, user `jol`, password `jol`).
+* The script **drops and recreates** the target database, then re-applies every Flyway migration under `src/main/resources/db/migration/` before importing data — safe to re-run, but never point it at a database you want to keep.
+
+**`--player-data-only`** restricts the import to tables owned by a single player — `player`/`player_role`, `player_activity`, `deck_info`/`deck_format`/`deck_content`, and `refresh_token`. Everything else (games, registrations, tournaments, global chat, past-game history) is skipped entirely. This is meant for a first test migration against a real data directory without dragging along live/in-progress game state — the summary printed at the end shows `0 rows` for every skipped table so you can confirm what did and didn't come across.
+
+**Local development:**
+```bash
+docker compose -f local-docker-compose.yml up -d db   # starts a local Postgres, no Traefik/nginx
+./load-test-fixtures.sh                                # shorthand for: ./migrate-to-db.sh src/test/resources/data
+```
+
+**Migrating a real (e.g. production or test) data directory**, when the target Postgres container doesn't have `psql`/`jq`/`python3` available on its host directly: run the script inside a throwaway container instead, with the real `JOL_DATA` volume mounted read-only and attached to the same Docker network as the Postgres container, so it can resolve it by service name:
+```bash
+docker run -d --name jol-migrate-tmp --network web -v <jol-data-volume>:/data:ro postgres:16 sleep infinity
+docker cp migrate-to-db.sh jol-migrate-tmp:/migrate-to-db.sh
+docker cp src/main/resources/db/migration/. jol-migrate-tmp:/src/main/resources/db/migration/
+docker exec jol-migrate-tmp bash -c "apt-get update -qq && apt-get install -y -qq jq python3"
+docker exec -e PGHOST=<postgres-service-name> -e PGPASSWORD=<password> \
+  jol-migrate-tmp bash /migrate-to-db.sh --player-data-only /data
+docker rm -f jol-migrate-tmp
+```
+(`postgres:16` already bundles `psql`; the script's relative `MIGRATIONS` path means the copied files must land at `/src/main/resources/db/migration` alongside the script at `/migrate-to-db.sh`, matching the repo's own layout.) Stop whatever's currently reading/writing that data directory first, so the import is a consistent snapshot rather than racing live writes.
 
 ### Technology Stack
-* JSP / Servlets - page entry points and login/session bootstrapping
-  * `MainServlet.java` - maps to `/`, `/main.jsp`, `/lobby`, `/deck`, `/admin`, `/game/*`, `/tournament`, `/tournamentAdmin`, `/profile`, `/active`, `/watch`, `/super`
-  * `LoginServlet.java` - maps to `/login`
-  * `LogoutServlet.java` - maps to `/logout`
-  * `RegisterServlet.java` - maps to `/register`
-  * JSP templates - located under `/WEB-INF/jsps`, grouped by function (`lobby`, `game`, `decks`, `admin`, `tournament`, `tournament-admin`, `profile`, `watch`, `help`, `main`); each has its own `layout.jsp` loaded first, then subsequent fragments
-  * `/WEB-INF/main.jsp` holds the references to the functional layout sections
-* Jersey - JAX-RS implementation for the REST API under `/jol/api/...`, which fully replaces the DWR-based client the app used to run on
+* JPA (Hibernate 7) / Flyway / HikariCP / PostgreSQL - persistence layer, see [Storage Mechanics](#storage-mechanics) above
+  * `net.deckserver.jpa.entity` - one `@Entity` per table; `net.deckserver.jpa.repository` - one repository per entity/aggregate holding the actual JPQL/`EntityManager` calls, so services never touch `EntityManager` directly
+  * `JpaFactory` bootstraps HikariCP + Flyway (`db/migration/`) + the `EntityManagerFactory` - `initialize()` for the real app, `initializeWithEmf()` for tests
+* Jersey - JAX-RS implementation for the REST API under `/jol/api/...`, the SPA's sole backend interface
   * `JolApplication` configures the application path and package scanning (`net.deckserver.rest`)
-  * Resources: `PageResource` (navigate/poll/chat), `LobbyResource`, `DeckResource`, `GameActionResource`, `GameResource`, `UserResource`, `PlayerResource`, `AdminResource`, `TournamentResource`, `NotificationResource`, `AuthResource`, `SystemResource`
+  * Resources: one per SPA page/concern, each returning that page's own bean directly with no shared envelope - `PageResource` (nav/global chat), `LobbyResource`, `DeckResource`/`DeckPageResource`, `GameActionResource`/`GameStateResource`, `AdminResource`/`AdminPageResource`, `TournamentResource`, `ProfileResource`, `PlayerResource`, `StatisticsResource`, `WatchResource`, `NotificationResource`, `ConfigResource`, `AuthResource`, `MainResource`
   * `SecurityFilter` rejects unauthenticated calls with 401 and populates the JAX-RS `SecurityContext` (`Principal` / `isUserInRole`)
-  * `src/main/webapp/js/ds.js` is the hand-written fetch-based REST client consumed by the JSPs and game JS — see [Frontend Architecture](#frontend-architecture) below for how it loads and updates pages
-* WebSocket (JSR-356) - lightweight server push over `/ws/updates`
+  * `LegacyClientResource` returns 401 to the two calls a pre-React browser tab left open across a deploy still makes on its own, bouncing it to `/login`
+* WebSocket (JSR-356) - lightweight server push over `/ws/updates`, signals only - see [Frontend Architecture](#frontend-architecture) below
   * `JolWebSocketEndpoint` authenticates the handshake off the login cookie and handles join/leave/ping frames
-  * `WebSocketRegistry` tracks player -> socket(s) and game -> sockets mappings; clients re-poll the REST API on receipt rather than getting full payloads over the socket
+  * `WebSocketRegistry` tracks player -> socket(s) and game -> sockets mappings; clients re-fetch the relevant REST endpoint on receipt rather than getting full payloads over the socket
 * Authentication - cookie-based, no server-side session store; see [Authentication](#authentication) below for the full request flow
-* Jackson - JSON serialization library, used throughout for reading/writing all data files listed above
-* JaxB - legacy XML serialization, retained only to read pre-migration `game.xml`/`actions.xml` files (`net.deckserver.game.jaxb`, `GameDataConversion`); all new games are stored as JSON
+* Jackson - JSON serialization throughout: REST request/response bodies, and the JSON/text blob columns described in [Database Schema](#database-schema) above
 * jBCrypt - password hashing for `PlayerInfo.hash`
 * Caffeine - in-memory caching, e.g. active-user summaries and hot `JolGame` lookups
-* jQuery - DOM manipulation and event wiring in `ds.js` and the page JS
-* Vite / React / TypeScript - incrementally replacing the JSP/jQuery frontend one route at a time, see [Frontend Architecture](#frontend-architecture) below
+* Vite / React / TypeScript - the entire client, see [Frontend Architecture](#frontend-architecture) below
   * `CardDatabaseBuilder.java` (test-scope) parses the VEKN-supplied crypt/library CSVs and generates the static JSON/HTML consumed by tooltips and modals, plus card images, served from `static.deckserver.net` (nginx) in prod and by `frontend/serveCardAssets.ts` (Vite) in local dev
 * Docker - runs the application server on deckserver.net, fronted by Traefik for TLS termination and routing
-  * `docker-compose.yml` - production config (`prod`, `test`, and `static` nginx containers), each with its own persistent named volume for `JOL_DATA`
+  * `docker-compose.yml` - production config: `prod` (+ its own `prod-db` Postgres), `test`, and `static` (nginx, serving prebuilt card assets) containers
+  * `local-docker-compose.yml` - dev-only, just a local Postgres `db` service; no Traefik/nginx, since the Vite dev server's own proxy already covers local routing
 
 ### Frontend Architecture
-There is no client-side router or virtual DOM — the browser loads one real page (`main.jsp`, which contains every panel: lobby, game, decks, admin, etc., toggled by CSS), and after that everything is driven by polling/pushed JSON that gets stitched into the existing DOM by jQuery. The whole cycle lives in `src/main/webapp/js/ds.js`.
+The entire client is `frontend/` — a real Vite/TypeScript/React SPA with a client-side router (`react-router-dom`) and no JSPs left anywhere in the request path. See `frontend/README.md` for the frontend project's own structure, scripts, and testing setup; this section covers how it fits into the wider app.
 
-1. **Initial load** — on `$(document).ready`, `ds.js` reads the current path (`/jol/game/<id>`, etc.) to figure out which view to start on, then calls `DS.init(target)`. This posts to `POST /jol/api/navigate` with `{target, init: true}` and, on response, calls `init(data)`, which applies the saved dark-mode preference, hands the payload to `processData`, and opens the WebSocket (`initWebSocket()`).
+1. **Routing.** `App.tsx` defines the routes directly with `react-router-dom` (`MainPage`/`LoginPage` load eagerly; every other page — `LobbyPage`, `GamePage`, `DeckPage`, `TournamentPage`, `AdminPage`, ... — is a separate lazily-loaded chunk, fetched on first navigation there). Server-side, `WEB-INF/rewrite.config`'s `RewriteValve` rules rewrite every one of those top-level paths to `/react/index.html` before dispatch ever reaches a servlet mapping — there's no Java class deciding routes anymore, just that one rewrite rule list mirroring the client's own route table, plus `web.xml`'s welcome-file mapping for the bare context root. No auth check happens server-side at that layer at all.
+2. **Auth gating is client-side.** `AuthGate` (in `App.tsx`) only renders the authenticated app shell once a `GET /jol/api/nav` call (`useNav`, backed by `SecurityFilter`) has actually confirmed a session — it doesn't trust the server to have gated the page already. A logged-out visitor sees `LoginPage`, which is deliberately mounted outside `AuthGate` so it can render before any session exists.
+3. **Data fetching is TanStack Query, not a hand-rolled cache.** Every page's `frontend/src/api/client.ts` call (a thin `fetch` wrapper — see [Authentication](#authentication) below for its 401 handling) is wrapped in a `useQuery`/`useMutation` hook; TanStack Query owns request de-duplication, caching, and refetch-on-focus. There's no server-response dispatch table and no shared page envelope — each JAX-RS resource returns exactly the bean the page that calls it needs (see `frontend/src/api/types.ts` for the hand-maintained mirrors of those Java bean shapes; update both sides together when one changes).
+4. **Staying current: WebSocket push invalidates a query key, nothing more.** `/ws/updates` (JSR-356) pushes lightweight envelopes — `{"type":"invalidate","key":[...]}` — never the actual payload. `WebSocketRegistry.notifyInvalidate(key)` is what any mutating endpoint calls after a save; client-side, `ws/useQueryInvalidation.ts` (mounted once, near the app root) bridges that straight into `queryClient.invalidateQueries({queryKey: key})` — every page's `useQuery` for that same key just refetches on its own, no per-page socket handling needed. A game page additionally calls `useGameSocket(gameId)` to join/leave that game's server-side "room" (`WebSocketRegistry.joinGame`/`leaveGame`) so its tab is one of the sessions a game-scoped `notifyGame`/`notifyInvalidate(["game", gameId])` call reaches — the hook itself does nothing with the push, since the same generic invalidation bridge already handles it. If the socket drops, `socket.ts` reconnects and every currently-joined room is rejoined (`onOpen` handlers), and a `visibilitychange` listener forces a reconnect on a backgrounded tab coming back to the front (sockets can die silently while backgrounded, with no `onclose` firing until the OS actually tears the connection down).
+5. **Self-triggered refetch race.** Because a state-saving action's own response already carries the fresh state, but that same action's server-side `notifyInvalidate` call *also* pings the actor's own session, a query refetch triggered by that self-ping can race the mutation's own response handling within the same round trip. State that must reflect only the mutating call's own response (not a subsequent full-snapshot refetch) is kept in local component state instead of read off the query result for exactly this reason — see `CommandForm.tsx`'s `status` field for a concrete case (server-side command-validation errors).
+6. **Errors and auth expiry.** `api/client.ts`'s `request()` redirects straight to `/jol/login` on any 401 — no client-side retry, because there's nothing to retry: `AuthService.authenticate` (see [Authentication](#authentication) below) already tries a silent refresh-token-backed reissue *within that same request*, so a 401 only ever reaches the client once the refresh token itself is no longer valid either. Any other failure surfaces via `useConnectivity`'s "reconnecting" banner (`ReconnectingOverlay`).
 
-2. **`processData` is the entire dispatch mechanism.** Every response from `/navigate`, `/poll`, or any action call (`DS.submitForm`, `DS.createGame`, ...) is a flat JSON object whose *keys are function names*:
-   ```js
-   const processDataHandlers = {
-       checkVersion, navigate, loadGame,
-       callbackMain, callbackLobby, callbackShowDecks, callbackAdmin,
-       callbackProfile, callbackTournament, callbackTournamentAdmin,
-       callbackAllGames, showStatus, setPreferences, setEdgeColorPref,
-   };
-   function processData(a) {
-       for (const key in a) { processDataHandlers[key]?.(a[key]); }
-   }
-   ```
-   `processData` loops over the object's keys and calls the matching handler with that key's value — **the server response shape *is* the client dispatch contract**. Key names are produced server-side by `ViewCreator.getFunction()` (e.g. `GameCreator.getFunction()` returns `"loadGame"`, `MainCreator` returns `"callbackMain"`) and consumed client-side by a same-named function in `ds.js`. Adding a new panel means adding both a `ViewCreator` on the server and a matching function here — nothing enforces the pairing beyond the string matching, so a rename on one side silently breaks the other.
-
-3. **Navigating.** Clicking a nav link calls `DS.navigate(target)` → `POST /navigate` with just `{target}` (no `init`). `PageResource.navigate` sets the player's current view (`PlayerModel.setView`/`enterGame`) server-side, then returns a fresh `UpdateFactory.getUpdate()` payload — same shape as the initial load, so it flows through `processData` identically. Browser back/forward (`popstate`) re-issues the same navigate call rather than doing any client-side history diffing.
-
-4. **Staying current: WebSocket-first, polling fallback.** `/ws/updates` pushes lightweight signals only — `{"type":"game","id":...}` or `{"type":"main"}` — never the actual payload. On receipt, the client re-fetches: `DS.getState(game, false)` if it's a game update for the game currently open, or `DS.doPoll()` (→ `GET /poll`) otherwise. If the socket drops, `ds.js` falls back to a 5-second `setTimeout` polling loop (`errorhandler`) until it reconnects, and a `visibilitychange` listener forces a reconnect plus one catch-up round-trip whenever a backgrounded tab becomes visible again (sockets can die silently while backgrounded, with no `onclose` firing until the OS actually tears the connection down).
-
-5. **Rendering a game specifically.** `loadGame(data)` (the `GameBean` payload — see [Game State Model](#game-state-model-playermodel--gamemodel--gameview--gamebean) below) doesn't re-render the whole board on every update. `data.state` and `data.hand` are pre-rendered HTML fragments (JSP-rendered server-side by `GameView`), swapped into the DOM wholesale only when the server says something actually changed. Chat lines (`data.turn`) get appended incrementally rather than replacing the log.
-
-6. **Errors and auth expiry.** Any 401 that survives `ds.js`'s own silent-refresh retry (see [Authentication](#authentication) below) redirects straight to `/jol/login` (`errorhandler`). Any other failure shows a "reconnecting" banner and retries via polling.
-
-**Mental model for a new dev:** the frontend has no state store of its own beyond a handful of module-level `let`s (`game`, `player`, `currentPage`, cached lobby/profile data for re-rendering). The server is the single source of truth; the client's job is "ask for an update, dump whatever comes back into the DOM via the function named by that key." This is simple to reason about and has no build step, but every UI change touches both a Java `ViewCreator`/bean and the matching jQuery handler by hand.
+**Mental model for a new dev:** there's no bespoke client-side cache or dispatch table to learn — TanStack Query is the state store, keyed the same way on both ends (`['game', gameId]`, etc.), and the WebSocket's only job is telling the query cache "this key is stale, go refetch it." Adding a new piece of server-pushed state means calling `notifyInvalidate` with the right key server-side and having *some* component already `useQuery`-ing that key client-side — no new dispatch wiring required on either side.
 
 ### Authentication
 Cookie-based, with no server-side session store — replaces an earlier `HttpSession`-based design that didn't survive app restarts or support "remember me."
 
 **Two cookies, two lifetimes:**
-* **`jol_at`** (access token) — a signed JWT, 15 minute expiry, `HttpOnly`+`Secure`. This is the *only* thing any request actually trusts: `SecurityFilter` (REST), `MainServlet` (JSP pages), and the WebSocket handshake (`JolWebSocketEndpoint.Configurator`) all validate it directly by signature, with no lookup required. That's what makes auth restart-proof — the signing key (`AuthService`, persisted to `<JOL_DATA>/jwt_secret.key` on first boot) is the only piece of state that has to survive, not a live session table.
-* **`jol_rt`** (refresh token) — an opaque, long-lived, per-device token, `HttpOnly`+`Secure`, tracked server-side by `RefreshTokenService` (`<JOL_DATA>/refreshTokens.json`). Used only to silently mint a new `jol_at` once it expires — the user never sees a re-login prompt as long as `jol_rt` is still valid.
+* **`jol_at`** (access token) — a signed JWT, 15 minute expiry, `HttpOnly`+`Secure`. This is the *only* thing any request actually trusts: `SecurityFilter` (REST) and the WebSocket handshake (`JolWebSocketEndpoint.Configurator`) both validate it directly by signature, with no lookup required. That's what makes auth restart-proof — the signing key (`AuthService`, read from the `JWT_SECRET_FILE` env var, generated and written there on first boot if missing) is the only piece of state that has to survive, not a live session table.
+* **`jol_rt`** (refresh token) — an opaque, long-lived, per-device token, `HttpOnly`+`Secure`, tracked server-side by `RefreshTokenService` (the `refresh_token` table — see [Database Schema](#database-schema) above). Used only to silently mint a new `jol_at` once it expires — the user never sees a re-login prompt as long as `jol_rt` is still valid.
 
 **Token shape and rotation.** A `jol_rt` cookie value is `{id}.{secret}` — the `id` gives O(1) lookup of the stored row, the `secret` is what's hashed (`SHA-256`) and compared. On every successful use, the secret half is rotated (new random secret, same `id`, new hash stored) and the token's expiry slides forward — up to a 90-day absolute cap from original creation, regardless of how often it's refreshed. If a presented secret doesn't match the currently-stored hash for its `id`, that means an *already-rotated-away* token was replayed (a strong signal of token theft), so the row is revoked outright rather than silently rejected.
 
-**Multi-device.** Each login (or "remember me" checkbox) creates its own `RefreshTokenService` row, tagged with a truncated `User-Agent` as a device label. Logging out revokes only that row (`AuthService.clearAuth`); other devices are untouched. `UserResource` exposes `/user/devices` (list), `/user/devices/{id}` (revoke one), and `/user/logout-all` (revoke everything) for the profile page.
+**Multi-device.** Each login (or "remember me" checkbox) creates its own `refresh_token` row, tagged with a truncated `User-Agent` as a device label. Logging out revokes only that row (`AuthService.clearAuth`); other devices are untouched. `RefreshTokenService` already has the methods for a device-management UI (`list`, `revoke(playerName, id)`, `revokeAll(playerName)`) but nothing in `net.deckserver.rest` currently calls them — there's no `/devices` endpoint wired up yet, so this is service-layer capability without a REST surface so far.
 
 **Request flow.** `AuthService.authenticate(req, resp)` is the single entry point every auth check goes through:
 1. Is `jol_at` present and does it verify? → done, return the username, no I/O.
-2. Otherwise, is `jol_rt` present and does it validate against `RefreshTokenService`? → mint a new `jol_at`, rotate `jol_rt`, set both cookies on the response, return the username. This is what makes an expired access token invisible to the user on a normal page load or REST call.
-3. Otherwise → unauthenticated (401 for REST, redirect-to-login for JSP pages, handshake rejection for WebSocket).
+2. Otherwise, is `jol_rt` present and does it validate against `RefreshTokenService`? → mint a new `jol_at`, rotate `jol_rt`, set both cookies on the response, return the username. This is what makes an expired access token invisible to the user on a normal page load or REST call — the client never sees a 401 for this case at all, since the very request that would have failed instead succeeds with fresh cookies attached.
+3. Otherwise → unauthenticated (401 for REST, handshake rejection for WebSocket).
 
-Because step 2 needs to write response cookies, it only happens where a response is available (REST filter, JSP servlets). The WebSocket handshake only does step 1 — if `jol_at` has already expired by the time a socket connects, the connection is rejected outright rather than silently refreshed; in practice this rarely bites because a fresh page load always mints a new `jol_at` first.
+Because step 2 needs to write response cookies, it only happens where a response is available (the REST security filter). The WebSocket handshake only does step 1 — if `jol_at` has already expired by the time a socket connects, the connection is rejected outright rather than silently refreshed; in practice this rarely bites because a fresh page load always mints a new `jol_at` first.
 
-**Client side (`ds.js`).** `apiCall` retries exactly once on a 401: it calls `POST /jol/api/auth/refresh` (`AuthResource`, deliberately exempted from `SecurityFilter`'s auth check since its whole purpose is to run *after* auth has expired), and if that succeeds, replays the original request. This is what lets a long-idle tab silently recover without the user noticing, as long as `jol_rt` hasn't also expired.
+**Client side** (`frontend/src/api/client.ts`). There's no client-side retry-on-401 logic, because there's nothing to retry: per the request flow above, a 401 only ever reaches the browser once the refresh token itself has *also* failed, at which point `client.ts` just redirects to `/jol/login` — see [Frontend Architecture](#frontend-architecture) above. `POST /jol/api/auth/refresh` (`AuthResource`, exempted from `SecurityFilter`'s auth check) runs the same `authenticate()` flow standalone for a forced refresh — currently unused from `frontend/src`, left over from an earlier client that called it explicitly on a 401 before every other endpoint's own request started transparently refreshing via step 2 above.
 
 **Notable non-goal:** logging out doesn't retroactively invalidate an already-issued `jol_at` — it only stops that device from getting a new one. A stolen/leaked access token remains valid for up to its remaining 15-minute window even after logout. This is the standard access/refresh-token trade-off, not an oversight.
 
 **Password storage** is unrelated to the above and unchanged: `PlayerService.authenticate` checks a jBCrypt hash (`PlayerInfo.hash`, cost factor 13) — no tokens or cookies involved in verifying the password itself, only in what happens after it succeeds.
 
-### Game State Model: PlayerModel / GameModel / GameView / GameBean
-This is the piece most likely to confuse a new developer, because there are four similarly-named classes involved and the caching/dirty-tracking is easy to miss on a first read.
+### Game State Model: JolGame / GameModel / GameView / GameSnapshot
+There used to be a fifth class here (`PlayerModel`, one instance per logged-in player tracking "which view/game is this player currently looking at") — it's gone, because that's now just React Router state plus whatever the current page's own `useQuery` calls ask for; nothing server-side needs to remember a player's "current view" between requests any more.
 
-* **`PlayerModel`** (`net.deckserver.dwr.model.PlayerModel`) is the *player's* piece of session-equivalent state — one instance per logged-in player, held in `JolAdmin.pmap` (`Map<String, PlayerModel>`, created lazily by `JolAdmin.getPlayerModel`). It knows almost nothing about game internals: just which `view` the player is currently on (`"main"`, `"game"`, `"lobby"`, ...) and, if `view == "game"`, which `game` (by name) they're looking at (`enterGame`/`getCurrentGame`). It also carries a few other player-scoped UI bits — the currently-loaded deck for the deck editor, the global chat read-position.
+* **`JolGame`** (`net.deckserver.game.model.JolGame`) is the actual game state — a record wrapping `GameData`, with all the game-rule mutation methods (`submit` a command runs through `DoCommand`, `newTurn`, region/card manipulation, ...). Loaded from and saved back to Postgres by `GameService` (write-through per save, see [Storage Mechanics](#storage-mechanics) above) — this class itself has no persistence awareness.
 
-* **`GameModel`** (`net.deckserver.game.model.GameModel`) is the *game's* piece of state — one instance per active game, held in `JolAdmin.gmap`, wrapping the actual `JolGame`/`GameData`. It owns a `Map<String player, GameView> views` — **one `GameView` per player currently seated at or watching that game**, created lazily in `getView(player)`. All game mutation (`submit`, `endTurn`, notes updates, ...) happens here, and after each mutation `GameModel` walks its `views` map and flips dirty flags on every `GameView` (`doReload`/`reloadNotes`) so every connected player's next fetch knows what to re-render.
+* **`GameModel`** (`net.deckserver.game.model.GameModel`) is the per-active-game orchestrator — one instance per game name, held in `JolAdmin.gmap` (`Map<String, GameModel>`, created lazily by `JolAdmin.getGameModel`). It's what `GameStateResource` actually calls: `submit(player, phase, command, chat, ping, clientId)` authorizes the caller (player-in-game, or a judge), runs the command against the current `JolGame` (fetched fresh from `GameService` each call — no caching at this layer), and persists via `JolAdmin.saveGameState`, which write-throughs to Postgres and calls `WebSocketRegistry.notifyGame(gameId, excludeClientId)`.
 
-* **`GameView`** (`net.deckserver.game.model.GameView`) is the *per-player, per-game rendering cache and dirty-tracker* — this is the piece that ties `PlayerModel` to `GameModel`. It's not stored on `PlayerModel` itself; `PlayerModel` only remembers the game's *name*. Every fetch resolves it fresh: `GameCreator.createData(player)` reads `player.getCurrentGame()`, looks up the `GameModel` via `JolAdmin.getGameModel(name)`, and calls `game.getView(player.getPlayerName())` — which returns the *same* cached `GameView` instance across requests (keyed by player name in `GameModel.views`), or creates one on first access. `GameView` tracks five independent dirty flags (`stateChanged`, `phaseChanged`, `turnChanged`, `globalNotesChanged`, `privateNotesChanged`) plus per-region collapse/expand UI state (`collapsed`) and a local buffer of unsent chat lines (`chats`).
+* **`GameView`** (`net.deckserver.game.model.GameView`) is now just a small per-viewer region-collapse cache (`toggleCollapsed`/`isCollapsed`), seeded with the same "collapse a torpored/ousted player's non-essential regions" defaults the client (`PlayerBoard.tsx`'s `ALWAYS_COLLAPSED`) now computes for itself instead. `GameModel` still holds a `Map<String, GameView> views` and `getView(player)`/`resetView(player)` methods to manage it (the latter still called on player-replace, for cache hygiene), but nothing currently calls `getView` at all — the client owns this UI state entirely now, and this whole path is vestigial server-side state left over from before it did. It used to also carry dirty-flag tracking and a JSP-rendered HTML fragment cache for the old client — both were removed once nothing but that removed rendering path read them.
 
-* **`GameBean`** (`net.deckserver.dwr.bean.GameBean`) is the flat, immutable JSON DTO actually sent to the browser — built fresh on every call by `GameView.create()`. This is where the dirty flags pay off: `create()` only does the expensive work (rendering `hand.jsp`/`state.jsp` to a string via `JspRenderer`, which requires a `RequestContext`) for fields whose flag is currently set — e.g. `hand` stays `null` unless `stateChanged` is true, so an update that only added a chat line doesn't re-render the whole board HTML. After building the bean, `clearAccess()` resets all the flags to `false` so the *next* call is a no-op unless something changes them again in between.
+* **`GameSnapshot`** (`net.deckserver.rest.bean.GameSnapshot`), built by `GameSnapshotFactory.build(gameModel, viewer, status)`, is the flat JSON DTO actually sent to the browser — from scratch, on every call, directly off the current `JolGame`. There's no dirty-flag tracking or per-field skip logic any more: the factory is stateless and safe to call from any number of concurrent requests, and the "only send what changed" optimization the old dirty-flag system existed for is now just "the client only refetches when a WebSocket push tells it its query key is stale" (see [Frontend Architecture](#frontend-architecture) above) — the expense that optimization used to guard against (rendering JSP fragments) doesn't exist on this path at all any more.
 
-**Full round trip for one game action**, tying it back to Frontend Architecture above:
-1. Client: `DS.submitForm(game, phase, command, chat, ping)` → `POST /jol/api/game/{name}/submit`.
-2. `GameActionResource` → `GameModel.submit(player, ...)` runs the command (`DoCommand`), mutates `JolGame`, then calls `doReload(...)` to mark every seated player's `GameView` dirty.
-3. The response to the *acting* player is built synchronously via the normal `update()` → `UpdateFactory.getUpdate()` → `GameCreator` → `GameView.create()` path, same as any other request, riding back on the HTTP response for that call.
-4. Other players watching the same game don't get this HTTP response — they get a WebSocket `{"type":"game","id":...}` ping, which (per Frontend Architecture) triggers *their* client to call `DS.getState(game, false)`, which re-enters the exact same `GameCreator`/`GameView.create()` path from their own request, reading whichever dirty flags `doReload` set for *their* `GameView` instance.
+**Full round trip for one game action:**
+1. Client: `GamePage` calls `POST /jol/api/game/{id}/view/submit` (via `api/client.ts`) with the phase/command/chat/ping to apply.
+2. `GameStateResource.submit` resolves the `GameModel` for that game id and calls `game.submit(player, ..., clientId())` — `clientId()` is this tab's `X-Client-Id` header, threaded through so the acting tab can be excluded from its own push (see next step).
+3. `GameModel.submit` authorizes the caller, runs the command against `JolGame`, and (if anything changed) calls `JolAdmin.saveGameState(game, silent, excludeClientId)` → `GameService.saveGame` (write-through to Postgres) → `WebSocketRegistry.notifyGame(gameId, excludeClientId)`.
+4. The acting tab's own response already carries the fresh `GameSnapshot` (built synchronously by `GameSnapshotFactory` and returned from the same call) — it doesn't need the WebSocket push at all, which is why step 3 excludes it.
+5. Every *other* tab watching this game (joined via `useGameSocket`, see [Frontend Architecture](#frontend-architecture) above) receives the `{"type":"invalidate","key":["game", gameId]}` push and refetches `GET /jol/api/game/{id}/view` on its own — same `GameSnapshotFactory` path, just entered from a different request, for that viewer.
 
-So: one game mutation, one `JolGame` update, but N independently dirty-tracked `GameView`s (one per connected viewer) and N separately-triggered fetches to collect them — `GameModel` is the fan-out point, `GameView` is what makes each fan-out target's re-render minimal.
+So: one game mutation, one `JolGame` update in Postgres, one broadcast — but no per-viewer server-side state to keep in sync any more; each viewer's next fetch just rebuilds its own `GameSnapshot` fresh, which is safe precisely because that build is stateless.
