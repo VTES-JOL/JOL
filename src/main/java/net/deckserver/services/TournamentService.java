@@ -642,7 +642,9 @@ public class TournamentService extends PersistedService {
             for (String playerName : seeding) {
                 String deckId = getRegistrations(tournamentName, playerName).map(TournamentRegistration::getDeck).orElseThrow();
                 ExtendedDeck deck = getTournamentDeck(tournamentName, deckId);
-                assert deck != null;
+                if (deck == null) {
+                    throw new IllegalStateException("No tournament deck found for " + tournamentName + " " + deckId);
+                }
                 // Create Registration
                 RegistrationService.registerDeck(gameName, playerName, deckId, deck.getDeck().getName(),
                         deck.getStats().getSummary(), DeckService.serializeDeck(deck));

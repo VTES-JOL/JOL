@@ -80,7 +80,11 @@ public class DeckService extends PersistedService {
     }
 
     public static String getDeckComments(String playerName, String deckName) {
-        String comments = getDeck(get(playerName, deckName).getDeckId()).getDeck().getComments();
+        DeckInfo deckInfo = get(playerName, deckName);
+        if (deckInfo == null) {
+            return "";
+        }
+        String comments = getDeck(deckInfo.getDeckId()).getDeck().getComments();
         return comments == null ? "" : comments;
     }
 

@@ -128,7 +128,8 @@ public class RegistrationService extends PersistedService {
         summary.setName(gameName);
         getGameRegistrations(gameName).forEach((key, value) -> summary.getPlayers().put(key, value.getSummary()));
         OffsetDateTime timestamp = OffsetDateTime.now().minusDays(5);
-        timestamp = getGameRegistrations(gameName).values().stream().map(RegistrationStatus::getTimestamp).max(Comparator.naturalOrder()).orElse(timestamp);
+        timestamp = getGameRegistrations(gameName).values().stream().map(RegistrationStatus::getTimestamp)
+                .filter(Objects::nonNull).max(Comparator.naturalOrder()).orElse(timestamp);
         summary.setTimestamp(timestamp);
         return summary;
     }

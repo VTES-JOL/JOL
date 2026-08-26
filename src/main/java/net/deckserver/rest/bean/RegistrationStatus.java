@@ -16,10 +16,10 @@ public class RegistrationStatus {
         this.player = player;
         this.gameName = game;
         net.deckserver.storage.json.system.RegistrationStatus status = RegistrationService.getRegistration(game, player);
-        this.registered = status.getDeckId() != null;
-        this.deckName = status.getDeckName();
-        this.deckSummary = status.getSummary();
-        this.valid = status.isValid();
+        this.registered = status != null && status.getDeckId() != null;
+        this.deckName = status == null ? null : status.getDeckName();
+        this.deckSummary = status == null ? null : status.getSummary();
+        this.valid = status != null && status.isValid();
     }
 
 }

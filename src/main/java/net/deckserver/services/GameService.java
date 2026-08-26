@@ -213,9 +213,10 @@ public class GameService extends PersistedService {
     }
 
     public static void saveGame(JolGame game) {
-        // compute() makes cache-put + DB write atomic per game, so a concurrent save of
-        // the same game can't interleave (GameStateEntity is @Version-ed; an interleaved
-        // save would fail with an optimistic lock conflict and be dropped).
+        // GameStateEntity is @Version-ed, so a concurrent DB write for the same game that's
+        // based on a stale version fails with an optimistic lock conflict. The cache put below
+        // is NOT similarly guarded, though: it's a plain put, not a compute(), so two concurrent
+        // saveGame() calls can still race on which one's put lands last in the cache.
         String gameName = INSTANCE.idToName.get(game.id());
         if (gameName != null && INSTANCE.games.containsKey(gameName)) {
             INSTANCE.requireJpaWrite(em -> gameStateRepository.save(em, game));

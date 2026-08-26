@@ -18,10 +18,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -31,8 +31,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class CardService {
 
     private static final Logger logger = getLogger(CardService.class);
-    private static final Map<String, String> nameKeys = new HashMap<>();
-    private static final Map<String, CardSummary> cards = new HashMap<>();
+    private static final Map<String, String> nameKeys = new ConcurrentHashMap<>();
+    private static final Map<String, CardSummary> cards = new ConcurrentHashMap<>();
 
     static {
         ObjectMapper objectMapper = new ObjectMapper();
