@@ -57,9 +57,16 @@ services:
       - "traefik.http.routers.test.tls.certresolver=myresolver"
     env_file: .keys
     environment:
-      JOL_DATA: /data
       TYPE: "test"
       _JAVA_OPTIONS: -Djava.security.egd=file:/dev/./urandom
+      JOL_DB_URL: jdbc:postgresql://prod-db:5432/jol
+      JOL_DB_USER: jol
+      JOL_DB_PASSWORD: ${PROD_DB_PASSWORD:?set PROD_DB_PASSWORD in .env}
+      VAPID_KEY_FILE: /data/vapid_private.pem
+      JWT_SECRET_FILE: /data/jwt_secret.key
+    depends_on:
+      prod-db:
+        condition: service_healthy
     volumes:
       - test-data:/data
       - test-app:/usr/local/tomcat/webapps

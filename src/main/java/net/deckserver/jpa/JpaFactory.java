@@ -26,6 +26,12 @@ public final class JpaFactory {
                 System.getProperty("jol.db.url", "jdbc:postgresql://localhost:5432/jol"));
 
         HikariConfig hikariConfig = new HikariConfig();
+        // Explicit driver class: deployed as a real WAR in standalone Tomcat, DriverManager's
+        // automatic ServiceLoader-based driver registration is unreliable (a JVM-wide singleton,
+        // its one-time driver scan runs against whatever classloader first touches it) and can
+        // fail with "No suitable driver" even though postgresql.jar is on the webapp classpath.
+        // Setting this forces HikariCP to Class.forName() it directly instead of relying on that.
+        hikariConfig.setDriverClassName("org.postgresql.Driver");
         hikariConfig.setJdbcUrl(url);
         hikariConfig.setUsername(System.getenv().getOrDefault("JOL_DB_USER", "jol"));
         hikariConfig.setPassword(System.getenv().getOrDefault("JOL_DB_PASSWORD", ""));

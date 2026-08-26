@@ -2,7 +2,14 @@
 # migrate-to-db.sh — Reinitialise PostgreSQL from JOL file-based data
 #
 # Usage:
-#   ./migrate-to-db.sh [DATA_DIR]
+#   ./migrate-to-db.sh [--player-data-only] [DATA_DIR]
+#
+# --player-data-only restricts the import to tables owned by a single player —
+# player/player_role, player_activity, deck_info/deck_format/deck_content, and
+# refresh_token. Everything else (games, registrations, tournaments, global
+# chat, past-game history) is skipped entirely. Useful for a first test
+# migration against a real data directory without dragging along live/in-
+# progress game state.
 #
 # DATA_DIR defaults to ~/data. Override DB connection via env vars:
 #   PGHOST PGPORT PGDATABASE PGUSER PGPASSWORD
@@ -11,7 +18,14 @@
 
 set -euo pipefail
 
-DATA="${1:-$HOME/data}"
+PLAYER_DATA_ONLY=false
+for arg in "$@"; do
+  case "$arg" in
+    --player-data-only) PLAYER_DATA_ONLY=true ;;
+    *) DATA="$arg" ;;
+  esac
+done
+DATA="${DATA:-$HOME/data}"
 export PGHOST="${PGHOST:-localhost}"
 export PGPORT="${PGPORT:-5432}"
 export PGDATABASE="${PGDATABASE:-jol}"
@@ -61,13 +75,17 @@ done
 
 [[ -d "$DATA" ]] || { echo "ERROR: DATA_DIR '$DATA' does not exist"; exit 1; }
 
-for f in players.json games.json registrations.json decks.json tournaments.json \
-          player-timestamps.json game-timestamps.json chats.json; do
+REQUIRED_FILES=(players.json decks.json player-timestamps.json)
+if [[ "$PLAYER_DATA_ONLY" == false ]]; then
+  REQUIRED_FILES+=(games.json registrations.json tournaments.json game-timestamps.json chats.json)
+fi
+for f in "${REQUIRED_FILES[@]}"; do
   [[ -f "$DATA/$f" ]] || { echo "ERROR: $DATA/$f not found"; exit 1; }
 done
 
 echo "Migrating data from: $DATA"
 echo "Target database:     $PGUSER@$PGHOST:$PGPORT/$PGDATABASE"
+[[ "$PLAYER_DATA_ONLY" == true ]] && echo "Mode:                 --player-data-only (games/registrations/tournaments/global chat/game history skipped)"
 echo
 
 # ── Temp files ────────────────────────────────────────────────────────────────
@@ -164,6 +182,10 @@ SQL
 success "$(jq 'length' "$DATA/player-timestamps.json") player timestamps"
 
 # ── 5. Tournaments ───────────────────────────────────────────────────────────
+if [[ "$PLAYER_DATA_ONLY" == true ]]; then
+  echo
+  echo "  ⚠ --player-data-only: skipping tournaments"
+else
 log "Loading tournaments..."
 jq -r '.[] | [
   .id,
@@ -250,8 +272,13 @@ SQL
 rm -f "$TOURN_DECK_CSV"
 
 success "$(jq 'length' "$DATA/tournaments.json") tournaments"
+fi
 
 # ── 6. Games ─────────────────────────────────────────────────────────────────
+if [[ "$PLAYER_DATA_ONLY" == true ]]; then
+  echo
+  echo "  ⚠ --player-data-only: skipping games"
+else
 log "Loading games..."
 # Write games CSV with owner_name; resolve to owner_id via LEFT JOIN so SYSTEM games get null owner.
 jq -r 'to_entries[] | [
@@ -287,8 +314,13 @@ SQL
 
 GAME_COUNT=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM game;")
 success "$GAME_COUNT games loaded"
+fi
 
 # ── 7. Registrations ─────────────────────────────────────────────────────────
+if [[ "$PLAYER_DATA_ONLY" == true ]]; then
+  echo
+  echo "  ⚠ --player-data-only: skipping registrations"
+else
 log "Loading registrations..."
 # registrations.json is keyed by game_name; stage to resolve both game_id and player_id.
 jq -r 'to_entries[] | .key as $game | .value | to_entries[] | [
@@ -363,6 +395,7 @@ SQL
 rm -f "$GAME_DECK_CSV"
 
 success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM registration;') registrations"
+fi
 
 # ── 8. Decks ──────────────────────────────────────────────────────────────────
 log "Loading deck info..."
@@ -444,6 +477,11 @@ DECK_COUNT=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) F
 CONTENT_COUNT=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM deck_content;")
 success "$DECK_COUNT decks ($CONTENT_COUNT with content)"
 
+# ── 9-13. Game states, game chat, game snapshots, game activity, global chat, game history ──
+if [[ "$PLAYER_DATA_ONLY" == true ]]; then
+  echo
+  echo "  ⚠ --player-data-only: skipping game states/chat/snapshots/activity, global chat, and game history"
+else
 # ── 9. Game states ────────────────────────────────────────────────────────────
 log "Loading game states..."
 # Only load states for game_ids that were actually inserted
@@ -607,6 +645,7 @@ if [[ -f "$DATA/pastGames.json" ]]; then
   success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM game_history;') game histories"
 else
   echo "  ⚠ no pastGames.json found — skipping game history"
+fi
 fi
 
 # ── 14. Refresh tokens ────────────────────────────────────────────────────────
