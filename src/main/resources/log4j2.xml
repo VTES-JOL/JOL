@@ -30,16 +30,30 @@
     </Appenders>
 
     <!--
-      No Root logger here: this file only governs log4j2's own
-      LoggerContext, which only net.deckserver.metrics/commands below ever
-      reach — GameModel obtains those two via org.apache.logging.log4j's
-      native LogManager (not SLF4J), specifically to get the per-game
-      dynamic file routing below (Quarkus's own logging has no equivalent
-      for that). Every other class logs via SLF4J, which Quarkus's own
-      org.jboss.slf4j:slf4j-jboss-logmanager binding wins over this file's
-      log4j-slf4j2-impl for — so a Root logger/console appender here would
-      never actually be reached by app code. See application.properties'
-      quarkus.log.console.format for that logging's equivalent config.
+      Root/Console below is dead weight in the *running app* (quarkus:dev
+      or prod): Quarkus's own launcher sets
+      -Djava.util.logging.manager=org.jboss.logmanager.LogManager before
+      anything logs, so org.jboss.slf4j:slf4j-jboss-logmanager wins the
+      SLF4J-provider race there over this file's log4j-slf4j2-impl —
+      confirmed by the running app's console using JBoss LogManager's
+      format. application.properties' quarkus.log.console.format is that
+      logging's real, active equivalent-settings config.
+
+      But it's still load-bearing for test-scope code (e.g.
+      CardDatabaseBuilder, tagged Builder — see CLAUDE.md): Maven Surefire's
+      forked test JVM never sets that system property, so JBoss LogManager's
+      binding fails there instead (confirmed: running a Builder-tagged test
+      logs "ERROR: The LogManager accessed before the
+      java.util.logging.manager system property was set... Results may be
+      unexpected" from org.jboss.logmanager.JBossLoggerFinder). Log4j2's own
+      binding is what actually carries plain SLF4J logging to the console in
+      that context, so removing Root here would silence test-scope logging
+      entirely rather than just being redundant with Quarkus's own config.
+
+      net.deckserver.metrics/commands are unaffected either way — GameModel
+      obtains those two via org.apache.logging.log4j's native LogManager
+      (not SLF4J) specifically for the per-game dynamic file routing below,
+      which has no Quarkus-native equivalent.
     -->
     <Loggers>
         <Logger name="net.deckserver.metrics" level="INFO" additivity="false">
@@ -49,6 +63,9 @@
             <AppenderRef ref="commands"/>
             <AppenderRef ref="console" level="error"/>
         </Logger>
+        <Root level="INFO">
+            <AppenderRef ref="console"/>
+        </Root>
     </Loggers>
 
 </Configuration>

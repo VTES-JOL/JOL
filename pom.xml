@@ -262,14 +262,24 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j2-impl</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.3.4</version>
+        </dependency>
+
+        <!--
+          GameModel's METRICS/COMMANDS loggers call
+          org.apache.logging.log4j.LogManager directly for log4j2.xml's
+          per-game dynamic file routing (see its class comment) — this used
+          to come in transitively via log4j-slf4j2-impl (removed: it made
+          log4j2 needlessly compete with org.jboss.slf4j:slf4j-jboss-
+          logmanager for the SLF4J-provider slot, which nothing actually
+          wanted log4j2 to win). Declared directly now that nothing else
+          pulls it in.
+        -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
         </dependency>
 
         <dependency>
@@ -429,7 +439,20 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.3</version>
                 <configuration>
+                    <!--
+                      Makes JBoss LogManager (the SLF4J provider that wins
+                      on this classpath — see log4j2.xml's Root/Loggers
+                      comment) the active java.util.logging.LogManager in
+                      Surefire's forked JVM, same as Quarkus's own
+                      dev/runtime launcher does for the real app. Needed
+                      for net.deckserver.testsupport.TestLoggingActivator
+                      (a JUnit TestExecutionListener, auto-registered via
+                      META-INF/services) to reach the right LogContext —
+                      see its class comment for why plain SLF4J logging is
+                      otherwise silently dropped in test scope.
+                    -->
                     <argLine>--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED
+                        -Djava.util.logging.manager=org.jboss.logmanager.LogManager
                     </argLine>
                     <excludedGroups>Builder</excludedGroups>
                 </configuration>
