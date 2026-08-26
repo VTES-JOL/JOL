@@ -3310,7 +3310,7 @@ function createKpis(kpis) {
 }
 
 function fillTop(top, target) {
-    const topPlayers = $(`#${target}`);
+    const topPlayers = document.getElementById(target);
     const isNations = target.toLowerCase().includes("nations");
     topPlayers.innerHTML = top.map((player, index) => {
         const [key, value] = Object.entries(player)[0];
