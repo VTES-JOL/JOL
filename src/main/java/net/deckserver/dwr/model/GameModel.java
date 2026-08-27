@@ -102,6 +102,7 @@ public class GameModel implements Comparable<GameModel> {
                 OffsetDateTime timestamp = OffsetDateTime.now();
                 METRICS.info(new ObjectArrayMessage(timestamp.getYear(), timestamp.getMonthValue(), timestamp.getDayOfMonth(), timestamp.getHour(), player, game.getName(), didCommand, didChat, didPing));
                 JolAdmin.clearPing(player, name);
+                COMMANDS.info("[{}] {}", player, "clear Ping");
             } else if(didPing) {
                 OffsetDateTime timestamp = OffsetDateTime.now();
                 METRICS.info(new ObjectArrayMessage(timestamp.getYear(), timestamp.getMonthValue(), timestamp.getDayOfMonth(), timestamp.getHour(), player, game.getName(), false, false, didPing));
