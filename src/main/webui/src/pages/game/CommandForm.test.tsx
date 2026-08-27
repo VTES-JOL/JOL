@@ -1,11 +1,21 @@
+import type { ComponentProps } from 'react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CommandForm } from './CommandForm';
+import { useSubmitGuard } from '../../hooks/useSubmitGuard';
 import { api } from '../../api/client';
 import { confirmDialog } from '../../components/dialog';
 import { showError } from '../../components/toast';
 import type { GameSnapshot } from '../../api/types';
+
+// Wires CommandForm to the real useSubmitGuard hook, same as GamePage does —
+// keeps these tests exercising the actual submitting/guard behavior instead
+// of stubbing it out.
+function TestHarness(props: Omit<ComponentProps<typeof CommandForm>, 'submitting' | 'guard'>) {
+  const { submitting, guard } = useSubmitGuard();
+  return <CommandForm {...props} submitting={submitting} guard={guard} />;
+}
 
 vi.mock('../../api/client', () => ({
   api: { post: vi.fn() },
@@ -57,7 +67,7 @@ describe('CommandForm', () => {
     vi.mocked(api.post).mockResolvedValue(updated);
     const onUpdated = vi.fn();
     const user = userEvent.setup();
-    render(<CommandForm gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={onUpdated} />);
+    render(<TestHarness gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={onUpdated} />);
 
     await user.type(screen.getByLabelText('Command'), 'burn library 1');
     await user.type(screen.getByLabelText('Chat'), 'hello');
@@ -77,7 +87,7 @@ describe('CommandForm', () => {
   it('shows a toast and stops submitting on API failure', async () => {
     vi.mocked(api.post).mockRejectedValue(new Error('boom'));
     const user = userEvent.setup();
-    render(<CommandForm gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={vi.fn()} />);
+    render(<TestHarness gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={vi.fn()} />);
 
     await user.type(screen.getByLabelText('Chat'), 'hello');
     await user.click(screen.getByRole('button', { name: 'Submit' }));
@@ -90,7 +100,7 @@ describe('CommandForm', () => {
     vi.mocked(confirmDialog).mockResolvedValue(false);
     const onUpdated = vi.fn();
     const user = userEvent.setup();
-    render(<CommandForm gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={onUpdated} />);
+    render(<TestHarness gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={onUpdated} />);
 
     await user.click(screen.getByRole('button', { name: 'End Turn' }));
     expect(api.post).not.toHaveBeenCalled();
@@ -103,7 +113,7 @@ describe('CommandForm', () => {
   });
 
   it('disables End Turn and the Phase select when it is not the viewer\'s turn', () => {
-    render(<CommandForm gameId="g1" game={makeGame({ currentPlayer: 'Player2' })} viewerName="Player1" onUpdated={vi.fn()} />);
+    render(<TestHarness gameId="g1" game={makeGame({ currentPlayer: 'Player2' })} viewerName="Player1" onUpdated={vi.fn()} />);
 
     expect(screen.getByRole('button', { name: 'End Turn' })).toBeDisabled();
     expect(screen.getByLabelText('Phase')).toBeDisabled();
@@ -111,7 +121,7 @@ describe('CommandForm', () => {
 
   it('hides player-only controls (Phase/Command/Ping/End Turn) for a judge who cannot play', () => {
     render(
-      <CommandForm gameId="g1" game={makeGame({ player: false, judge: true })} viewerName="Judge1" onUpdated={vi.fn()} />,
+      <TestHarness gameId="g1" game={makeGame({ player: false, judge: true })} viewerName="Judge1" onUpdated={vi.fn()} />,
     );
 
     expect(screen.queryByLabelText('Phase')).not.toBeInTheDocument();
@@ -121,7 +131,7 @@ describe('CommandForm', () => {
   });
 
   it('disables chat entirely for a spectator (neither player nor judge)', () => {
-    render(<CommandForm gameId="g1" game={makeGame({ player: false })} viewerName="Spectator" onUpdated={vi.fn()} />);
+    render(<TestHarness gameId="g1" game={makeGame({ player: false })} viewerName="Spectator" onUpdated={vi.fn()} />);
 
     expect(screen.getByLabelText('Chat')).toBeDisabled();
   });
@@ -137,14 +147,14 @@ describe('CommandForm', () => {
     vi.mocked(api.post).mockResolvedValue(makeGame({ status: 'No amount given use +/-' }));
     const onUpdated = vi.fn();
     const user = userEvent.setup();
-    const { rerender } = render(<CommandForm gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={onUpdated} />);
+    const { rerender } = render(<TestHarness gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={onUpdated} />);
 
     await user.type(screen.getByLabelText('Command'), 'vp');
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     expect(await screen.findByText('No amount given use +/-')).toBeInTheDocument();
 
-    rerender(<CommandForm gameId="g1" game={makeGame({ status: null })} viewerName="Player1" onUpdated={onUpdated} />);
+    rerender(<TestHarness gameId="g1" game={makeGame({ status: null })} viewerName="Player1" onUpdated={onUpdated} />);
 
     expect(screen.getByText('No amount given use +/-')).toBeInTheDocument();
   });

@@ -8,6 +8,7 @@ import { useGameSocket } from '../ws/useGameSocket';
 import { runRequest } from '../api/mutate';
 import { PageLoading } from '../components/PageLoading';
 import { useCardTooltips } from '../hooks/useCardTooltips';
+import { useSubmitGuard } from '../hooks/useSubmitGuard';
 import { PlayerBoard } from './game/PlayerBoard';
 import { HandStrip } from './game/HandStrip';
 import { CommandForm } from './game/CommandForm';
@@ -36,6 +37,7 @@ export function GamePage() {
   const [tableModal, setTableModal] = useState<TableCardContext | null>(null);
   const [pendingTarget, setPendingTarget] = useState<PendingTarget | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
+  const { submitting, guard } = useSubmitGuard();
 
   const { data: game } = useQuery({
     queryKey: ['game', gameId],
@@ -50,15 +52,17 @@ export function GamePage() {
   if (!game || !gameId) return <PageLoading />;
 
   const submit = (submission: Submission) => {
-    runRequest(
-      api.post<GameSnapshot>(`/game/${gameId}/view/submit`, {
-        phase: null,
-        command: submission.command ?? null,
-        chat: submission.chat ?? null,
-        ping: null,
-      }),
-      'Failed to submit',
-      applyUpdate,
+    guard(() =>
+      runRequest(
+        api.post<GameSnapshot>(`/game/${gameId}/view/submit`, {
+          phase: null,
+          command: submission.command ?? null,
+          chat: submission.chat ?? null,
+          ping: null,
+        }),
+        'Failed to submit',
+        applyUpdate,
+      ),
     );
   };
 
@@ -95,7 +99,14 @@ export function GamePage() {
       <div className="container-fluid my-1 g-0 flex-grow-1 min-h-0 overflow-y-auto" ref={boardRef}>
         <div className="control-grid">
           <HandStrip game={game} viewerName={viewerName} onPlayCardClick={handlePlayCardClick} />
-          <CommandForm gameId={gameId} game={game} viewerName={viewerName} onUpdated={applyUpdate} />
+          <CommandForm
+            gameId={gameId}
+            game={game}
+            viewerName={viewerName}
+            onUpdated={applyUpdate}
+            submitting={submitting}
+            guard={guard}
+          />
           {showHistory ? (
             <HistoryPanel gameId={gameId} game={game} viewerName={viewerName} onToggleChat={() => setShowHistory(false)} />
           ) : (

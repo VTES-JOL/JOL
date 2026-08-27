@@ -16,17 +16,25 @@ export function CommandForm({
   game,
   viewerName,
   onUpdated,
+  submitting,
+  guard,
 }: {
   gameId: string;
   game: GameSnapshot;
   viewerName: string | null;
   onUpdated: (updated: GameSnapshot) => void;
+  // Shared with GamePage's card-click submissions (see useSubmitGuard) so
+  // only one game-mutating request is ever in flight at a time, regardless
+  // of which control fired it — closes the double-submit window a plain
+  // per-button `submitting` flag can't (two clicks/Enters in the same tick,
+  // before React re-renders and disables anything, would both still pass).
+  submitting: boolean;
+  guard: <T>(run: () => Promise<T>) => Promise<T | undefined>;
 }) {
   const [phase, setPhase] = useState(game.phases[0] ?? '');
   const [command, setCommand] = useState('');
   const [chat, setChat] = useState('');
   const [ping, setPing] = useState('');
-  const [submitting, setSubmitting] = useState(false);
   const [showQuickCommand, setShowQuickCommand] = useState(false);
   const [showQuickChat, setShowQuickChat] = useState(false);
   // Deliberately local, not read off `game.status` — the submit response's
@@ -52,50 +60,55 @@ export function CommandForm({
 
   const submit = () => {
     if (!command && !chat && !phase) return;
-    setSubmitting(true);
-    runRequest(
-      api.post<GameSnapshot>(`/game/${gameId}/view/submit`, {
-        phase: phase || null,
-        command: command || null,
-        chat: chat || null,
-        ping: ping || null,
-      }),
-      'Failed to submit',
-      (updated) => {
-        setCommand('');
-        setChat('');
-        setPing('');
-        setStatus(updated.status ?? '');
-        onUpdated(updated);
-      },
-    ).finally(() => setSubmitting(false));
+    guard(() =>
+      runRequest(
+        api.post<GameSnapshot>(`/game/${gameId}/view/submit`, {
+          phase: phase || null,
+          command: command || null,
+          chat: chat || null,
+          ping: ping || null,
+        }),
+        'Failed to submit',
+        (updated) => {
+          setCommand('');
+          setChat('');
+          setPing('');
+          setStatus(updated.status ?? '');
+          onUpdated(updated);
+        },
+      ),
+    );
   };
 
   const sendQuickCommand = (quickCommand: string) => {
-    runRequest(
-      api.post<GameSnapshot>(`/game/${gameId}/view/submit`, { phase: null, command: quickCommand, chat: null, ping: null }),
-      'Failed to submit',
-      (updated) => {
-        setStatus(updated.status ?? '');
-        onUpdated(updated);
-      },
+    guard(() =>
+      runRequest(
+        api.post<GameSnapshot>(`/game/${gameId}/view/submit`, { phase: null, command: quickCommand, chat: null, ping: null }),
+        'Failed to submit',
+        (updated) => {
+          setStatus(updated.status ?? '');
+          onUpdated(updated);
+        },
+      ),
     );
   };
 
   const sendQuickChat = (message: string) => {
-    runRequest(
-      api.post<GameSnapshot>(`/game/${gameId}/view/submit`, { phase: null, command: null, chat: message, ping: null }),
-      'Failed to submit',
-      (updated) => {
-        setStatus(updated.status ?? '');
-        onUpdated(updated);
-      },
+    guard(() =>
+      runRequest(
+        api.post<GameSnapshot>(`/game/${gameId}/view/submit`, { phase: null, command: null, chat: message, ping: null }),
+        'Failed to submit',
+        (updated) => {
+          setStatus(updated.status ?? '');
+          onUpdated(updated);
+        },
+      ),
     );
   };
 
   const endTurn = async () => {
     if (!(await confirmDialog('Are you sure you want to end your turn?'))) return;
-    runRequest(api.post<GameSnapshot>(`/game/${gameId}/view/end-turn`), 'Failed to end turn', onUpdated);
+    guard(() => runRequest(api.post<GameSnapshot>(`/game/${gameId}/view/end-turn`), 'Failed to end turn', onUpdated));
   };
 
   return (
@@ -127,7 +140,13 @@ export function CommandForm({
               </select>
               <label htmlFor="command">Command</label>
               <div className="input-group input-group-sm mb-2">
-                <button type="button" className="btn btn-outline-secondary" tabIndex={-1} onClick={() => setShowQuickCommand(true)}>
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  tabIndex={-1}
+                  disabled={submitting}
+                  onClick={() => setShowQuickCommand(true)}
+                >
                   ...
                 </button>
                 <input
@@ -143,7 +162,13 @@ export function CommandForm({
           )}
           <label htmlFor="chat">Chat</label>
           <div className="input-group input-group-sm mb-2">
-            <button type="button" className="btn btn-outline-secondary" tabIndex={-1} disabled={!canChat} onClick={() => setShowQuickChat(true)}>
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              tabIndex={-1}
+              disabled={!canChat || submitting}
+              onClick={() => setShowQuickChat(true)}
+            >
               ...
             </button>
             <input
@@ -169,9 +194,9 @@ export function CommandForm({
               </select>
               <div className="mt-2 d-flex justify-content-between">
                 <button className="btn btn-secondary btn-sm" type="submit" disabled={submitting}>
-                  Submit
+                  {submitting ? 'Submitting…' : 'Submit'}
                 </button>
-                <button className="btn btn-warning btn-sm" type="button" disabled={!isMyTurn} onClick={endTurn}>
+                <button className="btn btn-warning btn-sm" type="button" disabled={!isMyTurn || submitting} onClick={endTurn}>
                   End Turn
                 </button>
               </div>
@@ -179,7 +204,7 @@ export function CommandForm({
           )}
           {!canPlay && (
             <button className="btn btn-secondary btn-sm mt-2" type="submit" disabled={submitting || !canChat}>
-              Submit
+              {submitting ? 'Submitting…' : 'Submit'}
             </button>
           )}
         </form>
