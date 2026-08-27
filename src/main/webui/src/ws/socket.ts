@@ -29,7 +29,11 @@ export const CLIENT_ID = crypto.randomUUID();
 
 function wsUrl(): string {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  return `${protocol}//${window.location.host}/jol/ws/updates`;
+  // clientId rides the handshake itself (query param), not a follow-up message — a message
+  // has to round-trip after the socket is already open, leaving a window right after connect
+  // (or reconnect) where a REST call fires before the server can exclude this tab from its
+  // own broadcast. See JolWebSocketEndpoint.Configurator.modifyHandshake.
+  return `${protocol}//${window.location.host}/jol/ws/updates?clientId=${encodeURIComponent(CLIENT_ID)}`;
 }
 
 function dispatch(message: Record<string, unknown>) {
@@ -45,7 +49,8 @@ function connect() {
   socket = new WebSocket(wsUrl());
   socket.onopen = () => {
     reconnectDelay = RECONNECT_BASE_MS;
-    socket?.send(JSON.stringify({ type: 'hello', clientId: CLIENT_ID }));
+    // clientId is already tagged via the handshake's own ?clientId= query param (see
+    // wsUrl above) — no follow-up 'hello' message needed.
     // A successful WS (re)connect is a strong, near-instant hint the server
     // is back — check immediately rather than waiting for connectivity's own
     // backoff-scheduled poll, which could be up to 30s away by this point.

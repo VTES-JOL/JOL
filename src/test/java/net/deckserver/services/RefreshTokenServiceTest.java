@@ -72,17 +72,37 @@ class RefreshTokenServiceTest {
     }
 
     @Test
-    void validateAndRotate_detectsReplayOfStaleSecret_andRevokesToken() {
+    void validateAndRotate_toleratesConcurrentReuseOfStaleSecret_withinGraceWindow() {
+        String player = uniquePlayer();
+        RefreshTokenService.Issued issued = RefreshTokenService.issue(player, "JUnit-Agent", true);
+        // one request rotates the secret away from the originally issued value...
+        RefreshTokenService.Rotated first = RefreshTokenService.validateAndRotate(issued.cookieValue()).orElseThrow();
+
+        // ...while a second, concurrent request (e.g. another tab's query, or the WS
+        // handshake, refreshing at the same moment) presents the same now-stale secret.
+        // This must not be treated as a stolen-token replay: it should transparently get
+        // back the same rotation the first request already produced.
+        Optional<RefreshTokenService.Rotated> raced = RefreshTokenService.validateAndRotate(issued.cookieValue());
+
+        assertThat(raced, is(Optional.of(first)));
+        assertThat("the token must still be usable, not revoked, after a raced reuse",
+                RefreshTokenService.list(player), hasSize(1));
+    }
+
+    @Test
+    void validateAndRotate_detectsReplayOfStaleSecret_andRevokesToken_onceGraceWindowHasPassed() {
         String player = uniquePlayer();
         RefreshTokenService.Issued issued = RefreshTokenService.issue(player, "JUnit-Agent", true);
         // legitimate use rotates the secret away from the originally issued value
-        RefreshTokenService.validateAndRotate(issued.cookieValue()).orElseThrow();
+        RefreshTokenService.Rotated first = RefreshTokenService.validateAndRotate(issued.cookieValue()).orElseThrow();
+        // simulate the grace window (meant only to absorb a same-moment race) having elapsed
+        RefreshTokenService.expireRotationGraceForTest(idOf(first.cookieValue()));
 
-        // an attacker (or a lost race) replays the now-stale original secret
+        // an attacker replays the stale original secret well after the legitimate rotation
         Optional<RefreshTokenService.Rotated> replay = RefreshTokenService.validateAndRotate(issued.cookieValue());
 
         assertThat(replay, is(Optional.empty()));
-        assertThat("the whole token id should be revoked once replay is detected, not just left rotated",
+        assertThat("the whole token id should be revoked once a genuine replay is detected, not just left rotated",
                 RefreshTokenService.list(player), is(empty()));
     }
 

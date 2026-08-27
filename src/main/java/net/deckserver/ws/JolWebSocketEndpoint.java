@@ -31,6 +31,12 @@ public class JolWebSocketEndpoint {
 
     private static final Logger log = LoggerFactory.getLogger(JolWebSocketEndpoint.class);
     private static final String PLAYER_KEY = "playerName";
+    // Read off the handshake's own query string (?clientId=...) rather than waiting for a
+    // follow-up {"type":"hello"} message — see registerHandshakeClientId below for why: a
+    // message has to round-trip after the socket is already open, leaving a window where a
+    // REST call fired right after connect (or reconnect) can't yet be excluded from its own
+    // WebSocketRegistry.notifyGame broadcast.
+    private static final String CLIENT_ID_HANDSHAKE_KEY = "handshakeClientId";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     static {
@@ -78,6 +84,14 @@ public class JolWebSocketEndpoint {
                 // NullPointerException on a null value.
                 config.getUserProperties().remove(PLAYER_KEY);
             }
+            // Same shared-map hazard as PLAYER_KEY above (see its comment) — always write or
+            // remove, never leave a previous handshake's clientId to be silently inherited.
+            List<String> clientIds = request.getParameterMap().get("clientId");
+            if (clientIds != null && !clientIds.isEmpty() && !clientIds.get(0).isBlank()) {
+                config.getUserProperties().put(CLIENT_ID_HANDSHAKE_KEY, clientIds.get(0));
+            } else {
+                config.getUserProperties().remove(CLIENT_ID_HANDSHAKE_KEY);
+            }
         }
 
         private static Optional<String> extractCookie(List<String> cookieHeaders, String name) {
@@ -96,6 +110,9 @@ public class JolWebSocketEndpoint {
     @OnOpen
     public void onOpen(Session ws, EndpointConfig config) throws IOException {
         String playerName = (String) config.getUserProperties().get(PLAYER_KEY);
+        // Read immediately, same as playerName above — config.getUserProperties() is shared
+        // across every handshake for this endpoint deployment, not fresh per connection.
+        String clientId = (String) config.getUserProperties().get(CLIENT_ID_HANDSHAKE_KEY);
         if (playerName == null) {
             log.warn("WebSocket onOpen: rejecting unauthenticated connection {}", ws.getId());
             ws.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "Unauthorized"));
@@ -103,6 +120,9 @@ public class JolWebSocketEndpoint {
         }
         ws.getUserProperties().put(PLAYER_KEY, playerName);
         WebSocketRegistry.register(playerName, ws);
+        if (clientId != null) {
+            WebSocketRegistry.registerClientId(clientId, ws);
+        }
         log.info("WebSocket opened for player {} (session {})", playerName, ws.getId());
     }
 
@@ -111,10 +131,11 @@ public class JolWebSocketEndpoint {
         // Clients send {"type":"join","game":"<gameId>"} when entering a game page,
         // and {"type":"leave","game":"<gameId>"} when leaving, so the server can
         // target game notifications to only the sessions watching that game.
-        // {"type":"hello","clientId":"<uuid>"} tags this session with a per-browser-tab
-        // id (generated once in frontend/src/ws/socket.ts) so a REST call from that same
-        // tab can ask to be excluded from a broadcast it triggered — see
-        // WebSocketRegistry.notifyInvalidate(key, excludeClientId).
+        // {"type":"hello","clientId":"<uuid>"} is a fallback for the same tagging the
+        // handshake's own ?clientId= query param now does at connect time (see
+        // Configurator.modifyHandshake/onOpen above) — kept only so a browser tab still
+        // running a cached pre-upgrade bundle across a deploy doesn't lose the tagging
+        // outright. New clients don't send it; registerClientId is idempotent either way.
         try {
             JsonNode node = MAPPER.readTree(message);
             String type = node.path("type").asText();

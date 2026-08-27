@@ -83,7 +83,9 @@ public class JolAdmin {
 
     public static void rollbackGame(String gameName, String adminName, String turn) {
         GameInfo gameInfo = GameService.get(gameName);
-        GameService.rollbackGame(gameName, turn);
+        // Guarded by the game's own lock — rollback replaces the cached JolGame outright,
+        // which must not race a concurrent player submit mutating the game it's replacing.
+        getGameModel(gameName).withLock(() -> GameService.rollbackGame(gameName, turn));
         ChatService.sendMessage(gameInfo.getId(), "SYSTEM", "Game state rolled back by administrator: " + adminName);
     }
 
@@ -373,23 +375,29 @@ public class JolAdmin {
 
     public static void startGame(String gameName, List<String> players) {
         GameInfo gameInfo = GameService.get(gameName);
-        GameData gameData = new GameData(gameInfo.getId(), gameName);
-        JolGame game = new JolGame(gameInfo.getId(), gameData);
-        RegistrationService.getGameRegistrations(gameName).forEach((playerName, registration) -> {
-            if (registration.getDeckId() != null) {
-                Deck deck = getGameDeck(gameName, playerName);
-                game.addPlayer(playerName, deck);
+        // Guarded by the game's own lock, not just the caller's `synchronized` — this
+        // constructs a brand-new JolGame and immediately caches/saves it, which can
+        // otherwise race a concurrent GameStateResource submit that's mutating the
+        // GameModel this same name is about to be associated with.
+        getGameModel(gameName).withLock(() -> {
+            GameData gameData = new GameData(gameInfo.getId(), gameName);
+            JolGame game = new JolGame(gameInfo.getId(), gameData);
+            RegistrationService.getGameRegistrations(gameName).forEach((playerName, registration) -> {
+                if (registration.getDeckId() != null) {
+                    Deck deck = getGameDeck(gameName, playerName);
+                    game.addPlayer(playerName, deck);
+                }
+            });
+            if (!game.getPlayers().isEmpty() && game.getPlayers().size() <= 5) {
+                game.startGame(players);
+                saveGameState(game);
+                GameService.updateGameInfo(gameName, info -> info.setStatus(GameStatus.ACTIVE));
+                pingPlayer(game.getActivePlayer(), gameName);
+                WebSocketRegistry.notifyInvalidate(List.of("nav"));
+                WebSocketRegistry.notifyInvalidate(List.of("watch"));
+                WebSocketRegistry.notifyInvalidate(List.of("main-games"));
             }
         });
-        if (!game.getPlayers().isEmpty() && game.getPlayers().size() <= 5) {
-            game.startGame(players);
-            saveGameState(game);
-            GameService.updateGameInfo(gameName, info -> info.setStatus(GameStatus.ACTIVE));
-            pingPlayer(game.getActivePlayer(), gameName);
-            WebSocketRegistry.notifyInvalidate(List.of("nav"));
-            WebSocketRegistry.notifyInvalidate(List.of("watch"));
-            WebSocketRegistry.notifyInvalidate(List.of("main-games"));
-        }
     }
 
     public static synchronized void startGame(String gameName) {
@@ -407,61 +415,67 @@ public class JolAdmin {
         startGame(gameName, players);
     }
 
-    public static synchronized void endGame(String gameName, boolean graceful) {
-        GameInfo gameInfo = GameService.get(gameName);
-        // try and generate stats for game
-        if (gameInfo.getStatus().equals(GameStatus.ACTIVE)) {
-            JolGame gameData = GameService.getGameByName(gameName);
-            if (gameData.getPlayers().size() >= 4 && graceful) {
-                GameHistory history = new GameHistory();
-                history.setName(gameName);
-                String startTime = gameInfo.getUpdated() != null ? gameInfo.getUpdated().format(ISO_OFFSET_DATE_TIME) : " --- ";
-                String endTime = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
-                history.setStarted(startTime);
-                history.setEnded(endTime);
-                PlayerResult winner = null;
-                double topVP = 0.0;
-                boolean hasVp = false;
-                for (String player : gameData.getPlayers()) {
-                    PlayerResult result = new PlayerResult();
-                    String deckName = Optional.ofNullable(RegistrationService.getRegistration(gameName, player)).map(RegistrationStatus::getDeckName).orElse("-- no deck name --");
-                    double victoryPoints = gameData.getVictoryPoints(player);
-                    if (victoryPoints > 0) {
-                        hasVp = true;
-                    }
-                    result.setPlayerName(player);
-                    result.setDeckName(deckName);
-                    result.setVictoryPoints(victoryPoints);
-                    if (victoryPoints >= 2.0) {
-                        if (winner == null) {
-                            winner = result;
-                            topVP = victoryPoints;
-                        } else if (victoryPoints > topVP) {
-                            winner = result;
-                            topVP = victoryPoints;
-                        } else {
-                            winner = null;
+    public static void endGame(String gameName, boolean graceful) {
+        // Guarded by the game's own lock (not `synchronized`, which is a different
+        // monitor than GameModel's per-game ReentrantLock and doesn't exclude a
+        // concurrent player submit) — this reads gameData.getPlayers()/getVictoryPoints()
+        // while stats are computed, which must not tear against a mutation in flight.
+        getGameModel(gameName).withLock(() -> {
+            GameInfo gameInfo = GameService.get(gameName);
+            // try and generate stats for game
+            if (gameInfo.getStatus().equals(GameStatus.ACTIVE)) {
+                JolGame gameData = GameService.getGameByName(gameName);
+                if (gameData.getPlayers().size() >= 4 && graceful) {
+                    GameHistory history = new GameHistory();
+                    history.setName(gameName);
+                    String startTime = gameInfo.getUpdated() != null ? gameInfo.getUpdated().format(ISO_OFFSET_DATE_TIME) : " --- ";
+                    String endTime = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
+                    history.setStarted(startTime);
+                    history.setEnded(endTime);
+                    PlayerResult winner = null;
+                    double topVP = 0.0;
+                    boolean hasVp = false;
+                    for (String player : gameData.getPlayers()) {
+                        PlayerResult result = new PlayerResult();
+                        String deckName = Optional.ofNullable(RegistrationService.getRegistration(gameName, player)).map(RegistrationStatus::getDeckName).orElse("-- no deck name --");
+                        double victoryPoints = gameData.getVictoryPoints(player);
+                        if (victoryPoints > 0) {
+                            hasVp = true;
                         }
+                        result.setPlayerName(player);
+                        result.setDeckName(deckName);
+                        result.setVictoryPoints(victoryPoints);
+                        if (victoryPoints >= 2.0) {
+                            if (winner == null) {
+                                winner = result;
+                                topVP = victoryPoints;
+                            } else if (victoryPoints > topVP) {
+                                winner = result;
+                                topVP = victoryPoints;
+                            } else {
+                                winner = null;
+                            }
+                        }
+                        history.getResults().add(result);
                     }
-                    history.getResults().add(result);
-                }
-                if (winner != null) {
-                    winner.setGameWin(true);
-                }
-                if (hasVp) {
-                    HistoryService.addGame(OffsetDateTime.now(), history);
+                    if (winner != null) {
+                        winner.setGameWin(true);
+                    }
+                    if (hasVp) {
+                        HistoryService.addGame(OffsetDateTime.now(), history);
+                    }
                 }
             }
-        }
-        // Clear out data
-        RegistrationService.clearRegistrations(gameName);
-        WebSocketRegistry.notifyGame(gameInfo.getId());
-        GameService.remove(gameName, gameInfo.getId());
-        PlayerGameActivityService.clearGame(gameName);
-        gmap.remove(gameName);
-        WebSocketRegistry.notifyInvalidate(List.of("nav"));
-        WebSocketRegistry.notifyInvalidate(List.of("watch"));
-        WebSocketRegistry.notifyInvalidate(List.of("main-games"));
+            // Clear out data
+            RegistrationService.clearRegistrations(gameName);
+            WebSocketRegistry.notifyGame(gameInfo.getId());
+            GameService.remove(gameName, gameInfo.getId());
+            PlayerGameActivityService.clearGame(gameName);
+            gmap.remove(gameName);
+            WebSocketRegistry.notifyInvalidate(List.of("nav"));
+            WebSocketRegistry.notifyInvalidate(List.of("watch"));
+            WebSocketRegistry.notifyInvalidate(List.of("main-games"));
+        });
     }
 
     public static String getDeckId(String playerName, String deckName) {
@@ -472,14 +486,19 @@ public class JolAdmin {
         return GameService.get(gameName).getId();
     }
 
-    public static synchronized void replacePlayer(String gameName, String existingPlayer, String newPlayer) {
+    public static void replacePlayer(String gameName, String existingPlayer, String newPlayer) {
         RegistrationStatus existingRegistration = RegistrationService.getRegistration(gameName, existingPlayer);
         RegistrationStatus newRegistration = RegistrationService.getRegistration(gameName, newPlayer);
         // Only replace player if existing player is in the game, and the new player isn't
         if (existingRegistration != null && newRegistration == null) {
-            JolGame game = GameService.getGameByName(gameName);
-            game.replacePlayer(existingPlayer, newPlayer);
-            saveGameState(game);
+            // Guarded by the game's own lock, not `synchronized` (a different monitor than
+            // GameModel's per-game ReentrantLock) — replacePlayer mutates the same shared
+            // JolGame a concurrent player submit could be mutating.
+            getGameModel(gameName).withLock(() -> {
+                JolGame game = GameService.getGameByName(gameName);
+                game.replacePlayer(existingPlayer, newPlayer);
+                saveGameState(game);
+            });
             // Set up the registrations
             RegistrationService.put(gameName, newPlayer, existingRegistration);
             RegistrationService.removePlayer(gameName, existingPlayer);
@@ -503,13 +522,18 @@ public class JolAdmin {
                 .orElse(null);
     }
 
-    public static synchronized void endTurn(String gameName, String adminName) {
-        JolGame game = GameService.getGameByName(gameName);
-        String id = GameService.get(gameName).getId();
-        ChatService.sendMessage(id, "SYSTEM", "Turn ended by administrator: " + adminName);
-        game.newTurn();
-        saveGameState(game);
-        pingPlayer(game.getActivePlayer(), gameName);
+    public static void endTurn(String gameName, String adminName) {
+        // Guarded by the game's own lock, not `synchronized` (a different monitor than
+        // GameModel's per-game ReentrantLock) — an admin-forced end turn mutates the same
+        // shared JolGame a concurrent player submit/end-turn could be mutating.
+        getGameModel(gameName).withLock(() -> {
+            JolGame game = GameService.getGameByName(gameName);
+            String id = GameService.get(gameName).getId();
+            ChatService.sendMessage(id, "SYSTEM", "Turn ended by administrator: " + adminName);
+            game.newTurn();
+            saveGameState(game);
+            pingPlayer(game.getActivePlayer(), gameName);
+        });
     }
 
     public static boolean isInRole(String username, String role) {

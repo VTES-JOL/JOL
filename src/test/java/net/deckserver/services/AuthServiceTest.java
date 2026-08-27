@@ -127,8 +127,11 @@ class AuthServiceTest {
         assertThat(AuthService.parseAccessToken(newAccess.getValue()), is(Optional.of(player)));
         assertThat("refresh token must rotate on use", newRefresh.getValue(), not(equalTo(issued.cookieValue())));
 
-        // the original (now-rotated-away) refresh cookie must no longer be usable
-        assertThat(RefreshTokenService.validateAndRotate(issued.cookieValue()), is(Optional.empty()));
+        // a concurrent request racing this same rotation (still holding the original,
+        // now-rotated-away cookie) must transparently get back the same rotation rather
+        // than being treated as a stolen-token replay and logged out
+        Optional<RefreshTokenService.Rotated> raced = RefreshTokenService.validateAndRotate(issued.cookieValue());
+        assertThat(raced.map(RefreshTokenService.Rotated::cookieValue), is(Optional.of(newRefresh.getValue())));
     }
 
     @Test

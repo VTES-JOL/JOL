@@ -45,6 +45,23 @@ public class RefreshTokenService extends PersistedService {
 
     private final Map<String, List<RefreshTokenInfo>> tokensByPlayer = new HashMap<>();
 
+    /**
+     * Tracks the most recent rotation per token id, purely in memory (never persisted —
+     * losing this on restart just narrows the grace window back to zero, which is safe).
+     * See {@link #validateAndRotate} for why this exists: without it, a burst of ordinary
+     * concurrent requests (e.g. GamePage's game-view query, NavContext's poll, and the WS
+     * handshake all silently refreshing at once) that all present the *same*
+     * not-yet-rotated cookie would have every request after the first treated as a replayed/
+     * stolen token and the row deleted outright — logging the player out for no actual
+     * security reason.
+     */
+    private final Map<String, RecentRotation> recentRotations = new HashMap<>();
+
+    private static final long ROTATION_GRACE_MILLIS = TimeUnit.SECONDS.toMillis(10);
+
+    private record RecentRotation(String previousSecretHash, Rotated rotated, long rotatedAtMillis) {
+    }
+
     RefreshTokenService() {
         super("RefreshTokenService", 0);
     }
@@ -87,18 +104,28 @@ public class RefreshTokenService extends PersistedService {
         if (dot < 0) return Optional.empty();
         String id = cookieValue.substring(0, dot);
         String secret = cookieValue.substring(dot + 1);
+        long now = System.currentTimeMillis();
+
+        // A concurrent request that started before this cookie was rotated (by another
+        // request racing it) still presents the pre-rotation secret. Rather than treating
+        // that as a replayed/stolen token, hand back the same rotation the winning request
+        // already produced, as long as it happened recently enough to plausibly be the same
+        // race rather than an actual stale/stolen cookie surfacing much later.
+        RecentRotation recent = instance().recentRotations.get(id);
+        if (recent != null && now - recent.rotatedAtMillis() <= ROTATION_GRACE_MILLIS
+                && matchesHash(secret, recent.previousSecretHash())) {
+            return Optional.of(recent.rotated());
+        }
 
         for (List<RefreshTokenInfo> tokens : instance().tokensByPlayer.values()) {
             for (RefreshTokenInfo info : tokens) {
                 if (!info.getId().equals(id)) continue;
 
-                long now = System.currentTimeMillis();
-                if (info.getExpiresAt() < now || !MessageDigest.isEqual(
-                        HexFormat.of().parseHex(info.getSecretHash()),
-                        HexFormat.of().parseHex(hash(secret)))) {
+                if (info.getExpiresAt() < now || !matchesHash(secret, info.getSecretHash())) {
                     instance().jpaWriteThenMutate(
                             em -> refreshTokenRepository.delete(em, id),
                             () -> tokens.remove(info));
+                    instance().recentRotations.remove(id);
                     return Optional.empty();
                 }
 
@@ -123,10 +150,23 @@ public class RefreshTokenService extends PersistedService {
                             info.setExpiresAt(previousExpiresAt);
                         });
 
-                return Optional.of(new Rotated(info.getPlayerName(), id + "." + newSecret, info.isRemember()));
+                Rotated rotated = new Rotated(info.getPlayerName(), id + "." + newSecret, info.isRemember());
+                instance().recentRotations.put(id, new RecentRotation(previousSecretHash, rotated, now));
+                return Optional.of(rotated);
             }
         }
         return Optional.empty();
+    }
+
+    private static boolean matchesHash(String secret, String expectedHash) {
+        return MessageDigest.isEqual(
+                HexFormat.of().parseHex(expectedHash),
+                HexFormat.of().parseHex(hash(secret)));
+    }
+
+    /** Test-only seam: simulates the rotation grace window having elapsed for a token id. */
+    static synchronized void expireRotationGraceForTest(String id) {
+        instance().recentRotations.remove(id);
     }
 
     public static synchronized void revoke(String cookieValue) {
@@ -136,6 +176,7 @@ public class RefreshTokenService extends PersistedService {
         instance().jpaWriteThenMutate(
                 em -> refreshTokenRepository.delete(em, id),
                 () -> instance().tokensByPlayer.values().forEach(tokens -> tokens.removeIf(t -> t.getId().equals(id))));
+        instance().recentRotations.remove(id);
     }
 
     public static synchronized void revoke(String playerName, String id) {
@@ -145,12 +186,16 @@ public class RefreshTokenService extends PersistedService {
                     List<RefreshTokenInfo> tokens = instance().tokensByPlayer.get(playerName);
                     if (tokens != null) tokens.removeIf(t -> t.getId().equals(id));
                 });
+        instance().recentRotations.remove(id);
     }
 
     public static synchronized void revokeAll(String playerName) {
+        List<RefreshTokenInfo> tokens = instance().tokensByPlayer.get(playerName);
+        List<String> ids = tokens == null ? List.of() : tokens.stream().map(RefreshTokenInfo::getId).toList();
         instance().jpaWriteThenMutate(
                 em -> refreshTokenRepository.deleteAllForPlayer(em, playerName),
                 () -> instance().tokensByPlayer.remove(playerName));
+        ids.forEach(instance().recentRotations::remove);
     }
 
     public static synchronized List<RefreshTokenInfo> list(String playerName) {
@@ -165,6 +210,7 @@ public class RefreshTokenService extends PersistedService {
                     instance().tokensByPlayer.values().forEach(tokens -> tokens.removeIf(t -> t.getExpiresAt() < now));
                     instance().tokensByPlayer.entrySet().removeIf(e -> e.getValue().isEmpty());
                 });
+        instance().recentRotations.values().removeIf(r -> now - r.rotatedAtMillis() > ROTATION_GRACE_MILLIS);
     }
 
     private static String randomSecret() {
