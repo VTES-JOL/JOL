@@ -3,14 +3,10 @@ import tippy, { hideAll, type Instance } from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import { getBaseUrl } from '../api/config';
 
-const PLACEHOLDER_WIDTH = 250;
-const PLACEHOLDER_HEIGHT = 358;
-
 function cardImagePlaceholder(label: string): HTMLElement {
   const el = document.createElement('div');
-  el.className = 'd-flex flex-column align-items-center justify-content-center gap-2 text-white-50 bg-dark';
-  el.style.width = `${PLACEHOLDER_WIDTH}px`;
-  el.style.height = `${PLACEHOLDER_HEIGHT}px`;
+  el.className =
+    'card-tooltip-image d-flex flex-column align-items-center justify-content-center gap-2 text-white-50 bg-dark';
 
   const icon = document.createElement('i');
   icon.className = 'bi bi-image';
@@ -78,8 +74,7 @@ export function useCardTooltips(containerRef: RefObject<HTMLElement | null>, dep
             const secured = link.dataset.secured === 'true' ? 'secured/' : '';
             getBaseUrl().then((baseUrl) => {
               const img = document.createElement('img');
-              img.width = PLACEHOLDER_WIDTH;
-              img.height = PLACEHOLDER_HEIGHT;
+              img.className = 'card-tooltip-image';
               img.alt = link.textContent ?? '';
               // A missing/broken card asset otherwise renders as the
               // browser's default broken-image icon with the alt text next

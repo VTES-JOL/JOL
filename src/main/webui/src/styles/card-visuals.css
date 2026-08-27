@@ -12,6 +12,19 @@
     padding: 0;
 }
 
+/* Card hover-preview image (chat card-name tooltips, useCardTooltips.ts).
+   Scales with viewport width instead of a fixed pixel size — a fixed 250px
+   preview reads as tiny on a 1920px+ monitor. 250px was the original size;
+   16.25vw lands at 312px (25% bigger) on a 1920-wide window and keeps
+   growing on larger monitors, while the clamp floor holds it at the
+   original 250px on anything narrower (phones/tablets) and the ceiling
+   keeps ultra-wide/4K monitors from getting an absurdly large preview. */
+.card-tooltip-image {
+    width: clamp(250px, 16.25vw, 420px);
+    aspect-ratio: 250 / 358;
+    height: auto;
+}
+
 a.card-name {
     text-decoration: none;
     font-family: matrix, sans-serif;
