@@ -6,6 +6,7 @@ import net.deckserver.rest.bean.GameStatusBean;
 import net.deckserver.rest.bean.PlayerActivityStatus;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.services.GameService;
+import net.deckserver.services.PlayerService;
 import net.deckserver.services.RegistrationService;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.ws.WebSocketRegistry;
@@ -112,6 +113,9 @@ public class LobbyResource extends BaseResource {
     public void invitePlayerReact(@PathParam("name") String game, InviteRequest body) {
         if (!GameService.existsGame(game)) {
             throw new NotFoundException("No such game: " + game);
+        }
+        if (!PlayerService.getPlayers().contains(body.player())) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("No such player: " + body.player()).build());
         }
         boolean selfJoiningPublicGame = username().equals(body.player()) && JolAdmin.isPublic(game);
         if (!selfJoiningPublicGame) {

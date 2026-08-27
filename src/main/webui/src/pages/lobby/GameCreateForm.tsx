@@ -22,6 +22,11 @@ export function GameCreateForm({ onCancel, onCreated }: { onCancel: () => void; 
   const addInvite = () => {
     const trimmed = inviteInput.trim();
     if (!trimmed || pendingInvites.includes(trimmed)) return;
+    if (!players.includes(trimmed)) {
+      setError(`No such player: ${trimmed}`);
+      return;
+    }
+    setError('');
     setPendingInvites((prev) => [...prev, trimmed]);
     setInviteInput('');
   };

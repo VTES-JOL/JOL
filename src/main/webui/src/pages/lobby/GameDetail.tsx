@@ -7,6 +7,7 @@ import { useSimpleDropdown } from '../../hooks/useSimpleDropdown';
 import { DeckPreview } from '../../components/DeckPreview';
 import { confirmDialog } from '../../components/dialog';
 import { runRequest } from '../../api/mutate';
+import { showError } from '../../components/toast';
 
 export function GameDetail({
   game,
@@ -63,6 +64,10 @@ export function GameDetail({
   const invitePlayer = () => {
     const p = inviteInput.trim();
     if (!p) return;
+    if (!players.includes(p)) {
+      showError(`No such player: ${p}`);
+      return;
+    }
     runRequest(api.post(`/lobby/player/games/${encodedName}/invite`, { player: p }), 'Failed to invite player', onChanged);
     setInviteInput('');
   };
