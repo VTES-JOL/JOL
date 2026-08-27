@@ -47,7 +47,9 @@ services:
       timeout: 5s
       retries: 5
   test:
-    image: tomcat:9-jdk21-corretto
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: test
     networks:
       - web
@@ -55,10 +57,11 @@ services:
       - "traefik.http.routers.test.entrypoints=websecure"
       - "traefik.http.routers.test.rule=Host(`test.deckserver.net`)"
       - "traefik.http.routers.test.tls.certresolver=myresolver"
+      - "traefik.http.services.test.loadbalancer.server.port=8080"
     env_file: .keys
     environment:
       TYPE: "test"
-      _JAVA_OPTIONS: -Djava.security.egd=file:/dev/./urandom
+      JDK_JAVA_OPTIONS: -Djava.security.egd=file:/dev/./urandom
       JOL_DB_URL: jdbc:postgresql://prod-db:5432/jol
       JOL_DB_USER: jol
       JOL_DB_PASSWORD: ${PROD_DB_PASSWORD:?set PROD_DB_PASSWORD in .env}
@@ -69,7 +72,6 @@ services:
         condition: service_healthy
     volumes:
       - test-data:/data
-      - test-app:/usr/local/tomcat/webapps
 networks:
   web:
     external: true
