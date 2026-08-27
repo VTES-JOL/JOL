@@ -44,6 +44,7 @@ export function GlobalChat() {
   const [hasNewMessages, setHasNewMessages] = useState(false);
 
   const outputRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   // Updated on every scroll event rather than computed inside the entries
   // effect, since by the time that effect runs the DOM (and scrollHeight)
   // already reflects the newly-appended content — too late to tell whether
@@ -160,6 +161,17 @@ export function GlobalChat() {
     }).finally(() => setSending(false));
   };
 
+  // Disabling the input while sending blurs it (a disabled element can't
+  // hold focus). Restore focus once React re-renders it enabled again —
+  // calling .focus() straight from send()'s finally() is too early, since
+  // the DOM node is still disabled until this effect's render commits.
+  // Skips the initial mount so this doesn't steal focus on page load.
+  const wasSendingRef = useRef(false);
+  useEffect(() => {
+    if (wasSendingRef.current && !sending) inputRef.current?.focus();
+    wasSendingRef.current = sending;
+  }, [sending]);
+
   return (
     <Card className="flex-fill d-flex flex-column" style={{ minHeight: 0 }}>
       <CardHeader>
@@ -212,6 +224,7 @@ export function GlobalChat() {
         </div>
         <div className="d-flex gap-2 mt-2">
           <input
+            ref={inputRef}
             className="form-control rounded-pill border border-secondary-subtle"
             placeholder="Chat with players..."
             value={text}
