@@ -44,6 +44,14 @@ export function useCardTooltips(containerRef: RefObject<HTMLElement | null>, dep
 
     links.forEach((link) => {
       if (link._tippy) return;
+      // These anchors carry no `href` (React-rendered CardLink/Card.tsx, and
+      // server-rendered markup from ParserService/JolGame's generateCardLink)
+      // — an <a> without href gets no implicit role and isn't in the tab
+      // order, so without this a keyboard or screen-reader user has no way
+      // to discover or open the tooltip at all. tippy's default trigger
+      // already includes 'focus', so making the element focusable is enough.
+      if (!link.hasAttribute('tabindex')) link.tabIndex = 0;
+      if (!link.hasAttribute('role')) link.setAttribute('role', 'link');
       instancesRef.current.push(
         tippy(link, {
           placement: 'auto',

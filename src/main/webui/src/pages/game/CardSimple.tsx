@@ -1,5 +1,6 @@
 import type { CardSnapshot } from '../../api/types';
 import { CardHidden } from './CardHidden';
+import { Clan } from './Clan';
 
 // Mirrors card-simple.jsp — used for ASH_HEAP/HAND/REMOVED_FROM_GAME/
 // LIBRARY/RESEARCH regions, and the hand strip. No recursion — these regions
@@ -37,7 +38,7 @@ export function CardSimple({
             {card.hasBlood && (
               <span>
                 {(card.clanClasses ?? []).map((clan) => (
-                  <span key={clan} className={`clan ${clan}`} />
+                  <Clan key={clan} value={clan} />
                 ))}
               </span>
             )}

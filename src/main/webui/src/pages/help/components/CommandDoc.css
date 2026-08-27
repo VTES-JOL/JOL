@@ -9,13 +9,13 @@
 
 .help-command-placeholder {
     font-family: var(--bs-body-font-family);
-    font-size: 0.7rem;
+    font-size: 0.8125rem;
     letter-spacing: 0.02em;
 }
 
 .help-command-heading {
     text-transform: uppercase;
-    font-size: 0.72rem;
+    font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0.04em;
     color: var(--bs-secondary-color);

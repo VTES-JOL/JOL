@@ -5,6 +5,7 @@ import { buildDiscardCommand, buildHandLabelCommand, buildPlayCommand, needsTarg
 import { CardImage } from './CardImage';
 import { runRequest } from '../../api/mutate';
 import { Modal } from '../../components/Modal';
+import { Clan } from './Clan';
 
 export interface PendingTarget {
   ctx: HandCardContext;
@@ -110,7 +111,7 @@ export function PlayCardModal({
             <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={definition.displayName} />
             <div className="requirements d-flex justify-content-center gap-2">
               {(definition.clans ?? []).map((clan) => (
-                <span key={clan} className={`clan ${clan.toLowerCase().replace(/ /g, '_')}`} title={clan} />
+                <Clan key={clan} value={clan} />
               ))}
               {definition.cost && <span>Cost: {definition.cost}</span>}
             </div>

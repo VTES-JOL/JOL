@@ -6,17 +6,29 @@ import { CardImage } from './CardImage';
 import { runRequest } from '../../api/mutate';
 import { Modal } from '../../components/Modal';
 import { COUNTER_STYLE, OTHER_VISIBLE_REGIONS } from './Card';
+import { CLAN, resolveClan } from './Clan';
+import { PATH, resolvePath } from './Path';
+import { SECT, resolveSect } from './Sect';
 
-const CLANS = [
-  'Abomination', 'Ahrimane', 'Akunanse', 'Baali', 'Banu Haqim', 'Blood Brother', 'Brujah', 'Brujah Antitribu',
-  'Caitiff', 'Daughter of Cacophony', 'Gangrel', 'Gangrel Antitribu', 'Gargoyle', 'Giovanni', 'Guruhi', 'Harbinger of Skulls',
-  'Ishtarri', 'Kiasyd', 'Lasombra', 'Malkavian', 'Malkavian Antitribu', 'Nagaraja', 'Nosferatu', 'Nosferatu Antitribu',
-  'Hecata', 'Ministry', 'Osebo', 'Pander', 'Ravnos', 'Salubri', 'Salubri Antitribu', 'Samedi', 'Toreador', 'Toreador Antitribu',
-  'Tremere', 'Tremere Antitribu', 'True Brujah', 'Tzimisce', 'Ventrue', 'Ventrue Antitribu', 'Avenger', 'Defender', 'Innocent',
-  'Judge', 'Martyr', 'Redeemer', 'Visionary', 'None',
-]; // eslint-disable-line prettier/prettier
-const PATHS = ['Death and the Soul', 'Power and the Inner Voice', 'Cathari', 'Caine', 'None'];
-const SECTS = ['Camarilla', 'Sabbat', 'Independent', 'Laibon', 'Anarch', 'None'];
+// 'None' is appended for the picker's clear option — CLAN/PATH/SECT
+// themselves are the closed set of real values (mirroring the Java enums),
+// same source InlinePicker's badges resolve their display name from below.
+const CLANS = [...Object.values(CLAN), 'None'];
+const PATHS = [...Object.values(PATH), 'None'];
+const SECTS = [...Object.values(SECT), 'None'];
+
+const clanName = (value?: string | null) => {
+  const code = resolveClan(value);
+  return code ? CLAN[code] : undefined;
+};
+const pathName = (value?: string | null) => {
+  const code = resolvePath(value);
+  return code ? PATH[code] : undefined;
+};
+const sectName = (value?: string | null) => {
+  const code = resolveSect(value);
+  return code ? SECT[code] : undefined;
+};
 
 function nameToKey(name: string): string {
   return name.toLowerCase().replace(/ /g, '_');
@@ -77,15 +89,17 @@ function InlinePicker({
   value,
   values,
   kind,
+  resolveName,
   onChange,
 }: {
   value: string | null | undefined;
   values: string[];
   kind: 'clan' | 'path' | 'sect';
+  resolveName: (value?: string | null) => string | undefined;
   onChange: (newKey: string) => void;
 }) {
   const [editing, setEditing] = useState(false);
-  const display = value && value !== 'NONE' ? value : 'None';
+  const display = resolveName(value) ?? 'None';
 
   if (editing) {
     return (
@@ -184,6 +198,7 @@ export function CardActionModal({
                   value={card.clan}
                   values={CLANS}
                   kind="clan"
+                  resolveName={clanName}
                   onChange={(key) => doAction((c) => cardActions.clan(c, key), false)}
                 />
               )}
@@ -196,6 +211,7 @@ export function CardActionModal({
                   value={card.path}
                   values={PATHS}
                   kind="path"
+                  resolveName={pathName}
                   onChange={(key) => doAction((c) => cardActions.path(c, key), false)}
                 />
               )}
@@ -204,6 +220,7 @@ export function CardActionModal({
                   value={card.sect}
                   values={SECTS}
                   kind="sect"
+                  resolveName={sectName}
                   onChange={(key) => doAction((c) => cardActions.sect(c, key), false)}
                 />
               )}

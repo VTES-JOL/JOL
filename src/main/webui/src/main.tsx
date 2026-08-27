@@ -4,8 +4,10 @@ import { App } from './App';
 import { loadLegacyStyles } from './legacyStyles';
 import './index.css';
 // App-authored global styles — fonts, tokens/typography, and the shared
-// card-visuals vocabulary (icon/clan/path/card-name) — bundled by Vite like
-// any other import, unlike loadLegacyStyles() below (which fetches
+// card-visuals vocabulary that has to stay global (icon/card-name — see
+// card-visuals.css's own header comment for why; clan/path have since moved
+// to their owning components, pages/game/Clan.css and Path.css) — bundled
+// by Vite like any other import, unlike loadLegacyStyles() below (which fetches
 // third-party/theme stylesheets that must stay reachable as plain WAR-served
 // files: bootstrap.min.css, dark-mode.css, light.css).
 import './styles/fonts.css';

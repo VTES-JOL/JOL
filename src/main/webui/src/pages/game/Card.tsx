@@ -1,5 +1,8 @@
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
 import { CardHidden } from './CardHidden';
+import { Clan } from './Clan';
+import { Sect } from './Sect';
+import { Path } from './Path';
 
 export const COUNTER_STYLE = (hasLife: boolean, hasBlood: boolean, capacity: number, otherVisibleRegion: boolean) => {
   if (hasLife && otherVisibleRegion) return 'text-bg-success';
@@ -61,7 +64,7 @@ export function Card({
               </a>
               {hasVotes && <span className="badge rounded-pill text-bg-warning">{card.votes}</span>}
               {card.contested && (
-                <span className="badge text-bg-warning p-1 px-2" style={{ fontSize: '0.6rem' }}>
+                <span className="badge text-bg-warning p-1 px-2" style={{ fontSize: '0.7rem' }}>
                   CONTESTED
                 </span>
               )}
@@ -79,16 +82,16 @@ export function Card({
             <div className="d-flex justify-content-end align-items-center gap-1">
               {card.infernal && <i className="bi bi-fire text-danger fs-6" />}
               {card.locked && (
-                <span className="badge text-bg-dark p-1 px-2" style={{ fontSize: '0.6rem' }}>
+                <span className="badge text-bg-dark p-1 px-2" style={{ fontSize: '0.7rem' }}>
                   LOCKED
                 </span>
               )}
               {showCounterBadge && <span className={`badge rounded-pill shadow ${counterStyle}`}>{counterText}</span>}
             </div>
             <div className="d-flex justify-content-end align-items-center gap-1">
-              {card.path && card.path !== 'NONE' && <span className={`path ${card.path.toLowerCase()}`} />}
-              {card.sect && card.sect !== 'NONE' && <small className="sect">{card.sect}</small>}
-              {card.clan && card.clan !== 'NONE' && <span className={`clan ${card.clan.toLowerCase()}`} title={card.clan} />}
+              <Path value={card.path} />
+              <Sect value={card.sect} />
+              <Clan value={card.clan} />
             </div>
           </div>
         </div>

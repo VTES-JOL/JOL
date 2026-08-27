@@ -1,0 +1,23 @@
+/* Path glyphs, rendered by the Path component (Path.tsx) only — same
+   reasoning as Clan.css: no server-rendered chat HTML ever emits a `.path`
+   span, so this is safe to scope to its component. */
+.path {
+    font-family: 'clans', sans-serif;
+    font-size: 1.5em;
+}
+
+.path.caine:before {
+    content: "#";
+}
+
+.path.cathari:before {
+    content: "$";
+}
+
+.path.death_and_the_soul:before {
+    content: "%";
+}
+
+.path.power_and_the_inner_voice:before {
+    content: "&";
+}

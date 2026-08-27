@@ -1,0 +1,205 @@
+/* Clan glyphs, rendered by the Clan component (Clan.tsx) only — unlike
+   a.card-name/.icon, no server-rendered chat HTML ever emits a `.clan` span
+   (checked ParserService.java and the generated static/html/* tooltip
+   fragments), so this can live scoped to its component instead of the
+   shared global stylesheet. */
+.clan {
+    font-family: clans, sans-serif;
+    font-size: 1.5rem;
+}
+
+.clan.abomination:before {
+    content: 'A';
+}
+
+.clan.ahrimane:before {
+    content: 'B';
+}
+
+.clan.akunanse:before {
+    content: 'C';
+}
+
+.clan.assamite:before {
+    content: 'n';
+}
+
+.clan.baali:before {
+    content: 'E';
+}
+
+.clan.blood_brother:before {
+    content: 'F';
+}
+
+.clan.brujah:before {
+    content: 'o';
+}
+
+.clan.brujah_antitribu:before {
+    content: 'H';
+}
+
+.clan.caitiff:before {
+    content: 'I';
+}
+
+.clan.daughter_of_cacophony:before {
+    content: 'J';
+}
+
+.clan.follower_of_set:before {
+    content: 'r';
+}
+
+.clan.gangrel:before {
+    content: 'p';
+}
+
+.clan.gangrel_antitribu:before {
+    content: 'M';
+}
+
+.clan.gargoyle:before {
+    content: 'N';
+}
+
+.clan.giovanni:before {
+    content: 'O';
+}
+
+.clan.guruhi:before {
+    content: 'P';
+}
+
+.clan.harbinger_of_skulls:before {
+    content: 'Q';
+}
+
+.clan.ishtarri:before {
+    content: 'R';
+}
+
+.clan.kiasyd:before {
+    content: 'S';
+}
+
+.clan.lasombra:before {
+    content: 'w';
+}
+
+.clan.malkavian:before {
+    content: 'q';
+}
+
+.clan.malkavian_antitribu:before {
+    content: 'V';
+}
+
+.clan.nagaraja:before {
+    content: 'W';
+}
+
+.clan.nosferatu:before {
+    content: 's';
+}
+
+.clan.nosferatu_antitribu:before {
+    content: 'Y';
+}
+
+.clan.hecata:before {
+    content: 'y';
+}
+
+.clan.osebo:before {
+    content: 'Z';
+}
+
+.clan.pander:before {
+    content: 'a';
+}
+
+.clan.ravnos:before {
+    content: 'x';
+}
+
+.clan.salubri:before {
+    content: 'c';
+}
+
+.clan.salubri_antitribu:before {
+    content: 'd';
+}
+
+.clan.samedi:before {
+    content: 'e';
+}
+
+.clan.toreador:before {
+    content: 't';
+}
+
+.clan.toreador_antitribu:before {
+    content: 'g';
+}
+
+.clan.tremere:before {
+    content: 'u';
+}
+
+.clan.tremere_antitribu:before {
+    content: 'i';
+}
+
+.clan.true_brujah:before {
+    content: 'j';
+}
+
+.clan.tzimisce:before {
+    content: 'k';
+}
+
+.clan.ventrue:before {
+    content: 'v';
+}
+
+.clan.ventrue_antitribu:before {
+    content: 'm';
+}
+
+.clan.banu_haqim:before {
+    content: 'n';
+}
+
+.clan.ministry:before {
+    content: 'r';
+}
+
+.clan.avenger:before {
+    content: '1';
+}
+
+.clan.defender:before {
+    content: '2';
+}
+
+.clan.innocent:before {
+    content: '3';
+}
+
+.clan.judge:before {
+    content: '4';
+}
+
+.clan.martyr:before {
+    content: '5';
+}
+
+.clan.redeemer:before {
+    content: '6';
+}
+
+.clan.visionary:before {
+    content: '7';
+}
