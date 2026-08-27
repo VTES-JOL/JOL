@@ -39,7 +39,8 @@ public class GameStateResource extends BaseResource {
     @GET
     @Path("view")
     public GameSnapshot getView() {
-        return GameSnapshotFactory.build(getModel(), username(), null);
+        GameModel game = getModel();
+        return game.withLock(() -> GameSnapshotFactory.build(game, username(), null));
     }
 
     @POST
@@ -52,8 +53,10 @@ public class GameStateResource extends BaseResource {
         if (!isPlaying && !canJudge) {
             throw new ForbiddenException("Must be a player in this game or a judge to submit");
         }
-        String status = game.submit(player, ne(body.phase()), ne(body.command()), ne(body.chat()), ne(body.ping()), clientId());
-        return GameSnapshotFactory.build(game, player, status);
+        return game.withLock(() -> {
+            String status = game.submit(player, ne(body.phase()), ne(body.command()), ne(body.chat()), ne(body.ping()), clientId());
+            return GameSnapshotFactory.build(game, player, status);
+        });
     }
 
     @POST
@@ -65,8 +68,10 @@ public class GameStateResource extends BaseResource {
         if (!isPlaying) {
             throw new ForbiddenException("Must be a player in this game to end the turn");
         }
-        game.endTurn(player, clientId());
-        return GameSnapshotFactory.build(game, player, null);
+        return game.withLock(() -> {
+            game.endTurn(player, clientId());
+            return GameSnapshotFactory.build(game, player, null);
+        });
     }
 
     private static String ne(String arg) {

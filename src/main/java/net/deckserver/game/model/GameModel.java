@@ -12,6 +12,8 @@ import org.apache.logging.log4j.message.ObjectArrayMessage;
 
 import java.time.OffsetDateTime;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 public class GameModel implements Comparable<GameModel> {
 
@@ -21,10 +23,36 @@ public class GameModel implements Comparable<GameModel> {
     @Getter
     private final String name;
     private final JolGame game;
+    // GameModel is cached one-per-game (JolAdmin.gmap), so this lock serializes every
+    // mutate-then-save-then-snapshot sequence for a single game across concurrent requests
+    // (e.g. two near-simultaneous submits, or a submit racing a plain view fetch) — without
+    // it, one request's DoCommand can still be mutating GameData's region lists while
+    // another request's GameSnapshotFactory.build() iterates them (ConcurrentModificationException),
+    // and two concurrent saveGame() calls can both read the same stale @Version before either
+    // writes, so the second commit fails with an OptimisticLockException.
+    private final ReentrantLock lock = new ReentrantLock();
 
     public GameModel(JolGame game) {
         this.name = game.getName();
         this.game = game;
+    }
+
+    public <T> T withLock(Supplier<T> action) {
+        lock.lock();
+        try {
+            return action.get();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void withLock(Runnable action) {
+        lock.lock();
+        try {
+            action.run();
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void endTurn(String player, String excludeClientId) {

@@ -10,6 +10,16 @@ const openListeners = new Set<() => void>();
 let socket: WebSocket | null = null;
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
+// Exponential backoff for reconnect attempts, reset to the base delay on any
+// successful open. Without this, a tab that can never reconnect (e.g. a
+// revoked session with no valid refresh cookie either — see
+// JolWebSocketEndpoint.Configurator for the cases a reconnect *can* recover
+// from) retries once every RECONNECT_BASE_MS forever, indefinitely spamming
+// the server's handshake-rejection log.
+const RECONNECT_BASE_MS = 3000;
+const RECONNECT_MAX_MS = 30000;
+let reconnectDelay = RECONNECT_BASE_MS;
+
 // Identifies this browser tab's connection to the server (one per page load,
 // stable across reconnects) — sent to client.ts as a header on every REST
 // call too, so a handler whose own response already carries fresh state can
@@ -34,6 +44,7 @@ function connect() {
   }
   socket = new WebSocket(wsUrl());
   socket.onopen = () => {
+    reconnectDelay = RECONNECT_BASE_MS;
     socket?.send(JSON.stringify({ type: 'hello', clientId: CLIENT_ID }));
     // A successful WS (re)connect is a strong, near-instant hint the server
     // is back — check immediately rather than waiting for connectivity's own
@@ -53,7 +64,8 @@ function connect() {
   };
   socket.onclose = () => {
     socket = null;
-    reconnectTimer = setTimeout(connect, 3000);
+    reconnectTimer = setTimeout(connect, reconnectDelay);
+    reconnectDelay = Math.min(reconnectDelay * 2, RECONNECT_MAX_MS);
   };
   socket.onerror = () => socket?.close();
 }
@@ -84,4 +96,5 @@ export function disconnect() {
   if (reconnectTimer) clearTimeout(reconnectTimer);
   socket?.close();
   socket = null;
+  reconnectDelay = RECONNECT_BASE_MS;
 }

@@ -18,7 +18,11 @@ import jakarta.websocket.Session;
 import jakarta.websocket.server.HandshakeRequest;
 import jakarta.websocket.server.ServerEndpoint;
 import jakarta.websocket.server.ServerEndpointConfig;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +41,25 @@ public class JolWebSocketEndpoint {
         @Override
         public void modifyHandshake(ServerEndpointConfig config, HandshakeRequest request, HandshakeResponse response) {
             List<String> cookieHeaders = request.getHeaders().getOrDefault("Cookie", List.of());
-            Optional<String> username = extractCookie(cookieHeaders, "jol_at").flatMap(AuthService::parseAccessToken);
+            Optional<String> accessToken = extractCookie(cookieHeaders, AuthService.ACCESS_COOKIE);
+            Optional<String> refreshToken = extractCookie(cookieHeaders, AuthService.REFRESH_COOKIE);
+            // Same silent-refresh fallback SecurityFilter gives every REST call: the access
+            // token is short-lived (15 min — see AuthService.ACCESS_TTL), and unlike a REST
+            // request, a WebSocket only gets auth-checked once, at handshake time. Without
+            // this, a tab idle past that TTL loses its socket on the next reconnect (sleep/
+            // wake, a blip, a server restart) and — since the client just retries on a timer —
+            // spins forever failing the same way, on a session that's actually still valid.
+            AuthService.AuthResult result = AuthService.authenticate(accessToken, refreshToken);
+            Optional<String> username = result.username();
+            if (!result.cookiesToSet().isEmpty()) {
+                RuntimeDelegate.HeaderDelegate<NewCookie> cookieDelegate =
+                        RuntimeDelegate.getInstance().createHeaderDelegate(NewCookie.class);
+                List<String> setCookies = response.getHeaders()
+                        .computeIfAbsent(HttpHeaders.SET_COOKIE, k -> new ArrayList<>());
+                for (NewCookie cookie : result.cookiesToSet()) {
+                    setCookies.add(cookieDelegate.toString(cookie));
+                }
+            }
             // getUserProperties() is one map shared across every handshake for this
             // whole @ServerEndpoint deployment, not a fresh one per connection —
             // confirmed the hard way under Quarkus/Undertow (see

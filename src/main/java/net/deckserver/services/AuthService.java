@@ -41,8 +41,8 @@ import java.util.Optional;
 public final class AuthService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
-    private static final String ACCESS_COOKIE = "jol_at";
-    private static final String REFRESH_COOKIE = "jol_rt";
+    public static final String ACCESS_COOKIE = "jol_at";
+    public static final String REFRESH_COOKIE = "jol_rt";
     private static final Duration ACCESS_TTL = Duration.ofMinutes(15);
 
     private static final SecretKey KEY = loadOrCreateKey();
@@ -63,13 +63,22 @@ public final class AuthService {
 
     /** Full auth check for an inbound request: valid access token, or a silent refresh via the refresh cookie. */
     public static AuthResult authenticate(HttpHeaders headers) {
-        Optional<String> fromAccessToken = cookieValue(headers, ACCESS_COOKIE).flatMap(AuthService::parseAccessToken);
+        return authenticate(cookieValue(headers, ACCESS_COOKIE), cookieValue(headers, REFRESH_COOKIE));
+    }
+
+    /**
+     * Same check as {@link #authenticate(HttpHeaders)}, taking raw cookie values directly —
+     * for callers with no {@link HttpHeaders} to hand it, namely the WebSocket handshake
+     * (see JolWebSocketEndpoint.Configurator), which only has the raw Cookie header off the
+     * handshake request.
+     */
+    public static AuthResult authenticate(Optional<String> accessTokenCookie, Optional<String> refreshTokenCookie) {
+        Optional<String> fromAccessToken = accessTokenCookie.flatMap(AuthService::parseAccessToken);
         if (fromAccessToken.isPresent()) return AuthResult.of(fromAccessToken.get());
 
-        Optional<String> refreshCookie = cookieValue(headers, REFRESH_COOKIE);
-        if (refreshCookie.isEmpty()) return AuthResult.unauthenticated();
+        if (refreshTokenCookie.isEmpty()) return AuthResult.unauthenticated();
 
-        Optional<RefreshTokenService.Rotated> rotated = RefreshTokenService.validateAndRotate(refreshCookie.get());
+        Optional<RefreshTokenService.Rotated> rotated = RefreshTokenService.validateAndRotate(refreshTokenCookie.get());
         if (rotated.isEmpty()) {
             return new AuthResult(Optional.empty(), List.of(clearCookie(REFRESH_COOKIE)));
         }

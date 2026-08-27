@@ -42,7 +42,7 @@ public class GameActionResource extends BaseResource {
         if (!isPlaying && !canJudge) {
             throw new ForbiddenException("Must be a player in this game or a judge to update notes");
         }
-        game.updateGlobalNotes(body.notes(), clientId());
+        game.withLock(() -> game.updateGlobalNotes(body.notes(), clientId()));
         JolAdmin.recordPlayerAccess(player, gameName());
     }
 
@@ -55,7 +55,7 @@ public class GameActionResource extends BaseResource {
         if (!game.getPlayers().contains(player)) {
             throw new ForbiddenException("Must be a player in this game to update notes");
         }
-        game.updatePrivateNotes(player, body.notes(), clientId());
+        game.withLock(() -> game.updatePrivateNotes(player, body.notes(), clientId()));
         JolAdmin.recordPlayerAccess(player, gameName());
     }
 
