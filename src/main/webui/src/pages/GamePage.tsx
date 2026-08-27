@@ -84,6 +84,7 @@ export function GamePage() {
   };
 
   const liveTableCard = tableModal ? findCardByCoordinate(game, tableModal.controller, tableModal.regionType, tableModal.coordinate) : null;
+  const liveControllerPool = tableModal ? game.players.find((p) => p.name === tableModal.controller)?.pool : undefined;
   const livePlayCard = playModal ? findCardByCoordinate(game, viewerName ?? '', playModal.ctx.regionType, playModal.ctx.coordinate) : null;
 
   return (
@@ -134,7 +135,11 @@ export function GamePage() {
       )}
       {tableModal && (
         <CardActionModal
-          ctx={liveTableCard ? { ...tableModal, card: liveTableCard } : tableModal}
+          ctx={{
+            ...tableModal,
+            ...(liveTableCard && { card: liveTableCard }),
+            ...(liveControllerPool !== undefined && { controllerPool: liveControllerPool }),
+          }}
           viewerName={viewerName}
           onSubmit={submit}
           onClose={() => setTableModal(null)}
