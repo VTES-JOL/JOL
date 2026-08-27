@@ -20,13 +20,25 @@ Requires the backend running instead, from the repo root — `JOL_DB_PASSWORD=jo
 | `npm run dev` | Vite dev server (started automatically by `quarkus:dev` via Quinoa — see above) |
 | `npm run build` | Type-check (`tsc -b`) then production build to `dist/` (Quinoa's default expected location) |
 | `npm run lint` | `oxlint` |
-| `npm run test` | Unit/component tests (Vitest) |
+| `npm run test` | Unit/component tests (Vitest) + Storybook interaction tests — see below |
+| `npm run test:storybook` | Just the Storybook interaction tests (`vitest run --project=storybook`) |
 | `npm run test:e2e` | End-to-end tests (Playwright) — see below |
+| `npm run storybook` | Storybook dev server (`http://localhost:6006`) for browsing/authoring component stories |
+| `npm run build-storybook` | Static Storybook build, to `storybook-static/` (not deployed anywhere yet — a local/CI artifact only) |
 | `npm run preview` | Preview a production build locally |
 
 ## Testing
 
-**Unit/component tests** (Vitest + React Testing Library, `src/**/*.test.ts(x)`) run in `jsdom` — see `vitest.config.ts` and `src/test/setup.ts`. Pure logic (`coordinates.test.ts`, `cardCommands.test.ts`) and component behavior (`LoginPage.test.tsx`, `CommandForm.test.tsx`, `ReplacePlayer.test.tsx`) both live alongside the code they test. `api/client.ts`'s `api` object is the usual mock seam — components call it directly rather than through a context/DI layer, so `vi.mock('../../api/client')` is enough.
+**Unit/component tests** (Vitest + React Testing Library, `src/**/*.test.ts(x)`) run in `jsdom` — see `vitest.config.ts`'s `unit` project and `src/test/setup.ts`. Pure logic (`coordinates.test.ts`, `cardCommands.test.ts`) and component behavior (`LoginPage.test.tsx`, `CommandForm.test.tsx`, `ReplacePlayer.test.tsx`) both live alongside the code they test. `api/client.ts`'s `api` object is the usual mock seam — components call it directly rather than through a context/DI layer, so `vi.mock('../../api/client')` is enough.
+
+**Storybook + interaction tests** (`src/components/*.stories.tsx`) cover the shared components in `src/components/` — `Card`, `Modal`, `TopBar`, `DeckPreview`, the toast/dialog hosts, etc. Each story renders one component in isolation; some also carry a `play` function (from `storybook/test`) that drives it with `userEvent` and asserts on the result — e.g. `Modal.stories.tsx`'s `ClosesOnEscape`, or `DialogHost.stories.tsx` round-tripping a real `confirmDialog()` call. `vitest.config.ts`'s `storybook` project (the `@storybook/addon-vitest` plugin) runs every story as a test in a real headless Chromium via Playwright:
+
+```bash
+npm run test:storybook   # just the stories
+npm run storybook        # interactive — browse stories, re-run/debug a play function
+```
+
+`.storybook/preview.tsx` wraps every story in a `QueryClientProvider` + `MemoryRouter` (most components need at least one) and loads the same Bootstrap/theme CSS the real app does — see its comments and `.storybook/main.ts`'s `staticDirs` for how, since this app doesn't bundle that CSS via Vite (`legacyStyles.ts` loads it at runtime instead). A component that reads a react-query cache the backend would normally fill (e.g. `TopBar`'s `useNav()`) gets a story-local decorator that seeds the cache with `queryClient.setQueryData(...)` instead of mocking a fetch — see `TopBar.stories.tsx`.
 
 **End-to-end tests** (`e2e/*.spec.ts`, Playwright) drive a real browser against the actual app — one `quarkus:dev` process, not a mocked environment. `playwright.config.ts`'s `webServer` entry starts it automatically:
 
@@ -44,7 +56,8 @@ Cold start (first Maven/npm dependency resolution + Quarkus boot) can take a cou
 - `src/api/` — `client.ts` (thin fetch wrapper used by everything), `types.ts` (hand-written mirrors of the Java response beans), `config.ts`, `connectivity.ts`
 - `src/ws/` — WebSocket client (`socket.ts`) and the `useGameSocket`/`useJolSocket` hooks that translate push signals into re-fetches
 - `src/nav/` — `NavContext`/`useNav`/`useAuth` — the authenticated shell's nav state (current player, per-game buttons, etc.), sourced from `GET /jol/api/nav`
-- `src/components/` — shared UI: `TopBar`, modal/dialog/toast hosts, `ChunkErrorBoundary`, `UpdateBanner`
+- `src/components/` — shared UI: `TopBar`, modal/dialog/toast hosts, `ChunkErrorBoundary`, `UpdateBanner` — each with a co-located `*.stories.tsx` (see Testing above)
+- `.storybook/` — Storybook config (`main.ts`, `preview.tsx`) — see Testing above
 - `src/content/help/` — MDX help content (see `@mdx-js/rollup` in `vite.config.ts`)
 - `src/hooks/` — small reusable hooks (card tooltips, dropdown open/close state)
 - `e2e/` — Playwright specs (see Testing above)
