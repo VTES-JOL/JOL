@@ -109,8 +109,16 @@ const DS = {
     statsPerNation:          (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/nations`, {treshold, fromDate, toDate, isTourney}, opts),
     statsPerOpponent:        (playerName, treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/performance/${_enc(playerName)}/players`, {treshold, fromDate, toDate, isTourney}, opts),
     statsPerGame:            (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/games`, {treshold, fromDate, toDate, isTourney}, opts),
-    statsJol:                (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/jol`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsJolMonth:           (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/jol/month`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsJolClans:           (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/jol/clans`, {treshold, fromDate, toDate, isTourney}, opts),
     statsPerformanceDeck:    (playerName, treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/performance/${_enc(playerName)}/decks`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsReactionPlayer:     (playerName, treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/reaction/${_enc(playerName)}`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsReactionAvg:        (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/reaction/avg`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsMetricsPlayer:      (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/metrics/player`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsMetricsGame:        (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/metrics/game`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsCommandsPlayer:     (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/commands/player`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsCommandsGame:       (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/commands/game`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsJolKpis:            (playerName, opts) => apiGet(`/stats/jol/kpis/${_enc(playerName)}`,  opts),
     updateSiteNotes:         (notes, opts) => apiPut('/admin/site-notes', {notes}, opts),
     clearSiteNotes:          (opts) => apiDel('/admin/site-notes', opts),
 
@@ -3093,6 +3101,11 @@ function exportCsv() {
     DS.exportPastGamesAsCsv({callback: (data) => createCsvDownloadLink(data, 'past-games.csv'), errorHandler: errorhandler});
 }
 
+function toggleLoading(target) {
+    $("#loadingScreen").toggleClass("d-none");
+    $(target).toggleClass("d-none");
+}
+
 function resetStats() {
     $('#fromDate').val('');
     $('#toDate').val('');
@@ -3127,13 +3140,27 @@ function renderStats() {
     let toDate = $('#toDate').val();
     let isTourney = $("#onlyTournaments").prop("checked");
 
-    if ($('#playerStatsTab').hasClass('active')) {
+    if($('#kpiStatsTab').hasClass('active')) {
+        toggleLoading("#kpiContainer")
+        DS.statsJolKpis(player, {
+            callback: (data) => {
+                createKpis(data);
+                toggleLoading("#kpiContainer");
+            },
+             errorHandler: (error) => {
+                 toggleLoading("#kpiContainer");
+                 errorhandler(error);
+             }
+         });
+    } else if ($('#playerStatsTab').hasClass('active')) {
         DS.statsPerPlayer(treshold, fromDate, toDate, isTourney, {
             callback: (data) => {
                 createStats(data, "#statsGames tbody");
                 filterName('#statsGames tbody tr', 'playerNameFilter', 1);
             },
-            errorHandler: errorhandler
+            errorHandler: (error) => {
+                errorhandler(error);
+            }
         });
     } else if($('#deckStatsTab').hasClass('active')) {
         DS.statsPerDeck(tresholdDeck, fromDate, toDate, isTourney,{
@@ -3144,7 +3171,7 @@ function renderStats() {
     } else if($('#nationStatsTab').hasClass('active')) {
         DS.statsPerNation(gameThresholdNation, fromDate, toDate, isTourney,{
             callback: (data) => {
-                createStats(data, "#statsNationGames  tbody");
+                createStats(data, "#statsNationGames tbody");
                 filterName('#statsNationGames  tbody tr', 'nationNameFilter', 1);
             }, errorHandler: errorhandler});
     } else if($('#personalStatsTab').hasClass('active')) {
@@ -3157,6 +3184,11 @@ function renderStats() {
             callback: (data) => {
                 createStatsPersonalDeck(data);
             }
+        });
+        DS.statsReactionPlayer(player, 0, fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createStatsPersonalReaction(data);
+            }
         })
     } else if($('#gameStatsTab').hasClass('active')) {
         DS.statsPerGame(0, fromDate, toDate, isTourney,{
@@ -3164,13 +3196,307 @@ function renderStats() {
                 createStatsGame(data);
                 filterName('#statsGameGames tbody tr', 'gameNameFilter', 1);
             }, errorHandler: errorhandler});
-    } else if($('#jolStatsTab').hasClass('active')) {
-        DS.statsJol(0, fromDate, toDate, isTourney,{
+    } else if($('#jolMonthlyTab').hasClass('active')) {
+        DS.statsJolMonth(0, fromDate, toDate, isTourney, {
             callback: (data) => {
-                createStatsJol(data);
+                createStatsJolMonth(data);
                 filterName('#statsJolGames tbody tr', 'monthFilter', 1);
+            }, errorHandler: errorhandler
+        });
+    } else if($('#jolReactionTab').hasClass('active')) {
+        DS.statsReactionAvg(0, fromDate, toDate, isTourney, {
+            callback: (data) => {
+                createStatsJolReaction(data);
+                filterName('#statsJolReaction tbody tr', 'playerReactionFilter', 1);
+            }, errorHandler: errorhandler
+        });
+    }else if($('#jolMetricsTab').hasClass('active')) {
+        DS.statsMetricsPlayer(0, fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createMetrics(data, "#playerMetrics tbody");
+            }, errorHandler: errorhandler
+        });
+        DS.statsMetricsGame(0, fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createMetrics(data, "#gamesMetrics tbody");
+            }, errorHandler: errorhandler});
+        DS.statsCommandsPlayer(0, fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createCommands(data, "#playerCommands tbody");
+            }, errorHandler: errorhandler});
+        DS.statsCommandsGame(0, fromDate, toDate, isTourney,{
+            callback: (data) => {
+                createCommands(data, "#gameCommands tbody");
             }, errorHandler: errorhandler});
     }
+}
+
+function createKpis(kpis) {
+    //Active Games Card
+    $('#currentMonthActiveGames').text(kpis.activeGames[0]);
+    $('#currentMonthActiveGamesChange')
+        .empty()
+        .append(kpis.activeChangeMonth[0] >=0 ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>')
+        .addClass(kpis.activeChangeMonth[0] >=0 ? 'text-success' : 'text-danger')
+        .append(kpis.activeChangeMonth[0] + " since last month");
+    $('#lastMonthActiveGames').text(kpis.activeGames[1]);
+    $('#lastMonthActiveGamesChange')
+        .empty()
+        .append(kpis.activeChangeMonth[1] >=0 ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>')
+        .addClass(kpis.activeChangeMonth[1] >=0 ? 'text-success' : 'text-danger')
+        .append(kpis.activeChangeMonth[1] + " since last month");
+    $('#beforeLastMonthActiveGames').text(kpis.activeGames[2]);
+    $('#beforeLastMonthActiveGamesChange')
+        .empty()
+        .append(kpis.activeChangeMonth[2] >=0 ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>')
+        .addClass(kpis.activeChangeMonth[2] >=0 ? 'text-success' : 'text-danger')
+        .append(kpis.activeChangeMonth[2] + " since last month");
+    //Tournament Games Card
+    $('#currentMonthActiveTournamentGames').text(kpis.tournamentGames[0]);
+    $('#currentMonthActiveTournamentGamesChange')
+        .empty()
+        .append(kpis.activeTourChangeMonth[0] >=0 ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>')
+        .addClass(kpis.activeTourChangeMonth[0] >=0 ? 'text-success' : 'text-danger')
+        .append(kpis.activeTourChangeMonth[0]+" since last month");
+    $('#lastMonthActiveTournamentGames').text(kpis.tournamentGames[1]);
+    $('#lastMonthActiveTournamentGamesChange')
+        .empty()
+        .append(kpis.activeTourChangeMonth[1] >=0 ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>')
+        .addClass(kpis.activeTourChangeMonth[1] >=0 ? 'text-success' : 'text-danger')
+        .append(kpis.activeTourChangeMonth[1]+" since last month");
+    $('#beforeLastMonthActiveTournamentGames').text(kpis.tournamentGames[2]);
+    $('#beforeLastMonthActiveTournamentGamesChange')
+        .empty()
+        .append(kpis.activeTourChangeMonth[2] >=0 ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>')
+        .addClass(kpis.activeTourChangeMonth[2] >=0 ? 'text-success' : 'text-danger')
+        .append(kpis.activeTourChangeMonth[2] + " since last month");
+    //PAST GAMES CARD
+    $('#currentMonthPastGames').text(kpis.pastGames);
+    $('#currentMonthPastTournamentGames').text(kpis.pastTournament);
+
+    fillTop(kpis.top3PlayersByWins[0], "currentMonthTop");
+    fillTop(kpis.top3PlayersByWins[1], "lastMonthTop");
+    fillTop(kpis.top3PlayersByWins[2], "beforeLastMonthTop");
+    fillTop(kpis.top3DecksByWins[0], "currentMonthTopDecks");
+    fillTop(kpis.top3DecksByWins[1], "lastMonthTopDecks");
+    fillTop(kpis.top3DecksByWins[2], "beforeLastMonthTopDecks");
+    fillTop(kpis.top3NationsByWins[0], "currentMonthTopNations");
+    fillTop(kpis.top3NationsByWins[1], "lastMonthTopNations");
+    fillTop(kpis.top3NationsByWins[2], "beforeLastMonthTopNations");
+
+    $('#decksKpi').text("ALL DECKS:" + kpis.decks);
+
+    //MOST ACTIVE GAMES
+    $('#gamesByPlayerKpi').text(Object.values(kpis.gamesByPlayer)[0]);
+    $('#highestActiveLastMonthKpi').text(Object.values(kpis.pastByPlayer)[0]);
+    //MOST TOURNAMENT GAMES
+    $('#tournamentsByPlayerKpi').text(Object.values(kpis.tournamentsByPlayer)[0]);
+    $('#highestTournamentLastMonthKpi').text(Object.values(kpis.pastTournamentByPlayer)[0]);
+
+    $('#oustedByPlayerKpi').text(Object.values(kpis.oustedByPlayer)[0]);
+    $('#decksByPlayerKpi').text(Object.values(kpis.decksByPlayer)[0]);
+
+    $('#nationsByPlayerKpi').text("MOST PLAYERS:" + Object.values(kpis.nationsByPlayer)[0]);
+
+    //Activity
+    fillMonthlyActivity('currentMonth', kpis.monthlyActivity[0]);
+    fillMonthlyActivity('lastMonth', kpis.monthlyActivity[1]);
+    fillMonthlyActivity('monthBeforeLast', kpis.monthlyActivity[2]);
+    fillOverallOverview(kpis.overallOverviewDto);
+    fillPeakActivity(kpis.peakActivityDays, '#peakActivityDays');
+    fillPeakActivity(kpis.peakActivityHours, '#peakActivityHours');
+    fillPlayerActivity(kpis.playerActivityOverviewDto);
+    fillChatCommandRatios(kpis.chatCommandRatioDto);
+}
+
+function fillTop(top, target) {
+    const topPlayers = document.getElementById(target);
+    const isNations = target.toLowerCase().includes("nations");
+    topPlayers.innerHTML = top.map((player, index) => {
+        const [key, value] = Object.entries(player)[0];
+        const display = isNations
+            ? `<span class="fi fi-${key.toLowerCase()} me-2"></span>`
+            : key;
+        return `
+        <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+            <div>
+                <span class="fw-semibold me-2">${index + 1}.</span>
+                ${display}
+            </div>
+
+            <span class="text-body-secondary small">
+                ${value} wins
+            </span>
+        </div>
+    `;
+    }).join("");
+}
+
+function fillChatCommandRatios(data) {
+    const container = $('#chatCommandRatioPlayers');
+    container.empty();
+
+    data.forEach((player, index) => {
+        container.append(`
+            <div class="list-group-item px-0">
+                <div class="d-flex justify-content-between">
+                    <span>
+                        <span class="fw-semibold me-2">
+                            ${index + 1}.
+                        </span>
+                        ${player.playerName}
+                    </span>
+
+                    <span class="fw-semibold">
+                        ${Number(player.ratio).toFixed(2)}
+                    </span>
+                </div>
+
+                <div class="small text-body-secondary">
+                    ${Number(player.chat).toLocaleString()} chat
+                    &nbsp;·&nbsp;
+                    ${Number(player.command).toLocaleString()} commands
+                </div>
+            </div>
+        `);
+    });
+}
+function fillPlayerActivity(data) {
+    $('#playerActivityName').text(data.playerName);
+    $('#playerTotalActivity').text(data.totalActivity.toLocaleString());
+    $('#playerChat').text(data.totalChat.toLocaleString());
+    $('#playerCommand').text(data.totalCmd.toLocaleString());
+    $('#totalUniqueGames').text(data.totalUniqueGames.toLocaleString());
+    $('#averageUniqueGamesPerMonth').text(data.averageUniqueGamesPerMonth.toFixed(2));
+    fillPeakActivity(data.mostActiveDaysOfWeek, '#playerActivityDays');
+    fillPeakActivity(data.mostActiveHours, '#playerActivityHours');
+}
+
+function fillPeakActivity(data, target) {
+    const container = $(target);
+    container.empty();
+
+    Object.entries(data)
+        .sort(([, eventsA], [, eventsB]) => Number(eventsB) - Number(eventsA))
+        .forEach(([key, events], index) => {
+            const displayTime = target === '#peakActivityHours' || target === '#playerActivityHours' ? `${key}:00` : key;
+            container.append(`
+                <div class="list-group-item d-flex justify-content-between px-0">
+                    <span>
+                        <span class="fw-semibold me-2">${index + 1}.</span>
+                        ${displayTime}
+                    </span>
+                    <span class="text-body-secondary">
+                        ${Number(events).toLocaleString()} events
+                    </span>
+                </div>
+            `);
+        });
+}
+
+function fillOverallOverview(data) {
+    $('#overallTotalActivity').text(data.totalActivity.toLocaleString());
+    $('#overallChat').text(data.totalChat.toLocaleString());
+    $('#overallCommand').text(data.totalCmd.toLocaleString());
+    $('#overallUniqueUsers').text(data.uniqueUsers.toLocaleString());
+    $('#overallMostActivePlayer').text(data.mostActivePlayer);
+    $('#overallMostActivePlayerEvents').text(data.mostActivePlayerEvents.toLocaleString());
+    $('#overallMostActiveGame').text(data.mostActiveGame);
+    $('#overallMostActiveGameEvents').text(data.mostActiveGameEvents[0].toLocaleString());
+    $('#overallMostActiveGameChat').text(data.mostActiveGameEvents[1].toLocaleString());
+    $('#overallMostActiveGameCommand').text(data.mostActiveGameEvents[2].toLocaleString());
+}
+
+function fillMonthlyActivity(prefix, data) {
+    $(`#${prefix}Label`).text(data.month);
+    $(`#${prefix}TotalActivity`).text(data.totalActivity.toLocaleString());
+    $(`#${prefix}Chat`).text(data.totalChat.toLocaleString());
+    $(`#${prefix}Command`).text(data.totalCommand.toLocaleString());
+    $(`#${prefix}UniqueUsers`).text(data.uniqueUsers.toLocaleString());
+    $(`#${prefix}MostActiveDay`).text(data.mostActiveDay);
+    $(`#${prefix}MostActiveDayEvents`).text(data.mostActiveDayEvents.toLocaleString());
+    $(`#${prefix}MostActiveHour`).text(`${data.mostActiveHour}:00`);
+    $(`#${prefix}MostActiveHourEvents`).text(data.mostActiveHourEvents.toLocaleString());
+
+    const topPlayers = $(`#${prefix}TopPlayers`);
+
+    topPlayers.empty();
+
+    Object.entries(data.topPlayers).forEach(([playerName, events], index) => {
+        topPlayers.append(`
+        <div class="list-group-item d-flex justify-content-between px-0">
+            <span>
+                <span class="fw-semibold me-2">${index + 1}.</span>
+                ${playerName}
+            </span>
+            <span class="text-body-secondary">
+                ${events.toLocaleString()} events
+            </span>
+        </div>
+    `);
+    });
+}
+
+function createMetrics(data, target) {
+    let table = $(target);
+    table.empty();
+    $.each(data, function (index, count) {
+        let row = $("<tr/>");
+        row.addClass("border-top")
+        let name = $("<td/>").text(index.length > 50 ? index.substring(0, 25) + "..." : index).attr("title", index);
+        let activity = $("<td/>").text(count[0]);
+        let chat = $("<td/>").text(count[1]);
+        let command = $("<td/>").text(count[2]);
+        let both = $("<td/>").text(count[3]);
+        let ping = $("<td/>").text(count[4]);
+        row.append(name, activity, chat, command, both, ping);
+        table.append(row);
+    })
+}
+
+function createCommands(data, target) {
+    let commands = $(target);
+    commands.empty();
+    $.each(data, function (index, count) {
+        let row = $("<tr/>");
+        row.addClass("border-top")
+        let name = $("<td/>").text(index.length > 50 ? index.substring(0, 25) + "..." : index).attr("title", index);
+        let timeout = $("<td/>").text(count[0]);
+        let vp = $("<td/>").text(count[1]);
+        let choose = $("<td/>").text(count[2]);
+        let reveal = $("<td/>").text(count[3]);
+        let label = $("<td/>").text(count[4]);
+        let votes = $("<td/>").text(count[5]);
+        let random = $("<td/>").text(count[6]);
+        let flip = $("<td/>").text(count[7]);
+        let discard = $("<td/>").text(count[8]);
+        let draw = $("<td/>").text(count[9]);
+        let edge = $("<td/>").text(count[10]);
+        let play = $("<td/>").text(count[11]);
+        let influence = $("<td/>").text(count[12]);
+        let move = $("<td/>").text(count[13]);
+        let burn = $("<td/>").text(count[14]);
+        let pool = $("<td/>").text(count[15]);
+        let blood = $("<td/>").text(count[16]);
+        let contest = $("<td/>").text(count[17]);
+        let disc = $("<td/>").text(count[18]);
+        let capacity = $("<td/>").text(count[19]);
+        let unlock = $("<td/>").text(count[20]);
+        let lock = $("<td/>").text(count[21]);
+        let order = $("<td/>").text(count[22]);
+        let show = $("<td/>").text(count[23]);
+        let shuffle = $("<td/>").text(count[24]);
+        let transfer = $("<td/>").text(count[25]);
+        let rfg = $("<td/>").text(count[26]);
+        let path = $("<td/>").text(count[27]);
+        let sect = $("<td/>").text(count[28]);
+        let clan = $("<td/>").text(count[29]);
+        let open = $("<td/>").text(count[30]);
+        let ping = $("<td/>").text(count[31]);
+        let all = $("<td/>").text(count[32]);
+        row.append(name, timeout, vp, choose, reveal, label, votes, random, flip, discard, draw, edge, play, influence, move, burn, pool, blood, contest, disc, capacity, unlock, lock, order, show, shuffle, transfer, rfg, path, sect, clan, open, ping, all);
+        commands.append(row);
+    })
 }
 
 function createStats(stats, tableId) {
@@ -3181,11 +3507,13 @@ function createStats(stats, tableId) {
             let row = $("<tr/>");
             row.addClass("border-top")
             let name = "";
-            if(tableId === "#statsNationGames  tbody") {
+            let playersOfNation = "";
+            if(tableId === "#statsNationGames tbody") {
                 let flag = entry
                     ? `<span data-tippy-content="${regionNames.of(index)}" class="fi fi-${index.toLowerCase()} fis"></span>`
                     : "";
                 name = $("<td/>").text(regionNames.of(index) + " / ").append(flag);
+                playersOfNation = $("<td/>").text(entry.playerCount);
             } else {
                 name = $("<td/>").text(index);
             }
@@ -3200,12 +3528,20 @@ function createStats(stats, tableId) {
             let maxWinStreak = $("<td/>").text(entry.winStreak);
             if(tableId === "#statsGames tbody") {
                 row.append(name, games, gw, vp, gwRat, vpRat, highestVp, uniqueOpp, mostOpp, maxWinStreak);
+            } else if(tableId === "#statsNationGames tbody") {
+                row.append(name, games, gw, vp, gwRat, vpRat, highestVp, maxWinStreak, playersOfNation);
             } else {
                 row.append(name, games, gw, vp, gwRat, vpRat, highestVp, maxWinStreak);
             }
             table.append(row);
         }
     })
+    if(tableId === "#statsNationGames tbody") {
+        createPieChart("nationChartGames", stats, "allGames", "Most Games", true);
+        createPieChart("nationChartWins", stats, "gwCount", "Most Wins", true);
+        createPieChart("nationChartVp", stats, "vpCount", "Most VP's", true);
+        createPieChart("nationChartPlayers", stats, "playerCount", "Most Players", true);
+    }
 }
 
 function createStatsPersonal(stats) {
@@ -3218,13 +3554,17 @@ function createStatsPersonal(stats) {
         let games = $("<td/>").text(entry.games);
         let wins = $("<td/>").text(entry.wins);
         let winRate = $("<td/>").text(entry.winRate);
+        let winRateAgainstOpponent = $("<td/>").text(entry.winRateOpponent);
         let winOpponent = $("<td/>").text(entry.winOpponent);
-        let winRateOpponent = $("<td/>").text(entry.winRateOpponent);
+        let winRateOpponent = $("<td/>").text(entry.oppWinRate);
         let winOther = $("<td/>").text(entry.winOther);
         let losses = $("<td/>").text(entry.losses);
-        row.append(name, games, wins, winRate, winOpponent, winRateOpponent, winOther, losses);
+        row.append(name, games, wins, winRate, winRateAgainstOpponent, winOpponent, winRateOpponent, winOther, losses);
         table.append(row);
     })
+
+    loadPersonalChart(stats);
+    loadPersonalChart(stats);
 }
 
 function createStatsPersonalDeck(stats) {
@@ -3248,7 +3588,23 @@ function createStatsPersonalDeck(stats) {
     })
 }
 
-function createStatsJol(stats) {
+function createStatsPersonalReaction(stats) {
+    let table = $("#statsPersonalReaction tbody");
+    table.empty();
+    $.each(stats, function (index, entry) {
+        let row = $("<tr/>");
+        row.addClass("border-top")
+        let game = $("<td/>").text(entry.gameName);
+        let fromPlayer = $("<td/>").text(entry.fromPlayer);
+        let command = $("<td/>").text(entry.fromCommand);
+        let response = $("<td/>").text(entry.toCommand);
+        let reactionTime = $("<td/>").text(entry.reactionTime);
+        row.append(game, fromPlayer, command, response, reactionTime);
+        table.append(row);
+    })
+}
+
+function createStatsJolMonth(stats) {
     let table = $("#statsJolGames tbody");
     table.empty();
     $.each(stats, function (index, entry) {
@@ -3281,6 +3637,34 @@ function createStatsJol(stats) {
             bestNation = $("<td/>").text("-");
         }
         row.append(name, started, ended, net, wins, winRate, vps, avgVp, avgDuration, bestPlayer, bestDeck, bestNation);
+        table.append(row);
+    })
+    loadJolChart(stats);
+}
+
+function createStatsJolReaction(stats) {
+    let table = $("#statsJolReaction tbody");
+    table.empty();
+    $.each(stats, function (index, entry) {
+        let row = $("<tr/>");
+        row.addClass("border-top")
+        let name = $("<td/>").text(index);
+        let avg = $("<td/>").text(entry);
+        row.append(name, avg);
+        table.append(row);
+    })
+}
+
+function createStatsJolClan(stats) {
+
+    let table = $("#statsJolClans tbody");
+    table.empty();
+    $.each(stats, function (index, entry) {
+        let row = $("<tr/>");
+        row.addClass("border-top")
+        let name = $("<td/>").text(entry.key);
+        let count = $("<td/>").text(entry.value);
+        row.append(name, count);
         table.append(row);
     })
 }
@@ -3358,8 +3742,8 @@ function sortTable(columnIndex, id) {
     sortDirection[columnIndex] = !sortDirection[columnIndex];
 
     rows.sort((a, b) => {
-        let x = a.cells[columnIndex].innerText.toLowerCase();
-        let y = b.cells[columnIndex].innerText.toLowerCase();
+        let x = a.cells[columnIndex]?.innerText.toLowerCase()??"";
+        let y = b.cells[columnIndex]?.innerText.toLowerCase()??"";
 
         // Numeric sorting
         if (!isNaN(x) && !isNaN(y)) {
@@ -3424,8 +3808,8 @@ function durationToSeconds(duration) {
         + Number(match[4] || 0);
 }
 
-function sortTableByDuration(columnIndex) {
-    const tbody = document.querySelector("#statsGameGames tbody");
+function sortTableByDuration(columnIndex, table) {
+    const tbody = document.querySelector(table);
 
     const rows = Array.from(tbody.querySelectorAll("tr"));
 

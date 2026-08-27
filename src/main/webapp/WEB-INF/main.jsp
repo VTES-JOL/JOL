@@ -84,6 +84,9 @@
 <script src="${pageContext.request.contextPath}/js/jquery-3.7.1.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/jquery-throttle.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/jquery-ui.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/chart.umd.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/charts.js"></script>
+<script src="${pageContext.request.contextPath}/js/chartjs-plugin-datalabels.js"></script>
 <script src='${pageContext.request.contextPath}/js/moment-with-locales.min.js'></script>
 <script src='${pageContext.request.contextPath}/js/moment-timezone-with-data.min.js'></script>
 <script src="${pageContext.request.contextPath}/js/popper.min.js"></script>
