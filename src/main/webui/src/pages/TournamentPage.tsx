@@ -7,6 +7,7 @@ import { OpenTournamentDetail } from './tournament/OpenTournamentDetail';
 import { FinalsTournamentDetail } from './tournament/FinalsTournamentDetail';
 import { PageLoading } from '../components/PageLoading';
 import { EmptyState } from '../components/EmptyState';
+import { SplitLayout } from '../components/SplitLayout';
 
 const TOURNAMENT_LIST_QUERY_KEY = ['tournament', 'list'];
 
@@ -35,29 +36,32 @@ export function TournamentPage() {
   const refreshRegistered = () => queryClient.invalidateQueries({ queryKey: ['tournament', 'registered'] });
 
   return (
-    <div className="row g-2 flex-fill align-items-stretch min-h-0 p-3">
-      <div className="col-lg-4 d-flex flex-column">
+    <SplitLayout
+      stackBelowLg
+      left={
         <TournamentList
           tournaments={data.tournaments}
           finalsInvites={data.finalsInvites}
           selection={selection}
           onSelect={setSelection}
         />
-      </div>
-      <div className="col-lg-8 d-flex flex-column">
-        {openTournament && (
-          <OpenTournamentDetail
-            tournament={openTournament}
-            onJoinedOrLeft={() => {
-              refreshList();
-              refreshRegistered();
-            }}
-            onDeckChanged={refreshRegistered}
-          />
-        )}
-        {finalsTournament && <FinalsTournamentDetail tournament={finalsTournament} />}
-        {!openTournament && !finalsTournament && <EmptyState icon="bi-trophy" message="Select a tournament" />}
-      </div>
-    </div>
+      }
+      right={
+        <>
+          {openTournament && (
+            <OpenTournamentDetail
+              tournament={openTournament}
+              onJoinedOrLeft={() => {
+                refreshList();
+                refreshRegistered();
+              }}
+              onDeckChanged={refreshRegistered}
+            />
+          )}
+          {finalsTournament && <FinalsTournamentDetail tournament={finalsTournament} />}
+          {!openTournament && !finalsTournament && <EmptyState icon="bi-trophy" message="Select a tournament" />}
+        </>
+      }
+    />
   );
 }

@@ -6,19 +6,19 @@ import { runRequest } from '../../api/mutate';
 export function AccountEditor() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState<{ text: string; kind: 'success' | 'danger' } | null>(null);
 
   const submit = () => {
     if (!newPassword && !confirmPassword) {
-      setMessage('Enter a new password.');
+      setMessage({ text: 'Enter a new password.', kind: 'danger' });
       return;
     }
     if (newPassword !== confirmPassword) {
-      setMessage('Password confirmation does not match.');
+      setMessage({ text: 'Password confirmation does not match.', kind: 'danger' });
       return;
     }
     runRequest(api.put('/profile/password', { newPassword }), 'Failed to change password', () => {
-      setMessage('Password updated.');
+      setMessage({ text: 'Password updated.', kind: 'success' });
       setNewPassword('');
       setConfirmPassword('');
     });
@@ -57,9 +57,11 @@ export function AccountEditor() {
         <button className="btn btn-outline-secondary btn-sm mt-2" onClick={submit}>
           Change Password
         </button>
-        <div id="profilePasswordError" className="mt-2">
-          {message}
-        </div>
+        {message && (
+          <div id="profilePasswordError" className={`alert alert-${message.kind} py-2 mt-2 mb-0`}>
+            {message.text}
+          </div>
+        )}
       </div>
     </Card>
   );

@@ -6,7 +6,7 @@ import { TournamentAdminList } from './tournamentAdmin/TournamentAdminList';
 import { TournamentEditor } from './tournamentAdmin/TournamentEditor';
 import { TournamentManager } from './tournamentAdmin/TournamentManager';
 import { confirmDialog } from '../components/dialog';
-import './TournamentAdminPage.css';
+import { SplitLayout } from '../components/SplitLayout';
 
 type View = { mode: 'edit'; name: string | null } | { mode: 'tables'; name: string } | null;
 
@@ -63,32 +63,33 @@ export function TournamentAdminPage() {
   };
 
   return (
-    <div className="tour-admin-layout p-3">
-      <div className="tour-admin-col-left">
-        <TournamentAdminList tournaments={tournaments} onSelect={selectTournament} onNew={newTournament} />
-      </div>
-      <div className="tour-admin-col-right">
-        {view?.mode === 'edit' && (
-          <div className="d-flex flex-column flex-fill min-h-0">
-            <TournamentEditor
-              tournamentName={view.name}
-              onSaved={refreshList}
-              onDirtyChange={(dirty) => {
-                editorDirtyRef.current = dirty;
-              }}
-            />
-          </div>
-        )}
-        {tablesTournament && (
-          <div className="d-flex flex-column flex-fill min-h-0">
-            <TournamentManager
-              tournament={tablesTournament}
-              onClose={() => setView(null)}
-              onChanged={refreshList}
-            />
-          </div>
-        )}
-      </div>
-    </div>
+    <SplitLayout
+      stackBelowLg
+      left={<TournamentAdminList tournaments={tournaments} onSelect={selectTournament} onNew={newTournament} />}
+      right={
+        <>
+          {view?.mode === 'edit' && (
+            <div className="d-flex flex-column flex-fill min-h-0">
+              <TournamentEditor
+                tournamentName={view.name}
+                onSaved={refreshList}
+                onDirtyChange={(dirty) => {
+                  editorDirtyRef.current = dirty;
+                }}
+              />
+            </div>
+          )}
+          {tablesTournament && (
+            <div className="d-flex flex-column flex-fill min-h-0">
+              <TournamentManager
+                tournament={tablesTournament}
+                onClose={() => setView(null)}
+                onChanged={refreshList}
+              />
+            </div>
+          )}
+        </>
+      }
+    />
   );
 }

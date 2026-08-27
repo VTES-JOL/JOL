@@ -34,14 +34,14 @@ export function ProfilePage() {
   if (!profile) return <PageLoading />;
 
   return (
-    <div className="row mt-2 p-3">
-      <div className="col-lg-3 col-md-6">
+    <div className="row g-3 mt-2 p-3">
+      <div className="col-12 col-md-6 col-lg-4">
         <ProfileEditor profile={profile} countries={countries} onSaved={onSaved} />
       </div>
-      <div className="col-lg-3 col-md-6">
+      <div className="col-12 col-md-6 col-lg-4">
         <AccountEditor />
       </div>
-      <div className="col-lg-3 col-md-6">
+      <div className="col-12 col-md-6 col-lg-4">
         <Preferences profile={profile} onSaved={onSaved} />
       </div>
     </div>

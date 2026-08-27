@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api, ApiError } from '../api/client';
 import type { UserRole } from '../api/types';
 import { PageLoading } from '../components/PageLoading';
+import { EmptyState } from '../components/EmptyState';
 import { PlayerRoles } from './admin/PlayerRoles';
 import { ReplacePlayer } from './admin/ReplacePlayer';
 import { EndTurn } from './admin/EndTurn';
@@ -27,9 +28,8 @@ export function AdminPage() {
 
   if (forbidden) {
     return (
-      <div className="p-4 text-center text-muted">
-        <i className="bi bi-shield-lock fs-1 d-block mb-2" />
-        <p className="mb-0">You don't have access to this page.</p>
+      <div className="p-4">
+        <EmptyState icon="bi-shield-lock" message="You don't have access to this page." />
       </div>
     );
   }
@@ -37,16 +37,16 @@ export function AdminPage() {
   if (!data) return <PageLoading />;
 
   return (
-    <div className="row g-2 p-3">
-      <div className="col-sm-4">
+    <div className="row g-3 p-3">
+      <div className="col-12 col-lg-4">
         <PlayerRoles />
       </div>
-      <div className="col-sm-4">
+      <div className="col-12 col-md-6 col-lg-4">
         <ReplacePlayer />
         <EndTurn />
         <RollbackGame />
       </div>
-      <div className="col-sm-4">
+      <div className="col-12 col-md-6 col-lg-4">
         <SiteNotesEditor />
         <IdleGames />
       </div>

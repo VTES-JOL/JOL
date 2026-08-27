@@ -47,52 +47,58 @@ export function StatsDtoTable({
   const filtered = sorted.filter((r) => filterValue(r.key).toLowerCase().includes(nameFilter.toLowerCase()));
 
   return (
-    <div className="overflow-auto pb-3" style={{ height: '78vh' }}>
+    <div className="overflow-auto pb-3" style={{ maxHeight: '78vh' }}>
       <table className="table table-bordered table-sm mb-0">
         <thead>
           <tr>
-            <th className="sticky-top bg-white">
+            <th className="sticky-top bg-body">
               {nameHeader}
-              <input type="text" value={nameFilter} onChange={(e) => onNameFilterChange(e.target.value)} />
+              <input
+                type="text"
+                className="form-control form-control-sm d-inline-block w-auto ms-1"
+                value={nameFilter}
+                onChange={(e) => onNameFilterChange(e.target.value)}
+              />
               <SortIcon column="key" onSort={toggle} />
             </th>
-            <th className="sticky-top bg-white">
+            <th className="sticky-top bg-body">
               Number of Games
               <input
                 type="number"
                 min={0}
+                className="form-control form-control-sm d-inline-block ms-1"
                 value={threshold}
                 onChange={(e) => onThresholdChange(e.target.value)}
-                style={{ width: 45, height: 25 }}
+                style={{ width: 60 }}
               />
               <SortIcon column="allGames" onSort={toggle} />
             </th>
-            <th className="sticky-top bg-white">
+            <th className="sticky-top bg-body">
               GW Total <SortIcon column="gwCount" onSort={toggle} />
             </th>
-            <th className="sticky-top bg-white">
+            <th className="sticky-top bg-body">
               VP Total <SortIcon column="vpCount" onSort={toggle} />
             </th>
-            <th className="sticky-top bg-white">
+            <th className="sticky-top bg-body">
               % Win Rate <SortIcon column="winRate" onSort={toggle} mode="percent" />
             </th>
-            <th className="sticky-top bg-white">
+            <th className="sticky-top bg-body">
               Average VP <SortIcon column="avgVp" onSort={toggle} />
             </th>
-            <th className="sticky-top bg-white">
+            <th className="sticky-top bg-body">
               Highest VP <SortIcon column="highestVp" onSort={toggle} />
             </th>
             {extended && (
-              <th className="sticky-top bg-white">
+              <th className="sticky-top bg-body">
                 Unique Opponents <SortIcon column="uniqueOpponents" onSort={toggle} />
               </th>
             )}
             {extended && (
-              <th className="sticky-top bg-white">
+              <th className="sticky-top bg-body">
                 Most played Opponent <SortIcon column="mostPlayedOpponent" onSort={toggle} />
               </th>
             )}
-            <th className="sticky-top bg-white">
+            <th className="sticky-top bg-body">
               Highest Win Streak <SortIcon column="winStreak" onSort={toggle} />
             </th>
           </tr>

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { GamesPanel } from './main/GamesPanel';
 import { GlobalChat } from './main/GlobalChat';
 import { OnlineUsers } from './main/OnlineUsers';
@@ -20,14 +21,41 @@ import './MainPage.css';
 // box height. .main-layout/.main-col-* are this page's own classes
 // (MainPage.css) built for exactly this — a plain (non-wrapping) flex row
 // that legacy's own main/layout.jsp already used for this same panel set.
+// Below the lg breakpoint there's no room for a third column, so the
+// left+center pane (Games/Chat) and the right pane (Notes/Online/Resources)
+// share the same space via a two-way toggle instead of the right column
+// simply disappearing — it used to be display:none below 992px, making
+// Site Notes/Online Users/Resources unreachable on any tablet or narrow
+// laptop. At lg+ both panes show at once (see MainPage.css) and this
+// toggle is hidden.
 export function MainPage() {
+  const [mobilePane, setMobilePane] = useState<'main' | 'info'>('main');
+
   return (
     <div className="main-layout p-3">
-      <div className="main-col-left">
-        <GamesPanel />
+      <div className="main-mobile-tabs d-lg-none btn-group" role="group">
+        <button
+          type="button"
+          className={`btn btn-sm ${mobilePane === 'main' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+          onClick={() => setMobilePane('main')}
+        >
+          Games &amp; Chat
+        </button>
+        <button
+          type="button"
+          className={`btn btn-sm ${mobilePane === 'info' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+          onClick={() => setMobilePane('info')}
+        >
+          Info
+        </button>
       </div>
-      <div className="main-col-center">
-        <GlobalChat />
+      <div className={`main-primary ${mobilePane === 'info' ? 'main-hidden-mobile' : ''}`}>
+        <div className="main-col-left">
+          <GamesPanel />
+        </div>
+        <div className="main-col-center">
+          <GlobalChat />
+        </div>
       </div>
       {/*
         overflow-y-auto here (not just relying on OnlineUsers' own internal
@@ -35,7 +63,7 @@ export function MainPage() {
         it'd get pushed out with zero visible space whenever OnlineUsers'
         flex-fill claims all the column's height.
       */}
-      <div className="main-col-right overflow-y-auto">
+      <div className={`main-col-right overflow-y-auto ${mobilePane === 'main' ? 'main-hidden-mobile' : ''}`}>
         <SiteNotes />
         <OnlineUsers />
         <Resources />

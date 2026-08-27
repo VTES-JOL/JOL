@@ -10,10 +10,10 @@ import './GamesPanel.css';
 
 type TabId = 'myGames' | 'tournamentGames' | 'oustedGames';
 
-const TABS: { id: TabId; label: string; field: keyof GamesSummary; showSeatRow: boolean }[] = [
-    {id: 'myGames', label: 'Active', field: 'games', showSeatRow: true},
-    {id: 'tournamentGames', label: 'Tournament', field: 'tournament', showSeatRow: true},
-    {id: 'oustedGames', label: 'Ousted', field: 'ousted', showSeatRow: false},
+const TABS: { id: TabId; label: string; field: keyof GamesSummary; showSeatRow: boolean; emptyMessage: string }[] = [
+    {id: 'myGames', label: 'Active', field: 'games', showSeatRow: true, emptyMessage: 'No active games. Start or join one from the Lobby.'},
+    {id: 'tournamentGames', label: 'Tournament', field: 'tournament', showSeatRow: true, emptyMessage: 'No tournament games in progress.'},
+    {id: 'oustedGames', label: 'Ousted', field: 'ousted', showSeatRow: false, emptyMessage: 'No ousted games to review.'},
 ];
 
 function SeatRow({game}: { game: GameStatusBean }) {
@@ -110,12 +110,16 @@ export function GamesPanel() {
                         role="tabpanel"
                         style={{display: activeTab === tab.id ? 'block' : 'none'}}
                     >
-                        <ul className="list-group list-group-flush">
-                            {summary[tab.field].map((game) => (
-                                <GameRow key={game.name} game={game} player={player}
-                                         showSeatRow={tab.showSeatRow}/>
-                            ))}
-                        </ul>
+                        {summary[tab.field].length === 0 ? (
+                            <div className="text-muted small text-center p-4">{tab.emptyMessage}</div>
+                        ) : (
+                            <ul className="list-group list-group-flush">
+                                {summary[tab.field].map((game) => (
+                                    <GameRow key={game.name} game={game} player={player}
+                                             showSeatRow={tab.showSeatRow}/>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                 ))}
             </div>

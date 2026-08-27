@@ -1,5 +1,6 @@
 import type { GameStatusBean } from '../../api/types';
 import { relativeTime } from '../../lib/relativeTime';
+import { Card, CardHeader, CardTitle } from '../../components/Card';
 
 const REL_LABEL: Record<string, string> = { OWNER: 'Owner', REGISTERED: 'Registered', INVITED: 'Invited', OPEN: 'Open' };
 const REL_CLASS: Record<string, string> = {
@@ -68,13 +69,13 @@ export function GameList({
   onNew: () => void;
 }) {
   return (
-    <div className="card shadow flex-fill d-flex flex-column">
-      <div className="card-header bg-body-secondary d-flex justify-content-between align-items-center">
-        <span className="fw-semibold">Games</span>
+    <Card className="flex-fill d-flex flex-column">
+      <CardHeader className="d-flex justify-content-between align-items-center">
+        <CardTitle>Games</CardTitle>
         <button className="btn btn-sm btn-outline-secondary" onClick={onNew}>
           New <i className="bi-plus-circle" />
         </button>
-      </div>
+      </CardHeader>
       <div className="flex-fill min-h-0" style={{ overflowY: 'auto', overflowX: 'clip' }}>
         <div className="list-group list-group-flush">
           {games.map((g) => (
@@ -82,6 +83,6 @@ export function GameList({
           ))}
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

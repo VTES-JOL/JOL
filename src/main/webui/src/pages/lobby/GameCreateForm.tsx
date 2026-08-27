@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../api/client';
+import { Card, CardHeader, CardTitle } from '../../components/Card';
 
 export function GameCreateForm({ onCancel, onCreated }: { onCancel: () => void; onCreated: (gameName: string) => void }) {
   const { data: players = [] } = useQuery({
@@ -61,13 +62,13 @@ export function GameCreateForm({ onCancel, onCreated }: { onCancel: () => void; 
   };
 
   return (
-    <div className="card shadow flex-fill d-flex flex-column">
-      <div className="card-header bg-body-secondary d-flex justify-content-between align-items-center">
-        <span className="fw-semibold">New Game</span>
+    <Card className="flex-fill d-flex flex-column">
+      <CardHeader className="d-flex justify-content-between align-items-center">
+        <CardTitle>New Game</CardTitle>
         <button className="btn btn-sm btn-outline-secondary" onClick={onCancel}>
           Cancel
         </button>
-      </div>
+      </CardHeader>
       <div className="card-body p-3 overflow-auto min-h-0">
         <div className="mb-3">
           <label className="form-label">Name</label>
@@ -144,6 +145,6 @@ export function GameCreateForm({ onCancel, onCreated }: { onCancel: () => void; 
         </button>
         <span className="text-danger small ms-2">{error}</span>
       </div>
-    </div>
+    </Card>
   );
 }

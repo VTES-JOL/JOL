@@ -7,6 +7,7 @@ import { GameCreateForm } from './lobby/GameCreateForm';
 import { GameDetail } from './lobby/GameDetail';
 import { PageLoading } from '../components/PageLoading';
 import { EmptyState } from '../components/EmptyState';
+import { SplitLayout } from '../components/SplitLayout';
 
 type View = { mode: 'create' } | { mode: 'detail'; gameName: string } | null;
 
@@ -42,28 +43,31 @@ export function LobbyPage() {
   const selectedGame = view?.mode === 'detail' ? games.find((g) => g.name === view.gameName) : null;
 
   return (
-    <div className="row g-2 flex-fill align-items-stretch min-h-0 p-3">
-      <div className="col-lg-4 d-flex flex-column">
+    <SplitLayout
+      stackBelowLg
+      left={
         <GameList
           games={games}
           selectedName={selectedGame?.name ?? null}
           onSelect={selectGame}
           onNew={() => setView({ mode: 'create' })}
         />
-      </div>
-      <div className="col-lg-8 d-flex flex-column">
-        {view?.mode === 'create' && (
-          <GameCreateForm
-            onCancel={() => setView(null)}
-            onCreated={(gameName) => {
-              refresh();
-              setView({ mode: 'detail', gameName });
-            }}
-          />
-        )}
-        {selectedGame && <GameDetail game={selectedGame} onClose={() => setView(null)} onChanged={refresh} />}
-        {!view && <EmptyState icon="bi-controller" message="Select a game or create a new one" />}
-      </div>
-    </div>
+      }
+      right={
+        <>
+          {view?.mode === 'create' && (
+            <GameCreateForm
+              onCancel={() => setView(null)}
+              onCreated={(gameName) => {
+                refresh();
+                setView({ mode: 'detail', gameName });
+              }}
+            />
+          )}
+          {selectedGame && <GameDetail game={selectedGame} onClose={() => setView(null)} onChanged={refresh} />}
+          {!view && <EmptyState icon="bi-controller" message="Select a game or create a new one" />}
+        </>
+      }
+    />
   );
 }

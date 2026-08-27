@@ -8,6 +8,8 @@ import { DeckPreview } from '../../components/DeckPreview';
 import { confirmDialog } from '../../components/dialog';
 import { runRequest } from '../../api/mutate';
 import { showError } from '../../components/toast';
+import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { SectionLabel } from '../../components/SectionLabel';
 
 export function GameDetail({
   game,
@@ -112,10 +114,10 @@ export function GameDetail({
   });
 
   return (
-    <div className="card shadow flex-fill d-flex flex-column min-h-0">
-      <div className="card-header bg-body-secondary d-flex justify-content-between align-items-center">
+    <Card className="flex-fill d-flex flex-column min-h-0">
+      <CardHeader className="d-flex justify-content-between align-items-center">
         <span className="d-flex align-items-center gap-2">
-          <span className="fw-semibold">{game.name}</span>
+          <CardTitle>{game.name}</CardTitle>
           <span className="badge bg-secondary">{game.format}</span>
           <span className={`badge ${game.visibility === 'PUBLIC' ? 'bg-success' : 'bg-secondary'}`}>
             {game.visibility === 'PUBLIC' ? 'Public' : 'Private'}
@@ -146,10 +148,10 @@ export function GameDetail({
             <i className="bi-x" />
           </button>
         </span>
-      </div>
+      </CardHeader>
       <div className="card-body p-0 d-flex flex-column overflow-auto min-h-0">
         <div className="p-3 border-bottom">
-          <div className="fw-semibold small text-muted mb-2">Players</div>
+          <SectionLabel>Players</SectionLabel>
           <table className="table table-sm table-hover mb-0">
             <tbody>
               {game.registrations.map((reg) => (
@@ -180,7 +182,7 @@ export function GameDetail({
 
         {game.playerRelationship === 'OWNER' && (
           <div className="p-3 border-bottom">
-            <div className="fw-semibold small text-muted mb-2">Invite Player</div>
+            <SectionLabel>Invite Player</SectionLabel>
             <div className="d-flex gap-2">
               <input
                 className="form-control form-control-sm"
@@ -206,7 +208,7 @@ export function GameDetail({
 
         {playerInRegistrations && (
           <div className="p-3 border-bottom">
-            <div className="fw-semibold small text-muted mb-2">Register Deck</div>
+            <SectionLabel>Register Deck</SectionLabel>
             <div className="d-flex align-items-center gap-2">
               <div className={`dropdown ${deckDropdown.open ? 'show' : ''}`} ref={deckDropdown.rootRef}>
                 <button
@@ -246,13 +248,13 @@ export function GameDetail({
 
         {preview && (
           <div className="p-3 flex-fill overflow-auto min-h-0">
-            <div className="fw-semibold small text-muted mb-2">Registered Deck</div>
+            <SectionLabel>Registered Deck</SectionLabel>
             <DeckPreview deck={preview} />
           </div>
         )}
 
         {visibleMessage && <div className="p-3 small text-success">{visibleMessage}</div>}
       </div>
-    </div>
+    </Card>
   );
 }

@@ -7,6 +7,7 @@ import { DeckEditor } from './deck/DeckEditor';
 import { DeckPreviewPanel } from './deck/DeckPreviewPanel';
 import { runRequest } from '../api/mutate';
 import { PageLoading } from '../components/PageLoading';
+import { SplitLayout } from '../components/SplitLayout';
 import './DeckPage.css';
 
 const PAGE_QUERY_KEY = ['decks', 'page'];
@@ -76,8 +77,8 @@ export function DeckPage() {
   };
 
   return (
-    <div className="deck-layout p-3">
-      <div className="deck-col-left">
+    <SplitLayout
+      left={
         <DeckListPanel
           decks={decks}
           tags={data.tags}
@@ -87,9 +88,9 @@ export function DeckPage() {
           onDelete={deleteDeck}
           onNew={newDeck}
         />
-      </div>
-      <div className="deck-col-right">
-        {editing ? (
+      }
+      right={
+        editing ? (
           <DeckEditor
             selectedDeck={data.selectedDeck}
             contents={data.contents}
@@ -101,8 +102,8 @@ export function DeckPage() {
           />
         ) : (
           <DeckPreviewPanel selectedDeck={data.selectedDeck} onEdit={() => setEditing(true)} />
-        )}
-      </div>
-    </div>
+        )
+      }
+    />
   );
 }

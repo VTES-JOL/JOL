@@ -126,10 +126,12 @@ export function ProfileEditor({
         <button id="updateProfileButton" className="btn btn-outline-secondary btn-sm mt-2" onClick={submit}>
           Update Profile
         </button>
-        <div id="profileUpdateResult" className="mt-2" style={{ color: status === 'error' ? 'red' : 'green' }}>
-          {status === 'saved' && 'Done!'}
-          {status === 'error' && 'An error occurred'}
-        </div>
+        {status === 'saved' && <div id="profileUpdateResult" className="alert alert-success py-2 mt-2 mb-0">Done!</div>}
+        {status === 'error' && (
+          <div id="profileUpdateResult" className="alert alert-danger py-2 mt-2 mb-0">
+            An error occurred
+          </div>
+        )}
       </div>
     </Card>
   );
