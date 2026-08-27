@@ -1,7 +1,7 @@
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
 import { CardHidden } from './CardHidden';
 
-const COUNTER_STYLE = (hasLife: boolean, hasBlood: boolean, capacity: number, otherVisibleRegion: boolean) => {
+export const COUNTER_STYLE = (hasLife: boolean, hasBlood: boolean, capacity: number, otherVisibleRegion: boolean) => {
   if (hasLife && otherVisibleRegion) return 'text-bg-success';
   if (hasBlood || capacity > 0) return 'text-bg-danger';
   return 'text-bg-secondary';
@@ -10,7 +10,7 @@ const COUNTER_STYLE = (hasLife: boolean, hasBlood: boolean, capacity: number, ot
 // region.jsp's RegionType.OTHER_VISIBLE_REGIONS — regions visible to
 // opponents too (READY, ASH_HEAP, TORPOR, REMOVED_FROM_GAME), used only to
 // pick the counter badge color (green="life" counters vs red="blood"/capacity).
-const OTHER_VISIBLE_REGIONS = new Set(['READY', 'ASH_HEAP', 'TORPOR', 'REMOVED_FROM_GAME']);
+export const OTHER_VISIBLE_REGIONS = new Set(['READY', 'ASH_HEAP', 'TORPOR', 'REMOVED_FROM_GAME']);
 
 export interface TableCardClick {
   coordinate: string;

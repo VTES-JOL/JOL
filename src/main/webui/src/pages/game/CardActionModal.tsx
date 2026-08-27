@@ -5,6 +5,7 @@ import { cardActions, type Submission, type TableCardContext } from './cardComma
 import { CardImage } from './CardImage';
 import { runRequest } from '../../api/mutate';
 import { Modal } from '../../components/Modal';
+import { COUNTER_STYLE, OTHER_VISIBLE_REGIONS } from './Card';
 
 const CLANS = [
   'Abomination', 'Ahrimane', 'Akunanse', 'Baali', 'Banu Haqim', 'Blood Brother', 'Brujah', 'Brujah Antitribu',
@@ -154,6 +155,8 @@ export function CardActionModal({
   const showCounters = ctx.regionCommandKey !== 'ashheap';
   const showTransfers = isOwner && minion && ctx.regionCommandKey !== 'ashheap';
   const hasVotes = !!card.votes && card.votes !== '0';
+  const counterText = `${card.counters}${(card.capacity ?? 0) > 0 ? ` / ${card.capacity}` : ''}`;
+  const counterStyle = COUNTER_STYLE(!!card.hasLife, !!card.hasBlood, card.capacity ?? 0, OTHER_VISIBLE_REGIONS.has(ctx.regionType));
 
   const doAction = (action: (ctx: TableCardContext) => Submission, close = true) => {
     onSubmit(action(ctx));
@@ -228,13 +231,13 @@ export function CardActionModal({
               <div className="d-flex justify-content-between fs-5 rounded-pill align-items-center bg-danger-subtle gap-1 p-1">
                 {showCounters && (
                   <div
-                    className="badge rounded-pill text-bg-secondary fs-5 gap-1 d-flex align-items-center"
+                    className={`badge rounded-pill ${counterStyle} fs-5 gap-1 d-flex align-items-center`}
                     title="Counters; click right side to increase, left to decrease"
                     style={{ cursor: 'pointer' }}
                     onClick={(e) => vialClick(e, () => doAction(cardActions.addCounter, false), () => doAction(cardActions.removeCounter, false))}
                   >
                     <i className="bi bi-dash-lg" />
-                    {card.counters}
+                    {counterText}
                     <i className="bi bi-plus-lg" />
                   </div>
                 )}
