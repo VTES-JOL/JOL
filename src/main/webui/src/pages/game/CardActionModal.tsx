@@ -223,6 +223,9 @@ export function CardActionModal({
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 onBlur={() => doAction((c) => cardActions.label(c, label), false)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') e.currentTarget.blur();
+                }}
               />
             </div>
           </div>

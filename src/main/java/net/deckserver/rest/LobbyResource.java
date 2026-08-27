@@ -110,7 +110,13 @@ public class LobbyResource extends BaseResource {
     @POST
     @Path("player/games/{name}/invite")
     public void invitePlayerReact(@PathParam("name") String game, InviteRequest body) {
-        requireOwnerOrAdmin(game);
+        if (!GameService.existsGame(game)) {
+            throw new NotFoundException("No such game: " + game);
+        }
+        boolean selfJoiningPublicGame = username().equals(body.player()) && JolAdmin.isPublic(game);
+        if (!selfJoiningPublicGame) {
+            requireOwnerOrAdmin(game);
+        }
         RegistrationService.invitePlayer(game, body.player());
         WebSocketRegistry.notifyInvalidate(List.of("main-games"));
         notifyLobby();
