@@ -55,15 +55,6 @@ public class JolAdmin {
         return gmap.computeIfAbsent(name, n -> new GameModel(GameService.getGameByName(name)));
     }
 
-    public static void remove(String player) {
-        logger.debug("removing player");
-        if (player != null) {
-            for (GameModel gameModel : gmap.values()) {
-                JolAdmin.resetView(player, gameModel.getName());
-            }
-        }
-    }
-
     public static void createGame(String gameName, Boolean isPublic, GameFormat format, String playerName) {
         createGame(gameName, isPublic, format, playerName, ULID.random());
     }
@@ -489,7 +480,6 @@ public class JolAdmin {
             JolGame game = GameService.getGameByName(gameName);
             game.replacePlayer(existingPlayer, newPlayer);
             saveGameState(game);
-            resetView(existingPlayer, gameName);
             // Set up the registrations
             RegistrationService.put(gameName, newPlayer, existingRegistration);
             RegistrationService.removePlayer(gameName, existingPlayer);
@@ -511,10 +501,6 @@ public class JolAdmin {
         return Optional.ofNullable(GameService.get(gameName))
                 .map(GameInfo::getUpdated)
                 .orElse(null);
-    }
-
-    public static synchronized void resetView(String playerName, String gameName) {
-        getGameModel(gameName).resetView(playerName);
     }
 
     public static synchronized void endTurn(String gameName, String adminName) {

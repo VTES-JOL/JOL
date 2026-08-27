@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
 import { Card, RegionLabelBadges, type TableCardClick } from './Card';
 import { CardSimple } from './CardSimple';
@@ -28,7 +28,10 @@ function clickMode(regionType: string, isOwnRegion: boolean, isSeatedPlayer: boo
 
 // Mirrors region.jsp — collapse/expand is purely local UI state here (see
 // GameSnapshotFactory's javadoc: the server no longer tracks this at all,
-// simplifying away GameView's per-viewer `collapsed` set).
+// simplifying away GameView's per-viewer `collapsed` set). The one bit of
+// JSP-era server behavior reimplemented client-side: a region that gains a
+// card (e.g. another player moves a minion into this player's READY region)
+// auto-expands so the change is visible, even if a viewer had collapsed it.
 export function Region({
   region,
   defaultCollapsed,
@@ -49,6 +52,14 @@ export function Region({
   onPlayCardClick: (ctx: HandCardContext, card: CardSnapshot) => void;
 }) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
+  const prevCardCount = useRef(region.cards.length);
+
+  useEffect(() => {
+    if (region.cards.length > prevCardCount.current) {
+      setCollapsed(false);
+    }
+    prevCardCount.current = region.cards.length;
+  }, [region.cards.length]);
 
   if (region.cards.length === 0) return null;
 

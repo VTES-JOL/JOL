@@ -83,7 +83,6 @@ public class AuthResource {
     @POST
     @Path("logout")
     public Response logout() {
-        AuthService.currentUsername(headers).ifPresent(JolAdmin::remove);
         Response response = Response.ok().build();
         attachCookies(response, AuthService.clearAuth(headers));
         return response;

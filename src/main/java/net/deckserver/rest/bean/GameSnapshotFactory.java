@@ -203,8 +203,6 @@ public class GameSnapshotFactory {
                 .build();
     }
 
-    // Same algorithm as GameView.colorIsDark (private there) — duplicated
-    // rather than shared since GameView is left untouched.
     private static boolean colorIsDark(String bgColor) {
         String color = (bgColor.charAt(0) == '#') ? bgColor.substring(1, 7) : bgColor;
         int r = Integer.parseInt(color.substring(0, 2), 16);

@@ -11,9 +11,7 @@ import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.message.ObjectArrayMessage;
 
 import java.time.OffsetDateTime;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class GameModel implements Comparable<GameModel> {
 
@@ -23,7 +21,6 @@ public class GameModel implements Comparable<GameModel> {
     @Getter
     private final String name;
     private final JolGame game;
-    private final Map<String, GameView> views = new ConcurrentHashMap<>();
 
     public GameModel(JolGame game) {
         this.name = game.getName();
@@ -96,14 +93,6 @@ public class GameModel implements Comparable<GameModel> {
             }
         }
         return status.toString();
-    }
-
-    public GameView getView(String player) {
-        return views.computeIfAbsent(player, p -> new GameView(game, name, p));
-    }
-
-    public void resetView(String player) {
-        views.remove(player);
     }
 
     public Set<String> getPlayers() {
