@@ -55,8 +55,8 @@ export function DeckEditor({
           </button>
         </span>
       </div>
-      <div className="card-body p-2 flex-fill overflow-auto px-3 min-h-0">
-        <div className="row mb-2">
+      <div className="card-body p-2 flex-fill d-flex flex-column overflow-auto px-3 min-h-0">
+        <div className="row mb-2 flex-shrink-0">
           <label className="col-form-label col-2">Name</label>
           <div className="col-10">
             <input
@@ -67,7 +67,7 @@ export function DeckEditor({
             />
           </div>
         </div>
-        <div className="row mb-2">
+        <div className="row mb-2 flex-shrink-0">
           <label className="col-form-label col-2">Format</label>
           <div className="col-7">
             <select className="form-select form-select-sm" value={format} onChange={(e) => setFormat(e.target.value)}>
@@ -84,21 +84,34 @@ export function DeckEditor({
             </button>
           </div>
         </div>
-        <label className="form-label small text-muted mb-1">Contents</label>
-        <textarea className="form-control form-control-sm mb-2" value={text} onChange={(e) => setText(e.target.value)} />
-        <label className="form-label small text-muted mb-1">Comment</label>
+        <div className="deck-editor-fields">
+          <div className="deck-editor-contents">
+            <label className="form-label small text-muted mb-1">Contents</label>
+            <textarea
+              className="form-control form-control-sm"
+              style={{ resize: 'none' }}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+            />
+          </div>
+          <div className="deck-editor-errors">
+            <label className="form-label small text-muted mb-1">Errors</label>
+            <div className="errors-box text-danger small border rounded p-2 bg-body">
+              {(selectedDeck?.errors ?? []).map((err, i) => (
+                <div key={i}>{err}</div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <label className="form-label small text-muted mb-1 flex-shrink-0">Comment</label>
         <textarea
-          className="form-control form-control-sm scrollable"
+          className="form-control form-control-sm flex-shrink-0"
+          style={{ resize: 'none' }}
           placeholder="Deck comment..."
           rows={3}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
-        <div className="text-danger small mt-2">
-          {(selectedDeck?.errors ?? []).map((err, i) => (
-            <div key={i}>{err}</div>
-          ))}
-        </div>
       </div>
     </div>
   );
