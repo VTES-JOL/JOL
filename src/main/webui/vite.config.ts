@@ -14,8 +14,7 @@ const buildId = Date.now().toString(36)
 
 // Quarkus + Quinoa (quarkus.quinoa.ui-dir=frontend, in application.properties)
 // replaced the old Tomcat/Jersey/RewriteValve stack this file used to talk
-// to directly — see quarkus-poc/FINDINGS.md for the full migration story.
-// Three things that setup needed and Quinoa makes unnecessary:
+// to directly. Three things that setup needed and Quinoa makes unnecessary:
 //   - @vitejs/plugin-basic-ssl: Quinoa proxies this dev server over plain
 //     HTTP internally: the browser only ever talks to Quarkus itself, which
 //     already terminates HTTPS in dev (see application.properties's
@@ -33,8 +32,7 @@ export default defineConfig(() => ({
   // no nested /react/ subpath the way the old WAR staging did): a
   // leading-slash src/href resolves against the browser's origin root, not
   // the current page, so this has to match quarkus.http.root-path or every
-  // asset request 404s before Quinoa ever sees it — confirmed the hard way
-  // in the Phase 0 POC.
+  // asset request 404s before Quinoa ever sees it — confirmed the hard way.
   base: '/jol/',
   // mdx() must run before react() — it compiles content/help/*.mdx into
   // plain JSX-emitting JS (via the automatic jsx-runtime), which react()'s

@@ -31,8 +31,7 @@ import java.util.Optional;
  * user to log in again. Replaces the old HttpSession "meth" attribute.
  * <p>
  * Ported from a javax.servlet HttpServletRequest/HttpServletResponse-based API to a
- * jakarta.ws.rs HttpHeaders-in / NewCookie-out one (Phase 3 of the Quarkus migration —
- * see quarkus-poc/FINDINGS.md): Quarkus REST's request pipeline never gives filters or
+ * jakarta.ws.rs HttpHeaders-in / NewCookie-out one: Quarkus REST's request pipeline never gives filters or
  * resources a live, directly-mutable response object the way a Servlet container did,
  * so cookie writes are now values returned to the caller (SecurityFilter, AuthResource)
  * to attach to the outgoing Response themselves, rather than a side effect this class

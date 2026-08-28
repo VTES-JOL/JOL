@@ -73,9 +73,8 @@ public class JolWebSocketEndpoint {
             }
             // getUserProperties() is one map shared across every handshake for this
             // whole @ServerEndpoint deployment, not a fresh one per connection —
-            // confirmed the hard way under Quarkus/Undertow (see
-            // quarkus-poc/FINDINGS.md's Phase 3 section): leaving this untouched on
-            // a failed handshake let a later unauthenticated connection silently
+            // confirmed the hard way under Quarkus/Undertow: leaving this untouched
+            // on a failed handshake let a later unauthenticated connection silently
             // inherit whichever username the *previous successful* handshake left
             // behind, indefinitely, with zero concurrency required to reproduce it.
             // Always writing — never just conditionally on success — closes that.

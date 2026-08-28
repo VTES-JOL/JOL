@@ -29,10 +29,9 @@ public class ChatService extends PersistedService {
     // meaning Instance.get() returns a client proxy — fine for method calls,
     // but direct field access (e.g. instance().historyCache) silently reads
     // the proxy's own empty field instead of the real bean's, since proxies
-    // only intercept methods. Confirmed the hard way (see
-    // quarkus-poc/FINDINGS.md's Phase 3 section: login worked against an
+    // only intercept methods. Confirmed the hard way: login worked against an
     // empty in-memory player map despite "Loaded 9 players from JPA" logging
-    // successfully at startup — two different objects). @Singleton is a CDI
+    // successfully at startup — two different objects. @Singleton is a CDI
     // pseudo-scope: no proxy, Instance.get() returns the real instance.
     private static ChatService instance() {
         return resolve(ChatService.class, ChatService::new);

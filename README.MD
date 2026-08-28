@@ -1,13 +1,19 @@
 # V:TES Online (deckserver.net)
 
-Online client and game server for Vampire: The Eternal Struggle. Built on **Quarkus**, packaged as a runnable jar. State is persisted in **PostgreSQL** via JPA (Hibernate + Flyway + Agroal, all Quarkus-managed) — see [Storage Mechanics](#storage-mechanics) below. (An older JSON-file-per-directory storage model predates this; [Migrating JSON Data to PostgreSQL](#migrating-json-data-to-postgresql) covers moving an existing `JOL_DATA` directory over.) See `quarkus-poc/FINDINGS.md` for the migration's own history, including several non-obvious bugs it surfaced and fixed.
+Online client and game server for Vampire: The Eternal Struggle. Built on **Quarkus**, packaged as a runnable jar. State is persisted in **PostgreSQL** via JPA (Hibernate + Flyway + Agroal, all Quarkus-managed) — see [Storage Mechanics](#storage-mechanics) below. (An older JSON-file-per-directory storage model predates this; [Migrating JSON Data to PostgreSQL](#migrating-json-data-to-postgresql) covers moving an existing `JOL_DATA` directory over.)
 
 # Requirements
-* Java 21 (Corretto recommended — Lombok's annotation processing breaks on newer JDKs)
-* Maven 3+
+* **Java 21** (Corretto recommended — Lombok's annotation processing breaks on newer JDKs; do **not** build with JDK 25)
+* **Maven 3+** — or just use the bundled `./mvnw` wrapper
+* **Node 22.x** (CI pins `22.17.0`; see `.nvmrc`) — Quinoa builds the frontend with whatever `node` is on your `PATH`, and Vite 8 / rolldown-vite requires Node ≥ 20.19 / 22.12. An older Node fails the frontend build with an opaque Vite error.
+* **Docker** — for the local PostgreSQL container (`local-docker-compose.yml`)
+* **`psql`, `jq`, `python3`** on your `PATH` — used by `migrate-to-db.sh` / `load-test-fixtures.sh` to load fixture data. On macOS: `brew install libpq jq` then `brew link --force libpq` to put `psql` on your `PATH` (`python3` ships with the Xcode command-line tools).
 
 ## Java
 Install Java 21 as per your operating system.
+
+## Node
+Install Node 22.x (`nvm install` picks up the pinned version from `.nvmrc`). Only needed on your `PATH` — there's no separate frontend install step for normal use; `quarkus:dev` drives the frontend build itself via Quinoa.
 
 ## Maven
 ### Build
@@ -15,6 +21,8 @@ Install Java 21 as per your operating system.
 
 ### Run
 #### Environment Variables
+None of the below are required for a local `quarkus:dev` run against the fixture database — the two flags in the quickstart command (`JOL_DB_PASSWORD=jol ENABLE_CAPTCHA=false`) are enough. For docker-compose / production-style runs, copy `.env.example` → `.env` and `.keys.example` → `.keys` (both git-ignored) and fill them in; each optional integration (captcha, Discord, web push, signed card URLs) is simply inactive when its variables are unset.
+
 * `JOL_DB_URL` - JDBC URL, default `jdbc:postgresql://localhost:5432/jol`
 * `JOL_DB_USER` / `JOL_DB_PASSWORD` - database credentials, default user `jol`
 * `JOL_DB_POOL_SIZE` - Agroal (Quarkus's connection pool) max pool size, default `10`
@@ -28,14 +36,24 @@ Install Java 21 as per your operating system.
 * `BASE_URL` / `KEY_ID` / `KEY_FILE` - required for CloudFront-signed secured card image URLs - distribution base URL, key pair id, and path to the CloudFront private key file, used by `SecuredCardLoader`
 * `TYPE` - visual/environment label (`dev`, `test`, `prod`, ...), default: `dev`
 
-Start a local Postgres and load fixture data, then run `quarkus:dev` (see [Migrating JSON Data to PostgreSQL](#migrating-json-data-to-postgresql) below for the two commands referenced here):
+Generate the dev-only HTTPS keystore (a one-time step — the file is git-ignored, and `quarkus:dev` binds port 8443 over TLS and will not start without it):
+```bash
+keytool -genkeypair -alias localhost -keyalg RSA -keysize 2048 -validity 3650 \
+  -keystore src/main/resources/dev-keystore.p12 -storetype PKCS12 -storepass changeit \
+  -dname "CN=localhost" -ext "SAN=dns:localhost,ip:127.0.0.1"
+```
+Re-run it only if you delete the keystore or it expires. (This command is also kept in `application.properties`'s `%dev.quarkus.http.ssl-port` comment block.)
+
+Then start a local Postgres, load fixture data, and run `quarkus:dev` (see [Migrating JSON Data to PostgreSQL](#migrating-json-data-to-postgresql) below for the two commands referenced here):
 ```bash
 docker compose -f local-docker-compose.yml up -d db
 ./load-test-fixtures.sh                    # resets the local db to Player1-5 fixture data
 JOL_DB_PASSWORD=jol ENABLE_CAPTCHA=false ./mvnw quarkus:dev
 ```
 
-The app is served at `https://localhost:8443/jol` (self-signed dev cert — see `application.properties`'s `%dev.quarkus.http.ssl-port` block; required because login cookies are `Secure`). Production runs plain HTTP behind Traefik's own TLS termination instead.
+The app is served at `https://localhost:8443/jol` (self-signed dev cert — see `application.properties`'s `%dev.quarkus.http.ssl-port` block; required because login cookies are `Secure`). Your browser will warn about the self-signed cert on first visit — accept it to proceed. Production runs plain HTTP behind Traefik's own TLS termination instead.
+
+**Logging in:** the fixture set has accounts `Player1`–`Player8`, all with password `password`. `Player1` carries `JUDGE` / `PLAYTESTER` / `SUPER_USER` roles, and the fixtures include a "Test Game" that `Player1`–`Player5` are already registered in.
 
 #### Frontend (React)
 The entire client is `src/main/webui/` (Quinoa's own default location for a Quarkus project's frontend) — a Vite/TypeScript/React SPA; there's no legacy JSP/jQuery page left anywhere in the request path. See [Frontend Architecture](#frontend-architecture) below for how it fits into the wider app, and `src/main/webui/README.md` for the frontend project's own structure and testing setup. `quarkus:dev` above starts it automatically (via the Quinoa extension) — no separate frontend command needed. Running `npm run dev` standalone from `src/main/webui/` is only useful for iterating on the frontend build config itself.
@@ -128,7 +146,7 @@ docker rm -f jol-migrate-tmp
 * Caffeine - in-memory caching, e.g. active-user summaries and hot `JolGame` lookups
 * Vite / React / TypeScript - the entire client, see [Frontend Architecture](#frontend-architecture) below
   * `CardDatabaseBuilder.java` (test-scope) parses the VEKN-supplied crypt/library CSVs and generates the static JSON/HTML consumed by tooltips and modals, plus card images, served from `static.deckserver.net` (nginx) in prod and by `src/main/webui/serveCardAssets.ts` (Vite) in local dev
-* Docker - runs the application server on deckserver.net, fronted by Traefik for TLS termination and routing. **Stale as of the Quarkus migration** - `docker-compose.yml`/`Dockerfile`s still describe building/running a Tomcat WAR, which this project hasn't produced since early in the migration (see `quarkus-poc/FINDINGS.md`); updating deployment for the Quarkus jar is outstanding work
+* Docker - runs the application server on deckserver.net, fronted by Traefik for TLS termination and routing. **Stale as of the Quarkus migration** - `docker-compose.yml`/`Dockerfile`s still describe building/running a Tomcat WAR, which this project hasn't produced since early in the migration; updating deployment for the Quarkus jar is outstanding work
   * `docker-compose.yml` - production config: `prod` (+ its own `prod-db` Postgres), `test`, and `static` (nginx, serving prebuilt card assets) containers
   * `local-docker-compose.yml` - dev-only, just a local Postgres `db` service
 

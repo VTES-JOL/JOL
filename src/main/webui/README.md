@@ -7,9 +7,11 @@ For build/run commands, environment variables, and the overall system architectu
 ## Development
 
 ```bash
-npm install
+npm install    # required once before any standalone script here (storybook, test, test:e2e, …)
 npm run dev
 ```
+
+> `quarkus:dev` from the repo root drives its own frontend install/build via Quinoa, so running the app doesn't populate a `node_modules` you can rely on here. Run `npm install` in this directory before using any of the scripts below directly.
 
 Requires the backend running instead, from the repo root — `JOL_DB_PASSWORD=jol ENABLE_CAPTCHA=false ./mvnw quarkus:dev`, which starts this frontend's own `npm run dev` as a subprocess automatically (via Quinoa) and proxies to it. Running `npm run dev` standalone from here is only useful for iterating on the frontend build config itself; for actually using the app, run `quarkus:dev` from the repo root instead.
 

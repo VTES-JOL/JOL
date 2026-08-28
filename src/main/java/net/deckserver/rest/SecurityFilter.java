@@ -36,7 +36,7 @@ public class SecurityFilter implements ContainerRequestFilter, ContainerResponse
     // No leading slash, unlike the Jersey-era version of this set — Quarkus
     // REST's UriInfo.getPath() returns a leading-slash path relative to
     // quarkus.http.root-path (e.g. "/auth/login"), confirmed empirically
-    // against a POC spike (see quarkus-poc/FINDINGS.md) before porting this.
+    // before porting this.
     private static final Set<String> PUBLIC_PATHS = Set.of("/auth/refresh", "/auth/login", "/auth/register", "/auth/logout", "/config");
 
     private static final String PENDING_COOKIES_PROPERTY = "net.deckserver.auth.pendingCookies";

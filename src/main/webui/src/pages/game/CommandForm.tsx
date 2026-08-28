@@ -7,10 +7,9 @@ import { confirmDialog } from '../../components/dialog';
 import { runRequest } from '../../api/mutate';
 
 // Mirrors commands.jsp/doSubmit()/doEndTurn() plus the quick-command/
-// quick-chat modals (Phase 3) — free-text Command, Chat, Phase, Ping,
-// submitted together, plus ending your own turn and the canned-button
-// shortcuts for both. Card-click actions (card-modal.js) are Phase 2, see
-// GamePage.
+// quick-chat modals — free-text Command, Chat, Phase, Ping, submitted
+// together, plus ending your own turn and the canned-button shortcuts for
+// both. Card-click actions (card-modal.js) are handled in GamePage.
 export function CommandForm({
   gameId,
   game,
