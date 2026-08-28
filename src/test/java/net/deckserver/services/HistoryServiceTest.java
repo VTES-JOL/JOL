@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -27,7 +28,13 @@ class HistoryServiceTest {
 
     @Test
     void addGame_isReadableBackFromGetHistoryAndGetGames() {
-        OffsetDateTime timestamp = OffsetDateTime.now();
+        // Truncate to millis: the recorded-at value is the map key, and it
+        // round-trips through an H2 TIMESTAMP WITH TIME ZONE column whose
+        // fractional-second precision is coarser than a Linux JVM's
+        // OffsetDateTime.now() (nanos). Without this the reconstructed key
+        // fails to equal `timestamp` on CI, though it happens to match on a
+        // macOS clock. Production never looks history up by a client-held key.
+        OffsetDateTime timestamp = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
         GameHistory history = new GameHistory();
         history.setName("HistoryServiceTest Game");
         history.setStarted("2026-01-01T00:00:00Z");
@@ -42,7 +49,13 @@ class HistoryServiceTest {
 
     @Test
     void validateGW_promotesTheHighestVpPlayerToGameWinWhenNoneWasRecorded() {
-        OffsetDateTime timestamp = OffsetDateTime.now();
+        // Truncate to millis: the recorded-at value is the map key, and it
+        // round-trips through an H2 TIMESTAMP WITH TIME ZONE column whose
+        // fractional-second precision is coarser than a Linux JVM's
+        // OffsetDateTime.now() (nanos). Without this the reconstructed key
+        // fails to equal `timestamp` on CI, though it happens to match on a
+        // macOS clock. Production never looks history up by a client-held key.
+        OffsetDateTime timestamp = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
         GameHistory history = new GameHistory();
         history.setName("HistoryServiceTest ValidateGW Game");
         history.setResults(List.of(result("Player1", 2.5, false), result("Player2", 1.0, false)));
