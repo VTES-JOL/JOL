@@ -14,8 +14,8 @@ env:
   JAVA_VERSION: '21'
   # quarkus.quinoa.package-manager-install=false (application.properties) —
   # Quinoa uses whatever Node is already on PATH rather than installing its
-  # own pinned one, so every job that triggers a Quinoa build (package, e2e;
-  # not backend-test, which never touches Quinoa/frontend at all) needs
+  # own pinned one, so every job that triggers a Quinoa build (package; not
+  # backend-test, which never touches Quinoa/frontend at all) needs
   # setup-node too, matching this version.
   NODE_VERSION: '22.17.0'
 
@@ -42,7 +42,7 @@ jobs:
         run: mkdir -p static/secured && cp src/test/resources/data/cards/cards.json static/secured/cards.json
       # Plain `mvn test` never triggers Quinoa's build (that only runs as
       # part of quarkus:build/quarkus:dev or full packaging — see the
-      # package/e2e jobs below), so this needs no Node/npm at all.
+      # package job below), so this needs no Node/npm at all.
       - name: Run backend tests
         run: ./mvnw --batch-mode --no-transfer-progress test
 
@@ -106,63 +106,12 @@ jobs:
           path: target/quarkus-app/
           retention-days: 7
 
-  e2e:
-    name: End-to-end tests (Playwright)
-    needs: [backend-test, frontend-check]
-    runs-on: ubuntu-latest
-    # Matches local-docker-compose.yml's db service — playwright.config.ts's
-    # webServer command runs ./load-test-fixtures.sh against it (via psql,
-    # preinstalled on ubuntu-latest) before starting quarkus:dev, the same
-    # reset a developer runs locally, so these specs always start from known
-    # fixture state instead of accumulating drift across CI runs.
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: jol
-          POSTGRES_USER: jol
-          POSTGRES_PASSWORD: jol
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U jol -d jol"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 5
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: ${{ env.JAVA_VERSION }}
-          cache: maven
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: src/main/webui/package-lock.json
-      - name: Install frontend deps
-        working-directory: src/main/webui
-        run: npm ci
-      - name: Install Playwright browsers
-        working-directory: src/main/webui
-        run: npx playwright install --with-deps chromium
-      # See backend-test's "Stage test card fixture" step — the quarkus:dev
-      # instance playwright.config.ts boots below hits the same CardService
-      # fallback path, so it needs the fixture staged here too.
-      - name: Stage test card fixture
-        run: mkdir -p static/secured && cp src/test/resources/data/cards/cards.json static/secured/cards.json
-      # playwright.config.ts's webServer entry resets Postgres to fixture
-      # data and starts quarkus:dev itself; first boot here is a cold start
-      # (fresh Maven + npm dependency resolution), hence the generous
-      # per-server timeout already configured there.
-      - name: Run E2E tests
-        working-directory: src/main/webui
-        run: npm run test:e2e
-      - name: Upload Playwright traces on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-traces
-          path: src/main/webui/test-results/
-          retention-days: 7
+  # The end-to-end (Playwright) job was removed for now — it has never passed
+  # in CI. Its webServer boots `./load-test-fixtures.sh && ./mvnw quarkus:dev`
+  # and waits for https://localhost:8443/jol/login, but dev mode needs
+  # src/main/resources/dev-keystore.p12 (gitignored) to bind 8443, and a
+  # cold quarkus:dev start may also exceed the 180s webServer timeout.
+  # Re-add once the dev keystore is provisioned in CI (generate via the
+  # keytool command in application.properties) and the webServer step is
+  # made observable (split fixture load into its own step; pipe stdout).
+  # Specs still run locally with `npm run test:e2e` (see src/main/webui).
