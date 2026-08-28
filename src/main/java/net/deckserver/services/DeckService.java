@@ -10,6 +10,9 @@ import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.entity.DeckInfoEntity;
 import net.deckserver.jpa.repository.DeckRepository;
 import net.deckserver.storage.json.deck.CardCount;
+import net.deckserver.storage.json.deck.Deck;
+import net.deckserver.storage.json.deck.DeckNormalizer;
+import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.system.DeckInfo;
 import org.slf4j.Logger;
@@ -103,10 +106,14 @@ public class DeckService extends PersistedService {
      * Serializes a deck for storage as a game registration's frozen snapshot
      * (see {@link RegistrationService#registerDeck}) — the player's own decks/<id>
      * row can keep changing after registration, so the game keeps its own copy.
+     *
+     * <p>Only the canonical {@link Deck} is written; derived stats/errors are
+     * recomputed by {@link #deserializeDeck(String)} on read.
      */
     public static String serializeDeck(ExtendedDeck deck) {
         try {
-            return objectMapper.writeValueAsString(deck);
+            Deck canonical = deck != null && deck.getDeck() != null ? deck.getDeck() : new Deck();
+            return objectMapper.writeValueAsString(canonical);
         } catch (JsonProcessingException e) {
             logger.error("Failed to serialize deck for game registration", e);
             return null;
@@ -114,15 +121,12 @@ public class DeckService extends PersistedService {
     }
 
     public static ExtendedDeck deserializeDeck(String json) {
-        if (json == null) {
+        if (json == null || json.isBlank()) {
             return new ExtendedDeck();
         }
-        try {
-            return objectMapper.readValue(json, ExtendedDeck.class);
-        } catch (IOException e) {
-            logger.error("Failed to deserialize registered game deck", e);
-            return new ExtendedDeck();
-        }
+        // DeckNormalizer handles both the current bare-Deck JSON and the old
+        // {"deck":…} ExtendedDeck snapshots still held by pre-existing games.
+        return DeckParser.analyze(DeckNormalizer.normalize(json));
     }
 
     public static PersistedService getInstance() {

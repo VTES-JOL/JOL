@@ -1,0 +1,155 @@
+/* Tailwind v4 entry — runs ALONGSIDE the legacy Bootstrap CSS during the
+   page-by-page migration off Bootstrap.
+
+   1. prefix(jt) — every Tailwind utility/variant is `jt:` -prefixed
+      (`jt:flex`, `jt:p-3`, `jt:md:hidden`, `jt:dark:bg-panel`). Bootstrap's
+      unprefixed `p-3`/`gap-2`/`border`/`shadow` therefore never collide.
+      When the last page is off Bootstrap, drop the prefix + codemod it away.
+
+   2. Utilities are UNLAYERED. Bootstrap's Reboot (in bootstrap.min.css,
+      loaded last and unlayered) styles bare `button`/`input` —
+      `button{border-radius:0}`, `-webkit-appearance:button`, etc. An
+      unlayered rule beats any layered rule regardless of specificity, so
+      layering the `jt:` utilities meant Reboot won and every `<button>` /
+      `<input>` on a migrated page rendered as raw native OS chrome. Keeping
+      the utilities unlayered lets `.jt\:rounded` (0,0,1,0) beat `button`
+      (0,0,0,1) on specificity. The `jt:` prefix already rules out any
+      class-name clash with Bootstrap's own utilities, so the layer bought
+      nothing.
+
+   3. Preflight is NOT imported (Reboot already resets the same elements and
+      would only fight it). The `.jt-scope` reset below covers the one thing
+      that actually matters without it: neutralising native form-control
+      chrome. Put `className="jt-scope"` on the root of any Tailwind page
+      (and on portal roots — modals render outside the page tree). */
+
+@import "tailwindcss/theme.css" prefix(jt);
+
+/* jol toggles dark mode with body[data-bs-theme="dark"] (TopBar.tsx). */
+@custom-variant dark (&:where(body[data-bs-theme="dark"], body[data-bs-theme="dark"] *));
+
+/* ── Design tokens carried over from the jol-quarkus rewrite ──────────── */
+:root {
+    --jt-base:    #f5f0eb;
+    --jt-panel:   #ede8e2;
+    --jt-surface: #faf8f5;
+    --jt-hover:   #e8e1d8;
+
+    --jt-ink:           #1e1410;
+    --jt-ink-secondary: #5a4838;
+    --jt-ink-muted:     #6b5844; /* darkened from #7d6854 for AA on panel/hover */
+
+    --jt-line:        rgba(100, 70, 40, 0.14);
+    --jt-line-accent: rgba(140, 90, 30, 0.30);
+
+    --jt-accent:      #7a3e0e;
+    --jt-accent-dim:  #a85a1a;
+    --jt-accent-soft: #c8834e;
+
+    --jt-gold:      #8a6a00;
+    --jt-gold-soft: #b89020;
+
+    --jt-arcane:      #5a3680;
+    --jt-arcane-soft: #7c5aaa;
+
+    --jt-blood:        #7a2020;
+    --jt-blood-bright: #e13737;
+    --jt-blood-soft:   #9e3a3a;
+
+    --jt-online:  #3d7a52;
+    --jt-away:    #9a7a20;
+    --jt-offline: #8a7870;
+}
+
+body[data-bs-theme="dark"] {
+    --jt-base:    #0d0b0f;
+    --jt-panel:   #13101a;
+    --jt-surface: #1c1726;
+    --jt-hover:   #241f31;
+
+    --jt-ink:           #e8e0f0;
+    --jt-ink-secondary: #9a8fb0;
+    --jt-ink-muted:     #8d82a8; /* lightened from #7d7294 for AA on dark surfaces */
+
+    --jt-line:        rgba(120, 80, 200, 0.20);
+    --jt-line-accent: rgba(160, 100, 255, 0.38);
+
+    --jt-accent:      #8b4dcc;
+    --jt-accent-dim:  #6b3a9e;
+    --jt-accent-soft: #a86cf0;
+
+    --jt-gold:      #b8860b;
+    --jt-gold-soft: #d4a017;
+
+    --jt-arcane:      #8b4dcc;
+    --jt-arcane-soft: #6b3a9e;
+
+    --jt-blood:        #c23b3b;
+    --jt-blood-bright: #e13737;
+    --jt-blood-soft:   #9e2a2a;
+
+    --jt-online:  #5c9e6e;
+    --jt-away:    #c8960a;
+    --jt-offline: #6a6070;
+}
+
+@theme inline {
+    --color-base:    var(--jt-base);
+    --color-panel:   var(--jt-panel);
+    --color-surface: var(--jt-surface);
+    --color-hover:   var(--jt-hover);
+
+    --color-ink:           var(--jt-ink);
+    --color-ink-secondary: var(--jt-ink-secondary);
+    --color-ink-muted:     var(--jt-ink-muted);
+
+    --color-line:        var(--jt-line);
+    --color-line-accent: var(--jt-line-accent);
+
+    --color-accent:      var(--jt-accent);
+    --color-accent-dim:  var(--jt-accent-dim);
+    --color-accent-soft: var(--jt-accent-soft);
+
+    --color-gold:      var(--jt-gold);
+    --color-gold-soft: var(--jt-gold-soft);
+
+    --color-arcane:      var(--jt-arcane);
+    --color-arcane-soft: var(--jt-arcane-soft);
+
+    --color-blood:        var(--jt-blood);
+    --color-blood-bright: var(--jt-blood-bright);
+    --color-blood-soft:   var(--jt-blood-soft);
+
+    --color-online:  var(--jt-online);
+    --color-away:    var(--jt-away);
+    --color-offline: var(--jt-offline);
+}
+
+/* ── Form-control reset ──────────────────────────────────────────────────
+   Placed BEFORE the utilities import so a `jt:` utility wins any
+   equal-specificity tie by source order. `:where()` keeps the whole
+   compound at (0,0,1,0) — enough to beat Reboot's bare `button`/`input`
+   (0,0,0,1), not enough to override a component's `jt:border` /
+   `jt:bg-*` / `jt:rounded-*`. Scoped to `.jt-scope` so legacy Bootstrap
+   pages are untouched. */
+.jt-scope :where(button, input, select, textarea) {
+    appearance: none;
+    -webkit-appearance: none;
+    border: 0 solid var(--jt-line);
+    border-radius: 0;
+    background-color: transparent;
+    color: inherit;
+    font: inherit;
+}
+
+.jt-scope :where(button):focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--jt-accent) 55%, transparent);
+    outline-offset: 2px;
+}
+
+.jt-scope :where(input, select, textarea):focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--jt-accent) 45%, transparent);
+    outline-offset: 1px;
+}
+
+@import "tailwindcss/utilities.css" prefix(jt);

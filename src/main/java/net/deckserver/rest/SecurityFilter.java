@@ -2,6 +2,7 @@ package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
 import net.deckserver.services.AuthService;
+import net.deckserver.services.PlayerService;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
@@ -61,6 +62,21 @@ public class SecurityFilter implements ContainerRequestFilter, ContainerResponse
         }
 
         String username = result.username().get();
+
+        // A correctly-signed, unexpired token whose subject no longer exists —
+        // e.g. the DB was swapped to a different fixture/data set underneath a
+        // live browser session (Player1 gone after loading real data). Without
+        // this guard the request sails through as "authenticated" and the first
+        // service call that looks the player up (PlayerService.get via
+        // JolAdmin.recordPlayerAccess on /nav) throws and becomes a 500 — which
+        // the SPA can't recover from, since only a 401 triggers its
+        // redirect-to-login. Clear both cookies (revoking any orphaned refresh
+        // token) and return a clean 401 instead.
+        if (!PlayerService.existsPlayer(username)) {
+            requestContext.setProperty(PENDING_COOKIES_PROPERTY, AuthService.clearAuth(headers));
+            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            return;
+        }
         requestContext.setSecurityContext(new SecurityContext() {
             @Override
             public Principal getUserPrincipal() {

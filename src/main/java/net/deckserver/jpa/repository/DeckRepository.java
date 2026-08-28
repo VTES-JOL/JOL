@@ -8,6 +8,9 @@ import net.deckserver.jpa.entity.DeckContentEntity;
 import net.deckserver.jpa.entity.DeckInfoEntity;
 import net.deckserver.jpa.entity.DeckInfoId;
 import net.deckserver.jpa.entity.PlayerEntity;
+import net.deckserver.storage.json.deck.Deck;
+import net.deckserver.storage.json.deck.DeckNormalizer;
+import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.system.DeckInfo;
 import org.slf4j.Logger;
@@ -42,7 +45,11 @@ public class DeckRepository {
 
     public void saveContent(EntityManager em, String deckId, ExtendedDeck deck) {
         try {
-            String json = mapper.writeValueAsString(deck);
+            // Persist only the canonical Deck model — the derived stats/errors
+            // in ExtendedDeck are recomputed on read by findContent(), never
+            // stored (they go stale against the card database otherwise).
+            Deck canonical = deck.getDeck() != null ? deck.getDeck() : new Deck();
+            String json = mapper.writeValueAsString(canonical);
             DeckContentEntity existing = em.find(DeckContentEntity.class, deckId);
             if (existing != null) {
                 existing.setContent(json);
@@ -76,15 +83,17 @@ public class DeckRepository {
         return entity != null ? entity.getContent() : null;
     }
 
+    /**
+     * Loads a deck's content and returns it with freshly-computed
+     * {@code stats}/{@code errors}. {@link DeckNormalizer} tolerates every
+     * historical stored shape (bare {@link Deck} JSON, the old
+     * {@code {"deck":…}} ExtendedDeck JSON, KRCG JSON, legacy text), so rows
+     * written before the canonical-Deck switch still read correctly.
+     */
     public ExtendedDeck findContent(EntityManager em, String deckId) {
         DeckContentEntity entity = em.find(DeckContentEntity.class, deckId);
         if (entity == null) return new ExtendedDeck();
-        try {
-            return mapper.readValue(entity.getContent(), ExtendedDeck.class);
-        } catch (JsonProcessingException e) {
-            logger.error("Failed to deserialize deck content for {}", deckId, e);
-            return new ExtendedDeck();
-        }
+        return DeckParser.analyze(DeckNormalizer.normalize(entity.getContent()));
     }
 
     public DeckInfo findByPlayerAndName(EntityManager em, String playerName, String deckName) {

@@ -28,5 +28,12 @@ FROM eclipse-temurin:21-jre-noble
 WORKDIR /deployments
 COPY --from=build /build/target/quarkus-app/ ./
 
+# VEKN card CSVs read at runtime by CardRegistry (jol.card.dir, default
+# csv/core relative to the working dir). Unlike CardService — which falls
+# back to a CloudFront-signed cards.json — the registry only reads these
+# local files, so they must be in the image for card search / deck
+# analytics / import to work.
+COPY csv/ csv/
+
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "quarkus-run.jar"]

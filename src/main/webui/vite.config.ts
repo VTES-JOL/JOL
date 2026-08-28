@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 import mdx from '@mdx-js/rollup'
 import remarkGfm from 'remark-gfm'
 import { serveCardAssets } from './serveCardAssets.js'
@@ -45,6 +46,9 @@ export default defineConfig(() => ({
   plugins: [
     mdx({ remarkPlugins: [remarkGfm] }),
     react(),
+    // Tailwind v4 — see src/styles/tailwind.css for how it's scoped to
+    // coexist with the legacy Bootstrap CSS (jt: prefix, no Preflight).
+    tailwindcss(),
     serveCardAssets(),
     // Emits version.json into outDir root, next to index.html/assets/ — same
     // place the hashed JS/CSS land, so it's reachable through whatever

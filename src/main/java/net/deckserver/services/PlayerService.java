@@ -59,6 +59,14 @@ public class PlayerService extends PersistedService {
     }
 
     public static void refreshActive(String playerName) {
+        // Defence in depth: SecurityFilter/the WS handshake already reject a
+        // token whose subject no longer exists, but don't let a stray call for
+        // an unknown player blow up here either — the Caffeine loader
+        // (generateSummary -> get -> loadPlayerInfo) would throw and surface as
+        // a 500 on whatever endpoint triggered it.
+        if (!existsPlayer(playerName)) {
+            return;
+        }
         activeUsers.get(playerName).setLastOnline(OffsetDateTime.now());
     }
 

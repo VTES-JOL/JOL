@@ -132,7 +132,7 @@ public class JolAdmin {
                 deck = DeckService.getDeck(deckId);
             }
             deck.getDeck().setName(deckName);
-            return new DeckEdit(deck, contents);
+            return new DeckEdit(deck, contents, deckId);
         } catch (IOException e) {
             logger.error("Unable to load deck", e);
             return DeckEdit.EMPTY;
@@ -158,7 +158,8 @@ public class JolAdmin {
         deckInfo.setGameFormats(tags);
         DeckService.addDeck(playerName, deckName, deckInfo);
         DeckService.saveDeck(deckInfo.getDeckId(), deck);
-        return new DeckEdit(deck, contents);
+        DeckValidityService.computeAndPersist(deckInfo.getDeckId(), deck.getDeck());
+        return new DeckEdit(deck, contents, deckInfo.getDeckId());
     }
 
     public static synchronized DeckEdit deleteDeck(String playerName, String deckName) {
@@ -232,7 +233,7 @@ public class JolAdmin {
     }
 
     public static void recordPlayerAccess(String playerName) {
-        if (playerName != null) {
+        if (playerName != null && PlayerService.existsPlayer(playerName)) {
             PlayerActivityService.recordPlayerAccess(playerName);
             PlayerService.refreshActive(playerName);
         }
@@ -574,7 +575,7 @@ public class JolAdmin {
         if (deckName != null && !deckName.isBlank()) {
             deck.getDeck().setName(deckName);
         }
-        return new DeckEdit(deck, contents);
+        return new DeckEdit(deck, contents, null);
     }
 
     public static List<GameFormat> getAvailableGameFormats(String playerName) {

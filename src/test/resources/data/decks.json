@@ -76,12 +76,6 @@
       "format" : "MODERN",
       "gameFormats" : [ "STANDARD", "V5" ]
     },
-    "Caine Pre-con" : {
-      "deckId" : "01K37P9CJXR5CTC5HQ0QZWRKXA",
-      "deckName" : "Caine Pre-con",
-      "format" : "MODERN",
-      "gameFormats" : [ "PLAYTEST" ]
-    },
     "Hecata Duel" : {
       "deckId" : "01K6XW1TPY6KAN7V1CY2KRT32K",
       "deckName" : "Hecata Duel",
@@ -125,12 +119,6 @@
       "deckName" : "Tzimisce Toolbox",
       "format" : "TAGGED",
       "gameFormats" : [ "STANDARD" ]
-    },
-    "Power Pre-con" : {
-      "deckId" : "01K37Y9WVH73X0SGQG44JWFPMF",
-      "deckName" : "Power Pre-con",
-      "format" : "MODERN",
-      "gameFormats" : [ "PLAYTEST" ]
     }
   },
   "Player3" : {
@@ -139,12 +127,6 @@
       "deckName" : "Toreador Politics",
       "format" : "TAGGED",
       "gameFormats" : [ "STANDARD" ]
-    },
-    "Death Pre-con" : {
-      "deckId" : "01K37Y6ZJX4BVE7VPRDV4R2JTT",
-      "deckName" : "Death Pre-con",
-      "format" : "MODERN",
-      "gameFormats" : [ "PLAYTEST" ]
     }
   }
 }

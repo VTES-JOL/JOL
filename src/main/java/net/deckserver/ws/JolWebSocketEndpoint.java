@@ -3,6 +3,7 @@ package net.deckserver.ws;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deckserver.services.AuthService;
+import net.deckserver.services.PlayerService;
 import net.deckserver.services.VersionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,11 @@ public class JolWebSocketEndpoint {
             // wake, a blip, a server restart) and — since the client just retries on a timer —
             // spins forever failing the same way, on a session that's actually still valid.
             AuthService.AuthResult result = AuthService.authenticate(accessToken, refreshToken);
-            Optional<String> username = result.username();
+            // Drop a token whose subject no longer exists (DB swapped under a live
+            // session) — same guard SecurityFilter applies to REST calls, so a
+            // ghost identity can't open a socket and later confuse per-player
+            // routing in WebSocketRegistry.
+            Optional<String> username = result.username().filter(PlayerService::existsPlayer);
             if (!result.cookiesToSet().isEmpty()) {
                 RuntimeDelegate.HeaderDelegate<NewCookie> cookieDelegate =
                         RuntimeDelegate.getInstance().createHeaderDelegate(NewCookie.class);

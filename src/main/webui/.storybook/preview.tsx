@@ -11,6 +11,7 @@ import '../src/index.css';
 import '../src/styles/fonts.css';
 import '../src/styles/theme.css';
 import '../src/styles/card-visuals.css';
+import '../src/styles/tailwind.css';
 
 // index.html gives <html>/<body>/#root these classes so flex-fill layouts
 // (SplitLayout, EmptyState, PageLoading, ...) have a real height to fill —
@@ -28,7 +29,11 @@ const withProviders: Decorator = (Story) => {
   return (
     <QueryClientProvider client={queryClient}>
       <MemoryRouter>
-        <Story />
+        {/* Mirrors the app: Tailwind pages live under a .jt-scope root so the
+            form-control reset in styles/tailwind.css applies. */}
+        <div className="jt-scope">
+          <Story />
+        </div>
       </MemoryRouter>
     </QueryClientProvider>
   );

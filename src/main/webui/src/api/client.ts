@@ -63,6 +63,30 @@ async function requestText(path: string): Promise<string> {
   return res.text();
 }
 
+async function postText<T>(path: string, body: string): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'X-Client-Id': CLIENT_ID, 'Content-Type': 'text/plain' },
+      body,
+    });
+  } catch {
+    reportFailure();
+    throw new ApiError(0, 'Network error');
+  }
+  reportSuccess();
+  if (res.status === 401) {
+    window.location.href = '/jol/login';
+    throw new ApiError(401, 'Unauthenticated');
+  }
+  if (!res.ok) {
+    throw new ApiError(res.status, await res.text());
+  }
+  return (await res.json()) as T;
+}
+
 export const api = {
   get: <T>(path: string) => request<T>('GET', path),
   post: <T>(path: string, body?: unknown) => request<T>('POST', path, body ?? {}),
@@ -70,6 +94,8 @@ export const api = {
   del: <T>(path: string, body?: unknown) => request<T>('DELETE', path, body),
   // For text/plain responses (e.g. CSV export) — request<T>() always parses JSON.
   getText: (path: string) => requestText(path),
+  // POST a raw text/plain body, parse a JSON response (deck-import preview).
+  postText: <T>(path: string, body: string) => postText<T>(path, body),
 };
 
 export { ApiError };

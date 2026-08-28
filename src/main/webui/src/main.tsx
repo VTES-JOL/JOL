@@ -13,6 +13,9 @@ import './index.css';
 import './styles/fonts.css';
 import './styles/theme.css';
 import './styles/card-visuals.css';
+// Tailwind v4 utilities (jt: -prefixed) — coexists with the Bootstrap CSS
+// loadLegacyStyles() fetches below; see styles/tailwind.css for the rules.
+import './styles/tailwind.css';
 
 // Wait for the site's own stylesheets to actually load before rendering —
 // see loadLegacyStyles' comment for why appending a <link> tag isn't enough

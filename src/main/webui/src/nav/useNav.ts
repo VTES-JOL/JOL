@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { NavBean } from '../api/types';
@@ -34,6 +35,17 @@ export function useNav(): NavBean | null {
  */
 export function useNavAuthState(): { status: 'loading' | 'authenticated' | 'unauthenticated' } {
   const { data, isLoading, isError } = useNavQuery();
+
+  // Safety net: a 401 already redirects to /login from client.ts, but any
+  // other /nav failure (e.g. a 5xx) would otherwise leave AuthGate rendering
+  // nothing — a blank page the user can't get out of. Treat any hard error on
+  // the auth check as "send them to login" so they can re-authenticate.
+  useEffect(() => {
+    if (isError && !window.location.pathname.startsWith('/jol/login')) {
+      window.location.href = '/jol/login';
+    }
+  }, [isError]);
+
   if (isError) return { status: 'unauthenticated' };
   if (data) return { status: 'authenticated' };
   return { status: isLoading ? 'loading' : 'unauthenticated' };

@@ -11,6 +11,7 @@
         <class>net.deckserver.jpa.entity.RegistrationEntity</class>
         <class>net.deckserver.jpa.entity.DeckInfoEntity</class>
         <class>net.deckserver.jpa.entity.DeckContentEntity</class>
+        <class>net.deckserver.jpa.entity.DeckFormatValidityEntity</class>
         <class>net.deckserver.jpa.entity.TournamentEntity</class>
         <class>net.deckserver.jpa.entity.TournamentRegistrationEntity</class>
         <class>net.deckserver.jpa.entity.GameStateEntity</class>
@@ -44,6 +45,7 @@
         <class>net.deckserver.jpa.entity.RegistrationEntity</class>
         <class>net.deckserver.jpa.entity.DeckInfoEntity</class>
         <class>net.deckserver.jpa.entity.DeckContentEntity</class>
+        <class>net.deckserver.jpa.entity.DeckFormatValidityEntity</class>
         <class>net.deckserver.jpa.entity.TournamentEntity</class>
         <class>net.deckserver.jpa.entity.TournamentRegistrationEntity</class>
         <class>net.deckserver.jpa.entity.GameStateEntity</class>

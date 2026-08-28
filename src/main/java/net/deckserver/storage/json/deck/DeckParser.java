@@ -93,6 +93,59 @@ public class DeckParser {
         return new ExtendedDeck(deck, stats, errors);
     }
 
+    /**
+     * Read-side companion to {@link #parseDeck(String)}: recomputes the derived
+     * view of an already-structured {@link Deck} — fixes up the crypt/library
+     * counts, rebuilds {@link DeckStats}, and reports any card id that no longer
+     * resolves against the card database.
+     *
+     * <p>Used when a deck is loaded from stored JSON rather than parsed from
+     * text, so {@code stats}/{@code errors} are always computed fresh and never
+     * persisted alongside the deck.
+     */
+    public static ExtendedDeck analyze(Deck deck) {
+        Crypt crypt = deck.getCrypt() != null ? deck.getCrypt() : new Crypt();
+        Library library = deck.getLibrary() != null ? deck.getLibrary() : new Library();
+        deck.setCrypt(crypt);
+        deck.setLibrary(library);
+
+        int cryptCount = crypt.getCards().stream().mapToInt(CardCount::getCount).sum();
+        crypt.setCount(cryptCount);
+
+        int libraryCount = 0;
+        for (LibraryCard group : library.getCards()) {
+            int typeCount = group.getCards().stream().mapToInt(CardCount::getCount).sum();
+            group.setCount(typeCount);
+            libraryCount += typeCount;
+        }
+        library.setCount(libraryCount);
+
+        List<String> errors = new ArrayList<>();
+        Set<String> groups = new HashSet<>();
+        boolean hasBannedCards = false;
+        for (CardCount cardCount : allCardCounts(deck)) {
+            CardSummary card = cardCount.getId() == null ? null : CardService.get(String.valueOf(cardCount.getId()));
+            if (card == null) {
+                errors.add("Unknown card: " + cardCount.getName() + " (" + cardCount.getId() + ")");
+                continue;
+            }
+            if (card.isCrypt() && !card.getGroup().equalsIgnoreCase("ANY")) {
+                groups.add(card.getGroup());
+            }
+            if (card.isBanned()) {
+                hasBannedCards = true;
+            }
+        }
+        DeckStats stats = new DeckStats(cryptCount, libraryCount, groups, hasBannedCards);
+        return new ExtendedDeck(deck, stats, errors);
+    }
+
+    private static List<CardCount> allCardCounts(Deck deck) {
+        List<CardCount> all = new ArrayList<>(deck.getCrypt().getCards());
+        deck.getLibrary().getCards().forEach(group -> all.addAll(group.getCards()));
+        return all;
+    }
+
     private static Optional<CardCount> parseLine(String deckLine) throws IllegalArgumentException {
         final String cleanLine = sanitizeLine(deckLine);
         Matcher countMatcher = COUNT_PATTERN.matcher(cleanLine);

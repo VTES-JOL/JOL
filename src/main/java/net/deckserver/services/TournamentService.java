@@ -12,6 +12,8 @@ import net.deckserver.game.enums.Visibility;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.entity.TournamentRegistrationEntity;
 import net.deckserver.jpa.repository.TournamentRepository;
+import net.deckserver.storage.json.deck.DeckNormalizer;
+import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.CardSimple;
 import net.deckserver.storage.json.game.GameData;
@@ -199,7 +201,7 @@ public class TournamentService extends PersistedService {
                 .filter(r -> deckId.equals(r.getDeck()))
                 .map(r -> {
                     try {
-                        return objectMapper.readValue(r.getDeckContent(), ExtendedDeck.class);
+                        return DeckParser.analyze(DeckNormalizer.normalize(r.getDeckContent()));
                     } catch (Exception e) {
                         logger.error("Unable to deserialize tournament deck {} {}", name, deckId, e);
                         return null;

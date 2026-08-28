@@ -207,9 +207,54 @@ export interface TournamentInviteStatus {
 // net.deckserver.rest.bean.DeckInfoBean.
 export interface DeckInfoBean {
   name: string;
+  deckId: string;
   deckFormat: string;
   gameFormats: string[];
   comments: string;
+}
+
+// net.deckserver.storage.json.deck.DeckValidity — one game format's validation
+// outcome. `format` is the format label ("Standard" | "Duel" | "V5");
+// `computedAt` is an ISO-8601 instant.
+export interface DeckValidity {
+  format: string;
+  valid: boolean;
+  errors: string[];
+  computedAt: string;
+}
+
+// net.deckserver.rest.bean.ImportPreviewBean — POST /jol/api/cards/preview.
+export interface ImportPreview {
+  format: 'krcg' | 'jol';
+  deckName: string | null;
+  deckDescription: string | null;
+  resolved: Array<{ count: number; card: CardDetail }>;
+  errors: Array<{ line: string; reason: string }>;
+}
+
+// net.deckserver.rest.bean.CardDetailBean — GET /jol/api/cards/{autocomplete,details}.
+// One shape for autocomplete suggestions, deck-entry enrichment and icons.
+// Crypt: types = ["Vampire"] | ["Imbued"], group = "1"–"7" | "ANY".
+// Library: types = the card's type list, group = null.
+export interface CardDetail {
+  id: string;
+  name: string;
+  crypt: boolean;
+  types: string[];
+  group: string | null;
+  banned: boolean;
+  advanced: boolean;
+  sets: string[];
+  clan: string | null;
+  path: string | null;
+  capacity: number | null;
+  disciplines: string[];
+  andDisciplines: string[];
+  orDisciplines: string[];
+  requirementClans: string[];
+  requirementPath: string | null;
+  poolCost: number | null;
+  bloodCost: number | null;
 }
 
 // net.deckserver.storage.json.deck.{Deck,Crypt,Library,LibraryCard,CardCount}.
@@ -351,6 +396,10 @@ export interface DeckPage {
   selectedDeck: ExtendedDeck | null;
   contents: string | null;
   tags: string[];
+  /** The selected deck's stable id, or null when nothing is loaded. */
+  deckId: string | null;
+  /** Per-format validation outcome, keyed by format name ("STANDARD" | "DUEL" | "V5"). */
+  formatValidity: Record<string, DeckValidity>;
 }
 
 // net.deckserver.rest.bean.CardSnapshot — recursive; children of a visible

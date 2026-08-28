@@ -31,7 +31,9 @@ const TournamentAdminPage = lazy(() => import('./pages/TournamentAdminPage').the
 const TournamentPage = lazy(() => import('./pages/TournamentPage').then((m) => ({ default: m.TournamentPage })));
 const WatchPage = lazy(() => import('./pages/WatchPage').then((m) => ({ default: m.WatchPage })));
 const LobbyPage = lazy(() => import('./pages/LobbyPage').then((m) => ({ default: m.LobbyPage })));
-const DeckPage = lazy(() => import('./pages/DeckPage').then((m) => ({ default: m.DeckPage })));
+const DeckPage = lazy(() =>
+  import('./pages/deck/DeckWorkbench').then((m) => ({ default: m.DeckWorkbench })),
+);
 const GamePage = lazy(() => import('./pages/GamePage').then((m) => ({ default: m.GamePage })));
 const HelpPage = lazy(() => import('./pages/help/HelpPage').then((m) => ({ default: m.HelpPage })));
 const HelpSection = lazy(() => import('./pages/help/HelpSection').then((m) => ({ default: m.HelpSection })));

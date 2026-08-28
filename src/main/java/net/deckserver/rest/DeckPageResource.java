@@ -4,9 +4,16 @@ import net.deckserver.JolAdmin;
 import net.deckserver.rest.bean.DeckPageBean;
 import net.deckserver.rest.bean.DeckEdit;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.services.DeckImportService;
+import net.deckserver.services.DeckValidityService;
+import net.deckserver.storage.json.deck.DeckValidity;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Dedicated, envelope-free reads/writes for the React deck page — same role
@@ -56,11 +63,36 @@ public class DeckPageResource extends BaseResource {
         return toBean(JolAdmin.validateDeck(body.name(), body.contents(), GameFormat.from(body.format())));
     }
 
+    /**
+     * Creates a deck from a confirmed import preview — the same save path a
+     * normal deck edit takes (tags + per-format validity recomputed), just fed
+     * canonical deck-list text built from the {cardId, count} entries.
+     */
+    @POST
+    @Path("import")
+    public DeckPageBean importDeck(ImportRequest body) {
+        String name = body.name() != null && !body.name().isBlank() ? body.name() : "Imported Deck";
+        String contents = DeckImportService.buildContents(
+                body.entries().stream().map(e -> new DeckImportService.Entry(e.cardId(), e.count())).toList());
+        return toBean(JolAdmin.saveDeck(username(), name, contents, body.comment() == null ? "" : body.comment()));
+    }
+
     private DeckPageBean toBean(DeckEdit edit) {
-        return new DeckPageBean(edit.deck(), edit.contents(), JolAdmin.getAvailableGameFormats(username()).stream().map(GameFormat::getLabel).toList());
+        Map<String, DeckValidity> validity = edit.deckId() == null
+                ? Map.of()
+                : DeckValidityService.getValidity(edit.deckId()).entrySet().stream()
+                        .collect(Collectors.toMap(e -> e.getKey().name(), Map.Entry::getValue));
+        return new DeckPageBean(
+                edit.deck(),
+                edit.contents(),
+                JolAdmin.getAvailableGameFormats(username()).stream().map(GameFormat::getLabel).toList(),
+                edit.deckId(),
+                validity);
     }
 
     public record LoadDeckRequest(String deckName) {}
     public record SaveDeckRequest(String deckName, String contents, String comment) {}
     public record ValidateRequest(String name, String contents, String format) {}
+    public record ImportRequest(String name, String comment, List<ImportEntry> entries) {}
+    public record ImportEntry(String cardId, int count) {}
 }
