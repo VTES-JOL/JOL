@@ -61,6 +61,13 @@ jobs:
           cache-dependency-path: src/main/webui/package-lock.json
       - run: npm ci
       - run: npm run lint
+      # `npm run test` (vitest run) runs both projects in vitest.config.ts —
+      # the jsdom "unit" project and the "storybook" project, which executes
+      # every *.stories.tsx play function in real Chromium via Playwright.
+      # That browser isn't bundled with the npm deps, so install it (only
+      # the e2e job did this before, which is why this job started failing
+      # once the storybook project was added).
+      - run: npx playwright install --with-deps chromium
       - run: npm run test
       # tsc -b + vite build — the same build Quinoa triggers as part of
       # `mvn package`, run here too so a type error or broken build fails

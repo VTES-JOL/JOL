@@ -16,6 +16,14 @@ src/test/resources/data/metrics/*
 images/*
 static/*
 csv/*
+# ...but the two core VEKN card CSVs are the source of truth CardRegistry
+# loads at startup (and CardRegistryTest/CardSearchServiceTest/
+# DeckImportServiceTest read from csv/core/ directly) — keep them tracked so
+# CI has them without a local-only manual copy step.
+!csv/core/
+csv/core/*
+!csv/core/vtescrypt.csv
+!csv/core/vteslib.csv
 aws/*
 
 # Environmental
