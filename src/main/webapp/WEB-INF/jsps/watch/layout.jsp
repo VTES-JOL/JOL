@@ -9,6 +9,12 @@
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link px-3 py-2" data-bs-toggle="tab"
+                        data-bs-target="#tournamentGamesWatchPane" type="button" role="tab">
+                    Tournament Games
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link px-3 py-2" data-bs-toggle="tab"
                         data-bs-target="#pastGamesPane" type="button" role="tab">
                     Past Games
                 </button>
@@ -29,6 +35,18 @@
     <div class="tab-content tab-content-fill">
         <div class="tab-pane fade show active" id="activeGamesPane" role="tabpanel">
             <table id="activeGames" class="table table-sm table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Game</th>
+                    <th>Current Turn</th>
+                    <th>Updated</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="tab-pane fade" id="tournamentGamesWatchPane" role="tabpanel">
+            <table id="tournamentGames" class="table table-sm table-hover mb-0">
                 <thead>
                 <tr>
                     <th>Game</th>

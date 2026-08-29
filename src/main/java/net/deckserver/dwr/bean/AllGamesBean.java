@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class AllGamesBean {
 
     private final List<GameSummaryBean> games;
+    private final List<GameSummaryBean> tournaments;
     private final List<GameHistory> history;
 
     public AllGamesBean(PlayerModel model) {
@@ -26,6 +27,13 @@ public class AllGamesBean {
                 .map(GameSummaryBean::new)
                 .collect(Collectors.toList());
         games.sort(Comparator.comparing(GameSummaryBean::getGameName, String.CASE_INSENSITIVE_ORDER));
+        this.tournaments = JolAdmin.getGameNames().stream()
+                .filter(JolAdmin::isActive)
+                .filter(JolAdmin::isTournament)
+                .filter(gameName -> JolAdmin.isViewable(gameName, player))
+                .map(GameSummaryBean::new)
+                .collect(Collectors.toList());
+        tournaments.sort(Comparator.comparing(GameSummaryBean::getGameName, String.CASE_INSENSITIVE_ORDER));
 
         this.history = HistoryService.getHistory().entrySet().stream()
                 .sorted(Map.Entry.<OffsetDateTime, GameHistory>comparingByKey().reversed())
