@@ -5,7 +5,7 @@ import { api } from '../api/client';
 import { runRequest } from '../api/mutate';
 import { useInvalidate } from '../api/useInvalidate';
 import type { CardDetail, DeckInfoBean, DeckPageBean } from '../api/types';
-import { PageLoading } from '../components/PageLoading';
+import { Spinner } from '../components/ui/Spinner';
 import { MasterDetailView } from '../components/ui/MasterDetailView';
 import { Panel } from '../components/ui/Panel';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -170,7 +170,13 @@ export function DeckPage() {
     [applyPage, refreshList],
   );
 
-  if (!page) return <PageLoading />;
+  if (!page) {
+    return (
+      <div className="jt-scope jt:flex jt:flex-1 jt:min-h-0 jt:items-center jt:justify-center jt:bg-base">
+        <Spinner />
+      </div>
+    );
+  }
 
   const selectedId = page.deckId;
   const selectedName = page.selectedDeck?.deck.name ?? '';
