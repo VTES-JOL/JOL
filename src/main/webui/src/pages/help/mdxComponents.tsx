@@ -26,8 +26,15 @@ export const helpMdxComponents: MDXComponents = {
   GameExample,
   DeckPreviewExample,
   CardLink,
-  table: (props) => <table className="table table-sm" {...props} />,
-  code: (props) => <code className="bg-body-tertiary px-1 rounded" {...props} />,
+  table: (props) => (
+    <table
+      className="jt:w-full jt:text-sm jt:my-3 jt:[&_th]:text-left jt:[&_th]:font-semibold jt:[&_th]:border-b jt:[&_th]:border-line jt:[&_th]:px-2 jt:[&_th]:py-1 jt:[&_td]:border-b jt:[&_td]:border-line/50 jt:[&_td]:px-2 jt:[&_td]:py-1"
+      {...props}
+    />
+  ),
+  code: (props) => (
+    <code className="jt:bg-hover jt:text-ink jt:px-1 jt:rounded jt:text-[0.9em]" {...props} />
+  ),
   // Cross-links between Help sections (e.g. "see Deck Editor") stay
   // client-side navigation via react-router instead of a full page reload.
   a: ({ href, children, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement>) =>

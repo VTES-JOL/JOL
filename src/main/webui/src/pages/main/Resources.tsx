@@ -1,21 +1,18 @@
-import { Card, CardHeader, CardTitle } from '../../components/Card';
+import type { ComponentType } from 'react';
+import { BookOpen, Bug, Database, Heart, Layers, MessageCircle, ScrollText, Users } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardBody } from '../../components/ui/Card';
 
 // Static content — mirrors src/main/webapp/WEB-INF/jsps/main/resources.jsp,
-// with one deliberate deviation: the "Resources" label moved from a plain
-// <p> inline in the card body into a real CardHeader, matching every other
-// widget's now-consistent header instead of legacy's one-off inline-text
-// pattern. This supersedes links.jsp/dark-pack.jsp: neither is referenced by
-// main/layout.jsp (or anywhere else) anymore — only resources.jsp is, having
-// consolidated both into one compact card.
-const RESOURCE_LINKS: { href: string; icon: string; label: string }[] = [
-  { href: 'http://www.vekn.net/rulebook', icon: 'bi-book', label: 'Rulebook' },
-  { href: 'https://codex-of-the-damned.org/', icon: 'bi-journal-text', label: 'Codex' },
-  { href: 'https://amaranth.vtes.co.nz/', icon: 'bi-collection', label: 'Amaranth' },
-  { href: 'https://vdb.im/', icon: 'bi-database', label: 'VDB' },
-  { href: 'https://discord.gg/fJjac75', icon: 'bi-discord', label: 'Discord' },
-  { href: 'https://www.facebook.com/groups/jolstatus/', icon: 'bi-facebook', label: 'Facebook' },
-  { href: 'https://github.com/VTES-JOL/JOL/issues', icon: 'bi-bug', label: 'Report Bug' },
-  { href: 'https://www.paypal.com/donate/?hosted_button_id=A8PKSSCTV92A2', icon: 'bi-heart', label: 'Donate' },
+// consolidating the old links.jsp/dark-pack.jsp into one compact card.
+const RESOURCE_LINKS: { href: string; icon: ComponentType<{ size?: number }>; label: string }[] = [
+  { href: 'http://www.vekn.net/rulebook', icon: BookOpen, label: 'Rulebook' },
+  { href: 'https://codex-of-the-damned.org/', icon: ScrollText, label: 'Codex' },
+  { href: 'https://amaranth.vtes.co.nz/', icon: Layers, label: 'Amaranth' },
+  { href: 'https://vdb.im/', icon: Database, label: 'VDB' },
+  { href: 'https://discord.gg/fJjac75', icon: MessageCircle, label: 'Discord' },
+  { href: 'https://www.facebook.com/groups/jolstatus/', icon: Users, label: 'Facebook' },
+  { href: 'https://github.com/VTES-JOL/JOL/issues', icon: Bug, label: 'Report Bug' },
+  { href: 'https://www.paypal.com/donate/?hosted_button_id=A8PKSSCTV92A2', icon: Heart, label: 'Donate' },
 ];
 
 export function Resources() {
@@ -24,24 +21,23 @@ export function Resources() {
       <CardHeader>
         <CardTitle>Resources</CardTitle>
       </CardHeader>
-      <div className="card-body p-2">
-        <div className="row row-cols-2 g-1 mb-2">
-          {RESOURCE_LINKS.map(({ href, icon, label }) => (
-            <div key={href} className="col">
-              <a
-                className="btn btn-sm btn-outline-secondary w-100 text-start d-flex align-items-center gap-2"
-                href={href}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <i className={`bi ${icon}`} />
-                <span>{label}</span>
-              </a>
-            </div>
+      <CardBody className="jt:p-2">
+        <div className="jt:grid jt:grid-cols-2 jt:gap-1 jt:mb-2">
+          {RESOURCE_LINKS.map(({ href, icon: Icon, label }) => (
+            <a
+              key={href}
+              className="jt:flex jt:items-center jt:gap-2 jt:px-2 jt:py-1 jt:text-sm jt:rounded jt:border jt:border-line-accent jt:text-ink-secondary jt:hover:text-ink jt:hover:bg-hover jt:no-underline"
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Icon size={14} />
+              <span>{label}</span>
+            </a>
           ))}
         </div>
-        <details className="small text-muted">
-          <summary className="d-flex align-items-center gap-2 mb-1" style={{ cursor: 'pointer', listStyle: 'none' }}>
+        <details className="jt:text-xs jt:text-ink-muted">
+          <summary className="jt:flex jt:items-center jt:gap-2 jt:mb-1 jt:cursor-pointer jt:list-none">
             <img
               src="https://static.deckserver.net/assets/images/darkpack_logo2.png"
               style={{ height: '1.2rem' }}
@@ -49,13 +45,13 @@ export function Resources() {
             />
             <span>Licensing</span>
           </summary>
-          <p className="mb-0 ps-1">
+          <p className="jt:mb-0 jt:pl-1">
             JOL is not an official World of Darkness product. Portions of the materials are the copyrights and
             trademarks of Paradox Interactive AB, and are used with permission. All rights reserved. For more
             information please visit worldofdarkness.com.
           </p>
         </details>
-      </div>
+      </CardBody>
     </Card>
   );
 }

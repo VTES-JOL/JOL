@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
 import { api } from '../../api/client';
 import type { NotesResponse } from '../../api/types';
 
@@ -18,7 +18,7 @@ export function SiteNotes() {
       </CardHeader>
       {/* Trusted admin-authored HTML from SiteNotesService — same trust boundary the
           legacy JSP rendered it under (server-side rich-text notes, not user input). */}
-      <div className="card-body p-2" dangerouslySetInnerHTML={{ __html: notes }} />
+      <div className="jt:p-2 jt:text-sm jt:text-ink" dangerouslySetInnerHTML={{ __html: notes }} />
     </Card>
   );
 }

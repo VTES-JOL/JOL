@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Gamepad2 } from 'lucide-react';
 import { api } from '../api/client';
-import { useInvalidate } from '../api/useInvalidate';
 import type { GameStatusBean } from '../api/types';
 import { GameList } from './lobby/GameList';
 import { GameCreateForm } from './lobby/GameCreateForm';
 import { GameDetail } from './lobby/GameDetail';
-import { PageLoading } from '../components/PageLoading';
-import { PanelPlaceholder } from '../components/PanelPlaceholder';
-import { SplitLayout } from '../components/SplitLayout';
+import { Spinner } from '../components/ui/Spinner';
+import { EmptyState } from '../components/ui/EmptyState';
+import { MasterDetailView } from '../components/ui/MasterDetailView';
+import { useInvalidate } from '../api/useInvalidate';
 
 type View = { mode: 'create' } | { mode: 'detail'; gameName: string } | null;
 
@@ -36,38 +37,59 @@ export function LobbyPage() {
 
   const refresh = useInvalidate(GAMES_QUERY_KEY);
 
-  const selectGame = (game: GameStatusBean) => setView({ mode: 'detail', gameName: game.name });
-
-  if (!games) return <PageLoading />;
+  if (!games) {
+    return (
+      <div className="jt-scope jt:flex jt:flex-1 jt:min-h-0 jt:items-center jt:justify-center jt:bg-base">
+        <Spinner />
+      </div>
+    );
+  }
 
   const selectedGame = view?.mode === 'detail' ? games.find((g) => g.name === view.gameName) : null;
+  const showDetailPane = view?.mode === 'create' || !!selectedGame;
+
+  let detail;
+  if (view?.mode === 'create') {
+    detail = (
+      <GameCreateForm
+        onCancel={() => setView(null)}
+        onCreated={(gameName) => {
+          refresh();
+          setView({ mode: 'detail', gameName });
+        }}
+      />
+    );
+  } else if (selectedGame) {
+    detail = <GameDetail game={selectedGame} onClose={() => setView(null)} onChanged={refresh} />;
+  } else {
+    detail = <EmptyState icon={Gamepad2} title="Select a game or create a new one" />;
+  }
 
   return (
-    <SplitLayout
-      stackBelowLg
-      left={
-        <GameList
-          games={games}
-          selectedName={selectedGame?.name ?? null}
-          onSelect={selectGame}
-          onNew={() => setView({ mode: 'create' })}
-        />
-      }
-      right={
-        <>
-          {view?.mode === 'create' && (
-            <GameCreateForm
-              onCancel={() => setView(null)}
-              onCreated={(gameName) => {
-                refresh();
-                setView({ mode: 'detail', gameName });
-              }}
-            />
-          )}
-          {selectedGame && <GameDetail game={selectedGame} onClose={() => setView(null)} onChanged={refresh} />}
-          {!view && <PanelPlaceholder icon="bi-controller" message="Select a game or create a new one" />}
-        </>
-      }
-    />
+    <div className="jt-scope jt:flex jt:flex-col jt:flex-1 jt:min-h-0 jt:p-4 jt:bg-base jt:text-ink">
+      <MasterDetailView
+        breakpoint="lg"
+        columns="340px minmax(360px, 1fr)"
+        activeKey={showDetailPane ? 'detail' : 'list'}
+        onActiveKeyChange={(k) => {
+          if (k === 'list') setView(null);
+        }}
+        panels={[
+          {
+            key: 'list',
+            label: 'Games',
+            content: (
+              <GameList
+                games={games}
+                selectedName={selectedGame?.name ?? null}
+                onSelect={(game) => setView({ mode: 'detail', gameName: game.name })}
+                onNew={() => setView({ mode: 'create' })}
+              />
+            ),
+          },
+          { key: 'detail', label: 'Details', content: detail },
+        ]}
+      />
+    </div>
   );
 }

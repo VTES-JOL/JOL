@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { CountryOption, Profile } from '../api/types';
 import { useNavRefresh } from '../auth/useNav';
-import { PageLoading } from '../components/PageLoading';
+import { Spinner } from '../components/ui/Spinner';
 import { ProfileEditor } from './profile/ProfileEditor';
 import { AccountEditor } from './profile/AccountEditor';
 import { Preferences } from './profile/Preferences';
@@ -31,19 +31,19 @@ export function ProfilePage() {
     refreshNav();
   };
 
-  if (!profile) return <PageLoading />;
+  if (!profile) {
+    return (
+      <div className="jt-scope jt:flex jt:flex-1 jt:min-h-0 jt:items-center jt:justify-center jt:bg-base">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
-    <div className="row g-3 mt-2 p-3">
-      <div className="col-12 col-md-6 col-lg-4">
-        <ProfileEditor profile={profile} countries={countries} onSaved={onSaved} />
-      </div>
-      <div className="col-12 col-md-6 col-lg-4">
-        <AccountEditor />
-      </div>
-      <div className="col-12 col-md-6 col-lg-4">
-        <Preferences profile={profile} onSaved={onSaved} />
-      </div>
+    <div className="jt-scope jt:grid jt:gap-4 jt:p-4 jt:bg-base jt:md:grid-cols-2 jt:lg:grid-cols-3 jt:content-start">
+      <ProfileEditor profile={profile} countries={countries} onSaved={onSaved} />
+      <AccountEditor />
+      <Preferences profile={profile} onSaved={onSaved} />
     </div>
   );
 }

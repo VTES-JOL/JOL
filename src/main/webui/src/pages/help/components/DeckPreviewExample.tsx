@@ -1,5 +1,8 @@
+import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 import type { CardCount, Deck } from '../../../api/types';
 import { DeckPreview } from '../../../components/DeckPreview';
+import { Card, CardHeader, CardBody } from '../../../components/ui/Card';
+import { Badge } from '../../../components/ui/Badge';
 
 // Accepts the exact "4 x Card Name, 3 x Other Card (ADV)" text a player
 // would type into the real deck editor — see deck-editor.mdx — so an author
@@ -46,24 +49,24 @@ export function DeckPreviewExample({ name = 'Preview', crypt, library, valid = t
   };
 
   return (
-    <div className="card shadow my-3" style={{ maxWidth: '26rem' }}>
-      <div className="card-header bg-body-secondary d-flex justify-content-between align-items-center">
-        <span className="fw-semibold">{name}</span>
+    <Card className="jt:my-3 jt:max-w-md">
+      <CardHeader className="jt:flex jt:items-center jt:justify-between">
+        <span className="jt:text-sm jt:font-semibold jt:text-ink">{name}</span>
         {valid ? (
-          <span className="badge bg-success-subtle text-success-emphasis border border-success-subtle">
-            <i className="bi bi-check-circle me-1" />
+          <Badge variant="online">
+            <CheckCircle2 size={12} className="jt:mr-1" />
             Valid
-          </span>
+          </Badge>
         ) : (
-          <span className="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
-            <i className="bi bi-exclamation-triangle me-1" />
+          <Badge variant="blood">
+            <AlertTriangle size={12} className="jt:mr-1" />
             Invalid
-          </span>
+          </Badge>
         )}
-      </div>
-      <div className="card-body p-2">
+      </CardHeader>
+      <CardBody className="jt:p-2">
         <DeckPreview deck={deck} />
-      </div>
-    </div>
+      </CardBody>
+    </Card>
   );
 }

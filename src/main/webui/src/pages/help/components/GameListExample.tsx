@@ -61,7 +61,7 @@ export function GameListExample({ children }: { children: ReactNode }) {
   });
 
   return (
-    <div className="my-3 d-flex flex-column" style={{ maxWidth: '26rem', height: '18rem' }}>
+    <div className="jt:my-3 jt:flex jt:flex-col" style={{ maxWidth: '26rem', height: '18rem' }}>
       <GameList games={games} selectedName={null} onSelect={() => {}} onNew={() => {}} />
     </div>
   );

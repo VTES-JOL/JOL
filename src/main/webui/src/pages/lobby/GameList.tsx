@@ -1,59 +1,57 @@
+import { PlusCircle, User } from 'lucide-react';
 import type { GameStatusBean } from '../../api/types';
 import { relativeTime } from '../../utils/relativeTime';
-import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { Panel } from '../../components/ui/Panel';
+import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
 
 const REL_LABEL: Record<string, string> = { OWNER: 'Owner', REGISTERED: 'Registered', INVITED: 'Invited', OPEN: 'Open' };
 const REL_CLASS: Record<string, string> = {
-  OWNER: 'text-primary',
-  REGISTERED: 'text-success',
-  INVITED: 'text-warning-emphasis',
-  OPEN: 'text-muted',
+  OWNER: 'jt:text-accent',
+  REGISTERED: 'jt:text-online',
+  INVITED: 'jt:text-gold',
+  OPEN: 'jt:text-ink-muted',
 };
 
 function GameListItem({ game, selected, onSelect }: { game: GameStatusBean; selected: boolean; onSelect: () => void }) {
-  const visClass =
-    game.visibility === 'PUBLIC'
-      ? 'bg-success-subtle text-success-emphasis border border-success-subtle'
-      : 'bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle';
   const relLabel = (game.playerRelationship && REL_LABEL[game.playerRelationship]) || '';
-  const relClass = (game.playerRelationship && REL_CLASS[game.playerRelationship]) || 'text-muted';
+  const relClass = (game.playerRelationship && REL_CLASS[game.playerRelationship]) || 'jt:text-ink-muted';
   const registeredCount = game.registrations.filter((r) => r.registered).length;
   const totalCount = game.registrations.length;
 
   return (
-    <a
-      href="#"
-      className={`list-group-item list-group-item-action px-3 py-2 ${selected ? 'active' : ''}`}
-      onClick={(e) => {
-        e.preventDefault();
-        onSelect();
-      }}
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`jt:w-full jt:text-left jt:px-3 jt:py-2 jt:border-b jt:border-line jt:transition-colors ${
+        selected ? 'jt:bg-accent/10 jt:text-ink' : 'jt:text-ink-secondary jt:hover:bg-hover'
+      }`}
     >
-      <div className="d-flex justify-content-between align-items-start">
-        <span className="fw-semibold text-break me-2">{game.name}</span>
-        <span className={`badge ${visClass} text-nowrap`}>{game.visibility}</span>
+      <div className="jt:flex jt:justify-between jt:items-start jt:gap-2">
+        <span className="jt:font-semibold jt:text-ink jt:break-words">{game.name}</span>
+        <Badge variant={game.visibility === 'PUBLIC' ? 'online' : 'muted'}>{game.visibility}</Badge>
       </div>
-      <div className="d-flex justify-content-between align-items-center mt-1">
-        <span className="badge bg-secondary">{game.format}</span>
-        <small className={relClass}>{relLabel}</small>
+      <div className="jt:flex jt:justify-between jt:items-center jt:mt-1">
+        <Badge variant="format">{game.format}</Badge>
+        <span className={`jt:text-xs ${relClass}`}>{relLabel}</span>
       </div>
       {(game.visibility === 'PUBLIC' || totalCount > 0) && (
-        <div className="d-flex justify-content-between align-items-center mt-1">
-          <span className="small text-muted">
+        <div className="jt:flex jt:justify-between jt:items-center jt:mt-1 jt:text-xs jt:text-ink-muted">
+          <span className="jt:flex jt:items-center jt:gap-1">
             {totalCount > 0 && (
               <>
-                {registeredCount}/{totalCount} <i className="bi bi-person" />
+                {registeredCount}/{totalCount} <User size={12} />
               </>
             )}
           </span>
           {game.visibility === 'PUBLIC' && game.created && (
-            <small className="text-muted">
+            <span>
               closes {relativeTime(new Date(new Date(game.created).getTime() + 5 * 24 * 60 * 60 * 1000).toISOString())}
-            </small>
+            </span>
           )}
         </div>
       )}
-    </a>
+    </button>
   );
 }
 
@@ -69,20 +67,19 @@ export function GameList({
   onNew: () => void;
 }) {
   return (
-    <Card className="flex-fill d-flex flex-column">
-      <CardHeader className="d-flex justify-content-between align-items-center">
-        <CardTitle>Games</CardTitle>
-        <button className="btn btn-sm btn-outline-secondary" onClick={onNew}>
-          New <i className="bi-plus-circle" />
-        </button>
-      </CardHeader>
-      <div className="flex-fill min-h-0" style={{ overflowY: 'auto', overflowX: 'clip' }}>
-        <div className="list-group list-group-flush">
-          {games.map((g) => (
-            <GameListItem key={g.name} game={g} selected={g.name === selectedName} onSelect={() => onSelect(g)} />
-          ))}
-        </div>
+    <Panel
+      title="Games"
+      right={
+        <Button variant="secondary" size="sm" icon={<PlusCircle size={14} />} onClick={onNew}>
+          New
+        </Button>
+      }
+    >
+      <div className="jt:flex-1 jt:min-h-0 jt:overflow-y-auto">
+        {games.map((g) => (
+          <GameListItem key={g.name} game={g} selected={g.name === selectedName} onSelect={() => onSelect(g)} />
+        ))}
       </div>
-    </Card>
+    </Panel>
   );
 }

@@ -1,4 +1,6 @@
 import type { TournamentMetadata } from '../../api/types';
+import { Panel } from '../../components/ui/Panel';
+import { Badge } from '../../components/ui/Badge';
 import { relativeTime } from '../../utils/relativeTime';
 
 export type Selection = { type: 'open' | 'finals'; name: string } | null;
@@ -16,50 +18,40 @@ export function TournamentList({
 }) {
   const isEmpty = tournaments.length === 0 && finalsInvites.length === 0;
 
+  const rowClass = (active: boolean) =>
+    `jt:w-full jt:text-left jt:px-3 jt:py-2 jt:border-b jt:border-line jt:flex jt:items-center jt:justify-between jt:gap-2 jt:transition-colors ${
+      active ? 'jt:bg-accent/10 jt:text-ink' : 'jt:text-ink-secondary jt:hover:bg-hover'
+    }`;
+
   return (
-    <div className="card shadow flex-fill d-flex flex-column">
-      <div className="card-header bg-body-secondary">
-        <span className="fw-semibold">Tournaments</span>
+    <Panel title="Tournaments">
+      <div className="jt:flex-1 jt:min-h-0 jt:overflow-y-auto">
+        {tournaments.map((t) => {
+          const active = selection?.type === 'open' && selection.name === t.name;
+          return (
+            <button key={t.name} type="button" className={rowClass(active)} onClick={() => onSelect({ type: 'open', name: t.name })}>
+              <span className="jt:flex jt:items-center jt:gap-2 jt:min-w-0">
+                <Badge variant="format">{t.deckFormat}</Badge>
+                <span className="jt:truncate">{t.name}</span>
+                <Badge variant={t.registered ? 'online' : 'muted'}>{t.registered ? 'Registered' : 'Open'}</Badge>
+              </span>
+              <span className="jt:shrink-0 jt:text-xs jt:text-ink-muted">Closes {relativeTime(t.registrationEndTime)}</span>
+            </button>
+          );
+        })}
+        {finalsInvites.map((t) => {
+          const active = selection?.type === 'finals' && selection.name === t.name;
+          return (
+            <button key={t.name} type="button" className={rowClass(active)} onClick={() => onSelect({ type: 'finals', name: t.name })}>
+              <span className="jt:flex jt:items-center jt:gap-2 jt:min-w-0">
+                <Badge variant="blood">Finals</Badge>
+                <span className="jt:truncate">{t.name}</span>
+              </span>
+            </button>
+          );
+        })}
+        {isEmpty && <p className="jt:px-3 jt:py-2 jt:text-xs jt:text-ink-muted">No tournaments available.</p>}
       </div>
-      <ul className="list-group list-group-flush flex-fill overflow-auto min-h-0">
-        {tournaments.map((t) => (
-          <li
-            key={t.name}
-            className={`list-group-item list-group-item-action d-flex justify-content-between align-items-center ${
-              selection?.type === 'open' && selection.name === t.name ? 'active' : ''
-            }`}
-            style={{ cursor: 'pointer' }}
-            onClick={() => onSelect({ type: 'open', name: t.name })}
-          >
-            <span className="d-flex align-items-center">
-              <span className="badge bg-secondary me-2">{t.deckFormat}</span>
-              <span>{t.name}</span>
-              {t.registered ? (
-                <span className="badge text-bg-success ms-2">Registered</span>
-              ) : (
-                <span className="badge text-bg-secondary ms-2">Open</span>
-              )}
-            </span>
-            <small className="text-muted">Closes {relativeTime(t.registrationEndTime)}</small>
-          </li>
-        ))}
-        {finalsInvites.map((t) => (
-          <li
-            key={t.name}
-            className={`list-group-item list-group-item-action d-flex justify-content-between align-items-center ${
-              selection?.type === 'finals' && selection.name === t.name ? 'active' : ''
-            }`}
-            style={{ cursor: 'pointer' }}
-            onClick={() => onSelect({ type: 'finals', name: t.name })}
-          >
-            <span className="d-flex align-items-center">
-              <span className="badge text-bg-danger me-2">Finals</span>
-              <span>{t.name}</span>
-            </span>
-          </li>
-        ))}
-        {isEmpty && <li className="list-group-item text-muted small">No tournaments available.</li>}
-      </ul>
-    </div>
+    </Panel>
   );
 }

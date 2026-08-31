@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { ChevronsUpDown } from 'lucide-react';
 
 // Mirrors ds.js's sortTable()/sortPercentageTable(): numeric-aware string
 // compare, or percent-string compare, toggling independently per column
@@ -68,5 +69,12 @@ export function useTableSort<T extends Record<string, unknown>>(rows: T[]) {
 }
 
 export function SortIcon<T>({ column, onSort, mode }: { column: keyof T; onSort: (key: keyof T, mode?: SortMode) => void; mode?: SortMode }) {
-  return <i className="bi bi-filter" role="button" onClick={() => onSort(column, mode)} />;
+  return (
+    <ChevronsUpDown
+      size={13}
+      role="button"
+      className="jt:inline jt:ml-1 jt:text-ink-muted jt:hover:text-ink jt:cursor-pointer jt:align-middle"
+      onClick={() => onSort(column, mode)}
+    />
+  );
 }

@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { Card, CardHeader, CardTitle, CardBody } from '../../components/ui/Card';
+import { Input } from '../../components/ui/Input';
+import { Button } from '../../components/ui/Button';
+import { InlineAlert } from '../../components/ui/FormFeedback';
 import { api } from '../../api/client';
 import { runRequest } from '../../api/mutate';
 
@@ -25,44 +28,36 @@ export function AccountEditor() {
   };
 
   return (
-    <Card className="mb-2">
+    <Card>
       <CardHeader>
         <CardTitle>Account</CardTitle>
       </CardHeader>
-      <div className="card-body">
-        <label htmlFor="profileNewPassword" className="form-label">
-          New Password
-        </label>
-        <input
+      <CardBody className="jt:flex jt:flex-col jt:gap-3">
+        <Input
           type="password"
           id="profileNewPassword"
+          label="New Password"
           placeholder="New password"
           autoComplete="new-password"
-          className="form-control"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
         />
-        <label htmlFor="profileConfirmPassword" className="form-label mt-2">
-          Confirm Password
-        </label>
-        <input
+        <Input
           type="password"
           id="profileConfirmPassword"
+          label="Confirm Password"
           placeholder="Confirm password"
           autoComplete="new-password"
-          className="form-control"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
-        <button className="btn btn-outline-secondary btn-sm mt-2" onClick={submit}>
-          Change Password
-        </button>
-        {message && (
-          <div id="profilePasswordError" className={`alert alert-${message.kind} py-2 mt-2 mb-0`}>
-            {message.text}
-          </div>
-        )}
-      </div>
+        <div className="jt:flex jt:flex-col jt:gap-2 jt:items-start">
+          <Button variant="secondary" size="sm" onClick={submit}>
+            Change Password
+          </Button>
+          {message && <InlineAlert kind={message.kind}>{message.text}</InlineAlert>}
+        </div>
+      </CardBody>
     </Card>
   );
 }

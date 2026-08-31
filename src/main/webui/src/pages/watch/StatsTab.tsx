@@ -1,5 +1,8 @@
 import { useState } from 'react';
+import { Trash2 } from 'lucide-react';
 import { TabBar, type TabDef } from '../../components/TabBar';
+import { Button } from '../../components/ui/Button';
+import { Switch } from '../../components/ui/Switch';
 import { useAuth } from '../../auth/useAuth';
 import { PlayerStats } from './stats/PlayerStats';
 import { DeckStats } from './stats/DeckStats';
@@ -18,6 +21,9 @@ const TABS: TabDef<StatsSubTab>[] = [
   { id: 'game', label: 'Games' },
   { id: 'jol', label: 'Jol' },
 ];
+
+const DATE_INPUT =
+  'jt:rounded jt:border jt:border-line jt:bg-surface/70 jt:px-2 jt:py-1 jt:text-sm jt:text-ink jt:outline-none jt:focus:border-accent/60';
 
 function currentYear() {
   return new Date().getFullYear();
@@ -42,61 +48,50 @@ export function StatsTab() {
   };
 
   return (
-    <div className="tab-pane fade show active overflow-hidden">
-      <div className="container mt-3">
-        <div className="row align-items-center g-2">
-          <div className="col-auto">
-            <label className="form-label mb-0">From</label>
-          </div>
-          <div className="col-auto">
-            <input type="date" className="form-control" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
-          </div>
-          <div className="col-auto">
-            <label className="form-label mb-0">To</label>
-          </div>
-          <div className="col-auto">
-            <input type="date" className="form-control" value={toDate} onChange={(e) => setToDate(e.target.value)} />
-          </div>
-          <div className="col-auto">
-            <button
-              type="button"
-              className="btn btn-outline-secondary btn-sm"
-              onClick={() => setRange(`${currentYear() - 1}-01-01`, `${currentYear() - 1}-12-31`)}
-            >
-              Last Year
-            </button>
-          </div>
-          <div className="col-auto">
-            <button
-              type="button"
-              className="btn btn-outline-secondary btn-sm"
-              onClick={() => setRange(`${currentYear()}-01-01`, `${currentYear()}-12-31`)}
-            >
-              Current Year
-            </button>
-          </div>
-          <div className="col-auto">
-            <button className="btn btn-outline-secondary btn-sm" title="Reset all filter" onClick={reset}>
-              <i className="bi-trash" />
-            </button>
-          </div>
-          <div className="form-check form-switch col-auto m-2 pt-1">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              role="switch"
-              id="onlyTournaments"
-              checked={isTourney}
-              onChange={(e) => setIsTourney(e.target.checked)}
-            />
-            <label className="form-check-label" htmlFor="onlyTournaments">
-              Only Tournaments
-            </label>
-          </div>
-        </div>
+    <div className="jt:flex jt:flex-col jt:min-h-0 jt:overflow-hidden">
+      <div className="jt:flex jt:flex-wrap jt:items-center jt:gap-2 jt:mt-3 jt:px-1">
+        <label htmlFor="statsFrom" className="jt:text-xs jt:text-ink-muted">
+          From
+        </label>
+        <input
+          id="statsFrom"
+          type="date"
+          className={DATE_INPUT}
+          value={fromDate}
+          onChange={(e) => setFromDate(e.target.value)}
+        />
+        <label htmlFor="statsTo" className="jt:text-xs jt:text-ink-muted">
+          To
+        </label>
+        <input id="statsTo" type="date" className={DATE_INPUT} value={toDate} onChange={(e) => setToDate(e.target.value)} />
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => setRange(`${currentYear() - 1}-01-01`, `${currentYear() - 1}-12-31`)}
+        >
+          Last Year
+        </Button>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => setRange(`${currentYear()}-01-01`, `${currentYear()}-12-31`)}
+        >
+          Current Year
+        </Button>
+        <Button variant="ghost" size="sm" title="Reset all filters" onClick={reset}>
+          <Trash2 size={14} />
+        </Button>
+        <Switch
+          id="onlyTournaments"
+          label="Only Tournaments"
+          checked={isTourney}
+          onChange={(e) => setIsTourney(e.target.checked)}
+        />
       </div>
+
       <TabBar tabs={TABS} active={subTab} onChange={setSubTab} className="mt-3" />
-      <div className="tab-content mt-3">
+
+      <div className="jt:flex-1 jt:min-h-0 jt:mt-3">
         {subTab === 'player' && <PlayerStats fromDate={fromDate} toDate={toDate} isTourney={isTourney} />}
         {subTab === 'deck' && <DeckStats fromDate={fromDate} toDate={toDate} isTourney={isTourney} />}
         {subTab === 'nation' && <NationStats fromDate={fromDate} toDate={toDate} isTourney={isTourney} />}

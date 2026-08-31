@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import type { GameSummary } from '../../api/types';
 import { pathForGame } from '../../routes';
+import { Panel } from '../../components/ui/Panel';
 
 const TIMESTAMP_FORMAT = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'UTC',
@@ -20,6 +21,9 @@ const TIMESTAMP_FORMAT = new Intl.DateTimeFormat('en-GB', {
 // games already in the list.
 const ACTIVE_GAMES_POLL_MS = 20_000;
 
+const TH = 'jt:sticky jt:top-0 jt:bg-panel jt:text-left jt:font-semibold jt:text-ink-muted jt:px-3 jt:py-1.5 jt:border-b jt:border-line';
+const TD = 'jt:px-3 jt:py-1 jt:border-b jt:border-line/50 jt:text-ink';
+
 export function ActiveGamesTab() {
   const { data: games = [] } = useQuery({
     queryKey: ['watch', 'active'],
@@ -28,32 +32,31 @@ export function ActiveGamesTab() {
   });
 
   return (
-    <div className="card shadow flex-fill d-flex flex-column min-h-0">
-      <div className="card-header bg-body-secondary d-flex justify-content-between align-items-center">
-        <span className="fw-semibold">Active Games</span>
-      </div>
-      <div className="flex-fill min-h-0" style={{ overflowY: 'auto', overflowX: 'clip' }}>
-        <table className="table table-sm table-hover mb-0">
+    <Panel title="Active Games">
+      <div className="jt:flex-1 jt:min-h-0 jt:overflow-auto">
+        <table className="jt:w-full jt:text-sm">
           <thead>
             <tr>
-              <th>Game</th>
-              <th>Current Turn</th>
-              <th>Updated</th>
+              <th className={TH}>Game</th>
+              <th className={TH}>Current Turn</th>
+              <th className={TH}>Updated</th>
             </tr>
           </thead>
           <tbody>
             {games.map((g) => (
-              <tr key={g.gameId}>
-                <td>
-                  <Link to={pathForGame(g.gameId)}>{g.gameName}</Link>
+              <tr key={g.gameId} className="jt:hover:bg-hover">
+                <td className={TD}>
+                  <Link to={pathForGame(g.gameId)} className="jt:text-accent jt:underline">
+                    {g.gameName}
+                  </Link>
                 </td>
-                <td>{g.turn}</td>
-                <td>{TIMESTAMP_FORMAT.format(new Date(g.timestamp))} UTC</td>
+                <td className={TD}>{g.turn}</td>
+                <td className={TD}>{TIMESTAMP_FORMAT.format(new Date(g.timestamp))} UTC</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </div>
+    </Panel>
   );
 }

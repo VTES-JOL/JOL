@@ -38,7 +38,10 @@ function SyntaxLine({ syntax }: { syntax: string }) {
       {tokenizeSyntax(syntax).map((token, i) => {
         const isPlaceholder = token.startsWith('[') && token.endsWith(']');
         return isPlaceholder ? (
-          <span key={i} className="badge rounded-pill text-bg-secondary fw-normal help-command-placeholder">
+          <span
+            key={i}
+            className="help-command-placeholder jt:inline-flex jt:items-center jt:rounded-full jt:bg-hover jt:text-ink-secondary jt:px-2 jt:py-0.5"
+          >
             {token.slice(1, -1)}
           </span>
         ) : (
@@ -65,17 +68,17 @@ export function CommandDoc({ name, syntax, description, children }: CommandDocPr
   const examples = childrenOfType(children, CommandExample);
 
   return (
-    <section className="help-command my-4">
-      <h3 className="h5 mb-2">{name}</h3>
+    <section className="help-command jt:my-4">
+      <h3 className="jt:text-[1.05rem] jt:font-semibold jt:mb-2">{name}</h3>
       <SyntaxLine syntax={syntax} />
-      <p className="text-body-secondary mt-2 mb-3">{description}</p>
+      <p className="jt:text-ink-secondary jt:mt-2 jt:mb-3">{description}</p>
       {options.length > 0 && (
-        <div className="mb-3">
+        <div className="jt:mb-3">
           <div className="help-command-heading">Options</div>
           {options.map((option, i) => (
             <div key={i} className="help-command-row">
               <span className="help-command-row-label">{option.props.name}</span>
-              <span className="small">{option.props.children}</span>
+              <span className="jt:text-sm">{option.props.children}</span>
             </div>
           ))}
         </div>
@@ -86,7 +89,7 @@ export function CommandDoc({ name, syntax, description, children }: CommandDocPr
           {examples.map((example, i) => (
             <div key={i} className="help-command-row">
               <code className="help-command-row-label">{example.props.cmd}</code>
-              <span className="small text-body-secondary">{example.props.children}</span>
+              <span className="jt:text-sm jt:text-ink-secondary">{example.props.children}</span>
             </div>
           ))}
         </div>

@@ -1,7 +1,8 @@
 /* Chat rendering — primarily this component's own markup, but .chat-mention
    and .chat-timestamp are also targeted by server-generated chat HTML
    (chatFormatting.ts's highlightMentions(), and GameChatLog.tsx's own
-   rendering), so these class names stay global rather than component-scoped. */
+   rendering), so these class names stay global rather than component-scoped.
+   Colours are on --jt-* tokens so the log flips with dark mode. */
 
 #globalChatOutput {
     min-height: 0;
@@ -9,42 +10,46 @@
 }
 
 .hover-success:hover {
-    background-color: mediumseagreen !important;
+    background-color: var(--jt-online) !important;
+    color: var(--jt-surface);
 }
 
 p.chat {
     margin: 0;
+    color: var(--jt-ink);
 }
 
 p.chat a {
     display: inline;
-    padding: 0.1rem 0.3rem 0.1rem 0.3rem;
+    padding: 0.1rem 0.3rem;
     border-radius: 0.4rem;
-    background-color: #ddd;
+    background-color: var(--jt-hover);
 }
 
 .chat-day-break {
-    height: .9rem;
-    margin-bottom: .6rem;
-    margin-top: -.3rem;
-    border-bottom: 1px solid var(--jol-day-break-border);
+    height: 0.9rem;
+    margin-bottom: 0.6rem;
+    margin-top: -0.3rem;
+    border-bottom: 1px solid var(--jt-line);
     text-align: center;
 }
 
 .chat-day-label {
-    font-size: .8rem;
-    background-color: var(--jol-day-label-bg);
-    padding: 0 .5rem;
-    color: var(--jol-day-label-color);
+    font-size: 0.8rem;
+    background-color: var(--jt-base);
+    padding: 0 0.5rem;
+    color: var(--jt-ink-muted);
     font-weight: bold;
 }
 
 .chat-mention {
-    background-color: var(--jol-mention-bg);
-    color: var(--jol-mention-fg);
+    background-color: color-mix(in oklab, var(--jt-arcane) 22%, transparent);
+    color: var(--jt-ink);
+    border-radius: 0.2rem;
+    padding: 0 0.15rem;
 }
 
 .chat-timestamp {
-    color: #888;
+    color: var(--jt-ink-muted);
     font-size: smaller;
 }

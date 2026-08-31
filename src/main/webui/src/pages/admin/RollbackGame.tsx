@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { Card, CardHeader, CardTitle, CardBody } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
 import { api } from '../../api/client';
 import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
@@ -31,11 +32,11 @@ export function RollbackGame() {
   };
 
   return (
-    <Card className="mt-2">
+    <Card>
       <CardHeader>
         <CardTitle>Rollback Game</CardTitle>
       </CardHeader>
-      <div className="card-body">
+      <CardBody className="jt:flex jt:flex-col jt:gap-2 jt:items-start">
         <AdminSelect id="rollbackGamesList" label="Games" value={gameId} onChange={setGameId} options={gameOptions} />
         <AdminSelect
           id="rollbackTurnsList"
@@ -44,10 +45,10 @@ export function RollbackGame() {
           onChange={setTurn}
           options={toOptions(turns)}
         />
-        <button onClick={submit} className="btn btn-outline-secondary btn-sm mt-2">
+        <Button variant="secondary" size="sm" onClick={submit}>
           Rollback Game
-        </button>
-      </div>
+        </Button>
+      </CardBody>
     </Card>
   );
 }

@@ -1,7 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
+import { Download } from 'lucide-react';
 import { api } from '../../api/client';
 import type { GameHistory } from '../../api/types';
 import { runRequest } from '../../api/mutate';
+import { Panel } from '../../components/ui/Panel';
+import { Button } from '../../components/ui/Button';
 
 const DATE_FORMAT = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'UTC',
@@ -24,6 +27,9 @@ function downloadCsv(data: string, filename: string) {
   URL.revokeObjectURL(url);
 }
 
+const TH = 'jt:sticky jt:top-0 jt:bg-panel jt:text-left jt:font-semibold jt:text-ink-muted jt:px-3 jt:py-1.5 jt:border-b jt:border-line';
+const TD = 'jt:px-3 jt:py-1 jt:text-ink jt:align-top';
+
 export function PastGamesTab() {
   const { data: history = [] } = useQuery({
     queryKey: ['watch', 'history'],
@@ -35,21 +41,24 @@ export function PastGamesTab() {
   };
 
   return (
-    <div className="card shadow flex-fill d-flex flex-column min-h-0">
-      <div className="card-header bg-body-secondary d-flex justify-content-between align-items-center">
-        <span className="fw-semibold">Past Games</span>
-        <button className="btn btn-outline-secondary btn-sm" onClick={exportCsv}>
-          Export CSV <i className="bi-download" />
-        </button>
-      </div>
-      <div className="flex-fill min-h-0" style={{ overflowY: 'auto', overflowX: 'clip' }}>
-        <table className="table table-sm table-hover mb-0">
+    <Panel
+      title="Past Games"
+      right={
+        <Button variant="secondary" size="sm" icon={<Download size={14} />} onClick={exportCsv}>
+          Export CSV
+        </Button>
+      }
+    >
+      <div className="jt:flex-1 jt:min-h-0 jt:overflow-auto">
+        <table className="jt:w-full jt:text-sm">
           <thead>
             <tr>
-              <th>Game</th>
-              <th>Started</th>
-              <th>Ended</th>
-              <th colSpan={3}>Results</th>
+              <th className={TH}>Game</th>
+              <th className={TH}>Started</th>
+              <th className={TH}>Ended</th>
+              <th className={TH} colSpan={3}>
+                Results
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -57,18 +66,26 @@ export function PastGamesTab() {
               g.results.map((r, i) => (
                 <tr
                   key={`${g.name}-${r.playerName}`}
-                  className={i === 0 ? 'border-3 border-top border-bottom-0 border-start-0 border-end-0' : 'border-top'}
+                  className={i === 0 ? 'jt:border-t-2 jt:border-line' : 'jt:border-t jt:border-line/40'}
                 >
                   {i === 0 && (
                     <>
-                      <td rowSpan={g.results.length}>{g.name}</td>
-                      <td rowSpan={g.results.length}>{DATE_FORMAT.format(new Date(g.started))} UTC</td>
-                      <td rowSpan={g.results.length}>{DATE_FORMAT.format(new Date(g.ended))} UTC</td>
+                      <td className={TD} rowSpan={g.results.length}>
+                        {g.name}
+                      </td>
+                      <td className={TD} rowSpan={g.results.length}>
+                        {DATE_FORMAT.format(new Date(g.started))} UTC
+                      </td>
+                      <td className={TD} rowSpan={g.results.length}>
+                        {DATE_FORMAT.format(new Date(g.ended))} UTC
+                      </td>
                     </>
                   )}
-                  <td>{r.playerName}</td>
-                  <td>{r.deckName.length > 50 ? `${r.deckName.slice(0, 50)}...` : r.deckName}</td>
-                  <td>
+                  <td className={`${TD} jt:py-1`}>{r.playerName}</td>
+                  <td className={`${TD} jt:py-1`}>
+                    {r.deckName.length > 50 ? `${r.deckName.slice(0, 50)}...` : r.deckName}
+                  </td>
+                  <td className={`${TD} jt:py-1`}>
                     {r.victoryPoints} VP
                     {r.gameWin ? ', 1 GW' : ''}
                   </td>
@@ -78,6 +95,6 @@ export function PastGamesTab() {
           </tbody>
         </table>
       </div>
-    </div>
+    </Panel>
   );
 }

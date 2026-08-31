@@ -76,7 +76,7 @@ export function PersonalStats({ player, ...filters }: PersonalProps) {
   return (
     <div>
       <TabBar tabs={SUB_TABS} active={subTab} onChange={setSubTab} className="mt-3" />
-      <div className="tab-content mt-3">
+      <div className="jt:mt-3">
         {subTab === 'opponent' ? (
           <OpponentPerformance player={player} {...filters} />
         ) : (

@@ -1,6 +1,9 @@
-/* Help prose column, rendered from content/help/*.mdx by HelpSection.tsx */
+/* Help prose column, rendered from content/help/*.mdx by HelpSection.tsx.
+   Styles MDX-generated elements (h1/h2/h3/p/li), so it stays CSS rather
+   than jt: utilities. Tokens from styles/tailwind.css. */
 .help-prose {
     max-width: 46rem;
+    color: var(--jt-ink);
 }
 
 .help-prose h1 {
@@ -9,7 +12,7 @@
 }
 
 .help-prose .help-lede {
-    color: var(--bs-secondary-color);
+    color: var(--jt-ink-muted);
     margin-bottom: 1.5rem;
 }
 
@@ -17,7 +20,7 @@
     font-size: 1.25rem;
     margin-top: 2rem;
     padding-top: 1rem;
-    border-top: 1px solid var(--bs-border-color-translucent);
+    border-top: 1px solid var(--jt-line);
 }
 
 .help-prose > *:first-child {
@@ -41,7 +44,7 @@
    have anywhere else in the app — first-time readers have no other cue that
    a name is a live, hoverable image preview rather than plain text. */
 .help-prose a.card-name {
-    border-bottom: 1px dotted var(--bs-secondary-color);
+    border-bottom: 1px dotted var(--jt-ink-muted);
     cursor: help;
 }
 

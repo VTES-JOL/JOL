@@ -1,4 +1,6 @@
-/* Help route layout: sidebar (desktop) / accordion toggle (mobile) */
+/* Help route layout: sidebar (desktop) / accordion toggle (mobile).
+   Tokens come from styles/tailwind.css (--jt-*), so this flips with dark
+   mode like the rest of the migrated app. */
 .help-layout {
     display: flex;
     flex-direction: column;
@@ -6,6 +8,8 @@
     min-height: 0;
     gap: 1rem;
     padding: 1rem;
+    background-color: var(--jt-base);
+    color: var(--jt-ink);
 }
 
 .help-sidebar {
@@ -23,18 +27,20 @@
     flex-direction: column;
     padding: 0.6rem 0.75rem;
     border-radius: 0.375rem;
-    color: var(--bs-body-color);
+    color: var(--jt-ink-secondary);
     text-decoration: none;
     border: 1px solid transparent;
 }
 
 .help-nav-link:hover {
-    background-color: var(--bs-secondary-bg);
+    background-color: var(--jt-hover);
+    color: var(--jt-ink);
 }
 
 .help-nav-link.active {
-    background-color: var(--bs-primary-bg-subtle);
-    border-color: var(--bs-primary-border-subtle);
+    background-color: color-mix(in oklab, var(--jt-accent) 12%, transparent);
+    border-color: var(--jt-line-accent);
+    color: var(--jt-ink);
 }
 
 .help-nav-title {
@@ -44,7 +50,7 @@
 
 .help-nav-summary {
     font-size: 0.8125rem;
-    color: var(--bs-secondary-color);
+    color: var(--jt-ink-muted);
 }
 
 .help-content {

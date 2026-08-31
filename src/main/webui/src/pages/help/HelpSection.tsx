@@ -4,7 +4,7 @@ import type { MDXProps } from 'mdx/types';
 import { HELP_SECTIONS } from '../../content/help/meta';
 import { helpMdxComponents } from './mdxComponents';
 import { useCardTooltips } from '../../hooks/useCardTooltips';
-import { PageLoading } from '../../components/PageLoading';
+import { Spinner } from '../../components/ui/Spinner';
 import { pathForHelp } from '../../routes';
 import './HelpSection.css';
 
@@ -57,7 +57,7 @@ export function HelpSection() {
   if (!isKnownSection || !section) return <Navigate to={pathForHelp(HELP_SECTIONS[0].slug)} replace />;
 
   return (
-    <Suspense fallback={<PageLoading />}>
+    <Suspense fallback={<Spinner />}>
       <HelpContentBody section={section} Content={lazyContentFor(section)} />
     </Suspense>
   );

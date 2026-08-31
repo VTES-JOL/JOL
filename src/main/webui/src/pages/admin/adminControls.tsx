@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../api/client';
+import { Select } from '../../components/ui/Select';
 
 export interface Option {
   value: string;
@@ -39,21 +40,16 @@ interface AdminSelectProps {
   options: readonly Option[];
 }
 
-/** Labelled Bootstrap `<select>` — the `<label class="form-label"> + <select
- *  class="form-select">` pair repeated across the admin cards. */
+/** Labelled `<select>` for the admin cards — thin wrapper over the Tailwind
+ *  `ui/Select` that takes an `Option[]` instead of `<option>` children. */
 export function AdminSelect({ id, label, value, onChange, options }: AdminSelectProps) {
   return (
-    <>
-      <label htmlFor={id} className="form-label">
-        {label}
-      </label>
-      <select id={id} className="form-select" value={value} onChange={(e) => onChange(e.target.value)}>
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-    </>
+    <Select id={id} label={label} value={value} onChange={(e) => onChange(e.target.value)}>
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </Select>
   );
 }

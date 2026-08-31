@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent } from 'react';
-import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { Card, CardHeader, CardTitle, CardBody } from '../../components/ui/Card';
+import { Switch } from '../../components/ui/Switch';
 import { api } from '../../api/client';
 import type { Profile } from '../../api/types';
 import { isPushSupported, subscribeToPush, unsubscribeFromPush } from '../../push/pushNotifications';
@@ -45,52 +46,40 @@ export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (
   };
 
   return (
-    <Card className="mb-2" style={{ overflow: 'visible' }}>
+    <Card>
       <CardHeader>
         <CardTitle>Preferences</CardTitle>
       </CardHeader>
-      <div className="card-body" id="playerPreferences">
-        <div className="form-check form-switch">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            role="switch"
-            id="imageTooltips"
-            checked={profile.imageTooltipPreference}
-            onChange={toggleImageTooltips}
-          />
-          <label className="form-check-label" htmlFor="imageTooltips">
-            Enable Image tooltips
-          </label>
-        </div>
-        <div className="d-flex justify-content-start align-items-center">
+      <CardBody className="jt:flex jt:flex-col jt:gap-3" id="playerPreferences">
+        <Switch
+          id="imageTooltips"
+          label="Enable Image tooltips"
+          checked={profile.imageTooltipPreference}
+          onChange={toggleImageTooltips}
+        />
+
+        <div className="jt:flex jt:items-center jt:gap-2">
           <input
             type="color"
             id="edgecolorpicker"
-            style={{ width: '8%' }}
+            className="jt:h-7 jt:w-10 jt:rounded jt:border jt:border-line jt:bg-transparent jt:cursor-pointer"
             value={profile.edgeColor ?? '#000000'}
             onChange={setEdgeColor}
           />
-          <label className="form-check-label m-1" htmlFor="edgecolorpicker">
+          <label htmlFor="edgecolorpicker" className="jt:text-sm jt:text-ink">
             Choose Edge Color
           </label>
         </div>
-        <div className="form-check form-switch">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            role="switch"
-            id="enableNotifications"
-            checked={profile.notificationsEnabled}
-            disabled={!pushSupported || notificationsBusy}
-            title={pushSupported ? undefined : 'Notifications are not supported in this browser.'}
-            onChange={toggleNotifications}
-          />
-          <label className="form-check-label" htmlFor="enableNotifications">
-            Enable notifications
-          </label>
-        </div>
-      </div>
+
+        <Switch
+          id="enableNotifications"
+          label="Enable notifications"
+          checked={profile.notificationsEnabled}
+          disabled={!pushSupported || notificationsBusy}
+          title={pushSupported ? undefined : 'Notifications are not supported in this browser.'}
+          onChange={toggleNotifications}
+        />
+      </CardBody>
     </Card>
   );
 }

@@ -1,9 +1,10 @@
-import {useEffect, useRef, useState} from 'react';
-import {api} from '../../api/client';
-import type {UserSummary} from '../../api/types';
-import {Card, CardHeader, CardTitle} from '../../components/Card';
-import {CountryFlag} from '../../components/CountryFlag';
-import {useSimpleTooltips} from '../../hooks/useSimpleTooltips';
+import { useEffect, useRef, useState } from 'react';
+import { History, ShieldCheck, Gavel } from 'lucide-react';
+import { api } from '../../api/client';
+import type { UserSummary } from '../../api/types';
+import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
+import { CountryFlag } from '../../components/CountryFlag';
+import { useSimpleTooltips } from '../../hooks/useSimpleTooltips';
 import './OnlineUsers.css';
 
 // No WS scope for this one, deliberately — "online" (PlayerService.activeUsers())
@@ -15,70 +16,67 @@ const REFRESH_INTERVAL_MS = 60_000;
 const OFFLINE_THRESHOLD_MINUTES = 60;
 
 const LAST_ONLINE_FORMAT = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'UTC',
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZoneName: 'short',
+  timeZone: 'UTC',
+  day: 'numeric',
+  month: 'short',
+  hour: '2-digit',
+  minute: '2-digit',
+  timeZoneName: 'short',
 });
 
 function minutesSince(timestamp: string): number {
-    return (Date.now() - new Date(timestamp).getTime()) / 60_000;
+  return (Date.now() - new Date(timestamp).getTime()) / 60_000;
 }
 
-function UserRow({user}: { user: UserSummary }) {
-    const isOffline = minutesSince(user.lastOnline) > OFFLINE_THRESHOLD_MINUTES;
-    return (
-        <div className="online-player-row">
-            {user.country && <CountryFlag code={user.country} />}
-            <span className="flex-grow-1 text-truncate">{user.name}</span>
-            {user.roles.includes('ADMIN') && (
-                <i data-tippy-content="Administrator" className="bi bi-star-fill text-warning"/>
-            )}
-            {user.roles.includes('JUDGE') && (
-                <i data-tippy-content="Judge" className="bi bi-person-raised-hand text-success"/>
-            )}
-            {isOffline && (
-                <i
-                    data-tippy-content={`Last Online: ${LAST_ONLINE_FORMAT.format(new Date(user.lastOnline))}`}
-                    className="bi bi-clock-history text-muted"
-                />
-            )}
-        </div>
-    );
+function UserRow({ user }: { user: UserSummary }) {
+  const isOffline = minutesSince(user.lastOnline) > OFFLINE_THRESHOLD_MINUTES;
+  return (
+    <div className="online-player-row jt:text-sm jt:text-ink">
+      {user.country && <CountryFlag code={user.country} />}
+      <span className="jt:flex-1 jt:truncate">{user.name}</span>
+      {user.roles.includes('ADMIN') && (
+        <ShieldCheck size={14} data-tippy-content="Administrator" className="jt:text-gold" />
+      )}
+      {user.roles.includes('JUDGE') && <Gavel size={14} data-tippy-content="Judge" className="jt:text-online" />}
+      {isOffline && (
+        <History
+          size={14}
+          data-tippy-content={`Last Online: ${LAST_ONLINE_FORMAT.format(new Date(user.lastOnline))}`}
+          className="jt:text-ink-muted"
+        />
+      )}
+    </div>
+  );
 }
 
 export function OnlineUsers() {
-    const [users, setUsers] = useState<UserSummary[]>([]);
-    const listRef = useRef<HTMLDivElement>(null);
+  const [users, setUsers] = useState<UserSummary[]>([]);
+  const listRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const refresh = () => {
-            api
-                .get<UserSummary[]>('/main/online')
-                .then(setUsers)
-                .catch((err) => console.error('Failed to load /main/online', err));
-        };
-        refresh();
-        const interval = setInterval(refresh, REFRESH_INTERVAL_MS);
-        return () => clearInterval(interval);
-    }, []);
+  useEffect(() => {
+    const refresh = () => {
+      api
+        .get<UserSummary[]>('/main/online')
+        .then(setUsers)
+        .catch((err) => console.error('Failed to load /main/online', err));
+    };
+    refresh();
+    const interval = setInterval(refresh, REFRESH_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, []);
 
-    useSimpleTooltips(listRef, [users]);
+  useSimpleTooltips(listRef, [users]);
 
-    return (
-        <Card className="overflow-y-auto">
-            <CardHeader>
-                <CardTitle>Online ({users.length})</CardTitle>
-            </CardHeader>
-            <div ref={listRef} className="overflow-y-auto">
-                <div className="card-body p-1">
-                    {users.map((user) => (
-                        <UserRow key={user.name} user={user}/>
-                    ))}
-                </div>
-            </div>
-        </Card>
-    );
+  return (
+    <Card className="jt:flex jt:flex-col jt:min-h-0 jt:overflow-hidden">
+      <CardHeader>
+        <CardTitle>Online ({users.length})</CardTitle>
+      </CardHeader>
+      <div ref={listRef} className="jt:overflow-y-auto jt:p-1">
+        {users.map((user) => (
+          <UserRow key={user.name} user={user} />
+        ))}
+      </div>
+    </Card>
+  );
 }

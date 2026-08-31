@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { Card, CardHeader, CardTitle, CardBody } from '../../components/ui/Card';
+import { Input } from '../../components/ui/Input';
+import { Select } from '../../components/ui/Select';
+import { Button } from '../../components/ui/Button';
+import { FieldHint, InlineAlert } from '../../components/ui/FormFeedback';
 import { api } from '../../api/client';
 import type { CountryOption, Profile } from '../../api/types';
 
@@ -44,29 +48,23 @@ export function ProfileEditor({
   };
 
   return (
-    <Card className="mb-2">
+    <Card>
       <CardHeader>
         <CardTitle>Profile</CardTitle>
       </CardHeader>
-      <div className="card-body">
-        <label htmlFor="profileEmail" className="form-label">
-          E-mail Address
-        </label>
-        <input
+      <CardBody className="jt:flex jt:flex-col jt:gap-3">
+        <Input
           type="email"
           id="profileEmail"
-          className="form-control"
+          label="E-mail Address"
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <label htmlFor="profileCountry" className="form-label">
-          Country
-        </label>
-        <select
+        <Select
           id="profileCountry"
-          className="form-select"
+          label="Country"
           value={country}
           onChange={(e) => setCountry(e.target.value)}
         >
@@ -76,63 +74,59 @@ export function ProfileEditor({
               {c.name}
             </option>
           ))}
-        </select>
+        </Select>
 
-        <label htmlFor="veknID" className="form-label mt-2">
-          VEKN ID
-        </label>
-        <input
-          type="text"
-          id="veknID"
-          className="form-control"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          aria-describedby="veknIdHelp"
-          value={veknID}
-          onChange={(e) => setVeknID(digitsOnly(e.target.value))}
-        />
-        <div className="form-text" id="veknIdHelp">
-          Link your account to your VEKN ID in order to be able to play sanctioned tournaments.
+        <div>
+          <Input
+            type="text"
+            id="veknID"
+            label="VEKN ID"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            aria-describedby="veknIdHelp"
+            value={veknID}
+            onChange={(e) => setVeknID(digitsOnly(e.target.value))}
+          />
+          <FieldHint id="veknIdHelp">
+            Link your account to your VEKN ID in order to be able to play sanctioned tournaments.
+          </FieldHint>
         </div>
 
-        <label htmlFor="discordID" className="form-label mt-2">
-          Discord User ID
-        </label>
-        <input
-          type="text"
-          id="discordID"
-          className="form-control"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          aria-describedby="discordIdHelp"
-          value={discordID}
-          onChange={(e) => setDiscordID(digitsOnly(e.target.value))}
-        />
-        <div className="form-text" id="discordIdHelp">
-          Link your account below to receive pings in Discord. Install the Discord app and enable push notifications
-          to receive pings on your phone.
-          <i> Pro tip: </i> Disable sound notifications for the Discord app to receive the visual banners without the
-          pestering dings or vibrations.{' '}
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-"
-          >
-            This article
-          </a>{' '}
-          explains how to get your user ID from Discord.
+        <div>
+          <Input
+            type="text"
+            id="discordID"
+            label="Discord User ID"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            aria-describedby="discordIdHelp"
+            value={discordID}
+            onChange={(e) => setDiscordID(digitsOnly(e.target.value))}
+          />
+          <FieldHint id="discordIdHelp">
+            Link your account below to receive pings in Discord. Install the Discord app and enable push
+            notifications to receive pings on your phone. <i>Pro tip:</i> Disable sound notifications for the Discord
+            app to receive the visual banners without the pestering dings or vibrations.{' '}
+            <a
+              className="jt:text-accent jt:underline"
+              target="_blank"
+              rel="noreferrer"
+              href="https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-"
+            >
+              This article
+            </a>{' '}
+            explains how to get your user ID from Discord.
+          </FieldHint>
         </div>
 
-        <button id="updateProfileButton" className="btn btn-outline-secondary btn-sm mt-2" onClick={submit}>
-          Update Profile
-        </button>
-        {status === 'saved' && <div id="profileUpdateResult" className="alert alert-success py-2 mt-2 mb-0">Done!</div>}
-        {status === 'error' && (
-          <div id="profileUpdateResult" className="alert alert-danger py-2 mt-2 mb-0">
-            An error occurred
-          </div>
-        )}
-      </div>
+        <div className="jt:flex jt:flex-col jt:gap-2 jt:items-start">
+          <Button id="updateProfileButton" variant="secondary" size="sm" onClick={submit}>
+            Update Profile
+          </Button>
+          {status === 'saved' && <InlineAlert kind="success">Done!</InlineAlert>}
+          {status === 'error' && <InlineAlert kind="danger">An error occurred</InlineAlert>}
+        </div>
+      </CardBody>
     </Card>
   );
 }

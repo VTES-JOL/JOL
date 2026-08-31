@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { useQuery } from '@tanstack/react-query';
+import { Plus, X } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardBody } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
 import { api } from '../../api/client';
 import type { UserRole } from '../../api/types';
+import { useInvalidate } from '../../api/useInvalidate';
 import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
 import { adminTimestamp } from './adminFormatting';
+import { AdminSelect, toOptions } from './adminControls';
 
-const ROLES: { value: string; label: string }[] = [
+const ROLES = [
   { value: 'JUDGE', label: 'Judge' },
   { value: 'SUPER_USER', label: 'Super User' },
   { value: 'ADMIN', label: 'Admin' },
@@ -17,14 +21,14 @@ const ROLES: { value: string; label: string }[] = [
 
 // Column order matches player-roles.jsp's table header.
 const COLUMNS = ['JUDGE', 'SUPER_USER', 'PLAYTESTER', 'ADMIN', 'TOURNAMENT_ADMIN'];
+const USER_ROLES_KEY = ['admin-page', 'user-roles'];
 
 export function PlayerRoles() {
-  const queryClient = useQueryClient();
   const [player, setPlayer] = useState('');
   const [role, setRole] = useState(ROLES[0].value);
 
   const { data: userRoles = [] } = useQuery({
-    queryKey: ['admin-page', 'user-roles'],
+    queryKey: USER_ROLES_KEY,
     queryFn: () => api.get<UserRole[]>('/admin-page/user-roles'),
   });
   // Same source as the replace-player dropdown — TanStack Query dedupes the
@@ -40,7 +44,7 @@ export function PlayerRoles() {
     if (!player && substitutes.length > 0) setPlayer(substitutes[0]);
   }, [substitutes, player]);
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin-page', 'user-roles'] });
+  const refresh = useInvalidate(USER_ROLES_KEY);
 
   const toggleRole = async (targetPlayer: string, targetRole: string, hasRole: boolean) => {
     if (hasRole && !(await confirmDialog('Are you sure you want to remove this role?'))) return;
@@ -57,79 +61,54 @@ export function PlayerRoles() {
   };
 
   return (
-    <Card className="mt-2">
+    <Card>
       <CardHeader>
         <CardTitle>Player Roles</CardTitle>
       </CardHeader>
-      <div className="card-body pb-2">
-        <div className="d-flex gap-2 align-items-end">
-          <div className="flex-grow-1">
-            <label htmlFor="adminPlayerList" className="form-label mb-1">
-              Player
-            </label>
-            <select
-              id="adminPlayerList"
-              className="form-select form-select-sm"
-              value={player}
-              onChange={(e) => setPlayer(e.target.value)}
-            >
-              {substitutes.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex-grow-1">
-            <label htmlFor="adminRoleList" className="form-label mb-1">
-              Role
-            </label>
-            <select
-              id="adminRoleList"
-              className="form-select form-select-sm"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-            >
-              {ROLES.map((r) => (
-                <option key={r.value} value={r.value}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button onClick={addRole} className="btn btn-outline-secondary btn-sm">
-            Add
-          </button>
+      <CardBody className="jt:flex jt:gap-2 jt:items-end">
+        <div className="jt:flex-1">
+          <AdminSelect id="adminPlayerList" label="Player" value={player} onChange={setPlayer} options={toOptions(substitutes)} />
         </div>
-      </div>
-      <div className="scrollable mhd-70" style={{ overflowX: 'auto' }}>
-        <table className="table table-sm table-hover mb-0">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Last Online</th>
-              <th>Judge</th>
-              <th>Super User</th>
-              <th>Playtester</th>
-              <th>Admin</th>
-              <th>Tournament Admin</th>
+        <div className="jt:flex-1">
+          <AdminSelect id="adminRoleList" label="Role" value={role} onChange={setRole} options={ROLES} />
+        </div>
+        <Button variant="secondary" size="sm" onClick={addRole}>
+          Add
+        </Button>
+      </CardBody>
+
+      <div className="jt:overflow-auto jt:max-h-[70dvh] jt:border-t jt:border-line">
+        <table className="jt:w-full jt:text-sm">
+          <thead className="jt:sticky jt:top-0 jt:bg-panel">
+            <tr className="jt:text-left jt:text-ink-muted">
+              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Name</th>
+              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Last Online</th>
+              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Judge</th>
+              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Super User</th>
+              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Playtester</th>
+              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Admin</th>
+              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Tournament Admin</th>
             </tr>
           </thead>
           <tbody>
             {userRoles.map((u) => (
-              <tr key={u.name}>
-                <td>{u.name}</td>
-                <td>{adminTimestamp(u.lastOnline)}</td>
+              <tr key={u.name} className="jt:hover:bg-hover">
+                <td className="jt:px-2 jt:py-1 jt:border-b jt:border-line/50 jt:text-ink">{u.name}</td>
+                <td className="jt:px-2 jt:py-1 jt:border-b jt:border-line/50 jt:text-ink-secondary">
+                  {adminTimestamp(u.lastOnline)}
+                </td>
                 {COLUMNS.map((col) => {
                   const hasRole = u.roles.includes(col);
                   return (
-                    <td key={col} className="text-center">
-                      <button
-                        className="btn btn-outline-secondary btn-sm"
+                    <td key={col} className="jt:px-2 jt:py-1 jt:border-b jt:border-line/50 jt:text-center">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        aria-label={hasRole ? `Remove ${col}` : `Add ${col}`}
                         onClick={() => toggleRole(u.name, col, hasRole)}
                       >
-                        <i className={`bi bi-${hasRole ? 'x' : 'plus'}`} />
-                      </button>
+                        {hasRole ? <X size={12} /> : <Plus size={12} />}
+                      </Button>
                     </td>
                   );
                 })}

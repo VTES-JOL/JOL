@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { PlusCircle, UserPlus, X } from 'lucide-react';
 import { api } from '../../api/client';
-import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { Panel } from '../../components/ui/Panel';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Select } from '../../components/ui/Select';
+import { InlineAlert } from '../../components/ui/FormFeedback';
 
 export function GameCreateForm({ onCancel, onCreated }: { onCancel: () => void; onCreated: (gameName: string) => void }) {
   const { data: players = [] } = useQuery({
@@ -62,52 +67,44 @@ export function GameCreateForm({ onCancel, onCreated }: { onCancel: () => void; 
   };
 
   return (
-    <Card className="flex-fill d-flex flex-column">
-      <CardHeader className="d-flex justify-content-between align-items-center">
-        <CardTitle>New Game</CardTitle>
-        <button className="btn btn-sm btn-outline-secondary" onClick={onCancel}>
+    <Panel
+      title="New Game"
+      right={
+        <Button variant="ghost" size="sm" onClick={onCancel}>
           Cancel
-        </button>
-      </CardHeader>
-      <div className="card-body p-3 overflow-auto min-h-0">
-        <div className="mb-3">
-          <label className="form-label">Name</label>
-          <input
-            type="text"
-            className="form-control"
-            maxLength={60}
-            placeholder="Game name (no ' or &quot; characters)"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Visibility</label>
-          <select
-            className="form-select"
-            value={visibility}
-            onChange={(e) => setVisibility(e.target.value as 'PRIVATE' | 'PUBLIC')}
-          >
-            <option value="PRIVATE">Private</option>
-            <option value="PUBLIC">Public</option>
-          </select>
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Format</label>
-          <select className="form-select" value={format || gameFormats[0] || ''} onChange={(e) => setFormat(e.target.value)}>
-            {gameFormats.map((f) => (
-              <option key={f} value={f}>
-                {f}
-              </option>
-            ))}
-          </select>
-        </div>
+        </Button>
+      }
+    >
+      <div className="jt:flex-1 jt:min-h-0 jt:overflow-y-auto jt:p-4 jt:flex jt:flex-col jt:gap-3">
+        <Input
+          label="Name"
+          maxLength={60}
+          placeholder="Game name (no ' or &quot; characters)"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <Select
+          label="Visibility"
+          value={visibility}
+          onChange={(e) => setVisibility(e.target.value as 'PRIVATE' | 'PUBLIC')}
+        >
+          <option value="PRIVATE">Private</option>
+          <option value="PUBLIC">Public</option>
+        </Select>
+        <Select label="Format" value={format || gameFormats[0] || ''} onChange={(e) => setFormat(e.target.value)}>
+          {gameFormats.map((f) => (
+            <option key={f} value={f}>
+              {f}
+            </option>
+          ))}
+        </Select>
+
         {visibility === 'PRIVATE' && (
-          <div className="mb-3">
-            <label className="form-label">Invite Players</label>
-            <div className="d-flex gap-2 mb-2">
-              <input
-                className="form-control"
+          <div>
+            <label className="jt:block jt:text-xs jt:text-ink-muted jt:mb-1">Invite Players</label>
+            <div className="jt:flex jt:gap-2 jt:mb-2">
+              <Input
+                srLabel="Player name"
                 list="lobby-players"
                 placeholder="Start typing a player name"
                 value={inviteInput}
@@ -121,30 +118,30 @@ export function GameCreateForm({ onCancel, onCreated }: { onCancel: () => void; 
                   <option key={p} value={p} />
                 ))}
               </datalist>
-              <button className="btn btn-outline-secondary btn-sm text-nowrap" onClick={addInvite}>
-                Add <i className="bi-person-plus" />
-              </button>
+              <Button variant="secondary" size="sm" icon={<UserPlus size={14} />} onClick={addInvite}>
+                Add
+              </Button>
             </div>
-            <ul className="list-group list-group-flush small">
+            <ul className="jt:text-sm">
               {pendingInvites.map((p) => (
-                <li key={p} className="list-group-item d-flex justify-content-between align-items-center py-1 px-2">
+                <li key={p} className="jt:flex jt:justify-between jt:items-center jt:py-1 jt:border-b jt:border-line/50">
                   <span>{p}</span>
-                  <button
-                    type="button"
-                    className="btn-close btn-sm"
-                    aria-label="Remove"
-                    onClick={() => removeInvite(p)}
-                  />
+                  <Button variant="ghost" size="sm" aria-label="Remove" onClick={() => removeInvite(p)}>
+                    <X size={12} />
+                  </Button>
                 </li>
               ))}
             </ul>
           </div>
         )}
-        <button className="btn btn-outline-secondary" onClick={create}>
-          Create Game <i className="bi-plus-circle" />
-        </button>
-        <span className="text-danger small ms-2">{error}</span>
+
+        <div className="jt:flex jt:items-center jt:gap-2">
+          <Button variant="secondary" size="sm" icon={<PlusCircle size={14} />} onClick={create}>
+            Create Game
+          </Button>
+          {error && <InlineAlert kind="danger">{error}</InlineAlert>}
+        </div>
       </div>
-    </Card>
+    </Panel>
   );
 }

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { Card, CardHeader, CardTitle, CardBody } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Textarea } from '../../components/ui/Textarea';
 import { api } from '../../api/client';
 import type { SiteNotes } from '../../api/types';
 import { useInvalidate } from '../../api/useInvalidate';
@@ -30,28 +32,21 @@ export function SiteNotesEditor() {
   };
 
   return (
-    <Card className="mt-2">
+    <Card>
       <CardHeader>
         <CardTitle>Site Notes</CardTitle>
       </CardHeader>
-      <div className="card-body">
-        <label htmlFor="siteNotesText" className="form-label">
-          Markdown
-        </label>
-        <textarea
-          id="siteNotesText"
-          className="form-control"
-          rows={6}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-        <button onClick={save} className="btn btn-outline-secondary btn-sm mt-2">
-          Save
-        </button>
-        <button onClick={clear} className="btn btn-outline-danger btn-sm mt-2">
-          Clear
-        </button>
-      </div>
+      <CardBody className="jt:flex jt:flex-col jt:gap-2">
+        <Textarea id="siteNotesText" label="Markdown" rows={6} value={text} onChange={(e) => setText(e.target.value)} />
+        <div className="jt:flex jt:gap-2">
+          <Button variant="secondary" size="sm" onClick={save}>
+            Save
+          </Button>
+          <Button variant="danger" size="sm" onClick={clear}>
+            Clear
+          </Button>
+        </div>
+      </CardBody>
     </Card>
   );
 }

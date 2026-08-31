@@ -1,29 +1,32 @@
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
+import { ChevronDown } from 'lucide-react';
 import { HELP_SECTIONS } from '../content/help/meta';
 import { pathForHelp } from '../routes';
 import './HelpPage.css';
 
 // Docs-style shell for the Help route: a section sidebar on desktop that
-// collapses into a toggleable accordion on mobile (see the Help route
-// plan's visual design direction), with the active section rendered by
-// HelpSection via <Outlet/>.
+// collapses into a toggleable accordion on mobile, with the active section
+// rendered by HelpSection via <Outlet/>.
 export function HelpPage() {
   const [navOpen, setNavOpen] = useState(false);
 
   return (
-    <div className="help-layout">
+    <div className="jt-scope help-layout">
       <aside className="help-sidebar">
         <button
-          className="btn btn-outline-secondary w-100 d-flex justify-content-between align-items-center d-lg-none"
+          className="jt:lg:hidden jt:w-full jt:flex jt:items-center jt:justify-between jt:px-3 jt:py-2 jt:rounded jt:border jt:border-line-accent jt:text-ink-secondary jt:hover:bg-hover"
           onClick={() => setNavOpen((open) => !open)}
           aria-expanded={navOpen}
           aria-controls="helpNav"
         >
           Help Sections
-          <i className={`bi ${navOpen ? 'bi-chevron-up' : 'bi-chevron-down'}`} />
+          <ChevronDown size={16} className={`jt:transition-transform ${navOpen ? 'jt:rotate-180' : ''}`} />
         </button>
-        <nav id="helpNav" className={`help-nav flex-column ${navOpen ? 'd-flex' : 'd-none'} d-lg-flex`}>
+        <nav
+          id="helpNav"
+          className={`help-nav jt:flex-col ${navOpen ? 'jt:flex' : 'jt:hidden'} jt:lg:flex`}
+        >
           {HELP_SECTIONS.map((section) => (
             <NavLink
               key={section.slug}

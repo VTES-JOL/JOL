@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { Card, CardHeader, CardTitle, CardBody } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
 import { api } from '../../api/client';
 import { runRequest } from '../../api/mutate';
 import { AdminSelect, toOptions, useAdminGames } from './adminControls';
@@ -39,11 +40,11 @@ export function ReplacePlayer() {
   };
 
   return (
-    <Card className="mt-2">
+    <Card>
       <CardHeader>
         <CardTitle>Replace Player</CardTitle>
       </CardHeader>
-      <div className="card-body">
+      <CardBody className="jt:flex jt:flex-col jt:gap-2 jt:items-start">
         <AdminSelect id="adminGameList" label="Games" value={gameId} onChange={setGameId} options={gameOptions} />
         <AdminSelect
           id="adminReplacePlayerList"
@@ -59,10 +60,10 @@ export function ReplacePlayer() {
           onChange={setPickedSubstitute}
           options={toOptions(substitutes)}
         />
-        <button onClick={submit} className="btn btn-outline-secondary btn-sm mt-2">
+        <Button variant="secondary" size="sm" onClick={submit}>
           Replace player
-        </button>
-      </div>
+        </Button>
+      </CardBody>
     </Card>
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Check, X } from 'lucide-react';
 import type { GameDuration } from '../../../api/types';
 import { SortableStatsTable, type StatsColumn } from './SortableStatsTable';
 import { useStatsQuery, type StatsFilters } from './useStatsQuery';
@@ -19,7 +20,11 @@ export function GameStats(filters: StatsFilters) {
       header: 'GW? ',
       sortMode: 'boolean',
       render: (r) =>
-        r.hasGw ? <i className="bi bi-check-circle text-success" /> : <i className="bi bi-x-circle text-danger" />,
+        r.hasGw ? (
+          <Check size={14} className="jt:inline jt:text-online" />
+        ) : (
+          <X size={14} className="jt:inline jt:text-blood-soft" />
+        ),
     },
     { key: 'vps', header: 'VPs ', sortMode: 'default' },
   ];

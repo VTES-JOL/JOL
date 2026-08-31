@@ -1,8 +1,9 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { ChevronsDown } from 'lucide-react';
 import { api } from '../../api/client';
 import type { ChatEntry } from '../../api/types';
-import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
 import { subscribe } from '../../stores/socket';
 import { useAuth } from '../../auth/useAuth';
 import { useCardTooltips } from '../../hooks/useCardTooltips';
@@ -173,11 +174,11 @@ export function GlobalChat() {
   }, [sending]);
 
   return (
-    <Card className="flex-fill d-flex flex-column" style={{ minHeight: 0 }}>
+    <Card className="jt:flex jt:flex-col jt:flex-1 jt:min-h-0 jt:overflow-hidden">
       <CardHeader>
         <CardTitle>Global Chat</CardTitle>
       </CardHeader>
-      <div className="card-body position-relative flex-fill d-flex flex-column p-2" style={{ minHeight: 0 }}>
+      <div className="jt:relative jt:flex jt:flex-col jt:flex-1 jt:min-h-0 jt:p-2">
         {/*
           overflowY/minHeight inline as well as in the co-located
           #globalChatOutput rule (GlobalChat.css) — belt-and-braces so the
@@ -189,7 +190,7 @@ export function GlobalChat() {
         <div
           id="globalChatOutput"
           ref={outputRef}
-          className="flex-fill"
+          className="jt:flex-1"
           style={{ minHeight: 0, overflowY: 'auto' }}
           onScroll={handleScroll}
         >
@@ -200,7 +201,7 @@ export function GlobalChat() {
                   <span className="chat-day-label">{day}</span>
                 </div>
               )}
-              <p className={`chat${isMention ? ' bg-warning-subtle rounded px-1' : ''}`}>
+              <p className={`chat${isMention ? ' jt:bg-arcane/10 jt:rounded jt:px-1' : ''}`}>
                 <span className="chat-timestamp" title={localTimeTitle(entry.timestamp)}>
                   {utcTime(entry.timestamp)}
                 </span>
@@ -214,18 +215,20 @@ export function GlobalChat() {
           ))}
         </div>
         <div
-          className={`text-center p-2 text-bg-success rounded hover-success position-absolute d-${hasNewMessages ? 'flex' : 'none'} justify-content-between align-items-center`}
-          style={{ bottom: '3.3rem', left: '1rem', width: 'calc(100% - 2rem)', cursor: 'pointer' }}
+          className={`hover-success jt:absolute jt:rounded jt:bg-online jt:text-surface jt:p-2 jt:justify-between jt:items-center jt:cursor-pointer ${
+            hasNewMessages ? 'jt:flex' : 'jt:hidden'
+          }`}
+          style={{ bottom: '3.3rem', left: '1rem', width: 'calc(100% - 2rem)' }}
           onClick={scrollToBottom}
         >
-          <i className="bi bi-chevron-double-down"></i>
+          <ChevronsDown size={16} />
           <span>New Messages</span>
-          <i className="bi bi-chevron-double-down"></i>
+          <ChevronsDown size={16} />
         </div>
-        <div className="d-flex gap-2 mt-2">
+        <div className="jt:flex jt:gap-2 jt:mt-2">
           <input
             ref={inputRef}
-            className="form-control rounded-pill border border-secondary-subtle"
+            className="jt:w-full jt:rounded-full jt:border jt:border-line-accent jt:bg-surface/70 jt:px-4 jt:py-1.5 jt:text-sm jt:text-ink jt:placeholder:text-ink-muted jt:outline-none jt:focus:border-accent/60"
             placeholder="Chat with players..."
             value={text}
             disabled={sending}

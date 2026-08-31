@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { api, ApiError } from '../api/client';
 import type { UserRole } from '../api/types';
-import { PageLoading } from '../components/PageLoading';
-import { PanelPlaceholder } from '../components/PanelPlaceholder';
+import { Spinner } from '../components/ui/Spinner';
+import { EmptyState } from '../components/ui/EmptyState';
+import { ShieldOff } from 'lucide-react';
 import { PlayerRoles } from './admin/PlayerRoles';
 import { ReplacePlayer } from './admin/ReplacePlayer';
 import { EndTurn } from './admin/EndTurn';
@@ -28,25 +29,31 @@ export function AdminPage() {
 
   if (forbidden) {
     return (
-      <div className="p-4">
-        <PanelPlaceholder icon="bi-shield-lock" message="You don't have access to this page." />
+      <div className="jt-scope jt:flex jt:flex-1 jt:min-h-0 jt:items-center jt:justify-center jt:bg-base">
+        <EmptyState icon={ShieldOff} title="You don't have access to this page." />
       </div>
     );
   }
 
-  if (!data) return <PageLoading />;
+  if (!data) {
+    return (
+      <div className="jt-scope jt:flex jt:flex-1 jt:min-h-0 jt:items-center jt:justify-center jt:bg-base">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
-    <div className="row g-3 p-3">
-      <div className="col-12 col-lg-4">
+    <div className="jt-scope jt:grid jt:gap-4 jt:p-4 jt:bg-base jt:lg:grid-cols-3 jt:content-start">
+      <div className="jt:flex jt:flex-col jt:gap-3">
         <PlayerRoles />
       </div>
-      <div className="col-12 col-md-6 col-lg-4">
+      <div className="jt:flex jt:flex-col jt:gap-3">
         <ReplacePlayer />
         <EndTurn />
         <RollbackGame />
       </div>
-      <div className="col-12 col-md-6 col-lg-4">
+      <div className="jt:flex jt:flex-col jt:gap-3">
         <SiteNotesEditor />
         <IdleGames />
       </div>

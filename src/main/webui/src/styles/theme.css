@@ -1,17 +1,12 @@
 /* Site-wide tokens and typography — everything here applies regardless of
    which page/component is mounted, so it lives here rather than co-located
    with any one component. Page- and component-specific styles live next to
-   their .tsx file instead (e.g. pages/MainPage.css, pages/HelpPage.css) —
+   their .tsx file instead (e.g. pages/HelpPage.css, pages/GamePage.css) —
    see main.tsx for the full list of what's imported globally vs. per-component. */
 
 :root {
     --bs-body-font-size: 0.9rem;
     --bs-body-line-height: 1.3;
-    --jol-mention-bg: #d4d7f9;
-    --jol-mention-fg: #000;
-    --jol-day-break-border: #dcc;
-    --jol-day-label-bg: #fff;
-    --jol-day-label-color: #b99;
 }
 
 body * {
@@ -61,28 +56,6 @@ nav * {
     overflow-wrap: break-word;
     overscroll-behavior: contain;
     height: 100%;
-}
-
-.mhd-70 {
-    max-height: 70dvh;
-    min-height: 70dvh;
-}
-
-/* Full-height tab panes: tab-content fills remaining card space, active pane
-   scrolls. Extends Bootstrap's own .tab-pane; used by WatchPage.tsx,
-   pages/main/GamesPanel.tsx, and pages/watch/StatsTab.tsx — no single owner. */
-.tab-content-fill {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-}
-
-.tab-content-fill > .tab-pane {
-    height: 100%;
-}
-
-.tab-content-fill > .tab-pane.active.show {
-    overflow-y: auto;
 }
 
 /* The app shell's content area (App.tsx) and the pre-auth login shell

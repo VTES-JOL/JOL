@@ -3,12 +3,12 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 0.35rem;
-    font-family: var(--bs-font-monospace);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.95rem;
 }
 
 .help-command-placeholder {
-    font-family: var(--bs-body-font-family);
+    font-family: inherit;
     font-size: 0.8125rem;
     letter-spacing: 0.02em;
 }
@@ -18,7 +18,7 @@
     font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0.04em;
-    color: var(--bs-secondary-color);
+    color: var(--jt-ink-muted);
     margin-bottom: 0.35rem;
 }
 
@@ -28,13 +28,13 @@
     align-items: baseline;
     gap: 0.75rem;
     padding: 0.4rem 0;
-    border-bottom: 1px solid var(--bs-border-color-translucent);
+    border-bottom: 1px solid var(--jt-line);
 }
 
 .help-command-row-label {
     flex: 0 0 auto;
     min-width: 9rem;
-    font-family: var(--bs-font-monospace);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.85rem;
     font-weight: 600;
 }

@@ -1,4 +1,5 @@
-import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { Card, CardHeader, CardTitle, CardBody } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
 import { api } from '../../api/client';
 import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
@@ -14,16 +15,16 @@ export function EndTurn() {
   };
 
   return (
-    <Card className="mt-2">
+    <Card>
       <CardHeader>
         <CardTitle>End Turn</CardTitle>
       </CardHeader>
-      <div className="card-body">
+      <CardBody className="jt:flex jt:flex-col jt:gap-2 jt:items-start">
         <AdminSelect id="endTurnList" label="Games" value={gameId} onChange={setGameId} options={gameOptions} />
-        <button onClick={submit} className="btn btn-outline-secondary btn-sm mt-2">
+        <Button variant="secondary" size="sm" onClick={submit}>
           End Turn
-        </button>
-      </div>
+        </Button>
+      </CardBody>
     </Card>
   );
 }

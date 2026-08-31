@@ -1,24 +1,19 @@
-import { Card, CardHeader } from '../../components/Card';
 import type { TournamentMetadata } from '../../api/types';
+import { Panel } from '../../components/ui/Panel';
 
 export function FinalsTournamentDetail({ tournament }: { tournament: TournamentMetadata }) {
   return (
-    <Card className="flex-fill d-flex flex-column">
-      <CardHeader>
-        <span className="fw-semibold">{tournament.name} — Finals</span>
-      </CardHeader>
-      <div className="card-body flex-fill overflow-auto min-h-0">
-        <p className="text-muted small mb-2">
+    <Panel title={`${tournament.name} — Finals`}>
+      <div className="jt:flex-1 jt:min-h-0 jt:overflow-y-auto jt:p-4">
+        <p className="jt:text-xs jt:text-ink-muted jt:mb-3">
           You have been selected for the final table. Seeding order below — seat selection will open in turn.
         </p>
-        <ol className="list-group list-group-numbered">
+        <ol className="jt:list-decimal jt:pl-5 jt:space-y-1 jt:text-sm jt:text-ink">
           {(tournament.finalsSeeding ?? []).map((player) => (
-            <li key={player} className="list-group-item d-flex justify-content-between align-items-center">
-              <span>{player}</span>
-            </li>
+            <li key={player}>{player}</li>
           ))}
         </ol>
       </div>
-    </Card>
+    </Panel>
   );
 }
