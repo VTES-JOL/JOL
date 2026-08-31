@@ -1,0 +1,110 @@
+/* Typography for server-rendered markdown HTML injected via
+   dangerouslySetInnerHTML (SiteNotesService renders admin notes with
+   CommonMark). Tailwind's Preflight strips all default element styling —
+   headings, list markers, paragraph spacing — so block markdown renders as an
+   undifferentiated blob without this. Scoped to `.markdown-body` so it only
+   touches those injected trees, never React-authored markup. Kept global for
+   the same reason as card-visuals.css: the HTML originates server-side. */
+
+.markdown-body > :first-child {
+    margin-top: 0;
+}
+
+.markdown-body > :last-child {
+    margin-bottom: 0;
+}
+
+.markdown-body p {
+    margin: 0 0 0.75em;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+    margin: 1em 0 0.5em;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.markdown-body h1 { font-size: 1.5em; }
+.markdown-body h2 { font-size: 1.3em; }
+.markdown-body h3 { font-size: 1.15em; }
+.markdown-body h4 { font-size: 1em; }
+.markdown-body h5,
+.markdown-body h6 { font-size: 0.9em; }
+
+.markdown-body ul,
+.markdown-body ol {
+    margin: 0 0 0.75em;
+    padding-left: 1.5em;
+}
+
+.markdown-body ul { list-style: disc; }
+.markdown-body ol { list-style: decimal; }
+
+.markdown-body li { margin: 0.15em 0; }
+
+.markdown-body li > ul,
+.markdown-body li > ol {
+    margin-bottom: 0;
+}
+
+.markdown-body a {
+    color: var(--jt-accent);
+    text-decoration: underline;
+}
+
+body[data-bs-theme="dark"] .markdown-body a {
+    color: var(--jt-accent-soft);
+}
+
+.markdown-body strong { font-weight: 700; }
+.markdown-body em { font-style: italic; }
+
+.markdown-body code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+    background: var(--jt-hover);
+}
+
+.markdown-body pre {
+    margin: 0 0 0.75em;
+    padding: 0.75em;
+    border-radius: 4px;
+    overflow-x: auto;
+    background: var(--jt-hover);
+}
+
+.markdown-body pre code {
+    padding: 0;
+    background: none;
+}
+
+.markdown-body blockquote {
+    margin: 0 0 0.75em;
+    padding-left: 0.75em;
+    border-left: 3px solid var(--jt-line-accent);
+    color: var(--jt-ink-secondary);
+}
+
+.markdown-body hr {
+    margin: 1em 0;
+    border: 0;
+    border-top: 1px solid var(--jt-line);
+}
+
+.markdown-body table {
+    margin: 0 0 0.75em;
+    border-collapse: collapse;
+}
+
+.markdown-body th,
+.markdown-body td {
+    padding: 0.3em 0.6em;
+    border: 1px solid var(--jt-line);
+}

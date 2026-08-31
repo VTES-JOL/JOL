@@ -26,6 +26,10 @@ public class SiteNotesService extends PersistedService {
     private static final HtmlRenderer HTML_RENDERER = HtmlRenderer.builder().escapeHtml(true).build();
 
     private String notes = "";
+    // Rendered form of `notes`, recomputed only when `notes` changes (startup
+    // load + admin edit) rather than per GET /main/notes request — every online
+    // player refetches that endpoint on each main-notes WS invalidate.
+    private String notesHtml = "";
 
     SiteNotesService() {
         super("SiteNotesService", 0);
@@ -36,18 +40,26 @@ public class SiteNotesService extends PersistedService {
     }
 
     public static String getNotesHtml() {
-        if (instance().notes.isBlank()) {
+        return instance().notesHtml;
+    }
+
+    private static String renderHtml(String markdown) {
+        if (markdown == null || markdown.isBlank()) {
             return "";
         }
-        Node document = MARKDOWN_PARSER.parse(instance().notes);
+        Node document = MARKDOWN_PARSER.parse(markdown);
         return HTML_RENDERER.render(document);
     }
 
     public static void setNotes(String notes) {
         String updatedNotes = notes == null ? "" : notes;
+        String updatedHtml = renderHtml(updatedNotes);
         if (instance().jpaWriteThenMutate(
                 em -> siteNotesRepository.save(em, updatedNotes),
-                () -> instance().notes = updatedNotes)) {
+                () -> {
+                    instance().notes = updatedNotes;
+                    instance().notesHtml = updatedHtml;
+                })) {
             WebSocketRegistry.notifyInvalidate(List.of("main-notes"));
         }
     }
@@ -69,6 +81,7 @@ public class SiteNotesService extends PersistedService {
     protected void load() {
         try (EntityManager em = JpaFactory.createEntityManager()) {
             notes = siteNotesRepository.load(em);
+            notesHtml = renderHtml(notes);
             logger.info("Loaded site notes from JPA");
         } catch (Exception e) {
             logger.error("JPA load failed for SiteNotesService", e);

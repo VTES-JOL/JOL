@@ -97,7 +97,9 @@ TOURNAMENT_REG_CSV=$(mktemp)
 GAMES_CSV=$(mktemp)
 DECK_INFO_CSV=$(mktemp)
 GLOBAL_CHAT_CSV=$(mktemp)
-trap 'rm -f "$DEDUPED_DECKS_FILE" "$REG_CSV" "$ACTIVITY_CSV" "$PLAYER_ACTIVITY_CSV" "$TOURNAMENT_REG_CSV" "$GAMES_CSV" "$DECK_INFO_CSV" "$GLOBAL_CHAT_CSV"' EXIT
+SUBSCRIPTION_CSV=$(mktemp)
+SITE_NOTES_CSV=$(mktemp)
+trap 'rm -f "$DEDUPED_DECKS_FILE" "$REG_CSV" "$ACTIVITY_CSV" "$PLAYER_ACTIVITY_CSV" "$TOURNAMENT_REG_CSV" "$GAMES_CSV" "$DECK_INFO_CSV" "$GLOBAL_CHAT_CSV" "$SUBSCRIPTION_CSV" "$SITE_NOTES_CSV"' EXIT
 
 # ── 1. Reset database ────────────────────────────────────────────────────────
 log "Resetting database..."
@@ -678,7 +680,61 @@ else
   echo "  ⚠ no refreshTokens.json found — skipping refresh tokens"
 fi
 
-# ── 15. Invalidate outstanding JWT access tokens ─────────────────────────────
+# ── 15. Site notes ───────────────────────────────────────────────────────────
+log "Loading site notes..."
+if [[ -f "$DATA/site-notes.md" ]]; then
+  # site-notes.md is raw markdown; slurp it into a single CSV field so embedded
+  # newlines/quotes survive the \copy. The table is a singleton (id = 1).
+  jq -Rrs '[.] | @csv' "$DATA/site-notes.md" > "$SITE_NOTES_CSV"
+
+  psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -v ON_ERROR_STOP=1 <<SQL
+CREATE TEMP TABLE site_notes_staging (notes TEXT);
+\copy site_notes_staging(notes) FROM '$SITE_NOTES_CSV' WITH (FORMAT csv, NULL '');
+INSERT INTO site_notes (id, notes)
+SELECT 1, COALESCE(notes, '') FROM site_notes_staging
+ON CONFLICT (id) DO UPDATE SET notes = EXCLUDED.notes;
+SQL
+  success "site notes loaded"
+else
+  echo "  ⚠ no site-notes.md found — skipping site notes"
+fi
+
+# ── 16. Web push subscriptions ───────────────────────────────────────────────
+log "Loading web push subscriptions..."
+if [[ -f "$DATA/subscriptions.json" ]]; then
+  # subscriptions.json is keyed by player_name -> [ {auth,key,endpoint,failureCount}, ... ].
+  # Stage by player_name and JOIN player to resolve player_id; subscriptions for
+  # unknown/deleted players are silently dropped.
+  jq -r 'to_entries[] | .key as $player | .value[] | [
+    $player,
+    .endpoint,
+    .auth,
+    .key,
+    (.failureCount // 0)
+  ] | @csv' "$DATA/subscriptions.json" > "$SUBSCRIPTION_CSV"
+
+  psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -v ON_ERROR_STOP=1 <<SQL
+CREATE TEMP TABLE subscription_staging (
+  player_name   VARCHAR(255),
+  endpoint      VARCHAR(1024),
+  auth_key      VARCHAR(255),
+  p256dh_key    VARCHAR(255),
+  failure_count INT
+);
+\copy subscription_staging(player_name,endpoint,auth_key,p256dh_key,failure_count) FROM '$SUBSCRIPTION_CSV' WITH (FORMAT csv, NULL '');
+INSERT INTO subscription (player_id, endpoint, auth_key, p256dh_key, failure_count)
+SELECT p.player_id, s.endpoint, s.auth_key, s.p256dh_key, COALESCE(s.failure_count, 0)
+FROM subscription_staging s
+JOIN player p USING (player_name)
+WHERE s.endpoint <> '' AND s.auth_key <> '' AND s.p256dh_key <> ''
+ON CONFLICT (player_id, endpoint) DO NOTHING;
+SQL
+  success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM subscription;') web push subscriptions"
+else
+  echo "  ⚠ no subscriptions.json found — skipping web push subscriptions"
+fi
+
+# ── 17. Invalidate outstanding JWT access tokens ─────────────────────────────
 # Swapping the whole DB out from under a running dev server leaves the browser
 # holding a still-valid access-token cookie for a player that no longer exists
 # (classic: logged in as Player1, then loaded real data). The server now
@@ -710,7 +766,7 @@ for tbl in player player_role player_activity \
             tournament tournament_registration \
             game_state game_chat game_snapshot \
             game_activity global_chat game_history \
-            refresh_token; do
+            refresh_token site_notes subscription; do
   n=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM $tbl;")
   printf "  %-35s %s rows\n" "$tbl" "$n"
 done

@@ -8,6 +8,7 @@ import './index.css';
 import './styles/fonts.css';
 import './styles/theme.css';
 import './styles/card-visuals.css';
+import './styles/markdown.css';
 import './styles/tailwind.css';
 
 createRoot(document.getElementById('root')!).render(
