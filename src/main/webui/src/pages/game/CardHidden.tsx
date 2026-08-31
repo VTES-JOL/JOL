@@ -6,7 +6,7 @@ import type { CardSnapshot } from '../../api/types';
 export function CardHidden({ card, region, coordinate }: { card: CardSnapshot; region: string; coordinate?: string }) {
   const regionStyle = region === 'REMOVED_FROM_GAME' ? 'opacity-50' : '';
   return (
-    <li className={`flex justify-between items-center p-1 border-b border-line/50 ${regionStyle}`}>
+    <li className={`flex justify-between items-center p-1 ${regionStyle}`}>
       <div className="mx-1 me-auto w-full">
         <div className="flex justify-between items-center w-full">
           <span className="flex items-center gap-1">

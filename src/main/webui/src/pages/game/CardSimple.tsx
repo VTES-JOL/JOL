@@ -22,7 +22,7 @@ export function CardSimple({
 
   return (
     <li
-      className={`flex justify-between items-center p-1 border-b border-line/50 ${regionStyle}`}
+      className={`flex justify-between items-center p-1 ${regionStyle}`}
       onClick={onClick}
       style={onClick ? { cursor: 'pointer' } : undefined}
     >
@@ -36,9 +36,11 @@ export function CardSimple({
             </a>
           </span>
           <span className="flex gap-1 items-center">
-            <span className="inline-flex items-center rounded bg-hover text-ink border border-line px-1.5 text-xs">
-              {card.label}
-            </span>
+            {card.label && (
+              <span className="inline-flex items-center rounded bg-hover text-ink border border-line px-1.5 text-xs">
+                {card.label}
+              </span>
+            )}
             <span className={`icon card-type ${card.typeClass ?? ''}`} />
             {card.hasBlood && (
               <span>

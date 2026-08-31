@@ -27,7 +27,7 @@ export function HandStrip({
       <div className="px-3 py-1.5 border-b border-line bg-panel/60 text-sm font-semibold text-ink shrink-0">
         Hand
       </div>
-      <ol className="flex-1 min-h-0 list-none scrollable">
+      <ol className="flex-1 min-h-0 list-none scrollable divide-y divide-line/40">
         {hand.cards.map((card, i) => (
           <CardSimple
             key={card.id}

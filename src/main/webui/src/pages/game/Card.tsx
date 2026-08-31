@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Flame } from 'lucide-react';
+import { Eye, EyeOff, Flame, Lock } from 'lucide-react';
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
 import { CardHidden } from './CardHidden';
 import { Clan } from './Clan';
@@ -30,14 +30,12 @@ export interface TableCardClick {
 export function Card({
   card,
   region,
-  shadow,
   coordinate,
   isChild = false,
   onAction,
 }: {
   card: CardSnapshot;
   region: string;
-  shadow: boolean;
   coordinate: string;
   isChild?: boolean;
   onAction?: (click: TableCardClick) => void;
@@ -50,10 +48,11 @@ export function Card({
   const counterStyle = COUNTER_STYLE(!!card.hasLife, !!card.hasBlood, card.capacity ?? 0, OTHER_VISIBLE_REGIONS.has(region));
   const regionStyle = region === 'TORPOR' ? 'opacity-75' : '';
   const contestedStyle = card.contested ? 'bg-gold/15' : '';
+  const rowPad = isChild ? 'px-2 py-1' : 'px-2 pt-2 pb-1';
 
   return (
     <li
-      className={`flex justify-between items-baseline px-2 pt-2 pb-1 border-b border-line/50 ${regionStyle} ${shadow ? 'shadow-sm' : ''} ${contestedStyle}`}
+      className={`flex justify-between items-start ${rowPad} ${regionStyle} ${contestedStyle} ${card.locked ? 'border-l-2 border-accent bg-accent/5' : ''}`}
       onClick={onAction ? () => onAction({ coordinate, card, isChild }) : undefined}
       style={onAction ? { cursor: 'pointer' } : undefined}
     >
@@ -61,6 +60,14 @@ export function Card({
         <div className="flex justify-between">
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
+              {card.locked && (
+                <span
+                  className="shrink-0 inline-flex items-center rounded bg-accent text-surface px-1 py-0.5"
+                  title="Locked"
+                >
+                  <Lock size={11} strokeWidth={2.75} />
+                </span>
+              )}
               <span className="text-ink-muted text-xs tabular-nums select-all shrink-0">{coordinate}</span>
               <a data-card-id={card.cardId} data-secured={card.playtest ? 'true' : undefined} className="card-name text-wrap">
                 {card.name}
@@ -71,19 +78,22 @@ export function Card({
                 <span className={`${PILL} bg-gold text-surface text-[0.7rem]`}>CONTESTED</span>
               )}
             </div>
-            <div className="flex items-center gap-1">
-              {(card.disciplines ?? []).map((disc) => (
-                <span key={disc} className={`icon ${disc}`} />
-              ))}
-            </div>
-            {
-              card.label && <div className="flex items-center gap-1"><span className={`${PILL} bg-hover text-ink border border-line`}>{card.label}</span></div>
-            }
+            {(card.disciplines?.length ?? 0) > 0 && (
+              <div className="flex items-center gap-1">
+                {card.disciplines!.map((disc) => (
+                  <span key={disc} className={`icon ${disc}`} />
+                ))}
+              </div>
+            )}
+            {card.label && (
+              <div className="flex items-center gap-1">
+                <span className={`${PILL} bg-hover text-ink border border-line`}>{card.label}</span>
+              </div>
+            )}
           </div>
           <div className="flex flex-col">
             <div className="flex justify-end items-center gap-1">
               {card.infernal && <Flame size={14} className="text-blood" />}
-              {card.locked && <span className={`${PILL} bg-ink text-base text-[0.7rem]`}>LOCKED</span>}
               {showCounterBadge && <span className={`${PILL} ${counterStyle} shadow-sm`}>{counterText}</span>}
             </div>
             <div className="flex justify-end items-center gap-1">
@@ -94,11 +104,11 @@ export function Card({
           </div>
         </div>
         {(card.cards?.length ?? 0) > 0 && (
-          // Nested equipment/retainer/counter stack. Preflight zeroes the
-          // browser-default <ol> padding Bootstrap's Reboot left in place, so
-          // the indent that used to come for free is set explicitly here —
-          // it compounds per recursion level, stepping deep stacks inward.
-          <ol className="list-none ml-1">
+          // A minion's attached cards (equipment, retainers, action modifiers,
+          // blood/counter stacks). Rendered as an indented branch with a left
+          // rail so the group reads as one unit; the rail + indent compound
+          // per level to form a depth ladder for deep stacks.
+          <ol className="list-none mt-1 ml-2 border-l border-line pl-1.5 divide-y divide-line/20">
             {card.cards!.map((nested, i) => (
               <NestedCard key={nested.id} card={nested} region={region} coordinate={`${coordinate}.${i + 1}`} onAction={onAction} />
             ))}
@@ -121,7 +131,7 @@ function NestedCard({
   onAction?: (click: TableCardClick) => void;
 }) {
   return card.visible ? (
-    <Card card={card} region={region} shadow={false} coordinate={coordinate} isChild onAction={onAction} />
+    <Card card={card} region={region} coordinate={coordinate} isChild onAction={onAction} />
   ) : (
     <CardHidden card={card} region={region} coordinate={coordinate} />
   );

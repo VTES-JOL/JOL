@@ -5,9 +5,15 @@ import { Card, RegionLabelBadges, type TableCardClick } from './Card';
 import { CardSimple } from './CardSimple';
 import type { HandCardContext, TableCardContext } from './cardCommands';
 
-const REGION_STYLE: Record<string, string> = {
-  TORPOR: 'bg-blood/10',
-  READY: 'bg-online/10',
+// READY/TORPOR/UNCONTROLLED are live board state — prominent header, coloured
+// left edge. Everything else (ash heap, RFG, library, crypt, hand, research)
+// is a reference pile: quiet, smaller header, no edge.
+const PRIMARY_REGIONS = new Set(['READY', 'TORPOR', 'UNCONTROLLED']);
+
+const REGION_ACCENT: Record<string, string> = {
+  READY: 'border-l-online',
+  TORPOR: 'border-l-blood',
+  UNCONTROLLED: 'border-l-gold',
 };
 
 // card.jsp/card-simple.jsp/card-hidden.jsp's click routing, replicated
@@ -61,25 +67,44 @@ export function Region({
 
   if (region.cards.length === 0) return null;
 
-  const style = REGION_STYLE[region.type] ?? 'bg-panel';
+  const primary = PRIMARY_REGIONS.has(region.type);
+  const accent = REGION_ACCENT[region.type] ?? 'border-l-line-accent';
   const mode = clickMode(region.type, isOwnRegion, isSeatedPlayer);
 
   const onAction = ({ coordinate, card, isChild }: TableCardClick) =>
     onTableCardClick({ controller, controllerPool, regionType: region.type, regionCommandKey: region.commandKey, coordinate, card, isChild });
 
   return (
-    <div className="mb-2">
-      <div className={`p-2 flex justify-between items-center text-sm ${style}`}>
-        <span className="flex items-center gap-1">
-          <button type="button" className="text-ink-muted hover:text-ink" onClick={() => setCollapsed((prev) => !prev)}>
+    <div className={`mb-2 ${primary ? `border-l-2 ${accent}` : ''}`}>
+      <div
+        className={`px-2 py-1.5 flex justify-between items-center ${
+          primary ? 'bg-panel border-b border-line-accent' : 'bg-panel/40'
+        }`}
+      >
+        <span className="flex items-center gap-1.5 min-w-0">
+          <button
+            type="button"
+            className="text-ink-muted hover:text-ink shrink-0"
+            onClick={() => setCollapsed((prev) => !prev)}
+            aria-label={collapsed ? `Expand ${region.label}` : `Collapse ${region.label}`}
+          >
             {collapsed ? <PlusCircle size={15} /> : <MinusCircle size={15} />}
           </button>
-          <span className="font-bold">{region.label}</span> <span>( {region.cards.length} )</span>
+          <span
+            className={`uppercase tracking-wide truncate ${
+              primary ? 'font-bold text-xs text-ink' : 'font-semibold text-[0.7rem] text-ink-muted'
+            }`}
+          >
+            {region.label}
+          </span>
           <RegionLabelBadges region={region} />
+        </span>
+        <span className={`text-xs tabular-nums shrink-0 ${primary ? 'text-ink-secondary' : 'text-ink-muted'}`}>
+          {region.cards.length}
         </span>
       </div>
       {!collapsed && (
-        <ol className={`region list-none ${style}`}>
+        <ol className="region list-none divide-y divide-line/40">
           {region.cards.map((card, i) => {
             const coordinate = String(i + 1);
             if (region.simple) {
@@ -96,7 +121,6 @@ export function Region({
                 key={card.id}
                 card={card}
                 region={region.type}
-                shadow
                 coordinate={coordinate}
                 onAction={mode === 'action' ? onAction : undefined}
               />
