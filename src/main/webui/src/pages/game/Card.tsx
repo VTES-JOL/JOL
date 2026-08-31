@@ -42,7 +42,7 @@ export function Card({
   isChild?: boolean;
   onAction?: (click: TableCardClick) => void;
 }) {
-  if (!card.visible) return <CardHidden card={card} region={region} />;
+  if (!card.visible) return <CardHidden card={card} region={region} coordinate={coordinate} />;
 
   const hasVotes = !!card.votes && card.votes !== '0';
   const counterText = `${card.counters}${(card.capacity ?? 0) > 0 ? ` / ${card.capacity}` : ''}`;
@@ -61,6 +61,7 @@ export function Card({
         <div className="flex justify-between">
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
+              <span className="text-ink-muted text-xs tabular-nums select-all shrink-0">{coordinate}</span>
               <a data-card-id={card.cardId} data-secured={card.playtest ? 'true' : undefined} className="card-name text-wrap">
                 {card.name}
                 {card.advanced && <i className="icon adv" />}
@@ -75,9 +76,9 @@ export function Card({
                 <span key={disc} className={`icon ${disc}`} />
               ))}
             </div>
-            <div className="flex items-center gap-1">
-              <span className={`${PILL} bg-hover text-ink border border-line`}>{card.label}</span>
-            </div>
+            {
+              card.label && <div className="flex items-center gap-1"><span className={`${PILL} bg-hover text-ink border border-line`}>{card.label}</span></div>
+            }
           </div>
           <div className="flex flex-col">
             <div className="flex justify-end items-center gap-1">
@@ -93,7 +94,11 @@ export function Card({
           </div>
         </div>
         {(card.cards?.length ?? 0) > 0 && (
-          <ol className="list-none -ml-3">
+          // Nested equipment/retainer/counter stack. Preflight zeroes the
+          // browser-default <ol> padding Bootstrap's Reboot left in place, so
+          // the indent that used to come for free is set explicitly here —
+          // it compounds per recursion level, stepping deep stacks inward.
+          <ol className="list-none ml-1">
             {card.cards!.map((nested, i) => (
               <NestedCard key={nested.id} card={nested} region={region} coordinate={`${coordinate}.${i + 1}`} onAction={onAction} />
             ))}
@@ -118,7 +123,7 @@ function NestedCard({
   return card.visible ? (
     <Card card={card} region={region} shadow={false} coordinate={coordinate} isChild onAction={onAction} />
   ) : (
-    <CardHidden card={card} region={region} />
+    <CardHidden card={card} region={region} coordinate={coordinate} />
   );
 }
 

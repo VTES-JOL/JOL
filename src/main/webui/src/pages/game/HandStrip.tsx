@@ -33,6 +33,7 @@ export function HandStrip({
             key={card.id}
             card={card}
             region="HAND"
+            coordinate={String(i + 1)}
             onClick={() => onPlayCardClick({ regionType: hand.type, regionCommandKey: hand.commandKey, coordinate: String(i + 1) }, card)}
           />
         ))}

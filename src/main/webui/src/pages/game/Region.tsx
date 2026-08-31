@@ -89,7 +89,7 @@ export function Region({
                   : mode === 'play'
                     ? () => onPlayCardClick({ regionType: region.type, regionCommandKey: region.commandKey, coordinate }, card)
                     : undefined;
-              return <CardSimple key={card.id} card={card} region={region.type} onClick={onClick} />;
+              return <CardSimple key={card.id} card={card} region={region.type} coordinate={coordinate} onClick={onClick} />;
             }
             return (
               <Card

@@ -8,13 +8,15 @@ import { Clan } from './Clan';
 export function CardSimple({
   card,
   region,
+  coordinate,
   onClick,
 }: {
   card: CardSnapshot;
   region: string;
+  coordinate: string;
   onClick?: () => void;
 }) {
-  if (!card.visible) return <CardHidden card={card} region={region} />;
+  if (!card.visible) return <CardHidden card={card} region={region} coordinate={coordinate} />;
 
   const regionStyle = region === 'REMOVED_FROM_GAME' ? 'opacity-50' : '';
 
@@ -26,7 +28,8 @@ export function CardSimple({
     >
       <div className="mx-1 me-auto w-full">
         <div className="flex justify-between items-center w-full">
-          <span>
+          <span className="flex items-center gap-1">
+            <span className="text-ink-muted text-xs tabular-nums select-all shrink-0">{coordinate}</span>
             <a data-card-id={card.cardId} data-secured={card.playtest ? 'true' : undefined} className="card-name text-wrap">
               {card.name}
               {card.advanced && <i className="icon adv" />}
