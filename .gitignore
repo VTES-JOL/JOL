@@ -34,9 +34,12 @@ aws/*
 
 # Certs
 *.pem
-
-# Auto-generated local JWT signing key (see AuthService.loadOrCreateKey)
-jwt_secret.key
+# ...except the committed non-secret dev keypair the access-token signer
+# (net.deckserver.services.TokenService) falls back to when JWT_PRIVATE_KEY_FILE
+# / JWT_PUBLIC_KEY_FILE are unset, so tests and a fresh checkout need no setup.
+# Prod supplies its own keypair via those env vars.
+!src/main/resources/jwt/jwt-dev-private.pem
+!src/main/resources/jwt/jwt-dev-public.pem
 
 # Dev-only self-signed HTTPS keystore (see application.properties's comment
 # for the keytool command that regenerates it)

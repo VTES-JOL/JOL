@@ -1,7 +1,5 @@
 package net.deckserver.services;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
@@ -9,16 +7,13 @@ import jakarta.ws.rs.core.NewCookie;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
-import javax.crypto.SecretKey;
 import java.lang.reflect.Proxy;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -79,12 +74,10 @@ class AuthServiceTest {
 
     @Test
     void currentUsername_returnsEmpty_forExpiredToken() throws Exception {
-        String expired = Jwts.builder()
-                .subject(uniquePlayer())
-                .issuedAt(Date.from(Instant.now().minus(Duration.ofHours(1))))
-                .expiration(Date.from(Instant.now().minus(Duration.ofMinutes(1))))
-                .signWith(loadTestSigningKey())
-                .compact();
+        String expired = TokenService.issueForTest(
+                uniquePlayer(), Set.of(),
+                Instant.now().minus(Duration.ofHours(1)),
+                Instant.now().minus(Duration.ofMinutes(5)));
 
         assertThat(AuthService.parseAccessToken(expired), is(Optional.empty()));
     }
@@ -135,6 +128,27 @@ class AuthServiceTest {
     }
 
     @Test
+    void authenticate_treatsAccessTokenIssuedBeforeARoleChangeAsStale() throws Exception {
+        String player = uniquePlayer();
+        NewCookie access = AuthService.issueTokens(player, false, headers(Map.of(), "JUnit-Agent")).stream()
+                .filter(AuthServiceTest::looksLikeJwt).findFirst().orElseThrow();
+        Cookie accessCookie = toRequestCookie(access);
+
+        // valid until a role change is recorded for this player...
+        assertThat(AuthService.authenticate(headers(Map.of("jol_at", accessCookie), "JUnit-Agent")).username(),
+                is(Optional.of(player)));
+
+        Thread.sleep(1100); // token iat has 1s granularity; make the bump land strictly after it
+        PlayerService.bumpMinTokenIssuedAt(player);
+
+        // ...after which the same token no longer authenticates on its own (and with
+        // no refresh cookie present, the request is simply unauthenticated).
+        AuthService.AuthResult afterChange =
+                AuthService.authenticate(headers(Map.of("jol_at", accessCookie), "JUnit-Agent"));
+        assertThat(afterChange.username(), is(Optional.empty()));
+    }
+
+    @Test
     void authenticate_clearsRefreshCookie_whenRefreshTokenInvalid() {
         Cookie bogusRefresh = new Cookie.Builder("jol_rt").value("not-a-real-token.value").build();
 
@@ -172,12 +186,6 @@ class AuthServiceTest {
 
     private static String uniquePlayer() {
         return "AuthServiceTest-" + UUID.randomUUID();
-    }
-
-    private static SecretKey loadTestSigningKey() throws Exception {
-        Path keyFile = Path.of("src", "test", "resources", "data", "jwt_secret.key");
-        byte[] keyBytes = java.util.Base64.getDecoder().decode(Files.readString(keyFile).strip());
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     /** Minimal HttpHeaders fake — AuthService only calls getCookies() and getHeaderString("User-Agent"). */

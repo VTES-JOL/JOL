@@ -9,6 +9,7 @@ import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.services.SiteNotesService;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -42,18 +43,12 @@ import java.util.stream.Collectors;
 @Path("admin-page")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RolesAllowed("ADMIN")
 public class AdminPageResource extends BaseResource {
-
-    private void requireAdmin() {
-        if (!JolAdmin.isAdmin(username())) {
-            throw new ForbiddenException("Admin role required");
-        }
-    }
 
     @GET
     @Path("user-roles")
     public List<UserSummaryBean> userRoles() {
-        requireAdmin();
         return PlayerService.getPlayers().stream()
                 .sorted()
                 .map(UserSummaryBean::new)
@@ -65,7 +60,6 @@ public class AdminPageResource extends BaseResource {
     @GET
     @Path("substitutes")
     public List<String> substitutes() {
-        requireAdmin();
         return PlayerActivityStatus.recentlyActiveNames();
     }
 
@@ -73,7 +67,6 @@ public class AdminPageResource extends BaseResource {
     @GET
     @Path("games")
     public Map<String, String> games() {
-        requireAdmin();
         return activeGameNames().stream()
                 .collect(Collectors.toMap(
                         name -> GameService.get(name).getId(),
@@ -85,7 +78,6 @@ public class AdminPageResource extends BaseResource {
     @GET
     @Path("idle-games")
     public List<GameActivityStatus> idleGames() {
-        requireAdmin();
         OffsetDateTime currentMonth = OffsetDateTime.now().minusMonths(1);
         return activeGameNames().stream()
                 .map(GameActivityStatus::new)
@@ -104,42 +96,36 @@ public class AdminPageResource extends BaseResource {
     @GET
     @Path("site-notes")
     public SiteNotesResponse siteNotes() {
-        requireAdmin();
         return new SiteNotesResponse(SiteNotesService.getRawNotes());
     }
 
     @PUT
     @Path("roles/{name}")
     public void setRole(@PathParam("name") String player, RoleRequest body) {
-        requireAdmin();
         JolAdmin.setRole(player, PlayerRole.valueOf(body.role()), body.value());
     }
 
     @PUT
     @Path("site-notes")
     public void setSiteNotes(SiteNotesRequest body) {
-        requireAdmin();
         SiteNotesService.setNotes(body.notes());
     }
 
     @DELETE
     @Path("site-notes")
     public void clearSiteNotes() {
-        requireAdmin();
         SiteNotesService.clear();
     }
 
     @POST
     @Path("games/{gameId}/end-turn")
     public void endTurn(@PathParam("gameId") String gameId) {
-        requireAdmin();
         JolAdmin.endTurn(gameName(gameId), username());
     }
 
     @POST
     @Path("games/{gameId}/rollback")
     public void rollback(@PathParam("gameId") String gameId, RollbackRequest body) {
-        requireAdmin();
         String turn = body.turn();
         String[] parts = (turn != null) ? turn.split(" ") : new String[0];
         if (parts.length < 2) {
@@ -152,14 +138,12 @@ public class AdminPageResource extends BaseResource {
     @PUT
     @Path("games/{gameId}/replace-player")
     public void replacePlayer(@PathParam("gameId") String gameId, ReplacePlayerRequest body) {
-        requireAdmin();
         JolAdmin.replacePlayer(gameName(gameId), body.existingPlayer(), body.newPlayer());
     }
 
     @DELETE
     @Path("games/{gameId}")
     public void endGame(@PathParam("gameId") String gameId) {
-        requireAdmin();
         JolAdmin.endGame(gameName(gameId), true);
     }
 

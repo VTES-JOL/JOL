@@ -23,7 +23,13 @@ services:
       JOL_DB_USER: jol
       JOL_DB_PASSWORD: ${PROD_DB_PASSWORD:?set PROD_DB_PASSWORD in .env}
       VAPID_KEY_FILE: /data/vapid_private.pem
-      JWT_SECRET_FILE: /data/jwt_secret.key
+      # Access-token signing/verification keypair (RS256). Generate once with:
+      #   openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out jwt-private.pem
+      #   openssl pkey -in jwt-private.pem -pubout -out jwt-public.pem
+      # and copy both onto the persisted /data volume (same as vapid_private.pem).
+      JWT_PRIVATE_KEY_FILE: /data/jwt-private.pem
+      JWT_PUBLIC_KEY_FILE: /data/jwt-public.pem
+      JWT_PUBLIC_KEY_LOCATION: file:/data/jwt-public.pem
     depends_on:
       prod-db:
         condition: service_healthy
@@ -66,7 +72,13 @@ services:
       JOL_DB_USER: jol
       JOL_DB_PASSWORD: ${PROD_DB_PASSWORD:?set PROD_DB_PASSWORD in .env}
       VAPID_KEY_FILE: /data/vapid_private.pem
-      JWT_SECRET_FILE: /data/jwt_secret.key
+      # Access-token signing/verification keypair (RS256). Generate once with:
+      #   openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out jwt-private.pem
+      #   openssl pkey -in jwt-private.pem -pubout -out jwt-public.pem
+      # and copy both onto the persisted /data volume (same as vapid_private.pem).
+      JWT_PRIVATE_KEY_FILE: /data/jwt-private.pem
+      JWT_PUBLIC_KEY_FILE: /data/jwt-public.pem
+      JWT_PUBLIC_KEY_LOCATION: file:/data/jwt-public.pem
     depends_on:
       prod-db:
         condition: service_healthy

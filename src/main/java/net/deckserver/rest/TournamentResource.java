@@ -17,6 +17,7 @@ import net.deckserver.ws.WebSocketRegistry;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -36,12 +37,6 @@ public class TournamentResource extends BaseResource {
 
     private static final Map<String, Integer> ADMIN_STATUS_ORDER = Map.of("ACTIVE", 0, "STARTING", 1, "EDIT", 2);
 
-    private void requireTournamentAdmin() {
-        if (!JolAdmin.isTournamentAdmin(username())) {
-            throw new ForbiddenException("Tournament admin role required");
-        }
-    }
-
     private TournamentDefinition requireTournament(String tourName) {
         TournamentDefinition def = TournamentService.getTournament(tourName);
         if (def == null) {
@@ -53,8 +48,8 @@ public class TournamentResource extends BaseResource {
     /** Dedicated, envelope-free list read for the React tournamentAdmin page — mirrors TournamentAdminBean. */
     @GET
     @Path("admin-list")
+    @RolesAllowed("TOURNAMENT_ADMIN")
     public List<TournamentMetadata> getAdminList() {
-        if (!JolAdmin.isTournamentAdmin(username())) throw new ForbiddenException("Tournament admin role required");
         return TournamentService.getTournamentsWithStatus(List.of(GameStatus.EDIT, GameStatus.STARTING, GameStatus.ACTIVE))
                 .stream()
                 .sorted(Comparator
@@ -65,8 +60,8 @@ public class TournamentResource extends BaseResource {
 
     /** Replaces DS.createTournament() */
     @POST
+    @RolesAllowed("TOURNAMENT_ADMIN")
     public boolean createTournament(CreateTournamentRequest body) {
-        requireTournamentAdmin();
         try {
             String originalName = body.originalName() != null ? body.originalName() : "";
             boolean isRename = !originalName.isEmpty() && !originalName.equals(body.tourName());
@@ -132,8 +127,8 @@ public class TournamentResource extends BaseResource {
     /** Publish tournament: moves status from EDIT to STARTING */
     @POST
     @Path("{name}/publish")
+    @RolesAllowed("TOURNAMENT_ADMIN")
     public boolean publishTournament(@PathParam("name") String tourName) {
-        requireTournamentAdmin();
         TournamentDefinition def = requireTournament(tourName);
         if (!def.getStatus().equals(GameStatus.EDIT)) return false;
         TournamentService.setTournamentStatus(tourName, GameStatus.STARTING);
@@ -175,11 +170,11 @@ public class TournamentResource extends BaseResource {
     /** Close a finished table game, snapshot live VP/GW into tournament data, then end the game. */
     @POST
     @Path("{name}/round/{round}/table/{table}/close")
+    @RolesAllowed("TOURNAMENT_ADMIN")
     public boolean closeTableGame(
             @PathParam("name") String tourName,
             @PathParam("round") int round,
             @PathParam("table") int table) {
-        requireTournamentAdmin();
         TournamentDefinition def = requireTournament(tourName);
 
         String gameName = String.format("%s: Round %d - Table %d", tourName, round, table);
@@ -238,12 +233,12 @@ public class TournamentResource extends BaseResource {
      */
     @POST
     @Path("{name}/round/{round}/table/{table}/recreate")
+    @RolesAllowed("TOURNAMENT_ADMIN")
     public Response recreateTable(
             @PathParam("name") String tourName,
             @PathParam("round") int round,
             @PathParam("table") int table,
             RecreateTableRequest body) {
-        if (!JolAdmin.isTournamentAdmin(username())) return Response.status(Response.Status.FORBIDDEN).build();
         try {
             TournamentService.recreateTable(tourName, round, table, body.csvData());
             return Response.noContent().build();
@@ -296,8 +291,8 @@ public class TournamentResource extends BaseResource {
     /** Replaces DS.createTournamentTables() */
     @POST
     @Path("{name}/tables")
+    @RolesAllowed("TOURNAMENT_ADMIN")
     public Response createTournamentTables(@PathParam("name") String tourName) {
-        if (!JolAdmin.isTournamentAdmin(username())) return Response.status(Response.Status.FORBIDDEN).build();
         try {
             TournamentService.createTournamentTables(tourName);
             return Response.noContent().build();
@@ -312,8 +307,8 @@ public class TournamentResource extends BaseResource {
     /** Replaces DS.saveTables() */
     @PUT
     @Path("{name}/rounds")
+    @RolesAllowed("TOURNAMENT_ADMIN")
     public void saveTables(@PathParam("name") String tourName, Map<Integer, Map<Integer, List<String>>> rounds) {
-        requireTournamentAdmin();
         Map<Integer, Map<Integer, List<TournamentPlayer>>> config = new HashMap<>();
         rounds.forEach((round, tableMap) -> {
             Map<Integer, List<TournamentPlayer>> tables = new HashMap<>();
@@ -333,8 +328,8 @@ public class TournamentResource extends BaseResource {
     /** Replaces DS.importTables() */
     @POST
     @Path("{name}/rounds/import")
+    @RolesAllowed("TOURNAMENT_ADMIN")
     public Response importTables(@PathParam("name") String tourName, ImportTablesRequest body) {
-        if (!JolAdmin.isTournamentAdmin(username())) return Response.status(Response.Status.FORBIDDEN).build();
         try {
             TournamentService.importRoundsFromCsv(tourName, body.csvData());
             return Response.noContent().build();
@@ -349,16 +344,16 @@ public class TournamentResource extends BaseResource {
     /** Replaces DS.createFinalTable() */
     @POST
     @Path("{name}/final")
+    @RolesAllowed("TOURNAMENT_ADMIN")
     public void createFinalTable(@PathParam("name") String tourName) {
-        requireTournamentAdmin();
         TournamentService.createFinal(tourName);
     }
 
     /** Replaces DS.setFinalSeeding() */
     @PUT
     @Path("{name}/seeding")
+    @RolesAllowed("TOURNAMENT_ADMIN")
     public void setFinalSeeding(@PathParam("name") String tourName, List<String> seeding) {
-        requireTournamentAdmin();
         requireTournament(tourName);
         TournamentService.setFinalsSeeding(tourName, seeding);
     }
@@ -373,8 +368,8 @@ public class TournamentResource extends BaseResource {
     /** Replaces DS.closeTournament() */
     @POST
     @Path("{name}/close")
+    @RolesAllowed("TOURNAMENT_ADMIN")
     public void closeTournament(@PathParam("name") String tourName) {
-        requireTournamentAdmin();
         TournamentService.setTournamentStatus(tourName, GameStatus.CLOSED);
     }
 
@@ -444,8 +439,8 @@ public class TournamentResource extends BaseResource {
     /** Replaces DS.resetTables() */
     @DELETE
     @Path("{name}/rounds")
+    @RolesAllowed("TOURNAMENT_ADMIN")
     public void resetTables(@PathParam("name") String tourName) {
-        requireTournamentAdmin();
         requireTournament(tourName);
         TournamentService.resetRounds(tourName);
     }
@@ -468,8 +463,8 @@ public class TournamentResource extends BaseResource {
     /** Replaces DS.saveFinal() */
     @PUT
     @Path("{name}/final-players")
+    @RolesAllowed("TOURNAMENT_ADMIN")
     public void saveFinal(@PathParam("name") String tourName, List<String> players) {
-        requireTournamentAdmin();
         if (!GameService.existsGame(String.format("%s: Final Table", tourName))) {
             requireTournament(tourName);
             TournamentFinals finals = new TournamentFinals();

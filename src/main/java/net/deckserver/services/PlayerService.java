@@ -37,6 +37,21 @@ public class PlayerService extends PersistedService {
     private static final Predicate<UserSummary> RECENTLY_ONLINE = summary -> OffsetDateTime.parse(summary.getLastOnline()).plusMinutes(30).isAfter(OffsetDateTime.now());
     private final Map<String, PlayerInfo> players = new ConcurrentHashMap<>();
 
+    /**
+     * Per-player "minimum acceptable token issue time" (epoch seconds), bumped by
+     * {@link #setRole}. An access token whose {@code iat} predates this is treated
+     * as stale by {@link AuthService#authenticate} even though its signature is
+     * still valid, so a role change takes effect on the player's very next request
+     * (a silent refresh-token rotation then mints a token with the new roles)
+     * rather than only when the old token would have expired on its own.
+     * <p>
+     * In-memory only — never persisted. Losing it on restart just means every
+     * outstanding token is accepted until its own {@code exp}
+     * ({@link TokenService#ACCESS_TTL}), which is the pre-existing behaviour and
+     * safe. Same rationale as {@code RefreshTokenService.recentRotations}.
+     */
+    private final Map<String, Long> minTokenIssuedAt = new ConcurrentHashMap<>();
+
     PlayerService() {
         super("PlayerService", 0);
     }
@@ -171,6 +186,23 @@ public class PlayerService extends PersistedService {
                     playerInfo.getRoles().clear();
                     playerInfo.getRoles().addAll(previousRoles);
                 });
+        if (!playerInfo.getRoles().equals(previousRoles)) {
+            bumpMinTokenIssuedAt(playerName);
+        }
+    }
+
+    /** Invalidate every access token issued for this player up to now (see {@link #minTokenIssuedAt}). */
+    static void bumpMinTokenIssuedAt(String playerName) {
+        instance().minTokenIssuedAt.put(playerName, OffsetDateTime.now().toEpochSecond());
+    }
+
+    /**
+     * Lowest {@code iat} (epoch seconds) an access token for {@code playerName} may
+     * carry and still be honoured; 0 (accept anything) unless a role change has
+     * bumped it this run. See {@link #minTokenIssuedAt}.
+     */
+    public static long minTokenIssuedAt(String playerName) {
+        return instance().minTokenIssuedAt.getOrDefault(playerName, 0L);
     }
 
     private static PlayerInfo loadPlayerInfo(String playerName) {

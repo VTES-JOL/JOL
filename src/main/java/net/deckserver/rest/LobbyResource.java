@@ -83,7 +83,7 @@ public class LobbyResource extends BaseResource {
             throw new NotFoundException("No such game: " + game);
         }
         String owner = JolAdmin.getOwner(game);
-        if (!playerName.equals(owner) && !JolAdmin.isSuperUser(playerName)) {
+        if (!playerName.equals(owner) && !sc.isUserInRole("SUPER_USER")) {
             throw new ForbiddenException("Only the game owner or a super user can start this game");
         }
         if (!JolAdmin.isStarting(game)) {
@@ -101,7 +101,7 @@ public class LobbyResource extends BaseResource {
             throw new NotFoundException("No such game: " + game);
         }
         String owner = JolAdmin.getOwner(game);
-        if (!playerName.equals(owner) && !JolAdmin.isAdmin(playerName)) {
+        if (!playerName.equals(owner) && !sc.isUserInRole("ADMIN")) {
             throw new ForbiddenException("Only the game owner or an admin can close this game");
         }
         JolAdmin.endGame(game, true);
@@ -141,7 +141,7 @@ public class LobbyResource extends BaseResource {
         }
         String playerName = username();
         String owner = JolAdmin.getOwner(game);
-        if (!playerName.equals(owner) && !JolAdmin.isAdmin(playerName)) {
+        if (!playerName.equals(owner) && !sc.isUserInRole("ADMIN")) {
             throw new ForbiddenException("Only the game owner or an admin can manage invites for this game");
         }
     }

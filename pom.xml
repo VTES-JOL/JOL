@@ -50,6 +50,17 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-websockets</artifactId>
         </dependency>
+        <!-- Quarkus: MicroProfile JWT RBAC. Provides the cookie-sourced
+             JWT HttpAuthenticationMechanism that builds a SecurityIdentity
+             (roles from the token's "groups" claim) so @RolesAllowed works,
+             and pulls in jose4j, which TokenService uses directly to sign
+             and verify the access token outside any Quarkus runtime context
+             (service-level tests boot without one). Replaces the hand-rolled
+             HMAC jjwt tokens in AuthService. -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-jwt</artifactId>
+        </dependency>
         <!-- Quarkus: frontend layer (Phase 4 — replaces frontend-maven-plugin/
              maven-war-plugin's manual react-dist staging, and Tomcat's
              RewriteValve-based SPA routing, entirely; see
@@ -108,24 +119,6 @@
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-api</artifactId>
-            <version>0.13.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-impl</artifactId>
-            <version>0.13.0</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId>
-            <version>0.13.0</version>
-            <scope>runtime</scope>
         </dependency>
 
         <!--

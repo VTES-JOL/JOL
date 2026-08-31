@@ -734,26 +734,18 @@ else
   echo "  ⚠ no subscriptions.json found — skipping web push subscriptions"
 fi
 
-# ── 17. Invalidate outstanding JWT access tokens ─────────────────────────────
+# ── 17. Outstanding JWT access tokens ───────────────────────────────────────
 # Swapping the whole DB out from under a running dev server leaves the browser
 # holding a still-valid access-token cookie for a player that no longer exists
-# (classic: logged in as Player1, then loaded real data). The server now
-# rejects that cleanly with a 401, but dropping the dev signing key here makes
-# it a non-issue regardless: AuthService regenerates one on next start, so
-# every previously-issued token fails signature verification and the browser
-# is bounced straight to the login page.
-#
-# Only the local-dev fallback key (JWT_SECRET_FILE unset -> jwt_secret.key next
-# to the working dir). The committed src/test/resources/data/jwt_secret.key is
-# left alone — AuthServiceTest signs with it.
-log "Invalidating outstanding JWT access tokens..."
-JWT_KEY_FILE="${JWT_SECRET_FILE:-$SCRIPT_DIR/jwt_secret.key}"
-if [[ -f "$JWT_KEY_FILE" ]]; then
-  rm -f "$JWT_KEY_FILE"
-  success "removed $JWT_KEY_FILE (regenerated on next server start)"
-else
-  echo "  ✓ no dev JWT key at $JWT_KEY_FILE — nothing to do"
-fi
+# (classic: logged in as Player1, then loaded real data). Two things already
+# cover this without touching any key material here:
+#   * SecurityFilter / the WS handshake reject a token whose subject is gone
+#     with a clean 401 (which bounces the SPA to /login), and
+#   * this script has just truncated the refresh_token table, so the silent
+#     refresh can't re-mint one either.
+# The RS256 signing keypair is now a committed dev key on the classpath (or a
+# JWT_PRIVATE_KEY_FILE / JWT_PUBLIC_KEY_FILE pair) — nothing to delete/rotate.
+echo "  ✓ stale access tokens handled by the subject-not-found 401 guard + refresh_token reset above"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo

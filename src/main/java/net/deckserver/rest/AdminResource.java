@@ -1,6 +1,5 @@
 package net.deckserver.rest;
 
-import net.deckserver.JolAdmin;
 import net.deckserver.services.HistoryService;
 import net.deckserver.storage.json.system.GameHistory;
 import net.deckserver.storage.json.system.PlayerResult;
@@ -8,7 +7,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.QuoteMode;
 
-import jakarta.ws.rs.ForbiddenException;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -25,6 +24,7 @@ import java.util.Map;
 // dedicated equivalents instead.
 @Path("/admin")
 @Produces(MediaType.APPLICATION_JSON)
+@RolesAllowed("ADMIN")
 public class AdminResource extends BaseResource {
 
     /**
@@ -34,9 +34,6 @@ public class AdminResource extends BaseResource {
     @Path("export/games.csv")
     @Produces(MediaType.TEXT_PLAIN)
     public String exportPastGamesAsCsv() throws IOException {
-        if (!JolAdmin.isAdmin(username())) {
-            throw new ForbiddenException("Admin role required");
-        }
         CSVFormat format = CSVFormat.DEFAULT.builder()
                 .setHeader("Game", "Started", "Ended", "Player", "Deck", "GW", "VP")
                 .setQuoteMode(QuoteMode.ALL)
