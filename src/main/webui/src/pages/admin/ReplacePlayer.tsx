@@ -3,30 +3,18 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import { runRequest } from '../../api/mutate';
+import { AdminSelect, toOptions, useAdminGames } from './adminControls';
 
 export function ReplacePlayer() {
-  const { data: games = {} } = useQuery({
-    queryKey: ['admin-page', 'games'],
-    queryFn: () => api.get<Record<string, string>>('/admin-page/games'),
-  });
+  const { gameOptions, gameId, setGameId } = useAdminGames();
   const { data: substitutes = [] } = useQuery({
     queryKey: ['admin-page', 'substitutes'],
     queryFn: () => api.get<string[]>('/admin-page/substitutes'),
   });
-  const gameIds = Object.keys(games);
-  const [gameId, setGameId] = useState('');
   const [players, setPlayers] = useState<string[]>([]);
   const [existingPlayer, setExistingPlayer] = useState('');
-  const [newPlayer, setNewPlayer] = useState('');
-
-  useEffect(() => {
-    if (!gameId && gameIds.length > 0) setGameId(gameIds[0]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameIds.length]);
-
-  useEffect(() => {
-    if (!newPlayer && substitutes.length > 0) setNewPlayer(substitutes[0]);
-  }, [substitutes, newPlayer]);
+  const [pickedSubstitute, setPickedSubstitute] = useState('');
+  const newPlayer = pickedSubstitute || substitutes[0] || '';
 
   useEffect(() => {
     if (!gameId) {
@@ -56,46 +44,21 @@ export function ReplacePlayer() {
         <CardTitle>Replace Player</CardTitle>
       </CardHeader>
       <div className="card-body">
-        <label htmlFor="adminGameList" className="form-label">
-          Games
-        </label>
-        <select id="adminGameList" className="form-select" value={gameId} onChange={(e) => setGameId(e.target.value)}>
-          {gameIds.map((id) => (
-            <option key={id} value={id}>
-              {games[id]}
-            </option>
-          ))}
-        </select>
-        <label htmlFor="adminReplacePlayerList" className="form-label">
-          Player to replace:
-        </label>
-        <select
+        <AdminSelect id="adminGameList" label="Games" value={gameId} onChange={setGameId} options={gameOptions} />
+        <AdminSelect
           id="adminReplacePlayerList"
-          className="form-select"
+          label="Player to replace:"
           value={existingPlayer}
-          onChange={(e) => setExistingPlayer(e.target.value)}
-        >
-          {players.map((p) => (
-            <option key={p} value={p}>
-              {p}
-            </option>
-          ))}
-        </select>
-        <label htmlFor="adminReplacementList" className="form-label">
-          Substitute
-        </label>
-        <select
+          onChange={setExistingPlayer}
+          options={toOptions(players)}
+        />
+        <AdminSelect
           id="adminReplacementList"
-          className="form-select"
+          label="Substitute"
           value={newPlayer}
-          onChange={(e) => setNewPlayer(e.target.value)}
-        >
-          {substitutes.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+          onChange={setPickedSubstitute}
+          options={toOptions(substitutes)}
+        />
         <button onClick={submit} className="btn btn-outline-secondary btn-sm mt-2">
           Replace player
         </button>

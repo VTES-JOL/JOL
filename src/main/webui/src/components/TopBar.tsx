@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useNav } from '../auth/useNav';
 import { pathForGame, pathForView, pathForHelp } from '../routes';
 import { logout as logoutRequest } from '../pages/login/authApi';
+import { CountryFlag } from './CountryFlag';
 import './TopBar.css';
 
 function toggleDarkMode() {
@@ -140,7 +141,7 @@ export function TopBar() {
             >
               <span>
                 {nav.country ? (
-                  <span className={`fi fi-${nav.country.toLowerCase()} fis rounded-1`} />
+                  <CountryFlag code={nav.country} className="rounded-1" tooltip={false} />
                 ) : (
                   <i className="bi bi-person-circle text-secondary" />
                 )}

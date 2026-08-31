@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
+import { useDebouncedCallback } from '../../hooks/useDebouncedCallback';
 
 /**
  * Debounced deck-notes textarea. Ported from jol-quarkus; Tailwind `jt:`
@@ -14,29 +15,16 @@ interface Props {
 
 export function DeckComments({ comments, onCommentsChange }: Props) {
   const [value, setValue] = useState(comments);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const changeRef = useRef(onCommentsChange);
-  useEffect(() => {
-    changeRef.current = onCommentsChange;
-  });
-
-  const handleChange = useCallback((next: string) => {
-    setValue(next);
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => changeRef.current(next.trim()), 1500);
-  }, []);
-
-  const flush = useCallback(() => {
-    clearTimeout(timerRef.current);
-    const trimmed = value.trim();
-    if (trimmed !== comments.trim()) changeRef.current(trimmed);
-  }, [value, comments]);
+  const { call: scheduleCommit, flush } = useDebouncedCallback(onCommentsChange, 1500);
 
   return (
     <div className="jt:px-3 jt:py-1.5 jt:border-b jt:border-line/50">
       <textarea
         value={value}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={(e) => {
+          setValue(e.target.value);
+          scheduleCommit(e.target.value.trim());
+        }}
         onBlur={flush}
         placeholder="Add a note…"
         rows={2}

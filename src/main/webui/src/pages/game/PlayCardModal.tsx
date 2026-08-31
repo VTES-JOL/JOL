@@ -93,20 +93,24 @@ export function PlayCardModal({
   };
 
   return (
-    <Modal onClose={onClose} contentStyle={{ textAlign: 'center' }}>
+    <Modal
+      onClose={onClose}
+      contentStyle={{ textAlign: 'center' }}
+      title={
+        definition ? (
+          <>
+            <span className={`icon card-type ${definition.type?.toLowerCase().replace(/ /g, '_').replace('/', ' ')}`} />{' '}
+            <span className="card-name">{definition.displayName}</span>
+          </>
+        ) : undefined
+      }
+    >
       {!definition ? (
         <div style={{ height: '30vh' }} className="d-flex align-items-center justify-content-center">
           <h2>Loading...</h2>
         </div>
       ) : (
         <>
-          <div className="modal-header">
-            <h5 className="modal-title">
-              <span className={`icon card-type ${definition.type?.toLowerCase().replace(/ /g, '_').replace('/', ' ')}`} />{' '}
-              <span className="card-name">{definition.displayName}</span>
-            </h5>
-            <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
-          </div>
           <div className="modal-body">
             <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={definition.displayName} />
             <div className="requirements d-flex justify-content-center gap-2">

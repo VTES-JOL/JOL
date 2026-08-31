@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pencil } from 'lucide-react';
 import type { CardDetail, DeckValidity } from '../../api/types';
 import type { DeckEntry } from './deckKit';
+import { useDebouncedCallback } from '../../hooks/useDebouncedCallback';
 import { Panel } from '../../components/ui/Panel';
 import { DeckSearchBar } from './DeckSearchBar';
 import { DeckComments } from './DeckComments';
@@ -58,7 +59,6 @@ export function DeckEditorPane({
   const entriesRef = useRef(initialEntries);
   const commentRef = useRef(initialComment);
   const dirtyRef = useRef(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const onSaveRef = useRef(onSave);
   const onEntriesChangeRef = useRef(onEntriesChange);
@@ -73,8 +73,12 @@ export function DeckEditorPane({
     }
   }, [editingName]);
 
-  const doSave = useCallback(async () => {
-    clearTimeout(timerRef.current);
+  // Persists the current working state. Runs on the debounce timer, on
+  // unmount (deck switch) when a debounced save is still pending — via
+  // useDebouncedCallback's flush — and directly from the "retry" control
+  // after a failed save (the recovery path if an unmount races a failure).
+  // setSaveStatus after an unmount is a harmless no-op under React 19.
+  const persist = useCallback(async () => {
     dirtyRef.current = false;
     setSaveStatus('saving');
     try {
@@ -86,21 +90,21 @@ export function DeckEditorPane({
     }
   }, []);
 
+  const { call: scheduleDebouncedSave, cancel: cancelDebouncedSave } = useDebouncedCallback(
+    () => void persist(),
+    SAVE_DEBOUNCE_MS,
+  );
+
   const scheduleSave = useCallback(() => {
     dirtyRef.current = true;
     setSaveStatus('saving');
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => void doSave(), SAVE_DEBOUNCE_MS);
-  }, [doSave]);
+    scheduleDebouncedSave();
+  }, [scheduleDebouncedSave]);
 
-  useEffect(() => {
-    return () => {
-      if (dirtyRef.current) {
-        clearTimeout(timerRef.current);
-        void onSaveRef.current(entriesToContents(entriesRef.current), commentRef.current);
-      }
-    };
-  }, []);
+  const retrySave = useCallback(() => {
+    cancelDebouncedSave();
+    void persist();
+  }, [cancelDebouncedSave, persist]);
 
   const mutate = useCallback(
     (fn: (prev: DeckEntry[]) => DeckEntry[]) => {
@@ -205,7 +209,7 @@ export function DeckEditorPane({
   return (
     <Panel
       title={titleSlot}
-      right={<DeckHeaderControls status={saveStatus} onRetry={doSave} onDelete={onDelete} />}
+      right={<DeckHeaderControls status={saveStatus} onRetry={retrySave} onDelete={onDelete} />}
     >
       <DeckSearchBar onSearch={onSearch} onAddCard={handleAddCard} />
       <DeckStatusBar entries={displayEntries} formatValidity={formatValidity} />

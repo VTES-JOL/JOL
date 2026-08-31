@@ -1,69 +1,28 @@
-import { useEffect, useState } from 'react';
-import { api } from '../../../api/client';
+import { useState } from 'react';
 import type { GameDuration } from '../../../api/types';
-import { SortIcon, useTableSort } from './statsUtils';
-import { runRequest } from '../../../api/mutate';
+import { SortableStatsTable, type StatsColumn } from './SortableStatsTable';
+import { useStatsQuery, type StatsFilters } from './useStatsQuery';
 
-export function GameStats({ fromDate, toDate, isTourney }: { fromDate: string; toDate: string; isTourney: boolean }) {
-  const [data, setData] = useState<GameDuration[]>([]);
+interface Row extends GameDuration, Record<string, unknown> {}
+
+export function GameStats(filters: StatsFilters) {
+  const { data = [] } = useStatsQuery<GameDuration[]>('/stats/games', filters);
   const [nameFilter, setNameFilter] = useState('');
   const [playerFilter, setPlayerFilter] = useState('');
 
-  useEffect(() => {
-    runRequest(api.post<GameDuration[]>('/stats/games', { treshold: 0, fromDate, toDate, isTourney }), 'Failed to load game stats', setData);
-  }, [fromDate, toDate, isTourney]);
+  const columns: StatsColumn<Row>[] = [
+    { key: 'gameName', header: 'Game', sortMode: 'default', filter: { value: nameFilter, onChange: setNameFilter } },
+    { key: 'players', header: 'Players', sortMode: 'default', filter: { value: playerFilter, onChange: setPlayerFilter } },
+    { key: 'duration', header: 'Duration ', sortMode: 'duration' },
+    {
+      key: 'hasGw',
+      header: 'GW? ',
+      sortMode: 'boolean',
+      render: (r) =>
+        r.hasGw ? <i className="bi bi-check-circle text-success" /> : <i className="bi bi-x-circle text-danger" />,
+    },
+    { key: 'vps', header: 'VPs ', sortMode: 'default' },
+  ];
 
-  const { sorted, toggle } = useTableSort(data as unknown as (GameDuration & Record<string, unknown>)[]);
-  const filtered = sorted.filter(
-    (r) =>
-      r.gameName.toLowerCase().includes(nameFilter.toLowerCase()) &&
-      r.players.toLowerCase().includes(playerFilter.toLowerCase()),
-  );
-
-  return (
-    <div className="overflow-auto pb-3" style={{ height: '78vh' }}>
-      <table className="table table-bordered table-sm mb-0">
-        <thead>
-          <tr>
-            <th className="sticky-top bg-white">
-              Game
-              <input type="text" value={nameFilter} onChange={(e) => setNameFilter(e.target.value)} />
-              <SortIcon column="gameName" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              Players
-              <input type="text" value={playerFilter} onChange={(e) => setPlayerFilter(e.target.value)} />
-              <SortIcon column="players" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              Duration <SortIcon column="duration" onSort={toggle} mode="duration" />
-            </th>
-            <th className="sticky-top bg-white">
-              GW? <SortIcon column="hasGw" onSort={toggle} mode="boolean" />
-            </th>
-            <th className="sticky-top bg-white">
-              VPs <SortIcon column="vps" onSort={toggle} />
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((r, i) => (
-            <tr key={i} className="border-top">
-              <td>{r.gameName}</td>
-              <td>{r.players}</td>
-              <td>{r.duration}</td>
-              <td>
-                {r.hasGw ? (
-                  <i className="bi bi-check-circle text-success" />
-                ) : (
-                  <i className="bi bi-x-circle text-danger" />
-                )}
-              </td>
-              <td>{r.vps}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+  return <SortableStatsTable<Row> rows={data as Row[]} columns={columns} rowKey={(_, i) => i} />;
 }

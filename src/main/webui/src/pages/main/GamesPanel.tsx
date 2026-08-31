@@ -4,6 +4,7 @@ import {Link} from 'react-router-dom';
 import {api} from '../../api/client';
 import type {GamesSummary, GameStatusBean} from '../../api/types';
 import {Card, CardHeader, CardTitle} from '../../components/Card';
+import {TabBar} from '../../components/TabBar';
 import {useAuth} from '../../auth/useAuth';
 import {pathForGame} from '../../routes';
 import './GamesPanel.css';
@@ -78,22 +79,13 @@ export function GamesPanel() {
             <CardHeader>
                 <CardTitle>Games List</CardTitle>
             </CardHeader>
-            <ul className="nav nav-tabs ms-0 border-0 bg-secondary-subtle" role="tablist">
-                {TABS.map((tab) => (
-                    <li key={tab.id} className="nav-item" role="presentation">
-                        <button
-                            className={`nav-link px-3 py-2${activeTab === tab.id ? ' active' : ''}`}
-                            type="button"
-                            role="tab"
-                            aria-selected={activeTab === tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                        >
-                            {tab.label} <span
-                            className="badge rounded-pill bg-secondary ms-1">{summary[tab.field].length}</span>
-                        </button>
-                    </li>
-                ))}
-            </ul>
+            <TabBar
+                tabs={TABS.map((tab) => ({ id: tab.id, label: tab.label, badge: summary[tab.field].length }))}
+                active={activeTab}
+                onChange={setActiveTab}
+                className="ms-0 border-0 bg-secondary-subtle"
+                tabClassName="px-3 py-2"
+            />
             {/*
         Bootstrap's own .tab-pane{display:none} rule has no matching
         .active{display:block} override in its CSS — that toggle is normally

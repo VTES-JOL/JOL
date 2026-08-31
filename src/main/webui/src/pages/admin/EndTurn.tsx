@@ -1,22 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
+import { AdminSelect, useAdminGames } from './adminControls';
 
 export function EndTurn() {
-  const { data: games = {} } = useQuery({
-    queryKey: ['admin-page', 'games'],
-    queryFn: () => api.get<Record<string, string>>('/admin-page/games'),
-  });
-  const gameIds = Object.keys(games);
-  const [gameId, setGameId] = useState('');
-
-  useEffect(() => {
-    if (!gameId && gameIds.length > 0) setGameId(gameIds[0]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameIds.length]);
+  const { games, gameOptions, gameId, setGameId } = useAdminGames();
 
   const submit = async () => {
     if (!gameId) return;
@@ -30,16 +19,7 @@ export function EndTurn() {
         <CardTitle>End Turn</CardTitle>
       </CardHeader>
       <div className="card-body">
-        <label htmlFor="endTurnList" className="form-label">
-          Games
-        </label>
-        <select id="endTurnList" className="form-select" value={gameId} onChange={(e) => setGameId(e.target.value)}>
-          {gameIds.map((id) => (
-            <option key={id} value={id}>
-              {games[id]}
-            </option>
-          ))}
-        </select>
+        <AdminSelect id="endTurnList" label="Games" value={gameId} onChange={setGameId} options={gameOptions} />
         <button onClick={submit} className="btn btn-outline-secondary btn-sm mt-2">
           End Turn
         </button>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
+import { useInvalidate } from '../api/useInvalidate';
 import type { GameStatusBean } from '../api/types';
 import { GameList } from './lobby/GameList';
 import { GameCreateForm } from './lobby/GameCreateForm';
@@ -26,7 +27,6 @@ const GAMES_QUERY_KEY = ['lobby', 'games'];
 //  - mutations invalidate the games query instead of applying a returned
 //    page object — this page no longer owns the games list, the query cache does
 export function LobbyPage() {
-  const queryClient = useQueryClient();
   const [view, setView] = useState<View>(null);
 
   const { data: games } = useQuery({
@@ -34,7 +34,7 @@ export function LobbyPage() {
     queryFn: () => api.get<GameStatusBean[]>('/lobby/player/games'),
   });
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: GAMES_QUERY_KEY });
+  const refresh = useInvalidate(GAMES_QUERY_KEY);
 
   const selectGame = (game: GameStatusBean) => setView({ mode: 'detail', gameName: game.name });
 

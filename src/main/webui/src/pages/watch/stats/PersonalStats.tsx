@@ -1,227 +1,86 @@
-import { useEffect, useState } from 'react';
-import { api } from '../../../api/client';
+import { useState } from 'react';
 import type { DeckMatchup, OpponentStats } from '../../../api/types';
-import { SortIcon, useTableSort } from './statsUtils';
-import { runRequest } from '../../../api/mutate';
+import { TabBar, type TabDef } from '../../../components/TabBar';
+import { SortableStatsTable, type StatsColumn } from './SortableStatsTable';
+import { useStatsQuery, type StatsFilters } from './useStatsQuery';
+
+interface PersonalProps extends StatsFilters {
+  player: string;
+}
+
+const SUB_TABS: TabDef<'opponent' | 'deck'>[] = [
+  { id: 'opponent', label: 'Opponent Performance' },
+  { id: 'deck', label: 'Deck Performance' },
+];
 
 interface OpponentRow extends OpponentStats, Record<string, unknown> {}
+interface DeckRow extends DeckMatchup, Record<string, unknown> {}
 
-function OpponentPerformance({
-  player,
-  fromDate,
-  toDate,
-  isTourney,
-}: {
-  player: string;
-  fromDate: string;
-  toDate: string;
-  isTourney: boolean;
-}) {
-  const [data, setData] = useState<Record<string, OpponentStats>>({});
+function OpponentPerformance({ player, ...filters }: PersonalProps) {
+  const { data = {} } = useStatsQuery<Record<string, OpponentStats>>(
+    `/stats/performance/${encodeURIComponent(player)}/players`,
+    filters,
+  );
   const [nameFilter, setNameFilter] = useState('');
 
-  useEffect(() => {
-    runRequest(
-      api.post<Record<string, OpponentStats>>(`/stats/performance/${encodeURIComponent(player)}/players`, {
-        treshold: 0,
-        fromDate,
-        toDate,
-        isTourney,
-      }),
-      'Failed to load opponent stats',
-      setData,
-    );
-  }, [player, fromDate, toDate, isTourney]);
-
-  const rows = Object.values(data) as OpponentRow[];
-  const { sorted, toggle } = useTableSort(rows);
-  const filtered = sorted.filter((r) => r.opponent.toLowerCase().includes(nameFilter.toLowerCase()));
+  const columns: StatsColumn<OpponentRow>[] = [
+    { key: 'opponent', header: 'Opponent', sortMode: 'default', filter: { value: nameFilter, onChange: setNameFilter } },
+    { key: 'games', header: 'Number of Games ', sortMode: 'default' },
+    { key: 'wins', header: 'Wins ', sortMode: 'default' },
+    { key: 'winRate', header: 'Win Rate ', sortMode: 'percent' },
+    { key: 'winOpponent', header: 'Opponent Won ', sortMode: 'default' },
+    { key: 'winRateOpponent', header: 'Win Rate Against Opponent ', sortMode: 'percent' },
+    { key: 'winOther', header: 'Other player won ', sortMode: 'default' },
+    { key: 'losses', header: 'Losses ', sortMode: 'default' },
+  ];
 
   return (
-    <div className="overflow-auto pb-3" style={{ height: '73vh' }}>
-      <table className="table table-bordered table-sm mb-0">
-        <thead>
-          <tr>
-            <th className="sticky-top bg-white">
-              Opponent
-              <input type="text" value={nameFilter} onChange={(e) => setNameFilter(e.target.value)} />
-              <SortIcon column="opponent" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              Number of Games <SortIcon column="games" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              Wins <SortIcon column="wins" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              Win Rate <SortIcon column="winRate" onSort={toggle} mode="percent" />
-            </th>
-            <th className="sticky-top bg-white">
-              Opponent Won <SortIcon column="winOpponent" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              Win Rate Against Opponent <SortIcon column="winRateOpponent" onSort={toggle} mode="percent" />
-            </th>
-            <th className="sticky-top bg-white">
-              Other player won <SortIcon column="winOther" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              Losses <SortIcon column="losses" onSort={toggle} />
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((r) => (
-            <tr key={r.opponent} className="border-top">
-              <td>{r.opponent}</td>
-              <td>{r.games}</td>
-              <td>{r.wins}</td>
-              <td>{r.winRate}</td>
-              <td>{r.winOpponent}</td>
-              <td>{r.winRateOpponent}</td>
-              <td>{r.winOther}</td>
-              <td>{r.losses}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <SortableStatsTable<OpponentRow>
+      rows={Object.values(data) as OpponentRow[]}
+      columns={columns}
+      rowKey={(r) => r.opponent}
+    />
   );
 }
 
-function DeckPerformance({
-  player,
-  fromDate,
-  toDate,
-  isTourney,
-}: {
-  player: string;
-  fromDate: string;
-  toDate: string;
-  isTourney: boolean;
-}) {
-  const [data, setData] = useState<DeckMatchup[]>([]);
+function DeckPerformance({ player, ...filters }: PersonalProps) {
+  const { data = [] } = useStatsQuery<DeckMatchup[]>(`/stats/performance/${encodeURIComponent(player)}/decks`, filters);
   const [deckFilter, setDeckFilter] = useState('');
   const [opponentFilter, setOpponentFilter] = useState('');
   const [gamesFilter, setGamesFilter] = useState('');
 
-  useEffect(() => {
-    runRequest(
-      api.post<DeckMatchup[]>(`/stats/performance/${encodeURIComponent(player)}/decks`, {
-        treshold: 0,
-        fromDate,
-        toDate,
-        isTourney,
-      }),
-      'Failed to load deck performance',
-      setData,
-    );
-  }, [player, fromDate, toDate, isTourney]);
+  const columns: StatsColumn<DeckRow>[] = [
+    { key: 'deckName', header: 'Deck', sortMode: 'default', filter: { value: deckFilter, onChange: setDeckFilter } },
+    {
+      key: 'opponentDeckName',
+      header: 'Opponent Deck',
+      sortMode: 'default',
+      filter: { value: opponentFilter, onChange: setOpponentFilter },
+    },
+    { key: 'gameNames', header: 'Game Names', sortMode: 'default', filter: { value: gamesFilter, onChange: setGamesFilter } },
+    { key: 'games', header: 'Games ', sortMode: 'default' },
+    { key: 'totalWins', header: 'Wins ', sortMode: 'default' },
+    { key: 'totalVP', header: 'VP ', sortMode: 'default' },
+    { key: 'averageVP', header: 'Avg VP ', sortMode: 'default' },
+    { key: 'opponentTotalVP', header: 'Opponent VP ', sortMode: 'default' },
+    { key: 'opponentAverageVP', header: 'Opponent Avg VP ', sortMode: 'default' },
+    { key: 'vpDifference', header: 'VP Difference ', sortMode: 'default' },
+  ];
 
-  const { sorted, toggle } = useTableSort(data as unknown as (DeckMatchup & Record<string, unknown>)[]);
-  const filtered = sorted.filter(
-    (r) =>
-      r.deckName.toLowerCase().includes(deckFilter.toLowerCase()) &&
-      r.opponentDeckName.toLowerCase().includes(opponentFilter.toLowerCase()) &&
-      r.gameNames.toLowerCase().includes(gamesFilter.toLowerCase()),
-  );
-
-  return (
-    <div className="overflow-auto pb-3" style={{ height: '73vh' }}>
-      <table className="table table-bordered table-sm mb-0">
-        <thead>
-          <tr>
-            <th className="sticky-top bg-white">
-              Deck
-              <input type="text" value={deckFilter} onChange={(e) => setDeckFilter(e.target.value)} />
-              <SortIcon column="deckName" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              Opponent Deck
-              <input type="text" value={opponentFilter} onChange={(e) => setOpponentFilter(e.target.value)} />
-              <SortIcon column="opponentDeckName" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              Game Names
-              <input type="text" value={gamesFilter} onChange={(e) => setGamesFilter(e.target.value)} />
-              <SortIcon column="gameNames" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              Games <SortIcon column="games" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              Wins <SortIcon column="totalWins" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              VP <SortIcon column="totalVP" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              Avg VP <SortIcon column="averageVP" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              Opponent VP <SortIcon column="opponentTotalVP" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              Opponent Avg VP <SortIcon column="opponentAverageVP" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-white">
-              VP Difference <SortIcon column="vpDifference" onSort={toggle} />
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((r, i) => (
-            <tr key={i} className="border-top">
-              <td>{r.deckName}</td>
-              <td>{r.opponentDeckName}</td>
-              <td>{r.gameNames}</td>
-              <td>{r.games}</td>
-              <td>{r.totalWins}</td>
-              <td>{r.totalVP}</td>
-              <td>{r.averageVP}</td>
-              <td>{r.opponentTotalVP}</td>
-              <td>{r.opponentAverageVP}</td>
-              <td>{r.vpDifference}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+  return <SortableStatsTable<DeckRow> rows={data as DeckRow[]} columns={columns} rowKey={(_, i) => i} />;
 }
 
-export function PersonalStats({
-  player,
-  fromDate,
-  toDate,
-  isTourney,
-}: {
-  player: string;
-  fromDate: string;
-  toDate: string;
-  isTourney: boolean;
-}) {
+export function PersonalStats({ player, ...filters }: PersonalProps) {
   const [subTab, setSubTab] = useState<'opponent' | 'deck'>('opponent');
 
   return (
     <div>
-      <ul className="nav nav-tabs mt-3">
-        <li className="nav-item">
-          <button className={`nav-link ${subTab === 'opponent' ? 'active' : ''}`} onClick={() => setSubTab('opponent')}>
-            Opponent Performance
-          </button>
-        </li>
-        <li className="nav-item">
-          <button className={`nav-link ${subTab === 'deck' ? 'active' : ''}`} onClick={() => setSubTab('deck')}>
-            Deck Performance
-          </button>
-        </li>
-      </ul>
+      <TabBar tabs={SUB_TABS} active={subTab} onChange={setSubTab} className="mt-3" />
       <div className="tab-content mt-3">
         {subTab === 'opponent' ? (
-          <OpponentPerformance player={player} fromDate={fromDate} toDate={toDate} isTourney={isTourney} />
+          <OpponentPerformance player={player} {...filters} />
         ) : (
-          <DeckPerformance player={player} fromDate={fromDate} toDate={toDate} isTourney={isTourney} />
+          <DeckPerformance player={player} {...filters} />
         )}
       </div>
     </div>

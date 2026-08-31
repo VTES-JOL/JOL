@@ -1,22 +1,24 @@
 import { useEffect, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import type { SiteNotes } from '../../api/types';
+import { useInvalidate } from '../../api/useInvalidate';
 import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
 
+const SITE_NOTES_KEY = ['admin-page', 'site-notes'];
+
 export function SiteNotesEditor() {
-  const queryClient = useQueryClient();
   const { data } = useQuery({
-    queryKey: ['admin-page', 'site-notes'],
+    queryKey: SITE_NOTES_KEY,
     queryFn: () => api.get<SiteNotes>('/admin-page/site-notes'),
   });
   const [text, setText] = useState('');
 
   useEffect(() => setText(data?.notes ?? ''), [data]);
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin-page', 'site-notes'] });
+  const refresh = useInvalidate(SITE_NOTES_KEY);
 
   const save = () => {
     runRequest(api.put('/admin-page/site-notes', { notes: text }), 'Failed to save site notes', refresh);

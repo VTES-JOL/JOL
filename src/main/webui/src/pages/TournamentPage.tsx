@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
+import { useInvalidate } from '../api/useInvalidate';
 import type { TournamentList as TournamentListData } from '../api/types';
 import { TournamentList, type Selection } from './tournament/TournamentList';
 import { OpenTournamentDetail } from './tournament/OpenTournamentDetail';
@@ -10,13 +11,13 @@ import { PanelPlaceholder } from '../components/PanelPlaceholder';
 import { SplitLayout } from '../components/SplitLayout';
 
 const TOURNAMENT_LIST_QUERY_KEY = ['tournament', 'list'];
+const TOURNAMENT_REGISTERED_QUERY_KEY = ['tournament', 'registered'];
 
 // Each widget below fetches its own slice (see tournament/*.tsx) —
 // registering a tournament deck no longer forces the tournament list to
 // refetch, and vice versa. See TournamentResource for the backend side of
 // this split (was previously one combined TournamentBean).
 export function TournamentPage() {
-  const queryClient = useQueryClient();
   const [selection, setSelection] = useState<Selection>(null);
 
   const { data } = useQuery({
@@ -24,16 +25,16 @@ export function TournamentPage() {
     queryFn: () => api.get<TournamentListData>('/tournament/list'),
   });
 
+  // Join/leave change tournament.registered on the list itself; deck
+  // registration doesn't, so it only needs to invalidate ['tournament','registered'].
+  const refreshList = useInvalidate(TOURNAMENT_LIST_QUERY_KEY);
+  const refreshRegistered = useInvalidate(TOURNAMENT_REGISTERED_QUERY_KEY);
+
   if (!data) return <PageLoading />;
 
   const openTournament = selection?.type === 'open' ? data.tournaments.find((t) => t.name === selection.name) : null;
   const finalsTournament =
     selection?.type === 'finals' ? data.finalsInvites.find((t) => t.name === selection.name) : null;
-
-  // Join/leave change tournament.registered on the list itself; deck
-  // registration doesn't, so it only needs to invalidate ['tournament','registered'].
-  const refreshList = () => queryClient.invalidateQueries({ queryKey: TOURNAMENT_LIST_QUERY_KEY });
-  const refreshRegistered = () => queryClient.invalidateQueries({ queryKey: ['tournament', 'registered'] });
 
   return (
     <SplitLayout

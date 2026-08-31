@@ -1,21 +1,15 @@
-import { useEffect, useState } from 'react';
-import { api } from '../../../api/client';
+import { useState } from 'react';
 import type { StatsDto } from '../../../api/types';
 import { StatsDtoTable } from './StatsDtoTable';
-import { runRequest } from '../../../api/mutate';
+import { useStatsQuery, type StatsFilters } from './useStatsQuery';
 
-export function PlayerStats({ fromDate, toDate, isTourney }: { fromDate: string; toDate: string; isTourney: boolean }) {
-  const [data, setData] = useState<Record<string, StatsDto>>({});
+export function PlayerStats(filters: StatsFilters) {
   const [threshold, setThreshold] = useState('0');
   const [nameFilter, setNameFilter] = useState('');
-
-  useEffect(() => {
-    runRequest(
-      api.post<Record<string, StatsDto>>('/stats/players', { treshold: Number(threshold) || 0, fromDate, toDate, isTourney }),
-      'Failed to load player stats',
-      setData,
-    );
-  }, [threshold, fromDate, toDate, isTourney]);
+  const { data = {} } = useStatsQuery<Record<string, StatsDto>>('/stats/players', {
+    ...filters,
+    threshold: Number(threshold) || 0,
+  });
 
   return (
     <StatsDtoTable

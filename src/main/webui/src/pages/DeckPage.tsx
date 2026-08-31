@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FolderOpen } from 'lucide-react';
 import { api } from '../api/client';
 import { runRequest } from '../api/mutate';
+import { useInvalidate } from '../api/useInvalidate';
 import type { CardDetail, DeckInfoBean, DeckPageBean } from '../api/types';
 import { PageLoading } from '../components/PageLoading';
 import { MasterDetailView } from '../components/ui/MasterDetailView';
@@ -98,10 +99,7 @@ export function DeckPage() {
     [queryClient],
   );
 
-  const refreshList = useCallback(
-    () => queryClient.invalidateQueries({ queryKey: LIST_KEY }),
-    [queryClient],
-  );
+  const refreshList = useInvalidate(LIST_KEY);
 
   const addCardDetail = useCallback((card: CardDetail) => {
     setDetailMap((prev) => (prev.has(card.id) ? prev : new Map(prev).set(card.id, card)));

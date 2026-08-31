@@ -26,11 +26,7 @@ export function QuickChatModal({ onSend, onClose }: { onSend: (message: string) 
   };
 
   return (
-    <Modal size="lg" onClose={onClose}>
-      <div className="modal-header">
-        <h5 className="modal-title">Quick Chat</h5>
-        <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
-      </div>
+    <Modal size="lg" onClose={onClose} title="Quick Chat">
       <div className="modal-body">
         {ROWS.map((row, i) => (
           <div key={i}>

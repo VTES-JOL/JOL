@@ -2,6 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 import {api} from '../../api/client';
 import type {UserSummary} from '../../api/types';
 import {Card, CardHeader, CardTitle} from '../../components/Card';
+import {CountryFlag} from '../../components/CountryFlag';
 import {useSimpleTooltips} from '../../hooks/useSimpleTooltips';
 import './OnlineUsers.css';
 
@@ -13,7 +14,6 @@ import './OnlineUsers.css';
 const REFRESH_INTERVAL_MS = 60_000;
 const OFFLINE_THRESHOLD_MINUTES = 60;
 
-const regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
 const LAST_ONLINE_FORMAT = new Intl.DateTimeFormat('en-US', {
     timeZone: 'UTC',
     day: 'numeric',
@@ -31,12 +31,7 @@ function UserRow({user}: { user: UserSummary }) {
     const isOffline = minutesSince(user.lastOnline) > OFFLINE_THRESHOLD_MINUTES;
     return (
         <div className="online-player-row">
-            {user.country && (
-                <span
-                    data-tippy-content={regionNames.of(user.country)}
-                    className={`fi fi-${user.country.toLowerCase()} fis`}
-                />
-            )}
+            {user.country && <CountryFlag code={user.country} />}
             <span className="flex-grow-1 text-truncate">{user.name}</span>
             {user.roles.includes('ADMIN') && (
                 <i data-tippy-content="Administrator" className="bi bi-star-fill text-warning"/>

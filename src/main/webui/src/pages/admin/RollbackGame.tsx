@@ -1,24 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
+import { AdminSelect, toOptions, useAdminGames } from './adminControls';
 
 export function RollbackGame() {
-  const { data: games = {} } = useQuery({
-    queryKey: ['admin-page', 'games'],
-    queryFn: () => api.get<Record<string, string>>('/admin-page/games'),
-  });
-  const gameIds = Object.keys(games);
-  const [gameId, setGameId] = useState('');
+  const { games, gameOptions, gameId, setGameId } = useAdminGames();
   const [turns, setTurns] = useState<string[]>([]);
   const [turn, setTurn] = useState('');
-
-  useEffect(() => {
-    if (!gameId && gameIds.length > 0) setGameId(gameIds[0]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameIds.length]);
 
   useEffect(() => {
     if (!gameId) {
@@ -46,31 +36,14 @@ export function RollbackGame() {
         <CardTitle>Rollback Game</CardTitle>
       </CardHeader>
       <div className="card-body">
-        <label htmlFor="rollbackGamesList" className="form-label">
-          Games
-        </label>
-        <select
-          id="rollbackGamesList"
-          className="form-select"
-          value={gameId}
-          onChange={(e) => setGameId(e.target.value)}
-        >
-          {gameIds.map((id) => (
-            <option key={id} value={id}>
-              {games[id]}
-            </option>
-          ))}
-        </select>
-        <label htmlFor="rollbackTurnsList" className="form-label">
-          Turns
-        </label>
-        <select id="rollbackTurnsList" className="form-select" value={turn} onChange={(e) => setTurn(e.target.value)}>
-          {turns.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
+        <AdminSelect id="rollbackGamesList" label="Games" value={gameId} onChange={setGameId} options={gameOptions} />
+        <AdminSelect
+          id="rollbackTurnsList"
+          label="Turns"
+          value={turn}
+          onChange={setTurn}
+          options={toOptions(turns)}
+        />
         <button onClick={submit} className="btn btn-outline-secondary btn-sm mt-2">
           Rollback Game
         </button>

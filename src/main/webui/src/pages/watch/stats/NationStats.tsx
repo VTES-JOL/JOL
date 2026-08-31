@@ -1,25 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
-import { api } from '../../../api/client';
+import { useRef, useState } from 'react';
 import type { StatsDto } from '../../../api/types';
-import { StatsDtoTable } from './StatsDtoTable';
+import { CountryFlag, countryName } from '../../../components/CountryFlag';
 import { useSimpleTooltips } from '../../../hooks/useSimpleTooltips';
-import { runRequest } from '../../../api/mutate';
+import { StatsDtoTable } from './StatsDtoTable';
+import { useStatsQuery, type StatsFilters } from './useStatsQuery';
 
-const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
-
-export function NationStats({ fromDate, toDate, isTourney }: { fromDate: string; toDate: string; isTourney: boolean }) {
-  const [data, setData] = useState<Record<string, StatsDto>>({});
+export function NationStats(filters: StatsFilters) {
   const [threshold, setThreshold] = useState('0');
   const [nameFilter, setNameFilter] = useState('');
   const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    runRequest(
-      api.post<Record<string, StatsDto>>('/stats/nations', { treshold: Number(threshold) || 0, fromDate, toDate, isTourney }),
-      'Failed to load nation stats',
-      setData,
-    );
-  }, [threshold, fromDate, toDate, isTourney]);
+  const { data = {} } = useStatsQuery<Record<string, StatsDto>>('/stats/nations', {
+    ...filters,
+    threshold: Number(threshold) || 0,
+  });
 
   useSimpleTooltips(ref, [data]);
 
@@ -31,14 +24,14 @@ export function NationStats({ fromDate, toDate, isTourney }: { fromDate: string;
         nameHeader="Nation"
         renderName={(code) => (
           <>
-            {regionNames.of(code)} / <span data-tippy-content={regionNames.of(code)} className={`fi fi-${code.toLowerCase()} fis`} />
+            {countryName(code)} / <CountryFlag code={code} />
           </>
         )}
         threshold={threshold}
         onThresholdChange={setThreshold}
         nameFilter={nameFilter}
         onNameFilterChange={setNameFilter}
-        filterValue={(code) => regionNames.of(code) ?? code}
+        filterValue={(code) => countryName(code) ?? code}
       />
     </div>
   );

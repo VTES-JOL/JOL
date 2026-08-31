@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
+import { useInvalidate } from '../api/useInvalidate';
 import type { TournamentMetadata } from '../api/types';
 import { TournamentAdminList } from './tournamentAdmin/TournamentAdminList';
 import { TournamentEditor } from './tournamentAdmin/TournamentEditor';
@@ -30,7 +31,6 @@ function decide(t: TournamentMetadata): View {
 }
 
 export function TournamentAdminPage() {
-  const queryClient = useQueryClient();
   const [view, setView] = useState<View>(null);
   // Set by TournamentEditor's onDirtyChange — a ref, not state, since it's
   // only ever read at the moment of a new selection, never during render.
@@ -41,7 +41,7 @@ export function TournamentAdminPage() {
     queryFn: () => api.get<TournamentMetadata[]>('/tournament/admin-list'),
   });
 
-  const refreshList = () => queryClient.invalidateQueries({ queryKey: TOURNAMENT_ADMIN_LIST_KEY });
+  const refreshList = useInvalidate(TOURNAMENT_ADMIN_LIST_KEY);
 
   // Derived from the live query result each render instead of a copy
   // snapshotted into `view` — so it never goes stale relative to `tournaments`.

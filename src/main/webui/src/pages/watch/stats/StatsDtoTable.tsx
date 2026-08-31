@@ -1,24 +1,16 @@
 import type { ReactNode } from 'react';
 import type { StatsDto } from '../../../api/types';
-import { SortIcon, useTableSort } from './statsUtils';
+import { SortableStatsTable, type StatsColumn } from './SortableStatsTable';
 
-interface Row extends Record<string, unknown> {
+interface Row extends StatsDto, Record<string, unknown> {
   key: string;
-  allGames: string;
-  gwCount: string;
-  vpCount: string;
-  winRate: string;
-  avgVp: string;
-  highestVp: string;
-  uniqueOpponents: string;
-  mostPlayedOpponent: string;
-  winStreak: string;
 }
 
 // Shared row shape/sort logic behind /stats/players, /stats/decks, /stats/nations
 // (ds.js's createStats()) — the only real differences between those three tabs
 // are the name column's header/rendering, the threshold input, and whether the
-// two "opponent" columns are shown (players only).
+// two "opponent" columns are shown (players only). Thin preset over
+// SortableStatsTable.
 export function StatsDtoTable({
   data,
   extended,
@@ -43,83 +35,45 @@ export function StatsDtoTable({
   filterValue?: (key: string) => string;
 }) {
   const rows: Row[] = Object.entries(data).map(([key, dto]) => ({ key, ...dto }));
-  const { sorted, toggle } = useTableSort(rows);
-  const filtered = sorted.filter((r) => filterValue(r.key).toLowerCase().includes(nameFilter.toLowerCase()));
 
-  return (
-    <div className="overflow-auto pb-3" style={{ maxHeight: '78vh' }}>
-      <table className="table table-bordered table-sm mb-0">
-        <thead>
-          <tr>
-            <th className="sticky-top bg-body">
-              {nameHeader}
-              <input
-                type="text"
-                className="form-control form-control-sm d-inline-block w-auto ms-1"
-                value={nameFilter}
-                onChange={(e) => onNameFilterChange(e.target.value)}
-              />
-              <SortIcon column="key" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-body">
-              Number of Games
-              <input
-                type="number"
-                min={0}
-                className="form-control form-control-sm d-inline-block ms-1"
-                value={threshold}
-                onChange={(e) => onThresholdChange(e.target.value)}
-                style={{ width: 60 }}
-              />
-              <SortIcon column="allGames" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-body">
-              GW Total <SortIcon column="gwCount" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-body">
-              VP Total <SortIcon column="vpCount" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-body">
-              % Win Rate <SortIcon column="winRate" onSort={toggle} mode="percent" />
-            </th>
-            <th className="sticky-top bg-body">
-              Average VP <SortIcon column="avgVp" onSort={toggle} />
-            </th>
-            <th className="sticky-top bg-body">
-              Highest VP <SortIcon column="highestVp" onSort={toggle} />
-            </th>
-            {extended && (
-              <th className="sticky-top bg-body">
-                Unique Opponents <SortIcon column="uniqueOpponents" onSort={toggle} />
-              </th>
-            )}
-            {extended && (
-              <th className="sticky-top bg-body">
-                Most played Opponent <SortIcon column="mostPlayedOpponent" onSort={toggle} />
-              </th>
-            )}
-            <th className="sticky-top bg-body">
-              Highest Win Streak <SortIcon column="winStreak" onSort={toggle} />
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((r) => (
-            <tr key={r.key} className="border-top">
-              <td>{renderName(r.key)}</td>
-              <td>{r.allGames}</td>
-              <td>{r.gwCount}</td>
-              <td>{r.vpCount}</td>
-              <td>{r.winRate}</td>
-              <td>{r.avgVp}</td>
-              <td>{r.highestVp}</td>
-              {extended && <td>{r.uniqueOpponents}</td>}
-              {extended && <td>{r.mostPlayedOpponent}</td>}
-              <td>{r.winStreak}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+  const columns: StatsColumn<Row>[] = [
+    {
+      key: 'key',
+      header: nameHeader,
+      sortMode: 'default',
+      render: (r) => renderName(r.key),
+      filter: { value: nameFilter, onChange: onNameFilterChange, accessor: (r) => filterValue(r.key) },
+    },
+    {
+      key: 'allGames',
+      sortMode: 'default',
+      header: (
+        <>
+          Number of Games
+          <input
+            type="number"
+            min={0}
+            className="form-control form-control-sm d-inline-block ms-1"
+            value={threshold}
+            onChange={(e) => onThresholdChange(e.target.value)}
+            style={{ width: 60 }}
+          />
+        </>
+      ),
+    },
+    { key: 'gwCount', header: 'GW Total ', sortMode: 'default' },
+    { key: 'vpCount', header: 'VP Total ', sortMode: 'default' },
+    { key: 'winRate', header: '% Win Rate ', sortMode: 'percent' },
+    { key: 'avgVp', header: 'Average VP ', sortMode: 'default' },
+    { key: 'highestVp', header: 'Highest VP ', sortMode: 'default' },
+    ...(extended
+      ? ([
+          { key: 'uniqueOpponents', header: 'Unique Opponents ', sortMode: 'default' },
+          { key: 'mostPlayedOpponent', header: 'Most played Opponent ', sortMode: 'default' },
+        ] as StatsColumn<Row>[])
+      : []),
+    { key: 'winStreak', header: 'Highest Win Streak ', sortMode: 'default' },
+  ];
+
+  return <SortableStatsTable<Row> rows={rows} columns={columns} rowKey={(r) => r.key} />;
 }

@@ -37,11 +37,21 @@ export function ImportTablesModal({
   };
 
   return (
-    <Modal size="lg" onClose={onClose}>
-      <div className="modal-header">
-        <h5 className="modal-title">Import Tables from CSV</h5>
-        <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
-      </div>
+    <Modal
+      size="lg"
+      onClose={onClose}
+      title="Import Tables from CSV"
+      footer={
+        <>
+          <button type="button" className="btn btn-secondary" onClick={onClose}>
+            Cancel
+          </button>
+          <button type="button" className="btn btn-primary" onClick={submit}>
+            Import
+          </button>
+        </>
+      }
+    >
       <div className="modal-body">
         <p className="text-muted small">
           Paste CSV data with columns <code>Round</code>, <code>Table</code>, <code>Player</code>. The header row is
@@ -55,14 +65,6 @@ export function ImportTablesModal({
           onChange={(e) => setCsvData(e.target.value)}
         />
         {error && <div className="alert alert-danger mt-2">{error}</div>}
-      </div>
-      <div className="modal-footer">
-        <button type="button" className="btn btn-secondary" onClick={onClose}>
-          Cancel
-        </button>
-        <button type="button" className="btn btn-primary" onClick={submit}>
-          Import
-        </button>
       </div>
     </Modal>
   );

@@ -9,11 +9,7 @@ export function QuickCommandModal({ onSend, onClose }: { onSend: (command: strin
   };
 
   return (
-    <Modal size="lg" onClose={onClose}>
-      <div className="modal-header">
-        <h5 className="modal-title">Quick Command</h5>
-        <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
-      </div>
+    <Modal size="lg" onClose={onClose} title="Quick Command">
       <div className="modal-body">
         <div>
           <button type="button" className="btn btn-outline-secondary m-1" onClick={() => send('unlock')}>

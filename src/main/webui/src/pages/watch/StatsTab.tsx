@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { TabBar, type TabDef } from '../../components/TabBar';
 import { useAuth } from '../../auth/useAuth';
 import { PlayerStats } from './stats/PlayerStats';
 import { DeckStats } from './stats/DeckStats';
@@ -9,7 +10,7 @@ import { JolStats } from './stats/JolStats';
 
 type StatsSubTab = 'player' | 'deck' | 'nation' | 'personal' | 'game' | 'jol';
 
-const TABS: { id: StatsSubTab; label: string }[] = [
+const TABS: TabDef<StatsSubTab>[] = [
   { id: 'player', label: 'Players' },
   { id: 'deck', label: 'Decks' },
   { id: 'nation', label: 'Nations' },
@@ -94,15 +95,7 @@ export function StatsTab() {
           </div>
         </div>
       </div>
-      <ul className="nav nav-tabs mt-3">
-        {TABS.map((t) => (
-          <li className="nav-item" key={t.id}>
-            <button className={`nav-link ${subTab === t.id ? 'active' : ''}`} onClick={() => setSubTab(t.id)}>
-              {t.label}
-            </button>
-          </li>
-        ))}
-      </ul>
+      <TabBar tabs={TABS} active={subTab} onChange={setSubTab} className="mt-3" />
       <div className="tab-content mt-3">
         {subTab === 'player' && <PlayerStats fromDate={fromDate} toDate={toDate} isTourney={isTourney} />}
         {subTab === 'deck' && <DeckStats fromDate={fromDate} toDate={toDate} isTourney={isTourney} />}

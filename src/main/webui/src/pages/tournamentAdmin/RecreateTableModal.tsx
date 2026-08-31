@@ -40,11 +40,21 @@ export function RecreateTableModal({
   };
 
   return (
-    <Modal size="lg" onClose={onClose}>
-      <div className="modal-header">
-        <h5 className="modal-title">Recreate Table</h5>
-        <button type="button" className="btn-close" onClick={onClose} aria-label="Close" />
-      </div>
+    <Modal
+      size="lg"
+      onClose={onClose}
+      title="Recreate Table"
+      footer={
+        <>
+          <button type="button" className="btn btn-secondary" onClick={onClose}>
+            Cancel
+          </button>
+          <button type="button" className="btn btn-danger" disabled={confirmText !== gameName} onClick={submit}>
+            Recreate Table
+          </button>
+        </>
+      }
+    >
       <div className="modal-body">
         <div className="alert alert-danger">
           <strong>This is destructive and cannot be undone.</strong> The existing game <code>{gameName}</code> and
@@ -75,14 +85,6 @@ export function RecreateTableModal({
           />
         </div>
         {error && <div className="alert alert-danger mt-2">{error}</div>}
-      </div>
-      <div className="modal-footer">
-        <button type="button" className="btn btn-secondary" onClick={onClose}>
-          Cancel
-        </button>
-        <button type="button" className="btn btn-danger" disabled={confirmText !== gameName} onClick={submit}>
-          Recreate Table
-        </button>
       </div>
     </Modal>
   );
