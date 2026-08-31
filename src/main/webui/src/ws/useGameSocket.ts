@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { onOpen, send } from './socket';
+import { onOpen, send } from '../stores/socket';
 
 /**
  * Joins the given game's WS "room" (see JolWebSocketEndpoint's join/leave

@@ -1,6 +1,6 @@
 import { TriangleAlert } from 'lucide-react';
 import type { CardDetail } from '../../api/types';
-import type { DeckEntry } from '../../components/ui/deckKit';
+import type { DeckEntry } from './deckKit';
 import { ClanIcon, DisciplineIcon, PathIcon } from '../../components/ui/icons';
 import { CardRowShell } from './CardRowShell';
 

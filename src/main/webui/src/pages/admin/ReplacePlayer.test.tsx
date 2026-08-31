@@ -4,13 +4,13 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReplacePlayer } from './ReplacePlayer';
 import { api } from '../../api/client';
-import { showError } from '../../components/toast';
+import { showError } from '../../stores/toast';
 
 vi.mock('../../api/client', () => ({
   api: { get: vi.fn(), put: vi.fn() },
 }));
 
-vi.mock('../../components/toast', () => ({
+vi.mock('../../stores/toast', () => ({
   showError: vi.fn(),
 }));
 

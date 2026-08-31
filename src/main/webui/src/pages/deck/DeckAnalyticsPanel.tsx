@@ -1,5 +1,5 @@
 import type { CardDetail } from '../../api/types';
-import type { DeckEntry } from '../../components/ui/deckKit';
+import type { DeckEntry } from './deckKit';
 import { Panel } from '../../components/ui/Panel';
 import { OpeningHandSection } from './analytics/OpeningHandSection';
 import { LibraryTypeSection } from './analytics/LibraryTypeSection';

@@ -1,4 +1,4 @@
-import { resolveDialog, useDialogRequest } from './dialog';
+import { resolveDialog, useDialogRequest } from '../stores/dialog';
 import { Modal } from './Modal';
 
 // Mounted once at the app root (see App.tsx) — renders whichever

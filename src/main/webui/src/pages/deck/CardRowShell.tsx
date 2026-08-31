@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Minus, Plus } from 'lucide-react';
-import type { DeckEntry } from '../../components/ui/deckKit';
+import type { DeckEntry } from './deckKit';
 
 /**
  * The +/count/− control cluster wrapping a card row's contents. Ported from

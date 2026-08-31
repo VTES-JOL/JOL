@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api, ApiError } from '../api/client';
 import type { UserRole } from '../api/types';
 import { PageLoading } from '../components/PageLoading';
-import { EmptyState } from '../components/EmptyState';
+import { PanelPlaceholder } from '../components/PanelPlaceholder';
 import { PlayerRoles } from './admin/PlayerRoles';
 import { ReplacePlayer } from './admin/ReplacePlayer';
 import { EndTurn } from './admin/EndTurn';
@@ -29,7 +29,7 @@ export function AdminPage() {
   if (forbidden) {
     return (
       <div className="p-4">
-        <EmptyState icon="bi-shield-lock" message="You don't have access to this page." />
+        <PanelPlaceholder icon="bi-shield-lock" message="You don't have access to this page." />
       </div>
     );
   }

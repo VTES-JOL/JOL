@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useNav } from '../nav/useNav';
+import { useNav } from '../auth/useNav';
 import { pathForGame, pathForView, pathForHelp } from '../routes';
 import { logout as logoutRequest } from '../pages/login/authApi';
 import './TopBar.css';

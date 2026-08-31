@@ -1,5 +1,5 @@
 import type { CardDetail } from '../../api/types';
-import type { DeckEntry } from '../../components/ui/deckKit';
+import type { DeckEntry } from './deckKit';
 import { CryptCardRow } from './CryptCardRow';
 import { LibraryCardRow } from './LibraryCardRow';
 

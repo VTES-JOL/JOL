@@ -1,4 +1,4 @@
-import type { DeckEntry } from '../../../components/ui/deckKit';
+import type { DeckEntry } from '../deckKit';
 import { SectionHeader } from './SectionHeader';
 import { openingHandProb } from './analyticsMath';
 

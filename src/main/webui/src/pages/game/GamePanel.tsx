@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 // this exact shape; panels elsewhere in the app (lobby/deck/tournament lists)
 // have enough header variation (tabs, badges, multiple buttons) that forcing
 // them through the same wrapper would cost more props than it saves.
-export function Panel({
+export function GamePanel({
   id,
   className,
   bodyClassName,

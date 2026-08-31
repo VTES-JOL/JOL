@@ -2,7 +2,7 @@
 // (per CLAUDE.md's "page-specific API module" convention). Backs the new
 // Tailwind deck editor being migrated onto /jol/deck.
 import { api } from '../../api/client';
-import type { CardDetail, DeckPage, ImportPreview } from '../../api/types';
+import type { CardDetail, DeckPageBean, ImportPreview } from '../../api/types';
 
 export const deckApi = {
   /** Up to 5 best card-name matches. Empty query short-circuits to []. */
@@ -17,6 +17,6 @@ export const deckApi = {
   previewImport: (text: string): Promise<ImportPreview> => api.postText<ImportPreview>('/cards/preview', text),
 
   /** Create a deck from a confirmed import preview. */
-  importDeck: (name: string, entries: Array<{ cardId: string; count: number }>, comment: string | null): Promise<DeckPage> =>
-    api.post<DeckPage>('/decks/player/import', { name, comment, entries }),
+  importDeck: (name: string, entries: Array<{ cardId: string; count: number }>, comment: string | null): Promise<DeckPageBean> =>
+    api.post<DeckPageBean>('/decks/player/import', { name, comment, entries }),
 };

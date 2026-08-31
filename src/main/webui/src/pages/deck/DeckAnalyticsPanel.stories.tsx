@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CardDetail } from '../../api/types';
-import type { DeckEntry } from '../../components/ui/deckKit';
+import type { DeckEntry } from './deckKit';
 import { DeckAnalyticsPanel } from './DeckAnalyticsPanel';
 
 const entries: DeckEntry[] = [

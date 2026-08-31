@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { ChatData, GameSnapshot } from '../../api/types';
 import { GameChatLog } from './GameChatLog';
-import { Panel } from './Panel';
+import { GamePanel } from './GamePanel';
 
 export function GameChatPanel({
   gameId,
@@ -27,7 +27,7 @@ export function GameChatPanel({
   }, [gameId, game.turnLabel, game.stamp]);
 
   return (
-    <Panel
+    <GamePanel
       id="gameChatCard"
       className="chat"
       bodyClassName="p-0 game-chat overflow-hidden"
@@ -36,6 +36,6 @@ export function GameChatPanel({
       toggle={{ icon: 'bi-clock-history', label: 'History', onClick: onToggleHistory }}
     >
       <GameChatLog lines={lines} viewerName={viewerName} />
-    </Panel>
+    </GamePanel>
   );
 }

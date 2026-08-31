@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { api } from '../../api/client';
-import { confirmDialog } from '../../components/dialog';
+import { confirmDialog } from '../../stores/dialog';
 import { Modal } from '../../components/Modal';
 
 export function ImportTablesModal({

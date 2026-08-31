@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 import {api} from '../../api/client';
 import type {GamesSummary, GameStatusBean} from '../../api/types';
 import {Card, CardHeader, CardTitle} from '../../components/Card';
-import {useAuth} from '../../nav/useAuth';
+import {useAuth} from '../../auth/useAuth';
 import {pathForGame} from '../../routes';
 import './GamesPanel.css';
 

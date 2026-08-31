@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { subscribe } from './socket';
+import { subscribe } from '../stores/socket';
 
 /**
  * Bridges the WS "invalidate" message (see WebSocketRegistry.notifyInvalidate)

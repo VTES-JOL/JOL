@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
-import { confirmDialog } from '../../components/dialog';
+import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
 
 export function RollbackGame() {

@@ -1,5 +1,5 @@
 import type { GameStatusBean } from '../../api/types';
-import { relativeTime } from '../../lib/relativeTime';
+import { relativeTime } from '../../utils/relativeTime';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 
 const REL_LABEL: Record<string, string> = { OWNER: 'Owner', REGISTERED: 'Registered', INVITED: 'Invited', OPEN: 'Open' };

@@ -6,7 +6,7 @@ import { TournamentList, type Selection } from './tournament/TournamentList';
 import { OpenTournamentDetail } from './tournament/OpenTournamentDetail';
 import { FinalsTournamentDetail } from './tournament/FinalsTournamentDetail';
 import { PageLoading } from '../components/PageLoading';
-import { EmptyState } from '../components/EmptyState';
+import { PanelPlaceholder } from '../components/PanelPlaceholder';
 import { SplitLayout } from '../components/SplitLayout';
 
 const TOURNAMENT_LIST_QUERY_KEY = ['tournament', 'list'];
@@ -59,7 +59,7 @@ export function TournamentPage() {
             />
           )}
           {finalsTournament && <FinalsTournamentDetail tournament={finalsTournament} />}
-          {!openTournament && !finalsTournament && <EmptyState icon="bi-trophy" message="Select a tournament" />}
+          {!openTournament && !finalsTournament && <PanelPlaceholder icon="bi-trophy" message="Select a tournament" />}
         </>
       }
     />

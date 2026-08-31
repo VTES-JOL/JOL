@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import type { Deck, DeckInfoBean, GameStatusBean } from '../../api/types';
-import { useAuth } from '../../nav/useAuth';
+import { useAuth } from '../../auth/useAuth';
 import { useSimpleDropdown } from '../../hooks/useSimpleDropdown';
 import { DeckPreview } from '../../components/DeckPreview';
-import { confirmDialog } from '../../components/dialog';
+import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
-import { showError } from '../../components/toast';
+import { showError } from '../../stores/toast';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { SectionLabel } from '../../components/SectionLabel';
 

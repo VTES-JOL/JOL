@@ -1,7 +1,7 @@
 import { TriangleAlert } from 'lucide-react';
 import type { DeckValidity } from '../../api/types';
-import { type DeckEntry, computeSummary, getBannedEntries } from '../../components/ui/deckKit';
-import { SummaryStats } from '../../components/ui/SummaryStats';
+import { type DeckEntry, computeSummary, getBannedEntries } from './deckKit';
+import { SummaryStats } from './SummaryStats';
 import { FormatValidityBadges } from './FormatValidityBadges';
 
 /**

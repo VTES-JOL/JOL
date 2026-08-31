@@ -6,7 +6,7 @@ import { GameList } from './lobby/GameList';
 import { GameCreateForm } from './lobby/GameCreateForm';
 import { GameDetail } from './lobby/GameDetail';
 import { PageLoading } from '../components/PageLoading';
-import { EmptyState } from '../components/EmptyState';
+import { PanelPlaceholder } from '../components/PanelPlaceholder';
 import { SplitLayout } from '../components/SplitLayout';
 
 type View = { mode: 'create' } | { mode: 'detail'; gameName: string } | null;
@@ -65,7 +65,7 @@ export function LobbyPage() {
             />
           )}
           {selectedGame && <GameDetail game={selectedGame} onClose={() => setView(null)} onChanged={refresh} />}
-          {!view && <EmptyState icon="bi-controller" message="Select a game or create a new one" />}
+          {!view && <PanelPlaceholder icon="bi-controller" message="Select a game or create a new one" />}
         </>
       }
     />

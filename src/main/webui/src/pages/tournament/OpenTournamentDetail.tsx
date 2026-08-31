@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader } from '../../components/Card';
 import { api } from '../../api/client';
 import type { DeckInfoBean, TournamentMetadata, TournamentRegistered } from '../../api/types';
-import { relativeTime } from '../../lib/relativeTime';
+import { relativeTime } from '../../utils/relativeTime';
 import { DeckPreview } from '../../components/DeckPreview';
 import { useSimpleDropdown } from '../../hooks/useSimpleDropdown';
-import { confirmDialog } from '../../components/dialog';
+import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
 
 export function OpenTournamentDetail({

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import type { PlayerRoundSummary } from '../../api/types';
-import { alertDialog, confirmDialog } from '../../components/dialog';
+import { alertDialog, confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
 import { RecreateTableModal } from './RecreateTableModal';
 

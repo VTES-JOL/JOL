@@ -1,5 +1,5 @@
-import { CLIENT_ID } from '../ws/socket';
-import { reportFailure, reportSuccess } from './connectivity';
+import { CLIENT_ID } from '../stores/socket';
+import { reportFailure, reportSuccess } from '../stores/connectivity';
 import { API_BASE } from './apiBase';
 
 class ApiError extends Error {

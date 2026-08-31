@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { StatsDto } from '../../../api/types';
-import { SortIcon, useTableSort } from '../statsUtils';
+import { SortIcon, useTableSort } from './statsUtils';
 
 interface Row extends Record<string, unknown> {
   key: string;

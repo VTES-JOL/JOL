@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { CardSnapshot, GameSnapshot } from '../api/types';
-import { useAuth } from '../nav/useAuth';
+import { useAuth } from '../auth/useAuth';
 import { useGameSocket } from '../ws/useGameSocket';
 import { runRequest } from '../api/mutate';
 import { PageLoading } from '../components/PageLoading';

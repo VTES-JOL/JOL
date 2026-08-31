@@ -1,5 +1,5 @@
 import type { CardDetail, ExtendedDeck } from '../../api/types';
-import { type DeckEntry, groupEntries } from '../../components/ui/deckKit';
+import { type DeckEntry, groupEntries } from './deckKit';
 
 /**
  * Flattens the server-resolved `ExtendedDeck` (crypt list + type-grouped

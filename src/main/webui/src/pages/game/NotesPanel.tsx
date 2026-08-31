@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { GameSnapshot } from '../../api/types';
 import { runRequest } from '../../api/mutate';
-import { Panel } from './Panel';
+import { GamePanel } from './GamePanel';
 
 // Mirrors notes.jsp — saves on blur (not every keystroke), matching legacy's
 // updateNotes()/updateNotesHand() triggers. PUT .../notes/global and
@@ -32,7 +32,7 @@ export function NotesPanel({
   };
 
   return (
-    <Panel
+    <GamePanel
       id="notesCard"
       className="notes"
       bodyClassName="p-0"
@@ -58,6 +58,6 @@ export function NotesPanel({
           onBlur={savePrivate}
         />
       )}
-    </Panel>
+    </GamePanel>
   );
 }

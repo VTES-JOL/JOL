@@ -1,4 +1,4 @@
-import { checkNow } from '../api/connectivity';
+import { checkNow } from '../stores/connectivity';
 
 // An overlay, not a full-page replacement: the previous version swapped out
 // <Routes> entirely while offline, which unmounted MainPage and everything

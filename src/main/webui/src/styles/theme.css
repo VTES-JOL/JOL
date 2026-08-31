@@ -1,7 +1,7 @@
 /* Site-wide tokens and typography — everything here applies regardless of
    which page/component is mounted, so it lives here rather than co-located
    with any one component. Page- and component-specific styles live next to
-   their .tsx file instead (e.g. pages/MainPage.css, pages/help/HelpPage.css) —
+   their .tsx file instead (e.g. pages/MainPage.css, pages/HelpPage.css) —
    see main.tsx for the full list of what's imported globally vs. per-component. */
 
 :root {

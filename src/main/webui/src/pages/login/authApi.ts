@@ -1,5 +1,5 @@
 import { API_BASE } from '../../api/apiBase';
-import { CLIENT_ID } from '../../ws/socket';
+import { CLIENT_ID } from '../../stores/socket';
 
 // Deliberately bypasses api/client.ts's request() — that helper hard-redirects
 // to /jol/login on any 401, which is the right behavior for an already-logged-in

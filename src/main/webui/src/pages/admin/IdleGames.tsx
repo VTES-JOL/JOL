@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import type { IdleGame } from '../../api/types';
 import { pathForGame } from '../../routes';
-import { confirmDialog } from '../../components/dialog';
+import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
 import { adminTimestamp } from './adminFormatting';
 

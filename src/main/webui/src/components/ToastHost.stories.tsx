@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { showError, showSuccess } from './toast';
+import { showError, showSuccess } from '../stores/toast';
 import { ToastHost } from './ToastHost';
 
 // Like DialogHost, ToastHost has no props — showError()/showSuccess() (see

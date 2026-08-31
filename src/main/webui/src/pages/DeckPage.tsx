@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FolderOpen } from 'lucide-react';
-import { api } from '../../api/client';
-import { runRequest } from '../../api/mutate';
-import type { CardDetail, DeckInfoBean, DeckPage } from '../../api/types';
-import { PageLoading } from '../../components/PageLoading';
-import { MasterDetailView } from '../../components/ui/MasterDetailView';
-import { Panel } from '../../components/ui/Panel';
-import { EmptyState } from '../../components/ui/EmptyState';
-import type { DeckEntry } from '../../components/ui/deckKit';
-import { deckApi } from './deckApi';
-import { DeckListPane } from './DeckListPane';
-import { DeckEditorPane } from './DeckEditorPane';
-import { DeckAnalyticsPanel } from './DeckAnalyticsPanel';
-import { DeckImportModal } from './DeckImportModal';
-import { enrichEntries, entriesFromExtendedDeck, entryIds } from './deckEntries';
+import { api } from '../api/client';
+import { runRequest } from '../api/mutate';
+import type { CardDetail, DeckInfoBean, DeckPageBean } from '../api/types';
+import { PageLoading } from '../components/PageLoading';
+import { MasterDetailView } from '../components/ui/MasterDetailView';
+import { Panel } from '../components/ui/Panel';
+import { EmptyState } from '../components/ui/EmptyState';
+import type { DeckEntry } from './deck/deckKit';
+import { deckApi } from './deck/deckApi';
+import { DeckListPane } from './deck/DeckListPane';
+import { DeckEditorPane } from './deck/DeckEditorPane';
+import { DeckAnalyticsPanel } from './deck/DeckAnalyticsPanel';
+import { DeckImportModal } from './deck/DeckImportModal';
+import { enrichEntries, entriesFromExtendedDeck, entryIds } from './deck/deckEntries';
 
 const PAGE_KEY = ['decks', 'page'];
 const LIST_KEY = ['decks', 'list'];
@@ -30,7 +30,7 @@ const FORMAT_FILTER_KEY = 'deckFilter';
  * per-format validity server-side). Inline rename does a save-as under the new
  * name followed by a delete of the old row.
  */
-export function DeckWorkbench() {
+export function DeckPage() {
   const queryClient = useQueryClient();
   const [formatFilter, setFormatFilter] = useState(() => localStorage.getItem(FORMAT_FILTER_KEY) ?? '');
   const [detailMap, setDetailMap] = useState<Map<string, CardDetail>>(new Map());
@@ -50,7 +50,7 @@ export function DeckWorkbench() {
 
   const { data: page } = useQuery({
     queryKey: PAGE_KEY,
-    queryFn: () => api.get<DeckPage>('/decks/player'),
+    queryFn: () => api.get<DeckPageBean>('/decks/player'),
   });
 
   const { data: decks = [] } = useQuery({
@@ -94,7 +94,7 @@ export function DeckWorkbench() {
   }, [baseEntries]);
 
   const applyPage = useCallback(
-    (next: DeckPage) => queryClient.setQueryData(PAGE_KEY, next),
+    (next: DeckPageBean) => queryClient.setQueryData(PAGE_KEY, next),
     [queryClient],
   );
 
@@ -109,7 +109,7 @@ export function DeckWorkbench() {
 
   const loadDeck = useCallback(
     (deck: DeckInfoBean) =>
-      runRequest(api.post<DeckPage>('/decks/player/load', { deckName: deck.name }), 'Failed to load deck', (next) => {
+      runRequest(api.post<DeckPageBean>('/decks/player/load', { deckName: deck.name }), 'Failed to load deck', (next) => {
         applyPage(next);
         setPanelKey('editor'); // focus the detail pane in the collapsed layout
       }),
@@ -118,7 +118,7 @@ export function DeckWorkbench() {
 
   const saveDeck = useCallback(
     async (deckName: string, contents: string, comment: string) => {
-      const next = await api.post<DeckPage>('/decks/player', { deckName, contents, comment });
+      const next = await api.post<DeckPageBean>('/decks/player', { deckName, contents, comment });
       applyPage(next);
       refreshList();
     },
@@ -139,7 +139,7 @@ export function DeckWorkbench() {
   // row (ignoring its now-empty page), and show the freshly-created deck.
   const renameDeck = useCallback(
     async (oldName: string, newName: string, contents: string, comment: string) => {
-      const next = await api.post<DeckPage>('/decks/player', { deckName: newName, contents, comment });
+      const next = await api.post<DeckPageBean>('/decks/player', { deckName: newName, contents, comment });
       await api.del(`/decks/player/${encodeURIComponent(oldName)}`).catch(() => {});
       applyPage(next);
       refreshList();
@@ -150,7 +150,7 @@ export function DeckWorkbench() {
   const deleteDeck = useCallback(
     (deckName: string) =>
       runRequest(
-        api.del<DeckPage>(`/decks/player/${encodeURIComponent(deckName)}`),
+        api.del<DeckPageBean>(`/decks/player/${encodeURIComponent(deckName)}`),
         'Failed to delete deck',
         (next) => {
           applyPage(next);

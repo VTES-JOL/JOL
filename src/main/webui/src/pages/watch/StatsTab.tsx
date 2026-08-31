@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAuth } from '../../nav/useAuth';
+import { useAuth } from '../../auth/useAuth';
 import { PlayerStats } from './stats/PlayerStats';
 import { DeckStats } from './stats/DeckStats';
 import { NationStats } from './stats/NationStats';

@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { getConnectivity, subscribeConnectivity, type ConnectivityState } from './connectivity';
+import { getConnectivity, subscribeConnectivity, type ConnectivityState } from '../stores/connectivity';
 
 // useSyncExternalStore, not useState+useEffect: the latter has a real gap —
 // the initial useState() value is captured at first render, but the effect

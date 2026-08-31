@@ -1,7 +1,7 @@
 // Thin wrapper around /jol/ws/updates (see JolWebSocketEndpoint). Auth rides the
 // jol_at cookie automatically since the handshake is same-origin. Messages are
 // small JSON envelopes: {"type":"invalidate","key":[...]}, {"type":"pong"}.
-import { checkNow } from '../api/connectivity';
+import { checkNow } from './connectivity';
 
 type Listener = (data: Record<string, unknown>) => void;
 

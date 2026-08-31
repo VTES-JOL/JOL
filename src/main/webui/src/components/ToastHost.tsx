@@ -1,4 +1,4 @@
-import { dismissToast, useToasts } from './toast';
+import { dismissToast, useToasts } from '../stores/toast';
 
 // Mounted once at the app root (see App.tsx), fixed to the bottom-right —
 // showError()/showSuccess() push into this from anywhere, no prop drilling.

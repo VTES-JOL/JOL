@@ -5,8 +5,8 @@ import userEvent from '@testing-library/user-event';
 import { CommandForm } from './CommandForm';
 import { useSubmitGuard } from '../../hooks/useSubmitGuard';
 import { api } from '../../api/client';
-import { confirmDialog } from '../../components/dialog';
-import { showError } from '../../components/toast';
+import { confirmDialog } from '../../stores/dialog';
+import { showError } from '../../stores/toast';
 import type { GameSnapshot } from '../../api/types';
 
 // Wires CommandForm to the real useSubmitGuard hook, same as GamePage does —
@@ -21,11 +21,11 @@ vi.mock('../../api/client', () => ({
   api: { post: vi.fn() },
 }));
 
-vi.mock('../../components/dialog', () => ({
+vi.mock('../../stores/dialog', () => ({
   confirmDialog: vi.fn(),
 }));
 
-vi.mock('../../components/toast', () => ({
+vi.mock('../../stores/toast', () => ({
   showError: vi.fn(),
 }));
 

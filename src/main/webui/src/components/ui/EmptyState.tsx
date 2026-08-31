@@ -3,7 +3,7 @@ import type { ComponentType, ReactNode } from 'react';
 /**
  * "Nothing here yet" placeholder for detail panes, ported from jol-quarkus.
  * Tailwind `jt:` -prefixed. Distinct from the Bootstrap-era
- * `components/EmptyState.tsx` — use this on pages migrated to Tailwind.
+ * `components/PanelPlaceholder.tsx` — use this on pages migrated to Tailwind.
  */
 interface EmptyStateProps {
   icon?: ComponentType<{ size?: number; className?: string }>;

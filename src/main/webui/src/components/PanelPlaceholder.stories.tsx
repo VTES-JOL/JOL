@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { EmptyState } from './EmptyState';
+import { PanelPlaceholder } from './PanelPlaceholder';
 
 const meta = {
-  title: 'Components/EmptyState',
-  component: EmptyState,
+  title: 'Components/PanelPlaceholder',
+  component: PanelPlaceholder,
   parameters: { layout: 'padded' },
-} satisfies Meta<typeof EmptyState>;
+} satisfies Meta<typeof PanelPlaceholder>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

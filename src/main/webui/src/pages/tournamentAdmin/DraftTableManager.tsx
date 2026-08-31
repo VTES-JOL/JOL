@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import type { TournamentPlayer, TournamentRegistration } from '../../api/types';
-import { confirmDialog } from '../../components/dialog';
+import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
 import { RoundColumn } from './RoundColumn';
 import type { DragPayload } from './dragDrop';

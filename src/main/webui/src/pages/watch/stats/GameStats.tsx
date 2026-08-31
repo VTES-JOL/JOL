@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
 import type { GameDuration } from '../../../api/types';
-import { SortIcon, useTableSort } from '../statsUtils';
+import { SortIcon, useTableSort } from './statsUtils';
 import { runRequest } from '../../../api/mutate';
 
 export function GameStats({ fromDate, toDate, isTourney }: { fromDate: string; toDate: string; isTourney: boolean }) {

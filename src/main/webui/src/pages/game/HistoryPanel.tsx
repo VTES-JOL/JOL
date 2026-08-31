@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import type { ChatData, GameSnapshot } from '../../api/types';
 import { GameChatLog } from './GameChatLog';
-import { Panel } from './Panel';
+import { GamePanel } from './GamePanel';
 
 export function HistoryPanel({
   gameId,
@@ -27,7 +27,7 @@ export function HistoryPanel({
   }, [gameId, turn]);
 
   return (
-    <Panel id="historyCard" bodyClassName="p-2 overflow-hidden" title="History" toggle={{ icon: 'bi-chat', label: 'Game Chat', onClick: onToggleChat }}>
+    <GamePanel id="historyCard" bodyClassName="p-2 overflow-hidden" title="History" toggle={{ icon: 'bi-chat', label: 'Game Chat', onClick: onToggleChat }}>
       <label htmlFor="historySelect">History:</label>
       <select id="historySelect" className="form-select form-select-sm mb-1" value={turn} onChange={(e) => setTurn(e.target.value)}>
         {game.turns.map((t) => (
@@ -37,6 +37,6 @@ export function HistoryPanel({
         ))}
       </select>
       <GameChatLog lines={lines} viewerName={viewerName} />
-    </Panel>
+    </GamePanel>
   );
 }

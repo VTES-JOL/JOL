@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import type { Profile } from '../../api/types';
 import { isPushSupported, subscribeToPush, unsubscribeFromPush } from '../../push/pushNotifications';
-import { alertDialog } from '../../components/dialog';
+import { alertDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
 
 export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (updated: Profile) => void }) {

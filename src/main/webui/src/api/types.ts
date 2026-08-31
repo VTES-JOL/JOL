@@ -392,7 +392,7 @@ export interface ExtendedDeck {
 }
 
 // GET/PUT /jol/api/decks/player — net.deckserver.rest.bean.DeckPageBean.
-export interface DeckPage {
+export interface DeckPageBean {
   selectedDeck: ExtendedDeck | null;
   contents: string | null;
   tags: string[];

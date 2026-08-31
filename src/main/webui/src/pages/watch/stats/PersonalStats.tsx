@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../../api/client';
 import type { DeckMatchup, OpponentStats } from '../../../api/types';
-import { SortIcon, useTableSort } from '../statsUtils';
+import { SortIcon, useTableSort } from './statsUtils';
 import { runRequest } from '../../../api/mutate';
 
 interface OpponentRow extends OpponentStats, Record<string, unknown> {}

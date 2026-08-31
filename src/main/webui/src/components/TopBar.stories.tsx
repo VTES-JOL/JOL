@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { NavBean } from '../api/types';
 import { TopBar } from './TopBar';
 
-// useNav() (src/nav/useNav.ts) reads a react-query cache entry keyed
+// useNav() (src/auth/useNav.ts) reads a react-query cache entry keyed
 // ['nav'] fed by GET /nav — there's no backend to answer that here, so each
 // story seeds the cache directly with setQueryData instead of mocking
 // fetch. This local decorator replaces preview.tsx's default empty

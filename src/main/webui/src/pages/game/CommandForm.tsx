@@ -3,7 +3,7 @@ import { api } from '../../api/client';
 import type { GameSnapshot } from '../../api/types';
 import { QuickCommandModal } from './QuickCommandModal';
 import { QuickChatModal } from './QuickChatModal';
-import { confirmDialog } from '../../components/dialog';
+import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
 
 // Mirrors commands.jsp/doSubmit()/doEndTurn() plus the quick-command/

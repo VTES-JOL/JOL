@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { CountryOption, Profile } from '../api/types';
-import { useNavRefresh } from '../nav/useNav';
+import { useNavRefresh } from '../auth/useNav';
 import { PageLoading } from '../components/PageLoading';
 import { ProfileEditor } from './profile/ProfileEditor';
 import { AccountEditor } from './profile/AccountEditor';

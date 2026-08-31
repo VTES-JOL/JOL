@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import type { CardDetail } from '../../api/types';
-import { type CardGroup, type DeckEntry, groupEntries } from '../../components/ui/deckKit';
+import { type CardGroup, type DeckEntry, groupEntries } from './deckKit';
 import { TypeIcon } from '../../components/ui/icons';
 import { DeckCardRow } from './DeckCardRow';
 

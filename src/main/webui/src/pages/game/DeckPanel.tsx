@@ -3,7 +3,7 @@ import { api } from '../../api/client';
 import type { Deck } from '../../api/types';
 import { DeckPreview } from '../../components/DeckPreview';
 import { runRequest } from '../../api/mutate';
-import { Panel } from './Panel';
+import { GamePanel } from './GamePanel';
 
 // Mirrors game-deck.jsp/doShowDeck() — GET .../deck is already a dedicated,
 // envelope-free endpoint. Fetched once (like legacy's own html==="" cache
@@ -16,8 +16,8 @@ export function DeckPanel({ gameId, onToggleNotes }: { gameId: string; onToggleN
   }, [gameId]);
 
   return (
-    <Panel id="gameDeckCard" bodyClassName="p-2 scrollable" title="Deck" toggle={{ icon: 'bi-journal', label: 'Notes', onClick: onToggleNotes }}>
+    <GamePanel id="gameDeckCard" bodyClassName="p-2 scrollable" title="Deck" toggle={{ icon: 'bi-journal', label: 'Notes', onClick: onToggleNotes }}>
       {deck && <DeckPreview deck={deck} />}
-    </Panel>
+    </GamePanel>
   );
 }

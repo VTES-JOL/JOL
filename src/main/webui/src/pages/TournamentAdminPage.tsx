@@ -5,7 +5,7 @@ import type { TournamentMetadata } from '../api/types';
 import { TournamentAdminList } from './tournamentAdmin/TournamentAdminList';
 import { TournamentEditor } from './tournamentAdmin/TournamentEditor';
 import { TournamentManager } from './tournamentAdmin/TournamentManager';
-import { confirmDialog } from '../components/dialog';
+import { confirmDialog } from '../stores/dialog';
 import { SplitLayout } from '../components/SplitLayout';
 
 type View = { mode: 'edit'; name: string | null } | { mode: 'tables'; name: string } | null;

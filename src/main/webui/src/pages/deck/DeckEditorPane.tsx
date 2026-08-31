@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pencil } from 'lucide-react';
 import type { CardDetail, DeckValidity } from '../../api/types';
-import type { DeckEntry } from '../../components/ui/deckKit';
+import type { DeckEntry } from './deckKit';
 import { Panel } from '../../components/ui/Panel';
 import { DeckSearchBar } from './DeckSearchBar';
 import { DeckComments } from './DeckComments';

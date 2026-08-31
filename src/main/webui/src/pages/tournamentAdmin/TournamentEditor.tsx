@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle } from '../../components/Card';
 import { api } from '../../api/client';
 import type { TournamentDetails, TournamentRegistration } from '../../api/types';
-import { confirmDialog } from '../../components/dialog';
+import { confirmDialog } from '../../stores/dialog';
 
 const DEFAULT_SPEC_RULES_CON =
   'The following JOL rules will be enforced for the duration of the rounds with the exception of the period between <Date> and <Date>.';

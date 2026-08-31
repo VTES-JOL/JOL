@@ -1,5 +1,5 @@
 import { QueryCache, QueryClient } from '@tanstack/react-query';
-import { showError } from '../components/toast';
+import { showError } from '../stores/toast';
 
 // Prototype-scoped: only LobbyPage uses TanStack Query so far (see
 // ws/useQueryInvalidation.ts and LobbyResource.getLobbyAndInvalidate on the

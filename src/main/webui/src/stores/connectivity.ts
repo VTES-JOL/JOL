@@ -4,7 +4,7 @@
 // HTTP error responses: a 404/500 means the server responded, so it's up,
 // just erroring — that's a different problem from "unavailable" and each
 // call site already handles it with its own .catch().
-import { API_BASE } from './apiBase';
+import { API_BASE } from '../api/apiBase';
 
 // A lone failed request shouldn't blank the whole app — only publish
 // "offline" if failures persist past this window, so a single dropped

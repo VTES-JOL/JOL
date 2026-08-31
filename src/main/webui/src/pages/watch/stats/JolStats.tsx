@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../../../api/client';
 import type { JolStats as JolStatsDto } from '../../../api/types';
-import { SortIcon, useTableSort } from '../statsUtils';
+import { SortIcon, useTableSort } from './statsUtils';
 import { useSimpleTooltips } from '../../../hooks/useSimpleTooltips';
 import { runRequest } from '../../../api/mutate';
 

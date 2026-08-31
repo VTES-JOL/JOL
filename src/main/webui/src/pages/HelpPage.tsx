@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { HELP_SECTIONS } from '../../content/help/meta';
-import { pathForHelp } from '../../routes';
+import { HELP_SECTIONS } from '../content/help/meta';
+import { pathForHelp } from '../routes';
 import './HelpPage.css';
 
 // Docs-style shell for the Help route: a section sidebar on desktop that

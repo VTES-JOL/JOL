@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CardDetail, ExtendedDeck } from '../../api/types';
-import type { DeckEntry } from '../../components/ui/deckKit';
+import type { DeckEntry } from './deckKit';
 import { enrichEntries, entriesFromExtendedDeck, entriesToContents, entryIds } from './deckEntries';
 
 const extended: ExtendedDeck = {
