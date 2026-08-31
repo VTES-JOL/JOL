@@ -194,15 +194,15 @@ export function DeckEditorPane({
           setEditingName(false);
         }
       }}
-      className="jt:bg-transparent jt:text-ink jt:tracking-wide jt:outline-none jt:border-b jt:border-line-accent jt:w-full jt:max-w-[220px]"
+      className="bg-transparent text-ink tracking-wide outline-none border-b border-line-accent w-full max-w-[220px]"
     />
   ) : (
     <span
       onClick={() => setEditingName(true)}
-      className="jt:tracking-wide jt:text-ink jt:cursor-pointer jt:group jt:flex jt:items-center jt:gap-1.5"
+      className="tracking-wide text-ink cursor-pointer group flex items-center gap-1.5"
     >
       {nameValue}
-      <Pencil className="jt:w-2.5 jt:h-2.5 jt:text-ink-muted jt:opacity-0 jt:group-hover:opacity-100 jt:transition-opacity" />
+      <Pencil className="w-2.5 h-2.5 text-ink-muted opacity-0 group-hover:opacity-100 transition-opacity" />
     </span>
   );
 

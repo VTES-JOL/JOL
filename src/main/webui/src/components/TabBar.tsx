@@ -11,31 +11,34 @@ interface TabBarProps<Id extends string> {
   tabs: readonly TabDef<Id>[];
   active: Id;
   onChange: (id: Id) => void;
-  /** Extra classes on the `<ul.nav.nav-tabs>` (e.g. `card-header-tabs`, `bg-secondary-subtle`). */
+  /** Extra classes on the tab strip `<ul>` (e.g. `mt-3`). */
   className?: string;
-  /** Extra classes on every tab `<button.nav-link>` (e.g. `px-3 py-2`). */
-  tabClassName?: string;
 }
 
-// The Bootstrap `nav nav-tabs` markup every tabbed view was hand-rolling
-// (WatchPage, watch/StatsTab, stats/PersonalStats, main/GamesPanel) — same
-// `<ul><li.nav-item><button.nav-link>` shell, same active toggle, same
-// optional count badge. Bootstrap's JS isn't loaded here, so the button
-// `onClick` drives everything; callers own the panel switching.
-export function TabBar<Id extends string>({ tabs, active, onChange, className, tabClassName }: TabBarProps<Id>) {
+// Underlined tab strip — a token-styled counterpart of Bootstrap
+// `nav nav-tabs`. Callers own the panel switching.
+export function TabBar<Id extends string>({ tabs, active, onChange, className }: TabBarProps<Id>) {
   return (
-    <ul className={`nav nav-tabs${className ? ` ${className}` : ''}`} role="tablist">
+    <ul className={`flex border-b border-line${className ? ` ${className}` : ''}`} role="tablist">
       {tabs.map((tab) => (
-        <li key={tab.id} className="nav-item" role="presentation">
+        <li key={tab.id} role="presentation">
           <button
             type="button"
             role="tab"
             aria-selected={active === tab.id}
-            className={`nav-link${tabClassName ? ` ${tabClassName}` : ''}${active === tab.id ? ' active' : ''}`}
+            className={`px-3 py-2 text-sm border-b-2 -mb-px transition-colors ${
+              active === tab.id
+                ? 'border-accent text-ink font-semibold'
+                : 'border-transparent text-ink-muted hover:text-ink'
+            }`}
             onClick={() => onChange(tab.id)}
           >
             {tab.label}
-            {tab.badge != null && <span className="badge rounded-pill bg-secondary ms-1">{tab.badge}</span>}
+            {tab.badge != null && (
+              <span className="ml-1 inline-flex items-center rounded-full bg-hover text-ink-muted px-1.5 text-xs">
+                {tab.badge}
+              </span>
+            )}
           </button>
         </li>
       ))}

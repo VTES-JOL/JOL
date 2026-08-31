@@ -39,7 +39,7 @@ export function LobbyPage() {
 
   if (!games) {
     return (
-      <div className="jt-scope jt:flex jt:flex-1 jt:min-h-0 jt:items-center jt:justify-center jt:bg-base">
+      <div className="flex flex-1 min-h-0 items-center justify-center bg-base">
         <Spinner />
       </div>
     );
@@ -66,7 +66,7 @@ export function LobbyPage() {
   }
 
   return (
-    <div className="jt-scope jt:flex jt:flex-col jt:flex-1 jt:min-h-0 jt:p-4 jt:bg-base jt:text-ink">
+    <div className="flex flex-col flex-1 min-h-0 p-4 bg-base text-ink">
       <MasterDetailView
         breakpoint="lg"
         columns="340px minmax(360px, 1fr)"

@@ -34,26 +34,26 @@ export function CryptCapacityCurve({ entries, detailMap }: Props) {
   const caps = Array.from({ length: maxCap - minCap + 1 }, (_, i) => minCap + i);
 
   return (
-    <div className="jt:border-b jt:border-line/50">
+    <div className="border-b border-line/50">
       <SectionHeader title="Crypt Capacity" subtitle={`avg ${avg} · range ${minCap}–${maxCap}`} />
-      <div className="jt:px-3 jt:py-3">
-        <div className="jt:flex jt:items-end jt:gap-0.5 jt:h-12">
+      <div className="px-3 py-3">
+        <div className="flex items-end gap-0.5 h-12">
           {caps.map((cap) => {
             const count = buckets.get(cap) ?? 0;
             const barPx = count > 0 ? Math.max(Math.round((count / barMax) * MAX_BAR_PX), 4) : 2;
             return (
               <div
                 key={cap}
-                className={`jt:flex-1 jt:rounded-t jt:transition-all ${count > 0 ? 'jt:bg-accent/70' : 'jt:bg-hover/40'}`}
+                className={`flex-1 rounded-t transition-all ${count > 0 ? 'bg-accent/70' : 'bg-hover/40'}`}
                 style={{ height: barPx }}
                 title={`Cap ${cap}: ${count} card${count !== 1 ? 's' : ''}`}
               />
             );
           })}
         </div>
-        <div className="jt:flex jt:gap-0.5 jt:mt-1">
+        <div className="flex gap-0.5 mt-1">
           {caps.map((cap) => (
-            <div key={cap} className="jt:flex-1 jt:text-center jt:text-[11px] jt:text-ink-muted jt:tabular-nums">
+            <div key={cap} className="flex-1 text-center text-[11px] text-ink-muted tabular-nums">
               {cap}
             </div>
           ))}

@@ -29,7 +29,7 @@ const meta = {
   parameters: { layout: 'padded' },
   decorators: [
     (Story) => (
-      <div className="jt:w-[560px] jt:bg-surface jt:border jt:border-line/60 jt:rounded-lg">
+      <div className="w-[560px] bg-surface border border-line/60 rounded-lg">
         <Story />
       </div>
     ),

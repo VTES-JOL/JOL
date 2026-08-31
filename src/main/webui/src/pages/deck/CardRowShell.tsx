@@ -4,7 +4,7 @@ import type { DeckEntry } from './deckKit';
 
 /**
  * The +/count/− control cluster wrapping a card row's contents. Ported from
- * jol-quarkus; Tailwind `jt:` -prefixed. Handlers are optional — when absent
+ * jol-quarkus; Tailwind Tailwind-based. Handlers are optional — when absent
  * the row renders read-only (Phase 2 skeleton).
  */
 interface Props {
@@ -20,13 +20,13 @@ export function CardRowShell({ entry, onIncrement, onDecrement, children }: Prop
 
   // Steppers are comfortably tappable on touch widths and tighten up from `sm`.
   const stepper =
-    'jt:w-9 jt:h-9 jt:sm:w-5 jt:sm:h-5 jt:flex jt:items-center jt:justify-center jt:rounded jt:transition-colors';
+    'w-9 h-9 sm:w-5 sm:h-5 flex items-center justify-center rounded transition-colors';
 
   return (
-    <div className="jt:flex jt:items-center jt:px-4 jt:py-1.5 jt:gap-1 jt:hover:bg-hover/50 jt:transition-colors">
+    <div className="flex items-center px-4 py-1.5 gap-1 hover:bg-hover/50 transition-colors">
       {children}
 
-      <div className="jt:flex jt:items-center jt:gap-0.5 jt:shrink-0">
+      <div className="flex items-center gap-0.5 shrink-0">
         {!readOnly && (
           <button
             onClick={onDecrement}
@@ -34,21 +34,21 @@ export function CardRowShell({ entry, onIncrement, onDecrement, children }: Prop
             className={[
               stepper,
               willRemove
-                ? 'jt:text-blood-soft jt:hover:text-blood jt:hover:bg-blood/10'
-                : 'jt:text-ink-secondary jt:hover:text-ink jt:hover:bg-hover',
+                ? 'text-blood-soft hover:text-blood hover:bg-blood/10'
+                : 'text-ink-secondary hover:text-ink hover:bg-hover',
             ].join(' ')}
           >
-            <Minus className="jt:w-3 jt:h-3 jt:sm:w-2.5 jt:sm:h-2.5" />
+            <Minus className="w-3 h-3 sm:w-2.5 sm:h-2.5" />
           </button>
         )}
-        <span className="jt:text-xs jt:text-ink jt:text-center jt:tabular-nums jt:w-5">{entry.count}</span>
+        <span className="text-xs text-ink text-center tabular-nums w-5">{entry.count}</span>
         {!readOnly && (
           <button
             onClick={onIncrement}
             title="Increase count"
-            className={`${stepper} jt:text-ink-secondary jt:hover:text-ink jt:hover:bg-hover`}
+            className={`${stepper} text-ink-secondary hover:text-ink hover:bg-hover`}
           >
-            <Plus className="jt:w-3 jt:h-3 jt:sm:w-2.5 jt:sm:h-2.5" />
+            <Plus className="w-3 h-3 sm:w-2.5 sm:h-2.5" />
           </button>
         )}
       </div>

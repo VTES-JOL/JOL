@@ -12,7 +12,7 @@ interface Props {
   onDecrement?: () => void;
 }
 
-const SEP = 'jt:text-[11px] jt:text-ink-muted jt:leading-none jt:select-none';
+const SEP = 'text-[11px] text-ink-muted leading-none select-none';
 
 export function LibraryCardRow({ entry, detail, onIncrement, onDecrement }: Props) {
   const orDiscs = detail?.orDisciplines ?? [];
@@ -23,11 +23,11 @@ export function LibraryCardRow({ entry, detail, onIncrement, onDecrement }: Prop
 
   return (
     <CardRowShell entry={entry} onIncrement={onIncrement} onDecrement={onDecrement}>
-      <div className="jt:flex jt:items-center jt:gap-1 jt:flex-1 jt:min-w-0">
-        <span className={`jt:text-xs jt:truncate ${entry.banned ? 'jt:text-blood-soft' : 'jt:text-ink-secondary'}`}>
+      <div className="flex items-center gap-1 flex-1 min-w-0">
+        <span className={`text-xs truncate ${entry.banned ? 'text-blood-soft' : 'text-ink-secondary'}`}>
           {entry.name}
         </span>
-        {entry.banned && <TriangleAlert className="jt:w-3 jt:h-3 jt:text-blood-soft jt:shrink-0" />}
+        {entry.banned && <TriangleAlert className="w-3 h-3 text-blood-soft shrink-0" />}
         {detail?.poolCost != null && (
           <CostIcon type="pool" amount={detail.poolCost === -1 ? 'x' : detail.poolCost} size={20} />
         )}
@@ -37,7 +37,7 @@ export function LibraryCardRow({ entry, detail, onIncrement, onDecrement }: Prop
       </div>
 
       {hasRightIcons && (
-        <div className="jt:flex jt:items-center jt:gap-0.5 jt:shrink-0 jt:ml-1">
+        <div className="flex items-center gap-0.5 shrink-0 ml-1">
           {reqPath && <PathIcon path={reqPath} size={16} />}
           {reqClans.map((c, i) => (
             <ClanIcon key={i} clan={c} size={16} />

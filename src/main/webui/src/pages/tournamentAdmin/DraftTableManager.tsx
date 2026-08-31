@@ -4,6 +4,8 @@ import { api } from '../../api/client';
 import type { TournamentPlayer, TournamentRegistration } from '../../api/types';
 import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
+import { Button } from '../../components/ui/Button';
+import { InlineAlert } from '../../components/ui/FormFeedback';
 import { RoundColumn } from './RoundColumn';
 import type { DragPayload } from './dragDrop';
 import { ImportTablesModal } from './ImportTablesModal';
@@ -169,25 +171,29 @@ export function DraftTableManager({
 
   return (
     <>
-      <div className="d-flex gap-1 flex-wrap">
-        <button onClick={saveTables} className="btn btn-outline-secondary btn-sm">
+      <div className="flex gap-1 flex-wrap">
+        <Button variant="secondary" size="sm" onClick={saveTables}>
           Save Tables
-        </button>
-        <button onClick={downloadTables} className="btn btn-outline-secondary btn-sm">
+        </Button>
+        <Button variant="secondary" size="sm" onClick={downloadTables}>
           Download
-        </button>
-        <button onClick={load} className="btn btn-outline-secondary btn-sm">
+        </Button>
+        <Button variant="secondary" size="sm" onClick={load}>
           Show Tables
-        </button>
-        <button onClick={() => setShowImport(true)} className="btn btn-outline-primary btn-sm">
+        </Button>
+        <Button variant="accent-ghost" size="sm" onClick={() => setShowImport(true)}>
           Import
-        </button>
-        <button onClick={createTables} className="btn btn-outline-success btn-sm">
+        </Button>
+        <Button size="sm" className="bg-online text-surface hover:opacity-90" onClick={createTables}>
           Create Rounds
-        </button>
+        </Button>
       </div>
-      {createError && <div className="alert alert-danger mt-2">{createError}</div>}
-      <div className="flex-fill overflow-auto mt-2 min-h-0">
+      {createError && (
+        <InlineAlert kind="danger" className="mt-2">
+          {createError}
+        </InlineAlert>
+      )}
+      <div className="flex-1 min-h-0 overflow-auto mt-2">
         {roundNumbers.map((round) => (
           <RoundColumn
             key={round}

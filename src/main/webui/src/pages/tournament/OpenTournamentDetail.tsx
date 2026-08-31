@@ -71,15 +71,15 @@ export function OpenTournamentDetail({
 
   return (
     <Panel title={tournament.name} right={action}>
-      <div className="jt:flex-1 jt:min-h-0 jt:overflow-y-auto jt:p-4 jt:text-sm jt:text-ink">
-        <p className="jt:text-xs jt:text-ink-muted jt:mb-3">
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 text-sm text-ink">
+        <p className="text-xs text-ink-muted mb-3">
           Registration closes {relativeTime(tournament.registrationEndTime)}
         </p>
 
         {tournament.rules.length > 0 && (
-          <div className="jt:mb-3">
-            <p className="jt:font-semibold jt:mb-1">Rules</p>
-            <ul className="jt:list-disc jt:pl-5 jt:space-y-0.5 jt:text-ink-secondary">
+          <div className="mb-3">
+            <p className="font-semibold mb-1">Rules</p>
+            <ul className="list-disc pl-5 space-y-0.5 text-ink-secondary">
               {tournament.rules.map((r, i) => (
                 <li key={i}>{r}</li>
               ))}
@@ -88,10 +88,10 @@ export function OpenTournamentDetail({
         )}
 
         {tournament.conditions && (
-          <div className="jt:mb-3">
-            <p className="jt:font-semibold jt:mb-1">Special Rules</p>
-            <p className="jt:text-ink-secondary">{tournament.conditions}</p>
-            <ul className="jt:list-disc jt:pl-5 jt:space-y-0.5 jt:text-ink-secondary">
+          <div className="mb-3">
+            <p className="font-semibold mb-1">Special Rules</p>
+            <p className="text-ink-secondary">{tournament.conditions}</p>
+            <ul className="list-disc pl-5 space-y-0.5 text-ink-secondary">
               {(tournament.specialRules ?? []).map((r, i) => (
                 <li key={i}>{r}</li>
               ))}
@@ -101,8 +101,8 @@ export function OpenTournamentDetail({
 
         {tournament.registered && (
           <div>
-            <p className="jt:font-semibold jt:mb-2">Deck Selection</p>
-            <div className="jt:flex jt:items-end jt:gap-2 jt:mb-3">
+            <p className="font-semibold mb-2">Deck Selection</p>
+            <div className="flex items-end gap-2 mb-3">
               <Select
                 id="tournamentDeck"
                 size="sm"

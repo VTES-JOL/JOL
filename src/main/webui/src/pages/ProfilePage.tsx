@@ -33,14 +33,14 @@ export function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="jt-scope jt:flex jt:flex-1 jt:min-h-0 jt:items-center jt:justify-center jt:bg-base">
+      <div className="flex flex-1 min-h-0 items-center justify-center bg-base">
         <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="jt-scope jt:grid jt:gap-4 jt:p-4 jt:bg-base jt:md:grid-cols-2 jt:lg:grid-cols-3 jt:content-start">
+    <div className="grid gap-4 p-4 bg-base md:grid-cols-2 lg:grid-cols-3 content-start">
       <ProfileEditor profile={profile} countries={countries} onSaved={onSaved} />
       <AccountEditor />
       <Preferences profile={profile} onSaved={onSaved} />

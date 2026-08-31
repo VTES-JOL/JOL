@@ -1,3 +1,5 @@
+import { X } from 'lucide-react';
+
 // Mirrors pick-target-modal.jsp/showTargetPicker() — a lightweight,
 // non-blocking banner (no backdrop) shown while a play-card mode with a
 // MINION_YOU_CONTROL/SELF/SOMETHING target is pending. Completing the pick
@@ -6,14 +8,21 @@
 export function TargetPicker({ cardName, onCancel }: { cardName: string; onCancel: () => void }) {
   return (
     <div
-      className="position-fixed top-0 start-50 translate-middle-x mt-2 shadow border-2 border-dark bg-secondary-subtle rounded"
+      className="fixed top-2 left-1/2 -translate-x-1/2 rounded border border-line-accent bg-panel text-ink shadow-xl"
       style={{ zIndex: 1055, width: 'min(90vw, 400px)' }}
     >
-      <div className="d-flex justify-content-between align-items-center p-2 border-bottom">
-        <span className="fw-bold">{cardName}</span>
-        <button type="button" className="btn-close" onClick={onCancel} aria-label="Cancel" />
+      <div className="flex justify-between items-center p-2 border-b border-line">
+        <span className="font-bold">{cardName}</span>
+        <button
+          type="button"
+          onClick={onCancel}
+          aria-label="Cancel"
+          className="p-1 rounded hover:bg-hover text-ink-muted"
+        >
+          <X size={14} />
+        </button>
       </div>
-      <div className="p-2">Pick target.</div>
+      <div className="p-2 text-sm">Pick target.</div>
     </div>
   );
 }

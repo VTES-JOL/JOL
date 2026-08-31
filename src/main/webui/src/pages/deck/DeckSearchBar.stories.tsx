@@ -72,7 +72,7 @@ const CARDS: CardDetail[] = [
 function Harness() {
   const [added, setAdded] = useState<string[]>([]);
   return (
-    <div className="jt:w-[360px] jt:bg-surface jt:border jt:border-line/60 jt:rounded-lg">
+    <div className="w-[360px] bg-surface border border-line/60 rounded-lg">
       <DeckSearchBar
         onSearch={async (q) => {
           await new Promise((r) => setTimeout(r, 250));
@@ -80,7 +80,7 @@ function Harness() {
         }}
         onAddCard={(c) => setAdded((a) => [...a, c.name])}
       />
-      <div className="jt:px-3 jt:py-2 jt:text-xs jt:text-ink-muted">
+      <div className="px-3 py-2 text-xs text-ink-muted">
         Added: {added.length ? added.join(', ') : '—'}
       </div>
     </div>

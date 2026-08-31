@@ -7,7 +7,7 @@ import { FormatValidityBadges } from './FormatValidityBadges';
 /**
  * Editor sub-header: live crypt/library/groups summary on the left; per-format
  * validity chips and a banned-card count on the right. Ported from jol-quarkus;
- * Tailwind `jt:` -prefixed.
+ * Tailwind Tailwind-based.
  */
 interface Props {
   entries: DeckEntry[];
@@ -20,19 +20,19 @@ export function DeckStatusBar({ entries, formatValidity }: Props) {
   const hasValidity = Object.keys(formatValidity).length > 0;
 
   return (
-    <div className="jt:px-3 jt:py-1.5 jt:border-b jt:border-line/50 jt:flex jt:flex-wrap jt:items-center jt:justify-between jt:gap-x-4 jt:gap-y-1.5 jt:min-h-[28px]">
-      <div className="jt:flex jt:items-center jt:min-w-0">
+    <div className="px-3 py-1.5 border-b border-line/50 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 min-h-[28px]">
+      <div className="flex items-center min-w-0">
         {summary ? (
           <SummaryStats summary={summary} validate />
         ) : (
-          <span className="jt:text-[11px] jt:text-ink-muted">Empty deck</span>
+          <span className="text-[11px] text-ink-muted">Empty deck</span>
         )}
       </div>
-      <div className="jt:flex jt:items-center jt:gap-2 jt:shrink-0">
+      <div className="flex items-center gap-2 shrink-0">
         {hasValidity && <FormatValidityBadges validity={formatValidity} />}
         {banned.length > 0 && (
-          <div className="jt:flex jt:items-center jt:gap-1.5 jt:px-2 jt:py-1 jt:rounded jt:border jt:border-blood/30 jt:bg-blood/10 jt:text-[11px] jt:text-blood-soft">
-            <TriangleAlert className="jt:w-3 jt:h-3 jt:shrink-0" />
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded border border-blood/30 bg-blood/10 text-[11px] text-blood-soft">
+            <TriangleAlert className="w-3 h-3 shrink-0" />
             <span>{banned.length} banned</span>
           </div>
         )}

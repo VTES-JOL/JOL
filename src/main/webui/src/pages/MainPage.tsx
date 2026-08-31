@@ -24,8 +24,8 @@ export function MainPage() {
     <button
       type="button"
       onClick={() => setMobilePane(pane)}
-      className={`jt:px-3 jt:py-1 jt:text-sm jt:rounded jt:border jt:border-line-accent ${
-        mobilePane === pane ? 'jt:bg-accent jt:text-surface' : 'jt:text-ink-secondary jt:hover:bg-hover'
+      className={`px-3 py-1 text-sm rounded border border-line-accent ${
+        mobilePane === pane ? 'bg-accent text-surface' : 'text-ink-secondary hover:bg-hover'
       }`}
     >
       {label}
@@ -33,28 +33,28 @@ export function MainPage() {
   );
 
   return (
-    <div className="jt-scope jt:flex jt:flex-col jt:flex-1 jt:min-h-0 jt:gap-2 jt:p-3 jt:bg-base jt:text-ink jt:lg:flex-row">
-      <div className="jt:lg:hidden jt:flex jt:gap-1">
+    <div className="flex flex-col flex-1 min-h-0 gap-2 p-3 bg-base text-ink lg:flex-row">
+      <div className="lg:hidden flex gap-1">
         {toggleBtn('main', 'Games & Chat')}
         {toggleBtn('info', 'Info')}
       </div>
 
       <div
-        className={`jt:flex-col jt:md:flex-row jt:flex-1 jt:min-h-0 jt:gap-2 jt:lg:flex ${
-          mobilePane === 'info' ? 'jt:hidden' : 'jt:flex'
+        className={`flex-col md:flex-row flex-1 min-h-0 gap-2 lg:flex ${
+          mobilePane === 'info' ? 'hidden' : 'flex'
         }`}
       >
-        <div className="jt:flex jt:flex-col jt:flex-1 jt:min-h-0 jt:min-w-0 jt:md:flex-none jt:md:w-1/3 jt:lg:w-1/4">
+        <div className="flex flex-col flex-1 min-h-0 min-w-0 md:flex-none md:w-1/3 lg:w-1/4">
           <GamesPanel />
         </div>
-        <div className="jt:flex jt:flex-col jt:flex-1 jt:min-h-0 jt:min-w-0">
+        <div className="flex flex-col flex-1 min-h-0 min-w-0">
           <GlobalChat />
         </div>
       </div>
 
       <div
-        className={`jt:flex-col jt:flex-1 jt:min-h-0 jt:gap-2 jt:overflow-y-auto jt:lg:flex jt:lg:flex-none jt:lg:w-1/4 ${
-          mobilePane === 'main' ? 'jt:hidden' : 'jt:flex'
+        className={`flex-col flex-1 min-h-0 gap-2 overflow-y-auto lg:flex lg:flex-none lg:w-1/4 ${
+          mobilePane === 'main' ? 'hidden' : 'flex'
         }`}
       >
         <SiteNotes />

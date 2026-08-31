@@ -9,11 +9,11 @@ import './Callout.css';
 // generic container).
 export function Callout({ title = 'Tip', children }: { title?: string; children: ReactNode }) {
   return (
-    <div className="help-callout jt:my-3">
+    <div className="help-callout my-3">
       <Lightbulb size={16} className="help-callout-icon" />
       <div>
         <div className="help-callout-title">{title}</div>
-        <div className="jt:text-sm">{children}</div>
+        <div className="text-sm">{children}</div>
       </div>
     </div>
   );

@@ -49,22 +49,22 @@ export function DeckPreviewExample({ name = 'Preview', crypt, library, valid = t
   };
 
   return (
-    <Card className="jt:my-3 jt:max-w-md">
-      <CardHeader className="jt:flex jt:items-center jt:justify-between">
-        <span className="jt:text-sm jt:font-semibold jt:text-ink">{name}</span>
+    <Card className="my-3 max-w-md">
+      <CardHeader className="flex items-center justify-between">
+        <span className="text-sm font-semibold text-ink">{name}</span>
         {valid ? (
           <Badge variant="online">
-            <CheckCircle2 size={12} className="jt:mr-1" />
+            <CheckCircle2 size={12} className="mr-1" />
             Valid
           </Badge>
         ) : (
           <Badge variant="blood">
-            <AlertTriangle size={12} className="jt:mr-1" />
+            <AlertTriangle size={12} className="mr-1" />
             Invalid
           </Badge>
         )}
       </CardHeader>
-      <CardBody className="jt:p-2">
+      <CardBody className="p-2">
         <DeckPreview deck={deck} />
       </CardBody>
     </Card>

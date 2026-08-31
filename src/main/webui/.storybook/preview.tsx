@@ -3,22 +3,23 @@ import { useEffect } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// App-authored global styles this app's main.tsx bundles at the app root
-// (fonts/tokens/card-visuals) — third-party Bootstrap CSS and icon/font CDN
-// links live in preview-head.html instead, mirroring legacyStyles.ts/
-// index.html's own split between the two.
+// The same global styles main.tsx bundles at the app root (tokens, Tailwind
+// + Preflight, fonts, card-visuals). Icon/font CDN links live in
+// preview-head.html.
 import '../src/index.css';
 import '../src/styles/fonts.css';
 import '../src/styles/theme.css';
 import '../src/styles/card-visuals.css';
 import '../src/styles/tailwind.css';
 
-// index.html gives <html>/<body>/#root these classes so flex-fill layouts
-// (SplitLayout, EmptyState, PageLoading, ...) have a real height to fill —
-// Storybook's own root divs don't, so components relying on that silently
-// collapse to zero height without this.
-document.documentElement.classList.add('h-100', 'mh-100');
-document.body.classList.add('h-100', 'mh-100', 'd-flex', 'flex-column');
+// index.css makes <html>/<body>/#root full-height flex columns so flex-fill
+// layouts (EmptyState, PageLoading, MasterDetailView, ...) have a real
+// height to fill — Storybook's own root divs don't, so set it explicitly.
+for (const el of [document.documentElement, document.body]) {
+  el.style.height = '100%';
+}
+document.body.style.display = 'flex';
+document.body.style.flexDirection = 'column';
 
 const withProviders: Decorator = (Story) => {
   // Fresh client per render so query state (e.g. TopBar's /nav cache) never
@@ -29,9 +30,9 @@ const withProviders: Decorator = (Story) => {
   return (
     <QueryClientProvider client={queryClient}>
       <MemoryRouter>
-        {/* Mirrors the app: Tailwind pages live under a .jt-scope root so the
+        {/* Mirrors the app: Tailwind pages live under a .root so the
             form-control reset in styles/tailwind.css applies. */}
-        <div className="jt-scope">
+        <div>
           <Story />
         </div>
       </MemoryRouter>

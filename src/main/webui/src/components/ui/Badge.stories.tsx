@@ -19,7 +19,7 @@ export const Muted: Story = { args: { variant: 'muted', children: 'Draft' } };
 
 export const AllVariants: Story = {
   render: () => (
-    <div className="jt:flex jt:flex-wrap jt:items-center jt:gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <Badge variant="format">Standard</Badge>
       <Badge variant="accent">New</Badge>
       <Badge variant="blood">Invalid</Badge>

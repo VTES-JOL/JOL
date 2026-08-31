@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-react';
 
 /**
  * Master/detail layout, ported from the jol-quarkus rewrite. Tailwind-based
- * (all classes `jt:` -prefixed — see styles/tailwind.css).
+ * (all classes Tailwind-based — see styles/tailwind.css).
  *
  * Desktop (>= breakpoint): every panel shown side-by-side in a CSS grid
  * whose track sizes come from `columns`.
@@ -63,45 +63,45 @@ export function MasterDetailView({
   };
 
   const mobileNavHidden = {
-    md: 'jt:md:hidden',
-    lg: 'jt:lg:hidden',
-    xl: 'jt:xl:hidden',
+    md: 'md:hidden',
+    lg: 'lg:hidden',
+    xl: 'xl:hidden',
   }[breakpoint];
 
   const gridColsClass = {
-    md: 'jt:md:grid',
-    lg: 'jt:lg:grid',
-    xl: 'jt:xl:grid',
+    md: 'md:grid',
+    lg: 'lg:grid',
+    xl: 'xl:grid',
   }[breakpoint];
 
   const panelResponsiveClass = {
-    md: 'jt:md:flex jt:md:flex-col jt:md:h-full jt:md:min-h-0 jt:md:w-full jt:md:overflow-y-auto',
-    lg: 'jt:lg:flex jt:lg:flex-col jt:lg:h-full jt:lg:min-h-0 jt:lg:w-full jt:lg:overflow-y-auto',
-    xl: 'jt:xl:flex jt:xl:flex-col jt:xl:h-full jt:xl:min-h-0 jt:xl:w-full jt:xl:overflow-y-auto',
+    md: 'md:flex md:flex-col md:h-full md:min-h-0 md:w-full md:overflow-y-auto',
+    lg: 'lg:flex lg:flex-col lg:h-full lg:min-h-0 lg:w-full lg:overflow-y-auto',
+    xl: 'xl:flex xl:flex-col xl:h-full xl:min-h-0 xl:w-full xl:overflow-y-auto',
   }[breakpoint];
 
   return (
-    <div className="jt:flex jt:flex-col jt:flex-1 jt:min-h-0">
+    <div className="flex flex-col flex-1 min-h-0">
       {/* Mobile dropdown selector */}
-      <div className={`${mobileNavHidden} jt:mb-4 jt:shrink-0 jt:relative jt:z-20`}>
+      <div className={`${mobileNavHidden} mb-4 shrink-0 relative z-20`}>
         <button
           onClick={() => setMobileNavOpen(!mobileNavOpen)}
-          className="jt:w-full jt:flex jt:items-center jt:justify-between jt:px-4 jt:py-3 jt:bg-panel jt:border jt:border-line jt:rounded-lg jt:text-sm jt:font-semibold jt:text-ink jt:shadow-sm"
+          className="w-full flex items-center justify-between px-4 py-3 bg-panel border border-line rounded-lg text-sm font-semibold text-ink shadow-sm"
         >
-          <span className="jt:truncate">{selectedPanel.label}</span>
+          <span className="truncate">{selectedPanel.label}</span>
           <ChevronDown
-            className={`jt:w-4 jt:h-4 jt:transition-transform ${mobileNavOpen ? 'jt:rotate-180' : ''}`}
+            className={`w-4 h-4 transition-transform ${mobileNavOpen ? 'rotate-180' : ''}`}
           />
         </button>
 
         {mobileNavOpen && (
-          <div className="jt:absolute jt:top-full jt:left-0 jt:right-0 jt:mt-2 jt:bg-panel jt:border jt:border-line jt:rounded-lg jt:shadow-xl jt:overflow-hidden jt:z-30">
+          <div className="absolute top-full left-0 right-0 mt-2 bg-panel border border-line rounded-lg shadow-xl overflow-hidden z-30">
             {panels.map((p) => (
               <button
                 key={p.key}
                 onClick={() => handleSelect(p.key)}
-                className={`jt:w-full jt:text-left jt:px-4 jt:py-3 jt:text-sm jt:transition-colors jt:hover:bg-hover ${
-                  p.key === selectedKey ? 'jt:text-accent-soft jt:font-bold' : 'jt:text-ink'
+                className={`w-full text-left px-4 py-3 text-sm transition-colors hover:bg-hover ${
+                  p.key === selectedKey ? 'text-accent-soft font-bold' : 'text-ink'
                 }`}
               >
                 {p.label}
@@ -113,7 +113,7 @@ export function MasterDetailView({
 
       {/* Content area */}
       <div
-        className={`jt:flex-1 jt:min-h-0 jt:w-full jt:flex jt:flex-col ${gridColsClass} jt:gap-6`}
+        className={`flex-1 min-h-0 w-full flex flex-col ${gridColsClass} gap-6`}
         style={{ gridTemplateColumns: columns }}
       >
         {panels.map((p) => (
@@ -121,8 +121,8 @@ export function MasterDetailView({
             key={p.key}
             className={
               p.key === selectedKey
-                ? 'jt:flex jt:flex-col jt:h-full jt:min-h-0 jt:w-full jt:overflow-y-auto'
-                : `jt:hidden ${panelResponsiveClass}`
+                ? 'flex flex-col h-full min-h-0 w-full overflow-y-auto'
+                : `hidden ${panelResponsiveClass}`
             }
           >
             {p.content}

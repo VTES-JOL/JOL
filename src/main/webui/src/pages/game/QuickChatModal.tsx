@@ -1,4 +1,4 @@
-import { Modal } from '../../components/Modal';
+import { Modal } from '../../components/ui/Modal';
 
 const ROWS: string[][] = [
   ['Block?', 'No block', 'Blocked', 'Yes', 'No', 'Wait', '1', '2', '3', '4', '5'],
@@ -16,7 +16,14 @@ const LABELS: Record<string, string> = {
   'Hands for 3': 'H3',
 };
 
-const ROW_STYLE = ['btn-outline-secondary', 'btn-outline-danger', 'btn-outline-danger', 'btn-outline-danger', 'btn-outline-success'];
+const BTN = 'm-1 rounded border px-2.5 py-1 text-sm transition-colors';
+const ROW_STYLE = [
+  `${BTN} border-line-accent text-ink-secondary hover:bg-hover`,
+  `${BTN} border-blood/40 text-blood hover:bg-blood/10`,
+  `${BTN} border-blood/40 text-blood hover:bg-blood/10`,
+  `${BTN} border-blood/40 text-blood hover:bg-blood/10`,
+  `${BTN} border-online/40 text-online hover:bg-online/10`,
+];
 
 // Mirrors quick-chat-modal.jsp — canned chat-message buttons for combat callouts.
 export function QuickChatModal({ onSend, onClose }: { onSend: (message: string) => void; onClose: () => void }) {
@@ -27,17 +34,15 @@ export function QuickChatModal({ onSend, onClose }: { onSend: (message: string) 
 
   return (
     <Modal size="lg" onClose={onClose} title="Quick Chat">
-      <div className="modal-body">
-        {ROWS.map((row, i) => (
-          <div key={i}>
-            {row.map((message) => (
-              <button key={message} type="button" className={`btn ${ROW_STYLE[i]} m-1`} onClick={() => send(message)}>
-                {LABELS[message] ?? message}
-              </button>
-            ))}
-          </div>
-        ))}
-      </div>
+      {ROWS.map((row, i) => (
+        <div key={i} className="flex flex-wrap">
+          {row.map((message) => (
+            <button key={message} type="button" className={ROW_STYLE[i]} onClick={() => send(message)}>
+              {LABELS[message] ?? message}
+            </button>
+          ))}
+        </div>
+      ))}
     </Modal>
   );
 }

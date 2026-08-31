@@ -24,32 +24,32 @@ export function IdleGames() {
     });
   };
 
-  const cell = 'jt:px-2 jt:py-1 jt:border-b jt:border-line/50 jt:align-top';
+  const cell = 'px-2 py-1 border-b border-line/50 align-top';
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Idle Games</CardTitle>
       </CardHeader>
-      <div className="jt:overflow-auto jt:max-h-[70dvh]">
-        <table className="jt:w-full jt:text-sm">
-          <thead className="jt:sticky jt:top-0 jt:bg-panel">
-            <tr className="jt:text-left jt:text-ink-muted">
-              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Name</th>
-              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Last Update</th>
-              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Player</th>
-              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Timestamp</th>
-              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Action</th>
+      <div className="overflow-auto max-h-[70dvh]">
+        <table className="w-full text-sm">
+          <thead className="sticky top-0 bg-panel">
+            <tr className="text-left text-ink-muted">
+              <th className="px-2 py-1.5 font-semibold border-b border-line">Name</th>
+              <th className="px-2 py-1.5 font-semibold border-b border-line">Last Update</th>
+              <th className="px-2 py-1.5 font-semibold border-b border-line">Player</th>
+              <th className="px-2 py-1.5 font-semibold border-b border-line">Timestamp</th>
+              <th className="px-2 py-1.5 font-semibold border-b border-line">Action</th>
             </tr>
           </thead>
           <tbody>
             {idleGames.map((g) => {
               const players = Object.entries(g.idlePlayers);
               return players.map(([player, timestamp], i) => (
-                <tr key={`${g.gameId}-${player}`} className="jt:hover:bg-hover">
+                <tr key={`${g.gameId}-${player}`} className="hover:bg-hover">
                   {i === 0 && (
                     <td className={cell} rowSpan={players.length}>
-                      <Link to={pathForGame(g.gameId)} className="jt:text-accent jt:underline">
+                      <Link to={pathForGame(g.gameId)} className="text-accent underline">
                         {g.gameName}
                       </Link>
                     </td>

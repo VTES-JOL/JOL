@@ -11,9 +11,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const panel = (label: string, body: string) => (
-  <div className="jt:flex-1 jt:min-h-0 jt:overflow-y-auto jt:p-4 jt:bg-surface jt:border jt:border-line jt:rounded-lg">
-    <h3 className="jt:text-ink jt:font-semibold jt:mb-2">{label}</h3>
-    <p className="jt:text-ink-muted jt:text-sm">{body}</p>
+  <div className="flex-1 min-h-0 overflow-y-auto p-4 bg-surface border border-line rounded-lg">
+    <h3 className="text-ink font-semibold mb-2">{label}</h3>
+    <p className="text-ink-muted text-sm">{body}</p>
   </div>
 );
 

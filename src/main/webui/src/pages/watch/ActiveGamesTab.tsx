@@ -21,8 +21,8 @@ const TIMESTAMP_FORMAT = new Intl.DateTimeFormat('en-GB', {
 // games already in the list.
 const ACTIVE_GAMES_POLL_MS = 20_000;
 
-const TH = 'jt:sticky jt:top-0 jt:bg-panel jt:text-left jt:font-semibold jt:text-ink-muted jt:px-3 jt:py-1.5 jt:border-b jt:border-line';
-const TD = 'jt:px-3 jt:py-1 jt:border-b jt:border-line/50 jt:text-ink';
+const TH = 'sticky top-0 bg-panel text-left font-semibold text-ink-muted px-3 py-1.5 border-b border-line';
+const TD = 'px-3 py-1 border-b border-line/50 text-ink';
 
 export function ActiveGamesTab() {
   const { data: games = [] } = useQuery({
@@ -33,8 +33,8 @@ export function ActiveGamesTab() {
 
   return (
     <Panel title="Active Games">
-      <div className="jt:flex-1 jt:min-h-0 jt:overflow-auto">
-        <table className="jt:w-full jt:text-sm">
+      <div className="flex-1 min-h-0 overflow-auto">
+        <table className="w-full text-sm">
           <thead>
             <tr>
               <th className={TH}>Game</th>
@@ -44,9 +44,9 @@ export function ActiveGamesTab() {
           </thead>
           <tbody>
             {games.map((g) => (
-              <tr key={g.gameId} className="jt:hover:bg-hover">
+              <tr key={g.gameId} className="hover:bg-hover">
                 <td className={TD}>
-                  <Link to={pathForGame(g.gameId)} className="jt:text-accent jt:underline">
+                  <Link to={pathForGame(g.gameId)} className="text-accent underline">
                     {g.gameName}
                   </Link>
                 </td>

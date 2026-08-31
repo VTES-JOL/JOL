@@ -28,7 +28,7 @@ export function RegionExample({ label, type = 'READY', children }: RegionExample
   };
 
   return (
-    <div className="jt:my-3" style={{ maxWidth: '24rem' }}>
+    <div className="my-3" style={{ maxWidth: '24rem' }}>
       <Region
         region={region}
         defaultCollapsed={false}

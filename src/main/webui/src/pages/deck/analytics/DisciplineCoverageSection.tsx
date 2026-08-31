@@ -45,16 +45,16 @@ export function DisciplineCoverageSection({ entries, detailMap }: Props) {
   const cryptMax = rows[0][1];
 
   return (
-    <div className="jt:border-b jt:border-line/50">
+    <div className="border-b border-line/50">
       <SectionHeader title="Discipline Coverage" subtitle="Crypt cards · library cards needed in ( )" />
-      <div className="jt:py-1">
+      <div className="py-1">
         {rows.map(([disc, cryptCount]) => {
           const libCount = libDiscs.get(disc) ?? 0;
           const label = (
-            <span className="jt:flex jt:items-center jt:gap-1">
+            <span className="flex items-center gap-1">
               <DisciplineIcon discipline={disc} size={12} />
               <span>{disc}</span>
-              {libCount > 0 && <span className="jt:text-ink-muted">({libCount})</span>}
+              {libCount > 0 && <span className="text-ink-muted">({libCount})</span>}
             </span>
           );
           return <BarRow key={disc} label={label} count={cryptCount} max={cryptMax} />;

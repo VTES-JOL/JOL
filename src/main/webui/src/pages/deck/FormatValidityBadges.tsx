@@ -9,7 +9,7 @@ import { Button } from '../../components/ui/Button';
  * STANDARD / DUEL / V5 validity chips, driven straight off the deck page's
  * `formatValidity` map (no extra fetch). An invalid chip is clickable and
  * opens a modal listing the recorded errors. Ported from jol-quarkus;
- * Tailwind `jt:` -prefixed.
+ * Tailwind Tailwind-based.
  */
 const FORMATS = [
   { key: 'STANDARD', label: 'Standard' },
@@ -27,7 +27,7 @@ export function FormatValidityBadges({ validity, className = '' }: Props) {
 
   return (
     <div className={className}>
-      <div className="jt:flex jt:items-center jt:gap-1.5">
+      <div className="flex items-center gap-1.5">
         {FORMATS.map(({ key, label }) => {
           const v = validity[key];
           const status = v?.valid; // true | false | undefined
@@ -40,20 +40,20 @@ export function FormatValidityBadges({ validity, className = '' }: Props) {
               aria-disabled={!isInvalid}
               title={isInvalid ? `${label}: invalid — click for details` : undefined}
               className={[
-                'jt:flex jt:items-center jt:gap-1 jt:px-1.5 jt:py-0.5 jt:rounded jt:text-[11px] jt:font-medium jt:transition-colors',
+                'flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-medium transition-colors',
                 status === true
-                  ? 'jt:bg-online/15 jt:text-online jt:cursor-default'
+                  ? 'bg-online/15 text-online cursor-default'
                   : isInvalid
-                    ? 'jt:bg-blood/15 jt:text-blood-soft jt:hover:bg-blood/25 jt:cursor-pointer'
-                    : 'jt:bg-hover jt:text-ink-muted jt:cursor-default',
+                    ? 'bg-blood/15 text-blood-soft hover:bg-blood/25 cursor-pointer'
+                    : 'bg-hover text-ink-muted cursor-default',
               ].join(' ')}
             >
               {status === true ? (
-                <Check className="jt:w-2.5 jt:h-2.5" />
+                <Check className="w-2.5 h-2.5" />
               ) : isInvalid ? (
-                <X className="jt:w-2.5 jt:h-2.5" />
+                <X className="w-2.5 h-2.5" />
               ) : (
-                <Minus className="jt:w-2.5 jt:h-2.5" />
+                <Minus className="w-2.5 h-2.5" />
               )}
               {label}
             </button>
@@ -64,37 +64,37 @@ export function FormatValidityBadges({ validity, className = '' }: Props) {
       {modal &&
         createPortal(
           <div
-            className="jt-scope jt:fixed jt:inset-0 jt:z-50 jt:flex jt:items-center jt:justify-center jt:p-4 jt:bg-black/60 jt:backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
             onClick={() => setModal(null)}
           >
             <div
-              className="jt:relative jt:flex jt:flex-col jt:w-full jt:max-w-sm jt:rounded-lg jt:border jt:border-line-accent jt:bg-surface jt:shadow-xl"
+              className="relative flex flex-col w-full max-w-sm rounded-lg border border-line-accent bg-surface shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="jt:flex jt:items-center jt:justify-between jt:px-4 jt:py-3 jt:border-b jt:border-line/75 jt:bg-panel/45">
-                <div className="jt:flex jt:items-center jt:gap-2">
-                  <h2 className="jt:text-sm jt:font-medium jt:text-ink jt:tracking-wide">{modal.label}</h2>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-line/75 bg-panel/45">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-medium text-ink tracking-wide">{modal.label}</h2>
                   <Badge variant="blood">
-                    <X className="jt:w-2.5 jt:h-2.5 jt:inline jt:mr-0.5" />
+                    <X className="w-2.5 h-2.5 inline mr-0.5" />
                     Invalid
                   </Badge>
                 </div>
                 <button
                   onClick={() => setModal(null)}
-                  className="jt:p-1 jt:rounded jt:hover:bg-hover jt:transition-colors jt:cursor-pointer"
+                  className="p-1 rounded hover:bg-hover transition-colors cursor-pointer"
                 >
-                  <X className="jt:w-4 jt:h-4 jt:text-ink-muted" />
+                  <X className="w-4 h-4 text-ink-muted" />
                 </button>
               </div>
 
-              <div className="jt:px-4 jt:py-3 jt:min-h-[60px]">
+              <div className="px-4 py-3 min-h-[60px]">
                 {modal.errors.length === 0 ? (
-                  <p className="jt:text-xs jt:text-ink-muted">No details recorded.</p>
+                  <p className="text-xs text-ink-muted">No details recorded.</p>
                 ) : (
-                  <ul className="jt:space-y-1.5">
+                  <ul className="space-y-1.5">
                     {modal.errors.map((err, i) => (
-                      <li key={i} className="jt:flex jt:items-start jt:gap-2 jt:text-xs jt:text-blood-soft">
-                        <span className="jt:mt-px jt:shrink-0 jt:text-blood/60">·</span>
+                      <li key={i} className="flex items-start gap-2 text-xs text-blood-soft">
+                        <span className="mt-px shrink-0 text-blood/60">·</span>
                         <span>{err}</span>
                       </li>
                     ))}
@@ -102,7 +102,7 @@ export function FormatValidityBadges({ validity, className = '' }: Props) {
                 )}
               </div>
 
-              <div className="jt:flex jt:justify-end jt:px-4 jt:py-3 jt:border-t jt:border-line/75">
+              <div className="flex justify-end px-4 py-3 border-t border-line/75">
                 <Button variant="secondary" size="sm" onClick={() => setModal(null)}>
                   Close
                 </Button>

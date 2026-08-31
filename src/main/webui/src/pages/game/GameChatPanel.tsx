@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { History } from 'lucide-react';
 import { api } from '../../api/client';
 import type { ChatData, GameSnapshot } from '../../api/types';
 import { GameChatLog } from './GameChatLog';
@@ -30,10 +31,10 @@ export function GameChatPanel({
     <GamePanel
       id="gameChatCard"
       className="chat"
-      bodyClassName="p-0 game-chat overflow-hidden"
+      bodyClassName="p-0 overflow-hidden"
       title="Game Chat"
-      headerExtra={<span className="px-2">{`${game.turnLabel} - ${game.phase}`}</span>}
-      toggle={{ icon: 'bi-clock-history', label: 'History', onClick: onToggleHistory }}
+      headerExtra={<span className="px-2 text-xs text-ink-muted">{`${game.turnLabel} - ${game.phase}`}</span>}
+      toggle={{ icon: <History size={13} />, label: 'History', onClick: onToggleHistory }}
     >
       <GameChatLog lines={lines} viewerName={viewerName} />
     </GamePanel>

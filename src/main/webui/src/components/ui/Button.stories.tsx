@@ -22,7 +22,7 @@ export const WithIcon: Story = { args: { icon: <Plus size={14} />, children: 'Ne
 
 export const Sizes: Story = {
   render: (args) => (
-    <div className="jt:flex jt:items-center jt:gap-2">
+    <div className="flex items-center gap-2">
       <Button {...args} size="sm">
         Small
       </Button>

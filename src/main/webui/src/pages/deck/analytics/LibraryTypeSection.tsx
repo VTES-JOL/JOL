@@ -23,9 +23,9 @@ export function LibraryTypeSection({ entries }: Props) {
   const total = libEntries.reduce((s, e) => s + e.count, 0);
 
   return (
-    <div className="jt:border-b jt:border-line/50">
+    <div className="border-b border-line/50">
       <SectionHeader title="Library Types" subtitle={`${total} cards · multi-type counted in each`} />
-      <div className="jt:py-1">
+      <div className="py-1">
         {rows.map(([type, count]) => (
           <BarRow key={type} label={type} count={count} max={max} />
         ))}

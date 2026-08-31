@@ -16,7 +16,7 @@ type Story = StoryObj;
 function Harness() {
   const [open, setOpen] = useState(true);
   return (
-    <div className="jt:p-4">
+    <div className="p-4">
       <Button onClick={() => setOpen(true)}>Open</Button>
       {open && (
         <Modal
@@ -33,7 +33,7 @@ function Harness() {
             </>
           }
         >
-          <p className="jt:text-sm jt:text-ink-secondary">Body content goes here.</p>
+          <p className="text-sm text-ink-secondary">Body content goes here.</p>
         </Modal>
       )}
     </div>

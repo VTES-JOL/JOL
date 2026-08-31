@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
+import { Info } from 'lucide-react';
 import { api } from '../../api/client';
 import type { GameSnapshot } from '../../api/types';
 import { runRequest } from '../../api/mutate';
 import { GamePanel } from './GamePanel';
+
+const NOTES_TEXTAREA =
+  'w-full bg-surface/70 text-sm text-ink placeholder:text-ink-muted p-2 outline-none resize-none scrollable disabled:opacity-60';
 
 // Mirrors notes.jsp — saves on blur (not every keystroke), matching legacy's
 // updateNotes()/updateNotesHand() triggers. PUT .../notes/global and
@@ -34,14 +38,13 @@ export function NotesPanel({
   return (
     <GamePanel
       id="notesCard"
-      className="notes"
-      bodyClassName="p-0"
+      bodyClassName="flex flex-col"
       title="Notes"
-      toggle={game.player ? { icon: 'bi-info-lg', label: 'Deck', onClick: onToggleDeck } : undefined}
+      toggle={game.player ? { icon: <Info size={13} />, label: 'Deck', onClick: onToggleDeck } : undefined}
     >
       <textarea
         id="globalNotes"
-        className="form-control scrollable"
+        className={NOTES_TEXTAREA}
         placeholder="Global Notes"
         disabled={!(game.player || game.judge)}
         value={globalNotes}
@@ -51,7 +54,7 @@ export function NotesPanel({
       {game.player && (
         <textarea
           id="privateNotes"
-          className="form-control scrollable"
+          className={`${NOTES_TEXTAREA} border-t border-line`}
           placeholder="Private Notes"
           value={privateNotes}
           onChange={(e) => setPrivateNotes(e.target.value)}

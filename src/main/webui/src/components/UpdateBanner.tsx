@@ -16,11 +16,14 @@ export function UpdateBanner({ visible }: { visible?: boolean }) {
 
   return (
     <div
-      className="position-fixed top-0 start-0 w-100 d-flex align-items-center justify-content-center gap-3 py-2 text-bg-info"
+      className="fixed top-0 left-0 right-0 flex items-center justify-center gap-3 py-2 bg-accent text-surface text-sm"
       style={{ zIndex: 1090 }}
     >
       <span>A new version is available.</span>
-      <button className="btn btn-sm btn-light" onClick={() => location.reload()}>
+      <button
+        className="rounded bg-surface text-ink px-2 py-0.5 text-xs hover:bg-hover"
+        onClick={() => location.reload()}
+      >
         Reload
       </button>
     </div>

@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 export function SectionLabel({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <p
-      className={`jt:text-xs jt:font-semibold jt:uppercase jt:tracking-wide jt:text-ink-muted jt:mb-2 ${className ?? ''}`.trim()}
+      className={`text-xs font-semibold uppercase tracking-wide text-ink-muted mb-2 ${className ?? ''}`.trim()}
     >
       {children}
     </p>

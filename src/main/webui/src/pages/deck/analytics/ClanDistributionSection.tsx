@@ -23,19 +23,19 @@ export function ClanDistributionSection({ entries, detailMap }: Props) {
   const max = rows[0]?.[1] ?? 1;
 
   return (
-    <div className="jt:border-b jt:border-line/50">
+    <div className="border-b border-line/50">
       <SectionHeader title="Clan Distribution" />
-      <div className="jt:py-1">
+      <div className="py-1">
         {rows.map(([clan, count]) => (
           <BarRow
             key={clan}
             label={
               clan === '—' ? (
-                <span className="jt:text-ink-muted">No clan</span>
+                <span className="text-ink-muted">No clan</span>
               ) : (
-                <span className="jt:flex jt:items-center jt:gap-1">
+                <span className="flex items-center gap-1">
                   <ClanIcon clan={clan} size={12} />
-                  <span className="jt:truncate">{clan}</span>
+                  <span className="truncate">{clan}</span>
                 </span>
               )
             }

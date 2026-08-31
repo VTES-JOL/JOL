@@ -6,15 +6,15 @@ export default meta;
 type Story = StoryObj;
 
 const Row = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <div className="jt:flex jt:items-center jt:gap-3 jt:py-2 jt:border-b jt:border-line/40">
-    <span className="jt:w-24 jt:text-xs jt:text-ink-muted">{label}</span>
-    <div className="jt:flex jt:items-center jt:gap-2">{children}</div>
+  <div className="flex items-center gap-3 py-2 border-b border-line/40">
+    <span className="w-24 text-xs text-ink-muted">{label}</span>
+    <div className="flex items-center gap-2">{children}</div>
   </div>
 );
 
 export const Gallery: Story = {
   render: () => (
-    <div className="jt:bg-base jt:p-4">
+    <div className="bg-base p-4">
       <Row label="Types">
         {['Action', 'Action Modifier', 'Combat', 'Equipment', 'Master', 'Political Action'].map((t) => (
           <TypeIcon key={t} type={t} size={28} />

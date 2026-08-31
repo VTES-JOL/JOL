@@ -16,9 +16,9 @@ export function WatchPage() {
   const [tab, setTab] = useState<MainTab>('active');
 
   return (
-    <div className="jt-scope jt:flex jt:flex-col jt:flex-1 jt:min-h-0 jt:p-4 jt:bg-base jt:text-ink">
+    <div className="flex flex-col flex-1 min-h-0 p-4 bg-base text-ink">
       <TabBar tabs={TABS} active={tab} onChange={setTab} />
-      <div className="jt:flex-1 jt:min-h-0 jt:mt-3 jt:flex jt:flex-col">
+      <div className="flex-1 min-h-0 mt-3 flex flex-col">
         {tab === 'active' && <ActiveGamesTab />}
         {tab === 'past' && <PastGamesTab />}
         {tab === 'stats' && <StatsTab />}

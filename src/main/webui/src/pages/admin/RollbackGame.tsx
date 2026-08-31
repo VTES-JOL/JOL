@@ -36,7 +36,7 @@ export function RollbackGame() {
       <CardHeader>
         <CardTitle>Rollback Game</CardTitle>
       </CardHeader>
-      <CardBody className="jt:flex jt:flex-col jt:gap-2 jt:items-start">
+      <CardBody className="flex flex-col gap-2 items-start">
         <AdminSelect id="rollbackGamesList" label="Games" value={gameId} onChange={setGameId} options={gameOptions} />
         <AdminSelect
           id="rollbackTurnsList"

@@ -49,7 +49,7 @@ export function AppShell() {
         for this specific override. position-relative scopes the overlay
         below to this content area rather than the whole viewport.
       */}
-      <div id="content" className="flex-grow-1 d-flex flex-column position-relative" style={{ minHeight: 0 }}>
+      <div id="content" className="flex-1 flex flex-col relative min-h-0">
         {/*
           Routes always render, even while offline — MainPage and its
           children stay mounted so their local state (chat scroll position,

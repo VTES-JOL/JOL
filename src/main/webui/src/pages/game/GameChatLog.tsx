@@ -17,7 +17,7 @@ export function GameChatLog({ lines, viewerName }: { lines: ChatData[]; viewerNa
   }, [lines]);
 
   return (
-    <div ref={ref} className="bg-white p-1 scrollable">
+    <div ref={ref} className="bg-surface text-ink p-1 scrollable">
       {lines.map((line, i) => {
         const { html } = highlightMentions(line.message, viewerName);
         return (

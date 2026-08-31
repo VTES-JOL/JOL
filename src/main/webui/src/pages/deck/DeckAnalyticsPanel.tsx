@@ -25,20 +25,20 @@ export function DeckAnalyticsPanel({ entries, detailMap }: Props) {
   return (
     <Panel title="Analytics">
       {entries.length === 0 ? (
-        <div className="jt:flex-1 jt:flex jt:items-center jt:justify-center jt:p-6 jt:text-xs jt:text-ink-muted jt:text-center jt:leading-relaxed">
+        <div className="flex-1 flex items-center justify-center p-6 text-xs text-ink-muted text-center leading-relaxed">
           Add cards to see analytics.
         </div>
       ) : (
-        <div className="jt:overflow-y-auto jt:flex-1 jt:min-h-0">
+        <div className="overflow-y-auto flex-1 min-h-0">
           <OpeningHandSection entries={entries} />
           <LibraryTypeSection entries={entries} />
 
-          <div className="jt:hidden jt:xl:block">
+          <div className="hidden xl:block">
             <LibraryCostSection entries={entries} detailMap={detailMap} />
             <CryptCapacityCurve entries={entries} detailMap={detailMap} />
           </div>
 
-          <div className="jt:hidden jt:2xl:block">
+          <div className="hidden 2xl:block">
             <ClanDistributionSection entries={entries} detailMap={detailMap} />
             <DisciplineCoverageSection entries={entries} detailMap={detailMap} />
           </div>

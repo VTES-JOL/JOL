@@ -1,7 +1,7 @@
+import { ChevronLeft, ChevronRight, TriangleAlert } from 'lucide-react';
 import type { CardSnapshot, GameSnapshot, PlayerSnapshot } from '../../api/types';
 import { Region } from './Region';
 import type { HandCardContext, TableCardContext } from './cardCommands';
-import './PlayerBoard.css';
 
 const REGION_ORDER = ['READY', 'TORPOR', 'UNCONTROLLED', 'ASH_HEAP', 'REMOVED_FROM_GAME', 'RESEARCH', 'LIBRARY', 'CRYPT', 'HAND'];
 // GameView's default-collapsed set — see Region.tsx's comment on why this is
@@ -9,9 +9,11 @@ const REGION_ORDER = ['READY', 'TORPOR', 'UNCONTROLLED', 'ASH_HEAP', 'REMOVED_FR
 // UNCONTROLLED/RESEARCH only start collapsed once that player is ousted.
 const ALWAYS_COLLAPSED = new Set(['ASH_HEAP', 'REMOVED_FROM_GAME', 'LIBRARY', 'HAND', 'CRYPT']);
 
+const PILL = 'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium';
+
 function poolStyle(pool: number): string {
-  if (pool === 0) return 'text-bg-dark';
-  return pool < 0 ? 'text-bg-warning' : 'text-bg-danger';
+  if (pool === 0) return 'bg-ink text-base';
+  return pool < 0 ? 'bg-gold text-surface' : 'bg-blood text-surface';
 }
 
 export function PlayerBoard({
@@ -28,40 +30,45 @@ export function PlayerBoard({
   onPlayCardClick: (ctx: HandCardContext, card: CardSnapshot) => void;
 }) {
   const isViewer = player.name === viewerName;
-  const activeStyle = player.active ? 'text-bg-light border-dark border-2' : isViewer ? 'border-secondary border-2' : '';
-  const activeHeaderStyle = player.active ? 'bg-info-subtle' : '';
+  const activeBorder = player.active
+    ? 'border-2 border-accent'
+    : isViewer
+      ? 'border-2 border-line-accent'
+      : 'border border-line-accent';
   const ousted = player.pool < 1;
 
   const regions = [...player.regions].sort((a, b) => REGION_ORDER.indexOf(a.type) - REGION_ORDER.indexOf(b.type));
 
   return (
-    <div className="col-xl col-lg-3 col-md-4 col-sm-6 g-2 player">
-      <div className={`card shadow-lg ${activeStyle}`}>
-        <div className={`card-header ${activeHeaderStyle} ${activeStyle}`}>
-          <h6 className="d-flex justify-content-between align-items-center mb-0 lh-base">
-            <span className="fw-bold">
-              <span>{player.name}</span>
-              {player.pinged && <i className="bi-exclamation-triangle ms-2" />}
+    <div className="min-w-0">
+      <div className={`rounded-lg bg-hover shadow-lg overflow-hidden ${activeBorder} ${ousted ? 'opacity-70' : ''}`}>
+        <div className={`px-2 py-1.5 border-b border-line ${player.active ? 'bg-accent/15' : 'bg-panel/60'}`}>
+          <div className="flex justify-between items-center gap-2">
+            <span className="font-bold flex items-center gap-1 min-w-0">
+              <span className="truncate">{player.name}</span>
+              {player.pinged && <TriangleAlert size={13} className="text-blood shrink-0" />}
             </span>
             {player.edge && (
               <span
-                className="badge border border-secondary fw-bold align-items-center d-flex gap-1"
+                className={`${PILL} border border-line gap-1`}
                 style={{ background: game.edgeColor, color: game.edgeTextColor }}
               >
-                <i className="bi bi-chevron-left" />
+                <ChevronLeft size={11} />
                 Edge
-                <i className="bi bi-chevron-right" />
+                <ChevronRight size={11} />
               </span>
             )}
-            <span className="d-inline align-items-center">
+            <span className="flex items-center gap-1 shrink-0">
               {player.victoryPoints > 0 && (
-                <span className="badge rounded-pill text-bg-warning">{player.victoryPoints.toFixed(1).replace(/\.0$/, '')} VP</span>
+                <span className={`${PILL} bg-gold text-surface`}>
+                  {player.victoryPoints.toFixed(1).replace(/\.0$/, '')} VP
+                </span>
               )}
-              <span className={`badge rounded-pill ${poolStyle(player.pool)}`}>{player.pool}</span>
+              <span className={`${PILL} ${poolStyle(player.pool)}`}>{player.pool}</span>
             </span>
-          </h6>
+          </div>
         </div>
-        <div className="card-body px-0 py-2">
+        <div className="py-2">
           {regions.map((region) => (
             <Region
               key={region.type}

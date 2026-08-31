@@ -2,7 +2,7 @@ import type { ComponentType, ReactNode } from 'react';
 
 /**
  * "Nothing here yet" placeholder for detail panes, ported from jol-quarkus.
- * Tailwind `jt:` -prefixed. Use this on pages migrated to Tailwind (the
+ * Tailwind Tailwind-based. Use this on pages migrated to Tailwind (the
  * Bootstrap pages that still exist inline their own empty states).
  */
 interface EmptyStateProps {
@@ -16,12 +16,12 @@ interface EmptyStateProps {
 export function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
   return (
     <div
-      className={`jt:flex jt:flex-col jt:items-center jt:justify-center jt:gap-3 jt:p-8 jt:text-center jt:flex-1 ${className ?? ''}`}
+      className={`flex flex-col items-center justify-center gap-3 p-8 text-center flex-1 ${className ?? ''}`}
     >
-      {Icon && <Icon size={32} className="jt:text-ink-muted/40" />}
-      <div className="jt:space-y-1">
-        <p className="jt:text-sm jt:text-ink-muted">{title}</p>
-        {description && <p className="jt:text-xs jt:text-ink-muted/70">{description}</p>}
+      {Icon && <Icon size={32} className="text-ink-muted/40" />}
+      <div className="space-y-1">
+        <p className="text-sm text-ink-muted">{title}</p>
+        {description && <p className="text-xs text-ink-muted/70">{description}</p>}
       </div>
       {action}
     </div>

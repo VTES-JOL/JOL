@@ -118,7 +118,7 @@ export function GameDetail({
   const eligibleDecks = decks.filter((d) => d.gameFormats.includes(game.format));
 
   const actions = (
-    <span className="jt:flex jt:gap-1">
+    <span className="flex gap-1">
       {game.playerRelationship === 'OWNER' && game.gameStatus === 'Inviting' && (
         <Button variant="secondary" size="sm" icon={<PlayCircle size={14} />} onClick={startGame}>
           Start
@@ -148,7 +148,7 @@ export function GameDetail({
   return (
     <Panel
       title={
-        <span className="jt:flex jt:items-center jt:gap-2">
+        <span className="flex items-center gap-2">
           {game.name}
           <Badge variant="format">{game.format}</Badge>
           <Badge variant={game.visibility === 'PUBLIC' ? 'online' : 'muted'}>
@@ -158,22 +158,22 @@ export function GameDetail({
       }
       right={actions}
     >
-      <div className="jt:flex-1 jt:min-h-0 jt:overflow-y-auto jt:text-sm jt:text-ink">
-        <div className="jt:p-4 jt:border-b jt:border-line">
+      <div className="flex-1 min-h-0 overflow-y-auto text-sm text-ink">
+        <div className="p-4 border-b border-line">
           <SectionLabel>Players</SectionLabel>
-          <table className="jt:w-full">
+          <table className="w-full">
             <tbody>
               {game.registrations.map((reg) => (
-                <tr key={reg.player} className="jt:border-b jt:border-line/50 jt:last:border-b-0">
-                  <td className="jt:py-1">{reg.player}</td>
-                  <td className="jt:py-1 jt:text-center">
+                <tr key={reg.player} className="border-b border-line/50 last:border-b-0">
+                  <td className="py-1">{reg.player}</td>
+                  <td className="py-1 text-center">
                     {reg.registered ? (
-                      <CheckCircle2 size={14} className="jt:inline jt:text-online" />
+                      <CheckCircle2 size={14} className="inline text-online" />
                     ) : (
-                      <Clock size={14} className="jt:inline jt:text-ink-muted" />
+                      <Clock size={14} className="inline text-ink-muted" />
                     )}
                   </td>
-                  <td className="jt:py-1 jt:text-right">
+                  <td className="py-1 text-right">
                     {game.playerRelationship === 'OWNER' && (
                       <Button
                         variant="danger"
@@ -192,9 +192,9 @@ export function GameDetail({
         </div>
 
         {game.playerRelationship === 'OWNER' && (
-          <div className="jt:p-4 jt:border-b jt:border-line">
+          <div className="p-4 border-b border-line">
             <SectionLabel>Invite Player</SectionLabel>
-            <div className="jt:flex jt:gap-2">
+            <div className="flex gap-2">
               <Input
                 srLabel="Player name"
                 size="sm"
@@ -219,7 +219,7 @@ export function GameDetail({
         )}
 
         {playerInRegistrations && (
-          <div className="jt:p-4 jt:border-b jt:border-line">
+          <div className="p-4 border-b border-line">
             <SectionLabel>Register Deck</SectionLabel>
             <Select
               srLabel="Deck"
@@ -238,13 +238,13 @@ export function GameDetail({
         )}
 
         {preview && (
-          <div className="jt:p-4">
+          <div className="p-4">
             <SectionLabel>Registered Deck</SectionLabel>
             <DeckPreview deck={preview} />
           </div>
         )}
 
-        {visibleMessage && <div className="jt:p-4 jt:text-sm jt:text-online">{visibleMessage}</div>}
+        {visibleMessage && <div className="p-4 text-sm text-online">{visibleMessage}</div>}
       </div>
     </Panel>
   );

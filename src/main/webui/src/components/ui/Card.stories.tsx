@@ -18,7 +18,7 @@ export const Default: Story = {
           <CardTitle>Player Roles</CardTitle>
         </CardHeader>
         <CardBody>
-          <p className="jt:text-sm jt:text-ink-secondary">Body content sits in a padded region.</p>
+          <p className="text-sm text-ink-secondary">Body content sits in a padded region.</p>
         </CardBody>
       </Card>
     </div>

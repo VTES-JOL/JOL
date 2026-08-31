@@ -2,10 +2,15 @@ import { useEffect, useState } from 'react';
 import type { CardDefinition, CardMode, CardModeTarget, CardSnapshot } from '../../api/types';
 import { fetchCardDefinition } from './cardDefinitions';
 import { buildDiscardCommand, buildHandLabelCommand, buildPlayCommand, needsTargetPicker, type HandCardContext } from './cardCommands';
+import { Recycle, Tag, Trash2 } from 'lucide-react';
 import { CardImage } from './CardImage';
 import { runRequest } from '../../api/mutate';
-import { Modal } from '../../components/Modal';
+import { Modal } from '../../components/ui/Modal';
+import { Button } from '../../components/ui/Button';
 import { Clan } from './Clan';
+
+const MODE_BTN =
+  'w-full rounded border px-3 py-1.5 text-sm transition-colors border-line-accent text-ink-secondary hover:bg-hover';
 
 export interface PendingTarget {
   ctx: HandCardContext;
@@ -95,7 +100,7 @@ export function PlayCardModal({
   return (
     <Modal
       onClose={onClose}
-      contentStyle={{ textAlign: 'center' }}
+      bodyClassName="flex flex-col gap-3 p-4 min-h-0 overflow-y-auto flex-1 text-center"
       title={
         definition ? (
           <>
@@ -106,80 +111,78 @@ export function PlayCardModal({
       }
     >
       {!definition ? (
-        <div style={{ height: '30vh' }} className="d-flex align-items-center justify-content-center">
-          <h2>Loading...</h2>
+        <div style={{ height: '30vh' }} className="flex items-center justify-center text-ink-muted">
+          Loading…
         </div>
       ) : (
         <>
-          <div className="modal-body">
-            <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={definition.displayName} />
-            <div className="requirements d-flex justify-content-center gap-2">
-              {(definition.clans ?? []).map((clan) => (
-                <Clan key={clan} value={clan} />
-              ))}
-              {definition.cost && <span>Cost: {definition.cost}</span>}
-            </div>
-            {definition.preamble && <p className="mb-2">{definition.preamble}</p>}
-            <div className="d-grid gap-2">
-              {(definition.modes ?? []).map((mode, i) =>
-                definition.multiMode ? (
-                  <button
-                    key={i}
-                    type="button"
-                    className={`btn mb-2 ${selected.has(i) ? 'btn-dark' : 'btn-outline-dark'}`}
-                    onClick={() =>
-                      setSelected((prev) => {
-                        const next = new Set(prev);
-                        if (next.has(i)) next.delete(i);
-                        else next.add(i);
-                        return next;
-                      })
-                    }
-                  >
-                    {(mode.disciplines ?? []).map((d) => (
-                      <span key={d} className={`icon ${d}`} />
-                    ))}{' '}
-                    <span dangerouslySetInnerHTML={{ __html: mode.text }} />
-                  </button>
-                ) : (
-                  <button key={i} type="button" className="btn btn-outline-dark mb-2" onClick={() => play(mode)}>
-                    {(mode.disciplines ?? []).map((d) => (
-                      <span key={d} className={`icon ${d}`} />
-                    ))}{' '}
-                    <span dangerouslySetInnerHTML={{ __html: mode.text }} />
-                  </button>
-                ),
-              )}
-            </div>
-            {definition.multiMode && (
-              <div className="mt-2">
-                <hr />
-                <button type="button" className="btn btn-outline-secondary mb-2" disabled={selected.size < 1} onClick={playMulti}>
-                  {selected.size < 1 ? 'Select one or more disciplines' : 'Play'}
+          <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={definition.displayName} />
+          <div className="flex justify-center items-center gap-2">
+            {(definition.clans ?? []).map((clan) => (
+              <Clan key={clan} value={clan} />
+            ))}
+            {definition.cost && <span>Cost: {definition.cost}</span>}
+          </div>
+          {definition.preamble && <p className="text-sm text-ink-secondary">{definition.preamble}</p>}
+          <div className="flex flex-col gap-2">
+            {(definition.modes ?? []).map((mode, i) =>
+              definition.multiMode ? (
+                <button
+                  key={i}
+                  type="button"
+                  className={`${MODE_BTN} ${selected.has(i) ? 'bg-accent text-surface border-accent' : ''}`}
+                  onClick={() =>
+                    setSelected((prev) => {
+                      const next = new Set(prev);
+                      if (next.has(i)) next.delete(i);
+                      else next.add(i);
+                      return next;
+                    })
+                  }
+                >
+                  {(mode.disciplines ?? []).map((d) => (
+                    <span key={d} className={`icon ${d}`} />
+                  ))}{' '}
+                  <span dangerouslySetInnerHTML={{ __html: mode.text }} />
                 </button>
-              </div>
+              ) : (
+                <button key={i} type="button" className={MODE_BTN} onClick={() => play(mode)}>
+                  {(mode.disciplines ?? []).map((d) => (
+                    <span key={d} className={`icon ${d}`} />
+                  ))}{' '}
+                  <span dangerouslySetInnerHTML={{ __html: mode.text }} />
+                </button>
+              ),
             )}
-            <div className="d-flex justify-content-center align-items-center mt-2">
-              <button type="button" className="btn btn-outline-danger mx-1" title="Discard" onClick={() => discard(false)}>
-                <i className="bi bi-trash" /> Discard
-              </button>
-              <button type="button" className="btn btn-outline-danger mx-1" title="Discard and replace" onClick={() => discard(true)}>
-                <i className="bi bi-recycle" /> Discard + Draw
-              </button>
+          </div>
+          {definition.multiMode && (
+            <div>
+              <hr className="my-2 border-line" />
+              <Button variant="secondary" size="sm" disabled={selected.size < 1} onClick={playMulti}>
+                {selected.size < 1 ? 'Select one or more disciplines' : 'Play'}
+              </Button>
             </div>
-            <div className="input-group mt-2">
-              <label className="input-group-text">
-                <i className="bi bi-tag" />
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Add a label for all players to see."
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-                onBlur={updateLabel}
-              />
-            </div>
+          )}
+          <div className="flex justify-center items-center gap-2">
+            <Button variant="danger" size="sm" icon={<Trash2 size={14} />} title="Discard" onClick={() => discard(false)}>
+              Discard
+            </Button>
+            <Button variant="danger" size="sm" icon={<Recycle size={14} />} title="Discard and replace" onClick={() => discard(true)}>
+              Discard + Draw
+            </Button>
+          </div>
+          <div className="flex items-stretch">
+            <span className="flex items-center rounded-l border border-r-0 border-line bg-panel px-2 text-ink-muted">
+              <Tag size={14} />
+            </span>
+            <input
+              type="text"
+              className="flex-1 min-w-0 rounded-r border border-line bg-surface/70 px-2 py-1 text-sm text-ink outline-none focus:border-accent/60"
+              placeholder="Add a label for all players to see."
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              onBlur={updateLabel}
+            />
           </div>
         </>
       )}

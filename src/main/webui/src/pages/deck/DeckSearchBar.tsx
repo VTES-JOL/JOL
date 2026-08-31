@@ -4,7 +4,7 @@ import type { CardDetail } from '../../api/types';
 
 /**
  * Debounced card-name search box with a keyboard-navigable suggestion list.
- * Ported from the jol-quarkus rewrite; Tailwind `jt:` -prefixed. Feeds the
+ * Ported from the jol-quarkus rewrite; Tailwind Tailwind-based. Feeds the
  * structured deck editor — selecting a result adds the card to the deck.
  */
 interface Props {
@@ -96,12 +96,12 @@ export function DeckSearchBar({ onSearch, onAddCard }: Props) {
   );
 
   return (
-    <div ref={searchRef} className="jt:relative jt:border-b jt:border-line/50">
-      <div className="jt:flex jt:items-center jt:gap-1.5 jt:px-3 jt:py-1.5">
+    <div ref={searchRef} className="relative border-b border-line/50">
+      <div className="flex items-center gap-1.5 px-3 py-1.5">
         {loading ? (
-          <div className="jt:w-3 jt:h-3 jt:border jt:border-accent/30 jt:border-t-accent jt:rounded-full jt:animate-spin jt:shrink-0" />
+          <div className="w-3 h-3 border border-accent/30 border-t-accent rounded-full animate-spin shrink-0" />
         ) : (
-          <Search className="jt:w-3 jt:h-3 jt:shrink-0 jt:text-ink-muted" />
+          <Search className="w-3 h-3 shrink-0 text-ink-muted" />
         )}
         <input
           type="text"
@@ -109,14 +109,14 @@ export function DeckSearchBar({ onSearch, onAddCard }: Props) {
           value={query}
           onChange={(e) => handleQueryChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="jt:w-full jt:bg-transparent jt:text-xs jt:text-ink jt:placeholder:text-ink-muted jt:outline-none"
+          className="w-full bg-transparent text-xs text-ink placeholder:text-ink-muted outline-none"
         />
       </div>
 
       {results.length > 0 && (
         <ul
           role="listbox"
-          className="jt:absolute jt:top-full jt:left-0 jt:right-0 jt:z-20 jt:bg-panel jt:border jt:border-line/60 jt:border-t-0 jt:rounded-b jt:shadow-lg jt:overflow-hidden"
+          className="absolute top-full left-0 right-0 z-20 bg-panel border border-line/60 border-t-0 rounded-b shadow-lg overflow-hidden"
         >
           {results.map((r, i) => (
             <li
@@ -129,24 +129,24 @@ export function DeckSearchBar({ onSearch, onAddCard }: Props) {
               }}
               onMouseEnter={() => setActiveIndex(i)}
               className={[
-                'jt:flex jt:items-center jt:justify-between jt:gap-2 jt:px-3 jt:py-1.5 jt:text-xs jt:cursor-pointer jt:transition-colors',
-                i === activeIndex ? 'jt:bg-accent/10 jt:text-ink' : 'jt:text-ink-secondary jt:hover:bg-hover/50',
+                'flex items-center justify-between gap-2 px-3 py-1.5 text-xs cursor-pointer transition-colors',
+                i === activeIndex ? 'bg-accent/10 text-ink' : 'text-ink-secondary hover:bg-hover/50',
               ].join(' ')}
             >
-              <span className="jt:truncate">{r.name}</span>
-              <span className="jt:text-[11px] jt:text-ink-muted jt:shrink-0">
+              <span className="truncate">{r.name}</span>
+              <span className="text-[11px] text-ink-muted shrink-0">
                 {r.crypt ? cryptHint(r) : r.types.join('/')}
               </span>
             </li>
           ))}
-          <li className="jt:px-3 jt:py-1 jt:text-[11px] jt:text-ink-muted jt:border-t jt:border-line/40 jt:select-none">
+          <li className="px-3 py-1 text-[11px] text-ink-muted border-t border-line/40 select-none">
             ↑↓ navigate · Enter select · Esc dismiss
           </li>
         </ul>
       )}
 
       {query.trim() && !loading && results.length === 0 && (
-        <div className="jt:absolute jt:top-full jt:left-0 jt:right-0 jt:z-20 jt:bg-panel jt:border jt:border-line/60 jt:border-t-0 jt:rounded-b jt:shadow-lg jt:px-3 jt:py-2 jt:text-xs jt:text-ink-muted">
+        <div className="absolute top-full left-0 right-0 z-20 bg-panel border border-line/60 border-t-0 rounded-b shadow-lg px-3 py-2 text-xs text-ink-muted">
           No cards found matching "{query}".
         </div>
       )}

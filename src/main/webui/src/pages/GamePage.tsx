@@ -6,7 +6,7 @@ import type { CardSnapshot, GameSnapshot } from '../api/types';
 import { useAuth } from '../auth/useAuth';
 import { useGameSocket } from '../ws/useGameSocket';
 import { runRequest } from '../api/mutate';
-import { PageLoading } from '../components/PageLoading';
+import { Spinner } from '../components/ui/Spinner';
 import { useCardTooltips } from '../hooks/useCardTooltips';
 import { useSubmitGuard } from '../hooks/useSubmitGuard';
 import { PlayerBoard } from './game/PlayerBoard';
@@ -48,7 +48,13 @@ export function GamePage() {
 
   const applyUpdate = (updated: GameSnapshot) => queryClient.setQueryData(['game', gameId], updated);
 
-  if (!game || !gameId) return <PageLoading />;
+  if (!game || !gameId) {
+    return (
+      <div className="flex flex-1 min-h-0 items-center justify-center bg-base">
+        <Spinner />
+      </div>
+    );
+  }
 
   const submit = (submission: Submission) => {
     guard(() =>
@@ -91,11 +97,11 @@ export function GamePage() {
   const livePlayCard = playModal ? findCardByCoordinate(game, viewerName ?? '', playModal.ctx.regionType, playModal.ctx.coordinate) : null;
 
   return (
-    <div className="flex-fill d-flex flex-column min-h-0 p-2">
-      <h5 className="w-100 d-flex justify-content-between align-items-center">
-        <span className="fs-5 user-select-all">{game.name}</span>
+    <div className="flex flex-col flex-1 min-h-0 p-2 bg-base text-ink">
+      <h5 className="flex justify-between items-center text-lg select-all">
+        <span>{game.name}</span>
       </h5>
-      <div className="container-fluid my-1 g-0 flex-grow-1 min-h-0 overflow-y-auto" ref={boardRef}>
+      <div className="flex-1 min-h-0 overflow-y-auto my-1" ref={boardRef}>
         <div className="control-grid">
           <HandStrip game={game} viewerName={viewerName} onPlayCardClick={handlePlayCardClick} />
           <CommandForm
@@ -117,19 +123,17 @@ export function GamePage() {
             <NotesPanel gameId={gameId} game={game} onToggleDeck={() => setShowDeck(true)} />
           )}
         </div>
-        <div className="row gx-2">
-          <div className="col-12 row gy-1 gx-2">
-            {game.players.map((player) => (
-              <PlayerBoard
-                key={player.name}
-                player={player}
-                game={game}
-                viewerName={viewerName}
-                onTableCardClick={handleTableCardClick}
-                onPlayCardClick={handlePlayCardClick}
-              />
-            ))}
-          </div>
+        <div className="grid gap-2 mt-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {game.players.map((player) => (
+            <PlayerBoard
+              key={player.name}
+              player={player}
+              game={game}
+              viewerName={viewerName}
+              onTableCardClick={handleTableCardClick}
+              onPlayCardClick={handlePlayCardClick}
+            />
+          ))}
         </div>
       </div>
       {pendingTarget && <TargetPicker cardName={pendingTarget.cardName} onCancel={() => setPendingTarget(null)} />}

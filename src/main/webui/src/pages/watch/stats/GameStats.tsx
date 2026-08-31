@@ -21,9 +21,9 @@ export function GameStats(filters: StatsFilters) {
       sortMode: 'boolean',
       render: (r) =>
         r.hasGw ? (
-          <Check size={14} className="jt:inline jt:text-online" />
+          <Check size={14} className="inline text-online" />
         ) : (
-          <X size={14} className="jt:inline jt:text-blood-soft" />
+          <X size={14} className="inline text-blood-soft" />
         ),
     },
     { key: 'vps', header: 'VPs ', sortMode: 'default' },

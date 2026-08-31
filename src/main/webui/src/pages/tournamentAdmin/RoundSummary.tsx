@@ -4,6 +4,8 @@ import { api } from '../../api/client';
 import type { PlayerRoundSummary } from '../../api/types';
 import { alertDialog, confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
+import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
 import { RecreateTableModal } from './RecreateTableModal';
 
 type Summary = Record<number, Record<number, PlayerRoundSummary[]>>;
@@ -12,6 +14,9 @@ type Summary = Record<number, Record<number, PlayerRoundSummary[]>>;
 // for in-game action (this page doesn't join any game's room) — poll so
 // results stay current while a round is in progress.
 const ROUND_SUMMARY_POLL_MS = 20_000;
+
+const TH = 'text-left font-semibold border-b border-line px-2 py-1';
+const TD = 'border-b border-line/50 px-2 py-1';
 
 export function RoundSummary({ tournamentName }: { tournamentName: string }) {
   const queryClient = useQueryClient();
@@ -39,52 +44,49 @@ export function RoundSummary({ tournamentName }: { tournamentName: string }) {
   };
 
   return (
-    <div className="flex-fill overflow-auto mt-2 min-h-0">
+    <div className="flex-1 min-h-0 overflow-auto mt-2">
       {Object.entries(summary).map(([round, tables]) => (
         <div key={round} className="mb-3">
-          <span className="h4">Round {round}</span>
-          <div className="row g-2 mt-1">
+          <span className="text-lg font-semibold">Round {round}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mt-1">
             {Object.entries(tables).map(([table, players]) => {
               const allDone = players.every((p) => p.pool <= 0);
               return (
-                <div key={table} className="col-lg-3 col-md-4 col-6">
-                  <div className="card p-2">
-                    <div className="fw-semibold mb-1">Table {table}</div>
-                    <table className="table table-sm table-bordered mb-0">
-                      <thead>
-                        <tr>
-                          <th>Player</th>
-                          <th>Pool</th>
-                          <th>VP</th>
-                          <th>GW</th>
+                <div key={table} className="rounded border border-line-accent bg-surface/85 p-2">
+                  <div className="font-semibold mb-1">Table {table}</div>
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr>
+                        <th className={TH}>Player</th>
+                        <th className={TH}>Pool</th>
+                        <th className={TH}>VP</th>
+                        <th className={TH}>GW</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {players.map((p) => (
+                        <tr key={p.name}>
+                          <td className={TD}>{p.name}</td>
+                          <td className={TD}>{p.pool}</td>
+                          <td className={TD}>{p.vp}</td>
+                          <td className={TD}>{p.gw && <Badge variant="online">GW</Badge>}</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {players.map((p) => (
-                          <tr key={p.name}>
-                            <td>{p.name}</td>
-                            <td>{p.pool}</td>
-                            <td>{p.vp}</td>
-                            <td>{p.gw && <span className="badge text-bg-success">GW</span>}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    {allDone && (
-                      <button
-                        className="btn btn-sm btn-outline-danger mt-2 w-100"
-                        onClick={() => closeTable(Number(round), Number(table))}
-                      >
-                        Close Table
-                      </button>
-                    )}
-                    <button
-                      className="btn btn-sm btn-outline-danger mt-2 w-100"
-                      onClick={() => setRecreateTarget({ round: Number(round), table: Number(table) })}
-                    >
-                      Recreate Table
-                    </button>
-                  </div>
+                      ))}
+                    </tbody>
+                  </table>
+                  {allDone && (
+                    <Button variant="danger" size="sm" className="mt-2 w-full" onClick={() => closeTable(Number(round), Number(table))}>
+                      Close Table
+                    </Button>
+                  )}
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    className="mt-2 w-full"
+                    onClick={() => setRecreateTarget({ round: Number(round), table: Number(table) })}
+                  >
+                    Recreate Table
+                  </Button>
                 </div>
               );
             })}

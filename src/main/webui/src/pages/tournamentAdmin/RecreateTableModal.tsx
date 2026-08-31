@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import { api } from '../../api/client';
-import { Modal } from '../../components/Modal';
+import { Modal } from '../../components/ui/Modal';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Textarea } from '../../components/ui/Textarea';
+import { InlineAlert } from '../../components/ui/FormFeedback';
+
+const CODE = 'bg-hover px-1 rounded';
 
 export function RecreateTableModal({
   tournamentName,
@@ -46,46 +52,39 @@ export function RecreateTableModal({
       title="Recreate Table"
       footer={
         <>
-          <button type="button" className="btn btn-secondary" onClick={onClose}>
+          <Button variant="secondary" size="sm" onClick={onClose}>
             Cancel
-          </button>
-          <button type="button" className="btn btn-danger" disabled={confirmText !== gameName} onClick={submit}>
+          </Button>
+          <Button variant="danger" size="sm" disabled={confirmText !== gameName} onClick={submit}>
             Recreate Table
-          </button>
+          </Button>
         </>
       }
     >
-      <div className="modal-body">
-        <div className="alert alert-danger">
-          <strong>This is destructive and cannot be undone.</strong> The existing game <code>{gameName}</code> and
-          all of its data (turns, pool, VP) will be permanently deleted and replaced with a new game seated from the
-          CSV below.
-        </div>
-        <p className="text-muted small">
-          Paste CSV data with columns <code>Round</code>, <code>Table</code>, <code>Player</code> — every row must be
-          for this round/table. The header row is required.
-        </p>
-        <textarea
-          className="form-control font-monospace"
-          rows={8}
-          placeholder={'"Round","Table","Player"\n"1","1","PlayerOne"'}
-          value={csvData}
-          onChange={(e) => setCsvData(e.target.value)}
-        />
-        <div className="mt-3">
-          <label className="form-label">
-            Type <code>{gameName}</code> to confirm:
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            autoComplete="off"
-            value={confirmText}
-            onChange={(e) => setConfirmText(e.target.value)}
-          />
-        </div>
-        {error && <div className="alert alert-danger mt-2">{error}</div>}
+      <InlineAlert kind="danger">
+        <strong>This is destructive and cannot be undone.</strong> The existing game <code className={CODE}>{gameName}</code>{' '}
+        and all of its data (turns, pool, VP) will be permanently deleted and replaced with a new game seated from the CSV
+        below.
+      </InlineAlert>
+      <p className="text-xs text-ink-muted">
+        Paste CSV data with columns <code className={CODE}>Round</code>, <code className={CODE}>Table</code>,{' '}
+        <code className={CODE}>Player</code> — every row must be for this round/table. The header row is required.
+      </p>
+      <Textarea
+        srLabel="CSV data"
+        className="font-mono text-xs"
+        rows={8}
+        placeholder={'"Round","Table","Player"\n"1","1","PlayerOne"'}
+        value={csvData}
+        onChange={(e) => setCsvData(e.target.value)}
+      />
+      <div>
+        <label className="block text-xs text-ink-muted mb-1">
+          Type <code className={CODE}>{gameName}</code> to confirm:
+        </label>
+        <Input srLabel="Confirmation" autoComplete="off" value={confirmText} onChange={(e) => setConfirmText(e.target.value)} />
       </div>
+      {error && <InlineAlert kind="danger">{error}</InlineAlert>}
     </Modal>
   );
 }

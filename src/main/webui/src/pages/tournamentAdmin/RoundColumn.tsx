@@ -1,3 +1,5 @@
+import { ArrowDownAZ, ArrowDown01, GripVertical } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 import { draggableChip, dropTarget, type DragPayload } from './dragDrop';
 
 function PlayerChip({
@@ -11,14 +13,14 @@ function PlayerChip({
 }) {
   return (
     <li
-      className="border rounded p-2 border-secondary d-flex justify-content-between align-items-center"
+      className="border border-line-accent rounded p-2 flex justify-between items-center gap-2 bg-surface cursor-grab"
       {...draggableChip({ player, from })}
     >
-      <div className="d-flex flex-column">
+      <div className="flex flex-col">
         <span>{player}</span>
-        <span className="fw-bold">{vekn}</span>
+        <span className="font-bold text-xs">{vekn}</span>
       </div>
-      <i className="bi bi-grip-vertical" />
+      <GripVertical size={14} className="text-ink-muted" />
     </li>
   );
 }
@@ -46,39 +48,32 @@ export function RoundColumn({
 }) {
   return (
     <div className="mb-3">
-      <span className="h4">
+      <div className="flex items-center gap-2 text-lg font-semibold">
         Round {round}
-        <i className="bi bi-sort-numeric-down ms-2" role="button" onClick={() => onSortPoolByVekn(round)} />
-        <i className="bi bi-sort-alpha-down ms-2" role="button" onClick={() => onSortPoolByName(round)} />
-      </span>
-      <button
-        className="btn btn-outline-secondary text-dark bg-info btn-sm mt-2 w-100"
-        onClick={() => onCreateTable(round)}
-      >
+        <ArrowDown01 size={16} role="button" className="cursor-pointer text-ink-muted hover:text-ink" onClick={() => onSortPoolByVekn(round)} />
+        <ArrowDownAZ size={16} role="button" className="cursor-pointer text-ink-muted hover:text-ink" onClick={() => onSortPoolByName(round)} />
+      </div>
+      <Button variant="secondary" size="sm" className="mt-2 w-full" onClick={() => onCreateTable(round)}>
         Create Table
-      </button>
+      </Button>
       <ul
-        className="list-unstyled d-flex flex-wrap gap-2 p-1 mt-2"
+        className="list-none flex flex-wrap gap-2 p-1 mt-2 min-h-8"
         {...dropTarget((payload) => onMove(round, payload, 'pool'))}
       >
         {pool.map((player) => (
           <PlayerChip key={player} player={player} vekn={playerVekn[player] ?? ''} from="pool" />
         ))}
       </ul>
-      <ol className="row g-2 p-1 list-unstyled">
+      <ol className="grid grid-cols-2 md:grid-cols-4 gap-2 p-1 list-none">
         {tables.map((table, tableIndex) => (
-          <li key={tableIndex} className="col-md-3 col-6">
-            <div className="card-body border border-success p-1">
-              <span className="h5 d-block">Table {tableIndex + 1}</span>
-              <button
-                className="btn btn-outline-secondary text-dark bg-warning btn-sm mt-1 mb-1"
-                onClick={() => onRemoveTable(round, tableIndex)}
-              >
+          <li key={tableIndex}>
+            <div className="border border-online/40 rounded p-1">
+              <span className="block font-semibold">Table {tableIndex + 1}</span>
+              <Button variant="secondary" size="sm" className="my-1" onClick={() => onRemoveTable(round, tableIndex)}>
                 Remove Table
-              </button>
+              </Button>
               <ul
-                className="border list-group"
-                style={{ minHeight: 38 }}
+                className="border border-line rounded list-none min-h-9 p-1 flex flex-col gap-1"
                 {...dropTarget((payload) => onMove(round, payload, tableIndex))}
               >
                 {table.map((player) => (

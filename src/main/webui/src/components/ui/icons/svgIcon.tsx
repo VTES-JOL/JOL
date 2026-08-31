@@ -29,7 +29,7 @@ export function SvgImg({
       title={title || alt}
       width={size}
       height={size}
-      className={`jt:inline-block jt:align-middle ${className || ''}`}
+      className={`inline-block align-middle ${className || ''}`}
       onError={onError}
     />
   );

@@ -52,7 +52,7 @@ export function ProfileEditor({
       <CardHeader>
         <CardTitle>Profile</CardTitle>
       </CardHeader>
-      <CardBody className="jt:flex jt:flex-col jt:gap-3">
+      <CardBody className="flex flex-col gap-3">
         <Input
           type="email"
           id="profileEmail"
@@ -108,7 +108,7 @@ export function ProfileEditor({
             notifications to receive pings on your phone. <i>Pro tip:</i> Disable sound notifications for the Discord
             app to receive the visual banners without the pestering dings or vibrations.{' '}
             <a
-              className="jt:text-accent jt:underline"
+              className="text-accent underline"
               target="_blank"
               rel="noreferrer"
               href="https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-"
@@ -119,7 +119,7 @@ export function ProfileEditor({
           </FieldHint>
         </div>
 
-        <div className="jt:flex jt:flex-col jt:gap-2 jt:items-start">
+        <div className="flex flex-col gap-2 items-start">
           <Button id="updateProfileButton" variant="secondary" size="sm" onClick={submit}>
             Update Profile
           </Button>

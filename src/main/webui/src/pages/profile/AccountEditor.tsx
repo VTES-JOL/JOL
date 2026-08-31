@@ -32,7 +32,7 @@ export function AccountEditor() {
       <CardHeader>
         <CardTitle>Account</CardTitle>
       </CardHeader>
-      <CardBody className="jt:flex jt:flex-col jt:gap-3">
+      <CardBody className="flex flex-col gap-3">
         <Input
           type="password"
           id="profileNewPassword"
@@ -51,7 +51,7 @@ export function AccountEditor() {
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
-        <div className="jt:flex jt:flex-col jt:gap-2 jt:items-start">
+        <div className="flex flex-col gap-2 items-start">
           <Button variant="secondary" size="sm" onClick={submit}>
             Change Password
           </Button>

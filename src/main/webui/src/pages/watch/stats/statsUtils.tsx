@@ -73,7 +73,7 @@ export function SortIcon<T>({ column, onSort, mode }: { column: keyof T; onSort:
     <ChevronsUpDown
       size={13}
       role="button"
-      className="jt:inline jt:ml-1 jt:text-ink-muted jt:hover:text-ink jt:cursor-pointer jt:align-middle"
+      className="inline ml-1 text-ink-muted hover:text-ink cursor-pointer align-middle"
       onClick={() => onSort(column, mode)}
     />
   );

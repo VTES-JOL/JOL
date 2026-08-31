@@ -1,3 +1,4 @@
+import { X } from 'lucide-react';
 import { dismissToast, useToasts } from '../stores/toast';
 
 // Mounted once at the app root (see App.tsx), fixed to the bottom-right —
@@ -7,22 +8,19 @@ export function ToastHost() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="position-fixed bottom-0 end-0 p-3" style={{ zIndex: 1080 }}>
+    <div className="fixed bottom-0 right-0 p-3 flex flex-col gap-2" style={{ zIndex: 1080 }}>
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`toast show align-items-center text-bg-${toast.kind === 'error' ? 'danger' : 'success'} border-0 mb-2`}
           role="alert"
+          className={`flex items-center gap-2 rounded px-3 py-2 text-sm text-surface shadow-lg ${
+            toast.kind === 'error' ? 'bg-blood' : 'bg-online'
+          }`}
         >
-          <div className="d-flex">
-            <div className="toast-body">{toast.message}</div>
-            <button
-              type="button"
-              className="btn-close btn-close-white me-2 m-auto"
-              aria-label="Close"
-              onClick={() => dismissToast(toast.id)}
-            />
-          </div>
+          <span>{toast.message}</span>
+          <button type="button" aria-label="Close" className="ml-2 opacity-80 hover:opacity-100" onClick={() => dismissToast(toast.id)}>
+            <X size={14} />
+          </button>
         </div>
       ))}
     </div>

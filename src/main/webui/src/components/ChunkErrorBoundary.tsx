@@ -39,10 +39,13 @@ export class ChunkErrorBoundary extends Component<{ children: ReactNode }, State
   render() {
     if (this.state.error) {
       return (
-        <div className="d-flex flex-column align-items-center justify-content-center text-center p-4 gap-2 flex-grow-1">
-          <h4 className="mb-0">Something went wrong</h4>
-          <p className="text-muted mb-0">{this.state.error.message}</p>
-          <button className="btn btn-outline-secondary btn-sm mt-2" onClick={() => location.reload()}>
+        <div className="flex flex-col items-center justify-center text-center p-4 gap-2 flex-1 bg-base text-ink">
+          <h4 className="text-lg font-semibold">Something went wrong</h4>
+          <p className="text-sm text-ink-muted">{this.state.error.message}</p>
+          <button
+            className="mt-2 rounded border border-line-accent px-3 py-1.5 text-sm text-ink-secondary hover:bg-hover"
+            onClick={() => location.reload()}
+          >
             Reload
           </button>
         </div>

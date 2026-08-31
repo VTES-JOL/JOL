@@ -59,14 +59,14 @@ export function SortableStatsTable<Row extends Record<string, unknown>>({
   );
 
   return (
-    <div className="jt:overflow-auto jt:pb-3" style={{ maxHeight }}>
-      <table className="jt:w-full jt:text-sm jt:border-separate jt:border-spacing-0">
+    <div className="overflow-auto pb-3" style={{ maxHeight }}>
+      <table className="w-full text-sm border-separate border-spacing-0">
         <thead>
           <tr>
             {columns.map((col) => (
               <th
                 key={col.key}
-                className={`jt:sticky jt:top-0 jt:bg-panel jt:text-left jt:font-semibold jt:text-ink-muted jt:px-2 jt:py-1.5 jt:border-b jt:border-line jt:align-bottom jt:whitespace-nowrap${
+                className={`sticky top-0 bg-panel text-left font-semibold text-ink-muted px-2 py-1.5 border-b border-line align-bottom whitespace-nowrap${
                   col.thClassName ? ` ${col.thClassName}` : ''
                 }`}
               >
@@ -74,7 +74,7 @@ export function SortableStatsTable<Row extends Record<string, unknown>>({
                 {col.filter && (
                   <input
                     type="text"
-                    className="jt:ml-1 jt:w-24 jt:rounded jt:border jt:border-line/60 jt:bg-surface/70 jt:px-1.5 jt:py-0.5 jt:text-xs jt:font-normal jt:text-ink jt:outline-none jt:focus:border-accent/60"
+                    className="ml-1 w-24 rounded border border-line/60 bg-surface/70 px-1.5 py-0.5 text-xs font-normal text-ink outline-none focus:border-accent/60"
                     placeholder={col.filter.placeholder}
                     value={col.filter.value}
                     onChange={(e) => col.filter!.onChange(e.target.value)}
@@ -93,11 +93,11 @@ export function SortableStatsTable<Row extends Record<string, unknown>>({
         </thead>
         <tbody>
           {filtered.map((row, i) => (
-            <tr key={rowKey(row, i)} className="jt:hover:bg-hover">
+            <tr key={rowKey(row, i)} className="hover:bg-hover">
               {columns.map((col) => (
                 <td
                   key={col.key}
-                  className={`jt:px-2 jt:py-1 jt:border-b jt:border-line/50 jt:text-ink${
+                  className={`px-2 py-1 border-b border-line/50 text-ink${
                     col.tdClassName ? ` ${col.tdClassName}` : ''
                   }`}
                 >

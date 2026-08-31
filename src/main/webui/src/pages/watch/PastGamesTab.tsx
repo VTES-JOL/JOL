@@ -27,8 +27,8 @@ function downloadCsv(data: string, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-const TH = 'jt:sticky jt:top-0 jt:bg-panel jt:text-left jt:font-semibold jt:text-ink-muted jt:px-3 jt:py-1.5 jt:border-b jt:border-line';
-const TD = 'jt:px-3 jt:py-1 jt:text-ink jt:align-top';
+const TH = 'sticky top-0 bg-panel text-left font-semibold text-ink-muted px-3 py-1.5 border-b border-line';
+const TD = 'px-3 py-1 text-ink align-top';
 
 export function PastGamesTab() {
   const { data: history = [] } = useQuery({
@@ -49,8 +49,8 @@ export function PastGamesTab() {
         </Button>
       }
     >
-      <div className="jt:flex-1 jt:min-h-0 jt:overflow-auto">
-        <table className="jt:w-full jt:text-sm">
+      <div className="flex-1 min-h-0 overflow-auto">
+        <table className="w-full text-sm">
           <thead>
             <tr>
               <th className={TH}>Game</th>
@@ -66,7 +66,7 @@ export function PastGamesTab() {
               g.results.map((r, i) => (
                 <tr
                   key={`${g.name}-${r.playerName}`}
-                  className={i === 0 ? 'jt:border-t-2 jt:border-line' : 'jt:border-t jt:border-line/40'}
+                  className={i === 0 ? 'border-t-2 border-line' : 'border-t border-line/40'}
                 >
                   {i === 0 && (
                     <>
@@ -81,11 +81,11 @@ export function PastGamesTab() {
                       </td>
                     </>
                   )}
-                  <td className={`${TD} jt:py-1`}>{r.playerName}</td>
-                  <td className={`${TD} jt:py-1`}>
+                  <td className={`${TD} py-1`}>{r.playerName}</td>
+                  <td className={`${TD} py-1`}>
                     {r.deckName.length > 50 ? `${r.deckName.slice(0, 50)}...` : r.deckName}
                   </td>
-                  <td className={`${TD} jt:py-1`}>
+                  <td className={`${TD} py-1`}>
                     {r.victoryPoints} VP
                     {r.gameWin ? ', 1 GW' : ''}
                   </td>

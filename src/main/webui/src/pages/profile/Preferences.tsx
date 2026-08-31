@@ -50,7 +50,7 @@ export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (
       <CardHeader>
         <CardTitle>Preferences</CardTitle>
       </CardHeader>
-      <CardBody className="jt:flex jt:flex-col jt:gap-3" id="playerPreferences">
+      <CardBody className="flex flex-col gap-3" id="playerPreferences">
         <Switch
           id="imageTooltips"
           label="Enable Image tooltips"
@@ -58,15 +58,15 @@ export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (
           onChange={toggleImageTooltips}
         />
 
-        <div className="jt:flex jt:items-center jt:gap-2">
+        <div className="flex items-center gap-2">
           <input
             type="color"
             id="edgecolorpicker"
-            className="jt:h-7 jt:w-10 jt:rounded jt:border jt:border-line jt:bg-transparent jt:cursor-pointer"
+            className="h-7 w-10 rounded border border-line bg-transparent cursor-pointer"
             value={profile.edgeColor ?? '#000000'}
             onChange={setEdgeColor}
           />
-          <label htmlFor="edgecolorpicker" className="jt:text-sm jt:text-ink">
+          <label htmlFor="edgecolorpicker" className="text-sm text-ink">
             Choose Edge Color
           </label>
         </div>

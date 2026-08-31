@@ -7,15 +7,15 @@ import { Button } from '../../components/ui/Button';
 
 const REL_LABEL: Record<string, string> = { OWNER: 'Owner', REGISTERED: 'Registered', INVITED: 'Invited', OPEN: 'Open' };
 const REL_CLASS: Record<string, string> = {
-  OWNER: 'jt:text-accent',
-  REGISTERED: 'jt:text-online',
-  INVITED: 'jt:text-gold',
-  OPEN: 'jt:text-ink-muted',
+  OWNER: 'text-accent',
+  REGISTERED: 'text-online',
+  INVITED: 'text-gold',
+  OPEN: 'text-ink-muted',
 };
 
 function GameListItem({ game, selected, onSelect }: { game: GameStatusBean; selected: boolean; onSelect: () => void }) {
   const relLabel = (game.playerRelationship && REL_LABEL[game.playerRelationship]) || '';
-  const relClass = (game.playerRelationship && REL_CLASS[game.playerRelationship]) || 'jt:text-ink-muted';
+  const relClass = (game.playerRelationship && REL_CLASS[game.playerRelationship]) || 'text-ink-muted';
   const registeredCount = game.registrations.filter((r) => r.registered).length;
   const totalCount = game.registrations.length;
 
@@ -23,21 +23,21 @@ function GameListItem({ game, selected, onSelect }: { game: GameStatusBean; sele
     <button
       type="button"
       onClick={onSelect}
-      className={`jt:w-full jt:text-left jt:px-3 jt:py-2 jt:border-b jt:border-line jt:transition-colors ${
-        selected ? 'jt:bg-accent/10 jt:text-ink' : 'jt:text-ink-secondary jt:hover:bg-hover'
+      className={`w-full text-left px-3 py-2 border-b border-line transition-colors ${
+        selected ? 'bg-accent/10 text-ink' : 'text-ink-secondary hover:bg-hover'
       }`}
     >
-      <div className="jt:flex jt:justify-between jt:items-start jt:gap-2">
-        <span className="jt:font-semibold jt:text-ink jt:break-words">{game.name}</span>
+      <div className="flex justify-between items-start gap-2">
+        <span className="font-semibold text-ink break-words">{game.name}</span>
         <Badge variant={game.visibility === 'PUBLIC' ? 'online' : 'muted'}>{game.visibility}</Badge>
       </div>
-      <div className="jt:flex jt:justify-between jt:items-center jt:mt-1">
+      <div className="flex justify-between items-center mt-1">
         <Badge variant="format">{game.format}</Badge>
-        <span className={`jt:text-xs ${relClass}`}>{relLabel}</span>
+        <span className={`text-xs ${relClass}`}>{relLabel}</span>
       </div>
       {(game.visibility === 'PUBLIC' || totalCount > 0) && (
-        <div className="jt:flex jt:justify-between jt:items-center jt:mt-1 jt:text-xs jt:text-ink-muted">
-          <span className="jt:flex jt:items-center jt:gap-1">
+        <div className="flex justify-between items-center mt-1 text-xs text-ink-muted">
+          <span className="flex items-center gap-1">
             {totalCount > 0 && (
               <>
                 {registeredCount}/{totalCount} <User size={12} />
@@ -75,7 +75,7 @@ export function GameList({
         </Button>
       }
     >
-      <div className="jt:flex-1 jt:min-h-0 jt:overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto">
         {games.map((g) => (
           <GameListItem key={g.name} game={g} selected={g.name === selectedName} onSelect={() => onSelect(g)} />
         ))}

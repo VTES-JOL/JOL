@@ -29,7 +29,7 @@ export function AdminPage() {
 
   if (forbidden) {
     return (
-      <div className="jt-scope jt:flex jt:flex-1 jt:min-h-0 jt:items-center jt:justify-center jt:bg-base">
+      <div className="flex flex-1 min-h-0 items-center justify-center bg-base">
         <EmptyState icon={ShieldOff} title="You don't have access to this page." />
       </div>
     );
@@ -37,23 +37,23 @@ export function AdminPage() {
 
   if (!data) {
     return (
-      <div className="jt-scope jt:flex jt:flex-1 jt:min-h-0 jt:items-center jt:justify-center jt:bg-base">
+      <div className="flex flex-1 min-h-0 items-center justify-center bg-base">
         <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="jt-scope jt:grid jt:gap-4 jt:p-4 jt:bg-base jt:lg:grid-cols-3 jt:content-start">
-      <div className="jt:flex jt:flex-col jt:gap-3">
+    <div className="grid gap-4 p-4 bg-base lg:grid-cols-3 content-start">
+      <div className="flex flex-col gap-3">
         <PlayerRoles />
       </div>
-      <div className="jt:flex jt:flex-col jt:gap-3">
+      <div className="flex flex-col gap-3">
         <ReplacePlayer />
         <EndTurn />
         <RollbackGame />
       </div>
-      <div className="jt:flex jt:flex-col jt:gap-3">
+      <div className="flex flex-col gap-3">
         <SiteNotesEditor />
         <IdleGames />
       </div>

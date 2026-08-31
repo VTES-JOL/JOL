@@ -66,7 +66,7 @@ export function buildCardSnapshot(props: CardExampleProps, id: string): CardSnap
 export function CardExample(props: CardExampleProps) {
   const snapshot = buildCardSnapshot(props, 'example');
   return (
-    <ol className="region list-group list-group-flush list-group-numbered jt:my-3" style={{ maxWidth: '24rem' }}>
+    <ol className="region list-group list-group-flush list-group-numbered my-3" style={{ maxWidth: '24rem' }}>
       <Card card={snapshot} region={props.region ?? 'READY'} shadow coordinate="1" />
     </ol>
   );

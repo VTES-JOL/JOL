@@ -31,18 +31,18 @@ function minutesSince(timestamp: string): number {
 function UserRow({ user }: { user: UserSummary }) {
   const isOffline = minutesSince(user.lastOnline) > OFFLINE_THRESHOLD_MINUTES;
   return (
-    <div className="online-player-row jt:text-sm jt:text-ink">
+    <div className="online-player-row text-sm text-ink">
       {user.country && <CountryFlag code={user.country} />}
-      <span className="jt:flex-1 jt:truncate">{user.name}</span>
+      <span className="flex-1 truncate">{user.name}</span>
       {user.roles.includes('ADMIN') && (
-        <ShieldCheck size={14} data-tippy-content="Administrator" className="jt:text-gold" />
+        <ShieldCheck size={14} data-tippy-content="Administrator" className="text-gold" />
       )}
-      {user.roles.includes('JUDGE') && <Gavel size={14} data-tippy-content="Judge" className="jt:text-online" />}
+      {user.roles.includes('JUDGE') && <Gavel size={14} data-tippy-content="Judge" className="text-online" />}
       {isOffline && (
         <History
           size={14}
           data-tippy-content={`Last Online: ${LAST_ONLINE_FORMAT.format(new Date(user.lastOnline))}`}
-          className="jt:text-ink-muted"
+          className="text-ink-muted"
         />
       )}
     </div>
@@ -68,11 +68,11 @@ export function OnlineUsers() {
   useSimpleTooltips(listRef, [users]);
 
   return (
-    <Card className="jt:flex jt:flex-col jt:min-h-0 jt:overflow-hidden">
+    <Card className="flex flex-col min-h-0 overflow-hidden">
       <CardHeader>
         <CardTitle>Online ({users.length})</CardTitle>
       </CardHeader>
-      <div ref={listRef} className="jt:overflow-y-auto jt:p-1">
+      <div ref={listRef} className="overflow-y-auto p-1">
         {users.map((user) => (
           <UserRow key={user.name} user={user} />
         ))}

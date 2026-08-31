@@ -53,7 +53,7 @@ export function StatsDtoTable({
           <input
             type="number"
             min={0}
-            className="jt:ml-1 jt:w-14 jt:rounded jt:border jt:border-line/60 jt:bg-surface/70 jt:px-1.5 jt:py-0.5 jt:text-xs jt:font-normal jt:text-ink jt:outline-none jt:focus:border-accent/60"
+            className="ml-1 w-14 rounded border border-line/60 bg-surface/70 px-1.5 py-0.5 text-xs font-normal text-ink outline-none focus:border-accent/60"
             value={threshold}
             onChange={(e) => onThresholdChange(e.target.value)}
           />

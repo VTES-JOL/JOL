@@ -18,7 +18,7 @@ export function SiteNotes() {
       </CardHeader>
       {/* Trusted admin-authored HTML from SiteNotesService — same trust boundary the
           legacy JSP rendered it under (server-side rich-text notes, not user input). */}
-      <div className="jt:p-2 jt:text-sm jt:text-ink" dangerouslySetInnerHTML={{ __html: notes }} />
+      <div className="p-2 text-sm text-ink" dangerouslySetInnerHTML={{ __html: notes }} />
     </Card>
   );
 }

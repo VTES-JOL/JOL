@@ -16,15 +16,8 @@ const config: StorybookConfig = {
     "@storybook/addon-a11y",
     "@storybook/addon-docs"
   ],
-  "framework": "@storybook/react-vite",
-  // The app's third-party CSS (bootstrap.min.css, dark-mode.css, light.css)
-  // is served at runtime from src/main/resources/META-INF/resources/css (see
-  // legacyStyles.ts) rather than being part of the Vite bundle — mirror that
-  // here so stories render with real Bootstrap styling instead of unstyled
-  // markup. Loaded via .storybook/preview-head.html at the same /jol/css
-  // path the real app uses.
-  "staticDirs": [
-    { "from": "../../resources/META-INF/resources/css", "to": "/jol/css" }
-  ]
+  "framework": "@storybook/react-vite"
+  // App CSS (tokens, Tailwind + Preflight, fonts, card-visuals) is imported
+  // in preview.tsx; the icon/font CDN links live in preview-head.html.
 };
 export default config;

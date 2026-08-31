@@ -1,29 +1,9 @@
-/* Tailwind v4 entry — runs ALONGSIDE the legacy Bootstrap CSS during the
-   page-by-page migration off Bootstrap.
+/* Tailwind v4 entry. Bootstrap is gone; Preflight is the base reset.
+   Utilities are unprefixed — the `jt:` prefix from the Bootstrap
+   coexistence era was dropped once the whole app moved to the kit. */
 
-   1. prefix(jt) — every Tailwind utility/variant is `jt:` -prefixed
-      (`jt:flex`, `jt:p-3`, `jt:md:hidden`, `jt:dark:bg-panel`). Bootstrap's
-      unprefixed `p-3`/`gap-2`/`border`/`shadow` therefore never collide.
-      When the last page is off Bootstrap, drop the prefix + codemod it away.
-
-   2. Utilities are UNLAYERED. Bootstrap's Reboot (in bootstrap.min.css,
-      loaded last and unlayered) styles bare `button`/`input` —
-      `button{border-radius:0}`, `-webkit-appearance:button`, etc. An
-      unlayered rule beats any layered rule regardless of specificity, so
-      layering the `jt:` utilities meant Reboot won and every `<button>` /
-      `<input>` on a migrated page rendered as raw native OS chrome. Keeping
-      the utilities unlayered lets `.jt\:rounded` (0,0,1,0) beat `button`
-      (0,0,0,1) on specificity. The `jt:` prefix already rules out any
-      class-name clash with Bootstrap's own utilities, so the layer bought
-      nothing.
-
-   3. Preflight is NOT imported (Reboot already resets the same elements and
-      would only fight it). The `.jt-scope` reset below covers the one thing
-      that actually matters without it: neutralising native form-control
-      chrome. Put `className="jt-scope"` on the root of any Tailwind page
-      (and on portal roots — modals render outside the page tree). */
-
-@import "tailwindcss/theme.css" prefix(jt);
+@import "tailwindcss/theme.css";
+@import "tailwindcss/preflight.css";
 
 /* jol toggles dark mode with body[data-bs-theme="dark"] (TopBar.tsx). */
 @custom-variant dark (&:where(body[data-bs-theme="dark"], body[data-bs-theme="dark"] *));
@@ -125,31 +105,32 @@ body[data-bs-theme="dark"] {
     --color-offline: var(--jt-offline);
 }
 
-/* ── Form-control reset ──────────────────────────────────────────────────
-   Placed BEFORE the utilities import so a `jt:` utility wins any
-   equal-specificity tie by source order. `:where()` keeps the whole
-   compound at (0,0,1,0) — enough to beat Reboot's bare `button`/`input`
-   (0,0,0,1), not enough to override a component's `jt:border` /
-   `jt:bg-*` / `jt:rounded-*`. Scoped to `.jt-scope` so legacy Bootstrap
-   pages are untouched. */
-.jt-scope :where(button, input, select, textarea) {
+@import "tailwindcss/utilities.css";
+
+/* ── Form-control normalize ─────────────────────────────────────────────
+   Preflight already inherits `font`/`color` onto form controls; this adds
+   the bits it leaves alone: kill the native <select> arrow (the kit's
+   ui/Select draws its own chevron), theme the placeholder, and give focus
+   a token-coloured ring. Kit components set their own border/bg/rounded, so
+   nothing here needs to fight them. */
+select {
     appearance: none;
     -webkit-appearance: none;
-    border: 0 solid var(--jt-line);
-    border-radius: 0;
-    background-color: transparent;
-    color: inherit;
-    font: inherit;
 }
 
-.jt-scope :where(button):focus-visible {
+::placeholder {
+    color: var(--jt-ink-muted);
+    opacity: 1;
+}
+
+button:focus-visible {
     outline: 2px solid color-mix(in oklab, var(--jt-accent) 55%, transparent);
     outline-offset: 2px;
 }
 
-.jt-scope :where(input, select, textarea):focus-visible {
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
     outline: 2px solid color-mix(in oklab, var(--jt-accent) 45%, transparent);
     outline-offset: 1px;
 }
-
-@import "tailwindcss/utilities.css" prefix(jt);

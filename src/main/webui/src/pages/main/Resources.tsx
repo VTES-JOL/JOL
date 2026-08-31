@@ -21,12 +21,12 @@ export function Resources() {
       <CardHeader>
         <CardTitle>Resources</CardTitle>
       </CardHeader>
-      <CardBody className="jt:p-2">
-        <div className="jt:grid jt:grid-cols-2 jt:gap-1 jt:mb-2">
+      <CardBody className="p-2">
+        <div className="grid grid-cols-2 gap-1 mb-2">
           {RESOURCE_LINKS.map(({ href, icon: Icon, label }) => (
             <a
               key={href}
-              className="jt:flex jt:items-center jt:gap-2 jt:px-2 jt:py-1 jt:text-sm jt:rounded jt:border jt:border-line-accent jt:text-ink-secondary jt:hover:text-ink jt:hover:bg-hover jt:no-underline"
+              className="flex items-center gap-2 px-2 py-1 text-sm rounded border border-line-accent text-ink-secondary hover:text-ink hover:bg-hover no-underline"
               href={href}
               target="_blank"
               rel="noreferrer"
@@ -36,8 +36,8 @@ export function Resources() {
             </a>
           ))}
         </div>
-        <details className="jt:text-xs jt:text-ink-muted">
-          <summary className="jt:flex jt:items-center jt:gap-2 jt:mb-1 jt:cursor-pointer jt:list-none">
+        <details className="text-xs text-ink-muted">
+          <summary className="flex items-center gap-2 mb-1 cursor-pointer list-none">
             <img
               src="https://static.deckserver.net/assets/images/darkpack_logo2.png"
               style={{ height: '1.2rem' }}
@@ -45,7 +45,7 @@ export function Resources() {
             />
             <span>Licensing</span>
           </summary>
-          <p className="jt:mb-0 jt:pl-1">
+          <p className="mb-0 pl-1">
             JOL is not an official World of Darkness product. Portions of the materials are the copyrights and
             trademarks of Paradox Interactive AB, and are used with permission. All rights reserved. For more
             information please visit worldofdarkness.com.

@@ -65,11 +65,11 @@ export function PlayerRoles() {
       <CardHeader>
         <CardTitle>Player Roles</CardTitle>
       </CardHeader>
-      <CardBody className="jt:flex jt:gap-2 jt:items-end">
-        <div className="jt:flex-1">
+      <CardBody className="flex gap-2 items-end">
+        <div className="flex-1">
           <AdminSelect id="adminPlayerList" label="Player" value={player} onChange={setPlayer} options={toOptions(substitutes)} />
         </div>
-        <div className="jt:flex-1">
+        <div className="flex-1">
           <AdminSelect id="adminRoleList" label="Role" value={role} onChange={setRole} options={ROLES} />
         </div>
         <Button variant="secondary" size="sm" onClick={addRole}>
@@ -77,30 +77,30 @@ export function PlayerRoles() {
         </Button>
       </CardBody>
 
-      <div className="jt:overflow-auto jt:max-h-[70dvh] jt:border-t jt:border-line">
-        <table className="jt:w-full jt:text-sm">
-          <thead className="jt:sticky jt:top-0 jt:bg-panel">
-            <tr className="jt:text-left jt:text-ink-muted">
-              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Name</th>
-              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Last Online</th>
-              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Judge</th>
-              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Super User</th>
-              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Playtester</th>
-              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Admin</th>
-              <th className="jt:px-2 jt:py-1.5 jt:font-semibold jt:border-b jt:border-line">Tournament Admin</th>
+      <div className="overflow-auto max-h-[70dvh] border-t border-line">
+        <table className="w-full text-sm">
+          <thead className="sticky top-0 bg-panel">
+            <tr className="text-left text-ink-muted">
+              <th className="px-2 py-1.5 font-semibold border-b border-line">Name</th>
+              <th className="px-2 py-1.5 font-semibold border-b border-line">Last Online</th>
+              <th className="px-2 py-1.5 font-semibold border-b border-line">Judge</th>
+              <th className="px-2 py-1.5 font-semibold border-b border-line">Super User</th>
+              <th className="px-2 py-1.5 font-semibold border-b border-line">Playtester</th>
+              <th className="px-2 py-1.5 font-semibold border-b border-line">Admin</th>
+              <th className="px-2 py-1.5 font-semibold border-b border-line">Tournament Admin</th>
             </tr>
           </thead>
           <tbody>
             {userRoles.map((u) => (
-              <tr key={u.name} className="jt:hover:bg-hover">
-                <td className="jt:px-2 jt:py-1 jt:border-b jt:border-line/50 jt:text-ink">{u.name}</td>
-                <td className="jt:px-2 jt:py-1 jt:border-b jt:border-line/50 jt:text-ink-secondary">
+              <tr key={u.name} className="hover:bg-hover">
+                <td className="px-2 py-1 border-b border-line/50 text-ink">{u.name}</td>
+                <td className="px-2 py-1 border-b border-line/50 text-ink-secondary">
                   {adminTimestamp(u.lastOnline)}
                 </td>
                 {COLUMNS.map((col) => {
                   const hasRole = u.roles.includes(col);
                   return (
-                    <td key={col} className="jt:px-2 jt:py-1 jt:border-b jt:border-line/50 jt:text-center">
+                    <td key={col} className="px-2 py-1 border-b border-line/50 text-center">
                       <Button
                         variant="secondary"
                         size="sm"

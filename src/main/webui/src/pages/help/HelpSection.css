@@ -1,6 +1,6 @@
 /* Help prose column, rendered from content/help/*.mdx by HelpSection.tsx.
    Styles MDX-generated elements (h1/h2/h3/p/li), so it stays CSS rather
-   than jt: utilities. Tokens from styles/tailwind.css. */
+   than utility classes. Tokens from styles/tailwind.css. */
 .help-prose {
     max-width: 46rem;
     color: var(--jt-ink);

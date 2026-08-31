@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { NotebookPen } from 'lucide-react';
 import { api } from '../../api/client';
 import type { Deck } from '../../api/types';
 import { DeckPreview } from '../../components/DeckPreview';
@@ -16,7 +17,12 @@ export function DeckPanel({ gameId, onToggleNotes }: { gameId: string; onToggleN
   }, [gameId]);
 
   return (
-    <GamePanel id="gameDeckCard" bodyClassName="p-2 scrollable" title="Deck" toggle={{ icon: 'bi-journal', label: 'Notes', onClick: onToggleNotes }}>
+    <GamePanel
+      id="gameDeckCard"
+      bodyClassName="p-2 scrollable"
+      title="Deck"
+      toggle={{ icon: <NotebookPen size={13} />, label: 'Notes', onClick: onToggleNotes }}
+    >
       {deck && <DeckPreview deck={deck} />}
     </GamePanel>
   );

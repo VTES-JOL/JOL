@@ -36,9 +36,9 @@ export function SiteNotesEditor() {
       <CardHeader>
         <CardTitle>Site Notes</CardTitle>
       </CardHeader>
-      <CardBody className="jt:flex jt:flex-col jt:gap-2">
+      <CardBody className="flex flex-col gap-2">
         <Textarea id="siteNotesText" label="Markdown" rows={6} value={text} onChange={(e) => setText(e.target.value)} />
-        <div className="jt:flex jt:gap-2">
+        <div className="flex gap-2">
           <Button variant="secondary" size="sm" onClick={save}>
             Save
           </Button>

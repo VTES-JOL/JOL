@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { Clock } from 'lucide-react';
 import { api } from '../../api/client';
 import type { ChatData, GameSnapshot } from '../../api/types';
+import { Select } from '../../components/ui/Select';
 import { GameChatLog } from './GameChatLog';
 import { GamePanel } from './GamePanel';
 
@@ -27,15 +29,26 @@ export function HistoryPanel({
   }, [gameId, turn]);
 
   return (
-    <GamePanel id="historyCard" bodyClassName="p-2 overflow-hidden" title="History" toggle={{ icon: 'bi-chat', label: 'Game Chat', onClick: onToggleChat }}>
-      <label htmlFor="historySelect">History:</label>
-      <select id="historySelect" className="form-select form-select-sm mb-1" value={turn} onChange={(e) => setTurn(e.target.value)}>
+    <GamePanel
+      id="historyCard"
+      bodyClassName="flex flex-col p-2 overflow-hidden"
+      title="History"
+      toggle={{ icon: <Clock size={13} />, label: 'Game Chat', onClick: onToggleChat }}
+    >
+      <Select
+        id="historySelect"
+        srLabel="History turn"
+        size="sm"
+        className="mb-1"
+        value={turn}
+        onChange={(e) => setTurn(e.target.value)}
+      >
         {game.turns.map((t) => (
           <option key={t} value={t}>
             {t}
           </option>
         ))}
-      </select>
+      </Select>
       <GameChatLog lines={lines} viewerName={viewerName} />
     </GamePanel>
   );

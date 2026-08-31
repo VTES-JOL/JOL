@@ -8,7 +8,7 @@ import { deckApi } from './deckApi';
 
 /**
  * Paste a KRCG JSON export or a plain JOL deck list, preview what resolves,
- * then create the deck. Ported from jol-quarkus; Tailwind `jt:` -prefixed.
+ * then create the deck. Ported from jol-quarkus; Tailwind Tailwind-based.
  */
 interface Props {
   onImport: (name: string, entries: Array<{ cardId: string; count: number }>, comments: string | null) => Promise<void>;
@@ -93,8 +93,8 @@ export function DeckImportModal({ onImport, onClose, onPreview = deckApi.preview
       footer={
         <>
           {createError && (
-            <p className="jt:mr-auto jt:text-xs jt:text-blood-soft jt:flex jt:items-center jt:gap-1">
-              <AlertCircle className="jt:w-3.5 jt:h-3.5 jt:shrink-0" />
+            <p className="mr-auto text-xs text-blood-soft flex items-center gap-1">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
               {createError}
             </p>
           )}
@@ -108,7 +108,7 @@ export function DeckImportModal({ onImport, onClose, onPreview = deckApi.preview
       }
     >
       <div>
-        <label className="jt:block jt:text-xs jt:text-ink-muted jt:mb-1">Paste KRCG JSON or JOL deck list</label>
+        <label className="block text-xs text-ink-muted mb-1">Paste KRCG JSON or JOL deck list</label>
         <textarea
           ref={textareaRef}
           value={text}
@@ -116,17 +116,17 @@ export function DeckImportModal({ onImport, onClose, onPreview = deckApi.preview
           rows={7}
           spellCheck={false}
           placeholder={'Paste deck list here…\n\nKRCG JSON: {"crypt": {…}, "library": {…}}\nJOL text:  2 Pentex Subversion\n           1 Govern the Unaligned'}
-          className="jt:w-full jt:rounded jt:border jt:border-line-accent jt:bg-panel/30 jt:px-3 jt:py-2 jt:text-xs jt:text-ink jt:placeholder:text-ink-muted jt:outline-none jt:focus:border-accent/60 jt:resize-none jt:font-mono"
+          className="w-full rounded border border-line-accent bg-panel/30 px-3 py-2 text-xs text-ink placeholder:text-ink-muted outline-none focus:border-accent/60 resize-none font-mono"
         />
       </div>
 
       {(loading || preview) && (
-        <div className="jt:flex jt:items-center jt:gap-2 jt:text-xs jt:text-ink-muted">
+        <div className="flex items-center gap-2 text-xs text-ink-muted">
           {loading ? (
-            <span className="jt:animate-pulse">Parsing…</span>
+            <span className="animate-pulse">Parsing…</span>
           ) : preview ? (
             <>
-              <span className="jt:px-1.5 jt:py-0.5 jt:rounded jt:bg-accent/20 jt:text-accent-soft jt:font-mono jt:text-[11px] jt:uppercase jt:tracking-wider">
+              <span className="px-1.5 py-0.5 rounded bg-accent/20 text-accent-soft font-mono text-[11px] uppercase tracking-wider">
                 {preview.format}
               </span>
               <span>
@@ -140,33 +140,33 @@ export function DeckImportModal({ onImport, onClose, onPreview = deckApi.preview
       )}
 
       {error && (
-        <p className="jt:text-xs jt:text-blood-soft jt:flex jt:items-center jt:gap-1.5">
-          <AlertCircle className="jt:w-3.5 jt:h-3.5 jt:shrink-0" />
+        <p className="text-xs text-blood-soft flex items-center gap-1.5">
+          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
           {error}
         </p>
       )}
 
       {preview && (preview.resolved.length > 0 || preview.errors.length > 0) && (
-        <div className="jt:rounded jt:border jt:border-line/50 jt:overflow-y-auto jt:max-h-48 jt:text-xs">
+        <div className="rounded border border-line/50 overflow-y-auto max-h-48 text-xs">
           {preview.errors.map((e, i) => (
             <div
               key={`e${i}`}
-              className="jt:flex jt:items-start jt:gap-1.5 jt:px-3 jt:py-1.5 jt:border-b jt:border-line/30 jt:text-blood-soft"
+              className="flex items-start gap-1.5 px-3 py-1.5 border-b border-line/30 text-blood-soft"
             >
-              <AlertCircle className="jt:w-3 jt:h-3 jt:shrink-0 jt:mt-0.5" />
-              <span className="jt:font-mono jt:truncate">{e.line}</span>
-              <span className="jt:ml-auto jt:shrink-0 jt:text-ink-muted">{e.reason}</span>
+              <AlertCircle className="w-3 h-3 shrink-0 mt-0.5" />
+              <span className="font-mono truncate">{e.line}</span>
+              <span className="ml-auto shrink-0 text-ink-muted">{e.reason}</span>
             </div>
           ))}
           {preview.resolved.map((r, i) => (
             <div
               key={`r${i}`}
-              className="jt:flex jt:items-center jt:gap-1.5 jt:px-3 jt:py-1.5 jt:border-b jt:border-line/30 jt:last:border-b-0 jt:text-ink-muted"
+              className="flex items-center gap-1.5 px-3 py-1.5 border-b border-line/30 last:border-b-0 text-ink-muted"
             >
-              <CheckCircle className="jt:w-3 jt:h-3 jt:shrink-0 jt:text-online/70" />
-              <span className="jt:tabular-nums jt:w-5 jt:text-right jt:text-ink">{r.count}×</span>
-              <span className="jt:text-ink jt:truncate">{r.card.name}</span>
-              <span className="jt:ml-auto jt:shrink-0 jt:text-[11px]">
+              <CheckCircle className="w-3 h-3 shrink-0 text-online/70" />
+              <span className="tabular-nums w-5 text-right text-ink">{r.count}×</span>
+              <span className="text-ink truncate">{r.card.name}</span>
+              <span className="ml-auto shrink-0 text-[11px]">
                 {r.card.crypt ? 'crypt' : r.card.types.join(', ')}
               </span>
             </div>
@@ -184,13 +184,13 @@ export function DeckImportModal({ onImport, onClose, onPreview = deckApi.preview
             onChange={(e) => setDeckName(e.target.value)}
           />
           <div>
-            <label className="jt:block jt:text-xs jt:text-ink-muted jt:mb-1">Comments</label>
+            <label className="block text-xs text-ink-muted mb-1">Comments</label>
             <textarea
               value={comments}
               placeholder="Optional deck notes…"
               rows={3}
               onChange={(e) => setComments(e.target.value)}
-              className="jt:w-full jt:rounded jt:border jt:border-line-accent jt:bg-panel/30 jt:px-3 jt:py-2 jt:text-xs jt:text-ink jt:placeholder:text-ink-muted jt:outline-none jt:focus:border-accent/60 jt:resize-none"
+              className="w-full rounded border border-line-accent bg-panel/30 px-3 py-2 text-xs text-ink placeholder:text-ink-muted outline-none focus:border-accent/60 resize-none"
             />
           </div>
         </>

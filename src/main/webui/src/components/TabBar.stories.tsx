@@ -47,6 +47,6 @@ export const SwitchesOnClick: Story = {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('tab', { name: 'Statistics' }));
     await expect(canvas.getByText('stats')).toBeInTheDocument();
-    await expect(canvas.getByRole('tab', { name: 'Statistics' })).toHaveClass('active');
+    await expect(canvas.getByRole('tab', { name: 'Statistics' })).toHaveAttribute('aria-selected', 'true');
   },
 };

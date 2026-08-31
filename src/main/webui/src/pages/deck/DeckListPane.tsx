@@ -9,7 +9,7 @@ import { DeckListItem } from './DeckListItem';
 /**
  * Left pane of the deck workbench: the deck list with a name filter and a
  * format-tag dropdown. Ported/adapted from jol-quarkus's DeckListPanel
- * (the advanced filter modal lands in a later phase). Tailwind `jt:` -prefixed.
+ * (the advanced filter modal lands in a later phase). Tailwind Tailwind-based.
  */
 interface Props {
   decks: DeckInfoBean[];
@@ -42,7 +42,7 @@ export function DeckListPane({
     <Panel
       title="My Decks"
       right={
-        <div className="jt:flex jt:items-center jt:gap-1">
+        <div className="flex items-center gap-1">
           <Button variant="ghost" size="sm" onClick={onImport}>
             Import
           </Button>
@@ -52,23 +52,23 @@ export function DeckListPane({
         </div>
       }
     >
-      <div className="jt:flex jt:items-center jt:gap-1.5 jt:px-3 jt:py-1.5 jt:border-b jt:border-line/50">
-        <Search className="jt:w-3 jt:h-3 jt:shrink-0 jt:text-ink-muted" />
+      <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-line/50">
+        <Search className="w-3 h-3 shrink-0 text-ink-muted" />
         <input
           type="text"
           placeholder="Filter by name…"
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
-          className="jt:w-full jt:bg-transparent jt:text-xs jt:text-ink jt:placeholder:text-ink-muted jt:outline-none"
+          className="w-full bg-transparent text-xs text-ink placeholder:text-ink-muted outline-none"
         />
       </div>
 
-      <div className="jt:px-3 jt:py-1.5 jt:border-b jt:border-line/50">
-        <div className="jt:relative">
+      <div className="px-3 py-1.5 border-b border-line/50">
+        <div className="relative">
           <select
             value={formatFilter}
             onChange={(e) => onFormatFilterChange(e.target.value)}
-            className="jt:w-full jt:bg-panel/40 jt:border jt:border-line-accent jt:rounded jt:text-xs jt:text-ink-secondary jt:pl-2 jt:pr-7 jt:py-1"
+            className="w-full bg-panel/40 border border-line-accent rounded text-xs text-ink-secondary pl-2 pr-7 py-1"
           >
             <option value="">All formats</option>
             {tags.map((t) => (
@@ -77,7 +77,7 @@ export function DeckListPane({
               </option>
             ))}
           </select>
-          <ChevronDown className="jt:pointer-events-none jt:absolute jt:right-2 jt:top-1/2 jt:-translate-y-1/2 jt:w-3 jt:h-3 jt:text-ink-muted" />
+          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-ink-muted" />
         </div>
       </div>
 
@@ -94,7 +94,7 @@ export function DeckListPane({
       ) : visible.length === 0 ? (
         <EmptyState title={`No decks match "${nameFilter}".`} />
       ) : (
-        <div className="jt:overflow-y-auto jt:flex-1 jt:min-h-0">
+        <div className="overflow-y-auto flex-1 min-h-0">
           {visible.map((deck) => (
             <DeckListItem
               key={deck.deckId}

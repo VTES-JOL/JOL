@@ -2,7 +2,7 @@ import type { ReactNode, TextareaHTMLAttributes } from 'react';
 import { forwardRef } from 'react';
 
 /**
- * Labelled `<textarea>` — the `jt:` -prefixed counterpart of a `form-control`
+ * Labelled `<textarea>` — the Tailwind-based counterpart of a `form-control`
  * textarea. Same prop shape as `ui/Input`.
  */
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -13,17 +13,17 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 }
 
 const BASE =
-  'jt:w-full jt:px-3 jt:py-2 jt:rounded jt:bg-surface/70 jt:border jt:border-line jt:text-ink jt:placeholder:text-ink-muted jt:outline-none jt:focus:border-line-accent jt:focus:ring-1 jt:focus:ring-accent/30 jt:resize-y';
+  'w-full px-3 py-2 rounded bg-surface/70 border border-line text-ink placeholder:text-ink-muted outline-none focus:border-line-accent focus:ring-1 focus:ring-accent/30 resize-y';
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea(
   { label, srLabel, error, hint, className, id, ...rest },
   ref,
 ) {
   const labelContent = label ?? srLabel;
-  const labelClass = label ? 'jt:block jt:text-xs jt:text-ink-muted jt:mb-1' : 'jt:sr-only';
+  const labelClass = label ? 'block text-xs text-ink-muted mb-1' : 'sr-only';
 
   return (
-    <div className="jt:w-full">
+    <div className="w-full">
       {labelContent && (
         <label htmlFor={id} className={labelClass}>
           {labelContent}
@@ -31,11 +31,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
       )}
       <textarea ref={ref} id={id} className={[BASE, className].filter(Boolean).join(' ')} {...rest} />
       {error && (
-        <p className="jt:text-blood jt:text-sm jt:mt-1" role="alert">
+        <p className="text-blood text-sm mt-1" role="alert">
           {error}
         </p>
       )}
-      {hint && !error && <p className="jt:text-ink-muted jt:text-xs jt:mt-1">{hint}</p>}
+      {hint && !error && <p className="text-ink-muted text-xs mt-1">{hint}</p>}
     </div>
   );
 });

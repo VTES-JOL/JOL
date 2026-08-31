@@ -35,7 +35,7 @@
 a.card-name {
     text-decoration: none;
     font-family: matrix, sans-serif;
-    color: black;
+    color: inherit;
     cursor: pointer;
 }
 

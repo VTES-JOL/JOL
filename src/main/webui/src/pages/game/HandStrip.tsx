@@ -20,9 +20,14 @@ export function HandStrip({
   if (!hand) return null;
 
   return (
-    <div className="card shadow hand" data-region="hand">
-      <div className="card-header bg-body-secondary">Hand</div>
-      <ol className="card-body list-group list-group-numbered p-0 scrollable">
+    <div
+      className="hand flex flex-col min-h-0 rounded-lg border border-line-accent bg-surface/85 shadow-lg overflow-hidden"
+      data-region="hand"
+    >
+      <div className="px-3 py-1.5 border-b border-line bg-panel/60 text-sm font-semibold text-ink shrink-0">
+        Hand
+      </div>
+      <ol className="flex-1 min-h-0 list-none scrollable">
         {hand.cards.map((card, i) => (
           <CardSimple
             key={card.id}

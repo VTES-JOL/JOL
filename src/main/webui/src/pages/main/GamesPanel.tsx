@@ -23,15 +23,15 @@ function SeatRow({ game }: { game: GameStatusBean }) {
   const prey = game.prey ? game.players[game.prey] : undefined;
 
   return (
-    <div className="jt:flex jt:items-center jt:gap-1 jt:text-ink-muted jt:text-xs jt:mt-1">
+    <div className="flex items-center gap-1 text-ink-muted text-xs mt-1">
       <ArrowLeft size={12} />
       <span>{pred?.playerName ?? game.predator}</span>
-      {pred?.pinged && <TriangleAlert size={11} className="jt:text-blood" />}
-      <span className="jt:mx-1 jt:text-ink-muted/60">·</span>
-      <strong className="jt:text-ink">{active?.playerName ?? game.activePlayer}</strong>
-      <span className="jt:mx-1 jt:text-ink-muted/60">·</span>
+      {pred?.pinged && <TriangleAlert size={11} className="text-blood" />}
+      <span className="mx-1 text-ink-muted/60">·</span>
+      <strong className="text-ink">{active?.playerName ?? game.activePlayer}</strong>
+      <span className="mx-1 text-ink-muted/60">·</span>
       <span>{prey?.playerName ?? game.prey}</span>
-      {prey?.pinged && <TriangleAlert size={11} className="jt:text-blood" />}
+      {prey?.pinged && <TriangleAlert size={11} className="text-blood" />}
       <ArrowRight size={12} />
     </div>
   );
@@ -41,18 +41,18 @@ function GameRow({ game, player, showSeatRow }: { game: GameStatusBean; player: 
   const self = player ? game.players[player] : undefined;
   const pinged = !!self?.pinged;
   const needsAttention = !!self && !self.current;
-  const accent = pinged ? 'jt:border-l-4 jt:border-blood' : needsAttention ? 'jt:border-l-4 jt:border-accent/40' : '';
+  const accent = pinged ? 'border-l-4 border-blood' : needsAttention ? 'border-l-4 border-accent/40' : '';
 
   return (
-    <li className={`jt:border-b jt:border-line/50 ${accent}`}>
-      <Link to={pathForGame(game.gameId)} className="jt:block jt:px-2 jt:py-2 jt:no-underline jt:text-ink jt:hover:bg-hover">
-        <div className="jt:flex jt:items-center jt:justify-between">
-          <span className="jt:font-bold jt:break-words jt:flex jt:items-center jt:gap-1">
-            {pinged && <TriangleAlert size={12} className="jt:text-blood" />}
+    <li className={`border-b border-line/50 ${accent}`}>
+      <Link to={pathForGame(game.gameId)} className="block px-2 py-2 no-underline text-ink hover:bg-hover">
+        <div className="flex items-center justify-between">
+          <span className="font-bold break-words flex items-center gap-1">
+            {pinged && <TriangleAlert size={12} className="text-blood" />}
             {!pinged && needsAttention && <Bell size={12} />}
             {game.name}
           </span>
-          {game.turn && <span className="jt:text-xs jt:text-ink-muted jt:ml-2 jt:whitespace-nowrap">{game.turn}</span>}
+          {game.turn && <span className="text-xs text-ink-muted ml-2 whitespace-nowrap">{game.turn}</span>}
         </div>
         {showSeatRow && game.predator && <SeatRow game={game} />}
       </Link>
@@ -73,7 +73,7 @@ export function GamesPanel() {
   const games = summary[tab.field];
 
   return (
-    <Card className="jt:flex jt:flex-col jt:flex-1 jt:min-h-0 jt:overflow-hidden">
+    <Card className="flex flex-col flex-1 min-h-0 overflow-hidden">
       <CardHeader>
         <CardTitle>Games List</CardTitle>
       </CardHeader>
@@ -81,14 +81,12 @@ export function GamesPanel() {
         tabs={TABS.map((t) => ({ id: t.id, label: t.label, badge: summary[t.field].length }))}
         active={activeTab}
         onChange={setActiveTab}
-        className="ms-0 border-0"
-        tabClassName="px-3 py-2"
       />
-      <div className="jt:flex-1 jt:min-h-0 jt:overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto">
         {games.length === 0 ? (
-          <div className="jt:text-ink-muted jt:text-sm jt:text-center jt:p-4">{tab.emptyMessage}</div>
+          <div className="text-ink-muted text-sm text-center p-4">{tab.emptyMessage}</div>
         ) : (
-          <ul className="jt:list-none">
+          <ul className="list-none">
             {games.map((game) => (
               <GameRow key={game.name} game={game} player={player} showSeatRow={tab.showSeatRow} />
             ))}

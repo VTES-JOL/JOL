@@ -15,7 +15,7 @@ export const Hint: Story = {
 
 export const Alerts: Story = {
   render: () => (
-    <div className="jt:flex jt:flex-col jt:gap-2" style={{ maxWidth: 320 }}>
+    <div className="flex flex-col gap-2" style={{ maxWidth: 320 }}>
       <InlineAlert kind="success">Profile updated.</InlineAlert>
       <InlineAlert kind="danger">Password confirmation does not match.</InlineAlert>
     </div>

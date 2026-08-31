@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Image as ImageIcon } from 'lucide-react';
 import { getBaseUrl } from '../../api/config';
 
 // Same static asset useCardTooltips already fetches for card-name hover
@@ -21,18 +22,18 @@ export function CardImage({ cardId, secured, name }: { cardId: string; secured: 
   if (!cardId) return null;
 
   return (
-    <div className="d-flex justify-content-center mb-2">
+    <div className="flex justify-center mb-2">
       {src && !broken ? (
         <img src={src} alt={name} width={200} height={286} className="rounded shadow-sm" onError={() => setBroken(true)} />
       ) : (
         <div
-          className="bg-body-secondary rounded d-flex flex-column align-items-center justify-content-center gap-2 text-body-secondary"
+          className="bg-panel rounded flex flex-col items-center justify-center gap-2 text-ink-muted"
           style={{ width: 200, height: 286 }}
         >
           {broken && (
             <>
-              <i className="bi bi-image fs-1" />
-              <span className="px-2 text-center small">{name || 'Image unavailable'}</span>
+              <ImageIcon size={40} />
+              <span className="px-2 text-center text-sm">{name || 'Image unavailable'}</span>
             </>
           )}
         </div>

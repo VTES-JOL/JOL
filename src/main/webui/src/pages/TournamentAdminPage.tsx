@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Wrench } from 'lucide-react';
 import { api } from '../api/client';
 import { useInvalidate } from '../api/useInvalidate';
 import type { TournamentMetadata } from '../api/types';
@@ -7,7 +8,8 @@ import { TournamentAdminList } from './tournamentAdmin/TournamentAdminList';
 import { TournamentEditor } from './tournamentAdmin/TournamentEditor';
 import { TournamentManager } from './tournamentAdmin/TournamentManager';
 import { confirmDialog } from '../stores/dialog';
-import { SplitLayout } from '../components/SplitLayout';
+import { EmptyState } from '../components/ui/EmptyState';
+import { MasterDetailView } from '../components/ui/MasterDetailView';
 
 type View = { mode: 'edit'; name: string | null } | { mode: 'tables'; name: string } | null;
 
@@ -62,34 +64,41 @@ export function TournamentAdminPage() {
     setView({ mode: 'edit', name: null });
   };
 
+  let detail;
+  if (view?.mode === 'edit') {
+    detail = (
+      <TournamentEditor
+        tournamentName={view.name}
+        onSaved={refreshList}
+        onDirtyChange={(dirty) => {
+          editorDirtyRef.current = dirty;
+        }}
+      />
+    );
+  } else if (tablesTournament) {
+    detail = <TournamentManager tournament={tablesTournament} onClose={() => setView(null)} onChanged={refreshList} />;
+  } else {
+    detail = <EmptyState icon={Wrench} title="Select a tournament to edit or manage" />;
+  }
+
   return (
-    <SplitLayout
-      stackBelowLg
-      left={<TournamentAdminList tournaments={tournaments} onSelect={selectTournament} onNew={newTournament} />}
-      right={
-        <>
-          {view?.mode === 'edit' && (
-            <div className="d-flex flex-column flex-fill min-h-0">
-              <TournamentEditor
-                tournamentName={view.name}
-                onSaved={refreshList}
-                onDirtyChange={(dirty) => {
-                  editorDirtyRef.current = dirty;
-                }}
-              />
-            </div>
-          )}
-          {tablesTournament && (
-            <div className="d-flex flex-column flex-fill min-h-0">
-              <TournamentManager
-                tournament={tablesTournament}
-                onClose={() => setView(null)}
-                onChanged={refreshList}
-              />
-            </div>
-          )}
-        </>
-      }
-    />
+    <div className="flex flex-col flex-1 min-h-0 p-4 bg-base text-ink">
+      <MasterDetailView
+        breakpoint="lg"
+        columns="320px minmax(360px, 1fr)"
+        activeKey={view ? 'detail' : 'list'}
+        onActiveKeyChange={(k) => {
+          if (k === 'list') void confirmDiscardIfDirty().then((ok) => ok && setView(null));
+        }}
+        panels={[
+          {
+            key: 'list',
+            label: 'Tournaments',
+            content: <TournamentAdminList tournaments={tournaments} onSelect={selectTournament} onNew={newTournament} />,
+          },
+          { key: 'detail', label: 'Details', content: detail },
+        ]}
+      />
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-/** Small status/label pill, ported from jol-quarkus. Tailwind `jt:` -prefixed. */
+/** Small status/label pill, ported from jol-quarkus. Tailwind Tailwind-based. */
 type BadgeVariant = 'format' | 'accent' | 'blood' | 'online' | 'muted';
 type BadgeSize = 'xs' | 'sm';
 
@@ -12,22 +12,22 @@ interface BadgeProps {
 }
 
 const VARIANT_CLASSES: Record<BadgeVariant, string> = {
-  format: 'jt:bg-arcane/10 jt:border jt:border-arcane/20 jt:text-arcane-soft jt:uppercase jt:tracking-tight jt:rounded-full',
-  accent: 'jt:bg-accent/15 jt:text-accent-soft jt:rounded',
-  blood: 'jt:bg-blood/15 jt:text-blood-soft jt:rounded',
-  online: 'jt:bg-online/15 jt:text-online jt:rounded',
-  muted: 'jt:bg-hover jt:text-ink-muted jt:rounded',
+  format: 'bg-arcane/10 border border-arcane/20 text-arcane-soft uppercase tracking-tight rounded-full',
+  accent: 'bg-accent/15 text-accent-soft rounded',
+  blood: 'bg-blood/15 text-blood-soft rounded',
+  online: 'bg-online/15 text-online rounded',
+  muted: 'bg-hover text-ink-muted rounded',
 };
 
 const SIZE_CLASSES: Record<BadgeSize, string> = {
-  xs: 'jt:text-[11px] jt:px-1.5 jt:py-0.5',
-  sm: 'jt:text-xs jt:px-2 jt:py-0.5',
+  xs: 'text-[11px] px-1.5 py-0.5',
+  sm: 'text-xs px-2 py-0.5',
 };
 
 export function Badge({ variant = 'accent', size = 'xs', children, className }: BadgeProps) {
   return (
     <span
-      className={['jt:inline-flex jt:items-center jt:font-medium', VARIANT_CLASSES[variant], SIZE_CLASSES[size], className]
+      className={['inline-flex items-center font-medium', VARIANT_CLASSES[variant], SIZE_CLASSES[size], className]
         .filter(Boolean)
         .join(' ')}
     >

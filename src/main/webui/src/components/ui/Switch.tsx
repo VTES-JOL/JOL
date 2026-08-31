@@ -1,7 +1,7 @@
 import type { ChangeEvent, ReactNode } from 'react';
 
 /**
- * Toggle switch — the `jt:` -prefixed counterpart of Bootstrap's
+ * Toggle switch — the Tailwind-based counterpart of Bootstrap's
  * `.form-check.form-switch`. A visually-hidden `role="switch"` checkbox drives
  * a pill track so keyboard/AT behaviour is native.
  */
@@ -20,11 +20,11 @@ export function Switch({ id, label, checked, onChange, disabled, title, classNam
     <label
       htmlFor={id}
       title={title}
-      className={`jt:flex jt:items-center jt:gap-2.5 jt:text-sm jt:text-ink ${
-        disabled ? 'jt:opacity-60 jt:cursor-not-allowed' : 'jt:cursor-pointer'
+      className={`flex items-center gap-2.5 text-sm text-ink ${
+        disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
       } ${className ?? ''}`.trim()}
     >
-      <span className="jt:relative jt:inline-flex jt:shrink-0">
+      <span className="relative inline-flex shrink-0">
         <input
           id={id}
           type="checkbox"
@@ -32,10 +32,10 @@ export function Switch({ id, label, checked, onChange, disabled, title, classNam
           checked={checked}
           disabled={disabled}
           onChange={onChange}
-          className="jt:peer jt:sr-only"
+          className="peer sr-only"
         />
-        <span className="jt:block jt:w-9 jt:h-5 jt:rounded-full jt:bg-hover jt:border jt:border-line jt:transition-colors jt:peer-checked:bg-accent jt:peer-checked:border-accent" />
-        <span className="jt:absolute jt:left-0.5 jt:top-0.5 jt:w-4 jt:h-4 jt:rounded-full jt:bg-surface jt:shadow jt:transition-transform jt:peer-checked:translate-x-4" />
+        <span className="block w-9 h-5 rounded-full bg-hover border border-line transition-colors peer-checked:bg-accent peer-checked:border-accent" />
+        <span className="absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-surface shadow transition-transform peer-checked:translate-x-4" />
       </span>
       {label}
     </label>

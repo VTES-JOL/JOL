@@ -5,9 +5,9 @@ interface Props {
 
 export function SectionHeader({ title, subtitle }: Props) {
   return (
-    <div className="jt:px-3 jt:py-2 jt:border-b jt:border-line/50">
-      <p className="jt:text-[11px] jt:font-semibold jt:uppercase jt:tracking-wider jt:text-ink-muted">{title}</p>
-      {subtitle && <p className="jt:text-[11px] jt:text-ink-muted jt:mt-0.5">{subtitle}</p>}
+    <div className="px-3 py-2 border-b border-line/50">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-muted">{title}</p>
+      {subtitle && <p className="text-[11px] text-ink-muted mt-0.5">{subtitle}</p>}
     </div>
   );
 }

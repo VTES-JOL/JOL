@@ -1,5 +1,6 @@
 import { resolveDialog, useDialogRequest } from '../stores/dialog';
-import { Modal } from './Modal';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 // Mounted once at the app root (see App.tsx) — renders whichever
 // confirmDialog()/alertDialog() request is currently pending, styled
@@ -11,30 +12,29 @@ export function DialogHost() {
   if (!request) return null;
 
   return (
-    <Modal onClose={() => resolveDialog(false)}>
-      {request.title && (
-        <div className="modal-header">
-          <h5 className="modal-title">{request.title}</h5>
-        </div>
-      )}
-      <div className="modal-body">
-        <p className="mb-0">{request.message}</p>
-      </div>
-      <div className="modal-footer">
-        {request.mode === 'confirm' && (
-          <button type="button" className="btn btn-secondary" onClick={() => resolveDialog(false)}>
-            {request.cancelLabel ?? 'Cancel'}
-          </button>
-        )}
-        <button
-          type="button"
-          autoFocus
-          className={`btn ${request.danger ? 'btn-danger' : 'btn-primary'}`}
-          onClick={() => resolveDialog(true)}
-        >
-          {request.confirmLabel ?? (request.mode === 'alert' ? 'OK' : 'Confirm')}
-        </button>
-      </div>
+    <Modal
+      size="sm"
+      onClose={() => resolveDialog(false)}
+      title={request.title}
+      footer={
+        <>
+          {request.mode === 'confirm' && (
+            <Button variant="secondary" size="sm" onClick={() => resolveDialog(false)}>
+              {request.cancelLabel ?? 'Cancel'}
+            </Button>
+          )}
+          <Button
+            autoFocus
+            variant={request.danger ? 'danger' : 'primary'}
+            size="sm"
+            onClick={() => resolveDialog(true)}
+          >
+            {request.confirmLabel ?? (request.mode === 'alert' ? 'OK' : 'Confirm')}
+          </Button>
+        </>
+      }
+    >
+      <p className="text-sm text-ink">{request.message}</p>
     </Modal>
   );
 }

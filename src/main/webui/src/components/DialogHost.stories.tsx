@@ -20,7 +20,7 @@ export const NoPendingRequest: Story = {};
 
 export const ConfirmAccepted: Story = {
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const canvas = within(canvasElement.ownerDocument.body);
     let resolved: boolean | undefined;
     void confirmDialog('Leave this game?', { title: 'Leave Game', danger: true }).then((value) => {
       resolved = value;
@@ -36,7 +36,7 @@ export const ConfirmAccepted: Story = {
 
 export const ConfirmCancelled: Story = {
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const canvas = within(canvasElement.ownerDocument.body);
     let resolved: boolean | undefined;
     void confirmDialog('Discard unsaved changes?').then((value) => {
       resolved = value;
@@ -51,7 +51,7 @@ export const ConfirmCancelled: Story = {
 
 export const Alert: Story = {
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    const canvas = within(canvasElement.ownerDocument.body);
     let resolvedCount = 0;
     void alertDialog('Your deck is invalid.', { title: 'Invalid Deck' }).then(() => {
       resolvedCount += 1;

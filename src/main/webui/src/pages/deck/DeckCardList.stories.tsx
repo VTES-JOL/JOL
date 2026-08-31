@@ -32,7 +32,7 @@ const meta = {
   parameters: { layout: 'centered' },
   decorators: [
     (Story) => (
-      <div className="jt:w-[380px] jt:h-[420px] jt:flex jt:flex-col jt:bg-surface jt:border jt:border-line/60 jt:rounded-lg jt:overflow-hidden">
+      <div className="w-[380px] h-[420px] flex flex-col bg-surface border border-line/60 rounded-lg overflow-hidden">
         <Story />
       </div>
     ),

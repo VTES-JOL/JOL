@@ -28,12 +28,12 @@ export const helpMdxComponents: MDXComponents = {
   CardLink,
   table: (props) => (
     <table
-      className="jt:w-full jt:text-sm jt:my-3 jt:[&_th]:text-left jt:[&_th]:font-semibold jt:[&_th]:border-b jt:[&_th]:border-line jt:[&_th]:px-2 jt:[&_th]:py-1 jt:[&_td]:border-b jt:[&_td]:border-line/50 jt:[&_td]:px-2 jt:[&_td]:py-1"
+      className="w-full text-sm my-3 [&_th]:text-left [&_th]:font-semibold [&_th]:border-b [&_th]:border-line [&_th]:px-2 [&_th]:py-1 [&_td]:border-b [&_td]:border-line/50 [&_td]:px-2 [&_td]:py-1"
       {...props}
     />
   ),
   code: (props) => (
-    <code className="jt:bg-hover jt:text-ink jt:px-1 jt:rounded jt:text-[0.9em]" {...props} />
+    <code className="bg-hover text-ink px-1 rounded text-[0.9em]" {...props} />
   ),
   // Cross-links between Help sections (e.g. "see Deck Editor") stay
   // client-side navigation via react-router instead of a full page reload.

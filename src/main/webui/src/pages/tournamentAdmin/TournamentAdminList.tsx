@@ -1,9 +1,13 @@
+import { Plus } from 'lucide-react';
 import type { TournamentMetadata } from '../../api/types';
+import { Panel } from '../../components/ui/Panel';
+import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
 
 function StatusBadge({ status }: { status: string }) {
-  if (status === 'ACTIVE') return <span className="badge text-bg-success">Active</span>;
-  if (status === 'STARTING') return <span className="badge text-bg-secondary">Starting</span>;
-  return <span className="badge text-bg-warning">Draft</span>;
+  if (status === 'ACTIVE') return <Badge variant="online">Active</Badge>;
+  if (status === 'STARTING') return <Badge variant="muted">Starting</Badge>;
+  return <Badge variant="format">Draft</Badge>;
 }
 
 export function TournamentAdminList({
@@ -16,28 +20,27 @@ export function TournamentAdminList({
   onNew: () => void;
 }) {
   return (
-    <div className="card shadow flex-fill d-flex flex-column">
-      <div className="card-header bg-body-secondary d-flex justify-content-between align-items-center">
-        <span className="fw-semibold">Tournaments</span>
-        <button className="btn btn-sm btn-outline-secondary" onClick={onNew}>
-          New <i className="bi-plus" />
-        </button>
+    <Panel
+      title="Tournaments"
+      right={
+        <Button variant="secondary" size="sm" icon={<Plus size={14} />} onClick={onNew}>
+          New
+        </Button>
+      }
+    >
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        {tournaments.map((t) => (
+          <button
+            key={t.name}
+            type="button"
+            className="w-full text-left px-3 py-2 border-b border-line flex justify-between items-center gap-2 text-ink-secondary hover:bg-hover"
+            onClick={() => onSelect(t)}
+          >
+            <span className="truncate">{t.name}</span>
+            <StatusBadge status={t.status} />
+          </button>
+        ))}
       </div>
-      <div className="flex-fill overflow-auto min-h-0">
-        <ul className="list-group list-group-flush">
-          {tournaments.map((t) => (
-            <li
-              key={t.name}
-              className="list-group-item d-flex justify-content-between align-items-center"
-              style={{ cursor: 'pointer' }}
-              onClick={() => onSelect(t)}
-            >
-              <span>{t.name}</span>
-              <StatusBadge status={t.status} />
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+    </Panel>
   );
 }

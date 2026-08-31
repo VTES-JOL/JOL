@@ -3,8 +3,14 @@ import { api } from '../../api/client';
 import type { GameSnapshot } from '../../api/types';
 import { QuickCommandModal } from './QuickCommandModal';
 import { QuickChatModal } from './QuickChatModal';
+import { Button } from '../../components/ui/Button';
+import { Select } from '../../components/ui/Select';
 import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
+
+const FIELD_LABEL = 'block text-xs text-ink-muted mb-0.5';
+const CMD_INPUT =
+  'flex-1 min-w-0 rounded-r border border-l-0 border-line bg-surface/70 px-2 py-1 text-sm text-ink outline-none focus:border-accent/60';
 
 // Mirrors commands.jsp/doSubmit()/doEndTurn() plus the quick-command/
 // quick-chat modals — free-text Command, Chat, Phase, Ping, submitted
@@ -111,9 +117,11 @@ export function CommandForm({
   };
 
   return (
-    <div className="card shadow commands">
-      <div className="card-header bg-body-secondary">Commands</div>
-      <div className="card-body p-2">
+    <div className="commands flex flex-col min-h-0 rounded-lg border border-line-accent bg-surface/85 shadow-lg overflow-hidden">
+      <div className="px-3 py-1.5 border-b border-line bg-panel/60 text-sm font-semibold text-ink shrink-0">
+        Commands
+      </div>
+      <div className="flex-1 min-h-0 overflow-y-auto p-2">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -123,10 +131,11 @@ export function CommandForm({
         >
           {canPlay && (
             <>
-              <label htmlFor="phase">Phase</label>
-              <select
+              <Select
                 id="phase"
-                className="form-select form-select-sm mb-2"
+                label="Phase"
+                size="sm"
+                className="mb-2"
                 value={phase}
                 disabled={!isMyTurn}
                 onChange={(e) => setPhase(e.target.value)}
@@ -136,21 +145,25 @@ export function CommandForm({
                     {p}
                   </option>
                 ))}
-              </select>
-              <label htmlFor="command">Command</label>
-              <div className="input-group input-group-sm mb-2">
-                <button
+              </Select>
+              <label htmlFor="command" className={FIELD_LABEL}>
+                Command
+              </label>
+              <div className="flex mb-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
                   type="button"
-                  className="btn btn-outline-secondary"
                   tabIndex={-1}
                   disabled={submitting}
+                  className="rounded-r-none"
                   onClick={() => setShowQuickCommand(true)}
                 >
                   ...
-                </button>
+                </Button>
                 <input
                   type="text"
-                  className="form-control form-control-sm"
+                  className={CMD_INPUT}
                   id="command"
                   placeholder="Enter game commands"
                   value={command}
@@ -159,20 +172,24 @@ export function CommandForm({
               </div>
             </>
           )}
-          <label htmlFor="chat">Chat</label>
-          <div className="input-group input-group-sm mb-2">
-            <button
+          <label htmlFor="chat" className={FIELD_LABEL}>
+            Chat
+          </label>
+          <div className="flex mb-2">
+            <Button
+              variant="secondary"
+              size="sm"
               type="button"
-              className="btn btn-outline-secondary"
               tabIndex={-1}
               disabled={!canChat || submitting}
+              className="rounded-r-none"
               onClick={() => setShowQuickChat(true)}
             >
               ...
-            </button>
+            </Button>
             <input
               type="text"
-              className="form-control form-control-sm"
+              className={CMD_INPUT}
               id="chat"
               placeholder="Chat to other players"
               value={chat}
@@ -182,32 +199,44 @@ export function CommandForm({
           </div>
           {canPlay && (
             <>
-              <label htmlFor="ping">Ping</label>
-              <select id="ping" className="form-select form-select-sm mb-2" value={ping} onChange={(e) => setPing(e.target.value)}>
+              <Select
+                id="ping"
+                label="Ping"
+                size="sm"
+                className="mb-2"
+                value={ping}
+                onChange={(e) => setPing(e.target.value)}
+              >
                 <option value="" />
                 {game.pingOptions.map((p) => (
                   <option key={p} value={p}>
                     {p}
                   </option>
                 ))}
-              </select>
-              <div className="mt-2 d-flex justify-content-between">
-                <button className="btn btn-secondary btn-sm" type="submit" disabled={submitting}>
+              </Select>
+              <div className="mt-2 flex justify-between">
+                <Button variant="secondary" size="sm" type="submit" disabled={submitting}>
                   {submitting ? 'Submitting…' : 'Submit'}
-                </button>
-                <button className="btn btn-warning btn-sm" type="button" disabled={!isMyTurn || submitting} onClick={endTurn}>
+                </Button>
+                <Button
+                  size="sm"
+                  type="button"
+                  disabled={!isMyTurn || submitting}
+                  className="bg-gold text-surface hover:bg-gold-soft"
+                  onClick={endTurn}
+                >
                   End Turn
-                </button>
+                </Button>
               </div>
             </>
           )}
           {!canPlay && (
-            <button className="btn btn-secondary btn-sm mt-2" type="submit" disabled={submitting || !canChat}>
+            <Button variant="secondary" size="sm" type="submit" className="mt-2" disabled={submitting || !canChat}>
               {submitting ? 'Submitting…' : 'Submit'}
-            </button>
+            </Button>
           )}
         </form>
-        {status && <div className="text-danger small mt-2">{status}</div>}
+        {status && <div className="text-blood text-sm mt-2">{status}</div>}
       </div>
       {showQuickCommand && <QuickCommandModal onSend={sendQuickCommand} onClose={() => setShowQuickCommand(false)} />}
       {showQuickChat && <QuickChatModal onSend={sendQuickChat} onClose={() => setShowQuickChat(false)} />}

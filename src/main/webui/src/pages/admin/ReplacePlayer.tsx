@@ -44,7 +44,7 @@ export function ReplacePlayer() {
       <CardHeader>
         <CardTitle>Replace Player</CardTitle>
       </CardHeader>
-      <CardBody className="jt:flex jt:flex-col jt:gap-2 jt:items-start">
+      <CardBody className="flex flex-col gap-2 items-start">
         <AdminSelect id="adminGameList" label="Games" value={gameId} onChange={setGameId} options={gameOptions} />
         <AdminSelect
           id="adminReplacePlayerList"

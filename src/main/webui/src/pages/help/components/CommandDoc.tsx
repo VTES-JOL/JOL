@@ -40,7 +40,7 @@ function SyntaxLine({ syntax }: { syntax: string }) {
         return isPlaceholder ? (
           <span
             key={i}
-            className="help-command-placeholder jt:inline-flex jt:items-center jt:rounded-full jt:bg-hover jt:text-ink-secondary jt:px-2 jt:py-0.5"
+            className="help-command-placeholder inline-flex items-center rounded-full bg-hover text-ink-secondary px-2 py-0.5"
           >
             {token.slice(1, -1)}
           </span>
@@ -68,17 +68,17 @@ export function CommandDoc({ name, syntax, description, children }: CommandDocPr
   const examples = childrenOfType(children, CommandExample);
 
   return (
-    <section className="help-command jt:my-4">
-      <h3 className="jt:text-[1.05rem] jt:font-semibold jt:mb-2">{name}</h3>
+    <section className="help-command my-4">
+      <h3 className="text-[1.05rem] font-semibold mb-2">{name}</h3>
       <SyntaxLine syntax={syntax} />
-      <p className="jt:text-ink-secondary jt:mt-2 jt:mb-3">{description}</p>
+      <p className="text-ink-secondary mt-2 mb-3">{description}</p>
       {options.length > 0 && (
-        <div className="jt:mb-3">
+        <div className="mb-3">
           <div className="help-command-heading">Options</div>
           {options.map((option, i) => (
             <div key={i} className="help-command-row">
               <span className="help-command-row-label">{option.props.name}</span>
-              <span className="jt:text-sm">{option.props.children}</span>
+              <span className="text-sm">{option.props.children}</span>
             </div>
           ))}
         </div>
@@ -89,7 +89,7 @@ export function CommandDoc({ name, syntax, description, children }: CommandDocPr
           {examples.map((example, i) => (
             <div key={i} className="help-command-row">
               <code className="help-command-row-label">{example.props.cmd}</code>
-              <span className="jt:text-sm jt:text-ink-secondary">{example.props.children}</span>
+              <span className="text-sm text-ink-secondary">{example.props.children}</span>
             </div>
           ))}
         </div>

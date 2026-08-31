@@ -1,8 +1,8 @@
 import type { DeckSummary } from './deckKit';
 
 /**
- * Crypt / Library / Groups chip row, ported from jol-quarkus. Tailwind `jt:`
- * -prefixed. With `validate`, cells whose value breaks a construction rule
+ * Crypt / Library / Groups chip row, ported from jol-quarkus. Tailwind-based.
+ * With `validate`, cells whose value breaks a construction rule
  * (crypt < 12, library outside 60–90, non-consecutive groups) are tinted red.
  */
 interface Props {
@@ -28,19 +28,19 @@ export function SummaryStats({ summary, validate = false, className = '' }: Prop
   const hasError = cryptInvalid || libInvalid || groupsInvalid;
 
   const chip = (label: string, value: string | number, invalid: boolean) => (
-    <span className={`jt:inline-flex jt:items-center jt:gap-1 jt:px-1.5 jt:py-0.5 ${invalid ? 'jt:bg-blood-soft/10' : ''}`}>
-      <span className={invalid ? 'jt:text-blood' : 'jt:text-ink-muted'}>{label}</span>
-      <span className={`jt:font-semibold ${invalid ? 'jt:text-blood' : 'jt:text-ink-secondary'}`}>{value}</span>
+    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 ${invalid ? 'bg-blood-soft/10' : ''}`}>
+      <span className={invalid ? 'text-blood' : 'text-ink-muted'}>{label}</span>
+      <span className={`font-semibold ${invalid ? 'text-blood' : 'text-ink-secondary'}`}>{value}</span>
     </span>
   );
 
   return (
     <div
       className={[
-        'jt:inline-flex jt:items-center jt:rounded jt:border jt:overflow-hidden jt:text-[11px] jt:leading-none jt:tabular-nums',
+        'inline-flex items-center rounded border overflow-hidden text-[11px] leading-none tabular-nums',
         hasError
-          ? 'jt:border-blood/40 jt:bg-hover/60 jt:divide-x jt:divide-blood/20'
-          : 'jt:border-line/60 jt:bg-hover/60 jt:divide-x jt:divide-line/60',
+          ? 'border-blood/40 bg-hover/60 divide-x divide-blood/20'
+          : 'border-line/60 bg-hover/60 divide-x divide-line/60',
         className,
       ]
         .filter(Boolean)

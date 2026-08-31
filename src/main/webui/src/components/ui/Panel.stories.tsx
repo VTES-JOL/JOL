@@ -8,7 +8,7 @@ const meta = {
   parameters: { layout: 'fullscreen' },
   decorators: [
     (Story) => (
-      <div className="jt:h-[400px] jt:p-4 jt:bg-base">
+      <div className="h-[400px] p-4 bg-base">
         <Story />
       </div>
     ),
@@ -21,7 +21,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     title: 'Decks',
-    children: <div className="jt:p-4 jt:text-sm jt:text-ink-secondary">Panel body content.</div>,
+    children: <div className="p-4 text-sm text-ink-secondary">Panel body content.</div>,
   },
 };
 
@@ -33,8 +33,8 @@ export const WithRightSlotAndFooter: Story = {
         + New
       </Button>
     ),
-    children: <div className="jt:p-4 jt:text-sm jt:text-ink-secondary jt:overflow-y-auto">Scrollable body.</div>,
-    footer: <div className="jt:px-4 jt:py-2 jt:text-xs jt:text-ink-muted">Footer</div>,
+    children: <div className="p-4 text-sm text-ink-secondary overflow-y-auto">Scrollable body.</div>,
+    footer: <div className="px-4 py-2 text-xs text-ink-muted">Footer</div>,
   },
 };
 
@@ -42,6 +42,6 @@ export const Compact: Story = {
   args: {
     size: 'compact',
     title: 'Analytics',
-    children: <div className="jt:p-4 jt:text-sm jt:text-ink-secondary">Compact header.</div>,
+    children: <div className="p-4 text-sm text-ink-secondary">Compact header.</div>,
   },
 };

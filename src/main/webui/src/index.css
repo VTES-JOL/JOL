@@ -7,3 +7,12 @@ body,
 body {
   margin: 0;
 }
+
+/* The app is a full-height flex column: TopBar is fixed-size, #content fills
+   the rest and scrolls internally (see styles/theme.css's #content rule).
+   Was `d-flex flex-column` Bootstrap utilities on <body>/#root in index.html. */
+body,
+#root {
+  display: flex;
+  flex-direction: column;
+}

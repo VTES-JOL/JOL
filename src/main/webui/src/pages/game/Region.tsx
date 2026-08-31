@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
+import { MinusCircle, PlusCircle } from 'lucide-react';
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
 import { Card, RegionLabelBadges, type TableCardClick } from './Card';
 import { CardSimple } from './CardSimple';
 import type { HandCardContext, TableCardContext } from './cardCommands';
 
 const REGION_STYLE: Record<string, string> = {
-  TORPOR: 'bg-danger-subtle',
-  READY: 'bg-success-subtle',
+  TORPOR: 'bg-blood/10',
+  READY: 'bg-online/10',
 };
 
 // card.jsp/card-simple.jsp/card-hidden.jsp's click routing, replicated
@@ -27,11 +28,8 @@ function clickMode(regionType: string, isOwnRegion: boolean, isSeatedPlayer: boo
 }
 
 // Mirrors region.jsp — collapse/expand is purely local UI state here (see
-// GameSnapshotFactory's javadoc: the server no longer tracks this at all,
-// simplifying away GameView's per-viewer `collapsed` set). The one bit of
-// JSP-era server behavior reimplemented client-side: a region that gains a
-// card (e.g. another player moves a minion into this player's READY region)
-// auto-expands so the change is visible, even if a viewer had collapsed it.
+// GameSnapshotFactory's javadoc). A region that gains a card auto-expands so
+// the change is visible, even if a viewer had collapsed it.
 export function Region({
   region,
   defaultCollapsed,
@@ -63,25 +61,25 @@ export function Region({
 
   if (region.cards.length === 0) return null;
 
-  const style = REGION_STYLE[region.type] ?? 'bg-body-secondary';
+  const style = REGION_STYLE[region.type] ?? 'bg-panel';
   const mode = clickMode(region.type, isOwnRegion, isSeatedPlayer);
 
   const onAction = ({ coordinate, card, isChild }: TableCardClick) =>
     onTableCardClick({ controller, controllerPool, regionType: region.type, regionCommandKey: region.commandKey, coordinate, card, isChild });
 
   return (
-    <div className="mb-2 text-bg-light">
-      <div className={`p-2 d-flex justify-content-between align-items-center ${style}`}>
-        <span>
-          <button className="btn btn-sm p-0" onClick={() => setCollapsed((prev) => !prev)}>
-            <i className={`fs-6 bi ${collapsed ? 'bi-plus-circle' : 'bi-dash-circle'}`} />
-          </button>{' '}
-          <span className="fw-bold">{region.label}</span> <span>( {region.cards.length} )</span>{' '}
+    <div className="mb-2">
+      <div className={`p-2 flex justify-between items-center text-sm ${style}`}>
+        <span className="flex items-center gap-1">
+          <button type="button" className="text-ink-muted hover:text-ink" onClick={() => setCollapsed((prev) => !prev)}>
+            {collapsed ? <PlusCircle size={15} /> : <MinusCircle size={15} />}
+          </button>
+          <span className="font-bold">{region.label}</span> <span>( {region.cards.length} )</span>
           <RegionLabelBadges region={region} />
         </span>
       </div>
       {!collapsed && (
-        <ol className={`region list-group list-group-flush list-group-numbered ${style}`}>
+        <ol className={`region list-none ${style}`}>
           {region.cards.map((card, i) => {
             const coordinate = String(i + 1);
             if (region.simple) {

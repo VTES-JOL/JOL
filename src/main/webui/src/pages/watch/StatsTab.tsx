@@ -23,7 +23,7 @@ const TABS: TabDef<StatsSubTab>[] = [
 ];
 
 const DATE_INPUT =
-  'jt:rounded jt:border jt:border-line jt:bg-surface/70 jt:px-2 jt:py-1 jt:text-sm jt:text-ink jt:outline-none jt:focus:border-accent/60';
+  'rounded border border-line bg-surface/70 px-2 py-1 text-sm text-ink outline-none focus:border-accent/60';
 
 function currentYear() {
   return new Date().getFullYear();
@@ -48,9 +48,9 @@ export function StatsTab() {
   };
 
   return (
-    <div className="jt:flex jt:flex-col jt:min-h-0 jt:overflow-hidden">
-      <div className="jt:flex jt:flex-wrap jt:items-center jt:gap-2 jt:mt-3 jt:px-1">
-        <label htmlFor="statsFrom" className="jt:text-xs jt:text-ink-muted">
+    <div className="flex flex-col min-h-0 overflow-hidden">
+      <div className="flex flex-wrap items-center gap-2 mt-3 px-1">
+        <label htmlFor="statsFrom" className="text-xs text-ink-muted">
           From
         </label>
         <input
@@ -60,7 +60,7 @@ export function StatsTab() {
           value={fromDate}
           onChange={(e) => setFromDate(e.target.value)}
         />
-        <label htmlFor="statsTo" className="jt:text-xs jt:text-ink-muted">
+        <label htmlFor="statsTo" className="text-xs text-ink-muted">
           To
         </label>
         <input id="statsTo" type="date" className={DATE_INPUT} value={toDate} onChange={(e) => setToDate(e.target.value)} />
@@ -91,7 +91,7 @@ export function StatsTab() {
 
       <TabBar tabs={TABS} active={subTab} onChange={setSubTab} className="mt-3" />
 
-      <div className="jt:flex-1 jt:min-h-0 jt:mt-3">
+      <div className="flex-1 min-h-0 mt-3">
         {subTab === 'player' && <PlayerStats fromDate={fromDate} toDate={toDate} isTourney={isTourney} />}
         {subTab === 'deck' && <DeckStats fromDate={fromDate} toDate={toDate} isTourney={isTourney} />}
         {subTab === 'nation' && <NationStats fromDate={fromDate} toDate={toDate} isTourney={isTourney} />}

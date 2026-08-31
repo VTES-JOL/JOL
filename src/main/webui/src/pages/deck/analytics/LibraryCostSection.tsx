@@ -52,18 +52,18 @@ export function LibraryCostSection({ entries, detailMap }: Props) {
   }
 
   const rows: CostRow[] = [
-    ...(free > 0 ? [{ label: 'Free', count: free, color: 'jt:bg-online/70' }] : []),
-    ...sortedRows(poolBuckets, 'Pool', 'jt:bg-accent/70'),
-    ...sortedRows(bloodBuckets, 'Blood', 'jt:bg-blood-soft/80'),
+    ...(free > 0 ? [{ label: 'Free', count: free, color: 'bg-online/70' }] : []),
+    ...sortedRows(poolBuckets, 'Pool', 'bg-accent/70'),
+    ...sortedRows(bloodBuckets, 'Blood', 'bg-blood-soft/80'),
   ];
 
   if (rows.length === 0) return null;
   const max = Math.max(...rows.map((r) => r.count));
 
   return (
-    <div className="jt:border-b jt:border-line/50">
+    <div className="border-b border-line/50">
       <SectionHeader title="Library Costs" />
-      <div className="jt:py-1">
+      <div className="py-1">
         {rows.map((row) => (
           <BarRow key={row.label} label={row.label} count={row.count} max={max} color={row.color} />
         ))}

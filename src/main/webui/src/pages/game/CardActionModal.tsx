@@ -1,14 +1,33 @@
 import { useEffect, useState, type MouseEvent, type ReactNode } from 'react';
+import {
+  ArrowLeftCircle,
+  ArrowRightCircle,
+  Ban,
+  Flame,
+  Lock,
+  LogOut,
+  Minus,
+  Plus,
+  Shield,
+  Tag,
+  Unlock,
+  X,
+} from 'lucide-react';
 import type { CardDefinition } from '../../api/types';
 import { fetchCardDefinition } from './cardDefinitions';
 import { cardActions, type Submission, type TableCardContext } from './cardCommands';
 import { CardImage } from './CardImage';
 import { runRequest } from '../../api/mutate';
-import { Modal } from '../../components/Modal';
+import { Modal } from '../../components/ui/Modal';
+import { Select } from '../../components/ui/Select';
 import { COUNTER_STYLE, OTHER_VISIBLE_REGIONS } from './Card';
 import { CLAN, resolveClan } from './Clan';
 import { PATH, resolvePath } from './Path';
 import { SECT, resolveSect } from './Sect';
+
+const PILL = 'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium';
+const ACTION_BTN =
+  'm-1 inline-flex items-center gap-1 rounded border border-line-accent px-2.5 py-1 text-sm text-ink-secondary hover:bg-hover';
 
 // 'None' is appended for the picker's clear option — CLAN/PATH/SECT
 // themselves are the closed set of real values (mirroring the Java enums),
@@ -60,18 +79,18 @@ const BUTTONS: ButtonConfig[] = [
   { key: 'go-anarch', label: 'Go Anarch', title: 'Go Anarch', regions: ['ready'], lockState: 'unlocked', topLevelOnly: true, ownerOnly: true, minionOnly: true, action: cardActions.goAnarch },
   { key: 'leave-torpor', label: 'Leave Torpor', title: 'Leave Torpor', regions: ['torpor'], lockState: 'unlocked', topLevelOnly: true, ownerOnly: true, minionOnly: true, action: cardActions.leaveTorpor },
   { key: 'move-ready', label: 'Move to ready', title: 'Move to ready', regions: ['torpor'], topLevelOnly: true, ownerOnly: true, minionOnly: true, action: cardActions.moveReady },
-  { key: 'lock', label: <><i className="bi bi-lock" /> Lock</>, title: 'Lock', regions: ['ready', 'torpor'], lockState: 'unlocked', action: cardActions.lock },
-  { key: 'unlock', label: <span style={{ transform: 'rotate(-90deg)' }}><i className="bi bi-unlock" /> Unlock</span>, title: 'Unlock', regions: ['ready', 'torpor'], lockState: 'locked', action: cardActions.unlock },
-  { key: 'block', label: <><i className="bi bi-shield" /> Block</>, title: 'Block', regions: ['ready'], topLevelOnly: true, ownerOnly: true, minionOnly: true, action: (ctx) => cardActions.block(ctx.card.name ?? '') },
+  { key: 'lock', label: <><Lock size={13} /> Lock</>, title: 'Lock', regions: ['ready', 'torpor'], lockState: 'unlocked', action: cardActions.lock },
+  { key: 'unlock', label: <><Unlock size={13} /> Unlock</>, title: 'Unlock', regions: ['ready', 'torpor'], lockState: 'locked', action: cardActions.unlock },
+  { key: 'block', label: <><Shield size={13} /> Block</>, title: 'Block', regions: ['ready'], topLevelOnly: true, ownerOnly: true, minionOnly: true, action: (ctx) => cardActions.block(ctx.card.name ?? '') },
   { key: 'torpor', label: 'Send to Torpor', title: 'Torpor', regions: ['ready'], topLevelOnly: true, minionOnly: true, action: cardActions.torpor },
-  { key: 'burn', label: <><i className="bi bi-fire" /> Burn</>, title: 'Burn', regions: ['ready', 'torpor', 'inactive'], action: cardActions.burn },
+  { key: 'burn', label: <><Flame size={13} /> Burn</>, title: 'Burn', regions: ['ready', 'torpor', 'inactive'], action: cardActions.burn },
   { key: 'move-hand', label: 'Move to Hand', title: 'Move to Hand', regions: ['ashheap'], ownerOnly: true, action: cardActions.moveHand },
   { key: 'move-library', label: 'Move to Library', title: 'Move to bottom of Library', regions: ['ashheap'], ownerOnly: true, nonMinionOnly: true, action: (ctx) => cardActions.moveLibrary(ctx, false) },
   { key: 'move-library-top', label: 'Move to Library (Top)', title: 'Move to top of Library', regions: ['ashheap'], ownerOnly: true, nonMinionOnly: true, action: (ctx) => cardActions.moveLibrary(ctx, true) },
   { key: 'move-uncontrolled', label: 'Move to Uncontrolled', title: 'Move to uncontrolled', regions: ['ashheap'], ownerOnly: true, minionOnly: true, action: cardActions.moveUncontrolled },
-  { key: 'rfg', label: <><i className="bi bi-escape" /> Remove from Game</>, title: 'Remove from game', regions: ['ready', 'ashheap', 'inactive'], ownerOnly: true, action: cardActions.removeFromGame },
-  { key: 'move-predator', label: <><i className="bi bi-arrow-left-circle" /> Move to Predator</>, title: 'Move to Predator', regions: ['ready'], action: cardActions.movePredator },
-  { key: 'move-prey', label: <><i className="bi bi-arrow-right-circle" /> Move to Prey</>, title: 'Move to Prey', regions: ['ready'], action: cardActions.movePrey },
+  { key: 'rfg', label: <><LogOut size={13} /> Remove from Game</>, title: 'Remove from game', regions: ['ready', 'ashheap', 'inactive'], ownerOnly: true, action: cardActions.removeFromGame },
+  { key: 'move-predator', label: <><ArrowLeftCircle size={13} /> Move to Predator</>, title: 'Move to Predator', regions: ['ready'], action: cardActions.movePredator },
+  { key: 'move-prey', label: <><ArrowRightCircle size={13} /> Move to Prey</>, title: 'Move to Prey', regions: ['ready'], action: cardActions.movePrey },
 ];
 
 function buttonVisible(btn: ButtonConfig, region: string, locked: boolean, contested: boolean, isOwner: boolean, isChild: boolean, minion: boolean): boolean {
@@ -103,9 +122,10 @@ function InlinePicker({
 
   if (editing) {
     return (
-      <select
-        className="form-select form-select-sm ms-2"
-        style={{ width: 'auto' }}
+      <Select
+        srLabel={kind}
+        size="sm"
+        className="w-auto ms-2"
         autoFocus
         defaultValue={nameToKey(display)}
         onBlur={() => setEditing(false)}
@@ -119,18 +139,17 @@ function InlinePicker({
             {v}
           </option>
         ))}
-      </select>
+      </Select>
     );
   }
 
   return display.toLowerCase() === 'none' ? (
-    <span className="text-muted mx-1" style={{ cursor: 'pointer' }} title="None" onClick={() => setEditing(true)}>
-      <i className="bi bi-ban" />
+    <span className="text-ink-muted mx-1 cursor-pointer" title="None" onClick={() => setEditing(true)}>
+      <Ban size={14} />
     </span>
   ) : (
     <span
-      className={`${kind} ${nameToKey(display)} mx-1`}
-      style={{ cursor: 'pointer' }}
+      className={`${kind} ${nameToKey(display)} mx-1 cursor-pointer`}
       title={display}
       onClick={() => setEditing(true)}
     />
@@ -184,15 +203,15 @@ export function CardActionModal({
   };
 
   return (
-    <Modal onClose={onClose} contentStyle={{ textAlign: 'center' }}>
+    <Modal onClose={onClose} bodyClassName="flex flex-col min-h-0 overflow-y-auto flex-1">
       {!definition ? (
-        <div style={{ height: '30vh' }} className="d-flex align-items-center justify-content-center">
-          <h2>Loading...</h2>
+        <div style={{ height: '30vh' }} className="flex items-center justify-center text-ink-muted">
+          Loading…
         </div>
       ) : (
         <>
-          <div className="modal-header py-1 px-2 justify-content-between align-items-center">
-            <span className="d-flex align-items-center">
+          <div className="flex justify-between items-center px-2 py-1 border-b border-line bg-panel/45">
+            <span className="flex items-center">
               {minion && (
                 <InlinePicker
                   value={card.clan}
@@ -202,10 +221,10 @@ export function CardActionModal({
                   onChange={(key) => doAction((c) => cardActions.clan(c, key), false)}
                 />
               )}
-              <span className="card-name fs-5">{definition.displayName}</span>
-              {hasVotes && <span className="badge rounded-pill text-bg-warning mx-2">{card.votes}</span>}
+              <span className="card-name text-lg">{definition.displayName}</span>
+              {hasVotes && <span className={`${PILL} bg-gold text-surface mx-2`}>{card.votes}</span>}
             </span>
-            <span className="d-flex align-items-center">
+            <span className="flex items-center">
               {minion && (
                 <InlinePicker
                   value={card.path}
@@ -224,18 +243,25 @@ export function CardActionModal({
                   onChange={(key) => doAction((c) => cardActions.sect(c, key), false)}
                 />
               )}
-              <button className="btn-close" title="Close" onClick={onClose} />
+              <button
+                type="button"
+                title="Close"
+                onClick={onClose}
+                className="p-1 rounded hover:bg-hover text-ink-muted"
+              >
+                <X size={14} />
+              </button>
             </span>
           </div>
-          <div className="modal-body">
+          <div className="p-4 text-center">
             <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={definition.displayName} />
-            <div className="input-group mt-2">
-              <label className="input-group-text">
-                <i className="bi bi-tag" />
-              </label>
+            <div className="flex items-stretch mt-2">
+              <span className="flex items-center rounded-l border border-r-0 border-line bg-panel px-2 text-ink-muted">
+                <Tag size={14} />
+              </span>
               <input
                 type="text"
-                className="form-control"
+                className="flex-1 min-w-0 rounded-r border border-line bg-surface/70 px-2 py-1 text-sm text-ink outline-none focus:border-accent/60"
                 placeholder="Add a label for all players to see."
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
@@ -246,44 +272,37 @@ export function CardActionModal({
               />
             </div>
           </div>
-          <div className="modal-footer d-flex flex-column flex-wrap justify-content-center">
+          <div className="flex flex-col items-center p-3 border-t border-line">
             {(showCounters || showTransfers) && (
-              <div className="d-flex justify-content-between fs-5 rounded-pill align-items-center bg-danger-subtle gap-1 p-1">
+              <div className="flex justify-between items-center gap-1 rounded-full bg-blood/15 p-1 text-lg">
                 {showCounters && (
                   <div
-                    className={`badge rounded-pill ${counterStyle} fs-5 gap-1 d-flex align-items-center`}
+                    className={`${PILL} ${counterStyle} gap-1 text-base cursor-pointer`}
                     title="Counters; click right side to increase, left to decrease"
-                    style={{ cursor: 'pointer' }}
                     onClick={(e) => vialClick(e, () => doAction(cardActions.addCounter, false), () => doAction(cardActions.removeCounter, false))}
                   >
-                    <i className="bi bi-dash-lg" />
+                    <Minus size={13} />
                     {counterText}
-                    <i className="bi bi-plus-lg" />
+                    <Plus size={13} />
                   </div>
                 )}
                 {showTransfers && (
                   <>
-                    <div className="fs-3" style={{ cursor: 'pointer' }} title="Transfer one pool to this card" onClick={() => doAction(cardActions.transferToCard, false)}>
+                    <div className="text-2xl cursor-pointer px-1" title="Transfer one pool to this card" onClick={() => doAction(cardActions.transferToCard, false)}>
                       &#9668;
                     </div>
-                    <div className="fs-3" style={{ cursor: 'pointer' }} title="Transfer one blood to your pool" onClick={() => doAction(cardActions.transferToPool, false)}>
+                    <div className="text-2xl cursor-pointer px-1" title="Transfer one blood to your pool" onClick={() => doAction(cardActions.transferToPool, false)}>
                       &#9658;
                     </div>
-                    <div className="badge rounded-pill text-bg-danger fs-5">{ctx.controllerPool} pool</div>
+                    <div className={`${PILL} bg-blood text-surface text-base`}>{ctx.controllerPool} pool</div>
                   </>
                 )}
               </div>
             )}
-            <div className="mt-2">
+            <div className="mt-2 flex flex-wrap justify-center">
               {BUTTONS.map((btn) =>
                 buttonVisible(btn, ctx.regionCommandKey, locked, contested, isOwner, ctx.isChild, minion) ? (
-                  <button
-                    key={btn.key}
-                    type="button"
-                    className="btn btn-outline-dark m-1"
-                    title={btn.title}
-                    onClick={() => doAction(btn.action)}
-                  >
+                  <button key={btn.key} type="button" className={ACTION_BTN} title={btn.title} onClick={() => doAction(btn.action)}>
                     {btn.label}
                   </button>
                 ) : null,

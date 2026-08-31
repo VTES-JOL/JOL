@@ -1,3 +1,4 @@
+import { Eye, EyeOff, Flame } from 'lucide-react';
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
 import { CardHidden } from './CardHidden';
 import { Clan } from './Clan';
@@ -5,15 +6,17 @@ import { Sect } from './Sect';
 import { Path } from './Path';
 
 export const COUNTER_STYLE = (hasLife: boolean, hasBlood: boolean, capacity: number, otherVisibleRegion: boolean) => {
-  if (hasLife && otherVisibleRegion) return 'text-bg-success';
-  if (hasBlood || capacity > 0) return 'text-bg-danger';
-  return 'text-bg-secondary';
+  if (hasLife && otherVisibleRegion) return 'bg-online text-surface';
+  if (hasBlood || capacity > 0) return 'bg-blood text-surface';
+  return 'bg-hover text-ink-muted';
 };
 
 // region.jsp's RegionType.OTHER_VISIBLE_REGIONS — regions visible to
 // opponents too (READY, ASH_HEAP, TORPOR, REMOVED_FROM_GAME), used only to
 // pick the counter badge color (green="life" counters vs red="blood"/capacity).
 export const OTHER_VISIBLE_REGIONS = new Set(['READY', 'ASH_HEAP', 'TORPOR', 'REMOVED_FROM_GAME']);
+
+const PILL = 'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium';
 
 export interface TableCardClick {
   coordinate: string;
@@ -46,49 +49,43 @@ export function Card({
   const showCounterBadge = (card.counters ?? 0) > 0 || (card.capacity ?? 0) > 0;
   const counterStyle = COUNTER_STYLE(!!card.hasLife, !!card.hasBlood, card.capacity ?? 0, OTHER_VISIBLE_REGIONS.has(region));
   const regionStyle = region === 'TORPOR' ? 'opacity-75' : '';
-  const contestedStyle = card.contested ? 'bg-warning-subtle' : '';
+  const contestedStyle = card.contested ? 'bg-gold/15' : '';
 
   return (
     <li
-      className={`list-group-item d-flex justify-content-between align-items-baseline px-2 pt-2 pb-1 ${regionStyle} ${shadow ? 'shadow' : ''} ${contestedStyle}`}
+      className={`flex justify-between items-baseline px-2 pt-2 pb-1 border-b border-line/50 ${regionStyle} ${shadow ? 'shadow-sm' : ''} ${contestedStyle}`}
       onClick={onAction ? () => onAction({ coordinate, card, isChild }) : undefined}
       style={onAction ? { cursor: 'pointer' } : undefined}
     >
-      <div className="mx-1 me-auto w-100">
-        <div className="d-flex justify-content-between">
-          <div className="d-flex flex-column">
-            <div className="d-flex align-items-center gap-1">
+      <div className="mx-1 me-auto w-full">
+        <div className="flex justify-between">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1">
               <a data-card-id={card.cardId} data-secured={card.playtest ? 'true' : undefined} className="card-name text-wrap">
                 {card.name}
                 {card.advanced && <i className="icon adv" />}
               </a>
-              {hasVotes && <span className="badge rounded-pill text-bg-warning">{card.votes}</span>}
+              {hasVotes && <span className={`${PILL} bg-gold text-surface`}>{card.votes}</span>}
               {card.contested && (
-                <span className="badge text-bg-warning p-1 px-2" style={{ fontSize: '0.7rem' }}>
-                  CONTESTED
-                </span>
+                <span className={`${PILL} bg-gold text-surface text-[0.7rem]`}>CONTESTED</span>
               )}
             </div>
-            <div className="d-flex align-items-center gap-1">
+            <div className="flex items-center gap-1">
               {(card.disciplines ?? []).map((disc) => (
                 <span key={disc} className={`icon ${disc}`} />
               ))}
             </div>
-            <div className="d-flex align-items-center gap-1">
-              <span className="badge bg-light text-black shadow border border-secondary-subtle">{card.label}</span>
+            <div className="flex items-center gap-1">
+              <span className={`${PILL} bg-hover text-ink border border-line`}>{card.label}</span>
             </div>
           </div>
-          <div className="d-flex flex-column">
-            <div className="d-flex justify-content-end align-items-center gap-1">
-              {card.infernal && <i className="bi bi-fire text-danger fs-6" />}
-              {card.locked && (
-                <span className="badge text-bg-dark p-1 px-2" style={{ fontSize: '0.7rem' }}>
-                  LOCKED
-                </span>
-              )}
-              {showCounterBadge && <span className={`badge rounded-pill shadow ${counterStyle}`}>{counterText}</span>}
+          <div className="flex flex-col">
+            <div className="flex justify-end items-center gap-1">
+              {card.infernal && <Flame size={14} className="text-blood" />}
+              {card.locked && <span className={`${PILL} bg-ink text-base text-[0.7rem]`}>LOCKED</span>}
+              {showCounterBadge && <span className={`${PILL} ${counterStyle} shadow-sm`}>{counterText}</span>}
             </div>
-            <div className="d-flex justify-content-end align-items-center gap-1">
+            <div className="flex justify-end items-center gap-1">
               <Path value={card.path} />
               <Sect value={card.sect} />
               <Clan value={card.clan} />
@@ -96,7 +93,7 @@ export function Card({
           </div>
         </div>
         {(card.cards?.length ?? 0) > 0 && (
-          <ol className="list-group list-group-numbered ms-n3">
+          <ol className="list-none -ml-3">
             {card.cards!.map((nested, i) => (
               <NestedCard key={nested.id} card={nested} region={region} coordinate={`${coordinate}.${i + 1}`} onAction={onAction} />
             ))}
@@ -126,5 +123,9 @@ function NestedCard({
 }
 
 export function RegionLabelBadges({ region }: { region: RegionSnapshot }) {
-  return region.openHand ? <i className="bi bi-eye" /> : region.hiddenHand ? <i className="bi bi-eye-slash" /> : null;
+  return region.openHand ? (
+    <Eye size={13} className="inline" />
+  ) : region.hiddenHand ? (
+    <EyeOff size={13} className="inline" />
+  ) : null;
 }

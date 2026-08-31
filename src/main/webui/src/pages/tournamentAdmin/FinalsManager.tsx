@@ -1,28 +1,31 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { GripVertical, Shuffle } from 'lucide-react';
 import { api } from '../../api/client';
 import type { PlayerStanding, TournamentRegistration } from '../../api/types';
 import { alertDialog, confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
+import { Button } from '../../components/ui/Button';
+import { Switch } from '../../components/ui/Switch';
+import { InlineAlert } from '../../components/ui/FormFeedback';
 import { draggableChip, dropTarget, type DragPayload } from './dragDrop';
 
 // tournament-admin/tournament-final.jsp's #finalSeeding crypt-reveal panel
 // (ds.js's startSeeding()/callbackFinalSeeding()) is never jsp:include'd by
-// tournament-admin/layout.jsp — dead markup, same as links.jsp/dark-pack.jsp
-// were for main. Not ported; the player-facing tournament/tournament-final.jsp
-// is the live version of that feature, out of scope here.
+// tournament-admin/layout.jsp — dead markup. Not ported; the player-facing
+// tournament/tournament-final.jsp is the live version, out of scope here.
 
 function Chip({ registration, from }: { registration: TournamentRegistration; from: 'pool' | 'table' }) {
   return (
     <li
-      className="border rounded p-2 border-secondary d-flex justify-content-between align-items-center"
+      className="border border-line-accent rounded p-2 flex justify-between items-center gap-2 bg-surface cursor-grab"
       {...draggableChip({ player: registration.player, from })}
     >
-      <div className="d-flex flex-column">
+      <div className="flex flex-col">
         <span>{registration.player}</span>
-        <span className="fw-bold">{registration.vekn}</span>
+        <span className="font-bold text-xs">{registration.vekn}</span>
       </div>
-      <i className="bi bi-grip-vertical" />
+      <GripVertical size={14} className="text-ink-muted" />
     </li>
   );
 }
@@ -59,26 +62,20 @@ function FinalistSelection({ tournamentName, onSaved }: { tournamentName: string
   return (
     <div>
       <p className="mb-2">Select 5 players for the finals:</p>
-      <div className="mb-3">
+      <div className="mb-3 flex flex-col gap-1">
         {standings.map((s, i) => (
-          <div className="form-check" key={s.player}>
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id={`finalist-${i}`}
-              checked={selected.has(s.player)}
-              onChange={() => toggle(s.player)}
-            />
-            <label className="form-check-label" htmlFor={`finalist-${i}`}>
-              {s.rank}. {s.player}
-              {s.vekn ? ` (${s.vekn})` : ''} — {s.gw} GW, {s.vp} VP
-            </label>
-          </div>
+          <Switch
+            key={s.player}
+            id={`finalist-${i}`}
+            checked={selected.has(s.player)}
+            onChange={() => toggle(s.player)}
+            label={`${s.rank}. ${s.player}${s.vekn ? ` (${s.vekn})` : ''} — ${s.gw} GW, ${s.vp} VP`}
+          />
         ))}
       </div>
-      <button className="btn btn-success btn-sm" onClick={save}>
+      <Button size="sm" className="bg-online text-surface hover:opacity-90" onClick={save}>
         Save Finals Selection
-      </button>
+      </Button>
     </div>
   );
 }
@@ -101,9 +98,6 @@ function FinalTableBuilder({ tournamentName, onSaved }: { tournamentName: string
 
   const started = data?.isStarted ?? false;
 
-  // Query data is the source of truth on (re)load; pool/table are then a
-  // local editable buffer the drag-and-drop below mutates freely, same as
-  // DraftTableManager's round state.
   useEffect(() => {
     if (!data) return;
     setTable(data.finalPlayers);
@@ -151,32 +145,35 @@ function FinalTableBuilder({ tournamentName, onSaved }: { tournamentName: string
   };
 
   if (started) {
-    return <div className="alert alert-info mt-2">Finals already started — see seating below.</div>;
+    return (
+      <InlineAlert kind="success" className="mt-2">
+        Finals already started — see seating below.
+      </InlineAlert>
+    );
   }
 
   return (
     <div>
-      <div className="d-flex gap-1 flex-wrap mb-2">
-        <button onClick={saveFinal} className="btn btn-outline-secondary btn-sm">
+      <div className="flex gap-1 flex-wrap mb-2">
+        <Button variant="secondary" size="sm" onClick={saveFinal}>
           Save Final
-        </button>
-        <button onClick={startFinal} className="btn btn-outline-success btn-sm">
+        </Button>
+        <Button size="sm" className="bg-online text-surface hover:opacity-90" onClick={startFinal}>
           Start Final
-        </button>
+        </Button>
       </div>
-      <span className="h4">Tournament Players</span>
-      <ul className="list-unstyled d-flex flex-wrap gap-2 p-1" {...dropTarget((payload) => move(payload, 'pool'))}>
+      <span className="text-lg font-semibold">Tournament Players</span>
+      <ul className="list-none flex flex-wrap gap-2 p-1 min-h-8" {...dropTarget((payload) => move(payload, 'pool'))}>
         {pool.map((r) => (
           <Chip key={r.player} registration={r} from="pool" />
         ))}
       </ul>
-      <div className="card-body p-1">
-        <span className="h4">
-          Final Table <i className="bi bi-shuffle ms-2" role="button" onClick={shuffle} />
+      <div className="p-1">
+        <span className="text-lg font-semibold flex items-center gap-2">
+          Final Table <Shuffle size={16} role="button" className="cursor-pointer text-ink-muted hover:text-ink" onClick={shuffle} />
         </span>
         <ul
-          className="border list-group"
-          style={{ minHeight: 38 }}
+          className="border border-line rounded list-none min-h-9 p-1 flex flex-col gap-1"
           {...dropTarget((payload) => move(payload, 'table'))}
         >
           {table.map((r) => (
@@ -202,7 +199,7 @@ export function FinalsManager({ tournamentName }: { tournamentName: string }) {
   if (seeding === undefined) return null;
 
   return (
-    <div className="flex-fill overflow-auto mt-2 min-h-0">
+    <div className="flex-1 min-h-0 overflow-auto mt-2">
       {seeding.length > 0 ? (
         <FinalTableBuilder tournamentName={tournamentName} onSaved={load} />
       ) : (

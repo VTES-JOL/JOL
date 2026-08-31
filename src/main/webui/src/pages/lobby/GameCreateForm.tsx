@@ -75,7 +75,7 @@ export function GameCreateForm({ onCancel, onCreated }: { onCancel: () => void; 
         </Button>
       }
     >
-      <div className="jt:flex-1 jt:min-h-0 jt:overflow-y-auto jt:p-4 jt:flex jt:flex-col jt:gap-3">
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 flex flex-col gap-3">
         <Input
           label="Name"
           maxLength={60}
@@ -101,8 +101,8 @@ export function GameCreateForm({ onCancel, onCreated }: { onCancel: () => void; 
 
         {visibility === 'PRIVATE' && (
           <div>
-            <label className="jt:block jt:text-xs jt:text-ink-muted jt:mb-1">Invite Players</label>
-            <div className="jt:flex jt:gap-2 jt:mb-2">
+            <label className="block text-xs text-ink-muted mb-1">Invite Players</label>
+            <div className="flex gap-2 mb-2">
               <Input
                 srLabel="Player name"
                 list="lobby-players"
@@ -122,9 +122,9 @@ export function GameCreateForm({ onCancel, onCreated }: { onCancel: () => void; 
                 Add
               </Button>
             </div>
-            <ul className="jt:text-sm">
+            <ul className="text-sm">
               {pendingInvites.map((p) => (
-                <li key={p} className="jt:flex jt:justify-between jt:items-center jt:py-1 jt:border-b jt:border-line/50">
+                <li key={p} className="flex justify-between items-center py-1 border-b border-line/50">
                   <span>{p}</span>
                   <Button variant="ghost" size="sm" aria-label="Remove" onClick={() => removeInvite(p)}>
                     <X size={12} />
@@ -135,7 +135,7 @@ export function GameCreateForm({ onCancel, onCreated }: { onCancel: () => void; 
           </div>
         )}
 
-        <div className="jt:flex jt:items-center jt:gap-2">
+        <div className="flex items-center gap-2">
           <Button variant="secondary" size="sm" icon={<PlusCircle size={14} />} onClick={create}>
             Create Game
           </Button>

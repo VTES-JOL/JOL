@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { api } from '../../api/client';
 import { confirmDialog } from '../../stores/dialog';
-import { Modal } from '../../components/Modal';
+import { Modal } from '../../components/ui/Modal';
+import { Button } from '../../components/ui/Button';
+import { Textarea } from '../../components/ui/Textarea';
+import { InlineAlert } from '../../components/ui/FormFeedback';
 
 export function ImportTablesModal({
   tournamentName,
@@ -43,29 +46,29 @@ export function ImportTablesModal({
       title="Import Tables from CSV"
       footer={
         <>
-          <button type="button" className="btn btn-secondary" onClick={onClose}>
+          <Button variant="secondary" size="sm" onClick={onClose}>
             Cancel
-          </button>
-          <button type="button" className="btn btn-primary" onClick={submit}>
+          </Button>
+          <Button variant="primary" size="sm" onClick={submit}>
             Import
-          </button>
+          </Button>
         </>
       }
     >
-      <div className="modal-body">
-        <p className="text-muted small">
-          Paste CSV data with columns <code>Round</code>, <code>Table</code>, <code>Player</code>. The header row is
-          required.
-        </p>
-        <textarea
-          className="form-control font-monospace"
-          rows={14}
-          placeholder={'"Round","Table","Player"\n"1","1","PlayerOne"\n"1","1","PlayerTwo"'}
-          value={csvData}
-          onChange={(e) => setCsvData(e.target.value)}
-        />
-        {error && <div className="alert alert-danger mt-2">{error}</div>}
-      </div>
+      <p className="text-xs text-ink-muted">
+        Paste CSV data with columns <code className="bg-hover px-1 rounded">Round</code>,{' '}
+        <code className="bg-hover px-1 rounded">Table</code>,{' '}
+        <code className="bg-hover px-1 rounded">Player</code>. The header row is required.
+      </p>
+      <Textarea
+        srLabel="CSV data"
+        className="font-mono text-xs"
+        rows={14}
+        placeholder={'"Round","Table","Player"\n"1","1","PlayerOne"\n"1","1","PlayerTwo"'}
+        value={csvData}
+        onChange={(e) => setCsvData(e.target.value)}
+      />
+      {error && <InlineAlert kind="danger">{error}</InlineAlert>}
     </Modal>
   );
 }

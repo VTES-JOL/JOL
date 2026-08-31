@@ -174,11 +174,11 @@ export function GlobalChat() {
   }, [sending]);
 
   return (
-    <Card className="jt:flex jt:flex-col jt:flex-1 jt:min-h-0 jt:overflow-hidden">
+    <Card className="flex flex-col flex-1 min-h-0 overflow-hidden">
       <CardHeader>
         <CardTitle>Global Chat</CardTitle>
       </CardHeader>
-      <div className="jt:relative jt:flex jt:flex-col jt:flex-1 jt:min-h-0 jt:p-2">
+      <div className="relative flex flex-col flex-1 min-h-0 p-2">
         {/*
           overflowY/minHeight inline as well as in the co-located
           #globalChatOutput rule (GlobalChat.css) — belt-and-braces so the
@@ -190,7 +190,7 @@ export function GlobalChat() {
         <div
           id="globalChatOutput"
           ref={outputRef}
-          className="jt:flex-1"
+          className="flex-1"
           style={{ minHeight: 0, overflowY: 'auto' }}
           onScroll={handleScroll}
         >
@@ -201,7 +201,7 @@ export function GlobalChat() {
                   <span className="chat-day-label">{day}</span>
                 </div>
               )}
-              <p className={`chat${isMention ? ' jt:bg-arcane/10 jt:rounded jt:px-1' : ''}`}>
+              <p className={`chat${isMention ? ' bg-arcane/10 rounded px-1' : ''}`}>
                 <span className="chat-timestamp" title={localTimeTitle(entry.timestamp)}>
                   {utcTime(entry.timestamp)}
                 </span>
@@ -215,8 +215,8 @@ export function GlobalChat() {
           ))}
         </div>
         <div
-          className={`hover-success jt:absolute jt:rounded jt:bg-online jt:text-surface jt:p-2 jt:justify-between jt:items-center jt:cursor-pointer ${
-            hasNewMessages ? 'jt:flex' : 'jt:hidden'
+          className={`hover-success absolute rounded bg-online text-surface p-2 justify-between items-center cursor-pointer ${
+            hasNewMessages ? 'flex' : 'hidden'
           }`}
           style={{ bottom: '3.3rem', left: '1rem', width: 'calc(100% - 2rem)' }}
           onClick={scrollToBottom}
@@ -225,10 +225,10 @@ export function GlobalChat() {
           <span>New Messages</span>
           <ChevronsDown size={16} />
         </div>
-        <div className="jt:flex jt:gap-2 jt:mt-2">
+        <div className="flex gap-2 mt-2">
           <input
             ref={inputRef}
-            className="jt:w-full jt:rounded-full jt:border jt:border-line-accent jt:bg-surface/70 jt:px-4 jt:py-1.5 jt:text-sm jt:text-ink jt:placeholder:text-ink-muted jt:outline-none jt:focus:border-accent/60"
+            className="w-full rounded-full border border-line-accent bg-surface/70 px-4 py-1.5 text-sm text-ink placeholder:text-ink-muted outline-none focus:border-accent/60"
             placeholder="Chat with players..."
             value={text}
             disabled={sending}

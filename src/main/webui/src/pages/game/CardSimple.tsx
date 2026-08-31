@@ -20,20 +20,22 @@ export function CardSimple({
 
   return (
     <li
-      className={`flex-grow-1 list-group-item d-flex justify-content-between align-items-center p-1 shadow ${regionStyle}`}
+      className={`flex justify-between items-center p-1 border-b border-line/50 ${regionStyle}`}
       onClick={onClick}
       style={onClick ? { cursor: 'pointer' } : undefined}
     >
-      <div className="mx-1 me-auto w-100 align-items-center">
-        <div className="d-flex justify-content-between align-items-center w-100">
+      <div className="mx-1 me-auto w-full">
+        <div className="flex justify-between items-center w-full">
           <span>
             <a data-card-id={card.cardId} data-secured={card.playtest ? 'true' : undefined} className="card-name text-wrap">
               {card.name}
               {card.advanced && <i className="icon adv" />}
             </a>
           </span>
-          <span className="d-flex gap-1 align-items-center">
-            <span className="badge bg-light text-black shadow border-secondary-subtle">{card.label}</span>
+          <span className="flex gap-1 items-center">
+            <span className="inline-flex items-center rounded bg-hover text-ink border border-line px-1.5 text-xs">
+              {card.label}
+            </span>
             <span className={`icon card-type ${card.typeClass ?? ''}`} />
             {card.hasBlood && (
               <span>

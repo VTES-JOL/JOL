@@ -1,6 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Card, CardHeader, CardTitle } from '../../components/Card';
+import { Save, Send } from 'lucide-react';
+import { Panel } from '../../components/ui/Panel';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Select } from '../../components/ui/Select';
+import { Textarea } from '../../components/ui/Textarea';
 import { api } from '../../api/client';
 import type { TournamentDetails, TournamentRegistration } from '../../api/types';
 import { confirmDialog } from '../../stores/dialog';
@@ -40,27 +45,27 @@ const BLANK: FormState = {
   status: 'EDIT',
 };
 
+const DATE_INPUT =
+  'w-full rounded border border-line bg-surface/70 px-2 py-1 text-sm text-ink outline-none focus:border-accent/60';
+
 function FormRow({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="row mb-2">
-      <label className="col-form-label col-3">{label}</label>
-      <div className="col-9">{children}</div>
+    <div className="grid grid-cols-[7rem_1fr] items-center gap-2 mb-2">
+      <label className="text-xs text-ink-muted">{label}</label>
+      <div>{children}</div>
     </div>
   );
 }
 
 function RuleList({ rules, onRemove }: { rules: string[]; onRemove: (i: number) => void }) {
   return (
-    <div className="mb-2">
+    <div className="mb-2 flex flex-col gap-1">
       {rules.map((rule, i) => (
-        <div className="border rounded m-1" key={i}>
-          <label className="form-label m-1">{rule}</label>
-          <button
-            className="btn btn-outline-secondary btn-sm mt-2 form-control m-1"
-            onClick={() => onRemove(i)}
-          >
-            Remove Rule
-          </button>
+        <div className="border border-line rounded p-2 flex justify-between items-center gap-2" key={i}>
+          <span className="text-sm">{rule}</span>
+          <Button variant="secondary" size="sm" onClick={() => onRemove(i)}>
+            Remove
+          </Button>
         </div>
       ))}
     </div>
@@ -210,127 +215,104 @@ export function TournamentEditor({
   };
 
   return (
-    <Card className="flex-fill d-flex flex-column">
-      <CardHeader>
-        <span className="d-flex justify-content-between align-items-center w-100">
-          <CardTitle>Tournament</CardTitle>
-          <span className="d-flex gap-1 align-items-center">
-            {msg && (
-              <span className={`badge text-bg-light me-1 ${msg.kind === 'success' ? 'text-success' : 'text-warning'}`}>
-                {msg.text}
-              </span>
-            )}
-            <button className="btn btn-sm btn-outline-secondary" onClick={save}>
-              Save <i className="bi-floppy" />
-            </button>
-            {form.status === 'EDIT' && (
-              <button className="btn btn-sm btn-success" onClick={publish}>
-                Publish <i className="bi-send" />
-              </button>
-            )}
-          </span>
+    <Panel
+      title="Tournament"
+      right={
+        <span className="flex items-center gap-1">
+          {msg && (
+            <span className={`text-xs ${msg.kind === 'success' ? 'text-online' : 'text-gold'}`}>{msg.text}</span>
+          )}
+          <Button variant="secondary" size="sm" icon={<Save size={13} />} onClick={save}>
+            Save
+          </Button>
+          {form.status === 'EDIT' && (
+            <Button size="sm" icon={<Send size={13} />} className="bg-online text-surface hover:opacity-90" onClick={publish}>
+              Publish
+            </Button>
+          )}
         </span>
-      </CardHeader>
-      <div className="card-body p-2 flex-fill overflow-auto px-3 min-h-0">
+      }
+    >
+      <div className="flex-1 min-h-0 overflow-y-auto p-3 text-sm">
         <FormRow label="Name">
-          <input className="form-control form-control-sm" value={form.name} onChange={(e) => set('name', e.target.value)} />
+          <input className={DATE_INPUT} value={form.name} onChange={(e) => set('name', e.target.value)} />
         </FormRow>
         <FormRow label="Reg Start">
-          <input
-            type="date"
-            className="form-control form-control-sm"
-            value={form.regStart}
-            onChange={(e) => set('regStart', e.target.value)}
-          />
+          <input type="date" className={DATE_INPUT} value={form.regStart} onChange={(e) => set('regStart', e.target.value)} />
         </FormRow>
         <FormRow label="Reg End">
-          <input
-            type="date"
-            className="form-control form-control-sm"
-            value={form.regEnd}
-            onChange={(e) => set('regEnd', e.target.value)}
-          />
+          <input type="date" className={DATE_INPUT} value={form.regEnd} onChange={(e) => set('regEnd', e.target.value)} />
         </FormRow>
         <FormRow label="Play Start">
-          <input
-            type="date"
-            className="form-control form-control-sm"
-            value={form.playStart}
-            onChange={(e) => set('playStart', e.target.value)}
-          />
+          <input type="date" className={DATE_INPUT} value={form.playStart} onChange={(e) => set('playStart', e.target.value)} />
         </FormRow>
         <FormRow label="Play End">
-          <input
-            type="date"
-            className="form-control form-control-sm"
-            value={form.playEnd}
-            onChange={(e) => set('playEnd', e.target.value)}
-          />
+          <input type="date" className={DATE_INPUT} value={form.playEnd} onChange={(e) => set('playEnd', e.target.value)} />
         </FormRow>
         <FormRow label="Rounds">
-          <select className="form-select form-select-sm" value={form.numOfRounds} onChange={(e) => set('numOfRounds', e.target.value)}>
+          <Select size="sm" value={form.numOfRounds} onChange={(e) => set('numOfRounds', e.target.value)}>
             {[2, 3].map((n) => (
               <option key={n} value={n}>
                 {n}
               </option>
             ))}
-          </select>
+          </Select>
         </FormRow>
         <FormRow label="VEKN ID">
-          <select className="form-select form-select-sm" value={form.reqId} onChange={(e) => set('reqId', e.target.value)}>
+          <Select size="sm" value={form.reqId} onChange={(e) => set('reqId', e.target.value)}>
             <option value="true">Required</option>
             <option value="false">Not Required</option>
-          </select>
+          </Select>
         </FormRow>
         <FormRow label="Format">
-          <select className="form-select form-select-sm" value={form.tourFormat} onChange={(e) => set('tourFormat', e.target.value)}>
+          <Select size="sm" value={form.tourFormat} onChange={(e) => set('tourFormat', e.target.value)}>
             <option value="SINGLE_DECK">Single Deck</option>
             <option value="MULTI_DECK">Multi-Deck</option>
-          </select>
+          </Select>
         </FormRow>
         <FormRow label="Game">
-          <select className="form-select form-select-sm" value={form.gameFormat} onChange={(e) => set('gameFormat', e.target.value)}>
+          <Select size="sm" value={form.gameFormat} onChange={(e) => set('gameFormat', e.target.value)}>
             <option value="STANDARD">Standard</option>
             <option value="V5">V5</option>
             <option value="DUEL">Duel</option>
             <option value="PLAYTEST">Playtest</option>
-          </select>
+          </Select>
         </FormRow>
-        <label className="form-label small text-muted mb-1">Tournament Rules</label>
-        <div className="input-group input-group-sm mb-1">
-          <input
-            className="form-control form-control-sm"
-            placeholder="Add a rule..."
-            value={ruleText}
-            onChange={(e) => setRuleText(e.target.value)}
-          />
-          <button onClick={addRule} className="btn btn-outline-secondary btn-sm">
+
+        <label className="block text-xs text-ink-muted mb-1">Tournament Rules</label>
+        <div className="flex gap-1 mb-1">
+          <Input srLabel="Rule" size="sm" placeholder="Add a rule..." value={ruleText} onChange={(e) => setRuleText(e.target.value)} />
+          <Button variant="secondary" size="sm" onClick={addRule}>
             Add
-          </button>
+          </Button>
         </div>
         <RuleList rules={form.rules} onRemove={(i) => set('rules', form.rules.filter((_, idx) => idx !== i))} />
-        <label className="form-label small text-muted mb-1">Special Rules Condition</label>
-        <textarea
+
+        <label className="block text-xs text-ink-muted mb-1">Special Rules Condition</label>
+        <Textarea
+          srLabel="Special rules condition"
           rows={3}
-          className="form-control form-control-sm mb-2"
+          className="mb-2 text-sm"
           value={form.specRulesCon}
           onChange={(e) => set('specRulesCon', e.target.value)}
         />
-        <div className="input-group input-group-sm mb-1">
-          <input
-            className="form-control form-control-sm"
+        <div className="flex gap-1 mb-1">
+          <Input
+            srLabel="Special rule"
+            size="sm"
             placeholder="Add a special rule..."
             value={specRuleText}
             onChange={(e) => setSpecRuleText(e.target.value)}
           />
-          <button onClick={addSpecRule} className="btn btn-outline-secondary btn-sm">
+          <Button variant="secondary" size="sm" onClick={addSpecRule}>
             Add
-          </button>
+          </Button>
         </div>
         <RuleList rules={form.specRules} onRemove={(i) => set('specRules', form.specRules.filter((_, idx) => idx !== i))} />
+
         <div className="mt-2">
           <strong>Registered Players</strong>
-          <ul className="list-unstyled small mb-0">
+          <ul className="list-none text-sm mb-0">
             {registeredPlayers.map((reg) => (
               <li key={reg.player}>
                 {reg.player}
@@ -340,6 +322,6 @@ export function TournamentEditor({
           </ul>
         </div>
       </div>
-    </Card>
+    </Panel>
   );
 }

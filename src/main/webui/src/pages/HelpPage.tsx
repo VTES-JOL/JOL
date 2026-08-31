@@ -12,20 +12,20 @@ export function HelpPage() {
   const [navOpen, setNavOpen] = useState(false);
 
   return (
-    <div className="jt-scope help-layout">
+    <div className="help-layout">
       <aside className="help-sidebar">
         <button
-          className="jt:lg:hidden jt:w-full jt:flex jt:items-center jt:justify-between jt:px-3 jt:py-2 jt:rounded jt:border jt:border-line-accent jt:text-ink-secondary jt:hover:bg-hover"
+          className="lg:hidden w-full flex items-center justify-between px-3 py-2 rounded border border-line-accent text-ink-secondary hover:bg-hover"
           onClick={() => setNavOpen((open) => !open)}
           aria-expanded={navOpen}
           aria-controls="helpNav"
         >
           Help Sections
-          <ChevronDown size={16} className={`jt:transition-transform ${navOpen ? 'jt:rotate-180' : ''}`} />
+          <ChevronDown size={16} className={`transition-transform ${navOpen ? 'rotate-180' : ''}`} />
         </button>
         <nav
           id="helpNav"
-          className={`help-nav jt:flex-col ${navOpen ? 'jt:flex' : 'jt:hidden'} jt:lg:flex`}
+          className={`help-nav flex-col ${navOpen ? 'flex' : 'hidden'} lg:flex`}
         >
           {HELP_SECTIONS.map((section) => (
             <NavLink
