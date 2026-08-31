@@ -40,7 +40,7 @@ export function ProfilePage() {
   }
 
   return (
-    <div className="grid gap-4 p-4 bg-base md:grid-cols-2 lg:grid-cols-3 content-start">
+    <div className="grid gap-4 p-4 bg-base md:grid-cols-2 lg:grid-cols-3 content-start flex-1 min-h-0 overflow-y-auto">
       <ProfileEditor profile={profile} countries={countries} onSaved={onSaved} />
       <AccountEditor />
       <Preferences profile={profile} onSaved={onSaved} />

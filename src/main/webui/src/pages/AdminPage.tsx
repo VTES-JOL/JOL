@@ -44,7 +44,7 @@ export function AdminPage() {
   }
 
   return (
-    <div className="grid gap-4 p-4 bg-base lg:grid-cols-3 content-start">
+    <div className="grid gap-4 p-4 bg-base lg:grid-cols-3 content-start flex-1 min-h-0 overflow-y-auto">
       <div className="flex flex-col gap-3">
         <PlayerRoles />
       </div>
