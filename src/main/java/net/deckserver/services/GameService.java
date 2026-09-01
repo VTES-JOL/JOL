@@ -14,6 +14,7 @@ import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.repository.GameActivityRepository;
 import net.deckserver.jpa.repository.GameChatMessageRepository;
 import net.deckserver.jpa.repository.GameChatRepository;
+import net.deckserver.jpa.repository.GameCommandErrorRepository;
 import net.deckserver.jpa.repository.GameInfoRepository;
 import net.deckserver.jpa.repository.GameSnapshotRepository;
 import net.deckserver.jpa.repository.GameStateRepository;
@@ -44,6 +45,7 @@ public class GameService extends PersistedService {
     private static final GameStateRepository gameStateRepository = new GameStateRepository();
     private static final GameChatRepository gameChatRepository = new GameChatRepository();
     private static final GameChatMessageRepository gameChatMessageRepository = new GameChatMessageRepository();
+    private static final GameCommandErrorRepository gameCommandErrorRepository = new GameCommandErrorRepository();
     private static final GameSnapshotRepository gameSnapshotRepository = new GameSnapshotRepository();
     private static final GameActivityRepository gameActivityRepository = new GameActivityRepository();
     private static GameService instance() {
@@ -175,6 +177,7 @@ public class GameService extends PersistedService {
                 em -> {
                     gameSnapshotRepository.deleteAllForGame(em, gameId);
                     gameChatMessageRepository.deleteForGame(em, gameId);
+                    gameCommandErrorRepository.deleteForGame(em, gameId);
                     gameChatRepository.delete(em, gameId);
                     gameStateRepository.delete(em, gameId);
                     // must run before gameInfoRepository.delete - looks up the game row by name first

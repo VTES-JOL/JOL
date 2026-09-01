@@ -752,6 +752,109 @@ PYEOF
 success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM game_chat_message;') game chat messages "\
 "($(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM game_chat_message WHERE invocation IS NOT NULL;') with a backfilled command)"
 
+# ── 10a. Failed command attempts (judge-only) ────────────────────────────────
+# The ERROR lines in the per-game command log are mistypes that produced no
+# chat. They land in game_command_error (V19), assigned to the turn whose time
+# span contains them, so a judge can see an attempt was made during a misplay.
+log "Loading failed command attempts..."
+python3 - "$DATA" <<PYEOF | psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -v ON_ERROR_STOP=1 \
+  -c "\copy game_command_error(game_id,turn_label,occurred_at,display_ts,player,raw_command,error_text) FROM STDIN WITH (FORMAT csv)"
+import sys, json, csv, os, datetime, re
+
+data_dir   = sys.argv[1]
+games_dir  = os.path.join(data_dir, "games")
+cmds_dir   = os.path.join(data_dir, "commands")
+loaded_ids = set("""$LOADED_GAME_IDS""".split())
+
+id_to_name = {}
+try:
+    gj = json.load(open(os.path.join(data_dir, "games.json")))
+    for g in (gj.values() if isinstance(gj, dict) else gj):
+        if g.get("id") and g.get("name"):
+            id_to_name[g["id"]] = g["name"]
+except Exception:
+    pass
+
+LOG_RE = re.compile(r'^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})[,.]\d+\s+(INFO|ERROR)\s+\[([^\]]+)\]\s+(.*)\$')
+
+def hist_dt(ts, ref):
+    ts = (ts or "").strip().replace("Sept ", "Sep ")
+    try:
+        t = datetime.datetime.strptime("2000 " + ts, "%Y %d-%b %H:%M")
+    except ValueError:
+        return None
+    cands = []
+    for y in (ref.year - 1, ref.year, ref.year + 1):
+        try:
+            cands.append(datetime.datetime(y, t.month, t.day, t.hour, t.minute))
+        except ValueError:
+            pass
+    return min(cands, key=lambda d: abs((d - ref).total_seconds())) if cands else None
+
+writer = csv.writer(sys.stdout)
+rows = games_seen = 0
+
+for entry in os.scandir(games_dir):
+    if not entry.is_dir() or entry.name not in loaded_ids:
+        continue
+    name = id_to_name.get(entry.name)
+    log_path = os.path.join(cmds_dir, (name or "") + ".log")
+    hist_path = os.path.join(entry.path, "history.json")
+    if not name or not os.path.exists(log_path) or not os.path.exists(hist_path):
+        continue
+
+    try:
+        turns = json.load(open(hist_path))
+    except Exception:
+        continue
+    # (turn_label, first-entry timestamp string) in order
+    turn_marks = []
+    for t in turns:
+        if t.get("turnId") is None or t.get("player") is None:
+            continue
+        chats = t.get("chats", [])
+        first_ts = chats[0].get("timestamp") if chats else None
+        turn_marks.append((f"{t['player']} {t['turnId']}", first_ts))
+    if not turn_marks:
+        continue
+
+    errs = []
+    with open(log_path, encoding="utf-8", errors="replace") as fh:
+        for line in fh:
+            m = LOG_RE.match(line.rstrip("\r\n"))
+            if not m or m.group(2) != "ERROR":
+                continue
+            ts, _lvl, issuer, raw = m.groups()
+            try:
+                dt = datetime.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S")
+            except ValueError:
+                continue
+            errs.append((dt, issuer.strip(), raw.strip()))
+    if not errs:
+        continue
+    games_seen += 1
+
+    for dt, issuer, raw in errs:
+        # turn whose start is the latest that is still <= this error's time
+        label = turn_marks[0][0]
+        for lbl, first_ts in turn_marks:
+            hd = hist_dt(first_ts, dt)
+            if hd is not None and hd <= dt + datetime.timedelta(minutes=1):
+                label = lbl
+            else:
+                break
+        writer.writerow([
+            entry.name, label,
+            dt.replace(tzinfo=datetime.timezone.utc).isoformat(),
+            dt.strftime("%-d-%b %H:%M "),
+            issuer, raw, "",
+        ])
+        rows += 1
+
+print(f"  {rows} failed attempts from {games_seen} game logs", file=sys.stderr)
+PYEOF
+success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM game_command_error;') failed command attempts"
+
 # ── 10b. Game turn snapshots (rollback) ───────────────────────────────────────
 log "Loading game turn snapshots..."
 python3 - "$DATA/games" <<PYEOF | copy_into game_snapshot "game_id,turn,state,created_at"
@@ -1004,7 +1107,7 @@ for tbl in player player_role player_activity \
             game registration \
             deck_info deck_format deck_content \
             tournament tournament_registration \
-            game_state game_chat_message game_snapshot \
+            game_state game_chat_message game_command_error game_snapshot \
             game_activity global_chat game_history \
             refresh_token site_notes subscription metric_event; do
   n=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM $tbl;")

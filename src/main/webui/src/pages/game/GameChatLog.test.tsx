@@ -34,4 +34,33 @@ describe('GameChatLog', () => {
     expect(screen.getByText('plain chat')).toBeInTheDocument();
     expect(document.querySelector('.chat-command')).toBeNull();
   });
+
+  const errors = [
+    { timestamp: '3-Feb 14:06', player: 'ShanDow', command: 'blodo ShanDow ready 2 -1', error: 'Unknown command' },
+  ];
+
+  it('shows mistyped attempts only when showCommands is on', () => {
+    const { rerender } = render(
+      <GameChatLog lines={lines} viewerName={null} showCommands={false} errors={errors} />,
+    );
+    expect(screen.queryByText(/blodo ShanDow/)).toBeNull();
+
+    rerender(<GameChatLog lines={lines} viewerName={null} showCommands errors={errors} />);
+    expect(screen.getByText('blodo ShanDow ready 2 -1')).toBeInTheDocument();
+    expect(screen.getByText(/Unknown command/)).toBeInTheDocument();
+  });
+
+  it('interleaves an attempt by timestamp', () => {
+    render(
+      <GameChatLog
+        lines={[line({ message: 'first', timestamp: '3-Feb 14:05' }), line({ message: 'last', timestamp: '3-Feb 14:07' })]}
+        viewerName={null}
+        showCommands
+        errors={[{ timestamp: '3-Feb 14:06', player: 'ShanDow', command: 'oops' }]}
+      />,
+    );
+    const text = document.body.textContent ?? '';
+    expect(text.indexOf('first')).toBeLessThan(text.indexOf('oops'));
+    expect(text.indexOf('oops')).toBeLessThan(text.indexOf('last'));
+  });
 });

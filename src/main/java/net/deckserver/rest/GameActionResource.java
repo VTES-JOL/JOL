@@ -7,6 +7,7 @@ import net.deckserver.services.GameService;
 import net.deckserver.services.RegistrationService;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.ChatData;
+import net.deckserver.storage.json.game.CommandErrorData;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -100,6 +101,23 @@ public class GameActionResource extends BaseResource {
             return lines;
         }
         return lines.stream().map(GameActionResource::withoutInvocation).toList();
+    }
+
+    /**
+     * Failed command attempts for a turn — mistypes / invalid commands that
+     * produced no chat. Judge-only (a judge not seated in the game); everyone
+     * else gets 403. Surfaced under the game chat "Commands" toggle.
+     */
+    @GET
+    @Path("command-errors")
+    public List<CommandErrorData> getCommandErrors(@QueryParam("turn") String turn) {
+        String player = username();
+        boolean canJudge = JolAdmin.isJudge(player)
+                && !RegistrationService.getPlayers(gameName()).contains(player);
+        if (!canJudge) {
+            throw new ForbiddenException("Command attempts are visible to judges only");
+        }
+        return ChatService.getFailedCommands(JolAdmin.getGameId(gameName()), turn);
     }
 
     private static ChatData withoutInvocation(ChatData c) {

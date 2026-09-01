@@ -17,6 +17,7 @@
         <class>net.deckserver.jpa.entity.GameStateEntity</class>
         <class>net.deckserver.jpa.entity.GameChatEntity</class>
         <class>net.deckserver.jpa.entity.GameChatMessageEntity</class>
+        <class>net.deckserver.jpa.entity.GameCommandErrorEntity</class>
         <class>net.deckserver.jpa.entity.GameHistoryEntity</class>
         <class>net.deckserver.jpa.entity.GameSnapshotEntity</class>
         <class>net.deckserver.jpa.entity.PlayerActivityEntity</class>
@@ -53,6 +54,7 @@
         <class>net.deckserver.jpa.entity.GameStateEntity</class>
         <class>net.deckserver.jpa.entity.GameChatEntity</class>
         <class>net.deckserver.jpa.entity.GameChatMessageEntity</class>
+        <class>net.deckserver.jpa.entity.GameCommandErrorEntity</class>
         <class>net.deckserver.jpa.entity.GameHistoryEntity</class>
         <class>net.deckserver.jpa.entity.GameSnapshotEntity</class>
         <class>net.deckserver.jpa.entity.PlayerActivityEntity</class>

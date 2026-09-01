@@ -77,3 +77,26 @@ p.chat-command code {
     border-radius: 0.2rem;
     padding: 0 0.25rem;
 }
+
+/* Judge-only: a command a player mistyped (produced no chat). */
+p.chat-attempt {
+    margin: 0.15rem 0;
+    font-size: 0.82rem;
+    color: var(--jt-ink-muted);
+}
+
+p.chat-attempt .chat-attempt-icon {
+    color: var(--jt-gold);
+}
+
+p.chat-attempt code {
+    color: var(--jt-ink);
+    background: var(--jt-hover);
+    border-radius: 0.2rem;
+    padding: 0 0.25rem;
+    text-decoration: line-through;
+}
+
+p.chat-attempt .chat-attempt-error {
+    font-style: italic;
+}

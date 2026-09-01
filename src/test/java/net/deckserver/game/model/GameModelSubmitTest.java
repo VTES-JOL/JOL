@@ -3,6 +3,8 @@ package net.deckserver.game.model;
 import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
 import net.deckserver.storage.json.game.ChatData;
+import net.deckserver.storage.json.game.CommandErrorData;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +12,7 @@ import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * The raw player command is bracketed onto the {@link ChatData}s it produces by
@@ -37,6 +40,9 @@ class GameModelSubmitTest {
         ChatService.beginInvocation(player, rawCommand.trim());
         try {
             worker.doCommand(player, rawCommand);
+        } catch (CommandException e) {
+            ChatService.recordFailedCommand("command-test", player, rawCommand.trim(), e.getMessage());
+            throw e;
         } finally {
             ChatService.endInvocation();
         }
@@ -83,5 +89,26 @@ class GameModelSubmitTest {
 
         ChatData last = ChatService.getChats("command-test").getLast();
         assertThat(last.getInvocation(), is(nullValue()));
+    }
+
+    @Test
+    void mistypedCommandProducesNoChatButIsRecordedForJudges() {
+        int chatBefore = ChatService.getChats("command-test").size();
+
+        CommandException thrown = assertThrows(CommandException.class,
+                () -> submitCommand("Player1", "vp Player1"));   // no amount -> parse failure
+        assertThat(thrown.getMessage(), not(emptyOrNullString()));
+
+        // the chat log is untouched
+        assertThat(ChatService.getChats("command-test").size(), is(chatBefore));
+
+        // ...but a judge can see the attempt
+        String turnLabel = ChatService.getTurns("command-test").getFirst();
+        List<CommandErrorData> errors = ChatService.getFailedCommands("command-test", turnLabel);
+        assertThat(errors, is(not(empty())));
+        CommandErrorData last = errors.getLast();
+        assertThat(last.getCommand(), is("vp Player1"));
+        assertThat(last.getPlayer(), is("Player1"));
+        assertThat(last.getError(), not(emptyOrNullString()));
     }
 }

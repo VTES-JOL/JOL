@@ -465,6 +465,16 @@ export interface ChatData {
   invocationBy?: string;
 }
 
+// GET /jol/api/game/{id}/command-errors?turn=X — judge-only. A command a player
+// mistyped: it produced no chat, but a judge investigating a misplay can see the
+// attempt. net.deckserver.storage.json.game.CommandErrorData.
+export interface CommandError {
+  timestamp: string;
+  player: string;
+  command: string;
+  error?: string;
+}
+
 // GET /jol/api/game/{id}/view (+ POST view/submit, POST view/end-turn) —
 // net.deckserver.rest.bean.GameSnapshot.
 export interface GameSnapshot {

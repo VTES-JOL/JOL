@@ -7,7 +7,9 @@ import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.repository.GameChatMessageRepository;
+import net.deckserver.jpa.repository.GameCommandErrorRepository;
 import net.deckserver.storage.json.game.ChatData;
+import net.deckserver.storage.json.game.CommandErrorData;
 import net.deckserver.storage.json.game.TurnData;
 import net.deckserver.storage.json.game.TurnHistory;
 
@@ -36,6 +38,7 @@ public class ChatService extends PersistedService {
     }
 
     private static final GameChatMessageRepository messageRepository = new GameChatMessageRepository();
+    private static final GameCommandErrorRepository errorRepository = new GameCommandErrorRepository();
 
     /**
      * The raw command currently being executed on this thread, if any. Set by
@@ -110,6 +113,26 @@ public class ChatService extends PersistedService {
     public static  void sendSystemMessage(String gameId, String message) {
         ChatData chatData = new ChatData(message, "SYSTEM", null);
         sendChat(gameId, chatData);
+    }
+
+    /**
+     * Record a command a player submitted that failed to parse or validate.
+     * These are NOT chat — they never enter TurnHistory or the normal log — but
+     * a judge investigating a misplay can see them (see {@link #getFailedCommands}).
+     * Written straight through with {@code jpaWriteAlways} (no in-memory cache,
+     * so it must persist even in test mode, like DeckService).
+     */
+    public static void recordFailedCommand(String gameId, String player, String rawCommand, String errorText) {
+        String turnLabel = instance().historyCache.get(gameId).getCurrentTurnLabel();
+        instance().jpaWriteAlways(em ->
+                errorRepository.insert(em, gameId, turnLabel, player, rawCommand, errorText));
+    }
+
+    /** Failed command attempts for a turn — judge-only, gated at the resource. */
+    public static List<CommandErrorData> getFailedCommands(String gameId, String turnLabel) {
+        List<CommandErrorData> result = instance().jpaRead(em ->
+                errorRepository.loadTurn(em, gameId, turnLabel));
+        return result != null ? result : new ArrayList<>();
     }
 
     private static  void sendChat(String gameId, ChatData chat) {

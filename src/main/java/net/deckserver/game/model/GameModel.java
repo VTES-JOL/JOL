@@ -111,6 +111,8 @@ public class GameModel implements Comparable<GameModel> {
                         } catch (CommandException e) {
                             COMMANDS.error("[{}] {}", player, cmd);
                             status.append(e.getMessage());
+                            // Not chat — recorded separately for judge misplay review.
+                            ChatService.recordFailedCommand(game.id(), player, cmd.trim(), e.getMessage());
                         } finally {
                             ChatService.endInvocation();
                         }
