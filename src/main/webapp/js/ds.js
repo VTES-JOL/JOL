@@ -2625,34 +2625,145 @@ function renderTournamentGames(games) {
     });
 }
 
+let pastGamesData = [];
+
 function renderPastGames(history) {
-    let pastGames = $("#pastGames tbody");
-    pastGames.empty();
-    $.each(history, function (index, gameEntry) {
-        let startTime = moment(gameEntry.started, moment.ISO_8601)
-        startTime = startTime.isValid ? startTime.tz("UTC").format("D-MMM-YYYY HH:mm z") : gameEntry.started
-        let endTime = moment(gameEntry.ended, moment.ISO_8601).tz("UTC").format("D-MMM-YYYY HH:mm z");
-        let firstPlayerRow = true;
-        $.each(gameEntry.results, function (i, value) {
-            let playerRow = $("<tr/>");
-            if (firstPlayerRow) {
-                let gameName = $("<td/>").attr('rowspan', gameEntry.results.length).text(gameEntry.name);
-                let gameStarted = $("<td/>").attr('rowspan', gameEntry.results.length).text(startTime);
-                let gameFinished = $("<td/>").attr('rowspan', gameEntry.results.length).text(endTime);
-                playerRow.append(gameName, gameStarted, gameFinished);
-                playerRow.addClass("border-3 border-top border-bottom-0 border-start-0 border-end-0")
-                firstPlayerRow = false;
-            } else {
-                playerRow.addClass("border-top")
-            }
-            let playerName = $("<td/>").text(value.playerName);
-            let nameString = value.deckName.length > 50 ? (value.deckName.substring(0, 50) + "...") : value.deckName;
-            let deckName = $("<td/>").text(nameString);
-            let score = $("<td/>").text((value.victoryPoints !== "0" ? value.victoryPoints + " VP" : "") + (value.gameWin ? ", 1 GW" : ""));
-            playerRow.append(playerName, deckName, score);
-            pastGames.append(playerRow);
-        })
-    })
+    pastGamesData = Array.isArray(history) ? history.slice() : [];
+    renderPastGamesList();
+}
+
+function filterPastGames() {
+    renderPastGamesList();
+}
+
+function pgEl(tag, cls, text) {
+    let el = $(document.createElement(tag));
+    if (cls) el.attr("class", cls);
+    if (text != null) el.text(String(text));
+    return el;
+}
+
+function pastGameParts(name) {
+    let m = /^(.*): Round (\d+) - Table (\d+)$/.exec(name || "");
+    if (m) {
+        return {tournament: true, title: m[1], sub: "Round " + m[2] + " · Table " + m[3]};
+    }
+    return {tournament: false, title: name || "Unnamed game", sub: ""};
+}
+
+function renderPastGamesList() {
+    let list = $("#pastGamesList");
+    list.empty();
+
+    let query = String($("#pastGamesFilter").val() || "").trim().toLowerCase();
+    let sort = String($("#pastGamesSort").val() || "newest");
+
+    let endedValue = e => {
+        let m = moment(e.ended, moment.ISO_8601);
+        return m.isValid() ? m.valueOf() : 0;
+    };
+    let topVp = e => (e.results || []).reduce((mx, r) => Math.max(mx, +r.victoryPoints || 0), 0);
+
+    let games = pastGamesData.slice();
+    if (sort === "oldest") {
+        games.sort((a, b) => endedValue(a) - endedValue(b));
+    } else if (sort === "vp") {
+        games.sort((a, b) => topVp(b) - topVp(a));
+    } else if (sort === "players") {
+        games.sort((a, b) => (b.results || []).length - (a.results || []).length);
+    }
+
+    let shown = 0;
+    games.forEach(function (entry) {
+        if (query) {
+            let haystack = [entry.name]
+                .concat((entry.results || []).map(r => r.playerName))
+                .concat((entry.results || []).map(r => r.deckName))
+                .filter(Boolean).join(" ").toLowerCase();
+            if (haystack.indexOf(query) === -1) return;
+        }
+        list.append(buildPastGameCard(entry));
+        shown++;
+    });
+
+    if (pastGamesData.length === 0) {
+        list.append(pgEl("div", "pg-list__empty text-body-secondary text-center py-5",
+            "No completed games yet."));
+    } else if (shown === 0) {
+        list.append(pgEl("div", "pg-list__empty text-body-secondary text-center py-5",
+            "No games match your filter."));
+    }
+
+    $("#pastGamesCount").text(
+        query && pastGamesData.length
+            ? shown + " of " + pastGamesData.length + " games"
+            : pastGamesData.length + (pastGamesData.length === 1 ? " game" : " games")
+    );
+
+    tippy("#pastGamesList [data-tippy-content]", {theme: "light"});
+}
+
+function buildPastGameCard(entry) {
+    let parts = pastGameParts(entry.name);
+    let results = (entry.results || []).slice().sort((a, b) =>
+        (Number(b.gameWin) - Number(a.gameWin)) ||
+        ((+b.victoryPoints || 0) - (+a.victoryPoints || 0)) ||
+        String(a.playerName || "").localeCompare(String(b.playerName || "")));
+
+    let endM = moment(entry.ended, moment.ISO_8601);
+    let startM = moment(entry.started, moment.ISO_8601);
+
+    let card = pgEl("div", "pg-card");
+
+    let head = pgEl("div", "pg-card__head").appendTo(card);
+    let titleRow = pgEl("div", "d-flex align-items-start justify-content-between gap-2").appendTo(head);
+    let title = pgEl("div", "pg-card__title").appendTo(titleRow);
+    title.append(pgEl("span", null, parts.title));
+    if (parts.sub) title.append(pgEl("span", "pg-card__sub", " · " + parts.sub));
+    pgEl("span",
+        "badge pg-card__badge " + (parts.tournament ? "text-bg-primary" : "text-bg-secondary"),
+        parts.tournament ? "Tournament" : "Casual").appendTo(titleRow);
+
+    let meta = pgEl("div", "pg-card__meta").appendTo(head);
+    let ended = pgEl("span", null, endM.isValid() ? "ended " + endM.fromNow() : "ended " + (entry.ended || "unknown"));
+    if (endM.isValid()) ended.attr("data-tippy-content", endM.tz("UTC").format("D MMM YYYY, HH:mm [UTC]"));
+    meta.append(ended);
+    if (endM.isValid() && startM.isValid() && endM.isAfter(startM)) {
+        meta.append(pgEl("span", null, " · lasted " + endM.from(startM, true)));
+    }
+    meta.append(pgEl("span", null, " · " + results.length + (results.length === 1 ? " player" : " players")));
+
+    let playersBox = pgEl("div", "pg-players").appendTo(card);
+    results.forEach(function (r, i) {
+        let vp = +r.victoryPoints || 0;
+        let isWinner = !!r.gameWin;
+        let rowClass = "pg-player";
+        if (isWinner) rowClass += " pg-player--winner";
+        else if (vp === 0) rowClass += " pg-player--zero";
+        let row = pgEl("div", rowClass).appendTo(playersBox);
+
+        if (isWinner) {
+            pgEl("i", "bi bi-trophy-fill pg-player__rank pg-player__rank--win").appendTo(row);
+        } else {
+            pgEl("span", "pg-player__rank", i + 1).appendTo(row);
+        }
+
+        let main = pgEl("div", "pg-player__main").appendTo(row);
+        pgEl("span", "pg-player__name", r.playerName || "—").appendTo(main);
+        let deck = r.deckName && r.deckName !== "-- no deck name --" ? r.deckName : "";
+        if (deck) {
+            pgEl("span", "pg-player__deck", deck).attr("title", deck).appendTo(main);
+        } else {
+            pgEl("span", "pg-player__deck pg-player__deck--empty", "no deck recorded").appendTo(main);
+        }
+
+        let score = pgEl("span", "pg-player__score").appendTo(row);
+        if (vp > 0) score.append(pgEl("span", "pg-vp", vp + " VP"));
+        if (isWinner) score.append(pgEl("span", "pg-gw", "GW"));
+        if (vp === 0 && !isWinner) score.append(pgEl("span", "pg-player__none", "–"));
+    });
+
+    return card;
 }
 
 function wsJoinGame(gameId) {

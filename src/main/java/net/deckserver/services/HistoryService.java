@@ -1,6 +1,7 @@
 package net.deckserver.services;
 
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import net.deckserver.game.GameOutcome;
 import net.deckserver.storage.json.system.GameHistory;
 import net.deckserver.storage.json.system.PlayerResult;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,37 +43,62 @@ public class HistoryService extends PersistedService {
         return INSTANCE.pastGames.values();
     }
 
-    public static  void validateGW() {
-        HistoryService.getGames().forEach(gameHistory -> {
-            PlayerResult winner = null;
-            PlayerResult previousWinner = gameHistory.getResults().stream().filter(PlayerResult::isGameWin).findFirst().orElse(null);
-            double topVP = 0.0;
-            for (PlayerResult result : gameHistory.getResults()) {
-                double victoryPoints = result.getVictoryPoints();
-                if (victoryPoints >= 2.0) {
-                    if (winner == null) {
-                        logger.debug("{} - {} has {} VP and there is no current high score.", gameHistory.getName(), result.getPlayerName(), victoryPoints);
-                        winner = result;
-                        topVP = victoryPoints;
-                    } else if (victoryPoints > topVP) {
-                        logger.debug("{} - {} has {} VP, previous high score was {} on {} VP.", gameHistory.getName(), result.getPlayerName(), victoryPoints, winner.getPlayerName(), topVP);
-                        winner = result;
-                        topVP = victoryPoints;
-                    } else if (victoryPoints == topVP) {
-                        logger.debug("{} - tie between {} and {}. No winner.", gameHistory.getName(), result.getPlayerName(), winner.getPlayerName());
-                        winner = null;
-                    }
-                }
+    /**
+     * Sweeps every stored game: drops records that can never be valid and rewrites the game-win
+     * flags on the rest so they match {@link GameOutcome}. Safe to run repeatedly - it is invoked
+     * on load and can also be scheduled as a maintenance job.
+     */
+    public static void validateGW() {
+        INSTANCE.validate();
+    }
+
+    private void validate() {
+        int before = pastGames.size();
+        pastGames.entrySet().removeIf(entry -> {
+            String reason = invalidReason(entry.getValue());
+            if (reason != null) {
+                logger.warn("Deleting invalid game history '{}' ({}): {}", entry.getValue().getName(), entry.getKey(), reason);
+                return true;
             }
-            if (winner != null && previousWinner == null) {
-                logger.info("Found a winner for {} where there wasn't one before, now {} on {}", gameHistory.getName(), winner.getPlayerName(), winner.getVictoryPoints());
-                winner.setGameWin(true);
-            } else if (winner != null && winner != previousWinner) {
-                logger.info("Found a new winner for {}, previously {} on {}, now {} on {}", gameHistory.getName(), previousWinner.getPlayerName(), previousWinner.getVictoryPoints(), winner.getPlayerName(), winner.getVictoryPoints());
-                winner.setGameWin(true);
-                previousWinner.setGameWin(false);
-            }
+            return false;
         });
+        int removed = before - pastGames.size();
+        if (removed > 0) {
+            logger.warn("Removed {} invalid game history record(s)", removed);
+        }
+        pastGames.values().forEach(HistoryService::reconcileGameWin);
+    }
+
+    /** @return a human-readable reason the record is unusable, or {@code null} if it is structurally sound */
+    static String invalidReason(GameHistory game) {
+        List<PlayerResult> results = game == null ? null : game.getResults();
+        if (results == null || results.isEmpty()) {
+            return "no player results";
+        }
+        if (results.stream().anyMatch(r -> r.getPlayerName() == null || r.getPlayerName().isBlank())) {
+            return "a result is missing its player name";
+        }
+        if (results.stream().anyMatch(r -> r.getVictoryPoints() == null)) {
+            return "a result is missing its victory points";
+        }
+        double totalVp = results.stream().mapToDouble(PlayerResult::getVictoryPoints).sum();
+        if (!GameOutcome.isPlausibleVictoryPointTotal(results.size(), totalVp)) {
+            return String.format("recorded VP total %s is invalid for a %d player game", totalVp, results.size());
+        }
+        return null;
+    }
+
+    /** Rewrites {@code gameWin} on every result of a (already validated) game to match {@link GameOutcome}. */
+    static void reconcileGameWin(GameHistory game) {
+        PlayerResult winner = GameOutcome.gameWinner(game.getResults(), PlayerResult::getVictoryPoints).orElse(null);
+        for (PlayerResult result : game.getResults()) {
+            boolean shouldWin = result == winner;
+            if (result.isGameWin() != shouldWin) {
+                logger.info("{} - {} game win for {} on {} VP", game.getName(),
+                        shouldWin ? "recording" : "clearing stale", result.getPlayerName(), result.getVictoryPoints());
+                result.setGameWin(shouldWin);
+            }
+        }
     }
 
     public static PersistedService getInstance() {
@@ -107,6 +134,7 @@ public class HistoryService extends PersistedService {
             Map<OffsetDateTime, GameHistory> loaded = objectMapper.readValue(PERSISTENCE_PATH.toFile(), typeFactory.constructMapType(ConcurrentHashMap.class, OffsetDateTime.class, GameHistory.class));
             pastGames.putAll(loaded);
             logger.info("Loaded {} game histories", loaded.size());
+            validate();
         } catch (IOException e) {
             logger.error("Unable to load game history.", e);
         }

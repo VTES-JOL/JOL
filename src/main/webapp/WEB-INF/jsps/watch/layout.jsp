@@ -40,17 +40,22 @@
             </table>
         </div>
         <div class="tab-pane fade" id="pastGamesPane" role="tabpanel">
-            <table id="pastGames" class="table table-sm table-hover mb-0">
-                <thead>
-                <tr>
-                    <th>Game</th>
-                    <th>Started</th>
-                    <th>Ended</th>
-                    <th colspan="3">Results</th>
-                </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <div class="pg-toolbar">
+                <div class="input-group input-group-sm pg-toolbar__search">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" id="pastGamesFilter" class="form-control"
+                           placeholder="Filter by game, player or deck&hellip;" oninput="filterPastGames()">
+                </div>
+                <select id="pastGamesSort" class="form-select form-select-sm pg-toolbar__sort"
+                        onchange="filterPastGames()">
+                    <option value="newest">Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                    <option value="vp">Biggest win</option>
+                    <option value="players">Most players</option>
+                </select>
+                <span id="pastGamesCount" class="pg-toolbar__count"></span>
+            </div>
+            <div id="pastGamesList" class="pg-list"></div>
         </div>
         <div class="tab-pane fade overflow-hidden" id="statGamesPane" role="tabpanel">
             <div class="container mt-3">

@@ -59,7 +59,7 @@
     "discordId" : "",
     "veknId" : "222222",
     "countryCode" : "AU",
-    "roles" : [ "JUDGE", "PLAYTESTER", "TOURNAMENT_ADMIN", "ADMIN" ],
+    "roles" : [ "PLAYTESTER", "TOURNAMENT_ADMIN", "JUDGE", "ADMIN" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF",
     "notificationsEnabled" : false
@@ -72,7 +72,7 @@
     "discordId" : "",
     "veknId" : "111111",
     "countryCode" : "US",
-    "roles" : [ "JUDGE", "PLAYTESTER", "SUPER_USER" ],
+    "roles" : [ "PLAYTESTER", "SUPER_USER", "JUDGE" ],
     "showImages" : true,
     "edgeColor" : "#FFFFFF",
     "notificationsEnabled" : false

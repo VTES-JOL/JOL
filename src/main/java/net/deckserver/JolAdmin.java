@@ -10,6 +10,7 @@ import io.azam.ulidj.ULID;
 import net.deckserver.dwr.model.GameModel;
 import net.deckserver.dwr.model.JolGame;
 import net.deckserver.dwr.model.PlayerModel;
+import net.deckserver.game.GameOutcome;
 import net.deckserver.game.enums.*;
 import net.deckserver.game.validators.DeckValidator;
 import net.deckserver.game.validators.ValidationResult;
@@ -418,8 +419,6 @@ public class JolAdmin {
                 String endTime = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
                 history.setStarted(startTime);
                 history.setEnded(endTime);
-                PlayerResult winner = null;
-                double topVP = 0.0;
                 boolean hasVp = false;
                 for (String player : gameData.getPlayers()) {
                     PlayerResult result = new PlayerResult();
@@ -431,23 +430,15 @@ public class JolAdmin {
                     result.setPlayerName(player);
                     result.setDeckName(deckName);
                     result.setVictoryPoints(victoryPoints);
-                    if (victoryPoints >= 2.0) {
-                        if (winner == null) {
-                            winner = result;
-                            topVP = victoryPoints;
-                        } else if (victoryPoints > topVP) {
-                            winner = result;
-                            topVP = victoryPoints;
-                        } else {
-                            winner = null;
-                        }
-                    }
                     history.getResults().add(result);
                 }
-                if (winner != null) {
-                    winner.setGameWin(true);
-                }
-                if (hasVp) {
+                GameOutcome.gameWinner(history.getResults(), PlayerResult::getVictoryPoints)
+                        .ifPresent(winner -> winner.setGameWin(true));
+                double totalVp = history.getResults().stream().mapToDouble(PlayerResult::getVictoryPoints).sum();
+                int playerCount = gameData.getPlayers().size();
+                if (!GameOutcome.isPlausibleVictoryPointTotal(playerCount, totalVp)) {
+                    logger.warn("Not recording game '{}' in history - recorded VP total {} exceeds the {} players in the game", gameName, totalVp, playerCount);
+                } else if (hasVp) {
                     HistoryService.addGame(OffsetDateTime.now(), history);
                 }
             }
