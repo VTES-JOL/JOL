@@ -49,6 +49,22 @@ export function useUpdateAvailable(): boolean {
   return useSyncExternalStore(subscribe, getSnapshot);
 }
 
+// A plain location.reload() can be handed a still-cached index.html that
+// references the previous hashed bundle, so __BUILD_ID__ never changes and
+// the next checkForUpdate() flips the banner straight back on — the "banner
+// won't go away without a hard refresh" symptom. Force a fresh copy of the
+// app shell into the HTTP cache first (`cache: 'reload'` bypasses the cache
+// for the request and replaces the stored entry with the response), then the
+// reload parses the new index.html and loads the new bundle.
+export async function reloadForUpdate(): Promise<void> {
+  try {
+    await fetch(import.meta.env.BASE_URL, { cache: 'reload' });
+  } catch {
+    // offline or blocked — a plain reload is still the best we can do
+  }
+  location.reload();
+}
+
 // Started once from App.tsx. No-op in dev — vite dev never emits
 // version.json, and a dev session isn't "deployed" in the sense this exists
 // to detect.

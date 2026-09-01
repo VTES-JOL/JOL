@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { reloadForUpdate } from '../updateCheck';
 
 // Reactive backstop for a stale tab whose lazily-loaded chunk (e.g. a help
 // section's MDX module — see HelpSection.tsx's lazy()) no longer exists on
@@ -32,7 +33,7 @@ export class ChunkErrorBoundary extends Component<{ children: ReactNode }, State
 
     if (CHUNK_LOAD_ERROR.test(error.message) && !sessionStorage.getItem(RELOAD_GUARD_KEY)) {
       sessionStorage.setItem(RELOAD_GUARD_KEY, '1');
-      location.reload();
+      void reloadForUpdate();
     }
   }
 
@@ -44,7 +45,7 @@ export class ChunkErrorBoundary extends Component<{ children: ReactNode }, State
           <p className="text-sm text-ink-muted">{this.state.error.message}</p>
           <button
             className="mt-2 rounded border border-line-accent px-3 py-1.5 text-sm text-ink-secondary hover:bg-hover"
-            onClick={() => location.reload()}
+            onClick={() => void reloadForUpdate()}
           >
             Reload
           </button>

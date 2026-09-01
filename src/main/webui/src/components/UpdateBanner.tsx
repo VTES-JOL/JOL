@@ -1,4 +1,4 @@
-import { useUpdateAvailable } from '../updateCheck';
+import { reloadForUpdate, useUpdateAvailable } from '../updateCheck';
 
 // A slim persistent bar, not a Toast (auto-dismisses after 6s — wrong for
 // something the user should be able to act on whenever they notice it) and
@@ -22,7 +22,7 @@ export function UpdateBanner({ visible }: { visible?: boolean }) {
       <span>A new version is available.</span>
       <button
         className="rounded bg-surface text-ink px-2 py-0.5 text-xs hover:bg-hover"
-        onClick={() => location.reload()}
+        onClick={() => void reloadForUpdate()}
       >
         Reload
       </button>
