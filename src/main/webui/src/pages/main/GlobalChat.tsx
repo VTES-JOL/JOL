@@ -13,6 +13,12 @@ import './GlobalChat.css';
 
 const AT_BOTTOM_THRESHOLD_PX = 20;
 
+// Identity of a chat entry for de-duplication. Timestamps are only
+// second-resolution (see ChatEntryBean), so a burst of messages posted in
+// the same second — e.g. PublicGameBuilder creating several public games in
+// one loop — all share a timestamp; player + message disambiguate them.
+const entryKey = (e: ChatEntry) => JSON.stringify([e.timestamp, e.player, e.message]);
+
 interface RenderedEntry {
   entry: ChatEntry;
   day: string;
@@ -64,10 +70,25 @@ export function GlobalChat() {
   // during render.
   const cursorRef = useRef<string | null>(null);
 
+  // Keys of every entry already merged into `entries`. Several 'main-chat'
+  // pushes landing in quick succession each trigger a delta fetch, and until
+  // the first response advances cursorRef they all go out with the same
+  // `since` value — so each comes back carrying the same messages. Without
+  // this guard appendChat would append that burst once per response (a
+  // PublicGameBuilder run showed each new-game line 6x). A cursor comparison
+  // can't dedupe here: the whole burst shares one second-resolution
+  // timestamp, so `> cursor` would also drop the genuine messages.
+  const seenKeysRef = useRef<Set<string>>(new Set());
+
   const appendChat = (delta: ChatEntry[]) => {
     if (delta.length === 0) return;
-    setEntries((log) => [...log, ...delta]);
+    const fresh = delta.filter((e) => !seenKeysRef.current.has(entryKey(e)));
+    // Still advance the cursor even when nothing is fresh — the server has
+    // confirmed everything up to here, so the next fetch can ask for less.
     cursorRef.current = delta[delta.length - 1].timestamp;
+    if (fresh.length === 0) return;
+    fresh.forEach((e) => seenKeysRef.current.add(entryKey(e)));
+    setEntries((log) => [...log, ...fresh]);
     // Keep the ['main-chat-history'] cache in sync with what's actually been
     // seen — its staleTime: Infinity means a remounted GlobalChat (e.g. after
     // navigating away and back) reads straight from this cache with no
@@ -75,7 +96,7 @@ export function GlobalChat() {
     // cached at the very first load, silently dropping every message
     // appended since (including any card-link messages, which is why hover
     // on them "stopped working" — the message itself was gone).
-    queryClient.setQueryData<ChatEntry[]>(['main-chat-history'], (old) => [...(old ?? []), ...delta]);
+    queryClient.setQueryData<ChatEntry[]>(['main-chat-history'], (old) => [...(old ?? []), ...fresh]);
   };
 
   // First load only: /main/chat/history ignores this player's read cursor
@@ -99,29 +120,51 @@ export function GlobalChat() {
   useEffect(() => {
     if (!history) return;
     setEntries(history);
+    seenKeysRef.current = new Set(history.map(entryKey));
     if (history.length > 0) cursorRef.current = history[history.length - 1].timestamp;
   }, [history]);
 
-  useEffect(
-    () =>
-      // Deliberately NOT routed through ws/useQueryInvalidation.ts's generic
-      // invalidateQueries bridge: chat is an ever-growing, append-only log,
-      // not a "refetch replaces the cache" resource — a blind invalidate
-      // would need a plain useQuery backing the full log, and GET /main/chat
-      // is a stateful delta-since-cursor endpoint that can't be one (see
-      // MainResource.chat()'s doc comment). Subscribe directly to the same
-      // underlying WS envelope instead, and merge the delta by hand.
-      subscribe('invalidate', (msg) => {
-        const key = msg.key;
-        if (!Array.isArray(key) || key.length !== 1 || key[0] !== 'main-chat') return;
-        const since = cursorRef.current;
-        api
-          .get<ChatEntry[]>(`/main/chat${since ? `?since=${encodeURIComponent(since)}` : ''}`)
-          .then(appendChat)
-          .catch((err) => console.error('Failed to load /main/chat', err));
-      }),
-    [],
-  );
+  // Serialises the delta fetches so a rapid run of 'main-chat' pushes can't
+  // all fire a request against the same stale cursor. Any push arriving
+  // while a fetch is in flight just sets `queued`; that request's
+  // completion then does one more fetch with the now-advanced cursor,
+  // collapsing the whole burst into two round trips at most.
+  const chatFetchInFlightRef = useRef(false);
+  const chatFetchQueuedRef = useRef(false);
+
+  useEffect(() => {
+    const fetchDelta = () => {
+      if (chatFetchInFlightRef.current) {
+        chatFetchQueuedRef.current = true;
+        return;
+      }
+      chatFetchInFlightRef.current = true;
+      const since = cursorRef.current;
+      api
+        .get<ChatEntry[]>(`/main/chat${since ? `?since=${encodeURIComponent(since)}` : ''}`)
+        .then(appendChat)
+        .catch((err) => console.error('Failed to load /main/chat', err))
+        .finally(() => {
+          chatFetchInFlightRef.current = false;
+          if (chatFetchQueuedRef.current) {
+            chatFetchQueuedRef.current = false;
+            fetchDelta();
+          }
+        });
+    };
+    // Deliberately NOT routed through ws/useQueryInvalidation.ts's generic
+    // invalidateQueries bridge: chat is an ever-growing, append-only log,
+    // not a "refetch replaces the cache" resource — a blind invalidate
+    // would need a plain useQuery backing the full log, and GET /main/chat
+    // is a stateful delta-since-cursor endpoint that can't be one (see
+    // MainResource.chat()'s doc comment). Subscribe directly to the same
+    // underlying WS envelope instead, and merge the delta by hand.
+    return subscribe('invalidate', (msg) => {
+      const key = msg.key;
+      if (!Array.isArray(key) || key.length !== 1 || key[0] !== 'main-chat') return;
+      fetchDelta();
+    });
+  }, []);
 
   const scrollToBottom = () => {
     const el = outputRef.current;
