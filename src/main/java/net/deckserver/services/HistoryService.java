@@ -4,6 +4,7 @@ import io.quarkus.runtime.Startup;
 import jakarta.inject.Singleton;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import net.deckserver.game.GameOutcome;
 import net.deckserver.jpa.entity.GameHistoryEntity;
 import net.deckserver.jpa.repository.GameHistoryRepository;
 import net.deckserver.storage.json.system.GameHistory;
@@ -58,36 +59,17 @@ public class HistoryService extends PersistedService {
                 return;
             }
 
-            PlayerResult winner = null;
-            PlayerResult previousWinner = gameHistory.getResults().stream().filter(PlayerResult::isGameWin).findFirst().orElse(null);
-            double topVP = 0.0;
-            for (PlayerResult result : gameHistory.getResults()) {
-                double victoryPoints = result.getVictoryPoints();
-                if (victoryPoints >= 2.0) {
-                    if (winner == null) {
-                        logger.debug("{} - {} has {} VP and there is no current high score.", gameHistory.getName(), result.getPlayerName(), victoryPoints);
-                        winner = result;
-                        topVP = victoryPoints;
-                    } else if (victoryPoints > topVP) {
-                        logger.debug("{} - {} has {} VP, previous high score was {} on {} VP.", gameHistory.getName(), result.getPlayerName(), victoryPoints, winner.getPlayerName(), topVP);
-                        winner = result;
-                        topVP = victoryPoints;
-                    } else if (victoryPoints == topVP) {
-                        logger.debug("{} - tie between {} and {}. No winner.", gameHistory.getName(), result.getPlayerName(), winner.getPlayerName());
-                        winner = null;
-                    }
-                }
-            }
+            PlayerResult winner = GameOutcome.gameWinner(gameHistory.getResults(),
+                    r -> r.getVictoryPoints() == null ? 0.0 : r.getVictoryPoints()).orElse(null);
             boolean changed = false;
-            if (winner != null && previousWinner == null) {
-                logger.info("Found a winner for {} where there wasn't one before, now {} on {}", gameHistory.getName(), winner.getPlayerName(), winner.getVictoryPoints());
-                winner.setGameWin(true);
-                changed = true;
-            } else if (winner != null && winner != previousWinner) {
-                logger.info("Found a new winner for {}, previously {} on {}, now {} on {}", gameHistory.getName(), previousWinner.getPlayerName(), previousWinner.getVictoryPoints(), winner.getPlayerName(), winner.getVictoryPoints());
-                winner.setGameWin(true);
-                previousWinner.setGameWin(false);
-                changed = true;
+            for (PlayerResult result : gameHistory.getResults()) {
+                boolean shouldWin = result == winner;
+                if (result.isGameWin() != shouldWin) {
+                    logger.info("{} - {} game win for {} on {} VP", gameHistory.getName(),
+                            shouldWin ? "recording" : "clearing stale", result.getPlayerName(), result.getVictoryPoints());
+                    result.setGameWin(shouldWin);
+                    changed = true;
+                }
             }
             if (changed) {
                 try {

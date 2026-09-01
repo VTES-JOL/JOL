@@ -120,6 +120,7 @@ docker compose -f local-docker-compose.yml up -d db   # starts a local Postgres,
 ```bash
 docker run -d --name jol-migrate-tmp --network web -v <jol-data-volume>:/data:ro postgres:16 sleep infinity
 docker cp migrate-to-db.sh jol-migrate-tmp:/migrate-to-db.sh
+docker exec jol-migrate-tmp mkdir -p /src/main/resources/db/migration   # docker cp won't create parent dirs
 docker cp src/main/resources/db/migration/. jol-migrate-tmp:/src/main/resources/db/migration/
 docker exec jol-migrate-tmp bash -c "apt-get update -qq && apt-get install -y -qq jq python3"
 docker exec -e PGHOST=<postgres-service-name> -e PGPASSWORD=<password> \

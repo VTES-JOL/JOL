@@ -1,6 +1,7 @@
 package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
+import net.deckserver.game.GameOutcome;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.TournamentFormat;
@@ -192,32 +193,14 @@ public class TournamentResource extends BaseResource {
         });
         if (!allDone) return false;
 
-        // Determine GW winner — same logic as JolAdmin.endGame
-        String gwWinner = null;
-        double topVP = 0.0;
-        for (TournamentPlayer tp : players) {
-            double vp;
-            try { vp = g.getVictoryPoints(tp.getName()); } catch (Exception ignored) { vp = 0; }
-            if (vp >= 2.0) {
-                if (gwWinner == null) {
-                    gwWinner = tp.getName();
-                    topVP = vp;
-                } else if (vp > topVP) {
-                    gwWinner = tp.getName();
-                    topVP = vp;
-                } else {
-                    gwWinner = null;
-                }
-            }
-        }
-
-        // Snapshot live VP and GW into the stored TournamentPlayer records
-        Map<String, Double> vpByPlayer = new HashMap<>();
+        // Snapshot live VP, then derive the game win with the shared rule (see GameOutcome).
+        Map<String, Double> vpByPlayer = new LinkedHashMap<>();
         for (TournamentPlayer tp : players) {
             double vp;
             try { vp = g.getVictoryPoints(tp.getName()); } catch (Exception ignored) { vp = tp.getVp(); }
             vpByPlayer.put(tp.getName(), vp);
         }
+        String gwWinner = GameOutcome.gameWinner(vpByPlayer).orElse(null);
         TournamentService.recordTableResults(tourName, round, table, vpByPlayer, gwWinner);
 
         // End game via standard flow (also writes GameHistory)

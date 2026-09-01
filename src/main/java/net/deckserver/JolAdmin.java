@@ -8,6 +8,7 @@ package net.deckserver;
 
 import io.azam.ulidj.ULID;
 import net.deckserver.rest.bean.DeckEdit;
+import net.deckserver.game.GameOutcome;
 import net.deckserver.game.model.GameModel;
 import net.deckserver.game.model.JolGame;
 import net.deckserver.game.enums.*;
@@ -222,10 +223,7 @@ public class JolAdmin {
             // Reset game time to the current time to extend idle timeout
             GameService.updateGameInfo(gameName, info -> info.setUpdated(OffsetDateTime.now()));
 
-            long registeredPlayers = RegistrationService.getRegisteredPlayerCount(gameName);
-            if (registeredPlayers == gameInfo.getGameFormat().getPlayerCount()) {
-                startGame(gameName);
-            }
+            attemptAutoStart(gameName);
         } catch (IllegalStateException exception) {
             logger.debug(exception.getMessage());
         }
@@ -374,34 +372,67 @@ public class JolAdmin {
         return GameService.get(gameName).getVisibility().equals(Visibility.PUBLIC);
     }
 
-    public static void startGame(String gameName, List<String> players) {
+    /**
+     * Builds and starts a game from its registrations. Nothing is persisted and the game status is not
+     * flipped to {@link GameStatus#ACTIVE} unless every registered player's deck loads playably and the
+     * game starts cleanly, so a failure here leaves the game recoverable in {@link GameStatus#STARTING}
+     * (re-registering a deck, or the owner/admin "start" action, retries).
+     *
+     * @return {@code true} if the game is now ACTIVE.
+     */
+    public static boolean startGame(String gameName, List<String> players) {
         GameInfo gameInfo = GameService.get(gameName);
+        if (gameInfo == null) {
+            logger.warn("Cannot start game '{}' - no such game", gameName);
+            return false;
+        }
         // Guarded by the game's own lock, not just the caller's `synchronized` — this
         // constructs a brand-new JolGame and immediately caches/saves it, which can
         // otherwise race a concurrent GameStateResource submit that's mutating the
         // GameModel this same name is about to be associated with.
-        getGameModel(gameName).withLock(() -> {
+        return Boolean.TRUE.equals(getGameModel(gameName).withLock(() -> {
             GameData gameData = new GameData(gameInfo.getId(), gameName);
             JolGame game = new JolGame(gameInfo.getId(), gameData);
-            RegistrationService.getGameRegistrations(gameName).forEach((playerName, registration) -> {
-                if (registration.getDeckId() != null) {
-                    Deck deck = getGameDeck(gameName, playerName);
+            List<String> broken = new ArrayList<>();
+            for (Map.Entry<String, RegistrationStatus> entry : RegistrationService.getGameRegistrations(gameName).entrySet()) {
+                if (entry.getValue().getDeckId() == null) {
+                    continue;
+                }
+                String playerName = entry.getKey();
+                Deck deck = getGameDeck(gameName, playerName);
+                if (deck == null || deck.getCrypt() == null || deck.getLibrary() == null
+                        || deck.getCrypt().getCards().isEmpty() || deck.getLibrary().getCards().isEmpty()) {
+                    broken.add(playerName);
+                } else {
                     game.addPlayer(playerName, deck);
                 }
-            });
-            if (!game.getPlayers().isEmpty() && game.getPlayers().size() <= 5) {
-                game.startGame(players);
-                saveGameState(game);
-                GameService.updateGameInfo(gameName, info -> info.setStatus(GameStatus.ACTIVE));
-                pingPlayer(game.getActivePlayer(), gameName);
-                WebSocketRegistry.notifyInvalidate(List.of("nav"));
-                WebSocketRegistry.notifyInvalidate(List.of("watch"));
-                WebSocketRegistry.notifyInvalidate(List.of("main-games"));
             }
-        });
+            if (!broken.isEmpty()) {
+                logger.error("Not starting game '{}' - unloadable/empty deck(s) for: {}", gameName, broken);
+                return false;
+            }
+            if (game.getPlayers().isEmpty() || game.getPlayers().size() > 5) {
+                logger.warn("Cannot start game '{}' - {} registered player(s)", gameName, game.getPlayers().size());
+                return false;
+            }
+            try {
+                game.startGame(players);
+            } catch (RuntimeException e) {
+                logger.error("Not starting game '{}' - startGame failed", gameName, e);
+                return false;
+            }
+            saveGameState(game);
+            GameService.updateGameInfo(gameName, info -> info.setStatus(GameStatus.ACTIVE));
+            pingPlayer(game.getActivePlayer(), gameName);
+            WebSocketRegistry.notifyInvalidate(List.of("nav"));
+            WebSocketRegistry.notifyInvalidate(List.of("watch"));
+            WebSocketRegistry.notifyInvalidate(List.of("main-games"));
+            logger.info("Started game '{}' with players {}", gameName, players);
+            return true;
+        }));
     }
 
-    public static synchronized void startGame(String gameName) {
+    public static synchronized boolean startGame(String gameName) {
         List<String> players = new ArrayList<>();
         List<String> invitedPlayers = new ArrayList<>();
         RegistrationService.getGameRegistrations(gameName).forEach((playerName, registration) -> {
@@ -413,7 +444,23 @@ public class JolAdmin {
         });
         invitedPlayers.forEach((playerName) -> RegistrationService.removePlayer(gameName, playerName));
         Collections.shuffle(players, new SecureRandom());
-        startGame(gameName, players);
+        return startGame(gameName, players);
+    }
+
+    /**
+     * Starts {@code gameName} if it is still in the lobby with a full roster. Safe to call repeatedly —
+     * a no-op unless the game is STARTING and has exactly the format's player count registered.
+     */
+    public static synchronized boolean attemptAutoStart(String gameName) {
+        GameInfo gameInfo = GameService.get(gameName);
+        if (gameInfo == null || !GameStatus.STARTING.equals(gameInfo.getStatus())) {
+            return false;
+        }
+        long registeredPlayers = RegistrationService.getRegisteredPlayerCount(gameName);
+        if (registeredPlayers != gameInfo.getGameFormat().getPlayerCount()) {
+            return false;
+        }
+        return startGame(gameName);
     }
 
     public static void endGame(String gameName, boolean graceful) {
@@ -433,8 +480,6 @@ public class JolAdmin {
                     String endTime = OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME);
                     history.setStarted(startTime);
                     history.setEnded(endTime);
-                    PlayerResult winner = null;
-                    double topVP = 0.0;
                     boolean hasVp = false;
                     for (String player : gameData.getPlayers()) {
                         PlayerResult result = new PlayerResult();
@@ -446,23 +491,15 @@ public class JolAdmin {
                         result.setPlayerName(player);
                         result.setDeckName(deckName);
                         result.setVictoryPoints(victoryPoints);
-                        if (victoryPoints >= 2.0) {
-                            if (winner == null) {
-                                winner = result;
-                                topVP = victoryPoints;
-                            } else if (victoryPoints > topVP) {
-                                winner = result;
-                                topVP = victoryPoints;
-                            } else {
-                                winner = null;
-                            }
-                        }
                         history.getResults().add(result);
                     }
-                    if (winner != null) {
-                        winner.setGameWin(true);
-                    }
-                    if (hasVp) {
+                    GameOutcome.gameWinner(history.getResults(), PlayerResult::getVictoryPoints)
+                            .ifPresent(winner -> winner.setGameWin(true));
+                    double totalVp = history.getResults().stream().mapToDouble(PlayerResult::getVictoryPoints).sum();
+                    int playerCount = gameData.getPlayers().size();
+                    if (!GameOutcome.isPlausibleVictoryPointTotal(playerCount, totalVp)) {
+                        logger.warn("Not recording game '{}' in history - recorded VP total {} exceeds the {} players in the game", gameName, totalVp, playerCount);
+                    } else if (hasVp) {
                         HistoryService.addGame(OffsetDateTime.now(), history);
                     }
                 }

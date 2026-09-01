@@ -138,7 +138,7 @@ public class AdminPageResource extends BaseResource {
     @PUT
     @Path("games/{gameId}/replace-player")
     public void replacePlayer(@PathParam("gameId") String gameId, ReplacePlayerRequest body) {
-        JolAdmin.replacePlayer(gameName(gameId), body.existingPlayer(), body.newPlayer());
+        JolAdmin.replacePlayer(gameName(gameId), PlayerService.canonicalize(body.existingPlayer()), PlayerService.canonicalize(body.newPlayer()));
     }
 
     @DELETE

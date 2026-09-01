@@ -89,7 +89,10 @@ public class LobbyResource extends BaseResource {
         if (!JolAdmin.isStarting(game)) {
             throw new WebApplicationException(Response.status(Response.Status.CONFLICT).entity("Game is not in starting status").build());
         }
-        JolAdmin.startGame(game);
+        if (!JolAdmin.startGame(game)) {
+            throw new WebApplicationException(Response.status(Response.Status.CONFLICT)
+                    .entity("Game could not start - one or more registered decks could not be loaded. Affected players should re-register.").build());
+        }
         notifyLobby();
     }
 
@@ -114,14 +117,15 @@ public class LobbyResource extends BaseResource {
         if (!GameService.existsGame(game)) {
             throw new NotFoundException("No such game: " + game);
         }
-        if (!PlayerService.getPlayers().contains(body.player())) {
+        String invitee = PlayerService.canonicalize(body.player());
+        if (!PlayerService.getPlayers().contains(invitee)) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("No such player: " + body.player()).build());
         }
-        boolean selfJoiningPublicGame = username().equals(body.player()) && JolAdmin.isPublic(game);
+        boolean selfJoiningPublicGame = username().equals(invitee) && JolAdmin.isPublic(game);
         if (!selfJoiningPublicGame) {
             requireOwnerOrAdmin(game);
         }
-        RegistrationService.invitePlayer(game, body.player());
+        RegistrationService.invitePlayer(game, invitee);
         WebSocketRegistry.notifyInvalidate(List.of("main-games"));
         notifyLobby();
     }
@@ -130,7 +134,7 @@ public class LobbyResource extends BaseResource {
     @Path("player/games/{name}/invite/{player}")
     public void unInvitePlayerReact(@PathParam("name") String game, @PathParam("player") String player) {
         requireOwnerOrAdmin(game);
-        JolAdmin.unInvitePlayer(game, player);
+        JolAdmin.unInvitePlayer(game, PlayerService.canonicalize(player));
         WebSocketRegistry.notifyInvalidate(List.of("main-games"));
         notifyLobby();
     }
