@@ -24,6 +24,7 @@
         <class>net.deckserver.jpa.entity.SiteNotesEntity</class>
         <class>net.deckserver.jpa.entity.SubscriptionEntity</class>
         <class>net.deckserver.jpa.entity.RefreshTokenEntity</class>
+        <class>net.deckserver.jpa.entity.MetricEventEntity</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
@@ -58,6 +59,7 @@
         <class>net.deckserver.jpa.entity.SiteNotesEntity</class>
         <class>net.deckserver.jpa.entity.SubscriptionEntity</class>
         <class>net.deckserver.jpa.entity.RefreshTokenEntity</class>
+        <class>net.deckserver.jpa.entity.MetricEventEntity</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 

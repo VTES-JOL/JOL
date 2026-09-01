@@ -9,11 +9,6 @@
             <ThresholdFilter level="INFO"/>
             <PatternLayout pattern="%d %-5p %c{1} - %m%n"/>
         </Console>
-        <RollingFile name="metrics" filePattern="${data}/metrics/%d{yyyy-MM}/%d{yyyy-MM-dd}.log" append="true">
-            <ThresholdFilter level="DEBUG"/>
-            <CsvParameterLayout quoteMode="NON_NUMERIC"/>
-            <TimeBasedTriggeringPolicy/>
-        </RollingFile>
         <RollingFile name="commands" filePattern="${data}/commands/%d{yyyy-MM}/%d{yyyy-MM-dd}.log" append="true">
             <ThresholdFilter level="INFO"/>
             <TimeBasedTriggeringPolicy/>
@@ -50,15 +45,13 @@
       that context, so removing Root here would silence test-scope logging
       entirely rather than just being redundant with Quarkus's own config.
 
-      net.deckserver.metrics/commands are unaffected either way — GameModel
-      obtains those two via org.apache.logging.log4j's native LogManager
-      (not SLF4J) specifically for the per-game dynamic file routing below,
-      which has no Quarkus-native equivalent.
+      net.deckserver.commands is unaffected either way — GameModel obtains it
+      via org.apache.logging.log4j's native LogManager (not SLF4J)
+      specifically for the per-game dynamic file routing below, which has no
+      Quarkus-native equivalent. (Site-activity metrics used to have a sibling
+      appender here; they moved to the metric_event table — see MetricsService.)
     -->
     <Loggers>
-        <Logger name="net.deckserver.metrics" level="INFO" additivity="false">
-            <AppenderRef ref="metrics"/>
-        </Logger>
         <Logger name="net.deckserver.commands" level="INFO" additivity="false">
             <AppenderRef ref="commands"/>
             <AppenderRef ref="console" level="error"/>

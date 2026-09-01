@@ -747,6 +747,61 @@ fi
 # JWT_PRIVATE_KEY_FILE / JWT_PUBLIC_KEY_FILE pair) — nothing to delete/rotate.
 echo "  ✓ stale access tokens handled by the subject-not-found 401 guard + refresh_token reset above"
 
+# ── 18. Activity metrics ─────────────────────────────────────────────────────
+# Backfill metric_event from the legacy metrics/*.log files (the old
+# net.deckserver.metrics log4j2 CSV appender). Site-wide activity, not
+# player-scoped, so it rides the full import only.
+if [[ "$PLAYER_DATA_ONLY" == true ]]; then
+  echo
+  echo "  ⚠ --player-data-only: skipping activity metrics"
+else
+log "Loading activity metrics..."
+if [[ -d "$DATA/metrics" ]]; then
+  python3 - "$DATA/metrics" <<'PYEOF' \
+  | copy_into metric_event "occurred_at,player_name,game_name,did_command,did_chat,is_tournament"
+import sys, os, csv, glob, re
+
+metrics_dir = sys.argv[1]
+writer = csv.writer(sys.stdout)
+# Mirror net.deckserver.game.model.GameNames.isTournament(String) — keep in sync.
+TABLE = re.compile(r"Round\s+\d+\s*-\s*Table\s+\d+")
+
+rows = skipped = 0
+for path in sorted(glob.glob(os.path.join(metrics_dir, "*", "*.log"))):
+    # newline="" + csv.reader handles quoted commas in game names and CRLF endings
+    with open(path, encoding="utf-8", errors="replace", newline="") as f:
+        for r in csv.reader(f):
+            if len(r) != 8:
+                skipped += 1
+                continue
+            y, mo, d, h, player, game, did_cmd, did_chat = r
+            if not player.strip() or not game.strip():
+                skipped += 1
+                continue
+            try:
+                occurred_at = "%04d-%02d-%02dT%02d:00:00Z" % (int(y), int(mo), int(d), int(h))
+            except ValueError:
+                skipped += 1
+                continue
+            dc = did_cmd.strip().lower()
+            ch = did_chat.strip().lower()
+            if dc not in ("true", "false") or ch not in ("true", "false"):
+                skipped += 1
+                continue
+            if dc == "false" and ch == "false":
+                skipped += 1  # violates ck_metric_event_activity
+                continue
+            is_tourn = ("Final Table" in game) or bool(TABLE.search(game))
+            writer.writerow([occurred_at, player, game, dc, ch, "true" if is_tourn else "false"])
+            rows += 1
+print(f"  parsed {rows} metric rows ({skipped} skipped)", file=sys.stderr)
+PYEOF
+  success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM metric_event;') metric events"
+else
+  echo "  ⚠ no metrics/ dir found — skipping activity metrics"
+fi
+fi
+
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo
 echo "════════════════════════════════════════"
@@ -758,7 +813,7 @@ for tbl in player player_role player_activity \
             tournament tournament_registration \
             game_state game_chat game_snapshot \
             game_activity global_chat game_history \
-            refresh_token site_notes subscription; do
+            refresh_token site_notes subscription metric_event; do
   n=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM $tbl;")
   printf "  %-35s %s rows\n" "$tbl" "$n"
 done

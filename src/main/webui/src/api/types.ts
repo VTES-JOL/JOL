@@ -307,7 +307,7 @@ export interface PlayerResult {
 
 // StatisticsResource.StatsRequest.
 export interface StatsRequest {
-  treshold: number;
+  threshold: number;
   fromDate: string;
   toDate: string;
   isTourney: boolean;
@@ -522,4 +522,49 @@ export interface CardDefinition {
   infernal?: boolean;
   votes?: string;
   title?: string;
+}
+
+// ── Metrics (MetricsResource — /metrics/*, public) ──────────────────────────
+// Mirrors of net.deckserver.rest.bean.Metric* records.
+
+export type MetricGrain = 'hour' | 'day' | 'month' | 'year';
+
+// MetricBucket — one time bucket. `bucket` is a local-time ISO string (no
+// offset) at the interval start, in the `tz` the query ran with.
+export interface MetricBucket {
+  bucket: string;
+  submits: number;
+  commands: number;
+  chats: number;
+  activePlayers: number;
+  activeGames: number;
+}
+
+// MetricSeries — response element of /metrics/by-player and /metrics/by-game.
+// `key` is the player or game name; series come most-active first.
+export interface MetricSeries {
+  key: string;
+  submits: number;
+  buckets: MetricBucket[];
+}
+
+// HeatmapCell — response element of /metrics/heatmap. dayOfWeek is ISO
+// (1 = Monday … 7 = Sunday); empty cells are omitted.
+export interface HeatmapCell {
+  dayOfWeek: number;
+  hourOfDay: number;
+  submits: number;
+}
+
+// MetricTotals — response of /metrics/totals. first/lastEvent are ISO offset
+// (UTC) strings, or null when the window is empty.
+export interface MetricTotals {
+  submits: number;
+  commands: number;
+  chats: number;
+  activePlayers: number;
+  activeGames: number;
+  activeDays: number;
+  firstEvent: string | null;
+  lastEvent: string | null;
 }

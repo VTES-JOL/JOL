@@ -4,20 +4,18 @@ import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.Phase;
 import net.deckserver.services.GameService;
+import net.deckserver.services.MetricsService;
 import net.deckserver.services.RegistrationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
-import org.apache.logging.log4j.message.ObjectArrayMessage;
 
-import java.time.OffsetDateTime;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 public class GameModel implements Comparable<GameModel> {
 
-    private static final Logger METRICS = LogManager.getLogger("net.deckserver.metrics");
     private static final Logger COMMANDS = LogManager.getLogger("net.deckserver.commands");
 
     @Getter
@@ -112,8 +110,7 @@ public class GameModel implements Comparable<GameModel> {
                     }
                     stateChanged = true;
                 }
-                OffsetDateTime timestamp = OffsetDateTime.now();
-                METRICS.info(new ObjectArrayMessage(timestamp.getYear(), timestamp.getMonthValue(), timestamp.getDayOfMonth(), timestamp.getHour(), player, game.getName(), didCommand, didChat));
+                MetricsService.record(player, game.getName(), didCommand, didChat);
                 JolAdmin.clearPing(player, name);
             }
             if (stateChanged || phaseChanged || chatChanged) {

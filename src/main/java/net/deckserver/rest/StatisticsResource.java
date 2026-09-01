@@ -1,11 +1,11 @@
 package net.deckserver.rest;
 
+import net.deckserver.game.model.GameNames;
 import net.deckserver.services.HistoryService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.storage.json.system.GameHistory;
 import net.deckserver.storage.json.system.PlayerResult;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -15,7 +15,6 @@ import java.time.OffsetDateTime;
 import java.time.YearMonth;
 import java.util.*;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -66,7 +65,7 @@ public class StatisticsResource extends BaseResource {
     }
 
     //Request Body for Statistics
-    public record StatsRequest(int treshold, String fromDate, String toDate, boolean isTourney) {
+    public record StatsRequest(int threshold, String fromDate, String toDate, boolean isTourney) {
     }
 
     //Get Stats for Player/Deck Statistics
@@ -108,7 +107,7 @@ public class StatisticsResource extends BaseResource {
                 .collect(Collectors.toSet());
 
         return allKeys.stream()
-                .filter(key -> games.get(key) >= body.treshold())
+                .filter(key -> games.get(key) >= body.threshold())
                 .collect(Collectors.toMap(
                         Function.identity(),
                         key -> new StatsDto(
@@ -549,8 +548,7 @@ public class StatisticsResource extends BaseResource {
 
     // Utils for checking Game History Relevance
     private boolean isTournamentGame(GameHistory game) {
-        return game.getName().contains("Final Table") ||
-                Pattern.compile("Round\\s+\\d+\\s*-\\s*Table\\s+\\d+").matcher(game.getName()).find();
+        return GameNames.isTournament(game.getName());
     }
 
     private boolean isInDateRange(GameHistory game, StatsRequest body) {
