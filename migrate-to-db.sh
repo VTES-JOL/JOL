@@ -530,15 +530,181 @@ PYEOF
 success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM game_state;') game states"
 
 # ── 10. Game chat ─────────────────────────────────────────────────────────────
-log "Loading game chat..."
-python3 - "$DATA/games" <<PYEOF | copy_into game_chat "game_id,history,updated_at"
-import sys, json, csv, os, datetime
+# Row-per-line model (game_chat_message, V18) is the only game-chat store the app
+# reads or writes, so it's the only one loaded here. The legacy game_chat blob
+# table is left empty on a fresh import; on an already-migrated database V18's
+# own backfill copies any existing blob into game_chat_message, and V19 drops
+# the blob table.
+#
+# invocation / invocation_by are backfilled here from the per-game raw-command
+# logs ($DATA/commands/<game name>.log) when present: the log and history.json
+# are the same event stream in the same order, so an order-preserving walk
+# anchored on (minute, issuer) — absorbing SYSTEM side-effect lines and the
+# `draw` line that play/discard append — reassociates each raw command with the
+# chat line(s) it produced. Best-effort: anything not confidently matched keeps
+# a NULL invocation. Games with no log file are simply skipped.
+#
+# FORCE_NOT_NULL (message): some prod chat lines have an empty/null message;
+# in CSV an unquoted empty field is read as NULL, which violates message's
+# NOT NULL. This keeps it an empty string instead (matching how the Java
+# paths and V18's COALESCE handle the same case).
+log "Loading game chat messages..."
+python3 - "$DATA" <<PYEOF | psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -v ON_ERROR_STOP=1 \
+  -c "\copy game_chat_message(game_id,turn_seq,chat_seq,turn_id,turn_player,turn_label,posted_at,display_ts,source,message,command,invocation,invocation_by) FROM STDIN WITH (FORMAT csv, FORCE_NOT_NULL (message))"
+import sys, json, csv, os, datetime, re
+from datetime import timedelta
 
-games_dir  = sys.argv[1]
+data_dir   = sys.argv[1]
+games_dir  = os.path.join(data_dir, "games")
+cmds_dir   = os.path.join(data_dir, "commands")
 loaded_ids = set("""$LOADED_GAME_IDS""".split())
+
+# game_id -> display name (raw-command logs are named by display name)
+id_to_name = {}
+try:
+    gj = json.load(open(os.path.join(data_dir, "games.json")))
+    for g in (gj.values() if isinstance(gj, dict) else gj):
+        if g.get("id") and g.get("name"):
+            id_to_name[g["id"]] = g["name"]
+except Exception as e:
+    print(f"WARN: games.json unreadable; command backfill disabled: {e}", file=sys.stderr)
+
+LOG_RE = re.compile(r'^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})[,.]\d+\s+(INFO|ERROR)\s+\[([^\]]+)\]\s+(.*)\$')
+
+def load_commands(game_name):
+    if not game_name:
+        return []
+    path = os.path.join(cmds_dir, game_name + ".log")
+    if not os.path.exists(path):
+        return []
+    out = []
+    with open(path, encoding="utf-8", errors="replace") as fh:
+        for line in fh:
+            m = LOG_RE.match(line.rstrip("\r\n"))
+            if not m:
+                continue
+            ts, level, issuer, raw = m.groups()
+            if level != "INFO":          # ERROR lines produced no chat
+                continue
+            try:
+                dt = datetime.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S")
+            except ValueError:
+                continue
+            out.append((dt, issuer.strip(), raw.strip()))
+    return out
+
+def hist_dt(ts, ref):
+    """Full datetime for a year-less 'd-MMM HH:mm' history stamp: history and log
+    are the same event, so pick the year (ref-1 / ref / ref+1) that places the
+    stamp closest to the log command time -- handles games spanning New Year."""
+    ts = (ts or "").strip().replace("Sept ", "Sep ")   # a stray long form seen in old data
+    try:
+        t = datetime.datetime.strptime("2000 " + ts, "%Y %d-%b %H:%M")  # 2000: leap-safe
+    except ValueError:
+        return None
+    cands = []
+    for y in (ref.year - 1, ref.year, ref.year + 1):
+        try:
+            cands.append(datetime.datetime(y, t.month, t.day, t.hour, t.minute))
+        except ValueError:
+            pass
+    return min(cands, key=lambda d: abs((d - ref).total_seconds())) if cands else None
+
+# raw verb -> synthetic verbs a single command may emit *after* its primary
+# line (every other side effect arrives as source="SYSTEM").
+FOLLOW_UPS = {"play": {"draw"}, "discard": {"draw"}}
+# raw verb -> synthetic verb(s) the same command can carry on its primary line
+VERB_ALIASES = {
+    "blood":  {"counter", "pool"},
+    "unlock": {"lock", "untap"},
+    "vp":     {"vp", "withdraw"},
+    "choose": {"choice"},
+}
+
+def _norm(tok):
+    return tok.lstrip("+").lower()
+
+def issuer_matches(chat, issuer):
+    if (chat.get("source") or "") == issuer:
+        return True
+    return issuer in (chat.get("command") or "").split()
+
+def starts_block(chat, issuer, raw):
+    """Whether this chat line can be the primary line a raw command produced:
+    a genuine command line (synthetic command present) by the right actor,
+    with the verb or trailing argument corroborating the pairing. This is what
+    stops phase headers and plain chat lines from absorbing a command."""
+    syn = (chat.get("command") or "").strip()
+    if not syn or not issuer_matches(chat, issuer):
+        return False
+    rparts, sparts = raw.split(), syn.split()
+    if not rparts or not sparts:
+        return False
+    rverb, sverb = rparts[0].lower(), sparts[0].lower()
+    if sverb == rverb or sverb in VERB_ALIASES.get(rverb, set()):
+        return True
+    return _norm(rparts[-1]) == _norm(sparts[-1]) and _norm(rparts[-1]) != rverb
+
+def align(entries, commands):
+    """Order-preserving assignment of each raw command to the run of chat
+    entries it produced. Mutates entries in place; returns the match count."""
+    li = ei = matched = 0
+    n = len(entries)
+    while li < len(commands) and ei < n:
+        ldt, issuer, raw = commands[li]
+        lmin  = ldt.replace(second=0, microsecond=0)
+        rverb = raw.split(" ", 1)[0].lower()
+
+        while ei < n:                                   # drop entries before this minute
+            hd = hist_dt(entries[ei].get("timestamp"), ldt)
+            if hd is None or hd < lmin:
+                ei += 1
+            else:
+                break
+        if ei >= n:
+            break
+
+        hd = hist_dt(entries[ei].get("timestamp"), ldt)
+        if hd is None or hd > lmin + timedelta(minutes=1):
+            li += 1                                     # command produced nothing visible
+            continue
+        if not starts_block(entries[ei], issuer, raw):
+            ei += 1                                     # not a corroborated primary line
+            continue
+
+        # If the next command is the same actor in the same minute, keep this
+        # block to just the primary line (+ SYSTEM / declared follow-ups).
+        greedy = not (li + 1 < len(commands)
+                      and commands[li + 1][0].replace(second=0, microsecond=0) <= lmin + timedelta(minutes=1)
+                      and commands[li + 1][1] == issuer)
+
+        start = ei
+        ei += 1
+        while ei < n:
+            hd2 = hist_dt(entries[ei].get("timestamp"), ldt)
+            if hd2 is None or hd2 > lmin + timedelta(minutes=1):
+                break
+            src   = entries[ei].get("source") or ""
+            cverb = (entries[ei].get("command") or "").split(" ", 1)[0].lower()
+            if src == "SYSTEM":
+                ei += 1
+            elif cverb and cverb in FOLLOW_UPS.get(rverb, set()):
+                ei += 1
+            elif greedy and cverb and issuer_matches(entries[ei], issuer):
+                ei += 1                                 # extra command line, same actor, no rival command
+            else:
+                break
+
+        for j in range(start, ei):
+            entries[j]["_inv"]    = raw
+            entries[j]["_inv_by"] = issuer
+            matched += 1
+        li += 1
+    return matched
 
 writer = csv.writer(sys.stdout)
 now    = datetime.datetime.now(datetime.timezone.utc).isoformat()
+rows = matched_total = games_with_log = 0
 
 for entry in os.scandir(games_dir):
     if not entry.is_dir():
@@ -553,11 +719,38 @@ for entry in os.scandir(games_dir):
         continue
     try:
         turns = json.load(open(history_json))
-        writer.writerow([game_id, json.dumps(turns), now])
     except Exception as e:
         print(f"WARN: skipping {history_json}: {e}", file=sys.stderr)
+        continue
+
+    valid_turns = [t for t in turns
+                   if t.get("turnId") is not None and t.get("player") is not None]
+    entries = [c for t in valid_turns for c in t.get("chats", [])]
+
+    commands = load_commands(id_to_name.get(game_id))
+    if commands:
+        games_with_log += 1
+        matched_total  += align(entries, commands)
+
+    for turn_seq, turn in enumerate(valid_turns):
+        turn_label = f"{turn['player']} {turn['turnId']}"
+        for chat_seq, chat in enumerate(turn.get("chats", [])):
+            writer.writerow([
+                game_id, turn_seq, chat_seq, turn["turnId"], turn["player"], turn_label, now,
+                chat.get("timestamp") or "",
+                chat.get("source") or "",
+                chat.get("message") or "",
+                chat.get("command") or "",
+                chat.get("_inv") or "",
+                chat.get("_inv_by") or "",
+            ])
+            rows += 1
+
+print(f"  generated {rows} chat message rows; backfilled the raw command for "
+      f"{matched_total} of them from {games_with_log} game logs", file=sys.stderr)
 PYEOF
-success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM game_chat;') game chat histories"
+success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM game_chat_message;') game chat messages "\
+"($(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FROM game_chat_message WHERE invocation IS NOT NULL;') with a backfilled command)"
 
 # ── 10b. Game turn snapshots (rollback) ───────────────────────────────────────
 log "Loading game turn snapshots..."
@@ -811,7 +1004,7 @@ for tbl in player player_role player_activity \
             game registration \
             deck_info deck_format deck_content \
             tournament tournament_registration \
-            game_state game_chat game_snapshot \
+            game_state game_chat_message game_snapshot \
             game_activity global_chat game_history \
             refresh_token site_notes subscription metric_event; do
   n=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT COUNT(*) FROM $tbl;")

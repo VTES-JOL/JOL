@@ -16,6 +16,10 @@ public class ChatData {
     private String message;
     private String source;
     private String command;
+    /** Raw text the player submitted for the command that produced this line. Judge-only; stripped for other viewers. */
+    private String invocation;
+    /** Who issued that command — often not {@link #source}, which is frequently the affected player. Judge-only. */
+    private String invocationBy;
 
     public ChatData() {
     }

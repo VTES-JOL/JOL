@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Clock } from 'lucide-react';
+import { Clock, Terminal } from 'lucide-react';
 import { api } from '../../api/client';
 import type { ChatData, GameSnapshot } from '../../api/types';
 import { Select } from '../../components/ui/Select';
 import { GameChatLog } from './GameChatLog';
 import { GamePanel } from './GamePanel';
+import { useShowCommands } from './useShowCommands';
 
 export function HistoryPanel({
   gameId,
@@ -19,6 +20,7 @@ export function HistoryPanel({
 }) {
   const [turn, setTurn] = useState(game.turns[game.turns.length - 1] ?? '');
   const [lines, setLines] = useState<ChatData[]>([]);
+  const [showCommands, toggleCommands] = useShowCommands();
 
   useEffect(() => {
     if (!turn) return;
@@ -33,6 +35,24 @@ export function HistoryPanel({
       id="historyCard"
       bodyClassName="flex flex-col p-2 overflow-hidden"
       title="History"
+      headerExtra={
+        game.judge && (
+          <button
+            type="button"
+            aria-pressed={showCommands}
+            onClick={toggleCommands}
+            title="Show the raw command behind each line"
+            className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${
+              showCommands
+                ? 'border-line-accent bg-hover text-ink'
+                : 'border-line text-ink-muted hover:bg-hover'
+            }`}
+          >
+            <Terminal size={12} />
+            Commands
+          </button>
+        )
+      }
       toggle={{ icon: <Clock size={13} />, label: 'Game Chat', onClick: onToggleChat }}
     >
       <Select
@@ -49,7 +69,7 @@ export function HistoryPanel({
           </option>
         ))}
       </Select>
-      <GameChatLog lines={lines} viewerName={viewerName} />
+      <GameChatLog lines={lines} viewerName={viewerName} showCommands={game.judge && showCommands} />
     </GamePanel>
   );
 }

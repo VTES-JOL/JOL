@@ -459,6 +459,10 @@ export interface ChatData {
   message: string;
   source: string;
   command?: string;
+  // Raw command a player submitted, plus who submitted it. Server only sends
+  // these to a judge watching a game they are not seated in; stripped otherwise.
+  invocation?: string;
+  invocationBy?: string;
 }
 
 // GET /jol/api/game/{id}/view (+ POST view/submit, POST view/end-turn) —

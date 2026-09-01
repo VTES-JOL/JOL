@@ -11,7 +11,9 @@ import net.deckserver.jpa.entity.*;
 import net.deckserver.jpa.repository.GameActivityRepository;
 import net.deckserver.jpa.repository.GameHistoryRepository;
 import net.deckserver.jpa.repository.TournamentRepository;
+import net.deckserver.storage.json.game.ChatData;
 import net.deckserver.storage.json.game.GameTimestampEntry;
+import net.deckserver.storage.json.game.TurnData;
 import net.deckserver.storage.json.system.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,7 +113,7 @@ class JolFixtureLoader {
                 loadGameState(gameDir, gameId);
             });
         }
-        // Chat FK references game_state, so flush states first then insert chats
+        // game_chat_message FK references game, already persisted above.
         em.flush();
         try (var dirs = Files.list(gamesDir)) {
             dirs.filter(Files::isDirectory).forEach(gameDir -> {
@@ -139,11 +141,30 @@ class JolFixtureLoader {
         File histFile = gameDir.resolve("history.json").toFile();
         if (!histFile.exists()) return;
         try {
-            GameChatEntity entity = new GameChatEntity();
-            entity.setGameId(gameId);
-            entity.setHistory(Files.readString(histFile.toPath()));
-            entity.setUpdatedAt(OffsetDateTime.now());
-            em.persist(entity);
+            List<TurnData> turns = objectMapper.readValue(histFile, new TypeReference<>() {});
+            OffsetDateTime now = OffsetDateTime.now();
+            for (int turnSeq = 0; turnSeq < turns.size(); turnSeq++) {
+                TurnData turn = turns.get(turnSeq);
+                List<ChatData> chats = turn.getChats();
+                for (int chatSeq = 0; chatSeq < chats.size(); chatSeq++) {
+                    ChatData chat = chats.get(chatSeq);
+                    GameChatMessageEntity entity = new GameChatMessageEntity();
+                    entity.setGameId(gameId);
+                    entity.setTurnSeq(turnSeq);
+                    entity.setChatSeq(chatSeq);
+                    entity.setTurnId(turn.getTurnId());
+                    entity.setTurnPlayer(turn.getPlayer());
+                    entity.setTurnLabel(turn.getLabel());
+                    entity.setPostedAt(now);
+                    entity.setDisplayTs(chat.getTimestamp());
+                    entity.setSource(chat.getSource());
+                    entity.setMessage(chat.getMessage() != null ? chat.getMessage() : "");
+                    entity.setCommand(chat.getCommand());
+                    entity.setInvocation(chat.getInvocation());
+                    entity.setInvocationBy(chat.getInvocationBy());
+                    em.persist(entity);
+                }
+            }
         } catch (IOException e) {
             logger.warn("Fixture: could not load game chat {}", gameId, e);
         }

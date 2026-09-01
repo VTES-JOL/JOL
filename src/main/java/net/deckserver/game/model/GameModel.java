@@ -3,6 +3,7 @@ package net.deckserver.game.model;
 import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.Phase;
+import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
 import net.deckserver.services.MetricsService;
 import net.deckserver.services.RegistrationService;
@@ -100,12 +101,18 @@ public class GameModel implements Comparable<GameModel> {
                     String[] commands = command.split(";");
                     ThreadContext.put("DYNAMIC_LOG", name);
                     for (String cmd : commands) {
+                        // Bracket the command so every ChatData it produces — including
+                        // side-effect and system lines — carries the raw text the player
+                        // typed and who typed it (surfaced to judges via ChatData.invocation).
+                        ChatService.beginInvocation(player, cmd.trim());
                         try {
                             commander.doCommand(player, cmd);
                             COMMANDS.info("[{}] {}", player, cmd);
                         } catch (CommandException e) {
                             COMMANDS.error("[{}] {}", player, cmd);
                             status.append(e.getMessage());
+                        } finally {
+                            ChatService.endInvocation();
                         }
                     }
                     stateChanged = true;

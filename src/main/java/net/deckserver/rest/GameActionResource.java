@@ -88,9 +88,30 @@ public class GameActionResource extends BaseResource {
     @GET
     @Path("history")
     public List<ChatData> getHistory(@QueryParam("turn") String turn) {
-        username(); // auth check
+        String player = username();
         String gameId = JolAdmin.getGameId(gameName());
-        return ChatService.getTurn(gameId, turn);
+        List<ChatData> lines = ChatService.getTurn(gameId, turn);
+        // Command context (ChatData.invocation) is judge-only: a judge watching a
+        // game they are not seated in. Everyone else gets copies with it stripped,
+        // so nothing sensitive leaves the server regardless of the client.
+        boolean canJudge = JolAdmin.isJudge(player)
+                && !RegistrationService.getPlayers(gameName()).contains(player);
+        if (canJudge) {
+            return lines;
+        }
+        return lines.stream().map(GameActionResource::withoutInvocation).toList();
+    }
+
+    private static ChatData withoutInvocation(ChatData c) {
+        if (c.getInvocation() == null && c.getInvocationBy() == null) {
+            return c;
+        }
+        ChatData copy = new ChatData();
+        copy.setTimestamp(c.getTimestamp());
+        copy.setMessage(c.getMessage());
+        copy.setSource(c.getSource());
+        copy.setCommand(c.getCommand());
+        return copy;
     }
 
     private GameModel getModel() {

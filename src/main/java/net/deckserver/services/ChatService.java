@@ -2,19 +2,17 @@ package net.deckserver.services;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.github.benmanes.caffeine.cache.RemovalCause;
 import io.quarkus.runtime.Startup;
 import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.JpaFactory;
-import net.deckserver.jpa.repository.GameChatRepository;
+import net.deckserver.jpa.repository.GameChatMessageRepository;
 import net.deckserver.storage.json.game.ChatData;
 import net.deckserver.storage.json.game.TurnData;
 import net.deckserver.storage.json.game.TurnHistory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
@@ -37,24 +35,40 @@ public class ChatService extends PersistedService {
         return resolve(ChatService.class, ChatService::new);
     }
 
-    private static final GameChatRepository gameChatRepository = new GameChatRepository();
+    private static final GameChatMessageRepository messageRepository = new GameChatMessageRepository();
 
+    /**
+     * The raw command currently being executed on this thread, if any. Set by
+     * {@link #beginInvocation}/{@link #endInvocation} around each
+     * {@code DoCommand.doCommand} call in {@code GameModel.submit}, and stamped
+     * onto every {@link ChatData} that command produces at {@link #sendChat}.
+     * Safe as a ThreadLocal: a submit runs single-threaded under
+     * {@code GameModel}'s ReentrantLock, single-node.
+     */
+    private record Invocation(String issuer, String raw) {}
+    private static final ThreadLocal<Invocation> CURRENT_INVOCATION = new ThreadLocal<>();
+
+    // Read accelerator only. Persistence is write-through per message (see sendChat);
+    // there is no background flush and eviction just drops the cached copy — the
+    // database already holds every row.
     private final LoadingCache<String, TurnHistory> historyCache = Caffeine.newBuilder()
             .expireAfterAccess(5, TimeUnit.MINUTES)
-            .removalListener((String key, TurnHistory history, RemovalCause cause) -> {
-                // Don't save during shutdown - it's handled explicitly
-                if (!isShuttingDown()) {
-                    saveHistory(key, history);
-                }
-            })
             .build(this::loadHistory);
 
     ChatService() {
-        super("ChatService", 5); // 5 minute persistence interval
+        super("ChatService", 0); // write-through, no scheduled persistence
     }
 
     public static PersistedService getInstance() {
         return instance();
+    }
+
+    public static void beginInvocation(String issuer, String raw) {
+        CURRENT_INVOCATION.set(new Invocation(issuer, raw));
+    }
+
+    public static void endInvocation() {
+        CURRENT_INVOCATION.remove();
     }
 
     public static  List<String> getTurns(String gameId) {
@@ -99,26 +113,34 @@ public class ChatService extends PersistedService {
     }
 
     private static  void sendChat(String gameId, ChatData chat) {
-        instance().historyCache.get(gameId).addChat(chat);
-    }
-
-    private void saveHistory(String gameId, TurnHistory history) {
-        if (shouldSkipPersistence()) {
-            return;
+        Invocation inv = CURRENT_INVOCATION.get();
+        if (inv != null) {
+            if (chat.getInvocation() == null) {
+                chat.setInvocation(inv.raw());
+            }
+            if (chat.getInvocationBy() == null) {
+                chat.setInvocationBy(inv.issuer());
+            }
         }
 
-        if (history == null || history.getTurns() == null || history.getTurns().isEmpty()) {
-            logger.debug("Skipping save for {} - history is empty", gameId);
-            return;
-        }
+        TurnHistory history = instance().historyCache.get(gameId);
+        TurnData turn = history.addChat(chat);
+        int turnSeq = history.getCurrentTurnIndex();
+        int chatSeq = Math.max(0, turn.getChats().size() - 1);
+        String turnId = history.getCurrentTurn();
+        String player = history.getCurrentPlayer();
+        String turnLabel = history.getCurrentTurnLabel();
 
-        logger.debug("Saving history for {} with {} turns", gameId, history.getTurns().size());
-        requireJpaWrite(em -> gameChatRepository.save(em, gameId, history.getTurns()));
+        boolean ok = instance().jpaWrite(em ->
+                messageRepository.insert(em, gameId, turnSeq, chatSeq, turnId, player, turnLabel, chat));
+        if (!ok) {
+            instance().logger.error("Failed to persist chat line for game {} (turn {})", gameId, turnLabel);
+        }
     }
 
     private TurnHistory loadHistory(String gameId) {
         try (EntityManager em = JpaFactory.createEntityManager()) {
-            List<TurnData> turns = gameChatRepository.load(em, gameId);
+            List<TurnData> turns = messageRepository.load(em, gameId);
             if (!turns.isEmpty()) {
                 return new TurnHistory(turns);
             }
@@ -130,35 +152,12 @@ public class ChatService extends PersistedService {
 
     @Override
     protected void persist() {
-        if (shouldSkipPersistence()) {
-            logger.debug("Skipping persistence - {} mode", isTestModeEnabled() ? "test" : "shutdown");
-            return;
-        }
-
-        Map<String, TurnHistory> snapshot = historyCache.asMap();
-        int persistedCount = 0;
-
-        logger.debug("Starting persistence of {} cached histories", snapshot.size());
-
-        for (Map.Entry<String, TurnHistory> entry : snapshot.entrySet()) {
-            String gameId = entry.getKey();
-            TurnHistory history = entry.getValue();
-
-            if (history != null && history.getTurns() != null && !history.getTurns().isEmpty()) {
-                saveHistory(gameId, history);
-                persistedCount++;
-            }
-        }
-
-        if (persistedCount > 0) {
-            logger.info("Persisted {} histories", persistedCount);
-        }
+        // Write-through — nothing to flush. Kept because PersistedService requires it.
     }
 
     @Override
     protected void load() {
-        // ChatService loads on-demand via Caffeine cache
-        // No bulk loading needed
+        // ChatService loads on-demand via Caffeine cache. No bulk loading needed.
     }
 
     @Override

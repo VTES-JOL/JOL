@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { History } from 'lucide-react';
+import { History, Terminal } from 'lucide-react';
 import { api } from '../../api/client';
 import type { ChatData, GameSnapshot } from '../../api/types';
 import { GameChatLog } from './GameChatLog';
 import { GamePanel } from './GamePanel';
+import { useShowCommands } from './useShowCommands';
 
 export function GameChatPanel({
   gameId,
@@ -17,6 +18,7 @@ export function GameChatPanel({
   onToggleHistory: () => void;
 }) {
   const [lines, setLines] = useState<ChatData[]>([]);
+  const [showCommands, toggleCommands] = useShowCommands();
 
   useEffect(() => {
     api
@@ -33,10 +35,30 @@ export function GameChatPanel({
       className="chat"
       bodyClassName="p-0 overflow-hidden"
       title="Game Chat"
-      headerExtra={<span className="px-2 text-xs text-ink-muted">{`${game.turnLabel} - ${game.phase}`}</span>}
+      headerExtra={
+        <span className="flex items-center gap-2">
+          {game.judge && (
+            <button
+              type="button"
+              aria-pressed={showCommands}
+              onClick={toggleCommands}
+              title="Show the raw command behind each line"
+              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${
+                showCommands
+                  ? 'border-line-accent bg-hover text-ink'
+                  : 'border-line text-ink-muted hover:bg-hover'
+              }`}
+            >
+              <Terminal size={12} />
+              Commands
+            </button>
+          )}
+          <span className="px-1 text-xs text-ink-muted">{`${game.turnLabel} - ${game.phase}`}</span>
+        </span>
+      }
       toggle={{ icon: <History size={13} />, label: 'History', onClick: onToggleHistory }}
     >
-      <GameChatLog lines={lines} viewerName={viewerName} />
+      <GameChatLog lines={lines} viewerName={viewerName} showCommands={game.judge && showCommands} />
     </GamePanel>
   );
 }
