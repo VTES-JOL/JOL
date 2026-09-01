@@ -221,10 +221,7 @@ public class JolAdmin {
             // Reset game time to the current time to extend idle timeout
             gameInfo.setUpdated(OffsetDateTime.now());
 
-            long registeredPlayers = RegistrationService.getRegisteredPlayerCount(gameName);
-            if (registeredPlayers == gameInfo.getGameFormat().getPlayerCount()) {
-                startGame(gameName);
-            }
+            attemptAutoStart(gameName);
         } catch (IllegalStateException exception) {
             logger.debug(exception.getMessage());
         } finally {
@@ -374,25 +371,81 @@ public class JolAdmin {
         return GameService.get(gameName).getVisibility().equals(Visibility.PUBLIC);
     }
 
-    public static void startGame(String gameName, List<String> players) {
+    /**
+     * Builds and starts a game from its registrations. Nothing is persisted and the game status is not
+     * flipped to {@link GameStatus#ACTIVE} unless every registered player's deck loads and the game
+     * starts cleanly, so a failure here leaves the game recoverable in {@link GameStatus#STARTING}
+     * (re-registering a deck or the owner/admin "start" action will retry).
+     *
+     * @return {@code true} if the game is now ACTIVE.
+     */
+    public static boolean startGame(String gameName, List<String> players) {
         GameInfo gameInfo = GameService.get(gameName);
-        GameData gameData = new GameData(gameInfo.getId(), gameName);
-        JolGame game = new JolGame(gameInfo.getId(), gameData);
-        RegistrationService.getGameRegistrations(gameName).forEach((playerName, registration) -> {
-            if (registration.getDeckId() != null) {
-                Deck deck = getGameDeck(gameName, playerName);
-                game.addPlayer(playerName, deck);
-            }
-        });
-        if (!game.getPlayers().isEmpty() && game.getPlayers().size() <= 5) {
-            game.startGame(players);
-            saveGameState(game);
-            gameInfo.setStatus(GameStatus.ACTIVE);
-            pingPlayer(game.getActivePlayer(), gameName);
+        if (gameInfo == null) {
+            logger.warn("Cannot start game '{}' - no such game", gameName);
+            return false;
         }
+        String gameId = gameInfo.getId();
+
+        Map<String, RegistrationStatus> registrations = RegistrationService.getGameRegistrations(gameName);
+        List<String> registered = registrations.entrySet().stream()
+                .filter(entry -> entry.getValue().getDeckId() != null)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        if (registered.isEmpty() || registered.size() > 5) {
+            logger.warn("Cannot start game '{}' - {} registered player(s)", gameName, registered.size());
+            return false;
+        }
+
+        // Pre-flight: every player's per-game deck file must be present and loadable. A missing copy is
+        // repaired from the master decks/ directory where possible. This runs before anything is built,
+        // so it cannot leave a half-started game behind.
+        Map<String, Deck> decks = new LinkedHashMap<>();
+        List<String> broken = new ArrayList<>();
+        for (String playerName : registered) {
+            String deckId = registrations.get(playerName).getDeckId();
+            if (!DeckService.gameDeckExists(gameId, deckId)) {
+                logger.warn("Game '{}' start: per-game deck file for {} ({}) missing - attempting repair copy", gameName, playerName, deckId);
+                DeckService.copyDeck(deckId, gameId);
+            }
+            try {
+                Deck deck = DeckService.loadGameDeck(gameId, deckId).getDeck();
+                if (deck == null || deck.getCrypt() == null || deck.getLibrary() == null
+                        || deck.getCrypt().getCards().isEmpty() || deck.getLibrary().getCards().isEmpty()) {
+                    broken.add(playerName);
+                } else {
+                    decks.put(playerName, deck);
+                }
+            } catch (RuntimeException e) {
+                logger.error("Game '{}' start: unable to load deck for {} ({})", gameName, playerName, deckId, e);
+                broken.add(playerName);
+            }
+        }
+        if (!broken.isEmpty()) {
+            logger.error("Not starting game '{}' - unloadable/empty deck(s) for: {}", gameName, broken);
+            String message = "Game could not start - deck(s) for " + String.join(", ", broken)
+                    + " could not be loaded. Please re-register.";
+            registered.forEach(playerName -> getPlayerModel(playerName).setMessage(message));
+            return false;
+        }
+
+        // Build + start in memory; only persist and flip the status on full success.
+        JolGame game = new JolGame(gameId, new GameData(gameId, gameName));
+        decks.forEach(game::addPlayer);
+        try {
+            game.startGame(players);
+        } catch (RuntimeException e) {
+            logger.error("Not starting game '{}' - startGame failed", gameName, e);
+            return false;
+        }
+        saveGameState(game);
+        gameInfo.setStatus(GameStatus.ACTIVE);
+        pingPlayer(game.getActivePlayer(), gameName);
+        logger.info("Started game '{}' with players {}", gameName, players);
+        return true;
     }
 
-    public static synchronized void startGame(String gameName) {
+    public static synchronized boolean startGame(String gameName) {
         List<String> players = new ArrayList<>();
         List<String> invitedPlayers = new ArrayList<>();
         RegistrationService.getGameRegistrations(gameName).forEach((playerName, registration) -> {
@@ -404,7 +457,25 @@ public class JolAdmin {
         });
         invitedPlayers.forEach((playerName) -> RegistrationService.removePlayer(gameName, playerName));
         Collections.shuffle(players, new SecureRandom());
-        startGame(gameName, players);
+        return startGame(gameName, players);
+    }
+
+    /**
+     * Starts {@code gameName} if it is still in the lobby with a full roster. Safe to call repeatedly -
+     * it is a no-op unless the game is STARTING and has exactly the format's player count registered.
+     * Used both when the last deck is registered and as a self-healing retry from {@code GameCleanUp}
+     * for a game whose initial auto-start failed (e.g. a transient filesystem error).
+     */
+    public static synchronized boolean attemptAutoStart(String gameName) {
+        GameInfo gameInfo = GameService.get(gameName);
+        if (gameInfo == null || !GameStatus.STARTING.equals(gameInfo.getStatus())) {
+            return false;
+        }
+        long registeredPlayers = RegistrationService.getRegisteredPlayerCount(gameName);
+        if (registeredPlayers != gameInfo.getGameFormat().getPlayerCount()) {
+            return false;
+        }
+        return startGame(gameName);
     }
 
     public static synchronized void endGame(String gameName, boolean graceful) {

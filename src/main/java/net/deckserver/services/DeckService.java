@@ -95,6 +95,32 @@ public class DeckService extends PersistedService {
         }
     }
 
+    /**
+     * True when the per-game copy of a deck exists on disk. The per-game copy is written by
+     * {@link #copyDeck(String, String)} at registration time and is what {@code JolAdmin.startGame}
+     * builds the game from.
+     */
+    public static boolean gameDeckExists(String gameId, String deckId) {
+        return Files.isRegularFile(DataPaths.path("games", gameId, deckId + ".json"));
+    }
+
+    /**
+     * Strict variant of {@link #getGameDeck(String, String)} for the game-start path. Throws instead of
+     * silently returning an empty deck when the per-game deck file is missing or unreadable, so a broken
+     * registration can never seat a player with an empty crypt/library.
+     */
+    public static ExtendedDeck loadGameDeck(String gameId, String deckId) {
+        Path gameDeckPath = DataPaths.path("games", gameId, deckId + ".json");
+        if (!Files.isRegularFile(gameDeckPath)) {
+            throw new IllegalStateException("Missing per-game deck file " + gameDeckPath);
+        }
+        try {
+            return objectMapper.readValue(gameDeckPath.toFile(), ExtendedDeck.class);
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to read per-game deck file " + gameDeckPath, e);
+        }
+    }
+
     public static String getDeckComments(String playerName, String deckName) {
         String comments = getDeck(get(playerName, deckName).getDeckId()).getDeck().getComments();
         return comments == null ? "" : comments;
@@ -110,17 +136,25 @@ public class DeckService extends PersistedService {
     }
 
     public static boolean copyDeck(String deckId, String gameId) {
-        try {
-            Path deckPath = DataPaths.path("decks", deckId + ".json");
-            Path gamePath = DataPaths.path("games", gameId, deckId + ".json");
-            logger.debug("Copying {} to {}", deckPath, gamePath);
-            Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
-            return true;
-        } catch (IOException e) {
-            logger.error("Unable to load deck for {}", deckId, e);
+        Path deckPath = DataPaths.path("decks", deckId + ".json");
+        Path gamePath = DataPaths.path("games", gameId, deckId + ".json");
+        if (!Files.isRegularFile(deckPath)) {
+            logger.error("Cannot copy deck {} into game {} - source deck file {} does not exist", deckId, gameId, deckPath);
             return false;
         }
-
+        try {
+            logger.debug("Copying {} to {}", deckPath, gamePath);
+            Files.createDirectories(gamePath.getParent());
+            Files.copy(deckPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            logger.error("Unable to copy deck {} into game {}", deckId, gameId, e);
+            return false;
+        }
+        if (!Files.isRegularFile(gamePath)) {
+            logger.error("Deck copy for {} into game {} reported success but target {} is missing", deckId, gameId, gamePath);
+            return false;
+        }
+        return true;
     }
 
     public static PersistedService getInstance() {

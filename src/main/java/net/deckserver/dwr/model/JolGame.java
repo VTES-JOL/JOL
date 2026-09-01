@@ -221,6 +221,17 @@ public record JolGame(String id, GameData data) {
         if (playerSeating.size() != players.size() || !new HashSet<>(players).containsAll(playerSeating)) {
             throw new IllegalArgumentException("Player ordering not valid, does not contain current players");
         }
+        int minCrypt = tournamentMode ? 3 : 4;
+        int minLibrary = tournamentMode ? 0 : 7;
+        for (String player : players) {
+            PlayerData playerData = data.getPlayer(player);
+            int cryptSize = playerData.getRegion(RegionType.CRYPT).getCards().size();
+            int librarySize = playerData.getRegion(RegionType.LIBRARY).getCards().size();
+            if (cryptSize < minCrypt || librarySize < minLibrary) {
+                throw new IllegalStateException("Cannot start game " + data.getName() + " - " + player
+                        + " has an unplayable deck (crypt=" + cryptSize + ", library=" + librarySize + ")");
+            }
+        }
         data.orderPlayers(playerSeating);
         for (String player : players) {
             PlayerData playerData = data.getPlayer(player);
