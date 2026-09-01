@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { MinusCircle, PlusCircle } from 'lucide-react';
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
 import { Card, RegionLabelBadges, type TableCardClick } from './Card';
@@ -36,7 +36,13 @@ function clickMode(regionType: string, isOwnRegion: boolean, isSeatedPlayer: boo
 // Mirrors region.jsp — collapse/expand is purely local UI state here (see
 // GameSnapshotFactory's javadoc). A region that gains a card auto-expands so
 // the change is visible, even if a viewer had collapsed it.
-export function Region({
+//
+// React.memo: `region` keeps the same reference across an unrelated ['game',
+// id] refetch (TanStack structural sharing), and every other prop is a
+// primitive or a stable callback, so an opponent's action skips this whole
+// card list. `onAction` is useCallback'd for the same reason — otherwise a
+// fresh closure each render would defeat Card's own memo.
+export const Region = memo(function Region({
   region,
   defaultCollapsed,
   controller,
@@ -65,14 +71,17 @@ export function Region({
     prevCardCount.current = region.cards.length;
   }, [region.cards.length]);
 
+  const onAction = useCallback(
+    ({ coordinate, card, isChild }: TableCardClick) =>
+      onTableCardClick({ controller, controllerPool, regionType: region.type, regionCommandKey: region.commandKey, coordinate, card, isChild }),
+    [onTableCardClick, controller, controllerPool, region.type, region.commandKey],
+  );
+
   if (region.cards.length === 0) return null;
 
   const primary = PRIMARY_REGIONS.has(region.type);
   const accent = REGION_ACCENT[region.type] ?? 'border-l-line-accent';
   const mode = clickMode(region.type, isOwnRegion, isSeatedPlayer);
-
-  const onAction = ({ coordinate, card, isChild }: TableCardClick) =>
-    onTableCardClick({ controller, controllerPool, regionType: region.type, regionCommandKey: region.commandKey, coordinate, card, isChild });
 
   return (
     <div className={`mb-2 ${primary ? `border-l-2 ${accent}` : ''}`}>
@@ -130,4 +139,4 @@ export function Region({
       )}
     </div>
   );
-}
+});

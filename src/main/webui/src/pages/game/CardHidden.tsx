@@ -1,9 +1,11 @@
+import { memo } from 'react';
 import type { CardSnapshot } from '../../api/types';
 
 // Mirrors card-hidden.jsp — no card identity crosses the wire for these (see
 // GameSnapshotFactory), so there's nothing to render beyond a placeholder and
-// the counter badge.
-export function CardHidden({ card, region, coordinate }: { card: CardSnapshot; region: string; coordinate?: string }) {
+// the counter badge. memo'd: all props are ref-stable across an unrelated
+// snapshot refetch (structural sharing), no callbacks.
+export const CardHidden = memo(function CardHidden({ card, region, coordinate }: { card: CardSnapshot; region: string; coordinate?: string }) {
   const regionStyle = region === 'REMOVED_FROM_GAME' ? 'opacity-50' : '';
   return (
     <li className={`flex justify-between items-center p-1 ${regionStyle}`}>
@@ -22,4 +24,4 @@ export function CardHidden({ card, region, coordinate }: { card: CardSnapshot; r
       </div>
     </li>
   );
-}
+});

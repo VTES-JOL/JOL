@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
@@ -46,7 +46,52 @@ export function GamePage() {
   useGameSocket(gameId ?? null);
   useCardTooltips(boardRef, [game]);
 
-  const applyUpdate = (updated: GameSnapshot) => queryClient.setQueryData(['game', gameId], updated);
+  const applyUpdate = useCallback(
+    (updated: GameSnapshot) => queryClient.setQueryData(['game', gameId], updated),
+    [queryClient, gameId],
+  );
+
+  const submit = useCallback(
+    (submission: Submission) => {
+      guard(() =>
+        runRequest(
+          api.post<GameSnapshot>(`/game/${gameId}/view/submit`, {
+            phase: null,
+            command: submission.command ?? null,
+            chat: submission.chat ?? null,
+            ping: null,
+          }),
+          'Failed to submit',
+          applyUpdate,
+        ),
+      );
+    },
+    [guard, gameId, applyUpdate],
+  );
+
+  // cardOnTableClicked()'s dual role: while a target pick is pending, a
+  // click on an on-table card completes that pick (pickTarget()) instead of
+  // opening the action modal.
+  const handleTableCardClick = useCallback(
+    (ctx: TableCardContext) => {
+      if (pendingTarget) {
+        const targetPlayer = ctx.controller.split(' ')[0];
+        const pickedTarget = `${targetPlayer} ${ctx.regionCommandKey} ${ctx.coordinate}`;
+        submit({
+          command: buildPlayCommand(pendingTarget.ctx, pendingTarget.disciplines, pendingTarget.target, pickedTarget, pendingTarget.doNotReplace),
+        });
+        setPendingTarget(null);
+        return;
+      }
+      setTableModal(ctx);
+    },
+    [pendingTarget, submit],
+  );
+
+  const handlePlayCardClick = useCallback((ctx: HandCardContext, card: CardSnapshot) => {
+    setPendingTarget(null);
+    setPlayModal({ ctx, card });
+  }, []);
 
   if (!game || !gameId) {
     return (
@@ -56,45 +101,13 @@ export function GamePage() {
     );
   }
 
-  const submit = (submission: Submission) => {
-    guard(() =>
-      runRequest(
-        api.post<GameSnapshot>(`/game/${gameId}/view/submit`, {
-          phase: null,
-          command: submission.command ?? null,
-          chat: submission.chat ?? null,
-          ping: null,
-        }),
-        'Failed to submit',
-        applyUpdate,
-      ),
-    );
-  };
-
-  // cardOnTableClicked()'s dual role: while a target pick is pending, a
-  // click on an on-table card completes that pick (pickTarget()) instead of
-  // opening the action modal.
-  const handleTableCardClick = (ctx: TableCardContext) => {
-    if (pendingTarget) {
-      const targetPlayer = ctx.controller.split(' ')[0];
-      const pickedTarget = `${targetPlayer} ${ctx.regionCommandKey} ${ctx.coordinate}`;
-      submit({
-        command: buildPlayCommand(pendingTarget.ctx, pendingTarget.disciplines, pendingTarget.target, pickedTarget, pendingTarget.doNotReplace),
-      });
-      setPendingTarget(null);
-      return;
-    }
-    setTableModal(ctx);
-  };
-
-  const handlePlayCardClick = (ctx: HandCardContext, card: CardSnapshot) => {
-    setPendingTarget(null);
-    setPlayModal({ ctx, card });
-  };
-
   const liveTableCard = tableModal ? findCardByCoordinate(game, tableModal.controller, tableModal.regionType, tableModal.coordinate) : null;
   const liveControllerPool = tableModal ? game.players.find((p) => p.name === tableModal.controller)?.pool : undefined;
   const livePlayCard = playModal ? findCardByCoordinate(game, viewerName ?? '', playModal.ctx.regionType, playModal.ctx.coordinate) : null;
+
+  const handRegion = viewerName
+    ? game.players.find((p) => p.name === viewerName)?.regions.find((r) => r.type === 'HAND')
+    : undefined;
 
   return (
     <div className="flex flex-col flex-1 min-h-0 p-2 bg-base text-ink">
@@ -103,7 +116,7 @@ export function GamePage() {
       </h5>
       <div className="flex-1 min-h-0 overflow-y-auto my-1" ref={boardRef}>
         <div className="control-grid">
-          <HandStrip game={game} viewerName={viewerName} onPlayCardClick={handlePlayCardClick} />
+          <HandStrip handRegion={handRegion} show={game.player && !!viewerName} onPlayCardClick={handlePlayCardClick} />
           <CommandForm
             gameId={gameId}
             game={game}
@@ -128,7 +141,9 @@ export function GamePage() {
             <PlayerBoard
               key={player.name}
               player={player}
-              game={game}
+              edgeColor={game.edgeColor}
+              edgeTextColor={game.edgeTextColor}
+              isSeatedPlayer={game.player}
               viewerName={viewerName}
               onTableCardClick={handleTableCardClick}
               onPlayCardClick={handlePlayCardClick}

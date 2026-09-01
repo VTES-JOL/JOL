@@ -1,5 +1,6 @@
+import { memo } from 'react';
 import { ChevronLeft, ChevronRight, TriangleAlert } from 'lucide-react';
-import type { CardSnapshot, GameSnapshot, PlayerSnapshot } from '../../api/types';
+import type { CardSnapshot, PlayerSnapshot } from '../../api/types';
 import { Region } from './Region';
 import type { HandCardContext, TableCardContext } from './cardCommands';
 
@@ -16,15 +17,26 @@ function poolStyle(pool: number): string {
   return pool < 0 ? 'bg-gold text-surface' : 'bg-blood text-surface';
 }
 
-export function PlayerBoard({
+// React.memo so an opponent acting — a full ['game', id] refetch — doesn't
+// re-render every board: TanStack's structural sharing hands back the same
+// `player` reference for any PlayerSnapshot that didn't change, and the other
+// props here are primitives / stable callbacks (see GamePage's useCallback),
+// so the memo comparison passes and the whole subtree (Region → Card) is
+// skipped. Passing the three needed `game` scalars instead of the whole
+// GameSnapshot is what keeps that comparison meaningful.
+export const PlayerBoard = memo(function PlayerBoard({
   player,
-  game,
+  edgeColor,
+  edgeTextColor,
+  isSeatedPlayer,
   viewerName,
   onTableCardClick,
   onPlayCardClick,
 }: {
   player: PlayerSnapshot;
-  game: GameSnapshot;
+  edgeColor: string;
+  edgeTextColor: 'white' | 'black';
+  isSeatedPlayer: boolean;
   viewerName: string | null;
   onTableCardClick: (ctx: TableCardContext) => void;
   onPlayCardClick: (ctx: HandCardContext, card: CardSnapshot) => void;
@@ -51,7 +63,7 @@ export function PlayerBoard({
             {player.edge && (
               <span
                 className={`${PILL} border border-line gap-1`}
-                style={{ background: game.edgeColor, color: game.edgeTextColor }}
+                style={{ background: edgeColor, color: edgeTextColor }}
               >
                 <ChevronLeft size={11} />
                 Edge
@@ -77,7 +89,7 @@ export function PlayerBoard({
               controller={player.name}
               controllerPool={player.pool}
               isOwnRegion={isViewer}
-              isSeatedPlayer={game.player}
+              isSeatedPlayer={isSeatedPlayer}
               onTableCardClick={onTableCardClick}
               onPlayCardClick={onPlayCardClick}
             />
@@ -86,4 +98,4 @@ export function PlayerBoard({
       </div>
     </div>
   );
-}
+});

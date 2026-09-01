@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Eye, EyeOff, Flame, Lock } from 'lucide-react';
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
 import { CardHidden } from './CardHidden';
@@ -27,7 +28,12 @@ export interface TableCardClick {
 // Mirrors card.jsp — the "full" card rendering used for CRYPT and the
 // non-simple regions (READY/TORPOR/UNCONTROLLED). Recurses into its own
 // `cards` for nested equipment/allies/blood-counter stacks.
-export function Card({
+//
+// React.memo: `card` keeps its reference across an unrelated ['game', id]
+// refetch (TanStack structural sharing), `onAction` is stable (Region's
+// useCallback), the rest are primitives — so an opponent's action doesn't
+// re-render cards whose state didn't change.
+export const Card = memo(function Card({
   card,
   region,
   coordinate,
@@ -117,9 +123,9 @@ export function Card({
       </div>
     </li>
   );
-}
+});
 
-function NestedCard({
+const NestedCard = memo(function NestedCard({
   card,
   region,
   coordinate,
@@ -135,7 +141,7 @@ function NestedCard({
   ) : (
     <CardHidden card={card} region={region} coordinate={coordinate} />
   );
-}
+});
 
 export function RegionLabelBadges({ region }: { region: RegionSnapshot }) {
   return region.openHand ? (

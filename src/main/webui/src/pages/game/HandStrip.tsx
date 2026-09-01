@@ -1,23 +1,26 @@
-import type { CardSnapshot, GameSnapshot } from '../../api/types';
+import { memo } from 'react';
+import type { CardSnapshot, RegionSnapshot } from '../../api/types';
 import { CardSimple } from './CardSimple';
 import type { HandCardContext } from './cardCommands';
 
 // Mirrors hand-card.jsp/hand.jsp — the compact "always visible to you" strip
 // of the viewer's own hand, separate from that same hand's entry in their
 // player board (which stays collapsed by default like any other region).
-export function HandStrip({
-  game,
-  viewerName,
+//
+// memo'd + fed the resolved hand region (not the whole GameSnapshot): when an
+// opponent acts, TanStack structural sharing keeps `handRegion`'s reference,
+// so the strip doesn't re-render. It re-renders only when the viewer's own
+// hand actually changes.
+export const HandStrip = memo(function HandStrip({
+  handRegion,
+  show,
   onPlayCardClick,
 }: {
-  game: GameSnapshot;
-  viewerName: string | null;
+  handRegion: RegionSnapshot | undefined;
+  show: boolean;
   onPlayCardClick: (ctx: HandCardContext, card: CardSnapshot) => void;
 }) {
-  if (!game.player || !viewerName) return null;
-  const me = game.players.find((p) => p.name === viewerName);
-  const hand = me?.regions.find((r) => r.type === 'HAND');
-  if (!hand) return null;
+  if (!show || !handRegion) return null;
 
   return (
     <div
@@ -28,16 +31,18 @@ export function HandStrip({
         Hand
       </div>
       <ol className="flex-1 min-h-0 list-none scrollable divide-y divide-line/40">
-        {hand.cards.map((card, i) => (
+        {handRegion.cards.map((card, i) => (
           <CardSimple
             key={card.id}
             card={card}
             region="HAND"
             coordinate={String(i + 1)}
-            onClick={() => onPlayCardClick({ regionType: hand.type, regionCommandKey: hand.commandKey, coordinate: String(i + 1) }, card)}
+            onClick={() =>
+              onPlayCardClick({ regionType: handRegion.type, regionCommandKey: handRegion.commandKey, coordinate: String(i + 1) }, card)
+            }
           />
         ))}
       </ol>
     </div>
   );
-}
+});

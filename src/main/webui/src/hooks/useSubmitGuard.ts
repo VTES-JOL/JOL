@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 /**
  * Serializes game-mutating requests one-at-a-time across every source that
@@ -16,7 +16,10 @@ export function useSubmitGuard() {
   const inFlight = useRef(false);
   const [submitting, setSubmitting] = useState(false);
 
-  function guard<T>(run: () => Promise<T>): Promise<T | undefined> {
+  // Stable identity so callers can list `guard` in useCallback deps without
+  // recreating their handlers every render (keeps the memoized game board from
+  // re-rendering on every unrelated snapshot refetch).
+  const guard = useCallback(<T>(run: () => Promise<T>): Promise<T | undefined> => {
     if (inFlight.current) return Promise.resolve(undefined);
     inFlight.current = true;
     setSubmitting(true);
@@ -24,7 +27,7 @@ export function useSubmitGuard() {
       inFlight.current = false;
       setSubmitting(false);
     });
-  }
+  }, []);
 
   return { submitting, guard };
 }
