@@ -53,7 +53,12 @@ public class JolAdmin {
     }
 
     public static GameModel getGameModel(String name) {
-        return gmap.computeIfAbsent(name, n -> new GameModel(GameService.getGameByName(name)));
+        // Pass `name` explicitly rather than deriving it from the JolGame: when a game
+        // has been created but not yet started there's no game_state row, so
+        // getGameByName returns an empty JolGame whose GameData.name is null. Deriving
+        // the model's name from that once-cached nameless game left every later
+        // getView() calling GameService.get(null) -> NPE.
+        return gmap.computeIfAbsent(name, n -> new GameModel(n, GameService.getGameByName(n)));
     }
 
     public static void createGame(String gameName, Boolean isPublic, GameFormat format, String playerName) {

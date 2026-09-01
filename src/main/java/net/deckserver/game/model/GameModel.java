@@ -31,9 +31,13 @@ public class GameModel implements Comparable<GameModel> {
     // writes, so the second commit fails with an OptimisticLockException.
     private final ReentrantLock lock = new ReentrantLock();
 
-    public GameModel(JolGame game) {
-        this.name = game.getName();
+    public GameModel(String name, JolGame game) {
+        this.name = name;
         this.game = game;
+    }
+
+    public GameModel(JolGame game) {
+        this(game.getName(), game);
     }
 
     public <T> T withLock(Supplier<T> action) {

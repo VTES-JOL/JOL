@@ -61,6 +61,14 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-jwt</artifactId>
         </dependency>
+        <!-- Quarkus: scheduled jobs. Replaces the raw
+             ScheduledExecutorService in the old (never-invoked-under-Quarkus)
+             JolApplicationInitializer ServletContextListener — see
+             net.deckserver.jobs.ScheduledJobs. -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-scheduler</artifactId>
+        </dependency>
         <!-- Quarkus: frontend layer (Phase 4 — replaces frontend-maven-plugin/
              maven-war-plugin's manual react-dist staging, and Tomcat's
              RewriteValve-based SPA routing, entirely; see
