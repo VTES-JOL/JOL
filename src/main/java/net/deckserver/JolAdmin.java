@@ -7,21 +7,21 @@
 package net.deckserver;
 
 import io.azam.ulidj.ULID;
-import net.deckserver.rest.bean.DeckEdit;
 import net.deckserver.game.GameOutcome;
+import net.deckserver.game.enums.*;
 import net.deckserver.game.model.GameModel;
 import net.deckserver.game.model.JolGame;
-import net.deckserver.game.enums.*;
 import net.deckserver.game.validators.DeckValidator;
 import net.deckserver.game.validators.ValidationResult;
 import net.deckserver.game.validators.ValidatorFactory;
+import net.deckserver.rest.bean.DeckEdit;
 import net.deckserver.services.*;
-import net.deckserver.ws.WebSocketRegistry;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
 import net.deckserver.storage.json.game.GameData;
 import net.deckserver.storage.json.system.*;
+import net.deckserver.ws.WebSocketRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

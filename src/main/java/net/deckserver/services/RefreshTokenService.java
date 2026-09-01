@@ -1,9 +1,8 @@
 package net.deckserver.services;
 
+import io.azam.ulidj.ULID;
 import io.quarkus.runtime.Startup;
 import jakarta.inject.Singleton;
-
-import io.azam.ulidj.ULID;
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.repository.RefreshTokenRepository;
@@ -13,13 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.HexFormat;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**

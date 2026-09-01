@@ -6,13 +6,14 @@
 
 package net.deckserver.game.model;
 
-import net.deckserver.services.CardService;
+import net.deckserver.game.cards.Card;
+import net.deckserver.game.cards.CardRegistry;
+import net.deckserver.game.cards.CryptCard;
 import net.deckserver.game.enums.Clan;
 import net.deckserver.game.enums.Path;
 import net.deckserver.game.enums.RegionType;
 import net.deckserver.game.enums.Sect;
 import net.deckserver.services.ParserService;
-import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.game.CardData;
 
 import java.util.*;
@@ -251,8 +252,8 @@ public record DoCommand(JolGame game, GameModel model) {
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
         CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         if (cmdObj.consumeString("reset")) {
-            CardSummary card = CardService.get(targetCard.getCardId());
-            List<String> disciplines = card.getDisciplines();
+            Card card = CardRegistry.findById(targetCard.getCardId());
+            List<String> disciplines = card instanceof CryptCard crypt ? crypt.disciplines() : List.of();
             game.setDisciplines(player, targetCard.getId(), disciplines, false);
         } else {
             Set<String> additions = new HashSet<>();

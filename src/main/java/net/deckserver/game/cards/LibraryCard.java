@@ -1,5 +1,7 @@
 package net.deckserver.game.cards;
 
+import net.deckserver.game.enums.CardType;
+
 import java.util.List;
 
 /**
@@ -18,6 +20,13 @@ import java.util.List;
  *
  * <p>Costs are null when not applicable, {@code -1} when variable (X).
  * {@code burnOption} is true when the Burn Option column is "Y"/"Yes".
+ *
+ * <p>{@code preamble} — the leading restriction line(s) of the card text that
+ * apply regardless of mode. {@code playModes} — the ways the card can be
+ * played (one entry for a simple card, one per discipline option otherwise);
+ * consumed by the play-card modal. {@code multiMode} — the card lets more than
+ * one discipline be combined in a single play. {@code doNotReplace} — no
+ * replacement card is drawn when this is played.
  */
 public record LibraryCard(
         String id,
@@ -27,6 +36,8 @@ public record LibraryCard(
         String cardText,
         String artist,
         boolean banned,
+        boolean playtest,
+        boolean unique,
         String flavorText,
         List<String> types,
         List<String> requirementClans,
@@ -36,6 +47,20 @@ public record LibraryCard(
         Integer poolCost,
         Integer bloodCost,
         Integer convictionCost,
-        boolean burnOption
+        boolean burnOption,
+        String preamble,
+        List<PlayMode> playModes,
+        boolean multiMode,
+        boolean doNotReplace
 ) implements Card {
+
+    @Override
+    public CardType cardType() {
+        return types.isEmpty() ? CardType.NONE : CardType.of(types.getFirst());
+    }
+
+    @Override
+    public String displayName() {
+        return name;
+    }
 }

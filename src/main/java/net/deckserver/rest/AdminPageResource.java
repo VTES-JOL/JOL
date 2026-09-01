@@ -1,18 +1,18 @@
 package net.deckserver.rest;
 
-import net.deckserver.JolAdmin;
-import net.deckserver.rest.bean.GameActivityStatus;
-import net.deckserver.rest.bean.PlayerActivityStatus;
-import net.deckserver.rest.bean.UserSummaryBean;
-import net.deckserver.game.enums.PlayerRole;
-import net.deckserver.services.GameService;
-import net.deckserver.services.PlayerService;
-import net.deckserver.services.SiteNotesService;
-
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import net.deckserver.JolAdmin;
+import net.deckserver.game.enums.PlayerRole;
+import net.deckserver.rest.bean.GameActivityStatus;
+import net.deckserver.rest.bean.PlayerActivityStatus;
+import net.deckserver.rest.bean.UserSummaryBean;
+import net.deckserver.services.GameService;
+import net.deckserver.services.PlayerService;
+import net.deckserver.services.SiteNotesService;
+
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.LinkedHashMap;

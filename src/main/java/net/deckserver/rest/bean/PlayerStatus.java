@@ -1,9 +1,6 @@
 package net.deckserver.rest.bean;
 
 import lombok.Data;
-import net.deckserver.JolAdmin;
-import net.deckserver.game.model.JolGame;
-import net.deckserver.services.PlayerActivityService;
 import net.deckserver.services.PlayerGameActivityService;
 
 @Data

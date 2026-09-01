@@ -1,6 +1,6 @@
 package net.deckserver.storage.json.deck;
 
-import net.deckserver.services.CardService;
+import net.deckserver.game.cards.CardRegistry;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ class DeckNormalizerTest {
     private static final Path FIXTURE_DECKS = Path.of("src/test/resources/data/decks");
 
     private static String cardId(String name) {
-        return CardService.findCard(name).orElseThrow(() -> new AssertionError("fixture card not found: " + name)).getId();
+        return CardRegistry.resolveFuzzy(name).orElseThrow(() -> new AssertionError("fixture card not found: " + name)).id();
     }
 
     // ── Fixture decks (all stored as ExtendedDeck JSON) ──────────────────────

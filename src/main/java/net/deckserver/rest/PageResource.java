@@ -1,12 +1,12 @@
 package net.deckserver.rest;
 
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import net.deckserver.JolAdmin;
 import net.deckserver.rest.bean.ChatEntryBean;
 import net.deckserver.rest.bean.NavBean;
 import net.deckserver.services.GlobalChatService;
 
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 
 @Path("/")

@@ -429,6 +429,14 @@ export interface CardSnapshot {
   hasBlood?: boolean;
   hasLife?: boolean;
   cards?: CardSnapshot[];
+  // Play-card-modal fields — present only for cards in the viewer's own HAND /
+  // RESEARCH region (GameSnapshotFactory scopes the enrichment), absent
+  // everywhere else.
+  modes?: CardMode[];
+  multiMode?: boolean;
+  doNotReplace?: boolean;
+  preamble?: string;
+  cost?: string;
 }
 
 // net.deckserver.rest.bean.RegionSnapshot.
@@ -500,42 +508,15 @@ export interface GameSnapshot {
   stamp: string;
 }
 
-// net.deckserver.storage.json.cards.LibraryCardMode (via the static per-card
-// JSON at {baseUrl}/[secured/]json/{cardId} — SummaryCard's serialized form,
-// same static asset useCardTooltips already fetches for images/html; not
-// part of this app's own REST API).
+// net.deckserver.rest.bean.PlayModeBean — one play option for a hand/research
+// card, carried on CardSnapshot.modes. `target` gates the client-side
+// target-picker flow (needsTargetPicker in cardCommands.ts).
 export type CardModeTarget = 'READY_REGION' | 'SELF' | 'SOMETHING' | 'REMOVE_FROM_GAME' | 'INACTIVE_REGION' | 'MINION_YOU_CONTROL';
 
 export interface CardMode {
   disciplines: string[] | null;
   text: string;
   target: CardModeTarget | null;
-}
-
-// SummaryCard — the static per-card definition (rules text, play modes,
-// clan/discipline requirements), distinct from CardSnapshot (per-instance
-// game state) and CardSummary-derived display fields already in CardSnapshot.
-export interface CardDefinition {
-  id: string;
-  displayName: string;
-  name: string;
-  type: string;
-  crypt: boolean;
-  burnOption?: boolean;
-  sect?: string;
-  path?: string;
-  clans?: string[];
-  preamble?: string;
-  modes?: CardMode[];
-  doNotReplace?: boolean;
-  multiMode?: boolean;
-  cost?: string;
-  capacity?: number;
-  disciplines?: string[];
-  advanced?: boolean;
-  infernal?: boolean;
-  votes?: string;
-  title?: string;
 }
 
 // ── Metrics (MetricsResource — /metrics/*, public) ──────────────────────────

@@ -1,13 +1,13 @@
 package net.deckserver.rest;
 
-import net.deckserver.services.GameService;
-import net.deckserver.storage.json.game.GameSummary;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.SecurityContext;
+import net.deckserver.services.GameService;
+import net.deckserver.storage.json.game.GameSummary;
+
 import java.util.Comparator;
 import java.util.List;
 

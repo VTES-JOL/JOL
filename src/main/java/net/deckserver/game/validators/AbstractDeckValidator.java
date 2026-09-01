@@ -1,7 +1,8 @@
 package net.deckserver.game.validators;
 
-import net.deckserver.services.CardService;
-import net.deckserver.storage.json.cards.CardSummary;
+import net.deckserver.game.cards.Card;
+import net.deckserver.game.cards.CardRegistry;
+import net.deckserver.game.cards.CryptCard;
 import net.deckserver.storage.json.deck.CardCount;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.LibraryCard;
@@ -18,16 +19,18 @@ public abstract class AbstractDeckValidator implements DeckValidator {
         return Stream.concat(cryptStream, libraryStream);
     }
 
-    protected Stream<CardSummary> cardSummaryStream(Deck deck) {
+    protected Stream<Card> cardStream(Deck deck) {
         return buildStream(deck)
                 .map(CardCount::getId)
                 .map(String::valueOf)
                 .distinct()
-                .map(CardService::get);
+                .map(CardRegistry::findById)
+                .filter(Objects::nonNull);
     }
 
     protected String getCardName(String id) {
-        return CardService.get(id).getDisplayName();
+        Card card = CardRegistry.findById(id);
+        return card != null ? card.displayName() : id;
     }
 
     protected Set<String> getGroups(Deck deck) {
@@ -36,35 +39,34 @@ public abstract class AbstractDeckValidator implements DeckValidator {
             return Collections.emptySet();
         }
         for (CardCount cardCount : deck.getCrypt().getCards()) {
-            String id = String.valueOf(cardCount.getId());
-            CardSummary card = CardService.get(id);
-            if (!card.getGroup().equalsIgnoreCase("ANY")) {
-                groups.add(card.getGroup());
+            Card card = CardRegistry.findById(String.valueOf(cardCount.getId()));
+            if (card instanceof CryptCard crypt && !crypt.group().equalsIgnoreCase("ANY")) {
+                groups.add(crypt.group());
             }
         }
         return groups;
     }
 
     protected Set<String> findBannedCards(Deck deck) {
-        return cardSummaryStream(deck)
-                .filter(CardSummary::isBanned)
-                .map(CardSummary::getDisplayName)
+        return cardStream(deck)
+                .filter(Card::banned)
+                .map(Card::displayName)
                 .collect(Collectors.toSet());
     }
 
     protected Set<String> findPlaytestCards(Deck deck) {
-        return cardSummaryStream(deck)
-                .filter(CardSummary::isPlayTest)
-                .map(CardSummary::getDisplayName)
+        return cardStream(deck)
+                .filter(Card::playtest)
+                .map(Card::displayName)
                 .collect(Collectors.toSet());
     }
 
     protected Set<String> checkAgainstWhitelist(Deck deck, List<String> validSets) {
-        return cardSummaryStream(deck).filter(cardSummary -> {
-                    Set<String> cardSets = new HashSet<>(cardSummary.getSets());
+        return cardStream(deck).filter(card -> {
+                    Set<String> cardSets = new HashSet<>(card.sets());
                     cardSets.retainAll(validSets);
                     return cardSets.isEmpty();
-                }).map(CardSummary::getId)
+                }).map(Card::id)
                 .collect(Collectors.toSet());
     }
 

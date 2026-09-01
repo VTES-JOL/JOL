@@ -3,8 +3,6 @@ package net.deckserver.rest.bean;
 import lombok.Getter;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.DeckFormat;
-import net.deckserver.services.DeckService;
-import net.deckserver.storage.json.deck.Crypt;
 
 import java.util.Set;
 

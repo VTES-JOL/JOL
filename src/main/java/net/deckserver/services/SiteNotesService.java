@@ -2,14 +2,13 @@ package net.deckserver.services;
 
 import io.quarkus.runtime.Startup;
 import jakarta.inject.Singleton;
-
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.repository.SiteNotesRepository;
 import net.deckserver.ws.WebSocketRegistry;
 import org.commonmark.node.Node;
-import org.commonmark.renderer.html.HtmlRenderer;
 import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 
 import java.util.List;
 

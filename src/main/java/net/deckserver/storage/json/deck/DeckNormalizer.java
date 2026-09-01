@@ -2,8 +2,8 @@ package net.deckserver.storage.json.deck;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.deckserver.services.CardService;
-import net.deckserver.storage.json.cards.CardSummary;
+import net.deckserver.game.cards.Card;
+import net.deckserver.game.cards.CardRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,9 +77,9 @@ public final class DeckNormalizer {
         if (cardCount.getId() == null) {
             return;
         }
-        CardSummary card = CardService.get(String.valueOf(cardCount.getId()));
+        Card card = CardRegistry.findById(String.valueOf(cardCount.getId()));
         if (card != null) {
-            cardCount.setName(card.getName());
+            cardCount.setName(card.name());
         }
     }
 

@@ -1,7 +1,8 @@
 package net.deckserver.services;
 
 import com.vdurmont.emoji.EmojiParser;
-import net.deckserver.storage.json.cards.CardSummary;
+import net.deckserver.game.cards.CardRef;
+import net.deckserver.game.cards.CardRegistry;
 import org.owasp.html.Sanitizers;
 
 import java.util.Set;
@@ -56,7 +57,7 @@ public class ParserService {
             for (int x = 1; x <= matcher.groupCount(); x++) {
                 String match = matcher.group(x).trim().replaceAll("&#39;", "'").replaceAll("&#34;", "\"");
                 try {
-                    CardService.findCardExact(match, includePlaytest).ifPresent(card -> matcher.appendReplacement(sb, generateCardLink(card)));
+                    CardRegistry.resolveNormalized(match, includePlaytest).map(CardRef::of).ifPresent(card -> matcher.appendReplacement(sb, generateCardLink(card)));
                 } catch (IllegalArgumentException e) {
                     // do nothing
                 }
@@ -106,8 +107,8 @@ public class ParserService {
         return sb.toString();
     }
 
-    private static String generateCardLink(CardSummary card) {
-        return String.format("<a class='card-name' data-card-id='%s' data-secured='%s'>%s%s</a>", card.getId(), card.isPlayTest(), card.getDisplayName(), (card.isAdvanced() ? " <i class='icon adv'></i>" : ""));
+    private static String generateCardLink(CardRef card) {
+        return String.format("<a class='card-name' data-card-id='%s' data-secured='%s'>%s%s</a>", card.id(), card.playtest(), card.name(), (card.advanced() ? " <i class='icon adv'></i>" : ""));
     }
 
     public static String generateDisciplineLink(String discipline) {

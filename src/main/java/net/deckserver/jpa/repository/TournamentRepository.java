@@ -7,7 +7,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.entity.TournamentEntity;
 import net.deckserver.jpa.entity.TournamentRegistrationEntity;
-import net.deckserver.storage.json.system.*;
+import net.deckserver.storage.json.system.TournamentDefinition;
+import net.deckserver.storage.json.system.TournamentFinals;
+import net.deckserver.storage.json.system.TournamentPlayer;
+import net.deckserver.storage.json.system.TournamentSpecialRules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

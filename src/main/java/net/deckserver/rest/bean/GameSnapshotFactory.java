@@ -1,16 +1,18 @@
 package net.deckserver.rest.bean;
 
 import net.deckserver.JolAdmin;
+import net.deckserver.game.cards.Card;
+import net.deckserver.game.cards.CardRegistry;
+import net.deckserver.game.cards.CryptCard;
+import net.deckserver.game.cards.LibraryCard;
 import net.deckserver.game.enums.Phase;
 import net.deckserver.game.enums.RegionType;
 import net.deckserver.game.model.GameModel;
 import net.deckserver.game.model.JolGame;
 import net.deckserver.game.ui.CardDetail;
-import net.deckserver.services.CardService;
 import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;
-import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.game.CardData;
 
 import java.time.OffsetDateTime;
@@ -122,11 +124,16 @@ public class GameSnapshotFactory {
         boolean hiddenHand = hand && !openHand;
         boolean regionVisible = type.isVisible(regionOwner, viewer) || openHand;
 
+        // Play-modal data (modes / replace rules / preamble / cost) is only
+        // ever used from the viewer's own hand or research region — enrich just
+        // those cards rather than bloating every snapshot card with it.
+        boolean enrich = (type == RegionType.HAND || type == RegionType.RESEARCH) && regionOwner.equals(viewer);
+
         List<CardData> cards = game.data().getPlayerRegion(regionOwner, type).getCards();
         List<CardSnapshot> cardSnapshots = cards.stream()
                 .map(card -> {
                     boolean visible = regionVisible || !card.getOwnerName().equals(regionOwner);
-                    return visible ? buildVisibleCard(card) : hiddenCard(card);
+                    return visible ? buildVisibleCard(card, enrich) : hiddenCard(card);
                 })
                 .toList();
 
@@ -170,19 +177,20 @@ public class GameSnapshotFactory {
 
     // Every card nested under a visible card is visible unconditionally —
     // see the class javadoc.
-    private static CardSnapshot buildVisibleCard(CardData card) {
+    private static CardSnapshot buildVisibleCard(CardData card, boolean enrich) {
         CardDetail detail = new CardDetail(card);
-        CardSummary summary = CardService.get(detail.getCardId());
+        Card definition = CardRegistry.findById(detail.getCardId());
+        boolean advanced = definition instanceof CryptCard c && c.advanced();
         List<CardSnapshot> nested = card.getCards().stream()
-                .map(GameSnapshotFactory::buildVisibleCard)
+                .map(nestedCard -> buildVisibleCard(nestedCard, enrich))
                 .toList();
-        return CardSnapshot.builder()
+        CardSnapshot.CardSnapshotBuilder builder = CardSnapshot.builder()
                 .id(card.getId())
                 .visible(true)
                 .counters(card.getCounters())
                 .cardId(detail.getCardId())
-                .name(summary.getDisplayName())
-                .advanced(summary.isAdvanced())
+                .name(definition != null ? definition.name() : card.getName())
+                .advanced(advanced)
                 .disciplines(detail.getDisciplines())
                 .capacity(detail.getCapacity())
                 .votes(detail.getVotes())
@@ -195,12 +203,32 @@ public class GameSnapshotFactory {
                 .path(detail.getPath() != null ? detail.getPath().toString() : null)
                 .label(detail.getLabel())
                 .minion(detail.isMinion())
-                .typeClass(summary.getTypeClass())
-                .clanClasses(summary.getClanClass())
-                .hasBlood(summary.hasBlood())
-                .hasLife(summary.hasLife())
-                .cards(nested)
-                .build();
+                .typeClass(definition != null ? definition.typeClass() : null)
+                .clanClasses(definition != null ? definition.clanClasses() : null)
+                .hasBlood(definition != null && definition.hasBlood())
+                .hasLife(definition != null && definition.hasLife())
+                .cards(nested);
+
+        if (enrich && definition instanceof LibraryCard lib) {
+            builder.modes(lib.playModes().stream().map(PlayModeBean::of).toList())
+                    .multiMode(lib.multiMode())
+                    .doNotReplace(lib.doNotReplace())
+                    .preamble(lib.preamble())
+                    .cost(formatCost(lib));
+        }
+        return builder.build();
+    }
+
+    /** Mirrors the old SummaryCard cost string: "<n> pool" / "<n> blood" / "<n> conviction". */
+    private static String formatCost(LibraryCard lib) {
+        if (lib.poolCost() != null) return costValue(lib.poolCost()) + " pool";
+        if (lib.bloodCost() != null) return costValue(lib.bloodCost()) + " blood";
+        if (lib.convictionCost() != null) return costValue(lib.convictionCost()) + " conviction";
+        return null;
+    }
+
+    private static String costValue(int cost) {
+        return cost < 0 ? "X" : String.valueOf(cost);
     }
 
     private static boolean colorIsDark(String bgColor) {

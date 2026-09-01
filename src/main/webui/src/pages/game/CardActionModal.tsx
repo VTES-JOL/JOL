@@ -13,11 +13,8 @@ import {
   Unlock,
   X,
 } from 'lucide-react';
-import type { CardDefinition } from '../../api/types';
-import { fetchCardDefinition } from './cardDefinitions';
 import { cardActions, type Submission, type TableCardContext } from './cardCommands';
 import { CardImage } from './CardImage';
-import { runRequest } from '../../api/mutate';
 import { Modal } from '../../components/ui/Modal';
 import { Select } from '../../components/ui/Select';
 import { COUNTER_STYLE, OTHER_VISIBLE_REGIONS } from './Card';
@@ -171,13 +168,8 @@ export function CardActionModal({
   onClose: () => void;
 }) {
   const { card } = ctx;
-  const [definition, setDefinition] = useState<CardDefinition | null>(null);
+  const cardName = card.name ?? '';
   const [label, setLabel] = useState(card.label ?? '');
-
-  useEffect(() => {
-    setDefinition(null);
-    runRequest(fetchCardDefinition(card.cardId ?? '', !!card.playtest), 'Failed to load card details', setDefinition);
-  }, [card.cardId, card.playtest]);
 
   useEffect(() => setLabel(card.label ?? ''), [card.label]);
 
@@ -204,12 +196,7 @@ export function CardActionModal({
 
   return (
     <Modal onClose={onClose} bodyClassName="flex flex-col min-h-0 overflow-y-auto flex-1">
-      {!definition ? (
-        <div style={{ height: '30vh' }} className="flex items-center justify-center text-ink-muted">
-          Loading…
-        </div>
-      ) : (
-        <>
+      <>
           <div className="flex justify-between items-center px-2 py-1 border-b border-line bg-panel/45">
             <span className="flex items-center">
               {minion && (
@@ -221,7 +208,7 @@ export function CardActionModal({
                   onChange={(key) => doAction((c) => cardActions.clan(c, key), false)}
                 />
               )}
-              <span className="card-name text-lg">{definition.displayName}</span>
+              <span className="card-name text-lg">{cardName}</span>
               {hasVotes && <span className={`${PILL} bg-gold text-surface mx-2`}>{card.votes}</span>}
             </span>
             <span className="flex items-center">
@@ -254,7 +241,7 @@ export function CardActionModal({
             </span>
           </div>
           <div className="p-4 text-center">
-            <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={definition.displayName} />
+            <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={cardName} />
             <div className="flex items-stretch mt-2">
               <span className="flex items-center rounded-l border border-r-0 border-line bg-panel px-2 text-ink-muted">
                 <Tag size={14} />
@@ -309,8 +296,7 @@ export function CardActionModal({
               )}
             </div>
           </div>
-        </>
-      )}
+      </>
     </Modal>
   );
 }

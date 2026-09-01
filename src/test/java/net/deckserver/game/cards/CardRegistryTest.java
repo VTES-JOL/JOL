@@ -16,10 +16,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 /**
- * Verifies the ported {@link CardRegistry} loads the VEKN CSVs correctly and
- * agrees with the pre-built {@code static/secured/cards.json} that
- * {@link net.deckserver.services.CardService} serves — the two must stay in
- * lock-step while both are live.
+ * Verifies {@link CardRegistry} loads the VEKN CSVs correctly, parses play
+ * modes, and still resolves every id in the committed
+ * {@code static/secured/cards.json} — a frozen parity baseline from the old
+ * {@code CardService} pipeline, kept as a regression guard against CSV drift.
  *
  * <p>Plain unit test: the registry has no DB / CDI / test-mode dependency, and
  * loads {@code csv/core/*.csv} relative to the working directory (repo root
@@ -63,6 +63,35 @@ class CardRegistryTest {
         assertThat(equipment.andDisciplines(), empty());
         assertThat(equipment.orDisciplines(), empty());
         assertThat(equipment.burnOption(), is(false));
+    }
+
+    @Test
+    void parsesDisciplineGatedPlayModes() {
+        // Earth Control: "[pro] +1 stealth." / "[PRO] +2 stealth." — two modes,
+        // one per discipline option.
+        LibraryCard earthControl = (LibraryCard) CardRegistry.findById("100600");
+        assertThat(earthControl.playModes(), hasSize(2));
+        assertThat(earthControl.playModes().get(0).disciplines(), contains("pro"));
+        assertThat(earthControl.playModes().get(1).disciplines(), contains("PRO"));
+        assertThat(earthControl.multiMode(), is(false));
+    }
+
+    @Test
+    void detectsMultiDisciplinePlay() {
+        // Guardian Vigil's preamble: "More than one Discipline can be used to
+        // play this card."
+        LibraryCard guardianVigil = (LibraryCard) CardRegistry.findById("100868");
+        assertThat(guardianVigil.multiMode(), is(true));
+        assertThat(guardianVigil.preamble(), containsString("Anarch"));
+    }
+
+    @Test
+    void reloadRebuildsTheIndexAndKeepsResolving() {
+        int before = CardRegistry.allCards().size();
+        RegistryStatus status = CardRegistry.reload();
+        assertThat(status.cardCount(), equalTo(before));
+        assertThat(CardRegistry.findById("100001"), notNullValue());
+        assertThat(CardRegistry.resolveExact(".44 Magnum").isPresent(), is(true));
     }
 
     @Test

@@ -2,13 +2,12 @@ package net.deckserver.services;
 
 import io.quarkus.runtime.Startup;
 import jakarta.inject.Singleton;
-
 import jakarta.persistence.EntityManager;
-import net.deckserver.game.model.JolGame;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
 import net.deckserver.game.enums.TournamentFormat;
 import net.deckserver.game.enums.Visibility;
+import net.deckserver.game.model.JolGame;
 import net.deckserver.jpa.JpaFactory;
 import net.deckserver.jpa.entity.TournamentRegistrationEntity;
 import net.deckserver.jpa.repository.TournamentRepository;

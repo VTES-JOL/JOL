@@ -6,7 +6,6 @@ import net.deckserver.game.enums.PlayerRole;
 import net.deckserver.services.PlayerService;
 
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;

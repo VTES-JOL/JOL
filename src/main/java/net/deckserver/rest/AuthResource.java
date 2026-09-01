@@ -1,5 +1,9 @@
 package net.deckserver.rest;
 
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.*;
 import net.deckserver.JolAdmin;
 import net.deckserver.Recaptcha;
 import net.deckserver.services.AuthService;
@@ -8,15 +12,6 @@ import net.deckserver.storage.json.cards.SecuredCardLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.cloudfront.cookie.CookiesForCustomPolicy;
-
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.NewCookie;
-import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 

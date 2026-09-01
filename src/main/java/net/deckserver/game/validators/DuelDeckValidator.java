@@ -1,7 +1,7 @@
 package net.deckserver.game.validators;
 
+import net.deckserver.game.cards.Card;
 import net.deckserver.game.enums.GameFormat;
-import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.Deck;
 import org.apache.commons.io.IOUtils;
 
@@ -47,7 +47,7 @@ public class DuelDeckValidator extends StandardDeckValidator {
     }
 
     private void validIds(Deck deck, ValidationResult result) {
-        cardSummaryStream(deck).map(CardSummary::getDisplayName)
+        cardStream(deck).map(Card::name)
                 .filter(cardName -> !validNames.contains(cardName))
                 .forEach(invalidCard -> {
                     result.addError(String.format("%s is not allowed in this format.", invalidCard));

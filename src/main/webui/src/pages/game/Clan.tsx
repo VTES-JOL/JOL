@@ -62,7 +62,7 @@ export type ClanCode = keyof typeof CLAN;
  * the raw enum constant (GameSnapshotFactory's `.clan(detail.getClan().
  * toString())`, e.g. "TOREADOR_ANTITRIBU"; CardSimple's `clanClasses`,
  * already lowercased/underscored the same way) or the human description
- * (CardSummary's `clans` list, sourced straight from vtescrypt.csv, e.g.
+ * (a `Card.clanClasses()` entry / raw clan name from vtescrypt.csv, e.g.
  * "Toreador Antitribu"). Mirrors Clan.java's own from()/of() pair — this is
  * a lookup against that same closed set, not a second source of truth for
  * what a "clan" is. Returns undefined for NONE/blank/unrecognized input.

@@ -22,7 +22,7 @@ import java.util.Map;
  * plain JOL deck list into a preview of resolved cards + unresolved lines, and
  * builds canonical deck-list text from confirmed {cardId, count} entries.
  *
- * <p>Plain static class, matching {@link CardService} / {@link CardSearchService}.
+ * <p>Plain static class, matching {@link net.deckserver.game.cards.CardRegistry} / {@link CardSearchService}.
  * The JOL-text branch delegates to the existing {@link DeckParser}; the KRCG
  * branch resolves ids straight against {@link CardRegistry}.
  */

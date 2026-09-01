@@ -1,5 +1,7 @@
 package net.deckserver.rest;
 
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.model.GameModel;
 import net.deckserver.services.ChatService;
@@ -9,8 +11,6 @@ import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.ChatData;
 import net.deckserver.storage.json.game.CommandErrorData;
 
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Set;
 

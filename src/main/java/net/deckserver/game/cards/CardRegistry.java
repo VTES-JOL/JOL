@@ -1,5 +1,7 @@
 package net.deckserver.game.cards;
 
+import net.deckserver.game.cards.importer.CryptMetadata;
+import net.deckserver.game.cards.importer.PlayModeParser;
 import net.deckserver.game.enums.Discipline;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -13,9 +15,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -24,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,22 +33,27 @@ import java.util.stream.Stream;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * Structured card database loaded from the VEKN CSV files
- * ({@code vtescrypt.csv} / {@code vteslib.csv} under {@code jol.card.dir},
- * default {@code csv/core}).
+ * The single source of truth for all card reference data. Parses the VEKN CSVs
+ * ({@code vtescrypt.csv} / {@code vteslib.csv}, plus optional
+ * {@code *_playtest.csv}, under {@code jol.card.dir} — default {@code csv/core})
+ * once at boot into an immutable {@link Index}, and serves every card concern
+ * from it:
  *
- * <p>Ported from the jol-quarkus rewrite and kept as a plain static holder to
- * match {@link net.deckserver.services.CardService} (which is likewise a
- * static, load-once reference-data class, not a CDI bean). The two run side by
- * side during the deck-editor migration: {@code CardService}/{@code CardSummary}
- * still backs the game board, chat card-links and {@code DeckParser}; this
- * registry adds the parsed structure they lack (split and/or disciplines,
- * structured costs, requirement clans/path, crypt group/capacity) for the
- * editor analytics, autocomplete DTOs and KRCG import work landing later.
+ * <ul>
+ *   <li>name resolution for deck text, chat card-links and KRCG/JOL import,</li>
+ *   <li>structured data for the deck editor (autocomplete, analytics, validation),</li>
+ *   <li>play-time data for the game board (modes, replace rules, css classes).</li>
+ * </ul>
  *
- * <p>Data loads on first access (class-init), exactly like {@code CardService}.
- * {@link #load(Path)} can be called again to point at a different directory —
- * only needed by tests.
+ * <p>Replaces the old split between this class, {@code CardService} /
+ * {@code CardSummary} and the CloudFront {@code cards.json}. Hot-reloadable:
+ * {@link #reload()} rebuilds the {@link Index} and swaps it in one volatile
+ * write, so a concurrent reader always sees a complete index (never a
+ * half-cleared map).
+ *
+ * <p>Plain static holder — no CDI, no DB — matching the reference-data classes
+ * it replaces. The index is built lazily on first access; {@link CardRegistryStartup}
+ * forces it at boot so the first request doesn't pay for it.
  */
 public final class CardRegistry {
 
@@ -62,64 +68,160 @@ public final class CardRegistry {
         }
     }
 
-    private static final List<Card> ALL_CARDS = Collections.synchronizedList(new ArrayList<>());
-    private static final Map<String, Card> ID_MAP = new ConcurrentHashMap<>();
-
-    /**
-     * Lookup index keyed by every searchable name variant (printed name,
-     * aliases, accent-stripped forms). For crypt cards the key carries the
-     * "(G# ADV)" qualifier. One card appears under several keys.
-     */
-    private static final Map<String, Card> LOOKUP_MAP = new ConcurrentHashMap<>();
-
-    /**
-     * Case-insensitive, accent-stripped index for JOL import name resolution.
-     * Key = lowercase accent-stripped lookup key; value = same card as {@link #LOOKUP_MAP}.
-     */
-    private static final Map<String, Card> LOWER_LOOKUP_MAP = new ConcurrentHashMap<>();
-
-    static {
-        String cardDir = ConfigProvider.getConfig()
-                .getOptionalValue("jol.card.dir", String.class)
-                .orElse("csv/core");
-        load(Paths.get(cardDir));
+    /** Immutable snapshot of one CSV load. Swapped wholesale by {@link #install}. */
+    private record Index(
+            List<Card> all,
+            Map<String, Card> byId,
+            Map<String, Card> byNameVariant,
+            Map<String, Card> byNormalizedName,
+            Instant loadedAt,
+            String sourceDir
+    ) {
+        RegistryStatus status() {
+            int crypt = (int) all.stream().filter(Card::isCrypt).count();
+            return new RegistryStatus(all.size(), crypt, all.size() - crypt,
+                    byNameVariant.size(), loadedAt, sourceDir);
+        }
     }
+
+    private static volatile Index index;
 
     private CardRegistry() {
     }
 
-    // ── Public accessors ─────────────────────────────────────────────────────
+    // ── Lifecycle ────────────────────────────────────────────────────────────
+
+    private static Index index() {
+        Index local = index;
+        if (local == null) {
+            synchronized (CardRegistry.class) {
+                if (index == null) {
+                    index = build(configuredCardDir());
+                }
+                local = index;
+            }
+        }
+        return local;
+    }
+
+    /** Force the initial load (called at boot by {@link CardRegistryStartup}). */
+    public static void bootstrap() {
+        index();
+    }
+
+    /** Re-parse the configured card directory and swap the index atomically. */
+    public static synchronized RegistryStatus reload() {
+        return install(build(configuredCardDir()));
+    }
+
+    /** Re-parse a specific directory (tests / staged set imports). */
+    public static synchronized RegistryStatus load(Path cardDir) {
+        return install(build(cardDir));
+    }
+
+    public static RegistryStatus status() {
+        return index().status();
+    }
+
+    private static RegistryStatus install(Index next) {
+        index = next;
+        RegistryStatus status = next.status();
+        logger.info("card registry loaded: {} cards ({} crypt / {} library), {} lookup keys, from {}",
+                status.cardCount(), status.cryptCount(), status.libraryCount(),
+                status.lookupKeyCount(), status.sourceDir());
+        return status;
+    }
+
+    private static Path configuredCardDir() {
+        return Paths.get(ConfigProvider.getConfig()
+                .getOptionalValue("jol.card.dir", String.class)
+                .orElse("csv/core"));
+    }
+
+    // ── Canonical model access ───────────────────────────────────────────────
 
     public static List<Card> allCards() {
-        return List.copyOf(ALL_CARDS);
+        return index().all();
     }
 
-    /** All lookup-map entries — used by autocomplete to iterate name variants. */
-    public static Map<String, Card> lookupEntries() {
-        return Collections.unmodifiableMap(LOOKUP_MAP);
-    }
-
+    /** The card with this printed id, or null. */
     public static Card findById(String id) {
-        return ID_MAP.get(id);
+        return index().byId().get(id);
     }
 
-    /** Looks up a card by accent-stripped, lowercased name as used in JOL import. */
+    public static boolean exists(String id) {
+        return index().byId().containsKey(id);
+    }
+
+    /** Name-variant -> card, for the autocomplete scorer to iterate. */
+    public static Map<String, Card> lookupEntries() {
+        return index().byNameVariant();
+    }
+
+    // ── Name resolution ─────────────────────────────────────────────────────
+
+    /** Every searchable string that resolves to this card (see {@link #buildIndexMaps}). */
+    public static Set<String> nameVariants(String id) {
+        Card card = findById(id);
+        if (card == null) return Set.of();
+        return index().byNameVariant().entrySet().stream()
+                .filter(e -> e.getValue().id().equals(id))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    /** Canonical display name: bare for library, name + " (G# ADV)" for crypt. */
+    public static String displayName(Card card) {
+        return card.displayName();
+    }
+
+    /** Exact resolve against a printed / aka / qualified variant, accent-sensitive. */
+    public static Optional<Card> resolveExact(String name) {
+        return name == null ? Optional.empty() : Optional.ofNullable(index().byNameVariant().get(name.trim()));
+    }
+
+    /** Exact resolve, accent- and case-insensitive; optionally excludes playtest cards. */
+    public static Optional<Card> resolveNormalized(String name, boolean includePlaytest) {
+        if (name == null) return Optional.empty();
+        Card card = index().byNormalizedName().get(StringUtils.stripAccents(name).toLowerCase().trim());
+        if (card == null) return Optional.empty();
+        return (includePlaytest || !card.playtest()) ? Optional.of(card) : Optional.empty();
+    }
+
+    /** {@link #findByNormalizedName} kept for existing callers. */
     public static Card findByNormalizedName(String normalizedName) {
-        return LOWER_LOOKUP_MAP.get(normalizedName);
+        return index().byNormalizedName().get(normalizedName);
     }
 
-    // ── Loading ──────────────────────────────────────────────────────────────
-
-    public static synchronized void load(Path cardDir) {
-        Path cryptPath = cardDir.resolve("vtescrypt.csv");
-        Path libraryPath = cardDir.resolve("vteslib.csv");
-
-        if (!Files.exists(cryptPath)) {
-            logger.error("Unable to find crypt card file at {}", cryptPath);
+    /**
+     * Loose resolve for free-text deck lines: exact-normalized first, then the
+     * last name-variant that starts with the query. No playtest filtering —
+     * callers inspect {@link Card#playtest()} themselves.
+     */
+    public static Optional<Card> resolveFuzzy(String text) {
+        if (text == null || text.isBlank()) return Optional.empty();
+        String key = StringUtils.stripAccents(text).toLowerCase().trim();
+        Card card = index().byNormalizedName().get(key);
+        if (card == null) {
+            for (Map.Entry<String, Card> e : index().byNormalizedName().entrySet()) {
+                if (e.getKey().startsWith(key)) {
+                    card = e.getValue();
+                }
+            }
         }
-        if (!Files.exists(libraryPath)) {
-            logger.error("Unable to find library card file at {}", libraryPath);
-        }
+        return Optional.ofNullable(card);
+    }
+
+    // ── Projections ─────────────────────────────────────────────────────────
+
+    public static Optional<CardRef> cardRef(String id) {
+        return Optional.ofNullable(findById(id)).map(CardRef::of);
+    }
+
+    // ── Loading ─────────────────────────────────────────────────────────────
+
+    private static Index build(Path cardDir) {
+        List<Card> all = new ArrayList<>();
 
         CSVFormat cryptFormat = CSVFormat.DEFAULT.builder()
                 .setHeader("Id", "Name", "Aka", "Type", "Clan", "Path", "Adv", "Group",
@@ -133,92 +235,66 @@ public final class CardRegistry {
                 .setSkipHeaderRecord(true)
                 .get();
 
-        ALL_CARDS.clear();
-        ID_MAP.clear();
-        LOOKUP_MAP.clear();
-        LOWER_LOOKUP_MAP.clear();
+        loadCrypt(all, cardDir.resolve("vtescrypt.csv"), cryptFormat, false);
+        loadLibrary(all, cardDir.resolve("vteslib.csv"), libraryFormat, false);
 
-        loadCrypt(cryptPath, cryptFormat);
-        loadLibrary(libraryPath, libraryFormat);
+        Path cryptPlaytest = cardDir.resolve("vtescrypt_playtest.csv");
+        Path libraryPlaytest = cardDir.resolve("vteslib_playtest.csv");
+        if (Files.exists(cryptPlaytest)) loadCrypt(all, cryptPlaytest, cryptFormat, true);
+        if (Files.exists(libraryPlaytest)) loadLibrary(all, libraryPlaytest, libraryFormat, true);
 
-        LOOKUP_MAP.forEach((k, v) -> LOWER_LOOKUP_MAP.put(StringUtils.stripAccents(k).toLowerCase(), v));
-
-        // For crypt cards whose bare name is unique, also index by that bare
-        // name so JOL imports don't need a group qualifier for unambiguous
-        // vampires.
-        Map<String, Set<Card>> bareNameToCards = new LinkedHashMap<>();
-        for (Card card : ALL_CARDS) {
-            if (!(card instanceof CryptCard)) continue;
-            for (String variant : nameVariants(card)) {
-                bareNameToCards.computeIfAbsent(variant, k -> new LinkedHashSet<>()).add(card);
-            }
-        }
-        int bareAdded = 0;
-        int bareDisambiguated = 0;
-        for (Map.Entry<String, Set<Card>> entry : bareNameToCards.entrySet()) {
-            if (entry.getValue().size() == 1) {
-                LOWER_LOOKUP_MAP.putIfAbsent(entry.getKey(), entry.getValue().iterator().next());
-                bareAdded++;
-            } else {
-                // Multiple versions share this name (different groups or ADV).
-                // Resolve to the non-advanced card with the lowest numeric
-                // group, matching the old JOL convention that the bare name
-                // refers to the original printing.
-                Optional<Card> canonical = entry.getValue().stream()
-                        .filter(c -> c instanceof CryptCard cc && !cc.advanced())
-                        .filter(c -> ((CryptCard) c).group().matches("\\d+"))
-                        .min(Comparator.comparingInt(c -> Integer.parseInt(((CryptCard) c).group())));
-                if (canonical.isPresent()) {
-                    LOWER_LOOKUP_MAP.putIfAbsent(entry.getKey(), canonical.get());
-                    bareDisambiguated++;
-                }
-            }
-        }
-
-        logger.info("Loaded {} cards ({} lookup keys, {} unambiguous crypt bare names, {} disambiguated to lowest non-adv group)",
-                ALL_CARDS.size(), LOOKUP_MAP.size(), bareAdded, bareDisambiguated);
+        return buildIndexMaps(all, cardDir.toString());
     }
 
-    private static void loadCrypt(Path path, CSVFormat format) {
+    private static void loadCrypt(List<Card> sink, Path path, CSVFormat format, boolean playtest) {
+        if (!Files.exists(path)) {
+            logger.error("crypt card file not found at {}", path);
+            return;
+        }
         try (Reader in = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             for (CSVRecord r : format.parse(in)) {
                 boolean advanced = "Advanced".equals(r.get("Adv"));
-                String group = r.get("Group");
-
+                String clan = nullIfBlank(r.get("Clan"));
+                String text = r.get("Card Text");
                 CryptCard card = new CryptCard(
                         r.get("Id"),
                         r.get("Name"),
                         splitSemicolon(r.get("Aka")),
                         parseSetColumn(r.get("Set")),
-                        r.get("Card Text"),
+                        text,
                         r.get("Artist"),
                         StringUtils.isNotBlank(r.get("Banned")),
+                        playtest,
+                        CryptMetadata.isUnique(text),
                         "Imbued".equals(r.get("Type")) ? CryptType.IMBUED : CryptType.VAMPIRE,
-                        nullIfBlank(r.get("Clan")),
+                        clan,
+                        CryptMetadata.determineSect(clan, text),
                         nullIfBlank(r.get("Path")),
-                        group,
+                        r.get("Group"),
                         advanced,
+                        CryptMetadata.isInfernal(text),
                         Integer.parseInt(r.get("Capacity")),
                         parseCryptDisciplines(r.get("Disciplines")),
-                        nullIfBlank(r.get("Title"))
+                        nullIfBlank(r.get("Title")),
+                        CryptMetadata.determineVotes(nullIfBlank(r.get("Title")))
                 );
-
-                ALL_CARDS.add(card);
-                ID_MAP.put(card.id(), card);
-                indexCryptCard(card, group, advanced);
+                sink.add(card);
             }
         } catch (IOException e) {
-            logger.error("Unable to read file {}", path, e);
+            logger.error("unable to read {}", path, e);
         }
     }
 
-    private static void loadLibrary(Path path, CSVFormat format) {
+    private static void loadLibrary(List<Card> sink, Path path, CSVFormat format, boolean playtest) {
+        if (!Files.exists(path)) {
+            logger.error("library card file not found at {}", path);
+            return;
+        }
         try (Reader in = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             for (CSVRecord r : format.parse(in)) {
                 String rawDisc = r.get("Discipline").trim();
                 List<String> andDisciplines;
                 List<String> orDisciplines;
-
                 if (rawDisc.contains(" & ")) {
                     andDisciplines = splitOn(rawDisc, " & ").stream().map(CardRegistry::disciplineToCode).toList();
                     orDisciplines = List.of();
@@ -230,6 +306,9 @@ public final class CardRegistry {
                     orDisciplines = List.of();
                 }
 
+                List<String> types = splitOn(r.get("Type"), "/");
+                PlayModeParser.Result modes = PlayModeParser.parse(types, r.get("Card Text"));
+
                 LibraryCard card = new LibraryCard(
                         r.get("Id"),
                         r.get("Name"),
@@ -238,8 +317,10 @@ public final class CardRegistry {
                         r.get("Card Text"),
                         r.get("Artist"),
                         StringUtils.isNotBlank(r.get("Banned")),
+                        playtest,
+                        modes.unique(),
                         nullIfBlank(r.get("Flavor Text")),
-                        splitOn(r.get("Type"), "/"),
+                        types,
                         splitOn(r.get("Clan"), "/").stream().filter(StringUtils::isNotBlank).toList(),
                         nullIfBlank(r.get("Path")),
                         andDisciplines,
@@ -247,41 +328,88 @@ public final class CardRegistry {
                         parseCost(r.get("Pool Cost")),
                         parseCost(r.get("Blood Cost")),
                         parseCost(r.get("Conviction Cost")),
-                        parseBurnOption(r.get("Burn Option"))
+                        parseBurnOption(r.get("Burn Option")),
+                        modes.preamble(),
+                        modes.modes(),
+                        modes.multiMode(),
+                        modes.doNotReplace()
                 );
-
-                ALL_CARDS.add(card);
-                ID_MAP.put(card.id(), card);
-                indexLibraryCard(card);
+                sink.add(card);
             }
         } catch (IOException e) {
-            logger.error("Unable to read file {}", path, e);
+            logger.error("unable to read {}", path, e);
         }
     }
 
     // ── Indexing ─────────────────────────────────────────────────────────────
 
-    private static void indexCryptCard(CryptCard card, String group, boolean advanced) {
-        final String suffix = "ANY".equals(group)
-                ? (advanced ? " (ADV)" : "")
-                : " (G" + group + (advanced ? " ADV" : "") + ")";
+    private static Index buildIndexMaps(List<Card> all, String sourceDir) {
+        Map<String, Card> byId = new HashMap<>();
+        Map<String, Card> byNameVariant = new HashMap<>();
+        for (Card card : all) {
+            byId.put(card.id(), card);
+            if (card instanceof CryptCard crypt) {
+                indexCryptCard(byNameVariant, crypt);
+            } else {
+                indexLibraryCard(byNameVariant, (LibraryCard) card);
+            }
+        }
 
+        Map<String, Card> byNormalized = new HashMap<>();
+        byNameVariant.forEach((k, v) -> byNormalized.put(StringUtils.stripAccents(k).toLowerCase(), v));
+
+        // Also index unambiguous crypt cards by their bare name so JOL imports
+        // don't need a group qualifier; ambiguous ones resolve to the lowest
+        // non-advanced numeric group (the original printing convention).
+        Map<String, Set<Card>> bareNameToCards = new LinkedHashMap<>();
+        for (Card card : all) {
+            if (!(card instanceof CryptCard)) continue;
+            for (String variant : bareNameVariants(card)) {
+                bareNameToCards.computeIfAbsent(variant, k -> new LinkedHashSet<>()).add(card);
+            }
+        }
+        for (Map.Entry<String, Set<Card>> entry : bareNameToCards.entrySet()) {
+            if (entry.getValue().size() == 1) {
+                byNormalized.putIfAbsent(entry.getKey(), entry.getValue().iterator().next());
+            } else {
+                entry.getValue().stream()
+                        .filter(c -> c instanceof CryptCard cc && !cc.advanced())
+                        .filter(c -> ((CryptCard) c).group().matches("\\d+"))
+                        .min(Comparator.comparingInt(c -> Integer.parseInt(((CryptCard) c).group())))
+                        .ifPresent(canonical -> byNormalized.putIfAbsent(entry.getKey(), canonical));
+            }
+        }
+
+        return new Index(List.copyOf(all), Map.copyOf(byId), Map.copyOf(byNameVariant),
+                Map.copyOf(byNormalized), Instant.now(), sourceDir);
+    }
+
+    private static void indexCryptCard(Map<String, Card> map, CryptCard card) {
+        String suffix = card.cryptSuffix();
+        // For an advanced card in a numbered group, also index the group-less
+        // "(ADV)" form so [Card Name (ADV)] resolves without the group number
+        // (matches the old Utils.generateNames behaviour). Lowest group wins.
+        String advSuffix = (card.advanced() && !"ANY".equals(card.group())) ? " (ADV)" : null;
         Stream.concat(
                 Stream.of(card.name(), StringUtils.stripAccents(card.name())),
                 card.aka().stream().flatMap(a -> Stream.of(a, StringUtils.stripAccents(a)))
         ).map(String::trim).filter(StringUtils::isNotBlank).distinct().forEach(variant -> {
-            LOOKUP_MAP.put(variant + suffix, card);
-            LOOKUP_MAP.put(replaceArticle(variant) + suffix, card);
+            map.put(variant + suffix, card);
+            map.put(replaceArticle(variant) + suffix, card);
+            if (advSuffix != null) {
+                map.putIfAbsent(variant + advSuffix, card);
+                map.putIfAbsent(replaceArticle(variant) + advSuffix, card);
+            }
         });
     }
 
-    private static void indexLibraryCard(LibraryCard card) {
+    private static void indexLibraryCard(Map<String, Card> map, LibraryCard card) {
         Stream.concat(
                 Stream.of(card.name(), StringUtils.stripAccents(card.name())),
                 card.aka().stream().flatMap(a -> Stream.of(a, StringUtils.stripAccents(a)))
         ).map(String::trim).filter(StringUtils::isNotBlank).distinct().forEach(variant -> {
-            LOOKUP_MAP.put(variant, card);
-            LOOKUP_MAP.put(replaceArticle(variant), card);
+            map.put(variant, card);
+            map.put(replaceArticle(variant), card);
         });
     }
 
@@ -334,7 +462,6 @@ public final class CardRegistry {
         return "Y".equalsIgnoreCase(raw) || "Yes".equalsIgnoreCase(raw);
     }
 
-    /** Converts a full discipline name from the CSV to its short code. */
     private static String disciplineToCode(String name) {
         return DISC_NAME_TO_CODE.getOrDefault(name.trim().toLowerCase(), name.trim().toLowerCase());
     }
@@ -343,11 +470,7 @@ public final class CardRegistry {
         return StringUtils.isBlank(value) ? null : value.trim();
     }
 
-    /**
-     * Stripped-lowercase bare name variants (name + AKAs) used to build the
-     * unambiguous crypt bare-name index.
-     */
-    private static Set<String> nameVariants(Card card) {
+    private static Set<String> bareNameVariants(Card card) {
         return Stream.concat(Stream.of(card.name()), card.aka().stream())
                 .flatMap(n -> Stream.of(n, replaceArticle(n)))
                 .map(n -> StringUtils.stripAccents(n).toLowerCase().strip())

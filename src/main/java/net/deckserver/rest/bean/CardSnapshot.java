@@ -1,5 +1,6 @@
 package net.deckserver.rest.bean;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,6 +16,7 @@ import java.util.List;
  */
 @Getter
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CardSnapshot {
     private final String id;
     private final boolean visible;
@@ -41,4 +43,12 @@ public class CardSnapshot {
     private final boolean hasBlood;
     private final boolean hasLife;
     private final List<CardSnapshot> cards;
+
+    // Play-card-modal fields — populated only for cards in the viewer's own
+    // HAND / RESEARCH region (GameSnapshotFactory), null everywhere else.
+    private final List<PlayModeBean> modes;
+    private final Boolean multiMode;
+    private final Boolean doNotReplace;
+    private final String preamble;
+    private final String cost;
 }

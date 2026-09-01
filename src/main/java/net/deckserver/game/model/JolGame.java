@@ -7,12 +7,14 @@
 package net.deckserver.game.model;
 
 import com.google.common.base.Strings;
+import net.deckserver.game.cards.Card;
+import net.deckserver.game.cards.CardRegistry;
+import net.deckserver.game.cards.CryptCard;
+import net.deckserver.game.cards.LibraryCard;
 import net.deckserver.game.enums.*;
-import net.deckserver.services.CardService;
 import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
 import net.deckserver.services.ParserService;
-import net.deckserver.storage.json.cards.CardSummary;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.CardData;
 import net.deckserver.storage.json.game.GameData;
@@ -316,24 +318,31 @@ public record JolGame(String id, GameData data) {
     }
 
     public CardData hydrateCard(CardData card) {
-        CardSummary summary = CardService.get(card.getCardId());
-        card.setName(summary.getName());
-        card.setPlaytest(summary.isPlayTest());
-        card.setUnique(summary.isUnique());
-        card.setType(summary.getCardType());
-        card.setMinion(summary.isMinion());
+        Card definition = CardRegistry.findById(card.getCardId());
+        if (definition == null) {
+            return card;
+        }
+        card.setName(definition.name());
+        card.setPlaytest(definition.playtest());
+        card.setUnique(definition.unique());
+        card.setType(definition.cardType());
+        card.setMinion(definition.isMinion());
         if (card.isMinion()) {
-            if (!summary.getClans().isEmpty()) {
-                card.setClan(Clan.of(summary.getClans().getFirst()));
+            if (definition instanceof CryptCard crypt) {
+                if (crypt.clan() != null) {
+                    card.setClan(Clan.of(crypt.clan()));
+                }
+                card.setSect(Sect.of(crypt.sect()));
+                card.setPath(Path.of(crypt.path()));
+                card.setDisciplines(crypt.disciplines());
+                card.setCapacity(crypt.capacity());
+                card.setVotes(crypt.votes());
+                card.setTitle(crypt.title());
+                card.setInfernal(crypt.infernal());
+                card.setAdvanced(crypt.advanced());
+            } else if (definition instanceof LibraryCard lib && !lib.requirementClans().isEmpty()) {
+                card.setClan(Clan.of(lib.requirementClans().getFirst()));
             }
-            card.setSect(Sect.of(summary.getSect()));
-            card.setPath(Path.of(summary.getPath()));
-            card.setDisciplines(summary.getDisciplines());
-            card.setCapacity(Optional.ofNullable(summary.getCapacity()).orElse(0));
-            card.setVotes(summary.getVotes());
-            card.setTitle(summary.getTitle());
-            card.setInfernal(summary.isInfernal());
-            card.setAdvanced(summary.isAdvanced());
         }
         return card;
     }

@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * Search, scoring and DTO projection over {@link CardRegistry} — the read side
  * of the deck editor's card lookups. Plain static class, matching
- * {@link CardService} / {@link CardRegistry}.
+ * {@link CardRegistry}.
  */
 public final class CardSearchService {
 
@@ -116,13 +116,6 @@ public final class CardSearchService {
     }
 
     private static String canonicalName(Card card) {
-        if (card instanceof CryptCard c) return c.name() + cryptSuffix(c);
-        return card.name();
-    }
-
-    private static String cryptSuffix(CryptCard c) {
-        return "ANY".equals(c.group())
-                ? (c.advanced() ? " (ADV)" : "")
-                : " (G" + c.group() + (c.advanced() ? " ADV" : "") + ")";
+        return card.displayName();
     }
 }
