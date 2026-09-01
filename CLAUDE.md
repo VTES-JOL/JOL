@@ -8,25 +8,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Build the runnable Quarkus jar (target/quarkus-app/quarkus-run.jar)
 ./mvnw clean package
 
-# Start local Postgres (required), then optionally load fixture data
-docker compose -f local-docker-compose.yml up -d db
-./migrate-to-db.sh src/test/resources/data   # reset DB + import fixture data
-./load-test-fixtures.sh                      # shorthand for the line above; resets local `db` to Player1-5 fixture data
+# Run locally — Quarkus dev mode, app served at /jol. Needs Docker: with no
+# JDBC URL configured under %dev, Quarkus Dev Services boots a throwaway
+# Postgres container and Flyway loads db/migration + db/devseed (Player1..5,
+# password "password"; Player1 is admin). Quinoa (see quarkus.quinoa.* in
+# application.properties) starts the frontend's own `npm run dev` as a
+# subprocess and proxies to it automatically.
+ENABLE_CAPTCHA=false ./mvnw quarkus:dev
 
-# Run locally — Quarkus dev mode, app served at /jol. Quinoa (see
-# quarkus.quinoa.* in application.properties) starts the frontend's own
-# `npm run dev` as a subprocess and proxies to it automatically — no
-# separate frontend terminal/command needed, unlike the old Tomcat setup.
-JOL_DB_PASSWORD=jol ENABLE_CAPTCHA=false ./mvnw quarkus:dev
+# Run a dev instance against a real / production-shaped Postgres instead
+# (does NOT migrate or clean it — schema must already be at head):
+JOL_DB_URL=jdbc:postgresql://host/db JOL_DB_USER=… JOL_DB_PASSWORD=… \
+  ./mvnw quarkus:dev -Dquarkus.profile=prodlike
 
-# Run all tests (excludes "Builder" group by default; uses in-memory H2, no Postgres needed)
+# Run all tests (excludes "Builder" group by default). Pure unit tests need
+# nothing. The JPA tier (net.deckserver.jpa.repository.*) uses a
+# Testcontainers Postgres running the real Flyway migrations — needs Docker;
+# it self-skips (not fails) when Docker is unavailable. See TESTING.md.
 ./mvnw test
 
 # Run a single test class
-./mvnw test -Dtest=DoCommandTest
+./mvnw test -Dtest=PlayerRepositoryTest
 
-# Run Cucumber BDD tests
-./mvnw test -Dtest=RunCucumberTest
+# migrate-to-db.sh / load-test-fixtures.sh are for seeding a real Postgres
+# from a production JSON snapshot only — not used by tests or `quarkus:dev`.
 
 # Frontend: type-check + build, lint, unit/component tests (from src/main/webui/)
 npm run build
@@ -38,7 +43,7 @@ npm run test
 npm run test:e2e
 ```
 
-Tests require `ENABLE_TEST_MODE=true` — set via `@SetEnvironmentVariable` on the test classes, so no manual setup is needed when running via Maven. Service-level tests boot an in-memory H2 database populated from `src/test/resources/data` by `JolServiceExtension`/`JolFixtureLoader` (see `src/test/resources/META-INF/persistence.xml`) — register any new JPA entity in both persistence units there, not just the main one, or JPA-backed tests fail with "Unknown entity type".
+See `TESTING.md` for the test structure. In short: pure-logic tests (`*Test`, no DB) run anywhere; the JPA tier (`net.deckserver.jpa.repository.*`, `@ExtendWith(PostgresJpaExtension.class)`) runs against a Testcontainers Postgres built by the real Flyway migrations plus the `src/main/resources/db/testseed` fixture. New `@Entity` classes must be added to `src/test/resources/META-INF/persistence.xml`'s single `jol-test-pu` unit (plain Jakarta Persistence bootstrap has no entity scanning; the main persistence unit still auto-discovers). The service-level test suite that booted H2 via the old `JolServiceExtension`/`JolFixtureLoader` was removed pending a rework — see TESTING.md's "Deferred" list.
 
 `quarkus:dev` serves HTTPS on `https://localhost:8443` (self-signed cert — see `application.properties`'s `%dev.quarkus.http.ssl-port` block for how to regenerate `src/main/resources/dev-keystore.p12` if needed), since `AuthService`'s cookies are unconditionally `Secure`. Production runs plain HTTP behind Traefik's own TLS termination (see `docker-compose.yml`) — the dev-only HTTPS config doesn't apply there.
 
@@ -48,10 +53,10 @@ The `Builder` tag is excluded from the default test run — these are `CardDatab
 
 | Variable | Purpose |
 |---|---|
-| `JOL_DB_URL` | JDBC URL (default `jdbc:postgresql://localhost:5432/jol`) |
-| `JOL_DB_USER` / `JOL_DB_PASSWORD` | Database credentials (default user `jol`) |
+| `JOL_DB_URL` | JDBC URL. Consulted under `%prod` / `%prodlike` only (default `jdbc:postgresql://localhost:5432/jol`). Under `%dev` it is unset ⇒ Dev Services; pass `-Dquarkus.datasource.jdbc.url=…` to override. |
+| `JOL_DB_USER` / `JOL_DB_PASSWORD` | Database credentials (default user `jol`). Ignored when Dev Services provides the container. |
 | `JOL_DB_POOL_SIZE` | Agroal (Quarkus's connection pool) max pool size (default 10) |
-| `ENABLE_TEST_MODE` | Skips the startup hook (`JpaStartup`) that calls `JpaFactory.initialize()` (test classes initialize their own H2 instance via `JolServiceExtension` instead) and makes every service's write-through methods (`PersistedService.jpaWrite`/`jpaWriteThenMutate`/`jpaWriteWithRollback`) a no-op that only updates in-memory state — so tests never touch a real database. Set to `true` in tests. |
+| `ENABLE_TEST_MODE` | Skips the startup hook (`JpaStartup`) that calls `JpaFactory.initialize()` and makes every service's write-through methods (`PersistedService.jpaWrite`/`jpaWriteThenMutate`/`jpaWriteWithRollback`) a no-op that only updates in-memory state. Still set by the surviving pure-logic tests (`AuthServiceTest`, `TokenServiceTest`, `ParserServiceTest`) via `@SetEnvironmentVariable` so they never touch a database. The JPA tier does **not** set it — those tests exercise the real repositories against Postgres. |
 | `ENABLE_CAPTCHA` | Set to `false` for local dev |
 | `JOL_RECAPTCHA_KEY` / `JOL_RECAPTCHA_SECRET` | reCAPTCHA credentials |
 | `DISCORD_BOT_TOKEN` / `DISCORD_PING_CHANNEL_ID` | Discord integration |

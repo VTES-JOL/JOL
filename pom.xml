@@ -338,10 +338,38 @@
             <version>2.1.4</version>
         </dependency>
 
+        <!--
+          JPA tests (net.deckserver.jpa.repository.*) run against a real
+          PostgreSQL in a Testcontainers-managed Docker container, with the
+          schema built by the actual Flyway migrations (src/main/resources/
+          db/migration) plus the declarative fixture in db/testseed — see
+          net.deckserver.testsupport.PostgresJpaExtension. This replaces the
+          old H2 (MODE=PostgreSQL) + hbm2ddl-generated schema, which never
+          exercised the migrations and couldn't run Postgres-specific DDL/DML
+          (V17's BRIN index, V18's lateral-join/jsonb backfill).
+
+          flyway-core / flyway-database-postgresql are pulled in transitively
+          by the quarkus-flyway extension at runtime; declared here at test
+          scope too so the extension can call Flyway's Java API directly.
+        -->
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>2.4.240</version>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -468,6 +496,17 @@
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-bom</artifactId>
                 <version>2.26.1</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+
+            <!-- quarkus-bom manages testcontainers-core (for its own Dev
+                 Services) but not the postgresql / junit-jupiter modules the
+                 JPA test tier uses directly. -->
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>1.20.4</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>

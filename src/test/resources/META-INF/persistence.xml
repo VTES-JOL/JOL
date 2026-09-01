@@ -5,6 +5,22 @@
                  https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
              version="3.2">
 
+    <!--
+      Single persistence unit for the JPA test suite
+      (net.deckserver.jpa.repository.*). It is bootstrapped by
+      net.deckserver.testsupport.PostgresJpaExtension, which:
+        * starts a Testcontainers PostgreSQL container (shared per JVM),
+        * runs the real Flyway migrations (classpath:db/migration) plus the
+          declarative fixture (classpath:db/testseed) against it,
+        * passes the container's jdbc url/user/password in as overrides to
+          Persistence.createEntityManagerFactory("jol-test-pu", props).
+
+      Schema is therefore owned by Flyway, exactly as in production -
+      hbm2ddl is set to "validate", never "create". The <class> list must
+      still be maintained by hand here (plain Jakarta Persistence bootstrap
+      has no classpath entity scanning the way Quarkus's Hibernate ORM
+      extension does for the main persistence unit); add every new @Entity.
+    -->
     <persistence-unit name="jol-test-pu" transaction-type="RESOURCE_LOCAL">
         <class>net.deckserver.jpa.entity.PlayerEntity</class>
         <class>net.deckserver.jpa.entity.GameInfoEntity</class>
@@ -31,50 +47,11 @@
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
-            <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
-            <property name="jakarta.persistence.jdbc.url"
-                      value="jdbc:h2:mem:jol-test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;NON_KEYWORDS=VALUE"/>
-            <property name="jakarta.persistence.jdbc.user" value="sa"/>
-            <property name="jakarta.persistence.jdbc.password" value=""/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
-            <property name="hibernate.show_sql" value="false"/>
-        </properties>
-    </persistence-unit>
-
-    <persistence-unit name="jol-repo-test-pu" transaction-type="RESOURCE_LOCAL">
-        <class>net.deckserver.jpa.entity.PlayerEntity</class>
-        <class>net.deckserver.jpa.entity.GameInfoEntity</class>
-        <class>net.deckserver.jpa.entity.RegistrationEntity</class>
-        <class>net.deckserver.jpa.entity.DeckInfoEntity</class>
-        <class>net.deckserver.jpa.entity.DeckContentEntity</class>
-        <class>net.deckserver.jpa.entity.DeckFormatValidityEntity</class>
-        <class>net.deckserver.jpa.entity.TournamentEntity</class>
-        <class>net.deckserver.jpa.entity.TournamentRegistrationEntity</class>
-        <class>net.deckserver.jpa.entity.GameStateEntity</class>
-        <class>net.deckserver.jpa.entity.GameChatEntity</class>
-        <class>net.deckserver.jpa.entity.GameChatMessageEntity</class>
-        <class>net.deckserver.jpa.entity.GameCommandErrorEntity</class>
-        <class>net.deckserver.jpa.entity.GameHistoryEntity</class>
-        <class>net.deckserver.jpa.entity.GameSnapshotEntity</class>
-        <class>net.deckserver.jpa.entity.PlayerActivityEntity</class>
-        <class>net.deckserver.jpa.entity.GameActivityEntity</class>
-        <class>net.deckserver.jpa.entity.GlobalChatEntity</class>
-        <class>net.deckserver.jpa.entity.SiteNotesEntity</class>
-        <class>net.deckserver.jpa.entity.SubscriptionEntity</class>
-        <class>net.deckserver.jpa.entity.RefreshTokenEntity</class>
-        <class>net.deckserver.jpa.entity.MetricEventEntity</class>
-
-        <exclude-unlisted-classes>true</exclude-unlisted-classes>
-
-        <properties>
-            <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
-            <property name="jakarta.persistence.jdbc.url"
-                      value="jdbc:h2:mem:jol-repo-test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;NON_KEYWORDS=VALUE"/>
-            <property name="jakarta.persistence.jdbc.user" value="sa"/>
-            <property name="jakarta.persistence.jdbc.password" value=""/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+            <!-- jdbc url / user / password are injected at runtime by
+                 PostgresJpaExtension from the Testcontainers container. -->
+            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="validate"/>
             <property name="hibernate.show_sql" value="false"/>
         </properties>
     </persistence-unit>

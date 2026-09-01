@@ -43,6 +43,12 @@ jobs:
       # Plain `mvn test` never triggers Quinoa's build (that only runs as
       # part of quarkus:build/quarkus:dev or full packaging — see the
       # package job below), so this needs no Node/npm at all.
+      #
+      # The JPA test tier (net.deckserver.jpa.repository.*) uses a
+      # Testcontainers PostgreSQL — the ubuntu-latest runner has a running
+      # Docker daemon, so it works with no extra setup. If Docker were
+      # unavailable that tier self-skips (PostgresJpaExtension), it does not
+      # fail. See TESTING.md.
       - name: Run backend tests
         run: ./mvnw --batch-mode --no-transfer-progress test
 

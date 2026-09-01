@@ -2,7 +2,8 @@ package net.deckserver.jpa.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import net.deckserver.testsupport.PostgresJpaExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import net.deckserver.game.model.JolGame;
 import net.deckserver.game.enums.GameFormat;
 import net.deckserver.game.enums.GameStatus;
@@ -23,6 +24,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+@ExtendWith(PostgresJpaExtension.class)
 class GameStateRepositoryTest {
 
     static EntityManagerFactory emf;
@@ -36,7 +38,7 @@ class GameStateRepositoryTest {
 
     @BeforeAll
     static void setUpEmf() {
-        emf = Persistence.createEntityManagerFactory("jol-repo-test-pu");
+        emf = PostgresJpaExtension.emf();
         // Seed player + game rows required by FK constraints
         EntityManager setup = emf.createEntityManager();
         setup.getTransaction().begin();
@@ -50,7 +52,7 @@ class GameStateRepositoryTest {
 
     @AfterAll
     static void tearDownEmf() {
-        if (emf != null) emf.close();
+        /* shared EMF: closed by PostgresJpaExtension, not per-class */;
     }
 
     @BeforeEach

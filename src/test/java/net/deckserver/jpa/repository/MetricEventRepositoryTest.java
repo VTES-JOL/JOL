@@ -2,7 +2,8 @@ package net.deckserver.jpa.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import net.deckserver.testsupport.PostgresJpaExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import net.deckserver.jpa.entity.MetricEventEntity;
 import net.deckserver.jpa.repository.MetricEventRepository.Grain;
 import net.deckserver.rest.bean.HeatmapCell;
@@ -19,6 +20,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+@ExtendWith(PostgresJpaExtension.class)
 class MetricEventRepositoryTest {
 
     static EntityManagerFactory emf;
@@ -30,12 +32,12 @@ class MetricEventRepositoryTest {
 
     @BeforeAll
     static void setUpEmf() {
-        emf = Persistence.createEntityManagerFactory("jol-repo-test-pu");
+        emf = PostgresJpaExtension.emf();
     }
 
     @AfterAll
     static void tearDownEmf() {
-        if (emf != null) emf.close();
+        /* shared EMF: closed by PostgresJpaExtension, not per-class */;
     }
 
     @BeforeEach
