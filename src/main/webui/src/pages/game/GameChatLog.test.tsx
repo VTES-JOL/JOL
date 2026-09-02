@@ -29,6 +29,29 @@ describe('GameChatLog', () => {
     expect(screen.getAllByText('Judge1')).toHaveLength(2);
   });
 
+  it('shows a header per submission when invocationSeq distinguishes identical text', () => {
+    // Five separate `transfer ready 1 -1` submissions: same text, distinct seq.
+    const repeated: ChatData[] = [1, 2, 3, 4, 5].map((seq) =>
+      line({
+        message: 'transferred 1 blood.',
+        invocation: 'transfer ready 1 -1',
+        invocationBy: 'Player1',
+        invocationSeq: seq,
+      }),
+    );
+    render(<GameChatLog lines={repeated} viewerName="Player1" showCommands />);
+    expect(screen.getAllByText('transfer ready 1 -1')).toHaveLength(5);
+  });
+
+  it('shows one header for a multi-line single submission (shared invocationSeq)', () => {
+    const oneCommand: ChatData[] = [
+      line({ message: 'plays a card.', invocation: 'play hand 1 draw', invocationBy: 'Player1', invocationSeq: 9 }),
+      line({ message: 'draws from their library.', invocation: 'play hand 1 draw', invocationBy: 'Player1', invocationSeq: 9 }),
+    ];
+    render(<GameChatLog lines={oneCommand} viewerName="Player1" showCommands />);
+    expect(screen.getAllByText('play hand 1 draw')).toHaveLength(1);
+  });
+
   it('leaves lines without an invocation unprefixed', () => {
     render(<GameChatLog lines={[line({ message: 'plain chat' })]} viewerName={null} showCommands />);
     expect(screen.getByText('plain chat')).toBeInTheDocument();

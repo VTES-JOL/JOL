@@ -544,13 +544,18 @@ success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FRO
 # chat line(s) it produced. Best-effort: anything not confidently matched keeps
 # a NULL invocation. Games with no log file are simply skipped.
 #
+# invocation_seq (V20) is assigned in the same walk: a per-game counter bumped
+# once per matched raw command, so the lines of one submission share a value and
+# the next submission gets a new one even when its text is identical (the judges'
+# chat log dedups its "» command" header on this). NULL for unmatched lines.
+#
 # FORCE_NOT_NULL (message): some prod chat lines have an empty/null message;
 # in CSV an unquoted empty field is read as NULL, which violates message's
 # NOT NULL. This keeps it an empty string instead (matching how the Java
 # paths and V18's COALESCE handle the same case).
 log "Loading game chat messages..."
 python3 - "$DATA" <<PYEOF | psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -v ON_ERROR_STOP=1 \
-  -c "\copy game_chat_message(game_id,turn_seq,chat_seq,turn_id,turn_player,turn_label,posted_at,display_ts,source,message,command,invocation,invocation_by) FROM STDIN WITH (FORMAT csv, FORCE_NOT_NULL (message))"
+  -c "\copy game_chat_message(game_id,turn_seq,chat_seq,turn_id,turn_player,turn_label,posted_at,display_ts,source,message,command,invocation,invocation_by,invocation_seq) FROM STDIN WITH (FORMAT csv, FORCE_NOT_NULL (message))"
 import sys, json, csv, os, datetime, re
 from datetime import timedelta
 
@@ -649,6 +654,7 @@ def align(entries, commands):
     """Order-preserving assignment of each raw command to the run of chat
     entries it produced. Mutates entries in place; returns the match count."""
     li = ei = matched = 0
+    seq = 0                                             # per-game invocation_seq, one bump per matched command
     n = len(entries)
     while li < len(commands) and ei < n:
         ldt, issuer, raw = commands[li]
@@ -695,9 +701,11 @@ def align(entries, commands):
             else:
                 break
 
+        seq += 1
         for j in range(start, ei):
-            entries[j]["_inv"]    = raw
-            entries[j]["_inv_by"] = issuer
+            entries[j]["_inv"]     = raw
+            entries[j]["_inv_by"]  = issuer
+            entries[j]["_inv_seq"] = seq
             matched += 1
         li += 1
     return matched
@@ -743,6 +751,7 @@ for entry in os.scandir(games_dir):
                 chat.get("command") or "",
                 chat.get("_inv") or "",
                 chat.get("_inv_by") or "",
+                chat.get("_inv_seq") or "",
             ])
             rows += 1
 

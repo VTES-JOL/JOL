@@ -72,8 +72,17 @@ export function GameChatLog({
         const line = row.data;
         const prev = row.i > 0 ? lines[row.i - 1] : undefined;
         const { html } = highlightMentions(line.message, viewerName);
+        // One header per command *submission*, not per distinct command text:
+        // dedup on invocationSeq (shared across the lines one submission emits,
+        // distinct for the next) so five identical `transfer ready 1 -1`s each
+        // get their own header. Pre-V20 rows have no seq — fall back to the
+        // text comparison, which still collapses a multi-line single command.
         const showInvocation =
-          showCommands && !!line.invocation && line.invocation !== prev?.invocation;
+          showCommands &&
+          !!line.invocation &&
+          (line.invocationSeq != null
+            ? line.invocationSeq !== prev?.invocationSeq
+            : line.invocation !== prev?.invocation);
         return (
           <Fragment key={`c${row.i}`}>
             {showInvocation && (

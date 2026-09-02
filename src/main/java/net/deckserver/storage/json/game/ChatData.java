@@ -20,6 +20,14 @@ public class ChatData {
     private String invocation;
     /** Who issued that command — often not {@link #source}, which is frequently the affected player. Judge-only. */
     private String invocationBy;
+    /**
+     * Monotonic id identifying the single command submission that produced this line —
+     * shared by every line that submission emitted, distinct for the next one even
+     * when {@link #invocation} is byte-identical. Lets judges' chat log show the
+     * "» command" header once per submission rather than once per distinct text.
+     * Judge-only; stripped for other viewers.
+     */
+    private Long invocationSeq;
 
     public ChatData() {
     }

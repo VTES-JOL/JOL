@@ -471,6 +471,10 @@ export interface ChatData {
   // these to a judge watching a game they are not seated in; stripped otherwise.
   invocation?: string;
   invocationBy?: string;
+  // Monotonic id shared by every line one command submission produced; distinct
+  // for the next submission even when `invocation` is identical. Used to show the
+  // "» command" header once per submission. Judge-only (stripped otherwise).
+  invocationSeq?: number;
 }
 
 // GET /jol/api/game/{id}/command-errors?turn=X — judge-only. A command a player

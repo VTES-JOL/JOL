@@ -33,6 +33,7 @@ public class GameChatMessageRepository {
         entity.setCommand(chat.getCommand());
         entity.setInvocation(chat.getInvocation());
         entity.setInvocationBy(chat.getInvocationBy());
+        entity.setInvocationSeq(chat.getInvocationSeq());
         em.persist(entity);
     }
 
@@ -72,6 +73,7 @@ public class GameChatMessageRepository {
         chat.setCommand(row.getCommand());
         chat.setInvocation(row.getInvocation());
         chat.setInvocationBy(row.getInvocationBy());
+        chat.setInvocationSeq(row.getInvocationSeq());
         return chat;
     }
 }

@@ -58,6 +58,10 @@ public class GameChatMessageEntity {
     @Column(name = "invocation_by", length = 255)
     private String invocationBy;
 
+    /** Monotonic id shared by every line one command submission produced; see V20. */
+    @Column(name = "invocation_seq")
+    private Long invocationSeq;
+
     public Long getId() { return id; }
 
     public String getGameId() { return gameId; }
@@ -98,4 +102,7 @@ public class GameChatMessageEntity {
 
     public String getInvocationBy() { return invocationBy; }
     public void setInvocationBy(String invocationBy) { this.invocationBy = invocationBy; }
+
+    public Long getInvocationSeq() { return invocationSeq; }
+    public void setInvocationSeq(Long invocationSeq) { this.invocationSeq = invocationSeq; }
 }

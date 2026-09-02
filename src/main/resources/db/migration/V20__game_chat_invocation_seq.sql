@@ -1,0 +1,21 @@
+-- V20: per-submission invocation identity for game chat lines.
+--
+-- `invocation` (V18) is the raw text a player typed. It is NOT a submission id:
+-- five separate `transfer ready 1 -1` commands all carry byte-identical
+-- `invocation` (and `command`) text, so the judge-only "» command" header in
+-- the chat log (GameChatLog.tsx) — which de-duplicates on consecutive equal
+-- `invocation` strings so one command that emits several lines shows its header
+-- once — wrongly collapses those five submissions into a single header.
+--
+-- `invocation_seq` is a monotonic id assigned once per ChatService.beginInvocation
+-- (i.e. once per command a player submits), stamped onto every ChatData that
+-- command produces. The client de-duplicates the header on this instead: equal
+-- seq = same submission (header once), different seq = a new submission (header
+-- again, even when the text is identical).
+--
+-- Nullable, not backfilled: rows written before this migration keep NULL and the
+-- client falls back to the old text comparison for them. A fresh legacy import
+-- (migrate-to-db.sh) does populate it, from the same command-log alignment that
+-- backfills `invocation`.
+
+ALTER TABLE game_chat_message ADD COLUMN invocation_seq BIGINT;

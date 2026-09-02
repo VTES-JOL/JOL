@@ -121,9 +121,11 @@ public class GameActionResource extends BaseResource {
     }
 
     private static ChatData withoutInvocation(ChatData c) {
-        if (c.getInvocation() == null && c.getInvocationBy() == null) {
+        if (c.getInvocation() == null && c.getInvocationBy() == null && c.getInvocationSeq() == null) {
             return c;
         }
+        // invocation / invocationBy / invocationSeq are all judge-only — a fresh
+        // copy carrying only the non-privileged fields drops every one of them.
         ChatData copy = new ChatData();
         copy.setTimestamp(c.getTimestamp());
         copy.setMessage(c.getMessage());

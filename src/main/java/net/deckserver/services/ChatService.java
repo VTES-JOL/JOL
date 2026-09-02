@@ -16,6 +16,7 @@ import net.deckserver.storage.json.game.TurnHistory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Singleton
 @Startup
@@ -48,8 +49,18 @@ public class ChatService extends PersistedService {
      * Safe as a ThreadLocal: a submit runs single-threaded under
      * {@code GameModel}'s ReentrantLock, single-node.
      */
-    private record Invocation(String issuer, String raw) {}
+    private record Invocation(String issuer, String raw, long seq) {}
     private static final ThreadLocal<Invocation> CURRENT_INVOCATION = new ThreadLocal<>();
+
+    /**
+     * Source of {@link ChatData#getInvocationSeq()} — one value per
+     * {@link #beginInvocation} (i.e. per command a player submits), shared by
+     * every line that command emits. Only ever compared for equality between
+     * two adjacent lines, so any strictly-increasing sequence works; seeding
+     * from wall-clock millis keeps values increasing across restarts too, so a
+     * post-restart line can never collide with the persisted line before it.
+     */
+    private static final AtomicLong INVOCATION_SEQ = new AtomicLong(System.currentTimeMillis());
 
     // Read accelerator only. Persistence is write-through per message (see sendChat);
     // there is no background flush and eviction just drops the cached copy — the
@@ -67,7 +78,7 @@ public class ChatService extends PersistedService {
     }
 
     public static void beginInvocation(String issuer, String raw) {
-        CURRENT_INVOCATION.set(new Invocation(issuer, raw));
+        CURRENT_INVOCATION.set(new Invocation(issuer, raw, INVOCATION_SEQ.incrementAndGet()));
     }
 
     public static void endInvocation() {
@@ -143,6 +154,9 @@ public class ChatService extends PersistedService {
             }
             if (chat.getInvocationBy() == null) {
                 chat.setInvocationBy(inv.issuer());
+            }
+            if (chat.getInvocationSeq() == null) {
+                chat.setInvocationSeq(inv.seq());
             }
         }
 
