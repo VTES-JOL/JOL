@@ -16,6 +16,8 @@ export interface NavBean {
 export interface ChatEntry {
   timestamp: string;
   player: string;
+  // Plain text with server-substituted tokens ([card:id:name], [disc:code],
+  // [d], [style:text]); rendered by <MessageContent>. Not HTML.
   message: string;
 }
 
@@ -467,6 +469,8 @@ export interface ChatData {
   // Full-precision ISO insert time; `timestamp` is only minute-granularity.
   // Used to interleave failed command attempts at their true position.
   postedAt?: string;
+  // Plain text with server-substituted tokens ([card:id:name], [disc:code],
+  // [d], [style:text]); rendered by <MessageContent>. Not HTML.
   message: string;
   source: string;
   command?: string;

@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useRef } from 'react';
 import type { ChatData, CommandError } from '../../api/types';
-import { highlightMentions } from '../main/chatFormatting';
+import { MessageContent } from '../../components/MessageContent';
 import { useCardTooltips } from '../../hooks/useCardTooltips';
 
 // Shared by GameChatPanel (current turn, live) and HistoryPanel (any turn,
@@ -86,7 +86,6 @@ export function GameChatLog({
         }
         const line = row.data;
         const prev = row.i > 0 ? lines[row.i - 1] : undefined;
-        const { html } = highlightMentions(line.message, viewerName);
         // One header per command *submission*, not per distinct command text:
         // dedup on invocationSeq (shared across the lines one submission emits,
         // distinct for the next) so five identical `transfer ready 1 -1`s each
@@ -110,7 +109,9 @@ export function GameChatLog({
             <p className="chat">
               <span className="chat-timestamp">{line.timestamp}</span>{' '}
               {line.source && line.source !== 'null' && <b>{line.source}</b>}{' '}
-              <span dangerouslySetInnerHTML={{ __html: html }} />
+              <span>
+                <MessageContent message={line.message} viewer={viewerName} />
+              </span>
             </p>
           </Fragment>
         );

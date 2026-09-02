@@ -994,6 +994,40 @@ if [[ -f "$DATA/pastGames.json" ]]; then
 else
   echo "  ⚠ no pastGames.json found — skipping game history"
 fi
+
+# ── 13b. Rewrite legacy chat HTML to plain-text tokens ───────────────────────
+# The file snapshot stores chat messages as the HTML the old ParserService
+# produced (<a class='card-name' …>, <span class='icon pot'>, …). The app now
+# stores and renders plain text with tokens instead — [card:<id>:<name>],
+# [disc:<code>], [d], [style:<text>] — and never re-parses a stored row, so an
+# imported environment has to be converted here to match what a fresh write
+# would look like. HTML entities the sanitiser added (&#39; &#34; &#64; &amp;)
+# are decoded back since the value is rendered as text now. pg_temp.* function
+# is dropped automatically with the session; the transform is a no-op on any
+# row already in token form.
+log "Rewriting legacy chat HTML to tokens..."
+psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -v ON_ERROR_STOP=1 <<'SQL'
+CREATE FUNCTION pg_temp.html_to_tokens(msg text) RETURNS text AS $fn$
+  SELECT replace(replace(replace(replace(
+           regexp_replace(
+           regexp_replace(
+           regexp_replace(
+           regexp_replace(
+           regexp_replace($1,
+             '<a class=''card-name'' data-card-id=''([0-9]+)''[^>]*>\s*([^<]+?)\s*<i class=''icon adv''></i></a>',
+             '[card:\1:\2:adv]', 'g'),
+             '<a class=''card-name'' data-card-id=''([0-9]+)''[^>]*>([^<]*)</a>',
+             '[card:\1:\2]', 'g'),
+             '<span class=''icon D''></span>', '[d]', 'g'),
+             '<span class=''icon ([A-Za-z]+)''></span>', '[disc:\1]', 'g'),
+             '<span class=''game-name''>([^<]*)</span>', '[style:\1]', 'g'),
+         '&#64;', '@'), '&#39;', ''''), '&#34;', '"'), '&amp;', '&')
+$fn$ LANGUAGE sql IMMUTABLE;
+
+UPDATE global_chat       SET message = pg_temp.html_to_tokens(message);
+UPDATE game_chat_message SET message = pg_temp.html_to_tokens(message);
+SQL
+success "chat HTML rewritten to tokens"
 fi
 
 # ── 14. Refresh tokens ────────────────────────────────────────────────────────

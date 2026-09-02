@@ -7,7 +7,9 @@ import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
 import { subscribe } from '../../stores/socket';
 import { useAuth } from '../../auth/useAuth';
 import { useCardTooltips } from '../../hooks/useCardTooltips';
-import { dayLabel, highlightMentions, localTimeTitle, utcTime } from './chatFormatting';
+import { MessageContent } from '../../components/MessageContent';
+import { messageHasMention } from '../../utils/mentions';
+import { dayLabel, localTimeTitle, utcTime } from './chatFormatting';
 import { runRequest } from '../../api/mutate';
 import './GlobalChat.css';
 
@@ -24,7 +26,6 @@ interface RenderedEntry {
   day: string;
   showDayBreak: boolean;
   showPlayerLabel: boolean;
-  html: string;
   isMention: boolean;
 }
 
@@ -37,8 +38,7 @@ function buildRenderedEntries(entries: ChatEntry[], player: string | null): Rend
     const showPlayerLabel = showDayBreak || entry.player !== lastPlayer;
     lastDay = day;
     lastPlayer = entry.player;
-    const { html, isMention } = highlightMentions(entry.message, player);
-    return { entry, day, showDayBreak, showPlayerLabel, html, isMention };
+    return { entry, day, showDayBreak, showPlayerLabel, isMention: messageHasMention(entry.message, player) };
   });
 }
 
@@ -237,7 +237,7 @@ export function GlobalChat() {
           style={{ minHeight: 0, overflowY: 'auto' }}
           onScroll={handleScroll}
         >
-          {rendered.map(({ entry, day, showDayBreak, showPlayerLabel, html, isMention }, i) => (
+          {rendered.map(({ entry, day, showDayBreak, showPlayerLabel, isMention }, i) => (
             <div key={i}>
               {showDayBreak && (
                 <div className="chat-day-break">
@@ -248,11 +248,15 @@ export function GlobalChat() {
                 <span className="chat-timestamp" title={localTimeTitle(entry.timestamp)}>
                   {utcTime(entry.timestamp)}
                 </span>
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: ` ${showPlayerLabel ? `<b>${entry.player}</b> ` : ''}${html}`,
-                  }}
-                />
+                <span>
+                  {' '}
+                  {showPlayerLabel && (
+                    <>
+                      <b>{entry.player}</b>{' '}
+                    </>
+                  )}
+                  <MessageContent message={entry.message} viewer={player} />
+                </span>
               </p>
             </div>
           ))}

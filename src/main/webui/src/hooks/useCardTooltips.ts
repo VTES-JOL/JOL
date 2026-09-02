@@ -22,10 +22,9 @@ function cardImagePlaceholder(label: string): HTMLElement {
 
 /**
  * Attaches a hoverable card-image tooltip to every `a.card-name[data-card-id]`
- * link inside containerRef — ParserService.parseGlobalChat already renders
- * card mentions like `[Anarch Convert]` as that exact markup server-side
- * (see net.deckserver.services.ParserService#generateCardLink), this just
- * restores the client-side behavior ds.js's addCardTooltips() provided.
+ * link inside containerRef. Chat/log card mentions are rendered as that markup
+ * by `<CardToken>` (from the `[card:<id>:<name>]` tokens ParserService emits);
+ * this restores the client-side behavior ds.js's addCardTooltips() provided.
  *
  * Re-runs whenever `deps` changes (e.g. the chat log grows) but only
  * attaches to links that don't already have a tippy instance — checked via
@@ -44,9 +43,9 @@ export function useCardTooltips(containerRef: RefObject<HTMLElement | null>, dep
 
     links.forEach((link) => {
       if (link._tippy) return;
-      // These anchors carry no `href` (React-rendered CardLink/Card.tsx, and
-      // server-rendered markup from ParserService/JolGame's generateCardLink)
-      // — an <a> without href gets no implicit role and isn't in the tab
+      // These anchors carry no `href` (React-rendered CardLink/Card.tsx and
+      // the chat/log <CardToken>) — an <a> without href gets no implicit
+      // role and isn't in the tab
       // order, so without this a keyboard or screen-reader user has no way
       // to discover or open the tooltip at all. tippy's default trigger
       // already includes 'focus', so making the element focusable is enough.
@@ -79,6 +78,8 @@ export function useCardTooltips(containerRef: RefObject<HTMLElement | null>, dep
           onShow(instance) {
             hideAll({ exclude: instance });
             const cardId = link.dataset.cardId;
+            // Chat/log card links (<CardToken>) never set data-secured — all
+            // non-secured. The other card-link sites still do, for now.
             const secured = link.dataset.secured === 'true' ? 'secured/' : '';
             getBaseUrl().then((baseUrl) => {
               const img = document.createElement('img');

@@ -111,7 +111,7 @@ public record JolGame(String id, GameData data) {
         CardData card = data.getCard(cardId);
         RegionData destination = data.getPlayer(player).getRegion(RegionType.ASH_HEAP);
         destination.addCard(card, false);
-        cardLink = getCardLink(card.getCardId(), card.getName(), card.isPlaytest());
+        cardLink = getCardLink(card.getCardId(), card.getName(), card.isAdvanced());
         String message = String.format("discards %s%s", cardLink, random ? " (picked randomly)" : "");
         ChatService.sendCommand(id, player, message, "discard", cardId, player, RegionType.ASH_HEAP.xmlLabel());
     }
@@ -126,7 +126,7 @@ public record JolGame(String id, GameData data) {
 
         if (modes != null) {
             for (String mode : modes)
-                modeMessage.append(ParserService.generateDisciplineLink(mode));
+                modeMessage.append(ParserService.disciplineToken(mode));
             modeMessage.insert(0, " at ");
         }
         CardData card = data.getCard(cardId);
@@ -134,7 +134,7 @@ public record JolGame(String id, GameData data) {
         RegionData source = card.getRegion();
         RegionData destination = data.getPlayerRegion(destinationPlayer, destinationRegion);
 
-        cardLink = getCardLink(card.getCardId(), card.getName(), card.isPlaytest());
+        cardLink = getCardLink(card.getCardId(), card.getName(), card.isAdvanced());
         sourceMessage = RegionType.HAND.equals(source.getType()) ? "" : " from their " + source.getType().xmlLabel();
         if (target == null) {
             destinationMessage = RegionType.ASH_HEAP.equals(destinationRegion) ? "" : String.format(" to %s %s", playerTitle, destinationRegion.xmlLabel());
@@ -796,12 +796,12 @@ public record JolGame(String id, GameData data) {
         return String.join(".", coordinates.reversed());
     }
 
-    private String getCardLink(String cardId, String name, boolean playTest) {
-        return String.format("<a class='card-name' data-card-id='%s' data-secured='%s'>%s</a>", cardId, playTest, name);
+    private String getCardLink(String cardId, String name, boolean advanced) {
+        return ParserService.cardToken(cardId, name, advanced);
     }
 
     private String getCardLink(CardData card) {
-        return String.format("<a class='card-name' data-card-id='%s' data-secured='%s'>%s</a>", card.getCardId(), card.isPlaytest(), card.getName());
+        return ParserService.cardToken(card.getCardId(), card.getName(), card.isAdvanced());
     }
 
     private List<CardData> unlockAll(RegionData regionData) {

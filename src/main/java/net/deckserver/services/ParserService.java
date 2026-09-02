@@ -9,6 +9,26 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Chat / log text rendering.
+ *
+ * <p>{@link #parseGlobalChat}/{@link #parseGameChat} no longer emit HTML. They
+ * rewrite the markup a player types into plain-text <em>tokens</em> the React
+ * client resolves to components at render time:
+ * <ul>
+ *   <li>{@code [Card Name]}      &rarr; {@code [card:<id>:<name>]} (+ {@code :adv} for an advanced crypt card)</li>
+ *   <li>{@code [pot]} / {@code [POT]} &rarr; {@code [disc:pot]} / {@code [disc:POT]} (case = inferior/superior)</li>
+ *   <li>{@code (D)}               &rarr; {@code [d]}</li>
+ *   <li>{@code {text}}            &rarr; {@code [style:text]}</li>
+ * </ul>
+ * Emoji shortcodes are still expanded to Unicode here. The output is plain text
+ * (HTML entities from {@link #sanitizeText} are decoded back), safe to render as
+ * React text nodes — see {@code src/main/webui/src/utils/parseMessageTokens.ts}.
+ *
+ * <p>{@link #parseSymbols} is unchanged and still emits HTML {@code <span>}
+ * icons — its only caller is {@code CardDatabaseBuilder}, which bakes the static
+ * card-tooltip HTML assets, not chat.
+ */
 public class ParserService {
 
     private static final Pattern MARKUP_PATTERN = Pattern.compile("\\[(.*?)\\]");
@@ -21,19 +41,20 @@ public class ParserService {
     }
 
     public static String parseGlobalChat(String text) {
-        String parsedForCards = parseTextForCards(text, false);
-        String parsedForDisciplines = parseTextForDisciplines(parsedForCards);
-        String parsedForDActions = parseTextForDAction(parsedForDisciplines);
-        String parsedForEmojis = parseTextForEmoji(parsedForDActions);
-        return parseTextForStyle(parsedForEmojis);
+        return parseChat(text, false);
     }
 
     public static String parseGameChat(String text) {
-        String parsedForCards = parseTextForCards(text, true);
-        String parsedForDisciplines = parseTextForDisciplines(parsedForCards);
-        String parsedForDActions = parseTextForDAction(parsedForDisciplines);
-        String parsedForEmojis = parseTextForEmoji(parsedForDActions);
-        return parseTextForStyle(parsedForEmojis);
+        return parseChat(text, true);
+    }
+
+    private static String parseChat(String text, boolean includePlaytest) {
+        String s = tokeniseCards(text, includePlaytest);
+        s = tokeniseDisciplines(s);
+        s = tokeniseDAction(s);
+        s = parseTextForEmoji(s);
+        s = tokeniseStyle(s);
+        return decodeBasicEntities(s);
     }
 
     public static String parseSymbols(String text) {
@@ -49,23 +70,82 @@ public class ParserService {
         return disciplineSet.contains(discipline.toLowerCase());
     }
 
-    private static String parseTextForCards(String text, boolean includePlaytest) {
+    // ── Token builders ──────────────────────────────────────────────────────
+    // Used directly by callers (e.g. JolGame) that assemble a message from
+    // pieces and never run it back through parseGameChat.
+
+    public static String cardToken(String cardId, String name, boolean advanced) {
+        return "[card:" + cardId + ":" + name + (advanced ? ":adv" : "") + "]";
+    }
+
+    public static String disciplineToken(String code) {
+        return "[disc:" + code + "]";
+    }
+
+    // ── Chat tokenisers ────────────────────────────────────────────────────
+
+    private static String tokeniseCards(String text, boolean includePlaytest) {
         Matcher matcher = MARKUP_PATTERN.matcher(text);
 
         StringBuilder sb = new StringBuilder(text.length());
         while (matcher.find()) {
-            for (int x = 1; x <= matcher.groupCount(); x++) {
-                String match = matcher.group(x).trim().replaceAll("&#39;", "'").replaceAll("&#34;", "\"");
-                try {
-                    CardRegistry.resolveNormalized(match, includePlaytest).map(CardRef::of).ifPresent(card -> matcher.appendReplacement(sb, generateCardLink(card)));
-                } catch (IllegalArgumentException e) {
-                    // do nothing
-                }
+            String match = matcher.group(1).trim().replaceAll("&#39;", "'").replaceAll("&#34;", "\"");
+            try {
+                CardRegistry.resolveNormalized(match, includePlaytest)
+                        .map(CardRef::of)
+                        .ifPresent(card -> matcher.appendReplacement(sb, Matcher.quoteReplacement(card.token())));
+            } catch (IllegalArgumentException e) {
+                // unresolved bracket — leave it verbatim
             }
         }
         matcher.appendTail(sb);
         return sb.toString();
     }
+
+    private static String tokeniseDisciplines(String text) {
+        Matcher matcher = MARKUP_PATTERN.matcher(text);
+
+        StringBuilder sb = new StringBuilder(text.length());
+        while (matcher.find()) {
+            String match = matcher.group(1).trim();
+            if (disciplineSet.contains(match.toLowerCase())) {
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(disciplineToken(match)));
+            }
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
+
+    private static String tokeniseDAction(String text) {
+        return D_PATTERN.matcher(text).replaceAll("[d]");
+    }
+
+    private static String tokeniseStyle(String text) {
+        Matcher matcher = STYLE_PATTERN.matcher(text);
+        StringBuilder sb = new StringBuilder(text.length());
+        while (matcher.find()) {
+            String match = matcher.group(1).trim();
+            matcher.appendReplacement(sb, Matcher.quoteReplacement("[style:" + match + "]"));
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
+
+    /**
+     * Undo the HTML entity encoding {@link #sanitizeText} applies — the message
+     * is rendered as plain text now, so {@code &#64;} / {@code &#39;} etc. must
+     * come back as real characters. {@code &amp;} is unescaped last so a
+     * literally-typed {@code &#64;} (encoded to {@code &amp;#64;}) survives as
+     * {@code &#64;} rather than being turned into an {@code @}.
+     */
+    private static String decodeBasicEntities(String text) {
+        return text.replace("&#64;", "@")
+                .replace("&#39;", "'")
+                .replace("&#34;", "\"")
+                .replace("&amp;", "&");
+    }
+
+    // ── HTML symbol rendering (CardDatabaseBuilder only) ────────────────────
 
     private static String parseTextForDisciplines(String text) {
         Matcher matcher = MARKUP_PATTERN.matcher(text);
@@ -94,29 +174,8 @@ public class ParserService {
         return sb.toString();
     }
 
-    private static String parseTextForStyle(String text) {
-        Matcher matcher = STYLE_PATTERN.matcher(text);
-        StringBuilder sb = new StringBuilder(text.length());
-        while (matcher.find()) {
-            for (int x = 1; x <= matcher.groupCount(); x++) {
-                String match = matcher.group(x).trim();
-                matcher.appendReplacement(sb, generateStyle(match));
-            }
-        }
-        matcher.appendTail(sb);
-        return sb.toString();
-    }
-
-    private static String generateCardLink(CardRef card) {
-        return String.format("<a class='card-name' data-card-id='%s' data-secured='%s'>%s%s</a>", card.id(), card.playtest(), card.name(), (card.advanced() ? " <i class='icon adv'></i>" : ""));
-    }
-
     public static String generateDisciplineLink(String discipline) {
         return "<span class='icon " + discipline + "'></span>";
-    }
-
-    public static String generateStyle(String text) {
-        return "<span class='game-name'>" + text + "</span>";
     }
 
     public static String generateDAction() {
