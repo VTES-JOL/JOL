@@ -5,6 +5,7 @@ import { Recycle, Tag, Trash2 } from 'lucide-react';
 import { CardImage } from './CardImage';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
+import { Switch } from '../../components/ui/Switch';
 import { Clan } from './Clan';
 
 const MODE_BTN =
@@ -42,13 +43,25 @@ export function PlayCardModal({
 }) {
   const [label, setLabel] = useState(card.label ?? '');
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  // Default on: play refills the hand, matching pre-toggle behaviour. Unticking
+  // suppresses the `draw` so a player can chain "played at the same time" cards
+  // (e.g. "only as announced …") before drawing back up manually.
+  const [replace, setReplace] = useState(true);
 
-  useEffect(() => setSelected(new Set()), [card.cardId]);
+  useEffect(() => {
+    setSelected(new Set());
+    setReplace(true);
+  }, [card.cardId]);
 
   const cardName = card.name ?? '';
   const typeClass = card.typeClass ?? '';
   const modes = card.modes ?? [];
-  const doNotReplace = ctx.regionCommandKey === 'research' ? true : !!card.doNotReplace;
+  const isResearch = ctx.regionCommandKey === 'research';
+  const doNotReplace = isResearch ? true : !!card.doNotReplace;
+  // doNotReplace cards (and research cards) are structurally never replaced —
+  // nothing to opt out of, so the toggle is shown disabled/off for them.
+  const canOptOut = !doNotReplace;
+  const effectiveNoReplace = doNotReplace || !replace;
 
   const play = (mode: CardMode) => {
     if (needsTargetPicker(mode.target)) {
@@ -56,14 +69,14 @@ export function PlayCardModal({
         ctx,
         disciplines: mode.disciplines,
         target: mode.target!,
-        doNotReplace,
+        doNotReplace: effectiveNoReplace,
         cardName,
         typeClass,
       });
       onClose();
       return;
     }
-    onSubmit({ command: buildPlayCommand(ctx, mode.disciplines, mode.target, null, doNotReplace) });
+    onSubmit({ command: buildPlayCommand(ctx, mode.disciplines, mode.target, null, effectiveNoReplace) });
     onClose();
   };
 
@@ -72,11 +85,11 @@ export function PlayCardModal({
     const disciplines = picked.flatMap((m) => m.disciplines ?? []);
     const target = picked[0]?.target ?? null;
     if (target && needsTargetPicker(target)) {
-      onRequestTarget({ ctx, disciplines, target, doNotReplace, cardName, typeClass });
+      onRequestTarget({ ctx, disciplines, target, doNotReplace: effectiveNoReplace, cardName, typeClass });
       onClose();
       return;
     }
-    onSubmit({ command: buildPlayCommand(ctx, disciplines, target, null, doNotReplace) });
+    onSubmit({ command: buildPlayCommand(ctx, disciplines, target, null, effectiveNoReplace) });
     onClose();
   };
 
@@ -146,6 +159,22 @@ export function PlayCardModal({
           </Button>
         </div>
       )}
+      <div className="flex justify-center">
+        <Switch
+          id="play-replace"
+          checked={replace && canOptOut}
+          disabled={!canOptOut}
+          onChange={(e) => setReplace(e.target.checked)}
+          title={
+            canOptOut
+              ? 'Draw a replacement card when this is played. Untick to chain same-time cards, then draw manually.'
+              : isResearch
+                ? 'Research cards are never replaced.'
+                : 'This card is flagged "do not replace".'
+          }
+          label="Replace this card"
+        />
+      </div>
       <div className="flex justify-center items-center gap-2">
         <Button variant="danger" size="sm" icon={<Trash2 size={14} />} title="Discard" onClick={() => discard(false)}>
           Discard
