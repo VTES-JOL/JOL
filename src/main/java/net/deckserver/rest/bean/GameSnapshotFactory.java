@@ -12,8 +12,10 @@ import net.deckserver.game.model.JolGame;
 import net.deckserver.game.ui.CardDetail;
 import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
+import net.deckserver.services.JudgeService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.storage.json.game.CardData;
+import net.deckserver.storage.json.game.JudgeRequestData;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -75,6 +77,10 @@ public class GameSnapshotFactory {
 
         String edgeColor = PlayerService.get(viewer).getEdgeColor();
 
+        JudgeRequestData openRequest = JudgeService.getOpenForGame(game.id());
+        JudgeRequestBean judgeRequest = openRequest == null ? null
+                : JudgeRequestBean.of(openRequest, viewer, isJudge && !openRequest.isTournament());
+
         return GameSnapshot.builder()
                 .id(game.id())
                 .name(model.getName())
@@ -96,6 +102,7 @@ public class GameSnapshotFactory {
                 .edgeTextColor(colorIsDark(edgeColor) ? "white" : "black")
                 .status(status)
                 .stamp(OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME))
+                .judgeRequest(judgeRequest)
                 .build();
     }
 

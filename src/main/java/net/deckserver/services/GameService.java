@@ -18,6 +18,7 @@ import net.deckserver.jpa.repository.GameCommandErrorRepository;
 import net.deckserver.jpa.repository.GameInfoRepository;
 import net.deckserver.jpa.repository.GameSnapshotRepository;
 import net.deckserver.jpa.repository.GameStateRepository;
+import net.deckserver.jpa.repository.JudgeRequestRepository;
 import net.deckserver.storage.json.game.GameData;
 import net.deckserver.storage.json.game.GameSummary;
 import net.deckserver.storage.json.game.PlayerSummary;
@@ -48,6 +49,7 @@ public class GameService extends PersistedService {
     private static final GameCommandErrorRepository gameCommandErrorRepository = new GameCommandErrorRepository();
     private static final GameSnapshotRepository gameSnapshotRepository = new GameSnapshotRepository();
     private static final GameActivityRepository gameActivityRepository = new GameActivityRepository();
+    private static final JudgeRequestRepository judgeRequestRepository = new JudgeRequestRepository();
     private static GameService instance() {
         return resolve(GameService.class, GameService::new);
     }
@@ -178,6 +180,10 @@ public class GameService extends PersistedService {
                     gameSnapshotRepository.deleteAllForGame(em, gameId);
                     gameChatMessageRepository.deleteForGame(em, gameId);
                     gameCommandErrorRepository.deleteForGame(em, gameId);
+                    // Judge requests are NOT deleted: game_id becomes NULL (FK ON DELETE
+                    // SET NULL) so the ruling history survives cleanup. Just close any
+                    // still-open one so it doesn't linger in the queue as a phantom.
+                    judgeRequestRepository.abandonOpenForGame(em, gameId);
                     gameChatRepository.delete(em, gameId);
                     gameStateRepository.delete(em, gameId);
                     // must run before gameInfoRepository.delete - looks up the game row by name first

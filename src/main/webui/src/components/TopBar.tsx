@@ -115,9 +115,15 @@ export function TopBar() {
 
         {(nav?.buttons ?? []).map((entry) => {
           const [view, label] = entry.split(':');
+          const pending = view === 'judge' ? (nav?.pendingJudgeRequests ?? 0) : 0;
           return (
             <Link key={view} className={NAV_LINK} to={pathForView(view)} onClick={() => setMobileOpen(false)}>
               {label}
+              {pending > 0 && (
+                <span className="ml-1.5 inline-flex items-center justify-center rounded-full bg-blood px-1.5 text-[11px] font-semibold text-white">
+                  {pending}
+                </span>
+              )}
             </Link>
           );
         })}

@@ -19,6 +19,7 @@ const ProfilePage = lazy(() => import('../pages/ProfilePage').then((m) => ({ def
 const AdminPage = lazy(() => import('../pages/AdminPage').then((m) => ({ default: m.AdminPage })));
 const TournamentAdminPage = lazy(() => import('../pages/TournamentAdminPage').then((m) => ({ default: m.TournamentAdminPage })));
 const TournamentPage = lazy(() => import('../pages/TournamentPage').then((m) => ({ default: m.TournamentPage })));
+const JudgePage = lazy(() => import('../pages/JudgePage').then((m) => ({ default: m.JudgePage })));
 const WatchPage = lazy(() => import('../pages/WatchPage').then((m) => ({ default: m.WatchPage })));
 const LobbyPage = lazy(() => import('../pages/LobbyPage').then((m) => ({ default: m.LobbyPage })));
 const DeckPage = lazy(() => import('../pages/DeckPage').then((m) => ({ default: m.DeckPage })));
@@ -68,6 +69,7 @@ export function AppShell() {
             <Route path={ROUTE_PATHS.admin} element={<AdminPage />} />
             <Route path={ROUTE_PATHS.tournamentAdmin} element={<TournamentAdminPage />} />
             <Route path={ROUTE_PATHS.tournament} element={<TournamentPage />} />
+            <Route path={ROUTE_PATHS.judge} element={<JudgePage />} />
             <Route path={ROUTE_PATHS.watch} element={<WatchPage />} />
             <Route path={ROUTE_PATHS.lobby} element={<LobbyPage />} />
             <Route path={ROUTE_PATHS.deck} element={<DeckPage />} />

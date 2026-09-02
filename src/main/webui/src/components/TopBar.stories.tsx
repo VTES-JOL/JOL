@@ -35,6 +35,7 @@ const loggedInNav: NavBean = {
   country: 'US',
   buttons: ['main:Main', 'lobby:Lobby', 'tournament:Tournaments'],
   gameButtons: { g1: 'Game vs Player2', g2: 'Game vs Player3' },
+  pendingJudgeRequests: 0,
 };
 
 const meta = {

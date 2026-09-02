@@ -36,4 +36,6 @@ public class GameSnapshot {
     private final String edgeTextColor;
     private final String status;
     private final String stamp;
+    /** The single OPEN "call a judge" request for this game, or null if none. Viewer-aware. */
+    private final JudgeRequestBean judgeRequest;
 }

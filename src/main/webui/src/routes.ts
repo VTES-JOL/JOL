@@ -14,6 +14,7 @@ export const ROUTE_PATHS = {
   admin: '/jol/admin',
   tournamentAdmin: '/jol/tournamentAdmin',
   tournament: '/jol/tournament',
+  judge: '/jol/judge',
   watch: '/jol/active',
   lobby: '/jol/lobby',
   deck: '/jol/deck',

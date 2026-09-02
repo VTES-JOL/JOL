@@ -23,6 +23,7 @@ public class NavBean {
     private boolean notificationsEnabled;
     private boolean hasSubscriptions;
     private String country = null;
+    private long pendingJudgeRequests;
 
     public NavBean(String playerName) {
         player = playerName;
@@ -35,6 +36,10 @@ public class NavBean {
             buttons.add("deck:Decks");
             buttons.add("lobby:Lobby");
             buttons.add("tournament:Tournament");
+            if (JolAdmin.isJudge(player)) {
+                buttons.add("judge:Judges");
+                pendingJudgeRequests = JudgeService.countOpen();
+            }
             if (JolAdmin.isTournamentAdmin(player)) {
                 buttons.add("tournamentAdmin:Tournament Admin");
             }

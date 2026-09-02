@@ -1,14 +1,23 @@
 package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
+import net.deckserver.game.enums.JudgeRequestCategory;
 import net.deckserver.rest.bean.GameSnapshot;
 import net.deckserver.game.model.GameModel;
 import net.deckserver.rest.bean.GameSnapshotFactory;
+import net.deckserver.services.ChatService;
 import net.deckserver.services.GameService;
+import net.deckserver.services.JudgeService;
 import net.deckserver.services.RegistrationService;
+import net.deckserver.storage.json.game.JudgeRequestData;
+import net.deckserver.ws.WebSocketRegistry;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Dedicated, envelope-free reads/writes for the React game page — same role
@@ -74,9 +83,153 @@ public class GameStateResource extends BaseResource {
         });
     }
 
+    // ── "Call a judge" ────────────────────────────────────────────────────────
+    // One OPEN request per game. Seated players raise / edit / retract it; a
+    // judge who is not seated in the game resolves it (and, until tournament→
+    // judge assignment exists, only for non-tournament games). Each transition
+    // drops a SYSTEM line into game chat and pushes a refresh to the table and
+    // to any open judges page. All four return the fresh snapshot so the
+    // caller's own game page updates without a second round trip.
+
+    @POST
+    @Path("judge-request")
+    public GameSnapshot raiseJudgeRequest(JudgeRequestBody body) {
+        String player = username();
+        GameModel game = getModel();
+        requireSeated(game, player, "Only a player in this game can call a judge");
+        String details = requireDetails(body == null ? null : body.details());
+        JudgeRequestCategory category = parseCategory(body.category());
+        String tournamentName = GameService.get(gameName()).getTournamentName();
+        try {
+            JudgeService.createRequest(gameId, gameName(), tournamentName, player, category, details);
+        } catch (IllegalStateException e) {
+            throw new ClientErrorException(e.getMessage(), Response.Status.CONFLICT);
+        }
+        ChatService.sendSystemMessage(gameId, player + " has called for a judge (" + label(category) + ").");
+        notifyJudgeChange();
+        return snapshot(game, player);
+    }
+
+    @PUT
+    @Path("judge-request")
+    public GameSnapshot editJudgeRequest(JudgeRequestBody body) {
+        String player = username();
+        GameModel game = getModel();
+        JudgeRequestData open = requireOpenRequest();
+        if (!open.getRequestedBy().equals(player)) {
+            throw new ForbiddenException("Only the player who called the judge can edit the request");
+        }
+        String details = requireDetails(body == null ? null : body.details());
+        JudgeRequestCategory category = parseCategory(body.category());
+        if (JudgeService.editRequest(open.getId(), category, details) == null) {
+            throw new ClientErrorException("The judge request is no longer open", Response.Status.CONFLICT);
+        }
+        ChatService.sendSystemMessage(gameId, player + " updated their judge request.");
+        notifyJudgeChange();
+        return snapshot(game, player);
+    }
+
+    @POST
+    @Path("judge-request/retract")
+    public GameSnapshot retractJudgeRequest() {
+        String player = username();
+        GameModel game = getModel();
+        JudgeRequestData open = requireOpenRequest();
+        if (!open.getRequestedBy().equals(player)) {
+            throw new ForbiddenException("Only the player who called the judge can retract the request");
+        }
+        if (!JudgeService.retractRequest(open.getId())) {
+            throw new ClientErrorException("The judge request is no longer open", Response.Status.CONFLICT);
+        }
+        ChatService.sendSystemMessage(gameId, player + " retracted their judge request.");
+        notifyJudgeChange();
+        return snapshot(game, player);
+    }
+
+    @POST
+    @Path("judge-request/resolve")
+    public GameSnapshot resolveJudgeRequest(ResolveRequest body) {
+        String player = username();
+        GameModel game = getModel();
+        JudgeRequestData open = requireOpenRequest();
+        boolean seated = game.getPlayers().contains(player);
+        if (!JolAdmin.isJudge(player) || seated) {
+            throw new ForbiddenException("Only a judge who is not playing in this game can resolve the request");
+        }
+        if (open.isTournament()) {
+            throw new ForbiddenException("Tournament judge rulings are not available yet");
+        }
+        JudgeRequestData resolved = JudgeService.resolveRequest(open.getId(), player,
+                body == null ? null : body.notes());
+        if (resolved == null) {
+            throw new ClientErrorException("The judge request is no longer open", Response.Status.CONFLICT);
+        }
+        String line = "Judge " + player + " resolved the judge request.";
+        if (resolved.getResolutionParsed() != null && !resolved.getResolutionParsed().isBlank()) {
+            line = "Judge " + player + " resolved the judge request: " + resolved.getResolutionParsed();
+        }
+        ChatService.sendSystemMessage(gameId, line);
+        notifyJudgeChange();
+        return snapshot(game, player);
+    }
+
+    private void requireSeated(GameModel game, String player, String message) {
+        if (!game.getPlayers().contains(player)) {
+            throw new ForbiddenException(message);
+        }
+    }
+
+    private JudgeRequestData requireOpenRequest() {
+        JudgeRequestData open = JudgeService.getOpenForGame(gameId);
+        if (open == null) {
+            throw new NotFoundException("No open judge request for this game");
+        }
+        return open;
+    }
+
+    private static String requireDetails(String details) {
+        if (details == null || details.isBlank()) {
+            throw new BadRequestException("Request details are required");
+        }
+        return details;
+    }
+
+    private static JudgeRequestCategory parseCategory(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return JudgeRequestCategory.INCORRECT_PLAY;
+        }
+        try {
+            return JudgeRequestCategory.valueOf(raw.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Unknown judge request category: " + raw);
+        }
+    }
+
+    private static String label(JudgeRequestCategory category) {
+        return switch (category) {
+            case INCORRECT_PLAY -> "Incorrect play";
+            case CARD_RULING -> "Card ruling";
+            case OTHER -> "Other";
+        };
+    }
+
+    private void notifyJudgeChange() {
+        WebSocketRegistry.notifyGame(gameId);
+        WebSocketRegistry.notifyInvalidate(List.of("judge", "requests"));
+        WebSocketRegistry.notifyInvalidate(List.of("nav")); // refresh the Judges badge count
+    }
+
+    private GameSnapshot snapshot(GameModel game, String player) {
+        return game.withLock(() -> GameSnapshotFactory.build(game, player, null));
+    }
+
     private static String ne(String arg) {
         return "".equals(arg) ? null : arg;
     }
 
     public record SubmitRequest(String phase, String command, String chat, String ping) {}
+
+    public record JudgeRequestBody(String category, String details) {}
+
+    public record ResolveRequest(String notes) {}
 }

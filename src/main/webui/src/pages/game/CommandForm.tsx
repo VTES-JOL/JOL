@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { Gavel } from 'lucide-react';
 import { api } from '../../api/client';
 import type { GameSnapshot } from '../../api/types';
 import { QuickCommandModal } from './QuickCommandModal';
 import { QuickChatModal } from './QuickChatModal';
+import { JudgeRequestModal } from './JudgeRequestModal';
 import { Button } from '../../components/ui/Button';
 import { Select } from '../../components/ui/Select';
 import { confirmDialog } from '../../stores/dialog';
@@ -42,6 +44,7 @@ export function CommandForm({
   const [ping, setPing] = useState('');
   const [showQuickCommand, setShowQuickCommand] = useState(false);
   const [showQuickChat, setShowQuickChat] = useState(false);
+  const [showJudge, setShowJudge] = useState(false);
   // Deliberately local, not read off `game.status` — the submit response's
   // status is transient (server never persists it), but `game` itself gets
   // clobbered by the very next refresh this same submit triggers: saving
@@ -62,6 +65,11 @@ export function CommandForm({
   const canPlay = game.player;
   const canChat = game.player || game.judge;
   const isMyTurn = viewerName === game.currentPlayer;
+
+  const judgeRequest = game.judgeRequest;
+  // Seated players can raise/edit/retract; a non-seated judge needs it in-game
+  // to resolve; anyone already looking at an open request can view it.
+  const showJudgeButton = game.player || game.judge || !!judgeRequest;
 
   const submit = () => {
     if (!command && !chat && !phase) return;
@@ -118,8 +126,23 @@ export function CommandForm({
 
   return (
     <div className="commands flex flex-col min-h-0 rounded-lg border border-line-accent bg-surface/85 shadow-lg overflow-hidden">
-      <div className="px-3 py-1.5 border-b border-line bg-panel/60 text-sm font-semibold text-ink shrink-0">
-        Commands
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-line bg-panel/60 shrink-0">
+        <span className="text-sm font-semibold text-ink">Commands</span>
+        {showJudgeButton && (
+          <button
+            type="button"
+            onClick={() => setShowJudge(true)}
+            title={judgeRequest ? 'A judge has been called — view the request' : 'Request a judge come to the table'}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs shadow-sm ${
+              judgeRequest
+                ? 'border-blood/50 bg-blood/15 text-blood animate-pulse'
+                : 'border-line-accent bg-surface text-ink-secondary hover:bg-hover'
+            }`}
+          >
+            <Gavel size={13} />
+            {judgeRequest ? 'Judge Called' : 'Call Judge'}
+          </button>
+        )}
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto p-2">
         <form
@@ -240,6 +263,16 @@ export function CommandForm({
       </div>
       {showQuickCommand && <QuickCommandModal onSend={sendQuickCommand} onClose={() => setShowQuickCommand(false)} />}
       {showQuickChat && <QuickChatModal onSend={sendQuickChat} onClose={() => setShowQuickChat(false)} />}
+      {showJudge && (
+        <JudgeRequestModal
+          gameId={gameId}
+          request={judgeRequest}
+          onUpdated={onUpdated}
+          onClose={() => setShowJudge(false)}
+          submitting={submitting}
+          guard={guard}
+        />
+      )}
     </div>
   );
 }

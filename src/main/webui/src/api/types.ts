@@ -11,6 +11,8 @@ export interface NavBean {
   country: string | null;
   buttons: string[];
   gameButtons: Record<string, string>;
+  // Count of outstanding judge requests — badge on the Judges nav item. 0 for non-judges.
+  pendingJudgeRequests: number;
 }
 
 export interface ChatEntry {
@@ -519,6 +521,51 @@ export interface GameSnapshot {
   edgeTextColor: 'white' | 'black';
   status: string | null;
   stamp: string;
+  // The single OPEN "call a judge" request for this game, or null. Viewer-aware:
+  // rawDetails and the can* flags depend on who is asking. net.deckserver.rest.bean.JudgeRequestBean.
+  judgeRequest: JudgeRequestSnapshot | null;
+}
+
+export type JudgeRequestCategory = 'INCORRECT_PLAY' | 'CARD_RULING' | 'OTHER';
+
+export interface JudgeRequestSnapshot {
+  id: number;
+  requester: string;
+  category: JudgeRequestCategory;
+  createdAt: string;
+  updatedAt: string;
+  // Parsed token form ([card:id:name] …) — render with <MessageContent>.
+  details: string;
+  // Verbatim text the requester typed; only present for the requester (edit pre-fill).
+  rawDetails: string | null;
+  status: 'OPEN';
+  canEdit: boolean;
+  canRetract: boolean;
+  canResolve: boolean;
+}
+
+// GET /jol/api/judge/requests — net.deckserver.rest.bean.JudgeQueueBean.
+export interface JudgeQueue {
+  open: JudgeQueueEntry[];
+  history: JudgeQueueEntry[];
+}
+
+export interface JudgeQueueEntry {
+  id: number;
+  gameId: string | null;
+  gameName: string;
+  tournamentName: string | null;
+  tournament: boolean;
+  requester: string;
+  category: JudgeRequestCategory;
+  status: 'OPEN' | 'RETRACTED' | 'RESOLVED';
+  createdAt: string;
+  // Parsed token form — render with <MessageContent>.
+  details: string;
+  canRule: boolean;
+  resolvedBy: string | null;
+  resolvedAt: string | null;
+  resolution: string | null;
 }
 
 // net.deckserver.rest.bean.PlayModeBean — one play option for a hand/research

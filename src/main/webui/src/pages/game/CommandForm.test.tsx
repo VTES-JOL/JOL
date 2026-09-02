@@ -18,7 +18,7 @@ function TestHarness(props: Omit<ComponentProps<typeof CommandForm>, 'submitting
 }
 
 vi.mock('../../api/client', () => ({
-  api: { post: vi.fn() },
+  api: { post: vi.fn(), put: vi.fn() },
 }));
 
 vi.mock('../../stores/dialog', () => ({
@@ -51,15 +51,31 @@ function makeGame(overrides: Partial<GameSnapshot> = {}): GameSnapshot {
     edgeTextColor: 'black',
     status: null,
     stamp: '1',
+    judgeRequest: null,
     ...overrides,
   };
 }
 
 beforeEach(() => {
   vi.mocked(api.post).mockReset();
+  vi.mocked(api.put).mockReset();
   vi.mocked(confirmDialog).mockReset();
   vi.mocked(showError).mockReset();
 });
+
+const openRequest: NonNullable<GameSnapshot['judgeRequest']> = {
+  id: 7,
+  requester: 'Player1',
+  category: 'CARD_RULING',
+  createdAt: '2026-09-02T10:00:00Z',
+  updatedAt: '2026-09-02T10:00:00Z',
+  details: 'question about [card:100:Fame]',
+  rawDetails: 'question about [Fame]',
+  status: 'OPEN',
+  canEdit: false,
+  canRetract: false,
+  canResolve: false,
+};
 
 describe('CommandForm', () => {
   it('submits phase/command/chat/ping together and clears the free-text fields', async () => {
@@ -157,5 +173,91 @@ describe('CommandForm', () => {
     rerender(<TestHarness gameId="g1" game={makeGame({ status: null })} viewerName="Player1" onUpdated={onUpdated} />);
 
     expect(screen.getByText('No amount given use +/-')).toBeInTheDocument();
+  });
+
+  describe('call a judge', () => {
+    it('lets a seated player raise a request from the Call Judge button', async () => {
+      const updated = makeGame({ judgeRequest: { ...openRequest } });
+      vi.mocked(api.post).mockResolvedValue(updated);
+      const onUpdated = vi.fn();
+      const user = userEvent.setup();
+      render(<TestHarness gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={onUpdated} />);
+
+      await user.click(screen.getByRole('button', { name: /Call Judge/ }));
+      await user.selectOptions(screen.getByLabelText('Type of request'), 'CARD_RULING');
+      await user.type(screen.getByLabelText(/What do you need a ruling on/), 'Does Fame trigger?');
+      await user.click(screen.getByRole('button', { name: 'Call judge' }));
+
+      expect(api.post).toHaveBeenCalledWith('/game/g1/judge-request', {
+        category: 'CARD_RULING',
+        details: 'Does Fame trigger?',
+      });
+      expect(onUpdated).toHaveBeenCalledWith(updated);
+    });
+
+    it('shows "Judge Called" and a read-only request for a non-requester', async () => {
+      const user = userEvent.setup();
+      render(
+        <TestHarness
+          gameId="g1"
+          game={makeGame({ judgeRequest: { ...openRequest, requester: 'Player2' } })}
+          viewerName="Player1"
+          onUpdated={vi.fn()}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: /Judge Called/ }));
+      expect(screen.getByText(/called by/)).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('Resolution notes')).not.toBeInTheDocument();
+    });
+
+    it('lets the requester edit their open request', async () => {
+      const updated = makeGame({ judgeRequest: { ...openRequest } });
+      vi.mocked(api.put).mockResolvedValue(updated);
+      const user = userEvent.setup();
+      render(
+        <TestHarness
+          gameId="g1"
+          game={makeGame({ judgeRequest: { ...openRequest, canEdit: true, canRetract: true } })}
+          viewerName="Player1"
+          onUpdated={vi.fn()}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: /Judge Called/ }));
+      const details = screen.getByLabelText(/What do you need a ruling on/);
+      expect(details).toHaveValue('question about [Fame]');
+      await user.clear(details);
+      await user.type(details, 'clearer question');
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(api.put).toHaveBeenCalledWith('/game/g1/judge-request', {
+        category: 'CARD_RULING',
+        details: 'clearer question',
+      });
+    });
+
+    it('offers a resolution box to a non-seated judge', async () => {
+      const updated = makeGame();
+      vi.mocked(api.post).mockResolvedValue(updated);
+      const user = userEvent.setup();
+      render(
+        <TestHarness
+          gameId="g1"
+          game={makeGame({ player: false, judge: true, judgeRequest: { ...openRequest, canResolve: true } })}
+          viewerName="Judge1"
+          onUpdated={vi.fn()}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: /Judge Called/ }));
+      await user.type(screen.getByLabelText('Resolution notes'), 'Ruling: yes, it triggers.');
+      await user.click(screen.getByRole('button', { name: 'Resolve request' }));
+
+      expect(api.post).toHaveBeenCalledWith('/game/g1/judge-request/resolve', {
+        notes: 'Ruling: yes, it triggers.',
+      });
+    });
   });
 });
