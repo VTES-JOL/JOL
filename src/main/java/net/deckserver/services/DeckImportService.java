@@ -90,18 +90,27 @@ public final class DeckImportService {
             JsonNode root = MAPPER.readTree(text);
 
             deckName = firstNonBlank(root.path("name").asText(null), root.path("meta").path("name").asText(null));
-            String rawComments = firstNonBlank(root.path("comments").asText(null),
+            String rawComments = firstNonBlank(root.path("comment").asText(null),
+                    root.path("comments").asText(null),
                     root.path("meta").path("description").asText(null));
             if (rawComments != null) {
                 deckDescription = rawComments.strip();
             }
 
-            for (JsonNode card : root.path("crypt").path("cards")) {
-                resolveKrcgCard(card, resolved, errors);
-            }
-            for (JsonNode group : root.path("library").path("cards")) {
-                for (JsonNode card : group.path("cards")) {
+            if (root.path("cards").isArray()) {
+                // KRCG v5: flat cards[] with a kind discriminator.
+                for (JsonNode card : root.path("cards")) {
                     resolveKrcgCard(card, resolved, errors);
+                }
+            } else {
+                // Legacy KRCG: crypt/library trees grouped by type.
+                for (JsonNode card : root.path("crypt").path("cards")) {
+                    resolveKrcgCard(card, resolved, errors);
+                }
+                for (JsonNode group : root.path("library").path("cards")) {
+                    for (JsonNode card : group.path("cards")) {
+                        resolveKrcgCard(card, resolved, errors);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -131,9 +140,10 @@ public final class DeckImportService {
         resolved.add(new ImportPreviewBean.ResolvedEntry(count, CardSearchService.toDetail(found)));
     }
 
-    private static String firstNonBlank(String a, String b) {
-        if (StringUtils.isNotBlank(a)) return a;
-        if (StringUtils.isNotBlank(b)) return b;
+    private static String firstNonBlank(String... values) {
+        for (String v : values) {
+            if (StringUtils.isNotBlank(v)) return v;
+        }
         return null;
     }
 

@@ -13,6 +13,7 @@ import type { DeckEntry } from './deck/deckKit';
 import { deckApi } from './deck/deckApi';
 import { DeckListPane } from './deck/DeckListPane';
 import { DeckEditorPane } from './deck/DeckEditorPane';
+import { LegacyDeckEditor } from './deck/LegacyDeckEditor';
 import { DeckAnalyticsPanel } from './deck/DeckAnalyticsPanel';
 import { DeckImportModal } from './deck/DeckImportModal';
 import { enrichEntries, entriesFromExtendedDeck, entryIds } from './deck/deckEntries';
@@ -123,6 +124,17 @@ export function DeckPage() {
     [applyPage, refreshList],
   );
 
+  // LEGACY decks: raw-text save that never destructively re-serialises — stays
+  // raw text (and unregistrable) until every line resolves, then converts.
+  const saveLegacyDeck = useCallback(
+    async (deckName: string, contents: string) => {
+      const next = await api.post<DeckPageBean>('/decks/player/legacy', { deckName, contents, comment: '' });
+      applyPage(next);
+      refreshList();
+    },
+    [applyPage, refreshList],
+  );
+
   // jol creates the deck row on first save, so "New" persists an empty deck
   // under the first free "New Deck [n]" name and opens it (rename it inline
   // from the editor header).
@@ -217,6 +229,15 @@ export function DeckPage() {
                     description="Choose a deck from the list, or start a new one."
                   />
                 </Panel>
+              ) : (page.selectedDeck?.errors.length ?? 0) > 0 ? (
+                <LegacyDeckEditor
+                  key={`${selectedId}:legacy`}
+                  deckName={selectedName}
+                  initialContents={page.contents ?? ''}
+                  errors={page.selectedDeck?.errors ?? []}
+                  onSave={(contents) => saveLegacyDeck(selectedName, contents)}
+                  onDelete={() => deleteDeck(selectedName)}
+                />
               ) : (
                 <DeckEditorPane
                   key={selectedId}

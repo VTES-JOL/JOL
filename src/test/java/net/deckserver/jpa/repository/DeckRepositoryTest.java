@@ -144,6 +144,28 @@ class DeckRepositoryTest {
     }
 
     @Test
+    void saveContentWritesKrcgV5Shape() {
+        String deckId = UUID.randomUUID().toString();
+        repository.saveDeckInfo(em, "Player1", "V5Deck", makeDeckInfo(deckId));
+        em.flush();
+
+        ExtendedDeck deck = DeckParser.parseDeck("4 Nkechi\n\n10 Govern the Unaligned\n");
+        repository.saveContent(em, deckId, deck);
+        em.flush();
+        em.clear();
+
+        String stored = em.find(DeckContentEntity.class, deckId).getContent();
+        assertThat(stored, containsString("\"cards\""));
+        assertThat(stored, containsString("\"kind\""));
+        assertThat(stored, not(containsString("\"crypt\"")));
+
+        ExtendedDeck back = repository.findContent(em, deckId);
+        assertThat(back.getErrors(), is(empty()));
+        assertThat(back.getDeck().getCrypt().getCount(), is(4));
+        assertThat(back.getDeck().getLibrary().getCount(), is(10));
+    }
+
+    @Test
     void updateDeckContent() {
         String deckId = UUID.randomUUID().toString();
         repository.saveDeckInfo(em, "Player1", "ContentUpdate", makeDeckInfo(deckId));

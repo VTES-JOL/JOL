@@ -59,6 +59,7 @@ public class DeckInfoEntity {
 
     public DeckInfoId getId() { return id; }
     public String getDeckId() { return deckId; }
+    public net.deckserver.game.enums.DeckFormat getFormat() { return format; }
     public String getPlayerName() { return player != null ? player.getPlayerName() : null; }
 
     @Override

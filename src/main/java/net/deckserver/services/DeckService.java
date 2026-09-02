@@ -1,6 +1,5 @@
 package net.deckserver.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.quarkus.runtime.Startup;
 import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
@@ -18,6 +17,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Singleton
 @Startup
@@ -33,6 +33,7 @@ public class DeckService extends PersistedService {
     DeckService() {
         super("DeckService", 0);
         upgrade();
+        migrateStorageToV5();
     }
 
     public static DeckInfo get(String playerName, String deckName) {
@@ -99,6 +100,16 @@ public class DeckService extends PersistedService {
     }
 
     /**
+     * Persists deck content as raw text, unparsed — used only for a LEGACY deck
+     * that still has unresolved card lines (see
+     * {@link net.deckserver.JolAdmin#saveLegacyDeckText}). Everything else
+     * stores KRCG v5 JSON via {@link #saveDeck}.
+     */
+    public static void saveRawDeckContent(String deckId, String rawText) {
+        instance().requireJpaWriteAlways(em -> deckRepository.saveRawContent(em, deckId, rawText));
+    }
+
+    /**
      * Serializes a deck for storage as a game registration's frozen snapshot
      * (see {@link RegistrationService#registerDeck}) — the player's own decks/<id>
      * row can keep changing after registration, so the game keeps its own copy.
@@ -107,13 +118,8 @@ public class DeckService extends PersistedService {
      * recomputed by {@link #deserializeDeck(String)} on read.
      */
     public static String serializeDeck(ExtendedDeck deck) {
-        try {
-            Deck canonical = deck != null && deck.getDeck() != null ? deck.getDeck() : new Deck();
-            return objectMapper.writeValueAsString(canonical);
-        } catch (JsonProcessingException e) {
-            logger.error("Failed to serialize deck for game registration", e);
-            return null;
-        }
+        Deck canonical = deck != null && deck.getDeck() != null ? deck.getDeck() : new Deck();
+        return KrcgV5Mapper.toJson(canonical);
     }
 
     public static ExtendedDeck deserializeDeck(String json) {
@@ -148,6 +154,133 @@ public class DeckService extends PersistedService {
                     logger.info("Upgrading {} to TAGGED with {} tags", entity.getDeckId(), tags);
                     deckRepository.saveDeckInfo(em, entity.getPlayerName(), info.getDeckName(), info);
                 }));
+    }
+
+    /**
+     * One-time migration of every stored deck to the KRCG v5 JSON shape
+     * ({@link KrcgV5Mapper}). Idempotent — a row already in v5 form is skipped
+     * before any parsing.
+     *
+     * <ul>
+     *   <li><b>MODERN / TAGGED player decks</b> and all <b>registration</b> /
+     *       <b>tournament</b> deck snapshots: re-serialised to v5 (shape change
+     *       only, they always parse).</li>
+     *   <li><b>LEGACY player decks</b>: converted to v5 <em>and</em> promoted to
+     *       TAGGED only when the raw text parses with zero unresolved cards;
+     *       otherwise the raw text is left untouched (card names have drifted —
+     *       the owner re-saves it through the editor). See the editor's
+     *       raw-text mode.</li>
+     * </ul>
+     */
+    private void migrateStorageToV5() {
+        migratePlayerDecksToV5();
+        migrateSnapshotDeckContentToV5(
+                "SELECT r.id FROM RegistrationEntity r WHERE r.deckContent IS NOT NULL AND r.deckContent <> ''",
+                net.deckserver.jpa.entity.RegistrationEntity.class,
+                net.deckserver.jpa.entity.RegistrationEntity::getDeckContent,
+                net.deckserver.jpa.entity.RegistrationEntity::setDeckContent,
+                "registration");
+        migrateSnapshotDeckContentToV5(
+                "SELECT r.id FROM TournamentRegistrationEntity r WHERE r.deckContent IS NOT NULL AND r.deckContent <> ''",
+                net.deckserver.jpa.entity.TournamentRegistrationEntity.class,
+                net.deckserver.jpa.entity.TournamentRegistrationEntity::getDeckContent,
+                net.deckserver.jpa.entity.TournamentRegistrationEntity::setDeckContent,
+                "tournament registration");
+    }
+
+    /**
+     * One row = one transaction: a single unconvertible deck logs and is skipped
+     * rather than aborting startup, and a fresh boot only revisits the rows still
+     * not in v5 form (LEGACY decks with unresolved cards, plus any that errored).
+     */
+    private void migratePlayerDecksToV5() {
+        java.util.List<String> deckIds = jpaRead(em -> em.createQuery(
+                "SELECT d.deckId FROM DeckInfoEntity d", String.class).getResultList());
+
+        int[] tally = {0, 0, 0, 0}; // converted-legacy, reshaped, kept-legacy, failed
+        Map<String, Deck> promotedFromLegacy = new java.util.LinkedHashMap<>();
+
+        for (String deckId : deckIds) {
+            boolean ok = jpaWriteAlways(em -> {
+                DeckInfoEntity entity = em.createQuery(
+                                "SELECT d FROM DeckInfoEntity d JOIN FETCH d.player WHERE d.deckId = :id", DeckInfoEntity.class)
+                        .setParameter("id", deckId).getResultStream().findFirst().orElse(null);
+                if (entity == null) {
+                    return;
+                }
+                String raw = deckRepository.findRawContent(em, deckId);
+                if (raw == null || raw.isBlank() || KrcgV5Mapper.looksLikeV5(raw.strip())) {
+                    return;
+                }
+                boolean legacy = entity.getFormat() == DeckFormat.LEGACY;
+
+                // Raw-text LEGACY decks must be parsed directly — DeckNormalizer
+                // drops unresolved lines (they never enter the Deck structure), so
+                // analyze() on its output would report zero errors and we'd
+                // silently convert a deck with a dropped card. parseDeck keeps the
+                // unresolved lines as errors.
+                boolean rawText = !raw.strip().startsWith("{");
+                ExtendedDeck ed = legacy && rawText
+                        ? DeckParser.parseDeck(raw)
+                        : DeckParser.analyze(DeckNormalizer.normalize(raw));
+
+                if (legacy && !ed.getErrors().isEmpty()) {
+                    tally[2]++;
+                    logger.debug("Keeping deck {} as LEGACY raw text ({} unresolved lines)", deckId, ed.getErrors().size());
+                    return;
+                }
+                deckRepository.saveRawContent(em, deckId, KrcgV5Mapper.toJson(ed.getDeck()));
+                if (legacy) {
+                    Set<String> tags = ValidatorFactory.getTags(ed.getDeck());
+                    DeckInfo info = entity.toDeckInfo();
+                    info.setGameFormats(tags);
+                    info.setFormat(DeckFormat.TAGGED);
+                    deckRepository.saveDeckInfo(em, entity.getPlayerName(), info.getDeckName(), info);
+                    promotedFromLegacy.put(deckId, ed.getDeck());
+                    tally[0]++;
+                } else {
+                    tally[1]++;
+                }
+            });
+            if (!ok) {
+                tally[3]++;
+                logger.warn("Deck {} could not be migrated to v5 — left as-is, will retry next boot", deckId);
+            }
+        }
+
+        // Recompute per-format validity for the promoted decks (own transaction each).
+        promotedFromLegacy.forEach(DeckValidityService::computeAndPersist);
+        if (tally[0] + tally[1] + tally[3] > 0) {
+            logger.info("Deck storage → v5: {} LEGACY converted to TAGGED, {} reshaped, {} kept as LEGACY raw text, {} failed",
+                    tally[0], tally[1], tally[2], tally[3]);
+        }
+    }
+
+    private <T> void migrateSnapshotDeckContentToV5(String idJpql, Class<T> type,
+                                                    Function<T, String> getter, java.util.function.BiConsumer<T, String> setter,
+                                                    String label) {
+        java.util.List<?> ids = jpaRead(em -> em.createQuery(idJpql).getResultList());
+        int[] tally = {0, 0}; // reshaped, failed
+        for (Object id : ids) {
+            boolean ok = jpaWriteAlways(em -> {
+                T row = em.find(type, id);
+                if (row == null) {
+                    return;
+                }
+                String raw = getter.apply(row);
+                if (raw == null || raw.isBlank() || KrcgV5Mapper.looksLikeV5(raw.strip())) {
+                    return;
+                }
+                setter.accept(row, KrcgV5Mapper.toJson(DeckNormalizer.normalize(raw)));
+                tally[0]++;
+            });
+            if (!ok) {
+                tally[1]++;
+            }
+        }
+        if (tally[0] + tally[1] > 0) {
+            logger.info("Deck storage → v5: {} {} deck snapshots reshaped, {} failed", tally[0], label, tally[1]);
+        }
     }
 
     @Override

@@ -1,8 +1,5 @@
 package net.deckserver.jpa.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.persistence.EntityManager;
 import net.deckserver.jpa.entity.DeckContentEntity;
 import net.deckserver.jpa.entity.DeckInfoEntity;
@@ -12,24 +9,14 @@ import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.deck.DeckNormalizer;
 import net.deckserver.storage.json.deck.DeckParser;
 import net.deckserver.storage.json.deck.ExtendedDeck;
+import net.deckserver.storage.json.deck.KrcgV5Mapper;
 import net.deckserver.storage.json.system.DeckInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DeckRepository {
-
-    private static final Logger logger = LoggerFactory.getLogger(DeckRepository.class);
-    private static final ObjectMapper mapper;
-
-    static {
-        mapper = new ObjectMapper();
-        mapper.findAndRegisterModules();
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
 
     public void saveDeckInfo(EntityManager em, String playerName, String deckName, DeckInfo info) {
         PlayerEntity player = new PlayerRepository().findEntityByName(em, playerName);
@@ -44,21 +31,29 @@ public class DeckRepository {
     }
 
     public void saveContent(EntityManager em, String deckId, ExtendedDeck deck) {
-        try {
-            // Persist only the canonical Deck model — the derived stats/errors
-            // in ExtendedDeck are recomputed on read by findContent(), never
-            // stored (they go stale against the card database otherwise).
-            Deck canonical = deck.getDeck() != null ? deck.getDeck() : new Deck();
-            String json = mapper.writeValueAsString(canonical);
-            DeckContentEntity existing = em.find(DeckContentEntity.class, deckId);
-            if (existing != null) {
-                existing.setContent(json);
-                em.merge(existing);
-            } else {
-                em.persist(new DeckContentEntity(deckId, json));
-            }
-        } catch (JsonProcessingException e) {
-            logger.error("Failed to serialize deck content for {}", deckId, e);
+        // Persist as KRCG v5 JSON (KrcgV5Mapper). Only the canonical Deck model
+        // is stored — the derived stats/errors in ExtendedDeck are recomputed
+        // on read by findContent() (they go stale against the card database
+        // otherwise).
+        Deck canonical = deck.getDeck() != null ? deck.getDeck() : new Deck();
+        String json = KrcgV5Mapper.toJson(canonical);
+        DeckContentEntity existing = em.find(DeckContentEntity.class, deckId);
+        if (existing != null) {
+            existing.setContent(json);
+            em.merge(existing);
+        } else {
+            em.persist(new DeckContentEntity(deckId, json));
+        }
+    }
+
+    /** Writes the {@code deck_content} column verbatim — used by the storage migration. */
+    public void saveRawContent(EntityManager em, String deckId, String content) {
+        DeckContentEntity existing = em.find(DeckContentEntity.class, deckId);
+        if (existing != null) {
+            existing.setContent(content);
+            em.merge(existing);
+        } else {
+            em.persist(new DeckContentEntity(deckId, content));
         }
     }
 

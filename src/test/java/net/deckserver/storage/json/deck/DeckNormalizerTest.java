@@ -159,6 +159,26 @@ class DeckNormalizerTest {
         assertThat(analyzed.getErrors(), contains(containsString("Ghost Card")));
     }
 
+    /**
+     * {@link DeckNormalizer#normalize} on plain text goes through
+     * {@link DeckParser#parseDeck} and keeps only the resolved cards — an
+     * unrecognised line is dropped, not surfaced. The storage-migration
+     * "does this LEGACY deck parse cleanly?" check must therefore use
+     * {@code parseDeck} directly (which reports it as an error), not
+     * {@code analyze(normalize(...))}.
+     */
+    @Test
+    void normalizePlainTextDropsUnresolvedLinesButParseDeckReportsThem() {
+        String text = "2 Vardar Vardarian\n1 feeding razor\n";
+
+        Deck normalised = DeckNormalizer.normalize(text);
+        assertThat("unresolved line is not carried into the Deck",
+                DeckParser.analyze(normalised).getErrors(), is(empty()));
+
+        assertThat("parseDeck keeps it as an error",
+                DeckParser.parseDeck(text).getErrors(), contains(containsString("feeding razor")));
+    }
+
     @Test
     void handlesNullAndBlankContent() {
         assertThat(DeckNormalizer.normalize(null).getCrypt().getCards(), is(empty()));

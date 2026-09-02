@@ -12,8 +12,9 @@ import org.slf4j.LoggerFactory;
  * canonical {@link Deck} model:
  *
  * <ul>
- *   <li>{@code ExtendedDeck} JSON — the current stored shape, {@code {"deck": …, "stats": …, "errors": …}} — is unwrapped to its {@code deck}</li>
- *   <li>bare {@link Deck} JSON / KRCG JSON ({@code {"crypt": …, "library": …}}, card ids as string or int) is read directly</li>
+ *   <li>KRCG v5 JSON ({@code {"cards": [ … ], …}}, the current stored shape) is mapped by {@link KrcgV5Mapper}</li>
+ *   <li>{@code ExtendedDeck} JSON — an older stored shape, {@code {"deck": …, "stats": …, "errors": …}} — is unwrapped to its {@code deck}</li>
+ *   <li>bare {@link Deck} JSON / old KRCG JSON ({@code {"crypt": …, "library": …}}, card ids as string or int) is read directly</li>
  *   <li>plain deck-list text and legacy {@code z@…@z} JOL exports are run through {@link DeckParser#parseDeck(String)}</li>
  * </ul>
  *
@@ -45,6 +46,11 @@ public final class DeckNormalizer {
 
         if (trimmed.startsWith("{")) {
             try {
+                if (KrcgV5Mapper.looksLikeV5(trimmed)) {
+                    Deck deck = KrcgV5Mapper.fromJson(trimmed);
+                    DeckParser.analyze(deck); // recompute counts in place
+                    return deck;
+                }
                 JsonNode root = MAPPER.readTree(trimmed);
                 JsonNode deckNode = root.has("deck") ? root.get("deck") : root;
                 Deck deck = MAPPER.treeToValue(deckNode, Deck.class);

@@ -168,6 +168,31 @@ public class JolAdmin {
         return new DeckEdit(deck, contents, deckInfo.getDeckId());
     }
 
+    /**
+     * Raw-text save for a LEGACY deck. If the text now resolves completely it is
+     * converted through the normal {@link #saveDeck} path; otherwise the raw
+     * text is persisted verbatim and the deck stays {@link DeckFormat#LEGACY}
+     * (and unregistrable), so the owner can keep fixing card names without
+     * losing the lines that still don't parse.
+     */
+    public static synchronized DeckEdit saveLegacyDeckText(String playerName, String deckName, String rawText) {
+        if (playerName == null || deckName == null || rawText == null) {
+            return DeckEdit.EMPTY;
+        }
+        String name = deckName.trim();
+        ExtendedDeck parsed = DeckParser.parseDeck(rawText);
+        if (parsed.getErrors().isEmpty()) {
+            return saveDeck(playerName, name, rawText, "");
+        }
+        DeckInfo info = Optional.ofNullable(DeckService.get(playerName, name))
+                .orElseGet(() -> new DeckInfo(ULID.random(), name, DeckFormat.LEGACY, Set.of()));
+        info.setFormat(DeckFormat.LEGACY);
+        DeckService.addDeck(playerName, name, info);
+        DeckService.saveRawDeckContent(info.getDeckId(), rawText);
+        parsed.getDeck().setName(name);
+        return new DeckEdit(parsed, rawText, info.getDeckId());
+    }
+
     public static synchronized DeckEdit deleteDeck(String playerName, String deckName) {
         if (playerName != null && deckName != null) {
             DeckService.remove(playerName, deckName);

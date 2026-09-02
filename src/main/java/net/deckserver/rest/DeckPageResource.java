@@ -51,6 +51,19 @@ public class DeckPageResource extends BaseResource {
         return toBean(JolAdmin.saveDeck(username(), body.deckName(), body.contents(), body.comment()));
     }
 
+    /**
+     * Raw-text save for a LEGACY deck (the editor's raw-text mode). Stores the
+     * text verbatim and keeps the deck LEGACY / unregistrable while any line
+     * still fails to resolve; converts it to the structured form only once the
+     * whole list parses cleanly. Never drops unresolved lines the way the
+     * normal {@link #saveDeck} path would.
+     */
+    @POST
+    @Path("legacy")
+    public DeckPageBean saveLegacyDeck(SaveDeckRequest body) {
+        return toBean(JolAdmin.saveLegacyDeckText(username(), body.deckName(), body.contents()));
+    }
+
     @DELETE
     @Path("{name}")
     public DeckPageBean deleteDeck(@PathParam("name") String deckName) {

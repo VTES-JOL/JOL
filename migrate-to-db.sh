@@ -446,6 +446,9 @@ WHERE EXISTS (SELECT 1 FROM deck_info d WHERE d.deck_id = s.deck_id);
 SQL
 rm -f "$DECK_FORMAT_CSV"
 
+# Deck content is loaded verbatim (legacy .txt / old JSON shapes and all).
+# DeckService.migrateStorageToV5() rewrites every row to KRCG v5 JSON on the
+# app's first boot; LEGACY decks that don't parse cleanly keep their raw text.
 log "Loading deck content..."
 LOADED_DECK_IDS=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc "SELECT deck_id FROM deck_info;")
 DECK_CONTENT_CSV=$(mktemp)
