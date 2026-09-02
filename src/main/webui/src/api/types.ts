@@ -464,6 +464,9 @@ export interface PlayerSnapshot {
 // GET /jol/api/game/{id}/history?turn=X — net.deckserver.storage.json.game.ChatData.
 export interface ChatData {
   timestamp: string;
+  // Full-precision ISO insert time; `timestamp` is only minute-granularity.
+  // Used to interleave failed command attempts at their true position.
+  postedAt?: string;
   message: string;
   source: string;
   command?: string;
@@ -482,6 +485,8 @@ export interface ChatData {
 // attempt. net.deckserver.storage.json.game.CommandErrorData.
 export interface CommandError {
   timestamp: string;
+  // Full-precision ISO attempt time, paralleling ChatData.postedAt.
+  occurredAt?: string;
   player: string;
   command: string;
   error?: string;

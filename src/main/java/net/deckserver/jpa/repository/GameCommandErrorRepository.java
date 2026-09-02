@@ -48,6 +48,7 @@ public class GameCommandErrorRepository {
     private static CommandErrorData toData(GameCommandErrorEntity e) {
         CommandErrorData d = new CommandErrorData();
         d.setTimestamp(e.getDisplayTs());
+        d.setOccurredAt(e.getOccurredAt() != null ? e.getOccurredAt().toString() : null);
         d.setPlayer(e.getPlayer());
         d.setCommand(e.getRawCommand());
         d.setError(e.getErrorText());

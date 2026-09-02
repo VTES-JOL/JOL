@@ -13,6 +13,7 @@ import net.deckserver.storage.json.game.CommandErrorData;
 import net.deckserver.storage.json.game.TurnData;
 import net.deckserver.storage.json.game.TurnHistory;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -158,6 +159,13 @@ public class ChatService extends PersistedService {
             if (chat.getInvocationSeq() == null) {
                 chat.setInvocationSeq(inv.seq());
             }
+        }
+        if (chat.getPostedAt() == null) {
+            // Full-precision sibling of the minute-granularity display timestamp,
+            // so judges' command log can interleave failed attempts precisely.
+            // The persisted game_chat_message.posted_at is set independently in
+            // the repository; both are OffsetDateTime.now() microseconds apart.
+            chat.setPostedAt(OffsetDateTime.now().toString());
         }
 
         TurnHistory history = instance().historyCache.get(gameId);

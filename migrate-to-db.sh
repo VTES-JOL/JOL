@@ -549,6 +549,13 @@ success "$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -Atc 'SELECT COUNT(*) FRO
 # the next submission gets a new one even when its text is identical (the judges'
 # chat log dedups its "» command" header on this). NULL for unmatched lines.
 #
+# posted_at is reconstructed per line (posted_at_iso) rather than stamped with a
+# single import time: each line's year-less "d-MMM HH:mm" display stamp is
+# resolved to a real minute-precision UTC datetime (year from game-timestamps.json
+# or the first logged command), so the judges' command log can interleave failed
+# attempts (game_command_error.occurred_at, imported the same way) at the right
+# spot. Minute precision is all legacy history has; live writes get sub-second.
+#
 # FORCE_NOT_NULL (message): some prod chat lines have an empty/null message;
 # in CSV an unquoted empty field is read as NULL, which violates message's
 # NOT NULL. This keeps it an empty string instead (matching how the Java
@@ -573,6 +580,18 @@ try:
             id_to_name[g["id"]] = g["name"]
 except Exception as e:
     print(f"WARN: games.json unreadable; command backfill disabled: {e}", file=sys.stderr)
+
+# game display name -> last-updated datetime, the year reference for resolving a
+# chat line's year-less "d-MMM HH:mm" stamp into a real posted_at (see below).
+name_to_ref = {}
+try:
+    for gname, meta in json.load(open(os.path.join(data_dir, "game-timestamps.json"))).items():
+        ts = (meta or {}).get("timestamp") or ""
+        m = re.match(r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})', ts)   # ignore any sub-second part (can be 9 digits)
+        if m:
+            name_to_ref[gname] = datetime.datetime.strptime(m.group(1), "%Y-%m-%dT%H:%M:%S")
+except Exception as e:
+    print(f"WARN: game-timestamps.json unreadable; posted_at falls back to import time: {e}", file=sys.stderr)
 
 LOG_RE = re.compile(r'^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})[,.]\d+\s+(INFO|ERROR)\s+\[([^\]]+)\]\s+(.*)\$')
 
@@ -614,6 +633,18 @@ def hist_dt(ts, ref):
         except ValueError:
             pass
     return min(cands, key=lambda d: abs((d - ref).total_seconds())) if cands else None
+
+def posted_at_iso(ts, ref, fallback):
+    """A chat line's game_chat_message.posted_at: its "d-MMM HH:mm" display stamp
+    resolved (via hist_dt) to a real minute-precision UTC datetime, so a judge's
+    command log can order it against game_command_error.occurred_at. Minute
+    precision is all legacy history carries; live writes get true sub-second
+    time. Falls back to the import timestamp when the year can't be resolved."""
+    if ref is not None:
+        hd = hist_dt(ts, ref)
+        if hd is not None:
+            return hd.replace(tzinfo=datetime.timezone.utc).isoformat()
+    return fallback
 
 # raw verb -> synthetic verbs a single command may emit *after* its primary
 # line (every other side effect arrives as source="SYSTEM").
@@ -735,16 +766,23 @@ for entry in os.scandir(games_dir):
                    if t.get("turnId") is not None and t.get("player") is not None]
     entries = [c for t in valid_turns for c in t.get("chats", [])]
 
-    commands = load_commands(id_to_name.get(game_id))
+    game_name = id_to_name.get(game_id)
+    commands = load_commands(game_name)
     if commands:
         games_with_log += 1
         matched_total  += align(entries, commands)
+
+    # Year reference for resolving each line's year-less "d-MMM HH:mm" stamp into
+    # a real posted_at (see posted_at_iso): the game's last-updated time, else its
+    # first logged command, else None -> fall back to the import timestamp.
+    ref = name_to_ref.get(game_name) or (commands[0][0] if commands else None)
 
     for turn_seq, turn in enumerate(valid_turns):
         turn_label = f"{turn['player']} {turn['turnId']}"
         for chat_seq, chat in enumerate(turn.get("chats", [])):
             writer.writerow([
-                game_id, turn_seq, chat_seq, turn["turnId"], turn["player"], turn_label, now,
+                game_id, turn_seq, chat_seq, turn["turnId"], turn["player"], turn_label,
+                posted_at_iso(chat.get("timestamp"), ref, now),
                 chat.get("timestamp") or "",
                 chat.get("source") or "",
                 chat.get("message") or "",

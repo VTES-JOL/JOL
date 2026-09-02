@@ -28,6 +28,14 @@ public class ChatData {
      * Judge-only; stripped for other viewers.
      */
     private Long invocationSeq;
+    /**
+     * Full-precision ISO-8601 insert time ({@code game_chat_message.posted_at}), as
+     * opposed to the minute-granularity display string in {@link #timestamp}. Lets
+     * the judges' chat log interleave failed command attempts
+     * ({@link CommandErrorData#getOccurredAt()}) at their true chronological position
+     * rather than rounding to the minute.
+     */
+    private String postedAt;
 
     public ChatData() {
     }

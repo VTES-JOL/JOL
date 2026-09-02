@@ -128,6 +128,7 @@ public class GameActionResource extends BaseResource {
         // copy carrying only the non-privileged fields drops every one of them.
         ChatData copy = new ChatData();
         copy.setTimestamp(c.getTimestamp());
+        copy.setPostedAt(c.getPostedAt());   // not privileged — a precise timestamp
         copy.setMessage(c.getMessage());
         copy.setSource(c.getSource());
         copy.setCommand(c.getCommand());

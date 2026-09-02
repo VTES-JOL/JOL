@@ -74,6 +74,7 @@ public class GameChatMessageRepository {
         chat.setInvocation(row.getInvocation());
         chat.setInvocationBy(row.getInvocationBy());
         chat.setInvocationSeq(row.getInvocationSeq());
+        chat.setPostedAt(row.getPostedAt() != null ? row.getPostedAt().toString() : null);
         return chat;
     }
 }

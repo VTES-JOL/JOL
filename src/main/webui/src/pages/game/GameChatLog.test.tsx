@@ -73,6 +73,39 @@ describe('GameChatLog', () => {
     expect(screen.getByText(/Unknown command/)).toBeInTheDocument();
   });
 
+  it('orders an attempt by sub-minute time when postedAt/occurredAt are present', () => {
+    render(
+      <GameChatLog
+        lines={[
+          line({
+            message: 'earlier success',
+            timestamp: '3-Feb 14:05',
+            postedAt: '2026-02-03T14:05:10Z',
+          }),
+          line({
+            message: 'later success',
+            timestamp: '3-Feb 14:05',
+            postedAt: '2026-02-03T14:05:50Z',
+          }),
+        ]}
+        viewerName={null}
+        showCommands
+        errors={[
+          {
+            timestamp: '3-Feb 14:05',
+            occurredAt: '2026-02-03T14:05:30Z',
+            player: 'ShanDow',
+            command: 'blodo ShanDow ready 2 -1',
+          },
+        ]}
+      />,
+    );
+    // Same display minute for all three; the attempt still lands between them.
+    const text = document.body.textContent ?? '';
+    expect(text.indexOf('earlier success')).toBeLessThan(text.indexOf('blodo ShanDow'));
+    expect(text.indexOf('blodo ShanDow')).toBeLessThan(text.indexOf('later success'));
+  });
+
   it('interleaves an attempt by timestamp', () => {
     render(
       <GameChatLog

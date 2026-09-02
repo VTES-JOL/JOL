@@ -17,6 +17,13 @@ public class CommandErrorData {
     private static final DateTimeFormatter SIMPLE_FORMAT = DateTimeFormatter.ofPattern("d-MMM HH:mm ");
 
     private String timestamp;
+    /**
+     * Full-precision ISO-8601 attempt time ({@code game_command_error.occurred_at}),
+     * paralleling {@link ChatData#getPostedAt()}. The judges' chat log sorts the
+     * merged chat/attempt stream on this so a mistype lands immediately before the
+     * corrected retry, not merely somewhere in the same minute.
+     */
+    private String occurredAt;
     private String player;
     private String command;
     private String error;
@@ -25,7 +32,9 @@ public class CommandErrorData {
     }
 
     public CommandErrorData(String player, String command, String error) {
-        this.timestamp = OffsetDateTime.now().format(SIMPLE_FORMAT);
+        OffsetDateTime now = OffsetDateTime.now();
+        this.timestamp = now.format(SIMPLE_FORMAT);
+        this.occurredAt = now.toString();
         this.player = player;
         this.command = command;
         this.error = error;

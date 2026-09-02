@@ -16,12 +16,28 @@ import { useCardTooltips } from '../../hooks/useCardTooltips';
 
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
-// "d-MMM HH:mm" -> a sortable tuple; unknown formats sort last.
-function tsKey(ts: string): number {
+// Fallback for rows predating postedAt/occurredAt: "d-MMM HH:mm" -> epoch ms in
+// the current year (year isn't in the string; a turn spanning New Year is not
+// worth handling here). Unknown formats sort last.
+function fallbackKey(ts: string): number {
   const m = /^(\d+)-([A-Za-z]+)\s+(\d+):(\d+)/.exec((ts ?? '').trim());
   if (!m) return Number.MAX_SAFE_INTEGER;
   const mon = MONTHS.indexOf(m[2].slice(0, 3).toLowerCase());
-  return ((mon < 0 ? 12 : mon) * 100 + +m[1]) * 10000 + +m[3] * 100 + +m[4];
+  if (mon < 0) return Number.MAX_SAFE_INTEGER;
+  return new Date(new Date().getFullYear(), mon, +m[1], +m[3], +m[4]).getTime();
+}
+
+// Chronological sort key. Prefer the full-precision ISO stamp
+// (ChatData.postedAt / CommandError.occurredAt) so a mistyped attempt lands
+// exactly where it happened relative to the chat lines around it; fall back to
+// the minute-granularity display string for older rows that carry neither.
+function rowKey(row: Row): number {
+  const iso = row.kind === 'chat' ? row.data.postedAt : row.data.occurredAt;
+  if (iso) {
+    const t = Date.parse(iso);
+    if (!Number.isNaN(t)) return t;
+  }
+  return fallbackKey(row.data.timestamp);
 }
 
 type Row = { kind: 'chat'; data: ChatData; i: number } | { kind: 'error'; data: CommandError };
@@ -45,15 +61,14 @@ export function GameChatLog({
     if (el) el.scrollTop = el.scrollHeight;
   }, [lines, errors]);
 
-  // Merge chat lines and (judge-only) error attempts by time; an error at the
-  // same minute as a chat line sorts just after it.
+  // Merge chat lines and (judge-only) error attempts into one time-ordered
+  // stream. rowKey uses full-precision timestamps where present; sort() is
+  // stable, so a genuine key tie (only possible when both sides fell back to
+  // the same minute) keeps chat-before-error insertion order.
   const rows: Row[] = lines.map((data, i) => ({ kind: 'chat', data, i }) as Row);
   if (showCommands && errors.length) {
     for (const e of errors) rows.push({ kind: 'error', data: e });
-    rows.sort((a, b) => {
-      const d = tsKey(a.data.timestamp) - tsKey(b.data.timestamp);
-      return d !== 0 ? d : (a.kind === 'error' ? 1 : 0) - (b.kind === 'error' ? 1 : 0);
-    });
+    rows.sort((a, b) => rowKey(a) - rowKey(b));
   }
 
   return (
