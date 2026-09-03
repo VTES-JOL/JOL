@@ -119,4 +119,15 @@ public class DeckRepository {
     public List<DeckInfoEntity> findAllDeckInfos(EntityManager em) {
         return em.createQuery("SELECT d FROM DeckInfoEntity d", DeckInfoEntity.class).getResultList();
     }
+
+    /** The deck-info row for a stable deck id (with its owner fetched), or null. */
+    public DeckInfoEntity findDeckInfoById(EntityManager em, String deckId) {
+        return em.createQuery(
+                        "SELECT d FROM DeckInfoEntity d JOIN FETCH d.player p WHERE d.deckId = :deckId",
+                        DeckInfoEntity.class)
+                .setParameter("deckId", deckId)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
+    }
 }

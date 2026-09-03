@@ -16,7 +16,7 @@ import { DeckEditorPane } from './deck/DeckEditorPane';
 import { LegacyDeckEditor } from './deck/LegacyDeckEditor';
 import { DeckAnalyticsPanel } from './deck/DeckAnalyticsPanel';
 import { DeckImportModal } from './deck/DeckImportModal';
-import { enrichEntries, entriesFromExtendedDeck, entryIds } from './deck/deckEntries';
+import { enrichEntries, entriesFromExtendedDeck } from './deck/deckEntries';
 
 const PAGE_KEY = ['decks', 'page'];
 const LIST_KEY = ['decks', 'list'];
@@ -75,25 +75,20 @@ export function DeckPage() {
     [liveEntries, baseEntries, detailMap],
   );
 
-  // Fetch display details for the loaded deck's cards; merge (don't replace)
-  // so details for cards added mid-session survive a deck reload.
+  // Card display details now ride on the page bean itself (server enriches the
+  // loaded deck from CardRegistry), so the editor paints icons on first render
+  // instead of waiting on a follow-up /cards/details round trip. Merge rather
+  // than replace so details for cards added mid-session (via addCardDetail)
+  // survive a deck reload.
   useEffect(() => {
-    const ids = entryIds(baseEntries);
-    if (ids.length === 0) return;
-    let active = true;
-    deckApi.cardDetails(ids).then((details) => {
-      if (active && details.length) {
-        setDetailMap((prev) => {
-          const next = new Map(prev);
-          details.forEach((d) => next.set(d.id, d));
-          return next;
-        });
-      }
+    const incoming = Object.entries(page?.details ?? {});
+    if (incoming.length === 0) return;
+    setDetailMap((prev) => {
+      const next = new Map(prev);
+      for (const [id, detail] of incoming) next.set(id, detail);
+      return next;
     });
-    return () => {
-      active = false;
-    };
-  }, [baseEntries]);
+  }, [page?.details]);
 
   const applyPage = useCallback(
     (next: DeckPageBean) => queryClient.setQueryData(PAGE_KEY, next),
@@ -106,12 +101,19 @@ export function DeckPage() {
     setDetailMap((prev) => (prev.has(card.id) ? prev : new Map(prev).set(card.id, card)));
   }, []);
 
+  // Load by stable deck id (a ULID unique across every player's decks) rather
+  // than by name — survives renames, needs no path-encoding of user text, and
+  // the endpoint authorises ownership server-side.
   const loadDeck = useCallback(
     (deck: DeckInfoBean) =>
-      runRequest(api.post<DeckPageBean>('/decks/player/load', { deckName: deck.name }), 'Failed to load deck', (next) => {
-        applyPage(next);
-        setPanelKey('editor'); // focus the detail pane in the collapsed layout
-      }),
+      runRequest(
+        api.get<DeckPageBean>(`/decks/${encodeURIComponent(deck.deckId)}`),
+        'Failed to load deck',
+        (next) => {
+          applyPage(next);
+          setPanelKey('editor'); // focus the detail pane in the collapsed layout
+        },
+      ),
     [applyPage],
   );
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NotebookPen } from 'lucide-react';
 import { api } from '../../api/client';
-import type { Deck } from '../../api/types';
+import type { EnrichedDeck } from '../../api/types';
 import { DeckPreview } from '../../components/DeckPreview';
 import { runRequest } from '../../api/mutate';
 import { GamePanel } from './GamePanel';
@@ -10,10 +10,10 @@ import { GamePanel } from './GamePanel';
 // envelope-free endpoint. Fetched once (like legacy's own html==="" cache
 // check), not refetched on every toggle back to this panel.
 export function DeckPanel({ gameId, onToggleNotes }: { gameId: string; onToggleNotes: () => void }) {
-  const [deck, setDeck] = useState<Deck | null>(null);
+  const [deck, setDeck] = useState<EnrichedDeck | null>(null);
 
   useEffect(() => {
-    runRequest(api.get<Deck>(`/game/${gameId}/deck`), 'Failed to load game deck', setDeck);
+    runRequest(api.get<EnrichedDeck>(`/game/${gameId}/deck`), 'Failed to load game deck', setDeck);
   }, [gameId]);
 
   return (
@@ -23,7 +23,7 @@ export function DeckPanel({ gameId, onToggleNotes }: { gameId: string; onToggleN
       title="Deck"
       toggle={{ icon: <NotebookPen size={13} />, label: 'Notes', onClick: onToggleNotes }}
     >
-      {deck && <DeckPreview deck={deck} />}
+      {deck?.deck && <DeckPreview deck={deck.deck} details={deck.details} />}
     </GamePanel>
   );
 }

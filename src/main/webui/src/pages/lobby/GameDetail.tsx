@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CheckCircle2, Clock, FileText, LogIn, LogOut, PlayCircle, UserPlus, Users, X, XCircle } from 'lucide-react';
 import { api, ApiError } from '../../api/client';
-import type { Deck, DeckInfoBean, GameStatusBean, RegistrationStatus } from '../../api/types';
+import type { DeckInfoBean, EnrichedDeck, GameStatusBean, RegistrationStatus } from '../../api/types';
 import { useAuth } from '../../auth/useAuth';
 import { DeckPreview } from '../../components/DeckPreview';
 import { confirmDialog } from '../../stores/dialog';
@@ -312,7 +312,7 @@ export function GameDeckPanel({ game }: { game: GameStatusBean | null }) {
 
   const { data: preview } = useQuery({
     queryKey: ['lobby', game?.name, 'deck', registration?.deckName],
-    queryFn: () => api.get<Deck>(`/lobby/player/games/${encodeURIComponent(game!.name)}/deck`),
+    queryFn: () => api.get<EnrichedDeck>(`/lobby/player/games/${encodeURIComponent(game!.name)}/deck`),
     enabled: !!game && !!registration?.deckName,
     // A failed preview fetch just means no preview shown, not worth a toast.
     meta: { silent: true },
@@ -327,8 +327,8 @@ export function GameDeckPanel({ game }: { game: GameStatusBean | null }) {
             title="No game selected"
             description="Your registered deck for the selected game shows here."
           />
-        ) : preview ? (
-          <DeckPreview deck={preview} />
+        ) : preview?.deck ? (
+          <DeckPreview deck={preview.deck} details={preview.details} />
         ) : registration?.deckName ? (
           <EmptyState icon={FileText} title="Loading deck…" />
         ) : (

@@ -36,6 +36,7 @@ export function GameListExample({ children }: { children: ReactNode }) {
     const registered = p.registered ?? 0;
     const registrations: RegistrationStatus[] = Array.from({ length: total }, (_, idx) => ({
       player: `Player${idx + 1}`,
+      playerId: `player-${idx + 1}`,
       gameName: p.name,
       registered: idx < registered,
       deckName: null,

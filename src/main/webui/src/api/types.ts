@@ -35,6 +35,8 @@ export type PlayerRelationship = 'OWNER' | 'REGISTERED' | 'INVITED' | 'OPEN' | n
 
 export interface PlayerStatus {
   playerName: string;
+  /** Stable, URL-safe id for `playerName` — path token for that player's deck endpoints. Null if unresolved. */
+  playerId: string | null;
   pinged: boolean;
   current: boolean;
 }
@@ -42,6 +44,8 @@ export interface PlayerStatus {
 // net.deckserver.rest.bean.RegistrationStatus.
 export interface RegistrationStatus {
   player: string;
+  /** Stable, URL-safe id for `player` — path token for that player's deck endpoints. Null if unresolved. */
+  playerId: string | null;
   gameName: string;
   registered: boolean;
   deckName: string | null;
@@ -207,6 +211,8 @@ export interface TournamentRegistered {
 export interface TournamentInviteStatus {
   name: string;
   deck: Deck | null;
+  /** Per-card display detail for `deck`, keyed by card id — feeds the shared deck view's icons. */
+  details: Record<string, CardDetail>;
   format: string;
 }
 
@@ -285,6 +291,15 @@ export interface LibraryCard {
   type: string;
   count: number;
   cards: CardCount[];
+}
+
+// net.deckserver.rest.bean.EnrichedDeck — the shared read-only deck-view shape.
+// Returned by the game / lobby / tournament deck endpoints and mirrored inside
+// DeckPageBean, so one <DeckView> renders every deck preview with icons.
+export interface EnrichedDeck {
+  deck: Deck;
+  /** card id (as a string) -> display detail. Covers every distinct card in `deck`. */
+  details: Record<string, CardDetail>;
 }
 
 // net.deckserver.rest.bean.GameSummaryBean.
@@ -397,7 +412,8 @@ export interface ExtendedDeck {
   errors: string[];
 }
 
-// GET/PUT /jol/api/decks/player — net.deckserver.rest.bean.DeckPageBean.
+// GET /jol/api/decks/{deckId} and POST /jol/api/decks/player/{load,…} —
+// net.deckserver.rest.bean.DeckPageBean.
 export interface DeckPageBean {
   selectedDeck: ExtendedDeck | null;
   contents: string | null;
@@ -406,6 +422,12 @@ export interface DeckPageBean {
   deckId: string | null;
   /** Per-format validation outcome, keyed by format name ("STANDARD" | "DUEL" | "V5"). */
   formatValidity: Record<string, DeckValidity>;
+  /**
+   * Per-card display detail for `selectedDeck`, keyed by card id (as a string) —
+   * lets the editor paint icons on first render instead of firing `/cards/details`.
+   * Empty when no deck is loaded.
+   */
+  details: Record<string, CardDetail>;
 }
 
 // net.deckserver.rest.bean.CardSnapshot — recursive. Each node is gated

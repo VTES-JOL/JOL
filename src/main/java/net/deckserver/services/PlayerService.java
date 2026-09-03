@@ -232,6 +232,36 @@ public class PlayerService extends PersistedService {
         return loadPlayerInfo(playerName);
     }
 
+    /**
+     * The stable player id for a name (an in-memory lookup — the {@code players}
+     * map is fully loaded). Returns null for an unknown name rather than
+     * throwing, so bean factories can degrade gracefully. Names remain the
+     * app-wide identity; this is exposed only so ids can be used as URL-safe
+     * path tokens (see the deck-view endpoints).
+     */
+    public static String getPlayerId(String playerName) {
+        String canonicalName = canonicalize(playerName);
+        PlayerInfo info = canonicalName == null ? null : instance().players.get(canonicalName);
+        return info == null ? null : info.getId();
+    }
+
+    /**
+     * The player name for a stable id — the reverse of {@link #getPlayerId}, for
+     * resolving an id path token back to the name the rest of the app keys on.
+     * Linear scan over the in-memory map; a cold path (deck views), not worth an
+     * index. Returns null when no player has that id.
+     */
+    public static String getPlayerName(String playerId) {
+        if (playerId == null || playerId.isBlank()) {
+            return null;
+        }
+        return instance().players.values().stream()
+                .filter(info -> playerId.equals(info.getId()))
+                .map(PlayerInfo::getName)
+                .findFirst()
+                .orElse(null);
+    }
+
     public static Set<String> getPlayers() {
         return instance().players.keySet();
     }

@@ -1,9 +1,11 @@
 package net.deckserver.rest;
 
 import net.deckserver.JolAdmin;
+import net.deckserver.rest.bean.CardDetailBean;
 import net.deckserver.rest.bean.DeckPageBean;
 import net.deckserver.rest.bean.DeckEdit;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.services.DeckEnrichmentService;
 import net.deckserver.services.DeckImportService;
 import net.deckserver.services.DeckValidityService;
 import net.deckserver.storage.json.deck.DeckValidity;
@@ -91,16 +93,29 @@ public class DeckPageResource extends BaseResource {
     }
 
     private DeckPageBean toBean(DeckEdit edit) {
+        return toBean(edit, username());
+    }
+
+    /**
+     * Shared with {@link DeckResource#loadDeckById} — same page bean, keyed by
+     * a caller name rather than the request principal so the by-id load path
+     * (which authorises separately) can reuse it.
+     */
+    static DeckPageBean toBean(DeckEdit edit, String username) {
         Map<String, DeckValidity> validity = edit.deckId() == null
                 ? Map.of()
                 : DeckValidityService.getValidity(edit.deckId()).entrySet().stream()
                         .collect(Collectors.toMap(e -> e.getKey().name(), Map.Entry::getValue));
+        Map<String, CardDetailBean> details = edit.deck() == null
+                ? Map.of()
+                : DeckEnrichmentService.details(edit.deck().getDeck());
         return new DeckPageBean(
                 edit.deck(),
                 edit.contents(),
-                JolAdmin.getAvailableGameFormats(username()).stream().map(GameFormat::getLabel).toList(),
+                JolAdmin.getAvailableGameFormats(username).stream().map(GameFormat::getLabel).toList(),
                 edit.deckId(),
-                validity);
+                validity,
+                details);
     }
 
     public record LoadDeckRequest(String deckName) {}

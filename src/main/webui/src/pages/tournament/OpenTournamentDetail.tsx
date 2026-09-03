@@ -124,7 +124,7 @@ export function OpenTournamentDetail({
                 ))}
               </Select>
             </div>
-            {registration?.deck && <DeckPreview deck={registration.deck} />}
+            {registration?.deck && <DeckPreview deck={registration.deck} details={registration.details} />}
           </div>
         )}
       </div>

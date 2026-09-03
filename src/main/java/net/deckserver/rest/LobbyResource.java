@@ -2,13 +2,14 @@ package net.deckserver.rest;
 
 import com.google.common.base.Strings;
 import net.deckserver.JolAdmin;
+import net.deckserver.rest.bean.EnrichedDeck;
 import net.deckserver.rest.bean.GameStatusBean;
 import net.deckserver.rest.bean.PlayerActivityStatus;
 import net.deckserver.game.enums.GameFormat;
+import net.deckserver.services.DeckEnrichmentService;
 import net.deckserver.services.GameService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.services.RegistrationService;
-import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.ws.WebSocketRegistry;
 
 import jakarta.ws.rs.*;
@@ -171,11 +172,15 @@ public class LobbyResource extends BaseResource {
         return new RegisterDeckResponse(message);
     }
 
-    /** The current player's registered deck for this game — no side effects (unlike DS.loadDeck()). */
+    /**
+     * The current player's registered deck for this game, enriched with
+     * per-card display detail so the shared deck view renders icons without a
+     * follow-up fetch. No side effects (unlike DS.loadDeck()).
+     */
     @GET
     @Path("player/games/{name}/deck")
-    public Deck getRegisteredDeck(@PathParam("name") String game) {
-        return JolAdmin.getGameDeck(game, username());
+    public EnrichedDeck getRegisteredDeck(@PathParam("name") String game) {
+        return DeckEnrichmentService.enrich(JolAdmin.getGameDeck(game, username()));
     }
 
     // createGame/startGame/invitePlayer/unInvitePlayer/registerDeck (the

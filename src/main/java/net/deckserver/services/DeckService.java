@@ -65,6 +65,22 @@ public class DeckService extends PersistedService {
         }
     }
 
+    /** Owner + name for a stable deck id — the identity needed to authorise and load it by id. */
+    public record DeckOwnership(String playerName, String deckName, DeckFormat format) {}
+
+    /** Resolves a stable deck id to its owner and name, or null when no such deck exists. */
+    public static DeckOwnership getOwnership(String deckId) {
+        if (deckId == null || deckId.isBlank()) {
+            return null;
+        }
+        return instance().jpaRead(em -> {
+            DeckInfoEntity entity = deckRepository.findDeckInfoById(em, deckId);
+            return entity == null
+                    ? null
+                    : new DeckOwnership(entity.getPlayerName(), entity.getId().getDeckName(), entity.getFormat());
+        });
+    }
+
     public static String getDeckContents(String deckId) {
         ExtendedDeck deck = getDeck(deckId);
         StringBuilder builder = new StringBuilder();

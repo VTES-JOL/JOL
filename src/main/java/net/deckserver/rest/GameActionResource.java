@@ -4,10 +4,12 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.model.GameModel;
+import net.deckserver.rest.bean.EnrichedDeck;
 import net.deckserver.services.ChatService;
+import net.deckserver.services.DeckEnrichmentService;
 import net.deckserver.services.GameService;
+import net.deckserver.services.PlayerService;
 import net.deckserver.services.RegistrationService;
-import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.ChatData;
 import net.deckserver.storage.json.game.CommandErrorData;
 
@@ -60,12 +62,37 @@ public class GameActionResource extends BaseResource {
         JolAdmin.recordPlayerAccess(player, gameName());
     }
 
-    /** Replaces DS.getGameDeck() */
+    /**
+     * The caller's own registered deck for this game, enriched with per-card
+     * display detail (clan / disciplines / path / cost / …) so the shared deck
+     * view renders icons without a follow-up fetch. Replaces DS.getGameDeck().
+     */
     @GET
     @Path("deck")
-    public Deck getGameDeck() {
+    public EnrichedDeck getGameDeck() {
         String playerName = username();
-        return JolAdmin.getGameDeck(gameName(), playerName);
+        return DeckEnrichmentService.enrich(JolAdmin.getGameDeck(gameName(), playerName));
+    }
+
+    /**
+     * A named player's registered deck for this game, by stable player id.
+     * Visible to that player, to an admin, or to a judge who isn't seated in
+     * the game (deck review) — not to opponents mid-game.
+     */
+    @GET
+    @Path("players/{playerId}/deck")
+    public EnrichedDeck getPlayerGameDeck(@PathParam("playerId") String playerId) {
+        String caller = username();
+        String targetName = PlayerService.getPlayerName(playerId);
+        if (targetName == null) {
+            throw new NotFoundException("No player with id " + playerId);
+        }
+        boolean isSelf = caller.equals(targetName);
+        boolean isJudgeReviewer = JolAdmin.isJudge(caller) && !getModel().getPlayers().contains(caller);
+        if (!isSelf && !isJudgeReviewer && !JolAdmin.isAdmin(caller)) {
+            throw new ForbiddenException("Not allowed to view this player's deck");
+        }
+        return DeckEnrichmentService.enrich(JolAdmin.getGameDeck(gameName(), targetName));
     }
 
     /** Replaces DS.getGamePlayers() */
