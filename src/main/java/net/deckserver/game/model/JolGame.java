@@ -412,6 +412,10 @@ public record JolGame(String id, GameData data) {
         return data.getPlayer(player).getPool();
     }
 
+    public boolean isOusted(String player) {
+        return data.getPlayer(player).isOusted();
+    }
+
     public void changePool(String source, String player, int amount) {
         if (amount == 0) return; // PENDING report this in status?
         PlayerData playerData = data.getPlayer(player);

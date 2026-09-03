@@ -3,6 +3,7 @@ import { Download, Search, Trophy } from 'lucide-react';
 import { api } from '../../api/client';
 import type { GameHistory, PlayerResult } from '../../api/types';
 import { displayDeckName } from '../../utils/deckName';
+import { parseGameTitle } from '../../utils/gameTitle';
 import { useQuery } from '@tanstack/react-query';
 import { Panel } from '../../components/ui/Panel';
 import { Button } from '../../components/ui/Button';
@@ -21,16 +22,13 @@ const EXACT_FORMAT = new Intl.DateTimeFormat('en-GB', {
   minute: '2-digit',
 });
 
-type SortKey = 'newest' | 'oldest' | 'vp' | 'players';
+type SortKey = 'newest' | 'oldest' | 'vp';
 
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: 'newest', label: 'Newest first' },
   { value: 'oldest', label: 'Oldest first' },
   { value: 'vp', label: 'Biggest win' },
-  { value: 'players', label: 'Most players' },
 ];
-
-const TOURNAMENT_NAME = /^(.*): Round (\d+) - Table (\d+)$/;
 
 function downloadCsv(data: string, filename: string) {
   const blob = new Blob([data], { type: 'text/csv' });
@@ -75,12 +73,6 @@ function historyToCsv(history: GameHistory[]): string {
   return rows.join('\n');
 }
 
-function parseTitle(name: string): { tournament: boolean; title: string; sub: string } {
-  const m = TOURNAMENT_NAME.exec(name ?? '');
-  if (m) return { tournament: true, title: m[1], sub: `Round ${m[2]} · Table ${m[3]}` };
-  return { tournament: false, title: name || 'Unnamed game', sub: '' };
-}
-
 function msValue(iso: string): number {
   const t = new Date(iso).getTime();
   return Number.isNaN(t) ? 0 : t;
@@ -112,7 +104,7 @@ function sortResults(results: PlayerResult[]): PlayerResult[] {
 }
 
 function PastGameCard({ game }: { game: GameHistory }) {
-  const { tournament, title, sub } = parseTitle(game.name);
+  const { tournament, title, sub } = parseGameTitle(game.name);
   const results = sortResults(game.results);
   const endedMs = msValue(game.ended);
   const span = formatSpan(game.started, game.ended);
@@ -237,9 +229,6 @@ export function PastGamesTab() {
         break;
       case 'vp':
         games.sort((a, b) => topVp(b) - topVp(a));
-        break;
-      case 'players':
-        games.sort((a, b) => b.results.length - a.results.length);
         break;
     }
     return games;

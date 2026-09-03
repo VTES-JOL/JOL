@@ -302,12 +302,29 @@ export interface EnrichedDeck {
   details: Record<string, CardDetail>;
 }
 
-// net.deckserver.rest.bean.GameSummaryBean.
+// net.deckserver.rest.bean.GameSummaryBean — one active game on Watch → Active
+// Games. Everything below `timestamp` is live in-memory game state, fresh on
+// each poll.
 export interface GameSummary {
   gameName: string;
   gameId: string;
+  /** Turn label, e.g. "Ludwig 5.2". */
   turn: string;
+  /** Round number (integer before the dot), for "furthest along" sorting. */
+  round: number;
   timestamp: string;
+  format: string;
+  activePlayer: string | null;
+  edge: string | null;
+  players: ActiveGamePlayer[];
+}
+
+// net.deckserver.rest.bean.GameSummaryBean.PlayerSummary — seating order.
+export interface ActiveGamePlayer {
+  name: string;
+  pool: number;
+  vp: number;
+  ousted: boolean;
 }
 
 // net.deckserver.storage.json.system.GameHistory.
