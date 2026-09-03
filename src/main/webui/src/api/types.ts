@@ -130,6 +130,52 @@ export interface IdleGame {
   idlePlayers: Record<string, string>; // player -> last-access timestamp
 }
 
+// GET /jol/api/admin-page/games/{gameId}/state — net.deckserver.rest.bean.AdminGameStateBean.
+export interface AdminGameState {
+  gameId: string;
+  gameName: string;
+  format: string;
+  turn: string;
+  round: number;
+  activePlayer: string | null;
+  edge: string | null;
+  gameTimestamp: string;
+  players: AdminGamePlayerState[];
+}
+
+// net.deckserver.rest.bean.AdminGameStateBean.PlayerState — seating order.
+export interface AdminGamePlayerState {
+  name: string;
+  seat: number;
+  pool: number;
+  vp: number;
+  ousted: boolean;
+  /** This player's last-access timestamp in this game — a replace-decision signal. */
+  lastAccess: string;
+}
+
+// GET /jol/api/admin-page/games/{gameId}/rollback-preview?turn= — net.deckserver.rest.bean.RollbackPreviewBean.
+export interface RollbackPreview {
+  fromTurn: string;
+  toTurn: string;
+  turnsDiscarded: number;
+  snapshotAvailable: boolean;
+  activePlayerBefore: string | null;
+  activePlayerAfter: string | null;
+  players: RollbackPlayerDiff[];
+}
+
+// net.deckserver.rest.bean.RollbackPreviewBean.PlayerDiff.
+export interface RollbackPlayerDiff {
+  name: string;
+  poolBefore: number;
+  poolAfter: number;
+  vpBefore: number;
+  vpAfter: number;
+  oustedBefore: boolean;
+  oustedAfter: boolean;
+}
+
 // GET /jol/api/tournament/admin-list — net.deckserver.storage.json.system.TournamentMetadata.
 export interface TournamentMetadata {
   id: string;

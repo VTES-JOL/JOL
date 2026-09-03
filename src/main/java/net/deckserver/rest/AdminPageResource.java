@@ -6,7 +6,9 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import net.deckserver.JolAdmin;
 import net.deckserver.game.enums.PlayerRole;
+import net.deckserver.rest.bean.AdminGameStateBean;
 import net.deckserver.rest.bean.GameActivityStatus;
+import net.deckserver.rest.bean.RollbackPreviewBean;
 import net.deckserver.rest.bean.PlayerActivityStatus;
 import net.deckserver.rest.bean.UserSummaryBean;
 import net.deckserver.services.GameService;
@@ -63,6 +65,15 @@ public class AdminPageResource extends BaseResource {
         return PlayerActivityStatus.recentlyActiveNames();
     }
 
+    /** Every player name, sorted — for the "grant a role to anyone" picker (not just recently-active). */
+    @GET
+    @Path("players")
+    public List<String> players() {
+        return PlayerService.getPlayers().stream()
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .toList();
+    }
+
     /** id -> name, for the game-picker dropdowns shared by ReplacePlayer/EndTurn/RollbackGame. */
     @GET
     @Path("games")
@@ -73,6 +84,13 @@ public class AdminPageResource extends BaseResource {
                         name -> name,
                         (a, b) -> a,
                         LinkedHashMap::new));
+    }
+
+    /** Live in-memory state (seating, active player, pool/vp, per-player last access) of one active game — powers the Games tab's game brief. */
+    @GET
+    @Path("games/{gameId}/state")
+    public AdminGameStateBean gameState(@PathParam("gameId") String gameId) {
+        return new AdminGameStateBean(gameName(gameId));
     }
 
     @GET
@@ -97,6 +115,13 @@ public class AdminPageResource extends BaseResource {
     @Path("site-notes")
     public SiteNotesResponse siteNotes() {
         return new SiteNotesResponse(SiteNotesService.getRawNotes());
+    }
+
+    /** Render the given markdown to the same sanitized HTML the main-page notice would show — for the editor's live preview, no persistence. */
+    @POST
+    @Path("site-notes/preview")
+    public SiteNotesResponse siteNotesPreview(SiteNotesRequest body) {
+        return new SiteNotesResponse(SiteNotesService.preview(body.notes()));
     }
 
     @PUT
@@ -126,13 +151,23 @@ public class AdminPageResource extends BaseResource {
     @POST
     @Path("games/{gameId}/rollback")
     public void rollback(@PathParam("gameId") String gameId, RollbackRequest body) {
-        String turn = body.turn();
-        String[] parts = (turn != null) ? turn.split(" ") : new String[0];
+        JolAdmin.rollbackGame(gameName(gameId), username(), turnCode(body.turn()));
+    }
+
+    /** Pool / VP / ousted diff (plus turns discarded and active-player change) a rollback to {@code turn} would apply — for the admin confirm modal. */
+    @GET
+    @Path("games/{gameId}/rollback-preview")
+    public RollbackPreviewBean rollbackPreview(@PathParam("gameId") String gameId, @QueryParam("turn") String turn) {
+        return new RollbackPreviewBean(gameName(gameId), gameId, turn, turnCode(turn));
+    }
+
+    /** Turn label ({@code "Enzorko 6.2"}) → the snapshot key the rollback machinery uses ({@code "6-2"}). */
+    private static String turnCode(String turnLabel) {
+        String[] parts = (turnLabel != null) ? turnLabel.split(" ") : new String[0];
         if (parts.length < 2) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Invalid turn format").build());
         }
-        String turnCode = parts[1].replaceAll("\\.", "-");
-        JolAdmin.rollbackGame(gameName(gameId), username(), turnCode);
+        return parts[1].replaceAll("\\.", "-");
     }
 
     @PUT

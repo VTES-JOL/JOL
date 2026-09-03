@@ -16,10 +16,23 @@ export function toOptions(values: readonly string[]): Option[] {
 }
 
 /**
- * The game picker every admin card (ReplacePlayer, EndTurn, RollbackGame)
- * was re-fetching and default-selecting itself, with an identical
- * effect + `eslint-disable`. The default is now derived, not an effect:
- * `gameId` falls back to the first game until the user picks another.
+ * Match a free-typed name against the known player list, case-insensitively,
+ * and return it in its canonical casing (or null if there's no such player).
+ * The admin player fields are `<input list>` datalists — the user can type
+ * anything — and the backend rejects an unknown name with a 500, so callers
+ * guard the submit on this instead.
+ */
+export function resolvePlayerName(input: string, players: readonly string[]): string | null {
+  const q = input.trim().toLowerCase();
+  if (!q) return null;
+  return players.find((p) => p.toLowerCase() === q) ?? null;
+}
+
+/**
+ * The active-games picker for the admin Games tab. One selection drives the
+ * whole tab (game brief + end-turn / rollback / replace actions). The default
+ * is derived, not an effect: `gameId` falls back to the first game until the
+ * user picks another.
  */
 export function useAdminGames() {
   const { data: games = {} } = useQuery({

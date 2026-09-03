@@ -50,6 +50,11 @@ public class SiteNotesService extends PersistedService {
         return HTML_RENDERER.render(document);
     }
 
+    /** Render arbitrary markdown to the same sanitized HTML {@link #getNotesHtml()} would produce — for the admin editor's live preview, without persisting. */
+    public static String preview(String markdown) {
+        return renderHtml(markdown);
+    }
+
     public static void setNotes(String notes) {
         String updatedNotes = notes == null ? "" : notes;
         String updatedHtml = renderHtml(updatedNotes);

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Search, ShieldCheck } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardBody } from '../../components/ui/Card';
@@ -12,7 +12,7 @@ import { useInvalidate } from '../../api/useInvalidate';
 import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
 import { adminTimestamp } from './adminFormatting';
-import { AdminSelect, toOptions } from './adminControls';
+import { AdminSelect, resolvePlayerName } from './adminControls';
 
 const ROLES = [
   { value: 'JUDGE', label: 'Judge' },
@@ -25,6 +25,8 @@ const ROLES = [
 // Column order for the table.
 const ROLE_COLUMNS = ['JUDGE', 'SUPER_USER', 'PLAYTESTER', 'ADMIN', 'TOURNAMENT_ADMIN'];
 const ROLE_LABELS = Object.fromEntries(ROLES.map((r) => [r.value, r.label]));
+// Granting one of these is as consequential as removing it — confirm both directions.
+const PRIVILEGED_ROLES = new Set(['ADMIN', 'SUPER_USER', 'TOURNAMENT_ADMIN']);
 const USER_ROLES_KEY = ['admin-page', 'user-roles'];
 
 export function PlayerRoles() {
@@ -32,6 +34,9 @@ export function PlayerRoles() {
   const [role, setRole] = useState(ROLES[0].value);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<string | null>(null);
+  // `${player}:${role}` of an in-flight change — disables that one control so a
+  // double-click can't fire the PUT twice.
+  const [pending, setPending] = useState<string | null>(null);
 
   // /admin-page/user-roles is already filtered to players with ≥1 role
   // server-side (UserSummaryBean::isSpecialUser).
@@ -39,46 +44,51 @@ export function PlayerRoles() {
     queryKey: USER_ROLES_KEY,
     queryFn: () => api.get<UserRole[]>('/admin-page/user-roles'),
   });
-  // Same source as the replace-player dropdown — TanStack Query dedupes the
-  // identical concurrent fetch rather than issuing it twice.
-  const { data: substitutes = [] } = useQuery({
-    queryKey: ['admin-page', 'substitutes'],
-    queryFn: () => api.get<string[]>('/admin-page/substitutes'),
+  // Every player name — the grant target isn't limited to recently-active users.
+  const { data: allPlayers = [] } = useQuery({
+    queryKey: ['admin-page', 'players'],
+    queryFn: () => api.get<string[]>('/admin-page/players'),
   });
-
-  // Recently-active players list only arrives after the page's first fetch —
-  // default to the first one once it does.
-  useEffect(() => {
-    if (!player && substitutes.length > 0) setPlayer(substitutes[0]);
-  }, [substitutes, player]);
 
   const refresh = useInvalidate(USER_ROLES_KEY);
 
-  const setRoleValue = async (targetPlayer: string, targetRole: string, next: boolean) => {
-    if (
-      !next &&
-      !(await confirmDialog(`${targetPlayer} loses the ${ROLE_LABELS[targetRole] ?? targetRole} permission on their next request.`, {
-        title: 'Remove this role?',
-        confirmLabel: 'Remove',
-        danger: true,
-      }))
-    )
-      return;
-    runRequest(
+  const applyRole = async (targetPlayer: string, targetRole: string, next: boolean) => {
+    const label = ROLE_LABELS[targetRole] ?? targetRole;
+    if (!next) {
+      if (
+        !(await confirmDialog(`${targetPlayer} loses the ${label} permission on their next request.`, {
+          title: 'Remove this role?',
+          confirmLabel: 'Remove',
+          danger: true,
+        }))
+      )
+        return;
+    } else if (PRIVILEGED_ROLES.has(targetRole)) {
+      if (
+        !(await confirmDialog(`${targetPlayer} gains the ${label} permission on their next request.`, {
+          title: `Grant ${label}?`,
+          confirmLabel: 'Grant',
+          danger: true,
+        }))
+      )
+        return;
+    }
+    const key = `${targetPlayer}:${targetRole}`;
+    setPending(key);
+    await runRequest(
       api.put(`/admin-page/roles/${encodeURIComponent(targetPlayer)}`, { role: targetRole, value: next }),
-      'Failed to update role',
+      next ? 'Failed to grant role' : 'Failed to update role',
       refresh,
     );
+    setPending((k) => (k === key ? null : k));
   };
 
+  const resolvedTarget = resolvePlayerName(player, allPlayers);
   const grantRole = () => {
-    if (!player) return;
-    runRequest(
-      api.put(`/admin-page/roles/${encodeURIComponent(player)}`, { role, value: true }),
-      'Failed to grant role',
-      refresh,
-    );
+    if (!resolvedTarget) return;
+    void applyRole(resolvedTarget, role, true);
   };
+  const grantKey = `${resolvedTarget ?? ''}:${role}`;
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -100,12 +110,32 @@ export function PlayerRoles() {
       <CardBody className="flex flex-col gap-3">
         <div className="flex flex-wrap items-end gap-2">
           <div className="min-w-40 flex-1">
-            <AdminSelect id="adminPlayerList" label="Grant to" value={player} onChange={setPlayer} options={toOptions(substitutes)} />
+            <Input
+              id="adminPlayerList"
+              label="Grant to"
+              size="sm"
+              list="admin-all-players"
+              placeholder="Type a player name…"
+              autoComplete="off"
+              value={player}
+              onChange={(e) => setPlayer(e.target.value)}
+              error={player.trim() && !resolvedTarget ? 'No player by that name' : undefined}
+            />
+            <datalist id="admin-all-players">
+              {allPlayers.map((p) => (
+                <option key={p} value={p} />
+              ))}
+            </datalist>
           </div>
           <div className="min-w-40 flex-1">
             <AdminSelect id="adminRoleList" label="Role" value={role} onChange={setRole} options={ROLES} />
           </div>
-          <Button variant="secondary" size="sm" onClick={grantRole}>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={grantRole}
+            disabled={!resolvedTarget || pending === grantKey}
+          >
             Grant
           </Button>
         </div>
@@ -177,7 +207,8 @@ export function PlayerRoles() {
                             id={`role-${u.name}-${r}`}
                             label={<span className="sr-only">{`${u.name} — ${ROLE_LABELS[r] ?? r}`}</span>}
                             checked={has}
-                            onChange={() => setRoleValue(u.name, r, !has)}
+                            disabled={pending === `${u.name}:${r}`}
+                            onChange={() => applyRole(u.name, r, !has)}
                           />
                         </span>
                       </td>
