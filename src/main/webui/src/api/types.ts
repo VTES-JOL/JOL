@@ -39,6 +39,10 @@ export interface PlayerStatus {
   playerId: string | null;
   pinged: boolean;
   current: boolean;
+  /** Live in-memory game state (active games only) — for the home Games List standing display. */
+  pool: number;
+  vp: number;
+  ousted: boolean;
 }
 
 // net.deckserver.rest.bean.RegistrationStatus.
@@ -66,6 +70,12 @@ export interface GameStatusBean {
   predator: string | null;
   prey: string | null;
   turn: string | null;
+  /** Round number (integer before the dot in `turn`); 0 when not an active game. */
+  round: number;
+  /** Player holding the edge, or null. */
+  edge: string | null;
+  /** Player names in seating order; `players` is unordered. Empty for an inviting game. */
+  seating: string[];
   // Last-activity time, not creation — GameCleanUp closes a stale public lobby
   // game 5 days after this. The "closes in N days" label is derived from it.
   updated: string | null;

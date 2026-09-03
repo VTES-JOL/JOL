@@ -33,6 +33,12 @@ public class GameStatusBean {
     private final String predator;
     private final String prey;
     private final String turn;
+    /** Round number (integer before the dot in the raw turn); 0 for a game that hasn't started a turn / isn't active. */
+    private final int round;
+    /** Player holding the edge, or null. */
+    private final String edge;
+    /** Player names in seating order — {@link #players} is an unordered map, this preserves the table order. */
+    private final List<String> seating;
     private final String visibility;
     private final String owner;
     private final String playerRelationship;
@@ -60,6 +66,9 @@ public class GameStatusBean {
             this.predator = game.getPredatorOf(activePlayer);
             this.prey = game.getPreyOf(activePlayer);
             this.turn = game.getTurnLabel();
+            this.round = parseRound(game.getCurrentTurn());
+            this.edge = game.getEdge();
+            this.seating = List.copyOf(game.getPlayers());
         } else {
             this.gameStatus = "Inviting";
             players = Collections.emptyMap();
@@ -71,6 +80,9 @@ public class GameStatusBean {
             this.predator = null;
             this.prey = null;
             this.turn = null;
+            this.round = 0;
+            this.edge = null;
+            this.seating = Collections.emptyList();
         }
         updated = JolAdmin.getUpdatedTime(gameName);
         if (playerName == null) {
@@ -83,6 +95,14 @@ public class GameStatusBean {
             this.playerRelationship = "INVITED";
         } else {
             this.playerRelationship = "OPEN";
+        }
+    }
+
+    private static int parseRound(String rawTurn) {
+        try {
+            return Integer.parseInt(rawTurn.split("\\.")[0]);
+        } catch (RuntimeException e) {
+            return 0;
         }
     }
 

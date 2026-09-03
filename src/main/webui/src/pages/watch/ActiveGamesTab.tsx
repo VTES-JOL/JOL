@@ -69,7 +69,7 @@ function PlayerRow({
           <span className="rounded bg-blood/15 px-1.5 py-0.5 text-[10px] font-bold text-blood-soft">OUT</span>
         ) : (
           <span className="inline-flex items-center gap-0.5">
-            <Droplet size={11} className="text-blood-soft" />
+            <Droplet size={11} className="fill-current text-blood" />
             {player.pool}
           </span>
         )}

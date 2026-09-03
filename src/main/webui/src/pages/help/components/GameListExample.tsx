@@ -57,6 +57,9 @@ export function GameListExample({ children }: { children: ReactNode }) {
       predator: null,
       prey: null,
       turn: null,
+      round: 0,
+      edge: null,
+      seating: [],
       updated: p.updatedDaysAgo != null ? new Date(now - p.updatedDaysAgo * 86_400_000).toISOString() : null,
       playerRelationship: p.relationship ?? null,
     };
