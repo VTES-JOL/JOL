@@ -68,7 +68,7 @@ export function JolStats(filters: StatsFilters) {
     { key: 'winRate', header: 'Win Rate', sortMode: 'percent' },
     { key: 'vpPerMonth', header: 'VP', sortMode: 'default' },
     { key: 'avgVp', header: 'Avg VP', sortMode: 'default' },
-    { key: 'avgDuration', header: 'Avg Duration', sortMode: 'duration' },
+    { key: 'avgDuration', header: 'Avg Elapsed', sortMode: 'duration' },
     { key: 'bestPlayer', header: 'Player of the Month', sortMode: 'default', render: (r) => <TieCell value={r.bestPlayer} /> },
     { key: 'bestDeck', header: 'Deck of the Month', sortMode: 'default', render: (r) => <TieCell value={r.bestDeck} isDeck /> },
     { key: 'bestNation', header: 'Nation of the Month', sortMode: 'default', render: (r) => <BestNation value={r.bestNation} /> },

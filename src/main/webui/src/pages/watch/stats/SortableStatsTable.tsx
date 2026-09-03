@@ -35,6 +35,13 @@ interface Props<Row extends Record<string, unknown>> {
   loading?: boolean;
   /** Scroll container max height. Default `72vh`. */
   maxHeight?: string;
+  /**
+   * Freeze the first column while the grid scrolls sideways, so a row keeps its
+   * label anchor. On by default — the first column is always the row identity
+   * (Month / Player / Deck / Nation / Game). The wide grids (JolStats' 12
+   * columns especially) are unusable on a phone without it.
+   */
+  stickyFirstColumn?: boolean;
 }
 
 const FILTER_INPUT =
@@ -54,6 +61,7 @@ export function SortableStatsTable<Row extends Record<string, unknown>>({
   defaultSort,
   loading,
   maxHeight = '72vh',
+  stickyFirstColumn = true,
 }: Props<Row>) {
   // useTableSort copies before sorting, so passing the array through is safe.
   const { sorted, toggle, activeKey, direction } = useTableSort<Row>(rows as Row[], defaultSort);
@@ -77,17 +85,18 @@ export function SortableStatsTable<Row extends Record<string, unknown>>({
         <table className="w-full text-sm border-separate border-spacing-0">
           <thead>
             <tr>
-              {columns.map((col) => {
+              {columns.map((col, ci) => {
                 const sortState =
                   col.sortMode && activeKey === (col.key as keyof Row)
                     ? (direction ?? 'asc')
                     : 'none';
+                const frozen = stickyFirstColumn && ci === 0;
                 return (
                   <th
                     key={col.key}
                     className={`sticky top-0 z-10 bg-panel text-left font-semibold text-ink-muted px-2 py-1.5 border-b border-line align-bottom whitespace-nowrap${
-                      col.thClassName ? ` ${col.thClassName}` : ''
-                    }`}
+                      frozen ? ' left-0 z-20 border-r border-line' : ''
+                    }${col.thClassName ? ` ${col.thClassName}` : ''}`}
                   >
                     {col.sortMode ? (
                       <button
@@ -131,13 +140,15 @@ export function SortableStatsTable<Row extends Record<string, unknown>>({
               </tr>
             ) : (
               filtered.map((row, i) => (
-                <tr key={rowKey(row, i)} className="hover:bg-hover">
-                  {columns.map((col) => (
+                <tr key={rowKey(row, i)} className="group hover:bg-hover">
+                  {columns.map((col, ci) => (
                     <td
                       key={col.key}
                       className={`px-2 py-1 border-b border-line/50 text-ink${
-                        col.tdClassName ? ` ${col.tdClassName}` : ''
-                      }`}
+                        stickyFirstColumn && ci === 0
+                          ? ' sticky left-0 z-10 border-r border-line bg-base group-hover:bg-hover'
+                          : ''
+                      }${col.tdClassName ? ` ${col.tdClassName}` : ''}`}
                     >
                       {col.render ? col.render(row) : String(row[col.key] ?? '')}
                     </td>

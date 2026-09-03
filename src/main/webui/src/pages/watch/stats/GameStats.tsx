@@ -14,7 +14,7 @@ export function GameStats(filters: StatsFilters) {
   const columns: StatsColumn<Row>[] = [
     { key: 'gameName', header: 'Game', sortMode: 'default', filter: { value: nameFilter, onChange: setNameFilter } },
     { key: 'players', header: 'Players', sortMode: 'default', filter: { value: playerFilter, onChange: setPlayerFilter } },
-    { key: 'duration', header: 'Duration ', sortMode: 'duration' },
+    { key: 'duration', header: 'Elapsed', sortMode: 'duration' },
     {
       key: 'hasGw',
       header: 'GW? ',

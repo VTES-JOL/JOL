@@ -563,13 +563,12 @@ public class StatisticsResource extends BaseResource {
         return !ended.isBefore(from) && !ended.isAfter(to);
     }
 
+    // Elapsed wall-clock time between a game's start and end. JOL games are
+    // asynchronous and routinely sit idle for days, so this is "how long ago it
+    // started", not play time — rendered Nd Nh Nm (same format as the averaged
+    // formatDuration, seconds dropped as noise at this scale).
     private String getDuration(Duration duration) {
-        long days = duration.toDays();
-        long hours = duration.toHoursPart();
-        long minutes = duration.toMinutesPart();
-        long seconds = duration.toSecondsPart();
-        return "%dd %02dh %02dm %02ds"
-                .formatted(days, hours, minutes, seconds);
+        return formatDuration(duration.toSeconds() / 60.0);
     }
 
     private String formatDuration(double minutes) {
