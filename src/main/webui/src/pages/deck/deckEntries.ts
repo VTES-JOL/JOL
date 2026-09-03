@@ -1,21 +1,22 @@
-import type { CardDetail, ExtendedDeck } from '../../api/types';
+import type { CardDetail, Deck, ExtendedDeck } from '../../api/types';
 import { type DeckEntry, groupEntries } from './deckKit';
 
 /**
- * Flattens the server-resolved `ExtendedDeck` (crypt list + type-grouped
- * library lists) into the flat `DeckEntry[]` the structured editor works with.
+ * Flattens a stored `Deck` (crypt list + type-grouped library lists) into the
+ * flat `DeckEntry[]` the structured editor and the read-only `DeckView` work
+ * with.
  *
- * The stored deck carries only id / name / count per card — `types`, `group`,
- * `banned`, `advanced` and the crypt display data come from a follow-up
- * `/cards/details` fetch (see {@link enrichEntries}). Until that resolves,
- * entries use best-effort placeholders (`types` from the library group's type,
- * `["Vampire"]` for crypt).
+ * The stored deck carries only id / name / count per card — `group`, `banned`,
+ * `advanced` and the crypt display data come from the enrichment detail map
+ * (see {@link enrichEntries}); `types` starts as a best-effort placeholder
+ * (the library group's type, `["Vampire"]` for crypt) and is refined once
+ * detail is merged.
  */
-export function entriesFromExtendedDeck(extended: ExtendedDeck | null): DeckEntry[] {
-  if (!extended?.deck) return [];
+export function entriesFromDeck(deck: Deck | null): DeckEntry[] {
+  if (!deck) return [];
   const out: DeckEntry[] = [];
 
-  for (const c of extended.deck.crypt.cards) {
+  for (const c of deck.crypt.cards) {
     out.push({
       cardId: String(c.id),
       name: c.name,
@@ -25,7 +26,7 @@ export function entriesFromExtendedDeck(extended: ExtendedDeck | null): DeckEntr
       banned: false,
     });
   }
-  for (const group of extended.deck.library.cards) {
+  for (const group of deck.library.cards) {
     for (const c of group.cards) {
       out.push({
         cardId: String(c.id),
@@ -38,6 +39,11 @@ export function entriesFromExtendedDeck(extended: ExtendedDeck | null): DeckEntr
     }
   }
   return out;
+}
+
+/** As {@link entriesFromDeck}, taking the editor's server-resolved `ExtendedDeck` wrapper. */
+export function entriesFromExtendedDeck(extended: ExtendedDeck | null): DeckEntry[] {
+  return entriesFromDeck(extended?.deck ?? null);
 }
 
 /** All card ids referenced by a set of entries — the argument for `/cards/details`. */

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../../api/client';
 import type { DeckInfoBean, TournamentMetadata, TournamentRegistered } from '../../api/types';
 import { relativeTime } from '../../utils/relativeTime';
-import { DeckPreview } from '../../components/DeckPreview';
+import { DeckView } from '../../components/DeckView';
 import { Panel } from '../../components/ui/Panel';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
@@ -124,7 +124,11 @@ export function OpenTournamentDetail({
                 ))}
               </Select>
             </div>
-            {registration?.deck && <DeckPreview deck={registration.deck} details={registration.details} />}
+            {registration?.deck && (
+              <div className="rounded border border-line/60 overflow-hidden">
+                <DeckView deck={registration.deck} details={registration.details} />
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -9,6 +9,8 @@ interface Props {
   detail?: CardDetail;
   onIncrement?: () => void;
   onDecrement?: () => void;
+  /** Render the card name as a hoverable `a.card-name` link (read-only DeckView); the editor keeps a plain span. */
+  linkCards?: boolean;
 }
 
 function groupHint(entry: DeckEntry): string | null {
@@ -18,7 +20,7 @@ function groupHint(entry: DeckEntry): string | null {
   return parts.length > 0 ? parts.join(' ') : null;
 }
 
-export function CryptCardRow({ entry, detail, onIncrement, onDecrement }: Props) {
+export function CryptCardRow({ entry, detail, onIncrement, onDecrement, linkCards }: Props) {
   return (
     <CardRowShell entry={entry} onIncrement={onIncrement} onDecrement={onDecrement}>
       <span className="w-4 shrink-0 flex items-center justify-center">
@@ -28,10 +30,17 @@ export function CryptCardRow({ entry, detail, onIncrement, onDecrement }: Props)
         {detail?.clan && <ClanIcon clan={detail.clan} size={16} />}
       </span>
 
-      <div className="flex items-center gap-1 flex-1 min-w-0">
-        <span className={`text-xs truncate ${entry.banned ? 'text-blood-soft' : 'text-ink-secondary'}`}>
-          {entry.name}
-        </span>
+      {/* banned color sits on the row so `a.card-name`'s `color: inherit` picks it up */}
+      <div className={`flex items-center gap-1 flex-1 min-w-0 ${entry.banned ? 'text-blood-soft' : ''}`}>
+        {linkCards ? (
+          <a className="card-name text-xs truncate" data-card-id={entry.cardId}>
+            {entry.name}
+          </a>
+        ) : (
+          <span className={`text-xs truncate ${entry.banned ? 'text-blood-soft' : 'text-ink-secondary'}`}>
+            {entry.name}
+          </span>
+        )}
         {groupHint(entry) && (
           <span className="text-[11px] text-ink-muted shrink-0 tabular-nums">{groupHint(entry)}</span>
         )}

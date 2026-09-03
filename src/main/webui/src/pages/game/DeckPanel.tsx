@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { NotebookPen } from 'lucide-react';
 import { api } from '../../api/client';
 import type { EnrichedDeck } from '../../api/types';
-import { DeckPreview } from '../../components/DeckPreview';
+import { DeckView } from '../../components/DeckView';
 import { runRequest } from '../../api/mutate';
 import { GamePanel } from './GamePanel';
 
@@ -19,11 +19,11 @@ export function DeckPanel({ gameId, onToggleNotes }: { gameId: string; onToggleN
   return (
     <GamePanel
       id="gameDeckCard"
-      bodyClassName="p-2 scrollable"
+      bodyClassName="scrollable"
       title="Deck"
       toggle={{ icon: <NotebookPen size={13} />, label: 'Notes', onClick: onToggleNotes }}
     >
-      {deck?.deck && <DeckPreview deck={deck.deck} details={deck.details} />}
+      {deck?.deck && <DeckView deck={deck.deck} details={deck.details} />}
     </GamePanel>
   );
 }

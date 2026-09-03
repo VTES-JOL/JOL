@@ -1,6 +1,6 @@
 import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 import type { CardCount, Deck } from '../../../api/types';
-import { DeckPreview } from '../../../components/DeckPreview';
+import { DeckView } from '../../../components/DeckView';
 import { Card, CardHeader, CardBody } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';
 
@@ -33,8 +33,8 @@ export interface DeckPreviewExampleProps {
   valid?: boolean;
 }
 
-// The deck editor's preview panel (crypt/library card list + Valid/Invalid
-// badge), rendered through the real `components/DeckPreview.tsx`.
+// The deck editor's preview panel (grouped crypt/library card list +
+// Valid/Invalid badge), rendered through the real `components/DeckView.tsx`.
 export function DeckPreviewExample({ name = 'Preview', crypt, library, valid = true }: DeckPreviewExampleProps) {
   const cryptCards = parseCardList(crypt);
   const libraryCards = parseCardList(library);
@@ -64,8 +64,8 @@ export function DeckPreviewExample({ name = 'Preview', crypt, library, valid = t
           </Badge>
         )}
       </CardHeader>
-      <CardBody className="p-2">
-        <DeckPreview deck={deck} />
+      <CardBody className="p-0">
+        <DeckView deck={deck} />
       </CardBody>
     </Card>
   );

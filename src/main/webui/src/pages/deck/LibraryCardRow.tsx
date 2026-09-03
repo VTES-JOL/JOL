@@ -10,11 +10,13 @@ interface Props {
   detail?: CardDetail;
   onIncrement?: () => void;
   onDecrement?: () => void;
+  /** Render the card name as a hoverable `a.card-name` link (read-only DeckView); the editor keeps a plain span. */
+  linkCards?: boolean;
 }
 
 const SEP = 'text-[11px] text-ink-muted leading-none select-none';
 
-export function LibraryCardRow({ entry, detail, onIncrement, onDecrement }: Props) {
+export function LibraryCardRow({ entry, detail, onIncrement, onDecrement, linkCards }: Props) {
   const orDiscs = detail?.orDisciplines ?? [];
   const andDiscs = detail?.andDisciplines ?? [];
   const reqClans = detail?.requirementClans ?? [];
@@ -23,10 +25,17 @@ export function LibraryCardRow({ entry, detail, onIncrement, onDecrement }: Prop
 
   return (
     <CardRowShell entry={entry} onIncrement={onIncrement} onDecrement={onDecrement}>
-      <div className="flex items-center gap-1 flex-1 min-w-0">
-        <span className={`text-xs truncate ${entry.banned ? 'text-blood-soft' : 'text-ink-secondary'}`}>
-          {entry.name}
-        </span>
+      {/* banned color sits on the row so `a.card-name`'s `color: inherit` picks it up */}
+      <div className={`flex items-center gap-1 flex-1 min-w-0 ${entry.banned ? 'text-blood-soft' : ''}`}>
+        {linkCards ? (
+          <a className="card-name text-xs truncate" data-card-id={entry.cardId}>
+            {entry.name}
+          </a>
+        ) : (
+          <span className={`text-xs truncate ${entry.banned ? 'text-blood-soft' : 'text-ink-secondary'}`}>
+            {entry.name}
+          </span>
+        )}
         {entry.banned && <TriangleAlert className="w-3 h-3 text-blood-soft shrink-0" />}
         {detail?.poolCost != null && (
           <CostIcon type="pool" amount={detail.poolCost === -1 ? 'x' : detail.poolCost} size={20} />

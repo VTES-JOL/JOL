@@ -4,7 +4,7 @@ import { CheckCircle2, Clock, FileText, LogIn, LogOut, PlayCircle, UserPlus, Use
 import { api, ApiError } from '../../api/client';
 import type { DeckInfoBean, EnrichedDeck, GameStatusBean, RegistrationStatus } from '../../api/types';
 import { useAuth } from '../../auth/useAuth';
-import { DeckPreview } from '../../components/DeckPreview';
+import { DeckView } from '../../components/DeckView';
 import { confirmDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
 import { showError } from '../../stores/toast';
@@ -320,27 +320,33 @@ export function GameDeckPanel({ game }: { game: GameStatusBean | null }) {
 
   return (
     <Panel title="My Deck">
-      <div className="flex-1 min-h-0 overflow-y-auto p-4 text-sm text-ink">
+      <div className="flex-1 min-h-0 overflow-y-auto text-sm text-ink">
         {!game ? (
-          <EmptyState
-            icon={FileText}
-            title="No game selected"
-            description="Your registered deck for the selected game shows here."
-          />
+          <div className="p-4">
+            <EmptyState
+              icon={FileText}
+              title="No game selected"
+              description="Your registered deck for the selected game shows here."
+            />
+          </div>
         ) : preview?.deck ? (
-          <DeckPreview deck={preview.deck} details={preview.details} />
+          <DeckView deck={preview.deck} details={preview.details} />
         ) : registration?.deckName ? (
-          <EmptyState icon={FileText} title="Loading deck…" />
+          <div className="p-4">
+            <EmptyState icon={FileText} title="Loading deck…" />
+          </div>
         ) : (
-          <EmptyState
-            icon={FileText}
-            title="No deck registered"
-            description={
-              registration
-                ? 'Pick a deck under Details to preview it here.'
-                : 'Join the game and register a deck to preview it here.'
-            }
-          />
+          <div className="p-4">
+            <EmptyState
+              icon={FileText}
+              title="No deck registered"
+              description={
+                registration
+                  ? 'Pick a deck under Details to preview it here.'
+                  : 'Join the game and register a deck to preview it here.'
+              }
+            />
+          </div>
         )}
       </div>
     </Panel>

@@ -8,12 +8,26 @@ interface Props {
   detail?: CardDetail;
   onIncrement?: () => void;
   onDecrement?: () => void;
+  /** Render card names as hoverable `a.card-name` links (read-only DeckView). */
+  linkCards?: boolean;
 }
 
-export function DeckCardRow({ entry, detail, onIncrement, onDecrement }: Props) {
+export function DeckCardRow({ entry, detail, onIncrement, onDecrement, linkCards }: Props) {
   return entry.isCrypt ? (
-    <CryptCardRow entry={entry} detail={detail} onIncrement={onIncrement} onDecrement={onDecrement} />
+    <CryptCardRow
+      entry={entry}
+      detail={detail}
+      onIncrement={onIncrement}
+      onDecrement={onDecrement}
+      linkCards={linkCards}
+    />
   ) : (
-    <LibraryCardRow entry={entry} detail={detail} onIncrement={onIncrement} onDecrement={onDecrement} />
+    <LibraryCardRow
+      entry={entry}
+      detail={detail}
+      onIncrement={onIncrement}
+      onDecrement={onDecrement}
+      linkCards={linkCards}
+    />
   );
 }
