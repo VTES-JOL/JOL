@@ -34,6 +34,11 @@ public class ParserService {
     private static final Pattern MARKUP_PATTERN = Pattern.compile("\\[(.*?)\\]");
     private static final Pattern STYLE_PATTERN = Pattern.compile("\\{(.*?)\\}");
     private static final Pattern D_PATTERN = Pattern.compile("\\(D\\)");
+    // Numeric character reference — decimal (&#43;) or hex (&#x1f972;). The legacy
+    // sanitiser encoded far more than the obvious &#39;/&#34;/&#64; (e.g. + as
+    // &#43;, = as &#61;, and emoji as &#x…;); all of them must come back now that
+    // the message is rendered as plain text, not HTML the browser would decode.
+    private static final Pattern NUMERIC_ENTITY = Pattern.compile("&#(x?)([0-9a-fA-F]+);");
     private static final Set<String> disciplineSet = Set.of("ani", "obe", "cel", "dom", "dem", "for", "san", "thn", "vic", "pro", "chi", "val", "mel", "nec", "obf", "pot", "qui", "pre", "ser", "tha", "aus", "vis", "abo", "myt", "dai", "spi", "tem", "obt", "str", "mal", "obl", "flight", "inn", "jud", "viz", "ven", "def", "mar", "red");
 
     public static String sanitizeText(String text) {
@@ -133,16 +138,28 @@ public class ParserService {
 
     /**
      * Undo the HTML entity encoding {@link #sanitizeText} applies — the message
-     * is rendered as plain text now, so {@code &#64;} / {@code &#39;} etc. must
-     * come back as real characters. {@code &amp;} is unescaped last so a
+     * is rendered as plain text now, so every numeric character reference
+     * ({@code &#64;}, {@code &#39;}, {@code &#43;}, {@code &#x1f972;}, …) must
+     * come back as a real character. {@code &amp;} is unescaped last so a
      * literally-typed {@code &#64;} (encoded to {@code &amp;#64;}) survives as
      * {@code &#64;} rather than being turned into an {@code @}.
      */
     private static String decodeBasicEntities(String text) {
-        return text.replace("&#64;", "@")
-                .replace("&#39;", "'")
-                .replace("&#34;", "\"")
-                .replace("&amp;", "&");
+        Matcher m = NUMERIC_ENTITY.matcher(text);
+        StringBuilder sb = new StringBuilder(text.length());
+        while (m.find()) {
+            int codePoint;
+            try {
+                codePoint = Integer.parseInt(m.group(2), m.group(1).isEmpty() ? 10 : 16);
+            } catch (NumberFormatException e) {
+                continue; // e.g. "&#abc;" with no x — not a valid reference, leave verbatim
+            }
+            if (Character.isValidCodePoint(codePoint)) {
+                m.appendReplacement(sb, Matcher.quoteReplacement(new String(Character.toChars(codePoint))));
+            }
+        }
+        m.appendTail(sb);
+        return sb.toString().replace("&amp;", "&");
     }
 
     // ── HTML symbol rendering (CardDatabaseBuilder only) ────────────────────

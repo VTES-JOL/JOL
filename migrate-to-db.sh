@@ -1001,14 +1001,34 @@ fi
 # stores and renders plain text with tokens instead — [card:<id>:<name>],
 # [disc:<code>], [d], [style:<text>] — and never re-parses a stored row, so an
 # imported environment has to be converted here to match what a fresh write
-# would look like. HTML entities the sanitiser added (&#39; &#34; &#64; &amp;)
-# are decoded back since the value is rendered as text now. pg_temp.* function
-# is dropped automatically with the session; the transform is a no-op on any
-# row already in token form.
+# would look like. Every numeric character reference the sanitiser added is
+# decoded back since the value is rendered as text now — the legacy sanitiser
+# encoded more than the obvious &#39;/&#34;/&#64; (e.g. + as &#43;, = as &#61;,
+# emoji as &#x…;), which the old HTML renderer decoded in the browser but the
+# React plain-text renderer does not. Mirrors ParserService.decodeBasicEntities.
+# &amp; is undone last so a literally-typed reference survives. pg_temp.*
+# functions drop with the session; the transform is a no-op on any row already
+# in token form.
 log "Rewriting legacy chat HTML to tokens..."
 psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -v ON_ERROR_STOP=1 <<'SQL'
+CREATE FUNCTION pg_temp.decode_entities(msg text) RETURNS text AS $fn$
+DECLARE
+  result text := msg;
+  hit    text;
+BEGIN
+  IF result IS NULL THEN RETURN NULL; END IF;
+  FOR hit IN SELECT DISTINCT (regexp_matches(result, '&#([0-9]+);', 'g'))[1] LOOP
+    result := replace(result, '&#' || hit || ';', chr(hit::int));
+  END LOOP;
+  FOR hit IN SELECT DISTINCT (regexp_matches(result, '&#x([0-9a-fA-F]+);', 'g'))[1] LOOP
+    result := replace(result, '&#x' || hit || ';', chr(('x' || lpad(hit, 8, '0'))::bit(32)::int));
+  END LOOP;
+  RETURN replace(result, '&amp;', '&');
+END;
+$fn$ LANGUAGE plpgsql IMMUTABLE;
+
 CREATE FUNCTION pg_temp.html_to_tokens(msg text) RETURNS text AS $fn$
-  SELECT replace(replace(replace(replace(
+  SELECT pg_temp.decode_entities(
            regexp_replace(
            regexp_replace(
            regexp_replace(
@@ -1020,8 +1040,7 @@ CREATE FUNCTION pg_temp.html_to_tokens(msg text) RETURNS text AS $fn$
              '[card:\1:\2]', 'g'),
              '<span class=''icon D''></span>', '[d]', 'g'),
              '<span class=''icon ([A-Za-z]+)''></span>', '[disc:\1]', 'g'),
-             '<span class=''game-name''>([^<]*)</span>', '[style:\1]', 'g'),
-         '&#64;', '@'), '&#39;', ''''), '&#34;', '"'), '&amp;', '&')
+             '<span class=''game-name''>([^<]*)</span>', '[style:\1]', 'g'))
 $fn$ LANGUAGE sql IMMUTABLE;
 
 UPDATE global_chat       SET message = pg_temp.html_to_tokens(message);

@@ -68,5 +68,20 @@ public class ParserServiceTest {
         // are decoded back. &amp; is undone last.
         assertEquals("say \"hi\" & ping @Player1",
                 ParserService.parseGlobalChat("say &#34;hi&#34; &amp; ping &#64;Player1"));
+
+        // Legacy data encoded more than the obvious few: + as &#43;, = as &#61;,
+        // backtick as &#96;, and emoji as hex references.
+        assertEquals("pool rich +1",
+                ParserService.parseGlobalChat("pool rich &#43;1"));
+        assertEquals("British humor = best humor",
+                ParserService.parseGlobalChat("British humor &#61; best humor"));
+        assertEquals("run `npm test`",
+                ParserService.parseGlobalChat("run &#96;npm test&#96;"));
+        assertEquals("nice 🥲",
+                ParserService.parseGlobalChat("nice &#x1f972;"));
+
+        // A literally-typed reference (sanitised to &amp;#43;) is NOT decoded.
+        assertEquals("literally &#43; here",
+                ParserService.parseGlobalChat("literally &amp;#43; here"));
     }
 }
