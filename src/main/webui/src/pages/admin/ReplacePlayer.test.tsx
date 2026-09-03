@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReplacePlayer } from './ReplacePlayer';
 import { api } from '../../api/client';
 import { showError } from '../../stores/toast';
+import { confirmDialog } from '../../stores/dialog';
 
 vi.mock('../../api/client', () => ({
   api: { get: vi.fn(), put: vi.fn() },
@@ -14,10 +15,16 @@ vi.mock('../../stores/toast', () => ({
   showError: vi.fn(),
 }));
 
+vi.mock('../../stores/dialog', () => ({
+  confirmDialog: vi.fn(),
+}));
+
 beforeEach(() => {
   vi.mocked(api.get).mockReset();
   vi.mocked(api.put).mockReset();
   vi.mocked(showError).mockReset();
+  // Default: the admin confirms the "Replace this player?" dialog.
+  vi.mocked(confirmDialog).mockReset().mockResolvedValue(true);
 });
 
 function renderWithClient(
@@ -76,10 +83,26 @@ describe('ReplacePlayer', () => {
 
     await user.click(screen.getByRole('button', { name: 'Replace player' }));
 
-    expect(api.put).toHaveBeenCalledWith('/admin-page/games/g1/replace-player', {
-      existingPlayer: 'Player1',
-      newPlayer: 'Sub1',
-    });
+    await waitFor(() =>
+      expect(api.put).toHaveBeenCalledWith('/admin-page/games/g1/replace-player', {
+        existingPlayer: 'Player1',
+        newPlayer: 'Sub1',
+      }),
+    );
+    expect(confirmDialog).toHaveBeenCalled();
+  });
+
+  it('does not submit when the confirm dialog is dismissed', async () => {
+    vi.mocked(confirmDialog).mockResolvedValue(false);
+    vi.mocked(api.put).mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    renderWithClient({ g1: 'Game One' }, ['Sub1'], { g1: ['Player1', 'Player2'] });
+    await waitFor(() => expect(screen.getByLabelText('Player to replace:')).toHaveValue('Player1'));
+
+    await user.click(screen.getByRole('button', { name: 'Replace player' }));
+
+    await waitFor(() => expect(confirmDialog).toHaveBeenCalled());
+    expect(api.put).not.toHaveBeenCalled();
   });
 
   it('shows a toast when the replace call fails', async () => {

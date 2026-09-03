@@ -41,6 +41,11 @@ export function DeckListPane({
   return (
     <Panel
       title="My Decks"
+      // The MasterDetailView tab strip already labels this pane on mobile;
+      // keep the header row (it holds Import / + New) but drop the duplicate
+      // title, and keep the buttons right-aligned without it.
+      titleClassName="hidden lg:block"
+      headerClassName="max-lg:justify-end"
       right={
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="sm" onClick={onImport}>

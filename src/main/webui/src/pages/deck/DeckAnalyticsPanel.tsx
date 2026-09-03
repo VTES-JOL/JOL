@@ -23,7 +23,7 @@ interface Props {
 
 export function DeckAnalyticsPanel({ entries, detailMap }: Props) {
   return (
-    <Panel title="Analytics">
+    <Panel title="Analytics" headerClassName="max-lg:hidden">
       {entries.length === 0 ? (
         <div className="flex-1 flex items-center justify-center p-6 text-xs text-ink-muted text-center leading-relaxed">
           Add cards to see analytics.

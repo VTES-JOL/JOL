@@ -222,7 +222,7 @@ export function DeckPage() {
             label: selectedName ? `Deck: ${selectedName}` : 'Deck Editor',
             content:
               selectedId == null ? (
-                <Panel title="Deck Editor">
+                <Panel title="Deck Editor" headerClassName="max-lg:hidden">
                   <EmptyState
                     icon={FolderOpen}
                     title="No deck selected"
@@ -260,7 +260,7 @@ export function DeckPage() {
             label: 'Analytics',
             content:
               selectedId == null ? (
-                <Panel title="Analytics">
+                <Panel title="Analytics" headerClassName="max-lg:hidden">
                   <EmptyState
                     icon={FolderOpen}
                     title="No deck selected"
