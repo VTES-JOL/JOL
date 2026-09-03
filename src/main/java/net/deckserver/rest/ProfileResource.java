@@ -7,6 +7,7 @@ import net.deckserver.services.PlayerService;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.List;
 
 /**
@@ -43,10 +44,27 @@ public class ProfileResource extends BaseResource {
         return profile();
     }
 
+    /**
+     * Requires the current password. There is no "forgot password" or e-mail
+     * reset flow yet, so re-authenticating here is the only guard against a
+     * left-open session being used to lock the owner out.
+     */
     @PUT
     @Path("password")
-    public void changePassword(PasswordRequest body) {
-        PlayerService.changePassword(username(), body.newPassword());
+    public Response changePassword(PasswordRequest body) {
+        String player = username();
+        if (body.currentPassword() == null || !PlayerService.authenticate(player, body.currentPassword())) {
+            return Response.status(Response.Status.FORBIDDEN).entity("Current password is incorrect.").build();
+        }
+        String next = body.newPassword();
+        if (next == null || next.length() < 8) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("New password must be at least 8 characters.").build();
+        }
+        if (next.equals(body.currentPassword())) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("New password must be different from your current one.").build();
+        }
+        PlayerService.changePassword(player, next);
+        return Response.noContent().build();
     }
 
     @PUT
@@ -55,6 +73,14 @@ public class ProfileResource extends BaseResource {
         String player = username();
         JolAdmin.setImageTooltipPreference(player, body.imageTooltips());
         JolAdmin.setNotificationPreference(player, body.notificationsEnabled());
+        return profile();
+    }
+
+    /** Turn-alert master switch, decoupled from the image-tooltip preference. */
+    @PUT
+    @Path("notifications")
+    public ProfileBean setNotifications(NotificationPrefRequest body) {
+        JolAdmin.setNotificationPreference(username(), body.enabled());
         return profile();
     }
 
@@ -67,7 +93,8 @@ public class ProfileResource extends BaseResource {
 
     public record CountryOption(String code, String name) {}
     public record ProfileRequest(String email, String discordID, String veknID, String country) {}
-    public record PasswordRequest(String newPassword) {}
+    public record PasswordRequest(String currentPassword, String newPassword) {}
     public record PreferencesRequest(boolean imageTooltips, boolean notificationsEnabled) {}
+    public record NotificationPrefRequest(boolean enabled) {}
     public record EdgeColorRequest(String color) {}
 }

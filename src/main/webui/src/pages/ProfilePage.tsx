@@ -6,6 +6,7 @@ import { Spinner } from '../components/ui/Spinner';
 import { ProfileEditor } from './profile/ProfileEditor';
 import { AccountEditor } from './profile/AccountEditor';
 import { Preferences } from './profile/Preferences';
+import { NotificationsCard } from './profile/NotificationsCard';
 
 const PROFILE_QUERY_KEY = ['profile'];
 
@@ -44,6 +45,7 @@ export function ProfilePage() {
       <ProfileEditor profile={profile} countries={countries} onSaved={onSaved} />
       <AccountEditor />
       <Preferences profile={profile} onSaved={onSaved} />
+      <NotificationsCard profile={profile} onSaved={onSaved} />
     </div>
   );
 }

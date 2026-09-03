@@ -112,6 +112,17 @@ export interface CountryOption {
   name: string;
 }
 
+// GET /jol/api/subscription — NotificationResource.listSubscriptions.
+export interface SubscriptionStatus {
+  endpoints: string[];
+}
+
+// POST /jol/api/subscription/test — NotificationResource.sendTest.
+export interface TestSendResult {
+  sent: number;
+  failed: number;
+}
+
 // GET /jol/api/admin-page/site-notes — net.deckserver.rest.AdminPageResource.SiteNotesResponse.
 export interface SiteNotes {
   notes: string;

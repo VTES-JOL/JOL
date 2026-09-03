@@ -138,6 +138,58 @@ public class NotificationService {
         }
     }
 
+    /**
+     * Result of a user-triggered test send: how many of the player's registered
+     * browser subscriptions accepted the push, how many failed, and whether web
+     * push is configured on this server at all (VAPID key present).
+     */
+    public record TestSendResult(int sent, int failed, boolean pushConfigured) {}
+
+    /**
+     * Sends a "notifications are working" push to every browser the player has
+     * subscribed, independent of their turn-alert preference. Dead endpoints are
+     * pruned exactly as {@link #pingPlayer} does.
+     */
+    public static TestSendResult sendTestNotification(String playerName) {
+        if (keyPair == null) {
+            return new TestSendResult(0, 0, false);
+        }
+        List<Subscription> subscriptions = SubscriptionService.getSubscriptions(playerName);
+        byte[] payload;
+        try {
+            payload = objectMapper.writeValueAsBytes(new PushPayload(
+                    "Test notification",
+                    "Push notifications are working — you'll be pinged here when it's your turn.",
+                    null,
+                    "/jol/"));
+        } catch (Exception e) {
+            logger.error("Failed to build test payload", e);
+            return new TestSendResult(0, subscriptions.size(), true);
+        }
+        int sent = 0;
+        int failed = 0;
+        for (Subscription subscription : subscriptions) {
+            try {
+                int statusCode = sendPushMessage(subscription, payload);
+                if (statusCode == 200 || statusCode == 201) {
+                    SubscriptionService.recordSuccess(playerName, subscription.getEndpoint());
+                    sent++;
+                } else if (statusCode == 404 || statusCode == 410) {
+                    SubscriptionService.removeSubscription(playerName, subscription.getEndpoint());
+                    failed++;
+                } else {
+                    SubscriptionService.recordFailure(playerName, subscription.getEndpoint());
+                    failed++;
+                }
+            } catch (Exception e) {
+                logger.error("Test push failed for {} (endpoint {})", playerName, subscription.getEndpoint(), e);
+                SubscriptionService.recordFailure(playerName, subscription.getEndpoint());
+                failed++;
+            }
+        }
+        return new TestSendResult(sent, failed, true);
+    }
+
     private static byte[] buildPayload(String gameName) throws Exception {
         GameInfo gameInfo = GameService.get(gameName);
         String gameId = gameInfo != null ? gameInfo.getId() : null;

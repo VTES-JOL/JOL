@@ -41,6 +41,19 @@ function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
     });
 }
 
+/**
+ * The push endpoint this browser is currently subscribed with, or null if it
+ * isn't subscribed / push isn't supported. Compared against the server's
+ * endpoint list to tell whether "this browser" is connected.
+ */
+export function getCurrentPushEndpoint(): Promise<string | null> {
+  if (!isPushSupported()) return Promise.resolve(null);
+  return registerServiceWorker()
+    .then((registration) => (registration ? registration.pushManager.getSubscription() : null))
+    .then((subscription) => subscription?.endpoint ?? null)
+    .catch(() => null);
+}
+
 export function subscribeToPush(): Promise<PushSubscription> {
   return registerServiceWorker()
     .then((registration) => {

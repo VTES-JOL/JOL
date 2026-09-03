@@ -6,10 +6,12 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import net.deckserver.push.Subscription;
+import net.deckserver.services.NotificationService;
 import net.deckserver.services.SubscriptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -20,6 +22,36 @@ public class NotificationResource {
     private SecurityContext securityContext;
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationResource.class);
+
+    /**
+     * The endpoints this player currently has registered — the profile page uses
+     * it to tell whether <em>this</em> browser is among them. Endpoint URLs are
+     * opaque and only ever returned to their owner.
+     */
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listSubscriptions() {
+        String playerName = getPlayerName();
+        List<String> endpoints = SubscriptionService.getSubscriptions(playerName).stream()
+                .map(Subscription::getEndpoint)
+                .toList();
+        return Response.ok(Map.of("endpoints", endpoints)).build();
+    }
+
+    /** Fires a test push to every browser this player has subscribed. */
+    @POST
+    @Path("test")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response sendTest() {
+        String playerName = getPlayerName();
+        NotificationService.TestSendResult result = NotificationService.sendTestNotification(playerName);
+        if (!result.pushConfigured()) {
+            return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                    .entity(Map.of("error", "Push notifications are not configured on this server."))
+                    .build();
+        }
+        return Response.ok(Map.of("sent", result.sent(), "failed", result.failed())).build();
+    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
