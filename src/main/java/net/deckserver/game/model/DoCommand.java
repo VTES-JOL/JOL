@@ -32,7 +32,7 @@ public record DoCommand(JolGame game, GameModel model) {
         command = command.replaceAll("\\s{2,}", " ");
         String[] cmdStr = command.trim().split("[\\s\n\r\f\t]");
         String cmd = cmdStr[0];
-        CommandParser cmdObj = new CommandParser(cmdStr, 1, game);
+        CommandParser cmdObj = new CommandParser(cmdStr, 1, game, player);
         switch (cmd.toLowerCase()) {
             case "timeout":
                 timeOut(player);
@@ -44,7 +44,17 @@ public record DoCommand(JolGame game, GameModel model) {
                 choose(cmdObj, player);
                 break;
             case "reveal":
+                if (cmdObj.hasMoreArgs()) {
+                    flipCard(cmdObj, player, false);
+                } else {
+                    throw new CommandException("Use 'tally' to reveal hidden choices, or 'reveal <player> <region> <position>' to flip a card face up");
+                }
+                break;
+            case "tally":
                 reveal();
+                break;
+            case "hide":
+                flipCard(cmdObj, player, true);
                 break;
             case "label":
                 label(cmdObj, player);
@@ -329,11 +339,12 @@ public record DoCommand(JolGame game, GameModel model) {
         RegionType destRegion = cmdObj.getRegion(RegionType.READY);
         CardData destCard = cmdObj.findCardData(false, false, destPlayer, destRegion);
         boolean top = Arrays.asList(cmdObj.args).contains("top");
+        boolean faceDown = Arrays.asList(cmdObj.args).contains("facedown");
 
         if (List.of(RegionType.READY, RegionType.UNCONTROLLED, RegionType.TORPOR).contains(destRegion) && destCard != null) {
-            game.moveToCard(player, srcCard.getId(), destCard.getId());
+            game.moveToCard(player, srcCard.getId(), destCard.getId(), faceDown);
         } else {
-            game.moveToRegion(player, srcCard.getId(), destPlayer, destRegion, top);
+            game.moveToRegion(player, srcCard.getId(), destPlayer, destRegion, top, faceDown);
         }
     }
 
@@ -358,8 +369,16 @@ public record DoCommand(JolGame game, GameModel model) {
         String targetPlayer = cmdObj.getPlayer(player);
         RegionType targetRegion = cmdObj.getRegion(RegionType.ASH_HEAP);
         String targetCardId = Optional.ofNullable(cmdObj.findCardData(false, false, targetPlayer, targetRegion)).map(CardData::getId).orElse(null);
-        boolean draw = cmdObj.consumeString("draw");
-        game.playCard(player, srcCard.getId(), targetPlayer, targetRegion, targetCardId, modes);
+        // trailing flags, order-independent: `draw` (redraw a replacement) and
+        // `facedown` (put the card into play without revealing its identity)
+        boolean draw = false;
+        boolean faceDown = false;
+        for (int i = 0; i < 2; i++) {
+            if (cmdObj.consumeString("draw")) draw = true;
+            else if (cmdObj.consumeString("facedown")) faceDown = true;
+            else break;
+        }
+        game.playCard(player, srcCard.getId(), targetPlayer, targetRegion, targetCardId, modes, faceDown);
         if (draw) game.drawCard(player, RegionType.LIBRARY, RegionType.HAND);
     }
 
@@ -429,6 +448,20 @@ public record DoCommand(JolGame game, GameModel model) {
 
     void reveal() {
         game.getChoices();
+    }
+
+    void flipCard(CommandParser cmdObj, String player, boolean faceDown) throws CommandException {
+        String targetPlayer = cmdObj.getPlayer(player);
+        RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
+        CardData card = cmdObj.findCardData(false, targetPlayer, targetRegion);
+        // "Controller" == the player whose board this card sits on.
+        if (!card.getRegion().getOwner().equals(player)) {
+            throw new CommandException("You can only hide or reveal cards you control");
+        }
+        if (card.isFaceDown() == faceDown) {
+            throw new CommandException("Card is already face " + (faceDown ? "down" : "up"));
+        }
+        game.setCardFaceDown(player, card.getId(), faceDown);
     }
 
     void timeOut(String player) {

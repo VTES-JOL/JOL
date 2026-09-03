@@ -16,13 +16,14 @@ export function CardSimple({
   coordinate: string;
   onClick?: () => void;
 }) {
-  if (!card.visible) return <CardHidden card={card} region={region} coordinate={coordinate} />;
+  if (!card.visible) return <CardHidden card={card} region={region} coordinate={coordinate} onClick={onClick} />;
 
   const regionStyle = region === 'REMOVED_FROM_GAME' ? 'opacity-50' : '';
+  const faceDownStyle = card.faceDown ? 'opacity-60' : '';
 
   return (
     <li
-      className={`flex justify-between items-center p-1 ${regionStyle}`}
+      className={`flex justify-between items-center p-1 ${regionStyle} ${faceDownStyle}`}
       onClick={onClick}
       style={onClick ? { cursor: 'pointer' } : undefined}
     >
@@ -36,6 +37,14 @@ export function CardSimple({
             </a>
           </span>
           <span className="flex gap-1 items-center">
+            {card.faceDown && (
+              <span
+                className="inline-flex items-center rounded bg-hover text-ink-muted border border-dashed border-ink-muted px-1.5 text-[0.7rem]"
+                title="Only you can see this card"
+              >
+                FACE DOWN
+              </span>
+            )}
             {card.label && (
               <span className="inline-flex items-center rounded bg-hover text-ink border border-line px-1.5 text-xs">
                 {card.label}

@@ -13,6 +13,7 @@ function makeCtx(overrides: Partial<TableCardContext> = {}): TableCardContext {
     coordinate: '1',
     card,
     isChild: false,
+    controlledByViewer: true,
     ...overrides,
   };
 }
@@ -24,6 +25,11 @@ describe('cardActions', () => {
 
   it('unlock builds a plain unlock command', () => {
     expect(cardActions.unlock(makeCtx())).toEqual({ command: 'unlock Player1 ready 1' });
+  });
+
+  it('hide / reveal build a plain flip command with the controller and position', () => {
+    expect(cardActions.hide(makeCtx())).toEqual({ command: 'hide Player1 ready 1' });
+    expect(cardActions.reveal(makeCtx({ regionCommandKey: 'torpor', coordinate: '2' }))).toEqual({ command: 'reveal Player1 torpor 2' });
   });
 
   it('bleed locks the card and echoes "Bleed" to chat', () => {
@@ -144,6 +150,12 @@ describe('buildPlayCommand', () => {
 
   it('combines disciplines, a fixed target suffix, and draw together', () => {
     expect(buildPlayCommand(ctx, ['for'], 'READY_REGION', null, false)).toBe('play hand 3 @ for ready draw');
+  });
+
+  it('never appends draw when the card is played from a table region, not hand', () => {
+    const tableCtx = { regionType: 'READY', regionCommandKey: 'ready', coordinate: '2' };
+    expect(buildPlayCommand(tableCtx, null, null, null, false)).toBe('play ready 2');
+    expect(buildPlayCommand(tableCtx, ['aus'], 'READY_REGION', null, false)).toBe('play ready 2 @ aus ready');
   });
 });
 

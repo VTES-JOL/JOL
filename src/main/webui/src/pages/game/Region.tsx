@@ -33,6 +33,14 @@ function clickMode(regionType: string, isOwnRegion: boolean, isSeatedPlayer: boo
   return null;
 }
 
+// A face-down card stays playable from wherever it sits — the server enriches
+// it with play modes for its controller (GameSnapshotFactory), so the
+// controller's click opens the play-card modal instead of the action modal,
+// overriding the region-level clickMode.
+function isFaceDownPlayable(card: CardSnapshot, isOwnRegion: boolean, isSeatedPlayer: boolean): boolean {
+  return isSeatedPlayer && isOwnRegion && !!card.faceDown && (card.modes?.length ?? 0) > 0;
+}
+
 // Mirrors region.jsp — collapse/expand is purely local UI state here (see
 // GameSnapshotFactory's javadoc). A region that gains a card auto-expands so
 // the change is visible, even if a viewer had collapsed it.
@@ -73,8 +81,17 @@ export const Region = memo(function Region({
 
   const onAction = useCallback(
     ({ coordinate, card, isChild }: TableCardClick) =>
-      onTableCardClick({ controller, controllerPool, regionType: region.type, regionCommandKey: region.commandKey, coordinate, card, isChild }),
-    [onTableCardClick, controller, controllerPool, region.type, region.commandKey],
+      onTableCardClick({
+        controller,
+        controllerPool,
+        regionType: region.type,
+        regionCommandKey: region.commandKey,
+        coordinate,
+        card,
+        isChild,
+        controlledByViewer: isOwnRegion,
+      }),
+    [onTableCardClick, controller, controllerPool, region.type, region.commandKey, isOwnRegion],
   );
 
   if (region.cards.length === 0) return null;
@@ -116,12 +133,16 @@ export const Region = memo(function Region({
         <ol className="region list-none divide-y divide-line/40">
           {region.cards.map((card, i) => {
             const coordinate = String(i + 1);
+            const playClick = () =>
+              onPlayCardClick({ regionType: region.type, regionCommandKey: region.commandKey, coordinate }, card);
+            const faceDownPlay = isFaceDownPlayable(card, isOwnRegion, isSeatedPlayer);
             if (region.simple) {
-              const onClick =
-                mode === 'action'
+              const onClick = faceDownPlay
+                ? playClick
+                : mode === 'action'
                   ? () => onAction({ coordinate, card, isChild: false })
                   : mode === 'play'
-                    ? () => onPlayCardClick({ regionType: region.type, regionCommandKey: region.commandKey, coordinate }, card)
+                    ? playClick
                     : undefined;
               return <CardSimple key={card.id} card={card} region={region.type} coordinate={coordinate} onClick={onClick} />;
             }
@@ -132,6 +153,7 @@ export const Region = memo(function Region({
                 region={region.type}
                 coordinate={coordinate}
                 onAction={mode === 'action' ? onAction : undefined}
+                onCardClick={faceDownPlay ? playClick : undefined}
               />
             );
           })}

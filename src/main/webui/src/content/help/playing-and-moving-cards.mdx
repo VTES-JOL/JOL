@@ -52,11 +52,12 @@ For everything else, `move` relocates a card from one position (`PLAYER`/`REGION
 
 ## Command Reference
 
-<CommandDoc name="Play" syntax="play [SOURCE] [@ DISCIPLINES] [DESTINATION] [draw]" description="Play a card from your hand or another region such as research, with optional context for which disciplines it's played with and whether to draw a replacement.">
+<CommandDoc name="Play" syntax="play [SOURCE] [@ DISCIPLINES] [DESTINATION] [draw] [facedown]" description="Play a card from your hand or another region such as research, with optional context for which disciplines it's played with and whether to draw a replacement.">
   <CommandOption name="SOURCE">Defaults to your own hand.</CommandOption>
   <CommandOption name="@ DISCIPLINES">Follow the <code>@</code> keyword with one or more discipline codes to tell other players which mode you're playing the card in.</CommandOption>
   <CommandOption name="DESTINATION">A player/region moves the card into that region; a player/region/card moves it onto an existing card. Defaults to your own ash heap.</CommandOption>
   <CommandOption name="draw">Draws a replacement card immediately.</CommandOption>
+  <CommandOption name="facedown">Puts the card into play face down — the chat log doesn't name it and only you can see it until you <code>reveal</code> it. For the handful of cards that enter play face down.</CommandOption>
   <CommandExample cmd="play 2 draw">Move hand #2 to your ash-heap and redraw (combat cards).</CommandExample>
   <CommandExample cmd="play 3">Move hand #3 to your ash-heap without redrawing (Bum's Rush, Wake with Evening's Freshness).</CommandExample>
   <CommandExample cmd="play 2 ready draw">Move hand #2 to your ready region and replace (allies).</CommandExample>
@@ -99,10 +100,11 @@ For everything else, `move` relocates a card from one position (`PLAYER`/`REGION
   <CommandExample cmd="burn crypt 1">Burn the top card of your own crypt.</CommandExample>
 </CommandDoc>
 
-<CommandDoc name="Move" syntax="move [SOURCE] [DESTINATION] [top]" description="Move any card from one position to another.">
+<CommandDoc name="Move" syntax="move [SOURCE] [DESTINATION] [top] [facedown]" description="Move any card from one position to another.">
   <CommandOption name="SOURCE">Defaults to your own ready region.</CommandOption>
   <CommandOption name="DESTINATION">Defaults to your own ready region. Also accepts the <code>prey</code>/<code>predator</code> keywords in place of a player name.</CommandOption>
   <CommandOption name="top">Moves the card to the top of the destination region/card instead of the bottom.</CommandOption>
+  <CommandOption name="facedown">Places the card face down — only you can see it, and the chat log won't name it if it wasn't already public. Use <code>reveal</code> to turn it face up later.</CommandOption>
   <CommandExample cmd="move 1">Move ready #1 to the end of your ready region — useful for re-ordering.</CommandExample>
   <CommandExample cmd="move 2 1 ready 1">Move card #1 stacked on ready #2 onto ready #1 — for moving equipment/retainers between minions.</CommandExample>
   <CommandExample cmd="move torpor 1 ready">Move torpor #1 into your ready region — rescuing from torpor.</CommandExample>
@@ -113,6 +115,7 @@ For everything else, `move` relocates a card from one position (`PLAYER`/`REGION
   <CommandExample cmd="move ashheap 1 library top">Move ash-heap #1 to the top of your library — for cards that re-sort your library.</CommandExample>
   <CommandExample cmd="move library 1 hand">Move the top card of your library into your hand (Heart of Nizchetus).</CommandExample>
   <CommandExample cmd="move 1 prey ready">Move your card #1 into your prey's ready region.</CommandExample>
+  <CommandExample cmd="move library 1 ready 2 facedown">Move the top card of your library face down onto ready #2 — the log reads "puts a card on … face down".</CommandExample>
 </CommandDoc>
 
 <CommandDoc name="Shuffle" syntax="shuffle [SOURCE] [AMOUNT]" description="Shuffle a stack of cards.">

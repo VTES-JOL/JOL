@@ -39,14 +39,37 @@ export const Card = memo(function Card({
   coordinate,
   isChild = false,
   onAction,
+  onCardClick,
 }: {
   card: CardSnapshot;
   region: string;
   coordinate: string;
   isChild?: boolean;
   onAction?: (click: TableCardClick) => void;
+  // Overrides the default action-modal wiring for this row only — used to send
+  // a controller's click on their own face-down card to the play-card modal.
+  onCardClick?: () => void;
 }) {
-  if (!card.visible) return <CardHidden card={card} region={region} coordinate={coordinate} />;
+  if (!card.visible) {
+    // A face-down card the viewer doesn't control: card back, plus any (rare)
+    // still-visible children rendered through the normal per-node dispatch.
+    if (card.faceDown && (card.cards?.length ?? 0) > 0) {
+      return (
+        <>
+          <CardHidden card={card} region={region} coordinate={coordinate} />
+          <ol className="list-none mt-1 ml-2 border-l border-line pl-1.5 divide-y divide-line/20">
+            {card.cards!.map((nested, i) => (
+              <NestedCard key={nested.id} card={nested} region={region} coordinate={`${coordinate}.${i + 1}`} onAction={onAction} />
+            ))}
+          </ol>
+        </>
+      );
+    }
+    return <CardHidden card={card} region={region} coordinate={coordinate} />;
+  }
+
+  const rowClick = onCardClick ?? (onAction ? () => onAction({ coordinate, card, isChild }) : undefined);
+  const faceDownStyle = card.faceDown ? 'opacity-60 border-l-2 border-dashed border-ink-muted' : '';
 
   const hasVotes = !!card.votes && card.votes !== '0';
   const counterText = `${card.counters}${(card.capacity ?? 0) > 0 ? ` / ${card.capacity}` : ''}`;
@@ -58,9 +81,9 @@ export const Card = memo(function Card({
 
   return (
     <li
-      className={`flex justify-between items-start ${rowPad} ${regionStyle} ${contestedStyle} ${card.locked ? 'border-l-2 border-accent bg-accent/5' : ''}`}
-      onClick={onAction ? () => onAction({ coordinate, card, isChild }) : undefined}
-      style={onAction ? { cursor: 'pointer' } : undefined}
+      className={`flex justify-between items-start ${rowPad} ${regionStyle} ${contestedStyle} ${faceDownStyle} ${card.locked ? 'border-l-2 border-accent bg-accent/5' : ''}`}
+      onClick={rowClick}
+      style={rowClick ? { cursor: 'pointer' } : undefined}
     >
       <div className="mx-1 me-auto w-full">
         <div className="flex justify-between">
@@ -82,6 +105,11 @@ export const Card = memo(function Card({
               {hasVotes && <span className={`${PILL} bg-gold text-surface`}>{card.votes}</span>}
               {card.contested && (
                 <span className={`${PILL} bg-gold text-surface text-[0.7rem]`}>CONTESTED</span>
+              )}
+              {card.faceDown && (
+                <span className={`${PILL} bg-hover text-ink-muted border border-dashed border-ink-muted text-[0.7rem]`} title="Only you can see this card">
+                  FACE DOWN
+                </span>
               )}
             </div>
             {(card.disciplines?.length ?? 0) > 0 && (

@@ -18,6 +18,7 @@ export interface TableCardContext {
   coordinate: string;
   card: CardSnapshot;
   isChild: boolean;
+  controlledByViewer: boolean; // the viewer owns the board this card sits on
 }
 
 function controllerFirstName(ctx: TableCardContext): string {
@@ -35,6 +36,8 @@ function doCardCommand(ctx: TableCardContext, keyword: string, tail = '', omitPl
 export const cardActions = {
   lock: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'lock') }),
   unlock: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'unlock') }),
+  hide: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'hide') }),
+  reveal: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'reveal') }),
   contest: (ctx: TableCardContext, clear: boolean): Submission => ({ command: doCardCommand(ctx, 'contest', clear ? 'clear' : '') }),
   bleed: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'lock'), chat: 'Bleed' }),
   hunt: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'lock'), chat: 'Hunt' }),
@@ -98,7 +101,9 @@ export function buildPlayCommand(
   if (target === 'REMOVE_FROM_GAME') command += ' rfg';
   if (target === 'INACTIVE_REGION') command += ' inactive';
   if (pickedTarget) command += ` ${pickedTarget}`;
-  if (!doNotReplace) command += ' draw';
+  // Only a card played from hand draws a replacement — a face-down card being
+  // played "for real" from the table has no hand slot to refill.
+  if (!doNotReplace && ctx.regionCommandKey === 'hand') command += ' draw';
   return command;
 }
 

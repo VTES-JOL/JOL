@@ -47,7 +47,7 @@ public class ScheduledJobs {
     private final GameCleanUp gameCleanUp = new GameCleanUp();
     private final TournamentJob tournamentJob = new TournamentJob();
 
-    @Scheduled(every = "1m", delayed = "3m", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
+    @Scheduled(every = "1m", delayed = "1m", concurrentExecution = Scheduled.ConcurrentExecution.SKIP)
     void buildPublicGames() {
         if (PersistedService.isTestMode()) return;
         publicGameBuilder.run();

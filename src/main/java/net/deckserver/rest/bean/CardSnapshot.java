@@ -22,6 +22,13 @@ public class CardSnapshot {
     private final boolean visible;
     private final int counters;
 
+    /**
+     * Face down on the board. Present on both the visible card (the controller's
+     * own view — render it distinctly) and the withheld placeholder (everyone
+     * else — render a card back rather than the hidden-hand asterisks).
+     */
+    private final boolean faceDown;
+
     // Visible-only fields:
     private final String cardId;
     private final String name;

@@ -42,6 +42,14 @@ public class CardData {
     private String name;
     private boolean locked;
     private boolean contested;
+    /**
+     * Face down in an otherwise fully-visible region: only the player whose board
+     * the card sits on (its region owner — see GameSnapshotFactory / CardVisibility)
+     * may see its identity. Toggled by the {@code hide} / {@code reveal} commands
+     * and set on entry by {@code play … facedown} / {@code move … facedown}.
+     * {@code @JsonInclude(NON_DEFAULT)} keeps it out of existing game_state blobs.
+     */
+    private boolean faceDown;
     private CardType type;
     private int capacity;
     private int counters;

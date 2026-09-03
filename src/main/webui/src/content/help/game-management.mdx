@@ -29,13 +29,27 @@
 
 ## Hidden Information
 
-<CommandDoc name="Choose" syntax="choose [CHOICE]" description="Make a hidden choice — for a vote or an effect that needs one.">
+<CommandDoc name="Choose" syntax="choose [CHOICE]" description="Make a hidden choice — for a vote or an effect that needs one. Use tally to reveal every player's choice at once.">
   <CommandExample cmd="choose 5">Set your hidden choice to "5".</CommandExample>
   <CommandExample cmd="choose Aye">Set your hidden choice to "Aye".</CommandExample>
 </CommandDoc>
 
-<CommandDoc name="Reveal" syntax="reveal" description="Reveal every player's hidden choice, then clear them all.">
-  <CommandExample cmd="reveal">Announce all hidden choices and clear them.</CommandExample>
+<CommandDoc name="Tally" syntax="tally" description="Reveal every player's hidden choice, then clear them all.">
+  <CommandExample cmd="tally">Announce all hidden choices and clear them.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Hide" syntax="hide [PLAYER] [REGION] [POSITION]" description="Turn one of your cards in play face down. Only you can see a face-down card's identity; everyone else sees a blank card back. Playing a card face down (see the play command) and moving one face down do the same thing on the way in.">
+  <CommandOption name="PLAYER">The board the card sits on. Must be you — you can only hide cards you control. Defaults to yourself.</CommandOption>
+  <CommandOption name="REGION">Defaults to your ready region.</CommandOption>
+  <CommandOption name="POSITION">Position of the card in that region.</CommandOption>
+  <CommandExample cmd="hide ready 2">Turn ready #2 face down.</CommandExample>
+</CommandDoc>
+
+<CommandDoc name="Reveal" syntax="reveal [PLAYER] [REGION] [POSITION]" description="Turn one of your face-down cards in play face up again, for everyone to see. Revealing a unique card in your ready region re-runs the contest check that was skipped while it was hidden.">
+  <CommandOption name="PLAYER">The board the card sits on. Must be you — you can only reveal cards you control. Defaults to yourself.</CommandOption>
+  <CommandOption name="REGION">Defaults to your ready region.</CommandOption>
+  <CommandOption name="POSITION">Position of the card in that region.</CommandOption>
+  <CommandExample cmd="reveal ready 2">Turn ready #2 face up.</CommandExample>
 </CommandDoc>
 
 <CommandDoc name="Show" syntax="show [PLAYER] [REGION] [AMOUNT] [all]" description="Reveal a number of cards — or all of them — from one of your regions to another player, or to everyone.">

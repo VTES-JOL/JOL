@@ -3,6 +3,8 @@ import {
   ArrowLeftCircle,
   ArrowRightCircle,
   Ban,
+  Eye,
+  EyeOff,
   Flame,
   Lock,
   LogOut,
@@ -61,6 +63,8 @@ interface ButtonConfig {
   topLevelOnly?: boolean;
   minionOnly?: boolean;
   nonMinionOnly?: boolean;
+  controllerOnly?: boolean; // ctx.controlledByViewer — the viewer owns this board
+  faceDown?: boolean; // shown only when card.faceDown matches this
   action: (ctx: TableCardContext) => Submission;
 }
 
@@ -78,6 +82,8 @@ const BUTTONS: ButtonConfig[] = [
   { key: 'move-ready', label: 'Move to ready', title: 'Move to ready', regions: ['torpor'], topLevelOnly: true, ownerOnly: true, minionOnly: true, action: cardActions.moveReady },
   { key: 'lock', label: <><Lock size={13} /> Lock</>, title: 'Lock', regions: ['ready', 'torpor'], lockState: 'unlocked', action: cardActions.lock },
   { key: 'unlock', label: <><Unlock size={13} /> Unlock</>, title: 'Unlock', regions: ['ready', 'torpor'], lockState: 'locked', action: cardActions.unlock },
+  { key: 'hide', label: <><EyeOff size={13} /> Turn Face Down</>, title: 'Turn this card face down — only you will see it', regions: ['ready', 'torpor', 'uncontrolled'], controllerOnly: true, faceDown: false, action: cardActions.hide },
+  { key: 'reveal', label: <><Eye size={13} /> Reveal</>, title: 'Turn this card face up for everyone', regions: ['ready', 'torpor', 'uncontrolled'], controllerOnly: true, faceDown: true, action: cardActions.reveal },
   { key: 'block', label: <><Shield size={13} /> Block</>, title: 'Block', regions: ['ready'], topLevelOnly: true, ownerOnly: true, minionOnly: true, action: (ctx) => cardActions.block(ctx.card.name ?? '') },
   { key: 'torpor', label: 'Send to Torpor', title: 'Torpor', regions: ['ready'], topLevelOnly: true, minionOnly: true, action: cardActions.torpor },
   { key: 'burn', label: <><Flame size={13} /> Burn</>, title: 'Burn', regions: ['ready', 'torpor', 'inactive'], action: cardActions.burn },
@@ -90,7 +96,7 @@ const BUTTONS: ButtonConfig[] = [
   { key: 'move-prey', label: <><ArrowRightCircle size={13} /> Move to Prey</>, title: 'Move to Prey', regions: ['ready'], action: cardActions.movePrey },
 ];
 
-function buttonVisible(btn: ButtonConfig, region: string, locked: boolean, contested: boolean, isOwner: boolean, isChild: boolean, minion: boolean): boolean {
+function buttonVisible(btn: ButtonConfig, region: string, locked: boolean, contested: boolean, isOwner: boolean, isChild: boolean, minion: boolean, faceDown: boolean, controlledByViewer: boolean): boolean {
   if (!btn.regions.includes(region)) return false;
   if (btn.lockState && btn.lockState !== (locked ? 'locked' : 'unlocked')) return false;
   if (btn.contested !== undefined && btn.contested !== contested) return false;
@@ -98,6 +104,8 @@ function buttonVisible(btn: ButtonConfig, region: string, locked: boolean, conte
   if (btn.topLevelOnly && isChild) return false;
   if (btn.minionOnly && !minion) return false;
   if (btn.nonMinionOnly && minion) return false;
+  if (btn.controllerOnly && !controlledByViewer) return false;
+  if (btn.faceDown !== undefined && btn.faceDown !== faceDown) return false;
   return true;
 }
 
@@ -288,7 +296,7 @@ export function CardActionModal({
             )}
             <div className="mt-2 flex flex-wrap justify-center">
               {BUTTONS.map((btn) =>
-                buttonVisible(btn, ctx.regionCommandKey, locked, contested, isOwner, ctx.isChild, minion) ? (
+                buttonVisible(btn, ctx.regionCommandKey, locked, contested, isOwner, ctx.isChild, minion, !!card.faceDown, ctx.controlledByViewer) ? (
                   <button key={btn.key} type="button" className={ACTION_BTN} title={btn.title} onClick={() => doAction(btn.action)}>
                     {btn.label}
                   </button>

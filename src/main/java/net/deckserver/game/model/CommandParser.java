@@ -20,12 +20,14 @@ class CommandParser {
 
     final String[] args;
     private final JolGame game;
+    private final String actor;
     private int ind;
 
-    public CommandParser(String[] args, int ind, JolGame game) {
+    public CommandParser(String[] args, int ind, JolGame game, String actor) {
         this.args = args;
         this.ind = ind;
         this.game = game;
+        this.actor = actor;
     }
 
     private String[] translateNextPosition(boolean allowRandom) throws CommandException {
@@ -145,6 +147,11 @@ class CommandParser {
 
         if (targetCard == null && greedy) {
             throw new CommandException("Invalid card position");
+        }
+        if (targetCard != null && targetCard.isFaceDown() && !targetCard.getRegion().getOwner().equals(actor)) {
+            // A face-down card is out of play for most intents — only its
+            // controller may name it as a target (to reveal / act on it).
+            throw new CommandException("That card is face down — only its controller can target it");
         }
         return targetCard;
     }

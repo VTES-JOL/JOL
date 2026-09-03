@@ -30,24 +30,24 @@ import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
  * GameSnapshot's javadoc), no shared mutable state, safe to call from any
  * number of concurrent requests.
  *
- * <p>The hidden-card visibility rule below replicates a genuinely subtle piece
- * of region.jsp/card.jsp behavior, traced carefully since getting it wrong
- * either leaks an opponent's hidden card identity (security) or incorrectly
- * hides something legacy shows (correctness):
+ * <p>The visibility rule lives entirely in {@link CardVisibility#visibleTo} and
+ * is applied to <em>every</em> node in the card tree by {@link #mapCard} —
+ * getting it wrong either leaks a hidden card's identity (security) or hides
+ * something legacy shows (correctness):
  * <ul>
  *   <li>A card directly in a region is visible if the region itself is visible
  *       to the viewer ({@link RegionType#isVisible}), or the region's hand is
  *       "open" (revealed to everyone), or the card's owner differs from the
  *       region's owning player (a "foreign" card — e.g. a stolen vampire —
  *       sitting in someone else's region is always shown).</li>
- *   <li>Once a card is visible, every card nested under it (equipment, allies,
- *       blood counters, ...) is visible unconditionally, regardless of that
- *       nested card's own owner — card.jsp's own recursive include never
- *       re-applies the owner/region check, only the top-level region.jsp call
- *       does.</li>
- *   <li>A hidden card renders as a bare placeholder: only its id and counter
- *       count cross the wire, nothing else identifying — matching
- *       card-hidden.jsp, which never recurses into a hidden card's children.</li>
+ *   <li>A face-down card overrides all of the above: it is visible only to its
+ *       controller (the player whose board it sits on). Because the check runs
+ *       per node, a face-down card may carry visible children and a visible
+ *       card may carry a face-down child — each is resolved on its own.</li>
+ *   <li>A withheld card renders as a bare placeholder: id, counter count, and
+ *       (for a face-down card) the {@code faceDown} flag and any still-visible
+ *       children; nothing identifying. A hidden hand card carries no children,
+ *       matching card-hidden.jsp.</li>
  * </ul>
  */
 public class GameSnapshotFactory {
@@ -133,15 +133,14 @@ public class GameSnapshotFactory {
 
         // Play-modal data (modes / replace rules / preamble / cost) is only
         // ever used from the viewer's own hand or research region — enrich just
-        // those cards rather than bloating every snapshot card with it.
+        // those cards rather than bloating every snapshot card with it. A
+        // face-down card the viewer controls is also enriched (mapCard), since
+        // it stays playable from wherever it sits.
         boolean enrich = (type == RegionType.HAND || type == RegionType.RESEARCH) && regionOwner.equals(viewer);
 
         List<CardData> cards = game.data().getPlayerRegion(regionOwner, type).getCards();
         List<CardSnapshot> cardSnapshots = cards.stream()
-                .map(card -> {
-                    boolean visible = regionVisible || !card.getOwnerName().equals(regionOwner);
-                    return visible ? buildVisibleCard(card, enrich) : hiddenCard(card);
-                })
+                .map(card -> mapCard(card, regionOwner, viewer, regionVisible, enrich))
                 .toList();
 
         return RegionSnapshot.builder()
@@ -173,6 +172,24 @@ public class GameSnapshotFactory {
         };
     }
 
+    /**
+     * The per-node visibility gate — every card in the tree (region children and
+     * every nested card) goes through here, so the face-down / region / foreign
+     * cascade in {@link CardVisibility} is applied at each level rather than only
+     * at the top (a face-down card may carry visible children, and vice versa).
+     */
+    private static CardSnapshot mapCard(CardData card, String regionOwner, String viewer, boolean regionVisible, boolean regionEnrich) {
+        if (CardVisibility.visibleTo(card, regionOwner, viewer, regionVisible)) {
+            boolean enrich = regionEnrich || (card.isFaceDown() && regionOwner.equals(viewer));
+            return buildVisibleCard(card, regionOwner, viewer, regionVisible, enrich);
+        }
+        return card.isFaceDown()
+                ? faceDownCard(card, regionOwner, viewer, regionVisible)
+                : hiddenCard(card);
+    }
+
+    // A hidden hand card: nothing identifying, and nothing visible beneath it
+    // (card-hidden.jsp never recursed).
     private static CardSnapshot hiddenCard(CardData card) {
         return CardSnapshot.builder()
                 .id(card.getId())
@@ -182,18 +199,33 @@ public class GameSnapshotFactory {
                 .build();
     }
 
-    // Every card nested under a visible card is visible unconditionally —
-    // see the class javadoc.
-    private static CardSnapshot buildVisibleCard(CardData card, boolean enrich) {
+    // A face-down card the viewer does not control: identity withheld, but it
+    // sits in a visible region and may (rarely) carry children whose own
+    // visibility is unaffected — so its subtree is still walked node by node.
+    private static CardSnapshot faceDownCard(CardData card, String regionOwner, String viewer, boolean regionVisible) {
+        List<CardSnapshot> nested = card.getCards().stream()
+                .map(c -> mapCard(c, regionOwner, viewer, regionVisible, false))
+                .toList();
+        return CardSnapshot.builder()
+                .id(card.getId())
+                .visible(false)
+                .faceDown(true)
+                .counters(card.getCounters())
+                .cards(nested)
+                .build();
+    }
+
+    private static CardSnapshot buildVisibleCard(CardData card, String regionOwner, String viewer, boolean regionVisible, boolean enrich) {
         CardDetail detail = new CardDetail(card);
         Card definition = CardRegistry.findById(detail.getCardId());
         boolean advanced = definition instanceof CryptCard c && c.advanced();
         List<CardSnapshot> nested = card.getCards().stream()
-                .map(nestedCard -> buildVisibleCard(nestedCard, enrich))
+                .map(nestedCard -> mapCard(nestedCard, regionOwner, viewer, regionVisible, enrich))
                 .toList();
         CardSnapshot.CardSnapshotBuilder builder = CardSnapshot.builder()
                 .id(card.getId())
                 .visible(true)
+                .faceDown(card.isFaceDown())
                 .counters(card.getCounters())
                 .cardId(detail.getCardId())
                 .name(definition != null ? definition.name() : card.getName())

@@ -109,6 +109,7 @@ public record JolGame(String id, GameData data) {
     public void discard(String player, String cardId, boolean random) {
         String cardLink;
         CardData card = data.getCard(cardId);
+        card.setFaceDown(false); // a card's identity becomes public as it leaves play
         RegionData destination = data.getPlayer(player).getRegion(RegionType.ASH_HEAP);
         destination.addCard(card, false);
         cardLink = getCardLink(card.getCardId(), card.getName(), card.isAdvanced());
@@ -116,13 +117,9 @@ public record JolGame(String id, GameData data) {
         ChatService.sendCommand(id, player, message, "discard", cardId, player, RegionType.ASH_HEAP.xmlLabel());
     }
 
-    public void playCard(String player, String cardId, String destinationPlayer, RegionType destinationRegion, String targetId, String[] modes) {
-        // Common
+    public void playCard(String player, String cardId, String destinationPlayer, RegionType destinationRegion, String targetId, String[] modes, boolean faceDown) {
         StringBuilder modeMessage = new StringBuilder();
-        String sourceMessage;
-        String destinationMessage;
         String playerTitle = destinationPlayer.equals(player) ? "their" : destinationPlayer + "'s";
-        String cardLink;
 
         if (modes != null) {
             for (String mode : modes)
@@ -134,8 +131,13 @@ public record JolGame(String id, GameData data) {
         RegionData source = card.getRegion();
         RegionData destination = data.getPlayerRegion(destinationPlayer, destinationRegion);
 
-        cardLink = getCardLink(card.getCardId(), card.getName(), card.isAdvanced());
-        sourceMessage = RegionType.HAND.equals(source.getType()) ? "" : " from their " + source.getType().xmlLabel();
+        // Playing a card resolves it: a face-down card being played "for real"
+        // from the table is revealed by the act. The flag only ever sets it the
+        // other way.
+        card.setFaceDown(faceDown);
+
+        String sourceMessage = RegionType.HAND.equals(source.getType()) ? "" : " from their " + source.getType().xmlLabel();
+        String destinationMessage;
         if (target == null) {
             destinationMessage = RegionType.ASH_HEAP.equals(destinationRegion) ? "" : String.format(" to %s %s", playerTitle, destinationRegion.xmlLabel());
             destination.addCard(card, false);
@@ -144,21 +146,51 @@ public record JolGame(String id, GameData data) {
             target.add(card, false);
         }
 
-        if (destinationRegion.equals(RegionType.READY)) {
-            List<CardData> cards = data.getUniqueCards(card);
-            if (cards.size() > 1) {
-                cards.forEach(c -> {
-                    c.setContested(true);
-                });
-                ChatService.sendSystemMessage(id, String.format("%s is now contested.", getCardLink(card)));
-
-            }
+        if (faceDown) {
+            // S1: no card token, no catalog id — identity lives only on CardData.
+            // Contest (unique cards) is re-checked when the card is revealed.
+            String message = String.format("plays a card face down%s%s.", sourceMessage, destinationMessage);
+            ChatService.sendCommand(id, player, message, "play", cardId, destinationPlayer, destinationRegion.xmlLabel());
+            return;
         }
 
+        if (destinationRegion.equals(RegionType.READY)) {
+            checkContested(card);
+        }
 
+        String cardLink = getCardLink(card.getCardId(), card.getName(), card.isAdvanced());
         String message = String.format("plays %s%s%s%s.", cardLink, sourceMessage, modeMessage, destinationMessage);
         ChatService.sendCommand(id, player, message, "play", cardId, destinationPlayer, destinationRegion.xmlLabel());
+    }
 
+    /** Mark every copy of a unique card in play as contested (and announce it). */
+    private void checkContested(CardData card) {
+        List<CardData> cards = data.getUniqueCards(card);
+        if (cards.size() > 1) {
+            cards.forEach(c -> c.setContested(true));
+            ChatService.sendSystemMessage(id, String.format("%s is now contested.", getCardLink(card)));
+        }
+    }
+
+    /**
+     * Toggle a card's face-down state ({@code hide} / {@code reveal}). Caller
+     * (DoCommand) has already checked the actor controls the card. Revealing a
+     * unique card in the ready region re-runs the contest check that
+     * {@link #playCard} skipped while it was hidden; hiding a card does
+     * <em>not</em> clear contests on other copies — that stays a manual step for
+     * their controllers.
+     */
+    public void setCardFaceDown(String player, String cardId, boolean faceDown) {
+        CardData card = data.getCard(cardId);
+        card.setFaceDown(faceDown);
+        if (faceDown) {
+            ChatService.sendCommand(id, player, String.format("turns %s face down.", getCardLink(card)), "hide", card.getId());
+        } else {
+            ChatService.sendCommand(id, player, String.format("reveals %s.", getCardLink(card)), "reveal", card.getId());
+            if (RegionType.READY.equals(card.getRegion().getType())) {
+                checkContested(card);
+            }
+        }
     }
 
     public void influenceCard(String player, String cardId) {
@@ -686,7 +718,7 @@ public record JolGame(String id, GameData data) {
         ChatService.sendCommand(id, player, msg, "show", targetRegion.xmlLabel(), String.valueOf(max), String.join(" ", recipients));
     }
 
-    public void moveToCard(String player, String srcCardId, String dstCardId) throws CommandException {
+    public void moveToCard(String player, String srcCardId, String dstCardId, boolean faceDown) throws CommandException {
         if (srcCardId.equals(dstCardId)) throw new CommandException("Can't move a card to itself");
         {
             CardData srcCard = data.getCard(srcCardId);
@@ -701,7 +733,11 @@ public record JolGame(String id, GameData data) {
             }
             RegionData dstRegion = dstCard.getRegion();
 
-            String message = String.format("puts %s on %s.", getCardName(srcCard, dstRegion), getTargetCardName(dstCard, player));
+            boolean hideIdentity = faceDown || srcCard.isFaceDown();
+            if (faceDown) srcCard.setFaceDown(true);
+            String srcName = hideIdentity ? "a card" : getCardName(srcCard, dstRegion);
+            String faceDownSuffix = srcCard.isFaceDown() ? " face down" : "";
+            String message = String.format("puts %s on %s%s.", srcName, getTargetCardName(dstCard, player), faceDownSuffix);
             ChatService.sendCommand(id, player, message, "move", srcCard.getId(), dstCard.getId());
             dstCard.add(srcCard, false);
         }
@@ -725,7 +761,9 @@ public record JolGame(String id, GameData data) {
 
         boolean sameOwner = card.getOwnerName().equals(player);
         String cardName;
-        if (RegionType.OTHER_HIDDEN_REGIONS.contains(cardRegion)) {
+        if (card.isFaceDown() || RegionType.OTHER_HIDDEN_REGIONS.contains(cardRegion)) {
+            // A face-down card is identified by position only — naming it here
+            // would leak its identity to everyone via the play/move chat line.
             String coordinates = getIndexCoordinates(card);
             cardName = "Card #" + coordinates;
         } else {
@@ -837,6 +875,7 @@ public record JolGame(String id, GameData data) {
         String owner = card.getOwnerName();
         RegionData region = data.getPlayerRegion(owner, RegionType.ASH_HEAP);
         card.setNotes(null);
+        card.setFaceDown(false);
         region.addCard(card, false);
         int counters = card.getCounters();
         if (counters > 0) {
@@ -849,15 +888,19 @@ public record JolGame(String id, GameData data) {
         _drawCard(player, srcRegion, destRegion, true);
     }
 
-    void moveToRegion(String player, String cardId, String destPlayer, RegionType destRegion, boolean top) {
+    void moveToRegion(String player, String cardId, String destPlayer, RegionType destRegion, boolean top, boolean faceDown) {
         {
             CardData card = data.getCard(cardId);
             RegionData sourceRegion = card.getRegion();
             RegionData destinationRegion = data.getPlayerRegion(destPlayer, destRegion);
+            boolean hideIdentity = faceDown || card.isFaceDown();
+            if (faceDown) card.setFaceDown(true);
             boolean sameOwner = Stream.of(sourceRegion.getOwner(), destinationRegion.getOwner()).allMatch(c -> c.equals(player));
             String topMessage = top ? "the top of " : "";
             String playerName = sameOwner ? "their" : destinationRegion.getOwner() + "'s";
-            String message = String.format("moves %s to %s%s %s.", getCardName(card, destinationRegion), topMessage, playerName, destRegion.xmlLabel());
+            String cardName = hideIdentity ? "a card" : getCardName(card, destinationRegion);
+            String faceDownSuffix = card.isFaceDown() ? " face down" : "";
+            String message = String.format("moves %s to %s%s %s%s.", cardName, topMessage, playerName, destRegion.xmlLabel(), faceDownSuffix);
             ChatService.sendCommand(id, player, message, "move", card.getId(), destPlayer, destRegion.xmlLabel(), top ? "top" : "bottom");
             destinationRegion.addCard(card, top);
         }
@@ -866,6 +909,7 @@ public record JolGame(String id, GameData data) {
     void burn(String player, String cardId, String srcPlayer, RegionType srcRegion, boolean random) {
         {
             CardData card = data.getCard(cardId);
+            card.setFaceDown(false); // a card's identity becomes public as it leaves play
             String owner = card.getOwnerName();
             RegionData destination = data.getPlayerRegion(player, RegionType.ASH_HEAP);
             boolean showRegionOwner = !player.equals(srcPlayer);
@@ -884,6 +928,7 @@ public record JolGame(String id, GameData data) {
     void rfg(String player, String cardId, String srcPlayer, RegionType srcRegion, boolean random) {
         {
             CardData card = data.getCard(cardId);
+            card.setFaceDown(false); // a card's identity becomes public as it leaves play
             String owner = card.getOwnerName();
             RegionData destination = data.getPlayerRegion(owner, RegionType.REMOVED_FROM_GAME);
             destination.addCard(card, false);

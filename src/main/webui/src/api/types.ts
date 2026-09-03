@@ -406,13 +406,17 @@ export interface DeckPageBean {
   formatValidity: Record<string, DeckValidity>;
 }
 
-// net.deckserver.rest.bean.CardSnapshot — recursive; children of a visible
-// card are always visible too, see GameSnapshotFactory's javadoc. When
-// `visible` is false every field below `counters` is absent.
+// net.deckserver.rest.bean.CardSnapshot — recursive. Each node is gated
+// independently by CardVisibility (a face-down card may sit under a visible
+// parent and vice versa). When `visible` is false every field below
+// `faceDown` is absent. `faceDown` is present on both forms: on the visible
+// card it's the controller's own view (render it distinctly); on the withheld
+// placeholder it means "render a card back", not the hidden-hand asterisks.
 export interface CardSnapshot {
   id: string;
   visible: boolean;
   counters: number;
+  faceDown?: boolean;
   cardId?: string;
   name?: string;
   advanced?: boolean;
