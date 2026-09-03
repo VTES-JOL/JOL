@@ -31,11 +31,51 @@
 
 .help-prose h3 {
     font-size: 1.05rem;
+    margin-top: 1.5rem;
 }
 
 .help-prose p,
 .help-prose li {
     line-height: 1.55;
+}
+
+/* MDX <p> carries no margin (Tailwind Preflight zeroes it), so consecutive
+   paragraphs would otherwise butt together. */
+.help-prose p {
+    margin: 0 0 0.85rem;
+}
+
+/* Preflight also strips list markers, padding and margin from ul/ol — restore
+   them just inside the prose column so authored markdown lists read as lists. */
+.help-prose ul,
+.help-prose ol {
+    margin: 0 0 1rem;
+    padding-left: 1.5rem;
+}
+
+.help-prose ul {
+    list-style: disc;
+}
+
+.help-prose ol {
+    list-style: decimal;
+}
+
+.help-prose li {
+    margin-bottom: 0.35rem;
+}
+
+.help-prose li::marker {
+    color: var(--jt-ink-muted);
+}
+
+.help-prose li:last-child {
+    margin-bottom: 0;
+}
+
+.help-prose li > ul,
+.help-prose li > ol {
+    margin: 0.35rem 0 0;
 }
 
 /* Card-name mentions (CardLink, and the real Card/DeckPreview components'

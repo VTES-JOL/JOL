@@ -38,8 +38,11 @@
 }
 
 .help-nav-link.active {
-    background-color: color-mix(in oklab, var(--jt-accent) 12%, transparent);
+    background-color: color-mix(in oklab, var(--jt-accent) 16%, transparent);
     border-color: var(--jt-line-accent);
+    border-left-color: var(--jt-accent);
+    border-left-width: 3px;
+    padding-left: calc(0.75rem - 2px);
     color: var(--jt-ink);
 }
 
@@ -57,6 +60,9 @@
     flex: 1 1 auto;
     min-height: 0;
     min-width: 0;
+    /* The prose column caps at 46rem; cap the panel not far past that so wide
+       screens don't leave a vast empty surface to the right of the text. */
+    max-width: 56rem;
     overflow-y: auto;
     /* Sit on a surface like every other page's content, instead of flush on
        the app background. */

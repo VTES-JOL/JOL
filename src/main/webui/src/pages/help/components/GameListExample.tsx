@@ -65,8 +65,11 @@ export function GameListExample({ children }: { children: ReactNode }) {
     };
   });
 
+  // Height follows the row count (a docs mock is 1–3 rows) rather than a fixed
+  // 18rem box that left dead space under a short list; cap it so a longer
+  // example still scrolls internally.
   return (
-    <div className="my-3 flex flex-col" style={{ maxWidth: '26rem', height: '18rem' }}>
+    <div className="my-3 flex flex-col" style={{ maxWidth: '26rem', maxHeight: '18rem' }}>
       <GameList games={games} selectedName={null} onSelect={() => {}} onNew={() => {}} />
     </div>
   );
