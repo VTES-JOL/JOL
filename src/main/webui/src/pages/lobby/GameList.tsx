@@ -1,57 +1,59 @@
-import { Gamepad2, PlusCircle, User } from 'lucide-react';
+import { Gamepad2, Globe, Lock, PlusCircle, Users } from 'lucide-react';
 import type { GameStatusBean } from '../../api/types';
+import type { BadgeVariant } from '../../components/ui/Badge';
 import { relativeTime } from '../../utils/relativeTime';
 import { Panel } from '../../components/ui/Panel';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
 
-const REL_LABEL: Record<string, string> = { OWNER: 'Owner', REGISTERED: 'Registered', INVITED: 'Invited', OPEN: 'Open' };
-const REL_CLASS: Record<string, string> = {
-  OWNER: 'text-accent',
-  REGISTERED: 'text-online',
-  INVITED: 'text-gold',
-  OPEN: 'text-ink-muted',
+// GameCleanUp.STALE_LOBBY_DAYS — a public lobby game is removed this many days
+// after its last activity (game.updated). Deck registration / invites bump it.
+const STALE_LOBBY_DAYS = 5;
+
+const REL_BADGE: Record<string, { label: string; variant: BadgeVariant }> = {
+  OWNER: { label: 'Owner', variant: 'accent' },
+  REGISTERED: { label: 'Registered', variant: 'online' },
+  INVITED: { label: 'Invited', variant: 'gold' },
+  OPEN: { label: 'Open', variant: 'muted' },
 };
 
 function GameListItem({ game, selected, onSelect }: { game: GameStatusBean; selected: boolean; onSelect: () => void }) {
-  const relLabel = (game.playerRelationship && REL_LABEL[game.playerRelationship]) || '';
-  const relClass = (game.playerRelationship && REL_CLASS[game.playerRelationship]) || 'text-ink-muted';
+  const rel = game.playerRelationship ? REL_BADGE[game.playerRelationship] : undefined;
   const registeredCount = game.registrations.filter((r) => r.registered).length;
   const totalCount = game.registrations.length;
+  const isPublic = game.visibility === 'PUBLIC';
+  const closesAt =
+    isPublic && game.updated
+      ? new Date(new Date(game.updated).getTime() + STALE_LOBBY_DAYS * 86_400_000).toISOString()
+      : null;
 
   return (
     <button
       type="button"
       onClick={onSelect}
-      className={`w-full text-left px-3 py-2 border-b border-line transition-colors ${
-        selected ? 'bg-accent/10 text-ink' : 'text-ink-secondary hover:bg-hover'
+      className={`w-full text-left px-3 py-2.5 border-b border-line transition-colors ${
+        selected ? 'bg-accent/10' : 'hover:bg-hover'
       }`}
     >
-      <div className="flex justify-between items-start gap-2">
+      <div className="flex items-start justify-between gap-2">
         <span className="font-semibold text-ink break-words">{game.name}</span>
-        <Badge variant={game.visibility === 'PUBLIC' ? 'online' : 'muted'}>{game.visibility}</Badge>
+        {rel && <Badge variant={rel.variant}>{rel.label}</Badge>}
       </div>
-      <div className="flex justify-between items-center mt-1">
+      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-ink-muted">
         <Badge variant="format">{game.format}</Badge>
-        <span className={`text-xs ${relClass}`}>{relLabel}</span>
-      </div>
-      {(game.visibility === 'PUBLIC' || totalCount > 0) && (
-        <div className="flex justify-between items-center mt-1 text-xs text-ink-muted">
-          <span className="flex items-center gap-1">
-            {totalCount > 0 && (
-              <>
-                {registeredCount}/{totalCount} <User size={12} />
-              </>
-            )}
+        <span className="inline-flex items-center gap-1">
+          {isPublic ? <Globe size={11} /> : <Lock size={11} />}
+          {isPublic ? 'Public' : 'Private'}
+        </span>
+        {totalCount > 0 && (
+          <span className="inline-flex items-center gap-1">
+            <Users size={11} />
+            {registeredCount}/{totalCount} registered
           </span>
-          {game.visibility === 'PUBLIC' && game.created && (
-            <span>
-              closes {relativeTime(new Date(new Date(game.created).getTime() + 5 * 24 * 60 * 60 * 1000).toISOString())}
-            </span>
-          )}
-        </div>
-      )}
+        )}
+        {closesAt && <span>· closes {relativeTime(closesAt)}</span>}
+      </div>
     </button>
   );
 }
@@ -70,6 +72,9 @@ export function GameList({
   return (
     <Panel
       title="Games"
+      // The MasterDetailView tab strip already labels this pane on mobile.
+      titleClassName="hidden lg:block"
+      headerClassName="max-lg:justify-end"
       right={
         <Button variant="secondary" size="sm" icon={<PlusCircle size={14} />} onClick={onNew}>
           New

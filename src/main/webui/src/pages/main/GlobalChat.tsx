@@ -287,7 +287,7 @@ export function GlobalChat() {
                 </span>
                 <span>
                   {' '}
-                  {showPlayerLabel && (
+                  {showPlayerLabel && entry.player !== 'SYSTEM' && (
                     <>
                       <b>{entry.player}</b>{' '}
                     </>

@@ -70,6 +70,15 @@ public class JolAdmin {
         if (gameName.length() > 2 && notExistsGame(gameName)) {
             try {
                 GameService.create(gameName, gameId, playerName, Visibility.fromBoolean(isPublic), format);
+                // Seat the creator straight away so they show up in the players
+                // list and get the "register your deck" control — without this a
+                // private-game owner has no path to register a deck or start the
+                // game (there's no self-Join button for a private game).
+                // PublicGameBuilder creates its games with a "SYSTEM" owner and
+                // calls GameService.create directly, so it never lands here.
+                if (playerName != null && !playerName.isBlank() && PlayerService.existsPlayer(playerName)) {
+                    RegistrationService.invitePlayer(gameName, playerName);
+                }
                 WebSocketRegistry.notifyInvalidate(List.of("nav"));
                 WebSocketRegistry.notifyInvalidate(List.of("watch"));
                 WebSocketRegistry.notifyInvalidate(List.of("main-games"));

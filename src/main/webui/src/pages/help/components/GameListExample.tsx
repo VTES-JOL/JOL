@@ -10,7 +10,8 @@ export interface GameExampleProps {
   relationship?: PlayerRelationship;
   registered?: number;
   total?: number;
-  createdDaysAgo?: number;
+  /** Days since the game's last activity — drives the "closes in N days" label. */
+  updatedDaysAgo?: number;
 }
 
 // Marker only — GameListExample reads its props and never renders it
@@ -55,7 +56,7 @@ export function GameListExample({ children }: { children: ReactNode }) {
       predator: null,
       prey: null,
       turn: null,
-      created: p.createdDaysAgo != null ? new Date(now - p.createdDaysAgo * 86_400_000).toISOString() : null,
+      updated: p.updatedDaysAgo != null ? new Date(now - p.updatedDaysAgo * 86_400_000).toISOString() : null,
       playerRelationship: p.relationship ?? null,
     };
   });

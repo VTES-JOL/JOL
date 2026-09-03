@@ -62,7 +62,9 @@ export interface GameStatusBean {
   predator: string | null;
   prey: string | null;
   turn: string | null;
-  created: string | null;
+  // Last-activity time, not creation — GameCleanUp closes a stale public lobby
+  // game 5 days after this. The "closes in N days" label is derived from it.
+  updated: string | null;
   playerRelationship: PlayerRelationship;
 }
 

@@ -44,7 +44,8 @@ public class LobbyResource extends BaseResource {
                         || (JolAdmin.isStarting(gameName) && RegistrationService.isInGame(gameName, player)))
                 .distinct()
                 .map(gameName -> new GameStatusBean(gameName, player))
-                .sorted(Comparator.comparing(GameStatusBean::getFormat).thenComparing(GameStatusBean::getCreated))
+                .sorted(Comparator.comparing(GameStatusBean::getFormat)
+                        .thenComparing(GameStatusBean::getUpdated, Comparator.nullsLast(Comparator.naturalOrder())))
                 .toList();
     }
 
@@ -88,6 +89,13 @@ public class LobbyResource extends BaseResource {
         }
         if (!JolAdmin.isStarting(game)) {
             throw new WebApplicationException(Response.status(Response.Status.CONFLICT).entity("Game is not in starting status").build());
+        }
+        long registered = RegistrationService.getRegisteredPlayerCount(game);
+        if (registered < 2) {
+            String reason = registered == 0
+                    ? "No one has registered a deck for this game yet."
+                    : "Only one player has registered a deck — you need at least two to start.";
+            throw new WebApplicationException(Response.status(Response.Status.CONFLICT).entity(reason).build());
         }
         if (!JolAdmin.startGame(game)) {
             throw new WebApplicationException(Response.status(Response.Status.CONFLICT)

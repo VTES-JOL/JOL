@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 /** Small status/label pill, ported from jol-quarkus. Tailwind Tailwind-based. */
-type BadgeVariant = 'format' | 'accent' | 'blood' | 'online' | 'muted';
+export type BadgeVariant = 'format' | 'accent' | 'blood' | 'online' | 'gold' | 'muted';
 type BadgeSize = 'xs' | 'sm';
 
 interface BadgeProps {
@@ -16,6 +16,7 @@ const VARIANT_CLASSES: Record<BadgeVariant, string> = {
   accent: 'bg-accent/15 text-accent-soft rounded',
   blood: 'bg-blood/15 text-blood-soft rounded',
   online: 'bg-online/15 text-online rounded',
+  gold: 'bg-gold/15 text-gold rounded',
   muted: 'bg-hover text-ink-muted rounded',
 };
 

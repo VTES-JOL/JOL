@@ -24,7 +24,10 @@ public class GameStatusBean {
     private final String gameStatus;
     private final List<RegistrationStatus> registrations;
     private final Map<String, PlayerStatus> players;
-    private final OffsetDateTime created;
+    // Last-activity time (registration, invite, …), not creation time — this is
+    // what GameCleanUp measures its 5-day stale-lobby window against, so the
+    // client's "closes in N days" label is derived from it.
+    private final OffsetDateTime updated;
     private final String format;
     private final String activePlayer;
     private final String predator;
@@ -69,7 +72,7 @@ public class GameStatusBean {
             this.prey = null;
             this.turn = null;
         }
-        created = JolAdmin.getUpdatedTime(gameName);
+        updated = JolAdmin.getUpdatedTime(gameName);
         if (playerName == null) {
             this.playerRelationship = null;
         } else if (this.owner.equals(playerName)) {
@@ -83,8 +86,8 @@ public class GameStatusBean {
         }
     }
 
-    public String getCreated() {
-        return Optional.ofNullable(created)
+    public String getUpdated() {
+        return Optional.ofNullable(updated)
                 .map(value -> value.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
                 .orElse(null);
     }
