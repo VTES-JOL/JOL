@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
-import { SortIcon, useTableSort } from './statsUtils';
-
-type SortMode = 'default' | 'percent' | 'duration' | 'boolean';
+import { Spinner } from '../../../components/ui/Spinner';
+import { SortIndicator, useTableSort, type SortMode, type SortSpec } from './statsUtils';
 
 export interface StatsColumn<Row> {
   /** Sort key + React key. Use a stable synthetic string for computed columns. */
@@ -9,6 +8,8 @@ export interface StatsColumn<Row> {
   header: ReactNode;
   /** Omit to make the column non-sortable (renders no sort control). */
   sortMode?: SortMode;
+  /** Extra control rendered on its own line under the header label (e.g. a threshold input). */
+  headerAux?: ReactNode;
   /** Cell content. Defaults to `String(row[key])`. */
   render?: (row: Row) => ReactNode;
   /** Adds a text filter input to the header; rows match case-insensitively. */
@@ -28,27 +29,34 @@ interface Props<Row extends Record<string, unknown>> {
   columns: ReadonlyArray<StatsColumn<Row>>;
   /** Stable key per row. */
   rowKey: (row: Row, index: number) => string | number;
-  /** Scroll container max height. Default `78vh`. */
+  /** Column the table sorts by on first render. */
+  defaultSort?: SortSpec<Row>;
+  /** Show a spinner instead of the (possibly stale/empty) table body. */
+  loading?: boolean;
+  /** Scroll container max height. Default `72vh`. */
   maxHeight?: string;
 }
 
+const FILTER_INPUT =
+  'mt-1 block w-full max-w-[10rem] rounded border border-line/60 bg-surface/70 px-1.5 py-0.5 text-xs font-normal text-ink outline-none focus:border-accent/60';
+
 /**
  * The sortable, per-column-filterable stats grid every watch/stats/ tab was
- * hand-rolling: a scroll container + sticky `<thead>` + `<SortIcon>` per
- * column + a `<tbody>` map, plus the `.filter(row => …includes…)` chain for
- * columns with a text box in their header. Sorting is `useTableSort` (per
- * ds.js's numeric-aware compare); this only owns the surrounding markup and
- * the filter wiring. `StatsDtoTable` is the players/decks/nations preset
- * built on top of it.
+ * hand-rolling. Sorting is `useTableSort` (per ds.js's numeric-aware compare);
+ * this owns the surrounding markup, the filter wiring, the active-column sort
+ * indicator, the loading state and the row count. `StatsDtoTable` is the
+ * players/decks/nations preset built on top of it.
  */
 export function SortableStatsTable<Row extends Record<string, unknown>>({
   rows,
   columns,
   rowKey,
-  maxHeight = '78vh',
+  defaultSort,
+  loading,
+  maxHeight = '72vh',
 }: Props<Row>) {
   // useTableSort copies before sorting, so passing the array through is safe.
-  const { sorted, toggle } = useTableSort<Row>(rows as Row[]);
+  const { sorted, toggle, activeKey, direction } = useTableSort<Row>(rows as Row[], defaultSort);
 
   const filtered = sorted.filter((row) =>
     columns.every((col) => {
@@ -58,56 +66,91 @@ export function SortableStatsTable<Row extends Record<string, unknown>>({
     }),
   );
 
+  const anyFilterActive = columns.some((c) => c.filter && c.filter.value.trim() !== '');
+  const countLabel = anyFilterActive
+    ? `${filtered.length} of ${rows.length}`
+    : `${rows.length} ${rows.length === 1 ? 'row' : 'rows'}`;
+
   return (
-    <div className="overflow-auto pb-3" style={{ maxHeight }}>
-      <table className="w-full text-sm border-separate border-spacing-0">
-        <thead>
-          <tr>
-            {columns.map((col) => (
-              <th
-                key={col.key}
-                className={`sticky top-0 bg-panel text-left font-semibold text-ink-muted px-2 py-1.5 border-b border-line align-bottom whitespace-nowrap${
-                  col.thClassName ? ` ${col.thClassName}` : ''
-                }`}
-              >
-                {col.header}
-                {col.filter && (
-                  <input
-                    type="text"
-                    className="ml-1 w-24 rounded border border-line/60 bg-surface/70 px-1.5 py-0.5 text-xs font-normal text-ink outline-none focus:border-accent/60"
-                    placeholder={col.filter.placeholder}
-                    value={col.filter.value}
-                    onChange={(e) => col.filter!.onChange(e.target.value)}
-                  />
-                )}
-                {col.sortMode && (
-                  <SortIcon
-                    column={col.key as keyof Row}
-                    onSort={toggle}
-                    mode={col.sortMode === 'default' ? undefined : col.sortMode}
-                  />
-                )}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((row, i) => (
-            <tr key={rowKey(row, i)} className="hover:bg-hover">
-              {columns.map((col) => (
-                <td
-                  key={col.key}
-                  className={`px-2 py-1 border-b border-line/50 text-ink${
-                    col.tdClassName ? ` ${col.tdClassName}` : ''
-                  }`}
-                >
-                  {col.render ? col.render(row) : String(row[col.key] ?? '')}
-                </td>
-              ))}
+    <div className="flex flex-col min-h-0">
+      <div className="overflow-auto pb-1" style={{ maxHeight }}>
+        <table className="w-full text-sm border-separate border-spacing-0">
+          <thead>
+            <tr>
+              {columns.map((col) => {
+                const sortState =
+                  col.sortMode && activeKey === (col.key as keyof Row)
+                    ? (direction ?? 'asc')
+                    : 'none';
+                return (
+                  <th
+                    key={col.key}
+                    className={`sticky top-0 z-10 bg-panel text-left font-semibold text-ink-muted px-2 py-1.5 border-b border-line align-bottom whitespace-nowrap${
+                      col.thClassName ? ` ${col.thClassName}` : ''
+                    }`}
+                  >
+                    {col.sortMode ? (
+                      <button
+                        type="button"
+                        className="group inline-flex items-center font-semibold text-ink-muted hover:text-ink"
+                        onClick={() => toggle(col.key as keyof Row, col.sortMode === 'default' ? undefined : col.sortMode)}
+                      >
+                        {col.header}
+                        <SortIndicator state={sortState} />
+                      </button>
+                    ) : (
+                      col.header
+                    )}
+                    {col.filter && (
+                      <input
+                        type="text"
+                        className={FILTER_INPUT}
+                        placeholder={col.filter.placeholder ?? 'filter…'}
+                        value={col.filter.value}
+                        onChange={(e) => col.filter!.onChange(e.target.value)}
+                      />
+                    )}
+                    {col.headerAux}
+                  </th>
+                );
+              })}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan={columns.length} className="px-2 py-10 text-center">
+                  <Spinner />
+                </td>
+              </tr>
+            ) : filtered.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length} className="px-2 py-8 text-center text-sm text-ink-muted">
+                  {rows.length === 0 ? 'No data for this filter range.' : 'No rows match your filter.'}
+                </td>
+              </tr>
+            ) : (
+              filtered.map((row, i) => (
+                <tr key={rowKey(row, i)} className="hover:bg-hover">
+                  {columns.map((col) => (
+                    <td
+                      key={col.key}
+                      className={`px-2 py-1 border-b border-line/50 text-ink${
+                        col.tdClassName ? ` ${col.tdClassName}` : ''
+                      }`}
+                    >
+                      {col.render ? col.render(row) : String(row[col.key] ?? '')}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+      {!loading && rows.length > 0 && (
+        <div className="shrink-0 px-2 pt-1 text-right text-xs text-ink-muted">{countLabel}</div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ChevronsUpDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react';
 
 // Mirrors ds.js's sortTable()/sortPercentageTable(): numeric-aware string
 // compare, or percent-string compare, toggling independently per column
@@ -30,14 +30,25 @@ export function parseDurationSeconds(duration: string): number {
   );
 }
 
-type SortMode = 'default' | 'percent' | 'duration' | 'boolean';
+export type SortMode = 'default' | 'percent' | 'duration' | 'boolean';
 
-export function useTableSort<T extends Record<string, unknown>>(rows: T[]) {
-  const [directions, setDirections] = useState<Partial<Record<keyof T, boolean>>>({});
-  const [active, setActive] = useState<{ key: keyof T; mode: SortMode } | null>(null);
+export interface SortSpec<T> {
+  key: keyof T;
+  mode?: SortMode;
+  /** Initial direction for this column when it first becomes active. Default ascending. */
+  ascending?: boolean;
+}
+
+export function useTableSort<T extends Record<string, unknown>>(rows: T[], initial?: SortSpec<T>) {
+  const [directions, setDirections] = useState<Partial<Record<keyof T, boolean>>>(
+    initial ? { [initial.key]: initial.ascending ?? true } as Partial<Record<keyof T, boolean>> : {},
+  );
+  const [active, setActive] = useState<{ key: keyof T; mode: SortMode } | null>(
+    initial ? { key: initial.key, mode: initial.mode ?? 'default' } : null,
+  );
 
   const toggle = (key: keyof T, mode: SortMode = 'default') => {
-    setDirections((prev) => ({ ...prev, [key]: !prev[key] }));
+    setDirections((prev) => ({ ...prev, [key]: !(prev[key] ?? true) }));
     setActive({ key, mode });
   };
 
@@ -65,16 +76,18 @@ export function useTableSort<T extends Record<string, unknown>>(rows: T[]) {
     return copy;
   }, [rows, active, directions]);
 
-  return { sorted, toggle };
+  const direction: 'asc' | 'desc' | null = active
+    ? (directions[active.key] ?? true)
+      ? 'asc'
+      : 'desc'
+    : null;
+
+  return { sorted, toggle, activeKey: (active?.key ?? null) as keyof T | null, direction };
 }
 
-export function SortIcon<T>({ column, onSort, mode }: { column: keyof T; onSort: (key: keyof T, mode?: SortMode) => void; mode?: SortMode }) {
-  return (
-    <ChevronsUpDown
-      size={13}
-      role="button"
-      className="inline ml-1 text-ink-muted hover:text-ink cursor-pointer align-middle"
-      onClick={() => onSort(column, mode)}
-    />
-  );
+/** Column-header sort affordance: a direction arrow on the active column, a dim hint otherwise. */
+export function SortIndicator({ state }: { state: 'asc' | 'desc' | 'none' }) {
+  if (state === 'asc') return <ArrowUp size={13} className="inline ml-1 align-middle text-accent" />;
+  if (state === 'desc') return <ArrowDown size={13} className="inline ml-1 align-middle text-accent" />;
+  return <ChevronsUpDown size={13} className="inline ml-1 align-middle text-ink-muted/60 group-hover:text-ink-muted" />;
 }

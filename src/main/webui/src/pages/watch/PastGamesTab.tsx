@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Download, Search, Trophy } from 'lucide-react';
 import { api } from '../../api/client';
 import type { GameHistory, PlayerResult } from '../../api/types';
-import { runRequest } from '../../api/mutate';
+import { displayDeckName } from '../../utils/deckName';
 import { useQuery } from '@tanstack/react-query';
 import { Panel } from '../../components/ui/Panel';
 import { Button } from '../../components/ui/Button';
@@ -42,6 +42,37 @@ function downloadCsv(data: string, filename: string) {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+const csvCell = (v: string | number): string => {
+  const s = String(v ?? '');
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
+
+// Built client-side from the history already on the page — the old
+// /admin/export/games.csv endpoint is ADMIN-only, so it 403'd for every
+// non-admin who could see this button.
+function historyToCsv(history: GameHistory[]): string {
+  const rows = [['Game', 'Ended', 'Started', 'Rank', 'Player', 'Deck', 'VP', 'Game Win'].join(',')];
+  for (const g of history) {
+    sortResults(g.results).forEach((r, i) => {
+      rows.push(
+        [
+          g.name,
+          g.ended,
+          g.started,
+          i + 1,
+          r.playerName,
+          displayDeckName(r.deckName) ?? '',
+          r.victoryPoints || 0,
+          r.gameWin ? 'Y' : '',
+        ]
+          .map(csvCell)
+          .join(','),
+      );
+    });
+  }
+  return rows.join('\n');
 }
 
 function parseTitle(name: string): { tournament: boolean; title: string; sub: string } {
@@ -109,7 +140,7 @@ function PastGameCard({ game }: { game: GameHistory }) {
         {results.map((r, i) => {
           const vp = r.victoryPoints || 0;
           const winner = r.gameWin;
-          const deck = r.deckName && r.deckName !== '-- no deck name --' ? r.deckName : '';
+          const deck = displayDeckName(r.deckName) ?? '';
           return (
             <div
               key={r.playerName || i}
@@ -160,6 +191,13 @@ function PastGameCard({ game }: { game: GameHistory }) {
   );
 }
 
+// The full history is ~1300 games (~6k player rows); rendering every card up
+// front is what makes the first paint slow. Mount a screenful at a time and
+// grow the window as the user scrolls toward the bottom.
+const PAGE_SIZE = 60;
+// Pixels from the bottom of the scroll area at which the next page loads.
+const LOAD_AHEAD_PX = 900;
+
 export function PastGamesTab() {
   const { data: history = [] } = useQuery({
     queryKey: ['watch', 'history'],
@@ -168,12 +206,11 @@ export function PastGamesTab() {
 
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<SortKey>('newest');
+  const [limit, setLimit] = useState(PAGE_SIZE);
 
-  const exportCsv = () => {
-    runRequest(api.getText('/admin/export/games.csv'), 'Failed to export past games', (data) =>
-      downloadCsv(data, 'past-games.csv'),
-    );
-  };
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const exportCsv = () => downloadCsv(historyToCsv(history), 'past-games.csv');
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -208,6 +245,37 @@ export function PastGamesTab() {
     return games;
   }, [history, query, sort]);
 
+  // Reset the window (and scroll position) whenever the filter/sort changes, so
+  // a search doesn't leave you scrolled into whitespace past the new results.
+  const filterKey = `${query} ${sort}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
+    setLimit(PAGE_SIZE);
+  }
+  useEffect(() => {
+    scrollRef.current?.scrollTo?.({ top: 0 });
+  }, [filterKey]);
+
+  const shown = visible.slice(0, limit);
+  const hasMore = limit < visible.length;
+
+  // Grow the window as the user nears the bottom. A plain scroll handler rather
+  // than IntersectionObserver — the tab sits several nested flex/overflow
+  // containers deep and an element-rooted observer proved unreliable here.
+  const visibleLenRef = useRef(0);
+  visibleLenRef.current = visible.length;
+  const growIfNearBottom = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < LOAD_AHEAD_PX) {
+      setLimit((n) => (n < visibleLenRef.current ? n + PAGE_SIZE : n));
+    }
+  };
+  // Top up after each grow / filter change if the content still doesn't reach
+  // past the fold (tall screen).
+  useEffect(growIfNearBottom, [shown.length, filterKey]);
+
   const countLabel =
     query.trim() && history.length
       ? `${visible.length} of ${history.length} games`
@@ -217,12 +285,18 @@ export function PastGamesTab() {
     <Panel
       title="Past Games"
       right={
-        <Button variant="secondary" size="sm" icon={<Download size={14} />} onClick={exportCsv}>
+        <Button
+          variant="secondary"
+          size="sm"
+          icon={<Download size={14} />}
+          onClick={exportCsv}
+          disabled={history.length === 0}
+        >
           Export CSV
         </Button>
       }
     >
-      <div className="flex-1 min-h-0 overflow-auto">
+      <div ref={scrollRef} onScroll={growIfNearBottom} className="flex-1 min-h-0 overflow-auto">
         <div className="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-line bg-panel/80 px-3 py-2 backdrop-blur">
           <div className="flex-1 min-w-[200px] max-w-[320px]">
             <Input
@@ -259,11 +333,27 @@ export function PastGamesTab() {
             title={history.length === 0 ? 'No completed games yet.' : 'No games match your filter.'}
           />
         ) : (
-          <div className="grid gap-3 p-3 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))] items-start">
-            {visible.map((g) => (
-              <PastGameCard key={`${g.name}-${g.ended}`} game={g} />
-            ))}
-          </div>
+          <>
+            <div className="grid gap-3 p-3 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))] items-start">
+              {shown.map((g) => (
+                <PastGameCard key={`${g.name}-${g.ended}`} game={g} />
+              ))}
+            </div>
+            {hasMore && (
+              <div className="p-4 text-center text-xs text-ink-muted">
+                <button
+                  type="button"
+                  className="rounded border border-line px-3 py-1 hover:bg-hover hover:text-ink"
+                  onClick={() => setLimit((n) => n + PAGE_SIZE)}
+                >
+                  Show more
+                </button>
+                <span className="ml-2">
+                  {shown.length} of {visible.length}
+                </span>
+              </div>
+            )}
+          </>
         )}
       </div>
     </Panel>

@@ -6,6 +6,12 @@ interface Row extends StatsDto, Record<string, unknown> {
   key: string;
 }
 
+/** Render a count-ish stat: an en-dash for zero / "-" / blank, the value otherwise. */
+function countCell(value: string): ReactNode {
+  const n = parseFloat(value);
+  return !value || value === '-' || n === 0 ? <span className="text-ink-muted">–</span> : value;
+}
+
 // Shared row shape/sort logic behind /stats/players, /stats/decks, /stats/nations
 // (ds.js's createStats()) — the only real differences between those three tabs
 // are the name column's header/rendering, the threshold input, and whether the
@@ -13,6 +19,7 @@ interface Row extends StatsDto, Record<string, unknown> {
 // SortableStatsTable.
 export function StatsDtoTable({
   data,
+  loading,
   extended,
   nameHeader,
   renderName,
@@ -23,6 +30,7 @@ export function StatsDtoTable({
   filterValue = (key) => key,
 }: {
   data: Record<string, StatsDto>;
+  loading?: boolean;
   extended: boolean;
   nameHeader: string;
   renderName: (key: string) => ReactNode;
@@ -47,32 +55,40 @@ export function StatsDtoTable({
     {
       key: 'allGames',
       sortMode: 'default',
-      header: (
-        <>
-          Number of Games
-          <input
-            type="number"
-            min={0}
-            className="ml-1 w-14 rounded border border-line/60 bg-surface/70 px-1.5 py-0.5 text-xs font-normal text-ink outline-none focus:border-accent/60"
-            value={threshold}
-            onChange={(e) => onThresholdChange(e.target.value)}
-          />
-        </>
+      header: 'Number of Games',
+      headerAux: (
+        <input
+          type="number"
+          min={0}
+          aria-label="Minimum games"
+          placeholder="min games"
+          className="mt-1 block w-24 rounded border border-line/60 bg-surface/70 px-1.5 py-0.5 text-xs font-normal text-ink outline-none focus:border-accent/60"
+          value={threshold}
+          onChange={(e) => onThresholdChange(e.target.value)}
+        />
       ),
     },
-    { key: 'gwCount', header: 'GW Total ', sortMode: 'default' },
-    { key: 'vpCount', header: 'VP Total ', sortMode: 'default' },
-    { key: 'winRate', header: '% Win Rate ', sortMode: 'percent' },
-    { key: 'avgVp', header: 'Average VP ', sortMode: 'default' },
-    { key: 'highestVp', header: 'Highest VP ', sortMode: 'default' },
+    { key: 'gwCount', header: 'GW Total', sortMode: 'default', render: (r) => countCell(r.gwCount) },
+    { key: 'vpCount', header: 'VP Total', sortMode: 'default' },
+    { key: 'winRate', header: '% Win Rate', sortMode: 'percent' },
+    { key: 'avgVp', header: 'Average VP', sortMode: 'default' },
+    { key: 'highestVp', header: 'Highest VP', sortMode: 'default' },
     ...(extended
       ? ([
-          { key: 'uniqueOpponents', header: 'Unique Opponents ', sortMode: 'default' },
-          { key: 'mostPlayedOpponent', header: 'Most played Opponent ', sortMode: 'default' },
+          { key: 'uniqueOpponents', header: 'Unique Opponents', sortMode: 'default' },
+          { key: 'mostPlayedOpponent', header: 'Most Played Opponent', sortMode: 'default' },
         ] as StatsColumn<Row>[])
       : []),
-    { key: 'winStreak', header: 'Highest Win Streak ', sortMode: 'default' },
+    { key: 'winStreak', header: 'Highest Win Streak', sortMode: 'default', render: (r) => countCell(r.winStreak) },
   ];
 
-  return <SortableStatsTable<Row> rows={rows} columns={columns} rowKey={(r) => r.key} />;
+  return (
+    <SortableStatsTable<Row>
+      rows={rows}
+      columns={columns}
+      rowKey={(r) => r.key}
+      loading={loading}
+      defaultSort={{ key: 'allGames', ascending: false }}
+    />
+  );
 }

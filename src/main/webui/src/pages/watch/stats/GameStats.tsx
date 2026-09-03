@@ -7,7 +7,7 @@ import { useStatsQuery, type StatsFilters } from './useStatsQuery';
 interface Row extends GameDuration, Record<string, unknown> {}
 
 export function GameStats(filters: StatsFilters) {
-  const { data = [] } = useStatsQuery<GameDuration[]>('/stats/games', filters);
+  const { data = [], isPending } = useStatsQuery<GameDuration[]>('/stats/games', filters);
   const [nameFilter, setNameFilter] = useState('');
   const [playerFilter, setPlayerFilter] = useState('');
 
@@ -29,5 +29,13 @@ export function GameStats(filters: StatsFilters) {
     { key: 'vps', header: 'VPs ', sortMode: 'default' },
   ];
 
-  return <SortableStatsTable<Row> rows={data as Row[]} columns={columns} rowKey={(_, i) => i} />;
+  return (
+    <SortableStatsTable<Row>
+      rows={data as Row[]}
+      columns={columns}
+      rowKey={(_, i) => i}
+      loading={isPending}
+      defaultSort={{ key: 'duration', mode: 'duration', ascending: false }}
+    />
+  );
 }

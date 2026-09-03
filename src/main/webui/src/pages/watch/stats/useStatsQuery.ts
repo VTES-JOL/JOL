@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { api } from '../../../api/client';
 
 export interface StatsFilters {
@@ -20,5 +20,8 @@ export function useStatsQuery<T>(endpoint: string, { fromDate, toDate, isTourney
   return useQuery({
     queryKey: ['stats', endpoint, fromDate, toDate, isTourney, threshold],
     queryFn: () => api.post<T>(endpoint, { threshold: threshold, fromDate, toDate, isTourney }),
+    // Keep the previous table visible while a filter change refetches — only
+    // the very first load of a tab shows the spinner.
+    placeholderData: keepPreviousData,
   });
 }

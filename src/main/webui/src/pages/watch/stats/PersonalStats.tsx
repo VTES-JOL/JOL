@@ -17,7 +17,7 @@ interface OpponentRow extends OpponentStats, Record<string, unknown> {}
 interface DeckRow extends DeckMatchup, Record<string, unknown> {}
 
 function OpponentPerformance({ player, ...filters }: PersonalProps) {
-  const { data = {} } = useStatsQuery<Record<string, OpponentStats>>(
+  const { data = {}, isPending } = useStatsQuery<Record<string, OpponentStats>>(
     `/stats/performance/${encodeURIComponent(player)}/players`,
     filters,
   );
@@ -39,12 +39,17 @@ function OpponentPerformance({ player, ...filters }: PersonalProps) {
       rows={Object.values(data) as OpponentRow[]}
       columns={columns}
       rowKey={(r) => r.opponent}
+      loading={isPending}
+      defaultSort={{ key: 'games', ascending: false }}
     />
   );
 }
 
 function DeckPerformance({ player, ...filters }: PersonalProps) {
-  const { data = [] } = useStatsQuery<DeckMatchup[]>(`/stats/performance/${encodeURIComponent(player)}/decks`, filters);
+  const { data = [], isPending } = useStatsQuery<DeckMatchup[]>(
+    `/stats/performance/${encodeURIComponent(player)}/decks`,
+    filters,
+  );
   const [deckFilter, setDeckFilter] = useState('');
   const [opponentFilter, setOpponentFilter] = useState('');
   const [gamesFilter, setGamesFilter] = useState('');
@@ -67,7 +72,15 @@ function DeckPerformance({ player, ...filters }: PersonalProps) {
     { key: 'vpDifference', header: 'VP Difference ', sortMode: 'default' },
   ];
 
-  return <SortableStatsTable<DeckRow> rows={data as DeckRow[]} columns={columns} rowKey={(_, i) => i} />;
+  return (
+    <SortableStatsTable<DeckRow>
+      rows={data as DeckRow[]}
+      columns={columns}
+      rowKey={(_, i) => i}
+      loading={isPending}
+      defaultSort={{ key: 'games', ascending: false }}
+    />
+  );
 }
 
 export function PersonalStats({ player, ...filters }: PersonalProps) {

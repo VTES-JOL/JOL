@@ -19,7 +19,7 @@ const TABS: TabDef<StatsSubTab>[] = [
   { id: 'nation', label: 'Nations' },
   { id: 'personal', label: 'Personal' },
   { id: 'game', label: 'Games' },
-  { id: 'jol', label: 'Jol' },
+  { id: 'jol', label: 'JOL' },
 ];
 
 const DATE_INPUT =

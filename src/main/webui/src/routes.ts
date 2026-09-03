@@ -15,7 +15,9 @@ export const ROUTE_PATHS = {
   tournamentAdmin: '/jol/tournamentAdmin',
   tournament: '/jol/tournament',
   judge: '/jol/judge',
-  watch: '/jol/active',
+  // '/jol/active' is canonical (the nav links here); '/jol/watch' is the
+  // friendlier alias matching the nav label.
+  watch: ['/jol/active', '/jol/watch'] as const,
   lobby: '/jol/lobby',
   deck: '/jol/deck',
   game: '/jol/game/:gameId',

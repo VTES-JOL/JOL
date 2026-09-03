@@ -4,9 +4,9 @@ import { StatsDtoTable } from './StatsDtoTable';
 import { useStatsQuery, type StatsFilters } from './useStatsQuery';
 
 export function PlayerStats(filters: StatsFilters) {
-  const [threshold, setThreshold] = useState('0');
+  const [threshold, setThreshold] = useState('');
   const [nameFilter, setNameFilter] = useState('');
-  const { data = {} } = useStatsQuery<Record<string, StatsDto>>('/stats/players', {
+  const { data = {}, isPending } = useStatsQuery<Record<string, StatsDto>>('/stats/players', {
     ...filters,
     threshold: Number(threshold) || 0,
   });
@@ -14,6 +14,7 @@ export function PlayerStats(filters: StatsFilters) {
   return (
     <StatsDtoTable
       data={data}
+      loading={isPending}
       extended
       nameHeader="Player"
       renderName={(key) => key}

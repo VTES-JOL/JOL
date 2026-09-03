@@ -70,7 +70,9 @@ export function AppShell() {
             <Route path={ROUTE_PATHS.tournamentAdmin} element={<TournamentAdminPage />} />
             <Route path={ROUTE_PATHS.tournament} element={<TournamentPage />} />
             <Route path={ROUTE_PATHS.judge} element={<JudgePage />} />
-            <Route path={ROUTE_PATHS.watch} element={<WatchPage />} />
+            {ROUTE_PATHS.watch.map((path) => (
+              <Route key={path} path={path} element={<WatchPage />} />
+            ))}
             <Route path={ROUTE_PATHS.lobby} element={<LobbyPage />} />
             <Route path={ROUTE_PATHS.deck} element={<DeckPage />} />
             <Route path={ROUTE_PATHS.game} element={<GamePage />} />
@@ -78,6 +80,8 @@ export function AppShell() {
               <Route index element={<Navigate to={pathForHelp(HELP_SECTIONS[0].slug)} replace />} />
               <Route path=":section" element={<HelpSection />} />
             </Route>
+            {/* Unknown path → home, instead of the shell rendering an empty content area. */}
+            <Route path="*" element={<Navigate to={ROUTE_PATHS.main[0]} replace />} />
           </Routes>
         </Suspense>
         {!online && <ReconnectingOverlay everConnected={everConnected} />}
