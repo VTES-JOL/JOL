@@ -67,7 +67,13 @@ export function JudgeRequestModal({
     );
 
   const retract = async () => {
-    if (!(await confirmDialog('Retract this judge request?'))) return;
+    if (
+      !(await confirmDialog('The judge will no longer see this request.', {
+        title: 'Retract this request?',
+        confirmLabel: 'Retract',
+      }))
+    )
+      return;
     call(() =>
       runRequest(
         api.post<GameSnapshot>(`/game/${gameId}/judge-request/retract`),

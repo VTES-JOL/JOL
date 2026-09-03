@@ -58,6 +58,12 @@
     min-height: 0;
     min-width: 0;
     overflow-y: auto;
+    /* Sit on a surface like every other page's content, instead of flush on
+       the app background. */
+    background-color: var(--jt-surface);
+    border: 1px solid var(--jt-line-accent);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
 }
 
 @media (min-width: 992px) {
@@ -68,5 +74,9 @@
     .help-sidebar {
         flex: 0 0 18rem;
         min-width: 0;
+        background-color: var(--jt-surface);
+        border: 1px solid var(--jt-line-accent);
+        border-radius: 0.5rem;
+        padding: 0.75rem;
     }
 }

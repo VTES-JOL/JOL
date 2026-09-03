@@ -120,7 +120,13 @@ export function CommandForm({
   };
 
   const endTurn = async () => {
-    if (!(await confirmDialog('Are you sure you want to end your turn?'))) return;
+    if (
+      !(await confirmDialog('Play passes to the next player.', {
+        title: 'End your turn?',
+        confirmLabel: 'End turn',
+      }))
+    )
+      return;
     guard(() => runRequest(api.post<GameSnapshot>(`/game/${gameId}/view/end-turn`), 'Failed to end turn', onUpdated));
   };
 

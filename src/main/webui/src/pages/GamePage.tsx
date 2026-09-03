@@ -1,11 +1,12 @@
 import { useCallback, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { CardSnapshot, GameSnapshot } from '../api/types';
 import { useAuth } from '../auth/useAuth';
 import { useGameSocket } from '../ws/useGameSocket';
 import { runRequest } from '../api/mutate';
+import { Button } from '../components/ui/Button';
 import { Spinner } from '../components/ui/Spinner';
 import { useCardTooltips } from '../hooks/useCardTooltips';
 import { useSubmitGuard } from '../hooks/useSubmitGuard';
@@ -28,6 +29,7 @@ import './GamePage.css';
 // form and the quick-command/quick-chat modals live in CommandForm.
 export function GamePage() {
   const { gameId } = useParams<{ gameId: string }>();
+  const navigate = useNavigate();
   const { player: viewerName } = useAuth();
   const queryClient = useQueryClient();
   const [showHistory, setShowHistory] = useState(false);
@@ -38,10 +40,11 @@ export function GamePage() {
   const boardRef = useRef<HTMLDivElement>(null);
   const { submitting, guard } = useSubmitGuard();
 
-  const { data: game } = useQuery({
+  const { data: game, isError, refetch } = useQuery({
     queryKey: ['game', gameId],
     queryFn: () => api.get<GameSnapshot>(`/game/${gameId}/view`),
     enabled: !!gameId,
+    retry: 1,
   });
   useGameSocket(gameId ?? null);
   useCardTooltips(boardRef, [game]);
@@ -93,7 +96,28 @@ export function GamePage() {
     setPlayModal({ ctx, card });
   }, []);
 
-  if (!game || !gameId) {
+  if (!gameId || (isError && !game)) {
+    return (
+      <div className="flex flex-1 min-h-0 flex-col items-center justify-center gap-3 bg-base p-8 text-center">
+        <p className="text-sm text-ink">This game couldn’t be loaded.</p>
+        <p className="text-xs text-ink-muted">
+          It may have been closed, or you don’t have access to it.
+        </p>
+        <div className="mt-1 flex gap-2">
+          {gameId && (
+            <Button variant="secondary" size="sm" onClick={() => refetch()}>
+              Try again
+            </Button>
+          )}
+          <Button variant="primary" size="sm" onClick={() => navigate('/jol/')}>
+            Back to lobby
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!game) {
     return (
       <div className="flex flex-1 min-h-0 items-center justify-center bg-base">
         <Spinner />

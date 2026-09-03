@@ -22,6 +22,14 @@ export const queryClient = new QueryClient({
     queries: {
       staleTime: 30_000,
       refetchOnWindowFocus: false,
+      // 'always', not the default 'online': this app has its own connectivity
+      // layer (stores/connectivity.ts, fed from client.ts) and drives the
+      // reconnect overlay from that. Leaving RQ's own online guess in charge
+      // lets it silently *pause* a query's retries when it believes the tab is
+      // offline — which strands the page on its loading spinner with no error
+      // and no retry (a real 4xx/5xx never surfaces). Run the queryFn
+      // regardless and let a genuine network failure reject normally.
+      networkMode: 'always',
     },
   },
 });

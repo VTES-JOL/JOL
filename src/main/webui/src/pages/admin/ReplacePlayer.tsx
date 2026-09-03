@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardBody } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button';
 import { api } from '../../api/client';
 import { runRequest } from '../../api/mutate';
+import { confirmDialog } from '../../stores/dialog';
 import { AdminSelect, toOptions, useAdminGames } from './adminControls';
 
 export function ReplacePlayer() {
@@ -16,6 +17,7 @@ export function ReplacePlayer() {
   const [existingPlayer, setExistingPlayer] = useState('');
   const [pickedSubstitute, setPickedSubstitute] = useState('');
   const newPlayer = pickedSubstitute || substitutes[0] || '';
+  const gameName = gameOptions.find((o) => o.value === gameId)?.label ?? gameId;
 
   useEffect(() => {
     if (!gameId) {
@@ -31,8 +33,16 @@ export function ReplacePlayer() {
       .catch((err) => console.error('Failed to load game players', err));
   }, [gameId]);
 
-  const submit = () => {
+  const submit = async () => {
     if (!gameId || !existingPlayer || !newPlayer) return;
+    if (
+      !(await confirmDialog(`${existingPlayer} is swapped out of ${gameName} and ${newPlayer} takes over their seat, deck and hand.`, {
+        title: 'Replace this player?',
+        confirmLabel: 'Replace player',
+        danger: true,
+      }))
+    )
+      return;
     runRequest(
       api.put(`/admin-page/games/${encodeURIComponent(gameId)}/replace-player`, { existingPlayer, newPlayer }),
       'Failed to replace player',

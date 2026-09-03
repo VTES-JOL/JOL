@@ -18,6 +18,23 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Pre-paint the saved theme before the bundle loads so a reload doesn't
+      // flash light. Mirrors the apply logic in src/theme.ts — keep in sync.
+      (function () {
+        try {
+          var p = localStorage.getItem('jol-theme') || 'system';
+          var dark =
+            p === 'dark' ||
+            (p === 'system' &&
+              window.matchMedia &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) document.body.setAttribute('data-bs-theme', 'dark');
+        } catch (e) {
+          /* storage unavailable — render light */
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

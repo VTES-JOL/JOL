@@ -1,20 +1,49 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Bell, TriangleAlert } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bell, Gamepad2, TriangleAlert } from 'lucide-react';
 import { api } from '../../api/client';
 import type { GamesSummary, GameStatusBean } from '../../api/types';
 import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
+import { EmptyState } from '../../components/ui/EmptyState';
 import { TabBar } from '../../components/TabBar';
 import { useAuth } from '../../auth/useAuth';
 import { pathForGame } from '../../routes';
 
 type TabId = 'myGames' | 'tournamentGames' | 'oustedGames';
 
-const TABS: { id: TabId; label: string; field: keyof GamesSummary; showSeatRow: boolean; emptyMessage: string }[] = [
-  { id: 'myGames', label: 'Active', field: 'games', showSeatRow: true, emptyMessage: 'No active games. Start or join one from the Lobby.' },
-  { id: 'tournamentGames', label: 'Tournament', field: 'tournament', showSeatRow: true, emptyMessage: 'No tournament games in progress.' },
-  { id: 'oustedGames', label: 'Ousted', field: 'ousted', showSeatRow: false, emptyMessage: 'No ousted games to review.' },
+const TABS: {
+  id: TabId;
+  label: string;
+  field: keyof GamesSummary;
+  showSeatRow: boolean;
+  emptyTitle: string;
+  emptyHint: string;
+}[] = [
+  {
+    id: 'myGames',
+    label: 'Active',
+    field: 'games',
+    showSeatRow: true,
+    emptyTitle: 'No active games',
+    emptyHint: 'Start or join one from the Lobby.',
+  },
+  {
+    id: 'tournamentGames',
+    label: 'Tournament',
+    field: 'tournament',
+    showSeatRow: true,
+    emptyTitle: 'No tournament games',
+    emptyHint: 'Games from tournaments you’re in show up here.',
+  },
+  {
+    id: 'oustedGames',
+    label: 'Ousted',
+    field: 'ousted',
+    showSeatRow: false,
+    emptyTitle: 'No ousted games',
+    emptyHint: 'Games where you’ve been ousted stay here for review.',
+  },
 ];
 
 function SeatRow({ game }: { game: GameStatusBean }) {
@@ -84,7 +113,7 @@ export function GamesPanel() {
       />
       <div className="flex-1 min-h-0 overflow-y-auto">
         {games.length === 0 ? (
-          <div className="text-ink-muted text-sm text-center p-4">{tab.emptyMessage}</div>
+          <EmptyState icon={Gamepad2} title={tab.emptyTitle} description={tab.emptyHint} />
         ) : (
           <ul className="list-none">
             {games.map((game) => (

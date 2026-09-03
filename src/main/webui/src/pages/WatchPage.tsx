@@ -16,9 +16,11 @@ export function WatchPage() {
   const [tab, setTab] = useState<MainTab>('active');
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 p-4 bg-base text-ink">
-      <TabBar tabs={TABS} active={tab} onChange={setTab} />
-      <div className="flex-1 min-h-0 mt-3 flex flex-col">
+    <div className="flex flex-col flex-1 min-h-0 gap-3 p-4 bg-base text-ink">
+      <div className="shrink-0 rounded-lg border border-line-accent bg-surface/85 px-2 backdrop-blur-md">
+        <TabBar tabs={TABS} active={tab} onChange={setTab} />
+      </div>
+      <div className="flex-1 min-h-0 flex flex-col">
         {tab === 'active' && <ActiveGamesTab />}
         {tab === 'past' && <PastGamesTab />}
         {tab === 'stats' && <StatsTab />}

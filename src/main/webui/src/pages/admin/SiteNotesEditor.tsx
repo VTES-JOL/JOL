@@ -27,7 +27,14 @@ export function SiteNotesEditor() {
   };
 
   const clear = async () => {
-    if (!(await confirmDialog('Clear the site notes?'))) return;
+    if (
+      !(await confirmDialog('The notes shown on the main page will be emptied.', {
+        title: 'Clear the site notes?',
+        confirmLabel: 'Clear',
+        danger: true,
+      }))
+    )
+      return;
     runRequest(api.del('/admin-page/site-notes'), 'Failed to clear site notes', refresh);
   };
 
@@ -37,7 +44,7 @@ export function SiteNotesEditor() {
         <CardTitle>Site Notes</CardTitle>
       </CardHeader>
       <CardBody className="flex flex-col gap-2">
-        <Textarea id="siteNotesText" label="Markdown" rows={6} value={text} onChange={(e) => setText(e.target.value)} />
+        <Textarea id="siteNotesText" label="Markdown" rows={10} value={text} onChange={(e) => setText(e.target.value)} />
         <div className="flex gap-2">
           <Button variant="secondary" size="sm" onClick={save}>
             Save

@@ -26,8 +26,8 @@ export function ImportTablesModal({
     }
     if (
       !(await confirmDialog(
-        'Import Tournament Tables from CSV? This replaces the current round/table assignments, and if the tournament has already started, existing tables/games for it will be deleted.',
-        { danger: true },
+        'This replaces the current round and table assignments. If the tournament has already started, its existing tables and games are deleted.',
+        { title: 'Import tables from CSV?', confirmLabel: 'Import', danger: true },
       ))
     ) {
       return;

@@ -139,7 +139,13 @@ export function DraftTableManager({
   };
 
   const saveTables = async () => {
-    if (!(await confirmDialog('Are you sure you want to SAVE the Tournament Tables?'))) return;
+    if (
+      !(await confirmDialog('Players will see the new seating immediately.', {
+        title: 'Save these tables?',
+        confirmLabel: 'Save tables',
+      }))
+    )
+      return;
     const body: Record<number, Record<number, string[]>> = {};
     roundNumbers.forEach((round) => {
       const tables = state.tables[round] ?? [];
@@ -161,7 +167,13 @@ export function DraftTableManager({
   };
 
   const createTables = async () => {
-    if (!(await confirmDialog('Are you sure you want to create the Tournament Tables?'))) return;
+    if (
+      !(await confirmDialog('This generates seating for every registered player.', {
+        title: 'Create the tables?',
+        confirmLabel: 'Create tables',
+      }))
+    )
+      return;
     setCreateError('');
     api
       .post(`/tournament/${encodeURIComponent(tournamentName)}/tables`)

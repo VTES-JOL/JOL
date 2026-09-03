@@ -1,9 +1,10 @@
-import { PlusCircle, User } from 'lucide-react';
+import { Gamepad2, PlusCircle, User } from 'lucide-react';
 import type { GameStatusBean } from '../../api/types';
 import { relativeTime } from '../../utils/relativeTime';
 import { Panel } from '../../components/ui/Panel';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
+import { EmptyState } from '../../components/ui/EmptyState';
 
 const REL_LABEL: Record<string, string> = { OWNER: 'Owner', REGISTERED: 'Registered', INVITED: 'Invited', OPEN: 'Open' };
 const REL_CLASS: Record<string, string> = {
@@ -76,9 +77,17 @@ export function GameList({
       }
     >
       <div className="flex-1 min-h-0 overflow-y-auto">
-        {games.map((g) => (
-          <GameListItem key={g.name} game={g} selected={g.name === selectedName} onSelect={() => onSelect(g)} />
-        ))}
+        {games.length === 0 ? (
+          <EmptyState
+            icon={Gamepad2}
+            title="No games yet"
+            description="Create one, or wait for a public game to open."
+          />
+        ) : (
+          games.map((g) => (
+            <GameListItem key={g.name} game={g} selected={g.name === selectedName} onSelect={() => onSelect(g)} />
+          ))
+        )}
       </div>
     </Panel>
   );

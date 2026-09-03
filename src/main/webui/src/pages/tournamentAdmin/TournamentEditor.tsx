@@ -182,7 +182,13 @@ export function TournamentEditor({
 
   const publish = async () => {
     if (!form.name) return;
-    if (!(await confirmDialog(`Publish "${form.name}"? Players will be able to see and register for this tournament.`))) return;
+    if (
+      !(await confirmDialog('Players will be able to see and register for it.', {
+        title: `Publish “${form.name}”?`,
+        confirmLabel: 'Publish',
+      }))
+    )
+      return;
     api
       .post<boolean>(`/tournament/${encodeURIComponent(form.name)}/publish`)
       .then((success) => {

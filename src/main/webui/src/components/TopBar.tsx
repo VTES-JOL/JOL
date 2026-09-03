@@ -1,20 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, LogOut, Menu, Moon, UserCircle } from 'lucide-react';
+import { ChevronDown, LogOut, Menu, UserCircle } from 'lucide-react';
 import { useNav } from '../auth/useNav';
 import { pathForGame, pathForView, pathForHelp } from '../routes';
 import { logout as logoutRequest } from '../pages/login/authApi';
 import { CountryFlag } from './CountryFlag';
-
-function toggleDarkMode() {
-  const isDark = document.body.getAttribute('data-bs-theme') !== 'dark';
-  if (isDark) {
-    document.body.setAttribute('data-bs-theme', 'dark');
-  } else {
-    document.body.removeAttribute('data-bs-theme');
-  }
-  localStorage.setItem('jol-theme', isDark ? 'dark' : '');
-}
 
 function logout() {
   // Hard redirect (not client-side navigation) is deliberate: the whole
@@ -155,21 +145,6 @@ export function TopBar() {
                   <Link className={MENU_ITEM} to={pathForView('profile')} onClick={() => setOpen(null)}>
                     <UserCircle size={14} /> Profile
                   </Link>
-                </li>
-                <li>
-                  <hr className="border-line my-1" />
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className={MENU_ITEM}
-                    onClick={() => {
-                      toggleDarkMode();
-                      setOpen(null);
-                    }}
-                  >
-                    <Moon size={14} /> Dark Mode
-                  </button>
                 </li>
                 <li>
                   <hr className="border-line my-1" />

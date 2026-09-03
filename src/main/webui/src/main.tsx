@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { initTheme } from './theme';
 import './index.css';
 // App-authored global styles — fonts, tokens/typography, the shared
 // card-visuals vocabulary (icon/card-name — see card-visuals.css's header for
@@ -10,6 +11,8 @@ import './styles/theme.css';
 import './styles/card-visuals.css';
 import './styles/markdown.css';
 import './styles/tailwind.css';
+
+initTheme();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -42,12 +42,25 @@ export function GameDetail({
   const encodedName = encodeURIComponent(game.name);
 
   const startGame = async () => {
-    if (!(await confirmDialog('Start Game?'))) return;
+    if (
+      !(await confirmDialog('Once the game starts, players can’t be added or swapped except by an admin.', {
+        title: 'Start this game?',
+        confirmLabel: 'Start game',
+      }))
+    )
+      return;
     runRequest(api.post(`/lobby/player/games/${encodedName}/start`), 'Failed to start game', onChanged);
   };
 
   const closeGame = async () => {
-    if (!(await confirmDialog('Close Game?', { danger: true }))) return;
+    if (
+      !(await confirmDialog('This ends the game for everyone and can’t be undone.', {
+        title: 'Close this game?',
+        confirmLabel: 'Close game',
+        danger: true,
+      }))
+    )
+      return;
     runRequest(api.del(`/lobby/player/games/${encodedName}`), 'Failed to close game', onChanged);
   };
 
@@ -57,7 +70,14 @@ export function GameDetail({
   };
 
   const leaveGame = async () => {
-    if (!player || !(await confirmDialog('Leave Game?'))) return;
+    if (
+      !player ||
+      !(await confirmDialog('Your seat and deck registration are released.', {
+        title: 'Leave this game?',
+        confirmLabel: 'Leave',
+      }))
+    )
+      return;
     runRequest(
       api.del(`/lobby/player/games/${encodedName}/invite/${encodeURIComponent(player)}`),
       'Failed to leave game',

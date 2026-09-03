@@ -17,6 +17,9 @@
 p.chat {
     margin: 0;
     color: var(--jt-ink);
+    /* Long card-name tokens and URLs must break rather than push the row
+       (and the page) wider than the viewport on narrow screens. */
+    overflow-wrap: anywhere;
 }
 
 p.chat a {

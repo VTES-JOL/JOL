@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Clock } from 'lucide-react';
 import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { TableEmpty } from '../../components/ui/TableEmpty';
 import { api } from '../../api/client';
 import type { IdleGame } from '../../api/types';
 import { pathForGame } from '../../routes';
@@ -17,7 +19,14 @@ export function IdleGames() {
   });
 
   const closeGame = async (gameId: string) => {
-    if (!(await confirmDialog('Are you sure you want to end this game?'))) return;
+    if (
+      !(await confirmDialog('The game is closed immediately for all players.', {
+        title: 'End this game?',
+        confirmLabel: 'End game',
+        danger: true,
+      }))
+    )
+      return;
     runRequest(api.del(`/admin-page/games/${encodeURIComponent(gameId)}`), 'Failed to end game', () => {
       queryClient.invalidateQueries({ queryKey: ['admin-page', 'games'] });
       queryClient.invalidateQueries({ queryKey: ['admin-page', 'idle-games'] });
@@ -42,6 +51,14 @@ export function IdleGames() {
               <th className="px-2 py-1.5 font-semibold border-b border-line">Action</th>
             </tr>
           </thead>
+          {idleGames.length === 0 ? (
+            <TableEmpty
+              colSpan={5}
+              icon={Clock}
+              title="No idle games"
+              description="Games where a player hasn’t acted in a while show up here."
+            />
+          ) : (
           <tbody>
             {idleGames.map((g) => {
               const players = Object.entries(g.idlePlayers);
@@ -72,6 +89,7 @@ export function IdleGames() {
               ));
             })}
           </tbody>
+          )}
         </table>
       </div>
     </Card>

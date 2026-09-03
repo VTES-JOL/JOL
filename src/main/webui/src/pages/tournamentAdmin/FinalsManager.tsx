@@ -140,7 +140,13 @@ function FinalTableBuilder({ tournamentName, onSaved }: { tournamentName: string
   };
 
   const startFinal = async () => {
-    if (!(await confirmDialog('Are you sure you want to START the FINAL?'))) return;
+    if (
+      !(await confirmDialog('Seating is locked and the final round begins for all five players.', {
+        title: 'Start the final?',
+        confirmLabel: 'Start final',
+      }))
+    )
+      return;
     runRequest(api.post(`/tournament/${encodeURIComponent(tournamentName)}/final`), 'Failed to start final', load);
   };
 

@@ -1,5 +1,4 @@
 import { type ReactNode, useEffect, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
 
 /**
  * Master/detail layout, ported from the jol-quarkus rewrite. Tailwind-based
@@ -7,8 +6,10 @@ import { ChevronDown } from 'lucide-react';
  *
  * Desktop (>= breakpoint): every panel shown side-by-side in a CSS grid
  * whose track sizes come from `columns`.
- * Mobile (< breakpoint): the panel list collapses into a dropdown selector;
- * only the selected panel renders.
+ * Mobile (< breakpoint): a scrollable segmented strip switches between
+ * panels, and only the selected panel renders. (A strip rather than a
+ * dropdown so it reads as navigation, not as a second copy of the panel's
+ * own title.)
  *
  * This is the Tailwind replacement for the Bootstrap-era SplitLayout — new
  * pages should use this; SplitLayout stays until its callers are migrated.
@@ -43,7 +44,6 @@ export function MasterDetailView({
 }: MasterDetailViewProps) {
   const controlled = onActiveKeyChange != null;
   const [internalKey, setInternalKey] = useState(activeKey ?? panels[0].key);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   // Uncontrolled: one-way sync from `activeKey` when its value changes.
   useEffect(() => {
@@ -54,10 +54,8 @@ export function MasterDetailView({
   }, [activeKey, controlled]);
 
   const selectedKey = controlled ? (activeKey ?? panels[0].key) : internalKey;
-  const selectedPanel = panels.find((p) => p.key === selectedKey) || panels[0];
 
   const handleSelect = (key: string) => {
-    setMobileNavOpen(false);
     if (controlled) onActiveKeyChange!(key);
     else setInternalKey(key);
   };
@@ -82,33 +80,27 @@ export function MasterDetailView({
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      {/* Mobile dropdown selector */}
-      <div className={`${mobileNavHidden} mb-4 shrink-0 relative z-20`}>
-        <button
-          onClick={() => setMobileNavOpen(!mobileNavOpen)}
-          className="w-full flex items-center justify-between px-4 py-3 bg-panel border border-line rounded-lg text-sm font-semibold text-ink shadow-sm"
-        >
-          <span className="truncate">{selectedPanel.label}</span>
-          <ChevronDown
-            className={`w-4 h-4 transition-transform ${mobileNavOpen ? 'rotate-180' : ''}`}
-          />
-        </button>
-
-        {mobileNavOpen && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-panel border border-line rounded-lg shadow-xl overflow-hidden z-30">
-            {panels.map((p) => (
-              <button
-                key={p.key}
-                onClick={() => handleSelect(p.key)}
-                className={`w-full text-left px-4 py-3 text-sm transition-colors hover:bg-hover ${
-                  p.key === selectedKey ? 'text-accent-soft font-bold' : 'text-ink'
-                }`}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-        )}
+      {/* Mobile panel switcher — a scrollable segmented strip */}
+      <div
+        className={`${mobileNavHidden} mb-4 shrink-0 flex gap-1 overflow-x-auto rounded-lg border border-line bg-panel p-1`}
+        role="tablist"
+      >
+        {panels.map((p) => (
+          <button
+            key={p.key}
+            type="button"
+            role="tab"
+            aria-selected={p.key === selectedKey}
+            onClick={() => handleSelect(p.key)}
+            className={`shrink-0 max-w-[45vw] truncate rounded px-3 py-1.5 text-sm transition-colors ${
+              p.key === selectedKey
+                ? 'bg-accent text-surface font-semibold'
+                : 'text-ink-secondary hover:bg-hover'
+            }`}
+          >
+            {p.label}
+          </button>
+        ))}
       </div>
 
       {/* Content area */}

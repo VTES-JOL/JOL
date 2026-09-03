@@ -6,6 +6,41 @@ import type { Profile } from '../../api/types';
 import { isPushSupported, subscribeToPush, unsubscribeFromPush } from '../../push/pushNotifications';
 import { alertDialog } from '../../stores/dialog';
 import { runRequest } from '../../api/mutate';
+import { setThemePref, useThemePref, type ThemePref } from '../../theme';
+
+const THEME_OPTIONS: { value: ThemePref; label: string }[] = [
+  { value: 'system', label: 'System' },
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+];
+
+function AppearanceControl() {
+  const pref = useThemePref();
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-sm text-ink">Appearance</span>
+      <div className="inline-flex w-fit overflow-hidden rounded border border-line-accent" role="group" aria-label="Appearance">
+        {THEME_OPTIONS.map((option, i) => (
+          <button
+            key={option.value}
+            type="button"
+            aria-pressed={pref === option.value}
+            onClick={() => setThemePref(option.value)}
+            className={`px-3 py-1 text-xs transition-colors cursor-pointer ${
+              i > 0 ? 'border-l border-line-accent' : ''
+            } ${
+              pref === option.value
+                ? 'bg-accent text-surface'
+                : 'text-ink-secondary hover:bg-hover hover:text-ink'
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (updated: Profile) => void }) {
   const [notificationsBusy, setNotificationsBusy] = useState(false);
@@ -51,6 +86,8 @@ export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (
         <CardTitle>Preferences</CardTitle>
       </CardHeader>
       <CardBody className="flex flex-col gap-3" id="playerPreferences">
+        <AppearanceControl />
+
         <Switch
           id="imageTooltips"
           label="Enable Image tooltips"

@@ -10,7 +10,13 @@ export function EndTurn() {
 
   const submit = async () => {
     if (!gameId) return;
-    if (!(await confirmDialog(`Are you sure you want to end turn for ${games[gameId]}`))) return;
+    if (
+      !(await confirmDialog(`This forces the current turn to end in ${games[gameId]}.`, {
+        title: 'End the current turn?',
+        confirmLabel: 'End turn',
+      }))
+    )
+      return;
     runRequest(api.post(`/admin-page/games/${encodeURIComponent(gameId)}/end-turn`), 'Failed to end turn');
   };
 

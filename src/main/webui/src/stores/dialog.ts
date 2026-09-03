@@ -10,7 +10,10 @@ import { useSyncExternalStore } from 'react';
 // required over useState+useEffect: the latter has a real gap between the
 // initial render's captured value and the effect attaching its listener).
 interface DialogRequest {
-  message: string;
+  // The consequence sentence shown under the title. Optional so a call can be
+  // title-only, though confirm dialogs should almost always state what the
+  // action does — see DialogHost.tsx.
+  message?: string;
   title?: string;
   confirmLabel?: string;
   cancelLabel?: string;

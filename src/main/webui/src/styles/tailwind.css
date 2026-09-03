@@ -5,7 +5,9 @@
 @import "tailwindcss/theme.css";
 @import "tailwindcss/preflight.css";
 
-/* jol toggles dark mode with body[data-bs-theme="dark"] (TopBar.tsx). */
+/* jol toggles dark mode with body[data-bs-theme="dark"] (src/theme.ts, set
+   from the Appearance control in Profile → Preferences and pre-painted by an
+   inline script in index.html). */
 @custom-variant dark (&:where(body[data-bs-theme="dark"], body[data-bs-theme="dark"] *));
 
 /* ── Design tokens carried over from the jol-quarkus rewrite ──────────── */

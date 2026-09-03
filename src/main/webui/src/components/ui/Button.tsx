@@ -7,7 +7,7 @@ import { Loader2 } from 'lucide-react';
  * legacy Bootstrap `.btn` classes. Use on pages already migrated off
  * Bootstrap.
  */
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'accent-ghost' | 'danger';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'accent-ghost' | 'danger' | 'danger-solid';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -23,6 +23,10 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   ghost: 'text-ink-secondary hover:text-ink hover:bg-hover',
   'accent-ghost': 'text-accent hover:text-accent-dim hover:bg-accent/10',
   danger: 'border border-blood/40 text-blood hover:bg-blood/10',
+  // Filled destructive — for the confirm button of a destructive dialog, where
+  // it needs to read as the weighty action. `danger` stays the outline style
+  // for inline/row actions.
+  'danger-solid': 'bg-blood text-white hover:bg-blood-bright',
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {

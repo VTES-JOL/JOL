@@ -38,7 +38,13 @@ export function OpenTournamentDetail({
   };
 
   const leave = async () => {
-    if (!(await confirmDialog('Leave Tournament?'))) return;
+    if (
+      !(await confirmDialog('Your registration and any submitted deck are withdrawn.', {
+        title: 'Leave this tournament?',
+        confirmLabel: 'Leave',
+      }))
+    )
+      return;
     runRequest(api.post(`/tournament/${encodeURIComponent(tournament.name)}/player/leave`), 'Failed to leave tournament', onJoinedOrLeft);
   };
 

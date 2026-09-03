@@ -1,6 +1,8 @@
+import { Trophy } from 'lucide-react';
 import type { TournamentMetadata } from '../../api/types';
 import { Panel } from '../../components/ui/Panel';
 import { Badge } from '../../components/ui/Badge';
+import { EmptyState } from '../../components/ui/EmptyState';
 import { relativeTime } from '../../utils/relativeTime';
 
 export type Selection = { type: 'open' | 'finals'; name: string } | null;
@@ -50,7 +52,13 @@ export function TournamentList({
             </button>
           );
         })}
-        {isEmpty && <p className="px-3 py-2 text-xs text-ink-muted">No tournaments available.</p>}
+        {isEmpty && (
+          <EmptyState
+            icon={Trophy}
+            title="No tournaments available"
+            description="Published tournaments open for registration appear here."
+          />
+        )}
       </div>
     </Panel>
   );

@@ -27,7 +27,14 @@ export function RollbackGame() {
 
   const submit = async () => {
     if (!gameId || !turn) return;
-    if (!(await confirmDialog(`Are you sure you want to rollback to turn ${turn} for ${games[gameId]}`))) return;
+    if (
+      !(await confirmDialog(`Every action after turn ${turn} in ${games[gameId]} is discarded for all players.`, {
+        title: `Roll back to turn ${turn}?`,
+        confirmLabel: 'Roll back',
+        danger: true,
+      }))
+    )
+      return;
     runRequest(api.post(`/admin-page/games/${encodeURIComponent(gameId)}/rollback`, { turn }), 'Failed to rollback game');
   };
 

@@ -32,7 +32,14 @@ export function RoundSummary({ tournamentName }: { tournamentName: string }) {
   const refresh = () => queryClient.invalidateQueries({ queryKey });
 
   const closeTable = async (round: number, table: number) => {
-    if (!(await confirmDialog('Close table and record VP/GW results?'))) return;
+    if (
+      !(await confirmDialog('The recorded VP and GW become final for this table.', {
+        title: 'Close table and record results?',
+        confirmLabel: 'Close table',
+        danger: true,
+      }))
+    )
+      return;
     runRequest(
       api.post<boolean>(`/tournament/${encodeURIComponent(tournamentName)}/round/${round}/table/${table}/close`),
       'Failed to close table',

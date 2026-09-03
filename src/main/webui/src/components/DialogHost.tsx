@@ -19,13 +19,20 @@ export function DialogHost() {
       footer={
         <>
           {request.mode === 'confirm' && (
-            <Button variant="secondary" size="sm" onClick={() => resolveDialog(false)}>
+            // On a destructive dialog the safe choice (Cancel) takes focus, so
+            // a reflexive Enter doesn't trigger the irreversible action.
+            <Button
+              variant="ghost"
+              size="sm"
+              autoFocus={request.danger}
+              onClick={() => resolveDialog(false)}
+            >
               {request.cancelLabel ?? 'Cancel'}
             </Button>
           )}
           <Button
-            autoFocus
-            variant={request.danger ? 'danger' : 'primary'}
+            autoFocus={!request.danger}
+            variant={request.danger ? 'danger-solid' : 'primary'}
             size="sm"
             onClick={() => resolveDialog(true)}
           >
@@ -34,7 +41,7 @@ export function DialogHost() {
         </>
       }
     >
-      <p className="text-sm text-ink">{request.message}</p>
+      {request.message && <p className="text-sm text-ink">{request.message}</p>}
     </Modal>
   );
 }

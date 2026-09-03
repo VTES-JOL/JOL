@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { Gamepad2 } from 'lucide-react';
 import { api } from '../../api/client';
 import type { GameSummary } from '../../api/types';
 import { pathForGame } from '../../routes';
 import { Panel } from '../../components/ui/Panel';
+import { TableEmpty } from '../../components/ui/TableEmpty';
 
 const TIMESTAMP_FORMAT = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'UTC',
@@ -42,19 +44,28 @@ export function ActiveGamesTab() {
               <th className={TH}>Updated</th>
             </tr>
           </thead>
-          <tbody>
-            {games.map((g) => (
-              <tr key={g.gameId} className="hover:bg-hover">
-                <td className={TD}>
-                  <Link to={pathForGame(g.gameId)} className="text-accent underline">
-                    {g.gameName}
-                  </Link>
-                </td>
-                <td className={TD}>{g.turn}</td>
-                <td className={TD}>{TIMESTAMP_FORMAT.format(new Date(g.timestamp))} UTC</td>
-              </tr>
-            ))}
-          </tbody>
+          {games.length === 0 ? (
+            <TableEmpty
+              colSpan={3}
+              icon={Gamepad2}
+              title="No games in progress"
+              description="Games show up here while they’re being played."
+            />
+          ) : (
+            <tbody>
+              {games.map((g) => (
+                <tr key={g.gameId} className="hover:bg-hover">
+                  <td className={TD}>
+                    <Link to={pathForGame(g.gameId)} className="text-accent underline">
+                      {g.gameName}
+                    </Link>
+                  </td>
+                  <td className={TD}>{g.turn}</td>
+                  <td className={TD}>{TIMESTAMP_FORMAT.format(new Date(g.timestamp))} UTC</td>
+                </tr>
+              ))}
+            </tbody>
+          )}
         </table>
       </div>
     </Panel>

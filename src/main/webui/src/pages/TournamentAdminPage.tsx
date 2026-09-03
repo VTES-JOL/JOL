@@ -52,7 +52,13 @@ export function TournamentAdminPage() {
   // TournamentEditor can't guard its own `tournamentName` prop changing out
   // from under it, so the confirm has to live here, at the two places that
   // actually change it.
-  const confirmDiscardIfDirty = async () => !editorDirtyRef.current || confirmDialog('Discard unsaved changes?');
+  const confirmDiscardIfDirty = async () =>
+    !editorDirtyRef.current ||
+    confirmDialog('Your edits to this tournament will be lost.', {
+      title: 'Discard unsaved changes?',
+      confirmLabel: 'Discard',
+      danger: true,
+    });
 
   const selectTournament = async (t: TournamentMetadata) => {
     if (!(await confirmDiscardIfDirty())) return;
