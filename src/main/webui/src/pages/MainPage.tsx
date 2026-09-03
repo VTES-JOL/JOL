@@ -44,7 +44,7 @@ export function MainPage() {
           mobilePane === 'info' ? 'hidden' : 'flex'
         }`}
       >
-        <div className="flex flex-col flex-1 min-h-0 min-w-0 md:flex-none md:w-1/3 lg:w-1/4">
+        <div className="flex flex-col flex-none min-h-0 min-w-0 md:w-1/3 lg:w-1/4">
           <GamesPanel />
         </div>
         <div className="flex flex-col flex-1 min-h-0 min-w-0">

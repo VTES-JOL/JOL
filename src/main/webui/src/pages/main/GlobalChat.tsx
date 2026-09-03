@@ -1,9 +1,11 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronsDown } from 'lucide-react';
+import { ChevronsDown, SendHorizontal } from 'lucide-react';
 import { api } from '../../api/client';
 import type { ChatEntry } from '../../api/types';
 import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Switch } from '../../components/ui/Switch';
 import { subscribe } from '../../stores/socket';
 import { useAuth } from '../../auth/useAuth';
 import { useCardTooltips } from '../../hooks/useCardTooltips';
@@ -42,6 +44,8 @@ function buildRenderedEntries(entries: ChatEntry[], player: string | null): Rend
   });
 }
 
+const HIDE_SYSTEM_KEY = 'jol-chat-hide-system';
+
 export function GlobalChat() {
   const { player } = useAuth();
   const queryClient = useQueryClient();
@@ -49,6 +53,14 @@ export function GlobalChat() {
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
   const [hasNewMessages, setHasNewMessages] = useState(false);
+  // Global chat is mostly "New public game … created" spam; let players mute it.
+  const [hideSystem, setHideSystem] = useState(() => {
+    try {
+      return localStorage.getItem(HIDE_SYSTEM_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
 
   const outputRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -62,8 +74,20 @@ export function GlobalChat() {
   // message, mirroring ds.js's `scrollChat` flag.
   const forceScrollRef = useRef(true);
 
-  const rendered = useMemo(() => buildRenderedEntries(entries, player), [entries, player]);
-  useCardTooltips(outputRef, [entries]);
+  const visibleEntries = useMemo(
+    () => (hideSystem ? entries.filter((e) => e.player !== 'SYSTEM') : entries),
+    [entries, hideSystem],
+  );
+  const rendered = useMemo(() => buildRenderedEntries(visibleEntries, player), [visibleEntries, player]);
+  useCardTooltips(outputRef, [visibleEntries]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(HIDE_SYSTEM_KEY, hideSystem ? '1' : '0');
+    } catch {
+      /* storage unavailable — the toggle just won't persist */
+    }
+  }, [hideSystem]);
 
   // Tracks the last-seen entry's timestamp for the delta fetch below — a
   // ref (not state) since it's only ever read from event handlers, never
@@ -219,7 +243,16 @@ export function GlobalChat() {
   return (
     <Card className="flex flex-col flex-1 min-h-0 overflow-hidden">
       <CardHeader>
-        <CardTitle>Global Chat</CardTitle>
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle>Global Chat</CardTitle>
+          <Switch
+            id="chat-hide-system"
+            className="text-xs text-ink-muted"
+            label="Hide system"
+            checked={hideSystem}
+            onChange={(e) => setHideSystem(e.target.checked)}
+          />
+        </div>
       </CardHeader>
       <div className="relative flex flex-col flex-1 min-h-0 p-2">
         {/*
@@ -244,7 +277,11 @@ export function GlobalChat() {
                   <span className="chat-day-label">{day}</span>
                 </div>
               )}
-              <p className={`chat${isMention ? ' bg-arcane/10 rounded px-1' : ''}`}>
+              <p
+                className={`chat${entry.player === 'SYSTEM' ? ' chat-system' : ''}${
+                  isMention ? ' bg-arcane/10 rounded px-1' : ''
+                }`}
+              >
                 <span className="chat-timestamp" title={localTimeTitle(entry.timestamp)}>
                   {utcTime(entry.timestamp)}
                 </span>
@@ -282,6 +319,16 @@ export function GlobalChat() {
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && send()}
           />
+          <Button
+            variant="primary"
+            size="sm"
+            className="shrink-0 rounded-full px-3"
+            disabled={sending || !text.trim()}
+            onClick={send}
+            aria-label="Send message"
+          >
+            <SendHorizontal size={16} />
+          </Button>
         </div>
       </div>
     </Card>

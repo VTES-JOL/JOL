@@ -41,7 +41,7 @@ function renderSegment(
         <Fragment key={key}>
           {splitMentions(seg.content, viewer).map((part, j) =>
             'mention' in part ? (
-              <span key={j} className="chat-mention">
+              <span key={j} className={`chat-mention${part.self ? ' chat-mention-self' : ''}`}>
                 @{part.mention}
               </span>
             ) : (

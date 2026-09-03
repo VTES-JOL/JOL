@@ -22,6 +22,20 @@ p.chat {
     overflow-wrap: anywhere;
 }
 
+/* Machine-generated lines (public game created/closed, tournament pairings…)
+   get their own quiet visual channel so they don't read like human chat. */
+p.chat.chat-system {
+    color: var(--jt-ink-muted);
+    font-style: italic;
+    border-left: 2px solid var(--jt-line);
+    padding-left: 0.5rem;
+}
+
+p.chat.chat-system b {
+    /* the leading "SYSTEM" author label is redundant noise here */
+    font-weight: 400;
+}
+
 p.chat a {
     display: inline;
     padding: 0.1rem 0.3rem;
@@ -45,9 +59,17 @@ p.chat a {
     font-weight: bold;
 }
 
+/* Any @name mention — kept light so it reads as a reference, not a shout. */
 .chat-mention {
+    color: var(--jt-arcane-soft);
+    font-weight: 500;
+}
+
+/* …except when it's you (or @All): then it's the attention-grabbing chip. */
+.chat-mention.chat-mention-self {
     background-color: color-mix(in oklab, var(--jt-arcane) 22%, transparent);
     color: var(--jt-ink);
+    font-weight: 500;
     border-radius: 0.2rem;
     padding: 0 0.15rem;
 }

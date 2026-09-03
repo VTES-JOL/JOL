@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Bell, Gamepad2, TriangleAlert } from 'lucide-react';
@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { TabBar } from '../../components/TabBar';
 import { useAuth } from '../../auth/useAuth';
+import { useSimpleTooltips } from '../../hooks/useSimpleTooltips';
 import { pathForGame } from '../../routes';
 
 type TabId = 'myGames' | 'tournamentGames' | 'oustedGames';
@@ -54,12 +55,14 @@ function SeatRow({ game }: { game: GameStatusBean }) {
   return (
     <div className="flex items-center gap-1 text-ink-muted text-xs mt-1">
       <ArrowLeft size={12} />
-      <span>{pred?.playerName ?? game.predator}</span>
+      <span data-tippy-content="Predator">{pred?.playerName ?? game.predator}</span>
       {pred?.pinged && <TriangleAlert size={11} className="text-blood" />}
       <span className="mx-1 text-ink-muted/60">·</span>
-      <strong className="text-ink">{active?.playerName ?? game.activePlayer}</strong>
+      <strong className="text-ink" data-tippy-content="Active player">
+        {active?.playerName ?? game.activePlayer}
+      </strong>
       <span className="mx-1 text-ink-muted/60">·</span>
-      <span>{prey?.playerName ?? game.prey}</span>
+      <span data-tippy-content="Prey">{prey?.playerName ?? game.prey}</span>
       {prey?.pinged && <TriangleAlert size={11} className="text-blood" />}
       <ArrowRight size={12} />
     </div>
@@ -101,17 +104,24 @@ export function GamesPanel() {
   const tab = TABS.find((t) => t.id === activeTab)!;
   const games = summary[tab.field];
 
+  const listRef = useRef<HTMLDivElement>(null);
+  useSimpleTooltips(listRef, [summary, activeTab]);
+
   return (
-    <Card className="flex flex-col flex-1 min-h-0 overflow-hidden">
+    // Content-height, not flex-1: with a handful of games this card would
+    // otherwise stretch to the (chat-driven) column height and leave a big
+    // empty panel. Cap it so a long list scrolls internally instead.
+    <Card className="flex flex-col min-h-0 overflow-hidden max-h-[45vh] lg:max-h-full">
       <CardHeader>
         <CardTitle>Games List</CardTitle>
       </CardHeader>
       <TabBar
-        tabs={TABS.map((t) => ({ id: t.id, label: t.label, badge: summary[t.field].length }))}
+        size="sm"
+        tabs={TABS.map((t) => ({ id: t.id, label: t.label, badge: summary[t.field].length || undefined }))}
         active={activeTab}
         onChange={setActiveTab}
       />
-      <div className="flex-1 min-h-0 overflow-y-auto">
+      <div ref={listRef} className="flex-1 min-h-0 overflow-y-auto">
         {games.length === 0 ? (
           <EmptyState icon={Gamepad2} title={tab.emptyTitle} description={tab.emptyHint} />
         ) : (

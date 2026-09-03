@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { BookOpen, Bug, Database, Heart, Layers, MessageCircle, ScrollText, Users } from 'lucide-react';
+import { BookOpen, Bug, ChevronRight, Database, Heart, Layers, MessageCircle, ScrollText, Users } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardBody } from '../../components/ui/Card';
 
 // Static content — mirrors src/main/webapp/WEB-INF/jsps/main/resources.jsp,
@@ -36,16 +36,17 @@ export function Resources() {
             </a>
           ))}
         </div>
-        <details className="text-xs text-ink-muted">
-          <summary className="flex items-center gap-2 mb-1 cursor-pointer list-none">
+        <details className="group text-xs text-ink-muted">
+          <summary className="flex items-center gap-2 px-2 py-1 rounded border border-line-accent cursor-pointer list-none text-ink-secondary hover:text-ink hover:bg-hover">
             <img
               src="https://static.deckserver.net/assets/images/darkpack_logo2.png"
-              style={{ height: '1.2rem' }}
+              className="h-[1.1rem]"
               alt="Dark Pack"
             />
-            <span>Licensing</span>
+            <span className="flex-1">Licensing</span>
+            <ChevronRight size={13} className="transition-transform group-open:rotate-90" />
           </summary>
-          <p className="mb-0 pl-1">
+          <p className="mt-1 mb-0 pl-1">
             JOL is not an official World of Darkness product. Portions of the materials are the copyrights and
             trademarks of Paradox Interactive AB, and are used with permission. All rights reserved. For more
             information please visit worldofdarkness.com.

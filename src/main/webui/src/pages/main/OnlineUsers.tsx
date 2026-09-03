@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { History, ShieldCheck, Gavel } from 'lucide-react';
+import { History } from 'lucide-react';
 import { api } from '../../api/client';
 import type { UserSummary } from '../../api/types';
 import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
@@ -28,16 +28,26 @@ function minutesSince(timestamp: string): number {
   return (Date.now() - new Date(timestamp).getTime()) / 60_000;
 }
 
+function RoleChip({ label, tone }: { label: string; tone: 'gold' | 'online' }) {
+  const cls =
+    tone === 'gold'
+      ? 'bg-gold/15 text-gold'
+      : 'bg-online/15 text-online';
+  return (
+    <span className={`rounded px-1 py-px text-[10px] font-semibold uppercase tracking-wide ${cls}`}>
+      {label}
+    </span>
+  );
+}
+
 function UserRow({ user }: { user: UserSummary }) {
   const isOffline = minutesSince(user.lastOnline) > OFFLINE_THRESHOLD_MINUTES;
   return (
     <div className="online-player-row text-sm text-ink">
       {user.country && <CountryFlag code={user.country} />}
       <span className="flex-1 truncate">{user.name}</span>
-      {user.roles.includes('ADMIN') && (
-        <ShieldCheck size={14} data-tippy-content="Administrator" className="text-gold" />
-      )}
-      {user.roles.includes('JUDGE') && <Gavel size={14} data-tippy-content="Judge" className="text-online" />}
+      {user.roles.includes('ADMIN') && <RoleChip label="Admin" tone="gold" />}
+      {user.roles.includes('JUDGE') && <RoleChip label="Judge" tone="online" />}
       {isOffline && (
         <History
           size={14}

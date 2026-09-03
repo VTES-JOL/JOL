@@ -28,8 +28,8 @@ export function SiteNotesEditor() {
 
   const clear = async () => {
     if (
-      !(await confirmDialog('The notes shown on the main page will be emptied.', {
-        title: 'Clear the site notes?',
+      !(await confirmDialog('The notice shown on the main page will be emptied.', {
+        title: 'Clear the notice?',
         confirmLabel: 'Clear',
         danger: true,
       }))
@@ -41,7 +41,7 @@ export function SiteNotesEditor() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Site Notes</CardTitle>
+        <CardTitle>Notice</CardTitle>
       </CardHeader>
       <CardBody className="flex flex-col gap-2">
         <Textarea id="siteNotesText" label="Markdown" rows={10} value={text} onChange={(e) => setText(e.target.value)} />
