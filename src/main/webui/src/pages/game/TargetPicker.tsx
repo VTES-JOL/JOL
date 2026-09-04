@@ -5,7 +5,15 @@ import { X } from 'lucide-react';
 // MINION_YOU_CONTROL/SELF/SOMETHING target is pending. Completing the pick
 // happens by clicking an on-table card, handled by GamePage's
 // onTableCardClick (mirrors cardOnTableClicked()'s dual role).
-export function TargetPicker({ cardName, onCancel }: { cardName: string; onCancel: () => void }) {
+export function TargetPicker({
+  cardName,
+  prompt = 'Pick target.',
+  onCancel,
+}: {
+  cardName: string;
+  prompt?: string;
+  onCancel: () => void;
+}) {
   return (
     <div
       className="fixed top-2 left-1/2 -translate-x-1/2 rounded border border-line-accent bg-panel text-ink shadow-xl"
@@ -22,7 +30,7 @@ export function TargetPicker({ cardName, onCancel }: { cardName: string; onCance
           <X size={14} />
         </button>
       </div>
-      <div className="p-2 text-sm">Pick target.</div>
+      <div className="p-2 text-sm">{prompt}</div>
     </div>
   );
 }

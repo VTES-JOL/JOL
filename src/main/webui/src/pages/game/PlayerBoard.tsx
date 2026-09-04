@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, TriangleAlert } from 'lucide-react';
 import type { CardSnapshot, PlayerSnapshot } from '../../api/types';
 import { Region } from './Region';
 import type { MenuAnchor } from './CardContextMenu';
-import type { HandCardContext, TableCardContext } from './cardCommands';
+import type { HandCardContext, Submission, TableCardContext } from './cardCommands';
 
 const REGION_ORDER = ['READY', 'TORPOR', 'UNCONTROLLED', 'ASH_HEAP', 'REMOVED_FROM_GAME', 'RESEARCH', 'LIBRARY', 'CRYPT', 'HAND'];
 // GameView's default-collapsed set — see Region.tsx's comment on why this is
@@ -32,6 +32,7 @@ export const PlayerBoard = memo(function PlayerBoard({
   isSeatedPlayer,
   viewerName,
   onTableCardClick,
+  onQuickCommand,
   onPlayCardClick,
 }: {
   player: PlayerSnapshot;
@@ -40,6 +41,7 @@ export const PlayerBoard = memo(function PlayerBoard({
   isSeatedPlayer: boolean;
   viewerName: string | null;
   onTableCardClick: (ctx: TableCardContext, anchor: MenuAnchor) => void;
+  onQuickCommand: (submission: Submission) => void;
   onPlayCardClick: (ctx: HandCardContext, card: CardSnapshot) => void;
 }) {
   const isViewer = player.name === viewerName;
@@ -92,6 +94,7 @@ export const PlayerBoard = memo(function PlayerBoard({
               isOwnRegion={isViewer}
               isSeatedPlayer={isSeatedPlayer}
               onTableCardClick={onTableCardClick}
+              onQuickCommand={onQuickCommand}
               onPlayCardClick={onPlayCardClick}
             />
           ))}

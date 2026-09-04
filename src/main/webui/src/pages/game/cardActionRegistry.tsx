@@ -5,6 +5,7 @@ import {
   Eye,
   EyeOff,
   Flame,
+  LifeBuoy,
   Lock,
   LogOut,
   Shield,
@@ -63,6 +64,9 @@ export interface CardAction {
   nonMinionOnly?: boolean;
   faceDown?: boolean;
   childSafe?: boolean;
+  // Instead of running build(), the surface asks the page to start a
+  // cross-card target pick (currently only Rescue → pick a torpor vampire).
+  requestTarget?: boolean;
   build: (ctx: TableCardContext) => Submission;
 }
 
@@ -80,6 +84,7 @@ export const CARD_ACTIONS: CardAction[] = [
   { id: 'hunt', group: 'declare', label: 'Hunt', title: 'Hunt', regions: ['ready'], phase: 'Minion', lockState: 'unlocked', topLevelOnly: true, controllerOnly: true, minionOnly: true, build: cardActions.hunt },
   { id: 'go-anarch', group: 'declare', label: 'Go Anarch', title: 'Go Anarch', regions: ['ready'], phase: 'Minion', lockState: 'unlocked', topLevelOnly: true, controllerOnly: true, minionOnly: true, build: cardActions.goAnarch },
   { id: 'block', group: 'declare', label: <><Shield size={13} /> Block</>, title: 'Block', regions: ['ready'], phase: 'Minion', topLevelOnly: true, controllerOnly: true, minionOnly: true, build: (ctx) => cardActions.block(ctx.card.name ?? '') },
+  { id: 'rescue', group: 'declare', label: <><LifeBuoy size={13} /> Rescue…</>, title: 'Attempt to rescue a vampire from torpor', regions: ['ready'], phase: 'Minion', topLevelOnly: true, controllerOnly: true, minionOnly: true, requestTarget: true, build: () => ({}) },
   { id: 'leave-torpor', group: 'declare', label: 'Leave Torpor', title: 'Leave Torpor', regions: ['torpor'], phase: 'Minion', lockState: 'unlocked', topLevelOnly: true, controllerOnly: true, minionOnly: true, build: cardActions.leaveTorpor },
 
   // ── Move ──────────────────────────────────────────────────────────────

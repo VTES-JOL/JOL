@@ -1,10 +1,10 @@
 import { memo, useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
 import { MinusCircle, PlusCircle } from 'lucide-react';
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
-import { Card, RegionLabelBadges, type TableCardClick } from './Card';
+import { Card, RegionLabelBadges, type QuickKind, type TableCardClick } from './Card';
 import { CardSimple } from './CardSimple';
 import type { MenuAnchor } from './CardContextMenu';
-import type { HandCardContext, TableCardContext } from './cardCommands';
+import { cardActions, type HandCardContext, type Submission, type TableCardContext } from './cardCommands';
 
 // READY/TORPOR/UNCONTROLLED are live board state — prominent header, coloured
 // left edge. Everything else (ash heap, RFG, library, crypt, hand, research)
@@ -59,6 +59,7 @@ export const Region = memo(function Region({
   isOwnRegion,
   isSeatedPlayer,
   onTableCardClick,
+  onQuickCommand,
   onPlayCardClick,
 }: {
   region: RegionSnapshot;
@@ -68,6 +69,7 @@ export const Region = memo(function Region({
   isOwnRegion: boolean;
   isSeatedPlayer: boolean;
   onTableCardClick: (ctx: TableCardContext, anchor: MenuAnchor) => void;
+  onQuickCommand: (submission: Submission) => void;
   onPlayCardClick: (ctx: HandCardContext, card: CardSnapshot) => void;
 }) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
@@ -96,6 +98,23 @@ export const Region = memo(function Region({
         anchor,
       ),
     [onTableCardClick, controller, controllerPool, region.type, region.commandKey, isOwnRegion],
+  );
+
+  const onQuick = useCallback(
+    ({ coordinate, card, isChild }: TableCardClick, kind: QuickKind) => {
+      const ctx: TableCardContext = {
+        controller,
+        controllerPool,
+        regionType: region.type,
+        regionCommandKey: region.commandKey,
+        coordinate,
+        card,
+        isChild,
+        controlledByViewer: isOwnRegion,
+      };
+      onQuickCommand((kind === 'lock' ? cardActions.lock : cardActions.unlock)(ctx));
+    },
+    [onQuickCommand, controller, controllerPool, region.type, region.commandKey, isOwnRegion],
   );
 
   if (region.cards.length === 0) return null;
@@ -172,6 +191,7 @@ export const Region = memo(function Region({
                 region={region.type}
                 coordinate={coordinate}
                 onAction={mode === 'action' ? onAction : undefined}
+                onQuick={mode === 'action' && (region.type === 'READY' || region.type === 'TORPOR') ? onQuick : undefined}
                 onCardClick={faceDownPlay ? playClick : undefined}
               />
             );

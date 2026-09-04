@@ -83,12 +83,14 @@ export function CardActionModal({
   viewerName,
   phase,
   onSubmit,
+  onRequestTarget,
   onClose,
 }: {
   ctx: TableCardContext;
   viewerName: string | null;
   phase: string;
   onSubmit: (submission: Submission) => void;
+  onRequestTarget: (actionId: string, rescuerName: string) => void;
   onClose: () => void;
 }) {
   const { card } = ctx;
@@ -222,7 +224,14 @@ export function CardActionModal({
                       type="button"
                       className={group === 'remove' ? ACTION_BTN_DANGER : ACTION_BTN}
                       title={a.title}
-                      onClick={() => doAction(a.build)}
+                      onClick={() => {
+                        if (a.requestTarget) {
+                          onRequestTarget(a.id, cardName);
+                          onClose();
+                        } else {
+                          doAction(a.build);
+                        }
+                      }}
                     >
                       {a.label}
                     </button>

@@ -22,7 +22,7 @@ import { CardActionModal } from './game/CardActionModal';
 import { CardContextMenu, type MenuAnchor } from './game/CardContextMenu';
 import { TargetPicker } from './game/TargetPicker';
 import { findCardByCoordinate } from './game/coordinates';
-import { buildPlayCommand, type HandCardContext, type Submission, type TableCardContext } from './game/cardCommands';
+import { buildPlayCommand, cardActions, type HandCardContext, type Submission, type TableCardContext } from './game/cardCommands';
 import './GamePage.css';
 
 // Handles card-modal.js's click-to-act interactions — play-card modal,
@@ -39,6 +39,7 @@ export function GamePage() {
   const [cardMenu, setCardMenu] = useState<{ ctx: TableCardContext; anchor: MenuAnchor } | null>(null);
   const [tableModal, setTableModal] = useState<TableCardContext | null>(null);
   const [pendingTarget, setPendingTarget] = useState<PendingTarget | null>(null);
+  const [pendingRescue, setPendingRescue] = useState<string | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const { submitting, guard } = useSubmitGuard();
 
@@ -89,10 +90,26 @@ export function GamePage() {
         setPendingTarget(null);
         return;
       }
+      if (pendingRescue) {
+        submit(cardActions.rescue(pendingRescue, ctx.card.name ?? 'a vampire'));
+        setPendingRescue(null);
+        return;
+      }
       setCardMenu({ ctx, anchor });
     },
-    [pendingTarget, submit],
+    [pendingTarget, pendingRescue, submit],
   );
+
+  // Rescue is the one registry action that starts a cross-card pick instead of
+  // submitting straight away (see cardActionRegistry's requestTarget).
+  const handleRequestTarget = useCallback((actionId: string, rescuerName: string) => {
+    if (actionId === 'rescue') {
+      setCardMenu(null);
+      setTableModal(null);
+      setPendingTarget(null);
+      setPendingRescue(rescuerName);
+    }
+  }, []);
 
   const handlePlayCardClick = useCallback((ctx: HandCardContext, card: CardSnapshot) => {
     setPendingTarget(null);
@@ -195,6 +212,7 @@ export function GamePage() {
               isSeatedPlayer={game.player}
               viewerName={viewerName}
               onTableCardClick={handleTableCardClick}
+              onQuickCommand={submit}
               onPlayCardClick={handlePlayCardClick}
             />
           ))}
@@ -212,6 +230,7 @@ export function GamePage() {
           phase={game.phase}
           viewerName={viewerName}
           onSubmit={submit}
+          onRequestTarget={handleRequestTarget}
           onOpenPanel={() => {
             setTableModal(cardMenu.ctx);
             setCardMenu(null);
@@ -220,6 +239,13 @@ export function GamePage() {
         />
       )}
       {pendingTarget && <TargetPicker cardName={pendingTarget.cardName} onCancel={() => setPendingTarget(null)} />}
+      {pendingRescue && (
+        <TargetPicker
+          cardName={`Rescue — ${pendingRescue}`}
+          prompt="Click the vampire in torpor to rescue."
+          onCancel={() => setPendingRescue(null)}
+        />
+      )}
       {playModal && viewerName && (
         <PlayCardModal
           ctx={playModal.ctx}
@@ -240,6 +266,7 @@ export function GamePage() {
           viewerName={viewerName}
           phase={game.phase}
           onSubmit={submit}
+          onRequestTarget={handleRequestTarget}
           onClose={() => setTableModal(null)}
         />
       )}

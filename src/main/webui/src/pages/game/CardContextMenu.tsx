@@ -19,6 +19,7 @@ export function CardContextMenu({
   phase,
   viewerName,
   onSubmit,
+  onRequestTarget,
   onOpenPanel,
   onClose,
 }: {
@@ -27,6 +28,7 @@ export function CardContextMenu({
   phase: string;
   viewerName: string | null;
   onSubmit: (submission: Submission) => void;
+  onRequestTarget: (actionId: string, rescuerName: string) => void;
   onOpenPanel: () => void;
   onClose: () => void;
 }) {
@@ -76,8 +78,13 @@ export function CardContextMenu({
     faceDown: !!card.faceDown,
   };
 
-  const run = (build: (c: TableCardContext) => Submission) => {
-    onSubmit(build(ctx));
+  const activate = (a: (typeof CARD_ACTIONS)[number]) => {
+    if (a.requestTarget) {
+      onRequestTarget(a.id, card.name ?? '');
+      onClose();
+      return;
+    }
+    onSubmit(a.build(ctx));
     onClose();
   };
   // Counter steps keep the menu open so you can tap a few in a row.
@@ -124,7 +131,7 @@ export function CardContextMenu({
                 type="button"
                 role="menuitem"
                 className={`${ITEM} ${group === 'remove' ? 'text-blood' : 'text-ink-secondary'}`}
-                onClick={() => run(a.build)}
+                onClick={() => activate(a)}
               >
                 {a.label}
               </button>

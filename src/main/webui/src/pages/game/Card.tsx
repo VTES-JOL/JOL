@@ -26,6 +26,9 @@ export interface TableCardClick {
   isChild: boolean;
 }
 
+// Inline one-tap actions on the card row itself (no menu).
+export type QuickKind = 'lock' | 'unlock';
+
 // Mirrors card.jsp — the "full" card rendering used for CRYPT and the
 // non-simple regions (READY/TORPOR/UNCONTROLLED). Recurses into its own
 // `cards` for nested equipment/allies/blood-counter stacks.
@@ -40,6 +43,7 @@ export const Card = memo(function Card({
   coordinate,
   isChild = false,
   onAction,
+  onQuick,
   onCardClick,
 }: {
   card: CardSnapshot;
@@ -47,6 +51,8 @@ export const Card = memo(function Card({
   coordinate: string;
   isChild?: boolean;
   onAction?: (click: TableCardClick, anchor: MenuAnchor) => void;
+  // One-tap lock/unlock straight off the row (no menu). Stable (Region useCallback).
+  onQuick?: (click: TableCardClick, kind: QuickKind) => void;
   // Overrides the default action-menu wiring for this row only — used to send
   // a controller's click on their own face-down card to the play-card modal.
   onCardClick?: () => void;
@@ -102,9 +108,16 @@ export const Card = memo(function Card({
   const contestedStyle = card.contested ? 'bg-gold/15' : '';
   const rowPad = isChild ? 'px-2 py-1' : 'px-2 pt-2 pb-1';
 
+  const quickLock = onQuick
+    ? (kind: QuickKind) => (e: MouseEvent) => {
+        e.stopPropagation();
+        onQuick({ coordinate, card, isChild }, kind);
+      }
+    : null;
+
   return (
     <li
-      className={`flex justify-between items-start ${rowPad} ${regionStyle} ${contestedStyle} ${faceDownStyle} ${card.locked ? 'border-l-2 border-accent bg-accent/5' : ''}`}
+      className={`group flex justify-between items-start ${rowPad} ${regionStyle} ${contestedStyle} ${faceDownStyle} ${card.locked ? 'border-l-2 border-accent bg-accent/5' : ''}`}
       onClick={rowClick}
       onContextMenu={rowContextMenu}
       style={rowClick ? { cursor: 'pointer' } : undefined}
@@ -113,13 +126,35 @@ export const Card = memo(function Card({
         <div className="flex justify-between">
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
-              {card.locked && (
-                <span
-                  className="shrink-0 inline-flex items-center rounded bg-accent text-surface px-1 py-0.5"
-                  title="Locked"
-                >
-                  <Lock size={11} strokeWidth={2.75} />
-                </span>
+              {card.locked ? (
+                quickLock ? (
+                  <button
+                    type="button"
+                    title="Unlock"
+                    onClick={quickLock('unlock')}
+                    className="shrink-0 inline-flex items-center rounded bg-accent text-surface px-1 py-0.5 hover:bg-accent-dim"
+                  >
+                    <Lock size={11} strokeWidth={2.75} />
+                  </button>
+                ) : (
+                  <span
+                    className="shrink-0 inline-flex items-center rounded bg-accent text-surface px-1 py-0.5"
+                    title="Locked"
+                  >
+                    <Lock size={11} strokeWidth={2.75} />
+                  </span>
+                )
+              ) : (
+                quickLock && !isChild && (
+                  <button
+                    type="button"
+                    title="Lock"
+                    onClick={quickLock('lock')}
+                    className="shrink-0 inline-flex items-center rounded border border-line-accent text-ink-muted px-1 py-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:border-ink hover:text-ink"
+                  >
+                    <Lock size={11} />
+                  </button>
+                )
               )}
               <span className="text-ink-muted text-xs tabular-nums select-all shrink-0">{coordinate}</span>
               <a data-card-id={card.cardId} data-secured={card.playtest ? 'true' : undefined} className="card-name text-wrap">
