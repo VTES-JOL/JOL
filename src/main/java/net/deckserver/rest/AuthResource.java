@@ -5,7 +5,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.*;
 import net.deckserver.JolAdmin;
-import net.deckserver.Recaptcha;
+import net.deckserver.Turnstile;
 import net.deckserver.services.AuthService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.storage.json.cards.SecuredCardLoader;
@@ -64,11 +64,17 @@ public class AuthResource {
         // never renders the Turnstile widget, so request.captchaResponse() would
         // always be blank; skip verification to match, rather than always
         // failing registration in dev.
-        if (captchaEnabled() && !Recaptcha.verify(request.captchaResponse())) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+        if (captchaEnabled() && !Turnstile.verify(request.captchaResponse())) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Captcha verification failed. Please try again.").build();
+        }
+        if (request.username() == null || request.username().isBlank()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Enter a username.").build();
+        }
+        if (request.password() == null || request.password().length() < 8) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Password must be at least 8 characters.").build();
         }
         if (!PlayerService.registerPlayer(request.username(), request.password(), request.email())) {
-            return Response.status(Response.Status.CONFLICT).build();
+            return Response.status(Response.Status.CONFLICT).entity("That username is already taken.").build();
         }
         Response response = Response.ok().build();
         attachCookies(response, AuthService.issueTokens(request.username(), false, headers));

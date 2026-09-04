@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { resolveDark, useThemePref } from '../../theme';
 
 // Cloudflare Turnstile's implicit "scan the DOM for .cf-turnstile on script
 // load" rendering doesn't work well for a conditionally-shown React panel
@@ -38,6 +39,7 @@ function loadScript(): Promise<void> {
 
 export function TurnstileWidget({ siteKey, onToken }: { siteKey: string; onToken: (token: string) => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const dark = resolveDark(useThemePref());
 
   useEffect(() => {
     let widgetId: string | undefined;
@@ -45,7 +47,13 @@ export function TurnstileWidget({ siteKey, onToken }: { siteKey: string; onToken
 
     loadScript().then(() => {
       if (cancelled || !containerRef.current || !window.turnstile) return;
-      widgetId = window.turnstile.render(containerRef.current, { sitekey: siteKey, theme: 'light', callback: onToken });
+      // Match the app theme, not the OS ('auto' keys off prefers-color-scheme,
+      // which the in-app toggle can override).
+      widgetId = window.turnstile.render(containerRef.current, {
+        sitekey: siteKey,
+        theme: dark ? 'dark' : 'light',
+        callback: onToken,
+      });
     });
 
     return () => {
@@ -53,7 +61,7 @@ export function TurnstileWidget({ siteKey, onToken }: { siteKey: string; onToken
       if (widgetId && window.turnstile) window.turnstile.remove(widgetId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [siteKey]);
+  }, [siteKey, dark]);
 
   return <div ref={containerRef} />;
 }

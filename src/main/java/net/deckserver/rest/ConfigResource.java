@@ -13,7 +13,7 @@ import jakarta.ws.rs.core.MediaType;
  * from SecurityFilter's auth requirement (see PUBLIC_PATHS there) since the
  * login page needs captchaEnabled/captchaSiteKey before it has any session —
  * none of these values are secret (site keys are public by design; only the
- * Turnstile *secret* key, never sent here, stays server-side in Recaptcha).
+ * Turnstile *secret* key, never sent here, stays server-side in Turnstile).
  */
 @Path("config")
 @Produces(MediaType.APPLICATION_JSON)
@@ -24,8 +24,14 @@ public class ConfigResource extends BaseResource {
         String baseUrl = System.getenv().getOrDefault("BASE_URL", "https://static.dev.deckserver.net");
         String vapidPublicKey = System.getenv("VAPID_PUBLIC_KEY");
         boolean captchaEnabled = System.getenv().getOrDefault("ENABLE_CAPTCHA", "true").equals("true");
-        String captchaSiteKey = System.getenv("JOL_RECAPTCHA_KEY");
+        // JOL_RECAPTCHA_KEY kept as a fallback so an existing deployment's env
+        // file keeps working after the rename to the Turnstile-accurate name.
+        String captchaSiteKey = firstNonBlank(System.getenv("JOL_TURNSTILE_KEY"), System.getenv("JOL_RECAPTCHA_KEY"));
         return new ConfigResponse(baseUrl, vapidPublicKey, captchaEnabled, captchaSiteKey);
+    }
+
+    private static String firstNonBlank(String a, String b) {
+        return (a != null && !a.isBlank()) ? a : b;
     }
 
     public record ConfigResponse(String baseUrl, String vapidPublicKey, boolean captchaEnabled, String captchaSiteKey) {}
