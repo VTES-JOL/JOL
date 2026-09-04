@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react';
 import type { CardSnapshot } from '../../api/types';
 import { CardHidden } from './CardHidden';
 import { Clan } from './Clan';
@@ -10,13 +11,16 @@ export function CardSimple({
   region,
   coordinate,
   onClick,
+  onContextMenu,
 }: {
   card: CardSnapshot;
   region: string;
   coordinate: string;
-  onClick?: () => void;
+  onClick?: (e: MouseEvent) => void;
+  onContextMenu?: (e: MouseEvent) => void;
 }) {
-  if (!card.visible) return <CardHidden card={card} region={region} coordinate={coordinate} onClick={onClick} />;
+  if (!card.visible)
+    return <CardHidden card={card} region={region} coordinate={coordinate} onClick={onClick} onContextMenu={onContextMenu} />;
 
   const regionStyle = region === 'REMOVED_FROM_GAME' ? 'opacity-50' : '';
   const faceDownStyle = card.faceDown ? 'opacity-60' : '';
@@ -25,6 +29,7 @@ export function CardSimple({
     <li
       className={`flex justify-between items-center p-1 ${regionStyle} ${faceDownStyle}`}
       onClick={onClick}
+      onContextMenu={onContextMenu}
       style={onClick ? { cursor: 'pointer' } : undefined}
     >
       <div className="mx-1 me-auto w-full">

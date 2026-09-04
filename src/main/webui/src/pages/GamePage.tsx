@@ -19,6 +19,7 @@ import { NotesDeckDrawer } from './game/NotesDeckDrawer';
 import { useNotesIndicator } from './game/useNotesIndicator';
 import { PlayCardModal, type PendingTarget } from './game/PlayCardModal';
 import { CardActionModal } from './game/CardActionModal';
+import { CardContextMenu, type MenuAnchor } from './game/CardContextMenu';
 import { TargetPicker } from './game/TargetPicker';
 import { findCardByCoordinate } from './game/coordinates';
 import { buildPlayCommand, type HandCardContext, type Submission, type TableCardContext } from './game/cardCommands';
@@ -35,6 +36,7 @@ export function GamePage() {
   const [showHistory, setShowHistory] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const [playModal, setPlayModal] = useState<{ ctx: HandCardContext; card: CardSnapshot } | null>(null);
+  const [cardMenu, setCardMenu] = useState<{ ctx: TableCardContext; anchor: MenuAnchor } | null>(null);
   const [tableModal, setTableModal] = useState<TableCardContext | null>(null);
   const [pendingTarget, setPendingTarget] = useState<PendingTarget | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
@@ -75,9 +77,9 @@ export function GamePage() {
 
   // cardOnTableClicked()'s dual role: while a target pick is pending, a
   // click on an on-table card completes that pick (pickTarget()) instead of
-  // opening the action modal.
+  // opening the action menu.
   const handleTableCardClick = useCallback(
-    (ctx: TableCardContext) => {
+    (ctx: TableCardContext, anchor: MenuAnchor) => {
       if (pendingTarget) {
         const targetPlayer = ctx.controller.split(' ')[0];
         const pickedTarget = `${targetPlayer} ${ctx.regionCommandKey} ${ctx.coordinate}`;
@@ -87,7 +89,7 @@ export function GamePage() {
         setPendingTarget(null);
         return;
       }
-      setTableModal(ctx);
+      setCardMenu({ ctx, anchor });
     },
     [pendingTarget, submit],
   );
@@ -129,6 +131,9 @@ export function GamePage() {
   const liveTableCard = tableModal ? findCardByCoordinate(game, tableModal.controller, tableModal.regionType, tableModal.coordinate) : null;
   const liveControllerPool = tableModal ? game.players.find((p) => p.name === tableModal.controller)?.pool : undefined;
   const livePlayCard = playModal ? findCardByCoordinate(game, viewerName ?? '', playModal.ctx.regionType, playModal.ctx.coordinate) : null;
+  // Keep the open menu's card/pool live so its counter stepper reflects each bump.
+  const liveMenuCard = cardMenu ? findCardByCoordinate(game, cardMenu.ctx.controller, cardMenu.ctx.regionType, cardMenu.ctx.coordinate) : null;
+  const liveMenuPool = cardMenu ? game.players.find((p) => p.name === cardMenu.ctx.controller)?.pool : undefined;
 
   const handRegion = viewerName
     ? game.players.find((p) => p.name === viewerName)?.regions.find((r) => r.type === 'HAND')
@@ -196,6 +201,24 @@ export function GamePage() {
         </div>
       </div>
       <NotesDeckDrawer gameId={gameId} game={game} open={notesOpen} onClose={() => setNotesOpen(false)} />
+      {cardMenu && (
+        <CardContextMenu
+          ctx={{
+            ...cardMenu.ctx,
+            ...(liveMenuCard && { card: liveMenuCard }),
+            ...(liveMenuPool !== undefined && { controllerPool: liveMenuPool }),
+          }}
+          anchor={cardMenu.anchor}
+          phase={game.phase}
+          viewerName={viewerName}
+          onSubmit={submit}
+          onOpenPanel={() => {
+            setTableModal(cardMenu.ctx);
+            setCardMenu(null);
+          }}
+          onClose={() => setCardMenu(null)}
+        />
+      )}
       {pendingTarget && <TargetPicker cardName={pendingTarget.cardName} onCancel={() => setPendingTarget(null)} />}
       {playModal && viewerName && (
         <PlayCardModal

@@ -1,8 +1,9 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
 import { MinusCircle, PlusCircle } from 'lucide-react';
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
 import { Card, RegionLabelBadges, type TableCardClick } from './Card';
 import { CardSimple } from './CardSimple';
+import type { MenuAnchor } from './CardContextMenu';
 import type { HandCardContext, TableCardContext } from './cardCommands';
 
 // READY/TORPOR/UNCONTROLLED are live board state — prominent header, coloured
@@ -66,7 +67,7 @@ export const Region = memo(function Region({
   controllerPool: number;
   isOwnRegion: boolean;
   isSeatedPlayer: boolean;
-  onTableCardClick: (ctx: TableCardContext) => void;
+  onTableCardClick: (ctx: TableCardContext, anchor: MenuAnchor) => void;
   onPlayCardClick: (ctx: HandCardContext, card: CardSnapshot) => void;
 }) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
@@ -80,17 +81,20 @@ export const Region = memo(function Region({
   }, [region.cards.length]);
 
   const onAction = useCallback(
-    ({ coordinate, card, isChild }: TableCardClick) =>
-      onTableCardClick({
-        controller,
-        controllerPool,
-        regionType: region.type,
-        regionCommandKey: region.commandKey,
-        coordinate,
-        card,
-        isChild,
-        controlledByViewer: isOwnRegion,
-      }),
+    ({ coordinate, card, isChild }: TableCardClick, anchor: MenuAnchor) =>
+      onTableCardClick(
+        {
+          controller,
+          controllerPool,
+          regionType: region.type,
+          regionCommandKey: region.commandKey,
+          coordinate,
+          card,
+          isChild,
+          controlledByViewer: isOwnRegion,
+        },
+        anchor,
+      ),
     [onTableCardClick, controller, controllerPool, region.type, region.commandKey, isOwnRegion],
   );
 
@@ -137,14 +141,29 @@ export const Region = memo(function Region({
               onPlayCardClick({ regionType: region.type, regionCommandKey: region.commandKey, coordinate }, card);
             const faceDownPlay = isFaceDownPlayable(card, isOwnRegion, isSeatedPlayer);
             if (region.simple) {
+              const actionClick = (e: MouseEvent) =>
+                onAction({ coordinate, card, isChild: false }, { x: e.clientX, y: e.clientY });
+              const actionContextMenu = (e: MouseEvent) => {
+                e.preventDefault(); // suppress Chrome's own menu
+                actionClick(e);
+              };
               const onClick = faceDownPlay
                 ? playClick
                 : mode === 'action'
-                  ? () => onAction({ coordinate, card, isChild: false })
+                  ? actionClick
                   : mode === 'play'
                     ? playClick
                     : undefined;
-              return <CardSimple key={card.id} card={card} region={region.type} coordinate={coordinate} onClick={onClick} />;
+              return (
+                <CardSimple
+                  key={card.id}
+                  card={card}
+                  region={region.type}
+                  coordinate={coordinate}
+                  onClick={onClick}
+                  onContextMenu={!faceDownPlay && mode === 'action' ? actionContextMenu : undefined}
+                />
+              );
             }
             return (
               <Card

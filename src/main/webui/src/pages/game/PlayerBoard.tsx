@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { ChevronLeft, ChevronRight, TriangleAlert } from 'lucide-react';
 import type { CardSnapshot, PlayerSnapshot } from '../../api/types';
 import { Region } from './Region';
+import type { MenuAnchor } from './CardContextMenu';
 import type { HandCardContext, TableCardContext } from './cardCommands';
 
 const REGION_ORDER = ['READY', 'TORPOR', 'UNCONTROLLED', 'ASH_HEAP', 'REMOVED_FROM_GAME', 'RESEARCH', 'LIBRARY', 'CRYPT', 'HAND'];
@@ -38,7 +39,7 @@ export const PlayerBoard = memo(function PlayerBoard({
   edgeTextColor: 'white' | 'black';
   isSeatedPlayer: boolean;
   viewerName: string | null;
-  onTableCardClick: (ctx: TableCardContext) => void;
+  onTableCardClick: (ctx: TableCardContext, anchor: MenuAnchor) => void;
   onPlayCardClick: (ctx: HandCardContext, card: CardSnapshot) => void;
 }) {
   const isViewer = player.name === viewerName;

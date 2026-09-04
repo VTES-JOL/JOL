@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type MouseEvent } from 'react';
 import { Square } from 'lucide-react';
 import type { CardSnapshot } from '../../api/types';
 
@@ -16,17 +16,20 @@ export const CardHidden = memo(function CardHidden({
   region,
   coordinate,
   onClick,
+  onContextMenu,
 }: {
   card: CardSnapshot;
   region: string;
   coordinate?: string;
-  onClick?: () => void;
+  onClick?: (e: MouseEvent) => void;
+  onContextMenu?: (e: MouseEvent) => void;
 }) {
   const regionStyle = region === 'REMOVED_FROM_GAME' ? 'opacity-50' : '';
   return (
     <li
       className={`flex justify-between items-center p-1 ${regionStyle}`}
       onClick={onClick}
+      onContextMenu={onContextMenu}
       style={onClick ? { cursor: 'pointer' } : undefined}
     >
       <div className="mx-1 me-auto w-full">

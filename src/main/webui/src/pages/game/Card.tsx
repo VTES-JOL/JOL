@@ -1,6 +1,7 @@
 import { memo, type MouseEvent } from 'react';
 import { Eye, EyeOff, Flame, Lock } from 'lucide-react';
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
+import type { MenuAnchor } from './CardContextMenu';
 import { CardHidden } from './CardHidden';
 import { Clan } from './Clan';
 import { Sect } from './Sect';
@@ -45,8 +46,8 @@ export const Card = memo(function Card({
   region: string;
   coordinate: string;
   isChild?: boolean;
-  onAction?: (click: TableCardClick) => void;
-  // Overrides the default action-modal wiring for this row only — used to send
+  onAction?: (click: TableCardClick, anchor: MenuAnchor) => void;
+  // Overrides the default action-menu wiring for this row only — used to send
   // a controller's click on their own face-down card to the play-card modal.
   onCardClick?: () => void;
 }) {
@@ -68,16 +69,29 @@ export const Card = memo(function Card({
     return <CardHidden card={card} region={region} coordinate={coordinate} />;
   }
 
-  const rawRowClick = onCardClick ?? (onAction ? () => onAction({ coordinate, card, isChild }) : undefined);
-  // An attached card sits inside its parent minion's clickable <li>; without
-  // this, a click on the child bubbles up and the parent's handler runs last,
-  // opening the base minion's actions instead of the child's.
-  const rowClick = rawRowClick
+  // An attached card sits inside its parent minion's clickable <li>; stopPropagation
+  // keeps a click on the child from also firing the parent's handler (which,
+  // running last, would otherwise open the base minion's actions instead).
+  const openMenu = onAction
     ? (e: MouseEvent) => {
         e.stopPropagation();
-        rawRowClick();
+        onAction({ coordinate, card, isChild }, { x: e.clientX, y: e.clientY });
       }
     : undefined;
+  const rowClick = onCardClick
+    ? (e: MouseEvent) => {
+        e.stopPropagation();
+        onCardClick();
+      }
+    : openMenu;
+  // Right-click opens the same menu — preventDefault suppresses Chrome's own.
+  const rowContextMenu =
+    onCardClick || !openMenu
+      ? undefined
+      : (e: MouseEvent) => {
+          e.preventDefault();
+          openMenu(e);
+        };
   const faceDownStyle = card.faceDown ? 'opacity-60 border-l-2 border-dashed border-ink-muted' : '';
 
   const hasVotes = !!card.votes && card.votes !== '0';
@@ -92,6 +106,7 @@ export const Card = memo(function Card({
     <li
       className={`flex justify-between items-start ${rowPad} ${regionStyle} ${contestedStyle} ${faceDownStyle} ${card.locked ? 'border-l-2 border-accent bg-accent/5' : ''}`}
       onClick={rowClick}
+      onContextMenu={rowContextMenu}
       style={rowClick ? { cursor: 'pointer' } : undefined}
     >
       <div className="mx-1 me-auto w-full">
