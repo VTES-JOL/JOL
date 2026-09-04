@@ -87,9 +87,14 @@ public class GameStateResource extends BaseResource {
     // One OPEN request per game. Seated players raise / edit / retract it; a
     // judge who is not seated in the game resolves it (and, until tournament→
     // judge assignment exists, only for non-tournament games). Each transition
-    // drops a SYSTEM line into game chat and pushes a refresh to the table and
-    // to any open judges page. All four return the fresh snapshot so the
-    // caller's own game page updates without a second round trip.
+    // pushes a refresh to the table and to any open judges page. All four
+    // return the fresh snapshot so the caller's own game page updates without a
+    // second round trip.
+    //
+    // Only a *resolution* drops a line into game chat (it carries the ruling
+    // text, which is worth keeping in the log). Call / edit / retract stay out
+    // of chat — the pulsing "Judge Called" button in CommandForm is the live
+    // cue, and the Judge page keeps the full request history.
 
     @POST
     @Path("judge-request")
@@ -105,7 +110,6 @@ public class GameStateResource extends BaseResource {
         } catch (IllegalStateException e) {
             throw new ClientErrorException(e.getMessage(), Response.Status.CONFLICT);
         }
-        ChatService.sendSystemMessage(gameId, player + " has called for a judge (" + label(category) + ").");
         notifyJudgeChange();
         return snapshot(game, player);
     }
@@ -124,7 +128,6 @@ public class GameStateResource extends BaseResource {
         if (JudgeService.editRequest(open.getId(), category, details) == null) {
             throw new ClientErrorException("The judge request is no longer open", Response.Status.CONFLICT);
         }
-        ChatService.sendSystemMessage(gameId, player + " updated their judge request.");
         notifyJudgeChange();
         return snapshot(game, player);
     }
@@ -141,7 +144,6 @@ public class GameStateResource extends BaseResource {
         if (!JudgeService.retractRequest(open.getId())) {
             throw new ClientErrorException("The judge request is no longer open", Response.Status.CONFLICT);
         }
-        ChatService.sendSystemMessage(gameId, player + " retracted their judge request.");
         notifyJudgeChange();
         return snapshot(game, player);
     }
@@ -203,14 +205,6 @@ public class GameStateResource extends BaseResource {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Unknown judge request category: " + raw);
         }
-    }
-
-    private static String label(JudgeRequestCategory category) {
-        return switch (category) {
-            case INCORRECT_PLAY -> "Incorrect play";
-            case CARD_RULING -> "Card ruling";
-            case OTHER -> "Other";
-        };
     }
 
     private void notifyJudgeChange() {

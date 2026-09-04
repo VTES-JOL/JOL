@@ -15,8 +15,8 @@ import { HandStrip } from './game/HandStrip';
 import { CommandForm } from './game/CommandForm';
 import { GameChatPanel } from './game/GameChatPanel';
 import { HistoryPanel } from './game/HistoryPanel';
-import { NotesPanel } from './game/NotesPanel';
-import { DeckPanel } from './game/DeckPanel';
+import { NotesDeckDrawer } from './game/NotesDeckDrawer';
+import { useNotesIndicator } from './game/useNotesIndicator';
 import { PlayCardModal, type PendingTarget } from './game/PlayCardModal';
 import { CardActionModal } from './game/CardActionModal';
 import { TargetPicker } from './game/TargetPicker';
@@ -33,7 +33,7 @@ export function GamePage() {
   const { player: viewerName } = useAuth();
   const queryClient = useQueryClient();
   const [showHistory, setShowHistory] = useState(false);
-  const [showDeck, setShowDeck] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
   const [playModal, setPlayModal] = useState<{ ctx: HandCardContext; card: CardSnapshot } | null>(null);
   const [tableModal, setTableModal] = useState<TableCardContext | null>(null);
   const [pendingTarget, setPendingTarget] = useState<PendingTarget | null>(null);
@@ -48,6 +48,7 @@ export function GamePage() {
   });
   useGameSocket(gameId ?? null);
   useCardTooltips(boardRef, [game]);
+  const notesIndicator = useNotesIndicator(game, notesOpen);
 
   const applyUpdate = useCallback(
     (updated: GameSnapshot) => queryClient.setQueryData(['game', gameId], updated),
@@ -135,9 +136,19 @@ export function GamePage() {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 p-2 bg-base text-ink">
-      <h5 className="flex justify-between items-center text-lg select-all">
-        <span>{game.name}</span>
-      </h5>
+      <div className="flex items-baseline gap-x-3 gap-y-0.5 flex-wrap px-1 pb-1">
+        <h1 className="text-lg font-semibold text-ink select-all">{game.name}</h1>
+        <span className="flex items-center gap-1.5 text-sm text-ink-secondary">
+          <span>{game.turnLabel}</span>
+          <span className="text-ink-muted">·</span>
+          <span>{game.phase}</span>
+        </span>
+        {viewerName === game.currentPlayer && (
+          <span className="inline-flex items-center rounded-full border border-accent/40 bg-accent/15 px-2 py-0.5 text-xs font-medium text-accent">
+            Your turn
+          </span>
+        )}
+      </div>
       <div className="flex-1 min-h-0 overflow-y-auto my-1" ref={boardRef}>
         <div className="control-grid">
           <HandStrip handRegion={handRegion} show={game.player && !!viewerName} onPlayCardClick={handlePlayCardClick} />
@@ -150,17 +161,26 @@ export function GamePage() {
             guard={guard}
           />
           {showHistory ? (
-            <HistoryPanel gameId={gameId} game={game} viewerName={viewerName} onToggleChat={() => setShowHistory(false)} />
+            <HistoryPanel
+              gameId={gameId}
+              game={game}
+              viewerName={viewerName}
+              onToggleChat={() => setShowHistory(false)}
+              notesIndicator={notesIndicator}
+              onOpenNotes={() => setNotesOpen(true)}
+            />
           ) : (
-            <GameChatPanel gameId={gameId} game={game} viewerName={viewerName} onToggleHistory={() => setShowHistory(true)} />
-          )}
-          {showDeck ? (
-            <DeckPanel gameId={gameId} onToggleNotes={() => setShowDeck(false)} />
-          ) : (
-            <NotesPanel gameId={gameId} game={game} onToggleDeck={() => setShowDeck(true)} />
+            <GameChatPanel
+              gameId={gameId}
+              game={game}
+              viewerName={viewerName}
+              onToggleHistory={() => setShowHistory(true)}
+              notesIndicator={notesIndicator}
+              onOpenNotes={() => setNotesOpen(true)}
+            />
           )}
         </div>
-        <div className="grid gap-2 mt-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="game-board grid gap-2 mt-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {game.players.map((player) => (
             <PlayerBoard
               key={player.name}
@@ -175,6 +195,7 @@ export function GamePage() {
           ))}
         </div>
       </div>
+      <NotesDeckDrawer gameId={gameId} game={game} open={notesOpen} onClose={() => setNotesOpen(false)} />
       {pendingTarget && <TargetPicker cardName={pendingTarget.cardName} onCancel={() => setPendingTarget(null)} />}
       {playModal && viewerName && (
         <PlayCardModal

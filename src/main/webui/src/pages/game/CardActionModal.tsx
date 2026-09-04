@@ -1,8 +1,9 @@
-import { useEffect, useState, type MouseEvent, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   ArrowLeftCircle,
   ArrowRightCircle,
-  Ban,
+  ChevronLeft,
+  ChevronRight,
   Eye,
   EyeOff,
   Flame,
@@ -109,57 +110,50 @@ function buttonVisible(btn: ButtonConfig, region: string, locked: boolean, conte
   return true;
 }
 
-function InlinePicker({
-  value,
-  values,
-  kind,
-  resolveName,
-  onChange,
-}: {
+// Read-only clan/path/sect glyph shown in the modal header. Nothing renders
+// for an unset value — the editable AttrRow below is where a blank one is
+// filled in.
+function AttrIcon({ kind, value, resolveName }: {
+  kind: 'clan' | 'path' | 'sect';
+  value: string | null | undefined;
+  resolveName: (value?: string | null) => string | undefined;
+}) {
+  const display = resolveName(value);
+  if (!display) return null;
+  return <span className={`${kind} ${nameToKey(display)} mx-1`} title={display} />;
+}
+
+// One labelled dropdown in the attributes row. Always visible (unlike the old
+// click-to-reveal InlinePicker), so it's clear these are editable fields, not
+// decoration. Same command path as before (cardActions.clan/path/sect).
+function AttrSelect({ label, value, values, resolveName, onChange }: {
+  label: string;
   value: string | null | undefined;
   values: string[];
-  kind: 'clan' | 'path' | 'sect';
   resolveName: (value?: string | null) => string | undefined;
   onChange: (newKey: string) => void;
 }) {
-  const [editing, setEditing] = useState(false);
   const display = resolveName(value) ?? 'None';
-
-  if (editing) {
-    return (
-      <Select
-        srLabel={kind}
-        size="sm"
-        className="w-auto ms-2"
-        autoFocus
-        defaultValue={nameToKey(display)}
-        onBlur={() => setEditing(false)}
-        onChange={(e) => {
-          onChange(e.target.value);
-          setEditing(false);
-        }}
-      >
-        {values.map((v) => (
-          <option key={v} value={nameToKey(v)}>
-            {v}
-          </option>
-        ))}
-      </Select>
-    );
-  }
-
-  return display.toLowerCase() === 'none' ? (
-    <span className="text-ink-muted mx-1 cursor-pointer" title="None" onClick={() => setEditing(true)}>
-      <Ban size={14} />
-    </span>
-  ) : (
-    <span
-      className={`${kind} ${nameToKey(display)} mx-1 cursor-pointer`}
-      title={display}
-      onClick={() => setEditing(true)}
-    />
+  return (
+    <Select
+      label={label}
+      size="sm"
+      value={nameToKey(display)}
+      onChange={(e) => onChange(e.target.value)}
+    >
+      {values.map((v) => (
+        <option key={v} value={nameToKey(v)}>
+          {v}
+        </option>
+      ))}
+    </Select>
   );
 }
+
+const STEP_BTN =
+  'inline-flex h-6 w-6 items-center justify-center rounded-full border border-line-accent text-ink-secondary hover:bg-hover';
+const XFER_BTN =
+  'inline-flex items-center gap-1 rounded border border-line-accent px-2 py-1 text-sm text-ink-secondary hover:bg-hover';
 
 // Mirrors card-modal.jsp + showCardModal()/doCardCommand() and friends from
 // card-modal.js — the core on-table card action modal used by every seated
@@ -187,6 +181,8 @@ export function CardActionModal({
   const contested = !!card.contested;
   const showCounters = ctx.regionCommandKey !== 'ashheap';
   const showTransfers = isOwner && minion && ctx.regionCommandKey !== 'ashheap';
+  // Clan / path / sect are only editable for a minion you own that's in play.
+  const showAttributes = minion && isOwner && ctx.regionCommandKey === 'ready';
   const hasVotes = !!card.votes && card.votes !== '0';
   const counterText = `${card.counters}${(card.capacity ?? 0) > 0 ? ` / ${card.capacity}` : ''}`;
   const counterStyle = COUNTER_STYLE(!!card.hasLife, !!card.hasBlood, card.capacity ?? 0, OTHER_VISIBLE_REGIONS.has(ctx.regionType));
@@ -196,48 +192,18 @@ export function CardActionModal({
     if (close) onClose();
   };
 
-  const vialClick = (e: MouseEvent<HTMLElement>, onUp: () => void, onDown: () => void) => {
-    const bounds = e.currentTarget.getBoundingClientRect();
-    if (e.clientX - bounds.left >= bounds.width / 2) onUp();
-    else onDown();
-  };
-
   return (
     <Modal onClose={onClose} bodyClassName="flex flex-col min-h-0 overflow-y-auto flex-1">
       <>
           <div className="flex justify-between items-center px-2 py-1 border-b border-line bg-panel/45">
             <span className="flex items-center">
-              {minion && (
-                <InlinePicker
-                  value={card.clan}
-                  values={CLANS}
-                  kind="clan"
-                  resolveName={clanName}
-                  onChange={(key) => doAction((c) => cardActions.clan(c, key), false)}
-                />
-              )}
+              <AttrIcon kind="clan" value={card.clan} resolveName={clanName} />
               <span className="card-name text-lg">{cardName}</span>
               {hasVotes && <span className={`${PILL} bg-gold text-surface mx-2`}>{card.votes}</span>}
             </span>
             <span className="flex items-center">
-              {minion && (
-                <InlinePicker
-                  value={card.path}
-                  values={PATHS}
-                  kind="path"
-                  resolveName={pathName}
-                  onChange={(key) => doAction((c) => cardActions.path(c, key), false)}
-                />
-              )}
-              {minion && (
-                <InlinePicker
-                  value={card.sect}
-                  values={SECTS}
-                  kind="sect"
-                  resolveName={sectName}
-                  onChange={(key) => doAction((c) => cardActions.sect(c, key), false)}
-                />
-              )}
+              <AttrIcon kind="path" value={card.path} resolveName={pathName} />
+              <AttrIcon kind="sect" value={card.sect} resolveName={sectName} />
               <button
                 type="button"
                 title="Close"
@@ -267,34 +233,83 @@ export function CardActionModal({
               />
             </div>
           </div>
-          <div className="flex flex-col items-center p-3 border-t border-line">
+          <div className="flex flex-col items-center gap-3 p-3 border-t border-line">
             {(showCounters || showTransfers) && (
-              <div className="flex justify-between items-center gap-1 rounded-full bg-blood/15 p-1 text-lg">
+              <div className="flex flex-col items-center gap-2">
                 {showCounters && (
-                  <div
-                    className={`${PILL} ${counterStyle} gap-1 text-base cursor-pointer`}
-                    title="Counters; click right side to increase, left to decrease"
-                    onClick={(e) => vialClick(e, () => doAction(cardActions.addCounter, false), () => doAction(cardActions.removeCounter, false))}
-                  >
-                    <Minus size={13} />
-                    {counterText}
-                    <Plus size={13} />
+                  <div className="flex items-center gap-2">
+                    <span className="w-14 text-right text-xs text-ink-muted">Counters</span>
+                    <div className="inline-flex items-center gap-2 rounded-full bg-blood/15 p-1">
+                      <button
+                        type="button"
+                        aria-label="Remove a counter"
+                        className={STEP_BTN}
+                        onClick={() => doAction(cardActions.removeCounter, false)}
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span className={`${PILL} ${counterStyle} min-w-[3ch] justify-center text-base`}>{counterText}</span>
+                      <button
+                        type="button"
+                        aria-label="Add a counter"
+                        className={STEP_BTN}
+                        onClick={() => doAction(cardActions.addCounter, false)}
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
                   </div>
                 )}
                 {showTransfers && (
-                  <>
-                    <div className="text-2xl cursor-pointer px-1" title="Transfer one pool to this card" onClick={() => doAction(cardActions.transferToCard, false)}>
-                      &#9668;
-                    </div>
-                    <div className="text-2xl cursor-pointer px-1" title="Transfer one blood to your pool" onClick={() => doAction(cardActions.transferToPool, false)}>
-                      &#9658;
-                    </div>
-                    <div className={`${PILL} bg-blood text-surface text-base`}>{ctx.controllerPool} pool</div>
-                  </>
+                  <div className="flex items-center gap-2">
+                    <span className="w-14 text-right text-xs text-ink-muted">Blood</span>
+                    <button
+                      type="button"
+                      className={XFER_BTN}
+                      title="Move one blood from your pool onto this card"
+                      onClick={() => doAction(cardActions.transferToCard, false)}
+                    >
+                      <ChevronLeft size={14} /> Move here
+                    </button>
+                    <span className={`${PILL} bg-blood text-surface`}>{ctx.controllerPool} pool</span>
+                    <button
+                      type="button"
+                      className={XFER_BTN}
+                      title="Move one blood from this card back to your pool"
+                      onClick={() => doAction(cardActions.transferToPool, false)}
+                    >
+                      To pool <ChevronRight size={14} />
+                    </button>
+                  </div>
                 )}
               </div>
             )}
-            <div className="mt-2 flex flex-wrap justify-center">
+            {showAttributes && (
+              <div className="grid w-full max-w-xs grid-cols-3 gap-2">
+                <AttrSelect
+                  label="Clan"
+                  value={card.clan}
+                  values={CLANS}
+                  resolveName={clanName}
+                  onChange={(key) => doAction((c) => cardActions.clan(c, key), false)}
+                />
+                <AttrSelect
+                  label="Path"
+                  value={card.path}
+                  values={PATHS}
+                  resolveName={pathName}
+                  onChange={(key) => doAction((c) => cardActions.path(c, key), false)}
+                />
+                <AttrSelect
+                  label="Sect"
+                  value={card.sect}
+                  values={SECTS}
+                  resolveName={sectName}
+                  onChange={(key) => doAction((c) => cardActions.sect(c, key), false)}
+                />
+              </div>
+            )}
+            <div className="flex flex-wrap justify-center">
               {BUTTONS.map((btn) =>
                 buttonVisible(btn, ctx.regionCommandKey, locked, contested, isOwner, ctx.isChild, minion, !!card.faceDown, ctx.controlledByViewer) ? (
                   <button key={btn.key} type="button" className={ACTION_BTN} title={btn.title} onClick={() => doAction(btn.action)}>

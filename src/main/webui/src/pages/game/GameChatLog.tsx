@@ -85,6 +85,10 @@ export function GameChatLog({
           );
         }
         const line = row.data;
+        // Machine-generated lines (phase markers, moves, judge rulings) get the
+        // same quiet channel as global chat's SYSTEM lines — see .chat-system
+        // in GamePage.css / GlobalChat.css.
+        const isSystem = line.source === 'SYSTEM';
         const prev = row.i > 0 ? lines[row.i - 1] : undefined;
         // One header per command *submission*, not per distinct command text:
         // dedup on invocationSeq (shared across the lines one submission emits,
@@ -106,9 +110,9 @@ export function GameChatLog({
                 <code>{line.invocation}</code>
               </p>
             )}
-            <p className="chat">
+            <p className={`chat${isSystem ? ' chat-system' : ''}`}>
               <span className="chat-timestamp">{line.timestamp}</span>{' '}
-              {line.source && line.source !== 'null' && <b>{line.source}</b>}{' '}
+              {!isSystem && line.source && line.source !== 'null' && <b>{line.source}</b>}{' '}
               <span>
                 <MessageContent message={line.message} viewer={viewerName} />
               </span>

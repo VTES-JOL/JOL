@@ -1,26 +1,26 @@
-/* The game table's grid layout: HandStrip/CommandForm/GameChatPanel or
-   HistoryPanel/DeckPanel or NotesPanel are the grid items assigned to these
-   named areas, so this file is really the layout contract those children
-   (pages/game/*.tsx) all rely on rather than something owned solely by
-   GamePage.tsx itself — it's imported once here since GamePage is what
-   mounts all of them together. */
+/* The game table's grid layout: HandStrip / CommandForm / (GameChatPanel or
+   HistoryPanel) are the grid items assigned to these named areas, so this
+   file is really the layout contract those children (pages/game/*.tsx) rely
+   on rather than something owned solely by GamePage.tsx — it's imported once
+   here since GamePage is what mounts them together. Notes + Deck are no
+   longer in this grid: they live in NotesDeckDrawer (a right-edge slide-over). */
 .control-grid {
     display: grid;
     grid-gap: 0.5rem;
     grid-auto-columns: minmax(10rem, 1fr);
     grid-auto-rows: minmax(0px, 22rem);
-    grid-template-areas: 'hand commands' 'chat chat' 'info info';
+    grid-template-areas: 'hand commands' 'chat chat';
 }
 
 @media (min-width: 768px) {
     .control-grid {
-        grid-template-areas: 'hand commands info' 'chat chat chat';
+        grid-template-areas: 'hand commands chat chat';
     }
 }
 
 @media (min-width: 1200px) {
     .control-grid {
-        grid-template-areas: 'hand commands chat chat chat info info';
+        grid-template-areas: 'hand commands chat chat chat';
     }
 }
 
@@ -38,18 +38,6 @@
 
 #historyCard {
     grid-area: chat;
-}
-
-#gameDeckCard {
-    grid-area: info;
-}
-
-#notesCard {
-    grid-area: info;
-}
-
-#globalNotes, #privateNotes {
-    height: 50%;
 }
 
 /* Judge-only "show commands" prefix line in the game chat log
@@ -99,4 +87,30 @@ p.chat-attempt code {
 
 p.chat-attempt .chat-attempt-error {
     font-style: italic;
+}
+
+/* Machine-generated game-chat lines (phase markers, moves, judge rulings) —
+   the same quiet visual channel global chat gives its SYSTEM lines
+   (GlobalChat.css). Kept here too because GlobalChat.css is only loaded on
+   the main page, never the game page. */
+p.chat.chat-system {
+    color: var(--jt-ink-muted);
+    font-style: italic;
+    border-left: 2px solid var(--jt-line);
+    padding-left: 0.5rem;
+}
+
+/* Card-name mentions on the board / hand strip get the same dotted-underline
+   hover affordance Help and Judge pages give card names — this page is
+   entirely about cards, so a cue that a name is a live hoverable preview is
+   worth the ink. Kept subtle (--jt-line, not --jt-ink-muted) because every
+   row here carries one. */
+.game-board a.card-name,
+.hand a.card-name {
+    border-bottom: 1px dotted var(--jt-line);
+}
+
+.game-board a.card-name:hover,
+.hand a.card-name:hover {
+    border-bottom-color: var(--jt-ink-muted);
 }

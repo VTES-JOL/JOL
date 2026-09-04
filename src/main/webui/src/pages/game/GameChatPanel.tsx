@@ -4,6 +4,8 @@ import { api } from '../../api/client';
 import type { ChatData, CommandError, GameSnapshot } from '../../api/types';
 import { GameChatLog } from './GameChatLog';
 import { GamePanel } from './GamePanel';
+import { NotesToggleButton } from './NotesToggleButton';
+import type { NotesIndicator } from './useNotesIndicator';
 import { useShowCommands } from './useShowCommands';
 
 export function GameChatPanel({
@@ -11,11 +13,15 @@ export function GameChatPanel({
   game,
   viewerName,
   onToggleHistory,
+  notesIndicator,
+  onOpenNotes,
 }: {
   gameId: string;
   game: GameSnapshot;
   viewerName: string | null;
   onToggleHistory: () => void;
+  notesIndicator: NotesIndicator;
+  onOpenNotes: () => void;
 }) {
   const [lines, setLines] = useState<ChatData[]>([]);
   const [errors, setErrors] = useState<CommandError[]>([]);
@@ -66,7 +72,7 @@ export function GameChatPanel({
               Commands
             </button>
           )}
-          <span className="px-1 text-xs text-ink-muted">{`${game.turnLabel} - ${game.phase}`}</span>
+          <NotesToggleButton indicator={notesIndicator} onClick={onOpenNotes} />
         </span>
       }
       toggle={{ icon: <History size={13} />, label: 'History', onClick: onToggleHistory }}

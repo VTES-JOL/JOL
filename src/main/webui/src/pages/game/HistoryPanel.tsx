@@ -5,6 +5,8 @@ import type { ChatData, CommandError, GameSnapshot } from '../../api/types';
 import { Select } from '../../components/ui/Select';
 import { GameChatLog } from './GameChatLog';
 import { GamePanel } from './GamePanel';
+import { NotesToggleButton } from './NotesToggleButton';
+import type { NotesIndicator } from './useNotesIndicator';
 import { useShowCommands } from './useShowCommands';
 
 export function HistoryPanel({
@@ -12,11 +14,15 @@ export function HistoryPanel({
   game,
   viewerName,
   onToggleChat,
+  notesIndicator,
+  onOpenNotes,
 }: {
   gameId: string;
   game: GameSnapshot;
   viewerName: string | null;
   onToggleChat: () => void;
+  notesIndicator: NotesIndicator;
+  onOpenNotes: () => void;
 }) {
   const [turn, setTurn] = useState(game.turns[game.turns.length - 1] ?? '');
   const [lines, setLines] = useState<ChatData[]>([]);
@@ -49,22 +55,25 @@ export function HistoryPanel({
       bodyClassName="flex flex-col p-2 overflow-hidden"
       title="History"
       headerExtra={
-        game.judge && (
-          <button
-            type="button"
-            aria-pressed={showCommands}
-            onClick={toggleCommands}
-            title="Show the raw command behind each line, and mistyped attempts"
-            className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${
-              showCommands
-                ? 'border-line-accent bg-hover text-ink'
-                : 'border-line text-ink-muted hover:bg-hover'
-            }`}
-          >
-            <Terminal size={12} />
-            Commands
-          </button>
-        )
+        <span className="flex items-center gap-2">
+          {game.judge && (
+            <button
+              type="button"
+              aria-pressed={showCommands}
+              onClick={toggleCommands}
+              title="Show the raw command behind each line, and mistyped attempts"
+              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${
+                showCommands
+                  ? 'border-line-accent bg-hover text-ink'
+                  : 'border-line text-ink-muted hover:bg-hover'
+              }`}
+            >
+              <Terminal size={12} />
+              Commands
+            </button>
+          )}
+          <NotesToggleButton indicator={notesIndicator} onClick={onOpenNotes} />
+        </span>
       }
       toggle={{ icon: <Clock size={13} />, label: 'Game Chat', onClick: onToggleChat }}
     >

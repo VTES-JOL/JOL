@@ -244,14 +244,14 @@ export function CommandForm({
                 ))}
               </Select>
               <div className="mt-2 flex justify-between">
-                <Button variant="secondary" size="sm" type="submit" disabled={submitting}>
+                <Button variant="primary" size="sm" type="submit" disabled={submitting}>
                   {submitting ? 'Submitting…' : 'Submit'}
                 </Button>
                 <Button
+                  variant="secondary"
                   size="sm"
                   type="button"
                   disabled={!isMyTurn || submitting}
-                  className="bg-gold text-surface hover:bg-gold-soft"
                   onClick={endTurn}
                 >
                   End Turn
@@ -260,7 +260,7 @@ export function CommandForm({
             </>
           )}
           {!canPlay && (
-            <Button variant="secondary" size="sm" type="submit" className="mt-2" disabled={submitting || !canChat}>
+            <Button variant="primary" size="sm" type="submit" className="mt-2" disabled={submitting || !canChat}>
               {submitting ? 'Submitting…' : 'Submit'}
             </Button>
           )}
