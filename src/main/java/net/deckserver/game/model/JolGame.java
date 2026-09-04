@@ -910,6 +910,23 @@ public record JolGame(String id, GameData data) {
         }
     }
 
+    /**
+     * Move a ready card to its controller's uncontrolled region (card effects
+     * such as Banishment). Any player may banish any card in play — like burn,
+     * the chat line records who did it. Source is always the ready region.
+     */
+    void banish(String player, String cardId, String srcPlayer) {
+        CardData card = data.getCard(cardId);
+        RegionData destination = data.getPlayerRegion(srcPlayer, RegionType.UNCONTROLLED);
+        boolean showRegionOwner = !player.equals(srcPlayer);
+        String message = String.format(
+                "banishes %s to %s uncontrolled region.",
+                getCardName(card, destination),
+                showRegionOwner ? srcPlayer + "'s" : "their");
+        ChatService.sendCommand(id, player, message, "banish", card.getId(), srcPlayer, RegionType.UNCONTROLLED.xmlLabel());
+        destination.addCard(card, false);
+    }
+
     void burn(String player, String cardId, String srcPlayer, RegionType srcRegion, boolean random) {
         {
             CardData card = data.getCard(cardId);

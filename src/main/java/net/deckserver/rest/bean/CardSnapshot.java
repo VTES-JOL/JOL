@@ -44,6 +44,8 @@ public class CardSnapshot {
     private final String sect;
     private final String path;
     private final String label;
+    /** Start-of-game owner (distinct from the board the card currently sits on). */
+    private final String owner;
     private final boolean minion;
     private final String typeClass;
     private final List<String> clanClasses;

@@ -539,6 +539,8 @@ export interface CardSnapshot {
   sect?: string;
   path?: string;
   label?: string;
+  /** Start-of-game owner — distinct from the board the card currently sits on. */
+  owner?: string;
   minion?: boolean;
   typeClass?: string;
   clanClasses?: string[];

@@ -89,6 +89,9 @@ public record DoCommand(JolGame game, GameModel model) {
             case "burn":
                 burn(cmdObj, player);
                 break;
+            case "banish":
+                banish(cmdObj, player);
+                break;
             case "pool":
                 pool(cmdObj, player);
                 break;
@@ -312,6 +315,13 @@ public record DoCommand(JolGame game, GameModel model) {
         CardData card = cmdObj.findCardData(true, srcPlayer, srcRegion);
         boolean random = Arrays.asList(cmdObj.args).contains("random");
         game.burn(player, card.getId(), srcPlayer, srcRegion, random);
+    }
+
+    // `banish [<player>] <position>` — source region is always ready.
+    void banish(CommandParser cmdObj, String player) throws CommandException {
+        String srcPlayer = cmdObj.getPlayer(player);
+        CardData card = cmdObj.findCardData(false, srcPlayer, RegionType.READY);
+        game.banish(player, card.getId(), srcPlayer);
     }
 
     void rfg(CommandParser cmdObj, String player) throws CommandException {

@@ -241,6 +241,7 @@ public class GameSnapshotFactory {
                 .sect(detail.getSect() != null ? detail.getSect().toString() : null)
                 .path(detail.getPath() != null ? detail.getPath().toString() : null)
                 .label(detail.getLabel())
+                .owner(card.getOwnerName())
                 .minion(detail.isMinion())
                 .typeClass(definition != null ? definition.typeClass() : null)
                 .clanClasses(definition != null ? definition.clanClasses() : null)

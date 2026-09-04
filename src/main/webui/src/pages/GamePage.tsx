@@ -215,6 +215,7 @@ export function GamePage() {
             ...(liveControllerPool !== undefined && { controllerPool: liveControllerPool }),
           }}
           viewerName={viewerName}
+          phase={game.phase}
           onSubmit={submit}
           onClose={() => setTableModal(null)}
         />

@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type MouseEvent } from 'react';
 import { Eye, EyeOff, Flame, Lock } from 'lucide-react';
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
 import { CardHidden } from './CardHidden';
@@ -68,7 +68,16 @@ export const Card = memo(function Card({
     return <CardHidden card={card} region={region} coordinate={coordinate} />;
   }
 
-  const rowClick = onCardClick ?? (onAction ? () => onAction({ coordinate, card, isChild }) : undefined);
+  const rawRowClick = onCardClick ?? (onAction ? () => onAction({ coordinate, card, isChild }) : undefined);
+  // An attached card sits inside its parent minion's clickable <li>; without
+  // this, a click on the child bubbles up and the parent's handler runs last,
+  // opening the base minion's actions instead of the child's.
+  const rowClick = rawRowClick
+    ? (e: MouseEvent) => {
+        e.stopPropagation();
+        rawRowClick();
+      }
+    : undefined;
   const faceDownStyle = card.faceDown ? 'opacity-60 border-l-2 border-dashed border-ink-muted' : '';
 
   const hasVotes = !!card.votes && card.votes !== '0';

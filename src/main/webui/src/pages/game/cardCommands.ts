@@ -42,6 +42,9 @@ export const cardActions = {
   bleed: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'lock'), chat: 'Bleed' }),
   hunt: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'lock'), chat: 'Hunt' }),
   torpor: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'move', `${controllerFirstName(ctx)} torpor`) }),
+  // `banish <player> <coord>` — engine moves the card from that player's ready
+  // region to their uncontrolled region and logs it (source is always ready).
+  banish: (ctx: TableCardContext): Submission => ({ command: `banish ${controllerFirstName(ctx)} ${ctx.coordinate}` }),
   goAnarch: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'lock'), chat: 'Go anarch' }),
   leaveTorpor: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'lock'), chat: 'Leave Torpor' }),
   burn: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'burn') }),
