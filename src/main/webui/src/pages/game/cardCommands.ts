@@ -49,11 +49,12 @@ export const cardActions = {
   leaveTorpor: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'lock'), chat: 'Leave Torpor' }),
   burn: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'burn') }),
   influence: (ctx: TableCardContext): Submission => ({ command: `influence ${ctx.coordinate}` }),
-  block: (cardName: string): Submission => ({ chat: `${cardName} blocks` }),
+  block: (cardName: string): Submission => ({ chat: `[${cardName}] blocks` }),
   // Rescue is announced like a block — the actual "move to ready" happens
   // separately if it resolves. Target name comes from a cross-card pick.
+  // [Name] brackets so parseGameChat resolves both to hoverable card links.
   rescue: (rescuerName: string, targetName: string): Submission => ({
-    chat: `${rescuerName} attempts to rescue ${targetName}`,
+    chat: `[${rescuerName}] attempts to rescue [${targetName}]`,
   }),
   moveHand: (ctx: TableCardContext): Submission => ({ command: `move ${ctx.regionCommandKey} ${ctx.coordinate} hand` }),
   moveReady: (ctx: TableCardContext): Submission => ({ command: `move ${ctx.regionCommandKey} ${ctx.coordinate} ready` }),

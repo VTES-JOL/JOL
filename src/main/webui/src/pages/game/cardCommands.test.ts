@@ -65,8 +65,14 @@ describe('cardActions', () => {
     expect(cardActions.influence(makeCtx({ coordinate: '2' }))).toEqual({ command: 'influence 2' });
   });
 
-  it('block is chat-only, no command', () => {
-    expect(cardActions.block('Some Vampire')).toEqual({ chat: 'Some Vampire blocks' });
+  it('block is chat-only, no command; card name is bracketed for link resolution', () => {
+    expect(cardActions.block('Some Vampire')).toEqual({ chat: '[Some Vampire] blocks' });
+  });
+
+  it('rescue is chat-only; rescuer and target are both bracketed', () => {
+    expect(cardActions.rescue('Nosferatu', 'Sasha Miklos')).toEqual({
+      chat: '[Nosferatu] attempts to rescue [Sasha Miklos]',
+    });
   });
 
   it('moveHand/moveReady/moveUncontrolled move by region+coordinate only (no controller name)', () => {

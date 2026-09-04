@@ -115,6 +115,37 @@ export const Card = memo(function Card({
       }
     : null;
 
+  // Sits in the right-hand cluster (just left of the counter badge) so it
+  // never shifts the coordinate number and break the nesting indent.
+  const lockControl = card.locked ? (
+    quickLock ? (
+      <button
+        type="button"
+        title="Unlock"
+        onClick={quickLock('unlock')}
+        className="shrink-0 inline-flex items-center rounded bg-accent text-surface px-1 py-0.5 hover:bg-accent-dim"
+      >
+        <Lock size={11} strokeWidth={2.75} />
+      </button>
+    ) : (
+      <span className="shrink-0 inline-flex items-center rounded bg-accent text-surface px-1 py-0.5" title="Locked">
+        <Lock size={11} strokeWidth={2.75} />
+      </span>
+    )
+  ) : (
+    quickLock &&
+    !isChild && (
+      <button
+        type="button"
+        title="Lock"
+        onClick={quickLock('lock')}
+        className="shrink-0 inline-flex items-center rounded border border-line-accent text-ink-muted px-1 py-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:border-ink hover:text-ink"
+      >
+        <Lock size={11} />
+      </button>
+    )
+  );
+
   return (
     <li
       className={`group flex justify-between items-start ${rowPad} ${regionStyle} ${contestedStyle} ${faceDownStyle} ${card.locked ? 'border-l-2 border-accent bg-accent/5' : ''}`}
@@ -126,36 +157,6 @@ export const Card = memo(function Card({
         <div className="flex justify-between">
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
-              {card.locked ? (
-                quickLock ? (
-                  <button
-                    type="button"
-                    title="Unlock"
-                    onClick={quickLock('unlock')}
-                    className="shrink-0 inline-flex items-center rounded bg-accent text-surface px-1 py-0.5 hover:bg-accent-dim"
-                  >
-                    <Lock size={11} strokeWidth={2.75} />
-                  </button>
-                ) : (
-                  <span
-                    className="shrink-0 inline-flex items-center rounded bg-accent text-surface px-1 py-0.5"
-                    title="Locked"
-                  >
-                    <Lock size={11} strokeWidth={2.75} />
-                  </span>
-                )
-              ) : (
-                quickLock && !isChild && (
-                  <button
-                    type="button"
-                    title="Lock"
-                    onClick={quickLock('lock')}
-                    className="shrink-0 inline-flex items-center rounded border border-line-accent text-ink-muted px-1 py-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:border-ink hover:text-ink"
-                  >
-                    <Lock size={11} />
-                  </button>
-                )
-              )}
               <span className="text-ink-muted text-xs tabular-nums select-all shrink-0">{coordinate}</span>
               <a data-card-id={card.cardId} data-secured={card.playtest ? 'true' : undefined} className="card-name text-wrap">
                 {card.name}
@@ -187,6 +188,7 @@ export const Card = memo(function Card({
           <div className="flex flex-col">
             <div className="flex justify-end items-center gap-1">
               {card.infernal && <Flame size={14} className="text-blood" />}
+              {lockControl}
               {showCounterBadge && <span className={`${PILL} ${counterStyle} shadow-sm`}>{counterText}</span>}
             </div>
             <div className="flex justify-end items-center gap-1">
