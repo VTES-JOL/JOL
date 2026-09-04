@@ -1,0 +1,14 @@
+/* Card-name mentions in a judge request or ruling get the same dotted-underline
+   hover affordance the Help page gives them (a.card-name is otherwise plain
+   text everywhere else) — this page exists for card rulings, so a visible cue
+   that a name is a live, hoverable preview is worth having here. Tokens from
+   styles/tailwind.css, so this flips with dark mode. */
+.judge-prose a.card-name {
+    border-bottom: 1px dotted var(--jt-ink-muted);
+    cursor: help;
+}
+
+.judge-prose a.card-name:hover {
+    border-bottom-style: solid;
+    border-bottom-color: currentColor;
+}
