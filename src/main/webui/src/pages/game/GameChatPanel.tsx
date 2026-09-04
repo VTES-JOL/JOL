@@ -77,7 +77,7 @@ export function GameChatPanel({
       }
       toggle={{ icon: <History size={13} />, label: 'History', onClick: onToggleHistory }}
     >
-      <GameChatLog lines={lines} viewerName={viewerName} showCommands={judgeCommands} errors={errors} />
+      <GameChatLog lines={lines} viewerName={viewerName} showCommands={judgeCommands} errors={errors} seating={game.seating} />
     </GamePanel>
   );
 }

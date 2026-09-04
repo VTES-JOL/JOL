@@ -589,6 +589,9 @@ export interface ChatData {
   // [d], [style:text]); rendered by <MessageContent>. Not HTML.
   message: string;
   source: string;
+  // Structured `verb arg…` form of the action. Judge-only — it carries the
+  // real card id even for a face-down play/move, so the server strips it for
+  // seated players / spectators. The client does not render it.
   command?: string;
   // Raw command a player submitted, plus who submitted it. Server only sends
   // these to a judge watching a game they are not seated in; stripped otherwise.

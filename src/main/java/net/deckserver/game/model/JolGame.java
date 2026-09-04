@@ -61,12 +61,22 @@ public record JolGame(String id, GameData data) {
     public void withdraw(String player) {
         data.getPlayer(player).setPool(0);
         data.getPlayer(player).addVictoryPoints(0.5f);
-        ChatService.sendCommand(id, player, "withdraws and gains 0.5 victory points.", "withdraw");
+        log(player, "withdraws and gains 0.5 victory points", "withdraw");
     }
 
-    public void updateVP(String targetPlayer, float amount) {
+    public void updateVP(String actor, String targetPlayer, float amount) {
         data.getPlayer(targetPlayer).addVictoryPoints(amount);
-        ChatService.sendCommand(id, targetPlayer, targetPlayer + " has " + (amount > 0 ? "gained " : "lost ") + DecimalFormat.getCompactNumberInstance().format(Math.abs(amount)) + " victory points.", "vp", String.valueOf(amount));
+        String vp = new DecimalFormat("0.##").format(Math.abs(amount))
+                + (Math.abs(amount) == 1f ? " victory point" : " victory points");
+        String body;
+        if (actor.equals(targetPlayer)) {
+            body = (amount > 0 ? "gains " : "loses ") + vp;
+        } else if (amount > 0) {
+            body = "awards " + targetPlayer + " " + vp;
+        } else {
+            body = "removes " + vp + " from " + targetPlayer;
+        }
+        log(actor, body, "vp", String.valueOf(amount));
     }
 
     public double getVictoryPoints(String player) {
@@ -79,7 +89,7 @@ public record JolGame(String id, GameData data) {
             playerData.setPool(0);
             playerData.setOusted(true);
         });
-        ChatService.sendSystemMessage(id, "Game has timed out.  Surviving players have been awarded ½ VP.");
+        ChatService.sendSystemMessage(id, "Game timed out. Surviving players are awarded ½ VP.");
     }
 
     public void requestTimeout(String player) {
@@ -91,10 +101,10 @@ public record JolGame(String id, GameData data) {
             data.setTimeoutRequestor(player);
         }
         if (isTimedOut) {
-            ChatService.sendCommand(id, player, "has confirmed the game time has been reached.", "timeout", "confirmed");
+            log(player, "confirms the game timeout", "timeout", "confirmed");
             timeout();
         } else {
-            ChatService.sendCommand(id, player,  "has requested that the game be timed out.", "timeout", "requested");
+            log(player, "requests a game timeout", "timeout", "requested");
         }
     }
 
@@ -113,13 +123,13 @@ public record JolGame(String id, GameData data) {
         RegionData destination = data.getPlayer(player).getRegion(RegionType.ASH_HEAP);
         destination.addCard(card, false);
         cardLink = getCardLink(card.getCardId(), card.getName(), card.isAdvanced());
-        String message = String.format("discards %s%s", cardLink, random ? " (picked randomly)" : "");
-        ChatService.sendCommand(id, player, message, "discard", cardId, player, RegionType.ASH_HEAP.xmlLabel());
+        String message = String.format("discards %s%s", cardLink, random ? " (picked at random)" : "");
+        log(player, message, "discard", cardId, player, RegionType.ASH_HEAP.xmlLabel());
     }
 
     public void playCard(String player, String cardId, String destinationPlayer, RegionType destinationRegion, String targetId, String[] modes, boolean faceDown) {
         StringBuilder modeMessage = new StringBuilder();
-        String playerTitle = destinationPlayer.equals(player) ? "their" : destinationPlayer + "'s";
+        String playerTitle = GameLog.possessive(destinationPlayer, player);
 
         if (modes != null) {
             for (String mode : modes)
@@ -136,10 +146,10 @@ public record JolGame(String id, GameData data) {
         // other way.
         card.setFaceDown(faceDown);
 
-        String sourceMessage = RegionType.HAND.equals(source.getType()) ? "" : " from their " + source.getType().xmlLabel();
+        String sourceMessage = RegionType.HAND.equals(source.getType()) ? "" : " from their " + source.getType().logLabel();
         String destinationMessage;
         if (target == null) {
-            destinationMessage = RegionType.ASH_HEAP.equals(destinationRegion) ? "" : String.format(" to %s %s", playerTitle, destinationRegion.xmlLabel());
+            destinationMessage = RegionType.ASH_HEAP.equals(destinationRegion) ? "" : String.format(" to %s %s", playerTitle, destinationRegion.logLabel());
             destination.addCard(card, false);
         } else {
             destinationMessage = String.format(" on %s", getTargetCardName(target, player));
@@ -149,8 +159,8 @@ public record JolGame(String id, GameData data) {
         if (faceDown) {
             // S1: no card token, no catalog id — identity lives only on CardData.
             // Contest (unique cards) is re-checked when the card is revealed.
-            String message = String.format("plays a card face down%s%s.", sourceMessage, destinationMessage);
-            ChatService.sendCommand(id, player, message, "play", cardId, destinationPlayer, destinationRegion.xmlLabel());
+            String message = String.format("plays a card face down%s%s", sourceMessage, destinationMessage);
+            log(player, message, "play", cardId, destinationPlayer, destinationRegion.xmlLabel());
             return;
         }
 
@@ -159,8 +169,8 @@ public record JolGame(String id, GameData data) {
         }
 
         String cardLink = getCardLink(card.getCardId(), card.getName(), card.isAdvanced());
-        String message = String.format("plays %s%s%s%s.", cardLink, sourceMessage, modeMessage, destinationMessage);
-        ChatService.sendCommand(id, player, message, "play", cardId, destinationPlayer, destinationRegion.xmlLabel());
+        String message = String.format("plays %s%s%s%s", cardLink, sourceMessage, modeMessage, destinationMessage);
+        log(player, message, "play", cardId, destinationPlayer, destinationRegion.xmlLabel());
     }
 
     /** Mark every copy of a unique card in play as contested (and announce it). */
@@ -184,9 +194,9 @@ public record JolGame(String id, GameData data) {
         CardData card = data.getCard(cardId);
         card.setFaceDown(faceDown);
         if (faceDown) {
-            ChatService.sendCommand(id, player, String.format("turns %s face down.", getCardLink(card)), "hide", card.getId());
+            log(player, String.format("turns %s face down", getCardLink(card)), "hide", card.getId());
         } else {
-            ChatService.sendCommand(id, player, String.format("reveals %s.", getCardLink(card)), "reveal", card.getId());
+            log(player, String.format("reveals %s", getCardLink(card)), "reveal", card.getId());
             if (RegionType.READY.equals(card.getRegion().getType())) {
                 checkContested(card);
             }
@@ -199,42 +209,42 @@ public record JolGame(String id, GameData data) {
         RegionData destination = data.getPlayerRegion(player, RegionType.READY);
         destination.addCard(card, true);
         if (!Strings.isNullOrEmpty(card.getVotes())) {
-            votesText = ", votes: " + card.getVotes();
+            votesText = " (votes: " + card.getVotes() + ")";
         }
-        ChatService.sendCommand(id, player, String.format("influences out %s%s.", getCardLink(card), votesText), "influence", card.getId(), player, RegionType.READY.xmlLabel());
-        List<CardData> cards = data.getUniqueCards(card);
-        if (cards.size() > 1) {
-            cards.forEach(c -> {
-                c.setContested(true);
-            });
-            ChatService.sendSystemMessage(id, String.format("%s is now contested.", getCardLink(card)));
-        }
+        log(player, String.format("influences out %s%s", getCardLink(card), votesText), "influence", card.getId(), player, RegionType.READY.xmlLabel());
+        checkContested(card);
     }
 
     public void setSect(String player, String cardId, Sect sect, boolean quiet) {
         CardData card = data.getCard(cardId);
-        String oldSect = card.getSect().getDescription();
         card.setSect(sect);
         if (!quiet) {
-            ChatService.sendCommand(id, player, String.format("changes sect of %s from %s to %s", getCardLink(card), oldSect, sect.getDescription()), "sect", card.getId(), player, sect.getDescription());
+            String body = sect == Sect.NONE
+                    ? String.format("clears %s's sect", getCardLink(card))
+                    : String.format("sets %s's sect to %s", getCardLink(card), sect.getDescription());
+            log(player, body, "sect", card.getId(), player, sect.getDescription());
         }
     }
 
     public void setPath(String player, String cardId, Path path, boolean quiet) {
         CardData card = data.getCard(cardId);
-        String oldPath = card.getPath().getDescription();
         card.setPath(path);
         if (!quiet) {
-            ChatService.sendCommand(id, player, String.format("changes path of %s from %s to %s", getCardLink(card), oldPath, path.getDescription()), "path", card.getId(), player, path.getDescription());
+            String body = path == Path.NONE
+                    ? String.format("clears %s's path", getCardLink(card))
+                    : String.format("sets %s's path to %s", getCardLink(card), path.getDescription());
+            log(player, body, "path", card.getId(), player, path.getDescription());
         }
     }
 
     public void setClan(String player, String cardId, Clan clan, boolean quiet) {
         CardData card = data.getCard(cardId);
-        String oldClan = card.getClan().getDescription();
         card.setClan(clan);
         if (!quiet) {
-            ChatService.sendCommand(id, player, String.format("changes clan of %s from %s to %s", getCardLink(card), oldClan, clan.getDescription()), "clan", card.getId(), player, clan.getDescription());
+            String body = clan == Clan.NONE
+                    ? String.format("clears %s's clan", getCardLink(card))
+                    : String.format("sets %s's clan to %s", getCardLink(card), clan.getDescription());
+            log(player, body, "clan", card.getId(), player, clan.getDescription());
         }
     }
 
@@ -242,8 +252,8 @@ public record JolGame(String id, GameData data) {
         RegionData region = data.getPlayerRegion(player, type);
         int size = region.getCards().size();
         region.shuffle(num);
-        String add = (num == 0 || num >= size) ? "their" : "the first " + num + " cards of their";
-        ChatService.sendCommand(id, player, String.format("shuffles %s %s.", add, type.xmlLabel()), "shuffle", player, type.xmlLabel(), String.valueOf(num));
+        String add = (num == 0 || num >= size) ? "their" : "the top " + num + " cards of their";
+        log(player, String.format("shuffles %s %s", add, type.logLabel()), "shuffle", player, type.xmlLabel(), String.valueOf(num));
     }
 
     public void startGame(List<String> playerSeating) {
@@ -319,8 +329,8 @@ public record JolGame(String id, GameData data) {
         playerData.setPool(newPool);
         card.setCounters(newCounters);
         String direction = amount > 0 ? "onto" : "off";
-        String message = String.format("transferred %d blood %s %s. Currently: %d, Pool: %d", Math.abs(amount), direction, getCardName(card), newCounters, newPool);
-        ChatService.sendCommand(id, player, message, "transfer", card.getId(), String.valueOf(amount));
+        String message = String.format("moves %d blood %s %s (now %d) (pool %d)", Math.abs(amount), direction, getCardName(card), newCounters, newPool);
+        log(player, message, "transfer", card.getId(), String.valueOf(amount));
     }
 
     public void changeCounters(String player, String cardId, int incr, boolean quiet) {
@@ -331,8 +341,8 @@ public record JolGame(String id, GameData data) {
             current += incr;
             card.setCounters(current);
             if (!quiet) {
-                String logText = String.format("%s %s blood %s %s, now %s. ", incr < 0 ? "removes" : "adds", Math.abs(incr), incr < 0 ? "from" : "to", getCardName(card), current);
-                ChatService.sendCommand(id, player, logText, "counter", card.getId(), String.valueOf(incr));
+                String logText = String.format("%s %d blood %s %s (now %d)", incr < 0 ? "removes" : "adds", Math.abs(incr), incr < 0 ? "from" : "to", getCardName(card), current);
+                log(player, logText, "counter", card.getId(), String.valueOf(incr));
             }
         }
     }
@@ -398,14 +408,21 @@ public record JolGame(String id, GameData data) {
     }
 
     public void setEdge(String source, String player) {
-        ChatService.sendCommand(id, source, String.format("%s gains the edge from %s.", player, getEdge()), "edge", player);
+        String previous = getEdge(); // "no one" when the edge is currently unheld
+        String body;
+        if (player.equals(source)) {
+            body = "no one".equals(previous) ? "takes the edge" : "takes the edge from " + previous;
+        } else {
+            body = "gives the edge to " + player;
+        }
+        log(source, body, "edge", player);
         PlayerData playerData = data.getPlayer(player);
         data.setEdge(playerData);
     }
 
     public void burnEdge(String player) {
         data.setEdge(null);
-        ChatService.sendCommand(id, player, String.format("%s burns the edge.", player), "edge", "burn");
+        log(player, "burns the edge", "edge", "burn");
     }
 
     public int getPool(String player) {
@@ -421,15 +438,44 @@ public record JolGame(String id, GameData data) {
         PlayerData playerData = data.getPlayer(player);
         int starting = playerData.getPool();
         int ending = starting + amount;
+        boolean wasOusted = playerData.isOusted();
         playerData.setPool(ending);
+        // S1: capture the ousted player's neighbours *before* the remap so the
+        // system line can report who now preys on whom.
+        String lostPredator = null;
+        String lostPrey = null;
+        boolean nowOusted = false;
+        boolean nowRestored = false;
         if (ending <= 0) {
+            if (!wasOusted) {
+                lostPredator = nameOf(playerData.getPredator());
+                lostPrey = nameOf(playerData.getPrey());
+                nowOusted = true;
+            }
             playerData.setOusted(true);
             data.updatePredatorMapping();
         } else if (starting <= 0) {
+            nowRestored = wasOusted;
             playerData.setOusted(false);
             data.updatePredatorMapping();
         }
-        ChatService.sendCommand(id, source, player + "'s pool was " + starting + ", now is " + ending + ".", "pool", source, String.valueOf(amount));
+        String body = player.equals(source)
+                ? String.format("%s %d pool (%d → %d)", amount > 0 ? "gains" : "loses", Math.abs(amount), starting, ending)
+                : String.format("%s %s's pool by %d (%d → %d)", amount > 0 ? "increases" : "reduces", player, Math.abs(amount), starting, ending);
+        log(source, body, "pool", source, String.valueOf(amount));
+        if (nowOusted) {
+            String tail = (lostPredator != null && lostPrey != null && !lostPredator.equals(lostPrey))
+                    ? " — " + lostPredator + " now preys on " + lostPrey + "."
+                    : "";
+            ChatService.sendSystemMessage(id, player + " is ousted." + tail);
+        } else if (nowRestored) {
+            String predator = nameOf(playerData.getPredator());
+            String prey = nameOf(playerData.getPrey());
+            String tail = (predator != null && prey != null)
+                    ? " — back in between " + predator + " and " + prey + "."
+                    : "";
+            ChatService.sendSystemMessage(id, player + " is back in the game." + tail);
+        }
     }
 
     public String getGlobalText() {
@@ -455,9 +501,9 @@ public record JolGame(String id, GameData data) {
         card.setNotes(cleanText);
         if (!quiet) {
             if (!cleanText.isEmpty()) {
-                ChatService.sendCommand(id, player, String.format("labels %s: \"%s\"", cardName, cleanText), "label", card.getId(), cleanText);
+                log(player, String.format("labels %s: \"%s\"", cardName, cleanText), "label", card.getId(), cleanText);
             } else {
-                ChatService.sendCommand(id, player, String.format("removes label from %s ", cardName), "label", card.getId(), "remove");
+                log(player, String.format("removes the label from %s", cardName), "label", card.getId(), "remove");
             }
         }
     }
@@ -467,11 +513,11 @@ public record JolGame(String id, GameData data) {
     }
 
     public void random(String player, int limit, int result) {
-        ChatService.sendCommand(id, player, "rolls from 1-" + limit + " : " + result, "random", String.valueOf(limit));
+        log(player, "rolls 1–" + limit + ": " + result, "random", String.valueOf(limit));
     }
 
     public void flip(String player, String result) {
-        ChatService.sendCommand(id, player, "flips a coin : " + result, "flip");
+        log(player, "flips a coin: " + result, "flip");
     }
 
     public void setVotes(String source, String cardId, String votes, boolean quiet) {
@@ -485,27 +531,30 @@ public record JolGame(String id, GameData data) {
         String message;
         if (votes.trim().equalsIgnoreCase("priscus") || votes.trim().equals("P")) {
             value = "P";
-            message = " is priscus.";
+            message = " is now priscus";
         } else if (voteAmount == 0) {
             value = "0";
-            message = " now has no votes.";
+            message = " now has no votes";
         } else {
             value = String.valueOf(voteAmount);
-            message = " now has " + voteAmount + " votes.";
+            message = " now has " + (voteAmount == 1 ? "1 vote" : voteAmount + " votes");
         }
         CardData card = data.getCard(cardId);
         card.setVotes(value);
         message = getCardName(card) + message;
         if (!quiet) {
-            ChatService.sendCommand(id, source, message, "votes", value);
+            log(source, message, "votes", value);
         }
     }
 
     public void contestCard(String source, String cardId, boolean clear) {
         CardData card = data.getCard(cardId);
         card.setContested(!clear);
-        String message = clear ? "no longer contested." : "now contested.";
-        ChatService.sendCommand(id, source, String.format("%s's %s is %s", card.getOwnerName(), getCardName(card), message), "contest", card.getId(), String.valueOf(clear));
+        String poss = GameLog.possessive(card.getOwnerName(), source);
+        String message = clear
+                ? String.format("clears the contest on %s %s", poss, getCardName(card))
+                : String.format("marks %s %s contested", poss, getCardName(card));
+        log(source, message, "contest", card.getId(), String.valueOf(clear));
     }
 
     public boolean getContested(CardData card) {
@@ -515,20 +564,20 @@ public record JolGame(String id, GameData data) {
     public void setLocked(String player, String cardId, boolean locked) {
         CardData card = data.getCard(cardId);
         card.setLocked(locked);
-        String message = String.format("%s %s.", locked ? "locks" : "unlocks", getCardName(card));
-        ChatService.sendCommand(id, player, message, "lock", card.getId(), String.valueOf(locked));
+        String message = String.format("%s %s", locked ? "locks" : "unlocks", getCardName(card));
+        log(player, message, "lock", card.getId(), String.valueOf(locked));
     }
 
     public void setOpenHand(String player) {
-        String message = "";
+        String message;
         if(data.isPlayerOpenHand(player)) {
             data.removePlayerFromOpenHand(player);
-            message = "NO longer plays now with an open hand";
+            message = "no longer plays with an open hand";
         } else {
             data.addPlayerToOpenHand(player);
-            message = "plays now with an open hand";
+            message = "now plays with an open hand";
         }
-        ChatService.sendCommand(id, player, message, "open");
+        log(player, message, "open");
     }
 
     public void unlockAll(String player) {
@@ -540,10 +589,9 @@ public record JolGame(String id, GameData data) {
                 notUnlockedString.append(regionResults).append(" ");
             }
         }
-        String message = String.format("unlocks.");
-        ChatService.sendCommand(id, player, message, "untap", player);
+        log(player, "unlocks", "untap", player);
         if (!notUnlockedString.toString().isEmpty()) {
-            ChatService.sendSystemMessage(id, "The following cards do not unlock as normal: " + notUnlockedString);
+            ChatService.sendSystemMessage(id, "These cards do not unlock as normal: " + notUnlockedString.toString().trim() + ".");
         }
     }
 
@@ -573,6 +621,7 @@ public record JolGame(String id, GameData data) {
         String turnId = String.format("%d.%d", round, index);
         // If we are reversed, choose predator, otherwise choose prey
         ChatService.addTurn(id, nextPlayer.getName(), turnId);
+        ChatService.sendSystemMessage(id, "Turn " + turnId + " — " + nextPlayer.getName() + ".");
         setPhase(Phase.UNLOCK);
         data.setTurn(turnId);
         GameService.saveGame(this, turnId);
@@ -584,7 +633,7 @@ public record JolGame(String id, GameData data) {
 
     public void setPhase(Phase phase) {
         data.setPhase(phase);
-        sendMsg(getActivePlayer(), "START OF " + phase.toString() + " PHASE.", false);
+        ChatService.sendSystemMessage(id, "Start of " + phase.getDescription().toLowerCase() + " phase.");
     }
 
     public void changeCapacity(String source, String cardId, int change, boolean quiet) {
@@ -595,7 +644,7 @@ public record JolGame(String id, GameData data) {
             if (newCapacity < 0) newCapacity = 0;
             card.setCapacity(newCapacity);
             if (!quiet)
-                ChatService.sendCommand(id, source, "Capacity of " + getCardName(card) + " now " + newCapacity, "capacity", card.getId(), change + "");
+                log(source, String.format("%s capacity of %s to %d", change < 0 ? "lowers" : "raises", getCardName(card), newCapacity), "capacity", card.getId(), change + "");
         }
     }
 
@@ -605,8 +654,8 @@ public record JolGame(String id, GameData data) {
             card.setDisciplines(disciplines);
             if (!quiet && !disciplines.isEmpty()) {
                 String disciplineList = disciplines.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" "));
-                String msg = ParserService.parseGameChat("reset " + getCardName(card) + " back to " + disciplineList);
-                ChatService.sendCommand(id, player, msg, "disc", card.getId(), disciplines.toString());
+                String msg = ParserService.parseGameChat("resets " + getCardName(card) + " to " + disciplineList);
+                log(player, msg, "disc", card.getId(), disciplines.toString());
             }
         }
     }
@@ -649,29 +698,37 @@ public record JolGame(String id, GameData data) {
         } else {
             throw new CommandException("No valid disciplines chosen.");
         }
-        String additionString = discAdded.isEmpty() ? "" : "added " + ParserService.parseGlobalChat(discAdded.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" ")));
-        String removalsString = discRemoved.isEmpty() ? "" : "removed " + ParserService.parseGlobalChat(discRemoved.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" ")));
-        ChatService.sendCommand(id, player, String.format("%s%s to %s.", additionString, removalsString, getCardName(data.getCard(cardId))), "disc", cardId, additionString, removalsString);
-
+        String addIcons = discAdded.isEmpty() ? "" : ParserService.parseGlobalChat(discAdded.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" ")));
+        String removeIcons = discRemoved.isEmpty() ? "" : ParserService.parseGlobalChat(discRemoved.stream().map(d -> "[" + d + "]").collect(Collectors.joining(" ")));
+        String cardName = getCardName(data.getCard(cardId));
+        String body;
+        if (!addIcons.isEmpty() && !removeIcons.isEmpty()) {
+            body = String.format("updates %s: +%s −%s", cardName, addIcons, removeIcons);
+        } else if (!addIcons.isEmpty()) {
+            body = String.format("adds %s to %s", addIcons, cardName);
+        } else {
+            body = String.format("removes %s from %s", removeIcons, cardName);
+        }
+        log(player, body, "disc", cardId, addIcons, removeIcons);
     }
 
     public void replacePlayer(String oldPlayer, String newPlayer) {
         data.replacePlayer(oldPlayer, newPlayer);
         data.setTimeoutRequestor(null);
-        ChatService.sendSystemMessage(id, "Player " + newPlayer + " replaced " + oldPlayer);
+        ChatService.sendSystemMessage(id, newPlayer + " replaced " + oldPlayer + ".");
     }
 
     public void setChoice(String player, String choice) {
         data.getPlayer(player).setChoice(choice);
-        ChatService.sendCommand(id, player, "has made their choice.", "choice", choice);
+        log(player, "makes a choice", "choice", choice);
     }
 
     public void getChoices() {
-        ChatService.sendSystemMessage(id, "The choices have been revealed:");
+        ChatService.sendSystemMessage(id, "Choices revealed:");
         data.getPlayers().values().forEach(player -> {
             String choice = player.getChoice();
             if (!Strings.isNullOrEmpty(choice)) {
-                ChatService.sendSystemMessage(id, player + " chose " + choice);
+                ChatService.sendSystemMessage(id, player.getName() + " chose " + choice + ".");
                 player.setChoice(null);
             }
         });
@@ -680,9 +737,7 @@ public record JolGame(String id, GameData data) {
     public void setOrder(String source, List<String> players) {
         data.orderPlayers(players);
         data.updatePredatorMapping();
-        StringBuilder order = new StringBuilder();
-        for (String player : players) order.append(" ").append(player);
-        ChatService.sendCommand(id, source, "Player order" + order, "order", order.toString());
+        log(source, "sets the seating order: " + String.join(", ", players), "order", String.join(" ", players));
     }
 
     public List<String> getValidPlayers() {
@@ -708,18 +763,19 @@ public record JolGame(String id, GameData data) {
             privateNotes += notes;
             recipientData.setNotes(privateNotes);
         }
-        String msg;
         boolean self = recipients.size() == 1 && recipients.contains(player);
         boolean all = recipients.size() == getValidPlayers().size();
+        String cardsWord = max == 1 ? "1 card" : max + " cards";
+        String region = targetRegion.logLabel();
+        String msg;
         if (self) {
-            msg = "looks at %d cards of their %s.";
+            msg = "looks at " + cardsWord + " of their " + region;
         } else if (all) {
-            msg = "shows everyone %d cards of their %s.";
+            msg = "shows everyone " + cardsWord + " of their " + region;
         } else {
-            msg = "shows %3$s %1$d cards of their %2$s.";
+            msg = "shows " + String.join(", ", recipients) + " " + cardsWord + " of their " + region;
         }
-        msg = String.format(msg, max, targetRegion.description(), String.join(", ", recipients));
-        ChatService.sendCommand(id, player, msg, "show", targetRegion.xmlLabel(), String.valueOf(max), String.join(" ", recipients));
+        log(player, msg, "show", targetRegion.xmlLabel(), String.valueOf(max), String.join(" ", recipients));
     }
 
     public void moveToCard(String player, String srcCardId, String dstCardId, boolean faceDown) throws CommandException {
@@ -741,8 +797,8 @@ public record JolGame(String id, GameData data) {
             if (faceDown) srcCard.setFaceDown(true);
             String srcName = hideIdentity ? "a card" : getCardName(srcCard, dstRegion);
             String faceDownSuffix = srcCard.isFaceDown() ? " face down" : "";
-            String message = String.format("puts %s on %s%s.", srcName, getTargetCardName(dstCard, player), faceDownSuffix);
-            ChatService.sendCommand(id, player, message, "move", srcCard.getId(), dstCard.getId());
+            String message = String.format("moves %s onto %s%s", srcName, getTargetCardName(dstCard, player), faceDownSuffix);
+            log(player, message, "move", srcCard.getId(), dstCard.getId());
             dstCard.add(srcCard, false);
         }
     }
@@ -755,8 +811,17 @@ public record JolGame(String id, GameData data) {
             dest.addCard(card, false);
         }
         if (log) {
-            ChatService.sendCommand(id, player, String.format("draws from their %s.", srcRegion.xmlLabel()), "draw", srcRegion.xmlLabel(), destRegion.xmlLabel());
+            log(player, String.format("draws a card from their %s", srcRegion.logLabel()), "draw", srcRegion.xmlLabel(), destRegion.xmlLabel());
         }
+    }
+
+    /** Draw {@code count} cards, logging a single coalesced line. */
+    void drawCards(String player, RegionType srcRegion, RegionType destRegion, int count) {
+        for (int i = 0; i < count; i++) {
+            _drawCard(player, srcRegion, destRegion, false);
+        }
+        String cardsWord = count == 1 ? "a card" : count + " cards";
+        log(player, String.format("draws %s from their %s", cardsWord, srcRegion.logLabel()), "draw", srcRegion.xmlLabel(), destRegion.xmlLabel());
     }
 
     private String getTargetCardName(CardData card, String player) {
@@ -774,7 +839,7 @@ public record JolGame(String id, GameData data) {
             cardName = getCardName(card);
         }
         String playerName = sameOwner ? "their" : card.getOwnerName() + "'s";
-        return String.format("%s in %s %s", cardName, playerName, cardRegion.xmlLabel());
+        return String.format("%s in %s %s", cardName, playerName, cardRegion.logLabel());
     }
 
     private String getCardName(CardData card) {
@@ -794,7 +859,7 @@ public record JolGame(String id, GameData data) {
 
         if (RegionType.OTHER_HIDDEN_REGIONS.containsAll(List.of(sourceType, destinationType)) && sameOwner) {
             String coordinates = getIndexCoordinates(card);
-            return String.format("card #%s in their %s", coordinates, sourceType.xmlLabel());
+            return String.format("card #%s in their %s", coordinates, sourceType.logLabel());
         }
 
         // if the card is not unique, then add some flavour to the name to help identify it better
@@ -895,17 +960,15 @@ public record JolGame(String id, GameData data) {
     void moveToRegion(String player, String cardId, String destPlayer, RegionType destRegion, boolean top, boolean faceDown) {
         {
             CardData card = data.getCard(cardId);
-            RegionData sourceRegion = card.getRegion();
             RegionData destinationRegion = data.getPlayerRegion(destPlayer, destRegion);
             boolean hideIdentity = faceDown || card.isFaceDown();
             if (faceDown) card.setFaceDown(true);
-            boolean sameOwner = Stream.of(sourceRegion.getOwner(), destinationRegion.getOwner()).allMatch(c -> c.equals(player));
             String topMessage = top ? "the top of " : "";
-            String playerName = sameOwner ? "their" : destinationRegion.getOwner() + "'s";
+            String playerName = GameLog.possessive(destinationRegion.getOwner(), player);
             String cardName = hideIdentity ? "a card" : getCardName(card, destinationRegion);
             String faceDownSuffix = card.isFaceDown() ? " face down" : "";
-            String message = String.format("moves %s to %s%s %s%s.", cardName, topMessage, playerName, destRegion.xmlLabel(), faceDownSuffix);
-            ChatService.sendCommand(id, player, message, "move", card.getId(), destPlayer, destRegion.xmlLabel(), top ? "top" : "bottom");
+            String message = String.format("moves %s to %s%s %s%s", cardName, topMessage, playerName, destRegion.logLabel(), faceDownSuffix);
+            log(player, message, "move", card.getId(), destPlayer, destRegion.xmlLabel(), top ? "top" : "bottom");
             destinationRegion.addCard(card, top);
         }
     }
@@ -918,12 +981,10 @@ public record JolGame(String id, GameData data) {
     void banish(String player, String cardId, String srcPlayer) {
         CardData card = data.getCard(cardId);
         RegionData destination = data.getPlayerRegion(srcPlayer, RegionType.UNCONTROLLED);
-        boolean showRegionOwner = !player.equals(srcPlayer);
-        String message = String.format(
-                "banishes %s to %s uncontrolled region.",
-                getCardName(card, destination),
-                showRegionOwner ? srcPlayer + "'s" : "their");
-        ChatService.sendCommand(id, player, message, "banish", card.getId(), srcPlayer, RegionType.UNCONTROLLED.xmlLabel());
+        // Source (ready) and destination (uncontrolled) are both fixed for
+        // banish, so neither region is named.
+        String message = String.format("banishes %s", getCardName(card, destination));
+        log(player, message, "banish", card.getId(), srcPlayer, RegionType.UNCONTROLLED.xmlLabel());
         destination.addCard(card, false);
     }
 
@@ -933,15 +994,12 @@ public record JolGame(String id, GameData data) {
             card.setFaceDown(false); // a card's identity becomes public as it leaves play
             String owner = card.getOwnerName();
             RegionData destination = data.getPlayerRegion(player, RegionType.ASH_HEAP);
-            boolean showRegionOwner = !player.equals(srcPlayer);
-            String message = String.format(
-                    "burns %s%s from %s %s.",
-                    getCardName(card, destination),
-                    random ? " (picked randomly)" : "",
-                    showRegionOwner ? srcPlayer + "'s" : "their",
-                    srcRegion.xmlLabel());
-
-            ChatService.sendCommand(id, player, message, "burn", card.getId(), owner, RegionType.ASH_HEAP.xmlLabel());
+            String randomSuffix = random ? " at random" : "";
+            String message = srcRegion == RegionType.READY
+                    ? String.format("burns %s%s", getCardName(card, destination), randomSuffix)
+                    : String.format("burns %s%s from %s %s", getCardName(card, destination), randomSuffix,
+                            GameLog.possessive(srcPlayer, player), srcRegion.logLabel());
+            log(player, message, "burn", card.getId(), owner, RegionType.ASH_HEAP.xmlLabel());
             burnQuietly(card);
         }
     }
@@ -953,14 +1011,20 @@ public record JolGame(String id, GameData data) {
             String owner = card.getOwnerName();
             RegionData destination = data.getPlayerRegion(owner, RegionType.REMOVED_FROM_GAME);
             destination.addCard(card, false);
-            boolean showRegionOwner = !player.equals(srcPlayer);
-            String message = String.format(
-                    "removes %s%s in %s %s from the game.",
-                    getCardName(card),
-                    random ? " (picked randomly)" : "",
-                    showRegionOwner ? srcPlayer + "'s" : "their",
-                    srcRegion.xmlLabel());
-            ChatService.sendCommand(id, player, message, "rfg", card.getId(), owner, RegionType.REMOVED_FROM_GAME.xmlLabel());
+            String randomSuffix = random ? " at random" : "";
+            String message = srcRegion == RegionType.ASH_HEAP
+                    ? String.format("removes %s from the game%s", getCardName(card), randomSuffix)
+                    : String.format("removes %s from the game%s (from %s %s)", getCardName(card), randomSuffix,
+                            GameLog.possessive(srcPlayer, player), srcRegion.logLabel());
+            log(player, message, "rfg", card.getId(), owner, RegionType.REMOVED_FROM_GAME.xmlLabel());
         }
+    }
+
+    private void log(String actor, String body, String... command) {
+        ChatService.sendCommand(id, actor, GameLog.sentence(body), command);
+    }
+
+    private static String nameOf(PlayerData player) {
+        return player == null ? null : player.getName();
     }
 }

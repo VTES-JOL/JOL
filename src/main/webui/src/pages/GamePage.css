@@ -89,15 +89,51 @@ p.chat-attempt .chat-attempt-error {
     font-style: italic;
 }
 
-/* Machine-generated game-chat lines (phase markers, moves, judge rulings) —
-   the same quiet visual channel global chat gives its SYSTEM lines
-   (GlobalChat.css). Kept here too because GlobalChat.css is only loaded on
-   the main page, never the game page. */
+/* Machine-generated game-chat lines (phase markers, turn markers, ousts,
+   judge rulings) — the same quiet visual channel global chat gives its SYSTEM
+   lines (GlobalChat.css). Kept here too because GlobalChat.css is only loaded
+   on the main page, never the game page. */
 p.chat.chat-system {
     color: var(--jt-ink-muted);
     font-style: italic;
     border-left: 2px solid var(--jt-line);
     padding-left: 0.5rem;
+}
+
+/* Every log line: hanging indent so a wrapped line's continuation aligns under
+   the message, not back under the timestamp (GameChatLog.tsx). */
+p.chat {
+    margin: 0.05rem 0;
+    padding-left: 1.35rem;
+    text-indent: -1.35rem;
+}
+
+/* A run of consecutive lines from one actor gets a left accent bar in that
+   seat's log colour (--log-accent, set inline). The repeated actor name on
+   rows 2..n of the run is dimmed — kept in the DOM for copy-paste / a11y. */
+p.chat.chat-accent {
+    border-left: 3px solid var(--log-accent);
+    padding-left: 0.5rem;
+    text-indent: -0.85rem;
+}
+
+p.chat .chat-name {
+    color: var(--log-accent, inherit);
+}
+
+p.chat .chat-name-repeat {
+    opacity: 0.45;
+    font-weight: 400;
+}
+
+/* Date separator between log lines whose day differs (U5). */
+p.chat-date-sep {
+    margin: 0.4rem 0 0.15rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--jt-ink-muted);
+    border-bottom: 1px solid var(--jt-line);
 }
 
 /* Card-name mentions on the board / hand strip get the same dotted-underline

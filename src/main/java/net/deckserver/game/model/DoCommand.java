@@ -408,12 +408,10 @@ public record DoCommand(JolGame game, GameModel model) {
         int size = crypt ? game.getSize(player, RegionType.CRYPT) : game.getSize(player, RegionType.LIBRARY);
         if (count <= 0) throw new CommandException("Must draw at least 1 card.");
         if (count > size) throw new CommandException("Unable to draw, only " + size + " cards left.");
-        for (int j = 0; j < count; j++) {
-            if (crypt)
-                game.drawCard(player, RegionType.CRYPT, RegionType.UNCONTROLLED);
-            else
-                game.drawCard(player, RegionType.LIBRARY, RegionType.HAND);
-        }
+        if (crypt)
+            game.drawCards(player, RegionType.CRYPT, RegionType.UNCONTROLLED, count);
+        else
+            game.drawCards(player, RegionType.LIBRARY, RegionType.HAND, count);
     }
 
     void label(CommandParser cmdObj, String player) throws CommandException {
@@ -487,7 +485,7 @@ public record DoCommand(JolGame game, GameModel model) {
             if (amount == 0) {
                 throw new CommandException("No amount given use +/-");
             }
-            game.updateVP(targetPlayer, amount);
+            game.updateVP(player, targetPlayer, amount);
         }
     }
 

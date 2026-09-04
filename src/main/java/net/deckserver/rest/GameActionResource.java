@@ -119,15 +119,17 @@ public class GameActionResource extends BaseResource {
         String player = username();
         String gameId = JolAdmin.getGameId(gameName());
         List<ChatData> lines = ChatService.getTurn(gameId, turn);
-        // Command context (ChatData.invocation) is judge-only: a judge watching a
-        // game they are not seated in. Everyone else gets copies with it stripped,
-        // so nothing sensitive leaves the server regardless of the client.
+        // The raw command context (invocation*) AND the structured command
+        // string are judge-only: a judge watching a game they are not seated
+        // in. Everyone else gets copies with both stripped — the structured
+        // command carries the real card id even for a face-down play/move, so
+        // it must never reach a seated opponent's client.
         boolean canJudge = JolAdmin.isJudge(player)
                 && !RegistrationService.getPlayers(gameName()).contains(player);
         if (canJudge) {
             return lines;
         }
-        return lines.stream().map(GameActionResource::withoutInvocation).toList();
+        return lines.stream().map(GameActionResource::forNonJudge).toList();
     }
 
     /**
@@ -147,18 +149,15 @@ public class GameActionResource extends BaseResource {
         return ChatService.getFailedCommands(JolAdmin.getGameId(gameName()), turn);
     }
 
-    private static ChatData withoutInvocation(ChatData c) {
-        if (c.getInvocation() == null && c.getInvocationBy() == null && c.getInvocationSeq() == null) {
-            return c;
-        }
-        // invocation / invocationBy / invocationSeq are all judge-only — a fresh
-        // copy carrying only the non-privileged fields drops every one of them.
+    private static ChatData forNonJudge(ChatData c) {
+        // A fresh copy carrying only the fields a seated player / spectator may
+        // see. command + invocation* are all judge-only and are dropped — the
+        // client never renders them anyway.
         ChatData copy = new ChatData();
         copy.setTimestamp(c.getTimestamp());
         copy.setPostedAt(c.getPostedAt());   // not privileged — a precise timestamp
         copy.setMessage(c.getMessage());
         copy.setSource(c.getSource());
-        copy.setCommand(c.getCommand());
         return copy;
     }
 

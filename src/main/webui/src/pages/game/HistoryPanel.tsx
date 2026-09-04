@@ -91,7 +91,7 @@ export function HistoryPanel({
           </option>
         ))}
       </Select>
-      <GameChatLog lines={lines} viewerName={viewerName} showCommands={judgeCommands} errors={errors} />
+      <GameChatLog lines={lines} viewerName={viewerName} showCommands={judgeCommands} errors={errors} seating={game.seating} />
     </GamePanel>
   );
 }

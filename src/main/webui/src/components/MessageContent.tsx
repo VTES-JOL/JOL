@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from 'react';
 import { parseMessageTokens } from '../utils/parseMessageTokens';
 import { splitMentions } from '../utils/mentions';
+import { isKnownDisciplineCode } from '../utils/disciplines';
 import { CardToken } from './CardToken';
 
 // Renders a chat / game-log message: plain text with server-substituted tokens
@@ -27,7 +28,13 @@ function renderSegment(
     case 'card':
       return <CardToken key={key} id={seg.id} name={seg.name} advanced={seg.advanced} />;
     case 'disc':
-      return <span key={key} className={`icon ${seg.code}`} />;
+      // An unknown code has no `.icon.<code>` rule and would render as an
+      // invisible empty span — show the bracketed code instead.
+      return isKnownDisciplineCode(seg.code) ? (
+        <span key={key} className={`icon ${seg.code}`} title={seg.code} />
+      ) : (
+        <Fragment key={key}>[{seg.code}]</Fragment>
+      );
     case 'daction':
       return <span key={key} className="icon D" />;
     case 'style':
