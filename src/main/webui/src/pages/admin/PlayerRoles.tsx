@@ -16,17 +16,15 @@ import { AdminSelect, resolvePlayerName } from './adminControls';
 
 const ROLES = [
   { value: 'JUDGE', label: 'Judge' },
-  { value: 'SUPER_USER', label: 'Super User' },
   { value: 'ADMIN', label: 'Admin' },
   { value: 'TOURNAMENT_ADMIN', label: 'Tournament Admin' },
-  { value: 'PLAYTESTER', label: 'Playtester' },
 ];
 
 // Column order for the table.
-const ROLE_COLUMNS = ['JUDGE', 'SUPER_USER', 'PLAYTESTER', 'ADMIN', 'TOURNAMENT_ADMIN'];
+const ROLE_COLUMNS = ['JUDGE', 'ADMIN', 'TOURNAMENT_ADMIN'];
 const ROLE_LABELS = Object.fromEntries(ROLES.map((r) => [r.value, r.label]));
 // Granting one of these is as consequential as removing it — confirm both directions.
-const PRIVILEGED_ROLES = new Set(['ADMIN', 'SUPER_USER', 'TOURNAMENT_ADMIN']);
+const PRIVILEGED_ROLES = new Set(['ADMIN', 'TOURNAMENT_ADMIN']);
 const USER_ROLES_KEY = ['admin-page', 'user-roles'];
 
 export function PlayerRoles() {

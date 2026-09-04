@@ -92,16 +92,11 @@ public class DeckPageResource extends BaseResource {
         return toBean(JolAdmin.saveDeck(username(), name, contents, body.comment() == null ? "" : body.comment()));
     }
 
-    private DeckPageBean toBean(DeckEdit edit) {
-        return toBean(edit, username());
-    }
-
     /**
-     * Shared with {@link DeckResource#loadDeckById} — same page bean, keyed by
-     * a caller name rather than the request principal so the by-id load path
-     * (which authorises separately) can reuse it.
+     * Shared with {@link DeckResource#loadDeckById} — same page bean; the by-id
+     * load path authorises separately before calling this.
      */
-    static DeckPageBean toBean(DeckEdit edit, String username) {
+    static DeckPageBean toBean(DeckEdit edit) {
         Map<String, DeckValidity> validity = edit.deckId() == null
                 ? Map.of()
                 : DeckValidityService.getValidity(edit.deckId()).entrySet().stream()
@@ -112,7 +107,7 @@ public class DeckPageResource extends BaseResource {
         return new DeckPageBean(
                 edit.deck(),
                 edit.contents(),
-                JolAdmin.getAvailableGameFormats(username).stream().map(GameFormat::getLabel).toList(),
+                JolAdmin.getAvailableGameFormats().stream().map(GameFormat::getLabel).toList(),
                 edit.deckId(),
                 validity,
                 details);

@@ -356,14 +356,6 @@ public class JolAdmin {
         return PlayerService.get(player).getRoles().contains(PlayerRole.TOURNAMENT_ADMIN);
     }
 
-    public static synchronized boolean isPlaytester(String player) {
-        return PlayerService.get(player).getRoles().contains(PlayerRole.PLAYTESTER);
-    }
-
-    public static synchronized boolean isSuperUser(String playerName) {
-        return PlayerService.get(playerName).getRoles().contains(PlayerRole.SUPER_USER);
-    }
-
     public static synchronized boolean isJudge(String playerName) {
         return PlayerService.get(playerName).getRoles().contains(PlayerRole.JUDGE);
     }
@@ -654,18 +646,8 @@ public class JolAdmin {
         return new DeckEdit(deck, contents, null);
     }
 
-    public static List<GameFormat> getAvailableGameFormats(String playerName) {
-        Set<PlayerRole> roles = PlayerService.get(playerName).getRoles();
-        List<GameFormat> formats = new ArrayList<>(EnumSet.of(GameFormat.STANDARD, GameFormat.V5, GameFormat.DUEL));
-        if (roles.contains(PlayerRole.PLAYTESTER)) {
-            formats.add(GameFormat.PLAYTEST);
-        }
-        return formats;
-    }
-
-    public static boolean isViewable(String gameName, String player) {
-        GameFormat format = GameService.get(gameName).getGameFormat();
-        return format != GameFormat.PLAYTEST || isPlaytester(player);
+    public static List<GameFormat> getAvailableGameFormats() {
+        return new ArrayList<>(EnumSet.of(GameFormat.STANDARD, GameFormat.V5, GameFormat.DUEL));
     }
 
     private static ValidationResult validateDeck(Deck deck, GameFormat gameFormat) {

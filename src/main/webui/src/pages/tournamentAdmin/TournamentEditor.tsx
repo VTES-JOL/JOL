@@ -281,7 +281,6 @@ export function TournamentEditor({
             <option value="STANDARD">Standard</option>
             <option value="V5">V5</option>
             <option value="DUEL">Duel</option>
-            <option value="PLAYTEST">Playtest</option>
           </Select>
         </FormRow>
 

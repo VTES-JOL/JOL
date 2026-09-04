@@ -157,8 +157,11 @@ jq -r 'to_entries[] | [
 ] | @csv' "$DATA/players.json" \
 | copy_into player "player_name,player_id,email,password_hash,discord_id,vekn_id,country_code,show_images,edge_color"
 
-# player_id is available directly in players.json — emit it without a staging table
-jq -r 'to_entries[] | .value.id as $id | .value.roles[] | [$id, .] | @csv' "$DATA/players.json" \
+# player_id is available directly in players.json — emit it without a staging table.
+# SUPER_USER / PLAYTESTER are retired roles (see V22 migration) — drop those grants.
+jq -r 'to_entries[] | .value.id as $id | .value.roles[]
+       | select(. != "SUPER_USER" and . != "PLAYTESTER")
+       | [$id, .] | @csv' "$DATA/players.json" \
 | copy_into player_role "player_id,role"
 
 PLAYER_COUNT=$(jq 'length' "$DATA/players.json")
@@ -197,7 +200,7 @@ jq -r '.[] | [
   .playStarts,
   .playEnds,
   .format,
-  ((.deckFormat // "") | ascii_upcase),
+  ((.deckFormat // "") | ascii_upcase | if . == "PLAYTEST" then "STANDARD" else . end),
   (.numberOfRounds // 0),
   (if .finalEnabled then "true" else "false" end),
   (if .requiresId then "true" else "false" end),
@@ -289,7 +292,7 @@ jq -r 'to_entries[] | [
   (.value.owner // ""),
   .value.visibility,
   .value.status,
-  (.value.gameFormat | ascii_upcase),
+  (.value.gameFormat | ascii_upcase | if . == "PLAYTEST" then "STANDARD" else . end),
   (.value.created // "2000-01-01T00:00:00Z"),
   (if .value.version == "INITIAL" then "0" elif .value.version == "GAME_STATE" then "1" else "2" end),
   (.value.tournamentName // "")
@@ -431,7 +434,10 @@ JOIN player p USING (player_name);
 SQL
 
 DECK_FORMAT_CSV=$(mktemp)
-jq -r '.[] | .deckId as $id | .gameFormats[] | [$id, .] | @csv' "$DEDUPED_DECKS_FILE" > "$DECK_FORMAT_CSV"
+# PLAYTEST is a retired format tag — skip it (see V22 migration).
+jq -r '.[] | .deckId as $id | .gameFormats[]
+       | select(. != "PLAYTEST")
+       | [$id, .] | @csv' "$DEDUPED_DECKS_FILE" > "$DECK_FORMAT_CSV"
 
 psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -v ON_ERROR_STOP=1 <<SQL
 CREATE TEMP TABLE deck_format_staging (

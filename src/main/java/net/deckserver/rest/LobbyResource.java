@@ -38,7 +38,6 @@ public class LobbyResource extends BaseResource {
         String player = username();
         return JolAdmin.getGameNames().stream()
                 .filter(Objects::nonNull)
-                .filter(gameName -> JolAdmin.isViewable(gameName, player))
                 .filter(gameName ->
                         (JolAdmin.isPrivate(gameName) && player.equals(JolAdmin.getOwner(gameName)))
                         || (JolAdmin.isStarting(gameName) && JolAdmin.isPublic(gameName))
@@ -60,7 +59,7 @@ public class LobbyResource extends BaseResource {
     @GET
     @Path("game-formats")
     public List<String> gameFormats() {
-        return JolAdmin.getAvailableGameFormats(username()).stream().map(GameFormat::getLabel).toList();
+        return JolAdmin.getAvailableGameFormats().stream().map(GameFormat::getLabel).toList();
     }
 
     private void notifyLobby() {
@@ -85,8 +84,8 @@ public class LobbyResource extends BaseResource {
             throw new NotFoundException("No such game: " + game);
         }
         String owner = JolAdmin.getOwner(game);
-        if (!playerName.equals(owner) && !sc.isUserInRole("SUPER_USER")) {
-            throw new ForbiddenException("Only the game owner or a super user can start this game");
+        if (!playerName.equals(owner) && !sc.isUserInRole("ADMIN")) {
+            throw new ForbiddenException("Only the game owner or an admin can start this game");
         }
         if (!JolAdmin.isStarting(game)) {
             throw new WebApplicationException(Response.status(Response.Status.CONFLICT).entity("Game is not in starting status").build());

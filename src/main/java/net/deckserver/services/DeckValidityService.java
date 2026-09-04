@@ -21,8 +21,7 @@ import java.util.Optional;
  *
  * <p>Cache-less like {@link DeckService} — every read goes straight to JPA.
  * The formats checked are the three a player can register a game in
- * ({@code STANDARD}, {@code DUEL}, {@code V5}); {@code PLAYTEST} is role-gated
- * and validated on demand elsewhere, not stored here.
+ * ({@code STANDARD}, {@code DUEL}, {@code V5}).
  */
 @Singleton
 @Startup

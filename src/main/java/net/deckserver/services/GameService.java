@@ -134,14 +134,6 @@ public class GameService extends PersistedService {
                 .count();
     }
 
-    public static List<String> getStartingGames(boolean includePlayTest) {
-        return instance().games.values().stream()
-                .filter(STARTING_GAME)
-                .filter(info -> info.isPlayTest() && includePlayTest)
-                .map(GameInfo::getName
-                ).sorted().toList();
-    }
-
     public static List<GameInfo> getGamesByOwner(String owner) {
         return instance().games.values().stream().filter(info -> info.getOwner().equals(owner)).toList();
     }

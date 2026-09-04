@@ -63,6 +63,6 @@ public class DeckResource extends BaseResource {
         if (!ownership.playerName().equals(caller) && !JolAdmin.isAdmin(caller)) {
             throw new ForbiddenException("Deck " + deckId + " does not belong to you");
         }
-        return DeckPageResource.toBean(JolAdmin.selectDeck(ownership.playerName(), ownership.deckName()), caller);
+        return DeckPageResource.toBean(JolAdmin.selectDeck(ownership.playerName(), ownership.deckName()));
     }
 }

@@ -4,14 +4,9 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.*;
-import net.deckserver.JolAdmin;
 import net.deckserver.Turnstile;
 import net.deckserver.services.AuthService;
 import net.deckserver.services.PlayerService;
-import net.deckserver.storage.json.cards.SecuredCardLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.services.cloudfront.cookie.CookiesForCustomPolicy;
 
 import java.util.List;
 
@@ -25,8 +20,6 @@ import java.util.List;
  */
 @Path("/auth")
 public class AuthResource {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthResource.class);
 
     @Context
     HttpHeaders headers;
@@ -50,9 +43,6 @@ public class AuthResource {
         }
         Response response = Response.ok().build();
         attachCookies(response, AuthService.issueTokens(request.username(), request.remember(), headers));
-        if (JolAdmin.isPlaytester(request.username())) {
-            attachPlaytestAuthCookies(response);
-        }
         return response;
     }
 
@@ -93,29 +83,8 @@ public class AuthResource {
         return System.getenv().getOrDefault("ENABLE_CAPTCHA", "true").equals("true");
     }
 
-    // MultivaluedMap.add is unambiguously additive, unlike ResponseBuilder.header()
-    // chaining — mutating the already-built Response's own header map directly
-    // lets this compose cleanly with attachPlaytestAuthCookies's raw Set-Cookie
-    // strings on the same response.
     private void attachCookies(Response response, List<NewCookie> cookies) {
         cookies.forEach(c -> response.getHeaders().add(HttpHeaders.SET_COOKIE, c));
-    }
-
-    private void attachPlaytestAuthCookies(Response response) {
-        logger.info("Setting up playtest auth cookies");
-        SecuredCardLoader cardLoader = new SecuredCardLoader("/secured/*");
-        try {
-            boolean devMode = System.getenv().getOrDefault("TYPE", "dev").equals("dev");
-            if (!devMode) {
-                String additionalSettings = ";HttpOnly; Domain=deckserver.net; Path=/; Secure;";
-                CookiesForCustomPolicy cookies = cardLoader.generateCookies();
-                response.getHeaders().add(HttpHeaders.SET_COOKIE, cookies.policyHeaderValue() + additionalSettings);
-                response.getHeaders().add(HttpHeaders.SET_COOKIE, cookies.signatureHeaderValue() + additionalSettings);
-                response.getHeaders().add(HttpHeaders.SET_COOKIE, cookies.keyPairIdHeaderValue() + additionalSettings);
-            }
-        } catch (Exception e) {
-            logger.error("Unable to set playtest auth cookies", e);
-        }
     }
 
     public record LoginRequest(String username, String password, boolean remember) {}

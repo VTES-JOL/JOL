@@ -23,9 +23,7 @@ public class PublicGameBuilder implements Runnable{
             for (int x = 0; x < gamesNeeded; x++) {
                 String gameName = NameService.generateName();
                 GameService.create(gameName, UUID.randomUUID().toString(), "SYSTEM", Visibility.PUBLIC, format);
-                if (format != GameFormat.PLAYTEST) {
-                    GlobalChatService.chat("SYSTEM", String.format("New public game <b>%s</b> (%s) has been created.", gameName, format.getLabel()));
-                }
+                GlobalChatService.chat("SYSTEM", String.format("New public game <b>%s</b> (%s) has been created.", gameName, format.getLabel()));
             }
         }
         logger.debug("Finished building public games");

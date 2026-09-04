@@ -32,10 +32,8 @@ public class WatchResource extends BaseResource {
     @GET
     @Path("active")
     public List<GameSummaryBean> active() {
-        String player = username();
         return JolAdmin.getGameNames().stream()
                 .filter(JolAdmin::isActive)
-                .filter(gameName -> JolAdmin.isViewable(gameName, player))
                 .map(GameSummaryBean::new)
                 .sorted(Comparator.comparing(GameSummaryBean::getGameName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
