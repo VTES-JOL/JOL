@@ -46,7 +46,7 @@ export function PhaseStepper({
               onClick={() => onSelect(phase)}
               className={`rounded-full px-1.5 py-0.5 transition-colors md:px-2 ${
                 isCurrent
-                  ? 'bg-accent font-semibold text-surface'
+                  ? 'bg-accent font-semibold text-white'
                   : isPast
                     ? 'text-ink-muted'
                     : 'text-ink-secondary'

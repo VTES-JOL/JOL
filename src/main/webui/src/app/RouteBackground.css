@@ -1,0 +1,34 @@
+/* Backdrop layer for RouteBackground.tsx. Sits behind #root's content
+   (z-index: -1; nothing in the app sets an opaque background above it now
+   that page roots are transparent). The ::after veil is the readability
+   floor — tuned per theme — and also carries a light blur so the plate
+   reads as atmosphere, not detail; each Panel's own backdrop-blur stacks
+   on top. */
+.route-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--jt-base);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.route-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* A light readability wash only — enough to settle the bare text of
+     empty states onto the plate, not so much it flattens the image out.
+     The translucent Panel/Card surfaces (bg-surface/85) do most of the
+     work; the plate is meant to show through them and in the gutters. */
+  background-color: color-mix(in oklab, var(--jt-hover) 34%, transparent);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+body[data-bs-theme="dark"] .route-bg::after {
+  /* Dark mode carries a heavier veil: the plates are already dim, dark
+     body text needs the extra floor, and it reads as intended atmosphere. */
+  background-color: color-mix(in oklab, var(--jt-base) 58%, transparent);
+}

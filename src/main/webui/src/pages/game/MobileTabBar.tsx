@@ -57,7 +57,7 @@ export function MobileTabBar({
       <span className="flex items-center gap-1">
         {label}
         {opts.badge !== undefined && opts.badge > 0 && (
-          <span className="rounded-full bg-accent px-1 text-[0.6rem] leading-none text-surface">{opts.badge}</span>
+          <span className="rounded-full bg-accent px-1 text-[0.6rem] leading-none text-white">{opts.badge}</span>
         )}
       </span>
     </button>

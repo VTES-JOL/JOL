@@ -23,7 +23,7 @@ export function GamePanel({
 }) {
   return (
     <div
-      className={`flex flex-col min-h-0 rounded-lg border border-line-accent bg-surface/85 shadow-lg overflow-hidden${
+      className={`flex flex-col min-h-0 rounded-lg border border-line-accent bg-surface/92 shadow-lg overflow-hidden${
         className ? ` ${className}` : ''
       }`}
       id={id}

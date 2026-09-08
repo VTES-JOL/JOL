@@ -16,7 +16,7 @@ export function UpdateBanner({ visible }: { visible?: boolean }) {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 flex items-center justify-center gap-3 py-2 bg-accent text-surface text-sm"
+      className="fixed top-0 left-0 right-0 flex items-center justify-center gap-3 py-2 bg-accent text-white text-sm"
       style={{ zIndex: 1090 }}
     >
       <span>A new version is available.</span>

@@ -18,7 +18,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-surface hover:bg-accent-dim',
+  // text-white, not text-surface: in dark mode --surface is near-black and
+  // only clears ~3.4:1 on the accent fill (fails AA); white is 5.2:1 dark /
+  // 8.3:1 light.
+  primary: 'bg-accent text-white hover:bg-accent-dim',
   secondary: 'border border-line-accent text-ink-secondary hover:text-ink hover:bg-hover',
   ghost: 'text-ink-secondary hover:text-ink hover:bg-hover',
   'accent-ghost': 'text-accent hover:text-accent-dim hover:bg-accent/10',

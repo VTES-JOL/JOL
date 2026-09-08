@@ -12,9 +12,11 @@ interface BadgeProps {
 }
 
 const VARIANT_CLASSES: Record<BadgeVariant, string> = {
-  format: 'bg-arcane/10 border border-arcane/20 text-arcane-soft uppercase tracking-tight rounded-full',
+  // *-label text tokens flip deep↔pale between themes — the *-soft tokens are
+  // mid-tone tints and only cleared ~2:1 as chip text in dark mode.
+  format: 'bg-arcane/15 border border-arcane/30 text-arcane-label uppercase tracking-tight rounded-full',
   accent: 'bg-accent/15 text-accent-soft rounded',
-  blood: 'bg-blood/15 text-blood-soft rounded',
+  blood: 'bg-blood/15 text-blood-label rounded',
   online: 'bg-online/15 text-online rounded',
   gold: 'bg-gold/15 text-gold rounded',
   muted: 'bg-hover text-ink-muted rounded',

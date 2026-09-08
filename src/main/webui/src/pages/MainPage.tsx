@@ -24,8 +24,10 @@ export function MainPage() {
     <button
       type="button"
       onClick={() => setMobilePane(pane)}
-      className={`px-3 py-1 text-sm rounded border border-line-accent ${
-        mobilePane === pane ? 'bg-accent text-surface' : 'text-ink-secondary hover:bg-hover'
+      className={`rounded px-3 py-1.5 text-sm transition-colors ${
+        mobilePane === pane
+          ? 'bg-accent text-white font-semibold'
+          : 'text-ink-secondary hover:bg-hover'
       }`}
     >
       {label}
@@ -33,8 +35,11 @@ export function MainPage() {
   );
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 gap-2 p-3 bg-base text-ink lg:flex-row">
-      <div className="lg:hidden flex gap-1">
+    <div className="flex flex-col flex-1 min-h-0 gap-2 p-3 text-ink lg:flex-row">
+      {/* Glass chip backing so the inactive tab's text keeps an AA-compliant
+          surface over the route background image (mirrors MasterDetailView's
+          mobile strip). */}
+      <div className="lg:hidden flex gap-1 self-start rounded-lg border border-line-accent bg-surface/92 backdrop-blur-md p-1">
         {toggleBtn('main', 'Games & Chat')}
         {toggleBtn('info', 'Info')}
       </div>

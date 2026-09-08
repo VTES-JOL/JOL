@@ -84,11 +84,11 @@ export function TournamentAdminPage() {
   } else if (tablesTournament) {
     detail = <TournamentManager tournament={tablesTournament} onClose={() => setView(null)} onChanged={refreshList} />;
   } else {
-    detail = <EmptyState icon={Wrench} title="Select a tournament to edit or manage" />;
+    detail = <EmptyState framed icon={Wrench} title="Select a tournament to edit or manage" />;
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 p-4 bg-base text-ink">
+    <div className="flex flex-col flex-1 min-h-0 p-4 text-ink">
       <MasterDetailView
         breakpoint="lg"
         columns="320px minmax(360px, 1fr)"

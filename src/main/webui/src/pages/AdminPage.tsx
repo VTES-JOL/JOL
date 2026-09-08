@@ -43,7 +43,7 @@ export function AdminPage() {
 
   if (forbidden) {
     return (
-      <div className="flex flex-1 min-h-0 items-center justify-center bg-base">
+      <div className="flex flex-1 min-h-0 items-center justify-center">
         <EmptyState icon={ShieldOff} title="You don't have access to this page." />
       </div>
     );
@@ -51,15 +51,15 @@ export function AdminPage() {
 
   if (!data) {
     return (
-      <div className="flex flex-1 min-h-0 items-center justify-center bg-base">
+      <div className="flex flex-1 min-h-0 items-center justify-center">
         <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 gap-3 p-4 bg-base">
-      <div className="shrink-0 rounded-lg border border-line-accent bg-surface/85 px-2 backdrop-blur-md">
+    <div className="flex flex-col flex-1 min-h-0 gap-3 p-4">
+      <div className="shrink-0 rounded-lg border border-line-accent bg-surface/92 px-2 backdrop-blur-md">
         <TabBar tabs={TABS} active={tab} onChange={setTab} />
       </div>
 
@@ -86,7 +86,7 @@ function GamesTab() {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="max-w-sm rounded-lg border border-line-accent bg-surface/85 p-3">
+      <div className="max-w-sm rounded-lg border border-line-accent bg-surface/92 p-3">
         <AdminSelect id="adminGamePicker" label="Game" value={gameId} onChange={setGameId} options={gameOptions} />
       </div>
       {gameId ? (

@@ -142,7 +142,7 @@ export function CardActionSheet({
           >
             ← Move here
           </button>
-          <span className="rounded-full bg-blood px-2 py-0.5 text-xs text-surface">{ctx.controllerPool} pool</span>
+          <span className="rounded-full bg-blood px-2 py-0.5 text-xs text-white">{ctx.controllerPool} pool</span>
           <button
             type="button"
             className="inline-flex min-h-11 items-center gap-1 rounded border border-line-accent px-2 text-ink-secondary hover:bg-hover"

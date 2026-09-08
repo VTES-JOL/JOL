@@ -34,14 +34,14 @@ export function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="flex flex-1 min-h-0 items-center justify-center bg-base">
+      <div className="flex flex-1 min-h-0 items-center justify-center">
         <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="grid gap-4 p-4 bg-base md:grid-cols-2 lg:grid-cols-3 content-start flex-1 min-h-0 overflow-y-auto">
+    <div className="grid gap-4 p-4 md:grid-cols-2 lg:grid-cols-3 content-start flex-1 min-h-0 overflow-y-auto">
       <ProfileEditor profile={profile} countries={countries} onSaved={onSaved} />
       <AccountEditor />
       <Preferences profile={profile} onSaved={onSaved} />

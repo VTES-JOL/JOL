@@ -9,7 +9,7 @@ import { Path } from './Path';
 
 export const COUNTER_STYLE = (hasLife: boolean, hasBlood: boolean, capacity: number, otherVisibleRegion: boolean) => {
   if (hasLife && otherVisibleRegion) return 'bg-online text-surface';
-  if (hasBlood || capacity > 0) return 'bg-blood text-surface';
+  if (hasBlood || capacity > 0) return 'bg-blood text-white';
   return 'bg-hover text-ink-muted';
 };
 
@@ -124,12 +124,12 @@ export const Card = memo(function Card({
         title="Unlock"
         aria-label={`Unlock ${card.name ?? 'card'}`}
         onClick={quickLock('unlock')}
-        className="shrink-0 inline-flex items-center rounded bg-accent text-surface px-1 py-0.5 hover:bg-accent-dim"
+        className="shrink-0 inline-flex items-center rounded bg-accent text-white px-1 py-0.5 hover:bg-accent-dim"
       >
         <Lock size={11} strokeWidth={2.75} />
       </button>
     ) : (
-      <span className="shrink-0 inline-flex items-center rounded bg-accent text-surface px-1 py-0.5" title="Locked">
+      <span className="shrink-0 inline-flex items-center rounded bg-accent text-white px-1 py-0.5" title="Locked">
         <Lock size={11} strokeWidth={2.75} />
       </span>
     )

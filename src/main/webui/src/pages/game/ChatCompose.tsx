@@ -49,7 +49,7 @@ export function ChatCompose({ onSend, disabled }: { onSend: (text: string) => vo
       <button
         type="submit"
         disabled={disabled || !text.trim()}
-        className="inline-flex min-h-11 min-w-11 md:min-h-0 md:min-w-0 shrink-0 items-center justify-center rounded bg-accent px-2 py-1.5 text-surface hover:bg-accent-dim disabled:opacity-40"
+        className="inline-flex min-h-11 min-w-11 md:min-h-0 md:min-w-0 shrink-0 items-center justify-center rounded bg-accent px-2 py-1.5 text-white hover:bg-accent-dim disabled:opacity-40"
         aria-label="Send"
       >
         <SendHorizonal size={15} />

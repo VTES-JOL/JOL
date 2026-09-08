@@ -38,7 +38,7 @@ export function Panel({
   const headerPy = size === 'compact' ? 'py-1.5' : 'py-2';
   return (
     <div
-      className={`relative flex flex-col h-full min-h-0 overflow-hidden rounded-lg border border-line-accent bg-surface/85 backdrop-blur-md shadow-lg ${className ?? ''}`}
+      className={`relative flex flex-col h-full min-h-0 overflow-hidden rounded-lg border border-line-accent bg-surface/92 backdrop-blur-md shadow-lg ${className ?? ''}`}
     >
       <div
         className={`flex justify-between items-center px-4 ${headerPy} border-b border-line bg-panel/60 shrink-0 ${headerClassName ?? ''}`}

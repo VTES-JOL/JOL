@@ -230,7 +230,7 @@ function FilterChip({ label, active, onClick }: { label: string; active: boolean
       onClick={onClick}
       className={`rounded-full border px-2.5 py-0.5 text-xs transition-colors ${
         active
-          ? 'border-accent bg-accent text-surface'
+          ? 'border-accent bg-accent text-white'
           : 'border-line-accent text-ink-secondary hover:bg-hover'
       }`}
     >

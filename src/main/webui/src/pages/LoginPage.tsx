@@ -93,7 +93,7 @@ export function LoginPage() {
     !captchaMisconfigured;
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 bg-base text-ink">
+    <div className="flex flex-col flex-1 min-h-0 text-ink">
       <header className="flex items-center bg-[#1c1e21] px-4 shrink-0">
         <span className="px-2 py-3 font-serif text-lg text-white">V:TES Online</span>
       </header>

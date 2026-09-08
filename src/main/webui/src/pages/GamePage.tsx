@@ -228,7 +228,7 @@ export function GamePage() {
 
   if (!gameId || (isError && !game)) {
     return (
-      <div className="flex flex-1 min-h-0 flex-col items-center justify-center gap-3 bg-base p-8 text-center">
+      <div className="flex flex-1 min-h-0 flex-col items-center justify-center gap-3 p-8 text-center">
         <p className="text-sm text-ink">This game couldn’t be loaded.</p>
         <p className="text-xs text-ink-muted">
           It may have been closed, or you don’t have access to it.
@@ -249,7 +249,7 @@ export function GamePage() {
 
   if (!game) {
     return (
-      <div className="flex flex-1 min-h-0 items-center justify-center bg-base">
+      <div className="flex flex-1 min-h-0 items-center justify-center">
         <Spinner />
       </div>
     );
@@ -314,7 +314,7 @@ export function GamePage() {
 
   return (
     <TextModeContext.Provider value={textMode}>
-    <div className="flex flex-col flex-1 min-h-0 bg-base text-ink">
+    <div className="flex flex-col flex-1 min-h-0 text-ink">
       <TableHud
         game={game}
         gameId={gameId}
@@ -502,7 +502,7 @@ export function GamePage() {
               header={
                 <>
                   <span className="font-semibold">Your hand</span>
-                  <span className="rounded-full bg-accent px-2 py-0.5 text-xs text-surface">
+                  <span className="rounded-full bg-accent px-2 py-0.5 text-xs text-white">
                     {handRegion?.cards.length ?? 0}
                   </span>
                 </>

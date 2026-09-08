@@ -44,7 +44,7 @@ export function LobbyPage() {
 
   if (!games) {
     return (
-      <div className="flex flex-1 min-h-0 items-center justify-center bg-base">
+      <div className="flex flex-1 min-h-0 items-center justify-center">
         <Spinner />
       </div>
     );
@@ -91,7 +91,7 @@ export function LobbyPage() {
       />
     );
   } else {
-    settings = <EmptyState icon={Gamepad2} title="Select a game or create a new one" />;
+    settings = <EmptyState framed icon={Gamepad2} title="Select a game or create a new one" />;
   }
 
   const panels: [PanelConfig, PanelConfig, ...PanelConfig[]] = [
@@ -125,7 +125,7 @@ export function LobbyPage() {
   const activeKey = !hasSelection ? 'list' : pane === 'deck' && !showDeckPane ? 'detail' : pane;
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 p-4 bg-base text-ink">
+    <div className="flex flex-col flex-1 min-h-0 p-4 text-ink">
       <MasterDetailView
         breakpoint="lg"
         columns={

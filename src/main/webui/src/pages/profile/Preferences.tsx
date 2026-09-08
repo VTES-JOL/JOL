@@ -34,7 +34,7 @@ function AppearanceControl() {
               i > 0 ? 'border-l border-line-accent' : ''
             } ${
               pref === option.value
-                ? 'bg-accent text-surface'
+                ? 'bg-accent text-white'
                 : 'text-ink-secondary hover:bg-hover hover:text-ink'
             }`}
           >

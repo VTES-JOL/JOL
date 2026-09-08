@@ -73,7 +73,7 @@ export function JudgePage() {
   const count = (shown: number, total: number) => (filtering ? `${shown} of ${total}` : `${total}`);
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 p-4 bg-base text-ink">
+    <div className="flex flex-col flex-1 min-h-0 p-4 text-ink">
       <h1 className="flex items-center gap-2 text-lg font-serif mb-3">
         <Gavel size={18} /> Judges
       </h1>

@@ -83,7 +83,7 @@ export const PermanentChip = memo(function PermanentChip({
       )}
       {card.label && <span className={`${CHIP} border border-line bg-hover text-ink`}>{card.label}</span>}
       {(card.counters ?? 0) > 0 && (
-        <span className="rounded-full bg-blood px-2 py-0.5 text-xs font-medium text-surface tabular-nums">{card.counters}</span>
+        <span className="rounded-full bg-blood px-2 py-0.5 text-xs font-medium text-white tabular-nums">{card.counters}</span>
       )}
       {card.locked ? (
         quick ? (
@@ -92,12 +92,12 @@ export const PermanentChip = memo(function PermanentChip({
             aria-label={`Unlock ${card.name ?? 'card'}`}
             title="Unlock"
             onClick={quick('unlock')}
-            className={`${TAP} shrink-0 rounded bg-accent text-surface hover:bg-accent-dim`}
+            className={`${TAP} shrink-0 rounded bg-accent text-white hover:bg-accent-dim`}
           >
             <Lock size={11} strokeWidth={2.75} />
           </button>
         ) : (
-          <span className={`${TAP} shrink-0 rounded bg-accent text-surface`} title="Locked">
+          <span className={`${TAP} shrink-0 rounded bg-accent text-white`} title="Locked">
             <Lock size={11} strokeWidth={2.75} />
           </span>
         )

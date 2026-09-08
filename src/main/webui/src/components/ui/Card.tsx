@@ -17,7 +17,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-lg border border-line-accent bg-surface/85 shadow-lg overflow-hidden ${className}`.trim()}
+      className={`rounded-lg border border-line-accent bg-surface/92 backdrop-blur-md shadow-lg overflow-hidden ${className}`.trim()}
       style={style}
     >
       {children}

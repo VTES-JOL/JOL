@@ -59,7 +59,7 @@ export function RoundSummary({ tournamentName }: { tournamentName: string }) {
             {Object.entries(tables).map(([table, players]) => {
               const allDone = players.every((p) => p.pool <= 0);
               return (
-                <div key={table} className="rounded border border-line-accent bg-surface/85 p-2">
+                <div key={table} className="rounded border border-line-accent bg-surface/92 p-2">
                   <div className="font-semibold mb-1">Table {table}</div>
                   <table className="w-full text-sm">
                     <thead>

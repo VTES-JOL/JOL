@@ -126,7 +126,7 @@ export function PlayCardModal({
             <button
               key={i}
               type="button"
-              className={`${MODE_BTN} ${selected.has(i) ? 'bg-accent text-surface border-accent' : ''}`}
+              className={`${MODE_BTN} ${selected.has(i) ? 'bg-accent text-white border-accent' : ''}`}
               onClick={() =>
                 setSelected((prev) => {
                   const next = new Set(prev);

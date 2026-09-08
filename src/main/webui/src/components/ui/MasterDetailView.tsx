@@ -94,7 +94,7 @@ export function MasterDetailView({
             onClick={() => handleSelect(p.key)}
             className={`shrink-0 max-w-[45vw] truncate rounded px-3 py-1.5 text-sm transition-colors ${
               p.key === selectedKey
-                ? 'bg-accent text-surface font-semibold'
+                ? 'bg-accent text-white font-semibold'
                 : 'text-ink-secondary hover:bg-hover'
             }`}
           >

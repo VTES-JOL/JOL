@@ -46,7 +46,7 @@ export const CardHidden = memo(function CardHidden({
             )}
           </span>
           {card.counters > 0 && (
-            <span className="inline-flex items-center rounded-full bg-blood text-surface px-2 py-0.5 text-xs shadow-sm">
+            <span className="inline-flex items-center rounded-full bg-blood text-white px-2 py-0.5 text-xs shadow-sm">
               {card.counters}
             </span>
           )}

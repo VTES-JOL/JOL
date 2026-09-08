@@ -44,7 +44,7 @@ export function FormatValidityBadges({ validity, className = '' }: Props) {
                 status === true
                   ? 'bg-online/15 text-online cursor-default'
                   : isInvalid
-                    ? 'bg-blood/15 text-blood-soft hover:bg-blood/25 cursor-pointer'
+                    ? 'bg-blood/15 text-blood-label hover:bg-blood/25 cursor-pointer'
                     : 'bg-hover text-ink-muted cursor-default',
               ].join(' ')}
             >
@@ -93,7 +93,7 @@ export function FormatValidityBadges({ validity, className = '' }: Props) {
                 ) : (
                   <ul className="space-y-1.5">
                     {modal.errors.map((err, i) => (
-                      <li key={i} className="flex items-start gap-2 text-xs text-blood-soft">
+                      <li key={i} className="flex items-start gap-2 text-xs text-blood-label">
                         <span className="mt-px shrink-0 text-blood/60">·</span>
                         <span>{err}</span>
                       </li>

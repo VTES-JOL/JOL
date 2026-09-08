@@ -230,7 +230,7 @@ function DensityToggle({ value, onChange }: { value: Density; onChange: (d: Dens
           onClick={() => onChange(id)}
           className={`rounded p-1 border ${
             value === id
-              ? 'border-line-accent bg-accent text-surface'
+              ? 'border-line-accent bg-accent text-white'
               : 'border-transparent text-ink-muted hover:bg-hover hover:text-ink'
           }`}
         >

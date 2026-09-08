@@ -33,7 +33,7 @@ export function TournamentPage() {
 
   if (!data) {
     return (
-      <div className="flex flex-1 min-h-0 items-center justify-center bg-base">
+      <div className="flex flex-1 min-h-0 items-center justify-center">
         <Spinner />
       </div>
     );
@@ -46,7 +46,7 @@ export function TournamentPage() {
   const hasSelection = Boolean(openTournament || finalsTournament);
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 p-4 bg-base text-ink">
+    <div className="flex flex-col flex-1 min-h-0 p-4 text-ink">
       <MasterDetailView
         breakpoint="lg"
         columns="340px minmax(360px, 1fr)"
@@ -82,7 +82,7 @@ export function TournamentPage() {
             ) : finalsTournament ? (
               <FinalsTournamentDetail tournament={finalsTournament} />
             ) : (
-              <EmptyState icon={Trophy} title="Select a tournament" />
+              <EmptyState framed icon={Trophy} title="Select a tournament" />
             ),
           },
         ]}

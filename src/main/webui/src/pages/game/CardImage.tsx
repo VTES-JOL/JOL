@@ -78,7 +78,7 @@ function CardTextSummary({ name, card }: { name: string; card?: CardSnapshot }) 
         <span className="font-semibold text-ink">{name}</span>
         {card?.advanced && <i className="icon adv" />}
         {counterText && (
-          <span className="ml-auto rounded-full bg-blood px-2 py-0.5 text-xs font-medium text-surface tabular-nums">
+          <span className="ml-auto rounded-full bg-blood px-2 py-0.5 text-xs font-medium text-white tabular-nums">
             {counterText}
           </span>
         )}

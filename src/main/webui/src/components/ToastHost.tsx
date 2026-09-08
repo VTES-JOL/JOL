@@ -13,8 +13,11 @@ export function ToastHost() {
         <div
           key={toast.id}
           role="alert"
-          className={`flex items-center gap-2 rounded px-3 py-2 text-sm text-surface shadow-lg ${
-            toast.kind === 'error' ? 'bg-blood' : 'bg-online'
+          className={`flex items-center gap-2 rounded px-3 py-2 text-sm shadow-lg ${
+            // on-fill text differs by kind: white clears AA on --blood in
+            // dark (text-surface is only ~3.3:1 there), text-surface clears
+            // it on the lighter --online (white would be ~3.2:1).
+            toast.kind === 'error' ? 'bg-blood text-white' : 'bg-online text-surface'
           }`}
         >
           <span>{toast.message}</span>
