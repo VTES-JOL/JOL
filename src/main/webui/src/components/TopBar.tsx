@@ -4,9 +4,14 @@ import { ChevronDown, LogOut, Menu, UserCircle } from 'lucide-react';
 import { useNav } from '../auth/useNav';
 import { pathForGame, pathForView, pathForHelp } from '../routes';
 import { logout as logoutRequest } from '../pages/login/authApi';
+import { applyTheme, clearThemeHint, getTheme, type Theme } from '../theme';
 import { CountryFlag } from './CountryFlag';
+import { ThemePicker } from './ThemePicker';
 
 function logout() {
+  // Drop the local theme hint so a shared browser's login form doesn't keep
+  // this user's theme for whoever logs in next.
+  clearThemeHint();
   // Hard redirect (not client-side navigation) is deliberate: the whole
   // authenticated shell needs a clean remount once logged out.
   logoutRequest().finally(() => {
@@ -14,7 +19,7 @@ function logout() {
   });
 }
 
-type DropdownId = 'games' | 'user' | null;
+type DropdownId = 'games' | 'user' | 'theme' | null;
 
 function useDropdown() {
   const [open, setOpen] = useState<DropdownId>(null);
@@ -46,6 +51,14 @@ export function TopBar() {
   const nav = useNav();
   const { open, setOpen, rootRef } = useDropdown();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Reconcile the local pre-paint hint against the authoritative server value
+  // once /nav resolves — brings a theme changed on another device into this
+  // browser (one repaint), and corrects a stale/absent hint on a fresh login.
+  const navTheme = nav?.theme;
+  useEffect(() => {
+    if (navTheme && navTheme !== getTheme()) applyTheme(navTheme as Theme);
+  }, [navTheme]);
 
   return (
     <nav
@@ -123,6 +136,13 @@ export function TopBar() {
       </div>
 
       <div className="flex items-center gap-1 ml-auto">
+        {nav?.player && (
+          <ThemePicker
+            open={open === 'theme'}
+            onToggle={() => setOpen(open === 'theme' ? null : 'theme')}
+            onClose={() => setOpen(null)}
+          />
+        )}
         {nav?.player && (
           <div className="relative">
             <button

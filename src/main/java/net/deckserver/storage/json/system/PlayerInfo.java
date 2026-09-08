@@ -21,6 +21,7 @@ public class PlayerInfo {
     private boolean showImages = true;
     private String edgeColor = "#FFFFFF";
     private boolean notificationsEnabled = false;
+    private String theme = "light";
 
     public PlayerInfo(String name, String id, String email, String hash) {
         this.name = name;

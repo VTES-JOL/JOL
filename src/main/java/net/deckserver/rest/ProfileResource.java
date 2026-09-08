@@ -9,6 +9,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Dedicated, envelope-free profile reads/writes for the React profile page —
@@ -23,6 +24,9 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ProfileResource extends BaseResource {
+
+    /** Keep in sync with the Theme union in src/main/webui/src/theme.ts and the token blocks in tailwind.css. */
+    private static final Set<String> VALID_THEMES = Set.of("light", "amethyst", "candlelit", "oxblood", "nightshade");
 
     @GET
     public ProfileBean profile() {
@@ -91,10 +95,26 @@ public class ProfileResource extends BaseResource {
         return profile();
     }
 
+    /**
+     * Standalone from {@link #setPreferences} so the top-bar theme switcher is a
+     * single cheap write. The value is the authoritative copy; the client also
+     * keeps a localStorage hint purely to pre-paint before /nav resolves.
+     */
+    @PUT
+    @Path("theme")
+    public Response setTheme(ThemeRequest body) {
+        if (body.theme() == null || !VALID_THEMES.contains(body.theme())) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Unknown theme.").build();
+        }
+        JolAdmin.setTheme(username(), body.theme());
+        return Response.noContent().build();
+    }
+
     public record CountryOption(String code, String name) {}
     public record ProfileRequest(String email, String discordID, String veknID, String country) {}
     public record PasswordRequest(String currentPassword, String newPassword) {}
     public record PreferencesRequest(boolean imageTooltips, boolean notificationsEnabled) {}
     public record NotificationPrefRequest(boolean enabled) {}
     public record EdgeColorRequest(String color) {}
+    public record ThemeRequest(String theme) {}
 }

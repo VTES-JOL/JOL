@@ -6,45 +6,14 @@ import { api } from '../../api/client';
 import type { Profile } from '../../api/types';
 import { runRequest } from '../../api/mutate';
 import { useNavRefresh } from '../../auth/useNav';
-import { setThemePref, useThemePref, type ThemePref } from '../../theme';
 import { useSave } from './saveState';
 import { SaveNote } from './SaveNote';
 
-const THEME_OPTIONS: { value: ThemePref; label: string }[] = [
-  { value: 'system', label: 'System' },
-  { value: 'light', label: 'Light' },
-  { value: 'dark', label: 'Dark' },
-];
+// Appearance moved to the always-visible switcher in the top bar (see
+// components/ThemePicker.tsx) — it's a server-persisted per-player preference,
+// no longer a light/dark toggle.
 
 const DEFAULT_EDGE_COLOR = '#FFFFFF';
-
-function AppearanceControl() {
-  const pref = useThemePref();
-  return (
-    <div className="flex flex-col gap-1.5">
-      <span className="text-sm text-ink">Appearance</span>
-      <div className="inline-flex w-fit overflow-hidden rounded border border-line-accent" role="group" aria-label="Appearance">
-        {THEME_OPTIONS.map((option, i) => (
-          <button
-            key={option.value}
-            type="button"
-            aria-pressed={pref === option.value}
-            onClick={() => setThemePref(option.value)}
-            className={`px-3 py-1 text-xs transition-colors cursor-pointer ${
-              i > 0 ? 'border-l border-line-accent' : ''
-            } ${
-              pref === option.value
-                ? 'bg-accent text-white'
-                : 'text-ink-secondary hover:bg-hover hover:text-ink'
-            }`}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (updated: Profile) => void }) {
   const edgeSave = useSave();
@@ -80,8 +49,6 @@ export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (
         <CardTitle>Preferences</CardTitle>
       </CardHeader>
       <CardBody className="flex flex-col gap-4" id="playerPreferences">
-        <AppearanceControl />
-
         <div>
           <Switch
             id="imageTooltips"

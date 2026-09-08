@@ -37,6 +37,7 @@ const loggedInNav: NavBean = {
   gameButtons: { g1: 'Game vs Player2', g2: 'Game vs Player3' },
   pendingJudgeRequests: 0,
   imageTooltipPreference: true,
+  theme: 'light',
 };
 
 const meta = {
@@ -71,5 +72,14 @@ export const OpensUserMenu: Story = {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByText('Player1'));
     await waitFor(() => expect(canvas.getByText('Log Out')).toBeVisible());
+  },
+};
+
+export const OpensThemePicker: Story = {
+  decorators: [withNav(loggedInNav)],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByLabelText('Appearance'));
+    await waitFor(() => expect(canvas.getByText('Oxblood Cathedral')).toBeVisible());
   },
 };

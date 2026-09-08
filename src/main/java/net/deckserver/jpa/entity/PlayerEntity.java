@@ -40,6 +40,9 @@ public class PlayerEntity {
     @Column(name = "edge_color", nullable = false)
     private String edgeColor = "#FFFFFF";
 
+    @Column(name = "theme", nullable = false)
+    private String theme = "light";
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "player_role",
             joinColumns = @JoinColumn(name = "player_id"))
@@ -60,6 +63,7 @@ public class PlayerEntity {
         entity.countryCode = info.getCountryCode();
         entity.showImages = info.isShowImages();
         entity.edgeColor = info.getEdgeColor();
+        entity.theme = info.getTheme();
         entity.roles = new HashSet<>(info.getRoles());
         return entity;
     }
@@ -71,6 +75,7 @@ public class PlayerEntity {
         info.setCountryCode(countryCode);
         info.setShowImages(showImages);
         info.setEdgeColor(edgeColor);
+        info.setTheme(theme);
         info.setRoles(new HashSet<>(roles));
         return info;
     }

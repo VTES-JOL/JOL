@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { resolveDark, useThemePref } from '../../theme';
+import { isDarkTheme, useTheme } from '../../theme';
 
 // Cloudflare Turnstile's implicit "scan the DOM for .cf-turnstile on script
 // load" rendering doesn't work well for a conditionally-shown React panel
@@ -39,7 +39,7 @@ function loadScript(): Promise<void> {
 
 export function TurnstileWidget({ siteKey, onToken }: { siteKey: string; onToken: (token: string) => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const dark = resolveDark(useThemePref());
+  const dark = isDarkTheme(useTheme());
 
   useEffect(() => {
     let widgetId: string | undefined;

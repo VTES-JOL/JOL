@@ -16,6 +16,8 @@ export interface NavBean {
   // false ⇒ the game screen renders cards text-only (no image tooltips / modal art).
   // Also forced on below the md breakpoint, where there is no hover. See pages/game/textMode.
   imageTooltipPreference: boolean;
+  // Server-persisted UI theme (authoritative). Mirrors the Theme union in src/theme.ts.
+  theme: string;
 }
 
 export interface ChatEntry {

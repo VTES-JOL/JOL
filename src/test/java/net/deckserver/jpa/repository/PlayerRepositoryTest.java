@@ -65,6 +65,24 @@ class PlayerRepositoryTest {
     }
 
     @Test
+    void themeDefaultsToLightAndRoundTrips() {
+        PlayerInfo player = new PlayerInfo("ThemePlayer", UUID.randomUUID().toString(), "theme@example.com", "hash");
+
+        repository.save(em, player);
+        em.flush();
+        em.clear();
+        assertThat(repository.findByName(em, "ThemePlayer").getTheme(), is("light"));
+
+        PlayerInfo found = repository.findByName(em, "ThemePlayer");
+        found.setTheme("candlelit");
+        repository.save(em, found);
+        em.flush();
+        em.clear();
+
+        assertThat(repository.findByName(em, "ThemePlayer").getTheme(), is("candlelit"));
+    }
+
+    @Test
     void savePlayerWithRoles() {
         PlayerInfo player = new PlayerInfo("AdminPlayer", UUID.randomUUID().toString(), "admin@example.com", "hash");
         player.setRoles(Set.of(PlayerRole.ADMIN, PlayerRole.JUDGE));

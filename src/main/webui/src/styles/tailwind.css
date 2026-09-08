@@ -49,38 +49,154 @@
     --jt-offline: #8a7870;
 }
 
-body[data-bs-theme="dark"] {
-    --jt-base:    #0d0b0f;
-    --jt-panel:   #13101a;
-    --jt-surface: #1c1726;
-    --jt-hover:   #241f31;
+/* ── Dark themes ──────────────────────────────────────────────────────
+   A flat named list chosen from the Profile → nav switcher (src/theme.ts),
+   persisted server-side on player.theme. Every dark theme also carries
+   body[data-bs-theme="dark"] (set by theme.ts / the index.html pre-paint
+   script) so the `dark` custom-variant above and the data-bs-theme="dark"
+   branches in RouteBackground.css / markdown.css keep working untouched.
 
-    --jt-ink:           #e8e0f0;
-    --jt-ink-secondary: #9a8fb0;
-    --jt-ink-muted:     #8d82a8; /* lightened from #7d7294 for AA on dark surfaces */
+   `body[data-bs-theme="dark"]` alone holds the AMETHYST values — the default
+   dark and the fallback if the data-theme attribute is ever missing. The
+   other three are [data-bs-theme="dark"][data-theme="…"] overrides (higher
+   specificity, so order-independent). Each palette lifts the ground off pure
+   black, spreads the four surface tiers, and keeps body ink in the ~9-13:1
+   band (higher than that shimmers under the serif body font). */
+body[data-bs-theme="dark"],
+body[data-bs-theme="dark"][data-theme="amethyst"] {
+    --jt-base:    #181521;
+    --jt-panel:   #201b2e;
+    --jt-surface: #2a2338;
+    --jt-hover:   #362d48;
 
-    --jt-line:        rgba(120, 80, 200, 0.20);
-    --jt-line-accent: rgba(160, 100, 255, 0.38);
+    --jt-ink:           #d9d1e6;
+    --jt-ink-secondary: #a99fbe;
+    --jt-ink-muted:     #978aa8;
 
-    --jt-accent:      #8b4dcc;
-    --jt-accent-dim:  #6b3a9e;
-    --jt-accent-soft: #a86cf0;
+    --jt-line:        rgba(150, 120, 210, 0.16);
+    --jt-line-accent: rgba(170, 120, 240, 0.32);
 
-    --jt-gold:      #b8860b;
-    --jt-gold-soft: #d4a017;
+    --jt-accent:      #9a63d4;
+    --jt-accent-dim:  #7847ad;
+    --jt-accent-soft: #bd93ec;
 
-    --jt-arcane:      #8b4dcc;
-    --jt-arcane-soft: #6b3a9e;
-    --jt-arcane-label: #c9a9ef; /* pale purple — ~7:1 on an --arcane/15 chip */
+    --jt-gold:      #c9a13a;
+    --jt-gold-soft: #e0bd63;
 
-    --jt-blood:        #c23b3b;
-    --jt-blood-bright: #e13737;
-    --jt-blood-soft:   #9e2a2a;
-    --jt-blood-label:  #eb9a9a; /* pale red — ~7:1 on a --blood/15 chip */
+    --jt-arcane:      #9a63d4;
+    --jt-arcane-soft: #7847ad;
+    --jt-arcane-label: #d5bef2;
 
-    --jt-online:  #5c9e6e;
-    --jt-away:    #c8960a;
-    --jt-offline: #6a6070;
+    --jt-blood:        #cf5050;
+    --jt-blood-bright: #e76a6a;
+    --jt-blood-soft:   #c15c5c;
+    --jt-blood-label:  #efb0b0;
+
+    --jt-online:  #64ab7c;
+    --jt-away:    #c9a13a;
+    --jt-offline: #7a7286;
+}
+
+body[data-bs-theme="dark"][data-theme="candlelit"] {
+    --jt-base:    #1a161c;
+    --jt-panel:   #231e26;
+    --jt-surface: #2e2732;
+    --jt-hover:   #3a323f;
+
+    --jt-ink:           #e4dbcd;
+    --jt-ink-secondary: #b3a897;
+    --jt-ink-muted:     #9a8d7c;
+
+    --jt-line:        rgba(190, 160, 120, 0.15);
+    --jt-line-accent: rgba(200, 140, 70, 0.32);
+
+    --jt-accent:      #a06ccf;
+    --jt-accent-dim:  #7d4fa8;
+    --jt-accent-soft: #c49ae8;
+
+    --jt-gold:      #d0a43c;
+    --jt-gold-soft: #e8c56d;
+
+    --jt-arcane:      #a06ccf;
+    --jt-arcane-soft: #7d4fa8;
+    --jt-arcane-label: #dcc6f2;
+
+    --jt-blood:        #d15656;
+    --jt-blood-bright: #e96b6b;
+    --jt-blood-soft:   #cf6a5a;
+    --jt-blood-label:  #f0b4a8;
+
+    --jt-online:  #7ab38a;
+    --jt-away:    #d0a43c;
+    --jt-offline: #847a70;
+}
+
+body[data-bs-theme="dark"][data-theme="oxblood"] {
+    --jt-base:    #1b1315;
+    --jt-panel:   #241a1d;
+    --jt-surface: #2f2226;
+    --jt-hover:   #3c2c30;
+
+    --jt-ink:           #e5d9d3;
+    --jt-ink-secondary: #b6a29c;
+    --jt-ink-muted:     #9c877f;
+
+    --jt-line:        rgba(190, 120, 110, 0.15);
+    --jt-line-accent: rgba(200, 100, 75, 0.32);
+
+    --jt-accent:      #c06848;
+    --jt-accent-dim:  #9a4f38;
+    --jt-accent-soft: #dd9478;
+
+    --jt-gold:      #c9a03c;
+    --jt-gold-soft: #e2c069;
+
+    --jt-arcane:      #9a6bc4;
+    --jt-arcane-soft: #7a52a0;
+    --jt-arcane-label: #cfb8ec;
+
+    --jt-blood:        #d55f5f;
+    --jt-blood-bright: #ee7070;
+    --jt-blood-soft:   #d06a6a;
+    --jt-blood-label:  #f1b6b6;
+
+    --jt-online:  #6fae82;
+    --jt-away:    #c9a03c;
+    --jt-offline: #847470;
+}
+
+body[data-bs-theme="dark"][data-theme="nightshade"] {
+    --jt-base:    #14161f;
+    --jt-panel:   #1c1f2b;
+    --jt-surface: #262a38;
+    --jt-hover:   #323848;
+
+    --jt-ink:           #d8dde9;
+    --jt-ink-secondary: #a3abbf;
+    --jt-ink-muted:     #8b93a6;
+
+    --jt-line:        rgba(120, 140, 210, 0.16);
+    --jt-line-accent: rgba(130, 150, 245, 0.32);
+
+    --jt-accent:      #7d7bd6;
+    --jt-accent-dim:  #5b58a8;
+    --jt-accent-soft: #a8a6ec;
+
+    --jt-gold:      #c2a34a;
+    --jt-gold-soft: #dcc074;
+
+    --jt-arcane:      #9a7bd6;
+    --jt-arcane-soft: #6f5aa8;
+    --jt-arcane-label: #cabff0;
+
+    --jt-blood:        #d55f5f;
+    --jt-blood-bright: #ec7373;
+    --jt-blood-soft:   #d06a6a;
+    --jt-blood-label:  #eeb4b4;
+
+    --jt-online:  #5faaa0;
+    --jt-away:    #c2a34a;
+    --jt-offline: #737b8e;
 }
 
 @theme inline {

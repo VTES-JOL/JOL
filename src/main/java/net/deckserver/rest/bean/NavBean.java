@@ -26,6 +26,8 @@ public class NavBean {
     private long pendingJudgeRequests;
     /** Whether this player wants image card tooltips (false ⇒ the game screen renders cards text-only). */
     private boolean imageTooltipPreference;
+    /** Server-persisted UI theme (authoritative). One of light / amethyst / candlelit / oxblood / nightshade. */
+    private String theme = "light";
 
     public NavBean(String playerName) {
         player = playerName;
@@ -34,6 +36,7 @@ public class NavBean {
             notificationsEnabled = JolAdmin.getNotificationPreference(player);
             hasSubscriptions = SubscriptionService.hasSubscriptions(player);
             imageTooltipPreference = JolAdmin.getImageTooltipPreference(player);
+            theme = JolAdmin.getTheme(player);
             chats = GlobalChatService.hasUnseenChats(player);
             buttons.add("active:Watch");
             buttons.add("deck:Decks");

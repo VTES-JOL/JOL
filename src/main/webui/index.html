@@ -19,19 +19,21 @@
   <body>
     <div id="root"></div>
     <script>
-      // Pre-paint the saved theme before the bundle loads so a reload doesn't
-      // flash light. Mirrors the apply logic in src/theme.ts — keep in sync.
+      // Pre-paint the hinted theme before the bundle loads so a reload / the
+      // login page don't flash the wrong theme. This is only a hint — the
+      // authenticated shell reconciles it against NavBean.theme once /nav
+      // resolves. Mirrors the apply logic in src/theme.ts — keep in sync.
       (function () {
         try {
-          var p = localStorage.getItem('jol-theme') || 'system';
-          var dark =
-            p === 'dark' ||
-            (p === 'system' &&
-              window.matchMedia &&
-              window.matchMedia('(prefers-color-scheme: dark)').matches);
-          if (dark) document.body.setAttribute('data-bs-theme', 'dark');
+          var t = localStorage.getItem('jol-theme');
+          if (t === 'dark') t = 'amethyst'; // legacy hint value
+          var known = ['light', 'amethyst', 'candlelit', 'oxblood', 'nightshade'];
+          if (known.indexOf(t) === -1) t = 'light';
+          document.body.dataset.theme = t;
+          if (t !== 'light') document.body.setAttribute('data-bs-theme', 'dark');
         } catch (e) {
           /* storage unavailable — render light */
+          document.body.dataset.theme = 'light';
         }
       })();
     </script>

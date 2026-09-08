@@ -345,6 +345,9 @@ public class JolAdmin {
     public static synchronized void setEdgeColor(String player, String value) {
         PlayerService.setEdgeColor(player, value);
     }
+    public static synchronized void setTheme(String player, String value) {
+        PlayerService.setTheme(player, value);
+    }
 
     public static synchronized boolean getImageTooltipPreference(String player) {
         if (player == null) {
@@ -358,6 +361,13 @@ public class JolAdmin {
             return "#FFFFFF";
         }
         return PlayerService.get(player).getEdgeColor();
+    }
+
+    public static synchronized String getTheme(String player) {
+        if (player == null) {
+            return "light";
+        }
+        return PlayerService.get(player).getTheme();
     }
 
     public static synchronized void setNotificationPreference(String player, boolean value) {

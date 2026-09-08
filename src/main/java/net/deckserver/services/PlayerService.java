@@ -176,6 +176,15 @@ public class PlayerService extends PersistedService {
                 () -> playerInfo.setEdgeColor(previousValue));
     }
 
+    public static void setTheme(String playerName, String value) {
+        PlayerInfo playerInfo = loadPlayerInfo(playerName);
+        String previousValue = playerInfo.getTheme();
+        instance().jpaWriteWithRollback(
+                () -> playerInfo.setTheme(value),
+                em -> playerRepository.save(em, playerInfo),
+                () -> playerInfo.setTheme(previousValue));
+    }
+
     public static void setNotificationPreference(String playerName, boolean value) {
         PlayerInfo playerInfo = loadPlayerInfo(playerName);
         boolean previousValue = playerInfo.isNotificationsEnabled();
