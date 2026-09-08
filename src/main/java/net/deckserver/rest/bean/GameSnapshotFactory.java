@@ -15,13 +15,15 @@ import net.deckserver.services.GameService;
 import net.deckserver.services.JudgeService;
 import net.deckserver.services.PlayerService;
 import net.deckserver.storage.json.game.CardData;
+import net.deckserver.storage.json.game.ChatData;
+import net.deckserver.storage.json.game.CommandErrorData;
 import net.deckserver.storage.json.game.JudgeRequestData;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
-
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Builds a viewer-aware {@link GameSnapshot} tree directly from {@link JolGame}
@@ -53,6 +55,10 @@ import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 public class GameSnapshotFactory {
 
     public static GameSnapshot build(GameModel model, String viewer, String status) {
+        return build(model, viewer, status, false);
+    }
+
+    public static GameSnapshot build(GameModel model, String viewer, String status, boolean rejected) {
         JolGame game = GameService.getGameByName(model.getName());
         boolean isPlayer = model.getPlayers().contains(viewer);
         boolean isAdmin = !isPlayer && JolAdmin.getOwner(model.getName()).equals(viewer);
@@ -63,8 +69,15 @@ public class GameSnapshotFactory {
         }
 
         List<String> pinged = JolAdmin.getPings(model.getName());
+        // The current predator/prey ring: living seats only (updatePredatorMapping
+        // already skips ousted). predator/prey are meaningless with < 2 alive.
+        Set<String> ring = game.data().getCurrentPlayers().stream()
+                .map(net.deckserver.storage.json.game.PlayerData::getName)
+                .collect(Collectors.toSet());
+        boolean ringActive = ring.size() >= 2;
         List<PlayerSnapshot> players = game.getPlayers().stream()
-                .map(playerName -> buildPlayer(game, playerName, viewer, pinged))
+                .map(playerName -> buildPlayer(game, playerName, viewer, pinged,
+                        ringActive && ring.contains(playerName)))
                 .toList();
 
         Phase phase = game.getPhase();
@@ -81,10 +94,24 @@ public class GameSnapshotFactory {
         JudgeRequestBean judgeRequest = openRequest == null ? null
                 : JudgeRequestBean.of(openRequest, viewer, isJudge && !openRequest.isTournament());
 
+        net.deckserver.storage.json.game.PendingActionData pending = game.data().getPendingAction();
+        PendingActionBean pendingAction = pending == null ? null : PendingActionBean.of(pending);
+
+        // Current-turn chat carried inline so the log updates in the same round
+        // trip as the board — same data as GET history?turn=<turnLabel>, with the
+        // judge-only fields stripped for anyone not judging this game from outside.
+        String turnLabel = game.getTurnLabel();
+        List<ChatData> chat = ChatService.getTurn(game.id(), turnLabel);
+        chat = isJudge ? chat : chat.stream().map(ChatData::forSeatedView).toList();
+        List<CommandErrorData> commandErrors = isJudge
+                ? ChatService.getFailedCommands(game.id(), turnLabel)
+                : List.of();
+
         return GameSnapshot.builder()
                 .id(game.id())
                 .name(model.getName())
                 .players(players)
+                .seating(game.getPlayers())
                 .currentPlayer(game.getActivePlayer())
                 .edgePlayer(game.getEdge())
                 .turn(game.data().getTurn())
@@ -101,16 +128,31 @@ public class GameSnapshotFactory {
                 .edgeColor(edgeColor)
                 .edgeTextColor(colorIsDark(edgeColor) ? "white" : "black")
                 .status(status)
-                .stamp(OffsetDateTime.now().format(ISO_OFFSET_DATE_TIME))
+                .rejected(rejected)
+                .stamp(JolAdmin.getGameStamp(game.id()))
                 .judgeRequest(judgeRequest)
+                .pendingAction(pendingAction)
+                .chat(chat)
+                .commandErrors(commandErrors)
                 .build();
     }
 
-    private static PlayerSnapshot buildPlayer(JolGame game, String playerName, String viewer, List<String> pinged) {
+    // Always present in the payload even when empty, so the client can tell
+    // "0 cards here" from "this seat's region wasn't sent" — TORPOR / UNCONTROLLED
+    // included (finding #7: "nobody in torpor" is real information the board
+    // should show, not read as absence of data). RESEARCH / REMOVED_FROM_GAME
+    // stay omitted when empty.
+    private static final EnumSet<RegionType> ALWAYS_EMIT = EnumSet.of(
+            RegionType.HAND, RegionType.READY, RegionType.TORPOR, RegionType.UNCONTROLLED,
+            RegionType.LIBRARY, RegionType.CRYPT, RegionType.ASH_HEAP);
+
+    private static PlayerSnapshot buildPlayer(JolGame game, String playerName, String viewer,
+                                             List<String> pinged, boolean inRing) {
+        net.deckserver.storage.json.game.ExitData exit = game.data().getExit(playerName);
         List<RegionSnapshot> regions = new ArrayList<>();
         for (RegionType type : RegionType.values()) {
             RegionSnapshot region = buildRegion(game, playerName, viewer, type);
-            if (!region.getCards().isEmpty()) {
+            if (!region.getCards().isEmpty() || ALWAYS_EMIT.contains(type)) {
                 regions.add(region);
             }
         }
@@ -121,6 +163,11 @@ public class GameSnapshotFactory {
                 .active(playerName.equals(game.getActivePlayer()))
                 .edge(playerName.equals(game.getEdge()))
                 .pinged(pinged.contains(playerName))
+                .predator(inRing ? game.getPredatorOf(playerName) : null)
+                .prey(inRing ? game.getPreyOf(playerName) : null)
+                .lastActionAt(game.getLastActionAt(playerName))
+                .exitKind(exit != null ? exit.getKind().name() : null)
+                .exitVpRecipient(exit != null ? exit.getVpRecipient() : null)
                 .regions(regions)
                 .build();
     }

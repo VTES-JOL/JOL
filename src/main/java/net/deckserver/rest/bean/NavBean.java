@@ -24,6 +24,8 @@ public class NavBean {
     private boolean hasSubscriptions;
     private String country = null;
     private long pendingJudgeRequests;
+    /** Whether this player wants image card tooltips (false ⇒ the game screen renders cards text-only). */
+    private boolean imageTooltipPreference;
 
     public NavBean(String playerName) {
         player = playerName;
@@ -31,6 +33,7 @@ public class NavBean {
             country = PlayerService.get(player).getCountryCode();
             notificationsEnabled = JolAdmin.getNotificationPreference(player);
             hasSubscriptions = SubscriptionService.hasSubscriptions(player);
+            imageTooltipPreference = JolAdmin.getImageTooltipPreference(player);
             chats = GlobalChatService.hasUnseenChats(player);
             buttons.add("active:Watch");
             buttons.add("deck:Decks");

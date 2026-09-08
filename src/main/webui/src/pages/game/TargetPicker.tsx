@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 
 // Mirrors pick-target-modal.jsp/showTargetPicker() — a lightweight,
 // non-blocking banner (no backdrop) shown while a play-card mode with a
@@ -14,9 +15,14 @@ export function TargetPicker({
   prompt?: string;
   onCancel: () => void;
 }) {
+  // <md: sit just above the bottom tab bar in the thumb zone (ActSheet.dc.html)
+  // rather than pinned under the HUD at the top.
+  const isMobile = useIsMobile();
   return (
     <div
-      className="fixed top-2 left-1/2 -translate-x-1/2 rounded border border-line-accent bg-panel text-ink shadow-xl"
+      className={`fixed left-1/2 -translate-x-1/2 rounded border border-line-accent bg-panel text-ink shadow-xl ${
+        isMobile ? 'bottom-20' : 'top-2'
+      }`}
       style={{ zIndex: 1055, width: 'min(90vw, 400px)' }}
     >
       <div className="flex justify-between items-center p-2 border-b border-line">

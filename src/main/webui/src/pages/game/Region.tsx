@@ -3,8 +3,15 @@ import { MinusCircle, PlusCircle } from 'lucide-react';
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
 import { Card, RegionLabelBadges, type QuickKind, type TableCardClick } from './Card';
 import { CardSimple } from './CardSimple';
+import { MinionTile } from './MinionTile';
+import { PermanentChip } from './PermanentChip';
 import type { MenuAnchor } from './CardContextMenu';
 import { cardActions, type HandCardContext, type Submission, type TableCardContext } from './cardCommands';
+
+// READY/TORPOR/UNCONTROLLED render as tiles (MinionTile / PermanentChip) in a
+// wrapping grid; CRYPT and the expanded piles stay on <Card>. UNCONTROLLED
+// uses MinionTile's compact variant (no lock, no stepper).
+const TILE_REGIONS = new Set(['READY', 'TORPOR', 'UNCONTROLLED']);
 
 // READY/TORPOR/UNCONTROLLED are live board state — prominent header, coloured
 // left edge. Everything else (ash heap, RFG, library, crypt, hand, research)
@@ -60,6 +67,7 @@ export const Region = memo(function Region({
   isSeatedPlayer,
   onTableCardClick,
   onQuickCommand,
+  onCounterBump,
   onPlayCardClick,
 }: {
   region: RegionSnapshot;
@@ -70,6 +78,9 @@ export const Region = memo(function Region({
   isSeatedPlayer: boolean;
   onTableCardClick: (ctx: TableCardContext, anchor: MenuAnchor) => void;
   onQuickCommand: (submission: Submission) => void;
+  // Inline blood +/- off a minion tile (coalesced by useCounterBump). Absent
+  // in the archival-pile context (PilesFooter), where no minion tiles render.
+  onCounterBump?: (ctx: TableCardContext, kind: 'blood', step: number) => void;
   onPlayCardClick: (ctx: HandCardContext, card: CardSnapshot) => void;
 }) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
@@ -100,28 +111,152 @@ export const Region = memo(function Region({
     [onTableCardClick, controller, controllerPool, region.type, region.commandKey, isOwnRegion],
   );
 
-  const onQuick = useCallback(
-    ({ coordinate, card, isChild }: TableCardClick, kind: QuickKind) => {
-      const ctx: TableCardContext = {
-        controller,
-        controllerPool,
-        regionType: region.type,
-        regionCommandKey: region.commandKey,
-        coordinate,
-        card,
-        isChild,
-        controlledByViewer: isOwnRegion,
-      };
-      onQuickCommand((kind === 'lock' ? cardActions.lock : cardActions.unlock)(ctx));
-    },
-    [onQuickCommand, controller, controllerPool, region.type, region.commandKey, isOwnRegion],
+  const rowCtx = useCallback(
+    ({ coordinate, card, isChild }: TableCardClick): TableCardContext => ({
+      controller,
+      controllerPool,
+      regionType: region.type,
+      regionCommandKey: region.commandKey,
+      coordinate,
+      card,
+      isChild,
+      controlledByViewer: isOwnRegion,
+    }),
+    [controller, controllerPool, region.type, region.commandKey, isOwnRegion],
   );
 
-  if (region.cards.length === 0) return null;
+  const onQuick = useCallback(
+    (click: TableCardClick, kind: QuickKind) => {
+      onQuickCommand((kind === 'lock' ? cardActions.lock : cardActions.unlock)(rowCtx(click)));
+    },
+    [onQuickCommand, rowCtx],
+  );
+
+  const onCounter = useCallback(
+    (click: TableCardClick, step: number) => {
+      onCounterBump?.(rowCtx(click), 'blood', step);
+    },
+    [onCounterBump, rowCtx],
+  );
 
   const primary = PRIMARY_REGIONS.has(region.type);
+  if (region.cards.length === 0) {
+    // A non-primary empty region is dropped (it lives in PilesFooter's count
+    // row). An empty primary region renders a quiet "TORPOR 0" label instead
+    // of vanishing — "nobody in torpor" is information (finding #7).
+    if (!primary) return null;
+    return (
+      <div className="mb-1 flex items-center gap-2 px-2 py-1 text-[0.7rem] font-semibold uppercase tracking-wide text-ink-muted">
+        <span className="truncate">{region.label}</span>
+        <span className="tabular-nums text-line-accent">0</span>
+      </div>
+    );
+  }
+
   const accent = REGION_ACCENT[region.type] ?? 'border-l-line-accent';
   const mode = clickMode(region.type, isOwnRegion, isSeatedPlayer);
+
+  // `i` is the card's index in the backend's region list — that IS its
+  // coordinate (`lock … ready <i+1>`), so it must travel with the card, not
+  // be re-derived from render position. The backend now stable-sorts READY
+  // minions-first on every submit / load (GameData.normalizeReadyOrder, D35b),
+  // so `i` and render order already agree and the numbers read contiguously;
+  // the client-side partition below is kept as a belt-and-braces guard for the
+  // brief window right after a rollback before the next submit re-normalises.
+  const indexed = region.cards.map((card, i) => ({ card, i }));
+  // NF2 (D32): an opponent's UNCONTROLLED is almost always a stack of
+  // identity-less `*********` rows — inert (you can't act on a hidden card you
+  // don't control) and ~100px of noise per seat. Collapse those into one dense
+  // "N hidden" chip row; visible influence-in-progress and deliberately
+  // face-down cards still render as tiles.
+  const hiddenUncontrolled =
+    region.type === 'UNCONTROLLED' ? indexed.filter((e) => !e.card.visible && !e.card.faceDown).length : 0;
+  const visibleIndexed =
+    region.type === 'UNCONTROLLED' ? indexed.filter((e) => e.card.visible || e.card.faceDown) : indexed;
+  const orderedCards =
+    region.type === 'READY'
+      ? [...visibleIndexed.filter((e) => e.card.minion !== false), ...visibleIndexed.filter((e) => e.card.minion === false)]
+      : visibleIndexed;
+
+  const renderCard = (card: CardSnapshot, i: number) => {
+    const coordinate = String(i + 1);
+    const playClick = () =>
+      onPlayCardClick({ regionType: region.type, regionCommandKey: region.commandKey, coordinate }, card);
+    const faceDownPlay = isFaceDownPlayable(card, isOwnRegion, isSeatedPlayer);
+    if (region.simple) {
+      const actionClick = (e: MouseEvent) =>
+        onAction({ coordinate, card, isChild: false }, { x: e.clientX, y: e.clientY });
+      const actionContextMenu = (e: MouseEvent) => {
+        e.preventDefault(); // suppress Chrome's own menu
+        actionClick(e);
+      };
+      const onClick = faceDownPlay
+        ? playClick
+        : mode === 'action'
+          ? actionClick
+          : mode === 'play'
+            ? playClick
+            : undefined;
+      return (
+        <CardSimple
+          key={card.id}
+          card={card}
+          region={region.type}
+          coordinate={coordinate}
+          onClick={onClick}
+          onContextMenu={!faceDownPlay && mode === 'action' ? actionContextMenu : undefined}
+        />
+      );
+    }
+    const actionHandler = mode === 'action' ? onAction : undefined;
+    const cardClick = faceDownPlay ? playClick : undefined;
+    if (TILE_REGIONS.has(region.type)) {
+      const uncontrolled = region.type === 'UNCONTROLLED';
+      // Uncontrolled minions can't be locked and don't take blood off the tile.
+      const quickHandler = mode === 'action' && !uncontrolled ? onQuick : undefined;
+      // A non-minion in READY (master / location / powerbase) — compact chip, no ring.
+      if (region.type === 'READY' && card.minion === false) {
+        return (
+          <PermanentChip
+            key={card.id}
+            card={card}
+            region={region.type}
+            coordinate={coordinate}
+            onAction={actionHandler}
+            onQuick={quickHandler}
+            onCardClick={cardClick}
+          />
+        );
+      }
+      return (
+        <MinionTile
+          key={card.id}
+          card={card}
+          region={region.type}
+          coordinate={coordinate}
+          compact={uncontrolled}
+          onAction={actionHandler}
+          onQuick={quickHandler}
+          // NF4 (D32): steppers only when the caller actually supplied a bump
+          // handler (controller / judge) — otherwise the tile shows a static
+          // count pill.
+          onCounter={quickHandler && onCounterBump ? onCounter : undefined}
+          onCardClick={cardClick}
+        />
+      );
+    }
+    return (
+      <Card
+        key={card.id}
+        card={card}
+        region={region.type}
+        coordinate={coordinate}
+        onAction={actionHandler}
+        onQuick={mode === 'action' && (region.type === 'READY' || region.type === 'TORPOR') ? onQuick : undefined}
+        onCardClick={cardClick}
+      />
+    );
+  };
 
   return (
     <div className={`mb-2 ${primary ? `border-l-2 ${accent}` : ''}`}>
@@ -153,49 +288,28 @@ export const Region = memo(function Region({
         </span>
       </div>
       {!collapsed && (
-        <ol className="region list-none divide-y divide-line/40">
-          {region.cards.map((card, i) => {
-            const coordinate = String(i + 1);
-            const playClick = () =>
-              onPlayCardClick({ regionType: region.type, regionCommandKey: region.commandKey, coordinate }, card);
-            const faceDownPlay = isFaceDownPlayable(card, isOwnRegion, isSeatedPlayer);
-            if (region.simple) {
-              const actionClick = (e: MouseEvent) =>
-                onAction({ coordinate, card, isChild: false }, { x: e.clientX, y: e.clientY });
-              const actionContextMenu = (e: MouseEvent) => {
-                e.preventDefault(); // suppress Chrome's own menu
-                actionClick(e);
-              };
-              const onClick = faceDownPlay
-                ? playClick
-                : mode === 'action'
-                  ? actionClick
-                  : mode === 'play'
-                    ? playClick
-                    : undefined;
-              return (
-                <CardSimple
-                  key={card.id}
-                  card={card}
-                  region={region.type}
-                  coordinate={coordinate}
-                  onClick={onClick}
-                  onContextMenu={!faceDownPlay && mode === 'action' ? actionContextMenu : undefined}
-                />
-              );
-            }
-            return (
-              <Card
-                key={card.id}
-                card={card}
-                region={region.type}
-                coordinate={coordinate}
-                onAction={mode === 'action' ? onAction : undefined}
-                onQuick={mode === 'action' && (region.type === 'READY' || region.type === 'TORPOR') ? onQuick : undefined}
-                onCardClick={faceDownPlay ? playClick : undefined}
-              />
-            );
-          })}
+        <ol
+          className={
+            region.type === 'UNCONTROLLED'
+              ? 'region list-none grid gap-1.5 p-1.5 [grid-template-columns:repeat(auto-fill,minmax(min(9rem,100%),1fr))]'
+              : TILE_REGIONS.has(region.type)
+                ? 'region list-none grid gap-1.5 p-1.5 [grid-template-columns:repeat(auto-fill,minmax(min(15rem,100%),1fr))]'
+                : 'region list-none divide-y divide-line/40'
+          }
+        >
+          {orderedCards.map(({ card, i }) => renderCard(card, i))}
+          {hiddenUncontrolled > 0 && (
+            <li
+              className="col-span-full flex list-none items-center gap-1.5 rounded border border-line-accent border-dashed bg-hover/30 px-2 py-1 text-[0.7rem] text-ink-muted"
+              style={{ gridColumn: '1 / -1' }}
+              title={`${hiddenUncontrolled} card${hiddenUncontrolled === 1 ? '' : 's'} being influenced — identity hidden`}
+            >
+              {Array.from({ length: Math.min(hiddenUncontrolled, 8) }).map((_, k) => (
+                <span key={k} className="inline-block h-2.5 w-2.5 rounded-[2px] border border-ink-muted/60" aria-hidden />
+              ))}
+              <span className="ml-auto tabular-nums font-semibold">{hiddenUncontrolled} hidden</span>
+            </li>
+          )}
         </ol>
       )}
     </div>

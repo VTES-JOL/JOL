@@ -7,6 +7,18 @@ type Listener = (data: Record<string, unknown>) => void;
 
 const listeners = new Map<string, Set<Listener>>();
 const openListeners = new Set<() => void>();
+// Coarse connection state for a UI affordance (the HUD's connect dot). This is
+// the *push channel*'s health specifically — distinct from stores/connectivity,
+// which tracks whether HTTP requests are reaching the server. The socket can be
+// down (missed signals → board goes stale until the reconnect resync) while
+// plain fetches still work.
+const statusListeners = new Set<() => void>();
+let connected = false;
+function setConnected(next: boolean) {
+  if (connected === next) return;
+  connected = next;
+  statusListeners.forEach((l) => l());
+}
 let socket: WebSocket | null = null;
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -49,6 +61,7 @@ function connect() {
   socket = new WebSocket(wsUrl());
   socket.onopen = () => {
     reconnectDelay = RECONNECT_BASE_MS;
+    setConnected(true);
     // clientId is already tagged via the handshake's own ?clientId= query param (see
     // wsUrl above) — no follow-up 'hello' message needed.
     // A successful WS (re)connect is a strong, near-instant hint the server
@@ -69,6 +82,7 @@ function connect() {
   };
   socket.onclose = () => {
     socket = null;
+    setConnected(false);
     reconnectTimer = setTimeout(connect, reconnectDelay);
     reconnectDelay = Math.min(reconnectDelay * 2, RECONNECT_MAX_MS);
   };
@@ -95,6 +109,16 @@ export function send(message: Record<string, unknown>) {
 export function onOpen(listener: () => void): () => void {
   openListeners.add(listener);
   return () => openListeners.delete(listener);
+}
+
+// Push-channel connection state, for useSyncExternalStore (see api/useSocketStatus).
+export function subscribeStatus(listener: () => void): () => void {
+  statusListeners.add(listener);
+  connect();
+  return () => statusListeners.delete(listener);
+}
+export function getConnected(): boolean {
+  return connected;
 }
 
 export function disconnect() {

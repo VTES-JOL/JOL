@@ -129,7 +129,7 @@ public class GameActionResource extends BaseResource {
         if (canJudge) {
             return lines;
         }
-        return lines.stream().map(GameActionResource::forNonJudge).toList();
+        return lines.stream().map(ChatData::forSeatedView).toList();
     }
 
     /**
@@ -147,18 +147,6 @@ public class GameActionResource extends BaseResource {
             throw new ForbiddenException("Command attempts are visible to judges only");
         }
         return ChatService.getFailedCommands(JolAdmin.getGameId(gameName()), turn);
-    }
-
-    private static ChatData forNonJudge(ChatData c) {
-        // A fresh copy carrying only the fields a seated player / spectator may
-        // see. command + invocation* are all judge-only and are dropped — the
-        // client never renders them anyway.
-        ChatData copy = new ChatData();
-        copy.setTimestamp(c.getTimestamp());
-        copy.setPostedAt(c.getPostedAt());   // not privileged — a precise timestamp
-        copy.setMessage(c.getMessage());
-        copy.setSource(c.getSource());
-        return copy;
     }
 
     private GameModel getModel() {

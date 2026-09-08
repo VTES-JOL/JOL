@@ -3,7 +3,7 @@ import type { CardMode, CardModeTarget, CardSnapshot } from '../../api/types';
 import { buildDiscardCommand, buildHandLabelCommand, buildPlayCommand, needsTargetPicker, type HandCardContext } from './cardCommands';
 import { Recycle, Tag, Trash2 } from 'lucide-react';
 import { CardImage } from './CardImage';
-import { Modal } from '../../components/ui/Modal';
+import { CardDialog } from './CardDialog';
 import { Button } from '../../components/ui/Button';
 import { Switch } from '../../components/ui/Switch';
 import { Clan } from './Clan';
@@ -103,7 +103,7 @@ export function PlayCardModal({
   };
 
   return (
-    <Modal
+    <CardDialog
       onClose={onClose}
       bodyClassName="flex flex-col gap-3 p-4 min-h-0 overflow-y-auto flex-1 text-center"
       title={
@@ -112,7 +112,7 @@ export function PlayCardModal({
         </>
       }
     >
-      <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={cardName} />
+      <CardImage cardId={card.cardId ?? ''} secured={!!card.playtest} name={cardName} card={card} />
       <div className="flex justify-center items-center gap-2">
         {(card.clanClasses ?? []).map((clan) => (
           <Clan key={clan} value={clan} />
@@ -154,7 +154,7 @@ export function PlayCardModal({
       {card.multiMode && (
         <div>
           <hr className="my-2 border-line" />
-          <Button variant="secondary" size="sm" disabled={selected.size < 1} onClick={playMulti}>
+          <Button variant="primary" size="sm" disabled={selected.size < 1} onClick={playMulti}>
             {selected.size < 1 ? 'Select one or more disciplines' : 'Play'}
           </Button>
         </div>
@@ -196,6 +196,6 @@ export function PlayCardModal({
           onBlur={updateLabel}
         />
       </div>
-    </Modal>
+    </CardDialog>
   );
 }

@@ -4,14 +4,36 @@ import { API_BASE } from './apiBase';
 
 class ApiError extends Error {
   status: number;
+  /**
+   * Stable error token from the server's `{code,message}` body (see
+   * net.deckserver.rest.ApiExceptionMappers). Present on mapped 4xx / 5xx;
+   * undefined for network errors, 401, and unmapped 500s. Prefer branching on
+   * this over matching `message`.
+   */
+  code?: string;
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, code?: string) {
     super(message);
     this.status = status;
+    this.code = code;
   }
 }
 
-async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+// Parse the server's uniform `{code,message}` error body; fall back to the raw
+// text as the message when it isn't that shape.
+function parseErrorBody(text: string): { message: string; code?: string } {
+  try {
+    const json = JSON.parse(text);
+    if (json && typeof json === 'object' && typeof json.code === 'string') {
+      return { message: typeof json.message === 'string' ? json.message : text, code: json.code };
+    }
+  } catch {
+    /* not JSON */
+  }
+  return { message: text };
+}
+
+async function request<T>(method: string, path: string, body?: unknown, extraHeaders?: Record<string, string>): Promise<T> {
   let res: Response;
   try {
     res = await fetch(`${API_BASE}${path}`, {
@@ -20,6 +42,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
       headers: {
         'X-Client-Id': CLIENT_ID,
         ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+        ...extraHeaders,
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
@@ -36,7 +59,8 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
     throw new ApiError(401, 'Unauthenticated');
   }
   if (!res.ok) {
-    throw new ApiError(res.status, await res.text());
+    const parsed = parseErrorBody(await res.text());
+    throw new ApiError(res.status, parsed.message, parsed.code);
   }
   if (res.status === 204) {
     return undefined as T;
@@ -58,7 +82,8 @@ async function requestText(path: string): Promise<string> {
     throw new ApiError(401, 'Unauthenticated');
   }
   if (!res.ok) {
-    throw new ApiError(res.status, await res.text());
+    const parsed = parseErrorBody(await res.text());
+    throw new ApiError(res.status, parsed.message, parsed.code);
   }
   return res.text();
 }
@@ -82,15 +107,18 @@ async function postText<T>(path: string, body: string): Promise<T> {
     throw new ApiError(401, 'Unauthenticated');
   }
   if (!res.ok) {
-    throw new ApiError(res.status, await res.text());
+    const parsed = parseErrorBody(await res.text());
+    throw new ApiError(res.status, parsed.message, parsed.code);
   }
   return (await res.json()) as T;
 }
 
 export const api = {
   get: <T>(path: string) => request<T>('GET', path),
-  post: <T>(path: string, body?: unknown) => request<T>('POST', path, body ?? {}),
-  put: <T>(path: string, body?: unknown) => request<T>('PUT', path, body ?? {}),
+  post: <T>(path: string, body?: unknown, headers?: Record<string, string>) =>
+    request<T>('POST', path, body ?? {}, headers),
+  put: <T>(path: string, body?: unknown, headers?: Record<string, string>) =>
+    request<T>('PUT', path, body ?? {}, headers),
   del: <T>(path: string, body?: unknown) => request<T>('DELETE', path, body),
   // For text/plain responses (e.g. CSV export) — request<T>() always parses JSON.
   getText: (path: string) => requestText(path),

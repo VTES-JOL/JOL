@@ -67,29 +67,33 @@ export interface CardAction {
   // Instead of running build(), the surface asks the page to start a
   // cross-card target pick (currently only Rescue → pick a torpor vampire).
   requestTarget?: boolean;
+  // Higher = more likely the thing you tapped the card to do right now. Feeds
+  // the mobile action sheet's "LIKELY NOW" lead list (ActSheet.dc.html); 0 /
+  // unset actions only ever appear in the grouped tail.
+  priority?: number;
   build: (ctx: TableCardContext) => Submission;
 }
 
 export const CARD_ACTIONS: CardAction[] = [
   // ── State ──────────────────────────────────────────────────────────────
-  { id: 'lock', group: 'state', label: <><Lock size={13} /> Lock</>, title: 'Lock', regions: ['ready', 'torpor'], lockState: 'unlocked', childSafe: true, build: cardActions.lock },
-  { id: 'unlock', group: 'state', label: <><Unlock size={13} /> Unlock</>, title: 'Unlock', regions: ['ready', 'torpor'], lockState: 'locked', childSafe: true, build: cardActions.unlock },
+  { id: 'lock', group: 'state', label: <><Lock size={13} /> Lock</>, title: 'Lock', regions: ['ready', 'torpor'], lockState: 'unlocked', childSafe: true, priority: 80, build: cardActions.lock },
+  { id: 'unlock', group: 'state', label: <><Unlock size={13} /> Unlock</>, title: 'Unlock', regions: ['ready', 'torpor'], lockState: 'locked', childSafe: true, priority: 78, build: cardActions.unlock },
   { id: 'contest', group: 'state', label: 'Contest', title: 'Contest', regions: ['ready', 'torpor'], contested: false, build: (ctx) => cardActions.contest(ctx, false) },
   { id: 'clear-contest', group: 'state', label: 'Clear Contest', title: 'Clear Contest', regions: ['ready', 'torpor'], contested: true, build: (ctx) => cardActions.contest(ctx, true) },
   { id: 'hide', group: 'state', label: <><EyeOff size={13} /> Turn Face Down</>, title: 'Turn this card face down — only you will see it', regions: ['ready', 'torpor', 'inactive'], controllerOnly: true, faceDown: false, build: cardActions.hide },
   { id: 'reveal', group: 'state', label: <><Eye size={13} /> Reveal</>, title: 'Turn this card face up for everyone', regions: ['ready', 'torpor', 'inactive'], controllerOnly: true, faceDown: true, build: cardActions.reveal },
 
   // ── Declare (minion phase — otherwise use chat) ────────────────────────
-  { id: 'bleed', group: 'declare', label: 'Bleed', title: 'Bleed', regions: ['ready'], phase: 'Minion', lockState: 'unlocked', topLevelOnly: true, controllerOnly: true, minionOnly: true, build: cardActions.bleed },
-  { id: 'hunt', group: 'declare', label: 'Hunt', title: 'Hunt', regions: ['ready'], phase: 'Minion', lockState: 'unlocked', topLevelOnly: true, controllerOnly: true, minionOnly: true, build: cardActions.hunt },
-  { id: 'go-anarch', group: 'declare', label: 'Go Anarch', title: 'Go Anarch', regions: ['ready'], phase: 'Minion', lockState: 'unlocked', topLevelOnly: true, controllerOnly: true, minionOnly: true, build: cardActions.goAnarch },
-  { id: 'block', group: 'declare', label: <><Shield size={13} /> Block</>, title: 'Block', regions: ['ready'], phase: 'Minion', topLevelOnly: true, controllerOnly: true, minionOnly: true, build: (ctx) => cardActions.block(ctx.card.name ?? '') },
-  { id: 'rescue', group: 'declare', label: <><LifeBuoy size={13} /> Rescue…</>, title: 'Attempt to rescue a vampire from torpor', regions: ['ready'], phase: 'Minion', topLevelOnly: true, controllerOnly: true, minionOnly: true, requestTarget: true, build: () => ({}) },
-  { id: 'leave-torpor', group: 'declare', label: 'Leave Torpor', title: 'Leave Torpor', regions: ['torpor'], phase: 'Minion', lockState: 'unlocked', topLevelOnly: true, controllerOnly: true, minionOnly: true, build: cardActions.leaveTorpor },
+  { id: 'bleed', group: 'declare', label: 'Bleed', title: 'Bleed', regions: ['ready'], phase: 'Minion', lockState: 'unlocked', topLevelOnly: true, controllerOnly: true, minionOnly: true, priority: 100, build: cardActions.bleed },
+  { id: 'hunt', group: 'declare', label: 'Hunt', title: 'Hunt', regions: ['ready'], phase: 'Minion', lockState: 'unlocked', topLevelOnly: true, controllerOnly: true, minionOnly: true, priority: 70, build: cardActions.hunt },
+  { id: 'go-anarch', group: 'declare', label: 'Go Anarch', title: 'Go Anarch', regions: ['ready'], phase: 'Minion', lockState: 'unlocked', topLevelOnly: true, controllerOnly: true, minionOnly: true, priority: 40, build: cardActions.goAnarch },
+  { id: 'block', group: 'declare', label: <><Shield size={13} /> Block</>, title: 'Block', regions: ['ready'], phase: 'Minion', topLevelOnly: true, controllerOnly: true, minionOnly: true, priority: 95, build: (ctx) => cardActions.block(ctx.card.name ?? '') },
+  { id: 'rescue', group: 'declare', label: <><LifeBuoy size={13} /> Rescue…</>, title: 'Attempt to rescue a vampire from torpor', regions: ['ready'], phase: 'Minion', topLevelOnly: true, controllerOnly: true, minionOnly: true, requestTarget: true, priority: 55, build: () => ({}) },
+  { id: 'leave-torpor', group: 'declare', label: 'Leave Torpor', title: 'Leave Torpor', regions: ['torpor'], phase: 'Minion', lockState: 'unlocked', topLevelOnly: true, controllerOnly: true, minionOnly: true, priority: 65, build: cardActions.leaveTorpor },
 
   // ── Move ──────────────────────────────────────────────────────────────
-  { id: 'influence', group: 'move', label: 'Influence out', title: 'Influence out — move to your ready region', regions: ['inactive'], phase: 'Influence', topLevelOnly: true, ownerOnly: true, minionOnly: true, build: cardActions.influence },
-  { id: 'move-ready', group: 'move', label: 'Move to ready', title: 'Move to ready', regions: ['torpor'], topLevelOnly: true, controllerOnly: true, minionOnly: true, build: cardActions.moveReady },
+  { id: 'influence', group: 'move', label: 'Influence out', title: 'Influence out — move to your ready region', regions: ['inactive'], phase: 'Influence', topLevelOnly: true, ownerOnly: true, minionOnly: true, priority: 90, build: cardActions.influence },
+  { id: 'move-ready', group: 'move', label: 'Move to ready', title: 'Move to ready', regions: ['torpor'], topLevelOnly: true, controllerOnly: true, minionOnly: true, priority: 60, build: cardActions.moveReady },
   { id: 'torpor', group: 'move', label: 'Send to Torpor', title: 'Send to Torpor', regions: ['ready'], topLevelOnly: true, minionOnly: true, build: cardActions.torpor },
   { id: 'banish', group: 'move', label: 'Banish', title: 'Banish to the uncontrolled region', regions: ['ready'], build: cardActions.banish },
   { id: 'move-predator', group: 'move', label: <><ArrowLeftCircle size={13} /> Move to Predator</>, title: 'Move to Predator', regions: ['ready'], build: cardActions.movePredator },
@@ -103,6 +107,17 @@ export const CARD_ACTIONS: CardAction[] = [
   { id: 'burn', group: 'remove', label: <><Flame size={13} /> Burn</>, title: 'Burn', regions: ['ready', 'torpor', 'inactive'], childSafe: true, build: cardActions.burn },
   { id: 'rfg', group: 'remove', label: <><LogOut size={13} /> Remove from Game</>, title: 'Remove from game', regions: ['ready', 'torpor', 'inactive', 'ashheap'], controllerOnly: true, build: cardActions.removeFromGame },
 ];
+
+// The top few actions worth leading with for a card in this state — the mobile
+// action sheet's "LIKELY NOW" section (ActSheet.dc.html). Only priority-weighted
+// actions qualify; returns [] when fewer than two do (the sheet then skips the
+// lead section and shows the grouped list straight away).
+export function likelyNow(env: ActionEnv, limit = 4): CardAction[] {
+  const ranked = CARD_ACTIONS.filter((a) => (a.priority ?? 0) > 0 && actionAvailable(a, env)).sort(
+    (a, b) => (b.priority ?? 0) - (a.priority ?? 0),
+  );
+  return ranked.length >= 2 ? ranked.slice(0, limit) : [];
+}
 
 export function actionAvailable(a: CardAction, env: ActionEnv): boolean {
   if (!a.regions.includes(env.region)) return false;

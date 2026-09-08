@@ -1,5 +1,7 @@
 package net.deckserver.services;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import io.quarkus.runtime.Startup;
 import jakarta.inject.Singleton;
 import net.deckserver.game.enums.JudgeRequestCategory;
@@ -8,6 +10,8 @@ import net.deckserver.storage.json.game.JudgeRequestData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * "Call a judge" requests raised from inside a game. No in-memory cache — reads
@@ -30,6 +34,26 @@ public class JudgeService extends PersistedService {
     private static final int HISTORY_LIMIT = 200;
 
     private static final JudgeRequestRepository repository = new JudgeRequestRepository();
+
+    /**
+     * gameId → the single OPEN request for that game (empty Optional = "none",
+     * which Caffeine can't store as a raw null). {@link GameSnapshotFactory}
+     * calls {@link #getOpenForGame} on every {@code /game/{id}/view} GET and
+     * every submit/end-turn response, for every viewer — almost always to learn
+     * "no open request". This turns that per-snapshot DB round trip into a map
+     * lookup (B2). Every mutator here invalidates it, so the acting request and
+     * every viewer's WS-triggered refetch see fresh state; the short TTL bounds
+     * any change that bypasses this service (direct SQL, reconciliation job).
+     */
+    private static final Cache<String, Optional<JudgeRequestData>> openRequestCache =
+            Caffeine.newBuilder()
+                    .expireAfterWrite(5, TimeUnit.MINUTES)
+                    .maximumSize(5_000)
+                    .build();
+
+    private static void invalidateOpenRequestCache() {
+        openRequestCache.invalidateAll();
+    }
 
     JudgeService() {
         super("JudgeService", 0); // write-through, no scheduled persistence
@@ -63,6 +87,7 @@ public class JudgeService extends PersistedService {
         if (!ok || holder[0] == null) {
             throw new IllegalStateException("Failed to raise judge request");
         }
+        invalidateOpenRequestCache();
         return holder[0];
     }
 
@@ -71,6 +96,7 @@ public class JudgeService extends PersistedService {
         String parsed = parse(rawDetails);
         int[] updated = new int[1];
         instance().jpaWriteAlways(em -> updated[0] = repository.updateDetails(em, id, category, rawDetails, parsed));
+        invalidateOpenRequestCache();
         return updated[0] > 0 ? getById(id) : null;
     }
 
@@ -78,6 +104,7 @@ public class JudgeService extends PersistedService {
     public static boolean retractRequest(long id) {
         int[] updated = new int[1];
         instance().jpaWriteAlways(em -> updated[0] = repository.retract(em, id));
+        invalidateOpenRequestCache();
         return updated[0] > 0;
     }
 
@@ -89,6 +116,7 @@ public class JudgeService extends PersistedService {
         String parsed = rawNotes == null || rawNotes.isBlank() ? null : parse(rawNotes);
         int[] updated = new int[1];
         instance().jpaWriteAlways(em -> updated[0] = repository.resolve(em, id, judge, rawNotes, parsed));
+        invalidateOpenRequestCache();
         return updated[0] > 0 ? getById(id) : null;
     }
 
@@ -97,7 +125,9 @@ public class JudgeService extends PersistedService {
     }
 
     public static JudgeRequestData getOpenForGame(String gameId) {
-        return instance().jpaRead(em -> repository.findOpenForGame(em, gameId));
+        return openRequestCache
+                .get(gameId, id -> Optional.ofNullable(instance().jpaRead(em -> repository.findOpenForGame(em, id))))
+                .orElse(null);
     }
 
     public static List<JudgeRequestData> listOpen() {

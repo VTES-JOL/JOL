@@ -31,6 +31,13 @@ public class PlayerData {
     private boolean ousted = false;
     private String notes;
     private String choice;
+    /**
+     * ISO-8601 UTC instant of this seat's last board-mutating action (a command
+     * or ending their turn). Null until the player first acts. Serialized into
+     * the game_state JSON blob — absent on rows written before this field
+     * existed, which deserialize as null (no migration needed).
+     */
+    private String lastActionAt;
 
     public PlayerData(String name) {
         this.name = name;

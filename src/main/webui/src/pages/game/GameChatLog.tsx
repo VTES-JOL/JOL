@@ -1,7 +1,8 @@
-import { Fragment, useEffect, useRef, type CSSProperties } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import type { ChatData, CommandError } from '../../api/types';
 import { MessageContent } from '../../components/MessageContent';
 import { useCardTooltips } from '../../hooks/useCardTooltips';
+import { useTextMode } from './textMode';
 import { accentFor, dayLabel, shortTime } from './chatLogStyle';
 
 // Shared by GameChatPanel (current turn, live) and HistoryPanel (any turn,
@@ -59,6 +60,7 @@ export function GameChatLog({
   showCommands = false,
   errors = [],
   seating,
+  newSince = null,
 }: {
   lines: ChatData[];
   viewerName: string | null;
@@ -66,11 +68,37 @@ export function GameChatLog({
   errors?: CommandError[];
   /** Player names in seating order — drives the per-actor accent colour. */
   seating?: string[];
+  /** ISO time of the newest line seen on the last visit — a "New" divider is
+   *  ruled before the first line newer than this (see useChatSeenMarker). */
+  newSince?: string | null;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  useCardTooltips(ref, [lines]);
+  // Follow the newest line only while the reader is already at the bottom.
+  // Someone who scrolled up to re-read an earlier play stays put; a "jump to
+  // latest" button appears while they're detached and hides once they catch up.
+  const stickToBottom = useRef(true);
+  const [showJump, setShowJump] = useState(false);
+  useCardTooltips(ref, [lines], !useTextMode());
+
+  const NEAR_BOTTOM_PX = 64;
+  const recomputeAnchor = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= NEAR_BOTTOM_PX;
+    stickToBottom.current = atBottom;
+    setShowJump(!atBottom);
+  }, []);
+
+  const scrollToLatest = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+    stickToBottom.current = true;
+    setShowJump(false);
+  }, []);
 
   useEffect(() => {
+    if (!stickToBottom.current) return;
     const el = ref.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [lines, errors]);
@@ -88,8 +116,16 @@ export function GameChatLog({
   let lastDay = '';
   let lastActor: string | null = null;
 
+  // First row newer than the last visit (see useChatSeenMarker). Only ruled
+  // when at least one already-seen line sits above it — a divider at the very
+  // top of the log (whole turn is new) says nothing useful.
+  const firstNewIdx = newSince
+    ? rows.findIndex((r) => r.kind === 'chat' && !!r.data.postedAt && r.data.postedAt > newSince)
+    : -1;
+  const showNewSep = firstNewIdx > 0;
+
   return (
-    <div ref={ref} className="bg-surface text-ink p-1 scrollable">
+    <div ref={ref} onScroll={recomputeAnchor} className="bg-surface text-ink p-1 scrollable">
       {rows.map((row, idx) => {
         const iso = row.kind === 'chat' ? row.data.postedAt : row.data.occurredAt;
         const day = dayLabel(iso, row.data.timestamp);
@@ -99,6 +135,12 @@ export function GameChatLog({
             {day}
           </p>
         ) : null;
+        const newSep =
+          showNewSep && idx === firstNewIdx ? (
+            <p className="chat-new-sep" key={`n${idx}`}>
+              <span>New</span>
+            </p>
+          ) : null;
         if (day) lastDay = day;
         // A date separator breaks the visual run — the line under it starts a
         // fresh group (full-strength name, no "repeat" dimming).
@@ -109,6 +151,7 @@ export function GameChatLog({
           return (
             <Fragment key={`e${idx}`}>
               {dateSep}
+              {newSep}
               <p className="chat-attempt">
                 <LogTimestamp iso={row.data.occurredAt} legacy={row.data.timestamp} />{' '}
                 <span className="chat-attempt-icon">⚠</span>{' '}
@@ -159,6 +202,7 @@ export function GameChatLog({
         return (
           <Fragment key={`c${row.i}`}>
             {dateSep}
+            {newSep}
             {showInvocation && (
               <p className="chat-command">
                 <span className="chat-command-marker">&raquo;</span>{' '}
@@ -178,6 +222,17 @@ export function GameChatLog({
           </Fragment>
         );
       })}
+      {showJump && (
+        <div className="sticky bottom-1 z-10 flex justify-center pt-1 pointer-events-none">
+          <button
+            type="button"
+            onClick={scrollToLatest}
+            className="pointer-events-auto rounded-full border border-line-accent bg-surface px-3 py-1 text-xs text-ink-secondary shadow-md hover:bg-hover"
+          >
+            Jump to latest ↓
+          </button>
+        </div>
+      )}
     </div>
   );
 }

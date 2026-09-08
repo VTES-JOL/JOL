@@ -96,7 +96,9 @@ public class GameService extends PersistedService {
 
     public static String getNameByGameId(String gameId) {
         String name = instance().idToName.get(gameId);
-        if (name == null) throw new IllegalArgumentException("No game with id: " + gameId);
+        // NoSuchElementException (not IllegalArgumentException) so the REST layer's
+        // mapper turns an unknown / stale game id into a 404, not a 400 / 500.
+        if (name == null) throw new java.util.NoSuchElementException("No game with id: " + gameId);
         return name;
     }
 
@@ -197,11 +199,42 @@ public class GameService extends PersistedService {
         try (EntityManager em = JpaFactory.createEntityManager()) {
             GameData gameData = gameStateRepository.load(em, gameId);
             if (gameData != null) {
+                backfillLastActionAt(em, gameId, gameData);
+                // D35b: bring existing games' READY lists into minions-first order
+                // so the rendered coordinates read contiguously from first load.
+                gameData.normalizeReadyOrder();
                 return new JolGame(gameId, gameData);
             }
         }
         // no row — a game that has never been saved legitimately starts empty
         return new JolGame(gameId, new GameData(gameId));
+    }
+
+    /**
+     * Seed {@link net.deckserver.storage.json.game.PlayerData#getLastActionAt()}
+     * for games whose state blob predates that field (added D11, no migration).
+     * Source: the latest {@code game_chat_message.posted_at} for a row whose
+     * {@code source} equals the seat's name — the cheapest per-player "last
+     * acted" signal (one grouped query, no extra table). A seat with no chat
+     * activity at all is left null (honest: there is no signal). Once a real
+     * {@code recordPlayerAction} write lands the value is non-null and this
+     * never touches it again; the seeded value is persisted on the next save.
+     */
+    private static void backfillLastActionAt(EntityManager em, String gameId, GameData gameData) {
+        boolean anyMissing = gameData.getPlayers().values().stream()
+                .anyMatch(p -> p.getLastActionAt() == null);
+        if (!anyMissing) {
+            return;
+        }
+        Map<String, java.time.OffsetDateTime> lastBySource = gameChatMessageRepository.lastActivityBySource(em, gameId);
+        gameData.getPlayers().forEach((name, player) -> {
+            if (player.getLastActionAt() == null) {
+                java.time.OffsetDateTime ts = lastBySource.get(name);
+                if (ts != null) {
+                    player.setLastActionAt(ts.toInstant().toString());
+                }
+            }
+        });
     }
 
     public static JolGame loadSnapshot(String gameId, String turn) {
@@ -211,6 +244,7 @@ public class GameService extends PersistedService {
                 // a missing snapshot must fail the rollback, not roll back to an empty game
                 throw new IllegalStateException("No snapshot for game " + gameId + " turn " + turn);
             }
+            gameData.normalizeReadyOrder(); // D35b — same as loadGame
             return new JolGame(gameId, gameData);
         }
     }
@@ -229,7 +263,14 @@ public class GameService extends PersistedService {
         // saveGame() calls can still race on which one's put lands last in the cache.
         String gameName = instance().idToName.get(game.id());
         if (gameName != null && instance().games.containsKey(gameName)) {
-            instance().requireJpaWrite(em -> gameStateRepository.save(em, game));
+            // One transaction for game_state AND any chat lines the current command
+            // buffered via ChatService.beginBatch() (B3) — board and log commit
+            // together. flushBatch is a no-op when no batch is open (every other
+            // saveGame caller: shutdown flush, rollback, admin flows).
+            instance().requireJpaWrite(em -> {
+                gameStateRepository.save(em, game);
+                ChatService.flushBatch(em);
+            });
         }
         instance().gameCache.put(game.id(), game);
     }

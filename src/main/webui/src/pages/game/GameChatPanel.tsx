@@ -1,61 +1,85 @@
-import { useEffect, useState } from 'react';
-import { History, Terminal } from 'lucide-react';
-import { api } from '../../api/client';
-import type { ChatData, CommandError, GameSnapshot } from '../../api/types';
+import { useState } from 'react';
+import { MessagesSquare, Terminal } from 'lucide-react';
+import type { GameSnapshot } from '../../api/types';
 import { GameChatLog } from './GameChatLog';
 import { GamePanel } from './GamePanel';
-import { NotesToggleButton } from './NotesToggleButton';
-import type { NotesIndicator } from './useNotesIndicator';
 import { useShowCommands } from './useShowCommands';
+import { useChatSeenMarker } from './useChatSeenMarker';
 
+// The live chat log. Notes / History / Call Judge moved to the HUD (D26); the
+// header keeps the judge-only "Commands" toggle (raw command behind each line)
+// and an All / Talk filter — "Talk" drops the mechanical `move` lines and the
+// per-turn `phase` markers, leaving what players actually said to the table
+// plus the game-event `system` lines (turn, oust, timeout, contest).
 export function GameChatPanel({
-  gameId,
   game,
+  gameId,
   viewerName,
-  onToggleHistory,
-  notesIndicator,
-  onOpenNotes,
 }: {
-  gameId: string;
   game: GameSnapshot;
+  gameId: string;
   viewerName: string | null;
-  onToggleHistory: () => void;
-  notesIndicator: NotesIndicator;
-  onOpenNotes: () => void;
 }) {
-  const [lines, setLines] = useState<ChatData[]>([]);
-  const [errors, setErrors] = useState<CommandError[]>([]);
   const [showCommands, toggleCommands] = useShowCommands();
+  const [talkOnly, setTalkOnly] = useState(() => {
+    try {
+      return localStorage.getItem('jol:chatTalkOnly') === '1';
+    } catch {
+      return false;
+    }
+  });
   const judgeCommands = game.judge && showCommands;
 
-  useEffect(() => {
-    api
-      .get<ChatData[]>(`/game/${gameId}/history?turn=${encodeURIComponent(game.turnLabel)}`)
-      .then(setLines)
-      .catch((err) => console.error('Failed to load game chat', err));
-    // Refetch on every fresh snapshot (game.stamp), not just turn changes —
-    // matches legacy pulling forward new lines on every refresh.
-  }, [gameId, game.turnLabel, game.stamp]);
+  // The current turn's lines and failed-command attempts ride on the game
+  // snapshot itself (GameSnapshotFactory), so they refresh in the same round
+  // trip as the board. HistoryPanel still fetches for browsing older turns.
+  const lines = game.chat;
+  const errors = judgeCommands ? game.commandErrors : [];
 
-  useEffect(() => {
-    if (!judgeCommands) {
-      setErrors([]);
-      return;
+  // Marker frozen from all lines (so it tracks the true newest); the filter
+  // only changes what's shown.
+  const newSince = useChatSeenMarker(gameId, lines);
+  const shown = talkOnly ? lines.filter((l) => l.kind === 'talk' || l.kind === 'system') : lines;
+
+  const setTalk = (v: boolean) => {
+    setTalkOnly(v);
+    try {
+      localStorage.setItem('jol:chatTalkOnly', v ? '1' : '0');
+    } catch {
+      /* ignore */
     }
-    api
-      .get<CommandError[]>(`/game/${gameId}/command-errors?turn=${encodeURIComponent(game.turnLabel)}`)
-      .then(setErrors)
-      .catch(() => setErrors([]));
-  }, [judgeCommands, gameId, game.turnLabel, game.stamp]);
+  };
 
   return (
     <GamePanel
       id="gameChatCard"
-      className="chat"
+      className="chat flex-1 min-h-0"
       bodyClassName="p-0 overflow-hidden"
       title="Game Chat"
       headerExtra={
-        <span className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          <div className="inline-flex overflow-hidden rounded-full border border-line text-xs">
+            <button
+              type="button"
+              aria-pressed={!talkOnly}
+              onClick={() => setTalk(false)}
+              className={`px-2 py-0.5 ${!talkOnly ? 'bg-hover text-ink' : 'text-ink-muted hover:bg-hover'}`}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              aria-pressed={talkOnly}
+              onClick={() => setTalk(true)}
+              title="Hide the mechanical move log and phase markers"
+              className={`inline-flex items-center gap-1 border-l border-line px-2 py-0.5 ${
+                talkOnly ? 'bg-hover text-ink' : 'text-ink-muted hover:bg-hover'
+              }`}
+            >
+              <MessagesSquare size={12} />
+              Talk
+            </button>
+          </div>
           {game.judge && (
             <button
               type="button"
@@ -63,21 +87,24 @@ export function GameChatPanel({
               onClick={toggleCommands}
               title="Show the raw command behind each line, and mistyped attempts"
               className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${
-                showCommands
-                  ? 'border-line-accent bg-hover text-ink'
-                  : 'border-line text-ink-muted hover:bg-hover'
+                showCommands ? 'border-line-accent bg-hover text-ink' : 'border-line text-ink-muted hover:bg-hover'
               }`}
             >
               <Terminal size={12} />
               Commands
             </button>
           )}
-          <NotesToggleButton indicator={notesIndicator} onClick={onOpenNotes} />
-        </span>
+        </div>
       }
-      toggle={{ icon: <History size={13} />, label: 'History', onClick: onToggleHistory }}
     >
-      <GameChatLog lines={lines} viewerName={viewerName} showCommands={judgeCommands} errors={errors} seating={game.seating} />
+      <GameChatLog
+        lines={shown}
+        viewerName={viewerName}
+        showCommands={judgeCommands}
+        errors={errors}
+        seating={game.seating}
+        newSince={newSince}
+      />
     </GamePanel>
   );
 }

@@ -37,6 +37,7 @@ export function RegionExample({ label, type = 'READY', children }: RegionExample
         isOwnRegion={false}
         isSeatedPlayer={false}
         onTableCardClick={() => {}}
+        onQuickCommand={() => {}}
         onPlayCardClick={() => {}}
       />
     </div>

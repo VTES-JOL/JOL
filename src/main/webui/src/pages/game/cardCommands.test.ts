@@ -32,20 +32,20 @@ describe('cardActions', () => {
     expect(cardActions.reveal(makeCtx({ regionCommandKey: 'torpor', coordinate: '2' }))).toEqual({ command: 'reveal Player1 torpor 2' });
   });
 
-  it('bleed locks the card and echoes "Bleed" to chat', () => {
-    expect(cardActions.bleed(makeCtx())).toEqual({ command: 'lock Player1 ready 1', chat: 'Bleed' });
+  it('bleed locks the card and declares the response window', () => {
+    expect(cardActions.bleed(makeCtx())).toEqual({ command: 'lock Player1 ready 1; declare bleed' });
   });
 
-  it('hunt locks the card and echoes "Hunt" to chat', () => {
-    expect(cardActions.hunt(makeCtx())).toEqual({ command: 'lock Player1 ready 1', chat: 'Hunt' });
+  it('hunt locks the card and declares', () => {
+    expect(cardActions.hunt(makeCtx())).toEqual({ command: 'lock Player1 ready 1; declare hunt' });
   });
 
-  it('goAnarch locks the card and echoes "Go anarch" to chat', () => {
-    expect(cardActions.goAnarch(makeCtx())).toEqual({ command: 'lock Player1 ready 1', chat: 'Go anarch' });
+  it('goAnarch locks the card and declares', () => {
+    expect(cardActions.goAnarch(makeCtx())).toEqual({ command: 'lock Player1 ready 1; declare go_anarch' });
   });
 
-  it('leaveTorpor locks the card and echoes "Leave Torpor" to chat', () => {
-    expect(cardActions.leaveTorpor(makeCtx())).toEqual({ command: 'lock Player1 ready 1', chat: 'Leave Torpor' });
+  it('leaveTorpor locks the card and declares', () => {
+    expect(cardActions.leaveTorpor(makeCtx())).toEqual({ command: 'lock Player1 ready 1; declare leave_torpor' });
   });
 
   it('contest(false) sets the contest, contest(true) clears it', () => {

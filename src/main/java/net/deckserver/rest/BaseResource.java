@@ -25,4 +25,13 @@ public abstract class BaseResource {
     protected String clientId() {
         return headers.getHeaderString("X-Client-Id");
     }
+
+    /**
+     * Per-submit idempotency key the frontend sends on each command POST so the
+     * server can drop a retried / double-fired submit instead of replaying its
+     * command string. Null for a client that doesn't send it (no dedupe).
+     */
+    protected String submitId() {
+        return headers.getHeaderString("X-Submit-Id");
+    }
 }

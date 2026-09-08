@@ -100,9 +100,14 @@ hand cards still show as "card #N in their inactive region", which is expected
 (opponents can't see the region anyway).
 
 **H5 — `show` is clean.** The actual card list goes only into each recipient's
-`PlayerData.notes` (`:707`); the public line leaks count + region only. Minor:
+`PlayerData.notes` (`:707`); the public line leaks count + region only. ~~Minor:
 no guard that `recipients` are live players, and the note is appended with a
-bare `\n` and no turn context.
+bare `\n` and no turn context.~~ *Fixed 2026-09-08:* `show` now filters
+recipients to live seats up front (a stale / mistyped name is dropped, not
+NPE'd), the log line names only who actually received the note, and the private
+note is prefixed `[Turn <id>] <player> shows N card(s) of their <logLabel>:` —
+turn context + singular/plural + prose region label (also closes the §5 "1
+cards" / capital-L note).
 
 ## 4. Cross-cutting text findings
 
@@ -332,10 +337,14 @@ Owner decisions on §4–§7, with concrete approaches. **U2 and U4 are dropped*
 > render as intended. One bug found & fixed in the pass: a date separator
 > wasn't breaking the visual run (line under it stayed dimmed).
 >
-> **Known pre-existing (not a regression), left alone:** card-name tokens
-> render in the `matrix` webfont with wide side-bearings, so `verb X.` reads
-> as `verb  X .` — visible on historical lines too. Tighten separately if it
-> bothers.
+> **Card-name token spacing (fixed 2026-09-08):** card-name tokens rendered in
+> the `matrix` webfont (the shared `a.card-name` rule in
+> `styles/card-visuals.css`), whose side-bearings made `verb X.` read as
+> `verb  X .` in inline log prose. `GamePage.css` now resets
+> `p.chat a.card-name` / `p.chat-attempt a.card-name` to `font-family: inherit`
+> and gives them the same dotted-underline affordance the board/hand names
+> carry, so a card name stays identifiable without the mismatched face. Board,
+> hand and global chat are untouched.
 
 ### 10.1 Shared backend helpers (build these first)
 
@@ -575,3 +584,54 @@ class is unknown). Add `title={code}` to the icon span in the known case too.
   extraction needed.
 - **`transfer`** — trailing-bracket style, matching `blood`:
   `moves 1 blood onto {c} (now 5) (pool 18).`
+
+---
+
+## 11. Completion checklist (§9 ranked list — verified 2026-09-08)
+
+Every §9 item re-checked against the source, not against §10's status note.
+
+### P1 — correctness / leak
+
+| # | item | status | evidence |
+|---|---|---|---|
+| 1 | **H1 / CC7** — strip `command` from the non-judge history payload | ✅ done | `GameActionResource.getHistory` → `ChatData.forSeatedView()` drops `command` + `invocation*`; `GameChatLog.tsx` never reads `command` |
+| 2 | **U1** — phase markers via `SYSTEM` | ✅ done | `setPhase` → `sendSystemMessage("Start of … phase.")`; no other `sendMsg(getActivePlayer(), …)` machine strings remain (only caller is the free-text `say`) |
+| 3 | **S1** — oust / predator re-map log line | ✅ `changePool` (SYSTEM oust/restore + "now preys on"). `withdraw`'s oust-path + line is in the parallel game-screen session (see `game-screen-session/decisions.md` D1/D12, uncommitted). `timeout` ends the game → per-seat remap line N/A, summary SYSTEM line only |
+
+### P2 — clarity
+
+| # | item | status | evidence |
+|---|---|---|---|
+| 4 | **CC1** — no duplicated actor name (`pool`,`vp`,`edge`,`contest`,`order`) | ✅ done | §10.2 two-shape rule applied at each call site |
+| 5 | **CC4** — `logLabel()` in prose; no `ashheap`/`rfg`/`inactive region`/`Library` | ✅ done | every remaining `xmlLabel()` is a structured `command` vararg, not body text; `show`'s private-note header (last `description()` in prose) fixed 2026-09-08 |
+| 6 | **CC2 / CC3** — tense + punctuation | ✅ done | all bodies routed through `GameLog.sentence()`; `transfer`/`capacity`/`blood`/`discard`/`counter` reworded |
+| 7 | **CC6** — "their" for `contest` and `pool` | ✅ done | `GameLog.possessive(...)` at `contestCard`; `changePool` uses the self/other split |
+
+### P3 — polish / UI
+
+| # | item | status | evidence |
+|---|---|---|---|
+| 8 | **CC5** — omit unambiguous region | ✅ done | `banish` (both fixed), `burn` (omit when `srcRegion == READY`), `rfg` (omit when `srcRegion == ASH_HEAP`) |
+| 9 | grammar — "1 victory point**s**", "1 cards", "from&nbsp;&nbsp;to", "added…removed…**to**", "plays now with an open hand", "1 vote**s**" | ✅ done | last one ("1 cards" in `show`) fixed 2026-09-08 |
+| 10 | **U3** per-seat colour / **U4** action-type gutter | ✅ U3 (`chatLogStyle.ts` accent bar + name tint + dimmed repeat) · **U4 dropped** (§10) |
+| 11 | **U2** turn dividers / **U7** hanging indent | **U2 dropped** (§10) · ✅ U7 (`p.chat` `text-indent`/`padding-left` in `GamePage.css`) |
+| 12 | **U5** — collapse repeated date, full stamp on hover | ✅ done | `dayLabel` date separators + `LogTimestamp` `title={iso}` |
+| 13 | coalesce multi-`draw` · unify `move`/`put` verb · fix `disc` phrasing | ✅ done | `drawCards` one coalesced line; `moveToCard`/`moveToRegion` both emit "moves"; `disc` = adds/removes/updates/resets |
+
+### Outside the §9 list
+
+| item | status |
+|---|---|
+| §10 status note — card-name tokens in the `matrix` face read as `verb  X .` | ✅ fixed 2026-09-08 (`GamePage.css`: `p.chat a.card-name` → `font-family: inherit` + dotted-underline affordance) |
+| **H5** (§3) — `show` recipients not guarded to live seats; private note had "1 cards" / capital-L / no turn context | ✅ fixed 2026-09-08 (`JolGame.show`) |
+| **H2** (§3) — `burn`/`rfg` of a face-down card reveals it | ✅ intended; one-line comment at both call sites |
+| **H3** (§3) — `discard` clears face-down unconditionally | moot (HAND only); noted, no change |
+| **S2** — turn marker in the log stream | ✅ `newTurn` → `sendSystemMessage("Turn <id> — <name>.")` |
+| **S3** — hiding a unique card doesn't clear other contests | closed (§10.9 — no gameplay effect on an out-of-play card) |
+| **U6** — attempt-row timestamp formatting | ✅ shared `LogTimestamp` in both branches |
+| **U8** — malformed `[disc:x]` renders invisible | ✅ `isKnownDisciplineCode` fallback in `MessageContent.tsx` |
+
+**Nothing in this document is now open** except the two items explicitly dropped
+by the owner (U2, U4) and `withdraw`/`timeout` VP+oust semantics, which are
+owned by the parallel game-screen session.

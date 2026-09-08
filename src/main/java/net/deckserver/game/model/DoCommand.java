@@ -140,7 +140,48 @@ public record DoCommand(JolGame game, GameModel model) {
             case "open":
                 open(player);
                 break;
+            case "declare":
+                declare(cmdObj, player);
+                break;
+            case "pass":
+                game.passPending(player);
+                break;
+            case "resolve":
+                game.resolvePending(player, cmdObj.consumeString("cancel"));
+                break;
         }
+    }
+
+    // `declare <type> [<targetPlayer>] [<amount>] [<note…>]` — opens the table's
+    // response window (rules R1). Emitted by the declare card-actions
+    // (bleed / hunt / go-anarch / leave-torpor) alongside the lock, and usable
+    // bare for anything not enumerated.
+    private void declare(CommandParser cmdObj, String player) throws CommandException {
+        if (!cmdObj.hasMoreArgs()) {
+            throw new CommandException("Usage: declare <bleed|hunt|rush|political|rescue|…> [target] [amount]");
+        }
+        String typeStr = cmdObj.nextArg().toUpperCase().replace('-', '_');
+        net.deckserver.storage.json.game.PendingActionData.Type type;
+        try {
+            type = net.deckserver.storage.json.game.PendingActionData.Type.valueOf(typeStr);
+        } catch (IllegalArgumentException e) {
+            type = net.deckserver.storage.json.game.PendingActionData.Type.OTHER;
+        }
+        List<String> players = game.getPlayers();
+        String target = null;
+        int amount = 0;
+        StringBuilder note = new StringBuilder();
+        while (cmdObj.hasMoreArgs()) {
+            String arg = cmdObj.nextArg();
+            if (target == null && players.contains(arg)) {
+                target = arg;
+            } else if (amount == 0 && arg.matches("\\d+")) {
+                amount = Integer.parseInt(arg);
+            } else {
+                note.append(arg).append(' ');
+            }
+        }
+        game.declareAction(player, type, null, target, null, amount, note.toString().trim());
     }
 
     private void sect(CommandParser cmdObj, String player) throws CommandException {
@@ -293,7 +334,10 @@ public record DoCommand(JolGame game, GameModel model) {
     void blood(CommandParser cmdObj, String player) throws CommandException {
         String targetPlayer = cmdObj.getPlayer(player);
         RegionType targetRegion = cmdObj.getRegion(RegionType.READY);
-        CardData targetCard = cmdObj.findCardData(false, false, targetPlayer, targetRegion);
+        // Greedy, like every sibling command (capacity/disc/sect/…) — a missing
+        // or out-of-range position must reject with a CommandException instead
+        // of leaving targetCard null for the changeCounters call below to NPE on.
+        CardData targetCard = cmdObj.findCardData(false, targetPlayer, targetRegion);
         int amount = cmdObj.getAmount(0);
         if (amount == 0) throw new CommandException("Must specify an amount of blood");
         game.changeCounters(player, targetCard.getId(), amount, false);

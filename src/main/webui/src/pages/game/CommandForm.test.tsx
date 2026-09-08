@@ -4,17 +4,24 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CommandForm } from './CommandForm';
 import { useSubmitGuard } from '../../hooks/useSubmitGuard';
+import { useCommandStatus } from './useCommandStatus';
 import { api } from '../../api/client';
 import { confirmDialog } from '../../stores/dialog';
 import { showError } from '../../stores/toast';
 import type { GameSnapshot } from '../../api/types';
 
-// Wires CommandForm to the real useSubmitGuard hook, same as GamePage does —
-// keeps these tests exercising the actual submitting/guard behavior instead
-// of stubbing it out.
-function TestHarness(props: Omit<ComponentProps<typeof CommandForm>, 'submitting' | 'guard'>) {
+// Wires CommandForm to the real useSubmitGuard + useCommandStatus hooks, same
+// as GamePage does — keeps these tests exercising the actual submitting/guard
+// behavior instead of stubbing it out.
+function TestHarness(props: Omit<ComponentProps<typeof CommandForm>, 'submitting' | 'guard' | 'captureStatus'>) {
   const { submitting, guard } = useSubmitGuard();
-  return <CommandForm {...props} submitting={submitting} guard={guard} />;
+  const { status, captureStatus } = useCommandStatus();
+  return (
+    <>
+      <CommandForm {...props} submitting={submitting} guard={guard} captureStatus={captureStatus} />
+      {status && <div>{status}</div>}
+    </>
+  );
 }
 
 vi.mock('../../api/client', () => ({
@@ -34,6 +41,9 @@ function makeGame(overrides: Partial<GameSnapshot> = {}): GameSnapshot {
     id: 'g1',
     name: 'Test Game',
     players: [],
+    seating: [],
+    chat: [],
+    commandErrors: [],
     currentPlayer: 'Player1',
     edgePlayer: 'Player1',
     turn: '1',
@@ -50,7 +60,7 @@ function makeGame(overrides: Partial<GameSnapshot> = {}): GameSnapshot {
     edgeColor: '#fff',
     edgeTextColor: 'black',
     status: null,
-    stamp: '1',
+    stamp: 1,
     judgeRequest: null,
     ...overrides,
   };
@@ -58,46 +68,30 @@ function makeGame(overrides: Partial<GameSnapshot> = {}): GameSnapshot {
 
 beforeEach(() => {
   vi.mocked(api.post).mockReset();
-  vi.mocked(api.put).mockReset();
   vi.mocked(confirmDialog).mockReset();
   vi.mocked(showError).mockReset();
 });
 
-const openRequest: NonNullable<GameSnapshot['judgeRequest']> = {
-  id: 7,
-  requester: 'Player1',
-  category: 'CARD_RULING',
-  createdAt: '2026-09-02T10:00:00Z',
-  updatedAt: '2026-09-02T10:00:00Z',
-  details: 'question about [card:100:Fame]',
-  rawDetails: 'question about [Fame]',
-  status: 'OPEN',
-  canEdit: false,
-  canRetract: false,
-  canResolve: false,
-};
-
 describe('CommandForm', () => {
-  it('submits phase/command/chat/ping together and clears the free-text fields', async () => {
+  it('submits the command (+ ping) and clears the field', async () => {
     const updated = makeGame({ phase: 'Master' });
     vi.mocked(api.post).mockResolvedValue(updated);
     const onUpdated = vi.fn();
     const user = userEvent.setup();
     render(<TestHarness gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={onUpdated} />);
 
-    await user.type(screen.getByLabelText('Command'), 'burn library 1');
-    await user.type(screen.getByLabelText('Chat'), 'hello');
+    const input = screen.getByPlaceholderText('Enter game commands');
+    await user.type(input, 'burn library 1');
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
-    expect(api.post).toHaveBeenCalledWith('/game/g1/view/submit', {
-      phase: 'Untap',
-      command: 'burn library 1',
-      chat: 'hello',
-      ping: null,
-    });
+    // Phase moved to the HUD stepper (C4); chat to ChatCompose (D24).
+    expect(api.post).toHaveBeenCalledWith(
+      '/game/g1/view/submit',
+      { phase: null, command: 'burn library 1', chat: null, ping: null },
+      { 'X-Submit-Id': expect.any(String) },
+    );
     expect(onUpdated).toHaveBeenCalledWith(updated);
-    expect(screen.getByLabelText('Command')).toHaveValue('');
-    expect(screen.getByLabelText('Chat')).toHaveValue('');
+    expect(input).toHaveValue('');
   });
 
   it('shows a toast and stops submitting on API failure', async () => {
@@ -105,7 +99,7 @@ describe('CommandForm', () => {
     const user = userEvent.setup();
     render(<TestHarness gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={vi.fn()} />);
 
-    await user.type(screen.getByLabelText('Chat'), 'hello');
+    await user.type(screen.getByPlaceholderText('Enter game commands'), 'burn library 1');
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     expect(await screen.findByRole('button', { name: 'Submit' })).toBeEnabled();
@@ -114,9 +108,8 @@ describe('CommandForm', () => {
 
   it('ends the turn only after the confirm dialog resolves true', async () => {
     vi.mocked(confirmDialog).mockResolvedValue(false);
-    const onUpdated = vi.fn();
     const user = userEvent.setup();
-    render(<TestHarness gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={onUpdated} />);
+    render(<TestHarness gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={vi.fn()} />);
 
     await user.click(screen.getByRole('button', { name: 'End Turn' }));
     expect(api.post).not.toHaveBeenCalled();
@@ -128,136 +121,31 @@ describe('CommandForm', () => {
     expect(api.post).toHaveBeenCalledWith('/game/g1/view/end-turn');
   });
 
-  it('disables End Turn and the Phase select when it is not the viewer\'s turn', () => {
+  it("disables End Turn when it is not the viewer's turn", () => {
     render(<TestHarness gameId="g1" game={makeGame({ currentPlayer: 'Player2' })} viewerName="Player1" onUpdated={vi.fn()} />);
-
     expect(screen.getByRole('button', { name: 'End Turn' })).toBeDisabled();
-    expect(screen.getByLabelText('Phase')).toBeDisabled();
   });
 
-  it('hides player-only controls (Phase/Command/Ping/End Turn) for a judge who cannot play', () => {
-    render(
+  it('renders nothing for a viewer who cannot play', () => {
+    const { container } = render(
       <TestHarness gameId="g1" game={makeGame({ player: false, judge: true })} viewerName="Judge1" onUpdated={vi.fn()} />,
     );
-
-    expect(screen.queryByLabelText('Phase')).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('Command')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'End Turn' })).not.toBeInTheDocument();
-    expect(screen.getByLabelText('Chat')).toBeEnabled();
+    expect(container.querySelector('#commandForm')).toBeNull();
   });
 
-  it('disables chat entirely for a spectator (neither player nor judge)', () => {
-    render(<TestHarness gameId="g1" game={makeGame({ player: false })} viewerName="Spectator" onUpdated={vi.fn()} />);
-
-    expect(screen.getByLabelText('Chat')).toBeDisabled();
-  });
-
-  it('shows a rejected command\'s status message and keeps it visible across a stale game-prop refresh', async () => {
-    // Regression test for the race this was fixed for: GameStateResource's
-    // GET /view (what any WebSocket-triggered refresh re-fetches, including
-    // the one this very submit's own state-save self-triggers) always
-    // returns status: null. If the message were read from `game.status`
-    // instead of local state, a parent re-render with a fresh-but-stale
-    // snapshot — exactly what happens here — would erase it before anyone
-    // could read it.
+  it("keeps a rejected command's status visible across a stale game-prop refresh", async () => {
+    // Regression: GET /view always returns status: null, so the message must be
+    // held in local state, not read off `game.status`.
     vi.mocked(api.post).mockResolvedValue(makeGame({ status: 'No amount given use +/-' }));
-    const onUpdated = vi.fn();
     const user = userEvent.setup();
-    const { rerender } = render(<TestHarness gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={onUpdated} />);
+    const { rerender } = render(<TestHarness gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={vi.fn()} />);
 
-    await user.type(screen.getByLabelText('Command'), 'vp');
+    await user.type(screen.getByPlaceholderText('Enter game commands'), 'vp');
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     expect(await screen.findByText('No amount given use +/-')).toBeInTheDocument();
 
-    rerender(<TestHarness gameId="g1" game={makeGame({ status: null })} viewerName="Player1" onUpdated={onUpdated} />);
-
+    rerender(<TestHarness gameId="g1" game={makeGame({ status: null })} viewerName="Player1" onUpdated={vi.fn()} />);
     expect(screen.getByText('No amount given use +/-')).toBeInTheDocument();
-  });
-
-  describe('call a judge', () => {
-    it('lets a seated player raise a request from the Call Judge button', async () => {
-      const updated = makeGame({ judgeRequest: { ...openRequest } });
-      vi.mocked(api.post).mockResolvedValue(updated);
-      const onUpdated = vi.fn();
-      const user = userEvent.setup();
-      render(<TestHarness gameId="g1" game={makeGame()} viewerName="Player1" onUpdated={onUpdated} />);
-
-      await user.click(screen.getByRole('button', { name: /Call Judge/ }));
-      await user.selectOptions(screen.getByLabelText('Type of request'), 'CARD_RULING');
-      await user.type(screen.getByLabelText(/What do you need a ruling on/), 'Does Fame trigger?');
-      await user.click(screen.getByRole('button', { name: 'Call judge' }));
-
-      expect(api.post).toHaveBeenCalledWith('/game/g1/judge-request', {
-        category: 'CARD_RULING',
-        details: 'Does Fame trigger?',
-      });
-      expect(onUpdated).toHaveBeenCalledWith(updated);
-    });
-
-    it('shows "Judge Called" and a read-only request for a non-requester', async () => {
-      const user = userEvent.setup();
-      render(
-        <TestHarness
-          gameId="g1"
-          game={makeGame({ judgeRequest: { ...openRequest, requester: 'Player2' } })}
-          viewerName="Player1"
-          onUpdated={vi.fn()}
-        />,
-      );
-
-      await user.click(screen.getByRole('button', { name: /Judge Called/ }));
-      expect(screen.getByText(/called by/)).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument();
-      expect(screen.queryByLabelText('Resolution notes')).not.toBeInTheDocument();
-    });
-
-    it('lets the requester edit their open request', async () => {
-      const updated = makeGame({ judgeRequest: { ...openRequest } });
-      vi.mocked(api.put).mockResolvedValue(updated);
-      const user = userEvent.setup();
-      render(
-        <TestHarness
-          gameId="g1"
-          game={makeGame({ judgeRequest: { ...openRequest, canEdit: true, canRetract: true } })}
-          viewerName="Player1"
-          onUpdated={vi.fn()}
-        />,
-      );
-
-      await user.click(screen.getByRole('button', { name: /Judge Called/ }));
-      const details = screen.getByLabelText(/What do you need a ruling on/);
-      expect(details).toHaveValue('question about [Fame]');
-      await user.clear(details);
-      await user.type(details, 'clearer question');
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-      expect(api.put).toHaveBeenCalledWith('/game/g1/judge-request', {
-        category: 'CARD_RULING',
-        details: 'clearer question',
-      });
-    });
-
-    it('offers a resolution box to a non-seated judge', async () => {
-      const updated = makeGame();
-      vi.mocked(api.post).mockResolvedValue(updated);
-      const user = userEvent.setup();
-      render(
-        <TestHarness
-          gameId="g1"
-          game={makeGame({ player: false, judge: true, judgeRequest: { ...openRequest, canResolve: true } })}
-          viewerName="Judge1"
-          onUpdated={vi.fn()}
-        />,
-      );
-
-      await user.click(screen.getByRole('button', { name: /Judge Called/ }));
-      await user.type(screen.getByLabelText('Resolution notes'), 'Ruling: yes, it triggers.');
-      await user.click(screen.getByRole('button', { name: 'Resolve request' }));
-
-      expect(api.post).toHaveBeenCalledWith('/game/g1/judge-request/resolve', {
-        notes: 'Ruling: yes, it triggers.',
-      });
-    });
   });
 });

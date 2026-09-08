@@ -33,12 +33,33 @@ function cardImagePlaceholder(label: string): HTMLElement {
  * remount cycle in a way that leaves tooltips permanently unattached.
  * Instances persist across re-runs and are only destroyed on unmount.
  */
-export function useCardTooltips(containerRef: RefObject<HTMLElement | null>, deps: unknown[]) {
+export function useCardTooltips(containerRef: RefObject<HTMLElement | null>, deps: unknown[], enabled = true) {
   const instancesRef = useRef<Instance[]>([]);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+
+    // §6c text mode (GamePage) — no image tooltip at all. Tear down anything
+    // a previous run attached (the preference can be toggled mid-session) and
+    // stop before re-attaching.
+    if (!enabled) {
+      instancesRef.current.forEach((instance) => instance.destroy());
+      instancesRef.current = [];
+      return;
+    }
+
+    // Release instances whose anchor has left the DOM — chat lines that
+    // scrolled out and re-rendered, board cards that were removed. Without
+    // this the array (and the detached tippy instances + their popper nodes)
+    // only ever grows for the whole session and is freed just on unmount.
+    instancesRef.current = instancesRef.current.filter((instance) => {
+      const el = instance.reference;
+      if (el instanceof HTMLElement && el.isConnected) return true;
+      instance.destroy();
+      return false;
+    });
+
     const links = container.querySelectorAll<HTMLElement & { _tippy?: Instance }>('a.card-name');
 
     links.forEach((link) => {
@@ -100,7 +121,7 @@ export function useCardTooltips(containerRef: RefObject<HTMLElement | null>, dep
       );
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
+  }, [...deps, enabled]);
 
   // Destroy everything accumulated across every run, but only on unmount —
   // not on every dependency change, which would tear down tooltips for

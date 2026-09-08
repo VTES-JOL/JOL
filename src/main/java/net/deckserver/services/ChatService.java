@@ -63,6 +63,69 @@ public class ChatService extends PersistedService {
      */
     private static final AtomicLong INVOCATION_SEQ = new AtomicLong(System.currentTimeMillis());
 
+    /**
+     * Deferred game-chat inserts for the command currently executing on this
+     * thread. When a batch is open (see {@link #beginBatch}), {@link #sendChat}
+     * buffers each line's insert instead of committing it in its own
+     * transaction; {@link #flushBatch} then replays them all against the SAME
+     * {@link EntityManager} that writes {@code game_state}, so a multi-line
+     * command and its resulting board state commit atomically (B3). Null ⇒ no
+     * batch open ⇒ every line is written through immediately, exactly as before
+     * — the single-line path is unchanged.
+     *
+     * ThreadLocal for the same reason {@link #CURRENT_INVOCATION} is: a submit
+     * runs single-threaded under {@code GameModel}'s ReentrantLock, single-node.
+     */
+    private record PendingChat(String gameId, int turnSeq, int chatSeq, String turnId,
+                               String turnPlayer, String turnLabel, ChatData chat) {}
+    private static final ThreadLocal<List<PendingChat>> CHAT_BATCH = new ThreadLocal<>();
+
+    /** Open a deferred-write scope for this thread. Pair with {@link #endBatch} in a finally. */
+    public static void beginBatch() {
+        CHAT_BATCH.set(new ArrayList<>());
+    }
+
+    /**
+     * Replay every buffered chat insert against {@code em} (the caller's
+     * transaction — the one also writing {@code game_state}). Clears the buffer
+     * so {@link #endBatch}'s safety net has nothing left to do on the happy
+     * path. No-op when no batch is open or nothing was buffered.
+     */
+    public static void flushBatch(EntityManager em) {
+        List<PendingChat> pending = CHAT_BATCH.get();
+        if (pending == null || pending.isEmpty()) {
+            return;
+        }
+        for (PendingChat p : pending) {
+            messageRepository.insert(em, p.gameId(), p.turnSeq(), p.chatSeq(),
+                    p.turnId(), p.turnPlayer(), p.turnLabel(), p.chat());
+        }
+        pending.clear();
+    }
+
+    /**
+     * Close the deferred-write scope. If anything is still buffered (the caller
+     * never reached a {@code game_state} write — e.g. a ping-only submit, or an
+     * exception before save) persist those lines individually now so they are
+     * not lost. On the normal path {@link #flushBatch} already emptied the buffer.
+     */
+    public static void endBatch() {
+        List<PendingChat> pending = CHAT_BATCH.get();
+        CHAT_BATCH.remove();
+        if (pending == null || pending.isEmpty()) {
+            return;
+        }
+        for (PendingChat p : pending) {
+            boolean ok = instance().jpaWrite(em ->
+                    messageRepository.insert(em, p.gameId(), p.turnSeq(), p.chatSeq(),
+                            p.turnId(), p.turnPlayer(), p.turnLabel(), p.chat()));
+            if (!ok) {
+                instance().logger.error("Failed to persist buffered chat line for game {} (turn {})",
+                        p.gameId(), p.turnLabel());
+            }
+        }
+    }
+
     // Read accelerator only. Persistence is write-through per message (see sendChat);
     // there is no background flush and eviction just drops the cached copy — the
     // database already holds every row.
@@ -176,10 +239,16 @@ public class ChatService extends PersistedService {
         String player = history.getCurrentPlayer();
         String turnLabel = history.getCurrentTurnLabel();
 
-        boolean ok = instance().jpaWrite(em ->
-                messageRepository.insert(em, gameId, turnSeq, chatSeq, turnId, player, turnLabel, chat));
-        if (!ok) {
-            instance().logger.error("Failed to persist chat line for game {} (turn {})", gameId, turnLabel);
+        List<PendingChat> batch = CHAT_BATCH.get();
+        if (batch != null) {
+            // Defer: flushBatch() will insert this in the same transaction as game_state.
+            batch.add(new PendingChat(gameId, turnSeq, chatSeq, turnId, player, turnLabel, chat));
+        } else {
+            boolean ok = instance().jpaWrite(em ->
+                    messageRepository.insert(em, gameId, turnSeq, chatSeq, turnId, player, turnLabel, chat));
+            if (!ok) {
+                instance().logger.error("Failed to persist chat line for game {} (turn {})", gameId, turnLabel);
+            }
         }
     }
 

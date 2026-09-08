@@ -63,28 +63,32 @@ public class WebSocketRegistry {
     }
 
     public static void notifyGame(String gameId) {
-        notifyGame(gameId, null);
+        notifyGame(gameId, null, -1L);
+    }
+
+    public static void notifyGame(String gameId, long stamp) {
+        notifyGame(gameId, null, stamp);
     }
 
     /**
-     * Same as notifyGame(gameId), but skips the single WS session tagged with
-     * excludeClientId — mirrors notifyInvalidate(key, excludeClientId): a
-     * caller whose own REST response already carries the fresh game state
-     * doesn't need its own action to also trigger a self-refetch race. Every
-     * other session watching this game, including that same player's other
-     * tabs, is unaffected.
+     * Room-scoped game-update push. Skips the single WS session tagged with
+     * excludeClientId — a caller whose own REST response already carries the
+     * fresh game state doesn't need its own action to also trigger a
+     * self-refetch race. Every other session watching this game, including that
+     * same player's other tabs, is unaffected.
      *
      * Uses the same {"type":"invalidate","key":[...]} envelope as
-     * notifyInvalidate (see below), just room-scoped to gameSessions instead
-     * of broadcast to every session — ws/useQueryInvalidation.ts's generic
-     * bridge handles this the same way it handles Lobby's pushes, with no
-     * per-page message-type handling needed. Replaces the old
-     * {"type":"game","id":...} shape outright (ws/useGameSocket.ts was its
-     * only consumer, so there's nothing else to keep working).
+     * notifyInvalidate, room-scoped to gameSessions — ws/useQueryInvalidation.ts's
+     * generic bridge handles it like any other push. In addition it carries
+     * {@code "stamp": <n>}: the per-game monotonic snapshot version (see
+     * JolAdmin.getGameStamp / bumpGameStamp). A client whose cached
+     * GameSnapshot.stamp is already ≥ this value can skip the refetch (D8
+     * optimistic-UI enabler). {@code stamp < 0} means "unknown — always refetch".
      */
-    public static void notifyGame(String gameId, String excludeClientId) {
+    public static void notifyGame(String gameId, String excludeClientId, long stamp) {
         Session exclude = excludeClientId == null ? null : clientSessions.get(excludeClientId);
-        String message = "{\"type\":\"invalidate\",\"key\":" + toJsonArray(List.of("game", gameId)) + "}";
+        String message = "{\"type\":\"invalidate\",\"key\":" + toJsonArray(List.of("game", gameId))
+                + ",\"stamp\":" + stamp + "}";
         CopyOnWriteArraySet<Session> targets = gameSessions.get(gameId);
         if (targets != null) {
             targets.forEach(session -> {
@@ -122,12 +126,32 @@ public class WebSocketRegistry {
         return sb.append("]").toString();
     }
 
+    // Fire-and-forget: getAsyncRemote().sendText queues the frame and returns
+    // immediately instead of blocking the caller until the socket drains. This
+    // matters because notifyGame/notifyInvalidate run inside GameModel.lock (via
+    // JolAdmin.saveGameState) — a single slow / backpressured consumer must not
+    // stall every other player's mutation for that game. Delivery failures for a
+    // dead session are reported to the SendHandler and evicted there.
     private static void send(Session session, String message) {
         try {
-            if (session.isOpen()) session.getBasicRemote().sendText(message);
+            if (!session.isOpen()) {
+                evict(session);
+                return;
+            }
+            session.getAsyncRemote().sendText(message, result -> {
+                if (!result.isOK()) {
+                    Throwable ex = result.getException();
+                    log.warn("WebSocket async send failed for session {}, removing: {}",
+                            session.getId(), ex == null ? "unknown error" : ex.getMessage());
+                    evict(session);
+                }
+            });
         } catch (Exception e) {
-            log.warn("WebSocket send failed for session {}, removing: {}", session.getId(), e.getMessage());
-            evict(session);
+            // A synchronous throw here (e.g. IllegalStateException if a prior async write is
+            // still in progress and the impl doesn't queue) does NOT mean the session is dead
+            // — only the SendHandler above can tell us that. Log and drop this one frame; the
+            // client re-syncs on its next REST fetch / reconnect anyway.
+            log.warn("WebSocket async send threw for session {}, dropping frame: {}", session.getId(), e.getMessage());
         }
     }
 

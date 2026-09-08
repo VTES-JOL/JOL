@@ -17,11 +17,14 @@ import net.deckserver.services.GameService;
 import net.deckserver.services.ParserService;
 import net.deckserver.storage.json.deck.Deck;
 import net.deckserver.storage.json.game.CardData;
+import net.deckserver.storage.json.game.ExitData;
 import net.deckserver.storage.json.game.GameData;
+import net.deckserver.storage.json.game.PendingActionData;
 import net.deckserver.storage.json.game.PlayerData;
 import net.deckserver.storage.json.game.RegionData;
 
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -59,9 +62,33 @@ public record JolGame(String id, GameData data) {
     }
 
     public void withdraw(String player) {
-        data.getPlayer(player).setPool(0);
-        data.getPlayer(player).addVictoryPoints(0.5f);
-        log(player, "withdraws and gains 0.5 victory points", "withdraw");
+        // Rulebook (game-flow.md:167): a player who withdraws (library exhausted,
+        // survives to their next unlock) receives a full 1 VP and leaves the game.
+        // The predator gets nothing — no VP, no pool. 0.5 was the timeout-survivor
+        // value, wrongly conflated here before.
+        //
+        // The withdrawer must actually leave the ring: withdraw used to only
+        // zero pool + award VP, so getCurrentPlayers() (filter !isOusted() ||
+        // pool>0) still contained them and newTurn() dealt them another turn.
+        // Mirror changePool's oust path — setOusted + updatePredatorMapping + a
+        // "X now preys on Y" system line.
+        PlayerData playerData = data.getPlayer(player);
+        String lostPredator = nameOf(playerData.getPredator());
+        String lostPrey = nameOf(playerData.getPrey());
+        boolean leaving = !playerData.isOusted();
+        playerData.setPool(0);
+        playerData.addVictoryPoints(1.0f);
+        playerData.setOusted(true);
+        data.updatePredatorMapping();
+        log(player, "withdraws and gains 1 victory point", "withdraw");
+        if (leaving) {
+            // A withdrawal credits the withdrawer themselves (game-flow.md:167) — not a predator.
+            data.recordExit(new ExitData(player, player, 1.0, data.getTurn(), ExitData.Kind.WITHDRAW));
+            String tail = (lostPredator != null && lostPrey != null && !lostPredator.equals(lostPrey))
+                    ? " — " + lostPredator + " now preys on " + lostPrey + "."
+                    : "";
+            ChatService.sendSystemMessage(id, player + " withdraws from the game." + tail);
+        }
     }
 
     public void updateVP(String actor, String targetPlayer, float amount) {
@@ -84,12 +111,20 @@ public record JolGame(String id, GameData data) {
     }
 
     public void timeout() {
-        data.getCurrentPlayers().forEach(playerData -> {
-            playerData.addVictoryPoints(0.5f);
+        // game-flow.md:162: on timeout all surviving players receive 0.5 VP each,
+        // except that a sole surviving player receives the normal full survivor VP
+        // (0.5 + 0.5 = 1.0). Capture the survivor list before mutating pool/ousted.
+        List<PlayerData> survivors = new ArrayList<>(data.getCurrentPlayers());
+        boolean soleSurvivor = survivors.size() == 1;
+        survivors.forEach(playerData -> {
+            playerData.addVictoryPoints(soleSurvivor ? 1.0f : 0.5f);
             playerData.setPool(0);
             playerData.setOusted(true);
         });
-        ChatService.sendSystemMessage(id, "Game timed out. Surviving players are awarded ½ VP.");
+        String vpNote = soleSurvivor
+                ? "The sole surviving player is awarded 1 VP."
+                : "Surviving players are awarded ½ VP.";
+        ChatService.sendSystemMessage(id, "Game timed out. " + vpNote);
     }
 
     public void requestTimeout(String player) {
@@ -106,6 +141,79 @@ public record JolGame(String id, GameData data) {
         } else {
             log(player, "requests a game timeout", "timeout", "requested");
         }
+    }
+
+    // ── pending action / response window (rules R1) ──────────────────────
+
+    /**
+     * The acting player declares an action, opening the table's one response
+     * window. Any window already open is auto-resolved first (a table never has
+     * two). {@code awaiting} is seeded by direction: a BLEED targets the actor's
+     * prey; RUSH / POLITICAL / ACTION_CARD put every other live seat on the
+     * hook; everything else (hunt, go-anarch, leave-torpor) is informational —
+     * a log line and a banner, but nobody "owes" a response in v1.
+     */
+    public void declareAction(String actor, PendingActionData.Type type, String actingCardId,
+                              String targetPlayer, String targetCardId, int amount, String note) {
+        PendingActionData prior = data.getPendingAction();
+        if (prior != null) {
+            ChatService.sendSystemMessage(id, actor + "'s " + prior.describe() + " is resolved.");
+            data.setPendingAction(null);
+        }
+        String target = targetPlayer;
+        if (type == PendingActionData.Type.BLEED && target == null) {
+            target = getPreyOf(actor);
+        }
+        PendingActionData pa = new PendingActionData(UUID.randomUUID().toString(), actor, actingCardId,
+                type, target, targetCardId, amount, emptyToNull(note), Instant.now().toString());
+        switch (type) {
+            case BLEED -> {
+                if (pa.getTargetPlayer() != null) pa.getAwaiting().add(pa.getTargetPlayer());
+            }
+            case RUSH, POLITICAL, ACTION_CARD -> pa.getAwaiting().addAll(otherLiveSeats(actor));
+            default -> { /* informational — no one owes a response */ }
+        }
+        data.setPendingAction(pa);
+        log(actor, "declares a " + pa.describe(), "declare", type.name().toLowerCase());
+    }
+
+    /** A responder passes on the open window (moves them from awaiting → passed). */
+    public void passPending(String player) {
+        PendingActionData pa = data.getPendingAction();
+        if (pa == null) return;
+        if (pa.getAwaiting().remove(player)) {
+            if (!pa.getPassed().contains(player)) pa.getPassed().add(player);
+            log(player, "passes on " + pa.getActor() + "'s " + pa.label(), "pass");
+        }
+    }
+
+    /** The actor closes the open window. {@code cancelled} distinguishes a mis-click withdrawal from a real resolution. */
+    public void resolvePending(String player, boolean cancelled) {
+        PendingActionData pa = data.getPendingAction();
+        if (pa == null || !pa.getActor().equals(player)) return;
+        data.setPendingAction(null);
+        log(player, (cancelled ? "withdraws the declared " : "resolves the ") + pa.describe(), "resolve");
+    }
+
+    /** Clear any open window when the turn ends / advances — with a log line if anyone still owed a response. */
+    public void autoResolvePending(String occasion) {
+        PendingActionData pa = data.getPendingAction();
+        if (pa == null) return;
+        if (!pa.getAwaiting().isEmpty()) {
+            ChatService.sendSystemMessage(id, pa.getActor() + "'s " + pa.describe() + " resolved on " + occasion
+                    + " — " + String.join(", ", pa.getAwaiting()) + " did not respond.");
+        }
+        data.setPendingAction(null);
+    }
+
+    private List<String> otherLiveSeats(String actor) {
+        return data.getPlayerNames().stream()
+                .filter(name -> !name.equals(actor) && !isOusted(name))
+                .toList();
+    }
+
+    private static String emptyToNull(String s) {
+        return s == null || s.isBlank() ? null : s.trim();
     }
 
     public String getName() {
@@ -324,6 +432,14 @@ public record JolGame(String id, GameData data) {
         PlayerData playerData = data.getPlayer(player);
         int counters = card.getCounters();
         int pool = playerData.getPool();
+        // Clamp so blood can't be moved off a card that doesn't have it (or,
+        // symmetrically, more than the player's own pool holds).
+        if (amount < 0) {
+            amount = -Math.min(-amount, counters);
+        } else if (amount > 0) {
+            amount = Math.min(amount, pool);
+        }
+        if (amount == 0) return;
         int newCounters = counters + amount;
         int newPool = pool - amount;
         playerData.setPool(newPool);
@@ -338,6 +454,11 @@ public record JolGame(String id, GameData data) {
         {
             CardData card = data.getCard(cardId);
             int current = card.getCounters();
+            // A card can't hold negative blood — clamp rather than underflow.
+            if (incr < 0) {
+                incr = -Math.min(-incr, current);
+            }
+            if (incr == 0) return;
             current += incr;
             card.setCounters(current);
             if (!quiet) {
@@ -399,6 +520,29 @@ public record JolGame(String id, GameData data) {
         return Optional.ofNullable(playerData.getPrey()).map(PlayerData::getName).orElse(null);
     }
 
+    /**
+     * Stamp {@code player}'s seat with the current instant as their last
+     * board-mutating action, for the "waiting how long on this seat?" HUD.
+     * No-op for a name that isn't a seated player (e.g. a judge issuing a
+     * command from outside the game).
+     */
+    public void recordPlayerAction(String player) {
+        PlayerData playerData = data.getPlayer(player);
+        if (playerData != null) {
+            playerData.setLastActionAt(Instant.now().toString());
+        }
+    }
+
+    public String getLastActionAt(String player) {
+        PlayerData playerData = data.getPlayer(player);
+        return playerData == null ? null : playerData.getLastActionAt();
+    }
+
+    /** D35b — see {@link GameData#normalizeReadyOrder()}. Run once per submit, after the command(s), before save. */
+    public void normalizeReadyOrder() {
+        data.normalizeReadyOrder();
+    }
+
     public int getSize(String player, RegionType region) {
         return data.getPlayerRegion(player, region).getCards().size();
     }
@@ -451,12 +595,15 @@ public record JolGame(String id, GameData data) {
                 lostPredator = nameOf(playerData.getPredator());
                 lostPrey = nameOf(playerData.getPrey());
                 nowOusted = true;
+                // Capture the VP recipient (predator-at-oust) before the remap re-links past this seat.
+                data.recordExit(new ExitData(player, lostPredator, 1.0, data.getTurn(), ExitData.Kind.OUST));
             }
             playerData.setOusted(true);
             data.updatePredatorMapping();
         } else if (starting <= 0) {
             nowRestored = wasOusted;
             playerData.setOusted(false);
+            data.clearExit(player);
             data.updatePredatorMapping();
         }
         String body = player.equals(source)
@@ -751,31 +898,47 @@ public record JolGame(String id, GameData data) {
         List<CardData> regionData = data.getPlayerRegion(player, targetRegion).getCards();
         int max = Math.min(regionData.size(), amount);
         List<CardData> cards = regionData.stream().limit(max).toList();
-        StringBuilder builder = new StringBuilder();
-        builder.append(String.format("%d cards of %s's %s\n", max, player, targetRegion.description()));
-        for (int i = 0; i < cards.size(); i++) {
-            builder.append(String.format("%d %s\n", i + 1, cards.get(i).getName()));
-        }
-        String notes = builder.toString();
-        for (String recipient : recipients) {
-            PlayerData recipientData = data.getPlayer(recipient);
-            String privateNotes = recipientData.getNotes() == null ? "" : recipientData.getNotes();
-            privateNotes += notes;
-            recipientData.setNotes(privateNotes);
-        }
-        boolean self = recipients.size() == 1 && recipients.contains(player);
-        boolean all = recipients.size() == getValidPlayers().size();
         String cardsWord = max == 1 ? "1 card" : max + " cards";
         String region = targetRegion.logLabel();
+
+        // H5: only ever write into a live seat's private notes — a name that
+        // isn't a current player (mistyped, or already ousted) is dropped, not
+        // NPE'd. The list is filtered once, up front, so the log line names the
+        // players who actually received the note.
+        List<String> delivered = recipients.stream()
+                .distinct()
+                .map(data::getPlayer)
+                .filter(Objects::nonNull)
+                .filter(p -> p.getName().equals(player) || !p.isOusted())
+                .map(PlayerData::getName)
+                .toList();
+
+        // The private note carries turn context (H5) so a stack of shows stays
+        // readable weeks later, and matches the log line's prose region label.
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("[Turn %s] %s shows %s of their %s:%n",
+                data.getTurn(), player, cardsWord, region));
+        for (int i = 0; i < cards.size(); i++) {
+            builder.append(String.format("%d %s%n", i + 1, cards.get(i).getName()));
+        }
+        String notes = builder.toString();
+        for (String recipient : delivered) {
+            PlayerData recipientData = data.getPlayer(recipient);
+            String privateNotes = recipientData.getNotes() == null ? "" : recipientData.getNotes();
+            recipientData.setNotes(privateNotes + notes);
+        }
+
+        boolean self = delivered.size() == 1 && delivered.contains(player);
+        boolean all = !self && delivered.size() == getValidPlayers().size();
         String msg;
         if (self) {
             msg = "looks at " + cardsWord + " of their " + region;
         } else if (all) {
             msg = "shows everyone " + cardsWord + " of their " + region;
         } else {
-            msg = "shows " + String.join(", ", recipients) + " " + cardsWord + " of their " + region;
+            msg = "shows " + String.join(", ", delivered) + " " + cardsWord + " of their " + region;
         }
-        log(player, msg, "show", targetRegion.xmlLabel(), String.valueOf(max), String.join(" ", recipients));
+        log(player, msg, "show", targetRegion.xmlLabel(), String.valueOf(max), String.join(" ", delivered));
     }
 
     public void moveToCard(String player, String srcCardId, String dstCardId, boolean faceDown) throws CommandException {

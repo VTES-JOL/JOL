@@ -9,12 +9,28 @@ import type { CardSnapshot, GameSnapshot } from '../../api/types';
 export function findCardByCoordinate(game: GameSnapshot, playerName: string, regionType: string, coordinate: string): CardSnapshot | null {
   const player = game.players.find((p) => p.name === playerName);
   const region = player?.regions.find((r) => r.type === regionType);
-  if (!region) return null;
-  let list = region.cards;
+  return region ? walkCoordinate(region.cards, coordinate) : null;
+}
+
+// Like findCardByCoordinate but keyed the way a command string addresses a card
+// (player's *first name* + region *commandKey*, e.g. `lock Player1 ready 3.1`) —
+// used by GamePage's optimistic-apply to locate the card a command targets.
+export function findCardByCommandCoordinate(
+  game: GameSnapshot,
+  playerFirstName: string,
+  regionCommandKey: string,
+  coordinate: string,
+): CardSnapshot | null {
+  const player = game.players.find((p) => p.name.split(' ')[0] === playerFirstName);
+  const region = player?.regions.find((r) => r.commandKey === regionCommandKey);
+  return region ? walkCoordinate(region.cards, coordinate) : null;
+}
+
+function walkCoordinate(cards: CardSnapshot[], coordinate: string): CardSnapshot | null {
+  let list = cards;
   let card: CardSnapshot | null = null;
   for (const part of coordinate.split('.')) {
-    const index = Number(part) - 1;
-    card = list[index] ?? null;
+    card = list[Number(part) - 1] ?? null;
     if (!card) return null;
     list = card.cards ?? [];
   }

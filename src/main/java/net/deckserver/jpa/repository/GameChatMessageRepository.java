@@ -59,6 +59,27 @@ public class GameChatMessageRepository {
         return turns;
     }
 
+    /**
+     * Latest {@code posted_at} per {@code source} for a game — used to backfill
+     * {@code PlayerData.lastActionAt} on load for games whose state blob predates
+     * that field (see {@code GameService.loadGame}). {@code source} is the actor
+     * name for a command / chat line ("SYSTEM" / "Judge - X" rows are returned
+     * too; the caller keeps only keys that match a seated player).
+     */
+    public java.util.Map<String, java.time.OffsetDateTime> lastActivityBySource(EntityManager em, String gameId) {
+        List<Object[]> rows = em.createQuery(
+                        "SELECT m.source, MAX(m.postedAt) FROM GameChatMessageEntity m "
+                                + "WHERE m.gameId = :gameId AND m.source IS NOT NULL "
+                                + "GROUP BY m.source", Object[].class)
+                .setParameter("gameId", gameId)
+                .getResultList();
+        java.util.Map<String, java.time.OffsetDateTime> result = new java.util.HashMap<>();
+        for (Object[] row : rows) {
+            result.put((String) row[0], (java.time.OffsetDateTime) row[1]);
+        }
+        return result;
+    }
+
     public void deleteForGame(EntityManager em, String gameId) {
         em.createQuery("DELETE FROM GameChatMessageEntity m WHERE m.gameId = :gameId")
                 .setParameter("gameId", gameId)

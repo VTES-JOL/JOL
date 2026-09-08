@@ -122,6 +122,7 @@ export const Card = memo(function Card({
       <button
         type="button"
         title="Unlock"
+        aria-label={`Unlock ${card.name ?? 'card'}`}
         onClick={quickLock('unlock')}
         className="shrink-0 inline-flex items-center rounded bg-accent text-surface px-1 py-0.5 hover:bg-accent-dim"
       >
@@ -138,8 +139,9 @@ export const Card = memo(function Card({
       <button
         type="button"
         title="Lock"
+        aria-label={`Lock ${card.name ?? 'card'}`}
         onClick={quickLock('lock')}
-        className="shrink-0 inline-flex items-center rounded border border-line-accent text-ink-muted px-1 py-0.5 opacity-0 transition-opacity group-hover:opacity-100 hover:border-ink hover:text-ink"
+        className="shrink-0 inline-flex items-center rounded border border-line-accent text-ink-muted px-1 py-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 hover:border-ink hover:text-ink"
       >
         <Lock size={11} />
       </button>
@@ -214,7 +216,7 @@ export const Card = memo(function Card({
   );
 });
 
-const NestedCard = memo(function NestedCard({
+export const NestedCard = memo(function NestedCard({
   card,
   region,
   coordinate,
@@ -223,7 +225,7 @@ const NestedCard = memo(function NestedCard({
   card: CardSnapshot;
   region: string;
   coordinate: string;
-  onAction?: (click: TableCardClick) => void;
+  onAction?: (click: TableCardClick, anchor: MenuAnchor) => void;
 }) {
   return card.visible ? (
     <Card card={card} region={region} coordinate={coordinate} isChild onAction={onAction} />

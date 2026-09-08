@@ -8,6 +8,8 @@ import type { CardModeTarget, CardSnapshot } from '../../api/types';
 export interface Submission {
   command?: string;
   chat?: string;
+  // Nudge a player — sent as POST /view/submit's `ping` field, not a command.
+  ping?: string;
 }
 
 export interface TableCardContext {
@@ -39,14 +41,17 @@ export const cardActions = {
   hide: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'hide') }),
   reveal: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'reveal') }),
   contest: (ctx: TableCardContext, clear: boolean): Submission => ({ command: doCardCommand(ctx, 'contest', clear ? 'clear' : '') }),
-  bleed: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'lock'), chat: 'Bleed' }),
-  hunt: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'lock'), chat: 'Hunt' }),
+  // The declare opens the table's response window (rules R1) and carries the
+  // rich log line ("… declares a bleed vs Stolas"), replacing the old bare
+  // "Bleed" chat. bleed's target defaults to the actor's prey server-side.
+  bleed: (ctx: TableCardContext): Submission => ({ command: `${doCardCommand(ctx, 'lock')}; declare bleed` }),
+  hunt: (ctx: TableCardContext): Submission => ({ command: `${doCardCommand(ctx, 'lock')}; declare hunt` }),
   torpor: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'move', `${controllerFirstName(ctx)} torpor`) }),
   // `banish <player> <coord>` — engine moves the card from that player's ready
   // region to their uncontrolled region and logs it (source is always ready).
   banish: (ctx: TableCardContext): Submission => ({ command: `banish ${controllerFirstName(ctx)} ${ctx.coordinate}` }),
-  goAnarch: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'lock'), chat: 'Go anarch' }),
-  leaveTorpor: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'lock'), chat: 'Leave Torpor' }),
+  goAnarch: (ctx: TableCardContext): Submission => ({ command: `${doCardCommand(ctx, 'lock')}; declare go_anarch` }),
+  leaveTorpor: (ctx: TableCardContext): Submission => ({ command: `${doCardCommand(ctx, 'lock')}; declare leave_torpor` }),
   burn: (ctx: TableCardContext): Submission => ({ command: doCardCommand(ctx, 'burn') }),
   influence: (ctx: TableCardContext): Submission => ({ command: `influence ${ctx.coordinate}` }),
   block: (cardName: string): Submission => ({ chat: `[${cardName}] blocks` }),

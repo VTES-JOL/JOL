@@ -37,6 +37,12 @@ public class GameData {
 
     private String timeoutRequestor;
 
+    /** Per-seat exit records (oust / withdrawal), in exit order. Empty on games that predate the field. */
+    private List<ExitData> exits = new ArrayList<>();
+
+    /** The one open action / response window (rules R1), or null when nothing is declared. */
+    private PendingActionData pendingAction;
+
     public GameData(String id, String name) {
         this.id = id;
         this.name = name;
@@ -154,9 +160,41 @@ public class GameData {
         }
     }
 
+    /**
+     * Stable-sort every player's READY region so minions precede permanents
+     * (masters / locations / powerbases). The list index <em>is</em> the command
+     * coordinate ({@code lock ready 3}) and the client renders that number, so
+     * an unsorted list can label a minion "3" while a permanent above it is "1"
+     * (D19 / D35b). Relative order within each group — i.e. influence / play
+     * order — is preserved. Call after a board-mutating submit and on load,
+     * never mid-command (coordinates must stay stable while a submit resolves).
+     */
+    public void normalizeReadyOrder() {
+        for (PlayerData player : players.values()) {
+            player.getRegion(RegionType.READY).getCards()
+                    .sort(Comparator.comparingInt(card -> card.isMinion() ? 0 : 1));
+        }
+    }
+
     @JsonIgnore
     public String getTurnLabel() {
         return String.format("%s %s", currentPlayer.getName(), turn);
+    }
+
+    /** Record (or replace) the exit record for a seat, so the ousted-seat strip can name the VP recipient. */
+    public void recordExit(ExitData exit) {
+        this.exits.removeIf(e -> e.getSeat().equals(exit.getSeat()));
+        this.exits.add(exit);
+    }
+
+    /** Drop a seat's exit record — it came back into the game. */
+    public void clearExit(String seat) {
+        this.exits.removeIf(e -> e.getSeat().equals(seat));
+    }
+
+    @JsonIgnore
+    public ExitData getExit(String seat) {
+        return this.exits.stream().filter(e -> e.getSeat().equals(seat)).findFirst().orElse(null);
     }
 
     public void replacePlayer(String oldPlayer, String newPlayer) {

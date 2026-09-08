@@ -1,43 +1,17 @@
-/* The game table's grid layout: HandStrip / CommandForm / (GameChatPanel or
-   HistoryPanel) are the grid items assigned to these named areas, so this
-   file is really the layout contract those children (pages/game/*.tsx) rely
-   on rather than something owned solely by GamePage.tsx — it's imported once
-   here since GamePage is what mounts them together. Notes + Deck are no
-   longer in this grid: they live in NotesDeckDrawer (a right-edge slide-over). */
-.control-grid {
-    display: grid;
-    grid-gap: 0.5rem;
-    grid-auto-columns: minmax(10rem, 1fr);
-    grid-auto-rows: minmax(0px, 22rem);
-    grid-template-areas: 'hand commands' 'chat chat';
-}
+/* The hand + command band is one horizontal row at the foot of the table
+   column, level with each other (Main.dc.html) — HandStrip is a scroll-x chip
+   row, CommandForm an inline control strip; both laid out with flex in
+   GamePage, no grid. Notes / Deck live in NotesDeckDrawer; Call Judge / Notes
+   / History moved to the HUD (D26). */
 
-@media (min-width: 768px) {
-    .control-grid {
-        grid-template-areas: 'hand commands chat chat';
-    }
+/* Hide the native scrollbar on the mobile seat pager — it's navigated by
+   swipe + the dot row + the ‹ › buttons, so the bar is just noise. */
+.no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
-
-@media (min-width: 1200px) {
-    .control-grid {
-        grid-template-areas: 'hand commands chat chat chat';
-    }
-}
-
-.hand {
-    grid-area: hand;
-}
-
-.commands {
-    grid-area: commands;
-}
-
-#gameChatCard {
-    grid-area: chat;
-}
-
-#historyCard {
-    grid-area: chat;
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
 }
 
 /* Judge-only "show commands" prefix line in the game chat log
@@ -101,11 +75,15 @@ p.chat.chat-system {
 }
 
 /* Every log line: hanging indent so a wrapped line's continuation aligns under
-   the message, not back under the timestamp (GameChatLog.tsx). */
+   the message, not back under the timestamp (GameChatLog.tsx). max-width keeps
+   the line to a reading measure (#12 / D32) — on the ~24rem talk rail it's
+   moot, but the lg+ right rail and the mobile Log sheet are wider and a line
+   running the full width is hard to scan. */
 p.chat {
     margin: 0.05rem 0;
     padding-left: 1.35rem;
     text-indent: -1.35rem;
+    max-width: 68ch;
 }
 
 /* A run of consecutive lines from one actor gets a left accent bar in that
@@ -113,7 +91,11 @@ p.chat {
    rows 2..n of the run is dimmed — kept in the DOM for copy-paste / a11y. */
 p.chat.chat-accent {
     border-left: 3px solid var(--log-accent);
-    padding-left: 0.5rem;
+    /* first line at padding-left + text-indent = 0 (flush with the content box,
+       clear of the 3px accent bar); wrapped lines hang at 0.85rem. The old
+       0.5rem / -0.85rem put the first line at -0.35rem, so the timestamp
+       collided with / spilled past the accent bar. */
+    padding-left: 0.85rem;
     text-indent: -0.85rem;
 }
 
@@ -124,6 +106,27 @@ p.chat .chat-name {
 p.chat .chat-name-repeat {
     opacity: 0.45;
     font-weight: 400;
+}
+
+/* "New since your last visit" rule (#12 / D32). A centred label on a hairline,
+   in the accent colour so it reads as a marker rather than another log line. */
+p.chat-new-sep {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.5rem 0 0.25rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--jt-accent-soft);
+}
+p.chat-new-sep::before,
+p.chat-new-sep::after {
+    content: "";
+    flex: 1;
+    border-top: 1px solid currentColor;
+    opacity: 0.5;
 }
 
 /* Date separator between log lines whose day differs (U5). */
@@ -142,11 +145,27 @@ p.chat-date-sep {
    worth the ink. Kept subtle (--jt-line, not --jt-ink-muted) because every
    row here carries one. */
 .game-board a.card-name,
-.hand a.card-name {
+.hand a.card-name,
+p.chat a.card-name,
+p.chat-attempt a.card-name {
     border-bottom: 1px dotted var(--jt-line);
 }
 
 .game-board a.card-name:hover,
-.hand a.card-name:hover {
+.hand a.card-name:hover,
+p.chat a.card-name:hover,
+p.chat-attempt a.card-name:hover {
     border-bottom-color: var(--jt-ink-muted);
+}
+
+/* In the log a card name sits inline in a prose sentence, not as a standalone
+   label like on the board — so drop the wide-set `matrix` display face the
+   shared a.card-name rule (styles/card-visuals.css) applies. Its cap height
+   and side-bearings differ enough from the log's body font that "plays Foo."
+   reads as "plays  Foo ." (game-log-review.md §10 status). The dotted
+   underline above keeps the name identifiable; the hover tooltip is keyed on
+   data-card-id and unaffected. */
+p.chat a.card-name,
+p.chat-attempt a.card-name {
+    font-family: inherit;
 }

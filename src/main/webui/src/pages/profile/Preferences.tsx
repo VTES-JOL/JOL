@@ -5,6 +5,7 @@ import { FieldHint } from '../../components/ui/FormFeedback';
 import { api } from '../../api/client';
 import type { Profile } from '../../api/types';
 import { runRequest } from '../../api/mutate';
+import { useNavRefresh } from '../../auth/useNav';
 import { setThemePref, useThemePref, type ThemePref } from '../../theme';
 import { useSave } from './saveState';
 import { SaveNote } from './SaveNote';
@@ -47,6 +48,9 @@ function AppearanceControl() {
 
 export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (updated: Profile) => void }) {
   const edgeSave = useSave();
+  // The game screen reads imageTooltipPreference off the /nav cache — refresh
+  // it so a toggle here takes effect there without a reload.
+  const refreshNav = useNavRefresh();
   const edgeColor = (profile.edgeColor ?? DEFAULT_EDGE_COLOR).toUpperCase();
   const isDefaultEdge = edgeColor === DEFAULT_EDGE_COLOR;
 
@@ -57,7 +61,10 @@ export function Preferences({ profile, onSaved }: { profile: Profile; onSaved: (
           imageTooltips: e.target.checked,
           notificationsEnabled: profile.notificationsEnabled,
         })
-        .then(onSaved),
+        .then((updated) => {
+          onSaved(updated);
+          refreshNav();
+        }),
       'Failed to update preference',
     );
   };

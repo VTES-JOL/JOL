@@ -19,6 +19,9 @@ function game(players: PlayerSnapshot[]): GameSnapshot {
     id: 'g1',
     name: 'Test Game',
     players,
+    seating: players.map((p) => p.name),
+    chat: [],
+    commandErrors: [],
     currentPlayer: players[0]?.name ?? '',
     edgePlayer: players[0]?.name ?? '',
     turn: '1',
@@ -35,7 +38,7 @@ function game(players: PlayerSnapshot[]): GameSnapshot {
     edgeColor: '#ffffff',
     edgeTextColor: 'black',
     status: null,
-    stamp: '2026-01-01T00:00:00Z',
+    stamp: 1,
     judgeRequest: null,
   };
 }

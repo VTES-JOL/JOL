@@ -42,6 +42,28 @@ public class JolAdmin {
 
     private static final Map<String, GameModel> gmap = new ConcurrentHashMap<>();
 
+    // Per-game monotonic snapshot version ("stamp"). Bumped on every game-update
+    // WebSocket notify, i.e. on every change a client would see by refetching
+    // /game/{id}/view. Carried on GameSnapshot.stamp and in the WS game-update
+    // frame so a client whose cached stamp already matches can skip the refetch
+    // (D8 optimistic-UI enabler). Seeded from wall-clock millis so a value never
+    // regresses below a client's cached one across a server restart.
+    private static final Map<String, java.util.concurrent.atomic.AtomicLong> gameStamps = new ConcurrentHashMap<>();
+
+    private static java.util.concurrent.atomic.AtomicLong stampCounter(String gameId) {
+        return gameStamps.computeIfAbsent(gameId, k -> new java.util.concurrent.atomic.AtomicLong(System.currentTimeMillis()));
+    }
+
+    /** Current snapshot version for a game (no bump). */
+    public static long getGameStamp(String gameId) {
+        return stampCounter(gameId).get();
+    }
+
+    /** Advance and return a game's snapshot version — call once per game-update notify. */
+    public static long bumpGameStamp(String gameId) {
+        return stampCounter(gameId).incrementAndGet();
+    }
+
     public static int getRefreshInterval(String gameName) {
         OffsetDateTime lastChanged = PlayerGameActivityService.getGameTimestamp(gameName);
         OffsetDateTime now = OffsetDateTime.now();
@@ -222,7 +244,8 @@ public class JolAdmin {
             PlayerGameActivityService.setGameTimestamp(game.getName());
         }
         GameService.saveGame(game);
-        WebSocketRegistry.notifyGame(game.id(), excludeClientId);
+        long stamp = bumpGameStamp(game.id());
+        WebSocketRegistry.notifyGame(game.id(), excludeClientId, stamp);
     }
 
     public static synchronized String registerDeck(String gameName, String playerName, String deckName) {
@@ -537,7 +560,7 @@ public class JolAdmin {
             }
             // Clear out data
             RegistrationService.clearRegistrations(gameName);
-            WebSocketRegistry.notifyGame(gameInfo.getId());
+            WebSocketRegistry.notifyGame(gameInfo.getId(), bumpGameStamp(gameInfo.getId()));
             GameService.remove(gameName, gameInfo.getId());
             PlayerGameActivityService.clearGame(gameName);
             gmap.remove(gameName);

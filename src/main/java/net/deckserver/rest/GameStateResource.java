@@ -62,9 +62,17 @@ public class GameStateResource extends BaseResource {
         if (!isPlaying && !canJudge) {
             throw new ForbiddenException("Must be a player in this game or a judge to submit");
         }
+        String submitId = submitId();
         return game.withLock(() -> {
-            String status = game.submit(player, ne(body.phase()), ne(body.command()), ne(body.chat()), ne(body.ping()), clientId());
-            return GameSnapshotFactory.build(game, player, status);
+            // Idempotency: a retried / double-fired POST carrying the same
+            // X-Submit-Id is skipped — return the current snapshot unchanged
+            // (not a rejection). Missing header = no dedupe (back-compat).
+            if (submitId != null && !GameModel.claimSubmitId(gameId, player, submitId)) {
+                return GameSnapshotFactory.build(game, player, "Duplicate submit ignored.", false);
+            }
+            GameModel.SubmitOutcome outcome = game.submit(player, ne(body.phase()), ne(body.command()),
+                    ne(body.chat()), ne(body.ping()), clientId());
+            return GameSnapshotFactory.build(game, player, outcome.status(), outcome.rejected());
         });
     }
 
@@ -78,8 +86,8 @@ public class GameStateResource extends BaseResource {
             throw new ForbiddenException("Must be a player in this game to end the turn");
         }
         return game.withLock(() -> {
-            game.endTurn(player, clientId());
-            return GameSnapshotFactory.build(game, player, null);
+            GameModel.SubmitOutcome outcome = game.endTurn(player, clientId());
+            return GameSnapshotFactory.build(game, player, outcome.status(), outcome.rejected());
         });
     }
 
@@ -208,7 +216,18 @@ public class GameStateResource extends BaseResource {
     }
 
     private void notifyJudgeChange() {
-        WebSocketRegistry.notifyGame(gameId);
+        // A judge-request transition changes GameSnapshot.judgeRequest without a
+        // game_state write, so bump the stamp explicitly — otherwise a client
+        // holding the current stamp would skip the refetch and miss it.
+        //
+        // Exclude the acting tab from the game-update signal (B11): every judge
+        // endpoint returns the fresh GameSnapshot to its caller, so the caller's
+        // own action must not also trigger a self-refetch of the game view —
+        // same rule submit / end-turn already follow. The two notifyInvalidate
+        // broadcasts below hit different query keys (the Judge page + the nav
+        // badge, not the game view), so they are NOT actor-excluded — the acting
+        // judge's own Judge page / badge should still refresh.
+        WebSocketRegistry.notifyGame(gameId, clientId(), JolAdmin.bumpGameStamp(gameId));
         WebSocketRegistry.notifyInvalidate(List.of("judge", "requests"));
         WebSocketRegistry.notifyInvalidate(List.of("nav")); // refresh the Judges badge count
     }
