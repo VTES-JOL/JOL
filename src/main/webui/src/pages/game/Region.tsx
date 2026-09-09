@@ -7,6 +7,7 @@ import { MinionTile } from './MinionTile';
 import { PermanentChip } from './PermanentChip';
 import type { MenuAnchor } from './CardContextMenu';
 import { cardActions, type HandCardContext, type Submission, type TableCardContext } from './cardCommands';
+import { useBoardDensity } from './boardDensity';
 
 // READY/TORPOR/UNCONTROLLED render as tiles (MinionTile / PermanentChip) in a
 // wrapping grid; CRYPT and the expanded piles stay on <Card>. UNCONTROLLED
@@ -85,6 +86,12 @@ export const Region = memo(function Region({
 }) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const prevCardCount = useRef(region.cards.length);
+  const { density } = useBoardDensity();
+  // READY / TORPOR tiles auto-fill: one per row in a narrow opponent column,
+  // two where there's room (a 2×2 opponent seat, your own dock board). Text
+  // density forces a single column. UNCONTROLLED keeps its compact chip grid.
+  const tileGridCols =
+    density === 'text' ? '1fr' : 'repeat(auto-fill, minmax(min(11rem, 100%), 1fr))';
 
   useEffect(() => {
     if (region.cards.length > prevCardCount.current) {
@@ -290,11 +297,16 @@ export const Region = memo(function Region({
       {!collapsed && (
         <ol
           className={
+            TILE_REGIONS.has(region.type)
+              ? 'region list-none grid gap-1.5 p-1.5'
+              : 'region list-none divide-y divide-line/40'
+          }
+          style={
             region.type === 'UNCONTROLLED'
-              ? 'region list-none grid gap-1.5 p-1.5 [grid-template-columns:repeat(auto-fill,minmax(min(9rem,100%),1fr))]'
+              ? { gridTemplateColumns: 'repeat(auto-fill, minmax(min(9rem, 100%), 1fr))' }
               : TILE_REGIONS.has(region.type)
-                ? 'region list-none grid gap-1.5 p-1.5 [grid-template-columns:repeat(auto-fill,minmax(min(15rem,100%),1fr))]'
-                : 'region list-none divide-y divide-line/40'
+                ? { gridTemplateColumns: tileGridCols }
+                : undefined
           }
         >
           {orderedCards.map(({ card, i }) => renderCard(card, i))}

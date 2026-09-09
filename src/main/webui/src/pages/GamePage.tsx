@@ -11,6 +11,7 @@ import { Spinner } from '../components/ui/Spinner';
 import { useCardTooltips } from '../hooks/useCardTooltips';
 import { useSubmitGuard } from '../hooks/useSubmitGuard';
 import { useMediaQuery, useIsMobile } from '../hooks/useMediaQuery';
+import { useResizableSplit } from '../hooks/useResizableSplit';
 import { useNav } from '../auth/useNav';
 import { useCounterBump } from './game/useCounterBump';
 import { useCommandStatus } from './game/useCommandStatus';
@@ -29,6 +30,7 @@ import { useNotesIndicator } from './game/useNotesIndicator';
 import { PlayCardModal, type PendingTarget } from './game/PlayCardModal';
 import { CardContextMenu, type MenuAnchor } from './game/CardContextMenu';
 import { TextModeContext } from './game/textMode';
+import { BoardDensityContext, useBoardDensityState } from './game/boardDensity';
 import { SeatPager } from './game/SeatPager';
 import { BottomSheet } from './game/BottomSheet';
 import { MobileTabBar, type MobileTab } from './game/MobileTabBar';
@@ -103,11 +105,22 @@ export function GamePage() {
   // lg+ pulls Game Chat / History into a full-height right rail; md–lg stacks
   // it under the control band; <md (isMobile) opens it as a bottom sheet.
   const wideLayout = useMediaQuery('(min-width: 1024px)');
+  // Genuinely wide screens — the talk rail can afford Game Chat and History
+  // side by side (~1/3 of the width); the HUD History toggle collapses it back.
+  const veryWide = useMediaQuery('(min-width: 1800px)');
+  // The narrow end of the wide range — 4 opponents fold to a 2×2 grid here
+  // rather than four cramped columns.
+  const midWide = useMediaQuery('(min-width: 1024px) and (max-width: 1399px)');
   const isMobile = useIsMobile();
+  // Draggable opponents / dock split (wide layout only), remembered per game.
+  const { topPercent, containerRef, dividerProps } = useResizableSplit(`jol-split:${gameId ?? 'none'}`);
   // §6c — image-free card mode. On when the player turned image tooltips off,
   // or always below md (no hover on touch). Provided to the whole board tree.
   const nav = useNav();
   const textMode = useIsMobile() || nav?.imageTooltipPreference === false;
+  // Board density (2-up tiles vs text rows), remembered per game; forced to
+  // text when textMode is on, single-column tiles on mobile widths.
+  const boardDensity = useBoardDensityState(gameId, textMode, useIsMobile());
 
   const { data: game, isError, refetch } = useQuery({
     queryKey: ['game', gameId],
@@ -261,6 +274,7 @@ export function GamePage() {
   const liveMenuPool = cardMenu ? game.players.find((p) => p.name === cardMenu.ctx.controller)?.pool : undefined;
 
   const isMyTurn = !!viewerName && viewerName === game.currentPlayer;
+  const influencePriority = isMyTurn && game.phase === 'Influence';
   const showHand = game.player && !!viewerName;
   const canChat = game.player || game.judge;
 
@@ -312,8 +326,123 @@ export function GamePage() {
     </>
   );
 
+  // Real-table ordering for the 2-up opponent grid (2×2, at the narrow end of
+  // the wide range): your prey-side and predator-side neighbours drop to the
+  // bottom row next to your dock, cross-table seats sit on top. A 3+-wide grid
+  // keeps the plain clockwise-from-prey order.
+  const twoWideGrid = midWide && others.length >= 4;
+  const orderedOthers = twoWideGrid
+    ? [...others.slice(1, -1), others[0], others[others.length - 1]]
+    : others;
+  const oppCols = others.length >= 4 ? (twoWideGrid ? 2 : 4) : Math.max(others.length, 1);
+
+  const opponentSeats = (
+    <div
+      className="grid gap-2 items-start"
+      style={{ gridTemplateColumns: `repeat(${oppCols}, minmax(0, 1fr))` }}
+    >
+      {orderedOthers.map((player) => (
+        <SeatColumn
+          key={player.name}
+          player={player}
+          gameId={gameId}
+          edgeColor={game.edgeColor}
+          edgeTextColor={game.edgeTextColor}
+          isSeatedPlayer={game.player}
+          viewerName={viewerName}
+          relation={relationFor(player.name)}
+          pingable={game.player && game.pingOptions.includes(player.name)}
+          onTableCardClick={handleTableCardClick}
+          onQuickCommand={submit}
+          onCounterBump={counterBumpFor(player.name)}
+          onPlayCardClick={handlePlayCardClick}
+        />
+      ))}
+    </div>
+  );
+
+  // Wide-layout dock: an L — your board over the command band on the left, your
+  // hand a full-height column on the right (ui review: hand as a first-class
+  // zone, command band directly under the board you read from).
+  const dockGrid = (
+    <div className="grid min-h-0 flex-1 gap-2 [grid-template-rows:minmax(0,1fr)_auto] [grid-template-columns:minmax(0,1fr)_minmax(0,1.15fr)]">
+      <div className="flex min-h-0 flex-col overflow-hidden [grid-column:1] [grid-row:1]">
+        {!textMode && (
+          <div className="flex shrink-0 items-center justify-end px-1 pb-1">
+            <button
+              type="button"
+              onClick={() => boardDensity.setDensity(boardDensity.density === 'text' ? 'tiles' : 'text')}
+              className="rounded border border-line-accent px-1.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide text-ink-muted hover:border-ink hover:text-ink"
+              title="Toggle board layout"
+            >
+              {boardDensity.density === 'text' ? '▦ Tiles' : '▤ Text'}
+            </button>
+          </div>
+        )}
+        {me && (
+          <YourSeatDock
+            player={me}
+            gameId={gameId}
+            edgeColor={game.edgeColor}
+            edgeTextColor={game.edgeTextColor}
+            viewerName={viewerName}
+            onTableCardClick={handleTableCardClick}
+            onQuickCommand={submit}
+            onCounterBump={counterBump}
+            onPlayCardClick={handlePlayCardClick}
+            influencePriority={influencePriority}
+          />
+        )}
+      </div>
+      <div className="flex min-h-0 flex-col overflow-hidden rounded-md border border-line bg-surface/30 [grid-column:2] [grid-row:1/3]">
+        <div className="flex shrink-0 items-center gap-2 border-b border-line px-2 py-1">
+          <span className="text-xs font-bold uppercase tracking-wide text-ink-muted">Your hand</span>
+          <span className="rounded-full bg-accent px-1.5 text-[0.7rem] font-semibold text-white tabular-nums">
+            {handRegion?.cards.length ?? 0}
+          </span>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto p-2">
+          {showHand && (
+            <HandStrip handRegion={handRegion} show layout="list" onPlayCardClick={handlePlayCardClick} />
+          )}
+        </div>
+      </div>
+      <div className="flex flex-col gap-1.5 border-t border-line pt-1.5 [grid-column:1] [grid-row:2]">
+        <CommandForm
+          gameId={gameId}
+          game={game}
+          viewerName={viewerName}
+          onUpdated={applyUpdate}
+          captureStatus={captureStatus}
+          submitting={submitting}
+          guard={guard}
+        />
+      </div>
+    </div>
+  );
+
+  // Talk rail: Chat + History side by side at 2xl (default); the HUD History
+  // toggle still collapses it to a single panel as an override.
+  const railContent =
+    veryWide && !showHistory ? (
+      <div className="flex min-h-0 flex-1 gap-2">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-line bg-surface/20">
+          <div className="flex flex-1 min-h-0 flex-col">
+            <GameChatPanel game={game} gameId={gameId} viewerName={viewerName} />
+          </div>
+          {canChat && <ChatCompose onSend={sendChat} disabled={submitting} />}
+        </div>
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-line bg-surface/20">
+          <HistoryPanel gameId={gameId} game={game} viewerName={viewerName} />
+        </div>
+      </div>
+    ) : (
+      chatPanel
+    );
+
   return (
     <TextModeContext.Provider value={textMode}>
+    <BoardDensityContext.Provider value={boardDensity}>
     <div className="flex flex-col flex-1 min-h-0 text-ink">
       <TableHud
         game={game}
@@ -379,6 +508,32 @@ export function GamePage() {
                 logUnread={logUnread}
               />
             </>
+          ) : wideLayout ? (
+            me ? (
+              <div ref={containerRef} className="flex flex-1 min-h-0 flex-col">
+                <div
+                  id="opponents"
+                  className="game-board shrink-0 overflow-y-auto"
+                  style={{ flexBasis: `${topPercent}%`, minHeight: '6rem' }}
+                >
+                  {opponentSeats}
+                </div>
+                <div
+                  {...dividerProps}
+                  className="group flex h-2.5 shrink-0 cursor-row-resize touch-none items-center justify-center"
+                  title="Drag to resize · double-click to reset"
+                >
+                  <span className="h-1 w-12 rounded-full bg-line-accent transition-colors group-hover:bg-ink-muted" />
+                </div>
+                <div className="flex flex-1 min-h-0 flex-col overflow-hidden border-t border-line-accent pt-1.5">
+                  {dockGrid}
+                </div>
+              </div>
+            ) : (
+              <div id="opponents" className="game-board flex-1 min-h-0 overflow-y-auto">
+                {opponentSeats}
+              </div>
+            )
           ) : (
             <>
               {/* Board state fills the top; your seat + hand + commands dock at
@@ -475,8 +630,11 @@ export function GamePage() {
         </div>
 
         {wideLayout && (
-          <div id="talk-rail" className="flex w-[24rem] shrink-0 flex-col min-h-0 p-2 pl-0">
-            {chatPanel}
+          <div
+            id="talk-rail"
+            className={`flex shrink-0 flex-col min-h-0 p-2 pl-0 ${veryWide && !showHistory ? 'w-[34rem]' : 'w-[24rem]'}`}
+          >
+            {railContent}
           </div>
         )}
       </div>
@@ -589,6 +747,7 @@ export function GamePage() {
         />
       )}
     </div>
+    </BoardDensityContext.Provider>
     </TextModeContext.Provider>
   );
 }

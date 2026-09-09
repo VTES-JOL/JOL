@@ -2,6 +2,21 @@ import { memo } from 'react';
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
 import type { HandCardContext } from './cardCommands';
 
+// A left colour band by card type, so the hand reads as scannable groups
+// (master / reaction / combat / …) without leaning on card art. Falls back to
+// the neutral line colour for anything unmapped.
+function typeBand(typeClass?: string): string {
+  const t = (typeClass ?? '').toLowerCase();
+  if (t.includes('master')) return 'border-l-gold';
+  if (t.includes('modifier')) return 'border-l-accent';
+  if (t.includes('reaction')) return 'border-l-arcane';
+  if (t.includes('combat')) return 'border-l-blood-soft';
+  if (t.includes('ally') || t.includes('retainer')) return 'border-l-online';
+  if (t.includes('equip')) return 'border-l-line-accent';
+  if (t.includes('action') || t.includes('political') || t.includes('event')) return 'border-l-blood';
+  return 'border-l-line-accent';
+}
+
 // The viewer's own hand. Two layouts:
 //   'strip' (default) — a horizontal row of concise chips that scrolls sideways,
 //     for the dock band (Main.dc.html: the hand reads left to right, not tall).
@@ -40,7 +55,7 @@ export const HandStrip = memo(function HandStrip({
                 type="button"
                 onClick={() => play(card, coordinate)}
                 title={`Play ${card.name ?? 'card'} (hand ${coordinate})`}
-                className="flex w-full items-start gap-2.5 rounded-lg border border-line-accent bg-hover/40 p-3 text-left hover:border-ink hover:bg-hover"
+                className={`flex w-full items-start gap-2.5 rounded-lg border border-l-4 border-line-accent bg-hover/40 py-3 pl-2.5 pr-3 text-left hover:border-ink hover:bg-hover ${typeBand(card.typeClass)}`}
               >
                 <span className="mt-0.5 shrink-0 text-xs tabular-nums text-ink-muted">{coordinate}</span>
                 <span className={`icon card-type mt-0.5 shrink-0 ${card.typeClass ?? ''}`} />

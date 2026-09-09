@@ -18,6 +18,7 @@ export function YourSeatDock({
   onQuickCommand,
   onCounterBump,
   onPlayCardClick,
+  influencePriority = false,
 }: {
   player: PlayerSnapshot;
   gameId: string;
@@ -28,6 +29,7 @@ export function YourSeatDock({
   onQuickCommand: (submission: Submission) => void;
   onCounterBump?: (ctx: TableCardContext, kind: 'blood', step: number) => void;
   onPlayCardClick: (ctx: HandCardContext, card: CardSnapshot) => void;
+  influencePriority?: boolean;
 }) {
   return (
     <div className="game-board flex-1 min-h-0 overflow-y-auto">
@@ -41,6 +43,7 @@ export function YourSeatDock({
         edgeTextColor={edgeTextColor}
         isSeatedPlayer
         viewerName={viewerName}
+        influencePriority={influencePriority}
         onTableCardClick={onTableCardClick}
         onQuickCommand={onQuickCommand}
         onCounterBump={onCounterBump}

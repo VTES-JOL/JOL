@@ -38,6 +38,7 @@ export const PlayerBoard = memo(function PlayerBoard({
   onQuickCommand,
   onCounterBump,
   onPlayCardClick,
+  influencePriority = false,
 }: {
   player: PlayerSnapshot;
   gameId: string;
@@ -46,6 +47,9 @@ export const PlayerBoard = memo(function PlayerBoard({
   isSeatedPlayer: boolean;
   viewerName: string | null;
   relation?: SeatRelation;
+  // Your Influence phase, your turn: float UNCONTROLLED to the top so
+  // influencing the crypt (step one of the phase) is right there.
+  influencePriority?: boolean;
   // Show a nudge button in this seat's header (the viewer can ping this player).
   pingable?: boolean;
   onTableCardClick: (ctx: TableCardContext, anchor: MenuAnchor) => void;
@@ -55,28 +59,36 @@ export const PlayerBoard = memo(function PlayerBoard({
 }) {
   const isViewer = player.name === viewerName;
   const activeBorder = player.active
-    ? 'border-2 border-accent'
+    ? 'border-2 border-accent ring-2 ring-accent/40'
     : isViewer
       ? 'border-2 border-line-accent'
       : 'border border-line-accent';
   const ousted = player.pool < 1;
 
+  const regionOrder = influencePriority
+    ? ['UNCONTROLLED', 'READY', 'TORPOR', 'RESEARCH']
+    : BOARD_REGION_ORDER;
   const boardRegions = player.regions
     .filter((r) => !PILE_REGIONS.has(r.type))
-    .sort((a, b) => BOARD_REGION_ORDER.indexOf(a.type) - BOARD_REGION_ORDER.indexOf(b.type));
+    .sort((a, b) => regionOrder.indexOf(a.type) - regionOrder.indexOf(b.type));
   const pileRegions = player.regions.filter((r) => PILE_REGIONS.has(r.type));
 
   return (
     <div className="min-w-0">
-      {relation && (
-        <div className="mb-0.5 flex px-1">
-          <SeatRelationChip relation={relation} />
-        </div>
-      )}
       <div className={`rounded-lg bg-hover shadow-lg overflow-hidden ${activeBorder} ${ousted ? 'opacity-70' : ''}`}>
         <div className={`px-2 py-1.5 border-b border-line ${player.active ? 'bg-accent/15' : 'bg-panel/60'}`}>
           <div className="flex justify-between items-center gap-2">
             <span className="font-bold flex items-center gap-1 min-w-0">
+              {relation && relation !== 'table' && (
+                <span className="shrink-0">
+                  <SeatRelationChip relation={relation} />
+                </span>
+              )}
+              {player.active && (
+                <span className="shrink-0 rounded bg-accent px-1 text-[0.6rem] font-bold uppercase tracking-wide text-white">
+                  ▶ Acting
+                </span>
+              )}
               <span className="truncate">{player.name}</span>
               {player.pinged ? (
                 <TriangleAlert size={13} className="text-blood shrink-0" aria-label="Pinged" />
