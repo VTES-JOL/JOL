@@ -5,7 +5,13 @@ import { type ReactNode, useEffect, useState } from 'react';
  * (all classes Tailwind-based — see styles/tailwind.css).
  *
  * Desktop (>= breakpoint): every panel shown side-by-side in a CSS grid
- * whose track sizes come from `columns`.
+ * whose track sizes come from `columns`. The first panel (the master/list)
+ * hugs its own content and only grows to the viewport height, scrolling
+ * internally past that — so a short list leaves the page background visible
+ * instead of stretching a near-empty card full height. Every other panel
+ * still fills the row. The grid gets an explicit `minmax(0, 1fr)` row track
+ * so that "viewport height" cap is a definite size rather than the (taller)
+ * detail panel's content height.
  * Mobile (< breakpoint): a scrollable segmented strip switches between
  * panels, and only the selected panel renders. (A strip rather than a
  * dropdown so it reads as navigation, not as a second copy of the panel's
@@ -72,10 +78,20 @@ export function MasterDetailView({
     xl: 'xl:grid',
   }[breakpoint];
 
-  const panelResponsiveClass = {
+  // Non-selected panels are still laid out by the grid on desktop (only the
+  // mobile strip hides the unselected one). `Fill` stretches to the row;
+  // `Fit` hugs content and caps at the row height (= viewport, via the
+  // grid's minmax(0,1fr) row track) — used for the first/list panel.
+  const panelFillClass = {
     md: 'md:flex md:flex-col md:h-full md:min-h-0 md:w-full md:overflow-y-auto',
     lg: 'lg:flex lg:flex-col lg:h-full lg:min-h-0 lg:w-full lg:overflow-y-auto',
     xl: 'xl:flex xl:flex-col xl:h-full xl:min-h-0 xl:w-full xl:overflow-y-auto',
+  }[breakpoint];
+
+  const panelFitClass = {
+    md: 'md:flex md:flex-col md:self-start md:max-h-full md:min-h-0 md:w-full md:overflow-y-auto',
+    lg: 'lg:flex lg:flex-col lg:self-start lg:max-h-full lg:min-h-0 lg:w-full lg:overflow-y-auto',
+    xl: 'xl:flex xl:flex-col xl:self-start xl:max-h-full xl:min-h-0 xl:w-full xl:overflow-y-auto',
   }[breakpoint];
 
   return (
@@ -106,20 +122,26 @@ export function MasterDetailView({
       {/* Content area */}
       <div
         className={`flex-1 min-h-0 w-full flex flex-col ${gridColsClass} gap-6`}
-        style={{ gridTemplateColumns: columns }}
+        style={{ gridTemplateColumns: columns, gridTemplateRows: 'minmax(0, 1fr)' }}
       >
-        {panels.map((p) => (
-          <div
-            key={p.key}
-            className={
-              p.key === selectedKey
-                ? 'flex flex-col h-full min-h-0 w-full overflow-y-auto'
-                : `hidden ${panelResponsiveClass}`
-            }
-          >
-            {p.content}
-          </div>
-        ))}
+        {panels.map((p, i) => {
+          const fit = i === 0;
+          const selectedClass = fit
+            ? 'flex flex-col self-start max-h-full min-h-0 w-full overflow-y-auto'
+            : 'flex flex-col h-full min-h-0 w-full overflow-y-auto';
+          return (
+            <div
+              key={p.key}
+              className={
+                p.key === selectedKey
+                  ? selectedClass
+                  : `hidden ${fit ? panelFitClass : panelFillClass}`
+              }
+            >
+              {p.content}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
