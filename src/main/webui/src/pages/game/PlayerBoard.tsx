@@ -59,11 +59,29 @@ export const PlayerBoard = memo(function PlayerBoard({
 }) {
   const isViewer = player.name === viewerName;
   const activeBorder = player.active
-    ? 'border-2 border-accent ring-2 ring-accent/40'
+    ? 'border-2 border-accent'
     : isViewer
       ? 'border-2 border-line-accent'
       : 'border border-line-accent';
   const ousted = player.pool < 1;
+  const lowPool = player.pool > 0 && player.pool <= 4;
+
+  // A left colour rail keyed to this seat's relation (prey green, predator red,
+  // across-the-table neutral) — plus the accent ring when it's the acting seat.
+  const railColor =
+    relation === 'prey'
+      ? 'var(--jt-online)'
+      : relation === 'predator'
+        ? 'var(--jt-blood-soft)'
+        : relation === 'table'
+          ? 'var(--jt-line-accent)'
+          : null;
+  const ring = player.active ? ', 0 0 0 3px rgba(122, 62, 14, 0.22)' : '';
+  const seatShadow = railColor
+    ? `inset 4px 0 0 0 ${railColor}${ring}`
+    : player.active
+      ? '0 0 0 3px rgba(122, 62, 14, 0.22)'
+      : undefined;
 
   const regionOrder = influencePriority
     ? ['UNCONTROLLED', 'READY', 'TORPOR', 'RESEARCH']
@@ -75,8 +93,11 @@ export const PlayerBoard = memo(function PlayerBoard({
 
   return (
     <div className="min-w-0">
-      <div className={`rounded-lg bg-hover shadow-lg overflow-hidden ${activeBorder} ${ousted ? 'opacity-70' : ''}`}>
-        <div className={`px-2 py-1.5 border-b border-line ${player.active ? 'bg-accent/15' : 'bg-panel/60'}`}>
+      <div
+        className={`overflow-hidden rounded-lg border bg-surface ${activeBorder} ${ousted ? 'opacity-70' : ''}`}
+        style={seatShadow ? { boxShadow: seatShadow } : undefined}
+      >
+        <div className={`px-2 py-1.5 border-b border-line ${player.active ? 'bg-accent/10' : 'bg-panel'}`}>
           <div className="flex justify-between items-center gap-2">
             <span className="font-bold flex items-center gap-1 min-w-0">
               {relation && relation !== 'table' && (
@@ -125,7 +146,9 @@ export const PlayerBoard = memo(function PlayerBoard({
                   {player.victoryPoints.toFixed(1).replace(/\.0$/, '')} VP
                 </span>
               )}
-              <span className={`${PILL} ${poolTone(player.pool)}`}>{player.pool}</span>
+              <span className={`${PILL} ${poolTone(player.pool)} ${lowPool ? 'ring-2 ring-blood/30' : ''}`}>
+                {player.pool}
+              </span>
             </span>
           </div>
         </div>

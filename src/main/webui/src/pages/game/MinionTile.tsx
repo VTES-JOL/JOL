@@ -2,7 +2,8 @@ import { memo, type MouseEvent } from 'react';
 import { Flame, Lock, Minus, Plus } from 'lucide-react';
 import type { CardSnapshot } from '../../api/types';
 import type { MenuAnchor } from './CardContextMenu';
-import { NestedCard, type QuickKind, type TableCardClick } from './Card';
+import { type QuickKind, type TableCardClick } from './Card';
+import { AttachedCards } from './AttachedCards';
 import { CardHidden } from './CardHidden';
 import { Clan } from './Clan';
 import { Sect } from './Sect';
@@ -101,6 +102,7 @@ export const MinionTile = memo(function MinionTile({
   if (compact) {
     return (
       <li
+        data-card-instance={card.id}
         className={`group list-none rounded border ${border} bg-hover/40 px-1.5 py-1`}
         onClick={tileClick}
         onContextMenu={tileContextMenu}
@@ -139,6 +141,7 @@ export const MinionTile = memo(function MinionTile({
 
   return (
     <li
+      data-card-instance={card.id}
       className={`group list-none rounded-md border ${border} bg-hover/40 p-2`}
       onClick={tileClick}
       onContextMenu={tileContextMenu}
@@ -150,7 +153,7 @@ export const MinionTile = memo(function MinionTile({
         <a
           data-card-id={card.cardId}
           data-secured={card.playtest ? 'true' : undefined}
-          className={`card-name min-w-0 flex-1 text-wrap text-sm font-medium ${card.faceDown ? 'opacity-60' : ''}`}
+          className={`card-name min-w-0 flex-1 truncate text-sm font-medium ${card.faceDown ? 'opacity-60' : ''}`}
         >
           {card.name}
           {card.advanced && <i className="icon adv" />}
@@ -193,23 +196,23 @@ export const MinionTile = memo(function MinionTile({
         )}
       </div>
 
-      {/* glyph row */}
-      {((card.disciplines?.length ?? 0) > 0 || card.clan || card.sect || card.path) && (
-        <div className="mt-1 flex items-center gap-1">
+      {/* line 2 — disciplines · path/sect/clan · state chips · blood counter,
+          on one wrapping row (Main.dc.html's 2-line tile) */}
+      {((card.disciplines?.length ?? 0) > 0 ||
+        card.clan ||
+        card.sect ||
+        card.path ||
+        hasCounterUi ||
+        card.contested ||
+        card.faceDown ||
+        card.label) && (
+        <div className="mt-1 flex flex-wrap items-center gap-x-1 gap-y-0.5">
           {(card.disciplines ?? []).map((disc) => (
             <span key={disc} className={`icon ${disc}`} />
           ))}
-          <span className="ml-auto flex items-center gap-1">
-            <Path value={card.path} />
-            <Sect value={card.sect} />
-            <Clan value={card.clan} />
-          </span>
-        </div>
-      )}
-
-      {/* counter stepper / state chips */}
-      {(hasCounterUi || card.contested || card.faceDown || card.label) && (
-        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+          <Path value={card.path} />
+          <Sect value={card.sect} />
+          <Clan value={card.clan} />
           {card.contested && <span className={`${CHIP} bg-gold text-surface`}>CONTESTED</span>}
           {card.faceDown && (
             <span
@@ -232,7 +235,7 @@ export const MinionTile = memo(function MinionTile({
                   <Minus size={12} />
                 </button>
               )}
-              <span className="min-w-[2.5ch] rounded-full bg-blood px-2 py-0.5 text-center text-xs font-medium text-white shadow-sm tabular-nums">
+              <span className="min-w-[2.5ch] rounded-full bg-blood px-1.5 py-0.5 text-center text-[0.7rem] font-medium text-white shadow-sm tabular-nums">
                 {counterText}
               </span>
               {counter && (
@@ -251,17 +254,12 @@ export const MinionTile = memo(function MinionTile({
       )}
 
       {(card.cards?.length ?? 0) > 0 && (
-        <ol className="mt-1.5 ml-1 list-none divide-y divide-line/20 border-l border-line pl-1.5">
-          {card.cards!.map((nested, i) => (
-            <NestedCard
-              key={nested.id}
-              card={nested}
-              region={region}
-              coordinate={`${coordinate}.${i + 1}`}
-              onAction={onAction}
-            />
-          ))}
-        </ol>
+        <AttachedCards
+          cards={card.cards!}
+          parentCoordinate={coordinate}
+          region={region}
+          onAction={onAction}
+        />
       )}
     </li>
   );

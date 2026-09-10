@@ -73,8 +73,10 @@ export function useBoardDensityState(
 
   const setDensity = useCallback((d: BoardDensity | null) => setOverride(d), []);
 
-  // Forced text wins; then the viewer's override; then the default.
-  const density: BoardDensity = textMode ? 'text' : (override ?? 'tiles');
+  // The viewer's explicit choice always wins — "images off" seeds text density
+  // but doesn't lock it, since dense tiles don't imply hover art. No override:
+  // follow textMode (images-off / touch width), else the default.
+  const density: BoardDensity = override ?? (textMode ? 'text' : 'tiles');
 
   return { density, override, setDensity, cardsPerRow: narrow ? 1 : 2 };
 }

@@ -92,17 +92,23 @@ export function applyTheme(theme: Theme): void {
 }
 
 /**
- * Drop the local hint and revert to the default. Called on logout so a shared
- * browser's login form doesn't keep the previous user's theme.
+ * Drop the local hint so a shared browser's login form doesn't keep the
+ * previous user's theme.
+ *
+ * `repaint` (default true) also reverts the live DOM to the default theme and
+ * notifies subscribers. Logout passes `false`: it immediately follows with a
+ * hard redirect to /jol/login, and repainting the still-mounted authenticated
+ * screen first just flashes it in the default theme for the duration of the
+ * logout request. The fresh document the redirect loads has no hint to read,
+ * so it paints the default anyway — with no outgoing screen to flash.
  */
-export function clearThemeHint(): void {
+export function clearThemeHint(repaint = true): void {
   try {
     localStorage.removeItem(KEY);
   } catch {
     // ignore
   }
-  // Repaint to the default without re-persisting — a post-logout browser
-  // should be indistinguishable from a never-seen one (no hint at all).
+  if (!repaint) return;
   paint(DEFAULT_THEME);
   if (current !== DEFAULT_THEME) {
     current = DEFAULT_THEME;

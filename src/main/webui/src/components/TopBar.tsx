@@ -10,8 +10,12 @@ import { ThemePicker } from './ThemePicker';
 
 function logout() {
   // Drop the local theme hint so a shared browser's login form doesn't keep
-  // this user's theme for whoever logs in next.
-  clearThemeHint();
+  // this user's theme for whoever logs in next — but do NOT repaint now
+  // (repaint: false). The hard redirect below reloads the document, which
+  // repaints from the (now absent) hint; repainting the still-visible
+  // authenticated screen first would flash it in the default theme for the
+  // length of the logout request.
+  clearThemeHint(false);
   // Hard redirect (not client-side navigation) is deliberate: the whole
   // authenticated shell needs a clean remount once logged out.
   logoutRequest().finally(() => {

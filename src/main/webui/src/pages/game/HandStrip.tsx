@@ -2,20 +2,28 @@ import { memo } from 'react';
 import type { CardSnapshot, RegionSnapshot } from '../../api/types';
 import type { HandCardContext } from './cardCommands';
 
-// A left colour band by card type, so the hand reads as scannable groups
-// (master / reaction / combat / …) without leaning on card art. Falls back to
-// the neutral line colour for anything unmapped.
-function typeBand(typeClass?: string): string {
+// A colour band by card type, so the hand reads as scannable groups
+// (master / reaction / combat / …) without leaning on card art.
+function typeKey(typeClass?: string): string {
   const t = (typeClass ?? '').toLowerCase();
-  if (t.includes('master')) return 'border-l-gold';
-  if (t.includes('modifier')) return 'border-l-accent';
-  if (t.includes('reaction')) return 'border-l-arcane';
-  if (t.includes('combat')) return 'border-l-blood-soft';
-  if (t.includes('ally') || t.includes('retainer')) return 'border-l-online';
-  if (t.includes('equip')) return 'border-l-line-accent';
-  if (t.includes('action') || t.includes('political') || t.includes('event')) return 'border-l-blood';
-  return 'border-l-line-accent';
+  if (t.includes('master')) return 'gold';
+  if (t.includes('modifier')) return 'accent';
+  if (t.includes('reaction')) return 'arcane';
+  if (t.includes('combat')) return 'blood-soft';
+  if (t.includes('ally') || t.includes('retainer')) return 'online';
+  if (t.includes('equip')) return 'line-accent';
+  if (t.includes('action') || t.includes('political') || t.includes('event')) return 'blood';
+  return 'line-accent';
 }
+const BAND_BG: Record<string, string> = {
+  gold: 'bg-gold',
+  accent: 'bg-accent',
+  arcane: 'bg-arcane',
+  'blood-soft': 'bg-blood-soft',
+  online: 'bg-online',
+  'line-accent': 'bg-line-accent',
+  blood: 'bg-blood',
+};
 
 // The viewer's own hand. Two layouts:
 //   'strip' (default) — a horizontal row of concise chips that scrolls sideways,
@@ -45,7 +53,7 @@ export const HandStrip = memo(function HandStrip({
 
   if (layout === 'list') {
     return (
-      <ul className="hand flex list-none flex-col gap-2">
+      <ul className="hand grid list-none gap-2 [grid-template-columns:repeat(auto-fill,minmax(min(10rem,100%),1fr))]">
         {handRegion.cards.map((card, i) => {
           const coordinate = String(i + 1);
           const disciplines = card.disciplines ?? [];
@@ -55,34 +63,35 @@ export const HandStrip = memo(function HandStrip({
                 type="button"
                 onClick={() => play(card, coordinate)}
                 title={`Play ${card.name ?? 'card'} (hand ${coordinate})`}
-                className={`flex w-full items-start gap-2.5 rounded-lg border border-l-4 border-line-accent bg-hover/40 py-3 pl-2.5 pr-3 text-left hover:border-ink hover:bg-hover ${typeBand(card.typeClass)}`}
+                className="flex h-full w-full flex-col overflow-hidden rounded-lg border border-line-accent bg-surface text-left transition-colors hover:border-ink"
               >
-                <span className="mt-0.5 shrink-0 text-xs tabular-nums text-ink-muted">{coordinate}</span>
-                <span className={`icon card-type mt-0.5 shrink-0 ${card.typeClass ?? ''}`} />
-                <span className="min-w-0 flex-1">
+                <span className={`h-1.5 w-full shrink-0 ${BAND_BG[typeKey(card.typeClass)]}`} />
+                <span className="flex flex-1 flex-col gap-1 p-2">
                   <a
                     data-card-id={card.cardId}
                     data-secured={card.playtest ? 'true' : undefined}
-                    className="card-name block text-sm font-medium text-ink"
+                    className="card-name text-sm font-semibold leading-tight text-ink [text-wrap:balance]"
                   >
                     {card.name}
                     {card.advanced && <i className="icon adv" />}
                   </a>
-                  {(disciplines.length > 0 || card.cost || card.label) && (
-                    <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-muted">
-                      {disciplines.map((disc) => (
-                        <span key={disc} className={`icon ${disc}`} />
-                      ))}
-                      {card.cost && <span>{card.cost}</span>}
-                      {card.label && <span className="rounded bg-hover px-1.5 text-ink">{card.label}</span>}
-                    </span>
-                  )}
+                  <span className="mt-auto flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[0.7rem] text-ink-muted">
+                    <span className="shrink-0 tabular-nums">{coordinate}</span>
+                    <span className={`icon card-type ${card.typeClass ?? ''}`} />
+                    {disciplines.map((disc) => (
+                      <span key={disc} className={`icon ${disc}`} />
+                    ))}
+                    {card.cost && <span>{card.cost}</span>}
+                    {card.label && <span className="rounded bg-hover px-1 text-ink">{card.label}</span>}
+                  </span>
                 </span>
               </button>
             </li>
           );
         })}
-        {handRegion.cards.length === 0 && <li className="p-3 text-sm text-ink-muted">Your hand is empty.</li>}
+        {handRegion.cards.length === 0 && (
+          <li className="col-span-full p-3 text-sm text-ink-muted">Your hand is empty.</li>
+        )}
       </ul>
     );
   }

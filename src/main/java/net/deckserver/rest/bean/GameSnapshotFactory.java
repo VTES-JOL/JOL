@@ -68,6 +68,14 @@ public class GameSnapshotFactory {
             JolAdmin.recordPlayerAccess(viewer, model.getName());
         }
 
+        // A judge watching from outside the game sees every seat's hand (the
+        // "reveal hand" investigative view — CardVisibility's anticipated
+        // all-seeing clause). Scoped to HAND only: library / crypt order stay
+        // hidden, and face-down in-play cards stay hidden (CardVisibility's
+        // face-down clause runs first). A seated judge is a player here and
+        // plays under the normal rules.
+        boolean allSeeing = isJudge;
+
         List<String> pinged = JolAdmin.getPings(model.getName());
         // The current predator/prey ring: living seats only (updatePredatorMapping
         // already skips ousted). predator/prey are meaningless with < 2 alive.
@@ -77,7 +85,7 @@ public class GameSnapshotFactory {
         boolean ringActive = ring.size() >= 2;
         List<PlayerSnapshot> players = game.getPlayers().stream()
                 .map(playerName -> buildPlayer(game, playerName, viewer, pinged,
-                        ringActive && ring.contains(playerName)))
+                        ringActive && ring.contains(playerName), allSeeing))
                 .toList();
 
         Phase phase = game.getPhase();
@@ -147,11 +155,11 @@ public class GameSnapshotFactory {
             RegionType.LIBRARY, RegionType.CRYPT, RegionType.ASH_HEAP);
 
     private static PlayerSnapshot buildPlayer(JolGame game, String playerName, String viewer,
-                                             List<String> pinged, boolean inRing) {
+                                             List<String> pinged, boolean inRing, boolean allSeeing) {
         net.deckserver.storage.json.game.ExitData exit = game.data().getExit(playerName);
         List<RegionSnapshot> regions = new ArrayList<>();
         for (RegionType type : RegionType.values()) {
-            RegionSnapshot region = buildRegion(game, playerName, viewer, type);
+            RegionSnapshot region = buildRegion(game, playerName, viewer, type, allSeeing);
             if (!region.getCards().isEmpty() || ALWAYS_EMIT.contains(type)) {
                 regions.add(region);
             }
@@ -172,11 +180,14 @@ public class GameSnapshotFactory {
                 .build();
     }
 
-    private static RegionSnapshot buildRegion(JolGame game, String regionOwner, String viewer, RegionType type) {
+    private static RegionSnapshot buildRegion(JolGame game, String regionOwner, String viewer, RegionType type, boolean allSeeing) {
         boolean hand = type == RegionType.HAND;
         boolean openHand = hand && Boolean.TRUE.equals(game.data().isPlayerOpenHand(regionOwner));
         boolean hiddenHand = hand && !openHand;
-        boolean regionVisible = type.isVisible(regionOwner, viewer) || openHand;
+        // allSeeing (an outside judge) reveals card identities in the HAND only —
+        // hiddenHand still reports true so the client keeps the "closed hand"
+        // affordance, but the cards carry their real names.
+        boolean regionVisible = type.isVisible(regionOwner, viewer) || openHand || (allSeeing && hand);
 
         // Play-modal data (modes / replace rules / preamble / cost) is only
         // ever used from the viewer's own hand or research region — enrich just

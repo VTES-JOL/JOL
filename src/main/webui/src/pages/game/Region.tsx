@@ -86,12 +86,19 @@ export const Region = memo(function Region({
 }) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const prevCardCount = useRef(region.cards.length);
-  const { density } = useBoardDensity();
-  // READY / TORPOR tiles auto-fill: one per row in a narrow opponent column,
-  // two where there's room (a 2×2 opponent seat, your own dock board). Text
-  // density forces a single column. UNCONTROLLED keeps its compact chip grid.
+  const { density, cardsPerRow } = useBoardDensity();
+  // READY / TORPOR tile layout:
+  //  - text density        → one column.
+  //  - your own dock board  → a fixed `cardsPerRow` (2 on desktop, 1 on mobile),
+  //                           so a wide dock doesn't spread to 5 sparse tiles.
+  //  - an opponent seat     → auto-fill: 1-up in a narrow column, 2-up in a
+  //                           2×2 seat, matching the design.
   const tileGridCols =
-    density === 'text' ? '1fr' : 'repeat(auto-fill, minmax(min(11rem, 100%), 1fr))';
+    density === 'text'
+      ? '1fr'
+      : isOwnRegion
+        ? `repeat(${cardsPerRow}, minmax(0, 1fr))`
+        : 'repeat(auto-fill, minmax(min(11rem, 100%), 1fr))';
 
   useEffect(() => {
     if (region.cards.length > prevCardCount.current) {

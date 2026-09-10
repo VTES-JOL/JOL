@@ -87,4 +87,18 @@ describe('clearThemeHint', () => {
     expect(document.body.hasAttribute('data-bs-theme')).toBe(false);
     expect(t.getTheme()).toBe('light');
   });
+
+  it('with repaint=false drops the hint but leaves the live DOM untouched', async () => {
+    const t = await loadTheme('nightshade');
+    t.initTheme();
+    expect(document.body.dataset.theme).toBe('nightshade');
+    expect(document.body.getAttribute('data-bs-theme')).toBe('dark');
+
+    t.clearThemeHint(false);
+    expect(localStorage.getItem('jol-theme')).toBeNull();
+    // no flash — the outgoing screen keeps its theme until the hard redirect
+    expect(document.body.dataset.theme).toBe('nightshade');
+    expect(document.body.getAttribute('data-bs-theme')).toBe('dark');
+    expect(t.getTheme()).toBe('nightshade');
+  });
 });

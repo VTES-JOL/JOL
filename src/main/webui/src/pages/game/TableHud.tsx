@@ -105,6 +105,11 @@ export function TableHud({
         active={isMyTurn}
         onSelect={onSubmitPhase}
       />
+      {game.pendingAction && (
+        <span className="inline-flex items-center gap-1 rounded bg-blood px-1.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+          ⚑ Response needed
+        </span>
+      )}
       {waiting && !isMyTurn && (
         <span className="inline-flex items-center gap-1 text-xs text-gold" title={lastActionAt ?? undefined}>
           <Clock size={11} />

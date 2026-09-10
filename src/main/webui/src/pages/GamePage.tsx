@@ -1,12 +1,11 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client';
-import type { CardSnapshot, GameSnapshot } from '../api/types';
+import type { CardSnapshot, GameSnapshot, PlayerSnapshot } from '../api/types';
 import { useAuth } from '../auth/useAuth';
 import { useGameSocket } from '../ws/useGameSocket';
 import { showError } from '../stores/toast';
-import { Button } from '../components/ui/Button';
 import { Spinner } from '../components/ui/Spinner';
 import { useCardTooltips } from '../hooks/useCardTooltips';
 import { useSubmitGuard } from '../hooks/useSubmitGuard';
@@ -19,9 +18,14 @@ import { submitHeaders } from './game/submitId';
 import { seatOrder, relationOf, type SeatRelation } from './game/seatOrder';
 import { TableHud } from './game/TableHud';
 import { SeatColumn } from './game/SeatColumn';
+import { SeatGrid } from './game/SeatGrid';
+import { GameLoadError } from './game/GameLoadError';
+import { BoardDensityToggle } from './game/BoardDensityToggle';
 import { YourSeatDock } from './game/YourSeatDock';
 import { HandStrip } from './game/HandStrip';
+import { HandDock } from './game/HandDock';
 import { CommandForm } from './game/CommandForm';
+import { DockCommandStack } from './game/DockCommandStack';
 import { GameChatPanel } from './game/GameChatPanel';
 import { ChatCompose } from './game/ChatCompose';
 import { HistoryPanel } from './game/HistoryPanel';
@@ -34,7 +38,6 @@ import { BoardDensityContext, useBoardDensityState } from './game/boardDensity';
 import { SeatPager } from './game/SeatPager';
 import { BottomSheet } from './game/BottomSheet';
 import { MobileTabBar, type MobileTab } from './game/MobileTabBar';
-import { CallJudgeButton } from './game/CallJudgeButton';
 import { TargetPicker } from './game/TargetPicker';
 import { findCardByCoordinate, findCardByCommandCoordinate } from './game/coordinates';
 import { buildPlayCommand, cardActions, type HandCardContext, type Submission, type TableCardContext } from './game/cardCommands';
@@ -107,7 +110,6 @@ export function GamePage() {
   const wideLayout = useMediaQuery('(min-width: 1024px)');
   // Genuinely wide screens — the talk rail can afford Game Chat and History
   // side by side (~1/3 of the width); the HUD History toggle collapses it back.
-  const veryWide = useMediaQuery('(min-width: 1800px)');
   // The narrow end of the wide range — 4 opponents fold to a 2×2 grid here
   // rather than four cramped columns.
   const midWide = useMediaQuery('(min-width: 1024px) and (max-width: 1399px)');
@@ -141,6 +143,23 @@ export function GamePage() {
   // the card-click act paths both feed this; TableHud renders it once. See
   // useCommandStatus for why it can't be read off `game`.
   const { status: commandStatus, captureStatus, clearStatus } = useCommandStatus();
+
+  // Deep-link: when a pending action names a board card, bring it into view and
+  // pulse it once so "respond to the bleed on X" points at X. Unconditional
+  // hook (guards on `game` inside) — it sits above GamePage's early returns.
+  const pendingTargetId = game?.pendingAction?.targetCardId ?? null;
+  const pendingKey = game?.pendingAction?.id ?? null;
+  useEffect(() => {
+    if (!pendingTargetId) return;
+    const el = boardRef.current?.querySelector(
+      `[data-card-instance="${pendingTargetId}"], [data-card-id="${pendingTargetId}"]`,
+    );
+    if (!el) return;
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    el.classList.add('card-pulse');
+    const t = setTimeout(() => el.classList.remove('card-pulse'), 1600);
+    return () => clearTimeout(t);
+  }, [pendingTargetId, pendingKey]);
 
   // Drives the Log tab's unread dot. `seenChatLen` is set (in the tab handler)
   // to the line count when the Log sheet is opened; a new turn shrinks
@@ -240,24 +259,7 @@ export function GamePage() {
   }, []);
 
   if (!gameId || (isError && !game)) {
-    return (
-      <div className="flex flex-1 min-h-0 flex-col items-center justify-center gap-3 p-8 text-center">
-        <p className="text-sm text-ink">This game couldn’t be loaded.</p>
-        <p className="text-xs text-ink-muted">
-          It may have been closed, or you don’t have access to it.
-        </p>
-        <div className="mt-1 flex gap-2">
-          {gameId && (
-            <Button variant="secondary" size="sm" onClick={() => refetch()}>
-              Try again
-            </Button>
-          )}
-          <Button variant="primary" size="sm" onClick={() => navigate('/jol/')}>
-            Back to lobby
-          </Button>
-        </div>
-      </div>
-    );
+    return <GameLoadError canRetry={!!gameId} onRetry={() => refetch()} onBack={() => navigate('/jol/')} />;
   }
 
   if (!game) {
@@ -275,6 +277,11 @@ export function GamePage() {
 
   const isMyTurn = !!viewerName && viewerName === game.currentPlayer;
   const influencePriority = isMyTurn && game.phase === 'Influence';
+  // A pending response window that needs THIS viewer to act (owes a response,
+  // or is the actor who can resolve). The informational face stays HUD-only.
+  const pa = game.pendingAction;
+  const pendingActionable =
+    !!pa && !!viewerName && (pa.actor === viewerName || pa.awaiting.includes(viewerName));
   const showHand = game.player && !!viewerName;
   const canChat = game.player || game.judge;
 
@@ -311,6 +318,25 @@ export function GamePage() {
     ? game.players.find((p) => p.name === viewerName)?.regions.find((r) => r.type === 'HAND')
     : undefined;
 
+  // One place for the per-seat prop wiring, shared by the wide grid, the
+  // 768–1023 auto-fill grid and the mobile SeatPager (was duplicated 3×).
+  const renderSeat = (seat: PlayerSnapshot) => (
+    <SeatColumn
+      player={seat}
+      gameId={gameId}
+      edgeColor={game.edgeColor}
+      edgeTextColor={game.edgeTextColor}
+      isSeatedPlayer={game.player}
+      viewerName={viewerName}
+      relation={relationFor(seat.name)}
+      pingable={game.player && game.pingOptions.includes(seat.name)}
+      onTableCardClick={handleTableCardClick}
+      onQuickCommand={submit}
+      onCounterBump={counterBumpFor(seat.name)}
+      onPlayCardClick={handlePlayCardClick}
+    />
+  );
+
   // Both panels stay mounted, one hidden — flipping to History no longer
   // unmounts the live chat (its scroll position, and any turn HistoryPanel had
   // loaded, survive the toggle). ui-design C4 #6.
@@ -326,39 +352,11 @@ export function GamePage() {
     </>
   );
 
-  // Real-table ordering for the 2-up opponent grid (2×2, at the narrow end of
-  // the wide range): your prey-side and predator-side neighbours drop to the
-  // bottom row next to your dock, cross-table seats sit on top. A 3+-wide grid
-  // keeps the plain clockwise-from-prey order.
-  const twoWideGrid = midWide && others.length >= 4;
-  const orderedOthers = twoWideGrid
-    ? [...others.slice(1, -1), others[0], others[others.length - 1]]
-    : others;
-  const oppCols = others.length >= 4 ? (twoWideGrid ? 2 : 4) : Math.max(others.length, 1);
-
+  // The wide-layout opponent grid — SeatGrid owns the real-table ordering and
+  // the player-count-/width-aware column count (2×2 with prey/predator flanking
+  // your dock at the narrow end of the wide range).
   const opponentSeats = (
-    <div
-      className="grid gap-2 items-start"
-      style={{ gridTemplateColumns: `repeat(${oppCols}, minmax(0, 1fr))` }}
-    >
-      {orderedOthers.map((player) => (
-        <SeatColumn
-          key={player.name}
-          player={player}
-          gameId={gameId}
-          edgeColor={game.edgeColor}
-          edgeTextColor={game.edgeTextColor}
-          isSeatedPlayer={game.player}
-          viewerName={viewerName}
-          relation={relationFor(player.name)}
-          pingable={game.player && game.pingOptions.includes(player.name)}
-          onTableCardClick={handleTableCardClick}
-          onQuickCommand={submit}
-          onCounterBump={counterBumpFor(player.name)}
-          onPlayCardClick={handlePlayCardClick}
-        />
-      ))}
-    </div>
+    <SeatGrid seats={others} variant="counted" midWide={midWide} renderSeat={renderSeat} />
   );
 
   // Wide-layout dock: an L — your board over the command band on the left, your
@@ -367,18 +365,12 @@ export function GamePage() {
   const dockGrid = (
     <div className="grid min-h-0 flex-1 gap-2 [grid-template-rows:minmax(0,1fr)_auto] [grid-template-columns:minmax(0,1fr)_minmax(0,1.15fr)]">
       <div className="flex min-h-0 flex-col overflow-hidden [grid-column:1] [grid-row:1]">
-        {!textMode && (
-          <div className="flex shrink-0 items-center justify-end px-1 pb-1">
-            <button
-              type="button"
-              onClick={() => boardDensity.setDensity(boardDensity.density === 'text' ? 'tiles' : 'text')}
-              className="rounded border border-line-accent px-1.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide text-ink-muted hover:border-ink hover:text-ink"
-              title="Toggle board layout"
-            >
-              {boardDensity.density === 'text' ? '▦ Tiles' : '▤ Text'}
-            </button>
-          </div>
-        )}
+        <div className="flex shrink-0 items-center justify-end px-1 pb-1">
+          <BoardDensityToggle
+            density={boardDensity.density}
+            onToggle={() => boardDensity.setDensity(boardDensity.density === 'text' ? 'tiles' : 'text')}
+          />
+        </div>
         {me && (
           <YourSeatDock
             player={me}
@@ -394,37 +386,37 @@ export function GamePage() {
           />
         )}
       </div>
-      <div className="flex min-h-0 flex-col overflow-hidden rounded-md border border-line bg-surface/30 [grid-column:2] [grid-row:1/3]">
-        <div className="flex shrink-0 items-center gap-2 border-b border-line px-2 py-1">
-          <span className="text-xs font-bold uppercase tracking-wide text-ink-muted">Your hand</span>
-          <span className="rounded-full bg-accent px-1.5 text-[0.7rem] font-semibold text-white tabular-nums">
-            {handRegion?.cards.length ?? 0}
-          </span>
-        </div>
-        <div className="min-h-0 flex-1 overflow-y-auto p-2">
-          {showHand && (
-            <HandStrip handRegion={handRegion} show layout="list" onPlayCardClick={handlePlayCardClick} />
-          )}
-        </div>
-      </div>
-      <div className="flex flex-col gap-1.5 border-t border-line pt-1.5 [grid-column:1] [grid-row:2]">
-        <CommandForm
-          gameId={gameId}
-          game={game}
-          viewerName={viewerName}
-          onUpdated={applyUpdate}
-          captureStatus={captureStatus}
-          submitting={submitting}
-          guard={guard}
-        />
-      </div>
+      <HandDock
+        className="[grid-column:2] [grid-row:1/3]"
+        handRegion={handRegion}
+        show={showHand}
+        onPlayCardClick={handlePlayCardClick}
+      />
+      <DockCommandStack
+        variant="dock"
+        className="flex flex-col gap-1.5 border-t border-line pt-1.5 [grid-column:1] [grid-row:2]"
+        game={game}
+        gameId={gameId}
+        viewerName={viewerName}
+        me={me}
+        isMyTurn={isMyTurn}
+        pendingActionable={pendingActionable}
+        onCommand={(command) => submit({ command })}
+        onUpdated={applyUpdate}
+        captureStatus={captureStatus}
+        submitting={submitting}
+        guard={guard}
+        onRespondFocus={() => document.getElementById('command')?.focus()}
+      />
     </div>
   );
 
-  // Talk rail: Chat + History side by side at 2xl (default); the HUD History
-  // toggle still collapses it to a single panel as an override.
+  // Talk rail: Chat + History side by side only for a spectator / judge (no
+  // dock competing for the width). A seated player always gets the single
+  // combined panel with the HUD History toggle switching Chat / History, at
+  // every resolution.
   const railContent =
-    veryWide && !showHistory ? (
+    !me && !showHistory ? (
       <div className="flex min-h-0 flex-1 gap-2">
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-line bg-surface/20">
           <div className="flex flex-1 min-h-0 flex-col">
@@ -475,25 +467,7 @@ export function GamePage() {
         <div id="table-col" className="flex flex-col flex-1 min-h-0 min-w-0 p-2" ref={boardRef}>
           {isMobile ? (
             <>
-              <SeatPager
-                seats={me ? [me, ...others] : others}
-                renderSeat={(seat) => (
-                  <SeatColumn
-                    player={seat}
-                    gameId={gameId}
-                    edgeColor={game.edgeColor}
-                    edgeTextColor={game.edgeTextColor}
-                    isSeatedPlayer={game.player}
-                    viewerName={viewerName}
-                    relation={relationFor(seat.name)}
-                    pingable={game.player && game.pingOptions.includes(seat.name)}
-                    onTableCardClick={handleTableCardClick}
-                    onQuickCommand={submit}
-                    onCounterBump={counterBumpFor(seat.name)}
-                    onPlayCardClick={handlePlayCardClick}
-                  />
-                )}
-              />
+              <SeatPager seats={me ? [me, ...others] : others} renderSeat={renderSeat} />
 
               <MobileTabBar
                 active={mobileTab}
@@ -520,10 +494,12 @@ export function GamePage() {
                 </div>
                 <div
                   {...dividerProps}
-                  className="group flex h-2.5 shrink-0 cursor-row-resize touch-none items-center justify-center"
+                  className="group flex h-3 shrink-0 cursor-row-resize touch-none items-center justify-center gap-2 text-[0.55rem] font-semibold uppercase tracking-[0.2em] text-ink-muted/50 transition-colors hover:text-ink-muted"
                   title="Drag to resize · double-click to reset"
                 >
-                  <span className="h-1 w-12 rounded-full bg-line-accent transition-colors group-hover:bg-ink-muted" />
+                  <span className="h-px flex-1 bg-line" />
+                  <span aria-hidden>⋯ drag ⋯</span>
+                  <span className="h-px flex-1 bg-line" />
                 </div>
                 <div className="flex flex-1 min-h-0 flex-col overflow-hidden border-t border-line-accent pt-1.5">
                   {dockGrid}
@@ -548,25 +524,7 @@ export function GamePage() {
                     4-opponent game at ≥1280px doesn't leave a dead 5th column
                     (finding #6's own sketch). Cards size to a ~17rem min and
                     grow to fill the row. */}
-                <div className="grid gap-2 items-start [grid-template-columns:repeat(auto-fill,minmax(min(17rem,100%),1fr))]">
-                  {others.map((player) => (
-                    <SeatColumn
-                      key={player.name}
-                      player={player}
-                      gameId={gameId}
-                      edgeColor={game.edgeColor}
-                      edgeTextColor={game.edgeTextColor}
-                      isSeatedPlayer={game.player}
-                      viewerName={viewerName}
-                      relation={relationFor(player.name)}
-                      pingable={game.player && game.pingOptions.includes(player.name)}
-                      onTableCardClick={handleTableCardClick}
-                      onQuickCommand={submit}
-                      onCounterBump={counterBumpFor(player.name)}
-                      onPlayCardClick={handlePlayCardClick}
-                    />
-                  ))}
-                </div>
+                <SeatGrid seats={others} variant="autofill" renderSeat={renderSeat} />
               </div>
 
               {!wideLayout && (
@@ -632,7 +590,9 @@ export function GamePage() {
         {wideLayout && (
           <div
             id="talk-rail"
-            className={`flex shrink-0 flex-col min-h-0 p-2 pl-0 ${veryWide && !showHistory ? 'w-[34rem]' : 'w-[24rem]'}`}
+            className={`flex shrink-0 flex-col min-h-0 p-2 pl-0 ${
+              !me && !showHistory ? 'w-[40rem]' : 'w-[30rem]'
+            }`}
           >
             {railContent}
           </div>
@@ -688,24 +648,21 @@ export function GamePage() {
               header={<span className="font-semibold">Act</span>}
               maxHeightClass="max-h-[60vh]"
             >
-              <div className="flex flex-col gap-3 px-4 pb-6 pt-1">
-                <CommandForm
-                  gameId={gameId}
-                  game={game}
-                  viewerName={viewerName}
-                  onUpdated={applyUpdate}
-                  captureStatus={captureStatus}
-                  submitting={submitting}
-                  guard={guard}
-                />
-                <CallJudgeButton
-                  gameId={gameId}
-                  game={game}
-                  onUpdated={applyUpdate}
-                  submitting={submitting}
-                  guard={guard}
-                />
-              </div>
+              <DockCommandStack
+                variant="sheet"
+                className="flex flex-col gap-3 px-4 pb-6 pt-1"
+                game={game}
+                gameId={gameId}
+                viewerName={viewerName}
+                me={me}
+                isMyTurn={isMyTurn}
+                pendingActionable={false}
+                onCommand={(command) => submit({ command })}
+                onUpdated={applyUpdate}
+                captureStatus={captureStatus}
+                submitting={submitting}
+                guard={guard}
+              />
             </BottomSheet>
           )}
         </>

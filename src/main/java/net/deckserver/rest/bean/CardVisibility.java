@@ -23,9 +23,11 @@ import net.deckserver.storage.json.game.CardData;
  *       always shown in whichever region they land in.</li>
  * </ol>
  *
- * <p>A future judge "see everything" toggle is a single extra clause here
- * ({@code || allSeeing}) and threading one boolean from
- * {@link GameSnapshotFactory#build} — deliberately localised to this method.
+ * <p>The judge "reveal hand" view is resolved one level up, in
+ * {@link GameSnapshotFactory}'s {@code buildRegion}, which folds an
+ * {@code allSeeing} flag (an outside judge) into the {@code regionVisible}
+ * argument for the HAND region — the same place the open-hand override is
+ * applied. This method's cascade is unchanged by it.
  */
 final class CardVisibility {
 

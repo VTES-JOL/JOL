@@ -4,6 +4,17 @@
    GamePage, no grid. Notes / Deck live in NotesDeckDrawer; Call Judge / Notes
    / History moved to the HUD (D26). */
 
+/* Deep-link cue: GamePage pulses the board tile a pending action targets
+   ("respond to the bleed on X") so the eye lands on the right card. */
+@keyframes jol-card-pulse {
+    0%   { box-shadow: 0 0 0 0 var(--jt-accent); }
+    100% { box-shadow: 0 0 0 6px transparent; }
+}
+.card-pulse {
+    animation: jol-card-pulse 0.8s ease-out 2;
+    border-radius: 0.375rem;
+}
+
 /* Hide the native scrollbar on the mobile seat pager — it's navigated by
    swipe + the dot row + the ‹ › buttons, so the bar is just noise. */
 .no-scrollbar {
