@@ -40,9 +40,9 @@ public class MetricsService {
                 .count();
         Collection<GameHistory> histories = HistoryService.getGames();
         //Active Games Last Month
-        long activeLastMonth = getAllActiveGamesLastMonth(histories,YearMonth.now().minusMonths(1));
-        long activeBeforeLast = getAllActiveGamesLastMonth(histories,YearMonth.now().minusMonths(2));
-        long activeThreeMonths = getAllActiveGamesLastMonth(histories,YearMonth.now().minusMonths(3));
+        long activeLastMonth = getAllActiveGamesLastMonth(histories, YearMonth.now().minusMonths(1));
+        long activeBeforeLast = getAllActiveGamesLastMonth(histories, YearMonth.now().minusMonths(2));
+        long activeThreeMonths = getAllActiveGamesLastMonth(histories, YearMonth.now().minusMonths(3));
         String activeChangeMonth = activeLastMonth == 0
                 ? (activeGames == 0 ? "0.0%" : "100.0%")
                 : String.format(
@@ -189,6 +189,13 @@ public class MetricsService {
         List<Map.Entry<String, Long>> top3NationsLast = StatisticsService.getTop3(histories, YearMonth.now().minusMonths(1), result -> StatisticsService.getCountryCode(result));
         List<Map.Entry<String, Long>> top3PNationsBeforeLast = StatisticsService.getTop3(histories, YearMonth.now().minusMonths(2), result -> StatisticsService.getCountryCode(result));
 
+        //Similar Sessions
+        List<PlayerSimilarity> similarPlayers = findSimilarPlayers(metrics, forPlayer);
+        //PlayerReactivity per game each action opens a window for an reaction
+        List<PlayerReactivity> reactions = findReactivity(metrics, null);
+        //filter chat metrics
+        List<PlayerChatReactivity> chatReactions = findChatReactivity(metrics, null);
+
         return new JolFacts(
                 List.of(activeGames, activeLastMonth, activeBeforeLast),
                 List.of(activeChangeMonth, activeChangeLast, activeChangeBefore),
@@ -212,7 +219,10 @@ public class MetricsService {
                 chatCommandRatioDto,
                 List.of(top3PlayersCurrent, top3PlayersLast, top3PlayersBeforeLast),
                 List.of(top3DecksCurrent, top3DecksLast, top3DecksBeforeLast),
-                List.of(top3NationsCurrent, top3NationsLast, top3PNationsBeforeLast));
+                List.of(top3NationsCurrent, top3NationsLast, top3PNationsBeforeLast),
+                similarPlayers,
+                reactions,
+                chatReactions);
     }
 
 
@@ -663,37 +673,380 @@ public class MetricsService {
                 .toList();
     }
 
-    public record PlayerMetricDto(OffsetDateTime timestamp, String playerName, String gameName, boolean didCommand,
-                                  boolean didChat, Boolean didPing) {
+    public static List<PlayerSimilarity> findSimilarPlayers(List<PlayerMetricDto> metrics, String yourPlayerName) {
+        Map<String, Set<LocalDateTime>> activeHoursByPlayer =
+                metrics.stream()
+                        .collect(Collectors.groupingBy(
+                                PlayerMetricDto::playerName,
+                                Collectors.mapping(
+                                        m -> m.timestamp()
+                                                .withMinute(0)
+                                                .withSecond(0)
+                                                .withNano(0)
+                                                .toLocalDateTime(),
+                                        Collectors.toSet()
+                                )
+                        ));
+
+        Set<LocalDateTime> yourHours =
+                activeHoursByPlayer.getOrDefault(
+                        yourPlayerName,
+                        Collections.emptySet()
+                );
+
+        List<PlayerSimilarity> result = new ArrayList<>();
+
+        for (var entry : activeHoursByPlayer.entrySet()) {
+            String playerName = entry.getKey();
+
+            if (playerName.equals(yourPlayerName)) {
+                continue;
+            }
+
+            Set<LocalDateTime> theirHours = entry.getValue();
+
+            Set<LocalDateTime> shared = new HashSet<>(yourHours);
+            shared.retainAll(theirHours);
+
+            Set<LocalDateTime> union = new HashSet<>(yourHours);
+            union.addAll(theirHours);
+
+            int sharedHours = shared.size();
+            int yourActiveHours = yourHours.size();
+            int theirActiveHours = theirHours.size();
+
+            double jaccardScore = union.isEmpty()
+                    ? 0.0
+                    : (double) sharedHours / union.size();
+
+            double yourOverlapScore = yourActiveHours == 0
+                    ? 0.0
+                    : (double) sharedHours / yourActiveHours;
+
+            result.add(new PlayerSimilarity(
+                    playerName,
+                    sharedHours,
+                    yourActiveHours,
+                    theirActiveHours,
+                    jaccardScore,
+                    yourOverlapScore
+            ));
+        }
+
+        return result.stream()
+                .sorted(Comparator.comparingDouble(
+                        PlayerSimilarity::yourOverlapScore
+                ).reversed())
+                .toList();
     }
 
-    public record CommandMetricDto(OffsetDateTime timestamp, String status, String playerName, String gameName,
-                                   String command) {
+    public static List<PlayerReactivity> findReactivity(List<PlayerMetricDto> metrics, String playerName) {
+        record ActionKey(
+                String playerName,
+                String gameName,
+                OffsetDateTime timestamp
+        ) {}
+
+        record PlayerGameKey(
+                String playerName,
+                String gameName
+        ) {}
+
+        Set<ActionKey> seen = new HashSet<>();
+
+        // Last player to make an action in each game.
+        Map<String, String> lastPlayerByGame = new HashMap<>();
+
+        // Reactions per player/game.
+        Map<PlayerGameKey, Integer> reactions = new HashMap<>();
+
+        // Total actual reaction events per game.
+        Map<String, Integer> totalReactionEventsByGame = new HashMap<>();
+
+        for (PlayerMetricDto metric : metrics) {
+            ActionKey action = new ActionKey(
+                    metric.playerName(),
+                    metric.gameName(),
+                    metric.timestamp()
+            );
+
+            // Ignore duplicate records.
+            if (!seen.add(action)) {
+                continue;
+            }
+
+            String game = metric.gameName();
+            String currentPlayer = metric.playerName();
+
+            String previousPlayer = lastPlayerByGame.get(game);
+
+            /*
+             * A different player making the next action means
+             * a reaction occurred.
+             */
+            if (previousPlayer != null
+                    && !previousPlayer.equals(currentPlayer)) {
+
+                // Only include the requested player, if specified.
+                if (playerName == null
+                        || playerName.equals(currentPlayer)) {
+
+                    PlayerGameKey key = new PlayerGameKey(
+                            currentPlayer,
+                            game
+                    );
+
+                    reactions.merge(key, 1, Integer::sum);
+                }
+
+                // Total reaction events are independent of player filter.
+                totalReactionEventsByGame.merge(
+                        game,
+                        1,
+                        Integer::sum
+                );
+            }
+
+            // Current player becomes the latest actor.
+            lastPlayerByGame.put(game, currentPlayer);
+        }
+
+        List<PlayerReactivity> result = new ArrayList<>();
+
+        for (var entry : reactions.entrySet()) {
+            PlayerGameKey key = entry.getKey();
+
+            int playerReactions = entry.getValue();
+
+            int totalReactionEvents =
+                    totalReactionEventsByGame.getOrDefault(
+                            key.gameName(),
+                            0
+                    );
+
+            double score = totalReactionEvents == 0
+                    ? 0.0
+                    : (double) playerReactions / totalReactionEvents;
+
+            result.add(new PlayerReactivity(
+                    key.playerName(),
+                    key.gameName(),
+                    playerReactions,
+                    totalReactionEvents,
+                    score
+            ));
+        }
+
+        return result.stream()
+                .sorted(
+                        Comparator
+                                .comparingDouble(
+                                        PlayerReactivity::score
+                                )
+                                .reversed()
+                )
+                .toList();
     }
 
-    public record JolFacts(List<Long> activeGames,
-                           List<String> activeChangeMonth,
-                           List<Long> tournamentGames,
-                           List<String> activeTourChangeMonth,
-                           Long pastGames,
-                           Long pastTournament,
-                           Long decks,
-                           Map<String, Long> gamesByPlayer,
-                           Map<String, Long> pastByPlayer,
-                           Map<String, Long> tournamentsByPlayer,
-                           Map<String, Long> pastTournamentByPlayer,
-                           Map<String, Long> oustedByPlayer,
-                           Map<String, Long> decksByPlayer,
-                           Map<String, Long> nationsByPlayer,
-                           List<MonthlyActivityDto> monthlyActivity,
-                           OverallOverviewDto overallOverviewDto,
-                           Map<String, Long> peakActivityDays,
-                           Map<String, Long> peakActivityHours,
-                           PlayerActivityOverviewDto playerActivityOverviewDto,
-                           List<ChatCommandRatioDto> chatCommandRatioDto,
-                           List<List<Map.Entry<String, Long>>> top3PlayersByWins,
-                           List<List<Map.Entry<String, Long>>> top3DecksByWins,
-                           List<List<Map.Entry<String, Long>>> top3NationsByWins) {
+    public static List<PlayerChatReactivity> findChatReactivity(List<PlayerMetricDto> metrics, String playerName) {
+        record ChatOpportunity(
+                String gameName,
+                String sourcePlayer,
+                Set<String> eligiblePlayers
+        ) {}
+
+        record PlayerGameKey(
+                String playerName,
+                String gameName
+        ) {}
+
+        Map<String, Set<String>> playersByGame = new HashMap<>();
+
+        // Open opportunities, in chronological/list order.
+        Map<String, Deque<ChatOpportunity>> openOpportunities =
+                new HashMap<>();
+
+        Map<PlayerGameKey, Integer> opportunities = new HashMap<>();
+        Map<PlayerGameKey, Integer> reactions = new HashMap<>();
+
+        for (PlayerMetricDto metric : metrics) {
+            if (!metric.didChat()) {
+                continue;
+            }
+
+            String game = metric.gameName();
+            String currentPlayer = metric.playerName();
+
+            Set<String> players = playersByGame.computeIfAbsent(
+                    game,
+                    ignored -> new LinkedHashSet<>()
+            );
+
+            /*
+             * The current player is now known to participate in this game.
+             */
+            players.add(currentPlayer);
+
+            Deque<ChatOpportunity> queue = openOpportunities.computeIfAbsent(
+                    game,
+                    ignored -> new ArrayDeque<>()
+            );
+
+            /*
+             * Find the earliest open opportunity in this game
+             * that this player can take.
+             *
+             * The source player cannot react to their own chat.
+             */
+            ChatOpportunity matchedOpportunity = null;
+
+            for (ChatOpportunity opportunity : queue) {
+                if (!opportunity.sourcePlayer().equals(currentPlayer)
+                        && opportunity.eligiblePlayers().contains(currentPlayer)) {
+                    matchedOpportunity = opportunity;
+                    break;
+                }
+            }
+
+            if (matchedOpportunity != null) {
+                queue.remove(matchedOpportunity);
+
+                PlayerGameKey key = new PlayerGameKey(
+                        currentPlayer,
+                        game
+                );
+
+                reactions.merge(key, 1, Integer::sum);
+            }
+
+            /*
+             * Before opening the new opportunity, count this player's
+             * opportunity from the previous event as resolved.
+             *
+             * Every eligible player gets an opportunity when a chat happens.
+             */
+            if (!queue.isEmpty()) {
+                // No action needed here; unresolved opportunities remain open.
+            }
+
+            /*
+             * The current chat creates a NEW opportunity for every other
+             * player currently participating in the game.
+             */
+            Set<String> eligiblePlayers = new LinkedHashSet<>(players);
+            eligiblePlayers.remove(currentPlayer);
+
+            if (!eligiblePlayers.isEmpty()) {
+                queue.addLast(new ChatOpportunity(
+                        game,
+                        currentPlayer,
+                        eligiblePlayers
+                ));
+
+                for (String eligiblePlayer : eligiblePlayers) {
+                    PlayerGameKey key = new PlayerGameKey(
+                            eligiblePlayer,
+                            game
+                    );
+
+                    opportunities.merge(key, 1, Integer::sum);
+                }
+            }
+        }
+
+        List<PlayerChatReactivity> result = new ArrayList<>();
+
+        Set<PlayerGameKey> keys = new HashSet<>(opportunities.keySet());
+        keys.addAll(reactions.keySet());
+
+        for (PlayerGameKey key : keys) {
+            if (playerName != null
+                    && !playerName.equals(key.playerName())) {
+                continue;
+            }
+
+            int opportunityCount =
+                    opportunities.getOrDefault(key, 0);
+
+            int reactionCount =
+                    reactions.getOrDefault(key, 0);
+
+            int missed = opportunityCount - reactionCount;
+
+            double score = opportunityCount == 0
+                    ? 0.0
+                    : (double) reactionCount / opportunityCount;
+
+            result.add(new PlayerChatReactivity(
+                    key.playerName(),
+                    key.gameName(),
+                    opportunityCount,
+                    reactionCount,
+                    missed,
+                    score
+            ));
+        }
+
+        return result.stream()
+                .sorted(
+                        Comparator
+                                .comparingDouble(
+                                        PlayerChatReactivity::score
+                                )
+                                .reversed()
+                                .thenComparing(
+                                        PlayerChatReactivity::reactions,
+                                        Comparator.reverseOrder()
+                                )
+                )
+                .toList();
+    }
+
+    public record PlayerMetricDto(
+            OffsetDateTime
+            timestamp,
+            String playerName,
+            String gameName,
+            boolean didCommand,
+            boolean didChat,
+            Boolean didPing) {
+    }
+
+    public record CommandMetricDto(
+            OffsetDateTime timestamp,
+            String status,
+            String playerName,
+            String gameName,
+            String command) {
+    }
+
+    public record JolFacts(
+            List<Long> activeGames,
+            List<String> activeChangeMonth,
+            List<Long> tournamentGames,
+            List<String> activeTourChangeMonth,
+            Long pastGames,
+            Long pastTournament,
+            Long decks,
+            Map<String, Long> gamesByPlayer,
+            Map<String, Long> pastByPlayer,
+            Map<String, Long> tournamentsByPlayer,
+            Map<String, Long> pastTournamentByPlayer,
+            Map<String, Long> oustedByPlayer,
+            Map<String, Long> decksByPlayer,
+            Map<String, Long> nationsByPlayer,
+            List<MonthlyActivityDto> monthlyActivity,
+            OverallOverviewDto overallOverviewDto,
+            Map<String, Long> peakActivityDays,
+            Map<String, Long> peakActivityHours,
+            PlayerActivityOverviewDto playerActivityOverviewDto,
+            List<ChatCommandRatioDto> chatCommandRatioDto,
+            List<List<Map.Entry<String, Long>>> top3PlayersByWins,
+            List<List<Map.Entry<String, Long>>> top3DecksByWins,
+            List<List<Map.Entry<String, Long>>> top3NationsByWins,
+            List<PlayerSimilarity> similarPlayers,
+            List<PlayerReactivity> reactions,
+            List<PlayerChatReactivity> chatReactions) {
     }
 
     public record MonthlyActivityDto(
@@ -709,11 +1062,14 @@ public class MetricsService {
             Map<String, String> topPlayers
     ) {
     }
+
     private record PlayerStats(
             long events,
             long chat,
             long command
-    ) {}
+    ) {
+    }
+
     public record OverallOverviewDto(
             long totalActivity,
             long totalChat,
@@ -725,6 +1081,7 @@ public class MetricsService {
             List<Long> mostActiveGameEvents
     ) {
     }
+
     public record PlayerActivityOverviewDto(
             String playerName,
             long totalActivity,
@@ -736,6 +1093,7 @@ public class MetricsService {
             Map<String, Long> mostActiveHours
     ) {
     }
+
     public record ChatCommandRatioDto(
             String playerName,
             double ratio,
@@ -743,4 +1101,32 @@ public class MetricsService {
             long command
     ) {
     }
+
+    public record PlayerSimilarity(
+            String playerName,
+            int sharedHours,
+            int yourActiveHours,
+            int theirActiveHours,
+            double jaccardScore,
+            double yourOverlapScore
+    ) {
+    }
+
+    public record PlayerReactivity(
+            String playerName,
+            String gameName,
+            int reactions,
+            int totalReactions,
+            double score
+    ) {}
+
+    public record PlayerChatReactivity(
+            String playerName,
+            String gameName,
+            int opportunities,
+            int reactions,
+            int missed,
+            double score
+    ) {}
+
 }

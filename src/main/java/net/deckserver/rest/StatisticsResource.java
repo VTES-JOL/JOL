@@ -51,6 +51,20 @@ public class StatisticsResource {
     public Map<YearMonth, StatisticsService.JolStats> getStatsJolMonth(StatsRequest body) {
         return StatisticsService.getJolStats(HistoryService.getHistory().values(), body);
     }
+
+    @POST
+    @Path("/jol/hour")
+    public Map<String, Long> getActivityPerHour(StatsRequest body) {
+        //action per hours
+        return MetricsService.loadMetrics().stream()
+                .filter(game -> StatisticsService.isInDateRange(game.timestamp().toLocalDate(), body))
+                .filter(game -> !body.isTourney() || StatisticsService.isTournamentGame(game.gameName()))
+                .collect(Collectors.groupingBy(
+                        m -> m.timestamp().toLocalDate().toString(),
+                        TreeMap::new,
+                        Collectors.counting()
+                ));
+    }
     @POST
     @Path("/jol/clans")
     public Map<String, Long> getStatsJolClans(StatsRequest body) {

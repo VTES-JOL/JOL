@@ -53,6 +53,9 @@
                             <div style="height: 350px;">
                                 <canvas id="jolChart"></canvas>
                             </div>
+                            <div style="height: 350px;">
+                                <canvas id="jolAction"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>

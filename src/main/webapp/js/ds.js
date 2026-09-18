@@ -110,6 +110,7 @@ const DS = {
     statsPerOpponent:        (playerName, treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/performance/${_enc(playerName)}/players`, {treshold, fromDate, toDate, isTourney}, opts),
     statsPerGame:            (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/games`, {treshold, fromDate, toDate, isTourney}, opts),
     statsJolMonth:           (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/jol/month`, {treshold, fromDate, toDate, isTourney}, opts),
+    statsJolHour:            (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/jol/hour`, {treshold, fromDate, toDate, isTourney}, opts),
     statsJolClans:           (treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/jol/clans`, {treshold, fromDate, toDate, isTourney}, opts),
     statsPerformanceDeck:    (playerName, treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/performance/${_enc(playerName)}/decks`, {treshold, fromDate, toDate, isTourney}, opts),
     statsReactionPlayer:     (playerName, treshold, fromDate, toDate, isTourney, opts) => apiPost(`/stats/reaction/${_enc(playerName)}`, {treshold, fromDate, toDate, isTourney}, opts),
@@ -3201,6 +3202,11 @@ function renderStats() {
             callback: (data) => {
                 createStatsJolMonth(data);
                 filterName('#statsJolGames tbody tr', 'monthFilter', 1);
+            }, errorHandler: errorhandler
+        });
+        DS.statsJolHour(0, fromDate, toDate, isTourney, {
+            callback: (data) => {
+                loadJolActionChart(data);
             }, errorHandler: errorhandler
         });
     } else if($('#jolReactionTab').hasClass('active')) {

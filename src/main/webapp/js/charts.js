@@ -42,6 +42,40 @@ function loadJolChart(data) {
     });
 }
 
+let jolActions;
+
+function loadJolActionChart(data) {
+    const hours = Object.keys(data);
+    const stats = Object.values(data);
+
+    if (jolActions) {
+        jolActions.destroy();
+    }
+
+    jolActions = new Chart(document.getElementById('jolAction'), {
+        type: 'line',
+        data: {
+            labels: hours,
+            datasets: [
+                {
+                    label: 'Events',
+                    data: stats,
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
 let personalChart;
 
 function loadPersonalChart(data) {
