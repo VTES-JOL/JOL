@@ -1,4 +1,4 @@
-import { memo, type MouseEvent } from 'react';
+import { memo, type KeyboardEvent, type MouseEvent } from 'react';
 import { Flame, Lock, Minus, Plus } from 'lucide-react';
 import type { CardSnapshot } from '../../api/types';
 import type { MenuAnchor } from './CardContextMenu';
@@ -73,6 +73,29 @@ export const MinionTile = memo(function MinionTile({
           openMenu(e);
         };
 
+  // F10: the tile-body click — the core click-to-act interaction — had no
+  // keyboard path. `e.target !== e.currentTarget` skips it when a nested
+  // real <button> (lock, counter +/-) already handled its own Enter/Space;
+  // those stopPropagation() on click, native or synthetic, same as pointer.
+  const tileKeyDown = tileClick
+    ? (e: KeyboardEvent<HTMLLIElement>) => {
+        if ((e.key !== 'Enter' && e.key !== ' ') || e.target !== e.currentTarget) return;
+        e.preventDefault();
+        if (onCardClick) {
+          onCardClick();
+        } else if (onAction) {
+          const r = e.currentTarget.getBoundingClientRect();
+          onAction({ coordinate, card, isChild: false }, { x: r.left + r.width / 2, y: r.top + r.height / 2 });
+        }
+      }
+    : undefined;
+  const tileInteractive = tileClick
+    ? { role: 'button' as const, tabIndex: 0, onKeyDown: tileKeyDown }
+    : {};
+  const focusRing = tileClick
+    ? 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent'
+    : '';
+
   const quick = onQuick
     ? (kind: QuickKind) => (e: MouseEvent) => {
         e.stopPropagation();
@@ -103,10 +126,11 @@ export const MinionTile = memo(function MinionTile({
     return (
       <li
         data-card-instance={card.id}
-        className={`group list-none rounded border ${border} bg-hover/40 px-1.5 py-1`}
+        className={`group list-none rounded border ${border} bg-hover/40 px-1.5 py-1 ${focusRing}`}
         onClick={tileClick}
         onContextMenu={tileContextMenu}
         style={tileClick ? { cursor: 'pointer' } : undefined}
+        {...tileInteractive}
       >
         <div className="flex items-baseline gap-1.5">
           <span className="shrink-0 select-all text-[0.7rem] tabular-nums text-ink-muted">{coordinate}</span>
@@ -142,10 +166,11 @@ export const MinionTile = memo(function MinionTile({
   return (
     <li
       data-card-instance={card.id}
-      className={`group list-none rounded-md border ${border} bg-hover/40 p-2`}
+      className={`group list-none rounded-md border ${border} bg-hover/40 p-2 ${focusRing}`}
       onClick={tileClick}
       onContextMenu={tileContextMenu}
       style={tileClick ? { cursor: 'pointer' } : undefined}
+      {...tileInteractive}
     >
       {/* identity row */}
       <div className="flex items-start gap-1.5">

@@ -5,8 +5,10 @@ import { JudgeRequestModal } from './JudgeRequestModal';
 
 // The "Call Judge" / "Judge Called" control + its request modal, together. Lives
 // in the HUD's right-hand cluster next to Notes / History (Main.dc.html), not in
-// the Commands panel. Shown to seated players, judges, and anyone who can see an
-// open request.
+// the Commands panel. Shown to seated players and to anyone who can see an open
+// request — NOT to a judge themselves (F7: a judge doesn't summon themselves;
+// a judge already reviewing an open request has the request modal available to
+// close/answer it via other surfaces, not this "call for help" button).
 export function CallJudgeButton({
   gameId,
   game,
@@ -23,6 +25,11 @@ export function CallJudgeButton({
   const [open, setOpen] = useState(false);
   const request = game.judgeRequest;
 
+  // A judge can't summon themselves, so hide the button when there's nothing
+  // open — but keep it (as "Judge Called") once a request exists, since this
+  // is also how a judge opens the modal to resolve it. A spectator similarly
+  // can't start a request, only see one that's already open.
+  if (game.judge && !request) return null;
   if (!game.player && !game.judge && !request) return null;
 
   return (

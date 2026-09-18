@@ -1,4 +1,4 @@
-import type { MouseEvent } from 'react';
+import type { KeyboardEvent, MouseEvent } from 'react';
 import type { CardSnapshot } from '../../api/types';
 import { CardHidden } from './CardHidden';
 import { Clan } from './Clan';
@@ -25,12 +25,33 @@ export function CardSimple({
   const regionStyle = region === 'REMOVED_FROM_GAME' ? 'opacity-50' : '';
   const faceDownStyle = card.faceDown ? 'opacity-60' : '';
 
+  // F10: keyboard path for the click-to-act tile. Callers position the
+  // action menu off e.clientX/clientY, so a keyboard activation fakes those
+  // from the tile's own centre.
+  const onKeyDown = onClick
+    ? (e: KeyboardEvent<HTMLLIElement>) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        const r = e.currentTarget.getBoundingClientRect();
+        onClick({
+          clientX: r.left + r.width / 2,
+          clientY: r.top + r.height / 2,
+          stopPropagation: () => {},
+          preventDefault: () => {},
+        } as unknown as MouseEvent);
+      }
+    : undefined;
+
   return (
     <li
-      className={`flex justify-between items-center p-1 ${regionStyle} ${faceDownStyle}`}
+      className={`flex justify-between items-center p-1 ${regionStyle} ${faceDownStyle} ${
+        onClick ? 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent' : ''
+      }`}
       onClick={onClick}
       onContextMenu={onContextMenu}
+      onKeyDown={onKeyDown}
       style={onClick ? { cursor: 'pointer' } : undefined}
+      {...(onClick ? { role: 'button' as const, tabIndex: 0 } : {})}
     >
       <div className="mx-1 me-auto w-full">
         <div className="flex justify-between items-center w-full">

@@ -1,4 +1,4 @@
-import { memo, type MouseEvent } from 'react';
+import { memo, type KeyboardEvent, type MouseEvent } from 'react';
 import { Square } from 'lucide-react';
 import type { CardSnapshot } from '../../api/types';
 
@@ -25,12 +25,31 @@ export const CardHidden = memo(function CardHidden({
   onContextMenu?: (e: MouseEvent) => void;
 }) {
   const regionStyle = region === 'REMOVED_FROM_GAME' ? 'opacity-50' : '';
+  // F10: same keyboard-activation fake as CardSimple — callers key an action
+  // menu's position off e.clientX/clientY.
+  const onKeyDown = onClick
+    ? (e: KeyboardEvent<HTMLLIElement>) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        const r = e.currentTarget.getBoundingClientRect();
+        onClick({
+          clientX: r.left + r.width / 2,
+          clientY: r.top + r.height / 2,
+          stopPropagation: () => {},
+          preventDefault: () => {},
+        } as unknown as MouseEvent);
+      }
+    : undefined;
   return (
     <li
-      className={`flex justify-between items-center p-1 ${regionStyle}`}
+      className={`flex justify-between items-center p-1 ${regionStyle} ${
+        onClick ? 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent' : ''
+      }`}
       onClick={onClick}
       onContextMenu={onContextMenu}
+      onKeyDown={onKeyDown}
       style={onClick ? { cursor: 'pointer' } : undefined}
+      {...(onClick ? { role: 'button' as const, tabIndex: 0 } : {})}
     >
       <div className="mx-1 me-auto w-full">
         <div className="flex justify-between items-center w-full">

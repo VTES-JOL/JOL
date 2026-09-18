@@ -27,7 +27,7 @@ const meta = {
   component: ActQuickBar,
   parameters: { layout: 'padded' },
   decorators: [(Story) => <div className="w-[420px] max-w-full"><Story /></div>],
-  args: { onCommand: fn(), me, players: [me, ...opponents] },
+  args: { onCommand: fn(), me, players: [me, ...opponents], hasEdge: true },
 } satisfies Meta<typeof ActQuickBar>;
 
 export default meta;

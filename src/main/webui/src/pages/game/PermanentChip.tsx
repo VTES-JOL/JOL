@@ -1,4 +1,4 @@
-import { memo, type MouseEvent } from 'react';
+import { memo, type KeyboardEvent, type MouseEvent } from 'react';
 import { Lock } from 'lucide-react';
 import type { CardSnapshot } from '../../api/types';
 import type { MenuAnchor } from './CardContextMenu';
@@ -57,14 +57,32 @@ export const PermanentChip = memo(function PermanentChip({
       }
     : null;
 
+  // F10: same pattern as MinionTile — the nested lock <button> stopPropagates
+  // its own click (native and synthetic-from-keyboard alike), so this only
+  // fires for a direct Enter/Space on the row itself.
+  const rowKeyDown = rowClick
+    ? (e: KeyboardEvent<HTMLLIElement>) => {
+        if ((e.key !== 'Enter' && e.key !== ' ') || e.target !== e.currentTarget) return;
+        e.preventDefault();
+        if (onCardClick) {
+          onCardClick();
+        } else if (onAction) {
+          const r = e.currentTarget.getBoundingClientRect();
+          onAction({ coordinate, card, isChild: false }, { x: r.left + r.width / 2, y: r.top + r.height / 2 });
+        }
+      }
+    : undefined;
+
   return (
     <li
       className={`group flex list-none items-center gap-1.5 self-start rounded border px-2 py-1 text-sm ${
         card.contested ? 'border-gold bg-gold/10' : card.locked ? 'border-accent bg-accent/5' : 'border-line-accent bg-hover/40'
-      }`}
+      } ${rowClick ? 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent' : ''}`}
       onClick={rowClick}
       onContextMenu={rowContextMenu}
+      onKeyDown={rowKeyDown}
       style={rowClick ? { cursor: 'pointer' } : undefined}
+      {...(rowClick ? { role: 'button' as const, tabIndex: 0 } : {})}
     >
       <span className="shrink-0 select-all text-xs tabular-nums text-ink-muted">{coordinate}</span>
       <a

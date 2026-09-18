@@ -40,6 +40,7 @@ import { BottomSheet } from './game/BottomSheet';
 import { MobileTabBar, type MobileTab } from './game/MobileTabBar';
 import { TargetPicker } from './game/TargetPicker';
 import { findCardByCoordinate, findCardByCommandCoordinate } from './game/coordinates';
+import { MessageSquare } from 'lucide-react';
 import { buildPlayCommand, cardActions, type HandCardContext, type Submission, type TableCardContext } from './game/cardCommands';
 import './GamePage.css';
 
@@ -96,6 +97,11 @@ export function GamePage() {
   // bottom sheet, 'table' = no sheet. The chat sheet stays mounted (its scroll
   // survives close-reopen); hand/act are cheap to remount.
   const [mobileTab, setMobileTab] = useState<MobileTab>('table');
+  // F2: the 768–1023 band (mid, not mobile) also moves chat out of the
+  // scrolling column and into a sheet — three fighting scrollers (opponents /
+  // chat / dock) all lost at this height. Same BottomSheet the mobile Log tab
+  // uses, own open flag since there's no tab bar at this width.
+  const [midChatOpen, setMidChatOpen] = useState(false);
   const [seenChatLen, setSeenChatLen] = useState(0);
   const [playModal, setPlayModal] = useState<{ ctx: HandCardContext; card: CardSnapshot } | null>(null);
   const [cardMenu, setCardMenu] = useState<{ ctx: TableCardContext; anchor: MenuAnchor } | null>(null);
@@ -113,9 +119,15 @@ export function GamePage() {
   // The narrow end of the wide range — 4 opponents fold to a 2×2 grid here
   // rather than four cramped columns.
   const midWide = useMediaQuery('(min-width: 1024px) and (max-width: 1399px)');
+  // F11: past this the seated player's rail can afford Chat + History side by
+  // side too, same as a judge/spectator already gets at every wide width.
+  const superWide = useMediaQuery('(min-width: 1700px)');
   const isMobile = useIsMobile();
   // Draggable opponents / dock split (wide layout only), remembered per game.
-  const { topPercent, containerRef, dividerProps } = useResizableSplit(`jol-split:${gameId ?? 'none'}`);
+  // F4: default the opponents pane taller (62%, was 50%) — at the old default
+  // a 4-opponent board clipped its last minion row before the dock even
+  // competed for space.
+  const { topPercent, containerRef, dividerProps } = useResizableSplit(`jol-split:${gameId ?? 'none'}`, { initial: 62 });
   // §6c — image-free card mode. On when the player turned image tooltips off,
   // or always below md (no hover on touch). Provided to the whole board tree.
   const nav = useNav();
@@ -161,11 +173,13 @@ export function GamePage() {
     return () => clearTimeout(t);
   }, [pendingTargetId, pendingKey]);
 
-  // Drives the Log tab's unread dot. `seenChatLen` is set (in the tab handler)
-  // to the line count when the Log sheet is opened; a new turn shrinks
-  // game.chat, so clamp before comparing — no effect needed.
+  // Drives the Log tab/toggle's unread dot (mobile tab bar and the mid-band
+  // sheet toggle both use it). `seenChatLen` is set to the line count when
+  // either sheet opens; a new turn shrinks game.chat, so clamp before
+  // comparing — no effect needed.
   const chatLen = game?.chat.length ?? 0;
-  const logUnread = mobileTab !== 'log' && chatLen > Math.min(seenChatLen, chatLen);
+  const logSheetOpen = mobileTab === 'log' || midChatOpen;
+  const logUnread = !logSheetOpen && chatLen > Math.min(seenChatLen, chatLen);
 
   // Shared optimistic POST wrapper (D15 silent reconcile): pre-write the cache,
   // fire the request, overwrite with server truth on return, roll back only on
@@ -411,12 +425,13 @@ export function GamePage() {
     </div>
   );
 
-  // Talk rail: Chat + History side by side only for a spectator / judge (no
-  // dock competing for the width). A seated player always gets the single
-  // combined panel with the HUD History toggle switching Chat / History, at
-  // every resolution.
+  // Talk rail: Chat + History side by side for a spectator / judge (no dock
+  // competing for the width) always, and for a seated player too past
+  // `superWide` (F11) — below that a seated player gets the single combined
+  // panel with the HUD History toggle switching Chat / History.
+  const splitRail = (!me || superWide) && !showHistory;
   const railContent =
-    !me && !showHistory ? (
+    splitRail ? (
       <div className="flex min-h-0 flex-1 gap-2">
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-line bg-surface/20">
           <div className="flex flex-1 min-h-0 flex-col">
@@ -431,6 +446,25 @@ export function GamePage() {
     ) : (
       chatPanel
     );
+
+  // F6: a judge isn't seated (`me` is null), so gets none of the seated dock's
+  // command band — despite the backend's submit already accepting a judge's
+  // commands (`canJudge`). Give an unseated judge a standalone command input
+  // in the rail, wide and mid bands (the mobile Act sheet already covers this
+  // via DockCommandStack, which now also gates on `game.judge`).
+  const judgeCommandBar = game.judge && !me && (
+    <div className="mt-2 shrink-0 border-t border-line pt-2">
+      <CommandForm
+        gameId={gameId}
+        game={game}
+        viewerName={viewerName}
+        onUpdated={applyUpdate}
+        captureStatus={captureStatus}
+        submitting={submitting}
+        guard={guard}
+      />
+    </div>
+  );
 
   return (
     <TextModeContext.Provider value={textMode}>
@@ -463,7 +497,14 @@ export function GamePage() {
         onToggleHistory={() => setShowHistory((v) => !v)}
       />
 
-      <div id="table-row" className="flex flex-1 min-h-0 min-w-0">
+      {/* F1: the table is not an "atmosphere" page — it's mostly bare gutter
+          (dock foot, board gaps, the space between seat rows) with no plate
+          over it, so RouteBackground's photo dominates instead of settling
+          into the corners. Opaque ground here opts the whole play area out.
+          F8: past ~1800px nothing keyed off the extra width — seats just grew
+          wider and the rail stayed a fixed size, so it was pure gutter, not
+          information. Cap + centre instead of pretending to scale further. */}
+      <div id="table-row" className="mx-auto flex w-full min-w-0 min-h-0 max-w-[1800px] flex-1 bg-base">
         <div id="table-col" className="flex flex-col flex-1 min-h-0 min-w-0 p-2" ref={boardRef}>
           {isMobile ? (
             <>
@@ -514,12 +555,12 @@ export function GamePage() {
             <>
               {/* Board state fills the top; your seat + hand + commands dock at
                   the foot of the column (Main.dc.html), so the state above no
-                  longer scrolls past a fixed top control band. Opponents and the
-                  dock share the column height 3:2 (was a fixed 44vh cap on the
-                  dock — cramped below ~1300px, D25); each has a rem floor and
-                  scrolls internally, so the command band is reachable at any
-                  window height. */}
-              <div id="opponents" className="game-board flex-[3_1_0%] min-h-[7rem] overflow-y-auto">
+                  longer scrolls past a fixed top control band. F2: chat moved
+                  out of this column into a sheet (below) — at 768–1023 it was
+                  a third scroller fighting #opponents and the dock for a share
+                  of a short viewport, so opponents now gets the whole column
+                  above the dock instead of a 3:2 split. */}
+              <div id="opponents" className="game-board flex-1 min-h-[7rem] overflow-y-auto">
                 {/* NF5 (D32): auto-fill instead of fixed column counts, so a
                     4-opponent game at ≥1280px doesn't leave a dead 5th column
                     (finding #6's own sketch). Cards size to a ~17rem min and
@@ -528,15 +569,20 @@ export function GamePage() {
               </div>
 
               {!wideLayout && (
-                // NF1 (D32): a real flex participant, not `shrink-0 max-h-[45vh]`
-                // — in the 768–1023 band that fixed block unconditionally took
-                // ~45vh and starved #opponents to its rem floor. Now it shares
-                // the leftover column height with #opponents 1 : 3 (the dock
-                // below is content-sized — NF6), with its own 7rem floor and a
-                // 35vh ceiling so it never balloons.
-                <div className="mt-2 flex flex-[1_1_0%] min-h-[7rem] max-h-[35vh] flex-col overflow-hidden">
-                  {chatPanel}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSeenChatLen(chatLen);
+                    setMidChatOpen(true);
+                  }}
+                  className="relative mt-2 flex shrink-0 items-center gap-1.5 self-start rounded-md border border-line bg-surface/40 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-ink-muted hover:bg-hover hover:text-ink"
+                >
+                  <MessageSquare size={14} />
+                  Table talk
+                  {logUnread && (
+                    <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-accent" aria-hidden />
+                  )}
+                </button>
               )}
 
               {/* NF6 (D32): the dock sizes to its content (your board + hand +
@@ -544,6 +590,7 @@ export function GamePage() {
                   own-board no longer leaves ~120px dead space above the hand
                   band; the slack goes back to #opponents (flex-[3]). */}
               <div className="mt-2 flex shrink-0 min-h-[13rem] max-h-[55vh] flex-col overflow-hidden border-t-2 border-line-accent pt-2">
+                {judgeCommandBar}
                 {me && (
                   <YourSeatDock
                     player={me}
@@ -590,14 +637,24 @@ export function GamePage() {
         {wideLayout && (
           <div
             id="talk-rail"
-            className={`flex shrink-0 flex-col min-h-0 p-2 pl-0 ${
-              !me && !showHistory ? 'w-[40rem]' : 'w-[30rem]'
-            }`}
+            className={`flex shrink-0 flex-col min-h-0 p-2 pl-0 ${splitRail ? 'w-[40rem]' : 'w-[30rem]'}`}
           >
             {railContent}
+            {judgeCommandBar}
           </div>
         )}
       </div>
+
+      {!isMobile && !wideLayout && (
+        <BottomSheet
+          open={midChatOpen}
+          onClose={() => setMidChatOpen(false)}
+          label="Table talk"
+          maxHeightClass="max-h-[80vh]"
+        >
+          <div className="flex min-h-0 flex-1 flex-col px-2 pb-2">{chatPanel}</div>
+        </BottomSheet>
+      )}
 
       {isMobile && (
         <>

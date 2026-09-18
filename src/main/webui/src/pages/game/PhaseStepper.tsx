@@ -28,8 +28,14 @@ export function PhaseStepper({
       role="group"
       aria-label="Turn phase"
       aria-disabled={!canSelect}
-      className={`inline-flex items-center rounded-full border border-line px-1 py-0.5 text-xs ${
-        active ? '' : 'opacity-55'
+      // F17: the "not your turn" cue used to be a flat opacity-55 wash over
+      // the whole group, which stacked on top of --jt-ink-muted (already
+      // tuned to just clear AA on its own — see tailwind.css) and dropped
+      // past-phase text below it. The muted/secondary text tokens are
+      // contrast-safe as-is, so dim only the border (decorative) instead of
+      // the text; the current-phase pill stays full accent/white either way.
+      className={`inline-flex items-center rounded-full border px-1 py-0.5 text-xs ${
+        active ? 'border-line' : 'border-line/60'
       }`}
     >
       {PHASES.map((phase, i) => {

@@ -126,11 +126,19 @@ describe('CommandForm', () => {
     expect(screen.getByRole('button', { name: 'End Turn' })).toBeDisabled();
   });
 
-  it('renders nothing for a viewer who cannot play', () => {
+  it('renders nothing for a spectator (neither player nor judge)', () => {
     const { container } = render(
-      <TestHarness gameId="g1" game={makeGame({ player: false, judge: true })} viewerName="Judge1" onUpdated={vi.fn()} />,
+      <TestHarness gameId="g1" game={makeGame({ player: false, judge: false })} viewerName="Watcher1" onUpdated={vi.fn()} />,
     );
     expect(container.querySelector('#commandForm')).toBeNull();
+  });
+
+  it('gives a judge the command input but not End Turn (F6)', () => {
+    render(
+      <TestHarness gameId="g1" game={makeGame({ player: false, judge: true })} viewerName="Judge1" onUpdated={vi.fn()} />,
+    );
+    expect(screen.getByPlaceholderText('Enter game commands')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'End Turn' })).not.toBeInTheDocument();
   });
 
   it("keeps a rejected command's status visible across a stale game-prop refresh", async () => {

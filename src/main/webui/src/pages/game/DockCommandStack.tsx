@@ -57,6 +57,11 @@ export function DockCommandStack({
     </div>
   );
 
+  // F13: "Burn edge" only actually applies while the viewer holds the edge —
+  // same "no one" sentinel TableHud guards against.
+  const rawEdge = game.edgePlayer?.trim();
+  const hasEdge = !!viewerName && !!rawEdge && rawEdge.toLowerCase() !== 'no one' && rawEdge === viewerName;
+
   const quickBar = game.player && (
     <ActQuickBar
       phase={game.phase}
@@ -65,6 +70,7 @@ export function DockCommandStack({
       me={me}
       players={game.players}
       onCommand={onCommand}
+      hasEdge={hasEdge}
     />
   );
 

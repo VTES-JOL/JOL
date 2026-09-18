@@ -22,6 +22,13 @@ function shortDuration(iso: string): string {
   return `${Math.floor(hrs / 24)}d`;
 }
 
+// F16: past this the "waiting" chip escalates from routine gold to a stale
+// blood treatment. Kept alongside shortDuration (also a Date.now() wrapper)
+// so the impure call stays out of the component body.
+function isStale(iso: string, thresholdMs: number): boolean {
+  return Date.now() - new Date(iso).getTime() > thresholdMs;
+}
+
 const CHIP = 'inline-flex items-center gap-1 rounded-full border border-line-accent px-2 py-0.5 text-xs text-ink-secondary hover:bg-hover';
 
 // Persistent turn/phase ribbon (Main.dc.html HUD): game · turn · active seat ·
@@ -75,6 +82,10 @@ export function TableHud({
   const activePlayer = game.players.find((p) => p.name === game.currentPlayer);
   const lastActionAt = activePlayer?.lastActionAt;
   const waiting = lastActionAt ? shortDuration(lastActionAt) : null;
+  // F16: a 5-minute wait and a 1-day wait read as the same gold chip
+  // otherwise — escalate past a stale threshold so a long-abandoned turn
+  // stands out instead of blending into routine "someone's thinking" gold.
+  const waitingStale = !!lastActionAt && isStale(lastActionAt, 24 * 60 * 60 * 1000);
 
   // `game.edgePlayer` serialises the literal "no one" when unclaimed (truthy),
   // so guard for it explicitly alongside empty/undefined.
@@ -111,7 +122,10 @@ export function TableHud({
         </span>
       )}
       {waiting && !isMyTurn && (
-        <span className="inline-flex items-center gap-1 text-xs text-gold" title={lastActionAt ?? undefined}>
+        <span
+          className={`inline-flex items-center gap-1 text-xs ${waitingStale ? 'font-semibold text-blood' : 'text-gold'}`}
+          title={lastActionAt ?? undefined}
+        >
           <Clock size={11} />
           waiting {waiting}
         </span>

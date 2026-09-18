@@ -82,7 +82,8 @@ p.chat.chat-system {
     color: var(--jt-ink-muted);
     font-style: italic;
     border-left: 2px solid var(--jt-line);
-    padding-left: 0.5rem;
+    padding-left: 1.35rem;
+    text-indent: 0;
 }
 
 /* Every log line: hanging indent so a wrapped line's continuation aligns under

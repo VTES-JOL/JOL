@@ -54,6 +54,7 @@ export const ActQuickBar = memo(function ActQuickBar({
   me,
   players,
   onCommand,
+  hasEdge,
 }: {
   phase: string;
   isMyTurn: boolean;
@@ -61,6 +62,8 @@ export const ActQuickBar = memo(function ActQuickBar({
   me: PlayerSnapshot | null | undefined;
   players: PlayerSnapshot[];
   onCommand: (command: string) => void;
+  /** Whether the viewer currently holds the edge — "Burn edge" only applies then. */
+  hasEdge: boolean;
 }) {
   const [open, setOpen] = useState(true);
   if (!me) return null;
@@ -109,7 +112,13 @@ export const ActQuickBar = memo(function ActQuickBar({
             <button type="button" className={NEUTRAL} onClick={() => onCommand('edge')} title="Take / keep the Edge">
               Edge
             </button>
-            <button type="button" className={RED} onClick={() => onCommand('edge burn')}>
+            <button
+              type="button"
+              className={hasEdge ? RED : NEUTRAL}
+              disabled={!hasEdge}
+              title={hasEdge ? undefined : "You don't hold the edge"}
+              onClick={() => onCommand('edge burn')}
+            >
               Burn edge
             </button>
             <button type="button" className={NEUTRAL} onClick={() => onCommand('draw')}>

@@ -9,14 +9,18 @@ import type { PlayerSnapshot } from '../../api/types';
 //    grow to fill the row, plain prey-first order.
 //  - variant="counted"  — the wide layout: a player-count- and width-aware
 //    fixed column count. At the narrow end of the wide range (`midWide`) a
-//    4-opponent game folds to 2×2 with the seats you act on flanking your
-//    dock: prey (bottom-left) · cross-table (top row) · predator (bottom-right).
+//    4-opponent game folds to 2×2. #opponents scrolls at this breakpoint
+//    (F3/D32), so whichever row lands first is the row that's guaranteed
+//    visible without scrolling — that has to be prey/predator, the seats a
+//    player actually acts on and defends against, not the cross-table seats.
+//    Physical-table framing preserved by prominence rather than position:
+//    prey (top-left) · predator (top-right) · cross-table (below, scrolls).
 
 export type SeatGridVariant = 'autofill' | 'counted';
 
 function countedLayout(seats: PlayerSnapshot[], midWide: boolean): { ordered: PlayerSnapshot[]; cols: number } {
   const twoWide = midWide && seats.length >= 4;
-  const ordered = twoWide ? [...seats.slice(1, -1), seats[0], seats[seats.length - 1]] : seats;
+  const ordered = twoWide ? [seats[0], seats[seats.length - 1], ...seats.slice(1, -1)] : seats;
   const cols = twoWide
     ? 2
     : seats.length >= 5

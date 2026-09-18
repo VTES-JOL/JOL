@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Zap } from 'lucide-react';
 import { api } from '../../api/client';
 import type { GameSnapshot } from '../../api/types';
 import { QuickCommandModal } from './QuickCommandModal';
@@ -9,8 +10,11 @@ import { submitHeaders } from './submitId';
 
 // The command controls as a single horizontal band — quick-command · input ·
 // ping · Submit · End Turn — sitting level with the hand chips in the dock
-// (Main.dc.html). Seated-player only; Call Judge / Notes / History moved to the
-// HUD (D26), table talk to ChatCompose (D24), phase to the HUD stepper (C4).
+// (Main.dc.html). Seated player, or a judge (F6: the backend's `submit`
+// already accepts a judge's commands — canJudge — the table just gave them
+// no way to issue one; a judge gets the input + Submit but not End Turn,
+// which isn't theirs to use). Call Judge / Notes / History moved to the HUD
+// (D26), table talk to ChatCompose (D24), phase to the HUD stepper (C4).
 export function CommandForm({
   gameId,
   game,
@@ -106,7 +110,7 @@ export function CommandForm({
     ).finally(() => setEndingTurn(false));
   };
 
-  if (!game.player) return null;
+  if (!game.player && !game.judge) return null;
 
   return (
     <>
@@ -125,9 +129,10 @@ export function CommandForm({
           title="Quick commands"
           disabled={submitting}
           onClick={() => setShowQuickCommand(true)}
-          className="inline-flex min-h-11 min-w-11 md:min-h-0 md:min-w-0 shrink-0 items-center justify-center rounded border border-line-accent px-2 text-sm leading-none text-ink-muted hover:text-ink disabled:opacity-40"
+          className="inline-flex min-h-11 md:min-h-0 shrink-0 items-center gap-1 rounded border border-line-accent px-2 text-sm leading-none text-ink-muted hover:text-ink disabled:opacity-40"
         >
-          …
+          <Zap size={14} />
+          <span className="hidden lg:inline text-xs font-medium">Quick</span>
         </button>
         <input
           id="command"
@@ -140,16 +145,19 @@ export function CommandForm({
         <Button variant="primary" size="sm" type="submit" disabled={submitting} className="min-h-11 md:min-h-0">
           {submitting ? 'Submitting…' : 'Submit'}
         </Button>
-        <Button
-          variant="secondary"
-          size="sm"
-          type="button"
-          disabled={!isMyTurn || submitting || endingTurn}
-          onClick={endTurn}
-          className="min-h-11 md:min-h-0"
-        >
-          {endingTurn ? 'Ending turn…' : 'End Turn'}
-        </Button>
+        {game.player && (
+          <Button
+            variant="accent-ghost"
+            size="sm"
+            type="button"
+            disabled={!isMyTurn || submitting || endingTurn}
+            onClick={endTurn}
+            title={!isMyTurn ? 'Not your turn' : undefined}
+            className="min-h-11 border border-accent/40 disabled:border-line-accent disabled:text-ink-muted disabled:opacity-100 md:min-h-0"
+          >
+            {endingTurn ? 'Ending turn…' : 'End Turn'}
+          </Button>
+        )}
       </form>
       {showQuickCommand && <QuickCommandModal onSend={sendQuickCommand} onClose={() => setShowQuickCommand(false)} />}
     </>
