@@ -273,3 +273,152 @@ on counts; `memo` discipline so an opponent's action doesn't re‑render every b
 `ShanDow`'s theme was toggled to Nightshade Slate during the review and **restored
 to Light** via `PUT /jol/api/profile/theme`. No games or player rows mutated. Dev
 server left running.
+
+---
+
+## Follow-up review — 2026-09-18
+
+A fresh pass after implementing F1–F17 (F12, F15, F18–20 and §6a–c were left for
+later — see brief). Live in Chrome as **player** (`ShanDow`, seated,
+`6bffd3f9-…`), **judge** (`acbishop`, unseated on the same game), and **spectator**
+(`ShanDow` viewing `01c0df29-…`, a busier 5‑seat game she isn't registered in),
+light and Nightshade Slate dark, at the real native viewport (2560px — this
+machine's window would not resize smaller; see below) plus simulated 1200px
+(mid‑wide) and 390px (mobile) via a `matchMedia` shim + a width‑clamped `#root`
+with a forced SPA remount (client‑side nav away and back, not a hard reload, so
+the shim survives) — same technique and same limits as the original review:
+Tailwind's own `md:`/`lg:` CSS breakpoints don't follow the shim (only the
+page's `useMediaQuery`‑driven branches do), and `BottomSheet`'s
+`createPortal(document.body)` escapes the width clamp entirely, so the mobile
+Act/Hand/Log sheets were confirmed **functionally** (content present, right
+persona gating) but not **visually** at true phone width.
+
+### Status of the original findings
+
+| # | Status | Note |
+|---|---|---|
+| F1 | **Fixed**, but see **NF1** below | Opaque `bg-base` on `#table-row` works — *inside* the capped column. F8's cap reopened the same bug in the new side gutters. |
+| F2 | **Fixed** | Mid band (768–1023) confirmed live at simulated 900px: opponents fill the column, chat is a "Table Talk" sheet toggle with an unread dot. |
+| F3 | **Fixed (redesigned, not the literal reorder)** | Prey/predator now render first (top row) in the 2×2 mid‑wide fold, both seated and — harmlessly, see NF3 — unseated. Confirmed live at simulated 1200px. |
+| F4 | **Fixed** | Default opponents/dock split raised to 62%; not independently re‑measured against a specific clipping card this pass. |
+| F5 | **Fixed** | Chat SYSTEM lines no longer clip their first character (visually confirmed in the log). |
+| F6 | **Fixed** | Judge gets a command input — confirmed present at wide (rail), simulated mid (dock area), and functionally on the mobile Act sheet (portal, so unstyled-width but content correct); no End Turn button for a judge in any case. |
+| F7 | **Fixed** | Call Judge hidden for a judge with nothing open; unaffected spectator behavior (hidden unless a request is open) reconfirmed. |
+| F8 | **Fixed, but caused NF1** | Board caps at 1800px and centers past it — confirmed at native 2560px. |
+| F9 | **Fixed** | End Turn now legible (accent‑ghost + border) disabled *and* enabled, with a "Not your turn" tooltip. |
+| F10 | **Fixed** | Board tiles are real `role="button"` elements with a focus ring — confirmed via the accessibility tree (`read_page`), not a manual Tab‑through. |
+| F11 | **Fixed** | Confirmed at native 2560px (well past the 1700px threshold): seated player's rail shows Chat + History side by side, same as judge/spectator. |
+| F12 | **Not independently re‑measured.** | Believed substantially resolved as a side effect of F11 (the previously‑wide single panel now splits into two narrower ones), per the original implementation note. |
+| F13 | **Fixed** | "Burn edge" rendered neutral + disabled with a "You don't hold the edge" tooltip while the viewer holds no edge. |
+| F14 | **Fixed** | Quick‑command trigger now shows a lightning icon + "Quick" label instead of a bare "…". |
+| F15 | **Still open** | Direction was picked (larger card tiles, not new information) but not implemented. |
+| F16 | **Fixed** | "waiting 9d" rendered in bold blood‑red in the live game, well past the 24h threshold. |
+| F17 | **Fixed** | Phase stepper's inactive state no longer washes text in opacity; border‑only dimming reads clearly in both themes. |
+| F18–20 | **Partially reverified** | F18 (phase labels) and F20 (mobile bg bleed) look fine functionally; true device confirmation still open per the original caveat. F19 (mobile hand sheet) still not visually confirmable — portal issue, noted above. |
+| §6a/b/c | **Still deferred**, as directed. | |
+
+### New findings
+
+#### NF1 — F8's cap reintroduces F1's background bleed, in the new gutters
+**High** · all personas · viewports wider than 1800px · light + dark (live at
+2560px, `acbishop` and `ShanDow`/spectator)
+
+`#table-row` is `mx-auto flex w-full min-w-0 min-h-0 max-w-[1800px] flex-1
+bg-base` (`GamePage.tsx`) — the *same element* carries both the cap/centering
+and the opaque background. Past 1800px the box centers and its two side
+margins are outside that element entirely, so they fall back through to the
+transparent page root and `RouteBackground`'s fixed photo shows again — right
+back to the original F1 symptom, just relocated from "everywhere" to "the
+two new side columns." Confirmed at native 2560px in both themes; the dark
+veil helps but the image (a wrecked‑car/garage scene) is still clearly
+legible.
+
+Fix: split the concerns — an outer, full‑width wrapper carries `bg-base`
+(covers the whole route unconditionally), and only an *inner* wrapper gets
+`mx-auto max-w-[1800px]`. E.g. wrap the current `#table-row` children in a new
+inner `<div className="mx-auto w-full max-w-[1800px] flex-1 flex">` and move
+`bg-base` (plus `flex-1 min-h-0`) to `#table-row` itself, unconstrained.
+
+#### NF2 — HUD spans full width; the board it describes is now boxed
+**Medium** · all personas · viewports wider than 1800px · (live at 2560px)
+
+`TableHud` (the sticky top bar — game name, turn/phase, HUD meta cluster) has
+no width cap and runs edge‑to‑edge, while `#table-row` below it caps at
+1800px and centers. Past 1800px this reads as a full‑bleed header sitting
+above a letterboxed board — the game name/turn readout drifts to the far left
+while the seats it's describing sit in a centered column well to its right.
+Not broken, just visually incoherent once NF1 is fixed and the gutters go
+quiet instead of noisy.
+
+Fix (decide): cap+center `TableHud`'s *content* the same 1800px width (its
+own background can stay full‑bleed, like a page chrome bar), or intentionally
+keep the HUD full‑bleed and treat it as global chrome — but then the
+board's cap should probably be a touch more generous so the mismatch reads
+less like an accident.
+
+#### NF3 — Prey/predator reorder is inert (harmlessly) for judge/spectator
+**Low** · judge / spectator · mid‑wide (1024–1399) · (live, simulated 1200px)
+
+`SeatGrid`'s F3 fold reorders `seats[0]`/`seats[last]` to the top row on the
+assumption those are the viewer's prey/predator. For an unseated judge or
+spectator, `others` is just every player in table order (`seatOrder.ts`
+returns `{me: null, others: players}`), so "prey/predator first" actually
+means "first and last players in table order first" — a harmless no‑op
+that still produces a clean 2×2, just not the semantically prioritized one a
+seated player gets. Not worth special‑casing; noting it so a future reader
+doesn't mistake the fold's top row for a real relation label when `!me`.
+
+#### NF4 — Judge's command input has no label or quick‑action shortcuts
+**Low‑Med** · judge · all widths · (live, `acbishop`)
+
+F6 gives a judge a bare `CommandForm` (Quick trigger + free‑text input +
+Submit) sitting under the rail's Chat/History panels, with no heading —
+it's easy to miss it's a *distinct* control surface (issuing a live command
+to the game) rather than more chat/history chrome. It also has no
+`ActQuickBar` (by design — that bar is player‑only), so a judge correcting a
+mistagged lock or edge has to hand‑type the full command every time, unlike
+a player who gets one‑tap buttons for exactly those cases.
+
+Fix (decide): a small "Judge commands" label above the input at minimum;
+consider whether judges would benefit from their own quick‑action row
+(unlock all / edge / burn edge are all plausible correction tools) — flagged
+as a direction call, not a given.
+
+### Confirmed still correct (spot‑checked this pass)
+Spectator gets no command bar and no chat compose box (read‑only, as
+designed); spectator board tiles are not click‑interactive (no action menu
+opens) despite `SeatColumn` always wiring the click handlers — the gating
+happens deeper than `GamePage`, so F10's new keyboard path doesn't
+accidentally expose an affordance to a persona that shouldn't have one.
+
+### Implemented — 2026-09-18
+
+NF1, NF2, and NF4 were fixed, and **F11 was reverted by design decision**: the
+side‑by‑side Chat + History split is gone entirely, for every persona and
+every width — always a single panel with the HUD's Chat/History toggle, even
+where there was room to spare (judge/spectator's "always split" and the
+seated player's `superWide`‑gated split both removed; the `superWide` media
+query and `splitRail` branching are gone from `GamePage.tsx`).
+
+- **NF1** — `#table-row` is now the full‑width, uncapped element carrying
+  `bg-base`; the 1800px cap + centering moved to a new inner wrapper around
+  `#table-col`/`#talk-rail`. Confirmed live at native 2560px, light and dark:
+  solid background all the way to the true viewport edge, no photo bleed.
+- **NF2** — `TableHud`'s content (title/turn row, `PendingActionBar`, the
+  rejected‑command banner) now sits in an inner `mx-auto max-w-[1800px]`
+  wrapper; the bar's own background stays full‑bleed. Confirmed live: the HUD
+  now lines up with the board's left edge instead of running past it.
+- **NF4** — a small "Judge commands" label sits above the judge's command
+  input. Confirmed live (`acbishop`, dark theme).
+
+Verified: `tsc --noEmit` clean, `npm run lint` no new warnings, all 395
+frontend tests pass, backend `mvn compile` clean. Live-checked in Chrome as
+`ShanDow` (seated, native 2560px, light + Nightshade Slate) and `acbishop`
+(judge, same game) — no regressions found in F1–F17's prior fixes.
+
+NF3 needed no fix (informational only). F15 and F18–20's device-confirmation
+gaps remain open. §6a/b/c were investigated (not implemented) in a follow-up
+pass — see `game-page-section6-investigation.md`: §6a deferred (found to be
+mostly solved already), §6b has a measured root cause and a recommended
+fix (extend D15 optimistic pre-writes), §6c has a chosen data-path + surface
+design, neither b nor c built yet.

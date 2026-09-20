@@ -119,9 +119,6 @@ export function GamePage() {
   // The narrow end of the wide range — 4 opponents fold to a 2×2 grid here
   // rather than four cramped columns.
   const midWide = useMediaQuery('(min-width: 1024px) and (max-width: 1399px)');
-  // F11: past this the seated player's rail can afford Chat + History side by
-  // side too, same as a judge/spectator already gets at every wide width.
-  const superWide = useMediaQuery('(min-width: 1700px)');
   const isMobile = useIsMobile();
   // Draggable opponents / dock split (wide layout only), remembered per game.
   // F4: default the opponents pane taller (62%, was 50%) — at the old default
@@ -425,27 +422,13 @@ export function GamePage() {
     </div>
   );
 
-  // Talk rail: Chat + History side by side for a spectator / judge (no dock
-  // competing for the width) always, and for a seated player too past
-  // `superWide` (F11) — below that a seated player gets the single combined
-  // panel with the HUD History toggle switching Chat / History.
-  const splitRail = (!me || superWide) && !showHistory;
-  const railContent =
-    splitRail ? (
-      <div className="flex min-h-0 flex-1 gap-2">
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-line bg-surface/20">
-          <div className="flex flex-1 min-h-0 flex-col">
-            <GameChatPanel game={game} gameId={gameId} viewerName={viewerName} />
-          </div>
-          {canChat && <ChatCompose onSend={sendChat} disabled={submitting} />}
-        </div>
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-line bg-surface/20">
-          <HistoryPanel gameId={gameId} game={game} viewerName={viewerName} />
-        </div>
-      </div>
-    ) : (
-      chatPanel
-    );
+  // Talk rail: always the single combined panel with the HUD History toggle
+  // switching Chat / History — for every persona, at every width. A prior
+  // pass tried a side-by-side Chat+History split for judge/spectator (always)
+  // and for a seated player past a width threshold (F11); removed by design
+  // decision — a toggle reads more clearly than two half-width panels even
+  // when there's room to spare.
+  const railContent = chatPanel;
 
   // F6: a judge isn't seated (`me` is null), so gets none of the seated dock's
   // command band — despite the backend's submit already accepting a judge's
@@ -454,6 +437,12 @@ export function GamePage() {
   // via DockCommandStack, which now also gates on `game.judge`).
   const judgeCommandBar = game.judge && !me && (
     <div className="mt-2 shrink-0 border-t border-line pt-2">
+      {/* NF4: a bare command band under the rail read as more chat/history
+          chrome — nothing marked it as a distinct control that issues a live
+          command to the game. */}
+      <span className="mb-1 block text-[0.65rem] font-bold uppercase tracking-wide text-ink-muted">
+        Judge commands
+      </span>
       <CommandForm
         gameId={gameId}
         game={game}
@@ -504,7 +493,14 @@ export function GamePage() {
           F8: past ~1800px nothing keyed off the extra width — seats just grew
           wider and the rail stayed a fixed size, so it was pure gutter, not
           information. Cap + centre instead of pretending to scale further. */}
-      <div id="table-row" className="mx-auto flex w-full min-w-0 min-h-0 max-w-[1800px] flex-1 bg-base">
+      {/* NF1: bg-base lives on this full-width, uncapped wrapper so it always
+          covers the whole route — a prior version put both the cap and the
+          background on the same element, so past 1800px the side margins
+          added by centering fell back to transparent and RouteBackground's
+          photo bled through again (F1, reopened). The cap/centering below is
+          purely an inner layout concern now. */}
+      <div id="table-row" className="flex flex-1 min-h-0 min-w-0 bg-base">
+        <div className="mx-auto flex w-full max-w-[1800px] min-w-0 min-h-0 flex-1">
         <div id="table-col" className="flex flex-col flex-1 min-h-0 min-w-0 p-2" ref={boardRef}>
           {isMobile ? (
             <>
@@ -635,14 +631,12 @@ export function GamePage() {
         </div>
 
         {wideLayout && (
-          <div
-            id="talk-rail"
-            className={`flex shrink-0 flex-col min-h-0 p-2 pl-0 ${splitRail ? 'w-[40rem]' : 'w-[30rem]'}`}
-          >
+          <div id="talk-rail" className="flex w-[30rem] shrink-0 flex-col min-h-0 p-2 pl-0">
             {railContent}
             {judgeCommandBar}
           </div>
         )}
+        </div>
       </div>
 
       {!isMobile && !wideLayout && (

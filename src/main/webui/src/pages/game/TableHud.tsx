@@ -183,45 +183,51 @@ export function TableHud({
 
   return (
     <div className="sticky top-0 z-30 shrink-0 border-b border-line bg-base/95 backdrop-blur-sm">
-      {isMobile ? (
-        <div className="flex flex-col gap-1 px-3 py-1.5">
-          <div className="flex items-center justify-between gap-x-3">
-            {titleEl}
-            <span className="flex shrink-0 items-center gap-2">{metaElsMobile}</span>
+      {/* NF2: the bar itself stays full-bleed (page chrome), but its content
+          caps at the same 1800px the board below caps at — past that width an
+          edge-to-edge turn/phase readout over a centered, boxed board read as
+          two different layouts stacked on each other. */}
+      <div className="mx-auto max-w-[1800px]">
+        {isMobile ? (
+          <div className="flex flex-col gap-1 px-3 py-1.5">
+            <div className="flex items-center justify-between gap-x-3">
+              {titleEl}
+              <span className="flex shrink-0 items-center gap-2">{metaElsMobile}</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">{turnEls}</div>
           </div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">{turnEls}</div>
-        </div>
-      ) : (
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5">
-          {titleEl}
-          {turnEls}
-          <span className="ml-auto flex items-center gap-2">{metaEls}</span>
-        </div>
-      )}
+        ) : (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5">
+            {titleEl}
+            {turnEls}
+            <span className="ml-auto flex items-center gap-2">{metaEls}</span>
+          </div>
+        )}
 
-      {game.pendingAction && (
-        <PendingActionBar
-          pending={game.pendingAction}
-          viewerName={viewerName}
-          onCommand={onPendingCommand}
-          onRespond={onPendingRespond}
-        />
-      )}
+        {game.pendingAction && (
+          <PendingActionBar
+            pending={game.pendingAction}
+            viewerName={viewerName}
+            onCommand={onPendingCommand}
+            onRespond={onPendingRespond}
+          />
+        )}
 
-      {commandStatus && (
-        <div className="flex items-center gap-2 border-t border-blood/30 bg-blood/10 px-3 py-1 text-xs text-blood">
-          <span className="flex-1">{commandStatus}</span>
-          <button
-            type="button"
-            onClick={onClearStatus}
-            title="Dismiss"
-            aria-label="Dismiss message"
-            className="shrink-0 rounded p-0.5 hover:bg-blood/15"
-          >
-            <X size={12} />
-          </button>
-        </div>
-      )}
+        {commandStatus && (
+          <div className="flex items-center gap-2 border-t border-blood/30 bg-blood/10 px-3 py-1 text-xs text-blood">
+            <span className="flex-1">{commandStatus}</span>
+            <button
+              type="button"
+              onClick={onClearStatus}
+              title="Dismiss"
+              aria-label="Dismiss message"
+              className="shrink-0 rounded p-0.5 hover:bg-blood/15"
+            >
+              <X size={12} />
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
