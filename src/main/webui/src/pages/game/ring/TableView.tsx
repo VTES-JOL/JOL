@@ -1,4 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import type { MiniCardMeter } from './MiniCard';
+import { MeterToggle } from './MeterToggle';
 import { RingBoard, type RingBoardProps } from './RingBoard';
 import { RingViewport } from './RingViewport';
 import { SeatPanels } from './SeatPanels';
@@ -19,9 +21,19 @@ export interface TableViewProps extends Omit<RingBoardProps, 'size'> {
   gutter?: number;
   initialView?: ViewState;
   onViewChange?: (v: ViewState) => void;
+  /** Called when the viewer switches the card meter. Pass `meter` too to control it from outside. */
+  onMeterChange?: (m: MiniCardMeter) => void;
 }
 
-export function TableView({ layout = 'wedge', gutter = 16, initialView, onViewChange, ...board }: TableViewProps) {
+export function TableView({ layout = 'wedge', gutter = 16, initialView, onViewChange, onMeterChange, ...board }: TableViewProps) {
+  // Uncontrolled unless the parent passes `meter` (BoardView does, so the choice survives layout switches).
+  const [ownMeter, setOwnMeter] = useState<MiniCardMeter>('gauge');
+  const meter = board.meter ?? ownMeter;
+  const changeMeter = (m: MiniCardMeter) => {
+    setOwnMeter(m);
+    onMeterChange?.(m);
+  };
+  const controls = <MeterToggle value={meter} onChange={changeMeter} />;
   const { ref, w, h } = useContainerSize<HTMLDivElement>();
   const panel = useMemo(
     () => (layout === 'panels' ? computePanelLayout(board.model.seats, board.model.anchorIndex) : null),
@@ -35,10 +47,10 @@ export function TableView({ layout = 'wedge', gutter = 16, initialView, onViewCh
       const cw = panel.width * fit;
       const ch = panel.height * fit;
       content = (
-        <RingViewport width={w} height={h} contentW={cw} contentH={ch} initialView={initialView} onViewChange={onViewChange}>
+        <RingViewport width={w} height={h} contentW={cw} contentH={ch} initialView={initialView} onViewChange={onViewChange} controls={controls}>
           <div style={{ width: cw, height: ch }}>
             <div style={{ width: panel.width, height: panel.height, transform: `scale(${fit})`, transformOrigin: '0 0' }}>
-              <SeatPanels {...board} />
+              <SeatPanels {...board} meter={meter} />
             </div>
           </div>
         </RingViewport>
@@ -46,8 +58,8 @@ export function TableView({ layout = 'wedge', gutter = 16, initialView, onViewCh
     } else {
       const size = clampSize(Math.min(w, h) - gutter);
       content = (
-        <RingViewport width={w} height={h} contentW={size} contentH={size} initialView={initialView} onViewChange={onViewChange}>
-          <RingBoard {...board} size={size} />
+        <RingViewport width={w} height={h} contentW={size} contentH={size} initialView={initialView} onViewChange={onViewChange} controls={controls}>
+          <RingBoard {...board} size={size} meter={meter} />
         </RingViewport>
       );
     }

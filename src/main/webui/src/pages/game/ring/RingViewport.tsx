@@ -15,11 +15,13 @@ export interface RingViewportProps {
   contentH: number;
   children: ReactNode;
   /** Let a parent keep zoom / pan across remounts (switching layout or level). */
+  /** Extra controls shown under the zoom controls (e.g. the card-meter switch). */
+  controls?: ReactNode;
   initialView?: ViewState;
   onViewChange?: (v: ViewState) => void;
 }
 
-export function RingViewport({ width, height, contentW, contentH, children, initialView, onViewChange }: RingViewportProps) {
+export function RingViewport({ width, height, contentW, contentH, children, controls, initialView, onViewChange }: RingViewportProps) {
   const box = { viewW: width, viewH: height, contentW, contentH };
   const vp = useRingViewport(box, { initial: initialView, onChange: onViewChange });
   const { bx, by } = baseOffset(box);
@@ -44,7 +46,8 @@ export function RingViewport({ width, height, contentW, contentH, children, init
         </div>
       </div>
 
-      <div className="absolute right-2 top-2 flex items-center gap-1" onPointerDown={(e) => e.stopPropagation()}>
+      <div className="absolute right-2 top-2 flex flex-col items-end gap-1" onPointerDown={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-1">
         <button type="button" className={btn} aria-label="Zoom out" onClick={vp.zoomOut} disabled={vp.atMin}>
           <Minus size={12} />
         </button>
@@ -57,6 +60,8 @@ export function RingViewport({ width, height, contentW, contentH, children, init
         <button type="button" className={btn} onClick={vp.reset} disabled={vp.isHome}>
           Reset
         </button>
+        </div>
+        {controls}
       </div>
       <span className="pointer-events-none absolute bottom-2 left-2 text-[10px] text-ink-muted">Scroll to zoom · right-drag to pan</span>
     </div>

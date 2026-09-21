@@ -1,35 +1,23 @@
 import { describe, expect, it } from 'vitest';
-import { BASE_SLOTS, pipGrid } from './pipLayout';
+import { PIPS_PER_ROW, allyPipRows } from './pipLayout';
 
-describe('pipGrid', () => {
-  it('always shows at least five slots, in one full-size row', () => {
-    for (const n of [0, 1, 3, 5]) {
-      const g = pipGrid(n);
-      expect(g.slots).toBe(BASE_SLOTS);
-      expect(g.rows).toBe(1);
-      expect(g.size).toBeGreaterThanOrEqual(6.5);
-    }
+describe('allyPipRows', () => {
+  it('shows nothing for no counters', () => {
+    expect(allyPipRows(0).rows).toEqual([]);
   });
 
-  it('grows the slot count with the counters, never below the counters', () => {
-    for (const n of [6, 9, 15, 30]) expect(pipGrid(n).slots).toBe(n);
+  it('is exactly one pip per counter — no minimum, no empty slots', () => {
+    for (const n of [1, 2, 3, 5, 7, 10]) expect(allyPipRows(n).rows).toEqual([n]);
   });
 
-  it('only ever shrinks the pips as counters grow', () => {
-    let prev = Infinity;
-    for (let n = 0; n <= 40; n++) {
-      const s = pipGrid(n).size;
-      expect(s).toBeLessThanOrEqual(prev + 1e-9);
-      prev = s;
-    }
+  it('never loses or invents pips', () => {
+    for (let n = 0; n <= 60; n++) expect(allyPipRows(n).rows.reduce((a, b) => a + b, 0)).toBe(n);
   });
 
-  it('keeps every pip inside the box', () => {
-    for (let n = 0; n <= 40; n++) {
-      const g = pipGrid(n);
-      expect(g.cols * g.rows).toBeGreaterThanOrEqual(g.slots);
-      expect(g.cols * g.size + (g.cols - 1)).toBeLessThanOrEqual(37 + 1e-6);
-      expect(g.rows * g.size + (g.rows - 1)).toBeLessThanOrEqual(12 + 1e-6);
-    }
+  it('splits into balanced rows past the row limit, with shorter pips', () => {
+    expect(allyPipRows(PIPS_PER_ROW + 1).rows).toEqual([6, 5]);
+    expect(allyPipRows(20).rows).toEqual([10, 10]);
+    expect(allyPipRows(14).height).toBeLessThan(allyPipRows(3).height);
+    expect(allyPipRows(45).height).toBeLessThanOrEqual(allyPipRows(14).height);
   });
 });

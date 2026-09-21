@@ -1,4 +1,5 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import type { MiniCardMeter } from './MiniCard';
 import type { PlayerSnapshot } from '../../../api/types';
 import { BoardViewSwitch } from './BoardViewSwitch';
 import type { RingLayoutKind } from './boardPrefs';
@@ -57,6 +58,8 @@ export function BoardView({
   // Zoom / pan survives switching level or layout and coming back.
   const views = useRef<Record<string, ViewState | undefined>>({});
   const viewKey = bv.layout;
+  // Board-wide card meter (gauge / pips): held here so it survives layout and level switches.
+  const [meter, setMeter] = useState<MiniCardMeter>('gauge');
 
   const common = { viewerName, showHands, onCardClick, onMarkerClick, onCounter };
   // One click on a seat opens it (Triad, or Seat when there is no triad); the legend only re-focuses.
@@ -73,6 +76,8 @@ export function BoardView({
         focusName={bv.focusName}
         hub={hub}
         showNames
+        meter={meter}
+        onMeterChange={setMeter}
         onSeatClick={onSeatClick}
         onCardClick={onCardClick}
         onMarkerClick={onMarkerClick}

@@ -1,30 +1,26 @@
-// Pip grid for counters with no maximum (an ally's life). It always shows at
-// least `BASE_SLOTS` slots; beyond that the slot count follows the counters and
-// the pips just get smaller, adding rows when one row would be too tight.
-// Pure and unit-tested; MiniCard only draws what this returns.
+// Pip rows for counters with no maximum (an ally's life). An ally has no
+// capacity, so for display its capacity IS its counters: exactly one pip per
+// counter, all filled, equally sized and spanning the card's width like a
+// vampire's row. Only when there are many are they split over several rows so
+// each pip stays visible. Pure and unit-tested; MiniCard just draws the rows.
 
-export const BASE_SLOTS = 5;
+/** Most pips in one row before a second row starts. */
+export const PIPS_PER_ROW = 10;
+const ROW_HEIGHT = [8, 5, 3.5] as const;
 
-export interface PipGrid {
-  /** Slots drawn (filled + empty). */
-  slots: number;
-  cols: number;
-  rows: number;
-  /** Pip side, px. */
-  size: number;
+export interface PipRows {
+  /** Pips in each row, top to bottom; balanced so rows are near-equal. Empty for 0 counters. */
+  rows: number[];
+  /** Pip height, px — shrinks as rows are added. */
+  height: number;
 }
 
-/**
- * Choose rows / columns so pips are as large as possible inside `width` × `height`
- * (px, gap included), capped at `maxSize`.
- */
-export function pipGrid(counters: number, width = 37, height = 12, gap = 1, maxSize = 7): PipGrid {
-  const slots = Math.max(BASE_SLOTS, Math.max(0, counters));
-  let best: PipGrid = { slots, cols: slots, rows: 1, size: 1 };
-  for (let rows = 1; rows <= slots; rows++) {
-    const cols = Math.ceil(slots / rows);
-    const size = Math.min(maxSize, (width - gap * (cols - 1)) / cols, (height - gap * (rows - 1)) / rows);
-    if (size > best.size) best = { slots, cols, rows, size };
-  }
-  return { ...best, size: Math.max(1, Math.floor(best.size * 10) / 10) };
+export function allyPipRows(counters: number): PipRows {
+  const n = Math.max(0, Math.floor(counters));
+  if (n === 0) return { rows: [], height: ROW_HEIGHT[0] };
+  const rowCount = Math.ceil(n / PIPS_PER_ROW);
+  const base = Math.floor(n / rowCount);
+  const extra = n % rowCount;
+  const rows = Array.from({ length: rowCount }, (_, i) => base + (i < extra ? 1 : 0));
+  return { rows, height: ROW_HEIGHT[Math.min(rowCount, ROW_HEIGHT.length) - 1] };
 }

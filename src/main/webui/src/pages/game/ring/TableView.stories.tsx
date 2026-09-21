@@ -130,4 +130,20 @@ export const WithLegend: Story = {
   ),
 };
 
+export const SwitchCardMeter: Story = {
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    const group = within(await c.findByRole('radiogroup', { name: 'Card blood display' }));
+    const count = (m: string) => canvasElement.querySelectorAll(`[data-meter=${m}]`).length;
+    await expect(count('gauge')).toBeGreaterThan(0);
+    await expect(count('pips')).toBe(0);
+    await userEvent.click(group.getByRole('radio', { name: 'Pips' }));
+    await waitFor(() => expect(count('gauge')).toBe(0));
+    await expect(count('pips')).toBeGreaterThan(0);
+    await userEvent.click(group.getByRole('radio', { name: 'Gauge' }));
+    await waitFor(() => expect(count('pips')).toBe(0));
+  },
+};
+export const SwitchCardMeterPanels: Story = { ...SwitchCardMeter, args: { layout: 'panels' } };
+
 export const Judge: Story = { args: { model: buildRingModel(players, seating), viewerName: null } };

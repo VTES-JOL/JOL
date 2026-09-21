@@ -1,7 +1,7 @@
 import { memo, type CSSProperties } from 'react';
 import { bloodFraction, cardLabel, type AttachmentKind, type CardView } from './cardView';
 import { MINI_CARD_H, MINI_CARD_W } from './miniCardFootprint';
-import { pipGrid } from './pipLayout';
+import { allyPipRows } from './pipLayout';
 
 // The overview-level card glyph used by the Wedge and Panels layouts: a 46×64
 // playing-card box a player can read at a glance. It draws ONLY its own box —
@@ -77,24 +77,22 @@ function Body({ view, meter }: { view: CardView; meter: MiniCardMeter }) {
     );
   }
   if (view.kind === 'ally') {
-    // Life has no maximum, so an unfilled slot is NOT outlined (an outline would read as a limit):
-    // green pips (min 5 slots, faint when unused), shrinking as the count grows, plus the number.
-    const g = pipGrid(view.counters);
+    // An ally has no capacity, so for display its capacity is its counters: one green pip
+    // per counter, all filled, equally sized like a vampire's row (never an empty slot).
+    const { rows, height } = allyPipRows(view.counters);
     return (
       <>
-        <span
-          className="grid"
-          style={{ gridTemplateColumns: `repeat(${g.cols}, ${g.size}px)`, gap: 1, justifyContent: 'center' }}
-          aria-hidden
-        >
-          {Array.from({ length: g.slots }, (_, i) => (
-            <i
-              key={i}
-              className={`block ${i < view.counters ? 'bg-green-500' : 'bg-green-500/15'}`}
-              style={{ width: g.size, height: g.size, borderRadius: g.size > 3 ? 1.5 : 0.5 }}
-            />
-          ))}
-        </span>
+        {rows.length > 0 && (
+          <span className="flex w-full flex-col gap-px" aria-hidden>
+            {rows.map((n, r) => (
+              <span key={r} className="flex w-full gap-px">
+                {Array.from({ length: n }, (_, i) => (
+                  <i key={i} className="block flex-1 bg-green-500" style={{ height }} />
+                ))}
+              </span>
+            ))}
+          </span>
+        )}
         <span className="font-mono text-[8.5px] font-bold leading-none text-ink">{view.counters}</span>
       </>
     );
@@ -150,11 +148,11 @@ export const MiniCard = memo(function MiniCard({ view, seatColor, meter = 'gauge
   );
 
   return onClick ? (
-    <button type="button" aria-label={label} title={label} className={cls} style={style} onClick={() => onClick(view)}>
+    <button type="button" aria-label={label} title={label} className={cls} style={style} data-meter={view.kind === 'vampire' ? meter : undefined} onClick={() => onClick(view)}>
       {content}
     </button>
   ) : (
-    <div role="img" aria-label={label} title={label} className={cls} style={style}>
+    <div role="img" aria-label={label} title={label} className={cls} style={style} data-meter={view.kind === 'vampire' ? meter : undefined}>
       {content}
     </div>
   );

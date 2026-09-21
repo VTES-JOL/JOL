@@ -103,6 +103,19 @@ export const ClickASeatToOpenIt: Story = {
   },
 };
 
+export const MeterSurvivesLayoutSwitch: Story = {
+  args: { profileLayout: 'wedge' },
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    await userEvent.click(within(await c.findByRole('radiogroup', { name: 'Card blood display' })).getByRole('radio', { name: 'Pips' }));
+    const layout = within(c.getByRole('radiogroup', { name: 'Table layout' }));
+    await userEvent.click(layout.getByRole('radio', { name: 'Panels' }));
+    await waitFor(() => expect(c.getByTestId('seat-panels')).toBeInTheDocument());
+    await expect(canvasElement.querySelectorAll('[data-meter=pips]').length).toBeGreaterThan(0);
+    await expect(canvasElement.querySelectorAll('[data-meter=gauge]').length).toBe(0);
+  },
+};
+
 export const CardClickBubblesUp: Story = {
   args: { defaultLevel: 'seat', onCardClick: fn(), onCounter: fn() },
   play: async ({ canvasElement, args }) => {
