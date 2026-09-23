@@ -273,6 +273,19 @@ class JolGameTest {
     }
 
     @Test
+    void startGameRejectsUnplayableDeck() {
+        JolGame newGame = new JolGame("new-game", new GameData("new-game"));
+        newGame.addPlayer("Player1", deck1.getDeck());
+        // Player2 was seated with a deck that failed to load - empty crypt and library.
+        newGame.addPlayer("Player2", new net.deckserver.storage.json.deck.Deck());
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> newGame.startGame(List.of("Player1", "Player2")));
+        assertThat(ex.getMessage(), containsString("Player2"));
+        // Nothing was dealt - the game did not partially start.
+        assertThat(newGame.data().getPlayerRegion("Player1", RegionType.HAND).getCards(), is(empty()));
+    }
+
+    @Test
     void initGame() {
     }
 

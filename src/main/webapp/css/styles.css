@@ -1221,3 +1221,118 @@ a.card-name {
     content: "Sabbat";
 }
 
+
+/* ============================================================
+   Past Games tab (Watch page)
+   ============================================================ */
+#pastGamesPane { padding: 0; }
+
+.pg-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+    padding: .5rem .75rem;
+    background: var(--bs-body-bg);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+.pg-toolbar__search { width: auto; flex: 1 1 240px; max-width: 340px; }
+.pg-toolbar__sort { width: auto; flex: 0 0 auto; }
+.pg-toolbar__count {
+    margin-left: auto;
+    font-size: .8rem;
+    color: var(--bs-secondary-color);
+    white-space: nowrap;
+}
+
+.pg-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: .75rem;
+    padding: .75rem;
+    align-items: start;
+}
+
+.pg-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--bs-border-color);
+    border-radius: .5rem;
+    overflow: hidden;
+    background: var(--bs-body-bg);
+}
+.pg-card__head {
+    padding: .5rem .7rem;
+    background: var(--bs-tertiary-bg);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+.pg-card__title { font-weight: 600; font-size: .9rem; line-height: 1.25; }
+.pg-card__sub { font-weight: 400; color: var(--bs-secondary-color); }
+.pg-card__badge {
+    flex: 0 0 auto;
+    font-weight: 600;
+    font-size: .65rem;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+}
+.pg-card__meta { margin-top: .15rem; font-size: .74rem; color: var(--bs-secondary-color); }
+
+.pg-players { display: flex; flex-direction: column; }
+.pg-player {
+    display: grid;
+    grid-template-columns: 1.4rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .5rem;
+    padding: .3rem .7rem;
+    font-size: .8rem;
+}
+.pg-player + .pg-player { border-top: 1px solid var(--bs-border-color); }
+.pg-player__rank {
+    color: var(--bs-secondary-color);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+.pg-player__rank--win { color: var(--bs-warning-text-emphasis); font-size: .95rem; }
+.pg-player--winner { background: var(--bs-warning-bg-subtle); }
+.pg-player--winner .pg-player__name { color: var(--bs-warning-text-emphasis); }
+.pg-player--zero { color: var(--bs-secondary-color); }
+.pg-player__main { min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
+.pg-player__name {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pg-player--zero .pg-player__name { font-weight: 500; }
+.pg-player__deck {
+    font-size: .72rem;
+    color: var(--bs-secondary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pg-player__deck--empty { font-style: italic; opacity: .7; }
+.pg-player__score {
+    white-space: nowrap;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+.pg-vp { font-weight: 600; }
+.pg-gw {
+    margin-left: .3rem;
+    padding: .05rem .32rem;
+    border-radius: .25rem;
+    font-size: .68rem;
+    font-weight: 700;
+    background: var(--bs-warning);
+    color: #000;
+}
+.pg-player__none { color: var(--bs-secondary-color); }
+
+@media (max-width: 575.98px) {
+    .pg-list { grid-template-columns: 1fr; }
+}
+.pg-list__empty { grid-column: 1 / -1; }

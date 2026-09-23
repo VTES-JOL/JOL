@@ -65,6 +65,18 @@ public class GameCleanUp implements Runnable {
             RegistrationService.removePlayer(registration.getRowKey(), registration.getColumnKey());
         });
 
+        // Retry auto-start for lobby games that have a full roster but never became ACTIVE
+        // (e.g. their initial auto-start hit a transient error). No-op unless the game can now start.
+        GameService.getGameNames().stream()
+                .map(GameService::get)
+                .filter(GameService.STARTING_GAME)
+                .map(GameInfo::getName)
+                .forEach(gameName -> {
+                    if (JolAdmin.attemptAutoStart(gameName)) {
+                        logger.info("Auto-start retry succeeded for lobby game {}", gameName);
+                    }
+                });
+
         // Remove public lobby games that have been idle for too long (deck registration extends the window)
         OffsetDateTime staleCutoff = OffsetDateTime.now().minusDays(STALE_LOBBY_DAYS);
         List<GameInfo> staleLobbyGames = GameService.getGameNames().stream()

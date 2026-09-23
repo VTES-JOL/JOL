@@ -265,7 +265,7 @@ public class TournamentService extends PersistedService {
             for (CSVRecord record : parser) {
                 int round = parseIntColumn(record, "Round");
                 int table = parseIntColumn(record, "Table");
-                String playerName = record.get("Player");
+                String playerName = PlayerService.canonicalize(record.get("Player"));
                 if (playerName == null || playerName.isEmpty()) continue;
 
                 TournamentPlayer tp = new TournamentPlayer();
@@ -568,7 +568,7 @@ public class TournamentService extends PersistedService {
                             record.getRecordNumber(), csvRound, csvTable, round, table));
                 }
 
-                String playerName = record.get("Player");
+                String playerName = PlayerService.canonicalize(record.get("Player"));
                 if (playerName == null || playerName.isEmpty()) continue;
 
                 TournamentPlayer tp = new TournamentPlayer();
