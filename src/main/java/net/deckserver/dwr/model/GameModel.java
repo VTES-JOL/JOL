@@ -53,14 +53,19 @@ public class GameModel implements Comparable<GameModel> {
         }
         JolGame game = GameService.getGameByName(name);
         StringBuilder status = new StringBuilder();
+        boolean didPing = false;
         if (player != null) {
             boolean stateChanged = false;
             boolean phaseChanged = false;
             boolean chatChanged = false;
             boolean turnChanged = false;
             if (ping != null) {
+                didPing = true;
                 boolean pingSuccessful = JolAdmin.pingPlayer(ping, name);
-                if (!pingSuccessful) {
+                if (pingSuccessful) {
+                    COMMANDS.info("[{}] {}", player, "ping " + ping);
+                } else {
+                    COMMANDS.error("[{}] {}", player, "ping " + ping);
                     status.append("Player is already pinged");
                 }
             }
@@ -95,8 +100,12 @@ public class GameModel implements Comparable<GameModel> {
                     stateChanged = true;
                 }
                 OffsetDateTime timestamp = OffsetDateTime.now();
-                METRICS.info(new ObjectArrayMessage(timestamp.getYear(), timestamp.getMonthValue(), timestamp.getDayOfMonth(), timestamp.getHour(), player, game.getName(), didCommand, didChat));
+                METRICS.info(new ObjectArrayMessage(timestamp.getYear(), timestamp.getMonthValue(), timestamp.getDayOfMonth(), timestamp.getHour(), player, game.getName(), didCommand, didChat, didPing));
                 JolAdmin.clearPing(player, name);
+                COMMANDS.info("[{}] {}", player, "clear Ping");
+            } else if(didPing) {
+                OffsetDateTime timestamp = OffsetDateTime.now();
+                METRICS.info(new ObjectArrayMessage(timestamp.getYear(), timestamp.getMonthValue(), timestamp.getDayOfMonth(), timestamp.getHour(), player, game.getName(), false, false, didPing));
             }
             if (stateChanged || phaseChanged || chatChanged) {
                 JolAdmin.saveGameState(game);
