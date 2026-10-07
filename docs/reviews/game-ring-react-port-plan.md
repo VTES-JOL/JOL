@@ -252,3 +252,199 @@ utilities layer is not applied (`@import must precede...` warning in `styles/tai
 so anything a play test must measure (container sizes) uses inline styles, not utility classes.
 Utility classes also failed to appear in the dev server for a freshly added class until a restart,
 so story frames use inline styles.
+
+## 11. Phase 5 — desktop conversion (partial)
+
+Scoped down from the full phase-5 description: **judge / spectator opponents view only**,
+wide layout only. A seated player's own board still uses the existing grid + dock —
+see below for why, and what full seated integration would need.
+
+Done:
+- **Backend preference**: `V24__player_board_prefs.sql` (nullable `board_style`,
+  `ring_layout` on `player`), `PlayerInfo`/`PlayerEntity`/`PlayerService`/`JolAdmin`,
+  `NavBean` + `ProfileBean` fields, `PUT /jol/api/profile/board-view` (returns the
+  updated `ProfileBean`, not 204 — see the bug note below).
+- **Preferences UI**: a switch + ring-layout select in `pages/profile/Preferences.tsx`.
+- **`GamePage.tsx`**: for `!me` (judge/spectator) at `wideLayout`, `#opponents` renders
+  `BoardView` instead of `SeatGrid` when the resolved style is `'ring'`
+  (`ring/useBoardStyle.ts`: session toggle > profile preference > `'grid'` default,
+  same precedence model as the layout toggle). A small button switches board style
+  for that visit only, next to `#opponents`.
+- Verified live against a real Postgres-backed `quarkus:dev` instance (not just
+  Storybook): logged in, toggled the Preferences switch and select, confirmed the
+  round trip via `GET /profile` after each change, confirmed 400 validation for a
+  bad value. Found and fixed a real bug this way (see below) that no amount of
+  Storybook or unit testing would have caught, since it only shows up against the
+  real endpoint contract.
+
+**Bug found and fixed during live verification**: `setBoardView` initially returned
+`Response.noContent()` (204, mirroring `setTheme`), but `Preferences.tsx` reads the
+updated `Profile` bean from the response to update the on-page switch — a 204 body
+parses as `undefined`, and `queryClient.setQueryData(key, undefined)` is a documented
+no-op in TanStack Query, so the switch silently stopped reflecting its own saves (the
+POST succeeded server-side the whole time). `setTheme` gets away with 204 because its
+only caller never reads the `profile` cache. Fixed by returning `ProfileBean` directly,
+matching `setPreferences`/`setEdgeColor` — the pattern to follow for any endpoint whose
+result needs to redraw the page that called it, not `setTheme`'s.
+
+**Not done — deferred, not silently dropped:**
+1. **Seated players.** The ring's "you at the bottom" framing needs your own seat
+   included in the model (`buildRingModel` computes prey/predator relative to it),
+   so it can't cleanly slot into a `SeatGrid`-only replacement for a seated player —
+   it would need to replace the opponents pane AND the board half of `dockGrid`'s
+   left column, keeping only the hand + command band in the dock. That's a real
+   restructure of `GamePage`'s most complex layout region, not done here.
+2. **Card / marker clicks.** The existing grid's click-to-act menu is itself gated
+   on `isSeatedPlayer` (`Region.tsx`'s `clickMode`) — a non-seated judge already gets
+   **no** click-to-act menu on the classic grid today (judges act via the free-text
+   command form in the rail instead). The ring matches that today: clicking a card
+   or marker does nothing for `!me`; clicking a seat still switches Table/Triad/Seat
+   level, a ring-only addition with no grid equivalent. Wiring real card actions
+   (`coordinate` must be the card's index in the *original* `RegionSnapshot.cards`
+   array — `ringModel`'s READY sort must not shift it) becomes relevant once seated
+   integration happens, not before.
+3. **Mobile.** `SeatPager` is untouched.
+4. **RESEARCH region / archival piles.** The ring only models READY/TORPOR/
+   UNCONTROLLED (matching the plan); `PlayerBoard`'s RESEARCH region and its
+   `PilesFooter` (ash heap/library/crypt/RFG/hand counts) have no ring equivalent yet.
+
+## 12. Player-conversion scaffolding (data model + click plumbing — no GamePage change)
+
+Completed ahead of the actual seated-player GamePage restructure (§11 item 1, still
+not started — that one needs a product decision on YourSeatDock's shape first).
+Everything below is additions under `game/ring/`; nothing outside it changed.
+
+- **Coordinate correctness** (`cardView.ts`, `ringModel.ts`): every `CardView` /
+  `MarkerView` now carries `coordinate` — its 1-based index in the *original*
+  `RegionSnapshot.cards` array, assigned before `ringModel`'s READY kind-sort
+  (vampire → ally → location) can reorder the display. A command built from a
+  resorted position would silently target the wrong card the first time a READY
+  region mixes kinds; `ringModel.test.ts`'s `coordinate` suite constructs a
+  region where the sort actually moves a card and asserts the coordinate stays
+  put. This was a real, previously-unnoticed bug risk, not speculative.
+- **Click anchor plumbing** (`clickAnchor.ts`, new): a popover needs a screen
+  position, real clicks report one, keyboard activation doesn't (`detail: 0`) —
+  falls back to the element's own centre, the same fallback `MinionTile`'s
+  keyboard path already uses. `MiniCard`, `UncontrolledMarker`, `DetailCard`
+  all now call `onClick(view, anchor)` / `onClick(marker, anchor)`; `RingSeat`,
+  `SeatPanels`, `SeatDetail` propagate it; `RingBoard`, `TableView`, `BoardView`
+  widen `onCardClick`/`onMarkerClick` to carry it through. `onSeatClick` and
+  `onCounter` are unaffected — a seat click never needed a popover position,
+  and the counter stepper isn't one.
+- **RESEARCH region** (`ringModel.ts`): `RingSeatModel.research: CardView[]`,
+  usually empty. Rendered at Triad/Seat (`SeatDetail`) using the same
+  `DetailCard` as READY/TORPOR; **not yet laid out inside the wedge/panel** —
+  doing that needs packer/panel-layout changes (a third bucket alongside ready
+  and the rim), not just component wiring, and research is rare enough that
+  Triad/Seat coverage handles it for now. Flagged, not silently dropped.
+- **Archival piles** (`ringModel.ts`, `detail/PileSummary.tsx`): `RingSeatModel.piles`
+  (ash heap / library / crypt / removed-from-game counts — hand is already
+  `handCount`). `PileSummary` is the ring's read-only counterpart to
+  `PilesFooter`: count chips only, shown at Triad/Seat, **no expand-to-cards**
+  interaction (that stays a classic-board affordance; opening a pile's actual
+  contents from the ring is a follow-up, not scaffolding). Renders nothing when
+  every pile is empty, same restrained "footer" role `PilesFooter` itself has.
+- **Counter bump**: already fully wired end to end since phase 4b
+  (`BoardView` → `SeatDetail` → `DetailCard`'s −/+ buttons) — nothing to add.
+- **Deliberately not built this pass** (still open, listed for when GamePage
+  wiring actually starts): an inline lock/unlock quick-action on `MiniCard`
+  (today only reachable via the eventual `CardContextMenu`, which itself isn't
+  wired to `GamePage` yet either); laying RESEARCH out inside the wedge/panel;
+  `influencePriority`'s region-reorder-to-top behaviour has no ring analogue.
+
+Verified: `tsc --noEmit` clean, `oxlint` clean (only the pre-existing ref-during-
+render warnings), all 564 frontend tests pass (169 under `game/ring`), and the
+research/pile rendering checked visually in Storybook (`BoardLevels — Player —
+Seat`, dark theme).
+
+## 13. Seated-player restructure (§11 item 1 — done)
+
+Adopted the prototype's own answer (`Main.dc.html`'s dock), not a fresh design: a
+single full-width strip along the foot of the column — identity, Pool/VP, a
+horizontal hand strip, and the command band in one row — replacing YourSeatDock's
+board *and* HandDock entirely. Your own board is never shown twice: at Table level
+you're a wedge/panel like everyone else (BoardView takes the full roster, not just
+`others`); at Triad/Seat level, `SeatDetail` shows it in full.
+
+**Responsive fallback** (the piece the prototype's single 1920px mock didn't cover):
+at the `midWide` band (1024–1399px) the strip's `compact` prop switches it from
+`flex-nowrap` to `flex-wrap` — the row becomes two or three as needed, nothing is
+cut or hidden. Checked in Storybook at 560px: identity+stats, hand, and commands
+each keep their own line, all still visible. No new breakpoint constant added —
+reuses the `midWide` boolean `GamePage` already computes.
+
+**New**: `PlayerDock.tsx` (the strip — built from existing pieces: `HandStrip`,
+`DockCommandStack` variant="dock", no new hand/command components).
+
+**`GamePage.tsx` changes** (seated, `wideLayout`, `boardStyle === 'ring'` only —
+`boardStyle === 'grid'` stays pixel-identical to before):
+- `BoardView` replaces the opponents grid AND YourSeatDock's board; `PlayerDock`
+  replaces the rest of `dockGrid`. No resizable split in ring mode (`PlayerDock` is
+  fixed-content, not a second scroller).
+- Real click-to-act wiring, not skipped this time (judges/spectators still get
+  none, matching Region.tsx's own `isSeatedPlayer` gate — see phase-11 note): ring
+  card/marker clicks build a `TableCardContext` from `CardView.region` +
+  `.coordinate` and call the *same* `handleTableCardClick` / `counterBump` the
+  classic grid uses — same `CardContextMenu`, same command builders, nothing
+  duplicated. One real nuance caught while wiring this: RESEARCH's `clickMode` in
+  `Region.tsx` is `'play'`, not `'action'` — and only on your own seat (an
+  opponent's/neighbour's RESEARCH isn't actionable at all in the classic grid
+  either). `onRingCardClick` branches on `view.region === 'RESEARCH'` to route to
+  `handlePlayCardClick` instead, and no-ops for anyone else's research — this
+  would have been a silent behavioural bug (wrong modal, or a menu appearing where
+  the classic grid shows none) if ported over uniformly.
+- A per-game "Switch to classic/ring board" toggle sits above the opponents pane,
+  now for seated players too, same as the judge/spectator one already had.
+
+**Verification:** `tsc --noEmit` clean, `oxlint` clean, all 570 frontend tests pass
+(no test file broke from the `CardView.region` / `MarkerView.source` additions
+beyond one story fixture). `PlayerDock` checked visually in Storybook, both wide
+and the 560px compact wrap. **Not checked live in the real app** — the dev
+Postgres has no active game (devseed only seeds players, not games/decks) and
+starting one to check this specifically was judged not worth the detour given
+`tsc`'s prop-level checking against the real component signatures already covers
+the main new risk (wiring, not visuals — those were already proven in Storybook
+component-by-component). Flagging this the same way the judge/spectator pass did.
+
+**Deliberately not done, staying in scope with what was asked:**
+- Judge's own dock (`judgeCommandBar`, in the talk rail) — untouched; the
+  prototype's judge-mode bottom strip was not built.
+- Laying RESEARCH out inside the wedge/panel (still Triad/Seat only, per §12).
+- `influencePriority` (float UNCONTROLLED to the top on your Influence-phase
+  turn) — `ringModel` still doesn't reorder regions; lost when `YourSeatDock`
+  (which supported it) is replaced by the ring in ring mode.
+
+## 14. Live verification (§13's "not checked live" — now done)
+
+Got a real 2-player Standard game running (`quarkus:dev`, real Postgres, not
+Storybook) and drove it as a seated player, logged in as Player1:
+
+- **Table level, Wedge and Panels**: both render correctly for a live 2-player
+  game — Panels by default (the ring's own container was narrower than 1024px
+  even though the browser window was wide, confirming layout resolution is
+  correctly container-width-based, not a `window` media query), Wedge after
+  toggling (a 2-seat ring is a half-circle, predator right / prey left, as
+  designed).
+- **Table → Seat**: real pool/VP/hand counts, a real "Nothing in play" READY
+  section, five real uncontrolled crypt vampires with correct blood/capacity,
+  and a real pile summary (`ASH 0 · LIBRARY 83 · CRYPT 7 · RFG 0`) — all pulled
+  from the actual game state, not a fixture.
+- **Click-to-act, for real**: clicked an uncontrolled marker at both Table and
+  Seat level — both opened the real `CardContextMenu` with the right card
+  identity and the real blood-counter/turn-face-down/burn/remove-from-game
+  actions. Used the menu's own stepper to add a blood counter; the chat log
+  confirmed the server's own account of what happened: *"Player1 adds 1 blood
+  to card #5 in their uncontrolled region"* — **card #5**, matching this
+  card's real position in the original UNCONTROLLED array, not a display
+  position. This is the coordinate-correctness fix from §12 confirmed against
+  the real engine, not just a unit test.
+- **The board-style toggle**: switched to the classic grid (full `PlayerBoard`
+  + `HandDock`, real card art, untouched) and back to the ring — state (the
+  blood counter just added) was intact across the switch both ways.
+- **`PlayerDock`**: real hand cards, real Pool/VP, real prey/predator names,
+  Quick Actions and the command input all present and consistent with the
+  classic dock's own data.
+
+No bugs found in this pass — the coordinate/region work from §12 held up
+against the real engine on the first try. Left the game running in the dev
+Postgres (throwaway, wiped on next `quarkus:dev` restart); no cleanup done.
